@@ -410,26 +410,27 @@ func TestSession_FetchUser(t *testing.T) {
 			}
 
 			user, err := session.FetchUser(context.Background())
-			if tt.want.err != nil && !tt.want.err(err) {
-				a.Fail("invalid error", err)
+			if tt.want.err != nil {
+				a.True(tt.want.err(err), "invalid err")
+				return
 			}
-			if tt.want.err == nil {
-				a.NoError(err)
-				a.Equal(tt.want.user, user)
-				a.Equal(tt.want.id, user.GetID())
-				a.Equal(tt.want.firstName, user.GetFirstName())
-				a.Equal(tt.want.lastName, user.GetLastName())
-				a.Equal(tt.want.displayName, user.GetDisplayName())
-				a.Equal(tt.want.nickName, user.GetNickname())
-				a.Equal(tt.want.preferredUsername, user.GetPreferredUsername())
-				a.Equal(domain.EmailAddress(tt.want.email), user.GetEmail())
-				a.Equal(tt.want.isEmailVerified, user.IsEmailVerified())
-				a.Equal(domain.PhoneNumber(tt.want.phone), user.GetPhone())
-				a.Equal(tt.want.isPhoneVerified, user.IsPhoneVerified())
-				a.Equal(tt.want.preferredLanguage, user.GetPreferredLanguage())
-				a.Equal(tt.want.avatarURL, user.GetAvatarURL())
-				a.Equal(tt.want.profile, user.GetProfile())
-			}
+
+			a.NoError(err)
+			a.Equal(tt.want.user, user)
+			a.Equal(tt.want.id, user.GetID())
+			a.Equal(tt.want.firstName, user.GetFirstName())
+			a.Equal(tt.want.lastName, user.GetLastName())
+			a.Equal(tt.want.displayName, user.GetDisplayName())
+			a.Equal(tt.want.nickName, user.GetNickname())
+			a.Equal(tt.want.preferredUsername, user.GetPreferredUsername())
+			a.Equal(domain.EmailAddress(tt.want.email), user.GetEmail())
+			a.Equal(tt.want.isEmailVerified, user.IsEmailVerified())
+			a.Equal(domain.PhoneNumber(tt.want.phone), user.GetPhone())
+			a.Equal(tt.want.isPhoneVerified, user.IsPhoneVerified())
+			a.Equal(tt.want.preferredLanguage, user.GetPreferredLanguage())
+			a.Equal(tt.want.avatarURL, user.GetAvatarURL())
+			a.Equal(tt.want.profile, user.GetProfile())
+
 		})
 	}
 }

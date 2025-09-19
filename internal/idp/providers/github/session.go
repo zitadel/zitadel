@@ -49,7 +49,10 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 		return nil, err
 	}
 	if user.GetEmail() == "" {
-		userInternal := user.(*User)
+		userInternal, ok := user.(*User)
+		if !ok {
+			return user, nil
+		}
 		for _, scope := range s.Provider.Provider.OAuthConfig().Scopes {
 			if strings.TrimSpace(scope) == "user:email" {
 				email, err := s.getPrivateMail()
