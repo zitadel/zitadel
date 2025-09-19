@@ -5,9 +5,9 @@ A Next.js application that provides interactive API documentation for ZITADEL se
 ## Features
 
 - **Interactive API Documentation**: Browse and test ZITADEL APIs directly in the browser
-- **Version Management**: Switch between different API versions with a dropdown selector
+- **Version Management**: Simple manual configuration of available API versions
 - **Service Selection**: Easy navigation between different ZITADEL services (admin, auth, management, etc.)
-- **Auto-generated**: Documentation is automatically generated from proto files
+- **Manual Version Control**: Define exactly which versions to show in `versions.config.simple.json`
 - **Modern UI**: Clean, responsive interface powered by Scalar
 - **Versioned Artifacts**: Organized storage of API specifications by version
 
@@ -26,15 +26,15 @@ A Next.js application that provides interactive API documentation for ZITADEL se
 pnpm install
 ```
 
-2. Generate OpenAPI specifications from proto files:
+2. Generate OpenAPI specifications from proto files (current branch only):
 
 ```bash
 pnpm run generate
 ```
 
 This command will:
-- Generate OpenAPI 3.x specifications from proto files
-- Auto-generate `versions.config.json` with available versions from git tags and existing artifacts
+
+- Generate OpenAPI 3.x specifications from proto files for the current branch
 
 3. Start the development server:
 
@@ -47,27 +47,53 @@ pnpm run dev
 ## Scripts
 
 ### Core Scripts
+
 - `pnpm run dev` - Start development server
 - `pnpm run build` - Build for production (includes generating OpenAPI specs)
 - `pnpm run start` - Start production server
-- `pnpm run generate` - Generate OpenAPI specifications from proto files AND auto-generate versions config
+- `pnpm run generate` - Generate OpenAPI specifications from proto files (current branch only)
 - `pnpm run lint` - Run ESLint
 
 ### Generation Scripts
-- `pnpm run generate:openapi` - Generate only OpenAPI specifications from proto files
-- `pnpm run generate:versions` - Generate/update versions.config.json based on available versions and git tags
 
-### Version Management Scripts
-- `pnpm run versions:create <version>` - Create a new version snapshot from current artifacts
-- `pnpm run versions:list` - List all available versions
-- `pnpm run versions:current` - Show current version info
-- `pnpm run organize` - Organize current artifacts into version-specific folders
+- `pnpm run generate:openapi` - Generate only OpenAPI specifications from proto files
+- `pnpm run versions:create` - Generate OpenAPI spec for current branch and save to artifacts
+
+### Version Management
+
+Versions are manually configured in `versions.config.simple.json`. Simply edit this file to define which versions should be available in the dropdown.
+
+Example `versions.config.simple.json`:
+
+```json
+{
+  "versions": [
+    {
+      "id": "main",
+      "name": "Latest (Main)",
+      "gitRef": "main",
+      "enabled": true,
+      "isStable": false
+    },
+    {
+      "id": "v4.2.2",
+      "name": "v4.2.2",
+      "gitRef": "v4.2.2",
+      "enabled": true,
+      "isStable": true
+    }
+  ],
+  "settings": {
+    "defaultVersion": "v4.2.2"
+  }
+}
+```
 
 ## How it works
 
 1. **Proto Generation**: The app uses the same `plugin-download.sh` script as the main docs to download the `protoc-gen-connect-openapi` plugin
 2. **OpenAPI Generation**: `buf generate` is used to convert proto files to OpenAPI 3.x specifications
-3. **Version Management**: `versions.config.json` is auto-generated from git tags and existing artifacts
+3. **Version Management**: Versions are manually defined in `versions.config.simple.json`
 4. **API Serving**: Next.js API routes serve the generated OpenAPI specs with version support
 5. **Rendering**: Scalar API Reference renders the interactive documentation with version switching
 
@@ -76,11 +102,13 @@ pnpm run dev
 The application supports multiple API versions through an automated system:
 
 ### Automatic Version Detection
+
 - Git tags matching semantic versioning (e.g., `v4.2.2`, `v4.2.1`) are automatically detected
 - The `pnpm run generate:versions` script scans git tags and existing artifacts to create `versions.config.json`
 - Available versions are determined by the presence of artifacts in `.artifacts/versions/`
 
 ### Current Workflow
+
 ```bash
 # Generate everything (OpenAPI specs + versions config)
 pnpm run generate
@@ -95,6 +123,7 @@ pnpm run versions:create v4.2.0
 ```
 
 ### Version Structure
+
 ```
 .artifacts/
 ├── openapi3/           # Current/latest artifacts
