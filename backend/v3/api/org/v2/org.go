@@ -53,7 +53,7 @@ func UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org
 
 	batchCmd := domain.BatchCommands(orgUpdtCmd, domainAddCmd, domainSetPrimaryCmd, domainRemoveCmd)
 
-	err := domain.Invoke(ctx, batchCmd, domain.WithOrganizationRepo(repository.OrganizationRepository(nil)))
+	err := domain.Invoke(ctx, batchCmd, domain.WithOrganizationRepo(repository.OrganizationRepository))
 	if err != nil {
 		return nil, err
 	}

@@ -4,13 +4,14 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/eventstore"
 	legacy_es "github.com/zitadel/zitadel/internal/eventstore"
 )
 
 type InvokeOpt func(*CommandOpts)
 
-func WithOrganizationRepo(repo OrganizationRepository) InvokeOpt {
+func WithOrganizationRepo(repo func(client database.QueryExecutor) OrganizationRepository) InvokeOpt {
 	return func(opts *CommandOpts) {
 		opts.organizationRepo = repo
 	}
@@ -29,9 +30,8 @@ func Invoke(ctx context.Context, cmd Commander, opts ...InvokeOpt) error {
 		),
 	)
 	commandOpts := &CommandOpts{
-		Invoker:          invoker.collector,
-		DB:               pool,
-		organizationRepo: nil,
+		Invoker: invoker.collector,
+		DB:      pool,
 	}
 	for _, opt := range opts {
 		opt(commandOpts)
