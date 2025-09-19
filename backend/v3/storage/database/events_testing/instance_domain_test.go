@@ -21,8 +21,8 @@ import (
 func TestServer_TestInstanceDomainReduces(t *testing.T) {
 	instance := integration.NewInstance(CTX)
 
-	instanceRepo := repository.InstanceRepository(pool)
-	instanceDomainRepo := instanceRepo.Domains(true)
+	instanceRepo := repository.InstanceRepository()
+	instanceDomainRepo := repository.InstanceDomainRepository()
 
 	t.Cleanup(func() {
 		_, err := instance.Client.InstanceV2Beta.DeleteInstance(CTX, &v2beta.DeleteInstanceRequest{
@@ -36,7 +36,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 	// Wait for instance to be created
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-		_, err := instanceRepo.Get(CTX,
+		_, err := instanceRepo.Get(CTX, pool,
 			database.WithCondition(instanceRepo.IDCondition(instance.ID())),
 		)
 		assert.NoError(t, err)
@@ -66,7 +66,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 		// Test that domain add reduces
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			domain, err := instanceDomainRepo.Get(CTX,
+			domain, err := instanceDomainRepo.Get(CTX, pool,
 				database.WithCondition(
 					database.And(
 						instanceDomainRepo.InstanceIDCondition(instance.Instance.Id),
@@ -96,7 +96,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 
 		t.Cleanup(func() {
 			// first we change the primary domain to something else
-			domain, err := instanceDomainRepo.Get(CTX,
+			domain, err := instanceDomainRepo.Get(CTX, pool,
 				database.WithCondition(
 					database.And(
 						instanceDomainRepo.InstanceIDCondition(instance.Instance.Id),
@@ -125,7 +125,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 		// Wait for domain to be created
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			domain, err := instanceDomainRepo.Get(CTX,
+			domain, err := instanceDomainRepo.Get(CTX, pool,
 				database.WithCondition(
 					database.And(
 						instanceDomainRepo.InstanceIDCondition(instance.Instance.Id),
@@ -151,7 +151,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 		// Test that set primary reduces
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			domain, err := instanceDomainRepo.Get(CTX,
+			domain, err := instanceDomainRepo.Get(CTX, pool,
 				database.WithCondition(
 					database.And(
 						instanceDomainRepo.InstanceIDCondition(instance.Instance.Id),
@@ -180,7 +180,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 		// Wait for domain to be created and verify it exists
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			_, err := instanceDomainRepo.Get(CTX,
+			_, err := instanceDomainRepo.Get(CTX, pool,
 				database.WithCondition(
 					database.And(
 						instanceDomainRepo.InstanceIDCondition(instance.Instance.Id),
@@ -202,7 +202,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 		// Test that domain remove reduces
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			domain, err := instanceDomainRepo.Get(CTX,
+			domain, err := instanceDomainRepo.Get(CTX, pool,
 				database.WithCondition(
 					database.And(
 						instanceDomainRepo.InstanceIDCondition(instance.Instance.Id),
@@ -241,7 +241,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 		// Test that domain add reduces
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			domain, err := instanceDomainRepo.Get(CTX,
+			domain, err := instanceDomainRepo.Get(CTX, pool,
 				database.WithCondition(
 					database.And(
 						instanceDomainRepo.InstanceIDCondition(instance.Instance.Id),
@@ -271,7 +271,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 		// Wait for domain to be created and verify it exists
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			_, err := instanceDomainRepo.Get(CTX,
+			_, err := instanceDomainRepo.Get(CTX, pool,
 				database.WithCondition(
 					database.And(
 						instanceDomainRepo.InstanceIDCondition(instance.Instance.Id),
@@ -293,7 +293,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 		// Test that domain remove reduces
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			domain, err := instanceDomainRepo.Get(CTX,
+			domain, err := instanceDomainRepo.Get(CTX, pool,
 				database.WithCondition(
 					database.And(
 						instanceDomainRepo.InstanceIDCondition(instance.Instance.Id),
