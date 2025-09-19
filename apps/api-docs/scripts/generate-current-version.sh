@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Enhanced script to generate OpenAPI spec and optionally add version to config
+# Enhanced script to manage versions and optionally generate OpenAPI specs
 # Usage: ./scripts/generate-current-version.sh [version_id]
 # If version_id is provided, it will be added to versions.config.json
 
@@ -14,7 +14,7 @@ CONFIG_FILE="$API_DOCS_DIR/versions.config.json"
 # Get version parameter (optional)
 VERSION_ID="$1"
 
-echo "🚀 Generating OpenAPI spec for current branch..."
+echo "🚀 Managing API versions..."
 
 cd "$API_DOCS_DIR"
 
@@ -29,18 +29,22 @@ echo "📦 Version ID: $FINAL_VERSION"
 # Create artifacts directory
 mkdir -p "$ARTIFACTS_DIR/versions/$FINAL_VERSION"
 
-# Generate OpenAPI spec for current branch only
-echo "🔧 Generating OpenAPI spec..."
-pnpm run generate:openapi
-
-# Copy generated files to artifacts
-if [ -d "public/openapi" ]; then
+# Try to generate OpenAPI spec for current branch
+echo "🔧 Attempting to generate OpenAPI spec..."
+if pnpm run generate:openapi && [ -d "public/openapi" ]; then
     echo "📦 Copying OpenAPI specs to artifacts..."
     cp -r public/openapi/* "$ARTIFACTS_DIR/versions/$FINAL_VERSION/"
     echo "✅ Generated OpenAPI spec for $FINAL_VERSION"
 else
-    echo "❌ No OpenAPI specs found in public/openapi"
-    exit 1
+    echo "⚠️  OpenAPI generation failed or no specs found, using existing artifacts if available"
+    
+    # Check if we have existing artifacts for this version
+    if [ -d "$ARTIFACTS_DIR/versions/$FINAL_VERSION" ] && [ "$(ls -A "$ARTIFACTS_DIR/versions/$FINAL_VERSION" 2>/dev/null)" ]; then
+        echo "📦 Using existing artifacts for $FINAL_VERSION"
+    else
+        echo "❌ No existing artifacts found for $FINAL_VERSION"
+        # Don't exit - still allow config updates
+    fi
 fi
 
 # If version ID was provided, add it to config
@@ -88,4 +92,4 @@ if [ -n "$VERSION_ID" ]; then
     fi
 fi
 
-echo "🎉 Done! OpenAPI spec generated for $FINAL_VERSION"
+echo "🎉 Done! Version management completed for $FINAL_VERSION"

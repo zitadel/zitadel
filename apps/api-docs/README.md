@@ -58,12 +58,28 @@ pnpm run dev
 
 - `pnpm run generate:openapi` - Generate only OpenAPI specifications from proto files
 - `pnpm run versions:create` - Generate OpenAPI spec for current branch and save to artifacts
+- `pnpm run versions:create <version>` - Add a specific version to the config and generate artifacts
 
 ### Version Management
 
-Versions are manually configured in `versions.config.simple.json`. Simply edit this file to define which versions should be available in the dropdown.
+Versions are manually configured in `versions.config.json`. You can:
 
-Example `versions.config.simple.json`:
+1. **Add versions manually** by editing `versions.config.json`
+2. **Add versions via script** using `pnpm run versions:create <version>`
+
+#### Adding Versions via Script
+
+```bash
+# Add a new version to config and generate artifacts
+pnpm run versions:create v4.3.0
+
+# This will:
+# 1. Try to generate OpenAPI specs for current branch
+# 2. Create artifact directory for v4.3.0
+# 3. Add v4.3.0 to versions.config.json automatically
+```
+
+Example `versions.config.json`:
 
 ```json
 {
@@ -93,7 +109,7 @@ Example `versions.config.simple.json`:
 
 1. **Proto Generation**: The app uses the same `plugin-download.sh` script as the main docs to download the `protoc-gen-connect-openapi` plugin
 2. **OpenAPI Generation**: `buf generate` is used to convert proto files to OpenAPI 3.x specifications
-3. **Version Management**: Versions are manually defined in `versions.config.simple.json`
+3. **Version Management**: Versions are manually defined in `versions.config.json`
 4. **API Serving**: Next.js API routes serve the generated OpenAPI specs with version support
 5. **Rendering**: Scalar API Reference renders the interactive documentation with version switching
 

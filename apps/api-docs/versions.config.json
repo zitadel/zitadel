@@ -20,6 +20,13 @@
       "gitRef": "v4.2.1",
       "enabled": true,
       "isStable": true
+    },
+    {
+      "id": "v4.2.0",
+      "name": "v4.2.0",
+      "gitRef": "v4.2.0",
+      "enabled": true,
+      "isStable": true
     }
   ],
   "settings": {
