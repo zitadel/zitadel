@@ -21,7 +21,8 @@ env:
 jobs:
   check:
     name: check
-    runs-on: ubuntu-latest
+    runs-on:
+      group: zitadel-public
     outputs:
       nx_cache_key: ${{ steps.nx_cache.outputs.cache-primary-key }}
       nx_cache_path: ${{ env.nx_cache_path }}
