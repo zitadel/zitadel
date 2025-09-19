@@ -106,8 +106,7 @@
         "{workspaceRoot}/pnpm-lock.yaml",
         "!{projectRoot}/acceptance/**/*",
         { "env": "API_MOCK_STUBS_URL" },
-        { "env": "LOGIN_BASE_URL" },
-        { "runtime": "nx run @zitadel/login-api-mock:status" }
+        { "env": "LOGIN_BASE_URL" }
       ]
     }
   }

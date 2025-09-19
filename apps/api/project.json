@@ -159,6 +159,7 @@
                 "test-integration-state",
                 "test-integration-env"
             ],
+            "executor": "nx:run-commands",
             "options": {
                 "parallel": false,
                 "commands": [
@@ -170,7 +171,6 @@
             "inputs": [
                 { "runtime": "go env GOOS" },
                 { "runtime": "go env GOARCH" },
-                { "runtime": "nx run @zitadel/devcontainer:compose ps --format \"{{.Service}}:{{.State}}:{{.Health}}\" db-api-integration cache-api-integration" },
                 "sources",
                 "{workspaceRoot}/internal/integration/**",
                 "{workspaceRoot}/go*"
