@@ -72,7 +72,7 @@ type organizationConditions interface {
 	// IDCondition returns an equal filter on the id field.
 	IDCondition(organizationID string) OrgIdentifierCondition
 	// NameCondition returns a filter on the name field.
-	NameCondition(name string) OrgIdentifierCondition
+	NameCondition(op database.TextOperation, name string) OrgIdentifierCondition
 	// InstanceIDCondition returns a filter on the instance id field.
 	InstanceIDCondition(instanceID string) database.Condition
 	// StateCondition returns a filter on the name field.

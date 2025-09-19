@@ -159,8 +159,8 @@ func (o org) IDCondition(id string) domain.OrgIdentifierCondition {
 }
 
 // NameCondition implements [domain.organizationConditions].
-func (o org) NameCondition(name string) domain.OrgIdentifierCondition {
-	return database.NewTextCondition(o.NameColumn(), database.TextOperationEqual, name)
+func (o org) NameCondition(op database.TextOperation, name string) domain.OrgIdentifierCondition {
+	return database.NewTextCondition(o.NameColumn(), op, name)
 }
 
 // InstanceIDCondition implements [domain.organizationConditions].

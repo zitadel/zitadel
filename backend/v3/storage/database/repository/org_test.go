@@ -537,7 +537,7 @@ func TestGetOrganization(t *testing.T) {
 
 					return &org
 				},
-				orgIdentifierCondition: orgRepo.NameCondition(organizationName),
+				orgIdentifierCondition: orgRepo.NameCondition(database.TextOperationEqual, organizationName),
 			}
 		}(),
 		{
@@ -549,7 +549,7 @@ func TestGetOrganization(t *testing.T) {
 				}
 				return &org
 			},
-			orgIdentifierCondition: orgRepo.NameCondition("non-existent-instance-name"),
+			orgIdentifierCondition: orgRepo.NameCondition(database.TextOperationEqual, "non-existent-instance-name"),
 			err:                    new(database.NoRowFoundError),
 		},
 	}
@@ -925,7 +925,7 @@ func TestDeleteOrganization(t *testing.T) {
 						organizations[i] = &org
 					}
 				},
-				orgIdentifierCondition: organizationRepo.NameCondition(organizationName),
+				orgIdentifierCondition: organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
 				noOfDeletedRows:        noOfOrganizations,
 			}
 		}(),
@@ -934,7 +934,7 @@ func TestDeleteOrganization(t *testing.T) {
 			non_existent_organization_name := gofakeit.Name()
 			return test{
 				name:                   "delete non existent organization",
-				orgIdentifierCondition: organizationRepo.NameCondition(non_existent_organization_name),
+				orgIdentifierCondition: organizationRepo.NameCondition(database.TextOperationEqual, non_existent_organization_name),
 			}
 		}(),
 		func() test {
@@ -963,13 +963,13 @@ func TestDeleteOrganization(t *testing.T) {
 
 					// delete organization
 					affectedRows, err := organizationRepo.Delete(ctx,
-						organizationRepo.NameCondition(organizationName),
+						organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
 						organizations[0].InstanceID,
 					)
 					assert.Equal(t, int64(1), affectedRows)
 					require.NoError(t, err)
 				},
-				orgIdentifierCondition: organizationRepo.NameCondition(organizationName),
+				orgIdentifierCondition: organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
 				// this test should return 0 affected rows as the org was already deleted
 				noOfDeletedRows: 0,
 			}
