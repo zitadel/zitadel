@@ -1,30 +1,9 @@
 {
   "versions": [
     {
-      "id": "v2.70.0",
-      "name": "v2.70.0",
-      "gitRef": "v2.70.0",
-      "enabled": true,
-      "isStable": true
-    },
-    {
-      "id": "v2.71.9",
-      "name": "v2.71.9",
-      "gitRef": "v2.71.9",
-      "enabled": true,
-      "isStable": true
-    },
-    {
-      "id": "v2.72.0-test",
-      "name": "v2.72.0-test",
-      "gitRef": "v2.72.0-test",
-      "enabled": true,
-      "isStable": false
-    },
-    {
-      "id": "v2.73.0-test",
-      "name": "v2.73.0-test",
-      "gitRef": "v2.73.0-test",
+      "id": "main",
+      "name": "Latest (Main Branch)",
+      "gitRef": "main",
       "enabled": true,
       "isStable": false
     },
@@ -97,25 +76,18 @@
       "gitRef": "v4.0.2",
       "enabled": true,
       "isStable": true
-    },
-    {
-      "id": "main",
-      "name": "Latest (Main Branch)",
-      "gitRef": "main",
-      "enabled": true,
-      "isStable": false
     }
   ],
   "settings": {
-    "defaultVersion": "v2.70.0",
+    "defaultVersion": "v4.2.2",
     "autoGenerate": true,
     "maxVersions": 15,
     "includePrerelease": false
   },
   "metadata": {
-    "generatedAt": "2025-09-19T11:36:46Z",
+    "generatedAt": "2025-09-19T13:39:45Z",
     "generatedBy": "scripts/generate-versions-config.sh",
-    "availableVersionsCount": 4,
-    "totalVersionsCount": 15
+    "availableVersionsCount": 2,
+    "totalVersionsCount": 11
   }
 }
