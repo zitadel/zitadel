@@ -4,8 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "chmod +x scripts/vercel-build.sh && ./scripts/vercel-build.sh && next build",
-    "build:versions": "chmod +x scripts/build-versions.sh && ./scripts/build-versions.sh",
+    "build": "pnpm run generate && next build",
     "start": "next start",
     "lint": "next lint",
     "ensure-plugins": "if [ ! -f \"protoc-gen-connect-openapi/protoc-gen-connect-openapi\" ]; then sh ./plugin-download.sh; fi",
