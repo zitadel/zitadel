@@ -35,7 +35,10 @@ jobs:
 
     # node to install sass for go
     - if: matrix.language == 'go'
-      uses: actions/setup-node@v4
+      name: Set up pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        run_install: false
     - if: matrix.language == 'go'
       run: |
         pnpm install -g sass nx
