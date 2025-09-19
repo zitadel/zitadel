@@ -157,33 +157,33 @@ func (o orgMetadata) ValueCondition(op database.BytesOperation, value []byte) da
 // -------------------------------------------------------------
 
 // CreatedAtColumn implements [domain.OrganizationMetadataRepository].
-func (orgMetadata) CreatedAtColumn() database.Column {
-	return database.NewColumn("org_metadata", "created_at")
+func (o orgMetadata) CreatedAtColumn() database.Column {
+	return database.NewColumn(o.unqualifiedTableName(), "created_at")
 }
 
 // InstanceIDColumn implements [domain.OrganizationMetadataRepository].
-func (orgMetadata) InstanceIDColumn() database.Column {
-	return database.NewColumn("org_metadata", "instance_id")
+func (o orgMetadata) InstanceIDColumn() database.Column {
+	return database.NewColumn(o.unqualifiedTableName(), "instance_id")
 }
 
 // KeyColumn implements [domain.OrganizationMetadataRepository].
-func (orgMetadata) KeyColumn() database.Column {
-	return database.NewColumn("org_metadata", "key")
+func (o orgMetadata) KeyColumn() database.Column {
+	return database.NewColumn(o.unqualifiedTableName(), "key")
 }
 
 // OrgIDColumn implements [domain.OrganizationMetadataRepository].
-func (orgMetadata) OrgIDColumn() database.Column {
-	return database.NewColumn("org_metadata", "org_id")
+func (o orgMetadata) OrgIDColumn() database.Column {
+	return database.NewColumn(o.unqualifiedTableName(), "org_id")
 }
 
 // UpdatedAtColumn implements [domain.OrganizationMetadataRepository].
-func (orgMetadata) UpdatedAtColumn() database.Column {
-	return database.NewColumn("org_metadata", "updated_at")
+func (o orgMetadata) UpdatedAtColumn() database.Column {
+	return database.NewColumn(o.unqualifiedTableName(), "updated_at")
 }
 
 // ValueColumn implements [domain.OrganizationMetadataRepository].
-func (orgMetadata) ValueColumn() database.Column {
-	return database.NewColumn("org_metadata", "value")
+func (o orgMetadata) ValueColumn() database.Column {
+	return database.NewColumn(o.unqualifiedTableName(), "value")
 }
 
 // -------------------------------------------------------------

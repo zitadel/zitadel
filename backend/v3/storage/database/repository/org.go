@@ -20,10 +20,6 @@ type org struct {
 	metadataRepo       orgMetadata
 }
 
-func (o org) qualifiedTableName() string {
-	return "zitadel.organizations"
-}
-
 func (o org) unqualifiedTableName() string {
 	return "organizations"
 }
@@ -217,33 +213,33 @@ func (o org) ExistsMetadata(cond database.Condition) database.Condition {
 // -------------------------------------------------------------
 
 // IDColumn implements [domain.organizationColumns].
-func (org) IDColumn() database.Column {
-	return database.NewColumn("organizations", "id")
+func (o org) IDColumn() database.Column {
+	return database.NewColumn(o.unqualifiedTableName(), "id")
 }
 
 // NameColumn implements [domain.organizationColumns].
-func (org) NameColumn() database.Column {
-	return database.NewColumn("organizations", "name")
+func (o org) NameColumn() database.Column {
+	return database.NewColumn(o.unqualifiedTableName(), "name")
 }
 
 // InstanceIDColumn implements [domain.organizationColumns].
-func (org) InstanceIDColumn() database.Column {
-	return database.NewColumn("organizations", "instance_id")
+func (o org) InstanceIDColumn() database.Column {
+	return database.NewColumn(o.unqualifiedTableName(), "instance_id")
 }
 
 // StateColumn implements [domain.organizationColumns].
-func (org) StateColumn() database.Column {
-	return database.NewColumn("organizations", "state")
+func (o org) StateColumn() database.Column {
+	return database.NewColumn(o.unqualifiedTableName(), "state")
 }
 
 // CreatedAtColumn implements [domain.organizationColumns].
-func (org) CreatedAtColumn() database.Column {
-	return database.NewColumn("organizations", "created_at")
+func (o org) CreatedAtColumn() database.Column {
+	return database.NewColumn(o.unqualifiedTableName(), "created_at")
 }
 
 // UpdatedAtColumn implements [domain.organizationColumns].
-func (org) UpdatedAtColumn() database.Column {
-	return database.NewColumn("organizations", "updated_at")
+func (o org) UpdatedAtColumn() database.Column {
+	return database.NewColumn(o.unqualifiedTableName(), "updated_at")
 }
 
 // -------------------------------------------------------------
