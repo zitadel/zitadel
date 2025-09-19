@@ -52,7 +52,7 @@ func (m userMachine) DescriptionCondition(op database.TextOperation, description
 // -------------------------------------------------------------
 
 // DescriptionColumn implements [domain.machineColumns].
-func (m userMachine) DescriptionColumn() *database.Column {
+func (m userMachine) DescriptionColumn() database.Column {
 	return database.NewColumn("user_machines", "description")
 }
 

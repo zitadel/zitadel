@@ -178,7 +178,7 @@ func (e existsCondition) Write(builder *database.StatementBuilder) {
 	builder.WriteString(")")
 }
 
-func (e existsCondition) ContainsColumn(col *database.Column) bool {
+func (e existsCondition) ContainsColumn(col database.Column) bool {
 	// Forward to the inner condition so safety checks (like instance_id presence) can still work.
 	return e.condition.ContainsColumn(col)
 }
@@ -230,32 +230,32 @@ func (o org) ExistsMetadata(cond database.Condition) database.Condition {
 // -------------------------------------------------------------
 
 // IDColumn implements [domain.organizationColumns].
-func (org) IDColumn() *database.Column {
+func (org) IDColumn() database.Column {
 	return database.NewColumn("organizations", "id")
 }
 
 // NameColumn implements [domain.organizationColumns].
-func (org) NameColumn() *database.Column {
+func (org) NameColumn() database.Column {
 	return database.NewColumn("organizations", "name")
 }
 
 // InstanceIDColumn implements [domain.organizationColumns].
-func (org) InstanceIDColumn() *database.Column {
+func (org) InstanceIDColumn() database.Column {
 	return database.NewColumn("organizations", "instance_id")
 }
 
 // StateColumn implements [domain.organizationColumns].
-func (org) StateColumn() *database.Column {
+func (org) StateColumn() database.Column {
 	return database.NewColumn("organizations", "state")
 }
 
 // CreatedAtColumn implements [domain.organizationColumns].
-func (org) CreatedAtColumn() *database.Column {
+func (org) CreatedAtColumn() database.Column {
 	return database.NewColumn("organizations", "created_at")
 }
 
 // UpdatedAtColumn implements [domain.organizationColumns].
-func (org) UpdatedAtColumn() *database.Column {
+func (org) UpdatedAtColumn() database.Column {
 	return database.NewColumn("organizations", "updated_at")
 }
 

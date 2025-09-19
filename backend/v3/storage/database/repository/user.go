@@ -189,37 +189,37 @@ func (u user) DeletedAtCondition(op database.NumberOperation, deletedAt time.Tim
 // -------------------------------------------------------------
 
 // InstanceIDColumn implements [domain.userColumns].
-func (user) InstanceIDColumn() *database.Column {
+func (user) InstanceIDColumn() database.Column {
 	return database.NewColumn("users", "instance_id")
 }
 
 // OrgIDColumn implements [domain.userColumns].
-func (user) OrgIDColumn() *database.Column {
+func (user) OrgIDColumn() database.Column {
 	return database.NewColumn("users", "org_id")
 }
 
 // IDColumn implements [domain.userColumns].
-func (user) IDColumn() *database.Column {
+func (user) IDColumn() database.Column {
 	return database.NewColumn("users", "id")
 }
 
 // UsernameColumn implements [domain.userColumns].
-func (user) UsernameColumn() *database.Column {
+func (user) UsernameColumn() database.Column {
 	return database.NewColumn("users", "username")
 }
 
 // FirstNameColumn implements [domain.userColumns].
-func (user) CreatedAtColumn() *database.Column {
+func (user) CreatedAtColumn() database.Column {
 	return database.NewColumn("users", "created_at")
 }
 
 // UpdatedAtColumn implements [domain.userColumns].
-func (user) UpdatedAtColumn() *database.Column {
+func (user) UpdatedAtColumn() database.Column {
 	return database.NewColumn("users", "updated_at")
 }
 
 // DeletedAtColumn implements [domain.userColumns].
-func (user) DeletedAtColumn() *database.Column {
+func (user) DeletedAtColumn() database.Column {
 	return database.NewColumn("users", "deleted_at")
 }
 

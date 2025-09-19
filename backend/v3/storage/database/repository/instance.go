@@ -193,47 +193,47 @@ func (i instance) ExistsDomain(cond database.Condition) database.Condition {
 // -------------------------------------------------------------
 
 // IDColumn implements [domain.instanceColumns].
-func (i instance) IDColumn() *database.Column {
+func (i instance) IDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "id")
 }
 
 // NameColumn implements [domain.instanceColumns].
-func (i instance) NameColumn() *database.Column {
+func (i instance) NameColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "name")
 }
 
 // CreatedAtColumn implements [domain.instanceColumns].
-func (i instance) CreatedAtColumn() *database.Column {
+func (i instance) CreatedAtColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "created_at")
 }
 
 // DefaultOrgIdColumn implements [domain.instanceColumns].
-func (i instance) DefaultOrgIDColumn() *database.Column {
+func (i instance) DefaultOrgIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "default_org_id")
 }
 
 // IAMProjectIDColumn implements [domain.instanceColumns].
-func (i instance) IAMProjectIDColumn() *database.Column {
+func (i instance) IAMProjectIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "iam_project_id")
 }
 
 // ConsoleClientIDColumn implements [domain.instanceColumns].
-func (i instance) ConsoleClientIDColumn() *database.Column {
+func (i instance) ConsoleClientIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "console_client_id")
 }
 
 // ConsoleAppIDColumn implements [domain.instanceColumns].
-func (i instance) ConsoleAppIDColumn() *database.Column {
+func (i instance) ConsoleAppIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "console_app_id")
 }
 
 // DefaultLanguageColumn implements [domain.instanceColumns].
-func (i instance) DefaultLanguageColumn() *database.Column {
+func (i instance) DefaultLanguageColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "default_language")
 }
 
 // UpdatedAtColumn implements [domain.instanceColumns].
-func (i instance) UpdatedAtColumn() *database.Column {
+func (i instance) UpdatedAtColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "updated_at")
 }
 

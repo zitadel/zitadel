@@ -152,37 +152,37 @@ func (i instanceDomain) TypeCondition(typ domain.DomainType) database.Condition 
 // -------------------------------------------------------------
 
 // CreatedAtColumn implements [domain.InstanceDomainRepository].
-func (i instanceDomain) CreatedAtColumn() *database.Column {
+func (i instanceDomain) CreatedAtColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "created_at")
 }
 
 // DomainColumn implements [domain.InstanceDomainRepository].
-func (i instanceDomain) DomainColumn() *database.Column {
+func (i instanceDomain) DomainColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "domain")
 }
 
 // InstanceIDColumn implements [domain.InstanceDomainRepository].
-func (i instanceDomain) InstanceIDColumn() *database.Column {
+func (i instanceDomain) InstanceIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "instance_id")
 }
 
 // IsPrimaryColumn implements [domain.InstanceDomainRepository].
-func (i instanceDomain) IsPrimaryColumn() *database.Column {
+func (i instanceDomain) IsPrimaryColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "is_primary")
 }
 
 // UpdatedAtColumn implements [domain.InstanceDomainRepository].
-func (i instanceDomain) UpdatedAtColumn() *database.Column {
+func (i instanceDomain) UpdatedAtColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "updated_at")
 }
 
 // IsGeneratedColumn implements [domain.InstanceDomainRepository].
-func (i instanceDomain) IsGeneratedColumn() *database.Column {
+func (i instanceDomain) IsGeneratedColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "is_generated")
 }
 
 // TypeColumn implements [domain.InstanceDomainRepository].
-func (i instanceDomain) TypeColumn() *database.Column {
+func (i instanceDomain) TypeColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "type")
 }
 

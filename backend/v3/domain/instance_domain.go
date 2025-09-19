@@ -40,9 +40,9 @@ type AddInstanceDomain struct {
 type instanceDomainColumns interface {
 	domainColumns
 	// IsGeneratedColumn returns the column for the is generated field.
-	IsGeneratedColumn() *database.Column
+	IsGeneratedColumn() database.Column
 	// TypeColumn returns the column for the type field.
-	TypeColumn() *database.Column
+	TypeColumn() database.Column
 }
 
 type instanceDomainConditions interface {

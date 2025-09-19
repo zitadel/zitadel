@@ -24,15 +24,15 @@ const (
 
 type domainColumns interface {
 	// InstanceIDColumn returns the column for the instance id field.
-	InstanceIDColumn() *database.Column
+	InstanceIDColumn() database.Column
 	// DomainColumn returns the column for the domain field.
-	DomainColumn() *database.Column
+	DomainColumn() database.Column
 	// IsPrimaryColumn returns the column for the is primary field.
-	IsPrimaryColumn() *database.Column
+	IsPrimaryColumn() database.Column
 	// CreatedAtColumn returns the column for the created at field.
-	CreatedAtColumn() *database.Column
+	CreatedAtColumn() database.Column
 	// UpdatedAtColumn returns the column for the updated at field.
-	UpdatedAtColumn() *database.Column
+	UpdatedAtColumn() database.Column
 }
 
 type domainConditions interface {

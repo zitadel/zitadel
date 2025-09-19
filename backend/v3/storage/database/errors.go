@@ -10,10 +10,10 @@ var (
 )
 
 type MissingConditionError struct {
-	col *Column
+	col Column
 }
 
-func NewMissingConditionError(col *Column) error {
+func NewMissingConditionError(col Column) error {
 	return &MissingConditionError{
 		col: col,
 	}

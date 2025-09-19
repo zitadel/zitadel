@@ -162,32 +162,32 @@ func (h userHuman) PhoneVerifiedAtCondition(op database.NumberOperation, verifie
 // -------------------------------------------------------------
 
 // FirstNameColumn implements [domain.humanColumns].
-func (h userHuman) FirstNameColumn() *database.Column {
+func (h userHuman) FirstNameColumn() database.Column {
 	return database.NewColumn("user_humans", "first_name")
 }
 
 // LastNameColumn implements [domain.humanColumns].
-func (h userHuman) LastNameColumn() *database.Column {
+func (h userHuman) LastNameColumn() database.Column {
 	return database.NewColumn("user_humans", "last_name")
 }
 
 // EmailAddressColumn implements [domain.humanColumns].
-func (h userHuman) EmailAddressColumn() *database.Column {
+func (h userHuman) EmailAddressColumn() database.Column {
 	return database.NewColumn("user_humans", "email_address")
 }
 
 // EmailVerifiedAtColumn implements [domain.humanColumns].
-func (h userHuman) EmailVerifiedAtColumn() *database.Column {
+func (h userHuman) EmailVerifiedAtColumn() database.Column {
 	return database.NewColumn("user_humans", "email_verified_at")
 }
 
 // PhoneNumberColumn implements [domain.humanColumns].
-func (h userHuman) PhoneNumberColumn() *database.Column {
+func (h userHuman) PhoneNumberColumn() database.Column {
 	return database.NewColumn("user_humans", "phone_number")
 }
 
 // PhoneVerifiedAtColumn implements [domain.humanColumns].
-func (h userHuman) PhoneVerifiedAtColumn() *database.Column {
+func (h userHuman) PhoneVerifiedAtColumn() database.Column {
 	return database.NewColumn("user_humans", "phone_verified_at")
 }
 

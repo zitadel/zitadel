@@ -157,32 +157,32 @@ func (o orgMetadata) ValueCondition(op database.BytesOperation, value []byte) da
 // -------------------------------------------------------------
 
 // CreatedAtColumn implements [domain.OrganizationMetadataRepository].
-func (orgMetadata) CreatedAtColumn() *database.Column {
+func (orgMetadata) CreatedAtColumn() database.Column {
 	return database.NewColumn("org_metadata", "created_at")
 }
 
 // InstanceIDColumn implements [domain.OrganizationMetadataRepository].
-func (orgMetadata) InstanceIDColumn() *database.Column {
+func (orgMetadata) InstanceIDColumn() database.Column {
 	return database.NewColumn("org_metadata", "instance_id")
 }
 
 // KeyColumn implements [domain.OrganizationMetadataRepository].
-func (orgMetadata) KeyColumn() *database.Column {
+func (orgMetadata) KeyColumn() database.Column {
 	return database.NewColumn("org_metadata", "key")
 }
 
 // OrgIDColumn implements [domain.OrganizationMetadataRepository].
-func (orgMetadata) OrgIDColumn() *database.Column {
+func (orgMetadata) OrgIDColumn() database.Column {
 	return database.NewColumn("org_metadata", "org_id")
 }
 
 // UpdatedAtColumn implements [domain.OrganizationMetadataRepository].
-func (orgMetadata) UpdatedAtColumn() *database.Column {
+func (orgMetadata) UpdatedAtColumn() database.Column {
 	return database.NewColumn("org_metadata", "updated_at")
 }
 
 // ValueColumn implements [domain.OrganizationMetadataRepository].
-func (orgMetadata) ValueColumn() *database.Column {
+func (orgMetadata) ValueColumn() database.Column {
 	return database.NewColumn("org_metadata", "value")
 }
 

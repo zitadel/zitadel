@@ -43,7 +43,7 @@ func (b *StatementBuilder) AppendArg(arg any) (placeholder string) {
 		b.existingArgs = make(map[any]string)
 	}
 	// the key is used to work around the following panic:
-	// panic: runtime error: hash of unhashable type []uint8
+	// runtime error: hash of unhashable type []uint8
 	key := arg
 	if argBytes, ok := arg.([]uint8); ok {
 		key = `\\bytes-` + hex.EncodeToString(argBytes)

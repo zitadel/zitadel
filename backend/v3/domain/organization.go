@@ -30,17 +30,17 @@ type Organization struct {
 // organizationColumns define all the columns of the instance table.
 type organizationColumns interface {
 	// IDColumn returns the column for the id field.
-	IDColumn() *database.Column
+	IDColumn() database.Column
 	// NameColumn returns the column for the name field.
-	NameColumn() *database.Column
+	NameColumn() database.Column
 	// InstanceIDColumn returns the column for the default org id field
-	InstanceIDColumn() *database.Column
+	InstanceIDColumn() database.Column
 	// StateColumn returns the column for the name field.
-	StateColumn() *database.Column
+	StateColumn() database.Column
 	// CreatedAtColumn returns the column for the created at field.
-	CreatedAtColumn() *database.Column
+	CreatedAtColumn() database.Column
 	// UpdatedAtColumn returns the column for the updated at field.
-	UpdatedAtColumn() *database.Column
+	UpdatedAtColumn() database.Column
 }
 
 // organizationConditions define all the conditions for the instance table.

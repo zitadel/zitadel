@@ -19,15 +19,15 @@ type Metadata struct {
 
 type MetadataColumns interface {
 	// InstanceIDColumn returns the column for the instance id field.
-	InstanceIDColumn() *database.Column
+	InstanceIDColumn() database.Column
 	// KeyColumn returns the column for the key field.
-	KeyColumn() *database.Column
+	KeyColumn() database.Column
 	// ValueColumn returns the column for the value field.
-	ValueColumn() *database.Column
+	ValueColumn() database.Column
 	// CreatedAtColumn returns the column for the created at field.
-	CreatedAtColumn() *database.Column
+	CreatedAtColumn() database.Column
 	// UpdatedAtColumn returns the column for the updated at field.
-	UpdatedAtColumn() *database.Column
+	UpdatedAtColumn() database.Column
 }
 
 type MetadataConditions interface {
