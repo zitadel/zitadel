@@ -6,6 +6,7 @@ import (
 	"connectrpc.com/connect"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
@@ -52,7 +53,7 @@ func UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org
 
 	batchCmd := domain.BatchCommands(orgUpdtCmd, domainAddCmd, domainSetPrimaryCmd, domainRemoveCmd)
 
-	err := domain.Invoke(ctx, batchCmd)
+	err := domain.Invoke(ctx, batchCmd, domain.WithOrganizationRepo(repository.OrganizationRepository(nil)))
 	if err != nil {
 		return nil, err
 	}

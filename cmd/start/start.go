@@ -26,6 +26,8 @@ import (
 	"golang.org/x/net/http2/h2c"
 	"golang.org/x/text/language"
 
+	new_domain "github.com/zitadel/zitadel/backend/v3/domain"
+	v3_postgres "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/encryption"
 	"github.com/zitadel/zitadel/cmd/key"
@@ -162,6 +164,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	if err != nil {
 		return fmt.Errorf("cannot start DB client for queries: %w", err)
 	}
+	new_domain.SetPool(v3_postgres.PGxPool(dbClient.Pool))
 
 	keyStorage, err := cryptoDB.NewKeyStorage(dbClient, masterKey)
 	if err != nil {

@@ -46,7 +46,7 @@ func (u *UpdateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err 
 	}
 	defer func() { err = close(ctx, err) }()
 
-	organizationRepo := opts.orgRepo()
+	organizationRepo := opts.organizationRepo
 	organizationRepo.Domains(true)
 
 	org, err := organizationRepo.Get(ctx, database.WithCondition(organizationRepo.IDCondition(u.ID)))

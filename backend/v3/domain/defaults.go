@@ -18,11 +18,6 @@ var (
 	logger           logging.Logger = *logging.NewLogger(slog.Default())
 	legacyEventstore eventstore.LegacyEventstore
 
-	// userRepo func(database.QueryExecutor) UserRepository
-	// instanceRepo func(database.QueryExecutor) InstanceRepository
-	// cryptoRepo func(database.QueryExecutor) CryptoRepository
-	orgRepo func(database.QueryExecutor) OrganizationRepository
-
 	// instanceCache cache.Cache[instanceCacheIndex, string, *Instance]
 	// orgCache cache.Cache[orgCacheIndex, string, *Org]
 
@@ -54,10 +49,6 @@ func SetLegacyEventstore(es eventstore.LegacyEventstore) {
 // func SetUserRepository(repo func(database.QueryExecutor) UserRepository) {
 // 	userRepo = repo
 // }
-
-func SetOrgRepository(repo func(database.QueryExecutor) OrganizationRepository) {
-	orgRepo = repo
-}
 
 // func SetInstanceRepository(repo func(database.QueryExecutor) InstanceRepository) {
 // 	instanceRepo = repo

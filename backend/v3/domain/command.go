@@ -31,18 +31,11 @@ type Invoker interface {
 type CommandOpts struct {
 	DB               database.QueryExecutor
 	Invoker          Invoker
-	organizationRepo func(db database.QueryExecutor) OrganizationRepository
+	organizationRepo OrganizationRepository
 }
 
-func (opts *CommandOpts) SetOrgRepo(repo func(db database.QueryExecutor) OrganizationRepository) {
+func (opts *CommandOpts) SetOrgRepo(repo OrganizationRepository) {
 	opts.organizationRepo = repo
-}
-
-func (opts *CommandOpts) orgRepo() OrganizationRepository {
-	if opts.organizationRepo != nil {
-		return opts.organizationRepo(opts.DB)
-	}
-	return orgRepo(opts.DB)
 }
 
 type ensureTxOpts struct {
@@ -114,9 +107,8 @@ func DefaultOpts(invoker Invoker) *CommandOpts {
 		invoker = &noopInvoker{}
 	}
 	return &CommandOpts{
-		DB:               pool,
-		Invoker:          invoker,
-		organizationRepo: orgRepo,
+		DB:      pool,
+		Invoker: invoker,
 	}
 }
 

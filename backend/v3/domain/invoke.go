@@ -8,11 +8,19 @@ import (
 	legacy_es "github.com/zitadel/zitadel/internal/eventstore"
 )
 
+type InvokeOpt func(*CommandOpts)
+
+func WithOrganizationRepo(repo OrganizationRepository) InvokeOpt {
+	return func(opts *CommandOpts) {
+		opts.organizationRepo = repo
+	}
+}
+
 // Invoke provides a way to execute commands within the domain package.
 // It uses a chain of responsibility pattern to handle the command execution.
 // The default chain includes logging, tracing, and event publishing.
 // If you want to invoke multiple commands in a single transaction, you can use the [commandBatch].
-func Invoke(ctx context.Context, cmd Commander) error {
+func Invoke(ctx context.Context, cmd Commander, opts ...InvokeOpt) error {
 	invoker := newEventStoreInvoker(
 		newLoggingInvoker(
 			newTraceInvoker(
@@ -20,12 +28,15 @@ func Invoke(ctx context.Context, cmd Commander) error {
 			),
 		),
 	)
-	opts := &CommandOpts{
+	commandOpts := &CommandOpts{
 		Invoker:          invoker.collector,
 		DB:               pool,
 		organizationRepo: nil,
 	}
-	return invoker.Invoke(ctx, cmd, opts)
+	for _, opt := range opts {
+		opt(commandOpts)
+	}
+	return invoker.Invoke(ctx, cmd, commandOpts)
 }
 
 // eventStoreInvoker checks if the [Commander].Events function returns any events.
