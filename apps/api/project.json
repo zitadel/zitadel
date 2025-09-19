@@ -9,6 +9,17 @@
             "{workspaceRoot}/proto/**/*.go",
             "{workspaceRoot}/pkg/**/*.go",
             "{workspaceRoot}/main.go"
+        ],
+        "runtime": [
+            "sources",
+            "{workspaceRoot}/go*",
+            "!{workspaceRoot}/internal/integration/**/*",
+            "!{workspaceRoot}/**/*_test.go",
+            "!{workspaceRoot}/**/integration_test/**/*"
+        ],
+        "pack": [
+            { "env": "VERSION" },
+            "runtime"
         ]
     },
     "targets": {
@@ -22,7 +33,7 @@
                     "DEV_CONFIG_FILE": "{projectRoot}/dev.yaml"
                 }
             },
-            "command": "bash -c './.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel} start --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --masterkey MasterkeyNeedsToHave32Characters'"
+            "command": "bash -c './.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} start --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --masterkey MasterkeyNeedsToHave32Characters'"
         },
         "setup": {
             "dependsOn": [
@@ -35,8 +46,8 @@
                     "DEV_CONFIG_FILE": "{projectRoot}/dev.yaml"
                 },
                 "commands": [
-                    "bash -c 'for i in {1..5}; do echo \"Attempt $i/5: Starting ZITADEL...\";./.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel} init --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} && break || (echo \"Failed, retrying in 2s...\" && sleep 2); done'",
-                    "bash -c './.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel} setup --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --steps ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --masterkey MasterkeyNeedsToHave32Characters'"
+                    "bash -c 'for i in {1..5}; do echo \"Attempt $i/5: Starting ZITADEL...\";./.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} init --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} && break || (echo \"Failed, retrying in 2s...\" && sleep 2); done'",
+                    "bash -c './.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} setup --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --steps ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --masterkey MasterkeyNeedsToHave32Characters'"
                 ]
             }
         },
@@ -45,59 +56,14 @@
             "dependsOn": [
                 "generate"
             ],
-            "command": "bash -c 'CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel -v -ldflags=\"-s -w\"'",
+            "command": "bash -c 'CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.local -v -ldflags=\"-s -w\"'",
             "inputs": [
                 { "runtime": "go env GOOS" },
                 { "runtime": "go env GOARCH" },
-                "sources",
-                "{workspaceRoot}/go*",
-                "!{workspaceRoot}/internal/integration/**",
-                "!{workspaceRoot}/**/*_test.go",
-                "!{workspaceRoot}/**/integration_test/**/*"
+                "runtime"
             ],
             "outputs": [
-                "{workspaceRoot}/.artifacts/bin/*/*/zitadel"
-            ]
-        },
-        "pack-platform": {
-            "description": "Build and package for a single platform",
-            "executor": "nx:run-commands",
-            "options": {
-                "commands": [
-                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; ZITADEL_VERSION=${VERSION:-development-${NOW}}; COMMIT_SHA=${COMMIT_SHA:-$(git rev-parse --short HEAD)}; echo \"Building for $GOOS-$GOARCH...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$GOOS/$GOARCH/zitadel$EXT -v -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=${COMMIT_SHA} -X github.com/zitadel/zitadel/cmd/build.date=${NOW} -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_VERSION}\"'",
-                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; FOLDER=\"zitadel-$GOOS-$GOARCH\"; mkdir -p \"$FOLDER\"; cp \".artifacts/bin/$GOOS/$GOARCH/zitadel$EXT\" \"$FOLDER/\"; cp LICENSE \"$FOLDER/\"; cp README.md \"$FOLDER/\"; tar -czvf \"$FOLDER.tar.gz\" \"$FOLDER\"; rm -rf \"$FOLDER\"'"
-                ]
-            },
-            "inputs": [
-                { "env": "GOOS" },
-                { "env": "GOARCH" },
-                { "env": "VERSION" },
-                { "env": "NOW" },
-                { "env": "COMMIT_SHA" },
-                "sources",
-                "{workspaceRoot}/go*",
-                "!{workspaceRoot}/internal/integration/**",
-                "!{workspaceRoot}/**/*_test.go",
-                "!{workspaceRoot}/**/integration_test/**/*"
-            ]
-        },
-        "pack": {
-            "description": "Build and package executables for all platforms",
-            "dependsOn": ["generate"],
-            "executor": "nx:run-commands",
-            "options": {
-                "parallel": false,
-                "commands": [
-                    "bash -c 'export NOW=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\"); for goos in linux darwin windows; do for goarch in amd64 arm64; do echo \"Building for $goos-$goarch...\"; GOOS=$goos GOARCH=$goarch nx run @zitadel/api:pack-platform; done; done'",
-                    "mkdir -p .artifacts/pack",
-                    "find . -maxdepth 1 -name 'zitadel-*-*.tar.gz' -exec mv {} .artifacts/pack/ \\;",
-                    "cd .artifacts/pack && sha256sum *.tar.gz > checksums.txt",
-                    "echo 'Packaging complete. Archives and checksums available in .artifacts/pack/'"
-                ]
-            },
-            "outputs": [
-                "{workspaceRoot}/.artifacts/pack/*.tar.gz",
-                "{workspaceRoot}/.artifacts/pack/checksums.txt"
+                "{workspaceRoot}/.artifacts/bin/*/*/zitadel.local"
             ]
         },
         "generate": {
@@ -111,12 +77,15 @@
         },
         "lint": {
             "description": "Lint the Go code using golangci-lint",
+            "dependsOn": [
+                "generate"
+            ],
+            "command": "docker run -t --rm -v $(pwd):/app -w /app golangci/golangci-lint:v2.4.0 golangci-lint run --timeout 15m --config ./.golangci.yaml",
             "cache": true,
             "inputs": [
                 "sources",
                 "{workspaceRoot}/.golangci.yaml"
-            ],
-            "command": "docker run -t --rm -v $(pwd):/app -w /app golangci/golangci-lint:v2.4.0 golangci-lint run --timeout 15m --config ./.golangci.yaml"
+            ]
         },
         "test-unit": {
             "description": "Run the unit tests with coverage",
@@ -231,7 +200,7 @@
             ],
             "command": "cp -r console/dist/console/* internal/api/ui/console/static",
             "outputs": [
-                "{workspaceRoot}/internal/api/ui/console/static/**"
+                "{workspaceRoot}/internal/api/ui/console/static"
             ]
         },
         "generate-stubs": {
@@ -399,6 +368,104 @@
                 "{workspaceRoot}/.artifacts/bin/*/*/mockgen",
                 "{workspaceRoot}/.artifacts/bin/*/*/stringer"
             ]
-        }
+        },
+        "pack-platform": {
+            "description": "Build and package for a single platform",
+            "executor": "nx:run-commands",
+            "options": {
+                "commands": [
+                    "mkdir -p .artifacts/pack",
+                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; echo \"Building for $GOOS-$GOARCH...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$GOOS/$GOARCH/zitadel$EXT -v -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\") -X github.com/zitadel/zitadel/cmd/build.version=${VERSION}\"'",
+                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; FOLDER=\"zitadel-$GOOS-$GOARCH\"; mkdir -p \"$FOLDER\"; cp \".artifacts/bin/$GOOS/$GOARCH/zitadel$EXT\" \"$FOLDER/\"; cp LICENSE \"$FOLDER/\"; cp README.md \"$FOLDER/\"; tar -czvf \"$FOLDER.tar.gz\" \"$FOLDER\"; rm -rf \"$FOLDER\"'"
+                ]
+            }
+        },
+        "pack-darwin-amd64": {
+            "dependsOn": ["generate"],
+            "command": "GOOS=darwin GOARCH=amd64 nx run @zitadel/api:pack-platform",
+            "cache": true,
+            "inputs": [
+                "pack"
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/pack/zitadel-darwin-amd64.tar.gz"
+            ]
+        },
+        "pack-darwin-arm64": {
+            "dependsOn": ["generate"],
+            "command": "GOOS=darwin GOARCH=arm64 nx run @zitadel/api:pack-platform",
+            "cache": true,
+            "inputs": [
+                "pack"
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/pack/zitadel-darwin-arm64.tar.gz"
+            ]
+        },
+        "pack-linux-amd64": {
+            "dependsOn": ["generate"],
+            "command": "GOOS=linux GOARCH=amd64 nx run @zitadel/api:pack-platform",
+            "cache": true,
+            "inputs": [
+                "pack"
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/pack/zitadel-linux-amd64.tar.gz"
+            ]
+        },
+        "pack-linux-arm64": {
+            "dependsOn": ["generate"],
+            "command": "GOOS=linux GOARCH=arm64 nx run @zitadel/api:pack-platform",
+            "cache": true,
+            "inputs": [
+                "pack"
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/pack/zitadel-linux-arm64.tar.gz"
+            ]
+        },
+        "pack-windows-amd64": {
+            "dependsOn": ["generate"],
+            "command": "GOOS=windows GOARCH=amd64 nx run @zitadel/api:pack-platform",
+            "cache": true,
+            "inputs": [
+                "pack"
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/pack/zitadel-windows-amd64.tar.gz"
+            ]
+        },
+        "pack-windows-arm64": {
+            "dependsOn": ["generate"],
+            "command": "GOOS=windows GOARCH=arm64 nx run @zitadel/api:pack-platform",
+            "cache": true,
+            "inputs": [
+                "pack"
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/pack/zitadel-windows-arm64.tar.gz"
+            ]
+        },
+        "pack": {
+            "description": "Build and package executables for all platforms",
+            "dependsOn": [
+                "pack-linux-*",
+                "pack-darwin-*",
+                "pack-windows-*"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "parallel": false,
+                "commands": [
+                    "sha256sum .artifacts/pack/zitadel-*-*.tar.gz > .artifacts/pack/checksums.txt"
+                ]
+            },
+            "inputs": [
+                "{workspaceRoot}/.artifacts/pack/zitadel-*-*.tar.gz"
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/pack/checksums.txt"
+            ]
+        }        
     }
 }
