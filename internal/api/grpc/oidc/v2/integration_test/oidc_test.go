@@ -426,7 +426,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
 				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
-				createProjectGrantUserGrant(ctx, t, Instance.DefaultOrg.GetId(), projectID, orgResp.GetOrganizationId(), user.GetUserId())
+				createProjectGrantUserGrant(ctx, t, projectID, orgResp.GetOrganizationId(), user.GetUserId())
 
 				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
@@ -564,7 +564,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
 
-				createProjectGrantUserGrant(ctx, t, orgResp.GetOrganizationId(), projectID, orgResp.GetOrganizationId(), user.GetUserId())
+				createProjectGrantUserGrant(ctx, t, projectID, orgResp.GetOrganizationId(), user.GetUserId())
 				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
 			want: &oidc_pb.CreateCallbackResponse{
@@ -940,26 +940,26 @@ func createOIDCApplication(ctx context.Context, t *testing.T, projectRoleCheck, 
 }
 
 func createProjectUserGrant(ctx context.Context, t *testing.T, orgID, projectID, userID string) {
-	resp := Instance.CreateProjectUserGrant(t, ctx, orgID, projectID, userID)
+	resp := Instance.CreateAuthorizationProject(t, ctx, projectID, userID)
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	require.EventuallyWithT(t, func(collect *assert.CollectT) {
 		_, err := Instance.Client.Mgmt.GetUserGrantByID(integration.SetOrgID(ctx, orgID), &mgmt.GetUserGrantByIDRequest{
 			UserId:  userID,
-			GrantId: resp.GetUserGrantId(),
+			GrantId: resp.GetId(),
 		})
 		assert.NoError(collect, err)
 	}, retryDuration, tick)
 }
 
-func createProjectGrantUserGrant(ctx context.Context, t *testing.T, orgID, projectID, projectGrantID, userID string) {
-	resp := Instance.CreateProjectGrantUserGrant(ctx, orgID, projectID, projectGrantID, userID)
+func createProjectGrantUserGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID, userID string) {
+	resp := Instance.CreateAuthorizationProjectGrant(t, ctx, projectID, grantedOrgID, userID)
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	require.EventuallyWithT(t, func(collect *assert.CollectT) {
-		_, err := Instance.Client.Mgmt.GetUserGrantByID(integration.SetOrgID(ctx, orgID), &mgmt.GetUserGrantByIDRequest{
+		_, err := Instance.Client.Mgmt.GetUserGrantByID(integration.SetOrgID(ctx, grantedOrgID), &mgmt.GetUserGrantByIDRequest{
 			UserId:  userID,
-			GrantId: resp.GetUserGrantId(),
+			GrantId: resp.GetId(),
 		})
 		assert.NoError(collect, err)
 	}, retryDuration, tick)

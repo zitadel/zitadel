@@ -1,6 +1,8 @@
 package command
 
 import (
+	"slices"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -14,6 +16,8 @@ type ProjectGrantWriteModel struct {
 	GrantedOrgID string
 	RoleKeys     []string
 	State        domain.ProjectGrantState
+
+	FoundGrantID string
 }
 
 func NewProjectGrantWriteModel(grantID, grantedOrgID, projectID, resourceOwner string) *ProjectGrantWriteModel {
@@ -22,6 +26,7 @@ func NewProjectGrantWriteModel(grantID, grantedOrgID, projectID, resourceOwner s
 			AggregateID:   projectID,
 			ResourceOwner: resourceOwner,
 		},
+		// Always either the grantID or the grantedOrgID is provided
 		GrantID:      grantID,
 		GrantedOrgID: grantedOrgID,
 	}
@@ -31,34 +36,46 @@ func (wm *ProjectGrantWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *project.GrantAddedEvent:
-			if (wm.GrantID != "" && e.GrantID == wm.GrantID) ||
-				(wm.GrantedOrgID != "" && e.GrantedOrgID == wm.GrantedOrgID) {
+			if projectGrantExists(wm.GrantID, wm.GrantedOrgID, e.GrantID, e.GrantedOrgID) {
+				wm.FoundGrantID = e.GrantID
 				wm.WriteModel.AppendEvents(e)
 			}
 		case *project.GrantChangedEvent:
-			if wm.GrantID != "" && e.GrantID == wm.GrantID {
+			if projectGrantEqual(wm.FoundGrantID, e.GrantID) {
 				wm.WriteModel.AppendEvents(e)
 			}
 		case *project.GrantCascadeChangedEvent:
-			if wm.GrantID != "" && e.GrantID == wm.GrantID {
+			if projectGrantEqual(wm.FoundGrantID, e.GrantID) {
 				wm.WriteModel.AppendEvents(e)
 			}
 		case *project.GrantDeactivateEvent:
-			if wm.GrantID != "" && e.GrantID == wm.GrantID {
+			if projectGrantEqual(wm.FoundGrantID, e.GrantID) {
 				wm.WriteModel.AppendEvents(e)
 			}
 		case *project.GrantReactivatedEvent:
-			if wm.GrantID != "" && e.GrantID == wm.GrantID {
+			if projectGrantEqual(wm.FoundGrantID, e.GrantID) {
 				wm.WriteModel.AppendEvents(e)
 			}
 		case *project.GrantRemovedEvent:
-			if wm.GrantID != "" && e.GrantID == wm.GrantID {
+			if projectGrantEqual(wm.FoundGrantID, e.GrantID) {
+				wm.FoundGrantID = ""
 				wm.WriteModel.AppendEvents(e)
 			}
 		case *project.ProjectRemovedEvent:
 			wm.WriteModel.AppendEvents(e)
 		}
 	}
+}
+
+func projectGrantExists(requiredGrantID, requiredGrantedOrgID, grantID, grantedOrgID string) bool {
+	// either grantID or grantedOrgID is provided and equal
+	return projectGrantEqual(requiredGrantID, grantID) ||
+		(requiredGrantedOrgID != "" && grantedOrgID == requiredGrantedOrgID)
+}
+
+func projectGrantEqual(requiredGrantID, grantID string) bool {
+	// grantID is provided and equal
+	return requiredGrantID != "" && grantID == requiredGrantID
 }
 
 func (wm *ProjectGrantWriteModel) Reduce() error {
@@ -93,7 +110,8 @@ func (wm *ProjectGrantWriteModel) Reduce() error {
 }
 
 func (wm *ProjectGrantWriteModel) Query() *eventstore.SearchQueryBuilder {
-	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(wm.AggregateID).
@@ -106,11 +124,6 @@ func (wm *ProjectGrantWriteModel) Query() *eventstore.SearchQueryBuilder {
 			project.GrantRemovedType,
 			project.ProjectRemovedType).
 		Builder()
-
-	if wm.ResourceOwner != "" {
-		query.ResourceOwner(wm.ResourceOwner)
-	}
-	return query
 }
 
 type ProjectGrantPreConditionReadModel struct {
@@ -159,14 +172,9 @@ func (wm *ProjectGrantPreConditionReadModel) Reduce() error {
 			if e.Aggregate().ResourceOwner != wm.ProjectResourceOwner {
 				continue
 			}
-			for i, key := range wm.ExistingRoleKeys {
-				if key == e.Key {
-					copy(wm.ExistingRoleKeys[i:], wm.ExistingRoleKeys[i+1:])
-					wm.ExistingRoleKeys[len(wm.ExistingRoleKeys)-1] = ""
-					wm.ExistingRoleKeys = wm.ExistingRoleKeys[:len(wm.ExistingRoleKeys)-1]
-					continue
-				}
-			}
+			wm.ExistingRoleKeys = slices.DeleteFunc(wm.ExistingRoleKeys, func(key string) bool {
+				return key == e.Key
+			})
 		case *org.OrgAddedEvent:
 			wm.GrantedOrgExists = true
 		case *org.OrgRemovedEvent:

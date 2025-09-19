@@ -133,19 +133,11 @@ func (c *Commands) checkPermissionDeleteProjectMember(ctx context.Context, resou
 }
 
 func (c *Commands) checkPermissionUpdateProjectGrantMember(ctx context.Context, grantedOrgID, projectGrantID string) (err error) {
-	// TODO: add permission check for project grant owners
-	//if err := c.newPermissionCheck(ctx, domain.PermissionProjectGrantMemberWrite, project.AggregateType)(resourceOwner, projectGrantID); err != nil {
 	return c.newPermissionCheck(ctx, domain.PermissionProjectGrantMemberWrite, project.AggregateType)(grantedOrgID, projectGrantID)
-	//}
-	//return nil
 }
 
 func (c *Commands) checkPermissionDeleteProjectGrantMember(ctx context.Context, grantedOrgID, projectGrantID string) (err error) {
-	// TODO: add permission check for project grant owners
-	//if err := c.newPermissionCheck(ctx, domain.PermissionProjectGrantMemberDelete, project.AggregateType)(resourceOwner, projectGrantID); err != nil {
 	return c.newPermissionCheck(ctx, domain.PermissionProjectGrantMemberDelete, project.AggregateType)(grantedOrgID, projectGrantID)
-	//}
-	//return nil
 }
 
 func (c *Commands) newUserGrantPermissionCheck(ctx context.Context, permission string) UserGrantPermissionCheck {

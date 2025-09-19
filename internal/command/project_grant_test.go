@@ -352,6 +352,61 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "grant for project, only granted org, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1", true, true, true,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("grantedorg1").Aggregate,
+								"granted org",
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"key1",
+								"key",
+								"",
+							),
+						),
+					),
+					expectPush(
+						project.NewGrantAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							"grantedorg1",
+							[]string{"key1"},
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "projectgrant1"),
+			},
+			args: args{
+				ctx: context.Background(),
+				projectGrant: &AddProjectGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "project1",
+					},
+					GrantedOrgID: "grantedorg1",
+					RoleKeys:     []string{"key1"},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -779,6 +834,75 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "project1",
 						ResourceOwner: "org1",
+					},
+					GrantedOrgID: "grantedorg1",
+					RoleKeys:     []string{"key1", "key2"},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "projectgrant only added roles,no resourceowner, grantedOrgID, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							"grantedorg1",
+							[]string{"key1"},
+						)),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1", true, true, true,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("grantedorg1").Aggregate,
+								"granted org",
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"key1",
+								"key",
+								"",
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"key2",
+								"key2",
+								"",
+							),
+						),
+					),
+					expectPush(
+						project.NewGrantChangedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							[]string{"key1", "key2"},
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx: context.Background(),
+				projectGrant: &ChangeProjectGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "project1",
 					},
 					GrantedOrgID: "grantedorg1",
 					RoleKeys:     []string{"key1", "key2"},
