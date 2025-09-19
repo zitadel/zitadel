@@ -78,7 +78,6 @@ jobs:
       pull-requests: write
     needs:
       - version
-      - api-integration-test
       - check
       - container
       - functional-ui
