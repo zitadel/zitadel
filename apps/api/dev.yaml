@@ -1,0 +1,31 @@
+ExternalSecure: false
+TLS.Enabled: false
+DATABASE.POSTGRES:
+  Port: 5432
+  User: zitadel
+  Password: zitadel
+  Database: zitadel
+  MaxOpenConns: 20
+  MaxIdleConns: 20
+  ConnMaxLifetime: 60m
+  ConnMaxIdleTime: 10m
+FirstInstance:
+  LoginClientPatPath: login-client.pat
+  PatPath: admin.pat
+  InstanceName: ZITADEL
+  DefaultLanguage: en
+  Org:
+    LoginClient:
+      Machine:
+        Username: login-client
+        Name: Automatically Initialized IAM Login Client
+      Pat.ExpirationDate: 2099-01-01T00:00:00Z
+    Machine:
+      Machine:
+        Username: admin
+        Name: Automatically Initialized IAM admin Client
+      Pat.ExpirationDate: 2099-01-01T00:00:00Z
+DefaultInstance:
+  Features:
+    LoginV2:
+      BaseURI: http://localhost:3000/ui/v2/login

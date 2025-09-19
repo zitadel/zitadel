@@ -1,0 +1,13 @@
+{
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "name": "@zitadel/devcontainer",
+  "targets": {
+    "compose": {
+      "description": "Run docker compose commands",
+      "command": "docker compose -f docker-compose.yaml -p zitadel_devcontainer",
+      "options": {
+        "cwd": "{projectRoot}"
+      }
+    }
+  }
+}

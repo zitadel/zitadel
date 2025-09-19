@@ -1,0 +1,113 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "build": {
+      "description": "Builds the Next.js Login application in standalone mode for production",
+      "cache": true,
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "default",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "!{projectRoot}/.env.*",
+        "!{projectRoot}/.local.env",
+        "!{projectRoot}/integration/**/*",
+        "!{projectRoot}/acceptance/**/*",
+        "!{projectRoot}/cypress.config.ts"
+      ],
+      "outputs": [
+        "{projectRoot}/.next/standalone"
+      ]
+    },
+    "build-vercel": {
+      "description": "Builds the Next.js Login application for Vercel deployment",
+      "cache": true,
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "default",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "!{projectRoot}/.env.*",
+        "!{projectRoot}/.local.env",
+        "!{projectRoot}/integration/**/*",
+        "!{projectRoot}/acceptance/**/*",
+        "!{projectRoot}/cypress.config.ts"
+      ],
+      "outputs": [
+        "{projectRoot}/.next",
+        "!{projectRoot}/.next/cache",
+        "!{projectRoot}/.next/standalone"
+      ]
+    },
+    "lint": {
+      "description": "Runs all linters",
+      "dependsOn": [
+        "lint-check-*"
+      ]
+    },
+    "lint-check-prettier": {
+      "description": "Checks code formatting with Prettier",
+      "cache": true,
+      "inputs": [
+        "default"
+      ]
+    },
+    "lint-check-next": {
+      "description": "Runs Next.js specific lint checks",
+      "cache": true,
+      "inputs": [
+        "default"
+      ]
+    },
+    "test-unit": {
+      "description": "Runs unit tests using Vitest",
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "prod": {
+      "description": "Runs the Next.js Login application in production mode from the standalone build",
+      "continuous": true,
+      "dependsOn": [
+        "build"
+      ]
+    },
+    "dev": {
+      "description": "Runs the Next.js Login application in development mode with hot-reloading",
+      "continuous": true,
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "test-integration-env": {
+      "dependsOn": [
+        "build",
+        "@zitadel/login-api-mock:build"
+      ],
+      "description": "Run the integration tests with cypress",
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "commands": [
+          "ZITADEL_API_URL=http://${DEVCONTAINER_LOGIN_API_MOCK_HOST:-localhost}:22222 ZITADEL_SERVICE_USER_TOKEN=none ZITADEL_SERVICE_USER_TOKEN_FILE=\"\" nx run @zitadel/login:prod --excludeTaskDependencies",
+          "nx run @zitadel/login-api-mock:serve --excludeTaskDependencies"
+        ]
+      }
+    },
+    "test-integration": {
+      "cache": true,
+      "dependsOn": [
+        "test-integration-env"
+      ],
+      "inputs": [
+        "default",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "!{projectRoot}/acceptance/**/*",
+        { "env": "API_MOCK_STUBS_URL" },
+        { "env": "LOGIN_BASE_URL" }
+      ]
+    }
+  }
+}
