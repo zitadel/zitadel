@@ -34,15 +34,21 @@ const (
 	TextOperationStartsWith
 	// TextOperationStartsWithIgnoreCase checks if the first string starts with the second, ignoring case.
 	TextOperationStartsWithIgnoreCase
+	// TextOperationContains checks if the first string contains the second
+	TextOperationContains
+	// TextOperationContains checks if the first string contains the second, ignoring case.
+	TextOperationContainsWithIgnoreCase
 )
 
 var textOperations = map[TextOperation]string{
-	TextOperationEqual:                " = ",
-	TextOperationEqualIgnoreCase:      " LIKE ",
-	TextOperationNotEqual:             " <> ",
-	TextOperationNotEqualIgnoreCase:   " NOT LIKE ",
-	TextOperationStartsWith:           " LIKE ",
-	TextOperationStartsWithIgnoreCase: " LIKE ",
+	TextOperationEqual:                  " = ",
+	TextOperationEqualIgnoreCase:        " LIKE ",
+	TextOperationNotEqual:               " <> ",
+	TextOperationNotEqualIgnoreCase:     " NOT LIKE ",
+	TextOperationStartsWith:             " LIKE ",
+	TextOperationStartsWithIgnoreCase:   " LIKE ",
+	TextOperationContains:               " LIKE ",
+	TextOperationContainsWithIgnoreCase: " ILIKE ",
 }
 
 func writeTextOperation[T Text](builder *StatementBuilder, col Column, op TextOperation, value T) {
@@ -74,6 +80,12 @@ func writeTextOperation[T Text](builder *StatementBuilder, col Column, op TextOp
 		builder.WriteString("LOWER(")
 		builder.WriteArg(value)
 		builder.WriteString(")")
+		builder.WriteString(" || '%'")
+	case TextOperationContains, TextOperationContainsWithIgnoreCase:
+		col.WriteQualified(builder)
+		builder.WriteString(textOperations[op])
+		builder.WriteString("'%' || ")
+		builder.WriteArg(value)
 		builder.WriteString(" || '%'")
 	default:
 		panic("unsupported text operation")
