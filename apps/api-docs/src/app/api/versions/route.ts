@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     // Load version config for fallback
     let versionConfig: VersionConfig | null = null;
     try {
-      const configPath = join(process.cwd(), "versions.config.simple.json");
+      const configPath = join(process.cwd(), "versions.config.json");
       if (existsSync(configPath)) {
         const configContent = await readFile(configPath, "utf-8");
         versionConfig = JSON.parse(configContent);
