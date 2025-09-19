@@ -57,6 +57,8 @@ func WithLeftJoin(table string, columns Condition) QueryOption {
 	}
 }
 
+// WithPermissionCheck enables a check if the authenticated user has the
+// passed permission to read or write a resource.
 func WithPermissionCheck(permission string) QueryOption {
 	return func(opts *QueryOpts) {
 		opts.Permission = permission
