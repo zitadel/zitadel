@@ -26,15 +26,16 @@ A Next.js application that provides interactive API documentation for ZITADEL se
 pnpm install
 ```
 
-2. Generate OpenAPI specifications from proto files (current branch only):
+2. Generate OpenAPI specifications for all configured versions:
 
 ```bash
 pnpm run generate
 ```
 
 This command will:
-
-- Generate OpenAPI 3.x specifications from proto files for the current branch
+- Read all enabled versions from `versions.config.json`
+- Generate OpenAPI 3.x specifications for each version by checking out the appropriate git refs
+- Save artifacts for each version in `.artifacts/versions/`
 
 3. Start the development server:
 
@@ -51,7 +52,7 @@ pnpm run dev
 - `pnpm run dev` - Start development server
 - `pnpm run build` - Build for production (includes generating OpenAPI specs)
 - `pnpm run start` - Start production server
-- `pnpm run generate` - Generate OpenAPI specifications from proto files (current branch only)
+- `pnpm run generate` - Generate OpenAPI specifications for ALL versions defined in versions.config.json
 - `pnpm run lint` - Run ESLint
 
 ### Generation Scripts
@@ -108,9 +109,10 @@ Example `versions.config.json`:
 ## How it works
 
 1. **Proto Generation**: The app uses the same `plugin-download.sh` script as the main docs to download the `protoc-gen-connect-openapi` plugin
-2. **OpenAPI Generation**: `buf generate` is used to convert proto files to OpenAPI 3.x specifications
+2. **OpenAPI Generation**: `buf generate` is used to convert proto files to OpenAPI 3.x specifications for each configured version
 3. **Version Management**: Versions are manually defined in `versions.config.json`
-4. **API Serving**: Next.js API routes serve the generated OpenAPI specs with version support
+4. **Multi-Version Generation**: `pnpm generate` reads the config and generates artifacts for all enabled versions
+5. **API Serving**: Next.js API routes serve the generated OpenAPI specs with version support
 5. **Rendering**: Scalar API Reference renders the interactive documentation with version switching
 
 ## Version Management

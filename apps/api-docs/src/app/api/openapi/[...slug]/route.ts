@@ -61,7 +61,6 @@ export async function GET(
         ".artifacts",
         "versions",
         version,
-        "openapi3",
         "zitadel"
       );
 
