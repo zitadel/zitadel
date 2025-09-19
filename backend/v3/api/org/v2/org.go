@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"connectrpc.com/connect"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
@@ -59,6 +60,10 @@ func UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org
 	}
 
 	return &connect.Response[v2beta_org.UpdateOrganizationResponse]{
-		Msg: &v2beta_org.UpdateOrganizationResponse{},
+		Msg: &v2beta_org.UpdateOrganizationResponse{
+			// TODO(IAM-Marco) Change this with the real update date when OrganizationRepo.Update()
+			// returns the timestamp
+			ChangeDate: timestamppb.Now(),
+		},
 	}, nil
 }

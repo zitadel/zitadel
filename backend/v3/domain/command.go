@@ -142,7 +142,7 @@ func (cmd *commandBatch) String() string {
 
 func (b *commandBatch) Execute(ctx context.Context, opts *CommandOpts) (err error) {
 	for _, cmd := range b.Commands {
-		if err = opts.Invoke(ctx, cmd); err != nil {
+		if err = cmd.Execute(ctx, opts); err != nil {
 			return err
 		}
 	}

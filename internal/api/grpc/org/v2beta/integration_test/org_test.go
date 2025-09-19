@@ -299,8 +299,10 @@ func TestServer_UpdateOrganization(t *testing.T) {
 	ctx := Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
 	t.Cleanup(func() {
-		Instance.Client.FeatureV2.ResetInstanceFeatures(ctx, &feature.ResetInstanceFeaturesRequest{})
+		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(ctx, &feature.ResetInstanceFeaturesRequest{})
+		require.NoError(t, err)
 	})
+
 	orgs, orgsName, _ := createOrgs(CTX, t, Client, 2)
 
 	relTableState := []struct {
@@ -359,19 +361,27 @@ func TestServer_UpdateOrganization(t *testing.T) {
 	for _, stateCase := range relTableState {
 		_, err := Instance.Client.FeatureV2.SetInstanceFeatures(ctx, stateCase.featureSet)
 		require.NoError(t, err)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		// It is necessary to use EventuallyWithT otherwise the test cases are going to fail randomly
+		// because the flag has not been updated in the projections on time.
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
+			features, err := Instance.Client.FeatureV2.GetInstanceFeatures(ctx, &feature.GetInstanceFeaturesRequest{})
+			assert.NoError(collect, err)
+			assert.Equal(collect, stateCase.featureSet.GetEnableRelationalTables(), features.EnableRelationalTables.GetEnabled())
+		}, retryDuration, tick)
 		for _, tt := range tests {
-			t.Run(fmt.Sprintf("%s - %s", stateCase.state, tt.name), func(t *testing.T) {
+			t.Run(fmt.Sprintf("%s - %s", stateCase.state, tt.name), func(t1 *testing.T) {
 				got, err := Client.UpdateOrganization(ctx, tt.req)
 				if tt.wantErr {
-					require.Error(t, err)
+					require.Error(t1, err)
 					return
 				}
-				require.NoError(t, err)
+				require.NoError(t1, err)
 
 				// check details
 				gotCD := got.GetChangeDate().AsTime()
 				now := time.Now()
-				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+				assert.WithinRange(t1, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 			})
 		}
 	}

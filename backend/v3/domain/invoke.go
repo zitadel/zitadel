@@ -50,6 +50,9 @@ func newEventStoreInvoker(next Invoker) *eventStoreInvoker {
 }
 
 func (i *eventStoreInvoker) Invoke(ctx context.Context, command Commander, opts *CommandOpts) (err error) {
+	close, err := opts.EnsureTx(ctx)
+	defer func() { err = close(ctx, err) }()
+
 	err = i.collector.Invoke(ctx, command, opts)
 	if err != nil {
 		return err
