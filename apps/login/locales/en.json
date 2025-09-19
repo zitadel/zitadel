@@ -35,6 +35,29 @@
     },
     "required": {
       "loginName": "This field is required"
+    },
+    "errors": {
+      "internalError": "An internal error occurred",
+      "couldNotGetLoginSettings": "Could not get login settings",
+      "couldNotSearchUsers": "Could not search users",
+      "couldNotGetDomain": "Could not get domain",
+      "couldNotGetHost": "Could not get host",
+      "couldNotStartIDPFlow": "Could not start IDP flow",
+      "moreThanOneUserFound": "More than one user found. Provide a unique identifier.",
+      "userNotFound": "User not found in the system",
+      "couldNotCreateSession": "Could not create session for user",
+      "initialUserNotSupported": "Initial User not supported",
+      "usernamePasswordNotAllowed": "Username Password not allowed! Contact your administrator for more information.",
+      "passkeysNotAllowed": "Passkeys not allowed! Contact your administrator for more information.",
+      "couldNotFindIdentityProvider": "Could not find identity provider.",
+      "userNotActive": "User is not active. Contact your administrator for more information."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "An error occurred",
+      "multipleUsersFound": "Multiple users found",
+      "userNotFound": "User not found in the system"
     }
   },
   "password": {
@@ -48,6 +71,13 @@
       },
       "required": {
         "password": "This field is required"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "Could not verify password",
+        "couldNotResetPassword": "Could not reset password"
+      },
+      "info": {
+        "passwordResetSent": "Password was reset. Please check your email"
       }
     },
     "set": {
@@ -66,6 +96,11 @@
         "code": "This field is required",
         "newPassword": "You have to provide a password!",
         "confirmPassword": "This field is required"
+      },
+      "errors": {
+        "couldNotSetPassword": "Could not set password",
+        "couldNotResetPassword": "Could not reset password",
+        "couldNotVerifyPassword": "Could not verify password"
       }
     },
     "change": {
@@ -79,7 +114,40 @@
       "required": {
         "newPassword": "You have to provide a new password!",
         "confirmPassword": "This field is required"
+      },
+      "errors": {
+        "couldNotChangePassword": "Could not change password",
+        "couldNotVerifyPassword": "Could not verify password",
+        "unknownError": "Unknown error"
       }
+    },
+    "complexity": {
+      "length": "Must be at least {minLength} characters long.",
+      "hasSymbol": "Must include a symbol.",
+      "hasNumber": "Must include a number.",
+      "hasUppercase": "Must include an uppercase letter.",
+      "hasLowercase": "Must include a lowercase letter.",
+      "equals": "Password confirmation matched.",
+      "matches": "Matches",
+      "doesNotMatch": "Doesn't match"
+    },
+    "errors": {
+      "noHostFound": "No host found",
+      "couldNotSendResetLink": "Could not send Password Reset Link",
+      "couldNotCreateSessionForUser": "Could not create session for user",
+      "couldNotVerifyPassword": "Could not verify password",
+      "failedToAuthenticate": "Failed to authenticate. You had {failedAttempts} of {maxPasswordAttempts} password attempts.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Failed to authenticate.",
+      "accountLockedContactAdmin": " Contact your administrator to unlock your account",
+      "userNotFound": "User not found in the system",
+      "initialUserNotSupported": "Initial User not supported",
+      "userInitialStateNotSupported": "User Initial State is not supported",
+      "codeOrVerificationRequired": "You have to provide a code or have a valid User Verification Check",
+      "verificationRequired": "User Verification Check has to be done",
+      "couldNotLoadSession": "Could not load session",
+      "couldNotLoadAuthMethods": "Could not load auth methods",
+      "failedPrecondition": "Failed precondition",
+      "sessionNotValid": "Session is not valid"
     }
   },
   "idp": {
@@ -244,6 +312,13 @@
       "firstname": "This field is required",
       "lastname": "This field is required",
       "email": "This field is required"
+    },
+    "errors": {
+      "couldNotCreateUser": "Could not create user",
+      "couldNotCreateSession": "Could not create session",
+      "userNotFound": "User not found in the system",
+      "couldNotLinkIDP": "Could not link IDP to user",
+      "couldNotRegisterUser": "Could not register user"
     }
   },
   "invite": {
@@ -287,6 +362,19 @@
       "required": {
         "code": "This field is required"
       }
+    },
+    "errors": {
+      "couldNotResendEmail": "Could not resend email",
+      "couldNotVerifyUser": "Could not verify user",
+      "couldNotVerifyInvite": "Could not verify invite",
+      "couldNotVerifyEmail": "Could not verify email",
+      "couldNotVerify": "Could not verify",
+      "couldNotLoadUser": "Could not load user",
+      "couldNotLoadAuthenticators": "Could not load possible authenticators",
+      "couldNotCreateSession": "Could not create session",
+      "noHostFound": "No host found",
+      "userAlreadyVerified": "User is already verified!",
+      "couldNotResendInvite": "Could not resend invite"
     }
   },
   "authenticator": {

@@ -35,6 +35,29 @@
     },
     "required": {
       "loginName": "To pole jest wymagane"
+    },
+    "errors": {
+      "internalError": "Wystąpił błąd wewnętrzny",
+      "couldNotGetLoginSettings": "Nie udało się pobrać ustawień logowania",
+      "couldNotSearchUsers": "Nie udało się wyszukać użytkowników",
+      "couldNotGetDomain": "Nie udało się pobrać domeny",
+      "couldNotGetHost": "Nie udało się pobrać hosta",
+      "couldNotStartIDPFlow": "Nie udało się rozpocząć procesu IDP",
+      "moreThanOneUserFound": "Znaleziono więcej niż jednego użytkownika. Podaj unikalny identyfikator.",
+      "userNotFound": "Użytkownik nie został znaleziony w systemie",
+      "couldNotCreateSession": "Nie udało się utworzyć sesji dla użytkownika",
+      "initialUserNotSupported": "Użytkownik inicjalny nie jest obsługiwany",
+      "usernamePasswordNotAllowed": "Logowanie przy użyciu nazwy użytkownika i hasła jest niedozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
+      "passkeysNotAllowed": "Klucze dostępu są niedozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
+      "couldNotFindIdentityProvider": "Nie udało się znaleźć dostawcy tożsamości.",
+      "userNotActive": "Użytkownik jest nieaktywny. Skontaktuj się z administratorem, aby uzyskać więcej informacji."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Wystąpił błąd",
+      "multipleUsersFound": "Znaleziono wielu użytkowników",
+      "userNotFound": "Użytkownik nie został znaleziony w systemie"
     }
   },
   "password": {
@@ -48,6 +71,13 @@
       },
       "required": {
         "password": "To pole jest wymagane"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "Nie można zweryfikować hasła",
+        "couldNotResetPassword": "Nie można zresetować hasła"
+      },
+      "info": {
+        "passwordResetSent": "Hasło zostało zresetowane. Sprawdź swoją pocztę e-mail"
       }
     },
     "set": {
@@ -66,6 +96,11 @@
         "code": "To pole jest wymagane",
         "newPassword": "Musisz podać hasło!",
         "confirmPassword": "To pole jest wymagane"
+      },
+      "errors": {
+        "couldNotSetPassword": "Nie można ustawić hasła",
+        "couldNotResetPassword": "Nie można zresetować hasła",
+        "couldNotVerifyPassword": "Nie można zweryfikować hasła"
       }
     },
     "change": {
@@ -79,7 +114,40 @@
       "required": {
         "newPassword": "Musisz podać nowe hasło!",
         "confirmPassword": "To pole jest wymagane"
+      },
+      "errors": {
+        "couldNotChangePassword": "Nie można zmienić hasła",
+        "couldNotVerifyPassword": "Nie można zweryfikować hasła",
+        "unknownError": "Nieznany błąd"
       }
+    },
+    "complexity": {
+      "length": "Musi zawierać co najmniej {minLength} znaków.",
+      "hasSymbol": "Musi zawierać symbol.",
+      "hasNumber": "Musi zawierać numer.",
+      "hasUppercase": "Musi zawierać dużą literę.",
+      "hasLowercase": "Musi zawierać małą literę.",
+      "equals": "Potwierdzenie hasła pasuje.",
+      "matches": "Pasuje",
+      "doesNotMatch": "Nie pasuje"
+    },
+    "errors": {
+      "noHostFound": "Nie znaleziono hosta",
+      "couldNotSendResetLink": "Nie można wysłać linku do resetowania hasła",
+      "couldNotCreateSessionForUser": "Nie można utworzyć sesji dla użytkownika",
+      "couldNotVerifyPassword": "Nie można zweryfikować hasła",
+      "failedToAuthenticate": "Uwierzytelnianie nie powiodło się. Wykorzystałeś {failedAttempts} z {maxPasswordAttempts} prób wprowadzenia hasła.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Uwierzytelnianie nie powiodło się.",
+      "accountLockedContactAdmin": " Skontaktuj się z administratorem, aby odblokować konto",
+      "userNotFound": "Użytkownik nie został znaleziony w systemie",
+      "initialUserNotSupported": "Użytkownik początkowy nie jest obsługiwany",
+      "userInitialStateNotSupported": "Początkowy stan użytkownika nie jest obsługiwany",
+      "codeOrVerificationRequired": "Musisz podać kod lub mieć ważną weryfikację użytkownika",
+      "verificationRequired": "Wymagana jest weryfikacja użytkownika",
+      "couldNotLoadSession": "Nie można załadować sesji",
+      "couldNotLoadAuthMethods": "Nie można załadować metod uwierzytelniania",
+      "failedPrecondition": "Nie spełniono warunków wstępnych",
+      "sessionNotValid": "Sesja jest nieważna"
     }
   },
   "idp": {
@@ -244,6 +312,13 @@
       "firstname": "To pole jest wymagane",
       "lastname": "To pole jest wymagane",
       "email": "To pole jest wymagane"
+    },
+    "errors": {
+      "couldNotCreateUser": "Nie udało się utworzyć użytkownika",
+      "couldNotCreateSession": "Nie udało się utworzyć sesji",
+      "userNotFound": "Nie znaleziono użytkownika w systemie",
+      "couldNotLinkIDP": "Nie udało się powiązać IDP z użytkownikiem",
+      "couldNotRegisterUser": "Nie udało się zarejestrować użytkownika"
     }
   },
   "invite": {
@@ -287,6 +362,19 @@
       "required": {
         "code": "To pole jest wymagane"
       }
+    },
+    "errors": {
+      "couldNotResendEmail": "Nie udało się ponownie wysłać wiadomości e-mail",
+      "couldNotVerifyUser": "Nie udało się zweryfikować użytkownika",
+      "couldNotVerifyInvite": "Nie udało się zweryfikować zaproszenia",
+      "couldNotVerifyEmail": "Nie udało się zweryfikować adresu e-mail",
+      "couldNotVerify": "Nie udało się zweryfikować",
+      "couldNotLoadUser": "Nie udało się załadować użytkownika",
+      "couldNotLoadAuthenticators": "Nie udało się wczytać dostępnych metod uwierzytelniania",
+      "couldNotCreateSession": "Nie udało się utworzyć sesji",
+      "noHostFound": "Nie znaleziono hosta",
+      "userAlreadyVerified": "Użytkownik jest już zweryfikowany!",
+      "couldNotResendInvite": "Nie udało się ponownie wysłać zaproszenia"
     }
   },
   "authenticator": {
