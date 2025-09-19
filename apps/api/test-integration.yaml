@@ -15,7 +15,7 @@ Database:
         Mode: disable
 FirstInstance:
   Skip: false
-  PatPath: tmp/admin-pat.txt
+  PatPath: .artifacts/api-test-integration/admin-pat.txt
   InstanceName: ZITADEL
   DefaultLanguage: en
   Org:

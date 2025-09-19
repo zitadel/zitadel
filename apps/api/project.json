@@ -80,12 +80,15 @@
         },
         "test-unit": {
             "description": "Run the unit tests with coverage",
+            "command": "go test -race -coverprofile=profile.api.test-unit.cov -coverpkg=./internal/...  ./...",
             "cache": true,
             "inputs": [
                 "sources",
                 "{workspaceRoot}/go*"
             ],
-            "command": "go test -race -coverprofile=profile.api.test-unit.cov -coverpkg=./internal/...  ./..."
+            "outputs": [
+                "{workspaceRoot}/profile.api.test-unit.cov"
+            ]
         },
         "test-integration-pull": {
             "command": "nx run @zitadel/devcontainer:compose pull db-api-integration cache-api-integration"
@@ -119,13 +122,19 @@
                 "test-integration-state",
                 "test-integration-build"
             ],
+            "executor": "nx:run-commands",
             "options": {
                 "env": {
                     "API_CONFIG_FILE": "{projectRoot}/test-integration.yaml",
-                    "ZITADEL_BINARY": "zitadel.test"
-                }
-            },
-            "command": "nx run @zitadel/api:setup --excludeTaskDependencies"
+                    "ZITADEL_BINARY": "zitadel.test",
+                    "GORACE": "halt_on_error=1"
+                },
+                "parallel": false,
+                "commands": [
+                    "mkdir -p .artifacts/api-test-integration/coverage",
+                    "nx run @zitadel/api:setup --excludeTaskDependencies"
+                ]
+            }
         },
         "test-integration-env": {
             "continuous": true,
@@ -136,20 +145,13 @@
             "options": {
                 "env": {
                     "API_CONFIG_FILE": "{projectRoot}/test-integration.yaml",
-                    "ZITADEL_BINARY": "zitadel.test"
+                    "ZITADEL_BINARY": "zitadel.test",
+                    "GORACE": "log_path=.artifacts/api-test-integration/race.log"
                 }
             },
             "command": "nx run @zitadel/api:prod --excludeTaskDependencies"
         },
         "test-integration": {
-            "cache": true,
-            "inputs": [
-                { "runtime": "go env GOOS" },
-                { "runtime": "go env GOARCH" },
-                "sources",
-                "{workspaceRoot}/internal/integration/**",
-                "{workspaceRoot}/go*"
-            ],
             "dependsOn": [
                 "test-integration-state",
                 "test-integration-env"
@@ -158,9 +160,21 @@
                 "parallel": false,
                 "commands": [
                     "bash -c 'go test -race -count 1 -tags integration -timeout 60m -parallel 1 $(go list -tags integration ./... | grep -e \"integration_test\" -e \"events_testing\")'",
-                    "go tool covdata textfmt -i=tmp/coverage -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/...,github.com/zitadel/zitadel/backend/... -o profile.api.test-integration.cov"
+                    "go tool covdata textfmt -i=.artifacts/api-test-integration/coverage -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/...,github.com/zitadel/zitadel/backend/... -o profile.api.test-integration.cov"
                 ]
-            }
+            },
+            "cache": true,
+            "inputs": [
+                { "runtime": "go env GOOS" },
+                { "runtime": "go env GOARCH" },
+                "sources",
+                "{workspaceRoot}/internal/integration/**",
+                "{workspaceRoot}/go*"
+            ],
+            "outputs": [
+                "{workspaceRoot}/profile.api.test-integration.cov",
+                ".artifacts/api-test-integration"
+            ]
         },
         "generate-console": {
             "description": "Build the console and copy the static files to the api",

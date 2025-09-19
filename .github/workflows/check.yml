@@ -30,8 +30,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          filter: tree:0
           fetch-depth: 0
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -76,14 +79,13 @@ jobs:
         with:
           key: ${{ steps.nx_cache.outputs.cache-primary-key }}
           path: ${{ env.nx_cache_path }}
-      - name: upload server logs
+      - name: upload race logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: integration-test-server-logs
+          name: integration-test-race-logs
           path: |
-           tmp/zitadel.log
-           tmp/race.log.*
+           .artifacts/api-test-integration/race.log.*
       - name: publish coverage
         uses: codecov/codecov-action@v4.3.0
         with:
