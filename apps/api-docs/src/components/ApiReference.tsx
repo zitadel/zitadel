@@ -177,6 +177,11 @@ export function ApiReferenceComponent() {
     loadVersions();
   }, []);
 
+  // Update URL when version or service changes
+  useEffect(() => {
+    updateUrlParams(selectedVersion, selectedSpec);
+  }, [selectedVersion, selectedSpec]);
+
   useEffect(() => {
     async function loadSpecs() {
       try {
@@ -368,6 +373,13 @@ export function ApiReferenceComponent() {
   };
 
   useEffect(() => {
+    console.log("🔄 Version/Spec useEffect triggered:", {
+      selectedSpec,
+      selectedVersion,
+      specsLength: specs.length,
+      containerExists: !!containerRef.current,
+    });
+
     // Don't try to load if specs haven't been loaded yet
     if (
       selectedSpec &&
@@ -376,6 +388,12 @@ export function ApiReferenceComponent() {
       specs.length > 0
     ) {
       const selectedSpecData = specs.find((spec) => spec.name === selectedSpec);
+      console.log(
+        "📋 Found spec data:",
+        !!selectedSpecData,
+        selectedSpecData?.name
+      );
+
       if (selectedSpecData) {
         const loadVersionedSpec = async () => {
           try {
@@ -385,9 +403,9 @@ export function ApiReferenceComponent() {
                 ? `/api/openapi/${selectedSpec}`
                 : `/api/openapi/${selectedVersion}/${selectedSpec}`;
 
-            console.log("Loading spec from URL:", specUrl);
+            console.log("🌐 Loading spec from URL:", specUrl);
             console.log(
-              "Selected version:",
+              "📊 Selected version:",
               selectedVersion,
               "Selected spec:",
               selectedSpec
@@ -406,20 +424,29 @@ export function ApiReferenceComponent() {
             }
 
             const specContent = await response.text();
-            console.log("Spec content length:", specContent.length);
+            const contentType = response.headers.get("content-type") || "";
+            console.log("📄 Spec content length:", specContent.length);
+            console.log("📋 Content-Type:", contentType);
             let parsedSpec;
 
-            // Parse YAML or JSON
+            // Parse YAML or JSON based on content type and URL
             try {
-              if (specUrl.endsWith(".yaml") || specUrl.endsWith(".yml")) {
+              if (
+                contentType.includes("yaml") ||
+                specUrl.endsWith(".yaml") ||
+                specUrl.endsWith(".yml")
+              ) {
+                console.log("🔧 Parsing as YAML");
                 parsedSpec = yaml.load(specContent);
               } else {
+                console.log("🔧 Parsing as JSON");
                 parsedSpec = JSON.parse(specContent);
               }
             } catch (parseError) {
+              console.error("❌ Parse error:", parseError);
               // Fallback: use the original content if versioned spec fails
               console.warn(
-                "Failed to parse versioned spec, using original:",
+                "⚠️ Failed to parse versioned spec, using original:",
                 parseError
               );
               if (selectedSpecData) {
@@ -431,26 +458,40 @@ export function ApiReferenceComponent() {
 
             // Debug: Log the parsed spec
             console.log(
-              "Selected spec:",
+              "📊 Final selected spec:",
               selectedSpec,
               "version:",
               selectedVersion
             );
-            console.log("Parsed spec:", parsedSpec);
-            console.log("Parsed spec paths:", parsedSpec.paths);
-            console.log(
-              "Number of paths:",
-              Object.keys(parsedSpec.paths || {}).length
-            );
+            console.log("📋 Parsed spec info:", {
+              title: parsedSpec?.info?.title,
+              version: parsedSpec?.info?.version,
+              description: parsedSpec?.info?.description,
+              pathCount: Object.keys(parsedSpec?.paths || {}).length,
+              hasTestIndicators:
+                parsedSpec?.info?.title?.includes("TEST") ||
+                parsedSpec?.info?.title?.includes("SIMPLIFIED") ||
+                parsedSpec?.info?.description?.includes("test")
+                  ? "✅ YES"
+                  : "❌ NO",
+            });
+            console.log("🗂️ Full parsed spec:", parsedSpec);
 
             // Clear the container
             if (containerRef.current) {
               containerRef.current.innerHTML = "";
 
-              // Create a div for Scalar
+              // Create a div for Scalar with unique ID to force re-render
               const scalarDiv = document.createElement("div");
-              scalarDiv.id = `api-reference-${selectedSpec}-${selectedVersion}`;
+              scalarDiv.id = `api-reference-${selectedSpec}-${selectedVersion}-${Date.now()}`;
               containerRef.current.appendChild(scalarDiv);
+
+              console.log("🎯 Creating Scalar with unique ID:", scalarDiv.id);
+              console.log("📋 Spec info:", {
+                title: parsedSpec.info?.title,
+                pathCount: Object.keys(parsedSpec.paths || {}).length,
+                version: parsedSpec.info?.version,
+              });
 
               // Create the API reference with correct configuration
               createApiReference(scalarDiv, {
@@ -899,6 +940,7 @@ export function ApiReferenceComponent() {
 
       {/* API Documentation content - fills remaining space */}
       <div
+        key={`${selectedVersion}-${selectedSpec}`} // Force re-render when version/spec changes
         ref={containerRef}
         style={{
           flex: 1,
