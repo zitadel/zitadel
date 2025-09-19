@@ -11,7 +11,7 @@ import "validate/validate.proto";
 
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
-import "zitadel/filter/v2beta/filter.proto";
+import "zitadel/filter/v2/filter.proto";
 import "zitadel/group/v2/group.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/group/v2;group";
@@ -350,10 +350,10 @@ message CreateGroupResponse {
 
 message ListGroupsRequest {
   // Criteria to list the user groups.
-  repeated GroupsSearchFilter queries = 1;
+  repeated GroupsSearchFilter filters = 1;
 
   // Pagination and sorting.
-  zitadel.filter.v2beta.PaginationRequest pagination = 2;
+  zitadel.filter.v2.PaginationRequest pagination = 2;
 
   // The field the result is sorted by.
   optional FieldName sorting_column = 3;
@@ -361,10 +361,10 @@ message ListGroupsRequest {
 
 message ListGroupsResponse {
   // The list of groups.
-  repeated Group groups = 2;
+  repeated Group groups = 1;
 
   // Contains the total number of groups matching the query and the applied limit.
-  zitadel.filter.v2beta.PaginationResponse pagination = 1;
+  zitadel.filter.v2.PaginationResponse pagination = 2;
 }
 
 message UpdateGroupRequest {
@@ -379,7 +379,7 @@ message UpdateGroupRequest {
   ];
 
   // Name of the group.
-  optional string name = 3 [
+  optional string name = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
@@ -389,7 +389,7 @@ message UpdateGroupRequest {
   ];
 
   // Description of the group.
-  optional string description = 4 [
+  optional string description = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
