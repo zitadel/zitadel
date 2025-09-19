@@ -175,17 +175,28 @@ func (i instance) NameCondition(op database.TextOperation, name string) database
 	return database.NewTextCondition(i.NameColumn(), op, name)
 }
 
+// ExistsDomain creates a correlated [database.Exists] condition on instance_domains.
+// Use this when you want to filter instances by a domain condition but still return all domains
+// of the instance in the aggregated result.
+// Example usage:
+//
+//	domainRepo := instanceRepo.Domains(true) // ensure domains are loaded/aggregated
+//	instance, _ := instanceRepo.Get(ctx,
+//	    database.WithCondition(
+//	        database.And(
+//	            instanceRepo.InstanceIDCondition(instanceID),
+//	            instanceRepo.DomainExists(domainRepo.DomainCondition(database.TextOperationEqual, "example.com")),
+//	        ),
+//	    ),
+//	)
 func (i instance) ExistsDomain(cond database.Condition) database.Condition {
-	// Build a correlated subquery: EXISTS (SELECT 1 FROM zitadel.org_domains WHERE
-	//   organizations.instance_id = org_domains.instance_id AND organizations.id = org_domains.org_id AND <cond>)
-	correlated := database.And(
-		database.NewColumnCondition(i.IDColumn(), i.domainRepo.InstanceIDColumn()),
-		cond,
+	return database.Exists(
+		i.domainRepo.qualifiedTableName(),
+		database.And(
+			database.NewColumnCondition(i.IDColumn(), i.domainRepo.InstanceIDColumn()),
+			cond,
+		),
 	)
-	return existsCondition{
-		table:     i.qualifiedTableName(),
-		condition: correlated,
-	}
 }
 
 // -------------------------------------------------------------

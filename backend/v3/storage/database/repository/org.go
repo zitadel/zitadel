@@ -14,7 +14,6 @@ import (
 var _ domain.OrganizationRepository = (*org)(nil)
 
 type org struct {
-	// repository
 	shouldLoadDomains  bool
 	domainRepo         orgDomain
 	shouldLoadMetadata bool
@@ -163,27 +162,7 @@ func (o org) StateCondition(state domain.OrgState) database.Condition {
 	return database.NewTextCondition(o.StateColumn(), database.TextOperationEqual, state.String())
 }
 
-// existsCondition is a helper to write an EXISTS (SELECT 1 FROM <table> WHERE <condition>) clause.
-// It implements database.Condition so it can be composed with other conditions using And/Or.
-type existsCondition struct {
-	table     string
-	condition database.Condition
-}
-
-func (e existsCondition) Write(builder *database.StatementBuilder) {
-	builder.WriteString(" EXISTS (SELECT 1 FROM ")
-	builder.WriteString(e.table)
-	builder.WriteString(" WHERE ")
-	e.condition.Write(builder)
-	builder.WriteString(")")
-}
-
-func (e existsCondition) ContainsColumn(col database.Column) bool {
-	// Forward to the inner condition so safety checks (like instance_id presence) can still work.
-	return e.condition.ContainsColumn(col)
-}
-
-// ExistsDomain creates a correlated EXISTS condition on org_domains.
+// ExistsDomain creates a correlated [database.Exists] condition on org_domains.
 // Use this when you want to filter organizations by a domain condition but still return all domains
 // of the organization in the aggregated result.
 // Example usage:
@@ -198,31 +177,39 @@ func (e existsCondition) ContainsColumn(col database.Column) bool {
 //	    ),
 //	)
 func (o org) ExistsDomain(cond database.Condition) database.Condition {
-	// Build a correlated subquery: EXISTS (SELECT 1 FROM zitadel.org_domains WHERE
-	//   organizations.instance_id = org_domains.instance_id AND organizations.id = org_domains.org_id AND <cond>)
-	correlated := database.And(
-		database.NewColumnCondition(o.InstanceIDColumn(), o.domainRepo.InstanceIDColumn()),
-		database.NewColumnCondition(o.IDColumn(), o.domainRepo.OrgIDColumn()),
-		cond,
+	return database.Exists(
+		o.domainRepo.qualifiedTableName(),
+		database.And(
+			database.NewColumnCondition(o.InstanceIDColumn(), o.domainRepo.InstanceIDColumn()),
+			database.NewColumnCondition(o.IDColumn(), o.domainRepo.OrgIDColumn()),
+			cond,
+		),
 	)
-	return existsCondition{
-		table:     "zitadel.org_domains",
-		condition: correlated,
-	}
 }
 
+// ExistsMetadata creates a correlated [database.Exists] condition on org_metadata.
+// Use this when you want to filter organizations by a metadata condition but still return all metadata
+// of the organization in the aggregated result.
+// Example usage:
+//
+//	metadataRepo := orgRepo.Metadata(true) // ensure metadata are loaded/aggregated
+//	org, _ := orgRepo.Get(ctx,
+//	    database.WithCondition(
+//	        database.And(
+//	            orgRepo.InstanceIDCondition(instanceID),
+//	            orgRepo.MetadataExists(metadataRepo.KeyCondition(database.TextOperationEqual, "urn:zitadel:org:custom:my-key")),
+//	        ),
+//	    ),
+//	)
 func (o org) ExistsMetadata(cond database.Condition) database.Condition {
-	// Build a correlated subquery: EXISTS (SELECT 1 FROM zitadel.org_metadata WHERE
-	//   organizations.instance_id = org_metadata.instance_id AND organizations.id = org_metadata.org_id AND <cond>)
-	correlated := database.And(
-		database.NewColumnCondition(o.InstanceIDColumn(), o.metadataRepo.InstanceIDColumn()),
-		database.NewColumnCondition(o.IDColumn(), o.metadataRepo.OrgIDColumn()),
-		cond,
+	return database.Exists(
+		o.metadataRepo.qualifiedTableName(),
+		database.And(
+			database.NewColumnCondition(o.InstanceIDColumn(), o.metadataRepo.InstanceIDColumn()),
+			database.NewColumnCondition(o.IDColumn(), o.metadataRepo.OrgIDColumn()),
+			cond,
+		),
 	)
-	return existsCondition{
-		table:     "zitadel.org_metadata",
-		condition: correlated,
-	}
 }
 
 // -------------------------------------------------------------
