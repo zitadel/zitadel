@@ -317,7 +317,7 @@ message ResourceType {
     reserved 2;
     // ProjectID is required to grant administrator privileges for a specific project.
     string project_id = 1;
-    // ProjectGrantID is required to grant administrator privileges for a specific project grant.
+    // OrganizationID is required to grant administrator privileges for a specific project grant.
     string organization_id = 3;
   }
 
