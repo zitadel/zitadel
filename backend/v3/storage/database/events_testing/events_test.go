@@ -28,13 +28,7 @@ func getEnv(key, fallback string) string {
 	return fallback
 }
 
-var ConnString = fmt.Sprintf("host=%s port=%s user=zitadel password=%s dbname=%s sslmode=%s",
-	getEnv("ZITADEL_DATABASE_POSTGRES_HOST", "localhost"),
-	getEnv("ZITADEL_DATABASE_POSTGRES_PORT", "5432"),
-	getEnv("ZITADEL_DATABASE_POSTGRES_PASSWORD", "zitadel"),
-	getEnv("ZITADEL_DATABASE_POSTGRES_DB", "zitadel"),
-	getEnv("ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE", "disable"),
-)
+var ConnString = fmt.Sprintf("host=%s port=5433 user=zitadel password=zitadel dbname=zitadel sslmode=disable", getEnv("ZITADEL_DATABASE_POSTGRES_HOST", "localhost"))
 
 var (
 	dbPool       *pgxpool.Pool
