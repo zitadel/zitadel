@@ -56,14 +56,11 @@ jobs:
         id: nx_cache
         with:
           path: ${{ env.nx_cache_path }}
-          # This key makes sure that every commit gets its own cache key
-          # As github.sha points to a virtual merge commit on PRs, we use the PR branches HEAD SHA first.
           # It includes the repository owner to prevent cache poisoning from forks.
           # We restore caches from previous commits on the HEAD branch, then we fall back to caches from the base.
-          key: nx-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-${{ github.repository_owner }}-${{ github.event.pull_request.head.sha || github.sha }}
+          key: nx-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-${{ github.repository_owner }}
           enableCrossOsArchive: true
           restore-keys: |
-            nx-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-${{ github.repository_owner }}-
             nx-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-
             nx-${{ github.event.pull_request.base.ref || github.ref_name }}-
       - name: Install global modules
@@ -73,7 +70,7 @@ jobs:
         working-directory: apps/login
       - uses: nrwl/nx-set-shas@v4
       - name: Lint, Build, Unit Tests
-        run: nx affected --targets lint build test-unit test-integration --exclude @zitadel/docs,@zitadel/benchmark
+        run: nx affected --targets lint build test-unit test-integration pack --exclude @zitadel/docs,@zitadel/benchmark
       - uses: actions/cache/save@v4
         if: always()
         with:
@@ -100,3 +97,8 @@ jobs:
           name: api-test-integration
           flags: api-test-integration
           token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload all platform artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: zitadel-binaries
+          path: zitadel-*-*.tar.gz

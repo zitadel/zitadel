@@ -22,7 +22,7 @@
                     "DEV_CONFIG_FILE": "{projectRoot}/dev.yaml"
                 }
             },
-            "command": "bash -c './.artifacts/bin/${GOOS:-$(go env GOOS)}/${GOARCH:-$(go env GOARCH)}/${ZITADEL_BINARY:-zitadel} start --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --masterkey MasterkeyNeedsToHave32Characters'"
+            "command": "bash -c './.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel} start --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --masterkey MasterkeyNeedsToHave32Characters'"
         },
         "setup": {
             "dependsOn": [
@@ -35,8 +35,8 @@
                     "DEV_CONFIG_FILE": "{projectRoot}/dev.yaml"
                 },
                 "commands": [
-                    "bash -c 'for i in {1..5}; do echo \"Attempt $i/5: Starting ZITADEL...\";./.artifacts/bin/${GOOS:-$(go env GOOS)}/${GOARCH:-$(go env GOARCH)}/${ZITADEL_BINARY:-zitadel} init --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} && break || (echo \"Failed, retrying in 2s...\" && sleep 2); done'",
-                    "bash -c './.artifacts/bin/${GOOS:-$(go env GOOS)}/${GOARCH:-$(go env GOARCH)}/${ZITADEL_BINARY:-zitadel} setup --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --steps ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --masterkey MasterkeyNeedsToHave32Characters'"
+                    "bash -c 'for i in {1..5}; do echo \"Attempt $i/5: Starting ZITADEL...\";./.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel} init --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} && break || (echo \"Failed, retrying in 2s...\" && sleep 2); done'",
+                    "bash -c './.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel} setup --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --steps ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --masterkey MasterkeyNeedsToHave32Characters'"
                 ]
             }
         },
@@ -45,11 +45,10 @@
             "dependsOn": [
                 "generate"
             ],
-            "command": "bash -c 'ZITADEL_NOW=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\"); ZITADEL_VERSION=${VERSION:-development-${ZITADEL_NOW}}; COMMIT_SHA=${COMMIT_SHA:-$(git rev-parse --short HEAD)}; CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel -v -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=${COMMIT_SHA} -X github.com/zitadel/zitadel/cmd/build.date=${ZITADEL_NOW} -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_VERSION}\"'",
+            "command": "bash -c 'CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel -v -ldflags=\"-s -w\"'",
             "inputs": [
                 { "runtime": "go env GOOS" },
                 { "runtime": "go env GOARCH" },
-                { "env": "VERSION" },
                 "sources",
                 "{workspaceRoot}/go*",
                 "!{workspaceRoot}/internal/integration/**",
@@ -58,6 +57,47 @@
             ],
             "outputs": [
                 "{workspaceRoot}/.artifacts/bin/*/*/zitadel"
+            ]
+        },
+        "pack-platform": {
+            "description": "Build and package for a single platform",
+            "executor": "nx:run-commands",
+            "options": {
+                "commands": [
+                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; ZITADEL_VERSION=${VERSION:-development-${NOW}}; COMMIT_SHA=${COMMIT_SHA:-$(git rev-parse --short HEAD)}; echo \"Building for $GOOS-$GOARCH...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$GOOS/$GOARCH/zitadel$EXT -v -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=${COMMIT_SHA} -X github.com/zitadel/zitadel/cmd/build.date=${NOW} -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_VERSION}\"'",
+                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; FOLDER=\"zitadel-$GOOS-$GOARCH\"; mkdir -p \"$FOLDER\"; cp \".artifacts/bin/$GOOS/$GOARCH/zitadel$EXT\" \"$FOLDER/\"; cp LICENSE \"$FOLDER/\"; cp README.md \"$FOLDER/\"; tar -czvf \"$FOLDER.tar.gz\" \"$FOLDER\"; rm -rf \"$FOLDER\"'"
+                ]
+            },
+            "inputs": [
+                { "env": "GOOS" },
+                { "env": "GOARCH" },
+                { "env": "VERSION" },
+                { "env": "NOW" },
+                { "env": "COMMIT_SHA" },
+                "sources",
+                "{workspaceRoot}/go*",
+                "!{workspaceRoot}/internal/integration/**",
+                "!{workspaceRoot}/**/*_test.go",
+                "!{workspaceRoot}/**/integration_test/**/*"
+            ]
+        },
+        "pack": {
+            "description": "Build and package executables for all platforms",
+            "dependsOn": ["generate"],
+            "executor": "nx:run-commands",
+            "options": {
+                "parallel": false,
+                "commands": [
+                    "bash -c 'export NOW=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\"); for goos in linux darwin windows; do for goarch in amd64 arm64; do echo \"Building for $goos-$goarch...\"; GOOS=$goos GOARCH=$goarch nx run @zitadel/api:pack-platform; done; done'",
+                    "mkdir -p .artifacts/pack",
+                    "find . -maxdepth 1 -name 'zitadel-*-*.tar.gz' -exec mv {} .artifacts/pack/ \\;",
+                    "cd .artifacts/pack && sha256sum *.tar.gz > checksums.txt",
+                    "echo 'Packaging complete. Archives and checksums available in .artifacts/pack/'"
+                ]
+            },
+            "outputs": [
+                "{workspaceRoot}/.artifacts/pack/*.tar.gz",
+                "{workspaceRoot}/.artifacts/pack/checksums.txt"
             ]
         },
         "generate": {
@@ -162,9 +202,12 @@
             "executor": "nx:run-commands",
             "options": {
                 "parallel": false,
+                "env": {
+                    "GOCOVERDIR": "{workspaceRoot}/.artifacts/api-test-integration/coverage"
+                },
                 "commands": [
                     "bash -c 'go test -race -count 1 -tags integration -timeout 60m -parallel 1 $(go list -tags integration ./... | grep -e \"integration_test\" -e \"events_testing\")'",
-                    "go tool covdata textfmt -i=.artifacts/api-test-integration/coverage -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/...,github.com/zitadel/zitadel/backend/... -o profile.api.test-integration.cov"
+                    "go tool covdata textfmt -i=$GOCOVERDIR -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/...,github.com/zitadel/zitadel/backend/... -o profile.api.test-integration.cov"
                 ]
             },
             "cache": true,
