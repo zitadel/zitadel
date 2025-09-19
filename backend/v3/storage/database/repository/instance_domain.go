@@ -32,8 +32,7 @@ const queryInstanceDomainStmt = `SELECT instance_domains.instance_id, instance_d
 	`FROM zitadel.instance_domains`
 
 // Get implements [domain.InstanceDomainRepository].
-// Subtle: this method shadows the method ([domain.InstanceRepository]).Get of instanceDomain.instance.
-func (i *instanceDomain) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.InstanceDomain, error) {
+func (i instanceDomain) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.InstanceDomain, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
@@ -47,8 +46,7 @@ func (i *instanceDomain) Get(ctx context.Context, client database.QueryExecutor,
 }
 
 // List implements [domain.InstanceDomainRepository].
-// Subtle: this method shadows the method ([domain.InstanceRepository]).List of instanceDomain.instance.
-func (i *instanceDomain) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.InstanceDomain, error) {
+func (i instanceDomain) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.InstanceDomain, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
@@ -62,7 +60,7 @@ func (i *instanceDomain) List(ctx context.Context, client database.QueryExecutor
 }
 
 // Add implements [domain.InstanceDomainRepository].
-func (i *instanceDomain) Add(ctx context.Context, client database.QueryExecutor, domain *domain.AddInstanceDomain) error {
+func (i instanceDomain) Add(ctx context.Context, client database.QueryExecutor, domain *domain.AddInstanceDomain) error {
 	var (
 		builder              database.StatementBuilder
 		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
@@ -82,8 +80,7 @@ func (i *instanceDomain) Add(ctx context.Context, client database.QueryExecutor,
 }
 
 // Update implements [domain.InstanceDomainRepository].
-// Subtle: this method shadows the method ([domain.InstanceRepository]).Update of instanceDomain.instance.
-func (i *instanceDomain) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+func (i instanceDomain) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}
@@ -98,7 +95,7 @@ func (i *instanceDomain) Update(ctx context.Context, client database.QueryExecut
 }
 
 // Remove implements [domain.InstanceDomainRepository].
-func (i *instanceDomain) Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+func (i instanceDomain) Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	var builder database.StatementBuilder
 
 	builder.WriteString(`DELETE FROM zitadel.instance_domains WHERE `)
@@ -155,7 +152,6 @@ func (i instanceDomain) TypeCondition(typ domain.DomainType) database.Condition 
 // -------------------------------------------------------------
 
 // CreatedAtColumn implements [domain.InstanceDomainRepository].
-// Subtle: this method shadows the method ([domain.InstanceRepository]).CreatedAtColumn of instanceDomain.instance.
 func (i instanceDomain) CreatedAtColumn() *database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "created_at")
 }
@@ -176,7 +172,6 @@ func (i instanceDomain) IsPrimaryColumn() *database.Column {
 }
 
 // UpdatedAtColumn implements [domain.InstanceDomainRepository].
-// Subtle: this method shadows the method ([domain.InstanceRepository]).UpdatedAtColumn of instanceDomain.instance.
 func (i instanceDomain) UpdatedAtColumn() *database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "updated_at")
 }

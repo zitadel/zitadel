@@ -39,7 +39,7 @@ const queryOrganizationStmt = `SELECT organizations.id, organizations.name, orga
 	` FROM zitadel.organizations`
 
 // Get implements [domain.OrganizationRepository].
-func (o *org) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Organization, error) {
+func (o org) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Organization, error) {
 	opts = append(opts,
 		o.joinDomains(),
 		o.joinMetadata(),
@@ -59,7 +59,7 @@ func (o *org) Get(ctx context.Context, client database.QueryExecutor, opts ...da
 }
 
 // List implements [domain.OrganizationRepository].
-func (o *org) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Organization, error) {
+func (o org) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Organization, error) {
 	opts = append(opts,
 		o.joinDomains(),
 		o.joinMetadata(),
@@ -83,7 +83,7 @@ const createOrganizationStmt = `INSERT INTO zitadel.organizations (id, name, ins
 	` RETURNING created_at, updated_at`
 
 // Create implements [domain.OrganizationRepository].
-func (o *org) Create(ctx context.Context, client database.QueryExecutor, organization *domain.Organization) error {
+func (o org) Create(ctx context.Context, client database.QueryExecutor, organization *domain.Organization) error {
 	builder := database.StatementBuilder{}
 	builder.AppendArgs(organization.ID, organization.Name, organization.InstanceID, organization.State)
 	builder.WriteString(createOrganizationStmt)
@@ -92,7 +92,7 @@ func (o *org) Create(ctx context.Context, client database.QueryExecutor, organiz
 }
 
 // Update implements [domain.OrganizationRepository].
-func (o *org) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+func (o org) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}
@@ -112,7 +112,7 @@ func (o *org) Update(ctx context.Context, client database.QueryExecutor, conditi
 }
 
 // Delete implements [domain.OrganizationRepository].
-func (o *org) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+func (o org) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	if !condition.ContainsColumn(o.InstanceIDColumn()) {
 		return 0, database.NewMissingConditionError(o.InstanceIDColumn())
 	}
@@ -310,14 +310,14 @@ func scanOrganizations(ctx context.Context, querier database.Querier, builder *d
 // sub repositories
 // -------------------------------------------------------------
 
-func (o *org) LoadDomains() domain.OrganizationRepository {
+func (o org) LoadDomains() domain.OrganizationRepository {
 	return &org{
 		shouldLoadDomains:  true,
 		shouldLoadMetadata: o.shouldLoadMetadata,
 	}
 }
 
-func (o *org) joinDomains() database.QueryOption {
+func (o org) joinDomains() database.QueryOption {
 	columns := make([]database.Condition, 0, 3)
 	columns = append(columns,
 		database.NewColumnCondition(o.InstanceIDColumn(), o.domainRepo.InstanceIDColumn()),
@@ -336,14 +336,14 @@ func (o *org) joinDomains() database.QueryOption {
 	)
 }
 
-func (o *org) LoadMetadata() domain.OrganizationRepository {
+func (o org) LoadMetadata() domain.OrganizationRepository {
 	return &org{
 		shouldLoadDomains:  o.shouldLoadDomains,
 		shouldLoadMetadata: true,
 	}
 }
 
-func (o *org) joinMetadata() database.QueryOption {
+func (o org) joinMetadata() database.QueryOption {
 	columns := make([]database.Condition, 0, 3)
 	columns = append(columns,
 		database.NewColumnCondition(o.InstanceIDColumn(), o.metadataRepo.InstanceIDColumn()),

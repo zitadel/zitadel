@@ -35,7 +35,7 @@ const queryOrganizationDomainStmt = `SELECT instance_id, org_id, domain, is_veri
 
 // Get implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).Get of orgDomain.org.
-func (o *orgDomain) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.OrganizationDomain, error) {
+func (o orgDomain) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.OrganizationDomain, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
@@ -50,7 +50,7 @@ func (o *orgDomain) Get(ctx context.Context, client database.QueryExecutor, opts
 
 // List implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).List of orgDomain.org.
-func (o *orgDomain) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.OrganizationDomain, error) {
+func (o orgDomain) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.OrganizationDomain, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
@@ -64,7 +64,7 @@ func (o *orgDomain) List(ctx context.Context, client database.QueryExecutor, opt
 }
 
 // Add implements [domain.OrganizationDomainRepository].
-func (o *orgDomain) Add(ctx context.Context, client database.QueryExecutor, domain *domain.AddOrganizationDomain) error {
+func (o orgDomain) Add(ctx context.Context, client database.QueryExecutor, domain *domain.AddOrganizationDomain) error {
 	var (
 		builder              database.StatementBuilder
 		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
@@ -85,7 +85,7 @@ func (o *orgDomain) Add(ctx context.Context, client database.QueryExecutor, doma
 
 // Update implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).Update of orgDomain.org.
-func (o *orgDomain) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+func (o orgDomain) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}
@@ -100,7 +100,7 @@ func (o *orgDomain) Update(ctx context.Context, client database.QueryExecutor, c
 }
 
 // Remove implements [domain.OrganizationDomainRepository].
-func (o *orgDomain) Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+func (o orgDomain) Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	var builder database.StatementBuilder
 
 	builder.WriteString(`DELETE FROM zitadel.org_domains `)

@@ -32,7 +32,7 @@ const queryOrganizationMetadataStmt = `SELECT instance_id, org_id, key, value, c
 	`FROM zitadel.org_metadata`
 
 // Get implements [domain.OrganizationMetadataRepository].
-func (o *orgMetadata) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.OrganizationMetadata, error) {
+func (o orgMetadata) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.OrganizationMetadata, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
@@ -49,7 +49,7 @@ func (o *orgMetadata) Get(ctx context.Context, client database.QueryExecutor, op
 }
 
 // List implements [domain.OrganizationMetadataRepository].
-func (o *orgMetadata) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.OrganizationMetadata, error) {
+func (o orgMetadata) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.OrganizationMetadata, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
@@ -66,7 +66,7 @@ func (o *orgMetadata) List(ctx context.Context, client database.QueryExecutor, o
 }
 
 // Set implements [domain.OrganizationMetadataRepository].
-func (o *orgMetadata) Set(ctx context.Context, client database.QueryExecutor, metadata ...*domain.OrganizationMetadata) error {
+func (o orgMetadata) Set(ctx context.Context, client database.QueryExecutor, metadata ...*domain.OrganizationMetadata) error {
 	if len(metadata) == 0 {
 		return database.ErrNoChanges
 	}
@@ -113,7 +113,7 @@ func (o *orgMetadata) Set(ctx context.Context, client database.QueryExecutor, me
 }
 
 // Remove implements [domain.OrganizationMetadataRepository].
-func (o *orgMetadata) Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+func (o orgMetadata) Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	var builder database.StatementBuilder
 	if !condition.ContainsColumn(o.InstanceIDColumn()) {
 		return 0, database.NewMissingConditionError(o.InstanceIDColumn())

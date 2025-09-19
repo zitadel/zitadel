@@ -40,7 +40,7 @@ const (
 )
 
 // Get implements [domain.InstanceRepository].
-func (i *instance) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Instance, error) {
+func (i instance) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Instance, error) {
 	opts = append(opts,
 		i.joinDomains(),
 		database.WithGroupBy(i.IDColumn()),
@@ -59,7 +59,7 @@ func (i *instance) Get(ctx context.Context, client database.QueryExecutor, opts 
 }
 
 // List implements [domain.InstanceRepository].
-func (i *instance) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Instance, error) {
+func (i instance) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Instance, error) {
 	opts = append(opts,
 		i.joinDomains(),
 		database.WithGroupBy(i.IDColumn()),
@@ -78,7 +78,7 @@ func (i *instance) List(ctx context.Context, client database.QueryExecutor, opts
 }
 
 // Create implements [domain.InstanceRepository].
-func (i *instance) Create(ctx context.Context, client database.QueryExecutor, instance *domain.Instance) error {
+func (i instance) Create(ctx context.Context, client database.QueryExecutor, instance *domain.Instance) error {
 	var (
 		builder              database.StatementBuilder
 		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
@@ -285,8 +285,10 @@ func scanInstances(ctx context.Context, querier database.Querier, builder *datab
 // sub repositories
 // -------------------------------------------------------------
 
-func (i *instance) LoadDomains() {
-	i.shouldLoadDomains = true
+func (i *instance) LoadDomains() domain.InstanceRepository {
+	return &instance{
+		shouldLoadDomains: true,
+	}
 }
 
 func (i *instance) joinDomains() database.QueryOption {

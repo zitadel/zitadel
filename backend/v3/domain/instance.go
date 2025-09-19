@@ -110,7 +110,7 @@ type InstanceRepository interface {
 
 	// LoadDomains loads the domains of the given instance.
 	// If it is called the [Instance].Domains field will be set on future calls to Get or List.
-	LoadDomains()
+	LoadDomains() InstanceRepository
 }
 
 type CreateInstance struct {
