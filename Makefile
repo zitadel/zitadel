@@ -109,6 +109,13 @@ clean:
 	$(RM) $(gen_authopt_path)
 	$(RM) $(gen_zitadel_path)
 	$(RM) -r tmp/
+	git clean -fdx -e 'assets.md' docs/apis/assets
+	git clean -fdx -e 'handler.go' openapi/
+	git clean -fdx */**/statik.go
+	$(RM) -r console/dist
+	git clean -fdx -e '.gitkeep' internal/api/ui/console/static
+	$(RM) zitadel
+	$(RM) zitadel.test
 
 .PHONY: core_unit_test
 core_unit_test:
