@@ -33,6 +33,7 @@ pnpm run generate
 ```
 
 This command will:
+
 - Read all enabled versions from `versions.config.json`
 - Generate OpenAPI 3.x specifications for each version by checking out the appropriate git refs
 - Save artifacts for each version in `.artifacts/versions/`
@@ -113,7 +114,7 @@ Example `versions.config.json`:
 3. **Version Management**: Versions are manually defined in `versions.config.json`
 4. **Multi-Version Generation**: `pnpm generate` reads the config and generates artifacts for all enabled versions
 5. **API Serving**: Next.js API routes serve the generated OpenAPI specs with version support
-5. **Rendering**: Scalar API Reference renders the interactive documentation with version switching
+6. **Rendering**: Scalar API Reference renders the interactive documentation with version switching
 
 ## Version Management
 

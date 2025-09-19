@@ -52,7 +52,8 @@ export async function GET(request: NextRequest) {
     const currentArtifactsPath = join(
       process.cwd(),
       ".artifacts",
-      "openapi3",
+      "versions",
+      "main",
       "zitadel"
     );
 
@@ -77,12 +78,7 @@ export async function GET(request: NextRequest) {
 
         for (const versionDir of versionDirs) {
           foundVersions.add(versionDir);
-          const versionPath = join(
-            versionsDir,
-            versionDir,
-            "openapi3",
-            "zitadel"
-          );
+          const versionPath = join(versionsDir, versionDir, "zitadel");
           const metadataPath = join(versionsDir, versionDir, "metadata.json");
 
           // Read metadata if available
@@ -159,7 +155,6 @@ export async function GET(request: NextRequest) {
           const versionPath = join(
             legacyVersionedArtifactsDir,
             versionDir,
-            "openapi3",
             "zitadel"
           );
 

@@ -52,8 +52,14 @@ export async function GET(
     let artifactsPath: string;
 
     if (version === "latest") {
-      // Use current artifacts
-      artifactsPath = join(process.cwd(), ".artifacts", "openapi3", "zitadel");
+      // Use main branch artifacts from versions folder
+      artifactsPath = join(
+        process.cwd(),
+        ".artifacts",
+        "versions",
+        "main",
+        "zitadel"
+      );
     } else {
       // Try organized version folders first
       const organizedPath = join(

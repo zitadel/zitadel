@@ -55,26 +55,13 @@ if pnpm run generate:openapi && [ -d "public/openapi" ]; then
         echo "✅ Artifacts created for $VERSION"
     done
 else
-    echo "⚠️  OpenAPI generation failed, trying to use existing artifacts..."
+    echo "⚠️  OpenAPI generation failed, but proceeding with version directory creation..."
     
-    # Check for existing artifacts in other locations
+    # Just create empty version directories - artifacts can be added manually later
     for VERSION in $ENABLED_VERSIONS; do
         VERSION_DIR="$ARTIFACTS_DIR/versions/$VERSION"
         mkdir -p "$VERSION_DIR"
-        
-        # Try to find existing artifacts
-        if [ -d ".artifacts/openapi" ]; then
-            cp -r .artifacts/openapi/* "$VERSION_DIR/" 2>/dev/null || true
-        fi
-        if [ -d ".artifacts/openapi3" ]; then
-            cp -r .artifacts/openapi3/* "$VERSION_DIR/" 2>/dev/null || true
-        fi
-        
-        if [ "$(ls -A "$VERSION_DIR" 2>/dev/null)" ]; then
-            echo "✅ Used existing artifacts for $VERSION"
-        else
-            echo "⚠️  No artifacts available for $VERSION"
-        fi
+        echo "📁 Created directory for $VERSION (no artifacts generated)"
     done
 fi
 
