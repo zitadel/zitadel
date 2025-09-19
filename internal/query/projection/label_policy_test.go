@@ -496,41 +496,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org reduceAssetsRemoved",
-			args: args{
-				event: getEvent(
-					testEvent(
-						org.LabelPolicyAssetsRemovedEventType,
-						org.AggregateType,
-						nil,
-					), org.LabelPolicyAssetsRemovedEventMapper),
-			},
-			reduce: (&labelPolicyProjection{}).reduceAssetsRemoved,
-			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, light_logo_url, light_icon_url, dark_logo_url, dark_icon_url, font_url) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (state = $9) AND (instance_id = $10)",
-							expectedArgs: []interface{}{
-								anyArg{},
-								uint64(15),
-								nil,
-								nil,
-								nil,
-								nil,
-								nil,
-								"agg-id",
-								domain.LabelPolicyStatePreview,
-								"instance-id",
-							},
-						},
-					},
-				},
-			},
-		},
-		{
 			name: "instance reduceAdded",
 			args: args{
 				event: getEvent(
@@ -948,41 +913,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
-								nil,
-								"agg-id",
-								domain.LabelPolicyStatePreview,
-								"instance-id",
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "instance reduceAssetsRemoved",
-			args: args{
-				event: getEvent(
-					testEvent(
-						instance.LabelPolicyAssetsRemovedEventType,
-						instance.AggregateType,
-						nil,
-					), instance.LabelPolicyAssetsRemovedEventMapper),
-			},
-			reduce: (&labelPolicyProjection{}).reduceAssetsRemoved,
-			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, light_logo_url, light_icon_url, dark_logo_url, dark_icon_url, font_url) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (state = $9) AND (instance_id = $10)",
-							expectedArgs: []interface{}{
-								anyArg{},
-								uint64(15),
-								nil,
-								nil,
-								nil,
-								nil,
 								nil,
 								"agg-id",
 								domain.LabelPolicyStatePreview,
