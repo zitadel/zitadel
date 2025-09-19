@@ -11,8 +11,19 @@ import (
 var _ domain.OrganizationDomainRepository = (*orgDomain)(nil)
 
 type orgDomain struct {
-	repository
-	*org
+	// *org
+}
+
+func OrganizationDomainRepository() domain.OrganizationDomainRepository {
+	return new(orgDomain)
+}
+
+func (orgDomain) qualifiedTableName() string {
+	return "zitadel.org_domains"
+}
+
+func (orgDomain) unqualifiedTableName() string {
+	return "org_domains"
 }
 
 // -------------------------------------------------------------
@@ -24,7 +35,7 @@ const queryOrganizationDomainStmt = `SELECT instance_id, org_id, domain, is_veri
 
 // Get implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).Get of orgDomain.org.
-func (o *orgDomain) Get(ctx context.Context, opts ...database.QueryOption) (*domain.OrganizationDomain, error) {
+func (o *orgDomain) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.OrganizationDomain, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
@@ -34,12 +45,12 @@ func (o *orgDomain) Get(ctx context.Context, opts ...database.QueryOption) (*dom
 	builder.WriteString(queryOrganizationDomainStmt)
 	options.Write(&builder)
 
-	return scanOrganizationDomain(ctx, o.client, &builder)
+	return scanOrganizationDomain(ctx, client, &builder)
 }
 
 // List implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).List of orgDomain.org.
-func (o *orgDomain) List(ctx context.Context, opts ...database.QueryOption) ([]*domain.OrganizationDomain, error) {
+func (o *orgDomain) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.OrganizationDomain, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
@@ -49,11 +60,11 @@ func (o *orgDomain) List(ctx context.Context, opts ...database.QueryOption) ([]*
 	builder.WriteString(queryOrganizationDomainStmt)
 	options.Write(&builder)
 
-	return scanOrganizationDomains(ctx, o.client, &builder)
+	return scanOrganizationDomains(ctx, client, &builder)
 }
 
 // Add implements [domain.OrganizationDomainRepository].
-func (o *orgDomain) Add(ctx context.Context, domain *domain.AddOrganizationDomain) error {
+func (o *orgDomain) Add(ctx context.Context, client database.QueryExecutor, domain *domain.AddOrganizationDomain) error {
 	var (
 		builder              database.StatementBuilder
 		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
@@ -69,12 +80,12 @@ func (o *orgDomain) Add(ctx context.Context, domain *domain.AddOrganizationDomai
 	builder.WriteArgs(domain.InstanceID, domain.OrgID, domain.Domain, domain.IsVerified, domain.IsPrimary, domain.ValidationType, createdAt, updatedAt)
 	builder.WriteString(`) RETURNING created_at, updated_at`)
 
-	return o.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&domain.CreatedAt, &domain.UpdatedAt)
+	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&domain.CreatedAt, &domain.UpdatedAt)
 }
 
 // Update implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).Update of orgDomain.org.
-func (o *orgDomain) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error) {
+func (o *orgDomain) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}
@@ -85,17 +96,17 @@ func (o *orgDomain) Update(ctx context.Context, condition database.Condition, ch
 	database.Changes(changes).Write(&builder)
 	writeCondition(&builder, condition)
 
-	return o.client.Exec(ctx, builder.String(), builder.Args()...)
+	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
 // Remove implements [domain.OrganizationDomainRepository].
-func (o *orgDomain) Remove(ctx context.Context, condition database.Condition) (int64, error) {
+func (o *orgDomain) Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	var builder database.StatementBuilder
 
 	builder.WriteString(`DELETE FROM zitadel.org_domains `)
 	writeCondition(&builder, condition)
 
-	return o.client.Exec(ctx, builder.String(), builder.Args()...)
+	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
 // -------------------------------------------------------------

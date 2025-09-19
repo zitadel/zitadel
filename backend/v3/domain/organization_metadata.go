@@ -30,14 +30,14 @@ type OrganizationMetadataRepository interface {
 	// Get returns one metadata based on the criteria.
 	// If none is found, it returns an error of type [database.ErrNotFound].
 	// If multiple were found, it returns an error of type [database.ErrMultipleRows].
-	Get(ctx context.Context, opts ...database.QueryOption) (*OrganizationMetadata, error)
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*OrganizationMetadata, error)
 	// List returns a list of metadata based on the criteria.
 	// If none are found, it returns an empty slice.
-	List(ctx context.Context, opts ...database.QueryOption) ([]*OrganizationMetadata, error)
+	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*OrganizationMetadata, error)
 
 	// Set sets the given metadata for the organization.
 	// If a metadata with the same key already exists, it will be overwritten, otherwise created.
-	Set(ctx context.Context, metadata ...*OrganizationMetadata) error
+	Set(ctx context.Context, client database.QueryExecutor, metadata ...*OrganizationMetadata) error
 	// Remove removes a metadata from the organization.
-	Remove(ctx context.Context, condition database.Condition) (int64, error)
+	Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }

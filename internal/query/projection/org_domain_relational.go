@@ -65,7 +65,7 @@ func (p *orgDomainRelationalProjection) reduceAdded(event eventstore.Event) (*ha
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-kGokE", "reduce.wrong.db.pool %T", ex)
 		}
-		return repository.OrganizationRepository(v3_sql.SQLTx(tx)).Domains(false).Add(ctx, &domain.AddOrganizationDomain{
+		return repository.OrganizationDomainRepository().Add(ctx, v3_sql.SQLTx(tx), &domain.AddOrganizationDomain{
 			InstanceID: e.Aggregate().InstanceID,
 			OrgID:      e.Aggregate().ResourceOwner,
 			Domain:     e.Domain,
@@ -85,13 +85,13 @@ func (p *orgDomainRelationalProjection) reducePrimarySet(event eventstore.Event)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-h6xF0", "reduce.wrong.db.pool %T", ex)
 		}
-		domainRepo := repository.OrganizationRepository(v3_sql.SQLTx(tx)).Domains(false)
+		domainRepo := repository.OrganizationDomainRepository()
 		condition := database.And(
 			domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
 			domainRepo.OrgIDCondition(e.Aggregate().ResourceOwner),
 			domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),
 		)
-		_, err := domainRepo.Update(ctx,
+		_, err := domainRepo.Update(ctx, v3_sql.SQLTx(tx),
 			condition,
 			domainRepo.SetPrimary(),
 		)
@@ -100,7 +100,7 @@ func (p *orgDomainRelationalProjection) reducePrimarySet(event eventstore.Event)
 		}
 		// we need to split the update into two statements because multiple events can have the same creation date
 		// therefore we first do not set the updated_at timestamp
-		_, err = domainRepo.Update(ctx,
+		_, err = domainRepo.Update(ctx, v3_sql.SQLTx(tx),
 			condition,
 			domainRepo.SetUpdatedAt(e.CreationDate()),
 		)
@@ -118,8 +118,8 @@ func (p *orgDomainRelationalProjection) reduceRemoved(event eventstore.Event) (*
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-X8oS8", "reduce.wrong.db.pool %T", ex)
 		}
-		domainRepo := repository.OrganizationRepository(v3_sql.SQLTx(tx)).Domains(false)
-		_, err := domainRepo.Remove(ctx,
+		domainRepo := repository.OrganizationDomainRepository()
+		_, err := domainRepo.Remove(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
 				domainRepo.OrgIDCondition(e.Aggregate().ResourceOwner),
@@ -149,14 +149,14 @@ func (p *orgDomainRelationalProjection) reduceVerificationAdded(event eventstore
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-yF03i", "reduce.wrong.db.pool %T", ex)
 		}
-		domainRepo := repository.OrganizationRepository(v3_sql.SQLTx(tx)).Domains(false)
+		domainRepo := repository.OrganizationDomainRepository()
 		condition := database.And(
 			domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
 			domainRepo.OrgIDCondition(e.Aggregate().ResourceOwner),
 			domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),
 		)
 
-		_, err := domainRepo.Update(ctx,
+		_, err := domainRepo.Update(ctx, v3_sql.SQLTx(tx),
 			condition,
 			domainRepo.SetValidationType(validationType),
 		)
@@ -165,7 +165,7 @@ func (p *orgDomainRelationalProjection) reduceVerificationAdded(event eventstore
 		}
 		// we need to split the update into two statements because multiple events can have the same creation date
 		// therefore we first do not set the updated_at timestamp
-		_, err = domainRepo.Update(ctx,
+		_, err = domainRepo.Update(ctx, v3_sql.SQLTx(tx),
 			condition,
 			domainRepo.SetUpdatedAt(e.CreationDate()),
 		)
@@ -183,7 +183,7 @@ func (p *orgDomainRelationalProjection) reduceVerified(event eventstore.Event) (
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-0ZGqC", "reduce.wrong.db.pool %T", ex)
 		}
-		domainRepo := repository.OrganizationRepository(v3_sql.SQLTx(tx)).Domains(false)
+		domainRepo := repository.OrganizationDomainRepository()
 
 		condition := database.And(
 			domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
@@ -191,7 +191,7 @@ func (p *orgDomainRelationalProjection) reduceVerified(event eventstore.Event) (
 			domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),
 		)
 
-		_, err := domainRepo.Update(ctx,
+		_, err := domainRepo.Update(ctx, v3_sql.SQLTx(tx),
 			condition,
 			domainRepo.SetVerified(),
 			domainRepo.SetUpdatedAt(e.CreationDate()),
@@ -201,7 +201,7 @@ func (p *orgDomainRelationalProjection) reduceVerified(event eventstore.Event) (
 		}
 		// we need to split the update into two statements because multiple events can have the same creation date
 		// therefore we first do not set the updated_at timestamp
-		_, err = domainRepo.Update(ctx,
+		_, err = domainRepo.Update(ctx, v3_sql.SQLTx(tx),
 			condition,
 			domainRepo.SetUpdatedAt(e.CreationDate()),
 		)

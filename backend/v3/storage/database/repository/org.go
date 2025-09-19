@@ -14,29 +14,35 @@ import (
 var _ domain.OrganizationRepository = (*org)(nil)
 
 type org struct {
-	repository
+	// repository
 	shouldLoadDomains  bool
-	domainRepo         domain.OrganizationDomainRepository
+	domainRepo         orgDomain
 	shouldLoadMetadata bool
-	metadataRepo       domain.OrganizationMetadataRepository
+	metadataRepo       orgMetadata
 }
 
-func OrganizationRepository(client database.QueryExecutor) domain.OrganizationRepository {
-	return &org{
-		repository: repository{
-			client: client,
-		},
-	}
+func (o org) qualifiedTableName() string {
+	return "zitadel.organizations"
+}
+
+func (o org) unqualifiedTableName() string {
+	return "organizations"
+}
+
+func OrganizationRepository() domain.OrganizationRepository {
+	return new(org)
 }
 
 const queryOrganizationStmt = `SELECT organizations.id, organizations.name, organizations.instance_id, organizations.state, organizations.created_at, organizations.updated_at` +
 	` , jsonb_agg(json_build_object('instanceId', org_domains.instance_id, 'orgId', org_domains.org_id, 'domain', org_domains.domain, 'isVerified', org_domains.is_verified, 'isPrimary', org_domains.is_primary, 'validationType', org_domains.validation_type, 'createdAt', org_domains.created_at, 'updatedAt', org_domains.updated_at)) FILTER (WHERE org_domains.org_id IS NOT NULL) AS domains` +
+	` , jsonb_agg(json_build_object('instanceId', org_metadata.instance_id, 'orgId', org_metadata.org_id, 'key', org_metadata.key, 'value', encode(org_metadata.value, 'base64'), 'createdAt', org_metadata.created_at, 'updatedAt', org_metadata.updated_at)) FILTER (WHERE org_metadata.org_id IS NOT NULL) AS metadata` +
 	` FROM zitadel.organizations`
 
 // Get implements [domain.OrganizationRepository].
-func (o *org) Get(ctx context.Context, opts ...database.QueryOption) (*domain.Organization, error) {
+func (o *org) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Organization, error) {
 	opts = append(opts,
 		o.joinDomains(),
+		o.joinMetadata(),
 		database.WithGroupBy(o.InstanceIDColumn(), o.IDColumn()),
 	)
 
@@ -49,13 +55,14 @@ func (o *org) Get(ctx context.Context, opts ...database.QueryOption) (*domain.Or
 	builder.WriteString(queryOrganizationStmt)
 	options.Write(&builder)
 
-	return scanOrganization(ctx, o.client, &builder)
+	return scanOrganization(ctx, client, &builder)
 }
 
 // List implements [domain.OrganizationRepository].
-func (o *org) List(ctx context.Context, opts ...database.QueryOption) ([]*domain.Organization, error) {
+func (o *org) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Organization, error) {
 	opts = append(opts,
 		o.joinDomains(),
+		o.joinMetadata(),
 		database.WithGroupBy(o.InstanceIDColumn(), o.IDColumn()),
 	)
 
@@ -68,26 +75,7 @@ func (o *org) List(ctx context.Context, opts ...database.QueryOption) ([]*domain
 	builder.WriteString(queryOrganizationStmt)
 	options.Write(&builder)
 
-	return scanOrganizations(ctx, o.client, &builder)
-}
-
-func (o *org) joinDomains() database.QueryOption {
-	columns := make([]database.Condition, 0, 3)
-	columns = append(columns,
-		database.NewColumnCondition(o.InstanceIDColumn(), o.Domains(false).InstanceIDColumn()),
-		database.NewColumnCondition(o.IDColumn(), o.Domains(false).OrgIDColumn()),
-	)
-
-	// If domains should not be joined, we make sure to return null for the domain columns
-	// the query optimizer of the dialect should optimize this away if no domains are requested
-	if !o.shouldLoadDomains {
-		columns = append(columns, database.IsNull(o.domainRepo.OrgIDColumn()))
-	}
-
-	return database.WithLeftJoin(
-		"zitadel.org_domains",
-		database.And(columns...),
-	)
+	return scanOrganizations(ctx, client, &builder)
 }
 
 const createOrganizationStmt = `INSERT INTO zitadel.organizations (id, name, instance_id, state)` +
@@ -95,16 +83,16 @@ const createOrganizationStmt = `INSERT INTO zitadel.organizations (id, name, ins
 	` RETURNING created_at, updated_at`
 
 // Create implements [domain.OrganizationRepository].
-func (o *org) Create(ctx context.Context, organization *domain.Organization) error {
+func (o *org) Create(ctx context.Context, client database.QueryExecutor, organization *domain.Organization) error {
 	builder := database.StatementBuilder{}
 	builder.AppendArgs(organization.ID, organization.Name, organization.InstanceID, organization.State)
 	builder.WriteString(createOrganizationStmt)
 
-	return o.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&organization.CreatedAt, &organization.UpdatedAt)
+	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&organization.CreatedAt, &organization.UpdatedAt)
 }
 
 // Update implements [domain.OrganizationRepository].
-func (o *org) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error) {
+func (o *org) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}
@@ -119,12 +107,12 @@ func (o *org) Update(ctx context.Context, condition database.Condition, changes 
 
 	stmt := builder.String()
 
-	rowsAffected, err := o.client.Exec(ctx, stmt, builder.Args()...)
+	rowsAffected, err := client.Exec(ctx, stmt, builder.Args()...)
 	return rowsAffected, err
 }
 
 // Delete implements [domain.OrganizationRepository].
-func (o *org) Delete(ctx context.Context, condition database.Condition) (int64, error) {
+func (o *org) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	if !condition.ContainsColumn(o.InstanceIDColumn()) {
 		return 0, database.NewMissingConditionError(o.InstanceIDColumn())
 	}
@@ -134,7 +122,7 @@ func (o *org) Delete(ctx context.Context, condition database.Condition) (int64, 
 	builder.WriteString(`DELETE FROM zitadel.organizations`)
 	writeCondition(&builder, condition)
 
-	return o.client.Exec(ctx, builder.String(), builder.Args()...)
+	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
 // -------------------------------------------------------------
@@ -173,6 +161,68 @@ func (o org) InstanceIDCondition(instanceID string) database.Condition {
 // StateCondition implements [domain.organizationConditions].
 func (o org) StateCondition(state domain.OrgState) database.Condition {
 	return database.NewTextCondition(o.StateColumn(), database.TextOperationEqual, state.String())
+}
+
+// existsCondition is a helper to write an EXISTS (SELECT 1 FROM <table> WHERE <condition>) clause.
+// It implements database.Condition so it can be composed with other conditions using And/Or.
+type existsCondition struct {
+	table     string
+	condition database.Condition
+}
+
+func (e existsCondition) Write(builder *database.StatementBuilder) {
+	builder.WriteString(" EXISTS (SELECT 1 FROM ")
+	builder.WriteString(e.table)
+	builder.WriteString(" WHERE ")
+	e.condition.Write(builder)
+	builder.WriteString(")")
+}
+
+func (e existsCondition) ContainsColumn(col *database.Column) bool {
+	// Forward to the inner condition so safety checks (like instance_id presence) can still work.
+	return e.condition.ContainsColumn(col)
+}
+
+// ExistsDomain creates a correlated EXISTS condition on org_domains.
+// Use this when you want to filter organizations by a domain condition but still return all domains
+// of the organization in the aggregated result.
+// Example usage:
+//
+//	domainRepo := orgRepo.Domains(true) // ensure domains are loaded/aggregated
+//	org, _ := orgRepo.Get(ctx,
+//	    database.WithCondition(
+//	        database.And(
+//	            orgRepo.InstanceIDCondition(instanceID),
+//	            orgRepo.DomainExists(domainRepo.DomainCondition(database.TextOperationEqual, "example.com")),
+//	        ),
+//	    ),
+//	)
+func (o org) ExistsDomain(cond database.Condition) database.Condition {
+	// Build a correlated subquery: EXISTS (SELECT 1 FROM zitadel.org_domains WHERE
+	//   organizations.instance_id = org_domains.instance_id AND organizations.id = org_domains.org_id AND <cond>)
+	correlated := database.And(
+		database.NewColumnCondition(o.InstanceIDColumn(), o.domainRepo.InstanceIDColumn()),
+		database.NewColumnCondition(o.IDColumn(), o.domainRepo.OrgIDColumn()),
+		cond,
+	)
+	return existsCondition{
+		table:     "zitadel.org_domains",
+		condition: correlated,
+	}
+}
+
+func (o org) ExistsMetadata(cond database.Condition) database.Condition {
+	// Build a correlated subquery: EXISTS (SELECT 1 FROM zitadel.org_metadata WHERE
+	//   organizations.instance_id = org_metadata.instance_id AND organizations.id = org_metadata.org_id AND <cond>)
+	correlated := database.And(
+		database.NewColumnCondition(o.InstanceIDColumn(), o.metadataRepo.InstanceIDColumn()),
+		database.NewColumnCondition(o.IDColumn(), o.metadataRepo.OrgIDColumn()),
+		cond,
+	)
+	return existsCondition{
+		table:     "zitadel.org_metadata",
+		condition: correlated,
+	}
 }
 
 // -------------------------------------------------------------
@@ -260,38 +310,54 @@ func scanOrganizations(ctx context.Context, querier database.Querier, builder *d
 // sub repositories
 // -------------------------------------------------------------
 
-// Domains implements [domain.OrganizationRepository].
-func (o *org) Domains(shouldLoad bool) domain.OrganizationDomainRepository {
-	if !o.shouldLoadDomains {
-		o.shouldLoadDomains = shouldLoad
+func (o *org) LoadDomains() domain.OrganizationRepository {
+	return &org{
+		shouldLoadDomains:  true,
+		shouldLoadMetadata: o.shouldLoadMetadata,
 	}
-
-	if o.domainRepo != nil {
-		return o.domainRepo
-	}
-
-	o.domainRepo = &orgDomain{
-		repository: o.repository,
-		org:        o,
-	}
-
-	return o.domainRepo
 }
 
-// Metadata implements [domain.OrganizationRepository].
-func (o *org) Metadata(shouldLoad bool) domain.OrganizationMetadataRepository {
+func (o *org) joinDomains() database.QueryOption {
+	columns := make([]database.Condition, 0, 3)
+	columns = append(columns,
+		database.NewColumnCondition(o.InstanceIDColumn(), o.domainRepo.InstanceIDColumn()),
+		database.NewColumnCondition(o.IDColumn(), o.domainRepo.OrgIDColumn()),
+	)
+
+	// If domains should not be joined, we make sure to return null for the domain columns
+	// the query optimizer of the dialect should optimize this away if no domains are requested
+	if !o.shouldLoadDomains {
+		columns = append(columns, database.IsNull(o.domainRepo.OrgIDColumn()))
+	}
+
+	return database.WithLeftJoin(
+		o.domainRepo.qualifiedTableName(),
+		database.And(columns...),
+	)
+}
+
+func (o *org) LoadMetadata() domain.OrganizationRepository {
+	return &org{
+		shouldLoadDomains:  o.shouldLoadDomains,
+		shouldLoadMetadata: true,
+	}
+}
+
+func (o *org) joinMetadata() database.QueryOption {
+	columns := make([]database.Condition, 0, 3)
+	columns = append(columns,
+		database.NewColumnCondition(o.InstanceIDColumn(), o.metadataRepo.InstanceIDColumn()),
+		database.NewColumnCondition(o.IDColumn(), o.metadataRepo.OrgIDColumn()),
+	)
+
+	// If metadata should not be joined, we make sure to return null for the metadata columns
+	// the query optimizer of the dialect should optimize this away if no metadata are requested
 	if !o.shouldLoadMetadata {
-		o.shouldLoadMetadata = shouldLoad
+		columns = append(columns, database.IsNull(o.metadataRepo.OrgIDColumn()))
 	}
 
-	if o.metadataRepo != nil {
-		return o.metadataRepo
-	}
-
-	o.metadataRepo = &orgMetadata{
-		repository: o.repository,
-		org:        o,
-	}
-
-	return o.metadataRepo
+	return database.WithLeftJoin(
+		"zitadel.org_metadata",
+		database.And(columns...),
+	)
 }

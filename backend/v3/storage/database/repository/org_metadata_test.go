@@ -17,8 +17,15 @@ func TestGetOrganizationMetadata(t *testing.T) {
 	tx, err := pool.Begin(t.Context(), nil)
 	require.NoError(t, err)
 	defer func() {
-		require.NoError(t, tx.Rollback(t.Context()))
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Log("error during rollback:", err)
+		}
 	}()
+
+	instanceRepo := repository.InstanceRepository()
+	orgRepo := repository.OrganizationRepository()
+	metadataRepo := repository.OrganizationMetadataRepository()
 
 	// create instance
 	instanceID := gofakeit.UUID()
@@ -31,11 +38,8 @@ func TestGetOrganizationMetadata(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	err = repository.InstanceRepository(tx).Create(t.Context(), &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
-
-	orgRepo := repository.OrganizationRepository(tx)
-	metadataRepo := orgRepo.Metadata(false)
 
 	// create organization
 	orgA := domain.Organization{
@@ -44,11 +48,12 @@ func TestGetOrganizationMetadata(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.OrgStateActive,
 	}
-	err = orgRepo.Create(t.Context(), &orgA)
+	err = orgRepo.Create(t.Context(), tx, &orgA)
 	require.NoError(t, err)
 
 	err = metadataRepo.Set(
 		t.Context(),
+		tx,
 		&domain.OrganizationMetadata{
 			OrgID: orgA.ID,
 			Metadata: domain.Metadata{
@@ -74,11 +79,11 @@ func TestGetOrganizationMetadata(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.OrgStateActive,
 	}
-	err = orgRepo.Create(t.Context(), &orgB)
+	err = orgRepo.Create(t.Context(), tx, &orgB)
 	require.NoError(t, err)
 
 	err = metadataRepo.Set(
-		t.Context(),
+		t.Context(), tx,
 		&domain.OrganizationMetadata{
 			OrgID: orgB.ID,
 			Metadata: domain.Metadata{
@@ -100,7 +105,7 @@ func TestGetOrganizationMetadata(t *testing.T) {
 
 	t.Run("metadata without instance condition", func(t *testing.T) {
 		metadata, err := metadataRepo.Get(
-			t.Context(),
+			t.Context(), tx,
 			database.WithCondition(metadataRepo.OrgIDCondition(orgA.ID)),
 		)
 		assert.ErrorIs(t, err, new(database.MissingConditionError))
@@ -109,7 +114,7 @@ func TestGetOrganizationMetadata(t *testing.T) {
 
 	t.Run("no metadata found", func(t *testing.T) {
 		metadata, err := metadataRepo.Get(
-			t.Context(),
+			t.Context(), tx,
 			database.WithCondition(metadataRepo.InstanceIDCondition("non-existing")),
 		)
 		assert.ErrorIs(t, err, new(database.NoRowFoundError))
@@ -118,7 +123,7 @@ func TestGetOrganizationMetadata(t *testing.T) {
 
 	t.Run("multiple metadata found", func(t *testing.T) {
 		metadata, err := metadataRepo.Get(
-			t.Context(),
+			t.Context(), tx,
 			database.WithCondition(metadataRepo.InstanceIDCondition(instanceID)),
 		)
 		require.ErrorIs(t, err, new(database.MultipleRowsFoundError))
@@ -127,7 +132,7 @@ func TestGetOrganizationMetadata(t *testing.T) {
 
 	t.Run("metadata by key", func(t *testing.T) {
 		metadata, err := metadataRepo.Get(
-			t.Context(),
+			t.Context(), tx,
 			database.WithCondition(
 				database.And(
 					metadataRepo.InstanceIDCondition(instanceID),
@@ -144,7 +149,7 @@ func TestGetOrganizationMetadata(t *testing.T) {
 
 	t.Run("metadata by value", func(t *testing.T) {
 		metadata, err := metadataRepo.Get(
-			t.Context(),
+			t.Context(), tx,
 			database.WithCondition(
 				database.And(
 					metadataRepo.InstanceIDCondition(instanceID),
@@ -163,8 +168,15 @@ func TestListOrganizationMetadata(t *testing.T) {
 	tx, err := pool.Begin(t.Context(), nil)
 	require.NoError(t, err)
 	defer func() {
-		require.NoError(t, tx.Rollback(t.Context()))
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Log("error during rollback:", err)
+		}
 	}()
+
+	instanceRepo := repository.InstanceRepository()
+	orgRepo := repository.OrganizationRepository()
+	metadataRepo := repository.OrganizationMetadataRepository()
 
 	// create instance
 	instanceID := gofakeit.UUID()
@@ -177,11 +189,8 @@ func TestListOrganizationMetadata(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	err = repository.InstanceRepository(tx).Create(t.Context(), &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
-
-	orgRepo := repository.OrganizationRepository(tx)
-	metadataRepo := orgRepo.Metadata(false)
 
 	// create organization
 	orgA := domain.Organization{
@@ -190,11 +199,11 @@ func TestListOrganizationMetadata(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.OrgStateActive,
 	}
-	err = orgRepo.Create(t.Context(), &orgA)
+	err = orgRepo.Create(t.Context(), tx, &orgA)
 	require.NoError(t, err)
 
 	err = metadataRepo.Set(
-		t.Context(),
+		t.Context(), tx,
 		&domain.OrganizationMetadata{
 			OrgID: orgA.ID,
 			Metadata: domain.Metadata{
@@ -215,7 +224,7 @@ func TestListOrganizationMetadata(t *testing.T) {
 	require.NoError(t, err)
 
 	metadataOrgA, err := metadataRepo.List(
-		t.Context(),
+		t.Context(), tx,
 		database.WithCondition(
 			database.And(
 				metadataRepo.OrgIDCondition(orgA.ID),
@@ -231,11 +240,11 @@ func TestListOrganizationMetadata(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.OrgStateActive,
 	}
-	err = orgRepo.Create(t.Context(), &orgB)
+	err = orgRepo.Create(t.Context(), tx, &orgB)
 	require.NoError(t, err)
 
 	err = metadataRepo.Set(
-		t.Context(),
+		t.Context(), tx,
 		&domain.OrganizationMetadata{
 			OrgID: orgB.ID,
 			Metadata: domain.Metadata{
@@ -256,7 +265,7 @@ func TestListOrganizationMetadata(t *testing.T) {
 	require.NoError(t, err)
 
 	metadataOrgB, err := metadataRepo.List(
-		t.Context(),
+		t.Context(), tx,
 		database.WithCondition(
 			database.And(
 				metadataRepo.OrgIDCondition(orgB.ID),
@@ -268,7 +277,7 @@ func TestListOrganizationMetadata(t *testing.T) {
 
 	t.Run("metadata without instance condition", func(t *testing.T) {
 		metadata, err := metadataRepo.List(
-			t.Context(),
+			t.Context(), tx,
 			database.WithCondition(metadataRepo.OrgIDCondition(orgA.ID)),
 		)
 		assert.ErrorIs(t, err, new(database.MissingConditionError))
@@ -277,7 +286,7 @@ func TestListOrganizationMetadata(t *testing.T) {
 
 	t.Run("no metadata found", func(t *testing.T) {
 		metadata, err := metadataRepo.List(
-			t.Context(),
+			t.Context(), tx,
 			database.WithCondition(metadataRepo.InstanceIDCondition("non-existing")),
 		)
 		assert.NoError(t, err)
@@ -286,7 +295,7 @@ func TestListOrganizationMetadata(t *testing.T) {
 
 	t.Run("all metadata of instance", func(t *testing.T) {
 		metadata, err := metadataRepo.List(
-			t.Context(),
+			t.Context(), tx,
 			database.WithCondition(metadataRepo.InstanceIDCondition(instanceID)),
 		)
 		require.NoError(t, err)
@@ -295,7 +304,7 @@ func TestListOrganizationMetadata(t *testing.T) {
 
 	t.Run("metadata by org id", func(t *testing.T) {
 		metadata, err := metadataRepo.List(
-			t.Context(),
+			t.Context(), tx,
 			database.WithCondition(
 				database.And(
 					metadataRepo.InstanceIDCondition(instanceID),
@@ -309,7 +318,7 @@ func TestListOrganizationMetadata(t *testing.T) {
 
 	t.Run("metadata by key", func(t *testing.T) {
 		metadata, err := metadataRepo.List(
-			t.Context(),
+			t.Context(), tx,
 			database.WithCondition(
 				database.And(
 					metadataRepo.InstanceIDCondition(instanceID),
@@ -326,7 +335,7 @@ func TestListOrganizationMetadata(t *testing.T) {
 
 	t.Run("metadata by value", func(t *testing.T) {
 		metadata, err := metadataRepo.List(
-			t.Context(),
+			t.Context(), tx,
 			database.WithCondition(
 				database.And(
 					metadataRepo.InstanceIDCondition(instanceID),
@@ -344,11 +353,19 @@ func TestListOrganizationMetadata(t *testing.T) {
 
 func TestSetOrganizationMetadata(t *testing.T) {
 	beforeSet := time.Now()
+
 	tx, err := pool.Begin(t.Context(), nil)
 	require.NoError(t, err)
 	defer func() {
-		require.NoError(t, tx.Rollback(t.Context()))
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Log("error during rollback:", err)
+		}
 	}()
+
+	instanceRepo := repository.InstanceRepository()
+	orgRepo := repository.OrganizationRepository()
+	metadataRepo := repository.OrganizationMetadataRepository()
 
 	// create instance
 	instanceID := gofakeit.UUID()
@@ -361,7 +378,7 @@ func TestSetOrganizationMetadata(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	err = repository.InstanceRepository(tx).Create(t.Context(), &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create organization
@@ -372,8 +389,37 @@ func TestSetOrganizationMetadata(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.OrgStateActive,
 	}
-	err = repository.OrganizationRepository(tx).Create(t.Context(), &organization)
+	err = orgRepo.Create(t.Context(), tx, &organization)
 	require.NoError(t, err)
+
+	t.Run("check fields all fields scanned", func(t *testing.T) {
+		savepoint, err := tx.Begin(t.Context())
+		require.NoError(t, err)
+		defer func() {
+			require.NoError(t, savepoint.Rollback(t.Context()))
+		}()
+
+		metadata := &domain.OrganizationMetadata{
+			OrgID: orgID,
+			Metadata: domain.Metadata{
+				InstanceID: instanceID,
+				Key:        "urn:zitadel:key",
+				Value:      []byte("some-value"),
+			},
+		}
+
+		err = metadataRepo.Set(t.Context(), tx, metadata)
+		require.NoError(t, err)
+		afterSet := time.Now()
+
+		assert.Equal(t, orgID, metadata.OrgID)
+		assert.Equal(t, instanceID, metadata.InstanceID)
+		assert.Equal(t, "urn:zitadel:key", metadata.Key)
+		assert.Equal(t, []byte("some-value"), metadata.Value)
+		assert.WithinRange(t, metadata.CreatedAt, beforeSet, afterSet)
+		assert.WithinRange(t, metadata.UpdatedAt, beforeSet, afterSet)
+		assert.Equal(t, metadata.CreatedAt, metadata.UpdatedAt)
+	})
 
 	t.Run("set one organization metadata", func(t *testing.T) {
 		savepoint, err := tx.Begin(t.Context())
@@ -381,9 +427,8 @@ func TestSetOrganizationMetadata(t *testing.T) {
 		defer func() {
 			require.NoError(t, savepoint.Rollback(t.Context()))
 		}()
-		metadataRepo := repository.OrganizationRepository(savepoint).Metadata(false)
 
-		err = metadataRepo.Set(t.Context(), &domain.OrganizationMetadata{
+		err = metadataRepo.Set(t.Context(), tx, &domain.OrganizationMetadata{
 			OrgID: orgID,
 			Metadata: domain.Metadata{
 				InstanceID: instanceID,
@@ -395,7 +440,7 @@ func TestSetOrganizationMetadata(t *testing.T) {
 		afterSet := time.Now()
 
 		savedMetadata, err := metadataRepo.Get(
-			t.Context(), database.WithCondition(
+			t.Context(), tx, database.WithCondition(
 				database.And(
 					metadataRepo.InstanceIDCondition(instanceID),
 					metadataRepo.OrgIDCondition(orgID),
@@ -419,9 +464,8 @@ func TestSetOrganizationMetadata(t *testing.T) {
 		defer func() {
 			require.NoError(t, savepoint.Rollback(t.Context()))
 		}()
-		metadataRepo := repository.OrganizationRepository(savepoint).Metadata(false)
 
-		err = metadataRepo.Set(t.Context(),
+		err = metadataRepo.Set(t.Context(), tx,
 			&domain.OrganizationMetadata{
 				OrgID: orgID,
 				Metadata: domain.Metadata{
@@ -443,7 +487,7 @@ func TestSetOrganizationMetadata(t *testing.T) {
 		afterSet := time.Now()
 
 		savedMetadata, err := metadataRepo.List(
-			t.Context(),
+			t.Context(), tx,
 			database.WithCondition(
 				database.And(
 					metadataRepo.InstanceIDCondition(instanceID),
@@ -477,9 +521,8 @@ func TestSetOrganizationMetadata(t *testing.T) {
 		defer func() {
 			require.NoError(t, savepoint.Rollback(t.Context()))
 		}()
-		metadataRepo := repository.OrganizationRepository(savepoint).Metadata(false)
 
-		err = metadataRepo.Set(t.Context())
+		err = metadataRepo.Set(t.Context(), tx)
 		require.ErrorIs(t, err, database.ErrNoChanges)
 	})
 
@@ -489,9 +532,8 @@ func TestSetOrganizationMetadata(t *testing.T) {
 		defer func() {
 			require.NoError(t, savepoint.Rollback(t.Context()))
 		}()
-		metadataRepo := repository.OrganizationRepository(savepoint).Metadata(false)
 
-		err = metadataRepo.Set(t.Context(), &domain.OrganizationMetadata{
+		err = metadataRepo.Set(t.Context(), tx, &domain.OrganizationMetadata{
 			OrgID: orgID,
 			Metadata: domain.Metadata{
 				InstanceID: instanceID,
@@ -503,7 +545,7 @@ func TestSetOrganizationMetadata(t *testing.T) {
 		afterSet := time.Now()
 
 		savedMetadata, err := metadataRepo.Get(
-			t.Context(), database.WithCondition(
+			t.Context(), tx, database.WithCondition(
 				database.And(
 					metadataRepo.InstanceIDCondition(instanceID),
 					metadataRepo.OrgIDCondition(orgID),
@@ -520,7 +562,7 @@ func TestSetOrganizationMetadata(t *testing.T) {
 		assert.WithinRange(t, savedMetadata.UpdatedAt, beforeSet, afterSet)
 		assert.Equal(t, savedMetadata.CreatedAt, savedMetadata.UpdatedAt)
 
-		err = metadataRepo.Set(t.Context(), &domain.OrganizationMetadata{
+		err = metadataRepo.Set(t.Context(), tx, &domain.OrganizationMetadata{
 			OrgID: orgID,
 			Metadata: domain.Metadata{
 				InstanceID: instanceID,
@@ -532,7 +574,7 @@ func TestSetOrganizationMetadata(t *testing.T) {
 		afterSet = time.Now()
 
 		savedMetadata, err = metadataRepo.Get(
-			t.Context(), database.WithCondition(
+			t.Context(), tx, database.WithCondition(
 				database.And(
 					metadataRepo.InstanceIDCondition(instanceID),
 					metadataRepo.OrgIDCondition(orgID),
@@ -558,9 +600,8 @@ func TestSetOrganizationMetadata(t *testing.T) {
 			defer func() {
 				require.NoError(t, savepoint.Rollback(t.Context()))
 			}()
-			metadataRepo := repository.OrganizationRepository(savepoint).Metadata(false)
 
-			err = metadataRepo.Set(t.Context(), &domain.OrganizationMetadata{
+			err = metadataRepo.Set(t.Context(), tx, &domain.OrganizationMetadata{
 				OrgID: orgID,
 				Metadata: domain.Metadata{
 					InstanceID: instanceID,
@@ -573,7 +614,7 @@ func TestSetOrganizationMetadata(t *testing.T) {
 			require.NoError(t, err)
 
 			savedMetadata, err := metadataRepo.Get(
-				t.Context(), database.WithCondition(
+				t.Context(), tx, database.WithCondition(
 					database.And(
 						metadataRepo.InstanceIDCondition(instanceID),
 						metadataRepo.OrgIDCondition(orgID),
@@ -597,11 +638,10 @@ func TestSetOrganizationMetadata(t *testing.T) {
 			defer func() {
 				require.NoError(t, savepoint.Rollback(t.Context()))
 			}()
-			metadataRepo := repository.OrganizationRepository(savepoint).Metadata(false)
 
 			// first event
 			firstEventCreatedAt := beforeSet.Add(-2 * time.Hour)
-			err = metadataRepo.Set(t.Context(), &domain.OrganizationMetadata{
+			err = metadataRepo.Set(t.Context(), tx, &domain.OrganizationMetadata{
 				OrgID: orgID,
 				Metadata: domain.Metadata{
 					InstanceID: instanceID,
@@ -615,7 +655,7 @@ func TestSetOrganizationMetadata(t *testing.T) {
 
 			// second event
 			secondEventCreatedAt := beforeSet.Add(-time.Hour)
-			err = metadataRepo.Set(t.Context(), &domain.OrganizationMetadata{
+			err = metadataRepo.Set(t.Context(), tx, &domain.OrganizationMetadata{
 				OrgID: orgID,
 				Metadata: domain.Metadata{
 					InstanceID: instanceID,
@@ -628,7 +668,7 @@ func TestSetOrganizationMetadata(t *testing.T) {
 			require.NoError(t, err)
 
 			savedMetadata, err := metadataRepo.Get(
-				t.Context(), database.WithCondition(
+				t.Context(), tx, database.WithCondition(
 					database.And(
 						metadataRepo.InstanceIDCondition(instanceID),
 						metadataRepo.OrgIDCondition(orgID),
@@ -704,8 +744,7 @@ func TestSetOrganizationMetadata(t *testing.T) {
 					require.NoError(t, savepoint.Rollback(t.Context()))
 				}()
 
-				metadataRepo := repository.OrganizationRepository(savepoint).Metadata(false)
-				err = metadataRepo.Set(t.Context(), testCase.metadata)
+				err = metadataRepo.Set(t.Context(), tx, testCase.metadata)
 				assert.ErrorIs(t, err, testCase.expectedErr)
 			})
 		}
@@ -716,8 +755,15 @@ func TestRemoveOrganizationMetadata(t *testing.T) {
 	tx, err := pool.Begin(t.Context(), nil)
 	require.NoError(t, err)
 	defer func() {
-		require.NoError(t, tx.Rollback(t.Context()))
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Log("error during rollback:", err)
+		}
 	}()
+
+	instanceRepo := repository.InstanceRepository()
+	orgRepo := repository.OrganizationRepository()
+	metadataRepo := repository.OrganizationMetadataRepository()
 
 	// create instance
 	instanceID := gofakeit.UUID()
@@ -730,11 +776,8 @@ func TestRemoveOrganizationMetadata(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	err = repository.InstanceRepository(tx).Create(t.Context(), &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
-
-	orgRepo := repository.OrganizationRepository(tx)
-	metadataRepo := orgRepo.Metadata(false)
 
 	// create organization
 	orgA := domain.Organization{
@@ -743,11 +786,11 @@ func TestRemoveOrganizationMetadata(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.OrgStateActive,
 	}
-	err = orgRepo.Create(t.Context(), &orgA)
+	err = orgRepo.Create(t.Context(), tx, &orgA)
 	require.NoError(t, err)
 
 	err = metadataRepo.Set(
-		t.Context(),
+		t.Context(), tx,
 		&domain.OrganizationMetadata{
 			OrgID: orgA.ID,
 			Metadata: domain.Metadata{
@@ -773,11 +816,11 @@ func TestRemoveOrganizationMetadata(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.OrgStateActive,
 	}
-	err = orgRepo.Create(t.Context(), &orgB)
+	err = orgRepo.Create(t.Context(), tx, &orgB)
 	require.NoError(t, err)
 
 	err = metadataRepo.Set(
-		t.Context(),
+		t.Context(), tx,
 		&domain.OrganizationMetadata{
 			OrgID: orgB.ID,
 			Metadata: domain.Metadata{
@@ -799,7 +842,7 @@ func TestRemoveOrganizationMetadata(t *testing.T) {
 
 	t.Run("without instance condition", func(t *testing.T) {
 		affected, err := metadataRepo.Remove(
-			t.Context(),
+			t.Context(), tx,
 			metadataRepo.OrgIDCondition(orgA.ID),
 		)
 		assert.ErrorIs(t, err, new(database.MissingConditionError))
@@ -808,7 +851,7 @@ func TestRemoveOrganizationMetadata(t *testing.T) {
 
 	t.Run("without org condition", func(t *testing.T) {
 		affected, err := metadataRepo.Remove(
-			t.Context(),
+			t.Context(), tx,
 			metadataRepo.InstanceIDCondition("non-existing"),
 		)
 		assert.ErrorIs(t, err, new(database.MissingConditionError))
@@ -821,9 +864,8 @@ func TestRemoveOrganizationMetadata(t *testing.T) {
 		defer func() {
 			require.NoError(t, savepoint.Rollback(t.Context()))
 		}()
-		metadataRepo := repository.OrganizationRepository(savepoint).Metadata(false)
 		affected, err := metadataRepo.Remove(
-			t.Context(),
+			t.Context(), tx,
 			database.And(
 				metadataRepo.InstanceIDCondition(instanceID),
 				metadataRepo.OrgIDCondition(orgA.ID),

@@ -66,7 +66,7 @@ func (p *orgMetadataRelationalProjection) reduceSet(event eventstore.Event) (*ha
 		} else {
 			logging.Info("valid")
 		}
-		return repository.OrganizationRepository(v3_sql.SQLTx(tx)).Metadata(false).Set(ctx, &domain.OrganizationMetadata{
+		return repository.OrganizationMetadataRepository().Set(ctx, v3_sql.SQLTx(tx), &domain.OrganizationMetadata{
 			Metadata: domain.Metadata{
 				InstanceID: e.Aggregate().InstanceID,
 				Key:        e.Key,
@@ -89,8 +89,8 @@ func (p *orgMetadataRelationalProjection) reduceRemoved(event eventstore.Event) 
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-QKMlz", "reduce.wrong.db.pool %T", ex)
 		}
-		domainRepo := repository.OrganizationRepository(v3_sql.SQLTx(tx)).Metadata(false)
-		_, err := domainRepo.Remove(ctx,
+		domainRepo := repository.OrganizationMetadataRepository()
+		_, err := domainRepo.Remove(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
 				domainRepo.OrgIDCondition(e.Aggregate().ResourceOwner),
@@ -111,8 +111,8 @@ func (p *orgMetadataRelationalProjection) reduceRemovedAll(event eventstore.Even
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-hjEHg", "reduce.wrong.db.pool %T", ex)
 		}
-		domainRepo := repository.OrganizationRepository(v3_sql.SQLTx(tx)).Metadata(false)
-		_, err := domainRepo.Remove(ctx,
+		domainRepo := repository.OrganizationMetadataRepository()
+		_, err := domainRepo.Remove(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
 				domainRepo.OrgIDCondition(e.Aggregate().ResourceOwner),

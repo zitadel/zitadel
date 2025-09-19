@@ -2,7 +2,6 @@ package database
 
 type Columns []*Column
 
-// WriteQualified implements [Column].
 func (m Columns) WriteQualified(builder *StatementBuilder) {
 	for i, col := range m {
 		if i > 0 {
@@ -12,7 +11,6 @@ func (m Columns) WriteQualified(builder *StatementBuilder) {
 	}
 }
 
-// WriteUnqualified implements [Column].
 func (m Columns) WriteUnqualified(builder *StatementBuilder) {
 	for i, col := range m {
 		if i > 0 {
@@ -21,14 +19,6 @@ func (m Columns) WriteUnqualified(builder *StatementBuilder) {
 		col.WriteUnqualified(builder)
 	}
 }
-
-// // Column represents a column in a database table.
-// type Column interface {
-// 	// Write(builder *StatementBuilder)
-// 	WriteQualified(builder *StatementBuilder)
-// 	WriteUnqualified(builder *StatementBuilder)
-// 	Equals(col Column) bool
-// }
 
 type Column struct {
 	table string
@@ -39,7 +29,6 @@ func NewColumn(table, name string) *Column {
 	return &Column{table: table, name: name}
 }
 
-// WriteQualified implements [Column].
 func (c Column) WriteQualified(builder *StatementBuilder) {
 	builder.Grow(len(c.table) + len(c.name) + 1)
 	builder.WriteString(c.table)
@@ -47,12 +36,10 @@ func (c Column) WriteQualified(builder *StatementBuilder) {
 	builder.WriteString(c.name)
 }
 
-// WriteUnqualified implements [Column].
 func (c Column) WriteUnqualified(builder *StatementBuilder) {
 	builder.WriteString(c.name)
 }
 
-// Equals implements [Column].
 func (c *Column) Equals(col *Column) bool {
 	if col == nil {
 		return c == nil
@@ -60,35 +47,30 @@ func (c *Column) Equals(col *Column) bool {
 	return c.table == col.table && c.name == col.name
 }
 
-// var _ Column = (*column)(nil)
+func Lower(col *Column) *lowerColumn {
+	return &lowerColumn{Column: col}
+}
 
-// // ignoreCaseColumn represents two database columns, one for the
-// // original value and one for the lower case value.
-// type ignoreCaseColumn interface {
-// 	Column
-// 	WriteIgnoreCase(builder *StatementBuilder)
-// }
+type lowerColumn struct {
+	*Column
+}
 
-// func NewIgnoreCaseColumn(col Column, suffix string) ignoreCaseColumn {
-// 	return ignoreCaseCol{
-// 		column: col,
-// 		suffix: suffix,
-// 	}
-// }
+func (c lowerColumn) WriteQualified(builder *StatementBuilder) {
+	builder.Grow(len("lower()") + len(c.table) + len(c.name) + 1)
+	builder.WriteString("LOWER(")
+	c.Column.WriteQualified(builder)
+	builder.WriteRune(')')
+}
 
-// type ignoreCaseCol struct {
-// 	column Column
-// 	suffix string
-// }
+func (c lowerColumn) WriteUnqualified(builder *StatementBuilder) {
+	builder.WriteString("LOWER(")
+	c.Column.WriteUnqualified(builder)
+	builder.WriteRune(')')
+}
 
-// // WriteIgnoreCase implements [ignoreCaseColumn].
-// func (c ignoreCaseCol) WriteIgnoreCase(builder *StatementBuilder) {
-// 	c.column.WriteQualified(builder)
-// 	builder.WriteString(c.suffix)
-// }
-
-// // WriteQualified implements [ignoreCaseColumn].
-// func (c ignoreCaseCol) WriteQualified(builder *StatementBuilder) {
-// 	c.column.WriteQualified(builder)
-// 	builder.WriteString(c.suffix)
-// }
+func (c *lowerColumn) Equals(col *Column) bool {
+	if col == nil {
+		return c == nil
+	}
+	return c.table == col.table && c.name == col.name
+}

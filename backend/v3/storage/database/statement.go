@@ -1,6 +1,7 @@
 package database
 
 import (
+	"encoding/hex"
 	"strconv"
 	"strings"
 )
@@ -45,7 +46,7 @@ func (b *StatementBuilder) AppendArg(arg any) (placeholder string) {
 	// panic: runtime error: hash of unhashable type []uint8
 	key := arg
 	if argBytes, ok := arg.([]uint8); ok {
-		key = string(argBytes)
+		key = `\\bytes-` + hex.EncodeToString(argBytes)
 	}
 	if placeholder, ok := b.existingArgs[key]; ok {
 		return placeholder

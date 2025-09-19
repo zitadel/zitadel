@@ -53,6 +53,10 @@ type organizationConditions interface {
 	InstanceIDCondition(id string) database.Condition
 	// StateCondition returns a filter on the name field.
 	StateCondition(state OrgState) database.Condition
+	// ExistsDomain returns a filter on the organizations domains.
+	ExistsDomain(cond database.Condition) database.Condition
+	// ExistsMetadata returns a filter on the organizations metadata.
+	ExistsMetadata(cond database.Condition) database.Condition
 }
 
 // organizationChanges define all the changes for the instance table.
@@ -69,21 +73,19 @@ type OrganizationRepository interface {
 	organizationConditions
 	organizationChanges
 
-	Get(ctx context.Context, opts ...database.QueryOption) (*Organization, error)
-	List(ctx context.Context, opts ...database.QueryOption) ([]*Organization, error)
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Organization, error)
+	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Organization, error)
 
-	Create(ctx context.Context, org *Organization) error
-	Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error)
-	Delete(ctx context.Context, condition database.Condition) (int64, error)
+	Create(ctx context.Context, client database.QueryExecutor, org *Organization) error
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
+	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 
-	// Domains returns the domain sub repository for the organization.
-	// If shouldLoad is true, the domains will be loaded from the database and written to the [Organization].Domains field.
-	// If shouldLoad is set to true once, the Domains field will be set event if shouldLoad is false in the future.
-	Domains(shouldLoad bool) OrganizationDomainRepository
-	// Metadata returns the domain sub repository for the organization.
-	// If shouldLoad is true, the metadata will be loaded from the database and written to the [Organization].Metadata field.
-	// If shouldLoad is set to true once, the Metadata field will be set event if shouldLoad is false in the future.
-	Metadata(shouldLoad bool) OrganizationMetadataRepository
+	// LoadDomains loads the domains of the given organizations.
+	// If it is called the [Organization].Domains field will be set on future calls to Get or List.
+	LoadDomains() OrganizationRepository
+	// LoadMetadata loads the metadata of the given organizations.
+	// If it is called the [Organization].Metadata field will be set on future calls to Get or List.
+	LoadMetadata() OrganizationRepository
 }
 
 type CreateOrganization struct {

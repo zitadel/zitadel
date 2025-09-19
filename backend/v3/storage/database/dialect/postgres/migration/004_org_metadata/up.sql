@@ -12,8 +12,8 @@ CREATE TABLE zitadel.org_metadata (
     , CONSTRAINT fk_org_metadata_org FOREIGN KEY (instance_id, org_id) REFERENCES zitadel.organizations (instance_id, id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_org_metadata_value ON zitadel.org_metadata (value);
 CREATE INDEX idx_org_metadata_key ON zitadel.org_metadata (key);
+CREATE INDEX idx_org_metadata_value ON zitadel.org_metadata (sha256(value));
 
 -- TODO(adlerhurst): these indexes can currently not be used by Postgres, because of the type conversion
 -- the value can be a json but doesn't have to be.

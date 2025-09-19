@@ -69,6 +69,8 @@ type instanceConditions interface {
 	IDCondition(instanceID string) database.Condition
 	// NameCondition returns a filter on the name field.
 	NameCondition(op database.TextOperation, name string) database.Condition
+	// ExistsDomain returns a filter on the instance domains.
+	ExistsDomain(cond database.Condition) database.Condition
 }
 
 // instanceChanges define all the changes for the instance table.
@@ -99,17 +101,16 @@ type InstanceRepository interface {
 	// Member returns the member repository which is a sub repository of the instance repository.
 	// Member() MemberRepository
 
-	Get(ctx context.Context, opts ...database.QueryOption) (*Instance, error)
-	List(ctx context.Context, opts ...database.QueryOption) ([]*Instance, error)
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Instance, error)
+	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Instance, error)
 
-	Create(ctx context.Context, instance *Instance) error
-	Update(ctx context.Context, id string, changes ...database.Change) (int64, error)
-	Delete(ctx context.Context, id string) (int64, error)
+	Create(ctx context.Context, client database.QueryExecutor, instance *Instance) error
+	Update(ctx context.Context, client database.QueryExecutor, id string, changes ...database.Change) (int64, error)
+	Delete(ctx context.Context, client database.QueryExecutor, id string) (int64, error)
 
-	// Domains returns the domain sub repository for the instance.
-	// If shouldLoad is true, the domains will be loaded from the database and written to the [Instance].Domains field.
-	// If shouldLoad is set to true once, the Domains field will be set even if shouldLoad is false in the future.
-	Domains(shouldLoad bool) InstanceDomainRepository
+	// LoadDomains loads the domains of the given instance.
+	// If it is called the [Instance].Domains field will be set on future calls to Get or List.
+	LoadDomains()
 }
 
 type CreateInstance struct {
