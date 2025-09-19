@@ -8,16 +8,16 @@
       "isStable": false
     },
     {
-      "id": "v4.2.2",
-      "name": "v4.2.2",
-      "gitRef": "v4.2.2",
+      "id": "v4.2.1",
+      "name": "v4.2.1",
+      "gitRef": "v4.2.1",
       "enabled": true,
       "isStable": true
     },
     {
-      "id": "v4.2.1",
-      "name": "v4.2.1",
-      "gitRef": "v4.2.1",
+      "id": "v4.2.2",
+      "name": "v4.2.2",
+      "gitRef": "v4.2.2",
       "enabled": true,
       "isStable": true
     },
@@ -79,15 +79,15 @@
     }
   ],
   "settings": {
-    "defaultVersion": "v4.2.2",
+    "defaultVersion": "v4.2.1",
     "autoGenerate": true,
     "maxVersions": 15,
     "includePrerelease": false
   },
   "metadata": {
-    "generatedAt": "2025-09-19T13:39:45Z",
+    "generatedAt": "2025-09-19T13:42:27Z",
     "generatedBy": "scripts/generate-versions-config.sh",
-    "availableVersionsCount": 2,
+    "availableVersionsCount": 3,
     "totalVersionsCount": 11
   }
 }
