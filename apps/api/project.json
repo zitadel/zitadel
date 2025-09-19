@@ -80,6 +80,9 @@
         },
         "test-unit": {
             "description": "Run the unit tests with coverage",
+            "dependsOn": [
+                "generate"
+            ],
             "command": "go test -race -coverprofile=profile.api.test-unit.cov -coverpkg=./internal/...  ./...",
             "cache": true,
             "inputs": [

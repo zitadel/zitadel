@@ -31,6 +31,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          filter: tree:0
+      - name: Fetch main branch
+        run: git fetch origin main:main
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
@@ -44,9 +47,6 @@ jobs:
         with:
           node-version: ${{ inputs.node_version }}
           cache: "pnpm"
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: 'go.mod'
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Install dependencies
