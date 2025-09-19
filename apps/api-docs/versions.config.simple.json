@@ -1,0 +1,28 @@
+{
+  "versions": [
+    {
+      "id": "main",
+      "name": "Latest (Main)",
+      "gitRef": "main",
+      "enabled": true,
+      "isStable": false
+    },
+    {
+      "id": "v4.2.2",
+      "name": "v4.2.2",
+      "gitRef": "v4.2.2",
+      "enabled": true,
+      "isStable": true
+    },
+    {
+      "id": "v4.2.1",
+      "name": "v4.2.1",
+      "gitRef": "v4.2.1",
+      "enabled": true,
+      "isStable": true
+    }
+  ],
+  "settings": {
+    "defaultVersion": "v4.2.2"
+  }
+}
