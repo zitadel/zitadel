@@ -23,8 +23,8 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	orgRepo := repository.OrganizationRepository(pool)
-	orgMetadataRepo := orgRepo.Metadata(false)
+	orgRepo := repository.OrganizationRepository()
+	orgMetadataRepo := repository.OrganizationMetadataRepository()
 
 	t.Cleanup(func() {
 		_, err := OrgClient.DeleteOrganization(CTX, &v2beta.DeleteOrganizationRequest{
@@ -38,7 +38,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 	// Wait for org to be created
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-		_, err := orgRepo.Get(CTX,
+		_, err := orgRepo.Get(CTX, pool,
 			database.WithCondition(orgRepo.IDCondition(org.GetId())),
 		)
 		assert.NoError(t, err)
@@ -92,7 +92,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 		var gottenMetadata []*domain.OrganizationMetadata
 
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			gottenMetadata, err = orgMetadataRepo.List(CTX,
+			gottenMetadata, err = orgMetadataRepo.List(CTX, pool,
 				database.WithCondition(
 					database.And(
 						orgMetadataRepo.InstanceIDCondition(Instance.Instance.Id),
@@ -184,7 +184,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 		// Test that metadata remove reduces
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			metadata, err := orgMetadataRepo.Get(CTX,
+			metadata, err := orgMetadataRepo.Get(CTX, pool,
 				database.WithCondition(
 					database.And(
 						orgMetadataRepo.InstanceIDCondition(Instance.Instance.Id),
@@ -236,7 +236,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 		// await metadata creation
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			metadata, err := orgMetadataRepo.List(CTX,
+			metadata, err := orgMetadataRepo.List(CTX, pool,
 				database.WithCondition(
 					database.And(
 						orgMetadataRepo.InstanceIDCondition(Instance.Instance.Id),
@@ -256,7 +256,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 		// Test that metadata remove reduces
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			metadata, err := orgMetadataRepo.List(CTX,
+			metadata, err := orgMetadataRepo.List(CTX, pool,
 				database.WithCondition(
 					database.And(
 						orgMetadataRepo.InstanceIDCondition(Instance.Instance.Id),
