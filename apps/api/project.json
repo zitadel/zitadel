@@ -173,7 +173,7 @@
             ],
             "outputs": [
                 "{workspaceRoot}/profile.api.test-integration.cov",
-                ".artifacts/api-test-integration"
+                "{workspaceRoot}.artifacts/api-test-integration"
             ]
         },
         "generate-console": {
