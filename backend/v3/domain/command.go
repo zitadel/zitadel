@@ -13,6 +13,7 @@ import (
 // If possible it should also be used for queries. We will find out if this is possible in the future.
 type Commander interface {
 	Execute(ctx context.Context, opts *CommandOpts) (err error)
+	Validate() (err error)
 	// Events returns the events that should be pushed to the event store after the command is executed.
 	// If the command does not produce events, it should return nil or an empty slice.
 	Events(ctx context.Context) []legacy_es.Command
@@ -26,10 +27,15 @@ type Invoker interface {
 }
 
 // CommandOpts are passed to each command
-// it provides common fields used by commands like the database client.
+// they provide common fields used by commands like the database client.
 type CommandOpts struct {
-	DB      database.QueryExecutor
-	Invoker Invoker
+	DB               database.QueryExecutor
+	Invoker          Invoker
+	organizationRepo func(client database.QueryExecutor) OrganizationRepository
+}
+
+func (opts *CommandOpts) SetOrgRepo(repo func(client database.QueryExecutor) OrganizationRepository) {
+	opts.organizationRepo = repo
 }
 
 type ensureTxOpts struct {
@@ -136,7 +142,16 @@ func (cmd *commandBatch) String() string {
 
 func (b *commandBatch) Execute(ctx context.Context, opts *CommandOpts) (err error) {
 	for _, cmd := range b.Commands {
-		if err = opts.Invoke(ctx, cmd); err != nil {
+		if err = cmd.Execute(ctx, opts); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (b *commandBatch) Validate() (err error) {
+	for _, cmd := range b.Commands {
+		if err = cmd.Validate(); err != nil {
 			return err
 		}
 	}

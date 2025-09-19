@@ -1,5 +1,16 @@
 package orgv2
 
+import (
+	"context"
+
+	"connectrpc.com/connect"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
+	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
+)
+
 // import (
 // 	"context"
 
@@ -31,3 +42,28 @@ package orgv2
 // 	}
 // 	return cmds
 // }
+
+func UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org.UpdateOrganizationRequest]) (*connect.Response[v2beta_org.UpdateOrganizationResponse], error) {
+	orgUpdtCmd := domain.NewUpdateOrgCommand(request.Msg.GetId(), request.Msg.GetName())
+
+	// TODO(IAM-Marco) Finish implementation in https://github.com/zitadel/zitadel/issues/10447
+	domainAddCmd := domain.NewAddOrgDomainCommand(request.Msg.GetId(), request.Msg.GetName())
+	domainSetPrimaryCmd := domain.NewSetPrimaryOrgDomainCommand(request.Msg.GetId(), request.Msg.GetName())
+	// TODO(IAM-Marco) Check if passing the pointer is actually working to retrieve the domain name and the DomainVerified
+	domainRemoveCmd := domain.NewRemoveOrgDomainCommand(request.Msg.GetId(), orgUpdtCmd.OldDomainName, orgUpdtCmd.IsOldDomainVerified)
+
+	batchCmd := domain.BatchCommands(orgUpdtCmd, domainAddCmd, domainSetPrimaryCmd, domainRemoveCmd)
+
+	err := domain.Invoke(ctx, batchCmd, domain.WithOrganizationRepo(repository.OrganizationRepository))
+	if err != nil {
+		return nil, err
+	}
+
+	return &connect.Response[v2beta_org.UpdateOrganizationResponse]{
+		Msg: &v2beta_org.UpdateOrganizationResponse{
+			// TODO(IAM-Marco) Change this with the real update date when OrganizationRepo.Update()
+			// returns the timestamp
+			ChangeDate: timestamppb.Now(),
+		},
+	}, nil
+}

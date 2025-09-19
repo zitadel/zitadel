@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/cache"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
@@ -25,6 +26,23 @@ type Organization struct {
 
 	Domains []*OrganizationDomain `json:"domains,omitempty" db:"-"` // domains need to be handled separately
 }
+
+type OrgCacheIndex uint8
+
+const (
+	orgCacheIndexUndefined OrgCacheIndex = iota
+	orgCacheIndexID
+)
+
+// Keys implements the [cache.Entry].
+func (o *Organization) Keys(index OrgCacheIndex) (key []string) {
+	if index == orgCacheIndexID {
+		return []string{o.ID}
+	}
+	return nil
+}
+
+var _ cache.Entry[OrgCacheIndex, string] = (*Organization)(nil)
 
 // OrgIdentifierCondition is used to help specify a single Organization,
 // it will either be used as the organization ID or organization name,
@@ -52,9 +70,9 @@ type organizationColumns interface {
 // organizationConditions define all the conditions for the instance table.
 type organizationConditions interface {
 	// IDCondition returns an equal filter on the id field.
-	IDCondition(instanceID string) OrgIdentifierCondition
+	IDCondition(organizationID string) OrgIdentifierCondition
 	// NameCondition returns a filter on the name field.
-	NameCondition(name string) OrgIdentifierCondition
+	NameCondition(op database.TextOperation, name string) OrgIdentifierCondition
 	// InstanceIDCondition returns a filter on the instance id field.
 	InstanceIDCondition(instanceID string) database.Condition
 	// StateCondition returns a filter on the name field.
@@ -69,6 +87,8 @@ type organizationChanges interface {
 	SetState(state OrgState) database.Change
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/org.mock.go . OrganizationRepository
+
 // OrganizationRepository is the interface for the instance repository.
 type OrganizationRepository interface {
 	organizationColumns
@@ -78,13 +98,13 @@ type OrganizationRepository interface {
 	Get(ctx context.Context, opts ...database.QueryOption) (*Organization, error)
 	List(ctx context.Context, opts ...database.QueryOption) ([]*Organization, error)
 
-	Create(ctx context.Context, instance *Organization) error
+	Create(ctx context.Context, organization *Organization) error
 	Update(ctx context.Context, id OrgIdentifierCondition, instance_id string, changes ...database.Change) (int64, error)
 	Delete(ctx context.Context, id OrgIdentifierCondition, instance_id string) (int64, error)
 
 	// Domains returns the domain sub repository for the organization.
 	// If shouldLoad is true, the domains will be loaded from the database and written to the [Instance].Domains field.
-	// If shouldLoad is set to true once, the Domains field will be set event if shouldLoad is false in the future.
+	// If shouldLoad is set to true once, the Domains field will be set even if shouldLoad is false in the future.
 	Domains(shouldLoad bool) OrganizationDomainRepository
 }
 

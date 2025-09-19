@@ -45,6 +45,11 @@ func (i *invokeTestCommand) String() string {
 	return "invokeTestCommand"
 }
 
+// Validate implements Commander.
+func (i *invokeTestCommand) Validate() error {
+	return nil
+}
+
 var _ Commander = (*invokeTestCommand)(nil)
 
 type invokeTestEvent struct {

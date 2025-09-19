@@ -34,15 +34,27 @@ const (
 	TextOperationStartsWith
 	// TextOperationStartsWithIgnoreCase checks if the first string starts with the second, ignoring case.
 	TextOperationStartsWithIgnoreCase
+	// TextOperationContains checks if the first string contains the second
+	TextOperationContains
+	// TextOperationContains checks if the first string contains the second, ignoring case.
+	TextOperationContainsWithIgnoreCase
+	// TextOperationEndsWith checks if the first string ends with the second.
+	TextOperationEndsWith
+	// TextOperationEndsWithIgnoreCase checks if the first string ends with the second, ignoring case.
+	TextOperationEndsWithIgnoreCase
 )
 
 var textOperations = map[TextOperation]string{
-	TextOperationEqual:                " = ",
-	TextOperationEqualIgnoreCase:      " LIKE ",
-	TextOperationNotEqual:             " <> ",
-	TextOperationNotEqualIgnoreCase:   " NOT LIKE ",
-	TextOperationStartsWith:           " LIKE ",
-	TextOperationStartsWithIgnoreCase: " LIKE ",
+	TextOperationEqual:                  " = ",
+	TextOperationEqualIgnoreCase:        " LIKE ",
+	TextOperationNotEqual:               " <> ",
+	TextOperationNotEqualIgnoreCase:     " NOT LIKE ",
+	TextOperationStartsWith:             " LIKE ",
+	TextOperationStartsWithIgnoreCase:   " LIKE ",
+	TextOperationContains:               " LIKE ",
+	TextOperationContainsWithIgnoreCase: " ILIKE ",
+	TextOperationEndsWith:               " LIKE ",
+	TextOperationEndsWithIgnoreCase:     " LIKE ",
 }
 
 func writeTextOperation[T Text](builder *StatementBuilder, col Column, op TextOperation, value T) {
@@ -75,6 +87,28 @@ func writeTextOperation[T Text](builder *StatementBuilder, col Column, op TextOp
 		builder.WriteArg(value)
 		builder.WriteString(")")
 		builder.WriteString(" || '%'")
+	case TextOperationContains, TextOperationContainsWithIgnoreCase:
+		col.WriteQualified(builder)
+		builder.WriteString(textOperations[op])
+		builder.WriteString("'%' || ")
+		builder.WriteArg(value)
+		builder.WriteString(" || '%'")
+	case TextOperationEndsWith:
+		col.WriteQualified(builder)
+		builder.WriteString(textOperations[op])
+		builder.WriteString("'%' || ")
+		builder.WriteArg(value)
+	case TextOperationEndsWithIgnoreCase:
+		builder.WriteString("LOWER(")
+		col.WriteQualified(builder)
+		builder.WriteString(")")
+
+		builder.WriteString(textOperations[op])
+		builder.WriteString("'%' || ")
+		builder.WriteString("LOWER(")
+		builder.WriteArg(value)
+		builder.WriteString(")")
+
 	default:
 		panic("unsupported text operation")
 	}
