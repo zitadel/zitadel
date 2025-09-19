@@ -57,6 +57,12 @@ func WithLeftJoin(table string, columns Condition) QueryOption {
 	}
 }
 
+func WithPermissionCheck(permission string) QueryOption {
+	return func(opts *QueryOpts) {
+		opts.Permission = permission
+	}
+}
+
 type joinType string
 
 const (
@@ -100,6 +106,9 @@ type QueryOpts struct {
 	// Joins is a list of joins to be applied to the query.
 	// It is used to build the JOIN clauses of the SQL statement.
 	Joins []join
+	// Permission required to read or write the resource.
+	// When unset, no permission check is made.
+	Permission string
 }
 
 func (opts *QueryOpts) Write(builder *StatementBuilder) {
