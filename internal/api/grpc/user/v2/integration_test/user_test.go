@@ -1859,7 +1859,7 @@ func TestServer_DeleteUser(t *testing.T) {
 			name: "remove dependencies, ok",
 			args: args{
 				req: &user.DeleteUserRequest{},
-				prepare: func(_ *testing.T, request *user.DeleteUserRequest) context.Context {
+				prepare: func(t *testing.T, request *user.DeleteUserRequest) context.Context {
 					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
 					Instance.CreateProjectUserGrant(t, CTX, Instance.DefaultOrg.GetId(), projectResp.GetId(), request.UserId)
