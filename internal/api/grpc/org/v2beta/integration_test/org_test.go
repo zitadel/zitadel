@@ -5,6 +5,7 @@ package org_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"slices"
 	"strings"
@@ -17,6 +18,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	v2beta_object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
@@ -294,18 +296,35 @@ func TestServer_CreateOrganization(t *testing.T) {
 }
 
 func TestServer_UpdateOrganization(t *testing.T) {
+	ctx := Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+
+	t.Cleanup(func() {
+		Instance.Client.FeatureV2.ResetInstanceFeatures(ctx, &feature.ResetInstanceFeaturesRequest{})
+	})
 	orgs, orgsName, _ := createOrgs(CTX, t, Client, 2)
+
+	relTableState := []struct {
+		state      string
+		featureSet *feature.SetInstanceFeaturesRequest
+	}{
+		{
+			state:      "when relational tables are enabled",
+			featureSet: &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)},
+		},
+		{
+			state:      "when relational tables are disabled",
+			featureSet: &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(false)},
+		},
+	}
 
 	tests := []struct {
 		name    string
-		ctx     context.Context
 		req     *v2beta_org.UpdateOrganizationRequest
 		want    *v2beta_org.UpdateOrganizationResponse
 		wantErr bool
 	}{
 		{
 			name: "update org with new name",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 			req: &v2beta_org.UpdateOrganizationRequest{
 				Id:   orgs[0].GetId(),
 				Name: "new org name",
@@ -313,7 +332,6 @@ func TestServer_UpdateOrganization(t *testing.T) {
 		},
 		{
 			name: "update org with same name",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 			req: &v2beta_org.UpdateOrganizationRequest{
 				Id:   orgs[1].GetId(),
 				Name: orgsName[1],
@@ -322,7 +340,6 @@ func TestServer_UpdateOrganization(t *testing.T) {
 		},
 		{
 			name: "update org with non existent org id",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 			req: &v2beta_org.UpdateOrganizationRequest{
 				Id:   "non existent org id",
 				Name: "new name",
@@ -331,7 +348,6 @@ func TestServer_UpdateOrganization(t *testing.T) {
 		},
 		{
 			name: "update org with no id",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 			req: &v2beta_org.UpdateOrganizationRequest{
 				Id:   " ",
 				Name: "new name",
@@ -339,20 +355,25 @@ func TestServer_UpdateOrganization(t *testing.T) {
 			wantErr: true,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.UpdateOrganization(tt.ctx, tt.req)
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
 
-			// check details
-			gotCD := got.GetChangeDate().AsTime()
-			now := time.Now()
-			assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-		})
+	for _, stateCase := range relTableState {
+		_, err := Instance.Client.FeatureV2.SetInstanceFeatures(ctx, stateCase.featureSet)
+		require.NoError(t, err)
+		for _, tt := range tests {
+			t.Run(fmt.Sprintf("%s - %s", stateCase.state, tt.name), func(t *testing.T) {
+				got, err := Client.UpdateOrganization(ctx, tt.req)
+				if tt.wantErr {
+					require.Error(t, err)
+					return
+				}
+				require.NoError(t, err)
+
+				// check details
+				gotCD := got.GetChangeDate().AsTime()
+				now := time.Now()
+				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+			})
+		}
 	}
 }
 
