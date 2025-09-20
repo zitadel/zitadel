@@ -77,6 +77,8 @@ type organizationConditions interface {
 	InstanceIDCondition(instanceID string) database.Condition
 	// StateCondition returns a filter on the name field.
 	StateCondition(state OrgState) database.Condition
+	// ExistsDomain returns a filter on the organizations domains.
+	ExistsDomain(cond database.Condition) database.Condition
 }
 
 // organizationChanges define all the changes for the instance table.

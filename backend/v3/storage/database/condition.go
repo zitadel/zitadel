@@ -217,3 +217,41 @@ func (c valueCondition) Write(builder *StatementBuilder) {
 }
 
 var _ Condition = (*valueCondition)(nil)
+
+// existsCondition is a helper to write an EXISTS (SELECT 1 FROM <table> WHERE <condition>) clause.
+// It implements Condition so it can be composed with other conditions using And/Or.
+type existsCondition struct {
+	table     string
+	condition Condition
+}
+
+// Matches implements Condition.
+func (e *existsCondition) Matches(x any) bool {
+	toMatch, ok := x.(existsCondition)
+	if !ok {
+		return false
+	}
+	return e.String() == toMatch.String()
+}
+
+// String implements Condition.
+func (e *existsCondition) String() string {
+	return "database.existsCondition"
+}
+
+// Exists creates a condition that checks for the existence of rows in a subquery.
+func Exists(table string, condition Condition) Condition {
+	return &existsCondition{
+		table:     table,
+		condition: condition,
+	}
+}
+
+// Write implements [Condition].
+func (e existsCondition) Write(builder *StatementBuilder) {
+	builder.WriteString(" EXISTS (SELECT 1 FROM ")
+	builder.WriteString(e.table)
+	builder.WriteString(" WHERE ")
+	e.condition.Write(builder)
+	builder.WriteString(")")
+}
