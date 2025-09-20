@@ -12,16 +12,10 @@ const queryUserStmt = `SELECT instance_id, org_id, id, username, type, created_a
 	` first_name, last_name, email_address, email_verified_at, phone_number, phone_verified_at, description` +
 	` FROM users_view users`
 
-type user struct {
-	repository
-}
+type user struct{}
 
-func UserRepository(client database.QueryExecutor) domain.UserRepository {
-	return &user{
-		repository: repository{
-			client: client,
-		},
-	}
+func UserRepository() domain.UserRepository {
+	return new(user)
 }
 
 var _ domain.UserRepository = (*user)(nil)
@@ -31,17 +25,17 @@ var _ domain.UserRepository = (*user)(nil)
 // -------------------------------------------------------------
 
 // Human implements [domain.UserRepository].
-func (u *user) Human() domain.HumanRepository {
+func (u user) Human() domain.HumanRepository {
 	return &userHuman{user: u}
 }
 
 // Machine implements [domain.UserRepository].
-func (u *user) Machine() domain.MachineRepository {
+func (u user) Machine() domain.MachineRepository {
 	return &userMachine{user: u}
 }
 
 // List implements [domain.UserRepository].
-func (u *user) List(ctx context.Context, opts ...database.QueryOption) (users []*domain.User, err error) {
+func (u user) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (users []*domain.User, err error) {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
@@ -54,7 +48,7 @@ func (u *user) List(ctx context.Context, opts ...database.QueryOption) (users []
 	options.WriteLimit(&builder)
 	options.WriteOffset(&builder)
 
-	rows, err := u.client.Query(ctx, builder.String(), builder.Args()...)
+	rows, err := client.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +73,7 @@ func (u *user) List(ctx context.Context, opts ...database.QueryOption) (users []
 }
 
 // Get implements [domain.UserRepository].
-func (u *user) Get(ctx context.Context, opts ...database.QueryOption) (*domain.User, error) {
+func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.User, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
@@ -92,7 +86,7 @@ func (u *user) Get(ctx context.Context, opts ...database.QueryOption) (*domain.U
 	options.WriteLimit(&builder)
 	options.WriteOffset(&builder)
 
-	return scanUser(u.client.QueryRow(ctx, builder.String(), builder.Args()...))
+	return scanUser(client.QueryRow(ctx, builder.String(), builder.Args()...))
 }
 
 const (
@@ -105,7 +99,7 @@ const (
 )
 
 // Create implements [domain.UserRepository].
-func (u *user) Create(ctx context.Context, user *domain.User) error {
+func (u user) Create(ctx context.Context, client database.QueryExecutor, user *domain.User) error {
 	builder := database.StatementBuilder{}
 	builder.AppendArgs(user.InstanceID, user.OrgID, user.ID, user.Username, user.Traits.Type())
 	switch trait := user.Traits.(type) {
@@ -116,15 +110,15 @@ func (u *user) Create(ctx context.Context, user *domain.User) error {
 		builder.WriteString(createMachineStmt)
 		builder.AppendArgs(trait.Description)
 	}
-	return u.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
+	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
 }
 
 // Delete implements [domain.UserRepository].
-func (u *user) Delete(ctx context.Context, condition database.Condition) error {
+func (u user) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) error {
 	builder := database.StatementBuilder{}
 	builder.WriteString("DELETE FROM users")
 	writeCondition(&builder, condition)
-	_, err := u.client.Exec(ctx, builder.String(), builder.Args()...)
+	_, err := client.Exec(ctx, builder.String(), builder.Args()...)
 	return err
 }
 

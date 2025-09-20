@@ -4,6 +4,9 @@ package database
 // Its written after the WHERE keyword in a SQL statement.
 type Condition interface {
 	Write(builder *StatementBuilder)
+	// ContainsColumn is used to check if the condition filters for a specific column.
+	// It acts as a save guard database operations that should be specific on the given column.
+	ContainsColumn(col Column) bool
 }
 
 type and struct {
@@ -27,6 +30,15 @@ func (a *and) Write(builder *StatementBuilder) {
 // And combines multiple conditions with AND.
 func And(conditions ...Condition) *and {
 	return &and{conditions: conditions}
+}
+
+func (a and) ContainsColumn(col Column) bool {
+	for _, condition := range a.conditions {
+		if condition.ContainsColumn(col) {
+			return true
+		}
+	}
+	return false
 }
 
 var _ Condition = (*and)(nil)
@@ -54,6 +66,17 @@ func Or(conditions ...Condition) *or {
 	return &or{conditions: conditions}
 }
 
+// ContainsColumn implements [Condition].
+// It always returns false because OR conditions
+func (o or) ContainsColumn(col Column) bool {
+	for _, condition := range o.conditions {
+		if !condition.ContainsColumn(col) {
+			return false
+		}
+	}
+	return true
+}
+
 var _ Condition = (*or)(nil)
 
 type isNull struct {
@@ -69,6 +92,10 @@ func (i *isNull) Write(builder *StatementBuilder) {
 // IsNull creates a condition that checks if a column is NULL.
 func IsNull(column Column) *isNull {
 	return &isNull{column: column}
+}
+
+func (i isNull) ContainsColumn(col Column) bool {
+	return i.column.Equals(col)
 }
 
 var _ Condition = (*isNull)(nil)
@@ -88,43 +115,110 @@ func IsNotNull(column Column) *isNotNull {
 	return &isNotNull{column: column}
 }
 
+// ContainsColumn implements [Condition].
+func (i isNotNull) ContainsColumn(col Column) bool {
+	return i.column.Equals(col)
+}
+
 var _ Condition = (*isNotNull)(nil)
 
-type valueCondition func(builder *StatementBuilder)
+type valueCondition struct {
+	write func(builder *StatementBuilder)
+	col   Column
+}
 
 // NewTextCondition creates a condition that compares a text column with a value.
 func NewTextCondition[V Text](col Column, op TextOperation, value V) Condition {
-	return valueCondition(func(builder *StatementBuilder) {
-		writeTextOperation(builder, col, op, value)
-	})
+	return valueCondition{
+		col: col,
+		write: func(builder *StatementBuilder) {
+			writeTextOperation(builder, col, op, value)
+		},
+	}
 }
 
 // NewDateCondition creates a condition that compares a numeric column with a value.
 func NewNumberCondition[V Number](col Column, op NumberOperation, value V) Condition {
-	return valueCondition(func(builder *StatementBuilder) {
-		writeNumberOperation(builder, col, op, value)
-	})
+	return valueCondition{
+		col: col,
+		write: func(builder *StatementBuilder) {
+			writeNumberOperation(builder, col, op, value)
+		},
+	}
 }
 
 // NewDateCondition creates a condition that compares a boolean column with a value.
 func NewBooleanCondition[V Boolean](col Column, value V) Condition {
-	return valueCondition(func(builder *StatementBuilder) {
-		writeBooleanOperation(builder, col, value)
-	})
+	return valueCondition{
+		col: col,
+		write: func(builder *StatementBuilder) {
+			writeBooleanOperation(builder, col, value)
+		},
+	}
+}
+
+// NewBytesCondition creates a condition that compares a BYTEA column with a value.
+func NewBytesCondition[V Bytes](col Column, op BytesOperation, value V) Condition {
+	return valueCondition{
+		col: col,
+		write: func(builder *StatementBuilder) {
+			writeBytesOperation(builder, col, op, value)
+		},
+	}
 }
 
 // NewColumnCondition creates a condition that compares two columns on equality.
 func NewColumnCondition(col1, col2 Column) Condition {
-	return valueCondition(func(builder *StatementBuilder) {
-		col1.WriteQualified(builder)
-		builder.WriteString(" = ")
-		col2.WriteQualified(builder)
-	})
+	return valueCondition{
+		col: col1,
+		write: func(builder *StatementBuilder) {
+			col1.WriteQualified(builder)
+			builder.WriteString(" = ")
+			col2.WriteQualified(builder)
+		},
+	}
 }
 
 // Write implements [Condition].
 func (c valueCondition) Write(builder *StatementBuilder) {
-	c(builder)
+	c.write(builder)
+}
+
+// ContainsColumn implements [Condition].
+func (i valueCondition) ContainsColumn(col Column) bool {
+	return i.col.Equals(col)
 }
 
 var _ Condition = (*valueCondition)(nil)
+
+// existsCondition is a helper to write an EXISTS (SELECT 1 FROM <table> WHERE <condition>) clause.
+// It implements Condition so it can be composed with other conditions using And/Or.
+type existsCondition struct {
+	table     string
+	condition Condition
+}
+
+// Exists creates a condition that checks for the existence of rows in a subquery.
+func Exists(table string, condition Condition) Condition {
+	return &existsCondition{
+		table:     table,
+		condition: condition,
+	}
+}
+
+// Write implements [Condition].
+func (e existsCondition) Write(builder *StatementBuilder) {
+	builder.WriteString(" EXISTS (SELECT 1 FROM ")
+	builder.WriteString(e.table)
+	builder.WriteString(" WHERE ")
+	e.condition.Write(builder)
+	builder.WriteString(")")
+}
+
+// ContainsColumn implements [Condition].
+func (e existsCondition) ContainsColumn(col Column) bool {
+	// Forward to the inner condition so safety checks (like instance_id presence) can still work.
+	return e.condition.ContainsColumn(col)
+}
+
+var _ Condition = (*existsCondition)(nil)

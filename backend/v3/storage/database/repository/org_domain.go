@@ -11,8 +11,19 @@ import (
 var _ domain.OrganizationDomainRepository = (*orgDomain)(nil)
 
 type orgDomain struct {
-	repository
-	*org
+	// *org
+}
+
+func OrganizationDomainRepository() domain.OrganizationDomainRepository {
+	return new(orgDomain)
+}
+
+func (orgDomain) qualifiedTableName() string {
+	return "zitadel.org_domains"
+}
+
+func (orgDomain) unqualifiedTableName() string {
+	return "org_domains"
 }
 
 // -------------------------------------------------------------
@@ -24,7 +35,7 @@ const queryOrganizationDomainStmt = `SELECT instance_id, org_id, domain, is_veri
 
 // Get implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).Get of orgDomain.org.
-func (o *orgDomain) Get(ctx context.Context, opts ...database.QueryOption) (*domain.OrganizationDomain, error) {
+func (o orgDomain) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.OrganizationDomain, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
@@ -34,12 +45,12 @@ func (o *orgDomain) Get(ctx context.Context, opts ...database.QueryOption) (*dom
 	builder.WriteString(queryOrganizationDomainStmt)
 	options.Write(&builder)
 
-	return scanOrganizationDomain(ctx, o.client, &builder)
+	return scanOrganizationDomain(ctx, client, &builder)
 }
 
 // List implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).List of orgDomain.org.
-func (o *orgDomain) List(ctx context.Context, opts ...database.QueryOption) ([]*domain.OrganizationDomain, error) {
+func (o orgDomain) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.OrganizationDomain, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
@@ -49,11 +60,11 @@ func (o *orgDomain) List(ctx context.Context, opts ...database.QueryOption) ([]*
 	builder.WriteString(queryOrganizationDomainStmt)
 	options.Write(&builder)
 
-	return scanOrganizationDomains(ctx, o.client, &builder)
+	return scanOrganizationDomains(ctx, client, &builder)
 }
 
 // Add implements [domain.OrganizationDomainRepository].
-func (o *orgDomain) Add(ctx context.Context, domain *domain.AddOrganizationDomain) error {
+func (o orgDomain) Add(ctx context.Context, client database.QueryExecutor, domain *domain.AddOrganizationDomain) error {
 	var (
 		builder              database.StatementBuilder
 		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
@@ -69,12 +80,12 @@ func (o *orgDomain) Add(ctx context.Context, domain *domain.AddOrganizationDomai
 	builder.WriteArgs(domain.InstanceID, domain.OrgID, domain.Domain, domain.IsVerified, domain.IsPrimary, domain.ValidationType, createdAt, updatedAt)
 	builder.WriteString(`) RETURNING created_at, updated_at`)
 
-	return o.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&domain.CreatedAt, &domain.UpdatedAt)
+	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&domain.CreatedAt, &domain.UpdatedAt)
 }
 
 // Update implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).Update of orgDomain.org.
-func (o *orgDomain) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error) {
+func (o orgDomain) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}
@@ -85,17 +96,17 @@ func (o *orgDomain) Update(ctx context.Context, condition database.Condition, ch
 	database.Changes(changes).Write(&builder)
 	writeCondition(&builder, condition)
 
-	return o.client.Exec(ctx, builder.String(), builder.Args()...)
+	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
 // Remove implements [domain.OrganizationDomainRepository].
-func (o *orgDomain) Remove(ctx context.Context, condition database.Condition) (int64, error) {
+func (o orgDomain) Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	var builder database.StatementBuilder
 
 	builder.WriteString(`DELETE FROM zitadel.org_domains `)
 	writeCondition(&builder, condition)
 
-	return o.client.Exec(ctx, builder.String(), builder.Args()...)
+	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
 // -------------------------------------------------------------
@@ -158,45 +169,43 @@ func (o orgDomain) OrgIDCondition(orgID string) database.Condition {
 
 // CreatedAtColumn implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).CreatedAtColumn of orgDomain.org.
-func (orgDomain) CreatedAtColumn() database.Column {
-	return database.NewColumn("org_domains", "created_at")
+func (o orgDomain) CreatedAtColumn() database.Column {
+	return database.NewColumn(o.unqualifiedTableName(), "created_at")
 }
 
 // DomainColumn implements [domain.OrganizationDomainRepository].
-func (orgDomain) DomainColumn() database.Column {
-	return database.NewColumn("org_domains", "domain")
+func (o orgDomain) DomainColumn() database.Column {
+	return database.NewColumn(o.unqualifiedTableName(), "domain")
 }
 
 // InstanceIDColumn implements [domain.OrganizationDomainRepository].
-// Subtle: this method shadows the method ([domain.OrganizationRepository]).InstanceIDColumn of orgDomain.org.
-func (orgDomain) InstanceIDColumn() database.Column {
-	return database.NewColumn("org_domains", "instance_id")
+func (o orgDomain) InstanceIDColumn() database.Column {
+	return database.NewColumn(o.unqualifiedTableName(), "instance_id")
 }
 
 // IsPrimaryColumn implements [domain.OrganizationDomainRepository].
-func (orgDomain) IsPrimaryColumn() database.Column {
-	return database.NewColumn("org_domains", "is_primary")
+func (o orgDomain) IsPrimaryColumn() database.Column {
+	return database.NewColumn(o.unqualifiedTableName(), "is_primary")
 }
 
 // IsVerifiedColumn implements [domain.OrganizationDomainRepository].
-func (orgDomain) IsVerifiedColumn() database.Column {
-	return database.NewColumn("org_domains", "is_verified")
+func (o orgDomain) IsVerifiedColumn() database.Column {
+	return database.NewColumn(o.unqualifiedTableName(), "is_verified")
 }
 
 // OrgIDColumn implements [domain.OrganizationDomainRepository].
-func (orgDomain) OrgIDColumn() database.Column {
-	return database.NewColumn("org_domains", "org_id")
+func (o orgDomain) OrgIDColumn() database.Column {
+	return database.NewColumn(o.unqualifiedTableName(), "org_id")
 }
 
 // UpdatedAtColumn implements [domain.OrganizationDomainRepository].
-// Subtle: this method shadows the method ([domain.OrganizationRepository]).UpdatedAtColumn of orgDomain.org.
-func (orgDomain) UpdatedAtColumn() database.Column {
-	return database.NewColumn("org_domains", "updated_at")
+func (o orgDomain) UpdatedAtColumn() database.Column {
+	return database.NewColumn(o.unqualifiedTableName(), "updated_at")
 }
 
 // ValidationTypeColumn implements [domain.OrganizationDomainRepository].
-func (orgDomain) ValidationTypeColumn() database.Column {
-	return database.NewColumn("org_domains", "validation_type")
+func (o orgDomain) ValidationTypeColumn() database.Column {
+	return database.NewColumn(o.unqualifiedTableName(), "validation_type")
 }
 
 // -------------------------------------------------------------

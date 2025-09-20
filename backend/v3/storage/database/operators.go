@@ -7,11 +7,11 @@ import (
 )
 
 type Value interface {
-	Boolean | Number | Text | Instruction
+	Boolean | Number | Text | Instruction | Bytes
 }
 
 type Operation interface {
-	BooleanOperation | NumberOperation | TextOperation
+	BooleanOperation | NumberOperation | TextOperation | BytesOperation
 }
 
 type Text interface {
@@ -132,5 +132,28 @@ const (
 func writeBooleanOperation[T Boolean](builder *StatementBuilder, col Column, value T) {
 	col.WriteQualified(builder)
 	builder.WriteString(" = ")
+	builder.WriteArg(value)
+}
+
+type Bytes interface {
+	~[]byte
+}
+
+// BytesOperation are operations that can be performed on bytea values.
+type BytesOperation uint8
+
+const (
+	BytesOperationEqual BytesOperation = iota + 1
+	BytesOperationNotEqual
+)
+
+var bytesOperations = map[BytesOperation]string{
+	BytesOperationEqual:    " = ",
+	BytesOperationNotEqual: " <> ",
+}
+
+func writeBytesOperation[T Bytes](builder *StatementBuilder, col Column, op BytesOperation, value T) {
+	col.WriteQualified(builder)
+	builder.WriteString(bytesOperations[op])
 	builder.WriteArg(value)
 }
