@@ -13,9 +13,9 @@ var _IDPAutoLinkingOptionIndex = [...]uint8{0, 8, 13}
 
 const _IDPAutoLinkingOptionLowerName = "usernameemail"
 
-func (i IDPAutoLinkingOption) String() string {
+func (i IDPAutoLinkingField) String() string {
 	i -= 1
-	if i >= IDPAutoLinkingOption(len(_IDPAutoLinkingOptionIndex)-1) {
+	if i >= IDPAutoLinkingField(len(_IDPAutoLinkingOptionIndex)-1) {
 		return fmt.Sprintf("IDPAutoLinkingOption(%d)", i+1)
 	}
 	return _IDPAutoLinkingOptionName[_IDPAutoLinkingOptionIndex[i]:_IDPAutoLinkingOptionIndex[i+1]]
@@ -29,9 +29,9 @@ func _IDPAutoLinkingOptionNoOp() {
 	_ = x[IDPAutoLinkingOptionEmail-(2)]
 }
 
-var _IDPAutoLinkingOptionValues = []IDPAutoLinkingOption{IDPAutoLinkingOptionUserName, IDPAutoLinkingOptionEmail}
+var _IDPAutoLinkingOptionValues = []IDPAutoLinkingField{IDPAutoLinkingOptionUserName, IDPAutoLinkingOptionEmail}
 
-var _IDPAutoLinkingOptionNameToValueMap = map[string]IDPAutoLinkingOption{
+var _IDPAutoLinkingOptionNameToValueMap = map[string]IDPAutoLinkingField{
 	_IDPAutoLinkingOptionName[0:8]:       IDPAutoLinkingOptionUserName,
 	_IDPAutoLinkingOptionLowerName[0:8]:  IDPAutoLinkingOptionUserName,
 	_IDPAutoLinkingOptionName[8:13]:      IDPAutoLinkingOptionEmail,
@@ -45,7 +45,7 @@ var _IDPAutoLinkingOptionNames = []string{
 
 // IDPAutoLinkingOptionString retrieves an enum value from the enum constants string name.
 // Throws an error if the param is not part of the enum.
-func IDPAutoLinkingOptionString(s string) (IDPAutoLinkingOption, error) {
+func IDPAutoLinkingOptionString(s string) (IDPAutoLinkingField, error) {
 	if val, ok := _IDPAutoLinkingOptionNameToValueMap[s]; ok {
 		return val, nil
 	}
@@ -57,7 +57,7 @@ func IDPAutoLinkingOptionString(s string) (IDPAutoLinkingOption, error) {
 }
 
 // IDPAutoLinkingOptionValues returns all values of the enum
-func IDPAutoLinkingOptionValues() []IDPAutoLinkingOption {
+func IDPAutoLinkingOptionValues() []IDPAutoLinkingField {
 	return _IDPAutoLinkingOptionValues
 }
 
@@ -69,7 +69,7 @@ func IDPAutoLinkingOptionStrings() []string {
 }
 
 // IsAIDPAutoLinkingOption returns "true" if the value is listed in the enum definition. "false" otherwise
-func (i IDPAutoLinkingOption) IsAIDPAutoLinkingOption() bool {
+func (i IDPAutoLinkingField) IsAIDPAutoLinkingOption() bool {
 	for _, v := range _IDPAutoLinkingOptionValues {
 		if i == v {
 			return true

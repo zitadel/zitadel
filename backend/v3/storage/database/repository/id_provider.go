@@ -502,7 +502,7 @@ func (i idProvider) AllowLinkingCondition(allow bool) database.Condition {
 	return database.NewBooleanCondition(i.AllowLinkingColumn(), allow)
 }
 
-func (i idProvider) AllowAutoLinkingCondition(linkingType domain.IDPAutoLinkingOption) database.Condition {
+func (i idProvider) AllowAutoLinkingCondition(linkingType domain.IDPAutoLinkingField) database.Condition {
 	return database.NewTextCondition(i.AllowAutoLinkingColumn(), database.TextOperationEqual, linkingType.String())
 }
 
