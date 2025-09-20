@@ -65,34 +65,51 @@ func (c *column) Equals(col Column) bool {
 	return c.table == toMatch.table && c.name == toMatch.name
 }
 
-func Lower(col Column) Column {
-	return &lowerColumn{col: col}
+// LowerColumn returns a column that represents LOWER(col).
+func LowerColumn(col Column) Column {
+	return &functionColumn{fn: functionLower, col: col}
 }
 
-type lowerColumn struct {
+// SHA256Column returns a column that represents SHA256(col).
+func SHA256Column(col Column) Column {
+	return &functionColumn{fn: functionSHA256, col: col}
+}
+
+type functionColumn struct {
+	fn  function
 	col Column
 }
 
-func (c lowerColumn) WriteQualified(builder *StatementBuilder) {
-	builder.Grow(len("lower()"))
-	builder.WriteString("LOWER(")
+type function string
+
+const (
+	_              function = ""
+	functionLower  function = "LOWER"
+	functionSHA256 function = "SHA256"
+)
+
+func (c functionColumn) WriteQualified(builder *StatementBuilder) {
+	builder.Grow(len(c.fn) + 2)
+	builder.WriteString(string(c.fn))
+	builder.WriteRune('(')
 	c.col.WriteQualified(builder)
 	builder.WriteRune(')')
 }
 
-func (c lowerColumn) WriteUnqualified(builder *StatementBuilder) {
-	builder.Grow(len("lower()"))
-	builder.WriteString("LOWER(")
+func (c functionColumn) WriteUnqualified(builder *StatementBuilder) {
+	builder.Grow(len(c.fn) + 2)
+	builder.WriteString(string(c.fn))
+	builder.WriteRune('(')
 	c.col.WriteUnqualified(builder)
 	builder.WriteRune(')')
 }
 
-func (c *lowerColumn) Equals(col Column) bool {
+func (c *functionColumn) Equals(col Column) bool {
 	if col == nil {
 		return c == nil
 	}
-	toMatch, ok := col.(*lowerColumn)
-	if !ok {
+	toMatch, ok := col.(*functionColumn)
+	if !ok || toMatch.fn != c.fn {
 		return false
 	}
 	return c.col.Equals(toMatch.col)

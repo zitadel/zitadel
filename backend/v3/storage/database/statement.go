@@ -21,8 +21,16 @@ type StatementBuilder struct {
 	existingArgs map[any]string
 }
 
+type argWriter interface {
+	WriteArg(builder *StatementBuilder)
+}
+
 // WriteArgs adds the argument to the statement and writes the placeholder to the query.
 func (b *StatementBuilder) WriteArg(arg any) {
+	if writer, ok := arg.(argWriter); ok {
+		writer.WriteArg(b)
+		return
+	}
 	b.WriteString(b.AppendArg(arg))
 }
 

@@ -128,6 +128,7 @@ type valueCondition struct {
 }
 
 // NewTextCondition creates a condition that compares a text column with a value.
+// If you want to use ignore case operations, consider using [LowerValue] and [LowerColumn] on the value and column.
 func NewTextCondition[V Text](col Column, op TextOperation, value V) Condition {
 	return valueCondition{
 		col: col,
@@ -158,11 +159,11 @@ func NewBooleanCondition[V Boolean](col Column, value V) Condition {
 }
 
 // NewBytesCondition creates a condition that compares a BYTEA column with a value.
-func NewBytesCondition[V Bytes](col Column, op BytesOperation, value V) Condition {
+func NewBytesCondition[V Bytes](col Column, op BytesOperation, value any) Condition {
 	return valueCondition{
 		col: col,
 		write: func(builder *StatementBuilder) {
-			writeBytesOperation(builder, col, op, value)
+			writeBytesOperation[V](builder, col, op, value)
 		},
 	}
 }

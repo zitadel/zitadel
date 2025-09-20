@@ -6,6 +6,29 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
+type wrappedValue[V Value] struct {
+	value V
+	fn    function
+}
+
+func LowerValue[T Value](v T) wrappedValue[T] {
+	return wrappedValue[T]{value: v, fn: functionLower}
+}
+
+func SHA256Value[T Value](v T) wrappedValue[T] {
+	return wrappedValue[T]{value: v, fn: functionSHA256}
+}
+
+func (b wrappedValue[V]) WriteArg(builder *StatementBuilder) {
+	builder.Grow(len(b.fn) + 5)
+	builder.WriteString(string(b.fn))
+	builder.WriteRune('(')
+	builder.WriteArg(b.value)
+	builder.WriteRune(')')
+}
+
+var _ argWriter = (*wrappedValue[string])(nil)
+
 type Value interface {
 	Boolean | Number | Text | Instruction | Bytes
 }
@@ -15,7 +38,7 @@ type Operation interface {
 }
 
 type Text interface {
-	~string | ~[]byte
+	~string | Bytes
 }
 
 // TextOperation are operations that can be performed on text values.
@@ -24,25 +47,16 @@ type TextOperation uint8
 const (
 	// TextOperationEqual compares two strings for equality.
 	TextOperationEqual TextOperation = iota + 1
-	// TextOperationEqualIgnoreCase compares two strings for equality, ignoring case.
-	TextOperationEqualIgnoreCase
 	// TextOperationNotEqual compares two strings for inequality.
 	TextOperationNotEqual
-	// TextOperationNotEqualIgnoreCase compares two strings for inequality, ignoring case.
-	TextOperationNotEqualIgnoreCase
 	// TextOperationStartsWith checks if the first string starts with the second.
 	TextOperationStartsWith
-	// TextOperationStartsWithIgnoreCase checks if the first string starts with the second, ignoring case.
-	TextOperationStartsWithIgnoreCase
 )
 
 var textOperations = map[TextOperation]string{
-	TextOperationEqual:                " = ",
-	TextOperationEqualIgnoreCase:      " LIKE ",
-	TextOperationNotEqual:             " <> ",
-	TextOperationNotEqualIgnoreCase:   " NOT LIKE ",
-	TextOperationStartsWith:           " LIKE ",
-	TextOperationStartsWithIgnoreCase: " LIKE ",
+	TextOperationEqual:      " = ",
+	TextOperationNotEqual:   " <> ",
+	TextOperationStartsWith: " LIKE ",
 }
 
 func writeTextOperation[T Text](builder *StatementBuilder, col Column, op TextOperation, value T) {
@@ -51,29 +65,10 @@ func writeTextOperation[T Text](builder *StatementBuilder, col Column, op TextOp
 		col.WriteQualified(builder)
 		builder.WriteString(textOperations[op])
 		builder.WriteArg(value)
-	case TextOperationEqualIgnoreCase, TextOperationNotEqualIgnoreCase:
-		builder.WriteString("LOWER(")
-		col.WriteQualified(builder)
-		builder.WriteString(")")
-
-		builder.WriteString(textOperations[op])
-		builder.WriteString("LOWER(")
-		builder.WriteArg(value)
-		builder.WriteString(")")
 	case TextOperationStartsWith:
 		col.WriteQualified(builder)
 		builder.WriteString(textOperations[op])
 		builder.WriteArg(value)
-		builder.WriteString(" || '%'")
-	case TextOperationStartsWithIgnoreCase:
-		builder.WriteString("LOWER(")
-		col.WriteQualified(builder)
-		builder.WriteString(")")
-
-		builder.WriteString(textOperations[op])
-		builder.WriteString("LOWER(")
-		builder.WriteArg(value)
-		builder.WriteString(")")
 		builder.WriteString(" || '%'")
 	default:
 		panic("unsupported text operation")
@@ -152,8 +147,16 @@ var bytesOperations = map[BytesOperation]string{
 	BytesOperationNotEqual: " <> ",
 }
 
-func writeBytesOperation[T Bytes](builder *StatementBuilder, col Column, op BytesOperation, value T) {
+func writeBytesOperation[B Bytes](builder *StatementBuilder, col Column, op BytesOperation, value any) {
 	col.WriteQualified(builder)
 	builder.WriteString(bytesOperations[op])
-	builder.WriteArg(value)
+	if bytes, ok := value.(B); ok {
+		builder.WriteArg(bytes)
+		return
+	}
+	if writer, ok := value.(argWriter); ok {
+		writer.WriteArg(builder)
+		return
+	}
+	panic("unsupported bytes value type")
 }
