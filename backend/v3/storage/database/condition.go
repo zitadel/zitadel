@@ -128,12 +128,22 @@ type valueCondition struct {
 }
 
 // NewTextCondition creates a condition that compares a text column with a value.
-// If you want to use ignore case operations, consider using [LowerValue] and [LowerColumn] on the value and column.
-func NewTextCondition[V Text](col Column, op TextOperation, value V) Condition {
+// If you want to use ignore case operations, consider using [NewTextIgnoreCaseCondition].
+func NewTextCondition[T Text](col Column, op TextOperation, value T) Condition {
 	return valueCondition{
 		col: col,
 		write: func(builder *StatementBuilder) {
-			writeTextOperation(builder, col, op, value)
+			writeTextOperation[T](builder, col, op, value)
+		},
+	}
+}
+
+// NewTextIgnoreCaseCondition creates a condition that compares a text column with a value, ignoring case by lowercasing both.
+func NewTextIgnoreCaseCondition[T Text](col Column, op TextOperation, value T) Condition {
+	return valueCondition{
+		col: col,
+		write: func(builder *StatementBuilder) {
+			writeTextOperation[T](builder, LowerColumn(col), op, LowerValue(value))
 		},
 	}
 }

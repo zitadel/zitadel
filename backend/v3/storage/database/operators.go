@@ -59,7 +59,13 @@ var textOperations = map[TextOperation]string{
 	TextOperationStartsWith: " LIKE ",
 }
 
-func writeTextOperation[T Text](builder *StatementBuilder, col Column, op TextOperation, value T) {
+func writeTextOperation[T Text](builder *StatementBuilder, col Column, op TextOperation, value any) {
+	switch value.(type) {
+	case T, argWriter:
+	default:
+		panic("unsupported text value type")
+	}
+
 	switch op {
 	case TextOperationEqual, TextOperationNotEqual:
 		col.WriteQualified(builder)
@@ -150,13 +156,11 @@ var bytesOperations = map[BytesOperation]string{
 func writeBytesOperation[B Bytes](builder *StatementBuilder, col Column, op BytesOperation, value any) {
 	col.WriteQualified(builder)
 	builder.WriteString(bytesOperations[op])
-	if bytes, ok := value.(B); ok {
-		builder.WriteArg(bytes)
+	switch value.(type) {
+	case B, argWriter:
+		builder.WriteArg(value)
 		return
+	default:
+		panic("unsupported bytes value type")
 	}
-	if writer, ok := value.(argWriter); ok {
-		writer.WriteArg(builder)
-		return
-	}
-	panic("unsupported bytes value type")
 }
