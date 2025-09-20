@@ -77,9 +77,9 @@ func TestWriteTextOperation(t *testing.T) {
 		{
 			name:     "ContainsIgnoreCase",
 			col:      NewColumn("test", "col"),
-			op:       TextOperationContainsWithIgnoreCase,
+			op:       TextOperationContainsIgnoreCase,
 			value:    "value",
-			expected: "test.col ILIKE '%' || $1 || '%'",
+			expected: "LOWER(test.col) LIKE '%' || LOWER($1) || '%'",
 			args:     []any{"value"},
 		},
 		{
