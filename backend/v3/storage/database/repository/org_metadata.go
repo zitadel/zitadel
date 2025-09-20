@@ -149,7 +149,7 @@ func (o orgMetadata) OrgIDCondition(orgID string) database.Condition {
 
 // ValueCondition implements [domain.OrganizationMetadataRepository].
 func (o orgMetadata) ValueCondition(op database.BytesOperation, value []byte) database.Condition {
-	return database.NewBytesCondition(o.ValueColumn(), op, value)
+	return database.NewBytesCondition[[]byte](database.SHA256Column(o.ValueColumn()), op, database.SHA256Value(value))
 }
 
 // -------------------------------------------------------------
