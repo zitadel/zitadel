@@ -24,9 +24,12 @@ func (m Columns) WriteUnqualified(builder *StatementBuilder) {
 
 // Column represents a column in a database table.
 type Column interface {
-	// Write(builder *StatementBuilder)
+	// WriteQualified writes the column with the table name as prefix.
 	WriteQualified(builder *StatementBuilder)
+	// WriteUnqualified writes the column without the table name as prefix.
 	WriteUnqualified(builder *StatementBuilder)
+	// Equals checks if two columns are equal.
+	Equals(col Column) bool
 }
 
 type column struct {
@@ -35,7 +38,7 @@ type column struct {
 }
 
 func NewColumn(table, name string) Column {
-	return column{table: table, name: name}
+	return &column{table: table, name: name}
 }
 
 // WriteQualified implements [Column].
@@ -51,35 +54,46 @@ func (c column) WriteUnqualified(builder *StatementBuilder) {
 	builder.WriteString(c.name)
 }
 
-var _ Column = (*column)(nil)
+func (c *column) Equals(col Column) bool {
+	if col == nil {
+		return c == nil
+	}
+	toMatch, ok := col.(*column)
+	if !ok {
+		return false
+	}
+	return c.table == toMatch.table && c.name == toMatch.name
+}
 
-// // ignoreCaseColumn represents two database columns, one for the
-// // original value and one for the lower case value.
-// type ignoreCaseColumn interface {
-// 	Column
-// 	WriteIgnoreCase(builder *StatementBuilder)
-// }
+func Lower(col Column) Column {
+	return &lowerColumn{col: col}
+}
 
-// func NewIgnoreCaseColumn(col Column, suffix string) ignoreCaseColumn {
-// 	return ignoreCaseCol{
-// 		column: col,
-// 		suffix: suffix,
-// 	}
-// }
+type lowerColumn struct {
+	col Column
+}
 
-// type ignoreCaseCol struct {
-// 	column Column
-// 	suffix string
-// }
+func (c lowerColumn) WriteQualified(builder *StatementBuilder) {
+	builder.Grow(len("lower()"))
+	builder.WriteString("LOWER(")
+	c.col.WriteQualified(builder)
+	builder.WriteRune(')')
+}
 
-// // WriteIgnoreCase implements [ignoreCaseColumn].
-// func (c ignoreCaseCol) WriteIgnoreCase(builder *StatementBuilder) {
-// 	c.column.WriteQualified(builder)
-// 	builder.WriteString(c.suffix)
-// }
+func (c lowerColumn) WriteUnqualified(builder *StatementBuilder) {
+	builder.Grow(len("lower()"))
+	builder.WriteString("LOWER(")
+	c.col.WriteUnqualified(builder)
+	builder.WriteRune(')')
+}
 
-// // WriteQualified implements [ignoreCaseColumn].
-// func (c ignoreCaseCol) WriteQualified(builder *StatementBuilder) {
-// 	c.column.WriteQualified(builder)
-// 	builder.WriteString(c.suffix)
-// }
+func (c *lowerColumn) Equals(col Column) bool {
+	if col == nil {
+		return c == nil
+	}
+	toMatch, ok := col.(*lowerColumn)
+	if !ok {
+		return false
+	}
+	return c.col.Equals(toMatch.col)
+}

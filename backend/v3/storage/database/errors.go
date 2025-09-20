@@ -5,7 +5,37 @@ import (
 	"fmt"
 )
 
-var ErrNoChanges = errors.New("update must contain a change")
+var (
+	ErrNoChanges = errors.New("update must contain a change")
+)
+
+type MissingConditionError struct {
+	col Column
+}
+
+func NewMissingConditionError(col Column) error {
+	return &MissingConditionError{
+		col: col,
+	}
+}
+
+func (e *MissingConditionError) Error() string {
+	var builder StatementBuilder
+	builder.WriteString("missing condition for column")
+	if e.col != nil {
+		builder.WriteString(": ")
+		e.col.WriteQualified(&builder)
+	}
+	return builder.String()
+}
+
+func (e *MissingConditionError) Is(target error) bool {
+	matched, ok := target.(*MissingConditionError)
+	if !ok || matched.col == nil {
+		return ok
+	}
+	return e.col.Equals(matched.col)
+}
 
 // NoRowFoundError is returned when QueryRow does not find any row.
 // It wraps the dialect specific original error to provide more context.
@@ -36,18 +66,16 @@ func (e *NoRowFoundError) Unwrap() error {
 // It wraps the dialect specific original error to provide more context.
 type MultipleRowsFoundError struct {
 	original error
-	count    int
 }
 
-func NewMultipleRowsFoundError(original error, count int) error {
+func NewMultipleRowsFoundError(original error) error {
 	return &MultipleRowsFoundError{
 		original: original,
-		count:    count,
 	}
 }
 
 func (e *MultipleRowsFoundError) Error() string {
-	return fmt.Sprintf("multiple rows found: %d", e.count)
+	return "multiple rows found"
 }
 
 func (e *MultipleRowsFoundError) Is(target error) bool {

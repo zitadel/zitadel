@@ -19,7 +19,7 @@ import (
 
 func TestServer_TestOrganizationReduces(t *testing.T) {
 	instanceID := Instance.ID()
-	orgRepo := repository.OrganizationRepository(pool)
+	orgRepo := repository.OrganizationRepository()
 
 	t.Run("test org add reduces", func(t *testing.T) {
 		beforeCreate := time.Now()
@@ -42,7 +42,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(tt *assert.CollectT) {
-			organization, err := orgRepo.Get(CTX,
+			organization, err := orgRepo.Get(CTX, pool,
 				database.WithCondition(
 					database.And(
 						orgRepo.IDCondition(org.GetId()),
@@ -92,7 +92,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			organization, err := orgRepo.Get(CTX,
+			organization, err := orgRepo.Get(CTX, pool,
 				database.WithCondition(
 					database.And(
 						orgRepo.IDCondition(organization.Id),
@@ -137,7 +137,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			organization, err := orgRepo.Get(CTX,
+			organization, err := orgRepo.Get(CTX, pool,
 				database.WithCondition(
 					database.And(
 						orgRepo.IDCondition(organization.Id),
@@ -177,11 +177,11 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		orgRepo := repository.OrganizationRepository(pool)
+		orgRepo := repository.OrganizationRepository()
 		// 3. check org deactivated
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			organization, err := orgRepo.Get(CTX,
+			organization, err := orgRepo.Get(CTX, pool,
 				database.WithCondition(
 					database.And(
 						orgRepo.IDCondition(organization.Id),
@@ -203,7 +203,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			organization, err := orgRepo.Get(CTX,
+			organization, err := orgRepo.Get(CTX, pool,
 				database.WithCondition(
 					database.And(
 						orgRepo.IDCondition(organization.Id),
@@ -230,10 +230,10 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// 2. check org retrievable
-		orgRepo := repository.OrganizationRepository(pool)
+		orgRepo := repository.OrganizationRepository()
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			_, err := orgRepo.Get(CTX,
+			_, err := orgRepo.Get(CTX, pool,
 				database.WithCondition(
 					database.And(
 						orgRepo.IDCondition(organization.Id),
@@ -252,7 +252,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			organization, err := orgRepo.Get(CTX,
+			organization, err := orgRepo.Get(CTX, pool,
 				database.WithCondition(
 					database.And(
 						orgRepo.IDCondition(organization.Id),
