@@ -36,12 +36,12 @@ const (
 	IDPStateInactive
 )
 
-//go:generate enumer -type IDPAutoLinkingOption -transform lower -trimprefix IDPAutoLinkingOption
+//go:generate enumer -type IDPAutoLinkingField -transform lower -trimprefix IDPAutoLinkingField
 type IDPAutoLinkingField uint8
 
 const (
-	IDPAutoLinkingOptionUserName IDPAutoLinkingField = iota + 1
-	IDPAutoLinkingOptionEmail
+	IDPAutoLinkingFieldUserName IDPAutoLinkingField = iota + 1
+	IDPAutoLinkingFieldEmail
 )
 
 type OIDCMappingField int8
