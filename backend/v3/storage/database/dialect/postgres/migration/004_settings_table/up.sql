@@ -1,15 +1,12 @@
 CREATE TYPE zitadel.settings_type AS ENUM (
     'login',
     'label',
-    'password_complexity', --4
-    'password_expiry', --4
-    'branding',
-    'domain', -- 3
-    'legal_and_support',
-    'lockout', -- 3
-    'general',
-    'security', -- 2
-    'organization' -- 4
+    'password_complexity',
+    'password_expiry',
+    'domain',
+    'lockout',
+    'security',
+    'organization'
 );
 
 CREATE TABLE zitadel.settings (
@@ -28,7 +25,7 @@ CREATE TABLE zitadel.settings (
 );
 
 -- CREATE UNIQUE INDEX idx_settings_unique_type ON zitadel.settings (instance_id, org_id, type) NULLS NOT DISTINCT WHERE deleted_at IS NULL;
-CREATE UNIQUE INDEX idx_settings_unique_type ON zitadel.settings (instance_id, org_id, type) NULLS NOT DISTINCT;
+CREATE UNIQUE INDEX idx_settings_unique_type ON zitadel.settings (instance_id, org_id, type) NULLS NOT DISTINCT WHERE type != 'label';
 
 CREATE INDEX idx_settings_type ON zitadel.settings(instance_id, type);
 

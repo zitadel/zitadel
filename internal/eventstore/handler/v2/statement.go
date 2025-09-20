@@ -426,10 +426,9 @@ func NewArrayRemoveCol(column string, value interface{}) Column {
 func NewArrayIntersectCol(column string, value interface{}) Column {
 	var arrayType string
 	switch value.(type) {
-
 	case []string, database.TextArray[string]:
 		arrayType = "TEXT"
-		//TODO: handle more types if necessary
+		// TODO: handle more types if necessary
 	}
 	return Column{
 		Name:  column,
@@ -513,6 +512,7 @@ func NewCopyStatement(event eventstore.Event, conflictCols, from, to []Column, n
 			strings.Join(updateColumns, ", ") +
 			")"
 	}
+	fmt.Printf("[DEBUGPRINT] [:1] q(config) = %+v\n", q(config))
 
 	return NewStatement(event, exec(config, q, opts))
 }
@@ -660,13 +660,15 @@ type Executer interface {
 	Exec(string, ...interface{}) (sql.Result, error)
 }
 
-type execOption func(*execConfig)
-type execConfig struct {
-	tableName string
+type (
+	execOption func(*execConfig)
+	execConfig struct {
+		tableName string
 
-	args []interface{}
-	err  error
-}
+		args []interface{}
+		err  error
+	}
+)
 
 type query func(config execConfig) string
 

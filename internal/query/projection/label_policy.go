@@ -2,7 +2,6 @@ package projection
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -433,8 +432,6 @@ func (p *labelPolicyProjection) reduceLogoAdded(event eventstore.Event) (*handle
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-4wbOI", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyLogoAddedEventType, instance.LabelPolicyLogoAddedEventType, org.LabelPolicyLogoDarkAddedEventType, instance.LabelPolicyLogoDarkAddedEventType})
 	}
-
-	fmt.Println("[DEBUGPRINT] [settings_relational.go:1] <>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> LOGO POLICY")
 
 	return handler.NewUpdateStatement(
 		event,

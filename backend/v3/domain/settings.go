@@ -17,11 +17,8 @@ const (
 	SettingTypeLabel
 	SettingTypePasswordComplexity
 	SettingTypePasswordExpiry
-	SettingTypeBranding
 	SettingTypeDomain
-	SettingTypeLegalAndSupport
 	SettingTypeLockout
-	SettingTypeGeneral
 	SettingTypeSecurity
 	SettingTypeOrganization
 )
@@ -103,6 +100,15 @@ const (
 	LabelPolicyThemeDark
 )
 
+//go:generate enumer -type LabelPolicyState -transform snake -trimprefix LabelPolicyState
+type LabelPolicyState int32
+
+const (
+	LabelPolicyStateActive LabelPolicyState = iota + 1
+	LabelPolicyStateRemoved
+	LabelPolicyStatePreview
+)
+
 type LabelSettings struct {
 	IsDefault           bool                 `json:"isDefault,omitempty"`
 	PrimaryColor        string               `json:"primaryColor,omitempty"`
@@ -125,6 +131,8 @@ type LabelSettings struct {
 	LabelPolicyDarkIconURL  *string `json:"labelPolicyDarkIconURL,omitempty"`
 
 	LabelPolicyFontURL *string `json:"labelPolicyLightFontURL,omitempty"`
+
+	LabelPolicyState string `json:"labelPolicyState,omitempty"`
 }
 
 type LabelSetting struct {
@@ -204,10 +212,6 @@ type OrgSetting struct {
 	Settings OrgSettings
 }
 
-func (s *OrgSetting) getSettings() any {
-	return s.Settings
-}
-
 type settingsColumns interface {
 	IDColumn() database.Column
 	InstanceIDColumn() database.Column
@@ -242,14 +246,15 @@ type SettingsRepository interface {
 	Get(ctx context.Context, instanceID string, orgID *string, typ SettingType) (*Setting, error)
 	List(ctx context.Context, conditions ...database.Condition) ([]*Setting, error)
 
+	CreateLogin(ctx context.Context, setting *LoginSetting) error
 	GetLogin(ctx context.Context, instanceID string, orgID *string) (*LoginSetting, error)
 	UpdateLogin(ctx context.Context, setting *LoginSetting) (int64, error)
-	DeleteLogin(ctx context.Context, instanceID string, orgID *string) (int64, error)
 
+	CreateLabel(ctx context.Context, setting *LabelSetting) error
 	GetLabel(ctx context.Context, instanceID string, orgID *string) (*LabelSetting, error)
 	UpdateLabel(ctx context.Context, setting *LabelSetting) (int64, error)
-	// DeleteLabel(ctx context.Context, instanceID string, orgID *string) (int64, error)
 
+	CreatePasswordComplexity(ctx context.Context, setting *PasswordComplexitySetting) error
 	GetPasswordComplexity(ctx context.Context, instanceID string, orgID *string) (*PasswordComplexitySetting, error)
 	UpdatePasswordComplexity(ctx context.Context, setting *PasswordComplexitySetting) (int64, error)
 
@@ -257,22 +262,28 @@ type SettingsRepository interface {
 	GetPasswordExpiry(ctx context.Context, instanceID string, orgID *string) (*PasswordExpirySetting, error)
 	UpdatePasswordExpiry(ctx context.Context, setting *PasswordExpirySetting) (int64, error)
 
+	CreateLockout(ctx context.Context, setting *LockoutSetting) error
 	GetLockout(ctx context.Context, instanceID string, orgID *string) (*LockoutSetting, error)
 	UpdateLockout(ctx context.Context, setting *LockoutSetting) (int64, error)
 
+	CreateSecurity(ctx context.Context, setting *SecuritySetting) error
 	GetSecurity(ctx context.Context, instanceID string, orgID *string) (*SecuritySetting, error)
 	UpdateSecurity(ctx context.Context, setting *SecuritySetting) (int64, error)
 
+	CreateDomain(ctx context.Context, setting *DomainSetting) error
 	GetDomain(ctx context.Context, instanceID string, orgID *string) (*DomainSetting, error)
 	UpdateDomain(ctx context.Context, setting *DomainSetting) (int64, error)
 
+	CreateOrg(ctx context.Context, setting *OrgSetting) error
 	GetOrg(ctx context.Context, instanceID string, orgID *string) (*OrgSetting, error)
 	UpdateOrg(ctx context.Context, setting *OrgSetting) (int64, error)
 
+	// Create is used for events reduction
 	Create(ctx context.Context, setting *Setting) error
-	// Update(ctx context.Context, id string, instanceID string, orgID *string, changes ...database.Change) (int64, error)
 	Delete(ctx context.Context, instanceID string, orgID *string, typ SettingType) (int64, error)
 
+	// DeleteSettingsForInstance is used when a Instance is deleted
 	DeleteSettingsForInstance(ctx context.Context, instanceID string) (int64, error)
-	DeleteSettingsForOrg(ctx context.Context, orgID *string) (int64, error)
+	// DeleteSettingsForOrg is used ehwn an Organization is deleted
+	DeleteSettingsForOrg(ctx context.Context, orgID string) (int64, error)
 }

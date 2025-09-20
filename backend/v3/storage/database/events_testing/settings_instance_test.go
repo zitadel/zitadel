@@ -17,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/policy"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 )
@@ -61,7 +62,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test change login settings reduces", func(t *testing.T) {
+	t.Run("test login settings change reduces", func(t *testing.T) {
 		ctx := t.Context()
 		before := time.Now()
 		newInstance := integration.NewInstance(t.Context())
@@ -317,6 +318,8 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			assert.Equal(t, false, setting.Settings.HideLoginNameSuffix)
 			assert.Equal(t, false, setting.Settings.ErrorMsgPopup)
 			assert.Equal(t, false, setting.Settings.DisableWatermark)
+			// event org.policy.label.activated
+			assert.Equal(t, domain.LabelPolicyStateActive.String(), setting.Settings.LabelPolicyState)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -328,8 +331,23 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 
+		_, err := newInstance.Client.Mgmt.AddCustomLabelPolicy(IAMCTX, &management.AddCustomLabelPolicyRequest{
+			PrimaryColor:        "#055000",
+			HideLoginNameSuffix: true,
+			WarnColor:           "#055000",
+			BackgroundColor:     "#055000",
+			FontColor:           "#055000",
+			PrimaryColorDark:    "#055000",
+			BackgroundColorDark: "#055000",
+			WarnColorDark:       "#055000",
+			FontColorDark:       "#055000",
+			DisableWatermark:    true,
+			ThemeMode:           policy.ThemeMode_THEME_MODE_LIGHT,
+		})
+		require.NoError(t, err)
+
 		before := time.Now()
-		_, err := newInstance.Client.Admin.UpdateLabelPolicy(IAMCTX, &admin.UpdateLabelPolicyRequest{
+		_, err = newInstance.Client.Admin.UpdateLabelPolicy(IAMCTX, &admin.UpdateLabelPolicyRequest{
 			PrimaryColor:        "#055000",
 			HideLoginNameSuffix: true,
 			WarnColor:           "#055000",
@@ -368,121 +386,11 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			assert.Equal(t, false, setting.Settings.ErrorMsgPopup)
 			assert.Equal(t, true, setting.Settings.DisableWatermark)
 			assert.Equal(t, domain.LabelPolicyThemeLight, setting.Settings.ThemeMode)
+			// event org.policy.label.activated
+			assert.Equal(t, domain.LabelPolicyStateActive.String(), setting.Settings.LabelPolicyState)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
-
-	// TODO
-	// t.Run("test policy label logo added", func(t *testing.T) {
-	// 	ctx := t.Context()
-	// 	newInstance := integration.NewInstance(t.Context())
-
-	// 	IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-	// 	// organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
-	// 	// 	Name: gofakeit.Name(),
-	// 	// })
-	// 	// require.NoError(t, err)
-	// 	// IAMCTX = integration.SetOrgID(IAMCTX, organization.Id)
-
-	// 	// token := newInstance.Users.Get(integration.UserTypeIAMOwner).Token
-	// 	token := integration.SystemToken
-
-	// 	// usr, err := newInstance.Client.Mgmt.AddMachineUser(IAMCTX, &management.AddMachineUserRequest{
-	// 	// usr, err := newInstance.Client.Mgmt.AddMachineUser(IAMCTX, &management.AddMachineUserRequest{
-	// 	// 	UserName:        "service_user",
-	// 	// 	Name:            "service_user",
-	// 	// 	AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_BEARER,
-	// 	// })
-	// 	// require.NoError(t, err)
-
-	// 	// _, err = newInstance.Client.Mgmt.SetUserMetadata(IAMCTX, &management.SetUserMetadataRequest{
-	// 	// 	Id:    usr.UserId,
-	// 	// 	Key:   "key",
-	// 	// 	Value: []byte("value"),
-	// 	// })
-	// 	// require.NoError(t, err)
-
-	// 	// tkn, err := newInstance.Client.Mgmt.AddPersonalAccessToken(IAMCTX, &management.AddPersonalAccessTokenRequest{
-	// 	// 	UserId:         usr.UserId,
-	// 	// 	ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour)),
-	// 	// })
-	// 	// require.NoError(t, err)
-
-	// 	// token := tkn.Token
-	// 	fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] token = %+v\n", token)
-
-	// 	client := resty.New()
-	// 	// _, err = client.R().SetAuthToken(token).
-	// 	out, err := client.R().SetAuthToken(token).
-	// 		SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
-	// 		Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/logo")
-	// 	require.NoError(t, err)
-	// require.Equal(t, 200, out.StatusCode())
-	// 	fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] err = %+v\n", err)
-
-	// 	// before := time.Now()
-	// 	_, err = newInstance.Client.Admin.UpdateLabelPolicy(IAMCTX, &admin.UpdateLabelPolicyRequest{})
-	// 	require.NoError(t, err)
-	// 	// after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
-
-	// 	// retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
-	// 	// assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 	// 	setting, err := settingsRepo.GetLabel(
-	// 	// 		ctx,
-	// 	// 		newInstance.ID(),
-	// 	// 		nil)
-	// 	// 	require.NoError(t, err)
-
-	// 	// 	// event instance.policy.label.logo.added
-	// 	// 	assert.Equal(t, domain.LabelPolicyThemeLight, setting.Settings.LabelPolicyLightLogoURL)
-	// 	// 	assert.WithinRange(t, setting.UpdatedAt, before, after)
-	// 	// }, retryDuration, tick)
-	// })
-
-	// instancne
-	// t.Run("test policy label logo added", func(t *testing.T) {
-	// 	ctx := t.Context()
-
-	// 	// token := newInstance.Users.Get(integration.UserTypeIAMOwner).Token
-	// 	instanceRepo := repository.InstanceRepository(pool)
-	// 	instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
-	// 	instanceID := instance.ID
-	// 	require.NoError(t, err)
-	// 	// orgRepo := repository.OrganizationRepository(pool)
-	// 	// org, err := orgRepo.Get(ctx, database.WithCondition(orgRepo.InstanceIDCondition(instanceID)), database.WithCondition(orgRepo.NameCondition("ZITADEL")))
-	// 	// orgID := org.ID
-
-	// 	require.NoError(t, err)
-
-	// 	token := integration.SystemToken
-
-	// 	// token := tkn.Token
-	// 	fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] token = %+v\n", token)
-
-	// 	before := time.Now()
-	// 	client := resty.New()
-	// 	out, err := client.R().SetAuthToken(token).
-	// 		SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
-	// 		Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/logo")
-	// 	require.NoError(t, err)
-	// require.Equal(t, 200, out.StatusCode())
-	// 	fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] err = %+v\n", err)
-
-	// 	after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
-
-	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		setting, err := settingsRepo.GetLabel(
-	// 			ctx,
-	// 			instanceID,
-	// 			nil)
-	// 		require.NoError(t, err)
-
-	// 		// event instance.policy.label.logo.added
-	// 		assert.Nil(t, setting.Settings.LabelPolicyLightLogoURL)
-	// 		assert.WithinRange(t, setting.UpdatedAt, before, after)
-	// 	}, retryDuration, tick)
-	// })
 
 	t.Run("test policy label logo light added", func(t *testing.T) {
 		ctx := t.Context()
@@ -513,8 +421,8 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event instance.policy.label.logo.added
-			// assert.Equal(t, domain.LabelPolicyThemeLight, setting.Settings.LabelPolicyLightLogoURL)
 			assert.NotNil(t, setting.Settings.LabelPolicyLightLogoURL)
+			assert.Equal(t, domain.LabelPolicyStatePreview.String(), setting.Settings.LabelPolicyState)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -548,8 +456,8 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event instance.policy.label.logo.dark.added
-			// assert.Equal(t, domain.LabelPolicyThemeLight, setting.Settings.LabelPolicyLightLogoURL)
 			assert.NotNil(t, setting.Settings.LabelPolicyDarkLogoURL)
+			assert.Equal(t, domain.LabelPolicyStatePreview.String(), setting.Settings.LabelPolicyState)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -603,6 +511,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 			// event instance.policy.label.logo.removed
 			assert.Nil(t, setting.Settings.LabelPolicyLightLogoURL)
+			assert.Equal(t, domain.LabelPolicyStatePreview.String(), setting.Settings.LabelPolicyState)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -656,6 +565,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 			// event instance.policy.label.logo.dark.removed
 			assert.Nil(t, setting.Settings.LabelPolicyDarkLogoURL)
+			assert.Equal(t, domain.LabelPolicyStatePreview.String(), setting.Settings.LabelPolicyState)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -690,6 +600,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 			// event instance.policy.label.icon.added
 			assert.NotNil(t, setting.Settings.LabelPolicyLightIconURL)
+			assert.Equal(t, domain.LabelPolicyStatePreview.String(), setting.Settings.LabelPolicyState)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -724,6 +635,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 			// event instance.policy.label.icon.dark.added
 			assert.NotNil(t, setting.Settings.LabelPolicyDarkIconURL)
+			assert.Equal(t, domain.LabelPolicyStatePreview.String(), setting.Settings.LabelPolicyState)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -777,6 +689,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 			// event instance.policy.label.icon.removed
 			assert.Nil(t, setting.Settings.LabelPolicyLightIconURL)
+			assert.Equal(t, domain.LabelPolicyStatePreview.String(), setting.Settings.LabelPolicyState)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -807,7 +720,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 				nil)
 			require.NoError(t, err)
 
-			// assert.Equal(t, domain.LabelPolicyThemeLight, setting.Settings.LabelPolicyLightLogoURL)
 			assert.NotNil(t, setting.Settings.LabelPolicyDarkIconURL)
 		}, retryDuration, tick)
 
@@ -831,6 +743,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 			// event instance.policy.label.icon.dark.removed
 			assert.Nil(t, setting.Settings.LabelPolicyDarkIconURL)
+			assert.Equal(t, domain.LabelPolicyStatePreview.String(), setting.Settings.LabelPolicyState)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -865,6 +778,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 			// event instance.policy.label.font.added
 			assert.NotNil(t, setting.Settings.LabelPolicyFontURL)
+			assert.Equal(t, domain.LabelPolicyStatePreview.String(), setting.Settings.LabelPolicyState)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -917,44 +831,10 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 			// event instance.policy.label.font.removed
 			assert.Nil(t, setting.Settings.LabelPolicyFontURL)
+			assert.Equal(t, domain.LabelPolicyStatePreview.String(), setting.Settings.LabelPolicyState)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
-
-	// // TODO activated
-
-	// t.Run("test label settings logo added reduces", func(t *testing.T) {
-	// 	ctx := t.Context()
-
-	// 	newInstance := integration.NewInstance(t.Context())
-	// 	IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-	// 	organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
-	// 		Name: gofakeit.Name(),
-	// 	})
-	// 	require.NoError(t, err)
-	// 	IAMCTX = integration.SetOrgID(IAMCTX, organization.Id)
-
-	// 	_, err = newInstance.Client.Mgmt.AddCustomLabelPolicy(IAMCTX, &management.AddCustomLabelPolicyRequest{
-	// 		PrimaryColor:        "#055090",
-	// 		HideLoginNameSuffix: false,
-	// 		WarnColor:           "#055090",
-	// 		BackgroundColor:     "#055090",
-	// 		FontColor:           "#055090",
-	// 		PrimaryColorDark:    "#055090",
-	// 		BackgroundColorDark: "#055090",
-	// 		WarnColorDark:       "#055090",
-	// 		FontColorDark:       "#055090",
-	// 		DisableWatermark:    false,
-	// 		ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-	// 	})
-	// 	require.NoError(t, err)
-
-	// 	// remove label policy delete org
-	// 	_, err = newInstance.Client.Admin.label(IAMCTX, &management.AddCustomLoginPolicyRequest{
-
-	// 	}
-	// 	require.NoError(t, err)
-	// })
 }
 
 func TestServer_TestPasswordComplexitySettingsReduces(t *testing.T) {
@@ -1207,7 +1087,7 @@ func TestServer_TestDomainSettingsReduces(t *testing.T) {
 				nil)
 			require.NoError(t, err)
 
-			// event instance.policy.lockout.changed
+			// event instance.policy.changed
 			assert.Equal(t, true, setting.Settings.IsDefault)
 			assert.Equal(t, true, setting.Settings.SMTPSenderAddressMatchesInstanceDomain)
 			assert.Equal(t, true, setting.Settings.UserLoginMustBeDomain)
@@ -1404,7 +1284,6 @@ func TestServer_TestSecuritySettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event instance.policy.security.set
-			// assert.Equal(t, true, setting.Settings.IsDefault)
 			assert.Equal(t, false, setting.Settings.EnableIframeEmbedding)
 			assert.Equal(t, []string{"no_value"}, setting.Settings.AllowedOrigins)
 			assert.Equal(t, false, setting.Settings.EnableImpersonation)
@@ -1458,107 +1337,3 @@ func TestServer_TestSecuritySettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 }
-
-// func TestServer_TestInstanceRemoveReduces(t *testing.T) {
-// 	settingsRepo := repository.SettingsRepository(pool)
-
-// 	t.Run("test label label assets remove reduces", func(t *testing.T) {
-// 		ctx := t.Context()
-
-// 		newInstance := integration.NewInstance(t.Context())
-
-// 		// check login settings exist
-// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			setting, err := settingsRepo.GetLogin(
-// 				ctx,
-// 				newInstance.ID(),
-// 				nil)
-// 			require.NoError(t, err)
-
-// 			assert.NotNil(t, setting)
-// 		}, retryDuration, tick)
-
-// 		// check label settings exist
-// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*5)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			setting, err := settingsRepo.GetLabel(
-// 				ctx,
-// 				newInstance.ID(),
-// 				&organization.Id)
-// 			require.NoError(t, err)
-
-// 			require.NotNil(t, setting)
-// 		}, retryDuration, tick)
-
-// 		// check login settings exist
-// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*5)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			setting, err := settingsRepo.GetPasswordComplexity(
-// 				ctx,
-// 				newInstance.ID(),
-// 				nil)
-// 			require.NoError(t, err)
-
-// 			require.NotNil(t, setting)
-// 		}, retryDuration, tick)
-
-// 		// check login settings exist
-// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*5)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			setting, err := settingsRepo.GetPasswordExpiry(
-// 				ctx,
-// 				newInstance.ID(),
-// 				nil)
-// 			require.NoError(t, err)
-
-// 			require.NotNil(t, setting)
-// 		}, retryDuration, tick)
-
-// 		// check login settings exist
-// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*5)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			setting, err := settingsRepo.GetDomain(
-// 				ctx,
-// 				newInstance.ID(),
-// 				nil)
-// 			require.NoError(t, err)
-
-// 			require.NotNil(t, setting)
-// 		}, retryDuration, tick)
-
-// 		// check login settings exist
-// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*5)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			setting, err := settingsRepo.GetLockout(
-// 				ctx,
-// 				newInstance.ID(),
-// 				nil)
-// 			require.NoError(t, err)
-
-// 			require.NotNil(t, setting)
-// 		}, retryDuration, tick)
-
-// 		// check organization settings exist
-// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*5)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			setting, err := settingsRepo.GetOrg(
-// 				ctx,
-// 				newInstance.ID(),
-// 				&organization.Id)
-// 			require.NoError(t, err)
-// 		}, retryDuration, tick)
-
-// 		// 2. check security instance exists
-// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*5)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			setting, err := settingsRepo.GetSecurity(
-// 				ctx,
-// 				newInstance.ID(),
-// 				nil)
-// 			require.NoError(t, err)
-
-// 			require.NotNil(t, setting)
-// 		}, retryDuration, tick)
-// 	})
-// }
