@@ -41,7 +41,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			UsernameMapping:    idp.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL,
 			AutoRegister:       true,
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -97,7 +97,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			StylingType:  idp_grpc.IDPStylingType_STYLING_TYPE_UNSPECIFIED,
 			AutoRegister: false,
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -141,7 +141,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		_, err = MgmtClient.DeactivateOrgIDP(IAMCTX, &management.DeactivateOrgIDPRequest{
 			IdpId: addOIDC.IdpId,
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -204,7 +204,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		_, err = MgmtClient.ReactivateOrgIDP(IAMCTX, &management.ReactivateOrgIDPRequest{
 			IdpId: addOIDC.IdpId,
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
@@ -346,7 +346,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			DisplayNameMapping: idp.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
 			UsernameMapping:    idp.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
@@ -448,7 +448,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			KeysEndpoint: "new_keyEndpoint",
 			HeaderName:   "new_headerName",
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
@@ -498,7 +498,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			},
 			UsePkce: false,
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -592,7 +592,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			},
 			UsePkce: true,
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
@@ -649,7 +649,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			IsIdTokenMapping: false,
 			UsePkce:          false,
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -735,7 +735,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			IsIdTokenMapping: true,
 			UsePkce:          true,
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
@@ -826,7 +826,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				},
 			},
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
@@ -908,7 +908,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				},
 			},
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
@@ -956,7 +956,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -1027,7 +1027,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -1083,7 +1083,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -1174,7 +1174,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		// check values for azure
@@ -1223,7 +1223,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -1299,7 +1299,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		// check values for azure
@@ -1349,7 +1349,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -1436,7 +1436,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		// check values for azure
@@ -1486,7 +1486,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -1564,7 +1564,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		// check values for gitlab
@@ -1612,7 +1612,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -1693,7 +1693,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		// check values for gitlab self hosted
@@ -1741,7 +1741,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -1819,7 +1819,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		// check values for google
@@ -1887,7 +1887,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -2025,7 +2025,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		// check values for ldap
@@ -2093,7 +2093,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -2176,7 +2176,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		// check values for apple
@@ -2232,7 +2232,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			},
 			SignatureAlgorithm: idp.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA1,
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -2329,7 +2329,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			},
 			SignatureAlgorithm: idp.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA256,
 		})
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 		require.NoError(t, err)
 
 		// check values for apple
