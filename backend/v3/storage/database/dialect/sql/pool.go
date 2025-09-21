@@ -20,7 +20,7 @@ func SQLPool(db *sql.DB) *sqlPool {
 }
 
 // Acquire implements [database.Pool].
-func (c *sqlPool) Acquire(ctx context.Context) (database.Client, error) {
+func (c *sqlPool) Acquire(ctx context.Context) (database.Connection, error) {
 	conn, err := c.Conn(ctx)
 	if err != nil {
 		return nil, wrapError(err)

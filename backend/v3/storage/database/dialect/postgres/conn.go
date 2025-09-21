@@ -13,15 +13,15 @@ type pgxConn struct {
 	*pgxpool.Conn
 }
 
-var _ database.Client = (*pgxConn)(nil)
+var _ database.Connection = (*pgxConn)(nil)
 
-// Release implements [database.Client].
+// Release implements [database.Connection].
 func (c *pgxConn) Release(_ context.Context) error {
 	c.Conn.Release()
 	return nil
 }
 
-// Begin implements [database.Client].
+// Begin implements [database.Connection].
 func (c *pgxConn) Begin(ctx context.Context, opts *database.TransactionOptions) (database.Transaction, error) {
 	tx, err := c.BeginTx(ctx, transactionOptionsToPgx(opts))
 	if err != nil {
