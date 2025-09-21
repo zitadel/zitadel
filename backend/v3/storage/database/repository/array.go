@@ -7,7 +7,7 @@ import (
 
 type JSONArray[T any] []*T
 
-var ScanSourceErr = errors.New("unsupported scan source")
+var ErrScanSource = errors.New("unsupported scan source")
 
 func (a *JSONArray[T]) Scan(src any) error {
 
@@ -25,6 +25,6 @@ func (a *JSONArray[T]) Scan(src any) error {
 	case nil:
 		return nil
 	default:
-		return ScanSourceErr
+		return ErrScanSource
 	}
 }

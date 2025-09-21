@@ -92,7 +92,7 @@ func TestJSONArray_Scan(t *testing.T) {
 			name: "wrong type",
 			src:  []int{1, 2, 3},
 			want: want{
-				err: repository.ScanSourceErr,
+				err: repository.ErrScanSource,
 				res: nil,
 			},
 		},
