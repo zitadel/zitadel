@@ -4,11 +4,9 @@ package idp_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -68,7 +66,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 				IamCTX,
 				&idp.GetIDPByIDRequest{},
 				func(ctx context.Context, request *idp.GetIDPByIDRequest) *idpAttr {
-					name := fmt.Sprintf("GetIDPByID-%s", gofakeit.AppName())
+					name := integration.IDPName()
 					resp := Instance.AddGenericOAuthProvider(ctx, name)
 					request.Id = resp.Id
 					return &idpAttr{
@@ -117,7 +115,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 				UserCTX,
 				&idp.GetIDPByIDRequest{},
 				func(ctx context.Context, request *idp.GetIDPByIDRequest) *idpAttr {
-					name := fmt.Sprintf("GetIDPByID-%s", gofakeit.AppName())
+					name := integration.IDPName()
 					resp := Instance.AddGenericOAuthProvider(IamCTX, name)
 					request.Id = resp.Id
 					return &idpAttr{
@@ -139,7 +137,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 				CTX,
 				&idp.GetIDPByIDRequest{},
 				func(ctx context.Context, request *idp.GetIDPByIDRequest) *idpAttr {
-					name := fmt.Sprintf("GetIDPByID-%s", gofakeit.AppName())
+					name := integration.IDPName()
 					resp := Instance.AddOrgGenericOAuthProvider(ctx, name)
 					request.Id = resp.Id
 					return &idpAttr{
@@ -188,7 +186,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 				UserCTX,
 				&idp.GetIDPByIDRequest{},
 				func(ctx context.Context, request *idp.GetIDPByIDRequest) *idpAttr {
-					name := fmt.Sprintf("GetIDPByID-%s", gofakeit.AppName())
+					name := integration.IDPName()
 					resp := Instance.AddOrgGenericOAuthProvider(CTX, name)
 					request.Id = resp.Id
 					return &idpAttr{

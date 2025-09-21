@@ -20,12 +20,10 @@ import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("register");
-  return { title: t('title')};
+  return { title: t("title") };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
   let { firstname, lastname, email, organization, requestId } = searchParams;
@@ -104,12 +102,9 @@ export default async function Page(props: {
         {legal &&
           passwordComplexitySettings &&
           organization &&
-          (loginSettings.allowUsernamePassword ||
-            loginSettings.passkeysType == PasskeysType.ALLOWED) && (
+          (loginSettings.allowUsernamePassword || loginSettings.passkeysType == PasskeysType.ALLOWED) && (
             <RegisterForm
-              idpCount={
-                !loginSettings?.allowExternalIdp ? 0 : identityProviders.length
-              }
+              idpCount={!loginSettings?.allowExternalIdp ? 0 : identityProviders.length}
               legal={legal}
               organization={organization}
               firstname={firstname}
@@ -122,12 +117,6 @@ export default async function Page(props: {
 
         {loginSettings?.allowExternalIdp && !!identityProviders.length && (
           <>
-            <div className="flex flex-col items-center py-3">
-              <p className="ztdl-p text-center">
-                <Translated i18nKey="orUseIDP" namespace="register" />
-              </p>
-            </div>
-
             <SignInWithIdp
               identityProviders={identityProviders}
               requestId={requestId}
