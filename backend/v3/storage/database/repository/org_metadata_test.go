@@ -655,7 +655,7 @@ func TestSetOrganizationMetadata(t *testing.T) {
 
 			// second event
 			secondEventCreatedAt := beforeSet.Add(-time.Hour)
-			err = metadataRepo.Set(t.Context(), tx, &domain.OrganizationMetadata{
+			savedMetadata := &domain.OrganizationMetadata{
 				OrgID: orgID,
 				Metadata: domain.Metadata{
 					InstanceID: instanceID,
@@ -664,18 +664,10 @@ func TestSetOrganizationMetadata(t *testing.T) {
 					CreatedAt:  secondEventCreatedAt,
 					UpdatedAt:  secondEventCreatedAt,
 				},
-			})
+			}
+			err = metadataRepo.Set(t.Context(), tx, savedMetadata)
 			require.NoError(t, err)
 
-			savedMetadata, err := metadataRepo.Get(
-				t.Context(), tx, database.WithCondition(
-					database.And(
-						metadataRepo.InstanceIDCondition(instanceID),
-						metadataRepo.OrgIDCondition(orgID),
-						metadataRepo.KeyCondition(database.TextOperationEqual, "urn:zitadel:key"),
-					),
-				),
-			)
 			require.NoError(t, err)
 			assert.Equal(t, orgID, savedMetadata.OrgID)
 			assert.Equal(t, instanceID, savedMetadata.InstanceID)
