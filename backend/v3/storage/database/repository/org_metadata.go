@@ -37,7 +37,7 @@ func (o orgMetadata) Get(ctx context.Context, client database.QueryExecutor, opt
 	for _, opt := range opts {
 		opt(options)
 	}
-	if !options.Condition.ContainsColumn(o.InstanceIDColumn()) {
+	if !options.Condition.IsRestrictingColumn(o.InstanceIDColumn()) {
 		return nil, database.NewMissingConditionError(o.InstanceIDColumn())
 	}
 
@@ -54,7 +54,7 @@ func (o orgMetadata) List(ctx context.Context, client database.QueryExecutor, op
 	for _, opt := range opts {
 		opt(options)
 	}
-	if !options.Condition.ContainsColumn(o.InstanceIDColumn()) {
+	if !options.Condition.IsRestrictingColumn(o.InstanceIDColumn()) {
 		return nil, database.NewMissingConditionError(o.InstanceIDColumn())
 	}
 
@@ -115,10 +115,10 @@ func (o orgMetadata) Set(ctx context.Context, client database.QueryExecutor, met
 // Remove implements [domain.OrganizationMetadataRepository].
 func (o orgMetadata) Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	var builder database.StatementBuilder
-	if !condition.ContainsColumn(o.InstanceIDColumn()) {
+	if !condition.IsRestrictingColumn(o.InstanceIDColumn()) {
 		return 0, database.NewMissingConditionError(o.InstanceIDColumn())
 	}
-	if !condition.ContainsColumn(o.OrgIDColumn()) {
+	if !condition.IsRestrictingColumn(o.OrgIDColumn()) {
 		return 0, database.NewMissingConditionError(o.OrgIDColumn())
 	}
 
