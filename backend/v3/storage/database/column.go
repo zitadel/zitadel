@@ -3,6 +3,7 @@ package database
 type Columns []Column
 
 // WriteQualified implements [Column].
+// Columns are separated by ", ".
 func (m Columns) WriteQualified(builder *StatementBuilder) {
 	for i, col := range m {
 		if i > 0 {
@@ -13,6 +14,7 @@ func (m Columns) WriteQualified(builder *StatementBuilder) {
 }
 
 // WriteUnqualified implements [Column].
+// Columns are separated by ", ".
 func (m Columns) WriteUnqualified(builder *StatementBuilder) {
 	for i, col := range m {
 		if i > 0 {
