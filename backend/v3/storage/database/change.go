@@ -13,6 +13,8 @@ type change[V Value] struct {
 
 var _ Change = (*change[string])(nil)
 
+// NewChange creates a new Change for the given column and value.
+// If you want to set a column to NULL, use [NewChangePtr].
 func NewChange[V Value](col Column, value V) Change {
 	return &change[V]{
 		column: col,
@@ -20,6 +22,8 @@ func NewChange[V Value](col Column, value V) Change {
 	}
 }
 
+// NewChangePtr creates a new Change for the given column and value pointer.
+// If the value pointer is nil, the column will be set to NULL.
 func NewChangePtr[V Value](col Column, value *V) Change {
 	if value == nil {
 		return NewChange(col, NullInstruction)
@@ -42,11 +46,11 @@ func NewChanges(cols ...Change) Change {
 
 // Write implements [Change].
 func (m Changes) Write(builder *StatementBuilder) {
-	for i, col := range m {
+	for i, change := range m {
 		if i > 0 {
 			builder.WriteString(", ")
 		}
-		col.Write(builder)
+		change.Write(builder)
 	}
 }
 

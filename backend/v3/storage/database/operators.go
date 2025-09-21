@@ -34,7 +34,7 @@ type Value interface {
 }
 
 type Operation interface {
-	BooleanOperation | NumberOperation | TextOperation | BytesOperation
+	NumberOperation | TextOperation | BytesOperation
 }
 
 type Text interface {
@@ -60,24 +60,9 @@ var textOperations = map[TextOperation]string{
 }
 
 func writeTextOperation[T Text](builder *StatementBuilder, col Column, op TextOperation, value any) {
-	switch value.(type) {
-	case T, argWriter:
-	default:
-		panic("unsupported text value type")
-	}
-
-	switch op {
-	case TextOperationEqual, TextOperationNotEqual:
-		col.WriteQualified(builder)
-		builder.WriteString(textOperations[op])
-		builder.WriteArg(value)
-	case TextOperationStartsWith:
-		col.WriteQualified(builder)
-		builder.WriteString(textOperations[op])
-		builder.WriteArg(value)
+	writeOperation[T](builder, col, textOperations[op], value)
+	if op == TextOperationStartsWith {
 		builder.WriteString(" || '%'")
-	default:
-		panic("unsupported text operation")
 	}
 }
 
@@ -112,28 +97,16 @@ var numberOperations = map[NumberOperation]string{
 	NumberOperationAtMost:      " >= ",
 }
 
-func writeNumberOperation[T Number](builder *StatementBuilder, col Column, op NumberOperation, value T) {
-	col.WriteQualified(builder)
-	builder.WriteString(numberOperations[op])
-	builder.WriteArg(value)
+func writeNumberOperation[T Number](builder *StatementBuilder, col Column, op NumberOperation, value any) {
+	writeOperation[T](builder, col, numberOperations[op], value)
 }
 
 type Boolean interface {
 	~bool
 }
 
-// BooleanOperation are operations that can be performed on boolean values.
-type BooleanOperation uint8
-
-const (
-	BooleanOperationIsTrue BooleanOperation = iota + 1
-	BooleanOperationIsFalse
-)
-
-func writeBooleanOperation[T Boolean](builder *StatementBuilder, col Column, value T) {
-	col.WriteQualified(builder)
-	builder.WriteString(" = ")
-	builder.WriteArg(value)
+func writeBooleanOperation[T Boolean](builder *StatementBuilder, col Column, value any) {
+	writeOperation[T](builder, col, " = ", value)
 }
 
 type Bytes interface {
@@ -153,14 +126,21 @@ var bytesOperations = map[BytesOperation]string{
 	BytesOperationNotEqual: " <> ",
 }
 
-func writeBytesOperation[B Bytes](builder *StatementBuilder, col Column, op BytesOperation, value any) {
-	col.WriteQualified(builder)
-	builder.WriteString(bytesOperations[op])
-	switch value.(type) {
-	case B, argWriter:
-		builder.WriteArg(value)
-		return
-	default:
-		panic("unsupported bytes value type")
+func writeBytesOperation[T Bytes](builder *StatementBuilder, col Column, op BytesOperation, value any) {
+	writeOperation[T](builder, col, bytesOperations[op], value)
+}
+
+func writeOperation[V Value](builder *StatementBuilder, col Column, op string, value any) {
+	if op == "" {
+		panic("unsupported operation")
 	}
+
+	switch value.(type) {
+	case V, wrappedValue[V], *wrappedValue[V]:
+	default:
+		panic("unsupported value type")
+	}
+	col.WriteQualified(builder)
+	builder.WriteString(op)
+	builder.WriteArg(value)
 }

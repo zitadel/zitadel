@@ -4,9 +4,9 @@ package database
 // Its written after the WHERE keyword in a SQL statement.
 type Condition interface {
 	Write(builder *StatementBuilder)
-	// ContainsColumn is used to check if the condition filters for a specific column.
+	// IsRestrictingColumn is used to check if the condition filters for a specific column.
 	// It acts as a save guard database operations that should be specific on the given column.
-	ContainsColumn(col Column) bool
+	IsRestrictingColumn(col Column) bool
 }
 
 type and struct {
@@ -32,9 +32,10 @@ func And(conditions ...Condition) *and {
 	return &and{conditions: conditions}
 }
 
-func (a and) ContainsColumn(col Column) bool {
+// IsRestrictingColumn implements [Condition].
+func (a and) IsRestrictingColumn(col Column) bool {
 	for _, condition := range a.conditions {
-		if condition.ContainsColumn(col) {
+		if condition.IsRestrictingColumn(col) {
 			return true
 		}
 	}
@@ -66,11 +67,11 @@ func Or(conditions ...Condition) *or {
 	return &or{conditions: conditions}
 }
 
-// ContainsColumn implements [Condition].
-// It always returns false because OR conditions
-func (o or) ContainsColumn(col Column) bool {
+// IsRestrictingColumn implements [Condition].
+// It returns true only if all conditions are restricting the given column.
+func (o or) IsRestrictingColumn(col Column) bool {
 	for _, condition := range o.conditions {
-		if !condition.ContainsColumn(col) {
+		if !condition.IsRestrictingColumn(col) {
 			return false
 		}
 	}
@@ -94,8 +95,10 @@ func IsNull(column Column) *isNull {
 	return &isNull{column: column}
 }
 
-func (i isNull) ContainsColumn(col Column) bool {
-	return i.column.Equals(col)
+// IsRestrictingColumn implements [Condition].
+// It returns false because it cannot be used for restricting a column.
+func (i isNull) IsRestrictingColumn(col Column) bool {
+	return false
 }
 
 var _ Condition = (*isNull)(nil)
@@ -115,9 +118,10 @@ func IsNotNull(column Column) *isNotNull {
 	return &isNotNull{column: column}
 }
 
-// ContainsColumn implements [Condition].
-func (i isNotNull) ContainsColumn(col Column) bool {
-	return i.column.Equals(col)
+// IsRestrictingColumn implements [Condition].
+// It returns false because it cannot be used for restricting a column.
+func (i isNotNull) IsRestrictingColumn(col Column) bool {
+	return false
 }
 
 var _ Condition = (*isNotNull)(nil)
@@ -153,7 +157,7 @@ func NewNumberCondition[V Number](col Column, op NumberOperation, value V) Condi
 	return valueCondition{
 		col: col,
 		write: func(builder *StatementBuilder) {
-			writeNumberOperation(builder, col, op, value)
+			writeNumberOperation[V](builder, col, op, value)
 		},
 	}
 }
@@ -163,7 +167,7 @@ func NewBooleanCondition[V Boolean](col Column, value V) Condition {
 	return valueCondition{
 		col: col,
 		write: func(builder *StatementBuilder) {
-			writeBooleanOperation(builder, col, value)
+			writeBooleanOperation[V](builder, col, value)
 		},
 	}
 }
@@ -195,8 +199,8 @@ func (c valueCondition) Write(builder *StatementBuilder) {
 	c.write(builder)
 }
 
-// ContainsColumn implements [Condition].
-func (i valueCondition) ContainsColumn(col Column) bool {
+// IsRestrictingColumn implements [Condition].
+func (i valueCondition) IsRestrictingColumn(col Column) bool {
 	return i.col.Equals(col)
 }
 
@@ -226,10 +230,10 @@ func (e existsCondition) Write(builder *StatementBuilder) {
 	builder.WriteString(")")
 }
 
-// ContainsColumn implements [Condition].
-func (e existsCondition) ContainsColumn(col Column) bool {
+// IsRestrictingColumn implements [Condition].
+func (e existsCondition) IsRestrictingColumn(col Column) bool {
 	// Forward to the inner condition so safety checks (like instance_id presence) can still work.
-	return e.condition.ContainsColumn(col)
+	return e.condition.IsRestrictingColumn(col)
 }
 
 var _ Condition = (*existsCondition)(nil)
