@@ -28,6 +28,7 @@ type Setting struct {
 	InstanceID string          `json:"instanceId,omitempty" db:"instance_id"`
 	OrgID      *string         `json:"orgId,omitempty" db:"org_id"`
 	Type       SettingType     `json:"type,omitempty" db:"type"`
+	LabelState *LabelState     `json:"labelState,omitempty", db:"label_state"`
 	Settings   json.RawMessage `json:"settings,omitempty" db:"settings"`
 	CreatedAt  time.Time       `json:"createdAt,omitzero" db:"created_at"`
 	UpdatedAt  time.Time       `json:"updatedAt,omitzero" db:"updated_at"`
@@ -100,13 +101,12 @@ const (
 	LabelPolicyThemeDark
 )
 
-//go:generate enumer -type LabelPolicyState -transform snake -trimprefix LabelPolicyState
-type LabelPolicyState int32
+//go:generate enumer -type LabelState -transform snake -trimprefix LabelState -sql
+type LabelState int32
 
 const (
-	LabelPolicyStateActive LabelPolicyState = iota + 1
-	LabelPolicyStateRemoved
-	LabelPolicyStatePreview
+	LabelStatePreview LabelState = iota + 1
+	LabelStateActivated
 )
 
 type LabelSettings struct {
@@ -131,8 +131,6 @@ type LabelSettings struct {
 	LabelPolicyDarkIconURL  *string `json:"labelPolicyDarkIconURL,omitempty"`
 
 	LabelPolicyFontURL *string `json:"labelPolicyLightFontURL,omitempty"`
-
-	LabelPolicyState string `json:"labelPolicyState,omitempty"`
 }
 
 type LabelSetting struct {
@@ -217,6 +215,7 @@ type settingsColumns interface {
 	InstanceIDColumn() database.Column
 	OrgIDColumn() database.Column
 	TypeColumn() database.Column
+	LabelStateColumn() database.Column
 	SettingsColumn() database.Column
 	CreatedAtColumn() database.Column
 	UpdatedAtColumn() database.Column
@@ -227,6 +226,7 @@ type settingsConditions interface {
 	OrgIDCondition(id *string) database.Condition
 	IDCondition(id string) database.Condition
 	TypeCondition(typ SettingType) database.Condition
+	LabelStateCondition(typ LabelState) database.Condition
 }
 
 type Settings interface {
@@ -243,7 +243,7 @@ type SettingsRepository interface {
 	settingsConditions
 	settingsChanges
 
-	Get(ctx context.Context, instanceID string, orgID *string, typ SettingType) (*Setting, error)
+	Get(ctx context.Context, instanceID string, orgID *string, typ SettingType, cond ...database.Condition) (*Setting, error)
 	List(ctx context.Context, conditions ...database.Condition) ([]*Setting, error)
 
 	CreateLogin(ctx context.Context, setting *LoginSetting) error
@@ -251,7 +251,7 @@ type SettingsRepository interface {
 	UpdateLogin(ctx context.Context, setting *LoginSetting) (int64, error)
 
 	CreateLabel(ctx context.Context, setting *LabelSetting) error
-	GetLabel(ctx context.Context, instanceID string, orgID *string) (*LabelSetting, error)
+	GetLabel(ctx context.Context, instanceID string, orgID *string, state LabelState) (*LabelSetting, error)
 	UpdateLabel(ctx context.Context, setting *LabelSetting) (int64, error)
 
 	CreatePasswordComplexity(ctx context.Context, setting *PasswordComplexitySetting) error

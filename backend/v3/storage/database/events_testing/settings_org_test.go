@@ -60,7 +60,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			ForceMfaLocalOnly:          false,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -143,7 +143,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			ForceMfaLocalOnly:          true,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -227,7 +227,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			Type: policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -315,7 +315,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			Type: policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		secondFactorTypes = append(secondFactorTypes, domain.SecondFactorType(policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS))
 
@@ -501,14 +501,15 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx,
 				newInstance.ID(),
-				&organization.Id)
+				&organization.Id,
+				domain.LabelStatePreview)
 			require.NoError(t, err)
 
 			// event org.policy.label.added
@@ -526,8 +527,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			assert.Equal(t, false, setting.Settings.ErrorMsgPopup)
 			assert.Equal(t, false, setting.Settings.DisableWatermark)
 			assert.Equal(t, domain.LabelPolicyThemeDark, setting.Settings.ThemeMode)
-			// event org.policy.label.activated
-			assert.Equal(t, domain.LabelPolicyStateActive.String(), setting.Settings.LabelPolicyState)
+			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -574,14 +574,16 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			ThemeMode:           policy.ThemeMode_THEME_MODE_LIGHT,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx,
 				newInstance.ID(),
-				&organization.Id)
+				&organization.Id,
+				// domain.LabelStatePreview)
+				domain.LabelStatePreview)
 			require.NoError(t, err)
 
 			// event org.policy.label.change
@@ -599,18 +601,23 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			assert.Equal(t, false, setting.Settings.ErrorMsgPopup)
 			assert.Equal(t, true, setting.Settings.DisableWatermark)
 			assert.Equal(t, domain.LabelPolicyThemeLight, setting.Settings.ThemeMode)
-			// event org.policy.label.activated
-			assert.Equal(t, domain.LabelPolicyStateActive.String(), setting.Settings.LabelPolicyState)
+			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
-	t.Run("test label policy activated", func(t *testing.T) {
+	t.Run("test label settings activated", func(t *testing.T) {
 		ctx := t.Context()
+
 		newInstance := integration.NewInstance(t.Context())
 		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
+			Name: gofakeit.Name(),
+		})
+		require.NoError(t, err)
+		IAMCTX = integration.SetOrgID(IAMCTX, organization.Id)
 
-		_, err := newInstance.Client.Mgmt.AddCustomLabelPolicy(IAMCTX, &management.AddCustomLabelPolicyRequest{
+		_, err = newInstance.Client.Mgmt.AddCustomLabelPolicy(IAMCTX, &management.AddCustomLabelPolicyRequest{
 			PrimaryColor:        "#055090",
 			HideLoginNameSuffix: false,
 			WarnColor:           "#055090",
@@ -625,33 +632,49 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		// check login not activated
+		// check label policy exists in preview
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx,
 				newInstance.ID(),
-				nil)
+				&organization.Id,
+				domain.LabelStatePreview)
 			require.NoError(t, err)
 
-			assert.Equal(t, domain.LabelPolicyStatePreview.String(), setting.Settings.LabelPolicyState)
+			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 		}, retryDuration, tick)
 
-		// activate label policy
+		// check label policy does not exists in activated
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			_, err := settingsRepo.GetLabel(
+				ctx,
+				newInstance.ID(),
+				&organization.Id,
+				domain.LabelStateActivated)
+
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
+
+		// activate label
+		before := time.Now()
 		_, err = newInstance.Client.Mgmt.ActivateCustomLabelPolicy(IAMCTX, &management.ActivateCustomLabelPolicyRequest{})
 		require.NoError(t, err)
+		after := time.Now().Add(time.Second * 30)
 
-		// check login setting activated
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx,
 				newInstance.ID(),
-				nil)
+				&organization.Id,
+				domain.LabelStateActivated)
 			require.NoError(t, err)
 
 			// event org.policy.label.activated
-			assert.Equal(t, domain.LabelPolicyStateActive.String(), setting.Settings.LabelPolicyState)
+			assert.Equal(t, domain.LabelStateActivated, *setting.LabelState)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -708,19 +731,20 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx,
 				instanceID,
-				&orgID)
+				&orgID,
+				domain.LabelStatePreview)
 			require.NoError(t, err)
 
 			// event org.policy.label.logo.added
 			assert.NotNil(t, setting.Settings.LabelPolicyLightLogoURL)
-			assert.Equal(t, domain.LabelPolicyStatePreview.String(), setting.Settings.LabelPolicyState)
+			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -783,19 +807,20 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx,
 				instanceID,
-				&orgID)
+				&orgID,
+				domain.LabelStatePreview)
 			require.NoError(t, err)
 
 			// event org.policy.label.logo.dark.added
 			assert.NotNil(t, setting.Settings.LabelPolicyDarkLogoURL)
-			assert.Equal(t, domain.LabelPolicyStatePreview.String(), setting.Settings.LabelPolicyState)
+			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -859,7 +884,8 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.GetLabel(
 				ctx,
 				instanceID,
-				&orgID)
+				&orgID,
+				domain.LabelStatePreview)
 			require.NoError(t, err)
 
 			assert.NotNil(t, setting.Settings.LabelPolicyLightLogoURL)
@@ -873,7 +899,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			Delete("http://localhost:8080" + "/management/v1" + "/policies/label/logo")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		// check light logo removed
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
@@ -881,12 +907,13 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.GetLabel(
 				ctx,
 				instanceID,
-				&orgID)
+				&orgID,
+				domain.LabelStatePreview)
 			require.NoError(t, err)
 
 			// event org.policy.label.logo.removed
 			assert.Nil(t, setting.Settings.LabelPolicyLightLogoURL)
-			assert.Equal(t, domain.LabelPolicyStatePreview.String(), setting.Settings.LabelPolicyState)
+			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -950,7 +977,8 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.GetLabel(
 				ctx,
 				instanceID,
-				&orgID)
+				&orgID,
+				domain.LabelStatePreview)
 			require.NoError(t, err)
 
 			assert.NotNil(t, setting.Settings.LabelPolicyDarkLogoURL)
@@ -964,7 +992,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			Delete("http://localhost:8080" + "/management/v1" + "/policies/label/logo_dark")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		// check dark logo removed
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
@@ -972,12 +1000,13 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.GetLabel(
 				ctx,
 				instanceID,
-				&orgID)
+				&orgID,
+				domain.LabelStatePreview)
 			require.NoError(t, err)
 
 			// event org.policy.label.logo.dark.removed
 			assert.Nil(t, setting.Settings.LabelPolicyDarkLogoURL)
-			assert.Equal(t, domain.LabelPolicyStatePreview.String(), setting.Settings.LabelPolicyState)
+			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1036,19 +1065,20 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx,
 				instanceID,
-				&orgID)
+				&orgID,
+				domain.LabelStatePreview)
 			require.NoError(t, err)
 
 			// event org.policy.label.icon.added
 			assert.NotNil(t, setting.Settings.LabelPolicyLightIconURL)
-			assert.Equal(t, domain.LabelPolicyStatePreview.String(), setting.Settings.LabelPolicyState)
+			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1106,19 +1136,20 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx,
 				instanceID,
-				&orgID)
+				&orgID,
+				domain.LabelStatePreview)
 			require.NoError(t, err)
 
 			// event org.policy.label.icon.dark.added
 			assert.NotNil(t, setting.Settings.LabelPolicyDarkIconURL)
-			assert.Equal(t, domain.LabelPolicyStatePreview.String(), setting.Settings.LabelPolicyState)
+			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1182,7 +1213,8 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.GetLabel(
 				ctx,
 				instanceID,
-				&orgID)
+				&orgID,
+				domain.LabelStatePreview)
 			require.NoError(t, err)
 
 			assert.NotNil(t, setting.Settings.LabelPolicyLightIconURL)
@@ -1196,7 +1228,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			Delete("http://localhost:8080" + "/management/v1" + "/policies/label/icon")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		// check light icon removed
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
@@ -1204,12 +1236,13 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.GetLabel(
 				ctx,
 				instanceID,
-				&orgID)
+				&orgID,
+				domain.LabelStatePreview)
 			require.NoError(t, err)
 
 			// event org.policy.label.icon.removed
 			assert.Nil(t, setting.Settings.LabelPolicyLightIconURL)
-			assert.Equal(t, domain.LabelPolicyStatePreview.String(), setting.Settings.LabelPolicyState)
+			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1273,7 +1306,8 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.GetLabel(
 				ctx,
 				instanceID,
-				&orgID)
+				&orgID,
+				domain.LabelStatePreview)
 			require.NoError(t, err)
 
 			// assert.Equal(t, domain.LabelPolicyThemeLight, setting.Settings.LabelPolicyLightLogoURL)
@@ -1288,7 +1322,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			Delete("http://localhost:8080" + "/management/v1" + "/policies/label/icon_dark")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		// check dark icon removed
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
@@ -1296,12 +1330,13 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.GetLabel(
 				ctx,
 				instanceID,
-				&orgID)
+				&orgID,
+				domain.LabelStatePreview)
 			require.NoError(t, err)
 
 			// event org.policy.label.icon.dark.removed
 			assert.Nil(t, setting.Settings.LabelPolicyDarkIconURL)
-			assert.Equal(t, domain.LabelPolicyStatePreview.String(), setting.Settings.LabelPolicyState)
+			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1360,19 +1395,20 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx,
 				instanceID,
-				&orgID)
+				&orgID,
+				domain.LabelStatePreview)
 			require.NoError(t, err)
 
 			// event org.policy.label.font.added
 			assert.NotNil(t, setting.Settings.LabelPolicyFontURL)
-			assert.Equal(t, domain.LabelPolicyStatePreview.String(), setting.Settings.LabelPolicyState)
+			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1435,7 +1471,8 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.GetLabel(
 				ctx,
 				instanceID,
-				&orgID)
+				&orgID,
+				domain.LabelStatePreview)
 			require.NoError(t, err)
 
 			assert.NotNil(t, setting.Settings.LabelPolicyFontURL)
@@ -1449,7 +1486,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			Delete("http://localhost:8080" + "/management/v1" + "/policies/label/font")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		// check font policy removed
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
@@ -1457,12 +1494,13 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.GetLabel(
 				ctx,
 				instanceID,
-				&orgID)
+				&orgID,
+				domain.LabelStatePreview)
 			require.NoError(t, err)
 
 			// event org.policy.label.font.removed
 			assert.Nil(t, setting.Settings.LabelPolicyFontURL)
-			assert.Equal(t, domain.LabelPolicyStatePreview.String(), setting.Settings.LabelPolicyState)
+			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1499,7 +1537,8 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.GetLabel(
 				ctx,
 				newInstance.ID(),
-				&organization.Id)
+				&organization.Id,
+				domain.LabelStatePreview)
 			require.NoError(t, err)
 
 			require.NotNil(t, setting)
@@ -1515,7 +1554,8 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			_, err := settingsRepo.GetLabel(
 				ctx,
 				newInstance.ID(),
-				&organization.Id)
+				&organization.Id,
+				domain.LabelStatePreview)
 
 			// event org.policy.label.removed
 			require.ErrorIs(t, err, new(database.NoRowFoundError))
@@ -1554,7 +1594,8 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.GetLabel(
 				ctx,
 				newInstance.ID(),
-				&organization.Id)
+				&organization.Id,
+				domain.LabelStatePreview)
 			require.NoError(t, err)
 
 			require.NotNil(t, setting)
@@ -1572,7 +1613,8 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			_, err := settingsRepo.GetLabel(
 				ctx,
 				newInstance.ID(),
-				&organization.Id)
+				&organization.Id,
+				domain.LabelStatePreview)
 
 			// event org.removed
 			require.ErrorIs(t, err, new(database.NoRowFoundError))
@@ -1603,7 +1645,7 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 			HasSymbol:    true,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -1656,7 +1698,7 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 			HasSymbol:    true,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -1800,7 +1842,7 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 			ExpireWarnDays: 10,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -1842,7 +1884,7 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 			ExpireWarnDays: 40,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -1975,7 +2017,7 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 			MaxOtpAttempts:      1,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -2016,7 +2058,7 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 			MaxOtpAttempts:      5,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -2150,7 +2192,7 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 			SmtpSenderAddressMatchesInstanceDomain: false,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -2198,7 +2240,7 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 			SmtpSenderAddressMatchesInstanceDomain: true,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -2340,7 +2382,7 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 			OrganizationScopedUsernames: &organizationScopedUsernames,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
+		after := time.Now().Add(time.Second * 30)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {

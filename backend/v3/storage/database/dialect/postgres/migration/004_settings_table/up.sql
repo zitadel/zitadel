@@ -9,11 +9,17 @@ CREATE TYPE zitadel.settings_type AS ENUM (
     'organization'
 );
 
+CREATE TYPE zitadel.label_state AS ENUM (
+    'preview',
+    'activated'
+);
+
 CREATE TABLE zitadel.settings (
     instance_id TEXT NOT NULL
     , org_id TEXT
     , id TEXT NOT NULL CHECK (id <> '') DEFAULT gen_random_uuid()
     , type zitadel.settings_type NOT NULL
+    , label_state zitadel.label_state DEFAULT NULL
     , settings JSONB -- the storage does not really care about what is configured so we store it as json
 
     , created_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -26,8 +32,9 @@ CREATE TABLE zitadel.settings (
 
 -- CREATE UNIQUE INDEX idx_settings_unique_type ON zitadel.settings (instance_id, org_id, type) NULLS NOT DISTINCT WHERE deleted_at IS NULL;
 CREATE UNIQUE INDEX idx_settings_unique_type ON zitadel.settings (instance_id, org_id, type) NULLS NOT DISTINCT WHERE type != 'label';
+CREATE UNIQUE INDEX idx_settings_label_unique_type ON zitadel.settings (instance_id, org_id, type, label_state) NULLS NOT DISTINCT WHERE type = 'label';
 
-CREATE INDEX idx_settings_type ON zitadel.settings(instance_id, type);
+CREATE INDEX idx_settings_type ON zitadel.settings(instance_id, type, label_state) NULLS NOT DISTINCT;
 
 
 CREATE TRIGGER trigger_set_updated_at

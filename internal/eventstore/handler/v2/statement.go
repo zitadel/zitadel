@@ -393,7 +393,7 @@ func AddDeleteStatement(conditions []Condition, opts ...execOption) func(eventst
 
 func AddCopyStatement(conflict, from, to []Column, conditions []NamespacedCondition, opts ...execOption) func(eventstore.Event) Exec {
 	return func(event eventstore.Event) Exec {
-		return NewCopyStatement(event, conflict, from, to, conditions, opts...).Execute
+		return NewCopyStatement(event, conflict, nil, from, to, conditions, opts...).Execute
 	}
 }
 
@@ -451,7 +451,7 @@ func NewCopyCol(column, from string) Column {
 // if the value of a col is empty the data will be copied from the selected row
 // if the value of a col is not empty the data will be set by the static value
 // conds represent the conditions for the selection subquery
-func NewCopyStatement(event eventstore.Event, conflictCols, from, to []Column, nsCond []NamespacedCondition, opts ...execOption) *Statement {
+func NewCopyStatement(event eventstore.Event, conflictCols []Column, conflictCond []Condition, from, to []Column, nsCond []NamespacedCondition, opts ...execOption) *Statement {
 	columnNames := make([]string, len(to))
 	selectColumns := make([]string, len(from))
 	updateColumns := make([]string, len(columnNames))
@@ -482,6 +482,13 @@ func NewCopyStatement(event eventstore.Event, conflictCols, from, to []Column, n
 		conflictTargets[i] = conflictCol.Name
 	}
 
+	// needed for cases where conflict cases use partial indexes
+	conflictWheres := make([]string, len(conflictCond))
+	if conflictCond != nil {
+		conflictWheres, values = conditionsToWhere(conflictCond, len(args)+1)
+		args = append(args, values...)
+	}
+
 	config := execConfig{
 		args: args,
 	}
@@ -506,13 +513,20 @@ func NewCopyStatement(event eventstore.Event, conflictCols, from, to []Column, n
 			strings.Join(wheres, " AND ") +
 			" ON CONFLICT (" +
 			strings.Join(conflictTargets, ", ") +
-			") DO UPDATE SET (" +
+			")" + func() string {
+			if conflictCond != nil {
+				out := " WHERE " +
+					strings.Join(conflictWheres, " AND ")
+				return out
+			}
+			return ""
+		}() +
+			" DO UPDATE SET (" +
 			strings.Join(columnNames, ", ") +
 			") = (" +
 			strings.Join(updateColumns, ", ") +
 			")"
 	}
-	fmt.Printf("[DEBUGPRINT] [:1] q(config) = %+v\n", q(config))
 
 	return NewStatement(event, exec(config, q, opts))
 }
@@ -612,6 +626,12 @@ func NewUnequalCond(name string, value any) Condition {
 func NewNamespacedCondition(name string, value interface{}) NamespacedCondition {
 	return func(namespace string) Condition {
 		return NewCond(namespace+"."+name, value)
+	}
+}
+
+func NewIsNotNulNSlCond(name string) NamespacedCondition {
+	return func(namespace string) Condition {
+		return NewIsNullCond(namespace + "." + name)
 	}
 }
 

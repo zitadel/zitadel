@@ -23,7 +23,10 @@ func SettingsRepository(client database.QueryExecutor) domain.SettingsRepository
 
 var _ domain.SettingsRepository = (*settings)(nil)
 
-var settingObjectMustNotBeNilErr error = errors.New("setting object must not be nill")
+var (
+	settingObjectMustNotBeNilErr error = errors.New("setting object must not be nill")
+	LabelStateMustBeDefineddErr  error = errors.New("label state must be defined")
+)
 
 // -------------------------------------------------------------
 // columns
@@ -43,6 +46,10 @@ func (settings) OrgIDColumn() database.Column {
 
 func (settings) TypeColumn() database.Column {
 	return database.NewColumn("settings", "type")
+}
+
+func (settings) LabelStateColumn() database.Column {
+	return database.NewColumn("settings", "label_state")
 }
 
 func (settings) SettingsColumn() database.Column {
@@ -80,6 +87,10 @@ func (s settings) TypeCondition(typ domain.SettingType) database.Condition {
 	return database.NewTextCondition(s.TypeColumn(), database.TextOperationEqual, typ.String())
 }
 
+func (s settings) LabelStateCondition(typ domain.LabelState) database.Condition {
+	return database.NewTextCondition(s.LabelStateColumn(), database.TextOperationEqual, typ.String())
+}
+
 // -------------------------------------------------------------
 // changes
 // -------------------------------------------------------------
@@ -92,18 +103,18 @@ func (s settings) SetSettings(settings string) database.Change {
 	return database.NewChange(s.SettingsColumn(), settings)
 }
 
-const querySettingStmt = `SELECT instance_id, org_id, id, type, settings,` +
+const querySettingStmt = `SELECT instance_id, org_id, id, type, label_state, settings,` +
 	` created_at, updated_at` +
 	` FROM zitadel.settings`
 
-func (s *settings) Get(ctx context.Context, instanceID string, orgID *string, typ domain.SettingType) (*domain.Setting, error) {
+func (s *settings) Get(ctx context.Context, instanceID string, orgID *string, typ domain.SettingType, cond ...database.Condition) (*domain.Setting, error) {
 	builder := database.StatementBuilder{}
 
 	builder.WriteString(querySettingStmt)
 
-	conditions := []database.Condition{s.TypeCondition(typ), s.InstanceIDCondition(instanceID), s.OrgIDCondition(orgID)}
+	cond = append(cond, s.TypeCondition(typ), s.InstanceIDCondition(instanceID), s.OrgIDCondition(orgID))
 
-	writeCondition(&builder, database.And(conditions...))
+	writeCondition(&builder, database.And(cond...))
 
 	return scanSetting(ctx, s.client, &builder)
 }
@@ -153,7 +164,6 @@ func (s *settings) UpdateLogin(ctx context.Context, setting *domain.LoginSetting
 	builder.WriteString(`UPDATE zitadel.settings SET `)
 
 	conditions := []database.Condition{
-		// s.IDCondition(*setting.ID),
 		s.InstanceIDCondition(setting.InstanceID),
 		s.OrgIDCondition(setting.OrgID),
 		s.TypeCondition(setting.Type),
@@ -178,11 +188,12 @@ func (s *settings) CreateLabel(ctx context.Context, setting *domain.LabelSetting
 	return s.createSetting(ctx, setting.Setting, &setting.Settings)
 }
 
-func (s *settings) GetLabel(ctx context.Context, instanceID string, orgID *string) (*domain.LabelSetting, error) {
+func (s *settings) GetLabel(ctx context.Context, instanceID string, orgID *string, state domain.LabelState) (*domain.LabelSetting, error) {
 	labelSetting := &domain.LabelSetting{}
 	var err error
 
-	labelSetting.Setting, err = s.Get(ctx, instanceID, orgID, domain.SettingTypeLabel)
+	stateCond := s.LabelStateCondition(state)
+	labelSetting.Setting, err = s.Get(ctx, instanceID, orgID, domain.SettingTypeLabel, stateCond)
 	if err != nil {
 		return nil, err
 	}
@@ -196,6 +207,9 @@ func (s *settings) GetLabel(ctx context.Context, instanceID string, orgID *strin
 }
 
 func (s *settings) UpdateLabel(ctx context.Context, setting *domain.LabelSetting) (int64, error) {
+	if setting.LabelState == nil {
+		return 0, LabelStateMustBeDefineddErr
+	}
 	return s.updateSetting(ctx, setting.Setting, &setting.Settings)
 }
 
@@ -400,8 +414,8 @@ func (s *settings) updateSetting(ctx context.Context, setting *domain.Setting, s
 }
 
 const createSettingStmt = `INSERT INTO zitadel.settings` +
-	` (instance_id, org_id, type, settings)` +
-	` VALUES ($1, $2, $3, $4)` +
+	` (instance_id, org_id, type, label_state, settings)` +
+	` VALUES ($1, $2, $3, $4, $5)` +
 	` RETURNING id, created_at, updated_at`
 
 func (s *settings) Create(ctx context.Context, setting *domain.Setting) error {
@@ -411,6 +425,7 @@ func (s *settings) Create(ctx context.Context, setting *domain.Setting) error {
 		setting.InstanceID,
 		setting.OrgID,
 		setting.Type,
+		setting.LabelState,
 		string(setting.Settings))
 	builder.WriteString(createSettingStmt)
 

@@ -24,10 +24,12 @@ import (
 const (
 	SettingsRelationalProjectionTable = "zitadel.settings"
 
-	SettingInstanceIDCol = "instance_id"
-	SettingsOrgIDCol     = "org_id"
-	SettingsTypeCol      = "type"
-	SettingsSettingsCol  = "settings"
+	SettingIDCol          = "id"
+	SettingInstanceIDCol  = "instance_id"
+	SettingsOrgIDCol      = "org_id"
+	SettingsTypeCol       = "type"
+	SettingsLabelStateCol = "label_state"
+	SettingsSettingsCol   = "settings"
 )
 
 type settingsRelationalProjection struct{}
@@ -671,7 +673,6 @@ func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) 
 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		type labelPolicy struct {
 			policy.LabelPolicyAddedEvent
-			LabelPolicyState string `json:"labelPolicyState,omitempty"`
 		}
 		type settingStruct struct {
 			labelPolicy
@@ -681,7 +682,6 @@ func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) 
 		labelSetting := settingStruct{
 			labelPolicy: labelPolicy{
 				LabelPolicyAddedEvent: policyEvent,
-				LabelPolicyState:      domain.LabelPolicyStatePreview.String(),
 			},
 			IsDefault: &isDefault,
 		}
@@ -695,11 +695,13 @@ func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) 
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
+		labelStatePreview := domain.LabelStatePreview
 		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
 		setting := domain.Setting{
 			InstanceID: policyEvent.Aggregate().InstanceID,
 			OrgID:      orgId,
 			Type:       domain.SettingTypeLabel,
+			LabelState: &labelStatePreview,
 			Settings:   settings,
 		}
 		err = settingsRepo.Create(ctx, &setting)
@@ -728,13 +730,9 @@ func (s *settingsRelationalProjection) reduceLabelChanged(event eventstore.Event
 
 		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
 
-		setting, err := settingsRepo.GetLabel(ctx, policyEvent.Agg.InstanceID, orgId)
+		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-r879m", "error accessing login policy record")
-		}
-
-		if setting.Settings.LabelPolicyState != domain.LabelPolicyStatePreview.String() {
-			return nil
 		}
 
 		if policyEvent.PrimaryColor != nil {
@@ -799,33 +797,49 @@ func (s *settingsRelationalProjection) reduceLabelPolicyRemoved(event eventstore
 }
 
 func (s *settingsRelationalProjection) reduceLabelActivated(event eventstore.Event) (*handler.Statement, error) {
-	var orgId *string
+	var orgCond handler.NamespacedCondition
 	switch event.(type) {
 	case *org.LabelPolicyActivatedEvent:
-		orgId = &event.Aggregate().ID
+		orgId := &event.Aggregate().ID
+		orgCond = handler.NewNamespacedCondition(SettingsOrgIDCol, orgId)
 	case *instance.LabelPolicyActivatedEvent:
+		orgCond = handler.NewIsNotNulNSlCond(SettingsOrgIDCol)
 		// everything ok
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-7Kd8U", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyActivatedEventType, instance.LabelPolicyActivatedEventType})
 	}
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		tx, ok := ex.(*sql.Tx)
-		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
-		}
 
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
-
-		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId)
-		if err != nil {
-			return err
-		}
-
-		setting.Settings.LabelPolicyState = domain.LabelPolicyStateActive.String()
-
-		settingsRepo.UpdateLabel(ctx, setting)
-		return err
-	}), nil
+	return handler.NewCopyStatement(
+		event,
+		[]handler.Column{
+			handler.NewCol(SettingInstanceIDCol, nil),
+			handler.NewCol(SettingsOrgIDCol, nil),
+			handler.NewCol(SettingsTypeCol, nil),
+			handler.NewCol(SettingsLabelStateCol, nil),
+		},
+		[]handler.Condition{
+			handler.NewCond(SettingsTypeCol, domain.SettingTypeLabel),
+		},
+		[]handler.Column{
+			handler.NewCol(SettingInstanceIDCol, nil),
+			handler.NewCol(SettingsOrgIDCol, nil),
+			handler.NewCol(SettingsTypeCol, nil),
+			handler.NewCol(SettingsLabelStateCol, domain.LabelStateActivated),
+			handler.NewCol(SettingsSettingsCol, nil),
+		},
+		[]handler.Column{
+			handler.NewCol(SettingInstanceIDCol, nil),
+			handler.NewCol(SettingsOrgIDCol, nil),
+			handler.NewCol(SettingsTypeCol, nil),
+			handler.NewCol(SettingsLabelStateCol, nil),
+			handler.NewCol(SettingsSettingsCol, nil),
+		},
+		[]handler.NamespacedCondition{
+			handler.NewNamespacedCondition(SettingsTypeCol, domain.SettingTypeLabel),
+			handler.NewNamespacedCondition(SettingInstanceIDCol, event.Aggregate().InstanceID),
+			orgCond,
+			handler.NewNamespacedCondition(SettingsLabelStateCol, domain.LabelStatePreview),
+		}), nil
 }
 
 func (p *settingsRelationalProjection) reduceLabelLogoAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -850,13 +864,9 @@ func (p *settingsRelationalProjection) reduceLabelLogoAdded(event eventstore.Eve
 		}
 		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
 
-		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId)
+		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-y7dDm", "error accessing login policy record")
-		}
-
-		if setting.Settings.LabelPolicyState != domain.LabelPolicyStatePreview.String() {
-			return nil
 		}
 
 		switch e := event.(type) {
@@ -895,13 +905,9 @@ func (p *settingsRelationalProjection) reduceLogoRemoved(event eventstore.Event)
 		}
 		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
 
-		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId)
+		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-d7L9s", "error accessing login policy record")
-		}
-
-		if setting.Settings.LabelPolicyState != domain.LabelPolicyStatePreview.String() {
-			return nil
 		}
 
 		switch event.(type) {
@@ -940,13 +946,9 @@ func (p *settingsRelationalProjection) reduceIconAdded(event eventstore.Event) (
 		}
 		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
 
-		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId)
+		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-s7a9m", "error accessing login policy record")
-		}
-
-		if setting.Settings.LabelPolicyState != domain.LabelPolicyStatePreview.String() {
-			return nil
 		}
 
 		switch e := event.(type) {
@@ -985,13 +987,9 @@ func (p *settingsRelationalProjection) reduceIconRemoved(event eventstore.Event)
 		}
 		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
 
-		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId)
+		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-B7L9m", "error accessing login policy record")
-		}
-
-		if setting.Settings.LabelPolicyState != domain.LabelPolicyStatePreview.String() {
-			return nil
 		}
 
 		switch event.(type) {
@@ -1027,13 +1025,9 @@ func (p *settingsRelationalProjection) reduceFontAdded(event eventstore.Event) (
 		}
 		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
 
-		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId)
+		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-H7S7m", "error accessing login policy record")
-		}
-
-		if setting.Settings.LabelPolicyState != domain.LabelPolicyStatePreview.String() {
-			return nil
 		}
 
 		switch e := event.(type) {
@@ -1065,13 +1059,9 @@ func (p *settingsRelationalProjection) reduceFontRemoved(event eventstore.Event)
 		}
 		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
 
-		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId)
+		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-77kMm", "error accessing login policy record")
-		}
-
-		if setting.Settings.LabelPolicyState != domain.LabelPolicyStatePreview.String() {
-			return nil
 		}
 
 		setting.Settings.LabelPolicyFontURL = nil
