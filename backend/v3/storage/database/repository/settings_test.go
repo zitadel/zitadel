@@ -1103,6 +1103,163 @@ func TestGetSetting(t *testing.T) {
 	}
 }
 
+func TestGetLabelPolicySetting(t *testing.T) {
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository(pool)
+	err := instanceRepo.Create(t.Context(), &instance)
+	require.NoError(t, err)
+
+	// create org
+	orgId := gofakeit.Name()
+	org := domain.Organization{
+		ID:         orgId,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive,
+	}
+	organizationRepo := repository.OrganizationRepository(pool)
+	err = organizationRepo.Create(t.Context(), &org)
+	require.NoError(t, err)
+
+	// create setting
+	// this setting is created as an additional org which should NOT
+	// be returned in the results of the tests
+	prexistingSetting := domain.Setting{
+		InstanceID: instanceId,
+		OrgID:      &orgId,
+		ID:         gofakeit.Name(),
+		Type:       domain.SettingTypePasswordExpiry,
+		Settings:   []byte("{}"),
+	}
+	settingRepo := repository.SettingsRepository(pool)
+	err = settingRepo.Create(t.Context(), &prexistingSetting)
+	require.NoError(t, err)
+
+	type test struct {
+		name     string
+		testFunc func(ctx context.Context, t *testing.T) *domain.LabelSetting
+		err      error
+	}
+
+	tests := []test{
+		{
+			name: "happy path, state preview",
+			testFunc: func(ctx context.Context, t *testing.T) *domain.LabelSetting {
+				setting := domain.LabelSetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						Type:       domain.SettingTypeLabel,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
+					},
+				}
+
+				err := settingRepo.CreateLabel(ctx, &setting)
+				require.NoError(t, err)
+				return &setting
+			},
+		},
+		{
+			name: "happy path, state activated",
+			testFunc: func(ctx context.Context, t *testing.T) *domain.LabelSetting {
+				setting := domain.LabelSetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						Type:       domain.SettingTypeLabel,
+						LabelState: gu.Ptr(domain.LabelStateActivated),
+						Settings:   []byte("{}"),
+					},
+				}
+
+				err := settingRepo.CreateLabel(ctx, &setting)
+				require.NoError(t, err)
+				return &setting
+			},
+		},
+		{
+			name: "get label policy using wrong state",
+			testFunc: func(ctx context.Context, t *testing.T) *domain.LabelSetting {
+				setting := domain.LabelSetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						Type:       domain.SettingTypeLabel,
+						LabelState: gu.Ptr(domain.LabelStateActivated),
+						Settings:   []byte("{}"),
+					},
+				}
+
+				err := settingRepo.CreateLabel(ctx, &setting)
+				require.NoError(t, err)
+
+				setting.LabelState = gu.Ptr(domain.LabelStatePreview)
+				return &setting
+			},
+			err: new(database.NoRowFoundError),
+		},
+		{
+			name: "get non existent label policy",
+			testFunc: func(ctx context.Context, t *testing.T) *domain.LabelSetting {
+				setting := domain.LabelSetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						Type:       domain.SettingTypeLabel,
+						LabelState: gu.Ptr(domain.LabelStateActivated),
+						Settings:   []byte("{}"),
+					},
+				}
+
+				return &setting
+			},
+			err: new(database.NoRowFoundError),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := t.Context()
+			t.Cleanup(func() {
+				_, err := pool.Exec(context.Background(), "DELETE FROM zitadel.settings")
+				require.NoError(t, err)
+			})
+
+			var setting *domain.LabelSetting
+			if tt.testFunc != nil {
+				setting = tt.testFunc(ctx, t)
+			}
+
+			// get setting
+			returnedIDP, err := settingRepo.GetLabel(ctx,
+				setting.InstanceID,
+				setting.OrgID,
+				*setting.LabelState,
+			)
+			if err != nil {
+				require.ErrorIs(t, tt.err, err)
+				return
+			}
+
+			assert.Equal(t, returnedIDP.InstanceID, setting.InstanceID)
+			assert.Equal(t, returnedIDP.OrgID, setting.OrgID)
+			assert.Equal(t, returnedIDP.ID, setting.ID)
+			assert.Equal(t, returnedIDP.Type, setting.Type)
+			assert.Equal(t, returnedIDP.Settings, setting.Settings)
+		})
+	}
+}
+
 // gocognit linting fails due to number of test cases
 // and the fact that each test case has a testFunc()
 //

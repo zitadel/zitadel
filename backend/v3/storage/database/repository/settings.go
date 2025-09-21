@@ -24,8 +24,8 @@ func SettingsRepository(client database.QueryExecutor) domain.SettingsRepository
 var _ domain.SettingsRepository = (*settings)(nil)
 
 var (
-	settingObjectMustNotBeNilErr error = errors.New("setting object must not be nill")
-	LabelStateMustBeDefineddErr  error = errors.New("label state must be defined")
+	ErrSettingObjectMustNotBeNil error = errors.New("setting object must not be nill")
+	ErrLabelStateMustBeDefined   error = errors.New("label state must be defined")
 )
 
 // -------------------------------------------------------------
@@ -136,7 +136,7 @@ func (s *settings) List(ctx context.Context, conditions ...database.Condition) (
 
 func (s *settings) CreateLogin(ctx context.Context, setting *domain.LoginSetting) error {
 	if setting == nil {
-		return settingObjectMustNotBeNilErr
+		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypeLogin
 	return s.createSetting(ctx, setting.Setting, &setting.Settings)
@@ -182,7 +182,7 @@ func (s *settings) UpdateLogin(ctx context.Context, setting *domain.LoginSetting
 
 func (s *settings) CreateLabel(ctx context.Context, setting *domain.LabelSetting) error {
 	if setting == nil {
-		return settingObjectMustNotBeNilErr
+		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypeLabel
 	return s.createSetting(ctx, setting.Setting, &setting.Settings)
@@ -208,14 +208,14 @@ func (s *settings) GetLabel(ctx context.Context, instanceID string, orgID *strin
 
 func (s *settings) UpdateLabel(ctx context.Context, setting *domain.LabelSetting) (int64, error) {
 	if setting.LabelState == nil {
-		return 0, LabelStateMustBeDefineddErr
+		return 0, ErrLabelStateMustBeDefined
 	}
 	return s.updateSetting(ctx, setting.Setting, &setting.Settings)
 }
 
 func (s *settings) CreatePasswordComplexity(ctx context.Context, setting *domain.PasswordComplexitySetting) error {
 	if setting == nil {
-		return settingObjectMustNotBeNilErr
+		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypePasswordComplexity
 	return s.createSetting(ctx, setting.Setting, &setting.Settings)
@@ -244,7 +244,7 @@ func (s *settings) UpdatePasswordComplexity(ctx context.Context, setting *domain
 
 func (s *settings) CreatePasswordExpiry(ctx context.Context, setting *domain.PasswordExpirySetting) error {
 	if setting == nil {
-		return settingObjectMustNotBeNilErr
+		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypePasswordExpiry
 	return s.createSetting(ctx, setting.Setting, &setting.Settings)
@@ -273,7 +273,7 @@ func (s *settings) UpdatePasswordExpiry(ctx context.Context, setting *domain.Pas
 
 func (s *settings) CreateSecurity(ctx context.Context, setting *domain.SecuritySetting) error {
 	if setting == nil {
-		return settingObjectMustNotBeNilErr
+		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypeSecurity
 	return s.createSetting(ctx, setting.Setting, &setting.Settings)
@@ -302,7 +302,7 @@ func (s *settings) UpdateSecurity(ctx context.Context, setting *domain.SecurityS
 
 func (s *settings) CreateLockout(ctx context.Context, setting *domain.LockoutSetting) error {
 	if setting == nil {
-		return settingObjectMustNotBeNilErr
+		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypeLockout
 	return s.createSetting(ctx, setting.Setting, &setting.Settings)
@@ -331,7 +331,7 @@ func (s *settings) UpdateLockout(ctx context.Context, setting *domain.LockoutSet
 
 func (s *settings) CreateDomain(ctx context.Context, setting *domain.DomainSetting) error {
 	if setting == nil {
-		return settingObjectMustNotBeNilErr
+		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypeDomain
 	return s.createSetting(ctx, setting.Setting, &setting.Settings)
@@ -360,7 +360,7 @@ func (s *settings) UpdateDomain(ctx context.Context, setting *domain.DomainSetti
 
 func (s *settings) CreateOrg(ctx context.Context, setting *domain.OrgSetting) error {
 	if setting == nil {
-		return settingObjectMustNotBeNilErr
+		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypeOrganization
 	return s.createSetting(ctx, setting.Setting, &setting.Settings)
@@ -444,6 +444,7 @@ func (s *settings) createSetting(ctx context.Context, setting *domain.Setting, s
 		setting.InstanceID,
 		setting.OrgID,
 		setting.Type,
+		setting.LabelState,
 		string(settingJSON))
 
 	builder.WriteString(createSettingStmt)
