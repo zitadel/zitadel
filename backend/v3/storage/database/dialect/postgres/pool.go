@@ -22,7 +22,7 @@ func PGxPool(pool *pgxpool.Pool) *pgxPool {
 }
 
 // Acquire implements [database.Pool].
-func (c *pgxPool) Acquire(ctx context.Context) (database.Client, error) {
+func (c *pgxPool) Acquire(ctx context.Context) (database.Connection, error) {
 	conn, err := c.Pool.Acquire(ctx)
 	if err != nil {
 		return nil, wrapError(err)

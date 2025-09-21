@@ -104,7 +104,7 @@ func (o org) Update(ctx context.Context, client database.QueryExecutor, conditio
 
 // Delete implements [domain.OrganizationRepository].
 func (o org) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	if !condition.ContainsColumn(o.InstanceIDColumn()) {
+	if !condition.IsRestrictingColumn(o.InstanceIDColumn()) {
 		return 0, database.NewMissingConditionError(o.InstanceIDColumn())
 	}
 

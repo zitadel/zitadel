@@ -3,6 +3,7 @@ package database
 type Columns []Column
 
 // WriteQualified implements [Column].
+// Columns are separated by ", ".
 func (m Columns) WriteQualified(builder *StatementBuilder) {
 	for i, col := range m {
 		if i > 0 {
@@ -13,6 +14,7 @@ func (m Columns) WriteQualified(builder *StatementBuilder) {
 }
 
 // WriteUnqualified implements [Column].
+// Columns are separated by ", ".
 func (m Columns) WriteUnqualified(builder *StatementBuilder) {
 	for i, col := range m {
 		if i > 0 {
@@ -21,6 +23,25 @@ func (m Columns) WriteUnqualified(builder *StatementBuilder) {
 		col.WriteUnqualified(builder)
 	}
 }
+
+// Equals implements [Column].
+func (m Columns) Equals(col Column) bool {
+	if col == nil {
+		return m == nil
+	}
+	other, ok := col.(Columns)
+	if !ok || len(other) != len(m) {
+		return false
+	}
+	for i, col := range m {
+		if !col.Equals(other[i]) {
+			return false
+		}
+	}
+	return true
+}
+
+var _ Column = (Columns)(nil)
 
 // Column represents a column in a database table.
 type Column interface {
@@ -54,6 +75,7 @@ func (c column) WriteUnqualified(builder *StatementBuilder) {
 	builder.WriteString(c.name)
 }
 
+// Equals implements [Column].
 func (c *column) Equals(col Column) bool {
 	if col == nil {
 		return c == nil
@@ -88,6 +110,7 @@ const (
 	functionSHA256 function = "SHA256"
 )
 
+// WriteQualified implements [Column].
 func (c functionColumn) WriteQualified(builder *StatementBuilder) {
 	builder.Grow(len(c.fn) + 2)
 	builder.WriteString(string(c.fn))
@@ -96,6 +119,7 @@ func (c functionColumn) WriteQualified(builder *StatementBuilder) {
 	builder.WriteRune(')')
 }
 
+// WriteUnqualified implements [Column].
 func (c functionColumn) WriteUnqualified(builder *StatementBuilder) {
 	builder.Grow(len(c.fn) + 2)
 	builder.WriteString(string(c.fn))
@@ -104,6 +128,7 @@ func (c functionColumn) WriteUnqualified(builder *StatementBuilder) {
 	builder.WriteRune(')')
 }
 
+// Equals implements [Column].
 func (c *functionColumn) Equals(col Column) bool {
 	if col == nil {
 		return c == nil
@@ -114,3 +139,5 @@ func (c *functionColumn) Equals(col Column) bool {
 	}
 	return c.col.Equals(toMatch.col)
 }
+
+var _ Column = (*functionColumn)(nil)
