@@ -160,30 +160,17 @@ func (s *settings) GetLogin(ctx context.Context, instanceID string, orgID *strin
 }
 
 func (s *settings) UpdateLogin(ctx context.Context, setting *domain.LoginSetting) (int64, error) {
-	builder := database.StatementBuilder{}
-	builder.WriteString(`UPDATE zitadel.settings SET `)
-
-	conditions := []database.Condition{
-		s.InstanceIDCondition(setting.InstanceID),
-		s.OrgIDCondition(setting.OrgID),
-		s.TypeCondition(setting.Type),
-	}
-	settingJSON, err := json.Marshal(setting.Settings)
-	if err != nil {
-		return 0, err
-	}
-	s.SetSettings(string(settingJSON)).Write(&builder)
-	writeCondition(&builder, database.And(conditions...))
-
-	stmt := builder.String()
-
-	return s.client.Exec(ctx, stmt, builder.Args()...)
+	return s.updateSetting(ctx, setting.Setting, &setting.Settings)
 }
 
 func (s *settings) CreateLabel(ctx context.Context, setting *domain.LabelSetting) error {
 	if setting == nil {
 		return ErrSettingObjectMustNotBeNil
 	}
+	if setting.LabelState == nil {
+		return ErrLabelStateMustBeDefined
+	}
+
 	setting.Type = domain.SettingTypeLabel
 	return s.createSetting(ctx, setting.Setting, &setting.Settings)
 }
@@ -385,11 +372,6 @@ func (s *settings) GetOrg(ctx context.Context, instanceID string, orgID *string)
 
 func (s *settings) UpdateOrg(ctx context.Context, setting *domain.OrgSetting) (int64, error) {
 	return s.updateSetting(ctx, setting.Setting, &setting.Settings)
-}
-
-// UpdateSetting added for testing purposes
-func UpdateSetting(ctx context.Context, s *settings, setting *domain.Setting, settings any) (int64, error) {
-	return s.updateSetting(ctx, setting, settings)
 }
 
 func (s *settings) updateSetting(ctx context.Context, setting *domain.Setting, settings any) (int64, error) {

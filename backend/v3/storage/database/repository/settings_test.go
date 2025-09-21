@@ -934,6 +934,7 @@ func TestUpdateSetting(t *testing.T) {
 	}
 }
 
+// NOTE all the Get.*() functions are a wrapper around Get()
 func TestGetSetting(t *testing.T) {
 	// create instance
 	instanceId := gofakeit.Name()
