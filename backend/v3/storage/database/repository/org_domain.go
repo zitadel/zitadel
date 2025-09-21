@@ -10,9 +10,7 @@ import (
 
 var _ domain.OrganizationDomainRepository = (*orgDomain)(nil)
 
-type orgDomain struct {
-	// *org
-}
+type orgDomain struct{}
 
 func OrganizationDomainRepository() domain.OrganizationDomainRepository {
 	return new(orgDomain)
