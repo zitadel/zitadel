@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/zitadel/logging"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
@@ -22,6 +23,7 @@ import (
 const (
 	pathBaseInformation = "/instances"
 	pathResourceCounts  = "/resource_counts"
+	maxSize             = 1024 * 1024 // 1MB
 )
 
 type Client struct {
@@ -52,6 +54,7 @@ func (c Client) callTelemetryService(ctx context.Context, path string, in proto.
 	if err != nil {
 		return err
 	}
+	logBodySize(len(requestBody), path)
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.endpoint+path, bytes.NewReader(requestBody))
 	if err != nil {
 		return err
@@ -78,6 +81,21 @@ func (c Client) callTelemetryService(ctx context.Context, path string, in proto.
 		AllowPartial:   true,
 		DiscardUnknown: true,
 	}.Unmarshal(body, out)
+}
+
+func logBodySize(requestBodySize int, path string) {
+	percentage := requestBodySize * 100 / maxSize
+	requestLog := logging.WithFields("body size", requestBodySize, "path", path, "max size", maxSize, "percentage", percentage)
+
+	if percentage >= 100 {
+		requestLog.Error("telemetry request body too large, please reduce the bulk size")
+		return
+	}
+	if percentage >= 80 {
+		requestLog.Warning("telemetry request body size approaching limit, please consider reducing the bulk size")
+		return
+	}
+	requestLog.Info("telemetry request body size")
 }
 
 func NewClient(config *Config) Client {
