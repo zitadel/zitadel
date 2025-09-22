@@ -45,22 +45,38 @@ export async function completeAuthFlow(command: AuthFlowParams): Promise<{ error
 
   if (requestId.startsWith("oidc_")) {
     // Complete OIDC flow
-    return loginWithOIDCAndSession({
+    const result = await loginWithOIDCAndSession({
       serviceUrl,
       authRequest: requestId.replace("oidc_", ""),
       sessionId,
       sessions,
       sessionCookies,
     });
+
+    // Safety net - ensure we always return a valid object
+    if (!result || typeof result !== "object" || (!("redirect" in result) && !("error" in result))) {
+      console.error("Auth flow: Invalid result from loginWithOIDCAndSession:", result);
+      return { error: "Authentication completed but navigation failed" };
+    }
+
+    return result;
   } else if (requestId.startsWith("saml_")) {
     // Complete SAML flow
-    return loginWithSAMLAndSession({
+    const result = await loginWithSAMLAndSession({
       serviceUrl,
       samlRequest: requestId.replace("saml_", ""),
       sessionId,
       sessions,
       sessionCookies,
     });
+
+    // Safety net - ensure we always return a valid object
+    if (!result || typeof result !== "object" || (!("redirect" in result) && !("error" in result))) {
+      console.error("Auth flow: Invalid result from loginWithSAMLAndSession:", result);
+      return { error: "Authentication completed but navigation failed" };
+    }
+
+    return result;
   }
 
   return { error: "Invalid request ID format" };
