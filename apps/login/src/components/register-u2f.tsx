@@ -146,7 +146,7 @@ export function RegisterU2f({ loginName, sessionId, organization, requestId, che
         return router.push(`/u2f?` + paramsToContinue);
       } else {
         if (requestId && sessionId) {
-          const response = await completeFlowOrGetUrl(
+          const callbackResponse = await completeFlowOrGetUrl(
             {
               sessionId: sessionId,
               requestId: requestId,
@@ -154,16 +154,21 @@ export function RegisterU2f({ loginName, sessionId, organization, requestId, che
             },
             loginSettings?.defaultRedirectUri,
           );
-          if (response && typeof response === "object" && "error" in response && response.error) {
-            setError(response.error);
+          if (
+            callbackResponse &&
+            typeof callbackResponse === "object" &&
+            "error" in callbackResponse &&
+            callbackResponse.error
+          ) {
+            setError(callbackResponse.error);
             return;
           }
 
-          if (response && typeof response === "string") {
-            return router.push(response);
+          if (callbackResponse && typeof callbackResponse === "string") {
+            return router.push(callbackResponse);
           }
         } else if (loginName) {
-          const response = await completeFlowOrGetUrl(
+          const callbackResponse = await completeFlowOrGetUrl(
             {
               loginName: loginName,
               organization: organization,
@@ -171,13 +176,18 @@ export function RegisterU2f({ loginName, sessionId, organization, requestId, che
             loginSettings?.defaultRedirectUri,
           );
 
-          if (response && typeof response === "object" && "error" in response && response.error) {
-            setError(response.error);
+          if (
+            callbackResponse &&
+            typeof callbackResponse === "object" &&
+            "error" in callbackResponse &&
+            callbackResponse.error
+          ) {
+            setError(callbackResponse.error);
             return;
           }
 
-          if (response && typeof response === "string") {
-            return router.push(response);
+          if (callbackResponse && typeof callbackResponse === "string") {
+            return router.push(callbackResponse);
           }
         }
       }

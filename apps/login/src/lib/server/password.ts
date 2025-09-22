@@ -283,17 +283,17 @@ export async function sendPassword(command: UpdateSessionCommand) {
     );
 
     if (callbackResponse && typeof callbackResponse === "object" && "error" in callbackResponse && callbackResponse.error) {
-      setError(callbackResponse.error);
-      return;
+      return { error: callbackResponse.error };
     }
 
+    // For regular flows (non-OIDC/SAML), return URL for client-side navigation
     if (callbackResponse && typeof callbackResponse === "string") {
-      return router.push(callbackResponse);
+      return { redirect: callbackResponse };
     }
   }
 
   // Regular flow (no requestId) - return URL for client-side navigation
-  const nextUrl = await completeFlowOrGetUrl(
+  const callbackResponse = await completeFlowOrGetUrl(
     {
       loginName: session.factors.user.loginName,
       organization: session.factors?.user?.organizationId,
@@ -301,8 +301,13 @@ export async function sendPassword(command: UpdateSessionCommand) {
     loginSettings?.defaultRedirectUri,
   );
 
-  if (nextUrl) {
-    return { redirect: nextUrl };
+  if (callbackResponse && typeof callbackResponse === "object" && "error" in callbackResponse && callbackResponse.error) {
+    return { error: callbackResponse.error };
+  }
+
+  // For regular flows (non-OIDC/SAML), return URL for client-side navigation
+  if (callbackResponse && typeof callbackResponse === "string") {
+    return { redirect: callbackResponse };
   }
 }
 

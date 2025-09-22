@@ -13,7 +13,7 @@ import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_p
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
-import { completeFlowOrGetUrl, getNextUrl } from "../client";
+import { completeFlowOrGetUrl } from "../client";
 import {
   getMostRecentSessionCookie,
   getSessionCookieById,
@@ -34,7 +34,7 @@ export async function skipMFAAndContinueWithNextUrl({
   sessionId?: string;
   requestId?: string;
   organization?: string;
-}): Promise<string | null> {
+}): Promise<{ redirect: string } | { error: string }> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -46,7 +46,7 @@ export async function skipMFAAndContinueWithNextUrl({
   await humanMFAInitSkipped({ serviceUrl, userId });
 
   if (requestId && sessionId) {
-    const result = await completeFlowOrGetUrl(
+    const callbackResponse = await completeFlowOrGetUrl(
       {
         sessionId: sessionId,
         requestId: requestId,
@@ -54,19 +54,35 @@ export async function skipMFAAndContinueWithNextUrl({
       },
       loginSettings?.defaultRedirectUri,
     );
-    return result || null;
+
+    if (callbackResponse && typeof callbackResponse === "object" && "error" in callbackResponse && callbackResponse.error) {
+      return { error: callbackResponse.error };
+    }
+
+    // For regular flows (non-OIDC/SAML), return URL for client-side navigation
+    if (callbackResponse && typeof callbackResponse === "string") {
+      return { redirect: callbackResponse };
+    }
   } else if (loginName) {
-    // For regular flows, always return URL for client-side navigation
-    return await getNextUrl(
+    const callbackResponse = await completeFlowOrGetUrl(
       {
         loginName: loginName,
         organization: organization,
       },
       loginSettings?.defaultRedirectUri,
     );
+
+    if (callbackResponse && typeof callbackResponse === "object" && "error" in callbackResponse && callbackResponse.error) {
+      return { error: callbackResponse.error };
+    }
+
+    // For regular flows (non-OIDC/SAML), return URL for client-side navigation
+    if (callbackResponse && typeof callbackResponse === "string") {
+      return { redirect: callbackResponse };
+    }
   }
-  
-  return null;
+
+  return { error: "Could not skip MFA and continue" };
 }
 
 export async function continueWithSession({ requestId, ...session }: Session & { requestId?: string }) {
@@ -89,17 +105,21 @@ export async function continueWithSession({ requestId, ...session }: Session & {
     );
     return; // OIDC/SAML flow completed via server action
   } else if (session.factors?.user) {
-    const nextUrl = await completeFlowOrGetUrl(
+    const callbackResponse = await completeFlowOrGetUrl(
       {
         loginName: session.factors.user.loginName,
         organization: session.factors.user.organizationId,
       },
       loginSettings?.defaultRedirectUri,
     );
-    
-    // For regular flows, return URL for client-side navigation
-    if (nextUrl) {
-      return { redirect: nextUrl };
+
+    if (callbackResponse && typeof callbackResponse === "object" && "error" in callbackResponse && callbackResponse.error) {
+      return { error: callbackResponse.error };
+    }
+
+    // For regular flows (non-OIDC/SAML), return URL for client-side navigation
+    if (callbackResponse && typeof callbackResponse === "string") {
+      return { redirect: callbackResponse };
     }
   }
 }
