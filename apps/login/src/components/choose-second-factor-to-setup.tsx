@@ -95,8 +95,8 @@ export function ChooseSecondFactorToSetup({
             }
 
             // For regular flows (non-OIDC/SAML), return URL for client-side navigation
-            if (skipResponse && typeof skipResponse === "string") {
-              router.push(skipResponse);
+            if ("redirect" in skipResponse && skipResponse.redirect) {
+              router.push(skipResponse.redirect);
             }
           }}
           type="button"
