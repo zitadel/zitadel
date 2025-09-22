@@ -88,7 +88,7 @@ export async function loginWithSAMLAndSession({
   sessionId,
   sessions,
   sessionCookies,
-}: LoginWithSAMLAndSession) {
+}: LoginWithSAMLAndSession): Promise<{ error: string } | { redirect: string }> {
   console.log(`Login with session: ${sessionId} and samlRequest: ${samlRequest}`);
 
   const selectedSession = sessions.find((s) => s.id === sessionId);
@@ -174,4 +174,7 @@ export async function loginWithSAMLAndSession({
       }
     }
   }
+
+  // If no session found or no valid cookie, return error
+  return { error: "Session not found or invalid" };
 }

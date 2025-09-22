@@ -19,7 +19,7 @@ export async function loginWithOIDCAndSession({
   sessionId,
   sessions,
   sessionCookies,
-}: LoginWithOIDCAndSession) {
+}: LoginWithOIDCAndSession): Promise<{ error: string } | { redirect: string }> {
   console.log(`Login with session: ${sessionId} and authRequest: ${authRequest}`);
 
   const selectedSession = sessions.find((s) => s.id === sessionId);
@@ -106,4 +106,7 @@ export async function loginWithOIDCAndSession({
       }
     }
   }
+
+  // If no session found or no valid cookie, return error
+  return { error: "Session not found or invalid" };
 }
