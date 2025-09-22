@@ -101,7 +101,6 @@ func LoginPolicyAddedEventMapper(event eventstore.Event) (eventstore.Event, erro
 }
 
 type LoginPolicyChangedEvent struct {
-
 	eventstore.BaseEvent `json:"-"`
 
 	AllowUserNamePassword      *bool                    `json:"allowUsernamePassword,omitempty"`
