@@ -32,14 +32,16 @@ var (
 		table: groupsTable,
 	}
 	GroupColumnResourceOwner = Column{
-		name: projection.GroupColumnResourceOwner,
+		name:  projection.GroupColumnResourceOwner,
+		table: groupsTable,
 	}
 	GroupColumnCreationDate = Column{
 		name:  projection.GroupColumnCreationDate,
 		table: groupsTable,
 	}
 	GroupColumnChangeDate = Column{
-		name: projection.GroupColumnChangeDate,
+		name:  projection.GroupColumnChangeDate,
+		table: groupsTable,
 	}
 	GroupColumnInstanceID = Column{
 		name:  projection.GroupColumnInstanceID,
@@ -50,7 +52,8 @@ var (
 		table: groupsTable,
 	}
 	GroupColumnState = Column{
-		name: projection.GroupColumnState,
+		name:  projection.GroupColumnState,
+		table: groupsTable,
 	}
 )
 
@@ -88,6 +91,22 @@ func (q *Queries) SearchGroups(ctx context.Context, queries *GroupSearchQuery) (
 	return groups, nil
 }
 
+func NewGroupNameSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
+	return NewTextQuery(GroupColumnName, value, comparison)
+}
+
+func NewGroupIDsSearchQuery(ids []string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
+		list[i] = value
+	}
+	return NewListQuery(GroupColumnID, list, ListIn)
+}
+
+func NewGroupOrganizationIdSearchQuery(id string) (SearchQuery, error) {
+	return NewTextQuery(GroupColumnResourceOwner, id, TextEquals)
+}
+
 func (q *Queries) searchGroups(ctx context.Context, queries *GroupSearchQuery) (groups *Groups, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -120,7 +139,9 @@ func prepareGroupsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Groups, error)) {
 			GroupColumnInstanceID.identifier(),
 			GroupColumnSequence.identifier(),
 			GroupColumnState.identifier(),
-		).From(groupsTable.identifier()).PlaceholderFormat(sq.Dollar),
+			countColumn.identifier()).
+			From(groupsTable.identifier()).
+			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Groups, error) {
 			groups := make([]*Group, 0)
 			var count uint64
@@ -136,6 +157,7 @@ func prepareGroupsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Groups, error)) {
 					&group.InstanceID,
 					&group.Sequence,
 					&group.State,
+					&count,
 				)
 				if err != nil {
 					return nil, err
@@ -153,20 +175,4 @@ func prepareGroupsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Groups, error)) {
 				},
 			}, nil
 		}
-}
-
-func NewGroupNameSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(GroupColumnName, value, comparison)
-}
-
-func NewGroupIDsSearchQuery(ids []string) (SearchQuery, error) {
-	list := make([]interface{}, len(ids))
-	for i, value := range ids {
-		list[i] = value
-	}
-	return NewListQuery(GroupColumnID, list, ListIn)
-}
-
-func NewGroupOrganizationIdSearchQuery(id string) (SearchQuery, error) {
-	return NewTextQuery(GroupColumnResourceOwner, id, TextEquals)
 }

@@ -6,7 +6,7 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
+	"github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
@@ -15,12 +15,16 @@ import (
 // ListGroups returns a list of groups that match the search criteria
 func (s *Server) ListGroups(ctx context.Context, req *connect.Request[group_v2.ListGroupsRequest]) (*connect.Response[group_v2.ListGroupsResponse], error) {
 	queries, err := s.listGroupsRequestToModel(req.Msg)
+	if err != nil {
+		return nil, err
+	}
 	resp, err := s.query.SearchGroups(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return connect.NewResponse(&group_v2.ListGroupsResponse{
-		Groups: groupsToPb(resp.Groups),
+		Groups:     groupsToPb(resp.Groups),
+		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, resp.SearchResponse),
 	}), nil
 }
 
