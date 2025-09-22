@@ -46,7 +46,7 @@ export async function completeAuthFlow(command: AuthFlowParams): Promise<{ error
   if (requestId.startsWith("oidc_")) {
     // Complete OIDC flow
     return (
- loginWithOIDCAndSession({
+      (await loginWithOIDCAndSession({
         serviceUrl,
         authRequest: requestId.replace("oidc_", ""),
         sessionId,
