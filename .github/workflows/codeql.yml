@@ -39,7 +39,7 @@ jobs:
       uses: pnpm/action-setup@v4
     - if: matrix.language == 'go'    
       run: |
-        pnpm fetch nx sass
+        pnpm fetch --dev
         pnpm add --offline --global sass nx
         nx run-many --projects @zitadel/api --targets generate-stubs generate-statik generate-assets
     # Initializes the CodeQL tools for scanning.
