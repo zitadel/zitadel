@@ -51,7 +51,7 @@ export async function completeFlowOrGetUrl(
     (command.requestId.startsWith("saml_") || command.requestId.startsWith("oidc_"))
   ) {
     // This completes the flow and returns a redirect URL or error
-    return await completeAuthFlow({
+    return completeAuthFlow({
       sessionId: command.sessionId,
       requestId: command.requestId,
     });
