@@ -13,7 +13,7 @@ import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_p
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
-import { getNextUrl } from "../client";
+import { completeFlowOrGetUrl } from "../client";
 import {
   getMostRecentSessionCookie,
   getSessionCookieById,
@@ -34,7 +34,7 @@ export async function skipMFAAndContinueWithNextUrl({
   sessionId?: string;
   requestId?: string;
   organization?: string;
-}) {
+}): Promise<{ redirect: string } | { error: string }> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -45,28 +45,26 @@ export async function skipMFAAndContinueWithNextUrl({
 
   await humanMFAInitSkipped({ serviceUrl, userId });
 
-  const url =
-    requestId && sessionId
-      ? await getNextUrl(
-          {
-            sessionId: sessionId,
-            requestId: requestId,
-            organization: organization,
-          },
-          loginSettings?.defaultRedirectUri,
-        )
-      : loginName
-        ? await getNextUrl(
-            {
-              loginName: loginName,
-              organization: organization,
-            },
-            loginSettings?.defaultRedirectUri,
-          )
-        : null;
-  if (url) {
-    return { redirect: url };
+  if (requestId && sessionId) {
+    return completeFlowOrGetUrl(
+      {
+        sessionId: sessionId,
+        requestId: requestId,
+        organization: organization,
+      },
+      loginSettings?.defaultRedirectUri,
+    );
+  } else if (loginName) {
+    return completeFlowOrGetUrl(
+      {
+        loginName: loginName,
+        organization: organization,
+      },
+      loginSettings?.defaultRedirectUri,
+    );
   }
+
+  return { error: "Could not skip MFA and continue" };
 }
 
 export async function continueWithSession({ requestId, ...session }: Session & { requestId?: string }) {
@@ -78,27 +76,23 @@ export async function continueWithSession({ requestId, ...session }: Session & {
     organization: session.factors?.user?.organizationId,
   });
 
-  const url =
-    requestId && session.id && session.factors?.user
-      ? await getNextUrl(
-          {
-            sessionId: session.id,
-            requestId: requestId,
-            organization: session.factors.user.organizationId,
-          },
-          loginSettings?.defaultRedirectUri,
-        )
-      : session.factors?.user
-        ? await getNextUrl(
-            {
-              loginName: session.factors.user.loginName,
-              organization: session.factors.user.organizationId,
-            },
-            loginSettings?.defaultRedirectUri,
-          )
-        : null;
-  if (url) {
-    return { redirect: url };
+  if (requestId && session.id && session.factors?.user) {
+    return completeFlowOrGetUrl(
+      {
+        sessionId: session.id,
+        requestId: requestId,
+        organization: session.factors.user.organizationId,
+      },
+      loginSettings?.defaultRedirectUri,
+    );
+  } else if (session.factors?.user) {
+    return completeFlowOrGetUrl(
+      {
+        loginName: session.factors.user.loginName,
+        organization: session.factors.user.organizationId,
+      },
+      loginSettings?.defaultRedirectUri,
+    );
   }
 }
 
