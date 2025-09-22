@@ -1,7 +1,7 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { DOCUMENT, ViewportScroller } from '@angular/common';
-import { Component, DestroyRef, effect, HostBinding, HostListener, Inject, OnDestroy, ViewChild } from '@angular/core';
+import { ViewportScroller } from '@angular/common';
+import { Component, DestroyRef, effect, HostBinding, HostListener, Inject, OnDestroy, ViewChild, DOCUMENT } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -30,6 +30,7 @@ import { NewAuthService } from './services/new-auth.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   animations: [toolbarAnimation, ...navAnimations, accountCard, routeAnimations, adminLineAnimation],
+  standalone: false,
 })
 export class AppComponent {
   @ViewChild('drawer') public drawer!: MatDrawer;

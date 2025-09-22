@@ -54,6 +54,7 @@ const MAX_ALLOWED_SIZE = 0.5 * 1024 * 1024;
   selector: 'cnsl-private-labeling-policy',
   templateUrl: './private-labeling-policy.component.html',
   styleUrls: ['./private-labeling-policy.component.scss'],
+  standalone: false,
 })
 export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   public theme: Theme = Theme.LIGHT;

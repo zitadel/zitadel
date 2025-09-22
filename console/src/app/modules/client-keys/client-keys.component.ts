@@ -19,6 +19,7 @@ import { PageEvent, PaginatorComponent } from '../paginator/paginator.component'
   selector: 'cnsl-client-keys',
   templateUrl: './client-keys.component.html',
   styleUrls: ['./client-keys.component.scss'],
+  standalone: false,
 })
 export class ClientKeysComponent implements OnInit {
   @Input() projectId!: string;

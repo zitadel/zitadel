@@ -25,6 +25,7 @@ const rotate = animation([
   templateUrl: './refresh-table.component.html',
   styleUrls: ['./refresh-table.component.scss'],
   animations: [trigger('rotate', [transition('* => *', [useAnimation(rotate, { params: { time: '1s' } })])])],
+  standalone: false,
 })
 export class RefreshTableComponent implements OnInit {
   @Input() public selection: SelectionModel<any> = new SelectionModel<any>(true, []);

@@ -24,6 +24,7 @@ export interface WebAuthNOptions {
   selector: 'cnsl-auth-user-mfa',
   templateUrl: './auth-user-mfa.component.html',
   styleUrls: ['./auth-user-mfa.component.scss'],
+  standalone: false,
 })
 export class AuthUserMfaComponent implements OnInit, OnDestroy {
   public displayedColumns: string[] = ['name', 'type', 'state', 'actions'];

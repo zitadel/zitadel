@@ -16,7 +16,7 @@ import {
   Self,
 } from '@angular/core';
 import { FormGroupDirective, NgControl, NgForm } from '@angular/forms';
-import { CanUpdateErrorState, ErrorStateMatcher, mixinErrorState } from '@angular/material/core';
+import { _ErrorStateTracker, ErrorStateMatcher } from '@angular/material/core';
 import { MatFormField, MatFormFieldControl, MAT_FORM_FIELD } from '@angular/material/form-field';
 import { getMatInputUnsupportedTypeError, MAT_INPUT_VALUE_ACCESSOR } from '@angular/material/input';
 import { Subject } from 'rxjs';
@@ -25,24 +25,6 @@ import { Subject } from 'rxjs';
 const MAT_INPUT_INVALID_TYPES = ['button', 'checkbox', 'file', 'hidden', 'image', 'radio', 'range', 'reset', 'submit'];
 
 let nextUniqueId = 0;
-
-const _MatInputBase = mixinErrorState(
-  class {
-    readonly stateChanges = new Subject<void>();
-
-    constructor(
-      public _defaultErrorStateMatcher: ErrorStateMatcher,
-      public _parentForm: NgForm,
-      public _parentFormGroup: FormGroupDirective,
-      /**
-       * Form control bound to the component.
-       * Implemented as part of `MatFormFieldControl`.
-       * @docs-private
-       */
-      public ngControl: NgControl,
-    ) {}
-  },
-);
 
 /** Directive that allows a native input to work inside a `MatFormField`. */
 @Directive({
@@ -68,11 +50,9 @@ const _MatInputBase = mixinErrorState(
     '[attr.aria-required]': 'required.toString()',
   },
   providers: [{ provide: MatFormFieldControl, useExisting: InputDirective }],
+  standalone: false,
 })
-export class InputDirective
-  extends _MatInputBase
-  implements MatFormFieldControl<any>, OnChanges, CanUpdateErrorState, OnDestroy, AfterViewInit, DoCheck, CanUpdateErrorState
-{
+export class InputDirective implements MatFormFieldControl<any>, OnChanges, OnDestroy, AfterViewInit, DoCheck {
   protected _uid: string = `cnsl-input-${nextUniqueId++}`;
   protected _previousNativeValue: any;
   private _inputValueAccessor: { value: any };
@@ -97,7 +77,14 @@ export class InputDirective
    * Implemented as part of MatFormFieldControl.
    * @docs-private
    */
-  override readonly stateChanges: Subject<void> = new Subject<void>();
+  readonly stateChanges: Subject<void> = new Subject<void>();
+
+  get errorState() {
+    return this._errorStateTracker.errorState;
+  }
+  set errorState(value: boolean) {
+    this._errorStateTracker.errorState = value;
+  }
 
   /**
    * Implemented as part of MatFormFieldControl.
@@ -184,9 +171,6 @@ export class InputDirective
   }
   protected _type: string = 'text';
 
-  /** An object used to control when error messages are shown. */
-  @Input() override errorStateMatcher!: ErrorStateMatcher;
-
   /**
    * Implemented as part of MatFormFieldControl.
    * @docs-private
@@ -223,23 +207,39 @@ export class InputDirective
     getSupportedInputTypes().has(t),
   );
 
+  @Input()
+  get errorStateMatcher() {
+    return this._errorStateTracker.matcher;
+  }
+  set errorStateMatcher(value: ErrorStateMatcher) {
+    this._errorStateTracker.matcher = value;
+  }
+
+  private _errorStateTracker: _ErrorStateTracker;
+
   constructor(
     protected _elementRef: ElementRef<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
     protected _platform: Platform,
     /** @docs-private */
-    @Optional() @Self() public override ngControl: NgControl,
-    @Optional() _parentForm: NgForm,
-    @Optional() _parentFormGroup: FormGroupDirective,
-    _defaultErrorStateMatcher: ErrorStateMatcher,
+    @Optional() @Self() public ngControl: NgControl,
+    @Optional() parentForm: NgForm,
+    @Optional() parentFormGroup: FormGroupDirective,
+    defaultErrorStateMatcher: ErrorStateMatcher,
     @Optional() @Self() @Inject(MAT_INPUT_VALUE_ACCESSOR) inputValueAccessor: any,
     private _autofillMonitor: AutofillMonitor,
     ngZone: NgZone,
     @Optional() @Inject(MAT_FORM_FIELD) private _formField?: MatFormField,
   ) {
-    super(_defaultErrorStateMatcher, _parentForm, _parentFormGroup, ngControl);
-
     const element = this._elementRef.nativeElement;
     const nodeName = element.nodeName.toLowerCase();
+
+    this._errorStateTracker = new _ErrorStateTracker(
+      defaultErrorStateMatcher,
+      ngControl,
+      parentFormGroup,
+      parentForm,
+      this.stateChanges,
+    );
 
     // If no input value accessor was explicitly specified, use the element as the input value
     // accessor.
@@ -315,6 +315,10 @@ export class InputDirective
     // We need to dirty-check and set the placeholder attribute ourselves, because whether it's
     // present or not depends on a query which is prone to "changed after checked" errors.
     this._dirtyCheckPlaceholder();
+  }
+
+  updateErrorState() {
+    this._errorStateTracker.updateErrorState();
   }
 
   /** Focuses the input. */

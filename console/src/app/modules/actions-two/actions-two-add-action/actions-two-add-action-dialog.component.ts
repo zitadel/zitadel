@@ -53,7 +53,6 @@ export type ActionTwoAddActionDialogResult = MessageInitShape<typeof SetExecutio
   selector: 'cnsl-actions-two-add-action-dialog',
   templateUrl: './actions-two-add-action-dialog.component.html',
   styleUrls: ['./actions-two-add-action-dialog.component.scss'],
-  standalone: true,
   imports: [
     CommonModule,
     MatButtonModule,

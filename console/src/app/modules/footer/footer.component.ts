@@ -7,6 +7,7 @@ import { faXTwitter } from '@fortawesome/free-brands-svg-icons';
   selector: 'cnsl-footer',
   templateUrl: './footer.component.html',
   styleUrls: ['./footer.component.scss'],
+  standalone: false,
 })
 export class FooterComponent {
   public faXTwitter = faXTwitter;

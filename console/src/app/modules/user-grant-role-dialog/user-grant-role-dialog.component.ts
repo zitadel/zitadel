@@ -5,6 +5,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
   selector: 'cnsl-user-grant-role-dialog',
   templateUrl: './user-grant-role-dialog.component.html',
   styleUrls: ['./user-grant-role-dialog.component.scss'],
+  standalone: false,
 })
 export class UserGrantRoleDialogComponent {
   public projectId: string = '';

@@ -10,6 +10,7 @@ import { InfoSectionType } from '../../info-section/info-section.component';
   selector: 'cnsl-security-policy',
   templateUrl: './security-policy.component.html',
   styleUrls: ['./security-policy.component.scss'],
+  standalone: false,
 })
 export class SecurityPolicyComponent implements OnInit {
   public originsList: string[] = [];

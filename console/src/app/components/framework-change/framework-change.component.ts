@@ -10,7 +10,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { FrameworkChangeDialogComponent } from './framework-change-dialog.component';
 
 @Component({
-  standalone: true,
   selector: 'cnsl-framework-change',
   templateUrl: './framework-change.component.html',
   styleUrls: ['./framework-change.component.scss'],

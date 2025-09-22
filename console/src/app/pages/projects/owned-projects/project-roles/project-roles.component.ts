@@ -7,6 +7,7 @@ const ROUTEPARAM = 'projectid';
   selector: 'cnsl-project-roles',
   templateUrl: './project-roles.component.html',
   styleUrls: ['./project-roles.component.scss'],
+  standalone: false,
 })
 export class ProjectRolesComponent {
   @Input() public projectId: string = '';

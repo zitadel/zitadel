@@ -37,6 +37,7 @@ const minValueValidator = (minValue: number) => (control: AbstractControl) => {
   selector: 'cnsl-login-policy',
   templateUrl: './login-policy.component.html',
   styleUrls: ['./login-policy.component.scss'],
+  standalone: false,
 })
 export class LoginPolicyComponent implements OnInit, OnDestroy {
   public LoginMethodComponentType: any = LoginMethodComponentType;

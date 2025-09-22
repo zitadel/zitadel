@@ -15,6 +15,7 @@ type StringMetadata = {
   selector: 'cnsl-metadata',
   templateUrl: './metadata.component.html',
   styleUrls: ['./metadata.component.scss'],
+  standalone: false,
 })
 export class MetadataComponent implements OnInit {
   @Input({ required: true }) public set metadata(metadata: (Metadata.AsObject | MetadataV2)[]) {

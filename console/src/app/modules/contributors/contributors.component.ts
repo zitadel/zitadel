@@ -25,6 +25,7 @@ import { Type } from 'src/app/proto/generated/zitadel/user_pb';
       ]),
     ]),
   ],
+  standalone: false,
 })
 export class ContributorsComponent {
   @Input() title: string = '';

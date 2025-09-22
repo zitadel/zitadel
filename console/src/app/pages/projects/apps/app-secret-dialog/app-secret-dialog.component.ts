@@ -5,6 +5,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
   selector: 'cnsl-app-secret-dialog',
   templateUrl: './app-secret-dialog.component.html',
   styleUrls: ['./app-secret-dialog.component.scss'],
+  standalone: false,
 })
 export class AppSecretDialogComponent {
   public copied: string = '';

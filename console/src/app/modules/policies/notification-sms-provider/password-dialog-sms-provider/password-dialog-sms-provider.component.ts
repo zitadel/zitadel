@@ -5,6 +5,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
   selector: 'cnsl-password-dialog-sms-provider',
   templateUrl: './password-dialog-sms-provider.component.html',
   styleUrls: ['./password-dialog-sms-provider.component.scss'],
+  standalone: false,
 })
 export class PasswordDialogSMSProviderComponent {
   public password: string = '';

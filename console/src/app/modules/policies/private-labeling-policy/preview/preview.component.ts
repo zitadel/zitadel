@@ -11,6 +11,7 @@ declare const tinycolor: any;
   selector: 'cnsl-preview',
   templateUrl: './preview.component.html',
   styleUrls: ['./preview.component.scss'],
+  standalone: false,
 })
 export class PreviewComponent implements OnInit, OnDestroy {
   @Input() policy!: LabelPolicy.AsObject;

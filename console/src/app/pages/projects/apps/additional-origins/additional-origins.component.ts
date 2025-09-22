@@ -6,6 +6,7 @@ import { Observable, Subscription } from 'rxjs';
   selector: 'cnsl-additional-origins',
   templateUrl: './additional-origins.component.html',
   styleUrls: ['./additional-origins.component.scss'],
+  standalone: false,
 })
 export class AdditionalOriginsComponent implements OnInit, OnDestroy {
   @Input() title: string = '';

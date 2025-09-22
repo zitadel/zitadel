@@ -1,17 +1,22 @@
 @use '@angular/material' as mat;
+@use '@angular/material/core/m2/palette' as m2;
+// https://github.com/lipis/flag-icons/issues/1395
+@forward '../node_modules/flag-icons/sass/variables' with (
+  $flag-icons-use-square: false
+);
+@use '../node_modules/flag-icons/sass/flag-icons-base';
+@use '../node_modules/flag-icons/sass/flag-icons-list';
 
 @import 'codemirror/lib/codemirror.css';
 @import './component-themes';
 @import './styles/lato-font.scss';
 @import './styles/ailerons.scss';
-@import '@angular/material/theming';
-@import '/node_modules/flag-icons/css/flag-icons.min.css';
 @import './styles/palette-helper.scss';
 @import './styles/palette.scss';
 
-$material-design-icons-font-directory-path: '~material-design-icons-iconfont/dist/fonts/';
+$material-design-icons-font-directory-path: 'material-design-icons-iconfont/dist/fonts/';
 
-@import 'material-design-icons-iconfont/src/material-design-icons.scss';
+@import 'material-design-icons-iconfont/src/material-design-icons';
 
 :root {
   --mat-table-row-item-label-text-size: 14px;
@@ -170,13 +175,13 @@ $cnsl-dark-theme-background: (
   dialog: map_get($cnsl-dark-background, 500),
   disabled-button: rgba(black, 0.12),
   raised-button: white,
-  focused-button: $dark-focused,
+  focused-button: m2.$dark-focused,
   selected-button: map_get($cnsl-dark-background, 300),
   selected-disabled-button: map_get($cnsl-dark-background, 400),
   disabled-button-toggle: map_get($cnsl-dark-background, 200),
   unselected-chip: map_get($cnsl-dark-background, 300),
   disabled-list-option: map_get($cnsl-dark-background, 200),
-  tooltip: map_get($mat-gray, 700),
+  tooltip: map_get(mat.$m2-gray-palette, 700),
   infosection: map_get($cnsl-dark-background, 300),
   warninfosection: #741f2c4a,
   alertinfosection: #92400e50,
@@ -207,13 +212,13 @@ $cnsl-light-theme-background: (
   dialog: map_get($cnsl-light-background, 500),
   disabled-button: rgba(black, 0.12),
   raised-button: white,
-  focused-button: $light-focused,
+  focused-button: m2.$light-focused,
   selected-button: map_get($cnsl-light-background, 300),
   selected-disabled-button: map_get($cnsl-light-background, 400),
   disabled-button-toggle: map_get($cnsl-light-background, 200),
   unselected-chip: map_get($cnsl-light-background, 300),
   disabled-list-option: map_get($cnsl-light-background, 200),
-  tooltip: map_get($mat-gray, 700),
+  tooltip: map_get(mat.$m2-gray-palette, 700),
   infosection: map_get($cnsl-light-background, 600),
   warninfosection: #ffc1c1,
   alertinfosection: rgb(251, 191, 36),
@@ -228,13 +233,13 @@ $cnsl-light-theme-background: (
 
 $cnsl-dark-theme-foreground: (
   base: white,
-  divider: $light-dividers,
-  dividers: $light-dividers,
-  disabled: $light-disabled-text,
+  divider: m2.$light-dividers,
+  dividers: m2.$light-dividers,
+  disabled: m2.$light-disabled-text,
   disabled-button: rgba(white, 0.26),
-  disabled-text: $light-disabled-text,
+  disabled-text: m2.$light-disabled-text,
   elevation: black,
-  hint-text: $light-disabled-text,
+  hint-text: m2.$light-disabled-text,
   secondary-text: $cnsl-dark-theme-secondary-text,
   placeholder-text: rgba(white, 0.4),
   icon: rgba(white, 0.54),
@@ -253,13 +258,13 @@ $cnsl-dark-theme-foreground: (
 
 $cnsl-light-theme-foreground: (
   base: black,
-  divider: $dark-dividers,
-  dividers: $dark-dividers,
-  disabled: $dark-disabled-text,
+  divider: m2.$dark-dividers,
+  dividers: m2.$dark-dividers,
+  disabled: m2.$dark-disabled-text,
   disabled-button: rgba(black, 0.26),
-  disabled-text: $dark-disabled-text,
+  disabled-text: m2.$dark-disabled-text,
   elevation: black,
-  hint-text: $dark-disabled-text,
+  hint-text: m2.$dark-disabled-text,
   secondary-text: $cnsl-light-theme-secondary-text,
   placeholder-text: rgba(black, 0.3),
   icon: rgba(black, 0.54),
@@ -276,7 +281,7 @@ $cnsl-light-theme-foreground: (
   slash: #0000006e,
 );
 
-$custom-level: mat.define-typography-level(
+$custom-level: mat.m2-define-typography-level(
   $font-family: Lato,
   $font-weight: 500,
   $font-size: 14px,
@@ -284,45 +289,45 @@ $custom-level: mat.define-typography-level(
   $letter-spacing: normal,
 );
 
-$custom-body-level: mat.define-typography-level(
+$custom-body-level: mat.m2-define-typography-level(
   $font-family: Lato,
   $font-weight: 500,
   $font-size: 16px,
   $letter-spacing: normal,
 );
 
-$custom-caption-level: mat.define-typography-level(
+$custom-caption-level: mat.m2-define-typography-level(
   $font-family: Lato,
   $font-weight: 500,
   $font-size: 12px,
   $letter-spacing: normal,
 );
 
-$custom-typography: mat.define-typography-config(
+$custom-typography: mat.m2-define-typography-config(
   $font-family: Lato,
   $button: $custom-level,
   $body-1: $custom-body-level,
   $caption: $custom-caption-level,
 );
 
-$caos-light-app-theme: mat.define-light-theme(
+$caos-light-app-theme: mat.m2-define-light-theme(
   (
     color: (
-      primary: mat-palette($caos-light-primary),
-      accent: mat-palette($caos-light-primary),
-      warn: mat-palette($caos-light-warn),
+      primary: $caos-light-primary,
+      accent: $caos-light-primary,
+      warn: $caos-light-warn,
     ),
     typography: $custom-typography,
     density: 0,
   )
 );
 
-$caos-dark-app-theme: mat.define-dark-theme(
+$caos-dark-app-theme: mat.m2-define-dark-theme(
   (
     color: (
-      primary: mat-palette($caos-dark-primary),
-      accent: mat-palette($caos-dark-primary),
-      warn: mat-palette($caos-dark-warn),
+      primary: $caos-dark-primary,
+      accent: $caos-dark-primary,
+      warn: $caos-dark-warn,
     ),
     typography: $custom-typography,
     density: 0,
@@ -385,13 +390,14 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
 
 @include component-themes($caos-dark-app-theme);
 @include mat.all-component-themes($caos-dark-app-theme);
+//@include mat.color-variants-backwards-compatibility($caos-dark-app-theme);
 
 .progress {
-  --mdc-linear-progress-active-indicator-color: var(--success);
-  --mdc-linear-progress-track-height: 8px !important;
-  --mdc-linear-progress-track-color: #00000010;
+  --mat-progress-bar-active-indicator-color: var(--success);
+  --mat-progress-bar-track-height: 8px !important;
+  --mat-progress-bar-track-color: #00000010;
   --mat-select-enabled-trigger-text-color: #000;
-  --mdc-linear-progress-active-indicator-height: 8px !important;
+  --mat-progress-bar-active-indicator-height: 8px !important;
 }
 
 .light-theme {
@@ -411,8 +417,8 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
   --mat-menu-item-label-text-size: 14px;
 
   .progress {
-    --mdc-linear-progress-track-color: #00000010;
-    --mdc-linear-progress-active-indicator-color: var(--success);
+    --mat-progress-bar-track-color: #00000010;
+    --mat-progress-bar-active-indicator-color: var(--success);
   }
 
   .mat-mdc-menu-panel {
@@ -435,12 +441,12 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
   }
 
   .mat-button-toggle {
-    background-color: mat.get-color-from-palette($background, cards);
+    background-color: mat.m2-get-color-from-palette($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     transition: border-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
 
     &.mat-button-toggle-checked {
-      background-color: mat.get-color-from-palette($background, background);
+      background-color: mat.m2-get-color-from-palette($background, background);
     }
   }
 
@@ -493,12 +499,12 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
   --mat-menu-item-label-text-size: 14px;
 
   .progress {
-    --mdc-linear-progress-track-color: #ffffff20;
-    --mdc-linear-progress-active-indicator-color: var(--success);
+    --mat-progress-bar-track-color: #ffffff20;
+    --mat-progress-bar-active-indicator-color: var(--success);
   }
 
   .main-container {
-    background-color: mat.get-color-from-palette($background, background);
+    background-color: mat.m2-get-color-from-palette($background, background);
     color: map-get($foreground, text);
   }
 
@@ -522,19 +528,19 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
   }
 
   .mat-button-toggle {
-    background-color: mat.get-color-from-palette($background, cards);
+    background-color: mat.m2-get-color-from-palette($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     transition: border-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
 
     &.mat-button-toggle-checked {
-      background-color: mat.get-color-from-palette($background, background);
+      background-color: mat.m2-get-color-from-palette($background, background);
     }
   }
 
   .main-container,
   .mat-mdc-dialog-container,
   .mat-calendar {
-    background-color: mat.get-color-from-palette($background, background);
+    background-color: mat.m2-get-color-from-palette($background, background);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
 

@@ -11,6 +11,7 @@ import { CorrectlyTypedExecution } from '../../actions-two-add-action/actions-tw
   templateUrl: './actions-two-actions-table.component.html',
   styleUrls: ['./actions-two-actions-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ActionsTwoActionsTableComponent {
   @Output()

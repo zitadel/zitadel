@@ -12,6 +12,7 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
   selector: 'cnsl-iam-views',
   templateUrl: './iam-views.component.html',
   styleUrls: ['./iam-views.component.scss'],
+  standalone: false,
 })
 export class IamViewsComponent implements AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;

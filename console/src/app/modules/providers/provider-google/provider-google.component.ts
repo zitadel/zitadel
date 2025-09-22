@@ -29,6 +29,7 @@ import { ProviderNextService } from '../provider-next/provider-next.service';
 @Component({
   selector: 'cnsl-provider-google',
   templateUrl: './provider-google.component.html',
+  standalone: false,
 })
 export class ProviderGoogleComponent {
   public showOptional: boolean = false;

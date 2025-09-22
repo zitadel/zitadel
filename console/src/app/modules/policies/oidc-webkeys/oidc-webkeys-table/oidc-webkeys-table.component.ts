@@ -9,6 +9,7 @@ import { State, WebKey } from '@zitadel/proto/zitadel/webkey/v2beta/key_pb';
   templateUrl: './oidc-webkeys-table.component.html',
   styleUrls: ['./oidc-webkeys-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class OidcWebKeysTableComponent {
   @Output()

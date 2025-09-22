@@ -14,6 +14,7 @@ import { DialogAddSMSProviderComponent } from './dialog-add-sms-provider/dialog-
   selector: 'cnsl-notification-sms-provider',
   templateUrl: './notification-sms-provider.component.html',
   styleUrls: ['./notification-sms-provider.component.scss'],
+  standalone: false,
 })
 export class NotificationSMSProviderComponent implements OnInit {
   @Input() public serviceType!: PolicyComponentServiceType;

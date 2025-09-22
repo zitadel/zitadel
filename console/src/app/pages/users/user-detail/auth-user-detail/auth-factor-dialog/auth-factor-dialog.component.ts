@@ -32,6 +32,7 @@ export type AddAuthFactorDialogData = {
   selector: 'cnsl-auth-factor-dialog',
   templateUrl: './auth-factor-dialog.component.html',
   styleUrls: ['./auth-factor-dialog.component.scss'],
+  standalone: false,
 })
 export class AuthFactorDialogComponent {
   public otpurl: string = '';

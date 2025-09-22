@@ -5,6 +5,7 @@ import { GrantedProject, ProjectGrantState, Role } from 'src/app/proto/generated
   selector: 'cnsl-project-grant-illustration',
   templateUrl: './project-grant-illustration.component.html',
   styleUrls: ['./project-grant-illustration.component.scss'],
+  standalone: false,
 })
 export class ProjectGrantIllustrationComponent {
   @Input() public grantedProject!: GrantedProject.AsObject;

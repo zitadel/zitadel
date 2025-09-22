@@ -16,7 +16,6 @@ import { ConditionType } from '../actions-two-add-action-condition/actions-two-a
 // }
 
 @Component({
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'cnsl-actions-two-add-action-type',
   templateUrl: './actions-two-add-action-type.component.html',

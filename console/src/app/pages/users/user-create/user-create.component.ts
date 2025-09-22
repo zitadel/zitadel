@@ -40,6 +40,7 @@ import { PasswordComplexityValidatorFactoryService } from 'src/app/services/pass
   selector: 'cnsl-user-create',
   templateUrl: './user-create.component.html',
   styleUrls: ['./user-create.component.scss'],
+  standalone: false,
 })
 export class UserCreateComponent implements OnInit {
   protected readonly genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];

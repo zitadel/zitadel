@@ -5,6 +5,7 @@ import { OIDCAppType } from 'src/app/proto/generated/zitadel/app_pb';
   selector: 'cnsl-app-card',
   templateUrl: './app-card.component.html',
   styleUrls: ['./app-card.component.scss'],
+  standalone: false,
 })
 export class AppCardComponent {
   @Input() public outline: boolean = false;

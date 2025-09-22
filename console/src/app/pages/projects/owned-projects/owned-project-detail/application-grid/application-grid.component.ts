@@ -8,6 +8,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
   selector: 'cnsl-application-grid',
   templateUrl: './application-grid.component.html',
   styleUrls: ['./application-grid.component.scss'],
+  standalone: false,
 })
 export class ApplicationGridComponent implements OnInit {
   @Input() public projectId: string = '';

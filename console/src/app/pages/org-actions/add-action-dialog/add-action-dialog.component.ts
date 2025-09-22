@@ -14,6 +14,7 @@ import { ToastService } from 'src/app/services/toast.service';
   selector: 'cnsl-add-action-dialog',
   templateUrl: './add-action-dialog.component.html',
   styleUrls: ['./add-action-dialog.component.scss'],
+  standalone: false,
 })
 export class AddActionDialogComponent implements OnInit, OnDestroy {
   public id: string = '';

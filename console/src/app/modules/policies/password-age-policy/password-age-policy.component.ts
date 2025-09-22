@@ -20,6 +20,7 @@ import { take } from 'rxjs/operators';
   selector: 'cnsl-password-age-policy',
   templateUrl: './password-age-policy.component.html',
   styleUrls: ['./password-age-policy.component.scss'],
+  standalone: false,
 })
 export class PasswordAgePolicyComponent implements OnInit {
   @Input() public service!: ManagementService | AdminService;

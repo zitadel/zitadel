@@ -1,5 +1,5 @@
 import { ConnectedPosition, ConnectionPositionPair, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
-import { ComponentPortal, PortalInjector } from '@angular/cdk/portal';
+import { ComponentPortal } from '@angular/cdk/portal';
 import { ComponentRef, Injectable, Injector } from '@angular/core';
 
 import { InfoOverlayComponent, OVERLAY_DATA } from '../../modules/info-overlay/info-overlay.component';
@@ -47,13 +47,14 @@ export class OverlayService {
     return containerRef.instance;
   }
 
-  private createInjector(config: InfoOverlayConfig, dialogRef: OverlayRef): PortalInjector {
-    const injectionTokens = new WeakMap();
-
-    injectionTokens.set(OverlayRef, dialogRef);
-    injectionTokens.set(OVERLAY_DATA, config.content);
-
-    return new PortalInjector(this.injector, injectionTokens);
+  private createInjector(config: InfoOverlayConfig, dialogRef: OverlayRef) {
+    return Injector.create({
+      parent: this.injector,
+      providers: [
+        { provide: OverlayRef, useValue: dialogRef },
+        { provide: OVERLAY_DATA, useValue: config.content },
+      ],
+    });
   }
 
   private createOverlay(config: InfoOverlayConfig): OverlayRef {

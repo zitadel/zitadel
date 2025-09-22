@@ -6,6 +6,7 @@ import { Color, getColorHash } from 'src/app/utils/color';
   selector: 'cnsl-avatar',
   templateUrl: './avatar.component.html',
   styleUrls: ['./avatar.component.scss'],
+  standalone: false,
 })
 export class AvatarComponent implements OnInit {
   @Input() name: string = '';

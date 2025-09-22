@@ -25,6 +25,7 @@ import {
   selector: 'cnsl-org-settings',
   templateUrl: './org-settings.component.html',
   styleUrls: ['./org-settings.component.scss'],
+  standalone: false,
 })
 export class OrgSettingsComponent implements OnInit {
   public id: string = '';

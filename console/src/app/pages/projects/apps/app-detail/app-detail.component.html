@@ -10,14 +10,14 @@
   <ng-template topActions cnslHasRole [hasRole]="['project.app.write:' + projectId, 'project.app.write']">
     <div
       class="regen-secret"
-      *ngIf="!isZitadel && this.app?.oidcConfig && (currentAuthMethod === 'CODE' || currentAuthMethod === 'POST')"
+      *ngIf="!isZitadel && app?.oidcConfig && (currentAuthMethod === 'CODE' || currentAuthMethod === 'POST')"
     >
       <button type="button" [disabled]="!canWrite" mat-menu-item (click)="regenerateOIDCClientSecret()">
         {{ 'APP.OIDC.REGENERATESECRET' | translate }}
       </button>
     </div>
 
-    <div class="regen-secret" *ngIf="!isZitadel && this.app?.apiConfig && currentAuthMethod === 'BASIC'">
+    <div class="regen-secret" *ngIf="!isZitadel && app?.apiConfig && currentAuthMethod === 'BASIC'">
       <button [disabled]="!canWrite" mat-menu-item (click)="regenerateAPIClientSecret()">
         {{ 'APP.API.REGENERATESECRET' | translate }}
       </button>
@@ -137,8 +137,8 @@
                     color="primary"
                     class="rt"
                     (change)="toggleRefreshToken($event)"
-                    [disabled]="!this.grantTypesList?.value.includes(OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE)"
-                    [checked]="this.grantTypesList?.value.includes(OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN)"
+                    [disabled]="!grantTypesList?.value.includes(OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE)"
+                    [checked]="grantTypesList?.value.includes(OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN)"
                   >
                     {{ 'APP.OIDC.REFRESHTOKEN' | translate }}
                   </mat-checkbox>

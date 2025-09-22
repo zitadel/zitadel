@@ -21,6 +21,7 @@ export enum CreationType {
   selector: 'cnsl-member-create-dialog',
   templateUrl: './member-create-dialog.component.html',
   styleUrls: ['./member-create-dialog.component.scss'],
+  standalone: false,
 })
 export class MemberCreateDialogComponent {
   private projectId: string = '';

@@ -18,6 +18,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   selector: 'cnsl-actions',
   templateUrl: './actions.component.html',
   styleUrls: ['./actions.component.scss'],
+  standalone: false,
 })
 export class ActionsComponent {
   protected flow!: Flow.AsObject;

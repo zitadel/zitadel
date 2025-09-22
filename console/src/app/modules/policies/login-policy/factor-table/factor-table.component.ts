@@ -33,6 +33,7 @@ export enum LoginMethodComponentType {
   selector: 'cnsl-factor-table',
   templateUrl: './factor-table.component.html',
   styleUrls: ['./factor-table.component.scss'],
+  standalone: false,
 })
 export class FactorTableComponent {
   public LoginMethodComponentType: any = LoginMethodComponentType;

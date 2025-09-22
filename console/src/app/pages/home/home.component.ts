@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
   selector: 'cnsl-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
+  standalone: false,
 })
 export class HomeComponent {
   public greendark: string = COLORS[6][700];

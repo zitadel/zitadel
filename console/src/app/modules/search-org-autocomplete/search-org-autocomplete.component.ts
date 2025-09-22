@@ -11,6 +11,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
   selector: 'cnsl-search-org-autocomplete',
   templateUrl: './search-org-autocomplete.component.html',
   styleUrls: ['./search-org-autocomplete.component.scss'],
+  standalone: false,
 })
 export class SearchOrgAutocompleteComponent implements OnInit, OnDestroy {
   public myControl: UntypedFormControl = new UntypedFormControl();

@@ -12,6 +12,7 @@ export enum AddKeyDialogType {
   selector: 'cnsl-add-key-dialog',
   templateUrl: './add-key-dialog.component.html',
   styleUrls: ['./add-key-dialog.component.scss'],
+  standalone: false,
 })
 export class AddKeyDialogComponent {
   public startDate: Date = new Date();

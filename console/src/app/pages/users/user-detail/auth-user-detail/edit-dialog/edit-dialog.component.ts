@@ -33,6 +33,7 @@ export type EditDialogResult = {
   selector: 'cnsl-edit-dialog',
   templateUrl: './edit-dialog.component.html',
   styleUrls: ['./edit-dialog.component.scss'],
+  standalone: false,
 })
 export class EditDialogComponent implements OnInit {
   public controlKey = 'editingField';

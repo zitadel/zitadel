@@ -22,6 +22,7 @@ import { Organization } from '@zitadel/proto/zitadel/org/v2/org_pb';
   selector: 'cnsl-memberships-table',
   templateUrl: './memberships-table.component.html',
   styleUrls: ['./memberships-table.component.scss'],
+  standalone: false,
 })
 export class MembershipsTableComponent implements OnInit, OnDestroy {
   public INITIALPAGESIZE: number = 25;

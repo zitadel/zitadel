@@ -41,6 +41,7 @@ import { TranslateService } from '@ngx-translate/core';
   selector: 'cnsl-smtp-provider',
   templateUrl: './smtp-provider.component.html',
   styleUrls: ['./smtp-provider.scss'],
+  standalone: false,
 })
 export class SMTPProviderComponent {
   public showOptional: boolean = false;

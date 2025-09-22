@@ -16,6 +16,7 @@ import { ProjectRolesDataSource } from './project-roles-table-datasource';
   selector: 'cnsl-project-roles-table',
   templateUrl: './project-roles-table.component.html',
   styleUrls: ['./project-roles-table.component.scss'],
+  standalone: false,
 })
 export class ProjectRolesTableComponent implements OnInit {
   public INITIAL_PAGE_SIZE: number = 50;

@@ -7,6 +7,7 @@ import { InfoSectionType } from '../info-section/info-section.component';
   selector: 'cnsl-warn-dialog',
   templateUrl: './warn-dialog.component.html',
   styleUrls: ['./warn-dialog.component.scss'],
+  standalone: false,
 })
 export class WarnDialogComponent {
   public confirm: string = '';
