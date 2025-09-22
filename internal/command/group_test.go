@@ -217,7 +217,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 					expectPushFailed(
 						pushErr,
 						group.NewGroupAddedEvent(context.Background(),
-							&group.NewAggregate("12345", "").Aggregate,
+							&group.NewAggregate("12345", "org1").Aggregate,
 							"example",
 							"example group",
 							"org1",
@@ -255,7 +255,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						group.NewGroupAddedEvent(context.Background(),
-							&group.NewAggregate("12345", "").Aggregate,
+							&group.NewAggregate("12345", "org1").Aggregate,
 							"example",
 							"example group",
 							"org1",
@@ -276,6 +276,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 			},
 			want: &domain.ObjectDetails{
 				ID: "12345",
+				ResourceOwner: "org1",
 			},
 		},
 		{
@@ -293,7 +294,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						group.NewGroupAddedEvent(context.Background(),
-							&group.NewAggregate("9090", "").Aggregate,
+							&group.NewAggregate("9090", "org1").Aggregate,
 							"example",
 							"example group",
 							"org1",
@@ -314,6 +315,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 			},
 			want: &domain.ObjectDetails{
 				ID: "9090",
+				ResourceOwner: "org1",
 			},
 		},
 	}

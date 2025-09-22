@@ -23,7 +23,7 @@ func NewGroupWriteModel(group *domain.Group) *GroupWriteModel {
 	return &GroupWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   group.AggregateID,
-			ResourceOwner: group.ResourceOwner,
+			ResourceOwner: group.OrganizationID,
 		},
 		Name:        group.Name,
 		Description: group.Description,
