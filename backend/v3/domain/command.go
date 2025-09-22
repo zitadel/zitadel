@@ -102,8 +102,9 @@ func DefaultOpts(invoker Invoker) *CommandOpts {
 		invoker = &noopInvoker{}
 	}
 	return &CommandOpts{
-		DB:      pool,
-		Invoker: invoker,
+		DB:          pool,
+		Invoker:     invoker,
+		Permissions: &noopPermissionChecker{}, // prevent panics for now
 	}
 }
 

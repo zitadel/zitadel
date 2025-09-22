@@ -26,3 +26,21 @@ type PermissionChecker interface {
 	// A permission may be inherited from the instance or granted organization level.
 	CheckProjectGrantPermission(ctx context.Context, permission, projectGrantID string) error
 }
+
+type noopPermissionChecker struct{}
+
+func (*noopPermissionChecker) CheckInstancePermission(context.Context, string) error {
+	return nil
+}
+
+func (*noopPermissionChecker) CheckOrganizationPermission(context.Context, string, string) error {
+	return nil
+}
+
+func (*noopPermissionChecker) CheckProjectPermission(context.Context, string, string) error {
+	return nil
+}
+
+func (*noopPermissionChecker) CheckProjectGrantPermission(context.Context, string, string) error {
+	return nil
+}
