@@ -37,9 +37,10 @@ jobs:
     - if: matrix.language == 'go'
       name: Set up pnpm
       uses: pnpm/action-setup@v4
-    - if: matrix.language == 'go'
+    - if: matrix.language == 'go'    
       run: |
-        pnpm add -g sass nx
+        pnpm fetch nx sass
+        pnpm add --offline --global sass nx
         nx run-many --projects @zitadel/api --targets generate-stubs generate-statik generate-assets
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
