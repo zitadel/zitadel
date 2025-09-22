@@ -45,22 +45,26 @@ export async function completeAuthFlow(command: AuthFlowParams): Promise<{ error
 
   if (requestId.startsWith("oidc_")) {
     // Complete OIDC flow
-    return (await loginWithOIDCAndSession({
-      serviceUrl,
-      authRequest: requestId.replace("oidc_", ""),
-      sessionId,
-      sessions,
-      sessionCookies,
-    })) ?? { error: "Unknown error occurred in OIDC flow" };
+    return (
+ loginWithOIDCAndSession({
+        serviceUrl,
+        authRequest: requestId.replace("oidc_", ""),
+        sessionId,
+        sessions,
+        sessionCookies,
+      })) ?? { error: "Unknown error occurred in OIDC flow" }
+    );
   } else if (requestId.startsWith("saml_")) {
     // Complete SAML flow
-    return (await loginWithSAMLAndSession({
-      serviceUrl,
-      samlRequest: requestId.replace("saml_", ""),
-      sessionId,
-      sessions,
-      sessionCookies,
-    })) ?? { error: "Unknown error occurred in SAML flow" };
+    return (
+      (await loginWithSAMLAndSession({
+        serviceUrl,
+        samlRequest: requestId.replace("saml_", ""),
+        sessionId,
+        sessions,
+        sessionCookies,
+      })) ?? { error: "Unknown error occurred in SAML flow" }
+    );
   }
 
   return { error: "Invalid request ID format" };

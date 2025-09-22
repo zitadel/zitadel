@@ -175,7 +175,7 @@ export async function createNewSessionFromIdpIntent(command: CreateNewSessionCom
     }
   }
 
-  const callbackResponse = await completeFlowOrGetUrl(
+  return completeFlowOrGetUrl(
     command.requestId && session.id
       ? {
           sessionId: session.id,
@@ -188,15 +188,6 @@ export async function createNewSessionFromIdpIntent(command: CreateNewSessionCom
         },
     loginSettings?.defaultRedirectUri,
   );
-
-  if (callbackResponse && typeof callbackResponse === "object" && "error" in callbackResponse && callbackResponse.error) {
-    return { error: callbackResponse.error };
-  }
-
-  // For regular flows (non-OIDC/SAML), return URL for client-side navigation
-  if (callbackResponse && typeof callbackResponse === "string") {
-    return { redirect: callbackResponse };
-  }
 }
 
 type createNewSessionForLDAPCommand = {

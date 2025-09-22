@@ -108,7 +108,7 @@ export async function registerUser(command: RegisterUserCommand) {
       return emailVerificationCheck;
     }
 
-    const callbackResponse = await completeFlowOrGetUrl(
+    return completeFlowOrGetUrl(
       command.requestId && session.id
         ? {
             sessionId: session.id,
@@ -121,15 +121,6 @@ export async function registerUser(command: RegisterUserCommand) {
           },
       loginSettings?.defaultRedirectUri,
     );
-
-    if (callbackResponse && typeof callbackResponse === "object" && "error" in callbackResponse && callbackResponse.error) {
-      return { error: callbackResponse.error };
-    }
-
-    // For regular flows (non-OIDC/SAML), return URL for client-side navigation
-    if (callbackResponse && typeof callbackResponse === "string") {
-      return { redirect: callbackResponse };
-    }
   }
 }
 
@@ -204,7 +195,7 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
     return { error: "Could not create session" };
   }
 
-  const callbackResponse = await completeFlowOrGetUrl(
+  return completeFlowOrGetUrl(
     command.requestId && session.id
       ? {
           sessionId: session.id,
@@ -217,13 +208,4 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
         },
     loginSettings?.defaultRedirectUri,
   );
-
-  if (callbackResponse && typeof callbackResponse === "object" && "error" in callbackResponse && callbackResponse.error) {
-    return { error: callbackResponse.error };
-  }
-
-  // For regular flows (non-OIDC/SAML), return URL for client-side navigation
-  if (callbackResponse && typeof callbackResponse === "string") {
-    return { redirect: callbackResponse };
-  }
 }

@@ -198,18 +198,13 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
           );
           setLoading(false);
 
-          if (
-            callbackResponse &&
-            typeof callbackResponse === "object" &&
-            "error" in callbackResponse &&
-            callbackResponse.error
-          ) {
+          if ("error" in callbackResponse) {
             setError(callbackResponse.error);
             return;
           }
 
-          if (callbackResponse && typeof callbackResponse === "string") {
-            return router.push(callbackResponse);
+          if ("redirect" in callbackResponse) {
+            return router.push(callbackResponse.redirect);
           }
         } else {
           setLoading(false);

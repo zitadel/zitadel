@@ -243,7 +243,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
   }
 
   if (requestId && session.id) {
-    const callbackResponse = await completeFlowOrGetUrl(
+    return completeFlowOrGetUrl(
       {
         sessionId: session.id,
         requestId: requestId,
@@ -251,31 +251,13 @@ export async function sendPasskey(command: SendPasskeyCommand) {
       },
       loginSettings?.defaultRedirectUri,
     );
-
-    if (callbackResponse && typeof callbackResponse === "object" && "error" in callbackResponse && callbackResponse.error) {
-      return { error: callbackResponse.error };
-    }
-
-    // For regular flows (non-OIDC/SAML), return URL for client-side navigation
-    if (callbackResponse && typeof callbackResponse === "string") {
-      return { redirect: callbackResponse };
-    }
   } else if (session?.factors?.user?.loginName) {
-    const callbackResponse = await completeFlowOrGetUrl(
+    return completeFlowOrGetUrl(
       {
         loginName: session.factors.user.loginName,
         organization: organization,
       },
       loginSettings?.defaultRedirectUri,
     );
-
-    if (callbackResponse && typeof callbackResponse === "object" && "error" in callbackResponse && callbackResponse.error) {
-      return { error: callbackResponse.error };
-    }
-
-    // For regular flows (non-OIDC/SAML), return URL for client-side navigation
-    if (callbackResponse && typeof callbackResponse === "string") {
-      return { redirect: callbackResponse };
-    }
   }
 }

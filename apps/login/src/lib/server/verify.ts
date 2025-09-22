@@ -221,7 +221,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
   // login user if no additional steps are required
   if (command.requestId && session.id) {
-    await completeFlowOrGetUrl(
+    return completeFlowOrGetUrl(
       {
         sessionId: session.id,
         requestId: command.requestId,
@@ -229,26 +229,16 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       },
       loginSettings?.defaultRedirectUri,
     );
-    return; // OIDC/SAML flow completed via server action
   }
 
   // Regular flow - return URL for client-side navigation
-  const callbackResponse = await completeFlowOrGetUrl(
+  return completeFlowOrGetUrl(
     {
       loginName: session.factors.user.loginName,
       organization: session.factors?.user?.organizationId,
     },
     loginSettings?.defaultRedirectUri,
   );
-
-  if (callbackResponse && typeof callbackResponse === "object" && "error" in callbackResponse && callbackResponse.error) {
-    return { error: callbackResponse.error };
-  }
-
-  // For regular flows (non-OIDC/SAML), return URL for client-side navigation
-  if (callbackResponse && typeof callbackResponse === "string") {
-    return { redirect: callbackResponse };
-  }
 }
 
 type resendVerifyEmailCommand = {

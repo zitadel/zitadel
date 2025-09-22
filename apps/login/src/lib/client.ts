@@ -43,32 +43,23 @@ function goToSignedInPage(
 export async function completeFlowOrGetUrl(
   command: FinishFlowCommand & { organization?: string },
   defaultRedirectUri?: string,
-): Promise<string | { error: string }> {
+): Promise<{ redirect: string } | { error: string }> {
   // Complete OIDC/SAML flows directly with server action
   if (
     "sessionId" in command &&
     "requestId" in command &&
     (command.requestId.startsWith("saml_") || command.requestId.startsWith("oidc_"))
   ) {
-    // This completes the flow and returns a redirect URL
-    const response = await completeAuthFlow({
+    // This completes the flow and returns a redirect URL or error
+    return await completeAuthFlow({
       sessionId: command.sessionId,
       requestId: command.requestId,
     });
-
-    if (response && "error" in response && response.error) {
-      return { error: response.error };
-    }
-
-    if (response && "redirect" in response && response.redirect) {
-      return response.redirect;
-    }
-
-    return { error: "No redirect URL received from auth flow" };
   }
 
   // For all other cases, return URL for navigation
-  return getNextUrl(command, defaultRedirectUri);
+  const url = await getNextUrl(command, defaultRedirectUri);
+  return { redirect: url };
 }
 
 /**

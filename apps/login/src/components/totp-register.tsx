@@ -73,18 +73,14 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
               },
               loginSettings?.defaultRedirectUri,
             );
-            if (
-              callbackResponse &&
-              typeof callbackResponse === "object" &&
-              "error" in callbackResponse &&
-              callbackResponse.error
-            ) {
+
+            if ("error" in callbackResponse) {
               setError(callbackResponse.error);
               return;
             }
 
-            if (callbackResponse && typeof callbackResponse === "string") {
-              return router.push(callbackResponse);
+            if ("redirect" in callbackResponse) {
+              return router.push(callbackResponse.redirect);
             }
           } else if (loginName) {
             const callbackResponse = await completeFlowOrGetUrl(
@@ -94,18 +90,14 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
               },
               loginSettings?.defaultRedirectUri,
             );
-            if (
-              callbackResponse &&
-              typeof callbackResponse === "object" &&
-              "error" in callbackResponse &&
-              callbackResponse.error
-            ) {
+
+            if ("error" in callbackResponse) {
               setError(callbackResponse.error);
               return;
             }
 
-            if (callbackResponse && typeof callbackResponse === "string") {
-              return router.push(callbackResponse);
+            if ("redirect" in callbackResponse) {
+              return router.push(callbackResponse.redirect);
             }
           }
         }

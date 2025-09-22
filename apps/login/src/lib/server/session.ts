@@ -46,7 +46,7 @@ export async function skipMFAAndContinueWithNextUrl({
   await humanMFAInitSkipped({ serviceUrl, userId });
 
   if (requestId && sessionId) {
-    const callbackResponse = await completeFlowOrGetUrl(
+    return completeFlowOrGetUrl(
       {
         sessionId: sessionId,
         requestId: requestId,
@@ -54,32 +54,14 @@ export async function skipMFAAndContinueWithNextUrl({
       },
       loginSettings?.defaultRedirectUri,
     );
-
-    if (callbackResponse && typeof callbackResponse === "object" && "error" in callbackResponse && callbackResponse.error) {
-      return { error: callbackResponse.error };
-    }
-
-    // For regular flows (non-OIDC/SAML), return URL for client-side navigation
-    if (callbackResponse && typeof callbackResponse === "string") {
-      return { redirect: callbackResponse };
-    }
   } else if (loginName) {
-    const callbackResponse = await completeFlowOrGetUrl(
+    return completeFlowOrGetUrl(
       {
         loginName: loginName,
         organization: organization,
       },
       loginSettings?.defaultRedirectUri,
     );
-
-    if (callbackResponse && typeof callbackResponse === "object" && "error" in callbackResponse && callbackResponse.error) {
-      return { error: callbackResponse.error };
-    }
-
-    // For regular flows (non-OIDC/SAML), return URL for client-side navigation
-    if (callbackResponse && typeof callbackResponse === "string") {
-      return { redirect: callbackResponse };
-    }
   }
 
   return { error: "Could not skip MFA and continue" };
@@ -95,7 +77,7 @@ export async function continueWithSession({ requestId, ...session }: Session & {
   });
 
   if (requestId && session.id && session.factors?.user) {
-    await completeFlowOrGetUrl(
+    return completeFlowOrGetUrl(
       {
         sessionId: session.id,
         requestId: requestId,
@@ -103,24 +85,14 @@ export async function continueWithSession({ requestId, ...session }: Session & {
       },
       loginSettings?.defaultRedirectUri,
     );
-    return; // OIDC/SAML flow completed via server action
   } else if (session.factors?.user) {
-    const callbackResponse = await completeFlowOrGetUrl(
+    return completeFlowOrGetUrl(
       {
         loginName: session.factors.user.loginName,
         organization: session.factors.user.organizationId,
       },
       loginSettings?.defaultRedirectUri,
     );
-
-    if (callbackResponse && typeof callbackResponse === "object" && "error" in callbackResponse && callbackResponse.error) {
-      return { error: callbackResponse.error };
-    }
-
-    // For regular flows (non-OIDC/SAML), return URL for client-side navigation
-    if (callbackResponse && typeof callbackResponse === "string") {
-      return { redirect: callbackResponse };
-    }
   }
 }
 

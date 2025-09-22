@@ -272,7 +272,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
 
   if (command.requestId && session.id) {
     // OIDC/SAML flow - use completeFlowOrGetUrl for proper handling
-    const callbackResponse = await completeFlowOrGetUrl(
+    return completeFlowOrGetUrl(
       {
         sessionId: session.id,
         requestId: command.requestId,
@@ -280,34 +280,16 @@ export async function sendPassword(command: UpdateSessionCommand) {
       },
       loginSettings?.defaultRedirectUri,
     );
-
-    if (callbackResponse && typeof callbackResponse === "object" && "error" in callbackResponse && callbackResponse.error) {
-      return { error: callbackResponse.error };
-    }
-
-    // For regular flows (non-OIDC/SAML), return URL for client-side navigation
-    if (callbackResponse && typeof callbackResponse === "string") {
-      return { redirect: callbackResponse };
-    }
   }
 
   // Regular flow (no requestId) - return URL for client-side navigation
-  const callbackResponse = await completeFlowOrGetUrl(
+  return completeFlowOrGetUrl(
     {
       loginName: session.factors.user.loginName,
       organization: session.factors?.user?.organizationId,
     },
     loginSettings?.defaultRedirectUri,
   );
-
-  if (callbackResponse && typeof callbackResponse === "object" && "error" in callbackResponse && callbackResponse.error) {
-    return { error: callbackResponse.error };
-  }
-
-  // For regular flows (non-OIDC/SAML), return URL for client-side navigation
-  if (callbackResponse && typeof callbackResponse === "string") {
-    return { redirect: callbackResponse };
-  }
 }
 
 // this function lets users with code set a password or users with valid User Verification Check
