@@ -2134,9 +2134,9 @@
       "SELECTGROUPTOOLTIP": "Select all Roles of the group {{group}}.",
       "OPTIONS": "Options",
       "ASSERTION": "Return user roles during authentication",
-      "ASSERTION_DESCRIPTION": "When a user authenticates, their role information is provided to your application. For OpenID Connect, the roles can be requested from the Userinfo endpoint or sent in the ID or Access Token, based on your application's configuration.",
+      "ASSERTION_DESCRIPTION": "When a user authenticates, their role information is provided to your application. For OpenID Connect, the roles can be requested from the UserInfo endpoint or sent in the ID or Access Token, based on your application's configuration.",
       "CHECK": "Only authorized users can authenticate",
-      "CHECK_DESCRIPTION": "Deny authentication if the user has no authorization assigned to this project. This includes authorizations to the project without assigning a specific role to the user.",
+      "CHECK_DESCRIPTION": "Deny authentication if the user has no authorization assigned to this project. Authorizations to the project without assigned a specific role to the user are allowed.",
       "DIALOG": {
         "DELETE_TITLE": "Delete role",
         "DELETE_DESCRIPTION": "You are about to delete a project role. Are you sure?"
