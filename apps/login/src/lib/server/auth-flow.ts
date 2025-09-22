@@ -7,7 +7,6 @@ import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { listSessions } from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 export interface AuthFlowParams {
   sessionId: string;
@@ -28,8 +27,9 @@ async function loadSessions({ serviceUrl, ids }: { serviceUrl: string; ids: stri
  * Server Action to complete authentication flow
  * Complete OIDC/SAML authentication flow with session
  * This is the shared logic for flow completion
+ * Returns either an error or a redirect URL for client-side navigation
  */
-export async function completeAuthFlow(command: AuthFlowParams): Promise<void | { error: string }> {
+export async function completeAuthFlow(command: AuthFlowParams): Promise<{ error: string } | { redirect: string }> {
   const { sessionId, requestId } = command;
 
   const _headers = await headers();
@@ -45,46 +45,22 @@ export async function completeAuthFlow(command: AuthFlowParams): Promise<void | 
 
   if (requestId.startsWith("oidc_")) {
     // Complete OIDC flow
-    const result = await loginWithOIDCAndSession({
+    return (await loginWithOIDCAndSession({
       serviceUrl,
       authRequest: requestId.replace("oidc_", ""),
       sessionId,
       sessions,
       sessionCookies,
-    });
-
-    // Handle redirect response from loginWithOIDCAndSession
-    if (result && "redirect" in result && result.redirect) {
-      redirect(result.redirect);
-    }
-
-    // Only return error, not redirect (since redirect throws)
-    if (result && "error" in result && result.error) {
-      return { error: result.error };
-    }
-
-    return; // No error, redirect was called
+    })) ?? { error: "Unknown error occurred in OIDC flow" };
   } else if (requestId.startsWith("saml_")) {
     // Complete SAML flow
-    const result = await loginWithSAMLAndSession({
+    return (await loginWithSAMLAndSession({
       serviceUrl,
       samlRequest: requestId.replace("saml_", ""),
       sessionId,
       sessions,
       sessionCookies,
-    });
-
-    // Handle redirect response from loginWithSAMLAndSession
-    if (result && "redirect" in result && result.redirect) {
-      redirect(result.redirect);
-    }
-
-    // Only return error, not redirect (since redirect throws)
-    if (result && "error" in result && result.error) {
-      return { error: result.error };
-    }
-
-    return; // No error, redirect was called
+    })) ?? { error: "Unknown error occurred in SAML flow" };
   }
 
   return { error: "Invalid request ID format" };

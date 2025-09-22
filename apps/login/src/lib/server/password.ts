@@ -20,7 +20,6 @@ import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings
 import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType, SetPasswordRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
 import { getServiceUrlFromHeaders } from "../service-url";

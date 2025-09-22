@@ -1,7 +1,6 @@
 "use client";
 
 import { registerUserAndLinkToIDP } from "@/lib/server/register";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { FieldValues, useForm } from "react-hook-form";
@@ -59,8 +58,6 @@ export function RegisterFormIDPIncomplete({
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-
-  const router = useRouter();
 
   async function submitAndRegister(values: Inputs) {
     setLoading(true);
@@ -146,8 +143,7 @@ export function RegisterFormIDPIncomplete({
           onClick={handleSubmit(submitAndRegister)}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
-          <Translated i18nKey="submit" namespace="register" />
+          {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="submit" namespace="register" />
         </Button>
       </div>
     </form>

@@ -50,7 +50,7 @@ export async function completeFlowOrGetUrl(
     "requestId" in command &&
     (command.requestId.startsWith("saml_") || command.requestId.startsWith("oidc_"))
   ) {
-    // This completes the flow and redirects, so no URL is returned
+    // This completes the flow and returns a redirect URL
     const response = await completeAuthFlow({
       sessionId: command.sessionId,
       requestId: command.requestId,
@@ -59,6 +59,12 @@ export async function completeFlowOrGetUrl(
     if (response && "error" in response && response.error) {
       return { error: response.error };
     }
+
+    if (response && "redirect" in response && response.redirect) {
+      return response.redirect;
+    }
+
+    return { error: "No redirect URL received from auth flow" };
   }
 
   // For all other cases, return URL for navigation
