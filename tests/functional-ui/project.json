@@ -1,23 +1,71 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
-    "lint": {},
-    "check": {},
-    "functional-ui": {
-      "cache": false,
-      "persistent": false
+    "test-pull": {
+        "command": "nx run @zitadel/devcontainer:compose pull db-functional-ui"
     },
-    "functional-ui:golang": {
-      "cache": false,
-      "persistent": false
+    "test-state": {
+        "dependsOn": [
+            "test-pull"
+        ],
+        "continuous": true,
+        "command": "nx run @zitadel/devcontainer:compose up --force-recreate db-functional-ui"
     },
-    "functional-ui:golangangular": {
-      "cache": false,
-      "persistent": false
+    "test-setup": {
+        "dependsOn": [
+            "test-state",
+            "test-build"
+        ],
+        "command": "nx run @zitadel/api:setup",
+        "options": {
+            "env": {
+                "API_CONFIG_FILE": "{projectRoot}/api.yaml"
+            }
+        }  
     },
-    "functional-ui:angular": {
-      "cache": false,
-      "persistent": false
+    "test-env": {
+        "continuous": true,
+        "dependsOn": [
+            "test-state",
+            "test-setup"
+        ],
+        "options": {
+            "env": {
+                "API_CONFIG_FILE": "{projectRoot}/api.yaml"
+            }
+        },
+        "command": "nx run @zitadel/api:prod --excludeTaskDependencies"
+    },
+    "test": {
+      "description": "Runs the functional UI tests against a Zitadel API. It sequentially runs agains Chrome and Firefox so the tests don't intefere with each other.",
+      "dependsOn": [
+        "test-state",
+        "test-env"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "parallel": false,
+        "cwd": "{projectRoot}",
+        "commands": [
+          "pnpm cypress run --browser chrome --config videosFolder=cypress/videos/chrome,screenshotsFolder=cypress/screenshots/chrome,reporterOptions.reportDir=cypress/results/chrome",
+          "pnpm cypress run --browser firefox --config videosFolder=cypress/videos/firefox,screenshotsFolder=cypress/screenshots/firefox,reporterOptions.reportDir=cypress/results/firefox"
+        ],
+        "env": {
+            "CYPRESS_BASE_URL": "http://localhost:8080/ui/console",
+            "CYPRESS_BACKEND_URL": "http://localhost:8080",
+            "CYPRESS_WEBHOOK_HANDLER_PORT": "8900",
+            "CYPRESS_ORGANIZATION": "zitadel"
+        }
+      },
+      "cache": true,
+      "inputs": [
+        "default"
+      ],
+      "outputs": [
+        "{projectRoot}/cypress/results",
+        "{projectRoot}/cypress/screenshots",
+        "{projectRoot}/cypress/videos"
+      ]
     }
   }
 }

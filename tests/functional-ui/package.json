@@ -1,32 +1,20 @@
 {
   "name": "@zitadel/functional-ui",
   "scripts": {
-    "open": "pnpm exec cypress open",
-    "test:run": "pnpm exec cypress run",
-    "test:open:golang": "pnpm run open --",
-    "test:run:golang": "pnpm run test:run --",
-    "test:open:golangangular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 pnpm run open --",
-    "test:run:golangangular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 pnpm run test:run --",
-    "test:open:angulargolang": "pnpm run test:open:golangangular --",
-    "test:run:angulargolang": "pnpm run test:run:golangangular --",
-    "test:open:angular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 CYPRESS_WEBHOOK_HANDLER_HOST=host.docker.internal pnpm run open --",
-    "test:run:angular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 CYPRESS_WEBHOOK_HANDLER_HOST=host.docker.internal pnpm run test:run --",
     "lint": "prettier --check cypress",
     "lint-fix": "prettier --write cypress",
     "clean": "rm -rf node_modules"
   },
   "private": true,
   "devDependencies": {
-    "@types/pg": "^8.11.6",
+    "@types/node": "^22.3.0",
+    "cypress": "^14.5.3",
     "cypress-wait-until": "^3.0.2",
     "jsonwebtoken": "^9.0.2",
     "mochawesome": "^7.1.3",
-    "pg": "^8.12.0",
     "prettier": "^3.3.3",
     "typescript": "^5.5.4",
     "uuid": "^10.0.0",
-    "wait-on": "^7.2.0",
-    "@types/node": "^22.3.0",
-    "cypress": "^14.5.3"
+    "wait-on": "^7.2.0"
   }
 }

@@ -83,6 +83,15 @@ jobs:
           name: integration-test-race-logs
           path: |
            .artifacts/api-test-integration/race.log.*
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: production-tests-${{ matrix.browser }}
+          path: |
+            tests/functional-ui/cypress/screenshots
+            tests/functional-ui/cypress/videos
+            tests/functional-ui/cypress/results
+          retention-days: 30           
       - name: publish coverage
         uses: codecov/codecov-action@v4.3.0
         with:

@@ -1,14 +1,13 @@
 Log:
   Level: info
 
-ExternalDomain: host.docker.internal
 ExternalSecure: false
 
 Database:
   postgres:
-    # This makes the test config reusable with an out-of-docker zitadel process and an /etc/hosts entry
-    Host: host.docker.internal
-    Port: 5432
+    # This makes the e2e config reusable with an out-of-docker zitadel process and an /etc/hosts entry
+    Port: 5434
+    database: zitadel
     MaxOpenConns: 15
     MaxIdleConns: 10
     Database: zitadel
@@ -31,24 +30,6 @@ FirstInstance:
     Human:
       PasswordChangeRequired: false
 
-LogStore:
-  Access:
-    Database:
-      Enabled: true
-      Debounce:
-        MinFrequency: 0s
-        MaxBulkSize: 0
-  Execution:
-    Database:
-      Enabled: true
-    Stdout:
-      Enabled: false
-
-Quotas:
-  Access:
-    ExhaustedCookieKey: "zitadel.quota.limiting"
-    ExhaustedCookieMaxAge: "600s"
-
 Console:
   InstanceManagementURL: "https://example.com/instances/{{.InstanceID}}"
 
@@ -56,6 +37,15 @@ Projections:
   Customizations:
     NotificationsQuotas:
       RequeueEvery: 1s
+
+Quotas:
+  Access:
+    Enabled: true
+    Debounce:
+      MinFrequency: 0s
+      MaxBulkSize: 0
+    ExhaustedCookieKey: "zitadel.quota.limiting"
+    ExhaustedCookieMaxAge: "600s"
 
 DefaultInstance:
   LoginPolicy:

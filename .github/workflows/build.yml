@@ -52,8 +52,6 @@ jobs:
       nx_cache_key: ${{ needs.check.outputs.nx_cache_key }}
       nx_cache_path: ${{ needs.check.outputs.nx_cache_path }}
 
-  functional-ui:
-    uses: ./.github/workflows/functional-ui.yml
   release:
     uses: ./.github/workflows/release.yml
     permissions:
@@ -65,7 +63,6 @@ jobs:
       - version
       - check
       - container
-      - functional-ui
     if: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}

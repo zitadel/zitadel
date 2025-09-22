@@ -1,7 +1,7 @@
 import { defineConfig } from 'cypress';
-import { Client } from "pg";
 import { createServer } from 'http'
 import { ZITADELWebhookEvent } from 'cypress/support/types';
+import { unlinkSync } from 'fs'
 
 const jwt = require('jsonwebtoken');
 
@@ -39,14 +39,12 @@ let failWebhookEventsCount = 0
 
 export default defineConfig({
   reporter: 'mochawesome',
-
+  video: true,
   reporterOptions: {
-    reportDir: 'cypress/results',
     overwrite: false,
     html: true,
     json: true,
   },
-
   trashAssetsBeforeRuns: false,
   defaultCommandTimeout: 10000,
 
@@ -63,7 +61,6 @@ export default defineConfig({
     experimentalOriginDependencies: true,
     pageLoadTimeout: 180000,
     setupNodeEvents(on, config) {
-
       startWebhookEventHandler()
 
       on('task', {
@@ -85,19 +82,6 @@ export default defineConfig({
             "exp": exp
           }, Buffer.from(privateKey, 'ascii').toString('ascii'), { algorithm: 'RS256' })
         },
-        async runSQL(statement: string) {
-          const client = new Client({
-            connectionString: process.env.CYPRESS_DATABASE_CONNECTION_URL || 'postgresql://root@localhost:26257/zitadel'
-          });
-
-          return client.connect().then(() => {
-            return client.query(statement).then((result) => {
-              return client.end().then(() => {
-                return result
-              })
-            })
-          })
-        },
         resetWebhookEvents() {
           webhookEvents = []
           failWebhookEventsCount = 0
@@ -111,6 +95,18 @@ export default defineConfig({
           return null
         }
       })
+      on('after:spec', (_, results) => {
+        if (results && results.video) {
+          // Do we have failures for any retry attempts?
+          const failures = results.tests.some((test) =>
+            test.attempts.some((attempt) => attempt.state === 'failed')
+          )
+          if (!failures) {
+            // delete the video if the spec passed and no tests retried
+            unlinkSync(results.video)
+          }
+        }
+      })      
     },
   },
 });

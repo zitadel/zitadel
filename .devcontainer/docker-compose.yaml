@@ -14,6 +14,7 @@ services:
       DEVCONTAINER_LOGIN_HOST: login
       DEVCONTAINER_LOGIN_API_MOCK_HOST: login-api-mock
       DEVCONTAINER_DB_API_INTEGRATION_HOST: db-api-integration
+      DEVCONTAINER_DB_FUNCTIONAL_UI_HOST: db-functional-ui
     ports:
       - "8080:8080"
       - "3000:3000"
@@ -21,7 +22,7 @@ services:
 
   db:
     container_name: db
-    image: postgres:latest
+    image: postgres:17
     restart: unless-stopped
     env_file:
       - ./.env.db
@@ -38,7 +39,7 @@ services:
 
   db-api-integration:
     restart: 'always'
-    image: 'postgres:latest'
+    image: 'postgres:17'
     environment:
       - POSTGRES_USER=zitadel
       - PGUSER=zitadel
@@ -59,6 +60,21 @@ services:
     image: 'redis:latest'
     ports:
       - 6379:6379
+
+  db-functional-ui:
+    restart: 'always'
+    image: 'postgres:17'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "zitadel", "-U", "postgres" ]
+      interval: '10s'
+      timeout: '30s'
+      retries: 5
+      start_period: '20s'
+    ports:
+      - "5434:5432"
 
   login-api-mock:
     container_name: login-api-mock
