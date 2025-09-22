@@ -49,6 +49,12 @@ jobs:
           cache: "pnpm"
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          version: v0.28.0
+      - name: Set up Docker Compose
+        uses: docker/setup-compose-action@v1
+        with:
+          version: v2.38.2
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Restore Nx cache

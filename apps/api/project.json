@@ -135,12 +135,13 @@
                 "env": {
                     "API_CONFIG_FILE": "{projectRoot}/test-integration.yaml",
                     "ZITADEL_BINARY": "zitadel.test",
+                    "GOCOVERDIR": "{workspaceRoot}/.artifacts/api-test-integration/coverage",
                     "GORACE": "halt_on_error=1"
                 },
                 "parallel": false,
                 "commands": [
                     "nx run @zitadel/devcontainer:compose up --detach --force-recreate --renew-anon-volumes db-api-integration cache-api-integration",
-                    "mkdir -p .artifacts/api-test-integration/coverage",
+                    "mkdir ${GOCOVERDIR}",
                     "nx run @zitadel/api:setup --excludeTaskDependencies"
                 ]
             }
@@ -154,6 +155,7 @@
                 "env": {
                     "API_CONFIG_FILE": "{projectRoot}/test-integration.yaml",
                     "ZITADEL_BINARY": "zitadel.test",
+                    "GOCOVERDIR": "{workspaceRoot}/.artifacts/api-test-integration/coverage",
                     "GORACE": "log_path=.artifacts/api-test-integration/race.log"
                 }
             },
