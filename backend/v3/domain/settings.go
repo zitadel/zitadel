@@ -201,8 +201,8 @@ type SecuritySetting struct {
 
 type OrgSettings struct {
 	OrganizationScopedUsernames    bool     `json:"organizationScopedUsernames,omitempty"`
-	oldOrganizationScopedUsernames bool     `json:"oldOrganizationScopedUsernames,omitempty"`
-	usernameChanges                []string `json:"usernameChanges,omitempty"`
+	OldOrganizationScopedUsernames bool     `json:"oldOrganizationScopedUsernames,omitempty"`
+	UsernameChanges                []string `json:"usernameChanges,omitempty"`
 }
 
 type OrgSetting struct {

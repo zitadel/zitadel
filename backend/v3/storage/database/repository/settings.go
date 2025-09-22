@@ -417,7 +417,7 @@ func (s *settings) Create(ctx context.Context, setting *domain.Setting) error {
 func (s *settings) createSetting(ctx context.Context, setting *domain.Setting, settings any) error {
 	builder := database.StatementBuilder{}
 
-	settingJSON, err := json.Marshal(setting.Settings)
+	settingJSON, err := json.Marshal(settings)
 	if err != nil {
 		return err
 	}

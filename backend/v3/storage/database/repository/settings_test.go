@@ -719,8 +719,100 @@ func TestCreateSpecificSetting(t *testing.T) {
 	}
 }
 
+func TestCreateSpecificSettingError(t *testing.T) {
+	settingRepo := repository.SettingsRepository(pool)
+	tests := []struct {
+		name     string
+		testFunc func(ctx context.Context) error
+		err      error
+	}{
+		{
+			name: "create login no settings error",
+			testFunc: func(ctx context.Context) error {
+				err := settingRepo.CreateLogin(ctx, nil)
+				return err
+			},
+			err: repository.ErrSettingObjectMustNotBeNil,
+		},
+		{
+			name: "create label no settings error",
+			testFunc: func(ctx context.Context) error {
+				err := settingRepo.CreateLabel(ctx, nil)
+				return err
+			},
+			err: repository.ErrSettingObjectMustNotBeNil,
+		},
+		{
+			name: "create label label not set",
+			testFunc: func(ctx context.Context) error {
+				err := settingRepo.CreateLabel(ctx, &domain.LabelSetting{
+					Setting: &domain.Setting{},
+				})
+				return err
+			},
+			err: repository.ErrLabelStateMustBeDefined,
+		},
+		{
+			name: "create password complexity no settings error",
+			testFunc: func(ctx context.Context) error {
+				err := settingRepo.CreatePasswordComplexity(ctx, nil)
+				return err
+			},
+			err: repository.ErrSettingObjectMustNotBeNil,
+		},
+		{
+			name: "create password expiry no settings error",
+			testFunc: func(ctx context.Context) error {
+				err := settingRepo.CreatePasswordExpiry(ctx, nil)
+				return err
+			},
+			err: repository.ErrSettingObjectMustNotBeNil,
+		},
+		{
+			name: "create lockout no settings error",
+			testFunc: func(ctx context.Context) error {
+				err := settingRepo.CreateLockout(ctx, nil)
+				return err
+			},
+			err: repository.ErrSettingObjectMustNotBeNil,
+		},
+		{
+			name: "create security no settings error",
+			testFunc: func(ctx context.Context) error {
+				err := settingRepo.CreateSecurity(ctx, nil)
+				return err
+			},
+			err: repository.ErrSettingObjectMustNotBeNil,
+		},
+		{
+			name: "create domain no settings error",
+			testFunc: func(ctx context.Context) error {
+				err := settingRepo.CreateDomain(ctx, nil)
+				return err
+			},
+			err: repository.ErrSettingObjectMustNotBeNil,
+		},
+		{
+			name: "create org no settings error",
+			testFunc: func(ctx context.Context) error {
+				err := settingRepo.CreateOrg(ctx, nil)
+				return err
+			},
+			err: repository.ErrSettingObjectMustNotBeNil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
+
+			err := tt.testFunc(ctx)
+			assert.ErrorIs(t, err, tt.err)
+		})
+	}
+}
+
 // NOTE all updated functions are just a wrapper around repository.updateSetting()
-// for the sake of testing, UpdatePasswordExpiry was used, but the underlying code is the same
+// for the sake of testing, UpdateLabel was used, but the underlying code is the same
 // across all Update.*() functions
 func TestUpdateSetting(t *testing.T) {
 	// create instance
@@ -754,81 +846,131 @@ func TestUpdateSetting(t *testing.T) {
 
 	tests := []struct {
 		name         string
-		testFunc     func(ctx context.Context, t *testing.T) *domain.PasswordExpirySetting
+		testFunc     func(ctx context.Context, t *testing.T) *domain.LabelSetting
 		rowsAffected int64
 		err          error
 	}{
 		{
 			name: "happy path update settings",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.PasswordExpirySetting {
-				setting := domain.PasswordExpirySetting{
+			testFunc: func(ctx context.Context, t *testing.T) *domain.LabelSetting {
+				setting := domain.LabelSetting{
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
 						OrgID:      &orgId,
 						ID:         gofakeit.Name(),
-						Type:       domain.SettingTypePasswordExpiry,
+						Type:       domain.SettingTypeLabel,
 						Settings:   []byte("{}"),
 					},
-					Settings: domain.PasswordExpirySettings{
-						IsDefault:      true,
-						ExpireWarnDays: 10,
-						MaxAgeDays:     40,
+					Settings: domain.LabelSettings{
+						IsDefault:           false,
+						PrimaryColor:        "value",
+						BackgroundColor:     "value",
+						WarnColor:           "value",
+						FontColor:           "value",
+						PrimaryColorDark:    "value",
+						BackgroundColorDark: "value",
+						WarnColorDark:       "value",
+						FontColorDark:       "value",
+						HideLoginNameSuffix: true,
+						ErrorMsgPopup:       true,
+						DisableWatermark:    true,
+						ThemeMode:           domain.LabelPolicyThemeAuto,
 					},
 				}
-				err := settingRepo.CreatePasswordExpiry(ctx, &setting)
+				err := settingRepo.CreateLabel(ctx, &setting)
 				require.NoError(t, err)
 
 				// update settings values
-				setting.Settings.IsDefault = false
-				setting.Settings.ExpireWarnDays = 20
-				setting.Settings.MaxAgeDays = 40
+				setting.Settings.IsDefault = true
+				setting.Settings.PrimaryColor = "new_value"
+				setting.Settings.BackgroundColor = "new_value"
+				setting.Settings.WarnColor = "new_value"
+				setting.Settings.FontColor = "new_value"
+				setting.Settings.PrimaryColorDark = "new_value"
+				setting.Settings.BackgroundColorDark = "new_value"
+				setting.Settings.WarnColorDark = "new_value"
+				setting.Settings.FontColorDark = "new_value"
+				setting.Settings.HideLoginNameSuffix = false
+				setting.Settings.ErrorMsgPopup = false
+				setting.Settings.DisableWatermark = false
+				setting.Settings.ThemeMode = domain.LabelPolicyThemeLight
 				return &setting
 			},
 			rowsAffected: 1,
 		},
 		{
 			name: "happy path update settings, no org",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.PasswordExpirySetting {
-				setting := domain.PasswordExpirySetting{
+			testFunc: func(ctx context.Context, t *testing.T) *domain.LabelSetting {
+				setting := domain.LabelSetting{
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
 						// OrgID:      &orgId,
 						ID:       gofakeit.Name(),
-						Type:     domain.SettingTypePasswordExpiry,
+						Type:     domain.SettingTypeLabel,
 						Settings: []byte("{}"),
 					},
-					Settings: domain.PasswordExpirySettings{
-						IsDefault:      true,
-						ExpireWarnDays: 10,
-						MaxAgeDays:     40,
+					Settings: domain.LabelSettings{
+						IsDefault:           false,
+						PrimaryColor:        "value",
+						BackgroundColor:     "value",
+						WarnColor:           "value",
+						FontColor:           "value",
+						PrimaryColorDark:    "value",
+						BackgroundColorDark: "value",
+						WarnColorDark:       "value",
+						FontColorDark:       "value",
+						HideLoginNameSuffix: true,
+						ErrorMsgPopup:       true,
+						DisableWatermark:    true,
+						ThemeMode:           domain.LabelPolicyThemeAuto,
 					},
 				}
-				err := settingRepo.CreatePasswordExpiry(ctx, &setting)
+				err := settingRepo.CreateLabel(ctx, &setting)
 				require.NoError(t, err)
 
 				// update settings values
-				setting.Settings.IsDefault = false
-				setting.Settings.ExpireWarnDays = 20
-				setting.Settings.MaxAgeDays = 40
+				setting.Settings.IsDefault = true
+				setting.Settings.PrimaryColor = "new_value"
+				setting.Settings.BackgroundColor = "new_value"
+				setting.Settings.WarnColor = "new_value"
+				setting.Settings.FontColor = "new_value"
+				setting.Settings.PrimaryColorDark = "new_value"
+				setting.Settings.BackgroundColorDark = "new_value"
+				setting.Settings.WarnColorDark = "new_value"
+				setting.Settings.FontColorDark = "new_value"
+				setting.Settings.HideLoginNameSuffix = false
+				setting.Settings.ErrorMsgPopup = false
+				setting.Settings.DisableWatermark = false
+				setting.Settings.ThemeMode = domain.LabelPolicyThemeLight
 				return &setting
 			},
 			rowsAffected: 1,
 		},
 		{
 			name: "update setting with non existent instance id",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.PasswordExpirySetting {
-				setting := domain.PasswordExpirySetting{
+			testFunc: func(ctx context.Context, t *testing.T) *domain.LabelSetting {
+				setting := domain.LabelSetting{
 					Setting: &domain.Setting{
 						InstanceID: "non-existent-instanceID",
 						OrgID:      &orgId,
 						ID:         gofakeit.Name(),
-						Type:       domain.SettingTypePasswordExpiry,
+						Type:       domain.SettingTypeLabel,
 						Settings:   []byte("{}"),
 					},
-					Settings: domain.PasswordExpirySettings{
-						IsDefault:      true,
-						ExpireWarnDays: 10,
-						MaxAgeDays:     40,
+					Settings: domain.LabelSettings{
+						IsDefault:           false,
+						PrimaryColor:        "value",
+						BackgroundColor:     "value",
+						WarnColor:           "value",
+						FontColor:           "value",
+						PrimaryColorDark:    "value",
+						BackgroundColorDark: "value",
+						WarnColorDark:       "value",
+						FontColorDark:       "value",
+						HideLoginNameSuffix: true,
+						ErrorMsgPopup:       true,
+						DisableWatermark:    true,
+						ThemeMode:           domain.LabelPolicyThemeAuto,
 					},
 				}
 
@@ -839,19 +981,29 @@ func TestUpdateSetting(t *testing.T) {
 		},
 		{
 			name: "update setting with non existent org id",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.PasswordExpirySetting {
-				setting := domain.PasswordExpirySetting{
+			testFunc: func(ctx context.Context, t *testing.T) *domain.LabelSetting {
+				setting := domain.LabelSetting{
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
 						OrgID:      gu.Ptr("non-existent-orgID"),
 						ID:         gofakeit.Name(),
-						Type:       domain.SettingTypePasswordExpiry,
+						Type:       domain.SettingTypeLabel,
 						Settings:   []byte("{}"),
 					},
-					Settings: domain.PasswordExpirySettings{
-						IsDefault:      true,
-						ExpireWarnDays: 10,
-						MaxAgeDays:     40,
+					Settings: domain.LabelSettings{
+						IsDefault:           false,
+						PrimaryColor:        "value",
+						BackgroundColor:     "value",
+						WarnColor:           "value",
+						FontColor:           "value",
+						PrimaryColorDark:    "value",
+						BackgroundColorDark: "value",
+						WarnColorDark:       "value",
+						FontColorDark:       "value",
+						HideLoginNameSuffix: true,
+						ErrorMsgPopup:       true,
+						DisableWatermark:    true,
+						ThemeMode:           domain.LabelPolicyThemeAuto,
 					},
 				}
 				return &setting
@@ -861,22 +1013,32 @@ func TestUpdateSetting(t *testing.T) {
 		},
 		{
 			name: "update setting with wrong type",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.PasswordExpirySetting {
-				setting := domain.PasswordExpirySetting{
+			testFunc: func(ctx context.Context, t *testing.T) *domain.LabelSetting {
+				setting := domain.LabelSetting{
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
 						OrgID:      &orgId,
 						ID:         gofakeit.Name(),
-						Type:       domain.SettingTypePasswordExpiry,
+						Type:       domain.SettingTypeLabel,
 						Settings:   []byte("{}"),
 					},
-					Settings: domain.PasswordExpirySettings{
-						IsDefault:      true,
-						ExpireWarnDays: 10,
-						MaxAgeDays:     40,
+					Settings: domain.LabelSettings{
+						IsDefault:           false,
+						PrimaryColor:        "value",
+						BackgroundColor:     "value",
+						WarnColor:           "value",
+						FontColor:           "value",
+						PrimaryColorDark:    "value",
+						BackgroundColorDark: "value",
+						WarnColorDark:       "value",
+						FontColorDark:       "value",
+						HideLoginNameSuffix: true,
+						ErrorMsgPopup:       true,
+						DisableWatermark:    true,
+						ThemeMode:           domain.LabelPolicyThemeAuto,
 					},
 				}
-				err := settingRepo.CreatePasswordExpiry(ctx, &setting)
+				err := settingRepo.CreateLabel(ctx, &setting)
 				require.NoError(t, err)
 
 				// change type
@@ -899,7 +1061,7 @@ func TestUpdateSetting(t *testing.T) {
 
 			// update setting
 			beforeUpdate := time.Now()
-			rowsAffected, err := settingRepo.UpdatePasswordExpiry(
+			rowsAffected, err := settingRepo.UpdateLabel(
 				ctx,
 				setting,
 			)
@@ -915,10 +1077,11 @@ func TestUpdateSetting(t *testing.T) {
 			}
 
 			// check updatedSetting values
-			updatedSetting, err := settingRepo.GetPasswordExpiry(
+			updatedSetting, err := settingRepo.GetLabel(
 				ctx,
 				setting.InstanceID,
 				setting.OrgID,
+				*setting.LabelState,
 			)
 			require.NoError(t, err)
 
@@ -926,9 +1089,9 @@ func TestUpdateSetting(t *testing.T) {
 			assert.Equal(t, setting.OrgID, updatedSetting.OrgID)
 			assert.Equal(t, setting.ID, updatedSetting.ID)
 			assert.Equal(t, setting.Type, updatedSetting.Type)
-			assert.Equal(t, setting.Settings.IsDefault, updatedSetting.Settings.IsDefault)
-			assert.Equal(t, setting.Settings.ExpireWarnDays, updatedSetting.Settings.ExpireWarnDays)
-			assert.Equal(t, setting.Settings.MaxAgeDays, updatedSetting.Settings.MaxAgeDays)
+
+			assert.Equal(t, setting.Settings, updatedSetting.Settings)
+
 			assert.WithinRange(t, updatedSetting.UpdatedAt, beforeUpdate, afterUpdate)
 		})
 	}
@@ -1085,7 +1248,7 @@ func TestGetSetting(t *testing.T) {
 			}
 
 			// get setting
-			returnedIDP, err := settingRepo.Get(ctx,
+			returnedSetting, err := settingRepo.Get(ctx,
 				setting.InstanceID,
 				setting.OrgID,
 				setting.Type,
@@ -1095,15 +1258,127 @@ func TestGetSetting(t *testing.T) {
 				return
 			}
 
-			assert.Equal(t, returnedIDP.InstanceID, setting.InstanceID)
-			assert.Equal(t, returnedIDP.OrgID, setting.OrgID)
-			assert.Equal(t, returnedIDP.ID, setting.ID)
-			assert.Equal(t, returnedIDP.Type, setting.Type)
-			assert.Equal(t, returnedIDP.Settings, setting.Settings)
+			assert.Equal(t, returnedSetting.InstanceID, setting.InstanceID)
+			assert.Equal(t, returnedSetting.OrgID, setting.OrgID)
+			assert.Equal(t, returnedSetting.ID, setting.ID)
+			assert.Equal(t, returnedSetting.Type, setting.Type)
+
+			assert.Equal(t, returnedSetting.Settings, setting.Settings)
 		})
 	}
 }
 
+// testing that values written to the db are successfully retrieved
+func TestCreateGetLoginPolicySetting(t *testing.T) {
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository(pool)
+	err := instanceRepo.Create(t.Context(), &instance)
+	require.NoError(t, err)
+
+	// create org
+	orgId := gofakeit.Name()
+	org := domain.Organization{
+		ID:         orgId,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive,
+	}
+	organizationRepo := repository.OrganizationRepository(pool)
+	err = organizationRepo.Create(t.Context(), &org)
+	require.NoError(t, err)
+
+	settingRepo := repository.SettingsRepository(pool)
+
+	type test struct {
+		name     string
+		testFunc func(ctx context.Context, t *testing.T) *domain.LoginSetting
+		err      error
+	}
+	tests := []test{
+		{
+			name: "happy path",
+			testFunc: func(ctx context.Context, t *testing.T) *domain.LoginSetting {
+				setting := domain.LoginSetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						Type:       domain.SettingTypeLabel,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
+					},
+					Settings: domain.LoginSettings{
+						IsDefault:                  true,
+						AllowUserNamePassword:      true,
+						AllowRegister:              true,
+						AllowExternalSetting:       true,
+						ForceMFA:                   true,
+						ForceMFALocalOnly:          true,
+						HidePasswordReset:          true,
+						IgnoreUnknownUsernames:     true,
+						AllowDomainDiscovery:       true,
+						DisableLoginWithEmail:      true,
+						DisableLoginWithPhone:      true,
+						PasswordlessType:           domain.PasswordlessTypeAllowed,
+						DefaultRedirectURI:         "wwww.example.com",
+						PasswordCheckLifetime:      time.Duration(time.Second * 50),
+						ExternalLoginCheckLifetime: time.Duration(time.Second * 50),
+						MFAInitSkipLifetime:        time.Duration(time.Second * 50),
+						SecondFactorCheckLifetime:  time.Duration(time.Second * 50),
+						MultiFactorCheckLifetime:   time.Duration(time.Second * 50),
+					},
+				}
+
+				err := settingRepo.CreateLogin(ctx, &setting)
+				require.NoError(t, err)
+				return &setting
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := t.Context()
+			// t.Cleanup(func() {
+			// 	_, err := pool.Exec(context.Background(), "DELETE FROM zitadel.settings")
+			// 	require.NoError(t, err)
+			// })
+
+			var setting *domain.LoginSetting
+			if tt.testFunc != nil {
+				setting = tt.testFunc(ctx, t)
+			}
+
+			// get setting
+			returnedSetting, err := settingRepo.GetLogin(ctx,
+				setting.InstanceID,
+				setting.OrgID,
+			)
+			if err != nil {
+				require.ErrorIs(t, tt.err, err)
+				return
+			}
+
+			assert.Equal(t, returnedSetting.InstanceID, setting.InstanceID)
+			assert.Equal(t, returnedSetting.OrgID, setting.OrgID)
+			assert.Equal(t, returnedSetting.ID, setting.ID)
+			assert.Equal(t, returnedSetting.Type, setting.Type)
+
+			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+		})
+	}
+}
+
+// testing that values written to the db are successfully retrieved
 func TestGetLabelPolicySetting(t *testing.T) {
 	// create instance
 	instanceId := gofakeit.Name()
@@ -1132,19 +1407,7 @@ func TestGetLabelPolicySetting(t *testing.T) {
 	err = organizationRepo.Create(t.Context(), &org)
 	require.NoError(t, err)
 
-	// create setting
-	// this setting is created as an additional org which should NOT
-	// be returned in the results of the tests
-	prexistingSetting := domain.Setting{
-		InstanceID: instanceId,
-		OrgID:      &orgId,
-		ID:         gofakeit.Name(),
-		Type:       domain.SettingTypePasswordExpiry,
-		Settings:   []byte("{}"),
-	}
 	settingRepo := repository.SettingsRepository(pool)
-	err = settingRepo.Create(t.Context(), &prexistingSetting)
-	require.NoError(t, err)
 
 	type test struct {
 		name     string
@@ -1162,7 +1425,21 @@ func TestGetLabelPolicySetting(t *testing.T) {
 						OrgID:      &orgId,
 						Type:       domain.SettingTypeLabel,
 						LabelState: gu.Ptr(domain.LabelStatePreview),
-						Settings:   []byte("{}"),
+					},
+					Settings: domain.LabelSettings{
+						IsDefault:           false,
+						PrimaryColor:        "value",
+						BackgroundColor:     "value",
+						WarnColor:           "value",
+						FontColor:           "value",
+						PrimaryColorDark:    "value",
+						BackgroundColorDark: "value",
+						WarnColorDark:       "value",
+						FontColorDark:       "value",
+						HideLoginNameSuffix: true,
+						ErrorMsgPopup:       true,
+						DisableWatermark:    true,
+						ThemeMode:           domain.LabelPolicyThemeAuto,
 					},
 				}
 
@@ -1180,7 +1457,21 @@ func TestGetLabelPolicySetting(t *testing.T) {
 						OrgID:      &orgId,
 						Type:       domain.SettingTypeLabel,
 						LabelState: gu.Ptr(domain.LabelStateActivated),
-						Settings:   []byte("{}"),
+					},
+					Settings: domain.LabelSettings{
+						IsDefault:           false,
+						PrimaryColor:        "value",
+						BackgroundColor:     "value",
+						WarnColor:           "value",
+						FontColor:           "value",
+						PrimaryColorDark:    "value",
+						BackgroundColorDark: "value",
+						WarnColorDark:       "value",
+						FontColorDark:       "value",
+						HideLoginNameSuffix: true,
+						ErrorMsgPopup:       true,
+						DisableWatermark:    true,
+						ThemeMode:           domain.LabelPolicyThemeAuto,
 					},
 				}
 
@@ -1198,7 +1489,6 @@ func TestGetLabelPolicySetting(t *testing.T) {
 						OrgID:      &orgId,
 						Type:       domain.SettingTypeLabel,
 						LabelState: gu.Ptr(domain.LabelStateActivated),
-						Settings:   []byte("{}"),
 					},
 				}
 
@@ -1242,7 +1532,7 @@ func TestGetLabelPolicySetting(t *testing.T) {
 			}
 
 			// get setting
-			returnedIDP, err := settingRepo.GetLabel(ctx,
+			returnedSetting, err := settingRepo.GetLabel(ctx,
 				setting.InstanceID,
 				setting.OrgID,
 				*setting.LabelState,
@@ -1252,11 +1542,559 @@ func TestGetLabelPolicySetting(t *testing.T) {
 				return
 			}
 
-			assert.Equal(t, returnedIDP.InstanceID, setting.InstanceID)
-			assert.Equal(t, returnedIDP.OrgID, setting.OrgID)
-			assert.Equal(t, returnedIDP.ID, setting.ID)
-			assert.Equal(t, returnedIDP.Type, setting.Type)
-			assert.Equal(t, returnedIDP.Settings, setting.Settings)
+			assert.Equal(t, returnedSetting.InstanceID, setting.InstanceID)
+			assert.Equal(t, returnedSetting.OrgID, setting.OrgID)
+			assert.Equal(t, returnedSetting.ID, setting.ID)
+			assert.Equal(t, returnedSetting.Type, setting.Type)
+
+			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+		})
+	}
+}
+
+// testing that values written to the db are successfully retrieved
+func TestCreateGetPasswordComplexityPolicySetting(t *testing.T) {
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository(pool)
+	err := instanceRepo.Create(t.Context(), &instance)
+	require.NoError(t, err)
+
+	// create org
+	orgId := gofakeit.Name()
+	org := domain.Organization{
+		ID:         orgId,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive,
+	}
+	organizationRepo := repository.OrganizationRepository(pool)
+	err = organizationRepo.Create(t.Context(), &org)
+	require.NoError(t, err)
+
+	settingRepo := repository.SettingsRepository(pool)
+
+	type test struct {
+		name     string
+		testFunc func(ctx context.Context, t *testing.T) *domain.PasswordComplexitySetting
+		err      error
+	}
+	tests := []test{
+		{
+			name: "happy path",
+			testFunc: func(ctx context.Context, t *testing.T) *domain.PasswordComplexitySetting {
+				setting := domain.PasswordComplexitySetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						Type:       domain.SettingTypeLabel,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
+					},
+					Settings: domain.PasswordComplexitySettings{
+						IsDefault:    true,
+						MinLength:    89,
+						HasLowercase: true,
+						HasUppercase: true,
+						HasNumber:    true,
+						HasSymbol:    true,
+					},
+				}
+
+				err := settingRepo.CreatePasswordComplexity(ctx, &setting)
+				require.NoError(t, err)
+				return &setting
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := t.Context()
+
+			var setting *domain.PasswordComplexitySetting
+			if tt.testFunc != nil {
+				setting = tt.testFunc(ctx, t)
+			}
+
+			// get setting
+			returnedSetting, err := settingRepo.GetPasswordComplexity(ctx,
+				setting.InstanceID,
+				setting.OrgID,
+			)
+			if err != nil {
+				require.ErrorIs(t, tt.err, err)
+				return
+			}
+
+			assert.Equal(t, returnedSetting.InstanceID, setting.InstanceID)
+			assert.Equal(t, returnedSetting.OrgID, setting.OrgID)
+			assert.Equal(t, returnedSetting.ID, setting.ID)
+			assert.Equal(t, returnedSetting.Type, setting.Type)
+
+			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+		})
+	}
+}
+
+func TestCreateGetPasswordExpiryPolicySetting(t *testing.T) {
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository(pool)
+	err := instanceRepo.Create(t.Context(), &instance)
+	require.NoError(t, err)
+
+	// create org
+	orgId := gofakeit.Name()
+	org := domain.Organization{
+		ID:         orgId,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive,
+	}
+	organizationRepo := repository.OrganizationRepository(pool)
+	err = organizationRepo.Create(t.Context(), &org)
+	require.NoError(t, err)
+
+	settingRepo := repository.SettingsRepository(pool)
+
+	type test struct {
+		name     string
+		testFunc func(ctx context.Context, t *testing.T) *domain.PasswordExpirySetting
+		err      error
+	}
+	tests := []test{
+		{
+			name: "happy path",
+			testFunc: func(ctx context.Context, t *testing.T) *domain.PasswordExpirySetting {
+				setting := domain.PasswordExpirySetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						Type:       domain.SettingTypeLabel,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
+					},
+					Settings: domain.PasswordExpirySettings{
+						IsDefault:      true,
+						ExpireWarnDays: 30,
+						MaxAgeDays:     30,
+					},
+				}
+
+				err := settingRepo.CreatePasswordExpiry(ctx, &setting)
+				require.NoError(t, err)
+				return &setting
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := t.Context()
+
+			var setting *domain.PasswordExpirySetting
+			if tt.testFunc != nil {
+				setting = tt.testFunc(ctx, t)
+			}
+
+			// get setting
+			returnedSetting, err := settingRepo.GetPasswordExpiry(ctx,
+				setting.InstanceID,
+				setting.OrgID,
+			)
+			if err != nil {
+				require.ErrorIs(t, tt.err, err)
+				return
+			}
+
+			assert.Equal(t, returnedSetting.InstanceID, setting.InstanceID)
+			assert.Equal(t, returnedSetting.OrgID, setting.OrgID)
+			assert.Equal(t, returnedSetting.ID, setting.ID)
+			assert.Equal(t, returnedSetting.Type, setting.Type)
+
+			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+		})
+	}
+}
+
+func TestCreateGetLockoutPolicySetting(t *testing.T) {
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository(pool)
+	err := instanceRepo.Create(t.Context(), &instance)
+	require.NoError(t, err)
+
+	// create org
+	orgId := gofakeit.Name()
+	org := domain.Organization{
+		ID:         orgId,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive,
+	}
+	organizationRepo := repository.OrganizationRepository(pool)
+	err = organizationRepo.Create(t.Context(), &org)
+	require.NoError(t, err)
+
+	settingRepo := repository.SettingsRepository(pool)
+
+	type test struct {
+		name     string
+		testFunc func(ctx context.Context, t *testing.T) *domain.LockoutSetting
+		err      error
+	}
+	tests := []test{
+		{
+			name: "happy path",
+			testFunc: func(ctx context.Context, t *testing.T) *domain.LockoutSetting {
+				setting := domain.LockoutSetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						Type:       domain.SettingTypeLabel,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
+					},
+					Settings: domain.LockoutSettings{
+						IsDefault:           true,
+						MaxPasswordAttempts: 50,
+						MaxOTPAttempts:      50,
+						ShowLockOutFailures: true,
+					},
+				}
+
+				err := settingRepo.CreateLockout(ctx, &setting)
+				require.NoError(t, err)
+				return &setting
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := t.Context()
+
+			var setting *domain.LockoutSetting
+			if tt.testFunc != nil {
+				setting = tt.testFunc(ctx, t)
+			}
+
+			// get setting
+			returnedSetting, err := settingRepo.GetLockout(ctx,
+				setting.InstanceID,
+				setting.OrgID,
+			)
+			if err != nil {
+				require.ErrorIs(t, tt.err, err)
+				return
+			}
+
+			assert.Equal(t, returnedSetting.InstanceID, setting.InstanceID)
+			assert.Equal(t, returnedSetting.OrgID, setting.OrgID)
+			assert.Equal(t, returnedSetting.ID, setting.ID)
+			assert.Equal(t, returnedSetting.Type, setting.Type)
+
+			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+		})
+	}
+}
+
+func TestCreateGetSecurityPolicySetting(t *testing.T) {
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository(pool)
+	err := instanceRepo.Create(t.Context(), &instance)
+	require.NoError(t, err)
+
+	// create org
+	orgId := gofakeit.Name()
+	org := domain.Organization{
+		ID:         orgId,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive,
+	}
+	organizationRepo := repository.OrganizationRepository(pool)
+	err = organizationRepo.Create(t.Context(), &org)
+	require.NoError(t, err)
+
+	settingRepo := repository.SettingsRepository(pool)
+
+	type test struct {
+		name     string
+		testFunc func(ctx context.Context, t *testing.T) *domain.SecuritySetting
+		err      error
+	}
+	tests := []test{
+		{
+			name: "happy path",
+			testFunc: func(ctx context.Context, t *testing.T) *domain.SecuritySetting {
+				setting := domain.SecuritySetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						Type:       domain.SettingTypeLabel,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
+					},
+					Settings: domain.SecuritySettings{
+						Enabled:               true,
+						EnableIframeEmbedding: true,
+						AllowedOrigins:        []string{"value"},
+						EnableImpersonation:   true,
+					},
+				}
+
+				err := settingRepo.CreateSecurity(ctx, &setting)
+				require.NoError(t, err)
+				return &setting
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := t.Context()
+
+			var setting *domain.SecuritySetting
+			if tt.testFunc != nil {
+				setting = tt.testFunc(ctx, t)
+			}
+
+			// get setting
+			returnedSetting, err := settingRepo.GetSecurity(ctx,
+				setting.InstanceID,
+				setting.OrgID,
+			)
+			if err != nil {
+				require.ErrorIs(t, tt.err, err)
+				return
+			}
+
+			assert.Equal(t, returnedSetting.InstanceID, setting.InstanceID)
+			assert.Equal(t, returnedSetting.OrgID, setting.OrgID)
+			assert.Equal(t, returnedSetting.ID, setting.ID)
+			assert.Equal(t, returnedSetting.Type, setting.Type)
+
+			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+		})
+	}
+}
+
+func TestCreateGetDomainPolicySetting(t *testing.T) {
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository(pool)
+	err := instanceRepo.Create(t.Context(), &instance)
+	require.NoError(t, err)
+
+	// create org
+	orgId := gofakeit.Name()
+	org := domain.Organization{
+		ID:         orgId,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive,
+	}
+	organizationRepo := repository.OrganizationRepository(pool)
+	err = organizationRepo.Create(t.Context(), &org)
+	require.NoError(t, err)
+
+	settingRepo := repository.SettingsRepository(pool)
+
+	type test struct {
+		name     string
+		testFunc func(ctx context.Context, t *testing.T) *domain.DomainSetting
+		err      error
+	}
+	tests := []test{
+		{
+			name: "happy path",
+			testFunc: func(ctx context.Context, t *testing.T) *domain.DomainSetting {
+				setting := domain.DomainSetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						Type:       domain.SettingTypeLabel,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
+					},
+					Settings: domain.DomainSettings{
+						IsDefault:                              true,
+						UserLoginMustBeDomain:                  true,
+						ValidateOrgDomains:                     true,
+						SMTPSenderAddressMatchesInstanceDomain: true,
+					},
+				}
+
+				err := settingRepo.CreateDomain(ctx, &setting)
+				require.NoError(t, err)
+				return &setting
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := t.Context()
+
+			var setting *domain.DomainSetting
+			if tt.testFunc != nil {
+				setting = tt.testFunc(ctx, t)
+			}
+
+			// get setting
+			returnedSetting, err := settingRepo.GetDomain(ctx,
+				setting.InstanceID,
+				setting.OrgID,
+			)
+			if err != nil {
+				require.ErrorIs(t, tt.err, err)
+				return
+			}
+
+			assert.Equal(t, returnedSetting.InstanceID, setting.InstanceID)
+			assert.Equal(t, returnedSetting.OrgID, setting.OrgID)
+			assert.Equal(t, returnedSetting.ID, setting.ID)
+			assert.Equal(t, returnedSetting.Type, setting.Type)
+
+			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+		})
+	}
+}
+
+func TestCreateGetOrgPolicySetting(t *testing.T) {
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository(pool)
+	err := instanceRepo.Create(t.Context(), &instance)
+	require.NoError(t, err)
+
+	// create org
+	orgId := gofakeit.Name()
+	org := domain.Organization{
+		ID:         orgId,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive,
+	}
+	organizationRepo := repository.OrganizationRepository(pool)
+	err = organizationRepo.Create(t.Context(), &org)
+	require.NoError(t, err)
+
+	settingRepo := repository.SettingsRepository(pool)
+
+	type test struct {
+		name     string
+		testFunc func(ctx context.Context, t *testing.T) *domain.OrgSetting
+		err      error
+	}
+	tests := []test{
+		{
+			name: "happy path",
+			testFunc: func(ctx context.Context, t *testing.T) *domain.OrgSetting {
+				setting := domain.OrgSetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						Type:       domain.SettingTypeLabel,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
+					},
+					Settings: domain.OrgSettings{
+						OrganizationScopedUsernames:    true,
+						OldOrganizationScopedUsernames: true,
+						UsernameChanges:                []string{"value"},
+					},
+				}
+
+				err := settingRepo.CreateOrg(ctx, &setting)
+				require.NoError(t, err)
+				return &setting
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := t.Context()
+
+			var setting *domain.OrgSetting
+			if tt.testFunc != nil {
+				setting = tt.testFunc(ctx, t)
+			}
+
+			// get setting
+			returnedSetting, err := settingRepo.GetOrg(ctx,
+				setting.InstanceID,
+				setting.OrgID,
+			)
+			if err != nil {
+				require.ErrorIs(t, tt.err, err)
+				return
+			}
+
+			assert.Equal(t, returnedSetting.InstanceID, setting.InstanceID)
+			assert.Equal(t, returnedSetting.OrgID, setting.OrgID)
+			assert.Equal(t, returnedSetting.ID, setting.ID)
+			assert.Equal(t, returnedSetting.Type, setting.Type)
+
+			assert.Equal(t, returnedSetting.Settings, setting.Settings)
 		})
 	}
 }
@@ -1301,10 +2139,10 @@ func TestListSetting(t *testing.T) {
 	settingRepo := repository.SettingsRepository(pool)
 
 	type test struct {
-		name             string
-		testFunc         func(ctx context.Context, t *testing.T) []*domain.Setting
-		conditionClauses func() []database.Condition
-		noIDPsReturned   bool
+		name               string
+		testFunc           func(ctx context.Context, t *testing.T) []*domain.Setting
+		conditionClauses   func() []database.Condition
+		noSettingsReturned bool
 	}
 	tests := []test{
 		{
@@ -1349,9 +2187,9 @@ func TestListSetting(t *testing.T) {
 				err := settingRepo.Create(ctx, &setting)
 				require.NoError(t, err)
 
-				noOfIDPs := 5
-				settings := make([]*domain.Setting, noOfIDPs)
-				for i := range noOfIDPs {
+				noOfSettings := 5
+				settings := make([]*domain.Setting, noOfSettings)
+				for i := range noOfSettings {
 
 					setting := domain.Setting{
 						InstanceID: instanceId,
@@ -1404,9 +2242,9 @@ func TestListSetting(t *testing.T) {
 				err := settingRepo.Create(ctx, &setting)
 				require.NoError(t, err)
 
-				noOfIDPs := 5
-				settings := make([]*domain.Setting, noOfIDPs)
-				for i := range noOfIDPs {
+				noOfSettings := 5
+				settings := make([]*domain.Setting, noOfSettings)
+				for i := range noOfSettings {
 
 					setting := domain.Setting{
 						InstanceID: instanceId,
@@ -1457,9 +2295,9 @@ func TestListSetting(t *testing.T) {
 				err := settingRepo.Create(ctx, &setting)
 				require.NoError(t, err)
 
-				noOfIDPs := 5
-				settings := make([]*domain.Setting, noOfIDPs)
-				for i := range noOfIDPs {
+				noOfSettings := 5
+				settings := make([]*domain.Setting, noOfSettings)
+				for i := range noOfSettings {
 
 					setting := domain.Setting{
 						InstanceID: instanceId,
@@ -1484,9 +2322,9 @@ func TestListSetting(t *testing.T) {
 		{
 			name: "happy path single setting no filter",
 			testFunc: func(ctx context.Context, t *testing.T) []*domain.Setting {
-				noOfIDPs := 1
-				settings := make([]*domain.Setting, noOfIDPs)
-				for i := range noOfIDPs {
+				noOfSettings := 1
+				settings := make([]*domain.Setting, noOfSettings)
+				for i := range noOfSettings {
 
 					setting := domain.Setting{
 						InstanceID: instanceId,
@@ -1508,9 +2346,9 @@ func TestListSetting(t *testing.T) {
 		{
 			name: "happy path multiple settings no filter",
 			testFunc: func(ctx context.Context, t *testing.T) []*domain.Setting {
-				noOfIDPs := 5
-				settings := make([]*domain.Setting, noOfIDPs)
-				for i := range noOfIDPs {
+				noOfSettings := 5
+				settings := make([]*domain.Setting, noOfSettings)
+				for i := range noOfSettings {
 
 					setting := domain.Setting{
 						InstanceID: instanceId,
@@ -1547,9 +2385,9 @@ func TestListSetting(t *testing.T) {
 					err := settingRepo.Create(ctx, &setting)
 					require.NoError(t, err)
 
-					noOfIDPs := 1
-					settings := make([]*domain.Setting, noOfIDPs)
-					for i := range noOfIDPs {
+					noOfSettings := 1
+					settings := make([]*domain.Setting, noOfSettings)
+					for i := range noOfSettings {
 
 						setting := domain.Setting{
 							InstanceID: instanceId,
@@ -1590,9 +2428,9 @@ func TestListSetting(t *testing.T) {
 				err := settingRepo.Create(ctx, &setting)
 				require.NoError(t, err)
 
-				noOfIDPs := 1
-				settings := make([]*domain.Setting, noOfIDPs)
-				for i := range noOfIDPs {
+				noOfSettings := 1
+				settings := make([]*domain.Setting, noOfSettings)
+				for i := range noOfSettings {
 
 					setting := domain.Setting{
 						InstanceID: instanceId,
@@ -1632,22 +2470,22 @@ func TestListSetting(t *testing.T) {
 			}
 
 			// check setting values
-			returnedIDPs, err := settingRepo.List(ctx,
+			returnedSettings, err := settingRepo.List(ctx,
 				conditions...,
 			)
 			require.NoError(t, err)
-			if tt.noIDPsReturned {
-				assert.Nil(t, returnedIDPs)
+			if tt.noSettingsReturned {
+				assert.Nil(t, returnedSettings)
 				return
 			}
 
-			assert.Equal(t, len(settings), len(returnedIDPs))
+			assert.Equal(t, len(settings), len(returnedSettings))
 			for i, setting := range settings {
 
-				assert.Equal(t, returnedIDPs[i].InstanceID, setting.InstanceID)
-				assert.Equal(t, returnedIDPs[i].OrgID, setting.OrgID)
-				assert.Equal(t, returnedIDPs[i].Type, setting.Type)
-				assert.Equal(t, returnedIDPs[i].Settings, setting.Settings)
+				assert.Equal(t, returnedSettings[i].InstanceID, setting.InstanceID)
+				assert.Equal(t, returnedSettings[i].OrgID, setting.OrgID)
+				assert.Equal(t, returnedSettings[i].Type, setting.Type)
+				assert.Equal(t, returnedSettings[i].Settings, setting.Settings)
 			}
 		})
 	}
@@ -1691,11 +2529,11 @@ func TestDeleteSetting(t *testing.T) {
 	}
 	tests := []test{
 		func() test {
-			var noOfIDPs int64 = 1
+			var noOfSettings int64 = 1
 			return test{
 				name: "happy path delete",
 				testFunc: func(ctx context.Context, t *testing.T) {
-					for range noOfIDPs {
+					for range noOfSettings {
 						setting := domain.Setting{
 							InstanceID: instanceId,
 							OrgID:      &orgId,
@@ -1707,7 +2545,7 @@ func TestDeleteSetting(t *testing.T) {
 						require.NoError(t, err)
 					}
 				},
-				noOfDeletedRows: noOfIDPs,
+				noOfDeletedRows: noOfSettings,
 				settingType:     domain.SettingTypeLogin,
 			}
 		}(),
@@ -1715,8 +2553,8 @@ func TestDeleteSetting(t *testing.T) {
 			return test{
 				name: "deleted setting with wrong type",
 				testFunc: func(ctx context.Context, t *testing.T) {
-					noOfIDPs := 1
-					for range noOfIDPs {
+					noOfSettings := 1
+					for range noOfSettings {
 						setting := domain.Setting{
 							InstanceID: instanceId,
 							OrgID:      &orgId,
@@ -1748,8 +2586,8 @@ func TestDeleteSetting(t *testing.T) {
 			return test{
 				name: "deleted already deleted setting",
 				testFunc: func(ctx context.Context, t *testing.T) {
-					noOfIDPs := 1
-					for range noOfIDPs {
+					noOfSettings := 1
+					for range noOfSettings {
 						setting := domain.Setting{
 							InstanceID: instanceId,
 							OrgID:      &orgId,
