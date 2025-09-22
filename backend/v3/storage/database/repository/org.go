@@ -46,6 +46,10 @@ func (o org) Get(ctx context.Context, client database.QueryExecutor, opts ...dat
 		opt(options)
 	}
 
+	if !options.Condition.IsRestrictingColumn(o.InstanceIDColumn()) {
+		return nil, database.NewMissingConditionError(o.InstanceIDColumn())
+	}
+
 	var builder database.StatementBuilder
 	builder.WriteString(queryOrganizationStmt)
 	options.Write(&builder)
@@ -64,6 +68,10 @@ func (o org) List(ctx context.Context, client database.QueryExecutor, opts ...da
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
+	}
+
+	if !options.Condition.IsRestrictingColumn(o.InstanceIDColumn()) {
+		return nil, database.NewMissingConditionError(o.InstanceIDColumn())
 	}
 
 	var builder database.StatementBuilder
@@ -88,6 +96,10 @@ func (o org) Create(ctx context.Context, client database.QueryExecutor, organiza
 
 // Update implements [domain.OrganizationRepository].
 func (o org) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+	if !condition.IsRestrictingColumn(o.InstanceIDColumn()) {
+		return 0, database.NewMissingConditionError(o.InstanceIDColumn())
+	}
+
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}

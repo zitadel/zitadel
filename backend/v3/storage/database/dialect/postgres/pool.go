@@ -22,8 +22,8 @@ func PGxPool(pool *pgxpool.Pool) *pgxPool {
 }
 
 // Acquire implements [database.Pool].
-func (c *pgxPool) Acquire(ctx context.Context) (database.Connection, error) {
-	conn, err := c.Pool.Acquire(ctx)
+func (p *pgxPool) Acquire(ctx context.Context) (database.Connection, error) {
+	conn, err := p.Pool.Acquire(ctx)
 	if err != nil {
 		return nil, wrapError(err)
 	}
@@ -32,8 +32,8 @@ func (c *pgxPool) Acquire(ctx context.Context) (database.Connection, error) {
 
 // Query implements [database.Pool].
 // Subtle: this method shadows the method (Pool).Query of pgxPool.Pool.
-func (c *pgxPool) Query(ctx context.Context, sql string, args ...any) (database.Rows, error) {
-	rows, err := c.Pool.Query(ctx, sql, args...)
+func (p *pgxPool) Query(ctx context.Context, sql string, args ...any) (database.Rows, error) {
+	rows, err := p.Pool.Query(ctx, sql, args...)
 	if err != nil {
 		return nil, wrapError(err)
 	}
@@ -42,14 +42,14 @@ func (c *pgxPool) Query(ctx context.Context, sql string, args ...any) (database.
 
 // QueryRow implements [database.Pool].
 // Subtle: this method shadows the method (Pool).QueryRow of pgxPool.Pool.
-func (c *pgxPool) QueryRow(ctx context.Context, sql string, args ...any) database.Row {
-	return &Row{c.Pool.QueryRow(ctx, sql, args...)}
+func (p *pgxPool) QueryRow(ctx context.Context, sql string, args ...any) database.Row {
+	return &Row{p.Pool.QueryRow(ctx, sql, args...)}
 }
 
 // Exec implements [database.Pool].
 // Subtle: this method shadows the method (Pool).Exec of pgxPool.Pool.
-func (c *pgxPool) Exec(ctx context.Context, sql string, args ...any) (int64, error) {
-	res, err := c.Pool.Exec(ctx, sql, args...)
+func (p *pgxPool) Exec(ctx context.Context, sql string, args ...any) (int64, error) {
+	res, err := p.Pool.Exec(ctx, sql, args...)
 	if err != nil {
 		return 0, wrapError(err)
 	}
@@ -57,8 +57,8 @@ func (c *pgxPool) Exec(ctx context.Context, sql string, args ...any) (int64, err
 }
 
 // Begin implements [database.Pool].
-func (c *pgxPool) Begin(ctx context.Context, opts *database.TransactionOptions) (database.Transaction, error) {
-	tx, err := c.BeginTx(ctx, transactionOptionsToPgx(opts))
+func (p *pgxPool) Begin(ctx context.Context, opts *database.TransactionOptions) (database.Transaction, error) {
+	tx, err := p.BeginTx(ctx, transactionOptionsToPgx(opts))
 	if err != nil {
 		return nil, wrapError(err)
 	}
@@ -66,23 +66,23 @@ func (c *pgxPool) Begin(ctx context.Context, opts *database.TransactionOptions) 
 }
 
 // Close implements [database.Pool].
-func (c *pgxPool) Close(_ context.Context) error {
-	c.Pool.Close()
+func (p *pgxPool) Close(_ context.Context) error {
+	p.Pool.Close()
 	return nil
 }
 
 // Ping implements [database.Pool].
-func (c *pgxPool) Ping(ctx context.Context) error {
-	return wrapError(c.Pool.Ping(ctx))
+func (p *pgxPool) Ping(ctx context.Context) error {
+	return wrapError(p.Pool.Ping(ctx))
 }
 
 // Migrate implements [database.Migrator].
-func (c *pgxPool) Migrate(ctx context.Context) error {
+func (p *pgxPool) Migrate(ctx context.Context) error {
 	if isMigrated {
 		return nil
 	}
 
-	client, err := c.Pool.Acquire(ctx)
+	client, err := p.Pool.Acquire(ctx)
 	if err != nil {
 		return err
 	}
@@ -93,8 +93,8 @@ func (c *pgxPool) Migrate(ctx context.Context) error {
 }
 
 // Migrate implements [database.PoolTest].
-func (c *pgxPool) MigrateTest(ctx context.Context) error {
-	client, err := c.Pool.Acquire(ctx)
+func (p *pgxPool) MigrateTest(ctx context.Context) error {
+	client, err := p.Pool.Acquire(ctx)
 	if err != nil {
 		return err
 	}

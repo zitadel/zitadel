@@ -4,8 +4,8 @@ type Columns []Column
 
 // WriteQualified implements [Column].
 // Columns are separated by ", ".
-func (m Columns) WriteQualified(builder *StatementBuilder) {
-	for i, col := range m {
+func (c Columns) WriteQualified(builder *StatementBuilder) {
+	for i, col := range c {
 		if i > 0 {
 			builder.WriteString(", ")
 		}
@@ -15,8 +15,8 @@ func (m Columns) WriteQualified(builder *StatementBuilder) {
 
 // WriteUnqualified implements [Column].
 // Columns are separated by ", ".
-func (m Columns) WriteUnqualified(builder *StatementBuilder) {
-	for i, col := range m {
+func (c Columns) WriteUnqualified(builder *StatementBuilder) {
+	for i, col := range c {
 		if i > 0 {
 			builder.WriteString(", ")
 		}
@@ -25,15 +25,15 @@ func (m Columns) WriteUnqualified(builder *StatementBuilder) {
 }
 
 // Equals implements [Column].
-func (m Columns) Equals(col Column) bool {
+func (c Columns) Equals(col Column) bool {
 	if col == nil {
-		return m == nil
+		return c == nil
 	}
 	other, ok := col.(Columns)
-	if !ok || len(other) != len(m) {
+	if !ok || len(other) != len(c) {
 		return false
 	}
-	for i, col := range m {
+	for i, col := range c {
 		if !col.Equals(other[i]) {
 			return false
 		}

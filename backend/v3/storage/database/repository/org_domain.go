@@ -39,6 +39,10 @@ func (o orgDomain) Get(ctx context.Context, client database.QueryExecutor, opts 
 		opt(options)
 	}
 
+	if !options.Condition.IsRestrictingColumn(o.InstanceIDColumn()) {
+		return nil, database.NewMissingConditionError(o.InstanceIDColumn())
+	}
+
 	var builder database.StatementBuilder
 	builder.WriteString(queryOrganizationDomainStmt)
 	options.Write(&builder)
@@ -52,6 +56,10 @@ func (o orgDomain) List(ctx context.Context, client database.QueryExecutor, opts
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
+	}
+
+	if !options.Condition.IsRestrictingColumn(o.InstanceIDColumn()) {
+		return nil, database.NewMissingConditionError(o.InstanceIDColumn())
 	}
 
 	var builder database.StatementBuilder
@@ -88,6 +96,13 @@ func (o orgDomain) Update(ctx context.Context, client database.QueryExecutor, co
 		return 0, database.ErrNoChanges
 	}
 
+	if !condition.IsRestrictingColumn(o.InstanceIDColumn()) {
+		return 0, database.NewMissingConditionError(o.InstanceIDColumn())
+	}
+	if !condition.IsRestrictingColumn(o.OrgIDColumn()) {
+		return 0, database.NewMissingConditionError(o.OrgIDColumn())
+	}
+
 	var builder database.StatementBuilder
 
 	builder.WriteString(`UPDATE zitadel.org_domains SET `)
@@ -99,8 +114,14 @@ func (o orgDomain) Update(ctx context.Context, client database.QueryExecutor, co
 
 // Remove implements [domain.OrganizationDomainRepository].
 func (o orgDomain) Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	var builder database.StatementBuilder
+	if !condition.IsRestrictingColumn(o.InstanceIDColumn()) {
+		return 0, database.NewMissingConditionError(o.InstanceIDColumn())
+	}
+	if !condition.IsRestrictingColumn(o.OrgIDColumn()) {
+		return 0, database.NewMissingConditionError(o.OrgIDColumn())
+	}
 
+	var builder database.StatementBuilder
 	builder.WriteString(`DELETE FROM zitadel.org_domains `)
 	writeCondition(&builder, condition)
 

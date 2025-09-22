@@ -81,6 +81,9 @@ func (i instanceDomain) Add(ctx context.Context, client database.QueryExecutor, 
 
 // Update implements [domain.InstanceDomainRepository].
 func (i instanceDomain) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+	if !condition.IsRestrictingColumn(i.InstanceIDColumn()) {
+		return 0, database.NewMissingConditionError(i.InstanceIDColumn())
+	}
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}
@@ -96,8 +99,11 @@ func (i instanceDomain) Update(ctx context.Context, client database.QueryExecuto
 
 // Remove implements [domain.InstanceDomainRepository].
 func (i instanceDomain) Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	var builder database.StatementBuilder
+	if !condition.IsRestrictingColumn(i.InstanceIDColumn()) {
+		return 0, database.NewMissingConditionError(i.InstanceIDColumn())
+	}
 
+	var builder database.StatementBuilder
 	builder.WriteString(`DELETE FROM zitadel.instance_domains WHERE `)
 	condition.Write(&builder)
 
