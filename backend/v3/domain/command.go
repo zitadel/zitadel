@@ -28,8 +28,9 @@ type Invoker interface {
 // CommandOpts are passed to each command
 // it provides common fields used by commands like the database client.
 type CommandOpts struct {
-	DB      database.QueryExecutor
-	Invoker Invoker
+	DB          database.QueryExecutor
+	Invoker     Invoker
+	Permissions PermissionChecker
 }
 
 type ensureTxOpts struct {
