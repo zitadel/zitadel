@@ -15,7 +15,7 @@ CREATE TABLE zitadel.identity_providers (
     , allow_auto_creation BOOLEAN NOT NULL DEFAULT TRUE
     , allow_auto_update BOOLEAN NOT NULL DEFAULT TRUE
     , allow_linking BOOLEAN NOT NULL DEFAULT TRUE
-    , allow_auto_linking SMALLINT DEFAULT NULL
+    , allow_auto_linking_field SMALLINT DEFAULT NULL
     , styling_type SMALLINT
     , payload JSONB
     
@@ -39,6 +39,6 @@ CREATE INDEX idx_identity_providers_type ON zitadel.identity_providers(instance_
 CREATE TRIGGER trigger_set_updated_at
 BEFORE UPDATE ON zitadel.identity_providers
 FOR EACH ROW
-WHEN (OLD.updated_at IS NOT DISTINCT FROM NEW.updated_at)
+WHEN (NEW.updated_at IS NULL)
 EXECUTE FUNCTION zitadel.set_updated_at();
 

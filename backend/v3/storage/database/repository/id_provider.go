@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -23,7 +25,7 @@ func IDProviderRepository(client database.QueryExecutor) domain.IDProviderReposi
 }
 
 const queryIDProviderStmt = `SELECT instance_id, org_id, id, state, name, type, auto_register, allow_creation, allow_auto_creation,` +
-	` allow_auto_update, allow_linking, allow_auto_linking, styling_type, payload, created_at, updated_at` +
+	` allow_auto_update, allow_linking, allow_auto_linking_field, styling_type, payload, created_at, updated_at` +
 	` FROM zitadel.identity_providers`
 
 func (i *idProvider) Get(ctx context.Context, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IdentityProvider, error) {
@@ -88,6 +90,7 @@ func (i *idProvider) Update(ctx context.Context, id domain.IDPIdentifierConditio
 	if changes == nil {
 		return 0, database.ErrNoChanges
 	}
+	changes = append(changes, i.SetUpdatedAt(nil))
 	builder := database.StatementBuilder{}
 	builder.WriteString(`UPDATE zitadel.identity_providers SET `)
 
@@ -100,6 +103,7 @@ func (i *idProvider) Update(ctx context.Context, id domain.IDPIdentifierConditio
 	writeCondition(&builder, database.And(conditions...))
 
 	stmt := builder.String()
+	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> stmt = %+v\n", stmt)
 
 	return i.client.Exec(ctx, stmt, builder.Args()...)
 }
@@ -432,7 +436,7 @@ func (idProvider) AllowLinkingColumn() database.Column {
 }
 
 func (idProvider) AllowAutoLinkingColumn() database.Column {
-	return database.NewColumn("identity_providers", "allow_auto_linking")
+	return database.NewColumn("identity_providers", "allow_auto_linking_field")
 }
 
 func (idProvider) StylingTypeColumn() database.Column {
@@ -556,6 +560,10 @@ func (i idProvider) SetStylingType(stylingType int16) database.Change {
 
 func (i idProvider) SetPayload(payload string) database.Change {
 	return database.NewChange(i.PayloadColumn(), payload)
+}
+
+func (i idProvider) SetUpdatedAt(updatedAt *time.Time) database.Change {
+	return database.NewChangePtr(i.UpdatedAtColumn(), updatedAt)
 }
 
 func scanIDProvider(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.IdentityProvider, error) {

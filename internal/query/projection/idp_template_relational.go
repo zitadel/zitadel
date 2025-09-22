@@ -27,7 +27,7 @@ const (
 	IDPRelationalAllowLinkingCol      = "allow_linking"
 	IDPRelationalAllowAutoCreationCol = "allow_auto_creation"
 	IDPRelationalAllowAutoUpdateCol   = "allow_auto_update"
-	IDPRelationalAllowAutoLinkingCol  = "allow_auto_linking"
+	IDPRelationalAllowAutoLinkingCol  = "allow_auto_linking_field"
 )
 
 type idpTemplateRelationalProjection struct {
@@ -378,6 +378,7 @@ func (p *idpTemplateRelationalProjection) reduceIDPRelationalAdded(event eventst
 			handler.NewCol(IDPRelationalAllowAutoLinkingCol, nil),
 			handler.NewCol(IDPStylingTypeCol, idpEvent.StylingType),
 			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
 		},
 	), nil
 }
@@ -396,23 +397,25 @@ func (p *idpTemplateRelationalProjection) reduceIDPRelationalChanged(event event
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YVvJD", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigChangedEventType, instance.IDPConfigChangedEventType})
 	}
 
-	cols := make([]handler.Column, 0, 5)
+	columns := make([]handler.Column, 0, 4)
 	if idpEvent.Name != nil {
-		cols = append(cols, handler.NewCol(IDPNameCol, *idpEvent.Name))
+		columns = append(columns, handler.NewCol(IDPNameCol, *idpEvent.Name))
 	}
 	if idpEvent.StylingType != nil {
-		cols = append(cols, handler.NewCol(IDPStylingTypeCol, *idpEvent.StylingType))
+		columns = append(columns, handler.NewCol(IDPStylingTypeCol, *idpEvent.StylingType))
 	}
 	if idpEvent.AutoRegister != nil {
-		cols = append(cols, handler.NewCol(IDPRelationalAutoRegisterCol, *idpEvent.AutoRegister))
+		columns = append(columns, handler.NewCol(IDPRelationalAutoRegisterCol, *idpEvent.AutoRegister))
 	}
-	if len(cols) == 0 {
+	if len(columns) == 0 {
 		return handler.NewNoOpStatement(&idpEvent), nil
 	}
 
+	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+
 	return handler.NewUpdateStatement(
 		&idpEvent,
-		cols,
+		columns,
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
 			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
@@ -439,6 +442,7 @@ func (p *idpTemplateRelationalProjection) reduceIDRelationalPDeactivated(event e
 		&idpEvent,
 		[]handler.Column{
 			handler.NewCol(IDPStateCol, domain.IDPStateInactive),
+			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
 		},
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
@@ -466,6 +470,7 @@ func (p *idpTemplateRelationalProjection) reduceIDPRelationalReactivated(event e
 		&idpEvent,
 		[]handler.Column{
 			handler.NewCol(IDPStateCol, domain.IDPStateActive.String()),
+			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
 		},
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
@@ -523,6 +528,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCRelationalConfigAdded(event 
 		[]handler.Column{
 			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 			handler.NewCol(IDPTypeCol, domain.IDPTypeOIDC),
+			handler.NewCol(UpdatedAt, idpEvent.CreatedAt()),
 		},
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
@@ -588,6 +594,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCRelationalConfigChanged(even
 		[]handler.Column{
 			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 			handler.NewCol(IDPTypeCol, domain.IDPTypeOIDC),
+			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
 		},
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
@@ -621,6 +628,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTRelationalConfigAdded(event e
 		[]handler.Column{
 			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 			handler.NewCol(IDPTypeCol, domain.IDPTypeJWT),
+			handler.NewCol(UpdatedAt, idpEvent.CreatedAt()),
 		},
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
@@ -674,6 +682,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTRelationalConfigChanged(event
 		[]handler.Column{
 			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 			handler.NewCol(IDPTypeCol, domain.IDPTypeJWT),
+			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
 		},
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
@@ -733,6 +742,7 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalAdded(event ev
 			}()),
 			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
 		},
 	), nil
 }
@@ -769,6 +779,8 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalChanged(event 
 		}
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
+
+	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
 
 	return handler.NewUpdateStatement(
 		&idpEvent,
@@ -820,6 +832,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalAdded(event eve
 			}()),
 			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
 		},
 	), nil
 }
@@ -856,6 +869,8 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalChanged(event e
 		}
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
+
+	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
 
 	return handler.NewUpdateStatement(
 		&idpEvent,
@@ -916,6 +931,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedAzureAD
 				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
 			}()),
 			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
 		},
 		[]handler.Condition{
 			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
@@ -966,6 +982,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedGoogle(
 				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
 			}()),
 			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
 		},
 		[]handler.Condition{
 			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
@@ -1021,6 +1038,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalAdded(event even
 			}()),
 			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
 		},
 	), nil
 }
@@ -1057,6 +1075,8 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalChanged(event ev
 		}
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
+
+	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
 
 	return handler.NewUpdateStatement(
 		&idpEvent,
@@ -1119,8 +1139,9 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalAdded(event 
 				}
 				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
 			}()),
-			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
 		},
 	), nil
 }
@@ -1161,6 +1182,8 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalChanged(even
 		}
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
+
+	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
 
 	return handler.NewUpdateStatement(
 		&idpEvent,
@@ -1216,8 +1239,9 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalAdded(event e
 				}
 				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
 			}()),
-			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
 		},
 	), nil
 }
@@ -1254,6 +1278,8 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalChanged(event
 		}
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
+
+	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
 
 	return handler.NewUpdateStatement(
 		&idpEvent,
@@ -1314,6 +1340,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalAdd
 			}()),
 			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
 		},
 	), nil
 }
@@ -1350,6 +1377,8 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalCha
 		}
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
+
+	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
 
 	return handler.NewUpdateStatement(
 		&idpEvent,
@@ -1405,8 +1434,9 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalAdded(event e
 				}
 				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
 			}()),
-			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
 		},
 	), nil
 }
@@ -1443,6 +1473,8 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalChanged(event
 		}
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
+
+	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
 
 	return handler.NewUpdateStatement(
 		&idpEvent,
@@ -1499,8 +1531,9 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalAdd
 				}
 				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
 			}()),
-			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
 		},
 	), nil
 }
@@ -1537,6 +1570,8 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalCha
 		}
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
+
+	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
 
 	return handler.NewUpdateStatement(
 		&idpEvent,
@@ -1592,8 +1627,9 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalAdded(event e
 				}
 				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
 			}()),
-			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
 		},
 	), nil
 }
@@ -1630,6 +1666,8 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalChanged(event
 		}
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
+
+	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
 
 	return handler.NewUpdateStatement(
 		&idpEvent,
@@ -1706,8 +1744,9 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPAdded(event eventstore.Ev
 				}
 				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
 			}()),
-			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
 		},
 	), nil
 }
@@ -1744,6 +1783,8 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPChanged(event eventstore.
 		}
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
+
+	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
 
 	return handler.NewUpdateStatement(
 		&idpEvent,
@@ -1801,8 +1842,9 @@ func (p *idpTemplateRelationalProjection) reduceAppleIDPAdded(event eventstore.E
 				}
 				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
 			}()),
-			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
 		},
 	), nil
 }
@@ -1839,6 +1881,8 @@ func (p *idpTemplateRelationalProjection) reduceAppleIDPChanged(event eventstore
 		}
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
+
+	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
 
 	return handler.NewUpdateStatement(
 		&idpEvent,
@@ -1899,8 +1943,9 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPAdded(event eventstore.Ev
 				}
 				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
 			}()),
-			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
 		},
 	), nil
 }
@@ -1938,6 +1983,8 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPChanged(event eventstore.
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
+	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+
 	return handler.NewUpdateStatement(
 		&idpEvent,
 		columns,
@@ -1974,7 +2021,7 @@ func (p *idpTemplateRelationalProjection) reduceIDPRemoved(event eventstore.Even
 }
 
 func reduceIDPRelationalChangedTemplateColumns(name *string, optionChanges idp.OptionChanges) []handler.Column {
-	cols := make([]handler.Column, 0, 7)
+	cols := make([]handler.Column, 0, 8)
 	if name != nil {
 		cols = append(cols, handler.NewCol(IDPTemplateNameCol, *name))
 	}
