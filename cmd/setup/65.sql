@@ -1,2 +1,3 @@
-ALTER TABLE IF EXISTS projections.sessions8
-ADD COLUMN IF NOT EXISTS mfa_recovery_code_checked_at TIMESTAMPTZ; 
+ALTER INDEX IF EXISTS projections.user_metadata5_metadata_key_idx
+    RENAME TO user_metadata5_key_idx;
+DROP INDEX IF EXISTS projections.user_metadata5_metadata_value_idx;

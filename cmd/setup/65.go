@@ -10,18 +10,18 @@ import (
 
 var (
 	//go:embed 65.sql
-	addSessionRecoveryCodeCheckedAt string
+	userMetadata5Index string
 )
 
-type SessionRecoveryCodeCheckedAt struct {
+type FixUserMetadata5Index struct {
 	dbClient *database.DB
 }
 
-func (mig *SessionRecoveryCodeCheckedAt) Execute(ctx context.Context, _ eventstore.Event) error {
-	_, err := mig.dbClient.ExecContext(ctx, addSessionRecoveryCodeCheckedAt)
+func (mig *FixUserMetadata5Index) Execute(ctx context.Context, _ eventstore.Event) error {
+	_, err := mig.dbClient.ExecContext(ctx, userMetadata5Index)
 	return err
 }
 
-func (mig *SessionRecoveryCodeCheckedAt) String() string {
-	return "65_session_recovery_code_checked_at"
+func (mig *FixUserMetadata5Index) String() string {
+	return "65_fix_user_metadata5_index"
 }
