@@ -640,7 +640,7 @@ func TestSetOrganizationMetadata(t *testing.T) {
 			}()
 
 			// first event
-			firstEventCreatedAt := beforeSet.Add(-2 * time.Hour)
+			firstEventCreatedAt := beforeSet.Add(-2 * time.Hour).Round(time.Microsecond) // the timestamps are rounded because postgres does not store nanoseconds
 			err = metadataRepo.Set(t.Context(), tx, &domain.OrganizationMetadata{
 				OrgID: orgID,
 				Metadata: domain.Metadata{
@@ -654,7 +654,7 @@ func TestSetOrganizationMetadata(t *testing.T) {
 			require.NoError(t, err)
 
 			// second event
-			secondEventCreatedAt := beforeSet.Add(-time.Hour)
+			secondEventCreatedAt := beforeSet.Add(-time.Hour).Round(time.Microsecond) // the timestamps are rounded because postgres does not store nanoseconds
 			savedMetadata := &domain.OrganizationMetadata{
 				OrgID: orgID,
 				Metadata: domain.Metadata{
@@ -673,9 +673,8 @@ func TestSetOrganizationMetadata(t *testing.T) {
 			assert.Equal(t, instanceID, savedMetadata.InstanceID)
 			assert.Equal(t, "urn:zitadel:key", savedMetadata.Key)
 			assert.Equal(t, []byte("some-other-value"), savedMetadata.Value)
-			// the timestamps are rounded because postgres does not store nanoseconds
-			assert.True(t, savedMetadata.CreatedAt.Equal(firstEventCreatedAt.Round(time.Microsecond)), "created at should have been %v, but was %v", firstEventCreatedAt, savedMetadata.CreatedAt)
-			assert.True(t, savedMetadata.UpdatedAt.Equal(secondEventCreatedAt.Round(time.Microsecond)), "updated at should have been %v, but was %v", secondEventCreatedAt, savedMetadata.UpdatedAt)
+			assert.True(t, savedMetadata.CreatedAt.Equal(firstEventCreatedAt), "created at should have been %v, but was %v", firstEventCreatedAt, savedMetadata.CreatedAt)
+			assert.True(t, savedMetadata.UpdatedAt.Equal(secondEventCreatedAt), "updated at should have been %v, but was %v", secondEventCreatedAt, savedMetadata.UpdatedAt)
 		})
 	})
 
