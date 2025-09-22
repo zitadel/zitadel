@@ -21,10 +21,21 @@ type OrgRepo struct {
 	domain.OrganizationRepository
 	mock       *MockOrganizationRepository
 	domainRepo *OrgDomainRepo
+
+	existDomain database.Condition
 }
 
 func (r *OrgRepo) SetDomains(repo *OrgDomainRepo) {
 	r.domainRepo = repo
+}
+
+func (r *OrgRepo) SetExistsDomain(existsDomainCondition database.Condition) {
+	r.existDomain = existsDomainCondition
+
+}
+
+func (r *OrgRepo) ExistsDomain(_ database.Condition) database.Condition {
+	return r.existDomain
 }
 
 func (r *OrgRepo) EXPECT() *MockOrganizationRepositoryMockRecorder {
