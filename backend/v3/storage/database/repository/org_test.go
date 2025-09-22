@@ -741,7 +741,10 @@ func TestListOrganization(t *testing.T) {
 
 					return organizations
 				},
-				conditionClauses: []database.Condition{organizationRepo.IDCondition(organizationId)},
+				conditionClauses: []database.Condition{
+					organizationRepo.InstanceIDCondition(instanceId),
+					organizationRepo.IDCondition(organizationId),
+				},
 			}
 		}(),
 		{
@@ -779,7 +782,10 @@ func TestListOrganization(t *testing.T) {
 
 				return organizations
 			},
-			conditionClauses: []database.Condition{organizationRepo.StateCondition(domain.OrgStateInactive)},
+			conditionClauses: []database.Condition{
+				organizationRepo.InstanceIDCondition(instanceId),
+				organizationRepo.StateCondition(domain.OrgStateInactive),
+			},
 		},
 		func() test {
 			instanceId_2 := gofakeit.Name()
@@ -861,7 +867,7 @@ func TestListOrganization(t *testing.T) {
 			}()
 			organizations := tt.testFunc(t, savepoint)
 
-			var condition database.Condition
+			condition := organizationRepo.InstanceIDCondition(instanceId)
 			if len(tt.conditionClauses) > 0 {
 				condition = database.And(tt.conditionClauses...)
 			}

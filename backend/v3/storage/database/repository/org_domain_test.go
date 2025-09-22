@@ -283,7 +283,10 @@ func TestGetOrganizationDomain(t *testing.T) {
 		{
 			name: "get primary domain",
 			opts: []database.QueryOption{
-				database.WithCondition(domainRepo.IsPrimaryCondition(true)),
+				database.WithCondition(database.And(
+					domainRepo.InstanceIDCondition(instanceID),
+					domainRepo.IsPrimaryCondition(true),
+				)),
 			},
 			expected: &domain.OrganizationDomain{
 				InstanceID:     instanceID,
@@ -297,7 +300,10 @@ func TestGetOrganizationDomain(t *testing.T) {
 		{
 			name: "get by domain name",
 			opts: []database.QueryOption{
-				database.WithCondition(domainRepo.DomainCondition(database.TextOperationEqual, domain2.Domain)),
+				database.WithCondition(database.And(
+					domainRepo.InstanceIDCondition(instanceID),
+					domainRepo.DomainCondition(database.TextOperationEqual, domain2.Domain),
+				)),
 			},
 			expected: &domain.OrganizationDomain{
 				InstanceID:     instanceID,
@@ -311,8 +317,11 @@ func TestGetOrganizationDomain(t *testing.T) {
 		{
 			name: "get by org ID",
 			opts: []database.QueryOption{
-				database.WithCondition(domainRepo.OrgIDCondition(orgID)),
-				database.WithCondition(domainRepo.IsPrimaryCondition(true)),
+				database.WithCondition(database.And(
+					domainRepo.InstanceIDCondition(instanceID),
+					domainRepo.OrgIDCondition(orgID),
+					domainRepo.IsPrimaryCondition(true),
+				)),
 			},
 			expected: &domain.OrganizationDomain{
 				InstanceID:     instanceID,
@@ -326,7 +335,10 @@ func TestGetOrganizationDomain(t *testing.T) {
 		{
 			name: "get verified domain",
 			opts: []database.QueryOption{
-				database.WithCondition(domainRepo.IsVerifiedCondition(true)),
+				database.WithCondition(database.And(
+					domainRepo.InstanceIDCondition(instanceID),
+					domainRepo.IsVerifiedCondition(true),
+				)),
 			},
 			expected: &domain.OrganizationDomain{
 				InstanceID:     instanceID,
@@ -340,7 +352,10 @@ func TestGetOrganizationDomain(t *testing.T) {
 		{
 			name: "get non-existent domain",
 			opts: []database.QueryOption{
-				database.WithCondition(domainRepo.DomainCondition(database.TextOperationEqual, "non-existent.com")),
+				database.WithCondition(database.And(
+					domainRepo.InstanceIDCondition(instanceID),
+					domainRepo.DomainCondition(database.TextOperationEqual, "non-existent.com"),
+				)),
 			},
 			err: new(database.NoRowFoundError),
 		},
@@ -445,42 +460,59 @@ func TestListOrganizationDomains(t *testing.T) {
 		expectedCount int
 	}{
 		{
-			name:          "list all domains",
-			opts:          []database.QueryOption{},
-			expectedCount: 3,
-		},
-		{
-			name: "list verified domains",
-			opts: []database.QueryOption{
-				database.WithCondition(domainRepo.IsVerifiedCondition(true)),
-			},
-			expectedCount: 2,
-		},
-		{
-			name: "list primary domains",
-			opts: []database.QueryOption{
-				database.WithCondition(domainRepo.IsPrimaryCondition(true)),
-			},
-			expectedCount: 1,
-		},
-		{
-			name: "list by organization",
-			opts: []database.QueryOption{
-				database.WithCondition(domainRepo.OrgIDCondition(organization.ID)),
-			},
-			expectedCount: 3,
-		},
-		{
-			name: "list by instance",
+			name: "list all domains",
 			opts: []database.QueryOption{
 				database.WithCondition(domainRepo.InstanceIDCondition(instance.ID)),
 			},
 			expectedCount: 3,
 		},
 		{
+			name: "list verified domains",
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					domainRepo.InstanceIDCondition(instance.ID),
+					domainRepo.IsVerifiedCondition(true),
+				)),
+			},
+			expectedCount: 2,
+		},
+		{
+			name: "list primary domains",
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					domainRepo.InstanceIDCondition(instance.ID),
+					domainRepo.IsPrimaryCondition(true),
+				)),
+			},
+			expectedCount: 1,
+		},
+		{
+			name: "list by organization",
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					domainRepo.InstanceIDCondition(instance.ID),
+					domainRepo.OrgIDCondition(organization.ID),
+				)),
+			},
+			expectedCount: 3,
+		},
+		{
+			name: "list by instance",
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					domainRepo.InstanceIDCondition(instance.ID),
+					domainRepo.InstanceIDCondition(instance.ID),
+				)),
+			},
+			expectedCount: 3,
+		},
+		{
 			name: "list non-existent organization",
 			opts: []database.QueryOption{
-				database.WithCondition(domainRepo.OrgIDCondition("non-existent")),
+				database.WithCondition(database.And(
+					domainRepo.InstanceIDCondition(instance.ID),
+					domainRepo.OrgIDCondition("non-existent"),
+				)),
 			},
 			expectedCount: 0,
 		},
@@ -565,26 +597,42 @@ func TestUpdateOrganizationDomain(t *testing.T) {
 		err       error
 	}{
 		{
-			name:      "set verified",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
-			changes:   []database.Change{domainRepo.SetVerified()},
-			expected:  1,
+			name: "set verified",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
+			),
+			changes:  []database.Change{domainRepo.SetVerified()},
+			expected: 1,
 		},
 		{
-			name:      "set primary",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
-			changes:   []database.Change{domainRepo.SetPrimary()},
-			expected:  1,
+			name: "set primary",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
+			),
+			changes:  []database.Change{domainRepo.SetPrimary()},
+			expected: 1,
 		},
 		{
-			name:      "set validation type",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
-			changes:   []database.Change{domainRepo.SetValidationType(domain.DomainValidationTypeHTTP)},
-			expected:  1,
+			name: "set validation type",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
+			),
+			changes:  []database.Change{domainRepo.SetValidationType(domain.DomainValidationTypeHTTP)},
+			expected: 1,
 		},
 		{
-			name:      "multiple changes",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
+			name: "multiple changes",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
+			),
 			changes: []database.Change{
 				domainRepo.SetVerified(),
 				domainRepo.SetPrimary(),
@@ -593,23 +641,35 @@ func TestUpdateOrganizationDomain(t *testing.T) {
 			expected: 1,
 		},
 		{
-			name:      "update by org ID and domain",
-			condition: database.And(domainRepo.OrgIDCondition(organization.ID), domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain)),
-			changes:   []database.Change{domainRepo.SetVerified()},
-			expected:  1,
+			name: "update by org ID and domain",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
+			),
+			changes:  []database.Change{domainRepo.SetVerified()},
+			expected: 1,
 		},
 		{
-			name:      "update non-existent domain",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, "non-existent.com"),
-			changes:   []database.Change{domainRepo.SetVerified()},
-			expected:  0,
+			name: "update non-existent domain",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, "non-existent.com"),
+			),
+			changes:  []database.Change{domainRepo.SetVerified()},
+			expected: 0,
 		},
 		{
-			name:      "no changes",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
-			changes:   []database.Change{},
-			expected:  0,
-			err:       database.ErrNoChanges,
+			name: "no changes",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
+			),
+			changes:  []database.Change{},
+			expected: 0,
+			err:      database.ErrNoChanges,
 		},
 	}
 
@@ -706,24 +766,40 @@ func TestRemoveOrganizationDomain(t *testing.T) {
 		expected  int64
 	}{
 		{
-			name:      "remove by domain name",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, domain1.Domain),
-			expected:  1,
+			name: "remove by domain name",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, domain1.Domain),
+			),
+			expected: 1,
 		},
 		{
-			name:      "remove by primary condition",
-			condition: domainRepo.IsPrimaryCondition(false),
-			expected:  1, // domain2 should still exist and be non-primary
+			name: "remove by primary condition",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.IsPrimaryCondition(false),
+			),
+			expected: 1, // domain2 should still exist and be non-primary
 		},
 		{
-			name:      "remove by org ID and domain",
-			condition: database.And(domainRepo.OrgIDCondition(organization.ID), domainRepo.DomainCondition(database.TextOperationEqual, domain2.Domain)),
-			expected:  1,
+			name: "remove by org ID and domain",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, domain2.Domain),
+			),
+			expected: 1,
 		},
 		{
-			name:      "remove non-existent domain",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, "non-existent.com"),
-			expected:  0,
+			name: "remove non-existent domain",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, "non-existent.com"),
+			),
+			expected: 0,
 		},
 	}
 
@@ -739,7 +815,10 @@ func TestRemoveOrganizationDomain(t *testing.T) {
 			}()
 
 			// count before removal
-			beforeCount, err := domainRepo.List(t.Context(), snapshot)
+			beforeCount, err := domainRepo.List(t.Context(), snapshot, database.WithCondition(database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+			)))
 			require.NoError(t, err)
 
 			rowsAffected, err := domainRepo.Remove(t.Context(), snapshot, test.condition)
@@ -747,7 +826,10 @@ func TestRemoveOrganizationDomain(t *testing.T) {
 			assert.Equal(t, test.expected, rowsAffected)
 
 			// verify removal
-			afterCount, err := domainRepo.List(t.Context(), snapshot)
+			afterCount, err := domainRepo.List(t.Context(), snapshot, database.WithCondition(database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+			)))
 			require.NoError(t, err)
 			assert.Equal(t, len(beforeCount)-int(test.expected), len(afterCount))
 		})

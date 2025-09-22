@@ -494,31 +494,38 @@ func TestUpdateInstanceDomain(t *testing.T) {
 		err       error
 	}{
 		{
-			name:      "set primary",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, instanceDomain.Domain),
-			changes:   []database.Change{domainRepo.SetPrimary()},
-			expected:  1,
+			name: "set primary",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, instanceDomain.Domain),
+			),
+			changes:  []database.Change{domainRepo.SetPrimary()},
+			expected: 1,
 		},
 		{
-			name:      "update non-existent domain",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, "non-existent.com"),
-			changes:   []database.Change{domainRepo.SetPrimary()},
-			expected:  0,
+			name: "update non-existent domain",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, "non-existent.com"),
+			),
+			changes:  []database.Change{domainRepo.SetPrimary()},
+			expected: 0,
 		},
 		{
-			name:      "no changes",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, instanceDomain.Domain),
-			changes:   []database.Change{},
-			expected:  0,
-			err:       database.ErrNoChanges,
+			name: "no changes",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, instanceDomain.Domain),
+			),
+			changes:  []database.Change{},
+			expected: 0,
+			err:      database.ErrNoChanges,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			ctx := t.Context()
-
-			rowsAffected, err := domainRepo.Update(ctx, tx, test.condition, test.changes...)
+			rowsAffected, err := domainRepo.Update(t.Context(), tx, test.condition, test.changes...)
 			if test.err != nil {
 				assert.ErrorIs(t, err, test.err)
 				return
@@ -529,7 +536,7 @@ func TestUpdateInstanceDomain(t *testing.T) {
 
 			// verify changes were applied if rows were affected
 			if rowsAffected > 0 && len(test.changes) > 0 {
-				result, err := domainRepo.Get(ctx, tx, database.WithCondition(test.condition))
+				result, err := domainRepo.Get(t.Context(), tx, database.WithCondition(test.condition))
 				require.NoError(t, err)
 
 				// We know changes were applied since rowsAffected > 0
@@ -594,19 +601,28 @@ func TestRemoveInstanceDomain(t *testing.T) {
 		expected  int64
 	}{
 		{
-			name:      "remove by domain name",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, domain1.Domain),
-			expected:  1,
+			name: "remove by domain name",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, domain1.Domain),
+			),
+			expected: 1,
 		},
 		{
-			name:      "remove by primary condition",
-			condition: domainRepo.IsPrimaryCondition(false),
-			expected:  1, // domain2 should still exist and be non-primary
+			name: "remove by primary condition",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.IsPrimaryCondition(false),
+			),
+			expected: 1, // domain2 should still exist and be non-primary
 		},
 		{
-			name:      "remove non-existent domain",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, "non-existent.com"),
-			expected:  0,
+			name: "remove non-existent domain",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, "non-existent.com"),
+			),
+			expected: 0,
 		},
 	}
 
