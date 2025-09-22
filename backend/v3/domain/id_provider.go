@@ -56,11 +56,12 @@ const (
 )
 
 type IdentityProvider struct {
-	InstanceID        string               `json:"instanceId,omitempty" db:"instance_id"`
-	OrgID             *string              `json:"orgId,omitempty" db:"org_id"`
-	ID                string               `json:"id,omitempty" db:"id"`
-	State             IDPState             `json:"state,omitempty" db:"state"`
-	Name              string               `json:"name,omitempty" db:"name"`
+	InstanceID string   `json:"instanceId,omitempty" db:"instance_id"`
+	OrgID      *string  `json:"orgId,omitempty" db:"org_id"`
+	ID         string   `json:"id,omitempty" db:"id"`
+	State      IDPState `json:"state,omitempty" db:"state"`
+	Name       string   `json:"name,omitempty" db:"name"`
+	// Type represents the type of and idp. It is a pointer because it can be nil during the migration of the events
 	Type              *IDPType             `json:"type,omitempty" db:"type"`
 	AllowCreation     bool                 `json:"allowCreation,omitempty" db:"allow_creation"`
 	AutoRegister      bool                 `json:"autoRegister,omitempty" db:"auto_register"`

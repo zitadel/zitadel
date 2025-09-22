@@ -1141,14 +1141,14 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalChanged(even
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YZ5x25s", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPChangedEventType, instance.AzureADIDPChangedEventType})
 	}
 
-	oauth, err := p.idpRepo.GetAzureAD(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+	azure, err := p.idpRepo.GetAzureAD(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
 	if err != nil {
 		return nil, err
 	}
 
 	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
-	payload := &oauth.Azure
+	payload := &azure.Azure
 	payloadChanged, err := reduceAzureADIDPRelationalChangedColumns(payload, &idpEvent)
 	if err != nil {
 		return nil, err
@@ -1427,14 +1427,14 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalChanged(event
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-mT5827b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPChangedEventType, instance.GitLabIDPChangedEventType})
 	}
 
-	oauth, err := p.idpRepo.GetGitlab(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+	gitlab, err := p.idpRepo.GetGitlab(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
 	if err != nil {
 		return nil, err
 	}
 
 	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
-	payload := &oauth.Gitlab
+	payload := &gitlab.Gitlab
 	payloadChanged := reduceGitLabIDPRelationalChangedColumns(payload, &idpEvent)
 	if payloadChanged {
 		payloadJSON, err := json.Marshal(payload)
@@ -1614,14 +1614,14 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalChanged(event
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YN58hml", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPChangedEventType, instance.GoogleIDPChangedEventType})
 	}
 
-	oauth, err := p.idpRepo.GetGoogle(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+	google, err := p.idpRepo.GetGoogle(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
 	if err != nil {
 		return nil, err
 	}
 
 	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
-	payload := &oauth.Google
+	payload := &google.Google
 	payloadChanged := reduceGoogleIDPRelationalChangedColumns(payload, &idpEvent)
 	if payloadChanged {
 		payloadJSON, err := json.Marshal(payload)
@@ -1728,14 +1728,14 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPChanged(event eventstore.
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.LDAPIDPChangedEventType, instance.LDAPIDPChangedEventType})
 	}
 
-	oauth, err := p.idpRepo.GetLDAP(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+	ldap, err := p.idpRepo.GetLDAP(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
 	if err != nil {
 		return nil, err
 	}
 
 	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
-	payload := &oauth.LDAP
+	payload := &ldap.LDAP
 	payloadChanged := reduceLDAPIDPRelationalChangedColumns(payload, &idpEvent)
 	if payloadChanged {
 		payloadJSON, err := json.Marshal(payload)
