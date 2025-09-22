@@ -7,7 +7,6 @@ import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { cookies } from "next/headers";
 import { v4 as uuidv4 } from "uuid";
 import { isSessionValid } from "./session";
-import { redirect } from "next/navigation";
 
 type LoginWithSAMLAndSession = {
   serviceUrl: string;
@@ -116,7 +115,7 @@ export async function loginWithSAMLAndSession({
       const res = await sendLoginname(command);
 
       if (res && "redirect" in res && res?.redirect) {
-        redirect(res.redirect);
+        return { redirect: res.redirect };
       }
     }
 
@@ -141,7 +140,7 @@ export async function loginWithSAMLAndSession({
           }),
         });
         if (url) {
-          return redirect(url);
+          return { redirect: url };
         } else {
           return { error: "An error occurred!" };
         }
@@ -156,7 +155,7 @@ export async function loginWithSAMLAndSession({
           });
 
           if (loginSettings?.defaultRedirectUri) {
-            redirect(loginSettings.defaultRedirectUri);
+            return { redirect: loginSettings.defaultRedirectUri };
           }
 
           const signedinUrl = "/signedin";
@@ -168,7 +167,7 @@ export async function loginWithSAMLAndSession({
           if (selectedSession.factors?.user?.organizationId) {
             params.append("organization", selectedSession.factors?.user?.organizationId);
           }
-          redirect(signedinUrl + "?" + params.toString());
+          return { redirect: signedinUrl + "?" + params.toString() };
         } else {
           return { error: "Unknown error occurred" };
         }

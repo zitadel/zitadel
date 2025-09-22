@@ -5,7 +5,6 @@ import { create } from "@zitadel/client";
 import { CreateCallbackRequestSchema, SessionSchema } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { isSessionValid } from "./session";
-import { redirect } from "next/navigation";
 
 type LoginWithOIDCAndSession = {
   serviceUrl: string;
@@ -47,7 +46,8 @@ export async function loginWithOIDCAndSession({
       const res = await sendLoginname(command);
 
       if (res && "redirect" in res && res?.redirect) {
-        redirect(res.redirect);
+        console.log("Redirecting to re-authenticate:", res.redirect);
+        return { redirect: res.redirect };
       }
     }
 
@@ -59,7 +59,6 @@ export async function loginWithOIDCAndSession({
         sessionToken: cookie?.token,
       };
 
-      // works not with _rsc request
       try {
         const { callbackUrl } = await createCallback({
           serviceUrl,
@@ -72,7 +71,8 @@ export async function loginWithOIDCAndSession({
           }),
         });
         if (callbackUrl) {
-          redirect(callbackUrl);
+          console.log("Redirecting to callback URL:", callbackUrl);
+          return { redirect: callbackUrl };
         } else {
           return { error: "An error occurred!" };
         }
@@ -86,7 +86,7 @@ export async function loginWithOIDCAndSession({
           });
 
           if (loginSettings?.defaultRedirectUri) {
-            redirect(loginSettings.defaultRedirectUri);
+            return { redirect: loginSettings.defaultRedirectUri };
           }
 
           const signedinUrl = "/signedin";
@@ -98,7 +98,8 @@ export async function loginWithOIDCAndSession({
           if (selectedSession.factors?.user?.organizationId) {
             params.append("organization", selectedSession.factors?.user?.organizationId);
           }
-          redirect(signedinUrl + "?" + params.toString());
+          console.log("Redirecting to signed-in page:", signedinUrl + "?" + params.toString());
+          return { redirect: signedinUrl + "?" + params.toString() };
         } else {
           return { error: "Unknown error occurred" };
         }

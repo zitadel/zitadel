@@ -7,6 +7,7 @@ import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { listSessions } from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export interface AuthFlowParams {
   sessionId: string;
@@ -44,22 +45,46 @@ export async function completeAuthFlow(command: AuthFlowParams): Promise<void | 
 
   if (requestId.startsWith("oidc_")) {
     // Complete OIDC flow
-    return loginWithOIDCAndSession({
+    const result = await loginWithOIDCAndSession({
       serviceUrl,
       authRequest: requestId.replace("oidc_", ""),
       sessionId,
       sessions,
       sessionCookies,
     });
+
+    // Handle redirect response from loginWithOIDCAndSession
+    if (result && "redirect" in result && result.redirect) {
+      redirect(result.redirect);
+    }
+
+    // Only return error, not redirect (since redirect throws)
+    if (result && "error" in result && result.error) {
+      return { error: result.error };
+    }
+
+    return; // No error, redirect was called
   } else if (requestId.startsWith("saml_")) {
     // Complete SAML flow
-    return loginWithSAMLAndSession({
+    const result = await loginWithSAMLAndSession({
       serviceUrl,
       samlRequest: requestId.replace("saml_", ""),
       sessionId,
       sessions,
       sessionCookies,
     });
+
+    // Handle redirect response from loginWithSAMLAndSession
+    if (result && "redirect" in result && result.redirect) {
+      redirect(result.redirect);
+    }
+
+    // Only return error, not redirect (since redirect throws)
+    if (result && "error" in result && result.error) {
+      return { error: result.error };
+    }
+
+    return; // No error, redirect was called
   }
 
   return { error: "Invalid request ID format" };
