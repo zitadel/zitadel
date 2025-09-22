@@ -31,7 +31,7 @@ type Setting struct {
 	LabelState *LabelState     `json:"labelState,omitempty", db:"label_state"`
 	Settings   json.RawMessage `json:"settings,omitempty" db:"settings"`
 	CreatedAt  time.Time       `json:"createdAt,omitzero" db:"created_at"`
-	UpdatedAt  time.Time       `json:"updatedAt,omitzero" db:"updated_at"`
+	UpdatedAt  *time.Time      `json:"updatedAt,omitzero" db:"updated_at"`
 }
 
 type PasswordlessType int32
@@ -236,6 +236,7 @@ type Settings interface {
 type settingsChanges interface {
 	SetType(state SettingType) database.Change
 	SetSettings(settings string) database.Change
+	SetUpdatedAt(updatedAt *time.Time) database.Change
 }
 
 type SettingsRepository interface {

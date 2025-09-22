@@ -379,6 +379,8 @@ func (s *settingsRelationalProjection) reduceLoginPolicyAdded(event eventstore.E
 			OrgID:      orgId,
 			Type:       domain.SettingTypeLogin,
 			Settings:   settingJSON,
+			CreatedAt:  policyEvent.CreationDate(),
+			UpdatedAt:  &policyEvent.Creation,
 		}
 		err = settingsRepo.Create(ctx, &setting)
 		return err
@@ -463,6 +465,8 @@ func (s *settingsRelationalProjection) reduceLoginPolicyChanged(event eventstore
 			setting.Settings.MultiFactorCheckLifetime = *policyEvent.MultiFactorCheckLifetime
 		}
 
+		setting.UpdatedAt = &policyEvent.Creation
+
 		_, err = settingsRepo.UpdateLogin(ctx, setting)
 		return err
 	}), nil
@@ -500,6 +504,9 @@ func (s *settingsRelationalProjection) reduceMFAAdded(event eventstore.Event) (*
 
 		setting.Settings.MFAType = append(setting.Settings.MFAType, domain.MultiFactorType(policyEvent.MFAType))
 
+		CreatedAt := event.CreatedAt()
+		setting.UpdatedAt = &CreatedAt
+
 		_, err = settingsRepo.UpdateLogin(ctx, setting)
 		return err
 	}), nil
@@ -534,6 +541,8 @@ func (s *settingsRelationalProjection) reduceMFARemoved(event eventstore.Event) 
 		setting.Settings.MFAType = slices.DeleteFunc(setting.Settings.MFAType, func(mfaType domain.MultiFactorType) bool {
 			return mfaType == domain.MultiFactorType(policyEvent.MFAType)
 		})
+
+		setting.UpdatedAt = &policyEvent.Creation
 
 		_, err = settingsRepo.UpdateLogin(ctx, setting)
 		return err
@@ -592,6 +601,8 @@ func (s *settingsRelationalProjection) reduceSecondFactorAdded(event eventstore.
 			return nil
 		}
 
+		setting.UpdatedAt = &policyEvent.Creation
+
 		setting.Settings.SecondFactorTypes = append(setting.Settings.SecondFactorTypes, domain.SecondFactorType(policyEvent.MFAType))
 
 		_, err = settingsRepo.UpdateLogin(ctx, setting)
@@ -628,6 +639,9 @@ func (s *settingsRelationalProjection) reduceSecondFactorRemoved(event eventstor
 		setting.Settings.SecondFactorTypes = slices.DeleteFunc(setting.Settings.SecondFactorTypes, func(secondFactorType domain.SecondFactorType) bool {
 			return secondFactorType == domain.SecondFactorType(policyEvent.MFAType)
 		})
+
+		CreatedAt := event.CreatedAt()
+		setting.UpdatedAt = &CreatedAt
 
 		_, err = settingsRepo.UpdateLogin(ctx, setting)
 		return err
@@ -703,6 +717,8 @@ func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) 
 			Type:       domain.SettingTypeLabel,
 			LabelState: &labelStatePreview,
 			Settings:   settings,
+			CreatedAt:  policyEvent.CreationDate(),
+			UpdatedAt:  &policyEvent.Creation,
 		}
 		err = settingsRepo.Create(ctx, &setting)
 		return err
@@ -771,6 +787,10 @@ func (s *settingsRelationalProjection) reduceLabelChanged(event eventstore.Event
 		if policyEvent.ThemeMode != nil {
 			setting.Settings.ThemeMode = domain.LabelPolicyThemeMode(*policyEvent.ThemeMode)
 		}
+
+		CreatedAt := event.CreatedAt()
+		setting.UpdatedAt = &CreatedAt
+
 		_, err = settingsRepo.UpdateLabel(ctx, setting)
 		return err
 	}), nil
@@ -826,6 +846,7 @@ func (s *settingsRelationalProjection) reduceLabelActivated(event eventstore.Eve
 			handler.NewCol(SettingsTypeCol, nil),
 			handler.NewCol(SettingsLabelStateCol, domain.LabelStateActivated),
 			handler.NewCol(SettingsSettingsCol, nil),
+			handler.NewCol(UpdatedAt, event.CreatedAt()),
 		},
 		[]handler.Column{
 			handler.NewCol(SettingInstanceIDCol, nil),
@@ -833,6 +854,7 @@ func (s *settingsRelationalProjection) reduceLabelActivated(event eventstore.Eve
 			handler.NewCol(SettingsTypeCol, nil),
 			handler.NewCol(SettingsLabelStateCol, nil),
 			handler.NewCol(SettingsSettingsCol, nil),
+			handler.NewCol(UpdatedAt, nil),
 		},
 		[]handler.NamespacedCondition{
 			handler.NewNamespacedCondition(SettingsTypeCol, domain.SettingTypeLabel),
@@ -880,6 +902,9 @@ func (p *settingsRelationalProjection) reduceLabelLogoAdded(event eventstore.Eve
 			setting.Settings.LabelPolicyDarkLogoURL = &e.StoreKey
 		}
 
+		CreatedAt := event.CreatedAt()
+		setting.UpdatedAt = &CreatedAt
+
 		_, err = settingsRepo.UpdateLabel(ctx, setting)
 		return err
 	}), nil
@@ -920,6 +945,9 @@ func (p *settingsRelationalProjection) reduceLogoRemoved(event eventstore.Event)
 		case *instance.LabelPolicyLogoDarkRemovedEvent:
 			setting.Settings.LabelPolicyDarkLogoURL = nil
 		}
+
+		CreatedAt := event.CreatedAt()
+		setting.UpdatedAt = &CreatedAt
 
 		_, err = settingsRepo.UpdateLabel(ctx, setting)
 		return err
@@ -962,6 +990,9 @@ func (p *settingsRelationalProjection) reduceIconAdded(event eventstore.Event) (
 			setting.Settings.LabelPolicyDarkIconURL = &e.StoreKey
 		}
 
+		CreatedAt := event.CreatedAt()
+		setting.UpdatedAt = &CreatedAt
+
 		_, err = settingsRepo.UpdateLabel(ctx, setting)
 		return err
 	}), nil
@@ -1003,6 +1034,9 @@ func (p *settingsRelationalProjection) reduceIconRemoved(event eventstore.Event)
 			setting.Settings.LabelPolicyDarkIconURL = nil
 		}
 
+		CreatedAt := event.CreatedAt()
+		setting.UpdatedAt = &CreatedAt
+
 		_, err = settingsRepo.UpdateLabel(ctx, setting)
 		return err
 	}), nil
@@ -1037,6 +1071,9 @@ func (p *settingsRelationalProjection) reduceFontAdded(event eventstore.Event) (
 			setting.Settings.LabelPolicyFontURL = &e.StoreKey
 		}
 
+		CreatedAt := event.CreatedAt()
+		setting.UpdatedAt = &CreatedAt
+
 		_, err = settingsRepo.UpdateLabel(ctx, setting)
 		return err
 	}), nil
@@ -1065,6 +1102,9 @@ func (p *settingsRelationalProjection) reduceFontRemoved(event eventstore.Event)
 		}
 
 		setting.Settings.LabelPolicyFontURL = nil
+
+		CreatedAt := event.CreatedAt()
+		setting.UpdatedAt = &CreatedAt
 
 		_, err = settingsRepo.UpdateLabel(ctx, setting)
 		return err
@@ -1112,6 +1152,8 @@ func (p *settingsRelationalProjection) reducePassedComplexityAdded(event eventst
 			OrgID:      orgId,
 			Type:       domain.SettingTypePasswordComplexity,
 			Settings:   settingJSON,
+			CreatedAt:  policyEvent.CreationDate(),
+			UpdatedAt:  &policyEvent.Creation,
 		}
 		err = settingsRepo.Create(ctx, &newSetting)
 		return err
@@ -1159,6 +1201,9 @@ func (s *settingsRelationalProjection) reducePasswordComplexityChanged(event eve
 		if policyEvent.HasNumber != nil {
 			setting.Settings.HasNumber = *policyEvent.HasNumber
 		}
+
+		CreatedAt := event.CreatedAt()
+		setting.UpdatedAt = &CreatedAt
 
 		_, err = settingsRepo.UpdatePasswordComplexity(ctx, setting)
 		return err
@@ -1228,6 +1273,8 @@ func (p *settingsRelationalProjection) reducePasswordPolicyAdded(event eventstor
 			OrgID:      orgId,
 			Type:       domain.SettingTypePasswordExpiry,
 			Settings:   settings,
+			CreatedAt:  policyEvent.CreationDate(),
+			UpdatedAt:  &policyEvent.Creation,
 		}
 		err = settingsRepo.Create(ctx, &setting)
 		return err
@@ -1265,6 +1312,9 @@ func (p *settingsRelationalProjection) reducePasswordPolicyChanged(event eventst
 		if policyEvent.MaxAgeDays != nil {
 			setting.Settings.MaxAgeDays = *policyEvent.MaxAgeDays
 		}
+
+		CreatedAt := event.CreatedAt()
+		setting.UpdatedAt = &CreatedAt
 
 		_, err = settingsRepo.UpdatePasswordExpiry(ctx, setting)
 		return err
@@ -1373,6 +1423,8 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyAdded(event eventstore
 			OrgID:      orgId,
 			Type:       domain.SettingTypeLockout,
 			Settings:   settings,
+			CreatedAt:  policyEvent.CreationDate(),
+			UpdatedAt:  &policyEvent.Creation,
 		}
 		err = settingsRepo.Create(ctx, &setting)
 		return err
@@ -1414,6 +1466,9 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyChanged(event eventsto
 		if policyEvent.ShowLockOutFailures != nil {
 			setting.Settings.ShowLockOutFailures = *policyEvent.ShowLockOutFailures
 		}
+
+		CreatedAt := event.CreatedAt()
+		setting.UpdatedAt = &CreatedAt
 
 		_, err = settingsRepo.UpdateLockout(ctx, setting)
 		return err
@@ -1460,6 +1515,8 @@ func (p *settingsRelationalProjection) reduceDomainPolicyAdded(event eventstore.
 			OrgID:      orgId,
 			Type:       domain.SettingTypeDomain,
 			Settings:   settingJSON,
+			CreatedAt:  policyEvent.CreationDate(),
+			UpdatedAt:  &policyEvent.Creation,
 		}
 		err = settingsRepo.Create(ctx, &setting)
 		return err
@@ -1501,6 +1558,9 @@ func (s *settingsRelationalProjection) reduceDomainPolicyChanged(event eventstor
 		if policyEvent.SMTPSenderAddressMatchesInstanceDomain != nil {
 			setting.Settings.SMTPSenderAddressMatchesInstanceDomain = *policyEvent.SMTPSenderAddressMatchesInstanceDomain
 		}
+
+		CreatedAt := event.CreatedAt()
+		setting.UpdatedAt = &CreatedAt
 
 		_, err = settingsRepo.UpdateDomain(ctx, setting)
 		return err
@@ -1552,6 +1612,8 @@ func (s *settingsRelationalProjection) reduceSecurityPolicySet(event eventstore.
 					InstanceID: e.Aggregate().InstanceID,
 					Type:       domain.SettingTypeSecurity,
 					Settings:   settings,
+					CreatedAt:  e.CreatedAt(),
+					UpdatedAt:  &e.Creation,
 				}
 				err = settingsRepo.Create(ctx, &setting)
 				return err
@@ -1572,6 +1634,10 @@ func (s *settingsRelationalProjection) reduceSecurityPolicySet(event eventstore.
 		if e.EnableImpersonation != nil {
 			existingSetting.Settings.EnableImpersonation = *e.EnableImpersonation
 		}
+
+		CreatedAt := event.CreatedAt()
+		existingSetting.UpdatedAt = &CreatedAt
+
 		_, err = settingsRepo.UpdateSecurity(ctx, existingSetting)
 		return err
 	}), nil
@@ -1605,6 +1671,8 @@ func (s *settingsRelationalProjection) reduceOrganizationSettingsSet(event event
 					OrgID:      orgID,
 					Type:       domain.SettingTypeOrganization,
 					Settings:   settings,
+					CreatedAt:  e.CreatedAt(),
+					UpdatedAt:  &e.Creation,
 				}
 				err = settingsRepo.Create(ctx, &setting)
 				return err
@@ -1615,6 +1683,9 @@ func (s *settingsRelationalProjection) reduceOrganizationSettingsSet(event event
 		}
 
 		existingSetting.Settings.OrganizationScopedUsernames = e.OrganizationScopedUsernames
+
+		CreatedAt := event.CreatedAt()
+		existingSetting.UpdatedAt = &CreatedAt
 
 		_, err = settingsRepo.UpdateOrg(ctx, existingSetting)
 		return err

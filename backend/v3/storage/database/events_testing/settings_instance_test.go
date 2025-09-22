@@ -35,7 +35,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		ctx := t.Context()
 		before := time.Now()
 		newInstance := integration.NewInstance(t.Context())
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -58,7 +58,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 			assert.Equal(t, time.Duration(time.Hour*18), setting.Settings.SecondFactorCheckLifetime)
 			assert.Equal(t, time.Duration(time.Hour*240), setting.Settings.ExternalLoginCheckLifetime)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -88,7 +88,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 			ForceMfaLocalOnly:          true,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -117,7 +117,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 			assert.Equal(t, true, setting.Settings.DisableLoginWithEmail)
 			assert.Equal(t, true, setting.Settings.DisableLoginWithPhone)
 			assert.Equal(t, true, setting.Settings.ForceMFALocalOnly)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -162,7 +162,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 			Type: policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		// add MFAType
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*5)
@@ -175,7 +175,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 
 			// event instance.policy.login.multifactor.added
 			assert.Equal(t, []domain.MultiFactorType{domain.MultiFactorType(policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION)}, setting.Settings.MFAType)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -205,7 +205,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 			Type: policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		secondFactorTypes = append(secondFactorTypes, domain.SecondFactorType(policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS))
 
@@ -220,7 +220,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 
 			// event instance.policy.login.multifactor.secondfactor.added
 			assert.Equal(t, secondFactorTypes, setting.Settings.SecondFactorTypes)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 
 		// remove second factor type
@@ -244,7 +244,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 
 			// event instance.policy.login.multifactor.secondfactor.removed
 			assert.Equal(t, secondFactorTypes, setting.Settings.SecondFactorTypes)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -293,7 +293,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		ctx := t.Context()
 		before := time.Now()
 		newInstance := integration.NewInstance(t.Context())
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -321,7 +321,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			assert.Equal(t, false, setting.Settings.DisableWatermark)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -361,7 +361,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			ThemeMode:           policy.ThemeMode_THEME_MODE_LIGHT,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -388,7 +388,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			assert.Equal(t, true, setting.Settings.DisableWatermark)
 			assert.Equal(t, domain.LabelPolicyThemeLight, setting.Settings.ThemeMode)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -402,7 +402,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		before := time.Now()
 		_, err := newInstance.Client.Admin.ActivateLabelPolicy(IAMCTX, &admin.ActivateLabelPolicyRequest{})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -416,7 +416,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 			// event instance.policy.label.activated
 			assert.Equal(t, domain.LabelStateActivated, *setting.LabelState)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -438,7 +438,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -452,7 +452,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			// event instance.policy.label.logo.added
 			assert.NotNil(t, setting.Settings.LabelPolicyLightLogoURL)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -474,7 +474,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -488,7 +488,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			// event instance.policy.label.logo.dark.added
 			assert.NotNil(t, setting.Settings.LabelPolicyDarkLogoURL)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -529,7 +529,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			Delete("http://localhost:8080" + "/admin/v1" + "/policies/label/logo")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		// check light logo removed
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
@@ -544,7 +544,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			// event instance.policy.label.logo.removed
 			assert.Nil(t, setting.Settings.LabelPolicyLightLogoURL)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -585,7 +585,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			Delete("http://localhost:8080" + "/admin/v1" + "/policies/label/logo_dark")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		// check dark logo removed
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
@@ -600,7 +600,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			// event instance.policy.label.logo.dark.removed
 			assert.Nil(t, setting.Settings.LabelPolicyDarkLogoURL)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -622,7 +622,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -636,7 +636,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			// event instance.policy.label.icon.added
 			assert.NotNil(t, setting.Settings.LabelPolicyLightIconURL)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -658,7 +658,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -672,7 +672,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			// event instance.policy.label.icon.dark.added
 			assert.NotNil(t, setting.Settings.LabelPolicyDarkIconURL)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -713,7 +713,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			Delete("http://localhost:8080" + "/admin/v1" + "/policies/label/icon")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		// check light icon removed
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
@@ -728,7 +728,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			// event instance.policy.label.icon.removed
 			assert.Nil(t, setting.Settings.LabelPolicyLightIconURL)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -769,7 +769,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			Delete("http://localhost:8080" + "/admin/v1" + "/policies/label/icon_dark")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		// check dark icon removed
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
@@ -784,7 +784,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			// event instance.policy.label.icon.dark.removed
 			assert.Nil(t, setting.Settings.LabelPolicyDarkIconURL)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -806,7 +806,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -820,7 +820,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			// event instance.policy.label.font.added
 			assert.NotNil(t, setting.Settings.LabelPolicyFontURL)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -860,7 +860,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			Delete("http://localhost:8080" + "/admin/v1" + "/policies/label/font")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		// check font policy removed
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
@@ -875,7 +875,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			// event instance.policy.label.font.removed
 			assert.Nil(t, setting.Settings.LabelPolicyFontURL)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -951,7 +951,7 @@ func TestServer_TestPasswordComplexitySettingsReduces(t *testing.T) {
 
 		before := time.Now()
 		newInstance := integration.NewInstance(t.Context())
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -970,7 +970,7 @@ func TestServer_TestPasswordComplexitySettingsReduces(t *testing.T) {
 			assert.Equal(t, true, setting.Settings.HasNumber)
 			assert.Equal(t, true, setting.Settings.HasSymbol)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -988,7 +988,7 @@ func TestServer_TestPasswordComplexitySettingsReduces(t *testing.T) {
 			HasSymbol:    true,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -1005,7 +1005,7 @@ func TestServer_TestPasswordComplexitySettingsReduces(t *testing.T) {
 			assert.Equal(t, true, setting.Settings.HasLowercase)
 			assert.Equal(t, true, setting.Settings.HasNumber)
 			assert.Equal(t, true, setting.Settings.HasSymbol)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -1055,7 +1055,7 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 
 		before := time.Now()
 		newInstance := integration.NewInstance(t.Context())
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -1070,7 +1070,7 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 			assert.Equal(t, uint64(0), setting.Settings.ExpireWarnDays)
 			assert.Equal(t, uint64(0), setting.Settings.MaxAgeDays)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -1086,7 +1086,7 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 			ExpireWarnDays: 30,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -1100,7 +1100,7 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 			assert.Equal(t, true, setting.Settings.IsDefault)
 			assert.Equal(t, uint64(30), setting.Settings.ExpireWarnDays)
 			assert.Equal(t, uint64(30), setting.Settings.MaxAgeDays)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -1150,7 +1150,7 @@ func TestServer_TestDomainSettingsReduces(t *testing.T) {
 
 		before := time.Now()
 		newInstance := integration.NewInstance(t.Context())
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -1166,7 +1166,7 @@ func TestServer_TestDomainSettingsReduces(t *testing.T) {
 			assert.Equal(t, false, setting.Settings.UserLoginMustBeDomain)
 			assert.Equal(t, false, setting.Settings.ValidateOrgDomains)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -1183,7 +1183,7 @@ func TestServer_TestDomainSettingsReduces(t *testing.T) {
 			SmtpSenderAddressMatchesInstanceDomain: true,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -1198,7 +1198,7 @@ func TestServer_TestDomainSettingsReduces(t *testing.T) {
 			assert.Equal(t, true, setting.Settings.SMTPSenderAddressMatchesInstanceDomain)
 			assert.Equal(t, true, setting.Settings.UserLoginMustBeDomain)
 			assert.Equal(t, true, setting.Settings.ValidateOrgDomains)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -1248,7 +1248,7 @@ func TestServer_TestLockoutSettingsReduces(t *testing.T) {
 
 		before := time.Now()
 		newInstance := integration.NewInstance(t.Context())
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -1264,7 +1264,7 @@ func TestServer_TestLockoutSettingsReduces(t *testing.T) {
 			assert.Equal(t, uint64(0), setting.Settings.MaxPasswordAttempts)
 			assert.Equal(t, true, setting.Settings.ShowLockOutFailures)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -1280,7 +1280,7 @@ func TestServer_TestLockoutSettingsReduces(t *testing.T) {
 			MaxOtpAttempts:      5,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -1294,7 +1294,7 @@ func TestServer_TestLockoutSettingsReduces(t *testing.T) {
 			assert.Equal(t, true, setting.Settings.IsDefault)
 			assert.Equal(t, uint64(5), setting.Settings.MaxOTPAttempts)
 			assert.Equal(t, uint64(5), setting.Settings.MaxPasswordAttempts)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -1353,7 +1353,7 @@ func TestServer_TestSecuritySettingsReduces(t *testing.T) {
 			EnableImpersonation:   true,
 		})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -1368,7 +1368,7 @@ func TestServer_TestSecuritySettingsReduces(t *testing.T) {
 			assert.Equal(t, []string{"value"}, setting.Settings.AllowedOrigins)
 			assert.Equal(t, true, setting.Settings.EnableImpersonation)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 
 		// 2. re-set security policy
@@ -1393,7 +1393,7 @@ func TestServer_TestSecuritySettingsReduces(t *testing.T) {
 			assert.Equal(t, false, setting.Settings.EnableIframeEmbedding)
 			assert.Equal(t, []string{"no_value"}, setting.Settings.AllowedOrigins)
 			assert.Equal(t, false, setting.Settings.EnableImpersonation)
-			assert.WithinRange(t, setting.UpdatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 

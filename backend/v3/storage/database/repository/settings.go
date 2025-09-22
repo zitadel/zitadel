@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -101,6 +102,10 @@ func (s settings) SetType(name domain.SettingType) database.Change {
 
 func (s settings) SetSettings(settings string) database.Change {
 	return database.NewChange(s.SettingsColumn(), settings)
+}
+
+func (s settings) SetUpdatedAt(updatedAt *time.Time) database.Change {
+	return database.NewChangePtr(s.UpdatedAtColumn(), updatedAt)
 }
 
 const querySettingStmt = `SELECT instance_id, org_id, id, type, label_state, settings,` +
@@ -387,7 +392,13 @@ func (s *settings) updateSetting(ctx context.Context, setting *domain.Setting, s
 	if err != nil {
 		return 0, err
 	}
-	s.SetSettings(string(settingJSON)).Write(&builder)
+	// s.SetSettings(string(settingJSON)).Write(&builder)
+	// s.SetUpdatedAt(&setting.UpdatedAt).Write(&builder)
+
+	changes := database.Changes{s.SetSettings(string(settingJSON)), s.SetUpdatedAt(setting.UpdatedAt)}
+
+	database.Changes(changes).Write(&builder)
+
 	writeCondition(&builder, database.And(conditions...))
 
 	stmt := builder.String()
@@ -396,8 +407,8 @@ func (s *settings) updateSetting(ctx context.Context, setting *domain.Setting, s
 }
 
 const createSettingStmt = `INSERT INTO zitadel.settings` +
-	` (instance_id, org_id, type, label_state, settings)` +
-	` VALUES ($1, $2, $3, $4, $5)` +
+	` (instance_id, org_id, type, label_state, settings, created_at, updated_at)` +
+	` VALUES ($1, $2, $3, $4, $5, $6, $7)` +
 	` RETURNING id, created_at, updated_at`
 
 func (s *settings) Create(ctx context.Context, setting *domain.Setting) error {
@@ -408,7 +419,9 @@ func (s *settings) Create(ctx context.Context, setting *domain.Setting) error {
 		setting.OrgID,
 		setting.Type,
 		setting.LabelState,
-		string(setting.Settings))
+		string(setting.Settings),
+		setting.CreatedAt,
+		setting.UpdatedAt)
 	builder.WriteString(createSettingStmt)
 
 	return s.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.ID, &setting.CreatedAt, &setting.UpdatedAt)
