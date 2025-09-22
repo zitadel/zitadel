@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -103,7 +102,6 @@ func (i *idProvider) Update(ctx context.Context, id domain.IDPIdentifierConditio
 	writeCondition(&builder, database.And(conditions...))
 
 	stmt := builder.String()
-	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> stmt = %+v\n", stmt)
 
 	return i.client.Exec(ctx, stmt, builder.Args()...)
 }
