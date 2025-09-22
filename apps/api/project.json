@@ -109,9 +109,6 @@
                 "{workspaceRoot}/profile.api.test-unit.cov"
             ]
         },
-        "test-integration-pull": {
-            "command": "nx run @zitadel/devcontainer:compose pull db-api-integration cache-api-integration"
-        },
         "test-integration-build": {
             "cache": true,
             "dependsOn": [
@@ -129,16 +126,8 @@
                 "{workspaceRoot}/.artifacts/bin/*/*/zitadel.test"
             ]
         },
-        "test-integration-state": {
-            "dependsOn": [
-                "test-integration-pull"
-            ],
-            "continuous": true,
-            "command": "nx run @zitadel/devcontainer:compose up --force-recreate --renew-anon-volumes --abort-on-container-failure db-api-integration cache-api-integration"
-        },
         "test-integration-setup": {
             "dependsOn": [
-                "test-integration-state",
                 "test-integration-build"
             ],
             "executor": "nx:run-commands",
@@ -150,6 +139,7 @@
                 },
                 "parallel": false,
                 "commands": [
+                    "nx run @zitadel/devcontainer:compose up --detach --force-recreate --renew-anon-volumes db-api-integration cache-api-integration",
                     "mkdir -p .artifacts/api-test-integration/coverage",
                     "nx run @zitadel/api:setup --excludeTaskDependencies"
                 ]
@@ -158,7 +148,6 @@
         "test-integration-env": {
             "continuous": true,
             "dependsOn": [
-                "test-integration-state",
                 "test-integration-setup"
             ],
             "options": {
@@ -172,7 +161,6 @@
         },
         "test-integration": {
             "dependsOn": [
-                "test-integration-state",
                 "test-integration-env"
             ],
             "executor": "nx:run-commands",

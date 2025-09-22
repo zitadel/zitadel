@@ -1,33 +1,27 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
-    "test-pull": {
-        "command": "nx run @zitadel/devcontainer:compose pull db-functional-ui"
-    },
-    "test-state": {
-        "dependsOn": [
-            "test-pull"
-        ],
-        "continuous": true,
-        "command": "nx run @zitadel/devcontainer:compose up --force-recreate --renew-anon-volumes db-functional-ui"
-    },
     "test-setup": {
         "dependsOn": [
             "test-state",
             "test-build",
             "@zitadel/api:build"
         ],
-        "command": "nx run @zitadel/api:setup --excludeTaskDependencies",
+        "executor": "nx:run-commands",
         "options": {
             "env": {
                 "API_CONFIG_FILE": "{projectRoot}/api.yaml"
-            }
+            },
+            "parallel": false,
+            "commands": [
+                "nx run @zitadel/devcontainer:compose up --detach --force-recreate --renew-anon-volumes db-functional-ui",
+                "nx run @zitadel/api:setup --excludeTaskDependencies"
+            ]
         }  
     },
     "test-env": {
         "continuous": true,
         "dependsOn": [
-            "test-state",
             "test-setup"
         ],
         "options": {
@@ -40,7 +34,6 @@
     "test": {
       "description": "Runs the functional UI tests against a Zitadel API. It sequentially runs agains Chrome and Firefox so the tests don't intefere with each other.",
       "dependsOn": [
-        "test-state",
         "test-env"
       ],
       "executor": "nx:run-commands",
