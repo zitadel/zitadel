@@ -4,6 +4,12 @@
     "sources": ["{projectRoot}/src/**/*"]
   },
   "targets": {
+    "test": {
+      "description": "Run tests",
+      "dependsOn": [
+        "test-unit"
+      ]
+    },
     "lint": {
       "dependsOn": [
         "lint-*"

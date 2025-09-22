@@ -1,6 +1,20 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
+    "prod": {
+      "description": "Runs the Next.js Login application in production mode from the standalone build",
+      "continuous": true,
+      "dependsOn": [
+        "build"
+      ]
+    },
+    "dev": {
+      "description": "Runs the Next.js Login application in development mode with hot-reloading",
+      "continuous": true,
+      "dependsOn": [
+        "^build"
+      ]
+    },    
     "build": {
       "description": "Builds the Next.js Login application in standalone mode for production",
       "cache": true,
@@ -61,22 +75,15 @@
         "default"
       ]
     },
+    "test": {
+      "description": "Run all tests (unit and integration)",
+      "dependsOn": [
+        "test-unit",
+        "test-integration"
+      ]
+    },
     "test-unit": {
       "description": "Runs unit tests using Vitest",
-      "dependsOn": [
-        "^build"
-      ]
-    },
-    "prod": {
-      "description": "Runs the Next.js Login application in production mode from the standalone build",
-      "continuous": true,
-      "dependsOn": [
-        "build"
-      ]
-    },
-    "dev": {
-      "description": "Runs the Next.js Login application in development mode with hot-reloading",
-      "continuous": true,
       "dependsOn": [
         "^build"
       ]

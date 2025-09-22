@@ -87,6 +87,13 @@
                 "{workspaceRoot}/.golangci.yaml"
             ]
         },
+        "test": {
+            "description": "Run all tests (unit and integration)",
+            "dependsOn": [
+                "test-unit",
+                "test-integration"
+            ]
+        },
         "test-unit": {
             "description": "Run the unit tests with coverage",
             "dependsOn": [
