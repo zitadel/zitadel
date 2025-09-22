@@ -14,9 +14,10 @@
     "test-setup": {
         "dependsOn": [
             "test-state",
-            "test-build"
+            "test-build",
+            "@zitadel/api:build"
         ],
-        "command": "nx run @zitadel/api:setup",
+        "command": "nx run @zitadel/api:setup --excludeTaskDependencies",
         "options": {
             "env": {
                 "API_CONFIG_FILE": "{projectRoot}/api.yaml"
