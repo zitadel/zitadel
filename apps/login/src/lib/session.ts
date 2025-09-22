@@ -44,55 +44,76 @@ export async function isSessionValid({ serviceUrl, session }: { serviceUrl: stri
 
   let mfaValid = true;
 
-  const authMethodTypes = await listAuthenticationMethodTypes({
-    serviceUrl,
-    userId: session.factors.user.id,
-  });
-
-  const authMethods = authMethodTypes.authMethodTypes;
-  if (authMethods && authMethods.length > 0) {
-    // Check if any of the configured authentication methods have been verified
-    const totpValid = authMethods.includes(AuthenticationMethodType.TOTP) && !!session.factors.totp?.verifiedAt;
-    const otpEmailValid = authMethods.includes(AuthenticationMethodType.OTP_EMAIL) && !!session.factors.otpEmail?.verifiedAt;
-    const otpSmsValid = authMethods.includes(AuthenticationMethodType.OTP_SMS) && !!session.factors.otpSms?.verifiedAt;
-    const u2fValid = authMethods.includes(AuthenticationMethodType.U2F) && !!session.factors.webAuthN?.verifiedAt;
-    
-    mfaValid = totpValid || otpEmailValid || otpSmsValid || u2fValid;
-    
-    if (!mfaValid) {
-      console.warn("Session has no valid MFA factor. Configured methods:", authMethods, "Session factors:", {
-        totp: session.factors.totp?.verifiedAt,
-        otpEmail: session.factors.otpEmail?.verifiedAt,
-        otpSms: session.factors.otpSms?.verifiedAt,
-        webAuthN: session.factors.webAuthN?.verifiedAt
-      });
-    }
+  // Check if user authenticated via IDP - if so, skip MFA validation entirely
+  const validIDP = session?.factors?.intent?.verifiedAt;
+  if (validIDP) {
+    // IDP authentication bypasses MFA requirements
+    mfaValid = true;
   } else {
-    // only check settings if no auth methods are available, as this would require a setup
+    // Get login settings to determine if MFA is actually required by policy
     const loginSettings = await getLoginSettings({
       serviceUrl,
       organization: session.factors?.user?.organizationId,
     });
-    if (loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly) {
-      const otpEmail = session.factors.otpEmail?.verifiedAt;
-      const otpSms = session.factors.otpSms?.verifiedAt;
-      const totp = session.factors.totp?.verifiedAt;
-      const webAuthN = session.factors.webAuthN?.verifiedAt;
-      const idp = session.factors.intent?.verifiedAt; // TODO: forceMFA should not consider this as valid factor
 
-      // must have one single check
-      mfaValid = !!(otpEmail || otpSms || totp || webAuthN || idp);
-      if (!mfaValid) {
-        console.warn("Session has no valid multifactor", session.factors);
+    const isMfaRequired = loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly;
+
+    // Only enforce MFA validation if MFA is required by policy
+    if (isMfaRequired) {
+      const authMethodTypes = await listAuthenticationMethodTypes({
+        serviceUrl,
+        userId: session.factors.user.id,
+      });
+
+      const authMethods = authMethodTypes.authMethodTypes;
+      // Filter to only MFA methods (exclude PASSWORD and PASSKEY)
+      const mfaMethods = authMethods?.filter(
+        (method) =>
+          method === AuthenticationMethodType.TOTP ||
+          method === AuthenticationMethodType.OTP_EMAIL ||
+          method === AuthenticationMethodType.OTP_SMS ||
+          method === AuthenticationMethodType.U2F,
+      );
+
+      if (mfaMethods && mfaMethods.length > 0) {
+        // Check if any of the configured MFA methods have been verified
+        const totpValid = mfaMethods.includes(AuthenticationMethodType.TOTP) && !!session.factors.totp?.verifiedAt;
+        const otpEmailValid =
+          mfaMethods.includes(AuthenticationMethodType.OTP_EMAIL) && !!session.factors.otpEmail?.verifiedAt;
+        const otpSmsValid = mfaMethods.includes(AuthenticationMethodType.OTP_SMS) && !!session.factors.otpSms?.verifiedAt;
+        const u2fValid = mfaMethods.includes(AuthenticationMethodType.U2F) && !!session.factors.webAuthN?.verifiedAt;
+
+        mfaValid = totpValid || otpEmailValid || otpSmsValid || u2fValid;
+
+        if (!mfaValid) {
+          console.warn("Session has no valid MFA factor. Configured methods:", mfaMethods, "Session factors:", {
+            totp: session.factors.totp?.verifiedAt,
+            otpEmail: session.factors.otpEmail?.verifiedAt,
+            otpSms: session.factors.otpSms?.verifiedAt,
+            webAuthN: session.factors.webAuthN?.verifiedAt,
+          });
+        }
+      } else {
+        // No specific MFA methods configured, but MFA is forced - check for any verified MFA factors
+        // (excluding IDP which should be handled separately)
+        const otpEmail = session.factors.otpEmail?.verifiedAt;
+        const otpSms = session.factors.otpSms?.verifiedAt;
+        const totp = session.factors.totp?.verifiedAt;
+        const webAuthN = session.factors.webAuthN?.verifiedAt;
+        // Note: Removed IDP (session.factors.intent?.verifiedAt) as requested
+
+        mfaValid = !!(otpEmail || otpSms || totp || webAuthN);
+        if (!mfaValid) {
+          console.warn("Session has no valid multifactor", session.factors);
+        }
       }
-    } else {
-      mfaValid = true;
     }
   }
+  // If MFA is not required by policy, mfaValid remains true
 
   const validPassword = session?.factors?.password?.verifiedAt;
   const validPasskey = session?.factors?.webAuthN?.verifiedAt;
-  const validIDP = session?.factors?.intent?.verifiedAt;
+  // validIDP already declared above for IDP bypass logic
 
   const stillValid = session.expirationDate ? timestampDate(session.expirationDate).getTime() > new Date().getTime() : true;
 
@@ -151,7 +172,8 @@ export async function findValidSession({
       return s.factors?.user?.loginName === authRequest.loginHint;
     }
     if (samlRequest) {
-      // TODO: do whatever
+      // SAML requests don't contain user hints like OIDC (hintUserId/loginHint)
+      // so we return all sessions for further processing
       return true;
     }
     return true;

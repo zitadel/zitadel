@@ -18,17 +18,10 @@ import {
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
-import { getNextUrl } from "../client";
-import {
-  getMostRecentSessionCookie,
-  getSessionCookieById,
-  getSessionCookieByLoginName,
-} from "../cookies";
+import { completeFlowOrGetUrl } from "../client";
+import { getMostRecentSessionCookie, getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
 import { getServiceUrlFromHeaders } from "../service-url";
-import {
-  checkEmailVerification,
-  checkUserVerification,
-} from "../verify-helper";
+import { checkEmailVerification, checkUserVerification } from "../verify-helper";
 import { setSessionAndUpdateCookie } from "./cookie";
 
 type VerifyPasskeyCommand = {
@@ -48,9 +41,7 @@ function isSessionValid(session: Partial<Session>): {
 } {
   const validPassword = session?.factors?.password?.verifiedAt;
   const validPasskey = session?.factors?.webAuthN?.verifiedAt;
-  const stillValid = session.expirationDate
-    ? timestampDate(session.expirationDate) > new Date()
-    : true;
+  const stillValid = session.expirationDate ? timestampDate(session.expirationDate) > new Date() : true;
 
   const verifiedAt = validPassword || validPasskey;
   const valid = !!((validPassword || validPasskey) && stillValid);
@@ -93,15 +84,12 @@ export async function registerPasskeyLink(
     // if the user has no authmethods set, we need to check if the user was verified
     if (authmethods.authMethodTypes.length !== 0) {
       return {
-        error:
-          "You have to authenticate or have a valid User Verification Check",
+        error: "You have to authenticate or have a valid User Verification Check",
       };
     }
 
     // check if a verification was done earlier
-    const hasValidUserVerificationCheck = await checkUserVerification(
-      session.session.factors.user.id,
-    );
+    const hasValidUserVerificationCheck = await checkUserVerification(session.session.factors.user.id);
 
     if (!hasValidUserVerificationCheck) {
       return { error: "User Verification Check has to be done" };
@@ -246,41 +234,30 @@ export async function sendPasskey(command: SendPasskeyCommand) {
     return { error: "User not found in the system" };
   }
 
-  const humanUser =
-    userResponse.user.type.case === "human"
-      ? userResponse.user.type.value
-      : undefined;
+  const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
 
-  const emailVerificationCheck = checkEmailVerification(
-    session,
-    humanUser,
-    organization,
-    requestId,
-  );
+  const emailVerificationCheck = checkEmailVerification(session, humanUser, organization, requestId);
 
   if (emailVerificationCheck?.redirect) {
     return emailVerificationCheck;
   }
 
-  const url =
-    requestId && session.id
-      ? await getNextUrl(
-          {
-            sessionId: session.id,
-            requestId: requestId,
-            organization: organization,
-          },
-          loginSettings?.defaultRedirectUri,
-        )
-      : session?.factors?.user?.loginName
-        ? await getNextUrl(
-            {
-              loginName: session.factors.user.loginName,
-              organization: organization,
-            },
-            loginSettings?.defaultRedirectUri,
-          )
-        : null;
-
-  return { redirect: url };
+  if (requestId && session.id) {
+    return completeFlowOrGetUrl(
+      {
+        sessionId: session.id,
+        requestId: requestId,
+        organization: organization,
+      },
+      loginSettings?.defaultRedirectUri,
+    );
+  } else if (session?.factors?.user?.loginName) {
+    return completeFlowOrGetUrl(
+      {
+        loginName: session.factors.user.loginName,
+        organization: organization,
+      },
+      loginSettings?.defaultRedirectUri,
+    );
+  }
 }
