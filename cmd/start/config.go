@@ -134,6 +134,9 @@ func MustNewConfig(v *viper.Viper) *Config {
 		actions.SetHTTPConfig(&config.Actions.HTTP)
 	}
 
+	err = config.SystemDefaults.Validate()
+	logging.OnError(err).Fatal("system defaults config invalid")
+
 	// Copy the global role permissions mappings to the instance until we allow instance-level configuration over the API.
 	config.DefaultInstance.RolePermissionMappings = config.InternalAuthZ.RolePermissionMappings
 

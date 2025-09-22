@@ -31,7 +31,7 @@ func RecoveryCodesFromRaw(codes []string, hasher *crypto.Hasher) ([]string, erro
 func GenerateRecoveryCodes(count int, config RecoveryCodesConfig, hasher *crypto.Hasher) ([]string, []string, error) {
 	hashedCodes, rawCodes := make([]string, count), make([]string, count)
 
-	for i := 0; i < count; i++ {
+	for i := range count {
 		rawCode, err := makeRawCode(config)
 		if err != nil {
 			return nil, nil, err
@@ -40,8 +40,7 @@ func GenerateRecoveryCodes(count int, config RecoveryCodesConfig, hasher *crypto
 		if err != nil {
 			return nil, nil, err
 		}
-		hashedCodes[i] = hashedCode
-		rawCodes[i] = rawCode
+		hashedCodes[i], rawCodes[i] = hashedCode, rawCode
 	}
 
 	return hashedCodes, rawCodes, nil
