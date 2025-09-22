@@ -73,3 +73,33 @@ func NewUnexpectedQueryTypeError[T any](errID string, assertedType T) error {
 func (u *UnexpectedQueryTypeError[T]) Error() string {
 	return fmt.Sprintf("ID=%s Message=unexpected query type '%T'", u.ID, u.assertedType)
 }
+
+type NoQueryCriteriaError struct {
+	ID string
+}
+
+func NewNoQueryCriteriaError(errID string) error {
+	return &NoQueryCriteriaError{
+		ID: errID,
+	}
+}
+
+func (err *NoQueryCriteriaError) Error() string {
+	return fmt.Sprintf("ID=%s Message=input query criteria is empty", err.ID)
+}
+
+type UnexpectedTextQueryOperationError[T any] struct {
+	ID           string
+	assertedType T
+}
+
+func NewUnexpectedTextQueryOperationError[T any](errID string, assertedType T) error {
+	return &UnexpectedTextQueryOperationError[T]{
+		ID:           errID,
+		assertedType: assertedType,
+	}
+}
+
+func (u *UnexpectedTextQueryOperationError[T]) Error() string {
+	return fmt.Sprintf("ID=%s Message=unexpected text query operation type '%T'", u.ID, u.assertedType)
+}
