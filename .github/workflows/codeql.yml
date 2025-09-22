@@ -47,9 +47,10 @@ jobs:
         path: ${{ env.nx_cache_path }}
         # It includes the repository owner to prevent cache poisoning from forks.
         # We restore caches from previous commits on the HEAD branch, then we fall back to caches from the base.
-        key: nx-codeql-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-${{ github.repository_owner }}
+        key: nx-codeql-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-${{ github.repository_owner }}-${{ github.sha }}
         enableCrossOsArchive: true
         restore-keys: |
+          nx-codeql-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-${{ github.repository_owner }}-
           nx-codeql-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-
           nx-codeql-${{ github.event.pull_request.base.ref || github.ref_name }}-
     - if: matrix.language == 'go'    
