@@ -46,7 +46,7 @@
                     "DEV_CONFIG_FILE": "{projectRoot}/dev.yaml"
                 },
                 "commands": [
-                    "bash -c 'for i in {1..5}; do echo \"Attempt $i/5: Starting ZITADEL...\";./.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} init --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} && break || (echo \"Failed, retrying in 2s...\" && sleep 2); done'",
+                    "bash -c 'for i in {1..20}; do echo \"Attempt $i/20: Starting ZITADEL...\";./.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} init --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} && break || (echo \"Failed, retrying in 2s...\" && sleep 2); done'",
                     "bash -c './.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} setup --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --steps ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --masterkey MasterkeyNeedsToHave32Characters'"
                 ]
             }

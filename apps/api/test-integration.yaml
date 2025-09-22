@@ -1,18 +1,11 @@
 Database:
-  postgres:
+  Postgres:
     Port: 5433
     MaxOpenConns: 20
     MaxIdleConns: 20
     MaxConnLifetime: 1h
     MaxConnIdleTime: 5m
-    User:
-      Password: zitadel
-      SSL:
-        Mode: disable
-    Admin:
-      Username: zitadel
-      SSL:
-        Mode: disable
+    Database: zitadel
 FirstInstance:
   Skip: false
   PatPath: .artifacts/api-test-integration/admin-pat.txt

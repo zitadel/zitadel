@@ -1,9 +1,7 @@
 ExternalSecure: false
 TLS.Enabled: false
-DATABASE.POSTGRES:
+Database.Postgres:
   Port: 5432
-  User: zitadel
-  Password: zitadel
   Database: zitadel
   MaxOpenConns: 20
   MaxIdleConns: 20
@@ -25,7 +23,4 @@ FirstInstance:
         Username: admin
         Name: Automatically Initialized IAM admin Client
       Pat.ExpirationDate: 2099-01-01T00:00:00Z
-DefaultInstance:
-  Features:
-    LoginV2:
-      BaseURI: http://localhost:3000/ui/v2/login
+DefaultInstance.Features.LoginV2.BaseURI: http://localhost:3000/ui/v2/login
