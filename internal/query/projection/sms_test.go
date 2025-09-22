@@ -302,7 +302,8 @@ func TestSMSProjection_reduces(t *testing.T) {
 						[]byte(`{
 						"id": "id",
 						"description": "description",
-						"endpoint": "endpoint"
+						"endpoint": "endpoint",
+						"signingKey": { "cryptoType": 0, "algorithm": "RSA-265", "keyId": "key-id" }
 					}`),
 					), eventstore.GenericEventMapper[instance.SMSConfigHTTPAddedEvent]),
 			},
@@ -327,11 +328,12 @@ func TestSMSProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.sms_configs3_http (sms_id, instance_id, endpoint) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.sms_configs3_http (sms_id, instance_id, endpoint, signing_key) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"id",
 								"instance-id",
 								"endpoint",
+								anyArg{},
 							},
 						},
 					},
@@ -348,7 +350,8 @@ func TestSMSProjection_reduces(t *testing.T) {
 						[]byte(`{
 						"id": "id",
 						"endpoint": "endpoint",
-						"description": "description"
+						"description": "description",
+						"signingKey": { "cryptoType": 0, "algorithm": "RSA-265", "keyId": "key-id" }
 					}`),
 					), eventstore.GenericEventMapper[instance.SMSConfigHTTPChangedEvent]),
 			},
@@ -369,8 +372,9 @@ func TestSMSProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.sms_configs3_http SET endpoint = $1 WHERE (sms_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.sms_configs3_http SET (signing_key, endpoint) = ($1, $2) WHERE (sms_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
+								anyArg{},
 								"endpoint",
 								"id",
 								"instance-id",
@@ -444,6 +448,46 @@ func TestSMSProjection_reduces(t *testing.T) {
 							expectedStmt: "UPDATE projections.sms_configs3_http SET endpoint = $1 WHERE (sms_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"endpoint",
+								"id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceSMSConfigHTTPChanged, only signing key",
+			args: args{
+				event: getEvent(
+					testEvent(
+						instance.SMSConfigHTTPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
+						"id": "id",
+						"signingKey": { "cryptoType": 0, "algorithm": "RSA-265", "keyId": "key-id" }
+					}`),
+					), eventstore.GenericEventMapper[instance.SMSConfigHTTPChangedEvent]),
+			},
+			reduce: (&smsConfigProjection{}).reduceSMSConfigHTTPChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.sms_configs3 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.sms_configs3_http SET signing_key = $1 WHERE (sms_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								anyArg{},
 								"id",
 								"instance-id",
 							},

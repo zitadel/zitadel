@@ -9,8 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
-
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 )
@@ -35,7 +33,7 @@ func TestMain(m *testing.M) {
 		CTX = Instance.WithAuthorizationToken(ctx, integration.UserTypeOrgOwner)
 
 		iamOwnerCtx := Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-		SecondaryOrganization = Instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+		SecondaryOrganization = Instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 		return m.Run()
 	}())

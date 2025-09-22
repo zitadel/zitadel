@@ -528,6 +528,10 @@ module.exports = {
               type: "doc",
               id: "guides/integrate/actions/migrate-from-v1",
             },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/webhook-site-setup",
+            },
           ],
         },
         {

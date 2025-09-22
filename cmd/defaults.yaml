@@ -387,6 +387,12 @@ Projections:
   # Maximum amount of instances cached as active
   # If set to 0, every instance is always considered active
   MaxActiveInstances: 0 # ZITADEL_PROJECTIONS_MAXACTIVEINSTANCES
+  # Limits the amount of concurrently running projection triggers
+  # If set to 0, 1/3 of database.MaxOpenConns is used
+  # The number must be lower than the Database.MaxOpenConns
+  # A good starting point is to set this to Database.MaxOpenConns / 3
+  # so that there are enough connections free for other operations (e.g. writing events, reading projections, notifications, ...)
+  MaxParallelTriggers: 0 # ZITADEL_PROJECTIONS_MAXPARALLELTRIGGERS
   # In the Customizations section, all settings from above can be overwritten for each specific projection
   Customizations:
     custom_texts:
@@ -1126,8 +1132,6 @@ DefaultInstance:
   # will be ignored until instance level features are reset.
   Features:
     LoginDefaultOrg: true # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINDEFAULTORG
-    # TriggerIntrospectionProjections: false # ZITADEL_DEFAULTINSTANCE_FEATURES_TRIGGERINTROSPECTIONPROJECTIONS
-    # LegacyIntrospection: false # ZITADEL_DEFAULTINSTANCE_FEATURES_LEGACYINTROSPECTION
     # UserSchema: false # ZITADEL_DEFAULTINSTANCE_FEATURES_USERSCHEMA
     # TokenExchange: false # ZITADEL_DEFAULTINSTANCE_FEATURES_TOKENEXCHANGE
     ImprovedPerformance: # ZITADEL_DEFAULTINSTANCE_FEATURES_IMPROVEDPERFORMANCE
@@ -1137,7 +1141,6 @@ DefaultInstance:
     #   - 3 # Project
     #   - 4 # UserGrant
     #   - 5 # OrgDomainVerified
-    # WebKey: false # ZITADEL_DEFAULTINSTANCE_FEATURES_WEBKEY
     # DebugOIDCParentError: false # ZITADEL_DEFAULTINSTANCE_FEATURES_DEBUGOIDCPARENTERROR
     # OIDCSingleV1SessionTermination: false # ZITADEL_DEFAULTINSTANCE_FEATURES_OIDCSINGLEV1SESSIONTERMINATION
     # EnableBackChannelLogout: false # ZITADEL_DEFAULTINSTANCE_FEATURES_ENABLEBACKCHANNELLOGOUT
@@ -1145,7 +1148,7 @@ DefaultInstance:
       Required: true # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED
     #  BaseURI: "" # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI
     # PermissionCheckV2: false # ZITADEL_DEFAULTINSTANCE_FEATURES_PERMISSIONCHECKV2
-    # ConsoleUseV2UserApi: false # ZITADEL_DEFAULTINSTANCE_FEATURES_CONSOLEUSEV2USERAPI
+    ConsoleUseV2UserApi: true # ZITADEL_DEFAULTINSTANCE_FEATURES_CONSOLEUSEV2USERAPI
     # EnableRelationalTables: false # ZITADEL_DEFAULTINSTANCE_FEATURES_ENABLERELATIONALTABLES
 
   Limits:
@@ -1239,6 +1242,9 @@ ServicePing:
     ResourceCount:
       Enabled: true # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_ENABLED
       # The number of counts that are sent in one batch.
+      # The bulk size is used to prevent large requests that might fail due to their size.
+      # Each report will log its size before sending it to the endpoint,
+      # so you can adjust the bulk size if you see that the requests are too large.
       BulkSize: 10000 # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_BULKSIZE
 
 InternalAuthZ:

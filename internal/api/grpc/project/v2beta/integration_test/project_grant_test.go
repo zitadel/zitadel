@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/integration"
@@ -16,7 +15,7 @@ import (
 
 func TestServer_CreateProjectGrant(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	type want struct {
 		creationDate bool
@@ -49,7 +48,7 @@ func TestServer_CreateProjectGrant(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(request *project.CreateProjectGrantRequest) {
 				request.ProjectId = "something"
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 			},
 			req:     &project.CreateProjectGrantRequest{},
@@ -74,7 +73,7 @@ func TestServer_CreateProjectGrant(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -101,7 +100,7 @@ func TestServer_CreateProjectGrant(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 			},
 			req: &project.CreateProjectGrantRequest{},
@@ -118,7 +117,7 @@ func TestServer_CreateProjectGrant(t *testing.T) {
 				request.ProjectId = projectResp.GetId()
 				request.RoleKeys = roles
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 			},
 			req:     &project.CreateProjectGrantRequest{},
@@ -137,7 +136,7 @@ func TestServer_CreateProjectGrant(t *testing.T) {
 
 				request.RoleKeys = roles
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 			},
 			req: &project.CreateProjectGrantRequest{},
@@ -167,7 +166,7 @@ func TestServer_CreateProjectGrant(t *testing.T) {
 
 func TestServer_CreateProjectGrant_Permission(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	userResp := instance.CreateMachineUser(iamOwnerCtx)
 	patResp := instance.CreatePersonalAccessToken(iamOwnerCtx, userResp.GetUserId())
@@ -191,7 +190,7 @@ func TestServer_CreateProjectGrant_Permission(t *testing.T) {
 			ctx:  CTX,
 			prepare: func(request *project.CreateProjectGrantRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
-				grantedOrgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 				request.ProjectId = projectResp.GetId()
 				request.GrantedOrganizationId = grantedOrgResp.GetOrganizationId()
@@ -204,7 +203,7 @@ func TestServer_CreateProjectGrant_Permission(t *testing.T) {
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 			prepare: func(request *project.CreateProjectGrantRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
-				grantedOrgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 				request.ProjectId = projectResp.GetId()
 				request.GrantedOrganizationId = grantedOrgResp.GetOrganizationId()
@@ -217,7 +216,7 @@ func TestServer_CreateProjectGrant_Permission(t *testing.T) {
 			ctx:  projectOwnerCtx,
 			prepare: func(request *project.CreateProjectGrantRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
-				grantedOrgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 				request.ProjectId = projectResp.GetId()
 				request.GrantedOrganizationId = grantedOrgResp.GetOrganizationId()
@@ -231,7 +230,7 @@ func TestServer_CreateProjectGrant_Permission(t *testing.T) {
 			prepare: func(request *project.CreateProjectGrantRequest) {
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 			},
 			req: &project.CreateProjectGrantRequest{},
@@ -244,7 +243,7 @@ func TestServer_CreateProjectGrant_Permission(t *testing.T) {
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 			prepare: func(request *project.CreateProjectGrantRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
-				grantedOrgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 				request.ProjectId = projectResp.GetId()
 				request.GrantedOrganizationId = grantedOrgResp.GetOrganizationId()
@@ -259,7 +258,7 @@ func TestServer_CreateProjectGrant_Permission(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 			},
 			req: &project.CreateProjectGrantRequest{},
@@ -272,7 +271,7 @@ func TestServer_CreateProjectGrant_Permission(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(request *project.CreateProjectGrantRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
-				grantedOrgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 				request.ProjectId = projectResp.GetId()
 				request.GrantedOrganizationId = grantedOrgResp.GetOrganizationId()
@@ -316,7 +315,7 @@ func assertCreateProjectGrantResponse(t *testing.T, creationDate, changeDate tim
 
 func TestServer_UpdateProjectGrant(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	type args struct {
 		ctx context.Context
@@ -354,7 +353,7 @@ func TestServer_UpdateProjectGrant(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -375,7 +374,7 @@ func TestServer_UpdateProjectGrant(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 				for _, role := range roles {
 					instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), role, role, "")
@@ -399,7 +398,7 @@ func TestServer_UpdateProjectGrant(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -436,7 +435,7 @@ func TestServer_UpdateProjectGrant(t *testing.T) {
 
 func TestServer_UpdateProjectGrant_Permission(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	userResp := instance.CreateMachineUser(iamOwnerCtx)
 	patResp := instance.CreatePersonalAccessToken(iamOwnerCtx, userResp.GetUserId())
@@ -466,7 +465,7 @@ func TestServer_UpdateProjectGrant_Permission(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -485,7 +484,7 @@ func TestServer_UpdateProjectGrant_Permission(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -523,7 +522,7 @@ func TestServer_UpdateProjectGrant_Permission(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -543,7 +542,7 @@ func TestServer_UpdateProjectGrant_Permission(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 				for _, role := range roles {
 					instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), role, role, "")
@@ -568,7 +567,7 @@ func TestServer_UpdateProjectGrant_Permission(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 				for _, role := range roles {
 					instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), role, role, "")
@@ -623,7 +622,7 @@ func assertUpdateProjectGrantResponse(t *testing.T, creationDate, changeDate tim
 
 func TestServer_DeleteProjectGrant(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	tests := []struct {
 		name             string
@@ -667,7 +666,7 @@ func TestServer_DeleteProjectGrant(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -684,7 +683,7 @@ func TestServer_DeleteProjectGrant(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -702,7 +701,7 @@ func TestServer_DeleteProjectGrant(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -732,7 +731,7 @@ func TestServer_DeleteProjectGrant(t *testing.T) {
 
 func TestServer_DeleteProjectGrant_Permission(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	tests := []struct {
 		name             string
@@ -749,7 +748,7 @@ func TestServer_DeleteProjectGrant_Permission(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -765,7 +764,7 @@ func TestServer_DeleteProjectGrant_Permission(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -782,7 +781,7 @@ func TestServer_DeleteProjectGrant_Permission(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -799,7 +798,7 @@ func TestServer_DeleteProjectGrant_Permission(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -816,7 +815,7 @@ func TestServer_DeleteProjectGrant_Permission(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -857,7 +856,7 @@ func assertDeleteProjectGrantResponse(t *testing.T, creationDate, deletionDate t
 
 func TestServer_DeactivateProjectGrant(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	type args struct {
 		ctx context.Context
@@ -880,7 +879,7 @@ func TestServer_DeactivateProjectGrant(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -910,7 +909,7 @@ func TestServer_DeactivateProjectGrant(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -931,7 +930,7 @@ func TestServer_DeactivateProjectGrant(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -968,7 +967,7 @@ func TestServer_DeactivateProjectGrant(t *testing.T) {
 
 func TestServer_DeactivateProjectGrant_Permission(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	type args struct {
 		ctx context.Context
@@ -991,7 +990,7 @@ func TestServer_DeactivateProjectGrant_Permission(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -1008,7 +1007,7 @@ func TestServer_DeactivateProjectGrant_Permission(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -1025,7 +1024,7 @@ func TestServer_DeactivateProjectGrant_Permission(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -1042,7 +1041,7 @@ func TestServer_DeactivateProjectGrant_Permission(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -1062,7 +1061,7 @@ func TestServer_DeactivateProjectGrant_Permission(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -1111,7 +1110,7 @@ func assertDeactivateProjectGrantResponse(t *testing.T, creationDate, changeDate
 
 func TestServer_ActivateProjectGrant(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	type args struct {
 		ctx context.Context
@@ -1147,7 +1146,7 @@ func TestServer_ActivateProjectGrant(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -1167,7 +1166,7 @@ func TestServer_ActivateProjectGrant(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -1205,7 +1204,7 @@ func TestServer_ActivateProjectGrant(t *testing.T) {
 
 func TestServer_ActivateProjectGrant_Permission(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	type args struct {
 		ctx context.Context
@@ -1228,7 +1227,7 @@ func TestServer_ActivateProjectGrant_Permission(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -1245,7 +1244,7 @@ func TestServer_ActivateProjectGrant_Permission(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -1263,7 +1262,7 @@ func TestServer_ActivateProjectGrant_Permission(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -1281,7 +1280,7 @@ func TestServer_ActivateProjectGrant_Permission(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())
@@ -1302,7 +1301,7 @@ func TestServer_ActivateProjectGrant_Permission(t *testing.T) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
 
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), grantedOrg.GetOrganizationId())

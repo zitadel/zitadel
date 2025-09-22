@@ -5,12 +5,12 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/query"
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
 )
@@ -38,7 +38,7 @@ func samlMetadataGen(entityID string) []byte {
 func TestCreateSAMLAppRequestToDomain(t *testing.T) {
 	t.Parallel()
 
-	genMetaForValidRequest := samlMetadataGen(gofakeit.URL())
+	genMetaForValidRequest := samlMetadataGen(integration.URL())
 
 	tt := []struct {
 		testName  string
@@ -55,7 +55,7 @@ func TestCreateSAMLAppRequestToDomain(t *testing.T) {
 			projectID: "proj-1",
 			req: &app.CreateSAMLApplicationRequest{
 				Metadata: &app.CreateSAMLApplicationRequest_MetadataXml{
-					MetadataXml: samlMetadataGen(gofakeit.URL()),
+					MetadataXml: samlMetadataGen(integration.URL()),
 				},
 				LoginVersion: &app.LoginVersion{
 					Version: &app.LoginVersion_LoginV2{
@@ -122,7 +122,7 @@ func TestCreateSAMLAppRequestToDomain(t *testing.T) {
 func TestUpdateSAMLAppConfigRequestToDomain(t *testing.T) {
 	t.Parallel()
 
-	genMetaForValidRequest := samlMetadataGen(gofakeit.URL())
+	genMetaForValidRequest := samlMetadataGen(integration.URL())
 
 	tt := []struct {
 		testName  string
@@ -139,7 +139,7 @@ func TestUpdateSAMLAppConfigRequestToDomain(t *testing.T) {
 			projectID: "proj-1",
 			req: &app.UpdateSAMLApplicationConfigurationRequest{
 				Metadata: &app.UpdateSAMLApplicationConfigurationRequest_MetadataXml{
-					MetadataXml: samlMetadataGen(gofakeit.URL()),
+					MetadataXml: samlMetadataGen(integration.URL()),
 				},
 				LoginVersion: &app.LoginVersion{
 					Version: &app.LoginVersion_LoginV2{
@@ -202,7 +202,7 @@ func TestUpdateSAMLAppConfigRequestToDomain(t *testing.T) {
 func TestAppSAMLConfigToPb(t *testing.T) {
 	t.Parallel()
 
-	metadata := samlMetadataGen(gofakeit.URL())
+	metadata := samlMetadataGen(integration.URL())
 
 	tt := []struct {
 		name         string
