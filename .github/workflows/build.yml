@@ -36,9 +36,7 @@ jobs:
       dry_run: true
 
   container:
-    needs: 
-    - api-compile
-    - check
+    needs: check
     uses: ./.github/workflows/container.yml
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
@@ -56,8 +54,6 @@ jobs:
 
   functional-ui:
     uses: ./.github/workflows/functional-ui.yml
-    needs: api-compile
-
   release:
     uses: ./.github/workflows/release.yml
     permissions:
