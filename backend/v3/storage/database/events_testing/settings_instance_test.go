@@ -1262,7 +1262,7 @@ func TestServer_TestLockoutSettingsReduces(t *testing.T) {
 			assert.Equal(t, true, setting.Settings.IsDefault)
 			assert.Equal(t, uint64(0), setting.Settings.MaxOTPAttempts)
 			assert.Equal(t, uint64(0), setting.Settings.MaxPasswordAttempts)
-			assert.Equal(t, false, setting.Settings.ShowLockOutFailures)
+			assert.Equal(t, true, setting.Settings.ShowLockOutFailures)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
