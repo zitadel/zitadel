@@ -40,11 +40,8 @@ services:
   db-api-integration:
     restart: 'always'
     image: 'postgres:17'
-    environment:
-      - POSTGRES_USER=zitadel
-      - PGUSER=zitadel
-      - POSTGRES_DB=zitadel
-      - POSTGRES_HOST_AUTH_METHOD=trust
+    env_file:
+      - ./.env.db
     command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all -c shared_buffers=1GB -c work_mem=16MB -c effective_io_concurrency=100 -c wal_level=minimal -c archive_mode=off -c max_wal_senders=0
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
@@ -64,9 +61,8 @@ services:
   db-functional-ui:
     restart: 'always'
     image: 'postgres:17'
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+    env_file:
+      - ./.env.db
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready", "-d", "zitadel", "-U", "postgres" ]
       interval: '10s'

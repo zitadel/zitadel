@@ -54,7 +54,6 @@ export default defineConfig({
     WEBHOOK_HANDLER_PORT: webhookHandlerPort(),
     WEBHOOK_HANDLER_HOST: process.env.CYPRESS_WEBHOOK_HANDLER_HOST || 'localhost',
   },
-
   e2e: {
     baseUrl: baseUrl(),
     experimentalRunAllSpecs: true,

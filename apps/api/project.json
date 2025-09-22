@@ -134,7 +134,7 @@
                 "test-integration-pull"
             ],
             "continuous": true,
-            "command": "nx run @zitadel/devcontainer:compose up --force-recreate db-api-integration cache-api-integration"
+            "command": "nx run @zitadel/devcontainer:compose up --force-recreate --renew-anon-volumes --abort-on-container-failure db-api-integration cache-api-integration"
         },
         "test-integration-setup": {
             "dependsOn": [
@@ -195,8 +195,7 @@
                 "{workspaceRoot}/go*"
             ],
             "outputs": [
-                "{workspaceRoot}/profile.api.test-integration.cov",
-                "{workspaceRoot}.artifacts/api-test-integration"
+                "{workspaceRoot}/profile.api.test-integration.cov"
             ]
         },
         "generate-console": {

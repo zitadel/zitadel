@@ -76,22 +76,6 @@ jobs:
         with:
           key: ${{ steps.nx_cache.outputs.cache-primary-key }}
           path: ${{ env.nx_cache_path }}
-      - name: upload race logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: integration-test-race-logs
-          path: |
-           .artifacts/api-test-integration/race.log.*
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: production-tests-${{ matrix.browser }}
-          path: |
-            tests/functional-ui/cypress/screenshots
-            tests/functional-ui/cypress/videos
-            tests/functional-ui/cypress/results
-          retention-days: 30           
       - name: publish coverage
         uses: codecov/codecov-action@v4.3.0
         with:
@@ -111,3 +95,18 @@ jobs:
         with:
           name: zitadel-binaries
           path: zitadel-*-*.tar.gz
+      - uses: actions/upload-artifact@v4
+        if: failure() || cancelled()
+        with:
+          name: functional-ui-tests
+          path: |
+            tests/functional-ui/cypress/screenshots
+            tests/functional-ui/cypress/videos
+            tests/functional-ui/cypress/results
+      - name: upload race logs
+        if: failure() || cancelled()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-integration-test-race-logs
+          path: |
+           .artifacts/api-test-integration/race.log.*
