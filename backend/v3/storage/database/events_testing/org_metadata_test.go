@@ -39,7 +39,10 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
 		_, err := orgRepo.Get(CTX, pool,
-			database.WithCondition(orgRepo.IDCondition(org.GetId())),
+			database.WithCondition(database.And(
+				orgRepo.InstanceIDCondition(Instance.Instance.Id),
+				orgRepo.IDCondition(org.GetId())),
+			),
 		)
 		assert.NoError(t, err)
 	}, retryDuration, tick)
