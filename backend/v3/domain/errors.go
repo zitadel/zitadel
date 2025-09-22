@@ -57,3 +57,19 @@ func NewOrgNameNotChangedError(errID string) error {
 func (err *OrgNameNotChangedError) Error() string {
 	return fmt.Sprintf("ID=%s Message=organization name has not changed", err.ID)
 }
+
+type UnexpectedQueryTypeError[T any] struct {
+	ID           string
+	assertedType T
+}
+
+func NewUnexpectedQueryTypeError[T any](errID string, assertedType T) error {
+	return &UnexpectedQueryTypeError[T]{
+		ID:           errID,
+		assertedType: assertedType,
+	}
+}
+
+func (u *UnexpectedQueryTypeError[T]) Error() string {
+	return fmt.Sprintf("ID=%s Message=unexpected query type '%T'", u.ID, u.assertedType)
+}
