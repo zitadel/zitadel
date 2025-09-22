@@ -25,8 +25,6 @@ var (
 
 	LabelPolicyFontAddedEventType   = orgEventTypePrefix + policy.LabelPolicyFontAddedEventType
 	LabelPolicyFontRemovedEventType = orgEventTypePrefix + policy.LabelPolicyFontRemovedEventType
-
-	LabelPolicyAssetsRemovedEventType = orgEventTypePrefix + policy.LabelPolicyAssetsRemovedEventType
 )
 
 type LabelPolicyAddedEvent struct {
@@ -464,20 +462,6 @@ func (e *LabelPolicyAssetsRemovedEvent) Payload() interface{} {
 
 func (e *LabelPolicyAssetsRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
-}
-
-func NewLabelPolicyAssetsRemovedEvent(
-	ctx context.Context,
-	aggregate *eventstore.Aggregate,
-) *LabelPolicyAssetsRemovedEvent {
-	return &LabelPolicyAssetsRemovedEvent{
-		LabelPolicyAssetsRemovedEvent: *policy.NewLabelPolicyAssetsRemovedEvent(
-			eventstore.NewBaseEventForPush(
-				ctx,
-				aggregate,
-				LabelPolicyAssetsRemovedEventType),
-		),
-	}
 }
 
 func LabelPolicyAssetsRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {

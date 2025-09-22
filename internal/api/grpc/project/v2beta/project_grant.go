@@ -32,7 +32,6 @@ func projectGrantCreateToCommand(req *project_pb.CreateProjectGrantRequest) *com
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: req.ProjectId,
 		},
-		GrantID:      req.GrantedOrganizationId,
 		GrantedOrgID: req.GrantedOrganizationId,
 		RoleKeys:     req.RoleKeys,
 	}
@@ -113,7 +112,7 @@ func (s *Server) userGrantsFromProjectGrant(ctx context.Context, projectID, gran
 	if err != nil {
 		return nil, err
 	}
-	grantQuery, err := query.NewUserGrantGrantIDSearchQuery(grantedOrganizationID)
+	grantQuery, err := query.NewUserGrantWithGrantedQuery(grantedOrganizationID)
 	if err != nil {
 		return nil, err
 	}

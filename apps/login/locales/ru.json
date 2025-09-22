@@ -222,7 +222,6 @@
     "termsOfService": "Условия использования",
     "privacyPolicy": "Политика конфиденциальности",
     "submit": "Продолжить",
-    "orUseIDP": "или используйте Identity Provider",
     "password": {
       "title": "Установить пароль",
       "description": "Установите пароль для вашего аккаунта",

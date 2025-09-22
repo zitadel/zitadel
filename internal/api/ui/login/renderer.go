@@ -437,8 +437,7 @@ func (l *Login) getTranslator(ctx context.Context, authReq *domain.AuthRequest) 
 	if err != nil {
 		logging.OnError(err).Warn("cannot load instance restrictions to retrieve allowed languages for creating the translator")
 	}
-	translator, err := l.renderer.NewTranslator(ctx, restrictions.AllowedLanguages)
-	logging.OnError(err).Warn("cannot load translator")
+	translator := l.renderer.NewTranslator(ctx, restrictions.AllowedLanguages)
 	if authReq != nil {
 		l.addLoginTranslations(translator, authReq.DefaultTranslations)
 		l.addLoginTranslations(translator, authReq.OrgTranslations)

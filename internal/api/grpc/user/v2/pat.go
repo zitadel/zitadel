@@ -19,7 +19,7 @@ func (s *Server) AddPersonalAccessToken(ctx context.Context, req *connect.Reques
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: req.Msg.GetUserId(),
 		},
-		PermissionCheck: s.command.NewPermissionCheckUserWrite(ctx),
+		PermissionCheck: s.command.NewPermissionCheckUserWrite(ctx, true),
 		ExpirationDate:  req.Msg.GetExpirationDate().AsTime(),
 		Scopes: []string{
 			oidc.ScopeOpenID,
@@ -46,7 +46,7 @@ func (s *Server) RemovePersonalAccessToken(ctx context.Context, req *connect.Req
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: req.Msg.GetUserId(),
 		},
-		PermissionCheck: s.command.NewPermissionCheckUserWrite(ctx),
+		PermissionCheck: s.command.NewPermissionCheckUserWrite(ctx, true),
 	})
 	if err != nil {
 		return nil, err
