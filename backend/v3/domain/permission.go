@@ -29,6 +29,8 @@ type PermissionChecker interface {
 
 type noopPermissionChecker struct{}
 
+var _ PermissionChecker = (*noopPermissionChecker)(nil)
+
 func (*noopPermissionChecker) CheckInstancePermission(context.Context, string) error {
 	return nil
 }
