@@ -14,7 +14,7 @@ type and struct {
 }
 
 // Write implements [Condition].
-func (a *and) Write(builder *StatementBuilder) {
+func (a and) Write(builder *StatementBuilder) {
 	if len(a.conditions) > 1 {
 		builder.WriteString("(")
 		defer builder.WriteString(")")
@@ -49,7 +49,7 @@ type or struct {
 }
 
 // Write implements [Condition].
-func (o *or) Write(builder *StatementBuilder) {
+func (o or) Write(builder *StatementBuilder) {
 	if len(o.conditions) > 1 {
 		builder.WriteString("(")
 		defer builder.WriteString(")")
@@ -85,7 +85,7 @@ type isNull struct {
 }
 
 // Write implements [Condition].
-func (i *isNull) Write(builder *StatementBuilder) {
+func (i isNull) Write(builder *StatementBuilder) {
 	i.column.WriteQualified(builder)
 	builder.WriteString(" IS NULL")
 }
@@ -108,7 +108,7 @@ type isNotNull struct {
 }
 
 // Write implements [Condition].
-func (i *isNotNull) Write(builder *StatementBuilder) {
+func (i isNotNull) Write(builder *StatementBuilder) {
 	i.column.WriteQualified(builder)
 	builder.WriteString(" IS NOT NULL")
 }
