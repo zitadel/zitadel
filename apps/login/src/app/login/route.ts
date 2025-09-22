@@ -32,6 +32,8 @@ import { DEFAULT_CSP } from "../../../constants/csp";
 export const dynamic = "force-dynamic";
 export const revalidate = false;
 export const fetchCache = "default-no-store";
+// Add this to prevent RSC requests
+export const runtime = 'nodejs';
 
 const gotoAccounts = ({
   request,
@@ -92,12 +94,6 @@ export async function GET(request: NextRequest) {
         : undefined);
 
   const sessionId = searchParams.get("sessionId");
-
-  // TODO: find a better way to handle _rsc (react server components) requests and block them to avoid conflicts when creating oidc callback
-  const _rsc = searchParams.get("_rsc");
-  if (_rsc) {
-    return NextResponse.json({ error: "No _rsc supported" }, { status: 500 });
-  }
 
   const sessionCookies = await getAllSessions();
   const ids = sessionCookies.map((s) => s.id);

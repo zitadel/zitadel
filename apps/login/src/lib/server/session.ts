@@ -131,6 +131,10 @@ export async function updateSession(options: UpdateSessionCommand) {
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const host = await getOriginalHost();
 
+  if (!host) {
+    return { error: "Could not get host" };
+  }
+
   if (host && challenges && challenges.webAuthN && !challenges.webAuthN.domain) {
     const [hostname] = host.split(":");
 
@@ -207,11 +211,11 @@ export async function clearSession(options: ClearSessionOptions) {
   });
 
   const securitySettings = await getSecuritySettings({ serviceUrl });
-  const sameSite = securitySettings?.embeddedIframe?.enabled ? "none" : true;
+  const iFrameEnabled = !!securitySettings?.embeddedIframe?.enabled;
 
   if (!deleteResponse) {
     throw new Error("Could not delete session");
   }
 
-  return removeSessionFromCookie({ session: sessionCookie, sameSite });
+  return removeSessionFromCookie({ session: sessionCookie, iFrameEnabled });
 }

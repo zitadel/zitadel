@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, signal } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { CopyToClipboardModule } from '../../directives/copy-to-clipboard/copy-to-clipboard.module';
+import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 
 @Component({
   standalone: true,
@@ -11,11 +11,12 @@ import { CopyToClipboardModule } from '../../directives/copy-to-clipboard/copy-t
   templateUrl: './copy-row.component.html',
   styleUrls: ['./copy-row.component.scss'],
   imports: [CommonModule, TranslateModule, MatButtonModule, MatTooltipModule, CopyToClipboardModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CopyRowComponent {
-  @Input({ required: true }) public label = '';
-  @Input({ required: true }) public value = '';
+  @Input({ required: true }) public label!: string;
+  @Input({ required: true }) public value!: string;
   @Input() public labelMinWidth = '';
 
-  public copied = '';
+  protected readonly copied = signal('');
 }

@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
@@ -42,7 +41,7 @@ func TestGetApplication(t *testing.T) {
 		CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
 			SamlRequest: &app.CreateSAMLApplicationRequest{
 				LoginVersion: &app.LoginVersion{Version: &app.LoginVersion_LoginV1{LoginV1: &app.LoginV1{}}},
-				Metadata:     &app.CreateSAMLApplicationRequest_MetadataXml{MetadataXml: samlMetadataGen(gofakeit.URL())},
+				Metadata:     &app.CreateSAMLApplicationRequest_MetadataXml{MetadataXml: samlMetadataGen(integration.URL())},
 			},
 		},
 	})
@@ -85,7 +84,7 @@ func TestGetApplication(t *testing.T) {
 			testName: "when unknown app ID should return not found error",
 			inputCtx: IAMOwnerCtx,
 			inputRequest: &app.GetApplicationRequest{
-				Id: gofakeit.Sentence(2),
+				Id: integration.ID(),
 			},
 
 			expectedErrorType: codes.NotFound,
@@ -170,9 +169,9 @@ func TestListApplications(t *testing.T) {
 	createdDeactivatedApiApp, deactivatedApiAppName := createAPIAppWithName(t, IAMOwnerCtx, instance, p.GetId())
 	deactivateApp(t, createdDeactivatedApiApp, p.GetId())
 
-	_, createdSAMLApp, samlAppName := createSAMLAppWithName(t, gofakeit.URL(), p.GetId())
+	_, createdSAMLApp, samlAppName := createSAMLAppWithName(t, integration.URL(), p.GetId())
 
-	createdOIDCApp, oidcAppName := createOIDCAppWithName(t, gofakeit.URL(), p.GetId())
+	createdOIDCApp, oidcAppName := createOIDCAppWithName(t, integration.URL(), p.GetId())
 
 	type appWithName struct {
 		app  *app.CreateApplicationResponse
@@ -593,7 +592,7 @@ func TestGetApplicationKey(t *testing.T) {
 			testName: "when unknown app ID should return not found error",
 			inputCtx: IAMOwnerCtx,
 			inputRequest: &app.GetApplicationKeyRequest{
-				Id: gofakeit.Sentence(2),
+				Id: integration.ID(),
 			},
 
 			expectedErrorType: codes.NotFound,

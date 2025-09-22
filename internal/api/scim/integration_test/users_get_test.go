@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
@@ -108,7 +107,7 @@ func TestGetUser(t *testing.T) {
 		{
 			name: "created via scim",
 			setup: func(t *testing.T) testCase {
-				username := gofakeit.Username()
+				username := integration.Username()
 				createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, username))
 				require.NoError(t, err)
 				return testCase{
@@ -221,7 +220,7 @@ func TestGetUser(t *testing.T) {
 		{
 			name: "scoped externalID",
 			setup: func(t *testing.T) testCase {
-				createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, gofakeit.Username()))
+				createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, integration.Username()))
 				require.NoError(t, err)
 				callingUserId, callingUserPat, err := Instance.CreateMachineUserPATWithMembership(CTX, "ORG_OWNER")
 				require.NoError(t, err)
