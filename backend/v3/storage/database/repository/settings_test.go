@@ -19,6 +19,7 @@ import (
 // 1. Create() which is used in projections
 // 2. Create.*() which are used to create specific types of settings
 func TestCreateGenericSetting(t *testing.T) {
+	now := time.Now()
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
@@ -63,6 +64,8 @@ func TestCreateGenericSetting(t *testing.T) {
 				ID:         gofakeit.Name(),
 				Type:       domain.SettingTypeLogin,
 				Settings:   []byte("{}"),
+				CreatedAt:  now,
+				UpdatedAt:  &now,
 			},
 		},
 		{
@@ -70,9 +73,11 @@ func TestCreateGenericSetting(t *testing.T) {
 			setting: domain.Setting{
 				InstanceID: instanceId,
 				// OrgID:      &orgId,
-				ID:       gofakeit.Name(),
-				Type:     domain.SettingTypeLogin,
-				Settings: []byte("{}"),
+				ID:        gofakeit.Name(),
+				Type:      domain.SettingTypeLogin,
+				Settings:  []byte("{}"),
+				CreatedAt: now,
+				UpdatedAt: &now,
 			},
 		},
 		{
@@ -85,6 +90,8 @@ func TestCreateGenericSetting(t *testing.T) {
 					OrgID:      &orgId,
 					Type:       domain.SettingTypePasswordExpiry,
 					Settings:   []byte("{}"),
+					CreatedAt:  now,
+					UpdatedAt:  &now,
 				}
 
 				err := settingRepo.Create(ctx, &setting)
@@ -131,6 +138,8 @@ func TestCreateGenericSetting(t *testing.T) {
 						OrgID:      &newOrgId,
 						Type:       domain.SettingTypeLockout,
 						Settings:   []byte("{}"),
+						CreatedAt:  now,
+						UpdatedAt:  &now,
 					}
 
 					err = settingRepo.Create(ctx, &setting)
@@ -187,6 +196,8 @@ func TestCreateGenericSetting(t *testing.T) {
 						OrgID:      &newOrgId,
 						Type:       domain.SettingTypeLockout,
 						Settings:   []byte("{}"),
+						CreatedAt:  now,
+						UpdatedAt:  &now,
 					}
 
 					err = settingRepo.Create(ctx, &setting)
@@ -243,6 +254,8 @@ func TestCreateGenericSetting(t *testing.T) {
 						OrgID:      &org.ID,
 						Type:       domain.SettingTypePasswordExpiry,
 						Settings:   []byte("{}"),
+						CreatedAt:  now,
+						UpdatedAt:  &now,
 					}
 
 					err = settingRepo.Create(ctx, &setting)
@@ -267,6 +280,8 @@ func TestCreateGenericSetting(t *testing.T) {
 					OrgID:      &newOrgId,
 					Type:       domain.SettingTypePasswordExpiry,
 					Settings:   []byte("{}"),
+					CreatedAt:  now,
+					UpdatedAt:  &now,
 				},
 			}
 		}(),
@@ -299,6 +314,8 @@ func TestCreateGenericSetting(t *testing.T) {
 				ID:         gofakeit.Name(),
 				Type:       domain.SettingTypeLockout,
 				Settings:   []byte("{}"),
+				CreatedAt:  now,
+				UpdatedAt:  &now,
 			},
 			err: new(database.ForeignKeyError),
 		},
@@ -310,6 +327,8 @@ func TestCreateGenericSetting(t *testing.T) {
 				ID:         gofakeit.Name(),
 				Type:       domain.SettingTypeLockout,
 				Settings:   []byte("{}"),
+				CreatedAt:  now,
+				UpdatedAt:  &now,
 			},
 			err: new(database.ForeignKeyError),
 		},
@@ -327,13 +346,13 @@ func TestCreateGenericSetting(t *testing.T) {
 			settingRepo := repository.SettingsRepository(pool)
 
 			// create setting
-			beforeCreate := time.Now()
+			// beforeCreate := time.Now()
 			err = settingRepo.Create(ctx, setting)
 			assert.ErrorIs(t, err, tt.err)
 			if err != nil {
 				return
 			}
-			afterCreate := time.Now()
+			// afterCreate := time.Now()
 
 			// check organization values
 			setting, err = settingRepo.Get(ctx,
@@ -342,12 +361,13 @@ func TestCreateGenericSetting(t *testing.T) {
 				setting.Type,
 			)
 			require.NoError(t, err)
-
 			assert.Equal(t, tt.setting.InstanceID, setting.InstanceID)
 			assert.Equal(t, tt.setting.OrgID, setting.OrgID)
 			assert.Equal(t, tt.setting.Type, setting.Type)
-			assert.WithinRange(t, setting.CreatedAt, beforeCreate, afterCreate)
-			assert.WithinRange(t, setting.UpdatedAt, beforeCreate, afterCreate)
+			assert.Equal(t, tt.setting.Type, setting.Type)
+
+			assert.Equal(t, setting.CreatedAt.UTC(), now.UTC())
+			assert.Equal(t, setting.UpdatedAt.UTC(), now.UTC())
 		})
 	}
 }
@@ -714,7 +734,7 @@ func TestCreateSpecificSetting(t *testing.T) {
 			assert.Equal(t, tt.setting.OrgID, setting.OrgID)
 			assert.Equal(t, tt.setting.Type, setting.Type)
 			assert.WithinRange(t, setting.CreatedAt, beforeCreate, afterCreate)
-			assert.WithinRange(t, setting.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, *setting.UpdatedAt, beforeCreate, afterCreate)
 		})
 	}
 }
@@ -743,7 +763,7 @@ func TestCreateSpecificSettingError(t *testing.T) {
 			err: repository.ErrSettingObjectMustNotBeNil,
 		},
 		{
-			name: "create label label not set",
+			name: "create label state not set",
 			testFunc: func(ctx context.Context) error {
 				err := settingRepo.CreateLabel(ctx, &domain.LabelSetting{
 					Setting: &domain.Setting{},
@@ -859,6 +879,7 @@ func TestUpdateSetting(t *testing.T) {
 						OrgID:      &orgId,
 						ID:         gofakeit.Name(),
 						Type:       domain.SettingTypeLabel,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
 						Settings:   []byte("{}"),
 					},
 					Settings: domain.LabelSettings{
@@ -905,9 +926,10 @@ func TestUpdateSetting(t *testing.T) {
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
 						// OrgID:      &orgId,
-						ID:       gofakeit.Name(),
-						Type:     domain.SettingTypeLabel,
-						Settings: []byte("{}"),
+						ID:         gofakeit.Name(),
+						Type:       domain.SettingTypeLabel,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
 					},
 					Settings: domain.LabelSettings{
 						IsDefault:           false,
@@ -955,6 +977,7 @@ func TestUpdateSetting(t *testing.T) {
 						OrgID:      &orgId,
 						ID:         gofakeit.Name(),
 						Type:       domain.SettingTypeLabel,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
 						Settings:   []byte("{}"),
 					},
 					Settings: domain.LabelSettings{
@@ -988,6 +1011,7 @@ func TestUpdateSetting(t *testing.T) {
 						OrgID:      gu.Ptr("non-existent-orgID"),
 						ID:         gofakeit.Name(),
 						Type:       domain.SettingTypeLabel,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
 						Settings:   []byte("{}"),
 					},
 					Settings: domain.LabelSettings{
@@ -1020,6 +1044,7 @@ func TestUpdateSetting(t *testing.T) {
 						OrgID:      &orgId,
 						ID:         gofakeit.Name(),
 						Type:       domain.SettingTypeLabel,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
 						Settings:   []byte("{}"),
 					},
 					Settings: domain.LabelSettings{
@@ -1092,13 +1117,14 @@ func TestUpdateSetting(t *testing.T) {
 
 			assert.Equal(t, setting.Settings, updatedSetting.Settings)
 
-			assert.WithinRange(t, updatedSetting.UpdatedAt, beforeUpdate, afterUpdate)
+			assert.WithinRange(t, *updatedSetting.UpdatedAt, beforeUpdate, afterUpdate)
 		})
 	}
 }
 
 // NOTE all the Get.*() functions are a wrapper around Get()
 func TestGetSetting(t *testing.T) {
+	now := time.Now()
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
@@ -1135,6 +1161,8 @@ func TestGetSetting(t *testing.T) {
 		ID:         gofakeit.Name(),
 		Type:       domain.SettingTypePasswordExpiry,
 		Settings:   []byte("{}"),
+		CreatedAt:  now,
+		UpdatedAt:  &now,
 	}
 	settingRepo := repository.SettingsRepository(pool)
 	err = settingRepo.Create(t.Context(), &prexistingSetting)
@@ -1156,6 +1184,8 @@ func TestGetSetting(t *testing.T) {
 					OrgID:      &orgId,
 					Type:       domain.SettingTypeLogin,
 					Settings:   []byte("{}"),
+					CreatedAt:  now,
+					UpdatedAt:  &now,
 				}
 
 				err := settingRepo.Create(ctx, &setting)
@@ -1170,8 +1200,10 @@ func TestGetSetting(t *testing.T) {
 				setting := domain.Setting{
 					InstanceID: instanceId,
 					// OrgID:      &orgId,
-					Type:     domain.SettingTypeLogin,
-					Settings: []byte("{}"),
+					Type:      domain.SettingTypeLogin,
+					Settings:  []byte("{}"),
+					CreatedAt: now,
+					UpdatedAt: &now,
 				}
 
 				err := settingRepo.Create(ctx, &setting)
@@ -1188,8 +1220,10 @@ func TestGetSetting(t *testing.T) {
 					OrgID:      &orgId,
 					ID:         gofakeit.Name(),
 
-					Type:     domain.SettingTypeDomain,
-					Settings: []byte("{}"),
+					Type:      domain.SettingTypeDomain,
+					Settings:  []byte("{}"),
+					CreatedAt: now,
+					UpdatedAt: &now,
 				}
 
 				err := settingRepo.Create(ctx, &setting)
@@ -1208,6 +1242,8 @@ func TestGetSetting(t *testing.T) {
 						OrgID:      &orgId,
 						Type:       domain.SettingTypePasswordComplexity,
 						Settings:   []byte("{}"),
+						CreatedAt:  now,
+						UpdatedAt:  &now,
 					}
 
 					err := settingRepo.Create(ctx, &setting)
@@ -1227,6 +1263,8 @@ func TestGetSetting(t *testing.T) {
 						OrgID:      &orgId,
 						Type:       domain.SettingTypeLockout,
 						Settings:   []byte("{}"),
+						CreatedAt:  now,
+						UpdatedAt:  &now,
 					}
 
 					err := settingRepo.Create(ctx, &setting)
@@ -2104,6 +2142,7 @@ func TestCreateGetOrgPolicySetting(t *testing.T) {
 //
 //nolint:gocognit
 func TestListSetting(t *testing.T) {
+	now := time.Now()
 	ctx := t.Context()
 	pool, stop, err := newEmbeddedDB(ctx)
 	require.NoError(t, err)
@@ -2183,6 +2222,8 @@ func TestListSetting(t *testing.T) {
 					ID:         gofakeit.Name(),
 					Type:       domain.SettingTypeSecurity,
 					Settings:   []byte("{}"),
+					CreatedAt:  now,
+					UpdatedAt:  &now,
 				}
 				err := settingRepo.Create(ctx, &setting)
 				require.NoError(t, err)
@@ -2196,8 +2237,10 @@ func TestListSetting(t *testing.T) {
 						OrgID:      &orgId,
 						ID:         gofakeit.Name(),
 						// Type:              domain.SettingTypeLogin,
-						Type:     domain.SettingType(i + 1),
-						Settings: []byte("{}"),
+						Type:      domain.SettingType(i + 1),
+						Settings:  []byte("{}"),
+						CreatedAt: now,
+						UpdatedAt: &now,
 					}
 
 					err := settingRepo.Create(ctx, &setting)
@@ -2235,9 +2278,11 @@ func TestListSetting(t *testing.T) {
 				setting := domain.Setting{
 					InstanceID: newInstanceId,
 					// OrgID:      &newOrgId,
-					ID:       gofakeit.Name(),
-					Type:     domain.SettingTypeSecurity,
-					Settings: []byte("{}"),
+					ID:        gofakeit.Name(),
+					Type:      domain.SettingTypeSecurity,
+					Settings:  []byte("{}"),
+					CreatedAt: now,
+					UpdatedAt: &now,
 				}
 				err := settingRepo.Create(ctx, &setting)
 				require.NoError(t, err)
@@ -2251,8 +2296,10 @@ func TestListSetting(t *testing.T) {
 						// OrgID:      &orgId,
 						ID: gofakeit.Name(),
 						// Type:              domain.SettingTypeLogin,
-						Type:     domain.SettingType(i + 1),
-						Settings: []byte("{}"),
+						Type:      domain.SettingType(i + 1),
+						Settings:  []byte("{}"),
+						CreatedAt: now,
+						UpdatedAt: &now,
 					}
 
 					err := settingRepo.Create(ctx, &setting)
@@ -2291,6 +2338,8 @@ func TestListSetting(t *testing.T) {
 					ID:         gofakeit.Name(),
 					Type:       domain.SettingTypeSecurity,
 					Settings:   []byte("{}"),
+					CreatedAt:  now,
+					UpdatedAt:  &now,
 				}
 				err := settingRepo.Create(ctx, &setting)
 				require.NoError(t, err)
@@ -2305,6 +2354,8 @@ func TestListSetting(t *testing.T) {
 						ID:         gofakeit.Name(),
 						Type:       domain.SettingType(i + 1),
 						Settings:   []byte("{}"),
+						CreatedAt:  now,
+						UpdatedAt:  &now,
 					}
 
 					err := settingRepo.Create(ctx, &setting)
@@ -2332,6 +2383,8 @@ func TestListSetting(t *testing.T) {
 						ID:         gofakeit.Name(),
 						Type:       domain.SettingType(i + 1),
 						Settings:   []byte("{}"),
+						CreatedAt:  now,
+						UpdatedAt:  &now,
 					}
 
 					err := settingRepo.Create(ctx, &setting)
@@ -2356,6 +2409,8 @@ func TestListSetting(t *testing.T) {
 						ID:         gofakeit.Name(),
 						Type:       domain.SettingType(i + 1),
 						Settings:   []byte("{}"),
+						CreatedAt:  now,
+						UpdatedAt:  &now,
 					}
 
 					err := settingRepo.Create(ctx, &setting)
@@ -2381,6 +2436,8 @@ func TestListSetting(t *testing.T) {
 						ID:         gofakeit.Name(),
 						Type:       domain.SettingTypeSecurity,
 						Settings:   []byte("{}"),
+						CreatedAt:  now,
+						UpdatedAt:  &now,
 					}
 					err := settingRepo.Create(ctx, &setting)
 					require.NoError(t, err)
@@ -2393,8 +2450,10 @@ func TestListSetting(t *testing.T) {
 							InstanceID: instanceId,
 							OrgID:      &orgId,
 							// ID:         id,
-							Type:     domain.SettingType(i + 1),
-							Settings: []byte("{}"),
+							Type:      domain.SettingType(i + 1),
+							Settings:  []byte("{}"),
+							CreatedAt: now,
+							UpdatedAt: &now,
 						}
 
 						err := settingRepo.Create(ctx, &setting)
@@ -2422,8 +2481,10 @@ func TestListSetting(t *testing.T) {
 					OrgID:      &orgId,
 					ID:         gofakeit.Name(),
 
-					Type:     domain.SettingTypeLogin,
-					Settings: []byte("{}"),
+					Type:      domain.SettingTypeLogin,
+					Settings:  []byte("{}"),
+					CreatedAt: now,
+					UpdatedAt: &now,
 				}
 				err := settingRepo.Create(ctx, &setting)
 				require.NoError(t, err)
@@ -2438,6 +2499,8 @@ func TestListSetting(t *testing.T) {
 						ID:         gofakeit.Name(),
 						Type:       domain.SettingTypePasswordExpiry,
 						Settings:   []byte("{}"),
+						CreatedAt:  now,
+						UpdatedAt:  &now,
 					}
 
 					err := settingRepo.Create(ctx, &setting)
@@ -2492,6 +2555,7 @@ func TestListSetting(t *testing.T) {
 }
 
 func TestDeleteSetting(t *testing.T) {
+	now := time.Now()
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
@@ -2539,6 +2603,8 @@ func TestDeleteSetting(t *testing.T) {
 							OrgID:      &orgId,
 							Type:       domain.SettingTypeLogin,
 							Settings:   []byte("{}"),
+							CreatedAt:  now,
+							UpdatedAt:  &now,
 						}
 
 						err := settingRepo.Create(ctx, &setting)
@@ -2559,9 +2625,10 @@ func TestDeleteSetting(t *testing.T) {
 							InstanceID: instanceId,
 							OrgID:      &orgId,
 							ID:         gofakeit.Name(),
-
-							Type:     domain.SettingTypeLogin,
-							Settings: []byte("{}"),
+							Type:       domain.SettingTypeLogin,
+							Settings:   []byte("{}"),
+							CreatedAt:  now,
+							UpdatedAt:  &now,
 						}
 
 						err := settingRepo.Create(ctx, &setting)
@@ -2593,8 +2660,10 @@ func TestDeleteSetting(t *testing.T) {
 							OrgID:      &orgId,
 							ID:         gofakeit.Name(),
 
-							Type:     domain.SettingTypeLogin,
-							Settings: []byte("{}"),
+							Type:      domain.SettingTypeLogin,
+							Settings:  []byte("{}"),
+							CreatedAt: now,
+							UpdatedAt: &now,
 						}
 
 						err := settingRepo.Create(ctx, &setting)
@@ -2698,6 +2767,7 @@ func TestDeleteSettingsForInstance(t *testing.T) {
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							OrgID:      &orgId,
+							LabelState: gu.Ptr(domain.LabelStatePreview),
 						},
 					})
 					require.NoError(t, err)
@@ -2755,6 +2825,7 @@ func TestDeleteSettingsForInstance(t *testing.T) {
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							// OrgID:      &orgId,
+							LabelState: gu.Ptr(domain.LabelStatePreview),
 						},
 					})
 					require.NoError(t, err)
@@ -2867,6 +2938,7 @@ func TestDeleteSettingsForOrg(t *testing.T) {
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							OrgID:      &orgId,
+							LabelState: gu.Ptr(domain.LabelStatePreview),
 						},
 					})
 					require.NoError(t, err)

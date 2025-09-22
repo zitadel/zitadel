@@ -392,8 +392,6 @@ func (s *settings) updateSetting(ctx context.Context, setting *domain.Setting, s
 	if err != nil {
 		return 0, err
 	}
-	// s.SetSettings(string(settingJSON)).Write(&builder)
-	// s.SetUpdatedAt(&setting.UpdatedAt).Write(&builder)
 
 	changes := database.Changes{s.SetSettings(string(settingJSON)), s.SetUpdatedAt(setting.UpdatedAt)}
 
@@ -406,7 +404,7 @@ func (s *settings) updateSetting(ctx context.Context, setting *domain.Setting, s
 	return s.client.Exec(ctx, stmt, builder.Args()...)
 }
 
-const createSettingStmt = `INSERT INTO zitadel.settings` +
+const eventCreateSettingStmt = `INSERT INTO zitadel.settings` +
 	` (instance_id, org_id, type, label_state, settings, created_at, updated_at)` +
 	` VALUES ($1, $2, $3, $4, $5, $6, $7)` +
 	` RETURNING id, created_at, updated_at`
@@ -422,10 +420,15 @@ func (s *settings) Create(ctx context.Context, setting *domain.Setting) error {
 		string(setting.Settings),
 		setting.CreatedAt,
 		setting.UpdatedAt)
-	builder.WriteString(createSettingStmt)
+	builder.WriteString(eventCreateSettingStmt)
 
 	return s.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.ID, &setting.CreatedAt, &setting.UpdatedAt)
 }
+
+const createSettingStmt = `INSERT INTO zitadel.settings` +
+	` (instance_id, org_id, type, label_state, settings)` +
+	` VALUES ($1, $2, $3, $4, $5)` +
+	` RETURNING id, created_at, updated_at`
 
 func (s *settings) createSetting(ctx context.Context, setting *domain.Setting, settings any) error {
 	builder := database.StatementBuilder{}

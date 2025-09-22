@@ -40,5 +40,5 @@ CREATE INDEX idx_settings_type ON zitadel.settings(instance_id, type, label_stat
 CREATE TRIGGER trigger_set_updated_at
 BEFORE UPDATE ON zitadel.settings
 FOR EACH ROW
-WHEN (NEW.updated_at IS NULL)
+WHEN (NEW.updated_at IS NULL OR OLD.updated_at IS NOT DISTINCT FROM NEW.updated_at)
 EXECUTE FUNCTION zitadel.set_updated_at();

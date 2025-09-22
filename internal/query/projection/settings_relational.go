@@ -847,6 +847,7 @@ func (s *settingsRelationalProjection) reduceLabelActivated(event eventstore.Eve
 			handler.NewCol(SettingsLabelStateCol, domain.LabelStateActivated),
 			handler.NewCol(SettingsSettingsCol, nil),
 			handler.NewCol(UpdatedAt, event.CreatedAt()),
+			handler.NewCol(CreatedAt, event.CreatedAt()),
 		},
 		[]handler.Column{
 			handler.NewCol(SettingInstanceIDCol, nil),
@@ -855,6 +856,7 @@ func (s *settingsRelationalProjection) reduceLabelActivated(event eventstore.Eve
 			handler.NewCol(SettingsLabelStateCol, nil),
 			handler.NewCol(SettingsSettingsCol, nil),
 			handler.NewCol(UpdatedAt, nil),
+			handler.NewCol(CreatedAt, nil),
 		},
 		[]handler.NamespacedCondition{
 			handler.NewNamespacedCondition(SettingsTypeCol, domain.SettingTypeLabel),
