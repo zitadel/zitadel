@@ -21,6 +21,7 @@ import {
   startIdentityProviderFlow,
 } from "../zitadel";
 import { createSessionAndUpdateCookie } from "./cookie";
+import { getOriginalHost } from "./host";
 
 export type SendLoginnameCommand = {
   loginName: string;
@@ -34,11 +35,6 @@ const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 export async function sendLoginname(command: SendLoginnameCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
-
-  if (!host) {
-    throw new Error("Could not get domain");
-  }
 
   const loginSettingsByContext = await getLoginSettings({
     serviceUrl,
@@ -80,11 +76,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     if (identityProviders.length === 1) {
       const _headers = await headers();
       const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-      const host = _headers.get("host");
-
-      if (!host) {
-        return { error: "Could not get host" };
-      }
+      const host = await getOriginalHost();
 
       const identityProviderType = identityProviders[0].type;
 
@@ -134,11 +126,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     if (identityProviders.length === 1) {
       const _headers = await headers();
       const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-      const host = _headers.get("host");
-
-      if (!host) {
-        return { error: "Could not get host" };
-      }
+      const host = await getOriginalHost();
 
       const identityProviderId = identityProviders[0].idpId;
 
