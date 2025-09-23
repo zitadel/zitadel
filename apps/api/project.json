@@ -78,9 +78,12 @@
         "lint": {
             "description": "Lint the Go code using golangci-lint",
             "dependsOn": [
-                "generate"
+                "generate-stubs"
             ],
-            "command": "docker run -t --rm -v $(pwd):/app -w /app golangci/golangci-lint:v2.4.0 golangci-lint run --timeout 15m --config ./.golangci.yaml",
+            "options": {
+                "WORKSPACE_ROOT": "{workspaceRoot}"
+            },
+            "command": "docker run -t --rm -v ${DEVCONTAINER_LOCAL_WORKSPACE_ROOT:-$WORKSPACE_ROOT}:/app -w /app golangci/golangci-lint:v2.4.0 golangci-lint run --timeout 15m --config ./.golangci.yaml",
             "cache": true,
             "inputs": [
                 "sources",
@@ -97,7 +100,7 @@
         "test-unit": {
             "description": "Run the unit tests with coverage",
             "dependsOn": [
-                "generate"
+                "generate-stubs"
             ],
             "command": "go test -race -coverprofile=profile.api.test-unit.cov -coverpkg=./internal/...  ./...",
             "cache": true,
@@ -112,7 +115,7 @@
         "test-integration-build": {
             "cache": true,
             "dependsOn": [
-                "generate"
+                "generate-stubs"
             ],            
             "command": "go build -cover -race -tags integration -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.test main.go",
             "inputs": [

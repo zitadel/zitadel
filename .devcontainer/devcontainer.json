@@ -35,6 +35,9 @@
 		"ghcr.io/guiyomh/features/golangci-lint:0": {},
 		"ghcr.io/devcontainers/features/docker-outside-of-docker": {}
 	},
+	"containerEnv": {
+		"DEVCONTAINER_LOCAL_WORKSPACE_ROOT": "${localWorkspaceFolder}"
+	},
 	"customizations": {
         "vscode": {
             "extensions": [
