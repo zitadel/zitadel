@@ -23,6 +23,7 @@ import { headers } from "next/headers";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
 import { getServiceUrlFromHeaders } from "../service-url";
+import { getOriginalHostWithProtocol } from "./host";
 import {
   checkEmailVerification,
   checkMFAFactors,
@@ -40,11 +41,9 @@ type ResetPasswordCommand = {
 export async function resetPassword(command: ResetPasswordCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
 
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  // Get the original host that the user sees with protocol
+  const hostWithProtocol = await getOriginalHostWithProtocol();
 
   const users = await listUsers({
     serviceUrl,
@@ -63,7 +62,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
     serviceUrl,
     userId,
     urlTemplate:
-      `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+      `${hostWithProtocol}${basePath}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
       (command.requestId ? `&requestId=${command.requestId}` : ""),
   });
 }
