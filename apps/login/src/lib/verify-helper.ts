@@ -20,9 +20,7 @@ export function checkPasswordChangeRequired(
   let isOutdated = false;
   if (expirySettings?.maxAgeDays && humanUser?.passwordChanged) {
     const maxAgeDays = Number(expirySettings.maxAgeDays); // Convert bigint to number
-    const passwordChangedDate = moment(
-      timestampDate(humanUser.passwordChanged),
-    );
+    const passwordChangedDate = moment(timestampDate(humanUser.passwordChanged));
     const outdatedPassword = passwordChangedDate.add(maxAgeDays, "days");
     isOutdated = moment().isAfter(outdatedPassword);
   }
@@ -33,10 +31,7 @@ export function checkPasswordChangeRequired(
     });
 
     if (organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        session.factors?.user?.organizationId as string,
-      );
+      params.append("organization", session.factors?.user?.organizationId as string);
     }
 
     if (requestId) {
@@ -47,12 +42,7 @@ export function checkPasswordChangeRequired(
   }
 }
 
-export function checkEmailVerified(
-  session: Session,
-  humanUser?: HumanUser,
-  organization?: string,
-  requestId?: string,
-) {
+export function checkEmailVerified(session: Session, humanUser?: HumanUser, organization?: string, requestId?: string) {
   if (!humanUser?.email?.isVerified) {
     const paramsVerify = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,
@@ -61,10 +51,7 @@ export function checkEmailVerified(
     });
 
     if (organization || session.factors?.user?.organizationId) {
-      paramsVerify.append(
-        "organization",
-        organization ?? (session.factors?.user?.organizationId as string),
-      );
+      paramsVerify.append("organization", organization ?? (session.factors?.user?.organizationId as string));
     }
 
     if (requestId) {
@@ -75,16 +62,8 @@ export function checkEmailVerified(
   }
 }
 
-export function checkEmailVerification(
-  session: Session,
-  humanUser?: HumanUser,
-  organization?: string,
-  requestId?: string,
-) {
-  if (
-    !humanUser?.email?.isVerified &&
-    process.env.EMAIL_VERIFICATION === "true"
-  ) {
+export function checkEmailVerification(session: Session, humanUser?: HumanUser, organization?: string, requestId?: string) {
+  if (!humanUser?.email?.isVerified && process.env.EMAIL_VERIFICATION === "true") {
     const params = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,
       send: "true", // set this to true as we dont expect old email codes to be valid anymore
@@ -95,10 +74,7 @@ export function checkEmailVerification(
     }
 
     if (organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        organization ?? (session.factors?.user?.organizationId as string),
-      );
+      params.append("organization", organization ?? (session.factors?.user?.organizationId as string));
     }
 
     return { redirect: `/verify?` + params };
@@ -115,13 +91,13 @@ export async function checkMFAFactors(
 ) {
   const availableMultiFactors = authMethods?.filter(
     (m: AuthenticationMethodType) =>
-      m !== AuthenticationMethodType.PASSWORD &&
-      m !== AuthenticationMethodType.PASSKEY,
+      m === AuthenticationMethodType.TOTP ||
+      m === AuthenticationMethodType.OTP_SMS ||
+      m === AuthenticationMethodType.OTP_EMAIL ||
+      m === AuthenticationMethodType.U2F,
   );
 
-  const hasAuthenticatedWithPasskey =
-    session.factors?.webAuthN?.verifiedAt &&
-    session.factors?.webAuthN?.userVerified;
+  const hasAuthenticatedWithPasskey = session.factors?.webAuthN?.verifiedAt && session.factors?.webAuthN?.userVerified;
 
   // escape further checks if user has authenticated with passkey
   if (hasAuthenticatedWithPasskey) {
@@ -139,10 +115,7 @@ export async function checkMFAFactors(
     }
 
     if (organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        organization ?? (session.factors?.user?.organizationId as string),
-      );
+      params.append("organization", organization ?? (session.factors?.user?.organizationId as string));
     }
 
     const factor = availableMultiFactors[0];
@@ -166,17 +139,11 @@ export async function checkMFAFactors(
     }
 
     if (organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        organization ?? (session.factors?.user?.organizationId as string),
-      );
+      params.append("organization", organization ?? (session.factors?.user?.organizationId as string));
     }
 
     return { redirect: `/mfa?` + params };
-  } else if (
-    (loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly) &&
-    !availableMultiFactors.length
-  ) {
+  } else if ((loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly) && !availableMultiFactors.length) {
     const params = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,
       force: "true", // this defines if the mfa is forced in the settings
@@ -188,18 +155,14 @@ export async function checkMFAFactors(
     }
 
     if (organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        organization ?? (session.factors?.user?.organizationId as string),
-      );
+      params.append("organization", organization ?? (session.factors?.user?.organizationId as string));
     }
 
     // TODO: provide a way to setup passkeys on mfa page?
     return { redirect: `/mfa/set?` + params };
   } else if (
     loginSettings?.mfaInitSkipLifetime &&
-    (loginSettings.mfaInitSkipLifetime.nanos > 0 ||
-      loginSettings.mfaInitSkipLifetime.seconds > 0) &&
+    (loginSettings.mfaInitSkipLifetime.nanos > 0 || loginSettings.mfaInitSkipLifetime.seconds > 0) &&
     !availableMultiFactors.length &&
     session?.factors?.user?.id
   ) {
@@ -208,17 +171,13 @@ export async function checkMFAFactors(
       userId: session.factors?.user?.id,
     });
 
-    const humanUser =
-      userResponse?.user?.type.case === "human"
-        ? userResponse?.user.type.value
-        : undefined;
+    const humanUser = userResponse?.user?.type.case === "human" ? userResponse?.user.type.value : undefined;
 
     if (humanUser?.mfaInitSkipped) {
       const mfaInitSkippedTimestamp = timestampDate(humanUser.mfaInitSkipped);
 
       const mfaInitSkipLifetimeMillis =
-        Number(loginSettings.mfaInitSkipLifetime.seconds) * 1000 +
-        loginSettings.mfaInitSkipLifetime.nanos / 1000000;
+        Number(loginSettings.mfaInitSkipLifetime.seconds) * 1000 + loginSettings.mfaInitSkipLifetime.nanos / 1000000;
       const currentTime = Date.now();
       const mfaInitSkippedTime = mfaInitSkippedTimestamp.getTime();
       const timeDifference = currentTime - mfaInitSkippedTime;
@@ -242,10 +201,7 @@ export async function checkMFAFactors(
     }
 
     if (organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        organization ?? (session.factors?.user?.organizationId as string),
-      );
+      params.append("organization", organization ?? (session.factors?.user?.organizationId as string));
     }
 
     // TODO: provide a way to setup passkeys on mfa page?
@@ -264,24 +220,17 @@ export async function checkUserVerification(userId: string): Promise<boolean> {
     return false;
   }
 
-  const verificationCheck = crypto
-    .createHash("sha256")
-    .update(`${userId}:${fingerPrintCookie.value}`)
-    .digest("hex");
+  const verificationCheck = crypto.createHash("sha256").update(`${userId}:${fingerPrintCookie.value}`).digest("hex");
 
   const cookieValue = await cookiesList.get("verificationCheck")?.value;
 
   if (!cookieValue) {
-    console.warn(
-      "User verification check cookie not found. User verification check failed.",
-    );
+    console.warn("User verification check cookie not found. User verification check failed.");
     return false;
   }
 
   if (cookieValue !== verificationCheck) {
-    console.warn(
-      `User verification check failed. Expected ${verificationCheck} but got ${cookieValue}`,
-    );
+    console.warn(`User verification check failed. Expected ${verificationCheck} but got ${cookieValue}`);
     return false;
   }
 
