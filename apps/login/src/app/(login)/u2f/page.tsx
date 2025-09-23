@@ -4,7 +4,6 @@ import { LoginPasskey } from "@/components/login-passkey";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
-import { getOriginalHost } from "@/lib/server/host";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getSession } from "@/lib/zitadel";

@@ -102,7 +102,6 @@ export async function createNewSessionFromIdpIntent(command: CreateNewSessionCom
   const _headers = await headers();
 
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = await getOriginalHost();
 
   if (!command.userId || !command.idpIntent) {
     throw new Error("No userId or loginName provided");
@@ -193,7 +192,6 @@ export async function createNewSessionForLDAP(command: createNewSessionForLDAPCo
   const _headers = await headers();
 
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = await getOriginalHost();
 
   if (!command.username || !command.password) {
     return { error: "No username or password provided" };
