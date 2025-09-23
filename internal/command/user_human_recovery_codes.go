@@ -165,7 +165,16 @@ func checkRecoveryCode(
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-84rgg", "Errors.User.MFA.RecoveryCodes.NotReady")
 	}
 
-	hashedCode, err := domain.ValidateRecoveryCode(code, toHumanRecoveryCode(ctx, recoveryCodeWm), secretHasher)
+	hashedCode, err := domain.ValidateRecoveryCode(ctx, code, toHumanRecoveryCode(recoveryCodeWm), secretHasher)
+
+	// recheck for additional events (failed password checks or locks)
+	recheckErr := queryReducer(ctx, recoveryCodeWm)
+	if recheckErr != nil {
+		return nil, recheckErr
+	}
+	if recoveryCodeWm.UserLocked() {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-ASV12", "Errors.User.Locked")
+	}
 
 	userAgg := UserAggregateFromWriteModelCtx(ctx, &recoveryCodeWm.WriteModel)
 	commands := make([]eventstore.Command, 0, 2)
@@ -173,16 +182,15 @@ func checkRecoveryCode(
 	authRequestInfo := authRequestDomainToAuthRequestInfo(authRequest)
 
 	if err == nil {
-		commands = append(commands, user.NewHumanRecoveryCodeCheckSucceededEvent(ctx, userAgg, hashedCode, authRequestInfo))
-	} else {
-		commands = append(commands, user.NewHumanRecoveryCodeCheckFailedEvent(ctx, userAgg, authRequestInfo))
+		return append(commands, user.NewHumanRecoveryCodeCheckSucceededEvent(ctx, userAgg, hashedCode, authRequestInfo)), nil
+	}
+	commands = append(commands, user.NewHumanRecoveryCodeCheckFailedEvent(ctx, userAgg, authRequestInfo))
 
-		lockoutPolicy, lockoutErr := getLockoutPolicy(ctx, recoveryCodeWm.ResourceOwner, queryReducer)
-		logging.OnError(lockoutErr).Error("failed to get lockout policy")
+	lockoutPolicy, lockoutErr := getLockoutPolicy(ctx, recoveryCodeWm.ResourceOwner, queryReducer)
+	logging.OnError(lockoutErr).Error("failed to get lockout policy")
 
-		if lockoutPolicy != nil && lockoutPolicy.MaxOTPAttempts > 0 && recoveryCodeWm.FailedAttempts+1 >= lockoutPolicy.MaxOTPAttempts {
-			commands = append(commands, user.NewUserLockedEvent(ctx, userAgg))
-		}
+	if lockoutPolicy != nil && lockoutPolicy.MaxOTPAttempts > 0 && recoveryCodeWm.FailedAttempts+1 >= lockoutPolicy.MaxOTPAttempts {
+		commands = append(commands, user.NewUserLockedEvent(ctx, userAgg))
 	}
 
 	return commands, err

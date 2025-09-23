@@ -716,7 +716,7 @@ func TestCommands_HumanCheckRecoveryCode(t *testing.T) {
 				code:          "validcode",
 				resourceOwner: "org1",
 			},
-			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-2w6oa", "Errors.User.Locked"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-2w6oa", "Errors.User.Locked"),
 		},
 		{
 			name: "recovery codes not ready, error",
@@ -731,7 +731,7 @@ func TestCommands_HumanCheckRecoveryCode(t *testing.T) {
 				code:          "validcode",
 				resourceOwner: "org1",
 			},
-			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-84rgg", "Errors.User.RecoveryCodes.NotReady"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-84rgg", "Errors.User.MFA.RecoveryCodes.NotReady"),
 		},
 		{
 			name: "valid code, successful check",
@@ -746,6 +746,7 @@ func TestCommands_HumanCheckRecoveryCode(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(), // additional lock check
 					expectPush(
 						user.NewHumanRecoveryCodeCheckSucceededEvent(ctx,
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -775,6 +776,7 @@ func TestCommands_HumanCheckRecoveryCode(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(), // additional lock check
 					expectPush(
 						user.NewHumanRecoveryCodeCheckSucceededEvent(ctx,
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -807,6 +809,36 @@ func TestCommands_HumanCheckRecoveryCode(t *testing.T) {
 					},
 				},
 			},
+		},
+		{
+			name: "valid code, locked in the meantime, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanRecoveryCodesAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+								[]string{"$plain$$validcode", "$plain$$validcode2"},
+								nil,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewUserLockedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				code:          "validcode",
+				resourceOwner: "org1",
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-ASV12", "Errors.User.Locked"),
 		},
 	}
 	for _, tt := range tests {
@@ -866,6 +898,23 @@ func TestCommands_checkRecoveryCode(t *testing.T) {
 		switch wm := r.(type) {
 		case *HumanRecoveryCodeWriteModel:
 			wm.State = domain.MFAStateNotReady
+		case *OrgLockoutPolicyWriteModel:
+			// Default lockout policy
+			wm.State = domain.PolicyStateActive
+		}
+		return nil
+	}
+
+	// Query reducer that sets up a locked user after the first check
+	queryReducerLockedAfterFirstCheck := func(ctx context.Context, r eventstore.QueryReducer) error {
+		switch wm := r.(type) {
+		case *HumanRecoveryCodeWriteModel:
+			wm.State = domain.MFAStateReady
+			// simulate lock after first check when the codes are already set by the first reduction
+			if len(wm.codes) > 0 {
+				wm.userLocked = true
+			}
+			wm.codes = []string{"$plain$$validcode", "$plain$$validcode2"}
 		case *OrgLockoutPolicyWriteModel:
 			// Default lockout policy
 			wm.State = domain.PolicyStateActive
@@ -938,7 +987,7 @@ func TestCommands_checkRecoveryCode(t *testing.T) {
 				secretHasher:  hasher,
 			},
 			wantCommands: 0,
-			wantErr:      zerrors.ThrowNotFound(nil, "COMMAND-2w6oa", "Errors.User.MFA.RecoveryCodes.Locked"),
+			wantErr:      zerrors.ThrowNotFound(nil, "COMMAND-2w6oa", "Errors.User.Locked"),
 		},
 		{
 			name: "recovery codes not ready, error",
@@ -978,6 +1027,19 @@ func TestCommands_checkRecoveryCode(t *testing.T) {
 			},
 			wantCommands: 1, // should return success event command
 			wantErr:      nil,
+		},
+		{
+			name: "valid code, locked in the meantime, error",
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				code:          "validcode",
+				resourceOwner: "org1",
+				queryReducer:  queryReducerLockedAfterFirstCheck,
+				secretHasher:  hasher,
+			},
+			wantCommands: 0,
+			wantErr:      zerrors.ThrowNotFound(nil, "COMMAND-ASV12", "Errors.User.Locked"),
 		},
 	}
 	for _, tt := range tests {

@@ -20,7 +20,7 @@ func CheckRecoveryCode(code string) SessionCommand {
 	}
 }
 
-func toHumanRecoveryCode(ctx context.Context, recoveryCodeWriteModel *HumanRecoveryCodeWriteModel) *domain.HumanRecoveryCodes {
+func toHumanRecoveryCode(recoveryCodeWriteModel *HumanRecoveryCodeWriteModel) *domain.HumanRecoveryCodes {
 	return &domain.HumanRecoveryCodes{
 		ObjectDetails: writeModelToObjectDetails(&recoveryCodeWriteModel.WriteModel),
 		Codes:         recoveryCodeWriteModel.Codes(),
