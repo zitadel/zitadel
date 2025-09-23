@@ -38,8 +38,7 @@ env:
     org.opencontainers.image.vendor=CAOS AG
 
 jobs:
-  api:
-    name: api
+  pack:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -73,7 +72,7 @@ jobs:
       - name: Pack API and Login
         env:
           ZITADEL_VERSION: ${{ inputs.zitadel_version }}
-        run: nx run pack
+        run: nx run --nxBail pack
       - name: Upload all platform archives
         uses: actions/upload-artifact@v4
         with:
