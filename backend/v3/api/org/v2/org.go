@@ -8,6 +8,7 @@ import (
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
+	v2_org "github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
@@ -64,6 +65,21 @@ func UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org
 			// TODO(IAM-Marco) Change this with the real update date when OrganizationRepo.Update()
 			// returns the timestamp
 			ChangeDate: timestamppb.Now(),
+		},
+	}, nil
+}
+
+func ListOrganizations(ctx context.Context, request *connect.Request[v2_org.ListOrganizationsRequest]) (*connect.Response[v2_org.ListOrganizationsResponse], error) {
+	orgListCmd := domain.NewListOrgsCommand(request.Msg)
+
+	err := domain.Invoke(ctx, orgListCmd)
+	if err != nil {
+		return nil, err
+	}
+
+	return &connect.Response[v2_org.ListOrganizationsResponse]{
+		Msg: &v2_org.ListOrganizationsResponse{
+			Result: orgListCmd.ResultToGRPC(),
 		},
 	}, nil
 }
