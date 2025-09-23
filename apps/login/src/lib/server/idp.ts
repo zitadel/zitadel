@@ -133,14 +133,14 @@ export async function createNewSessionFromIdpIntent(command: CreateNewSessionCom
     return { error: "Could not create session" };
   }
 
-  const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
+  // const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
 
-  // check to see if user was verified
-  const emailVerificationCheck = checkEmailVerification(session, humanUser, command.organization, command.requestId);
+  // // check to see if user was verified
+  // const emailVerificationCheck = checkEmailVerification(session, humanUser, command.organization, command.requestId);
 
-  if (emailVerificationCheck?.redirect) {
-    return emailVerificationCheck;
-  }
+  // if (emailVerificationCheck?.redirect) {
+  //   return emailVerificationCheck;
+  // }
 
   // check if user has MFA methods
   let authMethods;
