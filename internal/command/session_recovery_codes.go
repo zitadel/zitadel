@@ -9,7 +9,7 @@ import (
 
 func CheckRecoveryCode(code string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) ([]eventstore.Command, error) {
-		commands, err := checkRecoveryCode(ctx, cmd.sessionWriteModel.UserID, code, cmd.sessionWriteModel.UserResourceOwner, nil, cmd.eventstore.FilterToQueryReducer, cmd.secretHasher)
+		commands, err := checkRecoveryCode(ctx, cmd.sessionWriteModel.UserID, code, cmd.sessionWriteModel.UserResourceOwner, nil, cmd.eventstore.FilterToQueryReducer, cmd.hasher)
 		if err != nil {
 			return commands, err
 		}

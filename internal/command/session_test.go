@@ -1381,7 +1381,7 @@ func TestCheckRecoveryCode(t *testing.T) {
 				),
 				hasher: hasher,
 			},
-			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-84rgg", "Errors.User.RecoveryCodes.NotReady"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-84rgg", "Errors.User.MFA.RecoveryCodes.NotReady"),
 		},
 		{
 			name: "invalid code",
@@ -1397,6 +1397,7 @@ func TestCheckRecoveryCode(t *testing.T) {
 							user.NewHumanRecoveryCodesAddedEvent(ctx, userAgg, hashedCodes, nil),
 						),
 					),
+					expectFilter(), // additional lock check
 					expectFilter(
 						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 0, 0, false)),
 					),
@@ -1422,6 +1423,7 @@ func TestCheckRecoveryCode(t *testing.T) {
 							user.NewHumanRecoveryCodesAddedEvent(ctx, userAgg, hashedCodes, nil),
 						),
 					),
+					expectFilter(), // additional lock check
 					expectFilter(
 						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 1, 1, false)),
 					),
@@ -1454,7 +1456,7 @@ func TestCheckRecoveryCode(t *testing.T) {
 				),
 				hasher: hasher,
 			},
-			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-2w6oa", "Errors.User.Locked"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-2w6oa", "Errors.User.Locked"),
 		},
 		{
 			name: "ok",
@@ -1470,11 +1472,12 @@ func TestCheckRecoveryCode(t *testing.T) {
 							user.NewHumanRecoveryCodesAddedEvent(ctx, userAgg, hashedCodes, nil),
 						),
 					),
+					expectFilter(), // additional lock check
 				),
 				hasher: hasher,
 			},
 			wantEventCommands: []eventstore.Command{
-				user.NewHumanRecoveryCodeCheckSucceededEvent(ctx, userAgg, validCode, nil),
+				user.NewHumanRecoveryCodeCheckSucceededEvent(ctx, userAgg, "$plain$x$"+validCode, nil),
 				session.NewRecoveryCodeCheckedEvent(ctx, sessAgg, testNow),
 			},
 		},

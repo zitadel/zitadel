@@ -17,6 +17,10 @@ func (c *Commands) ImportHumanRecoveryCodes(ctx context.Context, userID, resourc
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	if len(codes) == 0 {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-vee93", "Errors.User.MFA.RecoveryCodes.CountInvalid")
+	}
+
 	if _, err = c.checkUserExists(ctx, userID, resourceOwner); err != nil {
 		return err
 	}
@@ -30,7 +34,7 @@ func (c *Commands) ImportHumanRecoveryCodes(ctx context.Context, userID, resourc
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-53cjw", "Errors.User.MFA.RecoveryCodes.MaxCountExceeded")
 	}
 
-	hashedCodes, err := domain.RecoveryCodesFromRaw(codes, c.secretHasher)
+	hashedCodes, err := domain.RecoveryCodesFromRaw(codes, c.userPasswordHasher)
 	if err != nil {
 		return err
 	}
@@ -51,6 +55,9 @@ type RecoveryCodesDetails struct {
 func (c *Commands) GenerateRecoveryCodes(ctx context.Context, userID string, count int, resourceOwner string, authRequest *domain.AuthRequest) (*RecoveryCodesDetails, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-4kje7", "Errors.User.UserIDMissing")
+	}
+	if count <= 0 {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-7c0nx", "Errors.User.RecoveryCodes.CountInvalid")
 	}
 
 	resourceOwner, err := c.checkUserExists(ctx, userID, resourceOwner)

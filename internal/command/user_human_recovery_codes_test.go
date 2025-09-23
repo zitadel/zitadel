@@ -98,25 +98,7 @@ func TestCommands_ImportHumanRecoveryCodes(t *testing.T) {
 		{
 			name: "empty codes, error",
 			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(ctx,
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-					),
-					expectFilter(), // no existing recovery codes
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           ctx,
@@ -124,7 +106,7 @@ func TestCommands_ImportHumanRecoveryCodes(t *testing.T) {
 				resourceOwner: "org1",
 				codes:         []string{},
 			},
-			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-vee93", "Errors.User.MFA.RecoveryCodes.ConfigInvalid"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-vee93", "Errors.User.MFA.RecoveryCodes.CountInvalid"),
 		},
 		{
 			name: "max count exceeded with existing codes, error",
@@ -163,7 +145,7 @@ func TestCommands_ImportHumanRecoveryCodes(t *testing.T) {
 				resourceOwner: "org1",
 				codes:         []string{"code9", "code10", "code11"}, // 8 existing + 3 new = 11 > max 10
 			},
-			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-53cjw", "Errors.User.MFA.RecoveryCodes.MaxCountExceeded"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-53cjw", "Errors.User.MFA.RecoveryCodes.MaxCountExceeded"),
 		},
 		{
 			name: "successful import",
@@ -206,8 +188,8 @@ func TestCommands_ImportHumanRecoveryCodes(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:   tt.fields.eventstore(t),
-				secretHasher: mockPasswordHasher(""),
+				eventstore:         tt.fields.eventstore(t),
+				userPasswordHasher: mockPasswordHasher(""),
 				multifactors: domain.MultifactorConfigs{
 					RecoveryCodes: domain.RecoveryCodesConfig{
 						MaxCount:   10,
@@ -305,24 +287,7 @@ func TestCommands_GenerateRecoveryCodes(t *testing.T) {
 		{
 			name: "invalid count (zero), error",
 			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(ctx,
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-					),
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           ctx,
@@ -352,6 +317,7 @@ func TestCommands_GenerateRecoveryCodes(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(), // no existing recovery codes
 				),
 			},
 			args: args{
@@ -360,7 +326,7 @@ func TestCommands_GenerateRecoveryCodes(t *testing.T) {
 				count:         15, // exceeds max count of 10
 				resourceOwner: "org1",
 			},
-			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-7c0nx", "Errors.User.RecoveryCodes.CountInvalid"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-8f2k9", "Errors.User.MFA.RecoveryCodes.MaxCountExceeded"),
 		},
 		{
 			name: "max count exceeded with existing codes, error",
@@ -399,15 +365,15 @@ func TestCommands_GenerateRecoveryCodes(t *testing.T) {
 				count:         5, // 8 existing + 5 new = 13 > max 10
 				resourceOwner: "org1",
 			},
-			wantErr: zerrors.ThrowAlreadyExists(nil, "COMMAND-8f2k9", "Errors.User.MFA.RecoveryCodes.MaxCountExceeded"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-8f2k9", "Errors.User.MFA.RecoveryCodes.MaxCountExceeded"),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:      tt.fields.eventstore(t),
-				checkPermission: tt.fields.checkPermission,
-				secretHasher:    mockPasswordHasher(""),
+				eventstore:         tt.fields.eventstore(t),
+				checkPermission:    tt.fields.checkPermission,
+				userPasswordHasher: mockPasswordHasher(""),
 				multifactors: domain.MultifactorConfigs{
 					RecoveryCodes: domain.RecoveryCodesConfig{
 						MaxCount:   10,
@@ -506,7 +472,7 @@ func TestCommands_RemoveRecoveryCodes(t *testing.T) {
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
-			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-d9u8q", "Errors.User.RecoveryCodes.Locked"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-d9u8q", "Errors.User.Locked"),
 		},
 		{
 			name: "recovery codes not added, error",
@@ -520,7 +486,7 @@ func TestCommands_RemoveRecoveryCodes(t *testing.T) {
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
-			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-84rgg", "Errors.User.RecoveryCodes.NotAdded"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-84rgg", "Errors.User.MFA.RecoveryCodes.NotReady"),
 		},
 		{
 			name: "successful removal",
@@ -987,7 +953,7 @@ func TestCommands_checkRecoveryCode(t *testing.T) {
 				secretHasher:  hasher,
 			},
 			wantCommands: 0,
-			wantErr:      zerrors.ThrowNotFound(nil, "COMMAND-2w6oa", "Errors.User.Locked"),
+			wantErr:      zerrors.ThrowPreconditionFailed(nil, "COMMAND-2w6oa", "Errors.User.Locked"),
 		},
 		{
 			name: "recovery codes not ready, error",
@@ -1000,7 +966,7 @@ func TestCommands_checkRecoveryCode(t *testing.T) {
 				secretHasher:  hasher,
 			},
 			wantCommands: 0,
-			wantErr:      zerrors.ThrowInvalidArgument(nil, "COMMAND-84rgg", "Errors.User.RecoveryCodes.NotReady"),
+			wantErr:      zerrors.ThrowPreconditionFailed(nil, "COMMAND-84rgg", "Errors.User.MFA.RecoveryCodes.NotReady"),
 		},
 		{
 			name: "invalid code, returns failed event and error",
@@ -1039,7 +1005,7 @@ func TestCommands_checkRecoveryCode(t *testing.T) {
 				secretHasher:  hasher,
 			},
 			wantCommands: 0,
-			wantErr:      zerrors.ThrowNotFound(nil, "COMMAND-ASV12", "Errors.User.Locked"),
+			wantErr:      zerrors.ThrowPreconditionFailed(nil, "COMMAND-ASV12", "Errors.User.Locked"),
 		},
 	}
 	for _, tt := range tests {
