@@ -455,15 +455,6 @@ func (c *Commands) removeLabelPolicyIfExists(ctx context.Context, orgID string) 
 	return org.NewLabelPolicyRemovedEvent(ctx, orgAgg), nil
 }
 
-func (c *Commands) removeLabelPolicyAssets(ctx context.Context, existingPolicy *OrgLabelPolicyWriteModel) (*org.LabelPolicyAssetsRemovedEvent, error) {
-	err := c.removeAssetsFolder(ctx, existingPolicy.AggregateID, static.ObjectTypeStyling)
-	if err != nil {
-		return nil, err
-	}
-	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
-	return org.NewLabelPolicyAssetsRemovedEvent(ctx, orgAgg), nil
-}
-
 func (c *Commands) orgLabelPolicyWriteModelByID(ctx context.Context, orgID string) (_ *OrgLabelPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

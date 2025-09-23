@@ -111,7 +111,7 @@ func TestServer_UserInfo(t *testing.T) {
 			assertions: []func(*testing.T, *oidc.UserInfo){
 				assertUserinfo,
 				func(t *testing.T, ui *oidc.UserInfo) {
-					assertProjectRoleClaims(t, projectID, ui.Claims, true, []string{roleFoo}, []string{Instance.DefaultOrg.Id})
+					assertProjectRoleClaims(t, projectID, ui.Claims, true, []string{roleFoo, roleBar}, []string{Instance.DefaultOrg.Id})
 				},
 			},
 		},
@@ -125,7 +125,7 @@ func TestServer_UserInfo(t *testing.T) {
 			assertions: []func(*testing.T, *oidc.UserInfo){
 				assertUserinfo,
 				func(t *testing.T, ui *oidc.UserInfo) {
-					assertProjectRoleClaims(t, projectID, ui.Claims, true, []string{roleFoo}, []string{Instance.DefaultOrg.Id})
+					assertProjectRoleClaims(t, projectID, ui.Claims, true, []string{roleFoo, roleBar}, []string{Instance.DefaultOrg.Id})
 				},
 			},
 		},
@@ -267,7 +267,7 @@ func TestServer_UserInfo_Issue6662(t *testing.T) {
 
 	userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, user.GetUserId(), provider)
 	require.NoError(t, err)
-	assertProjectRoleClaims(t, projectID, userinfo.Claims, false, []string{roleFoo}, []string{Instance.DefaultOrg.Id})
+	assertProjectRoleClaims(t, projectID, userinfo.Claims, false, []string{roleFoo, roleBar}, []string{Instance.DefaultOrg.Id})
 }
 
 func addProjectRolesGrants(t *testing.T, userID, projectID string, roles ...string) {
