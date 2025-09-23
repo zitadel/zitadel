@@ -227,6 +227,7 @@ func TestListOrgsCommand_OperationMapper(t *testing.T) {
 }
 
 func TestListOrgsCommand_Execute(t *testing.T) {
+	t.Parallel()
 	clientAcquireErr := errors.New("client acquire error")
 	listErr := errors.New("list mock error")
 
@@ -276,9 +277,23 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 				repo := domainmock.NewOrgRepo(ctrl)
 				domainRepo := domainmock.NewOrgDomainRepo(ctrl)
 				repo.SetDomains(domainRepo)
+				repo.SetExistsDomain(database.Exists("domains", domainRepo.DomainCondition(database.TextOperationEqual, "some domain")))
 
 				repo.EXPECT().
-					List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+					List(
+						gomock.Any(),
+						dbmock.QueryOptions(
+							database.WithCondition(
+								database.And(
+									repo.InstanceIDCondition("instance-1"),
+									repo.ExistsDomain(domainRepo.DomainCondition(database.TextOperationEqual, "some domain")),
+								),
+							),
+						),
+						dbmock.QueryOptions(database.WithOrderBy(database.OrderDirectionAsc, repo.NameColumn())),
+						dbmock.QueryOptions(database.WithLimit(2)),
+						dbmock.QueryOptions(database.WithOffset(1)),
+					).
 					Times(1).
 					Return(nil, listErr)
 
@@ -313,11 +328,21 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 				repo.SetDomains(domainRepo)
 
 				repo.EXPECT().
-					List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+					List(
+						gomock.Any(),
+						dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1"))),
+						dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-2"))),
+						dbmock.QueryOptions(database.WithCondition(repo.NameCondition(database.TextOperationEqual, "Named Org"))),
+						dbmock.QueryOptions(database.WithCondition(repo.StateCondition(domain.OrgStateActive))),
+
+						dbmock.QueryOptions(database.WithOrderBy(database.OrderDirectionDesc, repo.NameColumn())),
+						dbmock.QueryOptions(database.WithLimit(2)),
+						dbmock.QueryOptions(database.WithOffset(1)),
+					).
 					Times(1).
 					Return([]*domain.Organization{
-						{ID: "1"},
-						{ID: "2"},
+						{ID: "org-1"},
+						{ID: "org-2"},
 					}, nil)
 
 				return func(_ database.QueryExecutor) domain.OrganizationRepository { return repo }
@@ -325,25 +350,44 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 			inputRequest: &org.ListOrganizationsRequest{
 				Queries: []*org.SearchQuery{
 					{
-						Query: &org.SearchQuery_DomainQuery{
-							DomainQuery: &org.OrganizationDomainQuery{
-								Domain: "some domain",
+						Query: &org.SearchQuery_DefaultQuery{
+							DefaultQuery: &org.DefaultOrganizationQuery{},
+						},
+					},
+					{
+						Query: &org.SearchQuery_IdQuery{
+							IdQuery: &org.OrganizationIDQuery{
+								Id: "org-2",
+							},
+						},
+					},
+					{
+						Query: &org.SearchQuery_NameQuery{
+							NameQuery: &org.OrganizationNameQuery{
+								Name:   "Named Org",
 								Method: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS,
+							},
+						},
+					},
+					{
+						Query: &org.SearchQuery_StateQuery{
+							StateQuery: &org.OrganizationStateQuery{
+								State: org.OrganizationState_ORGANIZATION_STATE_ACTIVE,
 							},
 						},
 					},
 				},
 				SortingColumn: org.OrganizationFieldName_ORGANIZATION_FIELD_NAME_NAME,
 				Query: &object.ListQuery{
-					Asc:    true,
+					Asc:    false,
 					Offset: 1,
 					Limit:  2,
 				},
 			},
 
 			expectedOrganizations: []*domain.Organization{
-				{ID: "1"},
-				{ID: "2"},
+				{ID: "org-1"},
+				{ID: "org-2"},
 			},
 		},
 	}
