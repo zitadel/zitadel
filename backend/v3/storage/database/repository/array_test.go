@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 )
 
@@ -93,6 +94,14 @@ func TestJSONArray_Scan(t *testing.T) {
 			src:  []int{1, 2, 3},
 			want: want{
 				err: repository.ErrScanSource,
+				res: nil,
+			},
+		},
+		{
+			name: "badly formatted JSON",
+			src:  []byte(`this is not a JSON`),
+			want: want{
+				err: new(database.ScanError),
 				res: nil,
 			},
 		},

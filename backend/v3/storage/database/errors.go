@@ -221,6 +221,31 @@ func (e *NotNullError) Unwrap() error {
 	return &e.IntegrityViolationError
 }
 
+// ScanError is returned when scanning rows into objects failed.
+// It wraps the original error to provide more context.
+type ScanError struct {
+	original error
+}
+
+func NewScanError(original error) error {
+	return &ScanError{
+		original: original,
+	}
+}
+
+func (e *ScanError) Error() string {
+	return fmt.Sprintf("Scan error: %v", e.original)
+}
+
+func (e *ScanError) Is(target error) bool {
+	_, ok := target.(*ScanError)
+	return ok
+}
+
+func (e *ScanError) Unwrap() error {
+	return e.original
+}
+
 // UnknownError is returned when an unknown error occurs.
 // It wraps the dialect specific original error to provide more context.
 // It is used to indicate that an error occurred that does not fit into any of the other categories.
