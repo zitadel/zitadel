@@ -346,18 +346,17 @@ This repository uses **pnpm** as package manager and **Nx** for build orchestrat
 
 ### Quick Start
 
-**Use Dev Container** (everything pre-configured):
-
-Open in VS Code with Dev Container extension or use GitHub Codespaces.
-All dependencies and tools are already installed
-
-**Or install locally** ([requirements](#dev-requirements)):
-```bash
-pnpm install
-pnpm add -g nx
-```
+Make sure you have the [development requirements](#dev-requirements) installed.
 
 **Start developing***
+
+Install Dependencies
+
+```bash
+pnpm install
+pnpm add -g nx@21.5.2
+```
+
 ```bash
 nx run @zitadel/login:dev # or console:dev or docs:dev
 ```
@@ -551,10 +550,11 @@ nx run @zitadel/docs:build
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
 
 ## <a name="dev-requirements"></a>Development Requirements
+
 **Recommended: Use Dev Container** (everything pre-configured)
 
 Open in VS Code with Dev Container extension.
-All dependencies and tools are already installed
+NodeJS, PNPM, Docker, Go and golangci-lint are already installed.
 
 **For local development, install:**
 
@@ -571,7 +571,7 @@ All dependencies and tools are already installed
 ```bash
 # Install dependencies
 pnpm install
-pnpm add -g nx
+pnpm add -g nx@21.5.2
 
 # Test a project
 nx run @zitadel/login:dev  # Should start dev server at http://localhost:3000/ui/v2/login/loginname

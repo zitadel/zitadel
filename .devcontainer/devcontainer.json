@@ -28,20 +28,12 @@
 			"onAutoForward": "notify"
 		}
 	},
-	"updateContentCommand": {
-		"goModules": "go mod download || true",
-		"nodeModules": "pnpm install || true && pnpm add -g nx || true && cd apps/login && pnpm cypress install || true"
-	},
 	"features": {
 		"ghcr.io/devcontainers/features/go:1": {
 			"version": "1.24"
 		},
 		"ghcr.io/guiyomh/features/golangci-lint:0": {},
-		"ghcr.io/jungaretti/features/make:1": {},
-		"ghcr.io/devcontainers/features/docker-outside-of-docker": {},
-		"ghcr.io/devcontainers-extra/features/pnpm:2": {
-			"version": "10.13.1"
-		}
+		"ghcr.io/devcontainers/features/docker-outside-of-docker": {}
 	},
 	"customizations": {
         "vscode": {

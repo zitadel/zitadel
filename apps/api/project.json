@@ -174,7 +174,7 @@
                 "commands": [
                     "bash -c 'go test -race -count 1 -tags integration -timeout 60m -parallel 1 $(go list -tags integration ./... | grep -e \"integration_test\" -e \"events_testing\")'",
                     "go tool covdata textfmt -i=$GOCOVERDIR -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/...,github.com/zitadel/zitadel/backend/... -o profile.api.test-integration.cov",
-                    "nx run @zitadel/devcontainer:compose up down db-api-integration cache-api-integration"
+                    "nx run @zitadel/devcontainer:compose down db-api-integration cache-api-integration"
                 ]
             },
             "cache": true,
