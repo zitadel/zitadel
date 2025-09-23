@@ -93,6 +93,7 @@ func (p *orgDomainRelationalProjection) reducePrimarySet(event eventstore.Event)
 				domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),
 			),
 			domainRepo.SetPrimary(),
+			domainRepo.SetUpdatedAt(e.CreationDate()),
 		)
 		return err
 	}), nil
@@ -148,6 +149,7 @@ func (p *orgDomainRelationalProjection) reduceVerificationAdded(event eventstore
 				domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),
 			),
 			domainRepo.SetValidationType(validationType),
+			domainRepo.SetUpdatedAt(e.CreationDate()),
 		)
 		return err
 	}), nil

@@ -97,6 +97,7 @@ func (p *instanceDomainRelationalProjection) reduceDomainPrimarySet(event events
 				domainRepo.TypeCondition(domain.DomainTypeCustom),
 			),
 			domainRepo.SetPrimary(),
+			domainRepo.SetUpdatedAt(e.CreationDate()),
 		)
 		return err
 	}), nil
