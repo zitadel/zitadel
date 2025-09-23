@@ -11,12 +11,12 @@ on:
         type: boolean
     outputs:
         version:
-            value: ${{ jobs.generate.outputs.version }}
+            value: ${{ jobs.semantic.outputs.version }}
         published:
-            value: ${{jobs.generate.outputs.published }}
+            value: ${{jobs.semantic.outputs.published }}
 
 jobs:
-  generate:
+  semantic:
     runs-on: ubuntu-22.04
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -122,6 +122,9 @@
     },
     "pack": {
       "description": "Packages the Login application into an archive for distribution",
+      "dependsOn": [
+        "build"
+      ],
       "executor": "nx:run-commands",
       "options": {
         "parallel": false,
