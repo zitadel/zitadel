@@ -95,16 +95,17 @@ func (o orgDomain) Update(ctx context.Context, client database.QueryExecutor, co
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}
-
 	if !condition.IsRestrictingColumn(o.InstanceIDColumn()) {
 		return 0, database.NewMissingConditionError(o.InstanceIDColumn())
 	}
 	if !condition.IsRestrictingColumn(o.OrgIDColumn()) {
 		return 0, database.NewMissingConditionError(o.OrgIDColumn())
 	}
+	if !database.Changes(changes).IsOnColumn(o.UpdatedAtColumn()) {
+		changes = append(changes, database.NewChange(o.UpdatedAtColumn(), database.NullInstruction))
+	}
 
 	var builder database.StatementBuilder
-
 	builder.WriteString(`UPDATE zitadel.org_domains SET `)
 	database.Changes(changes).Write(&builder)
 	writeCondition(&builder, condition)

@@ -104,12 +104,13 @@ func (i instance) Update(ctx context.Context, client database.QueryExecutor, id 
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}
+	if !database.Changes(changes).IsOnColumn(i.UpdatedAtColumn()) {
+		changes = append(changes, database.NewChange(i.UpdatedAtColumn(), database.NullInstruction))
+	}
+
 	var builder database.StatementBuilder
-
 	builder.WriteString(`UPDATE zitadel.instances SET `)
-
 	database.Changes(changes).Write(&builder)
-
 	idCondition := i.IDCondition(id)
 	writeCondition(&builder, idCondition)
 
