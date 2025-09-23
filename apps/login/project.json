@@ -76,7 +76,7 @@
       ]
     },
     "test": {
-      "description": "Run all tests (unit and integration)",
+      "description": "Runs all tests (unit and integration)",
       "dependsOn": [
         "test-unit",
         "test-integration"
@@ -121,7 +121,7 @@
       ]
     },
     "pack": {
-      "description": "Packages the Login application into an archive for distribution",
+      "description": "Packages the standalone Login application build into an archive",
       "dependsOn": [
         "build"
       ],

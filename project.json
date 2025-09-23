@@ -19,7 +19,7 @@
       ]
     },
     "pack": {
-        "description": "Packages all archives and create checksums",
+        "description": "Packages archives for the API for all platforms. Also package an archive for the Login. Then it creates a checksums.txt file containing the sha256 checksums of all created archives.",
         "dependsOn": [
             "@zitadel/api:pack-linux-*",
             "@zitadel/api:pack-darwin-*",

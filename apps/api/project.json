@@ -24,6 +24,7 @@
     },
     "targets": {
         "prod": {
+            "description": "Runs the Go-based API backend in production mode",
             "continuous": true,
             "dependsOn": [
                 "setup"
@@ -36,6 +37,7 @@
             "command": "bash -c './.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} start --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --masterkey MasterkeyNeedsToHave32Characters'"
         },
         "setup": {
+            "description": "Sets up the API with initial data and migrates data to newer API versions.",
             "dependsOn": [
                 "build"
             ],
@@ -67,7 +69,7 @@
             ]
         },
         "generate": {
-            "description": "Generate the code needed to start the API",
+            "description": "Generates the code needed to start a full-featured API",
             "dependsOn": [
                 "generate-stubs",
                 "generate-statik",
@@ -76,7 +78,7 @@
             ]
         },
         "lint": {
-            "description": "Lint the Go code using golangci-lint",
+            "description": "Lints the Go code using a Docker container with golangci-lint",
             "dependsOn": [
                 "generate-stubs"
             ],
@@ -110,6 +112,7 @@
             ]
         },
         "test-integration-build": {
+            "description": "Builds the test binary for integration tests. The binary is able to record coverage and it supports debugger attachment.",
             "cache": true,
             "dependsOn": [
                 "generate-stubs"
@@ -127,6 +130,7 @@
             ]
         },
         "test-integration-state": {
+            "description": "Sets up the state for the integration tests. This includes starting an ephemeral PostgreSQL database and a Redis cache. It also sets up the data needed for the tests.",
             "dependsOn": [
                 "test-integration-build"
             ],
@@ -147,6 +151,7 @@
             }
         },
         "test-integration-app": {
+            "description": "Runs the API backend in a mode suitable for integration tests. This includes using the test configuration and enabling coverage recording.",
             "continuous": true,
             "dependsOn": [
                 "test-integration-state"
@@ -162,6 +167,7 @@
             "command": "nx run @zitadel/api:prod --excludeTaskDependencies"
         },
         "test-integration": {
+            "description": "Runs the integration tests sequentially with coverage and race condition detection. Go test caching is disabled, because the tests run against an out-of-process API.",
             "dependsOn": [
                 "test-integration-app"
             ],
@@ -190,7 +196,7 @@
             ]
         },
         "generate-console": {
-            "description": "Build the console and copy the static files to the api",
+            "description": "Builds the console and copies the static files to the API",
             "cache": true,
             "dependsOn": [
                 "@zitadel/console:build"
@@ -201,7 +207,7 @@
             ]
         },
         "generate-stubs": {
-            "description": "Generate the gRPC and OpenAPI stubs from the proto files",
+            "description": "Generates the gRPC and OpenAPI stubs from the proto files. This is the minimal requirement for compiling and running the API.",
             "cache": true,
             "dependsOn": [
                 "generate-stubs-build",
@@ -228,7 +234,7 @@
             ]            
         },
         "generate-stubs-build": {
-            "description": "Install protoc stub generators",
+            "description": "Builds custom protoc generators",
             "cache": true,
             "executor": "nx:run-commands",
             "options": {
@@ -251,7 +257,7 @@
             ]
         },
         "generate-stubs-install": {
-            "description": "Install protoc stub generators",
+            "description": "Installs third-party protoc generators",
             "cache": true,
             "executor": "nx:run-commands",
             "options": {
@@ -281,7 +287,7 @@
             ]
         },
         "generate-statik": {
-            "description": "Generate statik files for embedding static resources",
+            "description": "Generates statik files for embedding static resources",
             "cache": true,
             "dependsOn": [
                 "generate-statik-install"
@@ -323,7 +329,7 @@
             ]
         },        
         "generate-assets": {
-            "description": "Generate asset routes and documentation",
+            "description": "Generates asset routes and documentation",
             "cache": true,
             "command": "mkdir -p docs/apis/assets && go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=docs/apis/assets/assets.md",
             "inputs": [
@@ -336,7 +342,7 @@
             ]
         },
         "generate-go": {
-            "description": "Generate Go code",
+            "description": "Generates Go using Go native generation tools. This only needs to be run if sources for //go:generate files change, like for Stringer, Enumer, Mockgen etc.",
             "dependsOn": [
                 "generate-go-install"
             ],
@@ -367,7 +373,7 @@
             ]
         },
         "pack-platform": {
-            "description": "Build and package for a single platform",
+            "description": "Cross-compiles the binary and packages it for the platform defined by GOOS and GOARCH environment variables. The version is taken from the ZITADEL_VERSION environment variable.",
             "executor": "nx:run-commands",
             "options": {
                 "commands": [
@@ -378,6 +384,7 @@
             }
         },
         "pack-darwin-amd64": {
+            "description": "Packages the API for Darwin AMD64 (Intel) architecture",
             "dependsOn": ["generate"],
             "command": "GOOS=darwin GOARCH=amd64 nx run @zitadel/api:pack-platform",
             "cache": true,
@@ -391,6 +398,7 @@
             ]
         },
         "pack-darwin-arm64": {
+            "description": "Packages the API for Darwin ARM64 (Apple Silicon) architecture",
             "dependsOn": ["generate"],
             "command": "GOOS=darwin GOARCH=arm64 nx run @zitadel/api:pack-platform",
             "cache": true,
@@ -404,6 +412,7 @@
             ]
         },
         "pack-linux-amd64": {
+            "description": "Packages the API for Linux AMD64 architecture",
             "dependsOn": ["generate"],
             "command": "GOOS=linux GOARCH=amd64 nx run @zitadel/api:pack-platform",
             "cache": true,
@@ -417,6 +426,7 @@
             ]
         },
         "pack-linux-arm64": {
+            "description": "Packages the API for Linux ARM64 architecture",
             "dependsOn": ["generate"],
             "command": "GOOS=linux GOARCH=arm64 nx run @zitadel/api:pack-platform",
             "cache": true,
@@ -430,6 +440,7 @@
             ]
         },
         "pack-windows-amd64": {
+            "description": "Packages the API for Windows AMD64 architecture",
             "dependsOn": ["generate"],
             "command": "GOOS=windows GOARCH=amd64 nx run @zitadel/api:pack-platform",
             "cache": true,
@@ -443,6 +454,7 @@
             ]
         },
         "pack-windows-arm64": {
+            "description": "Packages the API for Windows ARM64 architecture",
             "dependsOn": ["generate"],
             "command": "GOOS=windows GOARCH=arm64 nx run @zitadel/api:pack-platform",
             "cache": true,

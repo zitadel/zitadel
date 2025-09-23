@@ -2,6 +2,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
     "test-setup": {
+        "description": "Sets up the functional UI (Console) test environment by starting a local Postgres database and configuring the Zitadel API",
         "dependsOn": [
             "test-state",
             "test-build",
@@ -20,6 +21,7 @@
         }  
     },
     "test-env": {
+        "description": "Runs the Zitadel API for functional UI (Console) tests",
         "continuous": true,
         "dependsOn": [
             "test-setup"
@@ -32,7 +34,7 @@
         "command": "nx run @zitadel/api:prod --excludeTaskDependencies"
     },
     "test-firefox": {
-      "description": "Runs the functional UI tests against a Zitadel API and a Firefox browser",
+      "description": "Runs the functional UI (Console) tests against a Zitadel API and a Firefox browser",
       "dependsOn": [
         "test-env"
       ],
@@ -51,7 +53,7 @@
       ]
     },
     "test-chrome": {
-      "description": "Runs the functional UI tests against a Zitadel API and a Chrome browser.",
+      "description": "Runs the functional UI (Console) tests against a Zitadel API and a Chrome browser.",
       "dependsOn": [
         "test-env"
       ],

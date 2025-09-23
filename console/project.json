@@ -22,7 +22,7 @@
             ]
         },
         "generate": {
-            "description": "Generate code from protobuf definitions for API v1 endpoints",
+            "description": "Generates code from protobuf definitions for API v1 endpoints",
             "inputs": [
                 "{workspaceRoot}/proto/**/*",
                 "{projectRoot}/buf.gen.yaml",
