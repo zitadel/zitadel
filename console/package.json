@@ -2,7 +2,7 @@
   "name": "@zitadel/console",
   "scripts": {
     "ng": "ng",
-    "dev": "node prebuild.development.js && ng serve --host=${DEVCONTAINER_LISTEN_HOST:-localhost}",
+    "dev": "node prebuild.development.js && ng serve --host=${DEVCONTAINER_LISTEN_HOST:-127.0.0.1}",
     "build": "ng build --configuration production --base-href=/ui/console/",
     "lint-check-ng": "ng lint",
     "lint-check-prettier": "prettier --check src",
