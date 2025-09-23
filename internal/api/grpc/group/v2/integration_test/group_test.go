@@ -5,11 +5,13 @@ package group_test
 import (
 	"context"
 	"testing"
-	"time"
 
+	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/integration"
 	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
@@ -20,16 +22,17 @@ func TestServer_CreateGroup(t *testing.T) {
 
 	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
-	alreadyExistingGroupName := "existingGroup1"
+	alreadyExistingGroupName := integration.GroupName()
 	resp := instance.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), alreadyExistingGroupName)
 
 	tests := []struct {
-		name        string
-		ctx         context.Context
-		req         *group_v2.CreateGroupRequest
-		wantResp    bool
-		wantGroupID string
-		wantErr     bool
+		name          string
+		ctx           context.Context
+		req           *group_v2.CreateGroupRequest
+		wantResp      bool
+		wantGroupID   string
+		wantErrorCode codes.Code
+		wantErrMsg    string
 	}{
 		{
 			name: "invalid name, error",
@@ -38,24 +41,27 @@ func TestServer_CreateGroup(t *testing.T) {
 				Name:           " ",
 				OrganizationId: "org1",
 			},
-			wantErr: true,
+			wantErrorCode: codes.InvalidArgument,
+			wantErrMsg:    "Errors.Group.InvalidName (CMDGRP-dUnd3r)",
 		},
 		{
 			name: "missing organization id, error",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.CreateGroupRequest{
-				Name: "example",
+				Name: integration.GroupName(),
 			},
-			wantErr: true,
+			wantErrorCode: codes.InvalidArgument,
+			wantErrMsg:    "invalid CreateGroupRequest.OrganizationId: value length must be between 1 and 200 runes, inclusive",
 		},
 		{
 			name: "organization not found, error",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.CreateGroupRequest{
-				Name:           "example",
+				Name:           integration.GroupName(),
 				OrganizationId: "org1",
 			},
-			wantErr: true,
+			wantErrorCode: codes.FailedPrecondition,
+			wantErrMsg:    "Organisation not found (CMDGRP-j1mH8l)",
 		},
 		{
 			name: "already existing group (unique name constraint), error",
@@ -64,24 +70,26 @@ func TestServer_CreateGroup(t *testing.T) {
 				Name:           alreadyExistingGroupName,
 				OrganizationId: orgResp.GetOrganizationId(),
 			},
-			wantErr: true,
+			wantErrorCode: codes.AlreadyExists,
+			wantErrMsg:    "Errors.Group.AlreadyExists (V3-DKcYh)",
 		},
 		{
 			name: "already existing group ID, error",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.CreateGroupRequest{
 				Id:             gu.Ptr(resp.Id),
-				Name:           "groupY",
+				Name:           integration.GroupName(),
 				OrganizationId: orgResp.GetOrganizationId(),
 			},
-			wantErr: true,
+			wantErrorCode: codes.AlreadyExists,
+			wantErrMsg:    "Errors.Group.AlreadyExists (CMDGRP-shRut3)",
 		},
 		{
 			name: "create group with ID, ok",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.CreateGroupRequest{
 				Id:             gu.Ptr("1234"),
-				Name:           "group1",
+				Name:           integration.GroupName(),
 				OrganizationId: orgResp.GetOrganizationId(),
 			},
 			wantResp:    true,
@@ -91,7 +99,7 @@ func TestServer_CreateGroup(t *testing.T) {
 			name: "create group without user provided ID, ok",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.CreateGroupRequest{
-				Name:           "group2",
+				Name:           integration.GroupName(),
 				OrganizationId: orgResp.GetOrganizationId(),
 			},
 			wantResp: true,
@@ -99,29 +107,22 @@ func TestServer_CreateGroup(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			creationDate := time.Now().UTC()
 			got, err := instance.Client.GroupV2.CreateGroup(tt.ctx, tt.req)
-			changeDate := time.Now().UTC()
-			if tt.wantErr {
+			if tt.wantErrorCode != codes.OK {
 				require.Error(t, err)
+				require.Empty(t, got.GetId())
+				require.Empty(t, got.GetCreationDate())
+				assert.Equal(t, tt.wantErrorCode, status.Code(err))
+				assert.Equal(t, tt.wantErrMsg, status.Convert(err).Message())
 				return
 			}
 			require.NoError(t, err)
 			if tt.wantGroupID != "" {
 				assert.Equal(t, tt.wantGroupID, got.Id, "want: %v, got: %v", tt.wantGroupID, got)
 			}
-			assertCreateGroupResponse(t, creationDate, changeDate, tt.wantResp, got)
+			require.NotEmpty(t, got.GetId())
+			require.NotEmpty(t, got.GetCreationDate())
 		})
-	}
-}
-
-func assertCreateGroupResponse(t *testing.T, creationDate, changeDate time.Time, expectResp bool, actualResp *group_v2.CreateGroupResponse) {
-	if expectResp {
-		assert.WithinRange(t, actualResp.GetCreationDate().AsTime(), creationDate, changeDate)
-		assert.NotEmpty(t, actualResp.GetId())
-	} else {
-		assert.Nil(t, actualResp.CreationDate)
-		assert.Nil(t, actualResp.Id)
 	}
 }
 
@@ -130,7 +131,7 @@ func TestServer_UpdateGroup(t *testing.T) {
 
 	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
-	groupName := "existingGroup2"
+	groupName := integration.GroupName()
 	existingGroup := instance.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), groupName)
 
 	tests := []struct {
@@ -138,7 +139,8 @@ func TestServer_UpdateGroup(t *testing.T) {
 		ctx            context.Context
 		req            *group_v2.UpdateGroupRequest
 		wantChangeDate bool
-		wantErr        bool
+		wantErrCode    codes.Code
+		wantErrMsg     string
 	}{
 		{
 			name: "invalid name, error",
@@ -147,7 +149,8 @@ func TestServer_UpdateGroup(t *testing.T) {
 				Id:   existingGroup.GetId(),
 				Name: gu.Ptr(" "),
 			},
-			wantErr: true,
+			wantErrCode: codes.InvalidArgument,
+			wantErrMsg:  "Errors.Group.InvalidName (CMDGRP-m177lN)",
 		},
 		{
 			name: "group not found, error",
@@ -156,14 +159,15 @@ func TestServer_UpdateGroup(t *testing.T) {
 				Id:   "12345",
 				Name: gu.Ptr("updated group name"),
 			},
-			wantErr: true,
+			wantErrCode: codes.NotFound,
+			wantErrMsg:  "Errors.Group.NotFound (CMDGRP-b33zly)",
 		},
 		{
 			name: "no change, ok",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.UpdateGroupRequest{
 				Id:   existingGroup.GetId(),
-				Name: gu.Ptr("groupX"),
+				Name: gu.Ptr(groupName),
 			},
 			wantChangeDate: true,
 		},
@@ -198,46 +202,38 @@ func TestServer_UpdateGroup(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			creationDate := time.Now().UTC()
 			got, err := instance.Client.GroupV2.UpdateGroup(tt.ctx, tt.req)
-			if tt.wantErr {
+			if tt.wantErrCode != codes.OK {
 				require.Error(t, err)
+				require.Empty(t, got.GetChangeDate())
+				assert.Equal(t, tt.wantErrCode, status.Code(err))
+				assert.Equal(t, tt.wantErrMsg, status.Convert(err).Message())
 				return
 			}
 			require.NoError(t, err)
-			changeDate := time.Now().UTC()
-			assertUpdateGroupResponse(t, creationDate, changeDate, tt.wantChangeDate, got)
+			require.NotEmpty(t, got.GetChangeDate())
 		})
-	}
-}
-
-func assertUpdateGroupResponse(t *testing.T, creationDate, changeDate time.Time, expectedChangeDate bool, actualResp *group_v2.UpdateGroupResponse) {
-	if expectedChangeDate {
-		assert.WithinRange(t, actualResp.GetChangeDate().AsTime(), creationDate, changeDate)
-	} else {
-		assert.Nil(t, actualResp.ChangeDate)
 	}
 }
 
 func TestServer_DeleteGroup(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-
 	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
-	groupName := "existingGroup3"
+	groupName := integration.GroupName()
 	existingGroup := instance.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), groupName)
 
-	startDate := time.Now().UTC()
-	deleteGroupName := "existingGroup4"
+	deleteGroupName := integration.GroupName()
 	deleteGroup := instance.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), deleteGroupName)
-	instance.DeleteGroup(iamOwnerCtx, t, deleteGroup.GetId())
+	deleteResp := instance.DeleteGroup(iamOwnerCtx, t, deleteGroup.GetId())
 
 	tests := []struct {
-		name             string
-		ctx              context.Context
-		req              *group_v2.DeleteGroupRequest
-		wantDeletionDate bool
-		wantErr          bool
+		name         string
+		ctx          context.Context
+		req          *group_v2.DeleteGroupRequest
+		wantErrCode  codes.Code
+		wantErrMsg   string
+		deletionTime *timestamp.Timestamp
 	}{
 		{
 			name: "missing id, error",
@@ -245,7 +241,8 @@ func TestServer_DeleteGroup(t *testing.T) {
 			req: &group_v2.DeleteGroupRequest{
 				Id: "",
 			},
-			wantErr: true,
+			wantErrCode: codes.InvalidArgument,
+			wantErrMsg:  "Errors.Group.MissingID (CMDGRP-aNg318)",
 		},
 		{
 			name: "group not found, ok",
@@ -253,7 +250,6 @@ func TestServer_DeleteGroup(t *testing.T) {
 			req: &group_v2.DeleteGroupRequest{
 				Id: "12345",
 			},
-			wantDeletionDate: false,
 		},
 		{
 			name: "delete, ok",
@@ -261,34 +257,31 @@ func TestServer_DeleteGroup(t *testing.T) {
 			req: &group_v2.DeleteGroupRequest{
 				Id: existingGroup.GetId(),
 			},
-			wantDeletionDate: true,
 		},
 		{
 			name: "delete already deleted group, ok",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.DeleteGroupRequest{
-				Id: existingGroup.GetId(),
+				Id: deleteGroup.GetId(),
 			},
-			wantDeletionDate: true,
+			deletionTime: deleteResp.GetDeletionDate(),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := instance.Client.GroupV2.DeleteGroup(tt.ctx, tt.req)
-			if tt.wantErr {
+			if tt.wantErrCode != codes.OK {
 				require.Error(t, err)
+				require.Empty(t, got.GetDeletionDate())
+				assert.Equal(t, tt.wantErrCode, status.Code(err))
+				assert.Equal(t, tt.wantErrMsg, status.Convert(err).Message())
 				return
 			}
 			require.NoError(t, err)
-			assertDeleteProjectResponse(t, startDate, time.Now().UTC(), tt.wantDeletionDate, got)
+			require.NotEmpty(t, got.GetDeletionDate())
+			if tt.deletionTime != nil {
+				assert.Equal(t, tt.deletionTime, got.GetDeletionDate())
+			}
 		})
-	}
-}
-
-func assertDeleteProjectResponse(t *testing.T, creationDate, deletionDate time.Time, wantDeletionDate bool, actualResp *group_v2.DeleteGroupResponse) {
-	if wantDeletionDate {
-		assert.WithinRange(t, actualResp.GetDeletionDate().AsTime(), creationDate, deletionDate)
-	} else {
-		assert.Nil(t, actualResp.DeletionDate)
 	}
 }

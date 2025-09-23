@@ -60,11 +60,7 @@ func (s *Server) DeleteGroup(ctx context.Context, req *connect.Request[group_v2.
 	if err != nil {
 		return nil, err
 	}
-	var deletionDate *timestamppb.Timestamp
-	if !details.EventDate.IsZero() {
-		deletionDate = timestamppb.New(details.EventDate)
-	}
 	return connect.NewResponse(&group_v2.DeleteGroupResponse{
-		DeletionDate: deletionDate,
+		DeletionDate: timestamppb.New(details.EventDate),
 	}), nil
 }
