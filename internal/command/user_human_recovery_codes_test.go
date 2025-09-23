@@ -387,7 +387,7 @@ func TestCommands_GenerateRecoveryCodes(t *testing.T) {
 			require.ErrorIs(t, err, tt.wantErr)
 			if tt.want != nil {
 				require.NotNil(t, got)
-				assert.Equal(t, tt.want.ObjectDetails.ResourceOwner, got.ObjectDetails.ResourceOwner)
+				assert.Equal(t, tt.want.ResourceOwner, got.ObjectDetails.ResourceOwner)
 			}
 		})
 	}
