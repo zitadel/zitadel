@@ -38,7 +38,7 @@ jobs:
     - if: matrix.language == 'go'
       name: Set up pnpm
       uses: pnpm/action-setup@v4
-    - if: matrix.language == 'go'    
+    - if: matrix.language == 'go'
       run: |
         pnpm install --frozen-lockfile
         pnpm add --global nx@${{ env.nx_version }} sass

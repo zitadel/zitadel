@@ -52,7 +52,7 @@ If you have a Login deployed, visit http://localhost:8080/ui/console?login_hint=
 
 To connect to the database and explore Zitadel data, run `psql "host=localhost dbname=zitadel sslmode=disable"`.
 
-For more options, go to the [API section](#api) 
+For more options, go to the [API section](#api)
 
 ### <a name="login-quick-start"></a>Login
 
@@ -72,7 +72,7 @@ Visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhos
 
 Make some changes to the source code and see how the browser is automatically updated.
 
-For more options, go to the [Login section](#login) 
+For more options, go to the [Login section](#login)
 
 ### <a name="console-quick-start"></a>Console
 
@@ -102,7 +102,7 @@ Visit http://localhost:4200/?login_hint=zitadel-admin@zitadel.localhost and ente
 
 Make some changes to the source code and see how the browser is automatically updated.
 
-For more options, go to the [Console section](#console) 
+For more options, go to the [Console section](#console)
 
 ## Introduction
 
@@ -320,9 +320,6 @@ Note that the actual race condition may have happened anywhere during the server
 To test the whole system, including the Console UI and the Login UI, run the Functional UI tests.
 
 ```bash
-# Build the zitadel binary
-nx run @zitadel/api:build-$(go env GOOS)-$(go env GOARCH) @zitadel/api
-
 # If you made changes in the tests/functional-ui directory, make sure you reformat the files
 nx run @zitadel/functional-ui:lint-fix
 
@@ -343,7 +340,7 @@ nx run @zitadel/functional-ui:test-env
 In another terminal, open the interactive test suite
 
 ```bash
-# The open command is configured to run against http://localhost:4200
+# The open command is configured to run against http://localhost:4200 by default
 nx run @zitadel/functional-ui:open
 ```
 
@@ -366,7 +363,7 @@ nx run @zitadel/login:dev # or console:dev or docs:dev
 Choose your contribution area:
 
 - **[Login App](#login)** (Next.js/React) - Modern authentication flows
-- **[Console](#console)** (Angular) - Admin dashboard and user management  
+- **[Console](#console)** (Angular) - Admin dashboard and user management
 - **[Docs](#docs)** (Docusaurus) - Project documentation
 - **[Client Packages](#client-packages)** - Shared libraries for API communication
 
@@ -374,7 +371,7 @@ Choose your contribution area:
 
 ```
 apps/login → packages/zitadel-client → packages/zitadel-proto
-console → packages/zitadel-client → packages/zitadel-proto  
+console → packages/zitadel-client → packages/zitadel-proto
 docs → (independent)
 ```
 
@@ -438,7 +435,7 @@ Reproduce the pipeline quality checks for the code you changed.
 # Run Login-related linting builds and unit tests
 nx run-many --projects @zitadel/login @zitadel/client @zitadel/proto --targets lint build test-unit
 # Run Login integration tests
-pnpm --filter @zitadel/login test-integration
+nx run @zitadel/login:test-integration
 ```
 
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.

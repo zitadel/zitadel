@@ -33,6 +33,14 @@
         },
         "command": "nx run @zitadel/api:prod --excludeTaskDependencies"
     },
+    "open": {
+      "description": "Opens the Cypress Test Runner for interactive testing",
+      "continuous": true,
+      "dependsOn": [
+        "@zitadel/console:dev",
+        "test-setup"
+      ]
+    },
     "test-firefox": {
       "description": "Runs the functional UI (Console) tests against a Zitadel API and a Firefox browser",
       "dependsOn": [

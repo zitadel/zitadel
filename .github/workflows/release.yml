@@ -97,7 +97,7 @@ jobs:
           ${{ inputs.image_name_github_api }}:${{ github.sha }}
         docker buildx imagetools create \
           --tag ${{ inputs.image_name_github_api }}:${{ needs.version.outputs.version }}-debug \
-          ${{ inputs.image_name_github_api }}:${{ github.sha }}-debug        
+          ${{ inputs.image_name_github_api }}:${{ github.sha }}-debug
         docker buildx imagetools create \
           --tag ${{ inputs.image_name_google_api }}:${{ needs.version.outputs.version }} \
           ${{ inputs.image_name_google_api }}:${{ github.sha }}

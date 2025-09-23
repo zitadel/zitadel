@@ -14,7 +14,7 @@
       "dependsOn": [
         "^build"
       ]
-    },    
+    },
     "build": {
       "description": "Builds the Next.js Login application in standalone mode for production",
       "cache": true,

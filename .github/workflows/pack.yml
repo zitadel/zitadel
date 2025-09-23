@@ -8,7 +8,7 @@ on:
         type: string
       nx_version:
         required: true
-        type: string        
+        type: string
       zitadel_version:
         required: true
         type: string
@@ -116,7 +116,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           labels: ${{ steps.scratch-meta.outputs.labels }}
-          tags: ${{ steps.scratch-meta.outputs.tags }}            
+          tags: ${{ steps.scratch-meta.outputs.tags }}
       - name: API Debug Image Tags and Labels
         id: debug-meta
         uses: docker/metadata-action@v5
@@ -126,7 +126,7 @@ jobs:
             ${{ inputs.image_name_google_api }}
           labels: ${{ env.default_labels}}
           tags: |
-            type=sha,prefix=,suffix=-debug,format=long            
+            type=sha,prefix=,suffix=-debug,format=long
       - name: API Debug Image Build and Push SHA
         id: build-debug
         uses: docker/build-push-action@v6

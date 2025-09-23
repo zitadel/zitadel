@@ -1,6 +1,7 @@
 {
   "name": "@zitadel/functional-ui",
   "scripts": {
+    "open": "cypress open",
     "lint": "prettier --check cypress",
     "lint-fix": "prettier --write cypress",
     "clean": "rm -rf node_modules"

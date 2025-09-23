@@ -1,8 +1,6 @@
 FROM debian:latest AS artifact
 ARG TARGETPLATFORM
 
-ENV ZITADEL_ARGS=
-
 RUN apt-get update && apt-get install ca-certificates -y
 
 COPY apps/api/entrypoint.sh /app/entrypoint.sh

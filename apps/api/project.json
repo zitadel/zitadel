@@ -116,7 +116,7 @@
             "cache": true,
             "dependsOn": [
                 "generate-stubs"
-            ],            
+            ],
             "command": "go build -cover -race -tags integration -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.test main.go",
             "inputs": [
                 { "runtime": "go env GOOS" },
@@ -226,12 +226,12 @@
             "inputs": [
                 "{workspaceRoot}/proto/**/*",
                 "{workspaceRoot}/buf.gen.yaml",
-                "{workspaceRoot}/buf.yaml"                
+                "{workspaceRoot}/buf.yaml"
             ],
             "outputs": [
                 "{workspaceRoot}/pkg/grpc/**/*",
                 "{workspaceRoot}/openapi/v2/zitadel/**/*"
-            ]            
+            ]
         },
         "generate-stubs-build": {
             "description": "Builds custom protoc generators",
@@ -247,7 +247,7 @@
             },
             "inputs": [
                 { "runtime": "go env GOOS" },
-                { "runtime": "go env GOARCH" },                
+                { "runtime": "go env GOARCH" },
                 "{workspaceRoot}/internal/protoc/protoc-gen-authoption/**/*",
                 "{workspaceRoot}/internal/protoc/protoc-gen-zitadel/**/*"
             ],
@@ -327,7 +327,7 @@
             "outputs": [
                 "{workspaceRoot}/.artifacts/bin/*/*/statik"
             ]
-        },        
+        },
         "generate-assets": {
             "description": "Generates asset routes and documentation",
             "cache": true,

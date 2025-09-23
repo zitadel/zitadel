@@ -13,7 +13,7 @@ This is the Zitadel Console Angular application.
 
 ```bash
 pnpm install
-pnpm add -g nx
+pnpm add -g nx@21.5.2
 ```
 
 ### Development Server

@@ -12,7 +12,7 @@ export default defineConfig({
     supportFile: "integration/support/e2e.{js,jsx,ts,tsx}",
     env: {
       API_MOCK_STUBS_URL: process.env.API_MOCK_STUBS_URL || "http://localhost:22220/v1/stubs"
-    },    
+    },
     setupNodeEvents(on, config) {
       // implement node event listeners here
     },

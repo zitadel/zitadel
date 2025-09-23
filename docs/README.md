@@ -9,7 +9,7 @@ The documentation is part of the ZITADEL monorepo and uses **pnpm** and **Nx** f
 ```bash
 # From the repository root
 pnpm install
-pnpm add -g nx
+pnpm add -g nx@21.5.2
 
 # Start development server with live-reloading
 nx run @zitadel/docs:dev
