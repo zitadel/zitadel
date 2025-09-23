@@ -80,10 +80,7 @@
             "dependsOn": [
                 "generate-stubs"
             ],
-            "options": {
-                "WORKSPACE_ROOT": "{workspaceRoot}"
-            },
-            "command": "docker run -t --rm -v ${DEVCONTAINER_LOCAL_WORKSPACE_ROOT:-$WORKSPACE_ROOT}:/app -w /app golangci/golangci-lint:v2.4.0 golangci-lint run --timeout 15m --config ./.golangci.yaml",
+            "command": "docker run -t --rm -v ${DEVCONTAINER_LOCAL_WORKSPACE_ROOT:-$(pwd)}:/app -w /app golangci/golangci-lint:v2.4.0 golangci-lint run --timeout 15m --config ./.golangci.yaml",
             "cache": true,
             "inputs": [
                 "sources",
