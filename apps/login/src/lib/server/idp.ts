@@ -11,7 +11,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { completeFlowOrGetUrl } from "../client";
 import { getServiceUrlFromHeaders } from "../service-url";
-import { checkMFAFactors } from "../verify-helper";
+import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
 import { getOriginalHost } from "./host";
 
@@ -133,14 +133,14 @@ export async function createNewSessionFromIdpIntent(command: CreateNewSessionCom
     return { error: "Could not create session" };
   }
 
-  // const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
+  const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
 
-  // // check to see if user was verified
-  // const emailVerificationCheck = checkEmailVerification(session, humanUser, command.organization, command.requestId);
+  // check to see if user was verified
+  const emailVerificationCheck = checkEmailVerification(session, humanUser, command.organization, command.requestId);
 
-  // if (emailVerificationCheck?.redirect) {
-  //   return emailVerificationCheck;
-  // }
+  if (emailVerificationCheck?.redirect) {
+    return emailVerificationCheck;
+  }
 
   // check if user has MFA methods
   let authMethods;
@@ -154,8 +154,6 @@ export async function createNewSessionFromIdpIntent(command: CreateNewSessionCom
     }
   }
 
-  // Always check MFA factors, even if no auth methods are configured
-  // This ensures that force MFA settings are respected
   const mfaFactorCheck = await checkMFAFactors(
     serviceUrl,
     session,
