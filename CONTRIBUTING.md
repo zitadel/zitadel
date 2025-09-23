@@ -41,7 +41,7 @@ nx run-many -p . @zitadel/login -t db prod
 If you don't need a Login or a Console, you can omit them and use the generated ./admin.pat to call the API.
 
 ```bash
-nx run-many --excludeTaskDependencies -p . @zitadel/api -t db generate
+nx run-many -p . @zitadel/api -t db generate-stubs
 ```
 
 Start a debug session in your IDE.
