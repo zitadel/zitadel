@@ -699,7 +699,8 @@ message CreateProjectRequest {
   ];
   // Enable this setting to provide role information to your application. For OpenID Connect, the roles can be requested from the UserInfo endpoint or sent in the ID or Access Token, based on your application's configuration.
   bool project_role_assertion = 4;
-  //Deny authentication if the user has no authorization assigned to this project. Authorizations to the project without assigned a specific role to the user are allowed.  bool authorization_required = 5;
+  //Deny authentication if the user has no authorization assigned to this project. Authorizations to the project without assigned a specific role to the user are allowed.
+  bool authorization_required = 5;
   // Before a user can be authenticated, it is verified that their affiliated organization has been granted access to this project. Authentication is not permitted for users from unauthorized organizations.
   bool project_access_required = 6;
   // Define which private labeling/branding should trigger when getting to a login of this project.
