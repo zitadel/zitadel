@@ -76,7 +76,7 @@ jobs:
       - name: Test Functional UI Chrome
         run: nx affected tests-functional-ui:test-chrome
       - name: Lint, Build, Tests and Pack
-        run: nx affected --targets lint build test --exclude @zitadel/docs,@zitadel/benchmark,@zitadel/functional-ui
+        run: nx run-many --targets lint build test --exclude @zitadel/docs,@zitadel/benchmark,@zitadel/functional-ui
       - uses: actions/cache/save@v4
         if: always()
         with:
