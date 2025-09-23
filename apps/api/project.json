@@ -126,7 +126,7 @@
                 "{workspaceRoot}/.artifacts/bin/*/*/zitadel.test"
             ]
         },
-        "test-integration-setup": {
+        "test-integration-state": {
             "dependsOn": [
                 "test-integration-build"
             ],
@@ -146,10 +146,10 @@
                 ]
             }
         },
-        "test-integration-env": {
+        "test-integration-app": {
             "continuous": true,
             "dependsOn": [
-                "test-integration-setup"
+                "test-integration-state"
             ],
             "options": {
                 "env": {
@@ -163,7 +163,7 @@
         },
         "test-integration": {
             "dependsOn": [
-                "test-integration-env"
+                "test-integration-app"
             ],
             "executor": "nx:run-commands",
             "options": {

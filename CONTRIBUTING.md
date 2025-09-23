@@ -264,23 +264,27 @@ Get familiar with the [API quick start](#api-quick-start).
 To test the code without dependencies, run the unit tests:
 
 ```bash
-make api_unit_test
+nx run @zitadel/api:test-unit
 ```
 
 ### Run Local Functional API Tests (Formerly Called Integration Tests)
 
 Functional API tests are run as gRPC clients against a running Zitadel server binary.
-The server binary is typically [build with coverage enabled](https://go.dev/doc/build-cover).
-It is also possible to run a Zitadel sever in a debugger and run the integrations tests like that. In order to run the server, a database is required.
-
-In order to prepare the local system, the following will bring up the database, builds a coverage binary, initializes the database and starts the sever.
+The server binary is [built with coverage enabled](https://go.dev/doc/build-cover).
 
 ```bash
-make api_integration_db_up api_integration_server_start
+nx run @zitadel/api:test-integration
 ```
 
-When this job is finished, you can run individual package integration test through your IDE or command-line. The actual integration test clients reside in the `integration_test` subdirectory of the package they aim to test. Integration test files use the `integration` build tag, in order to be excluded from regular unit tests.
-Because of the server-client split, Go is usually unaware of changes in server code and tends to cache test results. Pas `-count 1` to disable test caching.
+To develop and run the test cases from within your IDE or by the command line, start only the API.
+The actual integration test clients reside in the `integration_test` subdirectory of the package they aim to test.
+Integration test files use the `integration` build tag, in order to be excluded from regular unit tests.
+Because of the server-client split, Go is usually unaware of changes in server code and tends to cache test results.
+Pass `-count 1` to disable test caching.
+
+```bash
+nx run @zitadel/api:test-integration-app
+```
 
 Example command to run a single package integration test:
 
@@ -291,22 +295,25 @@ go test -count 1 -tags integration ./internal/api/grpc/management/integration_te
 To run all available integration tests:
 
 ```bash
-make api_integration_test_packages
+go test -count 1 -tags integration -parallel 1 $(go list -tags integration ./... | grep -e \"integration_test\" -e \"events_testing\")
 ```
 
-When you change any Zitadel server code, be sure to rebuild and restart the server before the next test run.
+It is also possible to run an API sever itself in a debugger and run the integrations tests like that.
+In order to run the server, a database with correctly set up data is required.
+When starting the debugger, make sure the Zitadel binary gets the flag `--config=./apps/api/test-integration.yaml`
 
 ```bash
-make api_integration_server_stop api_integration_server_start
+nx run @zitadel/api:test-integration-state
 ```
 
-To cleanup after testing (deletes the database!):
+To cleanup after testing (deletes the ephemeral database!):
 
 ```bash
-make api_integration_server_stop api_integration_db_down
+nx run @zitadel/devcontainer:compose down db-api-integration cache-api-integration
 ```
 
-The test binary has the race detector enabled. `api_integration_server_stop` checks for any race logs reported by Go and will print them along a `66` exit code when found. Note that the actual race condition may have happened anywhere during the server lifetime, including start, stop or serving gRPC requests during tests.
+The test binary has the race detector enabled. `api_integration_server_stop` checks for any race logs reported by Go and will print them along a `66` exit code when found.
+Note that the actual race condition may have happened anywhere during the server lifetime, including start, stop or serving gRPC requests during tests.
 
 ### Run Local Functional UI Tests
 
@@ -349,13 +356,6 @@ This repository uses **pnpm** as package manager and **Nx** for build orchestrat
 Make sure you have the [development requirements](#dev-requirements) installed.
 
 **Start developing***
-
-Install Dependencies
-
-```bash
-pnpm install
-pnpm add -g nx@21.5.2
-```
 
 ```bash
 nx run @zitadel/login:dev # or console:dev or docs:dev
