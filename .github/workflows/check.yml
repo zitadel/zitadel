@@ -6,12 +6,12 @@ on:
       node_version:
         required: true
         type: string
+      nx_version:
+        required: true
+        type: string
     secrets:
       CODECOV_TOKEN:
         required: true
-
-env:
-  nx_cache_path: .nx
 
 jobs:
   check:
@@ -52,36 +52,18 @@ jobs:
           version: v2.38.2
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Restore Nx cache
-        uses: actions/cache/restore@v4
-        id: nx_cache
-        with:
-          path: ${{ env.nx_cache_path }}
-          # It includes the repository owner to prevent cache poisoning from forks.
-          # We restore caches from previous commits on the HEAD branch, then we fall back to caches from the base.
-          key: nx-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-${{ github.repository_owner }}-${{ github.sha }}
-          enableCrossOsArchive: true
-          restore-keys: |
-            nx-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-${{ github.repository_owner }}-
-            nx-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-
-            nx-${{ github.event.pull_request.base.ref || github.ref_name }}-
       - name: Install global modules
-        run: pnpm add -g nx sass
+        run: pnpm add --global nx@${{ inputs.nx_version }} sass
       - name: Install Cypress binary
         run: pnpm cypress install
         working-directory: apps/login
       - uses: nrwl/nx-set-shas@v4
+      - name: Lint, Build and Tests
+        run: nx affected --targets lint build test --exclude @zitadel/docs,@zitadel/benchmark
       - name: Test Functional UI Firefox
         run: nx run @zitadel/functional-ui:test-firefox
       - name: Test Functional UI Chrome
         run: nx run @zitadel/functional-ui:test-chrome
-      - name: Lint, Build, Tests and Pack
-        run: nx affected --targets lint build test --exclude @zitadel/docs,@zitadel/benchmark
-      - uses: actions/cache/save@v4
-        if: always()
-        with:
-          key: ${{ steps.nx_cache.outputs.cache-primary-key }}
-          path: ${{ env.nx_cache_path }}
       - name: publish coverage
         uses: codecov/codecov-action@v4.3.0
         with:

@@ -6,6 +6,9 @@ on:
       node_version:
         required: true
         type: string
+      nx_version:
+        required: true
+        type: string        
       zitadel_version:
         required: true
         type: string
@@ -30,7 +33,6 @@ permissions:
   packages: write
 
 env:
-  nx_cache_path: .nx
   default_labels: |
     org.opencontainers.image.documentation=https://zitadel.com/docs
     org.opencontainers.image.vendor=CAOS AG
@@ -66,30 +68,12 @@ jobs:
           version: v0.28.0
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Restore Nx cache
-        uses: actions/cache/restore@v4
-        id: nx_cache
-        with:
-          path: ${{ env.nx_cache_path }}
-          # It includes the repository owner to prevent cache poisoning from forks.
-          # We restore caches from previous commits on the HEAD branch, then we fall back to caches from the base.
-          key: nx-pack-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-${{ github.repository_owner }}-${{ github.sha }}
-          enableCrossOsArchive: true
-          restore-keys: |
-            nx-pack-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-${{ github.repository_owner }}-
-            nx-pack-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-
-            nx-pack-${{ github.event.pull_request.base.ref || github.ref_name }}-
       - name: Install global modules
-        run: pnpm add -g nx sass
+        run: pnpm add --global nx@${{ inputs.nx_version }} sass
       - name: Pack API and Login
         env:
           ZITADEL_VERSION: ${{ inputs.zitadel_version }}
         run: nx run pack
-      - uses: actions/cache/save@v4
-        if: always()
-        with:
-          key: ${{ steps.nx_cache.outputs.cache-primary-key }}
-          path: ${{ env.nx_cache_path }}
       - name: Upload all platform archives
         uses: actions/upload-artifact@v4
         with:

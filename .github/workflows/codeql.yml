@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  nx_cache_path: .nx
+  nx_version: 21.5.2
 
 jobs:
   CodeQL-Build:
@@ -35,34 +35,13 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version-file: go.mod
-    # node to install sass for go
     - if: matrix.language == 'go'
       name: Set up pnpm
       uses: pnpm/action-setup@v4
-    - name: Restore Nx cache
-      if: matrix.language == 'go'
-      uses: actions/cache/restore@v4
-      id: nx_cache
-      with:
-        path: ${{ env.nx_cache_path }}
-        # It includes the repository owner to prevent cache poisoning from forks.
-        # We restore caches from previous commits on the HEAD branch, then we fall back to caches from the base.
-        key: nx-codeql-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-${{ github.repository_owner }}-${{ github.sha }}
-        enableCrossOsArchive: true
-        restore-keys: |
-          nx-codeql-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-${{ github.repository_owner }}-
-          nx-codeql-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-
-          nx-codeql-${{ github.event.pull_request.base.ref || github.ref_name }}-
     - if: matrix.language == 'go'    
       run: |
-        pnpm fetch --dev
-        pnpm add --prefer-offline --global sass nx
+        pnpm add --global nx@${{ env.nx_version }} sass
         nx run-many --projects @zitadel/api --targets generate-stubs generate-statik generate-assets
-    - uses: actions/cache/save@v4
-      if: matrix.language == 'go'
-      with:
-        key: ${{ steps.nx_cache.outputs.cache-primary-key }}
-        path: ${{ env.nx_cache_path }}
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
