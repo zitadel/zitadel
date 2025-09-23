@@ -7,6 +7,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -112,7 +113,12 @@ func (q *Queries) searchGroups(ctx context.Context, queries *GroupSearchQuery) (
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareGroupsQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	eq := sq.And{
+		sq.Eq{
+			GroupColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		},
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-FpBnrv", "Errors.Query.InvalidRequest")
 	}
@@ -175,4 +181,12 @@ func prepareGroupsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Groups, error)) {
 				},
 			}, nil
 		}
+}
+
+func (q *GroupSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	query = q.SearchRequest.toQuery(query)
+	for _, q := range q.Queries {
+		query = q.toQuery(query)
+	}
+	return query
 }

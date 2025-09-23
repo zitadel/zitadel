@@ -16,8 +16,7 @@ import (
 func (s *Server) CreateGroup(ctx context.Context, req *connect.Request[group_v2.CreateGroupRequest]) (*connect.Response[group_v2.CreateGroupResponse], error) {
 	userGroup := &domain.Group{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID:   req.Msg.GetId(),
-			ResourceOwner: authz.GetCtxData(ctx).ResourceOwner,
+			AggregateID: req.Msg.GetId(),
 		},
 		Name:           req.Msg.GetName(),
 		Description:    req.Msg.GetDescription(),
