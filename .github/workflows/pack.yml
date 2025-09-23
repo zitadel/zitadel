@@ -39,9 +39,8 @@ env:
 
 jobs:
   pack:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
+    runs-on:
+      group: zitadel-public
     steps:
       - name: Checkout
         uses: actions/checkout@v4
