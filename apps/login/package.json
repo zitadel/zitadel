@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "NEXT_OUTPUT_MODE=standalone next build && cp -r public scripts/* .next/standalone/ && cp -r .next/static .next/standalone/apps/login/.next/",
+    "build": "NEXT_OUTPUT_MODE=standalone next build && cp -r public scripts/* .next/standalone/ && cp -r .next/static .next/standalone/apps/login/.next/ && rm .next/standalone/apps/login/.env",
     "build-vercel": "next build",
     "dev": "HOSTNAME=${DEVCONTAINER_LISTEN_HOST:-localhost} ./scripts/entrypoint.sh next dev",
     "prod": "cd ./.next/standalone && HOSTNAME=${DEVCONTAINER_LISTEN_HOST:-localhost} ./entrypoint.sh node apps/login/server.js",
