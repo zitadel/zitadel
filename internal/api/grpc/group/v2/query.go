@@ -7,6 +7,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
@@ -14,7 +15,7 @@ import (
 
 // ListGroups returns a list of groups that match the search criteria
 func (s *Server) ListGroups(ctx context.Context, req *connect.Request[group_v2.ListGroupsRequest]) (*connect.Response[group_v2.ListGroupsResponse], error) {
-	queries, err := s.listGroupsRequestToModel(req.Msg)
+	queries, err := listGroupsRequestToModel(req.Msg, s.systemDefaults)
 	if err != nil {
 		return nil, err
 	}
@@ -28,8 +29,8 @@ func (s *Server) ListGroups(ctx context.Context, req *connect.Request[group_v2.L
 	}), nil
 }
 
-func (s *Server) listGroupsRequestToModel(req *group_v2.ListGroupsRequest) (*query.GroupSearchQuery, error) {
-	offset, limit, asc, err := filter.PaginationPbToQuery(s.systemDefaults, req.GetPagination())
+func listGroupsRequestToModel(req *group_v2.ListGroupsRequest, systemDefaults systemdefaults.SystemDefaults) (*query.GroupSearchQuery, error) {
+	offset, limit, asc, err := filter.PaginationPbToQuery(systemDefaults, req.GetPagination())
 	if err != nil {
 		return nil, err
 	}
