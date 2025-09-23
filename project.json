@@ -17,6 +17,29 @@
         "@zitadel/login:clean",
         "@zitadel/console:clean"
       ]
-    }
+    },
+    "pack": {
+        "description": "Packages all archives and create checksums",
+        "dependsOn": [
+            "@zitadel/api:pack-linux-*",
+            "@zitadel/api:pack-darwin-*",
+            "@zitadel/api:pack-windows-*",
+            "@zitadel/login:pack"
+        ],
+        "executor": "nx:run-commands",
+        "options": {
+            "parallel": false,
+            "commands": [
+                "sha256sum .artifacts/pack/zitadel-*-*.tar.gz > .artifacts/pack/checksums.txt"
+            ]
+        },
+        "cache": true,
+        "inputs": [
+            "{workspaceRoot}/.artifacts/pack/zitadel-*-*.tar.gz"
+        ],
+        "outputs": [
+            "{workspaceRoot}/.artifacts/pack/checksums.txt"
+        ]
+    }    
   }
 }

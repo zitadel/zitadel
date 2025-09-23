@@ -320,14 +320,8 @@ nx run @zitadel/api:build-$(go env GOOS)-$(go env GOARCH) @zitadel/api
 nx run @zitadel/functional-ui:lint-fix
 
 # Run the tests
-docker compose --file ./tests/functional-ui/docker-compose.yaml run --service-ports cypress
-```
-
-When you are happy with your changes, you can cleanup your environment.
-
-```bash
-# Stop and remove the docker containers for zitadel and the database
-docker compose --file ./tests/functional-ui/docker-compose.yaml down
+nx run @zitadel/functional-ui:test-firefox
+nx run @zitadel/functional-ui:test-chrome
 ```
 
 ### Run Local Functional UI Tests Against Your Dev Server Console
@@ -335,21 +329,15 @@ docker compose --file ./tests/functional-ui/docker-compose.yaml down
 If you also make [changes to the Console](#console), you can run the test suite against your locally built API and Console server.
 
 ```bash
-# Install dependencies (from repository root)
-pnpm install
-
-# Run the tests interactively
-pnpm run test:open:golangangular --filter @zitadel/functional-ui
-
-# Run the tests non-interactively
-pnpm run test:run:golangangular  --filter @zitadel/functional-ui
+# Run the API
+nx run @zitadel/functional-ui:test-env
 ```
 
-When you are happy with your changes, you can cleanup your environment.
+In another terminal, open the interactive test suite
 
 ```bash
-# Stop and remove the docker containers for zitadel and the database
-docker compose --file ./tests/functional-ui/docker-compose.yaml down
+# The open command is configured to run against http://localhost:4200
+nx run @zitadel/functional-ui:open
 ```
 
 ## <a name="frontend"></a>Contribute Frontend Code
@@ -494,13 +482,11 @@ Reproduce the pipeline quality checks for the code you changed.
 
 ```bash
 # Run console-related linting builds and unit tests
-nx run-many --projects @zitadel/console @zitadel/client @zitadel/proto @zitadel/functional-ui --targets lint build test-unit
+nx run-many --projects @zitadel/console @zitadel/client @zitadel/proto @zitadel/functional-ui --targets lint build test
 
-# Build the zitadel binary
-nx run @zitadel/api:build
-
-# Run the tests
-docker compose --file ./tests/functional-ui/docker-compose.yaml run --service-ports cypress
+# Run the functional UI tests
+nx run @zitadel/functional-ui:test-firefox
+nx run @zitadel/functional-ui:test-chrome
 ```
 
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.

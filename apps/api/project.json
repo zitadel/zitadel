@@ -371,7 +371,7 @@
             "options": {
                 "commands": [
                     "mkdir -p .artifacts/pack .artifacts/bin/$GOOS/$GOARCH",
-                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; echo \"Building for $GOOS-$GOARCH...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$GOOS/$GOARCH/zitadel$EXT -v -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\") -X github.com/zitadel/zitadel/cmd/build.version=${VERSION}\"'",
+                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; echo \"Building for $GOOS-$GOARCH...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$GOOS/$GOARCH/zitadel$EXT -v -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\") -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_VERSION}\"'",
                     "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; FOLDER=\".artifacts/pack/zitadel-$GOOS-$GOARCH\"; mkdir -p \"$FOLDER\"; cp \".artifacts/bin/$GOOS/$GOARCH/zitadel$EXT\" \"$FOLDER/\"; cp LICENSE \"$FOLDER/\"; cp README.md \"$FOLDER/\"; tar -czvf \"$FOLDER.tar.gz\" \"$FOLDER\"; rm -rf \"$FOLDER\"'"
                 ]
             }
@@ -381,10 +381,12 @@
             "command": "GOOS=darwin GOARCH=amd64 nx run @zitadel/api:pack-platform",
             "cache": true,
             "inputs": [
-                "pack"
+                "pack",
+                { "env": "ZITADEL_VERSION" }
             ],
             "outputs": [
-                "{workspaceRoot}/.artifacts/pack/zitadel-darwin-amd64.tar.gz"
+                "{workspaceRoot}/.artifacts/pack/zitadel-darwin-amd64.tar.gz",
+                "{workspaceRoot}/.artifacts/bin/darwin/amd64/zitadel"
             ]
         },
         "pack-darwin-arm64": {
@@ -392,10 +394,12 @@
             "command": "GOOS=darwin GOARCH=arm64 nx run @zitadel/api:pack-platform",
             "cache": true,
             "inputs": [
-                "pack"
+                "pack",
+                { "env": "ZITADEL_VERSION" }
             ],
             "outputs": [
-                "{workspaceRoot}/.artifacts/pack/zitadel-darwin-arm64.tar.gz"
+                "{workspaceRoot}/.artifacts/pack/zitadel-darwin-arm64.tar.gz",
+                "{workspaceRoot}/.artifacts/bin/darwin/arm64/zitadel"
             ]
         },
         "pack-linux-amd64": {
@@ -403,10 +407,12 @@
             "command": "GOOS=linux GOARCH=amd64 nx run @zitadel/api:pack-platform",
             "cache": true,
             "inputs": [
-                "pack"
+                "pack",
+                { "env": "ZITADEL_VERSION" }
             ],
             "outputs": [
-                "{workspaceRoot}/.artifacts/pack/zitadel-linux-amd64.tar.gz"
+                "{workspaceRoot}/.artifacts/pack/zitadel-linux-amd64.tar.gz",
+                "{workspaceRoot}/.artifacts/bin/linux/amd64/zitadel"
             ]
         },
         "pack-linux-arm64": {
@@ -414,10 +420,12 @@
             "command": "GOOS=linux GOARCH=arm64 nx run @zitadel/api:pack-platform",
             "cache": true,
             "inputs": [
-                "pack"
+                "pack",
+                { "env": "ZITADEL_VERSION" }
             ],
             "outputs": [
-                "{workspaceRoot}/.artifacts/pack/zitadel-linux-arm64.tar.gz"
+                "{workspaceRoot}/.artifacts/pack/zitadel-linux-arm64.tar.gz",
+                "{workspaceRoot}/.artifacts/bin/linux/arm64/zitadel"
             ]
         },
         "pack-windows-amd64": {
@@ -425,10 +433,12 @@
             "command": "GOOS=windows GOARCH=amd64 nx run @zitadel/api:pack-platform",
             "cache": true,
             "inputs": [
-                "pack"
+                "pack",
+                { "env": "ZITADEL_VERSION" }
             ],
             "outputs": [
-                "{workspaceRoot}/.artifacts/pack/zitadel-windows-amd64.tar.gz"
+                "{workspaceRoot}/.artifacts/pack/zitadel-windows-amd64.tar.gz",
+                "{workspaceRoot}/.artifacts/bin/windows/amd64/zitadel.exe"
             ]
         },
         "pack-windows-arm64": {
@@ -436,32 +446,13 @@
             "command": "GOOS=windows GOARCH=arm64 nx run @zitadel/api:pack-platform",
             "cache": true,
             "inputs": [
-                "pack"
+                "pack",
+                { "env": "ZITADEL_VERSION" }
             ],
             "outputs": [
-                "{workspaceRoot}/.artifacts/pack/zitadel-windows-arm64.tar.gz"
+                "{workspaceRoot}/.artifacts/pack/zitadel-windows-arm64.tar.gz",
+                "{workspaceRoot}/.artifacts/bin/windows/arm64/zitadel.exe"
             ]
-        },
-        "pack": {
-            "description": "Build and package executables for all platforms",
-            "dependsOn": [
-                "pack-linux-*",
-                "pack-darwin-*",
-                "pack-windows-*"
-            ],
-            "executor": "nx:run-commands",
-            "options": {
-                "parallel": false,
-                "commands": [
-                    "sha256sum .artifacts/pack/zitadel-*-*.tar.gz > .artifacts/pack/checksums.txt"
-                ]
-            },
-            "inputs": [
-                "{workspaceRoot}/.artifacts/pack/zitadel-*-*.tar.gz"
-            ],
-            "outputs": [
-                "{workspaceRoot}/.artifacts/pack/checksums.txt"
-            ]
-        }        
+        }
     }
 }

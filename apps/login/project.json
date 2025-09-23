@@ -115,6 +115,25 @@
         { "env": "API_MOCK_STUBS_URL" },
         { "env": "LOGIN_BASE_URL" }
       ]
+    },
+    "pack": {
+      "description": "Packages the Login application into an archive for distribution",
+      "executor": "nx:run-commands",
+      "options": {
+        "parallel": false,
+        "env": {
+          "STANDALONE_DIR": "{projectRoot}/.next/standalone",
+          "PACK_DIR": "{workspaceRoot}/.artifacts/pack"
+        },
+        "commands": [
+          "mkdir -p ${PACK_DIR}",
+          "tar -czvf ${PACK_DIR}/zitadel-login-standalone.tar.gz -C ${STANDALONE_DIR} ."
+        ]
+      },
+      "cache": true,
+      "outputs": [
+        "{workspaceRoot}/.artifacts/pack/zitadel-login-*.tar.gz"
+      ]
     }
   }
 }

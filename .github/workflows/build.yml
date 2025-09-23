@@ -35,9 +35,9 @@ jobs:
       semantic_version: "23.0.7"
       dry_run: true
 
-  container:
-    needs: check
-    uses: ./.github/workflows/container.yml
+  pack:
+    needs: version
+    uses: ./.github/workflows/pack.yml
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
     permissions:
@@ -49,8 +49,7 @@ jobs:
       image_name_google_api: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
       image_name_github_login: "ghcr.io/zitadel/zitadel-login"
       image_name_google_login: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel-login"
-      nx_cache_key: ${{ needs.check.outputs.nx_cache_key }}
-      nx_cache_path: ${{ needs.check.outputs.nx_cache_path }}
+      zitadel_version: ${{ needs.version.outputs.version }}
 
   release:
     uses: ./.github/workflows/release.yml
@@ -62,7 +61,7 @@ jobs:
     needs:
       - version
       - check
-      - container
+      - pack
     if: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}

@@ -6,11 +6,6 @@ on:
       node_version:
         required: true
         type: string
-    outputs:
-      nx_cache_key:
-        value: ${{ jobs.check.outputs.nx_cache_key }}
-      nx_cache_path:
-        value: ${{ jobs.check.outputs.nx_cache_path }}
     secrets:
       CODECOV_TOKEN:
         required: true
@@ -76,12 +71,12 @@ jobs:
         run: pnpm cypress install
         working-directory: apps/login
       - uses: nrwl/nx-set-shas@v4
-      - name: Lint, Build, Tests and Pack
-        run: nx affected --targets lint build test pack --exclude @zitadel/docs,@zitadel/benchmark,@zitadel/functional-ui
       - name: Test Functional UI Firefox
         run: nx affected tests-functional-ui:test-firefox
       - name: Test Functional UI Chrome
         run: nx affected tests-functional-ui:test-chrome
+      - name: Lint, Build, Tests and Pack
+        run: nx affected --targets lint build test --exclude @zitadel/docs,@zitadel/benchmark,@zitadel/functional-ui
       - uses: actions/cache/save@v4
         if: always()
         with:
@@ -101,11 +96,6 @@ jobs:
           name: api-test-integration
           flags: api-test-integration
           token: ${{ secrets.CODECOV_TOKEN }}
-      - name: Upload all platform artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: zitadel-binaries
-          path: zitadel-*-*.tar.gz
       - uses: actions/upload-artifact@v4
         if: failure() || cancelled()
         with:
