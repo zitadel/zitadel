@@ -88,31 +88,35 @@
         "^build"
       ]
     },
-    "test-integration-env": {
+    "test-integration-app": {
+      "description": "Runs the Login application under test",
       "dependsOn": [
-        "build",
-        "@zitadel/login-api-mock:build"
+        "build"
       ],
-      "description": "Run the integration tests with cypress",
-      "executor": "nx:run-commands",
       "continuous": true,
-      "options": {
-        "commands": [
-          "ZITADEL_API_URL=http://${DEVCONTAINER_LOGIN_API_MOCK_HOST:-localhost}:22222 ZITADEL_SERVICE_USER_TOKEN=none ZITADEL_SERVICE_USER_TOKEN_FILE=\"\" nx run @zitadel/login:prod --excludeTaskDependencies",
-          "nx run @zitadel/login-api-mock:serve --excludeTaskDependencies"
-        ]
-      }
+      "command": "nx run @zitadel/login:prod --excludeTaskDependencies"
     },
     "test-integration": {
-      "cache": true,
+      "description": "Runs integration tests using Cypress against a running Login and a mocked API",
       "dependsOn": [
-        "test-integration-env"
+        "test-integration-app",
+        "@zitadel/login-api-mock:build",
+        "@zitadel/login-api-mock:serve"
       ],
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "parallel": true,
+        "commands": [
+          "pnpm wait-on --verbose --interval 2000 --simultaneous 1 \"tcp:${API_MOCK_STUBS_HOST}:22220\" \"http-get://localhost:3000/ui/v2/login/verify?userId=221394658884845598&code=abc\" && DISPLAY='' pnpm cypress run --headless",
+          "nx run @zitadel/login-api-mock:down"
+        ]
+      },
+      "cache": true,
       "inputs": [
         "default",
         "{workspaceRoot}/pnpm-lock.yaml",
         "!{projectRoot}/acceptance/**/*",
-        { "env": "API_MOCK_STUBS_URL" },
         { "env": "LOGIN_BASE_URL" }
       ]
     },
