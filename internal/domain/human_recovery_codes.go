@@ -1,11 +1,13 @@
 package domain
 
 import (
+	"context"
 	"strings"
 
 	"github.com/google/uuid"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -82,13 +84,19 @@ func generateAlphanumericCode(length int, withHyphen bool) (string, error) {
 	return code, nil
 }
 
-func ValidateRecoveryCode(code string, recoveryCodes *HumanRecoveryCodes, hasher *crypto.Hasher) (string, error) {
+func ValidateRecoveryCode(ctx context.Context, code string, recoveryCodes *HumanRecoveryCodes, hasher *crypto.Hasher) (_ string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if code == "" {
 		return "", zerrors.ThrowInvalidArgument(nil, "DOMAIN-9xrr0", "Errors.User.MFA.RecoveryCodes.InvalidCode")
 	}
 
 	for _, recoveryCode := range recoveryCodes.Codes {
-		if _, verifyErr := hasher.Verify(recoveryCode, code); verifyErr != nil {
+		_, spanCodeComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
+		_, verifyErr := hasher.Verify(recoveryCode, code)
+		spanCodeComparison.EndWithError(verifyErr)
+		if verifyErr != nil {
 			continue
 		}
 		return recoveryCode, nil
