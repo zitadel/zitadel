@@ -20,7 +20,7 @@ func wrapError(err error) error {
 	if errors.Is(err, pgx.ErrTooManyRows) {
 		return database.NewMultipleRowsFoundError(err)
 	}
-	// scany does export its errors as strings only
+	// scany only exports its errors as strings
 	if strings.HasPrefix(err.Error(), "scany: expected 1 row, got: ") {
 		return database.NewMultipleRowsFoundError(err)
 	}
