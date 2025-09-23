@@ -23,6 +23,7 @@ import { getMostRecentSessionCookie, getSessionCookieById, getSessionCookieByLog
 import { getServiceUrlFromHeaders } from "../service-url";
 import { checkEmailVerification, checkUserVerification } from "../verify-helper";
 import { setSessionAndUpdateCookie } from "./cookie";
+import { getOriginalHost } from "./host";
 
 type VerifyPasskeyCommand = {
   passkeyId: string;
@@ -56,11 +57,7 @@ export async function registerPasskeyLink(
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
-
-  if (!host) {
-    throw new Error("Could not get domain");
-  }
+  const host = await getOriginalHost();
 
   const sessionCookie = await getSessionCookieById({ sessionId });
   const session = await getSession({

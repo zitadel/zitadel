@@ -13,16 +13,14 @@ import { completeFlowOrGetUrl } from "../client";
 import { getServiceUrlFromHeaders } from "../service-url";
 import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
+import { getOriginalHost } from "./host";
 
 export type RedirectToIdpState = { error?: string | null } | undefined;
 
 export async function redirectToIdp(prevState: RedirectToIdpState, formData: FormData): Promise<RedirectToIdpState> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
-  if (!host) {
-    return { error: "Could not get host" };
-  }
+  const host = await getOriginalHost();
 
   const params = new URLSearchParams();
 
@@ -88,7 +86,7 @@ async function startIDPFlow(command: StartIDPFlowCommand) {
   return { redirect: url };
 }
 
-type CreateNewSessionCommand = {
+export type CreateNewSessionCommand = {
   userId: string;
   idpIntent: {
     idpIntentId: string;
@@ -104,11 +102,6 @@ export async function createNewSessionFromIdpIntent(command: CreateNewSessionCom
   const _headers = await headers();
 
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
-
-  if (!host) {
-    return { error: "Could not get domain" };
-  }
 
   if (!command.userId || !command.idpIntent) {
     throw new Error("No userId or loginName provided");
@@ -160,19 +153,17 @@ export async function createNewSessionFromIdpIntent(command: CreateNewSessionCom
     }
   }
 
-  if (authMethods) {
-    const mfaFactorCheck = await checkMFAFactors(
-      serviceUrl,
-      session,
-      loginSettings,
-      authMethods,
-      command.organization,
-      command.requestId,
-    );
+  const mfaFactorCheck = await checkMFAFactors(
+    serviceUrl,
+    session,
+    loginSettings,
+    authMethods || [], // Pass empty array if no auth methods
+    command.organization,
+    command.requestId,
+  );
 
-    if (mfaFactorCheck?.redirect) {
-      return mfaFactorCheck;
-    }
+  if (mfaFactorCheck?.redirect) {
+    return mfaFactorCheck;
   }
 
   return completeFlowOrGetUrl(
@@ -201,11 +192,6 @@ export async function createNewSessionForLDAP(command: createNewSessionForLDAPCo
   const _headers = await headers();
 
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
-
-  if (!host) {
-    return { error: "Could not get domain" };
-  }
 
   if (!command.username || !command.password) {
     return { error: "No username or password provided" };
