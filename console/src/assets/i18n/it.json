@@ -2402,7 +2402,8 @@
       "1": "One Time Password per Authenticator App (TOTP)",
       "2": "Impronta digitale, chiave di sicurezza, Face ID e altri",
       "3": "One Time Password per Email (Email OTP)",
-      "4": "One Time Password per SMS (SMS OTP)"
+      "4": "One Time Password per SMS (SMS OTP)",
+      "5": "Codici di recupero"
     }
   },
   "LOGINPOLICY": {

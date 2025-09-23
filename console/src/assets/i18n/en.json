@@ -2427,7 +2427,8 @@
       "1": "One Time Password by Authenticator App (TOTP)",
       "2": "Fingerprint, Security Keys, Face ID and other",
       "3": "One Time Password by Email (Email OTP)",
-      "4": "One Time Password by SMS (SMS OTP)"
+      "4": "One Time Password by SMS (SMS OTP)",
+      "5": "Recovery Codes"
     }
   },
   "LOGINPOLICY": {

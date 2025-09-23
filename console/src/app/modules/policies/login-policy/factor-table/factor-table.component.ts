@@ -155,6 +155,7 @@ export class FactorTableComponent {
               SecondFactorType.SECOND_FACTOR_TYPE_OTP,
               SecondFactorType.SECOND_FACTOR_TYPE_OTP_SMS,
               SecondFactorType.SECOND_FACTOR_TYPE_OTP_EMAIL,
+              SecondFactorType.SECOND_FACTOR_TYPE_RECOVERY_CODES,
             ]
           : [];
 

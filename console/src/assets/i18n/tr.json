@@ -2426,7 +2426,8 @@
       "1": "Kimlik Doğrulayıcı Uygulama ile Tek Kullanımlık Şifre (TOTP)",
       "2": "Parmak izi, Güvenlik Anahtarları, Face ID ve diğerleri",
       "3": "E-posta ile Tek Kullanımlık Şifre (Email OTP)",
-      "4": "SMS ile Tek Kullanımlık Şifre (SMS OTP)"
+      "4": "SMS ile Tek Kullanımlık Şifre (SMS OTP)",
+      "5": "Kurtarma Kodları"
     }
   },
   "LOGINPOLICY": {

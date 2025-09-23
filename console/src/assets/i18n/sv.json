@@ -2426,7 +2426,8 @@
       "1": "Engångslösenord via autentiseringsapp (TOTP)",
       "2": "Fingeravtryck, säkerhetsnycklar, Face ID och andra",
       "3": "Engångslösenord via e-post (E-post OTP)",
-      "4": "Engångslösenord via SMS (SMS OTP)"
+      "4": "Engångslösenord via SMS (SMS OTP)",
+      "5": "Återställningskoder"
     }
   },
   "LOGINPOLICY": {

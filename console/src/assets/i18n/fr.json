@@ -2402,7 +2402,8 @@
       "1": "One Time Password via une application d'authentification (TOTP)",
       "2": "Empreinte digitale, clés de sécurité, Face ID et autres",
       "3": "One Time Password par e-mail (E-mail OTP)",
-      "4": "One Time Password par SMS (SMS OTP)"
+      "4": "One Time Password par SMS (SMS OTP)",
+      "5": "Codes de récupération"
     }
   },
   "LOGINPOLICY": {
