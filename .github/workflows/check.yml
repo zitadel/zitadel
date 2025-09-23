@@ -72,11 +72,11 @@ jobs:
         working-directory: apps/login
       - uses: nrwl/nx-set-shas@v4
       - name: Test Functional UI Firefox
-        run: nx affected --projects tests-functional-ui --targets test-firefox
+        run: nx run tests-functional-ui:test-firefox
       - name: Test Functional UI Chrome
-        run: nx affected --projects tests-functional-ui --targets test-chrome
+        run: nx run tests-functional-ui:test-chrome
       - name: Lint, Build, Tests and Pack
-        run: nx affected --targets lint build test --exclude @zitadel/docs,@zitadel/benchmark,@zitadel/functional-ui
+        run: nx affected --targets lint build test --exclude @zitadel/docs,@zitadel/benchmark
       - uses: actions/cache/save@v4
         if: always()
         with:
