@@ -90,24 +90,13 @@ func (p *instanceDomainRelationalProjection) reduceDomainPrimarySet(event events
 		}
 		domainRepo := repository.InstanceDomainRepository()
 
-		condition := database.And(
-			domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
-			domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),
-			domainRepo.TypeCondition(domain.DomainTypeCustom),
-		)
-
 		_, err := domainRepo.Update(ctx, v3_sql.SQLTx(tx),
-			condition,
+			database.And(
+				domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
+				domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),
+				domainRepo.TypeCondition(domain.DomainTypeCustom),
+			),
 			domainRepo.SetPrimary(),
-		)
-		if err != nil {
-			return err
-		}
-		// we need to split the update into two statements because multiple events can have the same creation date
-		// therefore we first do not set the updated_at timestamp
-		_, err = domainRepo.Update(ctx, v3_sql.SQLTx(tx),
-			condition,
-			domainRepo.SetUpdatedAt(e.CreationDate()),
 		)
 		return err
 	}), nil

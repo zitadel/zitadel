@@ -87,8 +87,11 @@ func (i instanceDomain) Update(ctx context.Context, client database.QueryExecuto
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}
-	var builder database.StatementBuilder
+	if !database.Changes(changes).IsOnColumn(i.UpdatedAtColumn()) {
+		changes = append(changes, database.NewChange(i.UpdatedAtColumn(), database.NullInstruction))
+	}
 
+	var builder database.StatementBuilder
 	builder.WriteString(`UPDATE zitadel.instance_domains SET `)
 	database.Changes(changes).Write(&builder)
 

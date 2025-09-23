@@ -17,7 +17,7 @@ import { create } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { cookies, headers } from "next/headers";
-import { getNextUrl } from "../client";
+import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
 import { getOrSetFingerprintId } from "../fingerprint";
 import { getServiceUrlFromHeaders } from "../service-url";
@@ -25,11 +25,7 @@ import { loadMostRecentSession } from "../session";
 import { checkMFAFactors } from "../verify-helper";
 import { createSessionAndUpdateCookie } from "./cookie";
 
-export async function verifyTOTP(
-  code: string,
-  loginName?: string,
-  organization?: string,
-) {
+export async function verifyTOTP(code: string, loginName?: string, organization?: string) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -104,8 +100,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   const user = userResponse.user;
 
   const sessionCookie = await getSessionCookieByLoginName({
-    loginName:
-      "loginName" in command ? command.loginName : user.preferredLoginName,
+    loginName: "loginName" in command ? command.loginName : user.preferredLoginName,
     organization: command.organization,
   }).catch((error) => {
     console.warn("Ignored error:", error); // checked later
@@ -134,11 +129,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   }
 
   // if no authmethods are found on the user, redirect to set one up
-  if (
-    authMethodResponse &&
-    authMethodResponse.authMethodTypes &&
-    authMethodResponse.authMethodTypes.length == 0
-  ) {
+  if (authMethodResponse && authMethodResponse.authMethodTypes && authMethodResponse.authMethodTypes.length == 0) {
     if (!sessionCookie) {
       const checks = create(ChecksSchema, {
         user: {
@@ -171,10 +162,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     const cookiesList = await cookies();
     const userAgentId = await getOrSetFingerprintId();
 
-    const verificationCheck = crypto
-      .createHash("sha256")
-      .update(`${user.userId}:${userAgentId}`)
-      .digest("hex");
+    const verificationCheck = crypto.createHash("sha256").update(`${user.userId}:${userAgentId}`).digest("hex");
 
     await cookiesList.set({
       name: "verificationCheck",
@@ -196,15 +184,10 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       verifySuccessParams.set("userId", command.userId);
     }
 
-    if (
-      ("loginName" in command && command.loginName) ||
-      user.preferredLoginName
-    ) {
+    if (("loginName" in command && command.loginName) || user.preferredLoginName) {
       verifySuccessParams.set(
         "loginName",
-        "loginName" in command && command.loginName
-          ? command.loginName
-          : user.preferredLoginName,
+        "loginName" in command && command.loginName ? command.loginName : user.preferredLoginName,
       );
     }
     if (command.requestId) {
@@ -238,28 +221,24 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
   // login user if no additional steps are required
   if (command.requestId && session.id) {
-    const nextUrl = await getNextUrl(
+    return completeFlowOrGetUrl(
       {
         sessionId: session.id,
         requestId: command.requestId,
-        organization:
-          command.organization ?? session.factors?.user?.organizationId,
+        organization: command.organization ?? session.factors?.user?.organizationId,
       },
       loginSettings?.defaultRedirectUri,
     );
-
-    return { redirect: nextUrl };
   }
 
-  const url = await getNextUrl(
+  // Regular flow - return URL for client-side navigation
+  return completeFlowOrGetUrl(
     {
       loginName: session.factors.user.loginName,
       organization: session.factors?.user?.organizationId,
     },
     loginSettings?.defaultRedirectUri,
   );
-
-  return { redirect: url };
 }
 
 type resendVerifyEmailCommand = {

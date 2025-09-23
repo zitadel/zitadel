@@ -96,13 +96,16 @@ func (o org) Create(ctx context.Context, client database.QueryExecutor, organiza
 
 // Update implements [domain.OrganizationRepository].
 func (o org) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	if !condition.IsRestrictingColumn(o.InstanceIDColumn()) {
-		return 0, database.NewMissingConditionError(o.InstanceIDColumn())
-	}
-
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}
+	if !condition.IsRestrictingColumn(o.InstanceIDColumn()) {
+		return 0, database.NewMissingConditionError(o.InstanceIDColumn())
+	}
+	if !database.Changes(changes).IsOnColumn(o.UpdatedAtColumn()) {
+		changes = append(changes, database.NewChange(o.UpdatedAtColumn(), database.NullInstruction))
+	}
+
 	var builder database.StatementBuilder
 	builder.WriteString(`UPDATE zitadel.organizations SET `)
 	database.Changes(changes).Write(&builder)
