@@ -11,9 +11,12 @@ import (
 //go:generate enumer -type OrgState -transform lower -trimprefix OrgState -sql
 type OrgState uint8
 
+// Must be in the same order and quantity as zitadel/org/v2/org.proto
 const (
-	OrgStateActive OrgState = iota
+	OrgStateUnspecified OrgState = iota
+	OrgStateActive
 	OrgStateInactive
+	OrgStateRemoved
 )
 
 type Organization struct {
