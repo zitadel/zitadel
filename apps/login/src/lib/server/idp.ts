@@ -11,7 +11,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { completeFlowOrGetUrl } from "../client";
 import { getServiceUrlFromHeaders } from "../service-url";
-import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
+import { checkMFAFactors } from "../verify-helper";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
 import { getOriginalHost } from "./host";
 

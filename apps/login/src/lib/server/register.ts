@@ -9,7 +9,6 @@ import { headers } from "next/headers";
 import { completeFlowOrGetUrl } from "../client";
 import { getServiceUrlFromHeaders } from "../service-url";
 import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
-import { getOriginalHost } from "./host";
 
 type RegisterUserCommand = {
   email: string;
