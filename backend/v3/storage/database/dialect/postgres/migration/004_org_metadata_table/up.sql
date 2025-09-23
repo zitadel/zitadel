@@ -24,5 +24,5 @@ CREATE INDEX idx_org_metadata_value ON zitadel.org_metadata (sha256(value));
 CREATE TRIGGER trg_set_updated_at_org_metadata
   BEFORE UPDATE ON zitadel.org_metadata
   FOR EACH ROW
-  WHEN (OLD.updated_at IS NOT DISTINCT FROM NEW.updated_at)
+  WHEN (NEW.updated_at IS NULL)
   EXECUTE FUNCTION zitadel.set_updated_at();

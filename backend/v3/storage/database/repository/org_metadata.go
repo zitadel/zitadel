@@ -74,7 +74,7 @@ func (o orgMetadata) Set(ctx context.Context, client database.QueryExecutor, met
 	var builder database.StatementBuilder
 	builder.WriteString(`INSERT INTO zitadel.org_metadata (instance_id, org_id, key, value, created_at, updated_at) VALUES `)
 	for i, m := range metadata {
-		var createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
+		var createdAt, updatedAt any = database.DefaultInstruction, database.NullInstruction
 		if !m.CreatedAt.IsZero() {
 			createdAt = m.CreatedAt
 		}
