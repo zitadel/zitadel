@@ -1,4 +1,4 @@
-name: CI
+name: ZITADEL CI/CD 
 
 on:
   push:
