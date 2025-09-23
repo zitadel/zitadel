@@ -159,14 +159,6 @@ func (i *LabelPolicyView) AppendEvent(event eventstore.Event) (err error) {
 	case instance.LabelPolicyActivatedEventType,
 		org.LabelPolicyActivatedEventType:
 		i.State = int32(domain.LabelPolicyStateActive)
-	case instance.LabelPolicyAssetsRemovedEventType,
-		org.LabelPolicyAssetsRemovedEventType:
-		i.LogoURL = ""
-		i.IconURL = ""
-		i.LogoDarkURL = ""
-		i.IconDarkURL = ""
-		i.FontURL = ""
-		i.State = int32(domain.LabelPolicyStatePreview)
 	}
 	return err
 }
