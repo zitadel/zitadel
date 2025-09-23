@@ -4,17 +4,26 @@ import (
 	"context"
 	"errors"
 
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
+	v2_org "github.com/zitadel/zitadel/pkg/grpc/org/v2"
 )
 
 type ListOrgsCommand struct {
 	Request *org.ListOrganizationsRequest
 
 	Result []*Organization
+}
+
+func NewListOrgsCommand(inputRequest *org.ListOrganizationsRequest) *ListOrgsCommand {
+	return &ListOrgsCommand{
+		Request: inputRequest,
+	}
 }
 
 // Events implements Commander.
@@ -40,7 +49,7 @@ func (l *ListOrgsCommand) Execute(ctx context.Context, opts *CommandOpts) (err e
 
 	sorting := l.Sorting(organizationRepo)
 	limit, pagination := l.Pagination()
-	conditions, condErr := l.Conditions(ctx, organizationRepo, domainRepo)
+	conditions, condErr := l.conditions(ctx, organizationRepo, domainRepo)
 	if condErr != nil {
 		err = condErr
 		return err
@@ -74,7 +83,7 @@ func (l *ListOrgsCommand) Pagination() (database.QueryOption, database.QueryOpti
 		database.WithOffset(uint32(l.Request.GetQuery().GetOffset()))
 }
 
-func (l *ListOrgsCommand) Conditions(ctx context.Context, orgRepo OrganizationRepository, domainRepo OrganizationDomainRepository) ([]database.QueryOption, error) {
+func (l *ListOrgsCommand) conditions(ctx context.Context, orgRepo OrganizationRepository, domainRepo OrganizationDomainRepository) ([]database.QueryOption, error) {
 	conditions := make([]database.QueryOption, len(l.Request.GetQueries()))
 	for i, query := range l.Request.GetQueries() {
 		switch assertedType := query.GetQuery().(type) {
@@ -148,3 +157,26 @@ func (l *ListOrgsCommand) Validate() (err error) {
 }
 
 var _ Commander = (*ListOrgsCommand)(nil)
+
+func (l *ListOrgsCommand) ResultToGRPC() []*v2_org.Organization {
+	toReturn := make([]*v2_org.Organization, len(l.Result))
+
+	for i, org := range l.Result {
+		toReturn[i] = l.orgToGRPC(org)
+	}
+
+	return toReturn
+}
+
+func (l *ListOrgsCommand) orgToGRPC(org *Organization) *v2_org.Organization {
+	return &v2_org.Organization{
+		Id: org.ID,
+		Details: &object.Details{
+			ChangeDate:   timestamppb.New(org.UpdatedAt),
+			CreationDate: timestamppb.New(org.CreatedAt),
+		},
+		State:         v2_org.OrganizationState(org.State),
+		Name:          org.Name,
+		PrimaryDomain: org.PrimaryDomain(),
+	}
+}

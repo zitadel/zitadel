@@ -123,3 +123,13 @@ type MemberRepository interface {
 	SetMemberRoles(ctx context.Context, orgID, userID string, roles []string) error
 	RemoveMember(ctx context.Context, orgID, userID string) error
 }
+
+func (o *Organization) PrimaryDomain() string {
+	for _, d := range o.Domains {
+		if d.IsPrimary {
+			return d.Domain
+		}
+	}
+
+	return ""
+}
