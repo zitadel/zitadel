@@ -1,5 +1,12 @@
 package database
 
+import (
+	"fmt"
+	"reflect"
+
+	"go.uber.org/mock/gomock"
+)
+
 type QueryOption func(opts *QueryOpts)
 
 // WithCondition sets the condition for the query.
@@ -101,6 +108,60 @@ type QueryOpts struct {
 	// It is used to build the JOIN clauses of the SQL statement.
 	Joins []join
 }
+
+// Matches implements gomock.Matcher.
+func (q *QueryOpts) Matches(x any) bool {
+	// Check if the optFunc can be converted to a QueryOption
+	optFunc, ok := x.(QueryOption)
+	if !ok {
+		return false
+	}
+
+	// QueryOption is a function that takes a *QueryOpts in input and fills it with its data.
+	// QueryOption data is not accessible because it's a function, so we exploit this "hack"
+	// to read the data.
+	inputOpts := &QueryOpts{}
+	optFunc(inputOpts)
+
+	// inputOpts now contains the actual data but made of other interfaces and functions/decorator.
+	// Doing a reflect.DeepEqual() will fail because you will endup into comparing functions
+	// which is not possible (comparison is successful only if both functions are nil).
+	// So we exploit the Write() method of QueryOpts to fill up the StatementBuilders:
+	// these objects are basically string builders, so we can leverage their String()
+	// method (implementing Stringer interface) to make an easy and safe comparison.
+	inputBuilder, expectedBuilder := &StatementBuilder{}, &StatementBuilder{}
+	inputOpts.Write(inputBuilder)
+	q.Write(expectedBuilder)
+
+	if len(inputBuilder.Args()) != len(expectedBuilder.Args()) {
+		return false
+	}
+
+	for i := range inputBuilder.Args() {
+		argIn, argExp := inputBuilder.Args()[i], expectedBuilder.Args()[i]
+
+		isEqual := reflect.DeepEqual(argIn, argExp)
+		if !isEqual {
+			return false
+		}
+	}
+	return inputBuilder.String() == expectedBuilder.String()
+}
+
+// String implements gomock.Matcher.
+func (q *QueryOpts) String() string {
+	return fmt.Sprintf("QueryOpts: {%v,%v,%v,%v,%v,%v,%v}\n",
+		q.Condition,
+		q.OrderBy,
+		q.Ordering,
+		q.Limit,
+		q.Offset,
+		q.GroupBy,
+		q.Joins,
+	)
+}
+
+var _ (gomock.Matcher) = (*QueryOpts)(nil)
 
 func (opts *QueryOpts) Write(builder *StatementBuilder) {
 	opts.WriteLeftJoins(builder)
