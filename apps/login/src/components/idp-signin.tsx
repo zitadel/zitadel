@@ -26,10 +26,9 @@ export function IdpSignin({ userId, idpIntent: { idpIntentId, idpIntentToken }, 
   useEffect(() => {
     // Prevent double execution in React Strict Mode
     if (executedRef.current) {
-      console.log("IdpSignin useEffect already executed, skipping");
       return;
     }
-
+    
     executedRef.current = true;
     let request: CreateNewSessionCommand = {
       userId,
