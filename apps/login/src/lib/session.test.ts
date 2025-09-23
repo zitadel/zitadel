@@ -229,15 +229,21 @@ describe("isSessionValid", () => {
         },
       });
 
+      vi.mocked(zitadelModule.listAuthenticationMethodTypes).mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD, AuthenticationMethodType.TOTP],
+      } as any);
+
       vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
         forceMfa: true,
         forceMfaLocalOnly: false,
       } as any);
 
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(true);
+
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
 
       expect(result).toBe(false);
-      expect(consoleSpy).toHaveBeenCalledWith("Session has no valid multifactor", expect.any(Object));
+      expect(consoleSpy).toHaveBeenCalledWith("Session has no valid MFA factor. Configured methods:", expect.any(Array), "Session factors:", expect.any(Object));
       consoleSpy.mockRestore();
     });
 
@@ -357,6 +363,8 @@ describe("isSessionValid", () => {
         forceMfaLocalOnly: false,
       } as any);
 
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(false);
+
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
 
       expect(result).toBe(true);
@@ -391,6 +399,8 @@ describe("isSessionValid", () => {
         forceMfa: false,
         forceMfaLocalOnly: false,
       } as any);
+
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(false);
 
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
 
@@ -427,6 +437,8 @@ describe("isSessionValid", () => {
       vi.mocked(zitadelModule.listAuthenticationMethodTypes).mockResolvedValue({
         authMethodTypes: [AuthenticationMethodType.TOTP],
       } as any);
+
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(true);
 
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
 
@@ -478,6 +490,8 @@ describe("isSessionValid", () => {
         forceMfaLocalOnly: false,
       } as any);
 
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(false);
+
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
 
       // This should be true - if it's false, the original bug still exists
@@ -516,6 +530,8 @@ describe("isSessionValid", () => {
         forceMfaLocalOnly: false,
       } as any);
 
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(false);
+
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
 
       // With our fix, this should be true (session is valid)
@@ -551,6 +567,8 @@ describe("isSessionValid", () => {
         forceMfaLocalOnly: false,
       } as any);
 
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(false);
+
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
 
       expect(result).toBe(true);
@@ -583,6 +601,8 @@ describe("isSessionValid", () => {
         forceMfa: true,
         forceMfaLocalOnly: false,
       } as any);
+
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(true);
 
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
 
@@ -687,6 +707,8 @@ describe("isSessionValid", () => {
         forceMfaLocalOnly: true,
       } as any);
 
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(true);
+
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
 
       expect(result).toBe(false);
@@ -731,6 +753,8 @@ describe("isSessionValid", () => {
         forceMfa: false,
         forceMfaLocalOnly: false,
       } as any);
+
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(false);
 
       vi.mocked(zitadelModule.getUserByID).mockResolvedValue({
         user: {
@@ -784,6 +808,8 @@ describe("isSessionValid", () => {
         forceMfaLocalOnly: false,
       } as any);
 
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(false);
+
       vi.mocked(zitadelModule.getUserByID).mockResolvedValue({
         user: {
           type: {
@@ -830,6 +856,8 @@ describe("isSessionValid", () => {
         forceMfa: false,
         forceMfaLocalOnly: false,
       } as any);
+
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(false);
 
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
 
