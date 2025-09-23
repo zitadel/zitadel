@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  nx_version: 21.5.2
+  nx_version: "21.5.2"
 
 jobs:
   CodeQL-Build:
@@ -40,6 +40,7 @@ jobs:
       uses: pnpm/action-setup@v4
     - if: matrix.language == 'go'    
       run: |
+        pnpm install --frozen-lockfile
         pnpm add --global nx@${{ env.nx_version }} sass
         nx run-many --projects @zitadel/api --targets generate-stubs generate-statik generate-assets
     # Initializes the CodeQL tools for scanning.
