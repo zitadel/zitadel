@@ -277,6 +277,9 @@ func (wm *SessionWriteModel) AuthMethodTypes() []domain.UserAuthMethodType {
 	if !wm.OTPEmailCheckedAt.IsZero() {
 		types = append(types, domain.UserAuthMethodTypeOTPEmail)
 	}
+	if !wm.RecoveryCodeCheckedAt.IsZero() {
+		types = append(types, domain.UserAuthMethodTypeRecoveryCode)
+	}
 	return types
 }
 
