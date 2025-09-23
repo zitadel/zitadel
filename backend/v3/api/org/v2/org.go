@@ -6,8 +6,11 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/backend/v3/api/org/v2/convert"
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
+	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	v2_org "github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
@@ -53,6 +56,8 @@ func UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org
 	// TODO(IAM-Marco) Check if passing the pointer is actually working to retrieve the domain name and the DomainVerified
 	domainRemoveCmd := domain.NewRemoveOrgDomainCommand(request.Msg.GetId(), orgUpdtCmd.OldDomainName, orgUpdtCmd.IsOldDomainVerified)
 
+	// TODO(IAM-Marco): I noticed while debugging that this is calling twice the commands (I think?)
+	// It's hard to debug, I haven't spent too much into it. Only drawback is pushing events twice.
 	batchCmd := domain.BatchCommands(orgUpdtCmd, domainAddCmd, domainSetPrimaryCmd, domainRemoveCmd)
 
 	err := domain.Invoke(ctx, batchCmd, domain.WithOrganizationRepo(repository.OrganizationRepository))
@@ -62,7 +67,7 @@ func UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org
 
 	return &connect.Response[v2beta_org.UpdateOrganizationResponse]{
 		Msg: &v2beta_org.UpdateOrganizationResponse{
-			// TODO(IAM-Marco) Change this with the real update date when OrganizationRepo.Update()
+			// TODO(IAM-Marco): Change this with the real update date when OrganizationRepo.Update()
 			// returns the timestamp
 			ChangeDate: timestamppb.Now(),
 		},
@@ -77,9 +82,36 @@ func ListOrganizations(ctx context.Context, request *connect.Request[v2_org.List
 		return nil, err
 	}
 
+	orgs := orgListCmd.ResultToGRPC()
 	return &connect.Response[v2_org.ListOrganizationsResponse]{
 		Msg: &v2_org.ListOrganizationsResponse{
 			Result: orgListCmd.ResultToGRPC(),
+			Details: &object.ListDetails{
+				// TODO(IAM-Marco): Return correct result once permissions are in place
+				TotalResult: uint64(len(orgs)),
+			},
+			SortingColumn: request.Msg.GetSortingColumn(),
+		},
+	}, nil
+}
+
+// TODO(IAM-Marco): Remove in V5
+func ListOrganizationsBeta(ctx context.Context, request *connect.Request[v2beta_org.ListOrganizationsRequest]) (*connect.Response[v2beta_org.ListOrganizationsResponse], error) {
+	orgListCmd := domain.NewListOrgsCommand(convert.OrganizationBetaRequestToV2Request(request.Msg))
+
+	err := domain.Invoke(ctx, orgListCmd)
+	if err != nil {
+		return nil, err
+	}
+
+	orgs := orgListCmd.ResultToGRPCBeta()
+	return &connect.Response[v2beta_org.ListOrganizationsResponse]{
+		Msg: &v2beta_org.ListOrganizationsResponse{
+			Organizations: orgs,
+			Pagination: &filter.PaginationResponse{
+				TotalResult:  uint64(len(orgs)),
+				AppliedLimit: uint64(request.Msg.GetPagination().GetLimit()),
+			},
 		},
 	}, nil
 }

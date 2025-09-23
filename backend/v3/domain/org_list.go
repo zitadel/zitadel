@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	v2_org "github.com/zitadel/zitadel/pkg/grpc/org/v2"
+	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
 type ListOrgsCommand struct {
@@ -176,6 +177,30 @@ func (l *ListOrgsCommand) orgToGRPC(org *Organization) *v2_org.Organization {
 			CreationDate: timestamppb.New(org.CreatedAt),
 		},
 		State:         v2_org.OrganizationState(org.State),
+		Name:          org.Name,
+		PrimaryDomain: org.PrimaryDomain(),
+	}
+}
+
+// TODO(IAM-Marco): Remove in V5
+func (l *ListOrgsCommand) ResultToGRPCBeta() []*v2beta_org.Organization {
+	toReturn := make([]*v2beta_org.Organization, len(l.Result))
+
+	for i, org := range l.Result {
+		toReturn[i] = l.orgToGRPCBeta(org)
+	}
+
+	return toReturn
+}
+
+// TODO(IAM-Marco): Remove in V5
+func (l *ListOrgsCommand) orgToGRPCBeta(org *Organization) *v2beta_org.Organization {
+	return &v2beta_org.Organization{
+		Id:           org.ID,
+		ChangedDate:  timestamppb.New(org.UpdatedAt),
+		CreationDate: timestamppb.New(org.CreatedAt),
+
+		State:         v2beta_org.OrgState(org.State),
 		Name:          org.Name,
 		PrimaryDomain: org.PrimaryDomain(),
 	}
