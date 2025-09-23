@@ -68,7 +68,9 @@ export async function skipMFAAndContinueWithNextUrl({
   return { error: "Could not skip MFA and continue" };
 }
 
-export async function continueWithSession({ requestId, ...session }: Session & { requestId?: string }) {
+export type ContinueWithSessionCommand = Session & { requestId?: string };
+
+export async function continueWithSession({ requestId, ...session }: ContinueWithSessionCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
