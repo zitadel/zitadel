@@ -20,7 +20,7 @@ import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings
 import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType, SetPasswordRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
-import { getNextUrl } from "../client";
+import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
 import { getServiceUrlFromHeaders } from "../service-url";
 import { getOriginalHostWithProtocol } from "./host";
@@ -74,7 +74,7 @@ export type UpdateSessionCommand = {
   requestId?: string;
 };
 
-export async function sendPassword(command: UpdateSessionCommand) {
+export async function sendPassword(command: UpdateSessionCommand): Promise<{ error: string } | { redirect: string }> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -132,10 +132,10 @@ export async function sendPassword(command: UpdateSessionCommand) {
         }
         return { error: "Could not create session for user" };
       }
+    } else {
+      // this is a fake error message to hide that the user does not even exist
+      return { error: "Could not verify password" };
     }
-
-    // this is a fake error message to hide that the user does not even exist
-    return { error: "Could not verify password" };
   } else {
     loginSettings = await getLoginSettings({
       serviceUrl,
@@ -204,7 +204,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
     });
   }
 
-  if (!session?.factors?.user?.id || !sessionCookie) {
+  if (!session?.factors?.user?.id) {
     return { error: "Could not create session for user" };
   }
 
@@ -270,7 +270,9 @@ export async function sendPassword(command: UpdateSessionCommand) {
   }
 
   if (command.requestId && session.id) {
-    const nextUrl = await getNextUrl(
+    // OIDC/SAML flow - use completeFlowOrGetUrl for proper handling
+    console.log("Password auth: OIDC/SAML flow with requestId:", command.requestId, "sessionId:", session.id);
+    const result = await completeFlowOrGetUrl(
       {
         sessionId: session.id,
         requestId: command.requestId,
@@ -278,19 +280,35 @@ export async function sendPassword(command: UpdateSessionCommand) {
       },
       loginSettings?.defaultRedirectUri,
     );
+    console.log("Password auth: OIDC/SAML flow result:", result);
 
-    return { redirect: nextUrl };
+    // Safety net - ensure we always return a valid object
+    if (!result || typeof result !== "object" || (!("redirect" in result) && !("error" in result))) {
+      console.error("Password auth: Invalid result from completeFlowOrGetUrl (OIDC/SAML):", result);
+      return { error: "Authentication completed but navigation failed" };
+    }
+
+    return result;
   }
 
-  const url = await getNextUrl(
+  // Regular flow (no requestId) - return URL for client-side navigation
+  console.log("Password auth: Regular flow with loginName:", session.factors.user.loginName);
+  const result = await completeFlowOrGetUrl(
     {
       loginName: session.factors.user.loginName,
       organization: session.factors?.user?.organizationId,
     },
     loginSettings?.defaultRedirectUri,
   );
+  console.log("Password auth: Regular flow result:", result);
 
-  return { redirect: url };
+  // Safety net - ensure we always return a valid object
+  if (!result || typeof result !== "object" || (!("redirect" in result) && !("error" in result))) {
+    console.error("Password auth: Invalid result from completeFlowOrGetUrl:", result);
+    return { error: "Authentication completed but navigation failed" };
+  }
+
+  return result;
 }
 
 // this function lets users with code set a password or users with valid User Verification Check

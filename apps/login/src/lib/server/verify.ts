@@ -17,7 +17,7 @@ import { create } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { cookies, headers } from "next/headers";
-import { getNextUrl } from "../client";
+import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
 import { getOrSetFingerprintId } from "../fingerprint";
 import { getServiceUrlFromHeaders } from "../service-url";
@@ -222,7 +222,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
   // login user if no additional steps are required
   if (command.requestId && session.id) {
-    const nextUrl = await getNextUrl(
+    return completeFlowOrGetUrl(
       {
         sessionId: session.id,
         requestId: command.requestId,
@@ -230,19 +230,16 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       },
       loginSettings?.defaultRedirectUri,
     );
-
-    return { redirect: nextUrl };
   }
 
-  const url = await getNextUrl(
+  // Regular flow - return URL for client-side navigation
+  return completeFlowOrGetUrl(
     {
       loginName: session.factors.user.loginName,
       organization: session.factors?.user?.organizationId,
     },
     loginSettings?.defaultRedirectUri,
   );
-
-  return { redirect: url };
 }
 
 type resendVerifyEmailCommand = {

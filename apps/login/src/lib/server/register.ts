@@ -6,7 +6,7 @@ import { create } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksJson, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
-import { getNextUrl } from "../client";
+import { completeFlowOrGetUrl } from "../client";
 import { getServiceUrlFromHeaders } from "../service-url";
 import { checkEmailVerification } from "../verify-helper";
 import { getOriginalHost } from "./host";
@@ -104,7 +104,7 @@ export async function registerUser(command: RegisterUserCommand) {
       return emailVerificationCheck;
     }
 
-    const url = await getNextUrl(
+    return completeFlowOrGetUrl(
       command.requestId && session.id
         ? {
             sessionId: session.id,
@@ -117,8 +117,6 @@ export async function registerUser(command: RegisterUserCommand) {
           },
       loginSettings?.defaultRedirectUri,
     );
-
-    return { redirect: url };
   }
 }
 
@@ -188,7 +186,7 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
     return { error: "Could not create session" };
   }
 
-  const url = await getNextUrl(
+  return completeFlowOrGetUrl(
     command.requestId && session.id
       ? {
           sessionId: session.id,
@@ -201,6 +199,4 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
         },
     loginSettings?.defaultRedirectUri,
   );
-
-  return { redirect: url };
 }

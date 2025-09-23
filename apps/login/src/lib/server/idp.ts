@@ -1,11 +1,17 @@
 "use server";
 
-import { getLoginSettings, getUserByID, startIdentityProviderFlow, startLDAPIdentityProviderFlow } from "@/lib/zitadel";
+import {
+  getLoginSettings,
+  getUserByID,
+  listAuthenticationMethodTypes,
+  startIdentityProviderFlow,
+  startLDAPIdentityProviderFlow,
+} from "@/lib/zitadel";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { getNextUrl } from "../client";
+import { completeFlowOrGetUrl } from "../client";
 import { getServiceUrlFromHeaders } from "../service-url";
-import { checkEmailVerification } from "../verify-helper";
+import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
 import { getOriginalHost } from "./host";
 
@@ -136,13 +142,34 @@ export async function createNewSessionFromIdpIntent(command: CreateNewSessionCom
     return emailVerificationCheck;
   }
 
-  // TODO: check if user has MFA methods
-  // const mfaFactorCheck = checkMFAFactors(session, loginSettings, authMethods, organization, requestId);
-  // if (mfaFactorCheck?.redirect) {
-  //   return mfaFactorCheck;
-  // }
+  // check if user has MFA methods
+  let authMethods;
+  if (session.factors?.user?.id) {
+    const response = await listAuthenticationMethodTypes({
+      serviceUrl,
+      userId: session.factors.user.id,
+    });
+    if (response.authMethodTypes && response.authMethodTypes.length) {
+      authMethods = response.authMethodTypes;
+    }
+  }
 
-  const url = await getNextUrl(
+  if (authMethods) {
+    const mfaFactorCheck = await checkMFAFactors(
+      serviceUrl,
+      session,
+      loginSettings,
+      authMethods,
+      command.organization,
+      command.requestId,
+    );
+
+    if (mfaFactorCheck?.redirect) {
+      return mfaFactorCheck;
+    }
+  }
+
+  return completeFlowOrGetUrl(
     command.requestId && session.id
       ? {
           sessionId: session.id,
@@ -155,10 +182,6 @@ export async function createNewSessionFromIdpIntent(command: CreateNewSessionCom
         },
     loginSettings?.defaultRedirectUri,
   );
-
-  if (url) {
-    return { redirect: url };
-  }
 }
 
 type createNewSessionForLDAPCommand = {
