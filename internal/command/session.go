@@ -34,7 +34,6 @@ type SessionCommands struct {
 	eventCommands     []eventstore.Command
 
 	hasher               *crypto.Hasher
-	secretHasher         *crypto.Hasher
 	intentAlg            crypto.EncryptionAlgorithm
 	totpAlg              crypto.EncryptionAlgorithm
 	otpAlg               crypto.EncryptionAlgorithm
