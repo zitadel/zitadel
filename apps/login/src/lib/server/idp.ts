@@ -154,19 +154,19 @@ export async function createNewSessionFromIdpIntent(command: CreateNewSessionCom
     }
   }
 
-  if (authMethods) {
-    const mfaFactorCheck = await checkMFAFactors(
-      serviceUrl,
-      session,
-      loginSettings,
-      authMethods,
-      command.organization,
-      command.requestId,
-    );
+  // Always check MFA factors, even if no auth methods are configured
+  // This ensures that force MFA settings are respected
+  const mfaFactorCheck = await checkMFAFactors(
+    serviceUrl,
+    session,
+    loginSettings,
+    authMethods || [], // Pass empty array if no auth methods
+    command.organization,
+    command.requestId,
+  );
 
-    if (mfaFactorCheck?.redirect) {
-      return mfaFactorCheck;
-    }
+  if (mfaFactorCheck?.redirect) {
+    return mfaFactorCheck;
   }
 
   return completeFlowOrGetUrl(

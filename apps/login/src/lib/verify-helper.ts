@@ -143,7 +143,7 @@ export async function checkMFAFactors(
     }
 
     return { redirect: `/mfa?` + params };
-  } else if ((loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly) && !availableMultiFactors.length) {
+  } else if (shouldEnforceMFA(session, loginSettings) && !availableMultiFactors.length) {
     const params = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,
       force: "true", // this defines if the mfa is forced in the settings
@@ -164,7 +164,8 @@ export async function checkMFAFactors(
     loginSettings?.mfaInitSkipLifetime &&
     (loginSettings.mfaInitSkipLifetime.nanos > 0 || loginSettings.mfaInitSkipLifetime.seconds > 0) &&
     !availableMultiFactors.length &&
-    session?.factors?.user?.id
+    session?.factors?.user?.id &&
+    shouldEnforceMFA(session, loginSettings)
   ) {
     const userResponse = await getUserByID({
       serviceUrl,
@@ -207,6 +208,52 @@ export async function checkMFAFactors(
     // TODO: provide a way to setup passkeys on mfa page?
     return { redirect: `/mfa/set?` + params };
   }
+}
+
+/**
+ * Determines if MFA should be enforced based on the authentication method used and login settings
+ * @param session - The current session
+ * @param loginSettings - The login settings containing MFA enforcement rules
+ * @returns true if MFA should be enforced, false otherwise
+ */
+export function shouldEnforceMFA(session: Session, loginSettings: LoginSettings | undefined): boolean {
+  if (!loginSettings) {
+    return false;
+  }
+
+  // Check if user authenticated with passkey (passkeys are inherently multi-factor)
+  const authenticatedWithPasskey = session.factors?.webAuthN?.verifiedAt && session.factors?.webAuthN?.userVerified;
+
+  // If user authenticated with passkey, MFA is not required regardless of settings
+  if (authenticatedWithPasskey) {
+    return false;
+  }
+
+  // If forceMfa is enabled, MFA is required for ALL authentication methods (except passkeys)
+  if (loginSettings.forceMfa) {
+    return true;
+  }
+
+  // If forceMfaLocalOnly is enabled, MFA is only required for local/password authentication
+  if (loginSettings.forceMfaLocalOnly) {
+    // Check if user authenticated with password (local authentication)
+    const authenticatedWithPassword = !!session.factors?.password?.verifiedAt;
+
+    // Check if user authenticated with IDP (external authentication)
+    const authenticatedWithIDP = !!session.factors?.intent?.verifiedAt;
+
+    // If user authenticated with IDP, MFA is not required for forceMfaLocalOnly
+    if (authenticatedWithIDP) {
+      return false;
+    }
+
+    // If user authenticated with password, MFA is required for forceMfaLocalOnly
+    if (authenticatedWithPassword) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 export async function checkUserVerification(userId: string): Promise<boolean> {
