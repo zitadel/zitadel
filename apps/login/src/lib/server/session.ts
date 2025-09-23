@@ -21,6 +21,7 @@ import {
   removeSessionFromCookie,
 } from "../cookies";
 import { getServiceUrlFromHeaders } from "../service-url";
+import { getOriginalHost } from "./host";
 
 export async function skipMFAAndContinueWithNextUrl({
   userId,
@@ -67,7 +68,9 @@ export async function skipMFAAndContinueWithNextUrl({
   return { error: "Could not skip MFA and continue" };
 }
 
-export async function continueWithSession({ requestId, ...session }: Session & { requestId?: string }) {
+export type ContinueWithSessionCommand = Session & { requestId?: string };
+
+export async function continueWithSession({ requestId, ...session }: ContinueWithSessionCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -122,7 +125,7 @@ export async function updateSession(options: UpdateSessionCommand) {
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
+  const host = await getOriginalHost();
 
   if (!host) {
     return { error: "Could not get host" };
