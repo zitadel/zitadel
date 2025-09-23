@@ -20,17 +20,12 @@ permissions:
   pull-requests: write
   actions: write
 
-env:
-  nx_version: "21.5.2"
-  node_version: "22"
-  semantic_version: "23.0.7"
-
 jobs:
   check:
     uses: ./.github/workflows/check.yml
     with:
-      node_version: ${{ env.node_version }}
-      nx_version: ${{ env.nx_version }}
+      node_version: "22"
+      nx_version: "21.5.2"
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -38,7 +33,7 @@ jobs:
     uses: ./.github/workflows/version.yml
     if: ${{ github.event_name == 'workflow_dispatch' }}
     with:
-      semantic_version: ${{ env.semantic_version }}
+      semantic_version: "23.0.7"
       dry_run: true
 
   pack:
@@ -50,8 +45,8 @@ jobs:
       packages: write
     if: ${{ github.event_name == 'workflow_dispatch' }}
     with:
-      node_version: ${{ env.node_version }}
-      nx_version: ${{ env.nx_version }}
+      node_version: "22"
+      nx_version: "21.5.2"
       zitadel_version: ${{ needs.version.outputs.version }}
       image_name_github_api: "ghcr.io/zitadel/zitadel"
       image_name_google_api: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
@@ -75,7 +70,7 @@ jobs:
       APP_ID: ${{ secrets.APP_ID }}
       APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
     with:
-      semantic_version: ${{ env.semantic_version }}
+      semantic_version: "23.0.7"
       image_name_github_api: "ghcr.io/zitadel/zitadel"
       image_name_google_api: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
       image_name_github_login: "ghcr.io/zitadel/zitadel-login"
