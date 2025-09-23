@@ -106,7 +106,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
-        "parallel": true,
+        "parallel": false,
         "commands": [
           "pnpm wait-on --verbose --interval 2000 --simultaneous 1 \"tcp:${API_MOCK_STUBS_HOST}:22220\" \"http-get://localhost:3000/ui/v2/login/verify?userId=221394658884845598&code=abc\" && DISPLAY='' pnpm cypress run --headless",
           "nx run @zitadel/login-api-mock:down"
