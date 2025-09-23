@@ -6,6 +6,9 @@
             "type": "go",
             "request": "launch",
             "mode": "debug",
+            "env": {
+                "ZITADEL_DATABASE_POSTGRES_HOST": "${env:DEVCONTAINER_DB_HOST}"
+            },
             "program": "main.go",
             "args": [
                  "start-from-init", "--config", "${workspaceFolder}/apps/api/dev.yaml", "--steps", "${workspaceFolder}/apps/api/dev.yaml", "--masterkey", "MasterkeyNeedsToHave32Characters"
