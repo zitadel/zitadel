@@ -89,6 +89,14 @@ export async function checkMFAFactors(
   organization?: string,
   requestId?: string,
 ) {
+  console.log("checkMFAFactors called with session:", {
+    sessionId: session.id,
+    userId: session.factors?.user?.id,
+    loginName: session.factors?.user?.loginName,
+    hasIntentFactor: !!session.factors?.intent?.verifiedAt,
+    hasPasswordFactor: !!session.factors?.password?.verifiedAt,
+    hasWebAuthNFactor: !!session.factors?.webAuthN?.verifiedAt,
+  });
   const availableMultiFactors = authMethods?.filter(
     (m: AuthenticationMethodType) =>
       m === AuthenticationMethodType.TOTP ||
@@ -150,6 +158,10 @@ export async function checkMFAFactors(
       checkAfter: "true", // this defines if the check is directly made after the setup
     });
 
+    if (session.id) {
+      params.append("sessionId", session.id);
+    }
+
     if (requestId) {
       params.append("requestId", requestId);
     }
@@ -196,6 +208,10 @@ export async function checkMFAFactors(
       force: "false", // this defines if the mfa is not forced in the settings and can be skipped
       checkAfter: "true", // this defines if the check is directly made after the setup
     });
+
+    if (session.id) {
+      params.append("sessionId", session.id);
+    }
 
     if (requestId) {
       params.append("requestId", requestId);

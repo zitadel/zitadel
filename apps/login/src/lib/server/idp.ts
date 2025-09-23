@@ -86,7 +86,7 @@ async function startIDPFlow(command: StartIDPFlowCommand) {
   return { redirect: url };
 }
 
-type CreateNewSessionCommand = {
+export type CreateNewSessionCommand = {
   userId: string;
   idpIntent: {
     idpIntentId: string;
