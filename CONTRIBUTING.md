@@ -68,7 +68,7 @@ In another terminal, start the Login development server
 nx run @zitadel/login:dev
 ```
 
-Visit http://localhost:8080/ui/v2/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
+Visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
 
 Make some changes to the source code and see how the browser is automatically updated.
 
@@ -76,10 +76,10 @@ For more options, go to the [Login section](#login)
 
 ### <a name="console-quick-start"></a>Console
 
-Develop the Console and connect a local API with a local DB:
+Develop the Console and connect a local API with a local Login and DB:
 
 ```bash
-nx run-many -p . @zitadel/api -t db prod
+nx run-many -p . @zitadel/api @zitadel/login -t db prod
 ```
 
 In another terminal, start the console development server

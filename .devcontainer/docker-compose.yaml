@@ -10,6 +10,7 @@ services:
     command: sleep infinity
     working_dir: /workspaces/zitadel
     environment:
+      DEVCONTAINER_LISTEN_HOST: 0.0.0.0
       DEVCONTAINER_DB_HOST: db
       DEVCONTAINER_API_HOST: api
       DEVCONTAINER_LOGIN_HOST: login
