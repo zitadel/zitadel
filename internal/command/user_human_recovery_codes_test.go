@@ -27,7 +27,7 @@ func TestCommands_ImportHumanRecoveryCodes(t *testing.T) {
 		ctx           context.Context
 		userID        string
 		resourceOwner string
-		codes         []string
+		codes         []domain.ImportHumanRecoveryCode
 	}
 	tests := []struct {
 		name    string
@@ -46,7 +46,10 @@ func TestCommands_ImportHumanRecoveryCodes(t *testing.T) {
 				ctx:           ctx,
 				userID:        "user1",
 				resourceOwner: "org1",
-				codes:         []string{"code1", "code2"},
+				codes: []domain.ImportHumanRecoveryCode{
+					{RawCode: "code1"},
+					{RawCode: "code2"},
+				},
 			},
 			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-uXHNj", "Errors.User.NotFound"),
 		},
@@ -92,7 +95,10 @@ func TestCommands_ImportHumanRecoveryCodes(t *testing.T) {
 				ctx:           ctx,
 				userID:        "user1",
 				resourceOwner: "org1",
-				codes:         []string{"code1", "code2"},
+				codes: []domain.ImportHumanRecoveryCode{
+					{RawCode: "code1"},
+					{RawCode: "code2"},
+				},
 			},
 		},
 		{
@@ -104,7 +110,7 @@ func TestCommands_ImportHumanRecoveryCodes(t *testing.T) {
 				ctx:           ctx,
 				userID:        "user1",
 				resourceOwner: "org1",
-				codes:         []string{},
+				codes:         []domain.ImportHumanRecoveryCode{},
 			},
 			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-vee93", "Errors.User.MFA.RecoveryCodes.CountInvalid"),
 		},
@@ -143,7 +149,11 @@ func TestCommands_ImportHumanRecoveryCodes(t *testing.T) {
 				ctx:           ctx,
 				userID:        "user1",
 				resourceOwner: "org1",
-				codes:         []string{"code9", "code10", "code11"}, // 8 existing + 3 new = 11 > max 10
+				codes: []domain.ImportHumanRecoveryCode{ // 8 existing + 3 new = 11 > max 10
+					{RawCode: "code9"},
+					{RawCode: "code10"},
+					{RawCode: "code11"},
+				},
 			},
 			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-53cjw", "Errors.User.MFA.RecoveryCodes.MaxCountExceeded"),
 		},
@@ -181,7 +191,10 @@ func TestCommands_ImportHumanRecoveryCodes(t *testing.T) {
 				ctx:           ctx,
 				userID:        "user1",
 				resourceOwner: "org1",
-				codes:         []string{"code1", "code2"},
+				codes: []domain.ImportHumanRecoveryCode{
+					{RawCode: "code1"},
+					{RawCode: "code2"},
+				},
 			},
 		},
 	}
@@ -475,7 +488,7 @@ func TestCommands_RemoveRecoveryCodes(t *testing.T) {
 			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-d9u8q", "Errors.User.Locked"),
 		},
 		{
-			name: "recovery codes not added, error",
+			name: "recovery codes not added, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(), // no recovery codes
@@ -486,7 +499,10 @@ func TestCommands_RemoveRecoveryCodes(t *testing.T) {
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-84rgg", "Errors.User.MFA.RecoveryCodes.NotReady"),
+			want: &domain.ObjectDetails{
+				ResourceOwner: "org1",
+				ID:            "user1",
+			},
 		},
 		{
 			name: "successful removal",
@@ -516,6 +532,7 @@ func TestCommands_RemoveRecoveryCodes(t *testing.T) {
 			},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "org1",
+				ID:            "user1",
 			},
 		},
 		{
@@ -563,6 +580,7 @@ func TestCommands_RemoveRecoveryCodes(t *testing.T) {
 			},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "org1",
+				ID:            "user1",
 			},
 		},
 		{
@@ -594,6 +612,7 @@ func TestCommands_RemoveRecoveryCodes(t *testing.T) {
 			},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "org1",
+				ID:            "user2",
 			},
 		},
 	}

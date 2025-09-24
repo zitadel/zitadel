@@ -17,17 +17,31 @@ type HumanRecoveryCodes struct {
 	Codes []string
 }
 
-func RecoveryCodesFromRaw(codes []string, hasher *crypto.Hasher) ([]string, error) {
+type ImportHumanRecoveryCode struct {
+	RawCode    string
+	HashedCode string
+}
+
+func HashRecoveryCodesIfNeeded(codes []ImportHumanRecoveryCode, hasher *crypto.Hasher) ([]string, error) {
 	hashedCodes := make([]string, len(codes))
 	for i, code := range codes {
-		hashedCode, err := hasher.Hash(code)
+		hashed, err := HashRecoveryCodeIfNeeded(code, hasher)
 		if err != nil {
 			return nil, err
 		}
-		hashedCodes[i] = hashedCode
+		hashedCodes[i] = hashed
 	}
-
 	return hashedCodes, nil
+}
+
+func HashRecoveryCodeIfNeeded(code ImportHumanRecoveryCode, hasher *crypto.Hasher) (string, error) {
+	if code.RawCode != "" {
+		return hasher.Hash(code.RawCode)
+	}
+	if !hasher.EncodingSupported(code.HashedCode) {
+		return "", zerrors.ThrowInvalidArgument(nil, "DOMAIN-JDk4t", "Errors.Hash.NotSupported")
+	}
+	return code.HashedCode, nil
 }
 
 func GenerateRecoveryCodes(count int, config RecoveryCodesConfig, hasher *crypto.Hasher) ([]string, []string, error) {

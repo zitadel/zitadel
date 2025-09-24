@@ -13,7 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) ImportHumanRecoveryCodes(ctx context.Context, userID, resourceOwner string, codes []string) (err error) {
+func (c *Commands) ImportHumanRecoveryCodes(ctx context.Context, userID, resourceOwner string, codes []domain.ImportHumanRecoveryCode) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -34,7 +34,7 @@ func (c *Commands) ImportHumanRecoveryCodes(ctx context.Context, userID, resourc
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-53cjw", "Errors.User.MFA.RecoveryCodes.MaxCountExceeded")
 	}
 
-	hashedCodes, err := domain.RecoveryCodesFromRaw(codes, c.userPasswordHasher)
+	hashedCodes, err := domain.HashRecoveryCodesIfNeeded(codes, c.userPasswordHasher)
 	if err != nil {
 		return err
 	}
@@ -48,7 +48,7 @@ func (c *Commands) ImportHumanRecoveryCodes(ctx context.Context, userID, resourc
 }
 
 type RecoveryCodesDetails struct {
-	domain.ObjectDetails
+	*domain.ObjectDetails
 	RawCodes []string
 }
 
@@ -93,10 +93,8 @@ func (c *Commands) GenerateRecoveryCodes(ctx context.Context, userID string, cou
 	}
 
 	return &RecoveryCodesDetails{
-		ObjectDetails: domain.ObjectDetails{
-			ResourceOwner: resourceOwner,
-		},
-		RawCodes: rawCodes,
+		ObjectDetails: writeModelToObjectDetails(&recoveryCodeWriteModel.WriteModel),
+		RawCodes:      rawCodes,
 	}, nil
 }
 
@@ -118,8 +116,9 @@ func (c *Commands) RemoveRecoveryCodes(ctx context.Context, userID, resourceOwne
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-d9u8q", "Errors.User.Locked")
 	}
 
+	// if there aren't any recovery codes, we don't need to do anything
 	if writeModel.State != domain.MFAStateReady {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-84rgg", "Errors.User.MFA.RecoveryCodes.NotReady")
+		return writeModelToObjectDetails(&writeModel.WriteModel), nil
 	}
 
 	userAgg := UserAggregateFromWriteModelCtx(ctx, &writeModel.WriteModel)
@@ -129,9 +128,7 @@ func (c *Commands) RemoveRecoveryCodes(ctx context.Context, userID, resourceOwne
 		return nil, err
 	}
 
-	return &domain.ObjectDetails{
-		ResourceOwner: resourceOwner,
-	}, nil
+	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
 func (c *Commands) HumanCheckRecoveryCode(ctx context.Context, userID, code, resourceOwner string, authRequest *domain.AuthRequest) error {

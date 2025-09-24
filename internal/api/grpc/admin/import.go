@@ -507,7 +507,14 @@ func importHumanUsers(ctx context.Context, s *Server, errors *[]*admin_pb.Import
 
 		if len(user.User.RecoveryCodes) > 0 {
 			logging.Debugf("import user recovery codes: %s", user.GetUserId())
-			if err := s.command.ImportHumanRecoveryCodes(ctx, user.UserId, org.GetOrgId(), user.User.RecoveryCodes); err != nil {
+			recoveryCodes := make([]domain.ImportHumanRecoveryCode, len(user.User.RecoveryCodes))
+			for i, code := range user.User.RecoveryCodes {
+				recoveryCodes[i] = domain.ImportHumanRecoveryCode{
+					RawCode:    code.GetRaw(),
+					HashedCode: code.GetHash(),
+				}
+			}
+			if err := s.command.ImportHumanRecoveryCodes(ctx, user.UserId, org.GetOrgId(), recoveryCodes); err != nil {
 				*errors = append(*errors, &admin_pb.ImportDataError{Type: "human_user_recovery_codes", Id: user.GetUserId(), Message: err.Error()})
 				if isCtxTimeout(ctx) {
 					return err

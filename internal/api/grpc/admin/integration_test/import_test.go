@@ -517,7 +517,11 @@ func TestServer_ImportData(t *testing.T) {
 												Email:           integration.Email(),
 												IsEmailVerified: true,
 											},
-											RecoveryCodes: []string{"code-001", "code-002", "code-003"},
+											RecoveryCodes: []*management.ImportHumanUserRequest_RecoveryCode{
+												{CodeType: &management.ImportHumanUserRequest_RecoveryCode_Raw{Raw: "code-001"}},
+												{CodeType: &management.ImportHumanUserRequest_RecoveryCode_Raw{Raw: "code-002"}},
+												{CodeType: &management.ImportHumanUserRequest_RecoveryCode_Raw{Raw: "code-003"}},
+											},
 										},
 									},
 									{
@@ -534,7 +538,10 @@ func TestServer_ImportData(t *testing.T) {
 												Email:           integration.Email(),
 												IsEmailVerified: true,
 											},
-											RecoveryCodes: []string{"code-101", "code-102"},
+											RecoveryCodes: []*management.ImportHumanUserRequest_RecoveryCode{
+												{CodeType: &management.ImportHumanUserRequest_RecoveryCode_Raw{Raw: "code-101"}},
+												{CodeType: &management.ImportHumanUserRequest_RecoveryCode_Hash{Hash: "$2a$12$3UWLT4aUQsgO/Jn/rydRmuqF39JTXox6G4dwea/UOvbstI/Qba20y"}},
+											},
 										},
 									},
 								},
@@ -542,7 +549,7 @@ func TestServer_ImportData(t *testing.T) {
 						},
 					},
 				},
-				Timeout: time.Minute.String(),
+				Timeout: (5 * time.Minute).String(),
 			},
 			want: &admin.ImportDataResponse{
 				Success: &admin.ImportDataSuccess{
@@ -581,7 +588,7 @@ func TestServer_ImportData(t *testing.T) {
 												Email:           integration.Email(),
 												IsEmailVerified: true,
 											},
-											RecoveryCodes: []string{}, // Empty array should be skipped
+											RecoveryCodes: []*management.ImportHumanUserRequest_RecoveryCode{},
 										},
 									},
 								},
@@ -598,6 +605,62 @@ func TestServer_ImportData(t *testing.T) {
 							OrgId:        orgIDs[8],
 							HumanUserIds: userIDs[5:6],
 						},
+					},
+				},
+			},
+		},
+		{
+			name: "invalid recovery code hash",
+			req: &admin.ImportDataRequest{
+				Data: &admin.ImportDataRequest_DataOrgs{
+					DataOrgs: &admin.ImportDataOrg{
+						Orgs: []*admin.DataOrg{
+							{
+								OrgId: orgIDs[9],
+								Org: &management.AddOrgRequest{
+									Name: integration.OrganizationName(),
+								},
+								HumanUsers: []*v1.DataHumanUser{
+									{
+										UserId: userIDs[6],
+										User: &management.ImportHumanUserRequest{
+											UserName: integration.Username(),
+											Profile: &management.ImportHumanUserRequest_Profile{
+												FirstName:         integration.FirstName(),
+												LastName:          integration.LastName(),
+												DisplayName:       integration.Username(),
+												PreferredLanguage: integration.Language(),
+											},
+											Email: &management.ImportHumanUserRequest_Email{
+												Email:           integration.Email(),
+												IsEmailVerified: true,
+											},
+											RecoveryCodes: []*management.ImportHumanUserRequest_RecoveryCode{
+												{CodeType: &management.ImportHumanUserRequest_RecoveryCode_Hash{Hash: "invalid-hash"}},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				Timeout: time.Minute.String(),
+			},
+			want: &admin.ImportDataResponse{
+				Success: &admin.ImportDataSuccess{
+					Orgs: []*admin.ImportDataSuccessOrg{
+						{
+							OrgId:        orgIDs[9],
+							HumanUserIds: userIDs[6:7],
+						},
+					},
+				},
+				Errors: []*admin.ImportDataError{
+					{
+						Type:    "human_user_recovery_codes",
+						Id:      userIDs[6],
+						Message: "ID=DOMAIN-JDk4t Message=Errors.Hash.NotSupported",
 					},
 				},
 			},

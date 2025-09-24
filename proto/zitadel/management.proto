@@ -8734,6 +8734,30 @@ message ImportHumanUserRequest {
             }
         ];
     }
+    message RecoveryCode {
+        oneof code_type {
+            string raw = 1 [
+                (validate.rules).string = {min_len: 1, max_len: 200},
+                (google.api.field_behavior) = REQUIRED,
+                (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                    example: "\"a435b-34kns\"";
+                    description: "\"Encoded hash of a recovery code in Modular Crypt Format: https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets\"";
+                    min_length: 1,
+                    max_length: 200;
+                }
+            ];
+            string hash = 2 [
+                (validate.rules).string = {min_len: 1, max_len: 200},
+                (google.api.field_behavior) = REQUIRED,
+                (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                    example: "\"$2a$12$lJ08fqVr8bFJilRVnDT9QeULI7YW.nT3iwUv6dyg0aCrfm3UY8XR2\"";
+                    description: "\"Encoded hash of a recovery code in Modular Crypt Format: https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets\"";
+                    min_length: 1,
+                    max_length: 200;
+                }
+            ];
+        }
+    }
 
     string user_name = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -8773,10 +8797,9 @@ message ImportHumanUserRequest {
             description: "To link your user directly with an external identity provider (Identity brokering)"
         }
     ];
-    repeated string recovery_codes = 11 [
+    repeated RecoveryCode recovery_codes = 11 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Raw recovery codes to import for the user. The codes will be hashed by Zitadel before storing them.";
-            example: "[\"a435b-34kns\", \"df456-vs987\"]";
+            description: "Import your existing recovery codes. You can import the raw code or the hashed code. The raw code will be hashed on import, the hashed code will be stored as is and need to be in Modular Crypt Format: https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets";
         }
     ];
 }

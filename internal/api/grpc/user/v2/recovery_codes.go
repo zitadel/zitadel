@@ -15,7 +15,7 @@ func (s *Server) GenerateRecoveryCodes(ctx context.Context, req *connect.Request
 		return nil, err
 	}
 	return connect.NewResponse(&user.GenerateRecoveryCodesResponse{
-		Details:       object.DomainToDetailsPb(&details.ObjectDetails),
+		Details:       object.DomainToDetailsPb(details.ObjectDetails),
 		RecoveryCodes: details.RawCodes,
 	}), nil
 }
