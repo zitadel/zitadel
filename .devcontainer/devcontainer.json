@@ -32,7 +32,6 @@
 		"ghcr.io/devcontainers/features/go:1": {
 			"version": "1.24"
 		},
-		"ghcr.io/guiyomh/features/golangci-lint:0": {},
 		"ghcr.io/devcontainers/features/docker-outside-of-docker": {}
 	},
 	"containerEnv": {
