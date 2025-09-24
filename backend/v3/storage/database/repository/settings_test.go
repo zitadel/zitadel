@@ -1358,7 +1358,7 @@ func TestCreateGetLoginPolicySetting(t *testing.T) {
 						IsDefault:                  true,
 						AllowUserNamePassword:      true,
 						AllowRegister:              true,
-						AllowExternalSetting:       true,
+						AllowExternalIDP:           true,
 						ForceMFA:                   true,
 						ForceMFALocalOnly:          true,
 						HidePasswordReset:          true,

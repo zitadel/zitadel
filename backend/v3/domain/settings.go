@@ -28,7 +28,7 @@ type Setting struct {
 	InstanceID string          `json:"instanceId,omitempty" db:"instance_id"`
 	OrgID      *string         `json:"orgId,omitempty" db:"org_id"`
 	Type       SettingType     `json:"type,omitempty" db:"type"`
-	LabelState *LabelState     `json:"labelState,omitempty", db:"label_state"`
+	LabelState *LabelState     `json:"labelState,omitempty" db:"label_state"`
 	Settings   json.RawMessage `json:"settings,omitempty" db:"settings"`
 	CreatedAt  time.Time       `json:"createdAt,omitzero" db:"created_at"`
 	UpdatedAt  *time.Time      `json:"updatedAt,omitzero" db:"updated_at"`
@@ -39,8 +39,6 @@ type PasswordlessType int32
 const (
 	PasswordlessTypeNotAllowed PasswordlessType = iota
 	PasswordlessTypeAllowed
-
-	passwordlessCount
 )
 
 type MultiFactorType int32
@@ -48,8 +46,6 @@ type MultiFactorType int32
 const (
 	MultiFactorTypeUnspecified MultiFactorType = iota
 	MultiFactorTypeU2FWithPIN
-
-	multiFactorCount
 )
 
 type SecondFactorType int32
@@ -60,24 +56,22 @@ const (
 	SecondFactorTypeU2F
 	SecondFactorTypeOTPEmail
 	SecondFactorTypeOTPSMS
-
-	secondFactorCount
 )
 
 type LoginSettings struct {
 	IsDefault                  bool             `json:"isDefault,omitempty"`
 	AllowUserNamePassword      bool             `json:"allowUsernamePassword,omitempty"`
 	AllowRegister              bool             `json:"allowRegister,omitempty"`
-	AllowExternalSetting       bool             `json:"allowExternalIdp,omitempty"`
-	ForceMFA                   bool             `json:"forceMFA,omitempty"`
-	ForceMFALocalOnly          bool             `json:"forceMFALocalOnly,omitempty"`
+	AllowExternalIDP           bool             `json:"allowExternalIdp,omitempty"`
+	ForceMFA                   bool             `json:"forceMfa,omitempty"`
+	ForceMFALocalOnly          bool             `json:"forceMfaLocalOnly,omitempty"`
 	HidePasswordReset          bool             `json:"hidePasswordReset,omitempty"`
 	IgnoreUnknownUsernames     bool             `json:"ignoreUnknownUsernames,omitempty"`
 	AllowDomainDiscovery       bool             `json:"allowDomainDiscovery,omitempty"`
 	DisableLoginWithEmail      bool             `json:"disableLoginWithEmail,omitempty"`
 	DisableLoginWithPhone      bool             `json:"disableLoginWithPhone,omitempty"`
 	PasswordlessType           PasswordlessType `json:"passwordlessType,omitempty"`
-	DefaultRedirectURI         string           `json:"defaultRedirectURI,omitempty"`
+	DefaultRedirectURI         string           `json:"defaultRedirectUri,omitempty"`
 	PasswordCheckLifetime      time.Duration    `json:"passwordCheckLifetime,omitempty"`
 	ExternalLoginCheckLifetime time.Duration    `json:"externalLoginCheckLifetime,omitempty"`
 	MFAInitSkipLifetime        time.Duration    `json:"mfaInitSkipLifetime,omitempty"`
@@ -85,7 +79,7 @@ type LoginSettings struct {
 	MultiFactorCheckLifetime   time.Duration    `json:"multiFactorCheckLifetime,omitempty"`
 
 	MFAType           []MultiFactorType  `json:"mfaType"`
-	SecondFactorTypes []SecondFactorType `json:"second_factors"`
+	SecondFactorTypes []SecondFactorType `json:"secondFactors"`
 }
 
 type LoginSetting struct {
@@ -166,7 +160,7 @@ type PasswordExpirySetting struct {
 type LockoutSettings struct {
 	IsDefault           bool   `json:"isDefault,omitempty"`
 	MaxPasswordAttempts uint64 `json:"maxPasswordAttempts,omitempty"`
-	MaxOTPAttempts      uint64 `json:"maxOTPAttempts,omitempty"`
+	MaxOTPAttempts      uint64 `json:"maxOtpAttempts,omitempty"`
 	ShowLockOutFailures bool   `json:"showLockOutFailures,omitempty"`
 }
 
@@ -189,9 +183,9 @@ type DomainSetting struct {
 
 type SecuritySettings struct {
 	Enabled               bool     `json:"enabled,omitempty"`
-	EnableIframeEmbedding bool     `json:"enable_iframe_embedding,omitempty"`
+	EnableIframeEmbedding bool     `json:"enableIframe_embedding,omitempty"`
 	AllowedOrigins        []string `json:"allowedOrigins,omitempty"`
-	EnableImpersonation   bool     `json:"enable_impersonation,omitempty"`
+	EnableImpersonation   bool     `json:"enableImpersonation,omitempty"`
 }
 
 type SecuritySetting struct {
@@ -285,6 +279,6 @@ type SettingsRepository interface {
 
 	// DeleteSettingsForInstance is used when a Instance is deleted
 	DeleteSettingsForInstance(ctx context.Context, instanceID string) (int64, error)
-	// DeleteSettingsForOrg is used ehwn an Organization is deleted
+	// DeleteSettingsForOrg is used when an Organization is deleted
 	DeleteSettingsForOrg(ctx context.Context, orgID string) (int64, error)
 }

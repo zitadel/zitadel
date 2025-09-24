@@ -49,7 +49,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 			// these values are found in default.yaml
 			assert.Equal(t, true, setting.Settings.IsDefault)
 			assert.Equal(t, true, setting.Settings.AllowRegister)
-			assert.Equal(t, true, setting.Settings.AllowExternalSetting)
+			assert.Equal(t, true, setting.Settings.AllowExternalIDP)
 			assert.Equal(t, domain.PasswordlessTypeAllowed, setting.Settings.PasswordlessType)
 			assert.Equal(t, true, setting.Settings.AllowDomainDiscovery)
 			assert.Equal(t, true, setting.Settings.AllowUserNamePassword)
@@ -101,7 +101,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 			// event instance.policy.login.changed
 			assert.Equal(t, true, setting.Settings.IsDefault)
 			assert.Equal(t, false, setting.Settings.AllowRegister)
-			assert.Equal(t, true, setting.Settings.AllowExternalSetting)
+			assert.Equal(t, true, setting.Settings.AllowExternalIDP)
 			assert.Equal(t, true, setting.Settings.ForceMFA)
 			assert.Equal(t, domain.PasswordlessTypeNotAllowed, setting.Settings.PasswordlessType)
 			assert.Equal(t, true, setting.Settings.HidePasswordReset)
