@@ -11,6 +11,8 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
+
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
@@ -19,7 +21,6 @@ import (
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/policy"
-	durationpb "google.golang.org/protobuf/types/known/durationpb"
 )
 
 //go:embed picture.png

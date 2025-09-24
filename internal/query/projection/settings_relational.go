@@ -12,13 +12,12 @@ import (
 	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	settings "github.com/zitadel/zitadel/internal/repository/organization_settings"
-	"github.com/zitadel/zitadel/internal/repository/policy"
-	"github.com/zitadel/zitadel/internal/zerrors"
-
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	settings "github.com/zitadel/zitadel/internal/repository/organization_settings"
+	"github.com/zitadel/zitadel/internal/repository/policy"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
