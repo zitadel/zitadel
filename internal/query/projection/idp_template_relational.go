@@ -27,7 +27,7 @@ const (
 	IDPRelationalAllowLinkingCol      = "allow_linking"
 	IDPRelationalAllowAutoCreationCol = "allow_auto_creation"
 	IDPRelationalAllowAutoUpdateCol   = "allow_auto_update"
-	IDPRelationalAllowAutoLinkingCol  = "allow_auto_linking_field"
+	IDPRelationalAllowAutoLinkingCol  = "auto_linking_field"
 )
 
 type idpTemplateRelationalProjection struct {
