@@ -551,7 +551,7 @@ Fix the quality checks, add new checks that cover your changes and mark your pul
 **Recommended: Use Dev Container** (everything pre-configured)
 
 Open in VS Code with Dev Container extension.
-NodeJS, PNPM, Docker, Go and golangci-lint are already installed.
+NodeJS, PNPM, Docker and Go are already installed.
 
 **For local development, install:**
 
@@ -562,7 +562,6 @@ NodeJS, PNPM, Docker, Go and golangci-lint are already installed.
 **For developing the API backend, additionally install:**
 
 - **[Go 1.24.x](https://go.dev/doc/install)**
-- **[golangci-lint v2](https://golangci-lint.run)** - Please use [this configuration](.golangci.yaml) when running `golangci-lint`
 
 **Install Node Modules:**
 ```bash
