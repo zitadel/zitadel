@@ -22,8 +22,8 @@ func TestServer_TestOrgDomainReduces(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	orgRepo := repository.OrganizationRepository(pool)
-	orgDomainRepo := orgRepo.Domains(false)
+	orgRepo := repository.OrganizationRepository()
+	orgDomainRepo := repository.OrganizationDomainRepository()
 
 	t.Cleanup(func() {
 		_, err := OrgClient.DeleteOrganization(CTX, &v2beta.DeleteOrganizationRequest{
@@ -37,8 +37,13 @@ func TestServer_TestOrgDomainReduces(t *testing.T) {
 	// Wait for org to be created
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-		_, err := orgRepo.Get(CTX,
-			database.WithCondition(orgRepo.IDCondition(org.GetId())),
+		_, err := orgRepo.Get(CTX, pool,
+			database.WithCondition(
+				database.And(
+					orgRepo.InstanceIDCondition(Instance.Instance.Id),
+					orgRepo.IDCondition(org.GetId()),
+				),
+			),
 		)
 		assert.NoError(t, err)
 	}, retryDuration, tick)
@@ -68,7 +73,7 @@ func TestServer_TestOrgDomainReduces(t *testing.T) {
 		// Test that domain add reduces
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			gottenDomain, err := orgDomainRepo.Get(CTX,
+			gottenDomain, err := orgDomainRepo.Get(CTX, pool,
 				database.WithCondition(
 					database.And(
 						orgDomainRepo.InstanceIDCondition(Instance.Instance.Id),
@@ -107,7 +112,7 @@ func TestServer_TestOrgDomainReduces(t *testing.T) {
 		// Test that domain remove reduces
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			domain, err := orgDomainRepo.Get(CTX,
+			domain, err := orgDomainRepo.Get(CTX, pool,
 				database.WithCondition(
 					database.And(
 						orgDomainRepo.InstanceIDCondition(Instance.Instance.Id),

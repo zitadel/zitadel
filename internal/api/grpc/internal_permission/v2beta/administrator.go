@@ -85,10 +85,10 @@ func createAdministratorProjectToCommand(req *internal_permission.ResourceType_P
 
 func createAdministratorProjectGrantToCommand(req *internal_permission.ResourceType_ProjectGrant_, userID string, roles []string) *command.AddProjectGrantMember {
 	return &command.AddProjectGrantMember{
-		GrantID:   req.ProjectGrant.ProjectGrantId,
-		ProjectID: req.ProjectGrant.ProjectId,
-		UserID:    userID,
-		Roles:     roles,
+		OrganizationID: req.ProjectGrant.OrganizationId,
+		ProjectID:      req.ProjectGrant.ProjectId,
+		UserID:         userID,
+		Roles:          roles,
 	}
 }
 
@@ -165,10 +165,10 @@ func updateAdministratorProjectToCommand(req *internal_permission.ResourceType_P
 
 func updateAdministratorProjectGrantToCommand(req *internal_permission.ResourceType_ProjectGrant_, userID string, roles []string) *command.ChangeProjectGrantMember {
 	return &command.ChangeProjectGrantMember{
-		GrantID:   req.ProjectGrant.ProjectGrantId,
-		ProjectID: req.ProjectGrant.ProjectId,
-		UserID:    userID,
-		Roles:     roles,
+		OrganizationID: req.ProjectGrant.OrganizationId,
+		ProjectID:      req.ProjectGrant.ProjectId,
+		UserID:         userID,
+		Roles:          roles,
 	}
 }
 
@@ -203,7 +203,7 @@ func (s *Server) DeleteAdministrator(ctx context.Context, req *connect.Request[i
 			deletionDate = timestamppb.New(member.EventDate)
 		}
 	case *internal_permission.ResourceType_ProjectGrant_:
-		member, err := s.command.RemoveProjectGrantMember(ctx, resource.ProjectGrant.ProjectId, req.Msg.UserId, resource.ProjectGrant.ProjectGrantId)
+		member, err := s.command.RemoveProjectGrantMember(ctx, resource.ProjectGrant.ProjectId, req.Msg.UserId, "", resource.ProjectGrant.OrganizationId)
 		if err != nil {
 			return nil, err
 		}

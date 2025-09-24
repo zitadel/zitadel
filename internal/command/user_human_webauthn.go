@@ -601,7 +601,7 @@ func (c *Commands) removeHumanWebAuthN(ctx context.Context, userID, webAuthNID, 
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-DAfb2", "Errors.User.WebAuthN.NotFound")
 	}
 
-	if err := c.checkPermissionUpdateUser(ctx, existingWebAuthN.ResourceOwner, existingWebAuthN.AggregateID); err != nil {
+	if err := c.checkPermissionUpdateUser(ctx, existingWebAuthN.ResourceOwner, existingWebAuthN.AggregateID, true); err != nil {
 		return nil, err
 	}
 

@@ -18,11 +18,12 @@ import {
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
-import { getNextUrl } from "../client";
+import { completeFlowOrGetUrl } from "../client";
 import { getMostRecentSessionCookie, getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
 import { getServiceUrlFromHeaders } from "../service-url";
 import { checkEmailVerification, checkUserVerification } from "../verify-helper";
 import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "./cookie";
+import { getOriginalHost } from "./host";
 
 type VerifyPasskeyCommand = {
   passkeyId: string;
@@ -63,11 +64,7 @@ export async function registerPasskeyLink(
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
-
-  if (!host) {
-    throw new Error("Could not get domain");
-  }
+  const host = await getOriginalHost();
 
   let session: GetSessionResponse | undefined;
   let createdSession: Session | undefined;
@@ -322,25 +319,22 @@ export async function sendPasskey(command: SendPasskeyCommand) {
     return emailVerificationCheck;
   }
 
-  const url =
-    requestId && session.id
-      ? await getNextUrl(
-          {
-            sessionId: session.id,
-            requestId: requestId,
-            organization: organization,
-          },
-          loginSettings?.defaultRedirectUri,
-        )
-      : session?.factors?.user?.loginName
-        ? await getNextUrl(
-            {
-              loginName: session.factors.user.loginName,
-              organization: organization,
-            },
-            loginSettings?.defaultRedirectUri,
-          )
-        : null;
-
-  return { redirect: url };
+  if (requestId && session.id) {
+    return completeFlowOrGetUrl(
+      {
+        sessionId: session.id,
+        requestId: requestId,
+        organization: organization,
+      },
+      loginSettings?.defaultRedirectUri,
+    );
+  } else if (session?.factors?.user?.loginName) {
+    return completeFlowOrGetUrl(
+      {
+        loginName: session.factors.user.loginName,
+        organization: organization,
+      },
+      loginSettings?.defaultRedirectUri,
+    );
+  }
 }
