@@ -386,6 +386,7 @@ func (s *settingsRelationalProjection) reduceLoginPolicyAdded(event eventstore.E
 	}), nil
 }
 
+//nolint:gocognit
 func (s *settingsRelationalProjection) reduceLoginPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LoginPolicyChangedEvent

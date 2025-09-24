@@ -2139,8 +2139,6 @@ func TestCreateGetOrgPolicySetting(t *testing.T) {
 
 // gocognit linting fails due to number of test cases
 // and the fact that each test case has a testFunc()
-//
-//nolint:gocognit
 func TestListSetting(t *testing.T) {
 	now := time.Now()
 	ctx := t.Context()
