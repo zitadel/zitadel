@@ -177,7 +177,7 @@ func (i instance) NameCondition(op database.TextOperation, name string) database
 }
 
 // ExistsDomain creates a correlated [database.Exists] condition on instance_domains.
-// Use this when you want to filter instances by a domain condition but still return all domains
+// Use this filter to make sure the Instance returned contains a specific domain.
 // of the instance in the aggregated result.
 // Example usage:
 //
@@ -186,7 +186,7 @@ func (i instance) NameCondition(op database.TextOperation, name string) database
 //	    database.WithCondition(
 //	        database.And(
 //	            instanceRepo.InstanceIDCondition(instanceID),
-//	            instanceRepo.DomainExists(domainRepo.DomainCondition(database.TextOperationEqual, "example.com")),
+//	            instanceRepo.ExistsDomain(domainRepo.DomainCondition(database.TextOperationEqual, "example.com")),
 //	        ),
 //	    ),
 //	)

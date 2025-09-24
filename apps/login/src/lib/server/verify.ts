@@ -24,6 +24,7 @@ import { getServiceUrlFromHeaders } from "../service-url";
 import { loadMostRecentSession } from "../session";
 import { checkMFAFactors } from "../verify-helper";
 import { createSessionAndUpdateCookie } from "./cookie";
+import { getOriginalHostWithProtocol } from "./host";
 
 export async function verifyTOTP(code: string, loginName?: string, organization?: string) {
   const _headers = await headers();
@@ -250,11 +251,7 @@ type resendVerifyEmailCommand = {
 export async function resendVerification(command: resendVerifyEmailCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
-
-  if (!host) {
-    return { error: "No host found" };
-  }
+  const hostWithProtocol = await getOriginalHostWithProtocol();
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
@@ -263,7 +260,7 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
         serviceUrl,
         userId: command.userId,
         urlTemplate:
-          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+          `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
           (command.requestId ? `&requestId=${command.requestId}` : ""),
       }).catch((error) => {
         if (error.code === 9) {
@@ -275,7 +272,7 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
         userId: command.userId,
         serviceUrl,
         urlTemplate:
-          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+          `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
           (command.requestId ? `&requestId=${command.requestId}` : ""),
       });
 }
