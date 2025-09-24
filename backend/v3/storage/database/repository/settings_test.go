@@ -31,8 +31,8 @@ func TestCreateGenericSetting(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err := instanceRepo.Create(t.Context(), &instance)
+	instanceRepo := repository.InstanceRepository()
+	err := instanceRepo.Create(t.Context(), pool, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -43,8 +43,8 @@ func TestCreateGenericSetting(t *testing.T) {
 		InstanceID: instanceId,
 		State:      domain.OrgStateActive,
 	}
-	organizationRepo := repository.OrganizationRepository(pool)
-	err = organizationRepo.Create(t.Context(), &org)
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), pool, &org)
 	require.NoError(t, err)
 
 	type test struct {
@@ -116,8 +116,8 @@ func TestCreateGenericSetting(t *testing.T) {
 						ConsoleAppID:    "consoleApp",
 						DefaultLanguage: "defaultLanguage",
 					}
-					instanceRepo := repository.InstanceRepository(pool)
-					err := instanceRepo.Create(ctx, &instance)
+					instanceRepo := repository.InstanceRepository()
+					err := instanceRepo.Create(ctx, pool, &instance)
 					assert.Nil(t, err)
 
 					// create org
@@ -127,8 +127,8 @@ func TestCreateGenericSetting(t *testing.T) {
 						InstanceID: newInstId,
 						State:      domain.OrgStateActive,
 					}
-					organizationRepo := repository.OrganizationRepository(pool)
-					err = organizationRepo.Create(ctx, &org)
+					organizationRepo := repository.OrganizationRepository()
+					err = organizationRepo.Create(ctx, pool, &org)
 					require.NoError(t, err)
 
 					// create setting
@@ -174,8 +174,8 @@ func TestCreateGenericSetting(t *testing.T) {
 						ConsoleAppID:    "consoleApp",
 						DefaultLanguage: "defaultLanguage",
 					}
-					instanceRepo := repository.InstanceRepository(pool)
-					err := instanceRepo.Create(ctx, &instance)
+					instanceRepo := repository.InstanceRepository()
+					err := instanceRepo.Create(ctx, pool, &instance)
 					assert.Nil(t, err)
 
 					// create org
@@ -185,8 +185,8 @@ func TestCreateGenericSetting(t *testing.T) {
 						InstanceID: newInstId,
 						State:      domain.OrgStateActive,
 					}
-					organizationRepo := repository.OrganizationRepository(pool)
-					err = organizationRepo.Create(ctx, &org)
+					organizationRepo := repository.OrganizationRepository()
+					err = organizationRepo.Create(ctx, pool, &org)
 					require.NoError(t, err)
 
 					// create setting
@@ -232,8 +232,8 @@ func TestCreateGenericSetting(t *testing.T) {
 						ConsoleAppID:    "consoleApp",
 						DefaultLanguage: "defaultLanguage",
 					}
-					instanceRepo := repository.InstanceRepository(pool)
-					err := instanceRepo.Create(ctx, &instance)
+					instanceRepo := repository.InstanceRepository()
+					err := instanceRepo.Create(ctx, pool, &instance)
 					assert.Nil(t, err)
 
 					// create org
@@ -243,8 +243,8 @@ func TestCreateGenericSetting(t *testing.T) {
 						InstanceID: newInstId,
 						State:      domain.OrgStateActive,
 					}
-					organizationRepo := repository.OrganizationRepository(pool)
-					err = organizationRepo.Create(ctx, &org)
+					organizationRepo := repository.OrganizationRepository()
+					err = organizationRepo.Create(ctx, pool, &org)
 					require.NoError(t, err)
 
 					// create setting
@@ -268,7 +268,7 @@ func TestCreateGenericSetting(t *testing.T) {
 						InstanceID: newInstId,
 						State:      domain.OrgStateActive,
 					}
-					err = organizationRepo.Create(ctx, &org)
+					err = organizationRepo.Create(ctx, pool, &org)
 					require.NoError(t, err)
 
 					// change the org id
@@ -387,8 +387,8 @@ func TestCreateSpecificSetting(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err := instanceRepo.Create(t.Context(), &instance)
+	instanceRepo := repository.InstanceRepository()
+	err := instanceRepo.Create(t.Context(), pool, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -399,8 +399,8 @@ func TestCreateSpecificSetting(t *testing.T) {
 		InstanceID: instanceId,
 		State:      domain.OrgStateActive,
 	}
-	organizationRepo := repository.OrganizationRepository(pool)
-	err = organizationRepo.Create(t.Context(), &org)
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), pool, &org)
 	require.NoError(t, err)
 
 	type test struct {
@@ -473,8 +473,8 @@ func TestCreateSpecificSetting(t *testing.T) {
 						ConsoleAppID:    "consoleApp",
 						DefaultLanguage: "defaultLanguage",
 					}
-					instanceRepo := repository.InstanceRepository(pool)
-					err := instanceRepo.Create(ctx, &instance)
+					instanceRepo := repository.InstanceRepository()
+					err := instanceRepo.Create(ctx, pool, &instance)
 					assert.Nil(t, err)
 
 					// create org
@@ -484,8 +484,8 @@ func TestCreateSpecificSetting(t *testing.T) {
 						InstanceID: newInstId,
 						State:      domain.OrgStateActive,
 					}
-					organizationRepo := repository.OrganizationRepository(pool)
-					err = organizationRepo.Create(ctx, &org)
+					organizationRepo := repository.OrganizationRepository()
+					err = organizationRepo.Create(ctx, pool, &org)
 					require.NoError(t, err)
 
 					// create setting
@@ -533,8 +533,8 @@ func TestCreateSpecificSetting(t *testing.T) {
 						ConsoleAppID:    "consoleApp",
 						DefaultLanguage: "defaultLanguage",
 					}
-					instanceRepo := repository.InstanceRepository(pool)
-					err := instanceRepo.Create(ctx, &instance)
+					instanceRepo := repository.InstanceRepository()
+					err := instanceRepo.Create(ctx, pool, &instance)
 					assert.Nil(t, err)
 
 					// create org
@@ -544,8 +544,8 @@ func TestCreateSpecificSetting(t *testing.T) {
 						InstanceID: newInstId,
 						State:      domain.OrgStateActive,
 					}
-					organizationRepo := repository.OrganizationRepository(pool)
-					err = organizationRepo.Create(ctx, &org)
+					organizationRepo := repository.OrganizationRepository()
+					err = organizationRepo.Create(ctx, pool, &org)
 					require.NoError(t, err)
 
 					// create setting
@@ -593,8 +593,8 @@ func TestCreateSpecificSetting(t *testing.T) {
 						ConsoleAppID:    "consoleApp",
 						DefaultLanguage: "defaultLanguage",
 					}
-					instanceRepo := repository.InstanceRepository(pool)
-					err := instanceRepo.Create(ctx, &instance)
+					instanceRepo := repository.InstanceRepository()
+					err := instanceRepo.Create(ctx, pool, &instance)
 					assert.Nil(t, err)
 
 					// create org
@@ -604,8 +604,8 @@ func TestCreateSpecificSetting(t *testing.T) {
 						InstanceID: newInstId,
 						State:      domain.OrgStateActive,
 					}
-					organizationRepo := repository.OrganizationRepository(pool)
-					err = organizationRepo.Create(ctx, &org)
+					organizationRepo := repository.OrganizationRepository()
+					err = organizationRepo.Create(ctx, pool, &org)
 					require.NoError(t, err)
 
 					// create setting
@@ -629,7 +629,7 @@ func TestCreateSpecificSetting(t *testing.T) {
 						InstanceID: newInstId,
 						State:      domain.OrgStateActive,
 					}
-					err = organizationRepo.Create(ctx, &org)
+					err = organizationRepo.Create(ctx, pool, &org)
 					require.NoError(t, err)
 
 					// change the org id
@@ -846,8 +846,8 @@ func TestUpdateSetting(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err := instanceRepo.Create(t.Context(), &instance)
+	instanceRepo := repository.InstanceRepository()
+	err := instanceRepo.Create(t.Context(), pool, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -858,8 +858,8 @@ func TestUpdateSetting(t *testing.T) {
 		InstanceID: instanceId,
 		State:      domain.OrgStateActive,
 	}
-	organizationRepo := repository.OrganizationRepository(pool)
-	err = organizationRepo.Create(t.Context(), &org)
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), pool, &org)
 	require.NoError(t, err)
 
 	settingRepo := repository.SettingsRepository(pool)
@@ -1136,8 +1136,8 @@ func TestGetSetting(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err := instanceRepo.Create(t.Context(), &instance)
+	instanceRepo := repository.InstanceRepository()
+	err := instanceRepo.Create(t.Context(), pool, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -1148,8 +1148,8 @@ func TestGetSetting(t *testing.T) {
 		InstanceID: instanceId,
 		State:      domain.OrgStateActive,
 	}
-	organizationRepo := repository.OrganizationRepository(pool)
-	err = organizationRepo.Create(t.Context(), &org)
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), pool, &org)
 	require.NoError(t, err)
 
 	// create setting
@@ -1171,7 +1171,7 @@ func TestGetSetting(t *testing.T) {
 	type test struct {
 		name                       string
 		testFunc                   func(ctx context.Context, t *testing.T) *domain.Setting
-		settingIdentifierCondition domain.OrgIdentifierCondition
+		settingIdentifierCondition database.Condition
 		err                        error
 	}
 
@@ -1319,8 +1319,8 @@ func TestCreateGetLoginPolicySetting(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err := instanceRepo.Create(t.Context(), &instance)
+	instanceRepo := repository.InstanceRepository()
+	err := instanceRepo.Create(t.Context(), pool, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -1331,8 +1331,8 @@ func TestCreateGetLoginPolicySetting(t *testing.T) {
 		InstanceID: instanceId,
 		State:      domain.OrgStateActive,
 	}
-	organizationRepo := repository.OrganizationRepository(pool)
-	err = organizationRepo.Create(t.Context(), &org)
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), pool, &org)
 	require.NoError(t, err)
 
 	settingRepo := repository.SettingsRepository(pool)
@@ -1429,8 +1429,8 @@ func TestGetLabelPolicySetting(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err := instanceRepo.Create(t.Context(), &instance)
+	instanceRepo := repository.InstanceRepository()
+	err := instanceRepo.Create(t.Context(), pool, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -1441,8 +1441,8 @@ func TestGetLabelPolicySetting(t *testing.T) {
 		InstanceID: instanceId,
 		State:      domain.OrgStateActive,
 	}
-	organizationRepo := repository.OrganizationRepository(pool)
-	err = organizationRepo.Create(t.Context(), &org)
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), pool, &org)
 	require.NoError(t, err)
 
 	settingRepo := repository.SettingsRepository(pool)
@@ -1603,8 +1603,8 @@ func TestCreateGetPasswordComplexityPolicySetting(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err := instanceRepo.Create(t.Context(), &instance)
+	instanceRepo := repository.InstanceRepository()
+	err := instanceRepo.Create(t.Context(), pool, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -1615,8 +1615,8 @@ func TestCreateGetPasswordComplexityPolicySetting(t *testing.T) {
 		InstanceID: instanceId,
 		State:      domain.OrgStateActive,
 	}
-	organizationRepo := repository.OrganizationRepository(pool)
-	err = organizationRepo.Create(t.Context(), &org)
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), pool, &org)
 	require.NoError(t, err)
 
 	settingRepo := repository.SettingsRepository(pool)
@@ -1696,8 +1696,8 @@ func TestCreateGetPasswordExpiryPolicySetting(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err := instanceRepo.Create(t.Context(), &instance)
+	instanceRepo := repository.InstanceRepository()
+	err := instanceRepo.Create(t.Context(), pool, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -1708,8 +1708,8 @@ func TestCreateGetPasswordExpiryPolicySetting(t *testing.T) {
 		InstanceID: instanceId,
 		State:      domain.OrgStateActive,
 	}
-	organizationRepo := repository.OrganizationRepository(pool)
-	err = organizationRepo.Create(t.Context(), &org)
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), pool, &org)
 	require.NoError(t, err)
 
 	settingRepo := repository.SettingsRepository(pool)
@@ -1786,8 +1786,8 @@ func TestCreateGetLockoutPolicySetting(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err := instanceRepo.Create(t.Context(), &instance)
+	instanceRepo := repository.InstanceRepository()
+	err := instanceRepo.Create(t.Context(), pool, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -1798,8 +1798,8 @@ func TestCreateGetLockoutPolicySetting(t *testing.T) {
 		InstanceID: instanceId,
 		State:      domain.OrgStateActive,
 	}
-	organizationRepo := repository.OrganizationRepository(pool)
-	err = organizationRepo.Create(t.Context(), &org)
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), pool, &org)
 	require.NoError(t, err)
 
 	settingRepo := repository.SettingsRepository(pool)
@@ -1877,8 +1877,8 @@ func TestCreateGetSecurityPolicySetting(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err := instanceRepo.Create(t.Context(), &instance)
+	instanceRepo := repository.InstanceRepository()
+	err := instanceRepo.Create(t.Context(), pool, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -1889,8 +1889,8 @@ func TestCreateGetSecurityPolicySetting(t *testing.T) {
 		InstanceID: instanceId,
 		State:      domain.OrgStateActive,
 	}
-	organizationRepo := repository.OrganizationRepository(pool)
-	err = organizationRepo.Create(t.Context(), &org)
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), pool, &org)
 	require.NoError(t, err)
 
 	settingRepo := repository.SettingsRepository(pool)
@@ -1968,8 +1968,8 @@ func TestCreateGetDomainPolicySetting(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err := instanceRepo.Create(t.Context(), &instance)
+	instanceRepo := repository.InstanceRepository()
+	err := instanceRepo.Create(t.Context(), pool, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -1980,8 +1980,8 @@ func TestCreateGetDomainPolicySetting(t *testing.T) {
 		InstanceID: instanceId,
 		State:      domain.OrgStateActive,
 	}
-	organizationRepo := repository.OrganizationRepository(pool)
-	err = organizationRepo.Create(t.Context(), &org)
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), pool, &org)
 	require.NoError(t, err)
 
 	settingRepo := repository.SettingsRepository(pool)
@@ -2059,8 +2059,8 @@ func TestCreateGetOrgPolicySetting(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err := instanceRepo.Create(t.Context(), &instance)
+	instanceRepo := repository.InstanceRepository()
+	err := instanceRepo.Create(t.Context(), pool, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -2071,8 +2071,8 @@ func TestCreateGetOrgPolicySetting(t *testing.T) {
 		InstanceID: instanceId,
 		State:      domain.OrgStateActive,
 	}
-	organizationRepo := repository.OrganizationRepository(pool)
-	err = organizationRepo.Create(t.Context(), &org)
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), pool, &org)
 	require.NoError(t, err)
 
 	settingRepo := repository.SettingsRepository(pool)
@@ -2159,8 +2159,8 @@ func TestListSetting(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err = instanceRepo.Create(ctx, &instance)
+	instanceRepo := repository.InstanceRepository()
+	err = instanceRepo.Create(ctx, pool, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -2171,8 +2171,8 @@ func TestListSetting(t *testing.T) {
 		InstanceID: instanceId,
 		State:      domain.OrgStateActive,
 	}
-	organizationRepo := repository.OrganizationRepository(pool)
-	err = organizationRepo.Create(t.Context(), &org)
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), pool, &org)
 	require.NoError(t, err)
 
 	settingRepo := repository.SettingsRepository(pool)
@@ -2198,7 +2198,7 @@ func TestListSetting(t *testing.T) {
 					ConsoleAppID:    "consoleApp",
 					DefaultLanguage: "defaultLanguage",
 				}
-				err = instanceRepo.Create(ctx, &instance)
+				err = instanceRepo.Create(ctx, pool, &instance)
 				require.NoError(t, err)
 
 				// create org
@@ -2209,8 +2209,8 @@ func TestListSetting(t *testing.T) {
 					InstanceID: newInstanceId,
 					State:      domain.OrgStateActive,
 				}
-				organizationRepo := repository.OrganizationRepository(pool)
-				err = organizationRepo.Create(ctx, &org)
+				organizationRepo := repository.OrganizationRepository()
+				err = organizationRepo.Create(ctx, pool, &org)
 				require.NoError(t, err)
 
 				// create setting
@@ -2269,7 +2269,7 @@ func TestListSetting(t *testing.T) {
 					ConsoleAppID:    "consoleApp",
 					DefaultLanguage: "defaultLanguage",
 				}
-				err = instanceRepo.Create(ctx, &instance)
+				err = instanceRepo.Create(ctx, pool, &instance)
 				require.NoError(t, err)
 
 				// create setting
@@ -2325,8 +2325,8 @@ func TestListSetting(t *testing.T) {
 					InstanceID: instanceId,
 					State:      domain.OrgStateActive,
 				}
-				organizationRepo := repository.OrganizationRepository(pool)
-				err = organizationRepo.Create(ctx, &org)
+				organizationRepo := repository.OrganizationRepository()
+				err = organizationRepo.Create(ctx, pool, &org)
 				require.NoError(t, err)
 
 				// create setting
@@ -2567,8 +2567,8 @@ func TestDeleteSetting(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err := instanceRepo.Create(t.Context(), &instance)
+	instanceRepo := repository.InstanceRepository()
+	err := instanceRepo.Create(t.Context(), pool, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -2579,8 +2579,8 @@ func TestDeleteSetting(t *testing.T) {
 		InstanceID: instanceId,
 		State:      domain.OrgStateActive,
 	}
-	organizationRepo := repository.OrganizationRepository(pool)
-	err = organizationRepo.Create(t.Context(), &org)
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), pool, &org)
 	require.NoError(t, err)
 
 	settingRepo := repository.SettingsRepository(pool)
@@ -2726,8 +2726,8 @@ func TestDeleteSettingsForInstance(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err := instanceRepo.Create(t.Context(), &instance)
+	instanceRepo := repository.InstanceRepository()
+	err := instanceRepo.Create(t.Context(), pool, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -2738,8 +2738,8 @@ func TestDeleteSettingsForInstance(t *testing.T) {
 		InstanceID: instanceId,
 		State:      domain.OrgStateActive,
 	}
-	organizationRepo := repository.OrganizationRepository(pool)
-	err = organizationRepo.Create(t.Context(), &org)
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), pool, &org)
 	require.NoError(t, err)
 
 	settingRepo := repository.SettingsRepository(pool)
@@ -2897,8 +2897,8 @@ func TestDeleteSettingsForOrg(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err := instanceRepo.Create(t.Context(), &instance)
+	instanceRepo := repository.InstanceRepository()
+	err := instanceRepo.Create(t.Context(), pool, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -2909,8 +2909,8 @@ func TestDeleteSettingsForOrg(t *testing.T) {
 		InstanceID: instanceId,
 		State:      domain.OrgStateActive,
 	}
-	organizationRepo := repository.OrganizationRepository(pool)
-	err = organizationRepo.Create(t.Context(), &org)
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), pool, &org)
 	require.NoError(t, err)
 
 	settingRepo := repository.SettingsRepository(pool)

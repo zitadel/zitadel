@@ -164,8 +164,8 @@ func (s *settings) GetLogin(ctx context.Context, instanceID string, orgID *strin
 	return loginSetting, nil
 }
 
-func (s *settings) UpdateLogin(ctx context.Context, setting *domain.LoginSetting) (int64, error) {
-	return s.updateSetting(ctx, setting.Setting, &setting.Settings)
+func (s *settings) UpdateLogin(ctx context.Context, setting *domain.LoginSetting, changes ...database.Change) (int64, error) {
+	return s.updateSetting(ctx, setting.Setting, &setting.Settings, changes...)
 }
 
 func (s *settings) CreateLabel(ctx context.Context, setting *domain.LabelSetting) error {
@@ -198,11 +198,11 @@ func (s *settings) GetLabel(ctx context.Context, instanceID string, orgID *strin
 	return labelSetting, nil
 }
 
-func (s *settings) UpdateLabel(ctx context.Context, setting *domain.LabelSetting) (int64, error) {
+func (s *settings) UpdateLabel(ctx context.Context, setting *domain.LabelSetting, changes ...database.Change) (int64, error) {
 	if setting.LabelState == nil {
 		return 0, ErrLabelStateMustBeDefined
 	}
-	return s.updateSetting(ctx, setting.Setting, &setting.Settings)
+	return s.updateSetting(ctx, setting.Setting, &setting.Settings, changes...)
 }
 
 func (s *settings) CreatePasswordComplexity(ctx context.Context, setting *domain.PasswordComplexitySetting) error {
@@ -230,8 +230,8 @@ func (s *settings) GetPasswordComplexity(ctx context.Context, instanceID string,
 	return passwordComplexitySetting, nil
 }
 
-func (s *settings) UpdatePasswordComplexity(ctx context.Context, setting *domain.PasswordComplexitySetting) (int64, error) {
-	return s.updateSetting(ctx, setting.Setting, &setting.Settings)
+func (s *settings) UpdatePasswordComplexity(ctx context.Context, setting *domain.PasswordComplexitySetting, changes ...database.Change) (int64, error) {
+	return s.updateSetting(ctx, setting.Setting, &setting.Settings, changes...)
 }
 
 func (s *settings) CreatePasswordExpiry(ctx context.Context, setting *domain.PasswordExpirySetting) error {
@@ -259,8 +259,8 @@ func (s *settings) GetPasswordExpiry(ctx context.Context, instanceID string, org
 	return passwordPolicySetting, nil
 }
 
-func (s *settings) UpdatePasswordExpiry(ctx context.Context, setting *domain.PasswordExpirySetting) (int64, error) {
-	return s.updateSetting(ctx, setting.Setting, &setting.Settings)
+func (s *settings) UpdatePasswordExpiry(ctx context.Context, setting *domain.PasswordExpirySetting, changes ...database.Change) (int64, error) {
+	return s.updateSetting(ctx, setting.Setting, &setting.Settings, changes...)
 }
 
 func (s *settings) CreateSecurity(ctx context.Context, setting *domain.SecuritySetting) error {
@@ -288,8 +288,8 @@ func (s *settings) GetSecurity(ctx context.Context, instanceID string, orgID *st
 	return securitySetting, nil
 }
 
-func (s *settings) UpdateSecurity(ctx context.Context, setting *domain.SecuritySetting) (int64, error) {
-	return s.updateSetting(ctx, setting.Setting, &setting.Settings)
+func (s *settings) UpdateSecurity(ctx context.Context, setting *domain.SecuritySetting, changes ...database.Change) (int64, error) {
+	return s.updateSetting(ctx, setting.Setting, &setting.Settings, changes...)
 }
 
 func (s *settings) CreateLockout(ctx context.Context, setting *domain.LockoutSetting) error {
@@ -317,8 +317,8 @@ func (s *settings) GetLockout(ctx context.Context, instanceID string, orgID *str
 	return lockoutSetting, nil
 }
 
-func (s *settings) UpdateLockout(ctx context.Context, setting *domain.LockoutSetting) (int64, error) {
-	return s.updateSetting(ctx, setting.Setting, &setting.Settings)
+func (s *settings) UpdateLockout(ctx context.Context, setting *domain.LockoutSetting, changes ...database.Change) (int64, error) {
+	return s.updateSetting(ctx, setting.Setting, &setting.Settings, changes...)
 }
 
 func (s *settings) CreateDomain(ctx context.Context, setting *domain.DomainSetting) error {
@@ -346,8 +346,8 @@ func (s *settings) GetDomain(ctx context.Context, instanceID string, orgID *stri
 	return lockoutSetting, nil
 }
 
-func (s *settings) UpdateDomain(ctx context.Context, setting *domain.DomainSetting) (int64, error) {
-	return s.updateSetting(ctx, setting.Setting, &setting.Settings)
+func (s *settings) UpdateDomain(ctx context.Context, setting *domain.DomainSetting, changes ...database.Change) (int64, error) {
+	return s.updateSetting(ctx, setting.Setting, &setting.Settings, changes...)
 }
 
 func (s *settings) CreateOrg(ctx context.Context, setting *domain.OrgSetting) error {
@@ -375,11 +375,11 @@ func (s *settings) GetOrg(ctx context.Context, instanceID string, orgID *string)
 	return orgSetting, nil
 }
 
-func (s *settings) UpdateOrg(ctx context.Context, setting *domain.OrgSetting) (int64, error) {
-	return s.updateSetting(ctx, setting.Setting, &setting.Settings)
+func (s *settings) UpdateOrg(ctx context.Context, setting *domain.OrgSetting, changes ...database.Change) (int64, error) {
+	return s.updateSetting(ctx, setting.Setting, &setting.Settings, changes...)
 }
 
-func (s *settings) updateSetting(ctx context.Context, setting *domain.Setting, settings any) (int64, error) {
+func (s *settings) updateSetting(ctx context.Context, setting *domain.Setting, settings any, changes ...database.Change) (int64, error) {
 	builder := database.StatementBuilder{}
 	builder.WriteString(`UPDATE zitadel.settings SET `)
 	conditions := []database.Condition{
@@ -393,7 +393,12 @@ func (s *settings) updateSetting(ctx context.Context, setting *domain.Setting, s
 		return 0, err
 	}
 
-	changes := database.Changes{s.SetSettings(string(settingJSON)), s.SetUpdatedAt(setting.UpdatedAt)}
+	if changes == nil || !database.Changes(changes).IsOnColumn(s.UpdatedAtColumn()) {
+		// if updated_at is not set, then explicitly set it to NULL so that the db trigger sets it to NOW()
+		changes = append(changes, s.SetSettings(string(settingJSON)), s.SetUpdatedAt(nil))
+	} else {
+		changes = append(changes, s.SetSettings(string(settingJSON)))
+	}
 
 	database.Changes(changes).Write(&builder)
 

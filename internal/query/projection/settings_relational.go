@@ -467,7 +467,7 @@ func (s *settingsRelationalProjection) reduceLoginPolicyChanged(event eventstore
 
 		setting.UpdatedAt = &policyEvent.Creation
 
-		_, err = settingsRepo.UpdateLogin(ctx, setting)
+		_, err = settingsRepo.UpdateLogin(ctx, setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
@@ -504,10 +504,7 @@ func (s *settingsRelationalProjection) reduceMFAAdded(event eventstore.Event) (*
 
 		setting.Settings.MFAType = append(setting.Settings.MFAType, domain.MultiFactorType(policyEvent.MFAType))
 
-		CreatedAt := event.CreatedAt()
-		setting.UpdatedAt = &CreatedAt
-
-		_, err = settingsRepo.UpdateLogin(ctx, setting)
+		_, err = settingsRepo.UpdateLogin(ctx, setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
@@ -544,7 +541,7 @@ func (s *settingsRelationalProjection) reduceMFARemoved(event eventstore.Event) 
 
 		setting.UpdatedAt = &policyEvent.Creation
 
-		_, err = settingsRepo.UpdateLogin(ctx, setting)
+		_, err = settingsRepo.UpdateLogin(ctx, setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
@@ -605,7 +602,7 @@ func (s *settingsRelationalProjection) reduceSecondFactorAdded(event eventstore.
 
 		setting.Settings.SecondFactorTypes = append(setting.Settings.SecondFactorTypes, domain.SecondFactorType(policyEvent.MFAType))
 
-		_, err = settingsRepo.UpdateLogin(ctx, setting)
+		_, err = settingsRepo.UpdateLogin(ctx, setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
@@ -640,10 +637,7 @@ func (s *settingsRelationalProjection) reduceSecondFactorRemoved(event eventstor
 			return secondFactorType == domain.SecondFactorType(policyEvent.MFAType)
 		})
 
-		CreatedAt := event.CreatedAt()
-		setting.UpdatedAt = &CreatedAt
-
-		_, err = settingsRepo.UpdateLogin(ctx, setting)
+		_, err = settingsRepo.UpdateLogin(ctx, setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
@@ -788,10 +782,7 @@ func (s *settingsRelationalProjection) reduceLabelChanged(event eventstore.Event
 			setting.Settings.ThemeMode = domain.LabelPolicyThemeMode(*policyEvent.ThemeMode)
 		}
 
-		CreatedAt := event.CreatedAt()
-		setting.UpdatedAt = &CreatedAt
-
-		_, err = settingsRepo.UpdateLabel(ctx, setting)
+		_, err = settingsRepo.UpdateLabel(ctx, setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
@@ -905,9 +896,8 @@ func (p *settingsRelationalProjection) reduceLabelLogoAdded(event eventstore.Eve
 		}
 
 		CreatedAt := event.CreatedAt()
-		setting.UpdatedAt = &CreatedAt
 
-		_, err = settingsRepo.UpdateLabel(ctx, setting)
+		_, err = settingsRepo.UpdateLabel(ctx, setting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
@@ -949,9 +939,8 @@ func (p *settingsRelationalProjection) reduceLogoRemoved(event eventstore.Event)
 		}
 
 		CreatedAt := event.CreatedAt()
-		setting.UpdatedAt = &CreatedAt
 
-		_, err = settingsRepo.UpdateLabel(ctx, setting)
+		_, err = settingsRepo.UpdateLabel(ctx, setting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
@@ -993,9 +982,8 @@ func (p *settingsRelationalProjection) reduceIconAdded(event eventstore.Event) (
 		}
 
 		CreatedAt := event.CreatedAt()
-		setting.UpdatedAt = &CreatedAt
 
-		_, err = settingsRepo.UpdateLabel(ctx, setting)
+		_, err = settingsRepo.UpdateLabel(ctx, setting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
@@ -1037,9 +1025,8 @@ func (p *settingsRelationalProjection) reduceIconRemoved(event eventstore.Event)
 		}
 
 		CreatedAt := event.CreatedAt()
-		setting.UpdatedAt = &CreatedAt
 
-		_, err = settingsRepo.UpdateLabel(ctx, setting)
+		_, err = settingsRepo.UpdateLabel(ctx, setting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
@@ -1074,9 +1061,8 @@ func (p *settingsRelationalProjection) reduceFontAdded(event eventstore.Event) (
 		}
 
 		CreatedAt := event.CreatedAt()
-		setting.UpdatedAt = &CreatedAt
 
-		_, err = settingsRepo.UpdateLabel(ctx, setting)
+		_, err = settingsRepo.UpdateLabel(ctx, setting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
@@ -1106,9 +1092,8 @@ func (p *settingsRelationalProjection) reduceFontRemoved(event eventstore.Event)
 		setting.Settings.LabelPolicyFontURL = nil
 
 		CreatedAt := event.CreatedAt()
-		setting.UpdatedAt = &CreatedAt
 
-		_, err = settingsRepo.UpdateLabel(ctx, setting)
+		_, err = settingsRepo.UpdateLabel(ctx, setting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
@@ -1205,9 +1190,8 @@ func (s *settingsRelationalProjection) reducePasswordComplexityChanged(event eve
 		}
 
 		CreatedAt := event.CreatedAt()
-		setting.UpdatedAt = &CreatedAt
 
-		_, err = settingsRepo.UpdatePasswordComplexity(ctx, setting)
+		_, err = settingsRepo.UpdatePasswordComplexity(ctx, setting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
@@ -1315,10 +1299,7 @@ func (p *settingsRelationalProjection) reducePasswordPolicyChanged(event eventst
 			setting.Settings.MaxAgeDays = *policyEvent.MaxAgeDays
 		}
 
-		CreatedAt := event.CreatedAt()
-		setting.UpdatedAt = &CreatedAt
-
-		_, err = settingsRepo.UpdatePasswordExpiry(ctx, setting)
+		_, err = settingsRepo.UpdatePasswordExpiry(ctx, setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
@@ -1469,10 +1450,7 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyChanged(event eventsto
 			setting.Settings.ShowLockOutFailures = *policyEvent.ShowLockOutFailures
 		}
 
-		CreatedAt := event.CreatedAt()
-		setting.UpdatedAt = &CreatedAt
-
-		_, err = settingsRepo.UpdateLockout(ctx, setting)
+		_, err = settingsRepo.UpdateLockout(ctx, setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
@@ -1561,10 +1539,7 @@ func (s *settingsRelationalProjection) reduceDomainPolicyChanged(event eventstor
 			setting.Settings.SMTPSenderAddressMatchesInstanceDomain = *policyEvent.SMTPSenderAddressMatchesInstanceDomain
 		}
 
-		CreatedAt := event.CreatedAt()
-		setting.UpdatedAt = &CreatedAt
-
-		_, err = settingsRepo.UpdateDomain(ctx, setting)
+		_, err = settingsRepo.UpdateDomain(ctx, setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
@@ -1638,9 +1613,8 @@ func (s *settingsRelationalProjection) reduceSecurityPolicySet(event eventstore.
 		}
 
 		CreatedAt := event.CreatedAt()
-		existingSetting.UpdatedAt = &CreatedAt
 
-		_, err = settingsRepo.UpdateSecurity(ctx, existingSetting)
+		_, err = settingsRepo.UpdateSecurity(ctx, existingSetting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
@@ -1687,9 +1661,8 @@ func (s *settingsRelationalProjection) reduceOrganizationSettingsSet(event event
 		existingSetting.Settings.OrganizationScopedUsernames = e.OrganizationScopedUsernames
 
 		CreatedAt := event.CreatedAt()
-		existingSetting.UpdatedAt = &CreatedAt
 
-		_, err = settingsRepo.UpdateOrg(ctx, existingSetting)
+		_, err = settingsRepo.UpdateOrg(ctx, existingSetting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }

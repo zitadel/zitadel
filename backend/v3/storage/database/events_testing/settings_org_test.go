@@ -682,12 +682,13 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		ctx := t.Context()
 		token := integration.SystemToken
 
-		instanceRepo := repository.InstanceRepository(pool)
-		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
+		instanceRepo := repository.InstanceRepository()
+		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
-		orgRepo := repository.OrganizationRepository(pool)
-		org_, err := orgRepo.Get(ctx, database.WithCondition(orgRepo.InstanceIDCondition(instanceID)), database.WithCondition(orgRepo.NameCondition("ZITADEL")))
+		orgRepo := repository.OrganizationRepository()
+		org_, err := orgRepo.Get(ctx, pool, database.WithCondition(database.And(orgRepo.InstanceIDCondition(instanceID), orgRepo.NameCondition(database.TextOperationEqual, "ZITADEL"))))
+		require.NoError(t, err)
 		orgID := org_.ID
 
 		// delete previous label settings
@@ -753,15 +754,14 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		ctx := t.Context()
 		token := integration.SystemToken
 
-		instanceRepo := repository.InstanceRepository(pool)
-		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
+		instanceRepo := repository.InstanceRepository()
+		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
-		orgRepo := repository.OrganizationRepository(pool)
-		org_, err := orgRepo.Get(ctx, database.WithCondition(orgRepo.InstanceIDCondition(instanceID)), database.WithCondition(orgRepo.NameCondition("ZITADEL")))
+		orgRepo := repository.OrganizationRepository()
+		org_, err := orgRepo.Get(ctx, pool, database.WithCondition(database.And(orgRepo.InstanceIDCondition(instanceID), orgRepo.NameCondition(database.TextOperationEqual, "ZITADEL"))))
+		require.NoError(t, err)
 		orgID := org_.ID
-
-		systemCTX := integration.WithSystemAuthorization(ctx)
 
 		// delete previous label settings
 		client := resty.New()
@@ -770,8 +770,6 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			Delete("http://localhost:8080" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
-
-		systemCTX = integration.SetOrgID(systemCTX, orgID)
 
 		// add label policy
 		label := management.AddCustomLabelPolicyRequest{
@@ -829,12 +827,13 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		ctx := t.Context()
 		token := integration.SystemToken
 
-		instanceRepo := repository.InstanceRepository(pool)
-		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
+		instanceRepo := repository.InstanceRepository()
+		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
-		orgRepo := repository.OrganizationRepository(pool)
-		org_, err := orgRepo.Get(ctx, database.WithCondition(orgRepo.InstanceIDCondition(instanceID)), database.WithCondition(orgRepo.NameCondition("ZITADEL")))
+		orgRepo := repository.OrganizationRepository()
+		org_, err := orgRepo.Get(ctx, pool, database.WithCondition(database.And(orgRepo.InstanceIDCondition(instanceID), orgRepo.NameCondition(database.TextOperationEqual, "ZITADEL"))))
+		require.NoError(t, err)
 		orgID := org_.ID
 
 		// delete previous label settings
@@ -922,12 +921,13 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		ctx := t.Context()
 		token := integration.SystemToken
 
-		instanceRepo := repository.InstanceRepository(pool)
-		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
+		instanceRepo := repository.InstanceRepository()
+		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
-		orgRepo := repository.OrganizationRepository(pool)
-		org_, err := orgRepo.Get(ctx, database.WithCondition(orgRepo.InstanceIDCondition(instanceID)), database.WithCondition(orgRepo.NameCondition("ZITADEL")))
+		orgRepo := repository.OrganizationRepository()
+		org_, err := orgRepo.Get(ctx, pool, database.WithCondition(database.And(orgRepo.InstanceIDCondition(instanceID), orgRepo.NameCondition(database.TextOperationEqual, "ZITADEL"))))
+		require.NoError(t, err)
 		orgID := org_.ID
 
 		// delete previous label settings
@@ -1015,12 +1015,13 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		ctx := t.Context()
 		token := integration.SystemToken
 
-		instanceRepo := repository.InstanceRepository(pool)
-		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
+		instanceRepo := repository.InstanceRepository()
+		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
-		orgRepo := repository.OrganizationRepository(pool)
-		org_, err := orgRepo.Get(ctx, database.WithCondition(orgRepo.InstanceIDCondition(instanceID)), database.WithCondition(orgRepo.NameCondition("ZITADEL")))
+		orgRepo := repository.OrganizationRepository()
+		org_, err := orgRepo.Get(ctx, pool, database.WithCondition(database.And(orgRepo.InstanceIDCondition(instanceID), orgRepo.NameCondition(database.TextOperationEqual, "ZITADEL"))))
+		require.NoError(t, err)
 		orgID := org_.ID
 
 		// delete previous label settings
@@ -1087,12 +1088,13 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		ctx := t.Context()
 		token := integration.SystemToken
 
-		instanceRepo := repository.InstanceRepository(pool)
-		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
+		instanceRepo := repository.InstanceRepository()
+		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
-		orgRepo := repository.OrganizationRepository(pool)
-		org_, err := orgRepo.Get(ctx, database.WithCondition(orgRepo.InstanceIDCondition(instanceID)), database.WithCondition(orgRepo.NameCondition("ZITADEL")))
+		orgRepo := repository.OrganizationRepository()
+		org_, err := orgRepo.Get(ctx, pool, database.WithCondition(database.And(orgRepo.InstanceIDCondition(instanceID), orgRepo.NameCondition(database.TextOperationEqual, "ZITADEL"))))
+		require.NoError(t, err)
 		orgID := org_.ID
 
 		// delete previous label settings
@@ -1158,12 +1160,13 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		ctx := t.Context()
 		token := integration.SystemToken
 
-		instanceRepo := repository.InstanceRepository(pool)
-		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
+		instanceRepo := repository.InstanceRepository()
+		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
-		orgRepo := repository.OrganizationRepository(pool)
-		org_, err := orgRepo.Get(ctx, database.WithCondition(orgRepo.InstanceIDCondition(instanceID)), database.WithCondition(orgRepo.NameCondition("ZITADEL")))
+		orgRepo := repository.OrganizationRepository()
+		org_, err := orgRepo.Get(ctx, pool, database.WithCondition(database.And(orgRepo.InstanceIDCondition(instanceID), orgRepo.NameCondition(database.TextOperationEqual, "ZITADEL"))))
+		require.NoError(t, err)
 		orgID := org_.ID
 
 		// delete previous label settings
@@ -1251,12 +1254,13 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		ctx := t.Context()
 		token := integration.SystemToken
 
-		instanceRepo := repository.InstanceRepository(pool)
-		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
+		instanceRepo := repository.InstanceRepository()
+		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
-		orgRepo := repository.OrganizationRepository(pool)
-		org_, err := orgRepo.Get(ctx, database.WithCondition(orgRepo.InstanceIDCondition(instanceID)), database.WithCondition(orgRepo.NameCondition("ZITADEL")))
+		orgRepo := repository.OrganizationRepository()
+		org_, err := orgRepo.Get(ctx, pool, database.WithCondition(database.And(orgRepo.InstanceIDCondition(instanceID), orgRepo.NameCondition(database.TextOperationEqual, "ZITADEL"))))
+		require.NoError(t, err)
 		orgID := org_.ID
 
 		// delete previous label settings
@@ -1345,12 +1349,13 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		ctx := t.Context()
 		token := integration.SystemToken
 
-		instanceRepo := repository.InstanceRepository(pool)
-		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
+		instanceRepo := repository.InstanceRepository()
+		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
-		orgRepo := repository.OrganizationRepository(pool)
-		org_, err := orgRepo.Get(ctx, database.WithCondition(orgRepo.InstanceIDCondition(instanceID)), database.WithCondition(orgRepo.NameCondition("ZITADEL")))
+		orgRepo := repository.OrganizationRepository()
+		org_, err := orgRepo.Get(ctx, pool, database.WithCondition(database.And(orgRepo.InstanceIDCondition(instanceID), orgRepo.NameCondition(database.TextOperationEqual, "ZITADEL"))))
+		require.NoError(t, err)
 		orgID := org_.ID
 
 		// delete previous label settings
@@ -1417,12 +1422,13 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		ctx := t.Context()
 		token := integration.SystemToken
 
-		instanceRepo := repository.InstanceRepository(pool)
-		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
+		instanceRepo := repository.InstanceRepository()
+		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
-		orgRepo := repository.OrganizationRepository(pool)
-		org_, err := orgRepo.Get(ctx, database.WithCondition(orgRepo.InstanceIDCondition(instanceID)), database.WithCondition(orgRepo.NameCondition("ZITADEL")))
+		orgRepo := repository.OrganizationRepository()
+		org_, err := orgRepo.Get(ctx, pool, database.WithCondition(database.And(orgRepo.InstanceIDCondition(instanceID), orgRepo.NameCondition(database.TextOperationEqual, "ZITADEL"))))
+		require.NoError(t, err)
 		orgID := org_.ID
 
 		// delete previous label settings

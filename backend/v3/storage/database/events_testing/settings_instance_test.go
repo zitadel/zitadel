@@ -424,8 +424,8 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		ctx := t.Context()
 		token := integration.SystemToken
 
-		instanceRepo := repository.InstanceRepository(pool)
-		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
+		instanceRepo := repository.InstanceRepository()
+		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
 
@@ -460,8 +460,8 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		ctx := t.Context()
 		token := integration.SystemToken
 
-		instanceRepo := repository.InstanceRepository(pool)
-		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
+		instanceRepo := repository.InstanceRepository()
+		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
 
@@ -496,8 +496,8 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		ctx := t.Context()
 		token := integration.SystemToken
 
-		instanceRepo := repository.InstanceRepository(pool)
-		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
+		instanceRepo := repository.InstanceRepository()
+		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
 
@@ -552,8 +552,8 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		ctx := t.Context()
 		token := integration.SystemToken
 
-		instanceRepo := repository.InstanceRepository(pool)
-		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
+		instanceRepo := repository.InstanceRepository()
+		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
 
@@ -608,8 +608,8 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		ctx := t.Context()
 		token := integration.SystemToken
 
-		instanceRepo := repository.InstanceRepository(pool)
-		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
+		instanceRepo := repository.InstanceRepository()
+		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
 
@@ -644,8 +644,8 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		ctx := t.Context()
 		token := integration.SystemToken
 
-		instanceRepo := repository.InstanceRepository(pool)
-		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
+		instanceRepo := repository.InstanceRepository()
+		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
 
@@ -680,8 +680,8 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		ctx := t.Context()
 		token := integration.SystemToken
 
-		instanceRepo := repository.InstanceRepository(pool)
-		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
+		instanceRepo := repository.InstanceRepository()
+		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
 
@@ -736,8 +736,8 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		ctx := t.Context()
 		token := integration.SystemToken
 
-		instanceRepo := repository.InstanceRepository(pool)
-		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
+		instanceRepo := repository.InstanceRepository()
+		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
 
@@ -792,8 +792,8 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		ctx := t.Context()
 		token := integration.SystemToken
 
-		instanceRepo := repository.InstanceRepository(pool)
-		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
+		instanceRepo := repository.InstanceRepository()
+		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
 
@@ -828,8 +828,8 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		ctx := t.Context()
 		token := integration.SystemToken
 
-		instanceRepo := repository.InstanceRepository(pool)
-		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
+		instanceRepo := repository.InstanceRepository()
+		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
 
