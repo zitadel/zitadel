@@ -4,21 +4,39 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/eventstore"
 	legacy_es "github.com/zitadel/zitadel/internal/eventstore"
 )
+
+type InvokeOpt func(*CommandOpts)
+
+func WithOrganizationRepo(repo func(client database.QueryExecutor) OrganizationRepository) InvokeOpt {
+	return func(opts *CommandOpts) {
+		opts.organizationRepo = repo
+	}
+}
 
 // Invoke provides a way to execute commands within the domain package.
 // It uses a chain of responsibility pattern to handle the command execution.
 // The default chain includes logging, tracing, and event publishing.
 // If you want to invoke multiple commands in a single transaction, you can use the [commandBatch].
-func Invoke(ctx context.Context, cmd Commander) error {
-	invoker := newEventStoreInvoker(newLoggingInvoker(newTraceInvoker(nil)))
-	opts := &CommandOpts{
+func Invoke(ctx context.Context, cmd Commander, opts ...InvokeOpt) error {
+	invoker := newEventStoreInvoker(
+		newLoggingInvoker(
+			newTraceInvoker(
+				newValidatorInvoker(nil),
+			),
+		),
+	)
+	commandOpts := &CommandOpts{
 		Invoker: invoker.collector,
 		DB:      pool,
 	}
-	return invoker.Invoke(ctx, cmd, opts)
+	for _, opt := range opts {
+		opt(commandOpts)
+	}
+	return invoker.Invoke(ctx, cmd, commandOpts)
 }
 
 // eventStoreInvoker checks if the [Commander].Events function returns any events.
@@ -32,6 +50,9 @@ func newEventStoreInvoker(next Invoker) *eventStoreInvoker {
 }
 
 func (i *eventStoreInvoker) Invoke(ctx context.Context, command Commander, opts *CommandOpts) (err error) {
+	close, err := opts.EnsureTx(ctx)
+	defer func() { err = close(ctx, err) }()
+
 	err = i.collector.Invoke(ctx, command, opts)
 	if err != nil {
 		return err
@@ -131,6 +152,26 @@ func (i *noopInvoker) Invoke(ctx context.Context, command Commander, opts *Comma
 	if i.next != nil {
 		return i.next.Invoke(ctx, command, opts)
 	}
+	return command.Execute(ctx, opts)
+}
+
+type validatorInvoker struct {
+	next Invoker
+}
+
+func newValidatorInvoker(next Invoker) *validatorInvoker {
+	return &validatorInvoker{next: next}
+}
+
+func (i *validatorInvoker) Invoke(ctx context.Context, command Commander, opts *CommandOpts) error {
+	if err := command.Validate(); err != nil {
+		return err
+	}
+
+	if i.next != nil {
+		return i.next.Invoke(ctx, command, opts)
+	}
+
 	return command.Execute(ctx, opts)
 }
 

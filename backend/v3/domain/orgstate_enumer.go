@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-const _OrgStateName = "activeinactive"
+const _OrgStateName = "unspecifiedactiveinactiveremoved"
 
-var _OrgStateIndex = [...]uint8{0, 6, 14}
+var _OrgStateIndex = [...]uint8{0, 11, 17, 25, 32}
 
-const _OrgStateLowerName = "activeinactive"
+const _OrgStateLowerName = "unspecifiedactiveinactiveremoved"
 
 func (i OrgState) String() string {
 	if i >= OrgState(len(_OrgStateIndex)-1) {
@@ -25,22 +25,30 @@ func (i OrgState) String() string {
 // Re-run the stringer command to generate them again.
 func _OrgStateNoOp() {
 	var x [1]struct{}
-	_ = x[OrgStateActive-(0)]
-	_ = x[OrgStateInactive-(1)]
+	_ = x[OrgStateUnspecified-(0)]
+	_ = x[OrgStateActive-(1)]
+	_ = x[OrgStateInactive-(2)]
+	_ = x[OrgStateRemoved-(3)]
 }
 
-var _OrgStateValues = []OrgState{OrgStateActive, OrgStateInactive}
+var _OrgStateValues = []OrgState{OrgStateUnspecified, OrgStateActive, OrgStateInactive, OrgStateRemoved}
 
 var _OrgStateNameToValueMap = map[string]OrgState{
-	_OrgStateName[0:6]:       OrgStateActive,
-	_OrgStateLowerName[0:6]:  OrgStateActive,
-	_OrgStateName[6:14]:      OrgStateInactive,
-	_OrgStateLowerName[6:14]: OrgStateInactive,
+	_OrgStateName[0:11]:       OrgStateUnspecified,
+	_OrgStateLowerName[0:11]:  OrgStateUnspecified,
+	_OrgStateName[11:17]:      OrgStateActive,
+	_OrgStateLowerName[11:17]: OrgStateActive,
+	_OrgStateName[17:25]:      OrgStateInactive,
+	_OrgStateLowerName[17:25]: OrgStateInactive,
+	_OrgStateName[25:32]:      OrgStateRemoved,
+	_OrgStateLowerName[25:32]: OrgStateRemoved,
 }
 
 var _OrgStateNames = []string{
-	_OrgStateName[0:6],
-	_OrgStateName[6:14],
+	_OrgStateName[0:11],
+	_OrgStateName[11:17],
+	_OrgStateName[17:25],
+	_OrgStateName[25:32],
 }
 
 // OrgStateString retrieves an enum value from the enum constants string name.

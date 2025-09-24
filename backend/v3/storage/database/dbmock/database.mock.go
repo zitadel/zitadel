@@ -238,6 +238,44 @@ func (c *MockPoolMigrateCall) DoAndReturn(f func(context.Context) error) *MockPo
 	return c
 }
 
+// Ping mocks base method.
+func (m *MockPool) Ping(arg0 context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Ping", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Ping indicates an expected call of Ping.
+func (mr *MockPoolMockRecorder) Ping(arg0 any) *MockPoolPingCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockPool)(nil).Ping), arg0)
+	return &MockPoolPingCall{Call: call}
+}
+
+// MockPoolPingCall wrap *gomock.Call
+type MockPoolPingCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockPoolPingCall) Return(arg0 error) *MockPoolPingCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockPoolPingCall) Do(f func(context.Context) error) *MockPoolPingCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockPoolPingCall) DoAndReturn(f func(context.Context) error) *MockPoolPingCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Query mocks base method.
 func (m *MockPool) Query(arg0 context.Context, arg1 string, arg2 ...any) (database.Rows, error) {
 	m.ctrl.T.Helper()
@@ -465,6 +503,44 @@ func (c *MockClientMigrateCall) Do(f func(context.Context) error) *MockClientMig
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockClientMigrateCall) DoAndReturn(f func(context.Context) error) *MockClientMigrateCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// Ping mocks base method.
+func (m *MockClient) Ping(arg0 context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Ping", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Ping indicates an expected call of Ping.
+func (mr *MockClientMockRecorder) Ping(arg0 any) *MockClientPingCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockClient)(nil).Ping), arg0)
+	return &MockClientPingCall{Call: call}
+}
+
+// MockClientPingCall wrap *gomock.Call
+type MockClientPingCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockClientPingCall) Return(arg0 error) *MockClientPingCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockClientPingCall) Do(f func(context.Context) error) *MockClientPingCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockClientPingCall) DoAndReturn(f func(context.Context) error) *MockClientPingCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

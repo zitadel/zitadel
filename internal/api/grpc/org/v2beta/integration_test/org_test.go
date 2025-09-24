@@ -5,6 +5,7 @@ package org_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"slices"
 	"strings"
@@ -17,6 +18,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	v2beta_object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
@@ -294,66 +296,75 @@ func TestServer_CreateOrganization(t *testing.T) {
 }
 
 func TestServer_UpdateOrganization(t *testing.T) {
-	orgs, orgsName, _ := createOrgs(CTX, t, Client, 1)
-	orgId := orgs[0].Id
-	orgName := orgsName[0]
+	ctx := Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+
+	t.Cleanup(func() {
+		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(ctx, &feature.ResetInstanceFeaturesRequest{})
+		require.NoError(t, err)
+	})
+
+	orgs, orgsName, _ := createOrgs(CTX, t, Client, 2)
+
+	relTableState := integration.RelationalTablesEnableMatrix()
 
 	tests := []struct {
 		name    string
-		ctx     context.Context
 		req     *v2beta_org.UpdateOrganizationRequest
 		want    *v2beta_org.UpdateOrganizationResponse
 		wantErr bool
 	}{
 		{
 			name: "update org with new name",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 			req: &v2beta_org.UpdateOrganizationRequest{
-				Id:   orgId,
+				Id:   orgs[0].GetId(),
 				Name: "new org name",
 			},
 		},
 		{
 			name: "update org with same name",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 			req: &v2beta_org.UpdateOrganizationRequest{
-				Id:   orgId,
-				Name: orgName,
+				Id:   orgs[1].GetId(),
+				Name: orgsName[1],
 			},
+			wantErr: true,
 		},
 		{
 			name: "update org with non existent org id",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 			req: &v2beta_org.UpdateOrganizationRequest{
-				Id: "non existant org id",
-				// Name: "",
+				Id:   "non existent org id",
+				Name: "new name",
 			},
 			wantErr: true,
 		},
 		{
 			name: "update org with no id",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 			req: &v2beta_org.UpdateOrganizationRequest{
-				Id:   "",
-				Name: orgName,
+				Id:   " ",
+				Name: "new name",
 			},
 			wantErr: true,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.UpdateOrganization(tt.ctx, tt.req)
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
 
-			// check details
-			gotCD := got.GetChangeDate().AsTime()
-			now := time.Now()
-			assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+	for _, stateCase := range relTableState {
+		integration.EnsureInstanceFeature(t, CTX, Instance, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
 		})
+		for _, tt := range tests {
+			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tt.name), func(t1 *testing.T) {
+				got, err := Client.UpdateOrganization(ctx, tt.req)
+				if tt.wantErr {
+					require.Error(t1, err)
+					return
+				}
+				require.NoError(t1, err)
+
+				// check details
+				gotCD := got.GetChangeDate().AsTime()
+				now := time.Now()
+				assert.WithinRange(t1, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+			})
+		}
 	}
 }
 
@@ -366,11 +377,13 @@ func TestServer_ListOrganizations(t *testing.T) {
 	noOfOrgs := 3
 	orgs, orgsName, orgsDomain := createOrgs(listOrgIAmOwnerCtx, t, listOrgClient, noOfOrgs)
 
-	// deactivat org[1]
+	// deactivate org[1]
 	_, err := listOrgClient.DeactivateOrganization(listOrgIAmOwnerCtx, &v2beta_org.DeactivateOrganizationRequest{
 		Id: orgs[1].Id,
 	})
 	require.NoError(t, err)
+
+	relTableState := integration.RelationalTablesEnableMatrix()
 
 	tests := []struct {
 		name  string
@@ -609,47 +622,54 @@ func TestServer_ListOrganizations(t *testing.T) {
 			},
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
-			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, err := listOrgClient.ListOrganizations(tt.ctx, &v2beta_org.ListOrganizationsRequest{
-					Filter: tt.query,
-				})
-				if tt.err != nil {
-					require.ErrorContains(ttt, err, tt.err.Error())
-					return
-				}
-				require.NoError(ttt, err)
 
-				require.Equal(ttt, uint64(len(tt.want)), got.Pagination.GetTotalResult())
+	for _, stateCase := range relTableState {
+		integration.EnsureInstanceFeature(t, CTX, Instance, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
+		})
 
-				foundOrgs := 0
-				for _, got := range got.Organizations {
-					for _, org := range tt.want {
+		for _, tt := range tests {
+			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tt.name), func(t *testing.T) {
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
+				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+					got, err := listOrgClient.ListOrganizations(tt.ctx, &v2beta_org.ListOrganizationsRequest{
+						Filter: tt.query,
+					})
+					if tt.err != nil {
+						require.ErrorContains(ttt, err, tt.err.Error())
+						return
+					}
+					require.NoError(ttt, err)
 
-						// created/chagned date
-						gotCD := got.GetCreationDate().AsTime()
-						now := time.Now()
-						assert.WithinRange(ttt, gotCD, testStartTimestamp, now.Add(time.Minute))
-						gotCD = got.GetChangedDate().AsTime()
-						assert.WithinRange(ttt, gotCD, testStartTimestamp, now.Add(time.Minute))
+					require.Equal(ttt, uint64(len(tt.want)), got.Pagination.GetTotalResult())
 
-						// default org
-						if org.Name == got.Name && got.Name == "testinstance" {
-							foundOrgs += 1
-							continue
-						}
+					foundOrgs := 0
+					for _, got := range got.Organizations {
+						for _, org := range tt.want {
 
-						if org.Name == got.Name &&
-							org.Id == got.Id {
-							foundOrgs += 1
+							// created/chagned date
+							gotCD := got.GetCreationDate().AsTime()
+							now := time.Now()
+							assert.WithinRange(ttt, gotCD, testStartTimestamp, now.Add(time.Minute))
+							gotCD = got.GetChangedDate().AsTime()
+							assert.WithinRange(ttt, gotCD, testStartTimestamp, now.Add(time.Minute))
+
+							// default org
+							if org.Name == got.Name && got.Name == "testinstance" {
+								foundOrgs += 1
+								continue
+							}
+
+							if org.Name == got.Name &&
+								org.Id == got.Id {
+								foundOrgs += 1
+							}
 						}
 					}
-				}
-				require.Equal(ttt, len(tt.want), foundOrgs)
-			}, retryDuration, tick, "timeout waiting for expected organizations being created")
-		})
+					require.Equal(ttt, len(tt.want), foundOrgs)
+				}, retryDuration, tick, "timeout waiting for expected organizations being created")
+			})
+		}
 	}
 }
 

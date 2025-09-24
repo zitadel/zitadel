@@ -7,6 +7,8 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	orgv2 "github.com/zitadel/zitadel/backend/v3/api/org/v2"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	metadata "github.com/zitadel/zitadel/internal/api/grpc/metadata/v2beta"
 	object "github.com/zitadel/zitadel/internal/api/grpc/object/v2beta"
 	user "github.com/zitadel/zitadel/internal/api/grpc/user/v2beta"
@@ -31,6 +33,10 @@ func (s *Server) CreateOrganization(ctx context.Context, request *connect.Reques
 }
 
 func (s *Server) UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org.UpdateOrganizationRequest]) (*connect.Response[v2beta_org.UpdateOrganizationResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return orgv2.UpdateOrganization(ctx, request)
+	}
+
 	org, err := s.command.ChangeOrg(ctx, request.Msg.GetId(), request.Msg.GetName())
 	if err != nil {
 		return nil, err
@@ -42,6 +48,10 @@ func (s *Server) UpdateOrganization(ctx context.Context, request *connect.Reques
 }
 
 func (s *Server) ListOrganizations(ctx context.Context, request *connect.Request[v2beta_org.ListOrganizationsRequest]) (*connect.Response[v2beta_org.ListOrganizationsResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return orgv2.ListOrganizationsBeta(ctx, request)
+	}
+
 	queries, err := listOrgRequestToModel(s.systemDefaults, request.Msg)
 	if err != nil {
 		return nil, err
