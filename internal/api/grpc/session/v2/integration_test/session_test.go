@@ -739,6 +739,8 @@ func TestServer_SetSession_flow(t *testing.T) {
 	totpSecret := registerTOTP(userAuthCtx, t, User.GetUserId())
 	registerOTPSMS(userAuthCtx, t, User.GetUserId())
 	registerOTPEmail(userAuthCtx, t, User.GetUserId())
+	recoveryCodes := registerRecoveryCode(userAuthCtx, t, User.GetUserId())
+	recoveryCode := recoveryCodes[0]
 
 	t.Run("check webauthn, user not verified (U2F)", func(t *testing.T) {
 
@@ -851,8 +853,6 @@ func TestServer_SetSession_flow(t *testing.T) {
 	})
 
 	t.Run("check Recovery Code", func(t *testing.T) {
-		recoveryCodes := registerRecoveryCode(userAuthCtx, t, User.GetUserId())
-		recoveryCode := recoveryCodes[0]
 
 		resp, err := Client.SetSession(CTX, &session.SetSessionRequest{
 			SessionId: createResp.GetSessionId(),

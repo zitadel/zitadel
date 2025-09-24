@@ -94,27 +94,7 @@ type QuotasConfig struct {
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
-	config := new(Config)
-
-	err := v.Unmarshal(config,
-		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
-			hooks.SliceTypeStringDecode[*domain.CustomMessageText],
-			hooks.SliceTypeStringDecode[authz.RoleMapping],
-			hooks.MapTypeStringDecode[string, *authz.SystemAPIUser],
-			hooks.MapHTTPHeaderStringDecode,
-			database.DecodeHook(false),
-			actions.HTTPConfigDecodeHook,
-			hook.EnumHookFunc(authz.MemberTypeString),
-			hooks.MapTypeStringDecode[domain.Feature, any],
-			hooks.SliceTypeStringDecode[*command.SetQuota],
-			hook.Base64ToBytesHookFunc(),
-			hook.TagToLanguageHookFunc(),
-			mapstructure.StringToTimeDurationHookFunc(),
-			mapstructure.StringToTimeHookFunc(time.RFC3339),
-			mapstructure.StringToSliceHookFunc(","),
-			mapstructure.TextUnmarshallerHookFunc(),
-		)),
-	)
+	config, err := readConfig(v)
 	logging.OnError(err).Fatal("unable to read config")
 
 	err = config.Log.SetLogger()
@@ -141,4 +121,29 @@ func MustNewConfig(v *viper.Viper) *Config {
 	config.DefaultInstance.RolePermissionMappings = config.InternalAuthZ.RolePermissionMappings
 
 	return config
+}
+
+func readConfig(v *viper.Viper) (*Config, error) {
+	config := new(Config)
+
+	err := v.Unmarshal(config,
+		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
+			hooks.SliceTypeStringDecode[*domain.CustomMessageText],
+			hooks.SliceTypeStringDecode[authz.RoleMapping],
+			hooks.MapTypeStringDecode[string, *authz.SystemAPIUser],
+			hooks.MapHTTPHeaderStringDecode,
+			database.DecodeHook(false),
+			actions.HTTPConfigDecodeHook,
+			hook.EnumHookFunc(authz.MemberTypeString),
+			hooks.MapTypeStringDecode[domain.Feature, any],
+			hooks.SliceTypeStringDecode[*command.SetQuota],
+			hook.Base64ToBytesHookFunc(),
+			hook.TagToLanguageHookFunc(),
+			mapstructure.StringToTimeDurationHookFunc(),
+			mapstructure.StringToTimeHookFunc(time.RFC3339),
+			mapstructure.StringToSliceHookFunc(","),
+			mapstructure.TextUnmarshallerHookFunc(),
+		)),
+	)
+	return config, err
 }
