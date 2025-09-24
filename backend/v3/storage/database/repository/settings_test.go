@@ -18,6 +18,7 @@ import (
 // 1. Create() which is used in projections
 // 2. Create.*() which are used to create specific types of settings
 func TestCreateGenericSetting(t *testing.T) {
+	now := time.Now().Round(time.Microsecond)
 	tx, err := pool.Begin(t.Context(), nil)
 	require.NoError(t, err)
 	defer func() {
@@ -27,7 +28,6 @@ func TestCreateGenericSetting(t *testing.T) {
 		}
 	}()
 
-	now := time.Now()
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
@@ -391,6 +391,7 @@ func TestCreateGenericSetting(t *testing.T) {
 // for the sake of testing, CreatePasswordExpiry was used, but the underlying code is the same
 // across all Create.*() functions
 func TestCreateSpecificSetting(t *testing.T) {
+	beforeCreate := time.Now()
 	tx, err := pool.Begin(t.Context(), nil)
 	require.NoError(t, err)
 	defer func() {
@@ -743,7 +744,6 @@ func TestCreateSpecificSetting(t *testing.T) {
 			settingRepo := repository.SettingsRepository()
 
 			// create setting
-			beforeCreate := time.Now()
 			err = settingRepo.CreatePasswordExpiry(t.Context(), tx, setting)
 			assert.ErrorIs(t, err, tt.err)
 			if err != nil {
@@ -2308,6 +2308,8 @@ func TestCreateGetOrgPolicySetting(t *testing.T) {
 
 // gocognit linting fails due to number of test cases
 // and the fact that each test case has a testFunc()
+//
+//nolint:gocognit
 func TestListSetting(t *testing.T) {
 	now := time.Now()
 
