@@ -5,9 +5,9 @@ import (
 )
 
 var (
-	//go:embed 005_settings_table/up.sql
+	//go:embed 006_settings_table/up.sql
 	up004SettingsTable string
-	//go:embed 005_settings_table/down.sql
+	//go:embed 006_settings_table/down.sql
 	down004SettingsTable string
 )
 
