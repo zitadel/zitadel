@@ -32,9 +32,9 @@ jobs:
       - name: Install Nx
         run: pnpm add --global nx@${{ inputs.nx_version }}
       - uses: nrwl/nx-set-shas@v4
-      - run: nx start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after=lint,build,test-unit
+      - run: nx start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after=lint,build,test-unit,test-integration-build
       - name: Run Quality Checks on Affected Projects
-        run: nx affected --targets lint build test-unit --exclude @zitadel/docs,@zitadel/benchmark,@zitadel/login-api-mock
+        run: nx affected --targets lint build test-unit test-integration-build --exclude @zitadel/docs,@zitadel/benchmark,@zitadel/login-api-mock
       - run: npx nx fix-ci
         if: always()
       - name: publish coverage
