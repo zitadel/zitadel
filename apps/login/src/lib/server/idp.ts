@@ -1,11 +1,6 @@
 "use server";
 
-import {
-  getLoginSettings,
-  getUserByID,
-  startIdentityProviderFlow,
-  startLDAPIdentityProviderFlow,
-} from "@/lib/zitadel";
+import { getLoginSettings, getUserByID, startIdentityProviderFlow, startLDAPIdentityProviderFlow } from "@/lib/zitadel";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getNextUrl } from "../client";
@@ -15,10 +10,7 @@ import { createSessionForIdpAndUpdateCookie } from "./cookie";
 
 export type RedirectToIdpState = { error?: string | null } | undefined;
 
-export async function redirectToIdp(
-  prevState: RedirectToIdpState,
-  formData: FormData,
-): Promise<RedirectToIdpState> {
+export async function redirectToIdp(prevState: RedirectToIdpState, formData: FormData): Promise<RedirectToIdpState> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
@@ -102,9 +94,7 @@ type CreateNewSessionCommand = {
   requestId?: string;
 };
 
-export async function createNewSessionFromIdpIntent(
-  command: CreateNewSessionCommand,
-) {
+export async function createNewSessionFromIdpIntent(command: CreateNewSessionCommand) {
   const _headers = await headers();
 
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -143,18 +133,10 @@ export async function createNewSessionFromIdpIntent(
     return { error: "Could not create session" };
   }
 
-  const humanUser =
-    userResponse.user.type.case === "human"
-      ? userResponse.user.type.value
-      : undefined;
+  const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
 
   // check to see if user was verified
-  const emailVerificationCheck = checkEmailVerification(
-    session,
-    humanUser,
-    command.organization,
-    command.requestId,
-  );
+  const emailVerificationCheck = checkEmailVerification(session, humanUser, command.organization, command.requestId);
 
   if (emailVerificationCheck?.redirect) {
     return emailVerificationCheck;
@@ -192,9 +174,7 @@ type createNewSessionForLDAPCommand = {
   link: boolean;
 };
 
-export async function createNewSessionForLDAP(
-  command: createNewSessionForLDAPCommand,
-) {
+export async function createNewSessionForLDAP(command: createNewSessionForLDAPCommand) {
   const _headers = await headers();
 
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -215,11 +195,7 @@ export async function createNewSessionForLDAP(
     password: command.password,
   });
 
-  if (
-    !response ||
-    response.nextStep.case !== "idpIntent" ||
-    !response.nextStep.value
-  ) {
+  if (!response || response.nextStep.case !== "idpIntent" || !response.nextStep.value) {
     return { error: "Could not start LDAP identity provider flow" };
   }
 

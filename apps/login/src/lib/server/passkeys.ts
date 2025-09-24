@@ -55,7 +55,7 @@ function isSessionValid(session: Partial<Session>): {
 export async function registerPasskeyLink(
   command: RegisterPasskeyCommand,
 ): Promise<RegisterPasskeyResponse | { error: string }> {
-  const { sessionId, userId } = command;
+  const { sessionId, userId, code } = command;
 
   if (!sessionId && !userId) {
     return { error: "Either sessionId or userId must be provided" };
@@ -162,7 +162,7 @@ export async function registerPasskeyLink(
 
   let registerCode;
 
-  if (!command.code) {
+  if (!code) {
     // request a new code if no code is provided
     const { code } = await createPasskeyRegistrationLink({
       serviceUrl,

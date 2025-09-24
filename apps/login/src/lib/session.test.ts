@@ -1,6 +1,6 @@
 /**
  * Unit tests for the isSessionValid function.
- * 
+ *
  * This test suite covers the comprehensive session validation logic including:
  * - Session expiration checks
  * - User presence validation
@@ -113,10 +113,7 @@ describe("isSessionValid", () => {
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
 
       expect(result).toBe(false);
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "Session is expired",
-        expect.any(String)
-      );
+      expect(consoleSpy).toHaveBeenCalledWith("Session is expired", expect.any(String));
       consoleSpy.mockRestore();
     });
   });
@@ -211,7 +208,7 @@ describe("isSessionValid", () => {
           otpEmail: undefined,
           otpSms: undefined,
           webAuthN: undefined,
-        })
+        }),
       );
       consoleSpy.mockRestore();
     });
@@ -368,10 +365,7 @@ describe("isSessionValid", () => {
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
 
       expect(result).toBe(false);
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "Session has no valid multifactor",
-        expect.any(Object)
-      );
+      expect(consoleSpy).toHaveBeenCalledWith("Session has no valid multifactor", expect.any(Object));
       consoleSpy.mockRestore();
     });
 
@@ -493,7 +487,7 @@ describe("isSessionValid", () => {
       expect(result).toBe(false);
       expect(consoleSpy).toHaveBeenCalledWith(
         "Session invalid: Email not verified and EMAIL_VERIFICATION is enabled",
-        mockUserId
+        mockUserId,
       );
       consoleSpy.mockRestore();
     });

@@ -16,11 +16,7 @@ type Props = {
   requestId?: string;
 };
 
-export function IdpSignin({
-  userId,
-  idpIntent: { idpIntentId, idpIntentToken },
-  requestId,
-}: Props) {
+export function IdpSignin({ userId, idpIntent: { idpIntentId, idpIntentToken }, requestId }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
