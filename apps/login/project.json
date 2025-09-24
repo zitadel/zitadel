@@ -120,6 +120,12 @@
         { "env": "LOGIN_BASE_URL" }
       ]
     },
+    "test-integration-login": {
+        "description": "This is an alias for test-integration to be able to run it in CI workflows using the affected command.",
+        "dependsOn": [
+            "test-integration"
+        ]
+    },
     "pack": {
       "description": "Packages the standalone Login application build into an archive",
       "dependsOn": [

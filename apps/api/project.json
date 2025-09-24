@@ -212,6 +212,12 @@
                 "{workspaceRoot}/profile.api.test-integration.cov"
             ]
         },
+        "test-integration-api": {
+            "description": "This is an alias for test-integration to be able to run it in CI workflows using the affected command.",
+            "dependsOn": [
+                "test-integration"
+            ]
+        },
         "generate-console": {
             "description": "Builds the console and copies the static files to the API",
             "cache": true,
