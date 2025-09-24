@@ -1368,11 +1368,11 @@ func TestCreateGetLoginPolicySetting(t *testing.T) {
 						DisableLoginWithPhone:      true,
 						PasswordlessType:           domain.PasswordlessTypeAllowed,
 						DefaultRedirectURI:         "wwww.example.com",
-						PasswordCheckLifetime:      time.Duration(time.Second * 50),
-						ExternalLoginCheckLifetime: time.Duration(time.Second * 50),
-						MFAInitSkipLifetime:        time.Duration(time.Second * 50),
-						SecondFactorCheckLifetime:  time.Duration(time.Second * 50),
-						MultiFactorCheckLifetime:   time.Duration(time.Second * 50),
+						PasswordCheckLifetime:      time.Second * 50,
+						ExternalLoginCheckLifetime: time.Second * 50,
+						MFAInitSkipLifetime:        time.Second * 50,
+						SecondFactorCheckLifetime:  time.Second * 50,
+						MultiFactorCheckLifetime:   time.Second * 50,
 					},
 				}
 

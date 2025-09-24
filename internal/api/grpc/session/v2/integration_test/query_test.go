@@ -737,7 +737,6 @@ func TestServer_ListSessions(t *testing.T) {
 				// expected count of sessions is not equal to created dependencies
 				require.Len(ttt, tt.want.Sessions, len(infos))
 
-
 				// expected count of sessions is not equal to received sessions
 				require.Equal(ttt, tt.want.Details.TotalResult, got.Details.TotalResult)
 				require.Len(ttt, got.Sessions, len(tt.want.Sessions))
