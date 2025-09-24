@@ -62,17 +62,17 @@ type IdentityProvider struct {
 	State      IDPState `json:"state,omitempty" db:"state"`
 	Name       string   `json:"name,omitempty" db:"name"`
 	// Type represents the type of and idp. It is a pointer because it can be nil during the migration of the events
-	Type                  *IDPType             `json:"type,omitempty" db:"type"`
-	AllowCreation         bool                 `json:"allowCreation,omitempty" db:"allow_creation"`
-	AutoRegister          bool                 `json:"autoRegister,omitempty" db:"auto_register"`
-	AllowAutoCreation     bool                 `json:"allowAutoCreation,omitempty" db:"allow_auto_creation"`
-	AllowAutoUpdate       bool                 `json:"allowAutoUpdate,omitempty" db:"allow_auto_update"`
-	AllowLinking          bool                 `json:"allowLinking,omitempty" db:"allow_linking"`
-	AllowAutoLinkingField *IDPAutoLinkingField `json:"allowAutoLinkingField,omitempty" db:"allow_auto_linking_field"`
-	StylingType           *int16               `json:"stylingType,omitempty" db:"styling_type"`
-	Payload               json.RawMessage      `json:"payload,omitempty" db:"payload"`
-	CreatedAt             time.Time            `json:"createdAt,omitzero" db:"created_at"`
-	UpdatedAt             time.Time            `json:"updatedAt,omitzero" db:"updated_at"`
+	Type              *IDPType             `json:"type,omitempty" db:"type"`
+	AllowCreation     bool                 `json:"allowCreation,omitempty" db:"allow_creation"`
+	AutoRegister      bool                 `json:"autoRegister,omitempty" db:"auto_register"`
+	AllowAutoCreation bool                 `json:"allowAutoCreation,omitempty" db:"allow_auto_creation"`
+	AllowAutoUpdate   bool                 `json:"allowAutoUpdate,omitempty" db:"allow_auto_update"`
+	AllowLinking      bool                 `json:"allowLinking,omitempty" db:"allow_linking"`
+	AutoLinkingField  *IDPAutoLinkingField `json:"autoLinkingField,omitempty" db:"allow_auto_linking_field"`
+	StylingType       *int16               `json:"stylingType,omitempty" db:"styling_type"`
+	Payload           json.RawMessage      `json:"payload,omitempty" db:"payload"`
+	CreatedAt         time.Time            `json:"createdAt,omitzero" db:"created_at"`
+	UpdatedAt         time.Time            `json:"updatedAt,omitzero" db:"updated_at"`
 }
 
 type OIDC struct {
