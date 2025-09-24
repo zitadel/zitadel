@@ -27,6 +27,8 @@ jobs:
         run: git fetch origin main:main
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --dev        
       - name: Install Nx
         run: pnpm add --global nx@${{ inputs.nx_version }}
       - uses: nrwl/nx-set-shas@v4
