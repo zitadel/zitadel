@@ -879,6 +879,7 @@ func TestCreateSpecificSettingError(t *testing.T) {
 // for the sake of testing, UpdateLabel was used, but the underlying code is the same
 // across all Update.*() functions
 func TestUpdateSetting(t *testing.T) {
+	beforeUpdate := time.Now()
 	tx, err := pool.Begin(t.Context(), nil)
 	require.NoError(t, err)
 	defer func() {
@@ -1143,7 +1144,6 @@ func TestUpdateSetting(t *testing.T) {
 			setting := tt.testFunc(t, tx)
 
 			// update setting
-			beforeUpdate := time.Now()
 			rowsAffected, err := settingRepo.UpdateLabel(
 				t.Context(), tx,
 				setting,
