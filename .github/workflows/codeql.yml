@@ -43,7 +43,7 @@ jobs:
         pnpm install --frozen-lockfile
         pnpm add --global nx@${{ env.nx_version }} sass
     - if: matrix.language == 'go'
-      run: nx start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after=pack
+      run: nx start-ci-run --distribute-on="3 medium" --stop-agents-after=pack
     - if: matrix.language == 'go'
       run: nx run-many --projects @zitadel/api --targets generate-stubs generate-statik generate-assets
     # Initializes the CodeQL tools for scanning.

@@ -23,8 +23,6 @@ jobs:
         with:
           fetch-depth: 0
           filter: tree:0
-      - name: Fetch main branch
-        run: git fetch origin main:main
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
       - name: Install dependencies
@@ -32,7 +30,7 @@ jobs:
       - name: Install Nx
         run: pnpm add --global nx@${{ inputs.nx_version }}
       - uses: nrwl/nx-set-shas@v4
-      - run: nx start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after=lint,build,test-unit,test-integration-build
+      - run: nx start-ci-run --distribute-on="3 medium" --stop-agents-after=lint,build,test-unit,test-integration-build
       - name: Run Quality Checks on Affected Projects
         run: nx affected --targets lint build test-unit test-integration-build --exclude @zitadel/docs,@zitadel/benchmark,@zitadel/login-api-mock
       - run: npx nx fix-ci
@@ -72,14 +70,17 @@ jobs:
         uses: docker/setup-compose-action@v1
         with:
           version: v2.38.2
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4          
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --dev
-      - name: Install global modules
+        run: pnpm install --frozen-lockfile --dev        
+      - name: Install Nx
         run: pnpm add --global nx@${{ inputs.nx_version }}
       - name: Install Cypress binary
         if: matrix.target == 'test-integration-login' || matrix.target == 'test-firefox' || matrix.target == 'test-chrome'
         run: pnpm cypress install
         working-directory: apps/login
+      - uses: nrwl/nx-set-shas@v4
       - name: Run ${{ matrix.target }}
         run: nx affected --targets=${{ matrix.target }}
       - run: npx nx fix-ci
