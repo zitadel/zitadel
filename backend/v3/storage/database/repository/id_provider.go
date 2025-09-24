@@ -130,7 +130,11 @@ func (i *idProvider) GetOIDC(ctx context.Context, id domain.IDPIdentifierConditi
 		return nil, err
 	}
 
-	idpType := *idpOIDC.Type
+	var idpType domain.IDPType
+	if idpOIDC.Type != nil {
+		idpType = *idpOIDC.Type
+	}
+
 	if idpType != domain.IDPTypeOIDC {
 		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeOIDC, idpType)
 	}
@@ -152,7 +156,11 @@ func (i *idProvider) GetJWT(ctx context.Context, id domain.IDPIdentifierConditio
 		return nil, err
 	}
 
-	idpType := *idpJWT.Type
+	var idpType domain.IDPType
+	if idpJWT.Type != nil {
+		idpType = *idpJWT.Type
+	}
+
 	if idpType != domain.IDPTypeJWT {
 		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeJWT, idpType)
 	}
@@ -174,7 +182,11 @@ func (i *idProvider) GetOAuth(ctx context.Context, id domain.IDPIdentifierCondit
 		return nil, err
 	}
 
-	idpType := *idpOAuth.Type
+	var idpType domain.IDPType
+	if idpOAuth.Type != nil {
+		idpType = *idpOAuth.Type
+	}
+
 	if idpType != domain.IDPTypeOAuth {
 		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeOAuth, idpType)
 	}
@@ -196,7 +208,11 @@ func (i *idProvider) GetAzureAD(ctx context.Context, id domain.IDPIdentifierCond
 		return nil, err
 	}
 
-	idpType := *idpAzure.Type
+	var idpType domain.IDPType
+	if idpAzure.Type != nil {
+		idpType = *idpAzure.Type
+	}
+
 	if idpType != domain.IDPTypeAzure {
 		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeAzure, idpType)
 	}
@@ -218,7 +234,11 @@ func (i *idProvider) GetGoogle(ctx context.Context, id domain.IDPIdentifierCondi
 		return nil, err
 	}
 
-	idpType := *idpGoogle.Type
+	var idpType domain.IDPType
+	if idpGoogle.Type != nil {
+		idpType = *idpGoogle.Type
+	}
+
 	if idpType != domain.IDPTypeGoogle {
 		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeGoogle, idpType)
 	}
@@ -240,7 +260,11 @@ func (i *idProvider) GetGithub(ctx context.Context, id domain.IDPIdentifierCondi
 		return nil, err
 	}
 
-	idpType := *idpGithub.Type
+	var idpType domain.IDPType
+	if idpGithub.Type != nil {
+		idpType = *idpGithub.Type
+	}
+
 	if idpType != domain.IDPTypeGitHub {
 		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeGitHub, idpType)
 	}
@@ -262,7 +286,11 @@ func (i *idProvider) GetGithubEnterprise(ctx context.Context, id domain.IDPIdent
 		return nil, err
 	}
 
-	idpType := *idpGithubEnterprise.Type
+	var idpType domain.IDPType
+	if idpGithubEnterprise.Type != nil {
+		idpType = *idpGithubEnterprise.Type
+	}
+
 	if idpType != domain.IDPTypeGitHubEnterprise {
 		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeGitHubEnterprise, idpType)
 	}
@@ -284,7 +312,11 @@ func (i *idProvider) GetGitlab(ctx context.Context, id domain.IDPIdentifierCondi
 		return nil, err
 	}
 
-	idpType := *idpGitlab.Type
+	var idpType domain.IDPType
+	if idpGitlab.Type != nil {
+		idpType = *idpGitlab.Type
+	}
+
 	if idpType != domain.IDPTypeGitLab {
 		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeGitLab, idpType)
 	}
@@ -306,7 +338,11 @@ func (i *idProvider) GetGitlabSelfHosting(ctx context.Context, id domain.IDPIden
 		return nil, err
 	}
 
-	idpType := *idpGitlabSelfHosting.Type
+	var idpType domain.IDPType
+	if idpGitlabSelfHosting.Type != nil {
+		idpType = *idpGitlabSelfHosting.Type
+	}
+
 	if idpType != domain.IDPTypeGitLabSelfHosted {
 		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeGitLabSelfHosted, idpType)
 	}
@@ -328,7 +364,11 @@ func (i *idProvider) GetLDAP(ctx context.Context, id domain.IDPIdentifierConditi
 		return nil, err
 	}
 
-	idpType := *ldap.Type
+	var idpType domain.IDPType
+	if ldap.Type != nil {
+		idpType = *ldap.Type
+	}
+
 	if idpType != domain.IDPTypeLDAP {
 		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeLDAP, idpType)
 	}
@@ -350,7 +390,11 @@ func (i *idProvider) GetApple(ctx context.Context, id domain.IDPIdentifierCondit
 		return nil, err
 	}
 
-	idpType := *apple.Type
+	var idpType domain.IDPType
+	if apple.Type != nil {
+		idpType = *apple.Type
+	}
+
 	if idpType != domain.IDPTypeApple {
 		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeApple, idpType)
 	}
@@ -372,7 +416,11 @@ func (i *idProvider) GetSAML(ctx context.Context, id domain.IDPIdentifierConditi
 		return nil, err
 	}
 
-	idpType := *saml.Type
+	var idpType domain.IDPType
+	if saml.Type != nil {
+		idpType = *saml.Type
+	}
+
 	if idpType != domain.IDPTypeSAML {
 		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeSAML, idpType)
 	}
