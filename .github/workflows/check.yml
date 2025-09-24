@@ -58,32 +58,15 @@ jobs:
         run: pnpm cypress install
         working-directory: apps/login
       - uses: nrwl/nx-set-shas@v4
-      - name: Restore Nx cache
-        uses: actions/cache/restore@v4
-        # We use a local cache temporarily, until we use remote shared caching.
-        # We need this because some quality checks are flaky and have to be retryable to keep the failure rates low.
-        id: nx_cache
-        with:
-          path: ${{ env.nx_cache_path }}
-          # It includes the repository owner to prevent cache poisoning from forks.
-          # We restore caches from previous commits on the HEAD branch, then we fall back to caches from the base.
-          key: nx-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-${{ github.repository_owner }}-${{ github.sha }}
-          enableCrossOsArchive: true
-          restore-keys: |
-            nx-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-${{ github.repository_owner }}-
-            nx-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-
-            nx-${{ github.event.pull_request.base.ref || github.ref_name }}-
+      - run: nx start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after=lint,test,build,test-firefox,test-chrome
       - name: Run Quality Checks on Affected Projects
-        run: nx affected --nxBail --targets lint build test --exclude @zitadel/docs,@zitadel/benchmark
+        run: nx affected --targets lint build test --exclude @zitadel/docs,@zitadel/benchmark
       - name: Test Functional UI Firefox
-        run: nx affected --nxBail --targets test-firefox
+        run: nx affected --targets test-firefox
       - name: Test Functional UI Chrome
-        run: nx affected --nxBail --targets test-chrome
-      - uses: actions/cache/save@v4
+        run: nx affected --targets test-chrome
+      - run: npx nx fix-ci
         if: always()
-        with:
-          key: ${{ steps.nx_cache.outputs.cache-primary-key }}
-          path: ${{ env.nx_cache_path }}
       - name: publish coverage
         uses: codecov/codecov-action@v4.3.0
         with:
