@@ -68,7 +68,7 @@ type IdentityProvider struct {
 	AllowAutoCreation bool                 `json:"allowAutoCreation,omitempty" db:"allow_auto_creation"`
 	AllowAutoUpdate   bool                 `json:"allowAutoUpdate,omitempty" db:"allow_auto_update"`
 	AllowLinking      bool                 `json:"allowLinking,omitempty" db:"allow_linking"`
-	AutoLinkingField  *IDPAutoLinkingField `json:"autoLinkingField,omitempty" db:"allow_auto_linking_field"`
+	AutoLinkingField  *IDPAutoLinkingField `json:"autoLinkingField,omitempty" db:"auto_linking_field"`
 	StylingType       *int16               `json:"stylingType,omitempty" db:"styling_type"`
 	Payload           json.RawMessage      `json:"payload,omitempty" db:"payload"`
 	CreatedAt         time.Time            `json:"createdAt,omitzero" db:"created_at"`

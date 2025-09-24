@@ -24,7 +24,7 @@ func IDProviderRepository(client database.QueryExecutor) domain.IDProviderReposi
 }
 
 const queryIDProviderStmt = `SELECT instance_id, org_id, id, state, name, type, auto_register, allow_creation, allow_auto_creation,` +
-	` allow_auto_update, allow_linking, allow_auto_linking_field, styling_type, payload, created_at, updated_at` +
+	` allow_auto_update, allow_linking, auto_linking_field, styling_type, payload, created_at, updated_at` +
 	` FROM zitadel.identity_providers`
 
 func (i *idProvider) Get(ctx context.Context, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IdentityProvider, error) {
@@ -482,7 +482,7 @@ func (idProvider) AllowLinkingColumn() database.Column {
 }
 
 func (idProvider) AllowAutoLinkingColumn() database.Column {
-	return database.NewColumn("identity_providers", "allow_auto_linking_field")
+	return database.NewColumn("identity_providers", "auto_linking_field")
 }
 
 func (idProvider) StylingTypeColumn() database.Column {
