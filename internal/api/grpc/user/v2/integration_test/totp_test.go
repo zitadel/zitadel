@@ -18,15 +18,15 @@ import (
 )
 
 func TestServer_RegisterTOTP(t *testing.T) {
-	userID := Instance.CreateHumanUser(CTX).GetUserId()
-	Instance.RegisterUserPasskey(CTX, userID)
+	userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
+	Instance.RegisterUserPasskey(OrgCTX, userID)
 	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, userID)
-	ctx := integration.WithAuthorizationToken(CTX, sessionToken)
+	ctx := integration.WithAuthorizationToken(OrgCTX, sessionToken)
 
-	otherUser := Instance.CreateHumanUser(CTX).GetUserId()
-	Instance.RegisterUserPasskey(CTX, otherUser)
+	otherUser := Instance.CreateHumanUser(OrgCTX).GetUserId()
+	Instance.RegisterUserPasskey(OrgCTX, otherUser)
 	_, sessionTokenOtherUser, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, otherUser)
-	ctxOtherUser := integration.WithAuthorizationToken(CTX, sessionTokenOtherUser)
+	ctxOtherUser := integration.WithAuthorizationToken(OrgCTX, sessionTokenOtherUser)
 
 	type args struct {
 		ctx context.Context
@@ -59,7 +59,7 @@ func TestServer_RegisterTOTP(t *testing.T) {
 		{
 			name: "admin",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.RegisterTOTPRequest{
 					UserId: userID,
 				},
@@ -104,10 +104,10 @@ func TestServer_RegisterTOTP(t *testing.T) {
 }
 
 func TestServer_VerifyTOTPRegistration(t *testing.T) {
-	userID := Instance.CreateHumanUser(CTX).GetUserId()
-	Instance.RegisterUserPasskey(CTX, userID)
+	userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
+	Instance.RegisterUserPasskey(OrgCTX, userID)
 	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, userID)
-	ctx := integration.WithAuthorizationToken(CTX, sessionToken)
+	ctx := integration.WithAuthorizationToken(OrgCTX, sessionToken)
 
 	reg, err := Client.RegisterTOTP(ctx, &user.RegisterTOTPRequest{
 		UserId: userID,
@@ -116,12 +116,12 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 	code, err := totp.GenerateCode(reg.Secret, time.Now())
 	require.NoError(t, err)
 
-	otherUser := Instance.CreateHumanUser(CTX).GetUserId()
-	Instance.RegisterUserPasskey(CTX, otherUser)
+	otherUser := Instance.CreateHumanUser(OrgCTX).GetUserId()
+	Instance.RegisterUserPasskey(OrgCTX, otherUser)
 	_, sessionTokenOtherUser, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, otherUser)
-	ctxOtherUser := integration.WithAuthorizationToken(CTX, sessionTokenOtherUser)
+	ctxOtherUser := integration.WithAuthorizationToken(OrgCTX, sessionTokenOtherUser)
 
-	regOtherUser, err := Client.RegisterTOTP(CTX, &user.RegisterTOTPRequest{
+	regOtherUser, err := Client.RegisterTOTP(OrgCTX, &user.RegisterTOTPRequest{
 		UserId: otherUser,
 	})
 	require.NoError(t, err)
@@ -178,7 +178,7 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 		{
 			name: "success, admin",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.VerifyTOTPRegistrationRequest{
 					UserId: otherUser,
 					Code:   codeOtherUser,
@@ -207,12 +207,12 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 }
 
 func TestServer_RemoveTOTP(t *testing.T) {
-	userID := Instance.CreateHumanUser(CTX).GetUserId()
-	Instance.RegisterUserPasskey(CTX, userID)
+	userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
+	Instance.RegisterUserPasskey(OrgCTX, userID)
 	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, userID)
 
-	userVerified := Instance.CreateHumanUser(CTX)
-	Instance.RegisterUserPasskey(CTX, userVerified.GetUserId())
+	userVerified := Instance.CreateHumanUser(OrgCTX)
+	Instance.RegisterUserPasskey(OrgCTX, userVerified.GetUserId())
 	_, sessionTokenVerified, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, userVerified.GetUserId())
 	userVerifiedCtx := integration.WithAuthorizationToken(context.Background(), sessionTokenVerified)
 	_, err := Instance.Client.UserV2.VerifyPhone(userVerifiedCtx, &user.VerifyPhoneRequest{
@@ -221,7 +221,7 @@ func TestServer_RemoveTOTP(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	regOtherUser, err := Client.RegisterTOTP(CTX, &user.RegisterTOTPRequest{
+	regOtherUser, err := Client.RegisterTOTP(OrgCTX, &user.RegisterTOTPRequest{
 		UserId: userVerified.GetUserId(),
 	})
 	require.NoError(t, err)

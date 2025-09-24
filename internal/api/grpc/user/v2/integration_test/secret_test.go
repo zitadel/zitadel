@@ -28,7 +28,7 @@ func TestServer_AddSecret(t *testing.T) {
 		{
 			name: "add secret, user not existing",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddSecretRequest{
 					UserId: "notexisting",
 				},
@@ -39,10 +39,10 @@ func TestServer_AddSecret(t *testing.T) {
 		{
 			name: "add secret, ok",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddSecretRequest{},
 				func(request *user.AddSecretRequest) error {
-					resp := Instance.CreateUserTypeMachine(CTX, Instance.DefaultOrg.Id)
+					resp := Instance.CreateUserTypeMachine(OrgCTX, Instance.DefaultOrg.Id)
 					request.UserId = resp.GetId()
 					return nil
 				},
@@ -51,10 +51,10 @@ func TestServer_AddSecret(t *testing.T) {
 		{
 			name: "add secret human, not ok",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddSecretRequest{},
 				func(request *user.AddSecretRequest) error {
-					resp := Instance.CreateUserTypeMachine(CTX, Instance.DefaultOrg.Id)
+					resp := Instance.CreateUserTypeMachine(OrgCTX, Instance.DefaultOrg.Id)
 					request.UserId = resp.GetId()
 					return nil
 				},
@@ -63,12 +63,12 @@ func TestServer_AddSecret(t *testing.T) {
 		{
 			name: "overwrite secret, ok",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddSecretRequest{},
 				func(request *user.AddSecretRequest) error {
-					resp := Instance.CreateUserTypeMachine(CTX, Instance.DefaultOrg.Id)
+					resp := Instance.CreateUserTypeMachine(OrgCTX, Instance.DefaultOrg.Id)
 					request.UserId = resp.GetId()
-					_, err := Client.AddSecret(CTX, &user.AddSecretRequest{
+					_, err := Client.AddSecret(OrgCTX, &user.AddSecretRequest{
 						UserId: resp.GetId(),
 					})
 					return err
@@ -137,7 +137,7 @@ func TestServer_AddSecret_Permission(t *testing.T) {
 		{
 			name: "org, error",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddSecretRequest{
 					UserId: otherOrgUser.GetId(),
 				},
@@ -187,7 +187,7 @@ func TestServer_RemoveSecret(t *testing.T) {
 		{
 			name: "remove secret, user not existing",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.RemoveSecretRequest{
 					UserId: "notexisting",
 				},
@@ -198,10 +198,10 @@ func TestServer_RemoveSecret(t *testing.T) {
 		{
 			name: "remove secret, not existing",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.RemoveSecretRequest{},
 				func(request *user.RemoveSecretRequest) error {
-					resp := Instance.CreateUserTypeMachine(CTX, Instance.DefaultOrg.Id)
+					resp := Instance.CreateUserTypeMachine(OrgCTX, Instance.DefaultOrg.Id)
 					request.UserId = resp.GetId()
 					return nil
 				},
@@ -211,12 +211,12 @@ func TestServer_RemoveSecret(t *testing.T) {
 		{
 			name: "remove secret, ok",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.RemoveSecretRequest{},
 				func(request *user.RemoveSecretRequest) error {
-					resp := Instance.CreateUserTypeMachine(CTX, Instance.DefaultOrg.Id)
+					resp := Instance.CreateUserTypeMachine(OrgCTX, Instance.DefaultOrg.Id)
 					request.UserId = resp.GetId()
-					_, err := Instance.Client.UserV2.AddSecret(CTX, &user.AddSecretRequest{
+					_, err := Instance.Client.UserV2.AddSecret(OrgCTX, &user.AddSecretRequest{
 						UserId: resp.GetId(),
 					})
 					return err
@@ -297,7 +297,7 @@ func TestServer_RemoveSecret_Permission(t *testing.T) {
 		{
 			name: "org, error",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.RemoveSecretRequest{
 					UserId: otherOrgUser.GetId(),
 				},
