@@ -12,6 +12,8 @@ on:
     secrets:
       CODECOV_TOKEN:
         required: true
+      NX_CLOUD_ACCESS_TOKEN_READONLY:
+        required: true
 
 env:
   nx_cache_path: .nx
@@ -19,6 +21,7 @@ env:
 jobs:
   check:
     name: check
+    environment: ${{ github.ref_protected && 'Protected' || '' }}
     runs-on:
       group: zitadel-public
     steps:
@@ -59,10 +62,16 @@ jobs:
         working-directory: apps/login
       - uses: nrwl/nx-set-shas@v4
       - name: Run Quality Checks on Affected Projects
+        env:
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
         run: nx affected --targets lint build test --exclude @zitadel/docs,@zitadel/benchmark
       - name: Test Functional UI Firefox
+        env:
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
         run: nx affected --targets test-firefox
       - name: Test Functional UI Chrome
+        env:
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
         run: nx affected --targets test-chrome
       - name: publish coverage
         uses: codecov/codecov-action@v4.3.0
