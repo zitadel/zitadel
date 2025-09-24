@@ -209,7 +209,7 @@ func assertRoles(projectID string, user *query.OIDCUserInfo, roleAudience, reque
 	}
 	// prevent returning obtained grants if none where requested
 	if (projectID != "" && len(requestedRoles) > 0) || len(roleAudience) > 0 {
-		setUserInfoRoleClaims(info, newProjectRoles(projectID, user.UserGrants, requestedRoles))
+		setUserInfoRoleClaims(info, newProjectRoles(projectID, user.UserGrants, requestedRoles, roleAudience))
 	}
 }
 
@@ -278,11 +278,24 @@ func setUserInfoOrgClaims(user *query.OIDCUserInfo, out *oidc.UserInfo) {
 
 func setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
 	if roles != nil && len(roles.projects) > 0 {
+		// Create a map to store accumulated roles for ClaimProjectsRoles
+		projectsRoles := make(projectRoles)
+
+		for requestAudID := range roles.requestAudIDs {
+			if projectRole, ok := roles.projects[requestAudID]; ok {
+				maps.Copy(projectsRoles, projectRole)
+			}
+		}
+
 		if roles, ok := roles.projects[roles.requestProjectID]; ok {
 			userInfo.AppendClaims(ClaimProjectRoles, roles)
 		}
 		for projectID, roles := range roles.projects {
 			userInfo.AppendClaims(fmt.Sprintf(ClaimProjectRolesFormat, projectID), roles)
+		}
+		// Finally, set the accumulated ClaimProjectsRoles
+		if len(projectsRoles) > 0 {
+			userInfo.AppendClaims(ClaimProjectsRoles, projectsRoles)
 		}
 	}
 }
