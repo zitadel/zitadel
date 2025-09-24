@@ -244,47 +244,47 @@ type SettingsRepository interface {
 	settingsConditions
 	settingsChanges
 
-	Get(ctx context.Context, instanceID string, orgID *string, typ SettingType, cond ...database.Condition) (*Setting, error)
-	List(ctx context.Context, conditions ...database.Condition) ([]*Setting, error)
+	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, typ SettingType, cond ...database.Condition) (*Setting, error)
+	List(ctx context.Context, client database.QueryExecutor, conditions ...database.Condition) ([]*Setting, error)
 
-	CreateLogin(ctx context.Context, setting *LoginSetting) error
-	GetLogin(ctx context.Context, instanceID string, orgID *string) (*LoginSetting, error)
-	UpdateLogin(ctx context.Context, setting *LoginSetting, changes ...database.Change) (int64, error)
+	CreateLogin(ctx context.Context, client database.QueryExecutor, setting *LoginSetting) error
+	GetLogin(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*LoginSetting, error)
+	UpdateLogin(ctx context.Context, client database.QueryExecutor, setting *LoginSetting, changes ...database.Change) (int64, error)
 
-	CreateLabel(ctx context.Context, setting *LabelSetting) error
-	GetLabel(ctx context.Context, instanceID string, orgID *string, state LabelState) (*LabelSetting, error)
-	UpdateLabel(ctx context.Context, setting *LabelSetting, changes ...database.Change) (int64, error)
+	CreateLabel(ctx context.Context, client database.QueryExecutor, setting *LabelSetting) error
+	GetLabel(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, state LabelState) (*LabelSetting, error)
+	UpdateLabel(ctx context.Context, client database.QueryExecutor, setting *LabelSetting, changes ...database.Change) (int64, error)
 
-	CreatePasswordComplexity(ctx context.Context, setting *PasswordComplexitySetting) error
-	GetPasswordComplexity(ctx context.Context, instanceID string, orgID *string) (*PasswordComplexitySetting, error)
-	UpdatePasswordComplexity(ctx context.Context, setting *PasswordComplexitySetting, changes ...database.Change) (int64, error)
+	CreatePasswordComplexity(ctx context.Context, client database.QueryExecutor, setting *PasswordComplexitySetting) error
+	GetPasswordComplexity(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*PasswordComplexitySetting, error)
+	UpdatePasswordComplexity(ctx context.Context, client database.QueryExecutor, setting *PasswordComplexitySetting, changes ...database.Change) (int64, error)
 
-	CreatePasswordExpiry(ctx context.Context, setting *PasswordExpirySetting) error
-	GetPasswordExpiry(ctx context.Context, instanceID string, orgID *string) (*PasswordExpirySetting, error)
-	UpdatePasswordExpiry(ctx context.Context, setting *PasswordExpirySetting, changes ...database.Change) (int64, error)
+	CreatePasswordExpiry(ctx context.Context, client database.QueryExecutor, setting *PasswordExpirySetting) error
+	GetPasswordExpiry(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*PasswordExpirySetting, error)
+	UpdatePasswordExpiry(ctx context.Context, client database.QueryExecutor, setting *PasswordExpirySetting, changes ...database.Change) (int64, error)
 
-	CreateLockout(ctx context.Context, setting *LockoutSetting) error
-	GetLockout(ctx context.Context, instanceID string, orgID *string) (*LockoutSetting, error)
-	UpdateLockout(ctx context.Context, setting *LockoutSetting, changes ...database.Change) (int64, error)
+	CreateLockout(ctx context.Context, client database.QueryExecutor, setting *LockoutSetting) error
+	GetLockout(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*LockoutSetting, error)
+	UpdateLockout(ctx context.Context, client database.QueryExecutor, setting *LockoutSetting, changes ...database.Change) (int64, error)
 
-	CreateSecurity(ctx context.Context, setting *SecuritySetting) error
-	GetSecurity(ctx context.Context, instanceID string, orgID *string) (*SecuritySetting, error)
-	UpdateSecurity(ctx context.Context, setting *SecuritySetting, changes ...database.Change) (int64, error)
+	CreateSecurity(ctx context.Context, client database.QueryExecutor, setting *SecuritySetting) error
+	GetSecurity(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*SecuritySetting, error)
+	UpdateSecurity(ctx context.Context, client database.QueryExecutor, setting *SecuritySetting, changes ...database.Change) (int64, error)
 
-	CreateDomain(ctx context.Context, setting *DomainSetting) error
-	GetDomain(ctx context.Context, instanceID string, orgID *string) (*DomainSetting, error)
-	UpdateDomain(ctx context.Context, setting *DomainSetting, changes ...database.Change) (int64, error)
+	CreateDomain(ctx context.Context, client database.QueryExecutor, setting *DomainSetting) error
+	GetDomain(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*DomainSetting, error)
+	UpdateDomain(ctx context.Context, client database.QueryExecutor, setting *DomainSetting, changes ...database.Change) (int64, error)
 
-	CreateOrg(ctx context.Context, setting *OrgSetting) error
-	GetOrg(ctx context.Context, instanceID string, orgID *string) (*OrgSetting, error)
-	UpdateOrg(ctx context.Context, setting *OrgSetting, changes ...database.Change) (int64, error)
+	CreateOrg(ctx context.Context, client database.QueryExecutor, setting *OrgSetting) error
+	GetOrg(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*OrgSetting, error)
+	UpdateOrg(ctx context.Context, client database.QueryExecutor, setting *OrgSetting, changes ...database.Change) (int64, error)
 
 	// Create is used for events reduction
-	Create(ctx context.Context, setting *Setting) error
-	Delete(ctx context.Context, instanceID string, orgID *string, typ SettingType) (int64, error)
+	Create(ctx context.Context, client database.QueryExecutor, setting *Setting) error
+	Delete(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, typ SettingType) (int64, error)
 
 	// DeleteSettingsForInstance is used when a Instance is deleted
-	DeleteSettingsForInstance(ctx context.Context, instanceID string) (int64, error)
+	DeleteSettingsForInstance(ctx context.Context, client database.QueryExecutor, instanceID string) (int64, error)
 	// DeleteSettingsForOrg is used ehwn an Organization is deleted
-	DeleteSettingsForOrg(ctx context.Context, orgID string) (int64, error)
+	DeleteSettingsForOrg(ctx context.Context, client database.QueryExecutor, orgID string) (int64, error)
 }

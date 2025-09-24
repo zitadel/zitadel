@@ -1,7 +1,6 @@
 package repository_test
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -19,6 +18,15 @@ import (
 // 1. Create() which is used in projections
 // 2. Create.*() which are used to create specific types of settings
 func TestCreateGenericSetting(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
 	now := time.Now()
 	// create instance
 	instanceId := gofakeit.Name()
@@ -32,7 +40,7 @@ func TestCreateGenericSetting(t *testing.T) {
 		DefaultLanguage: "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
-	err := instanceRepo.Create(t.Context(), pool, &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -44,12 +52,12 @@ func TestCreateGenericSetting(t *testing.T) {
 		State:      domain.OrgStateActive,
 	}
 	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), pool, &org)
+	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
 	type test struct {
 		name     string
-		testFunc func(ctx context.Context, t *testing.T) *domain.Setting
+		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.Setting
 		setting  domain.Setting
 		err      error
 	}
@@ -82,8 +90,8 @@ func TestCreateGenericSetting(t *testing.T) {
 		},
 		{
 			name: "adding setting with same instance id, org id twice",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.Setting {
-				settingRepo := repository.SettingsRepository(pool)
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Setting {
+				settingRepo := repository.SettingsRepository()
 
 				setting := domain.Setting{
 					InstanceID: instanceId,
@@ -94,7 +102,7 @@ func TestCreateGenericSetting(t *testing.T) {
 					UpdatedAt:  &now,
 				}
 
-				err := settingRepo.Create(ctx, &setting)
+				err := settingRepo.Create(t.Context(), tx, &setting)
 				require.NoError(t, err)
 				return &setting
 			},
@@ -105,7 +113,7 @@ func TestCreateGenericSetting(t *testing.T) {
 			newOrgId := gofakeit.Name()
 			return test{
 				name: "adding setting with same org (org on different instance), type, different instance",
-				testFunc: func(ctx context.Context, t *testing.T) *domain.Setting {
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Setting {
 					// create instance
 					instance := domain.Instance{
 						ID:              newInstId,
@@ -117,7 +125,7 @@ func TestCreateGenericSetting(t *testing.T) {
 						DefaultLanguage: "defaultLanguage",
 					}
 					instanceRepo := repository.InstanceRepository()
-					err := instanceRepo.Create(ctx, pool, &instance)
+					err := instanceRepo.Create(t.Context(), tx, &instance)
 					assert.Nil(t, err)
 
 					// create org
@@ -128,11 +136,11 @@ func TestCreateGenericSetting(t *testing.T) {
 						State:      domain.OrgStateActive,
 					}
 					organizationRepo := repository.OrganizationRepository()
-					err = organizationRepo.Create(ctx, pool, &org)
+					err = organizationRepo.Create(t.Context(), tx, &org)
 					require.NoError(t, err)
 
 					// create setting
-					settingRepo := repository.SettingsRepository(pool)
+					settingRepo := repository.SettingsRepository()
 					setting := domain.Setting{
 						InstanceID: newInstId,
 						OrgID:      &newOrgId,
@@ -142,7 +150,7 @@ func TestCreateGenericSetting(t *testing.T) {
 						UpdatedAt:  &now,
 					}
 
-					err = settingRepo.Create(ctx, &setting)
+					err = settingRepo.Create(t.Context(), tx, &setting)
 					require.NoError(t, err)
 
 					// change the instance
@@ -163,7 +171,7 @@ func TestCreateGenericSetting(t *testing.T) {
 			newOrgId := gofakeit.Name()
 			return test{
 				name: "adding setting with same instance, type, different org (org on different instance)",
-				testFunc: func(ctx context.Context, t *testing.T) *domain.Setting {
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Setting {
 					// create instance
 					instance := domain.Instance{
 						ID:              newInstId,
@@ -175,7 +183,7 @@ func TestCreateGenericSetting(t *testing.T) {
 						DefaultLanguage: "defaultLanguage",
 					}
 					instanceRepo := repository.InstanceRepository()
-					err := instanceRepo.Create(ctx, pool, &instance)
+					err := instanceRepo.Create(t.Context(), tx, &instance)
 					assert.Nil(t, err)
 
 					// create org
@@ -186,11 +194,11 @@ func TestCreateGenericSetting(t *testing.T) {
 						State:      domain.OrgStateActive,
 					}
 					organizationRepo := repository.OrganizationRepository()
-					err = organizationRepo.Create(ctx, pool, &org)
+					err = organizationRepo.Create(t.Context(), tx, &org)
 					require.NoError(t, err)
 
 					// create setting
-					settingRepo := repository.SettingsRepository(pool)
+					settingRepo := repository.SettingsRepository()
 					setting := domain.Setting{
 						InstanceID: newInstId,
 						OrgID:      &newOrgId,
@@ -200,7 +208,7 @@ func TestCreateGenericSetting(t *testing.T) {
 						UpdatedAt:  &now,
 					}
 
-					err = settingRepo.Create(ctx, &setting)
+					err = settingRepo.Create(t.Context(), tx, &setting)
 					require.NoError(t, err)
 
 					// change the instance
@@ -221,7 +229,7 @@ func TestCreateGenericSetting(t *testing.T) {
 			newOrgId := gofakeit.Name()
 			return test{
 				name: "adding setting with same instance, type different org (org on same instance)",
-				testFunc: func(ctx context.Context, t *testing.T) *domain.Setting {
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Setting {
 					// create instance
 					instance := domain.Instance{
 						ID:              newInstId,
@@ -233,7 +241,7 @@ func TestCreateGenericSetting(t *testing.T) {
 						DefaultLanguage: "defaultLanguage",
 					}
 					instanceRepo := repository.InstanceRepository()
-					err := instanceRepo.Create(ctx, pool, &instance)
+					err := instanceRepo.Create(t.Context(), tx, &instance)
 					assert.Nil(t, err)
 
 					// create org
@@ -244,11 +252,11 @@ func TestCreateGenericSetting(t *testing.T) {
 						State:      domain.OrgStateActive,
 					}
 					organizationRepo := repository.OrganizationRepository()
-					err = organizationRepo.Create(ctx, pool, &org)
+					err = organizationRepo.Create(t.Context(), tx, &org)
 					require.NoError(t, err)
 
 					// create setting
-					settingRepo := repository.SettingsRepository(pool)
+					settingRepo := repository.SettingsRepository()
 					setting := domain.Setting{
 						InstanceID: newInstId,
 						OrgID:      &org.ID,
@@ -258,7 +266,7 @@ func TestCreateGenericSetting(t *testing.T) {
 						UpdatedAt:  &now,
 					}
 
-					err = settingRepo.Create(ctx, &setting)
+					err = settingRepo.Create(t.Context(), tx, &setting)
 					require.NoError(t, err)
 
 					// create another org
@@ -268,7 +276,7 @@ func TestCreateGenericSetting(t *testing.T) {
 						InstanceID: newInstId,
 						State:      domain.OrgStateActive,
 					}
-					err = organizationRepo.Create(ctx, pool, &org)
+					err = organizationRepo.Create(t.Context(), tx, &org)
 					require.NoError(t, err)
 
 					// change the org id
@@ -335,19 +343,26 @@ func TestCreateGenericSetting(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := context.Background()
+			tx, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err = tx.Rollback(t.Context())
+				if err != nil {
+					t.Logf("error during rollback: %v", err)
+				}
+			}()
 
 			var setting *domain.Setting
 			if tt.testFunc != nil {
-				setting = tt.testFunc(ctx, t)
+				setting = tt.testFunc(t, tx)
 			} else {
 				setting = &tt.setting
 			}
-			settingRepo := repository.SettingsRepository(pool)
+			settingRepo := repository.SettingsRepository()
 
 			// create setting
 			// beforeCreate := time.Now()
-			err = settingRepo.Create(ctx, setting)
+			err = settingRepo.Create(t.Context(), tx, setting)
 			assert.ErrorIs(t, err, tt.err)
 			if err != nil {
 				return
@@ -355,7 +370,7 @@ func TestCreateGenericSetting(t *testing.T) {
 			// afterCreate := time.Now()
 
 			// check organization values
-			setting, err = settingRepo.Get(ctx,
+			setting, err = settingRepo.Get(t.Context(), tx,
 				setting.InstanceID,
 				setting.OrgID,
 				setting.Type,
@@ -376,6 +391,15 @@ func TestCreateGenericSetting(t *testing.T) {
 // for the sake of testing, CreatePasswordExpiry was used, but the underlying code is the same
 // across all Create.*() functions
 func TestCreateSpecificSetting(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
@@ -388,7 +412,7 @@ func TestCreateSpecificSetting(t *testing.T) {
 		DefaultLanguage: "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
-	err := instanceRepo.Create(t.Context(), pool, &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -400,12 +424,12 @@ func TestCreateSpecificSetting(t *testing.T) {
 		State:      domain.OrgStateActive,
 	}
 	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), pool, &org)
+	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
 	type test struct {
 		name     string
-		testFunc func(ctx context.Context, t *testing.T) *domain.PasswordExpirySetting
+		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.PasswordExpirySetting
 		setting  domain.PasswordExpirySetting
 		err      error
 	}
@@ -438,8 +462,8 @@ func TestCreateSpecificSetting(t *testing.T) {
 		},
 		{
 			name: "adding setting with same instance id, org id twice",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.PasswordExpirySetting {
-				settingRepo := repository.SettingsRepository(pool)
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.PasswordExpirySetting {
+				settingRepo := repository.SettingsRepository()
 
 				setting := domain.PasswordExpirySetting{
 					Setting: &domain.Setting{
@@ -451,7 +475,7 @@ func TestCreateSpecificSetting(t *testing.T) {
 					},
 				}
 
-				err := settingRepo.CreatePasswordExpiry(ctx, &setting)
+				err := settingRepo.CreatePasswordExpiry(t.Context(), tx, &setting)
 				require.NoError(t, err)
 				return &setting
 			},
@@ -462,7 +486,7 @@ func TestCreateSpecificSetting(t *testing.T) {
 			newOrgId := gofakeit.Name()
 			return test{
 				name: "adding setting with same org (org on different instance), type, different instance",
-				testFunc: func(ctx context.Context, t *testing.T) *domain.PasswordExpirySetting {
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.PasswordExpirySetting {
 					// create instance
 					instance := domain.Instance{
 						ID:              newInstId,
@@ -474,7 +498,7 @@ func TestCreateSpecificSetting(t *testing.T) {
 						DefaultLanguage: "defaultLanguage",
 					}
 					instanceRepo := repository.InstanceRepository()
-					err := instanceRepo.Create(ctx, pool, &instance)
+					err := instanceRepo.Create(t.Context(), tx, &instance)
 					assert.Nil(t, err)
 
 					// create org
@@ -485,11 +509,11 @@ func TestCreateSpecificSetting(t *testing.T) {
 						State:      domain.OrgStateActive,
 					}
 					organizationRepo := repository.OrganizationRepository()
-					err = organizationRepo.Create(ctx, pool, &org)
+					err = organizationRepo.Create(t.Context(), tx, &org)
 					require.NoError(t, err)
 
 					// create setting
-					settingRepo := repository.SettingsRepository(pool)
+					settingRepo := repository.SettingsRepository()
 					setting := domain.PasswordExpirySetting{
 						Setting: &domain.Setting{
 							InstanceID: newInstId,
@@ -499,7 +523,7 @@ func TestCreateSpecificSetting(t *testing.T) {
 						},
 					}
 
-					err = settingRepo.CreatePasswordExpiry(ctx, &setting)
+					err = settingRepo.CreatePasswordExpiry(t.Context(), tx, &setting)
 					require.NoError(t, err)
 
 					// change the instance
@@ -522,7 +546,7 @@ func TestCreateSpecificSetting(t *testing.T) {
 			newOrgId := gofakeit.Name()
 			return test{
 				name: "adding setting with same instance, type, different org (org on different instance)",
-				testFunc: func(ctx context.Context, t *testing.T) *domain.PasswordExpirySetting {
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.PasswordExpirySetting {
 					// create instance
 					instance := domain.Instance{
 						ID:              newInstId,
@@ -534,7 +558,7 @@ func TestCreateSpecificSetting(t *testing.T) {
 						DefaultLanguage: "defaultLanguage",
 					}
 					instanceRepo := repository.InstanceRepository()
-					err := instanceRepo.Create(ctx, pool, &instance)
+					err := instanceRepo.Create(t.Context(), tx, &instance)
 					assert.Nil(t, err)
 
 					// create org
@@ -545,11 +569,11 @@ func TestCreateSpecificSetting(t *testing.T) {
 						State:      domain.OrgStateActive,
 					}
 					organizationRepo := repository.OrganizationRepository()
-					err = organizationRepo.Create(ctx, pool, &org)
+					err = organizationRepo.Create(t.Context(), tx, &org)
 					require.NoError(t, err)
 
 					// create setting
-					settingRepo := repository.SettingsRepository(pool)
+					settingRepo := repository.SettingsRepository()
 					setting := domain.PasswordExpirySetting{
 						Setting: &domain.Setting{
 							InstanceID: newInstId,
@@ -559,7 +583,7 @@ func TestCreateSpecificSetting(t *testing.T) {
 						},
 					}
 
-					err = settingRepo.CreatePasswordExpiry(ctx, &setting)
+					err = settingRepo.CreatePasswordExpiry(t.Context(), tx, &setting)
 					require.NoError(t, err)
 
 					// change the instance
@@ -582,7 +606,7 @@ func TestCreateSpecificSetting(t *testing.T) {
 			newOrgId := gofakeit.Name()
 			return test{
 				name: "adding setting with same instance, type different org (org on same instance)",
-				testFunc: func(ctx context.Context, t *testing.T) *domain.PasswordExpirySetting {
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.PasswordExpirySetting {
 					// create instance
 					instance := domain.Instance{
 						ID:              newInstId,
@@ -594,7 +618,7 @@ func TestCreateSpecificSetting(t *testing.T) {
 						DefaultLanguage: "defaultLanguage",
 					}
 					instanceRepo := repository.InstanceRepository()
-					err := instanceRepo.Create(ctx, pool, &instance)
+					err := instanceRepo.Create(t.Context(), tx, &instance)
 					assert.Nil(t, err)
 
 					// create org
@@ -605,11 +629,11 @@ func TestCreateSpecificSetting(t *testing.T) {
 						State:      domain.OrgStateActive,
 					}
 					organizationRepo := repository.OrganizationRepository()
-					err = organizationRepo.Create(ctx, pool, &org)
+					err = organizationRepo.Create(t.Context(), tx, &org)
 					require.NoError(t, err)
 
 					// create setting
-					settingRepo := repository.SettingsRepository(pool)
+					settingRepo := repository.SettingsRepository()
 					setting := domain.PasswordExpirySetting{
 						Setting: &domain.Setting{
 							InstanceID: newInstId,
@@ -619,7 +643,7 @@ func TestCreateSpecificSetting(t *testing.T) {
 						},
 					}
 
-					err = settingRepo.CreatePasswordExpiry(ctx, &setting)
+					err = settingRepo.CreatePasswordExpiry(t.Context(), tx, &setting)
 					require.NoError(t, err)
 
 					// create another org
@@ -629,7 +653,7 @@ func TestCreateSpecificSetting(t *testing.T) {
 						InstanceID: newInstId,
 						State:      domain.OrgStateActive,
 					}
-					err = organizationRepo.Create(ctx, pool, &org)
+					err = organizationRepo.Create(t.Context(), tx, &org)
 					require.NoError(t, err)
 
 					// change the org id
@@ -701,21 +725,26 @@ func TestCreateSpecificSetting(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := context.Background()
-			_, err := pool.Exec(ctx, "DELETE FROM zitadel.settings")
+			tx, err := tx.Begin(t.Context())
 			require.NoError(t, err)
+			defer func() {
+				err = tx.Rollback(t.Context())
+				if err != nil {
+					t.Logf("error during rollback: %v", err)
+				}
+			}()
 
 			var setting *domain.PasswordExpirySetting
 			if tt.testFunc != nil {
-				setting = tt.testFunc(ctx, t)
+				setting = tt.testFunc(t, tx)
 			} else {
 				setting = &tt.setting
 			}
-			settingRepo := repository.SettingsRepository(pool)
+			settingRepo := repository.SettingsRepository()
 
 			// create setting
 			beforeCreate := time.Now()
-			err = settingRepo.CreatePasswordExpiry(ctx, setting)
+			err = settingRepo.CreatePasswordExpiry(t.Context(), tx, setting)
 			assert.ErrorIs(t, err, tt.err)
 			if err != nil {
 				return
@@ -724,7 +753,7 @@ func TestCreateSpecificSetting(t *testing.T) {
 
 			// check organization values
 			setting, err = settingRepo.GetPasswordExpiry(
-				ctx,
+				t.Context(), tx,
 				setting.InstanceID,
 				setting.OrgID,
 			)
@@ -740,32 +769,41 @@ func TestCreateSpecificSetting(t *testing.T) {
 }
 
 func TestCreateSpecificSettingError(t *testing.T) {
-	settingRepo := repository.SettingsRepository(pool)
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
+	settingRepo := repository.SettingsRepository()
 	tests := []struct {
 		name     string
-		testFunc func(ctx context.Context) error
+		testFunc func(t *testing.T, tx database.QueryExecutor) error
 		err      error
 	}{
 		{
 			name: "create login no settings error",
-			testFunc: func(ctx context.Context) error {
-				err := settingRepo.CreateLogin(ctx, nil)
+			testFunc: func(t *testing.T, tx database.QueryExecutor) error {
+				err := settingRepo.CreateLogin(t.Context(), tx, nil)
 				return err
 			},
 			err: repository.ErrSettingObjectMustNotBeNil,
 		},
 		{
 			name: "create label no settings error",
-			testFunc: func(ctx context.Context) error {
-				err := settingRepo.CreateLabel(ctx, nil)
+			testFunc: func(t *testing.T, tx database.QueryExecutor) error {
+				err := settingRepo.CreateLabel(t.Context(), tx, nil)
 				return err
 			},
 			err: repository.ErrSettingObjectMustNotBeNil,
 		},
 		{
 			name: "create label state not set",
-			testFunc: func(ctx context.Context) error {
-				err := settingRepo.CreateLabel(ctx, &domain.LabelSetting{
+			testFunc: func(t *testing.T, tx database.QueryExecutor) error {
+				err := settingRepo.CreateLabel(t.Context(), tx, &domain.LabelSetting{
 					Setting: &domain.Setting{},
 				})
 				return err
@@ -774,48 +812,48 @@ func TestCreateSpecificSettingError(t *testing.T) {
 		},
 		{
 			name: "create password complexity no settings error",
-			testFunc: func(ctx context.Context) error {
-				err := settingRepo.CreatePasswordComplexity(ctx, nil)
+			testFunc: func(t *testing.T, tx database.QueryExecutor) error {
+				err := settingRepo.CreatePasswordComplexity(t.Context(), tx, nil)
 				return err
 			},
 			err: repository.ErrSettingObjectMustNotBeNil,
 		},
 		{
 			name: "create password expiry no settings error",
-			testFunc: func(ctx context.Context) error {
-				err := settingRepo.CreatePasswordExpiry(ctx, nil)
+			testFunc: func(t *testing.T, tx database.QueryExecutor) error {
+				err := settingRepo.CreatePasswordExpiry(t.Context(), tx, nil)
 				return err
 			},
 			err: repository.ErrSettingObjectMustNotBeNil,
 		},
 		{
 			name: "create lockout no settings error",
-			testFunc: func(ctx context.Context) error {
-				err := settingRepo.CreateLockout(ctx, nil)
+			testFunc: func(t *testing.T, tx database.QueryExecutor) error {
+				err := settingRepo.CreateLockout(t.Context(), tx, nil)
 				return err
 			},
 			err: repository.ErrSettingObjectMustNotBeNil,
 		},
 		{
 			name: "create security no settings error",
-			testFunc: func(ctx context.Context) error {
-				err := settingRepo.CreateSecurity(ctx, nil)
+			testFunc: func(t *testing.T, tx database.QueryExecutor) error {
+				err := settingRepo.CreateSecurity(t.Context(), tx, nil)
 				return err
 			},
 			err: repository.ErrSettingObjectMustNotBeNil,
 		},
 		{
 			name: "create domain no settings error",
-			testFunc: func(ctx context.Context) error {
-				err := settingRepo.CreateDomain(ctx, nil)
+			testFunc: func(t *testing.T, tx database.QueryExecutor) error {
+				err := settingRepo.CreateDomain(t.Context(), tx, nil)
 				return err
 			},
 			err: repository.ErrSettingObjectMustNotBeNil,
 		},
 		{
 			name: "create org no settings error",
-			testFunc: func(ctx context.Context) error {
-				err := settingRepo.CreateOrg(ctx, nil)
+			testFunc: func(t *testing.T, tx database.QueryExecutor) error {
+				err := settingRepo.CreateOrg(t.Context(), tx, nil)
 				return err
 			},
 			err: repository.ErrSettingObjectMustNotBeNil,
@@ -823,9 +861,15 @@ func TestCreateSpecificSettingError(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := context.Background()
-
-			err := tt.testFunc(ctx)
+			tx, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err = tx.Rollback(t.Context())
+				if err != nil {
+					t.Logf("error during rollback: %v", err)
+				}
+			}()
+			err = tt.testFunc(t, tx)
 			assert.ErrorIs(t, err, tt.err)
 		})
 	}
@@ -835,6 +879,15 @@ func TestCreateSpecificSettingError(t *testing.T) {
 // for the sake of testing, UpdateLabel was used, but the underlying code is the same
 // across all Update.*() functions
 func TestUpdateSetting(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
@@ -847,7 +900,7 @@ func TestUpdateSetting(t *testing.T) {
 		DefaultLanguage: "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
-	err := instanceRepo.Create(t.Context(), pool, &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -859,20 +912,20 @@ func TestUpdateSetting(t *testing.T) {
 		State:      domain.OrgStateActive,
 	}
 	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), pool, &org)
+	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
-	settingRepo := repository.SettingsRepository(pool)
+	settingRepo := repository.SettingsRepository()
 
 	tests := []struct {
 		name         string
-		testFunc     func(ctx context.Context, t *testing.T) *domain.LabelSetting
+		testFunc     func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting
 		rowsAffected int64
 		err          error
 	}{
 		{
 			name: "happy path update settings",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.LabelSetting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
 				setting := domain.LabelSetting{
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
@@ -898,7 +951,7 @@ func TestUpdateSetting(t *testing.T) {
 						ThemeMode:           domain.LabelPolicyThemeAuto,
 					},
 				}
-				err := settingRepo.CreateLabel(ctx, &setting)
+				err := settingRepo.CreateLabel(t.Context(), tx, &setting)
 				require.NoError(t, err)
 
 				// update settings values
@@ -921,7 +974,7 @@ func TestUpdateSetting(t *testing.T) {
 		},
 		{
 			name: "happy path update settings, no org",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.LabelSetting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
 				setting := domain.LabelSetting{
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
@@ -947,7 +1000,7 @@ func TestUpdateSetting(t *testing.T) {
 						ThemeMode:           domain.LabelPolicyThemeAuto,
 					},
 				}
-				err := settingRepo.CreateLabel(ctx, &setting)
+				err := settingRepo.CreateLabel(t.Context(), tx, &setting)
 				require.NoError(t, err)
 
 				// update settings values
@@ -970,7 +1023,7 @@ func TestUpdateSetting(t *testing.T) {
 		},
 		{
 			name: "update setting with non existent instance id",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.LabelSetting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
 				setting := domain.LabelSetting{
 					Setting: &domain.Setting{
 						InstanceID: "non-existent-instanceID",
@@ -1004,7 +1057,7 @@ func TestUpdateSetting(t *testing.T) {
 		},
 		{
 			name: "update setting with non existent org id",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.LabelSetting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
 				setting := domain.LabelSetting{
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
@@ -1037,7 +1090,7 @@ func TestUpdateSetting(t *testing.T) {
 		},
 		{
 			name: "update setting with wrong type",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.LabelSetting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
 				setting := domain.LabelSetting{
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
@@ -1063,7 +1116,7 @@ func TestUpdateSetting(t *testing.T) {
 						ThemeMode:           domain.LabelPolicyThemeAuto,
 					},
 				}
-				err := settingRepo.CreateLabel(ctx, &setting)
+				err := settingRepo.CreateLabel(t.Context(), tx, &setting)
 				require.NoError(t, err)
 
 				// change type
@@ -1076,18 +1129,23 @@ func TestUpdateSetting(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := t.Context()
-			_, err := pool.Exec(ctx, "DELETE FROM zitadel.settings")
+			tx, err := tx.Begin(t.Context())
 			require.NoError(t, err)
+			defer func() {
+				err = tx.Rollback(t.Context())
+				if err != nil {
+					t.Logf("error during rollback: %v", err)
+				}
+			}()
 
-			settingRepo := repository.SettingsRepository(pool)
+			settingRepo := repository.SettingsRepository()
 
-			setting := tt.testFunc(ctx, t)
+			setting := tt.testFunc(t, tx)
 
 			// update setting
 			beforeUpdate := time.Now()
 			rowsAffected, err := settingRepo.UpdateLabel(
-				ctx,
+				t.Context(), tx,
 				setting,
 			)
 			afterUpdate := time.Now()
@@ -1103,7 +1161,7 @@ func TestUpdateSetting(t *testing.T) {
 
 			// check updatedSetting values
 			updatedSetting, err := settingRepo.GetLabel(
-				ctx,
+				t.Context(), tx,
 				setting.InstanceID,
 				setting.OrgID,
 				*setting.LabelState,
@@ -1124,6 +1182,15 @@ func TestUpdateSetting(t *testing.T) {
 
 // NOTE all the Get.*() functions are a wrapper around Get()
 func TestGetSetting(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
 	now := time.Now()
 	// create instance
 	instanceId := gofakeit.Name()
@@ -1137,7 +1204,7 @@ func TestGetSetting(t *testing.T) {
 		DefaultLanguage: "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
-	err := instanceRepo.Create(t.Context(), pool, &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -1149,7 +1216,7 @@ func TestGetSetting(t *testing.T) {
 		State:      domain.OrgStateActive,
 	}
 	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), pool, &org)
+	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
 	// create setting
@@ -1164,13 +1231,13 @@ func TestGetSetting(t *testing.T) {
 		CreatedAt:  now,
 		UpdatedAt:  &now,
 	}
-	settingRepo := repository.SettingsRepository(pool)
-	err = settingRepo.Create(t.Context(), &prexistingSetting)
+	settingRepo := repository.SettingsRepository()
+	err = settingRepo.Create(t.Context(), tx, &prexistingSetting)
 	require.NoError(t, err)
 
 	type test struct {
 		name                       string
-		testFunc                   func(ctx context.Context, t *testing.T) *domain.Setting
+		testFunc                   func(t *testing.T, tx database.QueryExecutor) *domain.Setting
 		settingIdentifierCondition database.Condition
 		err                        error
 	}
@@ -1178,7 +1245,7 @@ func TestGetSetting(t *testing.T) {
 	tests := []test{
 		{
 			name: "happy path get using type",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.Setting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Setting {
 				setting := domain.Setting{
 					InstanceID: instanceId,
 					OrgID:      &orgId,
@@ -1188,7 +1255,7 @@ func TestGetSetting(t *testing.T) {
 					UpdatedAt:  &now,
 				}
 
-				err := settingRepo.Create(ctx, &setting)
+				err := settingRepo.Create(t.Context(), tx, &setting)
 				require.NoError(t, err)
 				return &setting
 			},
@@ -1196,7 +1263,7 @@ func TestGetSetting(t *testing.T) {
 		},
 		{
 			name: "happy path get using type, no org",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.Setting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Setting {
 				setting := domain.Setting{
 					InstanceID: instanceId,
 					// OrgID:      &orgId,
@@ -1206,7 +1273,7 @@ func TestGetSetting(t *testing.T) {
 					UpdatedAt: &now,
 				}
 
-				err := settingRepo.Create(ctx, &setting)
+				err := settingRepo.Create(t.Context(), tx, &setting)
 				require.NoError(t, err)
 				return &setting
 			},
@@ -1214,7 +1281,7 @@ func TestGetSetting(t *testing.T) {
 		},
 		{
 			name: "get using non existent id",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.Setting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Setting {
 				setting := domain.Setting{
 					InstanceID: instanceId,
 					OrgID:      &orgId,
@@ -1226,7 +1293,7 @@ func TestGetSetting(t *testing.T) {
 					UpdatedAt: &now,
 				}
 
-				err := settingRepo.Create(ctx, &setting)
+				err := settingRepo.Create(t.Context(), tx, &setting)
 				require.NoError(t, err)
 				return &setting
 			},
@@ -1236,7 +1303,7 @@ func TestGetSetting(t *testing.T) {
 		func() test {
 			return test{
 				name: "non existent orgID",
-				testFunc: func(ctx context.Context, t *testing.T) *domain.Setting {
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Setting {
 					setting := domain.Setting{
 						InstanceID: instanceId,
 						OrgID:      &orgId,
@@ -1246,7 +1313,7 @@ func TestGetSetting(t *testing.T) {
 						UpdatedAt:  &now,
 					}
 
-					err := settingRepo.Create(ctx, &setting)
+					err := settingRepo.Create(t.Context(), tx, &setting)
 					require.NoError(t, err)
 					setting.OrgID = gu.Ptr("non-existent-orgID")
 					return &setting
@@ -1257,7 +1324,7 @@ func TestGetSetting(t *testing.T) {
 		func() test {
 			return test{
 				name: "non existent instanceID",
-				testFunc: func(ctx context.Context, t *testing.T) *domain.Setting {
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Setting {
 					setting := domain.Setting{
 						InstanceID: instanceId,
 						OrgID:      &orgId,
@@ -1267,7 +1334,7 @@ func TestGetSetting(t *testing.T) {
 						UpdatedAt:  &now,
 					}
 
-					err := settingRepo.Create(ctx, &setting)
+					err := settingRepo.Create(t.Context(), tx, &setting)
 					require.NoError(t, err)
 					setting.InstanceID = "non-existent-instanceID"
 					return &setting
@@ -1278,15 +1345,22 @@ func TestGetSetting(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := t.Context()
+			tx, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err = tx.Rollback(t.Context())
+				if err != nil {
+					t.Logf("error during rollback: %v", err)
+				}
+			}()
 
 			var setting *domain.Setting
 			if tt.testFunc != nil {
-				setting = tt.testFunc(ctx, t)
+				setting = tt.testFunc(t, tx)
 			}
 
 			// get setting
-			returnedSetting, err := settingRepo.Get(ctx,
+			returnedSetting, err := settingRepo.Get(t.Context(), tx,
 				setting.InstanceID,
 				setting.OrgID,
 				setting.Type,
@@ -1308,6 +1382,15 @@ func TestGetSetting(t *testing.T) {
 
 // testing that values written to the db are successfully retrieved
 func TestCreateGetLoginPolicySetting(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
@@ -1320,7 +1403,7 @@ func TestCreateGetLoginPolicySetting(t *testing.T) {
 		DefaultLanguage: "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
-	err := instanceRepo.Create(t.Context(), pool, &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -1332,20 +1415,20 @@ func TestCreateGetLoginPolicySetting(t *testing.T) {
 		State:      domain.OrgStateActive,
 	}
 	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), pool, &org)
+	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
-	settingRepo := repository.SettingsRepository(pool)
+	settingRepo := repository.SettingsRepository()
 
 	type test struct {
 		name     string
-		testFunc func(ctx context.Context, t *testing.T) *domain.LoginSetting
+		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.LoginSetting
 		err      error
 	}
 	tests := []test{
 		{
 			name: "happy path",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.LoginSetting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LoginSetting {
 				setting := domain.LoginSetting{
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
@@ -1376,7 +1459,7 @@ func TestCreateGetLoginPolicySetting(t *testing.T) {
 					},
 				}
 
-				err := settingRepo.CreateLogin(ctx, &setting)
+				err := settingRepo.CreateLogin(t.Context(), tx, &setting)
 				require.NoError(t, err)
 				return &setting
 			},
@@ -1385,19 +1468,22 @@ func TestCreateGetLoginPolicySetting(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := t.Context()
-			// t.Cleanup(func() {
-			// 	_, err := pool.Exec(context.Background(), "DELETE FROM zitadel.settings")
-			// 	require.NoError(t, err)
-			// })
+			tx, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err = tx.Rollback(t.Context())
+				if err != nil {
+					t.Logf("error during rollback: %v", err)
+				}
+			}()
 
 			var setting *domain.LoginSetting
 			if tt.testFunc != nil {
-				setting = tt.testFunc(ctx, t)
+				setting = tt.testFunc(t, tx)
 			}
 
 			// get setting
-			returnedSetting, err := settingRepo.GetLogin(ctx,
+			returnedSetting, err := settingRepo.GetLogin(t.Context(), tx,
 				setting.InstanceID,
 				setting.OrgID,
 			)
@@ -1418,6 +1504,15 @@ func TestCreateGetLoginPolicySetting(t *testing.T) {
 
 // testing that values written to the db are successfully retrieved
 func TestGetLabelPolicySetting(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
@@ -1430,7 +1525,7 @@ func TestGetLabelPolicySetting(t *testing.T) {
 		DefaultLanguage: "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
-	err := instanceRepo.Create(t.Context(), pool, &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -1442,21 +1537,21 @@ func TestGetLabelPolicySetting(t *testing.T) {
 		State:      domain.OrgStateActive,
 	}
 	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), pool, &org)
+	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
-	settingRepo := repository.SettingsRepository(pool)
+	settingRepo := repository.SettingsRepository()
 
 	type test struct {
 		name     string
-		testFunc func(ctx context.Context, t *testing.T) *domain.LabelSetting
+		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting
 		err      error
 	}
 
 	tests := []test{
 		{
 			name: "happy path, state preview",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.LabelSetting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
 				setting := domain.LabelSetting{
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
@@ -1481,14 +1576,14 @@ func TestGetLabelPolicySetting(t *testing.T) {
 					},
 				}
 
-				err := settingRepo.CreateLabel(ctx, &setting)
+				err := settingRepo.CreateLabel(t.Context(), tx, &setting)
 				require.NoError(t, err)
 				return &setting
 			},
 		},
 		{
 			name: "happy path, state activated",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.LabelSetting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
 				setting := domain.LabelSetting{
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
@@ -1513,14 +1608,14 @@ func TestGetLabelPolicySetting(t *testing.T) {
 					},
 				}
 
-				err := settingRepo.CreateLabel(ctx, &setting)
+				err := settingRepo.CreateLabel(t.Context(), tx, &setting)
 				require.NoError(t, err)
 				return &setting
 			},
 		},
 		{
 			name: "get label policy using wrong state",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.LabelSetting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
 				setting := domain.LabelSetting{
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
@@ -1530,7 +1625,7 @@ func TestGetLabelPolicySetting(t *testing.T) {
 					},
 				}
 
-				err := settingRepo.CreateLabel(ctx, &setting)
+				err := settingRepo.CreateLabel(t.Context(), tx, &setting)
 				require.NoError(t, err)
 
 				setting.LabelState = gu.Ptr(domain.LabelStatePreview)
@@ -1540,7 +1635,7 @@ func TestGetLabelPolicySetting(t *testing.T) {
 		},
 		{
 			name: "get non existent label policy",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.LabelSetting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
 				setting := domain.LabelSetting{
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
@@ -1558,19 +1653,22 @@ func TestGetLabelPolicySetting(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := t.Context()
-			t.Cleanup(func() {
-				_, err := pool.Exec(context.Background(), "DELETE FROM zitadel.settings")
-				require.NoError(t, err)
-			})
+			tx, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err = tx.Rollback(t.Context())
+				if err != nil {
+					t.Logf("error during rollback: %v", err)
+				}
+			}()
 
 			var setting *domain.LabelSetting
 			if tt.testFunc != nil {
-				setting = tt.testFunc(ctx, t)
+				setting = tt.testFunc(t, tx)
 			}
 
 			// get setting
-			returnedSetting, err := settingRepo.GetLabel(ctx,
+			returnedSetting, err := settingRepo.GetLabel(t.Context(), tx,
 				setting.InstanceID,
 				setting.OrgID,
 				*setting.LabelState,
@@ -1592,6 +1690,15 @@ func TestGetLabelPolicySetting(t *testing.T) {
 
 // testing that values written to the db are successfully retrieved
 func TestCreateGetPasswordComplexityPolicySetting(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
@@ -1604,7 +1711,7 @@ func TestCreateGetPasswordComplexityPolicySetting(t *testing.T) {
 		DefaultLanguage: "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
-	err := instanceRepo.Create(t.Context(), pool, &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -1616,20 +1723,20 @@ func TestCreateGetPasswordComplexityPolicySetting(t *testing.T) {
 		State:      domain.OrgStateActive,
 	}
 	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), pool, &org)
+	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
-	settingRepo := repository.SettingsRepository(pool)
+	settingRepo := repository.SettingsRepository()
 
 	type test struct {
 		name     string
-		testFunc func(ctx context.Context, t *testing.T) *domain.PasswordComplexitySetting
+		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.PasswordComplexitySetting
 		err      error
 	}
 	tests := []test{
 		{
 			name: "happy path",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.PasswordComplexitySetting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.PasswordComplexitySetting {
 				setting := domain.PasswordComplexitySetting{
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
@@ -1648,7 +1755,7 @@ func TestCreateGetPasswordComplexityPolicySetting(t *testing.T) {
 					},
 				}
 
-				err := settingRepo.CreatePasswordComplexity(ctx, &setting)
+				err := settingRepo.CreatePasswordComplexity(t.Context(), tx, &setting)
 				require.NoError(t, err)
 				return &setting
 			},
@@ -1657,15 +1764,22 @@ func TestCreateGetPasswordComplexityPolicySetting(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := t.Context()
+			tx, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err = tx.Rollback(t.Context())
+				if err != nil {
+					t.Logf("error during rollback: %v", err)
+				}
+			}()
 
 			var setting *domain.PasswordComplexitySetting
 			if tt.testFunc != nil {
-				setting = tt.testFunc(ctx, t)
+				setting = tt.testFunc(t, tx)
 			}
 
 			// get setting
-			returnedSetting, err := settingRepo.GetPasswordComplexity(ctx,
+			returnedSetting, err := settingRepo.GetPasswordComplexity(t.Context(), tx,
 				setting.InstanceID,
 				setting.OrgID,
 			)
@@ -1685,6 +1799,15 @@ func TestCreateGetPasswordComplexityPolicySetting(t *testing.T) {
 }
 
 func TestCreateGetPasswordExpiryPolicySetting(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
@@ -1697,7 +1820,7 @@ func TestCreateGetPasswordExpiryPolicySetting(t *testing.T) {
 		DefaultLanguage: "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
-	err := instanceRepo.Create(t.Context(), pool, &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -1709,20 +1832,20 @@ func TestCreateGetPasswordExpiryPolicySetting(t *testing.T) {
 		State:      domain.OrgStateActive,
 	}
 	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), pool, &org)
+	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
-	settingRepo := repository.SettingsRepository(pool)
+	settingRepo := repository.SettingsRepository()
 
 	type test struct {
 		name     string
-		testFunc func(ctx context.Context, t *testing.T) *domain.PasswordExpirySetting
+		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.PasswordExpirySetting
 		err      error
 	}
 	tests := []test{
 		{
 			name: "happy path",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.PasswordExpirySetting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.PasswordExpirySetting {
 				setting := domain.PasswordExpirySetting{
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
@@ -1738,7 +1861,7 @@ func TestCreateGetPasswordExpiryPolicySetting(t *testing.T) {
 					},
 				}
 
-				err := settingRepo.CreatePasswordExpiry(ctx, &setting)
+				err = settingRepo.CreatePasswordExpiry(t.Context(), tx, &setting)
 				require.NoError(t, err)
 				return &setting
 			},
@@ -1747,15 +1870,22 @@ func TestCreateGetPasswordExpiryPolicySetting(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := t.Context()
+			tx, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err = tx.Rollback(t.Context())
+				if err != nil {
+					t.Logf("error during rollback: %v", err)
+				}
+			}()
 
 			var setting *domain.PasswordExpirySetting
 			if tt.testFunc != nil {
-				setting = tt.testFunc(ctx, t)
+				setting = tt.testFunc(t, tx)
 			}
 
 			// get setting
-			returnedSetting, err := settingRepo.GetPasswordExpiry(ctx,
+			returnedSetting, err := settingRepo.GetPasswordExpiry(t.Context(), tx,
 				setting.InstanceID,
 				setting.OrgID,
 			)
@@ -1775,6 +1905,15 @@ func TestCreateGetPasswordExpiryPolicySetting(t *testing.T) {
 }
 
 func TestCreateGetLockoutPolicySetting(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
@@ -1787,7 +1926,7 @@ func TestCreateGetLockoutPolicySetting(t *testing.T) {
 		DefaultLanguage: "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
-	err := instanceRepo.Create(t.Context(), pool, &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -1799,20 +1938,20 @@ func TestCreateGetLockoutPolicySetting(t *testing.T) {
 		State:      domain.OrgStateActive,
 	}
 	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), pool, &org)
+	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
-	settingRepo := repository.SettingsRepository(pool)
+	settingRepo := repository.SettingsRepository()
 
 	type test struct {
 		name     string
-		testFunc func(ctx context.Context, t *testing.T) *domain.LockoutSetting
+		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.LockoutSetting
 		err      error
 	}
 	tests := []test{
 		{
 			name: "happy path",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.LockoutSetting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LockoutSetting {
 				setting := domain.LockoutSetting{
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
@@ -1829,7 +1968,7 @@ func TestCreateGetLockoutPolicySetting(t *testing.T) {
 					},
 				}
 
-				err := settingRepo.CreateLockout(ctx, &setting)
+				err := settingRepo.CreateLockout(t.Context(), tx, &setting)
 				require.NoError(t, err)
 				return &setting
 			},
@@ -1838,15 +1977,22 @@ func TestCreateGetLockoutPolicySetting(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := t.Context()
+			tx, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err = tx.Rollback(t.Context())
+				if err != nil {
+					t.Logf("error during rollback: %v", err)
+				}
+			}()
 
 			var setting *domain.LockoutSetting
 			if tt.testFunc != nil {
-				setting = tt.testFunc(ctx, t)
+				setting = tt.testFunc(t, tx)
 			}
 
 			// get setting
-			returnedSetting, err := settingRepo.GetLockout(ctx,
+			returnedSetting, err := settingRepo.GetLockout(t.Context(), tx,
 				setting.InstanceID,
 				setting.OrgID,
 			)
@@ -1866,6 +2012,15 @@ func TestCreateGetLockoutPolicySetting(t *testing.T) {
 }
 
 func TestCreateGetSecurityPolicySetting(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
@@ -1878,7 +2033,7 @@ func TestCreateGetSecurityPolicySetting(t *testing.T) {
 		DefaultLanguage: "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
-	err := instanceRepo.Create(t.Context(), pool, &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -1890,20 +2045,20 @@ func TestCreateGetSecurityPolicySetting(t *testing.T) {
 		State:      domain.OrgStateActive,
 	}
 	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), pool, &org)
+	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
-	settingRepo := repository.SettingsRepository(pool)
+	settingRepo := repository.SettingsRepository()
 
 	type test struct {
 		name     string
-		testFunc func(ctx context.Context, t *testing.T) *domain.SecuritySetting
+		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.SecuritySetting
 		err      error
 	}
 	tests := []test{
 		{
 			name: "happy path",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.SecuritySetting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.SecuritySetting {
 				setting := domain.SecuritySetting{
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
@@ -1920,7 +2075,7 @@ func TestCreateGetSecurityPolicySetting(t *testing.T) {
 					},
 				}
 
-				err := settingRepo.CreateSecurity(ctx, &setting)
+				err := settingRepo.CreateSecurity(t.Context(), tx, &setting)
 				require.NoError(t, err)
 				return &setting
 			},
@@ -1929,15 +2084,14 @@ func TestCreateGetSecurityPolicySetting(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := t.Context()
 
 			var setting *domain.SecuritySetting
 			if tt.testFunc != nil {
-				setting = tt.testFunc(ctx, t)
+				setting = tt.testFunc(t, tx)
 			}
 
 			// get setting
-			returnedSetting, err := settingRepo.GetSecurity(ctx,
+			returnedSetting, err := settingRepo.GetSecurity(t.Context(), tx,
 				setting.InstanceID,
 				setting.OrgID,
 			)
@@ -1957,6 +2111,15 @@ func TestCreateGetSecurityPolicySetting(t *testing.T) {
 }
 
 func TestCreateGetDomainPolicySetting(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
@@ -1969,7 +2132,7 @@ func TestCreateGetDomainPolicySetting(t *testing.T) {
 		DefaultLanguage: "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
-	err := instanceRepo.Create(t.Context(), pool, &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -1981,20 +2144,20 @@ func TestCreateGetDomainPolicySetting(t *testing.T) {
 		State:      domain.OrgStateActive,
 	}
 	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), pool, &org)
+	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
-	settingRepo := repository.SettingsRepository(pool)
+	settingRepo := repository.SettingsRepository()
 
 	type test struct {
 		name     string
-		testFunc func(ctx context.Context, t *testing.T) *domain.DomainSetting
+		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.DomainSetting
 		err      error
 	}
 	tests := []test{
 		{
 			name: "happy path",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.DomainSetting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.DomainSetting {
 				setting := domain.DomainSetting{
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
@@ -2011,7 +2174,7 @@ func TestCreateGetDomainPolicySetting(t *testing.T) {
 					},
 				}
 
-				err := settingRepo.CreateDomain(ctx, &setting)
+				err := settingRepo.CreateDomain(t.Context(), tx, &setting)
 				require.NoError(t, err)
 				return &setting
 			},
@@ -2020,15 +2183,14 @@ func TestCreateGetDomainPolicySetting(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := t.Context()
 
 			var setting *domain.DomainSetting
 			if tt.testFunc != nil {
-				setting = tt.testFunc(ctx, t)
+				setting = tt.testFunc(t, tx)
 			}
 
 			// get setting
-			returnedSetting, err := settingRepo.GetDomain(ctx,
+			returnedSetting, err := settingRepo.GetDomain(t.Context(), tx,
 				setting.InstanceID,
 				setting.OrgID,
 			)
@@ -2048,6 +2210,15 @@ func TestCreateGetDomainPolicySetting(t *testing.T) {
 }
 
 func TestCreateGetOrgPolicySetting(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
@@ -2060,7 +2231,7 @@ func TestCreateGetOrgPolicySetting(t *testing.T) {
 		DefaultLanguage: "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
-	err := instanceRepo.Create(t.Context(), pool, &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -2072,20 +2243,20 @@ func TestCreateGetOrgPolicySetting(t *testing.T) {
 		State:      domain.OrgStateActive,
 	}
 	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), pool, &org)
+	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
-	settingRepo := repository.SettingsRepository(pool)
+	settingRepo := repository.SettingsRepository()
 
 	type test struct {
 		name     string
-		testFunc func(ctx context.Context, t *testing.T) *domain.OrgSetting
+		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.OrgSetting
 		err      error
 	}
 	tests := []test{
 		{
 			name: "happy path",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.OrgSetting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.OrgSetting {
 				setting := domain.OrgSetting{
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
@@ -2101,7 +2272,7 @@ func TestCreateGetOrgPolicySetting(t *testing.T) {
 					},
 				}
 
-				err := settingRepo.CreateOrg(ctx, &setting)
+				err := settingRepo.CreateOrg(t.Context(), tx, &setting)
 				require.NoError(t, err)
 				return &setting
 			},
@@ -2110,15 +2281,13 @@ func TestCreateGetOrgPolicySetting(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := t.Context()
-
 			var setting *domain.OrgSetting
 			if tt.testFunc != nil {
-				setting = tt.testFunc(ctx, t)
+				setting = tt.testFunc(t, tx)
 			}
 
 			// get setting
-			returnedSetting, err := settingRepo.GetOrg(ctx,
+			returnedSetting, err := settingRepo.GetOrg(t.Context(), tx,
 				setting.InstanceID,
 				setting.OrgID,
 			)
@@ -2143,10 +2312,15 @@ func TestCreateGetOrgPolicySetting(t *testing.T) {
 //nolint:gocognit
 func TestListSetting(t *testing.T) {
 	now := time.Now()
-	ctx := t.Context()
-	pool, stop, err := newEmbeddedDB(ctx)
+
+	tx, err := pool.Begin(t.Context(), nil)
 	require.NoError(t, err)
-	defer stop()
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
 
 	// create instance
 	instanceId := gofakeit.Name()
@@ -2160,7 +2334,7 @@ func TestListSetting(t *testing.T) {
 		DefaultLanguage: "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
-	err = instanceRepo.Create(ctx, pool, &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -2172,21 +2346,21 @@ func TestListSetting(t *testing.T) {
 		State:      domain.OrgStateActive,
 	}
 	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), pool, &org)
+	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
-	settingRepo := repository.SettingsRepository(pool)
+	settingRepo := repository.SettingsRepository()
 
 	type test struct {
 		name               string
-		testFunc           func(ctx context.Context, t *testing.T) []*domain.Setting
+		testFunc           func(t *testing.T, tx database.QueryExecutor) []*domain.Setting
 		conditionClauses   func() []database.Condition
 		noSettingsReturned bool
 	}
 	tests := []test{
 		{
 			name: "multiple settings filter on instance",
-			testFunc: func(ctx context.Context, t *testing.T) []*domain.Setting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) []*domain.Setting {
 				// create instance
 				newInstanceId := gofakeit.Name()
 				instance := domain.Instance{
@@ -2198,7 +2372,7 @@ func TestListSetting(t *testing.T) {
 					ConsoleAppID:    "consoleApp",
 					DefaultLanguage: "defaultLanguage",
 				}
-				err = instanceRepo.Create(ctx, pool, &instance)
+				err = instanceRepo.Create(t.Context(), tx, &instance)
 				require.NoError(t, err)
 
 				// create org
@@ -2210,7 +2384,7 @@ func TestListSetting(t *testing.T) {
 					State:      domain.OrgStateActive,
 				}
 				organizationRepo := repository.OrganizationRepository()
-				err = organizationRepo.Create(ctx, pool, &org)
+				err = organizationRepo.Create(t.Context(), tx, &org)
 				require.NoError(t, err)
 
 				// create setting
@@ -2225,7 +2399,7 @@ func TestListSetting(t *testing.T) {
 					CreatedAt:  now,
 					UpdatedAt:  &now,
 				}
-				err := settingRepo.Create(ctx, &setting)
+				err := settingRepo.Create(t.Context(), tx, &setting)
 				require.NoError(t, err)
 
 				noOfSettings := 5
@@ -2243,7 +2417,7 @@ func TestListSetting(t *testing.T) {
 						UpdatedAt: &now,
 					}
 
-					err := settingRepo.Create(ctx, &setting)
+					err := settingRepo.Create(t.Context(), tx, &setting)
 					require.NoError(t, err)
 
 					settings[i] = &setting
@@ -2257,7 +2431,7 @@ func TestListSetting(t *testing.T) {
 		},
 		{
 			name: "multiple settings filter on instance, no org",
-			testFunc: func(ctx context.Context, t *testing.T) []*domain.Setting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) []*domain.Setting {
 				// create instance
 				newInstanceId := gofakeit.Name()
 				instance := domain.Instance{
@@ -2269,7 +2443,7 @@ func TestListSetting(t *testing.T) {
 					ConsoleAppID:    "consoleApp",
 					DefaultLanguage: "defaultLanguage",
 				}
-				err = instanceRepo.Create(ctx, pool, &instance)
+				err = instanceRepo.Create(t.Context(), tx, &instance)
 				require.NoError(t, err)
 
 				// create setting
@@ -2284,7 +2458,7 @@ func TestListSetting(t *testing.T) {
 					CreatedAt: now,
 					UpdatedAt: &now,
 				}
-				err := settingRepo.Create(ctx, &setting)
+				err := settingRepo.Create(t.Context(), tx, &setting)
 				require.NoError(t, err)
 
 				noOfSettings := 5
@@ -2302,7 +2476,7 @@ func TestListSetting(t *testing.T) {
 						UpdatedAt: &now,
 					}
 
-					err := settingRepo.Create(ctx, &setting)
+					err := settingRepo.Create(t.Context(), tx, &setting)
 					require.NoError(t, err)
 
 					settings[i] = &setting
@@ -2316,7 +2490,7 @@ func TestListSetting(t *testing.T) {
 		},
 		{
 			name: "multiple settings filter on org",
-			testFunc: func(ctx context.Context, t *testing.T) []*domain.Setting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) []*domain.Setting {
 				// create org
 				newOrgId := gofakeit.Name()
 				org := domain.Organization{
@@ -2326,7 +2500,7 @@ func TestListSetting(t *testing.T) {
 					State:      domain.OrgStateActive,
 				}
 				organizationRepo := repository.OrganizationRepository()
-				err = organizationRepo.Create(ctx, pool, &org)
+				err = organizationRepo.Create(t.Context(), tx, &org)
 				require.NoError(t, err)
 
 				// create setting
@@ -2341,7 +2515,7 @@ func TestListSetting(t *testing.T) {
 					CreatedAt:  now,
 					UpdatedAt:  &now,
 				}
-				err := settingRepo.Create(ctx, &setting)
+				err := settingRepo.Create(t.Context(), tx, &setting)
 				require.NoError(t, err)
 
 				noOfSettings := 5
@@ -2358,7 +2532,7 @@ func TestListSetting(t *testing.T) {
 						UpdatedAt:  &now,
 					}
 
-					err := settingRepo.Create(ctx, &setting)
+					err := settingRepo.Create(t.Context(), tx, &setting)
 					require.NoError(t, err)
 
 					settings[i] = &setting
@@ -2372,7 +2546,7 @@ func TestListSetting(t *testing.T) {
 		},
 		{
 			name: "happy path single setting no filter",
-			testFunc: func(ctx context.Context, t *testing.T) []*domain.Setting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) []*domain.Setting {
 				noOfSettings := 1
 				settings := make([]*domain.Setting, noOfSettings)
 				for i := range noOfSettings {
@@ -2387,7 +2561,7 @@ func TestListSetting(t *testing.T) {
 						UpdatedAt:  &now,
 					}
 
-					err := settingRepo.Create(ctx, &setting)
+					err := settingRepo.Create(t.Context(), tx, &setting)
 					require.NoError(t, err)
 
 					settings[i] = &setting
@@ -2398,7 +2572,7 @@ func TestListSetting(t *testing.T) {
 		},
 		{
 			name: "happy path multiple settings no filter",
-			testFunc: func(ctx context.Context, t *testing.T) []*domain.Setting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) []*domain.Setting {
 				noOfSettings := 5
 				settings := make([]*domain.Setting, noOfSettings)
 				for i := range noOfSettings {
@@ -2413,7 +2587,7 @@ func TestListSetting(t *testing.T) {
 						UpdatedAt:  &now,
 					}
 
-					err := settingRepo.Create(ctx, &setting)
+					err := settingRepo.Create(t.Context(), tx, &setting)
 					require.NoError(t, err)
 
 					settings[i] = &setting
@@ -2426,7 +2600,7 @@ func TestListSetting(t *testing.T) {
 			id := gofakeit.Name()
 			return test{
 				name: "setting filter on id",
-				testFunc: func(ctx context.Context, t *testing.T) []*domain.Setting {
+				testFunc: func(t *testing.T, tx database.QueryExecutor) []*domain.Setting {
 					// create setting
 					// this setting is created as an additional setting which should NOT
 					// be returned in the results of this test case
@@ -2439,7 +2613,7 @@ func TestListSetting(t *testing.T) {
 						CreatedAt:  now,
 						UpdatedAt:  &now,
 					}
-					err := settingRepo.Create(ctx, &setting)
+					err := settingRepo.Create(t.Context(), tx, &setting)
 					require.NoError(t, err)
 
 					noOfSettings := 1
@@ -2456,7 +2630,7 @@ func TestListSetting(t *testing.T) {
 							UpdatedAt: &now,
 						}
 
-						err := settingRepo.Create(ctx, &setting)
+						err := settingRepo.Create(t.Context(), tx, &setting)
 						require.NoError(t, err)
 
 						settings[i] = &setting
@@ -2472,7 +2646,7 @@ func TestListSetting(t *testing.T) {
 		}(),
 		{
 			name: "multiple settings filter on type",
-			testFunc: func(ctx context.Context, t *testing.T) []*domain.Setting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) []*domain.Setting {
 				// create setting
 				// this setting is created as an additional setting which should NOT
 				// be returned in the results of this test case
@@ -2486,7 +2660,7 @@ func TestListSetting(t *testing.T) {
 					CreatedAt: now,
 					UpdatedAt: &now,
 				}
-				err := settingRepo.Create(ctx, &setting)
+				err := settingRepo.Create(t.Context(), tx, &setting)
 				require.NoError(t, err)
 
 				noOfSettings := 1
@@ -2503,7 +2677,7 @@ func TestListSetting(t *testing.T) {
 						UpdatedAt:  &now,
 					}
 
-					err := settingRepo.Create(ctx, &setting)
+					err := settingRepo.Create(t.Context(), tx, &setting)
 					require.NoError(t, err)
 
 					settings[i] = &setting
@@ -2518,14 +2692,16 @@ func TestListSetting(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := context.WithoutCancel(t.Context())
+			tx, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err = tx.Rollback(t.Context())
+				if err != nil {
+					t.Logf("error during rollback: %v", err)
+				}
+			}()
 
-			t.Cleanup(func() {
-				_, err := pool.Exec(ctx, "DELETE FROM zitadel.settings")
-				require.NoError(t, err)
-			})
-
-			settings := tt.testFunc(ctx, t)
+			settings := tt.testFunc(t, tx)
 
 			var conditions []database.Condition
 			if tt.conditionClauses != nil {
@@ -2533,7 +2709,7 @@ func TestListSetting(t *testing.T) {
 			}
 
 			// check setting values
-			returnedSettings, err := settingRepo.List(ctx,
+			returnedSettings, err := settingRepo.List(t.Context(), tx,
 				conditions...,
 			)
 			require.NoError(t, err)
@@ -2556,6 +2732,16 @@ func TestListSetting(t *testing.T) {
 
 func TestDeleteSetting(t *testing.T) {
 	now := time.Now()
+
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
@@ -2568,7 +2754,7 @@ func TestDeleteSetting(t *testing.T) {
 		DefaultLanguage: "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
-	err := instanceRepo.Create(t.Context(), pool, &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -2580,14 +2766,14 @@ func TestDeleteSetting(t *testing.T) {
 		State:      domain.OrgStateActive,
 	}
 	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), pool, &org)
+	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
-	settingRepo := repository.SettingsRepository(pool)
+	settingRepo := repository.SettingsRepository()
 
 	type test struct {
 		name            string
-		testFunc        func(ctx context.Context, t *testing.T)
+		testFunc        func(t *testing.T, tx database.QueryExecutor)
 		settingType     domain.SettingType
 		noOfDeletedRows int64
 	}
@@ -2596,7 +2782,7 @@ func TestDeleteSetting(t *testing.T) {
 			var noOfSettings int64 = 1
 			return test{
 				name: "happy path delete",
-				testFunc: func(ctx context.Context, t *testing.T) {
+				testFunc: func(t *testing.T, tx database.QueryExecutor) {
 					for range noOfSettings {
 						setting := domain.Setting{
 							InstanceID: instanceId,
@@ -2607,7 +2793,7 @@ func TestDeleteSetting(t *testing.T) {
 							UpdatedAt:  &now,
 						}
 
-						err := settingRepo.Create(ctx, &setting)
+						err := settingRepo.Create(t.Context(), tx, &setting)
 						require.NoError(t, err)
 					}
 				},
@@ -2618,7 +2804,7 @@ func TestDeleteSetting(t *testing.T) {
 		func() test {
 			return test{
 				name: "deleted setting with wrong type",
-				testFunc: func(ctx context.Context, t *testing.T) {
+				testFunc: func(t *testing.T, tx database.QueryExecutor) {
 					noOfSettings := 1
 					for range noOfSettings {
 						setting := domain.Setting{
@@ -2631,12 +2817,12 @@ func TestDeleteSetting(t *testing.T) {
 							UpdatedAt:  &now,
 						}
 
-						err := settingRepo.Create(ctx, &setting)
+						err := settingRepo.Create(t.Context(), tx, &setting)
 						require.NoError(t, err)
 					}
 
 					// delete organization
-					affectedRows, err := settingRepo.Delete(ctx,
+					affectedRows, err := settingRepo.Delete(t.Context(), tx,
 						instanceId,
 						&orgId,
 						domain.SettingTypeLogin,
@@ -2652,7 +2838,7 @@ func TestDeleteSetting(t *testing.T) {
 		func() test {
 			return test{
 				name: "deleted already deleted setting",
-				testFunc: func(ctx context.Context, t *testing.T) {
+				testFunc: func(t *testing.T, tx database.QueryExecutor) {
 					noOfSettings := 1
 					for range noOfSettings {
 						setting := domain.Setting{
@@ -2666,12 +2852,12 @@ func TestDeleteSetting(t *testing.T) {
 							UpdatedAt: &now,
 						}
 
-						err := settingRepo.Create(ctx, &setting)
+						err := settingRepo.Create(t.Context(), tx, &setting)
 						require.NoError(t, err)
 					}
 
 					// delete organization
-					affectedRows, err := settingRepo.Delete(ctx,
+					affectedRows, err := settingRepo.Delete(t.Context(), tx,
 						instanceId,
 						&orgId,
 						domain.SettingTypeLogin,
@@ -2687,14 +2873,21 @@ func TestDeleteSetting(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := t.Context()
+			tx, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err = tx.Rollback(t.Context())
+				if err != nil {
+					t.Logf("error during rollback: %v", err)
+				}
+			}()
 
 			if tt.testFunc != nil {
-				tt.testFunc(ctx, t)
+				tt.testFunc(t, tx)
 			}
 
 			// delete setting
-			noOfDeletedRows, err := settingRepo.Delete(ctx,
+			noOfDeletedRows, err := settingRepo.Delete(t.Context(), tx,
 				instanceId,
 				&orgId,
 				tt.settingType,
@@ -2703,7 +2896,7 @@ func TestDeleteSetting(t *testing.T) {
 			assert.Equal(t, noOfDeletedRows, tt.noOfDeletedRows)
 
 			// check setting was deleted
-			organization, err := settingRepo.Get(ctx,
+			organization, err := settingRepo.Get(t.Context(), tx,
 				instanceId,
 				&orgId,
 				tt.settingType,
@@ -2715,6 +2908,15 @@ func TestDeleteSetting(t *testing.T) {
 }
 
 func TestDeleteSettingsForInstance(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
@@ -2727,7 +2929,7 @@ func TestDeleteSettingsForInstance(t *testing.T) {
 		DefaultLanguage: "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
-	err := instanceRepo.Create(t.Context(), pool, &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -2739,23 +2941,23 @@ func TestDeleteSettingsForInstance(t *testing.T) {
 		State:      domain.OrgStateActive,
 	}
 	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), pool, &org)
+	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
-	settingRepo := repository.SettingsRepository(pool)
+	settingRepo := repository.SettingsRepository()
 
 	type test struct {
 		name            string
-		testFunc        func(ctx context.Context, t *testing.T)
+		testFunc        func(t *testing.T, tx database.QueryExecutor)
 		noOfDeletedRows int64
 	}
 	tests := []test{
 		func() test {
 			return test{
 				name: "delete all settings for instance",
-				testFunc: func(ctx context.Context, t *testing.T) {
+				testFunc: func(t *testing.T, tx database.QueryExecutor) {
 					// create with org
-					err = settingRepo.CreateLogin(ctx, &domain.LoginSetting{
+					err = settingRepo.CreateLogin(t.Context(), tx, &domain.LoginSetting{
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							OrgID:      &orgId,
@@ -2763,7 +2965,7 @@ func TestDeleteSettingsForInstance(t *testing.T) {
 					})
 					require.NoError(t, err)
 
-					err = settingRepo.CreateLabel(ctx, &domain.LabelSetting{
+					err = settingRepo.CreateLabel(t.Context(), tx, &domain.LabelSetting{
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							OrgID:      &orgId,
@@ -2772,7 +2974,7 @@ func TestDeleteSettingsForInstance(t *testing.T) {
 					})
 					require.NoError(t, err)
 
-					err = settingRepo.CreatePasswordComplexity(ctx, &domain.PasswordComplexitySetting{
+					err = settingRepo.CreatePasswordComplexity(t.Context(), tx, &domain.PasswordComplexitySetting{
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							OrgID:      &orgId,
@@ -2780,7 +2982,7 @@ func TestDeleteSettingsForInstance(t *testing.T) {
 					})
 					require.NoError(t, err)
 
-					err = settingRepo.CreatePasswordExpiry(ctx, &domain.PasswordExpirySetting{
+					err = settingRepo.CreatePasswordExpiry(t.Context(), tx, &domain.PasswordExpirySetting{
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							OrgID:      &orgId,
@@ -2788,7 +2990,7 @@ func TestDeleteSettingsForInstance(t *testing.T) {
 					})
 					require.NoError(t, err)
 
-					err = settingRepo.CreateLockout(ctx, &domain.LockoutSetting{
+					err = settingRepo.CreateLockout(t.Context(), tx, &domain.LockoutSetting{
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							OrgID:      &orgId,
@@ -2796,7 +2998,7 @@ func TestDeleteSettingsForInstance(t *testing.T) {
 					})
 					require.NoError(t, err)
 
-					err = settingRepo.CreateSecurity(ctx, &domain.SecuritySetting{
+					err = settingRepo.CreateSecurity(t.Context(), tx, &domain.SecuritySetting{
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							OrgID:      &orgId,
@@ -2804,7 +3006,7 @@ func TestDeleteSettingsForInstance(t *testing.T) {
 					})
 					require.NoError(t, err)
 
-					err = settingRepo.CreateDomain(ctx, &domain.DomainSetting{
+					err = settingRepo.CreateDomain(t.Context(), tx, &domain.DomainSetting{
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							OrgID:      &orgId,
@@ -2813,7 +3015,7 @@ func TestDeleteSettingsForInstance(t *testing.T) {
 					require.NoError(t, err)
 
 					// create without org
-					err = settingRepo.CreateLogin(ctx, &domain.LoginSetting{
+					err = settingRepo.CreateLogin(t.Context(), tx, &domain.LoginSetting{
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							// OrgID:      &orgId,
@@ -2821,7 +3023,7 @@ func TestDeleteSettingsForInstance(t *testing.T) {
 					})
 					require.NoError(t, err)
 
-					err = settingRepo.CreateLabel(ctx, &domain.LabelSetting{
+					err = settingRepo.CreateLabel(t.Context(), tx, &domain.LabelSetting{
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							// OrgID:      &orgId,
@@ -2830,7 +3032,7 @@ func TestDeleteSettingsForInstance(t *testing.T) {
 					})
 					require.NoError(t, err)
 
-					err = settingRepo.CreatePasswordComplexity(ctx, &domain.PasswordComplexitySetting{
+					err = settingRepo.CreatePasswordComplexity(t.Context(), tx, &domain.PasswordComplexitySetting{
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							// OrgID:      &orgId,
@@ -2838,7 +3040,7 @@ func TestDeleteSettingsForInstance(t *testing.T) {
 					})
 					require.NoError(t, err)
 
-					err = settingRepo.CreatePasswordExpiry(ctx, &domain.PasswordExpirySetting{
+					err = settingRepo.CreatePasswordExpiry(t.Context(), tx, &domain.PasswordExpirySetting{
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							// OrgID:      &orgId,
@@ -2846,7 +3048,7 @@ func TestDeleteSettingsForInstance(t *testing.T) {
 					})
 					require.NoError(t, err)
 
-					err = settingRepo.CreateLockout(ctx, &domain.LockoutSetting{
+					err = settingRepo.CreateLockout(t.Context(), tx, &domain.LockoutSetting{
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							// OrgID:      &orgId,
@@ -2854,7 +3056,7 @@ func TestDeleteSettingsForInstance(t *testing.T) {
 					})
 					require.NoError(t, err)
 
-					err = settingRepo.CreateSecurity(ctx, &domain.SecuritySetting{
+					err = settingRepo.CreateSecurity(t.Context(), tx, &domain.SecuritySetting{
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							// OrgID:      &orgId,
@@ -2868,15 +3070,22 @@ func TestDeleteSettingsForInstance(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := t.Context()
+			tx, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err = tx.Rollback(t.Context())
+				if err != nil {
+					t.Logf("error during rollback: %v", err)
+				}
+			}()
 
 			if tt.testFunc != nil {
-				tt.testFunc(ctx, t)
+				tt.testFunc(t, tx)
 			}
 
 			// delete settings
 			noOfDeletedRows, err := settingRepo.DeleteSettingsForInstance(
-				ctx,
+				t.Context(), tx,
 				instanceId,
 			)
 			require.NoError(t, err)
@@ -2886,6 +3095,15 @@ func TestDeleteSettingsForInstance(t *testing.T) {
 }
 
 func TestDeleteSettingsForOrg(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
@@ -2898,7 +3116,7 @@ func TestDeleteSettingsForOrg(t *testing.T) {
 		DefaultLanguage: "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
-	err := instanceRepo.Create(t.Context(), pool, &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -2910,23 +3128,23 @@ func TestDeleteSettingsForOrg(t *testing.T) {
 		State:      domain.OrgStateActive,
 	}
 	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), pool, &org)
+	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
-	settingRepo := repository.SettingsRepository(pool)
+	settingRepo := repository.SettingsRepository()
 
 	type test struct {
 		name            string
-		testFunc        func(ctx context.Context, t *testing.T)
+		testFunc        func(t *testing.T, tx database.QueryExecutor)
 		noOfDeletedRows int64
 	}
 	tests := []test{
 		func() test {
 			return test{
 				name: "delete all settings for instance",
-				testFunc: func(ctx context.Context, t *testing.T) {
+				testFunc: func(t *testing.T, tx database.QueryExecutor) {
 					// create with org
-					err = settingRepo.CreateLogin(ctx, &domain.LoginSetting{
+					err = settingRepo.CreateLogin(t.Context(), tx, &domain.LoginSetting{
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							OrgID:      &orgId,
@@ -2934,7 +3152,7 @@ func TestDeleteSettingsForOrg(t *testing.T) {
 					})
 					require.NoError(t, err)
 
-					err = settingRepo.CreateLabel(ctx, &domain.LabelSetting{
+					err = settingRepo.CreateLabel(t.Context(), tx, &domain.LabelSetting{
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							OrgID:      &orgId,
@@ -2943,7 +3161,7 @@ func TestDeleteSettingsForOrg(t *testing.T) {
 					})
 					require.NoError(t, err)
 
-					err = settingRepo.CreatePasswordComplexity(ctx, &domain.PasswordComplexitySetting{
+					err = settingRepo.CreatePasswordComplexity(t.Context(), tx, &domain.PasswordComplexitySetting{
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							OrgID:      &orgId,
@@ -2951,7 +3169,7 @@ func TestDeleteSettingsForOrg(t *testing.T) {
 					})
 					require.NoError(t, err)
 
-					err = settingRepo.CreatePasswordExpiry(ctx, &domain.PasswordExpirySetting{
+					err = settingRepo.CreatePasswordExpiry(t.Context(), tx, &domain.PasswordExpirySetting{
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							OrgID:      &orgId,
@@ -2959,7 +3177,7 @@ func TestDeleteSettingsForOrg(t *testing.T) {
 					})
 					require.NoError(t, err)
 
-					err = settingRepo.CreateLockout(ctx, &domain.LockoutSetting{
+					err = settingRepo.CreateLockout(t.Context(), tx, &domain.LockoutSetting{
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							OrgID:      &orgId,
@@ -2967,7 +3185,7 @@ func TestDeleteSettingsForOrg(t *testing.T) {
 					})
 					require.NoError(t, err)
 
-					err = settingRepo.CreateSecurity(ctx, &domain.SecuritySetting{
+					err = settingRepo.CreateSecurity(t.Context(), tx, &domain.SecuritySetting{
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							OrgID:      &orgId,
@@ -2975,7 +3193,7 @@ func TestDeleteSettingsForOrg(t *testing.T) {
 					})
 					require.NoError(t, err)
 
-					err = settingRepo.CreateDomain(ctx, &domain.DomainSetting{
+					err = settingRepo.CreateDomain(t.Context(), tx, &domain.DomainSetting{
 						Setting: &domain.Setting{
 							InstanceID: instanceId,
 							OrgID:      &orgId,
@@ -2989,15 +3207,22 @@ func TestDeleteSettingsForOrg(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := t.Context()
+			tx, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err = tx.Rollback(t.Context())
+				if err != nil {
+					t.Logf("error during rollback: %v", err)
+				}
+			}()
 
 			if tt.testFunc != nil {
-				tt.testFunc(ctx, t)
+				tt.testFunc(t, tx)
 			}
 
 			// delete settings
 			noOfDeletedRows, err := settingRepo.DeleteSettingsForOrg(
-				ctx,
+				t.Context(), tx,
 				orgId,
 			)
 			require.NoError(t, err)

@@ -12,13 +12,12 @@ import (
 	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	settings "github.com/zitadel/zitadel/internal/repository/organization_settings"
-	"github.com/zitadel/zitadel/internal/repository/policy"
-	"github.com/zitadel/zitadel/internal/zerrors"
-
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	settings "github.com/zitadel/zitadel/internal/repository/organization_settings"
+	"github.com/zitadel/zitadel/internal/repository/policy"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -373,7 +372,7 @@ func (s *settingsRelationalProjection) reduceLoginPolicyAdded(event eventstore.E
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 		setting := domain.Setting{
 			InstanceID: policyEvent.Aggregate().InstanceID,
 			OrgID:      orgId,
@@ -382,7 +381,7 @@ func (s *settingsRelationalProjection) reduceLoginPolicyAdded(event eventstore.E
 			CreatedAt:  policyEvent.CreationDate(),
 			UpdatedAt:  &policyEvent.Creation,
 		}
-		err = settingsRepo.Create(ctx, &setting)
+		err = settingsRepo.Create(ctx, v3_sql.SQLTx(tx), &setting)
 		return err
 	}), nil
 }
@@ -406,9 +405,9 @@ func (s *settingsRelationalProjection) reduceLoginPolicyChanged(event eventstore
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rLk9y", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetLogin(ctx, policyEvent.Agg.InstanceID, orgId)
+		setting, err := settingsRepo.GetLogin(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-r7k9m", "error accessing login policy record")
 		}
@@ -467,7 +466,7 @@ func (s *settingsRelationalProjection) reduceLoginPolicyChanged(event eventstore
 
 		setting.UpdatedAt = &policyEvent.Creation
 
-		_, err = settingsRepo.UpdateLogin(ctx, setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
+		_, err = settingsRepo.UpdateLogin(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
@@ -491,9 +490,9 @@ func (s *settingsRelationalProjection) reduceMFAAdded(event eventstore.Event) (*
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rLw7y", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetLogin(ctx, policyEvent.Agg.InstanceID, orgId)
+		setting, err := settingsRepo.GetLogin(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-u7k7m", "error accessing login policy record")
 		}
@@ -504,7 +503,7 @@ func (s *settingsRelationalProjection) reduceMFAAdded(event eventstore.Event) (*
 
 		setting.Settings.MFAType = append(setting.Settings.MFAType, domain.MultiFactorType(policyEvent.MFAType))
 
-		_, err = settingsRepo.UpdateLogin(ctx, setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
+		_, err = settingsRepo.UpdateLogin(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
@@ -528,9 +527,9 @@ func (s *settingsRelationalProjection) reduceMFARemoved(event eventstore.Event) 
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rLi9y", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetLogin(ctx, policyEvent.Agg.InstanceID, orgId)
+		setting, err := settingsRepo.GetLogin(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-l7o9m", "error accessing login policy record")
 		}
@@ -541,7 +540,7 @@ func (s *settingsRelationalProjection) reduceMFARemoved(event eventstore.Event) 
 
 		setting.UpdatedAt = &policyEvent.Creation
 
-		_, err = settingsRepo.UpdateLogin(ctx, setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
+		_, err = settingsRepo.UpdateLogin(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
@@ -557,10 +556,10 @@ func (*settingsRelationalProjection) reduceLoginPolicyRemoved(event eventstore.E
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-arg9y", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
 		_, err := settingsRepo.Delete(
-			ctx,
+			ctx, v3_sql.SQLTx(tx),
 			loginPolicyRemovedEvent.Aggregate().InstanceID,
 			&loginPolicyRemovedEvent.Aggregate().ID,
 			domain.SettingTypeLogin)
@@ -587,9 +586,9 @@ func (s *settingsRelationalProjection) reduceSecondFactorAdded(event eventstore.
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iLk4m", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetLogin(ctx, policyEvent.Agg.InstanceID, orgId)
+		setting, err := settingsRepo.GetLogin(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-H7m9m", "error accessing login policy record")
 		}
@@ -602,7 +601,7 @@ func (s *settingsRelationalProjection) reduceSecondFactorAdded(event eventstore.
 
 		setting.Settings.SecondFactorTypes = append(setting.Settings.SecondFactorTypes, domain.SecondFactorType(policyEvent.MFAType))
 
-		_, err = settingsRepo.UpdateLogin(ctx, setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
+		_, err = settingsRepo.UpdateLogin(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
@@ -626,9 +625,9 @@ func (s *settingsRelationalProjection) reduceSecondFactorRemoved(event eventstor
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rnd0y", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetLogin(ctx, policyEvent.Agg.InstanceID, orgId)
+		setting, err := settingsRepo.GetLogin(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-rsk9m", "error accessing login policy record")
 		}
@@ -637,7 +636,7 @@ func (s *settingsRelationalProjection) reduceSecondFactorRemoved(event eventstor
 			return secondFactorType == domain.SecondFactorType(policyEvent.MFAType)
 		})
 
-		_, err = settingsRepo.UpdateLogin(ctx, setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
+		_, err = settingsRepo.UpdateLogin(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
@@ -654,9 +653,9 @@ func (s *settingsRelationalProjection) reduceInstanceRemoved(event eventstore.Ev
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rrdHy", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
-		_, err := settingsRepo.DeleteSettingsForInstance(ctx, removeInstanceEvent.Aggregate().InstanceID)
+		_, err := settingsRepo.DeleteSettingsForInstance(ctx, v3_sql.SQLTx(tx), removeInstanceEvent.Aggregate().InstanceID)
 		return err
 	}), nil
 }
@@ -704,7 +703,7 @@ func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) 
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
 		labelStatePreview := domain.LabelStatePreview
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 		setting := domain.Setting{
 			InstanceID: policyEvent.Aggregate().InstanceID,
 			OrgID:      orgId,
@@ -714,7 +713,7 @@ func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) 
 			CreatedAt:  policyEvent.CreationDate(),
 			UpdatedAt:  &policyEvent.Creation,
 		}
-		err = settingsRepo.Create(ctx, &setting)
+		err = settingsRepo.Create(ctx, v3_sql.SQLTx(tx), &setting)
 		return err
 	}), nil
 }
@@ -738,9 +737,9 @@ func (s *settingsRelationalProjection) reduceLabelChanged(event eventstore.Event
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-lhb9y", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
+		setting, err := settingsRepo.GetLabel(ctx, v3_sql.SQLTx(tx), event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-r879m", "error accessing login policy record")
 		}
@@ -782,7 +781,7 @@ func (s *settingsRelationalProjection) reduceLabelChanged(event eventstore.Event
 			setting.Settings.ThemeMode = domain.LabelPolicyThemeMode(*policyEvent.ThemeMode)
 		}
 
-		_, err = settingsRepo.UpdateLabel(ctx, setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
+		_, err = settingsRepo.UpdateLabel(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
@@ -798,11 +797,11 @@ func (s *settingsRelationalProjection) reduceLabelPolicyRemoved(event eventstore
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-r7k0y", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
 		orgID := &policyEvent.Aggregate().ID
 
-		_, err := settingsRepo.Delete(ctx, policyEvent.Aggregate().InstanceID, orgID, domain.SettingTypeLabel)
+		_, err := settingsRepo.Delete(ctx, v3_sql.SQLTx(tx), policyEvent.Aggregate().InstanceID, orgID, domain.SettingTypeLabel)
 		return err
 	}), nil
 }
@@ -877,9 +876,9 @@ func (p *settingsRelationalProjection) reduceLabelLogoAdded(event eventstore.Eve
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
+		setting, err := settingsRepo.GetLabel(ctx, v3_sql.SQLTx(tx), event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-y7dDm", "error accessing login policy record")
 		}
@@ -897,7 +896,7 @@ func (p *settingsRelationalProjection) reduceLabelLogoAdded(event eventstore.Eve
 
 		CreatedAt := event.CreatedAt()
 
-		_, err = settingsRepo.UpdateLabel(ctx, setting, settingsRepo.SetUpdatedAt(&CreatedAt))
+		_, err = settingsRepo.UpdateLabel(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
@@ -920,9 +919,9 @@ func (p *settingsRelationalProjection) reduceLogoRemoved(event eventstore.Event)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
+		setting, err := settingsRepo.GetLabel(ctx, v3_sql.SQLTx(tx), event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-d7L9s", "error accessing login policy record")
 		}
@@ -940,7 +939,7 @@ func (p *settingsRelationalProjection) reduceLogoRemoved(event eventstore.Event)
 
 		CreatedAt := event.CreatedAt()
 
-		_, err = settingsRepo.UpdateLabel(ctx, setting, settingsRepo.SetUpdatedAt(&CreatedAt))
+		_, err = settingsRepo.UpdateLabel(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
@@ -963,9 +962,9 @@ func (p *settingsRelationalProjection) reduceIconAdded(event eventstore.Event) (
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
+		setting, err := settingsRepo.GetLabel(ctx, v3_sql.SQLTx(tx), event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-s7a9m", "error accessing login policy record")
 		}
@@ -983,7 +982,7 @@ func (p *settingsRelationalProjection) reduceIconAdded(event eventstore.Event) (
 
 		CreatedAt := event.CreatedAt()
 
-		_, err = settingsRepo.UpdateLabel(ctx, setting, settingsRepo.SetUpdatedAt(&CreatedAt))
+		_, err = settingsRepo.UpdateLabel(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
@@ -1006,9 +1005,9 @@ func (p *settingsRelationalProjection) reduceIconRemoved(event eventstore.Event)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
+		setting, err := settingsRepo.GetLabel(ctx, v3_sql.SQLTx(tx), event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-B7L9m", "error accessing login policy record")
 		}
@@ -1026,7 +1025,7 @@ func (p *settingsRelationalProjection) reduceIconRemoved(event eventstore.Event)
 
 		CreatedAt := event.CreatedAt()
 
-		_, err = settingsRepo.UpdateLabel(ctx, setting, settingsRepo.SetUpdatedAt(&CreatedAt))
+		_, err = settingsRepo.UpdateLabel(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
@@ -1046,9 +1045,9 @@ func (p *settingsRelationalProjection) reduceFontAdded(event eventstore.Event) (
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
+		setting, err := settingsRepo.GetLabel(ctx, v3_sql.SQLTx(tx), event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-H7S7m", "error accessing login policy record")
 		}
@@ -1062,7 +1061,7 @@ func (p *settingsRelationalProjection) reduceFontAdded(event eventstore.Event) (
 
 		CreatedAt := event.CreatedAt()
 
-		_, err = settingsRepo.UpdateLabel(ctx, setting, settingsRepo.SetUpdatedAt(&CreatedAt))
+		_, err = settingsRepo.UpdateLabel(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
@@ -1082,9 +1081,9 @@ func (p *settingsRelationalProjection) reduceFontRemoved(event eventstore.Event)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
+		setting, err := settingsRepo.GetLabel(ctx, v3_sql.SQLTx(tx), event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-77kMm", "error accessing login policy record")
 		}
@@ -1093,7 +1092,7 @@ func (p *settingsRelationalProjection) reduceFontRemoved(event eventstore.Event)
 
 		CreatedAt := event.CreatedAt()
 
-		_, err = settingsRepo.UpdateLabel(ctx, setting, settingsRepo.SetUpdatedAt(&CreatedAt))
+		_, err = settingsRepo.UpdateLabel(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
@@ -1133,7 +1132,7 @@ func (p *settingsRelationalProjection) reducePassedComplexityAdded(event eventst
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 		newSetting := domain.Setting{
 			InstanceID: policyEvent.Aggregate().InstanceID,
 			OrgID:      orgId,
@@ -1142,7 +1141,7 @@ func (p *settingsRelationalProjection) reducePassedComplexityAdded(event eventst
 			CreatedAt:  policyEvent.CreationDate(),
 			UpdatedAt:  &policyEvent.Creation,
 		}
-		err = settingsRepo.Create(ctx, &newSetting)
+		err = settingsRepo.Create(ctx, v3_sql.SQLTx(tx), &newSetting)
 		return err
 	}), nil
 }
@@ -1166,9 +1165,9 @@ func (s *settingsRelationalProjection) reducePasswordComplexityChanged(event eve
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rLrfy", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetPasswordComplexity(ctx, policyEvent.Agg.InstanceID, orgId)
+		setting, err := settingsRepo.GetPasswordComplexity(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-rXK9m", "error accessing login policy record")
 		}
@@ -1191,7 +1190,7 @@ func (s *settingsRelationalProjection) reducePasswordComplexityChanged(event eve
 
 		CreatedAt := event.CreatedAt()
 
-		_, err = settingsRepo.UpdatePasswordComplexity(ctx, setting, settingsRepo.SetUpdatedAt(&CreatedAt))
+		_, err = settingsRepo.UpdatePasswordComplexity(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
@@ -1208,11 +1207,11 @@ func (s *settingsRelationalProjection) reducePasswordComplexityRemoved(event eve
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-UrdHy", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
 		orgID := &policyEvent.Aggregate().ID
 
-		_, err := settingsRepo.Delete(ctx, policyEvent.Aggregate().InstanceID, orgID, domain.SettingTypePasswordComplexity)
+		_, err := settingsRepo.Delete(ctx, v3_sql.SQLTx(tx), policyEvent.Aggregate().InstanceID, orgID, domain.SettingTypePasswordComplexity)
 		return err
 	}), nil
 }
@@ -1253,7 +1252,7 @@ func (p *settingsRelationalProjection) reducePasswordPolicyAdded(event eventstor
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 		setting := domain.Setting{
 			InstanceID: policyEvent.Aggregate().InstanceID,
 			OrgID:      orgId,
@@ -1262,7 +1261,7 @@ func (p *settingsRelationalProjection) reducePasswordPolicyAdded(event eventstor
 			CreatedAt:  policyEvent.CreationDate(),
 			UpdatedAt:  &policyEvent.Creation,
 		}
-		err = settingsRepo.Create(ctx, &setting)
+		err = settingsRepo.Create(ctx, v3_sql.SQLTx(tx), &setting)
 		return err
 	}), nil
 }
@@ -1285,9 +1284,9 @@ func (p *settingsRelationalProjection) reducePasswordPolicyChanged(event eventst
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-Mlk6y", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetPasswordExpiry(ctx, policyEvent.Agg.InstanceID, orgId)
+		setting, err := settingsRepo.GetPasswordExpiry(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-z7k3m", "error accessing login policy record")
 		}
@@ -1299,7 +1298,7 @@ func (p *settingsRelationalProjection) reducePasswordPolicyChanged(event eventst
 			setting.Settings.MaxAgeDays = *policyEvent.MaxAgeDays
 		}
 
-		_, err = settingsRepo.UpdatePasswordExpiry(ctx, setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
+		_, err = settingsRepo.UpdatePasswordExpiry(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
@@ -1315,11 +1314,11 @@ func (p *settingsRelationalProjection) reducePasswordPolicyRemoved(event eventst
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-UrdHy", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
 		orgID := &policyEvent.Aggregate().ID
 
-		_, err := settingsRepo.Delete(ctx, policyEvent.Aggregate().InstanceID, orgID, domain.SettingTypePasswordExpiry)
+		_, err := settingsRepo.Delete(ctx, v3_sql.SQLTx(tx), policyEvent.Aggregate().InstanceID, orgID, domain.SettingTypePasswordExpiry)
 		return err
 	}), nil
 }
@@ -1335,11 +1334,11 @@ func (p *settingsRelationalProjection) reduceOrgLockoutPolicyRemoved(event event
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-UrdHy", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
 		orgID := &policyEvent.Aggregate().ID
 
-		_, err := settingsRepo.Delete(ctx, policyEvent.Aggregate().InstanceID, orgID, domain.SettingTypeLockout)
+		_, err := settingsRepo.Delete(ctx, v3_sql.SQLTx(tx), policyEvent.Aggregate().InstanceID, orgID, domain.SettingTypeLockout)
 		return err
 	}), nil
 }
@@ -1356,11 +1355,11 @@ func (s *settingsRelationalProjection) reduceOrgRemoved(event eventstore.Event) 
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-UrdHy", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
 		orgID := e.Aggregate().ID
 
-		_, err := settingsRepo.DeleteSettingsForOrg(ctx, orgID)
+		_, err := settingsRepo.DeleteSettingsForOrg(ctx, v3_sql.SQLTx(tx), orgID)
 		return err
 	}), nil
 }
@@ -1400,7 +1399,7 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyAdded(event eventstore
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hnNE", "reduce.wrong.db.pool %T", ex)
 		}
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 		setting := domain.Setting{
 			InstanceID: policyEvent.Aggregate().InstanceID,
 			OrgID:      orgId,
@@ -1409,7 +1408,7 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyAdded(event eventstore
 			CreatedAt:  policyEvent.CreationDate(),
 			UpdatedAt:  &policyEvent.Creation,
 		}
-		err = settingsRepo.Create(ctx, &setting)
+		err = settingsRepo.Create(ctx, v3_sql.SQLTx(tx), &setting)
 		return err
 	}), nil
 }
@@ -1433,9 +1432,9 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyChanged(event eventsto
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rbsxy", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetLockout(ctx, policyEvent.Agg.InstanceID, orgId)
+		setting, err := settingsRepo.GetLockout(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-rPkxm", "error accessing login policy record")
 		}
@@ -1450,7 +1449,7 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyChanged(event eventsto
 			setting.Settings.ShowLockOutFailures = *policyEvent.ShowLockOutFailures
 		}
 
-		_, err = settingsRepo.UpdateLockout(ctx, setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
+		_, err = settingsRepo.UpdateLockout(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
@@ -1489,7 +1488,7 @@ func (p *settingsRelationalProjection) reduceDomainPolicyAdded(event eventstore.
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-chduE", "reduce.wrong.db.pool %T", ex)
 		}
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 		setting := domain.Setting{
 			InstanceID: policyEvent.Aggregate().InstanceID,
 			OrgID:      orgId,
@@ -1498,7 +1497,7 @@ func (p *settingsRelationalProjection) reduceDomainPolicyAdded(event eventstore.
 			CreatedAt:  policyEvent.CreationDate(),
 			UpdatedAt:  &policyEvent.Creation,
 		}
-		err = settingsRepo.Create(ctx, &setting)
+		err = settingsRepo.Create(ctx, v3_sql.SQLTx(tx), &setting)
 		return err
 	}), nil
 }
@@ -1522,9 +1521,9 @@ func (s *settingsRelationalProjection) reduceDomainPolicyChanged(event eventstor
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rbsxy", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetDomain(ctx, policyEvent.Agg.InstanceID, orgId)
+		setting, err := settingsRepo.GetDomain(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-rPkxm", "error accessing login policy record")
 		}
@@ -1539,7 +1538,7 @@ func (s *settingsRelationalProjection) reduceDomainPolicyChanged(event eventstor
 			setting.Settings.SMTPSenderAddressMatchesInstanceDomain = *policyEvent.SMTPSenderAddressMatchesInstanceDomain
 		}
 
-		_, err = settingsRepo.UpdateDomain(ctx, setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
+		_, err = settingsRepo.UpdateDomain(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
@@ -1555,11 +1554,11 @@ func (p *settingsRelationalProjection) reduceOrgDomainPolicyRemoved(event events
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-UrdHy", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
 		orgID := &policyEvent.Aggregate().ID
 
-		_, err := settingsRepo.Delete(ctx, policyEvent.Aggregate().InstanceID, orgID, domain.SettingTypeDomain)
+		_, err := settingsRepo.Delete(ctx, v3_sql.SQLTx(tx), policyEvent.Aggregate().InstanceID, orgID, domain.SettingTypeDomain)
 		return err
 	}), nil
 }
@@ -1580,9 +1579,9 @@ func (s *settingsRelationalProjection) reduceSecurityPolicySet(event eventstore.
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-lhPul", "reduce.wrong.db.pool %T", ex)
 		}
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
-		existingSetting, err := settingsRepo.GetSecurity(ctx, e.Agg.InstanceID, nil)
+		existingSetting, err := settingsRepo.GetSecurity(ctx, v3_sql.SQLTx(tx), e.Agg.InstanceID, nil)
 		if err != nil {
 			if errors.Is(err, &database.NoRowFoundError{}) {
 				setting := domain.Setting{
@@ -1592,7 +1591,7 @@ func (s *settingsRelationalProjection) reduceSecurityPolicySet(event eventstore.
 					CreatedAt:  e.CreatedAt(),
 					UpdatedAt:  &e.Creation,
 				}
-				err = settingsRepo.Create(ctx, &setting)
+				err = settingsRepo.Create(ctx, v3_sql.SQLTx(tx), &setting)
 				return err
 
 			} else {
@@ -1614,7 +1613,7 @@ func (s *settingsRelationalProjection) reduceSecurityPolicySet(event eventstore.
 
 		CreatedAt := event.CreatedAt()
 
-		_, err = settingsRepo.UpdateSecurity(ctx, existingSetting, settingsRepo.SetUpdatedAt(&CreatedAt))
+		_, err = settingsRepo.UpdateSecurity(ctx, v3_sql.SQLTx(tx), existingSetting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
@@ -1635,11 +1634,11 @@ func (s *settingsRelationalProjection) reduceOrganizationSettingsSet(event event
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-chluS", "reduce.wrong.db.pool %T", ex)
 		}
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
 		orgID := &e.Aggregate().ID
 
-		existingSetting, err := settingsRepo.GetOrg(ctx, e.Agg.InstanceID, nil)
+		existingSetting, err := settingsRepo.GetOrg(ctx, v3_sql.SQLTx(tx), e.Agg.InstanceID, nil)
 		if err != nil {
 			if errors.Is(err, &database.NoRowFoundError{}) {
 				setting := domain.Setting{
@@ -1650,7 +1649,7 @@ func (s *settingsRelationalProjection) reduceOrganizationSettingsSet(event event
 					CreatedAt:  e.CreatedAt(),
 					UpdatedAt:  &e.Creation,
 				}
-				err = settingsRepo.Create(ctx, &setting)
+				err = settingsRepo.Create(ctx, v3_sql.SQLTx(tx), &setting)
 				return err
 
 			} else {
@@ -1662,7 +1661,7 @@ func (s *settingsRelationalProjection) reduceOrganizationSettingsSet(event event
 
 		CreatedAt := event.CreatedAt()
 
-		_, err = settingsRepo.UpdateOrg(ctx, existingSetting, settingsRepo.SetUpdatedAt(&CreatedAt))
+		_, err = settingsRepo.UpdateOrg(ctx, v3_sql.SQLTx(tx), existingSetting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
@@ -1679,11 +1678,11 @@ func (s *settingsRelationalProjection) reduceOrganizationSettingsRemoved(event e
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rHiHb", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		settingsRepo := repository.SettingsRepository()
 
 		orgId := &event.Aggregate().ID
 
-		_, err := settingsRepo.Delete(ctx, e.Aggregate().InstanceID, orgId, domain.SettingTypeOrganization)
+		_, err := settingsRepo.Delete(ctx, v3_sql.SQLTx(tx), e.Aggregate().InstanceID, orgId, domain.SettingTypeOrganization)
 		return err
 	}), nil
 }
