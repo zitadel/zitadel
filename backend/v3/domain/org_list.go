@@ -10,20 +10,21 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
-	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	v2_org "github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
 type ListOrgsCommand struct {
-	Request *org.ListOrganizationsRequest
+	BaseCommand
+	Request *v2_org.ListOrganizationsRequest
 
 	Result []*Organization
 }
 
-func NewListOrgsCommand(inputRequest *org.ListOrganizationsRequest) *ListOrgsCommand {
+func NewListOrgsCommand(inputRequest *v2_org.ListOrganizationsRequest) *ListOrgsCommand {
 	return &ListOrgsCommand{
-		Request: inputRequest,
+		BaseCommand: BaseCommand{},
+		Request:     inputRequest,
 	}
 }
 
@@ -63,9 +64,9 @@ func (l *ListOrgsCommand) Execute(ctx context.Context, opts *CommandOpts) (err e
 func (l *ListOrgsCommand) Sorting(orgRepo OrganizationRepository) database.QueryOption {
 	var sortingCol database.Column
 	switch l.Request.GetSortingColumn() {
-	case org.OrganizationFieldName_ORGANIZATION_FIELD_NAME_NAME:
+	case v2_org.OrganizationFieldName_ORGANIZATION_FIELD_NAME_NAME:
 		sortingCol = orgRepo.NameColumn()
-	case org.OrganizationFieldName_ORGANIZATION_FIELD_NAME_UNSPECIFIED:
+	case v2_org.OrganizationFieldName_ORGANIZATION_FIELD_NAME_UNSPECIFIED:
 		fallthrough
 	default:
 		return func(opts *database.QueryOpts) {}
@@ -89,10 +90,10 @@ func (l *ListOrgsCommand) conditions(ctx context.Context, orgRepo OrganizationRe
 	for i, query := range l.Request.GetQueries() {
 		switch assertedType := query.GetQuery().(type) {
 
-		case *org.SearchQuery_DefaultQuery:
+		case *v2_org.SearchQuery_DefaultQuery:
 			conditions[i] = database.WithCondition(orgRepo.IDCondition(authz.GetInstance(ctx).DefaultOrganisationID()))
-		case *org.SearchQuery_DomainQuery:
-			method, err := l.OperationMapper(assertedType.DomainQuery.GetMethod())
+		case *v2_org.SearchQuery_DomainQuery:
+			method, err := l.TextOperationMapper(assertedType.DomainQuery.GetMethod())
 			if err != nil {
 				return nil, err
 			}
@@ -103,44 +104,21 @@ func (l *ListOrgsCommand) conditions(ctx context.Context, orgRepo OrganizationRe
 					orgRepo.ExistsDomain(domainRepo.DomainCondition(method, assertedType.DomainQuery.GetDomain())),
 				),
 			)
-		case *org.SearchQuery_IdQuery:
+		case *v2_org.SearchQuery_IdQuery:
 			conditions[i] = database.WithCondition(orgRepo.IDCondition(assertedType.IdQuery.GetId()))
-		case *org.SearchQuery_NameQuery:
-			method, err := l.OperationMapper(assertedType.NameQuery.GetMethod())
+		case *v2_org.SearchQuery_NameQuery:
+			method, err := l.TextOperationMapper(assertedType.NameQuery.GetMethod())
 			if err != nil {
 				return nil, err
 			}
 			conditions[i] = database.WithCondition(orgRepo.NameCondition(method, assertedType.NameQuery.GetName()))
-		case *org.SearchQuery_StateQuery:
+		case *v2_org.SearchQuery_StateQuery:
 			conditions[i] = database.WithCondition(orgRepo.StateCondition(OrgState(assertedType.StateQuery.GetState())))
 		default:
 			return nil, NewUnexpectedQueryTypeError("DOM-TCEzcr", assertedType)
 		}
 	}
 	return conditions, nil
-}
-
-func (l *ListOrgsCommand) OperationMapper(queryOperation object.TextQueryMethod) (database.TextOperation, error) {
-	switch queryOperation {
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS:
-		return database.TextOperationContains, nil
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE:
-		return database.TextOperationContainsIgnoreCase, nil
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH:
-		return database.TextOperationEndsWith, nil
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE:
-		return database.TextOperationEndsWithIgnoreCase, nil
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS:
-		return database.TextOperationEqual, nil
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE:
-		return database.TextOperationEqualIgnoreCase, nil
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH:
-		return database.TextOperationStartsWith, nil
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE:
-		return database.TextOperationStartsWithIgnoreCase, nil
-	default:
-		return 0, NewUnexpectedTextQueryOperationError("DOM-iBRBVe", queryOperation)
-	}
 }
 
 // String implements Commander.
