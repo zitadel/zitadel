@@ -313,10 +313,12 @@ message CreateAdministratorRequest {
 
 message ResourceType {
   message ProjectGrant {
+    reserved "project_grant_id";
+    reserved 2;
     // ProjectID is required to grant administrator privileges for a specific project.
     string project_id = 1;
-    // ProjectGrantID is required to grant administrator privileges for a specific project grant.
-    string project_grant_id = 2;
+    // OrganizationID is required to grant administrator privileges for a specific project grant.
+    string organization_id = 3;
   }
 
   // Resource is the type of the resource the administrator roles should be granted for.

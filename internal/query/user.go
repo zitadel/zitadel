@@ -1271,6 +1271,9 @@ func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 }
 
 func prepareUsersQuery(orderBy Column) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+	if orderBy.isZero() {
+		orderBy = UserIDCol
+	}
 	return sq.Select(
 			UserIDCol.identifier(),
 			UserCreationDateCol.identifier(),
