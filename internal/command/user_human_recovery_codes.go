@@ -34,7 +34,7 @@ func (c *Commands) ImportHumanRecoveryCodes(ctx context.Context, userID, resourc
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-53cjw", "Errors.User.MFA.RecoveryCodes.MaxCountExceeded")
 	}
 
-	hashedCodes, err := domain.HashRecoveryCodesIfNeeded(codes, c.userPasswordHasher)
+	hashedCodes, err := domain.HashRecoveryCodesIfNeeded(ctx, codes, c.userPasswordHasher)
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func (c *Commands) GenerateRecoveryCodes(ctx context.Context, userID string, cou
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-8f2k9", "Errors.User.MFA.RecoveryCodes.MaxCountExceeded")
 	}
 
-	hashedCodes, rawCodes, err := domain.GenerateRecoveryCodes(count, c.multifactors.RecoveryCodes, c.secretHasher)
+	hashedCodes, rawCodes, err := domain.GenerateRecoveryCodes(ctx, count, c.multifactors.RecoveryCodes, c.userPasswordHasher)
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func (c *Commands) RemoveRecoveryCodes(ctx context.Context, userID, resourceOwne
 }
 
 func (c *Commands) HumanCheckRecoveryCode(ctx context.Context, userID, code, resourceOwner string, authRequest *domain.AuthRequest) error {
-	commands, err := checkRecoveryCode(ctx, userID, code, resourceOwner, authRequest, c.eventstore.FilterToQueryReducer, c.secretHasher)
+	commands, err := checkRecoveryCode(ctx, userID, code, resourceOwner, authRequest, c.eventstore.FilterToQueryReducer, c.userPasswordHasher)
 	if len(commands) > 0 {
 		_, err = c.eventstore.Push(ctx, commands...)
 		logging.OnError(err).Error("failed to push recovery code check events")

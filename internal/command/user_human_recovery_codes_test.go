@@ -829,8 +829,8 @@ func TestCommands_HumanCheckRecoveryCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:   tt.fields.eventstore(t),
-				secretHasher: mockPasswordHasher(""),
+				eventstore:         tt.fields.eventstore(t),
+				userPasswordHasher: mockPasswordHasher(""),
 			}
 			err := c.HumanCheckRecoveryCode(tt.args.ctx, tt.args.userID, tt.args.code, tt.args.resourceOwner, tt.args.authRequest)
 			require.ErrorIs(t, err, tt.wantErr)

@@ -22,10 +22,13 @@ type ImportHumanRecoveryCode struct {
 	HashedCode string
 }
 
-func HashRecoveryCodesIfNeeded(codes []ImportHumanRecoveryCode, hasher *crypto.Hasher) ([]string, error) {
+func HashRecoveryCodesIfNeeded(ctx context.Context, codes []ImportHumanRecoveryCode, hasher *crypto.Hasher) (_ []string, err error) {
+	_, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	hashedCodes := make([]string, len(codes))
 	for i, code := range codes {
-		hashed, err := HashRecoveryCodeIfNeeded(code, hasher)
+		hashed, err := HashRecoveryCodeIfNeeded(ctx, code, hasher)
 		if err != nil {
 			return nil, err
 		}
@@ -34,7 +37,10 @@ func HashRecoveryCodesIfNeeded(codes []ImportHumanRecoveryCode, hasher *crypto.H
 	return hashedCodes, nil
 }
 
-func HashRecoveryCodeIfNeeded(code ImportHumanRecoveryCode, hasher *crypto.Hasher) (string, error) {
+func HashRecoveryCodeIfNeeded(ctx context.Context, code ImportHumanRecoveryCode, hasher *crypto.Hasher) (_ string, err error) {
+	_, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if code.RawCode != "" {
 		return hasher.Hash(code.RawCode)
 	}
@@ -44,22 +50,32 @@ func HashRecoveryCodeIfNeeded(code ImportHumanRecoveryCode, hasher *crypto.Hashe
 	return code.HashedCode, nil
 }
 
-func GenerateRecoveryCodes(count int, config RecoveryCodesConfig, hasher *crypto.Hasher) ([]string, []string, error) {
-	hashedCodes, rawCodes := make([]string, count), make([]string, count)
+func GenerateRecoveryCodes(ctx context.Context, count int, config RecoveryCodesConfig, hasher *crypto.Hasher) (hashedCodes []string, rawCodes []string, err error) {
+	hashedCodes, rawCodes = make([]string, count), make([]string, count)
 
 	for i := range count {
-		rawCode, err := makeRawCode(config)
+		hashedCodes[i], rawCodes[i], err = generateRecoveryCode(ctx, config, hasher)
 		if err != nil {
 			return nil, nil, err
 		}
-		hashedCode, err := hasher.Hash(rawCode)
-		if err != nil {
-			return nil, nil, err
-		}
-		hashedCodes[i], rawCodes[i] = hashedCode, rawCode
 	}
 
 	return hashedCodes, rawCodes, nil
+}
+
+func generateRecoveryCode(ctx context.Context, config RecoveryCodesConfig, hasher *crypto.Hasher) (hashedCode string, rawCode string, err error) {
+	_, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	rawCode, err = makeRawCode(config)
+	if err != nil {
+		return "", "", err
+	}
+	hashedCode, err = hasher.Hash(rawCode)
+	if err != nil {
+		return "", "", err
+	}
+	return hashedCode, rawCode, nil
 }
 
 func makeRawCode(config RecoveryCodesConfig) (string, error) {
