@@ -35,7 +35,7 @@ permissions:
 env:
   default_labels: |
     org.opencontainers.image.documentation=https://zitadel.com/docs
-    org.opencontainers.image.vendor=CAOS AG
+    org.opencontainers.image.vendor=ZITADEL
 
 jobs:
   pack:
