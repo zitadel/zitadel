@@ -73,14 +73,10 @@ export function SessionItem({
         <button
           onClick={async () => {
             if (valid && session?.factors?.user) {
-              const resp = await continueWithSession({
+              await continueWithSession({
                 ...session,
                 requestId: requestId,
               });
-
-              if (resp?.redirect) {
-                return router.push(resp.redirect);
-              }
             } else if (session.factors?.user) {
               setLoading(true);
               const res = await sendLoginname({

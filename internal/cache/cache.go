@@ -97,6 +97,9 @@ const (
 type Config struct {
 	Connector Connector
 
+	// Cache keys are prefixed with the Zitadel version.
+	ZitadelVersion string
+
 	// Age since an object was added to the cache,
 	// after which the object is considered invalid.
 	// 0 disables max age checks.

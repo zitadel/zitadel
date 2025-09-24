@@ -1,7 +1,6 @@
 package repository_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v6"
@@ -15,6 +14,15 @@ import (
 )
 
 func TestAddOrganizationDomain(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Log("error during rollback:", err)
+		}
+	}()
+
 	// create instance
 	instanceID := gofakeit.UUID()
 	instance := domain.Instance{
@@ -26,8 +34,11 @@ func TestAddOrganizationDomain(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err := instanceRepo.Create(t.Context(), &instance)
+	instanceRepo := repository.InstanceRepository()
+	orgRepo := repository.OrganizationRepository()
+	domainRepo := repository.OrganizationDomainRepository()
+
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create organization
@@ -41,7 +52,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 
 	tests := []struct {
 		name               string
-		testFunc           func(ctx context.Context, t *testing.T, domainRepo domain.OrganizationDomainRepository) *domain.AddOrganizationDomain
+		testFunc           func(t *testing.T, tx database.QueryExecutor) *domain.AddOrganizationDomain
 		organizationDomain domain.AddOrganizationDomain
 		err                error
 	}{
@@ -92,7 +103,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 		},
 		{
 			name: "add domain with same domain twice",
-			testFunc: func(ctx context.Context, t *testing.T, domainRepo domain.OrganizationDomainRepository) *domain.AddOrganizationDomain {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.AddOrganizationDomain {
 				domainName := gofakeit.DomainName()
 
 				organizationDomain := &domain.AddOrganizationDomain{
@@ -104,7 +115,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 					ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 				}
 
-				err := domainRepo.Add(ctx, organizationDomain)
+				err := domainRepo.Add(t.Context(), tx, organizationDomain)
 				require.NoError(t, err)
 
 				// return same domain again
@@ -169,28 +180,26 @@ func TestAddOrganizationDomain(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			ctx := t.Context()
-
-			tx, err := pool.Begin(t.Context(), nil)
+			savepoint, err := tx.Begin(t.Context())
 			require.NoError(t, err)
 			defer func() {
-				require.NoError(t, tx.Rollback(t.Context()))
+				err = savepoint.Rollback(t.Context())
+				if err != nil {
+					t.Log("error during rollback:", err)
+				}
 			}()
 
-			orgRepo := repository.OrganizationRepository(tx)
-			err = orgRepo.Create(t.Context(), &organization)
+			err = orgRepo.Create(t.Context(), savepoint, &organization)
 			require.NoError(t, err)
-
-			domainRepo := orgRepo.Domains(false)
 
 			var organizationDomain *domain.AddOrganizationDomain
 			if test.testFunc != nil {
-				organizationDomain = test.testFunc(ctx, t, domainRepo)
+				organizationDomain = test.testFunc(t, savepoint)
 			} else {
 				organizationDomain = &test.organizationDomain
 			}
 
-			err = domainRepo.Add(ctx, organizationDomain)
+			err = domainRepo.Add(t.Context(), tx, organizationDomain)
 			if test.err != nil {
 				assert.ErrorIs(t, err, test.err)
 				return
@@ -204,6 +213,16 @@ func TestAddOrganizationDomain(t *testing.T) {
 }
 
 func TestGetOrganizationDomain(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		require.NoError(t, tx.Rollback(t.Context()))
+	}()
+
+	instanceRepo := repository.InstanceRepository()
+	orgRepo := repository.OrganizationRepository()
+	domainRepo := repository.OrganizationDomainRepository()
+
 	// create instance
 	instanceID := gofakeit.UUID()
 	instance := domain.Instance{
@@ -225,29 +244,18 @@ func TestGetOrganizationDomain(t *testing.T) {
 		State:      domain.OrgStateActive,
 	}
 
-	tx, err := pool.Begin(t.Context(), nil)
-	require.NoError(t, err)
-	defer func() {
-		require.NoError(t, tx.Rollback(t.Context()))
-	}()
-
-	instanceRepo := repository.InstanceRepository(tx)
-	err = instanceRepo.Create(t.Context(), &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
-	orgRepo := repository.OrganizationRepository(tx)
-	err = orgRepo.Create(t.Context(), &organization)
+	err = orgRepo.Create(t.Context(), tx, &organization)
 	require.NoError(t, err)
 
 	// add domains
-	domainRepo := orgRepo.Domains(false)
-	domainName1 := gofakeit.DomainName()
-	domainName2 := gofakeit.DomainName()
 
 	domain1 := &domain.AddOrganizationDomain{
 		InstanceID:     instanceID,
 		OrgID:          orgID,
-		Domain:         domainName1,
+		Domain:         gofakeit.DomainName(),
 		IsVerified:     true,
 		IsPrimary:      true,
 		ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
@@ -255,15 +263,15 @@ func TestGetOrganizationDomain(t *testing.T) {
 	domain2 := &domain.AddOrganizationDomain{
 		InstanceID:     instanceID,
 		OrgID:          orgID,
-		Domain:         domainName2,
+		Domain:         gofakeit.DomainName(),
 		IsVerified:     false,
 		IsPrimary:      false,
 		ValidationType: gu.Ptr(domain.DomainValidationTypeHTTP),
 	}
 
-	err = domainRepo.Add(t.Context(), domain1)
+	err = domainRepo.Add(t.Context(), tx, domain1)
 	require.NoError(t, err)
-	err = domainRepo.Add(t.Context(), domain2)
+	err = domainRepo.Add(t.Context(), tx, domain2)
 	require.NoError(t, err)
 
 	tests := []struct {
@@ -275,12 +283,15 @@ func TestGetOrganizationDomain(t *testing.T) {
 		{
 			name: "get primary domain",
 			opts: []database.QueryOption{
-				database.WithCondition(domainRepo.IsPrimaryCondition(true)),
+				database.WithCondition(database.And(
+					domainRepo.InstanceIDCondition(instanceID),
+					domainRepo.IsPrimaryCondition(true),
+				)),
 			},
 			expected: &domain.OrganizationDomain{
 				InstanceID:     instanceID,
 				OrgID:          orgID,
-				Domain:         domainName1,
+				Domain:         domain1.Domain,
 				IsVerified:     true,
 				IsPrimary:      true,
 				ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
@@ -289,12 +300,15 @@ func TestGetOrganizationDomain(t *testing.T) {
 		{
 			name: "get by domain name",
 			opts: []database.QueryOption{
-				database.WithCondition(domainRepo.DomainCondition(database.TextOperationEqual, domainName2)),
+				database.WithCondition(database.And(
+					domainRepo.InstanceIDCondition(instanceID),
+					domainRepo.DomainCondition(database.TextOperationEqual, domain2.Domain),
+				)),
 			},
 			expected: &domain.OrganizationDomain{
 				InstanceID:     instanceID,
 				OrgID:          orgID,
-				Domain:         domainName2,
+				Domain:         domain2.Domain,
 				IsVerified:     false,
 				IsPrimary:      false,
 				ValidationType: gu.Ptr(domain.DomainValidationTypeHTTP),
@@ -303,13 +317,16 @@ func TestGetOrganizationDomain(t *testing.T) {
 		{
 			name: "get by org ID",
 			opts: []database.QueryOption{
-				database.WithCondition(domainRepo.OrgIDCondition(orgID)),
-				database.WithCondition(domainRepo.IsPrimaryCondition(true)),
+				database.WithCondition(database.And(
+					domainRepo.InstanceIDCondition(instanceID),
+					domainRepo.OrgIDCondition(orgID),
+					domainRepo.IsPrimaryCondition(true),
+				)),
 			},
 			expected: &domain.OrganizationDomain{
 				InstanceID:     instanceID,
 				OrgID:          orgID,
-				Domain:         domainName1,
+				Domain:         domain1.Domain,
 				IsVerified:     true,
 				IsPrimary:      true,
 				ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
@@ -318,12 +335,15 @@ func TestGetOrganizationDomain(t *testing.T) {
 		{
 			name: "get verified domain",
 			opts: []database.QueryOption{
-				database.WithCondition(domainRepo.IsVerifiedCondition(true)),
+				database.WithCondition(database.And(
+					domainRepo.InstanceIDCondition(instanceID),
+					domainRepo.IsVerifiedCondition(true),
+				)),
 			},
 			expected: &domain.OrganizationDomain{
 				InstanceID:     instanceID,
 				OrgID:          orgID,
-				Domain:         domainName1,
+				Domain:         domain1.Domain,
 				IsVerified:     true,
 				IsPrimary:      true,
 				ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
@@ -332,7 +352,10 @@ func TestGetOrganizationDomain(t *testing.T) {
 		{
 			name: "get non-existent domain",
 			opts: []database.QueryOption{
-				database.WithCondition(domainRepo.DomainCondition(database.TextOperationEqual, "non-existent.com")),
+				database.WithCondition(database.And(
+					domainRepo.InstanceIDCondition(instanceID),
+					domainRepo.DomainCondition(database.TextOperationEqual, "non-existent.com"),
+				)),
 			},
 			err: new(database.NoRowFoundError),
 		},
@@ -340,9 +363,7 @@ func TestGetOrganizationDomain(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			ctx := t.Context()
-
-			result, err := domainRepo.Get(ctx, test.opts...)
+			result, err := domainRepo.Get(t.Context(), tx, test.opts...)
 			if test.err != nil {
 				assert.ErrorIs(t, err, test.err)
 				return
@@ -362,10 +383,22 @@ func TestGetOrganizationDomain(t *testing.T) {
 }
 
 func TestListOrganizationDomains(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Log("error during rollback:", err)
+		}
+	}()
+
+	instanceRepo := repository.InstanceRepository()
+	orgRepo := repository.OrganizationRepository()
+	domainRepo := repository.OrganizationDomainRepository()
+
 	// create instance
-	instanceID := gofakeit.UUID()
 	instance := domain.Instance{
-		ID:              instanceID,
+		ID:              gofakeit.UUID(),
 		Name:            gofakeit.Name(),
 		DefaultOrgID:    "defaultOrgId",
 		IAMProjectID:    "iamProject",
@@ -375,50 +408,40 @@ func TestListOrganizationDomains(t *testing.T) {
 	}
 
 	// create organization
-	orgID := gofakeit.UUID()
 	organization := domain.Organization{
-		ID:         orgID,
+		ID:         gofakeit.UUID(),
 		Name:       gofakeit.Name(),
-		InstanceID: instanceID,
+		InstanceID: instance.ID,
 		State:      domain.OrgStateActive,
 	}
 
-	tx, err := pool.Begin(t.Context(), nil)
-	require.NoError(t, err)
-	defer func() {
-		require.NoError(t, tx.Rollback(t.Context()))
-	}()
-
-	instanceRepo := repository.InstanceRepository(tx)
-	err = instanceRepo.Create(t.Context(), &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
-	orgRepo := repository.OrganizationRepository(tx)
-	err = orgRepo.Create(t.Context(), &organization)
+	err = orgRepo.Create(t.Context(), tx, &organization)
 	require.NoError(t, err)
 
 	// add multiple domains
-	domainRepo := orgRepo.Domains(false)
 	domains := []domain.AddOrganizationDomain{
 		{
-			InstanceID:     instanceID,
-			OrgID:          orgID,
+			InstanceID:     instance.ID,
+			OrgID:          organization.ID,
 			Domain:         gofakeit.DomainName(),
 			IsVerified:     true,
 			IsPrimary:      true,
 			ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 		},
 		{
-			InstanceID:     instanceID,
-			OrgID:          orgID,
+			InstanceID:     instance.ID,
+			OrgID:          organization.ID,
 			Domain:         gofakeit.DomainName(),
 			IsVerified:     false,
 			IsPrimary:      false,
 			ValidationType: gu.Ptr(domain.DomainValidationTypeHTTP),
 		},
 		{
-			InstanceID:     instanceID,
-			OrgID:          orgID,
+			InstanceID:     instance.ID,
+			OrgID:          organization.ID,
 			Domain:         gofakeit.DomainName(),
 			IsVerified:     true,
 			IsPrimary:      false,
@@ -427,7 +450,7 @@ func TestListOrganizationDomains(t *testing.T) {
 	}
 
 	for i := range domains {
-		err = domainRepo.Add(t.Context(), &domains[i])
+		err = domainRepo.Add(t.Context(), tx, &domains[i])
 		require.NoError(t, err)
 	}
 
@@ -437,42 +460,59 @@ func TestListOrganizationDomains(t *testing.T) {
 		expectedCount int
 	}{
 		{
-			name:          "list all domains",
-			opts:          []database.QueryOption{},
+			name: "list all domains",
+			opts: []database.QueryOption{
+				database.WithCondition(domainRepo.InstanceIDCondition(instance.ID)),
+			},
 			expectedCount: 3,
 		},
 		{
 			name: "list verified domains",
 			opts: []database.QueryOption{
-				database.WithCondition(domainRepo.IsVerifiedCondition(true)),
+				database.WithCondition(database.And(
+					domainRepo.InstanceIDCondition(instance.ID),
+					domainRepo.IsVerifiedCondition(true),
+				)),
 			},
 			expectedCount: 2,
 		},
 		{
 			name: "list primary domains",
 			opts: []database.QueryOption{
-				database.WithCondition(domainRepo.IsPrimaryCondition(true)),
+				database.WithCondition(database.And(
+					domainRepo.InstanceIDCondition(instance.ID),
+					domainRepo.IsPrimaryCondition(true),
+				)),
 			},
 			expectedCount: 1,
 		},
 		{
 			name: "list by organization",
 			opts: []database.QueryOption{
-				database.WithCondition(domainRepo.OrgIDCondition(orgID)),
+				database.WithCondition(database.And(
+					domainRepo.InstanceIDCondition(instance.ID),
+					domainRepo.OrgIDCondition(organization.ID),
+				)),
 			},
 			expectedCount: 3,
 		},
 		{
 			name: "list by instance",
 			opts: []database.QueryOption{
-				database.WithCondition(domainRepo.InstanceIDCondition(instanceID)),
+				database.WithCondition(database.And(
+					domainRepo.InstanceIDCondition(instance.ID),
+					domainRepo.InstanceIDCondition(instance.ID),
+				)),
 			},
 			expectedCount: 3,
 		},
 		{
 			name: "list non-existent organization",
 			opts: []database.QueryOption{
-				database.WithCondition(domainRepo.OrgIDCondition("non-existent")),
+				database.WithCondition(database.And(
+					domainRepo.InstanceIDCondition(instance.ID),
+					domainRepo.OrgIDCondition("non-existent"),
+				)),
 			},
 			expectedCount: 0,
 		},
@@ -482,13 +522,13 @@ func TestListOrganizationDomains(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			ctx := t.Context()
 
-			results, err := domainRepo.List(ctx, test.opts...)
+			results, err := domainRepo.List(ctx, tx, test.opts...)
 			require.NoError(t, err)
 			assert.Len(t, results, test.expectedCount)
 
 			for _, result := range results {
-				assert.Equal(t, instanceID, result.InstanceID)
-				assert.Equal(t, orgID, result.OrgID)
+				assert.Equal(t, instance.ID, result.InstanceID)
+				assert.Equal(t, organization.ID, result.OrgID)
 				assert.NotEmpty(t, result.Domain)
 				assert.NotEmpty(t, result.CreatedAt)
 				assert.NotEmpty(t, result.UpdatedAt)
@@ -498,10 +538,22 @@ func TestListOrganizationDomains(t *testing.T) {
 }
 
 func TestUpdateOrganizationDomain(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Log("error during rollback:", err)
+		}
+	}()
+
+	instanceRepo := repository.InstanceRepository()
+	orgRepo := repository.OrganizationRepository()
+	domainRepo := repository.OrganizationDomainRepository()
+
 	// create instance
-	instanceID := gofakeit.UUID()
 	instance := domain.Instance{
-		ID:              instanceID,
+		ID:              gofakeit.UUID(),
 		Name:            gofakeit.Name(),
 		DefaultOrgID:    "defaultOrgId",
 		IAMProjectID:    "iamProject",
@@ -511,41 +563,30 @@ func TestUpdateOrganizationDomain(t *testing.T) {
 	}
 
 	// create organization
-	orgID := gofakeit.UUID()
 	organization := domain.Organization{
-		ID:         orgID,
+		ID:         gofakeit.UUID(),
 		Name:       gofakeit.Name(),
-		InstanceID: instanceID,
+		InstanceID: instance.ID,
 		State:      domain.OrgStateActive,
 	}
 
-	tx, err := pool.Begin(t.Context(), nil)
-	require.NoError(t, err)
-	defer func() {
-		require.NoError(t, tx.Rollback(t.Context()))
-	}()
-
-	instanceRepo := repository.InstanceRepository(tx)
-	err = instanceRepo.Create(t.Context(), &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
-	orgRepo := repository.OrganizationRepository(tx)
-	err = orgRepo.Create(t.Context(), &organization)
+	err = orgRepo.Create(t.Context(), tx, &organization)
 	require.NoError(t, err)
 
 	// add domain
-	domainRepo := orgRepo.Domains(false)
-	domainName := gofakeit.DomainName()
 	organizationDomain := &domain.AddOrganizationDomain{
-		InstanceID:     instanceID,
-		OrgID:          orgID,
-		Domain:         domainName,
+		InstanceID:     instance.ID,
+		OrgID:          organization.ID,
+		Domain:         gofakeit.DomainName(),
 		IsVerified:     false,
 		IsPrimary:      false,
 		ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 	}
 
-	err = domainRepo.Add(t.Context(), organizationDomain)
+	err = domainRepo.Add(t.Context(), tx, organizationDomain)
 	require.NoError(t, err)
 
 	tests := []struct {
@@ -556,26 +597,42 @@ func TestUpdateOrganizationDomain(t *testing.T) {
 		err       error
 	}{
 		{
-			name:      "set verified",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, domainName),
-			changes:   []database.Change{domainRepo.SetVerified()},
-			expected:  1,
+			name: "set verified",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
+			),
+			changes:  []database.Change{domainRepo.SetVerified()},
+			expected: 1,
 		},
 		{
-			name:      "set primary",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, domainName),
-			changes:   []database.Change{domainRepo.SetPrimary()},
-			expected:  1,
+			name: "set primary",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
+			),
+			changes:  []database.Change{domainRepo.SetPrimary()},
+			expected: 1,
 		},
 		{
-			name:      "set validation type",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, domainName),
-			changes:   []database.Change{domainRepo.SetValidationType(domain.DomainValidationTypeHTTP)},
-			expected:  1,
+			name: "set validation type",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
+			),
+			changes:  []database.Change{domainRepo.SetValidationType(domain.DomainValidationTypeHTTP)},
+			expected: 1,
 		},
 		{
-			name:      "multiple changes",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, domainName),
+			name: "multiple changes",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
+			),
 			changes: []database.Change{
 				domainRepo.SetVerified(),
 				domainRepo.SetPrimary(),
@@ -584,31 +641,41 @@ func TestUpdateOrganizationDomain(t *testing.T) {
 			expected: 1,
 		},
 		{
-			name:      "update by org ID and domain",
-			condition: database.And(domainRepo.OrgIDCondition(orgID), domainRepo.DomainCondition(database.TextOperationEqual, domainName)),
-			changes:   []database.Change{domainRepo.SetVerified()},
-			expected:  1,
+			name: "update by org ID and domain",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
+			),
+			changes:  []database.Change{domainRepo.SetVerified()},
+			expected: 1,
 		},
 		{
-			name:      "update non-existent domain",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, "non-existent.com"),
-			changes:   []database.Change{domainRepo.SetVerified()},
-			expected:  0,
+			name: "update non-existent domain",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, "non-existent.com"),
+			),
+			changes:  []database.Change{domainRepo.SetVerified()},
+			expected: 0,
 		},
 		{
-			name:      "no changes",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, domainName),
-			changes:   []database.Change{},
-			expected:  0,
-			err:       database.ErrNoChanges,
+			name: "no changes",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, organizationDomain.Domain),
+			),
+			changes:  []database.Change{},
+			expected: 0,
+			err:      database.ErrNoChanges,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			ctx := t.Context()
-
-			rowsAffected, err := domainRepo.Update(ctx, test.condition, test.changes...)
+			rowsAffected, err := domainRepo.Update(t.Context(), tx, test.condition, test.changes...)
 			if test.err != nil {
 				assert.ErrorIs(t, err, test.err)
 				return
@@ -619,7 +686,7 @@ func TestUpdateOrganizationDomain(t *testing.T) {
 
 			// verify changes were applied if rows were affected
 			if rowsAffected > 0 && len(test.changes) > 0 {
-				result, err := domainRepo.Get(ctx, database.WithCondition(test.condition))
+				result, err := domainRepo.Get(t.Context(), tx, database.WithCondition(test.condition))
 				require.NoError(t, err)
 
 				// We know changes were applied since rowsAffected > 0
@@ -632,10 +699,22 @@ func TestUpdateOrganizationDomain(t *testing.T) {
 }
 
 func TestRemoveOrganizationDomain(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Log("error during rollback:", err)
+		}
+	}()
+
+	instanceRepo := repository.InstanceRepository()
+	orgRepo := repository.OrganizationRepository()
+	domainRepo := repository.OrganizationDomainRepository()
+
 	// create instance
-	instanceID := gofakeit.UUID()
 	instance := domain.Instance{
-		ID:              instanceID,
+		ID:              gofakeit.UUID(),
 		Name:            gofakeit.Name(),
 		DefaultOrgID:    "defaultOrgId",
 		IAMProjectID:    "iamProject",
@@ -645,53 +724,40 @@ func TestRemoveOrganizationDomain(t *testing.T) {
 	}
 
 	// create organization
-	orgID := gofakeit.UUID()
 	organization := domain.Organization{
-		ID:         orgID,
+		ID:         gofakeit.UUID(),
 		Name:       gofakeit.Name(),
-		InstanceID: instanceID,
+		InstanceID: instance.ID,
 		State:      domain.OrgStateActive,
 	}
 
-	tx, err := pool.Begin(t.Context(), nil)
-	require.NoError(t, err)
-	defer func() {
-		require.NoError(t, tx.Rollback(t.Context()))
-	}()
-
-	instanceRepo := repository.InstanceRepository(tx)
-	err = instanceRepo.Create(t.Context(), &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
-	orgRepo := repository.OrganizationRepository(tx)
-	err = orgRepo.Create(t.Context(), &organization)
+	err = orgRepo.Create(t.Context(), tx, &organization)
 	require.NoError(t, err)
 
 	// add domains
-	domainRepo := orgRepo.Domains(false)
-	domainName1 := gofakeit.DomainName()
-	domainName2 := gofakeit.DomainName()
-
 	domain1 := &domain.AddOrganizationDomain{
-		InstanceID:     instanceID,
-		OrgID:          orgID,
-		Domain:         domainName1,
+		InstanceID:     instance.ID,
+		OrgID:          organization.ID,
+		Domain:         gofakeit.DomainName(),
 		IsVerified:     true,
 		IsPrimary:      true,
 		ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 	}
 	domain2 := &domain.AddOrganizationDomain{
-		InstanceID:     instanceID,
-		OrgID:          orgID,
-		Domain:         domainName2,
+		InstanceID:     instance.ID,
+		OrgID:          organization.ID,
+		Domain:         gofakeit.DomainName(),
 		IsVerified:     false,
 		IsPrimary:      false,
 		ValidationType: gu.Ptr(domain.DomainValidationTypeHTTP),
 	}
 
-	err = domainRepo.Add(t.Context(), domain1)
+	err = domainRepo.Add(t.Context(), tx, domain1)
 	require.NoError(t, err)
-	err = domainRepo.Add(t.Context(), domain2)
+	err = domainRepo.Add(t.Context(), tx, domain2)
 	require.NoError(t, err)
 
 	tests := []struct {
@@ -700,50 +766,70 @@ func TestRemoveOrganizationDomain(t *testing.T) {
 		expected  int64
 	}{
 		{
-			name:      "remove by domain name",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, domainName1),
-			expected:  1,
+			name: "remove by domain name",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, domain1.Domain),
+			),
+			expected: 1,
 		},
 		{
-			name:      "remove by primary condition",
-			condition: domainRepo.IsPrimaryCondition(false),
-			expected:  1, // domain2 should still exist and be non-primary
+			name: "remove by primary condition",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.IsPrimaryCondition(false),
+			),
+			expected: 1, // domain2 should still exist and be non-primary
 		},
 		{
-			name:      "remove by org ID and domain",
-			condition: database.And(domainRepo.OrgIDCondition(orgID), domainRepo.DomainCondition(database.TextOperationEqual, domainName2)),
-			expected:  1,
+			name: "remove by org ID and domain",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, domain2.Domain),
+			),
+			expected: 1,
 		},
 		{
-			name:      "remove non-existent domain",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, "non-existent.com"),
-			expected:  0,
+			name: "remove non-existent domain",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, "non-existent.com"),
+			),
+			expected: 0,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			ctx := t.Context()
-
-			snapshot, err := tx.Begin(ctx)
+			snapshot, err := tx.Begin(t.Context())
 			require.NoError(t, err)
 			defer func() {
-				require.NoError(t, snapshot.Rollback(ctx))
+				err = snapshot.Rollback(t.Context())
+				if err != nil {
+					t.Log("error during rollback:", err)
+				}
 			}()
 
-			orgRepo := repository.OrganizationRepository(snapshot)
-			domainRepo := orgRepo.Domains(false)
-
 			// count before removal
-			beforeCount, err := domainRepo.List(ctx)
+			beforeCount, err := domainRepo.List(t.Context(), snapshot, database.WithCondition(database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+			)))
 			require.NoError(t, err)
 
-			rowsAffected, err := domainRepo.Remove(ctx, test.condition)
+			rowsAffected, err := domainRepo.Remove(t.Context(), snapshot, test.condition)
 			require.NoError(t, err)
 			assert.Equal(t, test.expected, rowsAffected)
 
 			// verify removal
-			afterCount, err := domainRepo.List(ctx)
+			afterCount, err := domainRepo.List(t.Context(), snapshot, database.WithCondition(database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.OrgIDCondition(organization.ID),
+			)))
 			require.NoError(t, err)
 			assert.Equal(t, len(beforeCount)-int(test.expected), len(afterCount))
 		})
@@ -751,8 +837,7 @@ func TestRemoveOrganizationDomain(t *testing.T) {
 }
 
 func TestOrganizationDomainConditions(t *testing.T) {
-	orgRepo := repository.OrganizationRepository(pool)
-	domainRepo := orgRepo.Domains(false)
+	domainRepo := repository.OrganizationDomainRepository()
 
 	tests := []struct {
 		name      string
@@ -811,8 +896,7 @@ func TestOrganizationDomainConditions(t *testing.T) {
 }
 
 func TestOrganizationDomainChanges(t *testing.T) {
-	orgRepo := repository.OrganizationRepository(pool)
-	domainRepo := orgRepo.Domains(false)
+	domainRepo := repository.OrganizationDomainRepository()
 
 	tests := []struct {
 		name     string
@@ -851,8 +935,7 @@ func TestOrganizationDomainChanges(t *testing.T) {
 }
 
 func TestOrganizationDomainColumns(t *testing.T) {
-	orgRepo := repository.OrganizationRepository(pool)
-	domainRepo := orgRepo.Domains(false)
+	domainRepo := repository.OrganizationDomainRepository()
 
 	tests := []struct {
 		name      string

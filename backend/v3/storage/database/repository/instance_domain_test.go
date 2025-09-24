@@ -1,7 +1,6 @@
 package repository_test
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -16,31 +15,43 @@ import (
 )
 
 func TestAddInstanceDomain(t *testing.T) {
+	// we take now here because the timestamp of the transaction is used to set the createdAt and updatedAt fields
+	beforeAdd := time.Now()
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Log("error during rollback:", err)
+		}
+	}()
+
+	instanceRepo := repository.InstanceRepository()
+	domainRepo := repository.InstanceDomainRepository()
+
 	// create instance
-	instanceID := gofakeit.UUID()
 	instance := domain.Instance{
-		ID:              instanceID,
-		Name:            gofakeit.Name(),
+		ID:              gofakeit.NewCrypto().UUID(),
+		Name:            gofakeit.BeerName(),
 		DefaultOrgID:    "defaultOrgId",
 		IAMProjectID:    "iamProject",
 		ConsoleClientID: "consoleClient",
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err := instanceRepo.Create(t.Context(), &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	tests := []struct {
 		name           string
-		testFunc       func(ctx context.Context, t *testing.T, domainRepo domain.InstanceDomainRepository) *domain.AddInstanceDomain
+		testFunc       func(t *testing.T, tx database.QueryExecutor) *domain.AddInstanceDomain
 		instanceDomain domain.AddInstanceDomain
 		err            error
 	}{
 		{
 			name: "happy path custom domain",
 			instanceDomain: domain.AddInstanceDomain{
-				InstanceID:  instanceID,
+				InstanceID:  instance.ID,
 				Domain:      gofakeit.DomainName(),
 				Type:        domain.DomainTypeCustom,
 				IsPrimary:   gu.Ptr(false),
@@ -50,7 +61,7 @@ func TestAddInstanceDomain(t *testing.T) {
 		{
 			name: "happy path trusted domain",
 			instanceDomain: domain.AddInstanceDomain{
-				InstanceID: instanceID,
+				InstanceID: instance.ID,
 				Domain:     gofakeit.DomainName(),
 				Type:       domain.DomainTypeTrusted,
 			},
@@ -58,7 +69,7 @@ func TestAddInstanceDomain(t *testing.T) {
 		{
 			name: "add primary domain",
 			instanceDomain: domain.AddInstanceDomain{
-				InstanceID:  instanceID,
+				InstanceID:  instance.ID,
 				Domain:      gofakeit.DomainName(),
 				Type:        domain.DomainTypeCustom,
 				IsPrimary:   gu.Ptr(true),
@@ -68,7 +79,7 @@ func TestAddInstanceDomain(t *testing.T) {
 		{
 			name: "add custom domain without domain name",
 			instanceDomain: domain.AddInstanceDomain{
-				InstanceID:  instanceID,
+				InstanceID:  instance.ID,
 				Domain:      "",
 				Type:        domain.DomainTypeCustom,
 				IsPrimary:   gu.Ptr(false),
@@ -79,7 +90,7 @@ func TestAddInstanceDomain(t *testing.T) {
 		{
 			name: "add trusted domain without domain name",
 			instanceDomain: domain.AddInstanceDomain{
-				InstanceID: instanceID,
+				InstanceID: instance.ID,
 				Domain:     "",
 				Type:       domain.DomainTypeTrusted,
 			},
@@ -87,23 +98,23 @@ func TestAddInstanceDomain(t *testing.T) {
 		},
 		{
 			name: "add custom domain with same domain twice",
-			testFunc: func(ctx context.Context, t *testing.T, domainRepo domain.InstanceDomainRepository) *domain.AddInstanceDomain {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.AddInstanceDomain {
 				domainName := gofakeit.DomainName()
 
 				instanceDomain := &domain.AddInstanceDomain{
-					InstanceID:  instanceID,
+					InstanceID:  instance.ID,
 					Domain:      domainName,
 					Type:        domain.DomainTypeCustom,
 					IsPrimary:   gu.Ptr(false),
 					IsGenerated: gu.Ptr(false),
 				}
 
-				err := domainRepo.Add(ctx, instanceDomain)
+				err := domainRepo.Add(t.Context(), tx, instanceDomain)
 				require.NoError(t, err)
 
 				// return same domain again
 				return &domain.AddInstanceDomain{
-					InstanceID:  instanceID,
+					InstanceID:  instance.ID,
 					Domain:      domainName,
 					Type:        domain.DomainTypeCustom,
 					IsPrimary:   gu.Ptr(false),
@@ -114,22 +125,20 @@ func TestAddInstanceDomain(t *testing.T) {
 		},
 		{
 			name: "add trusted domain with same domain twice",
-			testFunc: func(ctx context.Context, t *testing.T, domainRepo domain.InstanceDomainRepository) *domain.AddInstanceDomain {
-				domainName := gofakeit.DomainName()
-
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.AddInstanceDomain {
 				instanceDomain := &domain.AddInstanceDomain{
-					InstanceID: instanceID,
-					Domain:     domainName,
+					InstanceID: instance.ID,
+					Domain:     gofakeit.DomainName(),
 					Type:       domain.DomainTypeTrusted,
 				}
 
-				err := domainRepo.Add(ctx, instanceDomain)
+				err := domainRepo.Add(t.Context(), tx, instanceDomain)
 				require.NoError(t, err)
 
 				// return same domain again
 				return &domain.AddInstanceDomain{
-					InstanceID: instanceID,
-					Domain:     domainName,
+					InstanceID: instance.ID,
+					Domain:     instanceDomain.Domain,
 					Type:       domain.DomainTypeTrusted,
 				}
 			},
@@ -196,26 +205,23 @@ func TestAddInstanceDomain(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			ctx := t.Context()
-
-			// we take now here because the timestamp of the transaction is used to set the createdAt and updatedAt fields
-			beforeAdd := time.Now()
-			tx, err := pool.Begin(t.Context(), nil)
+			savepoint, err := tx.Begin(t.Context())
 			require.NoError(t, err)
 			defer func() {
-				require.NoError(t, tx.Rollback(t.Context()))
+				err := savepoint.Rollback(t.Context())
+				if err != nil {
+					t.Log("error during rollback:", err)
+				}
 			}()
-			instanceRepo := repository.InstanceRepository(tx)
-			domainRepo := instanceRepo.Domains(false)
 
 			var instanceDomain *domain.AddInstanceDomain
 			if test.testFunc != nil {
-				instanceDomain = test.testFunc(ctx, t, domainRepo)
+				instanceDomain = test.testFunc(t, savepoint)
 			} else {
 				instanceDomain = &test.instanceDomain
 			}
 
-			err = domainRepo.Add(ctx, instanceDomain)
+			err = domainRepo.Add(t.Context(), savepoint, instanceDomain)
 			afterAdd := time.Now()
 			if test.err != nil {
 				assert.ErrorIs(t, err, test.err)
@@ -232,10 +238,21 @@ func TestAddInstanceDomain(t *testing.T) {
 }
 
 func TestGetInstanceDomain(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Log("error during rollback:", err)
+		}
+	}()
+
+	instanceRepo := repository.InstanceRepository()
+	domainRepo := repository.InstanceDomainRepository()
+
 	// create instance
-	instanceID := gofakeit.UUID()
 	instance := domain.Instance{
-		ID:              instanceID,
+		ID:              gofakeit.NewCrypto().UUID(),
 		Name:            gofakeit.Name(),
 		DefaultOrgID:    "defaultOrgId",
 		IAMProjectID:    "iamProject",
@@ -243,38 +260,29 @@ func TestGetInstanceDomain(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	tx, err := pool.Begin(t.Context(), nil)
-	require.NoError(t, err)
-	defer func() {
-		require.NoError(t, tx.Rollback(t.Context()))
-	}()
-	instanceRepo := repository.InstanceRepository(tx)
-	err = instanceRepo.Create(t.Context(), &instance)
+
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// add domains
-	domainRepo := instanceRepo.Domains(false)
-	domainName1 := gofakeit.DomainName()
-	domainName2 := gofakeit.DomainName()
-
 	domain1 := &domain.AddInstanceDomain{
-		InstanceID:  instanceID,
-		Domain:      domainName1,
+		InstanceID:  instance.ID,
+		Domain:      gofakeit.DomainName(),
 		IsPrimary:   gu.Ptr(true),
 		IsGenerated: gu.Ptr(false),
 		Type:        domain.DomainTypeCustom,
 	}
 	domain2 := &domain.AddInstanceDomain{
-		InstanceID:  instanceID,
-		Domain:      domainName2,
+		InstanceID:  instance.ID,
+		Domain:      gofakeit.DomainName(),
 		IsPrimary:   gu.Ptr(false),
 		IsGenerated: gu.Ptr(false),
 		Type:        domain.DomainTypeCustom,
 	}
 
-	err = domainRepo.Add(t.Context(), domain1)
+	err = domainRepo.Add(t.Context(), tx, domain1)
 	require.NoError(t, err)
-	err = domainRepo.Add(t.Context(), domain2)
+	err = domainRepo.Add(t.Context(), tx, domain2)
 	require.NoError(t, err)
 
 	tests := []struct {
@@ -289,19 +297,19 @@ func TestGetInstanceDomain(t *testing.T) {
 				database.WithCondition(domainRepo.IsPrimaryCondition(true)),
 			},
 			expected: &domain.InstanceDomain{
-				InstanceID: instanceID,
-				Domain:     domainName1,
+				InstanceID: instance.ID,
+				Domain:     domain1.Domain,
 				IsPrimary:  gu.Ptr(true),
 			},
 		},
 		{
 			name: "get by domain name",
 			opts: []database.QueryOption{
-				database.WithCondition(domainRepo.DomainCondition(database.TextOperationEqual, domainName2)),
+				database.WithCondition(domainRepo.DomainCondition(database.TextOperationEqual, domain2.Domain)),
 			},
 			expected: &domain.InstanceDomain{
-				InstanceID: instanceID,
-				Domain:     domainName2,
+				InstanceID: instance.ID,
+				Domain:     domain2.Domain,
 				IsPrimary:  gu.Ptr(false),
 			},
 		},
@@ -318,7 +326,7 @@ func TestGetInstanceDomain(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			ctx := t.Context()
 
-			result, err := domainRepo.Get(ctx, test.opts...)
+			result, err := domainRepo.Get(ctx, tx, test.opts...)
 			if test.err != nil {
 				assert.ErrorIs(t, err, test.err)
 				return
@@ -335,10 +343,21 @@ func TestGetInstanceDomain(t *testing.T) {
 }
 
 func TestListInstanceDomains(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Log("error during rollback:", err)
+		}
+	}()
+
+	instanceRepo := repository.InstanceRepository()
+	domainRepo := repository.InstanceDomainRepository()
+
 	// create instance
-	instanceID := gofakeit.UUID()
 	instance := domain.Instance{
-		ID:              instanceID,
+		ID:              gofakeit.NewCrypto().UUID(),
 		Name:            gofakeit.Name(),
 		DefaultOrgID:    "defaultOrgId",
 		IAMProjectID:    "iamProject",
@@ -346,42 +365,35 @@ func TestListInstanceDomains(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	tx, err := pool.Begin(t.Context(), nil)
-	require.NoError(t, err)
-	defer func() {
-		require.NoError(t, tx.Rollback(t.Context()))
-	}()
 
-	instanceRepo := repository.InstanceRepository(tx)
-	err = instanceRepo.Create(t.Context(), &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// add multiple domains
-	domainRepo := instanceRepo.Domains(false)
 	domains := []domain.AddInstanceDomain{
 		{
-			InstanceID:  instanceID,
+			InstanceID:  instance.ID,
 			Domain:      gofakeit.DomainName(),
 			IsPrimary:   gu.Ptr(true),
 			IsGenerated: gu.Ptr(false),
 			Type:        domain.DomainTypeCustom,
 		},
 		{
-			InstanceID:  instanceID,
+			InstanceID:  instance.ID,
 			Domain:      gofakeit.DomainName(),
 			IsPrimary:   gu.Ptr(false),
 			IsGenerated: gu.Ptr(false),
 			Type:        domain.DomainTypeCustom,
 		},
 		{
-			InstanceID: instanceID,
+			InstanceID: instance.ID,
 			Domain:     gofakeit.DomainName(),
 			Type:       domain.DomainTypeTrusted,
 		},
 	}
 
 	for i := range domains {
-		err = domainRepo.Add(t.Context(), &domains[i])
+		err = domainRepo.Add(t.Context(), tx, &domains[i])
 		require.NoError(t, err)
 	}
 
@@ -405,7 +417,7 @@ func TestListInstanceDomains(t *testing.T) {
 		{
 			name: "list by instance",
 			opts: []database.QueryOption{
-				database.WithCondition(domainRepo.InstanceIDCondition(instanceID)),
+				database.WithCondition(domainRepo.InstanceIDCondition(instance.ID)),
 			},
 			expectedCount: 3,
 		},
@@ -422,12 +434,12 @@ func TestListInstanceDomains(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			ctx := t.Context()
 
-			results, err := domainRepo.List(ctx, test.opts...)
+			results, err := domainRepo.List(ctx, tx, test.opts...)
 			require.NoError(t, err)
 			assert.Len(t, results, test.expectedCount)
 
 			for _, result := range results {
-				assert.Equal(t, instanceID, result.InstanceID)
+				assert.Equal(t, instance.ID, result.InstanceID)
 				assert.NotEmpty(t, result.Domain)
 				assert.NotEmpty(t, result.CreatedAt)
 				assert.NotEmpty(t, result.UpdatedAt)
@@ -437,10 +449,21 @@ func TestListInstanceDomains(t *testing.T) {
 }
 
 func TestUpdateInstanceDomain(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Log("error during rollback:", err)
+		}
+	}()
+
+	instanceRepo := repository.InstanceRepository()
+	domainRepo := repository.InstanceDomainRepository()
+
 	// create instance
-	instanceID := gofakeit.UUID()
 	instance := domain.Instance{
-		ID:              instanceID,
+		ID:              gofakeit.UUID(),
 		Name:            gofakeit.Name(),
 		DefaultOrgID:    "defaultOrgId",
 		IAMProjectID:    "iamProject",
@@ -448,29 +471,19 @@ func TestUpdateInstanceDomain(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-
-	tx, err := pool.Begin(t.Context(), nil)
-	require.NoError(t, err)
-	defer func() {
-		require.NoError(t, tx.Rollback(t.Context()))
-	}()
-
-	instanceRepo := repository.InstanceRepository(tx)
-	err = instanceRepo.Create(t.Context(), &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// add domain
-	domainRepo := instanceRepo.Domains(false)
-	domainName := gofakeit.DomainName()
 	instanceDomain := &domain.AddInstanceDomain{
-		InstanceID:  instanceID,
-		Domain:      domainName,
+		InstanceID:  instance.ID,
+		Domain:      gofakeit.DomainName(),
 		IsPrimary:   gu.Ptr(false),
 		IsGenerated: gu.Ptr(false),
 		Type:        domain.DomainTypeCustom,
 	}
 
-	err = domainRepo.Add(t.Context(), instanceDomain)
+	err = domainRepo.Add(t.Context(), tx, instanceDomain)
 	require.NoError(t, err)
 
 	tests := []struct {
@@ -481,31 +494,38 @@ func TestUpdateInstanceDomain(t *testing.T) {
 		err       error
 	}{
 		{
-			name:      "set primary",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, domainName),
-			changes:   []database.Change{domainRepo.SetPrimary()},
-			expected:  1,
+			name: "set primary",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, instanceDomain.Domain),
+			),
+			changes:  []database.Change{domainRepo.SetPrimary()},
+			expected: 1,
 		},
 		{
-			name:      "update non-existent domain",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, "non-existent.com"),
-			changes:   []database.Change{domainRepo.SetPrimary()},
-			expected:  0,
+			name: "update non-existent domain",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, "non-existent.com"),
+			),
+			changes:  []database.Change{domainRepo.SetPrimary()},
+			expected: 0,
 		},
 		{
-			name:      "no changes",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, domainName),
-			changes:   []database.Change{},
-			expected:  0,
-			err:       database.ErrNoChanges,
+			name: "no changes",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, instanceDomain.Domain),
+			),
+			changes:  []database.Change{},
+			expected: 0,
+			err:      database.ErrNoChanges,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			ctx := t.Context()
-
-			rowsAffected, err := domainRepo.Update(ctx, test.condition, test.changes...)
+			rowsAffected, err := domainRepo.Update(t.Context(), tx, test.condition, test.changes...)
 			if test.err != nil {
 				assert.ErrorIs(t, err, test.err)
 				return
@@ -516,7 +536,7 @@ func TestUpdateInstanceDomain(t *testing.T) {
 
 			// verify changes were applied if rows were affected
 			if rowsAffected > 0 && len(test.changes) > 0 {
-				result, err := domainRepo.Get(ctx, database.WithCondition(test.condition))
+				result, err := domainRepo.Get(t.Context(), tx, database.WithCondition(test.condition))
 				require.NoError(t, err)
 
 				// We know changes were applied since rowsAffected > 0
@@ -529,10 +549,21 @@ func TestUpdateInstanceDomain(t *testing.T) {
 }
 
 func TestRemoveInstanceDomain(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Log("error during rollback:", err)
+		}
+	}()
+
+	instanceRepo := repository.InstanceRepository()
+	domainRepo := repository.InstanceDomainRepository()
+
 	// create instance
-	instanceID := gofakeit.UUID()
 	instance := domain.Instance{
-		ID:              instanceID,
+		ID:              gofakeit.UUID(),
 		Name:            gofakeit.Name(),
 		DefaultOrgID:    "defaultOrgId",
 		IAMProjectID:    "iamProject",
@@ -540,37 +571,28 @@ func TestRemoveInstanceDomain(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	tx, err := pool.Begin(t.Context(), nil)
-	require.NoError(t, err)
-	defer func() {
-		require.NoError(t, tx.Rollback(t.Context()))
-	}()
-	instanceRepo := repository.InstanceRepository(tx)
-	err = instanceRepo.Create(t.Context(), &instance)
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// add domains
-	domainRepo := instanceRepo.Domains(false)
-	domainName1 := gofakeit.DomainName()
-
 	domain1 := &domain.AddInstanceDomain{
-		InstanceID:  instanceID,
-		Domain:      domainName1,
+		InstanceID:  instance.ID,
+		Domain:      gofakeit.DomainName(),
 		IsPrimary:   gu.Ptr(true),
 		IsGenerated: gu.Ptr(false),
 		Type:        domain.DomainTypeCustom,
 	}
 	domain2 := &domain.AddInstanceDomain{
-		InstanceID:  instanceID,
+		InstanceID:  instance.ID,
 		Domain:      gofakeit.DomainName(),
 		IsPrimary:   gu.Ptr(false),
 		IsGenerated: gu.Ptr(false),
 		Type:        domain.DomainTypeCustom,
 	}
 
-	err = domainRepo.Add(t.Context(), domain1)
+	err = domainRepo.Add(t.Context(), tx, domain1)
 	require.NoError(t, err)
-	err = domainRepo.Add(t.Context(), domain2)
+	err = domainRepo.Add(t.Context(), tx, domain2)
 	require.NoError(t, err)
 
 	tests := []struct {
@@ -579,36 +601,43 @@ func TestRemoveInstanceDomain(t *testing.T) {
 		expected  int64
 	}{
 		{
-			name:      "remove by domain name",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, domainName1),
-			expected:  1,
+			name: "remove by domain name",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, domain1.Domain),
+			),
+			expected: 1,
 		},
 		{
-			name:      "remove by primary condition",
-			condition: domainRepo.IsPrimaryCondition(false),
-			expected:  1, // domain2 should still exist and be non-primary
+			name: "remove by primary condition",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.IsPrimaryCondition(false),
+			),
+			expected: 1, // domain2 should still exist and be non-primary
 		},
 		{
-			name:      "remove non-existent domain",
-			condition: domainRepo.DomainCondition(database.TextOperationEqual, "non-existent.com"),
-			expected:  0,
+			name: "remove non-existent domain",
+			condition: database.And(
+				domainRepo.InstanceIDCondition(instance.ID),
+				domainRepo.DomainCondition(database.TextOperationEqual, "non-existent.com"),
+			),
+			expected: 0,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			ctx := t.Context()
-
 			// count before removal
-			beforeCount, err := domainRepo.List(ctx)
+			beforeCount, err := domainRepo.List(t.Context(), tx)
 			require.NoError(t, err)
 
-			rowsAffected, err := domainRepo.Remove(ctx, test.condition)
+			rowsAffected, err := domainRepo.Remove(t.Context(), tx, test.condition)
 			require.NoError(t, err)
 			assert.Equal(t, test.expected, rowsAffected)
 
 			// verify removal
-			afterCount, err := domainRepo.List(ctx)
+			afterCount, err := domainRepo.List(t.Context(), tx)
 			require.NoError(t, err)
 			assert.Equal(t, len(beforeCount)-int(test.expected), len(afterCount))
 		})
@@ -616,8 +645,7 @@ func TestRemoveInstanceDomain(t *testing.T) {
 }
 
 func TestInstanceDomainConditions(t *testing.T) {
-	instanceRepo := repository.InstanceRepository(pool)
-	domainRepo := instanceRepo.Domains(false)
+	domainRepo := repository.InstanceDomainRepository()
 
 	tests := []struct {
 		name      string
@@ -671,8 +699,7 @@ func TestInstanceDomainConditions(t *testing.T) {
 }
 
 func TestInstanceDomainChanges(t *testing.T) {
-	instanceRepo := repository.InstanceRepository(pool)
-	domainRepo := instanceRepo.Domains(false)
+	domainRepo := repository.InstanceDomainRepository()
 
 	tests := []struct {
 		name     string

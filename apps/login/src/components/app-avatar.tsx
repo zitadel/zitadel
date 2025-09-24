@@ -1,6 +1,5 @@
 import { ColorShade, getColorHash } from "@/helpers/colors";
 import { useTheme } from "next-themes";
-import Image from "next/image";
 import { getInitials } from "./avatar";
 
 interface AvatarProps {
@@ -33,7 +32,7 @@ export function AppAvatar({ appName, imageUrl, shadow }: AvatarProps) {
       style={resolvedTheme === "light" ? avatarStyleLight : avatarStyleDark}
     >
       {imageUrl ? (
-        <Image
+        <img
           height={48}
           width={48}
           alt="avatar"

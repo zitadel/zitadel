@@ -7,15 +7,24 @@ import (
 
 type JSONArray[T any] []*T
 
-func (a JSONArray[T]) Scan(src any) error {
+var ErrScanSource = errors.New("unsupported scan source")
+
+func (a *JSONArray[T]) Scan(src any) error {
+
 	switch s := src.(type) {
 	case string:
-		return json.Unmarshal([]byte(s), &a)
+		if len(s) == 0 {
+			return nil
+		}
+		return json.Unmarshal([]byte(s), a)
 	case []byte:
-		return json.Unmarshal(s, &a)
+		if len(s) == 0 {
+			return nil
+		}
+		return json.Unmarshal(s, a)
 	case nil:
 		return nil
 	default:
-		return errors.New("unsupported scan source")
+		return ErrScanSource
 	}
 }

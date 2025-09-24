@@ -154,10 +154,6 @@ func (p *labelPolicyProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceFontRemoved,
 				},
 				{
-					Event:  org.LabelPolicyAssetsRemovedEventType,
-					Reduce: p.reduceAssetsRemoved,
-				},
-				{
 					Event:  org.OrgRemovedEventType,
 					Reduce: p.reduceOwnerRemoved,
 				},
@@ -217,10 +213,6 @@ func (p *labelPolicyProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  instance.LabelPolicyFontRemovedEventType,
 					Reduce: p.reduceFontRemoved,
-				},
-				{
-					Event:  instance.LabelPolicyAssetsRemovedEventType,
-					Reduce: p.reduceAssetsRemoved,
 				},
 				{
 					Event:  instance.InstanceRemovedEventType,
@@ -357,7 +349,6 @@ func (p *labelPolicyProjection) reduceActivated(event eventstore.Event) (*handle
 			handler.NewCol(LabelPolicyIDCol, nil),
 			handler.NewCol(LabelPolicyStateCol, nil),
 		},
-		nil,
 		[]handler.Column{
 			handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
 			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
@@ -577,32 +568,6 @@ func (p *labelPolicyProjection) reduceFontRemoved(event eventstore.Event) (*hand
 			handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
 			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
 			handler.NewCol(col, nil),
-		},
-		[]handler.Condition{
-			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
-			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
-			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
-		}), nil
-}
-
-func (p *labelPolicyProjection) reduceAssetsRemoved(event eventstore.Event) (*handler.Statement, error) {
-	switch event.(type) {
-	case *org.LabelPolicyAssetsRemovedEvent, *instance.LabelPolicyAssetsRemovedEvent:
-		// ok
-	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-qi39A", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyAssetsRemovedEventType, instance.LabelPolicyAssetsRemovedEventType})
-	}
-
-	return handler.NewUpdateStatement(
-		event,
-		[]handler.Column{
-			handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
-			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
-			handler.NewCol(LabelPolicyLightLogoURLCol, nil),
-			handler.NewCol(LabelPolicyLightIconURLCol, nil),
-			handler.NewCol(LabelPolicyDarkLogoURLCol, nil),
-			handler.NewCol(LabelPolicyDarkIconURLCol, nil),
-			handler.NewCol(LabelPolicyFontURLCol, nil),
 		},
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),

@@ -57,13 +57,13 @@ type UserRepository interface {
 	userConditions
 	userChanges
 	// Get returns a user based on the given condition.
-	Get(ctx context.Context, opts ...database.QueryOption) (*User, error)
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*User, error)
 	// List returns a list of users based on the given condition.
-	List(ctx context.Context, opts ...database.QueryOption) ([]*User, error)
+	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*User, error)
 	// Create creates a new user.
-	Create(ctx context.Context, user *User) error
+	Create(ctx context.Context, client database.QueryExecutor, user *User) error
 	// Delete removes users based on the given condition.
-	Delete(ctx context.Context, condition database.Condition) error
+	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) error
 	// Human returns the [HumanRepository].
 	Human() HumanRepository
 	// Machine returns the [MachineRepository].
@@ -143,9 +143,9 @@ type HumanRepository interface {
 	humanChanges
 
 	// Get returns an email based on the given condition.
-	GetEmail(ctx context.Context, condition database.Condition) (*Email, error)
+	GetEmail(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Email, error)
 	// Update updates human users based on the given condition and changes.
-	Update(ctx context.Context, condition database.Condition, changes ...database.Change) error
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) error
 }
 
 // machineColumns define all the columns of the machine table which inherits the user table.
@@ -172,7 +172,7 @@ type machineChanges interface {
 // MachineRepository is the interface for the machine repository it inherits the user repository.
 type MachineRepository interface {
 	// Update updates machine users based on the given condition and changes.
-	Update(ctx context.Context, condition database.Condition, changes ...database.Change) error
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) error
 
 	machineColumns
 	machineConditions

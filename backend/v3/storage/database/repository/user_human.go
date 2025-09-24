@@ -13,7 +13,7 @@ import (
 // -------------------------------------------------------------
 
 type userHuman struct {
-	*user
+	user
 }
 
 var _ domain.HumanRepository = (*userHuman)(nil)
@@ -21,14 +21,14 @@ var _ domain.HumanRepository = (*userHuman)(nil)
 const userEmailQuery = `SELECT h.email_address, h.email_verified_at FROM user_humans h`
 
 // GetEmail implements [domain.HumanRepository].
-func (u *userHuman) GetEmail(ctx context.Context, condition database.Condition) (*domain.Email, error) {
+func (u *userHuman) GetEmail(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*domain.Email, error) {
 	var email domain.Email
 
 	builder := database.StatementBuilder{}
 	builder.WriteString(userEmailQuery)
 	writeCondition(&builder, condition)
 
-	err := u.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(
+	err := client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(
 		&email.Address,
 		&email.VerifiedAt,
 	)
@@ -39,7 +39,7 @@ func (u *userHuman) GetEmail(ctx context.Context, condition database.Condition) 
 }
 
 // Update implements [domain.HumanRepository].
-func (h userHuman) Update(ctx context.Context, condition database.Condition, changes ...database.Change) error {
+func (h userHuman) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) error {
 	builder := database.StatementBuilder{}
 	builder.WriteString(`UPDATE human_users SET `)
 	database.Changes(changes).Write(&builder)
@@ -47,7 +47,7 @@ func (h userHuman) Update(ctx context.Context, condition database.Condition, cha
 
 	stmt := builder.String()
 
-	_, err := h.client.Exec(ctx, stmt, builder.Args()...)
+	_, err := client.Exec(ctx, stmt, builder.Args()...)
 	return err
 }
 
