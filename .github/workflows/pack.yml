@@ -68,10 +68,11 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Install global modules
         run: pnpm add --global nx@${{ inputs.nx_version }} sass
+      - run: nx start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after=pack
       - name: Pack API and Login
         env:
           ZITADEL_VERSION: ${{ inputs.zitadel_version }}
-        run: nx run --nxBail pack
+        run: nx run pack
       - name: Upload all platform archives
         uses: actions/upload-artifact@v4
         with:
