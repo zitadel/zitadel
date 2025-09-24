@@ -1337,7 +1337,7 @@ func TestNewCopyStatement(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.want.executer.t = t
-			stmt := NewCopyStatement(tt.args.event, tt.args.conflictingCols, tt.args.from, tt.args.to, tt.args.conds)
+			stmt := NewCopyStatement(tt.args.event, tt.args.conflictingCols, nil, tt.args.from, tt.args.to, tt.args.conds)
 
 			err := stmt.Execute(t.Context(), tt.want.executer, tt.args.table)
 			if !tt.want.isErr(err) {

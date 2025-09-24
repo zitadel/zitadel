@@ -386,6 +386,7 @@ func (s *settingsRelationalProjection) reduceLoginPolicyAdded(event eventstore.E
 	}), nil
 }
 
+//nolint:gocognit
 func (s *settingsRelationalProjection) reduceLoginPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LoginPolicyChangedEvent
@@ -419,7 +420,7 @@ func (s *settingsRelationalProjection) reduceLoginPolicyChanged(event eventstore
 			setting.Settings.AllowUserNamePassword = *policyEvent.AllowUserNamePassword
 		}
 		if policyEvent.AllowExternalIDP != nil {
-			setting.Settings.AllowExternalSetting = *policyEvent.AllowExternalIDP
+			setting.Settings.AllowExternalIDP = *policyEvent.AllowExternalIDP
 		}
 		if policyEvent.ForceMFA != nil {
 			setting.Settings.ForceMFA = *policyEvent.ForceMFA

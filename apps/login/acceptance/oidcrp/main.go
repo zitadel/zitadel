@@ -20,7 +20,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
-
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	httphelper "github.com/zitadel/oidc/v3/pkg/http"

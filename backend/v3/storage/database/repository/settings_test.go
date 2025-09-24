@@ -1441,7 +1441,7 @@ func TestCreateGetLoginPolicySetting(t *testing.T) {
 						IsDefault:                  true,
 						AllowUserNamePassword:      true,
 						AllowRegister:              true,
-						AllowExternalSetting:       true,
+						AllowExternalIDP:           true,
 						ForceMFA:                   true,
 						ForceMFALocalOnly:          true,
 						HidePasswordReset:          true,
@@ -1451,11 +1451,11 @@ func TestCreateGetLoginPolicySetting(t *testing.T) {
 						DisableLoginWithPhone:      true,
 						PasswordlessType:           domain.PasswordlessTypeAllowed,
 						DefaultRedirectURI:         "wwww.example.com",
-						PasswordCheckLifetime:      time.Duration(time.Second * 50),
-						ExternalLoginCheckLifetime: time.Duration(time.Second * 50),
-						MFAInitSkipLifetime:        time.Duration(time.Second * 50),
-						SecondFactorCheckLifetime:  time.Duration(time.Second * 50),
-						MultiFactorCheckLifetime:   time.Duration(time.Second * 50),
+						PasswordCheckLifetime:      time.Second * 50,
+						ExternalLoginCheckLifetime: time.Second * 50,
+						MFAInitSkipLifetime:        time.Second * 50,
+						SecondFactorCheckLifetime:  time.Second * 50,
+						MultiFactorCheckLifetime:   time.Second * 50,
 					},
 				}
 
@@ -2308,8 +2308,6 @@ func TestCreateGetOrgPolicySetting(t *testing.T) {
 
 // gocognit linting fails due to number of test cases
 // and the fact that each test case has a testFunc()
-//
-//nolint:gocognit
 func TestListSetting(t *testing.T) {
 	now := time.Now()
 
