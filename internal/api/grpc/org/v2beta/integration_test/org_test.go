@@ -305,19 +305,7 @@ func TestServer_UpdateOrganization(t *testing.T) {
 
 	orgs, orgsName, _ := createOrgs(CTX, t, Client, 2)
 
-	relTableState := []struct {
-		state      string
-		featureSet *feature.SetInstanceFeaturesRequest
-	}{
-		{
-			state:      "when relational tables are enabled",
-			featureSet: &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)},
-		},
-		{
-			state:      "when relational tables are disabled",
-			featureSet: &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(false)},
-		},
-	}
+	relTableState := integration.RelationalTablesEnableMatrix()
 
 	tests := []struct {
 		name    string
@@ -359,18 +347,11 @@ func TestServer_UpdateOrganization(t *testing.T) {
 	}
 
 	for _, stateCase := range relTableState {
-		_, err := Instance.Client.FeatureV2.SetInstanceFeatures(ctx, stateCase.featureSet)
-		require.NoError(t, err)
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
-		// It is necessary to use EventuallyWithT otherwise the test cases are going to fail randomly
-		// because the flag has not been updated in the projections on time.
-		require.EventuallyWithT(t, func(collect *assert.CollectT) {
-			features, err := Instance.Client.FeatureV2.GetInstanceFeatures(ctx, &feature.GetInstanceFeaturesRequest{})
-			assert.NoError(collect, err)
-			assert.Equal(collect, stateCase.featureSet.GetEnableRelationalTables(), features.EnableRelationalTables.GetEnabled())
-		}, retryDuration, tick)
+		integration.EnsureInstanceFeature(t, CTX, Instance, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
+		})
 		for _, tt := range tests {
-			t.Run(fmt.Sprintf("%s - %s", stateCase.state, tt.name), func(t1 *testing.T) {
+			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tt.name), func(t1 *testing.T) {
 				got, err := Client.UpdateOrganization(ctx, tt.req)
 				if tt.wantErr {
 					require.Error(t1, err)
@@ -396,11 +377,13 @@ func TestServer_ListOrganizations(t *testing.T) {
 	noOfOrgs := 3
 	orgs, orgsName, orgsDomain := createOrgs(listOrgIAmOwnerCtx, t, listOrgClient, noOfOrgs)
 
-	// deactivat org[1]
+	// deactivate org[1]
 	_, err := listOrgClient.DeactivateOrganization(listOrgIAmOwnerCtx, &v2beta_org.DeactivateOrganizationRequest{
 		Id: orgs[1].Id,
 	})
 	require.NoError(t, err)
+
+	relTableState := integration.RelationalTablesEnableMatrix()
 
 	tests := []struct {
 		name  string
@@ -639,47 +622,54 @@ func TestServer_ListOrganizations(t *testing.T) {
 			},
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
-			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, err := listOrgClient.ListOrganizations(tt.ctx, &v2beta_org.ListOrganizationsRequest{
-					Filter: tt.query,
-				})
-				if tt.err != nil {
-					require.ErrorContains(ttt, err, tt.err.Error())
-					return
-				}
-				require.NoError(ttt, err)
 
-				require.Equal(ttt, uint64(len(tt.want)), got.Pagination.GetTotalResult())
+	for _, stateCase := range relTableState {
+		integration.EnsureInstanceFeature(t, CTX, Instance, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
+		})
 
-				foundOrgs := 0
-				for _, got := range got.Organizations {
-					for _, org := range tt.want {
+		for _, tt := range tests {
+			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tt.name), func(t *testing.T) {
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
+				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+					got, err := listOrgClient.ListOrganizations(tt.ctx, &v2beta_org.ListOrganizationsRequest{
+						Filter: tt.query,
+					})
+					if tt.err != nil {
+						require.ErrorContains(ttt, err, tt.err.Error())
+						return
+					}
+					require.NoError(ttt, err)
 
-						// created/chagned date
-						gotCD := got.GetCreationDate().AsTime()
-						now := time.Now()
-						assert.WithinRange(ttt, gotCD, testStartTimestamp, now.Add(time.Minute))
-						gotCD = got.GetChangedDate().AsTime()
-						assert.WithinRange(ttt, gotCD, testStartTimestamp, now.Add(time.Minute))
+					require.Equal(ttt, uint64(len(tt.want)), got.Pagination.GetTotalResult())
 
-						// default org
-						if org.Name == got.Name && got.Name == "testinstance" {
-							foundOrgs += 1
-							continue
-						}
+					foundOrgs := 0
+					for _, got := range got.Organizations {
+						for _, org := range tt.want {
 
-						if org.Name == got.Name &&
-							org.Id == got.Id {
-							foundOrgs += 1
+							// created/chagned date
+							gotCD := got.GetCreationDate().AsTime()
+							now := time.Now()
+							assert.WithinRange(ttt, gotCD, testStartTimestamp, now.Add(time.Minute))
+							gotCD = got.GetChangedDate().AsTime()
+							assert.WithinRange(ttt, gotCD, testStartTimestamp, now.Add(time.Minute))
+
+							// default org
+							if org.Name == got.Name && got.Name == "testinstance" {
+								foundOrgs += 1
+								continue
+							}
+
+							if org.Name == got.Name &&
+								org.Id == got.Id {
+								foundOrgs += 1
+							}
 						}
 					}
-				}
-				require.Equal(ttt, len(tt.want), foundOrgs)
-			}, retryDuration, tick, "timeout waiting for expected organizations being created")
-		})
+					require.Equal(ttt, len(tt.want), foundOrgs)
+				}, retryDuration, tick, "timeout waiting for expected organizations being created")
+			})
+		}
 	}
 }
 

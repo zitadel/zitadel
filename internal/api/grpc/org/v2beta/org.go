@@ -48,6 +48,10 @@ func (s *Server) UpdateOrganization(ctx context.Context, request *connect.Reques
 }
 
 func (s *Server) ListOrganizations(ctx context.Context, request *connect.Request[v2beta_org.ListOrganizationsRequest]) (*connect.Response[v2beta_org.ListOrganizationsResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return orgv2.ListOrganizationsBeta(ctx, request)
+	}
+
 	queries, err := listOrgRequestToModel(s.systemDefaults, request.Msg)
 	if err != nil {
 		return nil, err
