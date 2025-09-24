@@ -2,10 +2,11 @@ package projection
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
-	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
+	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	internal_domain "github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -35,8 +36,7 @@ type idpTemplateRelationalProjection struct {
 }
 
 func newIDPTemplateRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	client := postgres.PGxPool(config.Client.Pool)
-	idpRepo := repository.IDProviderRepository(client)
+	idpRepo := repository.IDProviderRepository()
 	return handler.NewHandler(ctx, &config, &idpTemplateRelationalProjection{
 		idpRepo: idpRepo,
 	})
@@ -554,54 +554,61 @@ func (p *idpTemplateRelationalProjection) reduceOIDCRelationalConfigChanged(even
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y2IVI", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPOIDCConfigChangedEventType, instance.IDPOIDCConfigChangedEventType})
 	}
 
-	oidc, err := p.idpRepo.GetOIDC(context.Background(), p.idpRepo.IDCondition(idpEvent.IDPConfigID), idpEvent.Agg.InstanceID, orgId)
-	if err != nil {
-		return nil, err
-	}
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInternal(nil, "HANDL-sh6Lp", "unable to cast to tx executer")
+		}
 
-	if idpEvent.ClientID != nil {
-		oidc.ClientID = *idpEvent.ClientID
-	}
-	if idpEvent.ClientSecret != nil {
-		oidc.ClientSecret = idpEvent.ClientSecret
-	}
-	if idpEvent.Issuer != nil {
-		oidc.Issuer = *idpEvent.Issuer
-	}
-	if idpEvent.AuthorizationEndpoint != nil {
-		oidc.AuthorizationEndpoint = *idpEvent.AuthorizationEndpoint
-	}
-	if idpEvent.TokenEndpoint != nil {
-		oidc.TokenEndpoint = *idpEvent.TokenEndpoint
-	}
-	if idpEvent.Scopes != nil {
-		oidc.Scopes = idpEvent.Scopes
-	}
-	if idpEvent.IDPDisplayNameMapping != nil {
-		oidc.IDPDisplayNameMapping = domain.OIDCMappingField(*idpEvent.IDPDisplayNameMapping)
-	}
-	if idpEvent.UserNameMapping != nil {
-		oidc.UserNameMapping = domain.OIDCMappingField(*idpEvent.UserNameMapping)
-	}
+		oidc, err := p.idpRepo.GetOIDC(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.IDPConfigID), idpEvent.Agg.InstanceID, orgId)
+		if err != nil {
+			return err
+		}
 
-	payloadJSON, err := json.Marshal(idpEvent)
-	if err != nil {
-		return nil, err
-	}
+		if idpEvent.ClientID != nil {
+			oidc.ClientID = *idpEvent.ClientID
+		}
+		if idpEvent.ClientSecret != nil {
+			oidc.ClientSecret = idpEvent.ClientSecret
+		}
+		if idpEvent.Issuer != nil {
+			oidc.Issuer = *idpEvent.Issuer
+		}
+		if idpEvent.AuthorizationEndpoint != nil {
+			oidc.AuthorizationEndpoint = *idpEvent.AuthorizationEndpoint
+		}
+		if idpEvent.TokenEndpoint != nil {
+			oidc.TokenEndpoint = *idpEvent.TokenEndpoint
+		}
+		if idpEvent.Scopes != nil {
+			oidc.Scopes = idpEvent.Scopes
+		}
+		if idpEvent.IDPDisplayNameMapping != nil {
+			oidc.IDPDisplayNameMapping = domain.OIDCMappingField(*idpEvent.IDPDisplayNameMapping)
+		}
+		if idpEvent.UserNameMapping != nil {
+			oidc.UserNameMapping = domain.OIDCMappingField(*idpEvent.UserNameMapping)
+		}
 
-	return handler.NewUpdateStatement(
-		&idpEvent,
-		[]handler.Column{
-			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
-			handler.NewCol(IDPTypeCol, domain.IDPTypeOIDC),
-			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
-		},
-		[]handler.Condition{
-			handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
-			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			orgCond,
-		},
-	), nil
+		payloadJSON, err := json.Marshal(idpEvent)
+		if err != nil {
+			return err
+		}
+
+		return handler.NewUpdateStatement(
+			&idpEvent,
+			[]handler.Column{
+				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+				handler.NewCol(IDPTypeCol, domain.IDPTypeOIDC),
+				handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
+			},
+			[]handler.Condition{
+				handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
+				handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				orgCond,
+			},
+		).Execute(ctx, ex, projectionName)
+	}), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceJWTRelationalConfigAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -654,42 +661,49 @@ func (p *idpTemplateRelationalProjection) reduceJWTRelationalConfigChanged(event
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y2IVI", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPJWTConfigChangedEventType, instance.IDPJWTConfigChangedEventType})
 	}
 
-	jwt, err := p.idpRepo.GetJWT(context.Background(), p.idpRepo.IDCondition(idpEvent.IDPConfigID), idpEvent.Agg.InstanceID, orgId)
-	if err != nil {
-		return nil, err
-	}
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInternal(nil, "HANDL-sh6Lp", "unable to cast to tx executer")
+		}
 
-	if idpEvent.JWTEndpoint != nil {
-		jwt.JWTEndpoint = *idpEvent.JWTEndpoint
-	}
-	if idpEvent.Issuer != nil {
-		jwt.Issuer = *idpEvent.Issuer
-	}
-	if idpEvent.KeysEndpoint != nil {
-		jwt.KeysEndpoint = *idpEvent.KeysEndpoint
-	}
-	if idpEvent.HeaderName != nil {
-		jwt.HeaderName = *idpEvent.HeaderName
-	}
+		jwt, err := p.idpRepo.GetJWT(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.IDPConfigID), idpEvent.Agg.InstanceID, orgId)
+		if err != nil {
+			return err
+		}
 
-	payloadJSON, err := json.Marshal(idpEvent)
-	if err != nil {
-		return nil, err
-	}
+		if idpEvent.JWTEndpoint != nil {
+			jwt.JWTEndpoint = *idpEvent.JWTEndpoint
+		}
+		if idpEvent.Issuer != nil {
+			jwt.Issuer = *idpEvent.Issuer
+		}
+		if idpEvent.KeysEndpoint != nil {
+			jwt.KeysEndpoint = *idpEvent.KeysEndpoint
+		}
+		if idpEvent.HeaderName != nil {
+			jwt.HeaderName = *idpEvent.HeaderName
+		}
 
-	return handler.NewUpdateStatement(
-		&idpEvent,
-		[]handler.Column{
-			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
-			handler.NewCol(IDPTypeCol, domain.IDPTypeJWT),
-			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
-		},
-		[]handler.Condition{
-			handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
-			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			orgCond,
-		},
-	), nil
+		payloadJSON, err := json.Marshal(idpEvent)
+		if err != nil {
+			return err
+		}
+
+		return handler.NewUpdateStatement(
+			&idpEvent,
+			[]handler.Column{
+				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+				handler.NewCol(IDPTypeCol, domain.IDPTypeJWT),
+				handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
+			},
+			[]handler.Condition{
+				handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
+				handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				orgCond,
+			},
+		).Execute(ctx, ex, projectionName)
+	}), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -763,34 +777,41 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalChanged(event 
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-K1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPChangedEventType, instance.OAuthIDPChangedEventType})
 	}
 
-	oauth, err := p.idpRepo.GetOAuth(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
-	if err != nil {
-		return nil, err
-	}
-
-	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
-
-	payload := &oauth.OAuth
-	payloadChanged := reduceOAuthIDPRelationalChangedColumns(payload, &idpEvent)
-	if payloadChanged {
-		payloadJSON, err := json.Marshal(payload)
-		if err != nil {
-			return nil, err
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
-	}
+		oauth, err := p.idpRepo.GetOAuth(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		if err != nil {
+			return err
+		}
 
-	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+		columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
-	return handler.NewUpdateStatement(
-		&idpEvent,
-		columns,
-		[]handler.Condition{
-			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			orgCond,
-		},
-	), nil
+		payload := &oauth.OAuth
+		payloadChanged := reduceOAuthIDPRelationalChangedColumns(payload, &idpEvent)
+		if payloadChanged {
+			payloadJSON, err := json.Marshal(payload)
+			if err != nil {
+				return err
+			}
+			columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
+		}
+
+		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+
+		return handler.NewUpdateStatement(
+			&idpEvent,
+			columns,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				orgCond,
+			},
+		).Execute(ctx, ex, projectionName)
+
+	}), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -853,34 +874,40 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalChanged(event e
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1K82ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
 	}
 
-	oidc, err := p.idpRepo.GetOIDC(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
-	if err != nil {
-		return nil, err
-	}
-
-	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
-
-	payload := &oidc.OIDC
-	payloadChanged := reduceOIDCIDPRelationalChangedColumns(payload, &idpEvent)
-	if payloadChanged {
-		payloadJSON, err := json.Marshal(payload)
-		if err != nil {
-			return nil, err
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInternal(nil, "HANDL-L8CQt", "unable to cast to tx executer")
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
-	}
+		oidc, err := p.idpRepo.GetOIDC(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		if err != nil {
+			return err
+		}
 
-	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+		columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
-	return handler.NewUpdateStatement(
-		&idpEvent,
-		columns,
-		[]handler.Condition{
-			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			orgCond,
-		},
-	), nil
+		payload := &oidc.OIDC
+		payloadChanged := reduceOIDCIDPRelationalChangedColumns(payload, &idpEvent)
+		if payloadChanged {
+			payloadJSON, err := json.Marshal(payload)
+			if err != nil {
+				return err
+			}
+			columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
+		}
+
+		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+
+		return handler.NewUpdateStatement(
+			&idpEvent,
+			columns,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				orgCond,
+			},
+		).Execute(ctx, ex, projectionName)
+	}), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedAzureAD(event eventstore.Event) (*handler.Statement, error) {
@@ -1059,34 +1086,40 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalChanged(event ev
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-H15j2il", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
 	}
 
-	jwt, err := p.idpRepo.GetJWT(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
-	if err != nil {
-		return nil, err
-	}
-
-	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
-
-	payload := &jwt.JWT
-	payloadChanged := reduceJWTIDPRelationalChangedColumns(payload, &idpEvent)
-	if payloadChanged {
-		payloadJSON, err := json.Marshal(payload)
-		if err != nil {
-			return nil, err
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
-	}
+		jwt, err := p.idpRepo.GetJWT(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		if err != nil {
+			return err
+		}
 
-	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+		columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
-	return handler.NewUpdateStatement(
-		&idpEvent,
-		columns,
-		[]handler.Condition{
-			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			orgCond,
-		},
-	), nil
+		payload := &jwt.JWT
+		payloadChanged := reduceJWTIDPRelationalChangedColumns(payload, &idpEvent)
+		if payloadChanged {
+			payloadJSON, err := json.Marshal(payload)
+			if err != nil {
+				return err
+			}
+			columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
+		}
+
+		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+
+		return handler.NewUpdateStatement(
+			&idpEvent,
+			columns,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				orgCond,
+			},
+		).Execute(ctx, ex, projectionName)
+	}), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -1162,38 +1195,45 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalChanged(even
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YZ5x25s", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPChangedEventType, instance.AzureADIDPChangedEventType})
 	}
 
-	azure, err := p.idpRepo.GetAzureAD(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
-	if err != nil {
-		return nil, err
-	}
-
-	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
-
-	payload := &azure.Azure
-	payloadChanged, err := reduceAzureADIDPRelationalChangedColumns(payload, &idpEvent)
-	if err != nil {
-		return nil, err
-	}
-
-	if payloadChanged {
-		payloadJSON, err := json.Marshal(payload)
-		if err != nil {
-			return nil, err
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
-	}
+		azure, err := p.idpRepo.GetAzureAD(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		if err != nil {
+			return err
+		}
 
-	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+		columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
-	return handler.NewUpdateStatement(
-		&idpEvent,
-		columns,
-		[]handler.Condition{
-			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			orgCond,
-		},
-	), nil
+		payload := &azure.Azure
+		payloadChanged, err := reduceAzureADIDPRelationalChangedColumns(payload, &idpEvent)
+		if err != nil {
+			return err
+		}
+
+		if payloadChanged {
+			payloadJSON, err := json.Marshal(payload)
+			if err != nil {
+				return err
+			}
+			columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
+		}
+
+		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+
+		return handler.NewUpdateStatement(
+			&idpEvent,
+			columns,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				orgCond,
+			},
+		).Execute(ctx, ex, projectionName)
+
+	}), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -1262,34 +1302,41 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalChanged(event
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-L1U89ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubIDPChangedEventType, instance.GitHubIDPChangedEventType})
 	}
 
-	github, err := p.idpRepo.GetGithub(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
-	if err != nil {
-		return nil, err
-	}
-
-	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
-
-	payload := &github.Github
-	payloadChanged := reduceGitHubIDPRelationalChangedColumns(payload, &idpEvent)
-	if payloadChanged {
-		payloadJSON, err := json.Marshal(payload)
-		if err != nil {
-			return nil, err
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
-	}
+		github, err := p.idpRepo.GetGithub(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		if err != nil {
+			return err
+		}
 
-	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+		columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
-	return handler.NewUpdateStatement(
-		&idpEvent,
-		columns,
-		[]handler.Condition{
-			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			orgCond,
-		},
-	), nil
+		payload := &github.Github
+		payloadChanged := reduceGitHubIDPRelationalChangedColumns(payload, &idpEvent)
+		if payloadChanged {
+			payloadJSON, err := json.Marshal(payload)
+			if err != nil {
+				return err
+			}
+			columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
+		}
+
+		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+
+		return handler.NewUpdateStatement(
+			&idpEvent,
+			columns,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				orgCond,
+			},
+		).Execute(ctx, ex, projectionName)
+
+	}), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -1361,34 +1408,41 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalCha
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YDg3g", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPChangedEventType, instance.GitHubEnterpriseIDPChangedEventType})
 	}
 
-	githubEnterprise, err := p.idpRepo.GetGithubEnterprise(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
-	if err != nil {
-		return nil, err
-	}
-
-	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
-
-	payload := &githubEnterprise.GithubEnterprise
-	payloadChanged := reduceGitHubEnterpriseIDPRelationalChangedColumns(payload, &idpEvent)
-	if payloadChanged {
-		payloadJSON, err := json.Marshal(payload)
-		if err != nil {
-			return nil, err
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
-	}
+		githubEnterprise, err := p.idpRepo.GetGithubEnterprise(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		if err != nil {
+			return err
+		}
 
-	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+		columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
-	return handler.NewUpdateStatement(
-		&idpEvent,
-		columns,
-		[]handler.Condition{
-			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			orgCond,
-		},
-	), nil
+		payload := &githubEnterprise.GithubEnterprise
+		payloadChanged := reduceGitHubEnterpriseIDPRelationalChangedColumns(payload, &idpEvent)
+		if payloadChanged {
+			payloadJSON, err := json.Marshal(payload)
+			if err != nil {
+				return err
+			}
+			columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
+		}
+
+		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+
+		return handler.NewUpdateStatement(
+			&idpEvent,
+			columns,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				orgCond,
+			},
+		).Execute(ctx, ex, projectionName)
+
+	}), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -1457,34 +1511,41 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalChanged(event
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-mT5827b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPChangedEventType, instance.GitLabIDPChangedEventType})
 	}
 
-	gitlab, err := p.idpRepo.GetGitlab(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
-	if err != nil {
-		return nil, err
-	}
-
-	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
-
-	payload := &gitlab.Gitlab
-	payloadChanged := reduceGitLabIDPRelationalChangedColumns(payload, &idpEvent)
-	if payloadChanged {
-		payloadJSON, err := json.Marshal(payload)
-		if err != nil {
-			return nil, err
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
-	}
+		gitlab, err := p.idpRepo.GetGitlab(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		if err != nil {
+			return err
+		}
 
-	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+		columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
-	return handler.NewUpdateStatement(
-		&idpEvent,
-		columns,
-		[]handler.Condition{
-			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			orgCond,
-		},
-	), nil
+		payload := &gitlab.Gitlab
+		payloadChanged := reduceGitLabIDPRelationalChangedColumns(payload, &idpEvent)
+		if payloadChanged {
+			payloadJSON, err := json.Marshal(payload)
+			if err != nil {
+				return err
+			}
+			columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
+		}
+
+		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+
+		return handler.NewUpdateStatement(
+			&idpEvent,
+			columns,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				orgCond,
+			},
+		).Execute(ctx, ex, projectionName)
+
+	}), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -1554,34 +1615,41 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalCha
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YAf3g2", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabSelfHostedIDPChangedEventType, instance.GitLabSelfHostedIDPChangedEventType})
 	}
 
-	gitlabSelfHosted, err := p.idpRepo.GetGitlabSelfHosting(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
-	if err != nil {
-		return nil, err
-	}
-
-	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
-
-	payload := &gitlabSelfHosted.GitlabSelfHosting
-	payloadChanged := reduceGitLabSelfHostedIDPRelationalChangedColumns(payload, &idpEvent)
-	if payloadChanged {
-		payloadJSON, err := json.Marshal(payload)
-		if err != nil {
-			return nil, err
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
-	}
+		gitlabSelfHosted, err := p.idpRepo.GetGitlabSelfHosting(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		if err != nil {
+			return err
+		}
 
-	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+		columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
-	return handler.NewUpdateStatement(
-		&idpEvent,
-		columns,
-		[]handler.Condition{
-			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			orgCond,
-		},
-	), nil
+		payload := &gitlabSelfHosted.GitlabSelfHosting
+		payloadChanged := reduceGitLabSelfHostedIDPRelationalChangedColumns(payload, &idpEvent)
+		if payloadChanged {
+			payloadJSON, err := json.Marshal(payload)
+			if err != nil {
+				return err
+			}
+			columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
+		}
+
+		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+
+		return handler.NewUpdateStatement(
+			&idpEvent,
+			columns,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				orgCond,
+			},
+		).Execute(ctx, ex, projectionName)
+
+	}), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -1650,34 +1718,41 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalChanged(event
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YN58hml", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPChangedEventType, instance.GoogleIDPChangedEventType})
 	}
 
-	google, err := p.idpRepo.GetGoogle(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
-	if err != nil {
-		return nil, err
-	}
-
-	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
-
-	payload := &google.Google
-	payloadChanged := reduceGoogleIDPRelationalChangedColumns(payload, &idpEvent)
-	if payloadChanged {
-		payloadJSON, err := json.Marshal(payload)
-		if err != nil {
-			return nil, err
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
-	}
+		google, err := p.idpRepo.GetGoogle(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		if err != nil {
+			return err
+		}
 
-	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+		columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
-	return handler.NewUpdateStatement(
-		&idpEvent,
-		columns,
-		[]handler.Condition{
-			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			orgCond,
-		},
-	), nil
+		payload := &google.Google
+		payloadChanged := reduceGoogleIDPRelationalChangedColumns(payload, &idpEvent)
+		if payloadChanged {
+			payloadJSON, err := json.Marshal(payload)
+			if err != nil {
+				return err
+			}
+			columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
+		}
+
+		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+
+		return handler.NewUpdateStatement(
+			&idpEvent,
+			columns,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				orgCond,
+			},
+		).Execute(ctx, ex, projectionName)
+
+	}), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceLDAPIDPAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -1767,34 +1842,41 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPChanged(event eventstore.
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.LDAPIDPChangedEventType, instance.LDAPIDPChangedEventType})
 	}
 
-	ldap, err := p.idpRepo.GetLDAP(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
-	if err != nil {
-		return nil, err
-	}
-
-	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
-
-	payload := &ldap.LDAP
-	payloadChanged := reduceLDAPIDPRelationalChangedColumns(payload, &idpEvent)
-	if payloadChanged {
-		payloadJSON, err := json.Marshal(payload)
-		if err != nil {
-			return nil, err
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
-	}
+		ldap, err := p.idpRepo.GetLDAP(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		if err != nil {
+			return err
+		}
 
-	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+		columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
-	return handler.NewUpdateStatement(
-		&idpEvent,
-		columns,
-		[]handler.Condition{
-			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			orgCond,
-		},
-	), nil
+		payload := &ldap.LDAP
+		payloadChanged := reduceLDAPIDPRelationalChangedColumns(payload, &idpEvent)
+		if payloadChanged {
+			payloadJSON, err := json.Marshal(payload)
+			if err != nil {
+				return err
+			}
+			columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
+		}
+
+		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+
+		return handler.NewUpdateStatement(
+			&idpEvent,
+			columns,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				orgCond,
+			},
+		).Execute(ctx, ex, projectionName)
+
+	}), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceAppleIDPAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -1865,34 +1947,41 @@ func (p *idpTemplateRelationalProjection) reduceAppleIDPChanged(event eventstore
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YBez3", "reduce.wrong.event.type %v", []eventstore.EventType{org.AppleIDPChangedEventType /*, instance.AppleIDPChangedEventType*/})
 	}
 
-	apple, err := p.idpRepo.GetApple(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
-	if err != nil {
-		return nil, err
-	}
-
-	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
-
-	payload := &apple.Apple
-	payloadChanged := reduceAppleIDPRelationalChangedColumns(payload, &idpEvent)
-	if payloadChanged {
-		payloadJSON, err := json.Marshal(payload)
-		if err != nil {
-			return nil, err
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
-	}
+		apple, err := p.idpRepo.GetApple(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		if err != nil {
+			return err
+		}
 
-	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+		columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
-	return handler.NewUpdateStatement(
-		&idpEvent,
-		columns,
-		[]handler.Condition{
-			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			orgCond,
-		},
-	), nil
+		payload := &apple.Apple
+		payloadChanged := reduceAppleIDPRelationalChangedColumns(payload, &idpEvent)
+		if payloadChanged {
+			payloadJSON, err := json.Marshal(payload)
+			if err != nil {
+				return err
+			}
+			columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
+		}
+
+		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+
+		return handler.NewUpdateStatement(
+			&idpEvent,
+			columns,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				orgCond,
+			},
+		).Execute(ctx, ex, projectionName)
+
+	}), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceSAMLIDPAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -1966,34 +2055,41 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPChanged(event eventstore.
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y7c0fii4ad", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPChangedEventType, instance.SAMLIDPChangedEventType})
 	}
 
-	saml, err := p.idpRepo.GetSAML(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
-	if err != nil {
-		return nil, err
-	}
-
-	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
-
-	payload := &saml.SAML
-	payloadChanged := reduceSAMLIDPRelationalChangedColumns(payload, &idpEvent)
-	if payloadChanged {
-		payloadJSON, err := json.Marshal(payload)
-		if err != nil {
-			return nil, err
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
-	}
+		saml, err := p.idpRepo.GetSAML(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		if err != nil {
+			return err
+		}
 
-	columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+		columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
-	return handler.NewUpdateStatement(
-		&idpEvent,
-		columns,
-		[]handler.Condition{
-			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			orgCond,
-		},
-	), nil
+		payload := &saml.SAML
+		payloadChanged := reduceSAMLIDPRelationalChangedColumns(payload, &idpEvent)
+		if payloadChanged {
+			payloadJSON, err := json.Marshal(payload)
+			if err != nil {
+				return err
+			}
+			columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
+		}
+
+		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+
+		return handler.NewUpdateStatement(
+			&idpEvent,
+			columns,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				orgCond,
+			},
+		).Execute(ctx, ex, projectionName)
+
+	}), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceIDPRemoved(event eventstore.Event) (*handler.Statement, error) {

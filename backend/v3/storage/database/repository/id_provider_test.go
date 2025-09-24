@@ -1,7 +1,6 @@
 package repository_test
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -18,6 +17,16 @@ import (
 var stylingType int16 = 1
 
 func TestCreateIDProvider(t *testing.T) {
+	beforeCreate := time.Now()
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err := tx.Rollback(t.Context())
+		if err != nil {
+			t.Errorf("error rolling back transaction: %v", err)
+		}
+	}()
+
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
@@ -29,8 +38,8 @@ func TestCreateIDProvider(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err := instanceRepo.Create(t.Context(), &instance)
+	instanceRepo := repository.InstanceRepository()
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -41,13 +50,13 @@ func TestCreateIDProvider(t *testing.T) {
 		InstanceID: instanceId,
 		State:      domain.OrgStateActive,
 	}
-	organizationRepo := repository.OrganizationRepository(pool)
-	err = organizationRepo.Create(t.Context(), &org)
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
 	type test struct {
 		name     string
-		testFunc func(ctx context.Context, t *testing.T) *domain.IdentityProvider
+		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider
 		idp      domain.IdentityProvider
 		err      error
 	}
@@ -91,8 +100,8 @@ func TestCreateIDProvider(t *testing.T) {
 		},
 		{
 			name: "adding idp with same id twice",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
-				idpRepo := repository.IDProviderRepository(pool)
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
+				idpRepo := repository.IDProviderRepository()
 
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
@@ -109,7 +118,7 @@ func TestCreateIDProvider(t *testing.T) {
 					Payload:           []byte("{}"),
 				}
 
-				err := idpRepo.Create(ctx, &idp)
+				err := idpRepo.Create(t.Context(), tx, &idp)
 				require.NoError(t, err)
 				// change the name to make sure same only the id clashes
 				org.Name = gofakeit.Name()
@@ -119,8 +128,8 @@ func TestCreateIDProvider(t *testing.T) {
 		},
 		{
 			name: "adding idp with same name twice",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
-				idpRepo := repository.IDProviderRepository(pool)
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
+				idpRepo := repository.IDProviderRepository()
 
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
@@ -137,7 +146,7 @@ func TestCreateIDProvider(t *testing.T) {
 					Payload:           []byte("{}"),
 				}
 
-				err := idpRepo.Create(ctx, &idp)
+				err := idpRepo.Create(t.Context(), tx, &idp)
 				require.NoError(t, err)
 				// change the id to make sure same name causes an error
 				idp.ID = gofakeit.Name()
@@ -150,7 +159,7 @@ func TestCreateIDProvider(t *testing.T) {
 			name := gofakeit.Name()
 			return test{
 				name: "adding idp with same name, id, different instance",
-				testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
 					// create instance
 					newInstId := gofakeit.Name()
 					instance := domain.Instance{
@@ -162,8 +171,8 @@ func TestCreateIDProvider(t *testing.T) {
 						ConsoleAppID:    "consoleApp",
 						DefaultLanguage: "defaultLanguage",
 					}
-					instanceRepo := repository.InstanceRepository(pool)
-					err := instanceRepo.Create(ctx, &instance)
+					instanceRepo := repository.InstanceRepository()
+					err := instanceRepo.Create(t.Context(), tx, &instance)
 					assert.Nil(t, err)
 
 					// create org
@@ -174,11 +183,11 @@ func TestCreateIDProvider(t *testing.T) {
 						InstanceID: newInstId,
 						State:      domain.OrgStateActive,
 					}
-					organizationRepo := repository.OrganizationRepository(pool)
-					err = organizationRepo.Create(ctx, &org)
+					organizationRepo := repository.OrganizationRepository()
+					err = organizationRepo.Create(t.Context(), tx, &org)
 					require.NoError(t, err)
 
-					idpRepo := repository.IDProviderRepository(pool)
+					idpRepo := repository.IDProviderRepository()
 					idp := domain.IdentityProvider{
 						InstanceID:        newInstId,
 						OrgID:             &newOrgId,
@@ -194,7 +203,7 @@ func TestCreateIDProvider(t *testing.T) {
 						Payload:           []byte("{}"),
 					}
 
-					err = idpRepo.Create(ctx, &idp)
+					err = idpRepo.Create(t.Context(), tx, &idp)
 					require.NoError(t, err)
 
 					// change the instanceID to a different instance
@@ -311,19 +320,26 @@ func TestCreateIDProvider(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := context.Background()
+			tx, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err := tx.Rollback(t.Context())
+				if err != nil {
+					t.Errorf("error rolling back savepoint: %v", err)
+				}
+			}()
 
 			var idp *domain.IdentityProvider
 			if tt.testFunc != nil {
-				idp = tt.testFunc(ctx, t)
+				idp = tt.testFunc(t, tx)
 			} else {
 				idp = &tt.idp
 			}
-			idpRepo := repository.IDProviderRepository(pool)
+			idpRepo := repository.IDProviderRepository()
 
 			// create idp
-			beforeCreate := time.Now()
-			err = idpRepo.Create(ctx, idp)
+
+			err = idpRepo.Create(t.Context(), tx, idp)
 			assert.ErrorIs(t, err, tt.err)
 			if err != nil {
 				return
@@ -331,7 +347,7 @@ func TestCreateIDProvider(t *testing.T) {
 			afterCreate := time.Now()
 
 			// check organization values
-			idp, err = idpRepo.Get(ctx,
+			idp, err = idpRepo.Get(t.Context(), tx,
 				idpRepo.IDCondition(idp.ID),
 				idp.InstanceID,
 				idp.OrgID,
@@ -357,6 +373,16 @@ func TestCreateIDProvider(t *testing.T) {
 }
 
 func TestUpdateIDProvider(t *testing.T) {
+	beforeUpdate := time.Now()
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err := tx.Rollback(t.Context())
+		if err != nil {
+			t.Errorf("error rolling back transaction: %v", err)
+		}
+	}()
+
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
@@ -368,8 +394,8 @@ func TestUpdateIDProvider(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err := instanceRepo.Create(t.Context(), &instance)
+	instanceRepo := repository.InstanceRepository()
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -380,21 +406,21 @@ func TestUpdateIDProvider(t *testing.T) {
 		InstanceID: instanceId,
 		State:      domain.OrgStateActive,
 	}
-	organizationRepo := repository.OrganizationRepository(pool)
-	err = organizationRepo.Create(t.Context(), &org)
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
-	idpRepo := repository.IDProviderRepository(pool)
+	idpRepo := repository.IDProviderRepository()
 
 	tests := []struct {
 		name         string
-		testFunc     func(ctx context.Context, t *testing.T) *domain.IdentityProvider
+		testFunc     func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider
 		update       []database.Change
 		rowsAffected int64
 	}{
 		{
 			name: "happy path update name",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
 					OrgID:             &orgId,
@@ -410,7 +436,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					Payload:           []byte("{}"),
 				}
 
-				err := idpRepo.Create(ctx, &idp)
+				err := idpRepo.Create(t.Context(), tx, &idp)
 				require.NoError(t, err)
 				idp.Name = "new_name"
 				return &idp
@@ -420,7 +446,7 @@ func TestUpdateIDProvider(t *testing.T) {
 		},
 		{
 			name: "happy path update state",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
 					OrgID:             &orgId,
@@ -436,7 +462,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					Payload:           []byte("{}"),
 				}
 
-				err := idpRepo.Create(ctx, &idp)
+				err := idpRepo.Create(t.Context(), tx, &idp)
 				require.NoError(t, err)
 				idp.State = domain.IDPStateInactive
 				return &idp
@@ -446,7 +472,7 @@ func TestUpdateIDProvider(t *testing.T) {
 		},
 		{
 			name: "happy path update AllowCreation",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
 					OrgID:             &orgId,
@@ -462,7 +488,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					Payload:           []byte("{}"),
 				}
 
-				err := idpRepo.Create(ctx, &idp)
+				err := idpRepo.Create(t.Context(), tx, &idp)
 				require.NoError(t, err)
 				idp.AllowCreation = false
 				return &idp
@@ -472,7 +498,7 @@ func TestUpdateIDProvider(t *testing.T) {
 		},
 		{
 			name: "happy path update AllowAutoCreation",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
 					OrgID:             &orgId,
@@ -488,7 +514,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					Payload:           []byte("{}"),
 				}
 
-				err := idpRepo.Create(ctx, &idp)
+				err := idpRepo.Create(t.Context(), tx, &idp)
 				require.NoError(t, err)
 				idp.AllowAutoCreation = false
 				return &idp
@@ -498,7 +524,7 @@ func TestUpdateIDProvider(t *testing.T) {
 		},
 		{
 			name: "happy path update AllowLinking",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
 					OrgID:             &orgId,
@@ -514,7 +540,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					Payload:           []byte("{}"),
 				}
 
-				err := idpRepo.Create(ctx, &idp)
+				err := idpRepo.Create(t.Context(), tx, &idp)
 				require.NoError(t, err)
 				idp.AllowLinking = false
 				return &idp
@@ -524,7 +550,7 @@ func TestUpdateIDProvider(t *testing.T) {
 		},
 		{
 			name: "happy path update StylingType",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
 					OrgID:             &orgId,
@@ -540,7 +566,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					Payload:           []byte("{}"),
 				}
 
-				err := idpRepo.Create(ctx, &idp)
+				err := idpRepo.Create(t.Context(), tx, &idp)
 				require.NoError(t, err)
 				newStyleType := int16(2)
 				idp.StylingType = &newStyleType
@@ -551,7 +577,7 @@ func TestUpdateIDProvider(t *testing.T) {
 		},
 		{
 			name: "happy path update Payload",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
 					OrgID:             &orgId,
@@ -567,7 +593,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					Payload:           []byte("{}"),
 				}
 
-				err := idpRepo.Create(ctx, &idp)
+				err := idpRepo.Create(t.Context(), tx, &idp)
 				require.NoError(t, err)
 				idp.Payload = []byte(`{"json": {}}`)
 				return &idp
@@ -579,15 +605,21 @@ func TestUpdateIDProvider(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := t.Context()
-			// organizationRepo := repository.OrganizationRepository(pool)
-			idpRepo := repository.IDProviderRepository(pool)
+			tx, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err := tx.Rollback(t.Context())
+				if err != nil {
+					t.Errorf("error rolling back savepoint: %v", err)
+				}
+			}()
+			// organizationRepo := repository.OrganizationRepository()
+			idpRepo := repository.IDProviderRepository()
 
-			createdIDP := tt.testFunc(ctx, t)
+			createdIDP := tt.testFunc(t, tx)
 
 			// update idp
-			beforeUpdate := time.Now()
-			rowsAffected, err := idpRepo.Update(ctx,
+			rowsAffected, err := idpRepo.Update(t.Context(), tx,
 				idpRepo.IDCondition(createdIDP.ID),
 				createdIDP.InstanceID,
 				createdIDP.OrgID,
@@ -603,7 +635,7 @@ func TestUpdateIDProvider(t *testing.T) {
 			}
 
 			// check idp values
-			idp, err := idpRepo.Get(ctx,
+			idp, err := idpRepo.Get(t.Context(), tx,
 				idpRepo.IDCondition(createdIDP.ID),
 				createdIDP.InstanceID,
 				createdIDP.OrgID,
@@ -628,6 +660,15 @@ func TestUpdateIDProvider(t *testing.T) {
 }
 
 func TestGetIDProvider(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err := tx.Rollback(t.Context())
+		if err != nil {
+			t.Errorf("error rolling back transaction: %v", err)
+		}
+	}()
+
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
@@ -639,8 +680,8 @@ func TestGetIDProvider(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err := instanceRepo.Create(t.Context(), &instance)
+	instanceRepo := repository.InstanceRepository()
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -651,8 +692,8 @@ func TestGetIDProvider(t *testing.T) {
 		InstanceID: instanceId,
 		State:      domain.OrgStateActive,
 	}
-	organizationRepo := repository.OrganizationRepository(pool)
-	err = organizationRepo.Create(t.Context(), &org)
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
 	// create organization
@@ -664,14 +705,14 @@ func TestGetIDProvider(t *testing.T) {
 		InstanceID: instanceId,
 		State:      domain.OrgStateActive,
 	}
-	err = organizationRepo.Create(t.Context(), &preexistingOrg)
+	err = organizationRepo.Create(t.Context(), tx, &preexistingOrg)
 	require.NoError(t, err)
 
-	idpRepo := repository.IDProviderRepository(pool)
+	idpRepo := repository.IDProviderRepository()
 	type test struct {
 		name                   string
-		testFunc               func(ctx context.Context, t *testing.T) *domain.IdentityProvider
-		idpIdentifierCondition domain.OrgIdentifierCondition
+		testFunc               func(t *testing.T) *domain.IdentityProvider
+		idpIdentifierCondition database.Condition
 		err                    error
 	}
 
@@ -680,7 +721,7 @@ func TestGetIDProvider(t *testing.T) {
 			id := gofakeit.Name()
 			return test{
 				name: "happy path get using id",
-				testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
+				testFunc: func(t *testing.T) *domain.IdentityProvider {
 					idp := domain.IdentityProvider{
 						InstanceID:        instanceId,
 						OrgID:             &orgId,
@@ -696,7 +737,7 @@ func TestGetIDProvider(t *testing.T) {
 						Payload:           []byte("{}"),
 					}
 
-					err := idpRepo.Create(ctx, &idp)
+					err := idpRepo.Create(t.Context(), tx, &idp)
 					require.NoError(t, err)
 					return &idp
 				},
@@ -707,7 +748,7 @@ func TestGetIDProvider(t *testing.T) {
 			name := gofakeit.Name()
 			return test{
 				name: "happy path get using name",
-				testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
+				testFunc: func(t *testing.T) *domain.IdentityProvider {
 					idp := domain.IdentityProvider{
 						InstanceID:        instanceId,
 						OrgID:             &orgId,
@@ -723,7 +764,7 @@ func TestGetIDProvider(t *testing.T) {
 						Payload:           []byte("{}"),
 					}
 
-					err := idpRepo.Create(ctx, &idp)
+					err := idpRepo.Create(t.Context(), tx, &idp)
 					require.NoError(t, err)
 					return &idp
 				},
@@ -732,7 +773,7 @@ func TestGetIDProvider(t *testing.T) {
 		}(),
 		{
 			name: "happy path using styling type",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
+			testFunc: func(t *testing.T) *domain.IdentityProvider {
 				stylingType := 2
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
@@ -749,7 +790,7 @@ func TestGetIDProvider(t *testing.T) {
 					Payload:           []byte("{}"),
 				}
 
-				err := idpRepo.Create(ctx, &idp)
+				err := idpRepo.Create(t.Context(), tx, &idp)
 				require.NoError(t, err)
 				return &idp
 			},
@@ -757,7 +798,7 @@ func TestGetIDProvider(t *testing.T) {
 		},
 		{
 			name: "get using non existent id",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
+			testFunc: func(t *testing.T) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
 					OrgID:             &orgId,
@@ -773,7 +814,7 @@ func TestGetIDProvider(t *testing.T) {
 					Payload:           []byte("{}"),
 				}
 
-				err := idpRepo.Create(ctx, &idp)
+				err := idpRepo.Create(t.Context(), tx, &idp)
 				require.NoError(t, err)
 				return &idp
 			},
@@ -782,7 +823,7 @@ func TestGetIDProvider(t *testing.T) {
 		},
 		{
 			name: "get using non existent name",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
+			testFunc: func(t *testing.T) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
 					OrgID:             &orgId,
@@ -798,7 +839,7 @@ func TestGetIDProvider(t *testing.T) {
 					Payload:           []byte("{}"),
 				}
 
-				err := idpRepo.Create(ctx, &idp)
+				err := idpRepo.Create(t.Context(), tx, &idp)
 				require.NoError(t, err)
 				return &idp
 			},
@@ -809,7 +850,7 @@ func TestGetIDProvider(t *testing.T) {
 			id := gofakeit.Name()
 			return test{
 				name: "non existent orgID",
-				testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
+				testFunc: func(t *testing.T) *domain.IdentityProvider {
 					idp := domain.IdentityProvider{
 						InstanceID:        instanceId,
 						OrgID:             &orgId,
@@ -825,7 +866,7 @@ func TestGetIDProvider(t *testing.T) {
 						Payload:           []byte("{}"),
 					}
 
-					err := idpRepo.Create(ctx, &idp)
+					err := idpRepo.Create(t.Context(), tx, &idp)
 					require.NoError(t, err)
 					idp.OrgID = gu.Ptr("non-existent-orgID")
 					return &idp
@@ -838,7 +879,7 @@ func TestGetIDProvider(t *testing.T) {
 			name := gofakeit.Name()
 			return test{
 				name: "non existent instanceID",
-				testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
+				testFunc: func(t *testing.T) *domain.IdentityProvider {
 					idp := domain.IdentityProvider{
 						InstanceID:        instanceId,
 						OrgID:             &orgId,
@@ -854,7 +895,7 @@ func TestGetIDProvider(t *testing.T) {
 						Payload:           []byte("{}"),
 					}
 
-					err := idpRepo.Create(ctx, &idp)
+					err := idpRepo.Create(t.Context(), tx, &idp)
 					require.NoError(t, err)
 					idp.InstanceID = "non-existent-instanceID"
 					return &idp
@@ -866,15 +907,14 @@ func TestGetIDProvider(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := t.Context()
 
 			var idp *domain.IdentityProvider
 			if tt.testFunc != nil {
-				idp = tt.testFunc(ctx, t)
+				idp = tt.testFunc(t)
 			}
 
 			// get idp
-			returnedIDP, err := idpRepo.Get(ctx,
+			returnedIDP, err := idpRepo.Get(t.Context(), tx,
 				tt.idpIdentifierCondition,
 				idp.InstanceID,
 				idp.OrgID,
@@ -905,9 +945,14 @@ func TestGetIDProvider(t *testing.T) {
 //
 //nolint:gocognit
 func TestListIDProvider(t *testing.T) {
-	ctx := t.Context()
-	pool, err := pool.Begin(t.Context(), nil)
+	tx, err := pool.Begin(t.Context(), nil)
 	require.NoError(t, err)
+	defer func() {
+		err := tx.Rollback(t.Context())
+		if err != nil {
+			t.Errorf("error rolling back transaction: %v", err)
+		}
+	}()
 
 	// create instance
 	instanceId := gofakeit.Name()
@@ -920,8 +965,8 @@ func TestListIDProvider(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err = instanceRepo.Create(ctx, &instance)
+	instanceRepo := repository.InstanceRepository()
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -932,22 +977,22 @@ func TestListIDProvider(t *testing.T) {
 		InstanceID: instanceId,
 		State:      domain.OrgStateActive,
 	}
-	organizationRepo := repository.OrganizationRepository(pool)
-	err = organizationRepo.Create(t.Context(), &org)
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
-	idpRepo := repository.IDProviderRepository(pool)
+	idpRepo := repository.IDProviderRepository()
 
 	type test struct {
 		name             string
-		testFunc         func(ctx context.Context, t *testing.T) []*domain.IdentityProvider
+		testFunc         func(t *testing.T) []*domain.IdentityProvider
 		conditionClauses []database.Condition
 		noIDPsReturned   bool
 	}
 	tests := []test{
 		{
 			name: "multiple idps filter on instance",
-			testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+			testFunc: func(t *testing.T) []*domain.IdentityProvider {
 				// create instance
 				newInstanceId := gofakeit.Name()
 				instance := domain.Instance{
@@ -959,7 +1004,7 @@ func TestListIDProvider(t *testing.T) {
 					ConsoleAppID:    "consoleApp",
 					DefaultLanguage: "defaultLanguage",
 				}
-				err = instanceRepo.Create(ctx, &instance)
+				err = instanceRepo.Create(t.Context(), tx, &instance)
 				require.NoError(t, err)
 
 				// create org
@@ -970,8 +1015,8 @@ func TestListIDProvider(t *testing.T) {
 					InstanceID: newInstanceId,
 					State:      domain.OrgStateActive,
 				}
-				organizationRepo := repository.OrganizationRepository(pool)
-				err = organizationRepo.Create(ctx, &org)
+				organizationRepo := repository.OrganizationRepository()
+				err = organizationRepo.Create(t.Context(), tx, &org)
 				require.NoError(t, err)
 
 				// create idp
@@ -991,7 +1036,7 @@ func TestListIDProvider(t *testing.T) {
 					StylingType:       &stylingType,
 					Payload:           []byte("{}"),
 				}
-				err := idpRepo.Create(ctx, &idp)
+				err := idpRepo.Create(t.Context(), tx, &idp)
 				require.NoError(t, err)
 
 				noOfIDPs := 5
@@ -1013,7 +1058,7 @@ func TestListIDProvider(t *testing.T) {
 						Payload:           []byte("{}"),
 					}
 
-					err := idpRepo.Create(ctx, &idp)
+					err := idpRepo.Create(t.Context(), tx, &idp)
 					require.NoError(t, err)
 
 					idps[i] = &idp
@@ -1025,7 +1070,7 @@ func TestListIDProvider(t *testing.T) {
 		},
 		{
 			name: "multiple idps filter on org",
-			testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+			testFunc: func(t *testing.T) []*domain.IdentityProvider {
 				// create org
 				newOrgId := gofakeit.Name()
 				org := domain.Organization{
@@ -1034,8 +1079,8 @@ func TestListIDProvider(t *testing.T) {
 					InstanceID: instanceId,
 					State:      domain.OrgStateActive,
 				}
-				organizationRepo := repository.OrganizationRepository(pool)
-				err = organizationRepo.Create(ctx, &org)
+				organizationRepo := repository.OrganizationRepository()
+				err = organizationRepo.Create(t.Context(), tx, &org)
 				require.NoError(t, err)
 
 				// create idp
@@ -1055,7 +1100,7 @@ func TestListIDProvider(t *testing.T) {
 					StylingType:       &stylingType,
 					Payload:           []byte("{}"),
 				}
-				err := idpRepo.Create(ctx, &idp)
+				err := idpRepo.Create(t.Context(), tx, &idp)
 				require.NoError(t, err)
 
 				noOfIDPs := 5
@@ -1077,7 +1122,7 @@ func TestListIDProvider(t *testing.T) {
 						Payload:           []byte("{}"),
 					}
 
-					err := idpRepo.Create(ctx, &idp)
+					err := idpRepo.Create(t.Context(), tx, &idp)
 					require.NoError(t, err)
 
 					idps[i] = &idp
@@ -1089,7 +1134,7 @@ func TestListIDProvider(t *testing.T) {
 		},
 		{
 			name: "happy path single idp no filter",
-			testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+			testFunc: func(t *testing.T) []*domain.IdentityProvider {
 				noOfIDPs := 1
 				idps := make([]*domain.IdentityProvider, noOfIDPs)
 				for i := range noOfIDPs {
@@ -1109,7 +1154,7 @@ func TestListIDProvider(t *testing.T) {
 						Payload:           []byte("{}"),
 					}
 
-					err := idpRepo.Create(ctx, &idp)
+					err := idpRepo.Create(t.Context(), tx, &idp)
 					require.NoError(t, err)
 
 					idps[i] = &idp
@@ -1120,7 +1165,7 @@ func TestListIDProvider(t *testing.T) {
 		},
 		{
 			name: "happy path multiple idps no filter",
-			testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+			testFunc: func(t *testing.T) []*domain.IdentityProvider {
 				noOfIDPs := 5
 				idps := make([]*domain.IdentityProvider, noOfIDPs)
 				for i := range noOfIDPs {
@@ -1140,7 +1185,7 @@ func TestListIDProvider(t *testing.T) {
 						Payload:           []byte("{}"),
 					}
 
-					err := idpRepo.Create(ctx, &idp)
+					err := idpRepo.Create(t.Context(), tx, &idp)
 					require.NoError(t, err)
 
 					idps[i] = &idp
@@ -1153,7 +1198,7 @@ func TestListIDProvider(t *testing.T) {
 			id := gofakeit.Name()
 			return test{
 				name: "idp filter on id",
-				testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+				testFunc: func(t *testing.T) []*domain.IdentityProvider {
 					// create idp
 					// this idp is created as an additional idp which should NOT
 					// be returned in the results of this test case
@@ -1171,7 +1216,7 @@ func TestListIDProvider(t *testing.T) {
 						StylingType:       &stylingType,
 						Payload:           []byte("{}"),
 					}
-					err := idpRepo.Create(ctx, &idp)
+					err := idpRepo.Create(t.Context(), tx, &idp)
 					require.NoError(t, err)
 
 					noOfIDPs := 1
@@ -1193,7 +1238,7 @@ func TestListIDProvider(t *testing.T) {
 							Payload:           []byte("{}"),
 						}
 
-						err := idpRepo.Create(ctx, &idp)
+						err := idpRepo.Create(t.Context(), tx, &idp)
 						require.NoError(t, err)
 
 						idps[i] = &idp
@@ -1206,7 +1251,7 @@ func TestListIDProvider(t *testing.T) {
 		}(),
 		{
 			name: "multiple idps filter on state",
-			testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+			testFunc: func(t *testing.T) []*domain.IdentityProvider {
 				// create idp
 				// this idp is created as an additional idp which should NOT
 				// be returned in the results of this test case
@@ -1225,7 +1270,7 @@ func TestListIDProvider(t *testing.T) {
 					StylingType:       &stylingType,
 					Payload:           []byte("{}"),
 				}
-				err := idpRepo.Create(ctx, &idp)
+				err := idpRepo.Create(t.Context(), tx, &idp)
 				require.NoError(t, err)
 
 				noOfIDPs := 5
@@ -1248,7 +1293,7 @@ func TestListIDProvider(t *testing.T) {
 						Payload:           []byte("{}"),
 					}
 
-					err := idpRepo.Create(ctx, &idp)
+					err := idpRepo.Create(t.Context(), tx, &idp)
 					require.NoError(t, err)
 
 					idps[i] = &idp
@@ -1262,7 +1307,7 @@ func TestListIDProvider(t *testing.T) {
 			name := gofakeit.Name()
 			return test{
 				name: "multiple idps filter on name",
-				testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+				testFunc: func(t *testing.T) []*domain.IdentityProvider {
 					// create idp
 					// this idp is created as an additional idp which should NOT
 					// be returned in the results of this test case
@@ -1280,7 +1325,7 @@ func TestListIDProvider(t *testing.T) {
 						StylingType:       &stylingType,
 						Payload:           []byte("{}"),
 					}
-					err := idpRepo.Create(ctx, &idp)
+					err := idpRepo.Create(t.Context(), tx, &idp)
 					require.NoError(t, err)
 
 					noOfIDPs := 1
@@ -1302,7 +1347,7 @@ func TestListIDProvider(t *testing.T) {
 							Payload:           []byte("{}"),
 						}
 
-						err := idpRepo.Create(ctx, &idp)
+						err := idpRepo.Create(t.Context(), tx, &idp)
 						require.NoError(t, err)
 
 						idps[i] = &idp
@@ -1315,7 +1360,7 @@ func TestListIDProvider(t *testing.T) {
 		}(),
 		{
 			name: "multiple idps filter on type",
-			testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+			testFunc: func(t *testing.T) []*domain.IdentityProvider {
 				// create idp
 				// this idp is created as an additional idp which should NOT
 				// be returned in the results of this test case
@@ -1333,7 +1378,7 @@ func TestListIDProvider(t *testing.T) {
 					StylingType:       &stylingType,
 					Payload:           []byte("{}"),
 				}
-				err := idpRepo.Create(ctx, &idp)
+				err := idpRepo.Create(t.Context(), tx, &idp)
 				require.NoError(t, err)
 
 				noOfIDPs := 5
@@ -1356,7 +1401,7 @@ func TestListIDProvider(t *testing.T) {
 						Payload:           []byte("{}"),
 					}
 
-					err := idpRepo.Create(ctx, &idp)
+					err := idpRepo.Create(t.Context(), tx, &idp)
 					require.NoError(t, err)
 
 					idps[i] = &idp
@@ -1368,7 +1413,7 @@ func TestListIDProvider(t *testing.T) {
 		},
 		{
 			name: "multiple idps filter on AllowCreation",
-			testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+			testFunc: func(t *testing.T) []*domain.IdentityProvider {
 				// create idp
 				// this idp is created as an additional idp which should NOT
 				// be returned in the results of this test case
@@ -1386,7 +1431,7 @@ func TestListIDProvider(t *testing.T) {
 					StylingType:       &stylingType,
 					Payload:           []byte("{}"),
 				}
-				err := idpRepo.Create(ctx, &idp)
+				err := idpRepo.Create(t.Context(), tx, &idp)
 				require.NoError(t, err)
 
 				noOfIDPs := 5
@@ -1409,7 +1454,7 @@ func TestListIDProvider(t *testing.T) {
 						Payload:           []byte("{}"),
 					}
 
-					err := idpRepo.Create(ctx, &idp)
+					err := idpRepo.Create(t.Context(), tx, &idp)
 					require.NoError(t, err)
 
 					idps[i] = &idp
@@ -1421,7 +1466,7 @@ func TestListIDProvider(t *testing.T) {
 		},
 		{
 			name: "multiple idps filter on AllowAutoCreation",
-			testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+			testFunc: func(t *testing.T) []*domain.IdentityProvider {
 				// create idp
 				// this idp is created as an additional idp which should NOT
 				// be returned in the results of this test case
@@ -1439,7 +1484,7 @@ func TestListIDProvider(t *testing.T) {
 					StylingType:       &stylingType,
 					Payload:           []byte("{}"),
 				}
-				err := idpRepo.Create(ctx, &idp)
+				err := idpRepo.Create(t.Context(), tx, &idp)
 				require.NoError(t, err)
 
 				noOfIDPs := 5
@@ -1462,7 +1507,7 @@ func TestListIDProvider(t *testing.T) {
 						Payload:           []byte("{}"),
 					}
 
-					err := idpRepo.Create(ctx, &idp)
+					err := idpRepo.Create(t.Context(), tx, &idp)
 					require.NoError(t, err)
 
 					idps[i] = &idp
@@ -1474,7 +1519,7 @@ func TestListIDProvider(t *testing.T) {
 		},
 		{
 			name: "multiple idps filter on AllowAutoUpdate",
-			testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+			testFunc: func(t *testing.T) []*domain.IdentityProvider {
 				// create idp
 				// this idp is created as an additional idp which should NOT
 				// be returned in the results of this test case
@@ -1493,7 +1538,7 @@ func TestListIDProvider(t *testing.T) {
 					StylingType:       &stylingType,
 					Payload:           []byte("{}"),
 				}
-				err := idpRepo.Create(ctx, &idp)
+				err := idpRepo.Create(t.Context(), tx, &idp)
 				require.NoError(t, err)
 
 				noOfIDPs := 5
@@ -1516,7 +1561,7 @@ func TestListIDProvider(t *testing.T) {
 						Payload:         []byte("{}"),
 					}
 
-					err := idpRepo.Create(ctx, &idp)
+					err := idpRepo.Create(t.Context(), tx, &idp)
 					require.NoError(t, err)
 
 					idps[i] = &idp
@@ -1528,7 +1573,7 @@ func TestListIDProvider(t *testing.T) {
 		},
 		{
 			name: "multiple idps filter on AllowLinking",
-			testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+			testFunc: func(t *testing.T) []*domain.IdentityProvider {
 				// create idp
 				// this idp is created as an additional idp which should NOT
 				// be returned in the results of this test case
@@ -1547,7 +1592,7 @@ func TestListIDProvider(t *testing.T) {
 					StylingType:       &stylingType,
 					Payload:           []byte("{}"),
 				}
-				err := idpRepo.Create(ctx, &idp)
+				err := idpRepo.Create(t.Context(), tx, &idp)
 				require.NoError(t, err)
 
 				noOfIDPs := 5
@@ -1570,7 +1615,7 @@ func TestListIDProvider(t *testing.T) {
 						Payload:      []byte("{}"),
 					}
 
-					err := idpRepo.Create(ctx, &idp)
+					err := idpRepo.Create(t.Context(), tx, &idp)
 					require.NoError(t, err)
 
 					idps[i] = &idp
@@ -1582,7 +1627,7 @@ func TestListIDProvider(t *testing.T) {
 		},
 		{
 			name: "multiple idps filter on StylingType",
-			testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+			testFunc: func(t *testing.T) []*domain.IdentityProvider {
 				// create idp
 				// this idp is created as an additional idp which should NOT
 				// be returned in the results of this test case
@@ -1600,7 +1645,7 @@ func TestListIDProvider(t *testing.T) {
 					StylingType:       &stylingType,
 					Payload:           []byte("{}"),
 				}
-				err := idpRepo.Create(ctx, &idp)
+				err := idpRepo.Create(t.Context(), tx, &idp)
 				require.NoError(t, err)
 
 				var sytlingType int16 = 4
@@ -1624,7 +1669,7 @@ func TestListIDProvider(t *testing.T) {
 						Payload:     []byte("{}"),
 					}
 
-					err := idpRepo.Create(ctx, &idp)
+					err := idpRepo.Create(t.Context(), tx, &idp)
 					require.NoError(t, err)
 
 					idps[i] = &idp
@@ -1638,7 +1683,7 @@ func TestListIDProvider(t *testing.T) {
 			payload := []byte(`{"json": {}}`)
 			return test{
 				name: "multiple idps filter on Payload",
-				testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+				testFunc: func(t *testing.T) []*domain.IdentityProvider {
 					// create idp
 					// this idp is created as an additional idp which should NOT
 					// be returned in the results of this test case
@@ -1656,7 +1701,7 @@ func TestListIDProvider(t *testing.T) {
 						StylingType:       &stylingType,
 						Payload:           []byte("{}"),
 					}
-					err := idpRepo.Create(ctx, &idp)
+					err := idpRepo.Create(t.Context(), tx, &idp)
 					require.NoError(t, err)
 
 					noOfIDPs := 1
@@ -1678,7 +1723,7 @@ func TestListIDProvider(t *testing.T) {
 							Payload:           payload,
 						}
 
-						err := idpRepo.Create(ctx, &idp)
+						err := idpRepo.Create(t.Context(), tx, &idp)
 						require.NoError(t, err)
 
 						idps[i] = &idp
@@ -1692,17 +1737,15 @@ func TestListIDProvider(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := context.WithoutCancel(t.Context())
-
-			t.Cleanup(func() {
-				_, err := pool.Exec(ctx, "DELETE FROM zitadel.identity_providers")
+			defer func() {
+				_, err := tx.Exec(t.Context(), "DELETE FROM zitadel.identity_providers")
 				require.NoError(t, err)
-			})
+			}()
 
-			idps := tt.testFunc(ctx, t)
+			idps := tt.testFunc(t)
 
 			// check idp values
-			returnedIDPs, err := idpRepo.List(ctx,
+			returnedIDPs, err := idpRepo.List(t.Context(), tx,
 				tt.conditionClauses...,
 			)
 			require.NoError(t, err)
@@ -1732,6 +1775,15 @@ func TestListIDProvider(t *testing.T) {
 }
 
 func TestDeleteIDProvider(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err := tx.Rollback(t.Context())
+		if err != nil {
+			t.Errorf("error rolling back transaction: %v", err)
+		}
+	}()
+
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
@@ -1743,8 +1795,8 @@ func TestDeleteIDProvider(t *testing.T) {
 		ConsoleAppID:    "consoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err := instanceRepo.Create(t.Context(), &instance)
+	instanceRepo := repository.InstanceRepository()
+	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
 	// create org
@@ -1755,15 +1807,15 @@ func TestDeleteIDProvider(t *testing.T) {
 		InstanceID: instanceId,
 		State:      domain.OrgStateActive,
 	}
-	organizationRepo := repository.OrganizationRepository(pool)
-	err = organizationRepo.Create(t.Context(), &org)
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
-	idpRepo := repository.IDProviderRepository(pool)
+	idpRepo := repository.IDProviderRepository()
 
 	type test struct {
 		name                   string
-		testFunc               func(ctx context.Context, t *testing.T)
+		testFunc               func(t *testing.T)
 		idpIdentifierCondition domain.IDPIdentifierCondition
 		noOfDeletedRows        int64
 	}
@@ -1773,7 +1825,7 @@ func TestDeleteIDProvider(t *testing.T) {
 			var noOfIDPs int64 = 1
 			return test{
 				name: "happy path delete idp filter id",
-				testFunc: func(ctx context.Context, t *testing.T) {
+				testFunc: func(t *testing.T) {
 					for range noOfIDPs {
 						idp := domain.IdentityProvider{
 							InstanceID:        instanceId,
@@ -1790,7 +1842,7 @@ func TestDeleteIDProvider(t *testing.T) {
 							Payload:           []byte("{}"),
 						}
 
-						err := idpRepo.Create(ctx, &idp)
+						err := idpRepo.Create(t.Context(), tx, &idp)
 						require.NoError(t, err)
 					}
 				},
@@ -1803,7 +1855,7 @@ func TestDeleteIDProvider(t *testing.T) {
 			var noOfIDPs int64 = 1
 			return test{
 				name: "happy path delete idp filter name",
-				testFunc: func(ctx context.Context, t *testing.T) {
+				testFunc: func(t *testing.T) {
 					for range noOfIDPs {
 						idp := domain.IdentityProvider{
 							InstanceID:        instanceId,
@@ -1820,7 +1872,7 @@ func TestDeleteIDProvider(t *testing.T) {
 							Payload:           []byte("{}"),
 						}
 
-						err := idpRepo.Create(ctx, &idp)
+						err := idpRepo.Create(t.Context(), tx, &idp)
 						require.NoError(t, err)
 
 					}
@@ -1837,7 +1889,7 @@ func TestDeleteIDProvider(t *testing.T) {
 			name := gofakeit.Name()
 			return test{
 				name: "deleted already deleted idp",
-				testFunc: func(ctx context.Context, t *testing.T) {
+				testFunc: func(t *testing.T) {
 					noOfIDPs := 1
 					for range noOfIDPs {
 						idp := domain.IdentityProvider{
@@ -1855,12 +1907,12 @@ func TestDeleteIDProvider(t *testing.T) {
 							Payload:           []byte("{}"),
 						}
 
-						err := idpRepo.Create(ctx, &idp)
+						err := idpRepo.Create(t.Context(), tx, &idp)
 						require.NoError(t, err)
 					}
 
 					// delete organization
-					affectedRows, err := idpRepo.Delete(ctx,
+					affectedRows, err := idpRepo.Delete(t.Context(), tx,
 						idpRepo.NameCondition(name),
 						instanceId,
 						&orgId,
@@ -1876,14 +1928,12 @@ func TestDeleteIDProvider(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := t.Context()
-
 			if tt.testFunc != nil {
-				tt.testFunc(ctx, t)
+				tt.testFunc(t)
 			}
 
 			// delete idp
-			noOfDeletedRows, err := idpRepo.Delete(ctx,
+			noOfDeletedRows, err := idpRepo.Delete(t.Context(), tx,
 				tt.idpIdentifierCondition,
 				instanceId,
 				&orgId,
@@ -1892,7 +1942,7 @@ func TestDeleteIDProvider(t *testing.T) {
 			assert.Equal(t, noOfDeletedRows, tt.noOfDeletedRows)
 
 			// check idp was deleted
-			organization, err := idpRepo.Get(ctx,
+			organization, err := idpRepo.Get(t.Context(), tx,
 				tt.idpIdentifierCondition,
 				instanceId,
 				&orgId,

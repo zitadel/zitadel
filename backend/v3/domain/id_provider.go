@@ -331,25 +331,25 @@ type IDProviderRepository interface {
 	idProviderConditions
 	idProviderChanges
 
-	Get(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IdentityProvider, error)
-	List(ctx context.Context, conditions ...database.Condition) ([]*IdentityProvider, error)
+	Get(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IdentityProvider, error)
+	List(ctx context.Context, client database.QueryExecutor, conditions ...database.Condition) ([]*IdentityProvider, error)
 
-	Create(ctx context.Context, idp *IdentityProvider) error
-	Update(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string, changes ...database.Change) (int64, error)
-	Delete(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (int64, error)
+	Create(ctx context.Context, client database.QueryExecutor, idp *IdentityProvider) error
+	Update(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string, changes ...database.Change) (int64, error)
+	Delete(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (int64, error)
 
-	GetOIDC(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPOIDC, error)
-	GetJWT(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPJWT, error)
+	GetOIDC(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPOIDC, error)
+	GetJWT(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPJWT, error)
 
-	GetOAuth(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPOAuth, error)
+	GetOAuth(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPOAuth, error)
 
-	GetAzureAD(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPAzureAD, error)
-	GetGoogle(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGoogle, error)
-	GetGithub(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGithub, error)
-	GetGithubEnterprise(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGithubEnterprise, error)
-	GetGitlab(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGitlab, error)
-	GetGitlabSelfHosting(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGitlabSelfHosting, error)
-	GetLDAP(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPLDAP, error)
-	GetApple(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPApple, error)
-	GetSAML(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPSAML, error)
+	GetAzureAD(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPAzureAD, error)
+	GetGoogle(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGoogle, error)
+	GetGithub(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGithub, error)
+	GetGithubEnterprise(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGithubEnterprise, error)
+	GetGitlab(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGitlab, error)
+	GetGitlabSelfHosting(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGitlabSelfHosting, error)
+	GetLDAP(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPLDAP, error)
+	GetApple(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPApple, error)
+	GetSAML(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPSAML, error)
 }

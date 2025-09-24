@@ -1,6 +1,7 @@
 package database
 
 import (
+	"encoding/hex"
 	"strconv"
 	"strings"
 )
@@ -20,8 +21,16 @@ type StatementBuilder struct {
 	existingArgs map[any]string
 }
 
+type argWriter interface {
+	WriteArg(builder *StatementBuilder)
+}
+
 // WriteArgs adds the argument to the statement and writes the placeholder to the query.
 func (b *StatementBuilder) WriteArg(arg any) {
+	if writer, ok := arg.(argWriter); ok {
+		writer.WriteArg(b)
+		return
+	}
 	b.WriteString(b.AppendArg(arg))
 }
 
@@ -41,7 +50,13 @@ func (b *StatementBuilder) AppendArg(arg any) (placeholder string) {
 	if b.existingArgs == nil {
 		b.existingArgs = make(map[any]string)
 	}
-	if placeholder, ok := b.existingArgs[arg]; ok {
+	// the key is used to work around the following panic:
+	// runtime error: hash of unhashable type []uint8
+	key := arg
+	if argBytes, ok := arg.([]uint8); ok {
+		key = `\\bytes-` + hex.EncodeToString(argBytes)
+	}
+	if placeholder, ok := b.existingArgs[key]; ok {
 		return placeholder
 	}
 	if instruction, ok := arg.(Instruction); ok {
@@ -50,7 +65,7 @@ func (b *StatementBuilder) AppendArg(arg any) (placeholder string) {
 
 	b.args = append(b.args, arg)
 	placeholder = "$" + strconv.Itoa(len(b.args))
-	b.existingArgs[arg] = placeholder
+	b.existingArgs[key] = placeholder
 	return placeholder
 }
 
