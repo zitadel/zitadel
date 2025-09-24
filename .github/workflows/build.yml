@@ -24,6 +24,7 @@ jobs:
   check:
     uses: ./.github/workflows/check.yml
     with:
+      node_version: "22"
       nx_version: "21.5.2"
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

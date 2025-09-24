@@ -42,10 +42,7 @@ jobs:
       run: |
         pnpm install --frozen-lockfile
         pnpm add --global nx@${{ env.nx_version }} sass
-    - if: matrix.language == 'go'
-      run: nx start-ci-run --distribute-on="1 medium" --stop-agents-after=generate-stubs generate-statik generate-assets
-    - if: matrix.language == 'go'
-      run: nx run-many --projects @zitadel/api --targets generate-stubs generate-statik generate-assets
+        nx run-many --projects @zitadel/api --targets generate-stubs generate-statik generate-assets
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
