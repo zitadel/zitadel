@@ -46,7 +46,7 @@ func (i *invokeTestCommand) String() string {
 }
 
 // Validate implements Commander.
-func (i *invokeTestCommand) Validate() error {
+func (i *invokeTestCommand) Validate(ctx context.Context, opts *CommandOpts) (err error) {
 	return nil
 }
 

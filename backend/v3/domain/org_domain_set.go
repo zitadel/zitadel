@@ -38,7 +38,7 @@ func (a *SetPrimaryOrgDomainCommand) String() string {
 }
 
 // Validate implements Commander.
-func (a *SetPrimaryOrgDomainCommand) Validate() (err error) {
+func (a *SetPrimaryOrgDomainCommand) Validate(ctx context.Context, opts *CommandOpts) (err error) {
 	return nil
 }
 

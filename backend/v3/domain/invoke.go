@@ -164,7 +164,7 @@ func newValidatorInvoker(next Invoker) *validatorInvoker {
 }
 
 func (i *validatorInvoker) Invoke(ctx context.Context, command Commander, opts *CommandOpts) error {
-	if err := command.Validate(); err != nil {
+	if err := command.Validate(ctx, opts); err != nil {
 		return err
 	}
 

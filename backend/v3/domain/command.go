@@ -13,7 +13,7 @@ import (
 // If possible it should also be used for queries. We will find out if this is possible in the future.
 type Commander interface {
 	Execute(ctx context.Context, opts *CommandOpts) (err error)
-	Validate() (err error)
+	Validate(ctx context.Context, opts *CommandOpts) (err error)
 	// Events returns the events that should be pushed to the event store after the command is executed.
 	// If the command does not produce events, it should return nil or an empty slice.
 	Events(ctx context.Context) []legacy_es.Command
@@ -149,9 +149,9 @@ func (b *commandBatch) Execute(ctx context.Context, opts *CommandOpts) (err erro
 	return nil
 }
 
-func (b *commandBatch) Validate() (err error) {
+func (b *commandBatch) Validate(ctx context.Context, opts *CommandOpts) (err error) {
 	for _, cmd := range b.Commands {
-		if err = cmd.Validate(); err != nil {
+		if err = cmd.Validate(ctx, opts); err != nil {
 			return err
 		}
 	}

@@ -95,7 +95,7 @@ func (u *UpdateOrgCommand) String() string {
 	return "UpdateOrgCommand"
 }
 
-func (u *UpdateOrgCommand) Validate() error {
+func (u *UpdateOrgCommand) Validate(_ context.Context, _ *CommandOpts) error {
 	if u.ID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-lEMhVC", "invalid organization ID")
 	}

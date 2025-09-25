@@ -49,7 +49,7 @@ func (r *RemoveOrgDomainCommand) String() string {
 }
 
 // Validate implements Commander.
-func (r *RemoveOrgDomainCommand) Validate() (err error) {
+func (r *RemoveOrgDomainCommand) Validate(ctx context.Context, opts *CommandOpts) (err error) {
 	return nil
 }
 

@@ -303,7 +303,7 @@ func TestUpdateOrgCommand_Validate(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			err := tc.cmd.Validate()
+			err := tc.cmd.Validate(context.Background(), &domain.CommandOpts{})
 			assert.Equal(t, tc.expectedError, err)
 		})
 	}

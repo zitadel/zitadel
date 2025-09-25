@@ -127,7 +127,7 @@ func (l *ListOrgsCommand) String() string {
 }
 
 // Validate implements Commander.
-func (l *ListOrgsCommand) Validate() (err error) {
+func (l *ListOrgsCommand) Validate(_ context.Context, _ *CommandOpts) (err error) {
 	if len(l.Request.GetQueries()) == 0 {
 		return NewNoQueryCriteriaError("DOM-75lU26")
 	}

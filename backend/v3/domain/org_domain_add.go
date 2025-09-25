@@ -40,7 +40,7 @@ func (a *AddOrgDomainCommand) String() string {
 }
 
 // Validate implements Commander.
-func (a *AddOrgDomainCommand) Validate() (err error) {
+func (a *AddOrgDomainCommand) Validate(ctx context.Context, opts *CommandOpts) (err error) {
 	return nil
 }
 
