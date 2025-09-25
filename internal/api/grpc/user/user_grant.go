@@ -107,6 +107,8 @@ func UserGrantQueryToQuery(ctx context.Context, query *user_pb.UserGrantQuery) (
 		return UserGrantWithGrantedQueryToModel(ctx, q.WithGrantedQuery)
 	case *user_pb.UserGrantQuery_UserTypeQuery:
 		return UserGrantUserTypeQueryToModel(q.UserTypeQuery)
+	case *user_pb.UserGrantQuery_InUserIdsQuery:
+		return UserGrantInUserIDsQueryToModel(q.InUserIdsQuery)
 	default:
 		return nil, errors.New("invalid query")
 	}
@@ -154,6 +156,10 @@ func UserGrantRoleKeyQueryToModel(q *user_pb.UserGrantRoleKeyQuery) (query.Searc
 
 func UserGrantUserIDQueryToModel(q *user_pb.UserGrantUserIDQuery) (query.SearchQuery, error) {
 	return query.NewUserGrantUserIDSearchQuery(q.UserId)
+}
+
+func UserGrantInUserIDsQueryToModel(q *user_pb.UserGrantInUserIDsQuery) (query.SearchQuery, error) {
+	return query.NewUserGrantInUserIDsSearchQuery(q.InUserIds)
 }
 
 func UserGrantUserNameQueryToModel(q *user_pb.UserGrantUserNameQuery) (query.SearchQuery, error) {
