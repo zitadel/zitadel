@@ -55,7 +55,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			orgRepo: func(ctrl *gomock.Controller) func(client database.QueryExecutor) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any()).
+					Get(gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
 					Times(1).
 					Return(nil, getErr)
 				return func(_ database.QueryExecutor) domain.OrganizationRepository { return repo }
@@ -69,7 +69,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			orgRepo: func(ctrl *gomock.Controller) func(client database.QueryExecutor) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any()).
+					Get(gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
 					Times(1).
 					Return(&domain.Organization{
 						ID:   "org-1",
@@ -86,7 +86,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			orgRepo: func(ctrl *gomock.Controller) func(client database.QueryExecutor) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any()).
+					Get(gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
 					Times(1).
 					Return(&domain.Organization{
 						ID:    "org-1",
@@ -104,7 +104,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			orgRepo: func(ctrl *gomock.Controller) func(client database.QueryExecutor) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any()).
+					Get(gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
 					Times(1).
 					Return(&domain.Organization{
 						ID:    "org-1",
@@ -127,7 +127,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			orgRepo: func(ctrl *gomock.Controller) func(client database.QueryExecutor) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any()).
+					Get(gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
 					Times(1).
 					Return(&domain.Organization{
 						ID:         "org-1",
@@ -157,7 +157,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			orgRepo: func(ctrl *gomock.Controller) func(client database.QueryExecutor) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any()).
+					Get(gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
 					Times(1).
 					Return(&domain.Organization{
 						ID:         "org-1",
@@ -186,7 +186,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			orgRepo: func(ctrl *gomock.Controller) func(client database.QueryExecutor) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any()).
+					Get(gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
 					Times(1).
 					Return(&domain.Organization{
 						ID:         "org-1",
@@ -217,7 +217,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			orgRepo: func(ctrl *gomock.Controller) func(client database.QueryExecutor) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any()).
+					Get(gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
 					Times(1).
 					Return(&domain.Organization{
 						ID:         "org-1",
