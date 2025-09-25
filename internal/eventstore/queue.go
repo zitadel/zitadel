@@ -9,7 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/queue"
 )
 
-//go:generate mockgen -package mock -destination ./mock/queue.mock.go github.com/zitadel/zitadel/internal/eventstore ExecutionQueue
+//go:generate go tool mockgen -package mock -destination ./mock/queue.mock.go github.com/zitadel/zitadel/internal/eventstore ExecutionQueue
 
 type ExecutionQueue interface {
 	// InsertManyFastTx wraps [river.Client.InsertManyFastTx] to insert all jobs in

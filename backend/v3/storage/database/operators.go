@@ -33,7 +33,7 @@ type Value interface {
 	Boolean | Number | Text | Instruction | Bytes
 }
 
-//go:generate enumer -type NumberOperation,TextOperation,BytesOperation -linecomment -output ./operators_enumer.go
+//go:generate go tool enumer -type NumberOperation,TextOperation,BytesOperation -linecomment -output ./operators_enumer.go
 type Operation interface {
 	NumberOperation | TextOperation | BytesOperation
 }

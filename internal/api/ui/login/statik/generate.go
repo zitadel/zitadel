@@ -1,3 +1,3 @@
 package statik
 
-//go:generate statik -f -src=../static -dest=.. -ns=login
+//go:generate go tool statik -f -src=../static -dest=.. -ns=login

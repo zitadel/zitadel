@@ -9,7 +9,7 @@ import (
 // We generate the Stringer implementation for prettier
 // log output.
 //
-//go:generate stringer -type=DeviceAuthState -linecomment
+//go:generate go tool stringer -type=DeviceAuthState -linecomment
 type DeviceAuthState uint
 
 const (

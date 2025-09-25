@@ -6,7 +6,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-//go:generate enumer -type DomainValidationType -transform lower -trimprefix DomainValidationType -sql
+//go:generate go tool enumer -type DomainValidationType -transform lower -trimprefix DomainValidationType -sql
 type DomainValidationType uint8
 
 const (
@@ -14,7 +14,7 @@ const (
 	DomainValidationTypeHTTP
 )
 
-//go:generate enumer -type DomainType -transform lower -trimprefix DomainType -sql
+//go:generate go tool enumer -type DomainType -transform lower -trimprefix DomainType -sql
 type DomainType uint8
 
 const (

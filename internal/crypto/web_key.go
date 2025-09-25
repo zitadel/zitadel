@@ -38,7 +38,7 @@ func (u KeyUsage) String() string {
 	return ""
 }
 
-//go:generate enumer -type WebKeyConfigType -trimprefix WebKeyConfigType -text -json -linecomment
+//go:generate go tool enumer -type WebKeyConfigType -trimprefix WebKeyConfigType -text -json -linecomment
 type WebKeyConfigType int
 
 const (
@@ -48,7 +48,7 @@ const (
 	WebKeyConfigTypeED25519
 )
 
-//go:generate enumer -type RSABits -trimprefix RSABits -text -json -linecomment
+//go:generate go tool enumer -type RSABits -trimprefix RSABits -text -json -linecomment
 type RSABits int
 
 const (
@@ -60,7 +60,7 @@ const (
 
 type RSAHasher int
 
-//go:generate enumer -type RSAHasher -trimprefix RSAHasher -text -json -linecomment
+//go:generate go tool enumer -type RSAHasher -trimprefix RSAHasher -text -json -linecomment
 const (
 	RSAHasherUnspecified RSAHasher = iota //
 	RSAHasherSHA256
@@ -70,7 +70,7 @@ const (
 
 type EllipticCurve int
 
-//go:generate enumer -type EllipticCurve -trimprefix EllipticCurve -text -json -linecomment
+//go:generate go tool enumer -type EllipticCurve -trimprefix EllipticCurve -text -json -linecomment
 const (
 	EllipticCurveUnspecified EllipticCurve = iota //
 	EllipticCurveP256

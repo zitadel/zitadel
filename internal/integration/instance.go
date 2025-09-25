@@ -42,7 +42,7 @@ const (
 // different permissions and reuse them.
 type UserType int
 
-//go:generate enumer -type UserType -transform snake -trimprefix UserType
+//go:generate go tool enumer -type UserType -transform snake -trimprefix UserType
 const (
 	UserTypeUnspecified UserType = iota
 	UserTypeIAMOwner
