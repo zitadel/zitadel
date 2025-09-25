@@ -857,8 +857,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 	})
 
 	t.Run("check Recovery Code", func(t *testing.T) {
-
-		resp, err := Client.SetSession(CTX, &session.SetSessionRequest{
+		resp, err := Client.SetSession(LoginCTX, &session.SetSessionRequest{
 			SessionId: createResp.GetSessionId(),
 			Checks: &session.Checks{
 				RecoveryCode: &session.CheckRecoveryCode{
@@ -868,7 +867,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 		})
 		require.NoError(t, err)
 		sessionToken = resp.GetSessionToken()
-		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId(), wantUserFactor, wantWebAuthNFactor, wantRecoveryCodeFactor)
+		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), resp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId(), wantUserFactor, wantWebAuthNFactor, wantRecoveryCodeFactor)
 	})
 }
 
