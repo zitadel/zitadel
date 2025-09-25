@@ -25,6 +25,14 @@ func MustNewConfig(v *viper.Viper) *Config {
 	)
 	logging.OnError(err).Fatal("unable to read config")
 
+	// Log where the configuration was loaded from, if possible
+	configFiles := v.ConfigFileUsed()
+	if configFiles != "" {
+		logging.WithFields("config_file", configFiles, "config", config).Info("Loaded configuration")
+	} else {
+		logging.WithFields("config", config).Info("Loaded configuration (no config file, possibly env or flags)")
+	}
+
 	err = config.Log.SetLogger()
 	logging.OnError(err).Fatal("unable to set logger")
 

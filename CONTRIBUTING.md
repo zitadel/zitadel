@@ -155,17 +155,18 @@ Please check out the dedicated [API guidelines](./API_DESIGN.md) page when contr
 
 ### <a name="backend-requirements"></a> Backend Requirements
 
-By executing the commands from this section, you run everything you need to develop the Zitadel backend locally.
+By executing the commands from this section, you can run everything you need to develop the Zitadel backend locally.
 
 > [!INFO]
 > Some [dev containers are available](dev-containers) for remote development with docker and pipeline debugging in isolated environments.
 > If you don't want to use one of the dev containers, you can develop the backend components directly on your local machine.
 > To do so, proceed with installing the necessary dependencies.
 
-Using [Docker Compose](https://docs.docker.com/compose/), you run a [PostgreSQL](https://www.postgresql.org/download/) container on your local machine.
-With [make](https://www.gnu.org/software/make/), you build a debuggable Zitadel binary and run it using [delve](https://github.com/go-delve/delve).
-Then, you test your changes via the console your binary is serving at http://<span because="breaks the link"></span>localhost:8080 and by verifying the database.
-Once you are happy with your changes, you run end-to-end tests and tear everything down.
+#### What You Will Do:
+The [Docker Compose](https://docs.docker.com/compose/) file below runs a [PostgreSQL](https://www.postgresql.org/download/) container on your local machine.
+Then, with [make](https://www.gnu.org/software/make/), you'll build a debuggable Zitadel binary and run it using [delve](https://github.com/go-delve/delve), a debugger.
+Finally, you'll test your changes via the console your binary is serving at http://<span because="breaks the link"></span>localhost:8080 and verify the database.
+Once you are happy with your changes, you'll run end-to-end tests and tear everything down.
 
 Zitadel uses [golangci-lint v2](https://golangci-lint.run) for code quality checks. Please use [this configuration](.golangci.yaml) when running `golangci-lint`. We recommend setting golangci-lint as the linter in your IDE.
 
@@ -184,7 +185,9 @@ Make some changes to the source code, then run the database locally.
 docker compose --file ./e2e/docker-compose.yaml up --detach db
 ```
 
-Build the binary. This takes a few minutes, but you can speed up rebuilds.
+
+
+Build the binary. This takes a few minutes, but you can speed up rebuilds. _If you don't already have [Buf](https://buf.build/docs/cli/installation/), you'll need to install it._
 
 ```bash
 make compile
@@ -197,7 +200,13 @@ make compile
 > Generating the console: `make console_build console_move`
 > Build the binary: `make compile`
 
-You can now run and debug the binary in .artifacts/zitadel/zitadel using your favourite IDE, for example GoLand.
+You can now run and debug the binary in `./zitadel` using your favourite IDE, for example [GoLand](https://www.jetbrains.com/go/).
+
+Or, from the CLI, run
+```baseh
+./zitadel start-from-init --masterkey MasterkeyNeedsToHave32Characters --tlsMode disabled
+```
+
 You can test if Zitadel does what you expect by using the UI at http://localhost:8080/ui/console.
 Also, you can verify the data by running `psql "host=localhost dbname=zitadel sslmode=disable"` and running SQL queries.
 
@@ -212,10 +221,10 @@ make core_unit_test
 ### Run Local Integration Tests
 
 Integration tests are run as gRPC clients against a running Zitadel server binary.
-The server binary is typically [build with coverage enabled](https://go.dev/doc/build-cover).
+The server binary is typically [built with coverage enabled](https://go.dev/doc/build-cover).
 It is also possible to run a Zitadel sever in a debugger and run the integrations tests like that. In order to run the server, a database is required.
 
-In order to prepare the local system, the following will bring up the database, builds a coverage binary, initializes the database and starts the sever.
+In order to prepare the local system, the following will bring up the database, builds a coverage binary, initializes the database and starts the server.
 
 ```bash
 make core_integration_db_up core_integration_server_start
@@ -421,8 +430,8 @@ Run the database and the latest backend locally.
 docker compose --file ./e2e/docker-compose.yaml up --detach zitadel
 ```
 
-When Zitadel accepts traffic, navigate to http://localhost:8080/ui/console/projects?login_hint=zitadel-admin@zitadel.localhost and log in with  _Password1!_.
 
+When Zitadel accepts traffic, navigate to http://localhost:8080/ui/console/projects?login_hint=zitadel-admin@zitadel.localhost and log in with  _Password1!_.
 Proceed [with configuring your console redirect URIs](console-redirect).
 
 #### <a name="console-redirect"></a> Configure Console redirect URI
@@ -499,8 +508,8 @@ The documentation server will be available at http://localhost:3000 with live re
 #### Style guide
 
 - **Code with variables**: Make sure that code snippets can be used by setting environment variables, instead of manually replacing a placeholder.
-- **Embedded files**: When embedding mdx files, make sure the template ist prefixed by "\_" (lowdash). The content will be rendered inside the parent page, but is not accessible individually (eg, by search).
-- **Don't repeat yourself**: When using the same content in multiple places, save and manage the content as separate file and make use of embedded files to import it into other docs pages.
+- **Embedded files**: When embedding mdx files, make sure the template is prefixed by "\_" (lowdash). The content will be rendered inside the parent page, but is not accessible individually (eg, by search).
+- **Don't repeat yourself**: When using the same content in multiple places, save and manage the content as a separate file and make use of embedded files to import it into other docs pages.
 - **Embedded code**: You can embed code snippets from a repository. See the [plugin](https://github.com/saucelabs/docusaurus-theme-github-codeblock#usage) for usage.
 
 Following the [Google style guide](https://developers.google.com/style) is highly recommended. Its clear and concise guidelines ensure consistency and effective communication within the wider developer community.
@@ -531,7 +540,7 @@ Fix the [quality checks](troubleshoot-frontend), add new checks that cover your 
 
 To debug and fix failing tasks, execute them individually using the `--filter` flag.
 
-We recommend to use [one of the dev containers](dev-containers) to reproduce pipeline issues.
+We recommend using [one of the dev containers](dev-containers) to reproduce pipeline issues.
 
 ```bash
 # to reproduce linting error in the console:
@@ -609,7 +618,7 @@ Zitadel loads translations from four files:
 - [Common texts](./internal/static/i18n) for success or error toasts
 
 You may edit the texts in these files or create a new file for additional language support. Make sure you set the locale (ISO 639-1 code) as the name of the new language file.
-Please make sure that the languages within the files remain in their own language, e.g. German must always be `Deutsch.
+Please make sure that the languages within the files remain in their own language, e.g. German must always be `Deutsch`.
 If you have added support for a new language, please also ensure that it is added in the list of languages in all the other language files.
 
 You also have to add some changes to the following files:
@@ -634,7 +643,7 @@ We want to deliver a new release every second week. So we plan everything in two
 Each Tuesday we estimate new issues and on Wednesday the last sprint will be reviewed and the next one will be planned.
 After a sprint ends a new version of Zitadel will be released, and publish to [Zitadel Cloud](https://zitadel.cloud) the following Monday.
 
-If there are some critical or urgent issues we will have a look at it earlier, than the two weeks.
+If there are critical or urgent issues we will have a look at it earlier than two weeks.
 To show the community the needed information, each issue gets attributes and labels.
 
 ### About the attributes
