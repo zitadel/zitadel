@@ -86,6 +86,7 @@ func (p *pgxPool) Migrate(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	defer client.Release()
 
 	err = migration.Migrate(ctx, client.Conn())
 	isMigrated = err == nil
@@ -98,6 +99,7 @@ func (p *pgxPool) MigrateTest(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	defer client.Release()
 
 	err = migration.Migrate(ctx, client.Conn())
 	isMigrated = err == nil
