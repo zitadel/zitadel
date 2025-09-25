@@ -20,8 +20,8 @@ func SQLPool(db *sql.DB) *sqlPool {
 }
 
 // Acquire implements [database.Pool].
-func (c *sqlPool) Acquire(ctx context.Context) (database.Client, error) {
-	conn, err := c.Conn(ctx)
+func (p *sqlPool) Acquire(ctx context.Context) (database.Connection, error) {
+	conn, err := p.Conn(ctx)
 	if err != nil {
 		return nil, wrapError(err)
 	}
@@ -30,9 +30,9 @@ func (c *sqlPool) Acquire(ctx context.Context) (database.Client, error) {
 
 // Query implements [database.Pool].
 // Subtle: this method shadows the method (Pool).Query of pgxPool.Pool.
-func (c *sqlPool) Query(ctx context.Context, sql string, args ...any) (database.Rows, error) {
+func (p *sqlPool) Query(ctx context.Context, sql string, args ...any) (database.Rows, error) {
 	//nolint:rowserrcheck // Rows.Close is called by the caller
-	rows, err := c.QueryContext(ctx, sql, args...)
+	rows, err := p.QueryContext(ctx, sql, args...)
 	if err != nil {
 		return nil, wrapError(err)
 	}
@@ -41,14 +41,14 @@ func (c *sqlPool) Query(ctx context.Context, sql string, args ...any) (database.
 
 // QueryRow implements [database.Pool].
 // Subtle: this method shadows the method (Pool).QueryRow of pgxPool.Pool.
-func (c *sqlPool) QueryRow(ctx context.Context, sql string, args ...any) database.Row {
-	return &Row{c.QueryRowContext(ctx, sql, args...)}
+func (p *sqlPool) QueryRow(ctx context.Context, sql string, args ...any) database.Row {
+	return &Row{p.QueryRowContext(ctx, sql, args...)}
 }
 
 // Exec implements [database.Pool].
 // Subtle: this method shadows the method (Pool).Exec of pgxPool.Pool.
-func (c *sqlPool) Exec(ctx context.Context, sql string, args ...any) (int64, error) {
-	res, err := c.ExecContext(ctx, sql, args...)
+func (p *sqlPool) Exec(ctx context.Context, sql string, args ...any) (int64, error) {
+	res, err := p.ExecContext(ctx, sql, args...)
 	if err != nil {
 		return 0, wrapError(err)
 	}
@@ -56,8 +56,8 @@ func (c *sqlPool) Exec(ctx context.Context, sql string, args ...any) (int64, err
 }
 
 // Begin implements [database.Pool].
-func (c *sqlPool) Begin(ctx context.Context, opts *database.TransactionOptions) (database.Transaction, error) {
-	tx, err := c.BeginTx(ctx, transactionOptionsToSQL(opts))
+func (p *sqlPool) Begin(ctx context.Context, opts *database.TransactionOptions) (database.Transaction, error) {
+	tx, err := p.BeginTx(ctx, transactionOptionsToSQL(opts))
 	if err != nil {
 		return nil, wrapError(err)
 	}
@@ -65,16 +65,16 @@ func (c *sqlPool) Begin(ctx context.Context, opts *database.TransactionOptions) 
 }
 
 // Ping implements [database.Pool].
-func (c *sqlPool) Ping(ctx context.Context) error {
-	return wrapError(c.PingContext(ctx))
+func (p *sqlPool) Ping(ctx context.Context) error {
+	return wrapError(p.PingContext(ctx))
 }
 
 // Close implements [database.Pool].
-func (c *sqlPool) Close(_ context.Context) error {
-	return c.DB.Close()
+func (p *sqlPool) Close(_ context.Context) error {
+	return p.DB.Close()
 }
 
 // Migrate implements [database.Migrator].
-func (c *sqlPool) Migrate(ctx context.Context) error {
+func (p *sqlPool) Migrate(ctx context.Context) error {
 	return ErrMigrate
 }

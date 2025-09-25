@@ -3,6 +3,7 @@ package sql
 import (
 	"database/sql"
 	"errors"
+	"strings"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -19,6 +20,15 @@ func wrapError(err error) error {
 	if errors.Is(err, pgx.ErrNoRows) || errors.Is(err, sql.ErrNoRows) {
 		return database.NewNoRowFoundError(err)
 	}
+
+	// scany only exports its errors as strings
+	if strings.HasPrefix(err.Error(), "scany: expected 1 row, got: ") {
+		return database.NewMultipleRowsFoundError(err)
+	}
+	if strings.HasPrefix(err.Error(), "scany:") || strings.HasPrefix(err.Error(), "scanning:") {
+		return database.NewScanError(err)
+	}
+
 	var pgxErr *pgconn.PgError
 	if !errors.As(err, &pgxErr) {
 		return database.NewUnknownError(err)
