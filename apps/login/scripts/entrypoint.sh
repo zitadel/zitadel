@@ -8,4 +8,4 @@ if [ -n "${ZITADEL_SERVICE_USER_TOKEN_FILE}" ] && [ -f "${ZITADEL_SERVICE_USER_T
   export ZITADEL_SERVICE_USER_TOKEN=$(cat "${ZITADEL_SERVICE_USER_TOKEN_FILE}")
 fi
 
-exec node /runtime/apps/login/server.js
+exec node /runtime/server.js
