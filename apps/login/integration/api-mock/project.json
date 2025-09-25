@@ -3,7 +3,7 @@
     "name": "@zitadel/login-api-mock",
     "targets": {
         "build": {
-            "description": "Build the API mock server",
+            "description": "Builds the API mock server",
             "command": "nx run @zitadel/devcontainer:compose build login-api-mock"
         },
         "serve": {
