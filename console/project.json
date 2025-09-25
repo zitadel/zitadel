@@ -34,7 +34,7 @@
             ]
         },
         "build": {
-            "description": "Builds the Angular Console application for production",
+            "description": "Builds the Console for production",
             "inputs": [
                 "default",
                 "{workspaceRoot}/pnpm-lock.yaml",
