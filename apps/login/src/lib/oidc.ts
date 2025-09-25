@@ -35,6 +35,7 @@ export async function loginWithOIDCAndSession({
     console.log("Session is valid:", isValid);
 
     if (!isValid && selectedSession.factors?.user) {
+      console.log("Session is not valid, need to re-authenticate user");
       // if the session is not valid anymore, we need to redirect the user to re-authenticate /
       // TODO: handle IDP intent direcly if available
       const command: SendLoginnameCommand = {

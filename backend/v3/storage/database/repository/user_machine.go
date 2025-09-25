@@ -8,7 +8,7 @@ import (
 )
 
 type userMachine struct {
-	*user
+	user
 }
 
 var _ domain.MachineRepository = (*userMachine)(nil)
@@ -18,14 +18,14 @@ var _ domain.MachineRepository = (*userMachine)(nil)
 // -------------------------------------------------------------
 
 // Update implements [domain.MachineRepository].
-func (m userMachine) Update(ctx context.Context, condition database.Condition, changes ...database.Change) error {
+func (m userMachine) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) error {
 	builder := database.StatementBuilder{}
 	builder.WriteString("UPDATE user_machines SET ")
 	database.Changes(changes).Write(&builder)
 	writeCondition(&builder, condition)
 	m.writeReturning()
 
-	_, err := m.client.Exec(ctx, builder.String(), builder.Args()...)
+	_, err := client.Exec(ctx, builder.String(), builder.Args()...)
 	return err
 }
 
