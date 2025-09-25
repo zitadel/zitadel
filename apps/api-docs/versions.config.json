@@ -27,6 +27,20 @@
       "gitRef": "v4.2.0",
       "enabled": true,
       "isStable": true
+    },
+    {
+      "id": "v4.1.1",
+      "name": "v4.1.1",
+      "gitRef": "v4.1.1",
+      "enabled": true,
+      "isStable": true
+    },
+    {
+      "id": "v4.1.0",
+      "name": "v4.1.0",
+      "gitRef": "v4.1.0",
+      "enabled": true,
+      "isStable": true
     }
   ],
   "settings": {

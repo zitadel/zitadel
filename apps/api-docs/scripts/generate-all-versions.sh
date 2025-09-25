@@ -43,7 +43,7 @@ echo "🔧 Generating OpenAPI specs for current branch and copying to all versio
 
 # Generate OpenAPI specs once
 echo "📦 Generating OpenAPI specs..."
-if pnpm run generate:openapi && [ -d "public/openapi" ]; then
+if pnpm run generate:openapi && [ -d ".artifacts/openapi" ]; then
     echo "✅ OpenAPI specs generated successfully"
     
     # Copy to each version directory
@@ -51,7 +51,15 @@ if pnpm run generate:openapi && [ -d "public/openapi" ]; then
         echo "📦 Creating artifacts for version: $VERSION"
         VERSION_DIR="$ARTIFACTS_DIR/versions/$VERSION"
         mkdir -p "$VERSION_DIR"
-        cp -r public/openapi/* "$VERSION_DIR/"
+        
+        # Copy both openapi v2 and openapi v3 artifacts if they exist
+        if [ -d ".artifacts/openapi" ]; then
+            cp -r .artifacts/openapi/* "$VERSION_DIR/"
+        fi
+        if [ -d ".artifacts/openapi3" ]; then
+            cp -r .artifacts/openapi3/* "$VERSION_DIR/"
+        fi
+        
         echo "✅ Artifacts created for $VERSION"
     done
 else
