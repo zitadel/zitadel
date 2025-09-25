@@ -93,4 +93,71 @@ type ProjectRepository interface {
 	Create(ctx context.Context, client database.QueryExecutor, project *Project) error
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+
+	Role() ProjectRoleRepository
+}
+
+type ProjectRole struct {
+	InstanceID     string    `json:"instanceId,omitempty" db:"instance_id"`
+	OrganizationID string    `json:"organizationId,omitempty" db:"organization_id"`
+	ProjectID      string    `json:"projectId,omitempty" db:"project_id"`
+	CreatedAt      time.Time `json:"createdAt,omitzero" db:"created_at"`
+	UpdatedAt      time.Time `json:"updatedAt,omitzero" db:"updated_at"`
+	Key            string    `json:"key,omitempty" db:"key"`
+	DisplayName    string    `json:"displayName,omitempty" db:"display_name"`
+	RoleGroup      string    `json:"roleGroup,omitempty" db:"role_group"`
+}
+
+type projectRoleColumns interface {
+	// InstanceIDColumn returns the column for the instance id field
+	InstanceIDColumn() database.Column
+	// OrganizationIDColumn returns the column for the organization id field
+	OrganizationIDColumn() database.Column
+	// ProjectIDColumn returns the column for the project id field
+	ProjectIDColumn() database.Column
+	// CreatedAtColumn returns the column for the created at field.
+	CreatedAtColumn() database.Column
+	// UpdatedAtColumn returns the column for the updated at field.
+	UpdatedAtColumn() database.Column
+	// KeyColumn returns the column for the key field.
+	KeyColumn() database.Column
+	// DisplayNameColumn returns the column for the display name field.
+	DisplayNameColumn() database.Column
+	// RoleGroupColumn returns the column for the role group field.
+	RoleGroupColumn() database.Column
+}
+
+type projectRoleConditions interface {
+	// InstanceIDCondition returns an equal filter on the instance id field.
+	InstanceIDCondition(instanceID string) database.Condition
+	// OrganizationIDCondition returns an equal filter on the organization id field.
+	OrganizationIDCondition(organizationID string) database.Condition
+	// ProjectIDCondition returns an equal filter on the project id field.
+	ProjectIDCondition(projectID string) database.Condition
+	// KeyCondition returns an equal filter on the key field.
+	KeyCondition(key string) database.Condition
+	// DisplayNameCondition returns a filter on the display name field.
+	DisplayNameCondition(op database.TextOperation, displayName string) database.Condition
+	// RoleGroupCondition returns a filter on the role group field.
+	RoleGroupCondition(op database.TextOperation, roleGroup string) database.Condition
+}
+
+type projectRoleChanges interface {
+	// SetDisplayName sets the display name column.
+	SetDisplayName(displayName string) database.Change
+	// SetRoleGroup sets the role group column.
+	SetRoleGroup(roleGroup string) database.Change
+}
+
+type ProjectRoleRepository interface {
+	projectRoleColumns
+	projectRoleConditions
+	projectRoleChanges
+
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*ProjectRole, error)
+	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*ProjectRole, error)
+
+	Create(ctx context.Context, client database.QueryExecutor, role *ProjectRole) error
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
+	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }

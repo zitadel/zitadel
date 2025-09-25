@@ -17,19 +17,9 @@ func ProjectRepository() domain.ProjectRepository {
 	return project{}
 }
 
-const queryProjectStmt = `SELECT
-	projects.instance_id,	
-	projects.organization_id,
-	projects.id,
-	projects.created_at,
-	projects.updated_at,
-	projects.name,
-	projects.state,
-	projects.should_assert_role,
-	projects.is_authorization_required,
-	projects.is_project_access_required,
-	projects.used_labeling_setting_owner
-	FROM zitadel.projects`
+func (project) Role() domain.ProjectRoleRepository {
+	return projectRoles{}
+}
 
 func (p project) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Project, error) {
 	builder, err := p.prepareQuery(opts)
@@ -73,8 +63,10 @@ func (p project) Update(ctx context.Context, client database.QueryExecutor, cond
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}
-	if !condition.IsRestrictingColumn(p.InstanceIDColumn()) {
-		return 0, database.NewMissingConditionError(p.InstanceIDColumn())
+	// TBD: do we support update operations of multiple projects?
+	// In other words: should we require projectIDColumn as well?
+	if err := p.checkRestrictingColumns(condition); err != nil {
+		return 0, err
 	}
 	if !database.Changes(changes).IsOnColumn(p.UpdatedAtColumn()) {
 		changes = append(changes, database.NewChange(p.UpdatedAtColumn(), database.NullInstruction))
@@ -87,9 +79,12 @@ func (p project) Update(ctx context.Context, client database.QueryExecutor, cond
 }
 
 func (p project) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	if !condition.IsRestrictingColumn(p.InstanceIDColumn()) {
-		return 0, database.NewMissingConditionError(p.InstanceIDColumn())
+	// TBD: do we support delete operations of multiple projects?
+	// In other words: should we require projectIDColumn as well?
+	if err := p.checkRestrictingColumns(condition); err != nil {
+		return 0, err
 	}
+
 	builder := database.NewStatementBuilder(`DELETE FROM zitadel.projects`)
 	writeCondition(builder, condition)
 
@@ -204,22 +199,40 @@ func (p project) UsedLabelingSettingOwnerColumn() database.Column {
 // helpers
 // -------------------------------------------------------------
 
-func (p project) prepareQuery(opts []database.QueryOption) (*database.StatementBuilder, error) {
-	opts = append(opts,
-		database.WithGroupBy(p.InstanceIDColumn(), p.IDColumn()),
-	)
+const queryProjectStmt = `SELECT
+	projects.instance_id,	
+	projects.organization_id,
+	projects.id,
+	projects.created_at,
+	projects.updated_at,
+	projects.name,
+	projects.state,
+	projects.should_assert_role,
+	projects.is_authorization_required,
+	projects.is_project_access_required,
+	projects.used_labeling_setting_owner
+	FROM zitadel.projects`
 
+func (p project) prepareQuery(opts []database.QueryOption) (*database.StatementBuilder, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
 	}
-	if !options.Condition.IsRestrictingColumn(p.InstanceIDColumn()) {
-		return nil, database.NewMissingConditionError(p.InstanceIDColumn())
+	if err := p.checkRestrictingColumns(options.Condition); err != nil {
+		return nil, err
 	}
 	builder := database.NewStatementBuilder(queryProjectStmt)
 	options.Write(builder)
 
 	return builder, nil
+}
+
+func (p project) checkRestrictingColumns(condition database.Condition) error {
+	return checkRestrictingColumns(
+		condition,
+		p.InstanceIDColumn(),
+		p.OrganizationIDColumn(),
+	)
 }
 
 func (project) getOne(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Project, error) {

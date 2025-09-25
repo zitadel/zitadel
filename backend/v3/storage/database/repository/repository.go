@@ -14,3 +14,15 @@ func writeCondition(
 	builder.WriteString(" WHERE ")
 	condition.Write(builder)
 }
+
+func checkRestrictingColumns(
+	condition database.Condition,
+	requiredColumns ...database.Column,
+) error {
+	for _, col := range requiredColumns {
+		if !condition.IsRestrictingColumn(col) {
+			return database.NewMissingConditionError(col)
+		}
+	}
+	return nil
+}
