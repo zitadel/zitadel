@@ -4,7 +4,7 @@
     "open": "cypress open",
     "lint": "prettier --check cypress",
     "lint-fix": "prettier --write cypress",
-    "clean": "rm -rf node_modules"
+    "clean": "rm -rf node_modules cypress/videos cypress/screenshots cypress/results cypress/downloads"
   },
   "private": true,
   "devDependencies": {

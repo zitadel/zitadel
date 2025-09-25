@@ -1,4 +1,6 @@
-FROM debian:latest AS artifact
+# Builder stage: Sets up the environment, installs dependencies, copies the Zitadel binary, and configures permissions for the application.
+# This stage produces a runnable image that can be used for debugging.
+FROM debian:latest AS builder
 ARG TARGETPLATFORM
 
 RUN apt-get update && apt-get install ca-certificates -y
@@ -18,11 +20,12 @@ ENV PATH="/app:${PATH}"
 USER zitadel
 ENTRYPOINT ["/app/entrypoint.sh"]
 
+# Final stage: Creates a minimal container image with just the Zitadel binary and necessary files
 FROM scratch AS final
 
-COPY --from=artifact /etc/passwd /etc/passwd
-COPY --from=artifact /etc/ssl/certs /etc/ssl/certs
-COPY --from=artifact /app/zitadel /app/zitadel
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /etc/ssl/certs /etc/ssl/certs
+COPY --from=builder /app/zitadel /app/zitadel
 
 HEALTHCHECK NONE
 EXPOSE 8080

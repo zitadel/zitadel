@@ -88,7 +88,7 @@
         "^build"
       ]
     },
-    "test-integration-app": {
+    "test-integration-run-login": {
       "description": "Runs the Login application under test",
       "dependsOn": [
         "build"
@@ -99,7 +99,7 @@
     "test-integration": {
       "description": "Runs integration tests using Cypress against a running Login and a mocked API",
       "dependsOn": [
-        "test-integration-app",
+        "test-integration-run-login",
         "@zitadel/login-api-mock:build",
         "@zitadel/login-api-mock:serve"
       ],

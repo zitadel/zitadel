@@ -37,7 +37,7 @@
             "command": "bash -c './.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} start --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --masterkey MasterkeyNeedsToHave32Characters'"
         },
         "setup": {
-            "description": "Sets up the API with initial data and migrates data to newer API versions.",
+            "description": "Takes care of data and schema migrations for the API.",
             "dependsOn": [
                 "build"
             ],
@@ -69,7 +69,7 @@
             ]
         },
         "generate": {
-            "description": "Generates the code needed to start a full-featured API",
+            "description": "Generates the code needed to start a full-featured API: gRPC and OpenAPI stubs, static files for the login and console, asset routes, documentation and the Console.",
             "dependsOn": [
                 "generate-stubs",
                 "generate-assets",

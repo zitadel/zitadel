@@ -93,7 +93,7 @@ jobs:
           registry: europe-docker.pkg.dev
           username: _json_key_base64
           password: ${{ secrets.GCR_JSON_KEY_BASE64 }}
-      - name: API Scratch Image Tags and Labels
+      - name: Generate Standard Tags and Labels from the GitHub Context for the API Scratch Container Image
         id: scratch-meta
         uses: docker/metadata-action@v5
         with:
@@ -103,7 +103,7 @@ jobs:
           labels: ${{ env.default_labels}}
           tags: |
             type=sha,prefix=,suffix=,format=long
-      - name: API Scratch Image Build and Push SHA
+      - name: Build and Push the SHA-tagged API Scratch Container Image
         id: build-scratch
         uses: docker/build-push-action@v6
         timeout-minutes: 3
@@ -117,7 +117,7 @@ jobs:
           push: true
           labels: ${{ steps.scratch-meta.outputs.labels }}
           tags: ${{ steps.scratch-meta.outputs.tags }}
-      - name: API Debug Image Tags and Labels
+      - name: Generate Standard Tags and Labels from the GitHub Context for the API Debug Container Image
         id: debug-meta
         uses: docker/metadata-action@v5
         with:
@@ -127,7 +127,7 @@ jobs:
           labels: ${{ env.default_labels}}
           tags: |
             type=sha,prefix=,suffix=-debug,format=long
-      - name: API Debug Image Build and Push SHA
+      - name: Build and Push the SHA-tagged API Debug Container Image
         id: build-debug
         uses: docker/build-push-action@v6
         timeout-minutes: 5
@@ -136,13 +136,13 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           file: apps/api/Dockerfile
-          target: artifact
+          target: builder
           platforms: linux/amd64,linux/arm64
           push: true
           labels: ${{ steps.debug-meta.outputs.labels }}
           tags: ${{ steps.debug-meta.outputs.tags }}
           outputs: type=image,name=${{ inputs.image_name_github_api }},name-canonical=true
-      - name: Login Image Tags and Labels
+      - name: Generate Standard Tags and Labels from the GitHub Context for the Login Container Image
         id: login-meta
         uses: docker/metadata-action@v5
         with:
@@ -154,7 +154,7 @@ jobs:
             ${{ env.default_labels}}
           tags: |
             type=sha,prefix=,suffix=,format=long
-      - name: Login Image Build and Push SHA
+      - name: Build and Push the SHA-tagged Login Container Image
         id: build-login
         uses: docker/build-push-action@v6
         timeout-minutes: 3
