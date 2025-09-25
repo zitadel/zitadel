@@ -25,6 +25,13 @@ type argWriter interface {
 	WriteArg(builder *StatementBuilder)
 }
 
+func NewStatementBuilder(baseQuery string, baseArgs ...any) *StatementBuilder {
+	b := &StatementBuilder{}
+	b.WriteString(baseQuery)
+	b.AppendArgs(baseArgs...)
+	return b
+}
+
 // WriteArgs adds the argument to the statement and writes the placeholder to the query.
 func (b *StatementBuilder) WriteArg(arg any) {
 	if writer, ok := arg.(argWriter); ok {

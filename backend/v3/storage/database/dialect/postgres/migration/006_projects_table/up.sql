@@ -5,7 +5,7 @@ CREATE TYPE zitadel.project_state AS ENUM (
 
 CREATE TABLE zitadel.projects(
     instance_id TEXT NOT NULL
-    , org_id TEXT NOT NULL
+    , organization_id TEXT NOT NULL
     , id TEXT NOT NULL
 
     , created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -22,13 +22,13 @@ CREATE TABLE zitadel.projects(
     --API: private_labeling_setting
     , used_labeling_setting_owner SMALLINT
 
-    , PRIMARY KEY (instance_id, org_id, id)
-    , FOREIGN KEY (instance_id, org_id) REFERENCES zitadel.organizations(instance_id, id) ON DELETE CASCADE
+    , PRIMARY KEY (instance_id, organization_id, id)
+    , FOREIGN KEY (instance_id, organization_id) REFERENCES zitadel.organizations(instance_id, id) ON DELETE CASCADE
 );
 
 CREATE TABLE zitadel.project_roles(
     instance_id TEXT NOT NULL
-    , org_id TEXT NOT NULL
+    , organization_id TEXT NOT NULL
     , project_id TEXT NOT NULL
 
     , created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -42,8 +42,8 @@ CREATE TABLE zitadel.project_roles(
     -- group is a reserved keyword in PostgreSQL
     , role_group TEXT
 
-    , PRIMARY KEY (instance_id, org_id, project_id, key)
-    , FOREIGN KEY (instance_id, org_id, project_id) REFERENCES zitadel.projects(instance_id, org_id, id) ON DELETE CASCADE
+    , PRIMARY KEY (instance_id, organization_id, project_id, key)
+    , FOREIGN KEY (instance_id, organization_id, project_id) REFERENCES zitadel.projects(instance_id, organization_id, id) ON DELETE CASCADE
 );
 
 CREATE TRIGGER trigger_set_updated_at
