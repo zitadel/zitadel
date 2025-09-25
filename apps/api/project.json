@@ -128,7 +128,7 @@
             ]
         },
         "test-integration-build": {
-            "description": "Builds the test binary for integration tests. The binary is able to record coverage and it supports debugger attachment.",
+            "description": "Builds the test binary for integration tests.",
             "cache": true,
             "dependsOn": [
                 "generate-stubs",
@@ -146,7 +146,7 @@
                 "{workspaceRoot}/.artifacts/bin/*/*/zitadel.test"
             ]
         },
-        "test-integration-state": {
+        "test-integration-setup": {
             "description": "Sets up the state for the integration tests. This includes starting an ephemeral PostgreSQL database and a Redis cache. It also sets up the data needed for the tests.",
             "dependsOn": [
                 "test-integration-build"
@@ -167,11 +167,11 @@
                 ]
             }
         },
-        "test-integration-app": {
+        "test-integration-run-api": {
             "description": "Runs the API backend in a mode suitable for integration tests. This includes using the test configuration and enabling coverage recording.",
             "continuous": true,
             "dependsOn": [
-                "test-integration-state"
+                "test-integration-setup"
             ],
             "options": {
                 "env": {
@@ -186,7 +186,7 @@
         "test-integration": {
             "description": "Runs the integration tests sequentially with coverage and race condition detection. Go test caching is disabled, because the tests run against an out-of-process API.",
             "dependsOn": [
-                "test-integration-app"
+                "test-integration-run-api"
             ],
             "executor": "nx:run-commands",
             "options": {
@@ -213,7 +213,7 @@
             ]
         },
         "generate-console": {
-            "description": "Builds the console and copies the static files to the API",
+            "description": "Embeds the consoles static files into the API. Requires a build of the console.",
             "cache": true,
             "dependsOn": [
                 "@zitadel/console:build"

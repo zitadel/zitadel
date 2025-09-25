@@ -10,8 +10,7 @@ ENV SHELL=/bin/bash \
 RUN apt-get update && \
     apt-get --no-install-recommends install -y \
     # Cypress dependencies
-    libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3 libxss1 libasound2 libxtst6 xauth xvfb && \
-    apt-get clean
+    libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3 libxss1 libasound2 libxtst6 xauth xvfb
 
 COPY package.json /tmp/package.json
 WORKDIR /tmp
