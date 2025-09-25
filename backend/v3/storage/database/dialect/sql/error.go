@@ -21,14 +21,6 @@ func wrapError(err error) error {
 		return database.NewNoRowFoundError(err)
 	}
 
-	// scany only exports its errors as strings
-	if strings.HasPrefix(err.Error(), "scany: expected 1 row, got: ") {
-		return database.NewMultipleRowsFoundError(err)
-	}
-	if strings.HasPrefix(err.Error(), "scany:") || strings.HasPrefix(err.Error(), "scanning:") {
-		return database.NewScanError(err)
-	}
-
 	var pgxErr *pgconn.PgError
 	if !errors.As(err, &pgxErr) {
 		return database.NewUnknownError(err)
@@ -47,5 +39,14 @@ func wrapError(err error) error {
 	case "23502":
 		return database.NewNotNullError(pgxErr.TableName, pgxErr.ConstraintName, pgxErr)
 	}
+
+	// scany only exports its errors as strings
+	if strings.HasPrefix(err.Error(), "scany: expected 1 row, got: ") {
+		return database.NewMultipleRowsFoundError(err)
+	}
+	if strings.HasPrefix(err.Error(), "scany:") || strings.HasPrefix(err.Error(), "scanning:") {
+		return database.NewScanError(err)
+	}
+
 	return database.NewUnknownError(err)
 }
