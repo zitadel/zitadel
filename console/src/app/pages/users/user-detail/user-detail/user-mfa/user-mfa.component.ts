@@ -23,6 +23,7 @@ type MFAQuery =
   selector: 'cnsl-user-mfa',
   templateUrl: './user-mfa.component.html',
   styleUrls: ['./user-mfa.component.scss'],
+  standalone: false,
 })
 export class UserMfaComponent {
   @Input({ required: true }) public set user(user: User) {

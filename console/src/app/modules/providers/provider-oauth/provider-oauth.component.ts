@@ -30,6 +30,7 @@ import { ProviderNextService } from '../provider-next/provider-next.service';
   selector: 'cnsl-provider-oauth',
   styleUrls: ['./provider-oauth.component.scss'],
   templateUrl: './provider-oauth.component.html',
+  standalone: false,
 })
 export class ProviderOAuthComponent {
   public showOptional: boolean = false;

@@ -11,6 +11,7 @@ import { ToastService } from 'src/app/services/toast.service';
   selector: 'cnsl-domain-verification',
   templateUrl: './domain-verification.component.html',
   styleUrls: ['./domain-verification.component.scss'],
+  standalone: false,
 })
 export class DomainVerificationComponent {
   public domain?: Domain.AsObject;

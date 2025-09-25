@@ -15,6 +15,7 @@ export type MetadataDialogData = {
   selector: 'cnsl-metadata-dialog',
   templateUrl: './metadata-dialog.component.html',
   styleUrls: ['./metadata-dialog.component.scss'],
+  standalone: false,
 })
 export class MetadataDialogComponent {
   public metadata: { key: string; value: string }[] = [];

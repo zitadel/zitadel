@@ -20,6 +20,7 @@ import { SetUpOrgRequestSchema } from '@zitadel/proto/zitadel/admin_pb';
   selector: 'cnsl-org-create',
   templateUrl: './org-create.component.html',
   styleUrls: ['./org-create.component.scss'],
+  standalone: false,
 })
 export class OrgCreateComponent {
   protected orgForm = this.fb.group({

@@ -7,6 +7,7 @@ import { KeyboardShortcut, ORGSHORTCUTS, SIDEWIDESHORTCUTS } from 'src/app/servi
   selector: 'cnsl-keyboard-shortcuts',
   templateUrl: './keyboard-shortcuts.component.html',
   styleUrls: ['./keyboard-shortcuts.component.scss'],
+  standalone: false,
 })
 export class KeyboardShortcutsComponent {
   public orgShortcuts: KeyboardShortcut[] = ORGSHORTCUTS;

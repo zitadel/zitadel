@@ -2,6 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'redirect',
+  standalone: false,
 })
 export class RedirectPipe implements PipeTransform {
   public transform(uri: string, isNative: boolean): boolean {

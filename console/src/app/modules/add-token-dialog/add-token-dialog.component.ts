@@ -6,6 +6,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
   selector: 'cnsl-add-token-dialog',
   templateUrl: './add-token-dialog.component.html',
   styleUrls: ['./add-token-dialog.component.scss'],
+  standalone: false,
 })
 export class AddTokenDialogComponent {
   public startDate: Date = new Date();

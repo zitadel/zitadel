@@ -8,6 +8,7 @@ import { ToastService } from 'src/app/services/toast.service';
   selector: 'cnsl-profile-picture',
   templateUrl: './profile-picture.component.html',
   styleUrls: ['./profile-picture.component.scss'],
+  standalone: false,
 })
 export class ProfilePictureComponent {
   constructor(

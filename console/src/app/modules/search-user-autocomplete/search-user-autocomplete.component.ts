@@ -32,6 +32,7 @@ const USER_LIMIT = 25;
   selector: 'cnsl-search-user-autocomplete',
   templateUrl: './search-user-autocomplete.component.html',
   styleUrls: ['./search-user-autocomplete.component.scss'],
+  standalone: false,
 })
 export class SearchUserAutocompleteComponent implements OnInit, AfterContentChecked {
   public removable: boolean = true;

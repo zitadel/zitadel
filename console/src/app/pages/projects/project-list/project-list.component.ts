@@ -32,6 +32,7 @@ import { ToastService } from 'src/app/services/toast.service';
       ]),
     ]),
   ],
+  standalone: false,
 })
 export class ProjectListComponent implements OnInit, OnDestroy {
   public totalResult: number = 0;

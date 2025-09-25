@@ -69,6 +69,7 @@ import { Organization } from '@zitadel/proto/zitadel/org/v2/org_pb';
       ]),
     ]),
   ],
+  standalone: false,
 })
 export class NavComponent implements OnDestroy {
   @ViewChild('input', { static: false }) input!: ElementRef;

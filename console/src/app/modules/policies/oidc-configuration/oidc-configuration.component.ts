@@ -18,6 +18,7 @@ import { requiredValidator } from '../../form-field/validators/validators';
   selector: 'cnsl-oidc-configuration',
   templateUrl: './oidc-configuration.component.html',
   styleUrls: ['./oidc-configuration.component.scss'],
+  standalone: false,
 })
 export class OIDCConfigurationComponent implements OnInit {
   public oidcSettings!: OIDCSettings.AsObject;

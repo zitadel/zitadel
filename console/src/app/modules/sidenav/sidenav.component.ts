@@ -19,6 +19,7 @@ export interface SidenavSetting {
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class SidenavComponent {
   @Input() public navigate: boolean = true;
@@ -43,33 +44,30 @@ export class SidenavComponent {
     private readonly router: Router,
     private readonly route: ActivatedRoute,
   ) {
-    effect(
-      () => {
-        const setting = this.setting$();
-        if (setting === null) {
-          return;
-        }
+    effect(() => {
+      const setting = this.setting$();
+      if (setting === null) {
+        return;
+      }
 
-        this.settingChange.emit(setting);
+      this.settingChange.emit(setting);
 
-        if (!this.navigate) {
-          return;
-        }
+      if (!this.navigate) {
+        return;
+      }
 
-        this.router
-          .navigate([], {
-            relativeTo: this.route,
-            queryParams: {
-              id: setting ? setting.id : undefined,
-            },
-            replaceUrl: true,
-            queryParamsHandling: 'merge',
-            skipLocationChange: false,
-          })
-          .then();
-      },
-      { allowSignalWrites: true },
-    );
+      this.router
+        .navigate([], {
+          relativeTo: this.route,
+          queryParams: {
+            id: setting ? setting.id : undefined,
+          },
+          replaceUrl: true,
+          queryParamsHandling: 'merge',
+          skipLocationChange: false,
+        })
+        .then();
+    });
   }
 
   protected trackSettings(_: number, setting: SidenavSetting): string {

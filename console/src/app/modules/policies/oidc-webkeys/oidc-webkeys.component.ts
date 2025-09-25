@@ -19,6 +19,7 @@ const CACHE_WARNING_MS = 5 * 60 * 1000; // 5 minutes
   selector: 'cnsl-oidc-webkeys',
   templateUrl: './oidc-webkeys.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class OidcWebKeysComponent {
   protected readonly refresh = new Subject<true>();

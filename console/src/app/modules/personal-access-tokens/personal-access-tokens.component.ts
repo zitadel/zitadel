@@ -20,6 +20,7 @@ import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
   selector: 'cnsl-personal-access-tokens',
   templateUrl: './personal-access-tokens.component.html',
   styleUrls: ['./personal-access-tokens.component.scss'],
+  standalone: false,
 })
 export class PersonalAccessTokensComponent implements OnInit {
   @Input() userId!: string;

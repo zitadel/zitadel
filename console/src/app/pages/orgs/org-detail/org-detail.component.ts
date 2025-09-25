@@ -25,6 +25,7 @@ import { toObservable } from '@angular/core/rxjs-interop';
   selector: 'cnsl-org-detail',
   templateUrl: './org-detail.component.html',
   styleUrls: ['./org-detail.component.scss'],
+  standalone: false,
 })
 export class OrgDetailComponent implements OnInit {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;

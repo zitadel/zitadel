@@ -4,6 +4,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   selector: 'cnsl-create-layout',
   templateUrl: './create-layout.component.html',
   styleUrls: ['./create-layout.component.scss'],
+  standalone: false,
 })
 export class CreateLayoutComponent {
   @Input() currentCreateStep: number = 1;

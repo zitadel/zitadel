@@ -54,6 +54,7 @@ type Query = NonNullable<QueryWrapper extends { query?: infer Q } ? Q : never>;
   templateUrl: './user-table.component.html',
   styleUrls: ['./user-table.component.scss'],
   animations: [enterAnimations],
+  standalone: false,
 })
 export class UserTableComponent implements OnInit {
   protected readonly Type = Type;

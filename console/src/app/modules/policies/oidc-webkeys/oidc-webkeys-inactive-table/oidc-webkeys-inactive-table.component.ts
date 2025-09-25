@@ -8,6 +8,7 @@ import { WebKey } from '@zitadel/proto/zitadel/webkey/v2beta/key_pb';
   selector: 'cnsl-oidc-webkeys-inactive-table',
   templateUrl: './oidc-webkeys-inactive-table.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class OidcWebKeysInactiveTableComponent {
   @Input({ required: true })

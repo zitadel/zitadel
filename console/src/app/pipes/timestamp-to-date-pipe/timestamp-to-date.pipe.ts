@@ -4,6 +4,7 @@ import { Timestamp } from 'src/app/proto/generated/google/protobuf/timestamp_pb'
 
 @Pipe({
   name: 'timestampToDate',
+  standalone: false,
 })
 export class TimestampToDatePipe implements PipeTransform {
   transform(date: BufTimestamp | Timestamp.AsObject | undefined): Date | undefined {

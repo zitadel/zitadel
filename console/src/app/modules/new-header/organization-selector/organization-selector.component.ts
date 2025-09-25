@@ -48,7 +48,6 @@ const QUERY_LIMIT = 20;
   selector: 'cnsl-organization-selector',
   templateUrl: './organization-selector.component.html',
   styleUrls: ['./organization-selector.component.scss'],
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     NgForOf,

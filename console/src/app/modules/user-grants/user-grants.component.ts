@@ -41,6 +41,7 @@ type UserGrantAsObject = AuthUserGrant.AsObject | MgmtUserGrant.AsObject;
   templateUrl: './user-grants.component.html',
   styleUrls: ['./user-grants.component.scss'],
   animations: [enterAnimations],
+  standalone: false,
 })
 export class UserGrantsComponent implements OnInit, AfterViewInit {
   public userGrantListSearchKey: UserGrantListSearchKey | undefined = undefined;

@@ -12,6 +12,7 @@ import { By } from '@angular/platform-browser';
 
 @Component({
   template: `<input appInputDirective />`,
+  standalone: false,
 })
 class TestHostComponent {}
 

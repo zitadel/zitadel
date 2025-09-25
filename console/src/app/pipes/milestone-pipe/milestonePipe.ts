@@ -6,6 +6,7 @@ import { Milestone } from '../../proto/generated/zitadel/milestone/v1/milestone_
 
 @Pipe({
   name: 'milestone',
+  standalone: false,
 })
 export class MilestonePipe implements PipeTransform {
   constructor(private translateService: TranslateService) {}

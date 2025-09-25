@@ -12,6 +12,7 @@ import { Human } from '@zitadel/proto/zitadel/user_pb';
   selector: 'cnsl-contact',
   templateUrl: './contact.component.html',
   styleUrls: ['./contact.component.scss'],
+  standalone: false,
 })
 export class ContactComponent {
   @Input() disablePhoneCode: boolean = false;

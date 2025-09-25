@@ -10,6 +10,7 @@ import { ToastService } from 'src/app/services/toast.service';
   selector: 'cnsl-project-create',
   templateUrl: './project-create.component.html',
   styleUrls: ['./project-create.component.scss'],
+  standalone: false,
 })
 export class ProjectCreateComponent {
   public project: AddProjectRequest.AsObject = new AddProjectRequest().toObject();

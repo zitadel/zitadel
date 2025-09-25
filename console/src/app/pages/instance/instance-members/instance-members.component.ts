@@ -15,6 +15,7 @@ import { InstanceMembersDataSource } from './instance-members-datasource';
   selector: 'cnsl-instance-members',
   templateUrl: './instance-members.component.html',
   styleUrls: ['./instance-members.component.scss'],
+  standalone: false,
 })
 export class InstanceMembersComponent {
   public INITIALPAGESIZE: number = 25;

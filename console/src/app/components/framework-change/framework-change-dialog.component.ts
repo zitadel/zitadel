@@ -17,7 +17,6 @@ import { TranslateModule } from '@ngx-translate/core';
   selector: 'cnsl-framework-change-dialog',
   templateUrl: './framework-change-dialog.component.html',
   styleUrls: ['./framework-change-dialog.component.scss'],
-  standalone: true,
   imports: [MatButtonModule, MatDialogModule, TranslateModule, FrameworkAutocompleteComponent],
 })
 export class FrameworkChangeDialogComponent {

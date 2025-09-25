@@ -26,6 +26,7 @@ type SearchQuery = NonNullable<MessageInitShape<typeof ListOrganizationsRequestS
   selector: 'cnsl-org-table',
   templateUrl: './org-table.component.html',
   styleUrls: ['./org-table.component.scss'],
+  standalone: false,
 })
 export class OrgTableComponent {
   public displayedColumns: string[] = ['name', 'state', 'primaryDomain', 'creationDate', 'changeDate', 'actions'];

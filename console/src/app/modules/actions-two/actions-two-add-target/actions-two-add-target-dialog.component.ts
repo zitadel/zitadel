@@ -22,7 +22,6 @@ type TargetTypes = ActionTwoAddTargetDialogComponent['targetTypes'][number];
   selector: 'cnsl-actions-two-add-target-dialog',
   templateUrl: './actions-two-add-target-dialog.component.html',
   styleUrls: ['./actions-two-add-target-dialog.component.scss'],
-  standalone: true,
   imports: [
     CommonModule,
     MatButtonModule,

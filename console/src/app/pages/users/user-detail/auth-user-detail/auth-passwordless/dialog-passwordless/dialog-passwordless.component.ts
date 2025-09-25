@@ -16,6 +16,7 @@ export enum U2FComponentDestination {
   selector: 'cnsl-dialog-passwordless',
   templateUrl: './dialog-passwordless.component.html',
   styleUrls: ['./dialog-passwordless.component.scss'],
+  standalone: false,
 })
 export class DialogPasswordlessComponent {
   private type!: U2FComponentDestination;

@@ -39,6 +39,7 @@ import { NameDialogComponent } from 'src/app/modules/name-dialog/name-dialog.com
   selector: 'cnsl-integrate',
   templateUrl: './integrate.component.html',
   styleUrls: ['./integrate.component.scss'],
+  standalone: false,
 })
 export class IntegrateAppComponent implements OnInit, OnDestroy {
   private destroy$: Subject<void> = new Subject();

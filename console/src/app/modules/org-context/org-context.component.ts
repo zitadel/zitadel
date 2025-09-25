@@ -15,6 +15,7 @@ const ORG_QUERY_LIMIT = 100;
   selector: 'cnsl-org-context',
   templateUrl: './org-context.component.html',
   styleUrls: ['./org-context.component.scss'],
+  standalone: false,
 })
 export class OrgContextComponent implements OnInit {
   public pinned: SelectionModel<Org.AsObject> = new SelectionModel<Org.AsObject>(true, []);

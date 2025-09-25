@@ -20,6 +20,7 @@ enum SMSProviderType {
   selector: 'cnsl-dialog-add-sms-provider',
   templateUrl: './dialog-add-sms-provider.component.html',
   styleUrls: ['./dialog-add-sms-provider.component.scss'],
+  standalone: false,
 })
 export class DialogAddSMSProviderComponent {
   public SMSProviderType: any = SMSProviderType;

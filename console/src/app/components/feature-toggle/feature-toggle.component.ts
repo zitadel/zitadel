@@ -11,7 +11,6 @@ import { ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Component({
-  standalone: true,
   selector: 'cnsl-feature-toggle',
   templateUrl: './feature-toggle.component.html',
   styleUrls: ['./feature-toggle.component.scss'],

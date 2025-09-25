@@ -12,6 +12,7 @@ import { ToastService } from 'src/app/services/toast.service';
   selector: 'cnsl-iam-failed-events',
   templateUrl: './failed-events.component.html',
   styleUrls: ['./failed-events.component.scss'],
+  standalone: false,
 })
 export class FailedEventsComponent implements AfterViewInit {
   @ViewChild(MatPaginator) public eventPaginator!: MatPaginator;

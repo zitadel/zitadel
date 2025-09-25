@@ -28,6 +28,7 @@ import { PasswordComplexityValidatorFactoryService } from 'src/app/services/pass
   selector: 'cnsl-password',
   templateUrl: './password.component.html',
   styleUrls: ['./password.component.scss'],
+  standalone: false,
 })
 export class PasswordComponent implements OnInit {
   private readonly breadcrumb$: Observable<Breadcrumb[]>;

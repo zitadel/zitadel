@@ -5,6 +5,7 @@ import { SecretGenerator, SecretGeneratorType } from 'src/app/proto/generated/zi
   selector: 'cnsl-secret-generator',
   templateUrl: './secret-generator.component.html',
   styleUrls: ['./secret-generator.component.scss'],
+  standalone: false,
 })
 export class SecretGeneratorComponent {
   public generators: SecretGenerator.AsObject[] = [];

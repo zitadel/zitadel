@@ -13,6 +13,7 @@ const ROUTEPARAM = 'projectid';
   selector: 'cnsl-project-grant-create',
   templateUrl: './project-grant-create.component.html',
   styleUrls: ['./project-grant-create.component.scss'],
+  standalone: false,
 })
 export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
   public org?: Org.AsObject;

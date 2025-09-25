@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SwUpdate } from '@angular/service-worker';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NEVER, switchMap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -10,12 +12,19 @@ export class UpdateService {
     private swUpdate: SwUpdate,
     snackbar: MatSnackBar,
   ) {
-    this.swUpdate.available.subscribe((evt) => {
-      const snack = snackbar.open('Update Available', 'Reload');
+    this.swUpdate.versionUpdates
+      .pipe(
+        switchMap((event) => {
+          if (event.type !== 'VERSION_DETECTED') {
+            return NEVER;
+          }
 
-      snack.onAction().subscribe(() => {
+          return snackbar.open('Update Available', 'Reload').onAction();
+        }),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => {
         window.location.reload();
       });
-    });
   }
 }

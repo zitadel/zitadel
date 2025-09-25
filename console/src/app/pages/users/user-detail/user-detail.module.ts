@@ -36,7 +36,6 @@ import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
-import { QRCodeModule } from 'angularx-qrcode';
 import { InfoDialogModule } from 'src/app/modules/info-dialog/info-dialog.module';
 import { MetadataModule } from 'src/app/modules/metadata/metadata.module';
 import { CountryCallingCodesService } from 'src/app/services/country-calling-codes.service';
@@ -61,6 +60,7 @@ import { MachineSecretDialogComponent } from './user-detail/machine-secret-dialo
 import { PasswordlessComponent } from './user-detail/passwordless/passwordless.component';
 import { UserDetailComponent } from './user-detail/user-detail.component';
 import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
+import { QRCodeComponent } from 'angularx-qrcode';
 
 @NgModule({
   declarations: [
@@ -95,7 +95,6 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     DetailFormMachineModule,
     WarnDialogModule,
     MatDialogModule,
-    QRCodeModule,
     ShowTokenDialogModule,
     MetaLayoutModule,
     MatCheckboxModule,
@@ -129,6 +128,8 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     InfoSectionModule,
     MatSelectModule,
     TypeSafeCellDefModule,
+    QRCodeComponent,
+    MatProgressSpinnerModule,
   ],
 })
 export class UserDetailModule {}

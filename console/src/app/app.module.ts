@@ -1,5 +1,5 @@
 import { CommonModule, registerLocaleData } from '@angular/common';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import localeBg from '@angular/common/locales/bg';
 import localeDe from '@angular/common/locales/de';
 import localeCs from '@angular/common/locales/cs';
@@ -20,7 +20,7 @@ import localeHu from '@angular/common/locales/hu';
 import localeKo from '@angular/common/locales/ko';
 import localeRo from '@angular/common/locales/ro';
 import localeTr from '@angular/common/locales/tr';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { NgModule, inject, provideAppInitializer } from '@angular/core';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -147,8 +147,11 @@ const authConfig: AuthConfig = {
 
 @NgModule({
   declarations: [AppComponent],
+  bootstrap: [AppComponent],
+  exports: [],
   imports: [
     AppRoutingModule,
+
     CommonModule,
     BrowserModule,
     HeaderModule,
@@ -164,7 +167,6 @@ const authConfig: AuthConfig = {
     HasRoleModule,
     InfoOverlayModule,
     BrowserAnimationsModule,
-    HttpClientModule,
     MatIconModule,
     MatTooltipModule,
     FooterModule,
@@ -182,18 +184,14 @@ const authConfig: AuthConfig = {
     ThemeService,
     EnvironmentService,
     ExhaustedService,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: appInitializerFn,
-      multi: true,
-      deps: [GrpcService],
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: stateHandlerFn,
-      multi: true,
-      deps: [StatehandlerService],
-    },
+    provideAppInitializer(() => {
+      const initializerFn = appInitializerFn(inject(GrpcService));
+      return initializerFn();
+    }),
+    provideAppInitializer(() => {
+      const initializerFn = stateHandlerFn(inject(StatehandlerService));
+      return initializerFn();
+    }),
     {
       provide: AuthConfig,
       useValue: authConfig,
@@ -258,9 +256,8 @@ const authConfig: AuthConfig = {
     provideNgIconsConfig({
       size: '1rem',
     }),
+    provideHttpClient(withInterceptorsFromDi()),
   ],
-  bootstrap: [AppComponent],
-  exports: [],
 })
 export class AppModule {
   constructor() {}

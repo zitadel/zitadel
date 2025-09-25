@@ -12,7 +12,6 @@ import { Observable, map, of, startWith, switchMap, tap } from 'rxjs';
 import { Framework } from '../quickstart/quickstart.component';
 
 @Component({
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'cnsl-framework-autocomplete',
   templateUrl: './framework-autocomplete.component.html',

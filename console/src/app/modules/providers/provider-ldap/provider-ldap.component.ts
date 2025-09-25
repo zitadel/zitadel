@@ -28,6 +28,7 @@ import { ProviderNextService } from '../provider-next/provider-next.service';
 @Component({
   selector: 'cnsl-provider-ldap',
   templateUrl: './provider-ldap.component.html',
+  standalone: false,
 })
 export class ProviderLDAPComponent {
   public updateBindPassword: boolean = false;

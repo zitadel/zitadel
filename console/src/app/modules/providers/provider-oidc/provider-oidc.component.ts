@@ -29,6 +29,7 @@ import { ProviderNextService } from '../provider-next/provider-next.service';
   selector: 'cnsl-provider-oidc',
   templateUrl: './provider-oidc.component.html',
   styleUrls: ['./provider-oidc.component.scss'],
+  standalone: false,
 })
 export class ProviderOIDCComponent {
   public showOptional: boolean = false;

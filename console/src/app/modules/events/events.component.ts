@@ -31,6 +31,7 @@ type LoadRequest = {
   selector: 'cnsl-events',
   templateUrl: './events.component.html',
   styleUrls: ['./events.component.scss'],
+  standalone: false,
 })
 export class EventsComponent implements OnDestroy {
   public INITPAGESIZE = 20;

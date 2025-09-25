@@ -23,6 +23,7 @@ export interface WebAuthNOptions {
   selector: 'cnsl-passwordless',
   templateUrl: './passwordless.component.html',
   styleUrls: ['./passwordless.component.scss'],
+  standalone: false,
 })
 export class PasswordlessComponent implements OnInit, OnDestroy {
   @Input({ required: true }) public user!: User;

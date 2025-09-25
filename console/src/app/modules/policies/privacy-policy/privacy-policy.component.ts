@@ -26,6 +26,7 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
   selector: 'cnsl-privacy-policy',
   templateUrl: './privacy-policy.component.html',
   styleUrls: ['./privacy-policy.component.scss'],
+  standalone: false,
 })
 export class PrivacyPolicyComponent implements OnInit, OnDestroy {
   public service!: ManagementService | AdminService;

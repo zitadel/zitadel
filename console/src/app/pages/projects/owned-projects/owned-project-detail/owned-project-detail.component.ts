@@ -32,6 +32,7 @@ const GRANTS: SidenavSetting = { id: 'grants', i18nKey: 'MENU.GRANTS' };
   selector: 'cnsl-owned-project-detail',
   templateUrl: './owned-project-detail.component.html',
   styleUrls: ['./owned-project-detail.component.scss'],
+  standalone: false,
 })
 export class OwnedProjectDetailComponent implements OnInit {
   public projectId: string = '';

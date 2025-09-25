@@ -11,6 +11,7 @@ export interface CopyUrl {
   templateUrl: './provider-next.component.html',
   styleUrls: ['./provider-next.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ProviderNextComponent {
   @Input() copyUrls: CopyUrl[] | null = null;
