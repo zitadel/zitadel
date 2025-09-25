@@ -71,7 +71,7 @@ jobs:
       - name: Pack API and Login
         env:
           ZITADEL_VERSION: ${{ inputs.zitadel_version }}
-        run: nx run --nxBail pack
+        run: nx run pack
       - name: Upload all platform archives
         uses: actions/upload-artifact@v4
         with:
