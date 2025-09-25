@@ -49,8 +49,6 @@ jobs:
           version: v2.38.2
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Install global modules
-        run: pnpm add --global sass
       - name: Install Cypress binary
         run: pnpm cypress install
         working-directory: apps/login

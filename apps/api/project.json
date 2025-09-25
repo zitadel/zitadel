@@ -227,7 +227,7 @@
             "description": "Generates the gRPC and OpenAPI stubs from the proto files. This is the minimal requirement for compiling and running the API.",
             "cache": true,
             "dependsOn": [
-                "generate-stubs-build"
+                "generate-stubs-custom-protoc"
             ],
             "executor": "nx:run-commands",
             "options": {
@@ -249,8 +249,8 @@
                 "{workspaceRoot}/openapi/v2/zitadel/**/*"
             ]
         },
-        "generate-stubs-build": {
-            "description": "Builds custom protoc generators",
+        "generate-stubs-custom-protoc": {
+            "description": "Compiles custom protoc generators",
             "cache": true,
             "executor": "nx:run-commands",
             "options": {

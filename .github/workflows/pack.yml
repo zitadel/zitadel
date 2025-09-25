@@ -63,8 +63,6 @@ jobs:
           version: v0.28.0
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Install global modules
-        run: pnpm add --global sass
       - name: Pack API and Login
         env:
           ZITADEL_VERSION: ${{ inputs.zitadel_version }}
