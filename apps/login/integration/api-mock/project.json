@@ -7,12 +7,12 @@
             "command": "nx run @zitadel/devcontainer:compose build login-api-mock"
         },
         "serve": {
-            "description": "Start the API mock server",
+            "description": "Starts the API mock server",
             "continuous": true,
             "command": "nx run @zitadel/devcontainer:compose up --watch --force-recreate --renew-anon-volumes login-api-mock"
         },
         "down": {
-            "description": "Stop the API mock server",
+            "description": "Stops the API mock server",
             "command": "nx run @zitadel/devcontainer:compose down login-api-mock"
         }
     }
