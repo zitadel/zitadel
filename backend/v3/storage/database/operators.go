@@ -33,6 +33,7 @@ type Value interface {
 	Boolean | Number | Text | Instruction | Bytes
 }
 
+//go:generate enumer -type NumberOperation,TextOperation,BytesOperation -linecomment -output ./operators_enumer.go
 type Operation interface {
 	NumberOperation | TextOperation | BytesOperation
 }
@@ -46,21 +47,15 @@ type TextOperation uint8
 
 const (
 	// TextOperationEqual compares two strings for equality.
-	TextOperationEqual TextOperation = iota + 1
+	TextOperationEqual TextOperation = iota + 1 // =
 	// TextOperationNotEqual compares two strings for inequality.
-	TextOperationNotEqual
+	TextOperationNotEqual // <>
 	// TextOperationStartsWith checks if the first string starts with the second.
-	TextOperationStartsWith
+	TextOperationStartsWith // LIKE
 )
 
-var textOperations = map[TextOperation]string{
-	TextOperationEqual:      " = ",
-	TextOperationNotEqual:   " <> ",
-	TextOperationStartsWith: " LIKE ",
-}
-
 func writeTextOperation[T Text](builder *StatementBuilder, col Column, op TextOperation, value any) {
-	writeOperation[T](builder, col, textOperations[op], value)
+	writeOperation[T](builder, col, op.String(), value)
 	if op == TextOperationStartsWith {
 		builder.WriteString(" || '%'")
 	}
@@ -75,30 +70,21 @@ type NumberOperation uint8
 
 const (
 	// NumberOperationEqual compares two numbers for equality.
-	NumberOperationEqual NumberOperation = iota + 1
+	NumberOperationEqual NumberOperation = iota + 1 // =
 	// NumberOperationNotEqual compares two numbers for inequality.
-	NumberOperationNotEqual
+	NumberOperationNotEqual // <>
 	// NumberOperationLessThan compares two numbers to check if the first is less than the second.
-	NumberOperationLessThan
+	NumberOperationLessThan // <
 	// NumberOperationLessThanOrEqual compares two numbers to check if the first is less than or equal to the second.
-	NumberOperationAtLeast
+	NumberOperationAtLeast // <=
 	// NumberOperationGreaterThan compares two numbers to check if the first is greater than the second.
-	NumberOperationGreaterThan
+	NumberOperationGreaterThan // >
 	// NumberOperationGreaterThanOrEqual compares two numbers to check if the first is greater than or equal to the second.
-	NumberOperationAtMost
+	NumberOperationAtMost // >=
 )
 
-var numberOperations = map[NumberOperation]string{
-	NumberOperationEqual:       " = ",
-	NumberOperationNotEqual:    " <> ",
-	NumberOperationLessThan:    " < ",
-	NumberOperationAtLeast:     " <= ",
-	NumberOperationGreaterThan: " > ",
-	NumberOperationAtMost:      " >= ",
-}
-
 func writeNumberOperation[T Number](builder *StatementBuilder, col Column, op NumberOperation, value any) {
-	writeOperation[T](builder, col, numberOperations[op], value)
+	writeOperation[T](builder, col, op.String(), value)
 }
 
 type Boolean interface {
@@ -106,7 +92,7 @@ type Boolean interface {
 }
 
 func writeBooleanOperation[T Boolean](builder *StatementBuilder, col Column, value any) {
-	writeOperation[T](builder, col, " = ", value)
+	writeOperation[T](builder, col, "=", value)
 }
 
 type Bytes interface {
@@ -117,17 +103,12 @@ type Bytes interface {
 type BytesOperation uint8
 
 const (
-	BytesOperationEqual BytesOperation = iota + 1
-	BytesOperationNotEqual
+	BytesOperationEqual    BytesOperation = iota + 1 // =
+	BytesOperationNotEqual                           // <>
 )
 
-var bytesOperations = map[BytesOperation]string{
-	BytesOperationEqual:    " = ",
-	BytesOperationNotEqual: " <> ",
-}
-
 func writeBytesOperation[T Bytes](builder *StatementBuilder, col Column, op BytesOperation, value any) {
-	writeOperation[T](builder, col, bytesOperations[op], value)
+	writeOperation[T](builder, col, op.String(), value)
 }
 
 func writeOperation[V Value](builder *StatementBuilder, col Column, op string, value any) {
@@ -141,6 +122,8 @@ func writeOperation[V Value](builder *StatementBuilder, col Column, op string, v
 		panic("unsupported value type")
 	}
 	col.WriteQualified(builder)
+	builder.WriteRune(' ')
 	builder.WriteString(op)
+	builder.WriteRune(' ')
 	builder.WriteArg(value)
 }

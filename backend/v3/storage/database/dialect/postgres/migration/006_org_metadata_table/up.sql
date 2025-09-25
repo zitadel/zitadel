@@ -22,7 +22,7 @@ CREATE INDEX idx_org_metadata_value ON zitadel.org_metadata (sha256(value));
 -- CREATE INDEX idx_org_metadata_value_boolean ON zitadel.org_metadata ((value::BOOLEAN)) WHERE jsonb_typeof(value) = 'boolean';
 
 CREATE TRIGGER trg_set_updated_at_org_metadata
-  BEFORE UPDATE ON zitadel.org_metadata
+  BEFORE INSERT OR UPDATE ON zitadel.org_metadata
   FOR EACH ROW
   WHEN (NEW.updated_at IS NULL)
   EXECUTE FUNCTION zitadel.set_updated_at();

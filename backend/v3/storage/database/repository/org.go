@@ -169,8 +169,7 @@ func (o org) StateCondition(state domain.OrgState) database.Condition {
 }
 
 // ExistsDomain creates a correlated [database.Exists] condition on org_domains.
-// Use this when you want to filter organizations by a domain condition but still return all domains
-// of the organization in the aggregated result.
+// Use this filter to make sure the organization returned contains a specific domain.
 // Example usage:
 //
 //	domainRepo := orgRepo.Domains(true) // ensure domains are loaded/aggregated
@@ -178,7 +177,7 @@ func (o org) StateCondition(state domain.OrgState) database.Condition {
 //	    database.WithCondition(
 //	        database.And(
 //	            orgRepo.InstanceIDCondition(instanceID),
-//	            orgRepo.DomainExists(domainRepo.DomainCondition(database.TextOperationEqual, "example.com")),
+//	            orgRepo.ExistsDomain(domainRepo.DomainCondition(database.TextOperationEqual, "example.com")),
 //	        ),
 //	    ),
 //	)
