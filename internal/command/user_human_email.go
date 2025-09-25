@@ -50,7 +50,7 @@ func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email, em
 		if err != nil {
 			return nil, err
 		}
-		events = append(events, user.NewHumanEmailCodeAddedEvent(ctx, userAgg, emailCode.Code, emailCode.Expiry, ""))
+		events = append(events, user.NewHumanEmailCodeAddedEvent(ctx, userAgg, emailCode.Code, emailCode.Expiry, c.defaultEmailCodeURLTemplate(ctx), false, ""))
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
@@ -134,7 +134,7 @@ func (c *Commands) CreateHumanEmailVerificationCode(ctx context.Context, userID,
 	if authRequestID == "" {
 		authRequestID = existingEmail.AuthRequestID
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanEmailCodeAddedEvent(ctx, userAgg, emailCode.Code, emailCode.Expiry, authRequestID))
+	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanEmailCodeAddedEvent(ctx, userAgg, emailCode.Code, emailCode.Expiry, c.defaultEmailCodeURLTemplate(ctx), false, authRequestID))
 	if err != nil {
 		return nil, err
 	}

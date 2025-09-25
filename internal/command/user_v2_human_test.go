@@ -492,7 +492,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						newAddHumanEvent("", false, true, "", language.English),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -565,7 +565,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					),
 					expectPush(
 						newAddHumanEvent("$plain$x$password", false, true, "", language.English),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -640,7 +640,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					),
 					expectPush(
 						newAddHumanEvent("$plain$x$password", false, true, "", language.English),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -1522,7 +1522,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					),
 					expectPush(
 						newRegisterHumanEvent("email@test.ch", "", false, true, "", language.English),
-						user.NewHumanEmailCodeAddedEventV2(
+						user.NewHumanEmailCodeAddedEvent(
 							context.Background(),
 							&userAgg.Aggregate,
 							&crypto.CryptoValue{
@@ -2554,7 +2554,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							&userAgg.Aggregate,
 							"changed@example.com",
 						),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -2735,7 +2735,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							&userAgg.Aggregate,
 							"changed@test.com",
 						),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
