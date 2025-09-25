@@ -3,9 +3,6 @@ package projection
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
-
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -59,12 +56,6 @@ func (p *orgMetadataRelationalProjection) reduceSet(event eventstore.Event) (*ha
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-xg4IJ", "reduce.wrong.db.pool %T", ex)
-		}
-		if !json.Valid(e.Value) {
-			// TODO(adlerhurst): how should we handle invalid data?
-			logging.Info("invalid")
-		} else {
-			logging.Info("valid")
 		}
 		return repository.OrganizationMetadataRepository().Set(ctx, v3_sql.SQLTx(tx), &domain.OrganizationMetadata{
 			Metadata: domain.Metadata{
