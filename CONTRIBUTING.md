@@ -10,7 +10,7 @@ You can build and start any project with Nx commands:
 | Task | Command | Notes |
 |------|---------|--------|
 | **Production** | `nx run PROJECT:prod` | Production server |
-| **Develop** | `nx run PROJECT:dev` | Hot reload development server |
+| **Develop** | `nx run PROJECT:dev` | Development server |
 | **Generate** | `nx run PROJECT:generate` | Generate files |
 | **Test** | `nx run PROJECT:test` | Run tests |
 | **Lint** | `nx run PROJECT:lint` | Check code style |
