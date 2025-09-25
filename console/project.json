@@ -45,7 +45,7 @@
             ]
         },
         "development": {
-            "description": "Runs the Angular Console application in development mode with hot-reloading",
+            "description": "Runs the Console in development mode with hot-reloading",
             "continuous": true,
             "dependsOn": [
                 "generate",
