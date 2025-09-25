@@ -425,7 +425,7 @@ The Login application consists of multiple packages:
 - `@zitadel/client` - TypeScript client library for Zitadel APIs
 - `@zitadel/proto` - Protocol buffer definitions and generated code
 
-The build process uses Nx and PNPM to orchestrate dependencies:
+The build process uses Nx and pnpm to orchestrate dependencies:
 
 #### Pass Quality Checks
 
@@ -551,17 +551,28 @@ Fix the quality checks, add new checks that cover your changes and mark your pul
 **Recommended: Use Dev Container** (everything pre-configured)
 
 Open in VS Code with Dev Container extension.
-NodeJS, PNPM, Docker and Go are already installed.
+NodeJS, Go, pnpm and Docker are already installed.
 
-**For local development, install:**
+**For developing frontend apps or libraries, install:**
 
 - **[Node.js v22.x](https://nodejs.org/en/download/)** - JavaScript runtime
-- **[pnpm 10.x](https://pnpm.io/installation)** - Package manager
 - **[Docker](https://docs.docker.com/engine/install/)** - For supporting services
 
-**For developing the API backend, additionally install:**
+**For developing the API backend, install:**
 
-- **[Go 1.24.x](https://go.dev/doc/install)**
+- **[Go 1.24.x](https://go.dev/doc/install)** - API development
+- **[Node.js v22.x](https://nodejs.org/en/download/)** - Required to run [nx commands](https://nx.dev/)
+- **[Docker](https://docs.docker.com/engine/install/)** - For supporting services
+
+**Install pnpm:**
+
+Use [Corepack](https://pnpm.io/installation#using-corepack) to install pnpm.
+This makes sure you have the pnpm version installed that is declared in [](./package.json)
+
+```bash
+npm install --global corepack@latest
+corepack enable
+```
 
 **Install Node Modules:**
 ```bash

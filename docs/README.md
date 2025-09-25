@@ -6,10 +6,18 @@ The documentation is part of the ZITADEL monorepo and uses **pnpm** and **Nx** f
 
 ## Quick Start
 
-```bash
-# From the repository root
-pnpm install
+Run the following commands from the repositorys root directory to install all dependencies needed.
+Using Corepack makes sure you have the pnpm version intalled that is declared in [](../package.json).
 
+```bash
+npm install --global corepack@latest
+corepack enable
+pnpm install
+```
+
+Start a docs server
+
+```bash
 # Start development server with live-reloading
 pnpm nx run @zitadel/docs:dev
 

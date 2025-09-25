@@ -7,6 +7,14 @@ services:
       dockerfile: .devcontainer/Dockerfile
     volumes:
       - ../:/workspaces/zitadel:cached
+      # The following anonymous volumes prevent overwriting node_modules in the container
+      - /workspaces/zitadel/node_modules
+      - /workspaces/zitadel/apps/login/node_modules
+      - /workspaces/zitadel/console/node_modules
+      - /workspaces/zitadel/packages/zitadel-client/node_modules
+      - /workspaces/zitadel/packages/zitadel-proto/node_modules
+      - /workspaces/zitadel/tests/functional-ui/node_modules
+      - /workspaces/zitadel/docs/node_modules
     command: sleep infinity
     working_dir: /workspaces/zitadel
     environment:

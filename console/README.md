@@ -1,46 +1,10 @@
-# Console Angular App
+# Zitadel Console
 
-This is the Zitadel Console Angular application.
+The Console is Zitadels management UI.
 
-## Development
+It is built using [Angular](https://angular.dev/) and part of the Zitadel monorepo.
 
-### Prerequisites
-
-- Node.js 18 or later
-- pnpm (latest)
-
-### Installation
-
-```bash
-pnpm install
-```
-
-### Development Server
-
-To start the development server:
-
-```bash
-pnpm nx run @zitadel/console:dev
-```
-
-This will:
-
-1. Fetch the environment configuration from the server
-2. Serve the app on the default port
-
-To allow Console access via http://localhost:4200, you have to configure the Zitadel backend.
-
-1. Navigate to /ui/console/projects in your target Zitadel instance.
-3. Select the _ZITADEL_ project.
-4. Select the _Console_ application.
-5. Select _Redirect Settings_
-6. Add _http://<span because="breaks the link"></span>localhost:4200/auth/callback_ to the _Redirect URIs_
-7. Add _http://<span because="breaks the link"></span>localhost:4200/signedout_ to the _Post Logout URIs_
-8. Select the _Save_ button
-
-Visit http://localhost:4200/?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
-
-Make some changes to the source code and see how the browser is automatically updated.
+To get started follow the [contributing quick start](../CONTRIBUTING.md#console).
 
 ### Building
 
