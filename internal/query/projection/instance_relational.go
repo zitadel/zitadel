@@ -74,7 +74,7 @@ func (p *instanceRelationalProjection) reduceInstanceAdded(event eventstore.Even
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rVUyy", "reduce.wrong.db.pool %T", ex)
 		}
-		return repository.InstanceRepository(v3_sql.SQLTx(tx)).Create(ctx, &domain.Instance{
+		return repository.InstanceRepository().Create(ctx, v3_sql.SQLTx(tx), &domain.Instance{
 			ID:        e.Aggregate().ID,
 			Name:      e.Name,
 			CreatedAt: e.CreationDate(),
@@ -93,8 +93,8 @@ func (p *instanceRelationalProjection) reduceInstanceChanged(event eventstore.Ev
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rVUyy", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.InstanceRepository(v3_sql.SQLTx(tx))
-		return p.updateInstance(ctx, event, repo, repo.SetName(e.Name))
+		repo := repository.InstanceRepository()
+		return p.updateInstance(ctx, v3_sql.SQLTx(tx), event, repo, repo.SetName(e.Name))
 	}), nil
 }
 
@@ -108,7 +108,7 @@ func (p *instanceRelationalProjection) reduceInstanceDelete(event eventstore.Eve
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rVUyy", "reduce.wrong.db.pool %T", ex)
 		}
-		_, err := repository.InstanceRepository(v3_sql.SQLTx(tx)).Delete(ctx, e.Aggregate().ID)
+		_, err := repository.InstanceRepository().Delete(ctx, v3_sql.SQLTx(tx), e.Aggregate().ID)
 		return err
 	}), nil
 }
@@ -124,8 +124,8 @@ func (p *instanceRelationalProjection) reduceDefaultOrgSet(event eventstore.Even
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rVUyy", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.InstanceRepository(v3_sql.SQLTx(tx))
-		return p.updateInstance(ctx, event, repo, repo.SetDefaultOrg(e.OrgID))
+		repo := repository.InstanceRepository()
+		return p.updateInstance(ctx, v3_sql.SQLTx(tx), event, repo, repo.SetDefaultOrg(e.OrgID))
 	}), nil
 }
 
@@ -140,8 +140,8 @@ func (p *instanceRelationalProjection) reduceIAMProjectSet(event eventstore.Even
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rVUyy", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.InstanceRepository(v3_sql.SQLTx(tx))
-		return p.updateInstance(ctx, event, repo, repo.SetIAMProject(e.ProjectID))
+		repo := repository.InstanceRepository()
+		return p.updateInstance(ctx, v3_sql.SQLTx(tx), event, repo, repo.SetIAMProject(e.ProjectID))
 	}), nil
 }
 
@@ -156,8 +156,8 @@ func (p *instanceRelationalProjection) reduceConsoleSet(event eventstore.Event) 
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rVUyy", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.InstanceRepository(v3_sql.SQLTx(tx))
-		return p.updateInstance(ctx, event, repo, repo.SetConsoleClientID(e.ClientID), repo.SetConsoleAppID(e.AppID))
+		repo := repository.InstanceRepository()
+		return p.updateInstance(ctx, v3_sql.SQLTx(tx), event, repo, repo.SetConsoleClientID(e.ClientID), repo.SetConsoleAppID(e.AppID))
 	}), nil
 }
 
@@ -172,18 +172,18 @@ func (p *instanceRelationalProjection) reduceDefaultLanguageSet(event eventstore
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rVUyy", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.InstanceRepository(v3_sql.SQLTx(tx))
-		return p.updateInstance(ctx, event, repo, repo.SetDefaultLanguage(e.Language))
+		repo := repository.InstanceRepository()
+		return p.updateInstance(ctx, v3_sql.SQLTx(tx), event, repo, repo.SetDefaultLanguage(e.Language))
 	}), nil
 }
 
-func (p *instanceRelationalProjection) updateInstance(ctx context.Context, event eventstore.Event, repo domain.InstanceRepository, changes ...database.Change) error {
-	_, err := repo.Update(ctx, event.Aggregate().ID, changes...)
+func (p *instanceRelationalProjection) updateInstance(ctx context.Context, tx database.Transaction, event eventstore.Event, repo domain.InstanceRepository, changes ...database.Change) error {
+	_, err := repo.Update(ctx, tx, event.Aggregate().ID, changes...)
 	if err != nil {
 		return err
 	}
 
-	instance, err := repo.Get(ctx, database.WithCondition(repo.IDCondition(event.Aggregate().ID)))
+	instance, err := repo.Get(ctx, tx, database.WithCondition(repo.IDCondition(event.Aggregate().ID)))
 	if err != nil {
 		return err
 	}
@@ -192,7 +192,7 @@ func (p *instanceRelationalProjection) updateInstance(ctx context.Context, event
 	}
 	// we need to split the update into two statements because multiple events can have the same creation date
 	// therefore we first do not set the updated_at timestamp
-	_, err = repo.Update(ctx,
+	_, err = repo.Update(ctx, tx,
 		event.Aggregate().ID,
 		repo.SetUpdatedAt(event.CreatedAt()),
 	)

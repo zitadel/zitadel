@@ -13,7 +13,7 @@ import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_p
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
-import { getNextUrl } from "../client";
+import { completeFlowOrGetUrl } from "../client";
 import {
   getMostRecentSessionCookie,
   getSessionCookieById,
@@ -21,6 +21,7 @@ import {
   removeSessionFromCookie,
 } from "../cookies";
 import { getServiceUrlFromHeaders } from "../service-url";
+import { getOriginalHost } from "./host";
 
 export async function skipMFAAndContinueWithNextUrl({
   userId,
@@ -34,7 +35,7 @@ export async function skipMFAAndContinueWithNextUrl({
   sessionId?: string;
   requestId?: string;
   organization?: string;
-}) {
+}): Promise<{ redirect: string } | { error: string }> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -45,34 +46,31 @@ export async function skipMFAAndContinueWithNextUrl({
 
   await humanMFAInitSkipped({ serviceUrl, userId });
 
-  const url =
-    requestId && sessionId
-      ? await getNextUrl(
-          {
-            sessionId: sessionId,
-            requestId: requestId,
-            organization: organization,
-          },
-          loginSettings?.defaultRedirectUri,
-        )
-      : loginName
-        ? await getNextUrl(
-            {
-              loginName: loginName,
-              organization: organization,
-            },
-            loginSettings?.defaultRedirectUri,
-          )
-        : null;
-  if (url) {
-    return { redirect: url };
+  if (requestId && sessionId) {
+    return completeFlowOrGetUrl(
+      {
+        sessionId: sessionId,
+        requestId: requestId,
+        organization: organization,
+      },
+      loginSettings?.defaultRedirectUri,
+    );
+  } else if (loginName) {
+    return completeFlowOrGetUrl(
+      {
+        loginName: loginName,
+        organization: organization,
+      },
+      loginSettings?.defaultRedirectUri,
+    );
   }
+
+  return { error: "Could not skip MFA and continue" };
 }
 
-export async function continueWithSession({
-  requestId,
-  ...session
-}: Session & { requestId?: string }) {
+export type ContinueWithSessionCommand = Session & { requestId?: string };
+
+export async function continueWithSession({ requestId, ...session }: ContinueWithSessionCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -81,27 +79,23 @@ export async function continueWithSession({
     organization: session.factors?.user?.organizationId,
   });
 
-  const url =
-    requestId && session.id && session.factors?.user
-      ? await getNextUrl(
-          {
-            sessionId: session.id,
-            requestId: requestId,
-            organization: session.factors.user.organizationId,
-          },
-          loginSettings?.defaultRedirectUri,
-        )
-      : session.factors?.user
-        ? await getNextUrl(
-            {
-              loginName: session.factors.user.loginName,
-              organization: session.factors.user.organizationId,
-            },
-            loginSettings?.defaultRedirectUri,
-          )
-        : null;
-  if (url) {
-    return { redirect: url };
+  if (requestId && session.id && session.factors?.user) {
+    return completeFlowOrGetUrl(
+      {
+        sessionId: session.id,
+        requestId: requestId,
+        organization: session.factors.user.organizationId,
+      },
+      loginSettings?.defaultRedirectUri,
+    );
+  } else if (session.factors?.user) {
+    return completeFlowOrGetUrl(
+      {
+        loginName: session.factors.user.loginName,
+        organization: session.factors.user.organizationId,
+      },
+      loginSettings?.defaultRedirectUri,
+    );
   }
 }
 
@@ -116,8 +110,7 @@ export type UpdateSessionCommand = {
 };
 
 export async function updateSession(options: UpdateSessionCommand) {
-  let { loginName, sessionId, organization, checks, requestId, challenges } =
-    options;
+  let { loginName, sessionId, organization, checks, requestId, challenges } = options;
   const recentSession = sessionId
     ? await getSessionCookieById({ sessionId })
     : loginName
@@ -132,18 +125,13 @@ export async function updateSession(options: UpdateSessionCommand) {
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
+  const host = await getOriginalHost();
 
   if (!host) {
     return { error: "Could not get host" };
   }
 
-  if (
-    host &&
-    challenges &&
-    challenges.webAuthN &&
-    !challenges.webAuthN.domain
-  ) {
+  if (host && challenges && challenges.webAuthN && !challenges.webAuthN.domain) {
     const [hostname] = host.split(":");
 
     challenges.webAuthN.domain = hostname;
@@ -219,11 +207,11 @@ export async function clearSession(options: ClearSessionOptions) {
   });
 
   const securitySettings = await getSecuritySettings({ serviceUrl });
-  const sameSite = securitySettings?.embeddedIframe?.enabled ? "none" : true;
+  const iFrameEnabled = !!securitySettings?.embeddedIframe?.enabled;
 
   if (!deleteResponse) {
     throw new Error("Could not delete session");
   }
 
-  return removeSessionFromCookie({ session: sessionCookie, sameSite });
+  return removeSessionFromCookie({ session: sessionCookie, iFrameEnabled });
 }

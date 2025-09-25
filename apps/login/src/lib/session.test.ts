@@ -1,10 +1,12 @@
 /**
  * Unit tests for the isSessionValid function.
- * 
+ *
  * This test suite covers the comprehensive session validation logic including:
  * - Session expiration checks
  * - User presence validation
  * - Authentication factor verification (password, passkey, IDP)
+ * - MFA validation using the shared shouldEnforceMFA function from verify-helper
+ * - Passkey authentication inherently satisfies MFA requirements
  * - MFA validation with configured authentication methods (TOTP, OTP Email/SMS, U2F)
  * - MFA validation with login settings (forceMfa, forceMfaLocalOnly)
  * - Email verification when EMAIL_VERIFICATION environment variable is enabled
@@ -15,6 +17,7 @@ import { timestampDate } from "@zitadel/client";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { isSessionValid } from "./session";
+import * as verifyHelperModule from "./verify-helper";
 import * as zitadelModule from "./zitadel";
 
 // Mock the zitadel client timestampDate function
@@ -27,6 +30,11 @@ vi.mock("./zitadel", () => ({
   listAuthenticationMethodTypes: vi.fn(),
   getLoginSettings: vi.fn(),
   getUserByID: vi.fn(),
+}));
+
+// Mock the verify-helper module
+vi.mock("./verify-helper", () => ({
+  shouldEnforceMFA: vi.fn(),
 }));
 
 // Mock environment variables
@@ -113,10 +121,7 @@ describe("isSessionValid", () => {
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
 
       expect(result).toBe(false);
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "Session is expired",
-        expect.any(String)
-      );
+      expect(consoleSpy).toHaveBeenCalledWith("Session is expired", expect.any(String));
       consoleSpy.mockRestore();
     });
   });
@@ -147,7 +152,7 @@ describe("isSessionValid", () => {
   });
 
   describe("MFA validation with configured authentication methods", () => {
-    test("should return true when TOTP is configured and verified", async () => {
+    test("should return true when TOTP is configured and verified with MFA required", async () => {
       const verifiedTimestamp = createMockTimestamp();
       const session = createMockSession({
         factors: {
@@ -167,8 +172,9 @@ describe("isSessionValid", () => {
         },
       });
 
-      vi.mocked(zitadelModule.listAuthenticationMethodTypes).mockResolvedValue({
-        authMethodTypes: [AuthenticationMethodType.TOTP],
+      vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
+        forceMfa: true,
+        forceMfaLocalOnly: false,
       } as any);
 
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
@@ -176,7 +182,35 @@ describe("isSessionValid", () => {
       expect(result).toBe(true);
     });
 
-    test("should return false when TOTP is configured but not verified", async () => {
+    test("should return true when TOTP is configured but not verified and MFA is not required", async () => {
+      const verifiedTimestamp = createMockTimestamp();
+      const session = createMockSession({
+        factors: {
+          user: {
+            id: mockUserId,
+            organizationId: mockOrganizationId,
+            loginName: "test@example.com",
+            displayName: "Test User",
+            verifiedAt: verifiedTimestamp,
+          },
+          password: {
+            verifiedAt: verifiedTimestamp,
+          },
+          // No TOTP verification
+        },
+      });
+
+      vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
+        forceMfa: false,
+        forceMfaLocalOnly: false,
+      } as any);
+
+      const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
+
+      expect(result).toBe(true);
+    });
+
+    test("should return false when TOTP is configured but not verified and MFA is required", async () => {
       const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
       const verifiedTimestamp = createMockTimestamp();
       const session = createMockSession({
@@ -196,27 +230,24 @@ describe("isSessionValid", () => {
       });
 
       vi.mocked(zitadelModule.listAuthenticationMethodTypes).mockResolvedValue({
-        authMethodTypes: [AuthenticationMethodType.TOTP],
+        authMethodTypes: [AuthenticationMethodType.PASSWORD, AuthenticationMethodType.TOTP],
       } as any);
+
+      vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
+        forceMfa: true,
+        forceMfaLocalOnly: false,
+      } as any);
+
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(true);
 
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
 
       expect(result).toBe(false);
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "Session has no valid MFA factor. Configured methods:",
-        [AuthenticationMethodType.TOTP],
-        "Session factors:",
-        expect.objectContaining({
-          totp: undefined,
-          otpEmail: undefined,
-          otpSms: undefined,
-          webAuthN: undefined,
-        })
-      );
+      expect(consoleSpy).toHaveBeenCalledWith("Session has no valid MFA factor. Configured methods:", expect.any(Array), "Session factors:", expect.any(Object));
       consoleSpy.mockRestore();
     });
 
-    test("should return true when OTP Email is configured and verified", async () => {
+    test("should return true when OTP Email is configured and verified with MFA required", async () => {
       const verifiedTimestamp = createMockTimestamp();
       const session = createMockSession({
         factors: {
@@ -274,7 +305,7 @@ describe("isSessionValid", () => {
       expect(result).toBe(true);
     });
 
-    test("should return true when multiple auth methods are configured and one is verified", async () => {
+    test("should return true when multiple auth methods are configured and one is verified with MFA required", async () => {
       const verifiedTimestamp = createMockTimestamp();
       const session = createMockSession({
         factors: {
@@ -295,12 +326,216 @@ describe("isSessionValid", () => {
         },
       });
 
+      vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
+        forceMfa: true,
+        forceMfaLocalOnly: false,
+      } as any);
+
       vi.mocked(zitadelModule.listAuthenticationMethodTypes).mockResolvedValue({
         authMethodTypes: [AuthenticationMethodType.TOTP, AuthenticationMethodType.OTP_EMAIL],
       } as any);
 
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
 
+      expect(result).toBe(true);
+    });
+
+    test("should return true when session has only password and MFA is not required by policy", async () => {
+      const verifiedTimestamp = createMockTimestamp();
+      const session = createMockSession({
+        factors: {
+          user: {
+            id: mockUserId,
+            organizationId: mockOrganizationId,
+            loginName: "test@example.com",
+            displayName: "Test User",
+            verifiedAt: verifiedTimestamp,
+          },
+          password: {
+            verifiedAt: verifiedTimestamp,
+          },
+          // No MFA factors verified
+        },
+      });
+
+      vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
+        forceMfa: false,
+        forceMfaLocalOnly: false,
+      } as any);
+
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(false);
+
+      const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
+
+      expect(result).toBe(true);
+    });
+
+    test("should return true when user has PASSWORD and TOTP configured but only password verified and MFA not required", async () => {
+      // This test specifically covers the original bug scenario:
+      // - User has PASSWORD and TOTP configured (would show up in listAuthenticationMethodTypes)
+      // - User has only verified password, not TOTP
+      // - MFA is not required by policy
+      // - Session should be valid (this was the bug - it was returning false)
+
+      const verifiedTimestamp = createMockTimestamp();
+      const session = createMockSession({
+        factors: {
+          user: {
+            id: mockUserId,
+            organizationId: mockOrganizationId,
+            loginName: "test@example.com",
+            displayName: "Test User",
+            verifiedAt: verifiedTimestamp,
+          },
+          password: {
+            verifiedAt: verifiedTimestamp,
+          },
+          // TOTP is configured but NOT verified - this is the key part
+          // totp: undefined (no verifiedAt)
+        },
+      });
+
+      vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
+        forceMfa: false,
+        forceMfaLocalOnly: false,
+      } as any);
+
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(false);
+
+      const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
+
+      expect(result).toBe(true);
+    });
+
+    test("should return false when user has PASSWORD and TOTP configured but only password verified and MFA IS required", async () => {
+      // This is the counterpart test to ensure MFA is still enforced when required
+
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const verifiedTimestamp = createMockTimestamp();
+      const session = createMockSession({
+        factors: {
+          user: {
+            id: mockUserId,
+            organizationId: mockOrganizationId,
+            loginName: "test@example.com",
+            displayName: "Test User",
+            verifiedAt: verifiedTimestamp,
+          },
+          password: {
+            verifiedAt: verifiedTimestamp,
+          },
+          // TOTP is configured but NOT verified
+          // totp: undefined (no verifiedAt)
+        },
+      });
+
+      vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
+        forceMfa: true,
+        forceMfaLocalOnly: false,
+      } as any);
+
+      vi.mocked(zitadelModule.listAuthenticationMethodTypes).mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.TOTP],
+      } as any);
+
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(true);
+
+      const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
+
+      expect(result).toBe(false);
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "Session has no valid MFA factor. Configured methods:",
+        [AuthenticationMethodType.TOTP],
+        "Session factors:",
+        expect.objectContaining({
+          totp: undefined,
+          otpEmail: undefined,
+          otpSms: undefined,
+          webAuthN: undefined,
+        }),
+      );
+      consoleSpy.mockRestore();
+    });
+
+    test("REGRESSION TEST: user with only PASSWORD factor should be valid when MFA not required", async () => {
+      // This test specifically verifies the original bug is fixed
+      // Original bug: A user with only PASSWORD authentication would be invalid
+      // because the code checked if authMethods.length > 0 (which included PASSWORD)
+      // and then required MFA verification even when MFA was not required by policy
+
+      const verifiedTimestamp = createMockTimestamp();
+      const session = createMockSession({
+        factors: {
+          user: {
+            id: mockUserId,
+            organizationId: mockOrganizationId,
+            loginName: "test@example.com",
+            displayName: "Test User",
+            verifiedAt: verifiedTimestamp,
+          },
+          password: {
+            verifiedAt: verifiedTimestamp,
+          },
+          // Explicitly no MFA factors at all
+          totp: undefined,
+          otpEmail: undefined,
+          otpSms: undefined,
+          webAuthN: undefined,
+          intent: undefined,
+        },
+      });
+
+      vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
+        forceMfa: false,
+        forceMfaLocalOnly: false,
+      } as any);
+
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(false);
+
+      const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
+
+      // This should be true - if it's false, the original bug still exists
+      expect(result).toBe(true);
+    });
+
+    test("DEMONSTRATION: how the original bug would manifest with old logic", async () => {
+      // This test demonstrates the original problematic scenario:
+      // 1. listAuthenticationMethodTypes returns [PASSWORD, TOTP]
+      // 2. Old logic would check authMethods.length > 0 (true because PASSWORD is included)
+      // 3. Old logic would then require MFA verification regardless of policy
+      // 4. User has only password verified, no TOTP
+      // 5. Session would be marked invalid even though MFA is not required
+
+      const verifiedTimestamp = createMockTimestamp();
+      const session = createMockSession({
+        factors: {
+          user: {
+            id: mockUserId,
+            organizationId: mockOrganizationId,
+            loginName: "test@example.com",
+            displayName: "Test User",
+            verifiedAt: verifiedTimestamp,
+          },
+          password: {
+            verifiedAt: verifiedTimestamp,
+          },
+          // User has TOTP configured but not verified
+          totp: undefined,
+        },
+      });
+
+      // MFA is NOT required by policy
+      vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
+        forceMfa: false,
+        forceMfaLocalOnly: false,
+      } as any);
+
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(false);
+
+      const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
+
+      // With our fix, this should be true (session is valid)
+      // With the old logic, this would have been false (bug)
       expect(result).toBe(true);
     });
   });
@@ -331,6 +566,8 @@ describe("isSessionValid", () => {
         forceMfa: false,
         forceMfaLocalOnly: false,
       } as any);
+
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(false);
 
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
 
@@ -365,13 +602,12 @@ describe("isSessionValid", () => {
         forceMfaLocalOnly: false,
       } as any);
 
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(true);
+
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
 
       expect(result).toBe(false);
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "Session has no valid multifactor",
-        expect.any(Object)
-      );
+      expect(consoleSpy).toHaveBeenCalledWith("Session has no valid multifactor", expect.any(Object));
       consoleSpy.mockRestore();
     });
 
@@ -442,6 +678,50 @@ describe("isSessionValid", () => {
 
       expect(result).toBe(true);
     });
+
+    test("should return false when forceMfaLocalOnly is enabled for password authentication but MFA not satisfied", async () => {
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const verifiedTimestamp = createMockTimestamp();
+      const session = createMockSession({
+        factors: {
+          user: {
+            id: mockUserId,
+            organizationId: mockOrganizationId,
+            loginName: "test@example.com",
+            displayName: "Test User",
+            verifiedAt: verifiedTimestamp,
+          },
+          password: {
+            verifiedAt: verifiedTimestamp,
+          },
+          // No MFA factors verified
+        },
+      });
+
+      vi.mocked(zitadelModule.listAuthenticationMethodTypes).mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.TOTP],
+      } as any);
+
+      vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
+        forceMfa: false,
+        forceMfaLocalOnly: true,
+      } as any);
+
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(true);
+
+      const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
+
+      expect(result).toBe(false);
+      expect(zitadelModule.getLoginSettings).toHaveBeenCalledWith({
+        serviceUrl: mockServiceUrl,
+        organization: mockOrganizationId,
+      });
+      expect(zitadelModule.listAuthenticationMethodTypes).toHaveBeenCalledWith({
+        serviceUrl: mockServiceUrl,
+        userId: mockUserId,
+      });
+      consoleSpy.mockRestore();
+    });
   });
 
   describe("email verification", () => {
@@ -474,6 +754,8 @@ describe("isSessionValid", () => {
         forceMfaLocalOnly: false,
       } as any);
 
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(false);
+
       vi.mocked(zitadelModule.getUserByID).mockResolvedValue({
         user: {
           type: {
@@ -493,7 +775,7 @@ describe("isSessionValid", () => {
       expect(result).toBe(false);
       expect(consoleSpy).toHaveBeenCalledWith(
         "Session invalid: Email not verified and EMAIL_VERIFICATION is enabled",
-        mockUserId
+        mockUserId,
       );
       consoleSpy.mockRestore();
     });
@@ -525,6 +807,8 @@ describe("isSessionValid", () => {
         forceMfa: false,
         forceMfaLocalOnly: false,
       } as any);
+
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(false);
 
       vi.mocked(zitadelModule.getUserByID).mockResolvedValue({
         user: {
@@ -573,6 +857,8 @@ describe("isSessionValid", () => {
         forceMfaLocalOnly: false,
       } as any);
 
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(false);
+
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
 
       expect(result).toBe(true);
@@ -616,7 +902,7 @@ describe("isSessionValid", () => {
   });
 
   describe("IDP authentication", () => {
-    test("should return true when authenticated with IDP intent", async () => {
+    test("should return true when authenticated with IDP intent and no MFA required", async () => {
       const verifiedTimestamp = createMockTimestamp();
       const session = createMockSession({
         factors: {
@@ -634,18 +920,194 @@ describe("isSessionValid", () => {
         },
       });
 
-      vi.mocked(zitadelModule.listAuthenticationMethodTypes).mockResolvedValue({
-        authMethodTypes: [],
-      } as any);
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(false);
 
       vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
         forceMfa: false,
         forceMfaLocalOnly: false,
       } as any);
 
+      vi.mocked(zitadelModule.listAuthenticationMethodTypes).mockResolvedValue({
+        authMethodTypes: [],
+      } as any);
+
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
 
       expect(result).toBe(true);
+      expect(verifyHelperModule.shouldEnforceMFA).toHaveBeenCalledWith(session, expect.any(Object));
+      expect(zitadelModule.getLoginSettings).toHaveBeenCalledWith({
+        serviceUrl: mockServiceUrl,
+        organization: mockOrganizationId,
+      });
+    });
+
+    test("should return false when authenticated with IDP intent but MFA required and not satisfied", async () => {
+      const verifiedTimestamp = createMockTimestamp();
+      const session = createMockSession({
+        factors: {
+          user: {
+            id: mockUserId,
+            organizationId: mockOrganizationId,
+            loginName: "test@example.com",
+            displayName: "Test User",
+            verifiedAt: verifiedTimestamp,
+          },
+          intent: {
+            verifiedAt: verifiedTimestamp,
+          },
+          // No password factor, no MFA factors verified
+        },
+      });
+
+      // shouldEnforceMFA returns true (MFA is required for this session)
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(true);
+
+      vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
+        forceMfa: true,
+        forceMfaLocalOnly: false,
+      } as any);
+
+      // User has MFA methods configured but none verified
+      vi.mocked(zitadelModule.listAuthenticationMethodTypes).mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.TOTP, AuthenticationMethodType.OTP_EMAIL],
+      } as any);
+
+      const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
+
+      expect(result).toBe(false);
+      expect(verifyHelperModule.shouldEnforceMFA).toHaveBeenCalledWith(session, expect.any(Object));
+      expect(zitadelModule.getLoginSettings).toHaveBeenCalledWith({
+        serviceUrl: mockServiceUrl,
+        organization: mockOrganizationId,
+      });
+      expect(zitadelModule.listAuthenticationMethodTypes).toHaveBeenCalledWith({
+        serviceUrl: mockServiceUrl,
+        userId: mockUserId,
+      });
+    });
+
+    test("should return true when authenticated with IDP intent and forceMfaLocalOnly (IDP bypasses local-only MFA)", async () => {
+      const verifiedTimestamp = createMockTimestamp();
+      const session = createMockSession({
+        factors: {
+          user: {
+            id: mockUserId,
+            organizationId: mockOrganizationId,
+            loginName: "test@example.com",
+            displayName: "Test User",
+            verifiedAt: verifiedTimestamp,
+          },
+          intent: {
+            verifiedAt: verifiedTimestamp,
+          },
+          // No password factor, no MFA factors verified
+        },
+      });
+
+      // shouldEnforceMFA returns false (IDP bypasses forceMfaLocalOnly)
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(false);
+
+      vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
+        forceMfa: false,
+        forceMfaLocalOnly: true,
+      } as any);
+
+      // User has MFA methods configured but none verified
+      vi.mocked(zitadelModule.listAuthenticationMethodTypes).mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.TOTP, AuthenticationMethodType.OTP_EMAIL],
+      } as any);
+
+      const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
+
+      expect(result).toBe(true);
+      expect(verifyHelperModule.shouldEnforceMFA).toHaveBeenCalledWith(session, expect.any(Object));
+      expect(zitadelModule.getLoginSettings).toHaveBeenCalledWith({
+        serviceUrl: mockServiceUrl,
+        organization: mockOrganizationId,
+      });
+      // Should not call listAuthenticationMethodTypes since shouldEnforceMFA returned false
+      expect(zitadelModule.listAuthenticationMethodTypes).not.toHaveBeenCalled();
+    });
+
+    test("should return true when authenticated with IDP intent and MFA required and satisfied", async () => {
+      const verifiedTimestamp = createMockTimestamp();
+      const session = createMockSession({
+        factors: {
+          user: {
+            id: mockUserId,
+            organizationId: mockOrganizationId,
+            loginName: "test@example.com",
+            displayName: "Test User",
+            verifiedAt: verifiedTimestamp,
+          },
+          intent: {
+            verifiedAt: verifiedTimestamp,
+          },
+          totp: {
+            verifiedAt: verifiedTimestamp,
+          },
+        },
+      });
+
+      // Organization enforces MFA
+      vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
+        forceMfa: true,
+        forceMfaLocalOnly: false,
+      } as any);
+
+      // User has TOTP configured and verified
+      vi.mocked(zitadelModule.listAuthenticationMethodTypes).mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.TOTP],
+      } as any);
+
+      const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
+
+      expect(result).toBe(true);
+    });
+  });
+
+  describe("passkey authentication", () => {
+    test("should return true when authenticated with passkey and MFA required (passkey satisfies MFA)", async () => {
+      const verifiedTimestamp = createMockTimestamp();
+      const session = createMockSession({
+        factors: {
+          user: {
+            id: mockUserId,
+            organizationId: mockOrganizationId,
+            loginName: "test@example.com",
+            displayName: "Test User",
+            verifiedAt: verifiedTimestamp,
+          },
+          webAuthN: {
+            verifiedAt: verifiedTimestamp,
+          },
+          // No password factor, no additional MFA factors
+        },
+      });
+
+      // shouldEnforceMFA returns false (passkey satisfies MFA requirements)
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(false);
+
+      vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
+        forceMfa: true,
+        forceMfaLocalOnly: false,
+      } as any);
+
+      // User has MFA methods configured but none verified (passkey should satisfy MFA)
+      vi.mocked(zitadelModule.listAuthenticationMethodTypes).mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.TOTP],
+      } as any);
+
+      const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
+
+      expect(result).toBe(true);
+      expect(verifyHelperModule.shouldEnforceMFA).toHaveBeenCalledWith(session, expect.any(Object));
+      expect(zitadelModule.getLoginSettings).toHaveBeenCalledWith({
+        serviceUrl: mockServiceUrl,
+        organization: mockOrganizationId,
+      });
+      // Should not call listAuthenticationMethodTypes since shouldEnforceMFA returned false
+      expect(zitadelModule.listAuthenticationMethodTypes).not.toHaveBeenCalled();
     });
   });
 

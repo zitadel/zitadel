@@ -70,15 +70,15 @@ type OrganizationDomainRepository interface {
 	// Get returns a single domain based on the criteria.
 	// If no domain is found, it returns an error of type [database.ErrNotFound].
 	// If multiple domains are found, it returns an error of type [database.ErrMultipleRows].
-	Get(ctx context.Context, opts ...database.QueryOption) (*OrganizationDomain, error)
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*OrganizationDomain, error)
 	// List returns a list of domains based on the criteria.
 	// If no domains are found, it returns an empty slice.
-	List(ctx context.Context, opts ...database.QueryOption) ([]*OrganizationDomain, error)
+	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*OrganizationDomain, error)
 
 	// Add adds a new domain to the organization.
-	Add(ctx context.Context, domain *AddOrganizationDomain) error
+	Add(ctx context.Context, client database.QueryExecutor, domain *AddOrganizationDomain) error
 	// Update updates an existing domain in the organization.
-	Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error)
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	// Remove removes a domain from the organization.
-	Remove(ctx context.Context, condition database.Condition) (int64, error)
+	Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }
