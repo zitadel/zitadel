@@ -1571,11 +1571,6 @@ func (s *settingsRelationalProjection) reduceSecurityPolicySet(event eventstore.
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		settings, err := json.Marshal(e)
-		if err != nil {
-			return err
-		}
-
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-lhPul", "reduce.wrong.db.pool %T", ex)
@@ -1583,21 +1578,34 @@ func (s *settingsRelationalProjection) reduceSecurityPolicySet(event eventstore.
 		settingsRepo := repository.SettingsRepository()
 
 		existingSetting, err := settingsRepo.GetSecurity(ctx, v3_sql.SQLTx(tx), e.Agg.InstanceID, nil)
-		if err != nil {
-			if errors.Is(err, &database.NoRowFoundError{}) {
-				setting := domain.Setting{
-					InstanceID: e.Aggregate().InstanceID,
-					Type:       domain.SettingTypeSecurity,
-					Settings:   settings,
-					CreatedAt:  e.CreatedAt(),
-					UpdatedAt:  &e.Creation,
-				}
-				err = settingsRepo.Create(ctx, v3_sql.SQLTx(tx), &setting)
-				return err
-
-			} else {
-				return zerrors.ThrowInternal(err, "HANDL-rSkxt", "error accessing login policy record")
+		if err != nil && !errors.Is(err, new(database.NoRowFoundError)) {
+			return zerrors.ThrowInternal(err, "HANDL-rSkxt", "error accessing login policy record")
+		}
+		if errors.Is(err, new(database.NoRowFoundError)) {
+			setting := new(domain.SecuritySettings)
+			if e.EnableIframeEmbedding != nil {
+				setting.EnableIframeEmbedding = *e.EnableIframeEmbedding
 			}
+			if e.Enabled != nil {
+				setting.Enabled = *e.Enabled
+			}
+			if e.AllowedOrigins != nil {
+				setting.AllowedOrigins = *e.AllowedOrigins
+			}
+			if e.EnableImpersonation != nil {
+				setting.EnableImpersonation = *e.EnableImpersonation
+			}
+			payload, err := json.Marshal(setting)
+			if err != nil {
+				return err
+			}
+			return settingsRepo.Create(ctx, v3_sql.SQLTx(tx), &domain.Setting{
+				InstanceID: e.Aggregate().InstanceID,
+				Type:       domain.SettingTypeSecurity,
+				Settings:   payload,
+				CreatedAt:  e.CreatedAt(),
+				UpdatedAt:  &e.Creation,
+			})
 		}
 
 		if e.EnableIframeEmbedding != nil {
