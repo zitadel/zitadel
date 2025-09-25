@@ -13,7 +13,6 @@ This is the Zitadel Console Angular application.
 
 ```bash
 pnpm install
-pnpm add -g nx@21.5.2
 ```
 
 ### Development Server
@@ -21,7 +20,7 @@ pnpm add -g nx@21.5.2
 To start the development server:
 
 ```bash
-nx run @zitadel/console:dev
+pnpm nx run @zitadel/console:dev
 ```
 
 This will:
@@ -48,7 +47,7 @@ Make some changes to the source code and see how the browser is automatically up
 To build for production:
 
 ```bash
-nx run @zitadel/console:build
+pnpm nx run @zitadel/console:build
 ```
 
 This will:
@@ -61,13 +60,13 @@ This will:
 To run linting and formatting checks:
 
 ```bash
-nx @zitadel/console:lint
+pnpm nx @zitadel/console:lint
 ```
 
 To auto-fix formatting issues:
 
 ```bash
-nx @zitadel/console:lint-fix
+pnpm nx @zitadel/console:lint-fix
 ```
 
 ## Project Structure

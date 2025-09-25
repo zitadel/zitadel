@@ -9,16 +9,16 @@ You can build and start any project with Nx commands:
 
 | Task | Command | Notes |
 |------|---------|--------|
-| **Production** | `nx run PROJECT:prod` | Production server |
-| **Develop** | `nx run PROJECT:dev` | Development server |
-| **Generate** | `nx run PROJECT:generate` | Generate files |
-| **Test** | `nx run PROJECT:test` | Run tests |
-| **Lint** | `nx run PROJECT:lint` | Check code style |
-| **Lint Fix** | `nx run PROJECT:lint-fix` | Auto-fix style issues |
+| **Production** | `pnpm nx run PROJECT:prod` | Production server |
+| **Develop** | `pnpm nx run PROJECT:dev` | Development server |
+| **Generate** | `pnpm nx run PROJECT:generate` | Generate files |
+| **Test** | `pnpm nx run PROJECT:test` | Run tests |
+| **Lint** | `pnpm nx run PROJECT:lint` | Check code style |
+| **Lint Fix** | `pnpm nx run PROJECT:lint-fix` | Auto-fix style issues |
 
 Replace `PROJECT` with one of the following:
 
-- `@zitadel/zitadel` (you can omit this root level project when using `nx run`, like `nx run db`)
+- `@zitadel/zitadel` (you can omit this root level project when using `pnpm nx run`, like `pnpm nx run db`)
 - `@zitadel/api`
 - `@zitadel/login`
 - `@zitadel/console`
@@ -26,22 +26,22 @@ Replace `PROJECT` with one of the following:
 - `@zitadel/client`
 - `@zitadel/proto`
 
-Instead of the project names, you can also use their directory names for `PROJECT`, like `nx run login:dev`.
-Alternatively, you can use the infix-notation, like `nx dev @zitadel/login` or `nx dev login`.
+Instead of the project names, you can also use their directory names for `PROJECT`, like `pnpm nx run login:dev`.
+Alternatively, you can use the infix-notation, like `pnpm nx dev @zitadel/login` or `pnpm nx dev login`.
 
 ### <a name="api-quick-start"></a>API
 
 Prepare the API development with a Console and run a local Login production build.
 
 ```bash
-nx run @zitadel/api:generate
-nx run-many -p . @zitadel/login -t db prod
+pnpm nx run @zitadel/api:generate
+pnpm nx run-many -p . @zitadel/login -t db prod
 ```
 
 If you don't need a Login or a Console, you can omit them and use the generated ./admin.pat to call the API.
 
 ```bash
-nx run-many -p . @zitadel/api -t db generate-stubs
+pnpm nx run-many -p . @zitadel/api -t db generate-stubs
 ```
 
 Start a debug session in your IDE.
@@ -59,13 +59,13 @@ For more options, go to the [API section](#api)
 Develop the Login and connect a local API with a local DB
 
 ```bash
-nx run-many -p . @zitadel/api -t db prod
+pnpm nx run-many -p . @zitadel/api -t db prod
 ```
 
 In another terminal, start the Login development server
 
 ```bash
-nx run @zitadel/login:dev
+pnpm nx run @zitadel/login:dev
 ```
 
 Visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
@@ -79,13 +79,13 @@ For more options, go to the [Login section](#login)
 Develop the Console and connect a local API with a local Login and DB:
 
 ```bash
-nx run-many -p . @zitadel/api @zitadel/login -t db prod
+pnpm nx run-many -p . @zitadel/api @zitadel/login -t db prod
 ```
 
 In another terminal, start the console development server
 
 ```bash
-nx run @zitadel/console:dev
+pnpm nx run @zitadel/console:dev
 ```
 
 To allow Console access via http://localhost:4200, you have to configure the Zitadel API.
@@ -264,7 +264,7 @@ Get familiar with the [API quick start](#api-quick-start).
 To test the code without dependencies, run the unit tests:
 
 ```bash
-nx run @zitadel/api:test-unit
+pnpm nx run @zitadel/api:test-unit
 ```
 
 ### Run Local Functional API Tests (Formerly Called Integration Tests)
@@ -273,7 +273,7 @@ Functional API tests are run as gRPC clients against a running Zitadel server bi
 The server binary is [built with coverage enabled](https://go.dev/doc/build-cover).
 
 ```bash
-nx run @zitadel/api:test-integration
+pnpm nx run @zitadel/api:test-integration
 ```
 
 To develop and run the test cases from within your IDE or by the command line, start only the API.
@@ -283,7 +283,7 @@ Because of the server-client split, Go is usually unaware of changes in server c
 Pass `-count 1` to disable test caching.
 
 ```bash
-nx run @zitadel/api:test-integration-app
+pnpm nx run @zitadel/api:test-integration-app
 ```
 
 Example command to run a single package integration test:
@@ -303,13 +303,13 @@ In order to run the server, a database with correctly set up data is required.
 When starting the debugger, make sure the Zitadel binary gets the flag `--config=./apps/api/test-integration.yaml`
 
 ```bash
-nx run @zitadel/api:test-integration-state
+pnpm nx run @zitadel/api:test-integration-state
 ```
 
 To cleanup after testing (deletes the ephemeral database!):
 
 ```bash
-nx run @zitadel/devcontainer:compose down db-api-integration cache-api-integration
+pnpm nx run @zitadel/devcontainer:compose down db-api-integration cache-api-integration
 ```
 
 The test binary has the race detector enabled. `api_integration_server_stop` checks for any race logs reported by Go and will print them along a `66` exit code when found.
@@ -321,11 +321,11 @@ To test the whole system, including the Console UI and the Login UI, run the Fun
 
 ```bash
 # If you made changes in the tests/functional-ui directory, make sure you reformat the files
-nx run @zitadel/functional-ui:lint-fix
+pnpm nx run @zitadel/functional-ui:lint-fix
 
 # Run the tests
-nx run @zitadel/functional-ui:test-firefox
-nx run @zitadel/functional-ui:test-chrome
+pnpm nx run @zitadel/functional-ui:test-firefox
+pnpm nx run @zitadel/functional-ui:test-chrome
 ```
 
 ### Run Local Functional UI Tests Against Your Dev Server Console
@@ -334,14 +334,14 @@ If you also make [changes to the Console](#console), you can run the test suite 
 
 ```bash
 # Run the API
-nx run @zitadel/functional-ui:test-env
+pnpm nx run @zitadel/functional-ui:test-env
 ```
 
 In another terminal, open the interactive test suite
 
 ```bash
 # The open command is configured to run against http://localhost:4200 by default
-nx run @zitadel/functional-ui:open
+pnpm nx run @zitadel/functional-ui:open
 ```
 
 ## <a name="frontend"></a>Contribute Frontend Code
@@ -355,7 +355,7 @@ Make sure you have the [development requirements](#dev-requirements) installed.
 **Start developing***
 
 ```bash
-nx run @zitadel/login:dev # or console:dev or docs:dev
+pnpm nx run @zitadel/login:dev # or console:dev or docs:dev
 ```
 
 ### Project Overview
@@ -381,12 +381,12 @@ docs → (independent)
 
 **`@zitadel/proto`**: Protocol buffer definitions and generated TypeScript/JavaScript clients.
 ```bash
-nx run @zitadel/proto:generate  # Regenerate after proto changes
+pnpm nx run @zitadel/proto:generate  # Regenerate after proto changes
 ```
 
 **`@zitadel/client`**: High-level TypeScript client library with utilities for API interaction.
 ```bash
-nx run @zitadel/client:build  # Build after changes
+pnpm nx run @zitadel/client:build  # Build after changes
 ```
 
 ### <a name="login"></a>Contribute to Login
@@ -412,7 +412,7 @@ ZITADEL_SERVICE_USER_TOKEN=[personal access token for an IAM Login Client]
 3. Start the development server.
 
 ```bash
-nx run @zitadel/login:dev
+pnpm nx run @zitadel/login:dev
 ```
 
 Visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
@@ -433,9 +433,9 @@ Reproduce the pipeline quality checks for the code you changed.
 
 ```bash
 # Run Login-related linting builds and unit tests
-nx run-many --projects @zitadel/login @zitadel/client @zitadel/proto --targets lint build test-unit
+pnpm nx run-many --projects @zitadel/login @zitadel/client @zitadel/proto --targets lint build test-unit
 # Run Login integration tests
-nx run @zitadel/login:test-integration
+pnpm nx run @zitadel/login:test-integration
 ```
 
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
@@ -443,8 +443,8 @@ Fix the quality checks, add new checks that cover your changes and mark your pul
 #### <a name="login-deploy"></a>Deploy
 
 - [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzitadel%2Fzitadel&env=ZITADEL_API_URL,ZITADEL_SERVICE_USER_ID,ZITADEL_SERVICE_USER_TOKEN&root-directory=apps/login&envDescription=Setup%20a%20service%20account%20with%20IAM_LOGIN_CLIENT%20membership%20on%20your%20instance%20and%20provide%20its%20id%20and%20personal%20access%20token.&project-name=zitadel-login&repository-name=zitadel-login)
-- Build and deploy with Docker: `nx run @zitadel/login:build && docker build -t my-zitadel-login apps/login`
-- Build and deploy with NodeJS: `nx run @zitadel/login:prod`
+- Build and deploy with Docker: `pnpm nx run @zitadel/login:build && docker build -t my-zitadel-login apps/login`
+- Build and deploy with NodeJS: `pnpm nx run @zitadel/login:prod`
 
 ### <a name="console"></a>Contribute to Console
 
@@ -465,7 +465,7 @@ ENVIRONMENT_JSON_URL=https://[your-cloud-instance-domain]/ui/console/assets/envi
 1. Start the development server.
 
 ```bash
-nx run @zitadel/console:dev
+pnpm nx run @zitadel/console:dev
 ```
 
 3. Allow your cloud instance to redirect to your local console, as described in the [Console quick start](#console-quick-start)
@@ -478,11 +478,11 @@ Reproduce the pipeline quality checks for the code you changed.
 
 ```bash
 # Run console-related linting builds and unit tests
-nx run-many --projects @zitadel/console @zitadel/client @zitadel/proto @zitadel/functional-ui --targets lint build test
+pnpm nx run-many --projects @zitadel/console @zitadel/client @zitadel/proto @zitadel/functional-ui --targets lint build test
 
 # Run the functional UI tests
-nx run @zitadel/functional-ui:test-firefox
-nx run @zitadel/functional-ui:test-chrome
+pnpm nx run @zitadel/functional-ui:test-firefox
+pnpm nx run @zitadel/functional-ui:test-chrome
 ```
 
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
@@ -497,10 +497,10 @@ To start developing the Docs, make sure your system has the [required system dep
 
 ```bash
 # Start development server (recommended)
-nx run @zitadel/docs:dev
+pnpm nx run @zitadel/docs:dev
 
 # Or start production server
-nx run @zitadel/docs:prod
+pnpm nx run @zitadel/docs:prod
 ```
 
 The Docs build process automatically:
@@ -541,7 +541,7 @@ Scope can be left empty (omit the brackets) or refer to the top navigation secti
 Verify the Docs build correctly.
 
 ```bash
-nx run @zitadel/docs:build
+pnpm nx run @zitadel/docs:build
 ```
 
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
@@ -567,10 +567,9 @@ NodeJS, PNPM, Docker and Go are already installed.
 ```bash
 # Install dependencies
 pnpm install
-pnpm add -g nx@21.5.2
 
 # Test a project
-nx run @zitadel/login:dev  # Should start dev server at http://localhost:3000/ui/v2/login/loginname
+pnpm nx run @zitadel/login:dev  # Should start dev server at http://localhost:3000/ui/v2/login/loginname
 ```
 
 **Additional requirements for testing:**

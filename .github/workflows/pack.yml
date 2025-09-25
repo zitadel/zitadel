@@ -6,9 +6,6 @@ on:
       node_version:
         required: true
         type: string
-      nx_version:
-        required: true
-        type: string
       zitadel_version:
         required: true
         type: string
@@ -67,11 +64,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Install global modules
-        run: pnpm add --global nx@${{ inputs.nx_version }} sass
+        run: pnpm add --global sass
       - name: Pack API and Login
         env:
           ZITADEL_VERSION: ${{ inputs.zitadel_version }}
-        run: nx run --nxBail pack
+        run: pnpm nx run --nxBail pack
       - name: Upload all platform archives
         uses: actions/upload-artifact@v4
         with:

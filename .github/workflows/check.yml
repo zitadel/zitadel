@@ -6,9 +6,6 @@ on:
       node_version:
         required: true
         type: string
-      nx_version:
-        required: true
-        type: string
     secrets:
       CODECOV_TOKEN:
         required: true
@@ -53,7 +50,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Install global modules
-        run: pnpm add --global nx@${{ inputs.nx_version }} sass
+        run: pnpm add --global sass
       - name: Install Cypress binary
         run: pnpm cypress install
         working-directory: apps/login
@@ -74,11 +71,11 @@ jobs:
             nx-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-
             nx-${{ github.event.pull_request.base.ref || github.ref_name }}-
       - name: Run Quality Checks on Affected Projects
-        run: nx affected --nxBail --targets lint build test --exclude @zitadel/docs,@zitadel/benchmark
+        run: pnpm nx affected --nxBail --targets lint build test --exclude @zitadel/docs,@zitadel/benchmark
       - name: Test Functional UI Firefox
-        run: nx affected --nxBail --targets test-firefox
+        run: pnpm nx affected --nxBail --targets test-firefox
       - name: Test Functional UI Chrome
-        run: nx affected --nxBail --targets test-chrome
+        run: pnpm nx affected --nxBail --targets test-chrome
       - uses: actions/cache/save@v4
         if: always()
         with:

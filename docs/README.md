@@ -9,13 +9,12 @@ The documentation is part of the ZITADEL monorepo and uses **pnpm** and **Nx** f
 ```bash
 # From the repository root
 pnpm install
-pnpm add -g nx@21.5.2
 
 # Start development server with live-reloading
-nx run @zitadel/docs:dev
+pnpm nx run @zitadel/docs:dev
 
 # Or serve a production build
-nx run @zitadel/docs:start
+pnpm nx run @zitadel/docs:start
 ```
 
 The site will be available at http://localhost:3100

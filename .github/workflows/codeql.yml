@@ -17,9 +17,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-env:
-  nx_version: "21.5.2"
-
 jobs:
   CodeQL-Build:
     runs-on: ubuntu-latest
@@ -41,8 +38,7 @@ jobs:
     - if: matrix.language == 'go'
       run: |
         pnpm install --frozen-lockfile
-        pnpm add --global nx@${{ env.nx_version }} sass
-        nx run-many --nxBail --projects @zitadel/api --targets generate-stubs generate-statik generate-assets
+        pnpm nx run-many --nxBail --projects @zitadel/api --targets generate-stubs generate-statik generate-assets
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
