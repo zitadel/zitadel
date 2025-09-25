@@ -16,6 +16,9 @@ const (
 	OrgStateUnspecified OrgState = iota
 	OrgStateActive
 	OrgStateInactive
+
+	// TODO(IAM-Marco): This should be removed in next versions of Zitadel I believe. We are hard deleting,
+	// so not sure when this state would be used. It is kept here just for compatibility with the gRPC model
 	OrgStateRemoved
 )
 
