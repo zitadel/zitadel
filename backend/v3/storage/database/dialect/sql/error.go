@@ -22,22 +22,8 @@ func wrapError(err error) error {
 	}
 
 	var pgxErr *pgconn.PgError
-	if !errors.As(err, &pgxErr) {
-		return database.NewUnknownError(err)
-	}
-	switch pgxErr.Code {
-	// 23514: check_violation - A value violates a CHECK constraint.
-	case "23514":
-		return database.NewCheckError(pgxErr.TableName, pgxErr.ConstraintName, pgxErr)
-	// 23505: unique_violation - A value violates a UNIQUE constraint.
-	case "23505":
-		return database.NewUniqueError(pgxErr.TableName, pgxErr.ConstraintName, pgxErr)
-	// 23503: foreign_key_violation - A value violates a foreign key constraint.
-	case "23503":
-		return database.NewForeignKeyError(pgxErr.TableName, pgxErr.ConstraintName, pgxErr)
-	// 23502: not_null_violation - A value violates a NOT NULL constraint.
-	case "23502":
-		return database.NewNotNullError(pgxErr.TableName, pgxErr.ConstraintName, pgxErr)
+	if errors.As(err, &pgxErr) {
+		return wrapPgError(pgxErr)
 	}
 
 	// scany only exports its errors as strings
@@ -49,4 +35,23 @@ func wrapError(err error) error {
 	}
 
 	return database.NewUnknownError(err)
+}
+
+func wrapPgError(err *pgconn.PgError) error {
+	switch err.Code {
+	// 23514: check_violation - A value violates a CHECK constraint.
+	case "23514":
+		return database.NewCheckError(err.TableName, err.ConstraintName, err)
+	// 23505: unique_violation - A value violates a UNIQUE constraint.
+	case "23505":
+		return database.NewUniqueError(err.TableName, err.ConstraintName, err)
+	// 23503: foreign_key_violation - A value violates a foreign key constraint.
+	case "23503":
+		return database.NewForeignKeyError(err.TableName, err.ConstraintName, err)
+	// 23502: not_null_violation - A value violates a NOT NULL constraint.
+	case "23502":
+		return database.NewNotNullError(err.TableName, err.ConstraintName, err)
+	default:
+		return database.NewUnknownError(err)
+	}
 }
