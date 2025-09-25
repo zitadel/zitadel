@@ -1,7 +1,7 @@
 services:
 
   devcontainer:
-    container_name: devcontainer
+    container_name: zitadel-devcontainer
     build:
       context: ..
       dockerfile: .devcontainer/Dockerfile
@@ -23,7 +23,7 @@ services:
       - "4200:4200"
 
   db:
-    container_name: db
+    container_name: zitadel-db
     image: postgres:17
     restart: unless-stopped
     env_file:
@@ -40,7 +40,7 @@ services:
       - 5432:5432
 
   db-api-integration:
-    restart: 'always'
+    container_name: zitadel-db-api-integration
     image: 'postgres:17'
     env_file:
       - ./.env.db
@@ -57,13 +57,13 @@ services:
       - 5433:5433
 
   cache-api-integration:
-    restart: 'always'
-    image: 'redis:latest'
+    container_name: zitadel-cache-api-integration
+    image: 'redis:8'
     ports:
       - 6379:6379
 
   db-functional-ui:
-    restart: 'always'
+    container_name: zitadel-db-functional-ui
     image: 'postgres:17'
     env_file:
       - ./.env.db
@@ -79,7 +79,7 @@ services:
       - "5434:5434"
 
   login-api-mock:
-    container_name: login-api-mock
+    container_name: zitadel-login-api-mock
     build:
       context: ../apps/login/integration/api-mock
       additional_contexts:

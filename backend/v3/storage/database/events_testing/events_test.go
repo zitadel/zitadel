@@ -16,7 +16,9 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	v2beta "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
+	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 )
@@ -33,9 +35,12 @@ var ConnString = fmt.Sprintf("host=%s port=5433 user=zitadel password=zitadel db
 var (
 	dbPool       *pgxpool.Pool
 	CTX          context.Context
+	IAMCTX       context.Context
 	Instance     *integration.Instance
 	SystemClient system.SystemServiceClient
 	OrgClient    v2beta_org.OrganizationServiceClient
+	AdminClient  admin.AdminServiceClient
+	MgmtClient   mgmt.ManagementServiceClient
 )
 
 var pool database.Pool
@@ -48,8 +53,11 @@ func TestMain(m *testing.M) {
 		CTX = integration.WithSystemAuthorization(ctx)
 		Instance = integration.NewInstance(CTX)
 
+		IAMCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		SystemClient = integration.SystemClient()
 		OrgClient = Instance.Client.OrgV2beta
+		AdminClient = Instance.Client.Admin
+		MgmtClient = Instance.Client.Mgmt
 
 		defer func() {
 			_, err := Instance.Client.InstanceV2Beta.DeleteInstance(CTX, &v2beta.DeleteInstanceRequest{
