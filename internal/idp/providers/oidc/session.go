@@ -2,7 +2,11 @@ package oidc
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"io"
+	"net/http"
+	"strings"
 	"time"
 
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
@@ -49,6 +53,12 @@ func (s *Session) PersistentParameters() map[string]any {
 // It will execute an OIDC code exchange if needed to retrieve the tokens,
 // call the userinfo endpoint and map the received information into an [idp.User].
 func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
+	// Check if the provider is Facebook
+	if strings.Contains(s.Provider.RelyingParty.Issuer(), "facebook.com") {
+		user, err = s.fetchFacebookUser(ctx)
+		return user, err
+	}
+
 	if s.Tokens == nil {
 		if err = s.Authorize(ctx); err != nil {
 			return nil, err
@@ -69,7 +79,72 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 			return nil, err
 		}
 	}
+
 	u := s.Provider.userInfoMapper(info)
+	return u, nil
+}
+
+func (s *Session) fetchFacebookUser(ctx context.Context) (user idp.User, err error) {
+	if s.Tokens == nil {
+		if err = s.Authorize(ctx); err != nil {
+			return nil, err
+		}
+	}
+
+	// Use the access token to get user info from Facebook's /me endpoint
+	endpoint := "https://graph.facebook.com/me?fields=id,name,email,first_name,last_name,picture&access_token=" + s.Tokens.AccessToken
+
+	req, err := http.NewRequestWithContext(ctx, "GET", endpoint, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var userInfo struct {
+		ID        string `json:"id"`
+		Email     string `json:"email"`
+		Name      string `json:"name"`
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
+		Picture   struct {
+			Data struct {
+				URL string `json:"url"`
+			} `json:"data"`
+		} `json:"picture"`
+	}
+	if err := json.Unmarshal(body, &userInfo); err != nil {
+		return nil, err
+	}
+
+	u := &User{
+		UserInfo: &oidc.UserInfo{
+			Subject: userInfo.ID,
+			UserInfoProfile: oidc.UserInfoProfile{
+				GivenName:  userInfo.FirstName,
+				FamilyName: userInfo.LastName,
+				Picture:    userInfo.Picture.Data.URL,
+			},
+			UserInfoEmail: oidc.UserInfoEmail{
+				Email:         userInfo.Email,
+				EmailVerified: oidc.Bool(userInfo.Email != ""),
+			},
+		},
+	}
+	// Set the display name, which is now a method, not a field.
+	// The underlying struct will compose this from GivenName and FamilyName if Name is not set.
+	// We have already set them from the Facebook response.
+	// For logging purposes, let's reconstruct the full name.
+	userInfo.Name = strings.TrimSpace(userInfo.FirstName + " " + userInfo.LastName)
 	return u, nil
 }
 
@@ -84,10 +159,18 @@ func (s *Session) Authorize(ctx context.Context) (err error) {
 	if s.Code == "" {
 		return ErrCodeMissing
 	}
+
+	// Check if the provider is Facebook and set custom token URL
+	if strings.Contains(s.Provider.RelyingParty.Issuer(), "facebook.com") {
+		s.Provider.RelyingParty.OAuthConfig().Endpoint.TokenURL = "https://graph.facebook.com/v23.0/oauth/access_token"
+		s.Provider.RelyingParty.OAuthConfig().Scopes = []string{"email", "public_profile"}
+	}
+
 	var opts []rp.CodeExchangeOpt
 	if s.CodeVerifier != "" {
 		opts = append(opts, rp.WithCodeVerifier(s.CodeVerifier))
 	}
+
 	s.Tokens, err = rp.CodeExchange[*oidc.IDTokenClaims](ctx, s.Code, s.Provider.RelyingParty, opts...)
 	return err
 }
