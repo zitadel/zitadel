@@ -9,6 +9,25 @@ A Next.js-based login application implementing ZITADEL's authentication flow wit
 - Node.js 18+ and pnpm
 - ZITADEL instance running (can be local or remote)
 
+## Developing Your Own ZITADEL Login UI
+
+We think the easiest path of getting up and running, is the following:
+
+1. Fork and clone this repository
+2. Rename the file .github/dependabot.example.yml to .github/dependabot.yml so you don't miss version and security updates.
+3. [Run the ZITADEL Cloud login UI locally](#development-setup)
+4. Make changes to the code and see the effects live on your local machine
+5. Study the rest of this README.md and get familiar and comfortable with how everything works.
+6. Decide on a way of how you want to build and run your login UI.
+   You can reuse ZITADEL Clouds way.
+   But if you need more freedom, you can also import the packages you need into your self built application.
+
+The `@zitadel/client` package is using [@connectrpc/connect](https://github.com/connectrpc/connect-es#readme).
+
+You can read the [contribution guide](/CONTRIBUTING.md) on how to contribute.
+Questions can be raised in our [Discord channel](https://discord.gg/erh5Brh7jE) or as
+a [GitHub issue](https://github.com/zitadel/typescript/issues).
+
 ### Development Setup
 
 1. **Install dependencies:**
@@ -86,6 +105,13 @@ pnpm --filter=@zitadel/login test
 ## Application Architecture
 
 This login application is implemented as a **state machine** with multiple pages handling different authentication steps. Each page represents a state in the authentication flow, with transitions based on user actions and system policies.
+
+### Custom translations
+
+The new login uses the [SettingsApi](https://zitadel.com/docs/apis/resources/settings_service_v2/settings-service-get-hosted-login-translation) to load custom translations.
+Translations can be overriden at both the instance and organization levels.
+To find the keys more easily, you can inspect the HTML and search for a `data-i18n-key` attribute, or look at the defaults in `/apps/login/locales/[locale].ts`.
+![Custom Translations](.github/custom-i18n.png)
 
 ## Complete Login Flow Diagram
 
@@ -260,6 +286,55 @@ Key settings that affect the flow:
 - `allowRegister`: Enable registration
 - `allowExternalIdp`: Enable IDP login
 - `mfaInitSkipLifetime`: How long MFA setup can be skipped
+
+## Tooling
+
+- [TypeScript](https://www.typescriptlang.org/) for static type checking
+- [ESLint](https://eslint.org/) for code linting
+- [Prettier](https://prettier.io) for code formatting
+
+## Useful Commands
+
+- `make login-quality` - Check the quality of your code against a production build without installing any dependencies besides Docker
+- `pnpm generate` - Build proto stubs for the client package
+- `pnpm dev` - Develop all packages and the login app
+- `pnpm build` - Build all packages and the login app
+- `pnpm clean` - Clean up all `node_modules` and `dist` folders (runs each package's clean script)
+
+### Run Login UI Acceptance tests
+
+To run the acceptance tests you need a running ZITADEL environment and a component which receives HTTP requests for the emails and sms's.
+This component should also be able to return the content of these notifications, as the codes and links are used in the login flows.
+There is a basic implementation in Golang available under [the sink package](./acceptance/sink).
+
+To setup ZITADEL with the additional Sink container for handling the notifications:
+
+```sh
+pnpm run-sink
+```
+
+Then you can start the acceptance tests with:
+
+```sh
+pnpm test:acceptance
+```
+
+### Deploy to Vercel
+
+To deploy your own version on Vercel, navigate to your instance and create a service user.
+Then create a personal access token (PAT), copy and set it as ZITADEL_SERVICE_USER_TOKEN, then navigate to your instance settings and make sure it gets IAM_OWNER permissions.
+Finally set your instance url as ZITADEL_API_URL. Make sure to set it without trailing slash.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzitadel%2Ftypescript&env=ZITADEL_API_URL,ZITADEL_SERVICE_USER_TOKEN&root-directory=apps/login&envDescription=Setup%20a%20service%20account%20with%20IAM_LOGIN_CLIENT%20membership%20on%20your%20instance%20and%20provide%20its%20personal%20access%20token.&project-name=zitadel-login&repository-name=zitadel-login)
+
+## Versioning And Publishing Packages
+
+Package publishing has been configured using [Changesets](https://github.com/changesets/changesets).
+Here is their [documentation](https://github.com/changesets/changesets#documentation) for more information about the workflow.
+
+The [GitHub Action](https://github.com/changesets/action) needs an `NPM_TOKEN` and `GITHUB_TOKEN` in the repository settings. The [Changesets bot](https://github.com/apps/changeset-bot) should also be installed on the GitHub repository.
+
+Read the [changesets documentation](https://github.com/changesets/changesets/blob/main/docs/automating-changesets.md) for more information about this automation
 
 ## Development
 
