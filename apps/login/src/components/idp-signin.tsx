@@ -1,8 +1,8 @@
 "use client";
 
-import { createNewSessionFromIdpIntent } from "@/lib/server/idp";
+import { CreateNewSessionCommand, createNewSessionFromIdpIntent } from "@/lib/server/idp";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Alert } from "./alert";
 import { Spinner } from "./spinner";
 
@@ -16,25 +16,33 @@ type Props = {
   requestId?: string;
 };
 
-export function IdpSignin({
-  userId,
-  idpIntent: { idpIntentId, idpIntentToken },
-  requestId,
-}: Props) {
+export function IdpSignin({ userId, idpIntent: { idpIntentId, idpIntentToken }, requestId }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const executedRef = useRef(false);
 
   const router = useRouter();
 
   useEffect(() => {
-    createNewSessionFromIdpIntent({
+    // Prevent double execution in React Strict Mode
+    if (executedRef.current) {
+      return;
+    }
+    
+    executedRef.current = true;
+    let request: CreateNewSessionCommand = {
       userId,
       idpIntent: {
         idpIntentId,
         idpIntentToken,
       },
-      requestId,
-    })
+    };
+
+    if (requestId) {
+      request = { ...request, requestId: requestId };
+    }
+
+    createNewSessionFromIdpIntent(request)
       .then((response) => {
         if (response && "error" in response && response?.error) {
           setError(response?.error);

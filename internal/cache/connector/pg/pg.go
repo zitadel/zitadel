@@ -4,6 +4,7 @@ import (
 	"context"
 	_ "embed"
 	"errors"
+	"fmt"
 	"log/slog"
 	"slices"
 	"strings"
@@ -40,21 +41,23 @@ type PGXPool interface {
 }
 
 type pgCache[I ~int, K ~string, V cache.Entry[I, K]] struct {
-	purpose   cache.Purpose
-	config    *cache.Config
-	indices   []I
-	connector *Connector
-	logger    *slog.Logger
+	purpose        cache.Purpose
+	zitadelVersion string
+	config         *cache.Config
+	indices        []I
+	connector      *Connector
+	logger         *slog.Logger
 }
 
 // NewCache returns a cache that stores and retrieves objects using PostgreSQL unlogged tables.
-func NewCache[I ~int, K ~string, V cache.Entry[I, K]](ctx context.Context, purpose cache.Purpose, config cache.Config, indices []I, connector *Connector) (cache.PrunerCache[I, K, V], error) {
+func NewCache[I ~int, K ~string, V cache.Entry[I, K]](ctx context.Context, purpose cache.Purpose, zitadelVersion string, config cache.Config, indices []I, connector *Connector) (cache.PrunerCache[I, K, V], error) {
 	c := &pgCache[I, K, V]{
-		purpose:   purpose,
-		config:    &config,
-		indices:   indices,
-		connector: connector,
-		logger:    config.Log.Slog().With("cache_purpose", purpose),
+		purpose:        purpose,
+		zitadelVersion: zitadelVersion,
+		config:         &config,
+		indices:        indices,
+		connector:      connector,
+		logger:         config.Log.Slog().With("cache_purpose", purpose),
 	}
 	c.logger.InfoContext(ctx, "pg cache logging enabled")
 
@@ -115,7 +118,14 @@ func (c *pgCache[I, K, V]) get(ctx context.Context, index I, key K) (value V, er
 	if !slices.Contains(c.indices, index) {
 		return value, cache.NewIndexUnknownErr(index)
 	}
-	err = c.connector.QueryRow(ctx, getQuery, c.purpose.String(), index, key, c.config.MaxAge, c.config.LastUseAge).Scan(&value)
+	err = c.connector.QueryRow(ctx,
+		getQuery,
+		c.purpose.String(),
+		index,
+		c.versionedKey(key),
+		c.config.MaxAge,
+		c.config.LastUseAge,
+	).Scan(&value)
 	return value, err
 }
 
@@ -123,7 +133,8 @@ func (c *pgCache[I, K, V]) Invalidate(ctx context.Context, index I, keys ...K) (
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	_, err = c.connector.Exec(ctx, invalidateQuery, c.purpose.String(), index, keys)
+	versionedKeys := c.versionedKeys(keys)
+	_, err = c.connector.Exec(ctx, invalidateQuery, c.purpose.String(), index, versionedKeys)
 	c.logger.DebugContext(ctx, "pg cache invalidate", "index", index, "keys", keys)
 	return err
 }
@@ -132,7 +143,8 @@ func (c *pgCache[I, K, V]) Delete(ctx context.Context, index I, keys ...K) (err 
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	_, err = c.connector.Exec(ctx, deleteQuery, c.purpose.String(), index, keys)
+	versionedKeys := c.versionedKeys(keys)
+	_, err = c.connector.Exec(ctx, deleteQuery, c.purpose.String(), index, versionedKeys)
 	c.logger.DebugContext(ctx, "pg cache delete", "index", index, "keys", keys)
 	return err
 }
@@ -155,20 +167,32 @@ func (c *pgCache[I, K, V]) Truncate(ctx context.Context) (err error) {
 	return err
 }
 
-type indexKey[I, K comparable] struct {
-	IndexID  I `json:"index_id"`
-	IndexKey K `json:"index_key"`
+type indexKey[I comparable] struct {
+	IndexID  I      `json:"index_id"`
+	IndexKey string `json:"index_key"`
 }
 
-func (c *pgCache[I, K, V]) indexKeysFromEntry(entry V) []indexKey[I, K] {
-	keys := make([]indexKey[I, K], 0, len(c.indices)*3) // naive assumption
+func (c *pgCache[I, K, V]) indexKeysFromEntry(entry V) []indexKey[I] {
+	keys := make([]indexKey[I], 0, len(c.indices)*3) // naive assumption
 	for _, index := range c.indices {
 		for _, key := range entry.Keys(index) {
-			keys = append(keys, indexKey[I, K]{
+			keys = append(keys, indexKey[I]{
 				IndexID:  index,
-				IndexKey: key,
+				IndexKey: c.versionedKey(key),
 			})
 		}
 	}
 	return keys
+}
+
+func (c *pgCache[I, K, V]) versionedKey(key K) string {
+	return fmt.Sprintf("%s:%s", c.zitadelVersion, key)
+}
+
+func (c *pgCache[I, K, V]) versionedKeys(key []K) []string {
+	result := make([]string, len(key))
+	for i, k := range key {
+		result[i] = c.versionedKey(k)
+	}
+	return result
 }
