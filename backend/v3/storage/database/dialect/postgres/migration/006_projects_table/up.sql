@@ -1,6 +1,6 @@
 CREATE TYPE zitadel.project_state AS ENUM (
-    'ACTIVE',
-    'INACTIVE'
+    'active',
+    'inactive'
 );
 
 CREATE TABLE zitadel.projects(
@@ -22,7 +22,8 @@ CREATE TABLE zitadel.projects(
     --API: private_labeling_setting
     , used_labeling_setting_owner SMALLINT
 
-    , PRIMARY KEY (instance_id, organization_id, id)
+    , PRIMARY KEY (instance_id, id)
+    , UNIQUE (instance_id, organization_id, id)
     , FOREIGN KEY (instance_id, organization_id) REFERENCES zitadel.organizations(instance_id, id) ON DELETE CASCADE
 );
 
@@ -42,7 +43,8 @@ CREATE TABLE zitadel.project_roles(
     -- group is a reserved keyword in PostgreSQL
     , role_group TEXT
 
-    , PRIMARY KEY (instance_id, organization_id, project_id, key)
+    , PRIMARY KEY (instance_id, project_id, key)
+    , UNIQUE (instance_id, organization_id, project_id, key)
     , FOREIGN KEY (instance_id, organization_id, project_id) REFERENCES zitadel.projects(instance_id, organization_id, id) ON DELETE CASCADE
 );
 
