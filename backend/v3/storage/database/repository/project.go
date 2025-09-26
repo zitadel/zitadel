@@ -13,6 +13,7 @@ import (
 
 type project struct{}
 
+// ProjectRepository manages projects and project roles.
 func ProjectRepository() domain.ProjectRepository {
 	return project{}
 }

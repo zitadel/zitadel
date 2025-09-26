@@ -82,18 +82,26 @@ type projectChanges interface {
 	SetUsedLabelingSettingOwner(usedLabelingSettingOwner int16) database.Change
 }
 
+// ProjectRepository manages projects and project roles.
 type ProjectRepository interface {
 	projectColumns
 	projectConditions
 	projectChanges
 
+	// Get a single project. An error is returned if not exactly one project is found.
 	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Project, error)
+	// List projects. An empty list is returned if no projects are found.
 	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Project, error)
-
+	// Create a new project.
 	Create(ctx context.Context, client database.QueryExecutor, project *Project) error
+	// Update an existing project.
+	// The condition must include the instanceID and ID of the project to update.
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
+	// Delete an existing project.
+	// The condition must include the instanceID and ID of the project to delete.
 	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 
+	// Role returns the sub-repository for project roles.
 	Role() ProjectRoleRepository
 }
 
@@ -154,10 +162,16 @@ type ProjectRoleRepository interface {
 	projectRoleConditions
 	projectRoleChanges
 
+	// Get a single project role. An error is returned if not exactly one project role is found.
 	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*ProjectRole, error)
+	// List project roles. An empty list is returned if no project roles are found.
 	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*ProjectRole, error)
-
+	// Create a new project role.
 	Create(ctx context.Context, client database.QueryExecutor, role *ProjectRole) error
+	// Update an existing project role.
+	// The condition must include the instanceID, projectID and key of the project role to update.
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
+	// Delete an existing project role.
+	// The condition must include the instanceID, projectID and key of the project role to delete.
 	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }
