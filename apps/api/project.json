@@ -127,11 +127,11 @@
         },
         "test-integration-build": {
             "description": "Builds the test binary for integration tests.",
-            "cache": true,
             "dependsOn": [
                 "generate"
             ],
             "command": "go build -cover -race -tags integration -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.test main.go",
+            "cache": true,
             "inputs": [
                 { "runtime": "go env GOOS" },
                 { "runtime": "go env GOARCH" },
@@ -211,18 +211,17 @@
         },
         "build-console": {
             "description": "Builds the Console and copies its static files to the API.",
-            "cache": true,
             "dependsOn": [
                 "@zitadel/console:build"
             ],
             "command": "cp -r console/dist/console/* internal/api/ui/console/static",
+            "cache": true,
             "outputs": [
                 "{workspaceRoot}/internal/api/ui/console/static"
             ]
         },
         "generate-install": {
             "description": "Installs the binaries needed for generating code.",
-            "cache": true,
             "executor": "nx:run-commands",
             "options": {
                 "commands": [
@@ -244,6 +243,7 @@
                     "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install ./internal/protoc/protoc-gen-zitadel"
                 ]
             },
+            "cache": true,
             "inputs": [
                 { "runtime": "go env GOOS" },
                 { "runtime": "go env GOARCH" },
@@ -270,7 +270,6 @@
         },
         "generate-stubs": {
             "description": "Generates the gRPC and OpenAPI stubs from the proto files.",
-            "cache": true,
             "dependsOn": [
                 "generate-install"
             ],
@@ -284,6 +283,7 @@
                     "cp -r .artifacts/grpc/zitadel/ openapi/v2/zitadel"
                 ]
             },
+            "cache": true,
             "inputs": [
                 "{workspaceRoot}/proto/**/*",
                 "{workspaceRoot}/buf.gen.yaml",
@@ -296,7 +296,9 @@
         },
         "generate-statik": {
             "description": "Generates statik files for embedding static resources",
-            "cache": true,
+            "dependsOn": [
+                "generate-install"
+            ],
             "executor": "nx:run-commands",
             "options": {
                 "commands": [
@@ -306,6 +308,7 @@
                     "PATH=\"$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/statik/generate.go"
                 ]
             },
+            "cache": true,
             "inputs": [
                 { "runtime": "go env GOOS" },
                 { "runtime": "go env GOARCH" },
@@ -323,8 +326,11 @@
         },
         "generate-assets": {
             "description": "Generates asset routes and documentation",
-            "cache": true,
+            "dependsOn": [
+                "generate-install"
+            ],
             "command": "mkdir -p docs/apis/assets && go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=docs/apis/assets/assets.md",
+            "cache": true,
             "inputs": [
                 "{workspaceRoot}/internal/api/assets/generator/asset_generator.go"
             ],
