@@ -3,7 +3,7 @@ version: '3.8'
 services:
   postgres:
     restart: 'always'
-    image: 'postgres:latest'
+    image: 'postgres:17'
     environment:
       - POSTGRES_USER=zitadel
       - PGUSER=zitadel
