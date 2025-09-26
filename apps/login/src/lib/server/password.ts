@@ -227,7 +227,7 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
   if (passwordChangedCheck?.redirect) {
     return passwordChangedCheck;
   }
-
+  
   // throw error if user is in initial state here and do not continue
   if (user.state === UserState.INITIAL) {
     return { error: "Initial User not supported" };
@@ -417,13 +417,13 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
 
   // if the user has no MFA but MFA is enforced, we can set a password otherwise we use the token of the user
   if (forceMfa && hasNoMFAMethods) {
+    console.log("Set password using service account due to enforced MFA without existing MFA methods");
     return setPassword({ serviceUrl, payload }).catch((error) => {
       // throw error if failed precondition (ex. User is not yet initialized)
       if (error.code === 9 && error.message) {
         return { error: "Failed precondition" };
-      } else {
-        throw error;
       }
+      return { error: "Could not set password" };
     });
   } else {
     const transport = async (serviceUrl: string, token: string) => {
@@ -450,7 +450,7 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
         if (error.code === 7) {
           return { error: "Session is not valid." };
         }
-        throw error;
+        return { error: "Could not set the password" };
       });
   }
 }
