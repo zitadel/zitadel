@@ -548,19 +548,12 @@ Fix the quality checks, add new checks that cover your changes and mark your pul
 
 ## <a name="dev-requirements"></a>Development Requirements
 
-**Recommended: Use Dev Container** (isolated and pre-configured)
-
-Open in VS Code with Dev Container extension.
-NodeJS, Go, pnpm and Docker are already installed.
-
-[![Open in Dev Container](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/zitadel/zitadel)
-
-**For developing frontend apps or libraries, install:**
+**For developing frontend apps or libraries, click [![in Dev Container](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/zitadel/zitadel) or install:**
 
 - **[Node.js v22.x](https://nodejs.org/en/download/)** - JavaScript runtime
 - **[Docker](https://docs.docker.com/engine/install/)** - For supporting services
 
-**For developing the API backend, install:**
+**For developing the API backend, click [![in Dev Container](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/zitadel/zitadel) or install:**
 
 - **[Go 1.24.x](https://go.dev/doc/install)** - API development
 - **[Node.js v22.x](https://nodejs.org/en/download/)** - Required to run [nx commands](https://nx.dev/)
