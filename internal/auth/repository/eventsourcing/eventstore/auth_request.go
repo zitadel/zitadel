@@ -460,6 +460,16 @@ func (repo *AuthRequestRepo) VerifyMFAOTPEmail(ctx context.Context, userID, reso
 	return repo.Command.HumanCheckOTPEmail(ctx, userID, code, resourceOwner, request.WithCurrentInfo(info))
 }
 
+func (repo *AuthRequestRepo) VerifyMFARecoveryCode(ctx context.Context, userID, resourceOwner, code, authRequestID, userAgentID string, info *domain.BrowserInfo) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
+	if err != nil {
+		return err
+	}
+	return repo.Command.HumanCheckRecoveryCode(ctx, userID, code, resourceOwner, request.WithCurrentInfo(info))
+}
+
 func (repo *AuthRequestRepo) BeginMFAU2FLogin(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string) (login *domain.WebAuthNLogin, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -1641,6 +1651,8 @@ var (
 		user_repo.UserIDPLoginCheckSucceededType,
 		user_repo.HumanMFAOTPCheckSucceededType,
 		user_repo.HumanMFAOTPCheckFailedType,
+		user_repo.HumanRecoveryCodeCheckSucceededType,
+		user_repo.HumanRecoveryCodeCheckFailedType,
 		user_repo.HumanSignedOutType,
 		user_repo.HumanPasswordlessTokenCheckSucceededType,
 		user_repo.HumanPasswordlessTokenCheckFailedType,
@@ -1690,6 +1702,8 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			user_repo.UserIDPLoginCheckSucceededType,
 			user_repo.HumanMFAOTPCheckSucceededType,
 			user_repo.HumanMFAOTPCheckFailedType,
+			user_repo.HumanRecoveryCodeCheckSucceededType,
+			user_repo.HumanRecoveryCodeCheckFailedType,
 			user_repo.HumanSignedOutType,
 			user_repo.HumanPasswordlessTokenCheckSucceededType,
 			user_repo.HumanPasswordlessTokenCheckFailedType,
