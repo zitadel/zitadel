@@ -29,7 +29,7 @@ services:
       - "host.docker.internal:host-gateway"
 
   db:
-    # restart: 'always'
+    restart: 'always'
     image: 'postgres:17-alpine'
     environment:
       - POSTGRES_DB=zitadel

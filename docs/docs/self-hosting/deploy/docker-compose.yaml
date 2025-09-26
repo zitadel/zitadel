@@ -24,7 +24,7 @@ services:
       ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel
       ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel
       ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
-      
+
       # By configuring a login client, the setup job creates a user of type machine with the role IAM_LOGIN_CLIENT.
       # It writes a PAT to the path specified in ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH.
       # The PAT is passed to the login container via the environment variable ZITADEL_SERVICE_USER_TOKEN_FILE.
@@ -49,7 +49,7 @@ services:
       # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME: admin
       # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME: Automatically Initialized IAM_OWNER
       # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_PAT_EXPIRATIONDATE: '2029-01-01T00:00:00Z'
-      
+
       # To change the initial human admin users username and password, uncomment the following lines.
       # The first login name is formatted like this: <username>@<org_name>.<external_domain>
       # With the following incommented configuration, this would be root@my-organization.localhost
@@ -62,7 +62,7 @@ services:
       # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD: RootPassword1!
 
       # Enable debug logs
-      # ZITADEL_LOG_LEVEL: debug     
+      # ZITADEL_LOG_LEVEL: debug
       # Write Access Logs to stdout.
       # ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED: true
 
@@ -87,9 +87,6 @@ services:
       db:
         condition: service_healthy
 
-
-
-
   login:
     restart: unless-stopped
     image: ghcr.io/zitadel/zitadel-login:latest
@@ -106,25 +103,6 @@ services:
     volumes:
       - .:/current-dir:ro
 
-
-
-  # login:
-  #   restart: unless-stopped
-  #   image: ghcr.io/zitadel/zitadel-login:latest
-  #   # If you can't use the network_mode service:zitadel, you can pass the environment variables ZITADEL_API_URL=http://zitadel:8080 and CUSTOM_REQUEST_HEADERS=Host:localhost instead.
-  #   environment:
-  #     - ZITADEL_API_URL=http://localhost:8080
-  #     - NEXT_PUBLIC_BASE_PATH=/ui/v2/login
-  #     - ZITADEL_SERVICE_USER_TOKEN_FILE=/current-dir/login-client.pat
-  #   network_mode: service:zitadel
-  #   user: "0"
-  #   volumes:
-  #     - .:/current-dir:ro
-  #   depends_on:
-  #     zitadel:
-  #       condition: service_healthy
-  #       restart: false
-
   db:
     restart: unless-stopped
     image: postgres:17-alpine
@@ -132,7 +110,7 @@ services:
       PGUSER: postgres
       POSTGRES_PASSWORD: postgres
     healthcheck:
-      test: 
+      test:
       - CMD-SHELL
       - pg_isready
       - -d
