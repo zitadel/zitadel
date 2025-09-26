@@ -1,8 +1,6 @@
 services:
 
   devcontainer:
-    networks:
-      - zitadel_dev
     container_name: zitadel-devcontainer
     image: mcr.microsoft.com/devcontainers/typescript-node:22-bookworm
     volumes:
@@ -28,8 +26,6 @@ services:
       - "4200:4200"
 
   db:
-    networks:
-      - zitadel_dev
     container_name: zitadel-db
     image: postgres:17
     restart: unless-stopped
@@ -47,8 +43,6 @@ services:
       - 5432:5432
 
   db-api-integration:
-    networks:
-      - zitadel_dev
     container_name: zitadel-db-api-integration
     image: 'postgres:17'
     env_file:
@@ -66,16 +60,12 @@ services:
       - 5433:5433
 
   cache-api-integration:
-    networks:
-      - zitadel_dev
     container_name: zitadel-cache-api-integration
     image: 'redis:8'
     ports:
       - 6379:6379
 
   db-functional-ui:
-    networks:
-      - zitadel_dev
     container_name: zitadel-db-functional-ui
     image: 'postgres:17'
     env_file:
@@ -92,8 +82,6 @@ services:
       - "5434:5434"
 
   login-api-mock:
-    networks:
-      - zitadel_dev
     container_name: zitadel-login-api-mock
     build:
       context: ../apps/login/integration/api-mock
@@ -111,6 +99,3 @@ services:
 
 volumes:
   db-data-dev:
-
-networks:
-  zitadel_dev:
