@@ -51,7 +51,7 @@ jobs:
       issues: write
       pull-requests: write
     needs:
-      - lint_build_test
+      - check
       - pack
     if: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
