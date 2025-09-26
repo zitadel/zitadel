@@ -31,11 +31,11 @@ Alternatively, you can use the infix-notation, like `pnpm nx dev @zitadel/login`
 
 ### <a name="api-quick-start"></a>API
 
-Make sure you have the [required system dependencies](#dev-requirements) and node modules and go dependencies installed
+Make sure you have the [required system dependencies](#dev-requirements) and node modules and go dev dependencies installed
 
 ```bash
 pnpm install
-go mod tidy
+go install tool
 ```
 
 Prepare the API development with a Console and run a local Login production build.
@@ -593,6 +593,9 @@ corepack enable
 ```bash
 # Install dependencies
 pnpm install
+
+# For building go code, install go dev dependencies
+go install tool
 
 # Test a project
 pnpm nx run @zitadel/login:dev  # Should start dev server at http://localhost:3000/ui/v2/login/loginname

@@ -50,7 +50,7 @@ jobs:
       - name: Install dependencies
         run: |
           pnpm install --frozen-lockfile
-          go mod tidy
+          go install tool
       - name: Install Cypress binary
         run: pnpm cypress install
         working-directory: apps/login
