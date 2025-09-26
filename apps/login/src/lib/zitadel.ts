@@ -687,7 +687,7 @@ export async function searchUsers({ serviceUrl, searchValue, loginSettings, orga
   }
 
   if (organizationId) {
-    queries.push(
+    emailAndPhoneQueries.push(
       create(SearchQuerySchema, {
         query: {
           case: "organizationIdQuery",
