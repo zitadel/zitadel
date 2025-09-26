@@ -2,7 +2,6 @@ package domain
 
 import (
 	"context"
-	"errors"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -35,16 +34,11 @@ func (l *ListOrgsCommand) Events(ctx context.Context) []eventstore.Command {
 
 // Execute implements Commander.
 func (l *ListOrgsCommand) Execute(ctx context.Context, opts *CommandOpts) (err error) {
-	close, err := opts.EnsureClient(ctx)
+	close, err := opts.EnsureTx(ctx)
 	if err != nil {
 		return err
 	}
-	defer func() {
-		closeErr := close(ctx)
-		if closeErr != nil {
-			err = errors.Join(err, closeErr)
-		}
-	}()
+	defer func() { err = close(ctx, err) }()
 
 	organizationRepo := opts.organizationRepo(pool)
 	domainRepo := organizationRepo.Domains(true)

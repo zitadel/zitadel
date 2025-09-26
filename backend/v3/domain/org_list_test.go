@@ -163,7 +163,7 @@ func TestListOrgsCommand_pagination(t *testing.T) {
 
 func TestListOrgsCommand_Execute(t *testing.T) {
 	t.Parallel()
-	clientAcquireErr := errors.New("client acquire error")
+	txInitErr := errors.New("tx init error")
 	listErr := errors.New("list mock error")
 
 	tt := []struct {
@@ -179,16 +179,16 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 		expectedError         error
 	}{
 		{
-			testName: "when DB client retrieval fails should return error",
+			testName: "when EnsureTx fails should return error",
 			queryExecutor: func(ctrl *gomock.Controller) database.QueryExecutor {
 				mockDB := dbmock.NewMockPool(ctrl)
 				mockDB.EXPECT().
-					Acquire(gomock.Any()).
+					Begin(gomock.Any(), gomock.Any()).
 					Times(1).
-					Return(nil, clientAcquireErr)
+					Return(nil, txInitErr)
 				return mockDB
 			},
-			expectedError: clientAcquireErr,
+			expectedError: txInitErr,
 		},
 		{
 			testName: "when condition parsing fails should return error",
