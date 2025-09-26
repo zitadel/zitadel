@@ -11,7 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -687,7 +686,7 @@ func TestServer_Deprecated_AddHumanUser(t *testing.T) {
 }
 
 func TestServer_Deprecated_AddHumanUser_Permission(t *testing.T) {
-	newOrgOwnerEmail := gofakeit.Email()
+	newOrgOwnerEmail := integration.Email()
 	newOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), newOrgOwnerEmail)
 	type args struct {
 		ctx context.Context
@@ -915,7 +914,7 @@ func TestServer_Deprecated_UpdateHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.UpdateHumanUserRequest{
-					Username: gu.Ptr(gofakeit.Username()),
+					Username: gu.Ptr(integration.Username()),
 				},
 			},
 			want: &user.UpdateHumanUserResponse{
@@ -1241,7 +1240,7 @@ func TestServer_Deprecated_UpdateHumanUser(t *testing.T) {
 }
 
 func TestServer_Deprecated_UpdateHumanUser_Permission(t *testing.T) {
-	newOrgOwnerEmail := gofakeit.Email()
+	newOrgOwnerEmail := integration.Email()
 	newOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), newOrgOwnerEmail)
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
 	type args struct {
@@ -1260,7 +1259,7 @@ func TestServer_Deprecated_UpdateHumanUser_Permission(t *testing.T) {
 				SystemCTX,
 				&user.UpdateHumanUserRequest{
 					UserId:   newUserID,
-					Username: gu.Ptr(gofakeit.Username()),
+					Username: gu.Ptr(integration.Username()),
 				},
 			},
 			want: &user.UpdateHumanUserResponse{
@@ -1276,7 +1275,7 @@ func TestServer_Deprecated_UpdateHumanUser_Permission(t *testing.T) {
 				IamCTX,
 				&user.UpdateHumanUserRequest{
 					UserId:   newUserID,
-					Username: gu.Ptr(gofakeit.Username()),
+					Username: gu.Ptr(integration.Username()),
 				},
 			},
 			want: &user.UpdateHumanUserResponse{
@@ -1292,7 +1291,7 @@ func TestServer_Deprecated_UpdateHumanUser_Permission(t *testing.T) {
 				CTX,
 				&user.UpdateHumanUserRequest{
 					UserId:   newUserID,
-					Username: gu.Ptr(gofakeit.Username()),
+					Username: gu.Ptr(integration.Username()),
 				},
 			},
 			wantErr: true,
@@ -1303,7 +1302,7 @@ func TestServer_Deprecated_UpdateHumanUser_Permission(t *testing.T) {
 				UserCTX,
 				&user.UpdateHumanUserRequest{
 					UserId:   newUserID,
-					Username: gu.Ptr(gofakeit.Username()),
+					Username: gu.Ptr(integration.Username()),
 				},
 			},
 			wantErr: true,
@@ -1340,6 +1339,17 @@ func TestServer_LockUser(t *testing.T) {
 				CTX,
 				&user.LockUserRequest{
 					UserId: "notexisting",
+				},
+				func(request *user.LockUserRequest) error { return nil },
+			},
+			wantErr: true,
+		},
+		{
+			name: "no permission, error",
+			args: args{
+				UserCTX,
+				&user.LockUserRequest{
+					UserId: Instance.Users.Get(integration.UserTypeNoPermission).ID,
 				},
 				func(request *user.LockUserRequest) error { return nil },
 			},
@@ -1454,6 +1464,17 @@ func TestServer_UnLockUser(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "no permission, error",
+			args: args{
+				UserCTX,
+				&user.UnlockUserRequest{
+					UserId: Instance.Users.Get(integration.UserTypeNoPermission).ID,
+				},
+				func(request *user.UnlockUserRequest) error { return nil },
+			},
+			wantErr: true,
+		},
+		{
 			name: "unlock, not locked",
 			args: args{
 				ctx: CTX,
@@ -1556,6 +1577,17 @@ func TestServer_DeactivateUser(t *testing.T) {
 				CTX,
 				&user.DeactivateUserRequest{
 					UserId: "notexisting",
+				},
+				func(request *user.DeactivateUserRequest) error { return nil },
+			},
+			wantErr: true,
+		},
+		{
+			name: "no permission, error",
+			args: args{
+				UserCTX,
+				&user.DeactivateUserRequest{
+					UserId: Instance.Users.Get(integration.UserTypeNoPermission).ID,
 				},
 				func(request *user.DeactivateUserRequest) error { return nil },
 			},
@@ -1671,6 +1703,17 @@ func TestServer_ReactivateUser(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "no permission, error",
+			args: args{
+				UserCTX,
+				&user.ReactivateUserRequest{
+					UserId: Instance.Users.Get(integration.UserTypeNoPermission).ID,
+				},
+				func(request *user.ReactivateUserRequest) error { return nil },
+			},
+			wantErr: true,
+		},
+		{
 			name: "reactivate, not deactivated",
 			args: args{
 				ctx: CTX,
@@ -1756,7 +1799,7 @@ func TestServer_ReactivateUser(t *testing.T) {
 }
 
 func TestServer_DeleteUser(t *testing.T) {
-	projectResp := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
+	projectResp := Instance.CreateProject(CTX, t, Instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 
 	type args struct {
 		req     *user.DeleteUserRequest
@@ -1819,7 +1862,7 @@ func TestServer_DeleteUser(t *testing.T) {
 				prepare: func(_ *testing.T, request *user.DeleteUserRequest) context.Context {
 					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
-					Instance.CreateProjectUserGrant(t, CTX, projectResp.GetId(), request.UserId)
+					Instance.CreateProjectUserGrant(t, CTX, Instance.DefaultOrg.GetId(), projectResp.GetId(), request.UserId)
 					Instance.CreateProjectMembership(t, CTX, projectResp.GetId(), request.UserId)
 					Instance.CreateOrgMembership(t, CTX, Instance.DefaultOrg.Id, request.UserId)
 					return CTX
@@ -1846,16 +1889,20 @@ func TestServer_DeleteUser(t *testing.T) {
 									FamilyName: "familyName",
 								},
 								Email: &user.SetHumanEmail{
-									Email:        gofakeit.Email(),
+									Email:        integration.Email(),
 									Verification: &user.SetHumanEmail_IsVerified{IsVerified: true},
 								},
 							},
 						},
 					})
 					require.NoError(t, err)
+
+					// allow self management incl. deletion
+					Instance.CreateOrgMembership(t, CTX, Instance.DefaultOrg.Id, removeUser.Id, "ORG_USER_SELF_MANAGER")
+
 					request.UserId = removeUser.Id
 					Instance.RegisterUserPasskey(CTX, removeUser.Id)
-					_, token, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, removeUser.Id)
+					token := createVerifiedWebAuthNSession(LoginCTX, t, removeUser.Id)
 					return integration.WithAuthorizationToken(UserCTX, token)
 				},
 			},
@@ -1884,7 +1931,7 @@ func TestServer_DeleteUser(t *testing.T) {
 func TestServer_StartIdentityProviderIntent(t *testing.T) {
 	idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 	orgIdpResp := Instance.AddOrgGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
-	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("NotDefaultOrg-%s", gofakeit.AppName()), gofakeit.Email())
+	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 	notDefaultOrgIdpResp := Instance.AddOrgGenericOAuthProvider(IamCTX, orgResp.OrganizationId)
 	samlIdpID := Instance.AddSAMLProvider(IamCTX)
 	samlRedirectIdpID := Instance.AddSAMLRedirectProvider(IamCTX, "")
@@ -2180,10 +2227,22 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 	}
 }
 
+func createVerifiedWebAuthNSession(ctx context.Context, t *testing.T, userID string) string {
+	// check if user is already processed
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(collect *assert.CollectT) {
+		_, err := Client.GetUserByID(ctx, &user.GetUserByIDRequest{UserId: userID})
+		require.NoError(collect, err)
+	}, retryDuration, tick)
+
+	_, token, _, _ := Instance.CreateVerifiedWebAuthNSession(t, ctx, userID)
+	return token
+}
+
 func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
-	oauthIdpID := Instance.AddGenericOAuthProvider(IamCTX, gofakeit.AppName()).GetId()
-	azureIdpID := Instance.AddAzureADProvider(IamCTX, gofakeit.AppName()).GetId()
-	oidcIdpID := Instance.AddGenericOIDCProvider(IamCTX, gofakeit.AppName()).GetId()
+	oauthIdpID := Instance.AddGenericOAuthProvider(IamCTX, integration.IDPName()).GetId()
+	azureIdpID := Instance.AddAzureADProvider(IamCTX, integration.IDPName()).GetId()
+	oidcIdpID := Instance.AddGenericOIDCProvider(IamCTX, integration.IDPName()).GetId()
 	samlIdpID := Instance.AddSAMLPostProvider(IamCTX)
 	ldapIdpID := Instance.AddLDAPProvider(IamCTX)
 	jwtIdPID := Instance.AddJWTProvider(IamCTX)
@@ -2857,7 +2916,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 func ctxFromNewUserWithRegisteredPasswordlessLegacy(t *testing.T) (context.Context, string, *auth.AddMyPasswordlessResponse) {
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	Instance.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, userID)
+	sessionToken := createVerifiedWebAuthNSession(LoginCTX, t, userID)
 	ctx := integration.WithAuthorizationToken(CTX, sessionToken)
 
 	pkr, err := Instance.Client.Auth.AddMyPasswordless(ctx, &auth.AddMyPasswordlessRequest{})
@@ -3228,7 +3287,7 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 				},
 			},
 			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
-				userWithSMS := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.GetId(), gofakeit.Email(), gofakeit.Phone()).GetUserId()
+				userWithSMS := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.GetId(), integration.Email(), integration.Phone()).GetUserId()
 				Instance.RegisterUserOTPSMS(CTX, userWithSMS)
 
 				args.UserId = userWithSMS
@@ -3249,7 +3308,7 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 				},
 			},
 			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
-				userWithEmail := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.GetId(), gofakeit.Email(), gofakeit.Phone()).GetUserId()
+				userWithEmail := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.GetId(), integration.Email(), integration.Phone()).GetUserId()
 				Instance.RegisterUserOTPEmail(CTX, userWithEmail)
 
 				args.UserId = userWithEmail
@@ -3347,7 +3406,7 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 				}
 				require.NoError(ttt, err)
 
-				assert.ElementsMatch(t, tt.want.GetResult(), got.GetResult())
+				assert.ElementsMatch(ttt, tt.want.GetResult(), got.GetResult())
 			}, retryDuration, tick, "timeout waiting for expected auth methods result")
 		})
 	}
@@ -4411,7 +4470,7 @@ func TestServer_CreateUser(t *testing.T) {
 							Username:       &username,
 							UserType: &user.CreateUserRequest_Machine_{
 								Machine: &user.CreateUserRequest_Machine{
-									Name: gofakeit.Name(),
+									Name: integration.Username(),
 								},
 							},
 						},
@@ -4606,8 +4665,8 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 }
 
 func TestServer_CreateUser_Permission(t *testing.T) {
-	newOrgOwnerEmail := gofakeit.Email()
-	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
+	newOrgOwnerEmail := integration.Email()
+	newOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), newOrgOwnerEmail)
 	type args struct {
 		ctx context.Context
 		req *user.CreateUserRequest
@@ -5041,7 +5100,7 @@ func TestServer_UpdateUserTypeHuman(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			now := time.Now()
 			runId := fmt.Sprint(now.UnixNano() + int64(i))
-			userId := Instance.CreateUserTypeHuman(CTX, gofakeit.Email()).GetId()
+			userId := Instance.CreateUserTypeHuman(CTX, integration.Email()).GetId()
 			test := tt.testCase(runId, userId)
 			got, err := Client.UpdateUser(test.args.ctx, test.args.req)
 			if test.wantErr {
@@ -5277,8 +5336,8 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 }
 
 func TestServer_UpdateUser_Permission(t *testing.T) {
-	newOrgOwnerEmail := gofakeit.Email()
-	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
+	newOrgOwnerEmail := integration.Email()
+	newOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), newOrgOwnerEmail)
 	newHumanUserID := newOrg.CreatedAdmins[0].GetUserId()
 	machineUserResp, err := Instance.Client.UserV2.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: newOrg.OrganizationId,

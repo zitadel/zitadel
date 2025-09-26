@@ -22,7 +22,7 @@ import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("mfa");
-  return { title: t('set.title')};
+  return { title: t("set.title") };
 }
 
 function isSessionValid(session: Partial<Session>): {
@@ -31,10 +31,11 @@ function isSessionValid(session: Partial<Session>): {
 } {
   const validPassword = session?.factors?.password?.verifiedAt;
   const validPasskey = session?.factors?.webAuthN?.verifiedAt;
+  const validIDP = session?.factors?.intent?.verifiedAt;
   const stillValid = session.expirationDate ? timestampDate(session.expirationDate) > new Date() : true;
 
-  const verifiedAt = validPassword || validPasskey;
-  const valid = !!((validPassword || validPasskey) && stillValid);
+  const verifiedAt = validPassword || validPasskey || validIDP;
+  const valid = !!((validPassword || validPasskey || validIDP) && stillValid);
 
   return { valid, verifiedAt };
 }
@@ -145,7 +146,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           </Alert>
         )}
 
-        {isSessionValid(sessionWithData).valid && loginSettings && sessionWithData && sessionWithData.factors?.user?.id && (
+        {valid && loginSettings && sessionWithData && sessionWithData.factors?.user?.id && (
           <ChooseSecondFactorToSetup
             userId={sessionWithData.factors?.user?.id}
             loginName={loginName}

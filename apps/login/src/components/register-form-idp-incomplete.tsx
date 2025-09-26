@@ -1,7 +1,6 @@
 "use client";
 
 import { registerUserAndLinkToIDP } from "@/lib/server/register";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { FieldValues, useForm } from "react-hook-form";
@@ -60,8 +59,6 @@ export function RegisterFormIDPIncomplete({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  const router = useRouter();
-
   async function submitAndRegister(values: Inputs) {
     setLoading(true);
     const response = await registerUserAndLinkToIDP({
@@ -88,11 +85,7 @@ export function RegisterFormIDPIncomplete({
       return;
     }
 
-    if (response && "redirect" in response && response.redirect) {
-      return router.push(response.redirect);
-    }
-
-    return response;
+    // If no error, the function has already handled the redirect
   }
 
   const { errors } = formState;
@@ -106,7 +99,7 @@ export function RegisterFormIDPIncomplete({
             autoComplete="firstname"
             required
             {...register("firstname", { required: t("required.firstname") })}
-            label="First name"
+            label={t("labels.firstname")}
             error={errors.firstname?.message as string}
             data-testid="firstname-text-input"
           />
@@ -117,7 +110,7 @@ export function RegisterFormIDPIncomplete({
             autoComplete="lastname"
             required
             {...register("lastname", { required: t("required.lastname") })}
-            label="Last name"
+            label={t("labels.lastname")}
             error={errors.lastname?.message as string}
             data-testid="lastname-text-input"
           />
@@ -128,7 +121,7 @@ export function RegisterFormIDPIncomplete({
             autoComplete="email"
             required
             {...register("email", { required: t("required.email") })}
-            label="E-mail"
+            label={t("labels.email")}
             error={errors.email?.message as string}
             data-testid="email-text-input"
           />
@@ -150,8 +143,7 @@ export function RegisterFormIDPIncomplete({
           onClick={handleSubmit(submitAndRegister)}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
-          <Translated i18nKey="submit" namespace="register" />
+          {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="submit" namespace="register" />
         </Button>
       </div>
     </form>

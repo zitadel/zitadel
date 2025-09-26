@@ -120,12 +120,6 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
         {loginSettings?.allowExternalIdp && !!identityProviders.length && (
           <>
-            <div className="flex flex-col items-center py-3">
-              <p className="ztdl-p text-center">
-                <Translated i18nKey="orUseIDP" namespace="register" />
-              </p>
-            </div>
-
             <SignInWithIdp
               identityProviders={identityProviders}
               requestId={requestId}

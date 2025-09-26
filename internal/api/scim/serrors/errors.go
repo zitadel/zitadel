@@ -9,7 +9,6 @@ import (
 	"strconv"
 
 	"github.com/zitadel/logging"
-	"golang.org/x/text/language"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	zhttp_middleware "github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -67,24 +66,22 @@ const (
 	ScimTypeUniqueness scimErrorType = "uniqueness"
 )
 
-var translator *i18n.Translator
+func ErrorHandler(translator *i18n.Translator) func(next zhttp_middleware.HandlerFuncWithError) http.Handler {
+	return func(next zhttp_middleware.HandlerFuncWithError) http.Handler {
+		var err error
 
-func ErrorHandler(next zhttp_middleware.HandlerFuncWithError) http.Handler {
-	var err error
-	translator, err = i18n.NewZitadelTranslator(language.English)
-	logging.OnError(err).Panic("unable to get translator")
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if err = next(w, r); err == nil {
+				return
+			}
 
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if err = next(w, r); err == nil {
-			return
-		}
+			scimErr := MapToScimError(r.Context(), translator, err)
+			w.WriteHeader(scimErr.StatusCode)
 
-		scimErr := MapToScimError(r.Context(), err)
-		w.WriteHeader(scimErr.StatusCode)
-
-		jsonErr := json.NewEncoder(w).Encode(scimErr)
-		logging.OnError(jsonErr).Warn("Failed to marshal scim error response")
-	})
+			jsonErr := json.NewEncoder(w).Encode(scimErr)
+			logging.OnError(jsonErr).Warn("Failed to marshal scim error response")
+		})
+	}
 }
 
 func ThrowInvalidValue(parent error) error {
@@ -146,7 +143,7 @@ func (err *wrappedScimError) Error() string {
 	return fmt.Sprintf("SCIM Error: %s: %s", err.ScimType, err.Parent.Error())
 }
 
-func MapToScimError(ctx context.Context, err error) *ScimError {
+func MapToScimError(ctx context.Context, translator *i18n.Translator, err error) *ScimError {
 	scimError := new(ScimError)
 	if ok := errors.As(err, &scimError); ok {
 		return scimError
@@ -154,7 +151,7 @@ func MapToScimError(ctx context.Context, err error) *ScimError {
 
 	scimWrappedError := new(wrappedScimError)
 	if ok := errors.As(err, &scimWrappedError); ok {
-		mappedErr := MapToScimError(ctx, scimWrappedError.Parent)
+		mappedErr := MapToScimError(ctx, translator, scimWrappedError.Parent)
 		if scimWrappedError.ScimType != "" {
 			mappedErr.ScimType = scimWrappedError.ScimType
 		}

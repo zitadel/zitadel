@@ -17,16 +17,16 @@ The use cases under tests are defined in `src/use_cases`. The implementation of 
 
 ### Env vars
 
-- `VUS`: Amount of parallel processes execute the test (default is 20)
-- `DURATION`: Defines how long the tests are executed (default is `200s`)
-- `ZITADEL_HOST`: URL of ZITADEL (default is `http://localhost:8080`)
-- `ADMIN_LOGIN_NAME`: Loginanme of a human user with `IAM_OWNER`-role
-- `ADMIN_PASSWORD`: password of the human user
+* `VUS`: Amount of parallel processes execute the test (default is 20)
+* `DURATION`: Defines how long the tests are executed (default is `200s`)
+* `ZITADEL_HOST`: URL of ZITADEL (default is `http://localhost:8080`)
+* `ADMIN_LOGIN_NAME`: Loginanme of a human user with `IAM_OWNER`-role
+* `ADMIN_PASSWORD`: password of the human user
 
 To setup the tests we use the credentials of console and log in using an admin. The user must be able to create organizations and all resources inside organizations.
 
-- `ADMIN_LOGIN_NAME`: `zitadel-admin@zitadel.localhost`
-- `ADMIN_PASSWORD`: `Password1!`
+* `ADMIN_LOGIN_NAME`: `zitadel-admin@zitadel.localhost`
+* `ADMIN_PASSWORD`: `Password1!`
 
 ### Test
 
@@ -67,3 +67,13 @@ Before you run the tests you need an initialized user. The tests don't implement
 * `make machine_jwt_profile_grant_single_user`  
   setup: generates private/public key, creates machine user, adds a key  
   test: creates a token and calls user info in parallel for the same user
+* `make users_by_metadata_key`  
+  setup: creates for half of the VUS a human user and a machine for the other half, adds 3 metadata to each user
+  test: calls the list users endpoint and filters by a metadata key
+* `make users_by_metadata_value`  
+  setup: creates for half of the VUS a human user and a machine for the other half, adds 3 metadata to each user
+  test: calls the list users endpoint and filters by a metadata value
+* `make verify_all_user_grants_exists`  
+  setup: creates 50 projects, 1 machine per VU
+  test: creates a machine and grants all projects to the machine
+  teardown: the organization is not removed to verify the data of the projections are correct. You can find additional information [at the bottom of this file](./src/use_cases/verify_all_user_grants_exist.ts)

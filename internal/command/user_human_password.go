@@ -112,7 +112,7 @@ type setPasswordVerification func(ctx context.Context) (newEncodedPassword strin
 // setPasswordWithPermission returns a permission check as [setPasswordVerification] implementation
 func (c *Commands) setPasswordWithPermission(userID, orgID string) setPasswordVerification {
 	return func(ctx context.Context) (_ string, err error) {
-		return "", c.checkPermissionUpdateUser(ctx, orgID, userID)
+		return "", c.checkPermissionUpdateUser(ctx, orgID, userID, false)
 	}
 }
 

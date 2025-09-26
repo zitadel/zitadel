@@ -78,7 +78,7 @@ export function Avatar({ size = "base", name, loginName, imageUrl, shadow }: Ava
       style={resolvedTheme === "light" ? avatarStyleLight : avatarStyleDark}
     >
       {imageUrl ? (
-        <Image
+        <img
           height={48}
           width={48}
           alt="avatar"

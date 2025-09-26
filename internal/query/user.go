@@ -634,7 +634,7 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, p
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareUsersQuery()
+	query, scan := prepareUsersQuery(queries.SortingColumn)
 	query = userPermissionCheckV2(ctx, query, permissionCheckV2, queries.Queries)
 	stmt, args, err := queries.toQuery(query).Where(sq.Eq{
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -863,27 +863,7 @@ func scanUser(row *sql.Row) (*User, error) {
 	var count int
 	preferredLoginName := sql.NullString{}
 
-	humanID := sql.NullString{}
-	firstName := sql.NullString{}
-	lastName := sql.NullString{}
-	nickName := sql.NullString{}
-	displayName := sql.NullString{}
-	preferredLanguage := sql.NullString{}
-	gender := sql.NullInt32{}
-	avatarKey := sql.NullString{}
-	email := sql.NullString{}
-	isEmailVerified := sql.NullBool{}
-	phone := sql.NullString{}
-	isPhoneVerified := sql.NullBool{}
-	passwordChangeRequired := sql.NullBool{}
-	passwordChanged := sql.NullTime{}
-	mfaInitSkipped := sql.NullTime{}
-
-	machineID := sql.NullString{}
-	name := sql.NullString{}
-	description := sql.NullString{}
-	encodedHash := sql.NullString{}
-	accessTokenType := sql.NullInt32{}
+	human, machine := sqlHuman{}, sqlMachine{}
 
 	err := row.Scan(
 		&u.ID,
@@ -896,26 +876,26 @@ func scanUser(row *sql.Row) (*User, error) {
 		&u.Username,
 		&u.LoginNames,
 		&preferredLoginName,
-		&humanID,
-		&firstName,
-		&lastName,
-		&nickName,
-		&displayName,
-		&preferredLanguage,
-		&gender,
-		&avatarKey,
-		&email,
-		&isEmailVerified,
-		&phone,
-		&isPhoneVerified,
-		&passwordChangeRequired,
-		&passwordChanged,
-		&mfaInitSkipped,
-		&machineID,
-		&name,
-		&description,
-		&encodedHash,
-		&accessTokenType,
+		&human.humanID,
+		&human.firstName,
+		&human.lastName,
+		&human.nickName,
+		&human.displayName,
+		&human.preferredLanguage,
+		&human.gender,
+		&human.avatarKey,
+		&human.email,
+		&human.isEmailVerified,
+		&human.phone,
+		&human.isPhoneVerified,
+		&human.passwordChangeRequired,
+		&human.passwordChanged,
+		&human.mfaInitSkipped,
+		&machine.machineID,
+		&machine.name,
+		&machine.description,
+		&machine.encodedSecret,
+		&machine.accessTokenType,
 		&count,
 	)
 
@@ -928,29 +908,29 @@ func scanUser(row *sql.Row) (*User, error) {
 
 	u.PreferredLoginName = preferredLoginName.String
 
-	if humanID.Valid {
+	if human.humanID.Valid {
 		u.Human = &Human{
-			FirstName:              firstName.String,
-			LastName:               lastName.String,
-			NickName:               nickName.String,
-			DisplayName:            displayName.String,
-			AvatarKey:              avatarKey.String,
-			PreferredLanguage:      language.Make(preferredLanguage.String),
-			Gender:                 domain.Gender(gender.Int32),
-			Email:                  domain.EmailAddress(email.String),
-			IsEmailVerified:        isEmailVerified.Bool,
-			Phone:                  domain.PhoneNumber(phone.String),
-			IsPhoneVerified:        isPhoneVerified.Bool,
-			PasswordChangeRequired: passwordChangeRequired.Bool,
-			PasswordChanged:        passwordChanged.Time,
-			MFAInitSkipped:         mfaInitSkipped.Time,
+			FirstName:              human.firstName.String,
+			LastName:               human.lastName.String,
+			NickName:               human.nickName.String,
+			DisplayName:            human.displayName.String,
+			AvatarKey:              human.avatarKey.String,
+			PreferredLanguage:      language.Make(human.preferredLanguage.String),
+			Gender:                 domain.Gender(human.gender.Int32),
+			Email:                  domain.EmailAddress(human.email.String),
+			IsEmailVerified:        human.isEmailVerified.Bool,
+			Phone:                  domain.PhoneNumber(human.phone.String),
+			IsPhoneVerified:        human.isPhoneVerified.Bool,
+			PasswordChangeRequired: human.passwordChangeRequired.Bool,
+			PasswordChanged:        human.passwordChanged.Time,
+			MFAInitSkipped:         human.mfaInitSkipped.Time,
 		}
-	} else if machineID.Valid {
+	} else if machine.machineID.Valid {
 		u.Machine = &Machine{
-			Name:            name.String,
-			Description:     description.String,
-			EncodedSecret:   encodedHash.String,
-			AccessTokenType: domain.OIDCTokenType(accessTokenType.Int32),
+			Name:            machine.name.String,
+			Description:     machine.description.String,
+			EncodedSecret:   machine.encodedSecret.String,
+			AccessTokenType: domain.OIDCTokenType(machine.accessTokenType.Int32),
 		}
 	}
 	return u, nil
@@ -1290,7 +1270,10 @@ func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 		}
 }
 
-func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+func prepareUsersQuery(orderBy Column) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+	if orderBy.isZero() {
+		orderBy = UserIDCol
+	}
 	return sq.Select(
 			UserIDCol.identifier(),
 			UserCreationDateCol.identifier(),
@@ -1316,15 +1299,19 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 			HumanIsPhoneVerifiedCol.identifier(),
 			HumanPasswordChangeRequiredCol.identifier(),
 			HumanPasswordChangedCol.identifier(),
+			HumanMFAInitSkippedCol.identifier(),
 			MachineUserIDCol.identifier(),
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
 			MachineSecretCol.identifier(),
 			MachineAccessTokenTypeCol.identifier(),
+			orderBy.orderBy(),
 			countColumn.identifier()).
+			Distinct().
 			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			LeftJoin(join(MachineUserIDCol, UserIDCol)).
+			LeftJoin(join(UserMetadataUserIDCol, UserIDCol)).
 			JoinClause(joinLoginNames).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Users, error) {
@@ -1335,26 +1322,8 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 				loginNames := database.TextArray[string]{}
 				preferredLoginName := sql.NullString{}
 
-				humanID := sql.NullString{}
-				firstName := sql.NullString{}
-				lastName := sql.NullString{}
-				nickName := sql.NullString{}
-				displayName := sql.NullString{}
-				preferredLanguage := sql.NullString{}
-				gender := sql.NullInt32{}
-				avatarKey := sql.NullString{}
-				email := sql.NullString{}
-				isEmailVerified := sql.NullBool{}
-				phone := sql.NullString{}
-				isPhoneVerified := sql.NullBool{}
-				passwordChangeRequired := sql.NullBool{}
-				passwordChanged := sql.NullTime{}
-
-				machineID := sql.NullString{}
-				name := sql.NullString{}
-				description := sql.NullString{}
-				encodedHash := sql.NullString{}
-				accessTokenType := sql.NullInt32{}
+				human, machine := sqlHuman{}, sqlMachine{}
+				var orderByValue any
 
 				err := rows.Scan(
 					&u.ID,
@@ -1367,25 +1336,30 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 					&u.Username,
 					&loginNames,
 					&preferredLoginName,
-					&humanID,
-					&firstName,
-					&lastName,
-					&nickName,
-					&displayName,
-					&preferredLanguage,
-					&gender,
-					&avatarKey,
-					&email,
-					&isEmailVerified,
-					&phone,
-					&isPhoneVerified,
-					&passwordChangeRequired,
-					&passwordChanged,
-					&machineID,
-					&name,
-					&description,
-					&encodedHash,
-					&accessTokenType,
+
+					&human.humanID,
+					&human.firstName,
+					&human.lastName,
+					&human.nickName,
+					&human.displayName,
+					&human.preferredLanguage,
+					&human.gender,
+					&human.avatarKey,
+					&human.email,
+					&human.isEmailVerified,
+					&human.phone,
+					&human.isPhoneVerified,
+					&human.passwordChangeRequired,
+					&human.passwordChanged,
+					&human.mfaInitSkipped,
+
+					&machine.machineID,
+					&machine.name,
+					&machine.description,
+					&machine.encodedSecret,
+					&machine.accessTokenType,
+
+					&orderByValue,
 					&count,
 				)
 				if err != nil {
@@ -1397,28 +1371,29 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 					u.PreferredLoginName = preferredLoginName.String
 				}
 
-				if humanID.Valid {
+				if human.humanID.Valid {
 					u.Human = &Human{
-						FirstName:              firstName.String,
-						LastName:               lastName.String,
-						NickName:               nickName.String,
-						DisplayName:            displayName.String,
-						AvatarKey:              avatarKey.String,
-						PreferredLanguage:      language.Make(preferredLanguage.String),
-						Gender:                 domain.Gender(gender.Int32),
-						Email:                  domain.EmailAddress(email.String),
-						IsEmailVerified:        isEmailVerified.Bool,
-						Phone:                  domain.PhoneNumber(phone.String),
-						IsPhoneVerified:        isPhoneVerified.Bool,
-						PasswordChangeRequired: passwordChangeRequired.Bool,
-						PasswordChanged:        passwordChanged.Time,
+						FirstName:              human.firstName.String,
+						LastName:               human.lastName.String,
+						NickName:               human.nickName.String,
+						DisplayName:            human.displayName.String,
+						AvatarKey:              human.avatarKey.String,
+						PreferredLanguage:      language.Make(human.preferredLanguage.String),
+						Gender:                 domain.Gender(human.gender.Int32),
+						Email:                  domain.EmailAddress(human.email.String),
+						IsEmailVerified:        human.isEmailVerified.Bool,
+						Phone:                  domain.PhoneNumber(human.phone.String),
+						IsPhoneVerified:        human.isPhoneVerified.Bool,
+						PasswordChangeRequired: human.passwordChangeRequired.Bool,
+						PasswordChanged:        human.passwordChanged.Time,
+						MFAInitSkipped:         human.mfaInitSkipped.Time,
 					}
-				} else if machineID.Valid {
+				} else if machine.machineID.Valid {
 					u.Machine = &Machine{
-						Name:            name.String,
-						Description:     description.String,
-						EncodedSecret:   encodedHash.String,
-						AccessTokenType: domain.OIDCTokenType(accessTokenType.Int32),
+						Name:            machine.name.String,
+						Description:     machine.description.String,
+						EncodedSecret:   machine.encodedSecret.String,
+						AccessTokenType: domain.OIDCTokenType(machine.accessTokenType.Int32),
 					}
 				}
 
@@ -1436,4 +1411,30 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 				},
 			}, nil
 		}
+}
+
+type sqlHuman struct {
+	humanID                sql.NullString
+	firstName              sql.NullString
+	lastName               sql.NullString
+	nickName               sql.NullString
+	displayName            sql.NullString
+	preferredLanguage      sql.NullString
+	gender                 sql.NullInt32
+	avatarKey              sql.NullString
+	email                  sql.NullString
+	isEmailVerified        sql.NullBool
+	phone                  sql.NullString
+	isPhoneVerified        sql.NullBool
+	passwordChangeRequired sql.NullBool
+	passwordChanged        sql.NullTime
+	mfaInitSkipped         sql.NullTime
+}
+
+type sqlMachine struct {
+	machineID       sql.NullString
+	name            sql.NullString
+	description     sql.NullString
+	encodedSecret   sql.NullString
+	accessTokenType sql.NullInt32
 }

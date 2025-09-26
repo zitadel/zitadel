@@ -206,7 +206,6 @@ module.exports = {
           items: [
             "guides/migrate/sources/zitadel",
             "guides/migrate/sources/auth0",
-            "guides/migrate/sources/auth0-guide",
             "guides/migrate/sources/keycloak",
           ],
         },
@@ -529,6 +528,10 @@ module.exports = {
               type: "doc",
               id: "guides/integrate/actions/migrate-from-v1",
             },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/webhook-site-setup",
+            },
           ],
         },
         {
@@ -639,7 +642,16 @@ module.exports = {
       label: "Support",
       collapsed: true,
       items: [
-        "support/software-release-cycles-support",
+        {
+          type: "link",
+          label: "Support States",
+          href: "https://help.zitadel.com/zitadel-support-states"
+        },
+        {
+          type: "link",
+          label: "Zitadel Release Cycle",
+          href: "https://help.zitadel.com/zitadel-software-release-cycle"
+        },
         "support/troubleshooting",
         {
           type: "category",

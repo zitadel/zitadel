@@ -11,7 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
@@ -53,7 +52,7 @@ func TestUpdateUser(t *testing.T) {
 		{
 			name: "not authenticated",
 			setup: func(t *testing.T) testCase {
-				username := gofakeit.Username()
+				username := integration.Username()
 				created, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, username))
 				require.NoError(t, err)
 				return testCase{
@@ -68,7 +67,7 @@ func TestUpdateUser(t *testing.T) {
 		{
 			name: "no permissions",
 			setup: func(t *testing.T) testCase {
-				username := gofakeit.Username()
+				username := integration.Username()
 				created, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, username))
 				require.NoError(t, err)
 				return testCase{
@@ -83,7 +82,7 @@ func TestUpdateUser(t *testing.T) {
 		{
 			name: "other org",
 			setup: func(t *testing.T) testCase {
-				username := gofakeit.Username()
+				username := integration.Username()
 				created, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, username))
 				require.NoError(t, err)
 				return testCase{
@@ -98,7 +97,7 @@ func TestUpdateUser(t *testing.T) {
 		{
 			name: "other org with permissions",
 			setup: func(t *testing.T) testCase {
-				username := gofakeit.Username()
+				username := integration.Username()
 				created, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, username))
 				require.NoError(t, err)
 				return testCase{
@@ -114,7 +113,7 @@ func TestUpdateUser(t *testing.T) {
 		{
 			name: "invalid patch json",
 			setup: func(t *testing.T) testCase {
-				username := gofakeit.Username()
+				username := integration.Username()
 				created, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, username))
 				require.NoError(t, err)
 				return testCase{
@@ -128,7 +127,7 @@ func TestUpdateUser(t *testing.T) {
 		{
 			name: "password complexity violation",
 			setup: func(t *testing.T) testCase {
-				username := gofakeit.Username()
+				username := integration.Username()
 				created, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, username))
 				require.NoError(t, err)
 				return testCase{
@@ -142,7 +141,7 @@ func TestUpdateUser(t *testing.T) {
 		{
 			name: "invalid profile url",
 			setup: func(t *testing.T) testCase {
-				username := gofakeit.Username()
+				username := integration.Username()
 				created, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, username))
 				require.NoError(t, err)
 				return testCase{
@@ -156,7 +155,7 @@ func TestUpdateUser(t *testing.T) {
 		{
 			name: "invalid time zone",
 			setup: func(t *testing.T) testCase {
-				username := gofakeit.Username()
+				username := integration.Username()
 				created, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, username))
 				require.NoError(t, err)
 				return testCase{
@@ -170,7 +169,7 @@ func TestUpdateUser(t *testing.T) {
 		{
 			name: "invalid locale",
 			setup: func(t *testing.T) testCase {
-				username := gofakeit.Username()
+				username := integration.Username()
 				created, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, username))
 				require.NoError(t, err)
 				return testCase{
@@ -195,7 +194,7 @@ func TestUpdateUser(t *testing.T) {
 		{
 			name: "full",
 			setup: func(t *testing.T) testCase {
-				username := gofakeit.Username()
+				username := integration.Username()
 				created, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, username))
 				require.NoError(t, err)
 				return testCase{

@@ -1,6 +1,6 @@
 import { loginByUsernamePassword } from '../../login_ui';
 import { createOrg, removeOrg } from '../../org';
-import { User, createHuman } from '../../user';
+import { User, createHuman, createMachine } from '../../user';
 import { Trend } from 'k6/metrics';
 import { Config, MaxVUs } from '../../config';
 import { createSession } from '../../session';

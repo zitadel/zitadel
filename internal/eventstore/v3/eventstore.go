@@ -13,6 +13,8 @@ import (
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
+	new_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -32,7 +34,8 @@ var (
 )
 
 type Eventstore struct {
-	client *database.DB
+	client new_db.Pool
+	queue  eventstore.ExecutionQueue
 }
 
 var (
@@ -152,17 +155,18 @@ func RegisterEventstoreTypes(ctx context.Context, conn *pgx.Conn) error {
 	return nil
 }
 
-// Client implements the [eventstore.Pusher]
-func (es *Eventstore) Client() *database.DB {
-	return es.client
-}
-
-func NewEventstore(client *database.DB) *Eventstore {
-	return &Eventstore{client: client}
+func NewEventstore(client *database.DB, opts ...EventstoreOption) *Eventstore {
+	es := &Eventstore{
+		client: new_sql.SQLPool(client.DB),
+	}
+	for _, opt := range opts {
+		opt(es)
+	}
+	return es
 }
 
 func (es *Eventstore) Health(ctx context.Context) error {
-	return es.client.PingContext(ctx)
+	return es.client.Ping(ctx)
 }
 
 var errTypesNotFound = errors.New("types not found")
@@ -181,22 +185,30 @@ func CheckExecutionPlan(ctx context.Context, conn *sql.Conn) error {
 	})
 }
 
-func (es *Eventstore) pushTx(ctx context.Context, client database.ContextQueryExecuter) (tx database.Tx, deferrable func(err error) error, err error) {
-	tx, ok := client.(database.Tx)
+func (es *Eventstore) pushTx(ctx context.Context, client new_db.QueryExecutor) (tx new_db.Transaction, deferrable func(err error) error, err error) {
+	tx, ok := client.(new_db.Transaction)
 	if ok {
 		return tx, nil, nil
 	}
-	beginner, ok := client.(database.Beginner)
+	beginner, ok := client.(new_db.Beginner)
 	if !ok {
 		beginner = es.client
 	}
 
-	tx, err = beginner.BeginTx(ctx, &sql.TxOptions{
-		Isolation: sql.LevelReadCommitted,
-		ReadOnly:  false,
+	tx, err = beginner.Begin(ctx, &new_db.TransactionOptions{
+		IsolationLevel: new_db.IsolationLevelReadCommitted,
+		AccessMode:     new_db.AccessModeReadWrite,
 	})
 	if err != nil {
 		return nil, nil, err
 	}
-	return tx, func(err error) error { return database.CloseTransaction(tx, err) }, nil
+	return tx, func(err error) error { return tx.End(ctx, err) }, nil
+}
+
+type EventstoreOption func(*Eventstore)
+
+func WithExecutionQueueOption(queue eventstore.ExecutionQueue) EventstoreOption {
+	return func(es *Eventstore) {
+		es.queue = queue
+	}
 }
