@@ -32,7 +32,10 @@
 		"ghcr.io/devcontainers/features/go:1": {
 			"version": "1.24"
 		},
-		"ghcr.io/devcontainers/features/docker-outside-of-docker": {}
+		"ghcr.io/devcontainers/features/docker-outside-of-docker": {},
+		"ghcr.io/schlich/devcontainer-features/cypress:1": {
+			"version": "14"
+		}
 	},
 	"containerEnv": {
 		"DEVCONTAINER_LOCAL_WORKSPACE_ROOT": "${localWorkspaceFolder}"
