@@ -44,19 +44,25 @@ pnpm nx run-many --projects @zitadel/api --targets generate build-console
 pnpm nx run-many --projects . @zitadel/login --targets db prod
 ```
 
+Start a debug session in your IDE.
+In VSCode, you can use the preconfigured [launch config](./.vscode/launch.json).
+In other IDEs, adjust accordingly.
+
+Visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
+
 If you don't need a Login or a Console, you can omit them and use the generated ./admin.pat to call the API.
 
 ```bash
 pnpm nx run-many --projects . @zitadel/api --targets db generate
 ```
 
-Start a debug session in your IDE.
-In VSCode, you can use the preconfigured [launch config](./.vscode/launch.json).
-In other IDEs, adjust accordingly.
+Call the API using grpcurl or grpcui, for example:
 
-If you have a Login deployed, visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
+```bash
+grpcurl
+```
 
-To connect to the database and explore Zitadel data, run `psql "host=localhost dbname=zitadel sslmode=disable"`.
+To connect to the database and explore Zitadel data, run `psql "host=${DEVCONTAINER_DB_HOST:-localhost}$ dbname=zitadel sslmode=disable"`.
 
 For more options, go to the [API section](#api)
 
