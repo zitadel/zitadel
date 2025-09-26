@@ -19,7 +19,7 @@ jobs:
     runs-on:
       group: zitadel-public
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -88,21 +88,29 @@ jobs:
         with:
           key: ${{ steps.nx_cache.outputs.cache-primary-key }}
           path: ${{ env.nx_cache_path }}
-      - name: publish coverage
+      - name: Publish API Unit Test Coverage
         uses: codecov/codecov-action@v4.3.0
         with:
           file: profile.api.test-unit.cov
           name: api-test-unit
           flags: api-test-unit
           token: ${{ secrets.CODECOV_TOKEN }}
-      - name: publish coverage
+      - name: Publish API Integration Test Coverage
         uses: codecov/codecov-action@v4.3.0
         with:
           file: profile.api.test-integration.cov
           name: api-test-integration
           flags: api-test-integration
           token: ${{ secrets.CODECOV_TOKEN }}
-      - uses: actions/upload-artifact@v4
+      - name: Upload API Integration Test Race Logs
+        if: failure() || cancelled()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-integration-test-race-logs
+          path: |
+           .artifacts/api-test-integration/race.log.*
+      - name: Upload Functional UI Test Artifacts
+        uses: actions/upload-artifact@v4
         if: failure() || cancelled()
         with:
           name: functional-ui-tests
@@ -110,10 +118,3 @@ jobs:
             tests/functional-ui/cypress/screenshots
             tests/functional-ui/cypress/videos
             tests/functional-ui/cypress/results
-      - name: upload race logs
-        if: failure() || cancelled()
-        uses: actions/upload-artifact@v4
-        with:
-          name: api-integration-test-race-logs
-          path: |
-           .artifacts/api-test-integration/race.log.*

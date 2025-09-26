@@ -46,7 +46,7 @@ jobs:
       group: zitadel-public
     needs: version
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
