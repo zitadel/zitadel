@@ -6,10 +6,6 @@
       "description": "Runs arbitrary Docker Compose commands with dev container support. All running services are manageable and addressable from in- and outside the dev container. The services are defined in .devcontainer/docker-compose.yaml.",
       "executor": "nx:run-commands",
       "options": {
-        "env": {
-          "WORKSPACE_ROOT": "{workspaceRoot}",
-          "PROJECT_ROOT": "{projectRoot}"
-        },
         "cwd": "{projectRoot}",
         "command": "./compose.sh"
       }
