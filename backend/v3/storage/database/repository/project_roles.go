@@ -52,7 +52,7 @@ func (p projectRoles) Update(ctx context.Context, client database.QueryExecutor,
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}
-	if err := p.checkRestrictingColumns(condition); err != nil {
+	if err := checkPKCondition(p, condition); err != nil {
 		return 0, err
 	}
 	if !database.Changes(changes).IsOnColumn(p.UpdatedAtColumn()) {
@@ -66,7 +66,7 @@ func (p projectRoles) Update(ctx context.Context, client database.QueryExecutor,
 }
 
 func (p projectRoles) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	if err := p.checkRestrictingColumns(condition); err != nil {
+	if err := checkPKCondition(p, condition); err != nil {
 		return 0, err
 	}
 	builder := database.NewStatementBuilder(`DELETE FROM zitadel.project_roles`)
@@ -175,7 +175,7 @@ func (p projectRoles) prepareQuery(opts []database.QueryOption) (*database.State
 	for _, opt := range opts {
 		opt(options)
 	}
-	if err := p.checkRestrictingColumns(options.Condition); err != nil {
+	if err := checkRestrictingColumns(options.Condition, p.InstanceIDColumn()); err != nil {
 		return nil, err
 	}
 	builder := database.NewStatementBuilder(queryProjectRoleStmt)
@@ -184,11 +184,11 @@ func (p projectRoles) prepareQuery(opts []database.QueryOption) (*database.State
 	return builder, nil
 }
 
-func (p projectRoles) checkRestrictingColumns(condition database.Condition) error {
-	return checkRestrictingColumns(
-		condition,
+// getPrimaryKeyColumns implements the [pkRepository] interface
+func (p projectRoles) getPrimaryKeyColumns() []database.Column {
+	return []database.Column{
 		p.InstanceIDColumn(),
-		p.OrganizationIDColumn(),
 		p.ProjectIDColumn(),
-	)
+		p.KeyColumn(),
+	}
 }

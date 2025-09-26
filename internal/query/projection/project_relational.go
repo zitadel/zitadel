@@ -115,7 +115,6 @@ func (p *projectRelationalProjection) reduceProjectChanged(event eventstore.Even
 		columns,
 		[]handler.Condition{
 			handler.NewCond(e.Aggregate().InstanceID, e.Aggregate().InstanceID),
-			handler.NewCond(e.Aggregate().ResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCond(ID, e.Aggregate().ID),
 		},
 	), nil
@@ -134,7 +133,6 @@ func (p *projectRelationalProjection) reduceProjectDeactivated(event eventstore.
 		},
 		[]handler.Condition{
 			handler.NewCond(ProjectColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCond(e.Aggregate().ResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCond(ID, e.Aggregate().ID),
 		},
 	), nil
@@ -153,7 +151,6 @@ func (p *projectRelationalProjection) reduceProjectReactivated(event eventstore.
 		},
 		[]handler.Condition{
 			handler.NewCond(InstanceID, e.Aggregate().InstanceID),
-			handler.NewCond(OrganizationID, e.Aggregate().ResourceOwner),
 			handler.NewCond(ID, e.Aggregate().ID),
 		},
 	), nil
@@ -168,7 +165,6 @@ func (p *projectRelationalProjection) reduceProjectRemoved(event eventstore.Even
 		e,
 		[]handler.Condition{
 			handler.NewCond(ProjectColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCond(e.Aggregate().ResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCond(ID, e.Aggregate().ID),
 		},
 	), nil

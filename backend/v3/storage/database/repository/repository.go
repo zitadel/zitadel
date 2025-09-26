@@ -29,6 +29,22 @@ func checkRestrictingColumns(
 	return nil
 }
 
+type pkRepository interface {
+	getPrimaryKeyColumns() []database.Column
+}
+
+// checkPKCondition checks if the Primary Key columns are part of the condition.
+// This can ensure only a single row is affected by updates and deletes.
+func checkPKCondition(
+	repo pkRepository,
+	condition database.Condition,
+) error {
+	return checkRestrictingColumns(
+		condition,
+		repo.getPrimaryKeyColumns()...,
+	)
+}
+
 func getOne[Target any](ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*Target, error) {
 	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {

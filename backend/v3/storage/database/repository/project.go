@@ -63,9 +63,7 @@ func (p project) Update(ctx context.Context, client database.QueryExecutor, cond
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}
-	// TBD: do we support update operations of multiple projects?
-	// In other words: should we require projectIDColumn as well?
-	if err := p.checkRestrictingColumns(condition); err != nil {
+	if err := checkPKCondition(p, condition); err != nil {
 		return 0, err
 	}
 	if !database.Changes(changes).IsOnColumn(p.UpdatedAtColumn()) {
@@ -79,13 +77,11 @@ func (p project) Update(ctx context.Context, client database.QueryExecutor, cond
 }
 
 func (p project) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	// TBD: do we support delete operations of multiple projects?
-	// In other words: should we require projectIDColumn as well?
-	if err := p.checkRestrictingColumns(condition); err != nil {
+	if err := checkPKCondition(p, condition); err != nil {
 		return 0, err
 	}
 
-	builder := database.NewStatementBuilder(`DELETE FROM zitadel.projects`)
+	builder := database.NewStatementBuilder(`DELETE FROM zitadel.projects `)
 	writeCondition(builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
@@ -218,7 +214,7 @@ func (p project) prepareQuery(opts []database.QueryOption) (*database.StatementB
 	for _, opt := range opts {
 		opt(options)
 	}
-	if err := p.checkRestrictingColumns(options.Condition); err != nil {
+	if err := checkRestrictingColumns(options.Condition, p.InstanceIDColumn()); err != nil {
 		return nil, err
 	}
 	builder := database.NewStatementBuilder(queryProjectStmt)
@@ -227,10 +223,10 @@ func (p project) prepareQuery(opts []database.QueryOption) (*database.StatementB
 	return builder, nil
 }
 
-func (p project) checkRestrictingColumns(condition database.Condition) error {
-	return checkRestrictingColumns(
-		condition,
+// getPrimaryKeyColumns implements the [pkRepository] interface
+func (p project) getPrimaryKeyColumns() []database.Column {
+	return []database.Column{
 		p.InstanceIDColumn(),
-		p.OrganizationIDColumn(),
-	)
+		p.IDColumn(),
+	}
 }
