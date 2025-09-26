@@ -1124,6 +1124,10 @@ func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTem
 	if identityProvider.SAMLIDPTemplate.Binding != "" {
 		opts = append(opts, saml.WithBinding(identityProvider.SAMLIDPTemplate.Binding))
 	}
+	if identityProvider.SAMLIDPTemplate.WithSignedRequest &&
+		identityProvider.SAMLIDPTemplate.SignatureAlgorithm != "" {
+		opts = append(opts, saml.WithSignatureAlgorithm(identityProvider.SAMLIDPTemplate.SignatureAlgorithm))
+	}
 	if identityProvider.SAMLIDPTemplate.NameIDFormat.Valid {
 		opts = append(opts, saml.WithNameIDFormat(identityProvider.SAMLIDPTemplate.NameIDFormat.V))
 	}

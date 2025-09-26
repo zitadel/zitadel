@@ -315,11 +315,13 @@ export class ProviderSamlSpComponent {
           const samlConfig = this.provider.config.saml;
           const bindingKey = getEnumKeyFromValue(SAMLBinding, samlConfig.binding) || '';
           const nameIdFormatKey = getEnumKeyFromValue(SAMLNameIDFormat, samlConfig.nameIdFormat) || '';
+          const signatureAlgorithmKey = getEnumKeyFromValue(SAMLSignatureAlgorithm, samlConfig.signatureAlgorithm) || '';
 
           this.form.patchValue({
             metadataXml: typeof samlConfig.metadataXml === 'string' ? samlConfig.metadataXml : '',
             binding: bindingKey,
             withSignedRequest: samlConfig.withSignedRequest,
+            signatureAlgorithm: signatureAlgorithmKey,
             nameIdFormat: nameIdFormatKey,
             transientMappingAttributeName: samlConfig.transientMappingAttributeName || '',
             federatedLogoutEnabled: samlConfig.federatedLogoutEnabled || false,
