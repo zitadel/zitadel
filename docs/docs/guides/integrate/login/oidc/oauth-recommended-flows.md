@@ -9,7 +9,7 @@ In this guide we will go over some basics on how to obtain an authorization with
 
 ZITADEL does not make assumptions about the application type you are about to integrate. Therefore you must qualify and define an appropriate method for your users to gain authorization to access your application (“authentication flow”). Your choice depends on the application’s ability to maintain the confidentiality of client credentials and the technological capabilities of your application. If you choose a deprecated or unfeasible flow to obtain authorization for your application, your users’ credentials may be compromised.
 
-We invite you to further explore the different authorization flows in the OAuth 2.x standard. For the start we assume that you have a brand-new application (ie. without legacy requirements) and you found an reliable SDK/Library that does the heavy lifting for you.
+We invite you to further explore the different authorization flows in the OAuth 2.x standard. We assume that you have a brand-new application (ie. without legacy requirements), and you've found a reliable SDK/Library that does the heavy lifting for you.
 
 So this module will only go over the basics and explain why we recommend the flow “Authorization Flow with PKCE” as default for most applications. We will also cover the case of machine-to-machine communication, ie. where there is no interactive login. Further we will guide you to further reading viable alternatives, if the default flow is not feasible.
 
