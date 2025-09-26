@@ -609,11 +609,6 @@ func TestGetOrganization(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			if org.Name == "non existent org" {
-				assert.Nil(t, returnedOrg)
-				return
-			}
-
 			assert.Equal(t, returnedOrg.ID, org.ID)
 			assert.Equal(t, returnedOrg.Name, org.Name)
 			assert.Equal(t, returnedOrg.InstanceID, org.InstanceID)
@@ -931,9 +926,7 @@ func TestDeleteOrganization(t *testing.T) {
 			return test{
 				name: "happy path delete organization filter id",
 				testFunc: func(t *testing.T) {
-					organizations := make([]*domain.Organization, noOfOrganizations)
-					for i := range noOfOrganizations {
-
+					for range noOfOrganizations {
 						org := domain.Organization{
 							ID:         organizationId,
 							Name:       gofakeit.Name(),
@@ -945,7 +938,6 @@ func TestDeleteOrganization(t *testing.T) {
 						err := organizationRepo.Create(t.Context(), tx, &org)
 						require.NoError(t, err)
 
-						organizations[i] = &org
 					}
 				},
 				orgIdentifierCondition: organizationRepo.IDCondition(organizationId),
@@ -958,9 +950,7 @@ func TestDeleteOrganization(t *testing.T) {
 			return test{
 				name: "happy path delete organization filter name",
 				testFunc: func(t *testing.T) {
-					organizations := make([]*domain.Organization, noOfOrganizations)
-					for i := range noOfOrganizations {
-
+					for range noOfOrganizations {
 						org := domain.Organization{
 							ID:         gofakeit.Name(),
 							Name:       organizationName,
@@ -972,7 +962,6 @@ func TestDeleteOrganization(t *testing.T) {
 						err := organizationRepo.Create(t.Context(), tx, &org)
 						require.NoError(t, err)
 
-						organizations[i] = &org
 					}
 				},
 				orgIdentifierCondition: organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
@@ -991,28 +980,21 @@ func TestDeleteOrganization(t *testing.T) {
 			return test{
 				name: "deleted already deleted organization",
 				testFunc: func(t *testing.T) {
-					noOfOrganizations := 1
-					organizations := make([]*domain.Organization, noOfOrganizations)
-					for i := range noOfOrganizations {
-
-						org := domain.Organization{
-							ID:         gofakeit.Name(),
-							Name:       organizationName,
-							InstanceID: instanceId,
-							State:      domain.OrgStateActive,
-						}
-
-						// create organization
-						err := organizationRepo.Create(t.Context(), tx, &org)
-						require.NoError(t, err)
-
-						organizations[i] = &org
+					org := domain.Organization{
+						ID:         gofakeit.Name(),
+						Name:       organizationName,
+						InstanceID: instanceId,
+						State:      domain.OrgStateActive,
 					}
+
+					// create organization
+					err := organizationRepo.Create(t.Context(), tx, &org)
+					require.NoError(t, err)
 
 					// delete organization
 					affectedRows, err := organizationRepo.Delete(t.Context(), tx,
 						database.And(
-							organizationRepo.InstanceIDCondition(organizations[0].InstanceID),
+							organizationRepo.InstanceIDCondition(org.InstanceID),
 							organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
 						),
 					)
