@@ -14,7 +14,7 @@ type AddOrgDomainCommand struct {
 }
 
 // Events implements Commander.
-func (a *AddOrgDomainCommand) Events(ctx context.Context) []eventstore.Command {
+func (a *AddOrgDomainCommand) Events(ctx context.Context, opts *CommandOpts) []eventstore.Command {
 	// TODO(IAM-Marco) Finish implementation in https://github.com/zitadel/zitadel/issues/10447
 	return []eventstore.Command{
 		org.NewDomainAddedEvent(ctx, &org.NewAggregate(a.OrgID).Aggregate, a.Name),

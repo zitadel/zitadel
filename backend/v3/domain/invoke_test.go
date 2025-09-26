@@ -28,7 +28,7 @@ type invokeTestCommand struct {
 }
 
 // Events implements Commander.
-func (i *invokeTestCommand) Events(ctx context.Context) []legacy_es.Command {
+func (i *invokeTestCommand) Events(ctx context.Context, opts *CommandOpts) []legacy_es.Command {
 	return i.events
 }
 

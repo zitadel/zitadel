@@ -19,7 +19,7 @@ func NewDeleteOrgCommand(organizationID string) *DeleteOrgCommand {
 }
 
 // Events implements Commander.
-func (d *DeleteOrgCommand) Events(ctx context.Context) []eventstore.Command {
+func (d *DeleteOrgCommand) Events(ctx context.Context, opts *CommandOpts) []eventstore.Command {
 	return nil
 }
 

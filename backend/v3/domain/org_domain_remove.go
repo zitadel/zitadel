@@ -14,7 +14,7 @@ type RemoveOrgDomainCommand struct {
 }
 
 // Events implements Commander.
-func (r *RemoveOrgDomainCommand) Events(ctx context.Context) []eventstore.Command {
+func (r *RemoveOrgDomainCommand) Events(ctx context.Context, opts *CommandOpts) []eventstore.Command {
 	// TODO(IAM-Marco) Finish implementation in https://github.com/zitadel/zitadel/issues/10447
 	oldDomainName := ""
 	isVerified := false

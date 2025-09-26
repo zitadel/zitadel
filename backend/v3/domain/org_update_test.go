@@ -348,7 +348,7 @@ func TestUpdateOrgCommand_Events(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			events := tt.cmd.Events(context.Background())
+			events := tt.cmd.Events(context.Background(), &domain.CommandOpts{})
 			assert.Len(t, events, tt.expectedCount)
 		})
 	}
