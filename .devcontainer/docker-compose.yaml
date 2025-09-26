@@ -2,12 +2,17 @@ services:
 
   devcontainer:
     container_name: zitadel-devcontainer
-    image: mcr.microsoft.com/devcontainers/typescript-node:20-bookworm
+    image: mcr.microsoft.com/devcontainers/typescript-node:22-bookworm
     volumes:
       - ../:/workspaces/zitadel:cached
     command: sleep infinity
     working_dir: /workspaces/zitadel
     environment:
+      SHELL: /bin/bash
+      DEBIAN_FRONTEND: noninteractive
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: 0
       DEVCONTAINER_LISTEN_HOST: 0.0.0.0
       DEVCONTAINER_DB_HOST: db
       DEVCONTAINER_API_HOST: api
