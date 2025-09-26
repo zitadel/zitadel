@@ -96,7 +96,7 @@
                 "generate-stubs",
                 "generate-assets"
             ],
-            "command": "PATH=\"$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" golangci-lint run --timeout 15m --config ./.golangci.yaml --verbose",
+            "command": "PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" golangci-lint run --timeout 15m --config ./.golangci.yaml --verbose",
             "cache": true,
             "inputs": [
                 "sources",
@@ -225,22 +225,22 @@
             "executor": "nx:run-commands",
             "options": {
                 "commands": [
-                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/dmarkham/enumer@v1.5.11",
-                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install go.uber.org/mock/mockgen@v0.4.0",
-                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install golang.org/x/tools/cmd/stringer@v0.36.0",
-                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/rakyll/statik@v0.1.7",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/dmarkham/enumer@v1.5.11",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install go.uber.org/mock/mockgen@v0.4.0",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install golang.org/x/tools/cmd/stringer@v0.36.0",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/rakyll/statik@v0.1.7",
 
-                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/bufbuild/buf/cmd/buf@v1.45.0",
-                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.1",
-                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1",
-                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.22.0",
-                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.22.0",
-                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/envoyproxy/protoc-gen-validate@v1.1.0",
-                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.18.1",
-                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.1",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/bufbuild/buf/cmd/buf@v1.45.0",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.1",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.22.0",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.22.0",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/envoyproxy/protoc-gen-validate@v1.1.0",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.18.1",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.1",
 
-                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install ./internal/protoc/protoc-gen-authoption",
-                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install ./internal/protoc/protoc-gen-zitadel"
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install ./internal/protoc/protoc-gen-authoption",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install ./internal/protoc/protoc-gen-zitadel"
                 ]
             },
             "cache": true,
@@ -277,7 +277,7 @@
             "options": {
                 "parallel": false,
                 "commands": [
-                    "bash -c 'PATH=\"$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" buf generate'",
+                    "bash -c 'PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" buf generate'",
                     "mkdir -p pkg/grpc openapi/v2/zitadel",
                     "cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/** pkg/grpc/",
                     "cp -r .artifacts/grpc/zitadel/ openapi/v2/zitadel"
@@ -302,10 +302,10 @@
             "executor": "nx:run-commands",
             "options": {
                 "commands": [
-                    "PATH=\"$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/api/ui/login/static/resources/generate.go",
-                    "PATH=\"$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/api/ui/login/statik/generate.go",
-                    "PATH=\"$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/notification/statik/generate.go",
-                    "PATH=\"$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/statik/generate.go"
+                    "PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/api/ui/login/static/resources/generate.go",
+                    "PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/api/ui/login/statik/generate.go",
+                    "PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/notification/statik/generate.go",
+                    "PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/statik/generate.go"
                 ]
             },
             "cache": true,
@@ -342,7 +342,7 @@
         },
         "generate-go": {
             "description": "Generates Go using Go native generation tools. This only needs to be run if sources for //go:generate  files change, like for Stringer, Enumer, Mockgen etc.",
-            "command": "PATH=\"$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate ./..."
+            "command": "PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate ./..."
         },
         "pack-platform": {
             "description": "Cross-compiles the binary and packages it for the platform defined by GOOS and GOARCH environment variables. The version is taken from the ZITADEL_VERSION environment variable.",
