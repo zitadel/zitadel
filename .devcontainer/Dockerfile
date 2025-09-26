@@ -7,19 +7,16 @@ ENV SHELL=/bin/bash \
     PNPM_HOME=/home/node/.local/share/pnpm \
     PATH=/home/node/.local/share/pnpm:$PATH
 
+WORKDIR /tmp
+COPY package.json /tmp/package.json
+
 RUN apt-get update && \
     apt-get --no-install-recommends install -y \
     # Cypress dependencies
-    libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3 libxss1 libasound2 libxtst6 xauth xvfb
-
-COPY package.json /tmp/package.json
-WORKDIR /tmp
-
-RUN corepack enable
-
-RUN pnpm --version
-
-RUN chown -R node:node ${PNPM_HOME}
+    libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3 libxss1 libasound2 libxtst6 xauth xvfb && \
+    # Install pnpm
+    corepack enable && \
+    chown -R node:node ${PNPM_HOME}
 
 WORKDIR /workspaces/zitadel
 
