@@ -125,6 +125,11 @@ module.exports = {
           label: "Pylon",
           href: "https://github.com/getcronit/pylon",
         },
+        {
+          type: "link",
+          label: "Vanilla-JS",
+          href: "https://github.com/zitadel/zitadel-vanilla-js",
+        },
       ],
     },
     {
