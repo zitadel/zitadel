@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"context"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -35,7 +34,7 @@ type userColumns interface {
 	OrgIDColumn() database.Column
 	IDColumn() database.Column
 	UsernameColumn() database.Column
-	UsernameOrgUnique() database.Column
+	UsernameOrgUniqueColumn() database.Column
 	StateColumn() database.Column
 	CreatedAtColumn() database.Column
 	UpdatedAtColumn() database.Column
@@ -46,21 +45,21 @@ type userConditions interface {
 	OrgIDCondition(orgID string) database.Condition
 	IDCondition(userID string) database.Condition
 	UsernameCondition(op database.TextOperation, username string) database.Condition
-	UsernameOrgUniqueCondition(op database.TextOperation, username string) database.Condition
+	UsernameOrgUniqueCondition(condition bool) database.Condition
 	StateCondition(state UserState) database.Condition
 	CreatedAtCondition(op database.NumberOperation, createdAt time.Time) database.Condition
 	UpdatedAtCondition(op database.NumberOperation, updatedAt time.Time) database.Condition
 }
 
 type userChanges interface {
-	SetInstanceID(instanceID string) database.Condition
-	SetOrgID(orgID string) database.Condition
-	SetID(userID string) database.Condition
-	SetUsername(op database.TextOperation, username string) database.Condition
-	SetUsernameOrgUnique(op database.TextOperation, username string) database.Condition
-	SetState(state UserState) database.Condition
-	SetCreatedAt(op database.NumberOperation, createdAt time.Time) database.Condition
-	SetUpdatedAt(op database.NumberOperation, updatedAt time.Time) database.Condition
+	// SetInstanceID(instanceID string) database.Condition
+	// SetOrgID(orgID string) database.Condition
+	// SetID(userID string) database.Condition
+	SetUsername(username string) database.Change
+	SetUsernameOrgUnique(op bool) database.Change
+	SetState(state UserState) database.Change
+	// SetCreatedAt(op database.NumberOperation, createdAt time.Time) database.Condition
+	// SetUpdatedAt(op database.NumberOperation, updatedAt time.Time) database.Condition
 }
 
 // machine user
@@ -78,14 +77,14 @@ type machineColumns interface {
 
 type machineConditions interface {
 	userConditions
-	NameCondition(name string) database.Condition
-	DescriptionCondition(description string) database.Condition
+	NameCondition(op database.TextOperation, name string) database.Condition
+	DescriptionCondition(op database.TextOperation, description string) database.Condition
 }
 
 type machineChanges interface {
 	userChanges
-	SetInstanceID(instanceID string) database.Condition
-	SetOrgID(orgID string) database.Condition
+	SetName(name string) database.Change
+	SetDescription(description string) database.Change
 }
 
 // human user
@@ -105,18 +104,18 @@ type humanColumns interface {
 	FirstNameColumn() database.Column
 	LastNameColumn() database.Column
 	DisplayNameColumn() database.Column
-	OerferredLanguageColumn() database.Column
+	PreferredLanguageColumn() database.Column
 	GenderColumn() database.Column
 	AvatarKeyColumn() database.Column
 }
 
 type humanConditions interface {
 	userConditions
-	FirstNameCondition(name string) database.Condition
-	LastNameCondition(name string) database.Condition
-	NickNameCondition(name string) database.Condition
-	DisplayNameCondition(name string) database.Condition
-	OerferredLanguageCondition(language string) database.Condition
+	FirstNameCondition(op database.TextOperation, name string) database.Condition
+	LastNameCondition(op database.TextOperation, name string) database.Condition
+	NickNameCondition(op database.TextOperation, name string) database.Condition
+	DisplayNameCondition(op database.TextOperation, name string) database.Condition
+	PreferredLanguageCondition(language string) database.Condition
 	GenderCondition(gender uint8) database.Condition
 	AvatarKeyCondition(key string) database.Condition
 }
@@ -127,7 +126,7 @@ type humanChanges interface {
 	SetLastName(name string) database.Change
 	SetNickName(name string) database.Change
 	SetDisplayName(name string) database.Change
-	SetOerferredLanguage(language string) database.Change
+	SetPreferredLanguage(language string) database.Change
 	SetGender(gender uint8) database.Change
 	SetAvatarKey(key string) database.Change
 }
@@ -136,7 +135,7 @@ type humanChanges interface {
 type ContactType uint8
 
 const (
-	ContactTypeUnspecified UserState = iota
+	ContactTypeUnspecified ContactType = iota
 	ContactTypeEmail
 	ContactTypePhone
 )
@@ -182,22 +181,24 @@ type humanContactChanges interface {
 	SetUnverifiedValue(value string) database.Change
 }
 
-type Repository interface {
-	organizationColumns
-	organizationConditions
-	organizationChanges
+type UserRepository interface {
+	userColumns
+	userConditions
+	userChanges
 
-	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Organization, error)
-	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Organization, error)
+	machineColumns
+	machineConditions
+	machineChanges
 
-	Create(ctx context.Context, client database.QueryExecutor, org *Organization) error
-	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
-	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+	humanColumns
+	humanConditions
+	humanChanges
 
-	// LoadDomains loads the domains of the given organizations.
-	// If it is called the [Organization].Domains field will be set on future calls to Get or List.
-	LoadDomains() OrganizationRepository
-	// LoadMetadata loads the metadata of the given organizations.
-	// If it is called the [Organization].Metadata field will be set on future calls to Get or List.
-	LoadMetadata() OrganizationRepository
+	// GetMachine(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Machine, error)
+	// ListMachine(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Machine, error)
+
+	// GetHuman(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Human, error)
+	// ListHuman(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Human, error)
+
+	// Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }
