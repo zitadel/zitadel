@@ -39,6 +39,7 @@ type OIDCApplicationWriteModel struct {
 	BackChannelLogoutURI     string
 	LoginVersion             domain.LoginVersion
 	LoginBaseURI             string
+	AllowedScopePrefixes     []string
 	oidc                     bool
 }
 
@@ -171,6 +172,7 @@ func (wm *OIDCApplicationWriteModel) appendAddOIDCEvent(e *project.OIDCConfigAdd
 	wm.BackChannelLogoutURI = e.BackChannelLogoutURI
 	wm.LoginVersion = e.LoginVersion
 	wm.LoginBaseURI = e.LoginBaseURI
+	wm.AllowedScopePrefixes = e.AllowedScopePrefixes
 }
 
 func (wm *OIDCApplicationWriteModel) appendChangeOIDCEvent(e *project.OIDCConfigChangedEvent) {
@@ -228,6 +230,9 @@ func (wm *OIDCApplicationWriteModel) appendChangeOIDCEvent(e *project.OIDCConfig
 	if e.LoginBaseURI != nil {
 		wm.LoginBaseURI = *e.LoginBaseURI
 	}
+	if e.AllowedScopePrefixes != nil {
+		wm.AllowedScopePrefixes = *e.AllowedScopePrefixes
+	}
 }
 
 func (wm *OIDCApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
@@ -272,6 +277,7 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	backChannelLogoutURI *string,
 	loginVersion *domain.LoginVersion,
 	loginBaseURI *string,
+	allowedScopePrefixes []string,
 ) (*project.OIDCConfigChangedEvent, bool, error) {
 	changes := make([]project.OIDCConfigChanges, 0)
 	var err error
@@ -329,6 +335,9 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	}
 	if loginBaseURI != nil && wm.LoginBaseURI != *loginBaseURI {
 		changes = append(changes, project.ChangeOIDCLoginBaseURI(*loginBaseURI))
+	}
+	if allowedScopePrefixes != nil && !slices.Equal(wm.AllowedScopePrefixes, allowedScopePrefixes) {
+		changes = append(changes, project.ChangeAllowedScopePrefixes(allowedScopePrefixes))
 	}
 
 	if len(changes) == 0 {

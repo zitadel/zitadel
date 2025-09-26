@@ -163,6 +163,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public redirectUrisList: string[] = [];
   public postLogoutRedirectUrisList: string[] = [];
   public additionalOriginsList: string[] = [];
+  public allowedScopePrefixesList: string[] = [];
 
   public isZitadel: boolean = false;
   public docs!: GetOIDCInformationResponse.AsObject;
@@ -274,6 +275,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     this.additionalOriginsList = origins;
   }
 
+  public allowedScopePrefixesListChanged(prefixes: string[]): void {
+    this.allowedScopePrefixesList = prefixes;
+  }
+
   public openNameDialog(): void {
     const dialogRef = this.dialog.open(NameDialogComponent, {
       data: {
@@ -373,6 +378,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                     { id: 'token', i18nKey: 'APP.TOKEN' },
                     { id: 'redirect-uris', i18nKey: 'APP.OIDC.REDIRECTSECTIONTITLE' },
                     { id: 'additional-origins', i18nKey: 'APP.ADDITIONALORIGINS' },
+                    { id: 'allowed-scope-prefixes', i18nKey: 'APP.ALLOWEDSCOPEPREFIXES' },
                     { id: 'urls', i18nKey: 'APP.URLS' },
                   ];
                 }
@@ -437,6 +443,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               }
               if (this.app.oidcConfig?.additionalOriginsList) {
                 this.additionalOriginsList = this.app.oidcConfig.additionalOriginsList;
+              }
+              if (this.app.oidcConfig?.allowedScopePrefixesList) {
+                this.allowedScopePrefixesList = this.app.oidcConfig.allowedScopePrefixesList;
               }
 
               if (this.app.oidcConfig?.clockSkew) {
@@ -662,6 +671,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.app.oidcConfig.redirectUrisList = this.redirectUrisList;
         this.app.oidcConfig.postLogoutRedirectUrisList = this.postLogoutRedirectUrisList;
         this.app.oidcConfig.additionalOriginsList = this.additionalOriginsList;
+        this.app.oidcConfig.allowedScopePrefixesList = this.allowedScopePrefixesList;
         this.app.oidcConfig.devMode = !!this.devMode?.value;
         this.app.oidcConfig.skipNativeAppSuccessPage = !!this.skipNativeAppSuccessPage?.value;
 
@@ -693,6 +703,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         // redirects
         req.setRedirectUrisList(this.app.oidcConfig.redirectUrisList);
         req.setAdditionalOriginsList(this.app.oidcConfig.additionalOriginsList);
+        req.setAllowedScopePrefixesList(this.app.oidcConfig.allowedScopePrefixesList);
         req.setPostLogoutRedirectUrisList(this.app.oidcConfig.postLogoutRedirectUrisList);
         req.setDevMode(this.app.oidcConfig.devMode);
         req.setSkipNativeAppSuccessPage(this.app.oidcConfig.skipNativeAppSuccessPage);

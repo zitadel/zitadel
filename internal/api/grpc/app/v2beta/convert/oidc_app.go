@@ -38,6 +38,7 @@ func CreateOIDCAppRequestToDomain(name, projectID string, req *app.CreateOIDCApp
 		BackChannelLogoutURI:     gu.Ptr(req.GetBackChannelLogoutUri()),
 		LoginVersion:             loginVersion,
 		LoginBaseURI:             loginBaseURI,
+		AllowedScopePrefixes:     req.GetAllowedScopePrefixes(),
 	}, nil
 }
 
@@ -68,6 +69,7 @@ func UpdateOIDCAppConfigRequestToDomain(appID, projectID string, app *app.Update
 		BackChannelLogoutURI:     app.BackChannelLogoutUri,
 		LoginVersion:             loginVersion,
 		LoginBaseURI:             loginBaseURI,
+		AllowedScopePrefixes:     app.AllowedScopePrefixes,
 	}, nil
 }
 
@@ -211,6 +213,7 @@ func appOIDCConfigToPb(oidcApp *query.OIDCApp) *app.Application_OidcConfig {
 			SkipNativeAppSuccessPage: oidcApp.SkipNativeAppSuccessPage,
 			BackChannelLogoutUri:     oidcApp.BackChannelLogoutURI,
 			LoginVersion:             loginVersionToPb(oidcApp.LoginVersion, oidcApp.LoginBaseURI),
+			AllowedScopePrefixes:     oidcApp.AllowedScopePrefixes,
 		},
 	}
 }

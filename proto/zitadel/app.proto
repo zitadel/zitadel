@@ -179,6 +179,12 @@ message OIDCConfig {
             description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
         }
     ];
+    repeated string allowed_scope_prefixes = 23 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"urn:thirdparty:\"]";
+            description: "Prefixes of scopes that are automatically allowed for this application and handled through the OIDC flow.";
+        }
+    ];
 }
 
 enum OIDCResponseType {

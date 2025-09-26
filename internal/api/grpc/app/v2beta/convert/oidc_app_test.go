@@ -63,6 +63,7 @@ func TestCreateOIDCAppRequestToDomain(t *testing.T) {
 				LoginVersion: &app.LoginVersion{Version: &app.LoginVersion_LoginV2{LoginV2: &app.LoginV2{
 					BaseUri: gu.Ptr("https://login"),
 				}}},
+				AllowedScopePrefixes: []string{"urn:foo:", "urn:bar:"},
 			},
 			expectedModel: &domain.OIDCApp{
 				ObjectRoot:               models.ObjectRoot{AggregateID: "project1"},
@@ -85,6 +86,7 @@ func TestCreateOIDCAppRequestToDomain(t *testing.T) {
 				BackChannelLogoutURI:     gu.Ptr("https://backchannel"),
 				LoginVersion:             gu.Ptr(domain.LoginVersion2),
 				LoginBaseURI:             gu.Ptr("https://login"),
+				AllowedScopePrefixes:     []string{"urn:foo:", "urn:bar:"},
 			},
 		},
 	}
@@ -469,6 +471,7 @@ func TestAppOIDCConfigToPb(t *testing.T) {
 				BackChannelLogoutURI:     "https://example.com/backchannel",
 				LoginVersion:             domain.LoginVersion2,
 				LoginBaseURI:             gu.Ptr("https://login.example.com"),
+				AllowedScopePrefixes:     []string{"urn:example:"},
 			},
 			expected: &app.Application_OidcConfig{
 				OidcConfig: &app.OIDCConfig{
@@ -502,6 +505,7 @@ func TestAppOIDCConfigToPb(t *testing.T) {
 							},
 						},
 					},
+					AllowedScopePrefixes: []string{"urn:example:"},
 				},
 			},
 		},

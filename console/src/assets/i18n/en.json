@@ -2572,6 +2572,8 @@
     "GRANT": "Grant Types",
     "ADDITIONALORIGINS": "Additional Origins",
     "ADDITIONALORIGINSDESC": "If you want to add additional Origins to your app which is not used as a redirect you can do that here.",
+    "ALLOWEDSCOPEPREFIXES": "Allowed Scope Prefixes",
+    "ALLOWEDSCOPEPREFIXESDESC": "Client-supplied scopes starting with one of the configured values will be included in the authorization.",
     "ORIGINS": "Origins",
     "NOTANORIGIN": "The entered value is not an origin",
     "PROSWITCH": "I'm a pro. Skip this wizard.",

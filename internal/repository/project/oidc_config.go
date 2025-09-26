@@ -46,6 +46,7 @@ type OIDCConfigAddedEvent struct {
 	BackChannelLogoutURI     string                     `json:"backChannelLogoutURI,omitempty"`
 	LoginVersion             domain.LoginVersion        `json:"loginVersion,omitempty"`
 	LoginBaseURI             string                     `json:"loginBaseURI,omitempty"`
+	AllowedScopePrefixes     []string                   `json:"allowedScopePrefixes,omitempty"`
 }
 
 func (e *OIDCConfigAddedEvent) Payload() interface{} {
@@ -80,6 +81,7 @@ func NewOIDCConfigAddedEvent(
 	backChannelLogoutURI string,
 	loginVersion domain.LoginVersion,
 	loginBaseURI string,
+	allowedScopePrefixes []string,
 ) *OIDCConfigAddedEvent {
 	return &OIDCConfigAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -108,6 +110,7 @@ func NewOIDCConfigAddedEvent(
 		BackChannelLogoutURI:     backChannelLogoutURI,
 		LoginVersion:             loginVersion,
 		LoginBaseURI:             loginBaseURI,
+		AllowedScopePrefixes:     allowedScopePrefixes,
 	}
 }
 
@@ -193,6 +196,14 @@ func (e *OIDCConfigAddedEvent) Validate(cmd eventstore.Command) bool {
 			return false
 		}
 	}
+	if len(e.AllowedScopePrefixes) != len(c.AllowedScopePrefixes) {
+		return false
+	}
+	for i, prefix := range e.AllowedScopePrefixes {
+		if prefix != c.AllowedScopePrefixes[i] {
+			return false
+		}
+	}
 	if e.SkipNativeAppSuccessPage != c.SkipNativeAppSuccessPage {
 		return false
 	}
@@ -240,6 +251,7 @@ type OIDCConfigChangedEvent struct {
 	BackChannelLogoutURI     *string                     `json:"backChannelLogoutURI,omitempty"`
 	LoginVersion             *domain.LoginVersion        `json:"loginVersion,omitempty"`
 	LoginBaseURI             *string                     `json:"loginBaseURI,omitempty"`
+	AllowedScopePrefixes     *[]string                   `json:"allowedScopePrefixes,omitempty"`
 }
 
 func (e *OIDCConfigChangedEvent) Payload() interface{} {
@@ -369,6 +381,16 @@ func ChangeAdditionalOrigins(additionalOrigins []string) func(event *OIDCConfigC
 			additionalOrigins = make([]string, 0)
 		}
 		e.AdditionalOrigins = &additionalOrigins
+	}
+}
+
+func ChangeAllowedScopePrefixes(allowedScopePrefixes []string) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		if allowedScopePrefixes == nil {
+			// explicitly set them to empty so we can differentiate "not set" in the event in case of no changes
+			allowedScopePrefixes = make([]string, 0)
+		}
+		e.AllowedScopePrefixes = &allowedScopePrefixes
 	}
 }
 

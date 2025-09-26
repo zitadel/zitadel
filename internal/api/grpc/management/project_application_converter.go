@@ -66,6 +66,7 @@ func AddOIDCAppRequestToDomain(req *mgmt_pb.AddOIDCAppRequest) (*domain.OIDCApp,
 		BackChannelLogoutURI:     gu.Ptr(req.GetBackChannelLogoutUri()),
 		LoginVersion:             gu.Ptr(loginVersion),
 		LoginBaseURI:             gu.Ptr(loginBaseURI),
+		AllowedScopePrefixes:     req.AllowedScopePrefixes,
 	}, nil
 }
 
@@ -130,6 +131,7 @@ func UpdateOIDCAppConfigRequestToDomain(app *mgmt_pb.UpdateOIDCAppConfigRequest)
 		BackChannelLogoutURI:     gu.Ptr(app.GetBackChannelLogoutUri()),
 		LoginVersion:             gu.Ptr(loginVersion),
 		LoginBaseURI:             gu.Ptr(loginBaseURI),
+		AllowedScopePrefixes:     app.AllowedScopePrefixes,
 	}, nil
 }
 

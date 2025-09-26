@@ -43,6 +43,7 @@ type OIDCClient struct {
 	ProjectRoleAssertion     bool                       `json:"project_role_assertion,omitempty"`
 	LoginVersion             domain.LoginVersion        `json:"login_version,omitempty"`
 	LoginBaseURI             *URL                       `json:"login_base_uri,omitempty"`
+	AllowedScopePrefixes     []string                   `json:"allowed_scope_prefixes,omitempty"`
 	ProjectRoleKeys          []string                   `json:"project_role_keys,omitempty"`
 	Settings                 *OIDCSettings              `json:"settings,omitempty"`
 }

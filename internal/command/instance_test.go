@@ -125,6 +125,7 @@ func oidcAppEvents(ctx context.Context, orgID, projectID, id, name, clientID str
 			"",
 			domain.LoginVersionUnspecified,
 			"",
+			[]string{},
 		),
 	}
 }
@@ -450,6 +451,7 @@ func generatedDomainFilters(instanceID, orgID, projectID, appID, generatedDomain
 				"",
 				domain.LoginVersionUnspecified,
 				"",
+				[]string{},
 			),
 		),
 		expectFilter(

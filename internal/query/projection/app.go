@@ -61,6 +61,7 @@ const (
 	AppOIDCConfigColumnBackChannelLogoutURI     = "back_channel_logout_uri"
 	AppOIDCConfigColumnLoginVersion             = "login_version"
 	AppOIDCConfigColumnLoginBaseURI             = "login_base_uri"
+	AppOIDCConfigColumnAllowedScopePrefixes     = "allowed_scope_prefixes"
 
 	appSAMLTableSuffix              = "saml_configs"
 	AppSAMLConfigColumnAppID        = "app_id"
@@ -133,6 +134,7 @@ func (*appProjection) Init() *old_handler.Check {
 			handler.NewColumn(AppOIDCConfigColumnBackChannelLogoutURI, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(AppOIDCConfigColumnLoginVersion, handler.ColumnTypeEnum, handler.Nullable()),
 			handler.NewColumn(AppOIDCConfigColumnLoginBaseURI, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(AppOIDCConfigColumnAllowedScopePrefixes, handler.ColumnTypeTextArray),
 		},
 			handler.NewPrimaryKey(AppOIDCConfigColumnInstanceID, AppOIDCConfigColumnAppID),
 			appOIDCTableSuffix,
@@ -513,6 +515,7 @@ func (p *appProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 				handler.NewCol(AppOIDCConfigColumnBackChannelLogoutURI, e.BackChannelLogoutURI),
 				handler.NewCol(AppOIDCConfigColumnLoginVersion, e.LoginVersion),
 				handler.NewCol(AppOIDCConfigColumnLoginBaseURI, e.LoginBaseURI),
+				handler.NewCol(AppOIDCConfigColumnAllowedScopePrefixes, database.TextArray[string](e.AllowedScopePrefixes)),
 			},
 			handler.WithTableSuffix(appOIDCTableSuffix),
 		),
@@ -589,6 +592,9 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 	}
 	if e.LoginBaseURI != nil {
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnLoginBaseURI, *e.LoginBaseURI))
+	}
+	if e.AllowedScopePrefixes != nil {
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnAllowedScopePrefixes, database.TextArray[string](*e.AllowedScopePrefixes)))
 	}
 
 	if len(cols) == 0 {

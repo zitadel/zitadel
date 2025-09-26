@@ -451,6 +451,28 @@
             </div>
           </cnsl-card>
         </ng-container>
+        <ng-container *ngIf="currentSetting.id === 'allowed-scope-prefixes'">
+          <cnsl-card title=" {{ 'APP.ALLOWEDSCOPEPREFIXES' | translate }}">
+            <p class="app-desc cnsl-secondary-text">{{ 'APP.ALLOWEDSCOPEPREFIXESDESC' | translate }}</p>
+            <cnsl-additional-origins
+              *ngIf="allowedScopePrefixesList && appType && appType?.value !== undefined"
+              class="app-input"
+              [canWrite]="canWrite"
+              [getValues]="requestRedirectValuesSubject$"
+              (changedUris)="allowedScopePrefixesListChanged($event)"
+              [urisList]="allowedScopePrefixesList"
+              title="{{ 'APP.ALLOWEDSCOPEPREFIXES' | translate }}"
+              placeholder='.* ":" .*'
+            >
+            </cnsl-additional-origins>
+
+            <div class="btn-container">
+              <button class="submit-button" (click)="saveOIDCApp()" color="primary" [disabled]="!canWrite" mat-raised-button>
+                {{ 'ACTIONS.SAVE' | translate }}
+              </button>
+            </div>
+          </cnsl-card>
+        </ng-container>
         <ng-container *ngIf="currentSetting.id === 'urls'">
           <cnsl-card title=" {{ 'APP.URLS' | translate }}">
             <cnsl-info-section *ngIf="issuer$ | async as issuer">
