@@ -10,7 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
-//go:generate go tool enumer -type IDPType -transform lower -trimprefix IDPType
+//go:generate  enumer -type IDPType -transform lower -trimprefix IDPType
 type IDPType uint8
 
 const (
@@ -28,7 +28,7 @@ const (
 	IDPTypeApple
 )
 
-//go:generate go tool enumer -type IDPState -transform lower -trimprefix IDPState -sql
+//go:generate  enumer -type IDPState -transform lower -trimprefix IDPState -sql
 type IDPState uint8
 
 const (
@@ -36,7 +36,7 @@ const (
 	IDPStateInactive
 )
 
-//go:generate go tool enumer -type IDPAutoLinkingField -transform lower -trimprefix IDPAutoLinkingField
+//go:generate  enumer -type IDPAutoLinkingField -transform lower -trimprefix IDPAutoLinkingField
 type IDPAutoLinkingField uint8
 
 const (
@@ -122,7 +122,7 @@ type IDPOAuth struct {
 	OAuth
 }
 
-//go:generate go tool enumer -type AzureTenantType -transform lower -trimprefix AzureTenantType
+//go:generate  enumer -type AzureTenantType -transform lower -trimprefix AzureTenantType
 type AzureTenantType uint8
 
 const (

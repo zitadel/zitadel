@@ -11,7 +11,7 @@ import (
 // Purpose describes which object types are stored by a cache.
 type Purpose int
 
-//go:generate go tool enumer -type Purpose -transform snake -trimprefix Purpose
+//go:generate  enumer -type Purpose -transform snake -trimprefix Purpose
 const (
 	PurposeUnspecified Purpose = iota
 	PurposeAuthzInstance
@@ -84,7 +84,7 @@ type Entry[I, K comparable] interface {
 
 type Connector int
 
-//go:generate go tool enumer -type Connector -transform snake -trimprefix Connector -linecomment -text
+//go:generate  enumer -type Connector -transform snake -trimprefix Connector -linecomment -text
 const (
 	// Empty line comment ensures empty string for unspecified value
 	ConnectorUnspecified Connector = iota //

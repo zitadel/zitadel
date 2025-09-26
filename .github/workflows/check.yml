@@ -48,9 +48,7 @@ jobs:
         with:
           version: v2.38.2
       - name: Install dependencies
-        run: |
-          pnpm install --frozen-lockfile
-          go install tool
+        run: pnpm install --frozen-lockfile
       - name: Install Cypress binary
         run: pnpm cypress install
         working-directory: apps/login

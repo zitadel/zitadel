@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-//go:generate go tool enumer -type OrgState -transform lower -trimprefix OrgState -sql
+//go:generate  enumer -type OrgState -transform lower -trimprefix OrgState -sql
 type OrgState uint8
 
 const (

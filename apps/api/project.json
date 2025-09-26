@@ -193,7 +193,7 @@
                 },
                 "commands": [
                     "bash -c 'go test -race -count 1 -tags integration -timeout 60m -parallel 1 $(go list -tags integration ./... | grep -e \"integration_test\" -e \"events_testing\")'",
-                    "go tool covdata textfmt -i=$GOCOVERDIR -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/...,github.com/zitadel/zitadel/backend/... -o profile.api.test-integration.cov",
+                    " covdata textfmt -i=$GOCOVERDIR -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/...,github.com/zitadel/zitadel/backend/... -o profile.api.test-integration.cov",
                     "nx run @zitadel/devcontainer:compose down db-api-integration cache-api-integration"
                 ]
             },
@@ -221,15 +221,24 @@
             ]
         },
         "generate-install": {
-            "description": "Installs local protoc generators needed for compiling custom proto options.",
+            "description": "Installs the binaries needed for generating code.",
             "cache": true,
             "executor": "nx:run-commands",
             "options": {
-                "parallel": false,
                 "commands": [
-                    "mkdir -p .artifacts/bin",
-                    "go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/protoc-gen-authoption internal/protoc/protoc-gen-authoption/main.go",
-                    "go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/protoc-gen-zitadel internal/protoc/protoc-gen-zitadel/main.go"
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/dmarkham/enumer@v1.5.11",
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install go.uber.org/mock/mockgen@v0.4.0",
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install golang.org/x/tools/cmd/stringer@v0.36.0",
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.1",
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1",
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.22.0",
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.22.0",
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/envoyproxy/protoc-gen-validate@v1.1.0",
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/bufbuild/buf/cmd/buf@v1.45.0",
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.18.1",
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.1",
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install ./internal/protoc/protoc-gen-authoption",
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install ./internal/protoc/protoc-gen-zitadel"
                 ]
             },
             "inputs": [
@@ -239,6 +248,16 @@
                 "{workspaceRoot}/internal/protoc/protoc-gen-zitadel/**/*"
             ],
             "outputs": [
+                "{workspaceRoot}/.artifacts/bin/*/*/enumer",
+                "{workspaceRoot}/.artifacts/bin/*/*/mockgen",
+                "{workspaceRoot}/.artifacts/bin/*/*/stringer",
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-go",
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-go-grpc",
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-grpc-gateway",
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-openapiv2",
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-validate",
+                "{workspaceRoot}/.artifacts/bin/*/*/buf",
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-connect-go",
                 "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-authoption",
                 "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-zitadel"
             ]
@@ -253,7 +272,7 @@
             "options": {
                 "parallel": false,
                 "commands": [
-                    "bash -c 'PATH=\"$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go tool buf generate'",
+                    "bash -c 'PATH=\"$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" buf generate'",
                     "mkdir -p pkg/grpc openapi/v2/zitadel",
                     "cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/** pkg/grpc/",
                     "cp -r .artifacts/grpc/zitadel/ openapi/v2/zitadel"
@@ -310,7 +329,7 @@
             ]
         },
         "generate-go": {
-            "description": "Generates Go using Go native generation tools. This only needs to be run if sources for //go:generate go tool files change, like for Stringer, Enumer, Mockgen etc.",
+            "description": "Generates Go using Go native generation tools. This only needs to be run if sources for //go:generate  files change, like for Stringer, Enumer, Mockgen etc.",
             "command": "go generate ./..."
         },
         "pack-platform": {

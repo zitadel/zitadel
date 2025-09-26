@@ -69,9 +69,7 @@ jobs:
         with:
           version: v0.28.0
       - name: Install dependencies
-        run: |
-          pnpm install --frozen-lockfile
-          go install tool
+        run: pnpm install --frozen-lockfile
       - name: Pack API and Login
         env:
           ZITADEL_VERSION: ${{ needs.version.outputs.version }}
