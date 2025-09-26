@@ -56,7 +56,8 @@
         "build": {
             "description": "Compiles the Go-based API backend into an executable binary.",
             "dependsOn": [
-                "generate"
+                "generate",
+                "build-console"
             ],
             "command": "bash -c 'CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.local -v -ldflags=\"-s -w\"'",
             "inputs": [
@@ -69,12 +70,11 @@
             ]
         },
         "generate": {
-            "description": "Generates the code needed to start a full-featured API: gRPC and OpenAPI stubs, static files for the login and console, asset routes, documentation and the Console.",
+            "description": "Generates the code needed to start a full-featured API: gRPC and OpenAPI stubs, static files for the embedded login v1, asset routes and documentation.",
             "dependsOn": [
                 "generate-stubs",
                 "generate-assets",
-                "generate-statik",
-                "generate-console"
+                "generate-statik"
             ]
         },
         "lint-install":{
@@ -90,7 +90,7 @@
             ]
         },
         "lint": {
-            "description": "Lints the Go code using a Docker container with golangci-lint",
+            "description": "Lints the Go code with golangci-lint using the configuration in .golangci.yaml",
             "dependsOn": [
                 "lint-install",
                 "generate-stubs",
@@ -104,18 +104,16 @@
             ]
         },
         "test": {
-            "description": "Run all tests (unit and integration)",
+            "description": "Runs all tests (unit and integration)",
             "dependsOn": [
                 "test-unit",
                 "test-integration"
             ]
         },
         "test-unit": {
-            "description": "Run the unit tests with coverage",
+            "description": "Runs the unit tests with coverage",
             "dependsOn": [
-                "generate-stubs",
-                "generate-assets",
-                "generate-statik"
+                "generate"
             ],
             "command": "go test -race -coverprofile=profile.api.test-unit.cov -coverpkg=./internal/...  ./...",
             "cache": true,
@@ -131,8 +129,7 @@
             "description": "Builds the test binary for integration tests.",
             "cache": true,
             "dependsOn": [
-                "generate-stubs",
-                "generate-assets"
+                "generate"
             ],
             "command": "go build -cover -race -tags integration -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.test main.go",
             "inputs": [
@@ -212,8 +209,8 @@
                 "{workspaceRoot}/profile.api.test-integration.cov"
             ]
         },
-        "generate-console": {
-            "description": "Embeds the consoles static files into the API. Requires a build of the console.",
+        "build-console": {
+            "description": "Builds the Console and copies its static files to the API.",
             "cache": true,
             "dependsOn": [
                 "@zitadel/console:build"
@@ -223,34 +220,8 @@
                 "{workspaceRoot}/internal/api/ui/console/static"
             ]
         },
-        "generate-stubs": {
-            "description": "Generates the gRPC and OpenAPI stubs from the proto files. This is the minimal requirement for compiling and running the API.",
-            "cache": true,
-            "dependsOn": [
-                "generate-stubs-custom-protoc"
-            ],
-            "executor": "nx:run-commands",
-            "options": {
-                "parallel": false,
-                "commands": [
-                    "PATH=\"$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" buf generate",
-                    "mkdir -p pkg/grpc openapi/v2/zitadel",
-                    "cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/** pkg/grpc/",
-                    "cp -r .artifacts/grpc/zitadel/ openapi/v2/zitadel"
-                ]
-            },
-            "inputs": [
-                "{workspaceRoot}/proto/**/*",
-                "{workspaceRoot}/buf.gen.yaml",
-                "{workspaceRoot}/buf.yaml"
-            ],
-            "outputs": [
-                "{workspaceRoot}/pkg/grpc/**/*",
-                "{workspaceRoot}/openapi/v2/zitadel/**/*"
-            ]
-        },
-        "generate-stubs-custom-protoc": {
-            "description": "Compiles custom protoc generators",
+        "generate-install": {
+            "description": "Installs local protoc generators needed for compiling custom proto options.",
             "cache": true,
             "executor": "nx:run-commands",
             "options": {
@@ -272,16 +243,42 @@
                 "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-zitadel"
             ]
         },
+        "generate-stubs": {
+            "description": "Generates the gRPC and OpenAPI stubs from the proto files.",
+            "cache": true,
+            "dependsOn": [
+                "generate-install"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "parallel": false,
+                "commands": [
+                    "go tool buf generate",
+                    "mkdir -p pkg/grpc openapi/v2/zitadel",
+                    "cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/** pkg/grpc/",
+                    "cp -r .artifacts/grpc/zitadel/ openapi/v2/zitadel"
+                ]
+            },
+            "inputs": [
+                "{workspaceRoot}/proto/**/*",
+                "{workspaceRoot}/buf.gen.yaml",
+                "{workspaceRoot}/buf.yaml"
+            ],
+            "outputs": [
+                "{workspaceRoot}/pkg/grpc/**/*",
+                "{workspaceRoot}/openapi/v2/zitadel/**/*"
+            ]
+        },
         "generate-statik": {
             "description": "Generates statik files for embedding static resources",
             "cache": true,
             "executor": "nx:run-commands",
             "options": {
                 "commands": [
-                    "PATH=\"$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/api/ui/login/static/resources/generate.go",
-                    "PATH=\"$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/api/ui/login/statik/generate.go",
-                    "PATH=\"$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/notification/statik/generate.go",
-                    "PATH=\"$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/statik/generate.go"
+                    "go generate internal/api/ui/login/static/resources/generate.go",
+                    "go generate internal/api/ui/login/statik/generate.go",
+                    "go generate internal/notification/statik/generate.go",
+                    "go generate internal/statik/generate.go"
                 ]
             },
             "inputs": [

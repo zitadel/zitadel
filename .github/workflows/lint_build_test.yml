@@ -1,4 +1,4 @@
-name: Check
+name: Lint, Build and Test
 
 on: 
   workflow_call: 
@@ -14,8 +14,8 @@ env:
   nx_cache_path: .nx
 
 jobs:
-  check:
-    name: check
+  lint_build_test:
+    name: Lint, Build and Test
     runs-on:
       group: zitadel-public
     steps:
@@ -52,7 +52,8 @@ jobs:
       - name: Install Cypress binary
         run: pnpm cypress install
         working-directory: apps/login
-      - uses: nrwl/nx-set-shas@v4
+      - name: Set SHAs for nx affected commands
+        uses: nrwl/nx-set-shas@v4
       - name: Restore Nx cache
         uses: actions/cache/restore@v4
         # We use a local cache temporarily, until we use remote shared caching.
@@ -68,8 +69,16 @@ jobs:
             nx-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-${{ github.repository_owner }}-
             nx-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-
             nx-${{ github.event.pull_request.base.ref || github.ref_name }}-
-      - name: Run Quality Checks on Affected Projects
-        run: pnpm nx affected --nxBail --targets lint build test --exclude @zitadel/docs,@zitadel/benchmark
+      - name: Lint
+        run: pnpm nx affected --nxBail --targets lint --exclude @zitadel/docs,@zitadel/benchmark
+      - name: Build
+        run: pnpm nx affected --nxBail --targets build --exclude @zitadel/docs,@zitadel/benchmark
+      - name: Test Unit
+        run: pnpm nx affected --nxBail --targets test-unit --exclude @zitadel/docs,@zitadel/benchmark
+      - name: Test Integration Login
+        run: pnpm nx affected --nxBail --targets test-integration-login
+      - name: Test Integration API
+        run: pnpm nx affected --nxBail --targets test-integration-api
       - name: Test Functional UI Firefox
         run: pnpm nx affected --nxBail --targets test-firefox
       - name: Test Functional UI Chrome

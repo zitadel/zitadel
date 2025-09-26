@@ -34,14 +34,14 @@ Alternatively, you can use the infix-notation, like `pnpm nx dev @zitadel/login`
 Prepare the API development with a Console and run a local Login production build.
 
 ```bash
-pnpm nx run @zitadel/api:generate
-pnpm nx run-many -p . @zitadel/login -t db prod
+pnpm nx run-many --projects @zitadel/api --targets generate build-console
+pnpm nx run-many --projects . @zitadel/login --targets db prod
 ```
 
 If you don't need a Login or a Console, you can omit them and use the generated ./admin.pat to call the API.
 
 ```bash
-pnpm nx run-many -p . @zitadel/api -t db generate-stubs
+pnpm nx run-many --projects . @zitadel/api --targets db generate
 ```
 
 Start a debug session in your IDE.
@@ -59,7 +59,7 @@ For more options, go to the [API section](#api)
 Develop the Login and connect a local API with a local DB
 
 ```bash
-pnpm nx run-many -p . @zitadel/api -t db prod
+pnpm nx run-many --projects . @zitadel/api --targets db prod
 ```
 
 In another terminal, start the Login development server
@@ -79,7 +79,7 @@ For more options, go to the [Login section](#login)
 Develop the Console and connect a local API with a local Login and DB:
 
 ```bash
-pnpm nx run-many -p . @zitadel/api @zitadel/login -t db prod
+pnpm nx run-many --projects . @zitadel/api @zitadel/login --targets db prod
 ```
 
 In another terminal, start the console development server
