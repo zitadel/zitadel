@@ -1966,6 +1966,7 @@
       "CREATE_DESC": "Ange ditt projekts namn.",
       "ROLE": "Roll",
       "NOITEMS": "Inga projekt",
+      "USERSELFACCOUNT": "Använd ditt personliga konto som projektägare.",
       "ZITADELPROJECT": "Detta tillhör ZITADEL-projektet. Observera: Om du gör ändringar kan ZITADEL inte fungera som avsett.",
       "TYPE": {
         "OWNED": "Ägda Projekt",

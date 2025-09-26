@@ -1960,6 +1960,7 @@
       "CREATE_DESC": "Add meg a projekted nevét.",
       "ROLE": "Szerepkör",
       "NOITEMS": "Nincsenek projektek",
+      "USERSELFACCOUNT": "Használja személyes fiókját a projekt tulajdonosaként.",
       "ZITADELPROJECT": "Ez a ZITADEL projekthez tartozik. Vigyázz: Ha változtatásokat hajtasz végre, a ZITADEL lehet, hogy nem fog a szándékod szerint működni.",
       "TYPE": {
         "OWNED": "Saját Projektek",
