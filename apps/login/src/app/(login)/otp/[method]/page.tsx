@@ -4,20 +4,17 @@ import { LoginOTP } from "@/components/login-otp";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
+import { getOriginalHost } from "@/lib/server/host";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
-import {
-  getBrandingSettings,
-  getLoginSettings,
-  getSession,
-} from "@/lib/zitadel";
+import { getBrandingSettings, getLoginSettings, getSession } from "@/lib/zitadel";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("otp");
-  return { title: t('verify.title')};
+  return { title: t("verify.title") };
 }
 
 export default async function Page(props: {
@@ -29,11 +26,7 @@ export default async function Page(props: {
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const host = await getOriginalHost();
 
   const {
     loginName, // send from password page
@@ -120,9 +113,7 @@ export default async function Page(props: {
             loginName={loginName ?? session.factors?.user?.loginName}
             sessionId={sessionId}
             requestId={requestId}
-            organization={
-              organization ?? session?.factors?.user?.organizationId
-            }
+            organization={organization ?? session?.factors?.user?.organizationId}
             method={method}
             loginSettings={loginSettings}
             host={host}

@@ -151,7 +151,7 @@ func TestUpdateInstace(t *testing.T) {
 				require.NotNil(t, res)
 				assert.NotEmpty(t, res.GetChangeDate())
 
-				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputContext, 20*time.Second)
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputContext, time.Minute)
 				require.EventuallyWithT(t, func(tt *assert.CollectT) {
 					retrievedInstance, err := inst.Client.InstanceV2Beta.GetInstance(tc.inputContext, &instance.GetInstanceRequest{InstanceId: inst.ID()})
 					require.Nil(tt, err)
