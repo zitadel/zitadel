@@ -6,6 +6,7 @@ import (
 
 func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, AddedType, eventstore.GenericEventMapper[AddedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, TerminatedType, eventstore.GenericEventMapper[TerminatedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, AccessTokenAddedType, eventstore.GenericEventMapper[AccessTokenAddedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, AccessTokenRevokedType, eventstore.GenericEventMapper[AccessTokenRevokedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, RefreshTokenAddedType, eventstore.GenericEventMapper[RefreshTokenAddedEvent])

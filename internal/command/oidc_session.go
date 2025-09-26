@@ -259,6 +259,26 @@ func oidcSessionTokenIDsFromToken(token string) (oidcSessionID, refreshTokenID, 
 	return "", "", "", zerrors.ThrowPreconditionFailed(nil, "OIDCS-S87kl", "Errors.OIDCSession.Token.Invalid")
 }
 
+func (c *Commands) TerminateOIDCSession(ctx context.Context, sessionID string) (*domain.ObjectDetails, error) {
+	writeModel := NewOIDCSessionWriteModel(sessionID, "")
+	err := c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "OIDCS-lI4Uh", "Errors.Internal")
+	}
+	if writeModel.State != domain.OIDCSessionStateActive {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDCS-he4PY", "Errors.OIDCSession.ID.Invalid")
+	}
+	if err := c.checkPermissionDeleteOidcSession(ctx, writeModel); err != nil {
+		return nil, err
+	}
+
+	err = c.pushAppendAndReduce(ctx, writeModel, oidcsession.NewTerminatedEvent(ctx, writeModel.aggregate))
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&writeModel.WriteModel), nil
+}
+
 // RevokeOIDCSessionToken revokes an access_token or refresh_token
 // if the OIDCSession cannot be retrieved by the provided token, is not active or if the token is already revoked,
 // then no error will be returned.

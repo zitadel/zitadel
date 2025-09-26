@@ -156,3 +156,12 @@ func (c *Commands) NewPermissionCheckUserGrantWrite(ctx context.Context) UserGra
 func (c *Commands) NewPermissionCheckUserGrantDelete(ctx context.Context) UserGrantPermissionCheck {
 	return c.newUserGrantPermissionCheck(ctx, domain.PermissionUserGrantDelete)
 }
+
+// checkPermissionDeleteOidcSession will check that the caller is either deleting the own session or
+// is granted the "oidc_session.delete" permission on the resource owner of the authenticated user.
+func (c *Commands) checkPermissionDeleteOidcSession(ctx context.Context, model *OIDCSessionWriteModel) error {
+	if model.UserID != "" && model.UserID == authz.GetCtxData(ctx).UserID {
+		return nil
+	}
+	return c.checkPermission(ctx, domain.PermissionOidcSessionDelete, model.UserResourceOwner, model.UserID)
+}

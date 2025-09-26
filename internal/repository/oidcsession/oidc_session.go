@@ -13,6 +13,7 @@ import (
 const (
 	oidcSessionEventPrefix  = "oidc_session."
 	AddedType               = oidcSessionEventPrefix + "added"
+	TerminatedType          = oidcSessionEventPrefix + "terminated"
 	AccessTokenAddedType    = oidcSessionEventPrefix + "access_token.added"
 	AccessTokenRevokedType  = oidcSessionEventPrefix + "access_token.revoked"
 	RefreshTokenAddedType   = oidcSessionEventPrefix + "refresh_token.added"
@@ -79,6 +80,34 @@ func NewAddedEvent(ctx context.Context,
 		Nonce:             nonce,
 		PreferredLanguage: preferredLanguage,
 		UserAgent:         userAgent,
+	}
+}
+
+type TerminatedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *TerminatedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *TerminatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func (e *TerminatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewTerminatedEvent(ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *TerminatedEvent {
+	return &TerminatedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			TerminatedType,
+		),
 	}
 }
 

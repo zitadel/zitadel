@@ -1360,6 +1360,7 @@ InternalAuthZ:
         - "session.read"
         - "session.write"
         - "session.delete"
+        - "oidc_session.delete"
         - "action.target.read"
         - "action.target.write"
         - "action.target.delete"
@@ -1463,6 +1464,7 @@ InternalAuthZ:
         - "project.grant.member.delete"
         - "session.read"
         - "session.delete"
+        - "oidc_session.delete"
     - Role: "IAM_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -1491,6 +1493,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "session.read"
         - "session.delete"
+        - "oidc_session.delete"
     - Role: "IAM_ADMIN_IMPERSONATOR"
       Permissions:
         - "admin.impersonation"
@@ -1555,6 +1558,7 @@ InternalAuthZ:
         - "project.grant.member.delete"
         - "session.read"
         - "session.delete"
+        - "oidc_session.delete"
     - Role: "IAM_LOGIN_CLIENT"
       Permissions:
         - "iam.read"
@@ -1612,6 +1616,7 @@ InternalAuthZ:
         - "project.role.read"
         - "session.read"
         - "session.delete"
+        - "oidc_session.delete"
     - Role: "ORG_OWNER_VIEWER"
       Permissions:
         - "org.read"
@@ -1920,6 +1925,7 @@ SystemAuthZ:
         - "session.read"
         - "session.write"
         - "session.delete"
+        - "oidc_session.delete"
         - "action.target.read"
         - "action.target.write"
         - "action.target.delete"
@@ -2023,6 +2029,7 @@ SystemAuthZ:
         - "project.grant.member.delete"
         - "session.read"
         - "session.delete"
+        - "oidc_session.delete"
     - Role: "IAM_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -2051,6 +2058,7 @@ SystemAuthZ:
         - "project.grant.member.read"
         - "session.read"
         - "session.delete"
+        - "oidc_session.delete"
     - Role: "IAM_ADMIN_IMPERSONATOR"
       Permissions:
         - "admin.impersonation"
