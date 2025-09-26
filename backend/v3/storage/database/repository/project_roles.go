@@ -18,7 +18,7 @@ func (p projectRoles) Get(ctx context.Context, client database.QueryExecutor, op
 	if err != nil {
 		return nil, err
 	}
-	return p.getOne(ctx, client, builder)
+	return getOne[domain.ProjectRole](ctx, client, builder)
 }
 
 func (p projectRoles) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.ProjectRole, error) {
@@ -26,7 +26,7 @@ func (p projectRoles) List(ctx context.Context, client database.QueryExecutor, o
 	if err != nil {
 		return nil, err
 	}
-	return p.getMany(ctx, client, builder)
+	return getMany[domain.ProjectRole](ctx, client, builder)
 }
 
 const insertProjectRoleStmt = `INSERT INTO zitadel.project_roles(
@@ -191,28 +191,4 @@ func (p projectRoles) checkRestrictingColumns(condition database.Condition) erro
 		p.OrganizationIDColumn(),
 		p.ProjectIDColumn(),
 	)
-}
-
-func (projectRoles) getOne(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.ProjectRole, error) {
-	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
-	if err != nil {
-		return nil, err
-	}
-	var role domain.ProjectRole
-	if err := rows.(database.CollectableRows).CollectExactlyOneRow(&role); err != nil {
-		return nil, err
-	}
-	return &role, nil
-}
-
-func (projectRoles) getMany(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.ProjectRole, error) {
-	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
-	if err != nil {
-		return nil, err
-	}
-	var roles []*domain.ProjectRole
-	if err := rows.(database.CollectableRows).Collect(&roles); err != nil {
-		return nil, err
-	}
-	return roles, nil
 }

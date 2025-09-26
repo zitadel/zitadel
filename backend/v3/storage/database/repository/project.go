@@ -26,7 +26,7 @@ func (p project) Get(ctx context.Context, client database.QueryExecutor, opts ..
 	if err != nil {
 		return nil, err
 	}
-	return p.getOne(ctx, client, builder)
+	return getOne[domain.Project](ctx, client, builder)
 }
 
 func (p project) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Project, error) {
@@ -34,7 +34,7 @@ func (p project) List(ctx context.Context, client database.QueryExecutor, opts .
 	if err != nil {
 		return nil, err
 	}
-	return p.getMany(ctx, client, builder)
+	return getMany[domain.Project](ctx, client, builder)
 }
 
 const insertProjectStmt = `INSERT INTO zitadel.projects(
@@ -233,28 +233,4 @@ func (p project) checkRestrictingColumns(condition database.Condition) error {
 		p.InstanceIDColumn(),
 		p.OrganizationIDColumn(),
 	)
-}
-
-func (project) getOne(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Project, error) {
-	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
-	if err != nil {
-		return nil, err
-	}
-	var project domain.Project
-	if err := rows.(database.CollectableRows).CollectExactlyOneRow(&project); err != nil {
-		return nil, err
-	}
-	return &project, nil
-}
-
-func (project) getMany(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.Project, error) {
-	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
-	if err != nil {
-		return nil, err
-	}
-	var projects []*domain.Project
-	if err := rows.(database.CollectableRows).Collect(&projects); err != nil {
-		return nil, err
-	}
-	return projects, nil
 }
