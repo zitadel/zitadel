@@ -70,15 +70,15 @@ jobs:
             nx-${{ github.event.pull_request.base.ref || github.ref_name }}-${{ github.head_ref || github.ref_name }}-
             nx-${{ github.event.pull_request.base.ref || github.ref_name }}-
       - name: Lint
-        run: pnpm nx affected --nxBail --targets lint --exclude @zitadel/docs,@zitadel/benchmark
+        run: pnpm nx affected --nxBail --targets lint
       - name: Build
         run: pnpm nx affected --nxBail --targets build --exclude @zitadel/docs,@zitadel/benchmark
       - name: Test Unit
-        run: pnpm nx affected --nxBail --targets test-unit --exclude @zitadel/docs,@zitadel/benchmark
+        run: pnpm nx affected --nxBail --targets test-unit
       - name: Test Integration Login
-        run: pnpm nx affected --nxBail --targets test-integration-login
+        run: pnpm nx affected --nxBail --targets test-integration --exclude @zitadel/api
       - name: Test Integration API
-        run: pnpm nx affected --nxBail --targets test-integration-api
+        run: pnpm nx affected --nxBail --targets test-integration --exclude @zitadel/login
       - name: Test Functional UI Firefox
         run: pnpm nx affected --nxBail --targets test-firefox
       - name: Test Functional UI Chrome
