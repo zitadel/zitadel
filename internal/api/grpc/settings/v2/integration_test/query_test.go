@@ -347,9 +347,7 @@ func TestServer_GetActiveIdentityProviders(t *testing.T) {
 				if !assert.NoError(ct, err) {
 					return
 				}
-				for i, result := range tt.want.GetIdentityProviders() {
-					assert.EqualExportedValues(ct, result, got.GetIdentityProviders()[i])
-				}
+				assert.ElementsMatch(ct, tt.want.GetIdentityProviders(), got.GetIdentityProviders())
 				integration.AssertListDetails(ct, tt.want, got)
 			}, retryDuration, tick)
 		})
