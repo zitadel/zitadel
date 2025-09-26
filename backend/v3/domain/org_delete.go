@@ -10,7 +10,12 @@ import (
 )
 
 type DeleteOrgCommand struct {
-	ID string `json:"id"`
+	OrganizationName string
+	ID               string `json:"id"`
+}
+
+func NewDeleteOrgCommand(organizationID string) *DeleteOrgCommand {
+	return &DeleteOrgCommand{ID: organizationID}
 }
 
 // Events implements Commander.
@@ -20,7 +25,35 @@ func (d *DeleteOrgCommand) Events(ctx context.Context) []eventstore.Command {
 
 // Execute implements Commander.
 func (d *DeleteOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err error) {
-	return nil
+	closeFunc, err := opts.EnsureTx(ctx)
+	if err != nil {
+		return err
+	}
+
+	defer func() { err = closeFunc(ctx, err) }()
+
+	orgRepo := opts.organizationRepo(pool)
+
+	orgToDelete, err := orgRepo.Get(ctx, database.WithCondition(orgRepo.IDCondition(d.ID)))
+	if err != nil {
+		return err
+	}
+	d.OrganizationName = orgToDelete.Name
+
+	deletedRows, err := orgRepo.Delete(ctx, orgRepo.IDCondition(d.ID), authz.GetInstance(ctx).InstanceID())
+	if err != nil {
+		return err
+	}
+
+	if deletedRows > 1 {
+		err = zerrors.ThrowInternalf(nil, "DOM-5cE9u6", "expecting 1 row deleted, got %d", deletedRows)
+		return err
+	}
+
+	if deletedRows < 1 {
+		err = zerrors.ThrowNotFoundf(nil, "DOM-ur6Qyv", "organization not found")
+	}
+	return err
 }
 
 // String implements Commander.
@@ -73,10 +106,6 @@ func (d *DeleteOrgCommand) Validate(ctx context.Context, opts *CommandOpts) (err
 	}
 
 	return err
-}
-
-func NewDeleteOrgCommand(organizationID string) *DeleteOrgCommand {
-	return &DeleteOrgCommand{ID: organizationID}
 }
 
 var _ Commander = (*DeleteOrgCommand)(nil)
