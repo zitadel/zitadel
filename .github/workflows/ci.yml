@@ -21,8 +21,8 @@ permissions:
   actions: write
 
 jobs:
-  lint_build_test:
-    uses: ./.github/workflows/lint_build_test.yml
+  check:
+    uses: ./.github/workflows/check.yml
     with:
       node_version: "22"
     secrets:
