@@ -159,6 +159,7 @@
                 "parallel": false,
                 "commands": [
                     "nx run @zitadel/devcontainer:compose up --detach --force-recreate --renew-anon-volumes db-api-integration cache-api-integration",
+                    "rm -rf .artifacts/api-test-integration",
                     "mkdir -p ${GOCOVERDIR}",
                     "nx run @zitadel/api:setup --excludeTaskDependencies"
                 ]
