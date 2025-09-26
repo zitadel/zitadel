@@ -56,10 +56,10 @@ If you don't need a Login or a Console, you can omit them and use the generated 
 pnpm nx run-many --projects . @zitadel/api --targets db generate
 ```
 
-Call the API using grpcurl or grpcui, for example:
+Call the API using [grpcurl](https://github.com/fullstorydev/grpcurl) or [grpcui](https://github.com/fullstorydev/grpcui), for example:
 
 ```bash
-grpcurl
+grpcurl -plaintext -H "Authorization: Bearer $(cat admin.pat)" ${DEVCONTAINER_DB_HOST:-localhost}:8080 zitadel.user.v2.UserService.ListUsers
 ```
 
 To connect to the database and explore Zitadel data, run `psql "host=${DEVCONTAINER_DB_HOST:-localhost}$ dbname=zitadel sslmode=disable"`.
