@@ -253,7 +253,7 @@
             "options": {
                 "parallel": false,
                 "commands": [
-                    "go tool buf generate",
+                    "bash -c 'PATH=\"$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go tool buf generate'",
                     "mkdir -p pkg/grpc openapi/v2/zitadel",
                     "cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/** pkg/grpc/",
                     "cp -r .artifacts/grpc/zitadel/ openapi/v2/zitadel"
