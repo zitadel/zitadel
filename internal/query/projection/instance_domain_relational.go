@@ -66,7 +66,7 @@ func (p *instanceDomainRelationalProjection) reduceCustomDomainAdded(event event
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-bXCa6", "reduce.wrong.db.pool %T", ex)
 		}
-		return repository.InstanceRepository(v3_sql.SQLTx(tx)).Domains(false).Add(ctx, &domain.AddInstanceDomain{
+		return repository.InstanceDomainRepository().Add(ctx, v3_sql.SQLTx(tx), &domain.AddInstanceDomain{
 			InstanceID:  e.Aggregate().InstanceID,
 			Domain:      e.Domain,
 			IsPrimary:   gu.Ptr(false),
@@ -88,25 +88,15 @@ func (p *instanceDomainRelationalProjection) reduceDomainPrimarySet(event events
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-QnjHo", "reduce.wrong.db.pool %T", ex)
 		}
-		domainRepo := repository.InstanceRepository(v3_sql.SQLTx(tx)).Domains(false)
+		domainRepo := repository.InstanceDomainRepository()
 
-		condition := database.And(
-			domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
-			domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),
-			domainRepo.TypeCondition(domain.DomainTypeCustom),
-		)
-
-		_, err := domainRepo.Update(ctx,
-			condition,
+		_, err := domainRepo.Update(ctx, v3_sql.SQLTx(tx),
+			database.And(
+				domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
+				domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),
+				domainRepo.TypeCondition(domain.DomainTypeCustom),
+			),
 			domainRepo.SetPrimary(),
-		)
-		if err != nil {
-			return err
-		}
-		// we need to split the update into two statements because multiple events can have the same creation date
-		// therefore we first do not set the updated_at timestamp
-		_, err = domainRepo.Update(ctx,
-			condition,
 			domainRepo.SetUpdatedAt(e.CreationDate()),
 		)
 		return err
@@ -123,8 +113,8 @@ func (p *instanceDomainRelationalProjection) reduceCustomDomainRemoved(event eve
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-58ghE", "reduce.wrong.db.pool %T", ex)
 		}
-		domainRepo := repository.InstanceRepository(v3_sql.SQLTx(tx)).Domains(false)
-		_, err := domainRepo.Remove(ctx,
+		domainRepo := repository.InstanceDomainRepository()
+		_, err := domainRepo.Remove(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
 				domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),
@@ -145,7 +135,7 @@ func (p *instanceDomainRelationalProjection) reduceTrustedDomainAdded(event even
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-gx7tQ", "reduce.wrong.db.pool %T", ex)
 		}
-		return repository.InstanceRepository(v3_sql.SQLTx(tx)).Domains(false).Add(ctx, &domain.AddInstanceDomain{
+		return repository.InstanceDomainRepository().Add(ctx, v3_sql.SQLTx(tx), &domain.AddInstanceDomain{
 			InstanceID: e.Aggregate().InstanceID,
 			Domain:     e.Domain,
 			Type:       domain.DomainTypeTrusted,
@@ -165,8 +155,8 @@ func (p *instanceDomainRelationalProjection) reduceTrustedDomainRemoved(event ev
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-D68ap", "reduce.wrong.db.pool %T", ex)
 		}
-		domainRepo := repository.InstanceRepository(v3_sql.SQLTx(tx)).Domains(false)
-		_, err := domainRepo.Remove(ctx,
+		domainRepo := repository.InstanceDomainRepository()
+		_, err := domainRepo.Remove(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
 				domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),

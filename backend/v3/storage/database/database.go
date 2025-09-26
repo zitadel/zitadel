@@ -10,8 +10,10 @@ type Pool interface {
 	QueryExecutor
 	Migrator
 
-	Acquire(ctx context.Context) (Client, error)
+	Acquire(ctx context.Context) (Connection, error)
 	Close(ctx context.Context) error
+
+	Ping(ctx context.Context) error
 }
 
 type PoolTest interface {
@@ -20,13 +22,15 @@ type PoolTest interface {
 	MigrateTest(ctx context.Context) error
 }
 
-// Client is a single database connection which can be released back to the pool.
-type Client interface {
+// Connection is a single database connection which can be released back to the pool.
+type Connection interface {
 	Beginner
 	QueryExecutor
 	Migrator
 
 	Release(ctx context.Context) error
+
+	Ping(ctx context.Context) error
 }
 
 // Querier is a database client that can execute queries and return rows.
