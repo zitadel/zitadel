@@ -3,6 +3,7 @@
 	"name": "Zitadel Devcontainer",
 	"dockerComposeFile": "docker-compose.yaml",
 	"service": "devcontainer",
+	"runServices": ["devcontainer"],
 	"workspaceFolder": "/workspaces/zitadel",
 	"forwardPorts": [
 		3000,
