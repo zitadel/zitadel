@@ -227,7 +227,7 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
   if (passwordChangedCheck?.redirect) {
     return passwordChangedCheck;
   }
-  
+
   // throw error if user is in initial state here and do not continue
   if (user.state === UserState.INITIAL) {
     return { error: "Initial User not supported" };
@@ -370,13 +370,26 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const sessionCookie = await getSessionCookieById({ sessionId });
+  let sessionCookie;
+  try {
+    sessionCookie = await getSessionCookieById({ sessionId });
+  } catch (error) {
+    console.error("Error getting session cookie:", error);
+    return { error: "Could not load session cookie" };
+  }
 
-  const { session } = await getSession({
-    serviceUrl,
-    sessionId: sessionCookie.id,
-    sessionToken: sessionCookie.token,
-  });
+  let session;
+  try {
+    const sessionResponse = await getSession({
+      serviceUrl,
+      sessionId: sessionCookie.id,
+      sessionToken: sessionCookie.token,
+    });
+    session = sessionResponse.session;
+  } catch (error) {
+    console.error("Error getting session:", error);
+    return { error: "Could not load session" };
+  }
 
   if (!session || !session.factors?.user?.id) {
     return { error: "Could not load session" };
@@ -390,10 +403,16 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
   });
 
   // check if the user has no password set in order to set a password
-  const authmethods = await listAuthenticationMethodTypes({
-    serviceUrl,
-    userId: session.factors.user.id,
-  });
+  let authmethods;
+  try {
+    authmethods = await listAuthenticationMethodTypes({
+      serviceUrl,
+      userId: session.factors.user.id,
+    });
+  } catch (error) {
+    console.error("Error getting auth methods:", error);
+    return { error: "Could not load auth methods" };
+  }
 
   if (!authmethods) {
     return { error: "Could not load auth methods" };
@@ -408,10 +427,16 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
 
   const hasNoMFAMethods = requiredAuthMethodsForForceMFA.every((method) => !authmethods.authMethodTypes.includes(method));
 
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: session.factors.user.organizationId,
-  });
+  let loginSettings;
+  try {
+    loginSettings = await getLoginSettings({
+      serviceUrl,
+      organization: session.factors.user.organizationId,
+    });
+  } catch (error) {
+    console.error("Error getting login settings:", error);
+    return { error: "Could not load login settings" };
+  }
 
   const forceMfa = !!(loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly);
 
