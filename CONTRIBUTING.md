@@ -548,10 +548,12 @@ Fix the quality checks, add new checks that cover your changes and mark your pul
 
 ## <a name="dev-requirements"></a>Development Requirements
 
-**Recommended: Use Dev Container** (everything pre-configured)
+**Recommended: Use Dev Container** (isolated and pre-configured)
 
 Open in VS Code with Dev Container extension.
 NodeJS, Go, pnpm and Docker are already installed.
+
+[![Open in Dev Container](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/zitadel/zitadel)
 
 **For developing frontend apps or libraries, install:**
 
