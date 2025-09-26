@@ -1146,7 +1146,6 @@ func (p *userProjection) reduceMachineChanged(event eventstore.Event) (*handler.
 			handler.WithTableSuffix(UserMachineSuffix),
 		),
 	), nil
-
 }
 
 func (p *userProjection) reduceUnsetMFAInitSkipped(e eventstore.Event) (*handler.Statement, error) {

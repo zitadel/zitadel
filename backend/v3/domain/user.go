@@ -7,235 +7,197 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-// userColumns define all the columns of the user table.
+//go:generate enumer -type UserState -transform lower -trimprefix UserState -sql
+type UserState uint8
+
+const (
+	UserStateUnspecified UserState = iota
+	UserStateActive
+	UserStateInactive
+	UserStateLocked
+	UserStateSuspended
+)
+
+// user
+type User struct {
+	InstanceID        string    `json:"instanceId,omitempty" db:"instance_id"`
+	OrgID             string    `json:"orgId,omitempty" db:"org_id"`
+	Username          string    `json:"username,omitempty" db:"username"`
+	UsernameOrgUnique bool      `json:"usernameOrgUnique,omitempty" db:"username_org_unique"`
+	State             UserState `json:"userState,omitempty" db:"user_state"`
+
+	CreatedAt time.Time `json:"createdAt,omitzero" db:"created_at"`
+	UpdatedAt time.Time `json:"updatedAt,omitzero" db:"updated_at"`
+}
+
 type userColumns interface {
-	// InstanceIDColumn returns the column for the instance id field.
 	InstanceIDColumn() database.Column
-	// OrgIDColumn returns the column for the org id field.
 	OrgIDColumn() database.Column
-	// IDColumn returns the column for the id field.
 	IDColumn() database.Column
-	// UsernameColumn returns the column for the username field.
 	UsernameColumn() database.Column
-	// CreatedAtColumn returns the column for the created at field.
+	UsernameOrgUnique() database.Column
+	StateColumn() database.Column
 	CreatedAtColumn() database.Column
-	// UpdatedAtColumn returns the column for the updated at field.
 	UpdatedAtColumn() database.Column
-	// DeletedAtColumn returns the column for the deleted at field.
-	DeletedAtColumn() database.Column
 }
 
-// userConditions define all the conditions for the user table.
 type userConditions interface {
-	// InstanceIDCondition returns an equal filter on the instance id field.
 	InstanceIDCondition(instanceID string) database.Condition
-	// OrgIDCondition returns an equal filter on the org id field.
 	OrgIDCondition(orgID string) database.Condition
-	// IDCondition returns an equal filter on the id field.
 	IDCondition(userID string) database.Condition
-	// UsernameCondition returns a filter on the username field.
 	UsernameCondition(op database.TextOperation, username string) database.Condition
-	// CreatedAtCondition returns a filter on the created at field.
+	UsernameOrgUniqueCondition(op database.TextOperation, username string) database.Condition
+	StateCondition(state UserState) database.Condition
 	CreatedAtCondition(op database.NumberOperation, createdAt time.Time) database.Condition
-	// UpdatedAtCondition returns a filter on the updated at field.
 	UpdatedAtCondition(op database.NumberOperation, updatedAt time.Time) database.Condition
-	// DeletedAtCondition filters for deleted users is isDeleted is set to true otherwise only not deleted users must be filtered.
-	DeletedCondition(isDeleted bool) database.Condition
-	// DeletedAtCondition filters for deleted users based on the given parameters.
-	DeletedAtCondition(op database.NumberOperation, deletedAt time.Time) database.Condition
 }
 
-// userChanges define all the changes for the user table.
 type userChanges interface {
-	// SetUsername sets the username column.
-	SetUsername(username string) database.Change
+	SetInstanceID(instanceID string) database.Condition
+	SetOrgID(orgID string) database.Condition
+	SetID(userID string) database.Condition
+	SetUsername(op database.TextOperation, username string) database.Condition
+	SetUsernameOrgUnique(op database.TextOperation, username string) database.Condition
+	SetState(state UserState) database.Condition
+	SetCreatedAt(op database.NumberOperation, createdAt time.Time) database.Condition
+	SetUpdatedAt(op database.NumberOperation, updatedAt time.Time) database.Condition
 }
 
-// UserRepository is the interface for the user repository.
-type UserRepository interface {
-	userColumns
-	userConditions
-	userChanges
-	// Get returns a user based on the given condition.
-	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*User, error)
-	// List returns a list of users based on the given condition.
-	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*User, error)
-	// Create creates a new user.
-	Create(ctx context.Context, client database.QueryExecutor, user *User) error
-	// Delete removes users based on the given condition.
-	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) error
-	// Human returns the [HumanRepository].
-	Human() HumanRepository
-	// Machine returns the [MachineRepository].
-	Machine() MachineRepository
+// machine user
+type Machine struct {
+	User
+	Name        string `json:"name,omitempty" db:"name"`
+	Description string `json:"description,omitempty" db:"description"`
 }
 
-// humanColumns define all the columns of the human table which inherits the user table.
-type humanColumns interface {
-	userColumns
-	// FirstNameColumn returns the column for the first name field.
-	FirstNameColumn() database.Column
-	// LastNameColumn returns the column for the last name field.
-	LastNameColumn() database.Column
-	// EmailAddressColumn returns the column for the email address field.
-	EmailAddressColumn() database.Column
-	// EmailVerifiedAtColumn returns the column for the email verified at field.
-	EmailVerifiedAtColumn() database.Column
-	// PhoneNumberColumn returns the column for the phone number field.
-	PhoneNumberColumn() database.Column
-	// PhoneVerifiedAtColumn returns the column for the phone verified at field.
-	PhoneVerifiedAtColumn() database.Column
-}
-
-// humanConditions define all the conditions for the human table which inherits the user table.
-type humanConditions interface {
-	userConditions
-	// FirstNameCondition returns a filter on the first name field.
-	FirstNameCondition(op database.TextOperation, firstName string) database.Condition
-	// LastNameCondition returns a filter on the last name field.
-	LastNameCondition(op database.TextOperation, lastName string) database.Condition
-	// EmailAddressCondition returns a filter on the email address field.
-	EmailAddressCondition(op database.TextOperation, email string) database.Condition
-	// EmailVerifiedCondition returns a filter that checks if the email is verified or not.
-	EmailVerifiedCondition(isVerified bool) database.Condition
-	// EmailVerifiedAtCondition returns a filter on the email verified at field.
-	EmailVerifiedAtCondition(op database.NumberOperation, emailVerifiedAt time.Time) database.Condition
-
-	// PhoneNumberCondition returns a filter on the phone number field.
-	PhoneNumberCondition(op database.TextOperation, phoneNumber string) database.Condition
-	// PhoneVerifiedCondition returns a filter that checks if the phone is verified or not.
-	PhoneVerifiedCondition(isVerified bool) database.Condition
-	// PhoneVerifiedAtCondition returns a filter on the phone verified at field.
-	PhoneVerifiedAtCondition(op database.NumberOperation, phoneVerifiedAt time.Time) database.Condition
-}
-
-// humanChanges define all the changes for the human table which inherits the user table.
-type humanChanges interface {
-	userChanges
-	// SetFirstName sets the first name field of the human.
-	SetFirstName(firstName string) database.Change
-	// SetLastName sets the last name field of the human.
-	SetLastName(lastName string) database.Change
-
-	// SetEmail sets the email address and verified field of the email
-	// if verifiedAt is nil the email is not verified
-	SetEmail(address string, verifiedAt *time.Time) database.Change
-	// SetEmailAddress sets the email address field of the email
-	SetEmailAddress(email string) database.Change
-	// SetEmailVerifiedAt sets the verified column of the email
-	// if at is zero the statement uses the database timestamp
-	SetEmailVerifiedAt(at time.Time) database.Change
-
-	// SetPhone sets the phone number and verified field
-	// if verifiedAt is nil the phone is not verified
-	SetPhone(number string, verifiedAt *time.Time) database.Change
-	// SetPhoneNumber sets the phone number field
-	SetPhoneNumber(phoneNumber string) database.Change
-	// SetPhoneVerifiedAt sets the verified field of the phone
-	// if at is zero the statement uses the database timestamp
-	SetPhoneVerifiedAt(at time.Time) database.Change
-}
-
-// HumanRepository is the interface for the human repository it inherits the user repository.
-type HumanRepository interface {
-	humanColumns
-	humanConditions
-	humanChanges
-
-	// Get returns an email based on the given condition.
-	GetEmail(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Email, error)
-	// Update updates human users based on the given condition and changes.
-	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) error
-}
-
-// machineColumns define all the columns of the machine table which inherits the user table.
 type machineColumns interface {
 	userColumns
-	// DescriptionColumn returns the column for the description field.
+	NameColumn() database.Column
 	DescriptionColumn() database.Column
 }
 
-// machineConditions define all the conditions for the machine table which inherits the user table.
 type machineConditions interface {
 	userConditions
-	// DescriptionCondition returns a filter on the description field.
-	DescriptionCondition(op database.TextOperation, description string) database.Condition
+	NameCondition(name string) database.Condition
+	DescriptionCondition(description string) database.Condition
 }
 
-// machineChanges define all the changes for the machine table which inherits the user table.
 type machineChanges interface {
 	userChanges
-	// SetDescription sets the description field of the machine.
-	SetDescription(description string) database.Change
+	SetInstanceID(instanceID string) database.Condition
+	SetOrgID(orgID string) database.Condition
 }
 
-// MachineRepository is the interface for the machine repository it inherits the user repository.
-type MachineRepository interface {
-	// Update updates machine users based on the given condition and changes.
-	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) error
-
-	machineColumns
-	machineConditions
-	machineChanges
+// human user
+type Human struct {
+	User
+	FirstName         string `json:"firstName,omitempty" db:"first_name"`
+	LastName          string `json:"lastName,omitempty" db:"last_name"`
+	NickName          string `json:"nickName,omitempty" db:"nick_name"`
+	DisplayName       string `json:"displayName,omitempty" db:"display_name"`
+	PreferredLanguage string `json:"preferredLanguage,omitempty" db:"preferred_language"`
+	Gender            uint8  `json:"gender,omitempty" db:"gender"`
+	AvatarKey         string `json:"avataryKey,omitempty" db:"avatar_key"`
 }
 
-// UserTraits is implemented by [Human] and [Machine].
-type UserTraits interface {
-	Type() UserType
+type humanColumns interface {
+	userColumns
+	FirstNameColumn() database.Column
+	LastNameColumn() database.Column
+	DisplayNameColumn() database.Column
+	OerferredLanguageColumn() database.Column
+	GenderColumn() database.Column
+	AvatarKeyColumn() database.Column
 }
 
-type UserType string
+type humanConditions interface {
+	userConditions
+	FirstNameCondition(name string) database.Condition
+	LastNameCondition(name string) database.Condition
+	NickNameCondition(name string) database.Condition
+	DisplayNameCondition(name string) database.Condition
+	OerferredLanguageCondition(language string) database.Condition
+	GenderCondition(gender uint8) database.Condition
+	AvatarKeyCondition(key string) database.Condition
+}
+
+type humanChanges interface {
+	userChanges
+	SetFirstName(name string) database.Change
+	SetLastName(name string) database.Change
+	SetNickName(name string) database.Change
+	SetDisplayName(name string) database.Change
+	SetOerferredLanguage(language string) database.Change
+	SetGender(gender uint8) database.Change
+	SetAvatarKey(key string) database.Change
+}
+
+//go:generate enumer -type ContactType -transform lower -trimprefix ContactType -sql
+type ContactType uint8
 
 const (
-	UserTypeHuman   UserType = "human"
-	UserTypeMachine UserType = "machine"
+	ContactTypeUnspecified UserState = iota
+	ContactTypeEmail
+	ContactTypePhone
 )
 
-type User struct {
-	InstanceID string
-	OrgID      string
-	ID         string
-
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt time.Time
-
-	Username string
-
-	Traits UserTraits
+// human contact type
+type HumanContact struct {
+	InstanceID      string      `json:"instanceId,omitempty" db:"instance_id"`
+	OrgID           string      `json:"orgId,omitempty" db:"org_id"`
+	UserId          string      `json:"userId,omitempty" db:"user_id"`
+	Type            ContactType `json:"type,omitempty" db:"type"`
+	CurrentValue    string      `json:"currentValue,omitempty" db:"current_value"`
+	Verified        bool        `json:"verified,omitempty" db:"verified"`
+	UnverifiedValue string      `json:"unverifiedValue,omitempty" db:"unverified_value"`
 }
 
-type Human struct {
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
-	Email     *Email `json:"email,omitempty"`
-	Phone     *Phone `json:"phone,omitempty"`
+type humanContactColumns interface {
+	InstanceIDCondition() database.Column
+	OrgIDCondition() database.Column
+	UserIDCondition() database.Column
+	TypeCondition() database.Column
+	CurrentValueCondition() database.Column
+	VerifiedCondition() database.Column
+	UnverifiedValueCondition() database.Column
 }
 
-// Type implements [UserTraits].
-func (h *Human) Type() UserType {
-	return UserTypeHuman
+type humanContactConditions interface {
+	InstanceIDCondition(instanceID string) database.Condition
+	OrgIDCondition(orgID string) database.Condition
+	UserIDCondition(userID string) database.Condition
+	TypeCondition(typ ContactType) database.Condition
+	CurrentValueCondition(value string) database.Condition
+	VerifiedCondition(verified bool) database.Condition
+	UnverifiedValueCondition(value string) database.Condition
 }
 
-var _ UserTraits = (*Human)(nil)
-
-type Email struct {
-	Address    string    `json:"address"`
-	VerifiedAt time.Time `json:"verifiedAt"`
+type humanContactChanges interface {
+	SetInstanceID(instanceID string) database.Change
+	SetOrgID(orgID string) database.Change
+	SetUserID(userID string) database.Change
+	SetType(typ ContactType) database.Change
+	SetCurrentValue(value string) database.Change
+	SetVerified(verified bool) database.Change
+	SetUnverifiedValue(value string) database.Change
 }
 
-type Phone struct {
-	Number     string    `json:"number"`
-	VerifiedAt time.Time `json:"verifiedAt"`
-}
+type Repository interface {
+	organizationColumns
+	organizationConditions
+	organizationChanges
 
-type Machine struct {
-	Description string `json:"description"`
-}
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Organization, error)
+	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Organization, error)
 
-// Type implements [UserTraits].
-func (m *Machine) Type() UserType {
-	return UserTypeMachine
-}
+	Create(ctx context.Context, client database.QueryExecutor, org *Organization) error
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
+	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 
-var _ UserTraits = (*Machine)(nil)
+	// LoadDomains loads the domains of the given organizations.
+	// If it is called the [Organization].Domains field will be set on future calls to Get or List.
+	LoadDomains() OrganizationRepository
+	// LoadMetadata loads the metadata of the given organizations.
+	// If it is called the [Organization].Metadata field will be set on future calls to Get or List.
+	LoadMetadata() OrganizationRepository
+}
