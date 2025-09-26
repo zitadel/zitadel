@@ -6,9 +6,6 @@ on:
       node_version:
         required: true
         type: string
-      zitadel_version:
-        required: true
-        type: string
       image_name_github_api:
         required: true
         type: string
@@ -20,6 +17,9 @@ on:
         type: string
       image_name_google_login:
         required: true
+        type: string
+      semantic_version:
+        required: false
         type: string
     secrets:
       GCR_JSON_KEY_BASE64:
@@ -35,9 +35,16 @@ env:
     org.opencontainers.image.vendor=ZITADEL
 
 jobs:
+  version:
+    uses: ./.github/workflows/version.yml
+    with:
+      semantic_version: ${{ inputs.semantic_version }}
+      dry_run: true
+
   pack:
     runs-on:
       group: zitadel-public
+    needs: version
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -65,7 +72,7 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Pack API and Login
         env:
-          ZITADEL_VERSION: ${{ inputs.zitadel_version }}
+          ZITADEL_VERSION: ${{ needs.version.outputs.version }}
         run: pnpm nx run --nxBail pack
       - name: Upload all platform archives
         uses: actions/upload-artifact@v4

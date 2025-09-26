@@ -41,7 +41,7 @@ jobs:
   # https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#create-a-release--parameters
   publish:
     runs-on: ubuntu-22.04
-    needs: [ version ]
+    needs: version
     if: needs.version.outputs.published == 'true'
     steps:
       - id: get_release

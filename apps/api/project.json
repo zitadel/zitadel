@@ -37,7 +37,7 @@
             "command": "bash -c './.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} start --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --masterkey MasterkeyNeedsToHave32Characters'"
         },
         "setup": {
-            "description": "Takes care of data and schema migrations for the API.",
+            "description": "Runs the schema migrations in order to prepare and update the database tables.",
             "dependsOn": [
                 "build"
             ],

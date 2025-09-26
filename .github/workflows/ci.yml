@@ -28,15 +28,7 @@ jobs:
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  version:
-    uses: ./.github/workflows/version.yml
-    if: ${{ github.event_name == 'workflow_dispatch' }}
-    with:
-      semantic_version: "23.0.7"
-      dry_run: true
-
   pack:
-    needs: version
     uses: ./.github/workflows/pack.yml
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
@@ -45,7 +37,7 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     with:
       node_version: "22"
-      zitadel_version: ${{ needs.version.outputs.version }}
+      semantic_version: "23.0.7"
       image_name_github_api: "ghcr.io/zitadel/zitadel"
       image_name_google_api: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
       image_name_github_login: "ghcr.io/zitadel/zitadel-login"
@@ -59,8 +51,7 @@ jobs:
       issues: write
       pull-requests: write
     needs:
-      - version
-      - check
+      - lint_build_test
       - pack
     if: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
