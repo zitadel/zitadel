@@ -88,7 +88,7 @@ const (
 	OIDCResponseTypeIDTokenToken
 )
 
-//go:generate go tool enumer -type OIDCResponseMode -transform snake -trimprefix OIDCResponseMode
+//go:generate enumer -type OIDCResponseMode -transform snake -trimprefix OIDCResponseMode
 type OIDCResponseMode int
 
 const (

@@ -1,4 +1,4 @@
-//go:generate go tool enumer -type MemberType -trimprefix MemberType -json -sql
+//go:generate enumer -type MemberType -trimprefix MemberType -json -sql
 
 package authz
 

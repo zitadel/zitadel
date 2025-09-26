@@ -31,10 +31,11 @@ Alternatively, you can use the infix-notation, like `pnpm nx dev @zitadel/login`
 
 ### <a name="api-quick-start"></a>API
 
-Make sure you have the [required system dependencies](#dev-requirements) and node modules installed
+Make sure you have the [required system dependencies](#dev-requirements) and node modules and go dependencies installed
 
 ```bash
 pnpm install
+go mod tidy
 ```
 
 Prepare the API development with a Console and run a local Login production build.

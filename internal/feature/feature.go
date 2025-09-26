@@ -5,7 +5,7 @@ import (
 	"slices"
 )
 
-//go:generate go tool enumer -type Key -transform snake -trimprefix Key
+//go:generate enumer -type Key -transform snake -trimprefix Key
 type Key int
 
 const (
@@ -25,7 +25,7 @@ const (
 	KeyEnableRelationalTables         Key = 16
 )
 
-//go:generate go tool enumer -type Level -transform snake -trimprefix Level
+//go:generate enumer -type Level -transform snake -trimprefix Level
 type Level int
 
 const (

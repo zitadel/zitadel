@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-//go:generate go tool enumer -type Type -json -linecomment
+//go:generate enumer -type Type -json -linecomment
 type Type int
 
 const (

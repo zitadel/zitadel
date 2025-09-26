@@ -38,6 +38,7 @@ jobs:
     - if: matrix.language == 'go'
       run: |
         pnpm install --frozen-lockfile
+        go mod tidy
         pnpm nx run-many --nxBail --projects @zitadel/api --targets generate-stubs generate-statik generate-assets
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL

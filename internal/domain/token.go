@@ -41,7 +41,7 @@ func addProjectID(audience []string, projectID string) []string {
 	return append(audience, projectID)
 }
 
-//go:generate go tool enumer -type TokenReason -transform snake -trimprefix TokenReason -json
+//go:generate enumer -type TokenReason -transform snake -trimprefix TokenReason -json
 type TokenReason int
 
 const (

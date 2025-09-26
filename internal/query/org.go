@@ -481,7 +481,7 @@ func prepareOrgUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 
 type orgIndex int
 
-//go:generate go tool enumer -type orgIndex -linecomment
+//go:generate enumer -type orgIndex -linecomment
 const (
 	// Empty line comment ensures empty string for unspecified value
 	orgIndexUnspecified orgIndex = iota //
