@@ -417,16 +417,7 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
   if (!authmethods) {
     return { error: "Could not load auth methods" };
   }
-
-  const requiredAuthMethodsForForceMFA = [
-    AuthenticationMethodType.OTP_EMAIL,
-    AuthenticationMethodType.OTP_SMS,
-    AuthenticationMethodType.TOTP,
-    AuthenticationMethodType.U2F,
-  ];
-
-  const hasNoMFAMethods = requiredAuthMethodsForForceMFA.every((method) => !authmethods.authMethodTypes.includes(method));
-
+  
   let loginSettings;
   try {
     loginSettings = await getLoginSettings({
@@ -439,9 +430,9 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
   }
 
   const forceMfa = !!(loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly);
-
+  
   // if the user has no MFA but MFA is enforced, we can set a password otherwise we use the token of the user
-  if (forceMfa && hasNoMFAMethods) {
+  if (forceMfa) {
     console.log("Set password using service account due to enforced MFA without existing MFA methods");
     return setPassword({ serviceUrl, payload }).catch((error) => {
       // throw error if failed precondition (ex. User is not yet initialized)
