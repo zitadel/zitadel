@@ -16,7 +16,7 @@ type Commander interface {
 	Validate(ctx context.Context, opts *CommandOpts) (err error)
 	// Events returns the events that should be pushed to the event store after the command is executed.
 	// If the command does not produce events, it should return nil or an empty slice.
-	Events(ctx context.Context, opts *CommandOpts) []legacy_es.Command
+	Events(ctx context.Context, opts *CommandOpts) ([]legacy_es.Command, error)
 	fmt.Stringer
 }
 
@@ -119,14 +119,18 @@ type commandBatch struct {
 }
 
 // Events implements Commander.
-func (cmd *commandBatch) Events(ctx context.Context, opts *CommandOpts) []legacy_es.Command {
+func (cmd *commandBatch) Events(ctx context.Context, opts *CommandOpts) ([]legacy_es.Command, error) {
 	commands := make([]legacy_es.Command, 0, len(cmd.Commands))
 	for _, c := range cmd.Commands {
-		if e := c.Events(ctx, opts); len(e) > 0 {
+		e, err := c.Events(ctx, opts)
+		if err != nil {
+			return nil, err
+		}
+		if len(e) > 0 {
 			commands = append(commands, e...)
 		}
 	}
-	return commands
+	return commands, nil
 }
 
 func BatchCommands(cmds ...Commander) *commandBatch {

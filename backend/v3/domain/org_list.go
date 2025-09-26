@@ -28,8 +28,8 @@ func NewListOrgsCommand(inputRequest *v2_org.ListOrganizationsRequest) *ListOrgs
 }
 
 // Events implements Commander.
-func (l *ListOrgsCommand) Events(_ context.Context, _ *CommandOpts) []eventstore.Command {
-	return nil
+func (l *ListOrgsCommand) Events(_ context.Context, _ *CommandOpts) ([]eventstore.Command, error) {
+	return nil, nil
 }
 
 // Execute implements Commander.

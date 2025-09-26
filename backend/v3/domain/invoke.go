@@ -88,7 +88,12 @@ func (i *eventCollector) Invoke(ctx context.Context, command Commander, opts *Co
 	if err != nil {
 		return err
 	}
-	i.events = append(command.Events(ctx, opts), i.events...)
+	collectedEvents, err := command.Events(ctx, opts)
+	if err != nil {
+		return err
+	}
+
+	i.events = append(collectedEvents, i.events...)
 
 	return
 }

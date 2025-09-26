@@ -20,14 +20,14 @@ type UpdateOrgCommand struct {
 }
 
 // Events implements Commander.
-func (u *UpdateOrgCommand) Events(ctx context.Context, opts *CommandOpts) []eventstore.Command {
+func (u *UpdateOrgCommand) Events(ctx context.Context, opts *CommandOpts) ([]eventstore.Command, error) {
 	toReturn := []eventstore.Command{}
 
 	if u.OldDomainName != nil && *u.OldDomainName != u.Name {
 		toReturn = append(toReturn, org.NewOrgChangedEvent(ctx, &org.NewAggregate(u.ID).Aggregate, *u.OldDomainName, u.Name))
 	}
 
-	return toReturn
+	return toReturn, nil
 }
 
 var _ Commander = (*UpdateOrgCommand)(nil)

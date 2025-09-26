@@ -10,7 +10,7 @@ import (
 )
 
 type DeleteOrgCommand struct {
-	OrganizationName string
+	OrganizationName string `json: "organization_name"`
 	ID               string `json:"id"`
 }
 
@@ -19,8 +19,8 @@ func NewDeleteOrgCommand(organizationID string) *DeleteOrgCommand {
 }
 
 // Events implements Commander.
-func (d *DeleteOrgCommand) Events(ctx context.Context, opts *CommandOpts) []eventstore.Command {
-	return nil
+func (d *DeleteOrgCommand) Events(ctx context.Context, opts *CommandOpts) ([]eventstore.Command, error) {
+	return nil, nil
 }
 
 // Execute implements Commander.

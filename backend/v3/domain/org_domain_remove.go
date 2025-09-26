@@ -14,7 +14,7 @@ type RemoveOrgDomainCommand struct {
 }
 
 // Events implements Commander.
-func (r *RemoveOrgDomainCommand) Events(ctx context.Context, opts *CommandOpts) []eventstore.Command {
+func (r *RemoveOrgDomainCommand) Events(ctx context.Context, opts *CommandOpts) ([]eventstore.Command, error) {
 	// TODO(IAM-Marco) Finish implementation in https://github.com/zitadel/zitadel/issues/10447
 	oldDomainName := ""
 	isVerified := false
@@ -27,7 +27,7 @@ func (r *RemoveOrgDomainCommand) Events(ctx context.Context, opts *CommandOpts) 
 
 	return []eventstore.Command{
 		org.NewDomainRemovedEvent(ctx, &org.NewAggregate(r.OrgID).Aggregate, oldDomainName, isVerified),
-	}
+	}, nil
 }
 
 func NewRemoveOrgDomainCommand(orgID string, domainName *string, isDomainVerified *bool) *RemoveOrgDomainCommand {

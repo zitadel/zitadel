@@ -7,6 +7,7 @@ import (
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -348,7 +349,8 @@ func TestUpdateOrgCommand_Events(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			events := tt.cmd.Events(context.Background(), &domain.CommandOpts{})
+			events, err := tt.cmd.Events(context.Background(), &domain.CommandOpts{})
+			require.Nil(t, err)
 			assert.Len(t, events, tt.expectedCount)
 		})
 	}

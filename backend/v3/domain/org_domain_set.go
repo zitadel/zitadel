@@ -13,11 +13,11 @@ type SetPrimaryOrgDomainCommand struct {
 }
 
 // Events implements Commander.
-func (a *SetPrimaryOrgDomainCommand) Events(ctx context.Context, opts *CommandOpts) []eventstore.Command {
+func (a *SetPrimaryOrgDomainCommand) Events(ctx context.Context, opts *CommandOpts) ([]eventstore.Command, error) {
 	// TODO(IAM-Marco) Finish implementation in https://github.com/zitadel/zitadel/issues/10447
 	return []eventstore.Command{
 		org.NewDomainPrimarySetEvent(ctx, &org.NewAggregate(a.OrgID).Aggregate, a.Name),
-	}
+	}, nil
 }
 
 func NewSetPrimaryOrgDomainCommand(orgID, domainName string) *SetPrimaryOrgDomainCommand {
