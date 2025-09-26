@@ -78,7 +78,7 @@
             ]
         },
         "lint-install":{
-            "description": "Installs golangci-lint binary for linting",
+            "description": "Installs golangci-lint binary for linting. Using go install is not recommended in the official docs, because this can produce non-deterministic results.",
             "cache": true,
             "command": "curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b .artifacts/bin/$(go env GOOS)/$(go env GOARCH) v2.5.0",
             "inputs": [
@@ -166,7 +166,7 @@
             }
         },
         "test-integration-run-api": {
-            "description": "Runs the API backend in a mode suitable for integration tests. This includes using the test configuration and enabling coverage recording.",
+            "description": "Runs the API backend in a mode suitable for integration tests. This includes using the test configuration and enabling coverage recording. It has its own target, separate from test-integration, because it's a continuous task.",
             "continuous": true,
             "dependsOn": [
                 "test-integration-setup"
@@ -222,7 +222,7 @@
             ]
         },
         "generate-install": {
-            "description": "Installs the binaries needed for generating code.",
+            "description": "Installs the binaries needed for generating code. We avoid using go tools so the dev tool dependencies don't interfere with the prod dependencies.",
             "executor": "nx:run-commands",
             "options": {
                 "commands": [
