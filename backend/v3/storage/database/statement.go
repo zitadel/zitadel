@@ -1,7 +1,6 @@
 package database
 
 import (
-	"encoding/hex"
 	"strconv"
 	"strings"
 )
@@ -17,8 +16,7 @@ const (
 // StatementBuilder is a helper to build SQL statement.
 type StatementBuilder struct {
 	strings.Builder
-	args         []any
-	existingArgs map[any]string
+	args []any
 }
 
 type argWriter interface {
@@ -47,30 +45,16 @@ func (b *StatementBuilder) WriteArgs(args ...any) {
 
 // AppendArg adds the argument to the statement and returns the placeholder.
 func (b *StatementBuilder) AppendArg(arg any) (placeholder string) {
-	if b.existingArgs == nil {
-		b.existingArgs = make(map[any]string)
-	}
-	// the key is used to work around the following panic:
-	// runtime error: hash of unhashable type []uint8
-	key := arg
-	if argBytes, ok := arg.([]uint8); ok {
-		key = `\\bytes-` + hex.EncodeToString(argBytes)
-	}
-	if placeholder, ok := b.existingArgs[key]; ok {
-		return placeholder
-	}
 	if instruction, ok := arg.(Instruction); ok {
 		return string(instruction)
 	}
 
 	b.args = append(b.args, arg)
 	placeholder = "$" + strconv.Itoa(len(b.args))
-	b.existingArgs[key] = placeholder
 	return placeholder
 }
 
 // AppendArgs adds the arguments to the statement and doesn't return the placeholders.
-// If an argument is already added, it will not be added again.
 func (b *StatementBuilder) AppendArgs(args ...any) {
 	for _, arg := range args {
 		b.AppendArg(arg)
