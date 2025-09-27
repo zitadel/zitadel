@@ -7,11 +7,12 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/proto"
+
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/integration"
 	v2beta_project "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
-	"google.golang.org/protobuf/proto"
 )
 
 func TestServer_ProjectRoleReduces(t *testing.T) {
