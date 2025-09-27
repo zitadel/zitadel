@@ -8,13 +8,12 @@ import (
 )
 
 func TestStatementBuilder_AppendArg(t *testing.T) {
-	t.Run("same arg returns same placeholder", func(t *testing.T) {
+	t.Run("same arg returns different placeholder", func(t *testing.T) {
 		var b StatementBuilder
 		placeholder1 := b.AppendArg("same")
 		placeholder2 := b.AppendArg("same")
-		assert.Equal(t, placeholder1, placeholder2)
-		assert.Len(t, b.Args(), 1)
-		assert.Len(t, b.existingArgs, 1)
+		assert.NotEqual(t, placeholder1, placeholder2)
+		assert.Len(t, b.Args(), 2)
 	})
 
 	t.Run("same arg different types", func(t *testing.T) {
@@ -23,9 +22,8 @@ func TestStatementBuilder_AppendArg(t *testing.T) {
 		placeholder2 := b.AppendArg([]byte("same"))
 		placeholder3 := b.AppendArg("same")
 		assert.NotEqual(t, placeholder1, placeholder2)
-		assert.Equal(t, placeholder1, placeholder3)
-		assert.Len(t, b.Args(), 2)
-		assert.Len(t, b.existingArgs, 2)
+		assert.NotEqual(t, placeholder1, placeholder3)
+		assert.Len(t, b.Args(), 3)
 	})
 
 	t.Run("Instruction args are always different", func(t *testing.T) {
@@ -34,30 +32,26 @@ func TestStatementBuilder_AppendArg(t *testing.T) {
 		placeholder2 := b.AppendArg(DefaultInstruction)
 		assert.Equal(t, placeholder1, placeholder2)
 		assert.Len(t, b.Args(), 0)
-		assert.Len(t, b.existingArgs, 0)
 	})
 }
 
 func TestStatementBuilder_AppendArgs(t *testing.T) {
-	t.Run("same arg returns same placeholder", func(t *testing.T) {
+	t.Run("same arg returns different placeholder", func(t *testing.T) {
 		var b StatementBuilder
 		b.AppendArgs("same", "same")
-		assert.Len(t, b.Args(), 1)
-		assert.Len(t, b.existingArgs, 1)
+		assert.Len(t, b.Args(), 2)
 	})
 
 	t.Run("same arg different types", func(t *testing.T) {
 		var b StatementBuilder
 		b.AppendArgs("same", []byte("same"), "same")
-		assert.Len(t, b.Args(), 2)
-		assert.Len(t, b.existingArgs, 2)
+		assert.Len(t, b.Args(), 3)
 	})
 
 	t.Run("Instruction args are always different", func(t *testing.T) {
 		var b StatementBuilder
 		b.AppendArgs(DefaultInstruction, DefaultInstruction)
 		assert.Len(t, b.Args(), 0)
-		assert.Len(t, b.existingArgs, 0)
 	})
 }
 
