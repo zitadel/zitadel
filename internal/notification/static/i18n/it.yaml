@@ -3,21 +3,21 @@ InitCode:
   PreHeader: Inizializzare l'utente
   Subject: Inizializzare l'utente
   Greeting: 'Ciao {{.DisplayName}},'
-  Text: Questo utente è stato creato in ZITADEL. Usa il nome utente {{.PreferredLoginName}} per accedere. Per favore, clicca il pulsante per finire il processo di inizializzazione. (Codice {{.Codice}}) Se non hai richiesto questa mail, per favore ignorala.
+  Text: Questo utente è stato creato in ZITADEL. Usa il nome utente {{.PreferredLoginName}} per accedere. Per favore, clicca il pulsante per finire il processo di inizializzazione. (Codice {{.Code}}) Se non hai richiesto questa mail, per favore ignorala.
   ButtonText: Termina
 PasswordReset:
   Title: ZITADEL - Ripristina la password
   PreHeader: Ripristina la password
   Subject: Ripristina la password
   Greeting: 'Ciao {{.DisplayName}},'
-  Text: Abbiamo ricevuto una richiesta di reimpostazione della password. Per favore clicca il pulsante per resettare la tua password. (Codice {{.Codice}}) Se non hai richiesto questa mail, ignorala.
+  Text: Abbiamo ricevuto una richiesta di reimpostazione della password. Per favore clicca il pulsante per resettare la tua password. (Codice {{.Code}}) Se non hai richiesto questa mail, ignorala.
   ButtonText: Ripristina
 VerifyEmail:
   Title: ZITADEL - Verifica l'e-mail
   PreHeader: Verifica l'e-mail
   Subject: Verifica l'e-mail
   Greeting: 'Ciao {{.DisplayName}},'
-  Text: È stata aggiunta una nuova email. Per favore fai clic sul pulsante per verificare la tua mail. (Codice {{.Codice}}) Se non hai aggiunto una nuova email, ignora questa email.
+  Text: È stata aggiunta una nuova email. Per favore fai clic sul pulsante per verificare la tua mail. (Codice {{.Code}}) Se non hai aggiunto una nuova email, ignora questa email.
   ButtonText: Verifica
 VerifyPhone:
   Title: ZITADEL - Verifica il telefono
