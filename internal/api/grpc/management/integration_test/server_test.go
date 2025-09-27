@@ -14,8 +14,8 @@ import (
 
 var (
 	CTX, IAMOwnerCTX, OrgCTX context.Context
-	Instance            *integration.Instance
-	Client              mgmt_pb.ManagementServiceClient
+	Instance                 *integration.Instance
+	Client                   mgmt_pb.ManagementServiceClient
 )
 
 func TestMain(m *testing.M) {
