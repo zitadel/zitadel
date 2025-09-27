@@ -120,6 +120,13 @@ func (p project) SetUsedLabelingSettingOwner(usedLabelingSettingOwner int16) dat
 // conditions
 // -------------------------------------------------------------
 
+func (p project) PrimaryKeyCondition(instanceID, projectID string) database.Condition {
+	return database.And(
+		p.InstanceIDCondition(instanceID),
+		p.IDCondition(projectID),
+	)
+}
+
 func (p project) InstanceIDCondition(instanceID string) database.Condition {
 	return database.NewTextCondition(p.InstanceIDColumn(), database.TextOperationEqual, instanceID)
 }

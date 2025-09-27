@@ -55,6 +55,8 @@ type projectColumns interface {
 }
 
 type projectConditions interface {
+	// PrimaryKeyCondition returns a filter on the primary key fields.
+	PrimaryKeyCondition(instanceID, projectID string) database.Condition
 	// InstanceIDCondition returns a filter on the instance id field.
 	InstanceIDCondition(instanceID string) database.Condition
 	// OrganizationIDCondition returns a filter on the organization id field.

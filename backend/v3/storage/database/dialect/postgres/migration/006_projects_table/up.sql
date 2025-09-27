@@ -5,13 +5,13 @@ CREATE TYPE zitadel.project_state AS ENUM (
 
 CREATE TABLE zitadel.projects(
     instance_id TEXT NOT NULL
-    , organization_id TEXT NOT NULL
-    , id TEXT NOT NULL
+    , organization_id TEXT NOT NULL CHECK (organization_id <> '')
+    , id TEXT NOT NULL CHECK (id <> '')
 
     , created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     , updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 
-    , name TEXT NOT NULL CHECK(LENGTH(name) > 0)
+    , name TEXT NOT NULL CHECK (name <> '')
     , state zitadel.project_state NOT NULL
     -- API: project_role_assertion
     , should_assert_role BOOLEAN NOT NULL DEFAULT FALSE
