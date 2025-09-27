@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -78,6 +79,10 @@ func (p projectRole) Delete(ctx context.Context, client database.QueryExecutor, 
 // -------------------------------------------------------------
 // changes
 // -------------------------------------------------------------
+
+func (p projectRole) SetUpdatedAt(updatedAt time.Time) database.Change {
+	return database.NewChange(p.UpdatedAtColumn(), updatedAt)
+}
 
 func (p projectRole) SetDisplayName(displayName string) database.Change {
 	return database.NewChange(p.DisplayNameColumn(), displayName)

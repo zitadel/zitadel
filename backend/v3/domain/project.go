@@ -72,6 +72,10 @@ type projectConditions interface {
 }
 
 type projectChanges interface {
+	// SetUpdatedAt sets the updated at column.
+	// Only use this when reducing events,
+	// during regular updates the DB sets this column automatically.
+	SetUpdatedAt(updatedAt time.Time) database.Change
 	// SetName sets the name column.
 	SetName(name string) database.Change
 	// SetState sets the state column.
@@ -157,6 +161,10 @@ type projectRoleConditions interface {
 }
 
 type projectRoleChanges interface {
+	// SetUpdatedAt sets the updated at column.
+	// Only use this when reducing events,
+	// during regular updates the DB sets this column automatically.
+	SetUpdatedAt(updatedAt time.Time) database.Change
 	// SetDisplayName sets the display name column.
 	SetDisplayName(displayName string) database.Change
 	// SetRoleGroup sets the role group column.
