@@ -107,3 +107,19 @@ func createOrganization(t *testing.T, tx database.Transaction, instanceID string
 
 	return org.ID
 }
+
+func createProject(t *testing.T, tx database.Transaction, instanceID, orgID string) (projectID string) {
+	t.Helper()
+	project := domain.Project{
+		InstanceID:     instanceID,
+		OrganizationID: orgID,
+		ID:             gofakeit.UUID(),
+		Name:           gofakeit.Name(),
+		State:          domain.ProjectStateActive,
+	}
+	projectRepo := repository.ProjectRepository()
+	err := projectRepo.Create(t.Context(), tx, &project)
+	require.NoError(t, err)
+
+	return project.ID
+}

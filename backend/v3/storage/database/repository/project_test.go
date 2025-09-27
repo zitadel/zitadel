@@ -192,7 +192,7 @@ func TestListProjects(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := projectRepo.List(t.Context(), tx,
 				database.WithCondition(tt.condition),
-				database.WithOrderByAscending(projectRepo.CreatedAtColumn(), projectRepo.IDColumn()),
+				database.WithOrderByAscending(projectRepo.PrimaryKeyColumns()...),
 			)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
@@ -269,21 +269,6 @@ func TestCreateProject(t *testing.T) {
 				UsedLabelingSettingOwner: 1,
 			},
 			wantErr: new(database.ForeignKeyError),
-		},
-		{
-			name: "empty org id error",
-			project: &domain.Project{
-				InstanceID:               instanceID,
-				OrganizationID:           "",
-				ID:                       gofakeit.UUID(),
-				Name:                     gofakeit.Name(),
-				State:                    domain.ProjectStateActive,
-				ShouldAssertRole:         true,
-				IsAuthorizationRequired:  true,
-				IsProjectAccessRequired:  true,
-				UsedLabelingSettingOwner: 1,
-			},
-			wantErr: new(database.CheckError),
 		},
 		{
 			name: "empty id error",
@@ -504,13 +489,11 @@ func TestDeleteProject(t *testing.T) {
 			name:             "not found",
 			condition:        projectRepo.PrimaryKeyCondition(instanceID, "foo"),
 			wantRowsAffected: 0,
-			wantErr:          nil,
 		},
 		{
-			name:             "ok",
+			name:             "delete project",
 			condition:        projectRepo.PrimaryKeyCondition(instanceID, existingProject.ID),
 			wantRowsAffected: 1,
-			wantErr:          nil,
 		},
 	}
 

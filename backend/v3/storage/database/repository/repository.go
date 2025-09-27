@@ -30,7 +30,7 @@ func checkRestrictingColumns(
 }
 
 type pkRepository interface {
-	getPrimaryKeyColumns() []database.Column
+	PrimaryKeyColumns() []database.Column
 }
 
 // checkPKCondition checks if the Primary Key columns are part of the condition.
@@ -41,7 +41,7 @@ func checkPKCondition(
 ) error {
 	return checkRestrictingColumns(
 		condition,
-		repo.getPrimaryKeyColumns()...,
+		repo.PrimaryKeyColumns()...,
 	)
 }
 

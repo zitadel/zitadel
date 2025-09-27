@@ -5,7 +5,7 @@ CREATE TYPE zitadel.project_state AS ENUM (
 
 CREATE TABLE zitadel.projects(
     instance_id TEXT NOT NULL
-    , organization_id TEXT NOT NULL CHECK (organization_id <> '')
+    , organization_id TEXT NOT NULL
     , id TEXT NOT NULL CHECK (id <> '')
 
     , created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -36,9 +36,9 @@ CREATE TABLE zitadel.project_roles(
     , updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 
     -- API: role_key
-    , key TEXT NOT NULL CHECK(LENGTH(key) > 0)
+    , key TEXT NOT NULL CHECK (key <> '')
     -- API: display_name
-    , display_name TEXT NOT NULL CHECK(LENGTH(display_name) > 0)
+    , display_name TEXT NOT NULL CHECK (display_name <> '')
     -- API: group
     -- group is a reserved keyword in PostgreSQL
     , role_group TEXT

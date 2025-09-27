@@ -155,6 +155,14 @@ func (project) unqualifiedTableName() string {
 	return "projects"
 }
 
+// PrimaryKeyColumns implements the [pkRepository] interface
+func (p project) PrimaryKeyColumns() []database.Column {
+	return []database.Column{
+		p.InstanceIDColumn(),
+		p.IDColumn(),
+	}
+}
+
 func (p project) InstanceIDColumn() database.Column {
 	return database.NewColumn(p.unqualifiedTableName(), "instance_id")
 }
@@ -229,12 +237,4 @@ func (p project) prepareQuery(opts []database.QueryOption) (*database.StatementB
 	options.Write(builder)
 
 	return builder, nil
-}
-
-// getPrimaryKeyColumns implements the [pkRepository] interface
-func (p project) getPrimaryKeyColumns() []database.Column {
-	return []database.Column{
-		p.InstanceIDColumn(),
-		p.IDColumn(),
-	}
 }

@@ -91,12 +91,16 @@ func (p projectRole) SetRoleGroup(roleGroup string) database.Change {
 // conditions
 // -------------------------------------------------------------
 
-func (p projectRole) InstanceIDCondition(instanceID string) database.Condition {
-	return database.NewTextCondition(p.InstanceIDColumn(), database.TextOperationEqual, instanceID)
+func (p projectRole) PrimaryKeyCondition(instanceID, projectID, key string) database.Condition {
+	return database.And(
+		p.InstanceIDCondition(instanceID),
+		p.ProjectIDCondition(projectID),
+		p.KeyCondition(key),
+	)
 }
 
-func (p projectRole) OrganizationIDCondition(organizationID string) database.Condition {
-	return database.NewTextCondition(p.OrganizationIDColumn(), database.TextOperationEqual, organizationID)
+func (p projectRole) InstanceIDCondition(instanceID string) database.Condition {
+	return database.NewTextCondition(p.InstanceIDColumn(), database.TextOperationEqual, instanceID)
 }
 
 func (p projectRole) ProjectIDCondition(projectID string) database.Condition {
@@ -121,6 +125,15 @@ func (p projectRole) RoleGroupCondition(op database.TextOperation, roleGroup str
 
 func (projectRole) unqualifiedTableName() string {
 	return "project_roles"
+}
+
+// PrimaryKeyColumns implements the [pkRepository] interface
+func (p projectRole) PrimaryKeyColumns() []database.Column {
+	return []database.Column{
+		p.InstanceIDColumn(),
+		p.ProjectIDColumn(),
+		p.KeyColumn(),
+	}
 }
 
 func (p projectRole) InstanceIDColumn() database.Column {
@@ -160,14 +173,14 @@ func (p projectRole) RoleGroupColumn() database.Column {
 // -------------------------------------------------------------
 
 const queryProjectRoleStmt = `SELECT
-	projects.instance_id,	
-	projects.organization_id,
-	projects.project_id,
-	projects.created_at,
-	projects.updated_at,
-	projects.key,
-	projects.display_name,
-	projects.role_group
+	project_roles.instance_id,	
+	project_roles.organization_id,
+	project_roles.project_id,
+	project_roles.created_at,
+	project_roles.updated_at,
+	project_roles.key,
+	project_roles.display_name,
+	project_roles.role_group
 	FROM zitadel.project_roles`
 
 func (p projectRole) prepareQuery(opts []database.QueryOption) (*database.StatementBuilder, error) {
@@ -175,20 +188,11 @@ func (p projectRole) prepareQuery(opts []database.QueryOption) (*database.Statem
 	for _, opt := range opts {
 		opt(options)
 	}
-	if err := checkRestrictingColumns(options.Condition, p.InstanceIDColumn()); err != nil {
+	if err := checkRestrictingColumns(options.Condition, p.InstanceIDColumn(), p.ProjectIDColumn()); err != nil {
 		return nil, err
 	}
 	builder := database.NewStatementBuilder(queryProjectRoleStmt)
 	options.Write(builder)
 
 	return builder, nil
-}
-
-// getPrimaryKeyColumns implements the [pkRepository] interface
-func (p projectRole) getPrimaryKeyColumns() []database.Column {
-	return []database.Column{
-		p.InstanceIDColumn(),
-		p.ProjectIDColumn(),
-		p.KeyColumn(),
-	}
 }

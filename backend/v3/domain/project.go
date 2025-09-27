@@ -30,6 +30,8 @@ type Project struct {
 }
 
 type projectColumns interface {
+	// PrimaryKeyColumns returns the columns for the primary key fields
+	PrimaryKeyColumns() []database.Column
 	// InstanceIDColumn returns the column for the instance id field
 	InstanceIDColumn() database.Column
 	// OrganizationIDColumn returns the column for the organization id field
@@ -115,10 +117,12 @@ type ProjectRole struct {
 	UpdatedAt      time.Time `json:"updatedAt,omitzero" db:"updated_at"`
 	Key            string    `json:"key,omitempty" db:"key"`
 	DisplayName    string    `json:"displayName,omitempty" db:"display_name"`
-	RoleGroup      string    `json:"roleGroup,omitempty" db:"role_group"`
+	RoleGroup      *string   `json:"roleGroup,omitempty" db:"role_group"`
 }
 
 type projectRoleColumns interface {
+	// PrimaryKeyColumns returns the columns for the primary key fields
+	PrimaryKeyColumns() []database.Column
 	// InstanceIDColumn returns the column for the instance id field
 	InstanceIDColumn() database.Column
 	// OrganizationIDColumn returns the column for the organization id field
@@ -138,10 +142,10 @@ type projectRoleColumns interface {
 }
 
 type projectRoleConditions interface {
+	// PrimaryKeyCondition returns a filter on the primary key fields.
+	PrimaryKeyCondition(instanceID, projectID, key string) database.Condition
 	// InstanceIDCondition returns an equal filter on the instance id field.
 	InstanceIDCondition(instanceID string) database.Condition
-	// OrganizationIDCondition returns an equal filter on the organization id field.
-	OrganizationIDCondition(organizationID string) database.Condition
 	// ProjectIDCondition returns an equal filter on the project id field.
 	ProjectIDCondition(projectID string) database.Condition
 	// KeyCondition returns an equal filter on the key field.
