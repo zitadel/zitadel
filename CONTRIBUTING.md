@@ -2,9 +2,9 @@
 
 ## Introduction
 
-Thank you for your interest about how to contribute! As you might know there is more than code to contribute. You can find all information needed to start contributing here.
+Thank you for your interest in contributing! As you might know there is more than code to contribute. You can find all information needed to start contributing here.
 
-Please give us and our community the chance to get rid of security vulnerabilities by responsibly disclose this kind of issues by contacting [security@zitadel.com](mailto:security@zitadel.com).
+Please give us and our community the chance to get rid of security vulnerabilities by responsibly disclosing these issues to [security@zitadel.com](mailto:security@zitadel.com).
 
 The strongest part of a community is the possibility to share thoughts. That's why we try to react as soon as possible to your ideas, thoughts and feedback. We love to discuss as much as possible in an open space like in the [issues](https://github.com/zitadel/zitadel/issues) and [discussions](https://github.com/zitadel/zitadel/discussions) section here or in our [chat](https://zitadel.com/chat), but we understand your doubts and provide further contact options [here](https://zitadel.com/contact).
 
@@ -13,13 +13,13 @@ If you want to give an answer or be part of discussions please be kind. Treat ot
 ## What can I contribute?
 
 For people who are new to Zitadel: We flag issues which are a good starting point to start contributing.
-You find them [here](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+You can find them [here](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
 We add the label "good first issue" for problems we think are a good starting point to contribute to Zitadel.
 
 - [Issues for first time contributors](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
 - [All issues](https://github.com/zitadel/zitadel/issues)
 
-Help shaping the future of Zitadel:
+Help shape the future of Zitadel:
 
 - Join our [chat](https://zitadel.com/chat) and discuss with us or others.
 - Ask or answer questions in the [issues section](https://github.com/zitadel/zitadel/issues)
@@ -37,7 +37,7 @@ Follow [@zitadel](https://twitter.com/zitadel) on twitter
 
 ## How to contribute
 
-We strongly recommend to [talk to us](https://zitadel.com/contact) before you start contributing to streamline our and your work.
+We strongly recommend [talking to us](https://zitadel.com/contact) before you start contributing to streamline your work with ours.
 
 We accept contributions through pull requests.
 You need a github account for that.
@@ -56,11 +56,11 @@ The code consists of the following parts:
 | console         | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](contribute-frontend)      |
 | login           | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./login](./login)                                  | [Contribute to Frontend](contribute-frontend)      |
 | docs            | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](contribute-frontend)      |
-| translations    | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations](contribute-translations) |
+| translations    | Internationalization files for default languages   | [YAML](https://yaml.org/)                                                                                 | [./console](./console) and [./internal](./internal) | [Contribute Translations](contribute-translations) |
 
 Please follow the guides to validate and test the code before you contribute.
 
-### Submit a pull request (PR)
+### Submitting a pull request (PR)
 
 1. [Fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) the [zitadel/zitadel](https://github.com/zitadel/zitadel) repository on GitHub
 2. On your fork, commit your changes to a new branch
@@ -107,7 +107,7 @@ Must be one of the following:
 
 #### Scope
 
-This is optional to indicate which component is affected. In doubt, leave blank (`<type>: <short summary>`)
+This is optional to indicate which component is affected. If in doubt, leave blank (`<type>: <short summary>`)
 
 #### Short summary
 
@@ -162,12 +162,12 @@ By executing the commands from this section, you run everything you need to deve
 > If you don't want to use one of the dev containers, you can develop the backend components directly on your local machine.
 > To do so, proceed with installing the necessary dependencies.
 
-Using [Docker Compose](https://docs.docker.com/compose/), you run a [PostgreSQL](https://www.postgresql.org/download/) on your local machine.
+Using [Docker Compose](https://docs.docker.com/compose/), you run a [PostgreSQL](https://www.postgresql.org/download/) container on your local machine.
 With [make](https://www.gnu.org/software/make/), you build a debuggable Zitadel binary and run it using [delve](https://github.com/go-delve/delve).
 Then, you test your changes via the console your binary is serving at http://<span because="breaks the link"></span>localhost:8080 and by verifying the database.
 Once you are happy with your changes, you run end-to-end tests and tear everything down.
 
-Zitadel uses [golangci-lint v2](https://golangci-lint.run) for code quality checks. Please use [this configuration](.golangci.yaml) when running `golangci-lint`. We recommend to set golangci-lint as linter in your IDE.
+Zitadel uses [golangci-lint v2](https://golangci-lint.run) for code quality checks. Please use [this configuration](.golangci.yaml) when running `golangci-lint`. We recommend setting golangci-lint as the linter in your IDE.
 
 The commands in this section are tested against the following software versions:
 
@@ -184,17 +184,17 @@ Make some changes to the source code, then run the database locally.
 docker compose --file ./e2e/docker-compose.yaml up --detach db
 ```
 
-Build the binary. This takes some minutes, but you can speed up rebuilds.
+Build the binary. This takes a few minutes, but you can speed up rebuilds.
 
 ```bash
 make compile
 ```
 
 > Note: With this command, several steps are executed.
-> For speeding up rebuilds, you can reexecute only specific steps you think are necessary based on your changes.  
-> Generating gRPC stubs: `make core_api`  
-> Running unit tests: `make core_unit_test`  
-> Generating the console: `make console_build console_move`  
+> For speeding up rebuilds, you can reexecute only specific steps you think are necessary based on your changes.
+> Generating gRPC stubs: `make core_api`
+> Running unit tests: `make core_unit_test`
+> Generating the console: `make console_build console_move`
 > Build the binary: `make compile`
 
 You can now run and debug the binary in .artifacts/zitadel/zitadel using your favourite IDE, for example GoLand.
@@ -221,8 +221,8 @@ In order to prepare the local system, the following will bring up the database, 
 make core_integration_db_up core_integration_server_start
 ```
 
-When this job is finished, you can run individual package integration test through your IDE or command-line. The actual integration test clients reside in the `integration_test` subdirectory of the package they aim to test. Integration test files use the `integration` build tag, in order to be excluded from regular unit tests.
-Because of the server-client split, Go is usually unaware of changes in server code and tends to cache test results. Pas `-count 1` to disable test caching.
+When this job is finished, you can run individual package integration tests through your IDE or command-line. The actual integration test clients reside in the `integration_test` subdirectory of the package they aim to test. Integration test files use the `integration` build tag, in order to be excluded from regular unit tests.
+Because of the server-client split, Go is usually unaware of changes in server code and tends to cache test results. Pass `-count 1` to disable test caching.
 
 Example command to run a single package integration test:
 
@@ -248,7 +248,7 @@ To cleanup after testing (deletes the database!):
 make core_integration_server_stop core_integration_db_down
 ```
 
-The test binary has the race detector enabled. `core_core_integration_server_stop` checks for any race logs reported by Go and will print them along a `66` exit code when found. Note that the actual race condition may have happened anywhere during the server lifetime, including start, stop or serving gRPC requests during tests.
+The test binary has the race detector enabled. `core_core_integration_server_stop` checks for any race logs reported by Go and will print them along with a `66` exit code when found. Note that the actual race condition may have happened anywhere during the server lifetime, including start, stop or serving gRPC requests during tests.
 
 ### Run Local End-to-End Tests
 
@@ -563,13 +563,13 @@ You can use dev containers if you'd like to make sure you have the same developm
 The following dev containers are available:
 
 - **.devcontainer/base/devcontainer.json**: Contains everything you need to run whatever you want.
-- **.devcontainer/turbo-lint-unit/devcontainer.json**: Runs a dev container that executes frontent linting and unit tests and then exits. This is useful to reproduce the corresponding GitHub PR check. 
+- **.devcontainer/turbo-lint-unit/devcontainer.json**: Runs a dev container that executes frontent linting and unit tests and then exits. This is useful to reproduce the corresponding GitHub PR check.
 - **.devcontainer/turbo-lint-unit-debug/devcontainer.json**: Runs a dev container that executes frontent linting and unit tests in watch mode. You can fix the errors right away and have immediate feedback.
 - **.devcontainer/login-integration/devcontainer.json**: Runs a dev container that executes login integration tests and then exits. This is useful to reproduce the corresponding GitHub PR check.
 - **.devcontainer/login-integration-debug/devcontainer.json**: Runs a dev container that spins up the login in a hot-reloading dev server and executes login integration tests interactively. You can fix the errors right away and have immediate feedback.
 
 You can also run the GitHub PR checks locally in dev containers without having to connect to a dev container.
- 
+
 
 The following pnpm commands use the [devcontainer CLI](https://github.com/devcontainers/cli/) and exit when the checks are done.
 The minimal system requirements are having Docker and the devcontainers CLI installed.
