@@ -52,6 +52,13 @@ function addRequiredEventListener(inputs, checks, form, button) {
       }
     }
   }
+
+  // Register reCAPTCHA event if it's loaded
+  if (document.getElementById("captcha") !== null) {
+    window.addEventListener("captchaChanged", function () {
+      toggleButton(checks, form, inputs, button);
+    });
+  }
 }
 
 function disableDoubleSubmit(form, button) {
@@ -63,7 +70,14 @@ function disableDoubleSubmit(form, button) {
 
 function toggleButton(checks, form, inputs, button) {
   if (checks !== undefined) {
-    if (checks() === false) {
+    if (Array.isArray(checks)) {
+      for (const check of checks) {
+        if (check() === false) {
+          button.disabled = true;
+          return;
+        }
+      }
+    } else if (checks() === false) {
       button.disabled = true;
       return;
     }

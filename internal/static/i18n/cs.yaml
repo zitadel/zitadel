@@ -608,6 +608,12 @@ Errors:
     FeatureDisabled: Funkce webového klíče je zakázána
     NoActive: Nebyl nalezen žádný aktivní webový klíč
     NotFound: Webový klíč nebyl nalezen
+  Captcha:
+    InitializationFailed: Nepodařilo se inicializovat Captcha
+    InvalidCaptcha: Ověření Captcha selhalo. Token je neplatný nebo vypršel
+    MissingToken: Chybí Captcha token
+    UnexpectedType: Neočekávaný typ Captcha v konfiguraci
+    ValidationFailed: Při ověřování Captcha tokenu došlo k chybě
 
 AggregateTypes:
   action: Akce

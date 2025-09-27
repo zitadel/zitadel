@@ -527,5 +527,11 @@ Errors:
       RegistrationNotAllowed: Registration is not allowed
   DeviceAuth:
     NotExisting: User Code doesn't exist
+  Captcha:
+    InitializationFailed: Failed to initialize Captcha
+    InvalidCaptcha: Captcha verification failed. The token is invalid or expired
+    MissingToken: Captcha token is missing
+    UnexpectedType: Unexpected Captcha type in configuration
+    ValidationFailed: An error occurred while validating the Captcha token
 
 optional: (optional)

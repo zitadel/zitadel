@@ -31,6 +31,11 @@ func AddLoginPolicyToCommand(p *mgmt_pb.AddCustomLoginPolicyRequest) *command.Ad
 		IDPProviders:               addLoginPolicyIDPsToCommand(p.Idps),
 		DisableLoginWithEmail:      p.DisableLoginWithEmail,
 		DisableLoginWithPhone:      p.DisableLoginWithPhone,
+		EnableRegistrationCaptcha:  p.EnableRegistrationCaptcha,
+		EnableLoginCaptcha:         p.EnableLoginCaptcha,
+		CaptchaType:                policy_grpc.CaptchaTypeToDomain(p.CaptchaType),
+		CaptchaSiteKey:             p.CaptchaSiteKey,
+		CaptchaSecretKey:           p.CaptchaSecretKey,
 	}
 }
 func addLoginPolicyIDPsToCommand(idps []*mgmt_pb.AddCustomLoginPolicyRequest_IDP) []*command.AddLoginPolicyIDP {
@@ -63,6 +68,11 @@ func updateLoginPolicyToCommand(p *mgmt_pb.UpdateCustomLoginPolicyRequest) *comm
 		MFAInitSkipLifetime:        p.MfaInitSkipLifetime.AsDuration(),
 		SecondFactorCheckLifetime:  p.SecondFactorCheckLifetime.AsDuration(),
 		MultiFactorCheckLifetime:   p.MultiFactorCheckLifetime.AsDuration(),
+		EnableRegistrationCaptcha:  p.EnableRegistrationCaptcha,
+		EnableLoginCaptcha:         p.EnableLoginCaptcha,
+		CaptchaType:                policy_grpc.CaptchaTypeToDomain(p.CaptchaType),
+		CaptchaSiteKey:             p.CaptchaSiteKey,
+		CaptchaSecretKey:           p.CaptchaSecretKey,
 	}
 }
 

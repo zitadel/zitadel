@@ -28,6 +28,11 @@ type LoginPolicyWriteModel struct {
 	MFAInitSkipLifetime        time.Duration
 	SecondFactorCheckLifetime  time.Duration
 	MultiFactorCheckLifetime   time.Duration
+	EnableRegistrationCaptcha  bool
+	EnableLoginCaptcha         bool
+	CaptchaType                domain.CaptchaType
+	CaptchaSiteKey             string
+	CaptchaSecretKey           string
 	State                      domain.PolicyState
 }
 
@@ -52,6 +57,11 @@ func (wm *LoginPolicyWriteModel) Reduce() error {
 			wm.MFAInitSkipLifetime = e.MFAInitSkipLifetime
 			wm.SecondFactorCheckLifetime = e.SecondFactorCheckLifetime
 			wm.MultiFactorCheckLifetime = e.MultiFactorCheckLifetime
+			wm.EnableRegistrationCaptcha = e.EnableRegistrationCaptcha
+			wm.EnableLoginCaptcha = e.EnableLoginCaptcha
+			wm.CaptchaType = e.CaptchaType
+			wm.CaptchaSiteKey = e.CaptchaSiteKey
+			wm.CaptchaSecretKey = e.CaptchaSecretKey
 			wm.State = domain.PolicyStateActive
 		case *policy.LoginPolicyChangedEvent:
 			if e.AllowRegister != nil {
@@ -104,6 +114,21 @@ func (wm *LoginPolicyWriteModel) Reduce() error {
 			}
 			if e.DisableLoginWithPhone != nil {
 				wm.DisableLoginWithPhone = *e.DisableLoginWithPhone
+			}
+			if e.EnableRegistrationCaptcha != nil {
+				wm.EnableRegistrationCaptcha = *e.EnableRegistrationCaptcha
+			}
+			if e.EnableLoginCaptcha != nil {
+				wm.EnableLoginCaptcha = *e.EnableLoginCaptcha
+			}
+			if e.CaptchaType != nil {
+				wm.CaptchaType = *e.CaptchaType
+			}
+			if e.CaptchaSiteKey != nil {
+				wm.CaptchaSiteKey = *e.CaptchaSiteKey
+			}
+			if e.CaptchaSecretKey != nil {
+				wm.CaptchaSecretKey = *e.CaptchaSecretKey
 			}
 		case *policy.LoginPolicyRemovedEvent:
 			wm.State = domain.PolicyStateRemoved

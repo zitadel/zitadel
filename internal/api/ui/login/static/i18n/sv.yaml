@@ -527,5 +527,11 @@ Errors:
       RegistrationNotAllowed: Registrering är inte tillåten
   DeviceAuth:
     NotExisting: Användarkoden finns inte
+  Captcha:
+    InitializationFailed: Misslyckades att initialisera Captcha
+    InvalidCaptcha: Captcha-verifieringen misslyckades. Token är ogiltig eller har gått ut
+    MissingToken: Captcha-token saknas
+    UnexpectedType: Oväntad Captcha-typ i konfigurationen
+    ValidationFailed: Ett fel uppstod vid validering av Captcha-token
 
 optional: (frivilligt)

@@ -611,6 +611,12 @@ Errors:
     FeatureDisabled: Web anahtarı özelliği devre dışı
     NoActive: Aktif web anahtarı bulunamadı
     NotFound: Web anahtarı bulunamadı
+  Captcha:
+    InitializationFailed: Captcha başlatılamadı
+    InvalidCaptcha: Captcha doğrulaması başarısız. Jeton geçersiz veya süresi dolmuş
+    MissingToken: Captcha jetonu eksik
+    UnexpectedType: Yapılandırmada beklenmeyen Captcha türü
+    ValidationFailed: Captcha jetonunu doğrularken bir hata oluştu
 
 AggregateTypes:
   action: Eylem
@@ -1365,7 +1371,6 @@ EventTypes:
         code:
           added: Telefon numarası doğrulama kodu oluşturuldu
           sent: Telefon numarası doğrulama kodu gönderildi
-
 
   web_key:
     added: Web Anahtarı eklendi
