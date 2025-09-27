@@ -89,7 +89,7 @@
       ]
     },
     "test-integration-run-login": {
-      "description": "Runs the Login application under test",
+      "description": "Runs the Login application under test. It has its own target, separate from test-integration, because it's a continuous task.",
       "dependsOn": [
         "build"
       ],

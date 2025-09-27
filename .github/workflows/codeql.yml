@@ -25,7 +25,7 @@ jobs:
       matrix:
         language: [go,javascript]
     steps:
-    - name: Checkout repository
+    - name: Checkout Repository
       uses: actions/checkout@v4
     - if: matrix.language == 'go'
       name: Install Go
@@ -35,7 +35,8 @@ jobs:
     - if: matrix.language == 'go'
       name: Set up pnpm
       uses: pnpm/action-setup@v4
-    - if: matrix.language == 'go'
+    - name: Generate gRPC Stubs and Static Assets
+      if: matrix.language == 'go'
       run: |
         pnpm install --frozen-lockfile
         pnpm nx run-many --nxBail --projects @zitadel/api --targets generate-stubs generate-statik generate-assets

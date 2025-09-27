@@ -5,10 +5,7 @@
     "db": {
       "continuous": true,
       "description": "Runs a local Postgres database for development",
-      "command": "nx run @zitadel/devcontainer:compose up db",
-      "options": {
-        "cwd": "{workspaceRoot}/.devcontainer"
-      }
+      "command": "nx run @zitadel/devcontainer:compose up db"
     },
     "clean": {
       "description": "Cleans all local-only files relating to the Zitadel platform (API, Login and Console)",

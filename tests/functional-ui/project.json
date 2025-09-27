@@ -51,7 +51,8 @@
         "parallel": false,
         "cwd": "{projectRoot}",
         "commands": [
-          "pnpm cypress run --browser firefox --reporter-options reportDir=cypress/results/firefox --config videosFolder=cypress/videos/firefox,screenshotsFolder=cypress/screenshots/firefox",
+          "pnpm cypress install",
+          "DISPLAY='' pnpm cypress run --browser firefox --reporter-options reportDir=cypress/results/firefox --config videosFolder=cypress/videos/firefox,screenshotsFolder=cypress/screenshots/firefox",
           "nx run @zitadel/devcontainer:compose down db-functional-ui"
         ]
       },
@@ -70,7 +71,8 @@
         "parallel": false,
         "cwd": "{projectRoot}",
         "commands": [
-          "pnpm cypress run --browser chrome --reporter-options reportDir=cypress/results/chrome --config videosFolder=cypress/videos/chrome,screenshotsFolder=cypress/screenshots/chrome",
+          "pnpm cypress install",
+          "DISPLAY='' pnpm cypress run --browser chrome --reporter-options reportDir=cypress/results/chrome --config videosFolder=cypress/videos/chrome,screenshotsFolder=cypress/screenshots/chrome",
           "nx run @zitadel/devcontainer:compose down db-functional-ui"
         ]
       },
