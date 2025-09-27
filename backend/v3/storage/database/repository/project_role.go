@@ -11,9 +11,9 @@ import (
 // repository
 // -------------------------------------------------------------
 
-type projectRoles struct{}
+type projectRole struct{}
 
-func (p projectRoles) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.ProjectRole, error) {
+func (p projectRole) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.ProjectRole, error) {
 	builder, err := p.prepareQuery(opts)
 	if err != nil {
 		return nil, err
@@ -21,7 +21,7 @@ func (p projectRoles) Get(ctx context.Context, client database.QueryExecutor, op
 	return getOne[domain.ProjectRole](ctx, client, builder)
 }
 
-func (p projectRoles) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.ProjectRole, error) {
+func (p projectRole) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.ProjectRole, error) {
 	builder, err := p.prepareQuery(opts)
 	if err != nil {
 		return nil, err
@@ -35,7 +35,7 @@ const insertProjectRoleStmt = `INSERT INTO zitadel.project_roles(
 VALUES ($1, $2, $3, $4, $5, $6)
 RETURNING created_at, updated_at`
 
-func (p projectRoles) Create(ctx context.Context, client database.QueryExecutor, role *domain.ProjectRole) error {
+func (p projectRole) Create(ctx context.Context, client database.QueryExecutor, role *domain.ProjectRole) error {
 	builder := database.NewStatementBuilder(insertProjectRoleStmt,
 		role.InstanceID,
 		role.OrganizationID,
@@ -48,7 +48,7 @@ func (p projectRoles) Create(ctx context.Context, client database.QueryExecutor,
 		Scan(&role.CreatedAt, &role.UpdatedAt)
 }
 
-func (p projectRoles) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+func (p projectRole) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}
@@ -65,7 +65,7 @@ func (p projectRoles) Update(ctx context.Context, client database.QueryExecutor,
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-func (p projectRoles) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+func (p projectRole) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	if err := checkPKCondition(p, condition); err != nil {
 		return 0, err
 	}
@@ -79,11 +79,11 @@ func (p projectRoles) Delete(ctx context.Context, client database.QueryExecutor,
 // changes
 // -------------------------------------------------------------
 
-func (p projectRoles) SetDisplayName(displayName string) database.Change {
+func (p projectRole) SetDisplayName(displayName string) database.Change {
 	return database.NewChange(p.DisplayNameColumn(), displayName)
 }
 
-func (p projectRoles) SetRoleGroup(roleGroup string) database.Change {
+func (p projectRole) SetRoleGroup(roleGroup string) database.Change {
 	return database.NewChange(p.RoleGroupColumn(), roleGroup)
 }
 
@@ -91,27 +91,27 @@ func (p projectRoles) SetRoleGroup(roleGroup string) database.Change {
 // conditions
 // -------------------------------------------------------------
 
-func (p projectRoles) InstanceIDCondition(instanceID string) database.Condition {
+func (p projectRole) InstanceIDCondition(instanceID string) database.Condition {
 	return database.NewTextCondition(p.InstanceIDColumn(), database.TextOperationEqual, instanceID)
 }
 
-func (p projectRoles) OrganizationIDCondition(organizationID string) database.Condition {
+func (p projectRole) OrganizationIDCondition(organizationID string) database.Condition {
 	return database.NewTextCondition(p.OrganizationIDColumn(), database.TextOperationEqual, organizationID)
 }
 
-func (p projectRoles) ProjectIDCondition(projectID string) database.Condition {
+func (p projectRole) ProjectIDCondition(projectID string) database.Condition {
 	return database.NewTextCondition(p.ProjectIDColumn(), database.TextOperationEqual, projectID)
 }
 
-func (p projectRoles) KeyCondition(key string) database.Condition {
+func (p projectRole) KeyCondition(key string) database.Condition {
 	return database.NewTextCondition(p.KeyColumn(), database.TextOperationEqual, key)
 }
 
-func (p projectRoles) DisplayNameCondition(op database.TextOperation, displayName string) database.Condition {
+func (p projectRole) DisplayNameCondition(op database.TextOperation, displayName string) database.Condition {
 	return database.NewTextCondition(p.DisplayNameColumn(), op, displayName)
 }
 
-func (p projectRoles) RoleGroupCondition(op database.TextOperation, roleGroup string) database.Condition {
+func (p projectRole) RoleGroupCondition(op database.TextOperation, roleGroup string) database.Condition {
 	return database.NewTextCondition(p.RoleGroupColumn(), op, roleGroup)
 }
 
@@ -119,39 +119,39 @@ func (p projectRoles) RoleGroupCondition(op database.TextOperation, roleGroup st
 // columns
 // -------------------------------------------------------------
 
-func (projectRoles) unqualifiedTableName() string {
+func (projectRole) unqualifiedTableName() string {
 	return "project_roles"
 }
 
-func (p projectRoles) InstanceIDColumn() database.Column {
+func (p projectRole) InstanceIDColumn() database.Column {
 	return database.NewColumn(p.unqualifiedTableName(), "instance_id")
 }
 
-func (p projectRoles) OrganizationIDColumn() database.Column {
+func (p projectRole) OrganizationIDColumn() database.Column {
 	return database.NewColumn(p.unqualifiedTableName(), "organization_id")
 }
 
-func (p projectRoles) ProjectIDColumn() database.Column {
+func (p projectRole) ProjectIDColumn() database.Column {
 	return database.NewColumn(p.unqualifiedTableName(), "project_id")
 }
 
-func (p projectRoles) CreatedAtColumn() database.Column {
+func (p projectRole) CreatedAtColumn() database.Column {
 	return database.NewColumn(p.unqualifiedTableName(), "created_at")
 }
 
-func (p projectRoles) UpdatedAtColumn() database.Column {
+func (p projectRole) UpdatedAtColumn() database.Column {
 	return database.NewColumn(p.unqualifiedTableName(), "updated_at")
 }
 
-func (p projectRoles) KeyColumn() database.Column {
+func (p projectRole) KeyColumn() database.Column {
 	return database.NewColumn(p.unqualifiedTableName(), "key")
 }
 
-func (p projectRoles) DisplayNameColumn() database.Column {
+func (p projectRole) DisplayNameColumn() database.Column {
 	return database.NewColumn(p.unqualifiedTableName(), "display_name")
 }
 
-func (p projectRoles) RoleGroupColumn() database.Column {
+func (p projectRole) RoleGroupColumn() database.Column {
 	return database.NewColumn(p.unqualifiedTableName(), "role_group")
 }
 
@@ -170,7 +170,7 @@ const queryProjectRoleStmt = `SELECT
 	projects.role_group
 	FROM zitadel.project_roles`
 
-func (p projectRoles) prepareQuery(opts []database.QueryOption) (*database.StatementBuilder, error) {
+func (p projectRole) prepareQuery(opts []database.QueryOption) (*database.StatementBuilder, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
@@ -185,7 +185,7 @@ func (p projectRoles) prepareQuery(opts []database.QueryOption) (*database.State
 }
 
 // getPrimaryKeyColumns implements the [pkRepository] interface
-func (p projectRoles) getPrimaryKeyColumns() []database.Column {
+func (p projectRole) getPrimaryKeyColumns() []database.Column {
 	return []database.Column{
 		p.InstanceIDColumn(),
 		p.ProjectIDColumn(),

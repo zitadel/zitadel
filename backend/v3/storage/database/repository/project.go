@@ -19,7 +19,7 @@ func ProjectRepository() domain.ProjectRepository {
 }
 
 func (project) Role() domain.ProjectRoleRepository {
-	return projectRoles{}
+	return projectRole{}
 }
 
 func (p project) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Project, error) {
