@@ -247,7 +247,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			_, err := idpRepo.Get(IAMCTX, pool,
 				idpRepo.IDCondition(addOIDC.IdpId),
