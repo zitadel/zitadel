@@ -129,36 +129,10 @@ With the introduction of passkeys the gesture can be provided on ANY of the user
 This is not strictly the device where the login flow is being executed (e.g., on a mobile device).
 The user experience depends mainly on the operating system and browser.
 
-## Hosted Login Version 2 (Beta)
+## Hosted Login Version 2
 
-We have worked on a new, self-hostable implementation of our hosted login built with Next.js and leveraging our [Session API](/docs/guides/integrate/login/login-users#zitadels-session-api).
-This solution empowers you to easily fork and customize the login experience to perfectly match your brand and needs.
-
-In this initial release, the new login is available for self-hosting only. We'll be progressively replacing the built-in login with this improved version, built with [TypeScript](https://github.com/zitadel/typescript).
-
-### Current State
-
-:::info
-The documentation describes the state of the feature in ZITADEL V3.
-:::
-
-Our primary goal for the TypeScript login system is to replace the existing login functionality within Zitadel Core, which is shipped with Zitadel automatically. This will allow us to leverage the benefits of the new system, including its modular architecture and enhanced security features.
-
-To achieve this, we are actively working on implementing the core features currently available in Zitadel Core, such as:
-
-- **Authentication Methods:**
-  - Username and Password
-  - Passkeys
-  - Multi-Factor Authentication (MFA)
-  - External Identity Providers (OIDC, SAML, etc.)
-- **OpenID Connect (OIDC) Compliance:** Adherence to the OIDC standard for seamless integration with various identity providers.
-- **Customization**:
-  - Branding options to match your organization's identity.
-  - Flexible configuration settings to tailor the login experience.
-
-The full feature list can be found [here](https://github.com/zitadel/typescript?tab=readme-ov-file#features-list).
-
-As we continue to develop the TypeScript login system, we will provide regular updates on its progress and new capabilities.
+We have worked on a new, self-hostable implementation of our hosted MIT licensed login built with Next.js and leveraging our [Session API](/docs/guides/integrate/login/login-users#zitadels-session-api).
+This solution empowers you to easily customize the login experience to perfectly match your brand and needs.
 
 ### Limitations
 
@@ -172,17 +146,21 @@ For the first implementation we have excluded the following features:
   - As passkey and u2f is bound to a domain, it is important to notice, that setting up the authentication possibility in the ZITADEL management console (Self-service), will not work if the login runs on a different domain
 - Custom Login Texts
 
-### Beta Testing
+### Important Changes
 
-The TypeScript login system is currently in beta testing. Your feedback is invaluable in helping us refine and improve this new solution.
-At your convenience please open any issues faced on our Typescript Login GitHub repository to report bugs or suggest enhancements while more general feedback can be shared directly to fabienne@zitadel.com.
-Your contributions will play a crucial role in shaping the future of our login system. Thank you for your support!
+- **Create Users:** The new typescript login is built with the session and the user V2 API, the users V2 API does have some differences to the v1 API, so make sure you create users through the new API.
+- **External IDPs:** If you want to use external identity provider login, such as Login with Google or Apple. You can follow our existing setup guides, just make sure to use the following redirect url: `${CUSTOM_DOMAIN}/idps/callback`
+- **Passkey/U2F:** Those authentication methods are bound to a domain. As your new login runs on a different domain than the previous login, existing passwordless authentication and u2f (fingerprint, face id, etc.) can’t be used. Also when they are managed through the management console of ZITADEL, they are added on a different domain.
+  <br />
+  *Note: If you run the login on a subdomain of your current instance, this problem
+  can be avoided. E.g myinstance.zitadel.cloud and login.myinstance.zitadel.cloud*
 
 #### Step-by-step Guide
 
-**Trying out the new login:** To preview the new login without changing your current setup, the easiest way is to visit `https://<CUSTOM_DOMAIN>/ui/v2/login` on your Zitadel Cloud custom domain. You can also activate the v2 login for your apps, so users are redirected to `/ui/v2/login` for authentication.
+**Using the new login:** To use the new login without changing your current setup, the easiest way is to visit `https://<CUSTOM_DOMAIN>/ui/v2/login` on your Zitadel Cloud custom domain.
+You can also activate the v2 login for your apps, so users are redirected to `/ui/v2/login` for authentication.
 
-**Customizing the new login:** The easiest way to actually customizing it is to fork the https://github.com/zitadel/typescript repo and use the "Deploy" button to run your code on Vercel.
+**Customizing the new login:** The easiest way to actually customizing it is to fork the https://github.com/zitadel/zitadel repo and use the [Deploy with Vercel button](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#login-deploy) to run your login code on Vercel.
 
 <Tabs queryString="deployment">
     <TabItem value="zitadel_cloud" label="Activate Zitadel Cloud V2 Login" default="true">
@@ -199,12 +177,12 @@ Your contributions will play a crucial role in shaping the future of our login s
     </TabItem>
     <TabItem value="vercel_custom" label="Vercel Custom Login Deployment">
 
-        The simplest way to deploy the new login for yourself is by using the [“Deploy” button in our repository](https://github.com/zitadel/typescript?tab=readme-ov-file#deploy-to-vercel) to deploy the login directly to your Vercel.
+        The simplest way to deploy the new login for yourself is by using the [Deploy with Vercel button](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#login-deploy) to deploy the login directly to your Vercel.
 
         1. [Create a service user](https://zitadel.com/docs/guides/integrate/service-users/personal-access-token#create-a-service-user-with-a-pat) with a PAT in your instance
         2. Give the user IAM_LOGIN_CLIENT Permissions in the default settings (CUSTOM_DOMAIN/ui/console/instance?id=organizations)
         Note: [Zitadel Manager Guide](https://zitadel.com/docs/guides/manage/console/managers)
-        3. Deploy login to Vercel: You can do so by directly clicking the [“Deploy” button](https://github.com/zitadel/typescript?tab=readme-ov-file#deploy-to-vercel) at the bottom of the readme in our [repository](https://github.com/zitadel/typescript)
+        3. Deploy login to Vercel: You can do so by directly clicking the [“Deploy” button](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#login-deploy) in our [repository](https://github.com/zitadel/zitadel)
         4. If you have used the deploy button in the steps before, you will automatically be asked for this step. Enter the environment variables in Vercel
            - PAT
            - ZITADEL_API_URL (Example: https://my-domain.zitadel.cloud, no trailing slash)
@@ -221,13 +199,3 @@ Your contributions will play a crucial role in shaping the future of our login s
     </TabItem>
 </Tabs>
 
-### Important Notes
-
-As this feature is currently in Beta, please be aware of some potential workarounds and important considerations before implementation.
-
-- **Create Users:** The new typescript login is built with the session and the user V2 API, the users V2 API does have some differences to the v1 API, so make sure you create users through the new API.
-- **External IDPs:** If you want to use external identity provider login, such as Login with Google or Apple. You can follow our existing setup guides, just make sure to use the following redirect url: `${CUSTOM_DOMAIN}/idps/callback`
-- **Passkey/U2F:** Those authentication methods are bound to a domain. As your new login runs on a different domain than the previous login, existing passwordless authentication and u2f (fingerprint, face id, etc.) can’t be used. Also when they are managed through the management console of ZITADEL, they are added on a different domain.
-  <br />
-  *Note: If you run the login on a subdomain of your current instance, this problem
-  can be avoided. E.g myinstance.zitadel.cloud and login.myinstance.zitadel.cloud*
