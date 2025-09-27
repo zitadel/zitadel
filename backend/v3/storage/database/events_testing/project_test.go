@@ -48,7 +48,7 @@ func TestServer_ProjectReduces(t *testing.T) {
 			assert.True(collect, dbProject.IsProjectAccessRequired)
 			assert.NotNil(collect, dbProject.CreatedAt)
 			assert.NotNil(collect, dbProject.UpdatedAt)
-		}, time.Minute, tick, "project not found within %v: %v", retryDuration, err)
+		}, retryDuration, tick, "project not found within %v: %v", retryDuration, err)
 	})
 
 	t.Run("update project reduces", func(t *testing.T) {
@@ -72,7 +72,7 @@ func TestServer_ProjectReduces(t *testing.T) {
 			assert.False(collect, dbProject.IsAuthorizationRequired)
 			assert.False(collect, dbProject.IsProjectAccessRequired)
 			assert.Equal(collect, int16(2), dbProject.UsedLabelingSettingOwner)
-		}, time.Minute, tick, "project not updated within %v: %v", retryDuration, err)
+		}, retryDuration, tick, "project not updated within %v: %v", retryDuration, err)
 	})
 
 	t.Run("(de)activate project reduces", func(t *testing.T) {
@@ -87,7 +87,7 @@ func TestServer_ProjectReduces(t *testing.T) {
 			))
 			require.NoError(collect, err)
 			assert.Equal(collect, domain.ProjectStateInactive, dbProject.State)
-		}, time.Minute, tick, "project not deactivated within %v: %v", retryDuration, err)
+		}, retryDuration, tick, "project not deactivated within %v: %v", retryDuration, err)
 
 		_, err = ProjectClient.ActivateProject(CTX, &v2beta_project.ActivateProjectRequest{
 			Id: createRes.GetId(),
@@ -100,7 +100,7 @@ func TestServer_ProjectReduces(t *testing.T) {
 			))
 			require.NoError(collect, err)
 			assert.Equal(collect, domain.ProjectStateActive, dbProject.State)
-		}, time.Minute, tick, "project not activated within %v: %v", retryDuration, err)
+		}, retryDuration, tick, "project not activated within %v: %v", retryDuration, err)
 	})
 
 	t.Run("delete project reduces", func(t *testing.T) {
@@ -114,6 +114,6 @@ func TestServer_ProjectReduces(t *testing.T) {
 				projectRepo.PrimaryKeyCondition(instanceID, createRes.GetId()),
 			))
 			require.ErrorIs(collect, err, database.NewNoRowFoundError(nil))
-		}, time.Minute, tick, "project not deleted within %v: %v", retryDuration, err)
+		}, retryDuration, tick, "project not deleted within %v: %v", retryDuration, err)
 	})
 }
