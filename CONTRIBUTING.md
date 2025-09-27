@@ -584,7 +584,6 @@ Use [Corepack](https://pnpm.io/installation#using-corepack) to install pnpm.
 This makes sure you have the pnpm version installed that is declared in [](./package.json)
 
 ```bash
-npm install --global corepack@latest
 corepack enable
 ```
 

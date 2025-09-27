@@ -10,7 +10,6 @@ Run the following commands from the repositorys root directory to install all de
 Using Corepack makes sure you have the pnpm version intalled that is declared in [](../package.json).
 
 ```bash
-npm install --global corepack@latest
 corepack enable
 pnpm install
 ```
