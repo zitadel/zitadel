@@ -99,6 +99,7 @@ linters:
       - .github
       - .keys
       - .vscode
+      - .devcontainer
       - build
       - deploy
       - guides
@@ -113,12 +114,13 @@ linters:
       - packages
       - console
       - docs
-      - load-test
+      - benchmark
+      - tests
 
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
-  new-from-rev: main
+  new-from-rev: origin/main
 formatters:
   enable:
     - gci
@@ -138,6 +140,7 @@ formatters:
       - .github
       - .keys
       - .vscode
+      - .devcontainer
       - build
       - deploy
       - guides
@@ -152,4 +155,5 @@ formatters:
       - packages
       - console
       - docs
-      - load-test
+      - benchmark
+      - tests

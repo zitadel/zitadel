@@ -1,0 +1,47 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "maxCacheSize": "5GB",
+  "workspaceLayout": {
+    "libsDir": "packages"
+  },
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*"
+    ]
+  },
+  "targetDefaults": {
+    "generate": {
+      "cache": true,
+      "inputs": [
+        "default"
+      ]
+    },
+    "build": {
+      "cache": true,
+      "inputs": [
+        "default"
+      ],
+      "dependsOn": [
+        "^build",
+        "generate"
+      ]
+    },
+    "lint": {
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    },
+    "test-unit": {
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    },
+    "test-integration": {
+      "inputs": [
+        "default"
+      ]
+    }
+  }
+}
