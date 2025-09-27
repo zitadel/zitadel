@@ -54,6 +54,8 @@ func (wm *OIDCSessionWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *oidcsession.AddedEvent:
 			wm.reduceAdded(e)
+		case *oidcsession.TerminatedEvent:
+			wm.reduceTerminated(e)
 		case *oidcsession.AccessTokenAddedEvent:
 			wm.reduceAccessTokenAdded(e)
 		case *oidcsession.AccessTokenRevokedEvent:
@@ -76,6 +78,7 @@ func (wm *OIDCSessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			oidcsession.AddedType,
+			oidcsession.TerminatedType,
 			oidcsession.AccessTokenAddedType,
 			oidcsession.RefreshTokenAddedType,
 			oidcsession.RefreshTokenRenewedType,
@@ -107,6 +110,10 @@ func (wm *OIDCSessionWriteModel) reduceAdded(e *oidcsession.AddedEvent) {
 	if wm.ResourceOwner == "" {
 		wm.aggregate = &oidcsession.NewAggregate(wm.AggregateID, e.Aggregate().ResourceOwner).Aggregate
 	}
+}
+
+func (wm *OIDCSessionWriteModel) reduceTerminated(e *oidcsession.TerminatedEvent) {
+	wm.State = domain.OIDCSessionStateTerminated
 }
 
 func (wm *OIDCSessionWriteModel) reduceAccessTokenAdded(e *oidcsession.AccessTokenAddedEvent) {

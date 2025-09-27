@@ -85,6 +85,16 @@ func (s *Server) CreateCallback(ctx context.Context, req *connect.Request[oidc_p
 	}
 }
 
+func (s *Server) DeleteSession(ctx context.Context, req *connect.Request[oidc_pb.DeleteSessionRequest]) (*connect.Response[oidc_pb.DeleteSessionResponse], error) {
+	details, err := s.command.TerminateOIDCSession(ctx, req.Msg.SessionId)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&oidc_pb.DeleteSessionResponse{
+		Details: object.DomainToDetailsPb(details),
+	}), nil
+}
+
 func (s *Server) failAuthRequest(ctx context.Context, authRequestID string, ae *oidc_pb.AuthorizationError) (*connect.Response[oidc_pb.CreateCallbackResponse], error) {
 	details, aar, err := s.command.FailAuthRequest(ctx, authRequestID, errorReasonToDomain(ae.GetError()))
 	if err != nil {
