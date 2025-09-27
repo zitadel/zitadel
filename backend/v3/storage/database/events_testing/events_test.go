@@ -19,20 +19,22 @@ import (
 	v2beta "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
+	v2beta_project "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
 const ConnString = "host=localhost port=5432 user=zitadel password=zitadel dbname=zitadel sslmode=disable"
 
 var (
-	dbPool       *pgxpool.Pool
-	CTX          context.Context
-	IAMCTX       context.Context
-	Instance     *integration.Instance
-	SystemClient system.SystemServiceClient
-	OrgClient    v2beta_org.OrganizationServiceClient
-	AdminClient  admin.AdminServiceClient
-	MgmtClient   mgmt.ManagementServiceClient
+	dbPool        *pgxpool.Pool
+	CTX           context.Context
+	IAMCTX        context.Context
+	Instance      *integration.Instance
+	SystemClient  system.SystemServiceClient
+	OrgClient     v2beta_org.OrganizationServiceClient
+	ProjectClient v2beta_project.ProjectServiceClient
+	AdminClient   admin.AdminServiceClient
+	MgmtClient    mgmt.ManagementServiceClient
 )
 
 var pool database.Pool
@@ -48,6 +50,7 @@ func TestMain(m *testing.M) {
 		IAMCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		SystemClient = integration.SystemClient()
 		OrgClient = Instance.Client.OrgV2beta
+		ProjectClient = Instance.Client.Projectv2Beta
 		AdminClient = Instance.Client.Admin
 		MgmtClient = Instance.Client.Mgmt
 
