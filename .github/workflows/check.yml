@@ -83,7 +83,7 @@ jobs:
         run: pnpm nx affected --nxBail --targets test-firefox
       - name: Test Functional UI Chrome
         run: pnpm nx affected --nxBail --targets test-chrome
-      - run: Always Write the New Nx Cache
+      - name: Always Write the New Nx Cache
         uses: actions/cache/save@v4
         if: always()
         with:
