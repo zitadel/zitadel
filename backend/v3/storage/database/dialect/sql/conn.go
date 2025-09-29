@@ -11,18 +11,18 @@ type sqlConn struct {
 	*sql.Conn
 }
 
-func SQLConn(conn *sql.Conn) database.Client {
+func SQLConn(conn *sql.Conn) database.Connection {
 	return &sqlConn{Conn: conn}
 }
 
-var _ database.Client = (*sqlConn)(nil)
+var _ database.Connection = (*sqlConn)(nil)
 
-// Release implements [database.Client].
+// Release implements [database.Connection].
 func (c *sqlConn) Release(_ context.Context) error {
 	return c.Close()
 }
 
-// Begin implements [database.Client].
+// Begin implements [database.Connection].
 func (c *sqlConn) Begin(ctx context.Context, opts *database.TransactionOptions) (database.Transaction, error) {
 	tx, err := c.BeginTx(ctx, transactionOptionsToSQL(opts))
 	if err != nil {

@@ -42,17 +42,17 @@ func (m *MockOrganizationRepository) EXPECT() *MockOrganizationRepositoryMockRec
 }
 
 // Create mocks base method.
-func (m *MockOrganizationRepository) Create(arg0 context.Context, arg1 *domain.Organization) error {
+func (m *MockOrganizationRepository) Create(arg0 context.Context, arg1 database.QueryExecutor, arg2 *domain.Organization) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", arg0, arg1)
+	ret := m.ctrl.Call(m, "Create", arg0, arg1, arg2)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockOrganizationRepositoryMockRecorder) Create(arg0, arg1 any) *MockOrganizationRepositoryCreateCall {
+func (mr *MockOrganizationRepositoryMockRecorder) Create(arg0, arg1, arg2 any) *MockOrganizationRepositoryCreateCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockOrganizationRepository)(nil).Create), arg0, arg1)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockOrganizationRepository)(nil).Create), arg0, arg1, arg2)
 	return &MockOrganizationRepositoryCreateCall{Call: call}
 }
 
@@ -68,13 +68,13 @@ func (c *MockOrganizationRepositoryCreateCall) Return(arg0 error) *MockOrganizat
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockOrganizationRepositoryCreateCall) Do(f func(context.Context, *domain.Organization) error) *MockOrganizationRepositoryCreateCall {
+func (c *MockOrganizationRepositoryCreateCall) Do(f func(context.Context, database.QueryExecutor, *domain.Organization) error) *MockOrganizationRepositoryCreateCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockOrganizationRepositoryCreateCall) DoAndReturn(f func(context.Context, *domain.Organization) error) *MockOrganizationRepositoryCreateCall {
+func (c *MockOrganizationRepositoryCreateCall) DoAndReturn(f func(context.Context, database.QueryExecutor, *domain.Organization) error) *MockOrganizationRepositoryCreateCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -118,7 +118,7 @@ func (c *MockOrganizationRepositoryCreatedAtColumnCall) DoAndReturn(f func() dat
 }
 
 // Delete mocks base method.
-func (m *MockOrganizationRepository) Delete(arg0 context.Context, arg1 domain.OrgIdentifierCondition, arg2 string) (int64, error) {
+func (m *MockOrganizationRepository) Delete(arg0 context.Context, arg1 database.QueryExecutor, arg2 database.Condition) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0, arg1, arg2)
 	ret0, _ := ret[0].(int64)
@@ -145,51 +145,13 @@ func (c *MockOrganizationRepositoryDeleteCall) Return(arg0 int64, arg1 error) *M
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockOrganizationRepositoryDeleteCall) Do(f func(context.Context, domain.OrgIdentifierCondition, string) (int64, error)) *MockOrganizationRepositoryDeleteCall {
+func (c *MockOrganizationRepositoryDeleteCall) Do(f func(context.Context, database.QueryExecutor, database.Condition) (int64, error)) *MockOrganizationRepositoryDeleteCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockOrganizationRepositoryDeleteCall) DoAndReturn(f func(context.Context, domain.OrgIdentifierCondition, string) (int64, error)) *MockOrganizationRepositoryDeleteCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
-// Domains mocks base method.
-func (m *MockOrganizationRepository) Domains(arg0 bool) domain.OrganizationDomainRepository {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Domains", arg0)
-	ret0, _ := ret[0].(domain.OrganizationDomainRepository)
-	return ret0
-}
-
-// Domains indicates an expected call of Domains.
-func (mr *MockOrganizationRepositoryMockRecorder) Domains(arg0 any) *MockOrganizationRepositoryDomainsCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Domains", reflect.TypeOf((*MockOrganizationRepository)(nil).Domains), arg0)
-	return &MockOrganizationRepositoryDomainsCall{Call: call}
-}
-
-// MockOrganizationRepositoryDomainsCall wrap *gomock.Call
-type MockOrganizationRepositoryDomainsCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *MockOrganizationRepositoryDomainsCall) Return(arg0 domain.OrganizationDomainRepository) *MockOrganizationRepositoryDomainsCall {
-	c.Call = c.Call.Return(arg0)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *MockOrganizationRepositoryDomainsCall) Do(f func(bool) domain.OrganizationDomainRepository) *MockOrganizationRepositoryDomainsCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockOrganizationRepositoryDomainsCall) DoAndReturn(f func(bool) domain.OrganizationDomainRepository) *MockOrganizationRepositoryDomainsCall {
+func (c *MockOrganizationRepositoryDeleteCall) DoAndReturn(f func(context.Context, database.QueryExecutor, database.Condition) (int64, error)) *MockOrganizationRepositoryDeleteCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -233,10 +195,10 @@ func (c *MockOrganizationRepositoryExistsDomainCall) DoAndReturn(f func(database
 }
 
 // Get mocks base method.
-func (m *MockOrganizationRepository) Get(arg0 context.Context, arg1 ...database.QueryOption) (*domain.Organization, error) {
+func (m *MockOrganizationRepository) Get(arg0 context.Context, arg1 database.QueryExecutor, arg2 ...database.QueryOption) (*domain.Organization, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0}
-	for _, a := range arg1 {
+	varargs := []any{arg0, arg1}
+	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Get", varargs...)
@@ -246,9 +208,9 @@ func (m *MockOrganizationRepository) Get(arg0 context.Context, arg1 ...database.
 }
 
 // Get indicates an expected call of Get.
-func (mr *MockOrganizationRepositoryMockRecorder) Get(arg0 any, arg1 ...any) *MockOrganizationRepositoryGetCall {
+func (mr *MockOrganizationRepositoryMockRecorder) Get(arg0, arg1 any, arg2 ...any) *MockOrganizationRepositoryGetCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0}, arg1...)
+	varargs := append([]any{arg0, arg1}, arg2...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockOrganizationRepository)(nil).Get), varargs...)
 	return &MockOrganizationRepositoryGetCall{Call: call}
 }
@@ -265,13 +227,13 @@ func (c *MockOrganizationRepositoryGetCall) Return(arg0 *domain.Organization, ar
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockOrganizationRepositoryGetCall) Do(f func(context.Context, ...database.QueryOption) (*domain.Organization, error)) *MockOrganizationRepositoryGetCall {
+func (c *MockOrganizationRepositoryGetCall) Do(f func(context.Context, database.QueryExecutor, ...database.QueryOption) (*domain.Organization, error)) *MockOrganizationRepositoryGetCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockOrganizationRepositoryGetCall) DoAndReturn(f func(context.Context, ...database.QueryOption) (*domain.Organization, error)) *MockOrganizationRepositoryGetCall {
+func (c *MockOrganizationRepositoryGetCall) DoAndReturn(f func(context.Context, database.QueryExecutor, ...database.QueryOption) (*domain.Organization, error)) *MockOrganizationRepositoryGetCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -315,10 +277,10 @@ func (c *MockOrganizationRepositoryIDColumnCall) DoAndReturn(f func() database.C
 }
 
 // IDCondition mocks base method.
-func (m *MockOrganizationRepository) IDCondition(arg0 string) domain.OrgIdentifierCondition {
+func (m *MockOrganizationRepository) IDCondition(arg0 string) database.Condition {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IDCondition", arg0)
-	ret0, _ := ret[0].(domain.OrgIdentifierCondition)
+	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
@@ -335,19 +297,19 @@ type MockOrganizationRepositoryIDConditionCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockOrganizationRepositoryIDConditionCall) Return(arg0 domain.OrgIdentifierCondition) *MockOrganizationRepositoryIDConditionCall {
+func (c *MockOrganizationRepositoryIDConditionCall) Return(arg0 database.Condition) *MockOrganizationRepositoryIDConditionCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockOrganizationRepositoryIDConditionCall) Do(f func(string) domain.OrgIdentifierCondition) *MockOrganizationRepositoryIDConditionCall {
+func (c *MockOrganizationRepositoryIDConditionCall) Do(f func(string) database.Condition) *MockOrganizationRepositoryIDConditionCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockOrganizationRepositoryIDConditionCall) DoAndReturn(f func(string) domain.OrgIdentifierCondition) *MockOrganizationRepositoryIDConditionCall {
+func (c *MockOrganizationRepositoryIDConditionCall) DoAndReturn(f func(string) database.Condition) *MockOrganizationRepositoryIDConditionCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -429,10 +391,10 @@ func (c *MockOrganizationRepositoryInstanceIDConditionCall) DoAndReturn(f func(s
 }
 
 // List mocks base method.
-func (m *MockOrganizationRepository) List(arg0 context.Context, arg1 ...database.QueryOption) ([]*domain.Organization, error) {
+func (m *MockOrganizationRepository) List(arg0 context.Context, arg1 database.QueryExecutor, arg2 ...database.QueryOption) ([]*domain.Organization, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0}
-	for _, a := range arg1 {
+	varargs := []any{arg0, arg1}
+	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "List", varargs...)
@@ -442,9 +404,9 @@ func (m *MockOrganizationRepository) List(arg0 context.Context, arg1 ...database
 }
 
 // List indicates an expected call of List.
-func (mr *MockOrganizationRepositoryMockRecorder) List(arg0 any, arg1 ...any) *MockOrganizationRepositoryListCall {
+func (mr *MockOrganizationRepositoryMockRecorder) List(arg0, arg1 any, arg2 ...any) *MockOrganizationRepositoryListCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0}, arg1...)
+	varargs := append([]any{arg0, arg1}, arg2...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockOrganizationRepository)(nil).List), varargs...)
 	return &MockOrganizationRepositoryListCall{Call: call}
 }
@@ -461,13 +423,51 @@ func (c *MockOrganizationRepositoryListCall) Return(arg0 []*domain.Organization,
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockOrganizationRepositoryListCall) Do(f func(context.Context, ...database.QueryOption) ([]*domain.Organization, error)) *MockOrganizationRepositoryListCall {
+func (c *MockOrganizationRepositoryListCall) Do(f func(context.Context, database.QueryExecutor, ...database.QueryOption) ([]*domain.Organization, error)) *MockOrganizationRepositoryListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockOrganizationRepositoryListCall) DoAndReturn(f func(context.Context, ...database.QueryOption) ([]*domain.Organization, error)) *MockOrganizationRepositoryListCall {
+func (c *MockOrganizationRepositoryListCall) DoAndReturn(f func(context.Context, database.QueryExecutor, ...database.QueryOption) ([]*domain.Organization, error)) *MockOrganizationRepositoryListCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// LoadDomains mocks base method.
+func (m *MockOrganizationRepository) LoadDomains() domain.OrganizationRepository {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LoadDomains")
+	ret0, _ := ret[0].(domain.OrganizationRepository)
+	return ret0
+}
+
+// LoadDomains indicates an expected call of LoadDomains.
+func (mr *MockOrganizationRepositoryMockRecorder) LoadDomains() *MockOrganizationRepositoryLoadDomainsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadDomains", reflect.TypeOf((*MockOrganizationRepository)(nil).LoadDomains))
+	return &MockOrganizationRepositoryLoadDomainsCall{Call: call}
+}
+
+// MockOrganizationRepositoryLoadDomainsCall wrap *gomock.Call
+type MockOrganizationRepositoryLoadDomainsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockOrganizationRepositoryLoadDomainsCall) Return(arg0 domain.OrganizationRepository) *MockOrganizationRepositoryLoadDomainsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockOrganizationRepositoryLoadDomainsCall) Do(f func() domain.OrganizationRepository) *MockOrganizationRepositoryLoadDomainsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockOrganizationRepositoryLoadDomainsCall) DoAndReturn(f func() domain.OrganizationRepository) *MockOrganizationRepositoryLoadDomainsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -511,10 +511,10 @@ func (c *MockOrganizationRepositoryNameColumnCall) DoAndReturn(f func() database
 }
 
 // NameCondition mocks base method.
-func (m *MockOrganizationRepository) NameCondition(arg0 database.TextOperation, arg1 string) domain.OrgIdentifierCondition {
+func (m *MockOrganizationRepository) NameCondition(arg0 database.TextOperation, arg1 string) database.Condition {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "NameCondition", arg0, arg1)
-	ret0, _ := ret[0].(domain.OrgIdentifierCondition)
+	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
@@ -531,19 +531,19 @@ type MockOrganizationRepositoryNameConditionCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockOrganizationRepositoryNameConditionCall) Return(arg0 domain.OrgIdentifierCondition) *MockOrganizationRepositoryNameConditionCall {
+func (c *MockOrganizationRepositoryNameConditionCall) Return(arg0 database.Condition) *MockOrganizationRepositoryNameConditionCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockOrganizationRepositoryNameConditionCall) Do(f func(database.TextOperation, string) domain.OrgIdentifierCondition) *MockOrganizationRepositoryNameConditionCall {
+func (c *MockOrganizationRepositoryNameConditionCall) Do(f func(database.TextOperation, string) database.Condition) *MockOrganizationRepositoryNameConditionCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockOrganizationRepositoryNameConditionCall) DoAndReturn(f func(database.TextOperation, string) domain.OrgIdentifierCondition) *MockOrganizationRepositoryNameConditionCall {
+func (c *MockOrganizationRepositoryNameConditionCall) DoAndReturn(f func(database.TextOperation, string) database.Condition) *MockOrganizationRepositoryNameConditionCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -701,7 +701,7 @@ func (c *MockOrganizationRepositoryStateConditionCall) DoAndReturn(f func(domain
 }
 
 // Update mocks base method.
-func (m *MockOrganizationRepository) Update(arg0 context.Context, arg1 domain.OrgIdentifierCondition, arg2 string, arg3 ...database.Change) (int64, error) {
+func (m *MockOrganizationRepository) Update(arg0 context.Context, arg1 database.QueryExecutor, arg2 database.Condition, arg3 ...database.Change) (int64, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1, arg2}
 	for _, a := range arg3 {
@@ -733,13 +733,13 @@ func (c *MockOrganizationRepositoryUpdateCall) Return(arg0 int64, arg1 error) *M
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockOrganizationRepositoryUpdateCall) Do(f func(context.Context, domain.OrgIdentifierCondition, string, ...database.Change) (int64, error)) *MockOrganizationRepositoryUpdateCall {
+func (c *MockOrganizationRepositoryUpdateCall) Do(f func(context.Context, database.QueryExecutor, database.Condition, ...database.Change) (int64, error)) *MockOrganizationRepositoryUpdateCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockOrganizationRepositoryUpdateCall) DoAndReturn(f func(context.Context, domain.OrgIdentifierCondition, string, ...database.Change) (int64, error)) *MockOrganizationRepositoryUpdateCall {
+func (c *MockOrganizationRepositoryUpdateCall) DoAndReturn(f func(context.Context, database.QueryExecutor, database.Condition, ...database.Change) (int64, error)) *MockOrganizationRepositoryUpdateCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

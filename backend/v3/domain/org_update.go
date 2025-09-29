@@ -46,10 +46,9 @@ func (u *UpdateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err 
 	}
 	defer func() { err = close(ctx, err) }()
 
-	organizationRepo := opts.organizationRepo(pool)
-	organizationRepo.Domains(true)
+	organizationRepo := opts.organizationRepo().LoadDomains()
 
-	org, err := organizationRepo.Get(ctx, database.WithCondition(organizationRepo.IDCondition(u.ID)))
+	org, err := organizationRepo.Get(ctx, pool, database.WithCondition(organizationRepo.IDCondition(u.ID)))
 	if err != nil {
 		return err
 	}
@@ -71,8 +70,11 @@ func (u *UpdateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err 
 
 	updateCount, err := organizationRepo.Update(
 		ctx,
-		organizationRepo.IDCondition(org.ID),
-		org.InstanceID,
+		pool,
+		database.And(
+			organizationRepo.IDCondition(org.ID),
+			organizationRepo.InstanceIDCondition(org.InstanceID),
+		),
 		database.NewChange(organizationRepo.NameColumn(), u.Name),
 	)
 	if err != nil {

@@ -27,8 +27,8 @@ func TestDeleteOrgCommand_Validate(t *testing.T) {
 	tt := []struct {
 		testName string
 		mockTx   func(ctrl *gomock.Controller) database.QueryExecutor
-		orgRepo  func(ctrl *gomock.Controller) func(client database.QueryExecutor) domain.OrganizationRepository
-		// projectRepo       func(ctrl *gomock.Controller) func(client database.QueryExecutor) domain.ProjectRepository
+		orgRepo  func(ctrl *gomock.Controller) func() domain.OrganizationRepository
+		// projectRepo       func(ctrl *gomock.Controller) func() domain.ProjectRepository
 		inputOrganizationID string
 		expectedError       error
 	}{
@@ -60,60 +60,60 @@ func TestDeleteOrgCommand_Validate(t *testing.T) {
 		// },
 		{
 			testName: "when fetching organization fails should return error",
-			orgRepo: func(ctrl *gomock.Controller) func(client database.QueryExecutor) domain.OrganizationRepository {
+			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
 					Times(1).
 					Return(nil, getErr)
-				return func(_ database.QueryExecutor) domain.OrganizationRepository { return repo }
+				return func() domain.OrganizationRepository { return repo }
 			},
 			inputOrganizationID: "org-1",
 			expectedError:       getErr,
 		},
 		{
 			testName: "when organization is neither active nor inactive should return not found error",
-			orgRepo: func(ctrl *gomock.Controller) func(client database.QueryExecutor) domain.OrganizationRepository {
+			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
 					Times(1).
 					Return(&domain.Organization{
 						ID:    "org-1",
 						State: domain.OrgStateRemoved,
 					}, nil)
-				return func(_ database.QueryExecutor) domain.OrganizationRepository { return repo }
+				return func() domain.OrganizationRepository { return repo }
 			},
 			inputOrganizationID: "org-1",
 			expectedError:       zerrors.ThrowNotFound(nil, "DOM-8KYOH3", "Errors.Org.NotFound"),
 		},
 		{
 			testName: "when organization is active should validate successfully",
-			orgRepo: func(ctrl *gomock.Controller) func(client database.QueryExecutor) domain.OrganizationRepository {
+			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
 					Times(1).
 					Return(&domain.Organization{
 						ID:    "org-1",
 						State: domain.OrgStateActive,
 					}, nil)
-				return func(_ database.QueryExecutor) domain.OrganizationRepository { return repo }
+				return func() domain.OrganizationRepository { return repo }
 			},
 			inputOrganizationID: "org-1",
 		},
 		{
 			testName: "when organization is inactive should validate successfully",
-			orgRepo: func(ctrl *gomock.Controller) func(client database.QueryExecutor) domain.OrganizationRepository {
+			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
 					Times(1).
 					Return(&domain.Organization{
 						ID:    "org-1",
 						State: domain.OrgStateInactive,
 					}, nil)
-				return func(_ database.QueryExecutor) domain.OrganizationRepository { return repo }
+				return func() domain.OrganizationRepository { return repo }
 			},
 			inputOrganizationID: "org-1",
 		},
@@ -153,7 +153,7 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 	tt := []struct {
 		testName string
 		mockTx   func(ctrl *gomock.Controller) database.QueryExecutor
-		orgRepo  func(ctrl *gomock.Controller) func(client database.QueryExecutor) domain.OrganizationRepository
+		orgRepo  func(ctrl *gomock.Controller) func() domain.OrganizationRepository
 
 		inputOrganizationID string
 
@@ -174,26 +174,28 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 		},
 		{
 			testName: "when retrieving organization fails should return error",
-			orgRepo: func(ctrl *gomock.Controller) func(client database.QueryExecutor) domain.OrganizationRepository {
+			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					Get(
+						gomock.Any(),
 						gomock.Any(),
 						dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1"))),
 					).
 					Times(1).
 					Return(nil, getErr)
-				return func(_ database.QueryExecutor) domain.OrganizationRepository { return repo }
+				return func() domain.OrganizationRepository { return repo }
 			},
 			inputOrganizationID: "org-1",
 			expectedError:       getErr,
 		},
 		{
 			testName: "when delete organization fails should return error",
-			orgRepo: func(ctrl *gomock.Controller) func(client database.QueryExecutor) domain.OrganizationRepository {
+			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					Get(
+						gomock.Any(),
 						gomock.Any(),
 						dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1"))),
 					).
@@ -203,10 +205,14 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 						Name: "organization 1",
 					}, nil)
 				repo.EXPECT().
-					Delete(gomock.Any(), repo.IDCondition("org-1"), "inst-1").
+					Delete(gomock.Any(), gomock.Any(),
+						database.And(
+							repo.IDCondition("org-1"),
+							repo.InstanceIDCondition("inst-1")),
+					).
 					Times(1).
 					Return(int64(0), deleteErr)
-				return func(_ database.QueryExecutor) domain.OrganizationRepository { return repo }
+				return func() domain.OrganizationRepository { return repo }
 			},
 			inputOrganizationID: "org-1",
 			expectedError:       deleteErr,
@@ -214,10 +220,11 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 		},
 		{
 			testName: "when more than one row deleted should return internal error",
-			orgRepo: func(ctrl *gomock.Controller) func(client database.QueryExecutor) domain.OrganizationRepository {
+			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					Get(
+						gomock.Any(),
 						gomock.Any(),
 						dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1"))),
 					).
@@ -227,10 +234,13 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 						Name: "organization 1",
 					}, nil)
 				repo.EXPECT().
-					Delete(gomock.Any(), repo.IDCondition("org-1"), "inst-1").
+					Delete(gomock.Any(), gomock.Any(), database.And(
+						repo.IDCondition("org-1"),
+						repo.InstanceIDCondition("inst-1")),
+					).
 					Times(1).
 					Return(int64(2), nil)
-				return func(_ database.QueryExecutor) domain.OrganizationRepository { return repo }
+				return func() domain.OrganizationRepository { return repo }
 			},
 			inputOrganizationID: "org-1",
 			expectedError:       zerrors.ThrowInternalf(nil, "DOM-5cE9u6", "expecting 1 row deleted, got %d", 2),
@@ -238,10 +248,11 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 		},
 		{
 			testName: "when no rows deleted should return not found error",
-			orgRepo: func(ctrl *gomock.Controller) func(client database.QueryExecutor) domain.OrganizationRepository {
+			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					Get(
+						gomock.Any(),
 						gomock.Any(),
 						dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1"))),
 					).
@@ -251,10 +262,13 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 						Name: "organization 1",
 					}, nil)
 				repo.EXPECT().
-					Delete(gomock.Any(), repo.IDCondition("org-1"), "inst-1").
+					Delete(gomock.Any(), gomock.Any(), database.And(
+						repo.IDCondition("org-1"),
+						repo.InstanceIDCondition("inst-1")),
+					).
 					Times(1).
 					Return(int64(0), nil)
-				return func(_ database.QueryExecutor) domain.OrganizationRepository { return repo }
+				return func() domain.OrganizationRepository { return repo }
 			},
 			inputOrganizationID: "org-1",
 			expectedError:       zerrors.ThrowNotFoundf(nil, "DOM-ur6Qyv", "organization not found"),
@@ -262,10 +276,11 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 		},
 		{
 			testName: "when one row deleted should execute successfully",
-			orgRepo: func(ctrl *gomock.Controller) func(client database.QueryExecutor) domain.OrganizationRepository {
+			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					Get(
+						gomock.Any(),
 						gomock.Any(),
 						dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1"))),
 					).
@@ -275,10 +290,13 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 						Name: "organization 1",
 					}, nil)
 				repo.EXPECT().
-					Delete(gomock.Any(), repo.IDCondition("org-1"), "inst-1").
+					Delete(gomock.Any(), gomock.Any(), database.And(
+						repo.IDCondition("org-1"),
+						repo.InstanceIDCondition("inst-1")),
+					).
 					Times(1).
 					Return(int64(1), nil)
-				return func(_ database.QueryExecutor) domain.OrganizationRepository { return repo }
+				return func() domain.OrganizationRepository { return repo }
 			},
 			inputOrganizationID: "org-1",
 			expectedOrgName:     "organization 1",

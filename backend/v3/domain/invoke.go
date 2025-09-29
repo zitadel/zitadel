@@ -4,14 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/eventstore"
 	legacy_es "github.com/zitadel/zitadel/internal/eventstore"
 )
 
 type InvokeOpt func(*CommandOpts)
 
-func WithOrganizationRepo(repo func(client database.QueryExecutor) OrganizationRepository) InvokeOpt {
+func WithOrganizationRepo(repo func() OrganizationRepository) InvokeOpt {
 	return func(opts *CommandOpts) {
 		opts.organizationRepo = repo
 	}

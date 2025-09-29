@@ -535,6 +535,10 @@ func TestServer_ListAdministrators(t *testing.T) {
 				// always first check length, otherwise its failed anyway
 				if assert.Len(ttt, got.Administrators, len(tt.want.Administrators)) {
 					for i := range tt.want.Administrators {
+						// need to set the project grant ID as it is generated
+						if grant := got.Administrators[i].GetProjectGrant(); grant != nil {
+							tt.want.Administrators[i].GetProjectGrant().Id = grant.Id
+						}
 						assert.EqualExportedValues(ttt, tt.want.Administrators[i], got.Administrators[i])
 					}
 				}
@@ -631,7 +635,8 @@ func createProjectGrantAdministrator(ctx context.Context, instance *integration.
 		},
 		Resource: &internal_permission.Administrator_ProjectGrant{
 			ProjectGrant: &internal_permission.ProjectGrant{
-				Id:                    grantedOrgID,
+				// left empty as generated
+				Id:                    "",
 				ProjectId:             projectID,
 				ProjectName:           projectName,
 				OrganizationId:        orgID,
@@ -1162,6 +1167,10 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 				// always first check length, otherwise its failed anyway
 				if assert.Len(ttt, got.Administrators, len(tt.want.Administrators)) {
 					for i := range tt.want.Administrators {
+						// set as project grant id is generated
+						if grant := got.Administrators[i].GetProjectGrant(); grant != nil {
+							tt.want.Administrators[i].GetProjectGrant().Id = grant.Id
+						}
 						assert.EqualExportedValues(ttt, tt.want.Administrators[i], got.Administrators[i])
 					}
 				}

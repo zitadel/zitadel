@@ -14,7 +14,7 @@ func (n *Pool) Ping(ctx context.Context) error {
 }
 
 // Acquire implements [database.Pool].
-func (n *Pool) Acquire(ctx context.Context) (database.Client, error) {
+func (n *Pool) Acquire(ctx context.Context) (database.Connection, error) {
 	return new(Client), nil
 }
 

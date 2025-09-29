@@ -40,8 +40,8 @@ func (l *ListOrgsCommand) Execute(ctx context.Context, opts *CommandOpts) (err e
 	}
 	defer func() { err = close(ctx, err) }()
 
-	organizationRepo := opts.organizationRepo(pool)
-	domainRepo := organizationRepo.Domains(true)
+	organizationRepo := opts.organizationRepo().LoadDomains()
+	domainRepo := opts.organizationDomainRepo()
 
 	sorting := l.Sorting(organizationRepo)
 	limit, pagination := l.Pagination()
@@ -51,7 +51,7 @@ func (l *ListOrgsCommand) Execute(ctx context.Context, opts *CommandOpts) (err e
 		return err
 	}
 
-	l.Result, err = organizationRepo.List(ctx, append(conditions, sorting, limit, pagination)...)
+	l.Result, err = organizationRepo.List(ctx, pool, append(conditions, sorting, limit, pagination)...)
 	return err
 }
 

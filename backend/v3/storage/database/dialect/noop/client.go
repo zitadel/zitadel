@@ -43,4 +43,4 @@ func (n *Client) Release(ctx context.Context) error {
 	return nil
 }
 
-var _ database.Client = (*Client)(nil)
+var _ database.Connection = (*Client)(nil)

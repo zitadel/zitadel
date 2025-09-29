@@ -13,7 +13,7 @@ import (
 func NewOrgRepo(ctrl *gomock.Controller) *OrgRepo {
 	return &OrgRepo{
 		mock:                   NewMockOrganizationRepository(ctrl),
-		OrganizationRepository: repository.OrganizationRepository(nil),
+		OrganizationRepository: repository.OrganizationRepository(),
 	}
 }
 
@@ -29,6 +29,8 @@ func (r *OrgRepo) SetDomains(repo *OrgDomainRepo) {
 	r.domainRepo = repo
 }
 
+// SetExistsDomain is a helper function that allows to skip calling EXISTS() when ExistsDomain() called.
+// You will not be able to mock the ExistsDomain() call though
 func (r *OrgRepo) SetExistsDomain(existsDomainCondition database.Condition) {
 	r.existDomain = existsDomainCondition
 
@@ -42,26 +44,26 @@ func (r *OrgRepo) EXPECT() *MockOrganizationRepositoryMockRecorder {
 	return r.mock.EXPECT()
 }
 
-func (r *OrgRepo) Get(ctx context.Context, opts ...database.QueryOption) (*domain.Organization, error) {
-	return r.mock.Get(ctx, opts...)
+func (r *OrgRepo) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Organization, error) {
+	return r.mock.Get(ctx, client, opts...)
 }
 
-func (r *OrgRepo) List(ctx context.Context, opts ...database.QueryOption) ([]*domain.Organization, error) {
-	return r.mock.List(ctx, opts...)
+func (r *OrgRepo) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Organization, error) {
+	return r.mock.List(ctx, client, opts...)
 }
 
-func (r *OrgRepo) Create(ctx context.Context, organization *domain.Organization) error {
-	return r.mock.Create(ctx, organization)
+func (r *OrgRepo) Create(ctx context.Context, client database.QueryExecutor, org *domain.Organization) error {
+	return r.mock.Create(ctx, client, org)
 }
 
-func (r *OrgRepo) Update(ctx context.Context, id domain.OrgIdentifierCondition, instance_id string, changes ...database.Change) (int64, error) {
-	return r.mock.Update(ctx, id, instance_id, changes...)
+func (r *OrgRepo) Update(ctx context.Context, client database.QueryExecutor, conditions database.Condition, changes ...database.Change) (int64, error) {
+	return r.mock.Update(ctx, client, conditions, changes...)
 }
 
-func (r *OrgRepo) Delete(ctx context.Context, id domain.OrgIdentifierCondition, instance_id string) (int64, error) {
-	return r.mock.Delete(ctx, id, instance_id)
+func (r *OrgRepo) Delete(ctx context.Context, client database.QueryExecutor, conditions database.Condition) (int64, error) {
+	return r.mock.Delete(ctx, client, conditions)
 }
 
-func (r *OrgRepo) Domains(shouldLoad bool) domain.OrganizationDomainRepository {
-	return r.domainRepo
+func (r *OrgRepo) LoadDomains() domain.OrganizationRepository {
+	return r.mock.LoadDomains()
 }

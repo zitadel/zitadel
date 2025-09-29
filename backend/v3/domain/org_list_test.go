@@ -170,7 +170,7 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 		testName string
 
 		queryExecutor func(ctrl *gomock.Controller) database.QueryExecutor
-		orgRepo       func(ctrl *gomock.Controller, queryParams ...database.QueryOption) func(client database.QueryExecutor) domain.OrganizationRepository
+		repos         func(ctrl *gomock.Controller, queryParams ...database.QueryOption) (func() domain.OrganizationRepository, func() domain.OrganizationDomainRepository)
 
 		queryParams  []database.QueryOption
 		inputRequest *org.ListOrganizationsRequest
@@ -192,10 +192,15 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 		},
 		{
 			testName: "when condition parsing fails should return error",
-			orgRepo: func(ctrl *gomock.Controller, _ ...database.QueryOption) func(client database.QueryExecutor) domain.OrganizationRepository {
-				repo := domainmock.NewOrgRepo(ctrl)
+			repos: func(ctrl *gomock.Controller, _ ...database.QueryOption) (func() domain.OrganizationRepository, func() domain.OrganizationDomainRepository) {
+				orgRepo := domainmock.NewOrgRepo(ctrl)
+				domainRepo := domainmock.NewOrgDomainRepo(ctrl)
+				orgRepo.EXPECT().
+					LoadDomains().
+					Times(1).
+					Return(orgRepo)
 
-				return func(_ database.QueryExecutor) domain.OrganizationRepository { return repo }
+				return func() domain.OrganizationRepository { return orgRepo }, func() domain.OrganizationDomainRepository { return domainRepo }
 			},
 			inputRequest: &org.ListOrganizationsRequest{
 				Queries: []*org.SearchQuery{{Query: &org.SearchQuery_DomainQuery{DomainQuery: &org.OrganizationDomainQuery{
@@ -208,31 +213,36 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 		},
 		{
 			testName: "when listing orgs fails should return error",
-			orgRepo: func(ctrl *gomock.Controller, queryParams ...database.QueryOption) func(client database.QueryExecutor) domain.OrganizationRepository {
-				repo := domainmock.NewOrgRepo(ctrl)
+			repos: func(ctrl *gomock.Controller, queryParams ...database.QueryOption) (func() domain.OrganizationRepository, func() domain.OrganizationDomainRepository) {
+				orgRepo := domainmock.NewOrgRepo(ctrl)
 				domainRepo := domainmock.NewOrgDomainRepo(ctrl)
-				repo.SetDomains(domainRepo)
-				repo.SetExistsDomain(database.Exists("domains", domainRepo.DomainCondition(database.TextOperationEqual, "some domain")))
+				orgRepo.SetExistsDomain(database.Exists("domains", domainRepo.DomainCondition(database.TextOperationEqual, "some domain")))
 
-				repo.EXPECT().
+				orgRepo.EXPECT().
+					LoadDomains().
+					Times(1).
+					Return(orgRepo)
+
+				orgRepo.EXPECT().
 					List(
+						gomock.Any(),
 						gomock.Any(),
 						dbmock.QueryOptions(
 							database.WithCondition(
 								database.And(
-									repo.InstanceIDCondition("instance-1"),
-									repo.ExistsDomain(domainRepo.DomainCondition(database.TextOperationEqual, "some domain")),
+									orgRepo.InstanceIDCondition("instance-1"),
+									orgRepo.ExistsDomain(domainRepo.DomainCondition(database.TextOperationEqual, "some domain")),
 								),
 							),
 						),
-						dbmock.QueryOptions(database.WithOrderBy(database.OrderDirectionAsc, repo.NameColumn())),
+						dbmock.QueryOptions(database.WithOrderBy(database.OrderDirectionAsc, orgRepo.NameColumn())),
 						dbmock.QueryOptions(database.WithLimit(2)),
 						dbmock.QueryOptions(database.WithOffset(1)),
 					).
 					Times(1).
 					Return(nil, listErr)
 
-				return func(_ database.QueryExecutor) domain.OrganizationRepository { return repo }
+				return func() domain.OrganizationRepository { return orgRepo }, func() domain.OrganizationDomainRepository { return domainRepo }
 			},
 			inputRequest: &org.ListOrganizationsRequest{
 				Queries: []*org.SearchQuery{
@@ -257,20 +267,25 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 		},
 		{
 			testName: "when listing orgs succeeds should return expected organizations",
-			orgRepo: func(ctrl *gomock.Controller, queryParams ...database.QueryOption) func(client database.QueryExecutor) domain.OrganizationRepository {
-				repo := domainmock.NewOrgRepo(ctrl)
+			repos: func(ctrl *gomock.Controller, queryParams ...database.QueryOption) (func() domain.OrganizationRepository, func() domain.OrganizationDomainRepository) {
+				orgRepo := domainmock.NewOrgRepo(ctrl)
 				domainRepo := domainmock.NewOrgDomainRepo(ctrl)
-				repo.SetDomains(domainRepo)
 
-				repo.EXPECT().
+				orgRepo.EXPECT().
+					LoadDomains().
+					Times(1).
+					Return(orgRepo)
+
+				orgRepo.EXPECT().
 					List(
 						gomock.Any(),
-						dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1"))),
-						dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-2"))),
-						dbmock.QueryOptions(database.WithCondition(repo.NameCondition(database.TextOperationEqual, "Named Org"))),
-						dbmock.QueryOptions(database.WithCondition(repo.StateCondition(domain.OrgStateActive))),
+						gomock.Any(),
+						dbmock.QueryOptions(database.WithCondition(orgRepo.IDCondition("org-1"))),
+						dbmock.QueryOptions(database.WithCondition(orgRepo.IDCondition("org-2"))),
+						dbmock.QueryOptions(database.WithCondition(orgRepo.NameCondition(database.TextOperationEqual, "Named Org"))),
+						dbmock.QueryOptions(database.WithCondition(orgRepo.StateCondition(domain.OrgStateActive))),
 
-						dbmock.QueryOptions(database.WithOrderBy(database.OrderDirectionDesc, repo.NameColumn())),
+						dbmock.QueryOptions(database.WithOrderBy(database.OrderDirectionDesc, orgRepo.NameColumn())),
 						dbmock.QueryOptions(database.WithLimit(2)),
 						dbmock.QueryOptions(database.WithOffset(1)),
 					).
@@ -280,7 +295,7 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 						{ID: "org-2"},
 					}, nil)
 
-				return func(_ database.QueryExecutor) domain.OrganizationRepository { return repo }
+				return func() domain.OrganizationRepository { return orgRepo }, func() domain.OrganizationDomainRepository { return domainRepo }
 			},
 			inputRequest: &org.ListOrganizationsRequest{
 				Queries: []*org.SearchQuery{
@@ -339,8 +354,10 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 			opts := &domain.CommandOpts{
 				DB: new(noopdb.Pool),
 			}
-			if tc.orgRepo != nil {
-				opts.SetOrgRepo(tc.orgRepo(ctrl, tc.queryParams...))
+			if tc.repos != nil {
+				org, domain := tc.repos(ctrl, tc.queryParams...)
+				opts.SetOrgRepo(org)
+				opts.SetOrgDomainRepo(domain)
 			}
 			if tc.queryExecutor != nil {
 				opts.DB = tc.queryExecutor(ctrl)

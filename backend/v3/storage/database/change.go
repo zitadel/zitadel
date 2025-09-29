@@ -2,6 +2,7 @@ package database
 
 import (
 	"reflect"
+	"slices"
 
 	"go.uber.org/mock/gomock"
 )
@@ -10,7 +11,10 @@ import (
 // Its written in the SET clause of an UPDATE statement.
 type Change interface {
 	gomock.Matcher
+	// Write writes the change to the given statement builder.
 	Write(builder *StatementBuilder)
+	// IsOnColumn checks if the change is on the given column.
+	IsOnColumn(col Column) bool
 }
 
 type change[V Value] struct {
@@ -24,7 +28,9 @@ func (c *change[V]) Matches(x any) bool {
 	if !ok {
 		return false
 	}
-	return c.column == toMatch.column && reflect.DeepEqual(c.value, toMatch.value)
+	colMatch := c.column.Equals(toMatch.column)
+	valueMatch := reflect.DeepEqual(c.value, toMatch.value)
+	return colMatch && valueMatch
 }
 
 // String implements [gomock.Matcher].
@@ -37,6 +43,8 @@ var (
 	_ gomock.Matcher = (*change[string])(nil)
 )
 
+// NewChange creates a new Change for the given column and value.
+// If you want to set a column to NULL, use [NewChangePtr].
 func NewChange[V Value](col Column, value V) Change {
 	return &change[V]{
 		column: col,
@@ -44,6 +52,8 @@ func NewChange[V Value](col Column, value V) Change {
 	}
 }
 
+// NewChangePtr creates a new Change for the given column and value pointer.
+// If the value pointer is nil, the column will be set to NULL.
 func NewChangePtr[V Value](col Column, value *V) Change {
 	if value == nil {
 		return NewChange(col, NullInstruction)
@@ -58,19 +68,31 @@ func (c change[V]) Write(builder *StatementBuilder) {
 	builder.WriteArg(c.value)
 }
 
+// IsOnColumn implements [Change].
+func (c change[V]) IsOnColumn(col Column) bool {
+	return c.column.Equals(col)
+}
+
 type Changes []Change
 
 func NewChanges(cols ...Change) Change {
 	return Changes(cols)
 }
 
+// IsOnColumn implements [Change].
+func (c Changes) IsOnColumn(col Column) bool {
+	return slices.ContainsFunc(c, func(change Change) bool {
+		return change.IsOnColumn(col)
+	})
+}
+
 // Write implements [Change].
 func (m Changes) Write(builder *StatementBuilder) {
-	for i, col := range m {
+	for i, change := range m {
 		if i > 0 {
 			builder.WriteString(", ")
 		}
-		col.Write(builder)
+		change.Write(builder)
 	}
 }
 
