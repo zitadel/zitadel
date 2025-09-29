@@ -76,13 +76,13 @@ jobs:
       - name: Test Unit
         run: pnpm nx affected --nxBail --targets test-unit
       - name: Test Integration Login
-        run: pnpm nx affected --nxBail --targets test-integration --exclude @zitadel/api
+        run: pnpm nx affected --nxBail --targets test-integration --exclude='*,!@zitadel/login'
       - name: Test Integration API
-        run: pnpm nx affected --nxBail --targets test-integration --exclude @zitadel/login
+        run: pnpm nx affected --nxBail --targets test-integration --exclude='*,!@zitadel/api'
       - name: Test Functional UI Firefox
-        run: pnpm nx affected --nxBail --targets test-firefox
+        run: pnpm nx affected --nxBail --targets test --exclude='*,!functional-ui' --browser firefox
       - name: Test Functional UI Chrome
-        run: pnpm nx affected --nxBail --targets test-chrome
+        run: pnpm nx affected --nxBail --targets test --exclude='*,!functional-ui' --browser chrome
       - name: Always Write the New Nx Cache
         uses: actions/cache/save@v4
         if: always()

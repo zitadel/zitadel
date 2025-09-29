@@ -348,8 +348,11 @@ To test the whole system, including the Console UI and the Login UI, run the Fun
 pnpm nx run @zitadel/functional-ui:lint-fix
 
 # Run the tests
-pnpm nx run @zitadel/functional-ui:test-firefox
-pnpm nx run @zitadel/functional-ui:test-chrome
+pnpm nx run test-functional:test --browser electron
+
+# Beware that firefox and chrome are not installed in the dev container.
+pnpm nx run test-functional:test --browser firefox
+pnpm nx run test-functional:test --browser chrome
 ```
 
 ### Run Local Functional UI Tests Against Your Dev Server Console
