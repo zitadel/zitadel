@@ -352,6 +352,10 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       loginNameUrl.searchParams.append("organization", organization);
     }
 
+    if (suffix) {
+      loginNameUrl.searchParams.append("suffix", suffix);
+    }
+
     return NextResponse.redirect(loginNameUrl);
   }
 }
