@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"context"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -19,11 +20,12 @@ const (
 
 // user
 type User struct {
+	ID                string    `json:"id,omitempty" db:"id"`
 	InstanceID        string    `json:"instanceId,omitempty" db:"instance_id"`
 	OrgID             string    `json:"orgId,omitempty" db:"org_id"`
 	Username          string    `json:"username,omitempty" db:"username"`
 	UsernameOrgUnique bool      `json:"usernameOrgUnique,omitempty" db:"username_org_unique"`
-	State             UserState `json:"userState,omitempty" db:"user_state"`
+	State             UserState `json:"state,omitempty" db:"state"`
 
 	CreatedAt time.Time `json:"createdAt,omitzero" db:"created_at"`
 	UpdatedAt time.Time `json:"updatedAt,omitzero" db:"updated_at"`
@@ -87,6 +89,12 @@ type machineChanges interface {
 	SetDescription(description string) database.Change
 }
 
+type MachineRepository interface {
+	machineColumns
+	machineConditions
+	machineChanges
+}
+
 // human user
 type Human struct {
 	User
@@ -129,6 +137,12 @@ type humanChanges interface {
 	SetPreferredLanguage(language string) database.Change
 	SetGender(gender uint8) database.Change
 	SetAvatarKey(key string) database.Change
+}
+
+type HumanRepository interface {
+	humanColumns
+	humanConditions
+	humanChanges
 }
 
 //go:generate enumer -type ContactType -transform lower -trimprefix ContactType -sql
@@ -182,23 +196,17 @@ type humanContactChanges interface {
 }
 
 type UserRepository interface {
-	userColumns
-	userConditions
-	userChanges
+	Human() HumanRepository
+	Machine() MachineRepository
 
-	machineColumns
-	machineConditions
-	machineChanges
+	CreateHuman(ctx context.Context, client database.QueryExecutor, user *Human) (*Human, error)
+	UpdateHuman(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
+	GetHuman(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Human, error)
+	ListHuman(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Human, error)
 
-	humanColumns
-	humanConditions
-	humanChanges
-
-	// GetMachine(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Machine, error)
+	CreateMachine(ctx context.Context, client database.QueryExecutor, user *Machine) (*Machine, error)
+	GetMachine(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Machine, error)
 	// ListMachine(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Machine, error)
-
-	// GetHuman(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Human, error)
-	// ListHuman(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Human, error)
 
 	// Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }

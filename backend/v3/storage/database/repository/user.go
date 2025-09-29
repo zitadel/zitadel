@@ -1,359 +1,522 @@
 package repository
 
 import (
+	"context"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-var _ domain.UserRepository = (*user)(nil)
+var (
+	_ domain.UserRepository    = (*user)(nil)
+	_ domain.HumanRepository   = (*human)(nil)
+	_ domain.MachineRepository = (*machine)(nil)
+)
 
-type user struct{}
+type (
+	human   struct{}
+	machine struct{}
+	user    struct {
+		human
+		machine
+	}
+)
 
 func UserRepository() domain.UserRepository {
-	return new(user)
+	return &user{
+		// human:   human{},
+		// machine: machine{},
+	}
 }
 
-// TODO rename
-func (o user) qualifiedTableName() string {
-	return "zitadel.users"
-}
-
-// TODO rename
-func (o user) unqualifiedTableName() string {
-	return "users"
-}
-
-func (o user) qualifiedMachineUsersTableName() string {
+func (m machine) qualifiedTableName() string {
 	return "zitadel.machine_users"
 }
 
-func (o user) unqualifiedMachineUsersTableName() string {
+func (m machine) unqualifiedTableName() string {
 	return "machine_users"
 }
 
-func (o user) qualifiedHumanUsersTableName() string {
+func (h human) qualifiedTableName() string {
 	return "zitadel.human_users"
 }
 
-func (o user) unqualifiedHumanUsersTableName() string {
+func (h human) unqualifiedTableName() string {
 	return "human_users"
 }
-
-// const queryUserStmt = `SELECT instance_id, org_id, id, username, type, created_at, updated_at, deleted_at,` +
-// 	` first_name, last_name, email_address, email_verified_at, phone_number, phone_verified_at, description` +
-// 	` FROM users_view users`
-
-// type user struct{}
-
-// func UserRepository() domain.UserRepository {
-// 	return new(user)
-// }
-
-// var _ domain.UserRepository = (*user)(nil)
-
-// // -------------------------------------------------------------
-// // repository
-// // -------------------------------------------------------------
-
-// // Human implements [domain.UserRepository].
-// func (u user) Human() domain.HumanRepository {
-// 	return &userHuman{user: u}
-// }
-
-// // Machine implements [domain.UserRepository].
-// func (u user) Machine() domain.MachineRepository {
-// 	return &userMachine{user: u}
-// }
-
-// // List implements [domain.UserRepository].
-// func (u user) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (users []*domain.User, err error) {
-// 	options := new(database.QueryOpts)
-// 	for _, opt := range opts {
-// 		opt(options)
-// 	}
-
-// 	builder := database.StatementBuilder{}
-// 	builder.WriteString(queryUserStmt)
-// 	options.WriteCondition(&builder)
-// 	options.WriteOrderBy(&builder)
-// 	options.WriteLimit(&builder)
-// 	options.WriteOffset(&builder)
-
-// 	rows, err := client.Query(ctx, builder.String(), builder.Args()...)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	defer func() {
-// 		closeErr := rows.Close()
-// 		if err != nil {
-// 			return
-// 		}
-// 		err = closeErr
-// 	}()
-// 	for rows.Next() {
-// 		user, err := scanUser(rows)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		users = append(users, user)
-// 	}
-// 	if err := rows.Err(); err != nil {
-// 		return nil, err
-// 	}
-// 	return users, nil
-// }
-
-// // Get implements [domain.UserRepository].
-// func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.User, error) {
-// 	options := new(database.QueryOpts)
-// 	for _, opt := range opts {
-// 		opt(options)
-// 	}
-
-// 	builder := database.StatementBuilder{}
-// 	builder.WriteString(queryUserStmt)
-// 	options.WriteCondition(&builder)
-// 	options.WriteOrderBy(&builder)
-// 	options.WriteLimit(&builder)
-// 	options.WriteOffset(&builder)
-
-// 	return scanUser(client.QueryRow(ctx, builder.String(), builder.Args()...))
-// }
-
-// const (
-// 	createHumanStmt = `INSERT INTO human_users (instance_id, org_id, user_id, username, first_name, last_name, email_address, email_verified_at, phone_number, phone_verified_at)` +
-// 		` VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)` +
-// 		` RETURNING created_at, updated_at`
-// 	createMachineStmt = `INSERT INTO user_machines (instance_id, org_id, user_id, username, description)` +
-// 		` VALUES ($1, $2, $3, $4, $5)` +
-// 		` RETURNING created_at, updated_at`
-// )
-
-// // Create implements [domain.UserRepository].
-// func (u user) Create(ctx context.Context, client database.QueryExecutor, user *domain.User) error {
-// 	builder := database.StatementBuilder{}
-// 	builder.AppendArgs(user.InstanceID, user.OrgID, user.ID, user.Username, user.Traits.Type())
-// 	switch trait := user.Traits.(type) {
-// 	case *domain.Human:
-// 		builder.WriteString(createHumanStmt)
-// 		builder.AppendArgs(trait.FirstName, trait.LastName, trait.Email.Address, trait.Email.VerifiedAt, trait.Phone.Number, trait.Phone.VerifiedAt)
-// 	case *domain.Machine:
-// 		builder.WriteString(createMachineStmt)
-// 		builder.AppendArgs(trait.Description)
-// 	}
-// 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
-// }
-
-// // Delete implements [domain.UserRepository].
-// func (u user) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) error {
-// 	builder := database.StatementBuilder{}
-// 	builder.WriteString("DELETE FROM users")
-// 	writeCondition(&builder, condition)
-// 	_, err := client.Exec(ctx, builder.String(), builder.Args()...)
-// 	return err
-// }
 
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
 
-// user
-func (u user) InstanceIDColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "instance_id")
-}
-
-func (u user) OrgIDColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "org_id")
-}
-
-func (u user) IDColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "id")
-}
-
-func (u user) UsernameColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "username")
-}
-
-func (u user) UsernameOrgUniqueColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "username_org_unique")
-}
-
-func (u user) StateColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "state")
-}
-
-func (u user) CreatedAtColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "created_at")
-}
-
-func (u user) UpdatedAtColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "updated_at")
-}
-
 // machine
-func (u user) NameColumn() database.Column {
-	return database.NewColumn(u.unqualifiedMachineUsersTableName(), "name")
+func (m machine) InstanceIDColumn() database.Column {
+	return database.NewColumn(m.unqualifiedTableName(), "instance_id")
 }
 
-func (u user) DescriptionColumn() database.Column {
-	return database.NewColumn(u.unqualifiedMachineUsersTableName(), "description")
+func (m machine) OrgIDColumn() database.Column {
+	return database.NewColumn(m.unqualifiedTableName(), "org_id")
+}
+
+func (m machine) IDColumn() database.Column {
+	return database.NewColumn(m.unqualifiedTableName(), "id")
+}
+
+func (m machine) UsernameColumn() database.Column {
+	return database.NewColumn(m.unqualifiedTableName(), "username")
+}
+
+func (m machine) UsernameOrgUniqueColumn() database.Column {
+	return database.NewColumn(m.unqualifiedTableName(), "username_org_unique")
+}
+
+func (m machine) StateColumn() database.Column {
+	return database.NewColumn(m.unqualifiedTableName(), "state")
+}
+
+func (m machine) CreatedAtColumn() database.Column {
+	return database.NewColumn(m.unqualifiedTableName(), "created_at")
+}
+
+func (m machine) UpdatedAtColumn() database.Column {
+	return database.NewColumn(m.unqualifiedTableName(), "updated_at")
+}
+
+func (m machine) NameColumn() database.Column {
+	return database.NewColumn(m.unqualifiedTableName(), "name")
+}
+
+func (m machine) DescriptionColumn() database.Column {
+	return database.NewColumn(m.unqualifiedTableName(), "description")
 }
 
 // human
-func (u user) FirstNameColumn() database.Column {
-	return database.NewColumn(u.unqualifiedHumanUsersTableName(), "first_name")
+func (h human) InstanceIDColumn() database.Column {
+	return database.NewColumn(h.unqualifiedTableName(), "instance_id")
 }
 
-func (u user) LastNameColumn() database.Column {
-	return database.NewColumn(u.unqualifiedHumanUsersTableName(), "last_name")
+func (h human) OrgIDColumn() database.Column {
+	return database.NewColumn(h.unqualifiedTableName(), "org_id")
 }
 
-func (u user) NickNameColumn() database.Column {
-	return database.NewColumn(u.unqualifiedHumanUsersTableName(), "nick_name")
+func (h human) IDColumn() database.Column {
+	return database.NewColumn(h.unqualifiedTableName(), "id")
 }
 
-func (u user) DisplayNameColumn() database.Column {
-	return database.NewColumn(u.unqualifiedHumanUsersTableName(), "display_name")
+func (h human) UsernameColumn() database.Column {
+	return database.NewColumn(h.unqualifiedTableName(), "username")
 }
 
-func (u user) PreferredLanguageColumn() database.Column {
-	return database.NewColumn(u.unqualifiedHumanUsersTableName(), "preferred_language")
+func (h human) UsernameOrgUniqueColumn() database.Column {
+	return database.NewColumn(h.unqualifiedTableName(), "username_org_unique")
 }
 
-func (u user) GenderColumn() database.Column {
-	return database.NewColumn(u.unqualifiedHumanUsersTableName(), "gender")
+func (h human) StateColumn() database.Column {
+	return database.NewColumn(h.unqualifiedTableName(), "state")
 }
 
-func (u user) AvatarKeyColumn() database.Column {
-	return database.NewColumn(u.unqualifiedHumanUsersTableName(), "avatar_key")
+func (h human) CreatedAtColumn() database.Column {
+	return database.NewColumn(h.unqualifiedTableName(), "created_at")
+}
+
+func (h human) UpdatedAtColumn() database.Column {
+	return database.NewColumn(h.unqualifiedTableName(), "updated_at")
+}
+
+func (h human) FirstNameColumn() database.Column {
+	return database.NewColumn(h.unqualifiedTableName(), "first_name")
+}
+
+func (h human) LastNameColumn() database.Column {
+	return database.NewColumn(h.unqualifiedTableName(), "last_name")
+}
+
+func (h human) NickNameColumn() database.Column {
+	return database.NewColumn(h.unqualifiedTableName(), "nick_name")
+}
+
+func (h human) DisplayNameColumn() database.Column {
+	return database.NewColumn(h.unqualifiedTableName(), "display_name")
+}
+
+func (h human) PreferredLanguageColumn() database.Column {
+	return database.NewColumn(h.unqualifiedTableName(), "preferred_language")
+}
+
+func (h human) GenderColumn() database.Column {
+	return database.NewColumn(h.unqualifiedTableName(), "gender")
+}
+
+func (h human) AvatarKeyColumn() database.Column {
+	return database.NewColumn(h.unqualifiedTableName(), "avatar_key")
 }
 
 // -------------------------------------------------------------
 // conditions
 // -------------------------------------------------------------
 
-func (u user) InstanceIDCondition(instanceID string) database.Condition {
-	return database.NewTextCondition(u.InstanceIDColumn(), database.TextOperationEqual, instanceID)
-}
-
-func (u user) OrgIDCondition(orgID string) database.Condition {
-	return database.NewTextCondition(u.OrgIDColumn(), database.TextOperationEqual, orgID)
-}
-
-func (u user) IDCondition(userID string) database.Condition {
-	return database.NewTextCondition(u.IDColumn(), database.TextOperationEqual, userID)
-}
-
-func (u user) UsernameCondition(op database.TextOperation, username string) database.Condition {
-	return database.NewTextCondition(u.UsernameColumn(), op, username)
-}
-
-func (u user) UsernameOrgUniqueCondition(condition bool) database.Condition {
-	return database.NewBooleanCondition(u.UsernameColumn(), condition)
-}
-
-func (u user) StateCondition(state domain.UserState) database.Condition {
-	return database.NewTextCondition(u.UsernameColumn(), database.TextOperationEqual, state.String())
-}
-
-func (u user) CreatedAtCondition(op database.NumberOperation, createdAt time.Time) database.Condition {
-	return database.NewNumberCondition(u.CreatedAtColumn(), op, createdAt)
-}
-
-func (u user) UpdatedAtCondition(op database.NumberOperation, updatedAt time.Time) database.Condition {
-	return database.NewNumberCondition(u.UpdatedAtColumn(), op, updatedAt)
-}
-
 // machine
-func (u user) NameCondition(op database.TextOperation, name string) database.Condition {
-	return database.NewTextCondition(u.DescriptionColumn(), op, name)
+func (m machine) InstanceIDCondition(instanceID string) database.Condition {
+	return database.NewTextCondition(m.InstanceIDColumn(), database.TextOperationEqual, instanceID)
 }
 
-func (u user) DescriptionCondition(op database.TextOperation, description string) database.Condition {
-	return database.NewTextCondition(u.DescriptionColumn(), op, description)
+func (m machine) OrgIDCondition(orgID string) database.Condition {
+	return database.NewTextCondition(m.OrgIDColumn(), database.TextOperationEqual, orgID)
+}
+
+func (m machine) IDCondition(userID string) database.Condition {
+	return database.NewTextCondition(m.IDColumn(), database.TextOperationEqual, userID)
+}
+
+func (m machine) UsernameCondition(op database.TextOperation, username string) database.Condition {
+	return database.NewTextCondition(m.UsernameColumn(), op, username)
+}
+
+func (m machine) UsernameOrgUniqueCondition(condition bool) database.Condition {
+	return database.NewBooleanCondition(m.UsernameColumn(), condition)
+}
+
+func (m machine) StateCondition(state domain.UserState) database.Condition {
+	return database.NewTextCondition(m.UsernameColumn(), database.TextOperationEqual, state.String())
+}
+
+func (m machine) CreatedAtCondition(op database.NumberOperation, createdAt time.Time) database.Condition {
+	return database.NewNumberCondition(m.CreatedAtColumn(), op, createdAt)
+}
+
+func (m machine) UpdatedAtCondition(op database.NumberOperation, updatedAt time.Time) database.Condition {
+	return database.NewNumberCondition(m.UpdatedAtColumn(), op, updatedAt)
+}
+
+func (m machine) NameCondition(op database.TextOperation, name string) database.Condition {
+	return database.NewTextCondition(m.DescriptionColumn(), op, name)
+}
+
+func (m machine) DescriptionCondition(op database.TextOperation, description string) database.Condition {
+	return database.NewTextCondition(m.DescriptionColumn(), op, description)
 }
 
 // human
-func (u user) FirstNameCondition(op database.TextOperation, name string) database.Condition {
-	return database.NewTextCondition(u.FirstNameColumn(), op, name)
+func (h human) InstanceIDCondition(instanceID string) database.Condition {
+	return database.NewTextCondition(h.InstanceIDColumn(), database.TextOperationEqual, instanceID)
 }
 
-func (u user) LastNameCondition(op database.TextOperation, name string) database.Condition {
-	return database.NewTextCondition(u.LastNameColumn(), op, name)
+func (h human) OrgIDCondition(orgID string) database.Condition {
+	return database.NewTextCondition(h.OrgIDColumn(), database.TextOperationEqual, orgID)
 }
 
-func (u user) NickNameCondition(op database.TextOperation, name string) database.Condition {
-	return database.NewTextCondition(u.NickNameColumn(), op, name)
+func (h human) IDCondition(userID string) database.Condition {
+	return database.NewTextCondition(h.IDColumn(), database.TextOperationEqual, userID)
 }
 
-func (u user) DisplayNameCondition(op database.TextOperation, name string) database.Condition {
-	return database.NewTextCondition(u.DisplayNameColumn(), op, name)
+func (h human) UsernameCondition(op database.TextOperation, username string) database.Condition {
+	return database.NewTextCondition(h.UsernameColumn(), op, username)
 }
 
-func (u user) PreferredLanguageCondition(language string) database.Condition {
-	return database.NewTextCondition(u.PreferredLanguageColumn(), database.TextOperationEqual, language)
+func (h human) UsernameOrgUniqueCondition(condition bool) database.Condition {
+	return database.NewBooleanCondition(h.UsernameColumn(), condition)
 }
 
-func (u user) GenderCondition(gender uint8) database.Condition {
-	return database.NewNumberCondition(u.GenderColumn(), database.NumberOperationEqual, gender)
+func (h human) StateCondition(state domain.UserState) database.Condition {
+	return database.NewTextCondition(h.UsernameColumn(), database.TextOperationEqual, state.String())
 }
 
-func (u user) AvatarKeyCondition(key string) database.Condition {
-	return database.NewTextCondition(u.AvatarKeyColumn(), database.TextOperationEqual, key)
+func (h human) CreatedAtCondition(op database.NumberOperation, createdAt time.Time) database.Condition {
+	return database.NewNumberCondition(h.CreatedAtColumn(), op, createdAt)
+}
+
+func (h human) UpdatedAtCondition(op database.NumberOperation, updatedAt time.Time) database.Condition {
+	return database.NewNumberCondition(h.UpdatedAtColumn(), op, updatedAt)
+}
+
+func (h human) FirstNameCondition(op database.TextOperation, name string) database.Condition {
+	return database.NewTextCondition(h.FirstNameColumn(), op, name)
+}
+
+func (h human) LastNameCondition(op database.TextOperation, name string) database.Condition {
+	return database.NewTextCondition(h.LastNameColumn(), op, name)
+}
+
+func (h human) NickNameCondition(op database.TextOperation, name string) database.Condition {
+	return database.NewTextCondition(h.NickNameColumn(), op, name)
+}
+
+func (h human) DisplayNameCondition(op database.TextOperation, name string) database.Condition {
+	return database.NewTextCondition(h.DisplayNameColumn(), op, name)
+}
+
+func (h human) PreferredLanguageCondition(language string) database.Condition {
+	return database.NewTextCondition(h.PreferredLanguageColumn(), database.TextOperationEqual, language)
+}
+
+func (h human) GenderCondition(gender uint8) database.Condition {
+	return database.NewNumberCondition(h.GenderColumn(), database.NumberOperationEqual, gender)
+}
+
+func (h human) AvatarKeyCondition(key string) database.Condition {
+	return database.NewTextCondition(h.AvatarKeyColumn(), database.TextOperationEqual, key)
 }
 
 // -------------------------------------------------------------
 // changes
 // -------------------------------------------------------------
 
-func (u user) SetUsername(username string) database.Change {
-	return database.NewChange(u.UsernameColumn(), username)
-}
-
-func (u user) SetUsernameOrgUnique(op bool) database.Change {
-	return database.NewChange(u.UsernameOrgUniqueColumn(), op)
-}
-
-func (u user) SetState(state domain.UserState) database.Change {
-	return database.NewChange(u.StateColumn(), state.String())
-}
-
 // machine
-func (u user) SetName(name string) database.Change {
-	return database.NewChange(u.NameColumn(), name)
+func (m machine) SetUsername(username string) database.Change {
+	return database.NewChange(m.UsernameColumn(), username)
 }
 
-func (u user) SetDescription(description string) database.Change {
-	return database.NewChange(u.DescriptionColumn(), description)
+func (m machine) SetUsernameOrgUnique(op bool) database.Change {
+	return database.NewChange(m.UsernameOrgUniqueColumn(), op)
+}
+
+func (m machine) SetState(state domain.UserState) database.Change {
+	return database.NewChange(m.StateColumn(), state.String())
+}
+
+func (m machine) SetName(name string) database.Change {
+	return database.NewChange(m.NameColumn(), name)
+}
+
+func (m machine) SetDescription(description string) database.Change {
+	return database.NewChange(m.DescriptionColumn(), description)
 }
 
 // human
-func (u user) SetFirstName(name string) database.Change {
-	return database.NewChange(u.FirstNameColumn(), name)
+func (h human) SetUsername(username string) database.Change {
+	return database.NewChange(h.UsernameColumn(), username)
 }
 
-func (u user) SetLastName(name string) database.Change {
-	return database.NewChange(u.LastNameColumn(), name)
+func (h human) SetUsernameOrgUnique(op bool) database.Change {
+	return database.NewChange(h.UsernameOrgUniqueColumn(), op)
 }
 
-func (u user) SetNickName(name string) database.Change {
-	return database.NewChange(u.NickNameColumn(), name)
+func (h human) SetState(state domain.UserState) database.Change {
+	return database.NewChange(h.StateColumn(), state.String())
 }
 
-func (u user) SetDisplayName(name string) database.Change {
-	return database.NewChange(u.DisplayNameColumn(), name)
+func (h human) SetFirstName(name string) database.Change {
+	return database.NewChange(h.FirstNameColumn(), name)
 }
 
-func (u user) SetPreferredLanguage(language string) database.Change {
-	return database.NewChange(u.PreferredLanguageColumn(), language)
+func (h human) SetLastName(name string) database.Change {
+	return database.NewChange(h.LastNameColumn(), name)
 }
 
-func (u user) SetGender(gender uint8) database.Change {
-	return database.NewChange(u.GenderColumn(), gender)
+func (h human) SetNickName(name string) database.Change {
+	return database.NewChange(h.NickNameColumn(), name)
 }
 
-func (u user) SetAvatarKey(key string) database.Change {
-	return database.NewChange(u.AvatarKeyColumn(), key)
+func (h human) SetDisplayName(name string) database.Change {
+	return database.NewChange(h.DisplayNameColumn(), name)
+}
+
+func (h human) SetPreferredLanguage(language string) database.Change {
+	return database.NewChange(h.PreferredLanguageColumn(), language)
+}
+
+func (h human) SetGender(gender uint8) database.Change {
+	return database.NewChange(h.GenderColumn(), gender)
+}
+
+func (h human) SetAvatarKey(key string) database.Change {
+	return database.NewChange(h.AvatarKeyColumn(), key)
+}
+
+func (u user) Human() domain.HumanRepository {
+	return &human{}
+}
+
+func (u user) Machine() domain.MachineRepository {
+	return &machine{}
+}
+
+const queryHumanUserStmt = `SELECT instance_id, org_id, id, username, username_org_unique, state,` +
+	` first_name, last_name, nick_name, display_name, preferred_language, gender, avatar_key,` +
+	` created_at, updated_at` +
+	` FROM zitadel.human_users`
+
+func (u user) GetHuman(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Human, error) {
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	if !options.Condition.IsRestrictingColumn(u.human.InstanceIDColumn()) {
+		return nil, database.NewMissingConditionError(u.human.InstanceIDColumn())
+	}
+
+	if !options.Condition.IsRestrictingColumn(u.human.OrgIDColumn()) {
+		return nil, database.NewMissingConditionError(u.human.OrgIDColumn())
+	}
+
+	if !options.Condition.IsRestrictingColumn(u.human.IDColumn()) {
+		return nil, database.NewMissingConditionError(u.human.IDColumn())
+	}
+
+	var builder database.StatementBuilder
+	builder.WriteString(queryHumanUserStmt)
+	options.Write(&builder)
+
+	return scanHuman(ctx, client, &builder)
+}
+
+const createHumaneStmt = `INSERT INTO zitadel.human_users (instance_id, org_id, id, username, username_org_unique, state,` +
+	` first_name, last_name, nick_name, display_name, preferred_language, gender, avatar_key)` +
+	` VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)` +
+	` RETURNING created_at, updated_at`
+
+func (u user) CreateHuman(ctx context.Context, client database.QueryExecutor, user *domain.Human) (*domain.Human, error) {
+	builder := database.StatementBuilder{}
+	builder.AppendArgs(user.InstanceID, user.OrgID, user.ID, user.Username, user.UsernameOrgUnique, user.State)
+	builder.AppendArgs(user.FirstName, user.LastName, user.NickName, user.DisplayName, user.PreferredLanguage, user.Gender, user.AvatarKey)
+
+	builder.WriteString(createHumaneStmt)
+
+	err := client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
+	return user, err
+}
+
+func (u user) UpdateHuman(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+	if len(changes) == 0 {
+		return 0, database.ErrNoChanges
+	}
+
+	if !condition.IsRestrictingColumn(u.human.InstanceIDColumn()) {
+		return 0, database.NewMissingConditionError(u.human.InstanceIDColumn())
+	}
+
+	if !condition.IsRestrictingColumn(u.human.OrgIDColumn()) {
+		return 0, database.NewMissingConditionError(u.human.OrgIDColumn())
+	}
+
+	if !condition.IsRestrictingColumn(u.human.IDColumn()) {
+		return 0, database.NewMissingConditionError(u.human.IDColumn())
+	}
+
+	var builder database.StatementBuilder
+	builder.WriteString(`UPDATE zitadel.human_users SET `)
+	database.Changes(changes).Write(&builder)
+	writeCondition(&builder, condition)
+
+	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+const querMachineUserStmt = `SELECT instance_id, org_id, id, username, username_org_unique, state,` +
+	` name, description,` +
+	` created_at, updated_at` +
+	` FROM zitadel.machine_users`
+
+func (u user) GetMachine(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Machine, error) {
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	options = new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	if !options.Condition.IsRestrictingColumn(u.machine.InstanceIDColumn()) {
+		return nil, database.NewMissingConditionError(u.machine.InstanceIDColumn())
+	}
+
+	if !options.Condition.IsRestrictingColumn(u.machine.OrgIDColumn()) {
+		return nil, database.NewMissingConditionError(u.machine.OrgIDColumn())
+	}
+
+	if !options.Condition.IsRestrictingColumn(u.machine.IDColumn()) {
+		return nil, database.NewMissingConditionError(u.machine.IDColumn())
+	}
+
+	var builder database.StatementBuilder
+	builder.WriteString(querMachineUserStmt)
+	options.Write(&builder)
+
+	return scanMachine(ctx, client, &builder)
+}
+
+const createMachineStmt = `INSERT INTO zitadel.machine_users (instance_id, org_id, id, username, username_org_unique, state,` +
+	` name, description)` +
+	` VALUES($1, $2, $3, $4, $5, $6, $7, $8)` +
+	` RETURNING created_at, updated_at`
+
+func (u user) CreateMachine(ctx context.Context, client database.QueryExecutor, user *domain.Machine) (*domain.Machine, error) {
+	builder := database.StatementBuilder{}
+	builder.AppendArgs(user.InstanceID, user.OrgID, user.ID, user.Username, user.UsernameOrgUnique, user.State)
+	builder.AppendArgs(user.Name, user.Description)
+
+	builder.WriteString(createMachineStmt)
+
+	err := client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
+	return user, err
+}
+
+func (u user) ListHuman(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Human, error) {
+	builder := database.StatementBuilder{}
+
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	if !options.Condition.IsRestrictingColumn(u.Human().InstanceIDColumn()) {
+		return nil, database.NewMissingConditionError(u.Human().InstanceIDColumn())
+	}
+
+	builder.WriteString(queryHumanUserStmt)
+	options.Write(&builder)
+
+	orderBy := database.OrderBy(u.Human().CreatedAtColumn())
+	orderBy.Write(&builder)
+
+	return scanHumans(ctx, client, &builder)
+}
+
+func scanMachine(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Machine, error) {
+	user := &domain.Machine{}
+	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+
+	err = rows.(database.CollectableRows).CollectExactlyOneRow(user)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, err
+}
+
+func scanHuman(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Human, error) {
+	user := &domain.Human{}
+	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+
+	err = rows.(database.CollectableRows).CollectExactlyOneRow(user)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, err
+}
+
+func scanHumans(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.Human, error) {
+	users := []*domain.Human{}
+
+	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+
+	err = rows.(database.CollectableRows).Collect(&users)
+	if err != nil {
+		return nil, err
+	}
+
+	return users, err
 }
