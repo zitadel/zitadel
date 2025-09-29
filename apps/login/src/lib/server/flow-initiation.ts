@@ -69,9 +69,10 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
   let suffix = "";
   let idpId = "";
 
-  if (authRequest?.scope) {
-    console.log("Auth request scopes:", authRequest.scope);
+  console.log("sessions:", sessions);
+  console.log("sessionCookies:", sessionCookies);
 
+  if (authRequest?.scope) {
     const orgScope = authRequest.scope.find((s: string) => ORG_SCOPE_REGEX.test(s));
     const idpScope = authRequest.scope.find((s: string) => IDP_SCOPE_REGEX.test(s));
 
@@ -82,7 +83,6 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       const orgDomainScope = authRequest.scope.find((s: string) => ORG_DOMAIN_SCOPE_REGEX.test(s));
 
       if (orgDomainScope) {
-        console.log("Found org domain scope:", orgDomainScope);
         const matched = ORG_DOMAIN_SCOPE_REGEX.exec(orgDomainScope);
         const orgDomain = matched?.[1] ?? "";
 
@@ -92,8 +92,6 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
             serviceUrl,
             domain: orgDomain,
           });
-
-          console.log("Orgs matching domain:", orgs.result);
 
           if (orgs.result && orgs.result.length === 1) {
             organization = orgs.result[0].id ?? "";
