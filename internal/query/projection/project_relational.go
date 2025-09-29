@@ -144,7 +144,7 @@ func (p *projectRelationalProjection) reduceProjectDeactivated(event eventstore.
 func (p *projectRelationalProjection) reduceProjectReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectReactivatedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-oof4U", "reduce.wrong.event.type %s", project.ProjectDeactivatedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-oof4U", "reduce.wrong.event.type %s", project.ProjectReactivatedType)
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
 		repo := repository.ProjectRepository()

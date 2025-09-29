@@ -88,7 +88,7 @@ func (p *projectRoleRelationalProjection) reduceProjectRoleAdded(event eventstor
 func (p *projectRoleRelationalProjection) reduceProjectRoleChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleChangedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-jie5J", "reduce.wrong.event.type %s", project.GrantChangedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-jie5J", "reduce.wrong.event.type %s", project.RoleChangedType)
 	}
 	if e.DisplayName == nil && e.Group == nil {
 		return handler.NewNoOpStatement(e), nil
@@ -121,7 +121,7 @@ func (p *projectRoleRelationalProjection) reduceProjectRoleChanged(event eventst
 func (p *projectRoleRelationalProjection) reduceProjectRoleRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleRemovedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-euf0U", "reduce.wrong.event.type %s", project.GrantRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-euf0U", "reduce.wrong.event.type %s", project.RoleRemovedType)
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
 		repo := repository.ProjectRepository().Role()
