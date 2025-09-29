@@ -26,16 +26,16 @@ jobs:
         language: [go,javascript]
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
     - if: matrix.language == 'go'
       name: Install Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         go-version-file: go.mod
 
     # node to install sass for go
     - if: matrix.language == 'go'
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v5
     - if: matrix.language == 'go'
       run: |
         npm install -g sass
