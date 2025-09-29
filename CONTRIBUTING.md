@@ -7,14 +7,14 @@ Zitadel is an open-source identity and access management platform built with a m
 This repository contains multiple interconnected projects.
 You can build and start any project with Nx commands:
 
-| Task | Command | Notes |
-|------|---------|--------|
-| **Production** | `pnpm nx run PROJECT:prod` | Production server |
-| **Develop** | `pnpm nx run PROJECT:dev` | Development server |
-| **Generate** | `pnpm nx run PROJECT:generate` | Generate files |
-| **Test** | `pnpm nx run PROJECT:test` | Run tests |
-| **Lint** | `pnpm nx run PROJECT:lint` | Check code style |
-| **Lint Fix** | `pnpm nx run PROJECT:lint-fix` | Auto-fix style issues |
+| Task           | Command                        | Notes                 |
+| -------------- | ------------------------------ | --------------------- |
+| **Production** | `pnpm nx run PROJECT:prod`     | Production server     |
+| **Develop**    | `pnpm nx run PROJECT:dev`      | Development server    |
+| **Generate**   | `pnpm nx run PROJECT:generate` | Generate files        |
+| **Test**       | `pnpm nx run PROJECT:test`     | Run tests             |
+| **Lint**       | `pnpm nx run PROJECT:lint`     | Check code style      |
+| **Lint Fix**   | `pnpm nx run PROJECT:lint-fix` | Auto-fix style issues |
 
 Replace `PROJECT` with one of the following:
 
@@ -115,12 +115,12 @@ pnpm nx run @zitadel/console:dev
 To allow Console access via http://localhost:4200, you have to configure the Zitadel API.
 
 1. Navigate to http://localhost:8080/ui/console/projects.
-3. Select the _ZITADEL_ project.
-4. Select the _Console_ application.
-5. Select _Redirect Settings_
-6. Add _http://<span because="breaks the link"></span>localhost:4200/auth/callback_ to the _Redirect URIs_
-7. Add _http://<span because="breaks the link"></span>localhost:4200/signedout_ to the _Post Logout URIs_
-8. Select the _Save_ button
+2. Select the _ZITADEL_ project.
+3. Select the _Console_ application.
+4. Select _Redirect Settings_
+5. Add _http://<span because="breaks the link"></span>localhost:4200/auth/callback_ to the _Redirect URIs_
+6. Add _http://<span because="breaks the link"></span>localhost:4200/signedout_ to the _Post Logout URIs_
+7. Select the _Save_ button
 
 Visit http://localhost:4200/?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
 
@@ -178,14 +178,14 @@ Go through the following checklist before you submit the final pull request:
 
 The code consists of the following parts:
 
-| name                | description                                        | language                                                                                                  | where to find                                       | Development Guide                                   |
-| ------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | --------------------------------------------------- |
-| API implementation  | Service that serves the grpc(-web) and RESTful API | [go](https://go.dev)                                                                                      | [API implementation](./internal/api/grpc)           | [Contribute to API](#api)                   |
-| API definitions     | Specifications of the API                          | [Protobuf](https://developers.google.com/protocol-buffers)                                                | [./proto/zitadel](./proto/zitadel)                  | [Contribute to API](#api)                   |
-| Console             | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#frontend) |
-| Login               | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./apps/login](./apps/login)                        | [Contribute to Frontend](#frontend) |
-| Docs                | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](#frontend) |
-| translations        | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations](#translations) |
+| name               | description                                        | language                                                                                                  | where to find                                       | Development Guide                        |
+| ------------------ | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | ---------------------------------------- |
+| API implementation | Service that serves the grpc(-web) and RESTful API | [go](https://go.dev)                                                                                      | [API implementation](./internal/api/grpc)           | [Contribute to API](#api)                |
+| API definitions    | Specifications of the API                          | [Protobuf](https://developers.google.com/protocol-buffers)                                                | [./proto/zitadel](./proto/zitadel)                  | [Contribute to API](#api)                |
+| Console            | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#frontend)      |
+| Login              | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./apps/login](./apps/login)                        | [Contribute to Frontend](#frontend)      |
+| Docs               | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](#frontend)      |
+| translations       | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations](#translations) |
 
 Please follow the guides to validate and test the code before you contribute.
 
@@ -359,7 +359,7 @@ This repository uses **pnpm** as package manager and **Nx** for build orchestrat
 
 Make sure you have the [development requirements](#dev-requirements) installed.
 
-**Start developing***
+**Start developing\***
 
 ```bash
 pnpm install
@@ -388,11 +388,13 @@ docs → (independent)
 ### <a name="client-packages"></a>Client Packages
 
 **`@zitadel/proto`**: Protocol buffer definitions and generated TypeScript/JavaScript clients.
+
 ```bash
 pnpm nx run @zitadel/proto:generate  # Regenerate after proto changes
 ```
 
 **`@zitadel/client`**: High-level TypeScript client library with utilities for API interaction.
+
 ```bash
 pnpm nx run @zitadel/client:build  # Build after changes
 ```
@@ -601,6 +603,7 @@ corepack enable
 ```
 
 **Install Node Modules:**
+
 ```bash
 # Install dependencies
 pnpm install
@@ -610,6 +613,7 @@ pnpm nx run @zitadel/login:dev  # Should start dev server at http://localhost:30
 ```
 
 **Additional requirements for testing:**
+
 - **[Cypress runtime dependencies](https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies)** - For UI tests
 
 <details>
@@ -617,13 +621,14 @@ pnpm nx run @zitadel/login:dev  # Should start dev server at http://localhost:30
   
   For Cypress tests on WSL2, you may need to configure X11 forwarding. Following suggestions [here](https://stackoverflow.com/questions/62641553/setup-cypress-on-wsl-ubuntu-for-windows-10) and [here](https://github.com/microsoft/WSL/issues/4106). Use at your own risk.
 
-  1. Install `VcXsrv Windows X Server`
-  2. Set shortcut target to `"C:\Program Files\VcXsrv\xlaunch.exe" -ac`
-  3. In WSL2: `export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0`
-  4. Disable access control when starting XLaunch
+1. Install `VcXsrv Windows X Server`
+2. Set shortcut target to `"C:\Program Files\VcXsrv\xlaunch.exe" -ac`
+3. In WSL2: `export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0`
+4. Disable access control when starting XLaunch
 </details>
 
 **Recommended VS Code extensions:**
+
 - [Go](https://marketplace.visualstudio.com/items?itemName=golang.Go) - For API development. Use golangci-lint v2 as linter.
 - [Angular Language Service](https://marketplace.visualstudio.com/items?itemName=Angular.ng-template) - For Console development
 - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) - Code linting
