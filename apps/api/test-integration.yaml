@@ -8,17 +8,10 @@ Database:
     Database: zitadel
 FirstInstance:
   Skip: false
-  PatPath: .artifacts/api-test-integration/admin-pat.txt
   InstanceName: ZITADEL
   DefaultLanguage: en
   Org:
     Name: ZITADEL
-    Machine:
-      Machine:
-        Username: boss
-        Name: boss
-      Pat:
-        ExpirationDate: 2099-01-01T00:00:00Z
     Human:
       PasswordChangeRequired: false
 
