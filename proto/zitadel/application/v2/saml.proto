@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package zitadel.application.v2;
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "zitadel/application/v2/login.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/application/v2;application";
+
+message SAMLConfig {
+  // The SAML metadata can be provided either as raw XML or as a URL where the metadata can be fetched from.
+  oneof metadata {
+    bytes metadata_xml = 1;
+    string metadata_url = 2;
+  }
+
+  // LoginVersion specifies the login UI, where the user is redirected to for authentication.
+  // It can be used to select a specific login UI, e.g. for embedded UIs or for custom login pages
+  // hosted on any other domain.
+  // If unset, the login UI is chosen by the instance default.
+  LoginVersion login_version = 3;
+}

@@ -1,0 +1,849 @@
+syntax = "proto3";
+
+package zitadel.application.v2;
+
+import "google/api/field_behavior.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "zitadel/application/v2/api.proto";
+import "zitadel/application/v2/application.proto";
+import "zitadel/application/v2/login.proto";
+import "zitadel/application/v2/oidc.proto";
+import "zitadel/filter/v2/filter.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/application/v2;application";
+
+// Service to manage applications.
+// The service provides methods to create, update, delete and list application and application keys.
+service ApplicationService {
+  // Create Application
+  //
+  // Create an application. The application can be OIDC, API or SAML type, based on the input.
+  //
+  // Required permissions:
+  //   - project.app.write
+  rpc CreateApplication(CreateApplicationRequest) returns (CreateApplicationResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {permission: "authenticated"}
+    };
+  }
+
+  // Update Application
+  //
+  // Changes the configuration of an OIDC, API or SAML type application, as well as
+  // the application name, based on the input provided.
+  //
+  // Required permissions:
+  //   - project.app.write
+  rpc UpdateApplication(UpdateApplicationRequest) returns (UpdateApplicationResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {permission: "authenticated"}
+    };
+  }
+
+  // Get Application
+  //
+  // Retrieves the application matching the provided ID.
+  //
+  // Required permissions:
+  //   - project.app.read
+  rpc GetApplication(GetApplicationRequest) returns (GetApplicationResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {permission: "authenticated"}
+    };
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Delete Application
+  //
+  // Deletes the application belonging to the input project and matching the provided
+  // application ID.
+  //
+  // Required permissions:
+  //   - project.app.delete
+  rpc DeleteApplication(DeleteApplicationRequest) returns (DeleteApplicationResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {permission: "authenticated"}
+    };
+  }
+
+  // Deactivate Application
+  //
+  // Deactivates the application belonging to the input project and matching the provided
+  // application ID.
+  //
+  // Required permissions:
+  //   - project.app.write
+  rpc DeactivateApplication(DeactivateApplicationRequest) returns (DeactivateApplicationResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {permission: "authenticated"}
+    };
+  }
+
+  // Reactivate Application
+  //
+  // Reactivates the application belonging to the input project and matching the provided
+  // application ID.
+  //
+  // Required permissions:
+  //   - project.app.write
+  rpc ReactivateApplication(ReactivateApplicationRequest) returns (ReactivateApplicationResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {permission: "authenticated"}
+    };
+  }
+
+  // Generate Client Secret
+  //
+  // Generates the client secret of an API or OIDC application that belongs to the input project.
+  //
+  // Required permissions:
+  //   - project.app.write
+  rpc GenerateClientSecret(GenerateClientSecretRequest) returns (GenerateClientSecretResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {permission: "authenticated"}
+    };
+  }
+
+  // List Applications
+  //
+  // Returns a list of applications matching the input parameters. The results can be filtered
+  // by project, state, type and name. It can be sorted by id, name, creation date, change date or state.
+  //
+  // Required permissions:
+  //   - project.app.read
+  rpc ListApplications(ListApplicationsRequest) returns (ListApplicationsResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {permission: "authenticated"}
+    };
+  }
+
+  // Create Application Key
+  //
+  // Create a new application key, which is used to authorize an API application.
+  //
+  // Key details are returned in the response. They must be stored safely, as it will not
+  // be possible to retrieve them again.
+  //
+  // Required permissions:
+  //   - `project.app.write`
+  rpc CreateApplicationKey(CreateApplicationKeyRequest) returns (CreateApplicationKeyResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {permission: "authenticated"}
+    };
+  }
+
+  // Delete Application Key
+  //
+  // Deletes an application key matching the provided ID.
+  //
+  // Organization ID is not mandatory, but helps with filtering/performance.
+  //
+  // The deletion time is returned in response message.
+  //
+  // Required permissions:
+  //   - `project.app.write`
+  rpc DeleteApplicationKey(DeleteApplicationKeyRequest) returns (DeleteApplicationKeyResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {permission: "authenticated"}
+    };
+  }
+
+  // Get Application Key
+  //
+  // Retrieves the application key matching the provided ID.
+  //
+  // Specifying a project, organization and application ID is optional but help with filtering/performance.
+  //
+  // Required permissions:
+  //   - project.app.read
+  rpc GetApplicationKey(GetApplicationKeyRequest) returns (GetApplicationKeyResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {permission: "authenticated"}
+    };
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // List Application Keys
+  //
+  // Returns a list of application keys matching the input parameters.
+  //
+  // The result can be sorted by id, aggregate, creation date, expiration date, resource owner or type.
+  // It can also be filtered by application, project or organization ID.
+  //
+  // Required permissions:
+  //   - project.app.read
+  rpc ListApplicationKeys(ListApplicationKeysRequest) returns (ListApplicationKeysResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {permission: "authenticated"}
+    };
+  }
+}
+
+message CreateApplicationRequest {
+  // The ID of the project the application will be created in.
+  string project_id = 1 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // Optionally, provide the unique ID of the new application. If omitted, the system will generate one for you,
+  // which is the recommended way. The generated ID wil be returned in the response.
+  string id = 2 [(validate.rules).string = {max_len: 200}];
+
+  // Publicly visible name of the application. This might be presented to users if they sign in.
+  string name = 3 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1 //TODO: needed?
+      max_length: 200
+      example: "\"MyApp\""
+    }
+  ];
+
+  // Defines the type of application to be created: OIDC, SAML or API and allows you
+  // to provide the configuration for the respective application type.
+  oneof application_type {
+    option (validate.required) = true;
+    CreateOIDCApplicationRequest oidc_request = 4;
+    CreateSAMLApplicationRequest saml_request = 5;
+    CreateAPIApplicationRequest api_request = 6;
+  }
+}
+
+message CreateApplicationResponse {
+  // The unique ID of the newly created application.
+  string application_id = 1;
+
+  // The timestamp of the application creation.
+  google.protobuf.Timestamp creation_date = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2024-12-18T07:50:47.492Z\""}];
+
+  // Depending on the application type, the response contains the relevant configuration details.
+  // This can include client IDs, secrets, or other generated information necessary for the application to function.
+  oneof creation_response_type {
+    CreateOIDCApplicationResponse oidc_response = 3;
+    CreateSAMLApplicationResponse saml_response = 4;
+    CreateAPIApplicationResponse api_response = 5;
+  }
+}
+
+message CreateOIDCApplicationRequest {
+  // RedirectURIs are the allowed callback URIs for the OAuth2 / OIDC flows,
+  // where the authorization code or tokens will be sent to.
+  // The redirect_uri parameter in the authorization request must exactly match one of these URIs.
+  repeated string redirect_uris = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "[\"http://localhost:4200/auth/callback\"]"}];
+
+  // ResponseTypes define whether a code, id_token token or just id_token will be returned.
+  // The response_type parameter in the authorization request must exactly match one of these values.
+  repeated OIDCResponseType response_types = 2 [(validate.rules).repeated = {
+    items: {
+      enum: {
+        defined_only: true
+        not_in: [0] /* OIDC_RESPONSE_TYPE_UNSPECIFIED is not allowed */
+      }
+    }
+  }];
+
+  // GrantTypes define the flow type the application is allowed to use.
+  // The grant_type parameter in the token request must exactly match one of these values.
+  // Minimum one grant type must be provided, but multiple grant types can be provided to allow
+  // different flows, e.g. authorization code flow and refresh token flow.
+  repeated OIDCGrantType grant_types = 3 [(validate.rules).repeated = {
+    items: {
+      enum: {defined_only: true}
+    }
+  }];
+
+  // ApplicationType defines the OAuth2/OIDC client type and their ability to maintain
+  // confidentiality of their credentials.
+  // This influences the allowed grant types and the required authentication method.
+  OIDCApplicationType app_type = 4 [(validate.rules).enum = {defined_only: true}];
+
+  // The authentication method type used by the application to authenticate at the token endpoint.
+  OIDCAuthMethodType auth_method_type = 5 [(validate.rules).enum = {defined_only: true}];
+
+  // PostLogoutRedirectURIs are the allowed URIs to redirect to after a logout.
+  // The post_logout_redirect_uri parameter in the logout request must exactly match one of these URIs.
+  repeated string post_logout_redirect_uris = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "[\"http://localhost:4200/signedout\"]"}];
+
+  // Version defines the OIDC version used by the application.
+  // Currently, only version 1.0 is supported.
+  // Future versions might introduce breaking changes.
+  OIDCVersion version = 7 [(validate.rules).enum = {defined_only: true}];
+
+  // DevMode can be enabled for development purposes. This allows the use of
+  // OIDC non-compliant and potentially insecure settings, such as the use of
+  // HTTP redirect URIs or wildcard redirect URIs.
+  bool dev_mode = 8;
+
+  // The AccessTokenType defines the type of the access token returned from ZITADEL.
+  // Bearer tokens are opaque to clients. JWT tokens are self-contained and can be validated by the client.
+  // Bearer tokens must be introspected at the ZITADEL token endpoint.
+  OIDCTokenType access_token_type = 9 [(validate.rules).enum = {defined_only: true}];
+
+  // If AccessTokenRoleAssertion is enabled, the roles of the user are added to the access token.
+  // Ensure that the access token is a JWT token and not a bearer token. And either request the roles
+  // by scope or enable the user role assertion on the project.
+  bool access_token_role_assertion = 10;
+
+  // If IDTokenRoleAssertion is enabled, the roles of the user are added to the id token.
+  // Ensure that either the roles are requested by scope or enable the user role assertion on the
+  // project.
+  bool id_token_role_assertion = 11;
+
+  // If IDTokenUserinfoAssertion is enabled, the claims of profile, email, address and phone scopes
+  // are added to the id token even if an access token is issued. This can be required by some applications
+  // that do not call the userinfo endpoint after authentication or directly use the id_token for retrieving
+  // user information.
+  // Attention: this violates the OIDC specification, which states that these claims must only be
+  // requested from the userinfo endpoint if an access token is issued. This is to prevent
+  // leaking of personal information in the id token, which is often stored in the browser and
+  // therefore more vulnerable.
+  bool id_token_userinfo_assertion = 12;
+
+  // ClockSkew is used to compensate time differences between the servers of ZITADEL and the application.
+  // It is added to the "exp" claim and subtracted from "iat", "auth_time" and "nbf" claims.
+  // The default is 0s, the maximum is 5s.
+  google.protobuf.Duration clock_skew = 13 [
+    (validate.rules).duration = {
+      gte: {}
+      lte: {seconds: 5}
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"1s\""}
+  ];
+
+  // AdditionalOrigins are HTTP origins (scheme + host + port) from where the API can be used
+  // additional to the redirect_uris.
+  // This is useful if the application is used from an origin different to the redirect_uris,
+  // e.g. if the application is a SPA served in a native app, where the redirect_uri is a custom scheme,
+  // but the application is served from a https origin.
+  repeated string additional_origins = 14 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "[\"scheme://localhost:8080\"]"}];
+
+  // For native apps a successful login usually shows a success page with a link to open the application again.
+  // SkipNativeAppSuccessPage can be used to skip this page and open the application directly.
+  bool skip_native_app_success_page = 15;
+
+  // BackChannelLogoutURI is used to notify the application about terminated sessions according
+  // to the OIDC Back-Channel Logout (https://openid.net/specs/openid-connect-backchannel-1_0.html).
+  string back_channel_logout_uri = 16 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "[\"https://example.com/auth/backchannel\"]"}];
+
+  // LoginVersion specifies the login UI, where the user is redirected to for authentication.
+  // It can be used to select a specific login UI, e.g. for embedded UIs or for custom login pages
+  // hosted on any other domain.
+  // If unset, the login UI is chosen by the instance default.
+  LoginVersion login_version = 17;
+}
+
+message CreateOIDCApplicationResponse {
+  // The unique OAuth2/OIDC client_id used for authentication of the application,
+  // e.g. at the token endpoint.
+  string client_id = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"1035496534033449\""}];
+
+  // In case of using the OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_CLIENT_SECRET_BASIC
+  // or OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_CLIENT_SECRET_POST the client_secret is generated and returned.
+  // It must be stored safely, as it will not be possible to retrieve it again.
+  // A new client_secret can be generated using the GenerateClientSecret endpoint.
+  string client_secret = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"gjoq34589uasgh\""}];
+
+  // NoneCompliant specifies whether the config is OIDC compliant. A production configuration SHOULD be compliant.
+  // Non-compliant configurations can run into interoperability issues with OIDC libraries and tools.
+  // Compliance problems are listed in the compliance_problems field.
+  bool none_compliant = 3;
+
+  // ComplianceProblems lists the problems for non-compliant configurations.
+  // In case of a compliant configuration, this list is empty.
+  repeated OIDCLocalizedMessage compliance_problems = 4;
+}
+
+message CreateSAMLApplicationRequest {
+  // The SAML metadata can be provided either as raw XML or as a URL where the metadata can be fetched from.
+  // Either metadata_xml or metadata_url must be provided.
+  oneof metadata {
+    option (validate.required) = true;
+    bytes metadata_xml = 1 [(validate.rules).bytes.max_len = 500000];
+    string metadata_url = 2 [(validate.rules).string = {
+      max_len: 2048
+      uri_ref: true
+    }];
+  }
+
+  // LoginVersion specifies the login UI, where the user is redirected to for authentication.
+  // It can be used to select a specific login UI, e.g. for embedded UIs or for custom login pages
+  // hosted on any other domain.
+  // If unset, the login UI is chosen by the instance default.
+  LoginVersion login_version = 3;
+}
+
+message CreateSAMLApplicationResponse {}
+
+message CreateAPIApplicationRequest {
+  // The authentication method type used by the API to authenticate at the introspection endpoint.
+  APIAuthMethodType auth_method_type = 1 [(validate.rules).enum = {defined_only: true}];
+}
+
+message CreateAPIApplicationResponse {
+  // The unique OAuth2 client_id used for authentication of the API, e.g. at the introspection endpoint.
+  string client_id = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"3950723409029374\""}];
+
+  // In case of using the APIAuthMethodType.API_AUTH_METHOD_TYPE_BASIC the client_secret is generated and returned.
+  // It must be stored safely, as it will not be possible to retrieve it again.
+  // A new client_secret can be generated using the GenerateClientSecret endpoint.
+  string client_secret = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"gjoq34589uasgh\""}];
+}
+
+message UpdateApplicationRequest {
+  // The unique ID of the application to be updated.
+  string id = 1 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1 // TODO: needed?
+      max_length: 200
+      example: "\"45984352431\""
+    }
+  ];
+
+  // The ID of the project the application belongs to.
+  string project_id = 2 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // Publicly visible name of the application. This might be presented to users if they sign in.
+  // If not set, the name will not be changed.
+  string name = 3 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"MyApplicationName\""
+      max_length: 200
+    }
+  ];
+
+  oneof update_request_type {
+    UpdateSAMLApplicationConfigurationRequest saml_configuration_request = 4;
+    UpdateOIDCApplicationConfigurationRequest oidc_configuration_request = 5;
+    UpdateAPIApplicationConfigurationRequest api_configuration_request = 6;
+  }
+}
+
+message UpdateApplicationResponse {
+  // The timestamp of the application update. If no changes were made, the previous change date is returned.
+  // This can be used to check if the application was actually updated.
+  google.protobuf.Timestamp change_date = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2024-12-18T07:50:47.492Z\""}];
+}
+
+message UpdateSAMLApplicationConfigurationRequest {
+  oneof metadata {
+    option (validate.required) = true;
+    bytes metadata_xml = 1 [(validate.rules).bytes.max_len = 500000];
+    string metadata_url = 2 [(validate.rules).string.max_len = 200];
+  }
+
+  // LoginVersion specifies the login UI, where the user is redirected to for authentication.
+  // It can be used to select a specific login UI, e.g. for embedded UIs or for custom login pages
+  // hosted on any other domain.
+  // If unset, the login UI is chosen by the instance default.
+  optional LoginVersion login_version = 3;
+}
+
+message UpdateOIDCApplicationConfigurationRequest {
+  // RedirectURIs are the allowed callback URIs for the OAuth2 / OIDC flows,
+  // where the authorization code or tokens will be sent to.
+  // The redirect_uri parameter in the authorization request must exactly match one of these URIs.
+  // Any existing redirect URIs not included in this list will be removed.
+  // If not set, the redirect URIs will not be changed.
+  repeated string redirect_uris = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "[\"http://localhost:4200/auth/callback\"]"}];
+
+  // ResponseTypes define whether a code, id_token token or just id_token will be returned.
+  // The response_type parameter in the authorization request must exactly match one of these values.
+  // Any existing response types not included in this list will be removed.
+  // If not set, the response types will not be changed.
+  repeated OIDCResponseType response_types = 2;
+
+  // GrantTypes define the flow type the application is allowed to use.
+  // The grant_type parameter in the token request must exactly match one of these values.
+  // Minimum one grant type must be provided, but multiple grant types can be provided to allow
+  // different flows, e.g. authorization code flow and refresh token flow.
+  // Any existing grant types not included in this list will be removed.
+  // If not set, the grant types will not be changed.
+  repeated OIDCGrantType grant_types = 3;
+
+  // ApplicationType defines the OAuth2/OIDC client type and their ability to maintain
+  // confidentiality of their credentials.
+  // This influences the allowed grant types and the required authentication method.
+  // If not set, the application type will not be changed.
+  optional OIDCApplicationType app_type = 4 [(validate.rules).enum = {defined_only: true}];
+
+  // The authentication method type used by the application to authenticate at the token endpoint.
+  // If not set, the authentication method type will not be changed.
+  optional OIDCAuthMethodType auth_method_type = 5 [(validate.rules).enum = {defined_only: true}];
+
+  // PostLogoutRedirectURIs are the allowed URIs to redirect to after a logout.
+  // The post_logout_redirect_uri parameter in the logout request must exactly match one of these URIs.
+  // Any existing post logout redirect URIs not included in this list will be removed.
+  // If not set, the post logout redirect URIs will not be changed.
+  repeated string post_logout_redirect_uris = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "[\"http://localhost:4200/signedout\"]"}];
+
+  // Version defines the OIDC version used by the application.
+  // Currently, only version 1.0 is supported.
+  // Future versions might introduce breaking changes.
+  // If not set, the version will not be changed.
+  optional OIDCVersion version = 7 [(validate.rules).enum = {defined_only: true}];
+
+  // DevMode can be enabled for development purposes. This allows the use of
+  // OIDC non-compliant and potentially insecure settings, such as the use of
+  // HTTP redirect URIs or wildcard redirect URIs.
+  // If not set, the dev mode will not be changed.
+  optional bool dev_mode = 8;
+
+  // The AccessTokenType defines the type of the access token returned from ZITADEL.
+  // Bearer tokens are opaque to clients. JWT tokens are self-contained and can be validated by the client.
+  // Bearer tokens must be introspected at the ZITADEL token endpoint.
+  // If not set, the access token type will not be changed.
+  optional OIDCTokenType access_token_type = 9 [(validate.rules).enum = {defined_only: true}];
+
+  // If AccessTokenRoleAssertion is enabled, the roles of the user are added to the access token.
+  // Ensure that the access token is a JWT token and not a bearer token. And either request the roles
+  // by scope or enable the user role assertion on the project.
+  // If not set, the access token role assertion will not be changed.
+  optional bool access_token_role_assertion = 10;
+
+  // If IDTokenRoleAssertion is enabled, the roles of the user are added to the id token.
+  // Ensure that either the roles are requested by scope or enable the user role assertion on the
+  // project.
+  // If not set, the id token role assertion will not be changed.
+  optional bool id_token_role_assertion = 11;
+
+  // If IDTokenUserinfoAssertion is enabled, the claims of profile, email, address and phone scopes
+  // are added to the id token even if an access token is issued. This can be required by some applications
+  // that do not call the userinfo endpoint after authentication or directly use the id_token for retrieving
+  // user information.
+  // Attention: this violates the OIDC specification, which states that these claims must only be
+  // requested from the userinfo endpoint if an access token is issued. This is to prevent
+  // leaking of personal information in the id token, which is often stored in the browser and
+  // therefore more vulnerable.
+  // If not set, the id token userinfo assertion will not be changed.
+  optional bool id_token_userinfo_assertion = 12;
+
+  // ClockSkew is used to compensate time differences between the servers of ZITADEL and the application.
+  // It is added to the "exp" claim and subtracted from "iat", "auth_time" and "nbf" claims.
+  // The default is 0s, the maximum is 5s.
+  // If not set, the clock skew will not be changed.
+  optional google.protobuf.Duration clock_skew = 13 [
+    (validate.rules).duration = {
+      gte: {}
+      lte: {seconds: 5}
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"1s\""}
+  ];
+
+  // AdditionalOrigins are HTTP origins (scheme + host + port) from where the API can be used
+  // additional to the redirect_uris.
+  // This is useful if the application is used from an origin different to the redirect_uris,
+  // e.g. if the application is a SPA served in a native app, where the redirect_uri is a custom scheme,
+  // but the application is served from a https origin.
+  // Any existing additional origins not included in this list will be removed.
+  // If not set, the additional origins will not be changed.
+  repeated string additional_origins = 14 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "[\"scheme://localhost:8080\"]"}];
+
+  // For native apps a successful login usually shows a success page with a link to open the application again.
+  // SkipNativeAppSuccessPage can be used to skip this page and open the application directly.
+  // If not set, the skip native app success page will not be changed.
+  optional bool skip_native_app_success_page = 15;
+
+  // BackChannelLogoutURI is used to notify the application about terminated sessions according
+  // to the OIDC Back-Channel Logout (https://openid.net/specs/openid-connect-backchannel-1_0.html).
+  // If not set, the back channel logout URI will not be changed.
+  optional string back_channel_logout_uri = 16 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "[\"https://example.com/auth/backchannel\"]"}];
+
+  // LoginVersion specifies the login UI, where the user is redirected to for authentication.
+  // It can be used to select a specific login UI, e.g. for embedded UIs or for custom login pages
+  // hosted on any other domain.
+  // If unset, the login UI is chosen by the instance default.
+  optional LoginVersion login_version = 17;
+}
+
+message UpdateAPIApplicationConfigurationRequest {
+  // The authentication method type used by the API to authenticate at the introspection endpoint.
+  APIAuthMethodType auth_method_type = 1 [(validate.rules).enum = {defined_only: true}];
+}
+
+message GetApplicationRequest {
+  // The unique ID of the application to be retrieved.
+  string application_id = 1 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1 // TODO: needed?
+      max_length: 200
+      example: "\"45984352431\""
+    }
+  ];
+}
+
+message GetApplicationResponse {
+  Application application = 1;
+}
+
+message DeleteApplicationRequest {
+  // The unique ID of the application to be deleted.
+  string application_id = 1 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // The ID of the project the application belongs to.
+  string project_id = 2 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message DeleteApplicationResponse {
+  // The timestamp of the application deletion. In case the application was already deleted,
+  // the previous deletion date is returned. This can be used to check if the application was
+  // actually deleted.
+  google.protobuf.Timestamp deletion_date = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2025-01-23T10:34:18.051Z\""}];
+}
+
+message DeactivateApplicationRequest {
+  // The unique ID of the application to be deactivated.
+  string application_id = 1 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // The ID of the project the application belongs to.
+  string project_id = 2 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message DeactivateApplicationResponse {
+  // The timestamp of the application deactivation.
+  google.protobuf.Timestamp deactivation_date = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2025-01-23T10:34:18.051Z\""}];
+}
+
+message ReactivateApplicationRequest {
+  // The unique ID of the application to be reactivated.
+  string application_id = 1 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // The ID of the project the application belongs to.
+  string project_id = 2 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message ReactivateApplicationResponse {
+  // The timestamp of the application reactivation.
+  google.protobuf.Timestamp reactivation_date = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2025-01-23T10:34:18.051Z\""}];
+}
+
+message GenerateClientSecretRequest {
+  // The unique ID of the application to generate a new client secret for.
+  string application_id = 1 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // The ID of the project the application belongs to.
+  string project_id = 2 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message GenerateClientSecretResponse {
+  // The newly generated client secret. It must be stored safely, as it will not be possible to retrieve it again.
+  // A new client secret can be generated using this endpoint.
+  string client_secret = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"gjoq34589uasgh\""}];
+
+  // The timestamp of the creation of the new client secret.
+  google.protobuf.Timestamp creation_date = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2025-01-23T10:34:18.051Z\""}];
+}
+
+message ListApplicationsRequest {
+  // Pagination and sorting.
+  zitadel.filter.v2.PaginationRequest pagination = 1;
+
+  ApplicationSorting sorting_column = 3;
+
+  // Criteria to filter the applications.
+  // All provided queries are combined with a logical AND.
+  repeated ApplicationSearchQuery queries = 2;
+}
+
+message ListApplicationsResponse {
+  // The list of applications matching the query. Depending on the applied limit,
+  // there might be more applications available than included in this list.
+  // Use the returned pagination information to request further applications.
+  repeated Application applications = 1;
+
+  // Contains the total number of apps matching the query and the applied limit.
+  zitadel.filter.v2.PaginationResponse pagination = 2;
+}
+
+message CreateApplicationKeyRequest {
+  // The ID of the application the key will be created for.
+  string application_id = 1 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // The ID of the project the application belongs to.
+  string project_id = 2 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // The timestamp the key will expire.
+  google.protobuf.Timestamp expiration_date = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2519-04-01T08:45:00.000000Z\""}];
+}
+
+message CreateApplicationKeyResponse {
+  // The unique ID of the newly created application key.
+  string key_id = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"28746028909593987\""}];
+
+  // The timestamp of the application creation.
+  google.protobuf.Timestamp creation_date = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2024-12-18T07:50:47.492Z\""}];
+
+  // KeyDetails contains the serialized private key and additional information depending on the key type.
+  // It must be stored safely, as it will not be possible to retrieve it again.
+  // A new key can be generated using the CreateApplicationKey endpoint.
+  bytes key_details = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"eyJ0eXBlIjoiYXBwbGljYXRpb24iLCJrZXlJZCI6IjIwMjcxMDE4NjYyMjcxNDExMyIsImtleSI6Ii0tLS0tQkVHSU4gUlNBIFBSSVZBVEUgS0VZLS0tLS1cbk1JSUVvd0lCQUFLQ0FRRUFuMUxyNStTV0pGRllURU1kaXQ2U0dNY0E2Yks5dG0xMmhlcm55V0wrZm9PWnA3eEVcbk9wcmsvWE81QVplSU5NY0x0ZVhxckJlK1NPdVVNMFpLU2xCMHFTNzNjVStDVTVMTGoycVB0UzhNOFI0N3BGdFhcbjJXRTFJNjNhZHB1N01TejA2SXduQ2lyNnJYOTVPQ2ZneHA3VU1Dd0pSTUZmYXJqdjVBRXY3NXpsSS9lYUV6bUJcbkxKWU1xanZFRmZoN2x3M2lPT3VsWW9kNjNpN3RDNWl5czNlYjNLZW4yWU0rN1FSbXB2dE5qcTJMVmlIMnkrUGJcbk9ESlI3MU9ib05TYVJDNTZDUFpWVytoWDByYXI3VzMwUjI2eGtIQ09oSytQbUpSeGtOY0g1VTdja0xXMEw0WEVcbnNNZkVUSmszeDR3Q0psbisxbElXUzkrNmw0R1E2TWRzWURyOU5RSURBUUFCQW9JQkFCSkx6WGQxMHFBZEQwekNcbnNGUFFOMnJNLzVmV3hONThONDR0YWF6QXg0VHp5K050UlZDTmxScGQvYkxuR2VjbHJIeVpDSmYycWcxcHNEMHJcbkowRGRlR2d0VXBFYWxsYk9scjNEZVBsUGkrYnNsK0RKOUk2c0VSUWwxTjZtQjVzZ0ZJZllBR3UwZjlFSXdIem9cblozR25yNnBRaEVmM0JPUVdsTVhVTlJNSksyOHp3M2E1L01nRmtKVUZUSTUzeXFwbGRtZ2hLajRZR1hLRk1LUGhcbkV3RkxrRncwK2s3K0xuSjFQNGp1ZVd1RXo3WlAyaFpvUWxCcXdSajVyTG9QZ05RbUU4UytFVDRuczlUYzByOFFcbnFyaHlacDZBczJrTDhGTytCZnF3SVpDZnpnWHN2cC9PLzRaSHIzVTB2Ymp3UW1sSzdVSm42U0J6T2hpWFpNU0lcbk5Wc0V5VUVDZ1lFQTFEaktkRGo3NTM1MWQzdlRNQlRFd2JSQ3hoUVZOdENFMnMwVUw4ckJQZ1I0K1dlblNUWmFcbnprWUprcEV0bE54VGxzYnN1Y0RTUXZqeWRYYk5nSHFBeDYzMm1vdTVkak9lR0VTUDFWVGtUdElsZFZQZWszQWxcbjVYbkpQa1dqWGVyVVJZNm5KeUQ5UWhlREx3MVp4NEFYVzNHWURiTFkrT05XV0VKUlJaQUloNjBDZ1lFQXdEQ2xcbnc1MHc4dkcvbEJ4RzNSYW9FaHdLOWNna1VXOHk2T25DekNwcEtjOEZUUmY1VE5iWjl5TzNXUmdYajhkeHRCakFcbkl5VGlzYk9NQk1VaFZKUUtGZHRQaDhoVDBwRkRjeE9ndzY0aHBtYzhyY2RTbXVKNzlYSVRTaHUySjA0N0UvNFZcbnJOTThpWVk5ZGR3VGdGUUlsdFNZL0l0RnFxWERmdjhqK1dVY25La0NnWUVBaENOUU80bDNuNjRucWR2WnBTaHBcblVrclJBTkJrWFJyOGZkZ1BaNnFSSS9KWStNSEhjVmg4dGM3NkN0NkdTUmZlbkJVRU5LeVF2czZPK1FDZCtBOU9cbnZBWGZkRjduZldlcVdtWG1RT2g0dDNNMWk1WkxFZlpVUWt2UU9BdllLcFFhMDZ4OCsyb1pCdHZvL0pVTmY2Q0xcbjZvNFNKUVZrLzZOZGtkckpDODBnNG9rQ2dZQkZsNWYrbkVYa1F0dWZVeG5wNXRGWE5XWldsM0ZuTjMvVXpRaW5cbmkxZm5OcnB4cnhPcjJrUzA4KzdwU1FzSEdpNDNDNXRQWG9UajJlTUN1eXNWaUVHYXBuNUc2YWhJb0NjdlhWVWlcblprUnpFQUR0NERZdU5ZS3pYdXBUTkhPaUNmYmtoMlhyM2RXVzZ0QUloSGRmU1k2T3AwNzZhNmYvWWVUSGNMWGpcbkVkVHBlUUtCZ0FPdnBqcDQ4TzRUWEZkU0JLSnYya005OHVhUjlSQURtdGxTWHd2cTlyQkhTV084NFk4bzE0L1Bcbkl1UmxUOHhROGRYKzhMR21UUCtjcUtiOFFRQ1grQk1YUWxMSEVtWnpnb0xFa0pGMUVIMm4vZEZ5bngxS3prdFNcbm9UZUdsRzZhbXhVOVh4eW9RVFlEVGJCbERwc2FZUlFBZ2FUQzM3UVZRUjhmK1ZoRzFHSFFcbi0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tXG4iLCJhcHBJZCI6IjIwMjcwNjM5ODgxMzg4MDU3NyIsImNsaWVudElkIjoiMjAyNzA2Mzk4ODEzOTQ2MTEzQG15dGVzdHByb2plY3QifQ==\""}];
+}
+
+message DeleteApplicationKeyRequest {
+  // The unique ID of the application key to be deleted.
+  string key_id = 1 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // The ID of the application the key belongs to.
+  string application_id = 2 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // The ID of the project the application belongs to.
+  string project_id = 3 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message DeleteApplicationKeyResponse {
+  // The timestamp of the application key deletion. In case the key was already deleted,
+  // the previous deletion date is returned. This can be used to check if the key was
+  // actually deleted.
+  google.protobuf.Timestamp deletion_date = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2025-01-23T10:34:18.051Z\""}];
+}
+
+message GetApplicationKeyRequest {
+  // The unique ID of the application key to be retrieved.
+  string key_id = 1 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message GetApplicationKeyResponse {
+  // Unique ID of the application key.
+  string key_id = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629023906488334\""}];
+
+  // The timestamp of the key creation.
+  google.protobuf.Timestamp creation_date = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2025-01-23T10:34:18.051Z\""}];
+
+  // The timestamp when the key will expire.
+  google.protobuf.Timestamp expiration_date = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"3019-04-01T08:45:00.000000Z\""}];
+}
+
+message ListApplicationKeysRequest {
+  // Pagination and sorting.
+  zitadel.filter.v2.PaginationRequest pagination = 1;
+
+  // The column to sort by. If not provided, the default is 'KEY_ID'.
+  ApplicationKeysSorting sorting_column = 2;
+
+  // Criteria to filter the application keys.
+  // All provided queries are combined with a logical AND.
+  repeated ApplicationKeySearchQuery queries = 3;
+}
+
+message ListApplicationKeysResponse {
+  // The list of application keys matching the query. Depending on the applied limit,
+  // there might be more keys available than returned in this list.
+  // Use the returned pagination information to request further keys.
+  repeated ApplicationKey keys = 1;
+
+  // Contains the total number of application keys matching the query and the applied limit.
+  zitadel.filter.v2.PaginationResponse pagination = 2;
+}
