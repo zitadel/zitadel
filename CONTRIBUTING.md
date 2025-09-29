@@ -29,9 +29,9 @@ Replace `PROJECT` with one of the following:
 Instead of the project names, you can also use their directory names for `PROJECT`, like `pnpm nx run login:dev`.
 Alternatively, you can use the infix-notation, like `pnpm nx dev @zitadel/login` or `pnpm nx dev login`.
 
-### <a name="api-quick-start"></a>API
+### API Quick Start
 
-Make sure you have the [required system dependencies](#dev-requirements) and node modules installed
+Make sure you have the [required system dependencies](#development-requirements) and node modules installed
 
 ```bash
 pnpm install
@@ -64,11 +64,11 @@ grpcurl -plaintext -H "Authorization: Bearer $(cat admin.pat)" localhost:8080 zi
 
 To connect to the database and explore Zitadel data, run `psql "host=${DEVCONTAINER_DB_HOST:-localhost} dbname=zitadel sslmode=disable"`.
 
-For more options, go to the [API section](#api)
+For more options, go to the [API section](#contribute-to-api)
 
-### <a name="login-quick-start"></a>Login
+### Login Quick Start
 
-Make sure you have the [required system dependencies](#dev-requirements) and node modules installed
+Make sure you have the [required system dependencies](#development-requirements) and node modules installed
 
 ```bash
 pnpm install
@@ -90,11 +90,11 @@ Visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhos
 
 Make some changes to the source code and see how the browser is automatically updated.
 
-For more options, go to the [Login section](#login)
+For more options, go to the [Login section](#contribute-to-login)
 
-### <a name="console-quick-start"></a>Console
+### Console Quick Start
 
-Make sure you have the [required system dependencies](#dev-requirements) and node modules installed
+Make sure you have the [required system dependencies](#development-requirements) and node modules installed
 
 ```bash
 pnpm install
@@ -126,7 +126,7 @@ Visit http://localhost:4200/?login_hint=zitadel-admin@zitadel.localhost and ente
 
 Make some changes to the source code and see how the browser is automatically updated.
 
-For more options, go to the [Console section](#console)
+For more options, go to the [Console section](#contribute-to-console)
 
 ## Introduction
 
@@ -159,10 +159,10 @@ Follow [@zitadel](https://twitter.com/zitadel) on twitter
 
 [Contribute](#how-to-contribute)
 
-- [Contribute API code](#api)
-- [Contribute frontend code](#frontend)
-- If you found a mistake on our [Docs page](https://zitadel.com/docs) or something is missing please read [the Docs section](#docs)
-- [Translate](#translations) and improve texts
+- [Contribute API code](#contribute-to-api)
+- [Contribute frontend code](#contribute-to-frontend)
+- If you found a mistake on our [Docs page](https://zitadel.com/docs) or something is missing please read [the Docs section](#contribute-to-docs)
+- [Translate]((#contribute-translations)) and improve texts
 
 ## How to contribute
 
@@ -178,14 +178,14 @@ Go through the following checklist before you submit the final pull request:
 
 The code consists of the following parts:
 
-| name               | description                                        | language                                                                                                  | where to find                                       | Development Guide                        |
-| ------------------ | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | ---------------------------------------- |
-| API implementation | Service that serves the grpc(-web) and RESTful API | [go](https://go.dev)                                                                                      | [API implementation](./internal/api/grpc)           | [Contribute to API](#api)                |
-| API definitions    | Specifications of the API                          | [Protobuf](https://developers.google.com/protocol-buffers)                                                | [./proto/zitadel](./proto/zitadel)                  | [Contribute to API](#api)                |
-| Console            | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#frontend)      |
-| Login              | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./apps/login](./apps/login)                        | [Contribute to Frontend](#frontend)      |
-| Docs               | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](#frontend)      |
-| translations       | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations](#translations) |
+| name               | description                                        | language                                                                                                  | where to find                                       | Development Guide                                     |
+| ------------------ | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | ----------------------------------------------------- |
+| API implementation | Service that serves the grpc(-web) and RESTful API | [go](https://go.dev)                                                                                      | [API implementation](./internal/api/grpc)           | [Contribute to API](#contribute-to-api)               |
+| API definitions    | Specifications of the API                          | [Protobuf](https://developers.google.com/protocol-buffers)                                                | [./proto/zitadel](./proto/zitadel)                  | [Contribute to API](#contribute-to-api)               |
+| Console            | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#contribute-to-frontend)     |
+| Login              | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./apps/login](./apps/login)                        | [Contribute to Frontend](#contribute-to-frontend)     |
+| Docs               | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](#contribute-to-frontend)     |
+| translations       | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations]((#contribute-translations)) |
 
 Please follow the guides to validate and test the code before you contribute.
 
@@ -220,7 +220,7 @@ If we ask you for changes in the code, you can follow the [GitHub Guide](https:/
 <!-- TODO: how to do this via git -->
 <!-- TODO: change commit message via git -->
 
-### <a name="commit-messages"></a>Commit messages
+### Commit messages
 
 Make sure you use [semantic release messages format](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#type).
 
@@ -278,9 +278,9 @@ The API is designed to be used by different clients, such as web applications, m
 Therefore, the API is designed to be easy to use, consistent, and reliable.
 Please check out the dedicated [API guidelines](./API_DESIGN.md) page when contributing to the API.
 
-## <a name="api"></a>Contribute API Code
+## Contribute API Code
 
-To start developing the Zitadel API Go application, make sure your system has the [required system dependencies](#dev-requirements) installed.
+To start developing the Zitadel API Go application, make sure your system has the [required system dependencies](#development-requirements) installed.
 Get familiar with the [API quick start](#api-quick-start).
 
 ### Run Local Unit Tests
@@ -351,13 +351,13 @@ pnpm nx run @zitadel/functional-ui:lint-fix
 pnpm nx run @zitadel/functional-ui:test --browser electron
 ```
 
-## <a name="frontend"></a>Contribute Frontend Code
+## Contribute Frontend Code
 
 This repository uses **pnpm** as package manager and **Nx** for build orchestration.
 
 ### Quick Start
 
-Make sure you have the [development requirements](#dev-requirements) installed.
+Make sure you have the [development requirements](#development-requirements) installed.
 
 **Start developing\***
 
@@ -370,9 +370,9 @@ pnpm nx run @zitadel/login:dev # or console:dev or docs:dev
 
 Choose your contribution area:
 
-- **[Login App](#login)** (Next.js/React) - Modern authentication flows
-- **[Console](#console)** (Angular) - Admin dashboard and user management
-- **[Docs](#docs)** (Docusaurus) - Project documentation
+- **[Login App](#contribute-to-login)** (Next.js/React) - Modern authentication flows
+- **[Console](#contribute-to-console)** (Angular) - Admin dashboard and user management
+- **[Docs](#contribute-to-docs)** (Docusaurus) - Project documentation
 - **[Client Packages](#client-packages)** - Shared libraries for API communication
 
 ### Project Dependencies
@@ -385,7 +385,7 @@ docs → (independent)
 
 **Nx handles this automatically** - when you change `zitadel-proto`, Nx rebuilds dependent projects.
 
-### <a name="client-packages"></a>Client Packages
+### Client Packages
 
 **`@zitadel/proto`**: Protocol buffer definitions and generated TypeScript/JavaScript clients.
 
@@ -399,12 +399,12 @@ pnpm nx run @zitadel/proto:generate  # Regenerate after proto changes
 pnpm nx run @zitadel/client:build  # Build after changes
 ```
 
-### <a name="login"></a>Contribute to Login
+### Contribute to Login
 
 The Login UI is a Next.js application that provides the user interface for authentication flows.
 It is MIT-licensed, so you are free to change and deploy it as you like.
 It's located in the `apps/login` directory and uses pnpm and Nx for development.
-To start developing the Login, make sure your system has the [required system dependencies](#dev-requirements) installed.
+To start developing the Login, make sure your system has the [required system dependencies](#development-requirements) installed.
 Get familiar with the [login quick start](#login-quick-start) and the [Login ui docs](https://zitadel.com/docs/guides/integrate/login-ui).
 
 #### Develop against a Cloud instance
@@ -456,9 +456,9 @@ Fix the quality checks, add new checks that cover your changes and mark your pul
 - Build and deploy with Docker: `pnpm nx run @zitadel/login:build && docker build -t my-zitadel-login apps/login`
 - Build and deploy with NodeJS: `pnpm nx run @zitadel/login:prod`
 
-### <a name="console"></a>Contribute to Console
+### Contribute to Console
 
-To start developing the Console, make sure your system has the [required system dependencies](#dev-requirements) installed.
+To start developing the Console, make sure your system has the [required system dependencies](#development-requirements) installed.
 To learn more about the Console, go to the Consoles [README.md](./console).
 Get familiar with the [Console quick start](#console-quick-start).
 
@@ -521,11 +521,11 @@ pnpm nx run @zitadel/functional-ui:test --browser chrome
 
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
 
-### <a name="docs"></a>Contribute to Docs
+### Contribute to Docs
 
 Project documentation is made with Docusaurus and is located under [./docs](./docs). The documentation uses **pnpm** and **Nx** for development and build processes.
 
-To start developing the Docs, make sure your system has the [required system dependencies](#dev-requirements) installed.
+To start developing the Docs, make sure your system has the [required system dependencies](#development-requirements) installed.
 
 #### Local Development
 
@@ -580,7 +580,7 @@ pnpm nx run @zitadel/docs:build
 
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
 
-## <a name="dev-requirements"></a>Development Requirements
+## Development Requirements
 
 **For developing frontend apps or libraries, [open in Dev Container](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/zitadel/zitadel) or install:**
 
@@ -635,7 +635,7 @@ pnpm nx run @zitadel/login:dev  # Should start dev server at http://localhost:30
 - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) - Code formatting
 - [Nx Console](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console) - Nx task runner UI
 
-## <a name="translations"></a>Contribute Translations
+## Contribute Translations
 
 Zitadel loads translations from four files:
 
