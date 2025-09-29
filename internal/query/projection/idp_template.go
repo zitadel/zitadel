@@ -30,6 +30,7 @@ const (
 	IDPTemplateLDAPTable             = IDPTemplateTable + "_" + IDPTemplateLDAPSuffix
 	IDPTemplateAppleTable            = IDPTemplateTable + "_" + IDPTemplateAppleSuffix
 	IDPTemplateSAMLTable             = IDPTemplateTable + "_" + IDPTemplateSAMLSuffix
+	IDPTemplateDingTalkTable         = IDPTemplateTable + "_" + IDPTemplateDingTalkSuffix
 
 	IDPTemplateOAuthSuffix            = "oauth2"
 	IDPTemplateOIDCSuffix             = "oidc"
@@ -43,6 +44,7 @@ const (
 	IDPTemplateLDAPSuffix             = "ldap2"
 	IDPTemplateAppleSuffix            = "apple"
 	IDPTemplateSAMLSuffix             = "saml"
+	IDPTemplateDingTalkSuffix         = "dingtalk"
 
 	IDPTemplateIDCol                = "id"
 	IDPTemplateCreationDateCol      = "creation_date"
@@ -129,6 +131,12 @@ const (
 	GoogleClientIDCol     = "client_id"
 	GoogleClientSecretCol = "client_secret"
 	GoogleScopesCol       = "scopes"
+
+	DingTalkIDCol           = "idp_id"
+	DingTalkInstanceIDCol   = "instance_id"
+	DingTalkClientIDCol     = "client_id"
+	DingTalkClientSecretCol = "client_secret"
+	DingTalkScopesCol       = "scopes"
 
 	LDAPIDCol                         = "idp_id"
 	LDAPInstanceIDCol                 = "instance_id"

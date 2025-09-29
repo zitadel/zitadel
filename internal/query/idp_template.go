@@ -47,6 +47,7 @@ type IDPTemplate struct {
 	*LDAPIDPTemplate
 	*AppleIDPTemplate
 	*SAMLIDPTemplate
+	*DingTalkIDPTemplate
 }
 
 type IDPTemplates struct {
@@ -126,6 +127,13 @@ type GitLabSelfHostedIDPTemplate struct {
 }
 
 type GoogleIDPTemplate struct {
+	IDPID        string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       database.TextArray[string]
+}
+
+type DingTalkIDPTemplate struct {
 	IDPID        string
 	ClientID     string
 	ClientSecret *crypto.CryptoValue
@@ -540,6 +548,33 @@ var (
 	GoogleScopesCol = Column{
 		name:  projection.GoogleScopesCol,
 		table: googleIdpTemplateTable,
+	}
+)
+
+var (
+	dingtalkIdpTemplateTable = table{
+		name:          projection.IDPTemplateDingTalkTable,
+		instanceIDCol: projection.DingTalkInstanceIDCol,
+	}
+	DingTalkIDCol = Column{
+		name:  projection.DingTalkIDCol,
+		table: dingtalkIdpTemplateTable,
+	}
+	DingTalkInstanceIDCol = Column{
+		name:  projection.DingTalkInstanceIDCol,
+		table: dingtalkIdpTemplateTable,
+	}
+	DingTalkClientIDCol = Column{
+		name:  projection.DingTalkClientIDCol,
+		table: dingtalkIdpTemplateTable,
+	}
+	DingTalkClientSecretCol = Column{
+		name:  projection.DingTalkClientSecretCol,
+		table: dingtalkIdpTemplateTable,
+	}
+	DingTalkScopesCol = Column{
+		name:  projection.DingTalkScopesCol,
+		table: dingtalkIdpTemplateTable,
 	}
 )
 

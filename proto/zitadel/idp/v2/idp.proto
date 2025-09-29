@@ -55,6 +55,7 @@ enum IDPType {
   IDP_TYPE_GOOGLE = 10;
   IDP_TYPE_APPLE = 11;
   IDP_TYPE_SAML = 12;
+  IDP_TYPE_DINGTALK = 13;
 }
 
 enum SAMLBinding {
@@ -93,6 +94,7 @@ message IDPConfig {
     AzureADConfig azure_ad = 11;
     AppleConfig apple = 12;
     SAMLConfig saml = 13;
+    DingTalkConfig dingtalk = 14;
   }
 }
 
@@ -246,6 +248,21 @@ message GoogleConfig {
           "\"client-id\"";
       } ];
   // The scopes requested by ZITADEL during the request to Google.
+  repeated string scopes = 2
+      [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example:
+          "[\"openid\", \"profile\", \"email\"]";
+      } ];
+}
+
+message DingTalkConfig {
+  // Client id of the DingTalk application.
+  string client_id = 1
+      [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example:
+          "\"client-id\"";
+      } ];
+  // The scopes requested by ZITADEL during the request to DingTalk.
   repeated string scopes = 2
       [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         example:

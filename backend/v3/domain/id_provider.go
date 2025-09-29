@@ -26,6 +26,7 @@ const (
 	IDPTypeAzure
 	IDPTypeGoogle
 	IDPTypeApple
+	IDPTypeDingTalk
 )
 
 //go:generate enumer -type IDPState -transform lower -trimprefix IDPState -sql
@@ -189,6 +190,17 @@ type Gitlab struct {
 type IDPGitlab struct {
 	*IdentityProvider
 	Gitlab
+}
+
+type DingTalk struct {
+	ClientID     string              `json:"clientId"`
+	ClientSecret *crypto.CryptoValue `json:"clientSecret"`
+	Scopes       []string            `json:"scopes,omitempty"`
+}
+
+type IDPDingTalk struct {
+	*IdentityProvider
+	DingTalk
 }
 
 type GitlabSelfHosting struct {
