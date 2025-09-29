@@ -12,6 +12,12 @@ module.exports = {
       varsIgnorePattern: "^_" ,
     }],
     "no-undef": "off",
+    "no-restricted-imports": ["error", {
+      "paths": [{
+        "name": "next/image",
+        "message": "Use of next/image is forbidden. Use regular <img> elements instead."
+      }]
+    }],
   },
   parserOptions: {
     ecmaVersion: "latest",
