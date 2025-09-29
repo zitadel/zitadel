@@ -44,7 +44,7 @@
                 "{projectRoot}/dist"
             ]
         },
-        "development": {
+        "dev": {
             "description": "Runs the Console in development mode with hot-reloading",
             "continuous": true,
             "dependsOn": [

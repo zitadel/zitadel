@@ -463,6 +463,9 @@ importers:
       typescript:
         specifier: '5.1'
         version: 5.1.6
+      wait-on:
+        specifier: ^7.2.0
+        version: 7.2.0
 
   docs:
     dependencies:
@@ -2173,6 +2176,7 @@ packages:
 
   '@ctrl/ngx-codemirror@6.1.0':
     resolution: {integrity: sha512-73QeoNbnluZalWmNw+SOFctsE+oz0+4Bl9KhlJOIfbCPK/U6OIc+vQNr28hMAp15Y/Idde3LntTwLBDFW0bRVA==}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
     peerDependencies:
       '@angular/core': '>=15.0.0-0'
       '@angular/forms': '>=15.0.0-0'
@@ -22975,14 +22979,6 @@ snapshots:
 
   axe-core@4.10.3: {}
 
-  axios@1.11.0:
-    dependencies:
-      follow-redirects: 1.15.11
-      form-data: 4.0.4
-      proxy-from-env: 1.1.0
-    transitivePeerDependencies:
-      - debug
-
   axios@1.11.0(debug@4.4.1):
     dependencies:
       follow-redirects: 1.15.11(debug@4.4.1)
@@ -25595,8 +25591,6 @@ snapshots:
   flat@5.0.2: {}
 
   flatted@3.3.3: {}
-
-  follow-redirects@1.15.11: {}
 
   follow-redirects@1.15.11(debug@4.4.1):
     optionalDependencies:
@@ -33115,7 +33109,7 @@ snapshots:
 
   wait-on@7.2.0:
     dependencies:
-      axios: 1.11.0
+      axios: 1.11.0(debug@4.4.1)
       joi: 17.13.3
       lodash: 4.17.21
       minimist: 1.2.8

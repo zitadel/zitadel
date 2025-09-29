@@ -348,27 +348,7 @@ To test the whole system, including the Console UI and the Login UI, run the Fun
 pnpm nx run @zitadel/functional-ui:lint-fix
 
 # Run the tests
-pnpm nx run test-functional:test --browser electron
-
-# Beware that firefox and chrome are not installed in the dev container.
-pnpm nx run test-functional:test --browser firefox
-pnpm nx run test-functional:test --browser chrome
-```
-
-### Run Local Functional UI Tests Against Your Dev Server Console
-
-If you also make [changes to the Console](#console), you can run the test suite against your locally built API and Console server.
-
-```bash
-# Run the API
-pnpm nx run @zitadel/functional-ui:test-env
-```
-
-In another terminal, open the interactive test suite
-
-```bash
-# The open command is configured to run against http://localhost:4200 by default
-pnpm nx run @zitadel/functional-ui:open
+pnpm nx run @zitadel/functional-ui:test --browser electron
 ```
 
 ## <a name="frontend"></a>Contribute Frontend Code
@@ -502,15 +482,39 @@ Visit http://localhost:4200/?login_hint=zitadel-admin@zitadel.localhost and ente
 
 #### Pass Quality Checks
 
-Reproduce the pipeline quality checks for the code you changed.
+Run the quality checks for the code you changed.
 
 ```bash
 # Run console-related linting builds and unit tests
-pnpm nx run-many --projects @zitadel/console @zitadel/client @zitadel/proto @zitadel/functional-ui --targets lint build test
+pnpm nx run-many --projects @zitadel/console @zitadel/client @zitadel/proto --targets lint build test
+```
 
-# Run the functional UI tests
-pnpm nx run @zitadel/functional-ui:test-firefox
-pnpm nx run @zitadel/functional-ui:test-chrome
+Run functional UI tests against a locally built API and a dev server Console.
+The API needs to be allowed [to redirect to http://localhost:4200](console-quick-start).
+
+Alternatively, create the file `tests/functional-ui/.env.open.local` with the following content:
+
+```conf
+CYPRESS_BASE_URL=http://localhost:8080/ui/console
+```
+
+```bash
+# Run the API and the Console dev server
+# Beware this doesn't work from within a dev container.
+pnpm nx run @zitadel/functional-ui:open
+```
+
+Or run all tests to completion.
+
+```bash
+# Run the tests
+pnpm nx run @zitadel/functional-ui:test --browser electron
+
+# Run the tests against another browser.
+# The specified browser needs to be installed on your system and detected by Cypress.
+# https://docs.cypress.io/app/references/troubleshooting#Launching-browsers
+pnpm nx run @zitadel/functional-ui:test --browser firefox
+pnpm nx run @zitadel/functional-ui:test --browser chrome
 ```
 
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
