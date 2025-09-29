@@ -45,8 +45,23 @@ pnpm nx run-many --projects . @zitadel/login --targets db prod
 ```
 
 Start a debug session in your IDE.
-In VSCode, you can use the preconfigured [launch config](./.vscode/launch.json).
-In other IDEs, adjust accordingly.
+For example, in VSCode, you can use a `launch.json` configuration like this.
+
+```json
+   {
+      "name": "Debug Zitadel",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "env": {
+            "ZITADEL_DATABASE_POSTGRES_HOST": "${env:DEVCONTAINER_DB_HOST}"
+      },
+      "program": "main.go",
+      "args": [
+            "start-from-init", "--config", "${workspaceFolder}/apps/api/dev.yaml", "--steps", "${workspaceFolder}/apps/api/dev.yaml", "--masterkey", "MasterkeyNeedsToHave32Characters"
+      ]
+   }
+```
 
 Visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
 

@@ -26,6 +26,7 @@ sandbox.go
 .idea
 .DS_STORE
 .run
+.vscode
 
 # credential
 google-credentials
