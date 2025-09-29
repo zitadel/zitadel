@@ -1,5 +1,6 @@
 @use '@angular/material' as mat;
 @use '@angular/material/core/m2/palette' as m2;
+@use '@fireflysemantics/sass-logger' as logger;
 // https://github.com/lipis/flag-icons/issues/1395
 @forward '../node_modules/flag-icons/sass/variables' with (
   $flag-icons-use-square: false
@@ -334,6 +335,7 @@ $caos-dark-app-theme: mat.m2-define-dark-theme(
   )
 );
 
+//@debug logger.pretty-map($caos-light-app-theme);
 $caos-light-app-theme: modify-palette($caos-light-app-theme, background, $cnsl-light-theme-background);
 $caos-dark-app-theme: modify-palette($caos-dark-app-theme, background, $cnsl-dark-theme-background);
 
@@ -341,7 +343,6 @@ $caos-light-app-theme: modify-palette($caos-light-app-theme, foreground, $cnsl-l
 $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dark-theme-foreground);
 
 @include mat.all-component-typographies($custom-typography);
-@include mat.core();
 
 .mat-mdc-dialog-container,
 .mat-mdc-raised-button,
@@ -406,7 +407,6 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
 
   $background: map-get($caos-light-app-theme, background);
   $foreground: map-get($caos-light-app-theme, foreground);
-  $primary: map-get($caos-light-app-theme, primary);
 
   --warn: #cd3d56;
   --success: #10b981;
@@ -451,11 +451,14 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
   }
 
   .main-container,
-  .mat-mdc-dialog-container,
   .mat-calendar {
     background-color: map-get($background, background);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
+
+  @include mat.dialog-overrides((
+    container-color: map-get($background, background),
+  ));
 
   ::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
@@ -488,7 +491,6 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
 .dark-theme {
   $background: map-get($caos-dark-app-theme, background);
   $foreground: map-get($caos-dark-app-theme, foreground);
-  $primary: map-get($caos-dark-app-theme, primary);
 
   --warn: #ff3b5b;
   --success: #10b981;
@@ -538,11 +540,14 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
   }
 
   .main-container,
-  .mat-mdc-dialog-container,
   .mat-calendar {
     background-color: mat.m2-get-color-from-palette($background, background);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
+
+  @include mat.dialog-overrides((
+    container-color: map-get($background, background),
+  ));
 
   ::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
