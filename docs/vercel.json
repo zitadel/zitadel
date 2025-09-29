@@ -218,6 +218,16 @@
       "source": "/docs/guides/integrate/login/login-users#password-reset",
       "destination": "/docs/guides/integrate/login/hosted-login#password-reset",
       "permanent": true
+    },
+    {
+      "source": "/docs/legal/service-description/billing",
+      "destination": "https://help.zitadel.com/pricing-and-billing-of-zitadel-services",
+      "permanent": true
+    },
+    {
+      "source": "/docs/legal/service-description/billing/",
+      "destination": "https://help.zitadel.com/pricing-and-billing-of-zitadel-services",
+      "permanent": true
     }
   ]
 }
