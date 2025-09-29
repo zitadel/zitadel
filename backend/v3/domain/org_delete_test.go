@@ -6,6 +6,7 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -304,6 +305,68 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 			// Verify
 			assert.Equal(t, tc.expectedError, err)
 			assert.Equal(t, tc.expectedOrgName, d.OrganizationName)
+		})
+	}
+}
+
+// TODO(IAM-Marco): Expand these tests once the needed repositories (policies, org settings, idp links and entities) are available
+func TestDeleteOrgCommand_Events(t *testing.T) {
+	t.Parallel()
+	ctx := authz.NewMockContext("inst-1", "org-1", gofakeit.UUID())
+	txInitErr := errors.New("tx init error")
+
+	tt := []struct {
+		testName      string
+		mockTx        func(ctrl *gomock.Controller) database.QueryExecutor
+		command       *domain.DeleteOrgCommand
+		expectedError error
+		expectedCount int
+	}{
+		{
+			testName: "when EnsureTx fails should return error",
+			mockTx: func(ctrl *gomock.Controller) database.QueryExecutor {
+				mockDB := dbmock.NewMockPool(ctrl)
+				mockDB.EXPECT().
+					Begin(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(nil, txInitErr)
+				return mockDB
+			},
+			command:       domain.NewDeleteOrgCommand("org-1"),
+			expectedError: txInitErr,
+		},
+		{
+			testName: "should create org removed event",
+			command: &domain.DeleteOrgCommand{
+				ID:               "org-1",
+				OrganizationName: "org name",
+				Domains: []*domain.OrganizationDomain{
+					{Domain: "domain1.com"},
+					{Domain: "domain2.com"},
+				},
+			},
+			expectedCount: 1,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+
+			// Given
+			ctrl := gomock.NewController(t)
+			opts := &domain.CommandOpts{DB: new(noopdb.Pool)}
+
+			if tc.mockTx != nil {
+				opts.DB = tc.mockTx(ctrl)
+			}
+
+			// Test
+			cmds, err := tc.command.Events(ctx, opts)
+
+			// Verify
+			require.Equal(t, tc.expectedError, err)
+			assert.Len(t, cmds, tc.expectedCount)
 		})
 	}
 }
