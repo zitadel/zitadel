@@ -597,38 +597,23 @@ Fix the quality checks, add new checks that cover your changes and mark your pul
 
 ## Development Requirements
 
-**For developing frontend apps or libraries, [open in Dev Container](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/zitadel/zitadel) or install:**
+1. Make sure you have the basic system dependencies installed to [develop frontend apps or libraries](#requirements-for-developing-frontend-apps-or-libraries) or to [develop the API](#requirements-for-developing-the-api).
+2. Use [Corepack](https://pnpm.io/installation#using-corepack) to make sure you have pnpm installed in the correct version: `corepack enable`.
+3. Install node module dependencies: `pnpm install`
+4. If you are working with VSCode, you can optionally install the following plugins:
+
+- [Go](https://marketplace.visualstudio.com/items?itemName=golang.Go) - For API development. Use golangci-lint v2 as linter.
+- [Angular Language Service](https://marketplace.visualstudio.com/items?itemName=Angular.ng-template) - For Console development
+- [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) - Code linting
+- [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) - Code formatting
+- [Nx Console](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console) - Nx task runner UI
+
+### Requirements for Developing Frontend Apps or Libraries
+
+[Open the repository in a Dev Container](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/zitadel/zitadel) or install:
 
 - **[Node.js v22.x](https://nodejs.org/en/download/)** - JavaScript runtime
 - **[Docker](https://docs.docker.com/engine/install/)** - For supporting services
-
-**For developing the API backend, [open in Dev Container](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/zitadel/zitadel) or install:**
-
-- **[Go 1.24.x](https://go.dev/doc/install)** - API development
-- **[Node.js v22.x](https://nodejs.org/en/download/)** - Required to run [nx commands](https://nx.dev/)
-- **[Docker](https://docs.docker.com/engine/install/)** - For supporting services
-
-**Install pnpm:**
-
-Use [Corepack](https://pnpm.io/installation#using-corepack) to install pnpm.
-This makes sure you have the pnpm version installed that is declared in [](./package.json)
-
-```bash
-corepack enable
-```
-
-**Install Node Modules:**
-
-```bash
-# Install dependencies
-pnpm install
-
-# Test a project
-pnpm nx run @zitadel/login:dev  # Should start dev server at http://localhost:3000/ui/v2/login/loginname
-```
-
-**Additional requirements for testing:**
-
 - **[Cypress runtime dependencies](https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies)** - For UI tests
 
 <details>
@@ -642,13 +627,13 @@ pnpm nx run @zitadel/login:dev  # Should start dev server at http://localhost:30
 4. Disable access control when starting XLaunch
 </details>
 
-**Recommended VS Code extensions:**
+### Requirements for Developing the API
 
-- [Go](https://marketplace.visualstudio.com/items?itemName=golang.Go) - For API development. Use golangci-lint v2 as linter.
-- [Angular Language Service](https://marketplace.visualstudio.com/items?itemName=Angular.ng-template) - For Console development
-- [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) - Code linting
-- [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) - Code formatting
-- [Nx Console](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console) - Nx task runner UI
+[Open the repository in a Dev Container](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/zitadel/zitadel) or install:
+
+- **[Go 1.24.x](https://go.dev/doc/install)** - API development
+- **[Node.js v22.x](https://nodejs.org/en/download/)** - Required to run [nx commands](https://nx.dev/)
+- **[Docker](https://docs.docker.com/engine/install/)** - For supporting services
 
 ## Contribute Translations
 
