@@ -56,12 +56,12 @@ func (p *projectRoleRelationalProjection) Reducers() []handler.AggregateReducer 
 func (p *projectRoleRelationalProjection) reduceProjectRoleAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleAddedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-uw7Oo", "reduce.wrong.event.type %s", project.RoleAddedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-EiPa5", "reduce.wrong.event.type %s", project.RoleAddedType)
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-kGokE", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-ohR0u", "reduce.wrong.db.pool %T", ex)
 		}
 
 		// Group is optional and nullable but not a pointer in the event
@@ -88,7 +88,7 @@ func (p *projectRoleRelationalProjection) reduceProjectRoleAdded(event eventstor
 func (p *projectRoleRelationalProjection) reduceProjectRoleChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleChangedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-jie5J", "reduce.wrong.event.type %s", project.RoleChangedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-PieJ9", "reduce.wrong.event.type %s", project.RoleChangedType)
 	}
 	if e.DisplayName == nil && e.Group == nil {
 		return handler.NewNoOpStatement(e), nil
@@ -108,7 +108,7 @@ func (p *projectRoleRelationalProjection) reduceProjectRoleChanged(event eventst
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-kGokE", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-ooCo1", "reduce.wrong.db.pool %T", ex)
 		}
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID, e.Key),
@@ -121,13 +121,13 @@ func (p *projectRoleRelationalProjection) reduceProjectRoleChanged(event eventst
 func (p *projectRoleRelationalProjection) reduceProjectRoleRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleRemovedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-euf0U", "reduce.wrong.event.type %s", project.RoleRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Ei9po", "reduce.wrong.event.type %s", project.RoleRemovedType)
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
 		repo := repository.ProjectRepository().Role()
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-kGokE", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-Voh4a", "reduce.wrong.db.pool %T", ex)
 		}
 		_, err := repo.Delete(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID, e.Key),
