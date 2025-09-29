@@ -223,11 +223,6 @@
       "source": "/docs/legal/service-description/billing",
       "destination": "https://help.zitadel.com/pricing-and-billing-of-zitadel-services",
       "permanent": true
-    },
-    {
-      "source": "/docs/legal/service-description/billing/",
-      "destination": "https://help.zitadel.com/pricing-and-billing-of-zitadel-services",
-      "permanent": true
     }
   ]
 }
