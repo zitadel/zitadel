@@ -7,6 +7,7 @@ import { headers } from "next/headers";
 import { userAgent } from "next/server";
 import { getSessionCookieById } from "../cookies";
 import { getServiceUrlFromHeaders } from "../service-url";
+import { getOriginalHost } from "./host";
 
 type RegisterU2FCommand = {
   sessionId: string;
@@ -22,11 +23,7 @@ type VerifyU2FCommand = {
 export async function addU2F(command: RegisterU2FCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const host = await getOriginalHost();
 
   const sessionCookie = await getSessionCookieById({
     sessionId: command.sessionId,
@@ -60,12 +57,6 @@ export async function addU2F(command: RegisterU2FCommand) {
 export async function verifyU2F(command: VerifyU2FCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
-
   let passkeyName = command.passkeyName;
   if (!passkeyName) {
     const headersList = await headers();

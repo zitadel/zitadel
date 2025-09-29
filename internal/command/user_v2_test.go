@@ -1352,7 +1352,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 			},
 		},
 		{
-			name: "remove self, ok",
+			name: "remove self, permission denied",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -1371,25 +1371,6 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							org.NewDomainPolicyAddedEvent(ctx,
-								orgAgg,
-								true,
-								true,
-								true,
-							),
-						),
-					),
-					expectFilterOrganizationSettings("org1", false, false),
-					expectPush(
-						user.NewUserRemovedEvent(ctx,
-							&user.NewAggregate(ctxUserID, "org1").Aggregate,
-							"username",
-							nil,
-							true,
-						),
-					),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
@@ -1397,9 +1378,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				userID: ctxUserID,
 			},
 			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 	}

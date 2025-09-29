@@ -103,10 +103,6 @@ func (s *Styling) Reducers() []handler.AggregateReducer {
 					Reduce: s.processLabelPolicy,
 				},
 				{
-					Event:  org.LabelPolicyAssetsRemovedEventType,
-					Reduce: s.processLabelPolicy,
-				},
-				{
 					Event:  org.LabelPolicyActivatedEventType,
 					Reduce: s.processLabelPolicy,
 				},
@@ -168,10 +164,6 @@ func (s *Styling) Reducers() []handler.AggregateReducer {
 					Reduce: s.processLabelPolicy,
 				},
 				{
-					Event:  instance.LabelPolicyAssetsRemovedEventType,
-					Reduce: s.processLabelPolicy,
-				},
-				{
 					Event:  instance.LabelPolicyActivatedEventType,
 					Reduce: s.processLabelPolicy,
 				},
@@ -212,9 +204,7 @@ func (m *Styling) processLabelPolicy(event eventstore.Event) (_ *handler.Stateme
 			instance.LabelPolicyFontAddedEventType,
 			org.LabelPolicyFontAddedEventType,
 			instance.LabelPolicyFontRemovedEventType,
-			org.LabelPolicyFontRemovedEventType,
-			instance.LabelPolicyAssetsRemovedEventType,
-			org.LabelPolicyAssetsRemovedEventType:
+			org.LabelPolicyFontRemovedEventType:
 
 			policy, err = m.view.StylingByAggregateIDAndState(event.Aggregate().ID, event.Aggregate().InstanceID, int32(domain.LabelPolicyStatePreview))
 			if err != nil {
@@ -343,7 +333,7 @@ const fontFaceTemplate = `
 
 func (m *Styling) uploadFilesToStorage(instanceID, aggregateID, contentType string, reader io.Reader, size int64) error {
 	fileName := domain.CssPath + "/" + domain.CssVariablesFileName
-	//TODO: handle location as soon as possible
+	// TODO: handle location as soon as possible
 	_, err := m.static.PutObject(context.Background(), instanceID, "", aggregateID, fileName, contentType, static.ObjectTypeStyling, reader, size)
 	return err
 }
