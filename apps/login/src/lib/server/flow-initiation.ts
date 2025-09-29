@@ -92,6 +92,9 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
             serviceUrl,
             domain: orgDomain,
           });
+
+          console.log("Orgs matching domain:", orgs.result);
+
           if (orgs.result && orgs.result.length === 1) {
             organization = orgs.result[0].id ?? "";
             suffix = orgDomain;
