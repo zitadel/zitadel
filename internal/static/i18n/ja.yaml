@@ -152,6 +152,7 @@ Errors:
       NotSet: パスワードが未設置です
       NotChanged: 新しいパスワードは現在のパスワードと同じにすることはできません
       NotSupported: パスワードハッシュエンコードはサポートされていません。 https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets を参照してください。
+      NoVerificationTokenOrCurrentPassword: 検証トークンまたは現在のパスワードがないとパスワードを変更できません
     PasswordComplexityPolicy:
       NotFound: パスワードポリシーが見つかりません
       MinLength: パスワードが短すぎます

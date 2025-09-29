@@ -151,6 +151,7 @@ Errors:
       NotSet: L'utilisateur n'a pas défini de mot de passe
       NotChanged: Le nouveau mot de passe ne peut pas être le même que votre mot de passe actuel
       NotSupported: Encodage de hachage de mot de passe non pris en charge. Consultez https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
+      NoVerificationTokenOrCurrentPassword: Impossible de modifier le mot de passe sans jeton de vérification ou mot de passe actuel
     PasswordComplexityPolicy:
       NotFound: Politique de mot de passe non trouvée
       MinLength: Le mot de passe est trop court

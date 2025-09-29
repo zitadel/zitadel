@@ -151,6 +151,7 @@ Errors:
       NotSet: Пароль не установлен пользователем
       NotChanged: Пароль не изменен
       NotSupported: Кодировка хэша пароля не поддерживается. Проверьте https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
+      NoVerificationTokenOrCurrentPassword: Невозможно сменить пароль без проверочного токена или текущего пароля.
     PasswordComplexityPolicy:
       NotFound: Политика паролей не найдена
       MinLength: Пароль слишком короткий

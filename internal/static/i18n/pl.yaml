@@ -151,6 +151,7 @@ Errors:
       NotSet: Użytkownik nie ustawił hasła
       NotChanged: Nowe hasło nie może być takie samo jak Twoje obecne hasło
       NotSupported: Kodowanie skrótu hasła nie jest obsługiwane. Sprawdź https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
+      NoVerificationTokenOrCurrentPassword: Nie można zmienić hasła bez tokena weryfikacyjnego lub aktualnego hasła
     PasswordComplexityPolicy:
       NotFound: Polityka hasła nie znaleziona
       MinLength: Hasło jest zbyt krótkie

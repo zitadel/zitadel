@@ -152,6 +152,7 @@ Errors:
       NotSet: Utilizatorul nu a setat o parolă
       NotChanged: Parola nouă nu poate fi aceeași cu parola curentă
       NotSupported: Codificarea hash a parolei nu este acceptată. Consultați https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
+      NoVerificationTokenOrCurrentPassword: Nu se poate schimba parola fără token de verificare sau parola curentă.
     PasswordComplexityPolicy:
       NotFound: Politica de parolă nu a fost găsită
       MinLength: Parola este prea scurtă
