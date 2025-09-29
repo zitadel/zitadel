@@ -22,9 +22,10 @@ func TestServer_ProjectReduces(t *testing.T) {
 	orgID := Instance.DefaultOrg.Id
 	projectRepo := repository.ProjectRepository()
 
+	projectName := integration.ProjectName()
 	createRes, err := ProjectClient.CreateProject(CTX, &v2beta_project.CreateProjectRequest{
 		OrganizationId:        orgID,
-		Name:                  "foobar",
+		Name:                  projectName,
 		ProjectRoleAssertion:  true,
 		AuthorizationRequired: true,
 		ProjectAccessRequired: true,
@@ -41,7 +42,7 @@ func TestServer_ProjectReduces(t *testing.T) {
 			require.NoError(collect, err)
 			assert.Equal(collect, createRes.GetId(), dbProject.ID)
 			assert.Equal(collect, orgID, dbProject.OrganizationID)
-			assert.Equal(collect, "foobar", dbProject.Name)
+			assert.Equal(collect, projectName, dbProject.Name)
 			assert.Equal(collect, domain.ProjectStateActive, dbProject.State)
 			assert.True(collect, dbProject.ShouldAssertRole)
 			assert.True(collect, dbProject.IsAuthorizationRequired)

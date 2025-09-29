@@ -24,7 +24,7 @@ func TestServer_ProjectRoleReduces(t *testing.T) {
 
 	projectRes, err := ProjectClient.CreateProject(CTX, &v2beta_project.CreateProjectRequest{
 		OrganizationId:        orgID,
-		Name:                  "foobar",
+		Name:                  integration.ProjectName(),
 		ProjectRoleAssertion:  true,
 		AuthorizationRequired: true,
 		ProjectAccessRequired: true,
