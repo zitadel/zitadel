@@ -115,3 +115,20 @@ func ListOrganizationsBeta(ctx context.Context, request *connect.Request[v2beta_
 		},
 	}, nil
 }
+
+func DeleteOrganization(ctx context.Context, request *connect.Request[v2beta_org.DeleteOrganizationRequest]) (*connect.Response[v2beta_org.DeleteOrganizationResponse], error) {
+	orgDeleteCmd := domain.NewDeleteOrgCommand(request.Msg.GetId())
+
+	err := domain.Invoke(ctx, orgDeleteCmd)
+	if err != nil {
+		return nil, err
+	}
+
+	return &connect.Response[v2beta_org.DeleteOrganizationResponse]{
+		Msg: &v2beta_org.DeleteOrganizationResponse{
+			// TODO(IAM-Marco): Change this with the real update date when OrganizationRepo.Delete()
+			// returns the timestamp
+			DeletionDate: timestamppb.Now(),
+		},
+	}, nil
+}

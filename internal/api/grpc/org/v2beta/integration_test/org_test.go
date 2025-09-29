@@ -369,6 +369,11 @@ func TestServer_UpdateOrganization(t *testing.T) {
 }
 
 func TestServer_ListOrganizations(t *testing.T) {
+	t.Cleanup(func() {
+		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(CTX, &feature.ResetInstanceFeaturesRequest{})
+		require.NoError(t, err)
+	})
+
 	testStartTimestamp := time.Now()
 	ListOrgIinstance := integration.NewInstance(CTX)
 	listOrgIAmOwnerCtx := ListOrgIinstance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
@@ -674,10 +679,29 @@ func TestServer_ListOrganizations(t *testing.T) {
 }
 
 func TestServer_DeleteOrganization(t *testing.T) {
+	t.Cleanup(func() {
+		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(CTX, &feature.ResetInstanceFeaturesRequest{})
+		require.NoError(t, err)
+	})
+
+	relTableState := integration.RelationalTablesEnableMatrix()
+
+	var orgs []*v2beta_org.CreateOrganizationResponse
+	orgs, _, _ = createOrgs(CTX, t, Client, 3)
+	require.NotNil(t, orgs)
+	require.NotEmpty(t, orgs)
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		deleteRes, err := Client.DeleteOrganization(CTX, &v2beta_org.DeleteOrganizationRequest{Id: orgs[2].GetId()})
+		assert.Nil(ttt, err)
+		assert.NotNil(ttt, deleteRes)
+		assert.NotZero(ttt, deleteRes.GetDeletionDate())
+	}, retryDuration, tick)
+
 	tests := []struct {
 		name          string
 		ctx           context.Context
-		createOrgFunc func() string
 		req           *v2beta_org.DeleteOrganizationRequest
 		want          *v2beta_org.DeleteOrganizationResponse
 		dontCheckTime bool
@@ -686,34 +710,22 @@ func TestServer_DeleteOrganization(t *testing.T) {
 		{
 			name: "delete org no permission",
 			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
-			createOrgFunc: func() string {
-				orgs, _, _ := createOrgs(CTX, t, Client, 1)
-				return orgs[0].Id
+			req: &v2beta_org.DeleteOrganizationRequest{
+				Id: orgs[0].GetId(),
 			},
-			req: &v2beta_org.DeleteOrganizationRequest{},
 			err: errors.New("membership not found"),
 		},
 		{
 			name: "delete org happy path",
 			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
-			createOrgFunc: func() string {
-				orgs, _, _ := createOrgs(CTX, t, Client, 1)
-				return orgs[0].Id
+			req: &v2beta_org.DeleteOrganizationRequest{
+				Id: orgs[1].GetId(),
 			},
-			req: &v2beta_org.DeleteOrganizationRequest{},
 		},
 		{
-			name: "delete already deleted org",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
-			createOrgFunc: func() string {
-				orgs, _, _ := createOrgs(CTX, t, Client, 1)
-				// delete org
-				_, err := Client.DeleteOrganization(CTX, &v2beta_org.DeleteOrganizationRequest{Id: orgs[0].Id})
-				require.NoError(t, err)
-
-				return orgs[0].Id
-			},
-			req:           &v2beta_org.DeleteOrganizationRequest{},
+			name:          "delete already deleted org",
+			ctx:           Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
+			req:           &v2beta_org.DeleteOrganizationRequest{Id: orgs[2].GetId()},
 			dontCheckTime: true,
 		},
 		{
@@ -725,26 +737,28 @@ func TestServer_DeleteOrganization(t *testing.T) {
 			dontCheckTime: true,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.createOrgFunc != nil {
-				tt.req.Id = tt.createOrgFunc()
-			}
-
-			got, err := Client.DeleteOrganization(tt.ctx, tt.req)
-			if tt.err != nil {
-				require.Contains(t, err.Error(), tt.err.Error())
-				return
-			}
-			require.NoError(t, err)
-
-			// check details
-			gotCD := got.GetDeletionDate().AsTime()
-			if !tt.dontCheckTime {
-				now := time.Now()
-				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-			}
+	for _, stateCase := range relTableState {
+		integration.EnsureInstanceFeature(t, CTX, Instance, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
 		})
+
+		for _, tt := range tests {
+			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tt.name), func(t *testing.T) {
+				got, err := Client.DeleteOrganization(tt.ctx, tt.req)
+				if tt.err != nil {
+					require.Contains(t, err.Error(), tt.err.Error())
+					return
+				}
+				require.NoError(t, err)
+
+				// check details
+				gotCD := got.GetDeletionDate().AsTime()
+				if !tt.dontCheckTime {
+					now := time.Now()
+					assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+				}
+			})
+		}
 	}
 }
 

@@ -70,6 +70,10 @@ func (s *Server) ListOrganizations(ctx context.Context, request *connect.Request
 }
 
 func (s *Server) DeleteOrganization(ctx context.Context, request *connect.Request[v2beta_org.DeleteOrganizationRequest]) (*connect.Response[v2beta_org.DeleteOrganizationResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return orgv2.DeleteOrganization(ctx, request)
+	}
+
 	details, err := s.command.RemoveOrg(ctx, request.Msg.GetId())
 	if err != nil {
 		var notFoundError *zerrors.NotFoundError
