@@ -101,6 +101,12 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 };
 
 service SAMLService {
+  // Get SAML Request
+  //
+  // Get SAML Request details by ID. Returns details that are parsed from the application's SAML Request.
+  //
+  // Required permissions:
+  //   - `session.read`
   rpc GetSAMLRequest (GetSAMLRequestRequest) returns (GetSAMLRequestResponse) {
     option (google.api.http) = {
       get: "/v2/saml/saml_requests/{saml_request_id}"
@@ -113,8 +119,6 @@ service SAMLService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get SAML Request details";
-      description: "Get SAML Request details by ID. Returns details that are parsed from the application's SAML Request."
       responses: {
         key: "200"
         value: {
@@ -124,6 +128,15 @@ service SAMLService {
     };
   }
 
+  // Create Response
+  //
+  // Finalize a SAML Request and get the response definition for success or failure.
+  // The response must be handled as per the SAML definition to inform the application about the success or failure.
+  // On success, the response contains details for the application to obtain the SAMLResponse.
+  // This method can only be called once for an SAML request.
+  //
+  // Required permissions:
+  //   - `session.link`
   rpc CreateResponse (CreateResponseRequest) returns (CreateResponseResponse) {
     option (google.api.http) = {
       post: "/v2/saml/saml_requests/{saml_request_id}"
@@ -137,8 +150,6 @@ service SAMLService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Finalize a SAML Request and get the response.";
-      description: "Finalize a SAML Request and get the response definition for success or failure. The response must be handled as per the SAML definition to inform the application about the success or failure. On success, the response contains details for the application to obtain the SAMLResponse. This method can only be called once for an SAML request."
       responses: {
         key: "200"
         value: {
@@ -153,6 +164,7 @@ message GetSAMLRequestRequest {
   // ID of the SAML Request, as obtained from the redirect URL.
   string saml_request_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
@@ -169,14 +181,19 @@ message CreateResponseRequest {
   // ID of the SAML Request.
   string saml_request_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"163840776835432705\"";
     }
   ];
 
+  // The result of the authorization flow, either success with the user's session or failure with an error.
   oneof response_kind {
     option (validate.required) = true;
+
+    // The session of the authenticated user, to finalize the authorization request.
     Session session = 2;
+
     // Set this field when the authorization flow failed. It creates a response depending on the SP, with the error details set.
     AuthorizationError error = 3;
   }
@@ -186,6 +203,7 @@ message Session {
   // ID of the session, used to login the user. Connects the session to the SAML Request.
   string session_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
@@ -196,6 +214,7 @@ message Session {
   // Token to verify the session is valid.
   string session_token = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
@@ -205,23 +224,30 @@ message Session {
 
 message CreateResponseResponse {
   zitadel.object.v2.Details details = 1;
+
   // URL including the Assertion Consumer Service where the user should be redirected or has to call per POST, depending on the binding. Contains details for the application to obtain the response on success, or error details on failure. Note that this field must be treated as credentials, as the contained SAMLResponse or code can be used on behalve of the user.
   string url = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"https://client.example.org/cb\""
     }
   ];
+
   // Binding is defined through the request, what the IDP is able to use and what bindings are available for the SP.
   oneof binding {
     // Set if the binding is Redirect-Binding, where the user can directly be redirected to the application, using a \"302 FOUND\" status to the URL.
     RedirectResponse redirect = 3;
+
     // Set if the binding is POST-Binding, where the application expects to be called per HTTP POST with the SAMLResponse and RelayState in the form body.
     PostResponse post = 4;
   }
 }
 
 message RedirectResponse{}
+
 message PostResponse{
+  // The SAML RelaySate, that needs to be returned to the application to match the response to the request.
   string relay_state = 1;
+
+  // The SAML Response, that needs to be returned to the application to complete the SAML flow.
   string saml_response = 2;
 }
