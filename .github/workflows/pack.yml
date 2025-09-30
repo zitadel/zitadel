@@ -73,6 +73,7 @@ jobs:
       - name: Pack API and Login
         env:
           ZITADEL_VERSION: ${{ needs.version.outputs.version }}
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
         run: pnpm nx run --nxBail pack
       - name: Upload all platform archives
         uses: actions/upload-artifact@v4

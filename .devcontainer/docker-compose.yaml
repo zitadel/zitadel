@@ -81,12 +81,6 @@ services:
       context: ../apps/login/integration/api-mock
       additional_contexts:
         zitadel-protos: ../proto
-    develop:
-      watch:
-        - path: ../apps/login/integration/api-mock
-          action: "rebuild"
-        - path: ../protos
-          action: "rebuild"
     ports:
       - 22220:22220
       - 22222:22222

@@ -37,4 +37,11 @@ If the user wants help with tasks or commands (which include keywords like "test
 - If the task was marked as "continuous" do not offer to rerun the task. This task is already running and the user can see the output in the terminal. You can use 'nx_current_running_task_output' to get the output of the task to verify the output. 
 
 
+# CI Error Guidelines
+If the user wants help with fixing an error in their CI pipeline, use the following flow:
+- Retrieve the list of current CI Pipeline Executions (CIPEs) using the 'nx_cloud_cipe_details' tool
+- If there are any errors, use the 'nx_cloud_fix_cipe_failure' tool to retrieve the logs for a specific task
+- Use the task logs to see what's wrong and help the user fix their problem. Use the appropriate tools if necessary
+- Make sure that the problem is fixed by running the task that you passed into the 'nx_cloud_fix_cipe_failure' tool
+
 
