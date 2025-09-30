@@ -297,7 +297,7 @@ Because of the server-client split, Go is usually unaware of changes in server c
 Pass `-count 1` to disable test caching.
 
 ```bash
-pnpm nx run @zitadel/api:test-integration-app
+pnpm nx run @zitadel/api:test-integration-run-api
 ```
 
 Example command to run a single package integration test:
@@ -317,7 +317,7 @@ In order to run the server, a database with correctly set up data is required.
 When starting the debugger, make sure the Zitadel binary gets the flag `--config=./apps/api/test-integration.yaml`
 
 ```bash
-pnpm nx run @zitadel/api:test-integration-state
+pnpm nx run @zitadel/api:test-integration-setup
 ```
 
 To cleanup after testing (deletes the ephemeral database!):
