@@ -1380,6 +1380,174 @@ func TestUpdateHumanUser(t *testing.T) {
 	}
 }
 
+func TestListHumanUser(t *testing.T) {
+	// tx, err := pool.Begin(t.Context(), nil)
+	// require.NoError(t, err)
+	// defer func() {
+	// 	err := tx.Rollback(t.Context())
+	// 	if err != nil {
+	// 		t.Logf("error during rollback: %v", err)
+	// 	}
+	// }()
+	tx := pool
+
+	instanceRepo := repository.InstanceRepository()
+	// create instance
+	instanceID := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceID,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	err := instanceRepo.Create(t.Context(), tx, &instance)
+	require.NoError(t, err)
+
+	// create organization
+	orgID := gofakeit.UUID()
+	orgRepo := repository.OrganizationRepository()
+	organization := domain.Organization{
+		ID:         orgID,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceID,
+		State:      domain.OrgStateActive,
+	}
+	err = orgRepo.Create(t.Context(), tx, &organization)
+	require.NoError(t, err)
+
+	userRepo := repository.UserRepository()
+
+	type test struct {
+		name     string
+		testFunc func(t *testing.T, client database.QueryExecutor) []*domain.Human
+		user     []*domain.Human
+		opts     []database.QueryOption
+		err      error
+	}
+
+	tests := []test{
+		{
+			name: "multiple idps filter on instance",
+			testFunc: func(t *testing.T, client database.QueryExecutor) []*domain.Human {
+				// create instance
+				newInstanceId := gofakeit.Name()
+				instance := domain.Instance{
+					ID:              newInstanceId,
+					Name:            gofakeit.Name(),
+					DefaultOrgID:    "defaultOrgId",
+					IAMProjectID:    "iamProject",
+					ConsoleClientID: "consoleCLient",
+					ConsoleAppID:    "consoleApp",
+					DefaultLanguage: "defaultLanguage",
+				}
+				err = instanceRepo.Create(t.Context(), tx, &instance)
+				require.NoError(t, err)
+
+				// create org
+				newOrgId := gofakeit.Name()
+				org := domain.Organization{
+					ID:         newOrgId,
+					Name:       gofakeit.Name(),
+					InstanceID: newInstanceId,
+					State:      domain.OrgStateActive,
+				}
+				organizationRepo := repository.OrganizationRepository()
+				err = organizationRepo.Create(t.Context(), tx, &org)
+				require.NoError(t, err)
+
+				noOfUsers := 5
+				users := make([]*domain.Human, noOfUsers)
+				for i := range noOfUsers {
+
+					user := domain.Human{
+						User: domain.User{
+							ID:                gofakeit.UUID(),
+							InstanceID:        instanceID,
+							OrgID:             orgID,
+							Username:          gofakeit.Username(),
+							UsernameOrgUnique: true,
+							State:             domain.UserStateActive,
+						},
+						FirstName:         gofakeit.FirstName(),
+						LastName:          gofakeit.LastName(),
+						NickName:          gofakeit.Username(),
+						DisplayName:       gofakeit.Name(),
+						PreferredLanguage: "en",
+						Gender:            1,
+						AvatarKey:         gofakeit.Animal(),
+					}
+
+					_, err := userRepo.CreateHuman(t.Context(), tx, &user)
+					require.NoError(t, err)
+
+					users[i] = &user
+				}
+
+				return users
+			},
+			opts: []database.QueryOption{
+				database.WithCondition(database.And(
+					userRepo.Human().InstanceIDCondition(instanceID),
+				)),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// savepoint, err := tx.Begin(t.Context())
+			// require.NoError(t, err)
+			// defer func() {
+			// 	err = savepoint.Rollback(t.Context())
+			// 	if err != nil {
+			// 		t.Logf("error during rollback: %v", err)
+			// 	}
+			// }()
+
+			// users := tt.testFunc(t)
+			users := tt.testFunc(t, pool)
+
+			// create user
+			// beforeCreate = time.Now()
+			returnedUsers, err := userRepo.ListHuman(t.Context(), pool, tt.opts...)
+			require.NoError(t, err)
+			if err != nil {
+				require.ErrorIs(t, err, tt.err)
+				return
+			}
+
+			assert.Equal(t, len(users), len(returnedUsers))
+			for i, user := range users {
+				// fmt.Printf("[DEBUGPRINT] [user.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> user.FirstName =             %+v\n", user.FirstName)
+				// fmt.Printf("[DEBUGPRINT] [user.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> user.CreatedAt             = %+v\n", user.CreatedAt)
+				// fmt.Printf("[DEBUGPRINT] [user.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> returnedUsers[i].FirstName = %+v\n", returnedUsers[i].FirstName)
+				// fmt.Printf("[DEBUGPRINT] [user.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> returnedUsers[i].CreatedAt = %+v\n", returnedUsers[i].CreatedAt)
+				// user
+				assert.Equal(t, returnedUsers[i].InstanceID, user.InstanceID)
+				assert.Equal(t, returnedUsers[i].OrgID, user.OrgID)
+				assert.Equal(t, returnedUsers[i].State, user.State)
+				assert.Equal(t, returnedUsers[i].ID, user.ID)
+				assert.Equal(t, returnedUsers[i].Username, user.Username)
+				assert.Equal(t, returnedUsers[i].UsernameOrgUnique, user.UsernameOrgUnique)
+				assert.Equal(t, returnedUsers[i].State, user.State)
+				assert.Equal(t, returnedUsers[i].CreatedAt, user.CreatedAt)
+				assert.Equal(t, returnedUsers[i].UpdatedAt, user.UpdatedAt)
+
+				// // human
+				assert.Equal(t, returnedUsers[i].FirstName, user.FirstName)
+				assert.Equal(t, returnedUsers[i].LastName, user.LastName)
+				assert.Equal(t, returnedUsers[i].NickName, user.NickName)
+				assert.Equal(t, returnedUsers[i].DisplayName, user.DisplayName)
+				assert.Equal(t, returnedUsers[i].PreferredLanguage, user.PreferredLanguage)
+				assert.Equal(t, returnedUsers[i].Gender, user.Gender)
+				assert.Equal(t, returnedUsers[i].AvatarKey, user.AvatarKey)
+			}
+		})
+	}
+}
+
 func TestCreateMachineUser(t *testing.T) {
 	beforeCreate := time.Now()
 	tx, err := pool.Begin(t.Context(), nil)
@@ -1486,197 +1654,6 @@ func TestCreateMachineUser(t *testing.T) {
 			// assert.Equal(t, tt.organization.State, organization.State)
 			assert.WithinRange(t, user.CreatedAt, beforeCreate, afterCreate)
 			assert.WithinRange(t, user.CreatedAt, beforeCreate, afterCreate)
-		})
-	}
-}
-
-func TestListHumanUser(t *testing.T) {
-	// tx, err := pool.Begin(t.Context(), nil)
-	// require.NoError(t, err)
-	// defer func() {
-	// 	err := tx.Rollback(t.Context())
-	// 	if err != nil {
-	// 		t.Logf("error during rollback: %v", err)
-	// 	}
-	// }()
-	tx := pool
-
-	instanceRepo := repository.InstanceRepository()
-	// create instance
-	instanceID := gofakeit.Name()
-	instance := domain.Instance{
-		ID:              instanceID,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleCLient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
-	}
-	err := instanceRepo.Create(t.Context(), tx, &instance)
-	require.NoError(t, err)
-
-	// create organization
-	orgID := gofakeit.UUID()
-	orgRepo := repository.OrganizationRepository()
-	organization := domain.Organization{
-		ID:         orgID,
-		Name:       gofakeit.Name(),
-		InstanceID: instanceID,
-		State:      domain.OrgStateActive,
-	}
-	err = orgRepo.Create(t.Context(), tx, &organization)
-	require.NoError(t, err)
-
-	userRepo := repository.UserRepository()
-
-	type test struct {
-		name     string
-		testFunc func(t *testing.T, client database.QueryExecutor) []*domain.Human
-		user     []*domain.Human
-		opts     []database.QueryOption
-		err      error
-	}
-
-	tests := []test{
-		{
-			name: "multiple idps filter on instance",
-			testFunc: func(t *testing.T, client database.QueryExecutor) []*domain.Human {
-				// create instance
-				newInstanceId := gofakeit.Name()
-				instance := domain.Instance{
-					ID:              newInstanceId,
-					Name:            gofakeit.Name(),
-					DefaultOrgID:    "defaultOrgId",
-					IAMProjectID:    "iamProject",
-					ConsoleClientID: "consoleCLient",
-					ConsoleAppID:    "consoleApp",
-					DefaultLanguage: "defaultLanguage",
-				}
-				err = instanceRepo.Create(t.Context(), tx, &instance)
-				require.NoError(t, err)
-
-				// create org
-				newOrgId := gofakeit.Name()
-				org := domain.Organization{
-					ID:         newOrgId,
-					Name:       gofakeit.Name(),
-					InstanceID: newInstanceId,
-					State:      domain.OrgStateActive,
-				}
-				organizationRepo := repository.OrganizationRepository()
-				err = organizationRepo.Create(t.Context(), tx, &org)
-				require.NoError(t, err)
-
-				// create user
-				// this user is created as an additional user which should NOT
-				// be returned in the results of this test case
-				// user := domain.Human{
-				// 	User: domain.User{
-				// 		ID:                gofakeit.UUID(),
-				// 		InstanceID:        instanceID,
-				// 		OrgID:             orgID,
-				// 		Username:          gofakeit.Username(),
-				// 		UsernameOrgUnique: true,
-				// 		State:             domain.UserStateActive,
-				// 	},
-				// 	FirstName:         gofakeit.FirstName(),
-				// 	LastName:          gofakeit.LastName(),
-				// 	NickName:          gofakeit.Username(),
-				// 	DisplayName:       gofakeit.Name(),
-				// 	PreferredLanguage: "en",
-				// 	Gender:            1,
-				// 	AvatarKey:         gofakeit.Animal(),
-				// }
-				// _, err := userRepo.CreateHuman(t.Context(), tx, &user)
-				// require.NoError(t, err)
-
-				noOfUsers := 5
-				users := make([]*domain.Human, noOfUsers)
-				for i := range noOfUsers {
-
-					user := domain.Human{
-						User: domain.User{
-							ID:                gofakeit.UUID(),
-							InstanceID:        instanceID,
-							OrgID:             orgID,
-							Username:          gofakeit.Username(),
-							UsernameOrgUnique: true,
-							State:             domain.UserStateActive,
-						},
-						FirstName:         gofakeit.FirstName(),
-						LastName:          gofakeit.LastName(),
-						NickName:          gofakeit.Username(),
-						DisplayName:       gofakeit.Name(),
-						PreferredLanguage: "en",
-						Gender:            1,
-						AvatarKey:         gofakeit.Animal(),
-					}
-
-					_, err := userRepo.CreateHuman(t.Context(), tx, &user)
-					require.NoError(t, err)
-
-					users[i] = &user
-				}
-
-				return users
-			},
-			opts: []database.QueryOption{
-				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-				)),
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// savepoint, err := tx.Begin(t.Context())
-			// require.NoError(t, err)
-			// defer func() {
-			// 	err = savepoint.Rollback(t.Context())
-			// 	if err != nil {
-			// 		t.Logf("error during rollback: %v", err)
-			// 	}
-			// }()
-
-			// users := tt.testFunc(t)
-			users := tt.testFunc(t, pool)
-
-			// create user
-			// beforeCreate = time.Now()
-			returnedUsers, err := userRepo.ListHuman(t.Context(), pool, tt.opts...)
-			require.NoError(t, err)
-			if err != nil {
-				require.ErrorIs(t, err, tt.err)
-				return
-			}
-
-			assert.Equal(t, len(users), len(returnedUsers))
-			for i, user := range users {
-				// fmt.Printf("[DEBUGPRINT] [user.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> user.FirstName =             %+v\n", user.FirstName)
-				// fmt.Printf("[DEBUGPRINT] [user.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> user.CreatedAt             = %+v\n", user.CreatedAt)
-				// fmt.Printf("[DEBUGPRINT] [user.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> returnedUsers[i].FirstName = %+v\n", returnedUsers[i].FirstName)
-				// fmt.Printf("[DEBUGPRINT] [user.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> returnedUsers[i].CreatedAt = %+v\n", returnedUsers[i].CreatedAt)
-				// user
-				assert.Equal(t, returnedUsers[i].InstanceID, user.InstanceID)
-				assert.Equal(t, returnedUsers[i].OrgID, user.OrgID)
-				assert.Equal(t, returnedUsers[i].State, user.State)
-				assert.Equal(t, returnedUsers[i].ID, user.ID)
-				assert.Equal(t, returnedUsers[i].Username, user.Username)
-				assert.Equal(t, returnedUsers[i].UsernameOrgUnique, user.UsernameOrgUnique)
-				assert.Equal(t, returnedUsers[i].State, user.State)
-				assert.Equal(t, returnedUsers[i].CreatedAt, user.CreatedAt)
-				assert.Equal(t, returnedUsers[i].UpdatedAt, user.UpdatedAt)
-
-				// // human
-				assert.Equal(t, returnedUsers[i].FirstName, user.FirstName)
-				assert.Equal(t, returnedUsers[i].LastName, user.LastName)
-				assert.Equal(t, returnedUsers[i].NickName, user.NickName)
-				assert.Equal(t, returnedUsers[i].DisplayName, user.DisplayName)
-				assert.Equal(t, returnedUsers[i].PreferredLanguage, user.PreferredLanguage)
-				assert.Equal(t, returnedUsers[i].Gender, user.Gender)
-				assert.Equal(t, returnedUsers[i].AvatarKey, user.AvatarKey)
-			}
 		})
 	}
 }
