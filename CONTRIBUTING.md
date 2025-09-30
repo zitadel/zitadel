@@ -626,7 +626,7 @@ pnpm nx run @zitadel/docs:build
 
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
 
-### Contribute Translations
+## Contribute Translations
 
 Zitadel loads translations from four files:
 
