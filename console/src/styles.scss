@@ -457,13 +457,17 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
 
-  @include mat.dialog-overrides((
-    container-color: map.get($background, background),
-  ));
+  @include mat.dialog-overrides(
+    (
+      container-color: map.get($background, background),
+    )
+  );
 
-  @include mat.button-overrides((
-    protected-container-color: map.get($caos-light-primary, 500)
-  ));
+  @include mat.button-overrides(
+    (
+      protected-container-color: map.get($caos-light-primary, 500),
+    )
+  );
 
   ::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
@@ -550,13 +554,17 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
 
-  @include mat.dialog-overrides((
-    container-color: map.get($background, background),
-  ));
+  @include mat.dialog-overrides(
+    (
+      container-color: map.get($background, background),
+    )
+  );
 
-  @include mat.button-overrides((
-    protected-container-color: map.get($caos-dark-primary, 500)
-  ));
+  @include mat.button-overrides(
+    (
+      protected-container-color: map.get($caos-dark-primary, 500),
+    )
+  );
 
   ::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);

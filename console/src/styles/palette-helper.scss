@@ -1,4 +1,4 @@
-@use "sass:map";
+@use 'sass:map';
 @use '@fireflysemantics/sass-logger' as logger;
 
 @function modify-palette($theme, $map, $partial) {
@@ -41,7 +41,6 @@
       $map: $background-palette,
     )
   );
-  $modified-theme: map.set($modified-theme, _mat-system, surface, map.get($theme, color, primary, 500));
 
   @return $modified-theme;
 }
