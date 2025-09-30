@@ -1,6 +1,5 @@
 @use '@angular/material' as mat;
 @use '@angular/material/core/m2/palette' as m2;
-@use '@fireflysemantics/sass-logger' as logger;
 @use 'sass:map';
 // https://github.com/lipis/flag-icons/issues/1395
 @forward '../node_modules/flag-icons/sass/variables' with (
@@ -392,7 +391,6 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
 
 @include component-themes($caos-dark-app-theme);
 @include mat.all-component-themes($caos-dark-app-theme);
-//@include mat.color-variants-backwards-compatibility($caos-dark-app-theme);
 
 .progress {
   --mat-progress-bar-active-indicator-color: var(--success);
@@ -408,6 +406,12 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
 
   $background: map.get($caos-light-app-theme, background);
   $foreground: map.get($caos-light-app-theme, foreground);
+
+  @include mat.dialog-overrides(
+    (
+      container-color: map.get($background, background),
+    )
+  );
 
   --warn: #cd3d56;
   --success: #10b981;
@@ -457,18 +461,6 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
 
-  @include mat.dialog-overrides(
-    (
-      container-color: map.get($background, background),
-    )
-  );
-
-  @include mat.button-overrides(
-    (
-      protected-container-color: map.get($caos-light-primary, 500),
-    )
-  );
-
   ::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
     box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
@@ -501,6 +493,12 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
   $background: map.get($caos-dark-app-theme, background);
   $foreground: map.get($caos-dark-app-theme, foreground);
 
+  @include mat.dialog-overrides(
+    (
+      container-color: map.get($background, background),
+    )
+  );
+
   --warn: #ff3b5b;
   --success: #10b981;
   $border-color: map.get($foreground, divider);
@@ -530,7 +528,7 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
     background-color: map.get($background, cards);
   }
 
-  .mat-mdc-option {
+  .mat-mdc-option.mdc-list-item {
     background-color: map.get($background, cards);
 
     &:hover {
@@ -553,18 +551,6 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
     background-color: mat.m2-get-color-from-palette($background, background);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
-
-  @include mat.dialog-overrides(
-    (
-      container-color: map.get($background, background),
-    )
-  );
-
-  @include mat.button-overrides(
-    (
-      protected-container-color: map.get($caos-dark-primary, 500),
-    )
-  );
 
   ::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);

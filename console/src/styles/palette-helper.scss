@@ -1,5 +1,4 @@
 @use 'sass:map';
-@use '@fireflysemantics/sass-logger' as logger;
 
 @function modify-palette($theme, $map, $partial) {
   // A theme is a map with the following structure:
