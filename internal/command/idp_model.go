@@ -17,6 +17,7 @@ import (
 	providers "github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/apple"
 	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
+	"github.com/zitadel/zitadel/internal/idp/providers/dingtalk"
 	"github.com/zitadel/zitadel/internal/idp/providers/github"
 	"github.com/zitadel/zitadel/internal/idp/providers/gitlab"
 	"github.com/zitadel/zitadel/internal/idp/providers/google"
@@ -1467,20 +1468,20 @@ func (wm *DingTalkIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.En
 	if err != nil {
 		return nil, err
 	}
-	opts := make([]oidc.ProviderOpts, 0, 4)
+	opts := make([]oauth.ProviderOpts, 0, 4)
 	if wm.IsCreationAllowed {
-		opts = append(opts, oidc.WithCreationAllowed())
+		opts = append(opts, oauth.WithCreationAllowed())
 	}
 	if wm.IsLinkingAllowed {
-		opts = append(opts, oidc.WithLinkingAllowed())
+		opts = append(opts, oauth.WithLinkingAllowed())
 	}
 	if wm.IsAutoCreation {
-		opts = append(opts, oidc.WithAutoCreation())
+		opts = append(opts, oauth.WithAutoCreation())
 	}
 	if wm.IsAutoUpdate {
-		opts = append(opts, oidc.WithAutoUpdate())
+		opts = append(opts, oauth.WithAutoUpdate())
 	}
-	return google.New(
+	return dingtalk.New(
 		wm.ClientID,
 		secret,
 		callbackURL,

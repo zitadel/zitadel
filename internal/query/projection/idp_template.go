@@ -334,6 +334,17 @@ func (*idpTemplateProjection) Init() *old_handler.Check {
 			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
 		),
 		handler.NewSuffixedTable([]*handler.InitColumn{
+			handler.NewColumn(DingTalkIDCol, handler.ColumnTypeText),
+			handler.NewColumn(DingTalkInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(DingTalkClientIDCol, handler.ColumnTypeText),
+			handler.NewColumn(DingTalkClientSecretCol, handler.ColumnTypeJSONB),
+			handler.NewColumn(DingTalkScopesCol, handler.ColumnTypeTextArray, handler.Nullable()),
+		},
+			handler.NewPrimaryKey(DingTalkInstanceIDCol, DingTalkIDCol),
+			IDPTemplateDingTalkSuffix,
+			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
+		),
+		handler.NewSuffixedTable([]*handler.InitColumn{
 			handler.NewColumn(LDAPIDCol, handler.ColumnTypeText),
 			handler.NewColumn(LDAPInstanceIDCol, handler.ColumnTypeText),
 			handler.NewColumn(LDAPServersCol, handler.ColumnTypeTextArray),
@@ -1922,13 +1933,13 @@ func (p *idpTemplateProjection) reduceDingTalkIDPAdded(event eventstore.Event) (
 		),
 		handler.AddCreateStatement(
 			[]handler.Column{
-				handler.NewCol(GoogleIDCol, idpEvent.ID),
-				handler.NewCol(GoogleInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(GoogleClientIDCol, idpEvent.ClientID),
-				handler.NewCol(GoogleClientSecretCol, idpEvent.ClientSecret),
-				handler.NewCol(GoogleScopesCol, database.TextArray[string](idpEvent.Scopes)),
+				handler.NewCol(DingTalkIDCol, idpEvent.ID),
+				handler.NewCol(DingTalkInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(DingTalkClientIDCol, idpEvent.ClientID),
+				handler.NewCol(DingTalkClientSecretCol, idpEvent.ClientSecret),
+				handler.NewCol(DingTalkScopesCol, database.TextArray[string](idpEvent.Scopes)),
 			},
-			handler.WithTableSuffix(IDPTemplateGoogleSuffix),
+			handler.WithTableSuffix(IDPTemplateDingTalkSuffix),
 		),
 	), nil
 }
@@ -1941,7 +1952,7 @@ func (p *idpTemplateProjection) reduceDingTalkIDPChanged(event eventstore.Event)
 	case *instance.DingTalkIDPChangedEvent:
 		idpEvent = e.DingTalkIDPChangedEvent
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPChangedEventType, instance.GoogleIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.DingTalkIDPChangedEventType, instance.DingTalkIDPChangedEventType})
 	}
 
 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)

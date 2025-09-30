@@ -709,9 +709,8 @@ func (wm *OrgDingTalkIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(org.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
-			org.GoogleIDPAddedEventType,
-			org.GoogleIDPChangedEventType,
-			org.OIDCIDPMigratedGoogleEventType,
+			org.DingTalkIDPAddedEventType,
+			org.DingTalkIDPChangedEventType,
 			org.IDPRemovedEventType,
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).

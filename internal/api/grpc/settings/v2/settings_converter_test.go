@@ -496,6 +496,10 @@ func Test_idpTypeToPb(t *testing.T) {
 			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_APPLE,
 		},
 		{
+			args: args{domain.IDPTypeDingTalk},
+			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_DINGTALK,
+		},
+		{
 			args: args{domain.IDPTypeSAML},
 			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_SAML,
 		},

@@ -852,14 +852,14 @@ func NewDingTalkIDPAddedEvent(
 	clientSecret *crypto.CryptoValue,
 	scopes []string,
 	options idp.Options,
-) *GoogleIDPAddedEvent {
+) *DingTalkIDPAddedEvent {
 
-	return &GoogleIDPAddedEvent{
-		GoogleIDPAddedEvent: *idp.NewGoogleIDPAddedEvent(
+	return &DingTalkIDPAddedEvent{
+		DingTalkIDPAddedEvent: *idp.NewDingTalkIDPAddedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				aggregate,
-				GoogleIDPAddedEventType,
+				DingTalkIDPAddedEventType,
 			),
 			id,
 			name,

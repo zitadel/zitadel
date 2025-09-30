@@ -227,6 +227,8 @@ func idpTypeToPb(idpType domain.IDPType) settings.IdentityProviderType {
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_GOOGLE
 	case domain.IDPTypeApple:
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_APPLE
+	case domain.IDPTypeDingTalk:
+		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_DINGTALK
 	case domain.IDPTypeSAML:
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_SAML
 	default:

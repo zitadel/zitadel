@@ -1591,7 +1591,7 @@ func (c *Commands) prepareAddOrgDingTalkProvider(a *org.Aggregate, writeModel *O
 				return nil, err
 			}
 			return []eventstore.Command{
-				org.NewGoogleIDPAddedEvent(
+				org.NewDingTalkIDPAddedEvent(
 					ctx,
 					&a.Aggregate,
 					writeModel.ID,
