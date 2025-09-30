@@ -5,10 +5,12 @@ import { addHumanUser, addIDPLink, getLoginSettings, getUserByID, listAuthentica
 import { create } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksJson, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
+import crypto from "crypto";
 import { completeFlowOrGetUrl } from "../client";
 import { getServiceUrlFromHeaders } from "../service-url";
 import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
+import { getOrSetFingerprintId } from "../fingerprint";
 
 type RegisterUserCommand = {
   email: string;
@@ -78,6 +80,21 @@ export async function registerUser(command: RegisterUserCommand) {
     if (command.requestId) {
       params.append("requestId", command.requestId);
     }
+
+    // Set verification cookie for users registering with passkey (no password)
+    // This allows them to proceed with passkey registration without additional verification
+    const cookiesList = await cookies();
+    const userAgentId = await getOrSetFingerprintId();
+
+    const verificationCheck = crypto.createHash("sha256").update(`${session.factors.user.id}:${userAgentId}`).digest("hex");
+
+    await cookiesList.set({
+      name: "verificationCheck",
+      value: verificationCheck,
+      httpOnly: true,
+      path: "/",
+      maxAge: 300, // 5 minutes
+    });
 
     return { redirect: "/passkey/set?" + params };
   } else {
