@@ -40,6 +40,7 @@ import (
 	oidc_pb_v2beta "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
+	project_v2 "github.com/zitadel/zitadel/pkg/grpc/project/v2"
 	project_v2beta "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
 	user_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
 	userschema_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha"
@@ -82,6 +83,7 @@ type Client struct {
 	SAMLv2                   saml_pb.SAMLServiceClient
 	SCIM                     *scim.Client
 	Projectv2Beta            project_v2beta.ProjectServiceClient
+	ProjectV2                project_v2.ProjectServiceClient
 	InstanceV2Beta           instance.InstanceServiceClient
 	AppV2Beta                app.AppServiceClient
 	InternalPermissionv2Beta internal_permission_v2beta.InternalPermissionServiceClient
@@ -126,6 +128,7 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		SAMLv2:                   saml_pb.NewSAMLServiceClient(cc),
 		SCIM:                     scim.NewScimClient(target),
 		Projectv2Beta:            project_v2beta.NewProjectServiceClient(cc),
+		ProjectV2:                project_v2.NewProjectServiceClient(cc),
 		InstanceV2Beta:           instance.NewInstanceServiceClient(cc),
 		AppV2Beta:                app.NewAppServiceClient(cc),
 		InternalPermissionv2Beta: internal_permission_v2beta.NewInternalPermissionServiceClient(cc),
