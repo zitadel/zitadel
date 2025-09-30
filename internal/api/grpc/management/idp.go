@@ -366,6 +366,27 @@ func (s *Server) AddGoogleProvider(ctx context.Context, req *mgmt_pb.AddGooglePr
 	}, nil
 }
 
+func (s *Server) AddDingTalkProvider(ctx context.Context, req *mgmt_pb.AddDingTalkProviderRequest) (*mgmt_pb.AddDingTalkProviderResponse, error) {
+	id, details, err := s.command.AddOrgDingTalkProvider(ctx, authz.GetCtxData(ctx).OrgID, addDingTalkProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddDingTalkProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateDingTalkProvider(ctx context.Context, req *mgmt_pb.UpdateDingTalkProviderRequest) (*mgmt_pb.UpdateDingTalkProviderResponse, error) {
+	details, err := s.command.UpdateOrgDingTalkProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateDingTalkProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateDingTalkProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
 func (s *Server) UpdateGoogleProvider(ctx context.Context, req *mgmt_pb.UpdateGoogleProviderRequest) (*mgmt_pb.UpdateGoogleProviderResponse, error) {
 	details, err := s.command.UpdateOrgGoogleProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGoogleProviderToCommand(req))
 	if err != nil {

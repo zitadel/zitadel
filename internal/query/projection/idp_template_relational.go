@@ -168,6 +168,14 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 					Reduce: p.reduceGoogleIDPRelationalChanged,
 				},
 				{
+					Event:  instance.DingTalkIDPAddedEventType,
+					Reduce: p.reduceDingTalkIDPRelationalAdded,
+				},
+				{
+					Event:  instance.DingTalkIDPChangedEventType,
+					Reduce: p.reduceDingTalkIDPRelationalChanged,
+				},
+				{
 					Event:  instance.LDAPIDPAddedEventType,
 					Reduce: p.reduceLDAPIDPAdded,
 				},
@@ -315,6 +323,14 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 				{
 					Event:  org.GoogleIDPChangedEventType,
 					Reduce: p.reduceGoogleIDPRelationalChanged,
+				},
+				{
+					Event:  org.DingTalkIDPAddedEventType,
+					Reduce: p.reduceDingTalkIDPRelationalAdded,
+				},
+				{
+					Event:  org.DingTalkIDPChangedEventType,
+					Reduce: p.reduceDingTalkIDPRelationalChanged,
 				},
 				{
 					Event:  org.LDAPIDPAddedEventType,
@@ -1755,6 +1771,109 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalChanged(event
 	}), nil
 }
 
+func (p *idpTemplateRelationalProjection) reduceDingTalkIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
+	var idpEvent idp.DingTalkIDPAddedEvent
+	switch e := event.(type) {
+	case *org.DingTalkIDPAddedEvent:
+		idpEvent = e.DingTalkIDPAddedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	case *instance.DingTalkIDPAddedEvent:
+		idpEvent = e.DingTalkIDPAddedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Yp9ihb", "reduce.wrong.event.type %v", []eventstore.EventType{org.DingTalkIDPAddedEventType, instance.DingTalkIDPAddedEventType})
+	}
+
+	dingTalk := domain.DingTalk{
+		ClientID:     idpEvent.ClientID,
+		ClientSecret: idpEvent.ClientSecret,
+		Scopes:       idpEvent.Scopes,
+	}
+
+	payloadJSON, err := json.Marshal(dingTalk)
+	if err != nil {
+		return nil, err
+	}
+
+	return handler.NewCreateStatement(
+		&idpEvent,
+		[]handler.Column{
+			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCol(IDPRelationalOrgId, orgId),
+			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeDingTalk),
+			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
+			handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
+			handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
+			handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
+			handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
+			handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+					return nil
+				}
+				return domain.IDPAutoLinkingField(idpEvent.AutoLinkingOption)
+			}()),
+			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+			handler.NewCol(UpdatedAt, idpEvent.CreationDate()),
+		},
+	), nil
+}
+
+func (p *idpTemplateRelationalProjection) reduceDingTalkIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
+	var orgCond handler.Condition
+	var idpEvent idp.DingTalkIDPChangedEvent
+	switch e := event.(type) {
+	case *org.DingTalkIDPChangedEvent:
+		idpEvent = e.DingTalkIDPChangedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
+		orgCond = handler.NewCond(IDPRelationalOrgId, orgId)
+	case *instance.DingTalkIDPChangedEvent:
+		idpEvent = e.DingTalkIDPChangedEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YN58hml", "reduce.wrong.event.type %v", []eventstore.EventType{org.DingTalkIDPChangedEventType, instance.DingTalkIDPChangedEventType})
+	}
+
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
+		}
+		dingTalk, err := p.idpRepo.GetDingTalk(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		if err != nil {
+			return err
+		}
+
+		columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
+
+		payload := &dingTalk.DingTalk
+		payloadChanged := reduceDingTalkIDPRelationalChangedColumns(payload, &idpEvent)
+		if payloadChanged {
+			payloadJSON, err := json.Marshal(payload)
+			if err != nil {
+				return err
+			}
+			columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
+		}
+
+		columns = append(columns, handler.NewCol(UpdatedAt, idpEvent.CreationDate()))
+
+		return handler.NewUpdateStatement(
+			&idpEvent,
+			columns,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				orgCond,
+			},
+		).Execute(ctx, ex, projectionName)
+
+	}), nil
+}
+
 func (p *idpTemplateRelationalProjection) reduceLDAPIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var idpEvent idp.LDAPIDPAddedEvent
@@ -2343,6 +2462,23 @@ func reduceGitLabSelfHostedIDPRelationalChangedColumns(payload *domain.GitlabSel
 }
 
 func reduceGoogleIDPRelationalChangedColumns(payload *domain.Google, idpEvent *idp.GoogleIDPChangedEvent) bool {
+	payloadChange := false
+	if idpEvent.ClientID != nil {
+		payloadChange = true
+		payload.ClientID = *idpEvent.ClientID
+	}
+	if idpEvent.ClientSecret != nil {
+		payloadChange = true
+		payload.ClientSecret = idpEvent.ClientSecret
+	}
+	if idpEvent.Scopes != nil {
+		payloadChange = true
+		payload.Scopes = idpEvent.Scopes
+	}
+	return payloadChange
+}
+
+func reduceDingTalkIDPRelationalChangedColumns(payload *domain.DingTalk, idpEvent *idp.DingTalkIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.ClientID != nil {
 		payloadChange = true

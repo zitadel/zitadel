@@ -38,6 +38,8 @@ const (
 	SAMLIDPAddedEventType               eventstore.EventType = "instance.idp.saml.added"
 	SAMLIDPChangedEventType             eventstore.EventType = "instance.idp.saml.changed"
 	IDPRemovedEventType                 eventstore.EventType = "instance.idp.removed"
+	DingTalkIDPAddedEventType           eventstore.EventType = "instance.idp.dingtalk.added"
+	DingTalkIDPChangedEventType         eventstore.EventType = "instance.idp.dingtalk.changed"
 )
 
 type OAuthIDPAddedEvent struct {
@@ -835,6 +837,82 @@ func GoogleIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, erro
 	}
 
 	return &GoogleIDPChangedEvent{GoogleIDPChangedEvent: *e.(*idp.GoogleIDPChangedEvent)}, nil
+}
+
+type DingTalkIDPAddedEvent struct {
+	idp.DingTalkIDPAddedEvent
+}
+
+func NewDingTalkIDPAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	clientID string,
+	clientSecret *crypto.CryptoValue,
+	scopes []string,
+	options idp.Options,
+) *DingTalkIDPAddedEvent {
+
+	return &DingTalkIDPAddedEvent{
+		DingTalkIDPAddedEvent: *idp.NewDingTalkIDPAddedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				DingTalkIDPAddedEventType,
+			),
+			id,
+			name,
+			clientID,
+			clientSecret,
+			scopes,
+			options,
+		),
+	}
+}
+
+func DingTalkIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	e, err := idp.DingTalkIDPAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &DingTalkIDPAddedEvent{DingTalkIDPAddedEvent: *e.(*idp.DingTalkIDPAddedEvent)}, nil
+}
+
+type DingTalkIDPChangedEvent struct {
+	idp.DingTalkIDPChangedEvent
+}
+
+func NewDingTalkIDPChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id string,
+	changes []idp.DingTalkIDPChanges,
+) (*DingTalkIDPChangedEvent, error) {
+
+	changedEvent, err := idp.NewDingTalkIDPChangedEvent(
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			DingTalkIDPChangedEventType,
+		),
+		id,
+		changes,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &DingTalkIDPChangedEvent{DingTalkIDPChangedEvent: *changedEvent}, nil
+}
+
+func DingTalkIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	e, err := idp.DingTalkIDPChangedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &DingTalkIDPChangedEvent{DingTalkIDPChangedEvent: *e.(*idp.DingTalkIDPChangedEvent)}, nil
 }
 
 type LDAPIDPAddedEvent struct {

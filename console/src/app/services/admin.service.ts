@@ -14,6 +14,8 @@ import {
   AddAzureADProviderResponse,
   AddCustomDomainPolicyRequest,
   AddCustomOrgIAMPolicyResponse,
+  AddDingTalkProviderRequest,
+  AddDingTalkProviderResponse,
   AddGenericOAuthProviderRequest,
   AddGenericOAuthProviderResponse,
   AddGenericOIDCProviderRequest,
@@ -254,6 +256,8 @@ import {
   UpdateAzureADProviderResponse,
   UpdateCustomDomainPolicyRequest,
   UpdateCustomDomainPolicyResponse,
+  UpdateDingTalkProviderRequest,
+  UpdateDingTalkProviderResponse,
   UpdateDomainPolicyRequest,
   UpdateDomainPolicyResponse,
   UpdateGenericOAuthProviderRequest,
@@ -1276,6 +1280,14 @@ export class AdminService {
 
   public updateGitHubProvider(req: UpdateGitHubProviderRequest): Promise<UpdateGitHubProviderResponse.AsObject> {
     return this.grpcService.admin.updateGitHubProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addDingTalkProvider(req: AddDingTalkProviderRequest): Promise<AddDingTalkProviderResponse.AsObject> {
+    return this.grpcService.admin.addDingTalkProvider(req, null).then((resp) => resp.toObject());
+  }
+  
+  public updateDingTalkProvider(req: UpdateDingTalkProviderRequest): Promise<UpdateDingTalkProviderResponse.AsObject> {
+    return this.grpcService.admin.updateDingTalkProvider(req, null).then((resp) => resp.toObject());
   }
 
   public addGenericOIDCProvider(req: AddGenericOIDCProviderRequest): Promise<AddGenericOIDCProviderResponse.AsObject> {

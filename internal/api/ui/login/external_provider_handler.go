@@ -27,6 +27,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/apple"
 	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
+	"github.com/zitadel/zitadel/internal/idp/providers/dingtalk"
 	"github.com/zitadel/zitadel/internal/idp/providers/github"
 	"github.com/zitadel/zitadel/internal/idp/providers/gitlab"
 	"github.com/zitadel/zitadel/internal/idp/providers/google"
@@ -184,6 +185,8 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		provider, err = l.gitlabSelfHostedProvider(r.Context(), identityProvider)
 	case domain.IDPTypeGoogle:
 		provider, err = l.googleProvider(r.Context(), identityProvider)
+	case domain.IDPTypeDingTalk:
+		provider, err = l.dingtalkProvider(r.Context(), identityProvider)
 	case domain.IDPTypeApple:
 		provider, err = l.appleProvider(r.Context(), identityProvider)
 	case domain.IDPTypeLDAP:
@@ -350,6 +353,13 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			return
 		}
 		session = openid.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
+	case domain.IDPTypeDingTalk:
+		provider, err := l.dingtalkProvider(r.Context(), identityProvider)
+		if err != nil {
+			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
+			return
+		}
+		session = oauth.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeApple:
 		provider, err := l.appleProvider(r.Context(), identityProvider)
 		if err != nil {
@@ -1039,6 +1049,24 @@ func (l *Login) googleProvider(ctx context.Context, identityProvider *query.IDPT
 		secret,
 		l.baseURL(ctx)+EndpointExternalLoginCallback,
 		identityProvider.GoogleIDPTemplate.Scopes,
+	)
+}
+
+func (l *Login) dingtalkProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*dingtalk.Provider, error) {
+	errorHandler := func(w http.ResponseWriter, r *http.Request, errorType string, errorDesc string, state string) {
+		logging.Errorf("token exchanged failed: %s - %s (state: %s)", errorType, errorType, state)
+		rp.DefaultErrorHandler(w, r, errorType, errorDesc, state)
+	}
+	openid.WithRelyingPartyOption(rp.WithErrorHandler(errorHandler))
+	secret, err := crypto.DecryptString(identityProvider.DingTalkIDPTemplate.ClientSecret, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
+	}
+	return dingtalk.New(
+		identityProvider.DingTalkIDPTemplate.ClientID,
+		secret,
+		l.baseURL(ctx)+EndpointExternalLoginCallback,
+		identityProvider.DingTalkIDPTemplate.Scopes,
 	)
 }
 

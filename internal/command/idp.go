@@ -98,6 +98,14 @@ type GoogleProvider struct {
 	IDPOptions   idp.Options
 }
 
+type DingTalkProvider struct {
+	Name         string
+	ClientID     string
+	ClientSecret string
+	Scopes       []string
+	IDPOptions   idp.Options
+}
+
 type LDAPProvider struct {
 	Name              string
 	Servers           []string

@@ -984,6 +984,11 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			GoogleClientIDCol.identifier(),
 			GoogleClientSecretCol.identifier(),
 			GoogleScopesCol.identifier(),
+			// dingtalk
+			DingTalkIDCol.identifier(),
+			DingTalkClientIDCol.identifier(),
+			DingTalkClientSecretCol.identifier(),
+			DingTalkScopesCol.identifier(),
 			// saml
 			SAMLIDCol.identifier(),
 			SAMLMetadataCol.identifier(),
@@ -1106,6 +1111,11 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			googleClientSecret := new(crypto.CryptoValue)
 			googleScopes := database.TextArray[string]{}
 
+			dingtalkID := sql.NullString{}
+			dingtalkClientID := sql.NullString{}
+			dingtalkClientSecret := new(crypto.CryptoValue)
+			dingtalkScopes := database.TextArray[string]{}
+
 			samlID := sql.NullString{}
 			var samlMetadata []byte
 			samlKey := new(crypto.CryptoValue)
@@ -1224,6 +1234,11 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 				&googleClientID,
 				&googleClientSecret,
 				&googleScopes,
+				// dingtalk
+				&dingtalkID,
+				&dingtalkClientID,
+				&dingtalkClientSecret,
+				&dingtalkScopes,
 				// saml
 				&samlID,
 				&samlMetadata,

@@ -1,5 +1,5 @@
 Log:
-  Level: info
+  Level: debug
 
 ExternalDomain: localhost
 ExternalSecure: false
@@ -7,15 +7,15 @@ ExternalSecure: false
 Database:
   postgres:
     # This makes the e2e config reusable with an out-of-docker zitadel process and an /etc/hosts entry
-    Host: host.docker.internal
+    Host: 127.0.0.1
     Port: 5432
     database: zitadel
     MaxOpenConns: 15
     MaxIdleConns: 10
     Database: zitadel
     User:
-      Username: zitadel
-      Password: zitadel
+      Username: postgres
+      Password: postgres
       SSL:
         Mode: disable
     Admin:

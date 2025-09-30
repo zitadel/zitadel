@@ -357,6 +357,7 @@ type IDProviderRepository interface {
 
 	GetAzureAD(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPAzureAD, error)
 	GetGoogle(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGoogle, error)
+	GetDingTalk(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPDingTalk, error)
 	GetGithub(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGithub, error)
 	GetGithubEnterprise(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGithubEnterprise, error)
 	GetGitlab(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGitlab, error)

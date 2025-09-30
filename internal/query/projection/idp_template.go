@@ -507,6 +507,14 @@ func (p *idpTemplateProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceGoogleIDPChanged,
 				},
 				{
+					Event:  instance.DingTalkIDPAddedEventType,
+					Reduce: p.reduceDingTalkIDPAdded,
+				},
+				{
+					Event:  instance.DingTalkIDPChangedEventType,
+					Reduce: p.reduceDingTalkIDPChanged,
+				},
+				{
 					Event:  instance.LDAPIDPAddedEventType,
 					Reduce: p.reduceLDAPIDPAdded,
 				},
@@ -650,6 +658,14 @@ func (p *idpTemplateProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  org.GoogleIDPChangedEventType,
 					Reduce: p.reduceGoogleIDPChanged,
+				},
+				{
+					Event:  org.DingTalkIDPAddedEventType,
+					Reduce: p.reduceDingTalkIDPAdded,
+				},
+				{
+					Event:  org.DingTalkIDPChangedEventType,
+					Reduce: p.reduceDingTalkIDPChanged,
 				},
 				{
 					Event:  org.LDAPIDPAddedEventType,
@@ -1869,6 +1885,95 @@ func (p *idpTemplateProjection) reduceGoogleIDPChanged(event eventstore.Event) (
 	), nil
 }
 
+func (p *idpTemplateProjection) reduceDingTalkIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.DingTalkIDPAddedEvent
+	var idpOwnerType domain.IdentityProviderType
+	switch e := event.(type) {
+	case *org.DingTalkIDPAddedEvent:
+		idpEvent = e.DingTalkIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeOrg
+	case *instance.DingTalkIDPAddedEvent:
+		idpEvent = e.DingTalkIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeSystem
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ap9ihb", "reduce.wrong.event.type %v", []eventstore.EventType{org.DingTalkIDPAddedEventType, instance.DingTalkIDPAddedEventType})
+	}
+
+	return handler.NewMultiStatement(
+		&idpEvent,
+		handler.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
+				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
+				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeDingTalk),
+				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
+				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
+				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
+				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
+				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
+			},
+		),
+		handler.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(GoogleIDCol, idpEvent.ID),
+				handler.NewCol(GoogleInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(GoogleClientIDCol, idpEvent.ClientID),
+				handler.NewCol(GoogleClientSecretCol, idpEvent.ClientSecret),
+				handler.NewCol(GoogleScopesCol, database.TextArray[string](idpEvent.Scopes)),
+			},
+			handler.WithTableSuffix(IDPTemplateGoogleSuffix),
+		),
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceDingTalkIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.DingTalkIDPChangedEvent
+	switch e := event.(type) {
+	case *org.DingTalkIDPChangedEvent:
+		idpEvent = e.DingTalkIDPChangedEvent
+	case *instance.DingTalkIDPChangedEvent:
+		idpEvent = e.DingTalkIDPChangedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPChangedEventType, instance.GoogleIDPChangedEventType})
+	}
+
+	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
+	ops = append(ops,
+		handler.AddUpdateStatement(
+			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+	)
+	dingTalkCols := reduceDingTalkIDPChangedColumns(idpEvent)
+	if len(dingTalkCols) > 0 {
+		ops = append(ops,
+			handler.AddUpdateStatement(
+				dingTalkCols,
+				[]handler.Condition{
+					handler.NewCond(DingTalkIDCol, idpEvent.ID),
+					handler.NewCond(DingTalkInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				},
+				handler.WithTableSuffix(IDPTemplateDingTalkSuffix),
+			),
+		)
+	}
+
+	return handler.NewMultiStatement(
+		&idpEvent,
+		ops...,
+	), nil
+}
+
 func (p *idpTemplateProjection) reduceLDAPIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 	var idpEvent idp.LDAPIDPAddedEvent
 	var idpOwnerType domain.IdentityProviderType
@@ -2420,6 +2525,20 @@ func reduceGoogleIDPChangedColumns(idpEvent idp.GoogleIDPChangedEvent) []handler
 		googleCols = append(googleCols, handler.NewCol(GoogleScopesCol, database.TextArray[string](idpEvent.Scopes)))
 	}
 	return googleCols
+}
+
+func reduceDingTalkIDPChangedColumns(idpEvent idp.DingTalkIDPChangedEvent) []handler.Column {
+	dingTalkCols := make([]handler.Column, 0, 3)
+	if idpEvent.ClientID != nil {
+		dingTalkCols = append(dingTalkCols, handler.NewCol(DingTalkClientIDCol, *idpEvent.ClientID))
+	}
+	if idpEvent.ClientSecret != nil {
+		dingTalkCols = append(dingTalkCols, handler.NewCol(DingTalkClientSecretCol, *idpEvent.ClientSecret))
+	}
+	if idpEvent.Scopes != nil {
+		dingTalkCols = append(dingTalkCols, handler.NewCol(DingTalkScopesCol, database.TextArray[string](idpEvent.Scopes)))
+	}
+	return dingTalkCols
 }
 
 func reduceLDAPIDPChangedColumns(idpEvent idp.LDAPIDPChangedEvent) []handler.Column {

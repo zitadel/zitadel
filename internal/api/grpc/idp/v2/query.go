@@ -140,6 +140,10 @@ func configToPb(config *query.IDPTemplate) *idp_pb.IDPConfig {
 		googleConfigToPb(idpConfig, config.GoogleIDPTemplate)
 		return idpConfig
 	}
+	if config.DingTalkIDPTemplate != nil {
+		dingtalkConfigToPb(idpConfig, config.DingTalkIDPTemplate)
+		return idpConfig
+	}
 	if config.LDAPIDPTemplate != nil {
 		ldapConfigToPb(idpConfig, config.LDAPIDPTemplate)
 		return idpConfig

@@ -72,7 +72,7 @@ export function idpTypeToIdentityProviderType(
       return IdentityProviderType.JWT;
 
     case IDPType.IDP_TYPE_DINGTALK:
-      return IdentityProviderType.IDENTITY_PROVIDER_TYPE_DINGTALK;
+      return IdentityProviderType.DINGTALK;
 
     default:
       throw new Error("Unknown identity provider type");

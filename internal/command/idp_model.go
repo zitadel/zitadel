@@ -1370,6 +1370,129 @@ func (wm *GoogleIDPWriteModel) GetProviderOptions() idp.Options {
 	return wm.Options
 }
 
+type DingTalkIDPWriteModel struct {
+	eventstore.WriteModel
+
+	ID           string
+	Name         string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       []string
+	idp.Options
+
+	State domain.IDPState
+}
+
+func (wm *DingTalkIDPWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.DingTalkIDPAddedEvent:
+			wm.reduceAddedEvent(e)
+		case *idp.DingTalkIDPChangedEvent:
+			wm.reduceChangedEvent(e)
+		case *idp.RemovedEvent:
+			wm.State = domain.IDPStateRemoved
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *DingTalkIDPWriteModel) reduceAddedEvent(e *idp.DingTalkIDPAddedEvent) {
+	wm.Name = e.Name
+	wm.ClientID = e.ClientID
+	wm.ClientSecret = e.ClientSecret
+	wm.Scopes = e.Scopes
+	wm.Options = e.Options
+	wm.State = domain.IDPStateActive
+}
+
+func (wm *DingTalkIDPWriteModel) reduceChangedEvent(e *idp.DingTalkIDPChangedEvent) {
+	if e.Name != nil {
+		wm.Name = *e.Name
+	}
+	if e.ClientID != nil {
+		wm.ClientID = *e.ClientID
+	}
+	if e.ClientSecret != nil {
+		wm.ClientSecret = e.ClientSecret
+	}
+	if e.Scopes != nil {
+		wm.Scopes = e.Scopes
+	}
+	wm.Options.ReduceChanges(e.OptionChanges)
+}
+
+func (wm *DingTalkIDPWriteModel) NewChanges(
+	name string,
+	clientID string,
+	clientSecretString string,
+	secretCrypto crypto.EncryptionAlgorithm,
+	scopes []string,
+	options idp.Options,
+) ([]idp.DingTalkIDPChanges, error) {
+	changes := make([]idp.DingTalkIDPChanges, 0)
+	var clientSecret *crypto.CryptoValue
+	var err error
+	if clientSecretString != "" {
+		clientSecret, err = crypto.Crypt([]byte(clientSecretString), secretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, idp.ChangeDingTalkClientSecret(clientSecret))
+	}
+	if wm.Name != name {
+		changes = append(changes, idp.ChangeDingTalkName(name))
+	}
+	if wm.ClientID != clientID {
+		changes = append(changes, idp.ChangeDingTalkClientID(clientID))
+	}
+	if !reflect.DeepEqual(wm.Scopes, scopes) {
+		changes = append(changes, idp.ChangeDingTalkScopes(scopes))
+	}
+
+	opts := wm.Options.Changes(options)
+	if !opts.IsZero() {
+		changes = append(changes, idp.ChangeDingTalkOptions(opts))
+	}
+	return changes, nil
+}
+
+func (wm *DingTalkIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+	errorHandler := func(w http.ResponseWriter, r *http.Request, errorType string, errorDesc string, state string) {
+		logging.Errorf("token exchanged failed: %s - %s (state: %s)", errorType, errorType, state)
+		rp.DefaultErrorHandler(w, r, errorType, errorDesc, state)
+	}
+	oidc.WithRelyingPartyOption(rp.WithErrorHandler(errorHandler))
+	secret, err := crypto.DecryptString(wm.ClientSecret, idpAlg)
+	if err != nil {
+		return nil, err
+	}
+	opts := make([]oidc.ProviderOpts, 0, 4)
+	if wm.IsCreationAllowed {
+		opts = append(opts, oidc.WithCreationAllowed())
+	}
+	if wm.IsLinkingAllowed {
+		opts = append(opts, oidc.WithLinkingAllowed())
+	}
+	if wm.IsAutoCreation {
+		opts = append(opts, oidc.WithAutoCreation())
+	}
+	if wm.IsAutoUpdate {
+		opts = append(opts, oidc.WithAutoUpdate())
+	}
+	return google.New(
+		wm.ClientID,
+		secret,
+		callbackURL,
+		wm.Scopes,
+		opts...,
+	)
+}
+
+func (wm *DingTalkIDPWriteModel) GetProviderOptions() idp.Options {
+	return wm.Options
+}
+
 type LDAPIDPWriteModel struct {
 	eventstore.WriteModel
 
@@ -1969,6 +2092,8 @@ func (wm *IDPRemoveWriteModel) Reduce() error {
 			wm.reduceAdded(e.ID)
 		case *idp.GoogleIDPAddedEvent:
 			wm.reduceAdded(e.ID)
+		case *idp.DingTalkIDPAddedEvent:
+			wm.reduceAdded(e.ID)
 		case *idp.LDAPIDPAddedEvent:
 			wm.reduceAdded(e.ID)
 		case *idp.AppleIDPAddedEvent:
@@ -2053,6 +2178,10 @@ func (wm *IDPTypeWriteModel) Reduce() error {
 			wm.reduceAdded(e.ID, domain.IDPTypeGoogle, e.Aggregate())
 		case *org.GoogleIDPAddedEvent:
 			wm.reduceAdded(e.ID, domain.IDPTypeGoogle, e.Aggregate())
+		case *instance.DingTalkIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeDingTalk, e.Aggregate())
+		case *org.DingTalkIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeDingTalk, e.Aggregate())
 		case *instance.LDAPIDPAddedEvent:
 			wm.reduceAdded(e.ID, domain.IDPTypeLDAP, e.Aggregate())
 		case *org.LDAPIDPAddedEvent:
@@ -2139,6 +2268,7 @@ func (wm *IDPTypeWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.GitLabIDPAddedEventType,
 			instance.GitLabSelfHostedIDPAddedEventType,
 			instance.GoogleIDPAddedEventType,
+			instance.DingTalkIDPAddedEventType,
 			instance.LDAPIDPAddedEventType,
 			instance.AppleIDPAddedEventType,
 			instance.SAMLIDPAddedEventType,
@@ -2159,6 +2289,7 @@ func (wm *IDPTypeWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.GitLabIDPAddedEventType,
 			org.GitLabSelfHostedIDPAddedEventType,
 			org.GoogleIDPAddedEventType,
+			org.DingTalkIDPAddedEventType,
 			org.LDAPIDPAddedEventType,
 			org.AppleIDPAddedEventType,
 			org.SAMLIDPAddedEventType,

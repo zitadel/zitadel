@@ -657,9 +657,25 @@ type OrgGoogleIDPWriteModel struct {
 	GoogleIDPWriteModel
 }
 
+type OrgDingTalkIDPWriteModel struct {
+	DingTalkIDPWriteModel
+}
+
 func NewGoogleOrgIDPWriteModel(orgID, id string) *OrgGoogleIDPWriteModel {
 	return &OrgGoogleIDPWriteModel{
 		GoogleIDPWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
+			},
+			ID: id,
+		},
+	}
+}
+
+func NewDingTalkOrgIDPWriteModel(orgID, id string) *OrgDingTalkIDPWriteModel {
+	return &OrgDingTalkIDPWriteModel{
+		DingTalkIDPWriteModel{
 			WriteModel: eventstore.WriteModel{
 				AggregateID:   orgID,
 				ResourceOwner: orgID,
@@ -686,6 +702,22 @@ func (wm *OrgGoogleIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 	}
 }
 
+func (wm *OrgDingTalkIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			org.GoogleIDPAddedEventType,
+			org.GoogleIDPChangedEventType,
+			org.OIDCIDPMigratedGoogleEventType,
+			org.IDPRemovedEventType,
+		).
+		EventData(map[string]interface{}{"id": wm.ID}).
+		Builder()
+}
+
 func (wm *OrgGoogleIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
@@ -700,6 +732,25 @@ func (wm *OrgGoogleIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).
 		Builder()
+}
+
+func (wm *OrgDingTalkIDPWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	clientID,
+	clientSecretString string,
+	secretCrypto crypto.EncryptionAlgorithm,
+	scopes []string,
+	options idp.Options,
+) (*org.DingTalkIDPChangedEvent, error) {
+
+	changes, err := wm.DingTalkIDPWriteModel.NewChanges(name, clientID, clientSecretString, secretCrypto, scopes, options)
+	if err != nil || len(changes) == 0 {
+		return nil, err
+	}
+	return org.NewDingTalkIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
 func (wm *OrgGoogleIDPWriteModel) NewChangedEvent(
@@ -996,6 +1047,8 @@ func (wm *OrgIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) {
 			wm.IDPRemoveWriteModel.AppendEvents(&e.GitLabSelfHostedIDPAddedEvent)
 		case *org.GoogleIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.GoogleIDPAddedEvent)
+		case *org.DingTalkIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.DingTalkIDPAddedEvent)
 		case *org.LDAPIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.LDAPIDPAddedEvent)
 		case *org.AppleIDPAddedEvent:
@@ -1030,6 +1083,7 @@ func (wm *OrgIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.GitLabIDPAddedEventType,
 			org.GitLabSelfHostedIDPAddedEventType,
 			org.GoogleIDPAddedEventType,
+			org.DingTalkIDPAddedEventType,
 			org.LDAPIDPAddedEventType,
 			org.AppleIDPAddedEventType,
 			org.SAMLIDPAddedEventType,

@@ -33,6 +33,8 @@ import {
   AddCustomPasswordComplexityPolicyResponse,
   AddCustomPrivacyPolicyRequest,
   AddCustomPrivacyPolicyResponse,
+  AddDingTalkProviderRequest,
+  AddDingTalkProviderResponse,
   AddGenericOAuthProviderRequest,
   AddGenericOAuthProviderResponse,
   AddGenericOIDCProviderRequest,
@@ -478,6 +480,8 @@ import {
   UpdateCustomPasswordComplexityPolicyResponse,
   UpdateCustomPrivacyPolicyRequest,
   UpdateCustomPrivacyPolicyResponse,
+  UpdateDingTalkProviderRequest,
+  UpdateDingTalkProviderResponse,
   UpdateGenericOAuthProviderRequest,
   UpdateGenericOAuthProviderResponse,
   UpdateGenericOIDCProviderRequest,
@@ -1041,6 +1045,14 @@ export class ManagementService {
 
   public updateGitHubProvider(req: UpdateGitHubProviderRequest): Promise<UpdateGitHubProviderResponse.AsObject> {
     return this.grpcService.mgmt.updateGitHubProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addDingTalkProvider(req: AddDingTalkProviderRequest): Promise<AddDingTalkProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addDingTalkProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateDingTalkProvider(req: UpdateDingTalkProviderRequest): Promise<UpdateDingTalkProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateDingTalkProvider(req, null).then((resp) => resp.toObject());
   }
 
   public addGenericOIDCProvider(req: AddGenericOIDCProviderRequest): Promise<AddGenericOIDCProviderResponse.AsObject> {
