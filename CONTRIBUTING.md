@@ -43,17 +43,17 @@ Jump to the dedicated sections for developing a specific project:
 This repository contains multiple interconnected projects.
 You can build and start any project with Nx commands.
 
-| Task                     | Command                                                      | Notes                   |
-| ------------------------ | ------------------------------------------------------------ | ----------------------- |
-| **Production**           | `pnpm nx run PROJECT:prod`                                   | Production server       |
-| **Develop**              | `pnpm nx run PROJECT:dev`                                    | Development server      |
-| **Generate**             | `pnpm nx run PROJECT:generate`                               | Generate files          |
-| **Test - Unit**          | `pnpm nx run PROJECT:test-unit`                              | Run unit tests          |
-| **Test - Integration**   | `pnpm nx run PROJECT:test-integration`                       | Run integration tests   |
-| **Test - Functional UI** | `pnpm nx run @zitadel/functional-ui:test --browser electron` | Run functional UI tests |
-| **Test**                 | `pnpm nx run PROJECT:test`                                   | Run all tests           |
-| **Lint**                 | `pnpm nx run PROJECT:lint`                                   | Check code style        |
-| **Lint Fix**             | `pnpm nx run PROJECT:lint-fix`                               | Auto-fix style issues   |
+| Task                     | Command                                                      | Notes                   | Details                                                                                 |
+| ------------------------ | ------------------------------------------------------------ | ----------------------- | --------------------------------------------------------------------------------------- |
+| **Production**           | `pnpm nx run PROJECT:prod`                                   | Production server       |                                                                                         |
+| **Develop**              | `pnpm nx run PROJECT:dev`                                    | Development server      |                                                                                         |
+| **Generate**             | `pnpm nx run PROJECT:generate`                               | Generate files          |                                                                                         |
+| **Test - Unit**          | `pnpm nx run PROJECT:test-unit`                              | Run unit tests          |                                                                                         |
+| **Test - Integration**   | `pnpm nx run PROJECT:test-integration`                       | Run integration tests   | [Debug API integration tests](#run-api-integration-tests)                               |
+| **Test - Functional UI** | `pnpm nx run @zitadel/functional-ui:test --browser electron` | Run functional UI tests | [Develop the Console and open the interactive Test Suite](#pass-console-quality-checks) |
+| **Test**                 | `pnpm nx run PROJECT:test`                                   | Run all tests           |                                                                                         |
+| **Lint**                 | `pnpm nx run PROJECT:lint`                                   | Check code style        |                                                                                         |
+| **Lint Fix**             | `pnpm nx run PROJECT:lint-fix`                               | Auto-fix style issues   |                                                                                         |
 
 Replace `PROJECT` with one of the following:
 
@@ -427,7 +427,7 @@ The Login application consists of multiple packages:
 
 The build process uses Nx and pnpm to orchestrate dependencies:
 
-#### Pass Quality Checks
+#### Pass Login Quality Checks
 
 Reproduce the pipeline quality checks for the code you changed.
 
@@ -510,7 +510,7 @@ To allow Console access via http://localhost:4200, you have to configure the Zit
 6. Add _http://<span because="breaks the link"></span>localhost:4200/signedout_ to the _Post Logout URIs_
 7. Select the _Save_ button
 
-#### Pass Quality Checks
+#### Pass Console Quality Checks
 
 Run the quality checks for the code you changed.
 
