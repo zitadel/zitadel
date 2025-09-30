@@ -12,9 +12,6 @@ on:
       NX_CLOUD_ACCESS_TOKEN_READONLY:
         required: true
 
-env:
-  nx_cache_path: .nx
-
 jobs:
   lint_build_test:
     name: Lint, Build and Test
