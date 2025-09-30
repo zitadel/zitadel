@@ -20,6 +20,7 @@ jobs:
     name: Lint, Build and Test
     runs-on:
       group: zitadel-public
+    environment: ${{ github.ref_protected == 'true' && 'Protected' || null }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -58,32 +59,37 @@ jobs:
         uses: nrwl/nx-set-shas@v4
       - name: Lint
         env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
         run: pnpm nx affected --nxBail --targets lint
       - name: Build
         env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
         run: pnpm nx affected --nxBail --targets build --exclude @zitadel/docs,@zitadel/benchmark
       - name: Test Unit
         env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
         run: pnpm nx affected --nxBail --targets test-unit
       - name: Test Integration Login
         env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
         run: pnpm nx affected --nxBail --targets test-integration --exclude='*,!@zitadel/login'
       - name: Test Integration API
         env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
         run: pnpm nx affected --nxBail --targets test-integration --exclude='*,!@zitadel/api'
       - name: Test Functional UI Firefox
         env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
         run: pnpm nx affected --nxBail --targets test --exclude='*,!@zitadel/functional-ui' --browser firefox
       - name: Test Functional UI Chrome
         env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
         run: pnpm nx affected --nxBail --targets test --exclude='*,!@zitadel/functional-ui' --browser chrome
+      - name: Suggest Pipeline Fix By Nx Cloud AI
+        if: always()
+        env:
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
+        run: pnpm nx fix-ci
       - name: Publish API Unit Test Coverage
         uses: codecov/codecov-action@v4.3.0
         with:
