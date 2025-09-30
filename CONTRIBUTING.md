@@ -103,7 +103,7 @@ Follow [@zitadel](https://twitter.com/zitadel) on twitter
 - [Contribute API code](#contribute-to-api)
 - [Contribute frontend code](#contribute-to-frontend)
 - If you found a mistake on our [Docs page](https://zitadel.com/docs) or something is missing please read [the Docs section](#contribute-to-docs)
-- [Translate]((#contribute-translations)) and improve texts
+- [Translate](#contribute-translations) and improve texts
 
 ## How to contribute
 
@@ -126,7 +126,7 @@ The code consists of the following parts:
 | Console            | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#contribute-to-frontend)     |
 | Login              | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./apps/login](./apps/login)                        | [Contribute to Frontend](#contribute-to-frontend)     |
 | Docs               | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](#contribute-to-frontend)     |
-| translations       | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations]((#contribute-translations)) |
+| translations       | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations](#contribute-translations) |
 
 Please follow the guides to validate and test the code before you contribute.
 
