@@ -3,7 +3,9 @@
 	"name": "Zitadel Devcontainer",
 	"dockerComposeFile": "docker-compose.yaml",
 	"service": "devcontainer",
-	"runServices": ["devcontainer"],
+	"runServices": [
+		"devcontainer"
+	],
 	"workspaceFolder": "/workspaces/zitadel",
 	"forwardPorts": [
 		3000,
@@ -42,11 +44,14 @@
 		"DEVCONTAINER_LOCAL_WORKSPACE_ROOT": "${localWorkspaceFolder}"
 	},
 	"customizations": {
-        "vscode": {
-            "extensions": [
-                "golang.Go",
+		"vscode": {
+			"extensions": [
+				"golang.Go",
+				"Angular.ng-template",
+				"dbaeumer.vscode-eslint",
+				"esbenp.prettier-vscode",
 				"nrwl.angular-console"
-            ]
-        }
-    }
+			]
+		}
+	}
 }
