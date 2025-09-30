@@ -69,9 +69,6 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
   let suffix = "";
   let idpId = "";
 
-  console.log("sessions:", sessions);
-  console.log("sessionCookies:", sessionCookies);
-
   if (authRequest?.scope) {
     const orgScope = authRequest.scope.find((s: string) => ORG_SCOPE_REGEX.test(s));
     const idpScope = authRequest.scope.find((s: string) => IDP_SCOPE_REGEX.test(s));

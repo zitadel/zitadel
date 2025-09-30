@@ -261,12 +261,6 @@ export async function getAllSessions<T>(cleanup: boolean = false): Promise<Sessi
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
-  console.log("getAllSessions: stringifiedCookie exists?", !!stringifiedCookie);
-  console.log("getAllSessions: stringifiedCookie value exists?", !!stringifiedCookie?.value);
-  if (stringifiedCookie?.value) {
-    console.log("getAllSessions: cookie value length:", stringifiedCookie.value.length);
-  }
-
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie?.value);
 
