@@ -6,10 +6,10 @@ Zitadel is an open-source identity and access management platform built with a m
 
 1. Clone the repository: `git clone https://github.com/zitadel/zitadel` or [open it in a local Dev Container](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/zitadel/zitadel) or [create a GitHub Codespace](https://codespaces.new/zitadel/zitadel)
 2. If you cloned the repository to your local machine, install the required development dependencies
-   - [Node.js v22.x](https://nodejs.org/en/download/)** - Required for UI development and to run development commands `pnpm nx ...`
-   - [Go 1.24.x](https://go.dev/doc/install)** - Required for API development
-   - [Docker](https://docs.docker.com/engine/install/)** - Required for supporting services like the development database and for tests.
-   - [Cypress runtime dependencies](https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies)** - Required for Browser UI tests
+   - [Node.js v22.x](https://nodejs.org/en/download/) - Required for UI development and to run development commands `pnpm nx ...`
+   - [Go 1.24.x](https://go.dev/doc/install) - Required for API development
+   - [Docker](https://docs.docker.com/engine/install/) - Required for supporting services like the development database and for tests.
+   - [Cypress runtime dependencies](https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies) - Required for Browser UI tests
    <details>
       <summary>WSL2 on Windows 10 users (click to expand)</summary>
       
@@ -22,7 +22,7 @@ Zitadel is an open-source identity and access management platform built with a m
    </details>
 3. Use [Corepack](https://pnpm.io/installation#using-corepack) to make sure you have [pnpm](https://pnpm.io/) installed in the correct version: `corepack enable`.
 4. Install node module dependencies: `pnpm install`
-5. Generate code `pnpm run-many --target generate`
+5. Generate code `pnpm nx run-many --target generate`
 6. Optionally, install the following VSCode plugins:
    - [Go](https://marketplace.visualstudio.com/items?itemName=golang.Go) - For API development. Use golangci-lint v2 as linter.
    - [Angular Language Service](https://marketplace.visualstudio.com/items?itemName=Angular.ng-template) - For Console development
@@ -67,6 +67,7 @@ Replace `PROJECT` with one of the following:
 
 Instead of the project names, you can also use their directory names for `PROJECT`, like `pnpm nx run login:dev`.
 Alternatively, you can use the infix-notation, like `pnpm nx dev @zitadel/login` or `pnpm nx dev login`.
+To stream all logs instead of opening the interactive terminal, disable the TUI with `pnpm nx --tui false ...`.
 
 
 ## Introduction
@@ -369,10 +370,16 @@ To start developing, make sure you followed the [quick start](#quick-start) step
 
 #### Develop the Login against a local API
 
-Develop the Login and connect a local API with a local DB
+Run the local development database.
 
 ```bash
-pnpm nx run-many --projects . @zitadel/api --targets db prod
+pnpm nx db
+```
+
+In another terminal, start the API
+
+```bash
+pnpm nx run @zitadel/api:prod
 ```
 
 In another terminal, start the Login development server
@@ -384,8 +391,6 @@ pnpm nx run @zitadel/login:dev
 Visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
 
 Make some changes to the source code and see how the browser is automatically updated.
-
-For more options, go to the [Login section](#contribute-to-login)
 
 #### Develop against a Cloud instance
 
@@ -444,19 +449,25 @@ To start developing, make sure you followed the [quick start](#quick-start) step
 
 #### Develop the Console against a local API
 
-Develop the Console and connect a local API with a local Login and DB:
+Run the local development database.
 
 ```bash
-pnpm nx run-many --projects . @zitadel/api @zitadel/login --targets db prod
+pnpm nx db
 ```
 
-In another terminal, start the console development server
+In another terminal, start the API
+
+```bash
+pnpm nx run @zitadel/api:prod
+```
+
+Allow the API [to redirect to your dev server](#configure-console-dev-server-redirects).
+
+In another terminal, start the Console development server
 
 ```bash
 pnpm nx run @zitadel/console:dev
 ```
-
-Allow the API [to redirect to your dev server](#configure-console-dev-server-redirects).
 
 Visit http://localhost:4200/?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
 
@@ -504,8 +515,8 @@ pnpm nx run-many --projects @zitadel/console @zitadel/client @zitadel/proto --ta
 ```
 
 Run functional UI tests against a locally built API and a dev server Console.
-The API needs to be allowed [to redirect to http://localhost:4200](console-quick-start).
 
+Allow the API [to redirect to your dev server](#configure-console-dev-server-redirects).
 Alternatively, create the file `tests/functional-ui/.env.open.local` with the following content:
 
 ```conf
