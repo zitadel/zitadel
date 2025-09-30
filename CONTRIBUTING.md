@@ -43,17 +43,19 @@ Jump to the dedicated sections for developing a specific project:
 This repository contains multiple interconnected projects.
 You can build and start any project with Nx commands.
 
-| Task                     | Command                                                      | Notes                   | Details                                                                                 |
-| ------------------------ | ------------------------------------------------------------ | ----------------------- | --------------------------------------------------------------------------------------- |
-| **Production**           | `pnpm nx run PROJECT:prod`                                   | Production server       |                                                                                         |
-| **Develop**              | `pnpm nx run PROJECT:dev`                                    | Development server      |                                                                                         |
-| **Generate**             | `pnpm nx run PROJECT:generate`                               | Generate files          |                                                                                         |
-| **Test - Unit**          | `pnpm nx run PROJECT:test-unit`                              | Run unit tests          |                                                                                         |
-| **Test - Integration**   | `pnpm nx run PROJECT:test-integration`                       | Run integration tests   | [Debug API integration tests](#run-api-integration-tests)                               |
-| **Test - Functional UI** | `pnpm nx run @zitadel/functional-ui:test --browser electron` | Run functional UI tests | [Develop the Console and open the interactive Test Suite](#pass-console-quality-checks) |
-| **Test**                 | `pnpm nx run PROJECT:test`                                   | Run all tests           |                                                                                         |
-| **Lint**                 | `pnpm nx run PROJECT:lint`                                   | Check code style        |                                                                                         |
-| **Lint Fix**             | `pnpm nx run PROJECT:lint-fix`                               | Auto-fix style issues   |                                                                                         |
+| Task                          | Command                                                      | Notes                        | Details                                                                                 |
+| ----------------------------- | ------------------------------------------------------------ | ---------------------------- | --------------------------------------------------------------------------------------- |
+| **Production**                | `pnpm nx run PROJECT:prod`                                   | Production server            |                                                                                         |
+| **Develop**                   | `pnpm nx run PROJECT:dev`                                    | Development server           |                                                                                         |
+| **Generate**                  | `pnpm nx run PROJECT:generate`                               | Generate files               |                                                                                         |
+| **Test - Unit**               | `pnpm nx run PROJECT:test-unit`                              | Run unit tests               |                                                                                         |
+| **Test - Integration**        | `pnpm nx run PROJECT:test-integration`                       | Run integration tests        | [Debug API integration tests](#run-api-integration-tests)                               |
+| **Test - Integration Stop**   | `pnpm nx run PROJECT:test-integration-stop`                  | Stop integration containers  |                                                                                         |
+| **Test - Functional UI**      | `pnpm nx run @zitadel/functional-ui:test --browser electron` | Run functional UI tests      | [Develop the Console and open the interactive Test Suite](#pass-console-quality-checks) |
+| **Test - Functional UI Stop** | `pnpm nx run @zitadel/functional-ui:stop`                    | Run functional UI containers |                                                                                         |
+| **Test**                      | `pnpm nx run PROJECT:test`                                   | Run all tests                |                                                                                         |
+| **Lint**                      | `pnpm nx run PROJECT:lint`                                   | Check code style             |                                                                                         |
+| **Lint Fix**                  | `pnpm nx run PROJECT:lint-fix`                               | Auto-fix style issues        |                                                                                         |
 
 Replace `PROJECT` with one of the following:
 
