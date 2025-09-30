@@ -20,9 +20,10 @@ type Props = {
   requestId?: string;
   organization?: string;
   code?: string;
+  codeId?: string;
 };
 
-export function RegisterPasskey({ sessionId, userId, isPrompt, organization, requestId, code }: Props) {
+export function RegisterPasskey({ sessionId, userId, isPrompt, organization, requestId, code, codeId }: Props) {
   const { handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
   });
@@ -67,11 +68,20 @@ export function RegisterPasskey({ sessionId, userId, isPrompt, organization, req
     }
 
     setLoading(true);
-    const resp = await registerPasskeyLink({
-      sessionId,
-      userId,
-      code,
-    })
+
+    let regReq;
+
+    if (sessionId) {
+      regReq = { sessionId };
+    } else if (userId && code && codeId) {
+      regReq = { userId, code, codeId };
+    } else {
+      setError("Missing code for user-based registration");
+      setLoading(false);
+      return;
+    }
+
+    const resp = await registerPasskeyLink(regReq)
       .catch(() => {
         setError("Could not register passkey");
         return;

@@ -37,6 +37,7 @@ type RegisterPasskeyCommand = {
   sessionId?: string;
   userId?: string;
   code?: string;
+  codeId?: string;
 };
 
 function isSessionValid(session: Partial<Session>): {
@@ -56,9 +57,7 @@ function isSessionValid(session: Partial<Session>): {
 export async function registerPasskeyLink(
   command: RegisterPasskeyCommand,
 ): Promise<RegisterPasskeyResponse | { error: string }> {
-  const { sessionId, userId } = command;
-
-  if (!sessionId && !userId) {
+  if (!command.sessionId && !command.userId) {
     return { error: "Either sessionId or userId must be provided" };
   }
 
@@ -69,10 +68,11 @@ export async function registerPasskeyLink(
   let session: GetSessionResponse | undefined;
   let createdSession: Session | undefined;
   let currentUserId: string | undefined = undefined;
+  let registerCode: { id: string; code: string } | undefined = undefined;
 
-  if (sessionId) {
+  if (command.sessionId) {
     // Session-based flow (existing logic)
-    const sessionCookie = await getSessionCookieById({ sessionId });
+    const sessionCookie = await getSessionCookieById({ sessionId: command.sessionId });
     session = await getSession({
       serviceUrl,
       sessionId: sessionCookie.id,
@@ -103,12 +103,31 @@ export async function registerPasskeyLink(
       // check if a verification was done earlier
       const hasValidUserVerificationCheck = await checkUserVerification(currentUserId);
 
+      console.log("hasValidUserVerificationCheck", hasValidUserVerificationCheck);
       if (!hasValidUserVerificationCheck) {
         return { error: "User Verification Check has to be done" };
       }
+
+      if (!command.code) {
+        // request a new code if no code is provided
+        const codeResponse = await createPasskeyRegistrationLink({
+          serviceUrl,
+          userId: currentUserId,
+        });
+
+        if (!codeResponse?.code?.code) {
+          return { error: "Could not create registration link" };
+        }
+
+        registerCode = codeResponse.code;
+      }
     }
-  } else if (userId) {
-    currentUserId = userId;
+  } else if (command.userId && command.code && command.codeId) {
+    currentUserId = command.userId;
+    registerCode = {
+      id: command.codeId,
+      code: command.code,
+    };
 
     // Check if user exists
     const userResponse = await getUserByID({
@@ -118,13 +137,6 @@ export async function registerPasskeyLink(
 
     if (!userResponse || !userResponse.user) {
       return { error: "User not found" };
-    }
-
-    // For userId-based flow, we assume verification was done via email/invite code
-    const hasValidUserVerificationCheck = await checkUserVerification(currentUserId);
-
-    if (!hasValidUserVerificationCheck) {
-      return { error: "User Verification Check has to be done" };
     }
 
     // Create a session for the user to continue the flow after passkey registration
@@ -147,6 +159,10 @@ export async function registerPasskeyLink(
     }
   }
 
+  if (!registerCode) {
+    throw new Error("Missing code in response");
+  }
+
   const [hostname] = host.split(":");
 
   if (!hostname) {
@@ -155,21 +171,6 @@ export async function registerPasskeyLink(
 
   if (!currentUserId) {
     throw new Error("Could not determine user");
-  }
-
-  let registerCode;
-
-  if (!command.code) {
-    // request a new code if no code is provided
-    const { code } = await createPasskeyRegistrationLink({
-      serviceUrl,
-      userId: currentUserId,
-    });
-    registerCode = code;
-  }
-
-  if (!registerCode) {
-    throw new Error("Missing code in response");
   }
 
   return registerPasskey({
