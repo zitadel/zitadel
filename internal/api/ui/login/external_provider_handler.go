@@ -359,7 +359,13 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = oauth.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
+		// DingTalk uses a custom OAuth flow, so we need a custom session
+		secret, err := crypto.DecryptString(identityProvider.DingTalkIDPTemplate.ClientSecret, l.idpConfigAlg)
+		if err != nil {
+			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
+			return
+		}
+		session = dingtalk.NewSession(provider, data.Code, identityProvider.DingTalkIDPTemplate.ClientID, secret)
 	case domain.IDPTypeApple:
 		provider, err := l.appleProvider(r.Context(), identityProvider)
 		if err != nil {
