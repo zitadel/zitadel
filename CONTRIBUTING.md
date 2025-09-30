@@ -68,7 +68,7 @@ Replace `PROJECT` with one of the following:
 Instead of the project names, you can also use their directory names for `PROJECT`, like `pnpm nx run login:dev`.
 Alternatively, you can use the infix-notation, like `pnpm nx dev @zitadel/login` or `pnpm nx dev login`.
 To stream all logs instead of opening the interactive terminal, disable the TUI with `pnpm nx --tui false ...`.
-
+If a command is stuck because a process is already running, reset the Nx daemon and try again: `pnpm nx reset --onlyDaemon`.
 
 ## Introduction
 

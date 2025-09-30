@@ -54,13 +54,17 @@
         "commands": [
           "pnpm cypress install",
           "DISPLAY='' pnpm cypress run --browser {args.browser} --reporter-options reportDir=cypress/results/{args.browser} --config videosFolder=cypress/videos/{args.browser},screenshotsFolder=cypress/screenshots/{args.browser}",
-          "nx run @zitadel/devcontainer:compose down db-functional-ui"
+          "nx run @zitadel/functional-ui:stop"
         ]
       },
       "cache": true,
       "inputs": [
         "default"
       ]
+    },
+    "stop": {
+      "description": "Stops the local Postgres database used for functional UI (Console) tests.",
+      "command": "nx run @zitadel/devcontainer:compose down db-functional-ui"
     }
   }
 }

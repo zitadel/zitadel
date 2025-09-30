@@ -111,7 +111,7 @@
           "pnpm cypress install",
           "pnpm wait-on --verbose --interval 2000 --simultaneous 1 \"tcp:${API_MOCK_STUBS_HOST}:22220\" \"http-get://localhost:3000/ui/v2/login/verify?userId=221394658884845598&code=abc\"",
           "DISPLAY='' pnpm cypress run --headless",
-          "nx run @zitadel/login-api-mock:down"
+          "nx run @zitadel/login:test-integration-stop"
         ]
       },
       "cache": true,
@@ -121,6 +121,10 @@
         "!{projectRoot}/acceptance/**/*",
         { "env": "LOGIN_BASE_URL" }
       ]
+    },
+    "test-integration-stop": {
+        "description": "Stops the gRPC mock container used for integration tests.",
+        "command": "nx run @zitadel/login-api-mock:down"
     },
     "pack": {
       "description": "Packages the standalone Login application build into an archive",
