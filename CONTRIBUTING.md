@@ -226,11 +226,22 @@ To start developing, make sure you followed the [quick start](#quick-start) step
 
 ### Develop the API
 
-Prepare the API development with a Console and run a local Login production build.
+Optionally build the Console
 
 ```bash
-pnpm nx run-many --projects @zitadel/api --targets generate build-console
-pnpm nx run-many --projects . @zitadel/login --targets db prod
+pnpm nx run @zitadel/api:build-console
+```
+
+Optionally start the Login in another terminal
+
+```bash
+pnpm nx run @zitadel/login:prod
+```
+
+Run the local development database.
+
+```bash
+pnpm nx db
 ```
 
 Start a debug session in your IDE.
@@ -252,15 +263,9 @@ For example, in VSCode, you can use a `launch.json` configuration like this.
    }
 ```
 
-Visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
+If you have built the Console and started the Login, visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
 
-If you don't need a Login or a Console, you can omit them and use the generated ./admin.pat to call the API.
-
-```bash
-pnpm nx run-many --projects . @zitadel/api --targets db generate
-```
-
-Call the API using [grpcurl](https://github.com/fullstorydev/grpcurl) or [grpcui](https://github.com/fullstorydev/grpcui), for example:
+Call the API using the generated [](./admin.pat) with [grpcurl](https://github.com/fullstorydev/grpcurl) or [grpcui](https://github.com/fullstorydev/grpcui), for example:
 
 ```bash
 grpcurl -plaintext -H "Authorization: Bearer $(cat admin.pat)" localhost:8080 zitadel.user.v2.UserService.ListUsers
