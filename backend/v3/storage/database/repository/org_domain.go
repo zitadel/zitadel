@@ -159,6 +159,9 @@ func (o orgDomain) SetUpdatedAt(updatedAt time.Time) database.Change {
 
 // DomainCondition implements [domain.OrganizationDomainRepository].
 func (o orgDomain) DomainCondition(op database.TextOperation, domain string) database.Condition {
+	if op.IsIgnoreCaseOperation() {
+		return database.NewTextIgnoreCaseCondition(o.DomainColumn(), op.Value(), domain)
+	}
 	return database.NewTextCondition(o.DomainColumn(), op, domain)
 }
 

@@ -230,11 +230,15 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 						dbmock.QueryOptions(
 							database.WithCondition(
 								database.And(
+									database.And(
+										orgRepo.InstanceIDCondition("instance-1"),
+										orgRepo.ExistsDomain(domainRepo.DomainCondition(database.TextOperationEqual, "some domain")),
+									),
 									orgRepo.InstanceIDCondition("instance-1"),
-									orgRepo.ExistsDomain(domainRepo.DomainCondition(database.TextOperationEqual, "some domain")),
 								),
 							),
 						),
+
 						dbmock.QueryOptions(database.WithOrderBy(database.OrderDirectionAsc, orgRepo.NameColumn())),
 						dbmock.QueryOptions(database.WithLimit(2)),
 						dbmock.QueryOptions(database.WithOffset(1)),
@@ -280,10 +284,13 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 					List(
 						gomock.Any(),
 						gomock.Any(),
-						dbmock.QueryOptions(database.WithCondition(orgRepo.IDCondition("org-1"))),
-						dbmock.QueryOptions(database.WithCondition(orgRepo.IDCondition("org-2"))),
-						dbmock.QueryOptions(database.WithCondition(orgRepo.NameCondition(database.TextOperationEqual, "Named Org"))),
-						dbmock.QueryOptions(database.WithCondition(orgRepo.StateCondition(domain.OrgStateActive))),
+						dbmock.QueryOptions(database.WithCondition(database.And(
+							orgRepo.IDCondition("org-1"),
+							orgRepo.IDCondition("org-2"),
+							orgRepo.NameCondition(database.TextOperationEqual, "Named Org"),
+							orgRepo.StateCondition(domain.OrgStateActive),
+							orgRepo.InstanceIDCondition("instance-1"),
+						))),
 
 						dbmock.QueryOptions(database.WithOrderBy(database.OrderDirectionDesc, orgRepo.NameColumn())),
 						dbmock.QueryOptions(database.WithLimit(2)),

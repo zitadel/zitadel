@@ -285,3 +285,137 @@ func Test_writeOperation(t *testing.T) {
 		})
 	}
 }
+
+func TestTextOperation_Value(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name string
+		op   TextOperation
+		want TextOperation
+	}{
+		{
+			name: "TextOperationStartsWith returns self",
+			op:   TextOperationStartsWith,
+			want: TextOperationStartsWith,
+		},
+		{
+			name: "TextOperationContains returns self",
+			op:   TextOperationContains,
+			want: TextOperationContains,
+		},
+		{
+			name: "TextOperationEndsWith returns self",
+			op:   TextOperationEndsWith,
+			want: TextOperationEndsWith,
+		},
+		{
+			name: "TextOperationEqual returns self",
+			op:   TextOperationEqual,
+			want: TextOperationEqual,
+		},
+		{
+			name: "TextOperationNotEqual returns self",
+			op:   TextOperationNotEqual,
+			want: TextOperationNotEqual,
+		},
+		{
+			name: "TextOperationContainsIgnoreCase returns Contains",
+			op:   TextOperationContainsIgnoreCase,
+			want: TextOperationContains,
+		},
+		{
+			name: "TextOperationEndsWithIgnoreCase returns EndsWith",
+			op:   TextOperationEndsWithIgnoreCase,
+			want: TextOperationEndsWith,
+		},
+		{
+			name: "TextOperationStartsWithIgnoreCase returns StartsWith",
+			op:   TextOperationStartsWithIgnoreCase,
+			want: TextOperationStartsWith,
+		},
+		{
+			name: "TextOperationEqualIgnoreCase returns Equal",
+			op:   TextOperationEqualIgnoreCase,
+			want: TextOperationEqual,
+		},
+		{
+			name: "TextOperationNotEqualIgnoreCase returns NotEqual",
+			op:   TextOperationNotEqualIgnoreCase,
+			want: TextOperationNotEqual,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			got := tt.op.Value()
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestTextOperation_IsIgnoreCaseOperation(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name string
+		op   TextOperation
+		want bool
+	}{
+		{
+			name: "TextOperationContainsIgnoreCase returns true",
+			op:   TextOperationContainsIgnoreCase,
+			want: true,
+		},
+		{
+			name: "TextOperationEndsWithIgnoreCase returns true",
+			op:   TextOperationEndsWithIgnoreCase,
+			want: true,
+		},
+		{
+			name: "TextOperationStartsWithIgnoreCase returns true",
+			op:   TextOperationStartsWithIgnoreCase,
+			want: true,
+		},
+		{
+			name: "TextOperationEqualIgnoreCase returns true",
+			op:   TextOperationEqualIgnoreCase,
+			want: true,
+		},
+		{
+			name: "TextOperationNotEqualIgnoreCase returns true",
+			op:   TextOperationNotEqualIgnoreCase,
+			want: true,
+		},
+		{
+			name: "TextOperationContains returns false",
+			op:   TextOperationContains,
+			want: false,
+		},
+		{
+			name: "TextOperationEndsWith returns false",
+			op:   TextOperationEndsWith,
+			want: false,
+		},
+		{
+			name: "TextOperationStartsWith returns false",
+			op:   TextOperationStartsWith,
+			want: false,
+		},
+		{
+			name: "TextOperationEqual returns false",
+			op:   TextOperationEqual,
+			want: false,
+		},
+		{
+			name: "TextOperationNotEqual returns false",
+			op:   TextOperationNotEqual,
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			got := tt.op.IsIgnoreCaseOperation()
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}

@@ -375,9 +375,9 @@ func TestServer_ListOrganizations(t *testing.T) {
 	})
 
 	testStartTimestamp := time.Now()
-	ListOrgIinstance := integration.NewInstance(CTX)
-	listOrgIAmOwnerCtx := ListOrgIinstance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	listOrgClient := ListOrgIinstance.Client.OrgV2beta
+	listOrgInstance := integration.NewInstance(CTX)
+	listOrgIAmOwnerCtx := listOrgInstance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	listOrgClient := listOrgInstance.Client.OrgV2beta
 
 	noOfOrgs := 3
 	orgs, orgsName, orgsDomain := createOrgs(listOrgIAmOwnerCtx, t, listOrgClient, noOfOrgs)
@@ -399,7 +399,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 	}{
 		{
 			name: "list organizations, without required permissions",
-			ctx:  ListOrgIinstance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
+			ctx:  listOrgInstance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 			err:  errors.New("membership not found"),
 		},
 		{
@@ -629,13 +629,13 @@ func TestServer_ListOrganizations(t *testing.T) {
 	}
 
 	for _, stateCase := range relTableState {
-		integration.EnsureInstanceFeature(t, CTX, Instance, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+		integration.EnsureInstanceFeature(t, listOrgIAmOwnerCtx, listOrgInstance, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
 			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
 		})
 
 		for _, tt := range tests {
 			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tt.name), func(t *testing.T) {
-				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 20*time.Second)
 				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 					got, err := listOrgClient.ListOrganizations(tt.ctx, &v2beta_org.ListOrganizationsRequest{
 						Filter: tt.query,
@@ -685,63 +685,62 @@ func TestServer_DeleteOrganization(t *testing.T) {
 	})
 
 	relTableState := integration.RelationalTablesEnableMatrix()
-
 	var orgs []*v2beta_org.CreateOrganizationResponse
-	orgs, _, _ = createOrgs(CTX, t, Client, 3)
+	orgsNumPerCase := 3
+	orgs, _, _ = createOrgs(CTX, t, Client, orgsNumPerCase*len(relTableState))
 	require.NotNil(t, orgs)
 	require.NotEmpty(t, orgs)
 
-	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-		deleteRes, err := Client.DeleteOrganization(CTX, &v2beta_org.DeleteOrganizationRequest{Id: orgs[2].GetId()})
-		assert.Nil(ttt, err)
-		assert.NotNil(ttt, deleteRes)
-		assert.NotZero(ttt, deleteRes.GetDeletionDate())
-	}, retryDuration, tick)
+	for i, stateCase := range relTableState {
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+			deleteRes, err := Client.DeleteOrganization(CTX, &v2beta_org.DeleteOrganizationRequest{Id: orgs[2+(orgsNumPerCase*i)].GetId()})
+			assert.Nil(ttt, err)
+			assert.NotNil(ttt, deleteRes)
+			assert.NotZero(ttt, deleteRes.GetDeletionDate())
+		}, retryDuration, tick)
 
-	tests := []struct {
-		name          string
-		ctx           context.Context
-		req           *v2beta_org.DeleteOrganizationRequest
-		want          *v2beta_org.DeleteOrganizationResponse
-		dontCheckTime bool
-		err           error
-	}{
-		{
-			name: "delete org no permission",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
-			req: &v2beta_org.DeleteOrganizationRequest{
-				Id: orgs[0].GetId(),
+		tests := []struct {
+			name          string
+			ctx           context.Context
+			req           *v2beta_org.DeleteOrganizationRequest
+			want          *v2beta_org.DeleteOrganizationResponse
+			dontCheckTime bool
+			err           error
+		}{
+			{
+				name: "delete org no permission",
+				ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
+				req: &v2beta_org.DeleteOrganizationRequest{
+					Id: orgs[0+(orgsNumPerCase*i)].GetId(),
+				},
+				err: errors.New("membership not found"),
 			},
-			err: errors.New("membership not found"),
-		},
-		{
-			name: "delete org happy path",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
-			req: &v2beta_org.DeleteOrganizationRequest{
-				Id: orgs[1].GetId(),
+			{
+				name: "delete org happy path",
+				ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
+				req: &v2beta_org.DeleteOrganizationRequest{
+					Id: orgs[1+(orgsNumPerCase*i)].GetId(),
+				},
 			},
-		},
-		{
-			name:          "delete already deleted org",
-			ctx:           Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
-			req:           &v2beta_org.DeleteOrganizationRequest{Id: orgs[2].GetId()},
-			dontCheckTime: true,
-		},
-		{
-			name: "delete non existent org",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
-			req: &v2beta_org.DeleteOrganizationRequest{
-				Id: "non existent org id",
+			{
+				name:          "delete already deleted org",
+				ctx:           Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
+				req:           &v2beta_org.DeleteOrganizationRequest{Id: orgs[2+(orgsNumPerCase*i)].GetId()},
+				dontCheckTime: true,
 			},
-			dontCheckTime: true,
-		},
-	}
-	for _, stateCase := range relTableState {
+			{
+				name: "delete non existent org",
+				ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
+				req: &v2beta_org.DeleteOrganizationRequest{
+					Id: "non existent org id",
+				},
+				dontCheckTime: true,
+			},
+		}
 		integration.EnsureInstanceFeature(t, CTX, Instance, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
 			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
 		})
-
 		for _, tt := range tests {
 			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tt.name), func(t *testing.T) {
 				got, err := Client.DeleteOrganization(tt.ctx, tt.req)

@@ -77,7 +77,10 @@ func UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org
 func ListOrganizations(ctx context.Context, request *connect.Request[v2_org.ListOrganizationsRequest]) (*connect.Response[v2_org.ListOrganizationsResponse], error) {
 	orgListCmd := domain.NewListOrgsCommand(request.Msg)
 
-	err := domain.Invoke(ctx, orgListCmd)
+	err := domain.Invoke(ctx, orgListCmd,
+		domain.WithOrganizationRepo(repository.OrganizationRepository),
+		domain.WithOrganizationDomainRepo(repository.OrganizationDomainRepository),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +102,10 @@ func ListOrganizations(ctx context.Context, request *connect.Request[v2_org.List
 func ListOrganizationsBeta(ctx context.Context, request *connect.Request[v2beta_org.ListOrganizationsRequest]) (*connect.Response[v2beta_org.ListOrganizationsResponse], error) {
 	orgListCmd := domain.NewListOrgsCommand(convert.OrganizationBetaRequestToV2Request(request.Msg))
 
-	err := domain.Invoke(ctx, orgListCmd)
+	err := domain.Invoke(ctx, orgListCmd,
+		domain.WithOrganizationRepo(repository.OrganizationRepository),
+		domain.WithOrganizationDomainRepo(repository.OrganizationDomainRepository),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +125,9 @@ func ListOrganizationsBeta(ctx context.Context, request *connect.Request[v2beta_
 func DeleteOrganization(ctx context.Context, request *connect.Request[v2beta_org.DeleteOrganizationRequest]) (*connect.Response[v2beta_org.DeleteOrganizationResponse], error) {
 	orgDeleteCmd := domain.NewDeleteOrgCommand(request.Msg.GetId())
 
-	err := domain.Invoke(ctx, orgDeleteCmd)
+	err := domain.Invoke(ctx, orgDeleteCmd,
+		domain.WithOrganizationRepo(repository.OrganizationRepository),
+	)
 	if err != nil {
 		return nil, err
 	}

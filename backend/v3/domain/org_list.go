@@ -51,7 +51,7 @@ func (l *ListOrgsCommand) Execute(ctx context.Context, opts *CommandOpts) (err e
 		return err
 	}
 
-	l.Result, err = organizationRepo.List(ctx, pool, append(conditions, sorting, limit, pagination)...)
+	l.Result, err = organizationRepo.List(ctx, pool, conditions, sorting, limit, pagination)
 	return err
 }
 
@@ -79,40 +79,43 @@ func (l *ListOrgsCommand) Pagination() (database.QueryOption, database.QueryOpti
 		database.WithOffset(uint32(l.Request.GetQuery().GetOffset()))
 }
 
-func (l *ListOrgsCommand) conditions(ctx context.Context, orgRepo OrganizationRepository, domainRepo OrganizationDomainRepository) ([]database.QueryOption, error) {
-	conditions := make([]database.QueryOption, len(l.Request.GetQueries()))
+func (l *ListOrgsCommand) conditions(ctx context.Context, orgRepo OrganizationRepository, domainRepo OrganizationDomainRepository) (database.QueryOption, error) {
+	conditions := make([]database.Condition, len(l.Request.GetQueries()))
+	instance := authz.GetInstance(ctx)
+
 	for i, query := range l.Request.GetQueries() {
 		switch assertedType := query.GetQuery().(type) {
 
 		case *v2_org.SearchQuery_DefaultQuery:
-			conditions[i] = database.WithCondition(orgRepo.IDCondition(authz.GetInstance(ctx).DefaultOrganisationID()))
+			conditions[i] = orgRepo.IDCondition(instance.DefaultOrganisationID())
 		case *v2_org.SearchQuery_DomainQuery:
 			method, err := l.TextOperationMapper(assertedType.DomainQuery.GetMethod())
 			if err != nil {
 				return nil, err
 			}
 
-			conditions[i] = database.WithCondition(
-				database.And(
-					orgRepo.InstanceIDCondition(authz.GetInstance(ctx).InstanceID()),
-					orgRepo.ExistsDomain(domainRepo.DomainCondition(method, assertedType.DomainQuery.GetDomain())),
-				),
+			conditions[i] = database.And(
+				orgRepo.InstanceIDCondition(instance.InstanceID()),
+				orgRepo.ExistsDomain(domainRepo.DomainCondition(method, assertedType.DomainQuery.GetDomain())),
 			)
 		case *v2_org.SearchQuery_IdQuery:
-			conditions[i] = database.WithCondition(orgRepo.IDCondition(assertedType.IdQuery.GetId()))
+			conditions[i] = orgRepo.IDCondition(assertedType.IdQuery.GetId())
 		case *v2_org.SearchQuery_NameQuery:
 			method, err := l.TextOperationMapper(assertedType.NameQuery.GetMethod())
 			if err != nil {
 				return nil, err
 			}
-			conditions[i] = database.WithCondition(orgRepo.NameCondition(method, assertedType.NameQuery.GetName()))
+			conditions[i] = orgRepo.NameCondition(method, assertedType.NameQuery.GetName())
 		case *v2_org.SearchQuery_StateQuery:
-			conditions[i] = database.WithCondition(orgRepo.StateCondition(OrgState(assertedType.StateQuery.GetState())))
+			conditions[i] = orgRepo.StateCondition(OrgState(assertedType.StateQuery.GetState()))
 		default:
 			return nil, NewUnexpectedQueryTypeError("DOM-TCEzcr", assertedType)
 		}
 	}
-	return conditions, nil
+
+	return database.WithCondition(database.And(
+		append(conditions, orgRepo.InstanceIDCondition(instance.InstanceID()))...,
+	)), nil
 }
 
 // String implements Commander.
@@ -122,10 +125,6 @@ func (l *ListOrgsCommand) String() string {
 
 // Validate implements Commander.
 func (l *ListOrgsCommand) Validate(_ context.Context, _ *CommandOpts) (err error) {
-	if len(l.Request.GetQueries()) == 0 {
-		return NewNoQueryCriteriaError("DOM-75lU26")
-	}
-
 	return nil
 }
 

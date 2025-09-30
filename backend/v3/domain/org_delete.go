@@ -104,14 +104,19 @@ func (d *DeleteOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err 
 	}
 
 	defer func() { err = closeFunc(ctx, err) }()
+	instance := authz.GetInstance(ctx)
 
 	orgRepo := opts.organizationRepo()
 
-	orgToDelete, err := orgRepo.Get(ctx, pool, database.WithCondition(orgRepo.IDCondition(d.ID)))
+	orgToDelete, err := orgRepo.Get(ctx, pool, database.WithCondition(database.And(
+		orgRepo.IDCondition(d.ID),
+		orgRepo.InstanceIDCondition(instance.InstanceID()),
+	)))
 	if err != nil {
 		return err
 	}
 	d.OrganizationName = orgToDelete.Name
+	d.Domains = orgToDelete.Domains
 
 	deletedRows, err := orgRepo.Delete(ctx, pool,
 		database.And(
@@ -168,7 +173,11 @@ func (d *DeleteOrgCommand) Validate(ctx context.Context, opts *CommandOpts) (err
 	// }
 
 	orgRepo := opts.organizationRepo()
-	org, err := orgRepo.Get(ctx, pool, database.WithCondition(orgRepo.IDCondition(d.ID)))
+	org, err := orgRepo.Get(ctx, pool,
+		database.WithCondition(database.And(
+			orgRepo.IDCondition(d.ID),
+			orgRepo.InstanceIDCondition(instance.InstanceID()),
+		)))
 	if err != nil {
 		return err
 	}

@@ -11,14 +11,24 @@ type BaseCommand struct{}
 // TextOperationMapper maps gRPC TextQueryMethod to database.TextOperation
 func (b *BaseCommand) TextOperationMapper(queryOperation object.TextQueryMethod) (database.TextOperation, error) {
 	switch queryOperation {
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS, object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE:
+
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS:
 		return database.TextOperationContains, nil
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH, object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE:
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE:
+		return database.TextOperationContainsIgnoreCase, nil
+
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH:
 		return database.TextOperationEndsWith, nil
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE:
+		return database.TextOperationEndsWithIgnoreCase, nil
+
 	case object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS, object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE:
 		return database.TextOperationEqual, nil
-	case object.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH, object.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE:
+
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH:
 		return database.TextOperationStartsWith, nil
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE:
+		return database.TextOperationStartsWithIgnoreCase, nil
 	default:
 		return 0, NewUnexpectedTextQueryOperationError("DOM-iBRBVe", queryOperation)
 	}

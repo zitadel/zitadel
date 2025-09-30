@@ -8,7 +8,7 @@ type Condition interface {
 	gomock.Matcher
 	Write(builder *StatementBuilder)
 	// IsRestrictingColumn is used to check if the condition filters for a specific column.
-	// It acts as a save guard database operations that should be specific on the given column.
+	// It acts as a safeguard database operations that should be specific on the given column.
 	IsRestrictingColumn(col Column) bool
 }
 

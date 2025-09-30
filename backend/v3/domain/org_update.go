@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -48,7 +49,12 @@ func (u *UpdateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err 
 
 	organizationRepo := opts.organizationRepo().LoadDomains()
 
-	org, err := organizationRepo.Get(ctx, pool, database.WithCondition(organizationRepo.IDCondition(u.ID)))
+	org, err := organizationRepo.Get(ctx, pool, database.WithCondition(
+		database.And(
+			organizationRepo.IDCondition(u.ID),
+			organizationRepo.InstanceIDCondition(authz.GetInstance(ctx).InstanceID()),
+		),
+	))
 	if err != nil {
 		return err
 	}

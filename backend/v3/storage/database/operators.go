@@ -57,7 +57,45 @@ const (
 	TextOperationContains // LIKE
 	// TextOperationEndsWith checks if the first string ends with the second.
 	TextOperationEndsWith // LIKE
+
+	// TextOperationContainsIgnoreCase checks if the first string contains the second ignoring case
+	TextOperationContainsIgnoreCase // LIKE
+	// TextOperationEndsWith checks if the first string ends with the second ignoring case
+	TextOperationEndsWithIgnoreCase // LIKE
+	// TextOperationStartsWith checks if the first string starts with the second ignoring case
+	TextOperationStartsWithIgnoreCase // LIKE
+	// TextOperationEqualIgnoreCase compares two strings for equality ignoring case
+	TextOperationEqualIgnoreCase // =
+	// TextOperationNotEqualIgnoreCase compares two strings for inequality ignoring case
+	TextOperationNotEqualIgnoreCase // <>
 )
+
+func (op TextOperation) IsIgnoreCaseOperation() bool {
+	return op == TextOperationContainsIgnoreCase ||
+		op == TextOperationEndsWithIgnoreCase ||
+		op == TextOperationStartsWithIgnoreCase ||
+		op == TextOperationEqualIgnoreCase ||
+		op == TextOperationNotEqualIgnoreCase
+}
+
+func (op TextOperation) Value() TextOperation {
+	switch op {
+	case TextOperationStartsWith, TextOperationContains, TextOperationEndsWith, TextOperationEqual, TextOperationNotEqual:
+		return op
+	case TextOperationContainsIgnoreCase:
+		return TextOperationContains
+	case TextOperationEndsWithIgnoreCase:
+		return TextOperationEndsWith
+	case TextOperationStartsWithIgnoreCase:
+		return TextOperationStartsWith
+	case TextOperationEqualIgnoreCase:
+		return TextOperationEqual
+	case TextOperationNotEqualIgnoreCase:
+		return TextOperationNotEqual
+	default:
+		panic(fmt.Sprintf("unexpected database.TextOperation: %#v", op))
+	}
+}
 
 func writeTextOperation[T Text](builder *StatementBuilder, col Column, op TextOperation, value any) {
 	switch op {

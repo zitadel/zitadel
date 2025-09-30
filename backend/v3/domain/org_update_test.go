@@ -60,7 +60,13 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 					Times(1).
 					Return(repo)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(
+						database.WithCondition(
+							database.And(
+								repo.IDCondition("org-1"),
+								repo.InstanceIDCondition("instance-1"),
+							),
+						))).
 					Times(1).
 					Return(nil, getErr)
 				return func() domain.OrganizationRepository { return repo }
@@ -78,7 +84,12 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 					Times(1).
 					Return(repo)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
+						database.And(
+							repo.IDCondition("org-1"),
+							repo.InstanceIDCondition("instance-1"),
+						),
+					))).
 					Times(1).
 					Return(&domain.Organization{
 						ID:   "org-1",
@@ -99,7 +110,12 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 					Times(1).
 					Return(repo)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
+						database.And(
+							repo.IDCondition("org-1"),
+							repo.InstanceIDCondition("instance-1"),
+						),
+					))).
 					Times(1).
 					Return(&domain.Organization{
 						ID:    "org-1",
@@ -121,7 +137,12 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 					Times(1).
 					Return(repo)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
+						database.And(
+							repo.IDCondition("org-1"),
+							repo.InstanceIDCondition("instance-1"),
+						),
+					))).
 					Times(1).
 					Return(&domain.Organization{
 						ID:    "org-1",
@@ -148,7 +169,12 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 					Times(1).
 					Return(repo)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
+						database.And(
+							repo.IDCondition("org-1"),
+							repo.InstanceIDCondition("instance-1"),
+						),
+					))).
 					Times(1).
 					Return(&domain.Organization{
 						ID:         "org-1",
@@ -188,7 +214,12 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 					Times(1).
 					Return(repo)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
+						database.And(
+							repo.IDCondition("org-1"),
+							repo.InstanceIDCondition("instance-1"),
+						),
+					))).
 					Times(1).
 					Return(&domain.Organization{
 						ID:         "org-1",
@@ -226,7 +257,12 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 					Times(1).
 					Return(repo)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
+						database.And(
+							repo.IDCondition("org-1"),
+							repo.InstanceIDCondition("instance-1"),
+						),
+					))).
 					Times(1).
 					Return(&domain.Organization{
 						ID:         "org-1",
@@ -266,7 +302,12 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 					Times(1).
 					Return(repo)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
+						database.And(
+							repo.IDCondition("org-1"),
+							repo.InstanceIDCondition("instance-1"),
+						),
+					))).
 					Times(1).
 					Return(&domain.Organization{
 						ID:         "org-1",

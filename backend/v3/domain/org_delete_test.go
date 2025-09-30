@@ -63,7 +63,9 @@ func TestDeleteOrgCommand_Validate(t *testing.T) {
 			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
+						database.And(repo.IDCondition("org-1"), repo.InstanceIDCondition("inst-1")),
+					))).
 					Times(1).
 					Return(nil, getErr)
 				return func() domain.OrganizationRepository { return repo }
@@ -76,7 +78,9 @@ func TestDeleteOrgCommand_Validate(t *testing.T) {
 			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
+						database.And(repo.IDCondition("org-1"), repo.InstanceIDCondition("inst-1")),
+					))).
 					Times(1).
 					Return(&domain.Organization{
 						ID:    "org-1",
@@ -92,7 +96,9 @@ func TestDeleteOrgCommand_Validate(t *testing.T) {
 			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
+						database.And(repo.IDCondition("org-1"), repo.InstanceIDCondition("inst-1")),
+					))).
 					Times(1).
 					Return(&domain.Organization{
 						ID:    "org-1",
@@ -107,7 +113,9 @@ func TestDeleteOrgCommand_Validate(t *testing.T) {
 			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1")))).
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
+						database.And(repo.IDCondition("org-1"), repo.InstanceIDCondition("inst-1")),
+					))).
 					Times(1).
 					Return(&domain.Organization{
 						ID:    "org-1",
@@ -180,7 +188,12 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 					Get(
 						gomock.Any(),
 						gomock.Any(),
-						dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1"))),
+						dbmock.QueryOptions(database.WithCondition(
+							database.And(
+								repo.IDCondition("org-1"),
+								repo.InstanceIDCondition("inst-1"),
+							),
+						)),
 					).
 					Times(1).
 					Return(nil, getErr)
@@ -197,7 +210,12 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 					Get(
 						gomock.Any(),
 						gomock.Any(),
-						dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1"))),
+						dbmock.QueryOptions(database.WithCondition(
+							database.And(
+								repo.IDCondition("org-1"),
+								repo.InstanceIDCondition("inst-1"),
+							),
+						)),
 					).
 					Times(1).
 					Return(&domain.Organization{
@@ -226,7 +244,12 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 					Get(
 						gomock.Any(),
 						gomock.Any(),
-						dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1"))),
+						dbmock.QueryOptions(database.WithCondition(
+							database.And(
+								repo.IDCondition("org-1"),
+								repo.InstanceIDCondition("inst-1"),
+							),
+						)),
 					).
 					Times(1).
 					Return(&domain.Organization{
@@ -254,7 +277,12 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 					Get(
 						gomock.Any(),
 						gomock.Any(),
-						dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1"))),
+						dbmock.QueryOptions(database.WithCondition(
+							database.And(
+								repo.IDCondition("org-1"),
+								repo.InstanceIDCondition("inst-1"),
+							),
+						)),
 					).
 					Times(1).
 					Return(&domain.Organization{
@@ -282,7 +310,12 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 					Get(
 						gomock.Any(),
 						gomock.Any(),
-						dbmock.QueryOptions(database.WithCondition(repo.IDCondition("org-1"))),
+						dbmock.QueryOptions(database.WithCondition(
+							database.And(
+								repo.IDCondition("org-1"),
+								repo.InstanceIDCondition("inst-1"),
+							),
+						)),
 					).
 					Times(1).
 					Return(&domain.Organization{

@@ -27,7 +27,7 @@ func TestBaseCommand_OperationMapper(t *testing.T) {
 		{
 			name:              "contains ignore case",
 			queryOperation:    object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE,
-			expectedOperation: database.TextOperationContains,
+			expectedOperation: database.TextOperationContainsIgnoreCase,
 		},
 		{
 			name:              "ends with",
@@ -37,7 +37,7 @@ func TestBaseCommand_OperationMapper(t *testing.T) {
 		{
 			name:              "ends with ignore case",
 			queryOperation:    object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE,
-			expectedOperation: database.TextOperationEndsWith,
+			expectedOperation: database.TextOperationEndsWithIgnoreCase,
 		},
 		{
 			name:              "equals",
@@ -57,7 +57,7 @@ func TestBaseCommand_OperationMapper(t *testing.T) {
 		{
 			name:              "starts with ignore case",
 			queryOperation:    object.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE,
-			expectedOperation: database.TextOperationStartsWith,
+			expectedOperation: database.TextOperationStartsWithIgnoreCase,
 		},
 		{
 			name:           "unknown operation",

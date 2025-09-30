@@ -8,6 +8,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	orgv2 "github.com/zitadel/zitadel/backend/v3/api/org/v2"
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	metadata "github.com/zitadel/zitadel/internal/api/grpc/metadata/v2beta"
 	object "github.com/zitadel/zitadel/internal/api/grpc/object/v2beta"
@@ -71,7 +72,15 @@ func (s *Server) ListOrganizations(ctx context.Context, request *connect.Request
 
 func (s *Server) DeleteOrganization(ctx context.Context, request *connect.Request[v2beta_org.DeleteOrganizationRequest]) (*connect.Response[v2beta_org.DeleteOrganizationResponse], error) {
 	if authz.GetFeatures(ctx).EnableRelationalTables {
-		return orgv2.DeleteOrganization(ctx, request)
+		var notFoundError *database.NoRowFoundError
+		res, err := orgv2.DeleteOrganization(ctx, request)
+		if err != nil {
+			if errors.As(err, &notFoundError) {
+				return connect.NewResponse(&v2beta_org.DeleteOrganizationResponse{}), nil
+			}
+			return nil, err
+		}
+		return res, nil
 	}
 
 	details, err := s.command.RemoveOrg(ctx, request.Msg.GetId())
