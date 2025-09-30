@@ -254,7 +254,7 @@ $cnsl-dark-theme-foreground: (
   warninfosection: #ffc1c1,
   alertinfosection: rgb(251, 191, 36),
   successinfosection: #cbf4c9,
-  toolbar-items: map-get(map-get($caos-dark-primary, contrast), 500),
+  toolbar-items: map.get($caos-dark-primary, contrast, 500),
   slash: #ffffff6e,
 );
 
@@ -275,11 +275,11 @@ $cnsl-light-theme-foreground: (
   slider-min: rgba(black, 0.87),
   slider-off: rgba(black, 0.26),
   slider-off-active: rgba(black, 0.38),
-  infosection: map-get(map-get($cnsl-light-background, contrast), 600),
+  infosection: map.get($cnsl-light-background, contrast, 600),
   warninfosection: #620e0e,
   alertinfosection: rgb(146, 64, 14),
   successinfosection: #0e6245,
-  toolbar-items: map-get(map-get($caos-light-primary, contrast), 500),
+  toolbar-items: map.get($caos-light-primary, contrast, 500),
   slash: #0000006e,
 );
 
@@ -406,12 +406,12 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
   @include component-themes($caos-light-app-theme);
   @include mat.all-component-colors($caos-light-app-theme);
 
-  $background: map-get($caos-light-app-theme, background);
-  $foreground: map-get($caos-light-app-theme, foreground);
+  $background: map.get($caos-light-app-theme, background);
+  $foreground: map.get($caos-light-app-theme, foreground);
 
   --warn: #cd3d56;
   --success: #10b981;
-  $border-color: map-get($foreground, divider);
+  $border-color: map.get($foreground, divider);
 
   --mat-select-enabled-trigger-text-color: #000;
   --mat-table-row-item-label-text-size: 14px;
@@ -423,21 +423,21 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
   }
 
   .mat-mdc-menu-panel {
-    background-color: map-get($background, cards);
+    background-color: map.get($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     border-radius: 6px;
     min-height: fit-content;
   }
 
   .mat-mdc-select-panel {
-    background-color: map-get($background, cards);
+    background-color: map.get($background, cards);
   }
 
   .mat-mdc-option {
-    background-color: map-get($background, cards);
+    background-color: map.get($background, cards);
 
     &:hover {
-      background-color: map-get($background, cardhovered);
+      background-color: map.get($background, cardhovered);
     }
   }
 
@@ -453,12 +453,12 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
 
   .main-container,
   .mat-calendar {
-    background-color: map-get($background, background);
+    background-color: map.get($background, background);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
 
   @include mat.dialog-overrides((
-    container-color: map-get($background, background),
+    container-color: map.get($background, background),
   ));
 
   @include mat.button-overrides((
@@ -468,14 +468,14 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
   ::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
     box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
-    background-color: map-get($background, background);
+    background-color: map.get($background, background);
     border-radius: 8px;
   }
 
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
-    background-color: map-get($background, background);
+    background-color: map.get($background, background);
   }
 
   ::-webkit-scrollbar-thumb {
@@ -485,7 +485,7 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
   }
 
   .root-header {
-    box-shadow: inset 0 -1px map-get($cnsl-light-theme-foreground, divider);
+    box-shadow: inset 0 -1px map.get($cnsl-light-theme-foreground, divider);
   }
 
   .desc-link {
@@ -494,12 +494,12 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
 }
 
 .dark-theme {
-  $background: map-get($caos-dark-app-theme, background);
-  $foreground: map-get($caos-dark-app-theme, foreground);
+  $background: map.get($caos-dark-app-theme, background);
+  $foreground: map.get($caos-dark-app-theme, foreground);
 
   --warn: #ff3b5b;
   --success: #10b981;
-  $border-color: map-get($foreground, divider);
+  $border-color: map.get($foreground, divider);
 
   --mat-select-enabled-trigger-text-color: #fff;
   --mat-table-row-item-label-text-size: 14px;
@@ -512,25 +512,25 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
 
   .main-container {
     background-color: mat.m2-get-color-from-palette($background, background);
-    color: map-get($foreground, text);
+    color: map.get($foreground, text);
   }
 
   .mat-mdc-menu-panel {
-    background-color: map-get($background, cards);
+    background-color: map.get($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     border-radius: 6px;
     min-height: fit-content;
   }
 
   .mat-mdc-select-panel {
-    background-color: map-get($background, cards);
+    background-color: map.get($background, cards);
   }
 
   .mat-mdc-option {
-    background-color: map-get($background, cards);
+    background-color: map.get($background, cards);
 
     &:hover {
-      background-color: map-get($background, cardhovered);
+      background-color: map.get($background, cardhovered);
     }
   }
 
@@ -569,7 +569,7 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
-    background-color: map-get($background, background);
+    background-color: map.get($background, background);
     transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
   }
 
@@ -581,7 +581,7 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
   }
 
   .root-header {
-    box-shadow: inset 0 -1px map-get($cnsl-dark-theme-foreground, divider);
+    box-shadow: inset 0 -1px map.get($cnsl-dark-theme-foreground, divider);
   }
 
   .desc-link {
