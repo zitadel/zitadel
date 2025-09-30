@@ -18,7 +18,7 @@ import { createUserServiceClient } from "@zitadel/client/v2";
 import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { AuthenticationMethodType, SetPasswordRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { SetPasswordRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
@@ -417,7 +417,7 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
   if (!authmethods) {
     return { error: "Could not load auth methods" };
   }
-  
+
   let loginSettings;
   try {
     loginSettings = await getLoginSettings({
@@ -430,7 +430,7 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
   }
 
   const forceMfa = !!(loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly);
-  
+
   // if the user has no MFA but MFA is enforced, we can set a password otherwise we use the token of the user
   if (forceMfa) {
     console.log("Set password using service account due to enforced MFA without existing MFA methods");
