@@ -18,7 +18,7 @@ message Group {
     }
   ];
 
-  // Name of the user group.
+  // Unique name of the user group inside the corresponding organization.
   string name = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"Support Group\"";
