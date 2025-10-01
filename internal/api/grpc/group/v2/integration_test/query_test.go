@@ -116,10 +116,11 @@ func TestServer_ListGroups(t *testing.T) {
 		dep func(*group_v2.ListGroupsRequest, *group_v2.ListGroupsResponse)
 	}
 	tests := []struct {
-		name    string
-		args    args
-		want    *group_v2.ListGroupsResponse
-		wantErr bool
+		name        string
+		args        args
+		want        *group_v2.ListGroupsResponse
+		wantErrCode codes.Code
+		wantErrMsg  string
 	}{
 		{
 			name: "list groups, unauthenticated",
@@ -127,7 +128,8 @@ func TestServer_ListGroups(t *testing.T) {
 				ctx: CTX,
 				req: &group_v2.ListGroupsRequest{},
 			},
-			wantErr: true,
+			wantErrCode: codes.Unauthenticated,
+			wantErrMsg:  "auth header missing",
 		},
 		{
 			name: "group ID not found",
@@ -162,10 +164,12 @@ func TestServer_ListGroups(t *testing.T) {
 					group1 := instance.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), groupName)
 
 					resp.Groups[0] = &group_v2.Group{
-						Id:           group1.GetId(),
-						Name:         groupName,
-						CreationDate: group1.GetCreationDate(),
-						ChangeDate:   group1.GetCreationDate(),
+						Id:             group1.GetId(),
+						Name:           groupName,
+						Description:    "",
+						OrganizationId: orgResp.GetOrganizationId(),
+						CreationDate:   group1.GetCreationDate(),
+						ChangeDate:     group1.GetCreationDate(),
 					}
 					req.Filters[0].Filter = &group_v2.GroupsSearchFilter_GroupIds{
 						GroupIds: &filter.InIDsFilter{
@@ -197,19 +201,23 @@ func TestServer_ListGroups(t *testing.T) {
 					group1 := instance.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), groupName1)
 
 					resp.Groups[1] = &group_v2.Group{
-						Id:           group1.GetId(),
-						Name:         groupName1,
-						CreationDate: group1.GetCreationDate(),
-						ChangeDate:   group1.GetCreationDate(),
+						Id:             group1.GetId(),
+						Name:           groupName1,
+						Description:    "",
+						OrganizationId: orgResp.GetOrganizationId(),
+						CreationDate:   group1.GetCreationDate(),
+						ChangeDate:     group1.GetCreationDate(),
 					}
 					groupName2 := integration.GroupName()
 					group2 := instance.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), groupName2)
 
 					resp.Groups[0] = &group_v2.Group{
-						Id:           group2.GetId(),
-						Name:         groupName2,
-						CreationDate: group2.GetCreationDate(),
-						ChangeDate:   group2.GetCreationDate(),
+						Id:             group2.GetId(),
+						Name:           groupName2,
+						Description:    "",
+						OrganizationId: orgResp.GetOrganizationId(),
+						CreationDate:   group2.GetCreationDate(),
+						ChangeDate:     group2.GetCreationDate(),
 					}
 					req.Filters[0].Filter = &group_v2.GroupsSearchFilter_GroupIds{
 						GroupIds: &filter.InIDsFilter{
@@ -241,10 +249,12 @@ func TestServer_ListGroups(t *testing.T) {
 					group1 := instance.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), groupName)
 
 					resp.Groups[0] = &group_v2.Group{
-						Id:           group1.GetId(),
-						Name:         groupName,
-						CreationDate: group1.GetCreationDate(),
-						ChangeDate:   group1.GetCreationDate(),
+						Id:             group1.GetId(),
+						Name:           groupName,
+						Description:    "",
+						OrganizationId: orgResp.GetOrganizationId(),
+						CreationDate:   group1.GetCreationDate(),
+						ChangeDate:     group1.GetCreationDate(),
 					}
 					req.Filters[0].Filter = &group_v2.GroupsSearchFilter_NameFilter{
 						NameFilter: &group_v2.GroupNameFilter{
@@ -276,28 +286,34 @@ func TestServer_ListGroups(t *testing.T) {
 					group2 := instance.CreateGroup(iamOwnerCtx, t, org1.GetOrganizationId(), groupName2)
 
 					resp.Groups[2] = &group_v2.Group{
-						Id:           group2.GetId(),
-						Name:         groupName2,
-						CreationDate: group2.GetCreationDate(),
-						ChangeDate:   group2.GetCreationDate(),
+						Id:             group2.GetId(),
+						Name:           groupName2,
+						Description:    "",
+						OrganizationId: org1.GetOrganizationId(),
+						CreationDate:   group2.GetCreationDate(),
+						ChangeDate:     group2.GetCreationDate(),
 					}
 					groupName1 := integration.GroupName()
 					group1 := instance.CreateGroup(iamOwnerCtx, t, org1.GetOrganizationId(), groupName1)
 
 					resp.Groups[1] = &group_v2.Group{
-						Id:           group1.GetId(),
-						Name:         groupName1,
-						CreationDate: group1.GetCreationDate(),
-						ChangeDate:   group1.GetCreationDate(),
+						Id:             group1.GetId(),
+						Name:           groupName1,
+						Description:    "",
+						OrganizationId: org1.GetOrganizationId(),
+						CreationDate:   group1.GetCreationDate(),
+						ChangeDate:     group1.GetCreationDate(),
 					}
 					groupName0 := integration.GroupName()
 					group0 := instance.CreateGroup(iamOwnerCtx, t, org1.GetOrganizationId(), groupName0)
 
 					resp.Groups[0] = &group_v2.Group{
-						Id:           group0.GetId(),
-						Name:         groupName0,
-						CreationDate: group0.GetCreationDate(),
-						ChangeDate:   group0.GetCreationDate(),
+						Id:             group0.GetId(),
+						Name:           groupName0,
+						Description:    "",
+						OrganizationId: org1.GetOrganizationId(),
+						CreationDate:   group0.GetCreationDate(),
+						ChangeDate:     group0.GetCreationDate(),
 					}
 					org2 := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					org2GroupName0 := integration.GroupName()
@@ -333,8 +349,10 @@ func TestServer_ListGroups(t *testing.T) {
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamOwnerCtx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := instance.Client.GroupV2.ListGroups(tt.args.ctx, tt.args.req)
-				if tt.wantErr {
+				if tt.wantErrCode != codes.OK {
 					require.Error(t, err)
+					assert.Equal(t, tt.wantErrCode, status.Code(err))
+					assert.Equal(t, tt.wantErrMsg, status.Convert(err).Message())
 					return
 				}
 				require.NoError(t, err)
