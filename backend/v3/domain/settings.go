@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 	"encoding/json"
+	"net/url"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -121,8 +122,8 @@ type LabelSettings struct {
 	LabelPolicyLightLogoURL *string `json:"labelPolicyLightLogoURL,omitempty"`
 	LabelPolicyDarkLogoURL  *string `json:"labelPolicyDarkLogoURL,omitempty"`
 
-	LabelPolicyLightIconURL *string `json:"labelPolicyLightIconURL,omitempty"`
-	LabelPolicyDarkIconURL  *string `json:"labelPolicyDarkIconURL,omitempty"`
+	LabelPolicyLightIconURL *url.URL `json:"labelPolicyLightIconURL,omitempty"`
+	LabelPolicyDarkIconURL  *url.URL `json:"labelPolicyDarkIconURL,omitempty"`
 
 	LabelPolicyFontURL *string `json:"labelPolicyLightFontURL,omitempty"`
 }

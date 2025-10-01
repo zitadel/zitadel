@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"net/url"
 	"slices"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -972,13 +973,29 @@ func (p *settingsRelationalProjection) reduceIconAdded(event eventstore.Event) (
 
 		switch e := event.(type) {
 		case *org.LabelPolicyIconAddedEvent:
-			setting.Settings.LabelPolicyLightIconURL = &e.StoreKey
+			url, err := url.Parse(e.StoreKey)
+			if err != nil {
+				return err
+			}
+			setting.Settings.LabelPolicyLightIconURL = url
 		case *instance.LabelPolicyIconAddedEvent:
-			setting.Settings.LabelPolicyLightIconURL = &e.StoreKey
+			url, err := url.Parse(e.StoreKey)
+			if err != nil {
+				return err
+			}
+			setting.Settings.LabelPolicyLightIconURL = url
 		case *org.LabelPolicyIconDarkAddedEvent:
-			setting.Settings.LabelPolicyDarkIconURL = &e.StoreKey
+			url, err := url.Parse(e.StoreKey)
+			if err != nil {
+				return err
+			}
+			setting.Settings.LabelPolicyDarkIconURL = url
 		case *instance.LabelPolicyIconDarkAddedEvent:
-			setting.Settings.LabelPolicyDarkIconURL = &e.StoreKey
+			url, err := url.Parse(e.StoreKey)
+			if err != nil {
+				return err
+			}
+			setting.Settings.LabelPolicyDarkIconURL = url
 		}
 
 		CreatedAt := event.CreatedAt()
