@@ -22,6 +22,12 @@ func WithOrganizationDomainRepo(repo OrganizationDomainRepository) InvokeOpt {
 	}
 }
 
+func WithProjectRepo(repo ProjectRepository) InvokeOpt {
+	return func(opts *CommandOpts) {
+		opts.projectRepo = repo
+	}
+}
+
 // Invoke provides a way to execute commands within the domain package.
 // It uses a chain of responsibility pattern to handle the command execution.
 // The default chain includes logging, tracing, and event publishing.

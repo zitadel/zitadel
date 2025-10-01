@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"errors"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -159,18 +160,23 @@ func (d *DeleteOrgCommand) Validate(ctx context.Context, opts *CommandOpts) (err
 
 	defer func() { err = closeFunc(ctx, err) }()
 
-	// TODO(IAM-Marco): Implement this when projects are available on relational
-	// // Check if the ZITADEL project exists on the input organization
-	// projectRepo := opts.projectRepo(pool)
-	// _, getErr := projectRepo.Get(ctx, database.WithCondition(projectRepo.IDCondition(instance.ProjectID())))
-	// if getErr == nil {
-	// 	return zerrors.ThrowPreconditionFailed(nil, "DOM-X7YXxC", "Errors.Org.ZitadelOrgNotDeletable")
-	// }
-	// // "precondition failed" error means the project does not exist, return other errors in case it's not that
-	// if !zerrors.IsPreconditionFailed(getErr) {
-	// 	err = getErr
-	// 	return err
-	// }
+	// Check if the ZITADEL project exists on the input organization
+	projectRepo := opts.projectRepo
+	_, getErr := projectRepo.Get(ctx, pool,
+		database.WithCondition(database.And(
+			projectRepo.IDCondition(instance.ProjectID()),
+			projectRepo.OrganizationIDCondition(d.ID),
+			projectRepo.InstanceIDCondition(instance.InstanceID()),
+		)),
+	)
+	if getErr == nil {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-X7YXxC", "Errors.Org.ZitadelOrgNotDeletable")
+	}
+	// "database.NoRowFoundError" error means the project does not exist, return other errors in case it's not that
+	if !errors.Is(getErr, &database.NoRowFoundError{}) {
+		err = getErr
+		return err
+	}
 
 	orgRepo := opts.organizationRepo
 	org, err := orgRepo.Get(ctx, pool,

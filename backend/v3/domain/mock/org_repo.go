@@ -29,7 +29,7 @@ func (r *OrgRepo) SetDomains(repo *OrgDomainRepo) {
 	r.domainRepo = repo
 }
 
-// SetExistsDomain is a helper function that allows to skip calling EXISTS() when ExistsDomain() called.
+// SetExistsDomain is a helper function that allows to skip calling EXISTS() when ExistsDomain() is called.
 // You will not be able to mock the ExistsDomain() call though
 func (r *OrgRepo) SetExistsDomain(existsDomainCondition database.Condition) {
 	r.existDomain = existsDomainCondition

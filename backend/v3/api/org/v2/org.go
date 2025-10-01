@@ -127,6 +127,7 @@ func DeleteOrganization(ctx context.Context, request *connect.Request[v2beta_org
 
 	err := domain.Invoke(ctx, orgDeleteCmd,
 		domain.WithOrganizationRepo(repository.OrganizationRepository()),
+		domain.WithProjectRepo(repository.ProjectRepository()),
 	)
 	if err != nil {
 		return nil, err

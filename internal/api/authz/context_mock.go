@@ -22,6 +22,12 @@ func WithMockFeatures(features feature.Features) MockContextInstanceOpts {
 	}
 }
 
+func WithMockProjectID(projectID string) MockContextInstanceOpts {
+	return func(i *instance) {
+		i.projectID = projectID
+	}
+}
+
 func NewMockContext(instanceID, orgID, userID string, opts ...MockContextInstanceOpts) context.Context {
 	ctx := context.WithValue(context.Background(), dataKey, CtxData{UserID: userID, OrgID: orgID})
 
