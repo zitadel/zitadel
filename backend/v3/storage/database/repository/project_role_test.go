@@ -377,6 +377,15 @@ func TestUpdateProjectRoles(t *testing.T) {
 				assert.Equal(t, gu.Ptr("group1 Updated"), role.RoleGroup)
 			},
 		},
+		{
+			name:      "set empty display name, not allowed",
+			condition: roleRepo.PrimaryKeyCondition(existingRole.InstanceID, existingRole.ProjectID, existingRole.Key),
+			changes: []database.Change{
+				roleRepo.SetDisplayName(""),
+			},
+			wantRowsAffected: 0,
+			wantErr:          new(database.CheckError),
+		},
 	}
 
 	for _, tt := range tests {
@@ -441,13 +450,16 @@ func TestDeleteProjectRole(t *testing.T) {
 			condition:        roleRepo.PrimaryKeyCondition(existingRole.InstanceID, existingRole.ProjectID, existingRole.Key),
 			wantRowsAffected: 1,
 		},
+		{
+			name:             "delete role twice",
+			condition:        roleRepo.PrimaryKeyCondition(existingRole.InstanceID, existingRole.ProjectID, existingRole.Key),
+			wantRowsAffected: 0,
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			savepoint, rollback := savepointForRollback(t, tx)
-			defer rollback()
-			gotRowsAffected, err := roleRepo.Delete(t.Context(), savepoint, tt.condition)
+			gotRowsAffected, err := roleRepo.Delete(t.Context(), tx, tt.condition)
 			assert.Equal(t, tt.wantRowsAffected, gotRowsAffected)
 			assert.ErrorIs(t, err, tt.wantErr)
 		})

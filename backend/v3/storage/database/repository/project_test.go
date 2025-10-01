@@ -428,6 +428,15 @@ func TestUpdateProject(t *testing.T) {
 				assert.Equal(t, int16(2), updatedProject.UsedLabelingSettingOwner)
 			},
 		},
+		{
+			name:      "set empty name, not allowed",
+			condition: projectRepo.PrimaryKeyCondition(instanceID, existingProject.ID),
+			changes: []database.Change{
+				projectRepo.SetName(""),
+			},
+			wantRowsAffected: 0,
+			wantErr:          new(database.CheckError),
+		},
 	}
 
 	for _, tt := range tests {
@@ -495,13 +504,16 @@ func TestDeleteProject(t *testing.T) {
 			condition:        projectRepo.PrimaryKeyCondition(instanceID, existingProject.ID),
 			wantRowsAffected: 1,
 		},
+		{
+			name:             "delete project twice",
+			condition:        projectRepo.PrimaryKeyCondition(instanceID, existingProject.ID),
+			wantRowsAffected: 0,
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			savepoint, rollback := savepointForRollback(t, tx)
-			defer rollback()
-			rowsAffected, err := projectRepo.Delete(t.Context(), savepoint, tt.condition)
+			rowsAffected, err := projectRepo.Delete(t.Context(), tx, tt.condition)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
 		})
