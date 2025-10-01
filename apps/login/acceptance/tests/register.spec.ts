@@ -1,13 +1,8 @@
 import { faker } from "@faker-js/faker";
 import { test } from "@playwright/test";
-import dotenv from "dotenv";
-import path from "path";
-import { loginScreenExpect } from "./login";
-import { registerWithPasskey, registerWithPassword } from "./register";
-import { removeUserByUsername } from "./zitadel";
-
-// Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, "../../login/.env.test.local") });
+import { loginScreenExpect } from "./login.js";
+import { registerWithPasskey, registerWithPassword } from "./register.js";
+import { removeUserByUsername } from "./zitadel.js";
 
 test("register with password", async ({ page }) => {
   const username = faker.internet.email();

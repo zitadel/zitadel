@@ -1,8 +1,4 @@
 import { defineConfig, devices } from "@playwright/test";
-import dotenv from "dotenv";
-import path from "path";
-
-dotenv.config({ path: path.resolve(__dirname, "../login/.env.test.local") });
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -18,7 +14,7 @@ export default defineConfig({
   expect: {
     timeout: 10_000, // 10 seconds
   },
-  timeout: 300 * 1000, // 5 minutes
+  timeout: 5 * 60_000, // 5 minutes
   globalTimeout: 30 * 60_000, // 30 minutes
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
@@ -28,12 +24,12 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
+    actionTimeout: 10_000, // 10 seconds
     baseURL: process.env.LOGIN_BASE_URL || "http://127.0.0.1:3000",
     trace: "retain-on-failure",
     headless: true,
     screenshot: "only-on-failure",
-    video: "retain-on-failure",
-    ignoreHTTPSErrors: true,
+    video: "retain-on-failure"
   },
   outputDir: "test-results/results",
 

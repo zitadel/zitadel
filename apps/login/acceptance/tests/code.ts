@@ -1,9 +1,9 @@
 import { Page } from "@playwright/test";
-import { codeScreen } from "./code-screen";
-import { getOtpFromSink } from "./sink";
+import { codeScreen } from "./code-screen.js";
+import { eventualOtp } from "./mock.js";
 
 export async function otpFromSink(page: Page, key: string) {
-  const c = await getOtpFromSink(key);
+  const c = await eventualOtp(key);
   await code(page, c);
 }
 

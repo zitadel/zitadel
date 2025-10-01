@@ -1,14 +1,9 @@
 import { faker } from "@faker-js/faker";
 import { test as base } from "@playwright/test";
-import dotenv from "dotenv";
-import path from "path";
-import { code, codeResend, otpFromSink } from "./code";
-import { codeScreenExpect } from "./code-screen";
-import { loginScreenExpect, loginWithPassword, loginWithPasswordAndEmailOTP } from "./login";
-import { OtpType, PasswordUserWithOTP } from "./user";
-
-// Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, "../../login/.env.test.local") });
+import { code, codeResend, otpFromSink } from "./code.js";
+import { codeScreenExpect } from "./code-screen.js";
+import { loginScreenExpect, loginWithPassword, loginWithPasswordAndEmailOTP } from "./login.js";
+import { OtpType, PasswordUserWithOTP } from "./user.js";
 
 const test = base.extend<{ user: PasswordUserWithOTP; sink: any }>({
   user: async ({ page }, use) => {

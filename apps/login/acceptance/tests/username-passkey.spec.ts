@@ -1,12 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { test as base } from "@playwright/test";
-import dotenv from "dotenv";
-import path from "path";
-import { loginScreenExpect, loginWithPasskey } from "./login";
-import { PasskeyUser } from "./user";
-
-// Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, "../../login/.env.test.local") });
+import { loginScreenExpect, loginWithPasskey } from "./login.js";
+import { PasskeyUser } from "./user.js";
 
 const test = base.extend<{ user: PasskeyUser }>({
   user: async ({ page }, use) => {

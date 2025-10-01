@@ -1,6 +1,6 @@
 import { Page } from "@playwright/test";
-import { registerWithPasskey } from "./register";
-import { activateOTP, addTOTP, addUser, eventualNewUser, getUserByUsername, removeUser } from "./zitadel";
+import { registerWithPasskey } from "./register.js";
+import { activateOTP, addTOTP, addUser, eventualNewUser, getUserByUsername, removeUser } from "./zitadel.js";
 
 export interface userProps {
   email: string;

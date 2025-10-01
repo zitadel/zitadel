@@ -1,5 +1,4 @@
-import { expect, Page } from "@playwright/test";
-import { CDPSession } from "playwright-core";
+import { expect, Page, CDPSession } from "@playwright/test";
 
 interface session {
   client: CDPSession;

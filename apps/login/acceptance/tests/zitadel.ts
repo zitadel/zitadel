@@ -1,13 +1,10 @@
 import { Authenticator } from "@otplib/core";
 import { createDigest, createRandomBytes } from "@otplib/plugin-crypto";
 import { keyDecoder, keyEncoder } from "@otplib/plugin-thirty-two"; // use your chosen base32 plugin
-import axios from "axios";
-import dotenv from "dotenv";
+import axios from 'axios';
 import { request } from "gaxios";
-import path from "path";
-import { OtpType, userProps } from "./user";
-
-dotenv.config({ path: path.resolve(__dirname, "../../login/.env.test.local") });
+import { OtpType, userProps } from "./user.js";
+import { readFileSync } from "fs";
 
 export async function addUser(props: userProps) {
   const body = {
@@ -58,7 +55,7 @@ async function deleteCall(url: string) {
   try {
     const response = await axios.delete(url, {
       headers: {
-        Authorization: `Bearer ${process.env.ZITADEL_ADMIN_TOKEN}`,
+        Authorization: `Bearer ${adminToken()}`,
       },
     });
 
@@ -92,7 +89,7 @@ async function listCall(url: string, data: any): Promise<any> {
     const response = await axios.post(url, data, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.ZITADEL_ADMIN_TOKEN}`,
+        Authorization: `Bearer ${adminToken()}`,
       },
     });
 
@@ -128,7 +125,7 @@ async function pushCall(url: string, data: any) {
     const response = await axios.post(url, data, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.ZITADEL_ADMIN_TOKEN}`,
+        Authorization: `Bearer ${adminToken()}`,
       },
     });
 
@@ -175,7 +172,7 @@ export async function eventualNewUser(id: string) {
     url: `${process.env.ZITADEL_API_URL}/v2/users/${id}`,
     method: "GET",
     headers: {
-      Authorization: `Bearer ${process.env.ZITADEL_ADMIN_TOKEN}`,
+      Authorization: `Bearer ${adminToken()}`,
       "Content-Type": "application/json",
     },
     retryConfig: {
@@ -187,4 +184,15 @@ export async function eventualNewUser(id: string) {
       },
     },
   });
+}
+
+var adminTokenCache: string | null = null;
+
+function adminToken(): string {
+  if (adminTokenCache) {
+    return adminTokenCache;
+  }
+  const token = readFileSync(process.env.ZITADEL_ADMIN_TOKEN_FILE!).toString().trim();
+  adminTokenCache = token;
+  return token;
 }

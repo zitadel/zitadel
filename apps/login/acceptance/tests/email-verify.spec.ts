@@ -1,15 +1,10 @@
 import { faker } from "@faker-js/faker";
 import { test as base } from "@playwright/test";
-import dotenv from "dotenv";
-import path from "path";
-import { emailVerify, emailVerifyResend } from "./email-verify";
-import { emailVerifyScreenExpect } from "./email-verify-screen";
-import { loginScreenExpect, loginWithPassword } from "./login";
-import { getCodeFromSink } from "./sink";
-import { PasswordUser } from "./user";
-
-// Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, "../../login/.env.test.local") });
+import { emailVerify, emailVerifyResend } from "./email-verify.js";
+import { emailVerifyScreenExpect } from "./email-verify-screen.js";
+import { loginScreenExpect, loginWithPassword } from "./login.js";
+import { eventualCode } from "./mock.js";
+import { PasswordUser } from "./user.js";
 
 const test = base.extend<{ user: PasswordUser }>({
   user: async ({ page }, use) => {
@@ -32,7 +27,7 @@ const test = base.extend<{ user: PasswordUser }>({
 
 test("user email not verified, verify", async ({ user, page }) => {
   await loginWithPassword(page, user.getUsername(), user.getPassword());
-  const c = await getCodeFromSink(user.getUsername());
+  const c = await eventualCode(user.getUsername());
   await emailVerify(page, c);
   // wait for resend of the code
   await page.waitForTimeout(2000);
@@ -43,7 +38,7 @@ test("user email not verified, resend, verify", async ({ user, page }) => {
   await loginWithPassword(page, user.getUsername(), user.getPassword());
   // auto-redirect on /verify
   await emailVerifyResend(page);
-  const c = await getCodeFromSink(user.getUsername());
+  const c = await eventualCode(user.getUsername());
   // wait for resend of the code
   await page.waitForTimeout(2000);
   await emailVerify(page, c);
@@ -52,7 +47,7 @@ test("user email not verified, resend, verify", async ({ user, page }) => {
 
 test("user email not verified, resend, old code", async ({ user, page }) => {
   await loginWithPassword(page, user.getUsername(), user.getPassword());
-  const c = await getCodeFromSink(user.getUsername());
+  const c = await eventualCode(user.getUsername());
   await emailVerifyResend(page);
   // wait for resend of the code
   await page.waitForTimeout(2000);

@@ -1,0 +1,17 @@
+{
+  "name": "@zitadel/login-acceptance",
+  "type": "module",
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.6.1",
+    "@zitadel/client": "workspace:*",
+    "@zitadel/proto": "workspace:*",
+    "axios": "^1.12.2",
+    "express": "^5.1.0",
+    "gaxios": "^7.1.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "wait-on": "^7.2.0"
+  }
+}

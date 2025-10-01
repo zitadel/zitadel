@@ -1,8 +1,8 @@
 import { Page } from "@playwright/test";
-import { emailVerify } from "./email-verify";
-import { passkeyRegister } from "./passkey";
-import { registerPasswordScreen, registerUserScreenPasskey, registerUserScreenPassword } from "./register-screen";
-import { getCodeFromSink } from "./sink";
+import { emailVerify } from "./email-verify.js";
+import { passkeyRegister } from "./passkey.js";
+import { registerPasswordScreen, registerUserScreenPasskey, registerUserScreenPassword } from "./register-screen.js";
+import { eventualCode } from "./mock.js";
 
 export async function registerWithPassword(
   page: Page,
@@ -12,7 +12,7 @@ export async function registerWithPassword(
   password1: string,
   password2: string,
 ) {
-  await page.goto("./register");
+  await page.goto("/ui/v2/login/register");
   await registerUserScreenPassword(page, firstname, lastname, email);
   await page.getByTestId("submit-button").click();
   await registerPasswordScreen(page, password1, password2);
@@ -21,7 +21,7 @@ export async function registerWithPassword(
 }
 
 export async function registerWithPasskey(page: Page, firstname: string, lastname: string, email: string): Promise<string> {
-  await page.goto("./register");
+  await page.goto("/ui/v2/login/register");
   await registerUserScreenPasskey(page, firstname, lastname, email);
   await page.getByTestId("submit-button").click();
 
@@ -34,6 +34,6 @@ export async function registerWithPasskey(page: Page, firstname: string, lastnam
 }
 
 async function verifyEmail(page: Page, email: string) {
-  const c = await getCodeFromSink(email);
+  const c = await eventualCode(email);
   await emailVerify(page, c);
 }

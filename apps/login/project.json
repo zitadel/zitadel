@@ -24,8 +24,6 @@
       "inputs": [
         "default",
         "{workspaceRoot}/pnpm-lock.yaml",
-        "!{projectRoot}/.env.*",
-        "!{projectRoot}/.local.env",
         "!{projectRoot}/integration/**/*",
         "!{projectRoot}/acceptance/**/*",
         "!{projectRoot}/cypress.config.ts"
@@ -43,8 +41,6 @@
       "inputs": [
         "default",
         "{workspaceRoot}/pnpm-lock.yaml",
-        "!{projectRoot}/.env.*",
-        "!{projectRoot}/.local.env",
         "!{projectRoot}/integration/**/*",
         "!{projectRoot}/acceptance/**/*",
         "!{projectRoot}/cypress.config.ts"
@@ -65,14 +61,20 @@
       "description": "Checks code formatting with Prettier",
       "cache": true,
       "inputs": [
-        "default"
+        "default",
+        "!{projectRoot}/integration/**/*",
+        "!{projectRoot}/acceptance/**/*",
+        "!{projectRoot}/cypress.config.ts"
       ]
     },
     "lint-check-next": {
       "description": "Runs Next.js specific lint checks",
       "cache": true,
       "inputs": [
-        "default"
+        "default",
+        "!{projectRoot}/integration/**/*",
+        "!{projectRoot}/acceptance/**/*",
+        "!{projectRoot}/cypress.config.ts"
       ]
     },
     "test": {
