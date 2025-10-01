@@ -249,7 +249,7 @@ type SettingsRepository interface {
 	CreateLabel(ctx context.Context, client database.QueryExecutor, setting *LabelSetting) error
 	GetLabel(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, state LabelState) (*LabelSetting, error)
 	UpdateLabel(ctx context.Context, client database.QueryExecutor, setting *LabelSetting, changes ...database.Change) (int64, error)
-	ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *LabelSetting) (int64, error)
+	ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *LabelSetting) error
 
 	CreatePasswordComplexity(ctx context.Context, client database.QueryExecutor, setting *PasswordComplexitySetting) error
 	GetPasswordComplexity(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*PasswordComplexitySetting, error)

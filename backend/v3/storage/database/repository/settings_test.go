@@ -2084,7 +2084,6 @@ func TestCreateGetSecurityPolicySetting(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			var setting *domain.SecuritySetting
 			if tt.testFunc != nil {
 				setting = tt.testFunc(t, tx)
@@ -2183,7 +2182,6 @@ func TestCreateGetDomainPolicySetting(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			var setting *domain.DomainSetting
 			if tt.testFunc != nil {
 				setting = tt.testFunc(t, tx)
@@ -3090,6 +3088,256 @@ func TestDeleteSettingsForInstance(t *testing.T) {
 			)
 			require.NoError(t, err)
 			assert.Equal(t, noOfDeletedRows, tt.noOfDeletedRows)
+		})
+	}
+}
+
+func TestActivateLabelSettings(t *testing.T) {
+	settingRepo := repository.SettingsRepository()
+
+	type test struct {
+		name            string
+		testFunc        func(t *testing.T, pool database.QueryExecutor) *domain.LabelSetting
+		noOfDeletedRows int64
+	}
+	tests := []test{
+		{
+			name: "happy path activate label settings, no preexisting active label",
+			testFunc: func(t *testing.T, pool database.QueryExecutor) *domain.LabelSetting {
+				// create instance
+				instanceId := gofakeit.Name()
+				instance := domain.Instance{
+					ID:              instanceId,
+					Name:            gofakeit.Name(),
+					DefaultOrgID:    "defaultOrgId",
+					IAMProjectID:    "iamProject",
+					ConsoleClientID: "consoleCLient",
+					ConsoleAppID:    "consoleApp",
+					DefaultLanguage: "defaultLanguage",
+				}
+				instanceRepo := repository.InstanceRepository()
+				err := instanceRepo.Create(t.Context(), pool, &instance)
+				require.NoError(t, err)
+
+				// create org
+				orgId := gofakeit.Name()
+				org := domain.Organization{
+					ID:         orgId,
+					Name:       gofakeit.Name(),
+					InstanceID: instanceId,
+					State:      domain.OrgStateActive,
+				}
+				organizationRepo := repository.OrganizationRepository()
+				err = organizationRepo.Create(t.Context(), pool, &org)
+				require.NoError(t, err)
+
+				setting := domain.LabelSetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						ID:         gofakeit.Name(),
+						Type:       domain.SettingTypeLabel,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
+					},
+					Settings: domain.LabelSettings{
+						IsDefault:           false,
+						PrimaryColor:        "value",
+						BackgroundColor:     "value",
+						WarnColor:           "value",
+						FontColor:           "value",
+						PrimaryColorDark:    "value",
+						BackgroundColorDark: "value",
+						WarnColorDark:       "value",
+						FontColorDark:       "value",
+						HideLoginNameSuffix: true,
+						ErrorMsgPopup:       true,
+						DisableWatermark:    true,
+						ThemeMode:           domain.LabelPolicyThemeAuto,
+					},
+				}
+				return &setting
+			},
+		},
+		{
+			name: "happy path activate label settings, with preexisting preview label",
+			testFunc: func(t *testing.T, pool database.QueryExecutor) *domain.LabelSetting {
+				// create instance
+				instanceId := gofakeit.Name()
+				instance := domain.Instance{
+					ID:              instanceId,
+					Name:            gofakeit.Name(),
+					DefaultOrgID:    "defaultOrgId",
+					IAMProjectID:    "iamProject",
+					ConsoleClientID: "consoleCLient",
+					ConsoleAppID:    "consoleApp",
+					DefaultLanguage: "defaultLanguage",
+				}
+				instanceRepo := repository.InstanceRepository()
+				err := instanceRepo.Create(t.Context(), pool, &instance)
+				require.NoError(t, err)
+
+				// create org
+				orgId := gofakeit.Name()
+				org := domain.Organization{
+					ID:         orgId,
+					Name:       gofakeit.Name(),
+					InstanceID: instanceId,
+					State:      domain.OrgStateActive,
+				}
+				organizationRepo := repository.OrganizationRepository()
+				err = organizationRepo.Create(t.Context(), pool, &org)
+				require.NoError(t, err)
+
+				setting := domain.LabelSetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						ID:         gofakeit.Name(),
+						Type:       domain.SettingTypeLabel,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
+					},
+					Settings: domain.LabelSettings{
+						IsDefault:           false,
+						PrimaryColor:        "value",
+						BackgroundColor:     "value",
+						WarnColor:           "value",
+						FontColor:           "value",
+						PrimaryColorDark:    "value",
+						BackgroundColorDark: "value",
+						WarnColorDark:       "value",
+						FontColorDark:       "value",
+						HideLoginNameSuffix: true,
+						ErrorMsgPopup:       true,
+						DisableWatermark:    true,
+						ThemeMode:           domain.LabelPolicyThemeAuto,
+					},
+				}
+				err = settingRepo.CreateLabel(t.Context(), pool, &setting)
+				require.NoError(t, err)
+
+				// update settings values
+				setting.Settings.IsDefault = true
+				setting.Settings.PrimaryColor = "new_value"
+				setting.Settings.BackgroundColor = "new_value"
+				setting.Settings.WarnColor = "new_value"
+				setting.Settings.FontColor = "new_value"
+				setting.Settings.PrimaryColorDark = "new_value"
+				setting.Settings.BackgroundColorDark = "new_value"
+				setting.Settings.WarnColorDark = "new_value"
+				setting.Settings.FontColorDark = "new_value"
+				setting.Settings.HideLoginNameSuffix = false
+				setting.Settings.ErrorMsgPopup = false
+				setting.Settings.DisableWatermark = false
+				setting.Settings.ThemeMode = domain.LabelPolicyThemeLight
+
+				return &setting
+			},
+		},
+		{
+			name: "happy path activate label settings, with preexisting active label",
+			testFunc: func(t *testing.T, pool database.QueryExecutor) *domain.LabelSetting {
+				// create instance
+				instanceId := gofakeit.Name()
+				instance := domain.Instance{
+					ID:              instanceId,
+					Name:            gofakeit.Name(),
+					DefaultOrgID:    "defaultOrgId",
+					IAMProjectID:    "iamProject",
+					ConsoleClientID: "consoleCLient",
+					ConsoleAppID:    "consoleApp",
+					DefaultLanguage: "defaultLanguage",
+				}
+				instanceRepo := repository.InstanceRepository()
+				err := instanceRepo.Create(t.Context(), pool, &instance)
+				require.NoError(t, err)
+
+				// create org
+				orgId := gofakeit.Name()
+				org := domain.Organization{
+					ID:         orgId,
+					Name:       gofakeit.Name(),
+					InstanceID: instanceId,
+					State:      domain.OrgStateActive,
+				}
+				organizationRepo := repository.OrganizationRepository()
+				err = organizationRepo.Create(t.Context(), pool, &org)
+				require.NoError(t, err)
+
+				setting := domain.LabelSetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						ID:         gofakeit.Name(),
+						Type:       domain.SettingTypeLabel,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
+					},
+					Settings: domain.LabelSettings{
+						IsDefault:           false,
+						PrimaryColor:        "value",
+						BackgroundColor:     "value",
+						WarnColor:           "value",
+						FontColor:           "value",
+						PrimaryColorDark:    "value",
+						BackgroundColorDark: "value",
+						WarnColorDark:       "value",
+						FontColorDark:       "value",
+						HideLoginNameSuffix: true,
+						ErrorMsgPopup:       true,
+						DisableWatermark:    true,
+						ThemeMode:           domain.LabelPolicyThemeAuto,
+					},
+				}
+				err = settingRepo.CreateLabel(t.Context(), pool, &setting)
+				require.NoError(t, err)
+
+				// update settings values
+				setting.Settings.IsDefault = true
+				setting.Settings.PrimaryColor = "new_value"
+				setting.Settings.BackgroundColor = "new_value"
+				setting.Settings.WarnColor = "new_value"
+				setting.Settings.FontColor = "new_value"
+				setting.Settings.PrimaryColorDark = "new_value"
+				setting.Settings.BackgroundColorDark = "new_value"
+				setting.Settings.WarnColorDark = "new_value"
+				setting.Settings.FontColorDark = "new_value"
+				setting.Settings.HideLoginNameSuffix = false
+				setting.Settings.ErrorMsgPopup = false
+				setting.Settings.DisableWatermark = false
+				setting.Settings.ThemeMode = domain.LabelPolicyThemeLight
+
+				return &setting
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			setting := tt.testFunc(t, pool)
+
+			before := time.Now()
+			err := settingRepo.ActivateLabelSetting(
+				t.Context(),
+				pool,
+				setting,
+			)
+			require.NoError(t, err)
+			after := time.Now()
+
+			updatedSetting, err := settingRepo.GetLabel(
+				t.Context(),
+				pool,
+				setting.InstanceID,
+				setting.OrgID,
+				domain.LabelStateActivated,
+			)
+			require.NoError(t, err)
+
+			assert.Equal(t, setting.Settings, updatedSetting.Settings)
+			assert.Equal(t, domain.LabelStateActivated, *updatedSetting.LabelState)
+			assert.WithinRange(t, *updatedSetting.UpdatedAt, before, after)
 		})
 	}
 }

@@ -199,15 +199,29 @@ func (s *settings) UpdateLabel(ctx context.Context, client database.QueryExecuto
 	return s.updateSetting(ctx, client, setting.Setting, &setting.Settings, changes...)
 }
 
-const upsertLabelSettingStmt = `INSERT INTO zitadel.settings` +
-	` (instance_id, org_id, type, label_state, settings, created_at, updated_at)` +
-	` VALUES ($1, $2, $3, $4, $5, $6, $7)` +
+const activatedLabelSettingStmt = `INSERT INTO zitadel.settings` +
+	` (instance_id, org_id, type, label_state, settings)` +
+	` VALUES ($1, $2, 'label', 'activated', $3)` +
 	` ON CONFLICT (instance_id, org_id, type, label_state) WHERE type = 'label' DO UPDATE SET` +
-	` settings = EXCLUDED.settings, updated_at = EXCLUDED.updated_at` +
+	` settings = EXCLUDED.settings` +
 	` RETURNING id, created_at, updated_at`
 
-func (s *settings) ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *domain.LabelSetting) (int64, error) {
-	return 0, nil
+func (s *settings) ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *domain.LabelSetting) error {
+	builder := database.StatementBuilder{}
+
+	settingJSON, err := json.Marshal(setting.Settings)
+	if err != nil {
+		return err
+	}
+
+	builder.AppendArgs(
+		setting.InstanceID,
+		setting.OrgID,
+		string(settingJSON))
+
+	builder.WriteString(activatedLabelSettingStmt)
+
+	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.ID, &setting.CreatedAt, &setting.UpdatedAt)
 }
 
 func (s *settings) CreatePasswordComplexity(ctx context.Context, client database.QueryExecutor, setting *domain.PasswordComplexitySetting) error {
