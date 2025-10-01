@@ -199,6 +199,17 @@ func (s *settings) UpdateLabel(ctx context.Context, client database.QueryExecuto
 	return s.updateSetting(ctx, client, setting.Setting, &setting.Settings, changes...)
 }
 
+const upsertLabelSettingStmt = `INSERT INTO zitadel.settings` +
+	` (instance_id, org_id, type, label_state, settings, created_at, updated_at)` +
+	` VALUES ($1, $2, $3, $4, $5, $6, $7)` +
+	` ON CONFLICT (instance_id, org_id, type, label_state) WHERE type = 'label' DO UPDATE SET` +
+	` settings = EXCLUDED.settings, updated_at = EXCLUDED.updated_at` +
+	` RETURNING id, created_at, updated_at`
+
+func (s *settings) ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *domain.LabelSetting) (int64, error) {
+	return 0, nil
+}
+
 func (s *settings) CreatePasswordComplexity(ctx context.Context, client database.QueryExecutor, setting *domain.PasswordComplexitySetting) error {
 	if setting == nil {
 		return ErrSettingObjectMustNotBeNil
