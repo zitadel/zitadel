@@ -60,12 +60,12 @@ func (u *UpdateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err 
 	}
 
 	if org.Name == u.Name {
-		err = NewOrgNameNotChangedError("DOM-nDzwIu")
+		err = zerrors.ThrowPreconditionFailed(nil, "DOM-nDzwIu", "Errors.Org.NotChanged")
 		return err
 	}
 
 	if org.State == OrgStateInactive || org.State == OrgStateUnspecified {
-		err = NewOrgNotFoundError("DOM-OcA1jq")
+		err = zerrors.ThrowNotFound(nil, "DOM-OcA1jq", "Errors.Org.NotFound")
 		return err
 	}
 
@@ -88,11 +88,11 @@ func (u *UpdateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err 
 	}
 
 	if updateCount == 0 {
-		err = NewOrgNotFoundError("DOM-7PfSUn")
+		err = zerrors.ThrowNotFound(nil, "DOM-7PfSUn", "Errors.Org.NotFound")
 		return err
 	}
 	if updateCount > 1 {
-		err = NewMultipleOrgsUpdatedError("DOM-QzITrx", 1, updateCount)
+		err = zerrors.ThrowInternal(NewMultipleOrgsUpdatedError(1, updateCount), "DOM-QzITrx", "unexpected number of rows updated")
 		return err
 	}
 

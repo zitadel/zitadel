@@ -7,6 +7,7 @@ import (
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 )
 
@@ -62,7 +63,7 @@ func TestBaseCommand_OperationMapper(t *testing.T) {
 		{
 			name:           "unknown operation",
 			queryOperation: object.TextQueryMethod(99),
-			expectedError:  domain.NewUnexpectedTextQueryOperationError("DOM-iBRBVe", object.TextQueryMethod(99)),
+			expectedError:  zerrors.ThrowInvalidArgument(domain.NewUnexpectedTextQueryOperationError(object.TextQueryMethod(99)), "DOM-iBRBVe", "List.Query.Invalid"),
 		},
 	}
 

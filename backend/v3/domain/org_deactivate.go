@@ -64,11 +64,11 @@ func (d *DeactivateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (
 	}
 
 	if updateCount == 0 {
-		err = NewOrgNotFoundError("DOM-vWPy7D")
+		err = zerrors.ThrowNotFound(nil, "DOM-vWPy7D", "Errors.Org.NotFound")
 		return err
 	}
 	if updateCount > 1 {
-		err = NewMultipleOrgsUpdatedError("DOM-dXl1kJ", 1, updateCount)
+		err = zerrors.ThrowInternal(NewMultipleOrgsUpdatedError(1, updateCount), "DOM-dXl1kJ", "unexpected number of rows updated")
 		return err
 	}
 

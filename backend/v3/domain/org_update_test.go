@@ -99,7 +99,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			},
 			inputID:       "org-1",
 			inputName:     "test org update",
-			expectedError: domain.NewOrgNameNotChangedError("DOM-nDzwIu"),
+			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-nDzwIu", "Errors.Org.NotChanged"),
 		},
 		{
 			testName: "when org state is inactive should return not found error",
@@ -126,7 +126,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			},
 			inputID:       "org-1",
 			inputName:     "test org update",
-			expectedError: domain.NewOrgNotFoundError("DOM-OcA1jq"),
+			expectedError: zerrors.ThrowNotFound(nil, "DOM-OcA1jq", "Errors.Org.NotFound"),
 		},
 		{
 			testName: "when org state is unspecified should return not found error",
@@ -153,7 +153,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			},
 			inputID:       "org-1",
 			inputName:     "test org update",
-			expectedError: domain.NewOrgNotFoundError("DOM-OcA1jq"),
+			expectedError: zerrors.ThrowNotFound(nil, "DOM-OcA1jq", "Errors.Org.NotFound"),
 		},
 		{
 			testName: "when setting domain info fails should return error",
@@ -271,7 +271,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 					Return(int64(0), nil)
 				return func() domain.OrganizationRepository { return repo }
 			},
-			expectedError:          domain.NewOrgNotFoundError("DOM-7PfSUn"),
+			expectedError:          zerrors.ThrowNotFound(nil, "DOM-7PfSUn", "Errors.Org.NotFound"),
 			expectedOldDomainName:  gu.Ptr("old-org-name."),
 			expectedDomainVerified: gu.Ptr(true),
 		},
@@ -316,7 +316,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			},
 			inputID:                "org-1",
 			inputName:              "test org update",
-			expectedError:          domain.NewMultipleOrgsUpdatedError("DOM-QzITrx", 1, 2),
+			expectedError:          zerrors.ThrowInternal(domain.NewMultipleOrgsUpdatedError(1, 2), "DOM-QzITrx", "unexpected number of rows updated"),
 			expectedOldDomainName:  gu.Ptr("old-org-name."),
 			expectedDomainVerified: gu.Ptr(true),
 		},

@@ -2,6 +2,7 @@ package domain
 
 import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 )
 
@@ -30,6 +31,6 @@ func (b *BaseCommand) TextOperationMapper(queryOperation object.TextQueryMethod)
 	case object.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE:
 		return database.TextOperationStartsWithIgnoreCase, nil
 	default:
-		return 0, NewUnexpectedTextQueryOperationError("DOM-iBRBVe", queryOperation)
+		return 0, zerrors.ThrowInvalidArgument(NewUnexpectedTextQueryOperationError(queryOperation), "DOM-iBRBVe", "List.Query.Invalid")
 	}
 }

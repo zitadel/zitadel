@@ -224,7 +224,7 @@ func TestDeactivateOrgCommand_Execute(t *testing.T) {
 					Return(int64(0), nil)
 				return func() domain.OrganizationRepository { return repo }
 			},
-			expectedError: domain.NewOrgNotFoundError("DOM-vWPy7D"),
+			expectedError: zerrors.ThrowNotFound(nil, "DOM-vWPy7D", "Errors.Org.NotFound"),
 		},
 		{
 			testName: "when org update returns more than 1 row updated should return internal error",
@@ -256,7 +256,7 @@ func TestDeactivateOrgCommand_Execute(t *testing.T) {
 				return func() domain.OrganizationRepository { return repo }
 			},
 			inputID:       "org-1",
-			expectedError: domain.NewMultipleOrgsUpdatedError("DOM-dXl1kJ", 1, 2),
+			expectedError: zerrors.ThrowInternal(domain.NewMultipleOrgsUpdatedError(1, 2), "DOM-dXl1kJ", "unexpected number of rows updated"),
 		},
 		{
 			testName: "when org update returns 1 row updated should return no error and set non-primary verified domain",

@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	v2_org "github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
@@ -109,7 +110,7 @@ func (l *ListOrgsCommand) conditions(ctx context.Context, orgRepo OrganizationRe
 		case *v2_org.SearchQuery_StateQuery:
 			conditions[i] = orgRepo.StateCondition(OrgState(assertedType.StateQuery.GetState()))
 		default:
-			return nil, NewUnexpectedQueryTypeError("DOM-TCEzcr", assertedType)
+			return nil, zerrors.ThrowInvalidArgument(NewUnexpectedQueryTypeError(assertedType), "DOM-TCEzcr", "List.Query.Invalid")
 		}
 	}
 

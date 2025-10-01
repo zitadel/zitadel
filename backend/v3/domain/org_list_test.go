@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dbmock"
 	noopdb "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/noop"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 )
@@ -209,7 +210,7 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 				},
 				},
 			},
-			expectedError: domain.NewUnexpectedTextQueryOperationError("DOM-iBRBVe", object.TextQueryMethod(99)),
+			expectedError: zerrors.ThrowInvalidArgument(domain.NewUnexpectedTextQueryOperationError(object.TextQueryMethod(99)), "DOM-iBRBVe", "List.Query.Invalid"),
 		},
 		{
 			testName: "when listing orgs fails should return error",
