@@ -134,7 +134,7 @@ func (d *DeleteOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err 
 	}
 
 	if deletedRows < 1 {
-		err = zerrors.ThrowNotFoundf(nil, "DOM-ur6Qyv", "organization not found")
+		err = zerrors.ThrowNotFound(nil, "DOM-ur6Qyv", "organization not found")
 	}
 	return err
 }
