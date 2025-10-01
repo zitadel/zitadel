@@ -17,7 +17,7 @@ import (
 )
 
 func TestServer_TestInstanceReduces(t *testing.T) {
-	instanceRepo := repository.InstanceRepository(pool)
+	instanceRepo := repository.InstanceRepository()
 
 	t.Run("test instance add reduces", func(t *testing.T) {
 		instanceName := gofakeit.Name()
@@ -46,7 +46,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			instance, err := instanceRepo.Get(CTX,
+			instance, err := instanceRepo.Get(CTX, pool,
 				database.WithCondition(instanceRepo.IDCondition(instance.GetInstanceId())),
 			)
 			require.NoError(t, err)
@@ -92,7 +92,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 		// check instance exists
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			instance, err := instanceRepo.Get(CTX,
+			instance, err := instanceRepo.Get(CTX, pool,
 				database.WithCondition(instanceRepo.IDCondition(res.GetInstanceId())),
 			)
 			require.NoError(t, err)
@@ -110,7 +110,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			instance, err := instanceRepo.Get(CTX,
+			instance, err := instanceRepo.Get(CTX, pool,
 				database.WithCondition(instanceRepo.IDCondition(res.GetInstanceId())),
 			)
 			require.NoError(t, err)
@@ -137,7 +137,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 		// check instance exists
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			instance, err := instanceRepo.Get(CTX,
+			instance, err := instanceRepo.Get(CTX, pool,
 				database.WithCondition(instanceRepo.IDCondition(res.GetInstanceId())),
 			)
 			require.NoError(t, err)
@@ -151,7 +151,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			instance, err := instanceRepo.Get(CTX,
+			instance, err := instanceRepo.Get(CTX, pool,
 				database.WithCondition(instanceRepo.IDCondition(res.GetInstanceId())),
 			)
 			// event instance.removed

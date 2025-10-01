@@ -51,8 +51,7 @@ async function resolveOrganizationForUser({
       serviceUrl,
       domain: suffix,
     });
-    const orgToCheckForDiscovery =
-      orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
+    const orgToCheckForDiscovery = orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
 
     if (orgToCheckForDiscovery) {
       const orgLoginSettings = await getLoginSettings({
@@ -141,12 +140,7 @@ export default async function Page(props: {
       }
     }
 
-    return loginSuccess(
-      userId,
-      { idpIntentId: id, idpIntentToken: token },
-      requestId,
-      branding,
-    );
+    return loginSuccess(userId, { idpIntentId: id, idpIntentToken: token }, requestId, branding);
   }
 
   if (link) {
@@ -174,12 +168,7 @@ export default async function Page(props: {
     if (!idpLink) {
       return linkingFailed(branding);
     } else {
-      return linkingSuccess(
-        userId,
-        { idpIntentId: id, idpIntentToken: token },
-        requestId,
-        branding,
-      );
+      return linkingSuccess(userId, { idpIntentId: id, idpIntentToken: token }, requestId, branding);
     }
   }
 
@@ -230,12 +219,7 @@ export default async function Page(props: {
       if (!idpLink) {
         return linkingFailed(branding);
       } else {
-        return linkingSuccess(
-          foundUser.userId,
-          { idpIntentId: id, idpIntentToken: token },
-          requestId,
-          branding,
-        );
+        return linkingSuccess(foundUser.userId, { idpIntentId: id, idpIntentToken: token }, requestId, branding);
       }
     }
   }
@@ -260,10 +244,7 @@ export default async function Page(props: {
         organization: organizationSchema,
       });
     } else {
-      addHumanUserWithOrganization = create(
-        AddHumanUserRequestSchema,
-        addHumanUser,
-      );
+      addHumanUserWithOrganization = create(AddHumanUserRequestSchema, addHumanUser);
     }
 
     try {
@@ -272,16 +253,10 @@ export default async function Page(props: {
         request: addHumanUserWithOrganization,
       });
     } catch (error: unknown) {
-      console.error(
-        "An error occurred while creating the user:",
-        error,
-        addHumanUser,
-      );
+      console.error("An error occurred while creating the user:", error, addHumanUser);
       return loginFailed(
         branding,
-        (error as ConnectError).message
-          ? (error as ConnectError).message
-          : "Could not create user",
+        (error as ConnectError).message ? (error as ConnectError).message : "Could not create user",
       );
     }
   } else if (options?.isCreationAllowed) {
@@ -325,11 +300,7 @@ export default async function Page(props: {
           <p className="ztdl-p">
             <Translated i18nKey="registerSuccess.description" namespace="idp" />
           </p>
-          <IdpSignin
-            userId={newUser.userId}
-            idpIntent={{ idpIntentId: id, idpIntentToken: token }}
-            requestId={requestId}
-          />
+          <IdpSignin userId={newUser.userId} idpIntent={{ idpIntentId: id, idpIntentToken: token }} requestId={requestId} />
         </div>
       </DynamicTheme>
     );

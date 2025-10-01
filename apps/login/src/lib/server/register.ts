@@ -1,14 +1,16 @@
 "use server";
 
 import { createSessionAndUpdateCookie, createSessionForIdpAndUpdateCookie } from "@/lib/server/cookie";
-import { addHumanUser, addIDPLink, getLoginSettings, getUserByID } from "@/lib/zitadel";
+import { addHumanUser, addIDPLink, getLoginSettings, getUserByID, listAuthenticationMethodTypes } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksJson, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
+import crypto from "crypto";
 import { completeFlowOrGetUrl } from "../client";
 import { getServiceUrlFromHeaders } from "../service-url";
-import { checkEmailVerification } from "../verify-helper";
+import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
+import { getOrSetFingerprintId } from "../fingerprint";
 
 type RegisterUserCommand = {
   email: string;
@@ -27,11 +29,6 @@ export type RegisterUserResponse = {
 export async function registerUser(command: RegisterUserCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
 
   const addResponse = await addHumanUser({
     serviceUrl,
@@ -83,6 +80,21 @@ export async function registerUser(command: RegisterUserCommand) {
     if (command.requestId) {
       params.append("requestId", command.requestId);
     }
+
+    // Set verification cookie for users registering with passkey (no password)
+    // This allows them to proceed with passkey registration without additional verification
+    const cookiesList = await cookies();
+    const userAgentId = await getOrSetFingerprintId();
+
+    const verificationCheck = crypto.createHash("sha256").update(`${session.factors.user.id}:${userAgentId}`).digest("hex");
+
+    await cookiesList.set({
+      name: "verificationCheck",
+      value: verificationCheck,
+      httpOnly: true,
+      path: "/",
+      maxAge: 300, // 5 minutes
+    });
 
     return { redirect: "/passkey/set?" + params };
   } else {
@@ -147,13 +159,8 @@ export type registerUserAndLinkToIDPResponse = {
 export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDPommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
 
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
-
-  const addResponse = await addHumanUser({
+  const addUserResponse = await addHumanUser({
     serviceUrl,
     email: command.email,
     firstName: command.firstName,
@@ -161,7 +168,7 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
     organization: command.organization,
   });
 
-  if (!addResponse) {
+  if (!addUserResponse) {
     return { error: "Could not create user" };
   }
 
@@ -177,7 +184,7 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
       userId: command.idpUserId,
       userName: command.idpUserName,
     },
-    userId: addResponse.userId,
+    userId: addUserResponse.userId,
   });
 
   if (!idpLink) {
@@ -186,13 +193,58 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
 
   const session = await createSessionForIdpAndUpdateCookie({
     requestId: command.requestId,
-    userId: addResponse.userId, // the user we just created
+    userId: addUserResponse.userId, // the user we just created
     idpIntent: command.idpIntent,
     lifetime: loginSettings?.externalLoginCheckLifetime,
   });
 
   if (!session || !session.factors?.user) {
     return { error: "Could not create session" };
+  }
+
+  // const userResponse = await getUserByID({
+  //   serviceUrl,
+  //   userId: session?.factors?.user?.id,
+  // });
+
+  // if (!userResponse.user) {
+  //   return { error: "User not found in the system" };
+  // }
+
+  // const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
+
+  // check to see if user was verified
+  // const emailVerificationCheck = checkEmailVerification(session, humanUser, command.organization, command.requestId);
+
+  // if (emailVerificationCheck?.redirect) {
+  //   return emailVerificationCheck;
+  // }
+
+  // check if user has MFA methods
+  let authMethods;
+  if (session.factors?.user?.id) {
+    const response = await listAuthenticationMethodTypes({
+      serviceUrl,
+      userId: session.factors.user.id,
+    });
+    if (response.authMethodTypes && response.authMethodTypes.length) {
+      authMethods = response.authMethodTypes;
+    }
+  }
+
+  // Always check MFA factors, even if no auth methods are configured
+  // This ensures that force MFA settings are respected
+  const mfaFactorCheck = await checkMFAFactors(
+    serviceUrl,
+    session,
+    loginSettings,
+    authMethods || [], // Pass empty array if no auth methods
+    command.organization,
+    command.requestId,
+  );
+
+  if (mfaFactorCheck?.redirect) {
+    return mfaFactorCheck;
   }
 
   return completeFlowOrGetUrl(
