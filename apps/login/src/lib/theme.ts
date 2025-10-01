@@ -40,7 +40,7 @@ export const DEFAULT_THEME: ThemeConfig = {
   roundness: "mid",
   componentRoundness: DEFAULT_COMPONENT_ROUNDNESS,
   layout: "top-to-bottom",
-  appearance: "material",
+  appearance: "flat",
   spacing: "regular",
 };
 
@@ -137,7 +137,8 @@ export const APPEARANCE_STYLES = {
   material: {
     card: "bg-background-light-400 dark:bg-background-dark-500 shadow-sm border-0",
     button: "shadow hover:shadow-xl active:shadow-xl", // Material shadows for buttons
-    "idp-button": "border border-button-light-border dark:border-button-dark-border shadow hover:shadow-xl active:shadow-xl", // Material shadows for IDP buttons
+    "idp-button":
+      "!bg-background-[#00000020] !dark:bg-background-[#ffffff50] transition shadow shadow-md hover:shadow-lg active:shadow-xl", // Material shadows for IDP buttons
     typography: "font-medium",
     background: "bg-background-light-400 dark:bg-background-dark-500", // Current system (shade 400)
   },
