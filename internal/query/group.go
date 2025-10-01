@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -80,6 +81,28 @@ type GroupSearchQuery struct {
 	Queries []SearchQuery
 }
 
+func (q *Queries) GetGroupByID(ctx context.Context, id string) (group *Group, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	stmt, scan := prepareGroupQuery()
+	eq := sq.Eq{
+		GroupColumnID.identifier():         id,
+		GroupColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	query, args, err := stmt.Where(eq).ToSql()
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-8bde1", "Errors.Query.SQLStatement")
+	}
+
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		group, err = scan(row)
+		return err
+	}, query, args...)
+	return group, err
+
+}
+
 // SearchGroups returns the list of groups that match the search criteria
 func (q *Queries) SearchGroups(ctx context.Context, queries *GroupSearchQuery) (_ *Groups, err error) {
 	ctx, span := tracing.NewSpan(ctx)
@@ -106,6 +129,42 @@ func NewGroupIDsSearchQuery(ids []string) (SearchQuery, error) {
 
 func NewGroupOrganizationIdSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(GroupColumnResourceOwner, id, TextEquals)
+}
+
+func prepareGroupQuery() (sq.SelectBuilder, func(*sql.Row) (*Group, error)) {
+	return sq.Select(
+			GroupColumnID.identifier(),
+			GroupColumnName.identifier(),
+			GroupColumnDescription.identifier(),
+			GroupColumnCreationDate.identifier(),
+			GroupColumnChangeDate.identifier(),
+			GroupColumnResourceOwner.identifier(),
+			GroupColumnInstanceID.identifier(),
+			GroupColumnSequence.identifier(),
+			GroupColumnState.identifier()).
+			From(groupsTable.identifier()).
+			PlaceholderFormat(sq.Dollar),
+		func(row *sql.Row) (*Group, error) {
+			group := new(Group)
+			err := row.Scan(
+				&group.ID,
+				&group.Name,
+				&group.Description,
+				&group.CreationDate,
+				&group.ChangeDate,
+				&group.ResourceOwner,
+				&group.InstanceID,
+				&group.Sequence,
+				&group.State,
+			)
+			if err != nil {
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-SG4WbR", "Errors.Group.NotFound")
+				}
+				return nil, zerrors.ThrowInternal(err, "QUERY-6yHJEz", "Errors.Internal")
+			}
+			return group, nil
+		}
 }
 
 func (q *Queries) searchGroups(ctx context.Context, queries *GroupSearchQuery) (groups *Groups, err error) {

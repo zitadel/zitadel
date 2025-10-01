@@ -25,7 +25,7 @@ var (
 		` COUNT(*) OVER ()` +
 		` FROM projections.groups1`
 
-	groupColumns = []string{
+	prepareGroupsColumns = []string{
 		"id",
 		"name",
 		"description",
@@ -36,6 +36,29 @@ var (
 		"sequence",
 		"state",
 		"count",
+	}
+
+	prepareGroupStmt = `SELECT projections.groups1.id,` +
+		` projections.groups1.name,` +
+		` projections.groups1.description,` +
+		` projections.groups1.creation_date,` +
+		` projections.groups1.change_date,` +
+		` projections.groups1.resource_owner,` +
+		` projections.groups1.instance_id,` +
+		` projections.groups1.sequence,` +
+		` projections.groups1.state` +
+		` FROM projections.groups1`
+
+	prepareGroupColumns = []string{
+		"id",
+		"name",
+		"description",
+		"creation_date",
+		"change_date",
+		"resource_owner",
+		"instance_id",
+		"sequence",
+		"state",
 	}
 )
 
@@ -51,7 +74,7 @@ func Test_GroupPrepares(t *testing.T) {
 		object  interface{}
 	}{
 		{
-			name:    "prepareGroupsQuery no result",
+			name:    "prepareGroupsQuery, no result",
 			prepare: prepareGroupsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
@@ -68,7 +91,7 @@ func Test_GroupPrepares(t *testing.T) {
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(prepareGroupsStmt),
-					groupColumns,
+					prepareGroupsColumns,
 					[][]driver.Value{
 						{
 							"9090",
@@ -109,7 +132,7 @@ func Test_GroupPrepares(t *testing.T) {
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(prepareGroupsStmt),
-					groupColumns,
+					prepareGroupsColumns,
 					[][]driver.Value{
 						{
 							"9091",
@@ -167,7 +190,7 @@ func Test_GroupPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareGroupsQuery sql err",
+			name:    "prepareGroupsQuery, sql err",
 			prepare: prepareGroupsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
@@ -184,7 +207,7 @@ func Test_GroupPrepares(t *testing.T) {
 			object: (*Groups)(nil),
 		},
 		{
-			name:    "prepareGroupsQuery no result",
+			name:    "prepareGroupsQuery, no result",
 			prepare: prepareGroupsQuery,
 			want: want{
 				sqlExpectations: mockQueriesScanErr(
@@ -204,6 +227,73 @@ func Test_GroupPrepares(t *testing.T) {
 					Count: 0,
 				},
 				Groups: []*Group{},
+			},
+		},
+		{
+			name:    "prepareGroupQuery, no result",
+			prepare: prepareGroupQuery,
+			want: want{
+				sqlExpectations: mockQueriesScanErr(
+					prepareGroupStmt,
+					nil,
+					nil,
+				),
+				err: func(err error) (error, bool) {
+					if !zerrors.IsNotFound(err) {
+						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
+					}
+					return nil, true
+				},
+			},
+			object: (*Group)(nil),
+		},
+		{
+			name:    "prepareGroupQuery, sql err",
+			prepare: prepareGroupQuery,
+			want: want{
+				sqlExpectations: mockQueryErr(
+					regexp.QuoteMeta(prepareGroupStmt),
+					sql.ErrConnDone,
+				),
+				err: func(err error) (error, bool) {
+					if !errors.Is(err, sql.ErrConnDone) {
+						return fmt.Errorf("err should be sql.ErrConnDone got: %w", err), false
+					}
+					return nil, true
+				},
+			},
+			object: (*Group)(nil),
+		},
+		{
+			name:    "prepareGroupQuery, found",
+			prepare: prepareGroupQuery,
+			want: want{
+				sqlExpectations: mockQuery(
+					regexp.QuoteMeta(prepareGroupStmt),
+					prepareGroupColumns,
+					[]driver.Value{
+						"9090",
+						"group1",
+						"my new group",
+						testNow,
+						testNow,
+						"org1",
+						"instance1",
+						1,
+						domain.GroupStateActive,
+					},
+				),
+			},
+			object: &Group{
+				ID:            "9090",
+				Name:          "group1",
+				Description:   "my new group",
+				CreationDate:  testNow,
+				ChangeDate:    testNow,
+				ResourceOwner: "org1",
+				InstanceID:    "instance1",
+				Sequence:      1,
+				State:         domain.GroupStateActive,
 			},
 		},
 	}
