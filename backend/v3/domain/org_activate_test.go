@@ -20,14 +20,14 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func TestDeactivateOrgCommand_Events(t *testing.T) {
+func TestActivateOrgCommand_Events(t *testing.T) {
 	t.Parallel()
 	// Given
-	expected := []eventstore.Command{org.NewOrgDeactivatedEvent(context.Background(), &org.NewAggregate("some-id").Aggregate)}
-	deactivateCmd := domain.NewDeactivateOrgCommand("some-id")
+	expected := []eventstore.Command{org.NewOrgReactivatedEvent(context.Background(), &org.NewAggregate("some-id").Aggregate)}
+	activateCmd := domain.NewActivateOrgCommand("some-id")
 
 	// Test
-	actual, err := deactivateCmd.Events(context.Background(), &domain.CommandOpts{})
+	actual, err := activateCmd.Events(context.Background(), &domain.CommandOpts{})
 
 	// Verify
 
@@ -35,7 +35,7 @@ func TestDeactivateOrgCommand_Events(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
-func TestDeactivateOrgCommand_Validate(t *testing.T) {
+func TestActivateOrgCommand_Validate(t *testing.T) {
 	t.Parallel()
 	tt := []struct {
 		name          string
@@ -44,12 +44,12 @@ func TestDeactivateOrgCommand_Validate(t *testing.T) {
 	}{
 		{
 			name:          "empty org id",
-			expectedError: zerrors.ThrowInvalidArgument(nil, "DOM-Qc3T1r", "invalid organization ID"),
+			expectedError: zerrors.ThrowInvalidArgument(nil, "DOM-hJuuAv", "invalid organization ID"),
 		},
 		{
 			name:          "whitespace org id",
 			inputOrgID:    "   ",
-			expectedError: zerrors.ThrowInvalidArgument(nil, "DOM-Qc3T1r", "invalid organization ID"),
+			expectedError: zerrors.ThrowInvalidArgument(nil, "DOM-hJuuAv", "invalid organization ID"),
 		},
 		{
 			name:       "valid org id",
@@ -61,7 +61,7 @@ func TestDeactivateOrgCommand_Validate(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			// Given
-			cmd := domain.NewDeactivateOrgCommand(tc.inputOrgID)
+			cmd := domain.NewActivateOrgCommand(tc.inputOrgID)
 
 			// Test
 			err := cmd.Validate(context.Background(), &domain.CommandOpts{})
@@ -72,7 +72,7 @@ func TestDeactivateOrgCommand_Validate(t *testing.T) {
 	}
 }
 
-func TestDeactivateOrgCommand_Execute(t *testing.T) {
+func TestActivateOrgCommand_Execute(t *testing.T) {
 	t.Parallel()
 	txInitErr := errors.New("tx init error")
 	getErr := errors.New("get error")
@@ -136,7 +136,7 @@ func TestDeactivateOrgCommand_Execute(t *testing.T) {
 				return func() domain.OrganizationRepository { return repo }
 			},
 			inputID:       "org-1",
-			expectedError: zerrors.ThrowNotFound(database.NewNoRowFoundError(getErr), "DOM-QEjfpz", "Errors.Org.NotFound"),
+			expectedError: zerrors.ThrowNotFound(database.NewNoRowFoundError(getErr), "DOM-86HVfs", "Errors.Org.NotFound"),
 		},
 		{
 			testName: "when org state is removed should return not found error",
@@ -157,7 +157,7 @@ func TestDeactivateOrgCommand_Execute(t *testing.T) {
 				return func() domain.OrganizationRepository { return repo }
 			},
 			inputID:       "org-1",
-			expectedError: zerrors.ThrowNotFound(nil, "DOM-o2S37M", "Errors.Org.NotFound"),
+			expectedError: zerrors.ThrowNotFound(nil, "DOM-GYmWRT", "Errors.Org.NotFound"),
 		},
 		{
 			testName: "when org state is unspecified should return not found error",
@@ -178,10 +178,10 @@ func TestDeactivateOrgCommand_Execute(t *testing.T) {
 				return func() domain.OrganizationRepository { return repo }
 			},
 			inputID:       "org-1",
-			expectedError: zerrors.ThrowNotFound(nil, "DOM-o2S37M", "Errors.Org.NotFound"),
+			expectedError: zerrors.ThrowNotFound(nil, "DOM-GYmWRT", "Errors.Org.NotFound"),
 		},
 		{
-			testName: "when org state is inactive should return already inactive error",
+			testName: "when org state is active should return already active error",
 			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
@@ -194,12 +194,12 @@ func TestDeactivateOrgCommand_Execute(t *testing.T) {
 					Times(1).
 					Return(&domain.Organization{
 						ID:    "org-1",
-						State: domain.OrgStateInactive,
+						State: domain.OrgStateActive,
 					}, nil)
 				return func() domain.OrganizationRepository { return repo }
 			},
 			inputID:       "org-1",
-			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-Z2dzsT", "Errors.Org.AlreadyDeactivated"),
+			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-Ixfbxh", "Errors.Org.AlreadyActive"),
 		},
 		{
 			testName: "when org update fails should return error",
@@ -216,7 +216,7 @@ func TestDeactivateOrgCommand_Execute(t *testing.T) {
 					Return(&domain.Organization{
 						ID:         "org-1",
 						InstanceID: "instance-1",
-						State:      domain.OrgStateActive,
+						State:      domain.OrgStateInactive,
 					}, nil)
 
 				repo.EXPECT().
@@ -225,7 +225,7 @@ func TestDeactivateOrgCommand_Execute(t *testing.T) {
 							repo.IDCondition("org-1"),
 							repo.InstanceIDCondition("instance-1"),
 						),
-						repo.SetState(domain.OrgStateInactive),
+						repo.SetState(domain.OrgStateActive),
 					).
 					Times(1).
 					Return(int64(0), updateErr)
@@ -250,7 +250,7 @@ func TestDeactivateOrgCommand_Execute(t *testing.T) {
 					Return(&domain.Organization{
 						ID:         "org-1",
 						InstanceID: "instance-1",
-						State:      domain.OrgStateActive,
+						State:      domain.OrgStateInactive,
 					}, nil)
 
 				repo.EXPECT().
@@ -259,12 +259,12 @@ func TestDeactivateOrgCommand_Execute(t *testing.T) {
 							repo.IDCondition("org-1"),
 							repo.InstanceIDCondition("instance-1"),
 						),
-						repo.SetState(domain.OrgStateInactive)).
+						repo.SetState(domain.OrgStateActive)).
 					Times(1).
 					Return(int64(0), nil)
 				return func() domain.OrganizationRepository { return repo }
 			},
-			expectedError: zerrors.ThrowNotFound(nil, "DOM-vWPy7D", "Errors.Org.NotFound"),
+			expectedError: zerrors.ThrowNotFound(nil, "DOM-CGumXG", "Errors.Org.NotFound"),
 		},
 		{
 			testName: "when org update returns more than 1 row updated should return internal error",
@@ -281,7 +281,7 @@ func TestDeactivateOrgCommand_Execute(t *testing.T) {
 					Return(&domain.Organization{
 						ID:         "org-1",
 						InstanceID: "instance-1",
-						State:      domain.OrgStateActive,
+						State:      domain.OrgStateInactive,
 					}, nil)
 
 				repo.EXPECT().
@@ -290,13 +290,13 @@ func TestDeactivateOrgCommand_Execute(t *testing.T) {
 							repo.IDCondition("org-1"),
 							repo.InstanceIDCondition("instance-1"),
 						),
-						repo.SetState(domain.OrgStateInactive)).
+						repo.SetState(domain.OrgStateActive)).
 					Times(1).
 					Return(int64(2), nil)
 				return func() domain.OrganizationRepository { return repo }
 			},
 			inputID:       "org-1",
-			expectedError: zerrors.ThrowInternal(domain.NewMultipleOrgsUpdatedError(1, 2), "DOM-dXl1kJ", "unexpected number of rows updated"),
+			expectedError: zerrors.ThrowInternal(domain.NewMultipleOrgsUpdatedError(1, 2), "DOM-SEWCLp", "unexpected number of rows updated"),
 		},
 		{
 			testName: "when org update returns 1 row updated should return no error",
@@ -313,7 +313,7 @@ func TestDeactivateOrgCommand_Execute(t *testing.T) {
 					Return(&domain.Organization{
 						ID:         "org-1",
 						InstanceID: "instance-1",
-						State:      domain.OrgStateActive,
+						State:      domain.OrgStateInactive,
 					}, nil)
 
 				repo.EXPECT().
@@ -322,7 +322,7 @@ func TestDeactivateOrgCommand_Execute(t *testing.T) {
 							repo.IDCondition("org-1"),
 							repo.InstanceIDCondition("instance-1"),
 						),
-						repo.SetState(domain.OrgStateInactive)).
+						repo.SetState(domain.OrgStateActive)).
 					Times(1).
 					Return(int64(1), nil)
 				return func() domain.OrganizationRepository { return repo }
@@ -337,7 +337,7 @@ func TestDeactivateOrgCommand_Execute(t *testing.T) {
 			// Given
 			ctx := authz.NewMockContext("instance-1", "", "")
 			ctrl := gomock.NewController(t)
-			cmd := &domain.DeactivateOrgCommand{
+			cmd := &domain.ActivateOrgCommand{
 				ID: tc.inputID,
 			}
 
