@@ -159,3 +159,22 @@ func DeactivateOrganization(ctx context.Context, request *connect.Request[v2beta
 		},
 	}, nil
 }
+
+func ActivateOrganization(ctx context.Context, request *connect.Request[v2beta_org.ActivateOrganizationRequest]) (*connect.Response[v2beta_org.ActivateOrganizationResponse], error) {
+	orgDeactivateCmd := domain.NewActivateOrgCommand(request.Msg.GetId())
+
+	err := domain.Invoke(ctx, orgDeactivateCmd,
+		domain.WithOrganizationRepo(repository.OrganizationRepository),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &connect.Response[v2beta_org.ActivateOrganizationResponse]{
+		Msg: &v2beta_org.ActivateOrganizationResponse{
+			// TODO(IAM-Marco): Change this with the real update date when OrganizationRepo.Update()
+			// returns the timestamp
+			ChangeDate: timestamppb.Now(),
+		},
+	}, nil
+}

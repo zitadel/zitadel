@@ -149,6 +149,10 @@ func (s *Server) DeactivateOrganization(ctx context.Context, request *connect.Re
 }
 
 func (s *Server) ActivateOrganization(ctx context.Context, request *connect.Request[org.ActivateOrganizationRequest]) (*connect.Response[org.ActivateOrganizationResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return orgv2.ActivateOrganization(ctx, request)
+	}
+
 	objectDetails, err := s.command.ReactivateOrg(ctx, request.Msg.GetId())
 	if err != nil {
 		return nil, err
