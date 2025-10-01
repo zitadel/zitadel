@@ -15,6 +15,13 @@ declare namespace NodeJS {
     ZITADEL_API_URL: string;
 
     /**
+     * The Zitadel API internal url
+     * If set this url is always used to call zitadel.
+     * The serviceUrl is stripped of schema and used as 
+     */
+    ZITADEL_API_INTERNAL_URL: string;
+
+    /**
      * The service user token
      */
     ZITADEL_SERVICE_USER_TOKEN: string;

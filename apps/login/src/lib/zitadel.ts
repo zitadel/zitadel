@@ -1199,12 +1199,23 @@ export async function listAuthenticationMethodTypes({ serviceUrl, userId }: { se
 }
 
 export function createServerTransport(token: string, baseUrl: string) {
-  return libCreateServerTransport(token, {
-    baseUrl,
-    interceptors: !process.env.CUSTOM_REQUEST_HEADERS
-      ? undefined
-      : [
-          (next) => {
+  const interceptors: Parameters<typeof libCreateServerTransport>[1]["interceptors"] = []
+
+  // If internal url is set, always overwrite baseUrl.
+  // To make sure the correct instance is used, set x-zitadel-instance-host to the original baseUrl.
+  if(process.env.ZITADEL_API_INTERNAL_URL) {
+      const host = baseUrl.replace(/^https?:\/\//, '') 
+      interceptors.push((next) => {
+            return (req) => {
+              req.header.set("x-zitadel-instance-host", host);
+              return next(req);
+            };
+          })
+      baseUrl = process.env.ZITADEL_API_INTERNAL_URL
+  }
+
+  if(process.env.CUSTOM_REQUEST_HEADERS) {
+      interceptors.push((next) => {
             return (req) => {
               process.env.CUSTOM_REQUEST_HEADERS!.split(",").forEach((header) => {
                 const kv = header.split(":");
@@ -1216,7 +1227,11 @@ export function createServerTransport(token: string, baseUrl: string) {
               });
               return next(req);
             };
-          },
-        ],
-  });
+      })
+  }
+
+  return libCreateServerTransport(token, {
+    baseUrl,
+    interceptors: interceptors
+  })
 }
