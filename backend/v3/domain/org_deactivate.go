@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"errors"
 	"strings"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -43,11 +44,20 @@ func (d *DeactivateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (
 		),
 	))
 	if err != nil {
+		var notFoundError *database.NoRowFoundError
+		if errors.As(err, &notFoundError) {
+			err = zerrors.ThrowNotFound(err, "DOM-QEjfpz", "Errors.Org.NotFound")
+		}
 		return err
 	}
 
-	if org.State == OrgStateInactive || org.State == OrgStateUnspecified {
+	if org.State == OrgStateRemoved || org.State == OrgStateUnspecified {
 		err = zerrors.ThrowNotFound(nil, "DOM-o2S37M", "Errors.Org.NotFound")
+		return err
+	}
+
+	if org.State == OrgStateInactive {
+		err = zerrors.ThrowPreconditionFailed(nil, "DOM-Z2dzsT", "Errors.Org.AlreadyDeactivated")
 		return err
 	}
 

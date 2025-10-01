@@ -140,3 +140,22 @@ func DeleteOrganization(ctx context.Context, request *connect.Request[v2beta_org
 		},
 	}, nil
 }
+
+func DeactivateOrganization(ctx context.Context, request *connect.Request[v2beta_org.DeactivateOrganizationRequest]) (*connect.Response[v2beta_org.DeactivateOrganizationResponse], error) {
+	orgDeactivateCmd := domain.NewDeactivateOrgCommand(request.Msg.GetId())
+
+	err := domain.Invoke(ctx, orgDeactivateCmd,
+		domain.WithOrganizationRepo(repository.OrganizationRepository),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &connect.Response[v2beta_org.DeactivateOrganizationResponse]{
+		Msg: &v2beta_org.DeactivateOrganizationResponse{
+			// TODO(IAM-Marco): Change this with the real update date when OrganizationRepo.Update()
+			// returns the timestamp
+			ChangeDate: timestamppb.Now(),
+		},
+	}, nil
+}

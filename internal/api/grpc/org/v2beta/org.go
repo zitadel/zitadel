@@ -135,6 +135,10 @@ func (s *Server) DeleteOrganizationMetadata(ctx context.Context, request *connec
 }
 
 func (s *Server) DeactivateOrganization(ctx context.Context, request *connect.Request[org.DeactivateOrganizationRequest]) (*connect.Response[org.DeactivateOrganizationResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return orgv2.DeactivateOrganization(ctx, request)
+	}
+
 	objectDetails, err := s.command.DeactivateOrg(ctx, request.Msg.GetId())
 	if err != nil {
 		return nil, err

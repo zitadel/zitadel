@@ -874,96 +874,85 @@ func TestServer_ActivateOrganization(t *testing.T) {
 }
 
 func TestServer_DeactivateOrganization(t *testing.T) {
-	tests := []struct {
-		name     string
-		ctx      context.Context
-		testFunc func() string
-		err      error
-	}{
-		{
-			name: "Deactivate, happy path",
-			ctx:  CTX,
-			testFunc: func() string {
-				// 1. create organization
-				orgs, _, _ := createOrgs(CTX, t, Client, 1)
-				orgId := orgs[0].Id
+	t.Cleanup(func() {
+		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(CTX, &feature.ResetInstanceFeaturesRequest{})
+		require.NoError(t, err)
+	})
+	relTableState := integration.RelationalTablesEnableMatrix()
 
-				return orgId
-			},
-		},
-		{
-			name: "Deactivate, no permission",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
-			testFunc: func() string {
-				orgs, _, _ := createOrgs(CTX, t, Client, 1)
-				orgId := orgs[0].Id
-				return orgId
-			},
-			// BUG: this needs changing
-			err: errors.New("membership not found"),
-		},
-		{
-			name: "Deactivate, not existing",
-			ctx:  CTX,
-			testFunc: func() string {
-				return "non-existing-org-id"
-			},
-			err: errors.New("Organisation not found"),
-		},
-		{
-			name: "Deactivate, already deactivated",
-			ctx:  CTX,
-			testFunc: func() string {
-				// 1. create organization
-				orgs, _, _ := createOrgs(CTX, t, Client, 1)
-				orgId := orgs[0].Id
+	orgsNumPerCase := 2
+	orgs, _, _ := createOrgs(CTX, t, Client, orgsNumPerCase*len(relTableState))
+	require.NotNil(t, orgs)
+	require.NotEmpty(t, orgs)
 
-				// 2. deactivate organization once
-				deactivate_res, err := Client.DeactivateOrganization(CTX, &v2beta_org.DeactivateOrganizationRequest{
-					Id: orgId,
-				})
-				require.NoError(t, err)
-				gotCD := deactivate_res.GetChangeDate().AsTime()
-				now := time.Now()
-				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-
-				// 3. check organization state is deactivated
-				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
-				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-					listOrgRes, err := Client.ListOrganizations(CTX, &v2beta_org.ListOrganizationsRequest{
-						Filter: []*v2beta_org.OrganizationSearchFilter{
-							{
-								Filter: &v2beta_org.OrganizationSearchFilter_IdFilter{
-									IdFilter: &v2beta_org.OrgIDFilter{
-										Id: orgId,
-									},
-								},
-							},
-						},
-					})
-					require.NoError(ttt, err)
-					require.Equal(ttt, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
-				}, retryDuration, tick, "timeout waiting for expected organizations being created")
-
-				return orgId
-			},
-			err: errors.New("Organisation is already deactivated"),
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var orgId string
-			orgId = tt.testFunc()
-			_, err := Client.DeactivateOrganization(tt.ctx, &v2beta_org.DeactivateOrganizationRequest{
-				Id: orgId,
-			})
-			if tt.err != nil {
-				require.Contains(t, err.Error(), tt.err.Error())
-			} else {
-				require.NoError(t, err)
-			}
+	for i, stateCase := range relTableState {
+		deactivatedOrgID := orgs[1+(orgsNumPerCase*i)].GetId()
+		deactivateRes, err := Client.DeactivateOrganization(CTX, &v2beta_org.DeactivateOrganizationRequest{
+			Id: deactivatedOrgID,
 		})
+		require.NoError(t, err)
+		now := time.Now()
+		assert.WithinRange(t, deactivateRes.GetChangeDate().AsTime(), now.Add(-time.Minute), now.Add(time.Minute))
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 20*time.Second)
+		require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+			listOrgRes, err := Client.ListOrganizations(CTX, &v2beta_org.ListOrganizationsRequest{
+				Filter: []*v2beta_org.OrganizationSearchFilter{
+					{Filter: &v2beta_org.OrganizationSearchFilter_IdFilter{IdFilter: &v2beta_org.OrgIDFilter{Id: deactivatedOrgID}}},
+				},
+			})
+			assert.NoError(ttt, err)
+			assert.Equal(ttt, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
+		}, retryDuration, tick, "timeout waiting for expected organizations being created")
+
+		tt := []struct {
+			name       string
+			ctx        context.Context
+			inputOrgID string
+			err        error
+		}{
+			{
+				name:       "Deactivate, happy path",
+				ctx:        CTX,
+				inputOrgID: orgs[0+(orgsNumPerCase*i)].GetId(),
+			},
+			{
+				name:       "Deactivate, no permission",
+				ctx:        Instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
+				inputOrgID: orgs[0+(orgsNumPerCase*i)].GetId(),
+
+				// BUG: this needs changing
+				err: errors.New("membership not found"),
+			},
+			{
+				name:       "Deactivate, not existing",
+				ctx:        CTX,
+				inputOrgID: "non-existing-org-id",
+				err:        errors.New("Organisation not found"),
+			},
+			{
+				name:       "Deactivate, already deactivated",
+				ctx:        CTX,
+				inputOrgID: deactivatedOrgID,
+				err:        errors.New("Organisation is already deactivated"),
+			},
+		}
+
+		integration.EnsureInstanceFeature(t, CTX, Instance, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
+		})
+		for _, tc := range tt {
+			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tc.name), func(t *testing.T) {
+				_, err := Client.DeactivateOrganization(tc.ctx, &v2beta_org.DeactivateOrganizationRequest{
+					Id: tc.inputOrgID,
+				})
+				if tc.err != nil {
+					require.Contains(t, err.Error(), tc.err.Error())
+				} else {
+					require.NoError(t, err)
+				}
+			})
+		}
 	}
 }
 

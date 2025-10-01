@@ -101,7 +101,7 @@ func TestDeactivateOrgCommand_Execute(t *testing.T) {
 			expectedError: txInitErr,
 		},
 		{
-			testName: "when retrieving org fails should return error",
+			testName: "when retrieving org fails with generic error should return error",
 			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
@@ -120,7 +120,26 @@ func TestDeactivateOrgCommand_Execute(t *testing.T) {
 			expectedError: getErr,
 		},
 		{
-			testName: "when org state is inactive should return not found error",
+			testName: "when retrieving org fails with not found error should return not found error",
+			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
+				repo := domainmock.NewOrgRepo(ctrl)
+				repo.EXPECT().
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(
+						database.WithCondition(
+							database.And(
+								repo.IDCondition("org-1"),
+								repo.InstanceIDCondition("instance-1"),
+							),
+						))).
+					Times(1).
+					Return(nil, database.NewNoRowFoundError(getErr))
+				return func() domain.OrganizationRepository { return repo }
+			},
+			inputID:       "org-1",
+			expectedError: zerrors.ThrowNotFound(database.NewNoRowFoundError(getErr), "DOM-QEjfpz", "Errors.Org.NotFound"),
+		},
+		{
+			testName: "when org state is removed should return not found error",
 			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
@@ -133,7 +152,7 @@ func TestDeactivateOrgCommand_Execute(t *testing.T) {
 					Times(1).
 					Return(&domain.Organization{
 						ID:    "org-1",
-						State: domain.OrgStateInactive,
+						State: domain.OrgStateRemoved,
 					}, nil)
 				return func() domain.OrganizationRepository { return repo }
 			},
@@ -160,6 +179,27 @@ func TestDeactivateOrgCommand_Execute(t *testing.T) {
 			},
 			inputID:       "org-1",
 			expectedError: zerrors.ThrowNotFound(nil, "DOM-o2S37M", "Errors.Org.NotFound"),
+		},
+		{
+			testName: "when org state is inactive should return already inactive error",
+			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
+				repo := domainmock.NewOrgRepo(ctrl)
+				repo.EXPECT().
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
+						database.And(
+							repo.IDCondition("org-1"),
+							repo.InstanceIDCondition("instance-1"),
+						),
+					))).
+					Times(1).
+					Return(&domain.Organization{
+						ID:    "org-1",
+						State: domain.OrgStateInactive,
+					}, nil)
+				return func() domain.OrganizationRepository { return repo }
+			},
+			inputID:       "org-1",
+			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-Z2dzsT", "Errors.Org.AlreadyDeactivated"),
 		},
 		{
 			testName: "when org update fails should return error",
