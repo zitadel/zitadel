@@ -111,6 +111,8 @@ func writeTextOperation[T Text](builder *StatementBuilder, col Column, op TextOp
 	case TextOperationStartsWith:
 		writeOperation[T](builder, col, op.String(), value)
 		builder.WriteString(" || '%'")
+	case TextOperationContainsIgnoreCase, TextOperationEndsWithIgnoreCase, TextOperationStartsWithIgnoreCase, TextOperationEqualIgnoreCase, TextOperationNotEqualIgnoreCase:
+		fallthrough
 	default:
 		panic(fmt.Sprintf("unexpected database.TextOperation: %#v", op))
 	}
