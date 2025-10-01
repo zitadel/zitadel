@@ -30,7 +30,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 		testName string
 
 		queryExecutor func(ctrl *gomock.Controller) database.QueryExecutor
-		orgRepo       func(ctrl *gomock.Controller) func() domain.OrganizationRepository
+		orgRepo       func(ctrl *gomock.Controller) domain.OrganizationRepository
 
 		inputID   string
 		inputName string
@@ -53,7 +53,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 		},
 		{
 			testName: "when retrieving org fails should return error",
-			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
+			orgRepo: func(ctrl *gomock.Controller) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					LoadDomains().
@@ -69,7 +69,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 						))).
 					Times(1).
 					Return(nil, getErr)
-				return func() domain.OrganizationRepository { return repo }
+				return repo
 			},
 			inputID:       "org-1",
 			inputName:     "test org update",
@@ -77,7 +77,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 		},
 		{
 			testName: "when org name is not changed should return name not changed error",
-			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
+			orgRepo: func(ctrl *gomock.Controller) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					LoadDomains().
@@ -95,7 +95,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 						ID:   "org-1",
 						Name: "test org update",
 					}, nil)
-				return func() domain.OrganizationRepository { return repo }
+				return repo
 			},
 			inputID:       "org-1",
 			inputName:     "test org update",
@@ -103,7 +103,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 		},
 		{
 			testName: "when org state is inactive should return not found error",
-			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
+			orgRepo: func(ctrl *gomock.Controller) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					LoadDomains().
@@ -122,7 +122,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 						Name:  "old org name",
 						State: domain.OrgStateInactive,
 					}, nil)
-				return func() domain.OrganizationRepository { return repo }
+				return repo
 			},
 			inputID:       "org-1",
 			inputName:     "test org update",
@@ -130,7 +130,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 		},
 		{
 			testName: "when org state is unspecified should return not found error",
-			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
+			orgRepo: func(ctrl *gomock.Controller) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					LoadDomains().
@@ -149,7 +149,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 						Name:  "old org name",
 						State: domain.OrgStateUnspecified,
 					}, nil)
-				return func() domain.OrganizationRepository { return repo }
+				return repo
 			},
 			inputID:       "org-1",
 			inputName:     "test org update",
@@ -157,7 +157,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 		},
 		{
 			testName: "when setting domain info fails should return error",
-			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
+			orgRepo: func(ctrl *gomock.Controller) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					LoadDomains().
@@ -181,7 +181,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 							{IsPrimary: false, IsVerified: true, Domain: "old primary org name"},
 						},
 					}, nil)
-				return func() domain.OrganizationRepository { return repo }
+				return repo
 			},
 			inputID:       "org-1",
 			inputName:     "test org update",
@@ -189,7 +189,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 		},
 		{
 			testName: "when org update fails should return error",
-			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
+			orgRepo: func(ctrl *gomock.Controller) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					LoadDomains().
@@ -224,7 +224,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 					).
 					Times(1).
 					Return(int64(0), updateErr)
-				return func() domain.OrganizationRepository { return repo }
+				return repo
 			},
 			inputID:       "org-1",
 			inputName:     "test org update",
@@ -234,7 +234,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			testName:  "when org update returns 0 rows updated should return not found error",
 			inputID:   "org-1",
 			inputName: "test org update",
-			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
+			orgRepo: func(ctrl *gomock.Controller) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					LoadDomains().
@@ -269,7 +269,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 						repo.SetName("test org update")).
 					Times(1).
 					Return(int64(0), nil)
-				return func() domain.OrganizationRepository { return repo }
+				return repo
 			},
 			expectedError:          zerrors.ThrowNotFound(nil, "DOM-7PfSUn", "Errors.Org.NotFound"),
 			expectedOldDomainName:  gu.Ptr("old-org-name."),
@@ -277,7 +277,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 		},
 		{
 			testName: "when org update returns more than 1 row updated should return internal error",
-			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
+			orgRepo: func(ctrl *gomock.Controller) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					LoadDomains().
@@ -312,7 +312,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 						repo.SetName("test org update")).
 					Times(1).
 					Return(int64(2), nil)
-				return func() domain.OrganizationRepository { return repo }
+				return repo
 			},
 			inputID:                "org-1",
 			inputName:              "test org update",
@@ -322,7 +322,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 		},
 		{
 			testName: "when org update returns 1 row updated should return no error and set non-primary verified domain",
-			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
+			orgRepo: func(ctrl *gomock.Controller) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					LoadDomains().
@@ -357,7 +357,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 						repo.SetName("test org update")).
 					Times(1).
 					Return(int64(1), nil)
-				return func() domain.OrganizationRepository { return repo }
+				return repo
 			},
 			inputID:   "org-1",
 			inputName: "test org update",

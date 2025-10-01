@@ -35,7 +35,7 @@ func (d *DeactivateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (
 	}
 	defer func() { err = close(ctx, err) }()
 
-	organizationRepo := opts.organizationRepo()
+	organizationRepo := opts.organizationRepo
 
 	org, err := organizationRepo.Get(ctx, pool, database.WithCondition(
 		database.And(

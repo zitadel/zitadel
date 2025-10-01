@@ -31,15 +31,15 @@ type Invoker interface {
 type CommandOpts struct {
 	DB                     database.QueryExecutor
 	Invoker                Invoker
-	organizationRepo       func() OrganizationRepository
-	organizationDomainRepo func() OrganizationDomainRepository
+	organizationRepo       OrganizationRepository
+	organizationDomainRepo OrganizationDomainRepository
 }
 
-func (opts *CommandOpts) SetOrgRepo(repo func() OrganizationRepository) {
+func (opts *CommandOpts) SetOrgRepo(repo OrganizationRepository) {
 	opts.organizationRepo = repo
 }
 
-func (opts *CommandOpts) SetOrgDomainRepo(repo func() OrganizationDomainRepository) {
+func (opts *CommandOpts) SetOrgDomainRepo(repo OrganizationDomainRepository) {
 	opts.organizationDomainRepo = repo
 }
 

@@ -106,7 +106,7 @@ func (d *DeleteOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err 
 	defer func() { err = closeFunc(ctx, err) }()
 	instance := authz.GetInstance(ctx)
 
-	orgRepo := opts.organizationRepo()
+	orgRepo := opts.organizationRepo
 
 	orgToDelete, err := orgRepo.Get(ctx, pool, database.WithCondition(database.And(
 		orgRepo.IDCondition(d.ID),
@@ -172,7 +172,7 @@ func (d *DeleteOrgCommand) Validate(ctx context.Context, opts *CommandOpts) (err
 	// 	return err
 	// }
 
-	orgRepo := opts.organizationRepo()
+	orgRepo := opts.organizationRepo
 	org, err := orgRepo.Get(ctx, pool,
 		database.WithCondition(database.And(
 			orgRepo.IDCondition(d.ID),

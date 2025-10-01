@@ -10,13 +10,13 @@ import (
 
 type InvokeOpt func(*CommandOpts)
 
-func WithOrganizationRepo(repo func() OrganizationRepository) InvokeOpt {
+func WithOrganizationRepo(repo OrganizationRepository) InvokeOpt {
 	return func(opts *CommandOpts) {
 		opts.organizationRepo = repo
 	}
 }
 
-func WithOrganizationDomainRepo(repo func() OrganizationDomainRepository) InvokeOpt {
+func WithOrganizationDomainRepo(repo OrganizationDomainRepository) InvokeOpt {
 	return func(opts *CommandOpts) {
 		opts.organizationDomainRepo = repo
 	}

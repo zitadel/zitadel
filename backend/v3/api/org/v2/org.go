@@ -60,7 +60,7 @@ func UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org
 	// It's hard to debug, I haven't spent too much into it. Only drawback is pushing events twice.
 	batchCmd := domain.BatchCommands(orgUpdtCmd, domainAddCmd, domainSetPrimaryCmd, domainRemoveCmd)
 
-	err := domain.Invoke(ctx, batchCmd, domain.WithOrganizationRepo(repository.OrganizationRepository))
+	err := domain.Invoke(ctx, batchCmd, domain.WithOrganizationRepo(repository.OrganizationRepository()))
 	if err != nil {
 		return nil, err
 	}
@@ -78,8 +78,8 @@ func ListOrganizations(ctx context.Context, request *connect.Request[v2_org.List
 	orgListCmd := domain.NewListOrgsCommand(request.Msg)
 
 	err := domain.Invoke(ctx, orgListCmd,
-		domain.WithOrganizationRepo(repository.OrganizationRepository),
-		domain.WithOrganizationDomainRepo(repository.OrganizationDomainRepository),
+		domain.WithOrganizationRepo(repository.OrganizationRepository()),
+		domain.WithOrganizationDomainRepo(repository.OrganizationDomainRepository()),
 	)
 	if err != nil {
 		return nil, err
@@ -103,8 +103,8 @@ func ListOrganizationsBeta(ctx context.Context, request *connect.Request[v2beta_
 	orgListCmd := domain.NewListOrgsCommand(convert.OrganizationBetaRequestToV2Request(request.Msg))
 
 	err := domain.Invoke(ctx, orgListCmd,
-		domain.WithOrganizationRepo(repository.OrganizationRepository),
-		domain.WithOrganizationDomainRepo(repository.OrganizationDomainRepository),
+		domain.WithOrganizationRepo(repository.OrganizationRepository()),
+		domain.WithOrganizationDomainRepo(repository.OrganizationDomainRepository()),
 	)
 	if err != nil {
 		return nil, err
@@ -126,7 +126,7 @@ func DeleteOrganization(ctx context.Context, request *connect.Request[v2beta_org
 	orgDeleteCmd := domain.NewDeleteOrgCommand(request.Msg.GetId())
 
 	err := domain.Invoke(ctx, orgDeleteCmd,
-		domain.WithOrganizationRepo(repository.OrganizationRepository),
+		domain.WithOrganizationRepo(repository.OrganizationRepository()),
 	)
 	if err != nil {
 		return nil, err
@@ -145,7 +145,7 @@ func DeactivateOrganization(ctx context.Context, request *connect.Request[v2beta
 	orgDeactivateCmd := domain.NewDeactivateOrgCommand(request.Msg.GetId())
 
 	err := domain.Invoke(ctx, orgDeactivateCmd,
-		domain.WithOrganizationRepo(repository.OrganizationRepository),
+		domain.WithOrganizationRepo(repository.OrganizationRepository()),
 	)
 	if err != nil {
 		return nil, err
@@ -164,7 +164,7 @@ func ActivateOrganization(ctx context.Context, request *connect.Request[v2beta_o
 	orgDeactivateCmd := domain.NewActivateOrgCommand(request.Msg.GetId())
 
 	err := domain.Invoke(ctx, orgDeactivateCmd,
-		domain.WithOrganizationRepo(repository.OrganizationRepository),
+		domain.WithOrganizationRepo(repository.OrganizationRepository()),
 	)
 	if err != nil {
 		return nil, err
