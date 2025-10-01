@@ -33,7 +33,10 @@ type CommandOpts struct {
 	Invoker                Invoker
 	organizationRepo       OrganizationRepository
 	organizationDomainRepo OrganizationDomainRepository
+	projectRepo            ProjectRepository
 }
+
+// Setters for tests
 
 func (opts *CommandOpts) SetOrgRepo(repo OrganizationRepository) {
 	opts.organizationRepo = repo
@@ -41,6 +44,10 @@ func (opts *CommandOpts) SetOrgRepo(repo OrganizationRepository) {
 
 func (opts *CommandOpts) SetOrgDomainRepo(repo OrganizationDomainRepository) {
 	opts.organizationDomainRepo = repo
+}
+
+func (opts *CommandOpts) SetProjectRepo(repo ProjectRepository) {
+	opts.projectRepo = repo
 }
 
 type ensureTxOpts struct {
