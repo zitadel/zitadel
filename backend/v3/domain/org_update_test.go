@@ -129,6 +129,33 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			expectedError: domain.NewOrgNotFoundError("DOM-OcA1jq"),
 		},
 		{
+			testName: "when org is unspecified should return not found error",
+			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
+				repo := domainmock.NewOrgRepo(ctrl)
+				repo.EXPECT().
+					LoadDomains().
+					Times(1).
+					Return(repo)
+				repo.EXPECT().
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
+						database.And(
+							repo.IDCondition("org-1"),
+							repo.InstanceIDCondition("instance-1"),
+						),
+					))).
+					Times(1).
+					Return(&domain.Organization{
+						ID:    "org-1",
+						Name:  "old org name",
+						State: domain.OrgStateUnspecified,
+					}, nil)
+				return func() domain.OrganizationRepository { return repo }
+			},
+			inputID:       "org-1",
+			inputName:     "test org update",
+			expectedError: domain.NewOrgNotFoundError("DOM-OcA1jq"),
+		},
+		{
 			testName: "when setting domain info fails should return error",
 			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)

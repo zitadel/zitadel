@@ -64,7 +64,7 @@ func (u *UpdateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err 
 		return err
 	}
 
-	if org.State == OrgStateInactive {
+	if org.State == OrgStateInactive || org.State == OrgStateUnspecified {
 		err = NewOrgNotFoundError("DOM-OcA1jq")
 		return err
 	}
