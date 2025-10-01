@@ -1418,7 +1418,28 @@ func TestListHumanUser(t *testing.T) {
 	err = orgRepo.Create(t.Context(), tx, &organization)
 	require.NoError(t, err)
 
+	// create user, this user is created to have at least one user in the dbdatabase
+	// that should not be returned in any of the results in these tests
+	user := domain.Human{
+		User: domain.User{
+			ID:                gofakeit.UUID(),
+			InstanceID:        instanceID,
+			OrgID:             orgID,
+			Username:          gofakeit.Username(),
+			UsernameOrgUnique: true,
+			State:             domain.UserStateActive,
+		},
+		FirstName:         gofakeit.FirstName(),
+		LastName:          gofakeit.LastName(),
+		NickName:          gofakeit.Username(),
+		DisplayName:       gofakeit.Name(),
+		PreferredLanguage: "en",
+		Gender:            1,
+		AvatarKey:         gofakeit.Animal(),
+	}
 	userRepo := repository.UserRepository()
+	_, err = userRepo.CreateHuman(t.Context(), tx, &user)
+	require.NoError(t, err)
 
 	type test struct {
 		name     string
@@ -1428,72 +1449,455 @@ func TestListHumanUser(t *testing.T) {
 		err      error
 	}
 
-	tests := []test{
-		{
-			name: "multiple idps filter on instance",
-			testFunc: func(t *testing.T, client database.QueryExecutor) []*domain.Human {
-				// create instance
-				newInstanceId := gofakeit.Name()
-				instance := domain.Instance{
-					ID:              newInstanceId,
-					Name:            gofakeit.Name(),
-					DefaultOrgID:    "defaultOrgId",
-					IAMProjectID:    "iamProject",
-					ConsoleClientID: "consoleCLient",
-					ConsoleAppID:    "consoleApp",
-					DefaultLanguage: "defaultLanguage",
-				}
-				err = instanceRepo.Create(t.Context(), tx, &instance)
-				require.NoError(t, err)
-
-				// create org
-				newOrgId := gofakeit.Name()
-				org := domain.Organization{
-					ID:         newOrgId,
-					Name:       gofakeit.Name(),
-					InstanceID: newInstanceId,
-					State:      domain.OrgStateActive,
-				}
-				organizationRepo := repository.OrganizationRepository()
-				err = organizationRepo.Create(t.Context(), tx, &org)
-				require.NoError(t, err)
-
-				noOfUsers := 5
-				users := make([]*domain.Human, noOfUsers)
-				for i := range noOfUsers {
-
-					user := domain.Human{
-						User: domain.User{
-							ID:                gofakeit.UUID(),
-							InstanceID:        instanceID,
-							OrgID:             orgID,
-							Username:          gofakeit.Username(),
-							UsernameOrgUnique: true,
-							State:             domain.UserStateActive,
-						},
-						FirstName:         gofakeit.FirstName(),
-						LastName:          gofakeit.LastName(),
-						NickName:          gofakeit.Username(),
-						DisplayName:       gofakeit.Name(),
-						PreferredLanguage: "en",
-						Gender:            1,
-						AvatarKey:         gofakeit.Animal(),
+	tests := []*test{
+		func() *test {
+			newInstanceId := gofakeit.Name()
+			return &test{
+				name: "multiple users filter on instance, across 2 orgs",
+				testFunc: func(t *testing.T, client database.QueryExecutor) []*domain.Human {
+					// create instance
+					instance := domain.Instance{
+						ID:              newInstanceId,
+						Name:            gofakeit.Name(),
+						DefaultOrgID:    "defaultOrgId",
+						IAMProjectID:    "iamProject",
+						ConsoleClientID: "consoleCLient",
+						ConsoleAppID:    "consoleApp",
+						DefaultLanguage: "defaultLanguage",
 					}
-
-					_, err := userRepo.CreateHuman(t.Context(), tx, &user)
+					err = instanceRepo.Create(t.Context(), tx, &instance)
 					require.NoError(t, err)
 
-					users[i] = &user
-				}
+					// create first org
+					newOrgId := gofakeit.Name()
+					org := domain.Organization{
+						ID:         newOrgId,
+						Name:       gofakeit.Name(),
+						InstanceID: newInstanceId,
+						State:      domain.OrgStateActive,
+					}
+					organizationRepo := repository.OrganizationRepository()
+					err = organizationRepo.Create(t.Context(), tx, &org)
+					require.NoError(t, err)
 
-				return users
-			},
-			opts: []database.QueryOption{
-				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-				)),
-			},
-		},
+					noOfUsers := 5
+					users := make([]*domain.Human, noOfUsers*2)
+					for i := range noOfUsers {
+
+						user := domain.Human{
+							User: domain.User{
+								ID:                gofakeit.UUID(),
+								InstanceID:        newInstanceId,
+								OrgID:             newOrgId,
+								Username:          gofakeit.Username(),
+								UsernameOrgUnique: true,
+								State:             domain.UserStateActive,
+							},
+							FirstName:         gofakeit.FirstName(),
+							LastName:          gofakeit.LastName(),
+							NickName:          gofakeit.Username(),
+							DisplayName:       gofakeit.Name(),
+							PreferredLanguage: "en",
+							Gender:            1,
+							AvatarKey:         gofakeit.Animal(),
+						}
+
+						_, err := userRepo.CreateHuman(t.Context(), tx, &user)
+						require.NoError(t, err)
+
+						users[i] = &user
+					}
+
+					// create second org
+					newOrgId = gofakeit.Name()
+					org = domain.Organization{
+						ID:         newOrgId,
+						Name:       gofakeit.Name(),
+						InstanceID: newInstanceId,
+						State:      domain.OrgStateActive,
+					}
+					err = organizationRepo.Create(t.Context(), tx, &org)
+					require.NoError(t, err)
+
+					for i := range noOfUsers {
+						i += noOfUsers
+
+						user := domain.Human{
+							User: domain.User{
+								ID:                gofakeit.UUID(),
+								InstanceID:        newInstanceId,
+								OrgID:             newOrgId,
+								Username:          gofakeit.Username(),
+								UsernameOrgUnique: true,
+								State:             domain.UserStateActive,
+							},
+							FirstName:         gofakeit.FirstName(),
+							LastName:          gofakeit.LastName(),
+							NickName:          gofakeit.Username(),
+							DisplayName:       gofakeit.Name(),
+							PreferredLanguage: "en",
+							Gender:            1,
+							AvatarKey:         gofakeit.Animal(),
+						}
+
+						_, err := userRepo.CreateHuman(t.Context(), tx, &user)
+						require.NoError(t, err)
+
+						users[i] = &user
+					}
+
+					return users
+				},
+				opts: []database.QueryOption{
+					database.WithCondition(database.And(
+						userRepo.Human().InstanceIDCondition(newInstanceId),
+					)),
+				},
+			}
+		}(),
+		func() *test {
+			newInstanceId := gofakeit.Name()
+			newOrgId := gofakeit.Name()
+			return &test{
+				name: "multiple users filter on non existing instance",
+				testFunc: func(t *testing.T, client database.QueryExecutor) []*domain.Human {
+					// create instance
+					instance := domain.Instance{
+						ID:              newInstanceId,
+						Name:            gofakeit.Name(),
+						DefaultOrgID:    "defaultOrgId",
+						IAMProjectID:    "iamProject",
+						ConsoleClientID: "consoleCLient",
+						ConsoleAppID:    "consoleApp",
+						DefaultLanguage: "defaultLanguage",
+					}
+					err = instanceRepo.Create(t.Context(), tx, &instance)
+					require.NoError(t, err)
+
+					// create first org
+					org := domain.Organization{
+						ID:         newOrgId,
+						Name:       gofakeit.Name(),
+						InstanceID: newInstanceId,
+						State:      domain.OrgStateActive,
+					}
+					organizationRepo := repository.OrganizationRepository()
+					err = organizationRepo.Create(t.Context(), tx, &org)
+					require.NoError(t, err)
+
+					noOfUsers := 5
+					users := make([]*domain.Human, noOfUsers)
+					for i := range noOfUsers {
+
+						user := domain.Human{
+							User: domain.User{
+								ID:                gofakeit.UUID(),
+								InstanceID:        newInstanceId,
+								OrgID:             newOrgId,
+								Username:          gofakeit.Username(),
+								UsernameOrgUnique: true,
+								State:             domain.UserStateActive,
+							},
+							FirstName:         gofakeit.FirstName(),
+							LastName:          gofakeit.LastName(),
+							NickName:          gofakeit.Username(),
+							DisplayName:       gofakeit.Name(),
+							PreferredLanguage: "en",
+							Gender:            1,
+							AvatarKey:         gofakeit.Animal(),
+						}
+
+						_, err := userRepo.CreateHuman(t.Context(), tx, &user)
+						require.NoError(t, err)
+
+						users[i] = &user
+					}
+
+					// return users
+					return nil
+				},
+				opts: []database.QueryOption{
+					database.WithCondition(database.And(
+						userRepo.Human().InstanceIDCondition("non-existing-instance"),
+					)),
+				},
+			}
+		}(),
+		func() *test {
+			newInstanceId := gofakeit.Name()
+			newOrgId := gofakeit.Name()
+			return &test{
+				name: "multiple users filter on orgs",
+				testFunc: func(t *testing.T, client database.QueryExecutor) []*domain.Human {
+					// create instance
+					instance := domain.Instance{
+						ID:              newInstanceId,
+						Name:            gofakeit.Name(),
+						DefaultOrgID:    "defaultOrgId",
+						IAMProjectID:    "iamProject",
+						ConsoleClientID: "consoleCLient",
+						ConsoleAppID:    "consoleApp",
+						DefaultLanguage: "defaultLanguage",
+					}
+					err = instanceRepo.Create(t.Context(), tx, &instance)
+					require.NoError(t, err)
+
+					// create first org
+					org := domain.Organization{
+						ID:         newOrgId,
+						Name:       gofakeit.Name(),
+						InstanceID: newInstanceId,
+						State:      domain.OrgStateActive,
+					}
+					organizationRepo := repository.OrganizationRepository()
+					err = organizationRepo.Create(t.Context(), tx, &org)
+					require.NoError(t, err)
+
+					noOfUsers := 5
+					users := make([]*domain.Human, noOfUsers)
+					for i := range noOfUsers {
+
+						user := domain.Human{
+							User: domain.User{
+								ID:                gofakeit.UUID(),
+								InstanceID:        newInstanceId,
+								OrgID:             newOrgId,
+								Username:          gofakeit.Username(),
+								UsernameOrgUnique: true,
+								State:             domain.UserStateActive,
+							},
+							FirstName:         gofakeit.FirstName(),
+							LastName:          gofakeit.LastName(),
+							NickName:          gofakeit.Username(),
+							DisplayName:       gofakeit.Name(),
+							PreferredLanguage: "en",
+							Gender:            1,
+							AvatarKey:         gofakeit.Animal(),
+						}
+
+						_, err := userRepo.CreateHuman(t.Context(), tx, &user)
+						require.NoError(t, err)
+
+						users[i] = &user
+					}
+
+					return users
+				},
+				opts: []database.QueryOption{
+					database.WithCondition(database.And(
+						userRepo.Human().InstanceIDCondition(newInstanceId),
+						userRepo.Human().OrgIDCondition(newOrgId),
+					)),
+				},
+			}
+		}(),
+		func() *test {
+			newInstanceId := gofakeit.Name()
+			newOrgId := gofakeit.Name()
+			return &test{
+				name: "multiple users filter on orgs, with non existing org",
+				testFunc: func(t *testing.T, client database.QueryExecutor) []*domain.Human {
+					// create instance
+					instance := domain.Instance{
+						ID:              newInstanceId,
+						Name:            gofakeit.Name(),
+						DefaultOrgID:    "defaultOrgId",
+						IAMProjectID:    "iamProject",
+						ConsoleClientID: "consoleCLient",
+						ConsoleAppID:    "consoleApp",
+						DefaultLanguage: "defaultLanguage",
+					}
+					err = instanceRepo.Create(t.Context(), tx, &instance)
+					require.NoError(t, err)
+
+					// create first org
+					org := domain.Organization{
+						ID:         newOrgId,
+						Name:       gofakeit.Name(),
+						InstanceID: newInstanceId,
+						State:      domain.OrgStateActive,
+					}
+					organizationRepo := repository.OrganizationRepository()
+					err = organizationRepo.Create(t.Context(), tx, &org)
+					require.NoError(t, err)
+
+					noOfUsers := 5
+					users := make([]*domain.Human, noOfUsers)
+					for i := range noOfUsers {
+
+						user := domain.Human{
+							User: domain.User{
+								ID:                gofakeit.UUID(),
+								InstanceID:        newInstanceId,
+								OrgID:             newOrgId,
+								Username:          gofakeit.Username(),
+								UsernameOrgUnique: true,
+								State:             domain.UserStateActive,
+							},
+							FirstName:         gofakeit.FirstName(),
+							LastName:          gofakeit.LastName(),
+							NickName:          gofakeit.Username(),
+							DisplayName:       gofakeit.Name(),
+							PreferredLanguage: "en",
+							Gender:            1,
+							AvatarKey:         gofakeit.Animal(),
+						}
+
+						_, err := userRepo.CreateHuman(t.Context(), tx, &user)
+						require.NoError(t, err)
+
+						users[i] = &user
+					}
+
+					// return users
+					return nil
+				},
+				opts: []database.QueryOption{
+					database.WithCondition(database.And(
+						userRepo.Human().InstanceIDCondition(newInstanceId),
+						userRepo.Human().OrgIDCondition("non-existing-org"),
+					)),
+				},
+			}
+		}(),
+		func() *test {
+			newInstanceId := gofakeit.Name()
+			return &test{
+				name: "multiple users filter on state",
+				testFunc: func(t *testing.T, client database.QueryExecutor) []*domain.Human {
+					// create instance
+					instance := domain.Instance{
+						ID:              newInstanceId,
+						Name:            gofakeit.Name(),
+						DefaultOrgID:    "defaultOrgId",
+						IAMProjectID:    "iamProject",
+						ConsoleClientID: "consoleCLient",
+						ConsoleAppID:    "consoleApp",
+						DefaultLanguage: "defaultLanguage",
+					}
+					err = instanceRepo.Create(t.Context(), tx, &instance)
+					require.NoError(t, err)
+
+					// create first org
+					newOrgId := gofakeit.Name()
+					org := domain.Organization{
+						ID:         newOrgId,
+						Name:       gofakeit.Name(),
+						InstanceID: newInstanceId,
+						State:      domain.OrgStateActive,
+					}
+					organizationRepo := repository.OrganizationRepository()
+					err = organizationRepo.Create(t.Context(), tx, &org)
+					require.NoError(t, err)
+
+					noOfUsers := 5
+					users := make([]*domain.Human, noOfUsers)
+					for i := range noOfUsers {
+
+						user := domain.Human{
+							User: domain.User{
+								ID:                gofakeit.UUID(),
+								InstanceID:        newInstanceId,
+								OrgID:             newOrgId,
+								Username:          gofakeit.Username(),
+								UsernameOrgUnique: true,
+								State:             domain.UserStateInactive,
+							},
+							FirstName:         gofakeit.FirstName(),
+							LastName:          gofakeit.LastName(),
+							NickName:          gofakeit.Username(),
+							DisplayName:       gofakeit.Name(),
+							PreferredLanguage: "en",
+							Gender:            1,
+							AvatarKey:         gofakeit.Animal(),
+						}
+
+						_, err := userRepo.CreateHuman(t.Context(), tx, &user)
+						require.NoError(t, err)
+
+						users[i] = &user
+					}
+
+					return users
+				},
+				opts: []database.QueryOption{
+					database.WithCondition(database.And(
+						userRepo.Human().InstanceIDCondition(newInstanceId),
+						userRepo.Human().StateCondition(domain.UserStateInactive),
+					)),
+				},
+			}
+		}(),
+		func() *test {
+			newInstanceId := gofakeit.Name()
+			return &test{
+				name: "multiple users filter on state no users found",
+				testFunc: func(t *testing.T, client database.QueryExecutor) []*domain.Human {
+					// create instance
+					instance := domain.Instance{
+						ID:              newInstanceId,
+						Name:            gofakeit.Name(),
+						DefaultOrgID:    "defaultOrgId",
+						IAMProjectID:    "iamProject",
+						ConsoleClientID: "consoleCLient",
+						ConsoleAppID:    "consoleApp",
+						DefaultLanguage: "defaultLanguage",
+					}
+					err = instanceRepo.Create(t.Context(), tx, &instance)
+					require.NoError(t, err)
+
+					// create first org
+					newOrgId := gofakeit.Name()
+					org := domain.Organization{
+						ID:         newOrgId,
+						Name:       gofakeit.Name(),
+						InstanceID: newInstanceId,
+						State:      domain.OrgStateActive,
+					}
+					organizationRepo := repository.OrganizationRepository()
+					err = organizationRepo.Create(t.Context(), tx, &org)
+					require.NoError(t, err)
+
+					noOfUsers := 5
+					users := make([]*domain.Human, noOfUsers)
+					for i := range noOfUsers {
+
+						user := domain.Human{
+							User: domain.User{
+								ID:                gofakeit.UUID(),
+								InstanceID:        newInstanceId,
+								OrgID:             newOrgId,
+								Username:          gofakeit.Username(),
+								UsernameOrgUnique: true,
+								State:             domain.UserStateInactive,
+							},
+							FirstName:         gofakeit.FirstName(),
+							LastName:          gofakeit.LastName(),
+							NickName:          gofakeit.Username(),
+							DisplayName:       gofakeit.Name(),
+							PreferredLanguage: "en",
+							Gender:            1,
+							AvatarKey:         gofakeit.Animal(),
+						}
+
+						_, err := userRepo.CreateHuman(t.Context(), tx, &user)
+						require.NoError(t, err)
+
+						users[i] = &user
+					}
+
+					// return nil as we expect no users to be returned
+					return nil
+				},
+				opts: []database.QueryOption{
+					database.WithCondition(database.And(
+						userRepo.Human().InstanceIDCondition(newInstanceId),
+						// should be no users with active state
+						userRepo.Human().StateCondition(domain.UserStateActive),
+					)),
+				},
+			}
+		}(),
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1506,11 +1910,9 @@ func TestListHumanUser(t *testing.T) {
 			// 	}
 			// }()
 
-			// users := tt.testFunc(t)
 			users := tt.testFunc(t, pool)
 
 			// create user
-			// beforeCreate = time.Now()
 			returnedUsers, err := userRepo.ListHuman(t.Context(), pool, tt.opts...)
 			require.NoError(t, err)
 			if err != nil {
@@ -1520,10 +1922,6 @@ func TestListHumanUser(t *testing.T) {
 
 			assert.Equal(t, len(users), len(returnedUsers))
 			for i, user := range users {
-				// fmt.Printf("[DEBUGPRINT] [user.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> user.FirstName =             %+v\n", user.FirstName)
-				// fmt.Printf("[DEBUGPRINT] [user.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> user.CreatedAt             = %+v\n", user.CreatedAt)
-				// fmt.Printf("[DEBUGPRINT] [user.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> returnedUsers[i].FirstName = %+v\n", returnedUsers[i].FirstName)
-				// fmt.Printf("[DEBUGPRINT] [user.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> returnedUsers[i].CreatedAt = %+v\n", returnedUsers[i].CreatedAt)
 				// user
 				assert.Equal(t, returnedUsers[i].InstanceID, user.InstanceID)
 				assert.Equal(t, returnedUsers[i].OrgID, user.OrgID)
@@ -1544,6 +1942,139 @@ func TestListHumanUser(t *testing.T) {
 				assert.Equal(t, returnedUsers[i].Gender, user.Gender)
 				assert.Equal(t, returnedUsers[i].AvatarKey, user.AvatarKey)
 			}
+		})
+	}
+}
+
+func TestDeleteHumanUser(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err := tx.Rollback(t.Context())
+		if err != nil {
+			t.Errorf("error rolling back transaction: %v", err)
+		}
+	}()
+
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository()
+	err = instanceRepo.Create(t.Context(), tx, &instance)
+	require.NoError(t, err)
+
+	// create org
+	orgId := gofakeit.Name()
+	org := domain.Organization{
+		ID:         orgId,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive,
+	}
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), tx, &org)
+	require.NoError(t, err)
+
+	userRepo := repository.UserRepository()
+
+	type test struct {
+		name                   string
+		testFunc               func(t *testing.T)
+		idpIdentifierCondition domain.IDPIdentifierCondition
+		noOfDeletedRows        int64
+	}
+	tests := []test{
+		func() test {
+			id := gofakeit.Name()
+			// create instance
+			newInstanceId := gofakeit.Name()
+			instance := domain.Instance{
+				ID:              newInstanceId,
+				Name:            gofakeit.Name(),
+				DefaultOrgID:    "defaultOrgId",
+				IAMProjectID:    "iamProject",
+				ConsoleClientID: "consoleCLient",
+				ConsoleAppID:    "consoleApp",
+				DefaultLanguage: "defaultLanguage",
+			}
+			err = instanceRepo.Create(t.Context(), tx, &instance)
+			require.NoError(t, err)
+
+			// create first org
+			newOrgId := gofakeit.Name()
+			org := domain.Organization{
+				ID:         newOrgId,
+				Name:       gofakeit.Name(),
+				InstanceID: newInstanceId,
+				State:      domain.OrgStateActive,
+			}
+			organizationRepo := repository.OrganizationRepository()
+			err = organizationRepo.Create(t.Context(), tx, &org)
+			require.NoError(t, err)
+			var noOfUsers int64 = 1
+			return test{
+				name: "happy path delete user filter id",
+				testFunc: func(t *testing.T) {
+					for range noOfUsers {
+						user := domain.Human{
+							User: domain.User{
+								ID:                gofakeit.UUID(),
+								InstanceID:        newInstanceId,
+								OrgID:             newOrgId,
+								Username:          gofakeit.Username(),
+								UsernameOrgUnique: true,
+								State:             domain.UserStateInactive,
+							},
+							FirstName:         gofakeit.FirstName(),
+							LastName:          gofakeit.LastName(),
+							NickName:          gofakeit.Username(),
+							DisplayName:       gofakeit.Name(),
+							PreferredLanguage: "en",
+							Gender:            1,
+							AvatarKey:         gofakeit.Animal(),
+						}
+
+						err := userRepo.CreateHuman(t.Context(), tx, &user)
+						require.NoError(t, err)
+					}
+				},
+				idpIdentifierCondition: userRepo.IDCondition(id),
+				noOfDeletedRows:        noOfUsers,
+			}
+		}(),
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.testFunc != nil {
+				tt.testFunc(t)
+			}
+
+			// delete user
+			noOfDeletedRows, err := userRepo.Delete(t.Context(),
+				tx,
+				tt.idpIdentifierCondition,
+				instanceId,
+				&orgId,
+			)
+			require.NoError(t, err)
+			assert.Equal(t, noOfDeletedRows, tt.noOfDeletedRows)
+
+			// check idp was deleted
+			organization, err := userRepo.Get(t.Context(), tx,
+				tt.idpIdentifierCondition,
+				instanceId,
+				&orgId,
+			)
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
+			assert.Nil(t, organization)
 		})
 	}
 }

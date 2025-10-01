@@ -203,10 +203,9 @@ type UserRepository interface {
 	UpdateHuman(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	GetHuman(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Human, error)
 	ListHuman(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Human, error)
+	DeleteHuman(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 
 	CreateMachine(ctx context.Context, client database.QueryExecutor, user *Machine) (*Machine, error)
 	GetMachine(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Machine, error)
 	// ListMachine(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Machine, error)
-
-	// Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }

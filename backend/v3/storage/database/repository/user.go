@@ -174,11 +174,11 @@ func (m machine) UsernameCondition(op database.TextOperation, username string) d
 }
 
 func (m machine) UsernameOrgUniqueCondition(condition bool) database.Condition {
-	return database.NewBooleanCondition(m.UsernameColumn(), condition)
+	return database.NewBooleanCondition(m.UsernameOrgUniqueColumn(), condition)
 }
 
 func (m machine) StateCondition(state domain.UserState) database.Condition {
-	return database.NewTextCondition(m.UsernameColumn(), database.TextOperationEqual, state.String())
+	return database.NewTextCondition(m.StateColumn(), database.TextOperationEqual, state.String())
 }
 
 func (m machine) CreatedAtCondition(op database.NumberOperation, createdAt time.Time) database.Condition {
@@ -215,11 +215,11 @@ func (h human) UsernameCondition(op database.TextOperation, username string) dat
 }
 
 func (h human) UsernameOrgUniqueCondition(condition bool) database.Condition {
-	return database.NewBooleanCondition(h.UsernameColumn(), condition)
+	return database.NewBooleanCondition(h.UsernameOrgUniqueColumn(), condition)
 }
 
 func (h human) StateCondition(state domain.UserState) database.Condition {
-	return database.NewTextCondition(h.UsernameColumn(), database.TextOperationEqual, state.String())
+	return database.NewTextCondition(h.StateColumn(), database.TextOperationEqual, state.String())
 }
 
 func (h human) CreatedAtCondition(op database.NumberOperation, createdAt time.Time) database.Condition {
@@ -473,6 +473,18 @@ func (u user) ListHuman(ctx context.Context, client database.QueryExecutor, opts
 	orderBy.Write(&builder)
 
 	return scanHumans(ctx, client, &builder)
+}
+
+func (u user) DeleteHuman(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	if !condition.IsRestrictingColumn(u.Human().InstanceIDColumn()) {
+		return 0, database.NewMissingConditionError(u.Human().InstanceIDColumn())
+	}
+
+	var builder database.StatementBuilder
+	builder.WriteString(`DELETE FROM zitadel.human_users`)
+	writeCondition(&builder, condition)
+
+	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
 func scanMachine(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Machine, error) {
