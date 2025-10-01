@@ -18,7 +18,7 @@ func (s *Server) GetGroup(ctx context.Context, req *connect.Request[group.GetGro
 }
 
 // ListGroups returns a list of groups that match the search criteria
-func (s *Server) ListGroups(ctx context.Context, req *connect.Request[group_v2.ListGroupsRequest]) (*connect.Response[group_v2.ListGroupsResponse], error) {
+func (s *Server) ListGroups(ctx context.Context, req *connect.Request[group.ListGroupsRequest]) (*connect.Response[group.ListGroupsResponse], error) {
 	queries, err := listGroupsRequestToModel(req.Msg, s.systemDefaults)
 	if err != nil {
 		return nil, err
@@ -69,7 +69,7 @@ func groupFilterToQuery(f *group.GroupsSearchFilter) (query.SearchQuery, error) 
 	case *group.GroupsSearchFilter_GroupIds:
 		return query.NewGroupIDsSearchQuery(q.GroupIds.GetIds())
 	case *group.GroupsSearchFilter_NameFilter:
-		return query.NewGroupNameSearchQuery(q.NameFilter.GetName(), filter.TextMethodPbToQuery(q.NameQuery.GetMethod()))
+		return query.NewGroupNameSearchQuery(q.NameFilter.GetName(), filter.TextMethodPbToQuery(q.NameFilter.GetMethod()))
 	case *group.GroupsSearchFilter_OrganizationId:
 		return query.NewGroupOrganizationIdSearchQuery(q.OrganizationId.GetId())
 	default:
