@@ -42,7 +42,7 @@ func TestServer_CreateGroup(t *testing.T) {
 				OrganizationId: "org1",
 			},
 			wantErrorCode: codes.InvalidArgument,
-			wantErrMsg:    "Errors.Group.InvalidName (CMDGRP-dUnd3r)",
+			wantErrMsg:    "Errors.Group.InvalidName (GROUP-m177lN)",
 		},
 		{
 			name: "missing organization id, error",
@@ -150,7 +150,7 @@ func TestServer_UpdateGroup(t *testing.T) {
 				Name: gu.Ptr(" "),
 			},
 			wantErrCode: codes.InvalidArgument,
-			wantErrMsg:  "Errors.Group.InvalidName (CMDGRP-m177lN)",
+			wantErrMsg:  "Errors.Group.InvalidName (GROUP-m177lN)",
 		},
 		{
 			name: "group not found, error",
@@ -242,7 +242,7 @@ func TestServer_DeleteGroup(t *testing.T) {
 				Id: "",
 			},
 			wantErrCode: codes.InvalidArgument,
-			wantErrMsg:  "Errors.Group.MissingID (CMDGRP-aNg318)",
+			wantErrMsg:  "invalid DeleteGroupRequest.Id: value length must be between 1 and 200 runes, inclusive",
 		},
 		{
 			name: "group not found, ok",

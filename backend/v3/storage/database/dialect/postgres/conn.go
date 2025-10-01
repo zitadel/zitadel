@@ -13,15 +13,15 @@ type pgxConn struct {
 	*pgxpool.Conn
 }
 
-var _ database.Client = (*pgxConn)(nil)
+var _ database.Connection = (*pgxConn)(nil)
 
-// Release implements [database.Client].
+// Release implements [database.Connection].
 func (c *pgxConn) Release(_ context.Context) error {
 	c.Conn.Release()
 	return nil
 }
 
-// Begin implements [database.Client].
+// Begin implements [database.Connection].
 func (c *pgxConn) Begin(ctx context.Context, opts *database.TransactionOptions) (database.Transaction, error) {
 	tx, err := c.BeginTx(ctx, transactionOptionsToPgx(opts))
 	if err != nil {
@@ -30,8 +30,8 @@ func (c *pgxConn) Begin(ctx context.Context, opts *database.TransactionOptions) 
 	return &Transaction{tx}, nil
 }
 
-// Query implements sql.Client.
-// Subtle: this method shadows the method (*Conn).Query of pgxConn.Conn.
+// Query implements [database.Connection].
+// Subtle: this method shadows the method (*Conn).Query of [pgxConn.Conn].
 func (c *pgxConn) Query(ctx context.Context, sql string, args ...any) (database.Rows, error) {
 	rows, err := c.Conn.Query(ctx, sql, args...)
 	if err != nil {
@@ -40,14 +40,14 @@ func (c *pgxConn) Query(ctx context.Context, sql string, args ...any) (database.
 	return &Rows{rows}, nil
 }
 
-// QueryRow implements sql.Client.
-// Subtle: this method shadows the method (*Conn).QueryRow of pgxConn.Conn.
+// QueryRow implements [database.Connection].
+// Subtle: this method shadows the method (*Conn).QueryRow of [pgxConn.Conn].
 func (c *pgxConn) QueryRow(ctx context.Context, sql string, args ...any) database.Row {
 	return &Row{c.Conn.QueryRow(ctx, sql, args...)}
 }
 
-// Exec implements [database.Pool].
-// Subtle: this method shadows the method (Pool).Exec of pgxPool.Pool.
+// QueryRow implements [database.Connection].
+// Subtle: this method shadows the method (*Conn).QueryRow of [pgxConn.Conn].
 func (c *pgxConn) Exec(ctx context.Context, sql string, args ...any) (int64, error) {
 	res, err := c.Conn.Exec(ctx, sql, args...)
 	if err != nil {

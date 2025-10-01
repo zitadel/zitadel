@@ -19,14 +19,12 @@ type GroupWriteModel struct {
 }
 
 // NewGroupWriteModel initializes a new instance of GroupWriteModel from the given Group.
-func NewGroupWriteModel(group *domain.Group) *GroupWriteModel {
+func NewGroupWriteModel(id, orgID string) *GroupWriteModel {
 	return &GroupWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID:   group.AggregateID,
-			ResourceOwner: group.OrganizationID,
+			AggregateID:   id,
+			ResourceOwner: orgID,
 		},
-		Name:        group.Name,
-		Description: group.Description,
 	}
 }
 

@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -21,63 +20,49 @@ const (
 type GroupAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID             string `json:"id,omitempty"`
-	Name           string `json:"name,omitempty"`
-	Description    string `json:"description,omitempty"`
-	OrganizationID string `json:"organizationId,omitempty"`
+	Name        string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
 }
 
 func NewGroupAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	name,
-	description,
-	organizationID string,
+	description string,
 ) *GroupAddedEvent {
 	return &GroupAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			GroupAddedEventType),
-		ID:             aggregate.ID,
-		Name:           name,
-		Description:    description,
-		OrganizationID: organizationID,
+		Name:        name,
+		Description: description,
 	}
 }
 
-func GroupAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	e := &GroupAddedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-
-	err := event.Unmarshal(e)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "GROUP-4bZsga", "unable to unmarshal group")
-	}
-
-	return e, nil
+func (g *GroupAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	g.BaseEvent = *event
 }
 
-func (g GroupAddedEvent) Payload() any {
+func (g *GroupAddedEvent) Payload() any {
 	return g
 }
 
-func (g GroupAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddGroupNameUniqueConstraint(g.Name)}
+func (g *GroupAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewAddGroupNameUniqueConstraint(g.Name, g.Agg.ResourceOwner)}
 }
 
-func NewAddGroupNameUniqueConstraint(groupName string) *eventstore.UniqueConstraint {
+func NewAddGroupNameUniqueConstraint(groupName, organizationID string) *eventstore.UniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		uniqueGroupname,
-		groupName,
+		groupName+":"+organizationID,
 		"Errors.Group.AlreadyExists")
 }
 
-func NewRemoveGroupNameUniqueConstraint(groupName string) *eventstore.UniqueConstraint {
+func NewRemoveGroupNameUniqueConstraint(groupName, organizationID string) *eventstore.UniqueConstraint {
 	return eventstore.NewRemoveUniqueConstraint(
 		uniqueGroupname,
-		groupName,
+		groupName+":"+organizationID,
 	)
 }
 
@@ -87,8 +72,7 @@ type GroupChangedEvent struct {
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
 
-	oldName        string
-	oldDescription string
+	oldName string
 }
 
 func NewGroupChangedEvent(
@@ -96,75 +80,58 @@ func NewGroupChangedEvent(
 	aggregate *eventstore.Aggregate,
 	oldName,
 	updatedName,
-	oldDescription,
 	updatedDescription string,
 ) *GroupChangedEvent {
 	return &GroupChangedEvent{
-		BaseEvent:      *eventstore.NewBaseEventForPush(ctx, aggregate, GroupChangedEventType),
-		Name:           updatedName,
-		Description:    updatedDescription,
-		oldName:        oldName,
-		oldDescription: oldDescription,
+		BaseEvent:   *eventstore.NewBaseEventForPush(ctx, aggregate, GroupChangedEventType),
+		Name:        updatedName,
+		Description: updatedDescription,
+		oldName:     oldName,
 	}
 }
 
-func GroupChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	e := &GroupChangedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-
-	err := event.Unmarshal(e)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "GROUP-4bYsga", "unable to unmarshal group")
-	}
-
-	return e, nil
+func (g *GroupChangedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	g.BaseEvent = *event
 }
 
-func (g GroupChangedEvent) Payload() any {
+func (g *GroupChangedEvent) Payload() any {
 	return g
 }
 
-func (g GroupChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+func (g *GroupChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{
-		NewRemoveGroupNameUniqueConstraint(g.oldName),
-		NewAddGroupNameUniqueConstraint(g.Name)}
+		NewRemoveGroupNameUniqueConstraint(g.oldName, g.Agg.ResourceOwner),
+		NewAddGroupNameUniqueConstraint(g.Name, g.Agg.ResourceOwner)}
 }
 
 type GroupRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	ID string `json:"id,omitempty"`
+
+	name string
 }
 
 func NewGroupRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	name string,
 ) *GroupRemovedEvent {
 	return &GroupRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(ctx, aggregate, GroupRemovedEventType),
 		ID:        aggregate.ID,
+		name:      name,
 	}
 }
 
-func GroupRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	e := &GroupRemovedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-
-	err := event.Unmarshal(e)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "GROUP-4bXsga", "unable to unmarshal group")
-	}
-
-	return e, nil
+func (g *GroupRemovedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	g.BaseEvent = *event
 }
 
-func (g GroupRemovedEvent) Payload() any {
+func (g *GroupRemovedEvent) Payload() any {
 	return g
 }
 
-func (g GroupRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	// todo: review group name or id?
-	return []*eventstore.UniqueConstraint{NewRemoveGroupNameUniqueConstraint(g.ID)}
+func (g *GroupRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewRemoveGroupNameUniqueConstraint(g.name, g.Agg.ResourceOwner)}
 }

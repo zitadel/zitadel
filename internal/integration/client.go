@@ -1290,10 +1290,6 @@ func (i *Instance) ActivateSchemaUser(ctx context.Context, orgID string, userID 
 }
 
 func (i *Instance) CreateGroup(ctx context.Context, t *testing.T, orgID, name string) *group_v2.CreateGroupResponse {
-	if orgID == "" {
-		orgID = i.DefaultOrg.GetId()
-	}
-
 	resp, err := i.Client.GroupV2.CreateGroup(ctx, &group_v2.CreateGroupRequest{
 		OrganizationId: orgID,
 		Name:           name,

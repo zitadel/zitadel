@@ -18,28 +18,40 @@ message Group {
     }
   ];
 
-  // Name of the user group.
+  // Unique name of the user group inside the corresponding organization.
   string name = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"Support Group\"";
     }
   ];
 
+  // Description the user group.
+  string description = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"Support Group\"";
+    }
+  ];
+
+  // The ID of the organization to which the group belongs.
+  string organization_id = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629098906488334\""
+    }
+  ];
+
   // Timestamp when the group was last changed.
-  google.protobuf.Timestamp change_date = 3 [
+  google.protobuf.Timestamp change_date = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
     }
   ];
 
   // Timestamp when the user group was created
-  google.protobuf.Timestamp creation_date = 4 [
+  google.protobuf.Timestamp creation_date = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
     }
   ];
-
-  // TODO: state of the group: active? inactive?
 }
 
 message GroupsSearchFilter {
@@ -49,13 +61,13 @@ message GroupsSearchFilter {
     // Search for groups by their IDs.
     zitadel.filter.v2.InIDsFilter group_ids = 1;
     // Search for groups by their names.
-    GroupNameQuery name_query = 2;
+    GroupNameFilter name_filter = 2;
     // Search for groups by their organization ID.
     zitadel.filter.v2.IDFilter organization_id = 3;
   }
 }
 
-message GroupNameQuery {
+message GroupNameFilter {
   // Name of the user group.
   string name = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
