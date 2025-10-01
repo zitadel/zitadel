@@ -23,11 +23,9 @@ import { useResponsiveLayout } from "@/lib/theme-hooks";
 export function DynamicTheme({
   branding,
   children,
-  appName,
 }: {
   children: ReactNode | ((isSideBySide: boolean) => ReactNode);
   branding?: BrandingSettings;
-  appName?: string;
 }) {
   const { isSideBySide } = useResponsiveLayout();
 
@@ -52,7 +50,7 @@ export function DynamicTheme({
             const hasLeftRightStructure = childArray.length === 2;
 
             return (
-              <div className="relative mx-auto w-full max-w-[1100px] py-8 px-8">
+              <div className="relative mx-auto w-full max-w-[1100px] py-4 px-8">
                 <Card>
                   <div className="flex min-h-[400px]">
                     {/* Left side: First child + branding */}
@@ -60,17 +58,12 @@ export function DynamicTheme({
                       <div className="max-w-[440px] mx-auto space-y-8">
                         {/* Logo and branding */}
                         {branding && (
-                          <div className="space-y-4">
-                            <Logo
-                              lightSrc={branding.lightTheme?.logoUrl}
-                              darkSrc={branding.darkTheme?.logoUrl}
-                              height={60}
-                              width={120}
-                            />
-                            {appName && (
-                              <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300">{appName}</h2>
-                            )}
-                          </div>
+                          <Logo
+                            lightSrc={branding.lightTheme?.logoUrl}
+                            darkSrc={branding.darkTheme?.logoUrl}
+                            height={60}
+                            width={120}
+                          />
                         )}
 
                         {/* First child content (title, description) - only if we have left/right structure */}
@@ -104,28 +97,24 @@ export function DynamicTheme({
             const hasMultipleChildren = childArray.length > 1;
 
             return (
-              <div className="relative mx-auto w-full max-w-[440px] py-8">
+              <div className="relative mx-auto w-full max-w-[440px] py-4 px-4">
                 <Card>
-                  <div className="mx-auto flex flex-col items-center space-y-4">
-                    <div className="relative flex flex-row items-center justify-center gap-8">
+                  <div className="mx-auto flex flex-col items-center space-y-8">
+                    <div className="relative flex flex-row items-center justify-center -mb-4">
                       {branding && (
-                        <>
-                          <Logo
-                            lightSrc={branding.lightTheme?.logoUrl}
-                            darkSrc={branding.darkTheme?.logoUrl}
-                            height={appName ? 100 : 150}
-                            width={appName ? 100 : 150}
-                          />
-
-                          {appName && <AppAvatar appName={appName} />}
-                        </>
+                        <Logo
+                          lightSrc={branding.lightTheme?.logoUrl}
+                          darkSrc={branding.darkTheme?.logoUrl}
+                          height={150}
+                          width={150}
+                        />
                       )}
                     </div>
 
                     {hasMultipleChildren ? (
                       <>
                         {/* Title and description - center aligned */}
-                        <div className="w-full flex flex-col items-center text-center space-y-4">{titleContent}</div>
+                        <div className="w-full text-center flex flex-col items-center mb-4">{titleContent}</div>
 
                         {/* Form content - left aligned */}
                         <div className="w-full">{formContent}</div>

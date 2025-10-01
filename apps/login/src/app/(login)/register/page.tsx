@@ -79,7 +79,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             <Translated i18nKey="disabled.description" namespace="register" />
           </p>
         </div>
-        <div></div>
+        <div className="w-full"></div>
       </DynamicTheme>
     );
   }
