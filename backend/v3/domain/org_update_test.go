@@ -102,7 +102,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			expectedError: domain.NewOrgNameNotChangedError("DOM-nDzwIu"),
 		},
 		{
-			testName: "when org is inactive should return not found error",
+			testName: "when org state is inactive should return not found error",
 			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
@@ -129,7 +129,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			expectedError: domain.NewOrgNotFoundError("DOM-OcA1jq"),
 		},
 		{
-			testName: "when org is unspecified should return not found error",
+			testName: "when org state is unspecified should return not found error",
 			orgRepo: func(ctrl *gomock.Controller) func() domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
