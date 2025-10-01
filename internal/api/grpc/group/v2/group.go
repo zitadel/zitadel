@@ -6,7 +6,6 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
@@ -19,8 +18,8 @@ func (s *Server) CreateGroup(ctx context.Context, req *connect.Request[group_v2.
 			AggregateID:   req.Msg.GetId(),
 			ResourceOwner: req.Msg.GetOrganizationId(),
 		},
-		Name:           req.Msg.GetName(),
-		Description:    req.Msg.GetDescription(),
+		Name:        req.Msg.GetName(),
+		Description: req.Msg.GetDescription(),
 	}
 
 	groupDetails, err := s.command.CreateGroup(ctx, userGroup)
@@ -37,8 +36,7 @@ func (s *Server) CreateGroup(ctx context.Context, req *connect.Request[group_v2.
 func (s *Server) UpdateGroup(ctx context.Context, req *connect.Request[group_v2.UpdateGroupRequest]) (*connect.Response[group_v2.UpdateGroupResponse], error) {
 	userGroup := &domain.Group{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID:   req.Msg.GetId(),
-			ResourceOwner: authz.GetCtxData(ctx).ResourceOwner,
+			AggregateID: req.Msg.GetId(),
 		},
 		Name:        req.Msg.GetName(),
 		Description: req.Msg.GetDescription(),

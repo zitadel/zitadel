@@ -2,11 +2,8 @@ package command
 
 import (
 	"context"
-	"strings"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	repo "github.com/zitadel/zitadel/internal/repository/group"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -19,14 +16,14 @@ func (c *Commands) CreateGroup(ctx context.Context, group *domain.Group) (detail
 
 	// todo: check permissions
 
-	if !group.IsValid() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "CMDGRP-dUnd3r", "Errors.Group.InvalidName")
+	if err = group.IsValid(); err != nil {
+		return nil, err
 	}
-	if group.OrganizationID == "" {
+	if group.ResourceOwner == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "CMDGRP-msc0Tt", "Errors.Group.MissingOrganizationID")
 	}
 	// check whether the organization where the group should be created exists
-	err = c.checkOrgExists(ctx, group.OrganizationID)
+	err = c.checkOrgExists(ctx, group.ResourceOwner)
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "CMDGRP-j1mH8l", "Errors.Org.NotFound")
 	}
@@ -40,7 +37,7 @@ func (c *Commands) CreateGroup(ctx context.Context, group *domain.Group) (detail
 	}
 
 	// check if a group with the same ID already exists
-	groupWriteModel, err := c.getGroupWriteModelByID(ctx, group)
+	groupWriteModel, err := c.getGroupWriteModelByID(ctx, group.AggregateID, group.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +51,6 @@ func (c *Commands) CreateGroup(ctx context.Context, group *domain.Group) (detail
 			GroupAggregateFromWriteModel(ctx, &groupWriteModel.WriteModel),
 			group.Name,
 			group.Description,
-			group.OrganizationID,
 		))
 	if err != nil {
 		return nil, err
@@ -68,7 +64,7 @@ func (c *Commands) UpdateGroup(ctx context.Context, groupUpdate *domain.Group) (
 	defer func() { span.EndWithError(err) }()
 
 	// todo: check permissions
-	existingGroup, err := c.getGroupWriteModelByID(ctx, groupUpdate)
+	existingGroup, err := c.getGroupWriteModelByID(ctx, groupUpdate.AggregateID, groupUpdate.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -76,9 +72,15 @@ func (c *Commands) UpdateGroup(ctx context.Context, groupUpdate *domain.Group) (
 		return nil, zerrors.ThrowNotFound(nil, "CMDGRP-b33zly", "Errors.Group.NotFound")
 	}
 
+	// if there are no updates being made, return a successful response as the desired state is achieved.
+	if groupUpdate.Name == existingGroup.Name && groupUpdate.Description == existingGroup.Description {
+		return writeModelToObjectDetails(&existingGroup.WriteModel), nil
+	}
+
+	// validate the group name if it is being updated
 	if groupUpdate.Name != "" && existingGroup.Name != groupUpdate.Name {
-		if !groupUpdate.IsValid() {
-			return nil, zerrors.ThrowInvalidArgument(nil, "CMDGRP-m177lN", "Errors.Group.InvalidName")
+		if err = groupUpdate.IsValid(); err != nil {
+			return nil, err
 		}
 	}
 
@@ -88,7 +90,6 @@ func (c *Commands) UpdateGroup(ctx context.Context, groupUpdate *domain.Group) (
 			GroupAggregateFromWriteModel(ctx, &existingGroup.WriteModel),
 			existingGroup.Name,
 			groupUpdate.Name,
-			existingGroup.Description,
 			groupUpdate.Description,
 		))
 	if err != nil {
@@ -102,10 +103,7 @@ func (c *Commands) DeleteGroup(ctx context.Context, groupID string) (details *do
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if strings.TrimSpace(groupID) == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "CMDGRP-aNg318", "Errors.Group.MissingID")
-	}
-	existingGroup, err := c.getGroupWriteModelByID(ctx, &domain.Group{ObjectRoot: models.ObjectRoot{AggregateID: groupID, ResourceOwner: authz.GetCtxData(ctx).ResourceOwner}})
+	existingGroup, err := c.getGroupWriteModelByID(ctx, groupID, "")
 	if err != nil {
 		return nil, err
 	}
@@ -117,6 +115,7 @@ func (c *Commands) DeleteGroup(ctx context.Context, groupID string) (details *do
 		existingGroup,
 		repo.NewGroupRemovedEvent(ctx,
 			GroupAggregateFromWriteModel(ctx, &existingGroup.WriteModel),
+			existingGroup.Name,
 		))
 	if err != nil {
 		return nil, err
@@ -124,8 +123,8 @@ func (c *Commands) DeleteGroup(ctx context.Context, groupID string) (details *do
 	return writeModelToObjectDetails(&existingGroup.WriteModel), nil
 }
 
-func (c *Commands) getGroupWriteModelByID(ctx context.Context, group *domain.Group) (*GroupWriteModel, error) {
-	groupWriteModel := NewGroupWriteModel(group)
+func (c *Commands) getGroupWriteModelByID(ctx context.Context, id, orgID string) (*GroupWriteModel, error) {
+	groupWriteModel := NewGroupWriteModel(id, orgID)
 	err := c.eventstore.FilterToQueryReducer(ctx, groupWriteModel)
 	if err != nil {
 		return nil, err

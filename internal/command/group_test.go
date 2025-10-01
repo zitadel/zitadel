@@ -48,9 +48,11 @@ func TestCommands_CreateGroup(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				group: &domain.Group{
-					Name:           " ",
-					Description:    "example group",
-					OrganizationID: "org1",
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+					Name:        " ",
+					Description: "example group",
 				},
 			},
 			wantErr: zerrors.IsErrorInvalidArgument,
@@ -79,9 +81,11 @@ func TestCommands_CreateGroup(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				group: &domain.Group{
-					Name:           "example",
-					Description:    "example group",
-					OrganizationID: "org1",
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+					Name:        "example",
+					Description: "example group",
 				},
 			},
 			wantErr: zerrors.IsPreconditionFailed,
@@ -103,9 +107,11 @@ func TestCommands_CreateGroup(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				group: &domain.Group{
-					Name:           "example",
-					Description:    "example group",
-					OrganizationID: "org1",
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+					Name:        "example",
+					Description: "example group",
 				},
 				aggregateID: func() (string, error) {
 					return "", idGeneratorErr
@@ -133,7 +139,6 @@ func TestCommands_CreateGroup(t *testing.T) {
 								&group.NewAggregate("1234", "org1").Aggregate,
 								"example",
 								"example group",
-								"org1",
 							),
 						),
 					),
@@ -143,11 +148,11 @@ func TestCommands_CreateGroup(t *testing.T) {
 				ctx: context.Background(),
 				group: &domain.Group{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "1234",
+						AggregateID:   "1234",
+						ResourceOwner: "org1",
 					},
-					Name:           "example",
-					Description:    "example group",
-					OrganizationID: "org1",
+					Name:        "example",
+					Description: "example group",
 				},
 			},
 			wantErr: zerrors.IsErrorAlreadyExists,
@@ -162,9 +167,11 @@ func TestCommands_CreateGroup(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				group: &domain.Group{
-					Name:           "example",
-					Description:    "example group",
-					OrganizationID: "org1",
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+					Name:        "example",
+					Description: "example group",
 				},
 			},
 			wantErr: func(err error) bool {
@@ -189,9 +196,11 @@ func TestCommands_CreateGroup(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				group: &domain.Group{
-					Name:           "example",
-					Description:    "example group",
-					OrganizationID: "org1",
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+					Name:        "example",
+					Description: "example group",
 				},
 				aggregateID: func() (string, error) {
 					return "12345", nil
@@ -220,7 +229,6 @@ func TestCommands_CreateGroup(t *testing.T) {
 							&group.NewAggregate("12345", "org1").Aggregate,
 							"example",
 							"example group",
-							"org1",
 						),
 					),
 				),
@@ -228,9 +236,11 @@ func TestCommands_CreateGroup(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				group: &domain.Group{
-					Name:           "example",
-					Description:    "example group",
-					OrganizationID: "org1",
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+					Name:        "example",
+					Description: "example group",
 				},
 				aggregateID: func() (string, error) {
 					return "12345", nil
@@ -258,7 +268,6 @@ func TestCommands_CreateGroup(t *testing.T) {
 							&group.NewAggregate("12345", "org1").Aggregate,
 							"example",
 							"example group",
-							"org1",
 						),
 					),
 				),
@@ -266,9 +275,11 @@ func TestCommands_CreateGroup(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				group: &domain.Group{
-					Name:           "example",
-					Description:    "example group",
-					OrganizationID: "org1",
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+					Name:        "example",
+					Description: "example group",
 				},
 				aggregateID: func() (string, error) {
 					return "12345", nil
@@ -297,7 +308,6 @@ func TestCommands_CreateGroup(t *testing.T) {
 							&group.NewAggregate("9090", "org1").Aggregate,
 							"example",
 							"example group",
-							"org1",
 						),
 					),
 				),
@@ -306,11 +316,11 @@ func TestCommands_CreateGroup(t *testing.T) {
 				ctx: context.Background(),
 				group: &domain.Group{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "9090",
+						AggregateID:   "9090",
+						ResourceOwner: "org1",
 					},
-					Name:           "example",
-					Description:    "example group",
-					OrganizationID: "org1",
+					Name:        "example",
+					Description: "example group",
 				},
 			},
 			want: &domain.ObjectDetails{
@@ -382,7 +392,6 @@ func TestCommands_UpdateGroup(t *testing.T) {
 								&group.NewAggregate("1234", "org1").Aggregate,
 								"group1",
 								"group1 description",
-								"org1",
 							),
 						),
 					),
@@ -391,9 +400,8 @@ func TestCommands_UpdateGroup(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				group: &domain.Group{
-					Name:           " ",
-					Description:    "example group",
-					OrganizationID: "org1",
+					Name:        " ",
+					Description: "example group",
 				},
 			},
 			wantErr: zerrors.IsErrorInvalidArgument,
@@ -411,9 +419,8 @@ func TestCommands_UpdateGroup(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "1234",
 					},
-					Name:           "updated name",
-					Description:    "updated description",
-					OrganizationID: "org1",
+					Name:        "updated name",
+					Description: "updated description",
 				},
 			},
 			wantErr: zerrors.IsNotFound,
@@ -446,7 +453,6 @@ func TestCommands_UpdateGroup(t *testing.T) {
 								&group.NewAggregate("1234", "org1").Aggregate,
 								"group1",
 								"group1 description",
-								"org1",
 							),
 						),
 					),
@@ -456,7 +462,6 @@ func TestCommands_UpdateGroup(t *testing.T) {
 							&group.NewAggregate("1234", "org1").Aggregate,
 							"group1",
 							"updated group name",
-							"group1 description",
 							"updated group description",
 						),
 					),
@@ -482,18 +487,6 @@ func TestCommands_UpdateGroup(t *testing.T) {
 							group.NewGroupAddedEvent(context.Background(),
 								&group.NewAggregate("1234", "org1").Aggregate,
 								"group1",
-								"group1 description",
-								"org1",
-							),
-						),
-					),
-					expectPush(
-						eventFromEventPusher(
-							group.NewGroupChangedEvent(context.Background(),
-								&group.NewAggregate("1234", "org1").Aggregate,
-								"group1",
-								"group1",
-								"group1 description",
 								"group1 description",
 							),
 						),
@@ -525,7 +518,6 @@ func TestCommands_UpdateGroup(t *testing.T) {
 								&group.NewAggregate("1234", "org1").Aggregate,
 								"group1",
 								"group1 description",
-								"org1",
 							),
 						),
 					),
@@ -535,7 +527,6 @@ func TestCommands_UpdateGroup(t *testing.T) {
 								&group.NewAggregate("1234", "org1").Aggregate,
 								"group1",
 								"groupXX",
-								"group1 description",
 								"",
 							),
 						),
@@ -566,7 +557,6 @@ func TestCommands_UpdateGroup(t *testing.T) {
 								&group.NewAggregate("1234", "org1").Aggregate,
 								"group1",
 								"group1 description",
-								"org1",
 							),
 						),
 					),
@@ -576,7 +566,6 @@ func TestCommands_UpdateGroup(t *testing.T) {
 								&group.NewAggregate("1234", "org1").Aggregate,
 								"group1",
 								"",
-								"group1 description",
 								"updated group description",
 							),
 						),
@@ -607,7 +596,6 @@ func TestCommands_UpdateGroup(t *testing.T) {
 								&group.NewAggregate("1234", "org1").Aggregate,
 								"group1",
 								"group1 description",
-								"org1",
 							),
 						),
 					),
@@ -617,7 +605,6 @@ func TestCommands_UpdateGroup(t *testing.T) {
 								&group.NewAggregate("1234", "org1").Aggregate,
 								"group1",
 								"groupXX",
-								"group1 description",
 								"updated group description",
 							),
 						),
@@ -680,17 +667,6 @@ func TestCommands_DeleteGroup(t *testing.T) {
 		wantErr func(error) bool
 	}{
 		{
-			name: "missing group ID, error",
-			fields: fields{
-				eventstore: expectEventstore(),
-			},
-			args: args{
-				ctx:     context.Background(),
-				groupID: "  ",
-			},
-			wantErr: zerrors.IsErrorInvalidArgument,
-		},
-		{
 			name: "failed to get group write model, error",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -730,7 +706,6 @@ func TestCommands_DeleteGroup(t *testing.T) {
 								&group.NewAggregate("1234", "").Aggregate,
 								"group1",
 								"group1 description",
-								"org1",
 							),
 						),
 					),
@@ -738,6 +713,7 @@ func TestCommands_DeleteGroup(t *testing.T) {
 						pushErr,
 						group.NewGroupRemovedEvent(context.Background(),
 							&group.NewAggregate("1234", "").Aggregate,
+							"group1",
 						),
 					),
 				),
@@ -760,7 +736,6 @@ func TestCommands_DeleteGroup(t *testing.T) {
 								&group.NewAggregate("1234", "").Aggregate,
 								"group1",
 								"group1 description",
-								"org1",
 							),
 						),
 					),
@@ -768,6 +743,7 @@ func TestCommands_DeleteGroup(t *testing.T) {
 						eventFromEventPusher(
 							group.NewGroupRemovedEvent(context.Background(),
 								&group.NewAggregate("1234", "").Aggregate,
+								"group1",
 							),
 						),
 					),

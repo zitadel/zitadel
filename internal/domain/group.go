@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -14,14 +15,16 @@ const (
 type Group struct {
 	models.ObjectRoot
 
-	Name           string
-	Description    string
-	OrganizationID string
+	Name        string
+	Description string
 }
 
-func (g *Group) IsValid() bool {
+func (g *Group) IsValid() error {
 	groupName := strings.TrimSpace(g.Name)
-	return groupName != "" && len(groupName) <= maxGroupNameLen
+	if groupName == "" || len(groupName) > maxGroupNameLen {
+		return zerrors.ThrowInvalidArgument(nil, "GROUP-m177lN", "Errors.Group.InvalidName")
+	}
+	return nil
 }
 
 type GroupState int32
@@ -29,7 +32,6 @@ type GroupState int32
 const (
 	GroupStateUnspecified GroupState = iota
 	GroupStateActive
-	GroupStateInactive
 	GroupStateRemoved
 )
 

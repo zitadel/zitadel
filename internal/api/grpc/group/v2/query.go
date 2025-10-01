@@ -7,8 +7,13 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	group "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 )
+
+func (s *Server) GetGroup(ctx context.Context, req *connect.Request[group.GetGroupRequest]) (*connect.Response[group.GetGroupResponse], error) {
+	return nil, zerrors.ThrowUnimplemented(nil, "GRP-1234", "Errors.Internal.Unimplemented")
+}
 
 // ListGroups returns a list of groups that match the search criteria
 func (s *Server) ListGroups(ctx context.Context, req *connect.Request[group.ListGroupsRequest]) (*connect.Response[group.ListGroupsResponse], error) {
