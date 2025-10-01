@@ -153,8 +153,8 @@ func TestServer_ListGroups(t *testing.T) {
 						CreationDate: group1.GetCreationDate(),
 						ChangeDate:   group1.GetCreationDate(),
 					}
-					req.Filters[0].Filter = &group_v2.GroupsSearchFilter_NameQuery{
-						NameQuery: &group_v2.GroupNameQuery{
+					req.Filters[0].Filter = &group_v2.GroupsSearchFilter_NameFilter{
+						NameFilter: &group_v2.GroupNameFilter{
 							Name: groupName,
 						},
 					}

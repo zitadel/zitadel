@@ -122,8 +122,8 @@ func Test_GroupSearchFiltersToQuery(t *testing.T) {
 					},
 				},
 				{
-					Filter: &group_v2.GroupsSearchFilter_NameQuery{
-						NameQuery: &group_v2.GroupNameQuery{
+					Filter: &group_v2.GroupsSearchFilter_NameFilter{
+						NameFilter: &group_v2.GroupNameFilter{
 							Name:   "mygroup",
 							Method: filter.TextFilterMethod_TEXT_FILTER_METHOD_STARTS_WITH,
 						},
