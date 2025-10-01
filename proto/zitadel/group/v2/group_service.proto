@@ -116,11 +116,6 @@ service GroupService {
   //   - "iam.member.write" for instance administrators
   //   - "org.member.write" for organization administrators
   rpc CreateGroup(CreateGroupRequest) returns (CreateGroupResponse) {
-    option (google.api.http) = {
-      post: "/v2/groups"
-      body: "*"
-    };
-
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
@@ -162,6 +157,39 @@ service GroupService {
     };
   }
 
+  // GetGroup
+  //
+  // Retrieves a group based on its ID.
+  //
+  // Required permission:
+  // - TODO
+  rpc GetGroup(GetGroupRequest) returns (GetGroupResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "Group retrieved successfully";
+        }
+      };
+      responses: {
+        key: "404"
+        value: {
+          description: "The requested group does not exist.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      };
+    };
+  }
+
   // ListGroups
   //
   // ListGroups returns all groups matching the request and necessary permissions from an organization.
@@ -170,11 +198,6 @@ service GroupService {
   //   - "iam.member.read" for instance administrators
   //   - "org.member.read" for organization administrators
   rpc ListGroups(ListGroupsRequest) returns (ListGroupsResponse) {
-    option (google.api.http) = {
-      post: "/v2/groups/search"
-      body: "*"
-    };
-
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
@@ -214,11 +237,6 @@ service GroupService {
   //   - "iam.member.write" for instance administrators
   //   - "org.member.write" for organization administrators
   rpc UpdateGroup(UpdateGroupRequest) returns (UpdateGroupResponse) {
-    option (google.api.http) = {
-      post: "/v2/groups/{id}"
-      body: "*"
-    };
-
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
@@ -258,10 +276,6 @@ service GroupService {
   //   - "iam.member.delete" for instance administrators
   //   - "org.member.delete" for organization administrators
   rpc DeleteGroup(DeleteGroupRequest) returns (DeleteGroupResponse) {
-    option (google.api.http) = {
-      delete: "/v2/groups/{id}"
-    };
-
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
@@ -299,7 +313,7 @@ message CreateGroupRequest {
       max_length: 200;
       example: "\"163840776835432345\"";
     },
-    (google.api.field_behavior) = REQUIRED,
+    (google.api.field_behavior) = REQUIRED
   ];
 
   // Name of the group. This must be unique inside the corresponding organization.
@@ -371,6 +385,23 @@ message ListGroupsResponse {
   zitadel.filter.v2.PaginationResponse pagination = 2;
 }
 
+message GetGroupRequest {
+  // The ID of the group to be retrieved.
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message GetGroupResponse {
+  Group group = 1;
+}
+
 message UpdateGroupRequest {
   // The ID of the user group to be updated.
   string id = 1 [
@@ -424,7 +455,6 @@ message DeleteGroupRequest {
       example: "\"69629012906488334\"";
     },
     (google.api.field_behavior) = REQUIRED
-
   ];
 }
 
