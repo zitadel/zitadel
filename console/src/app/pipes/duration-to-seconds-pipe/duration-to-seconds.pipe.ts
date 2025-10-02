@@ -3,6 +3,7 @@ import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 
 @Pipe({
   name: 'durationToSeconds',
+  standalone: false,
 })
 export class DurationToSecondsPipe implements PipeTransform {
   transform(value?: Duration.AsObject, ...args: unknown[]): unknown {

@@ -28,7 +28,6 @@ export type ConditionTypeValue<T extends ConditionType> = Omit<
 >;
 
 @Component({
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'cnsl-actions-two-add-action-condition',
   templateUrl: './actions-two-add-action-condition.component.html',

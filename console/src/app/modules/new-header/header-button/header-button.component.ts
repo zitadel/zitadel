@@ -7,7 +7,6 @@ import { MatRippleModule } from '@angular/material/core';
   selector: 'cnsl-header-button',
   templateUrl: './header-button.component.html',
   styleUrls: ['./header-button.component.scss'],
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgIconComponent, MatRippleModule],
   providers: [provideIcons({ heroChevronUpDown })],

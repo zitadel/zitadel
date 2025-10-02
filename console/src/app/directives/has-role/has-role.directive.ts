@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Directive({
   selector: '[cnslHasRole]',
+  standalone: false,
 })
 export class HasRoleDirective {
   private hasView: boolean = false;

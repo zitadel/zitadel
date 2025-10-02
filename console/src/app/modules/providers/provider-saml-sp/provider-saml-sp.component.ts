@@ -49,6 +49,7 @@ interface SAMLProviderForm {
   selector: 'cnsl-provider-saml-sp',
   templateUrl: './provider-saml-sp.component.html',
   styleUrls: ['./provider-saml-sp.component.scss'],
+  standalone: false,
 })
 export class ProviderSamlSpComponent {
   // DEPRECATED: use id$ instead

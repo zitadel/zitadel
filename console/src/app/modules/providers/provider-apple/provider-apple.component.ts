@@ -31,6 +31,7 @@ const MAX_ALLOWED_SIZE = 5 * 1024;
 @Component({
   selector: 'cnsl-provider-apple',
   templateUrl: './provider-apple.component.html',
+  standalone: false,
 })
 export class ProviderAppleComponent {
   public showOptional: boolean = false;

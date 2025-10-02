@@ -1,9 +1,11 @@
+@use 'sass:map';
+
 @mixin table-theme($theme) {
-  $primary: map-get($theme, primary);
-  $primary-color: map-get($primary, 500);
-  $is-dark-theme: map-get($theme, is-dark);
-  $foreground: map-get($theme, foreground);
-  $background: map-get($theme, background);
+  $primary: map.get($theme, primary);
+  $primary-color: map.get($primary, 500);
+  $is-dark-theme: map.get($theme, is-dark);
+  $foreground: map.get($theme, foreground);
+  $background: map.get($theme, background);
 
   .mat-mdc-table,
   .mat-mdc-paginator {
@@ -27,7 +29,7 @@
     white-space: nowrap;
 
     &.mat-mdc-header-cell {
-      color: map-get($foreground, text);
+      color: map.get($foreground, text);
       font-size: 11px;
       font-weight: 500;
     }
@@ -47,7 +49,7 @@
       &:hover {
         td {
           transition: background 0.1s ease;
-          background: map-get($background, hover);
+          background: map.get($background, hover);
         }
       }
     }
@@ -121,17 +123,17 @@
     font-weight: 500;
     font-size: 12px;
     white-space: nowrap;
-    background-color: if($is-dark-theme, map-get($background, state), #e4e7e4);
+    background-color: if($is-dark-theme, map.get($background, state), #e4e7e4);
     box-shadow: 0 0 3px #0000001a;
 
     &.active {
-      background-color: if($is-dark-theme, map-get($background, state-active), #cbf4c9);
+      background-color: if($is-dark-theme, map.get($background, state-active), #cbf4c9);
       color: if($is-dark-theme, #cbf4c9, #0e6245);
     }
 
     &.inactive {
       color: if($is-dark-theme, #ffc1c1, #620e0e);
-      background-color: if($is-dark-theme, map-get($background, state-inactive), #ffc1c1);
+      background-color: if($is-dark-theme, map.get($background, state-inactive), #ffc1c1);
     }
 
     &.neutral {
@@ -141,16 +143,16 @@
   }
 
   .bg-state {
-    background-color: if($is-dark-theme, map-get($background, state), #e4e7e4) !important;
+    background-color: if($is-dark-theme, map.get($background, state), #e4e7e4) !important;
 
     &.active {
-      background-color: if($is-dark-theme, map-get($background, state-active), #cbf4c9) !important;
+      background-color: if($is-dark-theme, map.get($background, state-active), #cbf4c9) !important;
       color: if($is-dark-theme, #cbf4c9, #0e6245) !important;
     }
 
     &.inactive {
       color: if($is-dark-theme, #ffc1c1, #620e0e) !important;
-      background-color: if($is-dark-theme, map-get($background, state-inactive), #ffc1c1) !important;
+      background-color: if($is-dark-theme, map.get($background, state-inactive), #ffc1c1) !important;
     }
   }
 

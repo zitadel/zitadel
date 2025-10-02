@@ -35,7 +35,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TableActionsModule } from 'src/app/modules/table-actions/table-actions.module';
 
 @Component({
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'cnsl-actions-two-add-action-target',
   templateUrl: './actions-two-add-action-target.component.html',

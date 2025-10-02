@@ -19,6 +19,7 @@ import { InfoSectionType } from '../../info-section/info-section.component';
   templateUrl: './actions-two-targets.component.html',
   styleUrls: ['./actions-two-targets.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ActionsTwoTargetsComponent {
   protected readonly targets$: Observable<Target[]>;

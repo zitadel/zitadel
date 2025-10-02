@@ -68,7 +68,7 @@ export class GrpcService {
 
     const browserLanguage = this.translate.getBrowserLang();
     const language = browserLanguage?.match(supportedLanguagesRegexp) ? browserLanguage : fallbackLanguage;
-    const init = this.translate.use(language || this.translate.defaultLang).pipe(
+    const init = this.translate.use(language).pipe(
       switchMap(() => this.envService.env),
       tap((env) => {
         if (!env?.api || !env?.issuer) {

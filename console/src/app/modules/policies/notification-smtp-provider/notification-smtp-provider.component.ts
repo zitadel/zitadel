@@ -9,6 +9,7 @@ import { SMTPKnownProviders } from '../../smtp-provider/known-smtp-providers-set
   selector: 'cnsl-notification-smtp-provider',
   templateUrl: './notification-smtp-provider.component.html',
   styleUrls: ['./notification-smtp-provider.component.scss'],
+  standalone: false,
 })
 export class NotificationSMTPProviderComponent implements OnInit {
   @Input() public serviceType!: PolicyComponentServiceType;

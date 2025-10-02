@@ -46,6 +46,7 @@ type UserWithHumanType = Omit<User, 'type'> & { type: { case: 'human'; value: Hu
   selector: 'cnsl-auth-user-detail',
   templateUrl: './auth-user-detail.component.html',
   styleUrls: ['./auth-user-detail.component.scss'],
+  standalone: false,
 })
 export class AuthUserDetailComponent implements OnInit {
   protected readonly genders: Gender[] = [Gender.MALE, Gender.FEMALE, Gender.DIVERSE];
@@ -112,23 +113,20 @@ export class AuthUserDetailComponent implements OnInit {
       filter(Boolean),
     );
 
-    effect(
-      () => {
-        const user = this.user.data();
-        if (!user || user.type.case !== 'human') {
-          return;
-        }
+    effect(() => {
+      const user = this.user.data();
+      if (!user || user.type.case !== 'human') {
+        return;
+      }
 
-        this.breadcrumbService.setBreadcrumb([
-          new Breadcrumb({
-            type: BreadcrumbType.AUTHUSER,
-            name: user.type.value.profile?.displayName,
-            routerLink: ['/users', 'me'],
-          }),
-        ]);
-      },
-      { allowSignalWrites: true },
-    );
+      this.breadcrumbService.setBreadcrumb([
+        new Breadcrumb({
+          type: BreadcrumbType.AUTHUSER,
+          name: user.type.value.profile?.displayName,
+          routerLink: ['/users', 'me'],
+        }),
+      ]);
+    });
 
     effect(() => {
       const error = this.user.error();

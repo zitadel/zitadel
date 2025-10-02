@@ -13,6 +13,7 @@ import { Organization } from '@zitadel/proto/zitadel/org/v2/org_pb';
   selector: 'cnsl-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
+  standalone: false,
 })
 export class HeaderComponent {
   @Input() public isDarkTheme: boolean = true;

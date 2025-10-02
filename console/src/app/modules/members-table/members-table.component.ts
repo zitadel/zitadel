@@ -26,6 +26,7 @@ type MemberDatasource =
   selector: 'cnsl-members-table',
   templateUrl: './members-table.component.html',
   styleUrls: ['./members-table.component.scss'],
+  standalone: false,
 })
 export class MembersTableComponent implements OnInit, OnDestroy {
   public INITIALPAGESIZE: number = 25;

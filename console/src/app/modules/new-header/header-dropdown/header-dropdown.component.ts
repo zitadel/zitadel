@@ -23,7 +23,6 @@ import { ReplaySubject } from 'rxjs';
   selector: 'cnsl-header-dropdown',
   templateUrl: './header-dropdown.component.html',
   styleUrls: ['./header-dropdown.component.scss'],
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CdkConnectedOverlay, NgIf, AsyncPipe],
 })
@@ -59,15 +58,12 @@ export class HeaderDropdownComponent implements OnInit {
     // to make sure the dropdown will be rendered in the correct position
     runInInjectionContext(this.injector, () => {
       const isOpen = toSignal(this.isOpen$, { requireSync: true });
-      effect(
-        () => {
-          this.isHandset();
-          if (untracked(() => isOpen())) {
-            this.closed.emit();
-          }
-        },
-        { allowSignalWrites: true },
-      );
+      effect(() => {
+        this.isHandset();
+        if (untracked(() => isOpen())) {
+          this.closed.emit();
+        }
+      });
     });
   }
 

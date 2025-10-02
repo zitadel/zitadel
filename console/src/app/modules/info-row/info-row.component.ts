@@ -15,6 +15,7 @@ import { Organization as OrgV2 } from '@zitadel/proto/zitadel/org/v2/org_pb';
   selector: 'cnsl-info-row',
   templateUrl: './info-row.component.html',
   styleUrls: ['./info-row.component.scss'],
+  standalone: false,
 })
 export class InfoRowComponent {
   @Input() public user?: User.AsObject | UserV2 | UserV1;

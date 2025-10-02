@@ -4,6 +4,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   selector: 'cnsl-top-view',
   templateUrl: './top-view.component.html',
   styleUrls: ['./top-view.component.scss'],
+  standalone: false,
 })
 export class TopViewComponent {
   @Input() public title: string = '';

@@ -44,6 +44,7 @@ import { ToastService } from 'src/app/services/toast.service';
       ]),
     ]),
   ],
+  standalone: false,
 })
 export class ProjectGridComponent implements OnInit, OnDestroy {
   public projectList: Array<Project.AsObject | GrantedProject.AsObject> = [];

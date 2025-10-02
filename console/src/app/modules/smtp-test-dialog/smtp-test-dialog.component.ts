@@ -13,6 +13,7 @@ import { take } from 'rxjs';
   selector: 'cnsl-smtp-test-dialog',
   templateUrl: './smtp-test-dialog.component.html',
   styleUrls: ['./smtp-test-dialog.component.scss'],
+  standalone: false,
 })
 export class SmtpTestDialogComponent {
   public resultClass = 'test-success';

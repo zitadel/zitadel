@@ -29,7 +29,6 @@ class Filter implements PipeTransform {
   selector: 'cnsl-actions-two-add-action-autocomplete-input',
   templateUrl: './actions-two-add-action-autocomplete-input.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     AsyncPipe,
     Filter,

@@ -46,6 +46,7 @@ type AuthenticationFactor =
   templateUrl: './user-create-v2.component.html',
   styleUrls: ['./user-create-v2.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class UserCreateV2Component implements OnInit {
   protected readonly loading = signal(false);
