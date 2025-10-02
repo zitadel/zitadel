@@ -18,7 +18,7 @@ import { createUserServiceClient } from "@zitadel/client/v2";
 import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { AuthenticationMethodType, SetPasswordRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { SetPasswordRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
@@ -370,13 +370,26 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const sessionCookie = await getSessionCookieById({ sessionId });
+  let sessionCookie;
+  try {
+    sessionCookie = await getSessionCookieById({ sessionId });
+  } catch (error) {
+    console.error("Error getting session cookie:", error);
+    return { error: "Could not load session cookie" };
+  }
 
-  const { session } = await getSession({
-    serviceUrl,
-    sessionId: sessionCookie.id,
-    sessionToken: sessionCookie.token,
-  });
+  let session;
+  try {
+    const sessionResponse = await getSession({
+      serviceUrl,
+      sessionId: sessionCookie.id,
+      sessionToken: sessionCookie.token,
+    });
+    session = sessionResponse.session;
+  } catch (error) {
+    console.error("Error getting session:", error);
+    return { error: "Could not load session" };
+  }
 
   if (!session || !session.factors?.user?.id) {
     return { error: "Could not load session" };
@@ -390,40 +403,43 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
   });
 
   // check if the user has no password set in order to set a password
-  const authmethods = await listAuthenticationMethodTypes({
-    serviceUrl,
-    userId: session.factors.user.id,
-  });
+  let authmethods;
+  try {
+    authmethods = await listAuthenticationMethodTypes({
+      serviceUrl,
+      userId: session.factors.user.id,
+    });
+  } catch (error) {
+    console.error("Error getting auth methods:", error);
+    return { error: "Could not load auth methods" };
+  }
 
   if (!authmethods) {
     return { error: "Could not load auth methods" };
   }
 
-  const requiredAuthMethodsForForceMFA = [
-    AuthenticationMethodType.OTP_EMAIL,
-    AuthenticationMethodType.OTP_SMS,
-    AuthenticationMethodType.TOTP,
-    AuthenticationMethodType.U2F,
-  ];
-
-  const hasNoMFAMethods = requiredAuthMethodsForForceMFA.every((method) => !authmethods.authMethodTypes.includes(method));
-
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: session.factors.user.organizationId,
-  });
+  let loginSettings;
+  try {
+    loginSettings = await getLoginSettings({
+      serviceUrl,
+      organization: session.factors.user.organizationId,
+    });
+  } catch (error) {
+    console.error("Error getting login settings:", error);
+    return { error: "Could not load login settings" };
+  }
 
   const forceMfa = !!(loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly);
 
   // if the user has no MFA but MFA is enforced, we can set a password otherwise we use the token of the user
-  if (forceMfa && hasNoMFAMethods) {
+  if (forceMfa) {
+    console.log("Set password using service account due to enforced MFA without existing MFA methods");
     return setPassword({ serviceUrl, payload }).catch((error) => {
       // throw error if failed precondition (ex. User is not yet initialized)
       if (error.code === 9 && error.message) {
         return { error: "Failed precondition" };
-      } else {
-        throw error;
       }
+      return { error: "Could not set password" };
     });
   } else {
     const transport = async (serviceUrl: string, token: string) => {
@@ -450,7 +466,7 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
         if (error.code === 7) {
           return { error: "Session is not valid." };
         }
-        throw error;
+        return { error: "Could not set the password" };
       });
   }
 }
