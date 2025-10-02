@@ -11,6 +11,7 @@ import (
 	group "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 )
 
+// GetGroup returns a group that matches the group ID in the request
 func (s *Server) GetGroup(ctx context.Context, req *connect.Request[group.GetGroupRequest]) (*connect.Response[group.GetGroupResponse], error) {
 	return nil, zerrors.ThrowUnimplemented(nil, "GRP-1234", "Errors.Internal.Unimplemented")
 }

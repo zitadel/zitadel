@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -30,7 +31,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 	}
 	type args struct {
 		ctx         context.Context
-		group       *domain.Group
+		group       *CreateGroup
 		aggregateID func() (string, error)
 	}
 	tests := []struct {
@@ -47,7 +48,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				group: &domain.Group{
+				group: &CreateGroup{
 					ObjectRoot: models.ObjectRoot{
 						ResourceOwner: "org1",
 					},
@@ -64,7 +65,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				group: &domain.Group{
+				group: &CreateGroup{
 					Name:        "example",
 					Description: "example group",
 				},
@@ -80,7 +81,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				group: &domain.Group{
+				group: &CreateGroup{
 					ObjectRoot: models.ObjectRoot{
 						ResourceOwner: "org1",
 					},
@@ -106,7 +107,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				group: &domain.Group{
+				group: &CreateGroup{
 					ObjectRoot: models.ObjectRoot{
 						ResourceOwner: "org1",
 					},
@@ -146,7 +147,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				group: &domain.Group{
+				group: &CreateGroup{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "1234",
 						ResourceOwner: "org1",
@@ -166,7 +167,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				group: &domain.Group{
+				group: &CreateGroup{
 					ObjectRoot: models.ObjectRoot{
 						ResourceOwner: "org1",
 					},
@@ -195,7 +196,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				group: &domain.Group{
+				group: &CreateGroup{
 					ObjectRoot: models.ObjectRoot{
 						ResourceOwner: "org1",
 					},
@@ -235,7 +236,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				group: &domain.Group{
+				group: &CreateGroup{
 					ObjectRoot: models.ObjectRoot{
 						ResourceOwner: "org1",
 					},
@@ -274,7 +275,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				group: &domain.Group{
+				group: &CreateGroup{
 					ObjectRoot: models.ObjectRoot{
 						ResourceOwner: "org1",
 					},
@@ -314,7 +315,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				group: &domain.Group{
+				group: &CreateGroup{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "9090",
 						ResourceOwner: "org1",
@@ -373,7 +374,7 @@ func TestCommands_UpdateGroup(t *testing.T) {
 	}
 	type args struct {
 		ctx   context.Context
-		group *domain.Group
+		group *UpdateGroup
 	}
 	tests := []struct {
 		name    string
@@ -385,23 +386,13 @@ func TestCommands_UpdateGroup(t *testing.T) {
 		{
 			name: "invalid group name, error",
 			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							group.NewGroupAddedEvent(context.Background(),
-								&group.NewAggregate("1234", "org1").Aggregate,
-								"group1",
-								"group1 description",
-							),
-						),
-					),
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: context.Background(),
-				group: &domain.Group{
-					Name:        " ",
-					Description: "example group",
+				group: &UpdateGroup{
+					Name:        gu.Ptr(" "),
+					Description: gu.Ptr("example group"),
 				},
 			},
 			wantErr: zerrors.IsErrorInvalidArgument,
@@ -415,12 +406,12 @@ func TestCommands_UpdateGroup(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				group: &domain.Group{
+				group: &UpdateGroup{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "1234",
 					},
-					Name:        "updated name",
-					Description: "updated description",
+					Name:        gu.Ptr("updated name"),
+					Description: gu.Ptr("updated description"),
 				},
 			},
 			wantErr: zerrors.IsNotFound,
@@ -434,9 +425,9 @@ func TestCommands_UpdateGroup(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				group: &domain.Group{
-					Name:        "updated group name",
-					Description: "updated group description",
+				group: &UpdateGroup{
+					Name:        gu.Ptr("updated group name"),
+					Description: gu.Ptr("updated group description"),
 				},
 			},
 			wantErr: func(err error) bool {
@@ -461,17 +452,19 @@ func TestCommands_UpdateGroup(t *testing.T) {
 						group.NewGroupChangedEvent(context.Background(),
 							&group.NewAggregate("1234", "org1").Aggregate,
 							"group1",
-							"updated group name",
-							"updated group description",
+							[]group.GroupChanges{
+								group.ChangeName("updated group name"),
+								group.ChangeDescription("updated group description"),
+							},
 						),
 					),
 				),
 			},
 			args: args{
 				ctx: context.Background(),
-				group: &domain.Group{
-					Name:        "updated group name",
-					Description: "updated group description",
+				group: &UpdateGroup{
+					Name:        gu.Ptr("updated group name"),
+					Description: gu.Ptr("updated group description"),
 				},
 			},
 			wantErr: func(err error) bool {
@@ -495,12 +488,12 @@ func TestCommands_UpdateGroup(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				group: &domain.Group{
+				group: &UpdateGroup{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "1234",
 					},
-					Name:        "group1",
-					Description: "group1 description",
+					Name:        gu.Ptr("group1"),
+					Description: gu.Ptr("group1 description"),
 				},
 			},
 			want: &domain.ObjectDetails{
@@ -522,24 +515,23 @@ func TestCommands_UpdateGroup(t *testing.T) {
 						),
 					),
 					expectPush(
-						eventFromEventPusher(
-							group.NewGroupChangedEvent(context.Background(),
-								&group.NewAggregate("1234", "org1").Aggregate,
-								"group1",
-								"groupXX",
-								"",
-							),
+						group.NewGroupChangedEvent(context.Background(),
+							&group.NewAggregate("1234", "org1").Aggregate,
+							"group1",
+							[]group.GroupChanges{
+								group.ChangeName("groupXX"),
+							},
 						),
 					),
 				),
 			},
 			args: args{
 				ctx: context.Background(),
-				group: &domain.Group{
+				group: &UpdateGroup{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "1234",
 					},
-					Name: "groupXX",
+					Name: gu.Ptr("groupXX"),
 				},
 			},
 			want: &domain.ObjectDetails{
@@ -561,24 +553,23 @@ func TestCommands_UpdateGroup(t *testing.T) {
 						),
 					),
 					expectPush(
-						eventFromEventPusher(
-							group.NewGroupChangedEvent(context.Background(),
-								&group.NewAggregate("1234", "org1").Aggregate,
-								"group1",
-								"",
-								"updated group description",
-							),
+						group.NewGroupChangedEvent(context.Background(),
+							&group.NewAggregate("1234", "org1").Aggregate,
+							"group1",
+							[]group.GroupChanges{
+								group.ChangeDescription("updated group description"),
+							},
 						),
 					),
 				),
 			},
 			args: args{
 				ctx: context.Background(),
-				group: &domain.Group{
+				group: &UpdateGroup{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "1234",
 					},
-					Description: "updated group description",
+					Description: gu.Ptr("updated group description"),
 				},
 			},
 			want: &domain.ObjectDetails{
@@ -600,25 +591,25 @@ func TestCommands_UpdateGroup(t *testing.T) {
 						),
 					),
 					expectPush(
-						eventFromEventPusher(
-							group.NewGroupChangedEvent(context.Background(),
-								&group.NewAggregate("1234", "org1").Aggregate,
-								"group1",
-								"groupXX",
-								"updated group description",
-							),
+						group.NewGroupChangedEvent(context.Background(),
+							&group.NewAggregate("1234", "org1").Aggregate,
+							"group1",
+							[]group.GroupChanges{
+								group.ChangeName("groupXX"),
+								group.ChangeDescription("updated group description"),
+							},
 						),
 					),
 				),
 			},
 			args: args{
 				ctx: context.Background(),
-				group: &domain.Group{
+				group: &UpdateGroup{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "1234",
 					},
-					Name:        "groupXX",
-					Description: "updated group description",
+					Name:        gu.Ptr("groupXX"),
+					Description: gu.Ptr("updated group description"),
 				},
 			},
 			want: &domain.ObjectDetails{
