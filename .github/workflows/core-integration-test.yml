@@ -39,9 +39,9 @@ jobs:
           - 6379:6379
     steps:
       - 
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       -
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: 'go.mod'
       - 
@@ -85,7 +85,7 @@ jobs:
            tmp/race.log.*
       - 
         name: publish coverage
-        uses: codecov/codecov-action@v4.3.0
+        uses: codecov/codecov-action@v5.5.1
         with:
           file: profile.cov
           name: core-integration-tests-postgres
