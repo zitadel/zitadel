@@ -528,5 +528,11 @@ Errors:
       RegistrationNotAllowed: la registrazione non è consentita.
   DeviceAuth:
     NotExisting: Il codice utente non esiste
+  Captcha:
+    InitializationFailed: Impossibile inizializzare il Captcha
+    InvalidCaptcha: Verifica del Captcha non riuscita. Il token è invalido o scaduto
+    MissingToken: Token Captcha mancante
+    UnexpectedType: Tipo di Captcha inatteso nella configurazione
+    ValidationFailed: Si è verificato un errore durante la validazione del token Captcha
 
 optional: (opzionale)

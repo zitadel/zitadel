@@ -150,7 +150,7 @@ Errors:
       Invalid: A jelszó érvénytelen
       NotSet: A felhasználó nem állított be jelszót
       NotChanged: Az új jelszó nem egyezhet meg a jelenlegi jelszóval
-      NotSupported: 'A jelszó hash kódolása nem támogatott. További információ itt: https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets'
+      NotSupported: "A jelszó hash kódolása nem támogatott. További információ itt: https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets"
     PasswordComplexityPolicy:
       NotFound: A jelszó szabályzat nem található
       MinLength: A jelszó túl rövid
@@ -343,7 +343,7 @@ Errors:
       NotActive: A projekt engedélye nem aktív
       NotInactive: A projekt engedélye nem inaktív
   IAM:
-    NotFound: 'Instance nem található. Győződj meg róla, hogy a domain helyes. Nézd meg itt: https://zitadel.com/docs/apis/introduction#domains'
+    NotFound: "Instance nem található. Győződj meg róla, hogy a domain helyes. Nézd meg itt: https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: A szerepkörök nem változtak
     MemberInvalid: Tag érvénytelen
@@ -610,6 +610,12 @@ Errors:
     FeatureDisabled: A webkulcs funkció le van tiltva
     NoActive: Aktív web kulcs nem található
     NotFound: Web kulcs nem található
+  Captcha:
+    InitializationFailed: A Captcha inicializálása sikertelen
+    InvalidCaptcha: A Captcha ellenőrzése sikertelen. A token érvénytelen vagy lejárt
+    MissingToken: Hiányzik a Captcha token
+    UnexpectedType: Váratlan Captcha típus a konfigurációban
+    ValidationFailed: Hiba történt a Captcha token ellenőrzése közben
 
 AggregateTypes:
   action: Művelet

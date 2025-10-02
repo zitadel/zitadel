@@ -1,0 +1,15 @@
+$captcha-padding: 15px !default;
+$captcha-min-width: 100% !default;
+$captcha-margin: 0 auto !default;
+
+// adds base styles to all captcha types.
+@mixin captcha-base {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+
+  // Sizing.
+  margin: $captcha-margin;
+  min-width: $captcha-min-width;
+  padding: $captcha-padding;
+}
