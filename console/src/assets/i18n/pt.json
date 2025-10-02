@@ -2397,7 +2397,8 @@
       "1": "Senha de uso único para o aplicativo autenticador (TOTP)",
       "2": "Impressão digital, Chaves de Segurança, Face ID e outros",
       "3": "Senha de uso único para e-mail (Email OTP)",
-      "4": "Senha de uso único para SMS (SMS OTP)"
+      "4": "Senha de uso único para SMS (SMS OTP)",
+      "5": "Códigos de recuperação"
     }
   },
   "LOGINPOLICY": {
