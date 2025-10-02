@@ -6,14 +6,16 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
-import "zitadel/project/v2beta/query.proto";
-import "google/protobuf/timestamp.proto";
 import "zitadel/filter/v2beta/filter.proto";
+import "zitadel/project/v2beta/query.proto";
+import "zitadel/user/v2/user.proto";
+import "zitadel/user/v2/user_service.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/project/v2beta;project";
 
@@ -669,6 +671,12 @@ service ProjectService {
 }
 
 message CreateProjectRequest {
+ message Admin {
+   string user_id = 1;
+   // specify the Project Member Roles for the provided user (default is PROJECT_OWNER if roles are empty
+   repeated string roles = 3;
+ }
+
   // The unique identifier of the organization the project belongs to.
   string organization_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -707,6 +715,8 @@ message CreateProjectRequest {
   PrivateLabelingSetting private_labeling_setting = 7 [
     (validate.rules).enum = {defined_only: true}
   ];
+  // List of users and Project Member roles (PROJECT_OWNER, by default) to be assigned to those users.
+  repeated Admin admins = 8;
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     example: "{\"organizationId\":\"69629026806489455\",\"name\":\"MyProject\",\"projectRoleAssertion\":true,\"projectRoleCheck\":true,\"hasProjectCheck\":true,\"privateLabelingSetting\":\"PRIVATE_LABELING_SETTING_UNSPECIFIED\"}";
   };
