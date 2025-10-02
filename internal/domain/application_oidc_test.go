@@ -489,7 +489,7 @@ func TestCheckRedirectUrisImplicit(t *testing.T) {
 		{
 			name: "only http protocol, app type native, only localhost",
 			args: args{
-				redirectUris: []string{"http://localhost:8080"},
+				redirectUris: []string{"http://localhost:8080", "http://localhost/", "http://localhost"},
 				appType:      gu.Ptr(OIDCApplicationTypeNative),
 			},
 			want: &Compliance{
