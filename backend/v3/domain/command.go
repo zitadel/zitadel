@@ -29,11 +29,15 @@ type Invoker interface {
 // CommandOpts are passed to each command
 // they provide common fields used by commands like the database client.
 type CommandOpts struct {
-	DB                     database.QueryExecutor
-	Invoker                Invoker
+	DB      database.QueryExecutor
+	Invoker Invoker
+
 	organizationRepo       OrganizationRepository
 	organizationDomainRepo OrganizationDomainRepository
-	projectRepo            ProjectRepository
+
+	projectRepo ProjectRepository
+
+	instanceRepo InstanceRepository
 }
 
 // Setters for tests
@@ -48,6 +52,10 @@ func (opts *CommandOpts) SetOrgDomainRepo(repo OrganizationDomainRepository) {
 
 func (opts *CommandOpts) SetProjectRepo(repo ProjectRepository) {
 	opts.projectRepo = repo
+}
+
+func (opts *CommandOpts) SetInstanceRepo(repo InstanceRepository) {
+	opts.instanceRepo = repo
 }
 
 type ensureTxOpts struct {
