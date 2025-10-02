@@ -33,17 +33,6 @@ func orgWriteModelToPasswordComplexityPolicy(wm *OrgPasswordComplexityPolicyWrit
 	}
 }
 
-func orgDomainWriteModelToOrgDomain(wm *OrgDomainWriteModel) *domain.OrgDomain {
-	return &domain.OrgDomain{
-		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel),
-		Domain:         wm.Domain,
-		Primary:        wm.Primary,
-		Verified:       wm.Verified,
-		ValidationType: wm.ValidationType,
-		ValidationCode: wm.ValidationCode,
-	}
-}
-
 func orgWriteModelToPrivacyPolicy(wm *OrgPrivacyPolicyWriteModel) *domain.PrivacyPolicy {
 	return &domain.PrivacyPolicy{
 		ObjectRoot:     writeModelToObjectRoot(wm.PrivacyPolicyWriteModel.WriteModel),
