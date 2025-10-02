@@ -11,12 +11,16 @@ import (
 
 const (
 	http                          = "http://"
+	httpLocalhost                 = "http://localhost"
 	httpLocalhostWithPort         = "http://localhost:"
 	httpLocalhostWithoutPort      = "http://localhost/"
+	httpLoopbackV4                = "http://127.0.0.1"
 	httpLoopbackV4WithPort        = "http://127.0.0.1:"
 	httpLoopbackV4WithoutPort     = "http://127.0.0.1/"
+	httpLoopbackV6                = "http://[::1]"
 	httpLoopbackV6WithPort        = "http://[::1]:"
 	httpLoopbackV6WithoutPort     = "http://[::1]/"
+	httpLoopbackV6Long            = "http://[0:0:0:0:0:0:0:1]"
 	httpLoopbackV6LongWithPort    = "http://[0:0:0:0:0:0:0:1]:"
 	httpLoopbackV6LongWithoutPort = "http://[0:0:0:0:0:0:0:1]/"
 	https                         = "https://"
@@ -394,12 +398,16 @@ func onlyLocalhostIsHttp(uris []string) bool {
 }
 
 func isHTTPLoopbackLocalhost(uri string) bool {
-	return strings.HasPrefix(uri, httpLocalhostWithoutPort) ||
+	return uri == httpLocalhost ||
+		strings.HasPrefix(uri, httpLocalhostWithoutPort) ||
 		strings.HasPrefix(uri, httpLocalhostWithPort) ||
+		uri == httpLoopbackV4 ||
 		strings.HasPrefix(uri, httpLoopbackV4WithoutPort) ||
 		strings.HasPrefix(uri, httpLoopbackV4WithPort) ||
+		uri == httpLoopbackV6 ||
 		strings.HasPrefix(uri, httpLoopbackV6WithoutPort) ||
 		strings.HasPrefix(uri, httpLoopbackV6WithPort) ||
+		uri == httpLoopbackV6Long ||
 		strings.HasPrefix(uri, httpLoopbackV6LongWithoutPort) ||
 		strings.HasPrefix(uri, httpLoopbackV6LongWithPort)
 }
