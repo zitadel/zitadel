@@ -1,11 +1,15 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
-    "test-setup": {
-        "description": "Sets up the functional UI (Console) test environment by starting a local Postgres database and configuring the Zitadel API",
+    "run-db": {
+      "continuous": true,
+      "description": "Runs a local ephemeral Postgres database for functional UI (Console) tests.",
+      "command": "nx run @zitadel/devcontainer:compose up --force-recreate --renew-anon-volumes db-functional-ui"
+    },
+    "setup-api": {
+        "description": "Sets up the Zitadel API against which the functional UI tests are run.",
         "dependsOn": [
-            "test-state",
-            "test-build",
+            "run-db",
             "@zitadel/api:build"
         ],
         "executor": "nx:run-commands",
@@ -13,38 +17,38 @@
             "env": {
                 "API_CONFIG_FILE": "{projectRoot}/api.yaml"
             },
-            "parallel": false,
-            "commands": [
-                "nx run @zitadel/devcontainer:compose up --detach --force-recreate --renew-anon-volumes db-functional-ui",
-                "nx run @zitadel/api:setup --excludeTaskDependencies"
-            ]
-        }  
+            "command": "nx run @zitadel/api:setup --excludeTaskDependencies"
+        }
     },
-    "test-env": {
-        "description": "Runs the Zitadel API for functional UI (Console) tests",
+    "run-api": {
+        "description": "Sets up and runs the Zitadel API with the embedded Console against which the functional UI tests are run.",
         "continuous": true,
         "dependsOn": [
-            "test-setup"
+            "run-db",
+            "setup-api"
         ],
+        "executor": "nx:run-commands",
         "options": {
             "env": {
                 "API_CONFIG_FILE": "{projectRoot}/api.yaml"
-            }
-        },
-        "command": "nx run @zitadel/api:prod --excludeTaskDependencies"
+            },
+            "command": "nx run @zitadel/api:prod --excludeTaskDependencies"
+        }  
     },
     "open": {
       "description": "Opens the Cypress Test Runner for interactive testing.",
       "continuous": true,
       "dependsOn": [
         "@zitadel/console:dev",
-        "test-env"
+        "run-db",
+        "run-api"
       ]
     },
     "test": {
-      "description": "Runs the functional UI (Console) tests against a Zitadel API and a specified browser. Valid browsers are 'electron', 'chrome' and 'firefox'. Beware that 'chrome' and 'firefox' are not installed in the dev container.",
+      "description": "Runs the functional UI (Console) tests against a Zitadel API and a specified browser. Pass an installed browser as an argument, like --browser electron. The 'electron' browser should always be available.",
       "dependsOn": [
-        "test-env"
+        "run-db",
+        "run-api"
       ],
       "executor": "nx:run-commands",
       "options": {
@@ -64,7 +68,7 @@
     },
     "stop": {
       "description": "Stops the local Postgres database used for functional UI (Console) tests.",
-      "command": "nx run @zitadel/devcontainer:compose down db-functional-ui"
+      "command": "nx run @zitadel/devcontainer:compose down --volumes db-functional-ui"
     }
   }
 }

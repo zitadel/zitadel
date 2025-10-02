@@ -28,7 +28,7 @@ Zitadel is an open-source identity and access management platform built with a m
    - [Angular Language Service](https://marketplace.visualstudio.com/items?itemName=Angular.ng-template) - For Console development
    - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) - Code linting
    - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) - Code formatting
-   - [Nx Console](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console) - Nx task runner U
+   - [Nx Console](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console) - Nx task runner tooling
 
 Jump to the dedicated sections for developing a specific project:
 
@@ -43,19 +43,20 @@ Jump to the dedicated sections for developing a specific project:
 This repository contains multiple interconnected projects.
 You can build and start any project with Nx commands.
 
-| Task                          | Command                                                      | Notes                        | Details                                                                                 |
-| ----------------------------- | ------------------------------------------------------------ | ---------------------------- | --------------------------------------------------------------------------------------- |
-| **Production**                | `pnpm nx run PROJECT:prod`                                   | Production server            |                                                                                         |
-| **Develop**                   | `pnpm nx run PROJECT:dev`                                    | Development server           |                                                                                         |
-| **Generate**                  | `pnpm nx run PROJECT:generate`                               | Generate files               |                                                                                         |
-| **Test - Unit**               | `pnpm nx run PROJECT:test-unit`                              | Run unit tests               |                                                                                         |
-| **Test - Integration**        | `pnpm nx run PROJECT:test-integration`                       | Run integration tests        | [Debug API integration tests](#run-api-integration-tests)                               |
-| **Test - Integration Stop**   | `pnpm nx run PROJECT:test-integration-stop`                  | Stop integration containers  |                                                                                         |
-| **Test - Functional UI**      | `pnpm nx run @zitadel/functional-ui:test --browser electron` | Run functional UI tests      | [Develop the Console and open the interactive Test Suite](#pass-console-quality-checks) |
-| **Test - Functional UI Stop** | `pnpm nx run @zitadel/functional-ui:stop`                    | Run functional UI containers |                                                                                         |
-| **Test**                      | `pnpm nx run PROJECT:test`                                   | Run all tests                |                                                                                         |
-| **Lint**                      | `pnpm nx run PROJECT:lint`                                   | Check code style             |                                                                                         |
-| **Lint Fix**                  | `pnpm nx run PROJECT:lint-fix`                               | Auto-fix style issues        |                                                                                         |
+| Task                          | Command                                                      | Notes                        | Details                                                                                                                                                                                          |
+| ----------------------------- | ------------------------------------------------------------ | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Production**                | `pnpm nx run PROJECT:prod`                                   | Production server            |                                                                                                                                                                                                  |
+| **Develop**                   | `pnpm nx run PROJECT:dev`                                    | Development server           |                                                                                                                                                                                                  |
+| **Generate**                  | `pnpm nx run PROJECT:generate`                               | Generate .gitignored files   |                                                                                                                                                                                                  |
+| **Generate Go Files**         | `pnpm nx run @zitadel/api:generate-go`                       | Regenerate checked-in files  | This is needed to generate files using [Stringer](https://pkg.go.dev/golang.org/x/tools/cmd/stringer), [Enumer](https://github.com/dmarkham/enumer) or [gomock](https://github.com/uber-go/mock) |
+| **Test - Unit**               | `pnpm nx run PROJECT:test-unit`                              | Run unit tests               |                                                                                                                                                                                                  |
+| **Test - Integration**        | `pnpm nx run PROJECT:test-integration`                       | Run integration tests        | [Debug API integration tests](#run-api-integration-tests)                                                                                                                                        |
+| **Test - Integration Stop**   | `pnpm nx run PROJECT:test-integration-stop`                  | Stop integration containers  |                                                                                                                                                                                                  |
+| **Test - Functional UI**      | `pnpm nx run @zitadel/functional-ui:test --browser electron` | Run functional UI tests      | [Develop the Console and open the interactive Test Suite](#pass-console-quality-checks)                                                                                                          |
+| **Test - Functional UI Stop** | `pnpm nx run @zitadel/functional-ui:stop`                    | Run functional UI containers |                                                                                                                                                                                                  |
+| **Test**                      | `pnpm nx run PROJECT:test`                                   | Run all tests                |                                                                                                                                                                                                  |
+| **Lint**                      | `pnpm nx run PROJECT:lint`                                   | Check code style             |                                                                                                                                                                                                  |
+| **Lint Fix**                  | `pnpm nx run PROJECT:lint-fix`                               | Auto-fix style issues        |                                                                                                                                                                                                  |
 
 Replace `PROJECT` with one of the following:
 

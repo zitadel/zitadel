@@ -2,6 +2,10 @@ Log:
   Level: info
 
 ExternalSecure: false
+# NOTE: The API is now configured to run on port 8081 instead of the default 8080.
+# Ensure that port 8081 does not conflict with other services in your development environment.
+Port: 8081
+ExternalPort: 8081
 
 Database:
   postgres:

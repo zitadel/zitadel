@@ -1,7 +1,6 @@
 import { defineConfig } from 'cypress';
 import { createServer } from 'http'
 import { ZITADELWebhookEvent } from 'cypress/support/types';
-import { unlinkSync } from 'fs'
 
 const jwt = require('jsonwebtoken');
 
@@ -99,7 +98,7 @@ export default defineConfig({
 });
 
 function baseUrl(){
-  return process.env.CYPRESS_BASE_URL || 'http://localhost:8080/ui/console'
+  return process.env.CYPRESS_BASE_URL || 'http://localhost:8081/ui/console'
 }
 
 function backendUrl(){
