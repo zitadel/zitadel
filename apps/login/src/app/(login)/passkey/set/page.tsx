@@ -63,6 +63,10 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           <Translated i18nKey="set.title" namespace="passkey" />
         </h1>
 
+        <p className="ztdl-p mb-6 block">
+          <Translated i18nKey="set.description" namespace="passkey" />
+        </p>
+
         {session ? (
           <UserAvatar
             loginName={loginName ?? session.factors?.user?.loginName}
@@ -78,10 +82,9 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             searchParams={searchParams}
           ></UserAvatar>
         ) : null}
-        <p className="ztdl-p mb-6 block">
-          <Translated i18nKey="set.description" namespace="passkey" />
-        </p>
+      </div>
 
+      <div className="w-full">
         <Alert type={AlertType.INFO}>
           <span>
             <Translated i18nKey="set.info.description" namespace="passkey" />
