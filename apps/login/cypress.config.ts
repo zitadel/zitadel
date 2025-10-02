@@ -1,6 +1,4 @@
 import { defineConfig } from "cypress";
-import { unlinkSync } from 'fs'
-
 export default defineConfig({
   reporter: "list",
   video: true,
