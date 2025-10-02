@@ -71,7 +71,7 @@ export default async function Page(props: {
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="verify.title" namespace="otp" />
         </h1>
@@ -107,7 +107,9 @@ export default async function Page(props: {
             searchParams={searchParams}
           ></UserAvatar>
         )}
+      </div>
 
+      <div className="w-full">
         {method && session && (
           <LoginOTP
             loginName={loginName ?? session.factors?.user?.loginName}

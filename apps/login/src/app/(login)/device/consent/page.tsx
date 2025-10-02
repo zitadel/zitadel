@@ -2,17 +2,11 @@ import { ConsentScreen } from "@/components/consent";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
-import {
-  getBrandingSettings,
-  getDefaultOrg,
-  getDeviceAuthorizationRequest,
-} from "@/lib/zitadel";
+import { getBrandingSettings, getDefaultOrg, getDeviceAuthorizationRequest } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { headers } from "next/headers";
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
   const userCode = searchParams?.user_code;
@@ -70,13 +64,9 @@ export default async function Page(props: {
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
-          <Translated
-            i18nKey="request.title"
-            namespace="device"
-            data={{ appName: deviceAuthorizationRequest?.appName }}
-          />
+          <Translated i18nKey="request.title" namespace="device" data={{ appName: deviceAuthorizationRequest?.appName }} />
         </h1>
 
         <p className="ztdl-p">
@@ -86,7 +76,9 @@ export default async function Page(props: {
             data={{ appName: deviceAuthorizationRequest?.appName }}
           />
         </p>
+      </div>
 
+      <div className="w-full">
         <ConsentScreen
           deviceAuthorizationRequestId={deviceAuthorizationRequest?.id}
           scope={deviceAuthorizationRequest.scope}

@@ -38,18 +38,17 @@ export default async function Page(props: {
   // return login failed if no linking or creation is allowed and no user was found
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="title" namespace="ldap" />
         </h1>
         <p className="ztdl-p">
           <Translated i18nKey="description" namespace="ldap" />
         </p>
+      </div>
 
-        <LDAPUsernamePasswordForm
-          idpId={idpId}
-          link={link === "true"}
-        ></LDAPUsernamePasswordForm>
+      <div className="w-full">
+        <LDAPUsernamePasswordForm idpId={idpId} link={link === "true"}></LDAPUsernamePasswordForm>
       </div>
     </DynamicTheme>
   );

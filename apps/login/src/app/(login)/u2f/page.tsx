@@ -51,10 +51,14 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="verify.title" namespace="u2f" />
         </h1>
+
+        <p className="ztdl-p mb-6 block">
+          <Translated i18nKey="verify.description" namespace="u2f" />
+        </p>
 
         {sessionFactors && (
           <UserAvatar
@@ -64,16 +68,15 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             searchParams={searchParams}
           ></UserAvatar>
         )}
-        <p className="ztdl-p mb-6 block">
-          <Translated i18nKey="verify.description" namespace="u2f" />
-        </p>
 
         {!(loginName || sessionId) && (
           <Alert>
             <Translated i18nKey="unknownContext" namespace="error" />
           </Alert>
         )}
+      </div>
 
+      <div className="w-full">
         {(loginName || sessionId) && (
           <LoginPasskey
             loginName={loginName}

@@ -13,16 +13,13 @@ import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("passkey");
-  return { title: t('verify.title')};
+  return { title: t("verify.title") };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
-  const { loginName, altPassword, requestId, organization, sessionId } =
-    searchParams;
+  const { loginName, altPassword, requestId, organization, sessionId } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -34,11 +31,7 @@ export default async function Page(props: {
         sessionParams: { loginName, organization },
       });
 
-  async function loadSessionById(
-    serviceUrl: string,
-    sessionId: string,
-    organization?: string,
-  ) {
+  async function loadSessionById(serviceUrl: string, sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
       serviceUrl,
@@ -58,10 +51,14 @@ export default async function Page(props: {
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="verify.title" namespace="passkey" />
         </h1>
+
+        <p className="ztdl-p mb-6 block">
+          <Translated i18nKey="verify.description" namespace="passkey" />
+        </p>
 
         {sessionFactors && (
           <UserAvatar
@@ -71,16 +68,17 @@ export default async function Page(props: {
             searchParams={searchParams}
           ></UserAvatar>
         )}
-        <p className="ztdl-p mb-6 block">
-          <Translated i18nKey="verify.description" namespace="passkey" />
-        </p>
+      </div>
 
+      <div className="w-full">
         {!(loginName || sessionId) && (
           <Alert>
             <Translated i18nKey="unknownContext" namespace="error" />
           </Alert>
         )}
+      </div>
 
+      <div className="w-full">
         {(loginName || sessionId) && (
           <LoginPasskey
             loginName={loginName}

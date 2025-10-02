@@ -13,12 +13,9 @@ export async function loginFailed(branding?: BrandingSettings, error?: string) {
         <p className="ztdl-p">
           <Translated i18nKey="loginError.description" namespace="idp" />
         </p>
-        {error && (
-          <div className="w-full">
-            {<Alert type={AlertType.ALERT}>{error}</Alert>}
-          </div>
-        )}
+        {error && <div className="w-full">{<Alert type={AlertType.ALERT}>{error}</Alert>}</div>}
       </div>
+      <div className="w-full"></div>
     </DynamicTheme>
   );
 }

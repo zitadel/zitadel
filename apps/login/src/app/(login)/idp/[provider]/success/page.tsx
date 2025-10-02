@@ -293,13 +293,16 @@ export default async function Page(props: {
   if (newUser) {
     return (
       <DynamicTheme branding={branding}>
-        <div className="flex flex-col items-center space-y-4">
+        <div className="flex flex-col space-y-4">
           <h1>
             <Translated i18nKey="registerSuccess.title" namespace="idp" />
           </h1>
           <p className="ztdl-p">
             <Translated i18nKey="registerSuccess.description" namespace="idp" />
           </p>
+        </div>
+
+        <div className="w-full">
           <IdpSignin userId={newUser.userId} idpIntent={{ idpIntentId: id, idpIntentToken: token }} requestId={requestId} />
         </div>
       </DynamicTheme>

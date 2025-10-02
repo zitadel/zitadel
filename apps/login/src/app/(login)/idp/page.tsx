@@ -9,12 +9,10 @@ import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("idp");
-  return { title: t('title')};
+  return { title: t("title") };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
   const requestId = searchParams?.requestId;
@@ -37,19 +35,22 @@ export default async function Page(props: {
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="title" namespace="idp" />
         </h1>
         <p className="ztdl-p">
           <Translated i18nKey="description" namespace="idp" />
         </p>
+      </div>
 
+      <div className="w-full">
         {!!identityProviders?.length && (
           <SignInWithIdp
             identityProviders={identityProviders}
             requestId={requestId}
             organization={organization}
+            showLabel={false}
           ></SignInWithIdp>
         )}
       </div>

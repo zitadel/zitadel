@@ -11,19 +11,17 @@ export async function linkingSuccess(
 ) {
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="linkingSuccess.title" namespace="idp" />
         </h1>
         <p className="ztdl-p">
           <Translated i18nKey="linkingSuccess.description" namespace="idp" />
         </p>
+      </div>
 
-        <IdpSignin
-          userId={userId}
-          idpIntent={idpIntent}
-          requestId={requestId}
-        />
+      <div className="w-full">
+        <IdpSignin userId={userId} idpIntent={idpIntent} requestId={requestId} />
       </div>
     </DynamicTheme>
   );

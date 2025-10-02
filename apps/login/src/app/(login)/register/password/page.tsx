@@ -12,9 +12,7 @@ import {
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { headers } from "next/headers";
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
   let { firstname, lastname, email, organization, requestId } = searchParams;
@@ -62,17 +60,20 @@ export default async function Page(props: {
           <Translated i18nKey="missingdata.description" namespace="register" />
         </p>
       </div>
+      <div className="w-full"></div>
     </DynamicTheme>
   ) : loginSettings?.allowRegister && loginSettings.allowUsernamePassword ? (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="password.title" namespace="register" />
         </h1>
         <p className="ztdl-p">
           <Translated i18nKey="description" namespace="register" />
         </p>
+      </div>
 
+      <div className="w-full">
         {legal && passwordComplexitySettings && (
           <SetRegisterPasswordForm
             passwordComplexitySettings={passwordComplexitySettings}
@@ -87,7 +88,7 @@ export default async function Page(props: {
     </DynamicTheme>
   ) : (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="disabled.title" namespace="register" />
         </h1>
@@ -95,6 +96,7 @@ export default async function Page(props: {
           <Translated i18nKey="disabled.description" namespace="register" />
         </p>
       </div>
+      <div className="w-full"></div>
     </DynamicTheme>
   );
 }

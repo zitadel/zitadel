@@ -12,12 +12,10 @@ import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("u2f");
-  return { title: t('set.title')};
+  return { title: t("set.title") };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
   const { loginName, organization, requestId, checkAfter } = searchParams;
@@ -45,6 +43,10 @@ export default async function Page(props: {
           <Translated i18nKey="set.title" namespace="u2f" />
         </h1>
 
+        <p className="ztdl-p mb-6 block">
+          <Translated i18nKey="set.description" namespace="u2f" />
+        </p>
+
         {sessionFactors && (
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
@@ -53,11 +55,9 @@ export default async function Page(props: {
             searchParams={searchParams}
           ></UserAvatar>
         )}
-        <p className="ztdl-p mb-6 block">
-          {" "}
-          <Translated i18nKey="set.description" namespace="u2f" />
-        </p>
+      </div>
 
+      <div className="w-full">
         {!sessionFactors && (
           <div className="py-4">
             <Alert>

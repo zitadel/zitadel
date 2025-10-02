@@ -50,7 +50,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="successTitle" namespace="verify" />
         </h1>
@@ -67,14 +67,11 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           ></UserAvatar>
         ) : (
           user && (
-            <UserAvatar
-              loginName={user.preferredLoginName}
-              displayName={human?.profile?.displayName}
-              showDropdown={false}
-            />
+            <UserAvatar loginName={user.preferredLoginName} displayName={human?.profile?.displayName} showDropdown={false} />
           )
         )}
       </div>
+      <div className="w-full"></div>
     </DynamicTheme>
   );
 }
