@@ -1,7 +1,6 @@
 import { defineConfig } from 'cypress';
 import { createServer } from 'http'
 import { ZITADELWebhookEvent } from 'cypress/support/types';
-import { unlinkSync } from 'fs'
 
 const jwt = require('jsonwebtoken');
 
