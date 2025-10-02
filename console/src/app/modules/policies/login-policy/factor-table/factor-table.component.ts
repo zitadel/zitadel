@@ -42,6 +42,7 @@ export class FactorTableComponent {
   @Input() disabled: boolean = false;
   @Input() list: Array<MultiFactorType | SecondFactorType> = [];
   @Output() typeRemoved: EventEmitter<Promise<any>> = new EventEmitter();
+  @Output() beforeTypeAdd: EventEmitter<() => void> = new EventEmitter();
   @Output() typeAdded: EventEmitter<Promise<any>> = new EventEmitter();
 
   @ViewChild(MatPaginator) public paginator!: MatPaginator;
@@ -114,33 +115,35 @@ export class FactorTableComponent {
 
     dialogRef.afterClosed().subscribe((mfaType: MultiFactorType | SecondFactorType) => {
       if (mfaType) {
-        let request;
+        this.beforeTypeAdd.emit(() => {
+          let request;
 
-        if (this.serviceType === PolicyComponentServiceType.MGMT) {
-          if (this.componentType === LoginMethodComponentType.MultiFactor) {
-            const req = new MgmtAddMultiFactorToLoginPolicyRequest();
-            req.setType(mfaType as MultiFactorType);
-            request = (this.service as ManagementService).addMultiFactorToLoginPolicy(req);
-          } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
-            const req = new MgmtAddSecondFactorToLoginPolicyRequest();
-            req.setType(mfaType as SecondFactorType);
-            request = (this.service as ManagementService).addSecondFactorToLoginPolicy(req);
+          if (this.serviceType === PolicyComponentServiceType.MGMT) {
+            if (this.componentType === LoginMethodComponentType.MultiFactor) {
+              const req = new MgmtAddMultiFactorToLoginPolicyRequest();
+              req.setType(mfaType as MultiFactorType);
+              request = (this.service as ManagementService).addMultiFactorToLoginPolicy(req);
+            } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
+              const req = new MgmtAddSecondFactorToLoginPolicyRequest();
+              req.setType(mfaType as SecondFactorType);
+              request = (this.service as ManagementService).addSecondFactorToLoginPolicy(req);
+            }
+          } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
+            if (this.componentType === LoginMethodComponentType.MultiFactor) {
+              const req = new AdminAddMultiFactorToLoginPolicyRequest();
+              req.setType(mfaType as MultiFactorType);
+              request = (this.service as AdminService).addMultiFactorToLoginPolicy(req);
+            } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
+              const req = new AdminAddSecondFactorToLoginPolicyRequest();
+              req.setType(mfaType as SecondFactorType);
+              request = (this.service as AdminService).addSecondFactorToLoginPolicy(req);
+            }
           }
-        } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
-          if (this.componentType === LoginMethodComponentType.MultiFactor) {
-            const req = new AdminAddMultiFactorToLoginPolicyRequest();
-            req.setType(mfaType as MultiFactorType);
-            request = (this.service as AdminService).addMultiFactorToLoginPolicy(req);
-          } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
-            const req = new AdminAddSecondFactorToLoginPolicyRequest();
-            req.setType(mfaType as SecondFactorType);
-            request = (this.service as AdminService).addSecondFactorToLoginPolicy(req);
-          }
-        }
 
-        if (request) {
-          this.typeAdded.emit(request);
-        }
+          if (request) {
+            this.typeAdded.emit(request);
+          }
+        });
       }
     });
   }

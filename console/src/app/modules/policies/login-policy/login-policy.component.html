@@ -55,6 +55,7 @@
     [componentType]="LoginMethodComponentType.MultiFactor"
     [list]="loginData.multiFactorsList"
     (typeRemoved)="removeFactor($event)"
+    (beforeTypeAdd)="beforeAddFactor($event)"
     (typeAdded)="addFactor($event)"
     [disabled]="
       loginData.passwordlessType === PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED ||
@@ -128,6 +129,7 @@
     [componentType]="LoginMethodComponentType.SecondFactor"
     [list]="loginData.secondFactorsList"
     (typeRemoved)="removeFactor($event)"
+    (beforeTypeAdd)="beforeAddFactor($event)"
     (typeAdded)="addFactor($event)"
     [disabled]="
       ([
