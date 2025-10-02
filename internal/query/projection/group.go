@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/group"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -97,9 +96,9 @@ func (g *groupProjection) Reducers() []handler.AggregateReducer {
 }
 
 func (g *groupProjection) reduceGroupAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*group.GroupAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "PRJXN-rdz7Sy", "reduce.wrong.event.type %s", group.GroupAddedEventType)
+	e, err := assertEvent[*group.GroupAddedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewCreateStatement(
 		e,
@@ -118,22 +117,32 @@ func (g *groupProjection) reduceGroupAdded(event eventstore.Event) (*handler.Sta
 }
 
 func (g *groupProjection) reduceGroupChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*group.GroupChangedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "PRJXN-edc9Ay", "reduce.wrong.event.type %s", group.GroupChangedEventType)
+	e, err := assertEvent[*group.GroupChangedEvent](event)
+	if err != nil {
+		return nil, err
 	}
-	if e.Name == "" {
+
+	columns := make([]handler.Column, 0, 4)
+
+	if e.Name != nil {
+		columns = append(columns, handler.NewCol(GroupColumnName, *e.Name))
+	}
+	if e.Description != nil {
+		columns = append(columns, handler.NewCol(GroupColumnDescription, *e.Description))
+	}
+	if len(columns) == 0 {
 		return handler.NewNoOpStatement(e), nil
 	}
 
+	columns = append(
+		columns,
+		handler.NewCol(GroupColumnChangeDate, e.CreationDate()),
+		handler.NewCol(GroupColumnSequence, e.Sequence()),
+	)
+
 	return handler.NewUpdateStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(GroupColumnName, e.Name),
-			handler.NewCol(GroupColumnDescription, e.Description),
-			handler.NewCol(GroupColumnChangeDate, e.CreationDate()),
-			handler.NewCol(GroupColumnSequence, e.Sequence()),
-		},
+		columns,
 		[]handler.Condition{
 			handler.NewCond(GroupColumnID, e.Aggregate().ID),
 			handler.NewCond(GroupColumnInstanceID, e.Aggregate().InstanceID),
@@ -142,9 +151,9 @@ func (g *groupProjection) reduceGroupChanged(event eventstore.Event) (*handler.S
 }
 
 func (g *groupProjection) reduceGroupRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*group.GroupRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "PRJXN-eii0Mi", "reduce.wrong.event.type %s", group.GroupRemovedEventType)
+	e, err := assertEvent[*group.GroupRemovedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewDeleteStatement(
 		e,
@@ -156,9 +165,9 @@ func (g *groupProjection) reduceGroupRemoved(event eventstore.Event) (*handler.S
 }
 
 func (g *groupProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*org.OrgRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "PRJXN-s8n23", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	e, err := assertEvent[*org.OrgRemovedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewDeleteStatement(
 		e,
