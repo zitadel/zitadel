@@ -1,0 +1,97 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+import "zitadel/filter/v2/filter.proto";
+
+package zitadel.group.v2;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/group/v2;group";
+
+message Group {
+  // Unique identifier of the user group.
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\""
+    }
+  ];
+
+  // Unique name of the user group inside the corresponding organization.
+  string name = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"Support Group\"";
+    }
+  ];
+
+  // Description the user group.
+  string description = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"Support Group\"";
+    }
+  ];
+
+  // The ID of the organization to which the group belongs.
+  string organization_id = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629098906488334\""
+    }
+  ];
+
+  // Timestamp when the group was last changed.
+  google.protobuf.Timestamp change_date = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+
+  // Timestamp when the user group was created
+  google.protobuf.Timestamp creation_date = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message GroupsSearchFilter {
+  oneof filter {
+    option (validate.required) = true;
+
+    // Search for groups by their IDs.
+    zitadel.filter.v2.InIDsFilter group_ids = 1;
+    // Search for groups by their names.
+    GroupNameFilter name_filter = 2;
+    // Search for groups by their organization ID.
+    zitadel.filter.v2.IDFilter organization_id = 3;
+  }
+}
+
+message GroupNameFilter {
+  // Name of the user group.
+  string name = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"My Group\"";
+    }
+  ];
+
+  // Defines which text comparison method used for the name query.
+  zitadel.filter.v2.TextFilterMethod method = 2 [
+    (validate.rules).enum.defined_only = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines which text equality method is used";
+    }
+  ];
+}
+
+
+enum FieldName {
+  FIELD_NAME_UNSPECIFIED = 0;
+  FIELD_NAME_ID = 1;
+  FIELD_NAME_NAME = 2;
+  FIELD_NAME_CREATION_DATE = 3;
+  FIELD_NAME_CHANGE_DATE = 4;
+}
