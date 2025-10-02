@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"net/netip"
+	"net/url"
 	"slices"
 	"strings"
 	"time"
@@ -10,16 +12,8 @@ import (
 )
 
 const (
-	http                          = "http://"
-	httpLocalhostWithPort         = "http://localhost:"
-	httpLocalhostWithoutPort      = "http://localhost/"
-	httpLoopbackV4WithPort        = "http://127.0.0.1:"
-	httpLoopbackV4WithoutPort     = "http://127.0.0.1/"
-	httpLoopbackV6WithPort        = "http://[::1]:"
-	httpLoopbackV6WithoutPort     = "http://[::1]/"
-	httpLoopbackV6LongWithPort    = "http://[0:0:0:0:0:0:0:1]:"
-	httpLoopbackV6LongWithoutPort = "http://[0:0:0:0:0:0:0:1]/"
-	https                         = "https://"
+	http  = "http://"
+	https = "https://"
 )
 
 type OIDCApp struct {
@@ -386,22 +380,33 @@ func containsCustom(uris []string) bool {
 
 func onlyLocalhostIsHttp(uris []string) bool {
 	for _, uri := range uris {
-		if strings.HasPrefix(uri, http) && !isHTTPLoopbackLocalhost(uri) {
+		url, err := url.ParseRequestURI(uri)
+
+		if err != nil {
+			return false
+		}
+
+		if url.Scheme == "http" {
+			hostname := url.Hostname()
+
+			if hostname == "localhost" {
+				continue
+			}
+
+			address, err := netip.ParseAddr(hostname)
+
+			if err != nil {
+				return false
+			}
+
+			if address.IsLoopback() {
+				continue
+			}
+
 			return false
 		}
 	}
 	return true
-}
-
-func isHTTPLoopbackLocalhost(uri string) bool {
-	return strings.HasPrefix(uri, httpLocalhostWithoutPort) ||
-		strings.HasPrefix(uri, httpLocalhostWithPort) ||
-		strings.HasPrefix(uri, httpLoopbackV4WithoutPort) ||
-		strings.HasPrefix(uri, httpLoopbackV4WithPort) ||
-		strings.HasPrefix(uri, httpLoopbackV6WithoutPort) ||
-		strings.HasPrefix(uri, httpLoopbackV6WithPort) ||
-		strings.HasPrefix(uri, httpLoopbackV6LongWithoutPort) ||
-		strings.HasPrefix(uri, httpLoopbackV6LongWithPort)
 }
 
 func OIDCOriginAllowList(redirectURIs, additionalOrigins []string) ([]string, error) {
