@@ -349,6 +349,7 @@ func (p *labelPolicyProjection) reduceActivated(event eventstore.Event) (*handle
 			handler.NewCol(LabelPolicyIDCol, nil),
 			handler.NewCol(LabelPolicyStateCol, nil),
 		},
+		nil,
 		[]handler.Column{
 			handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
 			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
