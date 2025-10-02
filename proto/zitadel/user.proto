@@ -829,6 +829,7 @@ message UserGrantQuery {
         UserGrantProjectNameQuery project_name_query = 12;
         UserGrantDisplayNameQuery display_name_query = 13;
         UserGrantUserTypeQuery user_type_query = 14;
+        UserGrantInUserIDsQuery in_user_ids_query = 15;
     }
 }
 
@@ -846,6 +847,15 @@ message UserGrantUserIDQuery {
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334\""
+        }
+    ];
+}
+
+message UserGrantInUserIDsQuery {
+    repeated string in_user_ids = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the IDs of the users to include"
+            example: "[\"69629023906488334\",\"69629023906488335\"]";
         }
     ];
 }

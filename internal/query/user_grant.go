@@ -114,6 +114,14 @@ func NewUserGrantUserIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(UserGrantUserID, id, TextEquals)
 }
 
+func NewUserGrantInUserIDsSearchQuery(ids []string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
+		list[i] = value
+	}
+	return NewListQuery(UserGrantUserID, list, ListIn)
+}
+
 func NewUserGrantProjectIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(UserGrantProjectID, id, TextEquals)
 }

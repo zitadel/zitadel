@@ -285,6 +285,39 @@ func TestServer_ListAuthorizations(t *testing.T) {
 			},
 		},
 		{
+			name: "list single id in ids, project and project grant, multiple",
+			args: args{
+				ctx: iamOwnerCtx,
+				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
+					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
+
+					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_InUserIds{
+						InUserIds: &filter.InIDsFilter{
+							Ids: []string{userResp.GetId()},
+						},
+					}
+					response.Authorizations[5] = createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), false)
+					response.Authorizations[4] = createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), false)
+					response.Authorizations[3] = createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), false)
+					response.Authorizations[2] = createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), true)
+					response.Authorizations[1] = createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), true)
+					response.Authorizations[0] = createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), true)
+				},
+				req: &authorization.ListAuthorizationsRequest{
+					Filters: []*authorization.AuthorizationsSearchFilter{{}},
+				},
+			},
+			want: &authorization.ListAuthorizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  6,
+					AppliedLimit: 100,
+				},
+				Authorizations: []*authorization.Authorization{
+					{}, {}, {}, {}, {}, {},
+				},
+			},
+		},
+		{
 			name: "list single id, project and project grant, multiple",
 			args: args{
 				ctx: iamOwnerCtx,
