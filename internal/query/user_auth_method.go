@@ -475,7 +475,7 @@ func prepareUserAuthMethodTypesQuery(activeOnly bool, includeWithoutDomain bool,
 				userAuthMethodTypes = append(userAuthMethodTypes, domain.UserAuthMethodTypePassword)
 			}
 			if idp.Valid && idp.Int64 > 0 {
-				logging.Error("IDP", idp.Int64)
+				logging.Debug("Adding IDP ", idp.Int64, " to userAuthMethodTypes")
 				userAuthMethodTypes = append(userAuthMethodTypes, domain.UserAuthMethodTypeIDP)
 			}
 
