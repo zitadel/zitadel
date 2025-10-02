@@ -150,6 +150,9 @@ func (o org) IDCondition(id string) database.Condition {
 
 // NameCondition implements [domain.organizationConditions].
 func (o org) NameCondition(op database.TextOperation, name string) database.Condition {
+	if op.IsIgnoreCaseOperation() {
+		return database.NewTextIgnoreCaseCondition(o.NameColumn(), op.Value(), name)
+	}
 	return database.NewTextCondition(o.NameColumn(), op, name)
 }
 

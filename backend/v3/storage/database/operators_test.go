@@ -78,6 +78,26 @@ func Test_writeOperation(t *testing.T) {
 			},
 		},
 		{
+			name: "text ends with",
+			write: func(builder *StatementBuilder) {
+				writeTextOperation[string](builder, NewColumn("table", "column"), TextOperationEndsWith, "value")
+			},
+			want: want{
+				stmt: "table.column LIKE '%' || $1",
+				args: []any{"value"},
+			},
+		},
+		{
+			name: "text contains",
+			write: func(builder *StatementBuilder) {
+				writeTextOperation[string](builder, NewColumn("table", "column"), TextOperationContains, "value")
+			},
+			want: want{
+				stmt: "table.column LIKE '%' || $1 || '%'",
+				args: []any{"value"},
+			},
+		},
+		{
 			name: "text equal with wrapped value",
 			write: func(builder *StatementBuilder) {
 				writeTextOperation[string](builder, LowerColumn(NewColumn("table", "column")), TextOperationEqual, LowerValue("value"))
@@ -107,6 +127,27 @@ func Test_writeOperation(t *testing.T) {
 				args: []any{"value"},
 			},
 		},
+		{
+			name: "text ends with with wrapped value",
+			write: func(builder *StatementBuilder) {
+				writeTextOperation[string](builder, LowerColumn(NewColumn("table", "column")), TextOperationEndsWith, LowerValue("value"))
+			},
+			want: want{
+				stmt: "LOWER(table.column) LIKE '%' || LOWER($1)",
+				args: []any{"value"},
+			},
+		},
+		{
+			name: "text contains with wrapped value",
+			write: func(builder *StatementBuilder) {
+				writeTextOperation[string](builder, LowerColumn(NewColumn("table", "column")), TextOperationContains, LowerValue("value"))
+			},
+			want: want{
+				stmt: "LOWER(table.column) LIKE '%' || LOWER($1) || '%'",
+				args: []any{"value"},
+			},
+		},
+
 		{
 			name: "number equal",
 			write: func(builder *StatementBuilder) {
@@ -167,6 +208,7 @@ func Test_writeOperation(t *testing.T) {
 				args: []any{123},
 			},
 		},
+
 		{
 			name: "boolean is true",
 			write: func(builder *StatementBuilder) {
@@ -187,6 +229,7 @@ func Test_writeOperation(t *testing.T) {
 				args: []any{false},
 			},
 		},
+
 		{
 			name: "bytes equal",
 			write: func(builder *StatementBuilder) {
@@ -239,6 +282,140 @@ func Test_writeOperation(t *testing.T) {
 
 			assert.Equal(t, tt.want.stmt, builder.String())
 			assert.Equal(t, tt.want.args, builder.Args())
+		})
+	}
+}
+
+func TestTextOperation_Value(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name string
+		op   TextOperation
+		want TextOperation
+	}{
+		{
+			name: "TextOperationStartsWith returns self",
+			op:   TextOperationStartsWith,
+			want: TextOperationStartsWith,
+		},
+		{
+			name: "TextOperationContains returns self",
+			op:   TextOperationContains,
+			want: TextOperationContains,
+		},
+		{
+			name: "TextOperationEndsWith returns self",
+			op:   TextOperationEndsWith,
+			want: TextOperationEndsWith,
+		},
+		{
+			name: "TextOperationEqual returns self",
+			op:   TextOperationEqual,
+			want: TextOperationEqual,
+		},
+		{
+			name: "TextOperationNotEqual returns self",
+			op:   TextOperationNotEqual,
+			want: TextOperationNotEqual,
+		},
+		{
+			name: "TextOperationContainsIgnoreCase returns Contains",
+			op:   TextOperationContainsIgnoreCase,
+			want: TextOperationContains,
+		},
+		{
+			name: "TextOperationEndsWithIgnoreCase returns EndsWith",
+			op:   TextOperationEndsWithIgnoreCase,
+			want: TextOperationEndsWith,
+		},
+		{
+			name: "TextOperationStartsWithIgnoreCase returns StartsWith",
+			op:   TextOperationStartsWithIgnoreCase,
+			want: TextOperationStartsWith,
+		},
+		{
+			name: "TextOperationEqualIgnoreCase returns Equal",
+			op:   TextOperationEqualIgnoreCase,
+			want: TextOperationEqual,
+		},
+		{
+			name: "TextOperationNotEqualIgnoreCase returns NotEqual",
+			op:   TextOperationNotEqualIgnoreCase,
+			want: TextOperationNotEqual,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			got := tt.op.Value()
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestTextOperation_IsIgnoreCaseOperation(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name string
+		op   TextOperation
+		want bool
+	}{
+		{
+			name: "TextOperationContainsIgnoreCase returns true",
+			op:   TextOperationContainsIgnoreCase,
+			want: true,
+		},
+		{
+			name: "TextOperationEndsWithIgnoreCase returns true",
+			op:   TextOperationEndsWithIgnoreCase,
+			want: true,
+		},
+		{
+			name: "TextOperationStartsWithIgnoreCase returns true",
+			op:   TextOperationStartsWithIgnoreCase,
+			want: true,
+		},
+		{
+			name: "TextOperationEqualIgnoreCase returns true",
+			op:   TextOperationEqualIgnoreCase,
+			want: true,
+		},
+		{
+			name: "TextOperationNotEqualIgnoreCase returns true",
+			op:   TextOperationNotEqualIgnoreCase,
+			want: true,
+		},
+		{
+			name: "TextOperationContains returns false",
+			op:   TextOperationContains,
+			want: false,
+		},
+		{
+			name: "TextOperationEndsWith returns false",
+			op:   TextOperationEndsWith,
+			want: false,
+		},
+		{
+			name: "TextOperationStartsWith returns false",
+			op:   TextOperationStartsWith,
+			want: false,
+		},
+		{
+			name: "TextOperationEqual returns false",
+			op:   TextOperationEqual,
+			want: false,
+		},
+		{
+			name: "TextOperationNotEqual returns false",
+			op:   TextOperationNotEqual,
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			got := tt.op.IsIgnoreCaseOperation()
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

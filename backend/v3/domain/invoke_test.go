@@ -28,8 +28,8 @@ type invokeTestCommand struct {
 }
 
 // Events implements Commander.
-func (i *invokeTestCommand) Events(ctx context.Context) []legacy_es.Command {
-	return i.events
+func (i *invokeTestCommand) Events(ctx context.Context, opts *CommandOpts) ([]legacy_es.Command, error) {
+	return i.events, nil
 }
 
 // Execute implements Commander.
@@ -43,6 +43,11 @@ func (i *invokeTestCommand) Execute(ctx context.Context, opts *CommandOpts) (err
 // String implements Commander.
 func (i *invokeTestCommand) String() string {
 	return "invokeTestCommand"
+}
+
+// Validate implements Commander.
+func (i *invokeTestCommand) Validate(ctx context.Context, opts *CommandOpts) (err error) {
+	return nil
 }
 
 var _ Commander = (*invokeTestCommand)(nil)
