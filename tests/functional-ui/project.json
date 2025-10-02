@@ -45,7 +45,7 @@
       ]
     },
     "test": {
-      "description": "Runs the functional UI (Console) tests against a Zitadel API and a specified browser. Valid browsers are 'electron', 'chrome' and 'firefox'. Beware that 'chrome' and 'firefox' are not installed in the dev container.",
+      "description": "Runs the functional UI (Console) tests against a Zitadel API and a specified browser. Pass an installed browser as an argument, like --browser electron. The 'electron' browser should always be available.",
       "dependsOn": [
         "run-db",
         "run-api"
