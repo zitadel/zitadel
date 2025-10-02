@@ -19,6 +19,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/apple"
 	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
+	"github.com/zitadel/zitadel/internal/idp/providers/dingtalk"
 	"github.com/zitadel/zitadel/internal/idp/providers/github"
 	"github.com/zitadel/zitadel/internal/idp/providers/gitlab"
 	"github.com/zitadel/zitadel/internal/idp/providers/google"
@@ -192,6 +193,8 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *connec
 			idpUser, err = unmarshalIdpUser(intent.IDPUser, oidc.InitUser())
 		case *google.Provider:
 			idpUser, err = unmarshalIdpUser(intent.IDPUser, google.InitUser())
+		case *dingtalk.Provider:
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, &dingtalk.User{})
 		case *saml.Provider:
 			idpUser, err = unmarshalIdpUser(intent.IDPUser, &saml.UserMapper{})
 		case *ldap.Provider:

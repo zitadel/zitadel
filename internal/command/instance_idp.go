@@ -406,6 +406,48 @@ func (c *Commands) AddInstanceGoogleProvider(ctx context.Context, provider Googl
 	return id, pushedEventsToObjectDetails(pushedEvents), nil
 }
 
+func (c *Commands) AddInstanceDingTalkProvider(ctx context.Context, provider DingTalkProvider) (string, *domain.ObjectDetails, error) {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	instanceAgg := instance.NewAggregate(instanceID)
+	id, err := c.idGenerator.Next()
+	if err != nil {
+		return "", nil, err
+	}
+	writeModel := NewDingTalkInstanceIDPWriteModel(instanceID, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceDingTalkProvider(instanceAgg, writeModel, provider))
+	if err != nil {
+		return "", nil, err
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return "", nil, err
+	}
+	return id, pushedEventsToObjectDetails(pushedEvents), nil
+}
+
+func (c *Commands) UpdateInstanceDingTalkProvider(ctx context.Context, id string, provider DingTalkProvider) (*domain.ObjectDetails, error) {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	instanceAgg := instance.NewAggregate(instanceID)
+	writeModel := NewDingTalkInstanceIDPWriteModel(instanceID, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceDingTalkProvider(instanceAgg, writeModel, provider))
+	if err != nil {
+		return nil, err
+	}
+	if len(cmds) == 0 {
+		// no change, so return directly
+		return &domain.ObjectDetails{
+			Sequence:      writeModel.ProcessedSequence,
+			EventDate:     writeModel.ChangeDate,
+			ResourceOwner: writeModel.ResourceOwner,
+		}, nil
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return pushedEventsToObjectDetails(pushedEvents), nil
+}
+
 func (c *Commands) UpdateInstanceGoogleProvider(ctx context.Context, id string, provider GoogleProvider) (*domain.ObjectDetails, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
@@ -1469,6 +1511,82 @@ func (c *Commands) prepareAddInstanceGoogleProvider(a *instance.Aggregate, write
 }
 
 func (c *Commands) prepareUpdateInstanceGoogleProvider(a *instance.Aggregate, writeModel *InstanceGoogleIDPWriteModel, provider GoogleProvider) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
+			return nil, zerrors.ThrowInvalidArgument(nil, "INST-S32t1", "Errors.Invalid.Argument")
+		}
+		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
+			return nil, zerrors.ThrowInvalidArgument(nil, "INST-ds432", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			if !writeModel.State.Exists() {
+				return nil, zerrors.ThrowNotFound(nil, "INST-D3r1s", "Errors.IDPConfig.NotExisting")
+			}
+			event, err := writeModel.NewChangedEvent(
+				ctx,
+				&a.Aggregate,
+				writeModel.ID,
+				provider.Name,
+				provider.ClientID,
+				provider.ClientSecret,
+				c.idpConfigEncryption,
+				provider.Scopes,
+				provider.IDPOptions,
+			)
+			if err != nil || event == nil {
+				return nil, err
+			}
+			return []eventstore.Command{event}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) prepareAddInstanceDingTalkProvider(a *instance.Aggregate, writeModel *InstanceDingTalkIDPWriteModel, provider DingTalkProvider) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
+			return nil, zerrors.ThrowInvalidArgument(nil, "INST-D3fvs", "Errors.Invalid.Argument")
+		}
+		if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
+			return nil, zerrors.ThrowInvalidArgument(nil, "INST-W2vqs", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			secret, err := crypto.Encrypt([]byte(provider.ClientSecret), c.idpConfigEncryption)
+			if err != nil {
+				return nil, err
+			}
+			return []eventstore.Command{
+				instance.NewDingTalkIDPAddedEvent(
+					ctx,
+					&a.Aggregate,
+					writeModel.ID,
+					provider.Name,
+					provider.ClientID,
+					secret,
+					provider.Scopes,
+					provider.IDPOptions,
+				),
+			}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) prepareUpdateInstanceDingTalkProvider(a *instance.Aggregate, writeModel *InstanceDingTalkIDPWriteModel, provider DingTalkProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "INST-S32t1", "Errors.Invalid.Argument")

@@ -217,4 +217,20 @@
       <span class="title">SAML</span>
     </div>
   </a>
+
+  <a
+    class="item card"
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'provider', 'dingtalk', 'create']
+        : serviceType === PolicyComponentServiceType.MGMT
+          ? ['/org', 'provider', 'dingtalk', 'create']
+          : []
+    "
+  >
+    <img class="idp-logo" src="./assets/images/idp/dingtalk.svg" alt="dingtalk" />
+    <div class="text-container">
+      <span class="title">DingTalk</span>
+    </div>
+  </a>
 </div>

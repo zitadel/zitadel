@@ -221,6 +221,8 @@ func idpTypeToPb(idpType domain.IDPType) settings.IdentityProviderType {
 	case domain.IDPTypeApple:
 		// Handle all remaining cases so the linter succeeds
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_UNSPECIFIED
+	case domain.IDPTypeDingTalk:
+		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_DINGTALK
 	default:
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_UNSPECIFIED
 	}

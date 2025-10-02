@@ -71,6 +71,9 @@ export function idpTypeToIdentityProviderType(
     case IDPType.IDP_TYPE_JWT:
       return IdentityProviderType.JWT;
 
+    case IDPType.IDP_TYPE_DINGTALK:
+      return IdentityProviderType.DINGTALK;
+
     default:
       throw new Error("Unknown identity provider type");
   }

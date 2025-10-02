@@ -101,7 +101,7 @@ console_dependencies:
 
 .PHONY: console_build
 console_build: console_dependencies
-	npx pnpm turbo build --filter=./console
+	npx pnpm turbo build --filter=./console --force
 
 .PHONY: clean
 clean:

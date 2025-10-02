@@ -406,6 +406,26 @@ func addGoogleProviderToCommand(req *admin_pb.AddGoogleProviderRequest) command.
 	}
 }
 
+func addDingTalkProviderToCommand(req *admin_pb.AddDingTalkProviderRequest) command.DingTalkProvider {
+	return command.DingTalkProvider{
+		Name:         req.Name,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateDingTalkProviderToCommand(req *admin_pb.UpdateDingTalkProviderRequest) command.DingTalkProvider {
+	return command.DingTalkProvider{
+		Name:         req.Name,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
 func updateGoogleProviderToCommand(req *admin_pb.UpdateGoogleProviderRequest) command.GoogleProvider {
 	return command.GoogleProvider{
 		Name:         req.Name,

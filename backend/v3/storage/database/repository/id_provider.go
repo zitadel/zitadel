@@ -245,6 +245,32 @@ func (i *idProvider) GetGoogle(ctx context.Context, client database.QueryExecuto
 	return idpGoogle, nil
 }
 
+func (i *idProvider) GetDingTalk(ctx context.Context, client database.QueryExecutor, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPDingTalk, error) {
+	idpDingTalk := &domain.IDPDingTalk{}
+	var err error
+
+	idpDingTalk.IdentityProvider, err = i.Get(ctx, client, id, instanceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var idpType domain.IDPType
+	if idpDingTalk.Type != nil {
+		idpType = *idpDingTalk.Type
+	}
+
+	if idpType != domain.IDPTypeDingTalk {
+		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeDingTalk, idpType)
+	}
+
+	err = json.Unmarshal(idpDingTalk.Payload, idpDingTalk)
+	if err != nil {
+		return nil, err
+	}
+
+	return idpDingTalk, nil
+}
+
 func (i *idProvider) GetGithub(ctx context.Context, client database.QueryExecutor, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPGithub, error) {
 	idpGithub := &domain.IDPGithub{}
 	var err error

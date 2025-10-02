@@ -26,6 +26,7 @@ const (
 	IDPTypeAzure
 	IDPTypeGoogle
 	IDPTypeApple
+	IDPTypeDingTalk
 )
 
 //go:generate enumer -type IDPState -transform lower -trimprefix IDPState -sql
@@ -191,6 +192,17 @@ type IDPGitlab struct {
 	Gitlab
 }
 
+type DingTalk struct {
+	ClientID     string              `json:"clientId"`
+	ClientSecret *crypto.CryptoValue `json:"clientSecret"`
+	Scopes       []string            `json:"scopes,omitempty"`
+}
+
+type IDPDingTalk struct {
+	*IdentityProvider
+	DingTalk
+}
+
 type GitlabSelfHosting struct {
 	Issuer       string              `json:"issuer"`
 	ClientID     string              `json:"clientId,omitempty"`
@@ -345,6 +357,7 @@ type IDProviderRepository interface {
 
 	GetAzureAD(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPAzureAD, error)
 	GetGoogle(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGoogle, error)
+	GetDingTalk(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPDingTalk, error)
 	GetGithub(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGithub, error)
 	GetGithubEnterprise(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGithubEnterprise, error)
 	GetGitlab(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGitlab, error)
