@@ -2,6 +2,8 @@ Log:
   Level: info
 
 ExternalSecure: false
+Port: 8081
+ExternalPort: 8081
 
 Database:
   postgres:

@@ -99,7 +99,7 @@ export default defineConfig({
 });
 
 function baseUrl(){
-  return process.env.CYPRESS_BASE_URL || 'http://localhost:8080/ui/console'
+  return process.env.CYPRESS_BASE_URL || 'http://localhost:8081/ui/console'
 }
 
 function backendUrl(){
