@@ -6,14 +6,14 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 )
 
 // CreateGroup creates a new user group in the specified organization.
 func (s *Server) CreateGroup(ctx context.Context, req *connect.Request[group_v2.CreateGroupRequest]) (*connect.Response[group_v2.CreateGroupResponse], error) {
-	userGroup := &domain.Group{
+	userGroup := &command.CreateGroup{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID:   req.Msg.GetId(),
 			ResourceOwner: req.Msg.GetOrganizationId(),
@@ -34,12 +34,12 @@ func (s *Server) CreateGroup(ctx context.Context, req *connect.Request[group_v2.
 
 // UpdateGroup updates a user group.
 func (s *Server) UpdateGroup(ctx context.Context, req *connect.Request[group_v2.UpdateGroupRequest]) (*connect.Response[group_v2.UpdateGroupResponse], error) {
-	userGroup := &domain.Group{
+	userGroup := &command.UpdateGroup{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: req.Msg.GetId(),
 		},
-		Name:        req.Msg.GetName(),
-		Description: req.Msg.GetDescription(),
+		Name:        req.Msg.Name,
+		Description: req.Msg.Description,
 	}
 
 	details, err := s.command.UpdateGroup(ctx, userGroup)

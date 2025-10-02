@@ -13,6 +13,7 @@ import (
 	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 )
 
+// GetGroup returns a group that matches the group ID in the request
 func (s *Server) GetGroup(ctx context.Context, req *connect.Request[group_v2.GetGroupRequest]) (*connect.Response[group_v2.GetGroupResponse], error) {
 	group, err := s.query.GetGroupByID(ctx, req.Msg.GetId())
 	if err != nil {

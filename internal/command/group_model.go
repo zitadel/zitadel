@@ -50,13 +50,35 @@ func (g *GroupWriteModel) Reduce() error {
 			g.Description = e.Description
 			g.State = domain.GroupStateActive
 		case *group.GroupChangedEvent:
-			g.Name = e.Name
-			g.Description = e.Description
+			if e.Name != nil {
+				g.Name = *e.Name
+			}
+			if e.Description != nil {
+				g.Description = *e.Description
+			}
 		case *group.GroupRemovedEvent:
 			g.State = domain.GroupStateRemoved
 		}
 	}
 	return g.WriteModel.Reduce()
+}
+
+func (g *GroupWriteModel) NewChangedEvent(ctx context.Context, agg *eventstore.Aggregate, name, description *string) *group.GroupChangedEvent {
+	changes := make([]group.GroupChanges, 0)
+	oldName := ""
+
+	if name != nil && g.Name != *name {
+		oldName = g.Name
+		changes = append(changes, group.ChangeName(*name))
+	}
+	if description != nil && g.Description != *description {
+		changes = append(changes, group.ChangeDescription(*description))
+	}
+	if len(changes) == 0 {
+		return nil
+	}
+
+	return group.NewGroupChangedEvent(ctx, agg, oldName, changes)
 }
 
 // GroupAggregateFromWriteModel maps a WriteModel to a group-specific Aggregate using its type and version.

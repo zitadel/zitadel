@@ -2,15 +2,31 @@ package command
 
 import (
 	"context"
+	"strings"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	repo "github.com/zitadel/zitadel/internal/repository/group"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+type CreateGroup struct {
+	models.ObjectRoot
+
+	Name        string
+	Description string
+}
+
+func (g *CreateGroup) IsValid() error {
+	if strings.TrimSpace(g.Name) == "" {
+		return zerrors.ThrowInvalidArgument(nil, "GROUP-m177lN", "Errors.Group.InvalidName")
+	}
+	return nil
+}
+
 // CreateGroup creates a new user group in an organization
-func (c *Commands) CreateGroup(ctx context.Context, group *domain.Group) (details *domain.ObjectDetails, err error) {
+func (c *Commands) CreateGroup(ctx context.Context, group *CreateGroup) (details *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -58,10 +74,28 @@ func (c *Commands) CreateGroup(ctx context.Context, group *domain.Group) (detail
 	return writeModelToObjectDetails(&groupWriteModel.WriteModel), nil
 }
 
+type UpdateGroup struct {
+	models.ObjectRoot
+
+	Name        *string
+	Description *string
+}
+
+func (g *UpdateGroup) IsValid() error {
+	if g.Name != nil && strings.TrimSpace(*g.Name) == "" {
+		return zerrors.ThrowInvalidArgument(nil, "GROUP-dUNd3r", "Errors.Group.InvalidName")
+	}
+	return nil
+}
+
 // UpdateGroup updates a user group in an organization
-func (c *Commands) UpdateGroup(ctx context.Context, groupUpdate *domain.Group) (details *domain.ObjectDetails, err error) {
+func (c *Commands) UpdateGroup(ctx context.Context, groupUpdate *UpdateGroup) (details *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	if err = groupUpdate.IsValid(); err != nil {
+		return nil, err
+	}
 
 	// todo: check permissions
 	existingGroup, err := c.getGroupWriteModelByID(ctx, groupUpdate.AggregateID, groupUpdate.ResourceOwner)
@@ -72,26 +106,19 @@ func (c *Commands) UpdateGroup(ctx context.Context, groupUpdate *domain.Group) (
 		return nil, zerrors.ThrowNotFound(nil, "CMDGRP-b33zly", "Errors.Group.NotFound")
 	}
 
-	// if there are no updates being made, return a successful response as the desired state is achieved.
-	if groupUpdate.Name == existingGroup.Name && groupUpdate.Description == existingGroup.Description {
+	changedEvent := existingGroup.NewChangedEvent(
+		ctx,
+		GroupAggregateFromWriteModel(ctx, &existingGroup.WriteModel),
+		groupUpdate.Name,
+		groupUpdate.Description,
+	)
+	if changedEvent == nil {
 		return writeModelToObjectDetails(&existingGroup.WriteModel), nil
-	}
-
-	// validate the group name if it is being updated
-	if groupUpdate.Name != "" && existingGroup.Name != groupUpdate.Name {
-		if err = groupUpdate.IsValid(); err != nil {
-			return nil, err
-		}
 	}
 
 	err = c.pushAppendAndReduce(ctx,
 		existingGroup,
-		repo.NewGroupChangedEvent(ctx,
-			GroupAggregateFromWriteModel(ctx, &existingGroup.WriteModel),
-			existingGroup.Name,
-			groupUpdate.Name,
-			groupUpdate.Description,
-		))
+		changedEvent)
 	if err != nil {
 		return nil, err
 	}
