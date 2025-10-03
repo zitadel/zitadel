@@ -469,6 +469,12 @@ In another terminal, start the API
 pnpm nx run @zitadel/api:prod
 ```
 
+In another terminal, start the Login
+
+```bash
+pnpm nx run @zitadel/login:prod
+```
+
 Allow the API [to redirect to your dev server](#configure-console-dev-server-redirects).
 
 In another terminal, start the Console development server
