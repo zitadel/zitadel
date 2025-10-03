@@ -1,4 +1,4 @@
-name: Check
+name: Lint Test Build
 
 on: 
   workflow_call: 
@@ -13,7 +13,7 @@ on:
         required: true
 
 jobs:
-  lint_build_test:
+  lint_test_build:
     name: Lint, Build and Test
     runs-on:
       group: zitadel-public
