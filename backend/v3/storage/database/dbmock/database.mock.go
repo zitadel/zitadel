@@ -21,7 +21,6 @@ import (
 type MockPool struct {
 	ctrl     *gomock.Controller
 	recorder *MockPoolMockRecorder
-	isgomock struct{}
 }
 
 // MockPoolMockRecorder is the mock recorder for MockPool.
@@ -42,18 +41,18 @@ func (m *MockPool) EXPECT() *MockPoolMockRecorder {
 }
 
 // Acquire mocks base method.
-func (m *MockPool) Acquire(ctx context.Context) (database.Connection, error) {
+func (m *MockPool) Acquire(arg0 context.Context) (database.Connection, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Acquire", ctx)
+	ret := m.ctrl.Call(m, "Acquire", arg0)
 	ret0, _ := ret[0].(database.Connection)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Acquire indicates an expected call of Acquire.
-func (mr *MockPoolMockRecorder) Acquire(ctx any) *MockPoolAcquireCall {
+func (mr *MockPoolMockRecorder) Acquire(arg0 any) *MockPoolAcquireCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Acquire", reflect.TypeOf((*MockPool)(nil).Acquire), ctx)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Acquire", reflect.TypeOf((*MockPool)(nil).Acquire), arg0)
 	return &MockPoolAcquireCall{Call: call}
 }
 
@@ -81,18 +80,18 @@ func (c *MockPoolAcquireCall) DoAndReturn(f func(context.Context) (database.Conn
 }
 
 // Begin mocks base method.
-func (m *MockPool) Begin(ctx context.Context, opts *database.TransactionOptions) (database.Transaction, error) {
+func (m *MockPool) Begin(arg0 context.Context, arg1 *database.TransactionOptions) (database.Transaction, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Begin", ctx, opts)
+	ret := m.ctrl.Call(m, "Begin", arg0, arg1)
 	ret0, _ := ret[0].(database.Transaction)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Begin indicates an expected call of Begin.
-func (mr *MockPoolMockRecorder) Begin(ctx, opts any) *MockPoolBeginCall {
+func (mr *MockPoolMockRecorder) Begin(arg0, arg1 any) *MockPoolBeginCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Begin", reflect.TypeOf((*MockPool)(nil).Begin), ctx, opts)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Begin", reflect.TypeOf((*MockPool)(nil).Begin), arg0, arg1)
 	return &MockPoolBeginCall{Call: call}
 }
 
@@ -120,17 +119,17 @@ func (c *MockPoolBeginCall) DoAndReturn(f func(context.Context, *database.Transa
 }
 
 // Close mocks base method.
-func (m *MockPool) Close(ctx context.Context) error {
+func (m *MockPool) Close(arg0 context.Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Close", ctx)
+	ret := m.ctrl.Call(m, "Close", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Close indicates an expected call of Close.
-func (mr *MockPoolMockRecorder) Close(ctx any) *MockPoolCloseCall {
+func (mr *MockPoolMockRecorder) Close(arg0 any) *MockPoolCloseCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockPool)(nil).Close), ctx)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockPool)(nil).Close), arg0)
 	return &MockPoolCloseCall{Call: call}
 }
 
@@ -158,10 +157,10 @@ func (c *MockPoolCloseCall) DoAndReturn(f func(context.Context) error) *MockPool
 }
 
 // Exec mocks base method.
-func (m *MockPool) Exec(ctx context.Context, stmt string, args ...any) (int64, error) {
+func (m *MockPool) Exec(arg0 context.Context, arg1 string, arg2 ...any) (int64, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, stmt}
-	for _, a := range args {
+	varargs := []any{arg0, arg1}
+	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Exec", varargs...)
@@ -171,9 +170,9 @@ func (m *MockPool) Exec(ctx context.Context, stmt string, args ...any) (int64, e
 }
 
 // Exec indicates an expected call of Exec.
-func (mr *MockPoolMockRecorder) Exec(ctx, stmt any, args ...any) *MockPoolExecCall {
+func (mr *MockPoolMockRecorder) Exec(arg0, arg1 any, arg2 ...any) *MockPoolExecCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, stmt}, args...)
+	varargs := append([]any{arg0, arg1}, arg2...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exec", reflect.TypeOf((*MockPool)(nil).Exec), varargs...)
 	return &MockPoolExecCall{Call: call}
 }
@@ -202,17 +201,17 @@ func (c *MockPoolExecCall) DoAndReturn(f func(context.Context, string, ...any) (
 }
 
 // Migrate mocks base method.
-func (m *MockPool) Migrate(ctx context.Context) error {
+func (m *MockPool) Migrate(arg0 context.Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Migrate", ctx)
+	ret := m.ctrl.Call(m, "Migrate", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Migrate indicates an expected call of Migrate.
-func (mr *MockPoolMockRecorder) Migrate(ctx any) *MockPoolMigrateCall {
+func (mr *MockPoolMockRecorder) Migrate(arg0 any) *MockPoolMigrateCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Migrate", reflect.TypeOf((*MockPool)(nil).Migrate), ctx)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Migrate", reflect.TypeOf((*MockPool)(nil).Migrate), arg0)
 	return &MockPoolMigrateCall{Call: call}
 }
 
@@ -240,17 +239,17 @@ func (c *MockPoolMigrateCall) DoAndReturn(f func(context.Context) error) *MockPo
 }
 
 // Ping mocks base method.
-func (m *MockPool) Ping(ctx context.Context) error {
+func (m *MockPool) Ping(arg0 context.Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Ping", ctx)
+	ret := m.ctrl.Call(m, "Ping", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Ping indicates an expected call of Ping.
-func (mr *MockPoolMockRecorder) Ping(ctx any) *MockPoolPingCall {
+func (mr *MockPoolMockRecorder) Ping(arg0 any) *MockPoolPingCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockPool)(nil).Ping), ctx)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockPool)(nil).Ping), arg0)
 	return &MockPoolPingCall{Call: call}
 }
 
@@ -278,10 +277,10 @@ func (c *MockPoolPingCall) DoAndReturn(f func(context.Context) error) *MockPoolP
 }
 
 // Query mocks base method.
-func (m *MockPool) Query(ctx context.Context, stmt string, args ...any) (database.Rows, error) {
+func (m *MockPool) Query(arg0 context.Context, arg1 string, arg2 ...any) (database.Rows, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, stmt}
-	for _, a := range args {
+	varargs := []any{arg0, arg1}
+	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Query", varargs...)
@@ -291,9 +290,9 @@ func (m *MockPool) Query(ctx context.Context, stmt string, args ...any) (databas
 }
 
 // Query indicates an expected call of Query.
-func (mr *MockPoolMockRecorder) Query(ctx, stmt any, args ...any) *MockPoolQueryCall {
+func (mr *MockPoolMockRecorder) Query(arg0, arg1 any, arg2 ...any) *MockPoolQueryCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, stmt}, args...)
+	varargs := append([]any{arg0, arg1}, arg2...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockPool)(nil).Query), varargs...)
 	return &MockPoolQueryCall{Call: call}
 }
@@ -322,10 +321,10 @@ func (c *MockPoolQueryCall) DoAndReturn(f func(context.Context, string, ...any) 
 }
 
 // QueryRow mocks base method.
-func (m *MockPool) QueryRow(ctx context.Context, stmt string, args ...any) database.Row {
+func (m *MockPool) QueryRow(arg0 context.Context, arg1 string, arg2 ...any) database.Row {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, stmt}
-	for _, a := range args {
+	varargs := []any{arg0, arg1}
+	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "QueryRow", varargs...)
@@ -334,9 +333,9 @@ func (m *MockPool) QueryRow(ctx context.Context, stmt string, args ...any) datab
 }
 
 // QueryRow indicates an expected call of QueryRow.
-func (mr *MockPoolMockRecorder) QueryRow(ctx, stmt any, args ...any) *MockPoolQueryRowCall {
+func (mr *MockPoolMockRecorder) QueryRow(arg0, arg1 any, arg2 ...any) *MockPoolQueryRowCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, stmt}, args...)
+	varargs := append([]any{arg0, arg1}, arg2...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryRow", reflect.TypeOf((*MockPool)(nil).QueryRow), varargs...)
 	return &MockPoolQueryRowCall{Call: call}
 }
@@ -368,7 +367,6 @@ func (c *MockPoolQueryRowCall) DoAndReturn(f func(context.Context, string, ...an
 type MockConnection struct {
 	ctrl     *gomock.Controller
 	recorder *MockConnectionMockRecorder
-	isgomock struct{}
 }
 
 // MockConnectionMockRecorder is the mock recorder for MockConnection.
@@ -389,18 +387,18 @@ func (m *MockConnection) EXPECT() *MockConnectionMockRecorder {
 }
 
 // Begin mocks base method.
-func (m *MockConnection) Begin(ctx context.Context, opts *database.TransactionOptions) (database.Transaction, error) {
+func (m *MockConnection) Begin(arg0 context.Context, arg1 *database.TransactionOptions) (database.Transaction, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Begin", ctx, opts)
+	ret := m.ctrl.Call(m, "Begin", arg0, arg1)
 	ret0, _ := ret[0].(database.Transaction)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Begin indicates an expected call of Begin.
-func (mr *MockConnectionMockRecorder) Begin(ctx, opts any) *MockConnectionBeginCall {
+func (mr *MockConnectionMockRecorder) Begin(arg0, arg1 any) *MockConnectionBeginCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Begin", reflect.TypeOf((*MockConnection)(nil).Begin), ctx, opts)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Begin", reflect.TypeOf((*MockConnection)(nil).Begin), arg0, arg1)
 	return &MockConnectionBeginCall{Call: call}
 }
 
@@ -428,10 +426,10 @@ func (c *MockConnectionBeginCall) DoAndReturn(f func(context.Context, *database.
 }
 
 // Exec mocks base method.
-func (m *MockConnection) Exec(ctx context.Context, stmt string, args ...any) (int64, error) {
+func (m *MockConnection) Exec(arg0 context.Context, arg1 string, arg2 ...any) (int64, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, stmt}
-	for _, a := range args {
+	varargs := []any{arg0, arg1}
+	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Exec", varargs...)
@@ -441,9 +439,9 @@ func (m *MockConnection) Exec(ctx context.Context, stmt string, args ...any) (in
 }
 
 // Exec indicates an expected call of Exec.
-func (mr *MockConnectionMockRecorder) Exec(ctx, stmt any, args ...any) *MockConnectionExecCall {
+func (mr *MockConnectionMockRecorder) Exec(arg0, arg1 any, arg2 ...any) *MockConnectionExecCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, stmt}, args...)
+	varargs := append([]any{arg0, arg1}, arg2...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exec", reflect.TypeOf((*MockConnection)(nil).Exec), varargs...)
 	return &MockConnectionExecCall{Call: call}
 }
@@ -472,17 +470,17 @@ func (c *MockConnectionExecCall) DoAndReturn(f func(context.Context, string, ...
 }
 
 // Migrate mocks base method.
-func (m *MockConnection) Migrate(ctx context.Context) error {
+func (m *MockConnection) Migrate(arg0 context.Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Migrate", ctx)
+	ret := m.ctrl.Call(m, "Migrate", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Migrate indicates an expected call of Migrate.
-func (mr *MockConnectionMockRecorder) Migrate(ctx any) *MockConnectionMigrateCall {
+func (mr *MockConnectionMockRecorder) Migrate(arg0 any) *MockConnectionMigrateCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Migrate", reflect.TypeOf((*MockConnection)(nil).Migrate), ctx)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Migrate", reflect.TypeOf((*MockConnection)(nil).Migrate), arg0)
 	return &MockConnectionMigrateCall{Call: call}
 }
 
@@ -510,17 +508,17 @@ func (c *MockConnectionMigrateCall) DoAndReturn(f func(context.Context) error) *
 }
 
 // Ping mocks base method.
-func (m *MockConnection) Ping(ctx context.Context) error {
+func (m *MockConnection) Ping(arg0 context.Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Ping", ctx)
+	ret := m.ctrl.Call(m, "Ping", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Ping indicates an expected call of Ping.
-func (mr *MockConnectionMockRecorder) Ping(ctx any) *MockConnectionPingCall {
+func (mr *MockConnectionMockRecorder) Ping(arg0 any) *MockConnectionPingCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockConnection)(nil).Ping), ctx)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockConnection)(nil).Ping), arg0)
 	return &MockConnectionPingCall{Call: call}
 }
 
@@ -548,10 +546,10 @@ func (c *MockConnectionPingCall) DoAndReturn(f func(context.Context) error) *Moc
 }
 
 // Query mocks base method.
-func (m *MockConnection) Query(ctx context.Context, stmt string, args ...any) (database.Rows, error) {
+func (m *MockConnection) Query(arg0 context.Context, arg1 string, arg2 ...any) (database.Rows, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, stmt}
-	for _, a := range args {
+	varargs := []any{arg0, arg1}
+	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Query", varargs...)
@@ -561,9 +559,9 @@ func (m *MockConnection) Query(ctx context.Context, stmt string, args ...any) (d
 }
 
 // Query indicates an expected call of Query.
-func (mr *MockConnectionMockRecorder) Query(ctx, stmt any, args ...any) *MockConnectionQueryCall {
+func (mr *MockConnectionMockRecorder) Query(arg0, arg1 any, arg2 ...any) *MockConnectionQueryCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, stmt}, args...)
+	varargs := append([]any{arg0, arg1}, arg2...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockConnection)(nil).Query), varargs...)
 	return &MockConnectionQueryCall{Call: call}
 }
@@ -592,10 +590,10 @@ func (c *MockConnectionQueryCall) DoAndReturn(f func(context.Context, string, ..
 }
 
 // QueryRow mocks base method.
-func (m *MockConnection) QueryRow(ctx context.Context, stmt string, args ...any) database.Row {
+func (m *MockConnection) QueryRow(arg0 context.Context, arg1 string, arg2 ...any) database.Row {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, stmt}
-	for _, a := range args {
+	varargs := []any{arg0, arg1}
+	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "QueryRow", varargs...)
@@ -604,9 +602,9 @@ func (m *MockConnection) QueryRow(ctx context.Context, stmt string, args ...any)
 }
 
 // QueryRow indicates an expected call of QueryRow.
-func (mr *MockConnectionMockRecorder) QueryRow(ctx, stmt any, args ...any) *MockConnectionQueryRowCall {
+func (mr *MockConnectionMockRecorder) QueryRow(arg0, arg1 any, arg2 ...any) *MockConnectionQueryRowCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, stmt}, args...)
+	varargs := append([]any{arg0, arg1}, arg2...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryRow", reflect.TypeOf((*MockConnection)(nil).QueryRow), varargs...)
 	return &MockConnectionQueryRowCall{Call: call}
 }
@@ -635,17 +633,17 @@ func (c *MockConnectionQueryRowCall) DoAndReturn(f func(context.Context, string,
 }
 
 // Release mocks base method.
-func (m *MockConnection) Release(ctx context.Context) error {
+func (m *MockConnection) Release(arg0 context.Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Release", ctx)
+	ret := m.ctrl.Call(m, "Release", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Release indicates an expected call of Release.
-func (mr *MockConnectionMockRecorder) Release(ctx any) *MockConnectionReleaseCall {
+func (mr *MockConnectionMockRecorder) Release(arg0 any) *MockConnectionReleaseCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Release", reflect.TypeOf((*MockConnection)(nil).Release), ctx)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Release", reflect.TypeOf((*MockConnection)(nil).Release), arg0)
 	return &MockConnectionReleaseCall{Call: call}
 }
 
@@ -676,7 +674,6 @@ func (c *MockConnectionReleaseCall) DoAndReturn(f func(context.Context) error) *
 type MockRow struct {
 	ctrl     *gomock.Controller
 	recorder *MockRowMockRecorder
-	isgomock struct{}
 }
 
 // MockRowMockRecorder is the mock recorder for MockRow.
@@ -697,10 +694,10 @@ func (m *MockRow) EXPECT() *MockRowMockRecorder {
 }
 
 // Scan mocks base method.
-func (m *MockRow) Scan(dest ...any) error {
+func (m *MockRow) Scan(arg0 ...any) error {
 	m.ctrl.T.Helper()
 	varargs := []any{}
-	for _, a := range dest {
+	for _, a := range arg0 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Scan", varargs...)
@@ -709,9 +706,9 @@ func (m *MockRow) Scan(dest ...any) error {
 }
 
 // Scan indicates an expected call of Scan.
-func (mr *MockRowMockRecorder) Scan(dest ...any) *MockRowScanCall {
+func (mr *MockRowMockRecorder) Scan(arg0 ...any) *MockRowScanCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Scan", reflect.TypeOf((*MockRow)(nil).Scan), dest...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Scan", reflect.TypeOf((*MockRow)(nil).Scan), arg0...)
 	return &MockRowScanCall{Call: call}
 }
 
@@ -742,7 +739,6 @@ func (c *MockRowScanCall) DoAndReturn(f func(...any) error) *MockRowScanCall {
 type MockRows struct {
 	ctrl     *gomock.Controller
 	recorder *MockRowsMockRecorder
-	isgomock struct{}
 }
 
 // MockRowsMockRecorder is the mock recorder for MockRows.
@@ -877,10 +873,10 @@ func (c *MockRowsNextCall) DoAndReturn(f func() bool) *MockRowsNextCall {
 }
 
 // Scan mocks base method.
-func (m *MockRows) Scan(dest ...any) error {
+func (m *MockRows) Scan(arg0 ...any) error {
 	m.ctrl.T.Helper()
 	varargs := []any{}
-	for _, a := range dest {
+	for _, a := range arg0 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Scan", varargs...)
@@ -889,9 +885,9 @@ func (m *MockRows) Scan(dest ...any) error {
 }
 
 // Scan indicates an expected call of Scan.
-func (mr *MockRowsMockRecorder) Scan(dest ...any) *MockRowsScanCall {
+func (mr *MockRowsMockRecorder) Scan(arg0 ...any) *MockRowsScanCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Scan", reflect.TypeOf((*MockRows)(nil).Scan), dest...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Scan", reflect.TypeOf((*MockRows)(nil).Scan), arg0...)
 	return &MockRowsScanCall{Call: call}
 }
 
@@ -922,7 +918,6 @@ func (c *MockRowsScanCall) DoAndReturn(f func(...any) error) *MockRowsScanCall {
 type MockTransaction struct {
 	ctrl     *gomock.Controller
 	recorder *MockTransactionMockRecorder
-	isgomock struct{}
 }
 
 // MockTransactionMockRecorder is the mock recorder for MockTransaction.
@@ -943,18 +938,18 @@ func (m *MockTransaction) EXPECT() *MockTransactionMockRecorder {
 }
 
 // Begin mocks base method.
-func (m *MockTransaction) Begin(ctx context.Context) (database.Transaction, error) {
+func (m *MockTransaction) Begin(arg0 context.Context) (database.Transaction, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Begin", ctx)
+	ret := m.ctrl.Call(m, "Begin", arg0)
 	ret0, _ := ret[0].(database.Transaction)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Begin indicates an expected call of Begin.
-func (mr *MockTransactionMockRecorder) Begin(ctx any) *MockTransactionBeginCall {
+func (mr *MockTransactionMockRecorder) Begin(arg0 any) *MockTransactionBeginCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Begin", reflect.TypeOf((*MockTransaction)(nil).Begin), ctx)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Begin", reflect.TypeOf((*MockTransaction)(nil).Begin), arg0)
 	return &MockTransactionBeginCall{Call: call}
 }
 
@@ -982,17 +977,17 @@ func (c *MockTransactionBeginCall) DoAndReturn(f func(context.Context) (database
 }
 
 // Commit mocks base method.
-func (m *MockTransaction) Commit(ctx context.Context) error {
+func (m *MockTransaction) Commit(arg0 context.Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Commit", ctx)
+	ret := m.ctrl.Call(m, "Commit", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Commit indicates an expected call of Commit.
-func (mr *MockTransactionMockRecorder) Commit(ctx any) *MockTransactionCommitCall {
+func (mr *MockTransactionMockRecorder) Commit(arg0 any) *MockTransactionCommitCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Commit", reflect.TypeOf((*MockTransaction)(nil).Commit), ctx)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Commit", reflect.TypeOf((*MockTransaction)(nil).Commit), arg0)
 	return &MockTransactionCommitCall{Call: call}
 }
 
@@ -1020,17 +1015,17 @@ func (c *MockTransactionCommitCall) DoAndReturn(f func(context.Context) error) *
 }
 
 // End mocks base method.
-func (m *MockTransaction) End(ctx context.Context, err error) error {
+func (m *MockTransaction) End(arg0 context.Context, arg1 error) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "End", ctx, err)
+	ret := m.ctrl.Call(m, "End", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // End indicates an expected call of End.
-func (mr *MockTransactionMockRecorder) End(ctx, err any) *MockTransactionEndCall {
+func (mr *MockTransactionMockRecorder) End(arg0, arg1 any) *MockTransactionEndCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "End", reflect.TypeOf((*MockTransaction)(nil).End), ctx, err)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "End", reflect.TypeOf((*MockTransaction)(nil).End), arg0, arg1)
 	return &MockTransactionEndCall{Call: call}
 }
 
@@ -1058,10 +1053,10 @@ func (c *MockTransactionEndCall) DoAndReturn(f func(context.Context, error) erro
 }
 
 // Exec mocks base method.
-func (m *MockTransaction) Exec(ctx context.Context, stmt string, args ...any) (int64, error) {
+func (m *MockTransaction) Exec(arg0 context.Context, arg1 string, arg2 ...any) (int64, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, stmt}
-	for _, a := range args {
+	varargs := []any{arg0, arg1}
+	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Exec", varargs...)
@@ -1071,9 +1066,9 @@ func (m *MockTransaction) Exec(ctx context.Context, stmt string, args ...any) (i
 }
 
 // Exec indicates an expected call of Exec.
-func (mr *MockTransactionMockRecorder) Exec(ctx, stmt any, args ...any) *MockTransactionExecCall {
+func (mr *MockTransactionMockRecorder) Exec(arg0, arg1 any, arg2 ...any) *MockTransactionExecCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, stmt}, args...)
+	varargs := append([]any{arg0, arg1}, arg2...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exec", reflect.TypeOf((*MockTransaction)(nil).Exec), varargs...)
 	return &MockTransactionExecCall{Call: call}
 }
@@ -1102,10 +1097,10 @@ func (c *MockTransactionExecCall) DoAndReturn(f func(context.Context, string, ..
 }
 
 // Query mocks base method.
-func (m *MockTransaction) Query(ctx context.Context, stmt string, args ...any) (database.Rows, error) {
+func (m *MockTransaction) Query(arg0 context.Context, arg1 string, arg2 ...any) (database.Rows, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, stmt}
-	for _, a := range args {
+	varargs := []any{arg0, arg1}
+	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Query", varargs...)
@@ -1115,9 +1110,9 @@ func (m *MockTransaction) Query(ctx context.Context, stmt string, args ...any) (
 }
 
 // Query indicates an expected call of Query.
-func (mr *MockTransactionMockRecorder) Query(ctx, stmt any, args ...any) *MockTransactionQueryCall {
+func (mr *MockTransactionMockRecorder) Query(arg0, arg1 any, arg2 ...any) *MockTransactionQueryCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, stmt}, args...)
+	varargs := append([]any{arg0, arg1}, arg2...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockTransaction)(nil).Query), varargs...)
 	return &MockTransactionQueryCall{Call: call}
 }
@@ -1146,10 +1141,10 @@ func (c *MockTransactionQueryCall) DoAndReturn(f func(context.Context, string, .
 }
 
 // QueryRow mocks base method.
-func (m *MockTransaction) QueryRow(ctx context.Context, stmt string, args ...any) database.Row {
+func (m *MockTransaction) QueryRow(arg0 context.Context, arg1 string, arg2 ...any) database.Row {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, stmt}
-	for _, a := range args {
+	varargs := []any{arg0, arg1}
+	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "QueryRow", varargs...)
@@ -1158,9 +1153,9 @@ func (m *MockTransaction) QueryRow(ctx context.Context, stmt string, args ...any
 }
 
 // QueryRow indicates an expected call of QueryRow.
-func (mr *MockTransactionMockRecorder) QueryRow(ctx, stmt any, args ...any) *MockTransactionQueryRowCall {
+func (mr *MockTransactionMockRecorder) QueryRow(arg0, arg1 any, arg2 ...any) *MockTransactionQueryRowCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, stmt}, args...)
+	varargs := append([]any{arg0, arg1}, arg2...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryRow", reflect.TypeOf((*MockTransaction)(nil).QueryRow), varargs...)
 	return &MockTransactionQueryRowCall{Call: call}
 }
@@ -1189,17 +1184,17 @@ func (c *MockTransactionQueryRowCall) DoAndReturn(f func(context.Context, string
 }
 
 // Rollback mocks base method.
-func (m *MockTransaction) Rollback(ctx context.Context) error {
+func (m *MockTransaction) Rollback(arg0 context.Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Rollback", ctx)
+	ret := m.ctrl.Call(m, "Rollback", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Rollback indicates an expected call of Rollback.
-func (mr *MockTransactionMockRecorder) Rollback(ctx any) *MockTransactionRollbackCall {
+func (mr *MockTransactionMockRecorder) Rollback(arg0 any) *MockTransactionRollbackCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Rollback", reflect.TypeOf((*MockTransaction)(nil).Rollback), ctx)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Rollback", reflect.TypeOf((*MockTransaction)(nil).Rollback), arg0)
 	return &MockTransactionRollbackCall{Call: call}
 }
 
