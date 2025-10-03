@@ -3,24 +3,7 @@ import { sendLoginname } from "./loginname";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
-
-// Import the actual functions for mocking
-import { headers } from "next/headers";
-import { create } from "@zitadel/client";
-import { getServiceUrlFromHeaders } from "../service-url";
-import {
-  getActiveIdentityProviders,
-  getIDPByID,
-  getLoginSettings,
-  getOrgsByDomain,
-  listAuthenticationMethodTypes,
-  listIDPLinks,
-  searchUsers,
-  startIdentityProviderFlow,
-} from "../zitadel";
-import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
-import { createSessionAndUpdateCookie } from "./cookie";
-import { getOriginalHost } from "./host";
+import { getIDPByID } from "../zitadel";
 
 // Mock all the dependencies
 vi.mock("next/headers", () => ({
