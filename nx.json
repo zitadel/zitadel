@@ -32,6 +32,12 @@
       ],
       "cache": true
     },
+    "test": {
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    },
     "test-unit": {
       "inputs": [
         "default"
@@ -41,7 +47,8 @@
     "test-integration": {
       "inputs": [
         "default"
-      ]
+      ],
+      "cache": true
     }
   }
 }
