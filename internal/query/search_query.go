@@ -32,15 +32,20 @@ func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	if req.Limit > 0 {
 		query = query.Limit(req.Limit)
 	}
+	return req.consumeSorting(query)
+}
 
+// consumeSorting sets the sorting column to the query once.
+// subsequent calls will not set the sorting column again.
+func (req *SearchRequest) consumeSorting(query sq.SelectBuilder) sq.SelectBuilder {
 	if !req.SortingColumn.isZero() {
 		clause := req.SortingColumn.orderBy()
 		if !req.Asc {
 			clause += " DESC"
 		}
 		query = query.OrderByClause(clause)
+		req.SortingColumn = Column{}
 	}
-
 	return query
 }
 
