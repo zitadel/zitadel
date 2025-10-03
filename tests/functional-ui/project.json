@@ -57,8 +57,9 @@
         "forwardAllArgs": false,
         "commands": [
           "pnpm cypress install",
+          "wait-on --verbose --interval 2000 --simultaneous 1 \"${CYPRESS_BACKEND_URL}/debug/ready\"",
           "DISPLAY='' pnpm cypress run",
-          "wait-on --verbose --interval 2000 --simultaneous 1 \"${CYPRESS_BACKEND_URL}/debug/ready\" && nx run @zitadel/functional-ui:stop"
+          "nx run @zitadel/functional-ui:stop"
         ]
       },
       "cache": true,
