@@ -1,0 +1,17 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "generate": {
+      "inputs": [
+        "default",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "{workspaceRoot}/proto/**/*"
+      ],
+      "outputs": [
+        "{projectRoot}/cjs",
+        "{projectRoot}/es",
+        "{projectRoot}/types"
+      ]
+    }
+  }
+}

@@ -106,7 +106,7 @@ services:
 
   db:
     restart: unless-stopped
-    image: postgres:17-alpine
+    image: postgres:17
     environment:
       PGUSER: postgres
       POSTGRES_PASSWORD: postgres

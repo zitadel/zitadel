@@ -11,7 +11,7 @@
 
 # Coverage
 coverage.txt
-profile.cov
+profile*.cov
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
@@ -24,9 +24,9 @@ sandbox.go
 
 # IDE
 .idea
-.vscode
 .DS_STORE
 .run
+.vscode
 
 # credential
 google-credentials
@@ -47,7 +47,6 @@ cmd/zitadel/zitadel
 /zitadel
 
 # buildfolders and generated files
-tmp/
 console/src/app/proto/generated/
 **.pb.go
 !pkg/grpc/protoc/v2/options.pb.go
@@ -79,21 +78,22 @@ build/local/*.env
 /zitadel
 node_modules/
 .kreya
+login-client.pat
+admin.pat
+.env.*local
 
 go.work
 go.work.sum
 # Local Netlify folder
 .netlify
 
-load-test/node_modules
-load-test/pnpm-debug.log
-load-test/dist
-load-test/output/*
+dist
 .vercel
-
-# Turbo
-.turbo/
-**/.turbo/
 
 # PNPM
 .pnpm-store
+
+# Nx
+.nx/cache
+.nx/workspace-data
+.cursor/rules/nx-rules.mdc

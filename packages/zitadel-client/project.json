@@ -1,0 +1,43 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "namedInputs": {
+    "sources": ["{projectRoot}/src/**/*"]
+  },
+  "targets": {
+    "test": {
+      "description": "Tests the TypeScript client library. It is an alias for test-unit.",
+      "dependsOn": [
+        "test-unit"
+      ]
+    },
+    "lint": {
+      "description": "Runs all linters",
+      "dependsOn": [
+        "lint-*"
+      ]
+    },
+    "lint-check-eslint": {
+      "description": "Checks code formatting with ESLint",
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    }, 
+    "lint-check-knip": {
+      "description": "Checks for unused dependencies with knip",
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    }, 
+    "build": {
+      "description": "Builds the TypeScript client library",
+      "inputs": [
+        "default",
+        "{workspaceRoot}/pnpm-lock.yaml"
+      ],
+      "outputs": ["{projectRoot}/dist"],
+      "dependsOn": ["^generate"]
+    }
+  }
+}

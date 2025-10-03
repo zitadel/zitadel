@@ -1,6 +1,6 @@
 node_modules
-.turbo
+.nx
 *.log
 .DS_Store
 buf.gen.yaml
-turbo.json
+nx.json

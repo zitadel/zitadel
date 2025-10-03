@@ -1,0 +1,19 @@
+{
+    "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+    "name": "@zitadel/login-api-mock",
+    "targets": {
+        "build": {
+            "description": "Builds the API mock server",
+            "command": "nx run @zitadel/devcontainer:compose build login-api-mock"
+        },
+        "serve": {
+            "description": "Starts the API mock server",
+            "continuous": true,
+            "command": "nx run @zitadel/devcontainer:compose up --force-recreate --renew-anon-volumes login-api-mock"
+        },
+        "down": {
+            "description": "Stops the API mock server",
+            "command": "nx run @zitadel/devcontainer:compose down login-api-mock"
+        }
+    }
+}
