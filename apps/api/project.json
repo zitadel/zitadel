@@ -118,7 +118,6 @@
                 "generate-statik"
             ],
             "command": "go test -race -coverprofile=profile.api.test-unit.cov -coverpkg=./internal/...  ./...",
-            "cache": true,
             "inputs": [
                 "sources",
                 "{workspaceRoot}/go*"
@@ -202,7 +201,6 @@
                     "nx run @zitadel/api:test-integration-stop"
                 ]
             },
-            "cache": true,
             "inputs": [
                 { "runtime": "go env GOOS" },
                 { "runtime": "go env GOARCH" },

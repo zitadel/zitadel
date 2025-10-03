@@ -115,7 +115,6 @@
           "nx run @zitadel/login:test-integration-stop"
         ]
       },
-      "cache": true,
       "inputs": [
         "default",
         "{workspaceRoot}/pnpm-lock.yaml",

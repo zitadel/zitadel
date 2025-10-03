@@ -21,8 +21,8 @@ permissions:
   actions: write
 
 jobs:
-  check:
-    uses: ./.github/workflows/check.yml
+  lint_test_build:
+    uses: ./.github/workflows/lint_test_build.yml
     with:
       node_version: "22"
     secrets:
@@ -52,7 +52,7 @@ jobs:
       issues: write
       pull-requests: write
     needs:
-      - check
+      - lint_test_build
       - pack
     if: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
