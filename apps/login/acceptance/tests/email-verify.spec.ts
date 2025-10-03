@@ -20,8 +20,6 @@ const test = base.extend<{ user: PasswordUser }>({
       passwordChangeRequired: false,
     });
     await user.ensure(page);
-    // drain the first code that is sent on user creation
-    await eventualEmailOTP(user.getUsername());
     await use(user);
     await user.cleanup();
   },

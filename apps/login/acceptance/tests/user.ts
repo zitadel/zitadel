@@ -4,14 +4,14 @@ import { activateOTP, addTOTP, addUser, eventualNewUser, getUserByUsername, remo
 
 export interface userProps {
   email: string;
-  isEmailVerified?: boolean;
+  isEmailVerified: boolean;
   firstName: string;
   lastName: string;
   organization: string;
   password: string;
-  passwordChangeRequired?: boolean;
+  passwordChangeRequired: boolean;
   phone: string;
-  isPhoneVerified?: boolean;
+  isPhoneVerified: boolean;
 }
 
 class User {

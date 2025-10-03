@@ -274,7 +274,7 @@ Call the API using the generated [](./admin.pat) with [grpcurl](https://github.c
 grpcurl -plaintext -H "Authorization: Bearer $(cat admin.pat)" localhost:8080 zitadel.user.v2.UserService.ListUsers
 ```
 
-To connect to the database and explore Zitadel data, run `psql "host=${DEVCONTAINER_DB_HOST:-localhost} dbname=zitadel sslmode=disable"`.
+To connect to the database and explore Zitadel data, run `psql "host=${DEVCONTAINER_DB_HOST:-localhost} port=5435 user=postgres dbname=zitadel sslmode=disable"`.
 
 ### Run API Unit Tests
 

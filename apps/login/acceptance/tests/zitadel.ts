@@ -18,25 +18,18 @@ export async function addUser(props: userProps) {
     },
     email: {
       email: props.email,
-      isVerified: true,
+      isVerified: props.isEmailVerified,
     },
     phone: {
       phone: props.phone,
-      isVerified: true,
+      isVerified: props.isPhoneVerified,
     },
     password: {
       password: props.password,
       changeRequired: props.passwordChangeRequired ?? false,
     },
   };
-  if (!props.isEmailVerified) {
-    delete body.email.isVerified;
-  }
-  if (!props.isPhoneVerified) {
-    delete body.phone.isVerified;
-  }
-
-  return await listCall(`${process.env.ZITADEL_API_URL}/v2/users/human`, body);
+  return await listCall(`${process.env.ZITADEL_API_URL}/v2/users/human`, props);
 }
 
 export async function removeUserByUsername(username: string) {
