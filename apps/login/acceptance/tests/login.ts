@@ -2,6 +2,7 @@ import { expect, Page } from "@playwright/test";
 import { code, emailOtpFromMockServer as enterEmailOTPFromMockServer, smsOtpFromMockServer as enterSMSOTPFromMockServer } from "./code.js";
 import { loginname } from "./loginname.js";
 import { password } from "./password.js";
+import { RegisteredUser } from "./user.js";
 
 export async function startLogin(page: Page) {
   await page.goto(`/ui/v2/login/loginname`);
@@ -34,7 +35,7 @@ export async function loginWithPasswordAndPhoneOTP(page: Page, username: string,
   await enterSMSOTPFromMockServer(page, phone);
 }
 
-export async function loginWithPasswordAndTOTP(page: Page, username: string, password: string, secret: string) {
-  await loginWithPassword(page, username, password);
-  await code(page, totp(secret));
+export async function loginWithPasswordAndTOTP(page: Page, user: RegisteredUser, secret: string) {
+  await loginWithPassword(page, user.username, user.password);
+  await code(page, user.svc.totp(secret));
 }

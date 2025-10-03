@@ -9,7 +9,7 @@ import { Authenticator } from "@otplib/core";
 import { createDigest, createRandomBytes } from "@otplib/plugin-crypto";
 import { keyDecoder, keyEncoder } from "@otplib/plugin-thirty-two"; // use your chosen base32 plugin
 
-class UserService {
+export class UserService {
     constructor(public readonly native: Client<typeof NativeUserService>) { }
 
     async getByUsername(username: string) {
@@ -39,7 +39,7 @@ class UserService {
         return response.secret;
     }
 
-    private totp(secret: string) {
+    public totp(secret: string) {
         const authenticator = new Authenticator({
             createDigest,
             createRandomBytes,
@@ -60,8 +60,8 @@ class UserService {
     }
 }
 
-class User {
-    constructor(private svc: UserService) { }
+export class RegisteredUser {
+    constructor(public svc: UserService) { }
 
     public readonly default: CreateUserRequest = {
         $typeName: "zitadel.user.v2.CreateUserRequest",
@@ -137,7 +137,7 @@ class User {
     }
 }
 
-export const test = base.extend<{ user: User; transport: Transport, userService: UserService }>({
+export const test = base.extend<{ transport: Transport, userService: UserService, registeredUser: RegisteredUser }>({
     transport: async ({ }, use) => {
         console.log("Setting up transport");
         const adminToken = readFileSync(process.env.ZITADEL_ADMIN_TOKEN_FILE!).toString().trim()
@@ -150,9 +150,9 @@ export const test = base.extend<{ user: User; transport: Transport, userService:
         const svc = new UserService(nativeUserService);
         await use(svc);
     },
-    user: async ({ userService }, use) => {
+    registeredUser: async ({ userService }, use) => {
         console.log("Setting up user");
-        const user = new User(userService);
+        const user = new RegisteredUser(userService);
         await use(user);
         await user.cleanup();
     }

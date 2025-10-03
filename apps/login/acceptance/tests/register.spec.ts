@@ -1,10 +1,9 @@
 import { faker } from "@faker-js/faker";
-import { test } from "@playwright/test";
+import { test } from "./user.js";
 import { loginScreenExpect } from "./login.js";
 import { registerWithPasskey, registerWithPassword } from "./register.js";
-import { removeUserByUsername } from "./zitadel.js";
 
-test("register with password", async ({ page }) => {
+test("register with password", async ({ page, user }) => {
   const username = faker.internet.email();
   const password = "Password1!";
   const firstname = faker.person.firstName();
