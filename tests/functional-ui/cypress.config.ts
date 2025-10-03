@@ -1,6 +1,7 @@
 import { defineConfig } from 'cypress';
 import { createServer } from 'http'
 import { ZITADELWebhookEvent } from 'cypress/support/types';
+import { report } from 'process';
 
 const jwt = require('jsonwebtoken');
 
@@ -43,7 +44,11 @@ export default defineConfig({
     overwrite: false,
     html: true,
     json: true,
+    reportDir: 'cypress/results',
   },
+  videosFolder: 'cypress/videos',
+  screenshotsFolder: 'cypress/screenshots',
+  downloadsFolder: 'cypress/downloads',
   trashAssetsBeforeRuns: false,
   defaultCommandTimeout: 10000,
 

@@ -14,7 +14,7 @@ on:
 
 jobs:
   lint_test_build:
-    name: Lint, Build and Test
+    name: Lint, Test and Build
     runs-on:
       group: zitadel-public
     environment: ${{ github.ref_protected == 'true' && 'Protected' || null }}
@@ -54,34 +54,10 @@ jobs:
         working-directory: apps/login
       - name: Set SHAs for nx affected commands
         uses: nrwl/nx-set-shas@v4
-      - name: Lint
+      - name: Lint, Test and Build
         env:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
-        run: pnpm nx affected --nxBail --targets lint
-      - name: Build
-        env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
-        run: pnpm nx affected --nxBail --targets build --exclude @zitadel/docs,@zitadel/benchmark
-      - name: Test Unit
-        env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
-        run: pnpm nx affected --nxBail --targets test-unit
-      - name: Test Integration Login
-        env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
-        run: pnpm nx affected --nxBail --targets test-integration --exclude='*,!@zitadel/login'
-      - name: Test Integration API
-        env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
-        run: pnpm nx affected --nxBail --targets test-integration --exclude='*,!@zitadel/api'
-      - name: Test Functional UI Firefox
-        env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
-        run: pnpm nx affected --nxBail --targets test --exclude='*,!@zitadel/functional-ui' --browser firefox
-      - name: Test Functional UI Chrome
-        env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
-        run: pnpm nx affected --nxBail --targets test --exclude='*,!@zitadel/functional-ui' --browser chrome
+        run: pnpm nx affected --nxBail --targets lint test build
       - name: Suggest Pipeline Fix By Nx Cloud AI
         if: always()
         env:
