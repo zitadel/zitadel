@@ -34,20 +34,17 @@
             "configurations": {
                 "dev": {
                     "env": {
-                        "API_CONFIG_FILE": "{projectRoot}/dev.yaml",
-                        "ZITADEL_DATABASE_POSTGRES_HOST": "${DEVCONTAINER_DB_HOST:-localhost}"
+                        "API_CONFIG_FILE": "{projectRoot}/dev.yaml"
                     }
                 },
                 "test-integration": {
                     "env": {
-                        "API_CONFIG_FILE": "{projectRoot}/test-integration.yaml",
-                        "ZITADEL_DATABASE_POSTGRES_HOST": "${DEVCONTAINER_DB_API_INTEGRATION_HOST:-localhost}"
+                        "API_CONFIG_FILE": "{projectRoot}/test-integration.yaml"
                     }
                 },
                 "test-functional-ui": {
                     "env": {
-                        "API_CONFIG_FILE": "{projectRoot}/test-functional-ui.yaml",
-                        "ZITADEL_DATABASE_POSTGRES_HOST": "${DEVCONTAINER_DB_FUNCTIONAL_UI_HOST:-localhost}"
+                        "API_CONFIG_FILE": "{projectRoot}/test-functional-ui.yaml"
                     }
                 }
             }
@@ -69,20 +66,17 @@
             "configurations": {
                 "dev": {
                     "env": {
-                        "API_CONFIG_FILE": "{projectRoot}/dev.yaml",
-                        "ZITADEL_DATABASE_POSTGRES_HOST": "${DEVCONTAINER_DB_HOST:-localhost}"
+                        "API_CONFIG_FILE": "{projectRoot}/dev.yaml"
                     }
                 },
                 "test-integration": {
                     "env": {
-                        "API_CONFIG_FILE": "{projectRoot}/test-integration.yaml",
-                        "ZITADEL_DATABASE_POSTGRES_HOST": "${DEVCONTAINER_DB_API_INTEGRATION_HOST:-localhost}"
+                        "API_CONFIG_FILE": "{projectRoot}/test-integration.yaml"
                     }
                 },
                 "test-functional-ui": {
                     "env": {
-                        "API_CONFIG_FILE": "{projectRoot}/test-functional-ui.yaml",
-                        "ZITADEL_DATABASE_POSTGRES_HOST": "${DEVCONTAINER_DB_FUNCTIONAL_UI_HOST:-localhost}"
+                        "API_CONFIG_FILE": "{projectRoot}/test-functional-ui.yaml"
                     }
                 }
             }
