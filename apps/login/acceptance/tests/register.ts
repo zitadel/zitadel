@@ -2,7 +2,7 @@ import { Page } from "@playwright/test";
 import { emailVerify } from "./email-verify.js";
 import { passkeyRegister } from "./passkey.js";
 import { registerPasswordScreen, registerUserScreenPasskey, registerUserScreenPassword } from "./register-screen.js";
-import { eventualCode } from "./mock.js";
+import { eventualEmailOTP } from "./mock.js";
 
 export async function registerWithPassword(
   page: Page,
@@ -34,6 +34,6 @@ export async function registerWithPasskey(page: Page, firstname: string, lastnam
 }
 
 async function verifyEmail(page: Page, email: string) {
-  const c = await eventualCode(email);
+  const c = await eventualEmailOTP(email);
   await emailVerify(page, c);
 }

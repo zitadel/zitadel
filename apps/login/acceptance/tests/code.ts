@@ -1,9 +1,14 @@
 import { Page } from "@playwright/test";
 import { codeScreen } from "./code-screen.js";
-import { eventualOtp } from "./mock.js";
+import { eventualEmailOTP , eventualSMSOTP } from "./mock.js";
 
-export async function otpFromSink(page: Page, key: string) {
-  const c = await eventualOtp(key);
+export async function emailOtpFromMockServer(page: Page, key: string) {
+  const c = await eventualEmailOTP(key);
+  await code(page, c);
+}
+
+export async function smsOtpFromMockServer(page: Page, key: string) {
+  const c = await eventualSMSOTP(key);
   await code(page, c);
 }
 

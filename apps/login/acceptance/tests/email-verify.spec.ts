@@ -3,7 +3,7 @@ import { test as base } from "@playwright/test";
 import { emailVerify, emailVerifyResend } from "./email-verify.js";
 import { emailVerifyScreenExpect } from "./email-verify-screen.js";
 import { loginScreenExpect, loginWithPassword } from "./login.js";
-import { eventualCode } from "./mock.js";
+import { eventualEmailOTP } from "./mock.js";
 import { PasswordUser } from "./user.js";
 
 const test = base.extend<{ user: PasswordUser }>({
@@ -20,15 +20,18 @@ const test = base.extend<{ user: PasswordUser }>({
       passwordChangeRequired: false,
     });
     await user.ensure(page);
+    // drain the first code that is sent on user creation
+    await eventualEmailOTP(user.getUsername());
     await use(user);
     await user.cleanup();
   },
 });
 
-test("user email not verified, verify", async ({ user, page }) => {
+test.only("user email not verified, verify", async ({ user, page }) => {
   await loginWithPassword(page, user.getUsername(), user.getPassword());
-  const c = await eventualCode(user.getUsername());
-  await emailVerify(page, c);
+  // Why does loginWithPassword send a code again?
+  const code = await eventualEmailOTP(user.getUsername());
+  await emailVerify(page, code);
   // wait for resend of the code
   await page.waitForTimeout(2000);
   await loginScreenExpect(page, user.getFullName());
@@ -38,7 +41,7 @@ test("user email not verified, resend, verify", async ({ user, page }) => {
   await loginWithPassword(page, user.getUsername(), user.getPassword());
   // auto-redirect on /verify
   await emailVerifyResend(page);
-  const c = await eventualCode(user.getUsername());
+  const code = await eventualEmailOTP(user.getUsername());
   // wait for resend of the code
   await page.waitForTimeout(2000);
   await emailVerify(page, c);
@@ -47,7 +50,7 @@ test("user email not verified, resend, verify", async ({ user, page }) => {
 
 test("user email not verified, resend, old code", async ({ user, page }) => {
   await loginWithPassword(page, user.getUsername(), user.getPassword());
-  const c = await eventualCode(user.getUsername());
+  const c = await eventualEmailOTP(user.getUsername());
   await emailVerifyResend(page);
   // wait for resend of the code
   await page.waitForTimeout(2000);

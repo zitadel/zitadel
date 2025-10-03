@@ -1,5 +1,5 @@
 import { expect, Page } from "@playwright/test";
-import { eventualCode } from "./mock.js";
+import { eventualEmailOTP } from "./mock.js";
 
 const codeField = "code-text-input";
 const passwordField = "password-text-input";
@@ -74,7 +74,7 @@ async function checkContent(page: Page, testid: string, match: boolean) {
 }
 
 export async function resetPasswordScreen(page: Page, username: string, password1: string, password2: string) {
-  const c = await eventualCode(username);
+  const c = await eventualEmailOTP(username);
   await page.getByTestId(codeField).pressSequentially(c);
   await page.getByTestId(passwordSetField).pressSequentially(password1);
   await page.getByTestId(passwordSetConfirmField).pressSequentially(password2);

@@ -1,5 +1,5 @@
 import { expect, Page } from "@playwright/test";
-import { code, otpFromSink } from "./code.js";
+import { code, emailOtpFromMockServer as enterEmailOTPFromMockServer, smsOtpFromMockServer as enterSMSOTPFromMockServer } from "./code.js";
 import { loginname } from "./loginname.js";
 import { password } from "./password.js";
 import { totp } from "./zitadel.js";
@@ -27,12 +27,12 @@ export async function loginScreenExpect(page: Page, fullName: string) {
 
 export async function loginWithPasswordAndEmailOTP(page: Page, username: string, password: string, email: string) {
   await loginWithPassword(page, username, password);
-  await otpFromSink(page, email);
+  await enterEmailOTPFromMockServer(page, email);
 }
 
 export async function loginWithPasswordAndPhoneOTP(page: Page, username: string, password: string, phone: string) {
   await loginWithPassword(page, username, password);
-  await otpFromSink(page, phone);
+  await enterSMSOTPFromMockServer(page, phone);
 }
 
 export async function loginWithPasswordAndTOTP(page: Page, username: string, password: string, secret: string) {

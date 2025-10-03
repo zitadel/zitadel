@@ -19,18 +19,21 @@ export async function setup(selfPort: number, apiUrl: string, apiToken: string) 
 export function serve(router: Router) {
     let notifications: { [key: string]: Object } = {}
     router.post(EMAIL_PATH, (req, res) => {
+        // Receive email webhook
         const { contextInfo: { recipientEmailAddress } } = req.body
         console.log("saving email for", recipientEmailAddress);
         notifications[recipientEmailAddress] = req.body
         res.send('Email!\n')
     })
     router.post(SMS_PATH, (req, res) => {
+        // Receive SMS webhook
         const { contextInfo: { recipientPhoneNumber } } = req.body
         console.log("saving SMS for", recipientPhoneNumber);
         notifications[recipientPhoneNumber] = req.body
         res.send('SMS!\n')
     })
     router.get('/notifications/:recipient', (req, res) => {
+        // Return notification for recipient to test case and remove it from memory
         const { recipient } = req.params
         const notification = notifications[recipient]
         if (!notification) {
@@ -40,5 +43,9 @@ export function serve(router: Router) {
         console.log("returning and removing notification for", recipient);
         delete notifications[recipient]
         res.contentType('application/json').json(notification)
+    })
+    router.get('/notifications', (req, res) => {
+        // for debugging purposes
+        res.contentType('application/json').json(notifications)
     })
 }

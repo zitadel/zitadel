@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { test as base } from "@playwright/test";
-import { code, codeResend, otpFromSink } from "./code.js";
+import { code, codeResend, smsOtpFromMockServer } from "./code.js";
 import { codeScreenExpect } from "./code-screen.js";
 import { loginScreenExpect, loginWithPassword, loginWithPasswordAndEmailOTP } from "./login.js";
 import { OtpType, PasswordUserWithOTP } from "./user.js";
@@ -61,7 +61,7 @@ test.skip("DOESN'T WORK: username, password and email otp login, resend code", a
   // User is redirected to the app (default redirect url)
   await loginWithPassword(page, user.getUsername(), user.getPassword());
   await codeResend(page);
-  await otpFromSink(page, user.getUsername());
+  await smsOtpFromMockServer(page, user.getUsername());
   await loginScreenExpect(page, user.getFullName());
 });
 

@@ -12,7 +12,7 @@ const awaitNotification = new Gaxios({
   },
 });
 
-export async function eventualOtp(recipient: string): Promise<any> {
+export async function eventualSMSOTP(recipient: string): Promise<any> {
   return awaitNotification.request({ url: `${process.env.SINK_NOTIFICATION_URL}/${recipient}` }).then((response) => {
     expectSuccess(response);
     const otp = response?.data?.args?.otp;
@@ -23,7 +23,7 @@ export async function eventualOtp(recipient: string): Promise<any> {
   });
 }
 
-export async function eventualCode(recipient: string): Promise<any> {
+export async function eventualEmailOTP(recipient: string): Promise<any> {
   return awaitNotification.request({ url: `${process.env.SINK_NOTIFICATION_URL}/${recipient}` }).then((response) => {
     expectSuccess(response);
     const code = response?.data?.args?.code;
