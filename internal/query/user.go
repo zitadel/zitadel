@@ -1259,7 +1259,7 @@ func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 		}
 }
 
-// prepareUserQuery creates the select query for searching users and returns a matching scan function.
+// prepareUsersQuery creates the select query for searching users and returns a matching scan function.
 // Permissions, filters and sorting are applied in a `SELECT FROM` distinct sub-select.
 // The count over window function and limit are applied in the outer query.
 // It is not possible to pass more filters to the returned query, as they need to be applied in the sub-select.
