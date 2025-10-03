@@ -301,7 +301,7 @@ func (c *Commands) CreateSession(
 	if err != nil {
 		return nil, err
 	}
-	if err = c.checkSessionWritePermission(ctx, sessionWriteModel, ""); err != nil {
+	if err = c.checkSessionWritePermission(ctx, sessionWriteModel); err != nil {
 		return nil, err
 	}
 	cmd := c.NewSessionCommands(cmds, sessionWriteModel)
@@ -311,7 +311,7 @@ func (c *Commands) CreateSession(
 
 func (c *Commands) UpdateSession(
 	ctx context.Context,
-	sessionID, sessionToken string,
+	sessionID string,
 	cmds []SessionCommand,
 	metadata map[string][]byte,
 	lifetime time.Duration,
@@ -321,7 +321,7 @@ func (c *Commands) UpdateSession(
 	if err != nil {
 		return nil, err
 	}
-	if err = c.checkSessionWritePermission(ctx, sessionWriteModel, sessionToken); err != nil {
+	if err = c.checkSessionWritePermission(ctx, sessionWriteModel); err != nil {
 		return nil, err
 	}
 	cmd := c.NewSessionCommands(cmds, sessionWriteModel)
@@ -400,14 +400,10 @@ func (c *Commands) updateSession(ctx context.Context, checks *SessionCommands, m
 	return changed, nil
 }
 
-// checkSessionWritePermission will check that the provided sessionToken is correct or
-// if empty, check that the caller is granted the "session.write" permission on the resource owner of the authenticated user.
-// In case the user is not set and the userResourceOwner is not set (also the case for the session creation),
+// checkSessionWritePermission will check that the caller is granted the "session.write" permission on the resource owner of the authenticated user.
+// In case the user is not set, and the userResourceOwner is not set (also the case for the session creation),
 // it will check permission on the instance.
-func (c *Commands) checkSessionWritePermission(ctx context.Context, model *SessionWriteModel, sessionToken string) error {
-	if sessionToken != "" {
-		return c.sessionTokenVerifier(ctx, sessionToken, model.AggregateID, model.TokenID)
-	}
+func (c *Commands) checkSessionWritePermission(ctx context.Context, model *SessionWriteModel) error {
 	userResourceOwner, err := c.sessionUserResourceOwner(ctx, model)
 	if err != nil {
 		return err

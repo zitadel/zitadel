@@ -16,8 +16,13 @@ message ExecutionSearchFilter {
   oneof filter {
     option (validate.required) = true;
 
+    // Filter for executions that are executed when certain conditions are met.
     InConditionsFilter in_conditions_filter = 1;
+
+    // Filter for executions of a certain type.
     ExecutionTypeFilter execution_type_filter = 2;
+
+    // Filter for executions that include a specific target.
     TargetFilter target_filter = 3;
   }
 }
@@ -33,10 +38,9 @@ message ExecutionTypeFilter {
 }
 
 message TargetFilter {
-  // Defines the id to query for.
+  // Defines the id of the target that needs to be part of the execution.
   string target_id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "the id of the targets to include"
       example: "\"69629023906488334\"";
     }
   ];
@@ -58,7 +62,10 @@ message TargetSearchFilter {
   oneof filter {
     option (validate.required) = true;
 
+    // Filter for targets with a specific name.
     TargetNameFilter target_name_filter = 1;
+
+    // Filter for targets with specific ids.
     InTargetIDsFilter in_target_ids_filter = 2;
   }
 }
@@ -72,12 +79,10 @@ message TargetNameFilter {
       example: "\"ip_allow_list\"";
     }
   ];
+
   // Defines which text comparison method used for the name query.
   zitadel.filter.v2.TextFilterMethod method = 2 [
-    (validate.rules).enum.defined_only = true,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "defines which text equality method is used";
-    }
+    (validate.rules).enum.defined_only = true
   ];
 }
 
@@ -85,7 +90,6 @@ message InTargetIDsFilter {
   // Defines the ids to query for.
   repeated string target_ids = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "the ids of the targets to include"
       example: "[\"69629023906488334\",\"69622366012355662\"]";
     }
   ];

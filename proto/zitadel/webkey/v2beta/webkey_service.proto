@@ -16,7 +16,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Web key Service";
     version: "2.0-beta";
-    description: "This API is intended to manage web keys for a ZITADEL instance, used to sign and validate OIDC tokens. This service is in beta state. It can AND will continue breaking until a stable version is released.\n\nThe public key endpoint (outside of this service) is used to retrieve the public keys of the active and inactive keys.\n\nPlease make sure to enable the `web_key` feature flag on your instance to use this service.";
+    description: "This API is intended to manage web keys for a ZITADEL instance, used to sign and validate OIDC tokens. This service is in beta state. It can AND will continue breaking until a stable version is released.\n\nThe public key endpoint (outside of this service) is used to retrieve the public keys of the active and inactive keys.\n\nDeprecated: use webkey service v2 instead. This service will be removed in the next major version of ZITADEL.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -104,9 +104,11 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 // The service provides methods to create, activate, delete and list web keys.
 // The public key endpoint (outside of this service) is used to retrieve the public keys of the active and inactive keys.
 //
-// Please make sure to enable the `web_key` feature flag on your instance to use this service.
+// Deprecated: use webkey service v2 instead. This service will be removed in the next major version of ZITADEL.
 service WebKeyService {
   // Create Web Key
+  //
+  // Deprecated: please move to the corresponding endpoint under oidc service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // Generate a private and public key pair. The private key can be used to sign OIDC tokens after activation.
   // The public key can be used to validate OIDC tokens.
@@ -117,9 +119,6 @@ service WebKeyService {
   //
   // Required permission:
   //   - `iam.web_key.write`
-  //
-  // Required feature flag:
-  //   - `web_key`
   rpc CreateWebKey(CreateWebKeyRequest) returns (CreateWebKeyResponse) {
     option (google.api.http) = {
       post: "/v2beta/web_keys"
@@ -133,6 +132,7 @@ service WebKeyService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -150,6 +150,8 @@ service WebKeyService {
 
   // Activate Web Key
   //
+  // Deprecated: please move to the corresponding endpoint under oidc service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Switch the active signing web key. The previously active key will be deactivated.
   // Note that the JWKs OIDC endpoint returns a cacheable response.
   // Therefore it is not advised to activate a key that has been created within the cache duration (default is 5min),
@@ -157,9 +159,6 @@ service WebKeyService {
   //
   // Required permission:
   //   - `iam.web_key.write`
-  //
-  // Required feature flag:
-  //   - `web_key`
   rpc ActivateWebKey(ActivateWebKeyRequest) returns (ActivateWebKeyResponse) {
     option (google.api.http) = {
       post: "/v2beta/web_keys/{id}/activate"
@@ -172,16 +171,11 @@ service WebKeyService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
           description: "Web key activated successfully.";
-        }
-      };
-      responses: {
-        key: "400"
-        value: {
-          description: "The feature flag `web_key` is not enabled.";
         }
       };
       responses: {
@@ -195,6 +189,8 @@ service WebKeyService {
 
   // Delete Web Key
   //
+  // Deprecated: please move to the corresponding endpoint under oidc service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Delete a web key pair. Only inactive keys can be deleted. Once a key is deleted,
   // any tokens signed by this key will be invalid.
   // Note that the JWKs OIDC endpoint returns a cacheable response.
@@ -204,9 +200,6 @@ service WebKeyService {
   //
   // Required permission:
   //   - `iam.web_key.delete`
-  //
-  // Required feature flag:
-  //   - `web_key`
   rpc DeleteWebKey(DeleteWebKeyRequest) returns (DeleteWebKeyResponse) {
     option (google.api.http) = {
       delete: "/v2beta/web_keys/{id}"
@@ -219,16 +212,11 @@ service WebKeyService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
           description: "Web key deleted successfully.";
-        }
-      };
-      responses: {
-        key: "400"
-        value: {
-          description: "The feature flag `web_key` is not enabled or the web key is currently active.";
         }
       };
     };
@@ -236,13 +224,12 @@ service WebKeyService {
 
   // List Web Keys
   //
+  // Deprecated: please move to the corresponding endpoint under oidc service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // List all web keys and their states.
   //
   // Required permission:
   //   - `iam.web_key.read`
-  //
-  // Required feature flag:
-  //   - `web_key`
   rpc ListWebKeys(ListWebKeysRequest) returns (ListWebKeysResponse) {
     option (google.api.http) = {
       get: "/v2beta/web_keys"
@@ -255,16 +242,11 @@ service WebKeyService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
           description: "List of all web keys.";
-        }
-      };
-      responses: {
-        key: "400"
-        value: {
-          description: "The feature flag `web_key` is not enabled.";
         }
       };
     };

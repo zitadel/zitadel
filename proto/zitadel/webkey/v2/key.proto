@@ -27,20 +27,24 @@ message WebKey {
       example: "\"69629012906488334\"";
     }
   ];
+
   // The timestamp of the key creation.
   google.protobuf.Timestamp creation_date = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2024-12-18T07:50:47.492Z\"";
     }
   ];
+
   // The timestamp of the last change to the key (e.g. creation, activation, deactivation).
   google.protobuf.Timestamp change_date = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
     }
   ];
+
   // State of the key
   State state = 4;
+
   // Configured type of the key (either RSA, ECDSA or ED25519)
   oneof key {
     RSA rsa = 5;
@@ -57,7 +61,8 @@ message RSA {
       default: "RSA_BITS_2048";
     }
   ];
-  // Signing algrithm used. Default is SHA256.
+
+  // Signing algorithm used. Default is SHA256.
   RSAHasher hasher = 2 [
     (validate.rules).enum = {defined_only: true, not_in: [0]},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

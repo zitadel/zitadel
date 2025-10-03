@@ -108,6 +108,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
+// Deprecated: use user service v2 instead. This service will be removed in the next major version of ZITADEL.
 service UserService {
 
   // Create a new human user
