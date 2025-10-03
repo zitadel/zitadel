@@ -6,7 +6,10 @@
       "continuous": true,
       "dependsOn": [
         "build"
-      ]
+      ],
+      "configurations": {
+        "test-integration": {}
+      }
     },
     "dev": {
       "description": "Runs the Next.js Login application in development mode with hot-reloading",
@@ -94,7 +97,7 @@
         "build"
       ],
       "continuous": true,
-      "command": "nx run @zitadel/login:prod --excludeTaskDependencies"
+      "command": "nx run @zitadel/login:prod:test-integration --excludeTaskDependencies"
     },
     "test-integration": {
       "description": "Runs integration tests using Cypress against a running Login and a mocked API",

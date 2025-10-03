@@ -29,12 +29,28 @@
             "dependsOn": [
                 "setup"
             ],
-            "options": {
-                "env": {
-                    "DEV_CONFIG_FILE": "{projectRoot}/dev.yaml"
+            "command": "bash -c './.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} start --config ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters'",
+            "defaultConfiguration": "dev",
+            "configurations": {
+                "dev": {
+                    "env": {
+                        "API_CONFIG_FILE": "{projectRoot}/dev.yaml",
+                        "ZITADEL_DATABASE_POSTGRES_HOST": "${DEVCONTAINER_DB_HOST:-localhost}"
+                    }
+                },
+                "test-integration": {
+                    "env": {
+                        "API_CONFIG_FILE": "{projectRoot}/test-integration.yaml",
+                        "ZITADEL_DATABASE_POSTGRES_HOST": "${DEVCONTAINER_DB_API_INTEGRATION_HOST:-localhost}"
+                    }
+                },
+                "test-functional-ui": {
+                    "env": {
+                        "API_CONFIG_FILE": "{projectRoot}/test-functional-ui.yaml",
+                        "ZITADEL_DATABASE_POSTGRES_HOST": "${DEVCONTAINER_DB_FUNCTIONAL_UI_HOST:-localhost}"
+                    }
                 }
-            },
-            "command": "bash -c './.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} start --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --masterkey MasterkeyNeedsToHave32Characters'"
+            }
         },
         "setup": {
             "description": "Runs the schema migrations in order to prepare and update the database tables.",
@@ -44,13 +60,31 @@
             "executor": "nx:run-commands",
             "options": {
                 "parallel": false,
-                "env": {
-                    "DEV_CONFIG_FILE": "{projectRoot}/dev.yaml"
-                },
                 "commands": [
                     "bash -c 'for i in {1..20}; do echo \"Attempt $i/20: Starting ZITADEL...\";./.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} init --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} && break || (echo \"Failed, retrying in 2s...\" && sleep 2); done'",
                     "bash -c './.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} setup --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --steps ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --masterkey MasterkeyNeedsToHave32Characters'"
                 ]
+            },
+            "defaultConfiguration": "dev",
+            "configurations": {
+                "dev": {
+                    "env": {
+                        "API_CONFIG_FILE": "{projectRoot}/dev.yaml",
+                        "ZITADEL_DATABASE_POSTGRES_HOST": "${DEVCONTAINER_DB_HOST:-localhost}"
+                    }
+                },
+                "test-integration": {
+                    "env": {
+                        "API_CONFIG_FILE": "{projectRoot}/test-integration.yaml",
+                        "ZITADEL_DATABASE_POSTGRES_HOST": "${DEVCONTAINER_DB_API_INTEGRATION_HOST:-localhost}"
+                    }
+                },
+                "test-functional-ui": {
+                    "env": {
+                        "API_CONFIG_FILE": "{projectRoot}/test-functional-ui.yaml",
+                        "ZITADEL_DATABASE_POSTGRES_HOST": "${DEVCONTAINER_DB_FUNCTIONAL_UI_HOST:-localhost}"
+                    }
+                }
             }
         },
         "build": {
@@ -154,7 +188,6 @@
             "executor": "nx:run-commands",
             "options": {
                 "env": {
-                    "API_CONFIG_FILE": "{projectRoot}/test-integration.yaml",
                     "ZITADEL_BINARY": "zitadel.test",
                     "GOCOVERDIR": "{workspaceRoot}/.artifacts/api-test-integration/coverage",
                     "GORACE": "halt_on_error=1"
@@ -164,7 +197,7 @@
                     "nx run @zitadel/devcontainer:compose up --detach --force-recreate --renew-anon-volumes db-api-integration cache-api-integration",
                     "rm -rf .artifacts/api-test-integration",
                     "mkdir -p ${GOCOVERDIR}",
-                    "nx run @zitadel/api:setup --excludeTaskDependencies"
+                    "nx run @zitadel/api:setup:test-integration --excludeTaskDependencies"
                 ]
             }
         },
@@ -176,13 +209,12 @@
             ],
             "options": {
                 "env": {
-                    "API_CONFIG_FILE": "{projectRoot}/test-integration.yaml",
                     "ZITADEL_BINARY": "zitadel.test",
                     "GOCOVERDIR": "{workspaceRoot}/.artifacts/api-test-integration/coverage",
                     "GORACE": "log_path=.artifacts/api-test-integration/race.log"
                 }
             },
-            "command": "nx run @zitadel/api:prod --excludeTaskDependencies"
+            "command": "nx run @zitadel/api:prod:test-integration --excludeTaskDependencies"
         },
         "test-integration": {
             "description": "Runs the integration tests sequentially with coverage and race condition detection. Go test caching is disabled, because the tests run against an out-of-process API.",

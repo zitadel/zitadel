@@ -14,10 +14,7 @@
         ],
         "executor": "nx:run-commands",
         "options": {
-            "env": {
-                "API_CONFIG_FILE": "{projectRoot}/api.yaml"
-            },
-            "command": "nx run @zitadel/api:setup --excludeTaskDependencies"
+            "command": "nx run @zitadel/api:setup:functional-ui-test:test-functional-ui --excludeTaskDependencies"
         }
     },
     "run-api": {
@@ -29,10 +26,7 @@
         ],
         "executor": "nx:run-commands",
         "options": {
-            "env": {
-                "API_CONFIG_FILE": "{projectRoot}/api.yaml"
-            },
-            "command": "nx run @zitadel/api:prod --excludeTaskDependencies"
+            "command": "nx run @zitadel/api:prod:test-functional-ui --excludeTaskDependencies"
         }  
     },
     "open": {
