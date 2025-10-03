@@ -22,7 +22,6 @@
         "^build"
       ],
       "inputs": [
-        "default",
         "{workspaceRoot}/pnpm-lock.yaml",
         "!{projectRoot}/integration/**/*",
         "!{projectRoot}/acceptance/**/*",

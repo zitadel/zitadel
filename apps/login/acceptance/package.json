@@ -2,6 +2,7 @@
   "name": "@zitadel/login-acceptance",
   "type": "module",
   "devDependencies": {
+    "@connectrpc/connect": "^2.1.0",
     "@playwright/test": "^1.55.0",
     "@types/express": "^5.0.3",
     "@types/node": "^24.6.1",

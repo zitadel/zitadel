@@ -1,177 +1,162 @@
-import { Page } from "@playwright/test";
-import { registerWithPasskey } from "./register.js";
-import { activateOTP, addTOTP, addUser, eventualNewUser, getUserByUsername, removeUser } from "./zitadel.js";
+import { CreateUserRequest, CreateUserResponse, UserService as NativeUserService } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { faker } from "@faker-js/faker";
+import { test as base } from "@playwright/test";
+import { readFileSync } from "fs";
+import { createServerTransport } from "@zitadel/client/node";
+import { Transport, Client } from "@connectrpc/connect";
+import { createClientFor } from "@zitadel/client";
+import { Authenticator } from "@otplib/core";
+import { createDigest, createRandomBytes } from "@otplib/plugin-crypto";
+import { keyDecoder, keyEncoder } from "@otplib/plugin-thirty-two"; // use your chosen base32 plugin
 
-export interface userProps {
-  email: string;
-  isEmailVerified: boolean;
-  firstName: string;
-  lastName: string;
-  organization: string;
-  password: string;
-  passwordChangeRequired: boolean;
-  phone: string;
-  isPhoneVerified: boolean;
+class UserService {
+    constructor(public readonly native: Client<typeof NativeUserService>) { }
+
+    async getByUsername(username: string) {
+        const res = await this.native.listUsers({
+            query: {
+                limit: 1,
+            },
+            queries: [{
+                query: {
+                    case: "userNameQuery",
+                    value: {
+                        userName: username,
+                    }
+                }
+            }]
+        })
+        if (res.result?.length !== 1) {
+            throw new Error(`User with username ${username} not found`);
+        }
+        return res.result[0];
+    }
+
+    async addTOTP(userId: string): Promise<string> {
+        const response = await this.native.registerTOTP({ userId });
+        const code = this.totp(response.secret);
+        await this.native.verifyTOTPRegistration({ userId, code });
+        return response.secret;
+    }
+
+    private totp(secret: string) {
+        const authenticator = new Authenticator({
+            createDigest,
+            createRandomBytes,
+            keyDecoder,
+            keyEncoder,
+        });
+        // google authenticator usage
+        const token = authenticator.generate(secret);
+
+        // check if token can be used
+        if (!authenticator.verify({ token: token, secret: secret })) {
+            const error = `Generated token could not be verified`;
+            console.error(error);
+            throw new Error(error);
+        }
+
+        return token;
+    }
 }
 
 class User {
-  private readonly props: userProps;
-  private user: string;
+    constructor(private svc: UserService) { }
 
-  constructor(userProps: userProps) {
-    this.props = userProps;
-  }
+    public readonly default: CreateUserRequest = {
+        $typeName: "zitadel.user.v2.CreateUserRequest",
+        organizationId: "340565276842066283",
+        userType: {
+            case: "human",
+            value: {
+                $typeName: "zitadel.user.v2.CreateUserRequest.Human",
+                metadata: [],
+                idpLinks: [],
+                email: {
+                    $typeName: "zitadel.user.v2.SetHumanEmail",
+                    email: faker.internet.email(),
+                    verification: {
+                        case: "isVerified",
+                        value: true
+                    }
+                },
+                profile: {
+                    $typeName: "zitadel.user.v2.SetHumanProfile",
+                    givenName: faker.person.firstName(),
+                    familyName: faker.person.lastName(),
+                },
+                phone: {
+                    $typeName: "zitadel.user.v2.SetHumanPhone",
+                    phone: faker.phone.number(),
+                    verification: {
+                        case: "isVerified",
+                        value: true
+                    }
+                },
+                passwordType: {
+                    case: "password",
+                    value: {
+                        $typeName: "zitadel.user.v2.Password",
+                        password: "Password1!",
+                        changeRequired: false,
+                    }
+                }
+            },
+        }
+    };
+    public res: CreateUserResponse | null = null;
+    public req: CreateUserRequest = { ...this.default };
 
-  async ensure(page: Page) {
-    const response = await addUser(this.props);
-
-    this.setUserId(response.userId);
-  }
-
-  async cleanup() {
-    await removeUser(this.getUserId());
-  }
-
-  public setUserId(userId: string) {
-    this.user = userId;
-  }
-
-  public getUserId() {
-    return this.user;
-  }
-
-  public getUsername() {
-    return this.props.email;
-  }
-
-  public getPassword() {
-    return this.props.password;
-  }
-
-  public getFirstname() {
-    return this.props.firstName;
-  }
-
-  public getLastname() {
-    return this.props.lastName;
-  }
-
-  public getPhone() {
-    return this.props.phone;
-  }
-
-  public getFullName() {
-    return `${this.props.firstName} ${this.props.lastName}`;
-  }
-}
-
-export class PasswordUser extends User {
-  async ensure(page: Page) {
-    await super.ensure(page);
-    await eventualNewUser(this.getUserId());
-  }
-}
-
-export enum OtpType {
-  sms = "sms",
-  email = "email",
-}
-
-export interface otpUserProps {
-  email: string;
-  isEmailVerified?: boolean;
-  firstName: string;
-  lastName: string;
-  organization: string;
-  password: string;
-  passwordChangeRequired?: boolean;
-  phone: string;
-  isPhoneVerified?: boolean;
-  type: OtpType;
-}
-
-export class PasswordUserWithOTP extends User {
-  private type: OtpType;
-
-  constructor(props: otpUserProps) {
-    super({
-      email: props.email,
-      firstName: props.firstName,
-      lastName: props.lastName,
-      organization: props.organization,
-      password: props.password,
-      phone: props.phone,
-      isEmailVerified: props.isEmailVerified,
-      isPhoneVerified: props.isPhoneVerified,
-      passwordChangeRequired: props.passwordChangeRequired,
-    });
-    this.type = props.type;
-  }
-
-  async ensure(page: Page) {
-    await super.ensure(page);
-    await activateOTP(this.getUserId(), this.type);
-    await eventualNewUser(this.getUserId());
-  }
-}
-
-export class PasswordUserWithTOTP extends User {
-  private secret: string;
-
-  async ensure(page: Page) {
-    await super.ensure(page);
-    this.secret = await addTOTP(this.getUserId());
-    await eventualNewUser(this.getUserId());
-  }
-
-  public getSecret(): string {
-    return this.secret;
-  }
-}
-
-export interface passkeyUserProps {
-  email: string;
-  firstName: string;
-  lastName: string;
-  organization: string;
-  phone: string;
-  isEmailVerified?: boolean;
-  isPhoneVerified?: boolean;
-}
-
-export class PasskeyUser extends User {
-  private authenticatorId: string;
-
-  constructor(props: passkeyUserProps) {
-    super({
-      email: props.email,
-      firstName: props.firstName,
-      lastName: props.lastName,
-      organization: props.organization,
-      password: "",
-      phone: props.phone,
-      isEmailVerified: props.isEmailVerified,
-      isPhoneVerified: props.isPhoneVerified,
-    });
-  }
-
-  public async ensure(page: Page) {
-    const authId = await registerWithPasskey(page, this.getFirstname(), this.getLastname(), this.getUsername());
-    this.authenticatorId = authId;
-
-    // wait for projection of user
-    await page.waitForTimeout(10000);
-  }
-
-  async cleanup() {
-    const resp: any = await getUserByUsername(this.getUsername());
-    if (!resp || !resp.result || !resp.result[0]) {
-      return;
+    async create(req: CreateUserRequest = this.default) {
+        this.req = req;
+        this.res = await this.svc.native.createUser(req);
     }
-    await removeUser(resp.result[0].userId);
-  }
 
-  public getAuthenticatorId(): string {
-    return this.authenticatorId;
-  }
+    async cleanup() {
+        if (this.res) {
+            await this.svc.native.deleteUser({ userId: this.res.id });
+        }
+    }
+
+    get username(): string {
+        return this.req.username!;
+    }
+
+    get password(): string {
+        if (this.req.userType?.case !== "human" || this.req.userType.value.passwordType.case !== "password") {
+            throw new Error("User has no password in the request.");
+        }
+        return this.req.userType.value.passwordType.value.password;
+    }
+
+    get fullName(): string {
+        if (this.req.userType?.case !== "human" || !this.req.userType.value.profile) {
+            throw new Error("User has no profile in the request.");
+        }
+        return `${this.req.userType.value.profile.givenName} ${this.req.userType.value.profile.familyName}`;
+    }
 }
+
+export const test = base.extend<{ user: User; transport: Transport, userService: UserService }>({
+    transport: async ({ }, use) => {
+        console.log("Setting up transport");
+        const adminToken = readFileSync(process.env.ZITADEL_ADMIN_TOKEN_FILE!).toString().trim()
+        const transport = createServerTransport(adminToken, { baseUrl: process.env.ZITADEL_API_URL! });
+        await use(transport);
+    },
+    userService: async ({ transport }, use) => {
+        console.log("Setting up user service");
+        const nativeUserService = createClientFor(NativeUserService)(transport);
+        const svc = new UserService(nativeUserService);
+        await use(svc);
+    },
+    user: async ({ userService }, use) => {
+        console.log("Setting up user");
+        const user = new User(userService);
+        await use(user);
+        await user.cleanup();
+    }
+});
+
+export { expect } from '@playwright/test';
+

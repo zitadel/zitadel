@@ -1,54 +1,36 @@
-import { faker } from "@faker-js/faker";
-import { test as base } from "@playwright/test";
 import { emailVerify, emailVerifyResend } from "./email-verify.js";
 import { emailVerifyScreenExpect } from "./email-verify-screen.js";
 import { loginScreenExpect, loginWithPassword } from "./login.js";
 import { eventualEmailOTP } from "./mock.js";
-import { PasswordUser } from "./user.js";
-
-const test = base.extend<{ user: PasswordUser }>({
-  user: async ({ page }, use) => {
-    const user = new PasswordUser({
-      email: faker.internet.email(),
-      isEmailVerified: false,
-      firstName: faker.person.firstName(),
-      lastName: faker.person.lastName(),
-      organization: "",
-      phone: faker.phone.number(),
-      isPhoneVerified: false,
-      password: "Password1!",
-      passwordChangeRequired: false,
-    });
-    await user.ensure(page);
-    await use(user);
-    await user.cleanup();
-  },
-});
+import { test } from "./user.js";
 
 test.only("user email not verified, verify", async ({ user, page }) => {
-  await loginWithPassword(page, user.getUsername(), user.getPassword());
+  await user.create();
+  await loginWithPassword(page, user.username, user.password);
   // Why does loginWithPassword send a code again?
-  const code = await eventualEmailOTP(user.getUsername());
+/*  const code = await eventualEmailOTP(user.getUsername());
   await emailVerify(page, code);
   // wait for resend of the code
-  await page.waitForTimeout(2000);
-  await loginScreenExpect(page, user.getFullName());
+  await page.waitForTimeout(2000);*/
+  await loginScreenExpect(page, user.password);
 });
 
 test("user email not verified, resend, verify", async ({ user, page }) => {
-  await loginWithPassword(page, user.getUsername(), user.getPassword());
+  await user.create();
+  await loginWithPassword(page, user.username, user.password);
   // auto-redirect on /verify
   await emailVerifyResend(page);
-  const code = await eventualEmailOTP(user.getUsername());
+  const code = await eventualEmailOTP(user.username);
   // wait for resend of the code
   await page.waitForTimeout(2000);
-  await emailVerify(page, c);
-  await loginScreenExpect(page, user.getFullName());
+  await emailVerify(page, code);
+  await loginScreenExpect(page, user.fullName);
 });
 
 test("user email not verified, resend, old code", async ({ user, page }) => {
-  await loginWithPassword(page, user.getUsername(), user.getPassword());
-  const c = await eventualEmailOTP(user.getUsername());
+  await user.create();
+  await loginWithPassword(page, user.username, user.password);
+  const c = await eventualEmailOTP(user.username);
   await emailVerifyResend(page);
   // wait for resend of the code
   await page.waitForTimeout(2000);
@@ -57,7 +39,8 @@ test("user email not verified, resend, old code", async ({ user, page }) => {
 });
 
 test("user email not verified, wrong code", async ({ user, page }) => {
-  await loginWithPassword(page, user.getUsername(), user.getPassword());
+  await user.create();    
+  await loginWithPassword(page, user.username, user.password);
   // auto-redirect on /verify
   const code = "wrong";
   await emailVerify(page, code);

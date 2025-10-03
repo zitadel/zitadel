@@ -32,7 +32,6 @@ router.get('/ready', (_, res) => {
 })
 
 router.listen(selfPort, () => {
-    console.log(`
-🚀 Server ready at: http://localhost:${selfPort}`)
+    console.log(`Server ready at: http://localhost:${selfPort}`)
 })
 
