@@ -23,6 +23,8 @@ type SearchRequest struct {
 	Limit         uint64
 	SortingColumn Column
 	Asc           bool
+
+	sortingConsumed bool
 }
 
 func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -38,13 +40,13 @@ func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 // consumeSorting sets the sorting column to the query once.
 // subsequent calls will not set the sorting column again.
 func (req *SearchRequest) consumeSorting(query sq.SelectBuilder) sq.SelectBuilder {
-	if !req.SortingColumn.isZero() {
+	if !req.sortingConsumed && !req.SortingColumn.isZero() {
 		clause := req.SortingColumn.orderBy()
 		if !req.Asc {
 			clause += " DESC"
 		}
 		query = query.OrderByClause(clause)
-		req.SortingColumn = Column{}
+		req.sortingConsumed = true
 	}
 	return query
 }
