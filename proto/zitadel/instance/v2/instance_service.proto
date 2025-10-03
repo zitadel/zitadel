@@ -1,0 +1,507 @@
+syntax = "proto3";
+
+package zitadel.instance.v2;
+
+import "validate/validate.proto";
+import "zitadel/object/v2/object.proto";
+import "zitadel/instance/v2/instance.proto";
+import "zitadel/filter/v2/filter.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/instance/v2;instance";
+
+// Service to manage instances and their domains.
+// The service provides methods to create, update, delete and list instances and their domains.
+//
+// Other than most services in ZITADEL, the instance service allows accessing data not only from
+// the current instance, but also from other instances.
+service InstanceService {
+
+  // Delete Instance
+  //
+  // Deletes an instance with the given ID.
+  // This method requires system level permissions and cannot be called from an instance context.
+  //
+  // Required permissions:
+  //   - `system.instance.delete`
+  rpc DeleteInstance(DeleteInstanceRequest) returns (DeleteInstanceResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "system.instance.delete"
+      }
+    };
+  }
+
+  // Get Instance
+  //
+  // Returns the instance in the current context or by its ID.
+  // By default the instance will be determined by the context of the request,
+  // e.g. the host header.
+  // You can optionally pass an InstanceID to retrieve a specific instance.
+  // This requires additional permissions.
+  //
+  // Required permissions:
+  //   - `iam.read`
+  //   - `system.instance.read` (if InstanceID is set)
+  rpc GetInstance(GetInstanceRequest) returns (GetInstanceResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // Update Instance
+  //
+  // Updates instance's name in the current context or by its ID.
+  // By default the instance will be determined by the context of the request,
+  // e.g. the host header.
+  // You can optionally pass an InstanceID to update a specific instance.
+  // This requires additional permissions.
+  //
+  // Required permissions:
+  //   - `iam.write`
+  //   - `system.instance.write` (if InstanceID is set)
+  rpc UpdateInstance(UpdateInstanceRequest) returns (UpdateInstanceResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // List Instances
+  //
+  // Lists instances matching the given query.
+  // The query can be used to filter either by instance ID or domain.
+  // The request is paginated and returns 100 results by default.
+  // This method requires system level permissions and cannot be called from an instance context.
+  //
+  // Required permissions:
+  //  - `system.instance.read`
+  rpc ListInstances(ListInstancesRequest) returns (ListInstancesResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "system.instance.read"
+      }
+    };
+  }
+  
+  // Add Custom Domain
+  //
+  // Adds a custom domain to the instance.
+  // The custom domain must be unique across all instances.
+  // Once the domain is added, it will be used to route requests to this instance.
+  // This method requires system level permissions and cannot be called from an instance context.
+  //
+  // Required permissions:
+  //   - `system.domain.write`
+  rpc AddCustomDomain(AddCustomDomainRequest) returns (AddCustomDomainResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "system.domain.write"
+      }
+    };
+  }
+
+  // Remove Custom Domain
+  //
+  // Removes a custom domain from the instance.
+  // Be aware that this will stop routing requests from this domain to the instance and
+  // might break existing setups or integrations.
+  // This method requires system level permissions and cannot be called from an instance context.
+  //
+  // Required permissions:
+  //  - `system.domain.write`
+  rpc RemoveCustomDomain(RemoveCustomDomainRequest) returns (RemoveCustomDomainResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "system.domain.write"
+      }
+    };
+  }
+
+  // List Custom Domains
+  //
+  // Lists custom domains of the instance.
+  //
+  // By default the instance will be determined by the context of the request,
+  // e.g. the host header.
+  // You can optionally pass an InstanceID to list the domains of a specific instance.
+  // This requires additional permissions.
+  //
+  // Required permissions:
+  //  - `iam.read`
+  //  - `system.instance.read` (if InstanceID is set)
+  rpc ListCustomDomains(ListCustomDomainsRequest) returns (ListCustomDomainsResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // Add Trusted Domain
+  //
+  // Adds a trusted domain to the instance.
+  // By default the instance will be determined by the context of the request,
+  // e.g. the host header.
+  // You can optionally pass an InstanceID to list the domains of a specific instance.
+  // This requires additional permissions.
+  //
+  // It must be a valid domain name.
+  // Once the domain is added, it can be used in API responses like OIDC discovery,
+  // email templates, and more.
+  // This can be used in cases where the API is accessed through a different domain
+  // than the instance domain, e.g. proxy setups and custom login UIs.
+  // Other than custom domains, are not used to route requests to this instance
+  // and therefore do not need to be uniquely assigned to an instance.
+  //
+  // Required permissions:
+  //  - `iam.write`
+  //  - `system.instance.write` (if InstanceID is set)
+  rpc AddTrustedDomain(AddTrustedDomainRequest) returns (AddTrustedDomainResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // Remove Trusted Domain
+  //
+  // Removes a trusted domain from the instance.
+  // By default the instance will be determined by the context of the request,
+  // e.g. the host header.
+  // You can optionally pass an InstanceID to list the domains of a specific instance.
+  // This requires additional permissions.
+  //
+  // Required permissions:
+  //  - `iam.write`
+  //  - `system.instance.write` (if InstanceID is set)
+  rpc RemoveTrustedDomain(RemoveTrustedDomainRequest) returns (RemoveTrustedDomainResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  
+  // List Trusted Domains
+  //
+  // Lists trusted domains of the instance.
+  // By default the instance will be determined by the context of the request,
+  // e.g. the host header.
+  // You can optionally pass an InstanceID to list the domains of a specific instance.
+  // This requires additional permissions.
+  //
+  // Required permissions:
+  //   - `iam.read`
+  //   - `system.instance.read` (if InstanceID is set)
+  rpc ListTrustedDomains(ListTrustedDomainsRequest) returns (ListTrustedDomainsResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+}
+
+message DeleteInstanceRequest {
+  // InstanceID is the unique ID of the instance to be deleted.
+  string instance_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"222430354126975533\"";
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message DeleteInstanceResponse {
+  // DeletionDate is the timestamp when the instance was deleted.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message GetInstanceRequest {
+  // InstanceID is the unique ID of the instance to be retrieved.
+  // If not set, the instance in the current context (e.g. identified by the host header) will be returned.
+  // If an ID is set, the caller must have additional permissions.
+  string instance_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"222430354126975533\"";
+    }
+  ];
+}
+
+message GetInstanceResponse {
+  zitadel.instance.v2.Instance instance = 1;
+}
+
+message UpdateInstanceRequest {
+  // InstanceID is the unique ID of the instance to be updated.
+  // If not set, the instance in the current context (e.g. identified by the host header) will be changed.
+  // If an ID is set, the caller must have additional permissions.
+  string instance_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"222430354126975533\"";
+    }
+  ];
+
+  // InstanceName is the new name of the instance to be set.
+  string instance_name = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"my instance\"";
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message UpdateInstanceResponse {
+  // ChangeDate is the timestamp when the instance was last changed.
+  // In case the instance was not changed during the call, the previous change date is returned.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message ListInstancesRequest {
+  // Paginate through the results using a limit, offset and sorting.
+  zitadel.filter.v2.PaginationRequest pagination = 1;
+
+  // The field the result is sorted by.
+  FieldName sorting_column = 2 [
+    (validate.rules).enum = {defined_only: true}
+  ];
+
+  // Filter the instances to be returned.
+  repeated Filter filters = 3;
+}
+
+message ListInstancesResponse {
+  // The instances matching the query.
+  repeated Instance instances = 1;
+
+  // Contains the total number of instances matching the query and the applied limit.
+  zitadel.filter.v2.PaginationResponse pagination = 2;
+}
+
+message AddCustomDomainRequest {
+  // // InstanceID is the unique ID of the instance to which the domain will be added.
+  string instance_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"222430354126975533\"";
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // Custom domain to add to the instance.
+  // Must be a valid domain name.
+  // Once the domain is added, it will be used to route requests to this instance.
+  string custom_domain = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 253},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 253;
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message AddCustomDomainResponse {
+  // CreationDate is the timestamp when the domain was added.
+  google.protobuf.Timestamp creation_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message RemoveCustomDomainRequest {
+  // InstanceID is the unique ID of the instance from which the domain will be removed.
+  string instance_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"222430354126975533\"";
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // CustomDomain is the the domain to remove from the instance.
+  string custom_domain = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 253},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 253;
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message RemoveCustomDomainResponse {
+  // DeletionDate is the timestamp when the domain was removed.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message ListCustomDomainsRequest {
+  // InstanceID is the unique ID of the instance  whose domains will be listed.
+  // If not set, the instance in the current context (e.g. identified by the host header) will be used.
+  // If an ID is set, the caller must have additional permissions.
+  string instance_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"222430354126975533\"";
+    }
+  ];
+
+  // Paginate and sort the results using a limit, offset and sorting.
+  zitadel.filter.v2.PaginationRequest pagination = 2;
+
+  // The field the result is sorted by.
+  DomainFieldName sorting_column = 3;
+
+  // Filter the domains to be returned.
+  repeated CustomDomainFilter filters = 4;
+}
+
+message ListCustomDomainsResponse {
+  // The list of custom domains matching the query.
+  repeated CustomDomain domains = 1;
+
+  // Contains the total number of domains matching the query and the applied limit.
+  zitadel.filter.v2.PaginationResponse pagination = 2;
+}
+
+message AddTrustedDomainRequest {
+  // InstanceID is the unique ID of the instance to which the trusted domain will be added.
+  // If not set, the instance in the current context (e.g. identified by the host header) will be used.
+  // If an ID is set, the caller must have additional permissions.
+  string instance_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"222430354126975533\"";
+    }
+  ];
+
+  // Trusted domain to be added to the instance.
+  // Must be a valid domain name.
+  // Once the domain is added, it can be used in API responses like OIDC discovery,
+  // email templates, and more.
+  // This can be used in cases where the API is accessed through a different domain
+  // than the instance domain, e.g. proxy setups and custom login UIs.
+  // Other than custom domains, are not used to route requests to this instance
+  // and therefore do not need to be uniquely assigned to an instance.
+  string trusted_domain = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 253},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"login.example.com\"";
+        min_length: 1;
+        max_length: 253;
+    }
+  ];
+}
+
+message AddTrustedDomainResponse {
+  // CreationDate is the timestamp when the trusted domain was added.
+  google.protobuf.Timestamp creation_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message RemoveTrustedDomainRequest {
+  // InstanceID is the unique ID of the instance from which the trusted domain will be removed.
+  // If not set, the instance in the current context (e.g. identified by the host header) will be used.
+  // If an ID is set, the caller must have additional permissions.
+  string instance_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"222430354126975533\"";
+    }
+  ];
+
+  // The trusted domain to remove from the instance.
+  string trusted_domain = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 253},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"login.example.com\"";
+        min_length: 1;
+        max_length: 253;
+    }
+  ];
+}
+
+message RemoveTrustedDomainResponse {
+  // DeletionDate is the timestamp when the trusted domain was removed.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message ListTrustedDomainsRequest {
+  // InstanceID is the unique ID of the instance whose trusted domains will be listed.
+  // If not set, the instance in the current context (e.g. identified by the host header) will be used.
+  // If an ID is set, the caller must have additional permissions.
+  string instance_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"222430354126975533\"";
+    }
+  ];
+
+  // Paginate and sort the results using a limit, offset and sorting.
+  zitadel.filter.v2.PaginationRequest pagination = 2;
+
+  // The field the result is sorted by.
+  TrustedDomainFieldName sorting_column = 3;
+  
+  // Filter the domains to be returned.
+  repeated TrustedDomainFilter filters = 4;
+}
+
+message ListTrustedDomainsResponse {
+  // The list of trusted domains matching the query.
+  repeated TrustedDomain trusted_domain = 1;
+
+  // Contains the total number of domains matching the query and the applied limit.
+  zitadel.filter.v2.PaginationResponse pagination = 2;
+}
