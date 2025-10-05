@@ -28,7 +28,10 @@
             "continuous": true,
             "executor": "nx:run-commands",
             "options": {
-                "command": "bash -c 'for i in {1..20}; do echo \"Attempt $i/20: Starting ZITADEL...\";./.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} start-from-init --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters && break || (echo \"Failed, retrying in 2s...\" && sleep 2); done'"
+                "commands": [
+                    "nx run @zitadel/devcontainer:compose up --detach --wait ${AWAIT_SERVICES}",
+                    "./.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} start-from-init --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters"
+                ]
             },
             "defaultConfiguration": "dev",
             "configurations": {
