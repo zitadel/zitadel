@@ -2,16 +2,16 @@ import { emailVerify, emailVerifyResend } from "./email-verify.js";
 import { emailVerifyScreenExpect } from "./email-verify-screen.js";
 import { loginScreenExpect, loginWithPassword } from "./login.js";
 import { eventualEmailOTP } from "./mock.js";
-import { test } from "./user.js";
+import { test } from "./fixtures.js";
 
 test.only("user email not verified, verify", async ({ registeredUser, page }) => {
+  // Create user with password but unverified email
   await registeredUser.create();
   await loginWithPassword(page, registeredUser.username, registeredUser.password);
-  // Why does loginWithPassword send a code again?
-/*  const code = await eventualEmailOTP(registeredUser.username);
+  const code = await eventualEmailOTP(registeredUser.username);
   await emailVerify(page, code);
   // wait for resend of the code
-  await page.waitForTimeout(2000);*/
+  await page.waitForTimeout(2000);
   await loginScreenExpect(page, registeredUser.fullName);
 });
 

@@ -10,7 +10,8 @@
       "defaultConfiguration": "dev",
       "configurations": {
         "dev": {},
-        "test-login-integration": {}
+        "test-login-integration": {},
+        "test-login-acceptance": {}
       }
     },
     "dev": {

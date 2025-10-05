@@ -2,7 +2,7 @@ import { expect, Page } from "@playwright/test";
 import { code, emailOtpFromMockServer as enterEmailOTPFromMockServer, smsOtpFromMockServer as enterSMSOTPFromMockServer } from "./code.js";
 import { loginname } from "./loginname.js";
 import { password } from "./password.js";
-import { RegisteredUser } from "./user.js";
+import { RegisteredUser } from "./user-registered.js";
 
 export async function startLogin(page: Page) {
   await page.goto(`/ui/v2/login/loginname`);

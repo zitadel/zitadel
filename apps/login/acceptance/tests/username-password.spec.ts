@@ -5,7 +5,7 @@ import { loginname } from "./loginname.js";
 import { loginnameScreenExpect } from "./loginname-screen.js";
 import { password } from "./password.js";
 import { passwordScreenExpect } from "./password-screen.js";
-import { PasswordUser } from "./user.js";
+import { PasswordUser } from "./registered.js";
 
 const test = base.extend<{ user: PasswordUser }>({
   user: async ({ page }, use) => {

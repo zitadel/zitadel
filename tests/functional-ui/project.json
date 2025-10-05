@@ -12,10 +12,7 @@
         "dependsOn": [
             "run-db"
         ],
-        "executor": "nx:run-commands",
-        "options": {
-            "command": "nx run @zitadel/api:prod:test-functional-ui"
-        }  
+        "command": "nx run @zitadel/api:prod:test-functional-ui"
     },
     "open": {
       "description": "Opens the Cypress Test Runner for interactive testing.",

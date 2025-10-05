@@ -5,9 +5,7 @@
             "description": "Runs the Playwright tests for the Login application",
             "dependsOn": [
                 "run-mock-server",
-                "run-login",
-                "run-db",
-                "run-api"
+                "run-login"
             ],
             "options": {
                 "cwd": "{projectRoot}"
@@ -21,6 +19,9 @@
         "run-mock-server": {
             "description": "Runs the mock server for the Login acceptance tests",
             "continuous": true,
+            "dependsOn": [
+                "run-api"
+            ],
             "options": {
                 "cwd": "{projectRoot}"
             },
@@ -31,43 +32,29 @@
             "continuous": true,
             "dependsOn": [
                 "@zitadel/login:build",
-                "setup-api"
+                "run-api"
             ],
-            "command": "nx run @zitadel/login:prod --excludeTaskDependencies"
-        },
-         "run-db": {
-            "description": "Runs an ephemeral database for running acceptance tests",
-            "continuous": true,
-            "command": "nx run @zitadel/devcontainer:compose up --force-recreate --renew-anon-volumes db-login-acceptance"
+            "options": {
+                "parallel": false,
+                "commands": [
+                    "wait-on --verbose --interval 2000 --simultaneous 1 \"${ZITADEL_API_URL}/debug/ready\"",
+                    "nx run @zitadel/login:prod:test-login-acceptance --excludeTaskDependencies"
+                ]
+            }
         },
         "run-api": {
             "description": "Runs the API for running acceptance tests",
             "continuous": true,
             "dependsOn": [
-                "run-db",
-                "setup-api"
+                "build-api",
+                "run-db"
             ],
-            "executor": "nx:run-commands",
-            "options": {
-                "env": {
-                    "API_CONFIG_FILE": "{projectRoot}/api.yaml"
-                },
-                "command": "nx run @zitadel/api:prod --excludeTaskDependencies"
-            }
+            "command": "nx run @zitadel/api:prod:test-acceptance-login"
         },
-        "setup-api": {
-            "description": "Sets up the API for running acceptance tests",
-            "dependsOn": [
-                "run-db",
-                "build-api"
-            ],
-            "executor": "nx:run-commands",
-            "options": {
-                "env": {
-                    "API_CONFIG_FILE": "{projectRoot}/api.yaml"
-                },
-                "command": "nx run @zitadel/api:setup --excludeTaskDependencies"
-            }
+        "run-db": {
+            "description": "Runs an ephemeral database for running acceptance tests",
+            "continuous": true,
+            "command": "nx run @zitadel/devcontainer:compose up --force-recreate --renew-anon-volumes db-login-acceptance"
         },
         "build-api": {
             "dependsOn": [
@@ -77,5 +64,5 @@
             ],
             "command": "nx run @zitadel/api:build --excludeTaskDependencies"
         }
-   }
+    }
 }

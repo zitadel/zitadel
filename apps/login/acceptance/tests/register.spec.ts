@@ -1,33 +1,23 @@
 import { faker } from "@faker-js/faker";
-import { test } from "./user.js";
+import { test } from "./fixtures.js";
 import { loginScreenExpect } from "./login.js";
-import { registerWithPasskey, registerWithPassword } from "./register.js";
 
-test("register with password", async ({ page, user }) => {
+test("register with password", async ({ page, anonymousUser }) => {
   const username = faker.internet.email();
   const password = "Password1!";
   const firstname = faker.person.firstName();
   const lastname = faker.person.lastName();
-
-  await registerWithPassword(page, firstname, lastname, username, password, password);
+  await anonymousUser.registerWithPassword(firstname, lastname, username, password, password);
   await loginScreenExpect(page, firstname + " " + lastname);
-
-  // wait for projection of user
-  await page.waitForTimeout(10000);
-  await removeUserByUsername(username);
 });
 
-test("register with passkey", async ({ page }) => {
+test("register with passkey", async ({ page, anonymousUser }) => {
   const username = faker.internet.email();
   const firstname = faker.person.firstName();
   const lastname = faker.person.lastName();
 
-  await registerWithPasskey(page, firstname, lastname, username);
+  await anonymousUser.registerWithPasskey(firstname, lastname, username);
   await loginScreenExpect(page, firstname + " " + lastname);
-
-  // wait for projection of user
-  await page.waitForTimeout(10000);
-  await removeUserByUsername(username);
 });
 
 test("register with username and password - only password enabled", async ({ page }) => {

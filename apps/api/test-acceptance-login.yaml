@@ -1,7 +1,7 @@
 ExternalSecure: false
 TLS.Enabled: false
-Port: 8081
-ExternalPort: 8081
+Port: 8083
+ExternalPort: 8083
 
 FirstInstance:
   PatPath: login-acceptance-admin.pat
@@ -26,7 +26,7 @@ FirstInstance:
       Pat.ExpirationDate: 2099-01-01T00:00:00Z
 
 DefaultInstance:
-  Features.LoginV2.BaseURI: http://localhost:3001/ui/v2/login
+  Features.LoginV2.BaseURI: http://localhost:3002/ui/v2/login
   LoginPolicy:
     AllowUsernamePassword: true # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_ALLOWUSERNAMEPASSWORD
     AllowRegister: true # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_ALLOWREGISTER

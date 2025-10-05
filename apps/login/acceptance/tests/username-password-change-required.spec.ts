@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { test as base } from "@playwright/test";
 import { loginScreenExpect, loginWithPassword } from "./login.js";
 import { changePassword } from "./password.js";
-import { PasswordUser } from "./user.js";
+import { PasswordUser } from "./registered.js";
 
 const test = base.extend<{ user: PasswordUser }>({
   user: async ({ page }, use) => {

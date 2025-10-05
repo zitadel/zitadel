@@ -50,6 +50,11 @@
                     "env": {
                         "API_CONFIG_FILE": "{projectRoot}/test-functional-ui.yaml"
                     }
+                },
+                "test-acceptance-login": {
+                    "env": {
+                        "API_CONFIG_FILE": "{projectRoot}/test-acceptance-login.yaml"
+                    }
                 }
             }
         },

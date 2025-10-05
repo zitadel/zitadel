@@ -3,7 +3,7 @@ import { test as base } from "@playwright/test";
 import { code } from "./code.js";
 import { codeScreenExpect } from "./code-screen.js";
 import { loginScreenExpect, loginWithPassword, loginWithPasswordAndTOTP } from "./login.js";
-import { PasswordUserWithTOTP } from "./user.js";
+import { PasswordUserWithTOTP } from "./registered.js";
 
 const test = base.extend<{ user: PasswordUserWithTOTP; sink: any }>({
   user: async ({ page }, use) => {

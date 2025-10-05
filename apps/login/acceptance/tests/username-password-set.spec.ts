@@ -4,7 +4,7 @@ import { loginScreenExpect, loginWithPassword, startLogin } from "./login.js";
 import { loginname } from "./loginname.js";
 import { resetPassword, startResetPassword } from "./password.js";
 import { resetPasswordScreen, resetPasswordScreenExpect } from "./password-screen.js";
-import { PasswordUser } from "./user.js";
+import { PasswordUser } from "./registered.js";
 
 const test = base.extend<{ user: PasswordUser }>({
   user: async ({ page }, use) => {

@@ -1,28 +1,12 @@
-import { faker } from "@faker-js/faker";
-import { test as base } from "@playwright/test";
+import { test } from "./registered.js";
 import { loginScreenExpect, loginWithPasskey } from "./login.js";
-import { PasskeyUser } from "./user.js";
 
-const test = base.extend<{ user: PasskeyUser }>({
-  user: async ({ page }, use) => {
-    const user = new PasskeyUser({
-      email: faker.internet.email(),
-      isEmailVerified: true,
-      firstName: faker.person.firstName(),
-      lastName: faker.person.lastName(),
-      organization: "",
-      phone: faker.phone.number(),
-      isPhoneVerified: false,
-    });
-    await user.ensure(page);
-    await use(user);
-    await user.cleanup();
-  },
-});
-
-test("username and passkey login", async ({ user, page }) => {
-  await loginWithPasskey(page, user.getAuthenticatorId(), user.getUsername());
-  await loginScreenExpect(page, user.getFullName());
+test("username and passkey login", async ({ registeredUser, page }) => {
+  await registeredUser.create({
+    ...registeredUser.minimal
+  })
+  await loginWithPasskey(page, registeredUser.getAuthenticatorId(), registeredUser.username);
+  await loginScreenExpect(page, registeredUser.fullName);
 });
 
 test("username and passkey login, multiple auth methods", async ({ page }) => {

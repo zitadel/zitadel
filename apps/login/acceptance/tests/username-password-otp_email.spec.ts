@@ -3,7 +3,7 @@ import { test as base } from "@playwright/test";
 import { code, codeResend, smsOtpFromMockServer } from "./code.js";
 import { codeScreenExpect } from "./code-screen.js";
 import { loginScreenExpect, loginWithPassword, loginWithPasswordAndEmailOTP } from "./login.js";
-import { OtpType, PasswordUserWithOTP } from "./user.js";
+import { OtpType, PasswordUserWithOTP } from "./registered.js";
 
 const test = base.extend<{ user: PasswordUserWithOTP; sink: any }>({
   user: async ({ page }, use) => {
