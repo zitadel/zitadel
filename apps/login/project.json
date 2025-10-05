@@ -7,7 +7,9 @@
       "dependsOn": [
         "build"
       ],
+      "defaultConfiguration": "dev",
       "configurations": {
+        "dev": {},
         "test-integration": {}
       }
     },

@@ -6,7 +6,7 @@ export default defineConfig({
     runMode: 2
   },
   e2e: {
-    baseUrl: `http://localhost:3000${process.env.NEXT_PUBLIC_BASE_PATH || ""}`,
+    baseUrl: `http://localhost:3001${process.env.NEXT_PUBLIC_BASE_PATH || ""}`,
     specPattern: "integration/integration/**/*.cy.{js,jsx,ts,tsx}",
     supportFile: "integration/support/e2e.{js,jsx,ts,tsx}",
     pageLoadTimeout: 120_0000,
