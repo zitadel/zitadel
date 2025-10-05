@@ -1994,7 +1994,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 				parametersEqual: map[string]string{
 					"client_id":     "clientID",
 					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Instance.Domain + ":8080/idps/callback",
+					"redirect_uri":  "http://" + Instance.Domain + ":8082/idps/callback",
 					"response_type": "code",
 					"scope":         "openid profile email",
 				},
@@ -2025,7 +2025,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 				parametersEqual: map[string]string{
 					"client_id":     "clientID",
 					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Instance.Domain + ":8080/idps/callback",
+					"redirect_uri":  "http://" + Instance.Domain + ":8082/idps/callback",
 					"response_type": "code",
 					"scope":         "openid profile email",
 				},
@@ -2056,7 +2056,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 				parametersEqual: map[string]string{
 					"client_id":     "clientID",
 					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Instance.Domain + ":8080/idps/callback",
+					"redirect_uri":  "http://" + Instance.Domain + ":8082/idps/callback",
 					"response_type": "code",
 					"scope":         "openid profile email",
 				},
@@ -2087,7 +2087,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 				parametersEqual: map[string]string{
 					"client_id":     "clientID",
 					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Instance.Domain + ":8080/idps/callback",
+					"redirect_uri":  "http://" + Instance.Domain + ":8082/idps/callback",
 					"response_type": "code",
 					"scope":         "openid profile email",
 				},
