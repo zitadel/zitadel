@@ -38,7 +38,7 @@ func TestServer_TelemetryPushMilestones(t *testing.T) {
 	require.NoError(t, err)
 	awaitMilestone(t, sub, instance.ID(), milestone.ProjectCreated)
 
-	redirectURI := "http://localhost:8882"
+	redirectURI := "http://localhost:8888"
 	application, err := instance.Client.Mgmt.AddOIDCApp(iamOwnerCtx, &management.AddOIDCAppRequest{
 		ProjectId:       projectAdded.GetId(),
 		Name:            "integration",
