@@ -28,6 +28,7 @@
             "continuous": true,
             "executor": "nx:run-commands",
             "options": {
+                "parallel": false,
                 "commands": [
                     "nx run @zitadel/devcontainer:compose up --detach --wait ${API_AWAIT_DB_SERVICE}",
                     "./.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} start-from-init --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters"
