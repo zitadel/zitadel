@@ -1,6 +1,5 @@
 Database:
   Postgres:
-    Port: 5433
     MaxOpenConns: 20
     MaxIdleConns: 20
     MaxConnLifetime: 1h
@@ -64,7 +63,7 @@ Quotas:
 Telemetry:
   Enabled: true
   Endpoints:
-  - http://localhost:8081/milestone
+  - http://localhost:8101/milestone
   Headers:
     single-value: "single-value"
     multi-value:

@@ -6,27 +6,15 @@
       "description": "Runs a local ephemeral Postgres database for functional UI (Console) tests.",
       "command": "nx run @zitadel/devcontainer:compose up --force-recreate --renew-anon-volumes db-functional-ui"
     },
-    "setup-api": {
-        "description": "Sets up the Zitadel API against which the functional UI tests are run.",
-        "dependsOn": [
-            "run-db",
-            "@zitadel/api:build"
-        ],
-        "executor": "nx:run-commands",
-        "options": {
-            "command": "nx run @zitadel/api:setup:functional-ui-test:test-functional-ui --excludeTaskDependencies"
-        }
-    },
     "run-api": {
         "description": "Sets up and runs the Zitadel API with the embedded Console against which the functional UI tests are run.",
         "continuous": true,
         "dependsOn": [
-            "run-db",
-            "setup-api"
+            "run-db"
         ],
         "executor": "nx:run-commands",
         "options": {
-            "command": "nx run @zitadel/api:prod:test-functional-ui --excludeTaskDependencies"
+            "command": "nx run @zitadel/api:prod:test-functional-ui"
         }  
     },
     "open": {
@@ -48,11 +36,10 @@
       "options": {
         "parallel": false,
         "cwd": "{projectRoot}",
-        "forwardAllArgs": false,
         "commands": [
-          "pnpm cypress install",
+          "cypress install",
           "wait-on --verbose --interval 2000 --simultaneous 1 \"${CYPRESS_BACKEND_URL}/debug/ready\"",
-          "DISPLAY='' pnpm cypress run",
+          "DISPLAY='' cypress run",
           "nx run @zitadel/functional-ui:stop"
         ]
       },
