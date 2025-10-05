@@ -1,9 +1,5 @@
-Port: 8082
-ExternalPort: 8082
-
 Database:
   Postgres:
-    Port: 5433
     MaxOpenConns: 20
     MaxIdleConns: 20
     MaxConnLifetime: 1h

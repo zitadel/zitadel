@@ -34,11 +34,11 @@
                     "./.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} start-from-init --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters"
                 ]
             },
-            "defaultConfiguration": "dev",
+            "defaultConfiguration": "default",
             "configurations": {
-                "dev": {
+                "default": {
                     "env": {
-                        "API_CONFIG_FILE": "{projectRoot}/dev.yaml"
+                        "API_CONFIG_FILE": "{projectRoot}/prod-default.yaml"
                     }
                 },
                 "test-integration-api": {
