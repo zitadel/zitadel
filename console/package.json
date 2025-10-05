@@ -2,7 +2,7 @@
   "name": "@zitadel/console",
   "scripts": {
     "ng": "ng",
-    "dev": "wait-on  --verbose --interval 2000 --simultaneous 1 ${ENVIRONMENT_JSON_URL} && node prebuild.development.js && ng serve --host=${DEVCONTAINER_LISTEN_HOST:-127.0.0.1}",
+    "dev": "wait-on  --verbose --interval 2000 --simultaneous 1 --timeout 30m ${ENVIRONMENT_JSON_URL} && node prebuild.development.js && ng serve --host=${DEVCONTAINER_LISTEN_HOST:-127.0.0.1}",
     "build": "ng build --configuration production --base-href=/ui/console/",
     "lint-check-ng": "ng lint",
     "lint-check-prettier": "prettier --check src",
@@ -92,7 +92,6 @@
     "karma-jasmine-html-reporter": "^2.1.0",
     "prettier": "^3.5.3",
     "prettier-plugin-organize-imports": "^4.1.0",
-    "typescript": "5.1",
-    "wait-on": "^7.2.0"
+    "typescript": "5.1"
   }
 }

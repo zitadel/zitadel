@@ -1,7 +1,6 @@
 ExternalSecure: false
 TLS.Enabled: false
 Database.Postgres:
-  Port: 5432
   Database: zitadel
   MaxOpenConns: 20
   MaxIdleConns: 20

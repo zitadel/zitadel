@@ -315,13 +315,9 @@ To run all available integration tests:
 go test -count 1 -tags integration -parallel 1 $(go list -tags integration ./... | grep -e \"integration_test\" -e \"events_testing\")
 ```
 
-It is also possible to run an API sever itself in a debugger and run the integrations tests like that.
+It is also possible to run the API in a debugger and run the integrations tests against it.
 In order to run the server, a database with correctly set up data is required.
-When starting the debugger, make sure the Zitadel binary gets the flag `--config=./apps/api/test-integration.yaml`
-
-```bash
-pnpm nx run @zitadel/api:test-integration-setup
-```
+When starting the debugger, make sure the Zitadel binary starts with `start-from-init --config=./apps/api/test-integration.yaml --steps=./apps/api/test-integration.yaml --masterkey=MasterkeyNeedsToHave32Characters"`
 
 To cleanup after testing (deletes the ephemeral database!):
 

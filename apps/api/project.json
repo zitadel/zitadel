@@ -26,31 +26,31 @@
         "prod": {
             "description": "Runs the Go-based API backend in production mode",
             "continuous": true,
-            "dependsOn": [
-                "setup"
-            ],
-            "options": {
-                "env": {
-                    "DEV_CONFIG_FILE": "{projectRoot}/dev.yaml"
-                }
-            },
-            "command": "bash -c './.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} start --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --masterkey MasterkeyNeedsToHave32Characters'"
-        },
-        "setup": {
-            "description": "Runs the schema migrations in order to prepare and update the database tables.",
-            "dependsOn": [
-                "build"
-            ],
             "executor": "nx:run-commands",
             "options": {
                 "parallel": false,
-                "env": {
-                    "DEV_CONFIG_FILE": "{projectRoot}/dev.yaml"
-                },
                 "commands": [
-                    "bash -c 'for i in {1..20}; do echo \"Attempt $i/20: Starting ZITADEL...\";./.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} init --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} && break || (echo \"Failed, retrying in 2s...\" && sleep 2); done'",
-                    "bash -c './.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} setup --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --steps ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --masterkey MasterkeyNeedsToHave32Characters'"
+                    "nx run @zitadel/devcontainer:compose up --detach --wait ${API_AWAIT_DB_SERVICE}",
+                    "./.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} start-from-init --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters"
                 ]
+            },
+            "defaultConfiguration": "default",
+            "configurations": {
+                "default": {
+                    "env": {
+                        "API_CONFIG_FILE": "{projectRoot}/prod-default.yaml"
+                    }
+                },
+                "test-integration-api": {
+                    "env": {
+                        "API_CONFIG_FILE": "{projectRoot}/test-integration-api.yaml"
+                    }
+                },
+                "test-functional-ui": {
+                    "env": {
+                        "API_CONFIG_FILE": "{projectRoot}/test-functional-ui.yaml"
+                    }
+                }
             }
         },
         "build": {
@@ -146,47 +146,37 @@
                 "{workspaceRoot}/.artifacts/bin/*/*/zitadel.test"
             ]
         },
-        "test-integration-setup": {
-            "description": "Sets up the state for the integration tests. This includes starting an ephemeral PostgreSQL database and a Redis cache. It also sets up the data needed for the tests.",
+        "test-integration-run-db": {
+            "description": "Runs the database and cache for integration tests.",
+            "continuous": true,
+            "command": "nx run @zitadel/devcontainer:compose up --force-recreate --renew-anon-volumes db-api-integration cache-api-integration"
+        },
+        "test-integration-run-api": {
+            "description": "Runs the API server for the integration tests.",
+            "continuous": true,
             "dependsOn": [
+                "test-integration-run-db",
                 "test-integration-build"
             ],
             "executor": "nx:run-commands",
             "options": {
                 "env": {
-                    "API_CONFIG_FILE": "{projectRoot}/test-integration.yaml",
-                    "ZITADEL_BINARY": "zitadel.test",
-                    "GOCOVERDIR": "{workspaceRoot}/.artifacts/api-test-integration/coverage",
-                    "GORACE": "halt_on_error=1"
-                },
-                "parallel": false,
-                "commands": [
-                    "nx run @zitadel/devcontainer:compose up --detach --force-recreate --renew-anon-volumes db-api-integration cache-api-integration",
-                    "rm -rf .artifacts/api-test-integration",
-                    "mkdir -p ${GOCOVERDIR}",
-                    "nx run @zitadel/api:setup --excludeTaskDependencies"
-                ]
-            }
-        },
-        "test-integration-run-api": {
-            "description": "Runs the API backend in a mode suitable for integration tests. This includes using the test configuration and enabling coverage recording. It has its own target, separate from test-integration, because it's a continuous task.",
-            "continuous": true,
-            "dependsOn": [
-                "test-integration-setup"
-            ],
-            "options": {
-                "env": {
-                    "API_CONFIG_FILE": "{projectRoot}/test-integration.yaml",
                     "ZITADEL_BINARY": "zitadel.test",
                     "GOCOVERDIR": "{workspaceRoot}/.artifacts/api-test-integration/coverage",
                     "GORACE": "log_path=.artifacts/api-test-integration/race.log"
-                }
-            },
-            "command": "nx run @zitadel/api:prod --excludeTaskDependencies"
+                },
+                "parallel": false,
+                "commands": [
+                    "rm -rf .artifacts/api-test-integration",
+                    "mkdir -p ${GOCOVERDIR}",
+                    "nx run @zitadel/api:prod:test-integration-api"
+                ]
+            }
         },
         "test-integration": {
             "description": "Runs the integration tests sequentially with coverage and race condition detection. Go test caching is disabled, because the tests run against an out-of-process API.",
             "dependsOn": [
+                "test-integration-run-db",
                 "test-integration-run-api"
             ],
             "executor": "nx:run-commands",
@@ -196,6 +186,7 @@
                     "GOCOVERDIR": "{workspaceRoot}/.artifacts/api-test-integration/coverage"
                 },
                 "commands": [
+                    "wait-on --verbose --interval 2000 --simultaneous 1 --timeout 30m \"${ZITADEL_API_URL}/debug/ready\"",
                     "bash -c 'go test -race -count 1 -tags integration -timeout 60m -parallel 1 $(go list -tags integration ./... | grep -e \"integration_test\" -e \"events_testing\")'",
                     "go tool covdata textfmt -i=$GOCOVERDIR -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/...,github.com/zitadel/zitadel/backend/... -o profile.api.test-integration.cov",
                     "nx run @zitadel/api:test-integration-stop"

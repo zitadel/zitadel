@@ -6,7 +6,12 @@
       "continuous": true,
       "dependsOn": [
         "build"
-      ]
+      ],
+      "defaultConfiguration": "dev",
+      "configurations": {
+        "dev": {},
+        "test-login-integration": {}
+      }
     },
     "dev": {
       "description": "Runs the Next.js Login application in development mode with hot-reloading",
@@ -95,7 +100,7 @@
         "build"
       ],
       "continuous": true,
-      "command": "nx run @zitadel/login:prod --excludeTaskDependencies"
+      "command": "nx run @zitadel/login:prod:test-login-integration --excludeTaskDependencies"
     },
     "test-integration": {
       "description": "Runs integration tests using Cypress against a running Login and a mocked API",
@@ -110,7 +115,7 @@
         "parallel": false,
         "commands": [
           "pnpm cypress install",
-          "pnpm wait-on --verbose --interval 2000 --simultaneous 1 \"tcp:${API_MOCK_STUBS_HOST}:22220\" \"http-get://localhost:3000/ui/v2/login/verify?userId=221394658884845598&code=abc\"",
+          "pnpm wait-on --verbose --interval 2000 --simultaneous 1 --timeout 30m \"tcp:${API_MOCK_STUBS_HOST}:22220\" \"http-get://localhost:3001/ui/v2/login/verify?userId=221394658884845598&code=abc\"",
           "DISPLAY='' pnpm cypress run --headless",
           "nx run @zitadel/login:test-integration-stop"
         ]
