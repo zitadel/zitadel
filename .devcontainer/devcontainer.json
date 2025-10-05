@@ -11,18 +11,11 @@
 		3000,
 		4200,
 		8080,
-		8081,
-		8082,
-		8083,
 		3100
 	],
 	"portsAttributes": {
 		"3000": {
 			"label": "Login",
-			"onAutoForward": "notify"
-		},
-		"3001": {
-			"label": "Login Test Integration",
 			"onAutoForward": "notify"
 		},
 		"4200": {
@@ -31,18 +24,6 @@
 		},
 		"8080": {
 			"label": "API",
-			"onAutoForward": "notify"
-		},
-		"8081": {
-			"label": "API Test Integration Sink",
-			"onAutoForward": "notify"
-		},
-		"8082": {
-			"label": "API Test Integration",
-			"onAutoForward": "notify"
-		},
-		"8083": {
-			"label": "API Test Functional UI",
 			"onAutoForward": "notify"
 		},
 		"3100": {
