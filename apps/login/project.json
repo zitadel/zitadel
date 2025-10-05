@@ -10,7 +10,7 @@
       "defaultConfiguration": "dev",
       "configurations": {
         "dev": {},
-        "test-integration": {}
+        "test-login-integration": {}
       }
     },
     "dev": {
@@ -99,7 +99,7 @@
         "build"
       ],
       "continuous": true,
-      "command": "nx run @zitadel/login:prod:test-integration --excludeTaskDependencies"
+      "command": "nx run @zitadel/login:prod:test-login-integration --excludeTaskDependencies"
     },
     "test-integration": {
       "description": "Runs integration tests using Cypress against a running Login and a mocked API",
