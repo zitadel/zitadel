@@ -1,8 +1,8 @@
 Log:
   Level: info
 
-Port: 8082
-ExternalPort: 8082
+Port: 8083
+ExternalPort: 8083
 ExternalSecure: false
 
 Database:
