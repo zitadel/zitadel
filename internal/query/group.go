@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -81,40 +82,31 @@ type GroupSearchQuery struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) GetGroupByID(ctx context.Context, id string) (group *Group, err error) {
+func (q *Queries) GetGroupByID(ctx context.Context, id string, permissionCheck domain.PermissionCheck) (group *Group, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	// todo: add permission check
-
-	stmt, scan := prepareGroupQuery()
-	eq := sq.Eq{
-		GroupColumnID.identifier():         id,
-		GroupColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	query, args, err := stmt.Where(eq).ToSql()
+	group, err = q.getGroupByID(ctx, id, err, group)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-8bde1", "Errors.Query.SQLStatement")
+		return nil, err
 	}
-
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		group, err = scan(row)
-		return err
-	}, query, args...)
-	return group, err
-
+	if err = groupCheckPermission(ctx, group.ResourceOwner, group.ID, permissionCheck); err != nil {
+		return nil, err
+	}
+	return group, nil
 }
 
 // SearchGroups returns the list of groups that match the search criteria
-func (q *Queries) SearchGroups(ctx context.Context, queries *GroupSearchQuery) (_ *Groups, err error) {
+func (q *Queries) SearchGroups(ctx context.Context, queries *GroupSearchQuery, permissionCheck domain.PermissionCheck) (_ *Groups, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-
-	// todo: add permission check
 
 	groups, err := q.searchGroups(ctx, queries)
 	if err != nil {
 		return nil, err
+	}
+	if permissionCheck != nil {
+		groupsCheckPermission(ctx, groups, permissionCheck) // todo: permission check v2?
 	}
 	return groups, nil
 }
@@ -133,6 +125,36 @@ func NewGroupIDsSearchQuery(ids []string) (SearchQuery, error) {
 
 func NewGroupOrganizationIdSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(GroupColumnResourceOwner, id, TextEquals)
+}
+
+func groupCheckPermission(ctx context.Context, resourceOwner, groupID string, permissionCheck domain.PermissionCheck) error {
+	return permissionCheck(ctx, domain.PermissionGroupRead, resourceOwner, groupID)
+}
+
+func groupsCheckPermission(ctx context.Context, groups *Groups, permissionCheck domain.PermissionCheck) {
+	groups.Groups = slices.DeleteFunc(groups.Groups,
+		func(group *Group) bool {
+			return groupCheckPermission(ctx, group.ResourceOwner, group.ID, permissionCheck) != nil
+		},
+	)
+}
+
+func (q *Queries) getGroupByID(ctx context.Context, id string, err error, group *Group) (*Group, error) {
+	stmt, scan := prepareGroupQuery()
+	eq := sq.Eq{
+		GroupColumnID.identifier():         id,
+		GroupColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	query, args, err := stmt.Where(eq).ToSql()
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-8bde1", "Errors.Query.SQLStatement")
+	}
+
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		group, err = scan(row)
+		return err
+	}, query, args...)
+	return group, err
 }
 
 func prepareGroupQuery() (sq.SelectBuilder, func(*sql.Row) (*Group, error)) {
