@@ -22,7 +22,7 @@ func AppToPb(query_app *query.App) *application.Application {
 	}
 
 	return &application.Application{
-		Id:            query_app.ID,
+		ApplicationId: query_app.ID,
 		CreationDate:  timestamppb.New(query_app.CreationDate),
 		ChangeDate:    timestamppb.New(query_app.ChangeDate),
 		State:         appStateToPb(query_app.State),

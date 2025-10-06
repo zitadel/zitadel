@@ -44,11 +44,11 @@ func TestAppToPb(t *testing.T) {
 				APIConfig:    &query.APIApp{},
 			},
 			expectedPbApp: &application.Application{
-				Id:           "id",
-				CreationDate: timestamppb.New(now),
-				ChangeDate:   timestamppb.New(now),
-				State:        application.ApplicationState_APPLICATION_STATE_ACTIVE,
-				Name:         "test-application",
+				ApplicationId: "id",
+				CreationDate:  timestamppb.New(now),
+				ChangeDate:    timestamppb.New(now),
+				State:         application.ApplicationState_APPLICATION_STATE_ACTIVE,
+				Name:          "test-application",
 				Configuration: &application.Application_ApiConfiguration{
 					ApiConfiguration: &application.APIConfiguration{},
 				},

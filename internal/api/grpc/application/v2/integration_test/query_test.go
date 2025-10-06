@@ -146,7 +146,7 @@ func TestGetApplication(t *testing.T) {
 				require.Equal(t, tc.expectedErrorType, status.Code(err))
 				if tc.expectedErrorType == codes.OK {
 
-					assert.Equal(t, tc.expectedAppID, res.GetApplication().GetId())
+					assert.Equal(t, tc.expectedAppID, res.GetApplication().GetApplicationId())
 					assert.Equal(t, tc.expectedAppName, res.GetApplication().GetName())
 					assert.NotZero(t, res.GetApplication().GetCreationDate())
 					assert.NotZero(t, res.GetApplication().GetChangeDate())
@@ -369,7 +369,7 @@ func TestListApplications(t *testing.T) {
 			actualOrderedKeys: func(apps []*application.Application) any {
 				ids := make([]string, len(apps))
 				for i, a := range apps {
-					ids[i] = a.GetId()
+					ids[i] = a.GetApplicationId()
 				}
 
 				return ids
@@ -509,7 +509,7 @@ func TestListApplications(t *testing.T) {
 
 func TestListApplications_WithPermissionV2(t *testing.T) {
 	ensureFeaturePermissionV2Enabled(t, instancePermissionV2)
-	iamOwnerCtx := instancePermissionV2.WithAuthorization(context.Background(), integration.UserTypeIAMOwner)
+	iamOwnerCtx := instancePermissionV2.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
 	p, projectOwnerCtx := getProjectAndProjectContext(t, instancePermissionV2, iamOwnerCtx)
 	_, otherProjectOwnerCtx := getProjectAndProjectContext(t, instancePermissionV2, iamOwnerCtx)
 
@@ -643,7 +643,7 @@ func TestListApplications_WithPermissionV2(t *testing.T) {
 
 					resAppIDs := []string{}
 					for _, a := range res.GetApplications() {
-						resAppIDs = append(resAppIDs, a.GetId())
+						resAppIDs = append(resAppIDs, a.GetApplicationId())
 					}
 
 					assert.ElementsMatch(ttt, tc.expectedAppIDs, resAppIDs)
@@ -830,8 +830,8 @@ func TestListApplicationKeys(t *testing.T) {
 
 func TestListApplicationKeys_WithPermissionV2(t *testing.T) {
 	ensureFeaturePermissionV2Enabled(t, instancePermissionV2)
-	iamOwnerCtx := instancePermissionV2.WithAuthorization(context.Background(), integration.UserTypeIAMOwner)
-	loginUserCtx := instancePermissionV2.WithAuthorization(context.Background(), integration.UserTypeLogin)
+	iamOwnerCtx := instancePermissionV2.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
+	loginUserCtx := instancePermissionV2.WithAuthorizationToken(context.Background(), integration.UserTypeLogin)
 	p, projectOwnerCtx := getProjectAndProjectContext(t, instancePermissionV2, iamOwnerCtx)
 
 	createdApiApp1 := createAPIApp(t, iamOwnerCtx, instancePermissionV2, p.GetId())

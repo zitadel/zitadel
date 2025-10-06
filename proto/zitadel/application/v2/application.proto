@@ -16,7 +16,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/application/v2;applicat
 
 message Application {
   // The unique identifier of the application.
-  string id = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629023906488334\""}];
+  string application_id = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629023906488334\""}];
 
   // The timestamp of the application creation.
   google.protobuf.Timestamp creation_date = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2024-12-18T07:50:47.492Z\""}];
