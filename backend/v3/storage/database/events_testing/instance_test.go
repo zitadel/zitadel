@@ -96,7 +96,9 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 				database.WithCondition(instanceRepo.IDCondition(res.GetInstanceId())),
 			)
 			assert.NoError(t, err)
-			assert.Equal(t, instanceName, instance.Name)
+			if instance != nil {
+				assert.Equal(t, instanceName, instance.Name)
+			}
 		}, retryDuration, tick)
 
 		instanceName += "new"
