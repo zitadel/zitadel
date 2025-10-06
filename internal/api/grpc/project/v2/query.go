@@ -15,7 +15,7 @@ import (
 )
 
 func (s *Server) GetProject(ctx context.Context, req *connect.Request[project_pb.GetProjectRequest]) (*connect.Response[project_pb.GetProjectResponse], error) {
-	project, err := s.query.GetProjectByIDWithPermission(ctx, true, req.Msg.GetId(), s.checkPermission)
+	project, err := s.query.GetProjectByIDWithPermission(ctx, true, req.Msg.GetProjectId(), s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +136,7 @@ func grantedProjectsToPb(projects []*query.GrantedProject) []*project_pb.Project
 
 func projectToPb(project *query.Project) *project_pb.Project {
 	return &project_pb.Project{
-		Id:                     project.ID,
+		ProjectId:              project.ID,
 		OrganizationId:         project.ResourceOwner,
 		CreationDate:           timestamppb.New(project.CreationDate),
 		ChangeDate:             timestamppb.New(project.ChangeDate),
@@ -159,7 +159,7 @@ func grantedProjectToPb(project *query.GrantedProject) *project_pb.Project {
 	}
 
 	return &project_pb.Project{
-		Id:                      project.ProjectID,
+		ProjectId:               project.ProjectID,
 		OrganizationId:          project.ResourceOwner,
 		CreationDate:            timestamppb.New(project.CreationDate),
 		ChangeDate:              timestamppb.New(project.ChangeDate),

@@ -25,15 +25,15 @@ func (s *Server) CreateProject(ctx context.Context, req *connect.Request[project
 		creationDate = timestamppb.New(project.EventDate)
 	}
 	return connect.NewResponse(&project_pb.CreateProjectResponse{
-		Id:           add.AggregateID,
+		ProjectId:    add.AggregateID,
 		CreationDate: creationDate,
 	}), nil
 }
 
 func projectCreateToCommand(req *project_pb.CreateProjectRequest) *command.AddProject {
 	var aggregateID string
-	if req.Id != nil {
-		aggregateID = *req.Id
+	if req.ProjectId != nil {
+		aggregateID = *req.ProjectId
 	}
 	return &command.AddProject{
 		ObjectRoot: models.ObjectRoot{
@@ -82,7 +82,7 @@ func projectUpdateToCommand(req *project_pb.UpdateProjectRequest) *command.Chang
 	}
 	return &command.ChangeProject{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.Id,
+			AggregateID: req.ProjectId,
 		},
 		Name:                   req.Name,
 		ProjectRoleAssertion:   req.ProjectRoleAssertion,
@@ -93,12 +93,12 @@ func projectUpdateToCommand(req *project_pb.UpdateProjectRequest) *command.Chang
 }
 
 func (s *Server) DeleteProject(ctx context.Context, req *connect.Request[project_pb.DeleteProjectRequest]) (*connect.Response[project_pb.DeleteProjectResponse], error) {
-	userGrantIDs, err := s.userGrantsFromProject(ctx, req.Msg.GetId())
+	userGrantIDs, err := s.userGrantsFromProject(ctx, req.Msg.GetProjectId())
 	if err != nil {
 		return nil, err
 	}
 
-	deletedAt, err := s.command.DeleteProject(ctx, req.Msg.GetId(), "", userGrantIDs...)
+	deletedAt, err := s.command.DeleteProject(ctx, req.Msg.GetProjectId(), "", userGrantIDs...)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +126,7 @@ func (s *Server) userGrantsFromProject(ctx context.Context, projectID string) ([
 }
 
 func (s *Server) DeactivateProject(ctx context.Context, req *connect.Request[project_pb.DeactivateProjectRequest]) (*connect.Response[project_pb.DeactivateProjectResponse], error) {
-	details, err := s.command.DeactivateProject(ctx, req.Msg.GetId(), "")
+	details, err := s.command.DeactivateProject(ctx, req.Msg.GetProjectId(), "")
 	if err != nil {
 		return nil, err
 	}

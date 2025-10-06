@@ -287,7 +287,7 @@ message CreateProjectRequest {
   // Optionally, provide the unique identifier of the new project.
   // If omitted, the system will generate a unique ID for you. This is the
   // recommended way. The generated ID will be returned in the response.
-  optional string id = 2 [
+  optional string project_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1,
@@ -326,7 +326,7 @@ message CreateProjectRequest {
 
 message CreateProjectResponse {
   // The unique identifier of the newly created project.
-  string id = 1 [
+  string project_id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629012906488334\"";
     }
@@ -342,7 +342,7 @@ message CreateProjectResponse {
 
 message UpdateProjectRequest {
   // The unique identifier of the project to be updated.
-  string id = 1 [
+  string project_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -393,7 +393,7 @@ message UpdateProjectResponse {
 
 message DeleteProjectRequest {
   // The unique identifier of the project to be deleted.
-  string id = 1 [
+  string project_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -417,7 +417,7 @@ message DeleteProjectResponse {
 
 message GetProjectRequest {
   // The unique identifier of the project to be retrieved.
-  string id = 1 [
+  string project_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -453,7 +453,7 @@ message ListProjectsResponse {
 
 message DeactivateProjectRequest {
   // The unique identifier of the project.
-  string id = 1 [
+  string project_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

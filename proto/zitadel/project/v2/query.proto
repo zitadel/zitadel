@@ -47,7 +47,7 @@ enum ProjectGrantState {
 
 message Project {
   // The unique identifier of the project.
-  string id = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629012906488334\""}];
+  string project_id = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629012906488334\""}];
 
   // The unique identifier of the organization the project belongs to.
   string organization_id = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629012906488334\""}];

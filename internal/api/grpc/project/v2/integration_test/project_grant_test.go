@@ -171,7 +171,7 @@ func TestServer_CreateProjectGrant_Permission(t *testing.T) {
 	userResp := instance.CreateMachineUser(iamOwnerCtx)
 	patResp := instance.CreatePersonalAccessToken(iamOwnerCtx, userResp.GetUserId())
 	projectResp := createProject(iamOwnerCtx, instance, t, instance.DefaultOrg.GetId(), false, false)
-	instance.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetId(), userResp.GetUserId())
+	instance.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetProjectId(), userResp.GetUserId())
 	projectOwnerCtx := integration.WithAuthorizationToken(CTX, patResp.Token)
 
 	type want struct {
@@ -228,7 +228,7 @@ func TestServer_CreateProjectGrant_Permission(t *testing.T) {
 			name: "project owner, ok",
 			ctx:  projectOwnerCtx,
 			prepare: func(request *project.CreateProjectGrantRequest) {
-				request.ProjectId = projectResp.GetId()
+				request.ProjectId = projectResp.GetProjectId()
 
 				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.GrantedOrganizationId = grantedOrg.GetOrganizationId()
