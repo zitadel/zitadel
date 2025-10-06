@@ -1,64 +1,58 @@
 import { test as base } from "@playwright/test";
 import { Transport } from "@connectrpc/connect";
 import { UserService } from "./api.js";
-import { CreateUserRequest, CreateUserResponse, UserService as NativeUserService } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { CreateUserRequest,  CreateUserRequestSchema, CreateUserResponse, UserService as NativeUserService } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import minimalRequest from './user-registered-request.json' with { type: "json" };
+import { create } from "@zitadel/client";
 import { faker } from "@faker-js/faker";
 
-export class RegisteredUser {
-    public readonly minimal: CreateUserRequest = {
-        $typeName: "zitadel.user.v2.CreateUserRequest",
-        organizationId: "340565276842066283",
-        userType: {
-            case: "human",
-            value: {
-                $typeName: "zitadel.user.v2.CreateUserRequest.Human",
-                metadata: [],
-                idpLinks: [],
-                email: {
-                    $typeName: "zitadel.user.v2.SetHumanEmail",
-                    email: faker.internet.email(),
-                    verification: {
-                        case: "isVerified",
-                        value: false
-                    }
-                },
-                profile: {
-                    $typeName: "zitadel.user.v2.SetHumanProfile",
-                    givenName: faker.person.firstName(),
-                    familyName: faker.person.lastName(),
-                },
-                phone: {
-                    $typeName: "zitadel.user.v2.SetHumanPhone",
-                    phone: faker.phone.number({ style: "international" }),
-                    verification: {
-                        case: "isVerified",
-                        value: true
-                    }
-                },
-                passwordType: {
-                    case: "password",
-                    value: {
-                        $typeName: "zitadel.user.v2.Password",
-                        password: "Password1!",
-                        changeRequired: false,
-                    },
-                },
-            },
-        }
-    };
+export class CreateUserRequestBuilder {
 
+    public req = minimalRequest
+    constructor() { }
+
+    build(): CreateUserRequest {
+        return create(CreateUserRequestSchema, {
+            ...minimalRequest,
+            ... {
+                human: {
+                    ...minimalRequest.human,
+                    email: {
+                        ...minimalRequest.human.email,
+                        email: faker.internet.email(),
+                    },
+                    profile: {
+                        ...minimalRequest.human.profile,
+                        givenName: faker.person.firstName(),
+                        familyName: faker.person.lastName(),
+                    },
+                    phone: {
+                        ...minimalRequest.human.phone,
+                        phone: faker.phone.number({ style: "international" }),
+                    },
+                }
+            }
+        })
+    }
+
+    withPasswordChangeRequired(): CreateUserRequestBuilder {
+        this.req.human.password.changeRequired = true;
+        return this;
+   }
+}
+
+
+export class RegisteredUser {
     constructor(private svc: UserService) { }
 
     public res: CreateUserResponse | null = null;
-    public req: CreateUserRequest = { ...this.minimal };
+    public builder: CreateUserRequestBuilder = new CreateUserRequestBuilder();
 
-    async create(req: CreateUserRequest = this.minimal) {
-        this.req = req;
-        try {
-        this.res = await this.svc.native.createUser(req);
-        } catch (e) {
-            console.error("Error creating user:", e);
+    async create(req?: CreateUserRequestBuilder) {
+        if (req) {
+            this.builder = req;
         }
+        this.res = await this.svc.native.createUser(this.builder.build());
         console.log("Created user", this.res);
         return this.res;
     }
@@ -70,31 +64,19 @@ export class RegisteredUser {
     }
 
     get username(): string {
-        if (this.req.userType?.case !== "human" || !this.req.userType.value.email) {
-            throw new Error("User has no email in the request.");
-        }
-        return this.req.userType?.value.email.email!;
+        return this.builder.req.human.email.email
     }
 
     get password(): string {
-        if (this.req.userType?.case !== "human" || this.req.userType.value.passwordType.case !== "password") {
-            throw new Error("User has no password in the request.");
-        }
-        return this.req.userType.value.passwordType.value.password;
+        return this.builder.req.human.password.password;
     }
 
     get phone(): string {
-        if (this.req.userType?.case !== "human" || !this.req.userType.value.phone) {
-            throw new Error("User has no phone in the request.");
-        }
-        return this.req.userType.value.phone.phone;
+        return this.builder.req.human.phone.phone;
     }
 
     get fullName(): string {
-        if (this.req.userType?.case !== "human" || !this.req.userType.value.profile) {
-            throw new Error("User has no profile in the request.");
-        }
-        return `${this.req.userType.value.profile.givenName} ${this.req.userType.value.profile.familyName}`;
+        return `${this.builder.req.human.profile.givenName} ${this.builder.req.human.profile.familyName}`;
     }
 }
 
