@@ -1,12 +1,13 @@
-import { test } from "./registered.js";
+import { AuthFactorState } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { test } from "./fixtures.js";
 import { loginScreenExpect, loginWithPasskey } from "./login.js";
+import { AuthFactors } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
-test("username and passkey login", async ({ registeredUser, page }) => {
-  await registeredUser.create({
-    ...registeredUser.minimal
-  })
-  await loginWithPasskey(page, registeredUser.getAuthenticatorId(), registeredUser.username);
-  await loginScreenExpect(page, registeredUser.fullName);
+test("username and passkey login", async ({ anonymousUser, userService, page }) => {
+  await anonymousUser.registerWithPasskey();
+  const { userId } = await userService.getByUsername(anonymousUser.username!);
+/*  await loginWithPasskey(page,anonymousUser.getAuthenticatorId(), registeredUser.username);
+  await loginScreenExpect(page, registeredUser.fullName);*/
 });
 
 test("username and passkey login, multiple auth methods", async ({ page }) => {

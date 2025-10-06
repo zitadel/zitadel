@@ -4,9 +4,10 @@ import { loginScreenExpect, loginWithPassword } from "./login.js";
 import { eventualEmailOTP } from "./mock.js";
 import { test } from "./fixtures.js";
 
-test.only("user email not verified, verify", async ({ registeredUser, page }) => {
+test("user email not verified, verify", async ({ registeredUser, page }) => {
   // Create user with password but unverified email
   await registeredUser.create();
+  console.log("Created user", registeredUser.username);
   await loginWithPassword(page, registeredUser.username, registeredUser.password);
   const code = await eventualEmailOTP(registeredUser.username);
   await emailVerify(page, code);

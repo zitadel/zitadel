@@ -34,8 +34,3 @@ export async function loginWithPasswordAndPhoneOTP(page: Page, username: string,
   await loginWithPassword(page, username, password);
   await enterSMSOTPFromMockServer(page, phone);
 }
-
-export async function loginWithPasswordAndTOTP(page: Page, user: RegisteredUser, secret: string) {
-  await loginWithPassword(page, user.username, user.password);
-  await code(page, user.svc.totp(secret));
-}

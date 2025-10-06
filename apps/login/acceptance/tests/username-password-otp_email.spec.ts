@@ -1,32 +1,10 @@
-import { faker } from "@faker-js/faker";
+import { test } from "./fixtures.js";
 import { test as base } from "@playwright/test";
-import { code, codeResend, smsOtpFromMockServer } from "./code.js";
+import { code, codeResend, emailOtpFromMockServer, smsOtpFromMockServer } from "./code.js";
 import { codeScreenExpect } from "./code-screen.js";
 import { loginScreenExpect, loginWithPassword, loginWithPasswordAndEmailOTP } from "./login.js";
-import { OtpType, PasswordUserWithOTP } from "./registered.js";
 
-const test = base.extend<{ user: PasswordUserWithOTP; sink: any }>({
-  user: async ({ page }, use) => {
-    const user = new PasswordUserWithOTP({
-      email: faker.internet.email(),
-      isEmailVerified: true,
-      firstName: faker.person.firstName(),
-      lastName: faker.person.lastName(),
-      organization: "",
-      phone: faker.phone.number(),
-      isPhoneVerified: false,
-      password: "Password1!",
-      passwordChangeRequired: false,
-      type: OtpType.email,
-    });
-
-    await user.ensure(page);
-    await use(user);
-    await user.cleanup();
-  },
-});
-
-test.skip("DOESN'T WORK: username, password and email otp login, enter code manually", async ({ user, page }) => {
+test.skip("DOESN'T WORK: username, password and email otp login, enter code manually", async ({ registeredUser, userService, page }) => {
   // Given email otp is enabled on the organization of the user
   // Given the user has only email otp configured as second factor
   // User enters username
@@ -34,8 +12,12 @@ test.skip("DOESN'T WORK: username, password and email otp login, enter code manu
   // User receives an email with a verification code
   // User enters the code into the ui
   // User is redirected to the app (default redirect url)
-  await loginWithPasswordAndEmailOTP(page, user.getUsername(), user.getPassword(), user.getUsername());
-  await loginScreenExpect(page, user.getFullName());
+  await registeredUser.create()
+  await userService.native.addOTPEmail({
+    userId: registeredUser.res?.id,
+  })
+  await loginWithPasswordAndEmailOTP(page, registeredUser.username, registeredUser.password, registeredUser.email);
+  await loginScreenExpect(page, registeredUser.fullName);
 });
 
 test("username, password and email otp login, click link in email", async ({ page }) => {
@@ -49,7 +31,7 @@ test("username, password and email otp login, click link in email", async ({ pag
   // User is redirected to the app (default redirect url)
 });
 
-test.skip("DOESN'T WORK: username, password and email otp login, resend code", async ({ user, page }) => {
+test.skip("DOESN'T WORK: username, password and email otp login, resend code", async ({ registeredUser, page }) => {
   // Given email otp is enabled on the organization of the user
   // Given the user has only email otp configured as second factor
   // User enters username
@@ -59,13 +41,15 @@ test.skip("DOESN'T WORK: username, password and email otp login, resend code", a
   // User receives a new email with a verification code
   // User enters the new code in the ui
   // User is redirected to the app (default redirect url)
-  await loginWithPassword(page, user.getUsername(), user.getPassword());
+  await registeredUser.create()
+  await loginWithPassword(page, registeredUser.username, registeredUser.password);
+  await emailOtpFromMockServer(page, registeredUser.username);
   await codeResend(page);
-  await smsOtpFromMockServer(page, user.getUsername());
-  await loginScreenExpect(page, user.getFullName());
+  await emailOtpFromMockServer(page, registeredUser.username);
+  await loginScreenExpect(page, registeredUser.fullName);
 });
 
-test("username, password and email otp login, wrong code", async ({ user, page }) => {
+test("username, password and email otp login, wrong code", async ({ registeredUser, userService, page }) => {
   // Given email otp is enabled on the organization of the user
   // Given the user has only email otp configured as second factor
   // User enters username
@@ -73,8 +57,13 @@ test("username, password and email otp login, wrong code", async ({ user, page }
   // User receives an email with a verification code
   // User enters a wrong code
   // Error message - "Invalid code" is shown
+  await registeredUser.create()
+  // Drain first code?
+  await userService.native.addOTPEmail({
+    userId: registeredUser.res?.id,
+  })
   const c = "wrongcode";
-  await loginWithPassword(page, user.getUsername(), user.getPassword());
+  await loginWithPassword(page, registeredUser.username, registeredUser.password);
   await code(page, c);
   await codeScreenExpect(page, c);
 });

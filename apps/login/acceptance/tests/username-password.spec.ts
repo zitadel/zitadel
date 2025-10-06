@@ -1,34 +1,15 @@
-import { faker } from "@faker-js/faker";
-import { test as base } from "@playwright/test";
 import { loginScreenExpect, loginWithPassword, startLogin } from "./login.js";
 import { loginname } from "./loginname.js";
 import { loginnameScreenExpect } from "./loginname-screen.js";
 import { password } from "./password.js";
 import { passwordScreenExpect } from "./password-screen.js";
-import { PasswordUser } from "./registered.js";
+import { test } from "./fixtures.js";
 
-const test = base.extend<{ user: PasswordUser }>({
-  user: async ({ page }, use) => {
-    const user = new PasswordUser({
-      email: faker.internet.email(),
-      isEmailVerified: true,
-      firstName: faker.person.firstName(),
-      lastName: faker.person.lastName(),
-      organization: "",
-      phone: faker.phone.number(),
-      isPhoneVerified: false,
-      password: "Password1!",
-      passwordChangeRequired: false,
-    });
-    await user.ensure(page);
-    await use(user);
-    await user.cleanup();
-  },
-});
-
-test("username and password login", async ({ user, page }) => {
-  await loginWithPassword(page, user.getUsername(), user.getPassword());
-  await loginScreenExpect(page, user.getFullName());
+test("username and password login", async ({ registeredUser, page }) => {
+  await registeredUser.create()
+  await registeredUser.create()
+  await loginWithPassword(page, registeredUser.username, registeredUser.getPassword());
+  await loginScreenExpect(page, registeredUser.fullName);
 });
 
 test("username and password login, unknown username", async ({ page }) => {
@@ -38,14 +19,15 @@ test("username and password login, unknown username", async ({ page }) => {
   await loginnameScreenExpect(page, username);
 });
 
-test("username and password login, wrong password", async ({ user, page }) => {
+test("username and password login, wrong password", async ({ registeredUser, page }) => {
+  await registeredUser.create()
   await startLogin(page);
-  await loginname(page, user.getUsername());
+  await loginname(page, registeredUser.username);
   await password(page, "wrong");
   await passwordScreenExpect(page, "wrong");
 });
 
-test("username and password login, wrong username, ignore unknown usernames", async ({ user, page }) => {
+test("username and password login, wrong username, ignore unknown usernames", async ({ }) => {
   test.skip();
   // Given user doesn't exist but ignore unknown usernames setting is set to true
   // Given username password login is enabled on the users organization
@@ -54,7 +36,7 @@ test("username and password login, wrong username, ignore unknown usernames", as
   // redirect to loginname page --> error message username or password wrong
 });
 
-test("username and password login, initial password change", async ({ user, page }) => {
+test("username and password login, initial password change", async ({ }) => {
   test.skip();
   // Given user is created and has changePassword set to true
   // Given username password login is enabled on the users organization
@@ -63,7 +45,7 @@ test("username and password login, initial password change", async ({ user, page
   // create new password
 });
 
-test("username and password login, reset password hidden", async ({ user, page }) => {
+test("username and password login, reset password hidden", async ({ }) => {
   test.skip();
   // Given the organization has enabled "Password reset hidden" in the login policy
   // Given username password login is enabled on the users organization
@@ -71,7 +53,7 @@ test("username and password login, reset password hidden", async ({ user, page }
   // password reset link should not be shown on password screen
 });
 
-test("username and password login, reset password - enter code manually", async ({ user, page }) => {
+test("username and password login, reset password - enter code manually", async ({ }) => {
   test.skip();
   // Given user has forgotten password and clicks the forgot password button
   // Given username password login is enabled on the users organization
@@ -81,7 +63,7 @@ test("username and password login, reset password - enter code manually", async 
   // user is redirected to app (default redirect url)
 });
 
-test("username and password login, reset password - click link", async ({ user, page }) => {
+test("username and password login, reset password - click link", async ({ }) => {
   test.skip();
   // Given user has forgotten password and clicks the forgot password button, and then the link in the email
   // Given username password login is enabled on the users organization
@@ -92,7 +74,7 @@ test("username and password login, reset password - click link", async ({ user, 
   // redirect to app (default redirect url)
 });
 
-test("username and password login, reset password, resend code", async ({ user, page }) => {
+test("username and password login, reset password, resend code", async ({ }) => {
   test.skip();
   // Given user has forgotten password and clicks the forgot password button and then resend code
   // Given username password login is enabled on the users organization
@@ -103,7 +85,7 @@ test("username and password login, reset password, resend code", async ({ user, 
   // user is redirected to app (default redirect url)
 });
 
-test("email login enabled", async ({ user, page }) => {
+test("email login enabled", async ({ }) => {
   test.skip();
   // Given user with the username "testuser", email test@zitadel.com and phone number 0711111111 exists
   // Given no other user with the same email address exists
@@ -111,7 +93,7 @@ test("email login enabled", async ({ user, page }) => {
   // user will get to password screen
 });
 
-test("email login disabled", async ({ user, page }) => {
+test("email login disabled", async ({ }) => {
   test.skip();
   // Given user with the username "testuser", email test@zitadel.com and phone number 0711111111 exists
   // Given no other user with the same email address exists
@@ -119,7 +101,7 @@ test("email login disabled", async ({ user, page }) => {
   // user will see error message "user not found"
 });
 
-test("email login enabled - multiple users", async ({ user, page }) => {
+test("email login enabled - multiple users", async ({ }) => {
   test.skip();
   // Given user with the username "testuser", email test@zitadel.com and phone number 0711111111 exists
   // Given a second user with the username "testuser2", email test@zitadel.com and phone number 0711111111 exists
@@ -127,7 +109,7 @@ test("email login enabled - multiple users", async ({ user, page }) => {
   // user will see error message "user not found"
 });
 
-test("phone login enabled", async ({ user, page }) => {
+test("phone login enabled", async ({ }) => {
   test.skip();
   // Given user with the username "testuser", email test@zitadel.com and phone number 0711111111 exists
   // Given no other user with the same phon number exists
@@ -135,7 +117,7 @@ test("phone login enabled", async ({ user, page }) => {
   // user will get to password screen
 });
 
-test("phone login disabled", async ({ user, page }) => {
+test("phone login disabled", async ({ }) => {
   test.skip();
   // Given user with the username "testuser", email test@zitadel.com and phone number 0711111111 exists
   // Given no other user with the same phone number exists
@@ -143,7 +125,7 @@ test("phone login disabled", async ({ user, page }) => {
   // user will see error message "user not found"
 });
 
-test("phone login enabled - multiple users", async ({ user, page }) => {
+test("phone login enabled - multiple users", async ({ }) => {
   test.skip();
   // Given user with the username "testuser", email test@zitadel.com and phone number 0711111111 exists
   // Given a second user with the username "testuser2", email test@zitadel.com and phone number 0711111111 exists

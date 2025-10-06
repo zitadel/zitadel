@@ -34,6 +34,7 @@
                 "@zitadel/login:build",
                 "run-api"
             ],
+            "executor": "nx:run-commands",
             "options": {
                 "parallel": false,
                 "commands": [

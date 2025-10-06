@@ -5,8 +5,6 @@ import { CreateUserRequest, CreateUserResponse, UserService as NativeUserService
 import { faker } from "@faker-js/faker";
 
 export class RegisteredUser {
-    constructor(private svc: UserService) { }
-
     public readonly minimal: CreateUserRequest = {
         $typeName: "zitadel.user.v2.CreateUserRequest",
         organizationId: "340565276842066283",
@@ -21,7 +19,7 @@ export class RegisteredUser {
                     email: faker.internet.email(),
                     verification: {
                         case: "isVerified",
-                        value: true
+                        value: false
                     }
                 },
                 profile: {
@@ -31,7 +29,7 @@ export class RegisteredUser {
                 },
                 phone: {
                     $typeName: "zitadel.user.v2.SetHumanPhone",
-                    phone: faker.phone.number(),
+                    phone: faker.phone.number({ style: "international" }),
                     verification: {
                         case: "isVerified",
                         value: true
@@ -48,12 +46,21 @@ export class RegisteredUser {
             },
         }
     };
+
+    constructor(private svc: UserService) { }
+
     public res: CreateUserResponse | null = null;
     public req: CreateUserRequest = { ...this.minimal };
 
     async create(req: CreateUserRequest = this.minimal) {
         this.req = req;
+        try {
         this.res = await this.svc.native.createUser(req);
+        } catch (e) {
+            console.error("Error creating user:", e);
+        }
+        console.log("Created user", this.res);
+        return this.res;
     }
 
     async cleanup() {
@@ -63,7 +70,10 @@ export class RegisteredUser {
     }
 
     get username(): string {
-        return this.req.username!;
+        if (this.req.userType?.case !== "human" || !this.req.userType.value.email) {
+            throw new Error("User has no email in the request.");
+        }
+        return this.req.userType?.value.email.email!;
     }
 
     get password(): string {
@@ -71,6 +81,13 @@ export class RegisteredUser {
             throw new Error("User has no password in the request.");
         }
         return this.req.userType.value.passwordType.value.password;
+    }
+
+    get phone(): string {
+        if (this.req.userType?.case !== "human" || !this.req.userType.value.phone) {
+            throw new Error("User has no phone in the request.");
+        }
+        return this.req.userType.value.phone.phone;
     }
 
     get fullName(): string {

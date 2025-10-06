@@ -3,19 +3,25 @@ import { emailVerify } from "./email-verify.js";
 import { passkeyRegister } from "./passkey.js";
 import { eventualEmailOTP } from "./mock.js";
 import { test as base, UserService } from "./api.js";
+import { faker } from "@faker-js/faker";
 
 export class AnonymousUser {
 
   private readonly passwordField = "password-text-input";
   private readonly passwordConfirmField = "password-confirm-text-input";
-  private username: string | null = null;
+  public username: string | null = null;
+
+  defaultFirstName = faker.person.firstName();
+  defaultLastName = faker.person.lastName()
+  defaultEmail = faker.internet.email();
+  
 
   constructor(private page: Page, private svc: UserService) { }
 
   public async registerWithPassword(
-    firstname: string,
-    lastname: string,
-    email: string,
+    firstname: string = this.defaultFirstName,
+    lastname: string = this.defaultLastName,
+    email: string = this.defaultEmail,
     password1: string,
     password2: string,
   ) {
@@ -28,7 +34,11 @@ export class AnonymousUser {
     await this.verifyEmail(email);
   }
 
-  public async registerWithPasskey(firstname: string, lastname: string, email: string): Promise<string> {
+  public async registerWithPasskey(
+    firstname: string = this.defaultFirstName,
+    lastname: string = this.defaultLastName,
+     email: string = this.defaultEmail
+  ): Promise<string> {
     await this.page.goto("/ui/v2/login/register");
     await this.registerUserScreenPasskey(firstname, lastname, email);
     await this.page.getByTestId("submit-button").click();
