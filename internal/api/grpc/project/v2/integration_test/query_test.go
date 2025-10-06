@@ -880,7 +880,7 @@ func TestServer_ListProjects_PermissionV2(t *testing.T) {
 					request.Filters[0].Filter = &project.ProjectSearchFilter_OrganizationIdFilter{
 						OrganizationIdFilter: &project.ProjectOrganizationIDFilter{
 							OrganizationId: *grantedProjectResp.GrantedOrganizationId,
-							Type:           project.ProjectOrganizationIDFilter_OWNED_OR_GRANTED,
+							Type:           project.ProjectOrganizationIDFilter_OWNED,
 						},
 					}
 				},

@@ -177,9 +177,9 @@ message ProjectOrganizationIDFilter {
     OWNED_OR_GRANTED = 3;
   }
   // Defines whether to filter for owned, granted or both types of projects.
+  // If not specified, defaults to OWNED_OR_GRANTED and will return both owned and granted projects.
   Type type = 2 [
-    (validate.rules).enum = {defined_only: true, not_in: [0]},
-    (google.api.field_behavior) = REQUIRED
+    (validate.rules).enum = {defined_only: true}
   ];
 }
 
