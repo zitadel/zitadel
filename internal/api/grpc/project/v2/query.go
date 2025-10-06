@@ -116,7 +116,7 @@ func projectOrganizationIDFilterToQuery(q *project_pb.ProjectOrganizationIDFilte
 	case project_pb.ProjectOrganizationIDFilter_OWNED:
 		return query.NewGrantedProjectResourceOwnerSearchQuery(q.GetOrganizationId())
 	case project_pb.ProjectOrganizationIDFilter_GRANTED:
-		return query.NewGrantedProjectGrantResourceOwnerSearchQuery(q.GetOrganizationId())
+		return query.NewGrantedProjectGrantedOrganizationIDSearchQuery(q.GetOrganizationId())
 	case project_pb.ProjectOrganizationIDFilter_OWNED_OR_GRANTED:
 		return query.NewGrantedProjectOrganizationIDSearchQuery(q.GetOrganizationId())
 	case project_pb.ProjectOrganizationIDFilter_TYPE_UNSPECIFIED:
