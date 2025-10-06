@@ -35,7 +35,7 @@ jobs:
     continue-on-error: true
     if: ${{ github.event_name == 'pull_request' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: bufbuild/buf-setup-action@v1
         with:
           version: ${{ inputs.buf_version }}
@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Install Dev Container CLI
         run: npm install -g @devcontainers/cli@0.80.0
       - name: Set up Docker Buildx
@@ -75,8 +75,8 @@ jobs:
     if: ${{ github.event_name == 'pull_request' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+        uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: "go.mod"
       - uses: actions/cache/restore@v4

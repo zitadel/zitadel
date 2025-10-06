@@ -33,7 +33,7 @@ jobs:
     outputs:
       login_build_image: ${{ steps.short-sha.outputs.login_build_image }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Login meta
         id: login-meta
         uses: docker/metadata-action@v5
