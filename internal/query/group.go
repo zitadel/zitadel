@@ -85,6 +85,8 @@ func (q *Queries) GetGroupByID(ctx context.Context, id string) (group *Group, er
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	// todo: add permission check
+
 	stmt, scan := prepareGroupQuery()
 	eq := sq.Eq{
 		GroupColumnID.identifier():         id,
@@ -107,6 +109,8 @@ func (q *Queries) GetGroupByID(ctx context.Context, id string) (group *Group, er
 func (q *Queries) SearchGroups(ctx context.Context, queries *GroupSearchQuery) (_ *Groups, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	// todo: add permission check
 
 	groups, err := q.searchGroups(ctx, queries)
 	if err != nil {
