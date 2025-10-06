@@ -26,16 +26,16 @@ jobs:
     steps:
     -
       name: Source checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
     -
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v5
       if: ${{ !inputs.dry_run }}
       with:
         path: .artifacts
         pattern: "{checksums.txt,zitadel-*}"
     -
       name: Semantic Release
-      uses: cycjimmy/semantic-release-action@v4
+      uses: cycjimmy/semantic-release-action@v5
       id: semantic
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
