@@ -32,7 +32,7 @@ Zitadel is an open-source identity and access management platform built with a m
 
 Jump to the dedicated sections for developing a specific project:
 
-- [Contributing to the API](#contribute-api-code)
+- [Contributing to the API](#contribute-to-api)
 - [Contributing to the Login](#contribute-to-login)
 - [Contributing to the Console](#contribute-to-console)
 - [Contributing to the Docs](#contribute-to-docs)
@@ -223,7 +223,7 @@ The API is designed to be used by different clients, such as web applications, m
 Therefore, the API is designed to be easy to use, consistent, and reliable.
 Please check out the dedicated [API guidelines](./API_DESIGN.md) page when contributing to the API.
 
-## Contribute API Code
+## Contribute to API
 
 To start developing, make sure you followed the [quick start](#quick-start) steps.
 
@@ -252,7 +252,7 @@ For example, in VSCode, you can use a `launch.json` configuration like this.
 
 ```json
    {
-      "name": "Debug Zitadel",
+      "name": "Debug Zitadel API",
       "type": "go",
       "request": "launch",
       "mode": "debug",
@@ -261,7 +261,13 @@ For example, in VSCode, you can use a `launch.json` configuration like this.
       },
       "program": "main.go",
       "args": [
-            "start-from-init", "--config", "${workspaceFolder}/apps/api/dev.yaml", "--steps", "${workspaceFolder}/apps/api/dev.yaml", "--masterkey", "MasterkeyNeedsToHave32Characters"
+            "start-from-init",
+            "--config",
+            "${workspaceFolder}/apps/api/prod-default.yaml",
+            "--steps",
+            "${workspaceFolder}/apps/api/prod-default.yaml",
+            "--masterkey",
+            "MasterkeyNeedsToHave32Characters"
       ]
    }
 ```
@@ -317,16 +323,13 @@ go test -count 1 -tags integration -parallel 1 $(go list -tags integration ./...
 
 It is also possible to run the API in a debugger and run the integrations tests against it.
 In order to run the server, a database with correctly set up data is required.
-When starting the debugger, make sure the Zitadel binary starts with `start-from-init --config=./apps/api/test-integration.yaml --steps=./apps/api/test-integration.yaml --masterkey=MasterkeyNeedsToHave32Characters"`
+When starting the debugger, make sure the Zitadel binary starts with `start-from-init --config=./apps/api/test-integration-api.yaml --steps=./apps/api/test-integration-api.yaml --masterkey=MasterkeyNeedsToHave32Characters"`
 
 To cleanup after testing (deletes the ephemeral database!):
 
 ```bash
 pnpm nx run @zitadel/devcontainer:compose down db-api-integration cache-api-integration
 ```
-
-The test binary has the race detector enabled. `api_integration_server_stop` checks for any race logs reported by Go and will print them along a `66` exit code when found.
-Note that the actual race condition may have happened anywhere during the server lifetime, including start, stop or serving gRPC requests during tests.
 
 ### Run Functional UI Tests
 
