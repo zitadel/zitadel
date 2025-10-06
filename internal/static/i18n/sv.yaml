@@ -95,6 +95,7 @@ Errors:
     InitCodeNotFound: Initieringskod hittades inte
     UsernameNotChanged: Användarnamn ändrades inte
     InvalidURLTemplate: URL-mallen är felaktig
+    Locked: Användaren är låst
     Profile:
       NotFound: Profil hittades inte
       NotChanged: Profil ändrades inte
@@ -177,6 +178,11 @@ Errors:
         NotExisting: U2F finns inte
       Passwordless:
         NotExisting: Lösenordsfri finns inte
+      RecoveryCodes:
+        InvalidCode: Ogiltig återställningskod angiven
+        MaxCountExceeded: Maximalt antal återställningskoder överskridet
+        NotReady: Återställningskoder är inte redo för användning
+        ConfigInvalid: Konfiguration för återställningskoder är ogiltig
     WebAuthN:
       NotFound: WebAuthN-token kunde inte hittas
       BeginRegisterFailed: WebAuthN-registrering misslyckades

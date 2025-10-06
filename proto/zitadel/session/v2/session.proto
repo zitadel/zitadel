@@ -56,6 +56,7 @@ message Factors {
   TOTPFactor totp = 5;
   OTPFactor otp_sms = 6;
   OTPFactor otp_email = 7;
+  RecoveryCodeFactor recovery_code = 8;
 }
 
 message UserFactor {
@@ -125,6 +126,14 @@ message OTPFactor {
   google.protobuf.Timestamp verified_at = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"time when the One-Time Password was last checked\"";
+    }
+  ];
+}
+
+message RecoveryCodeFactor {
+  google.protobuf.Timestamp verified_at = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time when the Recovery Code was last checked\"";
     }
   ];
 }

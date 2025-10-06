@@ -74,6 +74,7 @@ SELECT
     , u.instance_id
     , (SELECT EXISTS (SELECT true FROM verified_auth_methods WHERE method_type = 6)) AS otp_sms_added
     , (SELECT EXISTS (SELECT true FROM verified_auth_methods WHERE method_type = 7)) AS otp_email_added
+    , (SELECT EXISTS (SELECT true FROM verified_auth_methods WHERE method_type = 8)) AS recovery_code_added
 FROM projections.users14 u
     LEFT JOIN projections.users14_humans h
         ON u.instance_id = h.instance_id
