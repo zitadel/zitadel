@@ -28,7 +28,10 @@ export async function createServiceForHost<T extends ServiceClass>(
   if (
     process.env.AUDIENCE &&
     process.env.SYSTEM_USER_ID &&
-    process.env.SYSTEM_USER_PRIVATE_KEY
+    (
+      process.env.SYSTEM_USER_PRIVATE_KEY ||
+      process.env.SYSTEM_USER_PRIVATE_KEY_FILE
+    )
   ) {
     token = await systemAPIToken();
   } else if (process.env.ZITADEL_SERVICE_USER_TOKEN) {
