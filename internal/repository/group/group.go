@@ -3,7 +3,6 @@ package group
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -12,11 +11,6 @@ const (
 	GroupAddedEventType   = groupEventTypePrefix + "added"
 	GroupChangedEventType = groupEventTypePrefix + "changed"
 	GroupRemovedEventType = groupEventTypePrefix + "removed"
-
-	GroupSearchType       = "group"
-	GroupNameSearchField  = "name"
-	GroupStateSearchField = "state"
-	GroupObjectRevision   = uint8(1)
 )
 
 type GroupAddedEvent struct {
@@ -52,45 +46,6 @@ func (g *GroupAddedEvent) Payload() any {
 
 func (g *GroupAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewAddGroupNameUniqueConstraint(g.Name, g.Aggregate().ResourceOwner)}
-}
-
-func (g *GroupAddedEvent) Fields() []*eventstore.FieldOperation {
-	return []*eventstore.FieldOperation{
-		eventstore.SetField(
-			g.Aggregate(),
-			groupSearchObject(g.Aggregate().ID),
-			GroupNameSearchField,
-			&eventstore.Value{
-				Value:       g.Name,
-				ShouldIndex: true,
-			},
-			eventstore.FieldTypeInstanceID,
-			eventstore.FieldTypeResourceOwner,
-			eventstore.FieldTypeAggregateType,
-			eventstore.FieldTypeAggregateID,
-			eventstore.FieldTypeObjectType,
-			eventstore.FieldTypeObjectID,
-			eventstore.FieldTypeObjectRevision,
-			eventstore.FieldTypeFieldName,
-		),
-		eventstore.SetField(
-			g.Aggregate(),
-			groupSearchObject(g.Aggregate().ID),
-			GroupStateSearchField,
-			&eventstore.Value{
-				Value:       domain.GroupStateActive,
-				ShouldIndex: true,
-			},
-			eventstore.FieldTypeInstanceID,
-			eventstore.FieldTypeResourceOwner,
-			eventstore.FieldTypeAggregateID,
-			eventstore.FieldTypeAggregateType,
-			eventstore.FieldTypeObjectType,
-			eventstore.FieldTypeObjectID,
-			eventstore.FieldTypeObjectRevision,
-			eventstore.FieldTypeFieldName,
-		),
-	}
 }
 
 func NewAddGroupNameUniqueConstraint(groupName, organizationID string) *eventstore.UniqueConstraint {
@@ -138,15 +93,15 @@ func NewGroupChangedEvent(
 
 type GroupChanges func(event *GroupChangedEvent)
 
-func ChangeName(name string) func(event *GroupChangedEvent) {
+func ChangeName(name *string) func(event *GroupChangedEvent) {
 	return func(event *GroupChangedEvent) {
-		event.Name = &name
+		event.Name = name
 	}
 }
 
-func ChangeDescription(description string) func(event *GroupChangedEvent) {
+func ChangeDescription(description *string) func(event *GroupChangedEvent) {
 	return func(event *GroupChangedEvent) {
-		event.Description = &description
+		event.Description = description
 	}
 }
 
@@ -165,31 +120,6 @@ func (g *GroupChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{
 		NewRemoveGroupNameUniqueConstraint(g.oldName, g.Aggregate().ResourceOwner),
 		NewAddGroupNameUniqueConstraint(*g.Name, g.Aggregate().ResourceOwner)}
-}
-
-func (g *GroupChangedEvent) Fields() []*eventstore.FieldOperation {
-	if g.Name == nil {
-		return nil
-	}
-	return []*eventstore.FieldOperation{
-		eventstore.SetField(
-			g.Aggregate(),
-			groupSearchObject(g.Aggregate().ID),
-			GroupNameSearchField,
-			&eventstore.Value{
-				Value:       *g.Name,
-				ShouldIndex: true,
-			},
-			eventstore.FieldTypeInstanceID,
-			eventstore.FieldTypeResourceOwner,
-			eventstore.FieldTypeAggregateType,
-			eventstore.FieldTypeAggregateID,
-			eventstore.FieldTypeObjectType,
-			eventstore.FieldTypeObjectID,
-			eventstore.FieldTypeObjectRevision,
-			eventstore.FieldTypeFieldName,
-		),
-	}
 }
 
 type GroupRemovedEvent struct {
@@ -222,18 +152,4 @@ func (g *GroupRemovedEvent) Payload() any {
 
 func (g *GroupRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewRemoveGroupNameUniqueConstraint(g.name, g.Aggregate().ResourceOwner)}
-}
-
-func (g *GroupRemovedEvent) Fields() []*eventstore.FieldOperation {
-	return []*eventstore.FieldOperation{
-		eventstore.RemoveSearchFieldsByAggregate(g.Aggregate()),
-	}
-}
-
-func groupSearchObject(id string) eventstore.Object {
-	return eventstore.Object{
-		Type:     GroupSearchType,
-		Revision: GroupObjectRevision,
-		ID:       id,
-	}
 }

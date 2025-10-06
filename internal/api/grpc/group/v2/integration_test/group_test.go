@@ -150,7 +150,7 @@ func TestServer_UpdateGroup(t *testing.T) {
 				Name: gu.Ptr(" "),
 			},
 			wantErrCode: codes.InvalidArgument,
-			wantErrMsg:  "Errors.Group.InvalidName (GROUP-m177lN)",
+			wantErrMsg:  "Errors.Group.InvalidName (GROUP-dUNd3r)",
 		},
 		{
 			name: "group not found, error",
