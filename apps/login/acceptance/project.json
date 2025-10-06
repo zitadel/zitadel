@@ -50,7 +50,7 @@
                 "build-api",
                 "run-db"
             ],
-            "command": "nx run @zitadel/api:prod:test-acceptance-login"
+            "command": "nx run @zitadel/api:prod:test-acceptance-login --excludeTaskDependencies"
         },
         "run-db": {
             "description": "Runs an ephemeral database for running acceptance tests",
@@ -59,9 +59,7 @@
         },
         "build-api": {
             "dependsOn": [
-                "generate-stubs",
-                "generate-assets",
-                "generate-statik"
+                "@zitadel/api:generate"
             ],
             "command": "nx run @zitadel/api:build --excludeTaskDependencies"
         }

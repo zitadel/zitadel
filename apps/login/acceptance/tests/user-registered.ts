@@ -3,7 +3,7 @@ import { Transport } from "@connectrpc/connect";
 import { UserService } from "./api.js";
 import { CreateUserRequest, CreateUserRequestSchema, CreateUserResponse, UserService as NativeUserService } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import minimalRequest from './user-registered-request.json' with { type: "json" };
-import { create, fromJson } from "@zitadel/client";
+import { fromJson } from "@zitadel/client";
 import { faker } from "@faker-js/faker";
 
 export class CreateUserRequestBuilder {
@@ -82,7 +82,6 @@ export class RegisteredUser {
 
 export const test = base.extend<{ transport: Transport, userService: UserService, registeredUser: RegisteredUser }>({
     registeredUser: async ({ userService }, use) => {
-        console.log("Setting up user");
         const user = new RegisteredUser(userService);
         await use(user);
         await user.cleanup();
