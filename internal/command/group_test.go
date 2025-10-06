@@ -453,8 +453,8 @@ func TestCommands_UpdateGroup(t *testing.T) {
 							&group.NewAggregate("1234", "org1").Aggregate,
 							"group1",
 							[]group.GroupChanges{
-								group.ChangeName("updated group name"),
-								group.ChangeDescription("updated group description"),
+								group.ChangeName(gu.Ptr("updated group name")),
+								group.ChangeDescription(gu.Ptr("updated group description")),
 							},
 						),
 					),
@@ -519,7 +519,7 @@ func TestCommands_UpdateGroup(t *testing.T) {
 							&group.NewAggregate("1234", "org1").Aggregate,
 							"group1",
 							[]group.GroupChanges{
-								group.ChangeName("groupXX"),
+								group.ChangeName(gu.Ptr("groupXX")),
 							},
 						),
 					),
@@ -557,7 +557,7 @@ func TestCommands_UpdateGroup(t *testing.T) {
 							&group.NewAggregate("1234", "org1").Aggregate,
 							"group1",
 							[]group.GroupChanges{
-								group.ChangeDescription("updated group description"),
+								group.ChangeDescription(gu.Ptr("updated group description")),
 							},
 						),
 					),
@@ -595,8 +595,8 @@ func TestCommands_UpdateGroup(t *testing.T) {
 							&group.NewAggregate("1234", "org1").Aggregate,
 							"group1",
 							[]group.GroupChanges{
-								group.ChangeName("groupXX"),
-								group.ChangeDescription("updated group description"),
+								group.ChangeName(gu.Ptr("groupXX")),
+								group.ChangeDescription(gu.Ptr("updated group description")),
 							},
 						),
 					),

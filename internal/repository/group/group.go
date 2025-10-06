@@ -138,15 +138,15 @@ func NewGroupChangedEvent(
 
 type GroupChanges func(event *GroupChangedEvent)
 
-func ChangeName(name string) func(event *GroupChangedEvent) {
+func ChangeName(name *string) func(event *GroupChangedEvent) {
 	return func(event *GroupChangedEvent) {
-		event.Name = &name
+		event.Name = name
 	}
 }
 
-func ChangeDescription(description string) func(event *GroupChangedEvent) {
+func ChangeDescription(description *string) func(event *GroupChangedEvent) {
 	return func(event *GroupChangedEvent) {
-		event.Description = &description
+		event.Description = description
 	}
 }
 

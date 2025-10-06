@@ -69,10 +69,10 @@ func (g *GroupWriteModel) NewChangedEvent(ctx context.Context, agg *eventstore.A
 
 	if name != nil && g.Name != *name {
 		oldName = g.Name
-		changes = append(changes, group.ChangeName(*name))
+		changes = append(changes, group.ChangeName(name))
 	}
 	if description != nil && g.Description != *description {
-		changes = append(changes, group.ChangeDescription(*description))
+		changes = append(changes, group.ChangeDescription(description))
 	}
 	if len(changes) == 0 {
 		return nil
