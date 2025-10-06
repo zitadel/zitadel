@@ -1,44 +1,42 @@
 import { test as base } from "@playwright/test";
 import { Transport } from "@connectrpc/connect";
 import { UserService } from "./api.js";
-import { CreateUserRequest,  CreateUserRequestSchema, CreateUserResponse, UserService as NativeUserService } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { CreateUserRequest, CreateUserRequestSchema, CreateUserResponse, UserService as NativeUserService } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import minimalRequest from './user-registered-request.json' with { type: "json" };
-import { create } from "@zitadel/client";
+import { create, fromJson } from "@zitadel/client";
 import { faker } from "@faker-js/faker";
 
 export class CreateUserRequestBuilder {
 
-    public req = minimalRequest
+    public req = {
+        ...minimalRequest,
+        human: {
+            ...minimalRequest.human,
+            email: {
+                ...minimalRequest.human.email,
+                email: faker.internet.email(),
+            },
+            profile: {
+                ...minimalRequest.human.profile,
+                givenName: faker.person.firstName(),
+                familyName: faker.person.lastName(),
+            },
+            phone: {
+                ...minimalRequest.human.phone,
+                phone: faker.phone.number({ style: "international" }),
+            },
+        }
+    }
     constructor() { }
 
     build(): CreateUserRequest {
-        return create(CreateUserRequestSchema, {
-            ...minimalRequest,
-            ... {
-                human: {
-                    ...minimalRequest.human,
-                    email: {
-                        ...minimalRequest.human.email,
-                        email: faker.internet.email(),
-                    },
-                    profile: {
-                        ...minimalRequest.human.profile,
-                        givenName: faker.person.firstName(),
-                        familyName: faker.person.lastName(),
-                    },
-                    phone: {
-                        ...minimalRequest.human.phone,
-                        phone: faker.phone.number({ style: "international" }),
-                    },
-                }
-            }
-        })
+        return fromJson(CreateUserRequestSchema, this.req)
     }
 
     withPasswordChangeRequired(): CreateUserRequestBuilder {
         this.req.human.password.changeRequired = true;
         return this;
-   }
+    }
 }
 
 
@@ -48,11 +46,13 @@ export class RegisteredUser {
     public res: CreateUserResponse | null = null;
     public builder: CreateUserRequestBuilder = new CreateUserRequestBuilder();
 
-    async create(req?: CreateUserRequestBuilder) {
-        if (req) {
-            this.builder = req;
+    async create(builder?: CreateUserRequestBuilder) {
+        if (builder) {
+            this.builder = builder;
         }
-        this.res = await this.svc.native.createUser(this.builder.build());
+        const req = this.builder.build();
+        console.log("Creating user", req);
+        this.res = await this.svc.native.createUser(req);
         console.log("Created user", this.res);
         return this.res;
     }

@@ -17,7 +17,7 @@
         },
         "password": {
             "password": "Password1!",
-            "changeRequired": true
+            "changeRequired": false
         }
     }
 }
