@@ -95,10 +95,18 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 			instance, err := instanceRepo.Get(CTX, pool,
 				database.WithCondition(instanceRepo.IDCondition(res.GetInstanceId())),
 			)
-			assert.NoError(t, err)
-			if instance != nil {
-				assert.Equal(t, instanceName, instance.Name)
-			}
+			require.NoError(t, err)
+			assert.Equal(t, instanceName, instance.Name)
+		}, retryDuration, tick)
+
+		// check instance is projected, so the instance middleware finds it for the SystemClient.UpdateInstance call
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		require.EventuallyWithT(t, func(t *assert.CollectT) {
+			instance, err := SystemClient.GetInstance(CTX, &system.GetInstanceRequest{
+				InstanceId: res.InstanceId,
+			})
+			require.NoError(t, err)
+			assert.Equal(t, instanceName, instance.Instance.Name)
 		}, retryDuration, tick)
 
 		instanceName += "new"
@@ -144,6 +152,16 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 			assert.Equal(t, instanceName, instance.Name)
+		}, retryDuration, tick)
+
+		// check instance is projected, so the instance middleware finds it for the SystemClient.RemoveInstance call
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		require.EventuallyWithT(t, func(t *assert.CollectT) {
+			instance, err := SystemClient.GetInstance(CTX, &system.GetInstanceRequest{
+				InstanceId: res.InstanceId,
+			})
+			require.NoError(t, err)
+			assert.Equal(t, instanceName, instance.Instance.Name)
 		}, retryDuration, tick)
 
 		_, err = SystemClient.RemoveInstance(CTX, &system.RemoveInstanceRequest{
