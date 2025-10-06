@@ -29,6 +29,7 @@ import (
 	authorization "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	feature_v2beta "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
+	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
@@ -86,6 +87,7 @@ type Client struct {
 	AppV2Beta                app.AppServiceClient
 	InternalPermissionv2Beta internal_permission_v2beta.InternalPermissionServiceClient
 	AuthorizationV2Beta      authorization.AuthorizationServiceClient
+	GroupV2                  group_v2.GroupServiceClient
 }
 
 func NewDefaultClient(ctx context.Context) (*Client, error) {
@@ -130,6 +132,7 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		AppV2Beta:                app.NewAppServiceClient(cc),
 		InternalPermissionv2Beta: internal_permission_v2beta.NewInternalPermissionServiceClient(cc),
 		AuthorizationV2Beta:      authorization.NewAuthorizationServiceClient(cc),
+		GroupV2:                  group_v2.NewGroupServiceClient(cc),
 	}
 	return client, client.pollHealth(ctx)
 }
@@ -1284,4 +1287,21 @@ func (i *Instance) ActivateSchemaUser(ctx context.Context, orgID string, userID 
 	})
 	logging.OnError(err).Fatal("reactivate user")
 	return user
+}
+
+func (i *Instance) CreateGroup(ctx context.Context, t *testing.T, orgID, name string) *group_v2.CreateGroupResponse {
+	resp, err := i.Client.GroupV2.CreateGroup(ctx, &group_v2.CreateGroupRequest{
+		OrganizationId: orgID,
+		Name:           name,
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) DeleteGroup(ctx context.Context, t *testing.T, id string) *group_v2.DeleteGroupResponse {
+	resp, err := i.Client.GroupV2.DeleteGroup(ctx, &group_v2.DeleteGroupRequest{
+		Id: id,
+	})
+	require.NoError(t, err)
+	return resp
 }
