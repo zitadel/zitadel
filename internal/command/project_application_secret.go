@@ -32,7 +32,7 @@ func (c *Commands) ChangeApplicationSecret(ctx context.Context, projectID, appID
 		return "", time.Time{}, err
 	}
 
-	projectAgg := ProjectAggregateFromWriteModel(&existingApplication.WriteModel)
+	projectAgg := ProjectAggregateFromWriteModelWithCTX(ctx, &existingApplication.WriteModel)
 
 	var command eventstore.Command
 	command = project_repo.NewOIDCConfigSecretChangedEvent(ctx, projectAgg, appID, encodedHash)

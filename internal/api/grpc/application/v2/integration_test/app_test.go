@@ -1273,44 +1273,35 @@ func TestRegenerateClientSecret(t *testing.T) {
 	t.Parallel()
 
 	tt := []struct {
-		testName     string
-		inputCtx     context.Context
-		regenRequest *application.GenerateClientSecretRequest
+		testName        string
+		inputCtx        context.Context
+		generateRequest *application.GenerateClientSecretRequest
 
 		expectedErrorType codes.Code
 		oldSecret         string
 	}{
 		{
-			testName: "when application to regen is not expected type should return invalid argument error",
+			testName: "when application to generate is not found should return not found error",
 			inputCtx: IAMOwnerCtx,
-			regenRequest: &application.GenerateClientSecretRequest{
-				ProjectId:     p.GetId(),
-				ApplicationId: integration.ID(),
-			},
-			expectedErrorType: codes.InvalidArgument,
-		},
-		{
-			testName: "when application to regen is not found should return not found error",
-			inputCtx: IAMOwnerCtx,
-			regenRequest: &application.GenerateClientSecretRequest{
+			generateRequest: &application.GenerateClientSecretRequest{
 				ProjectId:     p.GetId(),
 				ApplicationId: integration.ID(),
 			},
 			expectedErrorType: codes.NotFound,
 		},
 		{
-			testName: "when API application to regen is found should return different secret",
+			testName: "when API application to generate is found should return different secret",
 			inputCtx: IAMOwnerCtx,
-			regenRequest: &application.GenerateClientSecretRequest{
+			generateRequest: &application.GenerateClientSecretRequest{
 				ProjectId:     p.GetId(),
 				ApplicationId: apiAppToRegen.GetApplicationId(),
 			},
 			oldSecret: apiAppToRegen.GetApiConfiguration().GetClientSecret(),
 		},
 		{
-			testName: "when OIDC application to regen is found should return different secret",
+			testName: "when OIDC application to generate is found should return different secret",
 			inputCtx: IAMOwnerCtx,
-			regenRequest: &application.GenerateClientSecretRequest{
+			generateRequest: &application.GenerateClientSecretRequest{
 				ProjectId:     p.GetId(),
 				ApplicationId: oidcAppToRegen.GetApplicationId(),
 			},
@@ -1323,7 +1314,7 @@ func TestRegenerateClientSecret(t *testing.T) {
 			t.Parallel()
 
 			// When
-			res, err := instance.Client.ApplicationV2.GenerateClientSecret(tc.inputCtx, tc.regenRequest)
+			res, err := instance.Client.ApplicationV2.GenerateClientSecret(tc.inputCtx, tc.generateRequest)
 
 			// Then
 			require.Equal(t, tc.expectedErrorType, status.Code(err))

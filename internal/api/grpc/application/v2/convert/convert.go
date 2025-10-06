@@ -166,6 +166,8 @@ func applicationTypeFilterToQuery(t application.ApplicationType) (*query.NotNull
 		return query.NewNotNullQuery(query.AppAPIConfigColumnAppID)
 	case application.ApplicationType_APPLICATION_TYPE_SAML:
 		return query.NewNotNullQuery(query.AppSAMLConfigColumnAppID)
+	case application.ApplicationType_APPLICATION_TYPE_UNSPECIFIED:
+		return nil, zerrors.ThrowInvalidArgument(nil, "CONV-Jke83s", "List.Query.Invalid")
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "CONV-Skj3q", "List.Query.Invalid")
 	}

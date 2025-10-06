@@ -124,6 +124,7 @@ func isProjectStateExists(state domain.ProjectState) bool {
 	return !slices.Contains([]domain.ProjectState{domain.ProjectStateRemoved, domain.ProjectStateUnspecified}, state)
 }
 
+// deprecated: use ProjectAggregateFromWriteModelWithCTX
 func ProjectAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
 	return eventstore.AggregateFromWriteModel(wm, project.AggregateType, project.AggregateVersion)
 }
