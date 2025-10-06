@@ -59,7 +59,3 @@ func (s *Server) MethodPrefix() string {
 func (s *Server) AuthMethods() authz.MethodMapping {
 	return group_v2.GroupService_AuthMethods
 }
-
-func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
-	return group_v2.RegisterGroupServiceHandler
-}
