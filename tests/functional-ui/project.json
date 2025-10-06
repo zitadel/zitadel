@@ -10,11 +10,12 @@
         "description": "Sets up and runs the Zitadel API with the embedded Console against which the functional UI tests are run.",
         "continuous": true,
         "dependsOn": [
+            "@zitadel/api:build",
             "run-db"
         ],
         "executor": "nx:run-commands",
         "options": {
-            "command": "nx run @zitadel/api:prod:test-functional-ui"
+            "command": "nx run @zitadel/api:prod:test-functional-ui --excludeTaskDependencies"
         }  
     },
     "open": {
