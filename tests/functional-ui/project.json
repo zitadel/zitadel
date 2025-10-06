@@ -10,9 +10,13 @@
         "description": "Sets up and runs the Zitadel API with the embedded Console against which the functional UI tests are run.",
         "continuous": true,
         "dependsOn": [
+            "@zitadel/api:build",
             "run-db"
         ],
-        "command": "nx run @zitadel/api:prod:test-functional-ui"
+        "executor": "nx:run-commands",
+        "options": {
+            "command": "nx run @zitadel/api:prod:test-functional-ui --excludeTaskDependencies"
+        }  
     },
     "open": {
       "description": "Opens the Cypress Test Runner for interactive testing.",

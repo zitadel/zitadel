@@ -26,6 +26,9 @@
         "prod": {
             "description": "Runs the Go-based API backend in production mode",
             "continuous": true,
+            "dependsOn": [
+                "build"
+            ],
             "executor": "nx:run-commands",
             "options": {
                 "parallel": false,
@@ -174,7 +177,7 @@
                 "commands": [
                     "rm -rf .artifacts/api-test-integration",
                     "mkdir -p ${GOCOVERDIR}",
-                    "nx run @zitadel/api:prod:test-integration-api"
+                    "nx run @zitadel/api:prod:test-integration-api --excludeTaskDependencies"
                 ]
             }
         },

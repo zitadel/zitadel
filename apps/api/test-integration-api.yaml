@@ -63,7 +63,7 @@ Quotas:
 Telemetry:
   Enabled: true
   Endpoints:
-  - http://localhost:8101/milestone
+  - http://localhost:8081/milestone
   Headers:
     single-value: "single-value"
     multi-value:
