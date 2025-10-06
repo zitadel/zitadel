@@ -7,9 +7,9 @@
       "dependsOn": [
         "build"
       ],
-      "defaultConfiguration": "dev",
+      "defaultConfiguration": "default",
       "configurations": {
-        "dev": {},
+        "default": {},
         "test-login-integration": {}
       }
     },
