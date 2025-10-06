@@ -3926,7 +3926,7 @@ service ManagementService {
 
     // Generate New OIDC Client Secret
     //
-    // Deprecated: Use [RegenerateClientSecret](/apis/resources/application_service_v2/zitadel-application-v-2-application-service-regenerate-client-secret.api.mdx) instead to regenerate an OIDC app client secret.
+    // Deprecated: Use [GenerateClientSecret](/apis/resources/application_service_v2/zitadel-application-v-2-application-service-generate-client-secret.api.mdx) instead to (re-)generate an OIDC app client secret.
     //
     // Generates a new client secret for the OIDC application, make sure to save the response.
     rpc RegenerateOIDCClientSecret(RegenerateOIDCClientSecretRequest) returns (RegenerateOIDCClientSecretResponse) {
