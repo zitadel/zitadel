@@ -100,7 +100,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// check instance is projected
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		require.EventuallyWithT(t, func(t *assert.CollectT) {
 			instance, err := SystemClient.GetInstance(CTX, &system.GetInstanceRequest{
 				InstanceId: res.InstanceId,
