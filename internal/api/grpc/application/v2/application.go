@@ -16,8 +16,8 @@ import (
 
 func (s *Server) CreateApplication(ctx context.Context, req *connect.Request[application.CreateApplicationRequest]) (*connect.Response[application.CreateApplicationResponse], error) {
 	switch t := req.Msg.GetApplicationType().(type) {
-	case *application.CreateApplicationRequest_ApiRequest:
-		apiApp, err := s.command.AddAPIApplication(ctx, convert.CreateAPIApplicationRequestToDomain(req.Msg.GetName(), req.Msg.GetProjectId(), req.Msg.GetId(), t.ApiRequest), "")
+	case *application.CreateApplicationRequest_ApiConfiguration:
+		apiApp, err := s.command.AddAPIApplication(ctx, convert.CreateAPIApplicationRequestToDomain(req.Msg.GetName(), req.Msg.GetProjectId(), req.Msg.GetApplicationId(), t.ApiConfiguration), "")
 		if err != nil {
 			return nil, err
 		}
@@ -25,16 +25,16 @@ func (s *Server) CreateApplication(ctx context.Context, req *connect.Request[app
 		return connect.NewResponse(&application.CreateApplicationResponse{
 			ApplicationId: apiApp.AppID,
 			CreationDate:  timestamppb.New(apiApp.ChangeDate),
-			CreationResponseType: &application.CreateApplicationResponse_ApiResponse{
-				ApiResponse: &application.CreateAPIApplicationResponse{
+			ApplicationType: &application.CreateApplicationResponse_ApiConfiguration{
+				ApiConfiguration: &application.CreateAPIApplicationResponse{
 					ClientId:     apiApp.ClientID,
 					ClientSecret: apiApp.ClientSecretString,
 				},
 			},
 		}), nil
 
-	case *application.CreateApplicationRequest_OidcRequest:
-		oidcAppRequest, err := convert.CreateOIDCAppRequestToDomain(req.Msg.GetName(), req.Msg.GetProjectId(), req.Msg.GetOidcRequest())
+	case *application.CreateApplicationRequest_OidcConfiguration:
+		oidcAppRequest, err := convert.CreateOIDCAppRequestToDomain(req.Msg.GetName(), req.Msg.GetProjectId(), req.Msg.GetOidcConfiguration())
 		if err != nil {
 			return nil, err
 		}
@@ -47,8 +47,8 @@ func (s *Server) CreateApplication(ctx context.Context, req *connect.Request[app
 		return connect.NewResponse(&application.CreateApplicationResponse{
 			ApplicationId: oidcApp.AppID,
 			CreationDate:  timestamppb.New(oidcApp.ChangeDate),
-			CreationResponseType: &application.CreateApplicationResponse_OidcResponse{
-				OidcResponse: &application.CreateOIDCApplicationResponse{
+			ApplicationType: &application.CreateApplicationResponse_OidcConfiguration{
+				OidcConfiguration: &application.CreateOIDCApplicationResponse{
 					ClientId:           oidcApp.ClientID,
 					ClientSecret:       oidcApp.ClientSecretString,
 					NoneCompliant:      oidcApp.Compliance.NoneCompliant,
@@ -57,8 +57,8 @@ func (s *Server) CreateApplication(ctx context.Context, req *connect.Request[app
 			},
 		}), nil
 
-	case *application.CreateApplicationRequest_SamlRequest:
-		samlAppRequest, err := convert.CreateSAMLAppRequestToDomain(req.Msg.GetName(), req.Msg.GetProjectId(), req.Msg.GetSamlRequest())
+	case *application.CreateApplicationRequest_SamlConfiguration:
+		samlAppRequest, err := convert.CreateSAMLAppRequestToDomain(req.Msg.GetName(), req.Msg.GetProjectId(), req.Msg.GetSamlConfiguration())
 		if err != nil {
 			return nil, err
 		}
@@ -71,8 +71,8 @@ func (s *Server) CreateApplication(ctx context.Context, req *connect.Request[app
 		return connect.NewResponse(&application.CreateApplicationResponse{
 			ApplicationId: samlApp.AppID,
 			CreationDate:  timestamppb.New(samlApp.ChangeDate),
-			CreationResponseType: &application.CreateApplicationResponse_SamlResponse{
-				SamlResponse: &application.CreateSAMLApplicationResponse{},
+			ApplicationType: &application.CreateApplicationResponse_SamlConfiguration{
+				SamlConfiguration: &application.CreateSAMLApplicationResponse{},
 			},
 		}), nil
 	default:
@@ -88,7 +88,7 @@ func (s *Server) UpdateApplication(ctx context.Context, req *connect.Request[app
 			ctx,
 			req.Msg.GetProjectId(),
 			&domain.ChangeApp{
-				AppID:   req.Msg.GetId(),
+				AppID:   req.Msg.GetApplicationId(),
 				AppName: name,
 			},
 			"",
@@ -100,17 +100,17 @@ func (s *Server) UpdateApplication(ctx context.Context, req *connect.Request[app
 		changedTime = updatedDetails.EventDate
 	}
 
-	switch t := req.Msg.GetUpdateRequestType().(type) {
-	case *application.UpdateApplicationRequest_ApiConfigurationRequest:
-		updatedAPIApp, err := s.command.UpdateAPIApplication(ctx, convert.UpdateAPIApplicationConfigurationRequestToDomain(req.Msg.GetId(), req.Msg.GetProjectId(), t.ApiConfigurationRequest), "")
+	switch t := req.Msg.GetApplicationType().(type) {
+	case *application.UpdateApplicationRequest_ApiConfiguration:
+		updatedAPIApp, err := s.command.UpdateAPIApplication(ctx, convert.UpdateAPIApplicationConfigurationRequestToDomain(req.Msg.GetApplicationId(), req.Msg.GetProjectId(), t.ApiConfiguration), "")
 		if err != nil {
 			return nil, err
 		}
 
 		changedTime = updatedAPIApp.ChangeDate
 
-	case *application.UpdateApplicationRequest_OidcConfigurationRequest:
-		oidcApp, err := convert.UpdateOIDCAppConfigRequestToDomain(req.Msg.GetId(), req.Msg.GetProjectId(), t.OidcConfigurationRequest)
+	case *application.UpdateApplicationRequest_OidcConfiguration:
+		oidcApp, err := convert.UpdateOIDCAppConfigRequestToDomain(req.Msg.GetApplicationId(), req.Msg.GetProjectId(), t.OidcConfiguration)
 		if err != nil {
 			return nil, err
 		}
@@ -122,8 +122,8 @@ func (s *Server) UpdateApplication(ctx context.Context, req *connect.Request[app
 
 		changedTime = updatedOIDCApp.ChangeDate
 
-	case *application.UpdateApplicationRequest_SamlConfigurationRequest:
-		samlApp, err := convert.UpdateSAMLAppConfigRequestToDomain(req.Msg.GetId(), req.Msg.GetProjectId(), t.SamlConfigurationRequest)
+	case *application.UpdateApplicationRequest_SamlConfiguration:
+		samlApp, err := convert.UpdateSAMLAppConfigRequestToDomain(req.Msg.GetApplicationId(), req.Msg.GetProjectId(), t.SamlConfiguration)
 		if err != nil {
 			return nil, err
 		}

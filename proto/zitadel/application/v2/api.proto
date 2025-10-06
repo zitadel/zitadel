@@ -11,7 +11,7 @@ enum APIAuthMethodType {
   API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT = 1;
 }
 
-message APIConfig {
+message APIConfiguration {
   // The unique OAuth2 client_id used for authentication of the API,
   // e.g. at the introspection endpoint.
   string client_id = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629023906488334@ZITADEL\""}];

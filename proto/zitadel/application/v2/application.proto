@@ -32,10 +32,10 @@ message Application {
 
   // Depending on the application type, this field contains the specific configuration.
   // Only one of the configurations will be set.
-  oneof config {
-    OIDCConfig oidc_config = 6;
-    APIConfig api_config = 7;
-    SAMLConfig saml_config = 8;
+  oneof configuration {
+    OIDCConfiguration oidc_configuration = 6;
+    APIConfiguration api_configuration = 7;
+    SAMLConfiguration saml_configuration = 8;
   }
 }
 
@@ -54,27 +54,25 @@ enum ApplicationSorting {
   APPLICATION_SORT_BY_CHANGE_DATE = 4;
 }
 
-message ApplicationSearchQuery {
-  oneof query {
+message ApplicationSearchFilter {
+  oneof filter {
     option (validate.required) = true;
 
     // Filter the projectID the application has to belong to.
-    ProjectIDQuery project_id_query = 1;
+    ProjectIDFilter project_id_filter = 1;
 
     // Filter the applications by their name.
-    ApplicationNameQuery name_query = 2;
+    ApplicationNameFilter name_filter = 2;
 
     // Filter the applications by their state.
-    ApplicationState state_query = 3;
+    ApplicationState state_filter = 3;
 
-    // TODO: ?
-    bool api_app_only = 4;
-    bool oidc_app_only = 5;
-    bool saml_app_only = 6;
+    // Filter for specific application types.
+    ApplicationType type_filter = 4 [(validate.rules).enum = {defined_only: true, not_in:[0]}];
   }
 }
 
-message ProjectIDQuery {
+message ProjectIDFilter {
   // Search for application belonging to the project with this ID.
   string project_id = 1 [
     (validate.rules).string = {
@@ -86,7 +84,7 @@ message ProjectIDQuery {
   ];
 }
 
-message ApplicationNameQuery {
+message ApplicationNameFilter {
   // The name of the application to search for.
   string name = 1 [
     (validate.rules).string = {max_len: 200},
@@ -95,6 +93,13 @@ message ApplicationNameQuery {
 
   // The method to use for text comparison. If not set, defaults to EQUALS.
   zitadel.filter.v2.TextFilterMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+enum ApplicationType {
+  APPLICATION_TYPE_UNSPECIFIED = 0;
+  APPLICATION_TYPE_OIDC = 1;
+  APPLICATION_TYPE_API = 2;
+  APPLICATION_TYPE_SAML = 3;
 }
 
 enum ApplicationKeysSorting {
@@ -107,17 +112,22 @@ enum ApplicationKeysSorting {
   APPLICATION_KEYS_SORT_BY_TYPE = 6;
 }
 
-message ApplicationKeySearchQuery {
-  oneof query {
+message ApplicationKeySearchFilter {
+  oneof filter {
     option (validate.required) = true;
 
-    ApplicationKeyApplicationIDQuery application_id_query = 1;
-    ApplicationKeyProjectIDQuery project_id_query = 2;
-    ApplicationKeyOrganizationIDQuery organization_id_query = 3;
+    // Filter the application keys by the application ID they belong to.
+    ApplicationKeyApplicationIDFilter application_id_filter = 1;
+
+    // Filter the application keys by the project ID the corresponding application belong to.
+    ApplicationKeyProjectIDFilter project_id_filter = 2;
+
+    // Filter the application keys by the organization ID the corresponding application belong to.
+    ApplicationKeyOrganizationIDFilter organization_id_filter = 3;
   }
 }
 
-message ApplicationKeyApplicationIDQuery {
+message ApplicationKeyApplicationIDFilter {
   // Search for application keys belonging to the application with this ID.
   string application_id = 1 [
     (validate.rules).string = {max_len: 200},
@@ -126,7 +136,7 @@ message ApplicationKeyApplicationIDQuery {
   ];
 }
 
-message ApplicationKeyProjectIDQuery {
+message ApplicationKeyProjectIDFilter {
   // Search for application keys belonging to applications in the project with this ID.
   string project_id = 1 [
     (validate.rules).string = {
@@ -138,7 +148,7 @@ message ApplicationKeyProjectIDQuery {
   ];
 }
 
-message ApplicationKeyOrganizationIDQuery {
+message ApplicationKeyOrganizationIDFilter {
   // Search for application keys belonging to applications in the organization with this ID.
   string organization_id = 1 [
     (validate.rules).string = {

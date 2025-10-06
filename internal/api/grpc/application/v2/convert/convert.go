@@ -22,12 +22,12 @@ func AppToPb(query_app *query.App) *application.Application {
 	}
 
 	return &application.Application{
-		Id:           query_app.ID,
-		CreationDate: timestamppb.New(query_app.CreationDate),
-		ChangeDate:   timestamppb.New(query_app.ChangeDate),
-		State:        appStateToPb(query_app.State),
-		Name:         query_app.Name,
-		Config:       appConfigToPb(query_app),
+		Id:            query_app.ID,
+		CreationDate:  timestamppb.New(query_app.CreationDate),
+		ChangeDate:    timestamppb.New(query_app.ChangeDate),
+		State:         appStateToPb(query_app.State),
+		Name:          query_app.Name,
+		Configuration: appConfigToPb(query_app),
 	}
 }
 
@@ -47,7 +47,7 @@ func ListApplicationsRequestToModel(sysDefaults systemdefaults.SystemDefaults, r
 		return nil, err
 	}
 
-	queries, err := appQueriesToModel(req.GetQueries())
+	queries, err := appQueriesToModel(req.GetFilters())
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func appStateToPb(state domain.AppState) application.ApplicationState {
 	}
 }
 
-func appConfigToPb(app *query.App) application.ApplicationConfig {
+func appConfigToPb(app *query.App) application.IsApplicationConfiguration {
 	if app.OIDCConfig != nil {
 		return appOIDCConfigToPb(app.OIDCConfig)
 	}
@@ -132,33 +132,42 @@ func loginVersionToPb(version domain.LoginVersion, baseURI *string) *application
 	}
 }
 
-func appQueriesToModel(queries []*application.ApplicationSearchQuery) (toReturn []query.SearchQuery, err error) {
-	toReturn = make([]query.SearchQuery, len(queries))
-	for i, query := range queries {
-		toReturn[i], err = appQueryToModel(query)
+func appQueriesToModel(filters []*application.ApplicationSearchFilter) (queries []query.SearchQuery, err error) {
+	queries = make([]query.SearchQuery, len(filters))
+	for i, f := range filters {
+		queries[i], err = applicationFilterToQuery(f)
 		if err != nil {
 			return nil, err
 		}
 	}
-	return toReturn, nil
+	return queries, nil
 }
 
-func appQueryToModel(appQuery *application.ApplicationSearchQuery) (query.SearchQuery, error) {
-	switch q := appQuery.GetQuery().(type) {
-	case *application.ApplicationSearchQuery_ProjectIdQuery:
-		return query.NewAppProjectIDSearchQuery(q.ProjectIdQuery.GetProjectId())
-	case *application.ApplicationSearchQuery_NameQuery:
-		return query.NewAppNameSearchQuery(filter.TextMethodPbToQuery(q.NameQuery.GetMethod()), q.NameQuery.Name)
-	case *application.ApplicationSearchQuery_StateQuery:
-		return query.NewAppStateSearchQuery(domain.AppState(q.StateQuery))
-	case *application.ApplicationSearchQuery_ApiAppOnly:
-		return query.NewNotNullQuery(query.AppAPIConfigColumnAppID)
-	case *application.ApplicationSearchQuery_OidcAppOnly:
-		return query.NewNotNullQuery(query.AppOIDCConfigColumnAppID)
-	case *application.ApplicationSearchQuery_SamlAppOnly:
-		return query.NewNotNullQuery(query.AppSAMLConfigColumnAppID)
+func applicationFilterToQuery(applicationFilter *application.ApplicationSearchFilter) (query.SearchQuery, error) {
+	switch q := applicationFilter.GetFilter().(type) {
+	case *application.ApplicationSearchFilter_ProjectIdFilter:
+		return query.NewAppProjectIDSearchQuery(q.ProjectIdFilter.GetProjectId())
+	case *application.ApplicationSearchFilter_NameFilter:
+		return query.NewAppNameSearchQuery(filter.TextMethodPbToQuery(q.NameFilter.GetMethod()), q.NameFilter.GetName())
+	case *application.ApplicationSearchFilter_StateFilter:
+		return query.NewAppStateSearchQuery(domain.AppState(q.StateFilter))
+	case *application.ApplicationSearchFilter_TypeFilter:
+		return applicationTypeFilterToQuery(q.TypeFilter)
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "CONV-z2mAGy", "List.Query.Invalid")
+	}
+}
+
+func applicationTypeFilterToQuery(t application.ApplicationType) (*query.NotNullQuery, error) {
+	switch t {
+	case application.ApplicationType_APPLICATION_TYPE_OIDC:
+		return query.NewNotNullQuery(query.AppOIDCConfigColumnAppID)
+	case application.ApplicationType_APPLICATION_TYPE_API:
+		return query.NewNotNullQuery(query.AppAPIConfigColumnAppID)
+	case application.ApplicationType_APPLICATION_TYPE_SAML:
+		return query.NewNotNullQuery(query.AppSAMLConfigColumnAppID)
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "CONV-Skj3q", "List.Query.Invalid")
 	}
 }
 
@@ -176,7 +185,7 @@ func CreateAPIClientKeyRequestToDomain(key *application.CreateApplicationKeyRequ
 func ListApplicationKeysRequestToDomain(sysDefaults systemdefaults.SystemDefaults, req *application.ListApplicationKeysRequest) (*query.AuthNKeySearchQueries, error) {
 	var queries []query.SearchQuery
 
-	queries, err := ApplicationKeySearchQueriesToQuery(req.GetQueries())
+	queries, err := ApplicationKeySearchQueriesToQuery(req.GetFilters())
 	if err != nil {
 		return nil, err
 	}
@@ -198,10 +207,10 @@ func ListApplicationKeysRequestToDomain(sysDefaults systemdefaults.SystemDefault
 	}, nil
 }
 
-func ApplicationKeySearchQueriesToQuery(queries []*application.ApplicationKeySearchQuery) (_ []query.SearchQuery, err error) {
+func ApplicationKeySearchQueriesToQuery(queries []*application.ApplicationKeySearchFilter) (_ []query.SearchQuery, err error) {
 	searchQueries := make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
-		searchQueries[i], err = ApplicationKeySearchQueryToQuery(query)
+		searchQueries[i], err = ApplicationKeySearchFilterToQuery(query)
 		if err != nil {
 			return nil, err
 		}
@@ -209,14 +218,14 @@ func ApplicationKeySearchQueriesToQuery(queries []*application.ApplicationKeySea
 	return searchQueries, nil
 }
 
-func ApplicationKeySearchQueryToQuery(searchQuery *application.ApplicationKeySearchQuery) (query.SearchQuery, error) {
-	switch f := searchQuery.GetQuery().(type) {
-	case *application.ApplicationKeySearchQuery_ApplicationIdQuery:
-		return query.NewAuthNKeyObjectIDQuery(strings.TrimSpace(f.ApplicationIdQuery.GetApplicationId()))
-	case *application.ApplicationKeySearchQuery_OrganizationIdQuery:
-		return query.NewAuthNKeyResourceOwnerQuery(strings.TrimSpace(f.OrganizationIdQuery.GetOrganizationId()))
-	case *application.ApplicationKeySearchQuery_ProjectIdQuery:
-		return query.NewAuthNKeyAggregateIDQuery(strings.TrimSpace(f.ProjectIdQuery.GetProjectId()))
+func ApplicationKeySearchFilterToQuery(searchQuery *application.ApplicationKeySearchFilter) (query.SearchQuery, error) {
+	switch f := searchQuery.GetFilter().(type) {
+	case *application.ApplicationKeySearchFilter_ApplicationIdFilter:
+		return query.NewAuthNKeyObjectIDQuery(strings.TrimSpace(f.ApplicationIdFilter.GetApplicationId()))
+	case *application.ApplicationKeySearchFilter_OrganizationIdFilter:
+		return query.NewAuthNKeyResourceOwnerQuery(strings.TrimSpace(f.OrganizationIdFilter.GetOrganizationId()))
+	case *application.ApplicationKeySearchFilter_ProjectIdFilter:
+		return query.NewAuthNKeyAggregateIDQuery(strings.TrimSpace(f.ProjectIdFilter.GetProjectId()))
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "CONV-t3ENme", "List.Query.Invalid")
 	}

@@ -50,7 +50,7 @@ enum OIDCTokenType {
   OIDC_TOKEN_TYPE_JWT = 1;
 }
 
-message OIDCConfig {
+message OIDCConfiguration {
   // RedirectURIs are the allowed callback URIs for the OAuth2 / OIDC flows,
   // where the authorization code or tokens will be sent to.
   // The redirect_uri parameter in the authorization request must exactly match one of these URIs.
@@ -94,10 +94,10 @@ message OIDCConfig {
   // In case of a compliant configuration, this list is empty.
   repeated OIDCLocalizedMessage compliance_problems = 10;
 
-  // DevMode can be enabled for development purposes. This allows the use of
+  // DevelopmentMode can be enabled for development purposes. This allows the use of
   // OIDC non-compliant and potentially insecure settings, such as the use of
   // HTTP redirect URIs or wildcard redirect URIs.
-  bool dev_mode = 11;
+  bool development_mode = 11;
 
   // The AccessTokenType defines the type of the access token returned from ZITADEL.
   // Bearer tokens are opaque to clients. JWT tokens are self-contained and can be validated by the client.

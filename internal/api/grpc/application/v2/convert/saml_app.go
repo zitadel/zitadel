@@ -58,19 +58,19 @@ func metasToDomain(metas application.MetaType) ([]byte, *string) {
 	}
 }
 
-func appSAMLConfigToPb(samlApp *query.SAMLApp) application.ApplicationConfig {
+func appSAMLConfigToPb(samlApp *query.SAMLApp) application.IsApplicationConfiguration {
 	if samlApp == nil {
-		return &application.Application_SamlConfig{
-			SamlConfig: &application.SAMLConfig{
-				Metadata:     &application.SAMLConfig_MetadataXml{},
+		return &application.Application_SamlConfiguration{
+			SamlConfiguration: &application.SAMLConfiguration{
 				LoginVersion: &application.LoginVersion{},
 			},
 		}
 	}
 
-	return &application.Application_SamlConfig{
-		SamlConfig: &application.SAMLConfig{
-			Metadata:     &application.SAMLConfig_MetadataXml{MetadataXml: samlApp.Metadata},
+	return &application.Application_SamlConfiguration{
+		SamlConfiguration: &application.SAMLConfiguration{
+			MetadataXml:  samlApp.Metadata,
+			MetadataUrl:  samlApp.MetadataURL,
 			LoginVersion: loginVersionToPb(samlApp.LoginVersion, samlApp.LoginBaseURI),
 		},
 	}

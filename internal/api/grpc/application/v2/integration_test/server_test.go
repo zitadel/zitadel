@@ -87,8 +87,8 @@ func createSAMLAppWithName(t *testing.T, baseURI, projectID string) ([]byte, *ap
 	appForSAMLConfigChange, appSAMLConfigChangeErr := instance.Client.ApplicationV2.CreateApplication(IAMOwnerCtx, &application.CreateApplicationRequest{
 		ProjectId: projectID,
 		Name:      appName,
-		ApplicationType: &application.CreateApplicationRequest_SamlRequest{
-			SamlRequest: &application.CreateSAMLApplicationRequest{
+		ApplicationType: &application.CreateApplicationRequest_SamlConfiguration{
+			SamlConfiguration: &application.CreateSAMLApplicationRequest{
 				Metadata: &application.CreateSAMLApplicationRequest_MetadataXml{
 					MetadataXml: samlMetas,
 				},
@@ -118,8 +118,8 @@ func createOIDCAppWithName(t *testing.T, baseURI, projectID string) (*applicatio
 	appForOIDCConfigChange, appOIDCConfigChangeErr := instance.Client.ApplicationV2.CreateApplication(IAMOwnerCtx, &application.CreateApplicationRequest{
 		ProjectId: projectID,
 		Name:      appName,
-		ApplicationType: &application.CreateApplicationRequest_OidcRequest{
-			OidcRequest: &application.CreateOIDCApplicationRequest{
+		ApplicationType: &application.CreateApplicationRequest_OidcConfiguration{
+			OidcConfiguration: &application.CreateOIDCApplicationRequest{
 				RedirectUris:           []string{"http://example.com"},
 				ResponseTypes:          []application.OIDCResponseType{application.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
 				GrantTypes:             []application.OIDCGrantType{application.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE},
@@ -153,8 +153,8 @@ func createOIDCApp(t *testing.T, baseURI, projctID string) *application.CreateAp
 func createAPIAppWithName(t *testing.T, ctx context.Context, inst *integration.Instance, projectID string) (*application.CreateApplicationResponse, string) {
 	appName := integration.ApplicationName()
 
-	reqForAPIAppCreation := &application.CreateApplicationRequest_ApiRequest{
-		ApiRequest: &application.CreateAPIApplicationRequest{AuthMethodType: application.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
+	reqForAPIAppCreation := &application.CreateApplicationRequest_ApiConfiguration{
+		ApiConfiguration: &application.CreateAPIApplicationRequest{AuthMethodType: application.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
 	}
 
 	appForAPIConfigChange, appAPIConfigChangeErr := inst.Client.ApplicationV2.CreateApplication(ctx, &application.CreateApplicationRequest{

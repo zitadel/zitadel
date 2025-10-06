@@ -55,7 +55,6 @@ service ApplicationService {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {permission: "authenticated"}
     };
-    option idempotency_level = NO_SIDE_EFFECTS;
   }
 
   // Delete Application
@@ -165,7 +164,6 @@ service ApplicationService {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {permission: "authenticated"}
     };
-    option idempotency_level = NO_SIDE_EFFECTS;
   }
 
   // List Application Keys
@@ -196,7 +194,7 @@ message CreateApplicationRequest {
 
   // Optionally, provide the unique ID of the new application. If omitted, the system will generate one for you,
   // which is the recommended way. The generated ID wil be returned in the response.
-  string id = 2 [(validate.rules).string = {max_len: 200}];
+  string application_id = 2 [(validate.rules).string = {max_len: 200}];
 
   // Publicly visible name of the application. This might be presented to users if they sign in.
   string name = 3 [
@@ -206,7 +204,7 @@ message CreateApplicationRequest {
     },
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1 //TODO: needed?
+      min_length: 1
       max_length: 200
       example: "\"MyApp\""
     }
@@ -216,9 +214,9 @@ message CreateApplicationRequest {
   // to provide the configuration for the respective application type.
   oneof application_type {
     option (validate.required) = true;
-    CreateOIDCApplicationRequest oidc_request = 4;
-    CreateSAMLApplicationRequest saml_request = 5;
-    CreateAPIApplicationRequest api_request = 6;
+    CreateOIDCApplicationRequest oidc_configuration = 4;
+    CreateSAMLApplicationRequest saml_configuration = 5;
+    CreateAPIApplicationRequest api_configuration = 6;
   }
 }
 
@@ -231,10 +229,10 @@ message CreateApplicationResponse {
 
   // Depending on the application type, the response contains the relevant configuration details.
   // This can include client IDs, secrets, or other generated information necessary for the application to function.
-  oneof creation_response_type {
-    CreateOIDCApplicationResponse oidc_response = 3;
-    CreateSAMLApplicationResponse saml_response = 4;
-    CreateAPIApplicationResponse api_response = 5;
+  oneof application_type {
+    CreateOIDCApplicationResponse oidc_configuration = 3;
+    CreateSAMLApplicationResponse saml_configuration = 4;
+    CreateAPIApplicationResponse api_configuration = 5;
   }
 }
 
@@ -282,10 +280,10 @@ message CreateOIDCApplicationRequest {
   // Future versions might introduce breaking changes.
   OIDCVersion version = 7 [(validate.rules).enum = {defined_only: true}];
 
-  // DevMode can be enabled for development purposes. This allows the use of
+  // DevelopmentMode can be enabled for development purposes. This allows the use of
   // OIDC non-compliant and potentially insecure settings, such as the use of
   // HTTP redirect URIs or wildcard redirect URIs.
-  bool dev_mode = 8;
+  bool development_mode = 8;
 
   // The AccessTokenType defines the type of the access token returned from ZITADEL.
   // Bearer tokens are opaque to clients. JWT tokens are self-contained and can be validated by the client.
@@ -404,14 +402,14 @@ message CreateAPIApplicationResponse {
 
 message UpdateApplicationRequest {
   // The unique ID of the application to be updated.
-  string id = 1 [
+  string application_id = 1 [
     (validate.rules).string = {
       min_len: 1
       max_len: 200
     },
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1 // TODO: needed?
+      min_length: 1
       max_length: 200
       example: "\"45984352431\""
     }
@@ -436,10 +434,10 @@ message UpdateApplicationRequest {
     }
   ];
 
-  oneof update_request_type {
-    UpdateSAMLApplicationConfigurationRequest saml_configuration_request = 4;
-    UpdateOIDCApplicationConfigurationRequest oidc_configuration_request = 5;
-    UpdateAPIApplicationConfigurationRequest api_configuration_request = 6;
+  oneof application_type {
+    UpdateSAMLApplicationConfigurationRequest saml_configuration = 4;
+    UpdateOIDCApplicationConfigurationRequest oidc_configuration = 5;
+    UpdateAPIApplicationConfigurationRequest api_configuration = 6;
   }
 }
 
@@ -450,8 +448,10 @@ message UpdateApplicationResponse {
 }
 
 message UpdateSAMLApplicationConfigurationRequest {
+  // The SAML metadata can be provided either as raw XML or as a URL where the metadata can be fetched from.
+  // Either metadata_xml or metadata_url must be provided.
+  // If omitted, the metadata will not be changed.
   oneof metadata {
-    option (validate.required) = true;
     bytes metadata_xml = 1 [(validate.rules).bytes.max_len = 500000];
     string metadata_url = 2 [(validate.rules).string.max_len = 200];
   }
@@ -507,11 +507,11 @@ message UpdateOIDCApplicationConfigurationRequest {
   // If not set, the version will not be changed.
   optional OIDCVersion version = 7 [(validate.rules).enum = {defined_only: true}];
 
-  // DevMode can be enabled for development purposes. This allows the use of
+  // DevelopmentMode can be enabled for development purposes. This allows the use of
   // OIDC non-compliant and potentially insecure settings, such as the use of
   // HTTP redirect URIs or wildcard redirect URIs.
   // If not set, the dev mode will not be changed.
-  optional bool dev_mode = 8;
+  optional bool development_mode = 8;
 
   // The AccessTokenType defines the type of the access token returned from ZITADEL.
   // Bearer tokens are opaque to clients. JWT tokens are self-contained and can be validated by the client.
@@ -594,7 +594,7 @@ message GetApplicationRequest {
     },
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1 // TODO: needed?
+      min_length: 1
       max_length: 200
       example: "\"45984352431\""
     }
@@ -718,8 +718,8 @@ message ListApplicationsRequest {
   ApplicationSorting sorting_column = 3;
 
   // Criteria to filter the applications.
-  // All provided queries are combined with a logical AND.
-  repeated ApplicationSearchQuery queries = 2;
+  // All provided filters are combined with a logical AND.
+  repeated ApplicationSearchFilter filters = 2;
 }
 
 message ListApplicationsResponse {
@@ -834,8 +834,8 @@ message ListApplicationKeysRequest {
   ApplicationKeysSorting sorting_column = 2;
 
   // Criteria to filter the application keys.
-  // All provided queries are combined with a logical AND.
-  repeated ApplicationKeySearchQuery queries = 3;
+  // All provided filters are combined with a logical AND.
+  repeated ApplicationKeySearchFilter filters = 3;
 }
 
 message ListApplicationKeysResponse {

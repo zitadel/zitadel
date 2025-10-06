@@ -208,7 +208,7 @@ func TestAppSAMLConfigToPb(t *testing.T) {
 		name         string
 		inputSAMLApp *query.SAMLApp
 
-		expectedPbApp application.ApplicationConfig
+		expectedPbApp application.IsApplicationConfiguration
 	}{
 		{
 			name: "valid conversion",
@@ -217,11 +217,9 @@ func TestAppSAMLConfigToPb(t *testing.T) {
 				LoginVersion: domain.LoginVersion2,
 				LoginBaseURI: gu.Ptr("https://example.com"),
 			},
-			expectedPbApp: &application.Application_SamlConfig{
-				SamlConfig: &application.SAMLConfig{
-					Metadata: &application.SAMLConfig_MetadataXml{
-						MetadataXml: metadata,
-					},
+			expectedPbApp: &application.Application_SamlConfiguration{
+				SamlConfiguration: &application.SAMLConfiguration{
+					MetadataXml: metadata,
 					LoginVersion: &application.LoginVersion{
 						Version: &application.LoginVersion_LoginV2{
 							LoginV2: &application.LoginV2{BaseUri: gu.Ptr("https://example.com")},
@@ -233,9 +231,8 @@ func TestAppSAMLConfigToPb(t *testing.T) {
 		{
 			name:         "nil saml application",
 			inputSAMLApp: nil,
-			expectedPbApp: &application.Application_SamlConfig{
-				SamlConfig: &application.SAMLConfig{
-					Metadata:     &application.SAMLConfig_MetadataXml{},
+			expectedPbApp: &application.Application_SamlConfiguration{
+				SamlConfiguration: &application.SAMLConfiguration{
 					LoginVersion: &application.LoginVersion{},
 				},
 			},

@@ -1,5 +1,5 @@
 package application
 
-type ApplicationConfig = isApplication_Config
+type IsApplicationConfiguration = isApplication_Configuration
 
 type MetaType = isUpdateSAMLApplicationConfigurationRequest_Metadata

@@ -49,8 +49,8 @@ func TestAppToPb(t *testing.T) {
 				ChangeDate:   timestamppb.New(now),
 				State:        application.ApplicationState_APPLICATION_STATE_ACTIVE,
 				Name:         "test-application",
-				Config: &application.Application_ApiConfig{
-					ApiConfig: &application.APIConfig{},
+				Configuration: &application.Application_ApiConfiguration{
+					ApiConfiguration: &application.APIConfiguration{},
 				},
 			},
 		},
@@ -103,7 +103,7 @@ func TestListApplicationsRequestToModel(t *testing.T) {
 			testName: "empty request",
 			req: &application.ListApplicationsRequest{
 				Pagination: &filter_pb_v2.PaginationRequest{Asc: true},
-				Queries:    []*application.ApplicationSearchQuery{},
+				Filters:    []*application.ApplicationSearchFilter{},
 			},
 			expectedResponse: &query.AppSearchQueries{
 				SearchRequest: query.SearchRequest{
@@ -118,12 +118,12 @@ func TestListApplicationsRequestToModel(t *testing.T) {
 		{
 			testName: "valid request",
 			req: &application.ListApplicationsRequest{
-				Queries: []*application.ApplicationSearchQuery{
+				Filters: []*application.ApplicationSearchFilter{
 					{
-						Query: &application.ApplicationSearchQuery_ProjectIdQuery{ProjectIdQuery: &application.ProjectIDQuery{ProjectId: "project1"}},
+						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{ProjectIdFilter: &application.ProjectIDFilter{ProjectId: "project1"}},
 					},
 					{
-						Query: &application.ApplicationSearchQuery_NameQuery{NameQuery: &application.ApplicationNameQuery{Name: "test"}},
+						Filter: &application.ApplicationSearchFilter_NameFilter{NameFilter: &application.ApplicationNameFilter{Name: "test"}},
 					},
 				},
 				SortingColumn: application.ApplicationSorting_APPLICATION_SORT_BY_NAME,
@@ -266,15 +266,15 @@ func TestAppConfigToPb(t *testing.T) {
 	tt := []struct {
 		name     string
 		app      *query.App
-		expected application.ApplicationConfig
+		expected application.IsApplicationConfiguration
 	}{
 		{
 			name: "OIDC config",
 			app: &query.App{
 				OIDCConfig: &query.OIDCApp{},
 			},
-			expected: &application.Application_OidcConfig{
-				OidcConfig: &application.OIDCConfig{
+			expected: &application.Application_OidcConfiguration{
+				OidcConfiguration: &application.OIDCConfiguration{
 					ResponseTypes:      []application.OIDCResponseType{},
 					GrantTypes:         []application.OIDCGrantType{},
 					ComplianceProblems: []*application.OIDCLocalizedMessage{},
@@ -287,10 +287,8 @@ func TestAppConfigToPb(t *testing.T) {
 			app: &query.App{
 				SAMLConfig: &query.SAMLApp{},
 			},
-			expected: &application.Application_SamlConfig{
-				SamlConfig: &application.SAMLConfig{
-					Metadata: &application.SAMLConfig_MetadataXml{},
-				},
+			expected: &application.Application_SamlConfiguration{
+				SamlConfiguration: &application.SAMLConfiguration{},
 			},
 		},
 		{
@@ -298,8 +296,8 @@ func TestAppConfigToPb(t *testing.T) {
 			app: &query.App{
 				APIConfig: &query.APIApp{},
 			},
-			expected: &application.Application_ApiConfig{
-				ApiConfig: &application.APIConfig{},
+			expected: &application.Application_ApiConfiguration{
+				ApiConfiguration: &application.APIConfiguration{},
 			},
 		},
 	}
@@ -444,16 +442,16 @@ func TestAppQueryToModel(t *testing.T) {
 
 	tt := []struct {
 		name  string
-		query *application.ApplicationSearchQuery
+		query *application.ApplicationSearchFilter
 
 		expectedQuery query.SearchQuery
 		expectedError error
 	}{
 		{
 			name: "name query",
-			query: &application.ApplicationSearchQuery{
-				Query: &application.ApplicationSearchQuery_NameQuery{
-					NameQuery: &application.ApplicationNameQuery{
+			query: &application.ApplicationSearchFilter{
+				Filter: &application.ApplicationSearchFilter_NameFilter{
+					NameFilter: &application.ApplicationNameFilter{
 						Name:   "test",
 						Method: filter_pb_v2.TextFilterMethod_TEXT_FILTER_METHOD_EQUALS,
 					},
@@ -463,17 +461,19 @@ func TestAppQueryToModel(t *testing.T) {
 		},
 		{
 			name: "state query",
-			query: &application.ApplicationSearchQuery{
-				Query: &application.ApplicationSearchQuery_StateQuery{
-					StateQuery: application.ApplicationState_APPLICATION_STATE_ACTIVE,
+			query: &application.ApplicationSearchFilter{
+				Filter: &application.ApplicationSearchFilter_StateFilter{
+					StateFilter: application.ApplicationState_APPLICATION_STATE_ACTIVE,
 				},
 			},
 			expectedQuery: validAppStateSearchQuery,
 		},
 		{
 			name: "api application only query",
-			query: &application.ApplicationSearchQuery{
-				Query: &application.ApplicationSearchQuery_ApiAppOnly{},
+			query: &application.ApplicationSearchFilter{
+				Filter: &application.ApplicationSearchFilter_TypeFilter{
+					TypeFilter: application.ApplicationType_APPLICATION_TYPE_API,
+				},
 			},
 			expectedQuery: &query.NotNullQuery{
 				Column: query.AppAPIConfigColumnAppID,
@@ -481,8 +481,10 @@ func TestAppQueryToModel(t *testing.T) {
 		},
 		{
 			name: "oidc application only query",
-			query: &application.ApplicationSearchQuery{
-				Query: &application.ApplicationSearchQuery_OidcAppOnly{},
+			query: &application.ApplicationSearchFilter{
+				Filter: &application.ApplicationSearchFilter_TypeFilter{
+					TypeFilter: application.ApplicationType_APPLICATION_TYPE_OIDC,
+				},
 			},
 			expectedQuery: &query.NotNullQuery{
 				Column: query.AppOIDCConfigColumnAppID,
@@ -490,8 +492,10 @@ func TestAppQueryToModel(t *testing.T) {
 		},
 		{
 			name: "saml application only query",
-			query: &application.ApplicationSearchQuery{
-				Query: &application.ApplicationSearchQuery_SamlAppOnly{},
+			query: &application.ApplicationSearchFilter{
+				Filter: &application.ApplicationSearchFilter_TypeFilter{
+					TypeFilter: application.ApplicationType_APPLICATION_TYPE_SAML,
+				},
 			},
 			expectedQuery: &query.NotNullQuery{
 				Column: query.AppSAMLConfigColumnAppID,
@@ -499,7 +503,7 @@ func TestAppQueryToModel(t *testing.T) {
 		},
 		{
 			name:          "invalid query type",
-			query:         &application.ApplicationSearchQuery{},
+			query:         &application.ApplicationSearchFilter{},
 			expectedQuery: nil,
 			expectedError: zerrors.ThrowInvalidArgument(nil, "CONV-z2mAGy", "List.Query.Invalid"),
 		},
@@ -510,7 +514,7 @@ func TestAppQueryToModel(t *testing.T) {
 			t.Parallel()
 
 			// When
-			result, err := appQueryToModel(tc.query)
+			result, err := applicationFilterToQuery(tc.query)
 
 			// Then
 			assert.Equal(t, tc.expectedError, err)
@@ -567,9 +571,9 @@ func TestListApplicationKeysRequestToDomain(t *testing.T) {
 			name: "only organization id",
 			req: &application.ListApplicationKeysRequest{
 				Pagination: &filter_pb_v2.PaginationRequest{Asc: true},
-				Queries: []*application.ApplicationKeySearchQuery{
-					{Query: &application.ApplicationKeySearchQuery_OrganizationIdQuery{
-						OrganizationIdQuery: &application.ApplicationKeyOrganizationIDQuery{OrganizationId: "org1"},
+				Filters: []*application.ApplicationKeySearchFilter{
+					{Filter: &application.ApplicationKeySearchFilter_OrganizationIdFilter{
+						OrganizationIdFilter: &application.ApplicationKeyOrganizationIDFilter{OrganizationId: "org1"},
 					}},
 				},
 			},
@@ -589,9 +593,9 @@ func TestListApplicationKeysRequestToDomain(t *testing.T) {
 			name: "only project id",
 			req: &application.ListApplicationKeysRequest{
 				Pagination: &filter_pb_v2.PaginationRequest{Asc: true},
-				Queries: []*application.ApplicationKeySearchQuery{
-					{Query: &application.ApplicationKeySearchQuery_ProjectIdQuery{
-						ProjectIdQuery: &application.ApplicationKeyProjectIDQuery{ProjectId: "project1"},
+				Filters: []*application.ApplicationKeySearchFilter{
+					{Filter: &application.ApplicationKeySearchFilter_ProjectIdFilter{
+						ProjectIdFilter: &application.ApplicationKeyProjectIDFilter{ProjectId: "project1"},
 					}},
 				},
 			},
@@ -611,9 +615,9 @@ func TestListApplicationKeysRequestToDomain(t *testing.T) {
 			name: "only application id",
 			req: &application.ListApplicationKeysRequest{
 				Pagination: &filter_pb_v2.PaginationRequest{Asc: true},
-				Queries: []*application.ApplicationKeySearchQuery{
-					{Query: &application.ApplicationKeySearchQuery_ApplicationIdQuery{
-						ApplicationIdQuery: &application.ApplicationKeyApplicationIDQuery{ApplicationId: "app1"},
+				Filters: []*application.ApplicationKeySearchFilter{
+					{Filter: &application.ApplicationKeySearchFilter_ApplicationIdFilter{
+						ApplicationIdFilter: &application.ApplicationKeyApplicationIDFilter{ApplicationId: "app1"},
 					}},
 				},
 			},

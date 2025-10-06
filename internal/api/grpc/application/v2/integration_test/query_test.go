@@ -26,8 +26,8 @@ func TestGetApplication(t *testing.T) {
 	createdApiApp, errAPIAppCreation := instance.Client.ApplicationV2.CreateApplication(IAMOwnerCtx, &application.CreateApplicationRequest{
 		ProjectId: p.GetId(),
 		Name:      apiAppName,
-		ApplicationType: &application.CreateApplicationRequest_ApiRequest{
-			ApiRequest: &application.CreateAPIApplicationRequest{
+		ApplicationType: &application.CreateApplicationRequest_ApiConfiguration{
+			ApiConfiguration: &application.CreateAPIApplicationRequest{
 				AuthMethodType: application.APIAuthMethodType_API_AUTH_METHOD_TYPE_BASIC,
 			},
 		},
@@ -38,8 +38,8 @@ func TestGetApplication(t *testing.T) {
 	createdSAMLApp, errSAMLAppCreation := instance.Client.ApplicationV2.CreateApplication(IAMOwnerCtx, &application.CreateApplicationRequest{
 		ProjectId: p.GetId(),
 		Name:      samlAppName,
-		ApplicationType: &application.CreateApplicationRequest_SamlRequest{
-			SamlRequest: &application.CreateSAMLApplicationRequest{
+		ApplicationType: &application.CreateApplicationRequest_SamlConfiguration{
+			SamlConfiguration: &application.CreateSAMLApplicationRequest{
 				LoginVersion: &application.LoginVersion{Version: &application.LoginVersion_LoginV1{LoginV1: &application.LoginV1{}}},
 				Metadata:     &application.CreateSAMLApplicationRequest_MetadataXml{MetadataXml: samlMetadataGen(integration.URL())},
 			},
@@ -51,8 +51,8 @@ func TestGetApplication(t *testing.T) {
 	createdOIDCApp, errOIDCAppCreation := instance.Client.ApplicationV2.CreateApplication(IAMOwnerCtx, &application.CreateApplicationRequest{
 		ProjectId: p.GetId(),
 		Name:      oidcAppName,
-		ApplicationType: &application.CreateApplicationRequest_OidcRequest{
-			OidcRequest: &application.CreateOIDCApplicationRequest{
+		ApplicationType: &application.CreateApplicationRequest_OidcConfiguration{
+			OidcConfiguration: &application.CreateOIDCApplicationRequest{
 				RedirectUris:           []string{"http://example.com"},
 				ResponseTypes:          []application.OIDCResponseType{application.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
 				GrantTypes:             []application.OIDCGrantType{application.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE},
@@ -107,7 +107,7 @@ func TestGetApplication(t *testing.T) {
 
 			expectedAppName:         apiAppName,
 			expectedAppID:           createdApiApp.GetApplicationId(),
-			expectedApplicationType: fmt.Sprintf("%T", &application.Application_ApiConfig{}),
+			expectedApplicationType: fmt.Sprintf("%T", &application.Application_ApiConfiguration{}),
 		},
 		{
 			testName: "when providing SAML application ID should return valid SAML application result",
@@ -118,7 +118,7 @@ func TestGetApplication(t *testing.T) {
 
 			expectedAppName:         samlAppName,
 			expectedAppID:           createdSAMLApp.GetApplicationId(),
-			expectedApplicationType: fmt.Sprintf("%T", &application.Application_SamlConfig{}),
+			expectedApplicationType: fmt.Sprintf("%T", &application.Application_SamlConfiguration{}),
 		},
 		{
 			testName: "when providing OIDC application ID should return valid OIDC application result",
@@ -129,7 +129,7 @@ func TestGetApplication(t *testing.T) {
 
 			expectedAppName:         oidcAppName,
 			expectedAppID:           createdOIDCApp.GetApplicationId(),
-			expectedApplicationType: fmt.Sprintf("%T", &application.Application_OidcConfig{}),
+			expectedApplicationType: fmt.Sprintf("%T", &application.Application_OidcConfiguration{}),
 		},
 	}
 
@@ -151,7 +151,7 @@ func TestGetApplication(t *testing.T) {
 					assert.NotZero(t, res.GetApplication().GetCreationDate())
 					assert.NotZero(t, res.GetApplication().GetChangeDate())
 
-					appType := fmt.Sprintf("%T", res.GetApplication().GetConfig())
+					appType := fmt.Sprintf("%T", res.GetApplication().GetConfiguration())
 					assert.Equal(t, tc.expectedApplicationType, appType)
 				}
 			}, retryDuration, tick)
@@ -245,10 +245,13 @@ func TestListApplications(t *testing.T) {
 			testName: "when no apps found should return empty list",
 			inputCtx: IAMOwnerCtx,
 			inputRequest: &application.ListApplicationsRequest{
-				Queries: []*application.ApplicationSearchQuery{
-					{Query: &application.ApplicationKeySearchQuery_ProjectIdFilter{}},
+				Filters: []*application.ApplicationSearchFilter{
+					{
+						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: "another-id"},
+						},
+					},
 				},
-				ProjectId: "another-id",
 			},
 
 			expectedOrderedList: []appWithName{},
@@ -259,7 +262,13 @@ func TestListApplications(t *testing.T) {
 			testName: "when user has no read permission should return empty set",
 			inputCtx: NoPermissionCtx,
 			inputRequest: &application.ListApplicationsRequest{
-				ProjectId: p.GetId(),
+				Filters: []*application.ApplicationSearchFilter{
+					{
+						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+						},
+					},
+				},
 			},
 
 			expectedOrderedList: []appWithName{},
@@ -270,9 +279,15 @@ func TestListApplications(t *testing.T) {
 			testName: "when sorting by name should return apps sorted by name in descending order",
 			inputCtx: IAMOwnerCtx,
 			inputRequest: &application.ListApplicationsRequest{
-				ProjectId:     p.GetId(),
 				SortingColumn: application.ApplicationSorting_APPLICATION_SORT_BY_NAME,
 				Pagination:    &filter.PaginationRequest{Asc: true},
+				Filters: []*application.ApplicationSearchFilter{
+					{
+						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+						},
+					},
+				},
 			},
 
 			expectedOrderedList: appsSortedByName,
@@ -298,7 +313,13 @@ func TestListApplications(t *testing.T) {
 			testName: "when user is project owner should return apps sorted by name in ascending order",
 			inputCtx: projectOwnerCtx,
 			inputRequest: &application.ListApplicationsRequest{
-				ProjectId:     p.GetId(),
+				Filters: []*application.ApplicationSearchFilter{
+					{
+						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+						},
+					},
+				},
 				SortingColumn: application.ApplicationSorting_APPLICATION_SORT_BY_NAME,
 				Pagination:    &filter.PaginationRequest{Asc: true},
 			},
@@ -326,7 +347,13 @@ func TestListApplications(t *testing.T) {
 			testName: "when sorting by id should return apps sorted by id in descending order",
 			inputCtx: IAMOwnerCtx,
 			inputRequest: &application.ListApplicationsRequest{
-				ProjectId:     p.GetId(),
+				Filters: []*application.ApplicationSearchFilter{
+					{
+						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+						},
+					},
+				},
 				SortingColumn: application.ApplicationSorting_APPLICATION_SORT_BY_ID,
 				Pagination:    &filter.PaginationRequest{Asc: true},
 			},
@@ -352,7 +379,13 @@ func TestListApplications(t *testing.T) {
 			testName: "when sorting by creation date should return apps sorted by creation date in descending order",
 			inputCtx: IAMOwnerCtx,
 			inputRequest: &application.ListApplicationsRequest{
-				ProjectId:     p.GetId(),
+				Filters: []*application.ApplicationSearchFilter{
+					{
+						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+						},
+					},
+				},
 				SortingColumn: application.ApplicationSorting_APPLICATION_SORT_BY_CREATION_DATE,
 				Pagination:    &filter.PaginationRequest{Asc: true},
 			},
@@ -378,10 +411,18 @@ func TestListApplications(t *testing.T) {
 			testName: "when filtering by active apps should return active apps only",
 			inputCtx: IAMOwnerCtx,
 			inputRequest: &application.ListApplicationsRequest{
-				ProjectId:  p.GetId(),
 				Pagination: &filter.PaginationRequest{Asc: true},
 				Filters: []*application.ApplicationSearchFilter{
-					{Filter: &application.ApplicationSearchFilter_StateFilter{StateFilter: application.ApplicationState_APPLICATION_STATE_ACTIVE}},
+					{
+						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+						},
+					},
+					{
+						Filter: &application.ApplicationSearchFilter_StateFilter{
+							StateFilter: application.ApplicationState_APPLICATION_STATE_ACTIVE,
+						},
+					},
 				},
 			},
 			expectedOrderedList: slices.DeleteFunc(
@@ -409,10 +450,16 @@ func TestListApplications(t *testing.T) {
 			testName: "when filtering by application type should return apps of matching type only",
 			inputCtx: IAMOwnerCtx,
 			inputRequest: &application.ListApplicationsRequest{
-				ProjectId:  p.GetId(),
 				Pagination: &filter.PaginationRequest{Asc: true},
 				Filters: []*application.ApplicationSearchFilter{
-					{Filter: &application.ApplicationSearchFilter_OidcAppOnly{}},
+					{
+						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+						},
+					},
+					{Filter: &application.ApplicationSearchFilter_TypeFilter{
+						TypeFilter: application.ApplicationType_APPLICATION_TYPE_OIDC,
+					}},
 				},
 			},
 			expectedOrderedList: slices.DeleteFunc(
@@ -467,8 +514,8 @@ func TestListApplications_WithPermissionV2(t *testing.T) {
 	_, otherProjectOwnerCtx := getProjectAndProjectContext(t, instancePermissionV2, iamOwnerCtx)
 
 	appName1, appName2, appName3 := integration.ApplicationName(), integration.ApplicationName(), integration.ApplicationName()
-	reqForAPIAppCreation := &application.CreateApplicationRequest_ApiRequest{
-		ApiRequest: &application.CreateAPIApplicationRequest{AuthMethodType: application.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
+	reqForAPIAppCreation := &application.CreateApplicationRequest_ApiConfiguration{
+		ApiConfiguration: &application.CreateAPIApplicationRequest{AuthMethodType: application.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
 	}
 
 	app1, appAPIConfigChangeErr := instancePermissionV2.Client.ApplicationV2.CreateApplication(iamOwnerCtx, &application.CreateApplicationRequest{
@@ -504,13 +551,15 @@ func TestListApplications_WithPermissionV2(t *testing.T) {
 	}{
 		{
 			testName: "when user has no read permission should return empty set",
-			inputCtx: instancePermissionV2.WithAuthorization(context.Background(), integration.UserTypeNoPermission),
+			inputCtx: instancePermissionV2.WithAuthorizationToken(context.Background(), integration.UserTypeNoPermission),
 			inputRequest: &application.ListApplicationsRequest{
-				Queries: []*application.ApplicationKeySearchQuery{
-					{Filter: &application.ApplicationKeySearchQuery_ApplicationIdFilter{
-						ApplicationIdFilter: &application.ApplicationKeyApplicationIDQuery{ApplicationId: createdApiApp1.GetApplicationId()}}},
+				Filters: []*application.ApplicationSearchFilter{
+					{
+						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+						},
+					},
 				},
-				ProjectId: p.GetId(),
 			},
 
 			expectedAppIDs: []string{},
@@ -519,7 +568,13 @@ func TestListApplications_WithPermissionV2(t *testing.T) {
 			testName: "when projectOwner should return full application list",
 			inputCtx: projectOwnerCtx,
 			inputRequest: &application.ListApplicationsRequest{
-				ProjectId: p.GetId(),
+				Filters: []*application.ApplicationSearchFilter{
+					{
+						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+						},
+					},
+				},
 			},
 
 			expectedCode:   codes.OK,
@@ -527,9 +582,15 @@ func TestListApplications_WithPermissionV2(t *testing.T) {
 		},
 		{
 			testName: "when orgOwner should return full application list",
-			inputCtx: instancePermissionV2.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			inputCtx: instancePermissionV2.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 			inputRequest: &application.ListApplicationsRequest{
-				ProjectId: p.GetId(),
+				Filters: []*application.ApplicationSearchFilter{
+					{
+						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+						},
+					},
+				},
 			},
 
 			expectedAppIDs: []string{app1.GetApplicationId(), app2.GetApplicationId(), app3.GetApplicationId()},
@@ -538,7 +599,13 @@ func TestListApplications_WithPermissionV2(t *testing.T) {
 			testName: "when iamOwner user should return full application list",
 			inputCtx: iamOwnerCtx,
 			inputRequest: &application.ListApplicationsRequest{
-				ProjectId: p.GetId(),
+				Filters: []*application.ApplicationSearchFilter{
+					{
+						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+						},
+					},
+				},
 			},
 
 			expectedAppIDs: []string{app1.GetApplicationId(), app2.GetApplicationId(), app3.GetApplicationId()},
@@ -547,7 +614,13 @@ func TestListApplications_WithPermissionV2(t *testing.T) {
 			testName: "when other projectOwner user should return empty list",
 			inputCtx: otherProjectOwnerCtx,
 			inputRequest: &application.ListApplicationsRequest{
-				ProjectId: p.GetId(),
+				Filters: []*application.ApplicationSearchFilter{
+					{
+						Filter: &application.ApplicationSearchFilter_ProjectIdFilter{
+							ProjectIdFilter: &application.ProjectIDFilter{ProjectId: p.GetId()},
+						},
+					},
+				},
 			},
 
 			expectedAppIDs: []string{},
@@ -696,8 +769,10 @@ func TestListApplicationKeys(t *testing.T) {
 			inputRequest: &application.ListApplicationKeysRequest{
 				Pagination:    &filter.PaginationRequest{Asc: true},
 				SortingColumn: application.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_EXPIRATION,
-				Queries: []*application.ApplicationKeySearchQuery{
-					{Filter: &application.ApplicationKeySearchQuery_ProjectIdFilter{ProjectIdFilter: &application.ApplicationKeyProjectIDQuery{ProjectId: p.GetId()}}},
+				Filters: []*application.ApplicationKeySearchFilter{
+					{Filter: &application.ApplicationKeySearchFilter_ProjectIdFilter{
+						ProjectIdFilter: &application.ApplicationKeyProjectIDFilter{ProjectId: p.GetId()},
+					}},
 				},
 			},
 			expectedAppKeysIDs: []string{appKey3.GetKeyId(), appKey4.GetKeyId(), appKey1.GetKeyId(), appKey2.GetKeyId()},
@@ -707,9 +782,10 @@ func TestListApplicationKeys(t *testing.T) {
 			inputCtx: IAMOwnerCtx,
 			inputRequest: &application.ListApplicationKeysRequest{
 				SortingColumn: application.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_CREATION_DATE,
-				Queries: []*application.ApplicationKeySearchQuery{
-					{Filter: &application.ApplicationKeySearchQuery_ProjectIdFilter{
-						ProjectIdFilter: &application.ApplicationKeyProjectIDQuery{ProjectId: p.GetId()}}},
+				Filters: []*application.ApplicationKeySearchFilter{
+					{Filter: &application.ApplicationKeySearchFilter_ProjectIdFilter{
+						ProjectIdFilter: &application.ApplicationKeyProjectIDFilter{ProjectId: p.GetId()},
+					}},
 				},
 			},
 			expectedAppKeysIDs: []string{appKey4.GetKeyId(), appKey3.GetKeyId(), appKey2.GetKeyId(), appKey1.GetKeyId()},
@@ -719,9 +795,10 @@ func TestListApplicationKeys(t *testing.T) {
 			inputCtx: projectOwnerCtx,
 			inputRequest: &application.ListApplicationKeysRequest{
 				Pagination: &filter.PaginationRequest{Asc: true},
-				Queries: []*application.ApplicationKeySearchQuery{
-					{Filter: &application.ApplicationKeySearchQuery_ApplicationIdFilter{
-						ApplicationIdFilter: &application.ApplicationKeyApplicationIDQuery{ApplicationId: createdApiApp1.GetApplicationId()}}},
+				Filters: []*application.ApplicationKeySearchFilter{
+					{Filter: &application.ApplicationKeySearchFilter_ApplicationIdFilter{
+						ApplicationIdFilter: &application.ApplicationKeyApplicationIDFilter{ApplicationId: createdApiApp1.GetApplicationId()},
+					}},
 				},
 			},
 			expectedAppKeysIDs: []string{appKey1.GetKeyId(), appKey2.GetKeyId(), appKey3.GetKeyId()},
@@ -802,9 +879,10 @@ func TestListApplicationKeys_WithPermissionV2(t *testing.T) {
 			inputCtx: projectOwnerCtx,
 			inputRequest: &application.ListApplicationKeysRequest{
 				Pagination: &filter.PaginationRequest{Asc: true},
-				Queries: []*application.ApplicationKeySearchQuery{
-					{Filter: &application.ApplicationKeySearchQuery_ApplicationIdFilter{
-						ApplicationIdFilter: &application.ApplicationKeyApplicationIDQuery{ApplicationId: createdApiApp1.GetApplicationId()}}},
+				Filters: []*application.ApplicationKeySearchFilter{
+					{Filter: &application.ApplicationKeySearchFilter_ApplicationIdFilter{
+						ApplicationIdFilter: &application.ApplicationKeyApplicationIDFilter{ApplicationId: createdApiApp1.GetApplicationId()},
+					}},
 				},
 			},
 			expectedAppKeysIDs: []string{appKey1.GetKeyId(), appKey2.GetKeyId(), appKey3.GetKeyId()},

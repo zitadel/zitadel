@@ -30,9 +30,9 @@ func UpdateAPIApplicationConfigurationRequestToDomain(appID, projectID string, a
 	}
 }
 
-func appAPIConfigToPb(apiApp *query.APIApp) application.ApplicationConfig {
-	return &application.Application_ApiConfig{
-		ApiConfig: &application.APIConfig{
+func appAPIConfigToPb(apiApp *query.APIApp) application.IsApplicationConfiguration {
+	return &application.Application_ApiConfiguration{
+		ApiConfiguration: &application.APIConfiguration{
 			ClientId:       apiApp.ClientID,
 			AuthMethodType: apiAuthMethodTypeToPb(apiApp.AuthMethodType),
 		},

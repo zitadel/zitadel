@@ -51,7 +51,7 @@ func TestCreateOIDCAppRequestToDomain(t *testing.T) {
 				AppType:                  application.OIDCApplicationType_OIDC_APP_TYPE_WEB,
 				AuthMethodType:           application.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_BASIC,
 				PostLogoutRedirectUris:   []string{"https://logout"},
-				DevMode:                  true,
+				DevelopmentMode:          true,
 				AccessTokenType:          application.OIDCTokenType_OIDC_TOKEN_TYPE_BEARER,
 				AccessTokenRoleAssertion: true,
 				IdTokenRoleAssertion:     true,
@@ -143,7 +143,7 @@ func TestUpdateOIDCAppConfigRequestToDomain(t *testing.T) {
 				AppType:                  gu.Ptr(application.OIDCApplicationType_OIDC_APP_TYPE_WEB),
 				AuthMethodType:           gu.Ptr(application.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_BASIC),
 				PostLogoutRedirectUris:   []string{"https://logout"},
-				DevMode:                  gu.Ptr(true),
+				DevelopmentMode:          gu.Ptr(true),
 				AccessTokenType:          gu.Ptr(application.OIDCTokenType_OIDC_TOKEN_TYPE_BEARER),
 				AccessTokenRoleAssertion: gu.Ptr(true),
 				IdTokenRoleAssertion:     gu.Ptr(true),
@@ -431,13 +431,13 @@ func TestAppOIDCConfigToPb(t *testing.T) {
 	tt := []struct {
 		name     string
 		input    *query.OIDCApp
-		expected *application.Application_OidcConfig
+		expected *application.Application_OidcConfiguration
 	}{
 		{
 			name:  "empty config",
 			input: &query.OIDCApp{},
-			expected: &application.Application_OidcConfig{
-				OidcConfig: &application.OIDCConfig{
+			expected: &application.Application_OidcConfiguration{
+				OidcConfiguration: &application.OIDCConfiguration{
 					Version:            application.OIDCVersion_OIDC_VERSION_1_0,
 					ComplianceProblems: []*application.OIDCLocalizedMessage{},
 					ClockSkew:          durationpb.New(0),
@@ -470,8 +470,8 @@ func TestAppOIDCConfigToPb(t *testing.T) {
 				LoginVersion:             domain.LoginVersion2,
 				LoginBaseURI:             gu.Ptr("https://login.example.com"),
 			},
-			expected: &application.Application_OidcConfig{
-				OidcConfig: &application.OIDCConfig{
+			expected: &application.Application_OidcConfiguration{
+				OidcConfiguration: &application.OIDCConfiguration{
 					RedirectUris:           []string{"https://example.com/callback"},
 					ResponseTypes:          []application.OIDCResponseType{application.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
 					GrantTypes:             []application.OIDCGrantType{application.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE},
@@ -485,7 +485,7 @@ func TestAppOIDCConfigToPb(t *testing.T) {
 						{Key: "problem1"},
 						{Key: "problem2"},
 					},
-					DevMode:                  true,
+					DevelopmentMode:          true,
 					AccessTokenType:          application.OIDCTokenType_OIDC_TOKEN_TYPE_BEARER,
 					AccessTokenRoleAssertion: true,
 					IdTokenRoleAssertion:     true,

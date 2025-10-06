@@ -27,7 +27,7 @@ func CreateOIDCAppRequestToDomain(name, projectID string, req *application.Creat
 		ApplicationType:          gu.Ptr(oidcApplicationTypeToDomain(req.GetAppType())),
 		AuthMethodType:           gu.Ptr(oidcAuthMethodTypeToDomain(req.GetAuthMethodType())),
 		PostLogoutRedirectUris:   req.GetPostLogoutRedirectUris(),
-		DevMode:                  &req.DevMode,
+		DevMode:                  &req.DevelopmentMode,
 		AccessTokenType:          gu.Ptr(oidcTokenTypeToDomain(req.GetAccessTokenType())),
 		AccessTokenRoleAssertion: gu.Ptr(req.GetAccessTokenRoleAssertion()),
 		IDTokenRoleAssertion:     gu.Ptr(req.GetIdTokenRoleAssertion()),
@@ -57,7 +57,7 @@ func UpdateOIDCAppConfigRequestToDomain(appID, projectID string, app *applicatio
 		ApplicationType:          oidcApplicationTypeToDomainPtr(app.AppType),
 		AuthMethodType:           oidcAuthMethodTypeToDomainPtr(app.AuthMethodType),
 		PostLogoutRedirectUris:   app.PostLogoutRedirectUris,
-		DevMode:                  app.DevMode,
+		DevMode:                  app.DevelopmentMode,
 		AccessTokenType:          oidcTokenTypeToDomainPtr(app.AccessTokenType),
 		AccessTokenRoleAssertion: app.AccessTokenRoleAssertion,
 		IDTokenRoleAssertion:     app.IdTokenRoleAssertion,
@@ -187,9 +187,9 @@ func ComplianceProblemsToLocalizedMessages(complianceProblems []string) []*appli
 	return converted
 }
 
-func appOIDCConfigToPb(oidcApp *query.OIDCApp) *application.Application_OidcConfig {
-	return &application.Application_OidcConfig{
-		OidcConfig: &application.OIDCConfig{
+func appOIDCConfigToPb(oidcApp *query.OIDCApp) *application.Application_OidcConfiguration {
+	return &application.Application_OidcConfiguration{
+		OidcConfiguration: &application.OIDCConfiguration{
 			RedirectUris:             oidcApp.RedirectURIs,
 			ResponseTypes:            oidcResponseTypesFromModel(oidcApp.ResponseTypes),
 			GrantTypes:               oidcGrantTypesFromModel(oidcApp.GrantTypes),
@@ -200,7 +200,7 @@ func appOIDCConfigToPb(oidcApp *query.OIDCApp) *application.Application_OidcConf
 			Version:                  application.OIDCVersion_OIDC_VERSION_1_0,
 			NoneCompliant:            len(oidcApp.ComplianceProblems) != 0,
 			ComplianceProblems:       ComplianceProblemsToLocalizedMessages(oidcApp.ComplianceProblems),
-			DevMode:                  oidcApp.IsDevMode,
+			DevelopmentMode:          oidcApp.IsDevMode,
 			AccessTokenType:          oidcTokenTypeToPb(oidcApp.AccessTokenType),
 			AccessTokenRoleAssertion: oidcApp.AssertAccessTokenRole,
 			IdTokenRoleAssertion:     oidcApp.AssertIDTokenRole,

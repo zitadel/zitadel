@@ -7,12 +7,14 @@ import "zitadel/application/v2/login.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/application/v2;application";
 
-message SAMLConfig {
-  // The SAML metadata can be provided either as raw XML or as a URL where the metadata can be fetched from.
-  oneof metadata {
-    bytes metadata_xml = 1;
-    string metadata_url = 2;
-  }
+message SAMLConfiguration {
+  // The Metadata XML is the provided or fetched metadata stored at Zitadel.
+  // If either the metadata was provided as XML or when Zitadel fetched it at the provided URL,
+  // it is stored here.
+  bytes metadata_xml = 1;
+  // The Metadata URL is the URL where the metadata was fetched from.
+  // In case the metadata was provided as raw XML, this field is empty.
+  string metadata_url = 2;
 
   // LoginVersion specifies the login UI, where the user is redirected to for authentication.
   // It can be used to select a specific login UI, e.g. for embedded UIs or for custom login pages
