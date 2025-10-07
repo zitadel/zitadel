@@ -28,20 +28,20 @@ func (e *wrongIDPTypeError) Is(target error) bool {
 	return ok
 }
 
-type MultipleOrgsUpdatedError struct {
+type MultipleObjectsUpdatedError struct {
 	Msg      string
 	Expected int64
 	Actual   int64
 }
 
-func NewMultipleOrgsUpdatedError(expected, actual int64) error {
-	return &MultipleOrgsUpdatedError{
+func NewMultipleObjecstUpdatedError(expected, actual int64) error {
+	return &MultipleObjectsUpdatedError{
 		Expected: expected,
 		Actual:   actual,
 	}
 }
 
-func (err *MultipleOrgsUpdatedError) Error() string {
+func (err *MultipleObjectsUpdatedError) Error() string {
 	return fmt.Sprintf("Message=expecting %d row(s) updated, got %d", err.Expected, err.Actual)
 }
 
