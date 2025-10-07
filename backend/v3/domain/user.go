@@ -159,9 +159,9 @@ const (
 
 // human contact type
 type HumanContact struct {
-	InstanceID      string      `json:"instanceId,omitempty" db:"instance_id"`
-	OrgID           string      `json:"orgId,omitempty" db:"org_id"`
-	UserId          string      `json:"userId,omitempty" db:"user_id"`
+	// InstanceID      string      `json:"instanceId,omitempty" db:"instance_id"`
+	// OrgID           string      `json:"orgId,omitempty" db:"org_id"`
+	// UserId          string      `json:"userId,omitempty" db:"user_id"`
 	Type            ContactType `json:"type,omitempty" db:"type"`
 	Value           string      `json:"value,omitempty" db:"value"`
 	IsVerified      bool        `json:"isVerified,omitempty" db:"is_verified"`
@@ -170,9 +170,9 @@ type HumanContact struct {
 
 // human security
 type HumanSecurity struct {
-	InstanceID string `json:"instanceId,omitempty" db:"instance_id"`
-	OrgID      string `json:"orgId,omitempty" db:"org_id"`
-	UserId     string `json:"userId,omitempty" db:"user_id"`
+	// InstanceID string `json:"instanceId,omitempty" db:"instance_id"`
+	// OrgID      string `json:"orgId,omitempty" db:"org_id"`
+	// UserId     string `json:"userId,omitempty" db:"user_id"`
 
 	PasswordChangeRequired bool      `json:"passwordChangeRequired,omitempty" db:"password_change_required"`
 	PasswordChange         time.Time `json:"passwordChange,omitempty" db:"password_change"`

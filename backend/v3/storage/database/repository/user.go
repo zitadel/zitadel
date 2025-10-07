@@ -332,11 +332,8 @@ func (u user) Machine() domain.MachineRepository {
 	return &machine{}
 }
 
-const queryHumanUserStmt = `SELECT instance_id, org_id, id, username, username_org_unique, state,` +
-	` first_name, last_name, nick_name, display_name, preferred_language, gender, avatar_key,` +
-	` created_at, updated_at` +
-	` FROM zitadel.human_users`
-
+// Create Human could have been done in one statement using CTE(s), but becuase a user may or may not email + phoen or just email, this would require more code to handle
+// place holder numbering, so I decided to use separate statements
 const createHumaneStmt = `INSERT INTO zitadel.human_users (instance_id, org_id, id, username, username_org_unique, state,` +
 	` first_name, last_name, nick_name, display_name, preferred_language, gender, avatar_key)` +
 	` VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)` +
@@ -348,6 +345,36 @@ func (u user) CreateHuman(ctx context.Context, client database.QueryExecutor, us
 	builder.AppendArgs(user.FirstName, user.LastName, user.NickName, user.DisplayName, user.PreferredLanguage, user.Gender, user.AvatarKey)
 
 	builder.WriteString(createHumaneStmt)
+
+	err := client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
+	return user, err
+}
+
+const createHumaneContactStmt = `INSERT INTO zitadel.human_contacts (instance_id, org_id, user_id,` +
+	` type, value, is_verified, unverified_value)` +
+	` VALUES($1, $2, $3, $4, $5, $6, $7)`
+
+func (u user) CreateHumanContact(ctx context.Context, client database.QueryExecutor, user *domain.Human) (*domain.Human, error) {
+	builder := database.StatementBuilder{}
+	builder.AppendArgs(user.User.InstanceID, user.User.OrgID, user.ID)
+	builder.AppendArgs(user.HumanContact.Type, user.HumanContact.Value, user.HumanContact.IsVerified, user.HumanContact.UnverifiedValue)
+
+	builder.WriteString(createHumaneContactStmt)
+
+	err := client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
+	return user, err
+}
+
+const createHumaneSecuirtyStmt = `INSERT INTO zitadel.human_secuirty (instance_id, org_id, user_id,` +
+	` password_change_required, password_changed, mfa_init_skipped)` +
+	` VALUES($1, $2, $3, $4, $5, $6)`
+
+func (u user) CreateHumanSecurity(ctx context.Context, client database.QueryExecutor, user *domain.Human) (*domain.Human, error) {
+	builder := database.StatementBuilder{}
+	builder.AppendArgs(user.User.InstanceID, user.User.OrgID, user.ID)
+	builder.AppendArgs(user.HumanSecurity.PasswordChangeRequired, user.HumanSecurity.PasswordChange, user.HumanSecurity.MFAInitSkipped)
+
+	builder.WriteString(createHumaneSecuirtyStmt)
 
 	err := client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
 	return user, err
@@ -377,6 +404,11 @@ func (u user) UpdateHuman(ctx context.Context, client database.QueryExecutor, co
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
+
+const queryHumanUserStmt = `SELECT instance_id, org_id, id, username, username_org_unique, state,` +
+	` first_name, last_name, nick_name, display_name, preferred_language, gender, avatar_key,` +
+	` created_at, updated_at` +
+	` FROM zitadel.human_users`
 
 func (u user) GetHuman(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Human, error) {
 	options := new(database.QueryOpts)
