@@ -34,3 +34,22 @@ func DeleteInstance(ctx context.Context, instanceID string) (*connect.Response[i
 		},
 	}, nil
 }
+
+func GetInstance(ctx context.Context, instanceID string) (*connect.Response[instance.GetInstanceResponse], error) {
+	instanceGetCmd := domain.NewGetInstanceCommand(instanceID)
+
+	err := domain.Invoke(ctx, instanceGetCmd, domain.WithInstanceRepo(repository.InstanceRepository()))
+
+	if err != nil {
+		if errors.Is(err, &database.NoRowFoundError{}) {
+			return nil, zerrors.ThrowNotFound(err, "INST-QVrUwc", "instance not found")
+		}
+		return nil, err
+	}
+
+	return &connect.Response[instance.GetInstanceResponse]{
+		Msg: &instance.GetInstanceResponse{
+			Instance: instanceGetCmd.ResultToGRPC(),
+		},
+	}, nil
+}
