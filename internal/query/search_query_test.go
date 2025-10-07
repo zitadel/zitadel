@@ -2287,7 +2287,7 @@ func TestBytesQuery_comp(t *testing.T) {
 				Compare: BytesEquals,
 			},
 			want: want{
-				query: sq.Eq{"test_table.test_col": []byte("foo")},
+				query: sq.Expr("sha256(test_table.test_col) = sha256(?)", []byte("foo")),
 			},
 		},
 		{
@@ -2298,7 +2298,7 @@ func TestBytesQuery_comp(t *testing.T) {
 				Compare: BytesNotEquals,
 			},
 			want: want{
-				query: sq.NotEq{"test_table.test_col": []byte("foo")},
+				query: sq.Expr("sha256(test_table.test_col) <> sha256(?)", []byte("foo")),
 			},
 		},
 		{
@@ -2322,7 +2322,7 @@ func TestBytesQuery_comp(t *testing.T) {
 			},
 			want: want{
 				err:   true,
-				query: sq.Eq{"": []byte("foo")},
+				query: sq.Expr("sha256() = sha256(?)", []byte("foo")),
 			},
 		},
 	}

@@ -648,13 +648,12 @@ func (q *BytesQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 func (q *BytesQuery) comp() sq.Sqlizer {
 	switch q.Compare {
 	case BytesEquals:
-		return sq.Eq{q.Column.identifier(): q.Value}
+		return sq.Expr("sha256("+q.Column.identifier()+") = sha256(?)", q.Value)
 	case BytesNotEquals:
-		return sq.NotEq{q.Column.identifier(): q.Value}
+		return sq.Expr("sha256("+q.Column.identifier()+") <> sha256(?)", q.Value)
 	case bytesCompareMax:
 		return nil
 	}
-
 	return nil
 }
 
