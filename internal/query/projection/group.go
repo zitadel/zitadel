@@ -49,7 +49,7 @@ func (g *groupProjection) Init() *old_handler.Check {
 			handler.NewColumn(GroupColumnSequence, handler.ColumnTypeInt64),
 			handler.NewColumn(GroupColumnState, handler.ColumnTypeEnum),
 		},
-			handler.NewPrimaryKey(GroupColumnInstanceID, GroupColumnID), // todo: review
+			handler.NewPrimaryKey(GroupColumnInstanceID, GroupColumnID),
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{GroupColumnResourceOwner})),
 		),
 	)
