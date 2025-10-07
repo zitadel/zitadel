@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
 import { ButtonHTMLAttributes, DetailedHTMLProps, forwardRef } from "react";
-import { getTypographyClasses, ThemeableProps } from "@/lib/themeUtils";
-import { getThemeConfig, ROUNDNESS_CLASSES, getComponentRoundness, APPEARANCE_STYLES } from "@/lib/theme";
+import { ThemeableProps } from "@/lib/themeUtils";
+import { getThemeConfig, getComponentRoundness, APPEARANCE_STYLES } from "@/lib/theme";
 
 export enum ButtonSizes {
   Small = "Small",
@@ -31,9 +31,7 @@ export const getButtonClasses = (
   variant: ButtonVariants,
   color: ButtonColors,
   roundnessClasses: string = "rounded-md", // Default fallback
-  typography: string = "font-medium", // Theme typography
   appearance: string = "", // Theme appearance (shadows, borders, etc.)
-  spacing: string = "space-y-2", // Theme spacing (if needed)
 ) =>
   clsx(
     {
@@ -52,7 +50,6 @@ export const getButtonClasses = (
       "px-4 h-[36px]": size === ButtonSizes.Small,
     },
     roundnessClasses, // Apply the full roundness classes directly
-    getTypographyClasses(typography),
     appearance, // Apply appearance-specific styling (shadows, borders, etc.)
   );
 
@@ -78,8 +75,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       size = ButtonSizes.Small,
       color = ButtonColors.Primary,
       roundness, // Will use theme default if not provided
-      typography, // Will use theme default if not provided
-      spacing = "space-y-2", // This is not used in button, kept for compatibility
       ...props
     },
     ref,

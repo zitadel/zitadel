@@ -3,7 +3,7 @@
 import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { getThemeConfig, ROUNDNESS_CLASSES, getComponentRoundness, APPEARANCE_STYLES } from "@/lib/theme";
+import { getThemeConfig, getComponentRoundness, APPEARANCE_STYLES } from "@/lib/theme";
 
 function getThemeToggleRoundness() {
   return getComponentRoundness("themeSwitch");

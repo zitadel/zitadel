@@ -3,7 +3,7 @@
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { clsx } from "clsx";
 import { ChangeEvent, DetailedHTMLProps, forwardRef, InputHTMLAttributes, ReactNode } from "react";
-import { getThemeConfig, ROUNDNESS_CLASSES, APPEARANCE_STYLES, getComponentRoundness } from "@/lib/theme";
+import { getComponentRoundness } from "@/lib/theme";
 
 export type TextInputProps = DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> & {
   label: string;

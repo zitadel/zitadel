@@ -2,7 +2,7 @@
 
 import { setLanguageCookie } from "@/lib/cookies";
 import { Lang, LANGS } from "@/lib/i18n";
-import { getThemeConfig, ROUNDNESS_CLASSES, getComponentRoundness, APPEARANCE_STYLES } from "@/lib/theme";
+import { getThemeConfig, getComponentRoundness, APPEARANCE_STYLES } from "@/lib/theme";
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";

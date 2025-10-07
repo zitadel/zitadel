@@ -2,8 +2,7 @@
 
 import { ColorShade, getColorHash } from "@/helpers/colors";
 import { useTheme } from "next-themes";
-import Image from "next/image";
-import { getThemeConfig, ROUNDNESS_CLASSES, getComponentRoundness } from "@/lib/theme";
+import { getComponentRoundness } from "@/lib/theme";
 
 interface AvatarProps {
   name: string | null | undefined;

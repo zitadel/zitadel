@@ -47,13 +47,3 @@ export function getCardRoundnessClasses(roundness: string) {
     "rounded-3xl": roundness === "rounded-3xl",
   });
 }
-
-// Utility for typography classes
-export function getTypographyClasses(typography: string) {
-  return clsx({
-    "font-normal": typography === "font-normal",
-    "font-medium": typography === "font-medium",
-    "font-semibold": typography === "font-semibold",
-    "font-bold": typography === "font-bold",
-  });
-}

@@ -1,6 +1,6 @@
 import { clsx } from "clsx";
 import { HTMLAttributes, forwardRef, ReactNode } from "react";
-import { getThemeConfig, ROUNDNESS_CLASSES, APPEARANCE_STYLES, SPACING_STYLES, getComponentRoundness } from "@/lib/theme";
+import { getThemeConfig, APPEARANCE_STYLES, SPACING_STYLES, getComponentRoundness } from "@/lib/theme";
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;

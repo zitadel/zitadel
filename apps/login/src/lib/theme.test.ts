@@ -5,7 +5,6 @@ import {
   ThemeAppearance,
   ThemeSpacing,
   ComponentRoundnessConfig,
-  ThemeConfig,
   DEFAULT_COMPONENT_ROUNDNESS,
   DEFAULT_THEME,
   getThemeConfig,

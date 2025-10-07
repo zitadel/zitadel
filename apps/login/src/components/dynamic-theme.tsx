@@ -3,7 +3,6 @@
 import { Logo } from "@/components/logo";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import React, { ReactNode, Children } from "react";
-import { AppAvatar } from "./app-avatar";
 import { ThemeWrapper } from "./theme-wrapper";
 import { Card } from "./card";
 import { useResponsiveLayout } from "@/lib/theme-hooks";
