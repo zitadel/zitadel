@@ -38,6 +38,10 @@ jobs:
         with:
           node-version: ${{ inputs.node_version }}
           cache: "pnpm"
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v4
+        with:
+          version: v28.3.2
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
