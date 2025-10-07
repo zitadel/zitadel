@@ -46,7 +46,6 @@ jobs:
         uses: docker/setup-compose-action@v1
         with:
           version: v2.38.2
-      - run: docker ps -a
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Install Cypress binary
@@ -57,7 +56,7 @@ jobs:
       - name: Lint, Test and Build
         env:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
-        run: pnpm nx affected  --nxBail --verbose --targets lint test build --exclude @zitadel/docs
+        run: pnpm nx affected  --nxBail --targets lint test build --exclude @zitadel/docs
       - name: Suggest Pipeline Fix By Nx Cloud AI
         if: always()
         env:
