@@ -33,7 +33,7 @@
             "options": {
                 "parallel": false,
                 "commands": [
-                    "nx run @zitadel/devcontainer:compose up --detach --wait ${API_AWAIT_DB_SERVICE}",
+                    "until nx run @zitadel/devcontainer:compose exec ${API_AWAIT_DB_SERVICE} pg_isready -U postgres -h localhost; do echo \"Awaiting DB\"; done",
                     "./.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} start-from-init --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters"
                 ]
             },
