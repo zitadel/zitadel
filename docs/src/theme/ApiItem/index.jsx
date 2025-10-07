@@ -37,10 +37,16 @@ export default function ApiItemWrapper(props) {
       <OriginalApiItem {...props} />
 
       <div className="mt-10 flex justify-start">
-        <div className="w-full max-w-2xl rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1a1a1a] p-6 shadow-sm">
-          {/* Title and buttons aligned horizontally */}
+        <div
+          className="w-full max-w-[35%] rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1a1a1a] p-6 shadow-sm transition-all duration-300"
+          style={{
+            minHeight: "120px",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           {feedback === null && (
-            <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center justify-between flex-wrap gap-3 flex-grow">
               <p
                 className="font-medium text-lg m-0"
                 style={{ color: "var(--ifm-menu-color)" }}
@@ -70,7 +76,7 @@ export default function ApiItemWrapper(props) {
           )}
 
           {feedback === "no" && (
-            <div className="mt-1 flex flex-col gap-3">
+            <div className="mt-1 flex flex-col gap-3 flex-grow">
               <textarea
                 className="textarea textarea-bordered w-full resize-none rounded-md border border-gray-300 dark:border-gray-600 bg-transparent p-2 text-sm"
                 rows="3"
@@ -99,12 +105,14 @@ export default function ApiItemWrapper(props) {
           )}
 
           {(feedback === "yes" || feedback === "submitted") && (
-            <p
-              className="mt-4 font-medium"
-              style={{ color: "var(--ifm-color-primary)" }}
-            >
-              Thanks for your feedback!
-            </p>
+            <div className="flex items-center justify-center flex-grow">
+              <p
+                className="font-medium text-center m-0"
+                style={{ color: "var(--ifm-color-primary)" }}
+              >
+                Thanks for your feedback!
+              </p>
+            </div>
           )}
         </div>
       </div>
