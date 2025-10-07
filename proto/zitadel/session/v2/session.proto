@@ -121,7 +121,7 @@ message SearchQuery {
     CreatorQuery creator_query = 4;
 
     // Search for sessions based on the user agent used to create the session.
-    // It can used to find sessions created from a specific device or browser.
+    // It can be used to find sessions created from a specific device or browser.
     // This is typically done for providing a list of active sessions to the user
     // in a user interface.
     UserAgentQuery user_agent_query = 5;

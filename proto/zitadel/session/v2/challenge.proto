@@ -32,7 +32,7 @@ message RequestChallenges {
     // When set to `USER_VERIFICATION_REQUIREMENT_REQUIRED` the behaviour is for passkey authentication.
     // Other values will mean U2F.
     // See also: https://www.w3.org/TR/webauthn/#enum-userVerificationRequirement
-    // If either the values is set to USER_VERIFICATION_REQUIREMENT_REQUIRED or in case the user verification
+    // If either the value is set to USER_VERIFICATION_REQUIREMENT_REQUIRED or the user verification
     // is passed as part of the authentication ceremony, the user_verified flag will be set in the resulting webauthn factor.
     UserVerificationRequirement user_verification_requirement = 2 [
       (validate.rules).enum = {
@@ -73,7 +73,7 @@ message RequestChallenges {
     }
   }
 
-  // WebAuthN request a challenge to be used in the WebAuthN authentication ceremony.
+  // WebAuthN requests a challenge to be used in the WebAuthN authentication ceremony.
   // They can be used for both passkey and U2F authentication.
   // They're required for a webauthn check at the SetSession endpoint.
   optional WebAuthN web_auth_n = 1;
