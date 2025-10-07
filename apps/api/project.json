@@ -152,7 +152,7 @@
         "test-integration-run-db": {
             "description": "Runs the database and cache for integration tests.",
             "continuous": true,
-            "command": "nx run @zitadel/devcontainer:compose up --force-recreate --renew-anon-volumes --remove-orphans db-api-integration cache-api-integration"
+            "command": "nx run @zitadel/devcontainer:compose up --force-recreate --renew-anon-volumes db-api-integration cache-api-integration"
         },
         "test-integration-run-api": {
             "description": "Runs the API server for the integration tests.",
@@ -207,7 +207,7 @@
         },
         "test-integration-stop": {
             "description": "Stops the database and cache containers used for integration tests.",
-            "command": "nx run @zitadel/devcontainer:compose down --remove-orphans --volumes db-api-integration cache-api-integration"
+            "command": "nx run @zitadel/devcontainer:compose down --volumes db-api-integration cache-api-integration"
         },
         "build-console": {
             "description": "Builds the Console and copies its static files to the API.",

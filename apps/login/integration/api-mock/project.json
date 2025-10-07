@@ -9,11 +9,11 @@
         "serve": {
             "description": "Starts the API mock server",
             "continuous": true,
-            "command": "nx run @zitadel/devcontainer:compose up --force-recreate --renew-anon-volumes --remove-orphans login-api-mock"
+            "command": "nx run @zitadel/devcontainer:compose up --force-recreate --renew-anon-volumes login-api-mock"
         },
         "down": {
             "description": "Stops the API mock server",
-            "command": "nx run @zitadel/devcontainer:compose down --remove-orphans login-api-mock"
+            "command": "nx run @zitadel/devcontainer:compose down login-api-mock"
         }
     }
 }
