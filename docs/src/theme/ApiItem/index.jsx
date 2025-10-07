@@ -88,6 +88,11 @@ export default function ApiItemWrapper(props) {
                 <button
                   className="button button--sm button--primary"
                   onClick={handleSubmitComment}
+                  disabled={comment.trim() === ""}
+                  style={{
+                    opacity: comment.trim() === "" ? 0.5 : 1,
+                    cursor: comment.trim() === "" ? "not-allowed" : "pointer",
+                  }}
                 >
                   Submit
                 </button>
