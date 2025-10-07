@@ -904,21 +904,18 @@ func TestServer_ListProjects_PermissionV2(t *testing.T) {
 				ctx: iamOwnerCtx,
 				dep: func(request *project.ListProjectsRequest, response *project.ListProjectsResponse) {
 					organizationName := integration.OrganizationName()
-					grantedOrganizationName := integration.OrganizationName()
-					projectName := integration.ProjectName()
 					organizationResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, organizationName, integration.Email())
-					grantedOrganizationResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, grantedOrganizationName, integration.Email())
 					projectResp := createProject(iamOwnerCtx, instancePermissionV2, t, organizationResp.GetOrganizationId(), true, true)
-					projectGrantResp := createProjectGrant(iamOwnerCtx, instancePermissionV2, t, grantedOrganizationResp.GetOrganizationId(), projectResp.GetProjectId(), projectName)
+					projectGrantResp := createProjectGrant(iamOwnerCtx, instancePermissionV2, t, organizationResp.GetOrganizationId(), projectResp.GetProjectId(), projectResp.GetName())
 					request.Filters[0].Filter = &project.ProjectSearchFilter_OrganizationIdFilter{
 						OrganizationIdFilter: &project.ProjectOrganizationIDFilter{
-							OrganizationId: grantedOrganizationResp.GetOrganizationId(),
+							OrganizationId: projectGrantResp.GetGrantedOrganizationId(),
 							Type:           project.ProjectOrganizationIDFilter_GRANTED,
 						},
 					}
 					response.Projects[0] = &project.Project{
 						ProjectId:               projectResp.GetProjectId(),
-						Name:                    projectName,
+						Name:                    projectResp.GetName(),
 						OrganizationId:          organizationResp.GetOrganizationId(),
 						CreationDate:            projectGrantResp.GetCreationDate(),
 						ChangeDate:              projectGrantResp.GetCreationDate(),
@@ -927,8 +924,8 @@ func TestServer_ListProjects_PermissionV2(t *testing.T) {
 						ProjectAccessRequired:   true,
 						AuthorizationRequired:   true,
 						PrivateLabelingSetting:  project.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED,
-						GrantedOrganizationId:   gu.Ptr(grantedOrganizationResp.GetOrganizationId()),
-						GrantedOrganizationName: gu.Ptr(grantedOrganizationName),
+						GrantedOrganizationId:   gu.Ptr(projectGrantResp.GrantedOrganizationId),
+						GrantedOrganizationName: gu.Ptr(projectGrantResp.GrantedOrganizationName),
 						GrantedState:            project.GrantedProjectState_GRANTED_PROJECT_STATE_ACTIVE,
 					}
 				},
