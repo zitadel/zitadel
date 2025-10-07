@@ -78,7 +78,7 @@ func (d *DeactivateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (
 		return err
 	}
 	if updateCount > 1 {
-		err = zerrors.ThrowInternal(NewMultipleOrgsUpdatedError(1, updateCount), "DOM-dXl1kJ", "unexpected number of rows updated")
+		err = zerrors.ThrowInternal(NewMultipleObjecstUpdatedError(1, updateCount), "DOM-dXl1kJ", "unexpected number of rows updated")
 		return err
 	}
 
