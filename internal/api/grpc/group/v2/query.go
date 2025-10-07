@@ -30,7 +30,7 @@ func (s *Server) ListGroups(ctx context.Context, req *connect.Request[group_v2.L
 	if err != nil {
 		return nil, err
 	}
-	resp, err := s.query.SearchGroups(ctx, queries)
+	resp, err := s.query.SearchGroups(ctx, queries, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
