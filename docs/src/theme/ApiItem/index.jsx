@@ -40,7 +40,7 @@ export default function ApiItemWrapper(props) {
         <div
           className="w-full max-w-[35%] rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1a1a1a] p-6 shadow-sm transition-all duration-300"
           style={{
-            minHeight: "120px",
+            minHeight: "100px",
             display: "flex",
             flexDirection: "column",
           }}
