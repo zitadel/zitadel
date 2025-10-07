@@ -15,8 +15,8 @@ importers:
         specifier: ^2.29.5
         version: 2.29.7(@types/node@24.3.1)
       nx:
-        specifier: 21.6.3
-        version: 21.6.3(@swc/core@1.13.5(@swc/helpers@0.5.17))
+        specifier: 21.6.1
+        version: 21.6.1(@swc/core@1.13.5(@swc/helpers@0.5.17))
       sass:
         specifier: ^1.64.1
         version: 1.92.1
@@ -10847,8 +10847,8 @@ packages:
       '@swc/core':
         optional: true
 
-  nx@21.6.3:
-    resolution: {integrity: sha512-CD/R7JV9OWy1UNsm6BOAMvH7m7EpqDKVHbBjoR8wmxYaTKkOQ9lPpi5yYIyRPpONK/uHCqYyeKa2cM3zP6euqw==}
+  nx@21.6.1:
+    resolution: {integrity: sha512-sVz4kXPxhHm+jyLpRlQblHP3ltlkivUc2psl6WpEbS3Z1pV5cMg6H/GDLohLt5VyQ8tgqKNA+mXQqljVUh8hWg==}
     hasBin: true
     peerDependencies:
       '@swc-node/register': ^1.8.0
@@ -29205,7 +29205,7 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  nx@21.6.3(@swc/core@1.13.5(@swc/helpers@0.5.17)):
+  nx@21.6.1(@swc/core@1.13.5(@swc/helpers@0.5.17)):
     dependencies:
       '@napi-rs/wasm-runtime': 0.2.4
       '@yarnpkg/lockfile': 1.1.0
