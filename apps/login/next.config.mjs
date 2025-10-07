@@ -42,9 +42,6 @@ const nextConfig = {
     // Add React 19 compatibility optimizations
     optimizePackageImports: ['@radix-ui/react-tooltip', '@heroicons/react'],
   },
-  images: {
-    unoptimized: true
-  },
   eslint: {
     ignoreDuringBuilds: true,
   },

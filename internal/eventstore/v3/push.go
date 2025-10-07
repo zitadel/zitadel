@@ -2,22 +2,22 @@ package eventstore
 
 import (
 	"context"
-	"database/sql"
 	_ "embed"
 	"fmt"
 
 	"github.com/riverqueue/river"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/queue"
 	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (es *Eventstore) Push(ctx context.Context, client database.ContextQueryExecuter, commands ...eventstore.Command) (events []eventstore.Event, err error) {
+func (es *Eventstore) Push(ctx context.Context, client database.QueryExecutor, commands ...eventstore.Command) (events []eventstore.Event, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -29,20 +29,9 @@ func (es *Eventstore) Push(ctx context.Context, client database.ContextQueryExec
 	return events, err
 }
 
-func (es *Eventstore) writeCommands(ctx context.Context, client database.ContextQueryExecuter, commands []eventstore.Command) (_ []eventstore.Event, err error) {
-	var conn *sql.Conn
-	switch c := client.(type) {
-	case database.Client:
-		conn, err = c.Conn(ctx)
-	case nil:
-		conn, err = es.client.Conn(ctx)
-		client = conn
-	}
-	if err != nil {
-		return nil, err
-	}
-	if conn != nil {
-		defer conn.Close()
+func (es *Eventstore) writeCommands(ctx context.Context, client database.QueryExecutor, commands []eventstore.Command) (_ []eventstore.Event, err error) {
+	if client == nil {
+		client = es.client
 	}
 
 	tx, close, err := es.pushTx(ctx, client)
@@ -56,7 +45,7 @@ func (es *Eventstore) writeCommands(ctx context.Context, client database.Context
 	}
 
 	// lock the instance for reading events if await events is set for the duration of the transaction.
-	_, err = tx.ExecContext(ctx, "SELECT pg_advisory_xact_lock_shared('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))", authz.GetInstance(ctx).InstanceID())
+	_, err = tx.Exec(ctx, "SELECT pg_advisory_xact_lock_shared('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))", authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +71,7 @@ func (es *Eventstore) writeCommands(ctx context.Context, client database.Context
 	return events, nil
 }
 
-func writeEvents(ctx context.Context, tx database.Tx, commands []eventstore.Command) (_ []eventstore.Event, err error) {
+func writeEvents(ctx context.Context, tx database.Transaction, commands []eventstore.Command) (_ []eventstore.Event, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -91,7 +80,7 @@ func writeEvents(ctx context.Context, tx database.Tx, commands []eventstore.Comm
 		return nil, err
 	}
 
-	rows, err := tx.QueryContext(ctx, `select owner, created_at, "sequence", position from eventstore.push($1::eventstore.command[])`, cmds)
+	rows, err := tx.Query(ctx, `select owner, created_at, "sequence", position from eventstore.push($1::eventstore.command[])`, cmds)
 	if err != nil {
 		return nil, err
 	}
@@ -110,12 +99,12 @@ func writeEvents(ctx context.Context, tx database.Tx, commands []eventstore.Comm
 	return events, nil
 }
 
-func (es *Eventstore) queueExecutions(ctx context.Context, tx database.Tx, events []eventstore.Event) error {
+func (es *Eventstore) queueExecutions(ctx context.Context, tx database.Transaction, events []eventstore.Event) error {
 	if es.queue == nil {
 		return nil
 	}
 
-	sqlTx, ok := tx.(*sql.Tx)
+	sqlTx, ok := tx.(*sql.Transaction)
 	if !ok {
 		types := make([]string, len(events))
 		for i, event := range events {
@@ -132,7 +121,7 @@ func (es *Eventstore) queueExecutions(ctx context.Context, tx database.Tx, event
 		return nil
 	}
 	return es.queue.InsertManyFastTx(
-		ctx, sqlTx, jobArgs,
+		ctx, sqlTx.Tx, jobArgs,
 		queue.WithQueueName(exec_repo.QueueName),
 	)
 }
