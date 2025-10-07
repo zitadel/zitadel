@@ -6,16 +6,40 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-type Value interface {
-	Boolean | Number | Text | Instruction
+type wrappedValue[V Value] struct {
+	value V
+	fn    function
 }
 
+func LowerValue[T Value](v T) wrappedValue[T] {
+	return wrappedValue[T]{value: v, fn: functionLower}
+}
+
+func SHA256Value[T Value](v T) wrappedValue[T] {
+	return wrappedValue[T]{value: v, fn: functionSHA256}
+}
+
+func (b wrappedValue[V]) WriteArg(builder *StatementBuilder) {
+	builder.Grow(len(b.fn) + 5)
+	builder.WriteString(string(b.fn))
+	builder.WriteRune('(')
+	builder.WriteArg(b.value)
+	builder.WriteRune(')')
+}
+
+var _ argWriter = (*wrappedValue[string])(nil)
+
+type Value interface {
+	Boolean | Number | Text | Instruction | Bytes
+}
+
+//go:generate enumer -type NumberOperation,TextOperation,BytesOperation -linecomment -output ./operators_enumer.go
 type Operation interface {
-	BooleanOperation | NumberOperation | TextOperation
+	NumberOperation | TextOperation | BytesOperation
 }
 
 type Text interface {
-	~string | ~[]byte
+	~string | Bytes
 }
 
 // TextOperation are operations that can be performed on text values.
@@ -23,60 +47,17 @@ type TextOperation uint8
 
 const (
 	// TextOperationEqual compares two strings for equality.
-	TextOperationEqual TextOperation = iota + 1
-	// TextOperationEqualIgnoreCase compares two strings for equality, ignoring case.
-	TextOperationEqualIgnoreCase
+	TextOperationEqual TextOperation = iota + 1 // =
 	// TextOperationNotEqual compares two strings for inequality.
-	TextOperationNotEqual
-	// TextOperationNotEqualIgnoreCase compares two strings for inequality, ignoring case.
-	TextOperationNotEqualIgnoreCase
+	TextOperationNotEqual // <>
 	// TextOperationStartsWith checks if the first string starts with the second.
-	TextOperationStartsWith
-	// TextOperationStartsWithIgnoreCase checks if the first string starts with the second, ignoring case.
-	TextOperationStartsWithIgnoreCase
+	TextOperationStartsWith // LIKE
 )
 
-var textOperations = map[TextOperation]string{
-	TextOperationEqual:                " = ",
-	TextOperationEqualIgnoreCase:      " LIKE ",
-	TextOperationNotEqual:             " <> ",
-	TextOperationNotEqualIgnoreCase:   " NOT LIKE ",
-	TextOperationStartsWith:           " LIKE ",
-	TextOperationStartsWithIgnoreCase: " LIKE ",
-}
-
-func writeTextOperation[T Text](builder *StatementBuilder, col Column, op TextOperation, value T) {
-	switch op {
-	case TextOperationEqual, TextOperationNotEqual:
-		col.WriteQualified(builder)
-		builder.WriteString(textOperations[op])
-		builder.WriteArg(value)
-	case TextOperationEqualIgnoreCase, TextOperationNotEqualIgnoreCase:
-		builder.WriteString("LOWER(")
-		col.WriteQualified(builder)
-		builder.WriteString(")")
-
-		builder.WriteString(textOperations[op])
-		builder.WriteString("LOWER(")
-		builder.WriteArg(value)
-		builder.WriteString(")")
-	case TextOperationStartsWith:
-		col.WriteQualified(builder)
-		builder.WriteString(textOperations[op])
-		builder.WriteArg(value)
+func writeTextOperation[T Text](builder *StatementBuilder, col Column, op TextOperation, value any) {
+	writeOperation[T](builder, col, op.String(), value)
+	if op == TextOperationStartsWith {
 		builder.WriteString(" || '%'")
-	case TextOperationStartsWithIgnoreCase:
-		builder.WriteString("LOWER(")
-		col.WriteQualified(builder)
-		builder.WriteString(")")
-
-		builder.WriteString(textOperations[op])
-		builder.WriteString("LOWER(")
-		builder.WriteArg(value)
-		builder.WriteString(")")
-		builder.WriteString(" || '%'")
-	default:
-		panic("unsupported text operation")
 	}
 }
 
@@ -89,48 +70,60 @@ type NumberOperation uint8
 
 const (
 	// NumberOperationEqual compares two numbers for equality.
-	NumberOperationEqual NumberOperation = iota + 1
+	NumberOperationEqual NumberOperation = iota + 1 // =
 	// NumberOperationNotEqual compares two numbers for inequality.
-	NumberOperationNotEqual
+	NumberOperationNotEqual // <>
 	// NumberOperationLessThan compares two numbers to check if the first is less than the second.
-	NumberOperationLessThan
+	NumberOperationLessThan // <
 	// NumberOperationLessThanOrEqual compares two numbers to check if the first is less than or equal to the second.
-	NumberOperationAtLeast
+	NumberOperationAtLeast // <=
 	// NumberOperationGreaterThan compares two numbers to check if the first is greater than the second.
-	NumberOperationGreaterThan
+	NumberOperationGreaterThan // >
 	// NumberOperationGreaterThanOrEqual compares two numbers to check if the first is greater than or equal to the second.
-	NumberOperationAtMost
+	NumberOperationAtMost // >=
 )
 
-var numberOperations = map[NumberOperation]string{
-	NumberOperationEqual:       " = ",
-	NumberOperationNotEqual:    " <> ",
-	NumberOperationLessThan:    " < ",
-	NumberOperationAtLeast:     " <= ",
-	NumberOperationGreaterThan: " > ",
-	NumberOperationAtMost:      " >= ",
-}
-
-func writeNumberOperation[T Number](builder *StatementBuilder, col Column, op NumberOperation, value T) {
-	col.WriteQualified(builder)
-	builder.WriteString(numberOperations[op])
-	builder.WriteArg(value)
+func writeNumberOperation[T Number](builder *StatementBuilder, col Column, op NumberOperation, value any) {
+	writeOperation[T](builder, col, op.String(), value)
 }
 
 type Boolean interface {
 	~bool
 }
 
-// BooleanOperation are operations that can be performed on boolean values.
-type BooleanOperation uint8
+func writeBooleanOperation[T Boolean](builder *StatementBuilder, col Column, value any) {
+	writeOperation[T](builder, col, "=", value)
+}
+
+type Bytes interface {
+	~[]byte
+}
+
+// BytesOperation are operations that can be performed on bytea values.
+type BytesOperation uint8
 
 const (
-	BooleanOperationIsTrue BooleanOperation = iota + 1
-	BooleanOperationIsFalse
+	BytesOperationEqual    BytesOperation = iota + 1 // =
+	BytesOperationNotEqual                           // <>
 )
 
-func writeBooleanOperation[T Boolean](builder *StatementBuilder, col Column, value T) {
+func writeBytesOperation[T Bytes](builder *StatementBuilder, col Column, op BytesOperation, value any) {
+	writeOperation[T](builder, col, op.String(), value)
+}
+
+func writeOperation[V Value](builder *StatementBuilder, col Column, op string, value any) {
+	if op == "" {
+		panic("unsupported operation")
+	}
+
+	switch value.(type) {
+	case V, wrappedValue[V], *wrappedValue[V]:
+	default:
+		panic("unsupported value type")
+	}
 	col.WriteQualified(builder)
-	builder.WriteString(" = ")
+	builder.WriteRune(' ')
+	builder.WriteString(op)
+	builder.WriteRune(' ')
 	builder.WriteArg(value)
 }

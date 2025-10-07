@@ -20,18 +20,26 @@ export type Cookie = {
 
 type SessionCookie<T> = Cookie & T;
 
-async function setSessionHttpOnlyCookie<T>(
-  sessions: SessionCookie<T>[],
-  sameSite: boolean | "lax" | "strict" | "none" = true,
-) {
+async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[], iFrameEnabled: boolean = false) {
   const cookiesList = await cookies();
+
+  // "none" is required for iframe embedding (with secure flag)
+  let resolvedSameSite: "lax" | "strict" | "none";
+
+  if (iFrameEnabled) {
+    // When embedded in iframe, must use "none" with secure flag
+    resolvedSameSite = "none";
+  } else {
+    // This allows cookies during top-level navigation while blocking cross-origin requests
+    resolvedSameSite = "lax";
+  }
 
   return cookiesList.set({
     name: "sessions",
     value: JSON.stringify(sessions),
     httpOnly: true,
     path: "/",
-    sameSite: process.env.NODE_ENV === "production" ? sameSite : "lax",
+    sameSite: resolvedSameSite,
     secure: process.env.NODE_ENV === "production",
   });
 }
@@ -50,22 +58,18 @@ export async function setLanguageCookie(language: string) {
 export async function addSessionToCookie<T>({
   session,
   cleanup,
-  sameSite,
+  iFrameEnabled,
 }: {
   session: SessionCookie<T>;
   cleanup?: boolean;
-  sameSite?: boolean | "lax" | "strict" | "none" | undefined;
+  iFrameEnabled?: boolean;
 }): Promise<any> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
-  let currentSessions: SessionCookie<T>[] = stringifiedCookie?.value
-    ? JSON.parse(stringifiedCookie?.value)
-    : [];
+  let currentSessions: SessionCookie<T>[] = stringifiedCookie?.value ? JSON.parse(stringifiedCookie?.value) : [];
 
-  const index = currentSessions.findIndex(
-    (s) => s.loginName === session.loginName,
-  );
+  const index = currentSessions.findIndex((s) => s.loginName === session.loginName);
 
   if (index > -1) {
     currentSessions[index] = session;
@@ -85,13 +89,11 @@ export async function addSessionToCookie<T>({
   if (cleanup) {
     const now = new Date();
     const filteredSessions = currentSessions.filter((session) =>
-      session.expirationTs
-        ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now
-        : true,
+      session.expirationTs ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now : true,
     );
-    return setSessionHttpOnlyCookie(filteredSessions, sameSite);
+    return setSessionHttpOnlyCookie(filteredSessions, iFrameEnabled);
   } else {
-    return setSessionHttpOnlyCookie(currentSessions, sameSite);
+    return setSessionHttpOnlyCookie(currentSessions, iFrameEnabled);
   }
 }
 
@@ -99,19 +101,17 @@ export async function updateSessionCookie<T>({
   id,
   session,
   cleanup,
-  sameSite,
+  iFrameEnabled,
 }: {
   id: string;
   session: SessionCookie<T>;
   cleanup?: boolean;
-  sameSite?: boolean | "lax" | "strict" | "none" | undefined;
+  iFrameEnabled?: boolean;
 }): Promise<any> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
-  const sessions: SessionCookie<T>[] = stringifiedCookie?.value
-    ? JSON.parse(stringifiedCookie?.value)
-    : [session];
+  const sessions: SessionCookie<T>[] = stringifiedCookie?.value ? JSON.parse(stringifiedCookie?.value) : [session];
 
   const foundIndex = sessions.findIndex((session) => session.id === id);
 
@@ -120,13 +120,11 @@ export async function updateSessionCookie<T>({
     if (cleanup) {
       const now = new Date();
       const filteredSessions = sessions.filter((session) =>
-        session.expirationTs
-          ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now
-          : true,
+        session.expirationTs ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now : true,
       );
-      return setSessionHttpOnlyCookie(filteredSessions, sameSite);
+      return setSessionHttpOnlyCookie(filteredSessions, iFrameEnabled);
     } else {
-      return setSessionHttpOnlyCookie(sessions, sameSite);
+      return setSessionHttpOnlyCookie(sessions, iFrameEnabled);
     }
   } else {
     throw "updateSessionCookie<T>: session id now found";
@@ -136,30 +134,26 @@ export async function updateSessionCookie<T>({
 export async function removeSessionFromCookie<T>({
   session,
   cleanup,
-  sameSite,
+  iFrameEnabled,
 }: {
   session: SessionCookie<T>;
   cleanup?: boolean;
-  sameSite?: boolean | "lax" | "strict" | "none" | undefined;
+  iFrameEnabled?: boolean;
 }) {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
-  const sessions: SessionCookie<T>[] = stringifiedCookie?.value
-    ? JSON.parse(stringifiedCookie?.value)
-    : [session];
+  const sessions: SessionCookie<T>[] = stringifiedCookie?.value ? JSON.parse(stringifiedCookie?.value) : [session];
 
   const reducedSessions = sessions.filter((s) => s.id !== session.id);
   if (cleanup) {
     const now = new Date();
     const filteredSessions = reducedSessions.filter((session) =>
-      session.expirationTs
-        ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now
-        : true,
+      session.expirationTs ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now : true,
     );
-    return setSessionHttpOnlyCookie(filteredSessions, sameSite);
+    return setSessionHttpOnlyCookie(filteredSessions, iFrameEnabled);
   } else {
-    return setSessionHttpOnlyCookie(reducedSessions, sameSite);
+    return setSessionHttpOnlyCookie(reducedSessions, iFrameEnabled);
   }
 }
 
@@ -194,9 +188,7 @@ export async function getSessionCookieById<T>({
     const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie?.value);
 
     const found = sessions.find((s) =>
-      organization
-        ? s.organization === organization && s.id === sessionId
-        : s.id === sessionId,
+      organization ? s.organization === organization && s.id === sessionId : s.id === sessionId,
     );
     if (found) {
       return found;
@@ -221,9 +213,7 @@ export async function getSessionCookieByLoginName<T>({
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie?.value);
     const found = sessions.find((s) =>
-      organization
-        ? s.organization === organization && s.loginName === loginName
-        : s.loginName === loginName,
+      organization ? s.organization === organization && s.loginName === loginName : s.loginName === loginName,
     );
     if (found) {
       return found;
@@ -240,9 +230,7 @@ export async function getSessionCookieByLoginName<T>({
  * @param cleanup when true, removes all expired sessions, default true
  * @returns Session Cookies
  */
-export async function getAllSessionCookieIds<T>(
-  cleanup: boolean = false,
-): Promise<string[]> {
+export async function getAllSessionCookieIds<T>(cleanup: boolean = false): Promise<string[]> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -253,9 +241,7 @@ export async function getAllSessionCookieIds<T>(
       const now = new Date();
       return sessions
         .filter((session) =>
-          session.expirationTs
-            ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now
-            : true,
+          session.expirationTs ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now : true,
         )
         .map((session) => session.id);
     } else {
@@ -271,9 +257,7 @@ export async function getAllSessionCookieIds<T>(
  * @param cleanup when true, removes all expired sessions, default true
  * @returns Session Cookies
  */
-export async function getAllSessions<T>(
-  cleanup: boolean = false,
-): Promise<SessionCookie<T>[]> {
+export async function getAllSessions<T>(cleanup: boolean = false): Promise<SessionCookie<T>[]> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -283,14 +267,13 @@ export async function getAllSessions<T>(
     if (cleanup) {
       const now = new Date();
       return sessions.filter((session) =>
-        session.expirationTs
-          ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now
-          : true,
+        session.expirationTs ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now : true,
       );
     } else {
       return sessions;
     }
   } else {
+    console.log("getAllSessions: No session cookie found, returning empty array");
     return [];
   }
 }
