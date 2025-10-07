@@ -81,7 +81,7 @@ func TestServer_CreateProject(t *testing.T) {
 			req: &project.CreateProjectRequest{
 				Name:           integration.ProjectName(),
 				OrganizationId: orgResp.GetOrganizationId(),
-				ProjectId:      gu.Ptr(integration.ID()),
+				ProjectId:      gu.Ptr(customID),
 			},
 			want: want{
 				id:           func(id string) { assert.Equal(t, customID, id) },
