@@ -4,7 +4,7 @@
     "run-db": {
       "continuous": true,
       "description": "Runs a local ephemeral Postgres database for functional UI (Console) tests.",
-      "command": "nx run @zitadel/devcontainer:compose up --force-recreate --renew-anon-volumes db-functional-ui"
+      "command": "nx run @zitadel/devcontainer:compose up --force-recreate --renew-anon-volumes --remove-orphans db-functional-ui"
     },
     "run-api": {
         "description": "Sets up and runs the Zitadel API with the embedded Console against which the functional UI tests are run.",

@@ -12,6 +12,10 @@ on:
       NX_CLOUD_ACCESS_TOKEN_READONLY:
         required: true
 
+concurrency:
+  group: lint-test-build-sequential
+  cancel-in-progress: false
+
 jobs:
   lint_test_build:
     name: Lint, Test and Build
