@@ -115,7 +115,7 @@ export default function ApiItemWrapper(props) {
                 className="font-medium text-center m-0"
                 style={{ color: "var(--ifm-color-primary)" }}
               >
-                Thanks for your feedback!
+                Thanks for your feedback 🎉
               </p>
             </div>
           )}
