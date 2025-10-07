@@ -7,6 +7,7 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/backend/v3/api/instance/v2/convert"
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
@@ -31,6 +32,25 @@ func DeleteInstance(ctx context.Context, instanceID string) (*connect.Response[i
 			// TODO(IAM-Marco): Change this with the real update date when OrganizationRepo.Update()
 			// returns the timestamp
 			DeletionDate: timestamppb.Now(),
+		},
+	}, nil
+}
+
+func GetInstance(ctx context.Context, instanceID string) (*connect.Response[instance.GetInstanceResponse], error) {
+	instanceGetCmd := domain.NewGetInstanceCommand(instanceID)
+
+	err := domain.Invoke(ctx, instanceGetCmd, domain.WithInstanceRepo(repository.InstanceRepository()))
+
+	if err != nil {
+		if errors.Is(err, &database.NoRowFoundError{}) {
+			return nil, zerrors.ThrowNotFound(err, "INST-QVrUwc", "instance not found")
+		}
+		return nil, err
+	}
+
+	return &connect.Response[instance.GetInstanceResponse]{
+		Msg: &instance.GetInstanceResponse{
+			Instance: convert.DomainInstanceModelToGRPCResponse(instanceGetCmd.Result()),
 		},
 	}, nil
 }

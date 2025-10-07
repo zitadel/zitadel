@@ -8,12 +8,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
@@ -27,43 +29,76 @@ func TestGetInstance(t *testing.T) {
 	defer cancel()
 
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
-	inst := integration.NewInstance(ctxWithSysAuthZ)
-	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
+	instEventStore := integration.NewInstance(ctxWithSysAuthZ)
+	orgOwnerCtxES := instEventStore.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
+
+	instRelational := integration.NewInstance(ctxWithSysAuthZ)
+	orgOwnerCtxREL := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
+	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)}, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+		assert.True(tCollect, got.GetEnableRelationalTables().GetEnabled())
+	})
 
 	t.Cleanup(func() {
-		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+		instRelational.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: instRelational.ID()})
+		instEventStore.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: instEventStore.ID()})
 	})
 
 	tt := []struct {
 		testName           string
+		instance           *integration.Instance
 		inputContext       context.Context
 		expectedInstanceID string
 		expectedErrorMsg   string
 		expectedErrorCode  codes.Code
 	}{
 		{
-			testName:          "when unauthN context should return unauthN error",
+			testName:          "eventstore instance - when unauthN context should return unauthN error",
 			inputContext:      context.Background(),
+			instance:          instEventStore,
 			expectedErrorCode: codes.Unauthenticated,
 			expectedErrorMsg:  "auth header missing",
 		},
 		{
-			testName:          "when unauthZ context should return unauthZ error",
-			inputContext:      orgOwnerCtx,
+			testName:          "eventstore instance - when unauthZ context should return unauthZ error",
+			inputContext:      orgOwnerCtxES,
+			instance:          instEventStore,
 			expectedErrorCode: codes.PermissionDenied,
 			expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
 		},
 		{
-			testName:           "when request succeeds should return matching instance",
+			testName:           "eventstore instance - when request succeeds should return matching instance",
 			inputContext:       ctxWithSysAuthZ,
-			expectedInstanceID: inst.ID(),
+			instance:           instEventStore,
+			expectedInstanceID: instEventStore.ID(),
+		},
+
+		// Relational
+		{
+			testName:          "relational instance - when unauthN context should return unauthN error",
+			inputContext:      context.Background(),
+			instance:          instRelational,
+			expectedErrorCode: codes.Unauthenticated,
+			expectedErrorMsg:  "auth header missing",
+		},
+		{
+			testName:          "relational instance - when unauthZ context should return unauthZ error",
+			inputContext:      orgOwnerCtxREL,
+			instance:          instRelational,
+			expectedErrorCode: codes.PermissionDenied,
+			expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
+		},
+		{
+			testName:           "relational instance - when request succeeds should return matching instance",
+			inputContext:       ctxWithSysAuthZ,
+			instance:           instRelational,
+			expectedInstanceID: instRelational.ID(),
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
 			// Test
-			res, err := inst.Client.InstanceV2Beta.GetInstance(tc.inputContext, &instance.GetInstanceRequest{InstanceId: inst.ID()})
+			res, err := tc.instance.Client.InstanceV2Beta.GetInstance(tc.inputContext, &instance.GetInstanceRequest{InstanceId: tc.instance.ID()})
 
 			// Verify
 			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
