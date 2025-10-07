@@ -337,31 +337,6 @@ const queryHumanUserStmt = `SELECT instance_id, org_id, id, username, username_o
 	` created_at, updated_at` +
 	` FROM zitadel.human_users`
 
-func (u user) GetHuman(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Human, error) {
-	options := new(database.QueryOpts)
-	for _, opt := range opts {
-		opt(options)
-	}
-
-	if !options.Condition.IsRestrictingColumn(u.human.InstanceIDColumn()) {
-		return nil, database.NewMissingConditionError(u.human.InstanceIDColumn())
-	}
-
-	if !options.Condition.IsRestrictingColumn(u.human.OrgIDColumn()) {
-		return nil, database.NewMissingConditionError(u.human.OrgIDColumn())
-	}
-
-	if !options.Condition.IsRestrictingColumn(u.human.IDColumn()) {
-		return nil, database.NewMissingConditionError(u.human.IDColumn())
-	}
-
-	var builder database.StatementBuilder
-	builder.WriteString(queryHumanUserStmt)
-	options.Write(&builder)
-
-	return scanHuman(ctx, client, &builder)
-}
-
 const createHumaneStmt = `INSERT INTO zitadel.human_users (instance_id, org_id, id, username, username_org_unique, state,` +
 	` first_name, last_name, nick_name, display_name, preferred_language, gender, avatar_key)` +
 	` VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)` +
@@ -369,7 +344,7 @@ const createHumaneStmt = `INSERT INTO zitadel.human_users (instance_id, org_id, 
 
 func (u user) CreateHuman(ctx context.Context, client database.QueryExecutor, user *domain.Human) (*domain.Human, error) {
 	builder := database.StatementBuilder{}
-	builder.AppendArgs(user.InstanceID, user.OrgID, user.ID, user.Username, user.UsernameOrgUnique, user.State)
+	builder.AppendArgs(user.User.InstanceID, user.User.OrgID, user.ID, user.Username, user.UsernameOrgUnique, user.State)
 	builder.AppendArgs(user.FirstName, user.LastName, user.NickName, user.DisplayName, user.PreferredLanguage, user.Gender, user.AvatarKey)
 
 	builder.WriteString(createHumaneStmt)
@@ -397,6 +372,113 @@ func (u user) UpdateHuman(ctx context.Context, client database.QueryExecutor, co
 
 	var builder database.StatementBuilder
 	builder.WriteString(`UPDATE zitadel.human_users SET `)
+	database.Changes(changes).Write(&builder)
+	writeCondition(&builder, condition)
+
+	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+func (u user) GetHuman(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Human, error) {
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	if !options.Condition.IsRestrictingColumn(u.human.InstanceIDColumn()) {
+		return nil, database.NewMissingConditionError(u.human.InstanceIDColumn())
+	}
+
+	if !options.Condition.IsRestrictingColumn(u.human.OrgIDColumn()) {
+		return nil, database.NewMissingConditionError(u.human.OrgIDColumn())
+	}
+
+	if !options.Condition.IsRestrictingColumn(u.human.IDColumn()) {
+		return nil, database.NewMissingConditionError(u.human.IDColumn())
+	}
+
+	var builder database.StatementBuilder
+	builder.WriteString(queryHumanUserStmt)
+	options.Write(&builder)
+
+	return scanHuman(ctx, client, &builder)
+}
+
+func (u user) ListHuman(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Human, error) {
+	builder := database.StatementBuilder{}
+
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	if !options.Condition.IsRestrictingColumn(u.Human().InstanceIDColumn()) {
+		return nil, database.NewMissingConditionError(u.Human().InstanceIDColumn())
+	}
+
+	builder.WriteString(queryHumanUserStmt)
+	options.Write(&builder)
+
+	orderBy := database.OrderBy(u.Human().CreatedAtColumn())
+	orderBy.Write(&builder)
+
+	return scanHumans(ctx, client, &builder)
+}
+
+func (u user) DeleteHuman(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	if !condition.IsRestrictingColumn(u.Human().InstanceIDColumn()) {
+		return 0, database.NewMissingConditionError(u.Human().InstanceIDColumn())
+	}
+
+	if !condition.IsRestrictingColumn(u.Human().OrgIDColumn()) {
+		return 0, database.NewMissingConditionError(u.Human().OrgIDColumn())
+	}
+
+	if !condition.IsRestrictingColumn(u.Human().IDColumn()) {
+		return 0, database.NewMissingConditionError(u.Human().IDColumn())
+	}
+
+	var builder database.StatementBuilder
+	builder.WriteString(`DELETE FROM zitadel.human_users`)
+	writeCondition(&builder, condition)
+
+	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+const createMachineStmt = `INSERT INTO zitadel.machine_users (instance_id, org_id, id, username, username_org_unique, state,` +
+	` name, description)` +
+	` VALUES($1, $2, $3, $4, $5, $6, $7, $8)` +
+	` RETURNING created_at, updated_at`
+
+func (u user) CreateMachine(ctx context.Context, client database.QueryExecutor, user *domain.Machine) (*domain.Machine, error) {
+	builder := database.StatementBuilder{}
+	builder.AppendArgs(user.InstanceID, user.OrgID, user.ID, user.Username, user.UsernameOrgUnique, user.State)
+	builder.AppendArgs(user.Name, user.Description)
+
+	builder.WriteString(createMachineStmt)
+
+	err := client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
+	return user, err
+}
+
+func (u user) UpdateMachine(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+	if len(changes) == 0 {
+		return 0, database.ErrNoChanges
+	}
+
+	if !condition.IsRestrictingColumn(u.machine.InstanceIDColumn()) {
+		return 0, database.NewMissingConditionError(u.machine.InstanceIDColumn())
+	}
+
+	if !condition.IsRestrictingColumn(u.machine.OrgIDColumn()) {
+		return 0, database.NewMissingConditionError(u.machine.OrgIDColumn())
+	}
+
+	if !condition.IsRestrictingColumn(u.machine.IDColumn()) {
+		return 0, database.NewMissingConditionError(u.machine.IDColumn())
+	}
+
+	var builder database.StatementBuilder
+	builder.WriteString(`UPDATE zitadel.machine_users SET `)
 	database.Changes(changes).Write(&builder)
 	writeCondition(&builder, condition)
 
@@ -438,23 +520,7 @@ func (u user) GetMachine(ctx context.Context, client database.QueryExecutor, opt
 	return scanMachine(ctx, client, &builder)
 }
 
-const createMachineStmt = `INSERT INTO zitadel.machine_users (instance_id, org_id, id, username, username_org_unique, state,` +
-	` name, description)` +
-	` VALUES($1, $2, $3, $4, $5, $6, $7, $8)` +
-	` RETURNING created_at, updated_at`
-
-func (u user) CreateMachine(ctx context.Context, client database.QueryExecutor, user *domain.Machine) (*domain.Machine, error) {
-	builder := database.StatementBuilder{}
-	builder.AppendArgs(user.InstanceID, user.OrgID, user.ID, user.Username, user.UsernameOrgUnique, user.State)
-	builder.AppendArgs(user.Name, user.Description)
-
-	builder.WriteString(createMachineStmt)
-
-	err := client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
-	return user, err
-}
-
-func (u user) ListHuman(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Human, error) {
+func (u user) ListMachine(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Machine, error) {
 	builder := database.StatementBuilder{}
 
 	options := new(database.QueryOpts)
@@ -462,26 +528,34 @@ func (u user) ListHuman(ctx context.Context, client database.QueryExecutor, opts
 		opt(options)
 	}
 
-	if !options.Condition.IsRestrictingColumn(u.Human().InstanceIDColumn()) {
-		return nil, database.NewMissingConditionError(u.Human().InstanceIDColumn())
+	if !options.Condition.IsRestrictingColumn(u.Machine().InstanceIDColumn()) {
+		return nil, database.NewMissingConditionError(u.Machine().InstanceIDColumn())
 	}
 
-	builder.WriteString(queryHumanUserStmt)
+	builder.WriteString(querMachineUserStmt)
 	options.Write(&builder)
 
-	orderBy := database.OrderBy(u.Human().CreatedAtColumn())
+	orderBy := database.OrderBy(u.Machine().CreatedAtColumn())
 	orderBy.Write(&builder)
 
-	return scanHumans(ctx, client, &builder)
+	return scanMachines(ctx, client, &builder)
 }
 
-func (u user) DeleteHuman(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	if !condition.IsRestrictingColumn(u.Human().InstanceIDColumn()) {
-		return 0, database.NewMissingConditionError(u.Human().InstanceIDColumn())
+func (u user) DeleteMachine(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	if !condition.IsRestrictingColumn(u.Machine().InstanceIDColumn()) {
+		return 0, database.NewMissingConditionError(u.Machine().InstanceIDColumn())
+	}
+
+	if !condition.IsRestrictingColumn(u.Machine().OrgIDColumn()) {
+		return 0, database.NewMissingConditionError(u.Machine().OrgIDColumn())
+	}
+
+	if !condition.IsRestrictingColumn(u.Machine().IDColumn()) {
+		return 0, database.NewMissingConditionError(u.Machine().IDColumn())
 	}
 
 	var builder database.StatementBuilder
-	builder.WriteString(`DELETE FROM zitadel.human_users`)
+	builder.WriteString(`DELETE FROM zitadel.machine_users`)
 	writeCondition(&builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
@@ -500,6 +574,22 @@ func scanMachine(ctx context.Context, querier database.Querier, builder *databas
 	}
 
 	return user, err
+}
+
+func scanMachines(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.Machine, error) {
+	users := []*domain.Machine{}
+
+	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+
+	err = rows.(database.CollectableRows).Collect(&users)
+	if err != nil {
+		return nil, err
+	}
+
+	return users, err
 }
 
 func scanHuman(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Human, error) {

@@ -67,8 +67,8 @@ type userChanges interface {
 // machine user
 type Machine struct {
 	User
-	Name        string `json:"name,omitempty" db:"name"`
-	Description string `json:"description,omitempty" db:"description"`
+	Name        string  `json:"name,omitempty" db:"name"`
+	Description *string `json:"description,omitempty" db:"description"`
 }
 
 type machineColumns interface {
@@ -98,6 +98,9 @@ type MachineRepository interface {
 // human user
 type Human struct {
 	User
+	HumanContact
+	HumanSecurity
+
 	FirstName         string `json:"firstName,omitempty" db:"first_name"`
 	LastName          string `json:"lastName,omitempty" db:"last_name"`
 	NickName          string `json:"nickName,omitempty" db:"nick_name"`
@@ -160,9 +163,20 @@ type HumanContact struct {
 	OrgID           string      `json:"orgId,omitempty" db:"org_id"`
 	UserId          string      `json:"userId,omitempty" db:"user_id"`
 	Type            ContactType `json:"type,omitempty" db:"type"`
-	CurrentValue    string      `json:"currentValue,omitempty" db:"current_value"`
-	Verified        bool        `json:"verified,omitempty" db:"verified"`
+	Value           string      `json:"value,omitempty" db:"value"`
+	IsVerified      bool        `json:"isVerified,omitempty" db:"is_verified"`
 	UnverifiedValue string      `json:"unverifiedValue,omitempty" db:"unverified_value"`
+}
+
+// human security
+type HumanSecurity struct {
+	InstanceID string `json:"instanceId,omitempty" db:"instance_id"`
+	OrgID      string `json:"orgId,omitempty" db:"org_id"`
+	UserId     string `json:"userId,omitempty" db:"user_id"`
+
+	PasswordChangeRequired bool      `json:"passwordChangeRequired,omitempty" db:"password_change_required"`
+	PasswordChange         time.Time `json:"passwordChange,omitempty" db:"password_change"`
+	MFAInitSkipped         bool      `json:"mfaInitSkipped,omitempty" db:"mfa_init_skipped"`
 }
 
 type humanContactColumns interface {
@@ -206,6 +220,8 @@ type UserRepository interface {
 	DeleteHuman(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 
 	CreateMachine(ctx context.Context, client database.QueryExecutor, user *Machine) (*Machine, error)
+	UpdateMachine(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	GetMachine(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Machine, error)
-	// ListMachine(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Machine, error)
+	ListMachine(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Machine, error)
+	DeleteMachine(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }

@@ -31,7 +31,7 @@ CREATE UNIQUE INDEX ON zitadel.users(instance_id, username) WHERE username_org_u
 
 -- machine user
 CREATE TABLE zitadel.machine_users(
-    name TEXT
+    name TEXT NOT NULL CHECK (name <> '')
     , description TEXT
 
     , PRIMARY KEY (instance_id, org_id, id)
@@ -56,6 +56,9 @@ CREATE TABLE zitadel.human_users(
     , gender SMALLINT 
     , avatar_key TEXT
 
+    , password_change_required TEXT
+    , avatar_key TEXT
+
     , PRIMARY KEY (instance_id, org_id, id)
     , FOREIGN KEY (instance_id) REFERENCES zitadel.instances(id)
     , FOREIGN KEY (instance_id, org_id) REFERENCES zitadel.organizations
@@ -77,7 +80,7 @@ CREATE TABLE zitadel.human_contacts(
     , org_id TEXT NOT NULL
     , user_id TEXT NOT NULL
     , type zitadel.human_contact_type NOT NULL
-    , current_value TEXT
+    , value TEXT
     , is_verified BOOLEAN NOT NULL DEFAULT FALSE
     , unverified_value TEXT -- if a user wants to update the info but its not yet verified, verification is done in a separate issue
 
@@ -87,6 +90,19 @@ CREATE TABLE zitadel.human_contacts(
 
 CREATE INDEX idx_human_contacts_value ON zitadel.human_contacts(instance_id, current_value);
 CREATE INDEX idx_human_contacts_value_lower ON zitadel.human_contacts(instance_id, lower(current_value)) WHERE type = 'email';
+
+CREATE TABLE zitadel.human_security(
+    instance_id TEXT NOT NULL
+    , org_id TEXT NOT NULL
+    , user_id TEXT NOT NULL
+
+    , password_change_required BOOLEAN NOT NULL DEFAULT FALSE
+    , password_changed TIMESTAMPTZ DEFAULT NOW()
+    , mfa_init_skipped BOOLEAN NOT NULL DEFAULT FALSE
+
+    , PRIMARY KEY (instance_id, org_id, user_id, type)
+    , FOREIGN KEY (instance_id, org_id, user_id) REFERENCES zitadel.human_users(instance_id, org_id, id) ON DELETE CASCADE
+);
 
 -- ------------------------------------------------------------
 -- function definitions

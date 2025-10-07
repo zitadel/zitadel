@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -12,7 +13,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 )
 
-func TestCreateHumanUser(t *testing.T) {
+func TestCreateMachineUser(t *testing.T) {
 	// beforeCreate := time.Now()
 	// tx, err := pool.Begin(t.Context(), nil)
 	// require.NoError(t, err)
@@ -56,7 +57,7 @@ func TestCreateHumanUser(t *testing.T) {
 	type test struct {
 		name     string
 		testFunc func(t *testing.T, client database.QueryExecutor)
-		user     *domain.Human
+		user     *domain.Machine
 		opts     []database.QueryOption
 		err      error
 	}
@@ -67,7 +68,7 @@ func TestCreateHumanUser(t *testing.T) {
 			id := gofakeit.UUID()
 			return test{
 				name: "happy path",
-				user: &domain.Human{
+				user: &domain.Machine{
 					User: domain.User{
 						ID:                id,
 						InstanceID:        instanceID,
@@ -76,26 +77,21 @@ func TestCreateHumanUser(t *testing.T) {
 						UsernameOrgUnique: true,
 						State:             domain.UserStateActive,
 					},
-					FirstName:         gofakeit.FirstName(),
-					LastName:          gofakeit.LastName(),
-					NickName:          gofakeit.Username(),
-					DisplayName:       gofakeit.Name(),
-					PreferredLanguage: "en",
-					Gender:            1,
-					AvatarKey:         gofakeit.Animal(),
+					Name:        gofakeit.Name(),
+					Description: gu.Ptr("description"),
 				},
 				opts: []database.QueryOption{
 					database.WithCondition(database.And(
-						userRepo.Human().InstanceIDCondition(instanceID),
-						userRepo.Human().OrgIDCondition(orgID),
-						userRepo.Human().IDCondition(id),
+						userRepo.Machine().InstanceIDCondition(instanceID),
+						userRepo.Machine().OrgIDCondition(orgID),
+						userRepo.Machine().IDCondition(id),
 					)),
 				},
 			}
 		}(),
 		{
 			name: "no id",
-			user: &domain.Human{
+			user: &domain.Machine{
 				User: domain.User{
 					// ID:         id,
 					InstanceID:        instanceID,
@@ -104,19 +100,13 @@ func TestCreateHumanUser(t *testing.T) {
 					UsernameOrgUnique: true,
 					State:             domain.UserStateActive,
 				},
-				FirstName:         gofakeit.FirstName(),
-				LastName:          gofakeit.LastName(),
-				NickName:          gofakeit.Username(),
-				DisplayName:       gofakeit.Name(),
-				PreferredLanguage: "en",
-				Gender:            1,
-				AvatarKey:         gofakeit.Animal(),
+				Name: gofakeit.Name(),
 			},
 			err: new(database.CheckError),
 		},
 		{
 			name: "no username",
-			user: &domain.Human{
+			user: &domain.Machine{
 				User: domain.User{
 					ID:         gofakeit.UUID(),
 					InstanceID: instanceID,
@@ -125,19 +115,13 @@ func TestCreateHumanUser(t *testing.T) {
 					UsernameOrgUnique: true,
 					State:             domain.UserStateActive,
 				},
-				FirstName:         gofakeit.FirstName(),
-				LastName:          gofakeit.LastName(),
-				NickName:          gofakeit.Username(),
-				DisplayName:       gofakeit.Name(),
-				PreferredLanguage: "en",
-				Gender:            1,
-				AvatarKey:         gofakeit.Animal(),
+				Name: gofakeit.Name(),
 			},
 			err: new(database.CheckError),
 		},
 		func() test {
 			id := gofakeit.UUID()
-			user := &domain.Human{
+			user := &domain.Machine{
 				User: domain.User{
 					ID:                id,
 					InstanceID:        instanceID,
@@ -146,19 +130,13 @@ func TestCreateHumanUser(t *testing.T) {
 					UsernameOrgUnique: true,
 					State:             domain.UserStateActive,
 				},
-				FirstName:         gofakeit.FirstName(),
-				LastName:          gofakeit.LastName(),
-				NickName:          gofakeit.Username(),
-				DisplayName:       gofakeit.Name(),
-				PreferredLanguage: "en",
-				Gender:            1,
-				AvatarKey:         gofakeit.Animal(),
+				Name: gofakeit.Name(),
 			}
 			return test{
 				name: "same instance + org + username twice, with username_org_unique = true",
 				user: user,
 				testFunc: func(t *testing.T, client database.QueryExecutor) {
-					_, err := userRepo.CreateHuman(t.Context(), pool, user)
+					_, err := userRepo.CreateMachine(t.Context(), pool, user)
 					require.NoError(t, err)
 				},
 				err: new(database.UniqueError),
@@ -166,7 +144,7 @@ func TestCreateHumanUser(t *testing.T) {
 		}(),
 		func() test {
 			id := gofakeit.UUID()
-			user := &domain.Human{
+			user := &domain.Machine{
 				User: domain.User{
 					ID:                id,
 					InstanceID:        instanceID,
@@ -175,15 +153,9 @@ func TestCreateHumanUser(t *testing.T) {
 					UsernameOrgUnique: false,
 					State:             domain.UserStateActive,
 				},
-				FirstName:         gofakeit.FirstName(),
-				LastName:          gofakeit.LastName(),
-				NickName:          gofakeit.Username(),
-				DisplayName:       gofakeit.Name(),
-				PreferredLanguage: "en",
-				Gender:            1,
-				AvatarKey:         gofakeit.Animal(),
+				Name: gofakeit.Name(),
 			}
-			_, err := userRepo.CreateHuman(t.Context(), pool, user)
+			_, err := userRepo.CreateMachine(t.Context(), pool, user)
 			require.NoError(t, err)
 			return test{
 				name: "same instance + org + id twice, with username_org_unique = false",
@@ -195,7 +167,7 @@ func TestCreateHumanUser(t *testing.T) {
 			id := gofakeit.UUID()
 			newOrgID := gofakeit.UUID()
 
-			user := &domain.Human{
+			user := &domain.Machine{
 				User: domain.User{
 					ID:                id,
 					InstanceID:        instanceID,
@@ -204,13 +176,7 @@ func TestCreateHumanUser(t *testing.T) {
 					UsernameOrgUnique: true,
 					State:             domain.UserStateActive,
 				},
-				FirstName:         gofakeit.FirstName(),
-				LastName:          gofakeit.LastName(),
-				NickName:          gofakeit.Username(),
-				DisplayName:       gofakeit.Name(),
-				PreferredLanguage: "en",
-				Gender:            1,
-				AvatarKey:         gofakeit.Animal(),
+				Name: gofakeit.Name(),
 			}
 			return test{
 				name: "same instance + username twice, different org with username_org_unique = true",
@@ -227,16 +193,16 @@ func TestCreateHumanUser(t *testing.T) {
 					err = orgRepo.Create(t.Context(), tx, &organization)
 					require.NoError(t, err)
 
-					_, err := userRepo.CreateHuman(t.Context(), pool, user)
+					_, err := userRepo.CreateMachine(t.Context(), pool, user)
 					require.NoError(t, err)
 					// change to different org
 					user.OrgID = orgID
 				},
 				opts: []database.QueryOption{
 					database.WithCondition(database.And(
-						userRepo.Human().InstanceIDCondition(instanceID),
-						userRepo.Human().OrgIDCondition(orgID),
-						userRepo.Human().IDCondition(id),
+						userRepo.Machine().InstanceIDCondition(instanceID),
+						userRepo.Machine().OrgIDCondition(orgID),
+						userRepo.Machine().IDCondition(id),
 					)),
 				},
 			}
@@ -246,7 +212,7 @@ func TestCreateHumanUser(t *testing.T) {
 			// create organization
 			newOrgID := gofakeit.UUID()
 
-			user := &domain.Human{
+			user := &domain.Machine{
 				User: domain.User{
 					ID:                id,
 					InstanceID:        instanceID,
@@ -255,13 +221,7 @@ func TestCreateHumanUser(t *testing.T) {
 					UsernameOrgUnique: false,
 					State:             domain.UserStateActive,
 				},
-				FirstName:         gofakeit.FirstName(),
-				LastName:          gofakeit.LastName(),
-				NickName:          gofakeit.Username(),
-				DisplayName:       gofakeit.Name(),
-				PreferredLanguage: "en",
-				Gender:            1,
-				AvatarKey:         gofakeit.Animal(),
+				Name: gofakeit.Name(),
 			}
 			return test{
 				name: "same instance + username twice, different org with username_org_unique = false",
@@ -278,7 +238,7 @@ func TestCreateHumanUser(t *testing.T) {
 					err = orgRepo.Create(t.Context(), tx, &organization)
 					require.NoError(t, err)
 
-					_, err := userRepo.CreateHuman(t.Context(), pool, user)
+					_, err := userRepo.CreateMachine(t.Context(), pool, user)
 					require.NoError(t, err)
 					// change to different org
 					user.OrgID = orgID
@@ -291,7 +251,7 @@ func TestCreateHumanUser(t *testing.T) {
 			// create organization
 			newOrgID := gofakeit.UUID()
 
-			user := &domain.Human{
+			user := &domain.Machine{
 				User: domain.User{
 					ID:                id,
 					InstanceID:        instanceID,
@@ -300,13 +260,7 @@ func TestCreateHumanUser(t *testing.T) {
 					UsernameOrgUnique: true,
 					State:             domain.UserStateActive,
 				},
-				FirstName:         gofakeit.FirstName(),
-				LastName:          gofakeit.LastName(),
-				NickName:          gofakeit.Username(),
-				DisplayName:       gofakeit.Name(),
-				PreferredLanguage: "en",
-				Gender:            1,
-				AvatarKey:         gofakeit.Animal(),
+				Name: gofakeit.Name(),
 			}
 			return test{
 				name: "same username, instance with username_org_unique = true",
@@ -323,16 +277,16 @@ func TestCreateHumanUser(t *testing.T) {
 					err = orgRepo.Create(t.Context(), tx, &organization)
 					require.NoError(t, err)
 
-					_, err = userRepo.CreateHuman(t.Context(), pool, user)
+					_, err = userRepo.CreateMachine(t.Context(), pool, user)
 					require.NoError(t, err)
 					// change to different org
 					user.OrgID = orgID
 				},
 				opts: []database.QueryOption{
 					database.WithCondition(database.And(
-						userRepo.Human().InstanceIDCondition(instanceID),
-						userRepo.Human().OrgIDCondition(orgID),
-						userRepo.Human().IDCondition(id),
+						userRepo.Machine().InstanceIDCondition(instanceID),
+						userRepo.Machine().OrgIDCondition(orgID),
+						userRepo.Machine().IDCondition(id),
 					)),
 				},
 			}
@@ -341,7 +295,7 @@ func TestCreateHumanUser(t *testing.T) {
 			id := gofakeit.UUID()
 			newOrgID := gofakeit.UUID()
 
-			user := &domain.Human{
+			user := &domain.Machine{
 				User: domain.User{
 					ID:                id,
 					InstanceID:        instanceID,
@@ -350,13 +304,7 @@ func TestCreateHumanUser(t *testing.T) {
 					UsernameOrgUnique: false,
 					State:             domain.UserStateActive,
 				},
-				FirstName:         gofakeit.FirstName(),
-				LastName:          gofakeit.LastName(),
-				NickName:          gofakeit.Username(),
-				DisplayName:       gofakeit.Name(),
-				PreferredLanguage: "en",
-				Gender:            1,
-				AvatarKey:         gofakeit.Animal(),
+				Name: gofakeit.Name(),
 			}
 			return test{
 				name: "same username, instance with username_org_unique = true",
@@ -373,7 +321,7 @@ func TestCreateHumanUser(t *testing.T) {
 					err = orgRepo.Create(t.Context(), tx, &organization)
 					require.NoError(t, err)
 
-					_, err = userRepo.CreateHuman(t.Context(), pool, user)
+					_, err = userRepo.CreateMachine(t.Context(), pool, user)
 					require.NoError(t, err)
 					// change to different instance
 					user.InstanceID = instanceID
@@ -387,7 +335,7 @@ func TestCreateHumanUser(t *testing.T) {
 			newInstanceID := gofakeit.Name()
 			newOrgID := gofakeit.UUID()
 
-			user := &domain.Human{
+			user := &domain.Machine{
 				User: domain.User{
 					ID:                id,
 					InstanceID:        newInstanceID,
@@ -396,13 +344,7 @@ func TestCreateHumanUser(t *testing.T) {
 					UsernameOrgUnique: true,
 					State:             domain.UserStateActive,
 				},
-				FirstName:         gofakeit.FirstName(),
-				LastName:          gofakeit.LastName(),
-				NickName:          gofakeit.Username(),
-				DisplayName:       gofakeit.Name(),
-				PreferredLanguage: "en",
-				Gender:            1,
-				AvatarKey:         gofakeit.Animal(),
+				Name: gofakeit.Name(),
 			}
 			return test{
 				name: "same username, different instance with username_org_unique = true",
@@ -431,7 +373,7 @@ func TestCreateHumanUser(t *testing.T) {
 					err = orgRepo.Create(t.Context(), tx, &organization)
 					require.NoError(t, err)
 
-					_, err = userRepo.CreateHuman(t.Context(), pool, user)
+					_, err = userRepo.CreateMachine(t.Context(), pool, user)
 					require.NoError(t, err)
 					// change to different instance
 					user.InstanceID = instanceID
@@ -439,9 +381,9 @@ func TestCreateHumanUser(t *testing.T) {
 				},
 				opts: []database.QueryOption{
 					database.WithCondition(database.And(
-						userRepo.Human().InstanceIDCondition(instanceID),
-						userRepo.Human().OrgIDCondition(orgID),
-						userRepo.Human().IDCondition(id),
+						userRepo.Machine().InstanceIDCondition(instanceID),
+						userRepo.Machine().OrgIDCondition(orgID),
+						userRepo.Machine().IDCondition(id),
 					)),
 				},
 			}
@@ -452,7 +394,7 @@ func TestCreateHumanUser(t *testing.T) {
 			newInstanceID := gofakeit.Name()
 			newOrgID := gofakeit.UUID()
 
-			user := &domain.Human{
+			user := &domain.Machine{
 				User: domain.User{
 					ID:                id,
 					InstanceID:        newInstanceID,
@@ -461,13 +403,7 @@ func TestCreateHumanUser(t *testing.T) {
 					UsernameOrgUnique: false,
 					State:             domain.UserStateActive,
 				},
-				FirstName:         gofakeit.FirstName(),
-				LastName:          gofakeit.LastName(),
-				NickName:          gofakeit.Username(),
-				DisplayName:       gofakeit.Name(),
-				PreferredLanguage: "en",
-				Gender:            1,
-				AvatarKey:         gofakeit.Animal(),
+				Name: gofakeit.Name(),
 			}
 			return test{
 				name: "same username, different instance with username_org_unique = false",
@@ -496,7 +432,7 @@ func TestCreateHumanUser(t *testing.T) {
 					err = orgRepo.Create(t.Context(), tx, &organization)
 					require.NoError(t, err)
 
-					_, err = userRepo.CreateHuman(t.Context(), pool, user)
+					_, err = userRepo.CreateMachine(t.Context(), pool, user)
 					require.NoError(t, err)
 					// change to different instance
 					user.InstanceID = instanceID
@@ -504,18 +440,33 @@ func TestCreateHumanUser(t *testing.T) {
 				},
 				opts: []database.QueryOption{
 					database.WithCondition(database.And(
-						userRepo.Human().InstanceIDCondition(instanceID),
-						userRepo.Human().OrgIDCondition(orgID),
-						userRepo.Human().IDCondition(id),
+						userRepo.Machine().InstanceIDCondition(instanceID),
+						userRepo.Machine().OrgIDCondition(orgID),
+						userRepo.Machine().IDCondition(id),
 					)),
 				},
 				// err: new(database.UniqueError),
 			}
 		}(),
-		// human
+		// machine
+		{
+			name: "no name",
+			user: &domain.Machine{
+				User: domain.User{
+					ID:                gofakeit.UUID(),
+					InstanceID:        instanceID,
+					OrgID:             orgID,
+					Username:          gofakeit.Username(),
+					UsernameOrgUnique: true,
+					State:             domain.UserStateActive,
+				},
+				// Name: gofakeit.Name(),
+			},
+			err: new(database.CheckError),
+		},
 		{
 			name: "no first name",
-			user: &domain.Human{
+			user: &domain.Machine{
 				User: domain.User{
 					ID:                gofakeit.UUID(),
 					InstanceID:        instanceID,
@@ -524,76 +475,7 @@ func TestCreateHumanUser(t *testing.T) {
 					UsernameOrgUnique: true,
 					State:             domain.UserStateActive,
 				},
-				// FirstName:         gofakeit.FirstName(),
-				LastName:          gofakeit.LastName(),
-				NickName:          gofakeit.Username(),
-				DisplayName:       gofakeit.Name(),
-				PreferredLanguage: "en",
-				Gender:            1,
-				AvatarKey:         gofakeit.Animal(),
-			},
-			err: new(database.CheckError),
-		},
-		{
-			name: "no last name",
-			user: &domain.Human{
-				User: domain.User{
-					ID:                gofakeit.UUID(),
-					InstanceID:        instanceID,
-					OrgID:             orgID,
-					Username:          gofakeit.Username(),
-					UsernameOrgUnique: true,
-					State:             domain.UserStateActive,
-				},
-				FirstName: gofakeit.FirstName(),
-				// LastName:          gofakeit.LastName(),
-				NickName:          gofakeit.Username(),
-				DisplayName:       gofakeit.Name(),
-				PreferredLanguage: "en",
-				Gender:            1,
-				AvatarKey:         gofakeit.Animal(),
-			},
-			err: new(database.CheckError),
-		},
-		{
-			name: "no display name",
-			user: &domain.Human{
-				User: domain.User{
-					ID:                gofakeit.UUID(),
-					InstanceID:        instanceID,
-					OrgID:             orgID,
-					Username:          gofakeit.Username(),
-					UsernameOrgUnique: true,
-					State:             domain.UserStateActive,
-				},
-				FirstName: gofakeit.FirstName(),
-				LastName:  gofakeit.LastName(),
-				NickName:  gofakeit.Username(),
-				// DisplayName:       gofakeit.Name(),
-				PreferredLanguage: "en",
-				Gender:            1,
-				AvatarKey:         gofakeit.Animal(),
-			},
-			err: new(database.CheckError),
-		},
-		{
-			name: "no preferred language",
-			user: &domain.Human{
-				User: domain.User{
-					ID:                gofakeit.UUID(),
-					InstanceID:        instanceID,
-					OrgID:             orgID,
-					Username:          gofakeit.Username(),
-					UsernameOrgUnique: true,
-					State:             domain.UserStateActive,
-				},
-				FirstName:   gofakeit.FirstName(),
-				LastName:    gofakeit.LastName(),
-				NickName:    gofakeit.Username(),
-				DisplayName: gofakeit.Name(),
-				// PreferredLanguage: "en",
-				Gender:    1,
-				AvatarKey: gofakeit.Animal(),
+				// Name:         gofakeit.Name(),
 			},
 			err: new(database.CheckError),
 		},
@@ -621,14 +503,14 @@ func TestCreateHumanUser(t *testing.T) {
 
 			// create user
 			beforeCreate := time.Now()
-			user, err := userRepo.CreateHuman(t.Context(), savepoint, tt.user)
+			user, err := userRepo.CreateMachine(t.Context(), savepoint, tt.user)
 			if err != nil {
 				require.ErrorIs(t, err, tt.err)
 				return
 			}
 			afterCreate := time.Now()
 
-			createdUser, err := userRepo.GetHuman(t.Context(), savepoint, tt.opts...)
+			createdUser, err := userRepo.GetMachine(t.Context(), savepoint, tt.opts...)
 			require.NoError(t, err)
 
 			// user
@@ -640,14 +522,9 @@ func TestCreateHumanUser(t *testing.T) {
 			assert.Equal(t, tt.user.UsernameOrgUnique, createdUser.UsernameOrgUnique)
 			assert.Equal(t, tt.user.State, createdUser.State)
 
-			//  human
-			assert.Equal(t, tt.user.FirstName, createdUser.FirstName)
-			assert.Equal(t, tt.user.LastName, createdUser.LastName)
-			assert.Equal(t, tt.user.NickName, createdUser.NickName)
-			assert.Equal(t, tt.user.DisplayName, createdUser.DisplayName)
-			assert.Equal(t, tt.user.PreferredLanguage, createdUser.PreferredLanguage)
-			assert.Equal(t, tt.user.Gender, createdUser.Gender)
-			assert.Equal(t, tt.user.AvatarKey, createdUser.AvatarKey)
+			// machine
+			assert.Equal(t, tt.user.Name, createdUser.Name)
+			assert.Equal(t, tt.user.Description, createdUser.Description)
 
 			assert.WithinRange(t, user.CreatedAt, beforeCreate, afterCreate)
 			assert.WithinRange(t, user.CreatedAt, beforeCreate, afterCreate)
@@ -655,7 +532,7 @@ func TestCreateHumanUser(t *testing.T) {
 	}
 }
 
-func TestUpdateHumanUser(t *testing.T) {
+func TestUpdateMachineUser(t *testing.T) {
 	beforeUpdate := time.Now()
 	tx, err := pool.Begin(t.Context(), nil)
 	require.NoError(t, err)
@@ -697,7 +574,7 @@ func TestUpdateHumanUser(t *testing.T) {
 
 	type test struct {
 		name         string
-		testFunc     func(t *testing.T, tx database.QueryExecutor) *domain.Human
+		testFunc     func(t *testing.T, tx database.QueryExecutor) *domain.Machine
 		condition    database.Condition
 		changes      []database.Change
 		rowsAffected int64
@@ -709,8 +586,8 @@ func TestUpdateHumanUser(t *testing.T) {
 			id := gofakeit.UUID()
 			test := &test{
 				name: "happy path update username",
-				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Human {
-					user := &domain.Human{
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Machine {
+					user := &domain.Machine{
 						User: domain.User{
 							ID:                id,
 							InstanceID:        instanceID,
@@ -719,26 +596,20 @@ func TestUpdateHumanUser(t *testing.T) {
 							UsernameOrgUnique: false,
 							State:             domain.UserStateActive,
 						},
-						FirstName:         gofakeit.FirstName(),
-						LastName:          gofakeit.LastName(),
-						NickName:          gofakeit.Username(),
-						DisplayName:       gofakeit.Name(),
-						PreferredLanguage: "en",
-						Gender:            1,
-						AvatarKey:         gofakeit.Animal(),
+						Name: gofakeit.Name(),
 					}
 
-					user, err := userRepo.CreateHuman(t.Context(), tx, user)
+					user, err := userRepo.CreateMachine(t.Context(), tx, user)
 					require.NoError(t, err)
 					user.Username = "new_username"
 					return user
 				},
 				condition: database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(id),
+					userRepo.Machine().InstanceIDCondition(instanceID),
+					userRepo.Machine().OrgIDCondition(orgID),
+					userRepo.Machine().IDCondition(id),
 				),
-				changes:      []database.Change{userRepo.Human().SetUsername("new_username")},
+				changes:      []database.Change{userRepo.Machine().SetUsername("new_username")},
 				rowsAffected: 1,
 			}
 			return test
@@ -747,8 +618,8 @@ func TestUpdateHumanUser(t *testing.T) {
 			id := gofakeit.UUID()
 			test := &test{
 				name: "update username invalid value",
-				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Human {
-					user := &domain.Human{
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Machine {
+					user := &domain.Machine{
 						User: domain.User{
 							ID:                id,
 							InstanceID:        instanceID,
@@ -757,25 +628,19 @@ func TestUpdateHumanUser(t *testing.T) {
 							UsernameOrgUnique: false,
 							State:             domain.UserStateActive,
 						},
-						FirstName:         gofakeit.FirstName(),
-						LastName:          gofakeit.LastName(),
-						NickName:          gofakeit.Username(),
-						DisplayName:       gofakeit.Name(),
-						PreferredLanguage: "en",
-						Gender:            1,
-						AvatarKey:         gofakeit.Animal(),
+						Name: gofakeit.Name(),
 					}
 
-					user, err := userRepo.CreateHuman(t.Context(), tx, user)
+					user, err := userRepo.CreateMachine(t.Context(), tx, user)
 					require.NoError(t, err)
 					return user
 				},
 				condition: database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(id),
+					userRepo.Machine().InstanceIDCondition(instanceID),
+					userRepo.Machine().OrgIDCondition(orgID),
+					userRepo.Machine().IDCondition(id),
 				),
-				changes: []database.Change{userRepo.Human().SetUsername("")},
+				changes: []database.Change{userRepo.Machine().SetUsername("")},
 				err:     new(database.CheckError),
 			}
 			return test
@@ -784,8 +649,8 @@ func TestUpdateHumanUser(t *testing.T) {
 			id := gofakeit.UUID()
 			test := &test{
 				name: "happy path update username_org_unique",
-				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Human {
-					user := &domain.Human{
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Machine {
+					user := &domain.Machine{
 						User: domain.User{
 							ID:                id,
 							InstanceID:        instanceID,
@@ -794,26 +659,20 @@ func TestUpdateHumanUser(t *testing.T) {
 							UsernameOrgUnique: false,
 							State:             domain.UserStateActive,
 						},
-						FirstName:         gofakeit.FirstName(),
-						LastName:          gofakeit.LastName(),
-						NickName:          gofakeit.Username(),
-						DisplayName:       gofakeit.Name(),
-						PreferredLanguage: "en",
-						Gender:            1,
-						AvatarKey:         gofakeit.Animal(),
+						Name: gofakeit.Name(),
 					}
 
-					user, err := userRepo.CreateHuman(t.Context(), tx, user)
+					user, err := userRepo.CreateMachine(t.Context(), tx, user)
 					require.NoError(t, err)
 					user.UsernameOrgUnique = true
 					return user
 				},
 				condition: database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(id),
+					userRepo.Machine().InstanceIDCondition(instanceID),
+					userRepo.Machine().OrgIDCondition(orgID),
+					userRepo.Machine().IDCondition(id),
 				),
-				changes:      []database.Change{userRepo.Human().SetUsernameOrgUnique(true)},
+				changes:      []database.Change{userRepo.Machine().SetUsernameOrgUnique(true)},
 				rowsAffected: 1,
 			}
 			return test
@@ -822,8 +681,8 @@ func TestUpdateHumanUser(t *testing.T) {
 			id := gofakeit.UUID()
 			test := &test{
 				name: "happy path update state",
-				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Human {
-					user := &domain.Human{
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Machine {
+					user := &domain.Machine{
 						User: domain.User{
 							ID:                id,
 							InstanceID:        instanceID,
@@ -832,26 +691,20 @@ func TestUpdateHumanUser(t *testing.T) {
 							UsernameOrgUnique: false,
 							State:             domain.UserStateActive,
 						},
-						FirstName:         gofakeit.FirstName(),
-						LastName:          gofakeit.LastName(),
-						NickName:          gofakeit.Username(),
-						DisplayName:       gofakeit.Name(),
-						PreferredLanguage: "en",
-						Gender:            1,
-						AvatarKey:         gofakeit.Animal(),
+						Name: gofakeit.Name(),
 					}
 
-					user, err := userRepo.CreateHuman(t.Context(), tx, user)
+					user, err := userRepo.CreateMachine(t.Context(), tx, user)
 					require.NoError(t, err)
 					user.State = domain.UserStateInactive
 					return user
 				},
 				condition: database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(id),
+					userRepo.Machine().InstanceIDCondition(instanceID),
+					userRepo.Machine().OrgIDCondition(orgID),
+					userRepo.Machine().IDCondition(id),
 				),
-				changes:      []database.Change{userRepo.Human().SetState(domain.UserStateInactive)},
+				changes:      []database.Change{userRepo.Machine().SetState(domain.UserStateInactive)},
 				rowsAffected: 1,
 			}
 			return test
@@ -860,8 +713,8 @@ func TestUpdateHumanUser(t *testing.T) {
 			id := gofakeit.UUID()
 			test := &test{
 				name: "update invalid state",
-				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Human {
-					user := &domain.Human{
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Machine {
+					user := &domain.Machine{
 						User: domain.User{
 							ID:                id,
 							InstanceID:        instanceID,
@@ -870,37 +723,31 @@ func TestUpdateHumanUser(t *testing.T) {
 							UsernameOrgUnique: false,
 							State:             domain.UserStateActive,
 						},
-						FirstName:         gofakeit.FirstName(),
-						LastName:          gofakeit.LastName(),
-						NickName:          gofakeit.Username(),
-						DisplayName:       gofakeit.Name(),
-						PreferredLanguage: "en",
-						Gender:            1,
-						AvatarKey:         gofakeit.Animal(),
+						Name: gofakeit.Name(),
 					}
 
-					user, err := userRepo.CreateHuman(t.Context(), tx, user)
+					user, err := userRepo.CreateMachine(t.Context(), tx, user)
 					require.NoError(t, err)
 					user.State = domain.UserStateInactive
 					return user
 				},
 				condition: database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(id),
+					userRepo.Machine().InstanceIDCondition(instanceID),
+					userRepo.Machine().OrgIDCondition(orgID),
+					userRepo.Machine().IDCondition(id),
 				),
-				changes: []database.Change{userRepo.Human().SetState(domain.UserStateUnspecified)},
+				changes: []database.Change{userRepo.Machine().SetState(domain.UserStateUnspecified)},
 				err:     new(database.CheckError),
 			}
 			return test
 		}(),
-		// human
+		// machine
 		func() *test {
 			id := gofakeit.UUID()
 			test := &test{
-				name: "happy path update first name",
-				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Human {
-					user := &domain.Human{
+				name: "happy path update  name",
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Machine {
+					user := &domain.Machine{
 						User: domain.User{
 							ID:                id,
 							InstanceID:        instanceID,
@@ -909,26 +756,20 @@ func TestUpdateHumanUser(t *testing.T) {
 							UsernameOrgUnique: false,
 							State:             domain.UserStateActive,
 						},
-						FirstName:         "first_name",
-						LastName:          gofakeit.LastName(),
-						NickName:          gofakeit.Username(),
-						DisplayName:       gofakeit.Name(),
-						PreferredLanguage: "en",
-						Gender:            1,
-						AvatarKey:         gofakeit.Animal(),
+						Name: "first_name",
 					}
 
-					user, err := userRepo.CreateHuman(t.Context(), tx, user)
+					user, err := userRepo.CreateMachine(t.Context(), tx, user)
 					require.NoError(t, err)
-					user.FirstName = "new_first_name"
+					user.Name = "new_name"
 					return user
 				},
 				condition: database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(id),
+					userRepo.Machine().InstanceIDCondition(instanceID),
+					userRepo.Machine().OrgIDCondition(orgID),
+					userRepo.Machine().IDCondition(id),
 				),
-				changes:      []database.Change{userRepo.Human().SetFirstName("new_first_name")},
+				changes:      []database.Change{userRepo.Machine().SetName("new_name")},
 				rowsAffected: 1,
 			}
 			return test
@@ -936,9 +777,9 @@ func TestUpdateHumanUser(t *testing.T) {
 		func() *test {
 			id := gofakeit.UUID()
 			test := &test{
-				name: "update first name to invalid value",
-				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Human {
-					user := &domain.Human{
+				name: "update name to invalid value",
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Machine {
+					user := &domain.Machine{
 						User: domain.User{
 							ID:                id,
 							InstanceID:        instanceID,
@@ -947,25 +788,19 @@ func TestUpdateHumanUser(t *testing.T) {
 							UsernameOrgUnique: false,
 							State:             domain.UserStateActive,
 						},
-						FirstName:         "first_name",
-						LastName:          gofakeit.LastName(),
-						NickName:          gofakeit.Username(),
-						DisplayName:       gofakeit.Name(),
-						PreferredLanguage: "en",
-						Gender:            1,
-						AvatarKey:         gofakeit.Animal(),
+						Name: "name",
 					}
 
-					user, err := userRepo.CreateHuman(t.Context(), tx, user)
+					user, err := userRepo.CreateMachine(t.Context(), tx, user)
 					require.NoError(t, err)
 					return user
 				},
 				condition: database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(id),
+					userRepo.Machine().InstanceIDCondition(instanceID),
+					userRepo.Machine().OrgIDCondition(orgID),
+					userRepo.Machine().IDCondition(id),
 				),
-				changes: []database.Change{userRepo.Human().SetFirstName("")},
+				changes: []database.Change{userRepo.Machine().SetName("")},
 				err:     new(database.CheckError),
 			}
 			return test
@@ -973,9 +808,9 @@ func TestUpdateHumanUser(t *testing.T) {
 		func() *test {
 			id := gofakeit.UUID()
 			test := &test{
-				name: "happy path update last name",
-				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Human {
-					user := &domain.Human{
+				name: "happy path update description",
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Machine {
+					user := &domain.Machine{
 						User: domain.User{
 							ID:                id,
 							InstanceID:        instanceID,
@@ -984,330 +819,21 @@ func TestUpdateHumanUser(t *testing.T) {
 							UsernameOrgUnique: false,
 							State:             domain.UserStateActive,
 						},
-						FirstName:         gofakeit.Username(),
-						LastName:          "last_name",
-						NickName:          gofakeit.Username(),
-						DisplayName:       gofakeit.Name(),
-						PreferredLanguage: "en",
-						Gender:            1,
-						AvatarKey:         gofakeit.Animal(),
+						Name:        gofakeit.Username(),
+						Description: gu.Ptr("description"),
 					}
 
-					user, err := userRepo.CreateHuman(t.Context(), tx, user)
+					user, err := userRepo.CreateMachine(t.Context(), tx, user)
 					require.NoError(t, err)
-					user.LastName = "new_last_name"
+					user.Description = gu.Ptr("new_description")
 					return user
 				},
 				condition: database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(id),
+					userRepo.Machine().InstanceIDCondition(instanceID),
+					userRepo.Machine().OrgIDCondition(orgID),
+					userRepo.Machine().IDCondition(id),
 				),
-				changes:      []database.Change{userRepo.Human().SetLastName("new_last_name")},
-				rowsAffected: 1,
-			}
-			return test
-		}(),
-		func() *test {
-			id := gofakeit.UUID()
-			test := &test{
-				name: "update last name to invalid value",
-				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Human {
-					user := &domain.Human{
-						User: domain.User{
-							ID:                id,
-							InstanceID:        instanceID,
-							OrgID:             orgID,
-							Username:          gofakeit.Username(),
-							UsernameOrgUnique: false,
-							State:             domain.UserStateActive,
-						},
-						FirstName:         gofakeit.Username(),
-						LastName:          "last_name",
-						NickName:          gofakeit.Username(),
-						DisplayName:       gofakeit.Name(),
-						PreferredLanguage: "en",
-						Gender:            1,
-						AvatarKey:         gofakeit.Animal(),
-					}
-
-					user, err := userRepo.CreateHuman(t.Context(), tx, user)
-					require.NoError(t, err)
-					return user
-				},
-				condition: database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(id),
-				),
-				changes: []database.Change{userRepo.Human().SetLastName("")},
-				err:     new(database.CheckError),
-			}
-			return test
-		}(),
-		func() *test {
-			id := gofakeit.UUID()
-			test := &test{
-				name: "happy path update nick name",
-				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Human {
-					user := &domain.Human{
-						User: domain.User{
-							ID:                id,
-							InstanceID:        instanceID,
-							OrgID:             orgID,
-							Username:          gofakeit.Username(),
-							UsernameOrgUnique: false,
-							State:             domain.UserStateActive,
-						},
-						FirstName:         gofakeit.Username(),
-						LastName:          gofakeit.LastName(),
-						NickName:          "nick_name",
-						DisplayName:       gofakeit.Name(),
-						PreferredLanguage: "en",
-						Gender:            1,
-						AvatarKey:         gofakeit.Animal(),
-					}
-
-					user, err := userRepo.CreateHuman(t.Context(), tx, user)
-					require.NoError(t, err)
-					user.NickName = "new_nick_name"
-					return user
-				},
-				condition: database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(id),
-				),
-				changes:      []database.Change{userRepo.Human().SetNickName("new_nick_name")},
-				rowsAffected: 1,
-			}
-			return test
-		}(),
-		func() *test {
-			id := gofakeit.UUID()
-			test := &test{
-				name: "happy path update display name",
-				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Human {
-					user := &domain.Human{
-						User: domain.User{
-							ID:                id,
-							InstanceID:        instanceID,
-							OrgID:             orgID,
-							Username:          gofakeit.Username(),
-							UsernameOrgUnique: false,
-							State:             domain.UserStateActive,
-						},
-						FirstName:         gofakeit.Username(),
-						LastName:          gofakeit.LastName(),
-						NickName:          gofakeit.Username(),
-						DisplayName:       "display_name",
-						PreferredLanguage: "en",
-						Gender:            1,
-						AvatarKey:         gofakeit.Animal(),
-					}
-
-					user, err := userRepo.CreateHuman(t.Context(), tx, user)
-					require.NoError(t, err)
-					user.DisplayName = "new_display_name"
-					return user
-				},
-				condition: database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(id),
-				),
-				changes:      []database.Change{userRepo.Human().SetDisplayName("new_display_name")},
-				rowsAffected: 1,
-			}
-			return test
-		}(),
-		func() *test {
-			id := gofakeit.UUID()
-			test := &test{
-				name: "update display name to invalid value",
-				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Human {
-					user := &domain.Human{
-						User: domain.User{
-							ID:                id,
-							InstanceID:        instanceID,
-							OrgID:             orgID,
-							Username:          gofakeit.Username(),
-							UsernameOrgUnique: false,
-							State:             domain.UserStateActive,
-						},
-						FirstName:         gofakeit.Username(),
-						LastName:          gofakeit.LastName(),
-						NickName:          gofakeit.Username(),
-						DisplayName:       "display_name",
-						PreferredLanguage: "en",
-						Gender:            1,
-						AvatarKey:         gofakeit.Animal(),
-					}
-
-					user, err := userRepo.CreateHuman(t.Context(), tx, user)
-					require.NoError(t, err)
-					return user
-				},
-				condition: database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(id),
-				),
-				changes:      []database.Change{userRepo.Human().SetDisplayName("")},
-				err:          new(database.CheckError),
-				rowsAffected: 1,
-			}
-			return test
-		}(),
-		func() *test {
-			id := gofakeit.UUID()
-			test := &test{
-				name: "happy path update gender",
-				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Human {
-					user := &domain.Human{
-						User: domain.User{
-							ID:                id,
-							InstanceID:        instanceID,
-							OrgID:             orgID,
-							Username:          gofakeit.Username(),
-							UsernameOrgUnique: false,
-							State:             domain.UserStateActive,
-						},
-						FirstName:         gofakeit.Username(),
-						LastName:          gofakeit.LastName(),
-						NickName:          gofakeit.Username(),
-						DisplayName:       gofakeit.Name(),
-						PreferredLanguage: "en",
-						Gender:            1,
-						AvatarKey:         gofakeit.Animal(),
-					}
-
-					user, err := userRepo.CreateHuman(t.Context(), tx, user)
-					require.NoError(t, err)
-					user.Gender = 2
-					return user
-				},
-				condition: database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(id),
-				),
-				changes:      []database.Change{userRepo.Human().SetGender(2)},
-				rowsAffected: 1,
-			}
-			return test
-		}(),
-		func() *test {
-			id := gofakeit.UUID()
-			test := &test{
-				name: "happy path update preferred language",
-				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Human {
-					user := &domain.Human{
-						User: domain.User{
-							ID:                id,
-							InstanceID:        instanceID,
-							OrgID:             orgID,
-							Username:          gofakeit.Username(),
-							UsernameOrgUnique: false,
-							State:             domain.UserStateActive,
-						},
-						FirstName:         gofakeit.Username(),
-						LastName:          gofakeit.LastName(),
-						NickName:          gofakeit.Username(),
-						DisplayName:       gofakeit.Name(),
-						PreferredLanguage: "en",
-						Gender:            1,
-						AvatarKey:         gofakeit.Animal(),
-					}
-
-					user, err := userRepo.CreateHuman(t.Context(), tx, user)
-					require.NoError(t, err)
-					user.PreferredLanguage = "de"
-					return user
-				},
-				condition: database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(id),
-				),
-				changes:      []database.Change{userRepo.Human().SetPreferredLanguage("de")},
-				rowsAffected: 1,
-			}
-			return test
-		}(),
-		func() *test {
-			id := gofakeit.UUID()
-			test := &test{
-				name: "update preferred language invalid value",
-				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Human {
-					user := &domain.Human{
-						User: domain.User{
-							ID:                id,
-							InstanceID:        instanceID,
-							OrgID:             orgID,
-							Username:          gofakeit.Username(),
-							UsernameOrgUnique: false,
-							State:             domain.UserStateActive,
-						},
-						FirstName:         gofakeit.Username(),
-						LastName:          gofakeit.LastName(),
-						NickName:          gofakeit.Username(),
-						DisplayName:       gofakeit.Name(),
-						PreferredLanguage: "en",
-						Gender:            1,
-						AvatarKey:         gofakeit.Animal(),
-					}
-
-					user, err := userRepo.CreateHuman(t.Context(), tx, user)
-					require.NoError(t, err)
-					user.PreferredLanguage = "de"
-					return user
-				},
-				condition: database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(id),
-				),
-				changes: []database.Change{userRepo.Human().SetPreferredLanguage("")},
-				err:     new(database.CheckError),
-			}
-			return test
-		}(),
-		func() *test {
-			id := gofakeit.UUID()
-			avatarKey := gofakeit.Animal()
-			test := &test{
-				name: "happy path update avatar key",
-				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Human {
-					user := &domain.Human{
-						User: domain.User{
-							ID:                id,
-							InstanceID:        instanceID,
-							OrgID:             orgID,
-							Username:          gofakeit.Username(),
-							UsernameOrgUnique: false,
-							State:             domain.UserStateActive,
-						},
-						FirstName:         gofakeit.Username(),
-						LastName:          gofakeit.LastName(),
-						NickName:          gofakeit.Username(),
-						DisplayName:       gofakeit.Name(),
-						PreferredLanguage: "en",
-						Gender:            1,
-						AvatarKey:         gofakeit.Animal(),
-					}
-
-					user, err := userRepo.CreateHuman(t.Context(), tx, user)
-					require.NoError(t, err)
-					user.AvatarKey = avatarKey
-					return user
-				},
-				condition: database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(id),
-				),
-				changes:      []database.Change{userRepo.Human().SetAvatarKey(avatarKey)},
+				changes:      []database.Change{userRepo.Machine().SetDescription("new_description")},
 				rowsAffected: 1,
 			}
 			return test
@@ -1327,7 +853,7 @@ func TestUpdateHumanUser(t *testing.T) {
 			createdUser := tt.testFunc(t, tx)
 
 			// update user
-			rowsAffected, err := userRepo.UpdateHuman(
+			rowsAffected, err := userRepo.UpdateMachine(
 				t.Context(),
 				tx,
 				tt.condition,
@@ -1347,7 +873,7 @@ func TestUpdateHumanUser(t *testing.T) {
 			assert.Equal(t, tt.rowsAffected, rowsAffected)
 
 			// check user values
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.GetMachine(
 				t.Context(),
 				tx,
 				database.WithCondition(database.And(
@@ -1365,21 +891,16 @@ func TestUpdateHumanUser(t *testing.T) {
 			assert.Equal(t, createdUser.UsernameOrgUnique, user.UsernameOrgUnique)
 			assert.Equal(t, createdUser.State, user.State)
 
-			// // human
-			assert.Equal(t, createdUser.FirstName, user.FirstName)
-			assert.Equal(t, createdUser.LastName, user.LastName)
-			assert.Equal(t, createdUser.NickName, user.NickName)
-			assert.Equal(t, createdUser.DisplayName, user.DisplayName)
-			assert.Equal(t, createdUser.PreferredLanguage, user.PreferredLanguage)
-			assert.Equal(t, createdUser.Gender, user.Gender)
-			assert.Equal(t, createdUser.AvatarKey, user.AvatarKey)
+			// machine
+			assert.Equal(t, createdUser.Name, user.Name)
+			assert.Equal(t, createdUser.Description, user.Description)
 
 			assert.WithinRange(t, user.UpdatedAt, beforeUpdate, afterUpdate)
 		})
 	}
 }
 
-func TestGetHumanUser(t *testing.T) {
+func TestGetMachineUser(t *testing.T) {
 	// tx, err := pool.Begin(t.Context(), nil)
 	// require.NoError(t, err)
 	// defer func() {
@@ -1419,7 +940,7 @@ func TestGetHumanUser(t *testing.T) {
 
 	// create user, this user is created to have at least one user in the database
 	// that should not be returned in any of the results in these tests
-	user := domain.Human{
+	user := domain.Machine{
 		User: domain.User{
 			ID:                gofakeit.UUID(),
 			InstanceID:        instanceID,
@@ -1428,22 +949,16 @@ func TestGetHumanUser(t *testing.T) {
 			UsernameOrgUnique: true,
 			State:             domain.UserStateActive,
 		},
-		FirstName:         gofakeit.Username(),
-		LastName:          gofakeit.LastName(),
-		NickName:          gofakeit.Username(),
-		DisplayName:       gofakeit.Name(),
-		PreferredLanguage: "en",
-		Gender:            1,
-		AvatarKey:         gofakeit.Animal(),
+		Name: gofakeit.Name(),
 	}
 	userRepo := repository.UserRepository()
-	_, err = userRepo.CreateHuman(t.Context(), tx, &user)
+	_, err = userRepo.CreateMachine(t.Context(), tx, &user)
 	require.NoError(t, err)
 
 	type test struct {
 		name     string
-		testFunc func(t *testing.T, client database.QueryExecutor) *domain.Human
-		user     []*domain.Human
+		testFunc func(t *testing.T, client database.QueryExecutor) *domain.Machine
+		user     []*domain.Machine
 		opts     []database.QueryOption
 		err      error
 	}
@@ -1455,7 +970,7 @@ func TestGetHumanUser(t *testing.T) {
 			id := gofakeit.UUID()
 			return &test{
 				name: "Get happy path",
-				testFunc: func(t *testing.T, client database.QueryExecutor) *domain.Human {
+				testFunc: func(t *testing.T, client database.QueryExecutor) *domain.Machine {
 					// create instance
 					instance := domain.Instance{
 						ID:              newInstanceId,
@@ -1480,7 +995,7 @@ func TestGetHumanUser(t *testing.T) {
 					err = organizationRepo.Create(t.Context(), tx, &org)
 					require.NoError(t, err)
 
-					user := domain.Human{
+					user := domain.Machine{
 						User: domain.User{
 							ID:                id,
 							InstanceID:        newInstanceId,
@@ -1489,25 +1004,20 @@ func TestGetHumanUser(t *testing.T) {
 							UsernameOrgUnique: true,
 							State:             domain.UserStateActive,
 						},
-						FirstName:         gofakeit.Username(),
-						LastName:          gofakeit.LastName(),
-						NickName:          gofakeit.Username(),
-						DisplayName:       gofakeit.Name(),
-						PreferredLanguage: "en",
-						Gender:            1,
-						AvatarKey:         gofakeit.Animal(),
+						Name:        gofakeit.Name(),
+						Description: gu.Ptr("description"),
 					}
 					userRepo := repository.UserRepository()
-					_, err = userRepo.CreateHuman(t.Context(), tx, &user)
+					_, err = userRepo.CreateMachine(t.Context(), tx, &user)
 					require.NoError(t, err)
 
 					return &user
 				},
 				opts: []database.QueryOption{
 					database.WithCondition(database.And(
-						userRepo.Human().InstanceIDCondition(newInstanceId),
-						userRepo.Human().OrgIDCondition(newOrgId),
-						userRepo.Human().IDCondition(id),
+						userRepo.Machine().InstanceIDCondition(newInstanceId),
+						userRepo.Machine().OrgIDCondition(newOrgId),
+						userRepo.Machine().IDCondition(id),
 					)),
 				},
 			}
@@ -1519,9 +1029,9 @@ func TestGetHumanUser(t *testing.T) {
 				name: "no instance id",
 				opts: []database.QueryOption{
 					database.WithCondition(database.And(
-						// userRepo.Human().InstanceIDCondition(newInstanceId),
-						userRepo.Human().OrgIDCondition(newOrgId),
-						userRepo.Human().IDCondition(id),
+						// userRepo.Machine().InstanceIDCondition(newInstanceId),
+						userRepo.Machine().OrgIDCondition(newOrgId),
+						userRepo.Machine().IDCondition(id),
 					)),
 				},
 				err: new(database.MissingConditionError),
@@ -1535,9 +1045,9 @@ func TestGetHumanUser(t *testing.T) {
 				name: "no org id",
 				opts: []database.QueryOption{
 					database.WithCondition(database.And(
-						userRepo.Human().InstanceIDCondition(newInstanceId),
-						// userRepo.Human().OrgIDCondition(newOrgId),
-						userRepo.Human().IDCondition(id),
+						userRepo.Machine().InstanceIDCondition(newInstanceId),
+						// userRepo.Machine().OrgIDCondition(newOrgId),
+						userRepo.Machine().IDCondition(id),
 					)),
 				},
 				err: new(database.MissingConditionError),
@@ -1551,9 +1061,9 @@ func TestGetHumanUser(t *testing.T) {
 				name: "no user id",
 				opts: []database.QueryOption{
 					database.WithCondition(database.And(
-						userRepo.Human().InstanceIDCondition(newInstanceId),
-						userRepo.Human().OrgIDCondition(newOrgId),
-						// userRepo.Human().IDCondition(id),
+						userRepo.Machine().InstanceIDCondition(newInstanceId),
+						userRepo.Machine().OrgIDCondition(newOrgId),
+						// userRepo.Machine().IDCondition(id),
 					)),
 				},
 				err: new(database.MissingConditionError),
@@ -1567,9 +1077,9 @@ func TestGetHumanUser(t *testing.T) {
 				name: "get non existing user",
 				opts: []database.QueryOption{
 					database.WithCondition(database.And(
-						userRepo.Human().InstanceIDCondition(newInstanceId),
-						userRepo.Human().OrgIDCondition(newOrgId),
-						// userRepo.Human().IDCondition(id),
+						userRepo.Machine().InstanceIDCondition(newInstanceId),
+						userRepo.Machine().OrgIDCondition(newOrgId),
+						// userRepo.Machine().IDCondition(id),
 					)),
 				},
 				err: new(database.MissingConditionError),
@@ -1605,9 +1115,9 @@ func TestGetHumanUser(t *testing.T) {
 			var noOfUsers int64 = 1
 			return &test{
 				name: "delete already deleted user",
-				testFunc: func(t *testing.T, client database.QueryExecutor) *domain.Human {
+				testFunc: func(t *testing.T, client database.QueryExecutor) *domain.Machine {
 					for range noOfUsers {
-						user := domain.Human{
+						user := domain.Machine{
 							User: domain.User{
 								ID:                id,
 								InstanceID:        newInstanceId,
@@ -1616,26 +1126,20 @@ func TestGetHumanUser(t *testing.T) {
 								UsernameOrgUnique: true,
 								State:             domain.UserStateInactive,
 							},
-							FirstName:         gofakeit.Username(),
-							LastName:          gofakeit.LastName(),
-							NickName:          gofakeit.Username(),
-							DisplayName:       gofakeit.Name(),
-							PreferredLanguage: "en",
-							Gender:            1,
-							AvatarKey:         gofakeit.Animal(),
+							Name: gofakeit.Name(),
 						}
 
-						_, err := userRepo.CreateHuman(t.Context(), tx, &user)
+						_, err := userRepo.CreateMachine(t.Context(), tx, &user)
 						require.NoError(t, err)
 
 						// delete user
-						noOfDeletedRows, err := userRepo.DeleteHuman(
+						noOfDeletedRows, err := userRepo.DeleteMachine(
 							t.Context(),
 							tx,
 							database.And(
-								userRepo.Human().InstanceIDCondition(newInstanceId),
-								userRepo.Human().OrgIDCondition(newOrgId),
-								userRepo.Human().IDCondition(id),
+								userRepo.Machine().InstanceIDCondition(newInstanceId),
+								userRepo.Machine().OrgIDCondition(newOrgId),
+								userRepo.Machine().IDCondition(id),
 							),
 						)
 						require.NoError(t, err)
@@ -1645,9 +1149,9 @@ func TestGetHumanUser(t *testing.T) {
 				},
 				opts: []database.QueryOption{
 					database.WithCondition(database.And(
-						userRepo.Human().InstanceIDCondition(newInstanceId),
-						userRepo.Human().OrgIDCondition(newOrgId),
-						userRepo.Human().IDCondition(id),
+						userRepo.Machine().InstanceIDCondition(newInstanceId),
+						userRepo.Machine().OrgIDCondition(newOrgId),
+						userRepo.Machine().IDCondition(id),
 					)),
 				},
 				err: new(database.NoRowFoundError),
@@ -1665,13 +1169,13 @@ func TestGetHumanUser(t *testing.T) {
 			// 	}
 			// }()
 
-			var user *domain.Human
+			var user *domain.Machine
 			if tt.testFunc != nil {
 				user = tt.testFunc(t, pool)
 			}
 
 			// create returnedUser
-			returnedUser, err := userRepo.GetHuman(t.Context(), pool, tt.opts...)
+			returnedUser, err := userRepo.GetMachine(t.Context(), pool, tt.opts...)
 			if err != nil {
 				require.ErrorIs(t, err, tt.err)
 				return
@@ -1689,21 +1193,16 @@ func TestGetHumanUser(t *testing.T) {
 			assert.Equal(t, user.CreatedAt, returnedUser.CreatedAt)
 			assert.Equal(t, user.UpdatedAt, returnedUser.UpdatedAt)
 
-			// // human
-			assert.Equal(t, user.FirstName, returnedUser.FirstName)
-			assert.Equal(t, user.LastName, returnedUser.LastName)
-			assert.Equal(t, user.NickName, returnedUser.NickName)
-			assert.Equal(t, user.DisplayName, returnedUser.DisplayName)
-			assert.Equal(t, user.PreferredLanguage, returnedUser.PreferredLanguage)
-			assert.Equal(t, user.Gender, returnedUser.Gender)
-			assert.Equal(t, user.AvatarKey, returnedUser.AvatarKey)
+			// machine
+			assert.Equal(t, user.Name, returnedUser.Name)
+			assert.Equal(t, user.Description, returnedUser.Description)
 		})
 	}
 }
 
-func TestListHumanUser(t *testing.T) {
-	// tx, err := pool.Begin(t.Context(), nil)
-	// require.NoError(t, err)
+func TestListMachineUser(t *testing.T) {
+	// tx, err := pool.Begin.Context(), nil)
+	// require.NoError(t, er
 	// defer func() {
 	// 	err := tx.Rollback(t.Context())
 	// 	if err != nil {
@@ -1741,7 +1240,7 @@ func TestListHumanUser(t *testing.T) {
 
 	// create user, this user is created to have at least one user in the dbdatabase
 	// that should not be returned in any of the results in these tests
-	user := domain.Human{
+	user := domain.Machine{
 		User: domain.User{
 			ID:                gofakeit.UUID(),
 			InstanceID:        instanceID,
@@ -1750,22 +1249,16 @@ func TestListHumanUser(t *testing.T) {
 			UsernameOrgUnique: true,
 			State:             domain.UserStateActive,
 		},
-		FirstName:         gofakeit.FirstName(),
-		LastName:          gofakeit.LastName(),
-		NickName:          gofakeit.Username(),
-		DisplayName:       gofakeit.Name(),
-		PreferredLanguage: "en",
-		Gender:            1,
-		AvatarKey:         gofakeit.Animal(),
+		Name: gofakeit.Name(),
 	}
 	userRepo := repository.UserRepository()
-	_, err = userRepo.CreateHuman(t.Context(), tx, &user)
+	_, err = userRepo.CreateMachine(t.Context(), tx, &user)
 	require.NoError(t, err)
 
 	type test struct {
 		name     string
-		testFunc func(t *testing.T, client database.QueryExecutor) []*domain.Human
-		user     []*domain.Human
+		testFunc func(t *testing.T, client database.QueryExecutor) []*domain.Machine
+		user     []*domain.Machine
 		opts     []database.QueryOption
 		err      error
 	}
@@ -1775,7 +1268,7 @@ func TestListHumanUser(t *testing.T) {
 			newInstanceId := gofakeit.Name()
 			return &test{
 				name: "multiple users filter on instance, across 2 orgs",
-				testFunc: func(t *testing.T, client database.QueryExecutor) []*domain.Human {
+				testFunc: func(t *testing.T, client database.QueryExecutor) []*domain.Machine {
 					// create instance
 					instance := domain.Instance{
 						ID:              newInstanceId,
@@ -1802,10 +1295,10 @@ func TestListHumanUser(t *testing.T) {
 					require.NoError(t, err)
 
 					noOfUsers := 5
-					users := make([]*domain.Human, noOfUsers*2)
+					users := make([]*domain.Machine, noOfUsers*2)
 					for i := range noOfUsers {
 
-						user := domain.Human{
+						user := domain.Machine{
 							User: domain.User{
 								ID:                gofakeit.UUID(),
 								InstanceID:        newInstanceId,
@@ -1814,16 +1307,10 @@ func TestListHumanUser(t *testing.T) {
 								UsernameOrgUnique: true,
 								State:             domain.UserStateActive,
 							},
-							FirstName:         gofakeit.FirstName(),
-							LastName:          gofakeit.LastName(),
-							NickName:          gofakeit.Username(),
-							DisplayName:       gofakeit.Name(),
-							PreferredLanguage: "en",
-							Gender:            1,
-							AvatarKey:         gofakeit.Animal(),
+							Name: gofakeit.Name(),
 						}
 
-						_, err := userRepo.CreateHuman(t.Context(), tx, &user)
+						_, err := userRepo.CreateMachine(t.Context(), tx, &user)
 						require.NoError(t, err)
 
 						users[i] = &user
@@ -1843,7 +1330,7 @@ func TestListHumanUser(t *testing.T) {
 					for i := range noOfUsers {
 						i += noOfUsers
 
-						user := domain.Human{
+						user := domain.Machine{
 							User: domain.User{
 								ID:                gofakeit.UUID(),
 								InstanceID:        newInstanceId,
@@ -1852,16 +1339,10 @@ func TestListHumanUser(t *testing.T) {
 								UsernameOrgUnique: true,
 								State:             domain.UserStateActive,
 							},
-							FirstName:         gofakeit.FirstName(),
-							LastName:          gofakeit.LastName(),
-							NickName:          gofakeit.Username(),
-							DisplayName:       gofakeit.Name(),
-							PreferredLanguage: "en",
-							Gender:            1,
-							AvatarKey:         gofakeit.Animal(),
+							Name: gofakeit.Name(),
 						}
 
-						_, err := userRepo.CreateHuman(t.Context(), tx, &user)
+						_, err := userRepo.CreateMachine(t.Context(), tx, &user)
 						require.NoError(t, err)
 
 						users[i] = &user
@@ -1871,7 +1352,7 @@ func TestListHumanUser(t *testing.T) {
 				},
 				opts: []database.QueryOption{
 					database.WithCondition(database.And(
-						userRepo.Human().InstanceIDCondition(newInstanceId),
+						userRepo.Machine().InstanceIDCondition(newInstanceId),
 					)),
 				},
 			}
@@ -1881,7 +1362,7 @@ func TestListHumanUser(t *testing.T) {
 			newOrgId := gofakeit.Name()
 			return &test{
 				name: "multiple users filter on non existing instance",
-				testFunc: func(t *testing.T, client database.QueryExecutor) []*domain.Human {
+				testFunc: func(t *testing.T, client database.QueryExecutor) []*domain.Machine {
 					// create instance
 					instance := domain.Instance{
 						ID:              newInstanceId,
@@ -1907,10 +1388,10 @@ func TestListHumanUser(t *testing.T) {
 					require.NoError(t, err)
 
 					noOfUsers := 5
-					users := make([]*domain.Human, noOfUsers)
+					users := make([]*domain.Machine, noOfUsers)
 					for i := range noOfUsers {
 
-						user := domain.Human{
+						user := domain.Machine{
 							User: domain.User{
 								ID:                gofakeit.UUID(),
 								InstanceID:        newInstanceId,
@@ -1919,16 +1400,10 @@ func TestListHumanUser(t *testing.T) {
 								UsernameOrgUnique: true,
 								State:             domain.UserStateActive,
 							},
-							FirstName:         gofakeit.FirstName(),
-							LastName:          gofakeit.LastName(),
-							NickName:          gofakeit.Username(),
-							DisplayName:       gofakeit.Name(),
-							PreferredLanguage: "en",
-							Gender:            1,
-							AvatarKey:         gofakeit.Animal(),
+							Name: gofakeit.Name(),
 						}
 
-						_, err := userRepo.CreateHuman(t.Context(), tx, &user)
+						_, err := userRepo.CreateMachine(t.Context(), tx, &user)
 						require.NoError(t, err)
 
 						users[i] = &user
@@ -1939,7 +1414,7 @@ func TestListHumanUser(t *testing.T) {
 				},
 				opts: []database.QueryOption{
 					database.WithCondition(database.And(
-						userRepo.Human().InstanceIDCondition("non-existing-instance"),
+						userRepo.Machine().InstanceIDCondition("non-existing-instance"),
 					)),
 				},
 			}
@@ -1949,7 +1424,7 @@ func TestListHumanUser(t *testing.T) {
 			newOrgId := gofakeit.Name()
 			return &test{
 				name: "multiple users filter on orgs",
-				testFunc: func(t *testing.T, client database.QueryExecutor) []*domain.Human {
+				testFunc: func(t *testing.T, client database.QueryExecutor) []*domain.Machine {
 					// create instance
 					instance := domain.Instance{
 						ID:              newInstanceId,
@@ -1975,10 +1450,10 @@ func TestListHumanUser(t *testing.T) {
 					require.NoError(t, err)
 
 					noOfUsers := 5
-					users := make([]*domain.Human, noOfUsers)
+					users := make([]*domain.Machine, noOfUsers)
 					for i := range noOfUsers {
 
-						user := domain.Human{
+						user := domain.Machine{
 							User: domain.User{
 								ID:                gofakeit.UUID(),
 								InstanceID:        newInstanceId,
@@ -1987,16 +1462,10 @@ func TestListHumanUser(t *testing.T) {
 								UsernameOrgUnique: true,
 								State:             domain.UserStateActive,
 							},
-							FirstName:         gofakeit.FirstName(),
-							LastName:          gofakeit.LastName(),
-							NickName:          gofakeit.Username(),
-							DisplayName:       gofakeit.Name(),
-							PreferredLanguage: "en",
-							Gender:            1,
-							AvatarKey:         gofakeit.Animal(),
+							Name: gofakeit.Name(),
 						}
 
-						_, err := userRepo.CreateHuman(t.Context(), tx, &user)
+						_, err := userRepo.CreateMachine(t.Context(), tx, &user)
 						require.NoError(t, err)
 
 						users[i] = &user
@@ -2006,8 +1475,8 @@ func TestListHumanUser(t *testing.T) {
 				},
 				opts: []database.QueryOption{
 					database.WithCondition(database.And(
-						userRepo.Human().InstanceIDCondition(newInstanceId),
-						userRepo.Human().OrgIDCondition(newOrgId),
+						userRepo.Machine().InstanceIDCondition(newInstanceId),
+						userRepo.Machine().OrgIDCondition(newOrgId),
 					)),
 				},
 			}
@@ -2017,7 +1486,7 @@ func TestListHumanUser(t *testing.T) {
 			newOrgId := gofakeit.Name()
 			return &test{
 				name: "multiple users filter on orgs, with non existing org",
-				testFunc: func(t *testing.T, client database.QueryExecutor) []*domain.Human {
+				testFunc: func(t *testing.T, client database.QueryExecutor) []*domain.Machine {
 					// create instance
 					instance := domain.Instance{
 						ID:              newInstanceId,
@@ -2043,10 +1512,10 @@ func TestListHumanUser(t *testing.T) {
 					require.NoError(t, err)
 
 					noOfUsers := 5
-					users := make([]*domain.Human, noOfUsers)
+					users := make([]*domain.Machine, noOfUsers)
 					for i := range noOfUsers {
 
-						user := domain.Human{
+						user := domain.Machine{
 							User: domain.User{
 								ID:                gofakeit.UUID(),
 								InstanceID:        newInstanceId,
@@ -2055,16 +1524,10 @@ func TestListHumanUser(t *testing.T) {
 								UsernameOrgUnique: true,
 								State:             domain.UserStateActive,
 							},
-							FirstName:         gofakeit.FirstName(),
-							LastName:          gofakeit.LastName(),
-							NickName:          gofakeit.Username(),
-							DisplayName:       gofakeit.Name(),
-							PreferredLanguage: "en",
-							Gender:            1,
-							AvatarKey:         gofakeit.Animal(),
+							Name: gofakeit.Name(),
 						}
 
-						_, err := userRepo.CreateHuman(t.Context(), tx, &user)
+						_, err := userRepo.CreateMachine(t.Context(), tx, &user)
 						require.NoError(t, err)
 
 						users[i] = &user
@@ -2075,8 +1538,8 @@ func TestListHumanUser(t *testing.T) {
 				},
 				opts: []database.QueryOption{
 					database.WithCondition(database.And(
-						userRepo.Human().InstanceIDCondition(newInstanceId),
-						userRepo.Human().OrgIDCondition("non-existing-org"),
+						userRepo.Machine().InstanceIDCondition(newInstanceId),
+						userRepo.Machine().OrgIDCondition("non-existing-org"),
 					)),
 				},
 			}
@@ -2085,7 +1548,7 @@ func TestListHumanUser(t *testing.T) {
 			newInstanceId := gofakeit.Name()
 			return &test{
 				name: "multiple users filter on state",
-				testFunc: func(t *testing.T, client database.QueryExecutor) []*domain.Human {
+				testFunc: func(t *testing.T, client database.QueryExecutor) []*domain.Machine {
 					// create instance
 					instance := domain.Instance{
 						ID:              newInstanceId,
@@ -2112,10 +1575,10 @@ func TestListHumanUser(t *testing.T) {
 					require.NoError(t, err)
 
 					noOfUsers := 5
-					users := make([]*domain.Human, noOfUsers)
+					users := make([]*domain.Machine, noOfUsers)
 					for i := range noOfUsers {
 
-						user := domain.Human{
+						user := domain.Machine{
 							User: domain.User{
 								ID:                gofakeit.UUID(),
 								InstanceID:        newInstanceId,
@@ -2124,16 +1587,10 @@ func TestListHumanUser(t *testing.T) {
 								UsernameOrgUnique: true,
 								State:             domain.UserStateInactive,
 							},
-							FirstName:         gofakeit.FirstName(),
-							LastName:          gofakeit.LastName(),
-							NickName:          gofakeit.Username(),
-							DisplayName:       gofakeit.Name(),
-							PreferredLanguage: "en",
-							Gender:            1,
-							AvatarKey:         gofakeit.Animal(),
+							Name: gofakeit.Name(),
 						}
 
-						_, err := userRepo.CreateHuman(t.Context(), tx, &user)
+						_, err := userRepo.CreateMachine(t.Context(), tx, &user)
 						require.NoError(t, err)
 
 						users[i] = &user
@@ -2143,8 +1600,8 @@ func TestListHumanUser(t *testing.T) {
 				},
 				opts: []database.QueryOption{
 					database.WithCondition(database.And(
-						userRepo.Human().InstanceIDCondition(newInstanceId),
-						userRepo.Human().StateCondition(domain.UserStateInactive),
+						userRepo.Machine().InstanceIDCondition(newInstanceId),
+						userRepo.Machine().StateCondition(domain.UserStateInactive),
 					)),
 				},
 			}
@@ -2153,7 +1610,7 @@ func TestListHumanUser(t *testing.T) {
 			newInstanceId := gofakeit.Name()
 			return &test{
 				name: "multiple users filter on state no users found",
-				testFunc: func(t *testing.T, client database.QueryExecutor) []*domain.Human {
+				testFunc: func(t *testing.T, client database.QueryExecutor) []*domain.Machine {
 					// create instance
 					instance := domain.Instance{
 						ID:              newInstanceId,
@@ -2180,10 +1637,10 @@ func TestListHumanUser(t *testing.T) {
 					require.NoError(t, err)
 
 					noOfUsers := 5
-					users := make([]*domain.Human, noOfUsers)
+					users := make([]*domain.Machine, noOfUsers)
 					for i := range noOfUsers {
 
-						user := domain.Human{
+						user := domain.Machine{
 							User: domain.User{
 								ID:                gofakeit.UUID(),
 								InstanceID:        newInstanceId,
@@ -2192,16 +1649,10 @@ func TestListHumanUser(t *testing.T) {
 								UsernameOrgUnique: true,
 								State:             domain.UserStateInactive,
 							},
-							FirstName:         gofakeit.FirstName(),
-							LastName:          gofakeit.LastName(),
-							NickName:          gofakeit.Username(),
-							DisplayName:       gofakeit.Name(),
-							PreferredLanguage: "en",
-							Gender:            1,
-							AvatarKey:         gofakeit.Animal(),
+							Name: gofakeit.Name(),
 						}
 
-						_, err := userRepo.CreateHuman(t.Context(), tx, &user)
+						_, err := userRepo.CreateMachine(t.Context(), tx, &user)
 						require.NoError(t, err)
 
 						users[i] = &user
@@ -2212,9 +1663,9 @@ func TestListHumanUser(t *testing.T) {
 				},
 				opts: []database.QueryOption{
 					database.WithCondition(database.And(
-						userRepo.Human().InstanceIDCondition(newInstanceId),
+						userRepo.Machine().InstanceIDCondition(newInstanceId),
 						// should be no users with active state
-						userRepo.Human().StateCondition(domain.UserStateActive),
+						userRepo.Machine().StateCondition(domain.UserStateActive),
 					)),
 				},
 			}
@@ -2234,7 +1685,7 @@ func TestListHumanUser(t *testing.T) {
 			users := tt.testFunc(t, pool)
 
 			// create user
-			returnedUsers, err := userRepo.ListHuman(t.Context(), pool, tt.opts...)
+			returnedUsers, err := userRepo.ListMachine(t.Context(), pool, tt.opts...)
 			require.NoError(t, err)
 			if err != nil {
 				require.ErrorIs(t, err, tt.err)
@@ -2254,20 +1705,15 @@ func TestListHumanUser(t *testing.T) {
 				assert.Equal(t, returnedUsers[i].CreatedAt, user.CreatedAt)
 				assert.Equal(t, returnedUsers[i].UpdatedAt, user.UpdatedAt)
 
-				// // human
-				assert.Equal(t, returnedUsers[i].FirstName, user.FirstName)
-				assert.Equal(t, returnedUsers[i].LastName, user.LastName)
-				assert.Equal(t, returnedUsers[i].NickName, user.NickName)
-				assert.Equal(t, returnedUsers[i].DisplayName, user.DisplayName)
-				assert.Equal(t, returnedUsers[i].PreferredLanguage, user.PreferredLanguage)
-				assert.Equal(t, returnedUsers[i].Gender, user.Gender)
-				assert.Equal(t, returnedUsers[i].AvatarKey, user.AvatarKey)
+				// machine
+				assert.Equal(t, returnedUsers[i].Name, user.Name)
+				assert.Equal(t, returnedUsers[i].Description, user.Description)
 			}
 		})
 	}
 }
 
-func TestDeleteHumanUser(t *testing.T) {
+func TestDeleteMachineUser(t *testing.T) {
 	tx, err := pool.Begin(t.Context(), nil)
 	require.NoError(t, err)
 	defer func() {
@@ -2346,7 +1792,7 @@ func TestDeleteHumanUser(t *testing.T) {
 				name: "happy path delete user",
 				testFunc: func(t *testing.T) {
 					for range noOfUsers {
-						user := domain.Human{
+						user := domain.Machine{
 							User: domain.User{
 								ID:                id,
 								InstanceID:        newInstanceId,
@@ -2355,23 +1801,17 @@ func TestDeleteHumanUser(t *testing.T) {
 								UsernameOrgUnique: true,
 								State:             domain.UserStateInactive,
 							},
-							FirstName:         gofakeit.FirstName(),
-							LastName:          gofakeit.LastName(),
-							NickName:          gofakeit.Username(),
-							DisplayName:       gofakeit.Name(),
-							PreferredLanguage: "en",
-							Gender:            1,
-							AvatarKey:         gofakeit.Animal(),
+							Name: gofakeit.Name(),
 						}
 
-						_, err := userRepo.CreateHuman(t.Context(), tx, &user)
+						_, err := userRepo.CreateMachine(t.Context(), tx, &user)
 						require.NoError(t, err)
 					}
 				},
 				conditions: database.And(
-					userRepo.Human().InstanceIDCondition(newInstanceId),
-					userRepo.Human().OrgIDCondition(newOrgId),
-					userRepo.Human().IDCondition(id),
+					userRepo.Machine().InstanceIDCondition(newInstanceId),
+					userRepo.Machine().OrgIDCondition(newOrgId),
+					userRepo.Machine().IDCondition(id),
 				),
 				noOfDeletedRows: noOfUsers,
 			}
@@ -2408,7 +1848,7 @@ func TestDeleteHumanUser(t *testing.T) {
 				name: "delete user, no instance specified",
 				testFunc: func(t *testing.T) {
 					for range noOfUsers {
-						user := domain.Human{
+						user := domain.Machine{
 							User: domain.User{
 								ID:                id,
 								InstanceID:        newInstanceId,
@@ -2417,23 +1857,17 @@ func TestDeleteHumanUser(t *testing.T) {
 								UsernameOrgUnique: true,
 								State:             domain.UserStateInactive,
 							},
-							FirstName:         gofakeit.FirstName(),
-							LastName:          gofakeit.LastName(),
-							NickName:          gofakeit.Username(),
-							DisplayName:       gofakeit.Name(),
-							PreferredLanguage: "en",
-							Gender:            1,
-							AvatarKey:         gofakeit.Animal(),
+							Name: gofakeit.Name(),
 						}
 
-						_, err := userRepo.CreateHuman(t.Context(), tx, &user)
+						_, err := userRepo.CreateMachine(t.Context(), tx, &user)
 						require.NoError(t, err)
 					}
 				},
 				conditions: database.And(
-					// userRepo.Human().InstanceIDCondition(newInstanceId),
-					userRepo.Human().OrgIDCondition(newOrgId),
-					userRepo.Human().IDCondition(id),
+					// userRepo.Machine().InstanceIDCondition(newInstanceId),
+					userRepo.Machine().OrgIDCondition(newOrgId),
+					userRepo.Machine().IDCondition(id),
 				),
 				noOfDeletedRows: 0,
 				err:             new(database.MissingConditionError),
@@ -2471,7 +1905,7 @@ func TestDeleteHumanUser(t *testing.T) {
 				name: "delete user, no organization specified",
 				testFunc: func(t *testing.T) {
 					for range noOfUsers {
-						user := domain.Human{
+						user := domain.Machine{
 							User: domain.User{
 								ID:                id,
 								InstanceID:        newInstanceId,
@@ -2480,23 +1914,17 @@ func TestDeleteHumanUser(t *testing.T) {
 								UsernameOrgUnique: true,
 								State:             domain.UserStateInactive,
 							},
-							FirstName:         gofakeit.FirstName(),
-							LastName:          gofakeit.LastName(),
-							NickName:          gofakeit.Username(),
-							DisplayName:       gofakeit.Name(),
-							PreferredLanguage: "en",
-							Gender:            1,
-							AvatarKey:         gofakeit.Animal(),
+							Name: gofakeit.Name(),
 						}
 
-						_, err := userRepo.CreateHuman(t.Context(), tx, &user)
+						_, err := userRepo.CreateMachine(t.Context(), tx, &user)
 						require.NoError(t, err)
 					}
 				},
 				conditions: database.And(
-					userRepo.Human().InstanceIDCondition(newInstanceId),
-					// userRepo.Human().OrgIDCondition(newOrgId),
-					userRepo.Human().IDCondition(id),
+					userRepo.Machine().InstanceIDCondition(newInstanceId),
+					// userRepo.Machine().OrgIDCondition(newOrgId),
+					userRepo.Machine().IDCondition(id),
 				),
 				noOfDeletedRows: 0,
 				err:             new(database.MissingConditionError),
@@ -2534,7 +1962,7 @@ func TestDeleteHumanUser(t *testing.T) {
 				name: "delete user, no id specified",
 				testFunc: func(t *testing.T) {
 					for range noOfUsers {
-						user := domain.Human{
+						user := domain.Machine{
 							User: domain.User{
 								ID:                id,
 								InstanceID:        newInstanceId,
@@ -2543,23 +1971,17 @@ func TestDeleteHumanUser(t *testing.T) {
 								UsernameOrgUnique: true,
 								State:             domain.UserStateInactive,
 							},
-							FirstName:         gofakeit.FirstName(),
-							LastName:          gofakeit.LastName(),
-							NickName:          gofakeit.Username(),
-							DisplayName:       gofakeit.Name(),
-							PreferredLanguage: "en",
-							Gender:            1,
-							AvatarKey:         gofakeit.Animal(),
+							Name: gofakeit.Name(),
 						}
 
-						_, err := userRepo.CreateHuman(t.Context(), tx, &user)
+						_, err := userRepo.CreateMachine(t.Context(), tx, &user)
 						require.NoError(t, err)
 					}
 				},
 				conditions: database.And(
-					userRepo.Human().InstanceIDCondition(newInstanceId),
-					userRepo.Human().OrgIDCondition(newOrgId),
-					// userRepo.Human().IDCondition(id),
+					userRepo.Machine().InstanceIDCondition(newInstanceId),
+					userRepo.Machine().OrgIDCondition(newOrgId),
+					// userRepo.Machine().IDCondition(id),
 				),
 				noOfDeletedRows: 0,
 				err:             new(database.MissingConditionError),
@@ -2594,9 +2016,9 @@ func TestDeleteHumanUser(t *testing.T) {
 			return test{
 				name: "delete user, no id specified",
 				conditions: database.And(
-					userRepo.Human().InstanceIDCondition(newInstanceId),
-					userRepo.Human().OrgIDCondition(newOrgId),
-					userRepo.Human().IDCondition("non-existing-id"),
+					userRepo.Machine().InstanceIDCondition(newInstanceId),
+					userRepo.Machine().OrgIDCondition(newOrgId),
+					userRepo.Machine().IDCondition("non-existing-id"),
 				),
 				noOfDeletedRows: 0,
 			}
@@ -2633,7 +2055,7 @@ func TestDeleteHumanUser(t *testing.T) {
 				name: "delete already deleted user",
 				testFunc: func(t *testing.T) {
 					for range noOfUsers {
-						user := domain.Human{
+						user := domain.Machine{
 							User: domain.User{
 								ID:                id,
 								InstanceID:        newInstanceId,
@@ -2642,26 +2064,20 @@ func TestDeleteHumanUser(t *testing.T) {
 								UsernameOrgUnique: true,
 								State:             domain.UserStateInactive,
 							},
-							FirstName:         gofakeit.FirstName(),
-							LastName:          gofakeit.LastName(),
-							NickName:          gofakeit.Username(),
-							DisplayName:       gofakeit.Name(),
-							PreferredLanguage: "en",
-							Gender:            1,
-							AvatarKey:         gofakeit.Animal(),
+							Name: gofakeit.Name(),
 						}
 
-						_, err := userRepo.CreateHuman(t.Context(), tx, &user)
+						_, err := userRepo.CreateMachine(t.Context(), tx, &user)
 						require.NoError(t, err)
 
 						// delete user
-						noOfDeletedRows, err := userRepo.DeleteHuman(
+						noOfDeletedRows, err := userRepo.DeleteMachine(
 							t.Context(),
 							tx,
 							database.And(
-								userRepo.Human().InstanceIDCondition(newInstanceId),
-								userRepo.Human().OrgIDCondition(newOrgId),
-								userRepo.Human().IDCondition(id),
+								userRepo.Machine().InstanceIDCondition(newInstanceId),
+								userRepo.Machine().OrgIDCondition(newOrgId),
+								userRepo.Machine().IDCondition(id),
 							),
 						)
 						require.NoError(t, err)
@@ -2669,11 +2085,12 @@ func TestDeleteHumanUser(t *testing.T) {
 					}
 				},
 				conditions: database.And(
-					userRepo.Human().InstanceIDCondition(newInstanceId),
-					userRepo.Human().OrgIDCondition(newOrgId),
-					userRepo.Human().IDCondition(id),
+					userRepo.Machine().InstanceIDCondition(newInstanceId),
+					userRepo.Machine().OrgIDCondition(newOrgId),
+					userRepo.Machine().IDCondition(id),
 				),
 				noOfDeletedRows: 0,
+				// err:             new(database.MissingConditionError),
 			}
 		}(),
 	}
@@ -2684,7 +2101,7 @@ func TestDeleteHumanUser(t *testing.T) {
 			}
 
 			// delete user
-			noOfDeletedRows, err := userRepo.DeleteHuman(
+			noOfDeletedRows, err := userRepo.DeleteMachine(
 				t.Context(),
 				tx,
 				tt.conditions,
@@ -2697,7 +2114,7 @@ func TestDeleteHumanUser(t *testing.T) {
 			assert.Equal(t, tt.noOfDeletedRows, noOfDeletedRows)
 
 			// check user was deleted
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.GetMachine(
 				t.Context(),
 				tx,
 				database.WithCondition(
@@ -2708,5 +2125,3 @@ func TestDeleteHumanUser(t *testing.T) {
 		})
 	}
 }
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
