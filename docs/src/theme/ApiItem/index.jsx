@@ -27,8 +27,8 @@ export default function ApiItemWrapper(props) {
 
   const sendPlausibleEvent = (feedbackValue, commentText = "") => {
     if (plausibleLoaded && typeof window.plausible === "function") {
-      console.log("Sending plausible event:", feedbackValue, commentText);
-      window.plausible("Feedback Submitted", {
+      console.log("Sending event:", feedbackValue, commentText);
+      window.plausible("docs-feedback-submitted", {
         props: {
           feedback: feedbackValue,
           comment: commentText,
