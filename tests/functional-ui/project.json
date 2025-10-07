@@ -7,28 +7,29 @@
       "command": "nx run @zitadel/devcontainer:compose up --force-recreate --renew-anon-volumes --remove-orphans db-functional-ui"
     },
     "run-api": {
-        "description": "Sets up and runs the Zitadel API with the embedded Console against which the functional UI tests are run.",
-        "continuous": true,
-        "dependsOn": [
-            "@zitadel/api:build",
-            "run-db"
-        ],
-        "executor": "nx:run-commands",
-        "options": {
-            "command": "nx run @zitadel/api:prod:test-functional-ui --excludeTaskDependencies"
-        }  
+      "description": "Sets up and runs the Zitadel API with the embedded Console against which the functional UI tests are run.",
+      "continuous": true,
+      "dependsOn": [
+        "@zitadel/api:build"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "nx run @zitadel/api:prod:test-functional-ui --excludeTaskDependencies"
+      }
     },
     "open": {
       "description": "Opens the Cypress Test Runner for interactive testing.",
       "continuous": true,
       "dependsOn": [
         "@zitadel/console:dev",
+        "run-db",
         "run-api"
       ]
     },
     "test": {
       "description": "Runs the functional UI (Console) tests against a Zitadel API and a specified browser. Pass an installed browser as an argument, like --browser electron. The 'electron' browser should always be available.",
       "dependsOn": [
+        "run-db",
         "run-api"
       ],
       "executor": "nx:run-commands",

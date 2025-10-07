@@ -158,7 +158,6 @@
             "description": "Runs the API server for the integration tests.",
             "continuous": true,
             "dependsOn": [
-                "test-integration-run-db",
                 "test-integration-build"
             ],
             "executor": "nx:run-commands",
@@ -179,6 +178,7 @@
         "test-integration": {
             "description": "Runs the integration tests sequentially with coverage and race condition detection. Go test caching is disabled, because the tests run against an out-of-process API.",
             "dependsOn": [
+                "test-integration-run-db",
                 "test-integration-run-api"
             ],
             "executor": "nx:run-commands",
