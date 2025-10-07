@@ -435,9 +435,7 @@ Reproduce the pipeline quality checks for the code you changed.
 
 ```bash
 # Run Login-related linting builds and unit tests
-pnpm nx run-many --projects @zitadel/login @zitadel/client @zitadel/proto --targets lint build test-unit
-# Run Login integration tests
-pnpm nx run @zitadel/login:test-integration
+pnpm nx run-many --projects @zitadel/login @zitadel/client @zitadel/proto --targets lint build test
 ```
 
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
@@ -524,7 +522,7 @@ Run the quality checks for the code you changed.
 
 ```bash
 # Run console-related linting builds and unit tests
-pnpm nx run-many --projects @zitadel/console @zitadel/client @zitadel/proto --targets lint build test
+pnpm nx run-many --projects @zitadel/console @zitadel/client @zitadel/proto @zitadel/functional-ui --targets lint build test
 ```
 
 Run functional UI tests against a locally built API and a dev server Console.
