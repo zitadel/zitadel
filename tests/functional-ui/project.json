@@ -51,7 +51,7 @@
     },
     "stop": {
       "description": "Stops the local Postgres database used for functional UI (Console) tests.",
-      "command": "nx run @zitadel/devcontainer:compose down --volumes db-functional-ui"
+      "command": "nx run @zitadel/devcontainer:compose down --volumes --remove-orphans db-functional-ui"
     }
   }
 }
