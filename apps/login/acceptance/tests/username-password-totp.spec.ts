@@ -1,10 +1,9 @@
-import { faker } from "@faker-js/faker";
-import { code } from "./code.js";
 import { codeScreenExpect } from "./code-screen.js";
 import { loginScreenExpect, loginWithPassword } from "./login.js";
 import { test } from "./fixtures.js";
+import { verifyTOTPCode } from "./code.js";
 
-test("username, password and totp login", async ({ registeredUser, userService, page }) => {
+test("username, password and totp login", async ({ userCreator: registeredUser, userService, page }) => {
   // Given totp is enabled on the organization of the user
   // Given the user has only totp configured as second factor
   // User enters username
@@ -13,13 +12,13 @@ test("username, password and totp login", async ({ registeredUser, userService, 
   // User enters the code into the ui
   // User is redirected to the app (default redirect url)
   const user = await registeredUser.create()
-  const secret = await userService.addTOTP(user.id);
+  const secret = await registeredUser.addTOTPFactor();
   await loginWithPassword(page, registeredUser.username, registeredUser.password);
-  await code(page, userService.totp(secret));
+  await verifyTOTPCode(page, userService.generateTOTPToken(secret));
   await loginScreenExpect(page, registeredUser.fullName);
 });
 
-test("username, password and totp otp login, wrong code", async ({ registeredUser, page }) => {
+test("username, password and totp otp login, wrong code", async ({ userCreator: registeredUser, page }) => {
   // Given totp is enabled on the organization of the user
   // Given the user has only totp configured as second factor
   // User enters username
@@ -30,7 +29,7 @@ test("username, password and totp otp login, wrong code", async ({ registeredUse
   await registeredUser.create()
   const c = "wrongcode";
   await loginWithPassword(page, registeredUser.username, registeredUser.password);
-  await code(page, c);
+  await verifyTOTPCode(page, c);
   await codeScreenExpect(page, c);
 });
 

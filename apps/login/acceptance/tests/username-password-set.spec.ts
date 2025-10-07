@@ -4,7 +4,7 @@ import { loginname } from "./loginname.js";
 import { resetPassword, startResetPassword } from "./password.js";
 import { resetPasswordScreen, resetPasswordScreenExpect } from "./password-screen.js";
 
-test("username and password set login", async ({ registeredUser, page }) => {
+test("username and password set login", async ({ userCreator: registeredUser, page }) => {
   const changedPw = "ChangedPw1!";
   await registeredUser.create();
   await startLogin(page);
@@ -16,7 +16,7 @@ test("username and password set login", async ({ registeredUser, page }) => {
   await loginScreenExpect(page, registeredUser.fullName);
 });
 
-test("password set not with desired complexity", async ({ registeredUser, page }) => {
+test("password set not with desired complexity", async ({ userCreator: registeredUser, page }) => {
   const changedPw1 = "change";
   const changedPw2 = "chang";
   await registeredUser.create();

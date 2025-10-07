@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, Request } from "express";
 import { createServerTransport } from '@zitadel/client/node'
 import { createClientFor } from '@zitadel/client'
 import { AdminService } from "@zitadel/proto/zitadel/admin_pb";
@@ -17,34 +17,31 @@ export async function setup(selfPort: number, apiUrl: string, apiToken: string) 
 }
 
 export function serve(router: Router) {
+    channel(router, EMAIL_PATH, (req) => req.body.contextInfo.recipientEmailAddress)
+    channel(router, SMS_PATH, (req) => req.body.contextInfo.recipientPhoneNumber)
+}
+
+function channel(router: Router, path: string, extractAddress: (req: Request) => string) {
     let notifications: { [key: string]: Object } = {}
-    router.post(EMAIL_PATH, (req, res) => {
-        // Receive email webhook
-        const { contextInfo: { recipientEmailAddress } } = req.body
-        console.log("saving email for", recipientEmailAddress);
-        notifications[recipientEmailAddress] = req.body
-        res.send('Email!\n')
+    router.post(path, (req, res) => {
+        const address = extractAddress(req)
+        console.log("saving message for", address);
+        notifications[address] = req.body
+        res.send('OK\n')
     })
-    router.post(SMS_PATH, (req, res) => {
-        // Receive SMS webhook
-        const { contextInfo: { recipientPhoneNumber } } = req.body
-        console.log("saving SMS for", recipientPhoneNumber);
-        notifications[recipientPhoneNumber] = req.body
-        res.send('SMS!\n')
-    })
-    router.get('/notifications/:recipient', (req, res) => {
+    router.get(`/notifications${path}/:address`, (req, res) => {
         // Return notification for recipient to test case and remove it from memory
-        const { recipient } = req.params
-        const notification = notifications[recipient]
+        const { address } = req.params
+        const notification = notifications[address]
         if (!notification) {
-            console.log("no notification found for", recipient, "in", Object.keys(notifications));
+            console.log("no notification found for", address, "in", Object.keys(notifications));
             return res.status(404).send('No message found\n')
         }
-        console.log("returning and removing notification for", recipient);
-        delete notifications[recipient]
+        console.log("returning and removing notification for", address);
+        delete notifications[address]
         res.contentType('application/json').json(notification)
     })
-    router.get('/notifications', (req, res) => {
+    router.get(`/notifications${path}`, (req, res) => {
         // for debugging purposes
         res.contentType('application/json').json(notifications)
     })

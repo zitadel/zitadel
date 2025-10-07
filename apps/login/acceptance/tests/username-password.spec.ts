@@ -5,11 +5,11 @@ import { password } from "./password.js";
 import { passwordScreenExpect } from "./password-screen.js";
 import { test } from "./fixtures.js";
 
-test("username and password login", async ({ registeredUser, page }) => {
-  await registeredUser.create()
-  await registeredUser.create()
-  await loginWithPassword(page, registeredUser.username, registeredUser.getPassword());
-  await loginScreenExpect(page, registeredUser.fullName);
+test("username and password login", async ({ userCreator, page }) => {
+  await userCreator.create()
+  await userCreator.create()
+  await loginWithPassword(page, userCreator.username, userCreator.password);
+  await loginScreenExpect(page, userCreator.fullName);
 });
 
 test("username and password login, unknown username", async ({ page }) => {
@@ -19,10 +19,10 @@ test("username and password login, unknown username", async ({ page }) => {
   await loginnameScreenExpect(page, username);
 });
 
-test("username and password login, wrong password", async ({ registeredUser, page }) => {
-  await registeredUser.create()
+test("username and password login, wrong password", async ({ userCreator, page }) => {
+  await userCreator.create()
   await startLogin(page);
-  await loginname(page, registeredUser.username);
+  await loginname(page, userCreator.username);
   await password(page, "wrong");
   await passwordScreenExpect(page, "wrong");
 });
