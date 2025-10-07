@@ -2,40 +2,19 @@ import { Client, create, Duration } from "@zitadel/client";
 import { createServerTransport as libCreateServerTransport } from "@zitadel/client/node";
 import { makeReqCtx } from "@zitadel/client/v2";
 import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb";
-import {
-  OrganizationSchema,
-  TextQueryMethod,
-} from "@zitadel/proto/zitadel/object/v2/object_pb";
-import {
-  CreateCallbackRequest,
-  OIDCService,
-} from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
+import { OrganizationSchema, TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
+import { CreateCallbackRequest, OIDCService } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { OrganizationService } from "@zitadel/proto/zitadel/org/v2/org_service_pb";
-import {
-  CreateResponseRequest,
-  SAMLService,
-} from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
+import { CreateResponseRequest, SAMLService } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
-import {
-  Checks,
-  SessionService,
-} from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { Checks, SessionService } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import { SendEmailVerificationCodeSchema } from "@zitadel/proto/zitadel/user/v2/email_pb";
-import type {
-  FormData,
-  RedirectURLsJson,
-} from "@zitadel/proto/zitadel/user/v2/idp_pb";
-import {
-  NotificationType,
-  SendPasswordResetLinkSchema,
-} from "@zitadel/proto/zitadel/user/v2/password_pb";
-import {
-  SearchQuery,
-  SearchQuerySchema,
-} from "@zitadel/proto/zitadel/user/v2/query_pb";
+import type { FormData, RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
+import { NotificationType, SendPasswordResetLinkSchema } from "@zitadel/proto/zitadel/user/v2/password_pb";
+import { SearchQuery, SearchQuerySchema } from "@zitadel/proto/zitadel/user/v2/query_pb";
 import { SendInviteCodeSchema } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import {
   AddHumanUserRequest,
@@ -74,8 +53,7 @@ export async function getHostedLoginTranslation({
   organization?: string;
   locale?: string;
 }) {
-  const settingsService: Client<typeof SettingsService> =
-    await createServiceForHost(SettingsService, serviceUrl);
+  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
   const callback = settingsService
     .getHostedLoginTranslation(
@@ -100,15 +78,8 @@ export async function getHostedLoginTranslation({
   return useCache ? cacheWrapper(callback) : callback;
 }
 
-export async function getBrandingSettings({
-  serviceUrl,
-  organization,
-}: {
-  serviceUrl: string;
-  organization?: string;
-}) {
-  const settingsService: Client<typeof SettingsService> =
-    await createServiceForHost(SettingsService, serviceUrl);
+export async function getBrandingSettings({ serviceUrl, organization }: { serviceUrl: string; organization?: string }) {
+  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
   const callback = settingsService
     .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
@@ -117,15 +88,8 @@ export async function getBrandingSettings({
   return useCache ? cacheWrapper(callback) : callback;
 }
 
-export async function getLoginSettings({
-  serviceUrl,
-  organization,
-}: {
-  serviceUrl: string;
-  organization?: string;
-}) {
-  const settingsService: Client<typeof SettingsService> =
-    await createServiceForHost(SettingsService, serviceUrl);
+export async function getLoginSettings({ serviceUrl, organization }: { serviceUrl: string; organization?: string }) {
+  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
   const callback = settingsService
     .getLoginSettings({ ctx: makeReqCtx(organization) }, {})
@@ -134,30 +98,16 @@ export async function getLoginSettings({
   return useCache ? cacheWrapper(callback) : callback;
 }
 
-export async function getSecuritySettings({
-  serviceUrl,
-}: {
-  serviceUrl: string;
-}) {
-  const settingsService: Client<typeof SettingsService> =
-    await createServiceForHost(SettingsService, serviceUrl);
+export async function getSecuritySettings({ serviceUrl }: { serviceUrl: string }) {
+  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
-  const callback = settingsService
-    .getSecuritySettings({})
-    .then((resp) => (resp.settings ? resp.settings : undefined));
+  const callback = settingsService.getSecuritySettings({}).then((resp) => (resp.settings ? resp.settings : undefined));
 
   return useCache ? cacheWrapper(callback) : callback;
 }
 
-export async function getLockoutSettings({
-  serviceUrl,
-  orgId,
-}: {
-  serviceUrl: string;
-  orgId?: string;
-}) {
-  const settingsService: Client<typeof SettingsService> =
-    await createServiceForHost(SettingsService, serviceUrl);
+export async function getLockoutSettings({ serviceUrl, orgId }: { serviceUrl: string; orgId?: string }) {
+  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
   const callback = settingsService
     .getLockoutSettings({ ctx: makeReqCtx(orgId) }, {})
@@ -166,15 +116,8 @@ export async function getLockoutSettings({
   return useCache ? cacheWrapper(callback) : callback;
 }
 
-export async function getPasswordExpirySettings({
-  serviceUrl,
-  orgId,
-}: {
-  serviceUrl: string;
-  orgId?: string;
-}) {
-  const settingsService: Client<typeof SettingsService> =
-    await createServiceForHost(SettingsService, serviceUrl);
+export async function getPasswordExpirySettings({ serviceUrl, orgId }: { serviceUrl: string; orgId?: string }) {
+  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
   const callback = settingsService
     .getPasswordExpirySettings({ ctx: makeReqCtx(orgId) }, {})
@@ -183,77 +126,34 @@ export async function getPasswordExpirySettings({
   return useCache ? cacheWrapper(callback) : callback;
 }
 
-export async function listIDPLinks({
-  serviceUrl,
-  userId,
-}: {
-  serviceUrl: string;
-  userId: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+export async function listIDPLinks({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.listIDPLinks({ userId }, {});
 }
 
-export async function addOTPEmail({
-  serviceUrl,
-  userId,
-}: {
-  serviceUrl: string;
-  userId: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+export async function addOTPEmail({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.addOTPEmail({ userId }, {});
 }
 
-export async function addOTPSMS({
-  serviceUrl,
-  userId,
-}: {
-  serviceUrl: string;
-  userId: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+export async function addOTPSMS({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.addOTPSMS({ userId }, {});
 }
 
-export async function registerTOTP({
-  serviceUrl,
-  userId,
-}: {
-  serviceUrl: string;
-  userId: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+export async function registerTOTP({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.registerTOTP({ userId }, {});
 }
 
-export async function getGeneralSettings({
-  serviceUrl,
-}: {
-  serviceUrl: string;
-}) {
-  const settingsService: Client<typeof SettingsService> =
-    await createServiceForHost(SettingsService, serviceUrl);
+export async function getGeneralSettings({ serviceUrl }: { serviceUrl: string }) {
+  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
-  const callback = settingsService
-    .getGeneralSettings({}, {})
-    .then((resp) => resp.supportedLanguages);
+  const callback = settingsService.getGeneralSettings({}, {}).then((resp) => resp.supportedLanguages);
 
   return useCache ? cacheWrapper(callback) : callback;
 }
@@ -265,8 +165,7 @@ export async function getLegalAndSupportSettings({
   serviceUrl: string;
   organization?: string;
 }) {
-  const settingsService: Client<typeof SettingsService> =
-    await createServiceForHost(SettingsService, serviceUrl);
+  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
   const callback = settingsService
     .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
@@ -282,8 +181,7 @@ export async function getPasswordComplexitySettings({
   serviceUrl: string;
   organization?: string;
 }) {
-  const settingsService: Client<typeof SettingsService> =
-    await createServiceForHost(SettingsService, serviceUrl);
+  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
   const callback = settingsService
     .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
@@ -301,8 +199,7 @@ export async function createSessionFromChecks({
   checks: Checks;
   lifetime: Duration;
 }) {
-  const sessionService: Client<typeof SessionService> =
-    await createServiceForHost(SessionService, serviceUrl);
+  const sessionService: Client<typeof SessionService> = await createServiceForHost(SessionService, serviceUrl);
 
   const userAgent = await getUserAgent();
 
@@ -323,8 +220,8 @@ export async function createSessionForUserIdAndIdpIntent({
   };
   lifetime: Duration;
 }) {
-  const sessionService: Client<typeof SessionService> =
-    await createServiceForHost(SessionService, serviceUrl);
+  console.log("Creating session for userId and IDP intent", { userId, idpIntent, lifetime });
+  const sessionService: Client<typeof SessionService> = await createServiceForHost(SessionService, serviceUrl);
 
   const userAgent = await getUserAgent();
 
@@ -358,8 +255,7 @@ export async function setSession({
   checks?: Checks;
   lifetime: Duration;
 }) {
-  const sessionService: Client<typeof SessionService> =
-    await createServiceForHost(SessionService, serviceUrl);
+  const sessionService: Client<typeof SessionService> = await createServiceForHost(SessionService, serviceUrl);
 
   return sessionService.setSession(
     {
@@ -383,8 +279,7 @@ export async function getSession({
   sessionId: string;
   sessionToken: string;
 }) {
-  const sessionService: Client<typeof SessionService> =
-    await createServiceForHost(SessionService, serviceUrl);
+  const sessionService: Client<typeof SessionService> = await createServiceForHost(SessionService, serviceUrl);
 
   return sessionService.getSession({ sessionId, sessionToken }, {});
 }
@@ -398,8 +293,7 @@ export async function deleteSession({
   sessionId: string;
   sessionToken: string;
 }) {
-  const sessionService: Client<typeof SessionService> =
-    await createServiceForHost(SessionService, serviceUrl);
+  const sessionService: Client<typeof SessionService> = await createServiceForHost(SessionService, serviceUrl);
 
   return sessionService.deleteSession({ sessionId, sessionToken }, {});
 }
@@ -410,8 +304,7 @@ type ListSessionsCommand = {
 };
 
 export async function listSessions({ serviceUrl, ids }: ListSessionsCommand) {
-  const sessionService: Client<typeof SessionService> =
-    await createServiceForHost(SessionService, serviceUrl);
+  const sessionService: Client<typeof SessionService> = await createServiceForHost(SessionService, serviceUrl);
 
   return sessionService.listSessions(
     {
@@ -437,36 +330,21 @@ export type AddHumanUserData = {
   organization: string;
 };
 
-export async function addHumanUser({
-  serviceUrl,
-  email,
-  firstName,
-  lastName,
-  password,
-  organization,
-}: AddHumanUserData) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+export async function addHumanUser({ serviceUrl, email, firstName, lastName, password, organization }: AddHumanUserData) {
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
-  let addHumanUserRequest: AddHumanUserRequest = create(
-    AddHumanUserRequestSchema,
-    {
-      email: {
-        email,
-        verification: {
-          case: "isVerified",
-          value: false,
-        },
+  let addHumanUserRequest: AddHumanUserRequest = create(AddHumanUserRequestSchema, {
+    email: {
+      email,
+      verification: {
+        case: "isVerified",
+        value: false,
       },
-      username: email,
-      profile: { givenName: firstName, familyName: lastName },
-      passwordType: password
-        ? { case: "password", value: { password } }
-        : undefined,
     },
-  );
+    username: email,
+    profile: { givenName: firstName, familyName: lastName },
+    passwordType: password ? { case: "password", value: { password } } : undefined,
+  });
 
   if (organization) {
     const organizationSchema = create(OrganizationSchema, {
@@ -482,32 +360,14 @@ export async function addHumanUser({
   return userService.addHumanUser(addHumanUserRequest);
 }
 
-export async function addHuman({
-  serviceUrl,
-  request,
-}: {
-  serviceUrl: string;
-  request: AddHumanUserRequest;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+export async function addHuman({ serviceUrl, request }: { serviceUrl: string; request: AddHumanUserRequest }) {
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.addHumanUser(request);
 }
 
-export async function updateHuman({
-  serviceUrl,
-  request,
-}: {
-  serviceUrl: string;
-  request: UpdateHumanUserRequest;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+export async function updateHuman({ serviceUrl, request }: { serviceUrl: string; request: UpdateHumanUserRequest }) {
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.updateHumanUser(request);
 }
@@ -521,40 +381,19 @@ export async function verifyTOTPRegistration({
   code: string;
   userId: string;
 }) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.verifyTOTPRegistration({ code, userId }, {});
 }
 
-export async function getUserByID({
-  serviceUrl,
-  userId,
-}: {
-  serviceUrl: string;
-  userId: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+export async function getUserByID({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.getUserByID({ userId }, {});
 }
 
-export async function humanMFAInitSkipped({
-  serviceUrl,
-  userId,
-}: {
-  serviceUrl: string;
-  userId: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+export async function humanMFAInitSkipped({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.humanMFAInitSkipped({ userId }, {});
 }
@@ -568,10 +407,7 @@ export async function verifyInviteCode({
   userId: string;
   verificationCode: string;
 }) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.verifyInviteCode({ userId, verificationCode }, {});
 }
@@ -597,10 +433,7 @@ export async function sendEmailCode({
     },
   });
 
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.sendEmailCode(medium, {});
 }
@@ -623,10 +456,7 @@ export async function createInviteCode({
     urlTemplate,
   };
 
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.createInviteCode(
     {
@@ -649,14 +479,7 @@ export type ListUsersCommand = {
   organizationId?: string;
 };
 
-export async function listUsers({
-  serviceUrl,
-  loginName,
-  userName,
-  phone,
-  email,
-  organizationId,
-}: ListUsersCommand) {
+export async function listUsers({ serviceUrl, loginName, userName, phone, email, organizationId }: ListUsersCommand) {
   const queries: SearchQuery[] = [];
 
   // either use loginName or userName, email, phone
@@ -739,10 +562,7 @@ export async function listUsers({
     );
   }
 
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.listUsers({ queries });
 }
@@ -792,13 +612,7 @@ const EmailQuery = (searchValue: string) =>
  * this is a dedicated search function to search for users from the loginname page
  * it searches users based on the loginName or userName and org suffix combination, and falls back to email and phone if no users are found
  *  */
-export async function searchUsers({
-  serviceUrl,
-  searchValue,
-  loginSettings,
-  organizationId,
-  suffix,
-}: SearchUsersCommand) {
+export async function searchUsers({ serviceUrl, searchValue, loginSettings, organizationId, suffix }: SearchUsersCommand) {
   const queries: SearchQuery[] = [];
 
   const t = await getTranslations("zitadel");
@@ -826,10 +640,7 @@ export async function searchUsers({
     );
   }
 
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   const loginNameResult = await userService.listUsers({ queries });
 
@@ -846,10 +657,7 @@ export async function searchUsers({
   }
 
   const emailAndPhoneQueries: SearchQuery[] = [];
-  if (
-    loginSettings.disableLoginWithEmail &&
-    loginSettings.disableLoginWithPhone
-  ) {
+  if (loginSettings.disableLoginWithEmail && loginSettings.disableLoginWithPhone) {
     return { error: t("errors.userNotFound") };
   } else if (loginSettings.disableLoginWithEmail && searchValue.length <= 20) {
     const phoneQuery = PhoneQuery(searchValue);
@@ -882,7 +690,7 @@ export async function searchUsers({
   }
 
   if (organizationId) {
-    queries.push(
+    emailAndPhoneQueries.push(
       create(SearchQuerySchema, {
         query: {
           case: "organizationIdQuery",
@@ -913,13 +721,8 @@ export async function searchUsers({
   return { error: t("errors.userNotFound") };
 }
 
-export async function getDefaultOrg({
-  serviceUrl,
-}: {
-  serviceUrl: string;
-}): Promise<Organization | null> {
-  const orgService: Client<typeof OrganizationService> =
-    await createServiceForHost(OrganizationService, serviceUrl);
+export async function getDefaultOrg({ serviceUrl }: { serviceUrl: string }): Promise<Organization | null> {
+  const orgService: Client<typeof OrganizationService> = await createServiceForHost(OrganizationService, serviceUrl);
 
   return orgService
     .listOrganizations(
@@ -938,15 +741,8 @@ export async function getDefaultOrg({
     .then((resp) => (resp?.result && resp.result[0] ? resp.result[0] : null));
 }
 
-export async function getOrgsByDomain({
-  serviceUrl,
-  domain,
-}: {
-  serviceUrl: string;
-  domain: string;
-}) {
-  const orgService: Client<typeof OrganizationService> =
-    await createServiceForHost(OrganizationService, serviceUrl);
+export async function getOrgsByDomain({ serviceUrl, domain }: { serviceUrl: string; domain: string }) {
+  const orgService: Client<typeof OrganizationService> = await createServiceForHost(OrganizationService, serviceUrl);
 
   return orgService.listOrganizations(
     {
@@ -972,10 +768,7 @@ export async function startIdentityProviderFlow({
   idpId: string;
   urls: RedirectURLsJson;
 }): Promise<string | null> {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService
     .startIdentityProviderIntent({
@@ -1002,10 +795,7 @@ export async function startIdentityProviderFlow({
           });
 
           const stringifiedFields = JSON.stringify(formData.fields);
-          console.log(
-            "Successfully stringified formData.fields, length:",
-            stringifiedFields.length,
-          );
+          console.log("Successfully stringified formData.fields, length:", stringifiedFields.length);
 
           // Check cookie size limits (typical limit is 4KB)
           if (stringifiedFields.length > 4000) {
@@ -1041,10 +831,7 @@ export async function startLDAPIdentityProviderFlow({
   username: string;
   password: string;
 }) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.startIdentityProviderIntent({
     idpId,
@@ -1058,13 +845,7 @@ export async function startLDAPIdentityProviderFlow({
   });
 }
 
-export async function getAuthRequest({
-  serviceUrl,
-  authRequestId,
-}: {
-  serviceUrl: string;
-  authRequestId: string;
-}) {
+export async function getAuthRequest({ serviceUrl, authRequestId }: { serviceUrl: string; authRequestId: string }) {
   const oidcService = await createServiceForHost(OIDCService, serviceUrl);
 
   return oidcService.getAuthRequest({
@@ -1072,13 +853,7 @@ export async function getAuthRequest({
   });
 }
 
-export async function getDeviceAuthorizationRequest({
-  serviceUrl,
-  userCode,
-}: {
-  serviceUrl: string;
-  userCode: string;
-}) {
+export async function getDeviceAuthorizationRequest({ serviceUrl, userCode }: { serviceUrl: string; userCode: string }) {
   const oidcService = await createServiceForHost(OIDCService, serviceUrl);
 
   return oidcService.getDeviceAuthorizationRequest({
@@ -1111,25 +886,13 @@ export async function authorizeOrDenyDeviceAuthorization({
   });
 }
 
-export async function createCallback({
-  serviceUrl,
-  req,
-}: {
-  serviceUrl: string;
-  req: CreateCallbackRequest;
-}) {
+export async function createCallback({ serviceUrl, req }: { serviceUrl: string; req: CreateCallbackRequest }) {
   const oidcService = await createServiceForHost(OIDCService, serviceUrl);
 
   return oidcService.createCallback(req);
 }
 
-export async function getSAMLRequest({
-  serviceUrl,
-  samlRequestId,
-}: {
-  serviceUrl: string;
-  samlRequestId: string;
-}) {
+export async function getSAMLRequest({ serviceUrl, samlRequestId }: { serviceUrl: string; samlRequestId: string }) {
   const samlService = await createServiceForHost(SAMLService, serviceUrl);
 
   return samlService.getSAMLRequest({
@@ -1137,13 +900,7 @@ export async function getSAMLRequest({
   });
 }
 
-export async function createResponse({
-  serviceUrl,
-  req,
-}: {
-  serviceUrl: string;
-  req: CreateResponseRequest;
-}) {
+export async function createResponse({ serviceUrl, req }: { serviceUrl: string; req: CreateResponseRequest }) {
   const samlService = await createServiceForHost(SAMLService, serviceUrl);
 
   return samlService.createResponse(req);
@@ -1158,10 +915,7 @@ export async function verifyEmail({
   userId: string;
   verificationCode: string;
 }) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.verifyEmail(
     {
@@ -1191,43 +945,19 @@ export async function resendEmailCode({
 
   request = { ...request, verification: { case: "sendCode", value: medium } };
 
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.resendEmailCode(request, {});
 }
 
-export async function retrieveIDPIntent({
-  serviceUrl,
-  id,
-  token,
-}: {
-  serviceUrl: string;
-  id: string;
-  token: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+export async function retrieveIDPIntent({ serviceUrl, id, token }: { serviceUrl: string; id: string; token: string }) {
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
-  return userService.retrieveIdentityProviderIntent(
-    { idpIntentId: id, idpIntentToken: token },
-    {},
-  );
+  return userService.retrieveIdentityProviderIntent({ idpIntentId: id, idpIntentToken: token }, {});
 }
 
-export async function getIDPByID({
-  serviceUrl,
-  id,
-}: {
-  serviceUrl: string;
-  id: string;
-}) {
-  const idpService: Client<typeof IdentityProviderService> =
-    await createServiceForHost(IdentityProviderService, serviceUrl);
+export async function getIDPByID({ serviceUrl, id }: { serviceUrl: string; id: string }) {
+  const idpService: Client<typeof IdentityProviderService> = await createServiceForHost(IdentityProviderService, serviceUrl);
 
   return idpService.getIDPByID({ id }, {}).then((resp) => resp.idp);
 }
@@ -1241,10 +971,7 @@ export async function addIDPLink({
   idp: { id: string; userId: string; userName: string };
   userId: string;
 }) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.addIDPLink(
     {
@@ -1277,10 +1004,7 @@ export async function passwordReset({
     urlTemplate,
   };
 
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.passwordReset(
     {
@@ -1322,10 +1046,7 @@ export async function setUserPassword({
     };
   }
 
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.setPassword(payload, {}).catch((error) => {
     // throw error if failed precondition (ex. User is not yet initialized)
@@ -1337,17 +1058,8 @@ export async function setUserPassword({
   });
 }
 
-export async function setPassword({
-  serviceUrl,
-  payload,
-}: {
-  serviceUrl: string;
-  payload: SetPasswordRequest;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+export async function setPassword({ serviceUrl, payload }: { serviceUrl: string; payload: SetPasswordRequest }) {
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.setPassword(payload, {});
 }
@@ -1358,17 +1070,8 @@ export async function setPassword({
  * @param userId the id of the user where the email should be set
  * @returns the newly set email
  */
-export async function createPasskeyRegistrationLink({
-  serviceUrl,
-  userId,
-}: {
-  serviceUrl: string;
-  userId: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+export async function createPasskeyRegistrationLink({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.createPasskeyRegistrationLink({
     userId,
@@ -1386,19 +1089,8 @@ export async function createPasskeyRegistrationLink({
  * @param domain the domain on which the factor is registered
  * @returns the newly set email
  */
-export async function registerU2F({
-  serviceUrl,
-  userId,
-  domain,
-}: {
-  serviceUrl: string;
-  userId: string;
-  domain: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+export async function registerU2F({ serviceUrl, userId, domain }: { serviceUrl: string; userId: string; domain: string }) {
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.registerU2F({
     userId,
@@ -1419,10 +1111,7 @@ export async function verifyU2FRegistration({
   serviceUrl: string;
   request: VerifyU2FRegistrationRequest;
 }) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.verifyU2FRegistration(request, {});
 }
@@ -1447,8 +1136,7 @@ export async function getActiveIdentityProviders({
   if (linking_allowed) {
     props.linkingAllowed = linking_allowed;
   }
-  const settingsService: Client<typeof SettingsService> =
-    await createServiceForHost(SettingsService, serviceUrl);
+  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
   return settingsService.getActiveIdentityProviders(props, {});
 }
@@ -1466,10 +1154,7 @@ export async function verifyPasskeyRegistration({
   serviceUrl: string;
   request: VerifyPasskeyRegistrationRequest;
 }) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.verifyPasskeyRegistration(request, {});
 }
@@ -1493,10 +1178,7 @@ export async function registerPasskey({
   code: { id: string; code: string };
   domain: string;
 }) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.registerPasskey({
     userId,
@@ -1511,17 +1193,8 @@ export async function registerPasskey({
  * @param userId the id of the user where the email should be set
  * @returns the list of authentication method types
  */
-export async function listAuthenticationMethodTypes({
-  serviceUrl,
-  userId,
-}: {
-  serviceUrl: string;
-  userId: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
+export async function listAuthenticationMethodTypes({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
   return userService.listAuthenticationMethodTypes({
     userId,
@@ -1536,16 +1209,14 @@ export function createServerTransport(token: string, baseUrl: string) {
       : [
           (next) => {
             return (req) => {
-              process.env
-                .CUSTOM_REQUEST_HEADERS!.split(",")
-                .forEach((header) => {
-                  const kv = header.split(":");
-                  if (kv.length === 2) {
-                    req.header.set(kv[0].trim(), kv[1].trim());
-                  } else {
-                    console.warn(`Skipping malformed header: ${header}`);
-                  }
-                });
+              process.env.CUSTOM_REQUEST_HEADERS!.split(",").forEach((header) => {
+                const kv = header.split(":");
+                if (kv.length === 2) {
+                  req.header.set(kv[0].trim(), kv[1].trim());
+                } else {
+                  console.warn(`Skipping malformed header: ${header}`);
+                }
+              });
               return next(req);
             };
           },

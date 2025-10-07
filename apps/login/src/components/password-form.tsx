@@ -26,18 +26,12 @@ type Props = {
   requestId?: string;
 };
 
-export function PasswordForm({
-  loginSettings,
-  loginName,
-  organization,
-  requestId,
-}: Props) {
+export function PasswordForm({ loginSettings, loginName, organization, requestId }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
   });
-  
-  const t = useTranslations("password");
 
+  const t = useTranslations("password");
 
   const [info, setInfo] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -138,14 +132,7 @@ export function PasswordForm({
           </button>
         )}
 
-        {loginName && (
-          <input
-            type="hidden"
-            name="loginName"
-            autoComplete="username"
-            value={loginName}
-          />
-        )}
+        {loginName && <input type="hidden" name="loginName" autoComplete="username" value={loginName} />}
       </div>
 
       {info && (
@@ -171,8 +158,7 @@ export function PasswordForm({
           onClick={handleSubmit(submitPassword)}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
-          <Translated i18nKey="verify.submit" namespace="password" />
+          {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="verify.submit" namespace="password" />
         </Button>
       </div>
     </form>

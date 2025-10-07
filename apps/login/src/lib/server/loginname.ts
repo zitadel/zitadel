@@ -22,6 +22,7 @@ import {
   startIdentityProviderFlow,
 } from "../zitadel";
 import { createSessionAndUpdateCookie } from "./cookie";
+import { getOriginalHost } from "./host";
 
 export type SendLoginnameCommand = {
   loginName: string;
@@ -35,13 +36,8 @@ const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 export async function sendLoginname(command: SendLoginnameCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
 
   const t = await getTranslations("loginname");
-
-  if (!host) {
-    throw new Error(t("errors.couldNotGetDomain"));
-  }
 
   const loginSettingsByContext = await getLoginSettings({
     serviceUrl,
@@ -83,11 +79,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     if (identityProviders.length === 1) {
       const _headers = await headers();
       const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-      const host = _headers.get("host");
-
-      if (!host) {
-        return { error: t("errors.couldNotGetHost") };
-      }
+      const host = await getOriginalHost();
 
       const identityProviderType = identityProviders[0].type;
 
@@ -137,11 +129,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     if (identityProviders.length === 1) {
       const _headers = await headers();
       const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-      const host = _headers.get("host");
-
-      if (!host) {
-        return { error: t("errors.couldNotGetHost") };
-      }
+      const host = await getOriginalHost();
 
       const identityProviderId = identityProviders[0].idpId;
 
@@ -281,6 +269,12 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       switch (method) {
         case AuthenticationMethodType.PASSWORD: // user has only password as auth method
           if (!userLoginSettings?.allowUsernamePassword) {
+            // Check if user has IDPs available as alternative, that could eventually be used to register/link.
+            const idpResp = await redirectUserToIDP(userId);
+            if (idpResp?.redirect) {
+              return idpResp;
+            }
+
             return {
               error: t("errors.usernamePasswordNotAllowed"),
             };
@@ -338,7 +332,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSKEY)) {
         const passkeyParams = new URLSearchParams({
           loginName: session.factors?.user?.loginName,
-          altPassword: `${methods.authMethodTypes.includes(1)}`, // show alternative password option
+          altPassword: `${methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD) && userLoginSettings?.allowUsernamePassword}`, // show alternative password option only if allowed
         });
 
         if (command.requestId) {
@@ -353,7 +347,14 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       } else if (methods.authMethodTypes.includes(AuthenticationMethodType.IDP)) {
         return redirectUserToIDP(userId);
       } else if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)) {
-        // user has no passkey setup and login settings allow passkeys
+        // Check if password authentication is allowed
+        if (!userLoginSettings?.allowUsernamePassword) {
+          return {
+            error: "Username Password not allowed! Contact your administrator for more information.",
+          };
+        }
+
+        // user has no passkey setup and login settings allow passwords
         const paramsPasswordDefault = new URLSearchParams({
           loginName: session.factors?.user?.loginName,
         });
