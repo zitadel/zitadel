@@ -1,12 +1,33 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import OriginalApiItem from "@theme-original/ApiItem";
 
 export default function ApiItemWrapper(props) {
   const [feedback, setFeedback] = useState(null);
   const [comment, setComment] = useState("");
+  const [plausibleLoaded, setPlausibleLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!document.getElementById("plausible-script")) {
+      const script = document.createElement("script");
+      script.src = "https://plausible.io/js/plausible.js";
+      script.defer = true;
+      script.async = true;
+      script.dataset.domain = window.location.hostname;
+      script.id = "plausible-script";
+
+      script.onload = () => {
+        setPlausibleLoaded(true);
+      };
+
+      document.body.appendChild(script);
+    } else {
+      setPlausibleLoaded(true);
+    }
+  }, []);
 
   const sendPlausibleEvent = (feedbackValue, commentText = "") => {
-    if (typeof window.plausible === "function") {
+    if (plausibleLoaded && typeof window.plausible === "function") {
+      console.log("Sending plausible event:", feedbackValue, commentText);
       window.plausible("Feedback Submitted", {
         props: {
           feedback: feedbackValue,
@@ -14,6 +35,8 @@ export default function ApiItemWrapper(props) {
           page: window.location.pathname,
         },
       });
+    } else {
+      console.warn("Plausible not loaded yet. Event skipped.");
     }
   };
 
@@ -56,6 +79,7 @@ export default function ApiItemWrapper(props) {
               <div className="flex gap-3">
                 <button
                   onClick={handleYes}
+                  disabled={!plausibleLoaded}
                   className="button button--sm"
                   style={{
                     backgroundColor: "transparent",
@@ -68,6 +92,7 @@ export default function ApiItemWrapper(props) {
                 <button
                   className="button button--sm button--secondary"
                   onClick={handleNo}
+                  disabled={!plausibleLoaded}
                 >
                   No
                 </button>
@@ -88,10 +113,13 @@ export default function ApiItemWrapper(props) {
                 <button
                   className="button button--sm button--primary"
                   onClick={handleSubmitComment}
-                  disabled={comment.trim() === ""}
+                  disabled={comment.trim() === "" || !plausibleLoaded}
                   style={{
                     opacity: comment.trim() === "" ? 0.5 : 1,
-                    cursor: comment.trim() === "" ? "not-allowed" : "pointer",
+                    cursor:
+                      comment.trim() === "" || !plausibleLoaded
+                        ? "not-allowed"
+                        : "pointer",
                   }}
                 >
                   Submit
