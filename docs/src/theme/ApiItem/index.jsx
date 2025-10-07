@@ -36,59 +36,77 @@ export default function ApiItemWrapper(props) {
     <>
       <OriginalApiItem {...props} />
 
-      <div className="mt-8 pt-4 border-t border-card-border">
-        <p className="mb-2 font-medium text-lg">Was this page useful?</p>
-
-        {feedback === null && (
-          <div className="flex gap-4">
-            <button
-              className="button button--sm button--primary"
-              onClick={handleYes}
-            >
-              Yes
-            </button>
-            <button
-              className="button button--sm button--secondary"
-              onClick={handleNo}
-            >
-              No
-            </button>
-          </div>
-        )}
-
-        {feedback === "no" && (
-          <div className="mt-2 flex flex-col gap-2">
-            <textarea
-              className="textarea textarea-bordered w-full max-w-[50%] resize-none"
-              rows="3"
-              placeholder="How can we improve this page?"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-            />
-            <div className="flex gap-2">
-              <button
-                className="button button--sm button--primary"
-                onClick={handleSubmitComment}
+      <div className="mt-10 flex justify-start">
+        <div className="w-full max-w-2xl rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1a1a1a] p-6 shadow-sm">
+          {/* Title and buttons aligned horizontally */}
+          {feedback === null && (
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <p
+                className="font-medium text-lg m-0"
+                style={{ color: "var(--ifm-menu-color)" }}
               >
-                Submit
-              </button>
-              <button
-                className="button button--sm button--secondary"
-                onClick={() => {
-                  setFeedback(null);
-                  setComment("");
-                }}
-              >
-                Go Back
-              </button>
+                Was this page useful?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleYes}
+                  className="button button--sm"
+                  style={{
+                    backgroundColor: "transparent",
+                    color: "var(--ifm-color-primary)",
+                    border: "1px solid var(--ifm-color-primary)",
+                  }}
+                >
+                  Yes
+                </button>
+                <button
+                  className="button button--sm button--secondary"
+                  onClick={handleNo}
+                >
+                  No
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {feedback === "yes" && <p className="mt-2">Thanks for your feedback!</p>}
-        {feedback === "submitted" && (
-          <p className="mt-2">Thanks for your feedback!</p>
-        )}
+          {feedback === "no" && (
+            <div className="mt-1 flex flex-col gap-3">
+              <textarea
+                className="textarea textarea-bordered w-full resize-none rounded-md border border-gray-300 dark:border-gray-600 bg-transparent p-2 text-sm"
+                rows="3"
+                placeholder="Sorry to hear that — how can we improve this page?"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+              />
+              <div className="flex gap-2">
+                <button
+                  className="button button--sm button--primary"
+                  onClick={handleSubmitComment}
+                >
+                  Submit
+                </button>
+                <button
+                  className="button button--sm button--secondary"
+                  onClick={() => {
+                    setFeedback(null);
+                    setComment("");
+                  }}
+                >
+                  Go Back
+                </button>
+              </div>
+            </div>
+          )}
+
+          {(feedback === "yes" || feedback === "submitted") && (
+            <p
+              className="mt-4 font-medium"
+              style={{ color: "var(--ifm-color-primary)" }}
+            >
+              Thanks for your feedback!
+            </p>
+          )}
+        </div>
       </div>
     </>
   );
