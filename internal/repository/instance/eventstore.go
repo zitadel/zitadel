@@ -98,6 +98,8 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, GitLabSelfHostedIDPChangedEventType, GitLabSelfHostedIDPChangedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, GoogleIDPAddedEventType, GoogleIDPAddedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, GoogleIDPChangedEventType, GoogleIDPChangedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, DingTalkIDPAddedEventType, DingTalkIDPAddedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, DingTalkIDPChangedEventType, DingTalkIDPChangedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, LDAPIDPAddedEventType, LDAPIDPAddedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, LDAPIDPChangedEventType, LDAPIDPChangedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, AppleIDPAddedEventType, AppleIDPAddedEventMapper)

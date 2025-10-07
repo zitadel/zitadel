@@ -374,6 +374,27 @@ func (s *Server) AddGoogleProvider(ctx context.Context, req *admin_pb.AddGoogleP
 	}, nil
 }
 
+func (s *Server) AddDingTalkProvider(ctx context.Context, req *admin_pb.AddDingTalkProviderRequest) (*admin_pb.AddDingTalkProviderResponse, error) {
+	id, details, err := s.command.AddInstanceDingTalkProvider(ctx, addDingTalkProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddDingTalkProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateDingTalkProvider(ctx context.Context, req *admin_pb.UpdateDingTalkProviderRequest) (*admin_pb.UpdateDingTalkProviderResponse, error) {
+	details, err := s.command.UpdateInstanceDingTalkProvider(ctx, req.Id, updateDingTalkProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateDingTalkProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
 func (s *Server) UpdateGoogleProvider(ctx context.Context, req *admin_pb.UpdateGoogleProviderRequest) (*admin_pb.UpdateGoogleProviderResponse, error) {
 	details, err := s.command.UpdateInstanceGoogleProvider(ctx, req.Id, updateGoogleProviderToCommand(req))
 	if err != nil {

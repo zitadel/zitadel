@@ -415,6 +415,8 @@ func providerTypeToPb(idpType domain.IDPType) idp_pb.ProviderType {
 		return idp_pb.ProviderType_PROVIDER_TYPE_APPLE
 	case domain.IDPTypeSAML:
 		return idp_pb.ProviderType_PROVIDER_TYPE_SAML
+	case domain.IDPTypeDingTalk:
+		return idp_pb.ProviderType_PROVIDER_TYPE_DINGTALK
 	case domain.IDPTypeUnspecified:
 		return idp_pb.ProviderType_PROVIDER_TYPE_UNSPECIFIED
 	default:
@@ -466,6 +468,10 @@ func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
 	}
 	if config.GoogleIDPTemplate != nil {
 		googleConfigToPb(providerConfig, config.GoogleIDPTemplate)
+		return providerConfig
+	}
+	if config.DingTalkIDPTemplate != nil {
+		dingTalkConfigToPb(providerConfig, config.DingTalkIDPTemplate)
 		return providerConfig
 	}
 	if config.LDAPIDPTemplate != nil {
@@ -602,6 +608,15 @@ func gitlabSelfHostedConfigToPb(providerConfig *idp_pb.ProviderConfig, template 
 func googleConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.GoogleIDPTemplate) {
 	providerConfig.Config = &idp_pb.ProviderConfig_Google{
 		Google: &idp_pb.GoogleConfig{
+			ClientId: template.ClientID,
+			Scopes:   template.Scopes,
+		},
+	}
+}
+
+func dingTalkConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.DingTalkIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_Dingtalk{
+		Dingtalk: &idp_pb.DingTalkConfig{
 			ClientId: template.ClientID,
 			Scopes:   template.Scopes,
 		},

@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _IDPTypeName = "oidcjwtoauthsamlldapgithubgithubenterprisegitlabgitlabselfhostedazuregoogleapple"
+const _IDPTypeName = "oidcjwtoauthsamlldapgithubgithubenterprisegitlabgitlabselfhostedazuregoogleappledingtalk"
 
-var _IDPTypeIndex = [...]uint8{0, 4, 7, 12, 16, 20, 26, 42, 48, 64, 69, 75, 80}
+var _IDPTypeIndex = [...]uint8{0, 4, 7, 12, 16, 20, 26, 42, 48, 64, 69, 75, 80, 88}
 
-const _IDPTypeLowerName = "oidcjwtoauthsamlldapgithubgithubenterprisegitlabgitlabselfhostedazuregoogleapple"
+const _IDPTypeLowerName = "oidcjwtoauthsamlldapgithubgithubenterprisegitlabgitlabselfhostedazuregoogleappledingtalk"
 
 func (i IDPType) String() string {
 	i -= 1
@@ -37,9 +37,10 @@ func _IDPTypeNoOp() {
 	_ = x[IDPTypeAzure-(10)]
 	_ = x[IDPTypeGoogle-(11)]
 	_ = x[IDPTypeApple-(12)]
+	_ = x[IDPTypeDingTalk-(13)]
 }
 
-var _IDPTypeValues = []IDPType{IDPTypeOIDC, IDPTypeJWT, IDPTypeOAuth, IDPTypeSAML, IDPTypeLDAP, IDPTypeGitHub, IDPTypeGitHubEnterprise, IDPTypeGitLab, IDPTypeGitLabSelfHosted, IDPTypeAzure, IDPTypeGoogle, IDPTypeApple}
+var _IDPTypeValues = []IDPType{IDPTypeOIDC, IDPTypeJWT, IDPTypeOAuth, IDPTypeSAML, IDPTypeLDAP, IDPTypeGitHub, IDPTypeGitHubEnterprise, IDPTypeGitLab, IDPTypeGitLabSelfHosted, IDPTypeAzure, IDPTypeGoogle, IDPTypeApple, IDPTypeDingTalk}
 
 var _IDPTypeNameToValueMap = map[string]IDPType{
 	_IDPTypeName[0:4]:        IDPTypeOIDC,
@@ -66,6 +67,8 @@ var _IDPTypeNameToValueMap = map[string]IDPType{
 	_IDPTypeLowerName[69:75]: IDPTypeGoogle,
 	_IDPTypeName[75:80]:      IDPTypeApple,
 	_IDPTypeLowerName[75:80]: IDPTypeApple,
+	_IDPTypeName[80:88]:      IDPTypeDingTalk,
+	_IDPTypeLowerName[80:88]: IDPTypeDingTalk,
 }
 
 var _IDPTypeNames = []string{
@@ -81,6 +84,7 @@ var _IDPTypeNames = []string{
 	_IDPTypeName[64:69],
 	_IDPTypeName[69:75],
 	_IDPTypeName[75:80],
+	_IDPTypeName[80:88],
 }
 
 // IDPTypeString retrieves an enum value from the enum constants string name.

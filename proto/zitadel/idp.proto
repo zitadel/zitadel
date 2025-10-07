@@ -267,6 +267,7 @@ enum ProviderType {
     PROVIDER_TYPE_GOOGLE = 10;
     PROVIDER_TYPE_APPLE = 11;
     PROVIDER_TYPE_SAML = 12;
+    PROVIDER_TYPE_DINGTALK = 13;
 }
 
 enum SAMLBinding {
@@ -305,6 +306,7 @@ message ProviderConfig {
         AzureADConfig azure_ad = 11;
         AppleConfig apple = 12;
         SAMLConfig saml = 13;
+        DingTalkConfig dingtalk = 14;
     }
 }
 
@@ -426,6 +428,21 @@ message GoogleConfig {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
             description: "the scopes requested by ZITADEL during the request to Google";
+        }
+    ];
+}
+
+message DingTalkConfig {
+    string client_id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"client-id\"";
+            description: "client id of the DingTalk application";
+        }
+    ];
+    repeated string scopes = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"openid\", \"profile\", \"email\"]";
+            description: "the scopes requested by ZITADEL during the request to DingTalk";
         }
     ];
 }

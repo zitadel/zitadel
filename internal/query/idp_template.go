@@ -47,6 +47,7 @@ type IDPTemplate struct {
 	*LDAPIDPTemplate
 	*AppleIDPTemplate
 	*SAMLIDPTemplate
+	*DingTalkIDPTemplate
 }
 
 type IDPTemplates struct {
@@ -126,6 +127,13 @@ type GitLabSelfHostedIDPTemplate struct {
 }
 
 type GoogleIDPTemplate struct {
+	IDPID        string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       database.TextArray[string]
+}
+
+type DingTalkIDPTemplate struct {
 	IDPID        string
 	ClientID     string
 	ClientSecret *crypto.CryptoValue
@@ -544,6 +552,33 @@ var (
 )
 
 var (
+	dingtalkIdpTemplateTable = table{
+		name:          projection.IDPTemplateDingTalkTable,
+		instanceIDCol: projection.DingTalkInstanceIDCol,
+	}
+	DingTalkIDCol = Column{
+		name:  projection.DingTalkIDCol,
+		table: dingtalkIdpTemplateTable,
+	}
+	DingTalkInstanceIDCol = Column{
+		name:  projection.DingTalkInstanceIDCol,
+		table: dingtalkIdpTemplateTable,
+	}
+	DingTalkClientIDCol = Column{
+		name:  projection.DingTalkClientIDCol,
+		table: dingtalkIdpTemplateTable,
+	}
+	DingTalkClientSecretCol = Column{
+		name:  projection.DingTalkClientSecretCol,
+		table: dingtalkIdpTemplateTable,
+	}
+	DingTalkScopesCol = Column{
+		name:  projection.DingTalkScopesCol,
+		table: dingtalkIdpTemplateTable,
+	}
+)
+
+var (
 	ldapIdpTemplateTable = table{
 		name:          projection.IDPTemplateLDAPTable,
 		instanceIDCol: projection.IDPTemplateInstanceIDCol,
@@ -949,6 +984,11 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			GoogleClientIDCol.identifier(),
 			GoogleClientSecretCol.identifier(),
 			GoogleScopesCol.identifier(),
+			// dingtalk
+			DingTalkIDCol.identifier(),
+			DingTalkClientIDCol.identifier(),
+			DingTalkClientSecretCol.identifier(),
+			DingTalkScopesCol.identifier(),
 			// saml
 			SAMLIDCol.identifier(),
 			SAMLMetadataCol.identifier(),
@@ -1002,6 +1042,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			LeftJoin(join(GitLabIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GitLabSelfHostedIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(DingTalkIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(SAMLIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(AppleIDCol, IDPTemplateIDCol)).
@@ -1070,6 +1111,11 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			googleClientID := sql.NullString{}
 			googleClientSecret := new(crypto.CryptoValue)
 			googleScopes := database.TextArray[string]{}
+
+			dingtalkID := sql.NullString{}
+			dingtalkClientID := sql.NullString{}
+			dingtalkClientSecret := new(crypto.CryptoValue)
+			dingtalkScopes := database.TextArray[string]{}
 
 			samlID := sql.NullString{}
 			var samlMetadata []byte
@@ -1189,6 +1235,11 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 				&googleClientID,
 				&googleClientSecret,
 				&googleScopes,
+				// dingtalk
+				&dingtalkID,
+				&dingtalkClientID,
+				&dingtalkClientSecret,
+				&dingtalkScopes,
 				// saml
 				&samlID,
 				&samlMetadata,
@@ -1329,6 +1380,14 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 					Scopes:       googleScopes,
 				}
 			}
+			if dingtalkID.Valid {
+				idpTemplate.DingTalkIDPTemplate = &DingTalkIDPTemplate{
+					IDPID:        dingtalkID.String,
+					ClientID:     dingtalkClientID.String,
+					ClientSecret: dingtalkClientSecret,
+					Scopes:       dingtalkScopes,
+				}
+			}
 			if samlID.Valid {
 				idpTemplate.SAMLIDPTemplate = &SAMLIDPTemplate{
 					IDPID:                         samlID.String,
@@ -1465,6 +1524,11 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			GoogleClientIDCol.identifier(),
 			GoogleClientSecretCol.identifier(),
 			GoogleScopesCol.identifier(),
+			// dingtalk
+			DingTalkIDCol.identifier(),
+			DingTalkClientIDCol.identifier(),
+			DingTalkClientSecretCol.identifier(),
+			DingTalkScopesCol.identifier(),
 			// saml
 			SAMLIDCol.identifier(),
 			SAMLMetadataCol.identifier(),
@@ -1520,6 +1584,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			LeftJoin(join(GitLabIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GitLabSelfHostedIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(DingTalkIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(SAMLIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(AppleIDCol, IDPTemplateIDCol)).
@@ -1591,6 +1656,11 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 				googleClientID := sql.NullString{}
 				googleClientSecret := new(crypto.CryptoValue)
 				googleScopes := database.TextArray[string]{}
+
+				dingtalkID := sql.NullString{}
+				dingtalkClientID := sql.NullString{}
+				dingtalkClientSecret := new(crypto.CryptoValue)
+				dingtalkScopes := database.TextArray[string]{}
 
 				samlID := sql.NullString{}
 				var samlMetadata []byte
@@ -1710,6 +1780,11 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 					&googleClientID,
 					&googleClientSecret,
 					&googleScopes,
+					// dingtalk
+					&dingtalkID,
+					&dingtalkClientID,
+					&dingtalkClientSecret,
+					&dingtalkScopes,
 					// saml
 					&samlID,
 					&samlMetadata,
@@ -1847,6 +1922,14 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 						ClientID:     googleClientID.String,
 						ClientSecret: googleClientSecret,
 						Scopes:       googleScopes,
+					}
+				}
+				if dingtalkID.Valid {
+					idpTemplate.DingTalkIDPTemplate = &DingTalkIDPTemplate{
+						IDPID:        dingtalkID.String,
+						ClientID:     dingtalkClientID.String,
+						ClientSecret: dingtalkClientSecret,
+						Scopes:       dingtalkScopes,
 					}
 				}
 				if samlID.Valid {

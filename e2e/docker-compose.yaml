@@ -1,8 +1,8 @@
 services:
-  zitadel:
-    extends:
-      file: './config/localhost/docker-compose.yaml'
-      service: 'zitadel'
+  # zitadel:
+  #   extends:
+  #     file: './config/localhost/docker-compose.yaml'
+  #     service: 'zitadel'
 
   db:
     extends:
