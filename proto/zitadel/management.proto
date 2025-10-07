@@ -3956,7 +3956,7 @@ service ManagementService {
 
     // Generate New API Client Secret
     //
-    // Deprecated: Use [RegenerateClientSecret](/apis/resources/application_service_v2/zitadel-application-v-2-application-service-regenerate-client-secret.api.mdx) instead to regenerate an API app client secret
+    // Deprecated: Use [GenerateClientSecret](/apis/resources/application_service_v2/zitadel-application-v-2-application-service-generate-client-secret.api.mdx) instead to (re-)generate an API app client secret
     //
     // Generates a new client secret for the API application, make sure to save the response.
     rpc RegenerateAPIClientSecret(RegenerateAPIClientSecretRequest) returns (RegenerateAPIClientSecretResponse) {
