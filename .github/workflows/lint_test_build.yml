@@ -46,6 +46,7 @@ jobs:
         uses: docker/setup-compose-action@v1
         with:
           version: v2.38.2
+      - run: docker ps -a
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Install Cypress binary
