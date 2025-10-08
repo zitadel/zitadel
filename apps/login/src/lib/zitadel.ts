@@ -447,7 +447,7 @@ export async function createInviteCode({
   userId: string;
 }) {
   let medium = create(SendInviteCodeSchema, {
-    applicationName: "Typescript Login",
+    applicationName: process.env.NEXT_PUBLIC_APPLICATION_NAME || "Zitadel Login",
   });
 
   medium = {
