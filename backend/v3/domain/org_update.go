@@ -59,16 +59,6 @@ func (u *UpdateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err 
 		return err
 	}
 
-	if org.Name == u.Name {
-		err = zerrors.ThrowPreconditionFailed(nil, "DOM-nDzwIu", "Errors.Org.NotChanged")
-		return err
-	}
-
-	if org.State == OrgStateInactive || org.State == OrgStateUnspecified {
-		err = zerrors.ThrowNotFound(nil, "DOM-OcA1jq", "Errors.Org.NotFound")
-		return err
-	}
-
 	err = u.setDomainInfos(ctx, org)
 	if err != nil {
 		return err
@@ -103,13 +93,37 @@ func (u *UpdateOrgCommand) String() string {
 	return "UpdateOrgCommand"
 }
 
-func (u *UpdateOrgCommand) Validate(_ context.Context, _ *CommandOpts) error {
+func (u *UpdateOrgCommand) Validate(ctx context.Context, opts *CommandOpts) error {
 	if u.ID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-lEMhVC", "invalid organization ID")
 	}
 	if u.Name == "" {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-wfUntW", "invalid organization name")
 	}
+
+	close, err := opts.EnsureTx(ctx)
+	if err != nil {
+		return err
+	}
+	defer func() { err = close(ctx, err) }()
+
+	organizationRepo := opts.organizationRepo
+
+	org, err := organizationRepo.Get(ctx, pool, database.WithCondition(
+		database.And(
+			organizationRepo.IDCondition(u.ID),
+			organizationRepo.InstanceIDCondition(authz.GetInstance(ctx).InstanceID()),
+		),
+	))
+	if err != nil {
+		return err
+	}
+
+	if org.Name == u.Name {
+		err = zerrors.ThrowPreconditionFailed(nil, "DOM-nDzwIu", "Errors.Org.NotChanged")
+		return err
+	}
+
 	return nil
 }
 
