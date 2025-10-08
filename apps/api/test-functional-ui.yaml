@@ -7,7 +7,9 @@ Database:
   postgres:
     # This makes the e2e config reusable with an out-of-docker zitadel process and an /etc/hosts entry
     database: zitadel
-    AwaitInitialConn: 5m
+    AwaitInitialConn:
+      Timeout: 5m
+      BackoffFactor: 1
     MaxOpenConns: 15
     MaxIdleConns: 10
     Database: zitadel

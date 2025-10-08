@@ -28,6 +28,17 @@ const (
 	sslPreferMode   = "prefer"
 )
 
+type AwaitInitialConn struct {
+	// Timeout is the total duration to wait for the initial connection to succeed
+	Timeout time.Duration
+	// InitialBackoff is the initial backoff duration after the first failed attempt
+	InitialBackoff time.Duration
+	// MaxBackoff is the maximum backoff duration between attempts
+	MaxBackoff time.Duration
+	// BackoffFactor is the factor by which the backoff increases after each failed attempt
+	BackoffFactor float64
+}
+
 type Config struct {
 	Host             string
 	Port             int32
@@ -36,7 +47,7 @@ type Config struct {
 	MaxIdleConns     uint32
 	MaxConnLifetime  time.Duration
 	MaxConnIdleTime  time.Duration
-	AwaitInitialConn time.Duration
+	AwaitInitialConn AwaitInitialConn
 	User             User
 	Admin            AdminUser
 	// Additional options to be appended as options=<Options>
@@ -128,14 +139,30 @@ func (c *Config) Connect(useAdmin bool) (*sql.DB, *pgxpool.Pool, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-
-	if err = pool.Ping(context.Background()); err != nil && c.AwaitInitialConn > 0 {
-		waitUntil := time.Now().Add(c.AwaitInitialConn)
+	initialBackoff := c.AwaitInitialConn.InitialBackoff
+	maxBackoff := c.AwaitInitialConn.MaxBackoff
+	backoffFactor := c.AwaitInitialConn.BackoffFactor
+	backoff := c.AwaitInitialConn.InitialBackoff
+	if err = pool.Ping(context.Background()); err != nil && c.AwaitInitialConn.Timeout > 0 {
+		if initialBackoff == 0 {
+			initialBackoff = 100 * time.Millisecond
+		}
+		if maxBackoff == 0 {
+			maxBackoff = time.Hour
+		}
+		if backoffFactor <= 1 {
+			backoffFactor = 1
+		}
+		waitUntil := time.Now().Add(c.AwaitInitialConn.Timeout)
 		for time.Now().Before(waitUntil) {
-			logging.Infof("retrying initial database connection: %v", err)
-			time.Sleep(100 * time.Millisecond)
+			logging.Infof("retrying initial database connection in %v: %v", backoff, err)
+			time.Sleep(backoff)
 			if err = pool.Ping(context.Background()); err == nil {
 				break
+			}
+			backoff = time.Duration(float64(backoff) * backoffFactor)
+			if backoff > maxBackoff {
+				backoff = maxBackoff
 			}
 		}
 	}
