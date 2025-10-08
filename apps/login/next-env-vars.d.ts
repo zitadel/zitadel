@@ -38,7 +38,7 @@ declare namespace NodeJS {
     NEXT_PUBLIC_BASE_PATH: string;
 
     /**
-     * The application name shown in the login and invite emails
+     * Optional: The application name shown in the login and invite emails
      */
     NEXT_PUBLIC_APPLICATION_NAME?: string;
   }
