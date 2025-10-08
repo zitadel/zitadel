@@ -171,7 +171,8 @@ func projectExistsOnOrganization(requiredOrganization, projectResourceOwner stri
 func projectGrantExistsOnOrganization(requiredGrantID, requiredOrganization, projectGrantID, grantedOrganization string) bool {
 	// Depending on the API, a request can either require a project grant (ID) and/or an organization (ID),
 	// where the project must be granted to.
-	return (requiredGrantID == "" || requiredGrantID == projectGrantID) &&
+	return (requiredGrantID != "" || requiredOrganization != "") &&
+		(requiredGrantID == "" || requiredGrantID == projectGrantID) &&
 		(requiredOrganization == "" || requiredOrganization == grantedOrganization)
 }
 

@@ -11,20 +11,24 @@ type sqlConn struct {
 	*sql.Conn
 }
 
-var _ database.Client = (*sqlConn)(nil)
+func SQLConn(conn *sql.Conn) database.Connection {
+	return &sqlConn{Conn: conn}
+}
 
-// Release implements [database.Client].
+var _ database.Connection = (*sqlConn)(nil)
+
+// Release implements [database.Connection].
 func (c *sqlConn) Release(_ context.Context) error {
 	return c.Close()
 }
 
-// Begin implements [database.Client].
+// Begin implements [database.Connection].
 func (c *sqlConn) Begin(ctx context.Context, opts *database.TransactionOptions) (database.Transaction, error) {
 	tx, err := c.BeginTx(ctx, transactionOptionsToSQL(opts))
 	if err != nil {
 		return nil, wrapError(err)
 	}
-	return &sqlTx{tx}, nil
+	return &Transaction{tx}, nil
 }
 
 // Query implements sql.Client.
@@ -52,6 +56,11 @@ func (c *sqlConn) Exec(ctx context.Context, sql string, args ...any) (int64, err
 		return 0, wrapError(err)
 	}
 	return res.RowsAffected()
+}
+
+// Ping implements [database.Pool].
+func (c *sqlConn) Ping(ctx context.Context) error {
+	return wrapError(c.PingContext(ctx))
 }
 
 // Migrate implements [database.Migrator].

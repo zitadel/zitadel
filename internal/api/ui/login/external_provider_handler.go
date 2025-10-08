@@ -321,14 +321,14 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = oauth.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
+		session = github.NewSession(provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGitHubEnterprise:
 		provider, err := l.githubEnterpriseProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = oauth.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
+		session = github.NewSession(provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGitLab:
 		provider, err := l.gitlabProvider(r.Context(), identityProvider)
 		if err != nil {
@@ -1113,22 +1113,26 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 }
 
 func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*saml.Provider, error) {
-	key, err := crypto.Decrypt(identityProvider.SAMLIDPTemplate.Key, l.idpConfigAlg)
+	key, err := crypto.Decrypt(identityProvider.Key, l.idpConfigAlg)
 	if err != nil {
 		return nil, err
 	}
 	opts := make([]saml.ProviderOpts, 0, 6)
-	if identityProvider.SAMLIDPTemplate.WithSignedRequest {
+	if identityProvider.WithSignedRequest {
 		opts = append(opts, saml.WithSignedRequest())
 	}
-	if identityProvider.SAMLIDPTemplate.Binding != "" {
-		opts = append(opts, saml.WithBinding(identityProvider.SAMLIDPTemplate.Binding))
+	if identityProvider.Binding != "" {
+		opts = append(opts, saml.WithBinding(identityProvider.Binding))
 	}
-	if identityProvider.SAMLIDPTemplate.NameIDFormat.Valid {
-		opts = append(opts, saml.WithNameIDFormat(identityProvider.SAMLIDPTemplate.NameIDFormat.V))
+	if identityProvider.WithSignedRequest &&
+		identityProvider.SignatureAlgorithm != "" {
+		opts = append(opts, saml.WithSignatureAlgorithm(identityProvider.SignatureAlgorithm))
 	}
-	if identityProvider.SAMLIDPTemplate.TransientMappingAttributeName != "" {
-		opts = append(opts, saml.WithTransientMappingAttributeName(identityProvider.SAMLIDPTemplate.TransientMappingAttributeName))
+	if identityProvider.NameIDFormat.Valid {
+		opts = append(opts, saml.WithNameIDFormat(identityProvider.NameIDFormat.V))
+	}
+	if identityProvider.TransientMappingAttributeName != "" {
+		opts = append(opts, saml.WithTransientMappingAttributeName(identityProvider.TransientMappingAttributeName))
 	}
 	opts = append(opts,
 		saml.WithEntityID(http_utils.DomainContext(ctx).Origin()+"/idps/"+identityProvider.ID+"/saml/metadata"),
@@ -1154,8 +1158,8 @@ func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTem
 	return saml.New(
 		identityProvider.Name,
 		l.baseURL(ctx)+EndpointExternalLogin+"/",
-		identityProvider.SAMLIDPTemplate.Metadata,
-		identityProvider.SAMLIDPTemplate.Certificate,
+		identityProvider.Metadata,
+		identityProvider.Certificate,
 		key,
 		opts...,
 	)
@@ -1320,6 +1324,8 @@ func tokens(session idp.Session) *oidc.Tokens[*oidc.IDTokenClaims] {
 		return s.Tokens
 	case *oauth.Session:
 		return s.Tokens
+	case *github.Session:
+		return s.Tokens()
 	case *azuread.Session:
 		return s.Tokens()
 	case *apple.Session:

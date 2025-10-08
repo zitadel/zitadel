@@ -575,10 +575,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 				{
 					Filter: &v2beta_org.OrganizationSearchFilter_DomainFilter{
 						DomainFilter: &v2beta_org.OrgDomainFilter{
-							Domain: func() string {
-								domain := strings.ToLower(strings.ReplaceAll(orgsName[1][1:len(orgsName[1])-2], " ", "-"))
-								return domain
-							}(),
+							Domain: orgsDomain[1][1 : len(orgsDomain[1])-2],
 							Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS,
 						},
 					},
@@ -598,10 +595,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 				{
 					Filter: &v2beta_org.OrganizationSearchFilter_DomainFilter{
 						DomainFilter: &v2beta_org.OrgDomainFilter{
-							Domain: func() string {
-								domain := strings.ToUpper(strings.ReplaceAll(orgsName[1][1:len(orgsName[1])-2], " ", "-"))
-								return domain
-							}(),
+							Domain: strings.ToUpper(orgsDomain[1][1 : len(orgsDomain[1])-2]),
 							Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE,
 						},
 					},
@@ -1254,21 +1248,20 @@ func TestServer_DeleteOrganizationDomain(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		var orgId string
 		t.Run(tt.name, func(t *testing.T) {
-			orgId = tt.testFunc()
-		})
+			orgId := tt.testFunc()
 
-		_, err := Client.DeleteOrganizationDomain(CTX, &v2beta_org.DeleteOrganizationDomainRequest{
-			OrganizationId: orgId,
-			Domain:         tt.domain,
-		})
+			_, err := Client.DeleteOrganizationDomain(CTX, &v2beta_org.DeleteOrganizationDomainRequest{
+				OrganizationId: orgId,
+				Domain:         tt.domain,
+			})
 
-		if tt.err != nil {
-			require.Contains(t, err.Error(), tt.err.Error())
-		} else {
-			require.NoError(t, err)
-		}
+			if tt.err != nil {
+				require.Contains(t, err.Error(), tt.err.Error())
+			} else {
+				require.NoError(t, err)
+			}
+		})
 	}
 }
 
@@ -1984,8 +1977,8 @@ func createOrgs(ctx context.Context, t *testing.T, client v2beta_org.Organizatio
 		require.NoError(t, err)
 	}
 
-	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	for i := range noOfOrgs {
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, 5*time.Minute)
 		require.EventuallyWithT(t, func(collect *assert.CollectT) {
 			listOrgRes, err := client.ListOrganizations(ctx, &v2beta_org.ListOrganizationsRequest{
 				Filter: []*v2beta_org.OrganizationSearchFilter{

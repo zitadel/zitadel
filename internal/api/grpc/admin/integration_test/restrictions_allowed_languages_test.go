@@ -191,7 +191,7 @@ func setAndAwaitDefaultLanguage(ctx context.Context, cc *integration.Client, t *
 func awaitDiscoveryEndpoint(t *testing.T, ctx context.Context, domain string, containsUILocales, notContainsUILocales []string) {
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	require.EventuallyWithT(t, func(tt *assert.CollectT) {
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+domain+":8080/.well-known/openid-configuration", nil)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+domain+":8082/.well-known/openid-configuration", nil)
 		require.NoError(tt, err)
 		resp, err := http.DefaultClient.Do(req)
 		require.NoError(tt, err)
@@ -218,7 +218,7 @@ func awaitDiscoveryEndpoint(t *testing.T, ctx context.Context, domain string, co
 func awaitLoginUILanguage(t *testing.T, ctx context.Context, domain string, acceptLanguage language.Tag, expectLang language.Tag, containsText string) {
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	require.EventuallyWithT(t, func(tt *assert.CollectT) {
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+domain+":8080/ui/login/register", nil)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+domain+":8082/ui/login/register", nil)
 		req.Header.Set("Accept-Language", acceptLanguage.String())
 		require.NoError(tt, err)
 		resp, err := http.DefaultClient.Do(req)
