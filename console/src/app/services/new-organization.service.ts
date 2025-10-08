@@ -52,6 +52,7 @@ export class NewOrganizationService {
       this.storage.setItem(StorageKey.organizationId, orgId, StorageLocation.local);
       this.orgIdSignal.set(orgId);
     } else {
+      this.storage.removeItem(StorageKey.organizationId, StorageLocation.session);
       throw new Error('request organization not found');
     }
     return organization;

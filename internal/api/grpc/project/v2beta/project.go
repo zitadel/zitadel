@@ -31,6 +31,7 @@ func (s *Server) CreateProject(ctx context.Context, req *connect.Request[project
 }
 
 func projectCreateToCommand(req *project_pb.CreateProjectRequest) *command.AddProject {
+	admins := projectCreateAdminsToCommand(req.GetAdmins())
 	var aggregateID string
 	if req.Id != nil {
 		aggregateID = *req.Id
@@ -45,7 +46,22 @@ func projectCreateToCommand(req *project_pb.CreateProjectRequest) *command.AddPr
 		ProjectRoleCheck:       req.AuthorizationRequired,
 		HasProjectCheck:        req.ProjectAccessRequired,
 		PrivateLabelingSetting: privateLabelingSettingToDomain(req.PrivateLabelingSetting),
+		Admins:                 admins,
 	}
+}
+
+func projectCreateAdminsToCommand(requestAdmins []*project_pb.CreateProjectRequest_Admin) []*command.AddProjectAdmin {
+	if len(requestAdmins) == 0 {
+		return nil
+	}
+	admins := make([]*command.AddProjectAdmin, len(requestAdmins))
+	for i, admin := range requestAdmins {
+		admins[i] = &command.AddProjectAdmin{
+			ID:    admin.GetUserId(),
+			Roles: admin.GetRoles(),
+		}
+	}
+	return admins
 }
 
 func privateLabelingSettingToDomain(setting project_pb.PrivateLabelingSetting) domain.PrivateLabelingSetting {
