@@ -51,6 +51,7 @@ type ListChanges =
   selector: 'cnsl-changes',
   templateUrl: './changes.component.html',
   styleUrls: ['./changes.component.scss'],
+  standalone: false,
 })
 export class ChangesComponent implements OnInit {
   @Input({ required: true }) public changeType!: ChangeType;

@@ -7,6 +7,7 @@ import { InfoSectionType } from '../info-section/info-section.component';
   selector: 'cnsl-info-dialog',
   templateUrl: './info-dialog.component.html',
   styleUrls: ['./info-dialog.component.scss'],
+  standalone: false,
 })
 export class InfoDialogComponent {
   public confirm: string = '';

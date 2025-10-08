@@ -25,6 +25,7 @@ import { ProjectGrantsDataSource } from './project-grants-datasource';
       transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
     ]),
   ],
+  standalone: false,
 })
 export class ProjectGrantsComponent implements OnInit {
   public INITIAL_PAGESIZE: number = 10;
