@@ -400,6 +400,8 @@ func TestSetOrganizationMetadata_UpdatedAt(t *testing.T) {
 	require.NoError(t, err)
 
 	metadata.Value = []byte("other-value")
+	metadata.CreatedAt = time.Time{}
+	metadata.UpdatedAt = time.Time{}
 	beforeUpdate := time.Now()
 	err = metadataRepo.Set(t.Context(), pool, metadata)
 	require.NoError(t, err)
