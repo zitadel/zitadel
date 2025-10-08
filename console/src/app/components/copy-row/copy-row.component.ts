@@ -6,7 +6,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 
 @Component({
-  standalone: true,
   selector: 'cnsl-copy-row',
   templateUrl: './copy-row.component.html',
   styleUrls: ['./copy-row.component.scss'],
