@@ -60,48 +60,114 @@ export default function ApiItemWrapper(props) {
       <OriginalApiItem {...props} />
 
       <div className="mt-10 flex justify-start">
-        <div
-          className="w-full max-w-[35%] rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1a1a1a] p-6 shadow-sm transition-all duration-300"
-          style={{
-            minHeight: "100px",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          {feedback === null && (
+        {feedback === "no" && (
+          <div
+            className="w-fit rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#ffffff10] px-2 py-2 shadow-sm transition-all duration-300"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
             <div className="flex items-center justify-between flex-wrap gap-3 flex-grow">
               <p
-                className="font-medium text-lg m-0"
+                className="font-base ml-4 mr-4 my-0"
                 style={{ color: "var(--ifm-menu-color)" }}
               >
                 Was this page useful?
               </p>
               <div className="flex gap-3">
                 <button
-                  onClick={handleYes}
-                  disabled={!plausibleLoaded}
-                  className="button button--sm"
-                  style={{
-                    backgroundColor: "transparent",
-                    color: "var(--ifm-color-primary)",
-                    border: "1px solid var(--ifm-color-primary)",
-                  }}
-                >
-                  Yes
-                </button>
-                <button
-                  className="button button--sm button--secondary"
                   onClick={handleNo}
                   disabled={!plausibleLoaded}
+                  className="group bg-[#00000010] dark:bg-[#00000020] rounded-full py-1 px-4 flex items-center"
+                  style={{
+                    border: "none",
+                    cursor: plausibleLoaded ? "pointer" : "not-allowed",
+                    opacity: plausibleLoaded ? 1 : 0.5,
+                  }}
+                  title="No, needs improvement"
                 >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="size-6 mr-2 group-hover:scale-110 group-hover:text-blue-500 transition-transform duration-200"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.182 16.318A4.486 4.486 0 0 0 12.016 15a4.486 4.486 0 0 0-3.198 1.318M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z"
+                    />
+                  </svg>
                   No
+                </button>
+
+                <button
+                  onClick={handleYes}
+                  disabled={!plausibleLoaded}
+                  className="group bg-[#00000010] dark:bg-[#00000020] rounded-full py-1 px-4 flex items-center"
+                  style={{
+                    border: "none",
+                    cursor: plausibleLoaded ? "pointer" : "not-allowed",
+                    opacity: plausibleLoaded ? 1 : 0.5,
+                  }}
+                  title="Yes, helpful!"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="size-6 mr-2 group-hover:scale-110 group-hover:text-amber-500 transition-transform duration-200"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.182 15.182a4.5 4.5 0 0 1-6.364 0M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z"
+                    />
+                  </svg>
+                  Yes
                 </button>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {feedback === "no" && (
-            <div className="mt-1 flex flex-col gap-3 flex-grow">
+        {feedback === null && (
+          <div
+            className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#ffffff10] px-2 py-2 shadow-sm transition-all duration-300"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <div className="mt-1 w-full flex flex-row items-center gap-3 flex-grow">
+              <button
+                className="button"
+                style={{ color: "var(--color-fg)" }}
+                onClick={() => {
+                  setFeedback(null);
+                  setComment("");
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="size-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+                  />
+                </svg>
+              </button>
               <textarea
                 className="textarea textarea-bordered w-full resize-none rounded-md border border-gray-300 dark:border-gray-600 bg-transparent p-2 text-sm"
                 rows="3"
@@ -111,7 +177,7 @@ export default function ApiItemWrapper(props) {
               />
               <div className="flex gap-2">
                 <button
-                  className="button button--sm button--primary"
+                  className="button button--sm button--primary h-fit"
                   onClick={handleSubmitComment}
                   disabled={comment.trim() === "" || !plausibleLoaded}
                   style={{
@@ -124,30 +190,26 @@ export default function ApiItemWrapper(props) {
                 >
                   Submit
                 </button>
-                <button
-                  className="button button--sm button--secondary"
-                  onClick={() => {
-                    setFeedback(null);
-                    setComment("");
-                  }}
-                >
-                  Go Back
-                </button>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {(feedback === "yes" || feedback === "submitted") && (
+        {(feedback === "yes" || feedback === "submitted") && (
+          <div
+            className="w-fit rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#ffffff10] px-2 py-2 shadow-sm transition-all duration-300"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
             <div className="flex items-center justify-center flex-grow">
-              <p
-                className="font-medium text-center m-0"
-                style={{ color: "var(--ifm-color-primary)" }}
-              >
-                Thanks for your feedback 🎉
+              <p className="font-medium text-center m-0 mx-4">
+                Thanks for your feedback! 🎉
               </p>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </>
   );
