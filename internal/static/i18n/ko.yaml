@@ -152,6 +152,7 @@ Errors:
       NotSet: 사용자가 비밀번호를 설정하지 않았습니다
       NotChanged: 새 비밀번호는 현재 비밀번호와 다르지 않아야 합니다
       NotSupported: 비밀번호 해시 인코딩이 지원되지 않습니다. 자세한 내용은 https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets를 참조하세요
+      NoVerificationTokenOrCurrentPassword: 인증 토큰이나 현재 비밀번호 없이는 비밀번호를 변경할 수 없습니다.
     PasswordComplexityPolicy:
       NotFound: 비밀번호 정책을 찾을 수 없습니다
       MinLength: 비밀번호가 너무 짧습니다
