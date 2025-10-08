@@ -40,6 +40,6 @@ declare namespace NodeJS {
     /**
      * The application name shown in the login and invite emails
      */
-    NEXT_PUBLIC_APPLICATION_NAME: string;
+    NEXT_PUBLIC_APPLICATION_NAME?: string;
   }
 }
