@@ -29,15 +29,16 @@ const (
 )
 
 type Config struct {
-	Host            string
-	Port            int32
-	Database        string
-	MaxOpenConns    uint32
-	MaxIdleConns    uint32
-	MaxConnLifetime time.Duration
-	MaxConnIdleTime time.Duration
-	User            User
-	Admin           AdminUser
+	Host             string
+	Port             int32
+	Database         string
+	MaxOpenConns     uint32
+	MaxIdleConns     uint32
+	MaxConnLifetime  time.Duration
+	MaxConnIdleTime  time.Duration
+	AwaitInitialConn time.Duration
+	User             User
+	Admin            AdminUser
 	// Additional options to be appended as options=<Options>
 	// The value will be taken as is. Multiple options are space separated.
 	Options string
@@ -128,7 +129,18 @@ func (c *Config) Connect(useAdmin bool) (*sql.DB, *pgxpool.Pool, error) {
 		return nil, nil, err
 	}
 
-	if err := pool.Ping(context.Background()); err != nil {
+	if err = pool.Ping(context.Background()); err != nil && c.AwaitInitialConn > 0 {
+		waitUntil := time.Now().Add(c.AwaitInitialConn)
+		for time.Now().Before(waitUntil) {
+			logging.Infof("retrying initial database connection: %v", err)
+			time.Sleep(100 * time.Millisecond)
+			if err = pool.Ping(context.Background()); err == nil {
+				break
+			}
+		}
+	}
+	if err != nil {
+		pool.Close()
 		return nil, nil, err
 	}
 
