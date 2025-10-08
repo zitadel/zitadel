@@ -768,9 +768,7 @@ func TestCommands_DeleteGroup(t *testing.T) {
 				ctx:     context.Background(),
 				groupID: "1234",
 			},
-			wantErr: func(err error) bool {
-				return zerrors.IsPermissionDenied(err)
-			},
+			wantErr: zerrors.IsPermissionDenied,
 		},
 		{
 			name: "failed to push group delete event, error",
