@@ -23,6 +23,7 @@ import { ExecutionFieldName } from '@zitadel/proto/zitadel/action/v2beta/query_p
   templateUrl: './actions-two-actions.component.html',
   styleUrls: ['./actions-two-actions.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ActionsTwoActionsComponent {
   protected readonly refresh$ = new Subject<true>();
