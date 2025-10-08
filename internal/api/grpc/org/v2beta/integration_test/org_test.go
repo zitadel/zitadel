@@ -303,53 +303,53 @@ func TestServer_UpdateOrganization(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	orgs, orgsName, _ := createOrgs(CTX, t, Client, 2)
-
 	relTableState := integration.RelationalTablesEnableMatrix()
 
-	tests := []struct {
-		name    string
-		req     *v2beta_org.UpdateOrganizationRequest
-		want    *v2beta_org.UpdateOrganizationResponse
-		wantErr bool
-	}{
-		{
-			name: "update org with new name",
-			req: &v2beta_org.UpdateOrganizationRequest{
-				Id:   orgs[0].GetId(),
-				Name: "new org name",
-			},
-		},
-		{
-			name: "update org with same name",
-			req: &v2beta_org.UpdateOrganizationRequest{
-				Id:   orgs[1].GetId(),
-				Name: orgsName[1],
-			},
-			wantErr: true,
-		},
-		{
-			name: "update org with non existent org id",
-			req: &v2beta_org.UpdateOrganizationRequest{
-				Id:   "non existent org id",
-				Name: "new name",
-			},
-			wantErr: true,
-		},
-		{
-			name: "update org with no id",
-			req: &v2beta_org.UpdateOrganizationRequest{
-				Id:   " ",
-				Name: "new name",
-			},
-			wantErr: true,
-		},
-	}
+	cases := len(relTableState)
+	orgs, orgNames, _ := createOrgs(CTX, t, Client, 2*cases)
 
-	for _, stateCase := range relTableState {
-		integration.EnsureInstanceFeature(t, CTX, Instance, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+	for i, stateCase := range relTableState {
+		integration.EnsureInstanceFeature(t, ctx, Instance, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
 			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
 		})
+		tests := []struct {
+			name    string
+			req     *v2beta_org.UpdateOrganizationRequest
+			want    *v2beta_org.UpdateOrganizationResponse
+			wantErr bool
+		}{
+			{
+				name: "update org with new name",
+				req: &v2beta_org.UpdateOrganizationRequest{
+					Id:   orgs[0+(i*cases)].GetId(),
+					Name: "new org name",
+				},
+			},
+			{
+				name: "update org with same name",
+				req: &v2beta_org.UpdateOrganizationRequest{
+					Id:   orgs[1+(i*cases)].GetId(),
+					Name: orgNames[1+(i*cases)],
+				},
+				wantErr: true,
+			},
+			{
+				name: "update org with non existent org id",
+				req: &v2beta_org.UpdateOrganizationRequest{
+					Id:   "non existent org id",
+					Name: "new name",
+				},
+				wantErr: true,
+			},
+			{
+				name: "update org with no id",
+				req: &v2beta_org.UpdateOrganizationRequest{
+					Id:   " ",
+					Name: "new name",
+				},
+				wantErr: true,
+			},
+		}
 		for _, tt := range tests {
 			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tt.name), func(t1 *testing.T) {
 				got, err := Client.UpdateOrganization(ctx, tt.req)

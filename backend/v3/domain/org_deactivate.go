@@ -37,30 +37,6 @@ func (d *DeactivateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (
 
 	organizationRepo := opts.organizationRepo
 
-	org, err := organizationRepo.Get(ctx, pool, database.WithCondition(
-		database.And(
-			organizationRepo.IDCondition(d.ID),
-			organizationRepo.InstanceIDCondition(authz.GetInstance(ctx).InstanceID()),
-		),
-	))
-	if err != nil {
-		var notFoundError *database.NoRowFoundError
-		if errors.As(err, &notFoundError) {
-			err = zerrors.ThrowNotFound(err, "DOM-QEjfpz", "Errors.Org.NotFound")
-		}
-		return err
-	}
-
-	if org.State == OrgStateRemoved || org.State == OrgStateUnspecified {
-		err = zerrors.ThrowNotFound(nil, "DOM-o2S37M", "Errors.Org.NotFound")
-		return err
-	}
-
-	if org.State == OrgStateInactive {
-		err = zerrors.ThrowPreconditionFailed(nil, "DOM-Z2dzsT", "Errors.Org.AlreadyDeactivated")
-		return err
-	}
-
 	updateCount, err := organizationRepo.Update(ctx, pool,
 		database.And(
 			organizationRepo.IDCondition(d.ID),
@@ -96,5 +72,31 @@ func (d *DeactivateOrgCommand) Validate(ctx context.Context, opts *CommandOpts) 
 		return zerrors.ThrowInvalidArgument(nil, "DOM-Qc3T1r", "invalid organization ID")
 	}
 
+	close, err := opts.EnsureTx(ctx)
+	if err != nil {
+		return err
+	}
+	defer func() { err = close(ctx, err) }()
+
+	organizationRepo := opts.organizationRepo
+
+	org, err := organizationRepo.Get(ctx, pool, database.WithCondition(
+		database.And(
+			organizationRepo.IDCondition(d.ID),
+			organizationRepo.InstanceIDCondition(authz.GetInstance(ctx).InstanceID()),
+		),
+	))
+	if err != nil {
+		var notFoundError *database.NoRowFoundError
+		if errors.As(err, &notFoundError) {
+			err = zerrors.ThrowNotFound(err, "DOM-QEjfpz", "Errors.Org.NotFound")
+		}
+		return err
+	}
+
+	if org.State == OrgStateInactive {
+		err = zerrors.ThrowPreconditionFailed(nil, "DOM-Z2dzsT", "Errors.Org.AlreadyDeactivated")
+		return err
+	}
 	return nil
 }
