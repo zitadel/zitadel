@@ -16,6 +16,9 @@ declare namespace NodeJS {
 
     /**
      * The service user token
+     * If ZITADEL_SERVICE_USER_TOKEN is set, its value is used.
+     * If ZITADEL_SERVICE_USER_TOKEN is not set but ZITADEL_SERVICE_USER_TOKEN_FILE is set, the application blocks until the file is created.
+     * As soon as the file exists, its content is read and ZITADEL_SERVICE_USER_TOKEN is set.
      */
     ZITADEL_SERVICE_USER_TOKEN: string;
 

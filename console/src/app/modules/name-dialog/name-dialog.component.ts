@@ -5,6 +5,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
   selector: 'cnsl-name-dialog',
   templateUrl: './name-dialog.component.html',
   styleUrls: ['./name-dialog.component.scss'],
+  standalone: false,
 })
 export class NameDialogComponent {
   public name: string = '';

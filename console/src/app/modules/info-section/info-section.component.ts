@@ -11,6 +11,7 @@ export enum InfoSectionType {
   templateUrl: './info-section.component.html',
   styleUrls: ['./info-section.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class InfoSectionComponent {
   @Input() type: InfoSectionType = InfoSectionType.INFO;
