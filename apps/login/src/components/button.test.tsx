@@ -177,7 +177,6 @@ describe("Button Component", () => {
         ButtonVariants.Primary,
         ButtonColors.Primary,
         "rounded-md",
-        "font-medium",
         appearance,
       );
       expect(classes).toContain(appearance);
