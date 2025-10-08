@@ -307,7 +307,7 @@ func Test_idpIntentToIDPIntentPb(t *testing.T) {
 								"userID":   "idpUserID",
 								"username": "username",
 							})
-							require.NoError(t, err)
+							require.Error(t, err)
 							return s
 						}(),
 					},
