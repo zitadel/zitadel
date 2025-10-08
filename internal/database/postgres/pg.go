@@ -139,13 +139,12 @@ func (c *Config) Connect(useAdmin bool) (*sql.DB, *pgxpool.Pool, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	initialBackoff := c.AwaitInitialConn.InitialBackoff
+	backoff := c.AwaitInitialConn.InitialBackoff
 	maxBackoff := c.AwaitInitialConn.MaxBackoff
 	backoffFactor := c.AwaitInitialConn.BackoffFactor
-	backoff := c.AwaitInitialConn.InitialBackoff
 	if err = pool.Ping(context.Background()); err != nil && c.AwaitInitialConn.Timeout > 0 {
-		if initialBackoff == 0 {
-			initialBackoff = 100 * time.Millisecond
+		if backoff == 0 {
+			backoff = 100 * time.Millisecond
 		}
 		if maxBackoff == 0 {
 			maxBackoff = time.Hour
