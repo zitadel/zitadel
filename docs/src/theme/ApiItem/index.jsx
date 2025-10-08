@@ -7,22 +7,16 @@ export default function ApiItemWrapper(props) {
   const [plausibleLoaded, setPlausibleLoaded] = useState(false);
 
   useEffect(() => {
-    if (!document.getElementById("plausible-script")) {
-      const script = document.createElement("script");
-      script.src = "https://plausible.io/js/plausible.js";
-      script.defer = true;
-      script.async = true;
-      script.dataset.domain = window.location.hostname;
-      script.id = "plausible-script";
-
-      script.onload = () => {
+    // Script is loaded via docusaurus.config.js, just check if it's available
+    const checkPlausible = () => {
+      if (typeof window.plausible === "function") {
         setPlausibleLoaded(true);
-      };
-
-      document.body.appendChild(script);
-    } else {
-      setPlausibleLoaded(true);
-    }
+      } else {
+        // Retry after a short delay if not loaded yet
+        setTimeout(checkPlausible, 100);
+      }
+    };
+    checkPlausible();
   }, []);
 
   const sendPlausibleEvent = (feedbackValue, commentText = "") => {
