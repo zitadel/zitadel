@@ -1,17 +1,15 @@
 <div
   class="info-section-row"
   [ngClass]="{
-    info: type === 'INFO',
-    warn: type === 'WARN',
-    alert: type === 'ALERT',
-    success: type === 'SUCCESS',
+    info: type === infoSectionType.INFO,
+    warn: type === infoSectionType.WARN,
+    alert: type === infoSectionType.ALERT,
     fit: fitWidth,
   }"
 >
-  <i *ngIf="type === 'INFO'" class="icon las la-info"></i>
-  <i *ngIf="type === 'WARN'" class="icon las la-exclamation"></i>
-  <i *ngIf="type === 'ALERT'" class="icon las la-exclamation"></i>
-  <i *ngIf="type === 'SUCCESS'" class="icon las la-check-circle"></i>
+  <i *ngIf="type === infoSectionType.INFO" class="icon las la-info"></i>
+  <i *ngIf="type === infoSectionType.WARN" class="icon las la-exclamation"></i>
+  <i *ngIf="type === infoSectionType.ALERT" class="icon las la-exclamation"></i>
 
   <div class="info-section-content">
     <ng-content></ng-content>

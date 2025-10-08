@@ -2,7 +2,7 @@ module github.com/zitadel/zitadel
 
 go 1.24
 
-toolchain go1.24.1
+toolchain go1.24.7
 
 require (
 	cloud.google.com/go/profiler v0.4.2

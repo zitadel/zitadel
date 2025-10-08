@@ -5,7 +5,6 @@ package user_test
 import (
 	"testing"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -147,7 +146,7 @@ func TestServer_Deprecated_SetEmail(t *testing.T) {
 
 func TestServer_ResendEmailCode(t *testing.T) {
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
-	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, gofakeit.Email(), gofakeit.Phone()).GetUserId()
+	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, integration.Email(), integration.Phone()).GetUserId()
 
 	tests := []struct {
 		name    string
@@ -251,7 +250,7 @@ func TestServer_ResendEmailCode(t *testing.T) {
 
 func TestServer_SendEmailCode(t *testing.T) {
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
-	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, gofakeit.Email(), gofakeit.Phone()).GetUserId()
+	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, integration.Email(), integration.Phone()).GetUserId()
 
 	tests := []struct {
 		name    string

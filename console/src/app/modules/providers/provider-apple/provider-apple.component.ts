@@ -4,7 +4,7 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, Observable, take } from 'rxjs';
+import { BehaviorSubject, take } from 'rxjs';
 import {
   AddAppleProviderRequest as AdminAddAppleProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -31,6 +31,7 @@ const MAX_ALLOWED_SIZE = 5 * 1024;
 @Component({
   selector: 'cnsl-provider-apple',
   templateUrl: './provider-apple.component.html',
+  standalone: false,
 })
 export class ProviderAppleComponent {
   public showOptional: boolean = false;

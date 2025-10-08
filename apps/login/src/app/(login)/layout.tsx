@@ -6,7 +6,6 @@ import { Skeleton } from "@/components/skeleton";
 import { Theme } from "@/components/theme";
 import { ThemeProvider } from "@/components/theme-provider";
 import * as Tooltip from "@radix-ui/react-tooltip";
-import { Analytics } from "@vercel/analytics/react";
 import { Lato } from "next/font/google";
 import { ReactNode, Suspense } from "react";
 import type { Metadata } from "next";
@@ -19,15 +18,10 @@ const lato = Lato({
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("common");
-  return { title: t('title')};
+  return { title: t("title") };
 }
 
-export default async function RootLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
-  
+export default async function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html className={`${lato.className}`} suppressHydrationWarning>
       <head />
@@ -66,7 +60,6 @@ export default async function RootLayout({
             </Suspense>
           </Tooltip.Provider>
         </ThemeProvider>
-        <Analytics />
       </body>
     </html>
   );

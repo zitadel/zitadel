@@ -1,11 +1,12 @@
 packages:
-  - "console"
-  - "docs"
-  - "e2e"
-  - "packages/*"
-  - "apps/*"
+  - docs
+  - console
+  - tests/*
+  - packages/*
+  - apps/*
+
+exclude:
+  - benchmark # because of the node 18 or 20 dependency
 
 overrides:
-  "@typescript-eslint/parser": "^8.35.1"
-  "@zitadel/client": "workspace:*"
-  "@zitadel/proto": "workspace:*"
+  '@typescript-eslint/parser': '^8.35.1'

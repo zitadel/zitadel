@@ -3,7 +3,7 @@ package sql
 import (
 	"database/sql"
 
-	pgxscan "github.com/georgysavva/scany/v2/dbscan"
+	"github.com/georgysavva/scany/v2/sqlscan"
 	"github.com/jackc/pgx/v5"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -44,7 +44,7 @@ func (r *Rows) Collect(dest any) (err error) {
 			err = closeErr
 		}
 	}()
-	return wrapError(pgxscan.ScanAll(dest, r.Rows))
+	return wrapError(sqlscan.ScanAll(dest, r.Rows))
 }
 
 // CollectFirst implements [database.CollectableRows].
@@ -56,7 +56,7 @@ func (r *Rows) CollectFirst(dest any) (err error) {
 			err = closeErr
 		}
 	}()
-	return wrapError(pgxscan.ScanRow(dest, r.Rows))
+	return wrapError(sqlscan.ScanRow(dest, r.Rows))
 }
 
 // CollectExactlyOneRow implements [database.CollectableRows].
@@ -68,7 +68,7 @@ func (r *Rows) CollectExactlyOneRow(dest any) (err error) {
 			err = closeErr
 		}
 	}()
-	return wrapError(pgxscan.ScanOne(dest, r.Rows))
+	return wrapError(sqlscan.ScanOne(dest, r.Rows))
 }
 
 // Close implements [database.Rows].

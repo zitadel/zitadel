@@ -222,7 +222,6 @@
     "termsOfService": "Regulamin",
     "privacyPolicy": "Polityka prywatności",
     "submit": "Kontynuuj",
-    "orUseIDP": "lub użyj dostawcy tożsamości",
     "password": {
       "title": "Ustaw hasło",
       "description": "Ustaw hasło dla swojego konta",

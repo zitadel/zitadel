@@ -6,7 +6,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -49,7 +48,7 @@ func TestServer_CreateUser(t *testing.T) {
 		}
 	}`)
 	permissionSchemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, permissionSchema)
-	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.OrganizationName(), integration.Email())
 
 	type res struct {
 		want            *resource_object.Details
@@ -185,11 +184,11 @@ func TestServer_CreateUser(t *testing.T) {
 					Data:     unmarshalJSON("{\"name\": \"user\"}"),
 					Contact: &user.SetContact{
 						Email: &user.SetEmail{
-							Address:      gofakeit.Email(),
+							Address:      integration.Email(),
 							Verification: &user.SetEmail_ReturnCode{ReturnCode: &user.ReturnEmailVerificationCode{}},
 						},
 						Phone: &user.SetPhone{
-							Number:       gofakeit.Phone(),
+							Number:       integration.Phone(),
 							Verification: &user.SetPhone_ReturnCode{ReturnCode: &user.ReturnPhoneVerificationCode{}},
 						},
 					},
@@ -257,7 +256,7 @@ func TestServer_PatchUser(t *testing.T) {
 		}
 	}`)
 	permissionSchemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, permissionSchema)
-	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.OrganizationName(), integration.Email())
 
 	type res struct {
 		want            *resource_object.Details
@@ -528,7 +527,7 @@ func TestServer_PatchUser(t *testing.T) {
 				User: &user.PatchUser{
 					Contact: &user.SetContact{
 						Email: &user.SetEmail{
-							Address:      gofakeit.Email(),
+							Address:      integration.Email(),
 							Verification: &user.SetEmail_ReturnCode{ReturnCode: &user.ReturnEmailVerificationCode{}},
 						},
 					},
@@ -562,7 +561,7 @@ func TestServer_PatchUser(t *testing.T) {
 				User: &user.PatchUser{
 					Contact: &user.SetContact{
 						Phone: &user.SetPhone{
-							Number:       gofakeit.Phone(),
+							Number:       integration.Phone(),
 							Verification: &user.SetPhone_ReturnCode{ReturnCode: &user.ReturnPhoneVerificationCode{}},
 						},
 					},
@@ -597,11 +596,11 @@ func TestServer_PatchUser(t *testing.T) {
 					Data: unmarshalJSON("{\"name\": \"changed\"}"),
 					Contact: &user.SetContact{
 						Email: &user.SetEmail{
-							Address:      gofakeit.Email(),
+							Address:      integration.Email(),
 							Verification: &user.SetEmail_ReturnCode{ReturnCode: &user.ReturnEmailVerificationCode{}},
 						},
 						Phone: &user.SetPhone{
-							Number:       gofakeit.Phone(),
+							Number:       integration.Phone(),
 							Verification: &user.SetPhone_ReturnCode{ReturnCode: &user.ReturnPhoneVerificationCode{}},
 						},
 					},
@@ -662,7 +661,7 @@ func TestServer_DeleteUser(t *testing.T) {
 		}
 	}`)
 	schemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
-	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.OrganizationName(), integration.Email())
 
 	tests := []struct {
 		name    string
@@ -878,7 +877,7 @@ func TestServer_LockUser(t *testing.T) {
 		}
 	}`)
 	schemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
-	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.OrganizationName(), integration.Email())
 
 	tests := []struct {
 		name    string
@@ -1079,7 +1078,7 @@ func TestServer_UnlockUser(t *testing.T) {
 		}
 	}`)
 	schemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
-	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.OrganizationName(), integration.Email())
 
 	tests := []struct {
 		name    string
@@ -1261,7 +1260,7 @@ func TestServer_DeactivateUser(t *testing.T) {
 		}
 	}`)
 	schemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
-	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.OrganizationName(), integration.Email())
 
 	tests := []struct {
 		name    string
@@ -1462,7 +1461,7 @@ func TestServer_ActivateUser(t *testing.T) {
 		}
 	}`)
 	schemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
-	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.OrganizationName(), integration.Email())
 
 	tests := []struct {
 		name    string

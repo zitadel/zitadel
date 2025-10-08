@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 
@@ -81,15 +80,15 @@ func TestServer_ImportData(t *testing.T) {
 									{
 										UserId: userIDs[0],
 										User: &management.ImportHumanUserRequest{
-											UserName: gofakeit.Username(),
+											UserName: integration.Username(),
 											Profile: &management.ImportHumanUserRequest_Profile{
-												FirstName:         gofakeit.FirstName(),
-												LastName:          gofakeit.LastName(),
-												DisplayName:       gofakeit.Username(),
-												PreferredLanguage: gofakeit.LanguageBCP(),
+												FirstName:         integration.FirstName(),
+												LastName:          integration.LastName(),
+												DisplayName:       integration.Username(),
+												PreferredLanguage: integration.Language(),
 											},
 											Email: &management.ImportHumanUserRequest_Email{
-												Email:           gofakeit.Email(),
+												Email:           integration.Email(),
 												IsEmailVerified: true,
 											},
 										},
@@ -97,15 +96,15 @@ func TestServer_ImportData(t *testing.T) {
 									{
 										UserId: userIDs[1],
 										User: &management.ImportHumanUserRequest{
-											UserName: gofakeit.Username(),
+											UserName: integration.Username(),
 											Profile: &management.ImportHumanUserRequest_Profile{
-												FirstName:         gofakeit.FirstName(),
-												LastName:          gofakeit.LastName(),
-												DisplayName:       gofakeit.Username(),
-												PreferredLanguage: gofakeit.LanguageBCP(),
+												FirstName:         integration.FirstName(),
+												LastName:          integration.LastName(),
+												DisplayName:       integration.Username(),
+												PreferredLanguage: integration.Language(),
 											},
 											Email: &management.ImportHumanUserRequest_Email{
-												Email:           gofakeit.Email(),
+												Email:           integration.Email(),
 												IsEmailVerified: true,
 											},
 										},
@@ -337,7 +336,7 @@ func TestServer_ImportData(t *testing.T) {
 					{
 						Type:    "project_grant",
 						Id:      orgIDs[3] + "_" + projectIDs[2] + "_" + orgIDs[4],
-						Message: "ID=V3-DKcYh Message=Errors.Project.Grant.AlreadyExists Parent=(ERROR: duplicate key value violates unique constraint \"unique_constraints_pkey\" (SQLSTATE 23505))",
+						Message: "ID=V3-DKcYh Message=Errors.Project.Grant.AlreadyExists",
 					},
 				},
 				Success: &admin.ImportDataSuccess{
@@ -408,15 +407,15 @@ func TestServer_ImportData(t *testing.T) {
 									{
 										UserId: userIDs[2],
 										User: &management.ImportHumanUserRequest{
-											UserName: gofakeit.Username(),
+											UserName: integration.Username(),
 											Profile: &management.ImportHumanUserRequest_Profile{
-												FirstName:         gofakeit.FirstName(),
-												LastName:          gofakeit.LastName(),
-												DisplayName:       gofakeit.Username(),
-												PreferredLanguage: gofakeit.LanguageBCP(),
+												FirstName:         integration.FirstName(),
+												LastName:          integration.LastName(),
+												DisplayName:       integration.Username(),
+												PreferredLanguage: integration.Language(),
 											},
 											Email: &management.ImportHumanUserRequest_Email{
-												Email:           gofakeit.Email(),
+												Email:           integration.Email(),
 												IsEmailVerified: true,
 											},
 										},

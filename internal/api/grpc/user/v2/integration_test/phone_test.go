@@ -6,7 +6,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -123,7 +122,7 @@ func TestServer_Deprecated_SetPhone(t *testing.T) {
 
 func TestServer_ResendPhoneCode(t *testing.T) {
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
-	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, gofakeit.Email(), gofakeit.Phone()).GetUserId()
+	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, integration.Email(), integration.Phone()).GetUserId()
 
 	tests := []struct {
 		name    string

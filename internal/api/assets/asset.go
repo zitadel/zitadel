@@ -13,7 +13,6 @@ import (
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/gorilla/mux"
 	"github.com/zitadel/logging"
-	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
@@ -94,9 +93,17 @@ func DefaultErrorHandler(translator *i18n.Translator) func(w http.ResponseWriter
 	}
 }
 
-func NewHandler(commands *command.Commands, verifier authz.APITokenVerifier, systemAuthCOnfig authz.Config, authConfig authz.Config, idGenerator id.Generator, storage static.Storage, queries *query.Queries, callDurationInterceptor, instanceInterceptor, assetCacheInterceptor, accessInterceptor func(handler http.Handler) http.Handler) http.Handler {
-	translator, err := i18n.NewZitadelTranslator(language.English)
-	logging.OnError(err).Panic("unable to get translator")
+func NewHandler(
+	commands *command.Commands,
+	verifier authz.APITokenVerifier,
+	systemAuthCOnfig authz.Config,
+	authConfig authz.Config,
+	idGenerator id.Generator,
+	storage static.Storage,
+	queries *query.Queries,
+	callDurationInterceptor, instanceInterceptor, assetCacheInterceptor, accessInterceptor func(handler http.Handler) http.Handler,
+	translator *i18n.Translator,
+) http.Handler {
 	h := &Handler{
 		commands:        commands,
 		errorHandler:    DefaultErrorHandler(translator),

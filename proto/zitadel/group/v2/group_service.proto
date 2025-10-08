@@ -1,0 +1,467 @@
+syntax = "proto3";
+
+package zitadel.group.v2;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+
+import "zitadel/filter/v2/filter.proto";
+import "zitadel/group/v2/group.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/group/v2;group";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Group Service";
+    version: "2.0";
+    description: "This API is intended to manage user groups in ZITADEL.";
+    contact:{
+      name: "ZITADEL"
+      url: "https://zitadel.com"
+      email: "hi@zitadel.com"
+    }
+    license: {
+      name: "Apache 2.0",
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSING.md";
+    };
+  };
+  schemes: HTTPS;
+  schemes: HTTP;
+
+  consumes: "application/json";
+  consumes: "application/grpc";
+
+  produces: "application/json";
+  produces: "application/grpc";
+
+  consumes: "application/grpc-web+proto";
+  produces: "application/grpc-web+proto";
+
+  host: "$CUSTOM-DOMAIN";
+  base_path: "/";
+
+  external_docs: {
+    description: "Detailed information about ZITADEL",
+    url: "https://zitadel.com/docs"
+  }
+  security_definitions: {
+    security: {
+      key: "OAuth2";
+      value: {
+        type: TYPE_OAUTH2;
+        flow: FLOW_ACCESS_CODE;
+        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        scopes: {
+          scope: {
+            key: "openid";
+            value: "openid";
+          }
+          scope: {
+            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+          }
+        }
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "OAuth2";
+      value: {
+        scope: "openid";
+        scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
+      }
+    }
+  }
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the resource.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+  responses: {
+    key: "404";
+    value: {
+      description: "Returned when the resource does not exist.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+};
+
+// GroupService is used to manage user groups.
+// This service provides methods to create, retrieve, update, and delete user groups in an organization.
+service GroupService {
+
+  // CreateGroup
+  //
+  // CreateGroup creates a new user group in an organization.
+  //
+  // Required permissions: // TODO
+  //   - "iam.member.write" for instance administrators
+  //   - "org.member.write" for organization administrators
+  rpc CreateGroup(CreateGroupRequest) returns (CreateGroupResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+      http_response: {
+        success_code: 201
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "201";
+        value: {
+          description: "The user group was created successfully";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "Invalid request to create user group";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
+      };
+      responses: {
+        key: "409"
+        value: {
+          description: "The user group already exists.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      };
+    };
+  }
+
+  // GetGroup
+  //
+  // Retrieves a group based on its ID.
+  //
+  // Required permission:
+  // - TODO
+  rpc GetGroup(GetGroupRequest) returns (GetGroupResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "Group retrieved successfully";
+        }
+      };
+      responses: {
+        key: "404"
+        value: {
+          description: "The requested group does not exist.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      };
+    };
+  }
+
+  // ListGroups
+  //
+  // ListGroups returns all groups matching the request and necessary permissions from an organization.
+  //
+  // Required permissions: // TODO
+  //   - "iam.member.read" for instance administrators
+  //   - "org.member.read" for organization administrators
+  rpc ListGroups(ListGroupsRequest) returns (ListGroupsResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all groups matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list group query";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
+      };
+    };
+  }
+
+  // UpdateGroup
+  //
+  // UpdateGroup updates the user group.
+  //
+  // In case the group there aren't any changes, the request will return a successful response as
+  // the desired state is already achieved.
+  // You can check the change date in the response to verify if the group was updated by the request.
+  //
+  // Required permissions: // TODO
+  //   - "iam.member.write" for instance administrators
+  //   - "org.member.write" for organization administrators
+  rpc UpdateGroup(UpdateGroupRequest) returns (UpdateGroupResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The user group was updated successfully";
+        };
+      };
+      responses: {
+        key: "404";
+        value: {
+          description: "The user group or one of the roles do not exist.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      }
+    };
+  }
+
+  // DeleteGroup
+  //
+  // DeleteGroup deletes the group.
+  //
+  // In case the group is not found, the request will return a successful response as
+  // the desired state is already achieved.
+  // You can check the deletion date in the response to verify if the group was deleted by the request.
+  //
+  // Required permissions: // TODO
+  //   - "iam.member.delete" for instance administrators
+  //   - "org.member.delete" for organization administrators
+  rpc DeleteGroup(DeleteGroupRequest) returns (DeleteGroupResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The user group was deleted successfully.";
+        };
+      };
+      responses: {
+        key: "404";
+        value: {
+          description: "The user group not found.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
+      };
+    };
+  }
+}
+
+message CreateGroupRequest {
+  // The ID of the Organization where the group should be created.
+  string organization_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432345\"";
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // Name of the group. This must be unique inside the corresponding organization.
+  string name = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"My group\"";
+    }
+  ];
+
+  // Optionally, provide a description of the group that could help others identify its purpose.
+  string description = 3 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"This is an example group\"";
+    }
+  ];
+
+  // In case you need to specify the unique identifier of the group, such as to recreate a previously existing group, you can provide the ID.
+  // If omitted, the system will generate an ID for you.
+  // This is the preferred way. The generated ID will be returned in the response.
+  optional string id = 4 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message CreateGroupResponse {
+  // ID is the unique identifier of the newly created user group.
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"This is the ID of the newly created user group\"";
+      example: "\"69629012906488334\"";
+    }
+  ];
+
+  // CreationDate is the timestamp when the user group was created.
+  google.protobuf.Timestamp creation_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-08-11T15:00:00.051Z\"";
+    }
+  ];
+}
+
+message ListGroupsRequest {
+  // Criteria to list the user groups.
+  repeated GroupsSearchFilter filters = 1;
+
+  // Pagination and sorting.
+  zitadel.filter.v2.PaginationRequest pagination = 2;
+
+  // The field the result is sorted by.
+  optional FieldName sorting_column = 3;
+}
+
+message ListGroupsResponse {
+  // The list of groups.
+  repeated Group groups = 1;
+
+  // Contains the total number of groups matching the query and the applied limit.
+  zitadel.filter.v2.PaginationResponse pagination = 2;
+}
+
+message GetGroupRequest {
+  // The ID of the group to be retrieved.
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message GetGroupResponse {
+  Group group = 1;
+}
+
+message UpdateGroupRequest {
+  // The ID of the user group to be updated.
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    }
+  ];
+
+  // Name of the group. The name must be unique inside the corresponding organization.
+  // If omitted, the name will be unchanged.
+  optional string name = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"My updated group\"";
+    }
+  ];
+
+  // Optionally, provide a new description of the group that could help others identify its purpose.
+  // If omitted, the description will be unchanged.
+  optional string description = 3 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"This is an example group\"";
+    }
+  ];
+}
+
+message UpdateGroupResponse {
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-08-11T15:00:00.051Z\"";
+    }
+  ];
+}
+
+message DeleteGroupRequest {
+  // ID of the user group to be deleted.
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message DeleteGroupResponse {
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-08-11T15:00:00.051Z\"";
+    }
+  ];
+}

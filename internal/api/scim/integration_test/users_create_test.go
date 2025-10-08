@@ -13,7 +13,6 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
@@ -173,7 +172,7 @@ func withUsername(fixture []byte, username string) []byte {
 }
 
 func TestCreateUser(t *testing.T) {
-	minimalUsername := gofakeit.Username()
+	minimalUsername := integration.Username()
 	tests := []struct {
 		name          string
 		body          []byte
@@ -278,21 +277,21 @@ func TestCreateUser(t *testing.T) {
 		},
 		{
 			name:        "not authenticated",
-			body:        withUsername(minimalUserJson, gofakeit.Username()),
+			body:        withUsername(minimalUserJson, integration.Username()),
 			ctx:         context.Background(),
 			wantErr:     true,
 			errorStatus: http.StatusUnauthorized,
 		},
 		{
 			name:        "no permissions",
-			body:        withUsername(minimalUserJson, gofakeit.Username()),
+			body:        withUsername(minimalUserJson, integration.Username()),
 			ctx:         Instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
 			wantErr:     true,
 			errorStatus: http.StatusNotFound,
 		},
 		{
 			name:        "another org",
-			body:        withUsername(minimalUserJson, gofakeit.Username()),
+			body:        withUsername(minimalUserJson, integration.Username()),
 			orgID:       SecondaryOrganization.OrganizationId,
 			wantErr:     true,
 			errorStatus: http.StatusNotFound,
@@ -356,7 +355,7 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestCreateUser_duplicate(t *testing.T) {
-	parsedMinimalUserJson := withUsername(minimalUserJson, gofakeit.Username())
+	parsedMinimalUserJson := withUsername(minimalUserJson, integration.Username())
 	createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, parsedMinimalUserJson)
 	require.NoError(t, err)
 
@@ -370,7 +369,7 @@ func TestCreateUser_duplicate(t *testing.T) {
 }
 
 func TestCreateUser_metadata(t *testing.T) {
-	username := gofakeit.Username()
+	username := integration.Username()
 	createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, username))
 	require.NoError(t, err)
 
@@ -408,7 +407,7 @@ func TestCreateUser_scopedExternalID(t *testing.T) {
 	require.NoError(t, err)
 	ctx := integration.WithAuthorizationToken(CTX, callingUserPat)
 	setProvisioningDomain(t, callingUserId, "fooBar")
-	createdUser, err := Instance.Client.SCIM.Users.Create(ctx, Instance.DefaultOrg.Id, withUsername(fullUserJson, gofakeit.Username()))
+	createdUser, err := Instance.Client.SCIM.Users.Create(ctx, Instance.DefaultOrg.Id, withUsername(fullUserJson, integration.Username()))
 	require.NoError(t, err)
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	require.EventuallyWithT(t, func(tt *assert.CollectT) {

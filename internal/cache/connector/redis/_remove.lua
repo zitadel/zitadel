@@ -3,8 +3,8 @@ local function remove(object_id)
     local keys = redis.call("SMEMBERS", setKey)
     local n = #keys
     for i = 1, n do
-        redis.call("DEL", keys[i])
+        redis.call("UNLINK", keys[i])
     end
-    redis.call("DEL", setKey)
-    redis.call("DEL", object_id)
+    redis.call("UNLINK", setKey)
+    redis.call("UNLINK", object_id)
 end
