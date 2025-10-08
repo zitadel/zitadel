@@ -207,6 +207,7 @@ func (s *systemIDReducer) AppendEvents(events ...eventstore.Event) {
 
 func (s *systemIDReducer) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		InstanceID(""). // to make sure we can use an appropriate index
 		AddQuery().
 		AggregateTypes(system.AggregateType).
 		EventTypes(system.IDGeneratedType).

@@ -1,0 +1,94 @@
+{
+  "packageManager": "pnpm@10.13.1",
+  "name": "@zitadel/client",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./v1": {
+      "types": {
+        "import": "./dist/v1.d.ts",
+        "require": "./dist/v1.d.cts",
+        "default": "./dist/v1.d.ts"
+      },
+      "import": "./dist/v1.js",
+      "require": "./dist/v1.cjs"
+    },
+    "./v2": {
+      "types": {
+        "import": "./dist/v2.d.ts",
+        "require": "./dist/v2.d.cts",
+        "default": "./dist/v2.d.ts"
+      },
+      "import": "./dist/v2.js",
+      "require": "./dist/v2.cjs"
+    },
+    "./v3alpha": {
+      "types": {
+        "import": "./dist/v3alpha.d.ts",
+        "require": "./dist/v3alpha.d.cts",
+        "default": "./dist/v3alpha.d.ts"
+      },
+      "import": "./dist/v3alpha.js",
+      "require": "./dist/v3alpha.cjs"
+    },
+    "./node": {
+      "types": {
+        "import": "./dist/node.d.ts",
+        "require": "./dist/node.d.cts",
+        "default": "./dist/node.d.ts"
+      },
+      "import": "./dist/node.js",
+      "require": "./dist/node.cjs"
+    },
+    "./web": {
+      "types": {
+        "import": "./dist/web.d.ts",
+        "require": "./dist/web.d.cts",
+        "default": "./dist/web.d.ts"
+      },
+      "import": "./dist/web.js",
+      "require": "./dist/web.cjs"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "lint-check-eslint": "eslint 'src/**/*.ts*'",
+    "lint-check-knip": "knip",
+    "test-unit": "vitest --run",
+    "clean": "rm -rf node_modules dist"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.2.2",
+    "@connectrpc/connect": "^2.0.0",
+    "@connectrpc/connect-node": "^2.0.0",
+    "@connectrpc/connect-web": "^2.0.0",
+    "@zitadel/proto": "workspace:*",
+    "jose": "^5.3.0"
+  },
+  "devDependencies": {
+    "@bufbuild/protocompile": "^0.0.1",
+    "@bufbuild/buf": "^1.53.0",
+    "@types/node": "^24.0.14",
+    "@typescript-eslint/eslint-plugin": "^8.15.0",
+    "@typescript-eslint/parser": "^8.15.0",
+    "eslint": "^8.57.0",
+    "knip": "^5.61.3",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.3",
+    "vitest": "^2.0.0"
+  }
+}

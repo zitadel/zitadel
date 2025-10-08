@@ -6,7 +6,6 @@ import {
   GetMyLoginPolicyResponse,
   GetMyLoginPolicyRequestSchema,
   GetMyPasswordComplexityPolicyResponse,
-  GetMyUserResponse,
   ListMyAuthFactorsRequestSchema,
   ListMyAuthFactorsResponse,
   RemoveMyAuthFactorOTPEmailRequestSchema,
@@ -19,17 +18,19 @@ import {
   RemoveMyAuthFactorOTPSMSResponse,
   ListMyMetadataResponse,
   VerifyMyPhoneResponse,
+  ListMyZitadelPermissionsResponse,
 } from '@zitadel/proto/zitadel/auth_pb';
+import { injectQuery } from '@tanstack/angular-query-experimental';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class NewAuthService {
-  constructor(private readonly grpcService: GrpcService) {}
-
-  public getMyUser(): Promise<GetMyUserResponse> {
-    return this.grpcService.authNew.getMyUser({});
-  }
+  constructor(
+    private readonly grpcService: GrpcService,
+    private readonly userService: UserService,
+  ) {}
 
   public verifyMyPhone(code: string): Promise<VerifyMyPhoneResponse> {
     return this.grpcService.authNew.verifyMyPhone({ code });
@@ -44,30 +45,41 @@ export class NewAuthService {
   }
 
   public listMyMultiFactors(): Promise<ListMyAuthFactorsResponse> {
-    return this.grpcService.authNew.listMyAuthFactors(create(ListMyAuthFactorsRequestSchema), null);
+    return this.grpcService.authNew.listMyAuthFactors(create(ListMyAuthFactorsRequestSchema));
   }
 
   public removeMyAuthFactorOTPSMS(): Promise<RemoveMyAuthFactorOTPSMSResponse> {
-    return this.grpcService.authNew.removeMyAuthFactorOTPSMS(create(RemoveMyAuthFactorOTPSMSRequestSchema), null);
+    return this.grpcService.authNew.removeMyAuthFactorOTPSMS(create(RemoveMyAuthFactorOTPSMSRequestSchema));
   }
 
   public getMyLoginPolicy(): Promise<GetMyLoginPolicyResponse> {
-    return this.grpcService.authNew.getMyLoginPolicy(create(GetMyLoginPolicyRequestSchema), null);
+    return this.grpcService.authNew.getMyLoginPolicy(create(GetMyLoginPolicyRequestSchema));
   }
 
   public removeMyMultiFactorOTP(): Promise<RemoveMyAuthFactorOTPResponse> {
-    return this.grpcService.authNew.removeMyAuthFactorOTP(create(RemoveMyAuthFactorOTPRequestSchema), null);
+    return this.grpcService.authNew.removeMyAuthFactorOTP(create(RemoveMyAuthFactorOTPRequestSchema));
   }
 
   public removeMyMultiFactorU2F(tokenId: string): Promise<RemoveMyAuthFactorU2FResponse> {
-    return this.grpcService.authNew.removeMyAuthFactorU2F(create(RemoveMyAuthFactorU2FRequestSchema, { tokenId }), null);
+    return this.grpcService.authNew.removeMyAuthFactorU2F(create(RemoveMyAuthFactorU2FRequestSchema, { tokenId }));
   }
 
   public removeMyAuthFactorOTPEmail(): Promise<RemoveMyAuthFactorOTPEmailResponse> {
-    return this.grpcService.authNew.removeMyAuthFactorOTPEmail(create(RemoveMyAuthFactorOTPEmailRequestSchema), null);
+    return this.grpcService.authNew.removeMyAuthFactorOTPEmail(create(RemoveMyAuthFactorOTPEmailRequestSchema));
   }
 
   public getMyPasswordComplexityPolicy(): Promise<GetMyPasswordComplexityPolicyResponse> {
     return this.grpcService.authNew.getMyPasswordComplexityPolicy({});
+  }
+
+  public listMyZitadelPermissions(): Promise<ListMyZitadelPermissionsResponse> {
+    return this.grpcService.authNew.listMyZitadelPermissions({});
+  }
+
+  public listMyZitadelPermissionsQuery() {
+    return injectQuery(() => ({
+      queryKey: [this.userService.userId(), 'auth', 'listMyZitadelPermissions'],
+      queryFn: () => this.listMyZitadelPermissions().then(({ result }) => result),
+    }));
   }
 }

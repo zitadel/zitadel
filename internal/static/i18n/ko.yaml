@@ -195,7 +195,7 @@ Errors:
     AlreadyExists: 인스턴스가 이미 존재합니다
     NotChanged: 인스턴스가 변경되지 않았습니다
   Org:
-    AlreadyExists: 조직 이름이 이미 사용 중입니다
+    AlreadyExists: 조직 이름 또는 ID가 이미 사용 중입니다
     Invalid: 조직이 유효하지 않습니다
     AlreadyDeactivated: 조직이 이미 비활성화되었습니다
     AlreadyActive: 조직이 이미 활성화되었습니다

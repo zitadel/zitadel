@@ -8,12 +8,14 @@ import { Gender, HumanProfile, HumanProfileSchema } from '@zitadel/proto/zitadel
 import { filter, startWith } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Profile } from '@zitadel/proto/zitadel/user_pb';
-import { create } from '@bufbuild/protobuf';
+//@ts-ignore
+import { create } from '@zitadel/client';
 
 function toHumanProfile(profile: HumanProfile | Profile): HumanProfile {
   if (profile.$typeName === 'zitadel.user.v2.HumanProfile') {
     return profile;
   }
+
   return create(HumanProfileSchema, {
     givenName: profile.firstName,
     familyName: profile.lastName,
@@ -29,6 +31,7 @@ function toHumanProfile(profile: HumanProfile | Profile): HumanProfile {
   selector: 'cnsl-detail-form',
   templateUrl: './detail-form.component.html',
   styleUrls: ['./detail-form.component.scss'],
+  standalone: false,
 })
 export class DetailFormComponent implements OnInit {
   @Input() public showEditImage: boolean = false;
@@ -117,6 +120,7 @@ export class DetailFormComponent implements OnInit {
     };
 
     const dialogRef = this.dialog.open<ProfilePictureComponent, typeof data, boolean>(ProfilePictureComponent, {
+      data: data,
       width: '400px',
     });
 

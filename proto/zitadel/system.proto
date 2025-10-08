@@ -250,9 +250,11 @@ service SystemService {
     };
   }
 
-  // Returns the custom domains of an instance
-  // Checks if a domain exists
-  // Deprecated: Use the Admin APIs ListInstanceDomains on the admin API instead
+  // List Domains
+  //
+  // Deprecated: use [instance service v2 ListCustomDomains](apis/resources/instance_service_v2/zitadel-instance-v-2-beta-instance-service-list-custom-domains.api.mdx) instead.
+  //
+  // Returns the custom domains of an instance.
   rpc ListDomains(ListDomainsRequest) returns (ListDomainsResponse) {
     option (google.api.http) = {
       post: "/instances/{instance_id}/domains/_search";

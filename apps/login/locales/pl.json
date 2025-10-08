@@ -1,0 +1,333 @@
+{
+  "common": {
+    "back": "Powrót",
+    "title": "Zaloguj się za pomocą Zitadel"
+  },
+  "accounts": {
+    "title": "Konta",
+    "description": "Wybierz konto, którego chcesz użyć.",
+    "addAnother": "Dodaj kolejne konto",
+    "noResults": "Nie znaleziono kont",
+    "verified": "zweryfikowany",
+    "expired": "wygasł"
+  },
+  "logout": {
+    "title": "Wyloguj się",
+    "description": "Wybierz konto, które chcesz usunąć",
+    "noResults": "Nie znaleziono kont",
+    "clear": "Usuń sesję",
+    "verifiedAt": "Ostatnia aktywność: {time}",
+    "success": {
+      "title": "Wylogowanie udane",
+      "description": "Pomyślnie się wylogowałeś."
+    }
+  },
+  "loginname": {
+    "title": "Witamy ponownie!",
+    "description": "Wprowadź dane logowania.",
+    "register": "Zarejestruj nowego użytkownika",
+    "submit": "Kontynuuj",
+    "labels": {
+      "loginname": "Login",
+      "username": "Nazwa użytkownika",
+      "usernameOrPhoneNumber": "Nazwa użytkownika lub numer telefonu",
+      "usernameOrEmail": "Nazwa użytkownika lub e-mail"
+    },
+    "required": {
+      "loginName": "To pole jest wymagane"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "Hasło",
+      "description": "Wprowadź swoje hasło.",
+      "resetPassword": "Zresetuj hasło",
+      "submit": "Kontynuuj",
+      "labels": {
+        "password": "Hasło"
+      },
+      "required": {
+        "password": "To pole jest wymagane"
+      }
+    },
+    "set": {
+      "title": "Ustaw hasło",
+      "description": "Ustaw hasło dla swojego konta",
+      "codeSent": "Kod został wysłany na twój adres e-mail.",
+      "noCodeReceived": "Nie otrzymałeś kodu?",
+      "resend": "Wyślij kod ponownie",
+      "submit": "Kontynuuj",
+      "labels": {
+        "code": "Kod",
+        "newPassword": "Nowe hasło",
+        "confirmPassword": "Potwierdź nowe hasło"
+      },
+      "required": {
+        "code": "To pole jest wymagane",
+        "newPassword": "Musisz podać hasło!",
+        "confirmPassword": "To pole jest wymagane"
+      }
+    },
+    "change": {
+      "title": "Zmień hasło",
+      "description": "Ustaw nowe hasło dla swojego konta",
+      "submit": "Kontynuuj",
+      "labels": {
+        "newPassword": "Nowe hasło",
+        "confirmPassword": "Potwierdź nowe hasło"
+      },
+      "required": {
+        "newPassword": "Musisz podać nowe hasło!",
+        "confirmPassword": "To pole jest wymagane"
+      }
+    }
+  },
+  "idp": {
+    "title": "Zaloguj się za pomocą SSO",
+    "description": "Wybierz jednego z poniższych dostawców, aby się zalogować",
+    "orSignInWith": "lub zaloguj się przez",
+    "signInWithApple": "Zaloguj się przez Apple",
+    "signInWithGoogle": "Zaloguj się przez Google",
+    "signInWithAzureAD": "Zaloguj się przez AzureAD",
+    "signInWithGithub": "Zaloguj się przez GitHub",
+    "signInWithGitlab": "Zaloguj się przez GitLab",
+    "loginSuccess": {
+      "title": "Logowanie udane",
+      "description": "Zostałeś pomyślnie zalogowany!"
+    },
+    "linkingSuccess": {
+      "title": "Konto powiązane",
+      "description": "Pomyślnie powiązałeś swoje konto!"
+    },
+    "registerSuccess": {
+      "title": "Rejestracja udana",
+      "description": "Pomyślnie się zarejestrowałeś!"
+    },
+    "loginError": {
+      "title": "Logowanie nieudane",
+      "description": "Wystąpił błąd podczas próby logowania."
+    },
+    "linkingError": {
+      "title": "Powiązanie konta nie powiodło się",
+      "description": "Wystąpił błąd podczas próby powiązania konta."
+    },
+    "completeRegister": {
+      "title": "Ukończ rejestrację",
+      "description": "Ukończ rejestrację swojego konta."
+    }
+  },
+  "ldap": {
+    "title": "Zaloguj się przez LDAP",
+    "description": "Wprowadź swoje dane logowania LDAP.",
+    "submit": "Kontynuuj",
+    "labels": {
+      "username": "Nazwa użytkownika",
+      "password": "Hasło"
+    },
+    "required": {
+      "username": "To pole jest wymagane",
+      "password": "To pole jest wymagane"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "Zweryfikuj swoją tożsamość",
+      "description": "Wybierz jeden z poniższych sposobów weryfikacji.",
+      "noResults": "Nie znaleziono dostępnych metod uwierzytelniania dwuskładnikowego."
+    },
+    "set": {
+      "title": "Skonfiguruj uwierzytelnianie dwuskładnikowe",
+      "description": "Wybierz jedną z poniższych metod drugiego czynnika.",
+      "skip": "Pomiń"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "Zweryfikuj uwierzytelnianie dwuskładnikowe",
+      "totpDescription": "Wprowadź kod z aplikacji uwierzytelniającej.",
+      "smsDescription": "Wprowadź kod otrzymany SMS-em.",
+      "emailDescription": "Wprowadź kod otrzymany e-mailem.",
+      "noCodeReceived": "Nie otrzymałeś kodu?",
+      "resendCode": "Wyślij kod ponownie",
+      "submit": "Kontynuuj",
+      "labels": {
+        "code": "Kod"
+      },
+      "required": {
+        "code": "To pole jest wymagane"
+      }
+    },
+    "set": {
+      "title": "Skonfiguruj uwierzytelnianie dwuskładnikowe",
+      "totpDescription": "Zeskanuj kod QR za pomocą aplikacji uwierzytelniającej.",
+      "smsDescription": "Wprowadź swój numer telefonu, aby otrzymać kod SMS-em.",
+      "emailDescription": "Wprowadź swój adres e-mail, aby otrzymać kod e-mailem.",
+      "totpRegisterDescription": "Zeskanuj kod QR lub otwórz adres URL ręcznie.",
+      "submit": "Kontynuuj",
+      "labels": {
+        "code": "Kod"
+      },
+      "required": {
+        "code": "To pole jest wymagane"
+      }
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "Uwierzytelnij się za pomocą klucza dostępu",
+      "description": "Twoje urządzenie poprosi o użycie odcisku palca, rozpoznawania twarzy lub blokady ekranu.",
+      "usePassword": "Użyj hasła",
+      "submit": "Kontynuuj"
+    },
+    "set": {
+      "title": "Skonfiguruj klucz dostępu",
+      "description": "Twoje urządzenie poprosi o użycie odcisku palca, rozpoznawania twarzy lub blokady ekranu.",
+      "info": {
+        "description": "Klucz dostępu to metoda uwierzytelniania na urządzeniu, wykorzystująca np. odcisk palca, Apple FaceID lub podobne rozwiązania.",
+        "link": "Uwierzytelnianie bez hasła"
+      },
+      "skip": "Pomiń",
+      "submit": "Kontynuuj"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "Zweryfikuj uwierzytelnianie dwuskładnikowe",
+      "description": "Zweryfikuj swoje konto za pomocą urządzenia."
+    },
+    "set": {
+      "title": "Skonfiguruj uwierzytelnianie dwuskładnikowe",
+      "description": "Skonfiguruj urządzenie jako dodatkowy czynnik uwierzytelniania.",
+      "submit": "Kontynuuj"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "Klucz dostępu",
+      "password": "Hasło"
+    },
+    "disabled": {
+      "title": "Rejestracja wyłączona",
+      "description": "Rejestracja jest wyłączona. Skontaktuj się z administratorem."
+    },
+    "missingdata": {
+      "title": "Brak danych",
+      "description": "Podaj e-mail, imię i nazwisko, aby się zarejestrować."
+    },
+    "title": "Rejestracja",
+    "description": "Utwórz konto ZITADEL.",
+    "noMethodAvailableWarning": "Brak dostępnych metod uwierzytelniania. Skontaktuj się z administratorem.",
+    "selectMethod": "Wybierz metodę uwierzytelniania, której chcesz użyć",
+    "agreeTo": "Aby się zarejestrować, musisz zaakceptować warunki korzystania",
+    "termsOfService": "Regulamin",
+    "privacyPolicy": "Polityka prywatności",
+    "submit": "Kontynuuj",
+    "password": {
+      "title": "Ustaw hasło",
+      "description": "Ustaw hasło dla swojego konta",
+      "submit": "Kontynuuj",
+      "labels": {
+        "password": "Hasło",
+        "confirmPassword": "Potwierdź hasło"
+      },
+      "required": {
+        "password": "Musisz podać hasło!",
+        "confirmPassword": "To pole jest wymagane"
+      }
+    },
+    "labels": {
+      "firstname": "Imię",
+      "lastname": "Nazwisko",
+      "email": "E-mail"
+    },
+    "required": {
+      "firstname": "To pole jest wymagane",
+      "lastname": "To pole jest wymagane",
+      "email": "To pole jest wymagane"
+    }
+  },
+  "invite": {
+    "title": "Zaproś użytkownika",
+    "description": "Podaj adres e-mail oraz imię i nazwisko użytkownika, którego chcesz zaprosić.",
+    "info": "Użytkownik otrzyma e-mail z dalszymi instrukcjami.",
+    "notAllowed": "Twoje ustawienia nie pozwalają na zapraszanie użytkowników.",
+    "submit": "Kontynuuj",
+    "success": {
+      "title": "Użytkownik zaproszony",
+      "description": "E-mail został pomyślnie wysłany.",
+      "verified": "Użytkownik został zaproszony i już zweryfikował swój e-mail.",
+      "notVerifiedYet": "Użytkownik został zaproszony. Otrzyma e-mail z dalszymi instrukcjami.",
+      "submit": "Zaproś kolejnego użytkownika"
+    }
+  },
+  "signedin": {
+    "title": "Witaj {user}!",
+    "description": "Jesteś zalogowany.",
+    "continue": "Kontynuuj",
+    "error": {
+      "title": "Błąd",
+      "description": "Nie można załadować danych. Sprawdź połączenie z internetem lub spróbuj ponownie później."
+    }
+  },
+  "verify": {
+    "userIdMissing": "Nie podano identyfikatora użytkownika!",
+    "successTitle": "Weryfikacja zakończona",
+    "successDescription": "Użytkownik został pomyślnie zweryfikowany.",
+    "setupAuthenticator": "Skonfiguruj uwierzytelnianie",
+    "verify": {
+      "title": "Zweryfikuj użytkownika",
+      "description": "Wprowadź kod z wiadomości weryfikacyjnej.",
+      "noCodeReceived": "Nie otrzymałeś kodu?",
+      "resendCode": "Wyślij kod ponownie",
+      "codeSent": "Kod został właśnie wysłany na twój adres e-mail.",
+      "submit": "Kontynuuj",
+      "labels": {
+        "code": "Kod"
+      },
+      "required": {
+        "code": "To pole jest wymagane"
+      }
+    }
+  },
+  "authenticator": {
+    "title": "Wybierz metodę uwierzytelniania",
+    "description": "Wybierz metodę, której chcesz użyć do uwierzytelnienia.",
+    "noMethodsAvailable": "Brak dostępnych metod uwierzytelniania",
+    "allSetup": "Już skonfigurowałeś metodę uwierzytelniania!",
+    "linkWithIDP": "lub połącz z dostawcą tożsamości"
+  },
+  "device": {
+    "usercode": {
+      "title": "Kod urządzenia",
+      "description": "Wprowadź kod.",
+      "submit": "Kontynuuj",
+      "labels": {
+        "code": "Kod"
+      },
+      "required": {
+        "code": "To pole jest wymagane"
+      }
+    },
+    "request": {
+      "title": "{appName} chce się połączyć:",
+      "description": "{appName} będzie miało dostęp do:",
+      "disclaimer": "Klikając Zezwól, pozwalasz tej aplikacji i Zitadel na korzystanie z Twoich informacji zgodnie z ich odpowiednimi warunkami użytkowania i politykami prywatności. Możesz cofnąć ten dostęp w dowolnym momencie.",
+      "submit": "Zezwól",
+      "deny": "Odmów"
+    },
+    "scope": {
+      "openid": "Zweryfikuj swoją tożsamość.",
+      "email": "Uzyskaj dostęp do swojego adresu e-mail.",
+      "profile": "Uzyskaj dostęp do pełnych informacji o swoim profilu.",
+      "offline_access": "Zezwól na dostęp offline do swojego konta."
+    }
+  },
+  "error": {
+    "noUserCode": "Nie podano kodu użytkownika!",
+    "noDeviceRequest": "Nie znaleziono żądania urządzenia.",
+    "unknownContext": "Nie udało się pobrać kontekstu użytkownika. Upewnij się, że najpierw wprowadziłeś nazwę użytkownika lub podałeś login jako parametr wyszukiwania.",
+    "sessionExpired": "Twoja sesja wygasła. Zaloguj się ponownie.",
+    "failedLoading": "Nie udało się załadować danych. Spróbuj ponownie.",
+    "tryagain": "Spróbuj ponownie"
+  }
+}

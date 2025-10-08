@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
@@ -45,7 +44,7 @@ func TestAddCustomDomain(t *testing.T) {
 			testName: "when invalid context should return unauthN error",
 			inputRequest: &instance.AddCustomDomainRequest{
 				InstanceId: inst.ID(),
-				Domain:     gofakeit.DomainName(),
+				Domain:     integration.DomainName(),
 			},
 			inputContext:      context.Background(),
 			expectedErrorCode: codes.Unauthenticated,
@@ -55,7 +54,7 @@ func TestAddCustomDomain(t *testing.T) {
 			testName: "when unauthZ context should return unauthZ error",
 			inputRequest: &instance.AddCustomDomainRequest{
 				InstanceId: inst.ID(),
-				Domain:     gofakeit.DomainName(),
+				Domain:     integration.DomainName(),
 			},
 			inputContext:      iamOwnerCtx,
 			expectedErrorCode: codes.PermissionDenied,
@@ -75,7 +74,7 @@ func TestAddCustomDomain(t *testing.T) {
 			testName: "when valid request should return successful response",
 			inputRequest: &instance.AddCustomDomainRequest{
 				InstanceId: inst.ID(),
-				Domain:     " " + gofakeit.DomainName(),
+				Domain:     " " + integration.DomainName(),
 			},
 			inputContext: ctxWithSysAuthZ,
 		},
@@ -115,7 +114,7 @@ func TestRemoveCustomDomain(t *testing.T) {
 	inst := integration.NewInstance(ctxWithSysAuthZ)
 	iamOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeIAMOwner)
 
-	customDomain := gofakeit.DomainName()
+	customDomain := integration.DomainName()
 
 	_, err := inst.Client.InstanceV2Beta.AddCustomDomain(ctxWithSysAuthZ, &instance.AddCustomDomainRequest{InstanceId: inst.ID(), Domain: customDomain})
 	require.Nil(t, err)
@@ -245,7 +244,7 @@ func TestAddTrustedDomain(t *testing.T) {
 			testName: "when valid request should return successful response",
 			inputRequest: &instance.AddTrustedDomainRequest{
 				InstanceId: inst.ID(),
-				Domain:     " " + gofakeit.DomainName(),
+				Domain:     " " + integration.DomainName(),
 			},
 			inputContext: ctxWithSysAuthZ,
 		},
@@ -285,7 +284,7 @@ func TestRemoveTrustedDomain(t *testing.T) {
 	inst := integration.NewInstance(ctxWithSysAuthZ)
 	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
 
-	trustedDomain := gofakeit.DomainName()
+	trustedDomain := integration.DomainName()
 
 	_, err := inst.Client.InstanceV2Beta.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: inst.ID(), Domain: trustedDomain})
 	require.Nil(t, err)

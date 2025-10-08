@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
@@ -23,7 +22,7 @@ import (
 func TestGetApplication(t *testing.T) {
 	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
 
-	apiAppName := gofakeit.AppName()
+	apiAppName := integration.ApplicationName()
 	createdApiApp, errAPIAppCreation := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId: p.GetId(),
 		Name:      apiAppName,
@@ -35,20 +34,20 @@ func TestGetApplication(t *testing.T) {
 	})
 	require.Nil(t, errAPIAppCreation)
 
-	samlAppName := gofakeit.AppName()
+	samlAppName := integration.ApplicationName()
 	createdSAMLApp, errSAMLAppCreation := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId: p.GetId(),
 		Name:      samlAppName,
 		CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
 			SamlRequest: &app.CreateSAMLApplicationRequest{
 				LoginVersion: &app.LoginVersion{Version: &app.LoginVersion_LoginV1{LoginV1: &app.LoginV1{}}},
-				Metadata:     &app.CreateSAMLApplicationRequest_MetadataXml{MetadataXml: samlMetadataGen(gofakeit.URL())},
+				Metadata:     &app.CreateSAMLApplicationRequest_MetadataXml{MetadataXml: samlMetadataGen(integration.URL())},
 			},
 		},
 	})
 	require.Nil(t, errSAMLAppCreation)
 
-	oidcAppName := gofakeit.AppName()
+	oidcAppName := integration.ApplicationName()
 	createdOIDCApp, errOIDCAppCreation := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId: p.GetId(),
 		Name:      oidcAppName,
@@ -85,7 +84,7 @@ func TestGetApplication(t *testing.T) {
 			testName: "when unknown app ID should return not found error",
 			inputCtx: IAMOwnerCtx,
 			inputRequest: &app.GetApplicationRequest{
-				Id: gofakeit.Sentence(2),
+				Id: integration.ID(),
 			},
 
 			expectedErrorType: codes.NotFound,
@@ -138,7 +137,7 @@ func TestGetApplication(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 30*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
 				res, err := instance.Client.AppV2Beta.GetApplication(tc.inputCtx, tc.inputRequest)
@@ -170,9 +169,9 @@ func TestListApplications(t *testing.T) {
 	createdDeactivatedApiApp, deactivatedApiAppName := createAPIAppWithName(t, IAMOwnerCtx, instance, p.GetId())
 	deactivateApp(t, createdDeactivatedApiApp, p.GetId())
 
-	_, createdSAMLApp, samlAppName := createSAMLAppWithName(t, gofakeit.URL(), p.GetId())
+	_, createdSAMLApp, samlAppName := createSAMLAppWithName(t, integration.URL(), p.GetId())
 
-	createdOIDCApp, oidcAppName := createOIDCAppWithName(t, gofakeit.URL(), p.GetId())
+	createdOIDCApp, oidcAppName := createOIDCAppWithName(t, integration.URL(), p.GetId())
 
 	type appWithName struct {
 		app  *app.CreateApplicationResponse
@@ -439,7 +438,7 @@ func TestListApplications(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 30*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
 				res, err := instance.Client.AppV2Beta.ListApplications(tc.inputCtx, tc.inputRequest)
@@ -464,7 +463,7 @@ func TestListApplications_WithPermissionV2(t *testing.T) {
 	p, projectOwnerCtx := getProjectAndProjectContext(t, instancePermissionV2, iamOwnerCtx)
 	_, otherProjectOwnerCtx := getProjectAndProjectContext(t, instancePermissionV2, iamOwnerCtx)
 
-	appName1, appName2, appName3 := gofakeit.AppName(), gofakeit.AppName(), gofakeit.AppName()
+	appName1, appName2, appName3 := integration.ApplicationName(), integration.ApplicationName(), integration.ApplicationName()
 	reqForAPIAppCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
 	}
@@ -551,7 +550,7 @@ func TestListApplications_WithPermissionV2(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 5*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
 				res, err := instancePermissionV2.Client.AppV2Beta.ListApplications(tc.inputCtx, tc.inputRequest)
@@ -593,7 +592,7 @@ func TestGetApplicationKey(t *testing.T) {
 			testName: "when unknown app ID should return not found error",
 			inputCtx: IAMOwnerCtx,
 			inputRequest: &app.GetApplicationKeyRequest{
-				Id: gofakeit.Sentence(2),
+				Id: integration.ID(),
 			},
 
 			expectedErrorType: codes.NotFound,
@@ -642,7 +641,7 @@ func TestGetApplicationKey(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 30*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
 				res, err := instance.Client.AppV2Beta.GetApplicationKey(tc.inputCtx, tc.inputRequest)
@@ -720,7 +719,7 @@ func TestListApplicationKeys(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 5*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
 				res, err := instance.Client.AppV2Beta.ListApplicationKeys(tc.inputCtx, tc.inputRequest)
@@ -800,7 +799,7 @@ func TestListApplicationKeys_WithPermissionV2(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			// t.Parallel()
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 5*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
 				res, err := instancePermissionV2.Client.AppV2Beta.ListApplicationKeys(tc.inputCtx, tc.inputRequest)

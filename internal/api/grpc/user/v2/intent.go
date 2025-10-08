@@ -185,7 +185,7 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *connec
 		case *jwt.Provider:
 			idpUser, err = unmarshalIdpUser(intent.IDPUser, jwt.InitUser())
 		case *azuread.Provider:
-			idpUser, err = unmarshalRawIdpUser(intent.IDPUser, p.User())
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, p.User())
 		case *github.Provider:
 			idpUser, err = unmarshalIdpUser(intent.IDPUser, &github.User{})
 		case *gitlab.Provider:

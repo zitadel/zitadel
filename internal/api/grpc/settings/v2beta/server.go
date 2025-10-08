@@ -11,6 +11,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2beta/settingsconnect"
@@ -19,20 +21,27 @@ import (
 var _ settingsconnect.SettingsServiceHandler = (*Server)(nil)
 
 type Server struct {
-	command         *command.Commands
-	query           *query.Queries
+	systemDefaults systemdefaults.SystemDefaults
+	command        *command.Commands
+	query          *query.Queries
+
+	checkPermission domain.PermissionCheck
 	assetsAPIDomain func(context.Context) string
 }
 
 type Config struct{}
 
 func CreateServer(
+	systemDefaults systemdefaults.SystemDefaults,
 	command *command.Commands,
 	query *query.Queries,
+	checkPermission domain.PermissionCheck,
 ) *Server {
 	return &Server{
+		systemDefaults:  systemDefaults,
 		command:         command,
 		query:           query,
+		checkPermission: checkPermission,
 		assetsAPIDomain: assets.AssetAPI(),
 	}
 }

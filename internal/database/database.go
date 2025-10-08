@@ -206,6 +206,7 @@ func (c Config) Type() dialect.DatabaseType {
 }
 
 func EscapeLikeWildcards(value string) string {
+	value = strings.ReplaceAll(value, "\\", "\\\\")
 	value = strings.ReplaceAll(value, "%", "\\%")
 	value = strings.ReplaceAll(value, "_", "\\_")
 	return value

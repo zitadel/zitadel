@@ -4,14 +4,13 @@ package user_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
@@ -97,12 +96,12 @@ func TestServer_AddSecret(t *testing.T) {
 }
 
 func TestServer_AddSecret_Permission(t *testing.T) {
-	otherOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddSecret-%s", gofakeit.AppName()), gofakeit.Email())
+	otherOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 	otherOrgUser, err := Instance.Client.UserV2.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
 		UserType: &user.CreateUserRequest_Machine_{
 			Machine: &user.CreateUserRequest_Machine{
-				Name: gofakeit.Name(),
+				Name: integration.Username(),
 			},
 		},
 	})
@@ -244,12 +243,12 @@ func TestServer_RemoveSecret(t *testing.T) {
 }
 
 func TestServer_RemoveSecret_Permission(t *testing.T) {
-	otherOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("RemoveSecret-%s", gofakeit.AppName()), gofakeit.Email())
+	otherOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 	otherOrgUser, err := Instance.Client.UserV2.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
 		UserType: &user.CreateUserRequest_Machine_{
 			Machine: &user.CreateUserRequest_Machine{
-				Name: gofakeit.Name(),
+				Name: integration.Username(),
 			},
 		},
 	})

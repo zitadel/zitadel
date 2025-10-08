@@ -194,7 +194,7 @@ Errors:
     AlreadyExists: La instancia ya existe
     NotChanged: La instancia no ha cambiado
   Org:
-    AlreadyExists: El nombre de la organización ya está cogido
+    AlreadyExists: El nombre o id de la organización ya está tomado
     Invalid: El nombre de la organización no es válido
     AlreadyDeactivated: La organización ya está desactivada
     AlreadyActive: La organización ya está activada

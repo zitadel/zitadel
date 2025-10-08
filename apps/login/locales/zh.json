@@ -1,0 +1,333 @@
+{
+  "common": {
+    "back": "返回",
+    "title": "使用 Zitadel 登录"
+  },
+  "accounts": {
+    "title": "账户",
+    "description": "选择您要使用的账户。",
+    "addAnother": "添加另一个账户",
+    "noResults": "未找到账户",
+    "verified": "已验证",
+    "expired": "已过期"
+  },
+  "logout": {
+    "title": "注销",
+    "description": "选择您想注销的账户",
+    "noResults": "未找到账户",
+    "clear": "注销会话",
+    "verifiedAt": "最后活动时间：{time}",
+    "success": {
+      "title": "注销成功",
+      "description": "您已成功注销。"
+    }
+  },
+  "loginname": {
+    "title": "欢迎回来！",
+    "description": "请输入您的登录信息。",
+    "register": "注册新用户",
+    "submit": "继续",
+    "labels": {
+      "loginname": "登录名",
+      "username": "用户名",
+      "usernameOrPhoneNumber": "用户名或电话号码",
+      "usernameOrEmail": "用户名或电子邮箱"
+    },
+    "required": {
+      "loginName": "此字段为必填项"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "密码",
+      "description": "请输入您的密码。",
+      "resetPassword": "重置密码",
+      "submit": "继续",
+      "labels": {
+        "password": "密码"
+      },
+      "required": {
+        "password": "此字段为必填项"
+      }
+    },
+    "set": {
+      "title": "设置密码",
+      "description": "为您的账户设置密码",
+      "codeSent": "验证码已发送到您的邮箱。",
+      "noCodeReceived": "没有收到验证码？",
+      "resend": "重发验证码",
+      "submit": "继续",
+      "labels": {
+        "code": "验证码",
+        "newPassword": "新密码",
+        "confirmPassword": "确认密码"
+      },
+      "required": {
+        "code": "此字段为必填项",
+        "newPassword": "必须提供密码！",
+        "confirmPassword": "此字段为必填项"
+      }
+    },
+    "change": {
+      "title": "更改密码",
+      "description": "为您的账户设置密码",
+      "submit": "继续",
+      "labels": {
+        "newPassword": "新密码",
+        "confirmPassword": "确认密码"
+      },
+      "required": {
+        "newPassword": "必须提供新密码！",
+        "confirmPassword": "此字段为必填项"
+      }
+    }
+  },
+  "idp": {
+    "title": "使用 SSO 登录",
+    "description": "选择以下提供商中的一个进行登录",
+    "orSignInWith": "或使用以下方式登录",
+    "signInWithApple": "用 Apple 登录",
+    "signInWithGoogle": "用 Google 登录",
+    "signInWithAzureAD": "用 AzureAD 登录",
+    "signInWithGithub": "用 GitHub 登录",
+    "signInWithGitlab": "用 GitLab 登录",
+    "loginSuccess": {
+      "title": "登录成功",
+      "description": "您已成功登录！"
+    },
+    "linkingSuccess": {
+      "title": "账户已链接",
+      "description": "您已成功链接您的账户！"
+    },
+    "registerSuccess": {
+      "title": "注册成功",
+      "description": "您已成功注册！"
+    },
+    "loginError": {
+      "title": "登录失败",
+      "description": "登录时发生错误。"
+    },
+    "linkingError": {
+      "title": "账户链接失败",
+      "description": "链接账户时发生错误。"
+    },
+    "completeRegister": {
+      "title": "完成注册",
+      "description": "完成您的账户注册。"
+    }
+  },
+  "ldap": {
+    "title": "使用 LDAP 登录",
+    "description": "请输入您的 LDAP 凭据。",
+    "submit": "继续",
+    "labels": {
+      "username": "用户名",
+      "password": "密码"
+    },
+    "required": {
+      "username": "此字段为必填项",
+      "password": "此字段为必填项"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "验证您的身份",
+      "description": "选择以下的一个因素。",
+      "noResults": "没有可设置的第二因素。"
+    },
+    "set": {
+      "title": "设置双因素认证",
+      "description": "选择以下的一个第二因素。",
+      "skip": "跳过"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "验证双因素",
+      "totpDescription": "请输入认证应用程序中的验证码。",
+      "smsDescription": "输入通过短信收到的验证码。",
+      "emailDescription": "输入通过电子邮件收到的验证码。",
+      "noCodeReceived": "没有收到验证码？",
+      "resendCode": "重发验证码",
+      "submit": "继续",
+      "labels": {
+        "code": "验证码"
+      },
+      "required": {
+        "code": "此字段为必填项"
+      }
+    },
+    "set": {
+      "title": "设置双因素认证",
+      "totpDescription": "使用认证应用程序扫描二维码。",
+      "smsDescription": "输入您的电话号码以接收短信验证码。",
+      "emailDescription": "输入您的电子邮箱地址以接收电子邮件验证码。",
+      "totpRegisterDescription": "扫描二维码或手动导航到URL。",
+      "submit": "继续",
+      "labels": {
+        "code": "验证码"
+      },
+      "required": {
+        "code": "此字段为必填项"
+      }
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "使用密钥认证",
+      "description": "您的设备将请求指纹、面部识别或屏幕锁",
+      "usePassword": "使用密码",
+      "submit": "继续"
+    },
+    "set": {
+      "title": "设置密钥",
+      "description": "您的设备将请求指纹、面部识别或屏幕锁",
+      "info": {
+        "description": "密钥是在设备上如指纹、Apple FaceID 或类似的认证方法。",
+        "link": "无密码认证"
+      },
+      "skip": "跳过",
+      "submit": "继续"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "验证双因素",
+      "description": "使用您的设备验证帐户。"
+    },
+    "set": {
+      "title": "设置双因素认证",
+      "description": "设置设备为第二因素。",
+      "submit": "继续"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "密钥",
+      "password": "密码"
+    },
+    "disabled": {
+      "title": "注册已禁用",
+      "description": "您的设置不允许注册新用户。"
+    },
+    "missingdata": {
+      "title": "缺少数据",
+      "description": "请提供所有必需的数据。"
+    },
+    "title": "注册",
+    "description": "创建您的 ZITADEL 账户。",
+    "noMethodAvailableWarning": "没有可用的认证方法。请联系您的系统管理员。",
+    "selectMethod": "选择您想使用的认证方法",
+    "agreeTo": "注册即表示您同意条款和条件",
+    "termsOfService": "服务条款",
+    "privacyPolicy": "隐私政策",
+    "submit": "继续",
+    "password": {
+      "title": "设置密码",
+      "description": "为您的账户设置密码",
+      "submit": "继续",
+      "labels": {
+        "password": "密码",
+        "confirmPassword": "确认密码"
+      },
+      "required": {
+        "password": "必须提供密码！",
+        "confirmPassword": "此字段为必填项"
+      }
+    },
+    "labels": {
+      "firstname": "名字",
+      "lastname": "姓氏",
+      "email": "电子邮箱"
+    },
+    "required": {
+      "firstname": "此字段为必填项",
+      "lastname": "此字段为必填项",
+      "email": "此字段为必填项"
+    }
+  },
+  "invite": {
+    "title": "邀请用户",
+    "description": "提供您想邀请的用户的电子邮箱地址和姓名。",
+    "info": "用户将收到一封包含进一步说明的电子邮件。",
+    "notAllowed": "您的设置不允许邀请用户。",
+    "submit": "继续",
+    "success": {
+      "title": "用户已邀请",
+      "description": "邮件已成功发送。",
+      "verified": "用户已被邀请并已验证其电子邮件。",
+      "notVerifiedYet": "用户已被邀请。他们将收到一封包含进一步说明的电子邮件。",
+      "submit": "邀请另一位用户"
+    }
+  },
+  "signedin": {
+    "title": "欢迎 {user}！",
+    "description": "您已登录。",
+    "continue": "继续",
+    "error": {
+      "title": "错误",
+      "description": "登录时发生错误。"
+    }
+  },
+  "verify": {
+    "userIdMissing": "未提供用户 ID！",
+    "successTitle": "用户已验证",
+    "successDescription": "用户已成功验证。",
+    "setupAuthenticator": "设置认证器",
+    "verify": {
+      "title": "验证用户",
+      "description": "输入验证邮件中的验证码。",
+      "noCodeReceived": "没有收到验证码？",
+      "resendCode": "重发验证码",
+      "codeSent": "刚刚发送了一封包含验证码的电子邮件。",
+      "submit": "继续",
+      "labels": {
+        "code": "验证码"
+      },
+      "required": {
+        "code": "此字段为必填项"
+      }
+    }
+  },
+  "authenticator": {
+    "title": "选择认证方式",
+    "description": "选择您想使用的认证方法",
+    "noMethodsAvailable": "没有可用的认证方法",
+    "allSetup": "您已经设置好了一个认证器！",
+    "linkWithIDP": "或将其与身份提供者关联"
+  },
+  "device": {
+    "usercode": {
+      "title": "设备代码",
+      "description": "输入代码。",
+      "submit": "继续",
+      "labels": {
+        "code": "验证码"
+      },
+      "required": {
+        "code": "此字段为必填项"
+      }
+    },
+    "request": {
+      "title": "{appName} 想要连接：",
+      "description": "{appName} 将访问：",
+      "disclaimer": "点击“允许”即表示您允许此应用程序和 Zitadel 根据其各自的服务条款和隐私政策使用您的信息。您可以随时撤销此访问权限。",
+      "submit": "允许",
+      "deny": "拒绝"
+    },
+    "scope": {
+      "openid": "验证您的身份。",
+      "email": "访问您的电子邮件地址。",
+      "profile": "访问您的完整个人资料信息。",
+      "offline_access": "允许离线访问您的账户。"
+    }
+  },
+  "error": {
+    "noUserCode": "未提供用户代码！",
+    "noDeviceRequest": "没有找到设备请求。",
+    "unknownContext": "无法获取用户的上下文。请先输入用户名或提供 loginName 作为搜索参数。",
+    "sessionExpired": "当前会话已过期，请重新登录。",
+    "failedLoading": "加载数据失败，请再试一次。",
+    "tryagain": "重试"
+  }
+}

@@ -92,6 +92,8 @@ func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error
 		0,
 		0,
 		nil,
+		nil,
+		nil,
 	)
 	if err != nil {
 		return err

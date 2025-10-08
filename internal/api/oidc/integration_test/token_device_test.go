@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
@@ -22,7 +21,7 @@ import (
 )
 
 func TestServer_DeviceAuth(t *testing.T) {
-	project := Instance.CreateProject(CTX, t, "", gofakeit.AppName(), false, false)
+	project := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
 	client, err := Instance.CreateOIDCClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, false, app.OIDCGrantType_OIDC_GRANT_TYPE_DEVICE_CODE)
 	require.NoError(t, err)
 

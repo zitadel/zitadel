@@ -15,4 +15,4 @@ ON
     AND e.aggregate_type = existing.aggregate_type
     AND e.aggregate_id = existing.aggregate_id
     AND e.sequence = existing.sequence
-FOR UPDATE;
+FOR NO KEY UPDATE;

@@ -304,33 +304,45 @@ func TestCommandSide_RemoveMachineSecret(t *testing.T) {
 }
 
 func TestCommands_MachineSecretCheckSucceeded(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
 
-	agg := user.NewAggregate("userID", "orgID")
-	cmd := user.NewMachineSecretCheckSucceededEvent(ctx, &agg.Aggregate)
+	tt := []struct {
+		testName               string
+		eventStoreExpectations func(ctx context.Context, updatedSecret string) []expect
 
-	c := &Commands{
-		eventstore: eventstoreExpect(t,
-			expectPushSlow(time.Second/100, cmd),
-		),
+		inputUpdatedMachineSecret string
+	}{
+		{
+			testName:                  "when machine secret is updated should meet expectations and return no error",
+			inputUpdatedMachineSecret: "upd4t3dS3cr3t",
+			eventStoreExpectations: func(ctx context.Context, updatedSecret string) []expect {
+				return []expect{expectPushSlow(time.Second/100, user.NewMachineSecretHashUpdatedEvent(
+					ctx,
+					&user.NewAggregate("userID", "orgID").Aggregate,
+					updatedSecret,
+				))}
+			},
+		},
+		{
+			testName: "when machine secret is not update should have no expectations and return no error",
+			eventStoreExpectations: func(_ context.Context, _ string) []expect {
+				return []expect{}
+			},
+		},
 	}
-	c.MachineSecretCheckSucceeded(ctx, "userID", "orgID", "")
-	require.NoError(t, c.Close(ctx))
-}
 
-func TestCommands_MachineSecretCheckFailed(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			// Given
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+			defer cancel()
 
-	agg := user.NewAggregate("userID", "orgID")
-	cmd := user.NewMachineSecretCheckFailedEvent(ctx, &agg.Aggregate)
+			c := &Commands{eventstore: expectEventstore(tc.eventStoreExpectations(ctx, tc.inputUpdatedMachineSecret)...)(t)}
 
-	c := &Commands{
-		eventstore: eventstoreExpect(t,
-			expectPushSlow(time.Second/100, cmd),
-		),
+			// Test
+			c.MachineSecretCheckSucceeded(ctx, "userID", "orgID", tc.inputUpdatedMachineSecret)
+
+			// Verify
+			require.NoError(t, c.Close(ctx))
+		})
 	}
-	c.MachineSecretCheckFailed(ctx, "userID", "orgID")
-	require.NoError(t, c.Close(ctx))
 }

@@ -30,16 +30,18 @@ type UserGrant struct {
 	GrantID string                `json:"grant_id,omitempty"`
 	State   domain.UserGrantState `json:"state,omitempty"`
 
-	UserID             string          `json:"user_id,omitempty"`
-	Username           string          `json:"username,omitempty"`
-	UserType           domain.UserType `json:"user_type,omitempty"`
-	UserResourceOwner  string          `json:"user_resource_owner,omitempty"`
-	FirstName          string          `json:"first_name,omitempty"`
-	LastName           string          `json:"last_name,omitempty"`
-	Email              string          `json:"email,omitempty"`
-	DisplayName        string          `json:"display_name,omitempty"`
-	AvatarURL          string          `json:"avatar_url,omitempty"`
-	PreferredLoginName string          `json:"preferred_login_name,omitempty"`
+	UserID                  string          `json:"user_id,omitempty"`
+	Username                string          `json:"username,omitempty"`
+	UserType                domain.UserType `json:"user_type,omitempty"`
+	UserResourceOwner       string          `json:"user_resource_owner,omitempty"`
+	UserResourceOwnerName   string          `json:"user_resource_owner_name,omitempty"`
+	UserResourceOwnerDomain string          `json:"user_resource_owner_domain,omitempty"`
+	FirstName               string          `json:"first_name,omitempty"`
+	LastName                string          `json:"last_name,omitempty"`
+	Email                   string          `json:"email,omitempty"`
+	DisplayName             string          `json:"display_name,omitempty"`
+	AvatarURL               string          `json:"avatar_url,omitempty"`
+	PreferredLoginName      string          `json:"preferred_login_name,omitempty"`
 
 	ResourceOwner    string `json:"resource_owner,omitempty"`
 	OrgName          string `json:"org_name,omitempty"`
@@ -110,6 +112,14 @@ func userGrantPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, ena
 
 func NewUserGrantUserIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(UserGrantUserID, id, TextEquals)
+}
+
+func NewUserGrantInUserIDsSearchQuery(ids []string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
+		list[i] = value
+	}
+	return NewListQuery(UserGrantUserID, list, ListIn)
 }
 
 func NewUserGrantProjectIDSearchQuery(id string) (SearchQuery, error) {
@@ -257,6 +267,25 @@ var (
 		name:  projection.UserGrantState,
 		table: userGrantTable,
 	}
+
+	UserOrgsTable = table{
+		name:          projection.OrgProjectionTable,
+		alias:         "user_orgs",
+		instanceIDCol: projection.OrgColumnInstanceID,
+	}
+	UserOrgColumnId = Column{
+		name:  projection.OrgColumnID,
+		table: UserOrgsTable,
+	}
+	UserOrgColumnName = Column{
+		name:  projection.OrgColumnName,
+		table: UserOrgsTable,
+	}
+	UserOrgColumnDomain = Column{
+		name:  projection.OrgColumnDomain,
+		table: UserOrgsTable,
+	}
+
 	GrantedOrgsTable = table{
 		name:          projection.OrgProjectionTable,
 		alias:         "granted_orgs",
@@ -305,12 +334,13 @@ func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, queries
 }
 
 func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, shouldTriggerBulk bool, permissionCheck domain.PermissionCheck) (*UserGrants, error) {
-	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
-	grants, err := q.userGrants(ctx, queries, shouldTriggerBulk, permissionCheckV2)
+	// removed as permission v2 is not implemented yet for project grant level permissions
+	// permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	grants, err := q.userGrants(ctx, queries, shouldTriggerBulk, false)
 	if err != nil {
 		return nil, err
 	}
-	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
+	if permissionCheck != nil { // && !authz.GetFeatures(ctx).PermissionCheckV2 {
 		userGrantsCheckPermission(ctx, grants, permissionCheck)
 	}
 	return grants, nil
@@ -365,7 +395,9 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 			UserGrantUserID.identifier(),
 			UserUsernameCol.identifier(),
 			UserTypeCol.identifier(),
-			UserResourceOwnerCol.identifier(),
+			UserOrgColumnId.identifier(),
+			UserOrgColumnName.identifier(),
+			UserOrgColumnDomain.identifier(),
 			HumanFirstNameCol.identifier(),
 			HumanLastNameCol.identifier(),
 			HumanEmailCol.identifier(),
@@ -390,6 +422,7 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 			LeftJoin(join(HumanUserIDCol, UserGrantUserID)).
 			LeftJoin(join(OrgColumnID, UserGrantResourceOwner)).
 			LeftJoin(join(ProjectColumnID, UserGrantProjectID)).
+			LeftJoin(join(UserOrgColumnId, UserResourceOwnerCol)).
 			LeftJoin(join(ProjectGrantColumnGrantID, UserGrantGrantID) + " AND " + ProjectGrantColumnProjectID.identifier() + " = " + UserGrantProjectID.identifier()).
 			LeftJoin(join(GrantedOrgColumnId, ProjectGrantColumnGrantedOrgID)).
 			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID)).
@@ -404,6 +437,8 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 				firstName          sql.NullString
 				userType           sql.NullInt32
 				userOwner          sql.NullString
+				userOwnerName      sql.NullString
+				userOwnerDomain    sql.NullString
 				lastName           sql.NullString
 				email              sql.NullString
 				displayName        sql.NullString
@@ -434,6 +469,8 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 				&username,
 				&userType,
 				&userOwner,
+				&userOwnerName,
+				&userOwnerDomain,
 				&firstName,
 				&lastName,
 				&email,
@@ -463,6 +500,8 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 			g.Username = username.String
 			g.UserType = domain.UserType(userType.Int32)
 			g.UserResourceOwner = userOwner.String
+			g.UserResourceOwnerName = userOwnerName.String
+			g.UserResourceOwnerDomain = userOwnerDomain.String
 			g.FirstName = firstName.String
 			g.LastName = lastName.String
 			g.Email = email.String
@@ -493,7 +532,9 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 			UserGrantUserID.identifier(),
 			UserUsernameCol.identifier(),
 			UserTypeCol.identifier(),
-			UserResourceOwnerCol.identifier(),
+			UserOrgColumnId.identifier(),
+			UserOrgColumnName.identifier(),
+			UserOrgColumnDomain.identifier(),
 			HumanFirstNameCol.identifier(),
 			HumanLastNameCol.identifier(),
 			HumanEmailCol.identifier(),
@@ -520,6 +561,7 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 			LeftJoin(join(HumanUserIDCol, UserGrantUserID)).
 			LeftJoin(join(OrgColumnID, UserGrantResourceOwner)).
 			LeftJoin(join(ProjectColumnID, UserGrantProjectID)).
+			LeftJoin(join(UserOrgColumnId, UserResourceOwnerCol)).
 			LeftJoin(join(ProjectGrantColumnGrantID, UserGrantGrantID) + " AND " + ProjectGrantColumnProjectID.identifier() + " = " + UserGrantProjectID.identifier()).
 			LeftJoin(join(GrantedOrgColumnId, ProjectGrantColumnGrantedOrgID)).
 			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID)).
@@ -536,6 +578,8 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 					username           sql.NullString
 					userType           sql.NullInt32
 					userOwner          sql.NullString
+					userOwnerName      sql.NullString
+					userOwnerDomain    sql.NullString
 					firstName          sql.NullString
 					lastName           sql.NullString
 					email              sql.NullString
@@ -567,6 +611,8 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 					&username,
 					&userType,
 					&userOwner,
+					&userOwnerName,
+					&userOwnerDomain,
 					&firstName,
 					&lastName,
 					&email,
@@ -595,6 +641,8 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 				g.Username = username.String
 				g.UserType = domain.UserType(userType.Int32)
 				g.UserResourceOwner = userOwner.String
+				g.UserResourceOwnerName = userOwnerName.String
+				g.UserResourceOwnerDomain = userOwnerDomain.String
 				g.FirstName = firstName.String
 				g.LastName = lastName.String
 				g.Email = email.String

@@ -1,0 +1,66 @@
+[
+  {
+    "service": "zitadel.settings.v2.SettingsService",
+    "method": "GetBrandingSettings",
+    "out": {
+      "data": {}
+    }
+  },
+  {
+    "service": "zitadel.settings.v2.SettingsService",
+    "method": "GetSecuritySettings",
+    "out": {
+      "data": {}
+    }
+  },
+  {
+    "service": "zitadel.settings.v2.SettingsService",
+    "method": "GetLegalAndSupportSettings",
+    "out": {
+      "data": {
+        "settings": {
+          "tosLink": "http://whatever.com/help",
+          "privacyPolicyLink": "http://whatever.com/help",
+          "helpLink": "http://whatever.com/help"
+        }
+      }
+    }
+  },
+  {
+    "service": "zitadel.settings.v2.SettingsService",
+    "method": "GetActiveIdentityProviders",
+    "out": {
+      "data": {
+        "identityProviders": [
+          {
+            "id": "123",
+            "name": "Hubba bubba",
+            "type": 10
+          }
+        ]
+      }
+    }
+  },
+  {
+    "service": "zitadel.settings.v2.SettingsService",
+    "method": "GetPasswordComplexitySettings",
+    "out": {
+      "data": {
+        "settings": {
+          "minLength": 8,
+          "requiresUppercase": true,
+          "requiresLowercase": true,
+          "requiresNumber": true,
+          "requiresSymbol": true
+        }
+      }
+    }
+  },
+  {
+    "service": "zitadel.settings.v2.SettingsService",
+    "method": "GetHostedLoginTranslation",
+    "out": {
+      "data": {}
+    }
+  }
+]

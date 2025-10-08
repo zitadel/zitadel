@@ -1,0 +1,333 @@
+{
+  "common": {
+    "back": "Back",
+    "title": "Login with Zitadel"
+  },
+  "accounts": {
+    "title": "Accounts",
+    "description": "Select the account you want to use.",
+    "addAnother": "Add another account",
+    "noResults": "No accounts found",
+    "verified": "verified",
+    "expired": "expired"
+  },
+  "logout": {
+    "title": "Logout",
+    "description": "Click an account to end the session",
+    "noResults": "No accounts found",
+    "clear": "End Session",
+    "verifiedAt": "Last active: {time}",
+    "success": {
+      "title": "Logout successful",
+      "description": "You have successfully logged out."
+    }
+  },
+  "loginname": {
+    "title": "Welcome back!",
+    "description": "Enter your login data.",
+    "register": "Register new user",
+    "submit": "Continue",
+    "labels": {
+      "loginname": "Loginname",
+      "username": "Username",
+      "usernameOrPhoneNumber": "Username or phone number",
+      "usernameOrEmail": "Username or email"
+    },
+    "required": {
+      "loginName": "This field is required"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "Password",
+      "description": "Enter your password.",
+      "resetPassword": "Reset Password",
+      "submit": "Continue",
+      "labels": {
+        "password": "Password"
+      },
+      "required": {
+        "password": "This field is required"
+      }
+    },
+    "set": {
+      "title": "Set Password",
+      "description": "Set the password for your account",
+      "codeSent": "A code has been sent to your email address.",
+      "noCodeReceived": "Didn't receive a code?",
+      "resend": "Resend code",
+      "submit": "Continue",
+      "labels": {
+        "code": "Code",
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm Password"
+      },
+      "required": {
+        "code": "This field is required",
+        "newPassword": "You have to provide a password!",
+        "confirmPassword": "This field is required"
+      }
+    },
+    "change": {
+      "title": "Change Password",
+      "description": "Set the password for your account",
+      "submit": "Continue",
+      "labels": {
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm Password"
+      },
+      "required": {
+        "newPassword": "You have to provide a new password!",
+        "confirmPassword": "This field is required"
+      }
+    }
+  },
+  "idp": {
+    "title": "Sign in with SSO",
+    "description": "Select one of the following providers to sign in",
+    "orSignInWith": "or sign in with",
+    "signInWithApple": "Sign in with Apple",
+    "signInWithGoogle": "Sign in with Google",
+    "signInWithAzureAD": "Sign in with AzureAD",
+    "signInWithGithub": "Sign in with GitHub",
+    "signInWithGitlab": "Sign in with GitLab",
+    "loginSuccess": {
+      "title": "Login successful",
+      "description": "You have successfully been loggedIn!"
+    },
+    "linkingSuccess": {
+      "title": "Account linked",
+      "description": "You have successfully linked your account!"
+    },
+    "registerSuccess": {
+      "title": "Registration successful",
+      "description": "You have successfully registered!"
+    },
+    "loginError": {
+      "title": "Login failed",
+      "description": "An error occurred while trying to login."
+    },
+    "linkingError": {
+      "title": "Account linking failed",
+      "description": "An error occurred while trying to link your account."
+    },
+    "completeRegister": {
+      "title": "Complete your data",
+      "description": "You need to complete your registration by providing your email address and name."
+    }
+  },
+  "ldap": {
+    "title": "LDAP Login",
+    "description": "Enter your LDAP credentials.",
+    "submit": "Continue",
+    "labels": {
+      "username": "Username",
+      "password": "Password"
+    },
+    "required": {
+      "username": "This field is required",
+      "password": "This field is required"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "Verify your identity",
+      "description": "Choose one of the following factors.",
+      "noResults": "No second factors available to setup."
+    },
+    "set": {
+      "title": "Set up 2-Factor",
+      "description": "Choose one of the following second factors.",
+      "skip": "Skip"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "Verify 2-Factor",
+      "totpDescription": "Enter the code from your authenticator app.",
+      "smsDescription": "Enter the code you received via SMS.",
+      "emailDescription": "Enter the code you received via email.",
+      "noCodeReceived": "Didn't receive a code?",
+      "resendCode": "Resend code",
+      "submit": "Continue",
+      "labels": {
+        "code": "Code"
+      },
+      "required": {
+        "code": "This field is required"
+      }
+    },
+    "set": {
+      "title": "Set up 2-Factor",
+      "totpDescription": "Scan the QR code with your authenticator app.",
+      "smsDescription": "Enter your phone number to receive a code via SMS.",
+      "emailDescription": "Enter your email address to receive a code via email.",
+      "totpRegisterDescription": "Scan the QR Code or navigate to the URL manually.",
+      "submit": "Continue",
+      "labels": {
+        "code": "Code"
+      },
+      "required": {
+        "code": "This field is required"
+      }
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "Authenticate with a passkey",
+      "description": "Your device will ask for your fingerprint, face, or screen lock",
+      "usePassword": "Use password",
+      "submit": "Continue"
+    },
+    "set": {
+      "title": "Setup a passkey",
+      "description": "Your device will ask for your fingerprint, face, or screen lock",
+      "info": {
+        "description": "A passkey is an authentication method on a device like your fingerprint, Apple FaceID or similar. ",
+        "link": "Passwordless Authentication"
+      },
+      "skip": "Skip",
+      "submit": "Continue"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "Verify 2-Factor",
+      "description": "Verify your account with your device."
+    },
+    "set": {
+      "title": "Set up 2-Factor",
+      "description": "Set up a device as a second factor.",
+      "submit": "Continue"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "Passkey",
+      "password": "Password"
+    },
+    "disabled": {
+      "title": "Registration disabled",
+      "description": "The registration is disabled. Please contact your administrator."
+    },
+    "missingdata": {
+      "title": "Missing data",
+      "description": "Provide email, first and last name to register."
+    },
+    "title": "Register",
+    "description": "Create your ZITADEL account.",
+    "noMethodAvailableWarning": "No authentication method available. Please contact your administrator.",
+    "selectMethod": "Select the method you would like to authenticate",
+    "agreeTo": "To register you must agree to the terms and conditions",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "submit": "Continue",
+    "password": {
+      "title": "Set Password",
+      "description": "Set the password for your account",
+      "submit": "Continue",
+      "labels": {
+        "password": "Password",
+        "confirmPassword": "Confirm Password"
+      },
+      "required": {
+        "password": "You have to provide a password!",
+        "confirmPassword": "This field is required"
+      }
+    },
+    "labels": {
+      "firstname": "First name",
+      "lastname": "Last name",
+      "email": "E-mail"
+    },
+    "required": {
+      "firstname": "This field is required",
+      "lastname": "This field is required",
+      "email": "This field is required"
+    }
+  },
+  "invite": {
+    "title": "Invite User",
+    "description": "Provide the email address and the name of the user you want to invite.",
+    "info": "The user will receive an email with further instructions.",
+    "notAllowed": "Your settings do not allow you to invite users.",
+    "submit": "Continue",
+    "success": {
+      "title": "User invited",
+      "description": "The email has successfully been sent.",
+      "verified": "The user has been invited and has already verified his email.",
+      "notVerifiedYet": "The user has been invited. They will receive an email with further instructions.",
+      "submit": "Invite another user"
+    }
+  },
+  "signedin": {
+    "title": "Welcome {user}!",
+    "description": "You are signed in.",
+    "continue": "Continue",
+    "error": {
+      "title": "Error",
+      "description": "An error occurred while trying to sign in."
+    }
+  },
+  "verify": {
+    "userIdMissing": "No userId provided!",
+    "successTitle": "User verified",
+    "successDescription": "The user has been verified successfully.",
+    "setupAuthenticator": "Setup authenticator",
+    "verify": {
+      "title": "Verify user",
+      "description": "Enter the Code provided in the verification email.",
+      "noCodeReceived": "Didn't receive a code?",
+      "resendCode": "Resend code",
+      "codeSent": "A code has just been sent to your email address.",
+      "submit": "Continue",
+      "labels": {
+        "code": "Code"
+      },
+      "required": {
+        "code": "This field is required"
+      }
+    }
+  },
+  "authenticator": {
+    "title": "Choose authentication method",
+    "description": "Select the method you would like to authenticate",
+    "noMethodsAvailable": "No authentication methods available",
+    "allSetup": "You have already setup an authenticator!",
+    "linkWithIDP": "or link with an Identity Provider"
+  },
+  "device": {
+    "usercode": {
+      "title": "Device code",
+      "description": "Enter the code displayed on your app or device.",
+      "submit": "Continue",
+      "labels": {
+        "code": "Code"
+      },
+      "required": {
+        "code": "This field is required"
+      }
+    },
+    "request": {
+      "title": "{appName} would like to connect",
+      "description": "{appName} will have access to:",
+      "disclaimer": "By clicking Allow, you allow {appName} and Zitadel to use your information in accordance with their respective terms of service and privacy policies. You can revoke this access at any time.",
+      "submit": "Allow",
+      "deny": "Deny"
+    },
+    "scope": {
+      "openid": "Verify your identity.",
+      "email": "View your email address.",
+      "profile": "View your full profile information.",
+      "offline_access": "Allow offline access to your account."
+    }
+  },
+  "error": {
+    "noUserCode": "No user code provided!",
+    "noDeviceRequest": "No device request found.",
+    "unknownContext": "Could not get the context of the user. Make sure to enter the username first or provide a loginName as searchParam.",
+    "sessionExpired": "Your current session has expired. Please login again.",
+    "failedLoading": "Failed to load data. Please try again.",
+    "tryagain": "Try Again"
+  }
+}

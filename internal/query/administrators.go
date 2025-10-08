@@ -165,12 +165,13 @@ func administratorProjectGrantCheckPermission(ctx context.Context, resourceOwner
 }
 
 func (q *Queries) SearchAdministrators(ctx context.Context, queries *MembershipSearchQuery, permissionCheck domain.PermissionCheck) (*Administrators, error) {
-	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
-	admins, err := q.searchAdministrators(ctx, queries, permissionCheckV2)
+	// removed as permission v2 is not implemented yet for project grant level permissions
+	// permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	admins, err := q.searchAdministrators(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}
-	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
+	if permissionCheck != nil { // && !authz.GetFeatures(ctx).PermissionCheckV2 {
 		administratorsCheckPermission(ctx, admins, permissionCheck)
 	}
 	return admins, nil
@@ -184,7 +185,7 @@ func (q *Queries) searchAdministrators(ctx context.Context, queries *MembershipS
 	eq := sq.Eq{membershipInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-TODO", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-xhEnpLFNpJ", "Errors.Query.InvalidRequest")
 	}
 	latestState, err := q.latestState(ctx, orgMemberTable, instanceMemberTable, projectMemberTable, projectGrantMemberTable)
 	if err != nil {
@@ -334,7 +335,7 @@ func prepareAdministratorsQuery(ctx context.Context, queries *MembershipSearchQu
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, zerrors.ThrowInternal(err, "QUERY-TODO", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-ajYcn0eK7f", "Errors.Query.CloseRows")
 			}
 
 			return &Administrators{

@@ -180,7 +180,7 @@ Your contributions will play a crucial role in shaping the future of our login s
 
 #### Step-by-step Guide
 
-**Trying out the new login:** To preview the new login without changing your current setup, the easiest way is to visit `https://<YOUR_ZITADEL_INSTANCE_DOMAIN>/ui/v2/login` on your Zitadel Cloud instance domain. You can also activate the v2 login for your apps, so users are redirected to `/ui/v2/login` for authentication.
+**Trying out the new login:** To preview the new login without changing your current setup, the easiest way is to visit `https://<CUSTOM_DOMAIN>/ui/v2/login` on your Zitadel Cloud custom domain. You can also activate the v2 login for your apps, so users are redirected to `/ui/v2/login` for authentication.
 
 **Customizing the new login:** The easiest way to actually customizing it is to fork the https://github.com/zitadel/typescript repo and use the "Deploy" button to run your code on Vercel.
 
@@ -202,7 +202,7 @@ Your contributions will play a crucial role in shaping the future of our login s
         The simplest way to deploy the new login for yourself is by using the [“Deploy” button in our repository](https://github.com/zitadel/typescript?tab=readme-ov-file#deploy-to-vercel) to deploy the login directly to your Vercel.
 
         1. [Create a service user](https://zitadel.com/docs/guides/integrate/service-users/personal-access-token#create-a-service-user-with-a-pat) with a PAT in your instance
-        2. Give the user IAM_LOGIN_CLIENT Permissions in the default settings (YOUR_DOMAIN/ui/console/instance?id=organizations)
+        2. Give the user IAM_LOGIN_CLIENT Permissions in the default settings (CUSTOM_DOMAIN/ui/console/instance?id=organizations)
         Note: [Zitadel Manager Guide](https://zitadel.com/docs/guides/manage/console/managers)
         3. Deploy login to Vercel: You can do so by directly clicking the [“Deploy” button](https://github.com/zitadel/typescript?tab=readme-ov-file#deploy-to-vercel) at the bottom of the readme in our [repository](https://github.com/zitadel/typescript)
         4. If you have used the deploy button in the steps before, you will automatically be asked for this step. Enter the environment variables in Vercel
@@ -226,7 +226,7 @@ Your contributions will play a crucial role in shaping the future of our login s
 As this feature is currently in Beta, please be aware of some potential workarounds and important considerations before implementation.
 
 - **Create Users:** The new typescript login is built with the session and the user V2 API, the users V2 API does have some differences to the v1 API, so make sure you create users through the new API.
-- **External IDPs:** If you want to use external identity provider login, such as Login with Google or Apple. You can follow our existing setup guides, just make sure to use the following redirect url: $YOUR-DOMAIN/idps/callback
+- **External IDPs:** If you want to use external identity provider login, such as Login with Google or Apple. You can follow our existing setup guides, just make sure to use the following redirect url: `${CUSTOM_DOMAIN}/idps/callback`
 - **Passkey/U2F:** Those authentication methods are bound to a domain. As your new login runs on a different domain than the previous login, existing passwordless authentication and u2f (fingerprint, face id, etc.) can’t be used. Also when they are managed through the management console of ZITADEL, they are added on a different domain.
   <br />
   *Note: If you run the login on a subdomain of your current instance, this problem

@@ -28,7 +28,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 
 	// We also need a user session
 	Instance.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, userID)
 
 	type args struct {
 		ctx context.Context

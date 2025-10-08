@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
@@ -90,7 +89,7 @@ func Test_ZITADEL_API_missing_audience_scope(t *testing.T) {
 func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 	clientID, _ := createClient(t, Instance)
 	authRequestID := createAuthRequest(t, Instance, clientID, redirectURI, oidc.ScopeOpenID, zitadelAudienceScope)
-	createResp, err := Instance.Client.SessionV2.CreateSession(CTX, &session.CreateSessionRequest{
+	createResp, err := Instance.Client.SessionV2.CreateSession(CTXLOGIN, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
 				Search: &session.CheckUser_UserId{UserId: User.GetUserId()},
@@ -123,7 +122,7 @@ func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 
 func Test_ZITADEL_API_missing_mfa_policy(t *testing.T) {
 	clientID, _ := createClient(t, Instance)
-	org := Instance.CreateOrganization(CTXIAM, fmt.Sprintf("ZITADEL_API_MISSING_MFA_%s", gofakeit.AppName()), gofakeit.Email())
+	org := Instance.CreateOrganization(CTXIAM, integration.OrganizationName(), integration.Email())
 	userID := org.CreatedAdmins[0].GetUserId()
 	Instance.SetUserPassword(CTXIAM, userID, integration.UserPassword, false)
 	authRequestID := createAuthRequest(t, Instance, clientID, redirectURI, oidc.ScopeOpenID, zitadelAudienceScope)
@@ -311,7 +310,7 @@ func Test_ZITADEL_API_terminated_session(t *testing.T) {
 	require.Equal(t, User.GetUserId(), myUserResp.GetUser().GetId())
 
 	// end session
-	postLogoutRedirect, err := rp.EndSession(CTX, provider, tokens.IDToken, logoutRedirectURI, "state")
+	postLogoutRedirect, err := rp.EndSession(CTX, provider, tokens.IDToken, logoutRedirectURI, "state", "", nil)
 	require.NoError(t, err)
 	assert.Equal(t, logoutRedirectURI+"?state=state", postLogoutRedirect.String())
 
@@ -421,7 +420,7 @@ type clientOpts struct {
 func createClientWithOpts(t testing.TB, instance *integration.Instance, opts clientOpts) (clientID, projectID string) {
 	ctx := instance.WithAuthorization(CTX, integration.UserTypeOrgOwner)
 
-	project := instance.CreateProject(ctx, t.(*testing.T), "", gofakeit.AppName(), false, false)
+	project := instance.CreateProject(ctx, t.(*testing.T), "", integration.ProjectName(), false, false)
 	app, err := instance.CreateOIDCClientLoginVersion(ctx, opts.redirectURI, opts.logoutURI, project.GetId(), app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, opts.devMode, opts.LoginVersion)
 	require.NoError(t, err)
 	return app.GetClientId(), project.GetId()

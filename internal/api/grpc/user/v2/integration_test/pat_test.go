@@ -4,12 +4,10 @@ package user_test
 
 import (
 	"context"
-	"fmt"
 	"slices"
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -64,7 +62,7 @@ func TestServer_AddPersonalAccessToken(t *testing.T) {
 					ExpirationDate: expirationDate,
 				},
 				func(request *user.AddPersonalAccessTokenRequest) error {
-					resp := Instance.CreateUserTypeHuman(IamCTX, gofakeit.Email())
+					resp := Instance.CreateUserTypeHuman(IamCTX, integration.Email())
 					request.UserId = resp.Id
 					return nil
 				},
@@ -110,12 +108,12 @@ func TestServer_AddPersonalAccessToken(t *testing.T) {
 
 func TestServer_AddPersonalAccessToken_Permission(t *testing.T) {
 	OrgCTX := CTX
-	otherOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddPersonalAccessToken-%s", gofakeit.AppName()), gofakeit.Email())
+	otherOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 	otherOrgUser, err := Client.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
 		UserType: &user.CreateUserRequest_Machine_{
 			Machine: &user.CreateUserRequest_Machine{
-				Name: gofakeit.Name(),
+				Name: integration.Username(),
 			},
 		},
 	})
@@ -249,12 +247,12 @@ func TestServer_RemovePersonalAccessToken(t *testing.T) {
 }
 
 func TestServer_RemovePersonalAccessToken_Permission(t *testing.T) {
-	otherOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("RemovePersonalAccessToken-%s", gofakeit.AppName()), gofakeit.Email())
+	otherOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 	otherOrgUser, err := Client.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
 		UserType: &user.CreateUserRequest_Machine_{
 			Machine: &user.CreateUserRequest_Machine{
-				Name: gofakeit.Name(),
+				Name: integration.Username(),
 			},
 		},
 	})
@@ -328,12 +326,12 @@ func TestServer_ListPersonalAccessTokens(t *testing.T) {
 		want *user.ListPersonalAccessTokensResponse
 	}
 	OrgCTX := CTX
-	otherOrg := Instance.CreateOrganization(SystemCTX, fmt.Sprintf("ListPersonalAccessTokens-%s", gofakeit.AppName()), gofakeit.Email())
+	otherOrg := Instance.CreateOrganization(SystemCTX, integration.OrganizationName(), integration.Email())
 	otherOrgUser, err := Client.CreateUser(SystemCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
 		UserType: &user.CreateUserRequest_Machine_{
 			Machine: &user.CreateUserRequest_Machine{
-				Name: gofakeit.Name(),
+				Name: integration.Username(),
 			},
 		},
 	})

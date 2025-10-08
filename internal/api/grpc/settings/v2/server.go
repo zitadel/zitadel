@@ -19,8 +19,9 @@ import (
 var _ settingsconnect.SettingsServiceHandler = (*Server)(nil)
 
 type Server struct {
-	command         *command.Commands
-	query           *query.Queries
+	command *command.Commands
+	query   *query.Queries
+
 	assetsAPIDomain func(context.Context) string
 }
 

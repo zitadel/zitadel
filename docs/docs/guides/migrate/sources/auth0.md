@@ -1,17 +1,38 @@
 ---
-title: Migrate from Auth0 to ZITADEL
+title: Migrate from Auth0 to ZITADEL (Including Password Hashes)
 sidebar_label: From Auth0
 ---
 
-Migrating users from Auth0 to ZITADEL requires the following steps:
+## 1. Introduction
 
-- Request and download hashed passwords
-- Export all user data
-- Run migration tool to merge Auth0 users and passwords
-- Import users and password hashes to ZITADEL
+This guide will walk you through the steps to migrate users from Auth0 to ZITADEL, including password hashes (which requires Auth0's support assistance), so users don't need to reset their passwords.
 
-## Export hashed passwords
+**What you'll learn with this guide**
+- How to prepare your data from Auth0
+- Use of the ZITADEL migration tooling
+- Performing the user import via ZITADEL's API
+- Troubleshooting and validating the migration
 
+---
+
+## 2. Prerequisites
+
+### 2.1. Install Go
+The migration tool is written in Go. Download and install the latest version of Go from the [official Go website](https://go.dev/doc/install).
+
+### 2.2. Create a ZITADEL Instance and Organization
+You'll need a target organization in ZITADEL to import your users. You can create a new organization or use an existing one.  
+
+If you don't have a ZITADEL instance, you can [sign up for free here](https://zitadel.com) to create a new one for you.  
+See: [Managing Organizations in ZITADEL](https://zitadel.com/docs/guides/manage/console/organizations).
+
+> **Note:** Copy your Organization ID (Resource ID) since you will use the id in the later steps.
+
+---
+
+## 3. Preparing Auth0 Data
+
+### 3.1. Export hashed passwords
 Auth0 does not export hashed passwords as part of the bulk user export.
 You must create a support ticket to download password hashes and password-related information.
 Please also refer to the Auth0 guide on how to [Export Data](https://auth0.com/docs/troubleshoot/customer-support/manage-subscriptions/export-data#user-passwords).
@@ -30,12 +51,13 @@ Users will be prompted to create a new password after they login for the first t
 You will receive a JSON file including the password hashes.
 See this [community post](https://community.auth0.com/t/password-hashes-export-data-format/58730) for more information about the contents and format.
 
-## Export all user data
+Reference: [Export hashed passwords from Auth0](https://zitadel.com/docs/guides/migrate/sources/auth0#export-hashed-passwords)
 
-Create a [bulk user export](https://auth0.com/docs/manage-users/user-migration/bulk-user-exports) from the Auth0 Management API.
+### 3.2. Export all user data
+Create a [bulk user export](https://auth0.com/docs/manage-users/user-migration/bulk-user-exports) from the Auth0 Management API, or use the [User Import/Export extension](https://auth0.com/docs/manage-users/user-migration/user-import-export-extension).
 You will receive a newline-delimited JSON with the requested user data.
 
-This is an example request, we have included the user id, the email and the name of the user. Make sure to export the users in a json format.
+This is an example request, we have included the user id, the email and the name of the user, but you can also export all the available user profile attributes. Make sure to export the users in a json format.
 
 ```bash
 curl --request POST \
@@ -53,19 +75,145 @@ curl --request POST \
 }'
 ```
 
-## Run Migration Tool
+---
 
+## 4. Running the ZITADEL Migration Tool
 We have developed a tool that combines your exported user data with their corresponding passwords to generate the import request body for ZITADEL.
 
-1. Download the latest release of [github.com/zitadel/zitadel-tools](https://github.com/zitadel/zitadel-tools/releases)
-2. Execute the binary with the following flags:
- ```bash
- ./zitadel-tools migrate auth0 --org=<organisation id> --users=./users.json --passwords=./passwords.json --output=./importBody.json
- ```
- Use the Organization ID from your ZITADEL instance where you like to add the users.
-3. You will now get a new file importBody.json which contains the body for the request to the import of ZITADEL
+### 4.1. Install the Migration Tool
+Follow the installation instructions to set up the ZITADEL migration tool from [ZITADEL Tools](https://github.com/zitadel/zitadel-tools?tab=readme-ov-file#installation).
 
-## Import users and password hashes to ZITADEL
+### 4.2. Generate Import JSON
+Use the migration tool to convert the Auth0 export file to a ZITADEL-compatible JSON.
+Step-by-step instructions can be found here: [Migration Tool for Auth0](https://github.com/zitadel/zitadel-tools/blob/main/cmd/migration/auth0/readme.md)
 
-Copy the content from the importBody.json file created in the last step.
-You can now follow the instructions described in the [Migrate Users](../users) guide to import users to ZITADEL.
+Typical steps:
+- Run the migration tool with your exported Auth0 files as input.
+- The tool generates a JSON file ready for import into ZITADEL.
+
+Example:
+After obtaining the 2 required input files (passwords and profile) in JSON lines format, you can run the following command:
+
+Sample `passwords.ndjson` content, as obtained from the Auth0 Support team:
+```json
+{"_id":{"$oid":"emxdpVxozXeFb1HeEn5ThAK8"},"email_verified":true,"email":"tommie_krajcik85@hotmail.com","passwordHash":"$2b$10$d.GvZhGwTllA7OdAmsA75uGGzqr/mhdQoU88M3zD.fX3Vb8Rcf33.","password_set_date":{"$date":"2025-06-30T00:00:00.000Z"},"tenant":"test","connection":"Username-Password-Authentication","_tmp_is_unique":true}
+```
+
+Sample `profiles.json` content, as obtained from the Auth0 Management API:
+```json
+{"user_id":"auth0|emxdpVxozXeFb1HeEn5ThAK8","email_verified":true,"name":"Tommie Krajcik","email":"tommie_krajcik85@hotmail.com"}
+```
+
+Run the following command in your terminal (replace ORG_ID with your own organization ID):
+```bash
+zitadel-tools migrate auth0 --org=<ORG_ID> --users=./profiles.json --passwords=./passwords.ndjson --multiline --email-verified --output=./importBody.json --timeout=5m0s
+```
+
+The tool will merge both objects into a single one in the importBody.json output, this will be used in the next step to complete the import process.
+
+---
+
+## 5. Importing Users into ZITADEL
+
+### 5.1. Obtain Access Token (or PAT) for API Access
+
+To call the ZITADEL Admin API, you need to authenticate using a **Service User** with the `IAM_OWNER` Manager permissions.
+
+There are two recommended authentication methods:
+
+- **Client Credentials Flow**  
+  [Learn how to authenticate with client credentials.](https://zitadel.com/docs/guides/integrate/service-users/client-credentials)
+
+- **Personal Access Token (PAT)**  
+  [Learn how to create and use a PAT.](https://zitadel.com/docs/guides/integrate/service-users/authenticate-service-users#personal-access-token)
+
+**Reference:** [Service Users & API Authentication](https://zitadel.com/docs/guides/integrate/service-users/authenticate-service-users#authentication-methods)
+
+### 5.2. Import Data with the ZITADEL API
+
+- Use your **access token** or **PAT** to authorize the request.
+- Call the [Admin API – Import Data](https://zitadel.com/docs/apis/resources/admin/admin-service-import-data) endpoint, passing your generated JSON file.
+- Verify that the users were imported successfully in the ZITADEL console.
+
+**Import Endpoint:**
+
+- `POST /admin/v1/import`
+- `Authorization: Bearer <token>`
+- **Body:** Generated in step 4.2
+
+#### Example cURL request
+
+```bash
+curl --location 'https://<instance-domain>/admin/v1/import' \
+--header 'Content-Type: application/json' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer <access-token>' \
+--data-raw '{
+  "dataOrgs": {
+    "orgs": [
+      {
+        "orgId": "<your-org-id>",
+        "humanUsers": [
+          {
+            "userId": "auth0|emxdpVxozXeFb1HeEn5ThAK8",
+            "user": {
+              "userName": "tommie_krajcik85@hotmail.com",
+              "profile": {
+                "firstName": "Tommie Krajcik",
+                "lastName": "Tommie Krajcik"
+              },
+              "email": {
+                "email": "tommie_krajcik85@hotmail.com",
+                "isEmailVerified": true
+              },
+              "hashedPassword": {
+                "value": "$2b$10$d.GvZhGwTllA7OdAmsA75uGGzqr/mhdQoU88M3zD.fX3Vb8Rcf33."
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "timeout": "5m0s"
+}'
+```
+
+---
+
+## 6. Testing the Migration
+
+### 6.1. Test User Login
+
+Use the **ZITADEL login page** or your integrated app to test logging in with one of the imported users.
+
+> **Password for the sample user:** `Password1!`
+
+Confirm that the migrated password works as expected.
+
+### 6.2. Troubleshooting
+
+**Common issues:**
+
+- Missing password hashes  
+- Malformed JSON  
+- Invalid or incomplete user data  
+
+The import endpoint returns an `errors` array which can help you identify any issues with the import.
+
+#### Where to check logs and get help
+
+You can also verify that a user was imported by calling the **events endpoint** and checking for the following event type:
+
+```json
+"user.human.added"
+```
+
+---
+
+## 7. Q&A and Further Resources
+
+**Q:** What is the maximum number of users that can be imported in a single batch?  
+**A:** There is no hard limit on the number of users. However, there is a **timeout**.  
+For **ZITADEL Cloud deployments**, the timeout is **5 minutes**, which typically allows for importing around **5,000 users per batch**.
+

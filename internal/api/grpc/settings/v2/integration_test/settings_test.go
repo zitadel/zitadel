@@ -35,7 +35,7 @@ func TestServer_SetSecuritySettings(t *testing.T) {
 		{
 			name: "permission error",
 			args: args{
-				ctx: Instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				ctx: Instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				req: &settings.SetSecuritySettingsRequest{
 					EmbeddedIframe: &settings.EmbeddedIframeSettings{
 						Enabled:        true,

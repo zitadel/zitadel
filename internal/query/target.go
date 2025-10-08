@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -79,7 +80,7 @@ type Target struct {
 	domain.ObjectDetails
 
 	Name             string
-	TargetType       domain.TargetType
+	TargetType       target_domain.TargetType
 	Endpoint         string
 	Timeout          time.Duration
 	InterruptOnError bool

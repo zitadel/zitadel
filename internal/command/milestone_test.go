@@ -627,3 +627,84 @@ func TestCommands_applicationCreatedMilestone(t *testing.T) {
 func (c *Commands) setMilestonesCompletedForTest(instanceID string) {
 	c.milestonesCompleted.Store(instanceID, struct{}{})
 }
+
+func TestSAMLSessionEvents_SetMilestones(t *testing.T) {
+	ctx := authz.WithInstanceID(context.Background(), "instanceID")
+	aggregate := milestone.NewAggregate(ctx)
+
+	type fields struct {
+		eventstore func(*testing.T) *eventstore.Eventstore
+	}
+	tests := []struct {
+		name       string
+		fields     fields
+		wantEvents []eventstore.Command
+		wantErr    error
+	}{
+		{
+			name: "get error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilterError(io.ErrClosedPipe),
+				),
+			},
+			wantErr: io.ErrClosedPipe,
+		},
+		{
+			name: "auth on instance, auth on application",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			wantEvents: []eventstore.Command{
+				milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnInstance),
+				milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnApplication),
+			},
+			wantErr: nil,
+		},
+		{
+			name: "auth on app with a previous auth on instance",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnInstance)),
+					),
+				),
+			},
+			wantEvents: []eventstore.Command{
+				milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnApplication),
+			},
+			wantErr: nil,
+		},
+		{
+			name: "milestones already reached",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnInstance)),
+						eventFromEventPusher(milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnApplication)),
+					),
+				),
+			},
+			wantErr: nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore: tt.fields.eventstore(t),
+				caches: &Caches{
+					milestones: noop.NewCache[milestoneIndex, string, *MilestonesReached](),
+				},
+			}
+			s := &SAMLSessionEvents{
+				commands: c,
+			}
+			postCommit, err := s.SetMilestones(ctx)
+			postCommit(ctx)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantEvents, s.events)
+		})
+	}
+}

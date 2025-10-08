@@ -200,12 +200,13 @@ func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, granted
 }
 
 func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrantSearchQueries, permissionCheck domain.PermissionCheck) (grants *ProjectGrants, err error) {
-	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
-	projectsGrants, err := q.searchProjectGrants(ctx, queries, permissionCheckV2)
+	// removed as permission v2 is not implemented yet for project grant level permissions
+	// permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	projectsGrants, err := q.searchProjectGrants(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}
-	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
+	if permissionCheck != nil { // && !authz.GetFeatures(ctx).PermissionCheckV2 {
 		projectGrantsCheckPermission(ctx, projectsGrants, permissionCheck)
 	}
 	return projectsGrants, nil

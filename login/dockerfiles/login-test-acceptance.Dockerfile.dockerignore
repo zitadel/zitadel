@@ -1,5 +1,0 @@
-*
-!/apps/login-test-acceptance/*.json
-!/apps/login-test-acceptance/*.ts
-!/apps/login-test-acceptance/zitadel.yaml
-!/apps/login-test-acceptance/tests

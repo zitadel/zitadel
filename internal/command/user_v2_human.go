@@ -138,7 +138,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 	}
 	// check for permission to create user on resourceOwner
 	if !human.Register {
-		if err := c.checkPermissionUpdateUser(ctx, resourceOwner, human.ID); err != nil {
+		if err := c.checkPermissionUpdateUser(ctx, resourceOwner, human.ID, true); err != nil {
 			return err
 		}
 	}
@@ -165,6 +165,11 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 		return err
 	}
 
+	organizationScopedUsername, err := c.checkOrganizationScopedUsernames(ctx, resourceOwner)
+	if err != nil {
+		return err
+	}
+
 	var createCmd humanCreationCommand
 	if human.Register {
 		createCmd = user.NewHumanRegisteredEvent(
@@ -178,7 +183,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 			human.PreferredLanguage,
 			human.Gender,
 			human.Email.Address,
-			domainPolicy.UserLoginMustBeDomain,
+			domainPolicy.UserLoginMustBeDomain || organizationScopedUsername,
 			human.UserAgentID,
 		)
 	} else {
@@ -193,7 +198,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 			human.PreferredLanguage,
 			human.Gender,
 			human.Email.Address,
-			domainPolicy.UserLoginMustBeDomain,
+			domainPolicy.UserLoginMustBeDomain || organizationScopedUsername,
 		)
 	}
 
@@ -274,6 +279,7 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg 
 		return err
 	}
 
+	metadataChanged := len(human.Metadata) > 0 || len(human.MetadataKeysToRemove) > 0
 	existingHuman, err := c.UserHumanWriteModel(
 		ctx,
 		human.ID,
@@ -284,14 +290,14 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg 
 		human.Password != nil,
 		false, // avatar not updateable
 		false, // IDPLinks not updateable
-		len(human.Metadata) > 0 || len(human.MetadataKeysToRemove) > 0,
+		metadataChanged,
 	)
 	if err != nil {
 		return err
 	}
 
 	if human.Changed() {
-		if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
+		if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID, !metadataChanged); err != nil {
 			return err
 		}
 	}
@@ -406,6 +412,10 @@ func (c *Commands) changeUserEmail(ctx context.Context, cmds []eventstore.Comman
 			if err != nil {
 				return cmds, code, err
 			}
+			if email.URLTemplate == "" {
+				email.URLTemplate = c.defaultEmailCodeURLTemplate(ctx)
+			}
+
 			cmds = append(cmds, user.NewHumanEmailCodeAddedEventV2(ctx, &wm.Aggregate().Aggregate, cryptoCode.Crypted, cryptoCode.Expiry, email.URLTemplate, email.ReturnCode, ""))
 			if email.ReturnCode {
 				code = &cryptoCode.Plain
@@ -513,7 +523,7 @@ func (c *Commands) HumanMFAInitSkippedV2(ctx context.Context, userID string) (*d
 	if !isUserStateExists(existingHuman.UserState) {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-auj6jeBei4", "Errors.User.NotFound")
 	}
-	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
+	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID, true); err != nil {
 		return nil, err
 	}
 

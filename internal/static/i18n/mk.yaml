@@ -193,7 +193,7 @@ Errors:
     AlreadyExists: Инстанцата веќе постои
     NotChanged: Инстанцата не е променета
   Org:
-    AlreadyExists: Името на организацијата е веќе зафатено
+    AlreadyExists: Името или ID-то на организацијата е веќе зафатено
     Invalid: Организацијата е невалидна
     AlreadyDeactivated: Организацијата е веќе деактивирана
     AlreadyActive: Организацијата е веќе активна

@@ -1,34 +1,34 @@
-<ng-container *ngIf="user$ | async as userQuery">
+<ng-container>
   <cnsl-top-view
-    title="{{ userName$ | async }}"
-    sub="{{ user(userQuery)?.preferredLoginName }}"
-    [isActive]="user(userQuery)?.state === UserState.ACTIVE"
-    [isInactive]="user(userQuery)?.state === UserState.INACTIVE"
-    stateTooltip="{{ 'USER.STATE.' + user(userQuery)?.state | translate }}"
+    [title]="userName()"
+    sub="{{ user.data()?.preferredLoginName }}"
+    [isActive]="user.data()?.state === UserState.ACTIVE"
+    [isInactive]="user.data()?.state === UserState.INACTIVE"
+    stateTooltip="{{ 'USER.STATE.' + user.data()?.state | translate }}"
     [hasBackButton]="['org.read'] | hasRole | async"
   >
     <cnsl-info-row
       topContent
-      *ngIf="user(userQuery) as user"
+      *ngIf="user.data() as user"
       [user]="user"
       [loginPolicy]="(loginPolicy$ | async) ?? undefined"
-    ></cnsl-info-row>
+    />
   </cnsl-top-view>
 
-  <div *ngIf="(user$ | async)?.state === 'loading'" class="max-width-container">
+  <div *ngIf="user.isLoading()" class="max-width-container">
     <div class="user-spinner-wrapper">
       <mat-progress-spinner diameter="25" color="primary" mode="indeterminate"></mat-progress-spinner>
     </div>
   </div>
 
   <div class="max-width-container">
-    <cnsl-meta-layout *ngIf="user(userQuery) as user">
+    <cnsl-meta-layout *ngIf="user.data() as user">
       <cnsl-sidenav
         [setting]="currentSetting$()"
         (settingChange)="currentSetting$.set($event)"
         [settingsList]="settingsList"
       >
-        <ng-container *ngIf="currentSetting$().id === 'general' && humanUser(userQuery) as humanUser">
+        <ng-container *ngIf="currentSetting$().id === 'general' && humanUser(user) as humanUser">
           <cnsl-card
             *ngIf="humanUser.type.value.profile as profile"
             class="app-card"
@@ -45,7 +45,7 @@
               (changedLanguage)="changedLanguage($event)"
               (changeUsernameClicked)="changeUsername(user)"
               (submitData)="saveProfile(user, $event)"
-              (avatarChanged)="refreshChanges$.emit()"
+              (avatarChanged)="invalidateUser()"
             >
             </cnsl-detail-form>
           </cnsl-card>
@@ -58,7 +58,7 @@
               class="icon-button"
               card-actions
               mat-icon-button
-              (click)="refreshChanges$.emit()"
+              (click)="invalidateUser()"
               matTooltip="{{ 'ACTIONS.REFRESH' | translate }}"
             >
               <mat-icon class="icon">refresh</mat-icon>
@@ -94,7 +94,7 @@
         </ng-container>
 
         <ng-container *ngIf="currentSetting$().id === 'security'">
-          <cnsl-card *ngIf="humanUser(userQuery) as humanUser" title="{{ 'USER.PASSWORD.TITLE' | translate }}">
+          <cnsl-card *ngIf="humanUser(user) as humanUser" title="{{ 'USER.PASSWORD.TITLE' | translate }}">
             <div class="contact-method-col">
               <div class="contact-method-row">
                 <div class="left">
@@ -121,7 +121,7 @@
           <cnsl-auth-passwordless #mfaComponent></cnsl-auth-passwordless>
 
           <cnsl-auth-user-mfa
-            [phoneVerified]="humanUser(userQuery)?.type?.value?.phone?.isVerified ?? false"
+            [phoneVerified]="humanUser(user)?.type?.value?.phone?.isVerified ?? false"
           ></cnsl-auth-user-mfa>
         </ng-container>
 
@@ -170,7 +170,7 @@
       </cnsl-sidenav>
 
       <div metainfo>
-        <cnsl-changes class="changes" [refresh]="refreshChanges$" [changeType]="ChangeType.MYUSER"> </cnsl-changes>
+        <cnsl-changes class="changes" [refresh]="refreshChanges$" [changeType]="ChangeType.MYUSER" />
       </div>
     </cnsl-meta-layout>
   </div>

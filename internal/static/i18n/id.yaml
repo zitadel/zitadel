@@ -194,7 +194,7 @@ Errors:
     AlreadyExists: Contoh sudah ada
     NotChanged: Contoh tidak berubah
   Org:
-    AlreadyExists: Nama organisasi sudah dipakai
+    AlreadyExists: Nama atau ID organisasi sudah digunakan
     Invalid: Organisasi tidak valid
     AlreadyDeactivated: Organisasi sudah dinonaktifkan
     AlreadyActive: Organisasi sudah aktif

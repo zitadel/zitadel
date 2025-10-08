@@ -101,8 +101,6 @@ func improvedPerformanceTypeToPb(typ feature.ImprovedPerformanceType) feature_pb
 	switch typ {
 	case feature.ImprovedPerformanceTypeUnspecified:
 		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_UNSPECIFIED
-	case feature.ImprovedPerformanceTypeOrgByID:
-		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID
 	case feature.ImprovedPerformanceTypeProjectGrant:
 		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_PROJECT_GRANT
 	case feature.ImprovedPerformanceTypeProject:
@@ -133,8 +131,6 @@ func improvedPerformanceToDomain(typ feature_pb.ImprovedPerformance) feature.Imp
 	switch typ {
 	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_UNSPECIFIED:
 		return feature.ImprovedPerformanceTypeUnspecified
-	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID:
-		return feature.ImprovedPerformanceTypeOrgByID
 	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_PROJECT_GRANT:
 		return feature.ImprovedPerformanceTypeProjectGrant
 	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_PROJECT:

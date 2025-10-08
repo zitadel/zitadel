@@ -25,6 +25,8 @@ type EncryptionAlgorithm interface {
 	DecryptString(hashed []byte, keyID string) (string, error)
 }
 
+// CryptoValue is a struct that can be used to store encrypted values in a database.
+// The struct is compatible with the [driver.Valuer] and database/sql.Scanner interfaces.
 type CryptoValue struct {
 	CryptoType CryptoType
 	Algorithm  string

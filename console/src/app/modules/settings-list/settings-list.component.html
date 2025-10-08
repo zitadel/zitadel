@@ -1,10 +1,4 @@
 <cnsl-sidenav [indented]="true" [setting]="setting()" (settingChange)="setting.set($event)" [settingsList]="settingsList">
-  <ng-container *ngIf="setting()?.id === 'organizations'">
-    <h2>{{ 'ORG.PAGES.LIST' | translate }}</h2>
-    <p class="org-desc cnsl-secondary-text">{{ 'ORG.PAGES.LISTDESCRIPTION' | translate }}</p>
-
-    <cnsl-org-table></cnsl-org-table>
-  </ng-container>
   <ng-container *ngIf="setting()?.id === 'features'">
     <cnsl-features></cnsl-features>
   </ng-container>
@@ -74,12 +68,6 @@
   <ng-container *ngIf="setting()?.id === 'failedevents' && serviceType === PolicyComponentServiceType.ADMIN">
     <cnsl-iam-failed-events></cnsl-iam-failed-events>
   </ng-container>
-  <!-- todo: figure out permissions -->
-  <ng-container *ngIf="setting()?.id === 'actions'">
-    <cnsl-actions-two-actions />
-  </ng-container>
-  <ng-container *ngIf="setting()?.id === 'actions_targets'">
-    <cnsl-actions-two-targets />
-  </ng-container>
+
   <ng-content></ng-content>
 </cnsl-sidenav>

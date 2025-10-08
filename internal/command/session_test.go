@@ -145,8 +145,9 @@ func TestSessionCommands_getHumanWriteModel(t *testing.T) {
 
 func TestCommands_CreateSession(t *testing.T) {
 	type fields struct {
-		idGenerator  id.Generator
-		tokenCreator func(sessionID string) (string, string, error)
+		idGenerator     id.Generator
+		tokenCreator    func(sessionID string) (string, string, error)
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx       context.Context
@@ -195,6 +196,22 @@ func TestCommands_CreateSession(t *testing.T) {
 			},
 		},
 		{
+			"missing permission",
+			fields{
+				idGenerator:     mock.NewIDGeneratorExpectIDs(t, "sessionID"),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args{
+				ctx: context.Background(),
+			},
+			[]expect{
+				expectFilter(),
+			},
+			res{
+				err: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			},
+		},
+		{
 			"negative lifetime",
 			fields{
 				idGenerator: mock.NewIDGeneratorExpectIDs(t, "sessionID"),
@@ -203,6 +220,7 @@ func TestCommands_CreateSession(t *testing.T) {
 						"token",
 						nil
 				},
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				ctx: authz.NewMockContext("instance1", "", ""),
@@ -230,6 +248,7 @@ func TestCommands_CreateSession(t *testing.T) {
 						"token",
 						nil
 				},
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				ctx: authz.NewMockContext("instance1", "", ""),
@@ -275,6 +294,7 @@ func TestCommands_CreateSession(t *testing.T) {
 				eventstore:          expectEventstore(tt.expect...)(t),
 				idGenerator:         tt.fields.idGenerator,
 				sessionTokenCreator: tt.fields.tokenCreator,
+				checkPermission:     tt.fields.checkPermission,
 			}
 			got, err := c.CreateSession(tt.args.ctx, tt.args.checks, tt.args.metadata, tt.args.userAgent, tt.args.lifetime)
 			require.ErrorIs(t, err, tt.res.err)
@@ -285,8 +305,8 @@ func TestCommands_CreateSession(t *testing.T) {
 
 func TestCommands_UpdateSession(t *testing.T) {
 	type fields struct {
-		eventstore    func(*testing.T) *eventstore.Eventstore
-		tokenVerifier func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
+		eventstore      func(*testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx       context.Context
@@ -320,6 +340,36 @@ func TestCommands_UpdateSession(t *testing.T) {
 			},
 		},
 		{
+			"no token, no permission",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							session.NewAddedEvent(context.Background(),
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
+						eventFromEventPusher(
+							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"tokenID")),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args{
+				ctx:       context.Background(),
+				sessionID: "sessionID",
+			},
+			res{
+				err: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			},
+		},
+		{
 			"no change",
 			fields{
 				eventstore: expectEventstore(
@@ -339,9 +389,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 								"tokenID")),
 					),
 				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return nil
-				},
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				ctx:       context.Background(),
@@ -362,8 +410,8 @@ func TestCommands_UpdateSession(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:           tt.fields.eventstore(t),
-				sessionTokenVerifier: tt.fields.tokenVerifier,
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := c.UpdateSession(tt.args.ctx, tt.args.sessionID, tt.args.checks, tt.args.metadata, tt.args.lifetime)
 			require.ErrorIs(t, err, tt.res.err)

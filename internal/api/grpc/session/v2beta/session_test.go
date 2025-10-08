@@ -328,24 +328,7 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "default request",
-			args: args{
-				ctx: authz.NewMockContext("123", "456", "789"),
-				req: &session.ListSessionsRequest{},
-			},
-			want: &query.SessionsSearchQueries{
-				SearchRequest: query.SearchRequest{
-					Offset: 0,
-					Limit:  0,
-					Asc:    false,
-				},
-				Queries: []query.SearchQuery{
-					mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
-				},
-			},
-		},
-		{
-			name: "default request with sorting column",
+			name: "sorting column",
 			args: args{
 				ctx: authz.NewMockContext("123", "456", "789"),
 				req: &session.ListSessionsRequest{
@@ -359,9 +342,7 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 					SortingColumn: query.SessionColumnCreationDate,
 					Asc:           false,
 				},
-				Queries: []query.SearchQuery{
-					mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
-				},
+				Queries: []query.SearchQuery{},
 			},
 		},
 		{
@@ -410,7 +391,6 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 					mustNewListQuery(t, query.SessionColumnID, []interface{}{"4", "5", "6"}, query.ListIn),
 					mustNewTextQuery(t, query.SessionColumnUserID, "10", query.TextEquals),
 					mustNewTimestampQuery(t, query.SessionColumnCreationDate, creationDate, query.TimestampGreater),
-					mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
 				},
 			},
 		},
@@ -458,15 +438,6 @@ func Test_sessionQueriesToQuery(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "creator only",
-			args: args{
-				ctx: authz.NewMockContext("123", "456", "789"),
-			},
-			want: []query.SearchQuery{
-				mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
-			},
-		},
-		{
 			name: "invalid argument",
 			args: args{
 				ctx: authz.NewMockContext("123", "456", "789"),
@@ -477,7 +448,7 @@ func Test_sessionQueriesToQuery(t *testing.T) {
 			wantErr: zerrors.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid"),
 		},
 		{
-			name: "creator and sessions",
+			name: "sessions",
 			args: args{
 				ctx: authz.NewMockContext("123", "456", "789"),
 				queries: []*session.SearchQuery{
@@ -496,7 +467,6 @@ func Test_sessionQueriesToQuery(t *testing.T) {
 			want: []query.SearchQuery{
 				mustNewListQuery(t, query.SessionColumnID, []interface{}{"1", "2", "3"}, query.ListIn),
 				mustNewListQuery(t, query.SessionColumnID, []interface{}{"4", "5", "6"}, query.ListIn),
-				mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
 			},
 		},
 	}

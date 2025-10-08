@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/logging"
@@ -20,14 +19,17 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/integration/scim"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
+	action_v2beta "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	authorization "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	feature_v2beta "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
+	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
@@ -69,7 +71,8 @@ type Client struct {
 	OIDCv2                   oidc_pb.OIDCServiceClient
 	OrgV2beta                org_v2beta.OrganizationServiceClient
 	OrgV2                    org.OrganizationServiceClient
-	ActionV2beta             action.ActionServiceClient
+	ActionV2beta             action_v2beta.ActionServiceClient
+	ActionV2                 action.ActionServiceClient
 	FeatureV2beta            feature_v2beta.FeatureServiceClient
 	FeatureV2                feature.FeatureServiceClient
 	UserSchemaV3             userschema_v3alpha.ZITADELUserSchemasClient
@@ -84,6 +87,7 @@ type Client struct {
 	AppV2Beta                app.AppServiceClient
 	InternalPermissionv2Beta internal_permission_v2beta.InternalPermissionServiceClient
 	AuthorizationV2Beta      authorization.AuthorizationServiceClient
+	GroupV2                  group_v2.GroupServiceClient
 }
 
 func NewDefaultClient(ctx context.Context) (*Client, error) {
@@ -112,7 +116,8 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		OIDCv2:                   oidc_pb.NewOIDCServiceClient(cc),
 		OrgV2beta:                org_v2beta.NewOrganizationServiceClient(cc),
 		OrgV2:                    org.NewOrganizationServiceClient(cc),
-		ActionV2beta:             action.NewActionServiceClient(cc),
+		ActionV2beta:             action_v2beta.NewActionServiceClient(cc),
+		ActionV2:                 action.NewActionServiceClient(cc),
 		FeatureV2beta:            feature_v2beta.NewFeatureServiceClient(cc),
 		FeatureV2:                feature.NewFeatureServiceClient(cc),
 		UserSchemaV3:             userschema_v3alpha.NewZITADELUserSchemasClient(cc),
@@ -127,6 +132,7 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		AppV2Beta:                app.NewAppServiceClient(cc),
 		InternalPermissionv2Beta: internal_permission_v2beta.NewInternalPermissionServiceClient(cc),
 		AuthorizationV2Beta:      authorization.NewAuthorizationServiceClient(cc),
+		GroupV2:                  group_v2.NewGroupServiceClient(cc),
 	}
 	return client, client.pollHealth(ctx)
 }
@@ -292,8 +298,11 @@ func (i *Instance) CreateUserTypeHuman(ctx context.Context, email string) *user_
 }
 
 func (i *Instance) CreateUserTypeMachine(ctx context.Context, orgId string) *user_v2.CreateUserResponse {
+	if orgId == "" {
+		orgId = i.DefaultOrg.GetId()
+	}
 	resp, err := i.Client.UserV2.CreateUser(ctx, &user_v2.CreateUserRequest{
-		OrganizationId: i.DefaultOrg.GetId(),
+		OrganizationId: orgId,
 		UserType: &user_v2.CreateUserRequest_Machine_{
 			Machine: &user_v2.CreateUserRequest_Machine{
 				Name: "machine",
@@ -402,6 +411,27 @@ func (i *Instance) CreateOrganizationWithUserID(ctx context.Context, name, userI
 		},
 	})
 	logging.OnError(err).Fatal("create org")
+	return resp
+}
+
+func (i *Instance) SetOrganizationSettings(ctx context.Context, t *testing.T, orgID string, organizationScopedUsernames bool) *settings_v2beta.SetOrganizationSettingsResponse {
+	resp, err := i.Client.SettingsV2beta.SetOrganizationSettings(ctx,
+		&settings_v2beta.SetOrganizationSettingsRequest{
+			OrganizationId:              orgID,
+			OrganizationScopedUsernames: gu.Ptr(organizationScopedUsernames),
+		},
+	)
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) DeleteOrganizationSettings(ctx context.Context, t *testing.T, orgID string) *settings_v2beta.DeleteOrganizationSettingsResponse {
+	resp, err := i.Client.SettingsV2beta.DeleteOrganizationSettings(ctx,
+		&settings_v2beta.DeleteOrganizationSettingsRequest{
+			OrganizationId: orgID,
+		},
+	)
+	require.NoError(t, err)
 	return resp
 }
 
@@ -603,6 +633,34 @@ func (i *Instance) AddProviderToDefaultLoginPolicy(ctx context.Context, id strin
 		IdpId: id,
 	})
 	logging.OnError(err).Panic("add provider to default login policy")
+}
+
+func (i *Instance) AddAzureADProvider(ctx context.Context, name string) *admin.AddAzureADProviderResponse {
+	resp, err := i.Client.Admin.AddAzureADProvider(ctx, &admin.AddAzureADProviderRequest{
+		Name:          name,
+		ClientId:      "clientID",
+		ClientSecret:  "clientSecret",
+		Tenant:        nil,
+		EmailVerified: false,
+		Scopes:        []string{"openid", "profile", "email"},
+		ProviderOptions: &idp.Options{
+			IsLinkingAllowed:  true,
+			IsCreationAllowed: true,
+			IsAutoCreation:    true,
+			IsAutoUpdate:      true,
+			AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+		},
+	})
+	logging.OnError(err).Panic("create Azure AD idp")
+
+	mustAwait(func() error {
+		_, err := i.Client.Admin.GetProviderByID(ctx, &admin.GetProviderByIDRequest{
+			Id: resp.GetId(),
+		})
+		return err
+	})
+
+	return resp
 }
 
 func (i *Instance) AddGenericOAuthProvider(ctx context.Context, name string) *admin.AddGenericOAuthProviderResponse {
@@ -904,8 +962,28 @@ func (i *Instance) ActivateProjectGrant(ctx context.Context, t *testing.T, proje
 	return resp
 }
 
-func (i *Instance) CreateProjectUserGrant(t *testing.T, ctx context.Context, projectID, userID string) *mgmt.AddUserGrantResponse {
-	resp, err := i.Client.Mgmt.AddUserGrant(ctx, &mgmt.AddUserGrantRequest{
+func (i *Instance) CreateAuthorizationProject(t *testing.T, ctx context.Context, projectID, userID string) *authorization.CreateAuthorizationResponse {
+	resp, err := i.Client.AuthorizationV2Beta.CreateAuthorization(ctx, &authorization.CreateAuthorizationRequest{
+		UserId:    userID,
+		ProjectId: projectID,
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) CreateAuthorizationProjectGrant(t *testing.T, ctx context.Context, projectID, orgID, userID string) *authorization.CreateAuthorizationResponse {
+	resp, err := i.Client.AuthorizationV2Beta.CreateAuthorization(ctx, &authorization.CreateAuthorizationRequest{
+		UserId:         userID,
+		ProjectId:      projectID,
+		OrganizationId: gu.Ptr(orgID),
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) CreateProjectUserGrant(t *testing.T, ctx context.Context, orgID, projectID, userID string) *mgmt.AddUserGrantResponse {
+	//nolint:staticcheck
+	resp, err := i.Client.Mgmt.AddUserGrant(SetOrgID(ctx, orgID), &mgmt.AddUserGrantRequest{
 		UserId:    userID,
 		ProjectId: projectID,
 	})
@@ -914,6 +992,7 @@ func (i *Instance) CreateProjectUserGrant(t *testing.T, ctx context.Context, pro
 }
 
 func (i *Instance) CreateProjectGrantUserGrant(ctx context.Context, orgID, projectID, projectGrantID, userID string) *mgmt.AddUserGrantResponse {
+	//nolint:staticcheck
 	resp, err := i.Client.Mgmt.AddUserGrant(SetOrgID(ctx, orgID), &mgmt.AddUserGrantRequest{
 		UserId:         userID,
 		ProjectId:      projectID,
@@ -942,13 +1021,17 @@ func (i *Instance) DeleteInstanceMembership(t *testing.T, ctx context.Context, u
 	require.NoError(t, err)
 }
 
-func (i *Instance) CreateOrgMembership(t *testing.T, ctx context.Context, orgID, userID string) *internal_permission_v2beta.CreateAdministratorResponse {
+// CreateOrgMembership creates an org membership with the given roles. If no roles are provided, the user will be assigned the "org.owner" role.
+func (i *Instance) CreateOrgMembership(t *testing.T, ctx context.Context, orgID, userID string, roles ...string) *internal_permission_v2beta.CreateAdministratorResponse {
+	if len(roles) == 0 {
+		roles = []string{domain.RoleOrgOwner}
+	}
 	resp, err := i.Client.InternalPermissionv2Beta.CreateAdministrator(ctx, &internal_permission_v2beta.CreateAdministratorRequest{
 		Resource: &internal_permission_v2beta.ResourceType{
 			Resource: &internal_permission_v2beta.ResourceType_OrganizationId{OrganizationId: orgID},
 		},
 		UserId: userID,
-		Roles:  []string{domain.RoleOrgOwner},
+		Roles:  roles,
 	})
 	require.NoError(t, err)
 	return resp
@@ -981,12 +1064,12 @@ func (i *Instance) DeleteProjectMembership(t *testing.T, ctx context.Context, pr
 	require.NoError(t, err)
 }
 
-func (i *Instance) CreateProjectGrantMembership(t *testing.T, ctx context.Context, projectID, grantID, userID string) *internal_permission_v2beta.CreateAdministratorResponse {
+func (i *Instance) CreateProjectGrantMembership(t *testing.T, ctx context.Context, projectID, orgID, userID string) *internal_permission_v2beta.CreateAdministratorResponse {
 	resp, err := i.Client.InternalPermissionv2Beta.CreateAdministrator(ctx, &internal_permission_v2beta.CreateAdministratorRequest{
 		Resource: &internal_permission_v2beta.ResourceType{
 			Resource: &internal_permission_v2beta.ResourceType_ProjectGrant_{ProjectGrant: &internal_permission_v2beta.ResourceType_ProjectGrant{
 				ProjectId:      projectID,
-				ProjectGrantId: grantID,
+				OrganizationId: orgID,
 			}},
 		},
 		UserId: userID,
@@ -996,12 +1079,12 @@ func (i *Instance) CreateProjectGrantMembership(t *testing.T, ctx context.Contex
 	return resp
 }
 
-func (i *Instance) DeleteProjectGrantMembership(t *testing.T, ctx context.Context, projectID, grantID, userID string) {
+func (i *Instance) DeleteProjectGrantMembership(t *testing.T, ctx context.Context, projectID, orgID, userID string) {
 	_, err := i.Client.InternalPermissionv2Beta.DeleteAdministrator(ctx, &internal_permission_v2beta.DeleteAdministratorRequest{
 		Resource: &internal_permission_v2beta.ResourceType{
 			Resource: &internal_permission_v2beta.ResourceType_ProjectGrant_{ProjectGrant: &internal_permission_v2beta.ResourceType_ProjectGrant{
 				ProjectId:      projectID,
-				ProjectGrantId: grantID,
+				OrganizationId: orgID,
 			}},
 		},
 		UserId: userID,
@@ -1009,9 +1092,9 @@ func (i *Instance) DeleteProjectGrantMembership(t *testing.T, ctx context.Contex
 	require.NoError(t, err)
 }
 
-func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoint string, ty domain.TargetType, interrupt bool) *action.CreateTargetResponse {
+func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoint string, ty target_domain.TargetType, interrupt bool) *action.CreateTargetResponse {
 	if name == "" {
-		name = gofakeit.Name()
+		name = TargetName()
 	}
 	req := &action.CreateTargetRequest{
 		Name:     name,
@@ -1019,44 +1102,44 @@ func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoin
 		Timeout:  durationpb.New(5 * time.Second),
 	}
 	switch ty {
-	case domain.TargetTypeWebhook:
+	case target_domain.TargetTypeWebhook:
 		req.TargetType = &action.CreateTargetRequest_RestWebhook{
 			RestWebhook: &action.RESTWebhook{
 				InterruptOnError: interrupt,
 			},
 		}
-	case domain.TargetTypeCall:
+	case target_domain.TargetTypeCall:
 		req.TargetType = &action.CreateTargetRequest_RestCall{
 			RestCall: &action.RESTCall{
 				InterruptOnError: interrupt,
 			},
 		}
-	case domain.TargetTypeAsync:
+	case target_domain.TargetTypeAsync:
 		req.TargetType = &action.CreateTargetRequest_RestAsync{
 			RestAsync: &action.RESTAsync{},
 		}
 	}
-	target, err := i.Client.ActionV2beta.CreateTarget(ctx, req)
+	target, err := i.Client.ActionV2.CreateTarget(ctx, req)
 	require.NoError(t, err)
 	return target
 }
 
 func (i *Instance) DeleteTarget(ctx context.Context, t *testing.T, id string) {
-	_, err := i.Client.ActionV2beta.DeleteTarget(ctx, &action.DeleteTargetRequest{
+	_, err := i.Client.ActionV2.DeleteTarget(ctx, &action.DeleteTargetRequest{
 		Id: id,
 	})
 	require.NoError(t, err)
 }
 
 func (i *Instance) DeleteExecution(ctx context.Context, t *testing.T, cond *action.Condition) {
-	_, err := i.Client.ActionV2beta.SetExecution(ctx, &action.SetExecutionRequest{
+	_, err := i.Client.ActionV2.SetExecution(ctx, &action.SetExecutionRequest{
 		Condition: cond,
 	})
 	require.NoError(t, err)
 }
 
 func (i *Instance) SetExecution(ctx context.Context, t *testing.T, cond *action.Condition, targets []string) *action.SetExecutionResponse {
-	target, err := i.Client.ActionV2beta.SetExecution(ctx, &action.SetExecutionRequest{
+	target, err := i.Client.ActionV2.SetExecution(ctx, &action.SetExecutionRequest{
 		Condition: cond,
 		Targets:   targets,
 	})
@@ -1204,4 +1287,21 @@ func (i *Instance) ActivateSchemaUser(ctx context.Context, orgID string, userID 
 	})
 	logging.OnError(err).Fatal("reactivate user")
 	return user
+}
+
+func (i *Instance) CreateGroup(ctx context.Context, t *testing.T, orgID, name string) *group_v2.CreateGroupResponse {
+	resp, err := i.Client.GroupV2.CreateGroup(ctx, &group_v2.CreateGroupRequest{
+		OrganizationId: orgID,
+		Name:           name,
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) DeleteGroup(ctx context.Context, t *testing.T, id string) *group_v2.DeleteGroupResponse {
+	resp, err := i.Client.GroupV2.DeleteGroup(ctx, &group_v2.DeleteGroupRequest{
+		Id: id,
+	})
+	require.NoError(t, err)
+	return resp
 }

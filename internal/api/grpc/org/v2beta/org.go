@@ -250,26 +250,5 @@ func createOrganizationRequestAdminToCommand(admin *v2beta_org.CreateOrganizatio
 }
 
 func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain, orgID string) ([]string, error) {
-	queries := make([]query.SearchQuery, 0, 2)
-	loginName, err := query.NewUserPreferredLoginNameSearchQuery("@"+orgDomain, query.TextEndsWithIgnoreCase)
-	if err != nil {
-		return nil, err
-	}
-	queries = append(queries, loginName)
-	if orgID != "" {
-		owner, err := query.NewUserResourceOwnerSearchQuery(orgID, query.TextNotEquals)
-		if err != nil {
-			return nil, err
-		}
-		queries = append(queries, owner)
-	}
-	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: queries}, nil)
-	if err != nil {
-		return nil, err
-	}
-	userIDs := make([]string, len(users.Users))
-	for i, user := range users.Users {
-		userIDs[i] = user.ID
-	}
-	return userIDs, nil
+	return s.query.SearchClaimedUserIDsOfOrgDomain(ctx, orgDomain, orgID)
 }

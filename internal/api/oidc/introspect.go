@@ -100,6 +100,7 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 		token.userID,
 		token.scope,
 		client.projectID,
+		client.clientID,
 		client.projectRoleAssertion,
 		true,
 		true,

@@ -9,7 +9,7 @@ import (
 type Key int
 
 const (
-	// Reserved: 2, 3, 6, 8
+	// Reserved: 2, 3, 6, 8, 11
 
 	KeyUnspecified                    Key = 0
 	KeyLoginDefaultOrg                Key = 1
@@ -18,11 +18,11 @@ const (
 	KeyImprovedPerformance            Key = 7
 	KeyDebugOIDCParentError           Key = 9
 	KeyOIDCSingleV1SessionTermination Key = 10
-	KeyDisableUserTokenEvent          Key = 11
 	KeyEnableBackChannelLogout        Key = 12
 	KeyLoginV2                        Key = 13
 	KeyPermissionCheckV2              Key = 14
 	KeyConsoleUseV2UserApi            Key = 15
+	KeyEnableRelationalTables         Key = 16
 )
 
 //go:generate enumer -type Level -transform snake -trimprefix Level
@@ -50,6 +50,7 @@ type Features struct {
 	LoginV2                        LoginV2                   `json:"login_v2,omitempty"`
 	PermissionCheckV2              bool                      `json:"permission_check_v2,omitempty"`
 	ConsoleUseV2UserApi            bool                      `json:"console_use_v2_user_api,omitempty"`
+	EnableRelationalTables         bool                      `json:"enable_relational_tables,omitempty"`
 }
 
 /* Note: do not generate the stringer or enumer for this type, is it breaks existing events */
@@ -57,12 +58,13 @@ type Features struct {
 type ImprovedPerformanceType int32
 
 const (
-	ImprovedPerformanceTypeUnspecified ImprovedPerformanceType = iota
-	ImprovedPerformanceTypeOrgByID
-	ImprovedPerformanceTypeProjectGrant
-	ImprovedPerformanceTypeProject
-	ImprovedPerformanceTypeUserGrant
-	ImprovedPerformanceTypeOrgDomainVerified
+	// Reserved: 1
+
+	ImprovedPerformanceTypeUnspecified       ImprovedPerformanceType = 0
+	ImprovedPerformanceTypeProjectGrant      ImprovedPerformanceType = 2
+	ImprovedPerformanceTypeProject           ImprovedPerformanceType = 3
+	ImprovedPerformanceTypeUserGrant         ImprovedPerformanceType = 4
+	ImprovedPerformanceTypeOrgDomainVerified ImprovedPerformanceType = 5
 )
 
 func (f Features) ShouldUseImprovedPerformance(typ ImprovedPerformanceType) bool {
