@@ -1,17 +1,14 @@
 {
-  "name": "console",
-  "version": "0.0.0",
+  "name": "@zitadel/console",
   "scripts": {
     "ng": "ng",
-    "dev": "node prebuild.development.js && ng serve",
-    "start": "node prebuild.development.js && ng serve",
+    "dev": "wait-on  --verbose --interval 2000 --simultaneous 1 --timeout 30m ${ENVIRONMENT_JSON_URL} && node prebuild.development.js && ng serve --host=${DEVCONTAINER_LISTEN_HOST:-127.0.0.1}",
     "build": "ng build --configuration production --base-href=/ui/console/",
-    "lint": "pnpm run '/^lint:check:.*$/'",
-    "lint:check:ng": "ng lint",
-    "lint:check:prettier": "prettier --check src",
-    "lint:fix": "prettier --write src",
+    "lint-check-ng": "ng lint",
+    "lint-check-prettier": "prettier --check src",
+    "lint-fix": "prettier --write src",
     "generate": "pnpm exec buf generate ../proto --include-imports --include-wkt",
-    "clean": "rm -rf dist .angular .turbo node_modules src/app/proto/generated"
+    "clean": "rm -rf dist .angular node_modules src/app/proto/generated"
   },
   "private": true,
   "dependencies": {
@@ -39,8 +36,6 @@
     "@ng-icons/heroicons": "^32.1.0",
     "@ngx-translate/core": "^17.0.0",
     "@tanstack/angular-query-experimental": "^5.85.6",
-    "@zitadel/client": "workspace:*",
-    "@zitadel/proto": "workspace:*",
     "angular-oauth2-oidc": "^20.0.2",
     "angularx-qrcode": "^20.0.0",
     "buffer": "^6.0.3",
@@ -84,6 +79,8 @@
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
+    "@zitadel/client": "workspace:*",
+    "@zitadel/proto": "workspace:*",
     "eslint": "^8.57.1",
     "jasmine-core": "~5.6.0",
     "jasmine-spec-reporter": "~7.0.0",
