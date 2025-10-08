@@ -60,7 +60,7 @@ export default function ApiItemWrapper(props) {
       <OriginalApiItem {...props} />
 
       <div className="mt-10 flex justify-start">
-        {feedback === "no" && (
+        {feedback === null && (
           <div
             className="w-fit rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#ffffff10] px-2 py-2 shadow-sm transition-all duration-300"
             style={{
@@ -136,48 +136,44 @@ export default function ApiItemWrapper(props) {
           </div>
         )}
 
-        {feedback === null && (
+        {feedback === "no" && (
           <div
-            className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#ffffff10] px-2 py-2 shadow-sm transition-all duration-300"
+            className="w-full max-w-2xl rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#ffffff10] shadow-sm transition-all duration-300"
             style={{
               display: "flex",
               flexDirection: "column",
             }}
           >
-            <div className="mt-1 w-full flex flex-row items-center gap-3 flex-grow">
-              <button
-                className="button"
-                style={{ color: "var(--color-fg)" }}
-                onClick={() => {
-                  setFeedback(null);
-                  setComment("");
-                }}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-6"
+            <div className="flex flex-col gap-4 p-4">
+              <div className="flex items-center gap-2">
+                <p
+                  className="font-medium text-base m-0"
+                  style={{ color: "var(--ifm-menu-color)" }}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
-                  />
-                </svg>
-              </button>
+                  Help us improve this page
+                </p>
+              </div>
+
               <textarea
-                className="textarea textarea-bordered w-full resize-none rounded-md border border-gray-300 dark:border-gray-600 bg-transparent p-2 text-sm"
-                rows="3"
-                placeholder="Sorry to hear that — how can we improve this page?"
+                className="w-full resize-none rounded-md border border-gray-300 dark:border-gray-600 bg-transparent p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                rows="4"
+                placeholder="What would make this page more helpful? (optional)"
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
               />
-              <div className="flex gap-2">
+
+              <div className="flex gap-2 justify-end">
                 <button
-                  className="button button--sm button--primary h-fit"
+                  className="button button--sm button--secondary"
+                  onClick={() => {
+                    setFeedback(null);
+                    setComment("");
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="button button--sm button--primary"
                   onClick={handleSubmitComment}
                   disabled={comment.trim() === "" || !plausibleLoaded}
                   style={{
@@ -188,7 +184,7 @@ export default function ApiItemWrapper(props) {
                         : "pointer",
                   }}
                 >
-                  Submit
+                  Submit Feedback
                 </button>
               </div>
             </div>
