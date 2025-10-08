@@ -87,7 +87,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         type="button"
         ref={ref}
-        className={`${getButtonClasses(size, variant, color, actualRoundness, actualAppearance, spacing)} ${className}`}
+        className={`${getButtonClasses(size, variant, color, actualRoundness, actualAppearance)} ${className}`}
         {...props}
       >
         {children}
