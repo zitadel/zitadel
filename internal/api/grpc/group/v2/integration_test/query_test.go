@@ -50,7 +50,7 @@ func TestServer_GetGroup(t *testing.T) {
 			wantErrMsg:  "invalid GetGroupRequest.Id: value length must be between 1 and 200 runes, inclusive",
 		},
 		{
-			name: "get group, not found",
+			name: "get group, instance owner, not found",
 			args: args{
 				ctx: iamOwnerCtx,
 				req: &group_v2.GetGroupRequest{
@@ -61,7 +61,62 @@ func TestServer_GetGroup(t *testing.T) {
 			wantErrMsg:  "Errors.Group.NotFound (QUERY-SG4WbR)",
 		},
 		{
-			name: "get group, found",
+			name: "get group, missing permission, error",
+			args: args{
+				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
+				dep: func(req *group_v2.GetGroupRequest, resp *group_v2.GetGroupResponse) {
+					groupName := integration.GroupName()
+					group := instance.CreateGroup(iamOwnerCtx, t, instance.DefaultOrg.GetId(), groupName)
+
+					req.Id = group.GetId()
+				},
+				req: &group_v2.GetGroupRequest{},
+			},
+			wantErrCode: codes.NotFound,
+			wantErrMsg:  "membership not found (AUTHZ-cdgFk)",
+		},
+		{
+			name: "get group, organization owner, missing permission, error",
+			args: args{
+				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+				dep: func(req *group_v2.GetGroupRequest, resp *group_v2.GetGroupResponse) {
+					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+					groupName := integration.GroupName()
+					group := instance.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), groupName)
+
+					req.Id = group.GetId()
+				},
+				req: &group_v2.GetGroupRequest{},
+			},
+			wantErrCode: codes.NotFound,
+			wantErrMsg:  "membership not found (AUTHZ-cdgFk)",
+		},
+		{
+			name: "get group, organization owner, with permission, found",
+			args: args{
+				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+				dep: func(req *group_v2.GetGroupRequest, resp *group_v2.GetGroupResponse) {
+					groupName := integration.GroupName()
+					group := instance.CreateGroup(iamOwnerCtx, t, instance.DefaultOrg.GetId(), groupName)
+
+					req.Id = group.GetId()
+					resp.Group = &group_v2.Group{
+						Id:             group.GetId(),
+						Name:           groupName,
+						Description:    "",
+						OrganizationId: instance.DefaultOrg.GetId(),
+						ChangeDate:     group.GetCreationDate(),
+						CreationDate:   group.GetCreationDate(),
+					}
+				},
+				req: &group_v2.GetGroupRequest{},
+			},
+			want: &group_v2.GetGroupResponse{
+				Group: &group_v2.Group{},
+			},
+		},
+		{
+			name: "get group, instance owner, found",
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(req *group_v2.GetGroupRequest, resp *group_v2.GetGroupResponse) {
@@ -132,7 +187,92 @@ func TestServer_ListGroups(t *testing.T) {
 			wantErrMsg:  "auth header missing",
 		},
 		{
-			name: "group ID not found",
+			name: "no permission, error",
+			args: args{
+				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
+				dep: func(req *group_v2.ListGroupsRequest, resp *group_v2.ListGroupsResponse) {
+					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+					groupName := integration.GroupName()
+					group1 := instance.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), groupName)
+
+					req.Filters[0].Filter = &group_v2.GroupsSearchFilter_GroupIds{
+						GroupIds: &filter.InIDsFilter{
+							Ids: []string{group1.GetId()},
+						},
+					}
+				},
+				req: &group_v2.ListGroupsRequest{
+					Filters: []*group_v2.GroupsSearchFilter{{}},
+				},
+			},
+			wantErrCode: codes.NotFound,
+			wantErrMsg:  "membership not found (AUTHZ-cdgFk)",
+		},
+		{
+			name: "org owner, missing permission, empty list",
+			args: args{
+				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+				dep: func(req *group_v2.ListGroupsRequest, resp *group_v2.ListGroupsResponse) {
+					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+					groupName := integration.GroupName()
+					group1 := instance.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), groupName)
+
+					req.Filters[0].Filter = &group_v2.GroupsSearchFilter_GroupIds{
+						GroupIds: &filter.InIDsFilter{
+							Ids: []string{group1.GetId()},
+						},
+					}
+				},
+				req: &group_v2.ListGroupsRequest{
+					Filters: []*group_v2.GroupsSearchFilter{{}},
+				},
+			},
+			want: &group_v2.ListGroupsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  1,
+					AppliedLimit: 100,
+				},
+				Groups: []*group_v2.Group{},
+			},
+		},
+		{
+			name: "org owner, with permission, ok",
+			args: args{
+				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+				dep: func(req *group_v2.ListGroupsRequest, resp *group_v2.ListGroupsResponse) {
+					groupName := integration.GroupName()
+					group1 := instance.CreateGroup(iamOwnerCtx, t, instance.DefaultOrg.GetId(), groupName)
+
+					req.Filters[0].Filter = &group_v2.GroupsSearchFilter_GroupIds{
+						GroupIds: &filter.InIDsFilter{
+							Ids: []string{group1.GetId()},
+						},
+					}
+					resp.Groups[0] = &group_v2.Group{
+						Id:             group1.GetId(),
+						Name:           groupName,
+						Description:    "",
+						OrganizationId: instance.DefaultOrg.GetId(),
+						CreationDate:   group1.GetCreationDate(),
+						ChangeDate:     group1.GetCreationDate(),
+					}
+				},
+				req: &group_v2.ListGroupsRequest{
+					Filters: []*group_v2.GroupsSearchFilter{{}},
+				},
+			},
+			want: &group_v2.ListGroupsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  1,
+					AppliedLimit: 100,
+				},
+				Groups: []*group_v2.Group{
+					{},
+				},
+			},
+		},
+		{
+			name: "instance owner, group ID not found",
 			args: args{
 				ctx: iamOwnerCtx,
 				req: &group_v2.ListGroupsRequest{

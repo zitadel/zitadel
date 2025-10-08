@@ -112,13 +112,12 @@ service GroupService {
   //
   // CreateGroup creates a new user group in an organization.
   //
-  // Required permissions: // TODO
-  //   - "iam.member.write" for instance administrators
-  //   - "org.member.write" for organization administrators
+  // Required permissions:
+  //   - `group.create`
   rpc CreateGroup(CreateGroupRequest) returns (CreateGroupResponse) {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "authenticated"
+        permission: "group.create"
       }
       http_response: {
         success_code: 201
@@ -162,11 +161,11 @@ service GroupService {
   // Retrieves a group based on its ID.
   //
   // Required permission:
-  // - TODO
+  // - `group.read`
   rpc GetGroup(GetGroupRequest) returns (GetGroupResponse) {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "authenticated"
+        permission: "group.read"
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -194,13 +193,12 @@ service GroupService {
   //
   // ListGroups returns all groups matching the request and necessary permissions from an organization.
   //
-  // Required permissions: // TODO
-  //   - "iam.member.read" for instance administrators
-  //   - "org.member.read" for organization administrators
+  // Required permissions:
+  //   - `group.read`
   rpc ListGroups(ListGroupsRequest) returns (ListGroupsResponse) {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "authenticated"
+        permission: "group.read"
       }
     };
 
@@ -233,13 +231,12 @@ service GroupService {
   // the desired state is already achieved.
   // You can check the change date in the response to verify if the group was updated by the request.
   //
-  // Required permissions: // TODO
-  //   - "iam.member.write" for instance administrators
-  //   - "org.member.write" for organization administrators
+  // Required permissions:
+  //   - `group.write`
   rpc UpdateGroup(UpdateGroupRequest) returns (UpdateGroupResponse) {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "authenticated"
+        permission: "group.write"
       }
     };
 
@@ -272,13 +269,12 @@ service GroupService {
   // the desired state is already achieved.
   // You can check the deletion date in the response to verify if the group was deleted by the request.
   //
-  // Required permissions: // TODO
-  //   - "iam.member.delete" for instance administrators
-  //   - "org.member.delete" for organization administrators
+  // Required permissions:
+  //   - `group.delete`
   rpc DeleteGroup(DeleteGroupRequest) returns (DeleteGroupResponse) {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "authenticated"
+        permission: "group.delete"
       }
     };
 

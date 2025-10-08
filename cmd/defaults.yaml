@@ -1511,7 +1511,6 @@ InternalAuthZ:
         - "session.read"
         - "session.delete"
         - "group.read"
-        - "group.write" # todo: review
     - Role: "IAM_ADMIN_IMPERSONATOR"
       Permissions:
         - "admin.impersonation"
@@ -1639,7 +1638,6 @@ InternalAuthZ:
         - "session.read"
         - "session.delete"
         - "group.read"
-        - "group.write" # todo: review
     - Role: "ORG_OWNER_VIEWER"
       Permissions:
         - "org.read"
@@ -2091,7 +2089,6 @@ SystemAuthZ:
         - "session.read"
         - "session.delete"
         - "group.read"
-        - "group.write" # todo: review
     - Role: "IAM_ADMIN_IMPERSONATOR"
       Permissions:
         - "admin.impersonation"
