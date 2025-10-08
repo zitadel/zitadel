@@ -37,30 +37,6 @@ func (d *ActivateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (er
 
 	organizationRepo := opts.organizationRepo
 
-	org, err := organizationRepo.Get(ctx, pool, database.WithCondition(
-		database.And(
-			organizationRepo.IDCondition(d.ID),
-			organizationRepo.InstanceIDCondition(authz.GetInstance(ctx).InstanceID()),
-		),
-	))
-	if err != nil {
-		var notFoundError *database.NoRowFoundError
-		if errors.As(err, &notFoundError) {
-			err = zerrors.ThrowNotFound(err, "DOM-86HVfs", "Errors.Org.NotFound")
-		}
-		return err
-	}
-
-	if org.State == OrgStateRemoved || org.State == OrgStateUnspecified {
-		err = zerrors.ThrowNotFound(nil, "DOM-GYmWRT", "Errors.Org.NotFound")
-		return err
-	}
-
-	if org.State == OrgStateActive {
-		err = zerrors.ThrowPreconditionFailed(nil, "DOM-Ixfbxh", "Errors.Org.AlreadyActive")
-		return err
-	}
-
 	updateCount, err := organizationRepo.Update(ctx, pool,
 		database.And(
 			organizationRepo.IDCondition(d.ID),
@@ -94,6 +70,32 @@ func (d *ActivateOrgCommand) String() string {
 func (d *ActivateOrgCommand) Validate(ctx context.Context, opts *CommandOpts) (err error) {
 	if strings.TrimSpace(d.ID) == "" {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-hJuuAv", "invalid organization ID")
+	}
+
+	close, err := opts.EnsureTx(ctx)
+	if err != nil {
+		return err
+	}
+	defer func() { err = close(ctx, err) }()
+	organizationRepo := opts.organizationRepo
+
+	org, err := organizationRepo.Get(ctx, pool, database.WithCondition(
+		database.And(
+			organizationRepo.IDCondition(d.ID),
+			organizationRepo.InstanceIDCondition(authz.GetInstance(ctx).InstanceID()),
+		),
+	))
+	if err != nil {
+		var notFoundError *database.NoRowFoundError
+		if errors.As(err, &notFoundError) {
+			err = zerrors.ThrowNotFound(err, "DOM-86HVfs", "Errors.Org.NotFound")
+		}
+		return err
+	}
+
+	if org.State == OrgStateActive {
+		err = zerrors.ThrowPreconditionFailed(nil, "DOM-Ixfbxh", "Errors.Org.AlreadyActive")
+		return err
 	}
 
 	return nil
