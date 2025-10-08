@@ -18,6 +18,11 @@ module.exports = {
       "data-domain": "zitadel.com",
       "data-api": "/docs/proxy/api/event",
     },
+    {
+      src: "/docs/proxy/js/feedback",
+      async: true,
+      defer: true,
+    },
   ],
   customFields: {
     description:
@@ -452,7 +457,7 @@ module.exports = {
     },
   ],
   markdown: {
-    mermaid:true,
+    mermaid: true,
   },
   themes: [
     "docusaurus-theme-github-codeblock",
