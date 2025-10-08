@@ -6,6 +6,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, map, startWith, switchMap } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 import { ActionTwoAddTargetDialogComponent } from '../actions-two-add-target/actions-two-add-target-dialog.component';
+import { ActionsTwoSigningKeyModalComponent } from '../actions-two-signing-key-modal/actions-two-signing-key-modal.component';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
 import {
@@ -78,7 +79,7 @@ export class ActionsTwoTargetsComponent {
         await this.actionService.updateTarget(request);
       } else {
         const resp = await this.actionService.createTarget(request);
-        console.log(`Your singing key: ${resp.signingKey}`);
+        this.showSigningKeyModal(resp.signingKey);
       }
 
       await new Promise((res) => setTimeout(res, 1000));
@@ -90,4 +91,15 @@ export class ActionsTwoTargetsComponent {
   }
 
   protected readonly InfoSectionType = InfoSectionType;
+
+  private showSigningKeyModal(signingKey: string) {
+    this.dialog.open(ActionsTwoSigningKeyModalComponent, {
+      width: '600px',
+      maxWidth: '90vw',
+      data: {
+        signingKey: signingKey,
+      },
+      disableClose: true,
+    });
+  }
 }

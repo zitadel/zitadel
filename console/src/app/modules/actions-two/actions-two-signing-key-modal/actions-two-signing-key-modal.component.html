@@ -1,0 +1,33 @@
+<span class="title" mat-dialog-title>{{ 'ACTIONSTWO.TARGET.SIGNING_KEY.TITLE' | translate }}</span>
+<div mat-dialog-content>
+  <cnsl-info-section [type]="InfoSectionType.WARN">
+    {{ 'ACTIONSTWO.TARGET.SIGNING_KEY.WARNING' | translate }}
+  </cnsl-info-section>
+
+  <p class="description">{{ 'ACTIONSTWO.TARGET.SIGNING_KEY.DESCRIPTION' | translate }}</p>
+
+  <div class="row">
+    <p class="left cnsl-secondary-text">{{ 'ACTIONSTWO.TARGET.SIGNING_KEY.TITLE' | translate }}</p>
+    <div class="right">
+      <button
+        class="copy-button"
+        [disabled]="copied === data.signingKey"
+        [matTooltip]="(copied !== data.signingKey ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
+        cnslCopyToClipboard
+        [valueToCopy]="data.signingKey"
+        (copiedValue)="copied = $event"
+        mat-icon-button
+      >
+        <mat-icon *ngIf="copied !== data.signingKey">content_copy</mat-icon>
+        <mat-icon *ngIf="copied === data.signingKey">check</mat-icon>
+      </button>
+      <span class="signing-key-text">{{ data.signingKey }}</span>
+    </div>
+  </div>
+</div>
+
+<div mat-dialog-actions class="action">
+  <button color="primary" mat-raised-button class="ok-button" (click)="close()">
+    {{ 'ACTIONS.CLOSE' | translate }}
+  </button>
+</div>
