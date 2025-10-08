@@ -1,6 +1,7 @@
 package repository_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -351,6 +352,63 @@ func TestListOrganizationMetadata(t *testing.T) {
 	})
 }
 
+func TestSetOrganizationMetadata_UpdatedAt(t *testing.T) {
+	instanceRepo := repository.InstanceRepository()
+	orgRepo := repository.OrganizationRepository()
+	metadataRepo := repository.OrganizationMetadataRepository()
+
+	// create instance
+	instanceID := gofakeit.UUID()
+	instance := domain.Instance{
+		ID:              instanceID,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleClient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	err := instanceRepo.Create(t.Context(), pool, &instance)
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		_, err := instanceRepo.Delete(context.Background(), pool, instanceID)
+		require.NoError(t, err)
+	})
+
+	// create organization
+	orgID := gofakeit.UUID()
+	organization := domain.Organization{
+		ID:         orgID,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceID,
+		State:      domain.OrgStateActive,
+	}
+	err = orgRepo.Create(t.Context(), pool, &organization)
+	require.NoError(t, err)
+
+	metadata := &domain.OrganizationMetadata{
+		OrgID: orgID,
+		Metadata: domain.Metadata{
+			InstanceID: instanceID,
+			Key:        "urn:zitadel:key",
+			Value:      []byte("some-value"),
+		},
+	}
+
+	beforeCreate := time.Now()
+	err = metadataRepo.Set(t.Context(), pool, metadata)
+	require.NoError(t, err)
+
+	metadata.Value = []byte("other-value")
+	beforeUpdate := time.Now()
+	err = metadataRepo.Set(t.Context(), pool, metadata)
+	require.NoError(t, err)
+	afterUpdate := time.Now()
+
+	assert.WithinRange(t, metadata.CreatedAt, beforeCreate, beforeUpdate)
+	assert.WithinRange(t, metadata.UpdatedAt, beforeUpdate, afterUpdate)
+}
+
 func TestSetOrganizationMetadata(t *testing.T) {
 	beforeSet := time.Now()
 
@@ -393,10 +451,10 @@ func TestSetOrganizationMetadata(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("check fields all fields scanned", func(t *testing.T) {
-		savepoint, err := tx.Begin(t.Context())
+		tx, err := tx.Begin(t.Context())
 		require.NoError(t, err)
 		defer func() {
-			require.NoError(t, savepoint.Rollback(t.Context()))
+			require.NoError(t, tx.Rollback(t.Context()))
 		}()
 
 		metadata := &domain.OrganizationMetadata{
@@ -422,10 +480,10 @@ func TestSetOrganizationMetadata(t *testing.T) {
 	})
 
 	t.Run("set one organization metadata", func(t *testing.T) {
-		savepoint, err := tx.Begin(t.Context())
+		tx, err := tx.Begin(t.Context())
 		require.NoError(t, err)
 		defer func() {
-			require.NoError(t, savepoint.Rollback(t.Context()))
+			require.NoError(t, tx.Rollback(t.Context()))
 		}()
 
 		err = metadataRepo.Set(t.Context(), tx, &domain.OrganizationMetadata{
@@ -459,10 +517,10 @@ func TestSetOrganizationMetadata(t *testing.T) {
 	})
 
 	t.Run("set multiple organization metadata", func(t *testing.T) {
-		savepoint, err := tx.Begin(t.Context())
+		tx, err := tx.Begin(t.Context())
 		require.NoError(t, err)
 		defer func() {
-			require.NoError(t, savepoint.Rollback(t.Context()))
+			require.NoError(t, tx.Rollback(t.Context()))
 		}()
 
 		err = metadataRepo.Set(t.Context(), tx,
@@ -516,10 +574,10 @@ func TestSetOrganizationMetadata(t *testing.T) {
 	})
 
 	t.Run("set no organization metadata", func(t *testing.T) {
-		savepoint, err := tx.Begin(t.Context())
+		tx, err := tx.Begin(t.Context())
 		require.NoError(t, err)
 		defer func() {
-			require.NoError(t, savepoint.Rollback(t.Context()))
+			require.NoError(t, tx.Rollback(t.Context()))
 		}()
 
 		err = metadataRepo.Set(t.Context(), tx)
@@ -527,12 +585,6 @@ func TestSetOrganizationMetadata(t *testing.T) {
 	})
 
 	t.Run("overwrite organization metadata", func(t *testing.T) {
-		savepoint, err := tx.Begin(t.Context())
-		require.NoError(t, err)
-		defer func() {
-			require.NoError(t, savepoint.Rollback(t.Context()))
-		}()
-
 		err = metadataRepo.Set(t.Context(), tx, &domain.OrganizationMetadata{
 			OrgID: orgID,
 			Metadata: domain.Metadata{
@@ -595,10 +647,10 @@ func TestSetOrganizationMetadata(t *testing.T) {
 
 	t.Run("from events", func(t *testing.T) {
 		t.Run("create", func(t *testing.T) {
-			savepoint, err := tx.Begin(t.Context())
+			tx, err := tx.Begin(t.Context())
 			require.NoError(t, err)
 			defer func() {
-				require.NoError(t, savepoint.Rollback(t.Context()))
+				require.NoError(t, tx.Rollback(t.Context()))
 			}()
 
 			err = metadataRepo.Set(t.Context(), tx, &domain.OrganizationMetadata{
@@ -633,10 +685,10 @@ func TestSetOrganizationMetadata(t *testing.T) {
 		})
 
 		t.Run("update", func(t *testing.T) {
-			savepoint, err := tx.Begin(t.Context())
+			tx, err := tx.Begin(t.Context())
 			require.NoError(t, err)
 			defer func() {
-				require.NoError(t, savepoint.Rollback(t.Context()))
+				require.NoError(t, tx.Rollback(t.Context()))
 			}()
 
 			// first event
@@ -730,10 +782,10 @@ func TestSetOrganizationMetadata(t *testing.T) {
 			},
 		} {
 			t.Run(testCase.name, func(t *testing.T) {
-				savepoint, err := tx.Begin(t.Context())
+				tx, err := tx.Begin(t.Context())
 				require.NoError(t, err)
 				defer func() {
-					require.NoError(t, savepoint.Rollback(t.Context()))
+					require.NoError(t, tx.Rollback(t.Context()))
 				}()
 
 				err = metadataRepo.Set(t.Context(), tx, testCase.metadata)
@@ -851,10 +903,10 @@ func TestRemoveOrganizationMetadata(t *testing.T) {
 	})
 
 	t.Run("successful", func(t *testing.T) {
-		savepoint, err := tx.Begin(t.Context())
+		tx, err := tx.Begin(t.Context())
 		require.NoError(t, err)
 		defer func() {
-			require.NoError(t, savepoint.Rollback(t.Context()))
+			require.NoError(t, tx.Rollback(t.Context()))
 		}()
 		affected, err := metadataRepo.Remove(
 			t.Context(), tx,
