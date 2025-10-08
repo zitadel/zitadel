@@ -157,7 +157,7 @@ export default function ApiItemWrapper(props) {
               <textarea
                 className="w-full resize-none rounded-md border border-gray-300 dark:border-gray-600 bg-transparent p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                 rows="4"
-                placeholder="What would make this page more helpful? (optional)"
+                placeholder="What would make this page more helpful?"
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
               />
