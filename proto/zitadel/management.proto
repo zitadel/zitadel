@@ -9861,17 +9861,17 @@ message AddProjectRequest {
     ];
     bool project_role_assertion = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Enable this setting to have role information included in the user info endpoint. It is also dependent on your application settings to include it in tokens and other types.";
+            description: "Enable this setting to provide role information to your application. For OpenID Connect, the roles can be requested from the UserInfo endpoint or sent in the ID or Access Token, based on your application's configuration.";
         }
     ];
     bool project_role_check = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "When enabled ZITADEL will check if a user has a role of this project assigned when login into an application of this project.";
+            description: "Deny authentication if the user has no authorization assigned to this project. Authorizations to the project without assigned a specific role to the user are allowed.";
         }
     ];
     bool has_project_check = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "When enabled ZITADEL will check if the organization of the user, that is trying to log in, has a grant to this project.";
+            description: "Before a user can be authenticated, it is verified that their affiliated organization has been granted access to this project. Authentication is not permitted for users from unauthorized organizations.";
         }
     ];
     zitadel.project.v1.PrivateLabelingSetting private_labeling_setting = 5 [
