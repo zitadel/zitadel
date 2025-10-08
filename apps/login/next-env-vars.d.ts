@@ -36,6 +36,10 @@ declare namespace NodeJS {
      * The base path the app is served from, e.g. /ui/v2/login
      */
     NEXT_PUBLIC_BASE_PATH: string;
+
+    /**
+     * The application name shown in the login and invite emails
+     */
     NEXT_PUBLIC_APPLICATION_NAME: string;
   }
 }
