@@ -23,8 +23,9 @@ import (
 )
 
 const (
-	QueueName   = "service_ping_report"
-	minInterval = 30 * time.Minute
+	QueueName = "service_ping_report"
+	// minInterval = 30 * time.Minute
+	minInterval = 1 * time.Minute // Debug - set frequent service pings
 )
 
 var (
@@ -56,6 +57,10 @@ type Queue interface {
 
 // Register implements the [queue.Worker] interface.
 func (w *Worker) Register(workers *river.Workers, queues map[string]river.QueueConfig) {
+	// river.AddWorker registers this worker (w) to handle jobs of type ServicePingReport in the river.Workers registry.
+	// The worker is triggered whenever a ServicePingReport job is enqueued in the "service_ping_report" queue.
+	// Jobs of this type are enqueued by calling the Insert method of the Queue interface with a ServicePingReport as the job argument.
+	// To find where jobs are enqueued, search for usages of Insert with QueueName ("service_ping_report") or for Insert calls with ServicePingReport as the argument.
 	river.AddWorker[*ServicePingReport](workers, w)
 	queues[QueueName] = river.QueueConfig{
 		MaxWorkers: 1, // for now, we only use a single worker to prevent too much side effects on other queues
@@ -109,6 +114,8 @@ func (w *Worker) reportResourceCounts(ctx context.Context, reportID string) erro
 		case <-ctx.Done():
 			return nil
 		default:
+			// ListResourceCounts is what determines the thing we are counting. It's an array with an element per count, like password age policies,
+			// complexity policy,  and for each a TableName like projections.orgs1, projections.projects4, etc.
 			counts, err := w.db.ListResourceCounts(ctx, lastID, w.config.Telemetry.ResourceCount.BulkSize)
 			if err != nil {
 				return err
