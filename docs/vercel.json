@@ -1,4 +1,6 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "pnpm nx run @zitadel/docs:build",
   "github": {
     "enabled": true
   },
@@ -222,6 +224,11 @@
     {
       "source": "/docs/guides/integrate/login-ui/typescript-repo",
       "destination": "/docs/guides/integrate/login-ui/login-app",
+      "permanent": true
+    },
+    {
+      "source": "/docs/legal/service-description/billing",
+      "destination": "https://help.zitadel.com/pricing-and-billing-of-zitadel-services",
       "permanent": true
     }
   ]

@@ -4,6 +4,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   selector: 'cnsl-nav-toggle',
   templateUrl: './nav-toggle.component.html',
   styleUrls: ['./nav-toggle.component.scss'],
+  standalone: false,
 })
 export class NavToggleComponent {
   @Input() public label: string = '';

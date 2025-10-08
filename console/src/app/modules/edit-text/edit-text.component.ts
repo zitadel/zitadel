@@ -9,6 +9,7 @@ import { InfoSectionType } from '../info-section/info-section.component';
   selector: 'cnsl-edit-text',
   templateUrl: './edit-text.component.html',
   styleUrls: ['./edit-text.component.scss'],
+  standalone: false,
 })
 export class EditTextComponent implements OnInit, OnDestroy {
   @Input() label: string = '';
