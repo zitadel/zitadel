@@ -6,6 +6,7 @@ ExternalSecure: false
 Database:
   postgres:
     database: zitadel
+    AwaitInitialConn: 5m
     MaxOpenConns: 15
     MaxIdleConns: 10
     Database: zitadel
