@@ -6,6 +6,7 @@ import { ThemeService } from 'src/app/services/theme.service';
   selector: 'cnsl-theme-setting',
   templateUrl: './theme-setting.component.html',
   styleUrls: ['./theme-setting.component.scss'],
+  standalone: false,
 })
 export class ThemeSettingComponent implements OnDestroy {
   public darkTheme: boolean = true;
