@@ -8,7 +8,6 @@ fi
 
 if [ -n "${ZITADEL_SERVICE_USER_TOKEN_FILE}" ]; then
     echo "ZITADEL_SERVICE_USER_TOKEN_FILE=${ZITADEL_SERVICE_USER_TOKEN_FILE} is set. Awaiting file and reading token."
-    echo "Current dir: ${PWD}"
     while [ ! -f "${ZITADEL_SERVICE_USER_TOKEN_FILE}" ]; do
         sleep 2
     done

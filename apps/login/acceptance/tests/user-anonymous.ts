@@ -9,46 +9,36 @@ export class AnonymousUser {
 
   private readonly passwordField = "password-text-input";
   private readonly passwordConfirmField = "password-confirm-text-input";
-  public username: string | null = null;
 
-  defaultFirstName = faker.person.firstName();
-  defaultLastName = faker.person.lastName()
-  defaultEmail = faker.internet.email();
-  
+  public firstName = faker.person.firstName();
+  public lastName = faker.person.lastName();
+  public username = faker.internet.email();
 
   constructor(private page: Page, private svc: UserService) { }
 
-  public async registerWithPassword(
-    firstname: string = this.defaultFirstName,
-    lastname: string = this.defaultLastName,
-    email: string = this.defaultEmail,
-    password1: string,
-    password2: string,
-  ) {
-    await this.page.goto("/ui/v2/login/register");
-    await this.registerUserScreenPassword(firstname, lastname, email);
-    await this.page.getByTestId("submit-button").click();
-    this.username = email;
-    await this.registerPasswordScreen(password1, password2);
-    await this.page.getByTestId("submit-button").click();
-    await this.verifyEmail(email);
+  get fullName() {
+    return this.firstName + " " + this.lastName;
   }
 
-  public async registerWithPasskey(
-    firstname: string = this.defaultFirstName,
-    lastname: string = this.defaultLastName,
-     email: string = this.defaultEmail
-  ): Promise<string> {
+  public async registerWithPassword() {
     await this.page.goto("/ui/v2/login/register");
-    await this.registerUserScreenPasskey(firstname, lastname, email);
+    await this.registerUserScreenPassword();
     await this.page.getByTestId("submit-button").click();
-    this.username = email;
+    await this.registerPasswordScreen();
+    await this.page.getByTestId("submit-button").click();
+    await this.verifyEmail(this.username);
+  }
+
+  public async registerWithPasskey(): Promise<string> {
+    await this.page.goto("/ui/v2/login/register");
+    await this.registerUserScreenPasskey();
+    await this.page.getByTestId("submit-button").click();
 
     // wait for projection of user
     await this.page.waitForTimeout(10000);
     const authId = await passkeyRegister(this.page);
 
-    await this.verifyEmail(email);
+    await this.verifyEmail(this.username);
     return authId;
   }
 
@@ -57,25 +47,25 @@ export class AnonymousUser {
     await emailVerify(this.page, c);
   }
 
-  async registerUserScreenPassword(firstname: string, lastname: string, email: string) {
-    await this.registerUserScreen(firstname, lastname, email);
+  private async registerUserScreenPassword() {
+    await this.registerUserScreen();
     await this.page.getByTestId("password-radio").click();
   }
 
-  async registerUserScreenPasskey(firstname: string, lastname: string, email: string) {
-    await this.registerUserScreen(firstname, lastname, email);
+  private async registerUserScreenPasskey() {
+    await this.registerUserScreen();
     await this.page.getByTestId("passkey-radio").click();
   }
 
-  async registerPasswordScreen(password1: string, password2: string) {
-    await this.page.getByTestId(this.passwordField).pressSequentially(password1);
-    await this.page.getByTestId(this.passwordConfirmField).pressSequentially(password2);
+  private async registerPasswordScreen() {
+    await this.page.getByTestId(this.passwordField).pressSequentially("Password2!");
+    await this.page.getByTestId(this.passwordConfirmField).pressSequentially("Password2!");
   }
 
-  async registerUserScreen(firstname: string, lastname: string, email: string) {
-    await this.page.getByTestId("firstname-text-input").pressSequentially(firstname);
-    await this.page.getByTestId("lastname-text-input").pressSequentially(lastname);
-    await this.page.getByTestId("email-text-input").pressSequentially(email);
+  private async registerUserScreen() {
+    await this.page.getByTestId("firstname-text-input").pressSequentially(this.firstName);
+    await this.page.getByTestId("lastname-text-input").pressSequentially(this.lastName);
+    await this.page.getByTestId("email-text-input").pressSequentially(this.username);
     await this.page.getByTestId("privacy-policy-checkbox").check();
     await this.page.getByTestId("tos-checkbox").check();
   }

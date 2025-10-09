@@ -3,21 +3,13 @@ import { test } from "./fixtures.js";
 import { loginScreenExpect } from "./login.js";
 
 test("register with password", async ({ page, anonymousUser }) => {
-  const username = faker.internet.email();
-  const password = "Password1!";
-  const firstname = faker.person.firstName();
-  const lastname = faker.person.lastName();
-  await anonymousUser.registerWithPassword(firstname, lastname, username, password, password);
-  await loginScreenExpect(page, firstname + " " + lastname);
+  await anonymousUser.registerWithPassword();
+  await loginScreenExpect(page, anonymousUser.fullName!);
 });
 
 test("register with passkey", async ({ page, anonymousUser }) => {
-  const username = faker.internet.email();
-  const firstname = faker.person.firstName();
-  const lastname = faker.person.lastName();
-
-  await anonymousUser.registerWithPasskey(firstname, lastname, username);
-  await loginScreenExpect(page, firstname + " " + lastname);
+  await anonymousUser.registerWithPasskey();
+  await loginScreenExpect(page, anonymousUser.fullName!);
 });
 
 test("register with username and password - only password enabled", async ({ page }) => {

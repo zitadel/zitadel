@@ -10,7 +10,7 @@ const awaitNotification = new Gaxios({
     statusCodesToRetry: [[404, 404]],
     retry: NOTIFICATION_RETRY_COUNT,
     onRetryAttempt: (error) => {
-      console.warn(`Retrying request to sink notification service: ${error.message}`);
+      console.warn(`Retrying request to mock notification service: ${error.message}`);
     },
   },
 });

@@ -101,7 +101,7 @@ export const test = base.extend<{ transport: Transport, userService: UserService
     userCreator: async ({ userService }, use) => {
         const user = new UserCreator(userService);
         await use(user);
-//        await user.cleanup();
+        await user.cleanup();
     }
 });
 
