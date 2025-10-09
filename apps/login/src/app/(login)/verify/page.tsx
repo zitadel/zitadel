@@ -159,19 +159,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           </div>
         )}
 
-        {sessionFactors ? (
-          <UserAvatar
-            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
-            displayName={sessionFactors.factors?.user?.displayName}
-            showDropdown
-            searchParams={searchParams}
-          ></UserAvatar>
-        ) : (
-          user && (
-            <UserAvatar loginName={user.preferredLoginName} displayName={human?.profile?.displayName} showDropdown={false} />
-          )
-        )}
-
         <VerifyForm
           loginName={loginName}
           organization={organization}

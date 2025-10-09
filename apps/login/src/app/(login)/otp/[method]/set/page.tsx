@@ -150,9 +150,7 @@ export default async function Page(props: {
             <Alert>{error?.message}</Alert>
           </div>
         )}
-      </div>
 
-      <div className="w-full">
         {session && (
           <UserAvatar
             loginName={loginName ?? session.factors?.user?.loginName}
@@ -161,7 +159,9 @@ export default async function Page(props: {
             searchParams={searchParams}
           ></UserAvatar>
         )}
+      </div>
 
+      <div className="w-full">
         {totpResponse && "uri" in totpResponse && "secret" in totpResponse ? (
           <div>
             <TotpRegister
