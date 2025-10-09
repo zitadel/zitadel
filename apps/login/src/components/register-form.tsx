@@ -72,7 +72,7 @@ export function RegisterForm({
       requestId: requestId,
     })
       .catch(() => {
-        setError("Could not register user");
+        setError(t("errors.couldNotRegisterUser"));
         return;
       })
       .finally(() => {
