@@ -2,17 +2,17 @@ import { expect, Page } from "@playwright/test";
 import { codeScreen } from "./code-screen.js";
 import { eventualEmailOTP , eventualSMSOTP } from "./mock.js";
 
-export async function verifyEmailCodeFromMockServer(page: Page, key: string) {
-  const c = await eventualEmailOTP(key);
+export async function verifyEmailOTPFromMockServer(page: Page, recipient: string) {
+  const c = await eventualEmailOTP(recipient, "oTP");
   await verifyCode(page, c);
 }
 
-export async function smsCodeFromMockServer(page: Page, key: string) {
-  const c = await eventualSMSOTP(key);
+export async function verifySMSOTPFromMockServer(page: Page, phone: string) {
+  const c = await eventualSMSOTP(phone);
   await verifyCode(page, c);
 }
 
-export async function verifyTOTPCode(page: Page, code: string) {
+export async function verifyOTPCode(page: Page, code: string) {
   await expect(page.getByRole("heading")).toContainText('Verify 2-Factor');
   await verifyCode(page, code); 
 }

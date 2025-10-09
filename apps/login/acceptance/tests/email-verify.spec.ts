@@ -6,7 +6,7 @@ import { test } from "./fixtures.js";
 
 test("user email not verified, verify", async ({ userCreator, page }) => {
   // Create user with password but unverified email
-  await userCreator.create();
+  await userCreator.withEmailUnverified().create();
   console.log("Created user", userCreator.username);
   await loginWithPassword(page, userCreator.username, userCreator.password);
   const code = await eventualEmailOTP(userCreator.username);
@@ -17,7 +17,7 @@ test("user email not verified, verify", async ({ userCreator, page }) => {
 });
 
 test("user email not verified, resend, verify", async ({ userCreator, page }) => {
-  await userCreator.create();
+  await userCreator.withEmailUnverified().create();
   await loginWithPassword(page, userCreator.username, userCreator.password);
   // auto-redirect on /verify
   await emailVerifyResend(page);
@@ -29,7 +29,7 @@ test("user email not verified, resend, verify", async ({ userCreator, page }) =>
 });
 
 test("user email not verified, resend, old code", async ({ userCreator, page }) => {
-  await userCreator.create();
+  await userCreator.withEmailUnverified().create();
   await loginWithPassword(page, userCreator.username, userCreator.password);
   const c = await eventualEmailOTP(userCreator.username);
   await emailVerifyResend(page);
@@ -40,7 +40,7 @@ test("user email not verified, resend, old code", async ({ userCreator, page }) 
 });
 
 test("user email not verified, wrong code", async ({ userCreator, page }) => {
-  await userCreator.create();
+  await userCreator.withEmailUnverified().create();
   await loginWithPassword(page, userCreator.username, userCreator.password);
   // auto-redirect on /verify
   const code = "wrong";

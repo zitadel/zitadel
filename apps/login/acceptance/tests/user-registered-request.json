@@ -5,7 +5,7 @@
         "idpLinks": [],
         "email": {
             "email": "user@example.com",
-            "isVerified": false
+            "isVerified": true
         },
         "profile": {
             "givenName": "John",

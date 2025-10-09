@@ -1,7 +1,7 @@
 import { codeScreenExpect } from "./code-screen.js";
 import { loginScreenExpect, loginWithPassword } from "./login.js";
 import { test } from "./fixtures.js";
-import { verifyTOTPCode } from "./code.js";
+import { verifyOTPCode } from "./code.js";
 
 test("username, password and totp login", async ({ userCreator: registeredUser, userService, page }) => {
   // Given totp is enabled on the organization of the user
@@ -14,7 +14,7 @@ test("username, password and totp login", async ({ userCreator: registeredUser, 
   const user = await registeredUser.create()
   const secret = await registeredUser.addTOTPFactor();
   await loginWithPassword(page, registeredUser.username, registeredUser.password);
-  await verifyTOTPCode(page, userService.generateTOTPToken(secret));
+  await verifyOTPCode(page, userService.generateTOTPToken(secret));
   await loginScreenExpect(page, registeredUser.fullName);
 });
 
@@ -27,9 +27,10 @@ test("username, password and totp otp login, wrong code", async ({ userCreator: 
   // User enters a wrong code
   // Error message - "Invalid code" is shown
   await registeredUser.create()
+  await registeredUser.addTOTPFactor();
   const c = "wrongcode";
   await loginWithPassword(page, registeredUser.username, registeredUser.password);
-  await verifyTOTPCode(page, c);
+  await verifyOTPCode(page, c);
   await codeScreenExpect(page, c);
 });
 

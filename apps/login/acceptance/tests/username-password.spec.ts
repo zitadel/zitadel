@@ -7,7 +7,6 @@ import { test } from "./fixtures.js";
 
 test("username and password login", async ({ userCreator, page }) => {
   await userCreator.create()
-  await userCreator.create()
   await loginWithPassword(page, userCreator.username, userCreator.password);
   await loginScreenExpect(page, userCreator.fullName);
 });

@@ -45,6 +45,11 @@ export class UserCreator {
         return this;
     }
 
+    withEmailUnverified(): UserCreator {
+        this.req.human.email.isVerified = false;
+        return this;
+    }
+
     async addTOTPFactor(): Promise<string> {
         if (!this.res) {
             throw new Error("User must be created before adding a TOTP factor");
@@ -53,6 +58,20 @@ export class UserCreator {
         const code = this.svc.generateTOTPToken(response.secret);
         await this.svc.native.verifyTOTPRegistration({ userId: this.res.id, code });
         return response.secret;
+    }
+
+    async addEmailOTPFactor(): Promise<void> {
+        if (!this.res) {
+            throw new Error("User must be created before adding an email OTP factor");
+        }
+        await this.svc.native.addOTPEmail({ userId: this.res.id });
+    }
+
+    async addSMSOTPFactor(): Promise<void> {
+        if (!this.res) {
+            throw new Error("User must be created before adding an SMS OTP factor");
+        }
+        await this.svc.native.addOTPSMS({ userId: this.res.id });
     }
 
     async cleanup() {
@@ -82,7 +101,7 @@ export const test = base.extend<{ transport: Transport, userService: UserService
     userCreator: async ({ userService }, use) => {
         const user = new UserCreator(userService);
         await use(user);
-        await user.cleanup();
+//        await user.cleanup();
     }
 });
 
