@@ -205,8 +205,13 @@ func TestServer_ListGroups(t *testing.T) {
 					Filters: []*group_v2.GroupsSearchFilter{{}},
 				},
 			},
-			wantErrCode: codes.NotFound,
-			wantErrMsg:  "membership not found (AUTHZ-cdgFk)",
+			want: &group_v2.ListGroupsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  0,
+					AppliedLimit: 100,
+				},
+				Groups: []*group_v2.Group{},
+			},
 		},
 		{
 			name: "org owner, missing permission, empty list",
@@ -229,7 +234,7 @@ func TestServer_ListGroups(t *testing.T) {
 			},
 			want: &group_v2.ListGroupsResponse{
 				Pagination: &filter.PaginationResponse{
-					TotalResult:  1,
+					TotalResult:  0,
 					AppliedLimit: 100,
 				},
 				Groups: []*group_v2.Group{},
