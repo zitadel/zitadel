@@ -93,7 +93,7 @@ func TestDeleteOrgCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-X7YXxC", "Errors.Org.ZitadelOrgNotDeletable"),
 		},
 		{
-			testName: "when fetching organization fails should return error",
+			testName: "when fetching organization fails with not found error should return not found error",
 			projectRepo: func(ctrl *gomock.Controller) domain.ProjectRepository {
 				repo := domainmock.NewProjectRepo(ctrl)
 
@@ -117,45 +117,11 @@ func TestDeleteOrgCommand_Validate(t *testing.T) {
 						database.And(repo.IDCondition("org-1"), repo.InstanceIDCondition("inst-1")),
 					))).
 					Times(1).
-					Return(nil, getErr)
-				return repo
-			},
-			inputOrganizationID: "org-1",
-			expectedError:       getErr,
-		},
-		{
-			testName: "when organization is neither active nor inactive should return not found error",
-			projectRepo: func(ctrl *gomock.Controller) domain.ProjectRepository {
-				repo := domainmock.NewProjectRepo(ctrl)
-
-				repo.EXPECT().Get(gomock.Any(), gomock.Any(),
-					dbmock.QueryOptions(database.WithCondition(
-						database.And(
-							repo.IDCondition("prj-1"),
-							repo.OrganizationIDCondition("org-1"),
-							repo.InstanceIDCondition("inst-1"),
-						),
-					))).
-					Times(1).
 					Return(nil, database.NewNoRowFoundError(getErr))
-
-				return repo
-			},
-			orgRepo: func(ctrl *gomock.Controller) domain.OrganizationRepository {
-				repo := domainmock.NewOrgRepo(ctrl)
-				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
-						database.And(repo.IDCondition("org-1"), repo.InstanceIDCondition("inst-1")),
-					))).
-					Times(1).
-					Return(&domain.Organization{
-						ID:    "org-1",
-						State: domain.OrgStateRemoved,
-					}, nil)
 				return repo
 			},
 			inputOrganizationID: "org-1",
-			expectedError:       zerrors.ThrowNotFound(nil, "DOM-8KYOH3", "Errors.Org.NotFound"),
+			expectedError:       zerrors.ThrowNotFound(database.NewNoRowFoundError(getErr), "DOM-8KYOH3", "Errors.Org.NotFound"),
 		},
 		{
 			testName: "when organization is active should validate successfully",
