@@ -2,6 +2,7 @@ ExternalSecure: false
 TLS.Enabled: false
 Database.Postgres:
   Database: zitadel
+  AwaitInitialConn: 5m
   MaxOpenConns: 20
   MaxIdleConns: 20
   ConnMaxLifetime: 60m
