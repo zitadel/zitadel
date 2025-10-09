@@ -13,11 +13,7 @@ Database:
     Host: localhost
     Port: 5432
     Database: zitadel
-    AwaitInitialConn:
-      Timeout: 5m
-      InitialBackoff: 100ms
-      MaxBackoff: 5s
-      BackoffFactor: 1.5
+    AwaitInitialConn: 5m
     MaxOpenConns: 15
     MaxIdleConns: 10
     MaxConnLifetime: 1h

@@ -1,8 +1,6 @@
 Database:
   Postgres:
-    AwaitInitialConn:
-      Timeout: 5m
-      BackoffFactor: 1
+    AwaitInitialConn: 5m
     MaxOpenConns: 20
     MaxIdleConns: 20
     MaxConnLifetime: 1h
