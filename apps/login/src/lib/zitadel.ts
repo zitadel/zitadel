@@ -30,6 +30,7 @@ import {
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { unstable_cacheLife as cacheLife } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { getUserAgent } from "./fingerprint";
 import { setSAMLFormCookie } from "./saml";
 import { createServiceForHost } from "./service";
@@ -614,6 +615,8 @@ const EmailQuery = (searchValue: string) =>
 export async function searchUsers({ serviceUrl, searchValue, loginSettings, organizationId, suffix }: SearchUsersCommand) {
   const queries: SearchQuery[] = [];
 
+  const t = await getTranslations("zitadel");
+
   // if a suffix is provided, we search for the userName concatenated with the suffix
   if (suffix) {
     const searchValueWithSuffix = `${searchValue}@${suffix}`;
@@ -642,11 +645,11 @@ export async function searchUsers({ serviceUrl, searchValue, loginSettings, orga
   const loginNameResult = await userService.listUsers({ queries });
 
   if (!loginNameResult || !loginNameResult.details) {
-    return { error: "An error occurred." };
+    return { error: t("errors.errorOccured") };
   }
 
   if (loginNameResult.result.length > 1) {
-    return { error: "Multiple users found" };
+    return { error: t("errors.multipleUsersFound") };
   }
 
   if (loginNameResult.result.length == 1) {
@@ -655,7 +658,7 @@ export async function searchUsers({ serviceUrl, searchValue, loginSettings, orga
 
   const emailAndPhoneQueries: SearchQuery[] = [];
   if (loginSettings.disableLoginWithEmail && loginSettings.disableLoginWithPhone) {
-    return { error: "User not found in the system" };
+    return { error: t("errors.userNotFound") };
   } else if (loginSettings.disableLoginWithEmail && searchValue.length <= 20) {
     const phoneQuery = PhoneQuery(searchValue);
     emailAndPhoneQueries.push(phoneQuery);
@@ -704,18 +707,18 @@ export async function searchUsers({ serviceUrl, searchValue, loginSettings, orga
   });
 
   if (!emailOrPhoneResult || !emailOrPhoneResult.details) {
-    return { error: "An error occurred." };
+    return { error: t("errors.errorOccured") };
   }
 
   if (emailOrPhoneResult.result.length > 1) {
-    return { error: "Multiple users found." };
+    return { error: t("errors.multipleUsersFound") };
   }
 
   if (emailOrPhoneResult.result.length == 1) {
     return emailOrPhoneResult;
   }
 
-  return { error: "User not found in the system" };
+  return { error: t("errors.userNotFound") };
 }
 
 export async function getDefaultOrg({ serviceUrl }: { serviceUrl: string }): Promise<Organization | null> {
