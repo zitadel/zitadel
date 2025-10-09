@@ -28,6 +28,10 @@ func (s *Server) DeleteInstance(ctx context.Context, request *connect.Request[in
 }
 
 func (s *Server) UpdateInstance(ctx context.Context, request *connect.Request[instance.UpdateInstanceRequest]) (*connect.Response[instance.UpdateInstanceResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.UpdateInstance(ctx, request.Msg)
+	}
+
 	obj, err := s.command.UpdateInstance(ctx, request.Msg.GetInstanceName())
 	if err != nil {
 		return nil, err

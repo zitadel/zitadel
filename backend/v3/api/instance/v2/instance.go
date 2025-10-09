@@ -53,3 +53,21 @@ func GetInstance(ctx context.Context, instanceID string) (*connect.Response[inst
 		},
 	}, nil
 }
+
+func UpdateInstance(ctx context.Context, request *instance.UpdateInstanceRequest) (*connect.Response[instance.UpdateInstanceResponse], error) {
+	instanceUpdateCmd := domain.NewUpdateInstanceCommand(request.GetInstanceId(), request.GetInstanceName())
+
+	err := domain.Invoke(ctx, instanceUpdateCmd, domain.WithInstanceRepo(repository.InstanceRepository()))
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &connect.Response[instance.UpdateInstanceResponse]{
+		Msg: &instance.UpdateInstanceResponse{
+			// TODO(IAM-Marco): Change this with the real update date when InstanceRepo.Update()
+			// returns the timestamp
+			ChangeDate: timestamppb.Now(),
+		},
+	}, nil
+}
