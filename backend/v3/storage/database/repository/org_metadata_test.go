@@ -411,6 +411,7 @@ func TestSetOrganizationMetadata_UpdatedAt(t *testing.T) {
 	require.NoError(t, err)
 	afterUpdate := time.Now()
 
+	assert.WithinRange(t, metadata.CreatedAt, beforeCreate, afterCreate)
 	assert.WithinRange(t, metadata.UpdatedAt, beforeUpdate, afterUpdate)
 }
 
