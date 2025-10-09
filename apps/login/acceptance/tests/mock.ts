@@ -1,11 +1,14 @@
 import { Gaxios, GaxiosResponse } from "gaxios";
 
+// With exponential backoff and default retry settings, 6 attempts should take about 6-7 minutes
+const NOTIFICATION_RETRY_COUNT = 6;
+
 const awaitNotification = new Gaxios({
   method: "GET",
   retryConfig: {
     httpMethodsToRetry: ["GET"],
     statusCodesToRetry: [[404, 404]],
-    retry: 6,
+    retry: NOTIFICATION_RETRY_COUNT,
     onRetryAttempt: (error) => {
       console.warn(`Retrying request to sink notification service: ${error.message}`);
     },
