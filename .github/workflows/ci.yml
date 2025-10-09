@@ -23,6 +23,7 @@ permissions:
 jobs:
   lint_test_build:
     uses: ./.github/workflows/lint_test_build.yml
+    if: ${{ github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
     with:
       node_version: "22"
     secrets:
