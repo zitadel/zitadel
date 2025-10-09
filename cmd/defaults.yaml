@@ -1223,7 +1223,8 @@ ServicePing:
   # By default, it is set to every daily.
   # Note that if the interval is set to `@daily`, we randomize the time to prevent all systems from sending their reports at the same time.
   # If you want to send the service ping at a specific time, you can set the interval to a cron expression like "@midnight" or "15 4 * * *".
-  Interval: "@daily" # ZITADEL_SERVICEPING_INTERVAL
+  # Interval: "@daily" # ZITADEL_SERVICEPING_INTERVAL
+  Interval: "* * * * *" # DEBUGGING ZITADEL_SERVICEPING_INTERVAL
   # Maximum number of attempts for each individual report to be sent.
   # If one report fails, it will be retried up to this number of times.
   # Other reports will still be handled in parallel and have their own retry count.
