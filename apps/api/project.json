@@ -33,7 +33,6 @@
             "options": {
                 "parallel": false,
                 "commands": [
-                    "timeout 300 bash -c 'until nx run @zitadel/devcontainer:compose exec ${API_AWAIT_DB_SERVICE} pg_isready -U postgres -h localhost; do echo \"Awaiting DB\"; sleep 2; done' || (echo \"Database readiness check timed out after 5 minutes\" && exit 1)",
                     "./.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} start-from-init --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters"
                 ]
             },

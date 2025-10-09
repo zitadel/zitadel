@@ -1,5 +1,6 @@
 Database:
   Postgres:
+    AwaitInitialConn: 5m
     MaxOpenConns: 20
     MaxIdleConns: 20
     MaxConnLifetime: 1h
