@@ -50,7 +50,8 @@
 				"Angular.ng-template",
 				"dbaeumer.vscode-eslint",
 				"esbenp.prettier-vscode",
-				"nrwl.angular-console"
+				"nrwl.angular-console",
+				"vitest.explorer"
 			]
 		}
 	}
