@@ -53,7 +53,6 @@ func UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org
 	// TODO(IAM-Marco) Finish implementation in https://github.com/zitadel/zitadel/issues/10447
 	domainAddCmd := domain.NewAddOrgDomainCommand(request.Msg.GetId(), request.Msg.GetName())
 	domainSetPrimaryCmd := domain.NewSetPrimaryOrgDomainCommand(request.Msg.GetId(), request.Msg.GetName())
-	// TODO(IAM-Marco) Check if passing the pointer is actually working to retrieve the domain name and the DomainVerified
 	domainRemoveCmd := domain.NewRemoveOrgDomainCommand(request.Msg.GetId(), orgUpdtCmd.OldDomainName, orgUpdtCmd.IsOldDomainVerified)
 
 	batchCmd := domain.BatchCommands(orgUpdtCmd, domainAddCmd, domainSetPrimaryCmd, domainRemoveCmd)
