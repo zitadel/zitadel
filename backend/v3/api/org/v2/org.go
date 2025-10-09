@@ -56,8 +56,6 @@ func UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org
 	// TODO(IAM-Marco) Check if passing the pointer is actually working to retrieve the domain name and the DomainVerified
 	domainRemoveCmd := domain.NewRemoveOrgDomainCommand(request.Msg.GetId(), orgUpdtCmd.OldDomainName, orgUpdtCmd.IsOldDomainVerified)
 
-	// TODO(IAM-Marco): I noticed while debugging that this is calling twice the commands (I think?)
-	// It's hard to debug, I haven't spent too much into it. Only drawback is pushing events twice.
 	batchCmd := domain.BatchCommands(orgUpdtCmd, domainAddCmd, domainSetPrimaryCmd, domainRemoveCmd)
 
 	err := domain.Invoke(ctx, batchCmd, domain.WithOrganizationRepo(repository.OrganizationRepository()))
