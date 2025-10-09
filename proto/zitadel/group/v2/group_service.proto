@@ -13,6 +13,7 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 import "zitadel/filter/v2/filter.proto";
 import "zitadel/group/v2/group.proto";
+import "zitadel/user.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/group/v2;group";
 
@@ -298,6 +299,51 @@ service GroupService {
       };
     };
   }
+
+  // Add Users
+  //
+  // Adds one or more users to a group.
+  // The users should be in the same organization as the group. // todo: review
+  //
+  // Required permissions:
+  //   - group.user.write
+  rpc AddUsersToGroup(AddUsersToGroupRequest) returns (AddUsersToGroupResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // Remove Users
+  //
+  // Removes one or more users from a group.
+  // If the user(s) is/are not in the group, the request will return a successful response as
+  // the desired state is already achieved.
+  //
+  // Required permissions:
+  //   - group.user.delete
+  rpc RemoveUsersFromGroup(RemoveUsersFromGroupRequest) returns (RemoveUsersFromGroupResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // List Users
+  //
+  // Lists all the users in a group.
+  //
+  // Required permissions:
+  //   - group.user.read
+  rpc ListUsersInGroup(ListUsersInGroupRequest) returns (ListUsersInGroupResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
 }
 
 message CreateGroupRequest {
@@ -460,4 +506,84 @@ message DeleteGroupResponse {
       example: "\"2025-08-11T15:00:00.051Z\"";
     }
   ];
+}
+
+message AddUsersToGroupRequest {
+  // ID of the group to which the users should be added.
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // UserIds is a list of IDs of the users who should be added to the group.
+  repeated string user_ids = 2 [
+    (validate.rules).repeated = {min_items: 1, items: {string: {min_len: 1, max_len: 200}}},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"69629023906488334\",\"69622366012355662\"]";
+    }
+  ];
+}
+
+message AddUsersToGroupResponse {
+  // ChangeDate is the timestamp when the users are added.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-08-11T15:00:00.051Z\"";
+    }
+  ];
+
+  // todo: should we include the list of user ids that were added (or the number of users that were added),
+  //  in case some of the IDs could not be added (for example, user does not exists) ?
+
+}
+
+message RemoveUsersFromGroupRequest {
+  // ID of the group from which the users should be removed.
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // UserIds is a list of IDs of the users who should be removed the group.
+  repeated string user_ids = 2 [
+    (validate.rules).repeated = {min_items: 1, items: {string: {min_len: 1, max_len: 200}}},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"69629023906488334\",\"69622366012355662\"]";
+    }
+  ];
+}
+
+message RemoveUsersFromGroupResponse {
+  // ChangeDate is the timestamp when the users are removed.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-08-11T15:00:00.051Z\"";
+    }
+  ];
+}
+
+// todo: query by username / userID / added date in a group?
+// return all users if there's no specific query?
+message ListUsersInGroupRequest {
+  // ID of the group from which users should be retrieved.
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message ListUsersInGroupResponse {
+  // Users is the list of users present in the requested group
+  repeated zitadel.user.v1.User users = 1;
 }
