@@ -5,32 +5,49 @@
     "libsDir": "packages"
   },
   "namedInputs": {
-    "default": ["{projectRoot}/**/*"]
+    "default": [
+      "{projectRoot}/**/*"
+    ]
   },
   "targetDefaults": {
     "generate": {
       "cache": true,
-      "inputs": ["default"]
+      "inputs": [
+        "default"
+      ]
     },
     "build": {
       "cache": true,
-      "inputs": ["default"],
-      "dependsOn": ["^build", "generate"]
+      "inputs": [
+        "default"
+      ],
+      "dependsOn": [
+        "^build",
+        "generate"
+      ]
     },
     "lint": {
-      "inputs": ["default"],
+      "inputs": [
+        "default"
+      ],
       "cache": true
     },
     "test": {
-      "inputs": ["default"],
+      "inputs": [
+        "default"
+      ],
       "cache": true
     },
     "test-unit": {
-      "inputs": ["default"],
+      "inputs": [
+        "default"
+      ],
       "cache": true
     },
     "test-integration": {
-      "inputs": ["default"],
+      "inputs": [
+        "default"
+      ],
       "cache": true
     }
   }
