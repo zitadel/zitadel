@@ -1210,9 +1210,9 @@ export function createServerTransport(token: string, baseUrl: string) {
           (next) => {
             return (req) => {
               process.env.CUSTOM_REQUEST_HEADERS!.split(",").forEach((header) => {
-                const kv = header.split(":");
-                if (kv.length === 2) {
-                  req.header.set(kv[0].trim(), kv[1].trim());
+                const kv = header.indexOf(":");
+                if (kv > 0) {
+                  req.header.set(header.slice(0, kv).trim(), header.slice(kv + 1).trim());
                 } else {
                   console.warn(`Skipping malformed header: ${header}`);
                 }
