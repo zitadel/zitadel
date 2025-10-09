@@ -23,6 +23,7 @@ import {
 } from "../zitadel";
 import { createSessionAndUpdateCookie } from "./cookie";
 import { getOriginalHost } from "./host";
+import { IDPLink } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 
 export type SendLoginnameCommand = {
   loginName: string;
@@ -70,7 +71,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   const redirectUserToIDP = async (userId?: string, organization?: string) => {
     // If userId is provided, check for user-specific IDP links first
-    let identityProviders: any[] = [];
+    let identityProviders: IDPLink[] = [];
     if (userId) {
       identityProviders = await listIDPLinks({
         serviceUrl,
