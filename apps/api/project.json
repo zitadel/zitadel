@@ -33,7 +33,7 @@
             "options": {
                 "parallel": false,
                 "commands": [
-                    "nx run @zitadel/devcontainer:compose up --detach --wait ${API_AWAIT_DB_SERVICE}",
+                    "timeout 300 bash -c 'until nx run @zitadel/devcontainer:compose exec ${API_AWAIT_DB_SERVICE} pg_isready -U postgres -h localhost; do echo \"Awaiting DB\"; sleep 2; done' || (echo \"Database readiness check timed out after 5 minutes\" && exit 1)",
                     "./.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} start-from-init --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters"
                 ]
             },
@@ -163,7 +163,6 @@
             "description": "Runs the API server for the integration tests.",
             "continuous": true,
             "dependsOn": [
-                "test-integration-run-db",
                 "test-integration-build"
             ],
             "executor": "nx:run-commands",
@@ -213,7 +212,7 @@
         },
         "test-integration-stop": {
             "description": "Stops the database and cache containers used for integration tests.",
-            "command": "nx run @zitadel/devcontainer:compose down db-api-integration cache-api-integration"
+            "command": "nx run @zitadel/devcontainer:compose down --volumes db-api-integration cache-api-integration"
         },
         "build-console": {
             "description": "Builds the Console and copies its static files to the API.",

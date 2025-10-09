@@ -75,9 +75,9 @@ If a command is stuck because a process is already running, stop the Nx daemon a
 
 ## Introduction
 
-Thank you for your interest about how to contribute! As you might know there is more than code to contribute. You can find all information needed to start contributing here.
+Thank you for your interest in contributing! As you might know there is more than code to contribute. You can find all information needed to start contributing here.
 
-Please give us and our community the chance to get rid of security vulnerabilities by responsibly disclose this kind of issues by contacting [security@zitadel.com](mailto:security@zitadel.com).
+Please give us and our community the chance to get rid of security vulnerabilities by responsibly disclosing these issues to [security@zitadel.com](mailto:security@zitadel.com).
 
 The strongest part of a community is the possibility to share thoughts. That's why we try to react as soon as possible to your ideas, thoughts and feedback. We love to discuss as much as possible in an open space like in the [issues](https://github.com/zitadel/zitadel/issues) and [discussions](https://github.com/zitadel/zitadel/discussions) section here or in our [chat](https://zitadel.com/chat), but we understand your doubts and provide further contact options [here](https://zitadel.com/contact).
 
@@ -86,13 +86,13 @@ If you want to give an answer or be part of discussions please be kind. Treat ot
 ## What can I contribute?
 
 For people who are new to Zitadel: We flag issues which are a good starting point to start contributing.
-You find them [here](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+You can find them [here](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
 We add the label "good first issue" for problems we think are a good starting point to contribute to Zitadel.
 
 - [Issues for first time contributors](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
 - [All issues](https://github.com/zitadel/zitadel/issues)
 
-Help shaping the future of Zitadel:
+Help shape the future of Zitadel:
 
 - Join our [chat](https://zitadel.com/chat) and discuss with us or others.
 - Ask or answer questions in the [issues section](https://github.com/zitadel/zitadel/issues)
@@ -111,7 +111,7 @@ Follow [@zitadel](https://twitter.com/zitadel) on twitter
 
 ## How to contribute
 
-We strongly recommend to [talk to us](https://zitadel.com/contact) before you start contributing to streamline our and your work.
+We strongly recommend [talking to us](https://zitadel.com/contact) before you start contributing to streamline your work with ours.
 
 We accept contributions through pull requests.
 You need a github account for that.
@@ -134,7 +134,7 @@ The code consists of the following parts:
 
 Please follow the guides to validate and test the code before you contribute.
 
-### Submit a pull request (PR)
+### Submitting a pull request (PR)
 
 1. [Fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) the [zitadel/zitadel](https://github.com/zitadel/zitadel) repository on GitHub
 2. On your fork, commit your changes to a new branch
@@ -181,7 +181,7 @@ Must be one of the following:
 
 #### Scope
 
-This is optional to indicate which component is affected. In doubt, leave blank (`<type>: <short summary>`)
+This is optional to indicate which component is affected. If in doubt, leave blank (`<type>: <short summary>`)
 
 #### Short summary
 
@@ -435,9 +435,7 @@ Reproduce the pipeline quality checks for the code you changed.
 
 ```bash
 # Run Login-related linting builds and unit tests
-pnpm nx run-many --projects @zitadel/login @zitadel/client @zitadel/proto --targets lint build test-unit
-# Run Login integration tests
-pnpm nx run @zitadel/login:test-integration
+pnpm nx run-many --projects @zitadel/login @zitadel/client @zitadel/proto --targets lint build test
 ```
 
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
@@ -524,7 +522,7 @@ Run the quality checks for the code you changed.
 
 ```bash
 # Run console-related linting builds and unit tests
-pnpm nx run-many --projects @zitadel/console @zitadel/client @zitadel/proto --targets lint build test
+pnpm nx run-many --projects @zitadel/console @zitadel/client @zitadel/proto @zitadel/functional-ui --targets lint build test
 ```
 
 Run functional UI tests against a locally built API and a dev server Console.
