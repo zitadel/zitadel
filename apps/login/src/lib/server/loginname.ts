@@ -68,63 +68,72 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   const { result: potentialUsers } = searchResult;
 
-  const redirectUserToSingleIDPIfAvailable = async () => {
-    const identityProviders = await getActiveIdentityProviders({
-      serviceUrl,
-      orgId: command.organization,
-    }).then((resp) => {
-      return resp.identityProviders;
-    });
-
-    if (identityProviders.length === 1) {
-      const _headers = await headers();
-      const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-      const host = await getOriginalHost();
-
-      const identityProviderType = identityProviders[0].type;
-
-      const provider = idpTypeToSlug(identityProviderType);
-
-      const params = new URLSearchParams();
-
-      if (command.requestId) {
-        params.set("requestId", command.requestId);
-      }
-
-      if (command.organization) {
-        params.set("organization", command.organization);
-      }
-
-      const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-
-      const url = await startIdentityProviderFlow({
+  const redirectUserToIDP = async (userId?: string, organization?: string) => {
+    // If userId is provided, check for user-specific IDP links first
+    let identityProviders: any[] = [];
+    if (userId) {
+      identityProviders = await listIDPLinks({
         serviceUrl,
-        idpId: identityProviders[0].id,
-        urls: {
-          successUrl:
-            `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/idp/${provider}/success?` +
-            new URLSearchParams(params),
-          failureUrl:
-            `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/idp/${provider}/failure?` +
-            new URLSearchParams(params),
-        },
+        userId,
+      }).then((resp) => {
+        return resp.result;
+      });
+    }
+
+    // If no IDP links exist for the user (or no userId provided), try to get active IDPs from the organization
+    if (identityProviders.length === 0) {
+      const activeIdps = await getActiveIdentityProviders({
+        serviceUrl,
+        orgId: organization,
+      }).then((resp) => {
+        return resp.identityProviders;
       });
 
-      if (!url) {
-        return { error: t("errors.couldNotStartIDPFlow") };
+      // If exactly one active IDP exists in the organization, redirect to it
+      if (activeIdps.length === 1) {
+        const _headers = await headers();
+        const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+        const host = await getOriginalHost();
+
+        const identityProviderType = activeIdps[0].type;
+        const provider = idpTypeToSlug(identityProviderType);
+
+        const params = new URLSearchParams();
+
+        if (userId) {
+          params.set("userId", userId);
+        }
+
+        if (command.requestId) {
+          params.set("requestId", command.requestId);
+        }
+
+        if (organization) {
+          params.set("organization", organization);
+        }
+
+        const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
+        const url = await startIdentityProviderFlow({
+          serviceUrl,
+          idpId: activeIdps[0].id,
+          urls: {
+            successUrl:
+              `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/idp/${provider}/success?` +
+              new URLSearchParams(params),
+            failureUrl:
+              `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/idp/${provider}/failure?` +
+              new URLSearchParams(params),
+          },
+        });
+
+        if (!url) {
+          return { error: t("errors.couldNotStartIDPFlow") };
+        }
+
+        return { redirect: url };
       }
-
-      return { redirect: url };
     }
-  };
-
-  const redirectUserToIDP = async (userId: string) => {
-    const identityProviders = await listIDPLinks({
-      serviceUrl,
-      userId,
-    }).then((resp) => {
-      return resp.result;
-    });
 
     if (identityProviders.length === 1) {
       const _headers = await headers();
@@ -147,14 +156,18 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       const identityProviderType = idpTypeToIdentityProviderType(idpType);
       const provider = idpTypeToSlug(identityProviderType);
 
-      const params = new URLSearchParams({ userId });
+      const params = new URLSearchParams();
+
+      if (userId) {
+        params.set("userId", userId);
+      }
 
       if (command.requestId) {
         params.set("requestId", command.requestId);
       }
 
-      if (command.organization) {
-        params.set("organization", command.organization);
+      if (command.organization || organization) {
+        params.set("organization", command.organization ?? (organization as string));
       }
 
       const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
@@ -270,7 +283,10 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         case AuthenticationMethodType.PASSWORD: // user has only password as auth method
           if (!userLoginSettings?.allowUsernamePassword) {
             // Check if user has IDPs available as alternative, that could eventually be used to register/link.
-            const idpResp = await redirectUserToIDP(userId);
+            const idpResp = await redirectUserToIDP(
+              userId,
+              command.organization ?? user.details?.resourceOwner ?? session.factors?.user?.organizationId,
+            );
             if (idpResp?.redirect) {
               return idpResp;
             }
@@ -319,7 +335,10 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           return { redirect: "/passkey?" + paramsPasskey };
 
         case AuthenticationMethodType.IDP:
-          const resp = await redirectUserToIDP(userId);
+          const resp = await redirectUserToIDP(
+            userId,
+            command.organization ?? user.details?.resourceOwner ?? session.factors?.user?.organizationId,
+          );
 
           if (resp?.error) {
             return { error: resp.error };
@@ -345,7 +364,10 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
         return { redirect: "/passkey?" + passkeyParams };
       } else if (methods.authMethodTypes.includes(AuthenticationMethodType.IDP)) {
-        return redirectUserToIDP(userId);
+        return redirectUserToIDP(
+          userId,
+          command.organization ?? user.details?.resourceOwner ?? session.factors?.user?.organizationId,
+        );
       } else if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)) {
         // Check if password authentication is allowed
         if (!userLoginSettings?.allowUsernamePassword) {
@@ -376,7 +398,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   // user not found, check if register is enabled on instance / organization context
   if (loginSettingsByContext?.allowRegister && !loginSettingsByContext?.allowUsernamePassword) {
-    const resp = await redirectUserToSingleIDPIfAvailable();
+    const resp = await redirectUserToIDP(undefined, command.organization);
     if (resp) {
       return resp;
     }
