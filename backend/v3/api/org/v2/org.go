@@ -66,7 +66,7 @@ func UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org
 	return &connect.Response[v2beta_org.UpdateOrganizationResponse]{
 		Msg: &v2beta_org.UpdateOrganizationResponse{
 			// TODO(IAM-Marco): Change this with the real update date when OrganizationRepo.Update()
-			// returns the timestamp
+			// returns the timestamp. See https://github.com/zitadel/zitadel/issues/10881
 			ChangeDate: timestamppb.Now(),
 		},
 	}, nil
@@ -134,7 +134,7 @@ func DeleteOrganization(ctx context.Context, request *connect.Request[v2beta_org
 	return &connect.Response[v2beta_org.DeleteOrganizationResponse]{
 		Msg: &v2beta_org.DeleteOrganizationResponse{
 			// TODO(IAM-Marco): Change this with the real update date when OrganizationRepo.Delete()
-			// returns the timestamp
+			// returns the timestamp. See https://github.com/zitadel/zitadel/issues/10881
 			DeletionDate: timestamppb.Now(),
 		},
 	}, nil
@@ -153,7 +153,7 @@ func DeactivateOrganization(ctx context.Context, request *connect.Request[v2beta
 	return &connect.Response[v2beta_org.DeactivateOrganizationResponse]{
 		Msg: &v2beta_org.DeactivateOrganizationResponse{
 			// TODO(IAM-Marco): Change this with the real update date when OrganizationRepo.Update()
-			// returns the timestamp
+			// returns the timestamp. See https://github.com/zitadel/zitadel/issues/10881
 			ChangeDate: timestamppb.Now(),
 		},
 	}, nil
@@ -172,7 +172,7 @@ func ActivateOrganization(ctx context.Context, request *connect.Request[v2beta_o
 	return &connect.Response[v2beta_org.ActivateOrganizationResponse]{
 		Msg: &v2beta_org.ActivateOrganizationResponse{
 			// TODO(IAM-Marco): Change this with the real update date when OrganizationRepo.Update()
-			// returns the timestamp
+			// returns the timestamp. See https://github.com/zitadel/zitadel/issues/10881
 			ChangeDate: timestamppb.Now(),
 		},
 	}, nil
