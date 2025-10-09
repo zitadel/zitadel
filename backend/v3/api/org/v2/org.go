@@ -98,7 +98,7 @@ func ListOrganizations(ctx context.Context, request *connect.Request[v2_org.List
 	}, nil
 }
 
-// TODO(IAM-Marco): Remove in V5
+// TODO(IAM-Marco): Remove in V5 (see https://github.com/zitadel/zitadel/issues/10877)
 func ListOrganizationsBeta(ctx context.Context, request *connect.Request[v2beta_org.ListOrganizationsRequest]) (*connect.Response[v2beta_org.ListOrganizationsResponse], error) {
 	orgListCmd := domain.NewListOrgsCommand(convert.OrganizationBetaRequestToV2Request(request.Msg))
 
