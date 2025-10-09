@@ -31,6 +31,7 @@ import {
   checkUserVerification,
 } from "../verify-helper";
 import { createServerTransport } from "../zitadel";
+import { getTranslations } from "next-intl/server";
 
 type ResetPasswordCommand = {
   loginName: string;
@@ -42,6 +43,8 @@ export async function resetPassword(command: ResetPasswordCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
+  const t = await getTranslations("password");
+
   // Get the original host that the user sees with protocol
   const hostWithProtocol = await getOriginalHostWithProtocol();
 
@@ -52,7 +55,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
   });
 
   if (!users.details || users.details.totalResult !== BigInt(1) || !users.result[0].userId) {
-    return { error: "Could not send Password Reset Link" };
+    return { error: t("errors.couldNotSendResetLink") };
   }
   const userId = users.result[0].userId;
 
@@ -77,6 +80,7 @@ export type UpdateSessionCommand = {
 export async function sendPassword(command: UpdateSessionCommand): Promise<{ error: string } | { redirect: string }> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const t = await getTranslations("password");
 
   let sessionCookie = await getSessionCookieByLoginName({
     loginName: command.loginName,
@@ -122,20 +126,28 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
             orgId: command.organization,
           });
 
+          const hasLimit =
+            lockoutSettings?.maxPasswordAttempts !== undefined && lockoutSettings?.maxPasswordAttempts > BigInt(0);
+          const locked = hasLimit && error.failedAttempts >= lockoutSettings?.maxPasswordAttempts;
+          const messageKey = hasLimit ? "errors.failedToAuthenticate" : "errors.failedToAuthenticateNoLimit";
+
           return {
-            error:
-              `Failed to authenticate. You had ${error.failedAttempts} of ${lockoutSettings?.maxPasswordAttempts} password attempts.` +
-              (lockoutSettings?.maxPasswordAttempts && error.failedAttempts >= lockoutSettings?.maxPasswordAttempts
-                ? "Contact your administrator to unlock your account"
-                : ""),
+            error: t(messageKey, {
+              failedAttempts: error.failedAttempts,
+              maxPasswordAttempts: hasLimit ? (lockoutSettings?.maxPasswordAttempts).toString() : "?",
+              lockoutMessage: locked ? t("errors.accountLockedContactAdmin") : "",
+            }),
           };
         }
-        return { error: "Could not create session for user" };
+        return { error: t("errors.couldNotCreateSessionForUser") };
       }
     } else {
       // this is a fake error message to hide that the user does not even exist
       return { error: "Could not verify password" };
     }
+
+    // this is a fake error message to hide that the user does not even exist
+    return { error: t("errors.couldNotVerifyPassword") };
   } else {
     loginSettings = await getLoginSettings({
       serviceUrl,
@@ -170,19 +182,24 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
           orgId: command.organization,
         });
 
+        const hasLimit =
+          lockoutSettings?.maxPasswordAttempts !== undefined && lockoutSettings?.maxPasswordAttempts > BigInt(0);
+        const locked = hasLimit && error.failedAttempts >= lockoutSettings?.maxPasswordAttempts;
+        const messageKey = hasLimit ? "errors.failedToAuthenticate" : "errors.failedToAuthenticateNoLimit";
+
         return {
-          error:
-            `Failed to authenticate. You had ${error.failedAttempts} of ${lockoutSettings?.maxPasswordAttempts} password attempts.` +
-            (lockoutSettings?.maxPasswordAttempts && error.failedAttempts >= lockoutSettings?.maxPasswordAttempts
-              ? " Contact your administrator to unlock your account"
-              : ""),
+          error: t(messageKey, {
+            failedAttempts: error.failedAttempts,
+            maxPasswordAttempts: hasLimit ? (lockoutSettings?.maxPasswordAttempts).toString() : "?",
+            lockoutMessage: locked ? t("errors.accountLockedContactAdmin") : "",
+          }),
         };
       }
       throw error;
     }
 
     if (!session?.factors?.user?.id) {
-      return { error: "Could not create session for user" };
+      return { error: t("errors.couldNotCreateSessionForUser") };
     }
 
     const userResponse = await getUserByID({
@@ -191,7 +208,7 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
     });
 
     if (!userResponse.user) {
-      return { error: "User not found in the system" };
+      return { error: t("errors.userNotFound") };
     }
 
     user = userResponse.user;
@@ -204,8 +221,8 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
     });
   }
 
-  if (!session?.factors?.user?.id) {
-    return { error: "Could not create session for user" };
+  if (!session?.factors?.user?.id || !sessionCookie) {
+    return { error: t("errors.couldNotCreateSessionForUser") };
   }
 
   const humanUser = user.type.case === "human" ? user.type.value : undefined;
@@ -230,7 +247,7 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
 
   // throw error if user is in initial state here and do not continue
   if (user.state === UserState.INITIAL) {
-    return { error: "Initial User not supported" };
+    return { error: t("errors.initialUserNotSupported") };
   }
 
   // check to see if user was verified
@@ -253,7 +270,7 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
   }
 
   if (!authMethods) {
-    return { error: "Could not verify password!" };
+    return { error: t("errors.couldNotVerifyPassword") };
   }
 
   const mfaFactorCheck = await checkMFAFactors(
@@ -315,6 +332,7 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
 export async function changePassword(command: { code?: string; userId: string; password: string }) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const t = await getTranslations("password");
 
   // check for init state
   const { user } = await getUserByID({
@@ -323,12 +341,12 @@ export async function changePassword(command: { code?: string; userId: string; p
   });
 
   if (!user || user.userId !== command.userId) {
-    return { error: "Could not send Password Reset Link" };
+    return { error: t("errors.couldNotSendResetLink") };
   }
   const userId = user.userId;
 
   if (user.state === UserState.INITIAL) {
-    return { error: "User Initial State is not supported" };
+    return { error: t("errors.userInitialStateNotSupported") };
   }
 
   // check if the user has no password set in order to set a password
@@ -341,7 +359,7 @@ export async function changePassword(command: { code?: string; userId: string; p
     // if the user has no authmethods set, we need to check if the user was verified
     if (authmethods.authMethodTypes.length !== 0) {
       return {
-        error: "You have to provide a code or have a valid User Verification Check",
+        error: t("errors.codeOrVerificationRequired"),
       };
     }
 
@@ -349,7 +367,7 @@ export async function changePassword(command: { code?: string; userId: string; p
     const hasValidUserVerificationCheck = await checkUserVerification(user.userId);
 
     if (!hasValidUserVerificationCheck) {
-      return { error: "User Verification Check has to be done" };
+      return { error: t("errors.verificationRequired") };
     }
   }
 
@@ -369,6 +387,7 @@ type CheckSessionAndSetPasswordCommand = {
 export async function checkSessionAndSetPassword({ sessionId, password }: CheckSessionAndSetPasswordCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const t = await getTranslations("password");
 
   let sessionCookie;
   try {
@@ -392,7 +411,7 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
   }
 
   if (!session || !session.factors?.user?.id) {
-    return { error: "Could not load session" };
+    return { error: t("errors.couldNotLoadSession") };
   }
 
   const payload = create(SetPasswordRequestSchema, {
@@ -415,7 +434,7 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
   }
 
   if (!authmethods) {
-    return { error: "Could not load auth methods" };
+    return { error: t("errors.couldNotLoadAuthMethods") };
   }
 
   let loginSettings;
@@ -437,7 +456,7 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
     return setPassword({ serviceUrl, payload }).catch((error) => {
       // throw error if failed precondition (ex. User is not yet initialized)
       if (error.code === 9 && error.message) {
-        return { error: "Failed precondition" };
+        return { error: t("errors.failedPrecondition") };
       }
       return { error: "Could not set password" };
     });
@@ -464,7 +483,7 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
       .catch((error: ConnectError) => {
         console.log(error);
         if (error.code === 7) {
-          return { error: "Session is not valid." };
+          return { error: t("errors.sessionNotValid") };
         }
         return { error: "Could not set the password" };
       });
