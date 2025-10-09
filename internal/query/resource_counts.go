@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	//go:embed Presource_counts_list.sql
+	//go:embed resource_counts_list.sql
 	resourceCountsListQuery string
 )
 

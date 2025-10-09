@@ -82,19 +82,7 @@ type Config struct {
 	LogStore            *logstore.Configs
 	Quotas              *QuotasConfig
 	Telemetry           *handlers.TelemetryPusherConfig
-	// Yes, there is a Config.ServicePing field, which is of type *serviceping.Config.
-	// The actual service ping config (including the interval in minutes) is set via configuration,
-	// which can be provided through YAML, environment variables, or other config sources supported by Viper.
-	// Example environment variables (so you don't have to use YAML):
-	//
-	// ZITADEL_SERVICEPING_ENABLED=true
-	// ZITADEL_SERVICEPING_INTERVAL=30m
-	// ZITADEL_SERVICEPING_MAXATTEMPTS=3
-	// ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_ENABLED=true
-	// ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_BULKSIZE=100
-	//
-	// The interval (e.g., "30m") is read from the INTERVAL field above.
-	ServicePing *serviceping.Config
+	ServicePing         *serviceping.Config
 }
 
 type QuotasConfig struct {
