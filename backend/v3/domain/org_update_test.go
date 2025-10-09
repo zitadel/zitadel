@@ -236,7 +236,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			},
 			inputID:                "org-1",
 			inputName:              "test org update",
-			expectedError:          zerrors.ThrowInternal(domain.NewMultipleObjecstUpdatedError(1, 2), "DOM-QzITrx", "unexpected number of rows updated"),
+			expectedError:          zerrors.ThrowInternal(domain.NewMultipleObjectsUpdatedError(1, 2), "DOM-QzITrx", "unexpected number of rows updated"),
 			expectedOldDomainName:  gu.Ptr("old-org-name."),
 			expectedDomainVerified: gu.Ptr(true),
 		},

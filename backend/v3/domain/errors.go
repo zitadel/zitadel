@@ -34,7 +34,7 @@ type MultipleObjectsUpdatedError struct {
 	Actual   int64
 }
 
-func NewMultipleObjecstUpdatedError(expected, actual int64) error {
+func NewMultipleObjectsUpdatedError(expected, actual int64) error {
 	return &MultipleObjectsUpdatedError{
 		Expected: expected,
 		Actual:   actual,

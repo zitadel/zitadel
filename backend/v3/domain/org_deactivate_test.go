@@ -237,7 +237,7 @@ func TestDeactivateOrgCommand_Execute(t *testing.T) {
 				return repo
 			},
 			inputID:       "org-1",
-			expectedError: zerrors.ThrowInternal(domain.NewMultipleObjecstUpdatedError(1, 2), "DOM-dXl1kJ", "unexpected number of rows updated"),
+			expectedError: zerrors.ThrowInternal(domain.NewMultipleObjectsUpdatedError(1, 2), "DOM-dXl1kJ", "unexpected number of rows updated"),
 		},
 		{
 			testName: "when org update returns 1 row updated should return no error",
