@@ -398,6 +398,10 @@ func TestSetOrganizationMetadata_UpdatedAt(t *testing.T) {
 	beforeCreate := time.Now()
 	err = metadataRepo.Set(t.Context(), pool, metadata)
 	require.NoError(t, err)
+	afterCreate := time.Now()
+
+	assert.WithinRange(t, metadata.CreatedAt, beforeCreate, afterCreate)
+	assert.WithinRange(t, metadata.UpdatedAt, beforeCreate, afterCreate)
 
 	metadata.Value = []byte("other-value")
 	metadata.CreatedAt = time.Time{}
@@ -407,7 +411,6 @@ func TestSetOrganizationMetadata_UpdatedAt(t *testing.T) {
 	require.NoError(t, err)
 	afterUpdate := time.Now()
 
-	assert.WithinRange(t, metadata.CreatedAt, beforeCreate, beforeUpdate)
 	assert.WithinRange(t, metadata.UpdatedAt, beforeUpdate, afterUpdate)
 }
 
