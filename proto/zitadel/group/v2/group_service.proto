@@ -117,7 +117,7 @@ service GroupService {
   rpc CreateGroup(CreateGroupRequest) returns (CreateGroupResponse) {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "group.create"
+        permission: "authenticated"
       }
       http_response: {
         success_code: 201
@@ -165,7 +165,7 @@ service GroupService {
   rpc GetGroup(GetGroupRequest) returns (GetGroupResponse) {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "group.read"
+        permission: "authenticated"
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -198,7 +198,7 @@ service GroupService {
   rpc ListGroups(ListGroupsRequest) returns (ListGroupsResponse) {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "group.read"
+        permission: "authenticated"
       }
     };
 
@@ -236,7 +236,7 @@ service GroupService {
   rpc UpdateGroup(UpdateGroupRequest) returns (UpdateGroupResponse) {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "group.write"
+        permission: "authenticated"
       }
     };
 
@@ -274,7 +274,7 @@ service GroupService {
   rpc DeleteGroup(DeleteGroupRequest) returns (DeleteGroupResponse) {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "group.delete"
+        permission: "authenticated"
       }
     };
 
