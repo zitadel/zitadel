@@ -25,7 +25,6 @@ const (
 	ScopeProjectsRoles              = "urn:zitadel:iam:org:projects:roles"
 	ClaimProjectRoles               = "urn:zitadel:iam:org:project:roles"
 	ClaimProjectRolesFormat         = "urn:zitadel:iam:org:project:%s:roles"
-	ClaimProjectsRoles              = "urn:zitadel:iam:org:projects:roles"
 	ScopeUserMetaData               = "urn:zitadel:iam:user:metadata"
 	ClaimUserMetaData               = ScopeUserMetaData
 	ScopeResourceOwner              = "urn:zitadel:iam:user:resourceowner"
@@ -96,7 +95,7 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(context.Context, string, string, 
 func checkGrantedRoles(roles *projectsRoles, grant query.UserGrant, requestedRole string, isRequested bool) {
 	for _, grantedRole := range grant.Roles {
 		if requestedRole == grantedRole {
-			roles.Add(grant.ProjectID, grantedRole, grant.ResourceOwner, grant.OrgPrimaryDomain, isRequested, false)
+			roles.Add(grant.ProjectID, grantedRole, grant.ResourceOwner, grant.OrgPrimaryDomain, isRequested)
 		}
 	}
 }
@@ -107,11 +106,9 @@ type projectsRoles struct {
 	projects map[string]projectRoles
 
 	requestProjectID string
-
-	requestAudIDs map[string]struct{}
 }
 
-func newProjectRoles(projectID string, grants []query.UserGrant, requestedRoles []string, roleAudience []string) *projectsRoles {
+func newProjectRoles(projectID string, grants []query.UserGrant, requestedRoles []string) *projectsRoles {
 	roles := new(projectsRoles)
 	// if specific roles where requested, check if they are granted and append them in the roles list
 	if len(requestedRoles) > 0 {
@@ -120,19 +117,18 @@ func newProjectRoles(projectID string, grants []query.UserGrant, requestedRoles 
 				checkGrantedRoles(roles, grant, requestedRole, grant.ProjectID == projectID)
 			}
 		}
+		return roles
 	}
 	// no specific roles were requested, so convert any grants into roles
 	for _, grant := range grants {
 		for _, role := range grant.Roles {
-			for _, projectAud := range roleAudience {
-				roles.Add(grant.ProjectID, role, grant.ResourceOwner, grant.OrgPrimaryDomain, grant.ProjectID == projectID, grant.ProjectID == projectAud)
-			}
+			roles.Add(grant.ProjectID, role, grant.ResourceOwner, grant.OrgPrimaryDomain, grant.ProjectID == projectID)
 		}
 	}
 	return roles
 }
 
-func (p *projectsRoles) Add(projectID, roleKey, orgID, domain string, isRequested bool, isAudienceReq bool) {
+func (p *projectsRoles) Add(projectID, roleKey, orgID, domain string, isRequested bool) {
 	if p.projects == nil {
 		p.projects = make(map[string]projectRoles, 1)
 	}
@@ -141,12 +137,6 @@ func (p *projectsRoles) Add(projectID, roleKey, orgID, domain string, isRequeste
 	}
 	if isRequested {
 		p.requestProjectID = projectID
-	}
-	if p.requestAudIDs == nil {
-		p.requestAudIDs = make(map[string]struct{}, 1)
-	}
-	if isAudienceReq {
-		p.requestAudIDs[projectID] = struct{}{}
 	}
 	p.projects[projectID].Add(roleKey, orgID, domain)
 }
