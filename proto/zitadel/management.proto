@@ -2922,7 +2922,7 @@ service ManagementService {
 
     // Get Project By ID
     //
-    // Deprecated: use [project v2 service GetProject](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-get-project.api.mdx) instead.
+    // Deprecated: use [project v2 service GetProject](apis/resources/project_service_v2/zitadel-project-v-2-project-service-get-project.api.mdx) instead.
     //
     // Returns a project owned by the organization (no granted projects). A Project is a vessel for different applications sharing the same role context.
     rpc GetProjectByID(GetProjectByIDRequest) returns (GetProjectByIDResponse) {
@@ -2951,7 +2951,7 @@ service ManagementService {
 
     // Get Granted Project By ID
     //
-    // Deprecated: use [project v2 service ListProjectGrants](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-list-project-grants.api.mdx) instead.
+    // Deprecated: use [project v2 service ListProjectGrants](apis/resources/project_service_v2/zitadel-project-v-2-project-service-list-project-grants.api.mdx) instead.
     //
     // Returns a project owned by another organization and granted to my organization. A Project is a vessel for different applications sharing the same role context.
     rpc GetGrantedProjectByID(GetGrantedProjectByIDRequest) returns (GetGrantedProjectByIDResponse) {
@@ -2980,7 +2980,7 @@ service ManagementService {
 
     // Search Project
     //
-    // Deprecated: use [project v2 service ListProjects](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-list-projects.api.mdx) instead.
+    // Deprecated: use [project v2 service ListProjects](apis/resources/project_service_v2/zitadel-project-v-2-project-service-list-projects.api.mdx) instead.
     //
     // Lists projects my organization is the owner of (no granted projects). A Project is a vessel for different applications sharing the same role context.
     rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse) {
@@ -3009,7 +3009,7 @@ service ManagementService {
 
     // Search Granted Project
     //
-    // Deprecated: use [project v2 service ListProjects](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-list-projects.api.mdx) instead.
+    // Deprecated: use [project v2 service ListProjects](apis/resources/project_service_v2/zitadel-project-v-2-project-service-list-projects.api.mdx) instead.
     //
     // Lists projects my organization got granted from another organization. A Project is a vessel for different applications sharing the same role context.
     rpc ListGrantedProjects(ListGrantedProjectsRequest) returns (ListGrantedProjectsResponse) {
@@ -3038,7 +3038,7 @@ service ManagementService {
 
     // Search Granted Project Roles
     //
-    // Deprecated: use [project v2 service ListProjectGrants](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-list-project-grants.api.mdx) instead.
+    // Deprecated: use [project v2 service ListProjectGrants](apis/resources/project_service_v2/zitadel-project-v-2-project-service-list-project-grants.api.mdx) instead.
     //
     // Lists the roles a granted projects has. These are the roles, that have been granted by the owner organization to my organization.
     rpc ListGrantedProjectRoles(ListGrantedProjectRolesRequest) returns (ListGrantedProjectRolesResponse) {
@@ -3092,7 +3092,7 @@ service ManagementService {
 
     // Create Project
     //
-    // Deprecated: use [project v2 service CreateProject](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-create-project.api.mdx) instead.
+    // Deprecated: use [project v2 service CreateProject](apis/resources/project_service_v2/zitadel-project-v-2-project-service-create-project.api.mdx) instead.
     //
     // Create a new project. A Project is a vessel for different applications sharing the same role context.
     rpc AddProject(AddProjectRequest) returns (AddProjectResponse) {
@@ -3121,7 +3121,7 @@ service ManagementService {
 
     // Update Project
     //
-    // Deprecated: use [project v2 service UpdateProject](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-update-project.api.mdx) instead.
+    // Deprecated: use [project v2 service UpdateProject](apis/resources/project_service_v2/zitadel-project-v-2-project-service-update-project.api.mdx) instead.
     //
     // Update a project and its settings. A Project is a vessel for different applications sharing the same role context.
     rpc UpdateProject(UpdateProjectRequest) returns (UpdateProjectResponse) {
@@ -3151,7 +3151,7 @@ service ManagementService {
 
     // Deactivate Project
     //
-    // Deprecated: use [project v2 service DeactivateProject](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-deactivate-project.api.mdx) instead.
+    // Deprecated: use [project v2 service DeactivateProject](apis/resources/project_service_v2/zitadel-project-v-2-project-service-deactivate-project.api.mdx) instead.
     //
     // Set the state of a project to deactivated. Request returns an error if the project is already deactivated.
     rpc DeactivateProject(DeactivateProjectRequest) returns (DeactivateProjectResponse) {
@@ -3181,7 +3181,7 @@ service ManagementService {
 
     // Reactivate Project
     //
-    // Deprecated: use [project v2 service ActivateProject](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-activate-project.api.mdx) instead.
+    // Deprecated: use [project v2 service ActivateProject](apis/resources/project_service_v2/zitadel-project-v-2-project-service-activate-project.api.mdx) instead.
     //
     // Set the state of a project to active. Request returns an error if the project is not deactivated.
     rpc ReactivateProject(ReactivateProjectRequest) returns (ReactivateProjectResponse) {
@@ -3211,7 +3211,7 @@ service ManagementService {
 
     // Remove Project
     //
-    // Deprecated: use [project v2 service DeleteProject](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-delete-project.api.mdx) instead.
+    // Deprecated: use [project v2 service DeleteProject](apis/resources/project_service_v2/zitadel-project-v-2-project-service-delete-project.api.mdx) instead.
     //
     // Set the state of a project to active. Request returns an error if the project is not deactivated.
     rpc RemoveProject(RemoveProjectRequest) returns (RemoveProjectResponse) {
@@ -3240,7 +3240,7 @@ service ManagementService {
 
     // Search Project Roles
     //
-    // Deprecated: use [project v2 service ListProjectRoles](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-list-project-roles.api.mdx) instead.
+    // Deprecated: use [project v2 service ListProjectRoles](apis/resources/project_service_v2/zitadel-project-v-2-project-service-list-project-roles.api.mdx) instead.
     //
     // Returns all roles of a project matching the search query.
     rpc ListProjectRoles(ListProjectRolesRequest) returns (ListProjectRolesResponse) {
@@ -3270,7 +3270,7 @@ service ManagementService {
 
     // Add Project Role
     //
-    // Deprecated: use [project v2 service AddProjectRole](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-add-project-role.api.mdx) instead.
+    // Deprecated: use [project v2 service AddProjectRole](apis/resources/project_service_v2/zitadel-project-v-2-project-service-add-project-role.api.mdx) instead.
     //
     // Add a new project role to a project. The key must be unique within the project.
     rpc AddProjectRole(AddProjectRoleRequest) returns (AddProjectRoleResponse) {
@@ -3300,7 +3300,7 @@ service ManagementService {
 
     // Bulk Add Project Role
     //
-    // Deprecated: use [project v2 service AddProjectRole](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-add-project-role.api.mdx) instead.
+    // Deprecated: use [project v2 service AddProjectRole](apis/resources/project_service_v2/zitadel-project-v-2-project-service-add-project-role.api.mdx) instead.
     //
     // Add a list of roles to a project. The keys must be unique within the project.
     rpc BulkAddProjectRoles(BulkAddProjectRolesRequest) returns (BulkAddProjectRolesResponse) {
@@ -3330,7 +3330,7 @@ service ManagementService {
 
     // Change Project Role
     //
-    // Deprecated: use [project v2 service UpdateProjectRole](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-update-project-role.api.mdx) instead.
+    // Deprecated: use [project v2 service UpdateProjectRole](apis/resources/project_service_v2/zitadel-project-v-2-project-service-update-project-role.api.mdx) instead.
     //
     // Change a project role. The key is not editable. If a key should change, remove the role and create a new one.
     rpc UpdateProjectRole(UpdateProjectRoleRequest) returns (UpdateProjectRoleResponse) {
@@ -3360,7 +3360,7 @@ service ManagementService {
 
     // Remove Project Role
     //
-    // Deprecated: use [project v2 service RemoveProjectRole](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-remove-project-role.api.mdx) instead.
+    // Deprecated: use [project v2 service RemoveProjectRole](apis/resources/project_service_v2/zitadel-project-v-2-project-service-remove-project-role.api.mdx) instead.
     //
     // Removes the role from the project and on every resource it has a dependency. This includes project grants and user grants.
     rpc RemoveProjectRole(RemoveProjectRoleRequest) returns (RemoveProjectRoleResponse) {
@@ -4129,7 +4129,7 @@ service ManagementService {
 
     // Project Grant By ID
     //
-    // Deprecated: use [ListProjectGrants](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-list-project-grants.api.mdx) instead.
+    // Deprecated: use [ListProjectGrants](apis/resources/project_service_v2/zitadel-project-v-2-project-service-list-project-grants.api.mdx) instead.
     //
     // Returns a project grant. A project grant is when the organization grants its project to another organization.
     rpc GetProjectGrantByID(GetProjectGrantByIDRequest) returns (GetProjectGrantByIDResponse) {
@@ -4157,7 +4157,7 @@ service ManagementService {
 
     // Search Project Grants from Project
     //
-    // Deprecated: use [ListProjectGrants](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-list-project-grants.api.mdx) instead.
+    // Deprecated: use [ListProjectGrants](apis/resources/project_service_v2/zitadel-project-v-2-project-service-list-project-grants.api.mdx) instead.
     //
     // Returns a list of project grants for a specific project. A project grant is when the organization grants its project to another organization.
     rpc ListProjectGrants(ListProjectGrantsRequest) returns (ListProjectGrantsResponse) {
@@ -4187,7 +4187,7 @@ service ManagementService {
 
     // Search Project Grants
     //
-    // Deprecated: use [ListProjectGrants](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-list-project-grants.api.mdx) instead.
+    // Deprecated: use [ListProjectGrants](apis/resources/project_service_v2/zitadel-project-v-2-project-service-list-project-grants.api.mdx) instead.
     //
     // Returns a list of project grants. A project grant is when the organization grants its project to another organization.
     rpc ListAllProjectGrants(ListAllProjectGrantsRequest) returns (ListAllProjectGrantsResponse) {
@@ -4216,7 +4216,7 @@ service ManagementService {
 
     // Add Project Grant
     //
-    // Deprecated: use [CreateProjectGrant](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-create-project-grant.api.mdx) instead.
+    // Deprecated: use [CreateProjectGrant](apis/resources/project_service_v2/zitadel-project-v-2-project-service-create-project-grant.api.mdx) instead.
     //
     // Grant a project to another organization. The project grant will allow the granted organization to access the project and manage the authorizations for its users. Project Grant will be listed in the granted project of the granted organization.
     rpc AddProjectGrant(AddProjectGrantRequest) returns (AddProjectGrantResponse) {
@@ -4245,7 +4245,7 @@ service ManagementService {
 
     // Change Project Grant
     //
-    // Deprecated: use [UpdateProjectGrant](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-update-project-grant.api.mdx) instead.
+    // Deprecated: use [UpdateProjectGrant](apis/resources/project_service_v2/zitadel-project-v-2-project-service-update-project-grant.api.mdx) instead.
     //
     // Change the roles of the project that is granted to another organization. The project grant will allow the granted organization to access the project and manage the authorizations for its users. Project Grant will be listed in the granted project of the granted organization.
     rpc UpdateProjectGrant(UpdateProjectGrantRequest) returns (UpdateProjectGrantResponse) {
@@ -4274,7 +4274,7 @@ service ManagementService {
 
     // Deactivate Project Grant
     //
-    // Deprecated: use [DeactivateProjectGrant](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-deactivate-project-grant.api.mdx) instead.
+    // Deprecated: use [DeactivateProjectGrant](apis/resources/project_service_v2/zitadel-project-v-2-project-service-deactivate-project-grant.api.mdx) instead.
     //
     // Set the state of the project grant to deactivated. The grant has to be active to be able to deactivate.
     rpc DeactivateProjectGrant(DeactivateProjectGrantRequest) returns (DeactivateProjectGrantResponse) {
@@ -4303,7 +4303,7 @@ service ManagementService {
 
     // Reactivate Project Grant
     //
-    // Deprecated: use [ActivateProjectGrant](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-activate-project-grant.api.mdx) instead.
+    // Deprecated: use [ActivateProjectGrant](apis/resources/project_service_v2/zitadel-project-v-2-project-service-activate-project-grant.api.mdx) instead.
     //
     // Set the state of the project grant to active. The grant has to be deactivated to be able to reactivate.
     rpc ReactivateProjectGrant(ReactivateProjectGrantRequest) returns (ReactivateProjectGrantResponse) {
@@ -4332,7 +4332,7 @@ service ManagementService {
 
     // Remove Project Grant
     //
-    // Deprecated: use [DeleteProjectGrant](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-delete-project-grant.api.mdx) instead.
+    // Deprecated: use [DeleteProjectGrant](apis/resources/project_service_v2/zitadel-project-v-2-project-service-delete-project-grant.api.mdx) instead.
     //
     // Remove a project grant. All user grants for this project grant will also be removed. A user will not have access to the project afterward (if permissions are checked).
     rpc RemoveProjectGrant(RemoveProjectGrantRequest) returns (RemoveProjectGrantResponse) {
