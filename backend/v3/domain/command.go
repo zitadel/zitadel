@@ -11,6 +11,8 @@ import (
 // Commander is all that is needed to implement the command pattern.
 // It is the interface all manipulations need to implement.
 // If possible it should also be used for queries. We will find out if this is possible in the future.
+//
+//go:generate mockgen -typed -package domainmock -destination ./mock/commander.mock.go . Commander
 type Commander interface {
 	Execute(ctx context.Context, opts *CommandOpts) (err error)
 	Validate(ctx context.Context, opts *CommandOpts) (err error)
