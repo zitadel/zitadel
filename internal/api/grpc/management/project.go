@@ -175,6 +175,7 @@ func (s *Server) ListProjectChanges(ctx context.Context, req *mgmt_pb.ListProjec
 }
 
 func (s *Server) AddProject(ctx context.Context, req *mgmt_pb.AddProjectRequest) (*mgmt_pb.AddProjectResponse, error) {
+	// TODO - add milestone here
 	add := ProjectCreateToCommand(req, "", authz.GetCtxData(ctx).OrgID)
 	project, err := s.command.AddProject(ctx, add)
 	if err != nil {
@@ -187,6 +188,7 @@ func (s *Server) AddProject(ctx context.Context, req *mgmt_pb.AddProjectRequest)
 }
 
 func (s *Server) UpdateProject(ctx context.Context, req *mgmt_pb.UpdateProjectRequest) (*mgmt_pb.UpdateProjectResponse, error) {
+	// TODO - add milestone here
 	project, err := s.command.ChangeProject(ctx, ProjectUpdateToCommand(req, authz.GetCtxData(ctx).OrgID))
 	if err != nil {
 		return nil, err
@@ -221,6 +223,7 @@ func (s *Server) ReactivateProject(ctx context.Context, req *mgmt_pb.ReactivateP
 }
 
 func (s *Server) RemoveProject(ctx context.Context, req *mgmt_pb.RemoveProjectRequest) (*mgmt_pb.RemoveProjectResponse, error) {
+	// TODO - add milestone here
 	projectQuery, err := query.NewUserGrantProjectIDSearchQuery(req.Id)
 	if err != nil {
 		return nil, err
