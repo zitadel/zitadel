@@ -2,14 +2,14 @@ import { faker } from "@faker-js/faker";
 import { test } from "./fixtures.js";
 import { loginScreenExpect } from "./login.js";
 
-test("register with password", async ({ page, anonymousUser }) => {
-  await anonymousUser.registerWithPassword();
-  await loginScreenExpect(page, anonymousUser.fullName!);
+test("register with password", async ({ page, userRegistrator }) => {
+  await userRegistrator.registerWithPassword();
+  await loginScreenExpect(page, userRegistrator.fullName!);
 });
 
-test("register with passkey", async ({ page, anonymousUser }) => {
-  await anonymousUser.registerWithPasskey();
-  await loginScreenExpect(page, anonymousUser.fullName!);
+test("register with passkey", async ({ page, userRegistrator }) => {
+  await userRegistrator.registerWithPasskey();
+  await loginScreenExpect(page, userRegistrator.fullName!);
 });
 
 test("register with username and password - only password enabled", async ({ page }) => {

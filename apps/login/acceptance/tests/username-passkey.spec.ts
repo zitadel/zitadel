@@ -3,10 +3,10 @@ import { test } from "./fixtures.js";
 import { loginScreenExpect, loginWithPasskey } from "./login.js";
 import { AuthFactors } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
-test("username and passkey login", async ({ anonymousUser, userService, page }) => {
-  const authId = await anonymousUser.registerWithPasskey();
-  await loginWithPasskey(page, authId, anonymousUser.username!);
-  await loginScreenExpect(page, anonymousUser.fullName!);
+test("username and passkey login", async ({ userRegistrator, page }) => {
+  const authId = await userRegistrator.registerWithPasskey();
+  await loginWithPasskey(page, authId, userRegistrator.username!);
+  await loginScreenExpect(page, userRegistrator.fullName!);
 });
 
 test("username and passkey login, multiple auth methods", async ({ page }) => {

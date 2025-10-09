@@ -5,7 +5,7 @@ import { eventualEmailOTP } from "./mock.js";
 import { test as base, UserService } from "./api.js";
 import { faker } from "@faker-js/faker";
 
-export class AnonymousUser {
+export class UserRegistrator {
 
   private readonly passwordField = "password-text-input";
   private readonly passwordConfirmField = "password-confirm-text-input";
@@ -82,10 +82,10 @@ export class AnonymousUser {
   }
 }
 
-export const test = base.extend<{ anonymousUser: AnonymousUser }>({
-  anonymousUser: async ({ page, userService }, use) => {
+export const test = base.extend<{ userRegistrator: UserRegistrator }>({
+  userRegistrator: async ({ page, userService }, use) => {
     console.log("Setting up user");
-    const user = new AnonymousUser(page, userService);
+    const user = new UserRegistrator(page, userService);
     await use(user);
     await user.cleanup();
   }

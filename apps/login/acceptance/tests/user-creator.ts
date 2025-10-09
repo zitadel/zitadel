@@ -2,27 +2,27 @@ import { test as base } from "@playwright/test";
 import { Transport } from "@connectrpc/connect";
 import { UserService } from "./api.js";
 import { CreateUserRequestSchema, CreateUserResponseJson, CreateUserResponseSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import minimalRequest from './user-registered-request.json' with { type: "json" };
+import userCreateDefaultRequest from './user-create-default-request.json' with { type: "json" };
 import { fromJson, toJson } from "@zitadel/client";
 import { faker } from "@faker-js/faker";
 
 export class UserCreator {
 
     public req = {
-        ...minimalRequest,
+        ...userCreateDefaultRequest,
         human: {
-            ...minimalRequest.human,
+            ...userCreateDefaultRequest.human,
             email: {
-                ...minimalRequest.human.email,
+                ...userCreateDefaultRequest.human.email,
                 email: faker.internet.email(),
             },
             profile: {
-                ...minimalRequest.human.profile,
+                ...userCreateDefaultRequest.human.profile,
                 givenName: faker.person.firstName(),
                 familyName: faker.person.lastName(),
             },
             phone: {
-                ...minimalRequest.human.phone,
+                ...userCreateDefaultRequest.human.phone,
                 phone: faker.phone.number({ style: "international" }),
             },
         }
