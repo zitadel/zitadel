@@ -13,7 +13,7 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 import "zitadel/filter/v2/filter.proto";
 import "zitadel/group/v2/group.proto";
-import "zitadel/user.proto";
+import "zitadel/authorization/v2beta/authorization.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/group/v2;group";
 
@@ -304,6 +304,8 @@ service GroupService {
   //
   // Adds one or more users to a group.
   // The users should be in the same organization as the group. // todo: review
+  // The request will not fail if some of the users could not be added to the group,
+  // and a list of failed user IDs is available in the response.
   //
   // Required permissions:
   //   - group.user.write
@@ -318,7 +320,7 @@ service GroupService {
   // Remove Users
   //
   // Removes one or more users from a group.
-  // If the user(s) is/are not in the group, the request will return a successful response as
+  // If some of the users are not in the group, the request will still return a successful response as
   // the desired state is already achieved.
   //
   // Required permissions:
@@ -530,16 +532,16 @@ message AddUsersToGroupRequest {
 }
 
 message AddUsersToGroupResponse {
+  // FailedUserIDs is the list of IDs of users who could not be added to the group.
+  // todo: do we need to add a failure reason?
+  repeated string failed_user_ids = 1;
+
   // ChangeDate is the timestamp when the users are added.
-  google.protobuf.Timestamp change_date = 1 [
+  google.protobuf.Timestamp change_date = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-08-11T15:00:00.051Z\"";
     }
   ];
-
-  // todo: should we include the list of user ids that were added (or the number of users that were added),
-  //  in case some of the IDs could not be added (for example, user does not exists) ?
-
 }
 
 message RemoveUsersFromGroupRequest {
@@ -570,8 +572,6 @@ message RemoveUsersFromGroupResponse {
   ];
 }
 
-// todo: query by username / userID / added date in a group?
-// return all users if there's no specific query?
 message ListUsersInGroupRequest {
   // ID of the group from which users should be retrieved.
   string id = 1 [
@@ -581,9 +581,12 @@ message ListUsersInGroupRequest {
     },
     (google.api.field_behavior) = REQUIRED
   ];
+
+  // UserIDs is a list IDs of the users to be retrieved in the provided group.
+  repeated zitadel.filter.v2.InIDsFilter user_ids = 2;
 }
 
 message ListUsersInGroupResponse {
-  // Users is the list of users present in the requested group
-  repeated zitadel.user.v1.User users = 1;
+  // Users is the list of users present in the requested group, matching the search criteria
+  repeated zitadel.authorization.v2beta.User users = 1;
 }
