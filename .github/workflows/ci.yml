@@ -33,8 +33,6 @@ jobs:
     uses: ./.github/workflows/pack.yml
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
-    permissions:
-      packages: write
     if: ${{ github.event_name == 'workflow_dispatch' }}
     with:
       node_version: "22"
