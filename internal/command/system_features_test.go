@@ -46,7 +46,7 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 			name:       "all nil, No Change",
 			eventstore: expectEventstore(),
 			args:       args{context.Background(), &SystemFeatures{}},
-			wantErr:    zerrors.ThrowInternal(nil, "COMMAND-Oop8a", "Errors.NoChangesFound"),
+			wantErr:    zerrors.ThrowInvalidArgument(nil, "COMMAND-Oop8a", "Errors.NoChangesFound"),
 		},
 		{
 			name: "set LoginDefaultOrg",
