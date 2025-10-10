@@ -99,3 +99,106 @@ func TestDomainInstanceModelToGRPCResponse(t *testing.T) {
 	// Verify
 	assert.Equal(t, expectedInstance, res)
 }
+
+func TestDomainInstanceListModelToGRPCResponse(t *testing.T) {
+	t.Parallel()
+	now := time.Now()
+
+	tt := []struct {
+		testName       string
+		inputResult    []*domain.Instance
+		expectedResult []*instance.Instance
+	}{
+		{
+			testName:       "empty result",
+			inputResult:    []*domain.Instance{},
+			expectedResult: []*instance.Instance{},
+		},
+		{
+			testName: "single instance without domains",
+			inputResult: []*domain.Instance{
+				{
+					ID:        "instance1",
+					Name:      "test-instance",
+					CreatedAt: now,
+					UpdatedAt: now,
+					Domains:   nil,
+				},
+			},
+			expectedResult: []*instance.Instance{
+				{
+					Id:           "instance1",
+					Name:         "test-instance",
+					CreationDate: timestamppb.New(now),
+					ChangeDate:   timestamppb.New(now),
+					State:        instance.State_STATE_RUNNING,
+					Domains:      []*instance.Domain{},
+				},
+			},
+		},
+		{
+			testName: "multiple instances with domains",
+			inputResult: []*domain.Instance{
+				{
+					ID:        "instance1",
+					Name:      "test-instance-1",
+					CreatedAt: now,
+					UpdatedAt: now,
+					Domains: []*domain.InstanceDomain{
+						{
+							InstanceID:  "instance1",
+							Domain:      "domain1.com",
+							CreatedAt:   now,
+							IsPrimary:   gu.Ptr(true),
+							IsGenerated: gu.Ptr(false),
+						},
+					},
+				},
+				{
+					ID:        "instance2",
+					Name:      "test-instance-2",
+					CreatedAt: now,
+					UpdatedAt: now,
+					Domains:   nil,
+				},
+			},
+			expectedResult: []*instance.Instance{
+				{
+					Id:           "instance1",
+					Name:         "test-instance-1",
+					CreationDate: timestamppb.New(now),
+					ChangeDate:   timestamppb.New(now),
+					State:        instance.State_STATE_RUNNING,
+					Domains: []*instance.Domain{
+						{
+							InstanceId:   "instance1",
+							Domain:       "domain1.com",
+							CreationDate: timestamppb.New(now),
+							Primary:      true,
+							Generated:    false,
+						},
+					},
+				},
+				{
+					Id:           "instance2",
+					Name:         "test-instance-2",
+					CreationDate: timestamppb.New(now),
+					ChangeDate:   timestamppb.New(now),
+					State:        instance.State_STATE_RUNNING,
+					Domains:      []*instance.Domain{},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+			// Test
+			result := DomainInstanceListModelToGRPCResponse(tc.inputResult)
+
+			// Verify
+			assert.Equal(t, tc.expectedResult, result)
+		})
+	}
+}

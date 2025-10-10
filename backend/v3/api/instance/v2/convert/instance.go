@@ -11,6 +11,16 @@ import (
  * Domain Model to GRPC v2
  */
 
+func DomainInstanceListModelToGRPCResponse(instances []*domain.Instance) []*instance.Instance {
+	toReturn := make([]*instance.Instance, len(instances))
+
+	for i, inst := range instances {
+		toReturn[i] = DomainInstanceModelToGRPCResponse(inst)
+	}
+
+	return toReturn
+}
+
 func DomainInstanceModelToGRPCResponse(inst *domain.Instance) *instance.Instance {
 	return &instance.Instance{
 		Id:           inst.ID,
