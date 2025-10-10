@@ -271,6 +271,7 @@ const isValid =
 | ---------------------------- | ---------------------------------- | ------- | -------- |
 | `ZITADEL_API_URL`            | ZITADEL API endpoint               | -       | ✅       |
 | `ZITADEL_SERVICE_USER_TOKEN` | Service user token for API auth    | -       | ✅       |
+| `ZITADEL_SERVICE_USER_TOKEN_FILE` | Service user token file for API auth    | -       | ✅       |
 | `EMAIL_VERIFICATION`         | Enforce email verification         | `false` | ❌       |
 | `DEBUG`                      | Enable debug mode                  | `false` | ❌       |
 | `PORT`                       | Custom port for the application    | `3000`  | ❌       |
