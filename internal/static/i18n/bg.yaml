@@ -628,6 +628,12 @@ Errors:
     FeatureDisabled: Ключовата уеб функция е деактивирана
     NoActive: Не е намерен активен уеб ключ
     NotFound: Уеб ключът не е намерен
+  Captcha:
+    InitializationFailed: Неуспешно инициализиране на Captcha
+    InvalidCaptcha: Неуспешна проверка на Captcha. Токенът е невалиден или е изтекъл
+    MissingToken: Липсва Captcha токен
+    UnexpectedType: Неочакван тип Captcha в конфигурацията
+    ValidationFailed: Възникна грешка при проверка на Captcha токена
 
 AggregateTypes:
   action: Действие

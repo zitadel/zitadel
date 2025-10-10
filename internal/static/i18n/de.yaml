@@ -610,6 +610,12 @@ Errors:
     FeatureDisabled: Webschlüsselfunktion deaktiviert
     NoActive: Kein aktiver Webschlüssel gefunden
     NotFound: Webschlüssel nicht gefunden
+  Captcha:
+    InitializationFailed: Initialisierung des Captcha fehlgeschlagen
+    InvalidCaptcha: Captcha-Verifizierung fehlgeschlagen. Das Token ist ungültig oder abgelaufen
+    MissingToken: Captcha-Token fehlt
+    UnexpectedType: Unerwarteter Captcha-Typ in der Konfiguration
+    ValidationFailed: Beim Validieren des Captcha-Tokens ist ein Fehler aufgetreten
 
 AggregateTypes:
   action: Action
