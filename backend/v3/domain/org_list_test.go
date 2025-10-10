@@ -26,8 +26,6 @@ func TestListOrgsCommand_sorting(t *testing.T) {
 		name    string
 		request *org.ListOrganizationsRequest
 
-		orgRepo func(*gomock.Controller) domain.OrganizationRepository
-
 		expectedSortingDirection database.OrderDirection
 		expectedOrderBy          database.Columns
 	}{
@@ -40,17 +38,6 @@ func TestListOrgsCommand_sorting(t *testing.T) {
 				},
 			},
 
-			orgRepo: func(c *gomock.Controller) domain.OrganizationRepository {
-				repo := domainmock.NewOrgRepo(c)
-
-				repo.EXPECT().
-					NameColumn().
-					Times(1).
-					Return(database.NewColumn("organizations", "name"))
-
-				return repo
-			},
-
 			expectedSortingDirection: database.OrderDirectionDesc,
 			expectedOrderBy:          database.Columns{database.NewColumn("organizations", "name")},
 		},
@@ -61,17 +48,6 @@ func TestListOrgsCommand_sorting(t *testing.T) {
 				Query: &object.ListQuery{
 					Asc: true,
 				},
-			},
-
-			orgRepo: func(c *gomock.Controller) domain.OrganizationRepository {
-				repo := domainmock.NewOrgRepo(c)
-
-				repo.EXPECT().
-					NameColumn().
-					Times(1).
-					Return(database.NewColumn("organizations", "name"))
-
-				return repo
 			},
 
 			expectedSortingDirection: database.OrderDirectionAsc,
@@ -94,9 +70,7 @@ func TestListOrgsCommand_sorting(t *testing.T) {
 			l := &domain.ListOrgsCommand{
 				Request: tc.request,
 			}
-			opts := &database.QueryOpts{
-				OrderBy: tc.expectedOrderBy,
-			}
+			opts := &database.QueryOpts{}
 
 			// Test
 			gotFunc := l.Sorting(orgRepo)
