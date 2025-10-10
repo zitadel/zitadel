@@ -30,7 +30,13 @@ func (c *Commands) CreateGroup(ctx context.Context, group *CreateGroup) (details
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	// todo: check permissions
+	// create a unique group ID if not provided
+	if group.AggregateID == "" {
+		group.AggregateID, err = c.idGenerator.Next()
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	if err = group.IsValid(); err != nil {
 		return nil, err
@@ -38,18 +44,15 @@ func (c *Commands) CreateGroup(ctx context.Context, group *CreateGroup) (details
 	if group.ResourceOwner == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "CMDGRP-msc0Tt", "Errors.Group.MissingOrganizationID")
 	}
+
+	if err = c.checkPermissionCreateGroup(ctx, group.ResourceOwner, group.AggregateID); err != nil {
+		return nil, err
+	}
+
 	// check whether the organization where the group should be created exists
 	err = c.checkOrgExists(ctx, group.ResourceOwner)
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "CMDGRP-j1mH8l", "Errors.Org.NotFound")
-	}
-
-	// create a unique group ID if not provided
-	if group.AggregateID == "" {
-		group.AggregateID, err = c.idGenerator.Next()
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	// check if a group with the same ID already exists
@@ -97,13 +100,16 @@ func (c *Commands) UpdateGroup(ctx context.Context, groupUpdate *UpdateGroup) (d
 		return nil, err
 	}
 
-	// todo: check permissions
 	existingGroup, err := c.getGroupWriteModelByID(ctx, groupUpdate.AggregateID, groupUpdate.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if !existingGroup.State.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "CMDGRP-b33zly", "Errors.Group.NotFound")
+	}
+
+	if err = c.checkPermissionUpdateGroup(ctx, existingGroup.ResourceOwner, existingGroup.AggregateID); err != nil {
+		return nil, err
 	}
 
 	changedEvent := existingGroup.NewChangedEvent(
@@ -136,6 +142,10 @@ func (c *Commands) DeleteGroup(ctx context.Context, groupID string) (details *do
 	}
 	if !existingGroup.State.Exists() {
 		return writeModelToObjectDetails(&existingGroup.WriteModel), nil
+	}
+
+	if err = c.checkPermissionDeleteGroup(ctx, existingGroup.ResourceOwner, existingGroup.AggregateID); err != nil {
+		return nil, err
 	}
 
 	err = c.pushAppendAndReduce(ctx,
