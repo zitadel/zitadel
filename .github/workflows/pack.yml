@@ -34,6 +34,8 @@ env:
 jobs:
   version:
     uses: ./.github/workflows/version.yml
+    permissions:
+      contents: write
     with:
       semantic_version: ${{ inputs.semantic_version }}
       dry_run: true
@@ -43,6 +45,9 @@ jobs:
       group: zitadel-public
     environment: ${{ github.ref_protected == 'true' && 'Protected' || null }}
     needs: version
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4

@@ -18,11 +18,12 @@ permissions:
   packages: write
   issues: write
   pull-requests: write
-  actions: write
 
 jobs:
   lint_test_build:
     uses: ./.github/workflows/lint_test_build.yml
+    permissions:
+      contents: read
     with:
       node_version: "22"
     secrets:
@@ -31,6 +32,9 @@ jobs:
 
   pack:
     uses: ./.github/workflows/pack.yml
+    permissions:
+      contents: write
+      packages: write
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
     if: ${{ github.event_name == 'workflow_dispatch' }}
