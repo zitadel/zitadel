@@ -44,6 +44,11 @@ jobs:
 
   release:
     uses: ./.github/workflows/release.yml
+    permissions:
+      packages: write
+      contents: write
+      issues: write
+      pull-requests: write
     needs:
       - lint_test_build
       - pack

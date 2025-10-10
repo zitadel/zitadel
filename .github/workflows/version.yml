@@ -15,9 +15,6 @@ on:
         published:
             value: ${{jobs.semantic.outputs.published }}
 
-permissions:
-  contents: write
-
 jobs:
   semantic:
     runs-on: ubuntu-22.04
