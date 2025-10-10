@@ -32,6 +32,7 @@ type Provider struct {
 	spOptions *samlsp.Options
 
 	binding                       string
+	signatureAlgorithm            string
 	nameIDFormat                  saml.NameIDFormat
 	transientMappingAttributeName string
 
@@ -84,6 +85,12 @@ func WithBinding(binding string) ProviderOpts {
 	}
 }
 
+func WithSignatureAlgorithm(signatureAlgorithm string) ProviderOpts {
+	return func(p *Provider) {
+		p.signatureAlgorithm = signatureAlgorithm
+	}
+}
+
 func WithNameIDFormat(format domain.SAMLNameIDFormat) ProviderOpts {
 	return func(p *Provider) {
 		p.nameIDFormat = nameIDFormatFromDomain(format)
@@ -126,7 +133,7 @@ func ParseMetadata(metadata []byte) (*saml.EntityDescriptor, error) {
 			if _, err := reader.Seek(0, io.SeekStart); err != nil {
 				return nil, err
 			}
-			entities := &EntitiesDescriptor{}
+			entities := &saml.EntitiesDescriptor{}
 			if err := decoder.Decode(entities); err != nil {
 				return nil, err
 			}
@@ -219,6 +226,9 @@ func (p *Provider) GetSP() (*samlsp.Middleware, error) {
 	if p.binding != "" {
 		sp.Binding = p.binding
 	}
+	if p.signatureAlgorithm != "" {
+		sp.ServiceProvider.SignatureMethod = p.signatureAlgorithm
+	}
 	sp.ServiceProvider.MetadataValidDuration = time.Until(sp.ServiceProvider.Certificate.NotAfter)
 	return sp, nil
 }
@@ -252,27 +262,4 @@ func nameIDFormatFromDomain(format domain.SAMLNameIDFormat) saml.NameIDFormat {
 	default:
 		return saml.UnspecifiedNameIDFormat
 	}
-}
-
-// EntitiesDescriptor is a workaround until we eventually fork the crewjam/saml library, since maintenance on that repo seems to have stopped.
-// This is to be able to handle xsd:duration format using the UnmarshalXML method.
-// crewjam/saml only implements the xsd:dateTime format for EntityDescriptor, but not EntitiesDescriptor.
-type EntitiesDescriptor saml.EntitiesDescriptor
-
-// UnmarshalXML implements xml.Unmarshaler
-func (m *EntitiesDescriptor) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	type Alias EntitiesDescriptor
-	aux := &struct {
-		ValidUntil    *saml.RelaxedTime `xml:"validUntil,attr,omitempty"`
-		CacheDuration *saml.Duration    `xml:"cacheDuration,attr,omitempty"`
-		*Alias
-	}{
-		Alias: (*Alias)(m),
-	}
-	if err := d.DecodeElement(aux, &start); err != nil {
-		return err
-	}
-	m.ValidUntil = (*time.Time)(aux.ValidUntil)
-	m.CacheDuration = (*time.Duration)(aux.CacheDuration)
-	return nil
 }

@@ -1,19 +1,16 @@
 <ng-container *ngIf="['iam.read$', 'iam.write$'] | hasRole as iamuser$">
   <div class="nav-col" [ngClass]="{ 'is-admin': (iamuser$ | async) }">
-    <ng-container
-      *ngIf="breadcrumbService.breadcrumbsExtended$ && (breadcrumbService.breadcrumbsExtended$ | async) as breadc"
-    >
+    <ng-container *ngIf="breadcrumbService.breadcrumbsExtended$ | async as breadc">
       <ng-container
         *ngIf="
           breadc[breadc.length - 1] &&
           !breadc[breadc.length - 1].hideNav &&
-          breadc[breadc.length - 1].type !== BreadcrumbType.AUTHUSER &&
-          breadc[breadc.length - 1].type !== BreadcrumbType.INSTANCE
+          breadc[breadc.length - 1].type !== BreadcrumbType.AUTHUSER
         "
         [ngSwitch]="breadc[0].type"
       >
         <div class="nav-row" @navrow>
-          <ng-container *ngSwitchCase="BreadcrumbType.ORG">
+          <ng-container *ngSwitchCase="BreadcrumbType.INSTANCE">
             <div class="nav-row-abs" @navrowproject>
               <a
                 class="nav-item"
@@ -24,6 +21,48 @@
                 <span class="label">{{ 'MENU.DASHBOARD' | translate }}</span>
               </a>
 
+              <ng-container class="org-list" *ngIf="org">
+                <ng-template cnslHasRole [hasRole]="['org.read']">
+                  <a
+                    class="nav-item"
+                    [routerLinkActive]="['active']"
+                    [routerLinkActiveOptions]="{ exact: false }"
+                    [routerLink]="['/orgs']"
+                  >
+                    <span class="label">{{ 'MENU.ORGS' | translate }}</span>
+                  </a>
+                </ng-template>
+
+                <ng-template cnslHasRole [hasRole]="['org.action.read']">
+                  <a
+                    class="nav-item"
+                    [routerLinkActive]="['active']"
+                    [routerLink]="['/actions']"
+                    [routerLinkActiveOptions]="{ exact: false }"
+                  >
+                    <span class="label">{{ 'MENU.ACTIONS' | translate }}</span>
+                  </a>
+                </ng-template>
+
+                <ng-template cnslHasRole [hasRole]="['org.read']">
+                  <a
+                    class="nav-item"
+                    [routerLinkActive]="['active']"
+                    [routerLinkActiveOptions]="{ exact: false }"
+                    [routerLink]="['/instance']"
+                    *ngIf="['iam.policy.read'] | hasRole | async"
+                  >
+                    <span class="label">{{ 'MENU.SETTINGS' | translate }}</span>
+                  </a>
+                </ng-template>
+              </ng-container>
+
+              <template [ngTemplateOutlet]="shortcutKeyRef"></template>
+            </div>
+          </ng-container>
+
+          <ng-container *ngSwitchCase="BreadcrumbType.ORG">
+            <div class="nav-row-abs" @navrowproject>
               <ng-container class="org-list" *ngIf="org">
                 <ng-template cnslHasRole [hasRole]="['org.read']">
                   <a
@@ -83,7 +122,7 @@
                   <a
                     class="nav-item"
                     [routerLinkActive]="['active']"
-                    [routerLink]="['/actions']"
+                    [routerLink]="['/actions-v1']"
                     [routerLinkActiveOptions]="{ exact: true }"
                   >
                     <span class="label">{{ 'MENU.ACTIONS' | translate }}</span>
@@ -96,12 +135,7 @@
                     [routerLinkActive]="['active']"
                     [routerLinkActiveOptions]="{ exact: false }"
                     [routerLink]="['/org-settings']"
-                    *ngIf="
-                      (['policy.read'] | hasRole | async) &&
-                      ((['iam.read$', 'iam.write$'] | hasRole | async) === false ||
-                        (((authService.cachedOrgs | async)?.length ?? 1) > 1 &&
-                          (['iam.read$', 'iam.write$'] | hasRole | async)))
-                    "
+                    *ngIf="['policy.read'] | hasRole | async"
                   >
                     <span class="label">{{ 'MENU.SETTINGS' | translate }}</span>
                   </a>
@@ -120,7 +154,6 @@
 <ng-template #shortcutKeyRef>
   <ng-container *ngIf="(isHandset$ | async) === false">
     <ng-template cnslHasRole [hasRole]="['iam.read']">
-      <span class="fill-space"></span>
       <ng-container *ngIf="!adminService.hideOnboarding && (adminService.progressAllDone | async) === false">
         <div
           cdkOverlayOrigin
@@ -160,6 +193,7 @@
       </ng-container>
     </ng-template>
 
+    <span class="fill-space"></span>
     <div
       (click)="openHelp()"
       class="nav-shortcut-action-key"

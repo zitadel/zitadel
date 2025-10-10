@@ -7,26 +7,25 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	"github.com/zitadel/zitadel/internal/domain"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/integration"
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 )
 
 func TestServer_CreateTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	type want struct {
 		id           bool
 		creationDate bool
 		signingKey   bool
 	}
-	alreadyExistingTargetName := gofakeit.AppName()
-	instance.CreateTarget(isolatedIAMOwnerCTX, t, alreadyExistingTargetName, "https://example.com", domain.TargetTypeAsync, false)
+	alreadyExistingTargetName := integration.TargetName()
+	instance.CreateTarget(isolatedIAMOwnerCTX, t, alreadyExistingTargetName, "https://example.com", target_domain.TargetTypeAsync, false)
 	tests := []struct {
 		name string
 		ctx  context.Context
@@ -36,9 +35,9 @@ func TestServer_CreateTarget(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.CreateTargetRequest{
-				Name: gofakeit.Name(),
+				Name: integration.TargetName(),
 			},
 			wantErr: true,
 		},
@@ -54,7 +53,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "empty type",
 			ctx:  isolatedIAMOwnerCTX,
 			req: &action.CreateTargetRequest{
-				Name:       gofakeit.Name(),
+				Name:       integration.TargetName(),
 				TargetType: nil,
 			},
 			wantErr: true,
@@ -63,7 +62,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "empty webhook url",
 			ctx:  isolatedIAMOwnerCTX,
 			req: &action.CreateTargetRequest{
-				Name: gofakeit.Name(),
+				Name: integration.TargetName(),
 				TargetType: &action.CreateTargetRequest_RestWebhook{
 					RestWebhook: &action.RESTWebhook{},
 				},
@@ -74,7 +73,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "empty request response url",
 			ctx:  isolatedIAMOwnerCTX,
 			req: &action.CreateTargetRequest{
-				Name: gofakeit.Name(),
+				Name: integration.TargetName(),
 				TargetType: &action.CreateTargetRequest_RestCall{
 					RestCall: &action.RESTCall{},
 				},
@@ -85,7 +84,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "empty timeout",
 			ctx:  isolatedIAMOwnerCTX,
 			req: &action.CreateTargetRequest{
-				Name:     gofakeit.Name(),
+				Name:     integration.TargetName(),
 				Endpoint: "https://example.com",
 				TargetType: &action.CreateTargetRequest_RestWebhook{
 					RestWebhook: &action.RESTWebhook{},
@@ -111,7 +110,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "async, ok",
 			ctx:  isolatedIAMOwnerCTX,
 			req: &action.CreateTargetRequest{
-				Name:     gofakeit.Name(),
+				Name:     integration.TargetName(),
 				Endpoint: "https://example.com",
 				TargetType: &action.CreateTargetRequest_RestAsync{
 					RestAsync: &action.RESTAsync{},
@@ -128,7 +127,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "webhook, ok",
 			ctx:  isolatedIAMOwnerCTX,
 			req: &action.CreateTargetRequest{
-				Name:     gofakeit.Name(),
+				Name:     integration.TargetName(),
 				Endpoint: "https://example.com",
 				TargetType: &action.CreateTargetRequest_RestWebhook{
 					RestWebhook: &action.RESTWebhook{
@@ -147,7 +146,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "webhook, interrupt on error, ok",
 			ctx:  isolatedIAMOwnerCTX,
 			req: &action.CreateTargetRequest{
-				Name:     gofakeit.Name(),
+				Name:     integration.TargetName(),
 				Endpoint: "https://example.com",
 				TargetType: &action.CreateTargetRequest_RestWebhook{
 					RestWebhook: &action.RESTWebhook{
@@ -166,7 +165,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "call, ok",
 			ctx:  isolatedIAMOwnerCTX,
 			req: &action.CreateTargetRequest{
-				Name:     gofakeit.Name(),
+				Name:     integration.TargetName(),
 				Endpoint: "https://example.com",
 				TargetType: &action.CreateTargetRequest_RestCall{
 					RestCall: &action.RESTCall{
@@ -186,7 +185,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "call, interruptOnError, ok",
 			ctx:  isolatedIAMOwnerCTX,
 			req: &action.CreateTargetRequest{
-				Name:     gofakeit.Name(),
+				Name:     integration.TargetName(),
 				Endpoint: "https://example.com",
 				TargetType: &action.CreateTargetRequest_RestCall{
 					RestCall: &action.RESTCall{
@@ -243,7 +242,7 @@ func assertCreateTargetResponse(t *testing.T, creationDate, changeDate time.Time
 
 func TestServer_UpdateTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	type args struct {
 		ctx context.Context
 		req *action.UpdateTargetRequest
@@ -263,13 +262,13 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "missing permission",
 			prepare: func(request *action.UpdateTargetRequest) {
-				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
+				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
 			},
 			args: args{
-				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+				ctx: instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 				req: &action.UpdateTargetRequest{
-					Name: gu.Ptr(gofakeit.Name()),
+					Name: gu.Ptr(integration.TargetName()),
 				},
 			},
 			wantErr: true,
@@ -278,12 +277,11 @@ func TestServer_UpdateTarget(t *testing.T) {
 			name: "not existing",
 			prepare: func(request *action.UpdateTargetRequest) {
 				request.Id = "notexisting"
-				return
 			},
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
 				req: &action.UpdateTargetRequest{
-					Name: gu.Ptr(gofakeit.Name()),
+					Name: gu.Ptr(integration.TargetName()),
 				},
 			},
 			wantErr: true,
@@ -291,7 +289,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "no change, ok",
 			prepare: func(request *action.UpdateTargetRequest) {
-				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
+				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
 			},
 			args: args{
@@ -309,13 +307,13 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "change name, ok",
 			prepare: func(request *action.UpdateTargetRequest) {
-				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
+				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
 			},
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
 				req: &action.UpdateTargetRequest{
-					Name: gu.Ptr(gofakeit.Name()),
+					Name: gu.Ptr(integration.TargetName()),
 				},
 			},
 			want: want{
@@ -327,7 +325,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "regenerate signingkey, ok",
 			prepare: func(request *action.UpdateTargetRequest) {
-				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
+				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
 			},
 			args: args{
@@ -345,7 +343,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "change type, ok",
 			prepare: func(request *action.UpdateTargetRequest) {
-				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
+				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
 			},
 			args: args{
@@ -367,7 +365,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "change url, ok",
 			prepare: func(request *action.UpdateTargetRequest) {
-				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
+				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
 			},
 			args: args{
@@ -385,7 +383,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "change timeout, ok",
 			prepare: func(request *action.UpdateTargetRequest) {
-				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
+				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
 			},
 			args: args{
@@ -403,7 +401,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "change type async, ok",
 			prepare: func(request *action.UpdateTargetRequest) {
-				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeAsync, false).GetId()
+				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeAsync, false).GetId()
 				request.Id = targetID
 			},
 			args: args{
@@ -461,7 +459,7 @@ func assertUpdateTargetResponse(t *testing.T, creationDate, changeDate time.Time
 
 func TestServer_DeleteTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	tests := []struct {
 		name             string
 		ctx              context.Context
@@ -472,7 +470,7 @@ func TestServer_DeleteTarget(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.DeleteTargetRequest{
 				Id: "notexisting",
 			},
@@ -499,7 +497,7 @@ func TestServer_DeleteTarget(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(request *action.DeleteTargetRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				targetID := instance.CreateTarget(iamOwnerCtx, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
+				targetID := instance.CreateTarget(iamOwnerCtx, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
 				return creationDate, time.Time{}
 			},
@@ -511,7 +509,7 @@ func TestServer_DeleteTarget(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(request *action.DeleteTargetRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				targetID := instance.CreateTarget(iamOwnerCtx, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
+				targetID := instance.CreateTarget(iamOwnerCtx, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
 				instance.DeleteTarget(iamOwnerCtx, t, targetID)
 				return creationDate, time.Now().UTC()

@@ -21,8 +21,7 @@ import (
 )
 
 func TestServer_DeviceAuth(t *testing.T) {
-	project, err := Instance.CreateProject(CTX)
-	require.NoError(t, err)
+	project := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
 	client, err := Instance.CreateOIDCClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, false, app.OIDCGrantType_OIDC_GRANT_TYPE_DEVICE_CODE)
 	require.NoError(t, err)
 

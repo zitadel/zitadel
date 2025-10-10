@@ -5,7 +5,6 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -29,7 +28,7 @@ func (c *Commands) LockUserV2(ctx context.Context, userID string) (*domain.Objec
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-lgws8wtsqf", "Errors.User.ShouldBeActiveOrInitial")
 	}
 
-	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
+	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID, false); err != nil {
 		return nil, err
 	}
 
@@ -54,7 +53,7 @@ func (c *Commands) UnlockUserV2(ctx context.Context, userID string) (*domain.Obj
 	if !hasUserState(existingHuman.UserState, domain.UserStateLocked) {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-olb9vb0oca", "Errors.User.NotLocked")
 	}
-	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
+	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID, false); err != nil {
 		return nil, err
 	}
 
@@ -82,7 +81,7 @@ func (c *Commands) DeactivateUserV2(ctx context.Context, userID string) (*domain
 	if isUserStateInactive(existingHuman.UserState) {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-5gunjw0cd7", "Errors.User.AlreadyInactive")
 	}
-	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
+	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID, false); err != nil {
 		return nil, err
 	}
 
@@ -107,7 +106,7 @@ func (c *Commands) ReactivateUserV2(ctx context.Context, userID string) (*domain
 	if !isUserStateInactive(existingHuman.UserState) {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-s5qqcz97hf", "Errors.User.NotInactive")
 	}
-	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
+	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID, false); err != nil {
 		return nil, err
 	}
 
@@ -115,36 +114,6 @@ func (c *Commands) ReactivateUserV2(ctx context.Context, userID string) (*domain
 		return nil, err
 	}
 	return writeModelToObjectDetails(&existingHuman.WriteModel), nil
-}
-
-func (c *Commands) checkPermissionUpdateUser(ctx context.Context, resourceOwner, userID string) error {
-	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
-		return nil
-	}
-	if err := c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, userID); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c *Commands) checkPermissionUpdateUserCredentials(ctx context.Context, resourceOwner, userID string) error {
-	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
-		return nil
-	}
-	if err := c.checkPermission(ctx, domain.PermissionUserCredentialWrite, resourceOwner, userID); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c *Commands) checkPermissionDeleteUser(ctx context.Context, resourceOwner, userID string) error {
-	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
-		return nil
-	}
-	if err := c.checkPermission(ctx, domain.PermissionUserDelete, resourceOwner, userID); err != nil {
-		return err
-	}
-	return nil
 }
 
 func (c *Commands) userStateWriteModel(ctx context.Context, userID string) (writeModel *UserV2WriteModel, err error) {
@@ -163,7 +132,6 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner strin
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-vaipl7s13l", "Errors.User.UserIDMissing")
 	}
-
 	existingUser, err := c.userRemoveWriteModel(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -174,16 +142,20 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner strin
 	if err := c.checkPermissionDeleteUser(ctx, existingUser.ResourceOwner, existingUser.AggregateID); err != nil {
 		return nil, err
 	}
-
 	domainPolicy, err := c.domainPolicyWriteModel(ctx, existingUser.ResourceOwner)
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-l40ykb3xh2", "Errors.Org.DomainPolicy.NotExisting")
 	}
+	organizationScopedUsername, err := c.checkOrganizationScopedUsernames(ctx, existingUser.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+
 	var events []eventstore.Command
-	events = append(events, user.NewUserRemovedEvent(ctx, &existingUser.Aggregate().Aggregate, existingUser.UserName, existingUser.IDPLinks, domainPolicy.UserLoginMustBeDomain))
+	events = append(events, user.NewUserRemovedEvent(ctx, &existingUser.Aggregate().Aggregate, existingUser.UserName, existingUser.IDPLinks, domainPolicy.UserLoginMustBeDomain || organizationScopedUsername))
 
 	for _, grantID := range cascadingGrantIDs {
-		removeEvent, _, err := c.removeUserGrant(ctx, grantID, "", true)
+		removeEvent, _, err := c.removeUserGrant(ctx, grantID, "", true, true, nil)
 		if err != nil {
 			logging.WithFields("usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
 			continue

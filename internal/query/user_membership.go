@@ -63,7 +63,15 @@ type MembershipSearchQuery struct {
 }
 
 func NewMembershipUserIDQuery(userID string) (SearchQuery, error) {
-	return NewTextQuery(membershipUserID.setTable(membershipAlias), userID, TextEquals)
+	return NewTextQuery(MembershipUserID.setTable(membershipAlias), userID, TextEquals)
+}
+
+func NewMembershipCreationDateQuery(timestamp time.Time, comparison TimestampComparison) (SearchQuery, error) {
+	return NewTimestampQuery(MembershipCreationDate.setTable(membershipAlias), timestamp, comparison)
+}
+
+func NewMembershipChangeDateQuery(timestamp time.Time, comparison TimestampComparison) (SearchQuery, error) {
+	return NewTimestampQuery(MembershipChangeDate.setTable(membershipAlias), timestamp, comparison)
 }
 
 func NewMembershipOrgIDQuery(value string) (SearchQuery, error) {
@@ -137,13 +145,13 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 		wg.Wait()
 	}
 
-	query, queryArgs, scan := prepareMembershipsQuery(queries)
+	query, queryArgs, scan := prepareMembershipsQuery(ctx, queries, false)
 	eq := sq.Eq{membershipInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-T84X9", "Errors.Query.InvalidRequest")
 	}
-	latestSequence, err := q.latestState(ctx, orgMemberTable, instanceMemberTable, projectMemberTable, projectGrantMemberTable)
+	latestState, err := q.latestState(ctx, orgMemberTable, instanceMemberTable, projectMemberTable, projectGrantMemberTable)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +164,7 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 	if err != nil {
 		return nil, err
 	}
-	memberships.State = latestSequence
+	memberships.State = latestState
 	return memberships, nil
 }
 
@@ -166,7 +174,7 @@ var (
 		name:          "members",
 		instanceIDCol: projection.MemberInstanceID,
 	}
-	membershipUserID = Column{
+	MembershipUserID = Column{
 		name:  projection.MemberUserIDCol,
 		table: membershipAlias,
 	}
@@ -174,11 +182,11 @@ var (
 		name:  projection.MemberRolesCol,
 		table: membershipAlias,
 	}
-	membershipCreationDate = Column{
+	MembershipCreationDate = Column{
 		name:  projection.MemberCreationDate,
 		table: membershipAlias,
 	}
-	membershipChangeDate = Column{
+	MembershipChangeDate = Column{
 		name:  projection.MemberChangeDate,
 		table: membershipAlias,
 	}
@@ -216,11 +224,11 @@ var (
 	}
 )
 
-func getMembershipFromQuery(queries *MembershipSearchQuery) (string, []interface{}) {
-	orgMembers, orgMembersArgs := prepareOrgMember(queries)
-	iamMembers, iamMembersArgs := prepareIAMMember(queries)
-	projectMembers, projectMembersArgs := prepareProjectMember(queries)
-	projectGrantMembers, projectGrantMembersArgs := prepareProjectGrantMember(queries)
+func getMembershipFromQuery(ctx context.Context, queries *MembershipSearchQuery, permissionV2 bool) (string, []interface{}) {
+	orgMembers, orgMembersArgs := prepareOrgMember(ctx, queries, permissionV2)
+	iamMembers, iamMembersArgs := prepareIAMMember(ctx, queries, permissionV2)
+	projectMembers, projectMembersArgs := prepareProjectMember(ctx, queries, permissionV2)
+	projectGrantMembers, projectGrantMembersArgs := prepareProjectGrantMember(ctx, queries, permissionV2)
 	args := make([]interface{}, 0)
 	args = append(append(append(append(args, orgMembersArgs...), iamMembersArgs...), projectMembersArgs...), projectGrantMembersArgs...)
 
@@ -236,13 +244,13 @@ func getMembershipFromQuery(queries *MembershipSearchQuery) (string, []interface
 		args
 }
 
-func prepareMembershipsQuery(queries *MembershipSearchQuery) (sq.SelectBuilder, []interface{}, func(*sql.Rows) (*Memberships, error)) {
-	query, args := getMembershipFromQuery(queries)
+func prepareMembershipsQuery(ctx context.Context, queries *MembershipSearchQuery, permissionV2 bool) (sq.SelectBuilder, []interface{}, func(*sql.Rows) (*Memberships, error)) {
+	query, args := getMembershipFromQuery(ctx, queries, permissionV2)
 	return sq.Select(
-			membershipUserID.identifier(),
+			MembershipUserID.identifier(),
 			membershipRoles.identifier(),
-			membershipCreationDate.identifier(),
-			membershipChangeDate.identifier(),
+			MembershipCreationDate.identifier(),
+			MembershipChangeDate.identifier(),
 			membershipSequence.identifier(),
 			membershipResourceOwner.identifier(),
 			membershipOrgID.identifier(),
@@ -257,7 +265,7 @@ func prepareMembershipsQuery(queries *MembershipSearchQuery) (sq.SelectBuilder, 
 		).From(query).
 			LeftJoin(join(ProjectColumnID, membershipProjectID)).
 			LeftJoin(join(OrgColumnID, membershipOrgID)).
-			LeftJoin(join(ProjectGrantColumnGrantID, membershipGrantID)).
+			LeftJoin(join(ProjectGrantColumnGrantID, membershipGrantID) + " AND " + membershipProjectID.identifier() + " = " + ProjectGrantColumnProjectID.identifier()).
 			LeftJoin(join(InstanceColumnID, membershipInstanceID)).
 			PlaceholderFormat(sq.Dollar),
 		args,
@@ -340,7 +348,7 @@ func prepareMembershipsQuery(queries *MembershipSearchQuery) (sq.SelectBuilder, 
 		}
 }
 
-func prepareOrgMember(query *MembershipSearchQuery) (string, []interface{}) {
+func prepareOrgMember(ctx context.Context, query *MembershipSearchQuery, permissionV2 bool) (string, []interface{}) {
 	builder := sq.Select(
 		OrgMemberUserID.identifier(),
 		OrgMemberRoles.identifier(),
@@ -354,6 +362,7 @@ func prepareOrgMember(query *MembershipSearchQuery) (string, []interface{}) {
 		"NULL::TEXT AS "+membershipProjectID.name,
 		"NULL::TEXT AS "+membershipGrantID.name,
 	).From(orgMemberTable.identifier())
+	builder = administratorOrgPermissionCheckV2(ctx, builder, permissionV2)
 
 	for _, q := range query.Queries {
 		if q.Col().table.name == membershipAlias.name || q.Col().table.name == orgMemberTable.name {
@@ -363,7 +372,7 @@ func prepareOrgMember(query *MembershipSearchQuery) (string, []interface{}) {
 	return builder.MustSql()
 }
 
-func prepareIAMMember(query *MembershipSearchQuery) (string, []interface{}) {
+func prepareIAMMember(ctx context.Context, query *MembershipSearchQuery, permissionV2 bool) (string, []interface{}) {
 	builder := sq.Select(
 		InstanceMemberUserID.identifier(),
 		InstanceMemberRoles.identifier(),
@@ -377,6 +386,7 @@ func prepareIAMMember(query *MembershipSearchQuery) (string, []interface{}) {
 		"NULL::TEXT AS "+membershipProjectID.name,
 		"NULL::TEXT AS "+membershipGrantID.name,
 	).From(instanceMemberTable.identifier())
+	builder = administratorInstancePermissionCheckV2(ctx, builder, permissionV2)
 
 	for _, q := range query.Queries {
 		if q.Col().table.name == membershipAlias.name || q.Col().table.name == instanceMemberTable.name {
@@ -386,7 +396,7 @@ func prepareIAMMember(query *MembershipSearchQuery) (string, []interface{}) {
 	return builder.MustSql()
 }
 
-func prepareProjectMember(query *MembershipSearchQuery) (string, []interface{}) {
+func prepareProjectMember(ctx context.Context, query *MembershipSearchQuery, permissionV2 bool) (string, []interface{}) {
 	builder := sq.Select(
 		ProjectMemberUserID.identifier(),
 		ProjectMemberRoles.identifier(),
@@ -400,6 +410,7 @@ func prepareProjectMember(query *MembershipSearchQuery) (string, []interface{}) 
 		ProjectMemberProjectID.identifier(),
 		"NULL::TEXT AS "+membershipGrantID.name,
 	).From(projectMemberTable.identifier())
+	builder = administratorProjectPermissionCheckV2(ctx, builder, permissionV2)
 
 	for _, q := range query.Queries {
 		if q.Col().table.name == membershipAlias.name || q.Col().table.name == projectMemberTable.name {
@@ -410,7 +421,7 @@ func prepareProjectMember(query *MembershipSearchQuery) (string, []interface{}) 
 	return builder.MustSql()
 }
 
-func prepareProjectGrantMember(query *MembershipSearchQuery) (string, []interface{}) {
+func prepareProjectGrantMember(ctx context.Context, query *MembershipSearchQuery, permissionV2 bool) (string, []interface{}) {
 	builder := sq.Select(
 		ProjectGrantMemberUserID.identifier(),
 		ProjectGrantMemberRoles.identifier(),
@@ -424,6 +435,7 @@ func prepareProjectGrantMember(query *MembershipSearchQuery) (string, []interfac
 		ProjectGrantMemberProjectID.identifier(),
 		ProjectGrantMemberGrantID.identifier(),
 	).From(projectGrantMemberTable.identifier())
+	builder = administratorProjectGrantPermissionCheckV2(ctx, builder, permissionV2)
 
 	for _, q := range query.Queries {
 		if q.Col().table.name == membershipAlias.name || q.Col().table.name == projectMemberTable.name || q.Col().table.name == projectGrantMemberTable.name {

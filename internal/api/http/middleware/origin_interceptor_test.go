@@ -11,8 +11,8 @@ import (
 
 func Test_composeOrigin(t *testing.T) {
 	type args struct {
-		h               http.Header
-		fallBackToHttps bool
+		h            http.Header
+		enforceHttps bool
 	}
 	tests := []struct {
 		name string
@@ -30,7 +30,7 @@ func Test_composeOrigin(t *testing.T) {
 			h: http.Header{
 				"Forwarded": []string{"proto=https"},
 			},
-			fallBackToHttps: false,
+			enforceHttps: false,
 		},
 		want: &http_util.DomainCtx{
 			InstanceHost: "host.header",
@@ -42,7 +42,7 @@ func Test_composeOrigin(t *testing.T) {
 			h: http.Header{
 				"Forwarded": []string{"host=forwarded.host"},
 			},
-			fallBackToHttps: false,
+			enforceHttps: false,
 		},
 		want: &http_util.DomainCtx{
 			InstanceHost: "forwarded.host",
@@ -54,7 +54,7 @@ func Test_composeOrigin(t *testing.T) {
 			h: http.Header{
 				"Forwarded": []string{"proto=https;host=forwarded.host"},
 			},
-			fallBackToHttps: false,
+			enforceHttps: false,
 		},
 		want: &http_util.DomainCtx{
 			InstanceHost: "forwarded.host",
@@ -66,7 +66,7 @@ func Test_composeOrigin(t *testing.T) {
 			h: http.Header{
 				"Forwarded": []string{"proto=https;host=forwarded.host, proto=http;host=forwarded.host2"},
 			},
-			fallBackToHttps: false,
+			enforceHttps: false,
 		},
 		want: &http_util.DomainCtx{
 			InstanceHost: "forwarded.host",
@@ -78,7 +78,7 @@ func Test_composeOrigin(t *testing.T) {
 			h: http.Header{
 				"Forwarded": []string{"proto=https;host=forwarded.host, proto=http"},
 			},
-			fallBackToHttps: false,
+			enforceHttps: false,
 		},
 		want: &http_util.DomainCtx{
 			InstanceHost: "forwarded.host",
@@ -90,11 +90,11 @@ func Test_composeOrigin(t *testing.T) {
 			h: http.Header{
 				"Forwarded": []string{"proto=http", "proto=https;host=forwarded.host", "proto=http"},
 			},
-			fallBackToHttps: true,
+			enforceHttps: true,
 		},
 		want: &http_util.DomainCtx{
 			InstanceHost: "forwarded.host",
-			Protocol:     "http",
+			Protocol:     "https",
 		},
 	}, {
 		name: "x-forwarded-proto https",
@@ -102,7 +102,7 @@ func Test_composeOrigin(t *testing.T) {
 			h: http.Header{
 				"X-Forwarded-Proto": []string{"https"},
 			},
-			fallBackToHttps: false,
+			enforceHttps: false,
 		},
 		want: &http_util.DomainCtx{
 			InstanceHost: "host.header",
@@ -114,25 +114,25 @@ func Test_composeOrigin(t *testing.T) {
 			h: http.Header{
 				"X-Forwarded-Proto": []string{"http"},
 			},
-			fallBackToHttps: true,
+			enforceHttps: true,
 		},
 		want: &http_util.DomainCtx{
 			InstanceHost: "host.header",
-			Protocol:     "http",
+			Protocol:     "https",
 		},
 	}, {
 		name: "fallback to http",
 		args: args{
-			fallBackToHttps: false,
+			enforceHttps: false,
 		},
 		want: &http_util.DomainCtx{
 			InstanceHost: "host.header",
 			Protocol:     "http",
 		},
 	}, {
-		name: "fallback to https",
+		name: "enforce https",
 		args: args{
-			fallBackToHttps: true,
+			enforceHttps: true,
 		},
 		want: &http_util.DomainCtx{
 			InstanceHost: "host.header",
@@ -144,7 +144,7 @@ func Test_composeOrigin(t *testing.T) {
 			h: http.Header{
 				"X-Forwarded-Host": []string{"x-forwarded.host"},
 			},
-			fallBackToHttps: false,
+			enforceHttps: false,
 		},
 		want: &http_util.DomainCtx{
 			InstanceHost: "x-forwarded.host",
@@ -157,7 +157,7 @@ func Test_composeOrigin(t *testing.T) {
 				"X-Forwarded-Proto": []string{"https"},
 				"X-Forwarded-Host":  []string{"x-forwarded.host"},
 			},
-			fallBackToHttps: false,
+			enforceHttps: false,
 		},
 		want: &http_util.DomainCtx{
 			InstanceHost: "x-forwarded.host",
@@ -170,7 +170,7 @@ func Test_composeOrigin(t *testing.T) {
 				"Forwarded":        []string{"host=forwarded.host"},
 				"X-Forwarded-Host": []string{"x-forwarded.host"},
 			},
-			fallBackToHttps: false,
+			enforceHttps: false,
 		},
 		want: &http_util.DomainCtx{
 			InstanceHost: "forwarded.host",
@@ -183,7 +183,7 @@ func Test_composeOrigin(t *testing.T) {
 				"Forwarded":         []string{"host=forwarded.host"},
 				"X-Forwarded-Proto": []string{"https"},
 			},
-			fallBackToHttps: false,
+			enforceHttps: false,
 		},
 		want: &http_util.DomainCtx{
 			InstanceHost: "forwarded.host",
@@ -198,10 +198,10 @@ func Test_composeOrigin(t *testing.T) {
 					Host:   "host.header",
 					Header: tt.args.h,
 				},
-				tt.args.fallBackToHttps,
+				tt.args.enforceHttps,
 				[]string{http_util.Forwarded, http_util.ForwardedFor, http_util.ForwardedHost, http_util.ForwardedProto},
 				[]string{"x-zitadel-public-host"},
-			), "headers: %+v, fallBackToHttps: %t", tt.args.h, tt.args.fallBackToHttps)
+			), "headers: %+v, enforceHttps: %t", tt.args.h, tt.args.enforceHttps)
 		})
 	}
 }

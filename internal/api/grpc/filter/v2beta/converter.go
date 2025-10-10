@@ -32,6 +32,23 @@ func TextMethodPbToQuery(method filter.TextFilterMethod) query.TextComparison {
 	}
 }
 
+func TimestampMethodPbToQuery(method filter.TimestampFilterMethod) query.TimestampComparison {
+	switch method {
+	case filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_EQUALS:
+		return query.TimestampEquals
+	case filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_LESS:
+		return query.TimestampLess
+	case filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_GREATER:
+		return query.TimestampGreater
+	case filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_LESS_OR_EQUALS:
+		return query.TimestampLessOrEquals
+	case filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_GREATER_OR_EQUALS:
+		return query.TimestampGreaterOrEquals
+	default:
+		return -1
+	}
+}
+
 func PaginationPbToQuery(defaults systemdefaults.SystemDefaults, query *filter.PaginationRequest) (offset, limit uint64, asc bool, err error) {
 	limit = defaults.DefaultQueryLimit
 	if query == nil {

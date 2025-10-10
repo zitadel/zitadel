@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package zitadel.user.v2;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2;user";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "zitadel/filter/v2/filter.proto";
+
+message Key {
+  // The timestamp of the key creation.
+  google.protobuf.Timestamp creation_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // The timestamp of the last change of the key.
+  google.protobuf.Timestamp change_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // The unique identifier of the key.
+  string id = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // The unique identifier of the user the key belongs to.
+  string user_id = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // The unique identifier of the organization the key belongs to.
+  string organization_id = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // The keys expiration date.
+  google.protobuf.Timestamp expiration_date = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+}
+
+message KeysSearchFilter {
+  oneof filter {
+    option (validate.required) = true;
+    zitadel.filter.v2.IDFilter key_id_filter = 1;
+    zitadel.filter.v2.IDFilter user_id_filter = 2;
+    zitadel.filter.v2.IDFilter organization_id_filter = 3;
+    zitadel.filter.v2.TimestampFilter created_date_filter = 4;
+    zitadel.filter.v2.TimestampFilter expiration_date_filter = 5;
+  }
+}
+
+enum KeyFieldName {
+  KEY_FIELD_NAME_UNSPECIFIED = 0;
+  KEY_FIELD_NAME_CREATED_DATE = 1;
+  KEY_FIELD_NAME_ID = 2;
+  KEY_FIELD_NAME_USER_ID = 3;
+  KEY_FIELD_NAME_ORGANIZATION_ID = 4;
+  KEY_FIELD_NAME_KEY_EXPIRATION_DATE = 5;
+}

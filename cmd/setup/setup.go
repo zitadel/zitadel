@@ -198,7 +198,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s35AddPositionToIndexEsWm = &AddPositionToIndexEsWm{dbClient: dbClient}
 	steps.s36FillV2Milestones = &FillV3Milestones{dbClient: dbClient, eventstore: eventstoreClient}
 	steps.s37Apps7OIDConfigsBackChannelLogoutURI = &Apps7OIDConfigsBackChannelLogoutURI{dbClient: dbClient}
-	steps.s38BackChannelLogoutNotificationStart = &BackChannelLogoutNotificationStart{dbClient: dbClient, esClient: eventstoreClient}
+	steps.s38BackChannelLogoutNotificationStart = &BackChannelLogoutNotificationStart{dbClient: dbClient}
 	steps.s40InitPushFunc = &InitPushFunc{dbClient: dbClient}
 	steps.s42Apps7OIDCConfigsLoginVersion = &Apps7OIDCConfigsLoginVersion{dbClient: dbClient}
 	steps.s43CreateFieldsDomainIndex = &CreateFieldsDomainIndex{dbClient: dbClient}
@@ -212,6 +212,17 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s51IDPTemplate6RootCA = &IDPTemplate6RootCA{dbClient: dbClient}
 	steps.s52IDPTemplate6LDAP2 = &IDPTemplate6LDAP2{dbClient: dbClient}
 	steps.s53InitPermittedOrgsFunction = &InitPermittedOrgsFunction53{dbClient: dbClient}
+	steps.s54InstancePositionIndex = &InstancePositionIndex{dbClient: dbClient}
+	steps.s55ExecutionHandlerStart = &ExecutionHandlerStart{dbClient: dbClient}
+	steps.s56IDPTemplate6SAMLFederatedLogout = &IDPTemplate6SAMLFederatedLogout{dbClient: dbClient}
+	steps.s57CreateResourceCounts = &CreateResourceCounts{dbClient: dbClient}
+	steps.s58ReplaceLoginNames3View = &ReplaceLoginNames3View{dbClient: dbClient}
+	steps.s60GenerateSystemID = &GenerateSystemID{eventstore: eventstoreClient}
+	steps.s61IDPTemplate6SAMLSignatureAlgorithm = &IDPTemplate6SAMLSignatureAlgorithm{dbClient: dbClient}
+	steps.s62HTTPProviderAddSigningKey = &HTTPProviderAddSigningKey{dbClient: dbClient}
+	steps.s63AlterResourceCounts = &AlterResourceCounts{dbClient: dbClient}
+	steps.s64ChangePushPosition = &ChangePushPosition{dbClient: dbClient}
+	steps.s65FixUserMetadata5Index = &FixUserMetadata5Index{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -254,6 +265,17 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s51IDPTemplate6RootCA,
 		steps.s52IDPTemplate6LDAP2,
 		steps.s53InitPermittedOrgsFunction,
+		steps.s54InstancePositionIndex,
+		steps.s55ExecutionHandlerStart,
+		steps.s56IDPTemplate6SAMLFederatedLogout,
+		steps.s57CreateResourceCounts,
+		steps.s58ReplaceLoginNames3View,
+		steps.s60GenerateSystemID,
+		steps.s61IDPTemplate6SAMLSignatureAlgorithm,
+		steps.s62HTTPProviderAddSigningKey,
+		steps.s63AlterResourceCounts,
+		steps.s64ChangePushPosition,
+		steps.s65FixUserMetadata5Index,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
@@ -262,6 +284,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	}
 
 	commands, _, _, _ := startCommandsQueries(ctx, eventstoreClient, eventstoreV4, dbClient, masterKey, config)
+	steps.s59SetupWebkeys = &SetupWebkeys{eventstore: eventstoreClient, commands: commands}
 
 	repeatableSteps := []migration.RepeatableMigration{
 		&externalConfigChange{
@@ -270,6 +293,9 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 			ExternalPort:   config.ExternalPort,
 			ExternalSecure: config.ExternalSecure,
 			defaults:       config.SystemDefaults,
+		},
+		&TransactionalTables{
+			dbClient: dbClient,
 		},
 		&projectionTables{
 			es:      eventstoreClient,
@@ -290,6 +316,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 			client: dbClient,
 		},
 	}
+	repeatableSteps = append(repeatableSteps, triggerSteps(dbClient)...)
 
 	for _, repeatableStep := range repeatableSteps {
 		setupErr = executeMigration(ctx, eventstoreClient, repeatableStep, "unable to migrate repeatable step")
@@ -310,6 +337,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s42Apps7OIDCConfigsLoginVersion,
 		steps.s43CreateFieldsDomainIndex,
 		steps.s48Apps7SAMLConfigsLoginVersion,
+		steps.s59SetupWebkeys, // this step needs commands.
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
@@ -451,6 +479,8 @@ func startCommandsQueries(
 		keys.OIDC,
 		keys.SAML,
 		keys.Target,
+		keys.SMS,
+		keys.SMTP,
 		config.InternalAuthZ.RolePermissionMappings,
 		sessionTokenVerifier,
 		func(q *query.Queries) domain.PermissionCheck {
@@ -512,6 +542,9 @@ func startCommandsQueries(
 		config.OIDC.DefaultRefreshTokenExpiration,
 		config.OIDC.DefaultRefreshTokenIdleExpiration,
 		config.DefaultInstance.SecretGenerators,
+
+		nil,
+		nil,
 	)
 	logging.OnError(err).Fatal("unable to start commands")
 
@@ -534,7 +567,7 @@ func startCommandsQueries(
 		commands,
 		queries,
 		eventstoreClient,
-		config.Login.DefaultOTPEmailURLV2,
+		config.Login.DefaultPaths.OTPEmailPath,
 		config.SystemDefaults.Notifications.FileSystemPath,
 		keys.User,
 		keys.SMTP,
@@ -551,8 +584,6 @@ func initProjections(
 	ctx context.Context,
 	eventstoreClient *eventstore.Eventstore,
 ) error {
-	logging.Info("init-projections is currently in beta")
-
 	for _, p := range projection.Projections() {
 		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
 			logging.WithFields("name", p.String()).OnError(err).Error("projection migration failed")

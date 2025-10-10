@@ -4,6 +4,8 @@
 </p>
 
 <p align="center">
+    <a href="https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/zitadel/zitadel" alt="Open in Dev Container">
+        <img src="https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue" /> </a>
     <a href="https://github.com/zitadel/zitadel/blob/main/LICENSE" alt="License">
         <img src="https://badgen.net/github/license/zitadel/zitadel/" /></a>
     <a href="https://bestpractices.coreinfrastructure.org/projects/6662"><img src="https://bestpractices.coreinfrastructure.org/projects/6662/badge"></a>
@@ -65,7 +67,6 @@ Deploying ZITADEL locally takes less than 3 minutes. Go ahead and give it a try!
 * [Linux](https://zitadel.com/docs/self-hosting/deploy/linux)
 * [MacOS](https://zitadel.com/docs/self-hosting/deploy/macos)
 * [Docker compose](https://zitadel.com/docs/self-hosting/deploy/compose)
-* [Knative](https://zitadel.com/docs/self-hosting/deploy/knative)
 * [Kubernetes](https://zitadel.com/docs/self-hosting/deploy/kubernetes)
 
 See all guides [here](https://zitadel.com/docs/self-hosting/deploy/overview)
@@ -118,14 +119,14 @@ Authentication
 - Username / Password
 - Multifactor authentication with OTP, U2F, Email OTP, SMS OTP
 - [LDAP](https://zitadel.com/docs/guides/integrate/identity-providers/ldap)
-- [External enterprise identity providers  and social logins](https://zitadel.com/docs/guides/integrate/identity-providers/introduction)
+- [External enterprise identity providers and social logins](https://zitadel.com/docs/guides/integrate/identity-providers/introduction)
 - [Device authorization](https://zitadel.com/docs/guides/solution-scenarios/device-authorization)
 - [OpenID Connect certified](https://openid.net/certification/#OPs) => [OIDC Endpoints](https://zitadel.com/docs/apis/openidoauth/endpoints)
 - [SAML 2.0](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html) => [SAML Endpoints](https://zitadel.com/docs/apis/saml/endpoints)
 - [Custom sessions](https://zitadel.com/docs/guides/integrate/login-ui/username-password) if you need to go beyond OIDC or SAML 
 - [Machine-to-machine](https://zitadel.com/docs/guides/integrate/service-users/authenticate-service-users) with JWT profile, Personal Access Tokens (PAT), and Client Credentials
 - [Token exchange and impersonation](https://zitadel.com/docs/guides/integrate/token-exchange)
-- [Beta: Hosted Login V2](https://zitadel.com/docs/guides/integrate/login/hosted-login#hosted-login-version-2-beta) our new login version 2.0
+- [Beta: Hosted Login V2](https://zitadel.com/docs/guides/integrate/login/hosted-login#hosted-login-version-2-beta) our new Login version 2.0
 
 Multi-Tenancy
 
@@ -143,7 +144,7 @@ Integration
 - [Examples and SDKs](https://zitadel.com/docs/sdk-examples/introduction)
 - [Audit Log and SOC/SIEM](https://zitadel.com/docs/guides/integrate/external-audit-log)
 - [User registration and onboarding](https://zitadel.com/docs/guides/integrate/onboarding)
-- [Hosted and custom login user interface](https://zitadel.com/docs/guides/integrate/login/login-users)
+- [Hosted and custom Login user interface](https://zitadel.com/docs/guides/integrate/login/login-users)
 
 Self-Service
 - [Self-registration](https://zitadel.com/docs/concepts/features/selfservice#registration) including verification
@@ -180,7 +181,7 @@ Secure a React Application using OpenID Connect Authorization Code with PKCE
 
 ### Login with Passkeys
 
-Use our login widget to allow easy and secure access to your applications and enjoy all the benefits of Passkeys (FIDO 2 / WebAuthN):
+Use our Login widget to allow easy and secure access to your applications and enjoy all the benefits of Passkeys (FIDO 2 / WebAuthN):
 
 [![Passkeys](https://user-images.githubusercontent.com/1366906/223664178-4132faef-4832-4014-b9ab-90c2a8d15436.gif)](https://www.youtube.com/watch?v=cZjHQYurSjw&list=PLTDa7jTlOyRLdABgD2zL0LGM7rx5GZ1IR&index=2 "Passkeys")
 
@@ -192,8 +193,8 @@ Use [Console](https://zitadel.com/docs/guides/manage/console/overview) or our [A
 
 ### Login V2
 
-Check out our new Login V2 version in our [typescript repository](https://github.com/zitadel/typescript) or in our [documentation](https://zitadel.com/docs/guides/integrate/login/hosted-login#hosted-login-version-2-beta)
-[![New Login Showcase](https://github.com/user-attachments/assets/cb5c5212-128b-4dc9-b11d-cabfd3f73e26)]
+Check out our new Login V2 version in our [documentation](https://zitadel.com/docs/guides/integrate/login/hosted-login#hosted-login-version-2-beta)
+![New Login Showcase](https://github.com/user-attachments/assets/cb5c5212-128b-4dc9-b11d-cabfd3f73e26)
 
 ## Security
 

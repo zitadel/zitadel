@@ -115,6 +115,7 @@ const (
 	IDPIntentStateStarted
 	IDPIntentStateSucceeded
 	IDPIntentStateFailed
+	IDPIntentStateConsumed
 
 	idpIntentStateCount
 )

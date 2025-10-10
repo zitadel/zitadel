@@ -118,6 +118,7 @@ Database:
     Host: localhost # ZITADEL_DATABASE_POSTGRES_HOST
     Port: 5432 # ZITADEL_DATABASE_POSTGRES_PORT
     Database: zitadel # ZITADEL_DATABASE_POSTGRES_DATABASE
+    AwaitInitialConn: 0m # ZITADEL_DATABASE_POSTGRES_AWAITINITIALCONN
     MaxOpenConns: 10 # ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS
     MaxIdleConns: 5 # ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS
     MaxConnLifetime: 30m # ZITADEL_DATABASE_POSTGRES_MAXCONNLIFETIME
@@ -312,6 +313,16 @@ Caches:
       AddSource: true
       Formatter:
         Format: text
+  # Federated logouts store the information needed to handle federated logout and their state transfer
+  FederatedLogouts:
+    Connector: "postgres"
+    MaxAge: 1h
+    LastUseAge: 10m
+    Log:
+      Level: error
+      AddSource: true
+      Formatter:
+        Format: text
 
 Machine:
   # Cloud-hosted VMs need to specify their metadata endpoint so that the machine can be uniquely identified.
@@ -377,6 +388,12 @@ Projections:
   # Maximum amount of instances cached as active
   # If set to 0, every instance is always considered active
   MaxActiveInstances: 0 # ZITADEL_PROJECTIONS_MAXACTIVEINSTANCES
+  # Limits the amount of concurrently running projection triggers
+  # If set to 0, 1/3 of database.MaxOpenConns is used
+  # The number must be lower than the Database.MaxOpenConns
+  # A good starting point is to set this to Database.MaxOpenConns / 3
+  # so that there are enough connections free for other operations (e.g. writing events, reading projections, notifications, ...)
+  MaxParallelTriggers: 0 # ZITADEL_PROJECTIONS_MAXPARALLELTRIGGERS
   # In the Customizations section, all settings from above can be overwritten for each specific projection
   Customizations:
     custom_texts:
@@ -387,7 +404,8 @@ Projections:
     org_domain_verified_fields:
       TransactionDuration: 0s
       BulkLimit: 2000
-
+    execution_handler:
+      BulkLimit: 10
     # The Notifications projection is used for preparing the messages (emails and SMS) to be sent to users
     Notifications:
       # As notification projections don't result in database statements, retries don't have an effect
@@ -513,15 +531,15 @@ OIDC:
     PollInterval: 5s # ZITADEL_OIDC_DEVICEAUTH_POLLINTERVAL
     UserCode:
       CharSet: "BCDFGHJKLMNPQRSTVWXZ" # ZITADEL_OIDC_DEVICEAUTH_USERCODE_CHARSET
-      CharAmount: 8 # ZITADEL_OIDC_DEVICEAUTH_USERCODE_CHARARMOUNT
+      CharAmount: 8 # ZITADEL_OIDC_DEVICEAUTH_USERCODE_CHARAMOUNT
       DashInterval: 4 # ZITADEL_OIDC_DEVICEAUTH_USERCODE_DASHINTERVAL
-  DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
-  DefaultLogoutURLV2: "/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
+  DefaultLoginURLV2: "/ui/v2/login/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
+  DefaultLogoutURLV2: "/ui/v2/login/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
   PublicKeyCacheMaxAge: 24h # ZITADEL_OIDC_PUBLICKEYCACHEMAXAGE
   DefaultBackChannelLogoutLifetime: 15m # ZITADEL_OIDC_DEFAULTBACKCHANNELLOGOUTLIFETIME
 
 SAML:
-  DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_SAML_DEFAULTLOGINURLV2
+  DefaultLoginURLV2: "/ui/v2/login/login?samlRequest=" # ZITADEL_SAML_DEFAULTLOGINURLV2
   ProviderConfig:
     MetadataConfig:
       Path: "/metadata" # ZITADEL_SAML_PROVIDERCONFIG_METADATACONFIG_PATH
@@ -560,7 +578,11 @@ Login:
     MaxAge: 12h # ZITADEL_LOGIN_CACHE_MAXAGE
     # 168h is 7 days, one week
     SharedMaxAge: 168h # ZITADEL_LOGIN_CACHE_SHAREDMAXAGE
-  DefaultOTPEmailURLV2: "/otp/verify?loginName={{.LoginName}}&code={{.Code}}" # ZITADEL_LOGIN_CACHE_DEFAULTOTPEMAILURLV2
+  DefaultPaths:
+    BasePath: "/ui/v2/login"
+    PasswordSetPath: "/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}"
+    EmailCodePath: "/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}"
+    OTPEmailPath: "/otp/verify?code={{.Code}}&userID={{.UserID}}&sessionId={{.SessionID}}"
 
 Console:
   ShortCache:
@@ -652,7 +674,7 @@ SystemDefaults:
     # or cost are automatically re-hashed using this config,
     # upon password validation or update.
     Hasher:
-      # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2"
+      # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2", "sha2"
       # Depending on the algorithm, different configuration options take effect.
       Algorithm: bcrypt # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
       # Cost takes effect for the algorithms bcrypt and scrypt
@@ -663,10 +685,11 @@ SystemDefaults:
       Memory: 32768 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_MEMORY
       # Threads takes effect for the algorithms argon2i and argon2id
       Threads: 4 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_THREADS
-      # Rounds takes effect for the algorithm pbkdf2
+      # Rounds takes effect for the algorithm pbkdf2 and sha2
       Rounds: 290000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ROUNDS
-      # Hash takes effect for the algorithm pbkdf2
-      # Can be "sha1", "sha224", "sha256", "sha384" or "sha512"
+      # Hash takes effect for the algorithm pbkdf2 and sha2
+      # Can be "sha1", "sha224", "sha256", "sha384" or "sha512" for pbkdf2
+      # Can be "sha256" or "sha512" for sha2
       Hash: sha256 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_HASH
 
     # Verifiers enable the possibility of verifying
@@ -688,6 +711,8 @@ SystemDefaults:
     #   - "md5"      # md5Crypt with salt and password shuffling.
     #   - "md5plain" # md5 digest of a password without salt
     #   - "md5salted" # md5 digest of a salted password
+    #   - "phpass"
+    #   - "sha2" # crypt(3) SHA-256 and SHA-512
     #   - "scrypt"
     #   - "pbkdf2"   # verifier for all pbkdf2 hash modes.
   SecretHasher:
@@ -735,6 +760,9 @@ SystemDefaults:
   DefaultQueryLimit: 100 # ZITADEL_SYSTEMDEFAULTS_DEFAULTQUERYLIMIT
   # MaxQueryLimit limits the number of items that can be queried in a single v3 API search request with explicitly passing a limit.
   MaxQueryLimit: 1000 # ZITADEL_SYSTEMDEFAULTS_MAXQUERYLIMIT
+  # The maximum duration of the IDP intent lifetime after which the IDP intent expires and can not be retrieved or used anymore.
+  # Note that this time is measured only after the IdP intent was successful and not after the IDP intent was created.
+  MaxIdPIntentLifetime: 1h # ZITADEL_SYSTEMDEFAULTS_MAXIDPINTENTLIFETIME
 
 Actions:
   HTTP:
@@ -822,6 +850,13 @@ DefaultInstance:
       Pat:
         # date format: 2023-01-01T00:00:00Z
         ExpirationDate: # ZITADEL_DEFAULTINSTANCE_ORG_MACHINE_PAT_EXPIRATIONDATE
+    LoginClient:
+      Machine:
+        Username: # ZITADEL_DEFAULTINSTANCE_ORG_LOGINCLIENT_MACHINE_USERNAME
+        Name: # ZITADEL_DEFAULTINSTANCE_ORG_LOGINCLIENT_MACHINE_NAME
+      Pat:
+        # date format: 2023-01-01T00:00:00Z
+        ExpirationDate: # ZITADEL_DEFAULTINSTANCE_ORG_LOGINCLIENT_PAT_EXPIRATIONDATE
   SecretGenerators:
     ClientSecret:
       Length: 64 # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_CLIENTSECRET_LENGTH
@@ -1098,26 +1133,24 @@ DefaultInstance:
   # will be ignored until instance level features are reset.
   Features:
     LoginDefaultOrg: true # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINDEFAULTORG
-    # TriggerIntrospectionProjections: false # ZITADEL_DEFAULTINSTANCE_FEATURES_TRIGGERINTROSPECTIONPROJECTIONS
-    # LegacyIntrospection: false # ZITADEL_DEFAULTINSTANCE_FEATURES_LEGACYINTROSPECTION
     # UserSchema: false # ZITADEL_DEFAULTINSTANCE_FEATURES_USERSCHEMA
     # TokenExchange: false # ZITADEL_DEFAULTINSTANCE_FEATURES_TOKENEXCHANGE
-    # ImprovedPerformance: # ZITADEL_DEFAULTINSTANCE_FEATURES_IMPROVEDPERFORMANCE
-    #   - OrgByID
-    #   - ProjectGrant
-    #   - Project
-    #   - UserGrant
-    #   - OrgDomainVerified
-    # WebKey: false # ZITADEL_DEFAULTINSTANCE_FEATURES_WEBKEY
+    ImprovedPerformance: # ZITADEL_DEFAULTINSTANCE_FEATURES_IMPROVEDPERFORMANCE
+    # https://github.com/zitadel/zitadel/blob/main/internal/feature/feature.go#L64-L68
+    #   - 1 # OrgByID
+    #   - 2 # ProjectGrant
+    #   - 3 # Project
+    #   - 4 # UserGrant
+    #   - 5 # OrgDomainVerified
     # DebugOIDCParentError: false # ZITADEL_DEFAULTINSTANCE_FEATURES_DEBUGOIDCPARENTERROR
     # OIDCSingleV1SessionTermination: false # ZITADEL_DEFAULTINSTANCE_FEATURES_OIDCSINGLEV1SESSIONTERMINATION
-    # DisableUserTokenEvent: false # ZITADEL_DEFAULTINSTANCE_FEATURES_DISABLEUSERTOKENEVENT
     # EnableBackChannelLogout: false # ZITADEL_DEFAULTINSTANCE_FEATURES_ENABLEBACKCHANNELLOGOUT
-    # LoginV2:
-    #  Required: false # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED
+    LoginV2:
+      Required: true # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED
     #  BaseURI: "" # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI
     # PermissionCheckV2: false # ZITADEL_DEFAULTINSTANCE_FEATURES_PERMISSIONCHECKV2
-    # ConsoleUseV2UserApi: false # ZITADEL_DEFAULTINSTANCE_FEATURES_CONSOLEUSEV2USERAPI
+    ConsoleUseV2UserApi: true # ZITADEL_DEFAULTINSTANCE_FEATURES_CONSOLEUSEV2USERAPI
+    # EnableRelationalTables: false # ZITADEL_DEFAULTINSTANCE_FEATURES_ENABLERELATIONALTABLES
 
   Limits:
     # AuditLogRetention limits the number of events that can be queried via the events API by their age.
@@ -1177,6 +1210,43 @@ DefaultInstance:
 # A value of "0s" means that all events are available.
 # If an audit log retention is set using an instance limit, it will overwrite the system default.
 AuditLogRetention: 0s # ZITADEL_AUDITLOGRETENTION
+
+# The ServicePing are periodic reports of analytics data and the usage of ZITADEL.
+# It is sent to a central endpoint to help us improve ZITADEL.
+# It's enabled by default, but you can opt out either completely or by disabling specific telemetry data.
+ServicePing:
+  # By setting Enabled to false, the service ping is disabled completely.
+  Enabled: true # ZITADEL_SERVICEPING_ENABLED
+  # The endpoint to which the reports are sent. The endpoint is used as a base path. Individual reports are sent to the endpoint with a specific path.
+  Endpoint: "https://zitadel.com/api/ping" # ZITADEL_SERVICEPING_ENDPOINT
+  # Interval at which the service ping is sent to the endpoint.
+  # The interval is in the format of a cron expression.
+  # By default, it is set to every daily.
+  # Note that if the interval is set to `@daily`, we randomize the time to prevent all systems from sending their reports at the same time.
+  # If you want to send the service ping at a specific time, you can set the interval to a cron expression like "@midnight" or "15 4 * * *".
+  Interval: "@daily" # ZITADEL_SERVICEPING_INTERVAL
+  # Maximum number of attempts for each individual report to be sent.
+  # If one report fails, it will be retried up to this number of times.
+  # Other reports will still be handled in parallel and have their own retry count.
+  # This means if the base information only succeeded after 3 attempts,
+  # the resource count still has 5 attempts to be sent.
+  MaxAttempts: 5 # ZITADEL_SERVICEPING_MAXATTEMPTS
+  # The following features can be enabled or disabled individually.
+  # By default, all features are enabled.
+  # Note that if the service ping is enabled, base information about the system is always sent.
+  # This includes the version and the id, creation date and domains of all instances.
+  # If you disable a feature, it will not be sent in the service ping.
+  # Some features provide additional configuration options, if enabled.
+  Telemetry:
+    # ResourceCount is a periodic report of the number of resources in ZITADEL.
+    # This includes the number of users, organizations, projects, and other resources.
+    ResourceCount:
+      Enabled: true # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_ENABLED
+      # The number of counts that are sent in one batch.
+      # The bulk size is used to prevent large requests that might fail due to their size.
+      # Each report will log its size before sending it to the endpoint,
+      # so you can adjust the bulk size if you see that the requests are too large.
+      BulkSize: 10000 # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_BULKSIZE
 
 InternalAuthZ:
   # Configure the RolePermissionMappings by environment variable using JSON notation:
@@ -1299,6 +1369,7 @@ InternalAuthZ:
         - "events.read"
         - "milestones.read"
         - "session.read"
+        - "session.write"
         - "session.delete"
         - "action.target.read"
         - "action.target.write"
@@ -1308,8 +1379,6 @@ InternalAuthZ:
         - "userschema.read"
         - "userschema.write"
         - "userschema.delete"
-        - "session.read"
-        - "session.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -1403,6 +1472,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
+        - "session.read"
         - "session.delete"
     - Role: "IAM_USER_MANAGER"
       Permissions:
@@ -1430,6 +1500,7 @@ InternalAuthZ:
         - "project.grant.write"
         - "project.grant.delete"
         - "project.grant.member.read"
+        - "session.read"
         - "session.delete"
     - Role: "IAM_ADMIN_IMPERSONATOR"
       Permissions:
@@ -1493,6 +1564,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
+        - "session.read"
         - "session.delete"
     - Role: "IAM_LOGIN_CLIENT"
       Permissions:
@@ -1528,6 +1600,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "session.read"
+        - "session.write"
         - "session.link"
         - "session.delete"
         - "userschema.read"
@@ -1548,6 +1621,7 @@ InternalAuthZ:
         - "policy.read"
         - "project.read"
         - "project.role.read"
+        - "session.read"
         - "session.delete"
     - Role: "ORG_OWNER_VIEWER"
       Permissions:
@@ -1855,6 +1929,7 @@ SystemAuthZ:
         - "events.read"
         - "milestones.read"
         - "session.read"
+        - "session.write"
         - "session.delete"
         - "action.target.read"
         - "action.target.write"
@@ -1864,8 +1939,6 @@ SystemAuthZ:
         - "userschema.read"
         - "userschema.write"
         - "userschema.delete"
-        - "session.read"
-        - "session.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -1959,6 +2032,7 @@ SystemAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
+        - "session.read"
         - "session.delete"
     - Role: "IAM_USER_MANAGER"
       Permissions:
@@ -1986,6 +2060,7 @@ SystemAuthZ:
         - "project.grant.write"
         - "project.grant.delete"
         - "project.grant.member.read"
+        - "session.read"
         - "session.delete"
     - Role: "IAM_ADMIN_IMPERSONATOR"
       Permissions:
@@ -2028,6 +2103,7 @@ SystemAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "session.read"
+        - "session.write"
         - "session.link"
         - "session.delete"
         - "userschema.read"

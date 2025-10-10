@@ -3,6 +3,8 @@ package repository
 import (
 	"database/sql"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -14,8 +16,6 @@ type SearchQuery struct {
 
 	SubQueries            [][]*Filter
 	Tx                    *sql.Tx
-	LockRows              bool
-	LockOption            eventstore.LockOption
 	AwaitOpenTransactions bool
 	Limit                 uint64
 	Offset                uint32
@@ -56,6 +56,8 @@ const (
 	OperationJSONContains
 	// OperationNotIn checks if a stored value does not match one of the passed value list
 	OperationNotIn
+
+	OperationGreaterOrEquals
 
 	operationCount
 )
@@ -131,7 +133,6 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 		AwaitOpenTransactions: builder.GetAwaitOpenTransactions(),
 		SubQueries:            make([][]*Filter, len(builder.GetQueries())),
 	}
-	query.LockRows, query.LockOption = builder.GetLockRows()
 
 	for _, f := range []func(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter{
 		instanceIDFilter,
@@ -250,10 +251,10 @@ func instanceIDsFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuer
 }
 
 func positionAfterFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter {
-	if builder.GetPositionAfter() == 0 {
+	if builder.GetPositionAtLeast().IsZero() {
 		return nil
 	}
-	query.Position = NewFilter(FieldPosition, builder.GetPositionAfter(), OperationGreater)
+	query.Position = NewFilter(FieldPosition, builder.GetPositionAtLeast(), OperationGreaterOrEquals)
 	return query.Position
 }
 
@@ -295,7 +296,7 @@ func eventDataFilter(query *eventstore.SearchQuery) *Filter {
 }
 
 func eventPositionAfterFilter(query *eventstore.SearchQuery) *Filter {
-	if pos := query.GetPositionAfter(); pos != 0 {
+	if pos := query.GetPositionAfter(); !pos.Equal(decimal.Decimal{}) {
 		return NewFilter(FieldPosition, pos, OperationGreater)
 	}
 	return nil

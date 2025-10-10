@@ -8,6 +8,7 @@ import { AccessTokenType } from '../../proto/generated/zitadel/user_pb';
   selector: 'cnsl-provider-options',
   templateUrl: './provider-options.component.html',
   styleUrls: ['./provider-options.component.scss'],
+  standalone: false,
 })
 export class ProviderOptionsComponent implements OnChanges, OnDestroy {
   @Input() public initialOptions?: Options.AsObject;

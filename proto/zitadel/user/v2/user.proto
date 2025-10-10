@@ -334,7 +334,7 @@ message AuthFactorU2F {
 
 message SendInviteCode {
   // Optionally set a url_template, which will be used in the invite mail sent by ZITADEL to guide the user to your invitation page.
-  // If no template is set, the default ZITADEL url will be used.
+  // If no template is set and no previous code was created, the default ZITADEL url will be used.
   //
   // The following placeholders can be used: UserID, OrgID, Code
   optional string url_template = 1 [
@@ -346,7 +346,7 @@ message SendInviteCode {
     }
   ];
   // Optionally set an application name, which will be used in the invite mail sent by ZITADEL.
-  // If no application name is set, ZITADEL will be used as default.
+  // If no application name is set and no previous code was created, ZITADEL will be used as default.
   optional string application_name = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

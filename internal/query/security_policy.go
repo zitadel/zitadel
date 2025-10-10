@@ -67,7 +67,7 @@ func (q *Queries) SecurityPolicy(ctx context.Context) (policy *SecurityPolicy, e
 		SecurityPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-Sf6d1", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Sf6d1", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {

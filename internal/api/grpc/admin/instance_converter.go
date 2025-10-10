@@ -51,8 +51,23 @@ func ListInstanceTrustedDomainsRequestToModel(req *admin_pb.ListInstanceTrustedD
 			Offset:        offset,
 			Limit:         limit,
 			Asc:           asc,
-			SortingColumn: fieldNameToInstanceDomainColumn(req.SortingColumn),
+			SortingColumn: fieldNameToInstanceTrustedDomainColumn(req.SortingColumn),
 		},
 		Queries: queries,
 	}, nil
+}
+
+func fieldNameToInstanceTrustedDomainColumn(fieldName instance.DomainFieldName) query.Column {
+	switch fieldName {
+	case instance.DomainFieldName_DOMAIN_FIELD_NAME_DOMAIN:
+		return query.InstanceTrustedDomainDomainCol
+	case instance.DomainFieldName_DOMAIN_FIELD_NAME_CREATION_DATE:
+		return query.InstanceTrustedDomainCreationDateCol
+	case instance.DomainFieldName_DOMAIN_FIELD_NAME_UNSPECIFIED,
+		instance.DomainFieldName_DOMAIN_FIELD_NAME_PRIMARY,
+		instance.DomainFieldName_DOMAIN_FIELD_NAME_GENERATED:
+		return query.InstanceTrustedDomainCreationDateCol
+	default:
+		return query.Column{}
+	}
 }

@@ -42,10 +42,7 @@ func oidcError(err error) error {
 	if statusCode < 500 {
 		newOidcErr = oidc.ErrInvalidRequest
 	}
-	return op.NewStatusError(
-		newOidcErr().
-			WithParent(err).
-			WithDescription(zError.GetMessage()),
-		statusCode,
-	)
+	oidcErr := newOidcErr().WithParent(err)
+	oidcErr.Description = zError.GetMessage()
+	return op.NewStatusError(oidcErr, statusCode)
 }

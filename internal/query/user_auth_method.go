@@ -112,7 +112,7 @@ func userAuthMethodPermissionCheckV2(ctx context.Context, query sq.SelectBuilder
 		ctx,
 		UserAuthMethodColumnResourceOwner,
 		domain.PermissionUserRead,
-		OwnedRowsPermissionOption(UserIDCol),
+		OwnedRowsPermissionOption(UserAuthMethodColumnUserID),
 	)
 	return query.JoinClause(join, args...)
 }

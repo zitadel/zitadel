@@ -61,7 +61,7 @@ func TestServer_GetSession(t *testing.T) {
 				UserCTX,
 				&session.GetSessionRequest{},
 				func(ctx context.Context, t *testing.T, request *session.GetSessionRequest) uint64 {
-					resp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{})
+					resp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{})
 					require.NoError(t, err)
 					request.SessionId = resp.SessionId
 					return resp.GetDetails().GetSequence()
@@ -72,10 +72,10 @@ func TestServer_GetSession(t *testing.T) {
 		{
 			name: "get session, permission, ok",
 			args: args{
-				CTX,
+				IAMOwnerCTX,
 				&session.GetSessionRequest{},
 				func(ctx context.Context, t *testing.T, request *session.GetSessionRequest) uint64 {
-					resp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{})
+					resp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{})
 					require.NoError(t, err)
 					request.SessionId = resp.SessionId
 					return resp.GetDetails().GetSequence()
@@ -91,7 +91,7 @@ func TestServer_GetSession(t *testing.T) {
 				UserCTX,
 				&session.GetSessionRequest{},
 				func(ctx context.Context, t *testing.T, request *session.GetSessionRequest) uint64 {
-					resp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{})
+					resp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{})
 					require.NoError(t, err)
 					request.SessionId = resp.SessionId
 					request.SessionToken = gu.Ptr(resp.SessionToken)
@@ -108,7 +108,7 @@ func TestServer_GetSession(t *testing.T) {
 				UserCTX,
 				&session.GetSessionRequest{},
 				func(ctx context.Context, t *testing.T, request *session.GetSessionRequest) uint64 {
-					resp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
+					resp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
 						UserAgent: &session.UserAgent{
 							FingerprintId: gu.Ptr("fingerPrintID"),
 							Ip:            gu.Ptr("1.2.3.4"),
@@ -144,7 +144,7 @@ func TestServer_GetSession(t *testing.T) {
 				UserCTX,
 				&session.GetSessionRequest{},
 				func(ctx context.Context, t *testing.T, request *session.GetSessionRequest) uint64 {
-					resp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
+					resp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
 						Lifetime: durationpb.New(5 * time.Minute),
 					},
 					)
@@ -165,7 +165,7 @@ func TestServer_GetSession(t *testing.T) {
 				UserCTX,
 				&session.GetSessionRequest{},
 				func(ctx context.Context, t *testing.T, request *session.GetSessionRequest) uint64 {
-					resp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
+					resp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
 						Metadata: map[string][]byte{"foo": []byte("bar")},
 					},
 					)
@@ -187,7 +187,7 @@ func TestServer_GetSession(t *testing.T) {
 				UserCTX,
 				&session.GetSessionRequest{},
 				func(ctx context.Context, t *testing.T, request *session.GetSessionRequest) uint64 {
-					resp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
+					resp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
 						Checks: &session.Checks{
 							User: &session.CheckUser{
 								Search: &session.CheckUser_UserId{
@@ -337,7 +337,7 @@ func TestServer_ListSessions(t *testing.T) {
 			},
 		},
 		{
-			name: "list sessions, wrong creator",
+			name: "list sessions, no permission",
 			args: args{
 				UserCTX,
 				&session.ListSessionsRequest{},
@@ -349,7 +349,7 @@ func TestServer_ListSessions(t *testing.T) {
 			},
 			want: &session.ListSessionsResponse{
 				Details: &object.ListDetails{
-					TotalResult: 0,
+					TotalResult: 1,
 					Timestamp:   timestamppb.Now(),
 				},
 				Sessions: []*session.Session{},
@@ -358,7 +358,7 @@ func TestServer_ListSessions(t *testing.T) {
 		{
 			name: "list sessions, full, ok",
 			args: args{
-				CTX,
+				IAMOwnerCTX,
 				&session.ListSessionsRequest{},
 				func(ctx context.Context, t *testing.T, request *session.ListSessionsRequest) []*sessionAttr {
 					info := createSession(ctx, t, User.GetUserId(), "agent", durationpb.New(time.Minute*5), map[string][]byte{"key": []byte("value")})
@@ -391,7 +391,7 @@ func TestServer_ListSessions(t *testing.T) {
 		{
 			name: "list sessions, multiple, ok",
 			args: args{
-				CTX,
+				IAMOwnerCTX,
 				&session.ListSessionsRequest{},
 				func(ctx context.Context, t *testing.T, request *session.ListSessionsRequest) []*sessionAttr {
 					infos := createSessions(ctx, t, 3, User.GetUserId(), "agent", durationpb.New(time.Minute*5), map[string][]byte{"key": []byte("value")})
@@ -446,7 +446,7 @@ func TestServer_ListSessions(t *testing.T) {
 		{
 			name: "list sessions, userid, ok",
 			args: args{
-				CTX,
+				IAMOwnerCTX,
 				&session.ListSessionsRequest{},
 				func(ctx context.Context, t *testing.T, request *session.ListSessionsRequest) []*sessionAttr {
 					createdUser := createFullUser(ctx)
@@ -480,7 +480,7 @@ func TestServer_ListSessions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			infos := tt.args.dep(CTX, t, tt.args.req)
+			infos := tt.args.dep(LoginCTX, t, tt.args.req)
 
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
@@ -499,7 +499,7 @@ func TestServer_ListSessions(t *testing.T) {
 				}
 
 				// expected count of sessions is not equal to received sessions
-				if !assert.Equal(ttt, got.Details.TotalResult, tt.want.Details.TotalResult) || !assert.Len(ttt, got.Sessions, len(tt.want.Sessions)) {
+				if !assert.Equal(ttt, tt.want.Details.TotalResult, got.Details.TotalResult) || !assert.Len(ttt, got.Sessions, len(tt.want.Sessions)) {
 					return
 				}
 

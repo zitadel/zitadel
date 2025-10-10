@@ -71,7 +71,7 @@ func (l *Login) handleU2FVerification(w http.ResponseWriter, r *http.Request) {
 
 	metadata, actionErr := l.runPostInternalAuthenticationActions(authReq, r, authMethodU2F, err)
 	if err == nil && actionErr == nil && len(metadata) > 0 {
-		_, err = l.command.BulkSetUserMetadata(r.Context(), authReq.UserID, authReq.UserOrgID, metadata...)
+		err = l.bulkSetUserMetadata(r.Context(), authReq.UserID, authReq.UserOrgID, metadata)
 	} else if actionErr != nil && err == nil {
 		err = actionErr
 	}

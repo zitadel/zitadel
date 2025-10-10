@@ -1,6 +1,8 @@
 package command
 
 import (
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
@@ -35,21 +37,21 @@ func oidcWriteModelToOIDCConfig(writeModel *OIDCApplicationWriteModel) *domain.O
 		RedirectUris:             writeModel.RedirectUris,
 		ResponseTypes:            writeModel.ResponseTypes,
 		GrantTypes:               writeModel.GrantTypes,
-		ApplicationType:          writeModel.ApplicationType,
-		AuthMethodType:           writeModel.AuthMethodType,
+		ApplicationType:          gu.Ptr(writeModel.ApplicationType),
+		AuthMethodType:           gu.Ptr(writeModel.AuthMethodType),
 		PostLogoutRedirectUris:   writeModel.PostLogoutRedirectUris,
-		OIDCVersion:              writeModel.OIDCVersion,
-		DevMode:                  writeModel.DevMode,
-		AccessTokenType:          writeModel.AccessTokenType,
-		AccessTokenRoleAssertion: writeModel.AccessTokenRoleAssertion,
-		IDTokenRoleAssertion:     writeModel.IDTokenRoleAssertion,
-		IDTokenUserinfoAssertion: writeModel.IDTokenUserinfoAssertion,
-		ClockSkew:                writeModel.ClockSkew,
+		OIDCVersion:              gu.Ptr(writeModel.OIDCVersion),
+		DevMode:                  gu.Ptr(writeModel.DevMode),
+		AccessTokenType:          gu.Ptr(writeModel.AccessTokenType),
+		AccessTokenRoleAssertion: gu.Ptr(writeModel.AccessTokenRoleAssertion),
+		IDTokenRoleAssertion:     gu.Ptr(writeModel.IDTokenRoleAssertion),
+		IDTokenUserinfoAssertion: gu.Ptr(writeModel.IDTokenUserinfoAssertion),
+		ClockSkew:                gu.Ptr(writeModel.ClockSkew),
 		AdditionalOrigins:        writeModel.AdditionalOrigins,
-		SkipNativeAppSuccessPage: writeModel.SkipNativeAppSuccessPage,
-		BackChannelLogoutURI:     writeModel.BackChannelLogoutURI,
-		LoginVersion:             writeModel.LoginVersion,
-		LoginBaseURI:             writeModel.LoginBaseURI,
+		SkipNativeAppSuccessPage: gu.Ptr(writeModel.SkipNativeAppSuccessPage),
+		BackChannelLogoutURI:     gu.Ptr(writeModel.BackChannelLogoutURI),
+		LoginVersion:             gu.Ptr(writeModel.LoginVersion),
+		LoginBaseURI:             gu.Ptr(writeModel.LoginBaseURI),
 	}
 }
 
@@ -60,10 +62,10 @@ func samlWriteModelToSAMLConfig(writeModel *SAMLApplicationWriteModel) *domain.S
 		AppName:      writeModel.AppName,
 		State:        writeModel.State,
 		Metadata:     writeModel.Metadata,
-		MetadataURL:  writeModel.MetadataURL,
+		MetadataURL:  gu.Ptr(writeModel.MetadataURL),
 		EntityID:     writeModel.EntityID,
-		LoginVersion: writeModel.LoginVersion,
-		LoginBaseURI: writeModel.LoginBaseURI,
+		LoginVersion: gu.Ptr(writeModel.LoginVersion),
+		LoginBaseURI: gu.Ptr(writeModel.LoginBaseURI),
 	}
 }
 
@@ -75,15 +77,6 @@ func apiWriteModelToAPIConfig(writeModel *APIApplicationWriteModel) *domain.APIA
 		State:          writeModel.State,
 		ClientID:       writeModel.ClientID,
 		AuthMethodType: writeModel.AuthMethodType,
-	}
-}
-
-func roleWriteModelToRole(writeModel *ProjectRoleWriteModel) *domain.ProjectRole {
-	return &domain.ProjectRole{
-		ObjectRoot:  writeModelToObjectRoot(writeModel.WriteModel),
-		Key:         writeModel.Key,
-		DisplayName: writeModel.DisplayName,
-		Group:       writeModel.Group,
 	}
 }
 

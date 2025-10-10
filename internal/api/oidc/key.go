@@ -10,17 +10,12 @@ import (
 
 	"github.com/go-jose/go-jose/v4"
 	"github.com/jonboulle/clockwork"
-	"github.com/muhlemmer/gu"
-	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/repository/keypair"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -35,11 +30,8 @@ var supportedWebKeyAlgs = []string{
 	string(jose.ES512),
 }
 
-func supportedSigningAlgs(ctx context.Context) []string {
-	if authz.GetFeatures(ctx).WebKey {
-		return supportedWebKeyAlgs
-	}
-	return []string{string(jose.RS256)}
+func supportedSigningAlgs() []string {
+	return supportedWebKeyAlgs
 }
 
 type cachedPublicKey struct {
@@ -210,15 +202,6 @@ func withKeyExpiryCheck(check bool) keySetOption {
 	}
 }
 
-func jsonWebkey(key query.PublicKey) *jose.JSONWebKey {
-	return &jose.JSONWebKey{
-		KeyID:     key.ID(),
-		Algorithm: key.Algorithm(),
-		Use:       key.Use().String(),
-		Key:       key.Key(),
-	}
-}
-
 // keySetMap is a mapping of key IDs to public key data.
 type keySetMap map[string][]byte
 
@@ -249,7 +232,6 @@ func (k keySetMap) VerifySignature(ctx context.Context, jws *jose.JSONWebSignatu
 }
 
 const (
-	locksTable = "projections.locks"
 	signingKey = "signing_key"
 	oidcUser   = "OIDC"
 
@@ -278,195 +260,29 @@ func (s *SigningKey) ID() string {
 	return s.id
 }
 
-// PublicKey wraps the query.PublicKey to implement the op.Key interface
-type PublicKey struct {
-	key query.PublicKey
-}
-
-func (s *PublicKey) Algorithm() jose.SignatureAlgorithm {
-	return jose.SignatureAlgorithm(s.key.Algorithm())
-}
-
-func (s *PublicKey) Use() string {
-	return s.key.Use().String()
-}
-
-func (s *PublicKey) Key() interface{} {
-	return s.key.Key()
-}
-
-func (s *PublicKey) ID() string {
-	return s.key.ID()
-}
-
 // KeySet implements the op.Storage interface
 func (o *OPStorage) KeySet(ctx context.Context) (keys []op.Key, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-	err = retry(func() error {
-		publicKeys, err := o.query.ActivePublicKeys(ctx, time.Now())
-		if err != nil {
-			return err
-		}
-		keys = make([]op.Key, len(publicKeys.Keys))
-		for i, key := range publicKeys.Keys {
-			keys[i] = &PublicKey{key}
-		}
-		return nil
-	})
-	return keys, err
+	panic(o.panicErr("KeySet"))
 }
 
 // SignatureAlgorithms implements the op.Storage interface
 func (o *OPStorage) SignatureAlgorithms(ctx context.Context) ([]jose.SignatureAlgorithm, error) {
-	key, err := o.SigningKey(ctx)
-	if err != nil {
-		logging.WithError(err).Warn("unable to fetch signing key")
-		return nil, err
-	}
-	return []jose.SignatureAlgorithm{key.SignatureAlgorithm()}, nil
+	panic(o.panicErr("SignatureAlgorithms"))
 }
 
 // SigningKey implements the op.Storage interface
 func (o *OPStorage) SigningKey(ctx context.Context) (key op.SigningKey, err error) {
-	err = retry(func() error {
-		key, err = o.getSigningKey(ctx)
-		if err != nil {
-			return err
-		}
-		if key == nil {
-			return zerrors.ThrowNotFound(nil, "OIDC-ve4Qu", "Errors.Internal")
-		}
-		return nil
-	})
-	return key, err
-}
-
-func (o *OPStorage) getSigningKey(ctx context.Context) (op.SigningKey, error) {
-	keys, err := o.query.ActivePrivateSigningKey(ctx, time.Now().Add(gracefulPeriod))
-	if err != nil {
-		return nil, err
-	}
-	if len(keys.Keys) > 0 {
-		return PrivateKeyToSigningKey(SelectSigningKey(keys.Keys), o.encAlg)
-	}
-	var position float64
-	if keys.State != nil {
-		position = keys.State.Position
-	}
-	return nil, o.refreshSigningKey(ctx, position)
-}
-
-func (o *OPStorage) refreshSigningKey(ctx context.Context, position float64) error {
-	ok, err := o.ensureIsLatestKey(ctx, position)
-	if err != nil || !ok {
-		return zerrors.ThrowInternal(err, "OIDC-ASfh3", "cannot ensure that projection is up to date")
-	}
-	err = o.lockAndGenerateSigningKeyPair(ctx)
-	if err != nil {
-		return zerrors.ThrowInternal(err, "OIDC-ADh31", "could not create signing key")
-	}
-	return zerrors.ThrowInternal(nil, "OIDC-Df1bh", "")
-}
-
-func (o *OPStorage) ensureIsLatestKey(ctx context.Context, position float64) (bool, error) {
-	maxSequence, err := o.getMaxKeySequence(ctx)
-	if err != nil {
-		return false, fmt.Errorf("error retrieving new events: %w", err)
-	}
-	return position >= maxSequence, nil
-}
-
-func PrivateKeyToSigningKey(key query.PrivateKey, algorithm crypto.EncryptionAlgorithm) (_ op.SigningKey, err error) {
-	keyData, err := crypto.Decrypt(key.Key(), algorithm)
-	if err != nil {
-		return nil, err
-	}
-	privateKey, err := crypto.BytesToPrivateKey(keyData)
-	if err != nil {
-		return nil, err
-	}
-	return &SigningKey{
-		algorithm: jose.SignatureAlgorithm(key.Algorithm()),
-		key:       privateKey,
-		id:        key.ID(),
-	}, nil
-}
-
-func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context) error {
-	logging.Info("lock and generate signing key pair")
-
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	errs := o.locker.Lock(ctx, lockDuration, authz.GetInstance(ctx).InstanceID())
-	err, ok := <-errs
-	if err != nil || !ok {
-		if zerrors.IsErrorAlreadyExists(err) {
-			return nil
-		}
-		logging.OnError(err).Debug("initial lock failed")
-		return err
-	}
-
-	return o.command.GenerateSigningKeyPair(setOIDCCtx(ctx), "RS256")
-}
-
-func (o *OPStorage) getMaxKeySequence(ctx context.Context) (float64, error) {
-	return o.eventstore.LatestSequence(ctx,
-		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
-			ResourceOwner(authz.GetInstance(ctx).InstanceID()).
-			AwaitOpenTransactions().
-			AddQuery().
-			AggregateTypes(
-				keypair.AggregateType,
-				instance.AggregateType,
-			).
-			EventTypes(
-				keypair.AddedEventType,
-				instance.InstanceRemovedEventType,
-			).
-			Builder(),
-	)
-}
-
-func SelectSigningKey(keys []query.PrivateKey) query.PrivateKey {
-	return keys[len(keys)-1]
-}
-
-func setOIDCCtx(ctx context.Context) context.Context {
-	return authz.SetCtxData(ctx, authz.CtxData{UserID: oidcUser, OrgID: authz.GetInstance(ctx).InstanceID()})
-}
-
-func retry(retryable func() error) (err error) {
-	for i := 0; i < retryCount; i++ {
-		err = retryable()
-		if err == nil {
-			return nil
-		}
-		time.Sleep(retryBackoff)
-	}
-	return err
+	panic(o.panicErr("SigningKey"))
 }
 
 func (s *Server) Keys(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if !authz.GetFeatures(ctx).WebKey {
-		return s.LegacyServer.Keys(ctx, r)
-	}
-
 	keyset, err := s.query.GetWebKeySet(ctx)
 	if err != nil {
 		return nil, err
 	}
-
-	// Return legacy keys, so we do not invalidate all tokens
-	// once the feature flag is enabled.
-	legacyKeys, err := s.query.ActivePublicKeys(ctx, time.Now())
-	logging.OnError(err).Error("oidc server: active public keys (legacy)")
-	appendPublicKeysToWebKeySet(keyset, legacyKeys)
 
 	resp := op.NewResponse(keyset)
 	if s.jwksCacheControlMaxAge != 0 {
@@ -474,7 +290,6 @@ func (s *Server) Keys(ctx context.Context, r *op.Request[struct{}]) (_ *op.Respo
 			fmt.Sprintf("max-age=%d, must-revalidate", int(s.jwksCacheControlMaxAge/time.Second)),
 		)
 	}
-
 	return resp, nil
 }
 
@@ -496,20 +311,10 @@ func appendPublicKeysToWebKeySet(keyset *jose.JSONWebKeySet, pubkeys *query.Publ
 
 func queryKeyFunc(q *query.Queries) func(ctx context.Context, keyID string) (*jose.JSONWebKey, *time.Time, error) {
 	return func(ctx context.Context, keyID string) (*jose.JSONWebKey, *time.Time, error) {
-		if authz.GetFeatures(ctx).WebKey {
-			webKey, err := q.GetPublicWebKeyByID(ctx, keyID)
-			if err == nil {
-				return webKey, nil, nil
-			}
-			if !zerrors.IsNotFound(err) {
-				return nil, nil, err
-			}
-		}
-
-		pubKey, err := q.GetPublicKeyByID(ctx, keyID)
+		webKey, err := q.GetPublicWebKeyByID(ctx, keyID)
 		if err != nil {
 			return nil, nil, err
 		}
-		return jsonWebkey(pubKey), gu.Ptr(pubKey.Expiry()), nil
+		return webKey, nil, nil
 	}
 }

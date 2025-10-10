@@ -81,6 +81,7 @@ type Commands struct {
 	publicKeyLifetime       time.Duration
 	certificateLifetime     time.Duration
 	defaultSecretGenerators *SecretGenerators
+	maxIdPIntentLifetime    time.Duration
 
 	samlCertificateAndKeyGenerator func(id string) ([]byte, []byte, error)
 	webKeyGenerator                func(keyID string, alg crypto.EncryptionAlgorithm, genConfig crypto.WebKeyConfig) (encryptedPrivate *crypto.CryptoValue, public *jose.JSONWebKey, err error)
@@ -98,6 +99,9 @@ type Commands struct {
 	// These instance's milestones never need to be invalidated,
 	// so the query and cache overhead can completely eliminated.
 	milestonesCompleted sync.Map
+
+	defaultEmailCodeURLTemplate   func(ctx context.Context) string
+	defaultPasswordSetURLTemplate func(ctx context.Context) string
 }
 
 func StartCommands(
@@ -119,6 +123,8 @@ func StartCommands(
 	defaultRefreshTokenLifetime,
 	defaultRefreshTokenIdleLifetime time.Duration,
 	defaultSecretGenerators *SecretGenerators,
+	defaultEmailCodeURLTemplate func(ctx context.Context) string,
+	defaultPasswordSetURLTemplate func(ctx context.Context) string,
 ) (repo *Commands, err error) {
 	if externalDomain == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "no external domain specified")
@@ -152,6 +158,7 @@ func StartCommands(
 		privateKeyLifetime:              defaults.KeyConfig.PrivateKeyLifetime,
 		publicKeyLifetime:               defaults.KeyConfig.PublicKeyLifetime,
 		certificateLifetime:             defaults.KeyConfig.CertificateLifetime,
+		maxIdPIntentLifetime:            defaults.MaxIdPIntentLifetime,
 		idpConfigEncryption:             idpConfigEncryption,
 		smtpEncryption:                  smtpEncryption,
 		smsEncryption:                   smsEncryption,
@@ -197,8 +204,10 @@ func StartCommands(
 				Issuer:    defaults.Multifactors.OTP.Issuer,
 			},
 		},
-		GenerateDomain: domain.NewGeneratedInstanceDomain,
-		caches:         caches,
+		GenerateDomain:                domain.NewGeneratedInstanceDomain,
+		caches:                        caches,
+		defaultEmailCodeURLTemplate:   defaultEmailCodeURLTemplate,
+		defaultPasswordSetURLTemplate: defaultPasswordSetURLTemplate,
 	}
 
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {
@@ -285,7 +294,12 @@ func samlCertificateAndKeyGenerator(keySize int, lifetime time.Duration) func(id
 			SerialNumber: big.NewInt(int64(serial)),
 			Subject: pkix.Name{
 				Organization: []string{"ZITADEL"},
+				CommonName:   fmt.Sprintf("ZITADEL SP %s", id),
 				SerialNumber: id,
+			},
+			Issuer: pkix.Name{
+				Organization: []string{"ZITADEL"},
+				CommonName:   "ZITADEL",
 			},
 			NotBefore:             now,
 			NotAfter:              now.Add(lifetime),

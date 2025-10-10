@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 )
 
 const (
@@ -19,12 +19,12 @@ const (
 type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Name             string              `json:"name"`
-	TargetType       domain.TargetType   `json:"targetType"`
-	Endpoint         string              `json:"endpoint"`
-	Timeout          time.Duration       `json:"timeout"`
-	InterruptOnError bool                `json:"interruptOnError"`
-	SigningKey       *crypto.CryptoValue `json:"signingKey"`
+	Name             string                   `json:"name"`
+	TargetType       target_domain.TargetType `json:"targetType"`
+	Endpoint         string                   `json:"endpoint"`
+	Timeout          time.Duration            `json:"timeout"`
+	InterruptOnError bool                     `json:"interruptOnError"`
+	SigningKey       *crypto.CryptoValue      `json:"signingKey"`
 }
 
 func (e *AddedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -43,7 +43,7 @@ func NewAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	name string,
-	targetType domain.TargetType,
+	targetType target_domain.TargetType,
 	endpoint string,
 	timeout time.Duration,
 	interruptOnError bool,
@@ -59,12 +59,12 @@ func NewAddedEvent(
 type ChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Name             *string             `json:"name,omitempty"`
-	TargetType       *domain.TargetType  `json:"targetType,omitempty"`
-	Endpoint         *string             `json:"endpoint,omitempty"`
-	Timeout          *time.Duration      `json:"timeout,omitempty"`
-	InterruptOnError *bool               `json:"interruptOnError,omitempty"`
-	SigningKey       *crypto.CryptoValue `json:"signingKey,omitempty"`
+	Name             *string                   `json:"name,omitempty"`
+	TargetType       *target_domain.TargetType `json:"targetType,omitempty"`
+	Endpoint         *string                   `json:"endpoint,omitempty"`
+	Timeout          *time.Duration            `json:"timeout,omitempty"`
+	InterruptOnError *bool                     `json:"interruptOnError,omitempty"`
+	SigningKey       *crypto.CryptoValue       `json:"signingKey,omitempty"`
 
 	oldName string
 }
@@ -114,7 +114,7 @@ func ChangeName(oldName, name string) func(event *ChangedEvent) {
 	}
 }
 
-func ChangeTargetType(targetType domain.TargetType) func(event *ChangedEvent) {
+func ChangeTargetType(targetType target_domain.TargetType) func(event *ChangedEvent) {
 	return func(e *ChangedEvent) {
 		e.TargetType = &targetType
 	}

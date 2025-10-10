@@ -78,7 +78,7 @@ func (q *Queries) GetInstanceRestrictions(ctx context.Context) (restrictions Res
 		RestrictionsColumnResourceOwner.identifier(): instanceID,
 	}).ToSql()
 	if err != nil {
-		return restrictions, zitade_errors.ThrowInternal(err, "QUERY-XnLMQ", "Errors.Query.SQLStatment")
+		return restrictions, zitade_errors.ThrowInternal(err, "QUERY-XnLMQ", "Errors.Query.SQLStatement")
 	}
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
 		restrictions, err = scan(row)

@@ -171,7 +171,7 @@ func CreateGateway(
 	}, nil
 }
 
-func RegisterGateway(ctx context.Context, gateway *Gateway, server Server) error {
+func RegisterGateway(ctx context.Context, gateway *Gateway, server WithGateway) error {
 	err := server.RegisterGateway()(ctx, gateway.mux, gateway.connection)
 	if err != nil {
 		return fmt.Errorf("failed to register grpc gateway: %w", err)

@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 
-import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { NewAuthService } from 'src/app/services/new-auth.service';
 import { CodeDialogComponent } from '../auth-user-detail/code-dialog/code-dialog.component';
 import { EditDialogType } from '../auth-user-detail/edit-dialog/edit-dialog.component';
 import { HumanUser, UserState } from '@zitadel/proto/zitadel/user/v2/user_pb';
@@ -12,6 +12,7 @@ import { Human } from '@zitadel/proto/zitadel/user_pb';
   selector: 'cnsl-contact',
   templateUrl: './contact.component.html',
   styleUrls: ['./contact.component.scss'],
+  standalone: false,
 })
 export class ContactComponent {
   @Input() disablePhoneCode: boolean = false;
@@ -28,12 +29,12 @@ export class ContactComponent {
   public EditDialogType: any = EditDialogType;
   constructor(
     private dialog: MatDialog,
-    private authService: GrpcAuthService,
+    private authService: NewAuthService,
   ) {}
 
   async emitDeletePhone(): Promise<void> {
-    const { resultList } = await this.authService.listMyMultiFactors();
-    const hasSMSOTP = !!resultList.find((mfa) => mfa.otpSms);
+    const { result } = await this.authService.listMyMultiFactors();
+    const hasSMSOTP = !!result.some((mfa) => mfa.type.case === 'otpSms');
 
     const dialogRef = this.dialog.open(WarnDialogComponent, {
       data: {

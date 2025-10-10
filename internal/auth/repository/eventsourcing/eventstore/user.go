@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
+	"github.com/zitadel/zitadel/internal/user/repository/view/model"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -47,6 +48,10 @@ func (repo *UserRepo) UserSessionsByAgentID(ctx context.Context, agentID string)
 
 func (repo *UserRepo) UserAgentIDBySessionID(ctx context.Context, sessionID string) (string, error) {
 	return repo.View.UserAgentIDBySessionID(ctx, sessionID, authz.GetInstance(ctx).InstanceID())
+}
+
+func (repo *UserRepo) UserSessionByID(ctx context.Context, sessionID string) (*model.UserSessionView, error) {
+	return repo.View.UserSessionByID(ctx, sessionID, authz.GetInstance(ctx).InstanceID())
 }
 
 func (repo *UserRepo) ActiveUserSessionsBySessionID(ctx context.Context, sessionID string) (userAgentID string, signoutSessions []command.HumanSignOutSession, err error) {

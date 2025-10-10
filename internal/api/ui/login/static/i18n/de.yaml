@@ -265,6 +265,7 @@ RegistrationUser:
   Hungarian: Magyar
   Korean: 한국어
   Romanian: Română
+  Turkish: Türkçe
   GenderLabel: Geschlecht
   Female: weiblich
   Male: männlich
@@ -309,6 +310,7 @@ ExternalRegistrationUserOverview:
   Hungarian: Magyar
   Korean: 한국어
   Romanian: Română
+  Turkish: Türkçe
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGB
@@ -387,6 +389,7 @@ ExternalNotFound:
   Hungarian: Magyar
   Korean: 한국어
   Romanian: Română
+  Turkish: Türkçe
 DeviceAuth:
   Title: Gerät verbinden
   UserCode:

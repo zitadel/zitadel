@@ -13,10 +13,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/api/scim/resources"
 	"github.com/zitadel/zitadel/internal/api/scim/schemas"
@@ -48,7 +49,7 @@ func init() {
 
 func TestBulk(t *testing.T) {
 	iamOwnerCtx := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	secondaryOrg := Instance.CreateOrganization(iamOwnerCtx, gofakeit.Name(), gofakeit.Email())
+	secondaryOrg := Instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	createdSecondaryOrgUser := createHumanUser(t, iamOwnerCtx, secondaryOrg.OrganizationId, 0)
 	bulkMinimalUpdateSecondaryOrgJson := test.Must(json.Marshal(buildMinimalUpdateRequest(createdSecondaryOrgUser.UserId)))
@@ -478,7 +479,7 @@ func TestBulk(t *testing.T) {
 		},
 		{
 			name: "fail on errors",
-			body: bulkFailOnErrorsJson,
+			body: withUsername(bulkFailOnErrorsJson, integration.Username()),
 			want: &scim.BulkResponse{
 				Schemas: []schemas.ScimSchemaType{schemas.IdBulkResponse},
 				Operations: []*scim.BulkResponseOperation{
@@ -579,7 +580,6 @@ func TestBulk(t *testing.T) {
 
 			response, err := Instance.Client.SCIM.Bulk(ctx, orgID, tt.body)
 			createdUserIDs := buildCreatedIDs(response)
-			defer deleteUsers(t, createdUserIDs)
 
 			if tt.wantErr != nil {
 				statusCode := tt.wantErr.status
@@ -656,17 +656,6 @@ func buildCreatedIDs(response *scim.BulkResponse) []string {
 	return createdIds
 }
 
-func deleteUsers(t require.TestingT, ids []string) {
-	for _, id := range ids {
-		err := Instance.Client.SCIM.Users.Delete(CTX, Instance.DefaultOrg.Id, id)
-
-		// only not found errors are ok (if the user is deleted in a later on bulk request)
-		if err != nil {
-			scim.RequireScimError(t, http.StatusNotFound, err)
-		}
-	}
-}
-
 func buildMinimalUpdateRequest(userID string) *scim.BulkRequest {
 	return &scim.BulkRequest{
 		Schemas: []schemas.ScimSchemaType{schemas.IdBulkRequest},
@@ -690,7 +679,7 @@ func buildTooManyOperationsRequest() *scim.BulkRequest {
 		req.Operations[i] = &scim.BulkRequestOperation{
 			Method: http.MethodPost,
 			Path:   "/Users",
-			Data:   minimalUserJson,
+			Data:   withUsername(minimalUserJson, integration.Username()),
 		}
 	}
 
@@ -720,8 +709,11 @@ func ensureMetadataProjected(t require.TestingT, userID, key, value string) {
 			Id:  userID,
 			Key: key,
 		})
-		require.NoError(tt, err)
-		require.Equal(tt, value, string(md.Metadata.Value))
+		if !assert.NoError(tt, err) {
+			require.Equal(tt, status.Code(err), codes.NotFound)
+			return
+		}
+		assert.Equal(tt, value, string(md.Metadata.Value))
 	}, retryDuration, tick)
 }
 

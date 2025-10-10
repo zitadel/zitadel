@@ -12,7 +12,6 @@ import { TranslateModule } from '@ngx-translate/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
-  standalone: true,
   selector: 'cnsl-login-v2-feature-toggle',
   templateUrl: './login-v2-feature-toggle.component.html',
   imports: [

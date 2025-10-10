@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -17,6 +18,7 @@ import (
 )
 
 func TestCommandSide_LockUserV2(t *testing.T) {
+	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	type fields struct {
 		eventstore      func(*testing.T) *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
@@ -78,7 +80,7 @@ func TestCommandSide_LockUserV2(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 								"username",
 								"firstname",
 								"lastname",
@@ -92,7 +94,7 @@ func TestCommandSide_LockUserV2(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewUserLockedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 							),
 						),
 					),
@@ -116,7 +118,7 @@ func TestCommandSide_LockUserV2(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							user.NewMachineAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 								"username",
 								"name",
 								"description",
@@ -126,7 +128,7 @@ func TestCommandSide_LockUserV2(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewUserLockedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 							),
 						),
 					),
@@ -150,7 +152,7 @@ func TestCommandSide_LockUserV2(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 								"username",
 								"firstname",
 								"lastname",
@@ -165,7 +167,7 @@ func TestCommandSide_LockUserV2(t *testing.T) {
 					),
 					expectPush(
 						user.NewUserLockedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
+							userAgg,
 						),
 					),
 				),
@@ -188,7 +190,7 @@ func TestCommandSide_LockUserV2(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 								"username",
 								"firstname",
 								"lastname",
@@ -221,7 +223,7 @@ func TestCommandSide_LockUserV2(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							user.NewMachineAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 								"username",
 								"name",
 								"description",
@@ -232,7 +234,7 @@ func TestCommandSide_LockUserV2(t *testing.T) {
 					),
 					expectPush(
 						user.NewUserLockedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
+							userAgg,
 						),
 					),
 				),
@@ -270,6 +272,7 @@ func TestCommandSide_LockUserV2(t *testing.T) {
 }
 
 func TestCommandSide_UnlockUserV2(t *testing.T) {
+	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	type fields struct {
 		eventstore      func(*testing.T) *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
@@ -331,7 +334,7 @@ func TestCommandSide_UnlockUserV2(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 								"username",
 								"firstname",
 								"lastname",
@@ -363,7 +366,7 @@ func TestCommandSide_UnlockUserV2(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						user.NewMachineAddedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
+							userAgg,
 							"username",
 							"name",
 							"description",
@@ -391,7 +394,7 @@ func TestCommandSide_UnlockUserV2(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 								"username",
 								"firstname",
 								"lastname",
@@ -405,12 +408,12 @@ func TestCommandSide_UnlockUserV2(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewUserLockedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate),
+								userAgg),
 						),
 					),
 					expectPush(
 						user.NewUserUnlockedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
+							userAgg,
 						),
 					),
 				),
@@ -433,7 +436,7 @@ func TestCommandSide_UnlockUserV2(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 								"username",
 								"firstname",
 								"lastname",
@@ -447,7 +450,7 @@ func TestCommandSide_UnlockUserV2(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewUserLockedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate),
+								userAgg),
 						),
 					),
 				),
@@ -470,7 +473,7 @@ func TestCommandSide_UnlockUserV2(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							user.NewMachineAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 								"username",
 								"name",
 								"description",
@@ -480,12 +483,12 @@ func TestCommandSide_UnlockUserV2(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewUserLockedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate),
+								userAgg),
 						),
 					),
 					expectPush(
 						user.NewUserUnlockedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
+							userAgg,
 						),
 					),
 				),
@@ -523,6 +526,7 @@ func TestCommandSide_UnlockUserV2(t *testing.T) {
 }
 
 func TestCommandSide_DeactivateUserV2(t *testing.T) {
+	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	type fields struct {
 		eventstore      func(*testing.T) *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
@@ -584,7 +588,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 								"username",
 								"firstname",
 								"lastname",
@@ -598,7 +602,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewHumanInitialCodeAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 								nil, time.Hour*1,
 								"",
 							),
@@ -624,7 +628,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 								"username",
 								"firstname",
 								"lastname",
@@ -638,7 +642,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewUserDeactivatedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 							),
 						),
 					),
@@ -662,7 +666,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 								"username",
 								"firstname",
 								"lastname",
@@ -676,13 +680,13 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewHumanInitializedCheckSucceededEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 							),
 						),
 					),
 					expectPush(
 						user.NewUserDeactivatedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
+							userAgg,
 						),
 					),
 				),
@@ -705,7 +709,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 								"username",
 								"firstname",
 								"lastname",
@@ -719,7 +723,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewHumanInitializedCheckSucceededEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 							),
 						),
 					),
@@ -743,7 +747,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							user.NewMachineAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 								"username",
 								"name",
 								"description",
@@ -753,7 +757,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewUserDeactivatedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 							),
 						),
 					),
@@ -777,7 +781,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							user.NewMachineAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 								"username",
 								"name",
 								"description",
@@ -788,7 +792,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 					),
 					expectPush(
 						user.NewUserDeactivatedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
+							userAgg,
 						),
 					),
 				),
@@ -826,6 +830,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 }
 
 func TestCommandSide_ReactivateUserV2(t *testing.T) {
+	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	type fields struct {
 		eventstore      func(*testing.T) *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
@@ -887,7 +892,7 @@ func TestCommandSide_ReactivateUserV2(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 								"username",
 								"firstname",
 								"lastname",
@@ -920,7 +925,7 @@ func TestCommandSide_ReactivateUserV2(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							user.NewMachineAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 								"username",
 								"name",
 								"description",
@@ -949,7 +954,7 @@ func TestCommandSide_ReactivateUserV2(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 								"username",
 								"firstname",
 								"lastname",
@@ -963,12 +968,12 @@ func TestCommandSide_ReactivateUserV2(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewUserDeactivatedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate),
+								userAgg),
 						),
 					),
 					expectPush(
 						user.NewUserReactivatedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
+							userAgg,
 						),
 					),
 				),
@@ -991,7 +996,7 @@ func TestCommandSide_ReactivateUserV2(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 								"username",
 								"firstname",
 								"lastname",
@@ -1005,7 +1010,7 @@ func TestCommandSide_ReactivateUserV2(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewUserDeactivatedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate),
+								userAgg),
 						),
 					),
 				),
@@ -1028,7 +1033,7 @@ func TestCommandSide_ReactivateUserV2(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							user.NewMachineAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								userAgg,
 								"username",
 								"name",
 								"description",
@@ -1038,12 +1043,12 @@ func TestCommandSide_ReactivateUserV2(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewUserDeactivatedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate),
+								userAgg),
 						),
 					),
 					expectPush(
 						user.NewUserReactivatedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
+							userAgg,
 						),
 					),
 				),
@@ -1081,13 +1086,16 @@ func TestCommandSide_ReactivateUserV2(t *testing.T) {
 }
 
 func TestCommandSide_RemoveUserV2(t *testing.T) {
+	ctxUserID := "ctxUserID"
+	ctx := authz.SetCtxData(context.Background(), authz.CtxData{UserID: ctxUserID})
+	userAgg := &user.NewAggregate("user1", "org1").Aggregate
+	orgAgg := &org.NewAggregate("org1").Aggregate
 	type fields struct {
 		eventstore      func(*testing.T) *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
 	}
 	type (
 		args struct {
-			ctx                  context.Context
 			userID               string
 			cascadingMemberships []*CascadingMembership
 			grantIDs             []string
@@ -1110,7 +1118,6 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:    context.Background(),
 				userID: "",
 			},
 			res: res{
@@ -1128,7 +1135,6 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:    context.Background(),
 				userID: "user1",
 			},
 			res: res{
@@ -1143,8 +1149,8 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+							user.NewHumanAddedEvent(ctx,
+								userAgg,
 								"username",
 								"firstname",
 								"lastname",
@@ -1157,8 +1163,8 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewUserRemovedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+							user.NewUserRemovedEvent(ctx,
+								userAgg,
 								"username",
 								nil,
 								true,
@@ -1169,7 +1175,6 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:    context.Background(),
 				userID: "user1",
 			},
 			res: res{
@@ -1184,8 +1189,8 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+							user.NewHumanAddedEvent(ctx,
+								userAgg,
 								"username",
 								"firstname",
 								"lastname",
@@ -1201,16 +1206,17 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								orgAgg,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
-						user.NewUserRemovedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
+						user.NewUserRemovedEvent(ctx,
+							userAgg,
 							"username",
 							nil,
 							true,
@@ -1220,7 +1226,6 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:    context.Background(),
 				userID: "user1",
 			},
 			res: res{
@@ -1235,8 +1240,8 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+							user.NewHumanAddedEvent(ctx,
+								userAgg,
 								"username",
 								"firstname",
 								"lastname",
@@ -1249,8 +1254,8 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanInitializedCheckSucceededEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+							user.NewHumanInitializedCheckSucceededEvent(ctx,
+								userAgg,
 							),
 						),
 					),
@@ -1258,13 +1263,10 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
-				ctx:    context.Background(),
 				userID: "user1",
 			},
 			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
-				},
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 		{
@@ -1273,8 +1275,8 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							user.NewMachineAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+							user.NewMachineAddedEvent(ctx,
+								userAgg,
 								"username",
 								"name",
 								"description",
@@ -1283,8 +1285,8 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewUserRemovedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+							user.NewUserRemovedEvent(ctx,
+								userAgg,
 								"username",
 								nil,
 								true,
@@ -1292,10 +1294,8 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:    context.Background(),
 				userID: "user1",
 			},
 			res: res{
@@ -1310,8 +1310,8 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							user.NewMachineAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+							user.NewMachineAddedEvent(ctx,
+								userAgg,
 								"username",
 								"name",
 								"description",
@@ -1323,16 +1323,17 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								orgAgg,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
-						user.NewUserRemovedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
+						user.NewUserRemovedEvent(ctx,
+							userAgg,
 							"username",
 							nil,
 							true,
@@ -1342,13 +1343,42 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:    context.Background(),
 				userID: "user1",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
 					ResourceOwner: "org1",
 				},
+			},
+		},
+		{
+			name: "remove self, permission denied",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(ctx,
+								&user.NewAggregate(ctxUserID, "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				userID: ctxUserID,
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 	}
@@ -1358,7 +1388,8 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := r.RemoveUserV2(tt.args.ctx, tt.args.userID, "", tt.args.cascadingMemberships, tt.args.grantIDs...)
+
+			got, err := r.RemoveUserV2(ctx, tt.args.userID, "", tt.args.cascadingMemberships, tt.args.grantIDs...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

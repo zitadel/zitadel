@@ -53,7 +53,6 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, LabelPolicyIconDarkRemovedEventType, LabelPolicyIconDarkRemovedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, LabelPolicyFontAddedEventType, LabelPolicyFontAddedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, LabelPolicyFontRemovedEventType, LabelPolicyFontRemovedEventMapper)
-	eventstore.RegisterFilterEventMapper(AggregateType, LabelPolicyAssetsRemovedEventType, LabelPolicyAssetsRemovedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, LoginPolicyAddedEventType, LoginPolicyAddedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, LoginPolicyChangedEventType, LoginPolicyChangedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, DomainPolicyAddedEventType, DomainPolicyAddedEventMapper)
@@ -130,4 +129,5 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, NotificationPolicyChangedEventType, NotificationPolicyChangedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, TrustedDomainAddedEventType, eventstore.GenericEventMapper[TrustedDomainAddedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, TrustedDomainRemovedEventType, eventstore.GenericEventMapper[TrustedDomainRemovedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, HostedLoginTranslationSet, HostedLoginTranslationSetEventMapper)
 }

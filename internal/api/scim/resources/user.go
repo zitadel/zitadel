@@ -90,6 +90,7 @@ type ScimIms struct {
 type ScimEmail struct {
 	Value   string `json:"value" scim:"required"`
 	Primary bool   `json:"primary"`
+	Type    string `json:"type,omitempty"`
 }
 
 type ScimPhoneNumber struct {
@@ -203,7 +204,6 @@ func (h *UsersHandler) Delete(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-
 	_, err = h.command.RemoveUserV2(ctx, id, authz.GetCtxData(ctx).OrgID, memberships, grants...)
 	return err
 }
@@ -262,7 +262,7 @@ func (h *UsersHandler) queryUserDependencies(ctx context.Context, userID string)
 
 	grants, err := h.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{userGrantUserQuery},
-	}, true)
+	}, true, nil)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -11,4 +11,5 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, SAMLRequestEventType, SAMLRequestEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, LDAPSucceededEventType, LDAPSucceededEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, FailedEventType, FailedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, ConsumedEventType, eventstore.GenericEventMapper[ConsumedEvent])
 }

@@ -2,8 +2,10 @@ package projection
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
@@ -84,12 +86,24 @@ var (
 	UserSchemaProjection                *handler.Handler
 	WebKeyProjection                    *handler.Handler
 	DebugEventsProjection               *handler.Handler
+	HostedLoginTranslationProjection    *handler.Handler
+	OrganizationSettingsProjection      *handler.Handler
+
+	InstanceRelationalProjection           *handler.Handler
+	OrganizationRelationalProjection       *handler.Handler
+	InstanceDomainRelationalProjection     *handler.Handler
+	OrganizationDomainRelationalProjection *handler.Handler
+	IDPTemplateRelationalProjection        *handler.Handler
+	ProjectRelationalProjection            *handler.Handler
+	ProjectRoleRelationalProjection        *handler.Handler
 
 	ProjectGrantFields      *handler.FieldHandler
 	OrgDomainVerifiedFields *handler.FieldHandler
 	InstanceDomainFields    *handler.FieldHandler
 	MembershipFields        *handler.FieldHandler
 	PermissionFields        *handler.FieldHandler
+
+	GroupProjection *handler.Handler
 )
 
 type projection interface {
@@ -116,6 +130,14 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 		TransactionDuration: config.TransactionDuration,
 		ActiveInstancer:     config.ActiveInstancer,
 	}
+
+	if config.MaxParallelTriggers == 0 {
+		config.MaxParallelTriggers = uint16(sqlClient.Pool.Config().MaxConns / 3)
+	}
+	if sqlClient.Pool.Config().MaxConns <= int32(config.MaxParallelTriggers) {
+		logging.WithFields("database.MaxOpenConnections", sqlClient.Pool.Config().MaxConns, "projections.MaxParallelTriggers", config.MaxParallelTriggers).Fatal("Number of max parallel triggers must be lower than max open connections")
+	}
+	handler.StartWorkerPool(config.MaxParallelTriggers)
 
 	OrgProjection = newOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
 	OrgMetadataProjection = newOrgMetadataProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_metadata"]))
@@ -177,6 +199,8 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	UserSchemaProjection = newUserSchemaProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_schemas"]))
 	WebKeyProjection = newWebKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["web_keys"]))
 	DebugEventsProjection = newDebugEventsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["debug_events"]))
+	HostedLoginTranslationProjection = newHostedLoginTranslationProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["hosted_login_translation"]))
+	OrganizationSettingsProjection = newOrganizationSettingsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organization_settings"]))
 
 	ProjectGrantFields = newFillProjectGrantFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsProjectGrant]))
 	OrgDomainVerifiedFields = newFillOrgDomainVerifiedFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsOrgDomainVerified]))
@@ -184,6 +208,16 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	MembershipFields = newFillMembershipFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsMemberships]))
 	PermissionFields = newFillPermissionFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsPermission]))
 	// Don't forget to add the new field handler to [ProjectInstanceFields]
+
+	GroupProjection = newGroupProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["groups"]))
+
+	InstanceRelationalProjection = newInstanceRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instances_relational"]))
+	OrganizationRelationalProjection = newOrgRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organizations_relational"]))
+	InstanceDomainRelationalProjection = newInstanceDomainRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instance_domains_relational"]))
+	OrganizationDomainRelationalProjection = newOrgDomainRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organization_domains_relational"]))
+	IDPTemplateRelationalProjection = newIDPTemplateRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_templates_relational"]))
+	ProjectRelationalProjection = newProjectRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects_relational"]))
+	ProjectRoleRelationalProjection = newProjectRoleRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_roles_relational"]))
 
 	newProjectionsList()
 	newFieldsList()
@@ -203,20 +237,36 @@ func Init(ctx context.Context) error {
 	return nil
 }
 
-func Start(ctx context.Context) {
+func Start(ctx context.Context) error {
+	projectionTableMap := make(map[string]bool, len(projections))
 	for _, projection := range projections {
+		table := projection.String()
+		if projectionTableMap[table] {
+			return fmt.Errorf("projection for %s already added", table)
+		}
+		projectionTableMap[table] = true
+
 		projection.Start(ctx)
 	}
+	return nil
 }
 
 func ProjectInstance(ctx context.Context) error {
 	for i, projection := range projections {
 		logging.WithFields("name", projection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("starting projection")
-		_, err := projection.Trigger(ctx)
-		if err != nil {
-			return err
+		for {
+			_, err := projection.Trigger(ctx)
+			if err == nil {
+				break
+			}
+			var pgErr *pgconn.PgError
+			errors.As(err, &pgErr)
+			if pgErr.Code != database.PgUniqueConstraintErrorCode {
+				return err
+			}
+			logging.WithFields("name", projection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID()).WithError(err).Debug("projection failed because of unique constraint, retrying")
 		}
-		logging.WithFields("name", projection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID()).Info("projection done")
+		logging.WithFields("name", projection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("projection done")
 	}
 	return nil
 }
@@ -224,11 +274,19 @@ func ProjectInstance(ctx context.Context) error {
 func ProjectInstanceFields(ctx context.Context) error {
 	for i, fieldProjection := range fields {
 		logging.WithFields("name", fieldProjection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(fields))).Info("starting fields projection")
-		err := fieldProjection.Trigger(ctx)
-		if err != nil {
-			return err
+		for {
+			err := fieldProjection.Trigger(ctx)
+			if err == nil {
+				break
+			}
+			var pgErr *pgconn.PgError
+			errors.As(err, &pgErr)
+			if pgErr.Code != database.PgUniqueConstraintErrorCode {
+				return err
+			}
+			logging.WithFields("name", fieldProjection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID()).WithError(err).Debug("fields projection failed because of unique constraint, retrying")
 		}
-		logging.WithFields("name", fieldProjection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID()).Info("fields projection done")
+		logging.WithFields("name", fieldProjection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(fields))).Info("fields projection done")
 	}
 	return nil
 }
@@ -253,10 +311,15 @@ func applyCustomConfig(config handler.Config, customConfig CustomConfig) handler
 	if customConfig.TransactionDuration != nil {
 		config.TransactionDuration = *customConfig.TransactionDuration
 	}
+	config.SkipInstanceIDs = append(config.SkipInstanceIDs, customConfig.SkipInstanceIDs...)
 
 	return config
 }
 
+// we know this is ugly, but we need to have a singleton slice of all projections
+// and are only able to initialize it after all projections are created
+// as setup and start currently create them individually, we make sure we get the right one
+// will be refactored when changing to new id based projections
 func newFieldsList() {
 	fields = []*handler.FieldHandler{
 		ProjectGrantFields,
@@ -335,5 +398,16 @@ func newProjectionsList() {
 		UserSchemaProjection,
 		WebKeyProjection,
 		DebugEventsProjection,
+		HostedLoginTranslationProjection,
+		OrganizationSettingsProjection,
+		GroupProjection,
+
+		InstanceRelationalProjection,
+		OrganizationRelationalProjection,
+		InstanceDomainRelationalProjection,
+		OrganizationDomainRelationalProjection,
+		IDPTemplateRelationalProjection,
+		ProjectRelationalProjection,
+		ProjectRoleRelationalProjection,
 	}
 }

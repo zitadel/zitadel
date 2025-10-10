@@ -9,7 +9,9 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/shopspring/decimal"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/service"
 	"github.com/zitadel/zitadel/internal/database"
@@ -347,7 +349,7 @@ func (repo *testPusher) Health(ctx context.Context) error {
 	return nil
 }
 
-func (repo *testPusher) Push(_ context.Context, _ database.ContextQueryExecuter, commands ...Command) (events []Event, err error) {
+func (repo *testPusher) Push(_ context.Context, _ new_db.QueryExecutor, commands ...Command) (events []Event, err error) {
 	if len(repo.errs) != 0 {
 		err, repo.errs = repo.errs[0], repo.errs[1:]
 		return nil, err
@@ -397,7 +399,7 @@ func (repo *testPusher) Push(_ context.Context, _ database.ContextQueryExecuter,
 
 type testQuerier struct {
 	events    []Event
-	sequence  float64
+	sequence  decimal.Decimal
 	instances []string
 	err       error
 	t         *testing.T
@@ -430,9 +432,9 @@ func (repo *testQuerier) FilterToReducer(ctx context.Context, searchQuery *Searc
 	return nil
 }
 
-func (repo *testQuerier) LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (float64, error) {
+func (repo *testQuerier) LatestPosition(ctx context.Context, queryFactory *SearchQueryBuilder) (decimal.Decimal, error) {
 	if repo.err != nil {
-		return 0, repo.err
+		return decimal.Decimal{}, repo.err
 	}
 	return repo.sequence, nil
 }
@@ -1076,7 +1078,7 @@ func TestEventstore_FilterEvents(t *testing.T) {
 	}
 }
 
-func TestEventstore_LatestSequence(t *testing.T) {
+func TestEventstore_LatestPosition(t *testing.T) {
 	type args struct {
 		query *SearchQueryBuilder
 	}
@@ -1096,7 +1098,7 @@ func TestEventstore_LatestSequence(t *testing.T) {
 			name: "no events",
 			args: args{
 				query: &SearchQueryBuilder{
-					columns: ColumnsMaxSequence,
+					columns: ColumnsMaxPosition,
 					queries: []*SearchQuery{
 						{
 							builder:        &SearchQueryBuilder{},
@@ -1119,7 +1121,7 @@ func TestEventstore_LatestSequence(t *testing.T) {
 			name: "repo error",
 			args: args{
 				query: &SearchQueryBuilder{
-					columns: ColumnsMaxSequence,
+					columns: ColumnsMaxPosition,
 					queries: []*SearchQuery{
 						{
 							builder:        &SearchQueryBuilder{},
@@ -1142,7 +1144,7 @@ func TestEventstore_LatestSequence(t *testing.T) {
 			name: "found events",
 			args: args{
 				query: &SearchQueryBuilder{
-					columns: ColumnsMaxSequence,
+					columns: ColumnsMaxPosition,
 					queries: []*SearchQuery{
 						{
 							builder:        &SearchQueryBuilder{},
@@ -1168,7 +1170,7 @@ func TestEventstore_LatestSequence(t *testing.T) {
 				querier: tt.fields.repo,
 			}
 
-			_, err := es.LatestSequence(context.Background(), tt.args.query)
+			_, err := es.LatestPosition(context.Background(), tt.args.query)
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("Eventstore.aggregatesToEvents() error = %v, wantErr %v", err, tt.res.wantErr)
 			}

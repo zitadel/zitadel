@@ -150,6 +150,18 @@ type Steps struct {
 	s51IDPTemplate6RootCA                   *IDPTemplate6RootCA
 	s52IDPTemplate6LDAP2                    *IDPTemplate6LDAP2
 	s53InitPermittedOrgsFunction            *InitPermittedOrgsFunction53
+	s54InstancePositionIndex                *InstancePositionIndex
+	s55ExecutionHandlerStart                *ExecutionHandlerStart
+	s56IDPTemplate6SAMLFederatedLogout      *IDPTemplate6SAMLFederatedLogout
+	s57CreateResourceCounts                 *CreateResourceCounts
+	s58ReplaceLoginNames3View               *ReplaceLoginNames3View
+	s59SetupWebkeys                         *SetupWebkeys
+	s60GenerateSystemID                     *GenerateSystemID
+	s61IDPTemplate6SAMLSignatureAlgorithm   *IDPTemplate6SAMLSignatureAlgorithm
+	s62HTTPProviderAddSigningKey            *HTTPProviderAddSigningKey
+	s63AlterResourceCounts                  *AlterResourceCounts
+	s64ChangePushPosition                   *ChangePushPosition
+	s65FixUserMetadata5Index                *FixUserMetadata5Index
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

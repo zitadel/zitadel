@@ -133,6 +133,30 @@ func (s *OIDCSessionEvents) SetMilestones(ctx context.Context, clientID string, 
 	return postCommit, nil
 }
 
+func (s *SAMLSessionEvents) SetMilestones(ctx context.Context) (postCommit func(ctx context.Context), err error) {
+	postCommit = func(ctx context.Context) {}
+	milestones, err := s.commands.GetMilestonesReached(ctx)
+	if err != nil {
+		return postCommit, err
+	}
+
+	instance := authz.GetInstance(ctx)
+	aggregate := milestone.NewAggregate(ctx)
+	var invalidate bool
+	if !milestones.AuthenticationSucceededOnInstance {
+		s.events = append(s.events, milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnInstance))
+		invalidate = true
+	}
+	if !milestones.AuthenticationSucceededOnApplication {
+		s.events = append(s.events, milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnApplication))
+		invalidate = true
+	}
+	if invalidate {
+		postCommit = s.commands.invalidateMilestoneCachePostCommit(instance.InstanceID())
+	}
+	return postCommit, nil
+}
+
 func (c *Commands) projectCreatedMilestone(ctx context.Context, cmds *[]eventstore.Command) (postCommit func(ctx context.Context), err error) {
 	postCommit = func(ctx context.Context) {}
 	if isSystemUser(ctx) {

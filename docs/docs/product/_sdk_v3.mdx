@@ -1,0 +1,32 @@
+import NewFeature from './_new-feature.mdx';
+
+An initial version of our Software Development Kit (SDK) will be published.
+To better align our versioning with the [ZITADEL core](#zitadel-core), the SDK will be released as version 3.x.
+This strategic versioning will ensure a more consistent and intuitive development experience across our entire ecosystem.
+
+<details>
+    <summary>New Features</summary>
+
+    <NewFeature/>
+
+    <details>
+        <summary>Machine User Authentication Methods</summary>
+
+        This feature introduces robust and standardized authentication methods for your machine users, enabling secure automated access to your resources.
+
+        Choose from the following authentication methods:
+        - **Private Key JWT Authentication**: Enhance security by using asymmetric cryptography. A client with a registered public key can generate and sign a JSON Web Token (JWT) with its private key to authenticate.
+        - **Client Credentials Grant**: A simple and direct method for machine-to-machine authentication where the client confidentially provides its credentials to the authorization server in exchange for an access token.
+        - **Personal Access Tokens (PATs)**: Ideal for individual developers or specific scripts, PATs offer a convenient way to create long-lived, revocable tokens with specific scopes, acting as a substitute for a password.
+
+    </details>
+
+    <details>
+        <summary>Zitadel APIs Wrapper</summary>
+
+        This SDK provides a convenient client for interacting with the ZITADEL APIs, simplifying how you manage resources within your instance.
+
+        Currently, the client is tailored for machine-to-machine communication, enabling machine users to authenticate and manage ZITADEL resources programmatically.
+        Please note that this initial version is focused on API calls for automated tasks and does not yet include support for human user authentication flows like OAuth or OIDC.
+    </details>
+</details>

@@ -1,7 +1,7 @@
 {
   "schemas": ["urn:ietf:params:scim:schemas:core:2.0:User"],
   "externalId": "701984",
-  "userName": "bjensen@example.com",
+  "userName": "{{ .Username }}@example.com",
   "name": {
     "formatted": "Ms. Barbara J Jensen, III",
     "familyName": "Jensen",
@@ -15,12 +15,12 @@
   "profileUrl": "http://login.example.com/bjensen",
   "emails": [
     {
-      "value": "bjensen@example.com",
+      "value": "{{ .Username }}@example.com",
       "type": "work",
       "primary": true
     },
     {
-      "value": "babs@jensen.org",
+      "value": "{{ .Username }}+1@example.com",
       "type": "home"
     }
   ],

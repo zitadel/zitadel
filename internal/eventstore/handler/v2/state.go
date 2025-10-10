@@ -7,6 +7,8 @@ import (
 	"errors"
 	"time"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -14,7 +16,7 @@ import (
 
 type state struct {
 	instanceID     string
-	position       float64
+	position       decimal.Decimal
 	eventTimestamp time.Time
 	aggregateType  eventstore.AggregateType
 	aggregateID    string
@@ -25,17 +27,11 @@ type state struct {
 var (
 	//go:embed state_get.sql
 	currentStateStmt string
-	//go:embed state_get_await.sql
-	currentStateAwaitStmt string
 	//go:embed state_set.sql
 	updateStateStmt string
-	//go:embed state_lock.sql
-	lockStateStmt string
-
-	errJustUpdated = errors.New("projection was just updated")
 )
 
-func (h *Handler) currentState(ctx context.Context, tx *sql.Tx, config *triggerConfig) (currentState *state, err error) {
+func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *state, err error) {
 	currentState = &state{
 		instanceID: authz.GetInstance(ctx).InstanceID(),
 	}
@@ -45,16 +41,11 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx, config *triggerC
 		aggregateType = new(sql.NullString)
 		sequence      = new(sql.NullInt64)
 		timestamp     = new(sql.NullTime)
-		position      = new(sql.NullFloat64)
+		position      = new(decimal.NullDecimal)
 		offset        = new(sql.NullInt64)
 	)
 
-	stateQuery := currentStateStmt
-	if config.awaitRunning {
-		stateQuery = currentStateAwaitStmt
-	}
-
-	row := tx.QueryRow(stateQuery, currentState.instanceID, h.projection.Name())
+	row := tx.QueryRow(currentStateStmt, currentState.instanceID, h.projection.Name())
 	err = row.Scan(
 		aggregateID,
 		aggregateType,
@@ -63,10 +54,7 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx, config *triggerC
 		position,
 		offset,
 	)
-	if errors.Is(err, sql.ErrNoRows) {
-		err = h.lockState(tx, currentState.instanceID)
-	}
-	if err != nil {
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		h.log().WithError(err).Debug("unable to query current state")
 		return nil, err
 	}
@@ -75,7 +63,7 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx, config *triggerC
 	currentState.aggregateType = eventstore.AggregateType(aggregateType.String)
 	currentState.sequence = uint64(sequence.Int64)
 	currentState.eventTimestamp = timestamp.Time
-	currentState.position = position.Float64
+	currentState.position = position.Decimal
 	// psql does not provide unsigned numbers so we work around it
 	currentState.offset = uint32(offset.Int64)
 	return currentState, nil
@@ -99,20 +87,6 @@ func (h *Handler) setState(tx *sql.Tx, updatedState *state) error {
 	if affected, err := res.RowsAffected(); affected == 0 {
 		h.log().OnError(err).Error("unable to check if states are updated")
 		return zerrors.ThrowInternal(err, "V2-FGEKi", "unable to update state")
-	}
-	return nil
-}
-
-func (h *Handler) lockState(tx *sql.Tx, instanceID string) error {
-	res, err := tx.Exec(lockStateStmt,
-		h.projection.Name(),
-		instanceID,
-	)
-	if err != nil {
-		return err
-	}
-	if affected, err := res.RowsAffected(); affected == 0 || err != nil {
-		return zerrors.ThrowInternal(err, "V2-lpiK0", "projection already locked")
 	}
 	return nil
 }

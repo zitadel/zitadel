@@ -1,0 +1,6 @@
+{
+  "printWidth": 125,
+  "trailingComma": "all",
+  "plugins": ["prettier-plugin-organize-imports"],
+  "filepath": ""
+}

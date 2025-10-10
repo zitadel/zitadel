@@ -1,7 +1,10 @@
 package saml
 
 import (
-	"google.golang.org/grpc"
+	"net/http"
+
+	"connectrpc.com/connect"
+	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
@@ -9,9 +12,10 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/query"
 	saml_pb "github.com/zitadel/zitadel/pkg/grpc/saml/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/saml/v2/samlconnect"
 )
 
-var _ saml_pb.SAMLServiceServer = (*Server)(nil)
+var _ samlconnect.SAMLServiceHandler = (*Server)(nil)
 
 type Server struct {
 	saml_pb.UnimplementedSAMLServiceServer
@@ -38,8 +42,12 @@ func CreateServer(
 	}
 }
 
-func (s *Server) RegisterServer(grpcServer *grpc.Server) {
-	saml_pb.RegisterSAMLServiceServer(grpcServer, s)
+func (s *Server) RegisterConnectServer(interceptors ...connect.Interceptor) (string, http.Handler) {
+	return samlconnect.NewSAMLServiceHandler(s, connect.WithInterceptors(interceptors...))
+}
+
+func (s *Server) FileDescriptor() protoreflect.FileDescriptor {
+	return saml_pb.File_zitadel_saml_v2_saml_service_proto
 }
 
 func (s *Server) AppName() string {

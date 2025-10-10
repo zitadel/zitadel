@@ -58,7 +58,7 @@ func TestServer_SetSystemFeatures(t *testing.T) {
 			args: args{
 				ctx: IamCTX,
 				req: &feature.SetSystemFeaturesRequest{
-					OidcTriggerIntrospectionProjections: gu.Ptr(true),
+					LoginDefaultOrg: gu.Ptr(true),
 				},
 			},
 			wantErr: true,
@@ -76,7 +76,8 @@ func TestServer_SetSystemFeatures(t *testing.T) {
 			args: args{
 				ctx: SystemCTX,
 				req: &feature.SetSystemFeaturesRequest{
-					OidcTriggerIntrospectionProjections: gu.Ptr(true),
+					LoginDefaultOrg:        gu.Ptr(true),
+					EnableRelationalTables: gu.Ptr(true),
 				},
 			},
 			want: &feature.SetSystemFeaturesResponse{
@@ -170,8 +171,9 @@ func TestServer_GetSystemFeatures(t *testing.T) {
 			name: "some features",
 			prepare: func(t *testing.T) {
 				_, err := Client.SetSystemFeatures(SystemCTX, &feature.SetSystemFeaturesRequest{
-					LoginDefaultOrg:                     gu.Ptr(true),
-					OidcTriggerIntrospectionProjections: gu.Ptr(false),
+					LoginDefaultOrg:        gu.Ptr(true),
+					UserSchema:             gu.Ptr(false),
+					EnableRelationalTables: gu.Ptr(true),
 				})
 				require.NoError(t, err)
 			},
@@ -184,8 +186,12 @@ func TestServer_GetSystemFeatures(t *testing.T) {
 					Enabled: true,
 					Source:  feature.Source_SOURCE_SYSTEM,
 				},
-				OidcTriggerIntrospectionProjections: &feature.FeatureFlag{
+				UserSchema: &feature.FeatureFlag{
 					Enabled: false,
+					Source:  feature.Source_SOURCE_SYSTEM,
+				},
+				EnableRelationalTables: &feature.FeatureFlag{
+					Enabled: true,
 					Source:  feature.Source_SOURCE_SYSTEM,
 				},
 			},
@@ -208,9 +214,8 @@ func TestServer_GetSystemFeatures(t *testing.T) {
 			}
 			require.NoError(t, err)
 			assertFeatureFlag(t, tt.want.LoginDefaultOrg, got.LoginDefaultOrg)
-			assertFeatureFlag(t, tt.want.OidcTriggerIntrospectionProjections, got.OidcTriggerIntrospectionProjections)
-			assertFeatureFlag(t, tt.want.OidcLegacyIntrospection, got.OidcLegacyIntrospection)
 			assertFeatureFlag(t, tt.want.UserSchema, got.UserSchema)
+			assertFeatureFlag(t, tt.want.EnableRelationalTables, got.EnableRelationalTables)
 		})
 	}
 }
@@ -231,7 +236,7 @@ func TestServer_SetInstanceFeatures(t *testing.T) {
 			args: args{
 				ctx: OrgCTX,
 				req: &feature.SetInstanceFeaturesRequest{
-					OidcTriggerIntrospectionProjections: gu.Ptr(true),
+					LoginDefaultOrg: gu.Ptr(true),
 				},
 			},
 			wantErr: true,
@@ -249,7 +254,8 @@ func TestServer_SetInstanceFeatures(t *testing.T) {
 			args: args{
 				ctx: IamCTX,
 				req: &feature.SetInstanceFeaturesRequest{
-					OidcTriggerIntrospectionProjections: gu.Ptr(true),
+					LoginDefaultOrg:        gu.Ptr(true),
+					EnableRelationalTables: gu.Ptr(true),
 				},
 			},
 			want: &feature.SetInstanceFeaturesResponse{
@@ -321,7 +327,7 @@ func TestServer_ResetInstanceFeatures(t *testing.T) {
 
 func TestServer_GetInstanceFeatures(t *testing.T) {
 	_, err := Client.SetSystemFeatures(SystemCTX, &feature.SetSystemFeaturesRequest{
-		OidcLegacyIntrospection: gu.Ptr(true),
+		LoginDefaultOrg: gu.Ptr(true),
 	})
 	require.NoError(t, err)
 	t.Cleanup(func() {
@@ -358,18 +364,14 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 			},
 			want: &feature.GetInstanceFeaturesResponse{
 				LoginDefaultOrg: &feature.FeatureFlag{
-					Enabled: false,
-					Source:  feature.Source_SOURCE_UNSPECIFIED,
-				},
-				OidcTriggerIntrospectionProjections: &feature.FeatureFlag{
-					Enabled: false,
-					Source:  feature.Source_SOURCE_UNSPECIFIED,
-				},
-				OidcLegacyIntrospection: &feature.FeatureFlag{
 					Enabled: true,
 					Source:  feature.Source_SOURCE_SYSTEM,
 				},
 				UserSchema: &feature.FeatureFlag{
+					Enabled: false,
+					Source:  feature.Source_SOURCE_UNSPECIFIED,
+				},
+				EnableRelationalTables: &feature.FeatureFlag{
 					Enabled: false,
 					Source:  feature.Source_SOURCE_UNSPECIFIED,
 				},
@@ -379,9 +381,9 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 			name: "some features, no inheritance",
 			prepare: func(t *testing.T) {
 				_, err := Client.SetInstanceFeatures(IamCTX, &feature.SetInstanceFeaturesRequest{
-					LoginDefaultOrg:                     gu.Ptr(true),
-					OidcTriggerIntrospectionProjections: gu.Ptr(false),
-					UserSchema:                          gu.Ptr(true),
+					LoginDefaultOrg:        gu.Ptr(true),
+					UserSchema:             gu.Ptr(true),
+					EnableRelationalTables: gu.Ptr(true),
 				})
 				require.NoError(t, err)
 			},
@@ -394,11 +396,11 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 					Enabled: true,
 					Source:  feature.Source_SOURCE_INSTANCE,
 				},
-				OidcTriggerIntrospectionProjections: &feature.FeatureFlag{
-					Enabled: false,
+				UserSchema: &feature.FeatureFlag{
+					Enabled: true,
 					Source:  feature.Source_SOURCE_INSTANCE,
 				},
-				UserSchema: &feature.FeatureFlag{
+				EnableRelationalTables: &feature.FeatureFlag{
 					Enabled: true,
 					Source:  feature.Source_SOURCE_INSTANCE,
 				},
@@ -423,15 +425,11 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 					Enabled: true,
 					Source:  feature.Source_SOURCE_INSTANCE,
 				},
-				OidcTriggerIntrospectionProjections: &feature.FeatureFlag{
+				UserSchema: &feature.FeatureFlag{
 					Enabled: false,
 					Source:  feature.Source_SOURCE_UNSPECIFIED,
 				},
-				OidcLegacyIntrospection: &feature.FeatureFlag{
-					Enabled: true,
-					Source:  feature.Source_SOURCE_SYSTEM,
-				},
-				UserSchema: &feature.FeatureFlag{
+				EnableRelationalTables: &feature.FeatureFlag{
 					Enabled: false,
 					Source:  feature.Source_SOURCE_UNSPECIFIED,
 				},
@@ -455,9 +453,8 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 			}
 			require.NoError(t, err)
 			assertFeatureFlag(t, tt.want.LoginDefaultOrg, got.LoginDefaultOrg)
-			assertFeatureFlag(t, tt.want.OidcTriggerIntrospectionProjections, got.OidcTriggerIntrospectionProjections)
-			assertFeatureFlag(t, tt.want.OidcLegacyIntrospection, got.OidcLegacyIntrospection)
 			assertFeatureFlag(t, tt.want.UserSchema, got.UserSchema)
+			assertFeatureFlag(t, tt.want.EnableRelationalTables, got.EnableRelationalTables)
 		})
 	}
 }

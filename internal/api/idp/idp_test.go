@@ -4,6 +4,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -14,11 +15,12 @@ import (
 
 func Test_redirectToSuccessURL(t *testing.T) {
 	type args struct {
-		id         string
-		userID     string
-		token      string
-		failureURL string
-		successURL string
+		id                   string
+		userID               string
+		token                string
+		failureURL           string
+		successURL           string
+		maxIdPIntentLifetime time.Duration
 	}
 	type res struct {
 		want string
@@ -59,7 +61,7 @@ func Test_redirectToSuccessURL(t *testing.T) {
 			req := httptest.NewRequest("GET", "http://example.com", nil)
 			resp := httptest.NewRecorder()
 
-			wm := command.NewIDPIntentWriteModel(tt.args.id, tt.args.id)
+			wm := command.NewIDPIntentWriteModel(tt.args.id, tt.args.id, tt.args.maxIdPIntentLifetime)
 			wm.FailureURL, _ = url.Parse(tt.args.failureURL)
 			wm.SuccessURL, _ = url.Parse(tt.args.successURL)
 
@@ -71,11 +73,12 @@ func Test_redirectToSuccessURL(t *testing.T) {
 
 func Test_redirectToFailureURL(t *testing.T) {
 	type args struct {
-		id         string
-		failureURL string
-		successURL string
-		err        string
-		desc       string
+		id                   string
+		failureURL           string
+		successURL           string
+		err                  string
+		desc                 string
+		maxIdPIntentLifetime time.Duration
 	}
 	type res struct {
 		want string
@@ -115,7 +118,7 @@ func Test_redirectToFailureURL(t *testing.T) {
 			req := httptest.NewRequest("GET", "http://example.com", nil)
 			resp := httptest.NewRecorder()
 
-			wm := command.NewIDPIntentWriteModel(tt.args.id, tt.args.id)
+			wm := command.NewIDPIntentWriteModel(tt.args.id, tt.args.id, tt.args.maxIdPIntentLifetime)
 			wm.FailureURL, _ = url.Parse(tt.args.failureURL)
 			wm.SuccessURL, _ = url.Parse(tt.args.successURL)
 
@@ -127,10 +130,11 @@ func Test_redirectToFailureURL(t *testing.T) {
 
 func Test_redirectToFailureURLErr(t *testing.T) {
 	type args struct {
-		id         string
-		failureURL string
-		successURL string
-		err        error
+		id                   string
+		failureURL           string
+		successURL           string
+		err                  error
+		maxIdPIntentLifetime time.Duration
 	}
 	type res struct {
 		want string
@@ -158,7 +162,7 @@ func Test_redirectToFailureURLErr(t *testing.T) {
 			req := httptest.NewRequest("GET", "http://example.com", nil)
 			resp := httptest.NewRecorder()
 
-			wm := command.NewIDPIntentWriteModel(tt.args.id, tt.args.id)
+			wm := command.NewIDPIntentWriteModel(tt.args.id, tt.args.id, tt.args.maxIdPIntentLifetime)
 			wm.FailureURL, _ = url.Parse(tt.args.failureURL)
 			wm.SuccessURL, _ = url.Parse(tt.args.successURL)
 

@@ -171,8 +171,10 @@ const (
 	SAMLCertificateCol                = "certificate"
 	SAMLBindingCol                    = "binding"
 	SAMLWithSignedRequestCol          = "with_signed_request"
+	SAMLSignatureAlgorithmCol         = "signature_algorithm"
 	SAMLNameIDFormatCol               = "name_id_format"
 	SAMLTransientMappingAttributeName = "transient_mapping_attribute_name"
+	SAMLFederatedLogoutEnabled        = "federated_logout_enabled"
 )
 
 type idpTemplateProjection struct{}
@@ -375,8 +377,10 @@ func (*idpTemplateProjection) Init() *old_handler.Check {
 			handler.NewColumn(SAMLCertificateCol, handler.ColumnTypeBytes),
 			handler.NewColumn(SAMLBindingCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(SAMLWithSignedRequestCol, handler.ColumnTypeBool, handler.Nullable()),
+			handler.NewColumn(SAMLSignatureAlgorithmCol, handler.ColumnTypeText, handler.Default("")),
 			handler.NewColumn(SAMLNameIDFormatCol, handler.ColumnTypeEnum, handler.Nullable()),
 			handler.NewColumn(SAMLTransientMappingAttributeName, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(SAMLFederatedLogoutEnabled, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(SAMLInstanceIDCol, SAMLIDCol),
 			IDPTemplateSAMLSuffix,
@@ -1989,7 +1993,9 @@ func (p *idpTemplateProjection) reduceSAMLIDPAdded(event eventstore.Event) (*han
 		handler.NewCol(SAMLCertificateCol, idpEvent.Certificate),
 		handler.NewCol(SAMLBindingCol, idpEvent.Binding),
 		handler.NewCol(SAMLWithSignedRequestCol, idpEvent.WithSignedRequest),
+		handler.NewCol(SAMLSignatureAlgorithmCol, idpEvent.SignatureAlgorithm),
 		handler.NewCol(SAMLTransientMappingAttributeName, idpEvent.TransientMappingAttributeName),
+		handler.NewCol(SAMLFederatedLogoutEnabled, idpEvent.FederatedLogoutEnabled),
 	}
 	if idpEvent.NameIDFormat != nil {
 		columns = append(columns, handler.NewCol(SAMLNameIDFormatCol, *idpEvent.NameIDFormat))
@@ -2519,11 +2525,17 @@ func reduceSAMLIDPChangedColumns(idpEvent idp.SAMLIDPChangedEvent) []handler.Col
 	if idpEvent.WithSignedRequest != nil {
 		SAMLCols = append(SAMLCols, handler.NewCol(SAMLWithSignedRequestCol, *idpEvent.WithSignedRequest))
 	}
+	if idpEvent.SignatureAlgorithm != nil {
+		SAMLCols = append(SAMLCols, handler.NewCol(SAMLSignatureAlgorithmCol, *idpEvent.SignatureAlgorithm))
+	}
 	if idpEvent.NameIDFormat != nil {
 		SAMLCols = append(SAMLCols, handler.NewCol(SAMLNameIDFormatCol, *idpEvent.NameIDFormat))
 	}
 	if idpEvent.TransientMappingAttributeName != nil {
 		SAMLCols = append(SAMLCols, handler.NewCol(SAMLTransientMappingAttributeName, *idpEvent.TransientMappingAttributeName))
+	}
+	if idpEvent.FederatedLogoutEnabled != nil {
+		SAMLCols = append(SAMLCols, handler.NewCol(SAMLFederatedLogoutEnabled, *idpEvent.FederatedLogoutEnabled))
 	}
 	return SAMLCols
 }

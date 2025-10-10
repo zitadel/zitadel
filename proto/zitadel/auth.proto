@@ -859,6 +859,11 @@ service AuthService {
         };
     }
 
+    // List My Authorizations / User Grants
+    //
+    // Deprecated: [List authorizations](apis/resources/authorization_service_v2/zitadel-authorization-v-2-beta-authorization-service-list-authorizations.api.mdx) and pass the user ID filter with your users ID to search for your authorizations on granted and owned projects.
+    //
+    // Returns a list of the authorizations/user grants the authenticated user has. User grants consist of an organization, a project and 1-n roles.
     rpc ListMyUserGrants(ListMyUserGrantsRequest) returns (ListMyUserGrantsResponse) {
         option (google.api.http) = {
             post: "/usergrants/me/_search"
@@ -869,9 +874,8 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Authorizations/Grants"
-            summary: "List My Authorizations/Grants";
-            description: "Returns a list of the authorizations/user grants the authenticated user has. User grants consist of an organization, a project and 1-n roles."
+            tags: "User Authorizations/Grants";
+            deprecated: true;
         };
     }
 
@@ -908,6 +912,11 @@ service AuthService {
         };
     }
 
+    // List My Project Roles
+    //
+    // Deprecated: [List authorizations](apis/resources/authorization_service_v2/zitadel-authorization-v-2-beta-authorization-service-list-authorizations.api.mdx) and pass the user ID filter with your users ID and the project ID filter to search for your authorizations on a granted and an owned project.
+    //
+    // Returns a list of roles for the authenticated user and for the requesting project.
     rpc ListMyProjectPermissions(ListMyProjectPermissionsRequest) returns (ListMyProjectPermissionsResponse) {
         option (google.api.http) = {
             post: "/permissions/me/_search"
@@ -919,8 +928,7 @@ service AuthService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authorizations/Grants"
-            summary: "List My Project Roles";
-            description: "Returns a list of roles for the authenticated user and for the requesting project (based on the token)."
+            deprecated: true;
         };
     }
 

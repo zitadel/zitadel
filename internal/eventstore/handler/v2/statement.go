@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -9,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 	"golang.org/x/exp/constraints"
 
@@ -49,10 +51,10 @@ func (h *Handler) eventsToStatements(tx *sql.Tx, events []eventstore.Event, curr
 			if shouldContinue := h.handleFailedStmt(tx, failureFromEvent(event, err)); shouldContinue {
 				continue
 			}
-			return statements, err
+			return statements, &executionError{err}
 		}
 		offset++
-		if previousPosition != event.Position() {
+		if !previousPosition.Equal(event.Position()) {
 			// offset is 1 because we want to skip this event
 			offset = 1
 		}
@@ -82,7 +84,7 @@ func (h *Handler) reduce(event eventstore.Event) (*Statement, error) {
 type Statement struct {
 	Aggregate    *eventstore.Aggregate
 	Sequence     uint64
-	Position     float64
+	Position     decimal.Decimal
 	CreationDate time.Time
 
 	offset uint32
@@ -90,7 +92,7 @@ type Statement struct {
 	Execute Exec
 }
 
-type Exec func(ex Executer, projectionName string) error
+type Exec func(ctx context.Context, ex Executer, projectionName string) error
 
 func WithTableSuffix(name string) func(*execConfig) {
 	return func(o *execConfig) {
@@ -669,7 +671,7 @@ type execConfig struct {
 type query func(config execConfig) string
 
 func exec(config execConfig, q query, opts []execOption) Exec {
-	return func(ex Executer, projectionName string) (err error) {
+	return func(ctx context.Context, ex Executer, projectionName string) (err error) {
 		if projectionName == "" {
 			return ErrNoProjection
 		}
@@ -693,12 +695,12 @@ func exec(config execConfig, q query, opts []execOption) Exec {
 }
 
 func multiExec(execList []Exec) Exec {
-	return func(ex Executer, projectionName string) error {
+	return func(ctx context.Context, ex Executer, projectionName string) error {
 		for _, exec := range execList {
 			if exec == nil {
 				continue
 			}
-			if err := exec(ex, projectionName); err != nil {
+			if err := exec(ctx, ex, projectionName); err != nil {
 				return err
 			}
 		}

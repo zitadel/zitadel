@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	httphelper "github.com/zitadel/oidc/v3/pkg/http"
@@ -36,7 +37,7 @@ func NewSession(provider *Provider, code string, idpArguments map[string]any) *S
 }
 
 // GetAuth implements the [idp.Session] interface.
-func (s *Session) GetAuth(ctx context.Context) (string, bool) {
+func (s *Session) GetAuth(ctx context.Context) (idp.Auth, error) {
 	return idp.Redirect(s.AuthURL)
 }
 
@@ -67,6 +68,13 @@ func (s *Session) FetchUser(ctx context.Context) (_ idp.User, err error) {
 		return nil, err
 	}
 	return user, nil
+}
+
+func (s *Session) ExpiresAt() time.Time {
+	if s.Tokens == nil {
+		return time.Time{}
+	}
+	return s.Tokens.Expiry
 }
 
 func (s *Session) authorize(ctx context.Context) (err error) {

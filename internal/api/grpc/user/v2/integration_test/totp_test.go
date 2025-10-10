@@ -20,12 +20,12 @@ import (
 func TestServer_RegisterTOTP(t *testing.T) {
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	Instance.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, userID)
 	ctx := integration.WithAuthorizationToken(CTX, sessionToken)
 
 	otherUser := Instance.CreateHumanUser(CTX).GetUserId()
 	Instance.RegisterUserPasskey(CTX, otherUser)
-	_, sessionTokenOtherUser, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
+	_, sessionTokenOtherUser, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, otherUser)
 	ctxOtherUser := integration.WithAuthorizationToken(CTX, sessionTokenOtherUser)
 
 	type args struct {
@@ -106,7 +106,7 @@ func TestServer_RegisterTOTP(t *testing.T) {
 func TestServer_VerifyTOTPRegistration(t *testing.T) {
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	Instance.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, userID)
 	ctx := integration.WithAuthorizationToken(CTX, sessionToken)
 
 	reg, err := Client.RegisterTOTP(ctx, &user.RegisterTOTPRequest{
@@ -118,7 +118,7 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 
 	otherUser := Instance.CreateHumanUser(CTX).GetUserId()
 	Instance.RegisterUserPasskey(CTX, otherUser)
-	_, sessionTokenOtherUser, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
+	_, sessionTokenOtherUser, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, otherUser)
 	ctxOtherUser := integration.WithAuthorizationToken(CTX, sessionTokenOtherUser)
 
 	regOtherUser, err := Client.RegisterTOTP(CTX, &user.RegisterTOTPRequest{
@@ -209,11 +209,11 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 func TestServer_RemoveTOTP(t *testing.T) {
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	Instance.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, userID)
 
 	userVerified := Instance.CreateHumanUser(CTX)
 	Instance.RegisterUserPasskey(CTX, userVerified.GetUserId())
-	_, sessionTokenVerified, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userVerified.GetUserId())
+	_, sessionTokenVerified, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, userVerified.GetUserId())
 	userVerifiedCtx := integration.WithAuthorizationToken(context.Background(), sessionTokenVerified)
 	_, err := Instance.Client.UserV2.VerifyPhone(userVerifiedCtx, &user.VerifyPhoneRequest{
 		UserId:           userVerified.GetUserId(),

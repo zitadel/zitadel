@@ -11,6 +11,7 @@ import { CorrectlyTypedExecution } from '../../actions-two-add-action/actions-tw
   templateUrl: './actions-two-actions-table.component.html',
   styleUrls: ['./actions-two-actions-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ActionsTwoActionsTableComponent {
   @Output()
@@ -55,13 +56,9 @@ export class ActionsTwoActionsTableComponent {
       }
 
       return executions.map((execution) => {
-        const mappedTargets = execution.targets.map((target) => {
-          const targetType = targetsMap.get(target);
-          if (!targetType) {
-            throw new Error(`Target with id ${target} not found`);
-          }
-          return targetType;
-        });
+        const mappedTargets = execution.targets
+          .map((target) => targetsMap.get(target))
+          .filter((target): target is NonNullable<typeof target> => !!target);
         return { execution, mappedTargets };
       });
     });

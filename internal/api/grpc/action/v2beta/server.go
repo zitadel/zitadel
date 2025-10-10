@@ -1,7 +1,10 @@
 package action
 
 import (
-	"google.golang.org/grpc"
+	"net/http"
+
+	"connectrpc.com/connect"
+	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
@@ -9,12 +12,12 @@ import (
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/query"
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/action/v2beta/actionconnect"
 )
 
-var _ action.ActionServiceServer = (*Server)(nil)
+var _ actionconnect.ActionServiceHandler = (*Server)(nil)
 
 type Server struct {
-	action.UnimplementedActionServiceServer
 	systemDefaults      systemdefaults.SystemDefaults
 	command             *command.Commands
 	query               *query.Queries
@@ -43,8 +46,12 @@ func CreateServer(
 	}
 }
 
-func (s *Server) RegisterServer(grpcServer *grpc.Server) {
-	action.RegisterActionServiceServer(grpcServer, s)
+func (s *Server) RegisterConnectServer(interceptors ...connect.Interceptor) (string, http.Handler) {
+	return actionconnect.NewActionServiceHandler(s, connect.WithInterceptors(interceptors...))
+}
+
+func (s *Server) FileDescriptor() protoreflect.FileDescriptor {
+	return action.File_zitadel_action_v2beta_action_service_proto
 }
 
 func (s *Server) AppName() string {

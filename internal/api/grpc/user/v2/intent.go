@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"time"
 
+	"connectrpc.com/connect"
 	oidc_pkg "github.com/zitadel/oidc/v3/pkg/oidc"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -31,18 +33,18 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func (s *Server) StartIdentityProviderIntent(ctx context.Context, req *user.StartIdentityProviderIntentRequest) (_ *user.StartIdentityProviderIntentResponse, err error) {
-	switch t := req.GetContent().(type) {
+func (s *Server) StartIdentityProviderIntent(ctx context.Context, req *connect.Request[user.StartIdentityProviderIntentRequest]) (_ *connect.Response[user.StartIdentityProviderIntentResponse], err error) {
+	switch t := req.Msg.GetContent().(type) {
 	case *user.StartIdentityProviderIntentRequest_Urls:
-		return s.startIDPIntent(ctx, req.GetIdpId(), t.Urls)
+		return s.startIDPIntent(ctx, req.Msg.GetIdpId(), t.Urls)
 	case *user.StartIdentityProviderIntentRequest_Ldap:
-		return s.startLDAPIntent(ctx, req.GetIdpId(), t.Ldap)
+		return s.startLDAPIntent(ctx, req.Msg.GetIdpId(), t.Ldap)
 	default:
 		return nil, zerrors.ThrowUnimplementedf(nil, "USERv2-S2g21", "type oneOf %T in method StartIdentityProviderIntent not implemented", t)
 	}
 }
 
-func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.RedirectURLs) (*user.StartIdentityProviderIntentResponse, error) {
+func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.RedirectURLs) (*connect.Response[user.StartIdentityProviderIntentResponse], error) {
 	state, session, err := s.command.AuthFromProvider(ctx, idpID, s.idpCallback(ctx), s.samlRootURL(ctx, idpID))
 	if err != nil {
 		return nil, err
@@ -51,38 +53,47 @@ func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.Re
 	if err != nil {
 		return nil, err
 	}
-	content, redirect := session.GetAuth(ctx)
-	if redirect {
-		return &user.StartIdentityProviderIntentResponse{
-			Details:  object.DomainToDetailsPb(details),
-			NextStep: &user.StartIdentityProviderIntentResponse_AuthUrl{AuthUrl: content},
-		}, nil
+	auth, err := session.GetAuth(ctx)
+	if err != nil {
+		return nil, err
 	}
-	return &user.StartIdentityProviderIntentResponse{
-		Details: object.DomainToDetailsPb(details),
-		NextStep: &user.StartIdentityProviderIntentResponse_PostForm{
-			PostForm: []byte(content),
-		},
-	}, nil
+	switch a := auth.(type) {
+	case *idp.RedirectAuth:
+		return connect.NewResponse(&user.StartIdentityProviderIntentResponse{
+			Details:  object.DomainToDetailsPb(details),
+			NextStep: &user.StartIdentityProviderIntentResponse_AuthUrl{AuthUrl: a.RedirectURL},
+		}), nil
+	case *idp.FormAuth:
+		return connect.NewResponse(&user.StartIdentityProviderIntentResponse{
+			Details: object.DomainToDetailsPb(details),
+			NextStep: &user.StartIdentityProviderIntentResponse_FormData{
+				FormData: &user.FormData{
+					Url:    a.URL,
+					Fields: a.Fields,
+				},
+			},
+		}), nil
+	}
+	return nil, zerrors.ThrowInvalidArgumentf(nil, "USERv2-3g2j3", "type oneOf %T in method StartIdentityProviderIntent not implemented", auth)
 }
 
-func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*user.StartIdentityProviderIntentResponse, error) {
+func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*connect.Response[user.StartIdentityProviderIntentResponse], error) {
 	intentWriteModel, details, err := s.command.CreateIntent(ctx, "", idpID, "", "", authz.GetInstance(ctx).InstanceID(), nil)
 	if err != nil {
 		return nil, err
 	}
-	externalUser, userID, attributes, err := s.ldapLogin(ctx, intentWriteModel.IDPID, ldapCredentials.GetUsername(), ldapCredentials.GetPassword())
+	externalUser, userID, session, err := s.ldapLogin(ctx, intentWriteModel.IDPID, ldapCredentials.GetUsername(), ldapCredentials.GetPassword())
 	if err != nil {
 		if err := s.command.FailIDPIntent(ctx, intentWriteModel, err.Error()); err != nil {
 			return nil, err
 		}
 		return nil, err
 	}
-	token, err := s.command.SucceedLDAPIDPIntent(ctx, intentWriteModel, externalUser, userID, attributes)
+	token, err := s.command.SucceedLDAPIDPIntent(ctx, intentWriteModel, externalUser, userID, session)
 	if err != nil {
 		return nil, err
 	}
-	return &user.StartIdentityProviderIntentResponse{
+	return connect.NewResponse(&user.StartIdentityProviderIntentResponse{
 		Details: object.DomainToDetailsPb(details),
 		NextStep: &user.StartIdentityProviderIntentResponse_IdpIntent{
 			IdpIntent: &user.IDPIntent{
@@ -91,7 +102,7 @@ func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredenti
 				UserId:         userID,
 			},
 		},
-	}, nil
+	}), nil
 }
 
 func (s *Server) checkLinkedExternalUser(ctx context.Context, idpID, externalUserID string) (string, error) {
@@ -116,7 +127,7 @@ func (s *Server) checkLinkedExternalUser(ctx context.Context, idpID, externalUse
 	return "", nil
 }
 
-func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string) (idp.User, string, map[string][]string, error) {
+func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string) (idp.User, string, *ldap.Session, error) {
 	provider, err := s.command.GetProvider(ctx, idpID, "", "")
 	if err != nil {
 		return nil, "", nil, err
@@ -137,24 +148,22 @@ func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string
 	if err != nil {
 		return nil, "", nil, err
 	}
-
-	attributes := make(map[string][]string, 0)
-	for _, item := range session.Entry.Attributes {
-		attributes[item.Name] = item.Values
-	}
-	return externalUser, userID, attributes, nil
+	return externalUser, userID, session, nil
 }
 
-func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.RetrieveIdentityProviderIntentRequest) (_ *user.RetrieveIdentityProviderIntentResponse, err error) {
-	intent, err := s.command.GetIntentWriteModel(ctx, req.GetIdpIntentId(), "")
+func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *connect.Request[user.RetrieveIdentityProviderIntentRequest]) (_ *connect.Response[user.RetrieveIdentityProviderIntentResponse], err error) {
+	intent, err := s.command.GetIntentWriteModel(ctx, req.Msg.GetIdpIntentId(), "")
 	if err != nil {
 		return nil, err
 	}
-	if err := s.checkIntentToken(req.GetIdpIntentToken(), intent.AggregateID); err != nil {
+	if err := s.checkIntentToken(req.Msg.GetIdpIntentToken(), intent.AggregateID); err != nil {
 		return nil, err
 	}
 	if intent.State != domain.IDPIntentStateSucceeded {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-nme4gszsvx", "Errors.Intent.NotSucceeded")
+	}
+	if time.Now().After(intent.ExpiresAt()) {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-SAf42", "Errors.Intent.Expired")
 	}
 	idpIntent, err := idpIntentToIDPIntentPb(intent, s.idpAlg)
 	if err != nil {
@@ -168,21 +177,21 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.R
 		var idpUser idp.User
 		switch p := provider.(type) {
 		case *apple.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &apple.User{})
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, apple.InitUser())
 		case *oauth.Provider:
 			idpUser, err = unmarshalRawIdpUser(intent.IDPUser, p.User())
 		case *oidc.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &oidc.User{UserInfo: &oidc_pkg.UserInfo{}})
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, oidc.InitUser())
 		case *jwt.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &jwt.User{})
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, jwt.InitUser())
 		case *azuread.Provider:
-			idpUser, err = unmarshalRawIdpUser(intent.IDPUser, p.User())
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, p.User())
 		case *github.Provider:
 			idpUser, err = unmarshalIdpUser(intent.IDPUser, &github.User{})
 		case *gitlab.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &oidc.User{UserInfo: &oidc_pkg.UserInfo{}})
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, oidc.InitUser())
 		case *google.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &oidc.User{UserInfo: &oidc_pkg.UserInfo{}})
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, google.InitUser())
 		case *saml.Provider:
 			idpUser, err = unmarshalIdpUser(intent.IDPUser, &saml.UserMapper{})
 		case *ldap.Provider:
@@ -195,7 +204,7 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.R
 		}
 		idpIntent.AddHumanUser = idpUserToAddHumanUser(idpUser, idpIntent.IdpInformation.IdpId)
 	}
-	return idpIntent, nil
+	return connect.NewResponse(idpIntent), nil
 }
 
 type rawUserMapper struct {

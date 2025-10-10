@@ -65,6 +65,7 @@ const MAX_ALLOWED_SIZE = 1 * 1024 * 1024;
   selector: 'cnsl-app-detail',
   templateUrl: './app-detail.component.html',
   styleUrls: ['./app-detail.component.scss'],
+  standalone: false,
 })
 export class AppDetailComponent implements OnInit, OnDestroy {
   public editState: boolean = false;
@@ -423,6 +424,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
               if (allowed) {
                 this.oidcForm.enable();
+                this.oidcForm.controls['clientId'].disable();
                 this.oidcTokenForm.enable();
                 this.apiForm.enable();
                 this.samlForm.enable();

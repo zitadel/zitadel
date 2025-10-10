@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	_ "embed"
-	"fmt"
 	"regexp"
 	"testing"
 	"time"
@@ -22,9 +21,7 @@ import (
 )
 
 func TestQueries_AuthRequestByID(t *testing.T) {
-	expQuery := regexp.QuoteMeta(fmt.Sprintf(
-		authRequestByIDQuery,
-	))
+	expQuery := regexp.QuoteMeta(authRequestByIDQuery)
 
 	cols := []string{
 		projection.AuthRequestColumnID,

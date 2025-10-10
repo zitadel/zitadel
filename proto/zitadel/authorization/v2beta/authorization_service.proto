@@ -1,0 +1,456 @@
+syntax = "proto3";
+
+package zitadel.authorization.v2beta;
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "google/api/annotations.proto";
+
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+import "zitadel/authorization/v2beta/authorization.proto";
+import "zitadel/filter/v2beta/filter.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta;authorization";
+
+// AuthorizationService provides methods to manage authorizations for users within your projects and applications.
+//
+// For managing permissions and roles for ZITADEL internal resources, like organizations, projects,
+// users, etc., please use the InternalPermissionService.
+service AuthorizationService {
+
+  // List Authorizations
+  //
+  // ListAuthorizations returns all authorizations matching the request and necessary permissions.
+  //
+  // Required permissions:
+  //   - "user.grant.read"
+  //   - no permissions required for listing own authorizations
+  rpc ListAuthorizations(ListAuthorizationsRequest) returns (ListAuthorizationsResponse) {
+    option (google.api.http) = {
+      // The only reason why it is used here is to avoid a conflict with the ListUsers endpoint, which already handles POST /v2/users.
+      post: "/v2beta/authorizations/search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all authorizations matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+        };
+      };
+    };
+  }
+
+  // Create Authorization
+  //
+  // CreateAuthorization creates a new authorization for a user in an owned or granted project.
+  //
+  // Required permissions:
+  //   - "user.grant.write"
+  rpc CreateAuthorization(CreateAuthorizationRequest) returns (CreateAuthorizationResponse) {
+    option (google.api.http) = {
+      post: "/v2beta/authorizations"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The newly created authorization";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid create request";
+        };
+      };
+      responses: {
+        key: "409"
+        value: {
+          description: "The authorization already exists.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      };
+    };
+  }
+
+  // Update Authorization
+  //
+  // UpdateAuthorization updates the authorization.
+  //
+  // Note that any role keys previously granted to the user and not present in the request will be revoked.
+  //
+  // Required permissions:
+  //   - "user.grant.write"
+  rpc UpdateAuthorization(UpdateAuthorizationRequest) returns (UpdateAuthorizationResponse) {
+    option (google.api.http) = {
+      patch: "/v2beta/authorizations/{id}"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "OK";
+        };
+      };
+      responses: {
+        key: "404";
+        value: {
+          description: "Authorization or one of the roles do not exist.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      }
+    };
+  }
+
+  // Delete Authorization
+  //
+  // DeleteAuthorization deletes the authorization.
+  //
+  // In case the authorization is not found, the request will return a successful response as
+  // the desired state is already achieved.
+  // You can check the deletion date in the response to verify if the authorization was deleted by the request.
+  //
+  // Required permissions:
+  //   - "user.grant.delete"
+  rpc DeleteAuthorization(DeleteAuthorizationRequest) returns (DeleteAuthorizationResponse) {
+    option (google.api.http) = {
+      delete: "/v2beta/authorizations/{id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The authorization was deleted successfully.";
+        };
+      };
+      responses: {
+        key: "404";
+        value: {
+          description: "Authorization not found.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
+      };
+    };
+  }
+
+  // Activate Authorization
+  //
+  // ActivateAuthorization activates an existing but inactive authorization.
+  //
+  // In case the authorization is already active, the request will return a successful response as
+  // the desired state is already achieved.
+  // You can check the change date in the response to verify if the authorization was activated by the request.
+  //
+  // Required permissions:
+  //   - "user.grant.write"
+  rpc ActivateAuthorization(ActivateAuthorizationRequest) returns (ActivateAuthorizationResponse) {
+    option (google.api.http) = {
+      post: "/v2beta/authorizations/{id}/activate"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The authorization was activated successfully.";
+        };
+      };
+      responses: {
+        key: "404";
+        value: {
+          description: "Authorization not found.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
+      };
+    };
+  }
+
+  // Deactivate Authorization
+  //
+  // DeactivateAuthorization deactivates an existing and active authorization.
+  //
+  // In case the authorization is already inactive, the request will return a successful response as
+  // the desired state is already achieved.
+  // You can check the change date in the response to verify if the authorization was deactivated by the request.
+  //
+  // Required permissions:
+  //   - "user.grant.write"
+  rpc DeactivateAuthorization(DeactivateAuthorizationRequest) returns (DeactivateAuthorizationResponse) {
+    option (google.api.http) = {
+      post: "/v2beta/authorizations/{id}/deactivate"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The authorization was deactivated successfully.";
+        };
+      };
+      responses: {
+        key: "404";
+        value: {
+          description: "Authorization not found.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
+      };
+    };
+  }
+}
+
+message ListAuthorizationsRequest {
+  // Paginate through the results using a limit, offset and sorting.
+  optional zitadel.filter.v2beta.PaginationRequest pagination = 1;
+  // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
+  optional AuthorizationFieldName sorting_column = 2 [
+    (validate.rules).enum = {defined_only: true},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"AUTHORIZATION_FIELD_NAME_CREATED_DATE\""
+    }
+  ];
+  // Define the criteria to query for.
+  repeated AuthorizationsSearchFilter filters = 3;
+}
+
+message ListAuthorizationsResponse {
+  // Details contains the pagination information.
+  zitadel.filter.v2beta.PaginationResponse pagination = 1;
+  repeated Authorization authorizations = 2;
+}
+
+message CreateAuthorizationRequest {
+  // UserID is the ID of the user who should be granted the authorization.
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432345\"";
+    }
+  ];
+  // Project ID is the ID of the project the user should be authorized for.
+  string project_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432345\"";
+    }
+  ];
+  // OrganizationID is the ID of the organization on which the authorization should be created.
+  // The organization must either own the project or have a grant for the project.
+  // If omitted, the authorization is created on the projects organization.
+  optional string organization_id = 3 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"163840776835432345\"";
+    }
+  ];
+  // RoleKeys are the keys of the roles the user should be granted.
+  repeated string role_keys = 4 [
+    (validate.rules).repeated = {
+      unique: true
+      items: {
+        string: {
+          min_len: 1
+          max_len: 200
+        }
+      }
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "[\"user\",\"admin\"]";
+    }
+  ];
+}
+
+message CreateAuthorizationResponse {
+  // ID is the unique identifier of the newly created authorization.
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // CreationDate is the timestamp when the authorization was created.
+  google.protobuf.Timestamp creation_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message UpdateAuthorizationRequest {
+  // ID is the unique identifier of the authorization.
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432345\"";
+    }
+  ];
+  // RoleKeys are the keys of the roles the user should be granted.
+  // Note that any role keys previously granted to the user and not present in the list will be revoked.
+  repeated string role_keys = 2 [
+    (validate.rules).repeated = {
+      unique: true
+      items: {
+        string: {
+          min_len: 1
+          max_len: 200
+        }
+      }
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "[\"user\",\"admin\"]";
+    }
+  ];
+}
+
+message UpdateAuthorizationResponse {
+  // ChangeDate is the timestamp when the authorization was last updated.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+}
+
+message DeleteAuthorizationRequest {
+  // ID is the unique identifier of the authorization that should be deleted.
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432345\"";
+    }
+  ];
+}
+
+message DeleteAuthorizationResponse {
+  // DeletionDate is the timestamp when the authorization was deleted.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+}
+
+message ActivateAuthorizationRequest {
+  // ID is the unique identifier of the authorization that should be activated.
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432345\"";
+    }
+  ];
+}
+
+message ActivateAuthorizationResponse {
+  // ChangeDate is the last timestamp when the authorization was changed / activated.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+}
+
+message DeactivateAuthorizationRequest {
+  // ID is the unique identifier of the authorization that should be deactivated.
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432345\"";
+    }
+  ];
+}
+
+message DeactivateAuthorizationResponse {
+  // ChangeDate is the last timestamp when the authorization was changed / deactivated.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+}

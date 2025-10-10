@@ -8,6 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/zitadel/zitadel/internal/v2/database/mock"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -818,7 +820,7 @@ func Test_push(t *testing.T) {
 							[][]driver.Value{
 								{
 									time.Now(),
-									float64(123),
+									decimal.NewFromFloat(123).String(),
 								},
 							},
 						),
@@ -899,11 +901,11 @@ func Test_push(t *testing.T) {
 							[][]driver.Value{
 								{
 									time.Now(),
-									float64(123),
+									decimal.NewFromFloat(123).String(),
 								},
 								{
 									time.Now(),
-									float64(123.1),
+									decimal.NewFromFloat(123.1).String(),
 								},
 							},
 						),
@@ -984,11 +986,11 @@ func Test_push(t *testing.T) {
 							[][]driver.Value{
 								{
 									time.Now(),
-									float64(123),
+									decimal.NewFromFloat(123).String(),
 								},
 								{
 									time.Now(),
-									float64(123.1),
+									decimal.NewFromFloat(123.1).String(),
 								},
 							},
 						),
@@ -1044,7 +1046,7 @@ func Test_push(t *testing.T) {
 							[][]driver.Value{
 								{
 									time.Now(),
-									float64(123),
+									decimal.NewFromFloat(123).String(),
 								},
 							},
 						),
@@ -1099,7 +1101,7 @@ func Test_push(t *testing.T) {
 							[][]driver.Value{
 								{
 									time.Now(),
-									float64(123),
+									decimal.NewFromFloat(123).String(),
 								},
 							},
 						),
@@ -1181,11 +1183,11 @@ func Test_push(t *testing.T) {
 							[][]driver.Value{
 								{
 									time.Now(),
-									float64(123),
+									decimal.NewFromFloat(123).String(),
 								},
 								{
 									time.Now(),
-									float64(123.1),
+									decimal.NewFromFloat(123.1).String(),
 								},
 							},
 						),
@@ -1272,11 +1274,11 @@ func Test_push(t *testing.T) {
 							[][]driver.Value{
 								{
 									time.Now(),
-									float64(123),
+									decimal.NewFromFloat(123).String(),
 								},
 								{
 									time.Now(),
-									float64(123.1),
+									decimal.NewFromFloat(123.1).String(),
 								},
 							},
 						),

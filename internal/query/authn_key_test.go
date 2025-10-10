@@ -19,22 +19,26 @@ import (
 
 var (
 	prepareAuthNKeysStmt = `SELECT projections.authn_keys2.id,` +
+		` projections.authn_keys2.aggregate_id,` +
 		` projections.authn_keys2.creation_date,` +
 		` projections.authn_keys2.change_date,` +
 		` projections.authn_keys2.resource_owner,` +
 		` projections.authn_keys2.sequence,` +
 		` projections.authn_keys2.expiration,` +
 		` projections.authn_keys2.type,` +
+		` projections.authn_keys2.object_id,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.authn_keys2`
 	prepareAuthNKeysCols = []string{
 		"id",
+		"aggregate_id",
 		"creation_date",
 		"change_date",
 		"resource_owner",
 		"sequence",
 		"expiration",
 		"type",
+		"object_id",
 		"count",
 	}
 
@@ -120,12 +124,14 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"id",
+							"aggId",
 							testNow,
 							testNow,
 							"ro",
 							uint64(20211109),
 							testNow,
 							1,
+							"app1",
 						},
 					},
 				),
@@ -137,12 +143,14 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 				AuthNKeys: []*AuthNKey{
 					{
 						ID:            "id",
+						AggregateID:   "aggId",
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						ResourceOwner: "ro",
 						Sequence:      20211109,
 						Expiration:    testNow,
 						Type:          domain.AuthNKeyTypeJSON,
+						ApplicationID: "app1",
 					},
 				},
 			},
@@ -157,21 +165,25 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"id-1",
+							"aggId-1",
 							testNow,
 							testNow,
 							"ro",
 							uint64(20211109),
 							testNow,
 							1,
+							"app1",
 						},
 						{
 							"id-2",
+							"aggId-2",
 							testNow,
 							testNow,
 							"ro",
 							uint64(20211109),
 							testNow,
 							1,
+							"app1",
 						},
 					},
 				),
@@ -183,21 +195,25 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 				AuthNKeys: []*AuthNKey{
 					{
 						ID:            "id-1",
+						AggregateID:   "aggId-1",
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						ResourceOwner: "ro",
 						Sequence:      20211109,
 						Expiration:    testNow,
 						Type:          domain.AuthNKeyTypeJSON,
+						ApplicationID: "app1",
 					},
 					{
 						ID:            "id-2",
+						AggregateID:   "aggId-2",
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						ResourceOwner: "ro",
 						Sequence:      20211109,
 						Expiration:    testNow,
 						Type:          domain.AuthNKeyTypeJSON,
+						ApplicationID: "app1",
 					},
 				},
 			},
@@ -414,55 +430,6 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 				},
 			},
 			object: (*AuthNKey)(nil),
-		},
-		{
-			name:    "prepareAuthNKeyPublicKeyQuery no result",
-			prepare: prepareAuthNKeyPublicKeyQuery,
-			want: want{
-				sqlExpectations: mockQueriesScanErr(
-					regexp.QuoteMeta(prepareAuthNKeyPublicKeyStmt),
-					nil,
-					nil,
-				),
-				err: func(err error) (error, bool) {
-					if !zerrors.IsNotFound(err) {
-						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
-					}
-					return nil, true
-				},
-			},
-			object: ([]byte)(nil),
-		},
-		{
-			name:    "prepareAuthNKeyPublicKeyQuery found",
-			prepare: prepareAuthNKeyPublicKeyQuery,
-			want: want{
-				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(prepareAuthNKeyPublicKeyStmt),
-					prepareAuthNKeyPublicKeyCols,
-					[]driver.Value{
-						[]byte("publicKey"),
-					},
-				),
-			},
-			object: []byte("publicKey"),
-		},
-		{
-			name:    "prepareAuthNKeyPublicKeyQuery sql err",
-			prepare: prepareAuthNKeyPublicKeyQuery,
-			want: want{
-				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(prepareAuthNKeyPublicKeyStmt),
-					sql.ErrConnDone,
-				),
-				err: func(err error) (error, bool) {
-					if !errors.Is(err, sql.ErrConnDone) {
-						return fmt.Errorf("err should be sql.ErrConnDone got: %w", err), false
-					}
-					return nil, true
-				},
-			},
-			object: ([]byte)(nil),
 		},
 	}
 	for _, tt := range tests {

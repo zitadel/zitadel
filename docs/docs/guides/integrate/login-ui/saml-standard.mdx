@@ -37,7 +37,7 @@ https://login.example.com/saml/v2/SSO?SAMLRequest=nJLRa9swEMb%2FFXHvjmVTY0fUhqxh
 The SAML request includes all the relevant information for the SAML standard, which includes the RelayState, the used binding and other information.
 
 You now have to proxy the SAML request from your own UI to the SSO Endpoint of ZITADEL.
-For more information, see [OIDC Proxy](./typescript-repo#oidc-proxy) for the necessary headers.
+For more information, see [OIDC Proxy](./login-app#oidc-proxy) for the necessary headers.
 
 :::note
 The version and the optional custom URI for the available login UI is configurable under the application settings.
@@ -55,7 +55,7 @@ With the ID from the redirect before you will now be able to get the information
 
 ```bash
 curl --request GET \
-  --url https://$ZITADEL_DOMAIN/v2/saml/saml_requests/V2_224908753244265546 \
+  --url https://${CUSTOM_DOMAIN}/v2/saml/saml_requests/V2_224908753244265546 \
   --header 'Authorization: Bearer '"$TOKEN"''
 ```
 
@@ -77,7 +77,7 @@ Response Example:
 ### Perform Login
 
 After you have initialized the SAML flow you can implement the login.
-Implement all the steps you like the user to go trough by [creating](/docs/apis/resources/session_service_v2/session-service-create-session) and [updating](/docs/apis/resources/session_service/session-service-set-session) the user-session.
+Implement all the steps you like the user to go trough by [creating](/docs/apis/resources/session_service_v2/session-service-create-session) and [updating](/docs/apis/resources/session_service_v2/session-service-set-session) the user-session.
 
 Read the following resources for more information about the different checks:
 - [Username and Password](./username-password)
@@ -97,7 +97,7 @@ Read more about the [Finalize SAML Request Documentation](/docs/apis/resources/s
 Make sure that the authorization header is from an account which is permitted to finalize the SAML Request through the `IAM_LOGIN_CLIENT` role.
 ```bash
 curl --request POST \
-  --url $ZITADEL_DOMAIN/v2/saml/saml_requests/V2_224908753244265546 \
+  --url ${CUSTOM_DOMAIN}/v2/saml/saml_requests/V2_224908753244265546 \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \

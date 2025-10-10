@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	_ "embed"
-	"fmt"
 	"regexp"
 	"testing"
 
@@ -20,9 +19,7 @@ import (
 )
 
 func TestQueries_SamlRequestByID(t *testing.T) {
-	expQuery := regexp.QuoteMeta(fmt.Sprintf(
-		samlRequestByIDQuery,
-	))
+	expQuery := regexp.QuoteMeta(samlRequestByIDQuery)
 
 	cols := []string{
 		projection.SamlRequestColumnID,
