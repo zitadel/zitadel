@@ -37,7 +37,8 @@ type CommandOpts struct {
 
 	projectRepo ProjectRepository
 
-	instanceRepo InstanceRepository
+	instanceRepo       InstanceRepository
+	instanceDomainRepo InstanceDomainRepository
 }
 
 // Setters for tests
@@ -56,6 +57,10 @@ func (opts *CommandOpts) SetProjectRepo(repo ProjectRepository) {
 
 func (opts *CommandOpts) SetInstanceRepo(repo InstanceRepository) {
 	opts.instanceRepo = repo
+}
+
+func (opts *CommandOpts) SetInstanceDomainRepo(repo InstanceDomainRepository) {
+	opts.instanceDomainRepo = repo
 }
 
 type ensureTxOpts struct {
