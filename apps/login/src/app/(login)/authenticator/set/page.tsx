@@ -26,12 +26,10 @@ import { redirect } from "next/navigation";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("authenticator");
-  return { title: t('title')};
+  return { title: t("title") };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
   const { loginName, requestId, organization, sessionId } = searchParams;
@@ -59,8 +57,7 @@ export default async function Page(props: {
       userId,
     }).then((methods) => {
       return getUserByID({ serviceUrl, userId }).then((user) => {
-        const humanUser =
-          user.user?.type.case === "human" ? user.user?.type.value : undefined;
+        const humanUser = user.user?.type.case === "human" ? user.user?.type.value : undefined;
 
         return {
           factors: session?.factors,
@@ -73,10 +70,7 @@ export default async function Page(props: {
     });
   }
 
-  async function loadSessionByLoginname(
-    loginName?: string,
-    organization?: string,
-  ) {
+  async function loadSessionByLoginname(loginName?: string, organization?: string) {
     return loadMostRecentSession({
       serviceUrl,
       sessionParams: {
@@ -99,11 +93,7 @@ export default async function Page(props: {
     });
   }
 
-  if (
-    !sessionWithData ||
-    !sessionWithData.factors ||
-    !sessionWithData.factors.user
-  ) {
+  if (!sessionWithData || !sessionWithData.factors || !sessionWithData.factors.user) {
     return (
       <Alert>
         <Translated i18nKey="unknownContext" namespace="error" />
@@ -122,9 +112,7 @@ export default async function Page(props: {
   });
 
   // check if user was verified recently
-  const isUserVerified = await checkUserVerification(
-    sessionWithData.factors.user?.id,
-  );
+  const isUserVerified = await checkUserVerification(sessionWithData.factors.user?.id);
 
   if (!isUserVerified) {
     const params = new URLSearchParams({
@@ -138,10 +126,7 @@ export default async function Page(props: {
     }
 
     if (organization || sessionWithData.factors.user.organizationId) {
-      params.append(
-        "organization",
-        organization ?? (sessionWithData.factors.user.organizationId as string),
-      );
+      params.append("organization", organization ?? (sessionWithData.factors.user.organizationId as string));
     }
 
     redirect(`/verify?` + params);
@@ -210,6 +195,7 @@ export default async function Page(props: {
               requestId={requestId}
               organization={sessionWithData.factors?.user?.organizationId}
               linkOnly={true} // tell the callback function to just link the IDP and not login, to get an error when user is already available
+              postErrorRedirectUrl="/authenticator/set"
             ></SignInWithIdp>
           </>
         )}

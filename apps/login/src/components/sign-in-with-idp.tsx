@@ -2,10 +2,7 @@
 
 import { idpTypeToSlug } from "@/lib/idp";
 import { redirectToIdp } from "@/lib/server/idp";
-import {
-  IdentityProvider,
-  IdentityProviderType,
-} from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { IdentityProvider, IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { ReactNode, useActionState } from "react";
 import { Alert } from "./alert";
 import { SignInWithIdentityProviderProps } from "./idps/base-button";
@@ -23,6 +20,7 @@ export interface SignInWithIDPProps {
   requestId?: string;
   organization?: string;
   linkOnly?: boolean;
+  postErrorRedirectUrl?: string;
 }
 
 export function SignInWithIdp({
@@ -30,27 +28,21 @@ export function SignInWithIdp({
   requestId,
   organization,
   linkOnly,
+  postErrorRedirectUrl,
 }: Readonly<SignInWithIDPProps>) {
   const [state, action, _isPending] = useActionState(redirectToIdp, {});
 
   const renderIDPButton = (idp: IdentityProvider, index: number) => {
     const { id, name, type } = idp;
 
-    const components: Partial<
-      Record<
-        IdentityProviderType,
-        (props: SignInWithIdentityProviderProps) => ReactNode
-      >
-    > = {
+    const components: Partial<Record<IdentityProviderType, (props: SignInWithIdentityProviderProps) => ReactNode>> = {
       [IdentityProviderType.APPLE]: SignInWithApple,
       [IdentityProviderType.OAUTH]: SignInWithGeneric,
       [IdentityProviderType.OIDC]: SignInWithGeneric,
       [IdentityProviderType.GITHUB]: SignInWithGithub,
       [IdentityProviderType.GITHUB_ES]: SignInWithGithub,
       [IdentityProviderType.AZURE_AD]: SignInWithAzureAd,
-      [IdentityProviderType.GOOGLE]: (props) => (
-        <SignInWithGoogle {...props} e2e="google" />
-      ),
+      [IdentityProviderType.GOOGLE]: (props) => <SignInWithGoogle {...props} e2e="google" />,
       [IdentityProviderType.GITLAB]: SignInWithGitlab,
       [IdentityProviderType.GITLAB_SELF_HOSTED]: SignInWithGitlab,
       [IdentityProviderType.SAML]: SignInWithGeneric,
@@ -65,11 +57,8 @@ export function SignInWithIdp({
         <input type="hidden" name="provider" value={idpTypeToSlug(type)} />
         <input type="hidden" name="requestId" value={requestId} />
         <input type="hidden" name="organization" value={organization} />
-        <input
-          type="hidden"
-          name="linkOnly"
-          value={linkOnly ? "true" : "false"}
-        />
+        <input type="hidden" name="linkOnly" value={linkOnly ? "true" : "false"} />
+        {postErrorRedirectUrl && <input type="hidden" name="postErrorRedirectUrl" value={postErrorRedirectUrl} />}
         <Component key={id} name={name} />
       </form>
     ) : null;

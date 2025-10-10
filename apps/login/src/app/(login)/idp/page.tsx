@@ -9,12 +9,10 @@ import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("idp");
-  return { title: t('title')};
+  return { title: t("title") };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
   const requestId = searchParams?.requestId;
@@ -50,6 +48,7 @@ export default async function Page(props: {
             identityProviders={identityProviders}
             requestId={requestId}
             organization={organization}
+            postErrorRedirectUrl="/idp"
           ></SignInWithIdp>
         )}
       </div>
