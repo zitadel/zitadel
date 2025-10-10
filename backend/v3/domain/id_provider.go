@@ -296,6 +296,8 @@ type idProviderColumns interface {
 }
 
 type idProviderConditions interface {
+	// PrimaryKeyCondition returns a filter on the primary key fields.
+	PrimaryKeyCondition(instanceID, idpID string) database.Condition
 	InstanceIDCondition(id string) database.Condition
 	OrgIDCondition(id *string) database.Condition
 	IDCondition(id string) IDPIdentifierCondition
@@ -327,6 +329,8 @@ type idProviderChanges interface {
 }
 
 type IDProviderRepository interface {
+	Repository
+
 	idProviderColumns
 	idProviderConditions
 	idProviderChanges
