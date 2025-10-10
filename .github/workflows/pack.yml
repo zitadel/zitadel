@@ -26,9 +26,6 @@ on:
         description: 'base64 endcrypted key to connect to Google'
         required: true
 
-permissions:
-  packages: write
-
 env:
   default_labels: |
     org.opencontainers.image.documentation=https://zitadel.com/docs
