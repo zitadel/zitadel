@@ -8,6 +8,9 @@ on:
     types:
       - opened
 
+permissions:
+  issues: write
+
 jobs:
   add-to-project:
     name: Add issue and community pr to project
