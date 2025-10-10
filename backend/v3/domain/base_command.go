@@ -34,3 +34,7 @@ func (b *BaseCommand) TextOperationMapper(queryOperation object.TextQueryMethod)
 		return 0, zerrors.ThrowInvalidArgument(NewUnexpectedTextQueryOperationError(queryOperation), "DOM-iBRBVe", "List.Query.Invalid")
 	}
 }
+
+func (b *BaseCommand) Pagination(limit uint32, offset uint64) (limitOpt, offsetOpt database.QueryOption) {
+	return database.WithLimit(limit), database.WithOffset(uint32(offset))
+}

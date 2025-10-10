@@ -77,3 +77,49 @@ func TestBaseCommand_OperationMapper(t *testing.T) {
 		})
 	}
 }
+func TestBaseCommand_Pagination(t *testing.T) {
+	t.Parallel()
+	tt := []struct {
+		name           string
+		inputLimit     uint32
+		inputOffset    uint64
+		expectedLimit  uint32
+		expectedOffset uint32
+	}{
+		{
+			name: "when zero values should return empty options",
+		},
+		{
+			name:           "normal values",
+			inputLimit:     10,
+			inputOffset:    20,
+			expectedLimit:  10,
+			expectedOffset: 20,
+		},
+		{
+			name:           "large offset",
+			inputLimit:     5,
+			inputOffset:    1000000,
+			expectedLimit:  5,
+			expectedOffset: 1000000,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			// Given
+			t.Parallel()
+			b := &domain.BaseCommand{}
+			opts := &database.QueryOpts{}
+
+			// Test
+			limitOpt, offsetOpt := b.Pagination(tc.inputLimit, tc.inputOffset)
+			limitOpt(opts)
+			offsetOpt(opts)
+
+			// Verify
+			assert.Equal(t, tc.expectedLimit, opts.Limit)
+			assert.Equal(t, tc.expectedOffset, opts.Offset)
+		})
+	}
+}
