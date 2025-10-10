@@ -12,6 +12,9 @@ on:
       NX_CLOUD_ACCESS_TOKEN_READONLY:
         required: true
 
+permissions:
+  contents: read
+
 jobs:
   lint_test_build:
     name: Lint, Test and Build

@@ -29,6 +29,12 @@ on:
         description: 'GH App Private Key to request token for homebrew update'
         required: true
 
+permissions:
+  packages: write
+  contents: write
+  issues: write
+  pull-requests: write
+
 jobs:
   version:
     uses: ./.github/workflows/version.yml

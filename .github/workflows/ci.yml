@@ -13,12 +13,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: write
-  packages: write
-  issues: write
-  pull-requests: write
-  actions: write
+permissions: {}
 
 jobs:
   lint_test_build:
@@ -33,8 +28,6 @@ jobs:
     uses: ./.github/workflows/pack.yml
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
-    permissions:
-      packages: write
     if: ${{ github.event_name == 'workflow_dispatch' }}
     with:
       node_version: "22"
@@ -46,11 +39,6 @@ jobs:
 
   release:
     uses: ./.github/workflows/release.yml
-    permissions:
-      packages: write
-      contents: write
-      issues: write
-      pull-requests: write
     needs:
       - lint_test_build
       - pack
