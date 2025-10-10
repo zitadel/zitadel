@@ -157,7 +157,6 @@
             "description": "Runs the API server for the integration tests.",
             "continuous": true,
             "dependsOn": [
-                "test-integration-run-db",
                 "test-integration-build"
             ],
             "executor": "nx:run-commands",
