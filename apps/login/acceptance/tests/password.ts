@@ -1,11 +1,11 @@
 import { Page } from "@playwright/test";
-import { changePasswordScreen, passwordScreen, resetPasswordScreen } from "./password-screen";
+import { changePasswordScreen, passwordScreen, resetPasswordScreen } from "./password-screen.js";
 
 const passwordSubmitButton = "submit-button";
 const passwordResetButton = "reset-button";
 
 export async function startChangePassword(page: Page, loginname: string) {
-  await page.goto("./password/change?" + new URLSearchParams({ loginName: loginname }));
+  await page.goto("/ui/v2/login/password/change?" + new URLSearchParams({ loginName: loginname }));
 }
 
 export async function changePassword(page: Page, password: string) {

@@ -78,8 +78,7 @@ build/local/*.env
 /zitadel
 node_modules/
 .kreya
-login-client.pat
-admin.pat
+*.pat
 .env.*local
 
 go.work
