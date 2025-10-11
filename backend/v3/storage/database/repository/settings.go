@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -102,7 +103,7 @@ func (s settings) SetUpdatedAt(updatedAt *time.Time) database.Change {
 	return database.NewChangePtr(s.UpdatedAtColumn(), updatedAt)
 }
 
-const querySettingStmt = `SELECT instance_id, org_id, id, type, is_default, label_state, settings,` +
+const querySettingStmt = `SELECT instance_id, org_id, id, type, owner_type, label_state, settings,` +
 	` created_at, updated_at` +
 	` FROM zitadel.settings`
 
@@ -121,6 +122,7 @@ func (s *settings) Get(ctx context.Context, client database.QueryExecutor, insta
 	options.Write(&builder)
 	// writeCondition(&builder, database.And(cond...))
 
+	// fmt.Printf("[DEBUGPRINT] [settings.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> builder.String() = %+v\n", builder.String())
 	return scanSetting(ctx, client, &builder)
 }
 
@@ -143,6 +145,7 @@ func (s *settings) List(ctx context.Context, client database.QueryExecutor, opts
 
 	orderBy := database.OrderBy(s.CreatedAtColumn())
 	orderBy.Write(&builder)
+	fmt.Printf("[DEBUGPRINT] [settings_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> builder.String() = %+v\n", builder.String())
 
 	return scanSettings(ctx, client, &builder)
 }
@@ -214,7 +217,7 @@ func (s *settings) UpdateLabel(ctx context.Context, client database.QueryExecuto
 }
 
 const activatedLabelSettingStmt = `INSERT INTO zitadel.settings` +
-	` (instance_id, org_id, type, is_default, label_state, settings)` +
+	` (instance_id, org_id, type, owner_type, label_state, settings)` +
 	` VALUES ($1, $2, 'label', $3, 'activated', $4)` +
 	` ON CONFLICT (instance_id, org_id, type, label_state) WHERE type = 'label' DO UPDATE SET` +
 	` settings = EXCLUDED.settings` +
@@ -231,7 +234,7 @@ func (s *settings) ActivateLabelSetting(ctx context.Context, client database.Que
 	builder.AppendArgs(
 		setting.InstanceID,
 		setting.OrgID,
-		setting.IsDefault,
+		setting.OwnerType,
 		string(settingJSON))
 
 	builder.WriteString(activatedLabelSettingStmt)
@@ -444,7 +447,7 @@ func (s *settings) updateSetting(ctx context.Context, client database.QueryExecu
 }
 
 const eventCreateSettingStmt = `INSERT INTO zitadel.settings` +
-	` (instance_id, org_id, type, is_default, label_state, settings, created_at, updated_at)` +
+	` (instance_id, org_id, type, owner_type, label_state, settings, created_at, updated_at)` +
 	` VALUES ($1, $2, $3, $4, $5, $6, $7, $8)` +
 	` RETURNING id, created_at, updated_at`
 
@@ -455,7 +458,7 @@ func (s *settings) Create(ctx context.Context, client database.QueryExecutor, se
 		setting.InstanceID,
 		setting.OrgID,
 		setting.Type,
-		setting.IsDefault,
+		setting.OwnerType,
 		setting.LabelState,
 		string(setting.Settings),
 		setting.CreatedAt,
@@ -466,7 +469,7 @@ func (s *settings) Create(ctx context.Context, client database.QueryExecutor, se
 }
 
 const createSettingStmt = `INSERT INTO zitadel.settings` +
-	` (instance_id, org_id, type, is_default, label_state, settings)` +
+	` (instance_id, org_id, type, owner_type, label_state, settings)` +
 	` VALUES ($1, $2, $3, $4, $5, $6)` +
 	` RETURNING id, created_at, updated_at`
 
@@ -482,7 +485,7 @@ func (s *settings) createSetting(ctx context.Context, client database.QueryExecu
 		setting.InstanceID,
 		setting.OrgID,
 		setting.Type,
-		setting.IsDefault,
+		setting.OwnerType,
 		setting.LabelState,
 		string(settingJSON))
 

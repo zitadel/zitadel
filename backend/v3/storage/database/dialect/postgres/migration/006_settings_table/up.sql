@@ -14,12 +14,18 @@ CREATE TYPE zitadel.label_state AS ENUM (
     'activated'
 );
 
+CREATE TYPE zitadel.owner_type AS ENUM (
+    'system',
+    'instance',
+    'organization'
+);
+
 CREATE TABLE zitadel.settings (
     instance_id TEXT NOT NULL
     , org_id TEXT
     , id TEXT NOT NULL CHECK (id <> '') DEFAULT gen_random_uuid()
     , type zitadel.settings_type NOT NULL
-    , is_default BOOLEAN NOT NULL
+    , owner_type zitadel.owner_type NOT NULL
     , label_state zitadel.label_state DEFAULT NULL
     , settings JSONB -- the storage does not really care about what is configured so we store it as json
 

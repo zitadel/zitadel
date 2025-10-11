@@ -341,14 +341,14 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 func (s *settingsRelationalProjection) reduceLoginPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LoginPolicyAddedEvent
-	var isDefault bool
+	var ownerType domain.OwnerType
 	switch e := event.(type) {
 	case *instance.LoginPolicyAddedEvent:
 		policyEvent = e.LoginPolicyAddedEvent
-		isDefault = true
+		ownerType = domain.OwnerTypeInstance
 	case *org.LoginPolicyAddedEvent:
 		policyEvent = e.LoginPolicyAddedEvent
-		isDefault = false
+		ownerType = domain.OwnerTypeOrganization
 		orgId = &policyEvent.Aggregate().ResourceOwner
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YYPxS", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyAddedEventType, instance.LoginPolicyAddedEventType})
@@ -369,7 +369,7 @@ func (s *settingsRelationalProjection) reduceLoginPolicyAdded(event eventstore.E
 			InstanceID: policyEvent.Aggregate().InstanceID,
 			OrgID:      orgId,
 			Type:       domain.SettingTypeLogin,
-			IsDefault:  isDefault,
+			OwnerType:  ownerType,
 			Settings:   settingJSON,
 			CreatedAt:  policyEvent.CreationDate(),
 			UpdatedAt:  &policyEvent.Creation,
@@ -658,15 +658,15 @@ func (s *settingsRelationalProjection) reduceInstanceRemoved(event eventstore.Ev
 func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LabelPolicyAddedEvent
-	var isDefault bool
+	var ownerType domain.OwnerType
 	switch e := event.(type) {
 	case *org.LabelPolicyAddedEvent:
 		policyEvent = e.LabelPolicyAddedEvent
-		isDefault = false
+		ownerType = domain.OwnerTypeOrganization
 		orgId = &policyEvent.Aggregate().ResourceOwner
 	case *instance.LabelPolicyAddedEvent:
 		policyEvent = e.LabelPolicyAddedEvent
-		isDefault = true
+		ownerType = domain.OwnerTypeInstance
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-CSE7A", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyAddedEventType, instance.LabelPolicyAddedEventType})
 	}
@@ -686,7 +686,7 @@ func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) 
 		setting := domain.Setting{
 			InstanceID: policyEvent.Aggregate().InstanceID,
 			OrgID:      orgId,
-			IsDefault:  isDefault,
+			OwnerType:  ownerType,
 			Type:       domain.SettingTypeLabel,
 			LabelState: &labelStatePreview,
 			Settings:   settings,
@@ -1096,15 +1096,15 @@ func (p *settingsRelationalProjection) reduceFontRemoved(event eventstore.Event)
 func (p *settingsRelationalProjection) reducePassedComplexityAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.PasswordComplexityPolicyAddedEvent
-	var isDefault bool
+	var ownerType domain.OwnerType
 	switch e := event.(type) {
 	case *org.PasswordComplexityPolicyAddedEvent:
 		policyEvent = e.PasswordComplexityPolicyAddedEvent
-		isDefault = false
+		ownerType = domain.OwnerTypeOrganization
 		orgId = &policyEvent.Aggregate().ResourceOwner
 	case *instance.PasswordComplexityPolicyAddedEvent:
 		policyEvent = e.PasswordComplexityPolicyAddedEvent
-		isDefault = true
+		ownerType = domain.OwnerTypeInstance
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-KTHmJ", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordComplexityPolicyAddedEventType, instance.PasswordComplexityPolicyAddedEventType})
 	}
@@ -1124,7 +1124,7 @@ func (p *settingsRelationalProjection) reducePassedComplexityAdded(event eventst
 			InstanceID: policyEvent.Aggregate().InstanceID,
 			OrgID:      orgId,
 			Type:       domain.SettingTypePasswordComplexity,
-			IsDefault:  isDefault,
+			OwnerType:  ownerType,
 			Settings:   settingJSON,
 			CreatedAt:  policyEvent.CreationDate(),
 			UpdatedAt:  &policyEvent.Creation,
@@ -1207,15 +1207,15 @@ func (s *settingsRelationalProjection) reducePasswordComplexityRemoved(event eve
 func (p *settingsRelationalProjection) reducePasswordPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.PasswordAgePolicyAddedEvent
-	var isDefault bool
+	var ownerType domain.OwnerType
 	switch e := event.(type) {
 	case *org.PasswordAgePolicyAddedEvent:
 		policyEvent = e.PasswordAgePolicyAddedEvent
-		isDefault = false
+		ownerType = domain.OwnerTypeOrganization
 		orgId = &policyEvent.Aggregate().ResourceOwner
 	case *instance.PasswordAgePolicyAddedEvent:
 		policyEvent = e.PasswordAgePolicyAddedEvent
-		isDefault = true
+		ownerType = domain.OwnerTypeInstance
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-CJqF0", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordAgePolicyAddedEventType, instance.PasswordAgePolicyAddedEventType})
 	}
@@ -1235,7 +1235,7 @@ func (p *settingsRelationalProjection) reducePasswordPolicyAdded(event eventstor
 			InstanceID: policyEvent.Aggregate().InstanceID,
 			OrgID:      orgId,
 			Type:       domain.SettingTypePasswordExpiry,
-			IsDefault:  isDefault,
+			OwnerType:  ownerType,
 			Settings:   settings,
 			CreatedAt:  policyEvent.CreationDate(),
 			UpdatedAt:  &policyEvent.Creation,
@@ -1346,15 +1346,15 @@ func (s *settingsRelationalProjection) reduceOrgRemoved(event eventstore.Event) 
 func (p *settingsRelationalProjection) reduceLockoutPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LockoutPolicyAddedEvent
-	var isDefault bool
+	var ownerType domain.OwnerType
 	switch e := event.(type) {
 	case *org.LockoutPolicyAddedEvent:
 		policyEvent = e.LockoutPolicyAddedEvent
-		isDefault = false
+		ownerType = domain.OwnerTypeOrganization
 		orgId = &policyEvent.Aggregate().ResourceOwner
 	case *instance.LockoutPolicyAddedEvent:
 		policyEvent = e.LockoutPolicyAddedEvent
-		isDefault = true
+		ownerType = domain.OwnerTypeInstance
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-d8mZO", "reduce.wrong.event.type, %v", []eventstore.EventType{org.LockoutPolicyAddedEventType, instance.LockoutPolicyAddedEventType})
 	}
@@ -1374,7 +1374,7 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyAdded(event eventstore
 			InstanceID: policyEvent.Aggregate().InstanceID,
 			OrgID:      orgId,
 			Type:       domain.SettingTypeLockout,
-			IsDefault:  isDefault,
+			OwnerType:  ownerType,
 			Settings:   settings,
 			CreatedAt:  policyEvent.CreationDate(),
 			UpdatedAt:  &policyEvent.Creation,
@@ -1428,15 +1428,16 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyChanged(event eventsto
 func (p *settingsRelationalProjection) reduceDomainPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.DomainPolicyAddedEvent
-	var isDefault bool
+	var ownerType domain.OwnerType
 	switch e := event.(type) {
 	case *org.DomainPolicyAddedEvent:
 		policyEvent = e.DomainPolicyAddedEvent
-		isDefault = false
+		ownerType = domain.OwnerTypeOrganization
+		ownerType = domain.OwnerTypeOrganization
 		orgId = &policyEvent.Aggregate().ResourceOwner
 	case *instance.DomainPolicyAddedEvent:
 		policyEvent = e.DomainPolicyAddedEvent
-		isDefault = true
+		ownerType = domain.OwnerTypeInstance
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-8se7M", "reduce.wrong.event.type %v", []eventstore.EventType{org.DomainPolicyAddedEventType, instance.DomainPolicyAddedEventType})
 	}
@@ -1456,7 +1457,7 @@ func (p *settingsRelationalProjection) reduceDomainPolicyAdded(event eventstore.
 			InstanceID: policyEvent.Aggregate().InstanceID,
 			OrgID:      orgId,
 			Type:       domain.SettingTypeDomain,
-			IsDefault:  isDefault,
+			OwnerType:  ownerType,
 			Settings:   settingJSON,
 			CreatedAt:  policyEvent.CreationDate(),
 			UpdatedAt:  &policyEvent.Creation,

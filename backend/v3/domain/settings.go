@@ -24,12 +24,22 @@ const (
 	SettingTypeOrganization
 )
 
+//go:generate enumer -type OwnerType -transform snake -trimprefix OwnerType -sql
+type OwnerType uint8
+
+const (
+	OwnerTypeUnspecified OwnerType = iota
+	OwnerTypeSystem
+	OwnerTypeInstance
+	OwnerTypeOrganization
+)
+
 type Setting struct {
 	ID         string          `json:"id,omitempty" db:"id"`
 	InstanceID string          `json:"instanceId,omitempty" db:"instance_id"`
 	OrgID      *string         `json:"orgId,omitempty" db:"org_id"`
 	Type       SettingType     `json:"type,omitempty" db:"type"`
-	IsDefault  bool            `json:"isDefault,omitempty" db:"is_default"`
+	OwnerType  OwnerType       `json:"ownerType,omitempty" db:"owner_type"`
 	LabelState *LabelState     `json:"labelState,omitempty" db:"label_state"`
 	Settings   json.RawMessage `json:"settings,omitempty" db:"settings"`
 	CreatedAt  time.Time       `json:"createdAt,omitzero" db:"created_at"`
@@ -283,5 +293,5 @@ type SettingsRepository interface {
 type LoginRepository interface {
 	Create(ctx context.Context, client database.QueryExecutor, setting *LoginSetting) error
 	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*LoginSetting, error)
-	Update(ctx context.Context, client database.QueryExecutor, setting *LoginSetting, changes ...database.Change) (int64, error)
+	Set(ctx context.Context, client database.QueryExecutor, setting *LoginSetting, changes ...database.Change) (int64, error)
 }
