@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
@@ -48,6 +49,7 @@ func newUser(
 func (*User) Name() string {
 	return userTable
 }
+
 func (u *User) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
@@ -166,6 +168,7 @@ func (u *User) Reducers() []handler.AggregateReducer {
 
 //nolint:gocognit
 func (u *User) ProcessUser(event eventstore.Event) (_ *handler.Statement, err error) {
+	fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> EVENT")
 	// in case anything needs to be change here check if appendEvent function needs the change as well
 	switch event.Type() {
 	case user_repo.UserV1AddedType,

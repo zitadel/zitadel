@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/zitadel/logging"
@@ -200,6 +201,7 @@ func (c *Commands) ValidateOrgDomain(ctx context.Context, orgDomain *domain.OrgD
 		return nil, err
 	}
 	checkType, _ := domainWriteModel.ValidationType.CheckType()
+	fmt.Printf("[DEBUGPRINT] [users_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> validationCode = %+v\n", validationCode)
 	err = c.domainVerificationValidator(domainWriteModel.Domain, validationCode, validationCode, checkType)
 	orgAgg := OrgAggregateFromWriteModel(&domainWriteModel.WriteModel)
 	var events []eventstore.Command

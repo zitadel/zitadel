@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-const _UserStateName = "unspecifiedactiveinactivelockedsuspended"
+const _UserStateName = "initalactiveinactivelockedsuspended"
 
-var _UserStateIndex = [...]uint8{0, 11, 17, 25, 31, 40}
+var _UserStateIndex = [...]uint8{0, 6, 12, 20, 26, 35}
 
-const _UserStateLowerName = "unspecifiedactiveinactivelockedsuspended"
+const _UserStateLowerName = "initalactiveinactivelockedsuspended"
 
 func (i UserState) String() string {
 	if i >= UserState(len(_UserStateIndex)-1) {
@@ -25,34 +25,34 @@ func (i UserState) String() string {
 // Re-run the stringer command to generate them again.
 func _UserStateNoOp() {
 	var x [1]struct{}
-	_ = x[UserStateUnspecified-(0)]
+	_ = x[UserStateInital-(0)]
 	_ = x[UserStateActive-(1)]
 	_ = x[UserStateInactive-(2)]
 	_ = x[UserStateLocked-(3)]
 	_ = x[UserStateSuspended-(4)]
 }
 
-var _UserStateValues = []UserState{UserStateUnspecified, UserStateActive, UserStateInactive, UserStateLocked, UserStateSuspended}
+var _UserStateValues = []UserState{UserStateInital, UserStateActive, UserStateInactive, UserStateLocked, UserStateSuspended}
 
 var _UserStateNameToValueMap = map[string]UserState{
-	_UserStateName[0:11]:       UserStateUnspecified,
-	_UserStateLowerName[0:11]:  UserStateUnspecified,
-	_UserStateName[11:17]:      UserStateActive,
-	_UserStateLowerName[11:17]: UserStateActive,
-	_UserStateName[17:25]:      UserStateInactive,
-	_UserStateLowerName[17:25]: UserStateInactive,
-	_UserStateName[25:31]:      UserStateLocked,
-	_UserStateLowerName[25:31]: UserStateLocked,
-	_UserStateName[31:40]:      UserStateSuspended,
-	_UserStateLowerName[31:40]: UserStateSuspended,
+	_UserStateName[0:6]:        UserStateInital,
+	_UserStateLowerName[0:6]:   UserStateInital,
+	_UserStateName[6:12]:       UserStateActive,
+	_UserStateLowerName[6:12]:  UserStateActive,
+	_UserStateName[12:20]:      UserStateInactive,
+	_UserStateLowerName[12:20]: UserStateInactive,
+	_UserStateName[20:26]:      UserStateLocked,
+	_UserStateLowerName[20:26]: UserStateLocked,
+	_UserStateName[26:35]:      UserStateSuspended,
+	_UserStateLowerName[26:35]: UserStateSuspended,
 }
 
 var _UserStateNames = []string{
-	_UserStateName[0:11],
-	_UserStateName[11:17],
-	_UserStateName[17:25],
-	_UserStateName[25:31],
-	_UserStateName[31:40],
+	_UserStateName[0:6],
+	_UserStateName[6:12],
+	_UserStateName[12:20],
+	_UserStateName[20:26],
+	_UserStateName[26:35],
 }
 
 // UserStateString retrieves an enum value from the enum constants string name.

@@ -3,6 +3,7 @@ package projection
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -410,6 +411,7 @@ func (p *userProjection) reduceHumanRegistered(event eventstore.Event) (*handler
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xE53M", "reduce.wrong.event.type %s", user.HumanRegisteredType)
 	}
+	fmt.Println("[DEBUGPRINT] [users_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> HUMAN REGISTERED REDUCE ***")
 	passwordSet := crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""
 	return handler.NewMultiStatement(
 		e,
@@ -610,6 +612,7 @@ func (p *userProjection) reduceDomainClaimed(event eventstore.Event) (*handler.S
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ASwf3", "reduce.wrong.event.type %s", user.UserDomainClaimedType)
 	}
+	fmt.Println("[DEBUGPRINT] [users_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DOMAIN CLAIMED ****")
 
 	return handler.NewUpdateStatement(
 		e,

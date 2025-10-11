@@ -11,7 +11,7 @@ import (
 type UserState uint8
 
 const (
-	UserStateUnspecified UserState = iota
+	UserStateInital UserState = iota
 	UserStateActive
 	UserStateInactive
 	UserStateLocked
@@ -20,9 +20,9 @@ const (
 
 // user
 type User struct {
-	ID                string    `json:"id,omitempty" db:"id"`
 	InstanceID        string    `json:"instanceId,omitempty" db:"instance_id"`
 	OrgID             string    `json:"orgId,omitempty" db:"org_id"`
+	ID                string    `json:"id,omitempty" db:"id"`
 	Username          string    `json:"username,omitempty" db:"username"`
 	UsernameOrgUnique bool      `json:"usernameOrgUnique,omitempty" db:"username_org_unique"`
 	State             UserState `json:"state,omitempty" db:"state"`
@@ -61,7 +61,7 @@ type userChanges interface {
 	SetUsernameOrgUnique(op bool) database.Change
 	SetState(state UserState) database.Change
 	// SetCreatedAt(op database.NumberOperation, createdAt time.Time) database.Condition
-	// SetUpdatedAt(op database.NumberOperation, updatedAt time.Time) database.Condition
+	SetUpdatedAt(updatedAt time.Time) database.Change
 }
 
 // machine user
@@ -98,16 +98,18 @@ type MachineRepository interface {
 // human user
 type Human struct {
 	User
-	HumanContact
+	HumanEmailContact HumanContact  `db:"email"`
+	HumanPhoneContact *HumanContact `db:"phone"`
+
 	HumanSecurity
 
-	FirstName         string `json:"firstName,omitempty" db:"first_name"`
-	LastName          string `json:"lastName,omitempty" db:"last_name"`
-	NickName          string `json:"nickName,omitempty" db:"nick_name"`
-	DisplayName       string `json:"displayName,omitempty" db:"display_name"`
-	PreferredLanguage string `json:"preferredLanguage,omitempty" db:"preferred_language"`
-	Gender            uint8  `json:"gender,omitempty" db:"gender"`
-	AvatarKey         string `json:"avataryKey,omitempty" db:"avatar_key"`
+	FirstName         string  `json:"firstName,omitempty" db:"first_name"`
+	LastName          string  `json:"lastName,omitempty" db:"last_name"`
+	NickName          string  `json:"nickName,omitempty" db:"nick_name"`
+	DisplayName       string  `json:"displayName,omitempty" db:"display_name"`
+	PreferredLanguage string  `json:"preferredLanguage,omitempty" db:"preferred_language"`
+	Gender            uint8   `json:"gender,omitempty" db:"gender"`
+	AvatarKey         *string `json:"avataryKey,omitempty" db:"avatar_key"`
 }
 
 type humanColumns interface {
@@ -162,10 +164,10 @@ type HumanContact struct {
 	// InstanceID      string      `json:"instanceId,omitempty" db:"instance_id"`
 	// OrgID           string      `json:"orgId,omitempty" db:"org_id"`
 	// UserId          string      `json:"userId,omitempty" db:"user_id"`
-	Type            ContactType `json:"type,omitempty" db:"type"`
-	Value           string      `json:"value,omitempty" db:"value"`
-	IsVerified      bool        `json:"isVerified,omitempty" db:"is_verified"`
-	UnverifiedValue string      `json:"unverifiedValue,omitempty" db:"unverified_value"`
+	Type            *ContactType `json:"type,omitempty" db:"type"`
+	Value           *string      `json:"value,omitempty" db:"value"`
+	IsVerified      *bool        `json:"isVerified,omitempty" db:"is_verified"`
+	UnverifiedValue *string      `json:"unverifiedValue,omitempty" db:"unverified_value"`
 }
 
 // human security
@@ -174,9 +176,9 @@ type HumanSecurity struct {
 	// OrgID      string `json:"orgId,omitempty" db:"org_id"`
 	// UserId     string `json:"userId,omitempty" db:"user_id"`
 
-	PasswordChangeRequired bool      `json:"passwordChangeRequired,omitempty" db:"password_change_required"`
-	PasswordChange         time.Time `json:"passwordChange,omitempty" db:"password_change"`
-	MFAInitSkipped         bool      `json:"mfaInitSkipped,omitempty" db:"mfa_init_skipped"`
+	PasswordChangeRequired bool       `json:"passwordChangeRequired,omitempty" db:"password_change_required"`
+	PasswordChange         *time.Time `json:"passwordChange,omitempty" db:"password_change"`
+	MFAInitSkipped         bool       `json:"mfaInitSkipped,omitempty" db:"mfa_init_skipped"`
 }
 
 type humanContactColumns interface {

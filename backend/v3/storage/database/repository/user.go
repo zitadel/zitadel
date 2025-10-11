@@ -283,6 +283,10 @@ func (m machine) SetDescription(description string) database.Change {
 	return database.NewChange(m.DescriptionColumn(), description)
 }
 
+func (m machine) SetUpdatedAt(updatedAt time.Time) database.Change {
+	return database.NewChange(m.UpdatedAtColumn(), updatedAt)
+}
+
 // human
 func (h human) SetUsername(username string) database.Change {
 	return database.NewChange(h.UsernameColumn(), username)
@@ -324,6 +328,10 @@ func (h human) SetAvatarKey(key string) database.Change {
 	return database.NewChange(h.AvatarKeyColumn(), key)
 }
 
+func (h human) SetUpdatedAt(updatedAt time.Time) database.Change {
+	return database.NewChange(h.UpdatedAtColumn(), updatedAt)
+}
+
 func (u user) Human() domain.HumanRepository {
 	return &human{}
 }
@@ -332,14 +340,56 @@ func (u user) Machine() domain.MachineRepository {
 	return &machine{}
 }
 
-// Create Human could have been done in one statement using CTE(s), but becuase a user may or may not email + phoen or just email, this would require more code to handle
+// Create Human could have been done in one statement using CTE(s), but because a user may or may not email + phone or just email, this would require more code to handle
 // place holder numbering, so I decided to use separate statements
+func (u user) CreateHuman(ctx context.Context, client database.QueryExecutor, user *domain.Human) (*domain.Human, error) {
+	// if user.HumanContact != nil {
+	// }
+	// if user.HumanSecurity != nil {
+	// }
+
+	user, err := u.createHuman(ctx, client, user)
+	if err != nil {
+		return nil, err
+	}
+
+	humanEmailContactCreateErrChann := make(chan error, 1)
+	go func() {
+		humanEmailContactCreateErrChann <- u.CreateHumanContact(ctx, client, user, &user.HumanEmailContact)
+	}()
+
+	var humanPhoneContactCreateErrChann chan error
+	if user.HumanPhoneContact != nil {
+		humanPhoneContactCreateErrChann = make(chan error, 1)
+		go func() {
+			humanPhoneContactCreateErrChann <- u.CreateHumanContact(ctx, client, user, user.HumanPhoneContact)
+		}()
+	}
+
+	err = u.CreateHumanSecurity(ctx, client, user)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := <-humanEmailContactCreateErrChann; err != nil {
+		return nil, err
+	}
+
+	if humanPhoneContactCreateErrChann != nil {
+		if err := <-humanPhoneContactCreateErrChann; err != nil {
+			return nil, err
+		}
+	}
+
+	return user, nil
+}
+
 const createHumaneStmt = `INSERT INTO zitadel.human_users (instance_id, org_id, id, username, username_org_unique, state,` +
 	` first_name, last_name, nick_name, display_name, preferred_language, gender, avatar_key)` +
 	` VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)` +
 	` RETURNING created_at, updated_at`
 
-func (u user) CreateHuman(ctx context.Context, client database.QueryExecutor, user *domain.Human) (*domain.Human, error) {
+func (u user) createHuman(ctx context.Context, client database.QueryExecutor, user *domain.Human) (*domain.Human, error) {
 	builder := database.StatementBuilder{}
 	builder.AppendArgs(user.User.InstanceID, user.User.OrgID, user.ID, user.Username, user.UsernameOrgUnique, user.State)
 	builder.AppendArgs(user.FirstName, user.LastName, user.NickName, user.DisplayName, user.PreferredLanguage, user.Gender, user.AvatarKey)
@@ -354,30 +404,32 @@ const createHumaneContactStmt = `INSERT INTO zitadel.human_contacts (instance_id
 	` type, value, is_verified, unverified_value)` +
 	` VALUES($1, $2, $3, $4, $5, $6, $7)`
 
-func (u user) CreateHumanContact(ctx context.Context, client database.QueryExecutor, user *domain.Human) (*domain.Human, error) {
+func (u user) CreateHumanContact(ctx context.Context, client database.QueryExecutor, user *domain.Human, contact *domain.HumanContact) error {
 	builder := database.StatementBuilder{}
 	builder.AppendArgs(user.User.InstanceID, user.User.OrgID, user.ID)
-	builder.AppendArgs(user.HumanContact.Type, user.HumanContact.Value, user.HumanContact.IsVerified, user.HumanContact.UnverifiedValue)
+	builder.AppendArgs(contact.Type, contact.Value, contact.IsVerified, contact.UnverifiedValue)
 
 	builder.WriteString(createHumaneContactStmt)
 
-	err := client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
-	return user, err
+	// return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
+	_, err := client.Exec(ctx, builder.String(), builder.Args()...)
+	return err
 }
 
-const createHumaneSecuirtyStmt = `INSERT INTO zitadel.human_secuirty (instance_id, org_id, user_id,` +
+const createHumaneSecuirtyStmt = `INSERT INTO zitadel.human_security (instance_id, org_id, user_id,` +
 	` password_change_required, password_changed, mfa_init_skipped)` +
 	` VALUES($1, $2, $3, $4, $5, $6)`
 
-func (u user) CreateHumanSecurity(ctx context.Context, client database.QueryExecutor, user *domain.Human) (*domain.Human, error) {
+func (u user) CreateHumanSecurity(ctx context.Context, client database.QueryExecutor, user *domain.Human) error {
 	builder := database.StatementBuilder{}
 	builder.AppendArgs(user.User.InstanceID, user.User.OrgID, user.ID)
 	builder.AppendArgs(user.HumanSecurity.PasswordChangeRequired, user.HumanSecurity.PasswordChange, user.HumanSecurity.MFAInitSkipped)
 
 	builder.WriteString(createHumaneSecuirtyStmt)
 
-	err := client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
-	return user, err
+	// return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
+	_, err := client.Exec(ctx, builder.String(), builder.Args()...)
+	return err
 }
 
 func (u user) UpdateHuman(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
@@ -389,9 +441,9 @@ func (u user) UpdateHuman(ctx context.Context, client database.QueryExecutor, co
 		return 0, database.NewMissingConditionError(u.human.InstanceIDColumn())
 	}
 
-	if !condition.IsRestrictingColumn(u.human.OrgIDColumn()) {
-		return 0, database.NewMissingConditionError(u.human.OrgIDColumn())
-	}
+	// if !condition.IsRestrictingColumn(u.human.OrgIDColumn()) {
+	// 	return 0, database.NewMissingConditionError(u.human.OrgIDColumn())
+	// }
 
 	if !condition.IsRestrictingColumn(u.human.IDColumn()) {
 		return 0, database.NewMissingConditionError(u.human.IDColumn())
@@ -405,10 +457,35 @@ func (u user) UpdateHuman(ctx context.Context, client database.QueryExecutor, co
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-const queryHumanUserStmt = `SELECT instance_id, org_id, id, username, username_org_unique, state,` +
+// const queryHumanUserStmt = `SELECT instance_id, org_id, id, username, username_org_unique, state,` +
+// 	` first_name, last_name, nick_name, display_name, preferred_language, gender, avatar_key,` +
+// 	` created_at, updated_at` +
+// 	` FROM zitadel.human_users`
+
+// func (u user) GetHuman(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Human, error) {
+// 	options := new(database.QueryOpts)
+// 	for _, opt := range opts {
+// 		opt(options)
+// 	}
+
+const queryHumanUserStmt = `SELECT zitadel.human_users.instance_id, zitadel.human_users.org_id, id, username, username_org_unique, state,` +
 	` first_name, last_name, nick_name, display_name, preferred_language, gender, avatar_key,` +
-	` created_at, updated_at` +
-	` FROM zitadel.human_users`
+	` created_at, updated_at,` +
+	// email
+	` email.type AS "email.type", email.value AS "email.value", email.is_verified AS "email.is_verified", email.unverified_value AS "email.unverified_value",` +
+	// phone
+	` phone.type AS "phone.type", phone.value AS "phone.value", phone.is_verified AS "phone.is_verified", phone.unverified_value AS "phone.unverified_value"` +
+	` FROM zitadel.human_users` +
+	// join email
+	` LEFT JOIN zitadel.human_contacts AS email ON zitadel.human_users.id = email.user_id` +
+	` AND zitadel.human_users.instance_id = email.instance_id` +
+	` AND zitadel.human_users.org_id = email.org_id` +
+	` AND email.type = 'email'` +
+	// join phone
+	` LEFT JOIN zitadel.human_contacts AS phone ON zitadel.human_users.id = phone.user_id` +
+	` AND zitadel.human_users.instance_id = phone.instance_id` +
+	` AND zitadel.human_users.org_id = phone.org_id` +
+	` AND phone.type = 'phone'`
 
 func (u user) GetHuman(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Human, error) {
 	options := new(database.QueryOpts)
@@ -432,7 +509,16 @@ func (u user) GetHuman(ctx context.Context, client database.QueryExecutor, opts 
 	builder.WriteString(queryHumanUserStmt)
 	options.Write(&builder)
 
-	return scanHuman(ctx, client, &builder)
+	user, err := scanHuman(ctx, client, &builder)
+	if err != nil {
+		return nil, err
+	}
+
+	if user.HumanPhoneContact != nil && user.HumanPhoneContact.Value == nil {
+		user.HumanPhoneContact = nil
+	}
+
+	return user, nil
 }
 
 func (u user) ListHuman(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Human, error) {
@@ -461,9 +547,9 @@ func (u user) DeleteHuman(ctx context.Context, client database.QueryExecutor, co
 		return 0, database.NewMissingConditionError(u.Human().InstanceIDColumn())
 	}
 
-	if !condition.IsRestrictingColumn(u.Human().OrgIDColumn()) {
-		return 0, database.NewMissingConditionError(u.Human().OrgIDColumn())
-	}
+	// if !condition.IsRestrictingColumn(u.Human().OrgIDColumn()) {
+	// 	return 0, database.NewMissingConditionError(u.Human().OrgIDColumn())
+	// }
 
 	if !condition.IsRestrictingColumn(u.Human().IDColumn()) {
 		return 0, database.NewMissingConditionError(u.Human().IDColumn())

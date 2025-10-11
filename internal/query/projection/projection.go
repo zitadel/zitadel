@@ -101,7 +101,7 @@ var (
 	ProjectGrantFields      *handler.FieldHandler
 	OrgDomainVerifiedFields *handler.FieldHandler
 	InstanceDomainFields    *handler.FieldHandler
-embershipFields        *handler.FieldHandler
+	MembershipFields        *handler.FieldHandler
 	PermissionFields        *handler.FieldHandler
 )
 
