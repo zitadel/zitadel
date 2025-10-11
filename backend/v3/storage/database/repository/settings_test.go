@@ -932,12 +932,12 @@ func TestUpdateSetting(t *testing.T) {
 						InstanceID: instanceId,
 						OrgID:      &orgId,
 						ID:         gofakeit.Name(),
+						IsDefault:  false,
 						Type:       domain.SettingTypeLabel,
 						LabelState: gu.Ptr(domain.LabelStatePreview),
 						Settings:   []byte("{}"),
 					},
 					Settings: domain.LabelSettings{
-						IsDefault:           false,
 						PrimaryColor:        "value",
 						BackgroundColor:     "value",
 						WarnColor:           "value",
@@ -956,7 +956,7 @@ func TestUpdateSetting(t *testing.T) {
 				require.NoError(t, err)
 
 				// update settings values
-				setting.Settings.IsDefault = true
+				setting.IsDefault = true
 				setting.Settings.PrimaryColor = "new_value"
 				setting.Settings.BackgroundColor = "new_value"
 				setting.Settings.WarnColor = "new_value"
@@ -981,12 +981,12 @@ func TestUpdateSetting(t *testing.T) {
 						InstanceID: instanceId,
 						// OrgID:      &orgId,
 						ID:         gofakeit.Name(),
+						IsDefault:  false,
 						Type:       domain.SettingTypeLabel,
 						LabelState: gu.Ptr(domain.LabelStatePreview),
 						Settings:   []byte("{}"),
 					},
 					Settings: domain.LabelSettings{
-						IsDefault:           false,
 						PrimaryColor:        "value",
 						BackgroundColor:     "value",
 						WarnColor:           "value",
@@ -1005,7 +1005,7 @@ func TestUpdateSetting(t *testing.T) {
 				require.NoError(t, err)
 
 				// update settings values
-				setting.Settings.IsDefault = true
+				setting.IsDefault = true
 				setting.Settings.PrimaryColor = "new_value"
 				setting.Settings.BackgroundColor = "new_value"
 				setting.Settings.WarnColor = "new_value"
@@ -1030,12 +1030,12 @@ func TestUpdateSetting(t *testing.T) {
 						InstanceID: "non-existent-instanceID",
 						OrgID:      &orgId,
 						ID:         gofakeit.Name(),
+						IsDefault:  false,
 						Type:       domain.SettingTypeLabel,
 						LabelState: gu.Ptr(domain.LabelStatePreview),
 						Settings:   []byte("{}"),
 					},
 					Settings: domain.LabelSettings{
-						IsDefault:           false,
 						PrimaryColor:        "value",
 						BackgroundColor:     "value",
 						WarnColor:           "value",
@@ -1064,12 +1064,12 @@ func TestUpdateSetting(t *testing.T) {
 						InstanceID: instanceId,
 						OrgID:      gu.Ptr("non-existent-orgID"),
 						ID:         gofakeit.Name(),
+						IsDefault:  false,
 						Type:       domain.SettingTypeLabel,
 						LabelState: gu.Ptr(domain.LabelStatePreview),
 						Settings:   []byte("{}"),
 					},
 					Settings: domain.LabelSettings{
-						IsDefault:           false,
 						PrimaryColor:        "value",
 						BackgroundColor:     "value",
 						WarnColor:           "value",
@@ -1097,12 +1097,12 @@ func TestUpdateSetting(t *testing.T) {
 						InstanceID: instanceId,
 						OrgID:      &orgId,
 						ID:         gofakeit.Name(),
+						IsDefault:  false,
 						Type:       domain.SettingTypeLabel,
 						LabelState: gu.Ptr(domain.LabelStatePreview),
 						Settings:   []byte("{}"),
 					},
 					Settings: domain.LabelSettings{
-						IsDefault:           false,
 						PrimaryColor:        "value",
 						BackgroundColor:     "value",
 						WarnColor:           "value",
@@ -1222,7 +1222,7 @@ func TestGetSetting(t *testing.T) {
 	// create setting
 	// this setting is created as an additional org which should NOT
 	// be returned in the results of the tests
-	prexistingSetting := domain.Setting{
+	preExistingSetting := domain.Setting{
 		InstanceID: instanceId,
 		OrgID:      &orgId,
 		ID:         gofakeit.Name(),
@@ -1232,7 +1232,7 @@ func TestGetSetting(t *testing.T) {
 		UpdatedAt:  &now,
 	}
 	settingRepo := repository.SettingsRepository()
-	err = settingRepo.Create(t.Context(), tx, &prexistingSetting)
+	err = settingRepo.Create(t.Context(), tx, &preExistingSetting)
 	require.NoError(t, err)
 
 	type test struct {
@@ -1433,12 +1433,12 @@ func TestCreateGetLoginPolicySetting(t *testing.T) {
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
 						OrgID:      &orgId,
+						IsDefault:  true,
 						Type:       domain.SettingTypeLabel,
 						LabelState: gu.Ptr(domain.LabelStatePreview),
 						Settings:   []byte("{}"),
 					},
 					Settings: domain.LoginSettings{
-						IsDefault:                  true,
 						AllowUserNamePassword:      true,
 						AllowRegister:              true,
 						AllowExternalIDP:           true,
@@ -1556,11 +1556,11 @@ func TestGetLabelPolicySetting(t *testing.T) {
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
 						OrgID:      &orgId,
+						IsDefault:  false,
 						Type:       domain.SettingTypeLabel,
 						LabelState: gu.Ptr(domain.LabelStatePreview),
 					},
 					Settings: domain.LabelSettings{
-						IsDefault:           false,
 						PrimaryColor:        "value",
 						BackgroundColor:     "value",
 						WarnColor:           "value",
@@ -1588,11 +1588,11 @@ func TestGetLabelPolicySetting(t *testing.T) {
 					Setting: &domain.Setting{
 						InstanceID: instanceId,
 						OrgID:      &orgId,
+						IsDefault:  false,
 						Type:       domain.SettingTypeLabel,
 						LabelState: gu.Ptr(domain.LabelStateActivated),
 					},
 					Settings: domain.LabelSettings{
-						IsDefault:           false,
 						PrimaryColor:        "value",
 						BackgroundColor:     "value",
 						WarnColor:           "value",
@@ -1742,11 +1742,11 @@ func TestCreateGetPasswordComplexityPolicySetting(t *testing.T) {
 						InstanceID: instanceId,
 						OrgID:      &orgId,
 						Type:       domain.SettingTypeLabel,
+						IsDefault:  true,
 						LabelState: gu.Ptr(domain.LabelStatePreview),
 						Settings:   []byte("{}"),
 					},
 					Settings: domain.PasswordComplexitySettings{
-						IsDefault:    true,
 						MinLength:    89,
 						HasLowercase: true,
 						HasUppercase: true,
@@ -1851,11 +1851,11 @@ func TestCreateGetPasswordExpiryPolicySetting(t *testing.T) {
 						InstanceID: instanceId,
 						OrgID:      &orgId,
 						Type:       domain.SettingTypeLabel,
+						IsDefault:  true,
 						LabelState: gu.Ptr(domain.LabelStatePreview),
 						Settings:   []byte("{}"),
 					},
 					Settings: domain.PasswordExpirySettings{
-						IsDefault:      true,
 						ExpireWarnDays: 30,
 						MaxAgeDays:     30,
 					},
@@ -1957,11 +1957,11 @@ func TestCreateGetLockoutPolicySetting(t *testing.T) {
 						InstanceID: instanceId,
 						OrgID:      &orgId,
 						Type:       domain.SettingTypeLabel,
+						IsDefault:  true,
 						LabelState: gu.Ptr(domain.LabelStatePreview),
 						Settings:   []byte("{}"),
 					},
 					Settings: domain.LockoutSettings{
-						IsDefault:           true,
 						MaxPasswordAttempts: 50,
 						MaxOTPAttempts:      50,
 						ShowLockOutFailures: true,
@@ -2162,11 +2162,11 @@ func TestCreateGetDomainPolicySetting(t *testing.T) {
 						InstanceID: instanceId,
 						OrgID:      &orgId,
 						Type:       domain.SettingTypeLabel,
+						IsDefault:  true,
 						LabelState: gu.Ptr(domain.LabelStatePreview),
 						Settings:   []byte("{}"),
 					},
 					Settings: domain.DomainSettings{
-						IsDefault:                              true,
 						UserLoginMustBeDomain:                  true,
 						ValidateOrgDomains:                     true,
 						SMTPSenderAddressMatchesInstanceDomain: true,
@@ -3136,12 +3136,12 @@ func TestActivateLabelSettings(t *testing.T) {
 						InstanceID: instanceId,
 						OrgID:      &orgId,
 						ID:         gofakeit.Name(),
+						IsDefault:  false,
 						Type:       domain.SettingTypeLabel,
 						LabelState: gu.Ptr(domain.LabelStatePreview),
 						Settings:   []byte("{}"),
 					},
 					Settings: domain.LabelSettings{
-						IsDefault:           false,
 						PrimaryColor:        "value",
 						BackgroundColor:     "value",
 						WarnColor:           "value",
@@ -3195,11 +3195,11 @@ func TestActivateLabelSettings(t *testing.T) {
 						OrgID:      &orgId,
 						ID:         gofakeit.Name(),
 						Type:       domain.SettingTypeLabel,
+						IsDefault:  false,
 						LabelState: gu.Ptr(domain.LabelStatePreview),
 						Settings:   []byte("{}"),
 					},
 					Settings: domain.LabelSettings{
-						IsDefault:           false,
 						PrimaryColor:        "value",
 						BackgroundColor:     "value",
 						WarnColor:           "value",
@@ -3218,7 +3218,7 @@ func TestActivateLabelSettings(t *testing.T) {
 				require.NoError(t, err)
 
 				// update settings values
-				setting.Settings.IsDefault = true
+				setting.IsDefault = true
 				setting.Settings.PrimaryColor = "new_value"
 				setting.Settings.BackgroundColor = "new_value"
 				setting.Settings.WarnColor = "new_value"
@@ -3271,11 +3271,11 @@ func TestActivateLabelSettings(t *testing.T) {
 						OrgID:      &orgId,
 						ID:         gofakeit.Name(),
 						Type:       domain.SettingTypeLabel,
+						IsDefault:  false,
 						LabelState: gu.Ptr(domain.LabelStatePreview),
 						Settings:   []byte("{}"),
 					},
 					Settings: domain.LabelSettings{
-						IsDefault:           false,
 						PrimaryColor:        "value",
 						BackgroundColor:     "value",
 						WarnColor:           "value",
@@ -3294,7 +3294,7 @@ func TestActivateLabelSettings(t *testing.T) {
 				require.NoError(t, err)
 
 				// update settings values
-				setting.Settings.IsDefault = true
+				setting.IsDefault = true
 				setting.Settings.PrimaryColor = "new_value"
 				setting.Settings.BackgroundColor = "new_value"
 				setting.Settings.WarnColor = "new_value"

@@ -29,6 +29,7 @@ type Setting struct {
 	InstanceID string          `json:"instanceId,omitempty" db:"instance_id"`
 	OrgID      *string         `json:"orgId,omitempty" db:"org_id"`
 	Type       SettingType     `json:"type,omitempty" db:"type"`
+	IsDefault  bool            `json:"isDefault,omitempty" db:"is_default"`
 	LabelState *LabelState     `json:"labelState,omitempty" db:"label_state"`
 	Settings   json.RawMessage `json:"settings,omitempty" db:"settings"`
 	CreatedAt  time.Time       `json:"createdAt,omitzero" db:"created_at"`
@@ -60,7 +61,6 @@ const (
 )
 
 type LoginSettings struct {
-	IsDefault                  bool             `json:"isDefault,omitempty"`
 	AllowUserNamePassword      bool             `json:"allowUsernamePassword,omitempty"`
 	AllowRegister              bool             `json:"allowRegister,omitempty"`
 	AllowExternalIDP           bool             `json:"allowExternalIdp,omitempty"`
@@ -105,7 +105,6 @@ const (
 )
 
 type LabelSettings struct {
-	IsDefault           bool                 `json:"isDefault,omitempty"`
 	PrimaryColor        string               `json:"primaryColor,omitempty"`
 	BackgroundColor     string               `json:"backgroundColor,omitempty"`
 	WarnColor           string               `json:"warnColor,omitempty"`
@@ -134,7 +133,6 @@ type LabelSetting struct {
 }
 
 type PasswordComplexitySettings struct {
-	IsDefault    bool   `json:"isDefault,omitempty"`
 	MinLength    uint64 `json:"minLength,omitempty"`
 	HasLowercase bool   `json:"hasLowercase,omitempty"`
 	HasUppercase bool   `json:"hasUppercase,omitempty"`
@@ -148,7 +146,6 @@ type PasswordComplexitySetting struct {
 }
 
 type PasswordExpirySettings struct {
-	IsDefault      bool   `json:"isDefault,omitempty"`
 	ExpireWarnDays uint64 `json:"expireWarnDays,omitempty"`
 	MaxAgeDays     uint64 `json:"maxAgeDays,omitempty"`
 }
@@ -159,7 +156,6 @@ type PasswordExpirySetting struct {
 }
 
 type LockoutSettings struct {
-	IsDefault           bool   `json:"isDefault,omitempty"`
 	MaxPasswordAttempts uint64 `json:"maxPasswordAttempts,omitempty"`
 	MaxOTPAttempts      uint64 `json:"maxOtpAttempts,omitempty"`
 	ShowLockOutFailures bool   `json:"showLockOutFailures,omitempty"`
@@ -171,7 +167,6 @@ type LockoutSetting struct {
 }
 
 type DomainSettings struct {
-	IsDefault                              bool `json:"isDefault,omitempty"`
 	UserLoginMustBeDomain                  bool `json:"userLoginMustBeDomain,omitempty"`
 	ValidateOrgDomains                     bool `json:"validateOrgDomains,omitempty"`
 	SMTPSenderAddressMatchesInstanceDomain bool `json:"smtpSenderAddressMatchesInstanceDomain,omitempty"`

@@ -357,12 +357,10 @@ func (s *settingsRelationalProjection) reduceLoginPolicyAdded(event eventstore.E
 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		type settingStruct struct {
 			policy.LoginPolicyAddedEvent
-			IsDefault *bool `json:"isDefault,omitempty"`
 		}
 
 		loginPolicySetting := settingStruct{
 			LoginPolicyAddedEvent: policyEvent,
-			IsDefault:             &isDefault,
 		}
 		settingJSON, err := json.Marshal(loginPolicySetting)
 		if err != nil {
@@ -378,6 +376,7 @@ func (s *settingsRelationalProjection) reduceLoginPolicyAdded(event eventstore.E
 			InstanceID: policyEvent.Aggregate().InstanceID,
 			OrgID:      orgId,
 			Type:       domain.SettingTypeLogin,
+			IsDefault:  isDefault,
 			Settings:   settingJSON,
 			CreatedAt:  policyEvent.CreationDate(),
 			UpdatedAt:  &policyEvent.Creation,
@@ -685,14 +684,12 @@ func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) 
 		}
 		type settingStruct struct {
 			labelPolicy
-			IsDefault *bool `json:"isDefault,omitempty"`
 		}
 
 		labelSetting := settingStruct{
 			labelPolicy: labelPolicy{
 				LabelPolicyAddedEvent: policyEvent,
 			},
-			IsDefault: &isDefault,
 		}
 
 		settings, err := json.Marshal(labelSetting)
@@ -709,6 +706,7 @@ func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) 
 		setting := domain.Setting{
 			InstanceID: policyEvent.Aggregate().InstanceID,
 			OrgID:      orgId,
+			IsDefault:  isDefault,
 			Type:       domain.SettingTypeLabel,
 			LabelState: &labelStatePreview,
 			Settings:   settings,
@@ -1134,12 +1132,10 @@ func (p *settingsRelationalProjection) reducePassedComplexityAdded(event eventst
 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		type setting struct {
 			policy.PasswordComplexityPolicyAddedEvent
-			IsDefault *bool `json:"isDefault,omitempty"`
 		}
 
 		passwordComplexitySetting := setting{
 			PasswordComplexityPolicyAddedEvent: policyEvent,
-			IsDefault:                          &isDefault,
 		}
 		settingJSON, err := json.Marshal(passwordComplexitySetting)
 		if err != nil {
@@ -1155,6 +1151,7 @@ func (p *settingsRelationalProjection) reducePassedComplexityAdded(event eventst
 			InstanceID: policyEvent.Aggregate().InstanceID,
 			OrgID:      orgId,
 			Type:       domain.SettingTypePasswordComplexity,
+			IsDefault:  isDefault,
 			Settings:   settingJSON,
 			CreatedAt:  policyEvent.CreationDate(),
 			UpdatedAt:  &policyEvent.Creation,
@@ -1253,12 +1250,10 @@ func (p *settingsRelationalProjection) reducePasswordPolicyAdded(event eventstor
 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		type settingStruct struct {
 			policy.PasswordAgePolicyAddedEvent
-			IsDefault *bool `json:"isDefault,omitempty"`
 		}
 
 		passwordAgeSetting := settingStruct{
 			PasswordAgePolicyAddedEvent: policyEvent,
-			IsDefault:                   &isDefault,
 		}
 
 		settings, err := json.Marshal(passwordAgeSetting)
@@ -1275,6 +1270,7 @@ func (p *settingsRelationalProjection) reducePasswordPolicyAdded(event eventstor
 			InstanceID: policyEvent.Aggregate().InstanceID,
 			OrgID:      orgId,
 			Type:       domain.SettingTypePasswordExpiry,
+			IsDefault:  isDefault,
 			Settings:   settings,
 			CreatedAt:  policyEvent.CreationDate(),
 			UpdatedAt:  &policyEvent.Creation,
@@ -1401,12 +1397,10 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyAdded(event eventstore
 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		type settingStruct struct {
 			policy.LockoutPolicyAddedEvent
-			IsDefault *bool `json:"isDefault,omitempty"`
 		}
 
 		loginSettings := settingStruct{
 			LockoutPolicyAddedEvent: policyEvent,
-			IsDefault:               &isDefault,
 		}
 		settings, err := json.Marshal(loginSettings)
 		if err != nil {
@@ -1422,6 +1416,7 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyAdded(event eventstore
 			InstanceID: policyEvent.Aggregate().InstanceID,
 			OrgID:      orgId,
 			Type:       domain.SettingTypeLockout,
+			IsDefault:  isDefault,
 			Settings:   settings,
 			CreatedAt:  policyEvent.CreationDate(),
 			UpdatedAt:  &policyEvent.Creation,
@@ -1491,11 +1486,9 @@ func (p *settingsRelationalProjection) reduceDomainPolicyAdded(event eventstore.
 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		type settingStruct struct {
 			policy.DomainPolicyAddedEvent
-			IsDefault *bool `json:"isDefault,omitempty"`
 		}
 		loginSettings := settingStruct{
 			DomainPolicyAddedEvent: policyEvent,
-			IsDefault:              &isDefault,
 		}
 		settingJSON, err := json.Marshal(loginSettings)
 		if err != nil {
@@ -1511,6 +1504,7 @@ func (p *settingsRelationalProjection) reduceDomainPolicyAdded(event eventstore.
 			InstanceID: policyEvent.Aggregate().InstanceID,
 			OrgID:      orgId,
 			Type:       domain.SettingTypeDomain,
+			IsDefault:  isDefault,
 			Settings:   settingJSON,
 			CreatedAt:  policyEvent.CreationDate(),
 			UpdatedAt:  &policyEvent.Creation,

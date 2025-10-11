@@ -48,7 +48,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 
 			// event instance.policy.login.added
 			// these values are found in default.yaml
-			assert.Equal(t, true, setting.Settings.IsDefault)
+			assert.Equal(t, true, setting.IsDefault)
 			assert.Equal(t, true, setting.Settings.AllowRegister)
 			assert.Equal(t, true, setting.Settings.AllowExternalIDP)
 			assert.Equal(t, domain.PasswordlessTypeAllowed, setting.Settings.PasswordlessType)
@@ -100,7 +100,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event instance.policy.login.changed
-			assert.Equal(t, true, setting.Settings.IsDefault)
+			assert.Equal(t, true, setting.IsDefault)
 			assert.Equal(t, false, setting.Settings.AllowRegister)
 			assert.Equal(t, true, setting.Settings.AllowExternalIDP)
 			assert.Equal(t, true, setting.Settings.ForceMFA)
@@ -307,7 +307,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 			// event instance.policy.label.added
 			// these values are found in default.yaml
-			assert.Equal(t, true, setting.Settings.IsDefault)
+			assert.Equal(t, true, setting.IsDefault)
 			assert.Equal(t, "#5469d4", setting.Settings.PrimaryColor)
 			assert.Equal(t, "#fafafa", setting.Settings.BackgroundColor)
 			assert.Equal(t, "#cd3d56", setting.Settings.WarnColor)
@@ -374,7 +374,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event instance.policy.label.change
-			assert.Equal(t, true, setting.Settings.IsDefault)
+			assert.Equal(t, true, setting.IsDefault)
 			assert.Equal(t, "#055000", setting.Settings.PrimaryColor)
 			assert.Equal(t, "#055000", setting.Settings.BackgroundColor)
 			assert.Equal(t, "#055000", setting.Settings.WarnColor)
@@ -964,7 +964,7 @@ func TestServer_TestPasswordComplexitySettingsReduces(t *testing.T) {
 
 			// event instance.policy.password.complexity.added
 			// these values are found in default.yaml
-			assert.Equal(t, true, setting.Settings.IsDefault)
+			assert.Equal(t, true, setting.IsDefault)
 			assert.Equal(t, uint64(8), setting.Settings.MinLength)
 			assert.Equal(t, true, setting.Settings.HasUppercase)
 			assert.Equal(t, true, setting.Settings.HasLowercase)
@@ -1000,7 +1000,7 @@ func TestServer_TestPasswordComplexitySettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event instance.policy.password.complexity.changed
-			assert.Equal(t, true, setting.Settings.IsDefault)
+			assert.Equal(t, true, setting.IsDefault)
 			assert.Equal(t, uint64(5), setting.Settings.MinLength)
 			assert.Equal(t, true, setting.Settings.HasUppercase)
 			assert.Equal(t, true, setting.Settings.HasLowercase)
@@ -1067,7 +1067,7 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event instance.policy.password.age.added
-			assert.Equal(t, true, setting.Settings.IsDefault)
+			assert.Equal(t, true, setting.IsDefault)
 			assert.Equal(t, uint64(0), setting.Settings.ExpireWarnDays)
 			assert.Equal(t, uint64(0), setting.Settings.MaxAgeDays)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
@@ -1098,7 +1098,7 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event instance.policy.password.age.changed
-			assert.Equal(t, true, setting.Settings.IsDefault)
+			assert.Equal(t, true, setting.IsDefault)
 			assert.Equal(t, uint64(30), setting.Settings.ExpireWarnDays)
 			assert.Equal(t, uint64(30), setting.Settings.MaxAgeDays)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
@@ -1162,7 +1162,7 @@ func TestServer_TestDomainSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event instance.policy.domain.added
-			assert.Equal(t, true, setting.Settings.IsDefault)
+			assert.Equal(t, true, setting.IsDefault)
 			assert.Equal(t, false, setting.Settings.SMTPSenderAddressMatchesInstanceDomain)
 			assert.Equal(t, false, setting.Settings.UserLoginMustBeDomain)
 			assert.Equal(t, false, setting.Settings.ValidateOrgDomains)
@@ -1195,7 +1195,7 @@ func TestServer_TestDomainSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event instance.policy.changed
-			assert.Equal(t, true, setting.Settings.IsDefault)
+			assert.Equal(t, true, setting.IsDefault)
 			assert.Equal(t, true, setting.Settings.SMTPSenderAddressMatchesInstanceDomain)
 			assert.Equal(t, true, setting.Settings.UserLoginMustBeDomain)
 			assert.Equal(t, true, setting.Settings.ValidateOrgDomains)
@@ -1260,7 +1260,7 @@ func TestServer_TestLockoutSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event instance.policy.lockout.added
-			assert.Equal(t, true, setting.Settings.IsDefault)
+			assert.Equal(t, true, setting.IsDefault)
 			assert.Equal(t, uint64(0), setting.Settings.MaxOTPAttempts)
 			assert.Equal(t, uint64(0), setting.Settings.MaxPasswordAttempts)
 			assert.Equal(t, true, setting.Settings.ShowLockOutFailures)
@@ -1292,7 +1292,7 @@ func TestServer_TestLockoutSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event instance.policy.lockout.changed
-			assert.Equal(t, true, setting.Settings.IsDefault)
+			assert.Equal(t, true, setting.IsDefault)
 			assert.Equal(t, uint64(5), setting.Settings.MaxOTPAttempts)
 			assert.Equal(t, uint64(5), setting.Settings.MaxPasswordAttempts)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)

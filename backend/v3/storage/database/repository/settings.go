@@ -59,9 +59,9 @@ func (settings) UpdatedAtColumn() database.Column {
 	return database.NewColumn("settings", "updated_at")
 }
 
-// // -------------------------------------------------------------
-// // conditions
-// // -------------------------------------------------------------
+// -------------------------------------------------------------
+// conditions
+// -------------------------------------------------------------
 
 func (s settings) InstanceIDCondition(id string) database.Condition {
 	return database.NewTextCondition(s.InstanceIDColumn(), database.TextOperationEqual, id)
@@ -102,7 +102,7 @@ func (s settings) SetUpdatedAt(updatedAt *time.Time) database.Change {
 	return database.NewChangePtr(s.UpdatedAtColumn(), updatedAt)
 }
 
-const querySettingStmt = `SELECT instance_id, org_id, id, type, label_state, settings,` +
+const querySettingStmt = `SELECT instance_id, org_id, id, type, is_default, label_state, settings,` +
 	` created_at, updated_at` +
 	` FROM zitadel.settings`
 
@@ -200,8 +200,8 @@ func (s *settings) UpdateLabel(ctx context.Context, client database.QueryExecuto
 }
 
 const activatedLabelSettingStmt = `INSERT INTO zitadel.settings` +
-	` (instance_id, org_id, type, label_state, settings)` +
-	` VALUES ($1, $2, 'label', 'activated', $3)` +
+	` (instance_id, org_id, type, is_default, label_state, settings)` +
+	` VALUES ($1, $2, 'label', $3 'activated', $4)` +
 	` ON CONFLICT (instance_id, org_id, type, label_state) WHERE type = 'label' DO UPDATE SET` +
 	` settings = EXCLUDED.settings` +
 	` RETURNING id, created_at, updated_at`
@@ -217,6 +217,7 @@ func (s *settings) ActivateLabelSetting(ctx context.Context, client database.Que
 	builder.AppendArgs(
 		setting.InstanceID,
 		setting.OrgID,
+		setting.IsDefault,
 		string(settingJSON))
 
 	builder.WriteString(activatedLabelSettingStmt)
@@ -429,8 +430,8 @@ func (s *settings) updateSetting(ctx context.Context, client database.QueryExecu
 }
 
 const eventCreateSettingStmt = `INSERT INTO zitadel.settings` +
-	` (instance_id, org_id, type, label_state, settings, created_at, updated_at)` +
-	` VALUES ($1, $2, $3, $4, $5, $6, $7)` +
+	` (instance_id, org_id, type, is_default, label_state, settings, created_at, updated_at)` +
+	` VALUES ($1, $2, $3, $4, $5, $6, $7, $8)` +
 	` RETURNING id, created_at, updated_at`
 
 func (s *settings) Create(ctx context.Context, client database.QueryExecutor, setting *domain.Setting) error {
@@ -440,6 +441,7 @@ func (s *settings) Create(ctx context.Context, client database.QueryExecutor, se
 		setting.InstanceID,
 		setting.OrgID,
 		setting.Type,
+		setting.IsDefault,
 		setting.LabelState,
 		string(setting.Settings),
 		setting.CreatedAt,
@@ -450,8 +452,8 @@ func (s *settings) Create(ctx context.Context, client database.QueryExecutor, se
 }
 
 const createSettingStmt = `INSERT INTO zitadel.settings` +
-	` (instance_id, org_id, type, label_state, settings)` +
-	` VALUES ($1, $2, $3, $4, $5)` +
+	` (instance_id, org_id, type, is_default, label_state, settings)` +
+	` VALUES ($1, $2, $3, $4, $5, $6)` +
 	` RETURNING id, created_at, updated_at`
 
 func (s *settings) createSetting(ctx context.Context, client database.QueryExecutor, setting *domain.Setting, settings any) error {
@@ -466,6 +468,7 @@ func (s *settings) createSetting(ctx context.Context, client database.QueryExecu
 		setting.InstanceID,
 		setting.OrgID,
 		setting.Type,
+		setting.IsDefault,
 		setting.LabelState,
 		string(settingJSON))
 

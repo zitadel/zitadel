@@ -47,7 +47,7 @@ func wrapError(err error) error {
 	case "23502":
 		return database.NewNotNullError(pgxErr.TableName, pgxErr.ConstraintName, pgxErr)
 	case "22P02":
-		return database.NewCheckError(pgxErr.ConstraintName, pgxErr.TableName, pgxErr)
+		return database.NewCheckError(pgxErr.TableName, pgxErr.ConstraintName, pgxErr)
 	}
 	return database.NewUnknownError(err)
 }
