@@ -106,26 +106,40 @@ const querySettingStmt = `SELECT instance_id, org_id, id, type, is_default, labe
 	` created_at, updated_at` +
 	` FROM zitadel.settings`
 
-func (s *settings) Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, typ domain.SettingType, cond ...database.Condition) (*domain.Setting, error) {
+func (s *settings) Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, typ domain.SettingType, opts ...database.QueryOption) (*domain.Setting, error) {
 	builder := database.StatementBuilder{}
 
 	builder.WriteString(querySettingStmt)
 
-	cond = append(cond, s.TypeCondition(typ), s.InstanceIDCondition(instanceID), s.OrgIDCondition(orgID))
+	// opts = append(opts, database.WithCondition(s.TypeCondition(typ)), database.WithCondition(s.InstanceIDCondition(instanceID)), database.WithCondition(s.OrgIDCondition(orgID)))
+	opts = append(opts, database.WithCondition(database.And(s.TypeCondition(typ), s.InstanceIDCondition(instanceID), s.OrgIDCondition(orgID))))
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
 
-	writeCondition(&builder, database.And(cond...))
+	options.Write(&builder)
+	// writeCondition(&builder, database.And(cond...))
 
 	return scanSetting(ctx, client, &builder)
 }
 
-func (s *settings) List(ctx context.Context, client database.QueryExecutor, conditions ...database.Condition) ([]*domain.Setting, error) {
+func (s *settings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Setting, error) {
 	builder := database.StatementBuilder{}
 
 	builder.WriteString(querySettingStmt)
 
-	if conditions != nil {
-		writeCondition(&builder, database.And(conditions...))
+	// if conditions != nil {
+	// 	writeCondition(&builder, database.And(conditions...))
+	// }
+
+	// if opts != nil {
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
 	}
+	options.Write(&builder)
+	// }
 
 	orderBy := database.OrderBy(s.CreatedAtColumn())
 	orderBy.Write(&builder)
@@ -178,7 +192,7 @@ func (s *settings) GetLabel(ctx context.Context, client database.QueryExecutor, 
 	labelSetting := &domain.LabelSetting{}
 	var err error
 
-	stateCond := s.LabelStateCondition(state)
+	stateCond := database.WithCondition(s.LabelStateCondition(state))
 	labelSetting.Setting, err = s.Get(ctx, client, instanceID, orgID, domain.SettingTypeLabel, stateCond)
 	if err != nil {
 		return nil, err
@@ -201,7 +215,7 @@ func (s *settings) UpdateLabel(ctx context.Context, client database.QueryExecuto
 
 const activatedLabelSettingStmt = `INSERT INTO zitadel.settings` +
 	` (instance_id, org_id, type, is_default, label_state, settings)` +
-	` VALUES ($1, $2, 'label', $3 'activated', $4)` +
+	` VALUES ($1, $2, 'label', $3, 'activated', $4)` +
 	` ON CONFLICT (instance_id, org_id, type, label_state) WHERE type = 'label' DO UPDATE SET` +
 	` settings = EXCLUDED.settings` +
 	` RETURNING id, created_at, updated_at`

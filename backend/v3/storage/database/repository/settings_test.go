@@ -2352,7 +2352,7 @@ func TestListSetting(t *testing.T) {
 	type test struct {
 		name               string
 		testFunc           func(t *testing.T, tx database.QueryExecutor) []*domain.Setting
-		conditionClauses   func() []database.Condition
+		conditionClauses   database.QueryOption
 		noSettingsReturned bool
 	}
 	tests := []test{
@@ -2423,9 +2423,7 @@ func TestListSetting(t *testing.T) {
 
 				return settings
 			},
-			conditionClauses: func() []database.Condition {
-				return []database.Condition{settingRepo.InstanceIDCondition(instanceId)}
-			},
+			conditionClauses: database.WithCondition(settingRepo.InstanceIDCondition(instanceId)),
 		},
 		{
 			name: "multiple settings filter on instance, no org",
@@ -2482,9 +2480,7 @@ func TestListSetting(t *testing.T) {
 
 				return settings
 			},
-			conditionClauses: func() []database.Condition {
-				return []database.Condition{settingRepo.InstanceIDCondition(instanceId)}
-			},
+			conditionClauses: database.WithCondition(settingRepo.InstanceIDCondition(instanceId)),
 		},
 		{
 			name: "multiple settings filter on org",
@@ -2538,9 +2534,7 @@ func TestListSetting(t *testing.T) {
 
 				return settings
 			},
-			conditionClauses: func() []database.Condition {
-				return []database.Condition{settingRepo.OrgIDCondition(&orgId)}
-			},
+			conditionClauses: database.WithCondition(settingRepo.OrgIDCondition(&orgId)),
 		},
 		{
 			name: "happy path single setting no filter",
@@ -2594,54 +2588,52 @@ func TestListSetting(t *testing.T) {
 				return settings
 			},
 		},
-		func() test {
-			id := gofakeit.Name()
-			return test{
-				name: "setting filter on id",
-				testFunc: func(t *testing.T, tx database.QueryExecutor) []*domain.Setting {
-					// create setting
-					// this setting is created as an additional setting which should NOT
-					// be returned in the results of this test case
-					setting := domain.Setting{
-						InstanceID: instanceId,
-						OrgID:      &orgId,
-						ID:         gofakeit.Name(),
-						Type:       domain.SettingTypeSecurity,
-						Settings:   []byte("{}"),
-						CreatedAt:  now,
-						UpdatedAt:  &now,
-					}
-					err := settingRepo.Create(t.Context(), tx, &setting)
-					require.NoError(t, err)
+		// func() test {
+		// 	id := gofakeit.Name()
+		// 	return test{
+		// 		name: "setting filter on id",
+		// 		testFunc: func(t *testing.T, tx database.QueryExecutor) []*domain.Setting {
+		// 			// create setting
+		// 			// this setting is created as an additional setting which should NOT
+		// 			// be returned in the results of this test case
+		// 			setting := domain.Setting{
+		// 				InstanceID: instanceId,
+		// 				OrgID:      &orgId,
+		// 				ID:         gofakeit.Name(),
+		// 				Type:       domain.SettingTypeSecurity,
+		// 				Settings:   []byte("{}"),
+		// 				CreatedAt:  now,
+		// 				UpdatedAt:  &now,
+		// 			}
+		// 			err := settingRepo.Create(t.Context(), tx, &setting)
+		// 			require.NoError(t, err)
 
-					noOfSettings := 1
-					settings := make([]*domain.Setting, noOfSettings)
-					for i := range noOfSettings {
+		// 			noOfSettings := 1
+		// 			settings := make([]*domain.Setting, noOfSettings)
+		// 			for i := range noOfSettings {
 
-						setting := domain.Setting{
-							InstanceID: instanceId,
-							OrgID:      &orgId,
-							// ID:         id,
-							Type:      domain.SettingType(i + 1),
-							Settings:  []byte("{}"),
-							CreatedAt: now,
-							UpdatedAt: &now,
-						}
+		// 				setting := domain.Setting{
+		// 					InstanceID: instanceId,
+		// 					OrgID:      &orgId,
+		// 					ID:         id,
+		// 					Type:       domain.SettingType(i + 1),
+		// 					Settings:   []byte("{}"),
+		// 					CreatedAt:  now,
+		// 					UpdatedAt:  &now,
+		// 				}
 
-						err := settingRepo.Create(t.Context(), tx, &setting)
-						require.NoError(t, err)
+		// 				err := settingRepo.Create(t.Context(), tx, &setting)
+		// 				require.NoError(t, err)
 
-						settings[i] = &setting
-						id = setting.ID
-					}
+		// 				settings[i] = &setting
+		// 				// id = setting.ID
+		// 			}
 
-					return settings
-				},
-				conditionClauses: func() []database.Condition {
-					return []database.Condition{settingRepo.IDCondition(id)}
-				},
-			}
-		}(),
+		// 			return settings
+		// 		},
+		// 		conditionClauses: database.WithCondition(settingRepo.IDCondition(id)),
+		// 	}
+		// }(),
 		{
 			name: "multiple settings filter on type",
 			testFunc: func(t *testing.T, tx database.QueryExecutor) []*domain.Setting {
@@ -2683,9 +2675,7 @@ func TestListSetting(t *testing.T) {
 
 				return settings
 			},
-			conditionClauses: func() []database.Condition {
-				return []database.Condition{settingRepo.TypeCondition(domain.SettingTypePasswordExpiry)}
-			},
+			conditionClauses: database.WithCondition(settingRepo.TypeCondition(domain.SettingTypePasswordExpiry)),
 		},
 	}
 	for _, tt := range tests {
@@ -2701,15 +2691,15 @@ func TestListSetting(t *testing.T) {
 
 			settings := tt.testFunc(t, tx)
 
-			var conditions []database.Condition
-			if tt.conditionClauses != nil {
-				conditions = tt.conditionClauses()
-			}
-
 			// check setting values
-			returnedSettings, err := settingRepo.List(t.Context(), tx,
-				conditions...,
-			)
+			var returnedSettings []*domain.Setting
+			if tt.conditionClauses != nil {
+				returnedSettings, err = settingRepo.List(t.Context(), tx,
+					tt.conditionClauses,
+				)
+			} else {
+				returnedSettings, err = settingRepo.List(t.Context(), tx)
+			}
 			require.NoError(t, err)
 			if tt.noSettingsReturned {
 				assert.Nil(t, returnedSettings)

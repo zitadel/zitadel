@@ -355,14 +355,7 @@ func (s *settingsRelationalProjection) reduceLoginPolicyAdded(event eventstore.E
 	}
 
 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		type settingStruct struct {
-			policy.LoginPolicyAddedEvent
-		}
-
-		loginPolicySetting := settingStruct{
-			LoginPolicyAddedEvent: policyEvent,
-		}
-		settingJSON, err := json.Marshal(loginPolicySetting)
+		settingJSON, err := json.Marshal(policyEvent)
 		if err != nil {
 			return err
 		}
@@ -679,20 +672,7 @@ func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) 
 	}
 
 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		type labelPolicy struct {
-			policy.LabelPolicyAddedEvent
-		}
-		type settingStruct struct {
-			labelPolicy
-		}
-
-		labelSetting := settingStruct{
-			labelPolicy: labelPolicy{
-				LabelPolicyAddedEvent: policyEvent,
-			},
-		}
-
-		settings, err := json.Marshal(labelSetting)
+		settings, err := json.Marshal(policyEvent)
 		if err != nil {
 			return err
 		}
@@ -1130,14 +1110,7 @@ func (p *settingsRelationalProjection) reducePassedComplexityAdded(event eventst
 	}
 
 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		type setting struct {
-			policy.PasswordComplexityPolicyAddedEvent
-		}
-
-		passwordComplexitySetting := setting{
-			PasswordComplexityPolicyAddedEvent: policyEvent,
-		}
-		settingJSON, err := json.Marshal(passwordComplexitySetting)
+		settingJSON, err := json.Marshal(policyEvent)
 		if err != nil {
 			return err
 		}
@@ -1248,15 +1221,7 @@ func (p *settingsRelationalProjection) reducePasswordPolicyAdded(event eventstor
 	}
 
 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		type settingStruct struct {
-			policy.PasswordAgePolicyAddedEvent
-		}
-
-		passwordAgeSetting := settingStruct{
-			PasswordAgePolicyAddedEvent: policyEvent,
-		}
-
-		settings, err := json.Marshal(passwordAgeSetting)
+		settings, err := json.Marshal(policyEvent)
 		if err != nil {
 			return err
 		}
@@ -1395,14 +1360,7 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyAdded(event eventstore
 	}
 
 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		type settingStruct struct {
-			policy.LockoutPolicyAddedEvent
-		}
-
-		loginSettings := settingStruct{
-			LockoutPolicyAddedEvent: policyEvent,
-		}
-		settings, err := json.Marshal(loginSettings)
+		settings, err := json.Marshal(policyEvent)
 		if err != nil {
 			return err
 		}
@@ -1484,13 +1442,7 @@ func (p *settingsRelationalProjection) reduceDomainPolicyAdded(event eventstore.
 	}
 
 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		type settingStruct struct {
-			policy.DomainPolicyAddedEvent
-		}
-		loginSettings := settingStruct{
-			DomainPolicyAddedEvent: policyEvent,
-		}
-		settingJSON, err := json.Marshal(loginSettings)
+		settingJSON, err := json.Marshal(policyEvent)
 		if err != nil {
 			return err
 		}

@@ -234,8 +234,8 @@ type SettingsRepository interface {
 	settingsConditions
 	settingsChanges
 
-	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, typ SettingType, cond ...database.Condition) (*Setting, error)
-	List(ctx context.Context, client database.QueryExecutor, conditions ...database.Condition) ([]*Setting, error)
+	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, typ SettingType, opts ...database.QueryOption) (*Setting, error)
+	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Setting, error)
 
 	CreateLogin(ctx context.Context, client database.QueryExecutor, setting *LoginSetting) error
 	GetLogin(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*LoginSetting, error)
@@ -278,4 +278,10 @@ type SettingsRepository interface {
 	DeleteSettingsForInstance(ctx context.Context, client database.QueryExecutor, instanceID string) (int64, error)
 	// DeleteSettingsForOrg is used ehwn an Organization is deleted
 	DeleteSettingsForOrg(ctx context.Context, client database.QueryExecutor, orgID string) (int64, error)
+}
+
+type LoginRepository interface {
+	Create(ctx context.Context, client database.QueryExecutor, setting *LoginSetting) error
+	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*LoginSetting, error)
+	Update(ctx context.Context, client database.QueryExecutor, setting *LoginSetting, changes ...database.Change) (int64, error)
 }
