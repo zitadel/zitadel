@@ -41,6 +41,15 @@ func (c Columns) Equals(col Column) bool {
 	return true
 }
 
+func (c Columns) IsOnTable(table string) bool {
+	for _, col := range c {
+		if col.IsOnTable(table) {
+			return true
+		}
+	}
+	return false
+}
+
 var _ Column = (Columns)(nil)
 
 // Column represents a column in a database table.
@@ -51,6 +60,7 @@ type Column interface {
 	WriteUnqualified(builder *StatementBuilder)
 	// Equals checks if two columns are equal.
 	Equals(col Column) bool
+	IsOnTable(table string) bool
 }
 
 type column struct {
@@ -85,6 +95,10 @@ func (c *column) Equals(col Column) bool {
 		return false
 	}
 	return c.table == toMatch.table && c.name == toMatch.name
+}
+
+func (c *column) IsOnTable(table string) bool {
+	return c.table == table
 }
 
 // LowerColumn returns a column that represents LOWER(col).
@@ -138,6 +152,10 @@ func (c *functionColumn) Equals(col Column) bool {
 		return false
 	}
 	return c.col.Equals(toMatch.col)
+}
+
+func (c *functionColumn) IsOnTable(table string) bool {
+	return c.col.IsOnTable(table)
 }
 
 var _ Column = (*functionColumn)(nil)

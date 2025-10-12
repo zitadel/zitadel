@@ -35,6 +35,7 @@ require (
 	github.com/go-chi/chi/v5 v5.2.2
 	github.com/go-jose/go-jose/v4 v4.1.0
 	github.com/go-ldap/ldap/v3 v3.4.11
+	github.com/go-resty/resty/v2 v2.16.5
 	github.com/go-webauthn/webauthn v0.10.2
 	github.com/goccy/go-json v0.10.5
 	github.com/golang/protobuf v1.5.4
@@ -110,6 +111,7 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20250512202823-5a2f75b736a9
 	google.golang.org/grpc v1.72.1
 	google.golang.org/protobuf v1.36.6
+	gopkg.in/headzoo/surf.v1 v1.0.1
 	sigs.k8s.io/yaml v1.4.0
 )
 
@@ -124,7 +126,9 @@ require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.3.0 // indirect
 	github.com/Masterminds/sprig/v3 v3.3.0 // indirect
+	github.com/PuerkitoBio/goquery v1.5.1 // indirect
 	github.com/alicebob/gopher-json v0.0.0-20230218143504-906a9b012302 // indirect
+	github.com/andybalholm/cascadia v1.1.0 // indirect
 	github.com/bmatcuk/doublestar/v4 v4.9.0 // indirect
 	github.com/cncf/xds/go v0.0.0-20250121191232-2f005788dc42 // indirect
 	github.com/crewjam/httperr v0.2.0 // indirect
@@ -145,6 +149,8 @@ require (
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
+	github.com/headzoo/surf v1.0.1 // indirect
+	github.com/headzoo/ut v0.0.0-20181013193318-a13b5a7a02ca // indirect
 	github.com/huandu/xstrings v1.5.0 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.10 // indirect

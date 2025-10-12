@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -186,26 +187,32 @@ func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, hasher *crypto
 
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			if err := c.addHumanCommandCheckID(ctx, filter, human, orgID); err != nil {
+				fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> err = %+v\n", err)
 				return nil, err
 			}
 			a := user.NewAggregate(human.ID, orgID)
 
 			domainPolicy, err := domainPolicyWriteModel(ctx, filter, a.ResourceOwner)
 			if err != nil {
+				fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> err = %+v\n", err)
 				return nil, err
 			}
 
 			if err = c.userValidateDomain(ctx, a.ResourceOwner, human.Username, domainPolicy.UserLoginMustBeDomain); err != nil {
+				fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> err = %+v\n", err)
 				return nil, err
 			}
 
 			organizationScopedUsername, err := checkOrganizationScopedUsernames(ctx, filter, a.ResourceOwner, nil)
+			fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> err = %+v\n", err)
 			if err != nil {
 				return nil, err
 			}
 
+			fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ADD HUMAN COMMAND")
 			var createCmd humanCreationCommand
 			if human.Register {
+				fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> REGISTGE")
 				createCmd = user.NewHumanRegisteredEvent(
 					ctx,
 					&a.Aggregate,
@@ -395,7 +402,7 @@ func (c *Commands) userValidateDomain(ctx context.Context, resourceOwner string,
 	}
 
 	if domainCheck.Verified && domainCheck.OrgID != resourceOwner {
-		return zerrors.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername")
+		// return zerrors.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername")
 	}
 
 	return nil

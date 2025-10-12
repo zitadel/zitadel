@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -15,7 +16,10 @@ var (
 )
 
 type (
-	human   struct{}
+	contact struct{}
+	human   struct {
+		contact
+	}
 	machine struct{}
 	user    struct {
 		human
@@ -44,6 +48,10 @@ func (h human) qualifiedTableName() string {
 
 func (h human) unqualifiedTableName() string {
 	return "human_users"
+}
+
+func (c contact) qualifiedTableName() string {
+	return "zitadel.human_contacts"
 }
 
 // -------------------------------------------------------------
@@ -391,6 +399,7 @@ const createHumaneStmt = `INSERT INTO zitadel.human_users (instance_id, org_id, 
 
 func (u user) createHuman(ctx context.Context, client database.QueryExecutor, user *domain.Human) (*domain.Human, error) {
 	builder := database.StatementBuilder{}
+	fmt.Printf("[DEBUGPRINT] [users_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> user.State = %+v\n", user.State)
 	builder.AppendArgs(user.User.InstanceID, user.User.OrgID, user.ID, user.Username, user.UsernameOrgUnique, user.State)
 	builder.AppendArgs(user.FirstName, user.LastName, user.NickName, user.DisplayName, user.PreferredLanguage, user.Gender, user.AvatarKey)
 
@@ -457,16 +466,24 @@ func (u user) UpdateHuman(ctx context.Context, client database.QueryExecutor, co
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-// const queryHumanUserStmt = `SELECT instance_id, org_id, id, username, username_org_unique, state,` +
-// 	` first_name, last_name, nick_name, display_name, preferred_language, gender, avatar_key,` +
-// 	` created_at, updated_at` +
-// 	` FROM zitadel.human_users`
-
-// func (u user) GetHuman(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Human, error) {
-// 	options := new(database.QueryOpts)
-// 	for _, opt := range opts {
-// 		opt(options)
+// func (h human) GetHumanTableChanges(changes ...database.Change) []*database.Change {
+// 	var humanChanges []*database.Change
+// 	for _, change := range changes {
+// 		if change.IsOnTable(h.contact.qualifiedTableName()) {
+// 			if humanChanges == nil {
+// 				humanChanges = make([]*database.Change, 0, len(changes))
+// 			}
+// 			humanChanges = append(humanChanges, &change)
+// 		}
 // 	}
+// 	return humanChanges
+// }
+
+func (c contact) Set(ctx context.Context, client database.QueryExecutor, contact domain.HumanContact) (int64, error) {
+	// 	for _, opt := range opts {
+	// 		opt(options)
+	return 0, nil
+}
 
 const queryHumanUserStmt = `SELECT zitadel.human_users.instance_id, zitadel.human_users.org_id, id, username, username_org_unique, state,` +
 	` first_name, last_name, nick_name, display_name, preferred_language, gender, avatar_key,` +
@@ -497,13 +514,13 @@ func (u user) GetHuman(ctx context.Context, client database.QueryExecutor, opts 
 		return nil, database.NewMissingConditionError(u.human.InstanceIDColumn())
 	}
 
-	if !options.Condition.IsRestrictingColumn(u.human.OrgIDColumn()) {
-		return nil, database.NewMissingConditionError(u.human.OrgIDColumn())
-	}
+	// if !options.Condition.IsRestrictingColumn(u.human.OrgIDColumn()) {
+	// 	return nil, database.NewMissingConditionError(u.human.OrgIDColumn())
+	// }
 
-	if !options.Condition.IsRestrictingColumn(u.human.IDColumn()) {
-		return nil, database.NewMissingConditionError(u.human.IDColumn())
-	}
+	// if !options.Condition.IsRestrictingColumn(u.human.IDColumn()) {
+	// 	return nil, database.NewMissingConditionError(u.human.IDColumn())
+	// }
 
 	var builder database.StatementBuilder
 	builder.WriteString(queryHumanUserStmt)

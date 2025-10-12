@@ -7,9 +7,11 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/go-resty/resty/v2"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/headzoo/surf.v1"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -103,113 +105,88 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 	// TODO
 	// // ~/go/src/zitadel/internal/api/ui/login/register_org_handler.go
-	// t.Run("test human user register reduced", func(t *testing.T) {
-	// 	humanUserRequest := &management.AddHumanUserRequest{
-	// UserName: gofakeit.Username(),
-	// 		Profile: &management.AddHumanUserRequest_Profile{
-	// 			FirstName:         "first",
-	// 			LastName:          "last",
-	// 			NickName:          "nick",
-	// 			DisplayName:       "display",
-	// 			PreferredLanguage: "en",
-	// 			Gender:            user.Gender_GENDER_MALE,
-	// 		},
-	// 		Email: &management.AddHumanUserRequest_Email{
-	// 			Email:           gofakeit.Email(),
-	// 			IsEmailVerified: true,
-	// 		},
-	// 		Phone: &management.AddHumanUserRequest_Phone{
-	// 			Phone:           "+" + gofakeit.Phone(),
-	// 			IsPhoneVerified: true,
-	// 		},
-	// 		InitialPassword: "Password1!",
-	// 	}
+	t.Run("test human user register reduced", func(t *testing.T) {
+		token := integration.SystemToken
+		client := resty.New()
 
-	// 	userAddRequest := &v2User.AddHumanUserRequest{
-	// 		UserId:   gu.Ptr("userID"),
-	// 		Username: gu.Ptr(gofakeit.Username()),
-	// 		Organization: &v2Object.Organization{
-	// 			Org: &v2Object.Organization_OrgId{
-	// 				OrgId: orgID,
-	// 			},
-	// 		},
-	// 		Profile: &v2User.SetHumanProfile{
-	// 			GivenName:         gofakeit.FirstName(),
-	// 			FamilyName:        gofakeit.LastName(),
-	// 			NickName:          gu.Ptr(gofakeit.Username()),
-	// 			DisplayName:       gu.Ptr(gofakeit.Name()),
-	// 			PreferredLanguage: gu.Ptr("en"),
-	// 			Gender:            gu.Ptr(v2User.Gender_GENDER_MALE),
-	// 		},
-	// 		Email: &v2User.SetHumanEmail{
-	// 			Email: gofakeit.Email(),
-	// 			Verification: &v2User.SetHumanEmail_IsVerified{
-	// 				IsVerified: true,
-	// 			},
-	// 		},
-	// 		Phone: &v2User.SetHumanPhone{
-	// 			Phone: "+" + gofakeit.Phone(),
-	// 			Verification: &v2User.SetHumanPhone_IsVerified{
-	// 				IsVerified: true,
-	// 			},
-	// 		},
-	// 	}
+		bow := surf.NewBrowser()
+		err := bow.Open("http://localhost:8080" + "/ui/login/register/org")
+		require.NoError(t, err)
+		require.Equal(t, 200, bow.StatusCode())
 
-	// 	// resp, err := MgmtClient.AddHumanUser(IAMCTX, humanUserRequest)
-	// 	before := time.Now()
-	// 	resp, err := UserClient.AddHumanUser(CTX, userAddRequest)
-	// 	fmt.Printf("[DEBUGPRINT] [users_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> respo = %+v\n", resp)
-	// 	fmt.Printf("[DEBUGPRINT] [users_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> err = %+v\n", err)
-	// 	return
-	// 	require.NoError(t, err)
-	// 	after := time.Now()
+		csfr, err := bow.Forms()[1].Value("gorilla.csrf.Token")
+		require.NoError(t, err)
 
-	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		user, err := userRepo.GetHuman(
-	// 			CTX,
-	// 			pool,
-	// 			database.WithCondition(database.And(
-	// 				userRepo.Human().InstanceIDCondition(instanceID),
-	// 				userRepo.Human().OrgIDCondition(orgID),
-	// 				userRepo.Human().IDCondition(resp.UserId),
-	// 			)),
-	// 		)
-	// 		require.NoError(t, err)
+		before := time.Now()
+		client.SetCookieJar(bow.CookieJar())
+		firstName := gofakeit.Name()
+		lastName := gofakeit.Name()
+		email := gofakeit.Email()
+		out, err := client.R().SetAuthToken(token).
+			SetFormData(map[string]string{
+				"gorilla.csrf.Token": csfr,
+				"orgname":            gofakeit.Name(),
+				"firstname":          firstName,
+				"lastname":           lastName,
+				// "email":                          "@zitadel.localhost",
+				"email":                          email,
+				"register-password":              "Password1!",
+				"register-password-confirmation": "Password1!",
+			}).
+			Post("http://localhost:8080" + "/ui/login/register/org")
 
-	// 		// event user.added
-	// 		// event user.human.added
-	// 		// domain.User
-	// 		assert.Equal(t, instanceID, user.InstanceID)
-	// 		assert.Equal(t, orgID, user.OrgID)
-	// 		assert.Equal(t, resp.UserId, user.ID)
-	// 		assert.Equal(t, humanUserRequest.UserName, user.Username)
-	// 		assert.Equal(t, domain.UserStateActive, user.State)
-	// 		// TODO
-	// 		// assert.Equal(t, true, user.UsernameOrgUnique)
-	// 		assert.WithinRange(t, user.UpdatedAt, before, after)
-	// 		assert.WithinRange(t, user.CreatedAt, before, after)
-	// 		// Email
-	// 		assert.Equal(t, domain.ContactTypeEmail, *user.HumanEmailContact.Type)
-	// 		assert.Equal(t, humanUserRequest.Email.Email, *user.HumanEmailContact.Value)
-	// 		// TODO
-	// 		// assert.Equal(t, true, *user.HumanEmailContact.IsVerified)
-	// 		assert.Nil(t, user.HumanEmailContact.UnverifiedValue)
-	// 		// Phone
-	// 		assert.Equal(t, domain.ContactTypePhone, *user.HumanPhoneContact.Type)
-	// 		assert.Equal(t, humanUserRequest.Phone.Phone, *user.HumanPhoneContact.Value)
-	// 		// TODO
-	// 		// assert.Equal(t, true, *user.HumanPhoneContact.IsVerified)
-	// 		assert.Nil(t, user.HumanPhoneContact.UnverifiedValue)
-	// 		// Human
-	// 		assert.Equal(t, humanUserRequest.Profile.FirstName, user.FirstName)
-	// 		assert.Equal(t, humanUserRequest.Profile.LastName, user.LastName)
-	// 		assert.Equal(t, humanUserRequest.Profile.NickName, user.NickName)
-	// 		assert.Equal(t, humanUserRequest.Profile.DisplayName, user.DisplayName)
-	// 		assert.Equal(t, humanUserRequest.Profile.PreferredLanguage, user.PreferredLanguage)
-	// 		assert.Equal(t, uint8(humanUserRequest.Profile.Gender), user.Gender)
-	// 	}, retryDuration, tick)
-	// })
+		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
+		after := time.Now()
+
+		ctx := t.Context()
+		instanceRepo := repository.InstanceRepository()
+		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
+		assert.NoError(t, err)
+		instanceID := instance.ID
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			user, err := userRepo.GetHuman(
+				CTX,
+				pool,
+				database.WithCondition(database.And(
+					userRepo.Human().InstanceIDCondition(instanceID),
+					userRepo.Human().FirstNameCondition(database.TextOperationEqual, firstName),
+					userRepo.Human().LastNameCondition(database.TextOperationEqual, lastName),
+				)),
+			)
+			require.NoError(t, err)
+
+			// // domain.User
+			assert.Equal(t, instanceID, user.InstanceID)
+			assert.Equal(t, email, user.Username)
+			assert.Equal(t, domain.UserStateActive, user.State)
+			// // TODO
+			// // assert.Equal(t, true, user.UsernameOrgUnique)
+			assert.WithinRange(t, user.UpdatedAt, before, after)
+			assert.WithinRange(t, user.CreatedAt, before, after)
+			// // Email
+			// assert.Equal(t, domain.ContactTypeEmail, *user.HumanEmailContact.Type)
+			// assert.Equal(t, humanUserRequest.Email.Email, *user.HumanEmailContact.Value)
+			// // TODO
+			// // assert.Equal(t, true, *user.HumanEmailContact.IsVerified)
+			// assert.Nil(t, user.HumanEmailContact.UnverifiedValue)
+			// // Phone
+			// assert.Equal(t, domain.ContactTypePhone, *user.HumanPhoneContact.Type)
+			// assert.Equal(t, humanUserRequest.Phone.Phone, *user.HumanPhoneContact.Value)
+			// // TODO
+			// // assert.Equal(t, true, *user.HumanPhoneContact.IsVerified)
+			// assert.Nil(t, user.HumanPhoneContact.UnverifiedValue)
+			// // Human
+			assert.Equal(t, firstName, user.FirstName)
+			assert.Equal(t, lastName, user.LastName)
+			// assert.Equal(t, humanUserRequest.Profile.NickName, user.NickName)
+			// assert.Equal(t, humanUserRequest.Profile.DisplayName, user.DisplayName)
+			// assert.Equal(t, humanUserRequest.Profile.PreferredLanguage, user.PreferredLanguage)
+			// assert.Equal(t, uint8(humanUserRequest.Profile.Gender), user.Gender)
+		}, retryDuration, tick)
+	})
 
 	// TODO
 	// t.Run("test human user added init reduced", func(t *testing.T) {

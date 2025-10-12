@@ -9,6 +9,8 @@ type Change interface {
 	Write(builder *StatementBuilder)
 	// IsOnColumn checks if the change is on the given column.
 	IsOnColumn(col Column) bool
+	// IsOnColumn checks if the change is on the given table.
+	IsOnTable(table string) bool
 }
 
 type change[V Value] struct {
@@ -48,6 +50,10 @@ func (c change[V]) IsOnColumn(col Column) bool {
 	return c.column.Equals(col)
 }
 
+func (c change[V]) IsOnTable(table string) bool {
+	return c.column.IsOnTable(table)
+}
+
 type Changes []Change
 
 func NewChanges(cols ...Change) Change {
@@ -69,6 +75,12 @@ func (m Changes) Write(builder *StatementBuilder) {
 		}
 		change.Write(builder)
 	}
+}
+
+func (c Changes) IsOnTable(table string) bool {
+	return slices.ContainsFunc(c, func(change Change) bool {
+		return change.IsOnTable(table)
+	})
 }
 
 var _ Change = Changes(nil)

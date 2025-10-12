@@ -161,10 +161,10 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 				// 			Event:  user.HumanAvatarRemovedType,
 				// 			Reduce: p.reduceHumanAvatarRemoved,
 				// 		},
-						{
-							Event:  user.MachineAddedEventType,
-							Reduce: p.reduceMachineAdded,
-						},
+				{
+					Event:  user.MachineAddedEventType,
+					Reduce: p.reduceMachineAdded,
+				},
 				// 		{
 				// 			Event:  user.MachineChangedEventType,
 				// 			Reduce: p.reduceMachineChanged,
@@ -838,7 +838,8 @@ func (p *userRelationalProjection) reduceHumanPhoneChanged(event eventstore.Even
 				userRepo.Human().InstanceIDCondition(e.Aggregate().InstanceID),
 				userRepo.Human().IDCondition(e.Aggregate().ID),
 			),
-			userRepo.Human().SetUsername(e.UserName),
+			// TODO
+			// userRepo.Human().SetUsername(e.UserName),
 			userRepo.Human().SetUpdatedAt(e.CreationDate()),
 		)
 		if err != nil {
@@ -1074,7 +1075,7 @@ func (p *userRelationalProjection) reduceHumanAvatarAdded(event eventstore.Event
 				userRepo.Human().InstanceIDCondition(e.Aggregate().InstanceID),
 				userRepo.Human().IDCondition(e.Aggregate().ID),
 			),
-			userRepo.Human().SetAvatarKey(e.StoreKey)
+			userRepo.Human().SetAvatarKey(e.StoreKey),
 			userRepo.Human().SetUpdatedAt(e.CreationDate()),
 		)
 		if err != nil {

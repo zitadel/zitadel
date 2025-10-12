@@ -411,7 +411,6 @@ func (p *userProjection) reduceHumanRegistered(event eventstore.Event) (*handler
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xE53M", "reduce.wrong.event.type %s", user.HumanRegisteredType)
 	}
-	fmt.Println("[DEBUGPRINT] [users_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> HUMAN REGISTERED REDUCE ***")
 	passwordSet := crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""
 	return handler.NewMultiStatement(
 		e,

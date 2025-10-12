@@ -1,6 +1,7 @@
 package login
 
 import (
+	"fmt"
 	"net/http"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
@@ -57,26 +58,31 @@ func (l *Login) handleRegisterOrg(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CHECK")
 	restrictions, err := l.query.GetInstanceRestrictions(r.Context())
 	if err != nil {
 		l.renderError(w, r, nil, err)
 		return
 	}
+	fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 1")
 	if restrictions.DisallowPublicOrgRegistration {
 		w.WriteHeader(http.StatusConflict)
 		return
 	}
 	data := new(registerOrgFormData)
+	fmt.Println("[DEBUGPRINT] [:2] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 2")
 	authRequest, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authRequest, err)
 		return
 	}
+	fmt.Println("[DEBUGPRINT] [:2] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 3")
 	if data.Password != data.Password2 {
 		err := zerrors.ThrowInvalidArgument(nil, "VIEW-KaGue", "Errors.User.Password.ConfirmationWrong")
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
 	}
+	fmt.Println("[DEBUGPRINT]] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 4")
 
 	ctx := setContext(r.Context(), "")
 	userIDs, err := l.getClaimedUserIDsOfOrgDomain(ctx, data.RegisterOrgName)
@@ -84,6 +90,7 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
 	}
+	fmt.Println("[DEBUGPRINT]] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 5")
 	_, err = l.command.SetUpOrg(ctx, data.toCommandOrg(), true, userIDs...)
 	if err != nil {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
@@ -97,6 +104,7 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRequest *domain.AuthRequest, formData *registerOrgFormData, err error) {
+	fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> REGISTER")
 	if formData == nil {
 		formData = new(registerOrgFormData)
 	}
