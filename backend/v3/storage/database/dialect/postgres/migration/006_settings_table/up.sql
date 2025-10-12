@@ -37,8 +37,8 @@ CREATE TABLE zitadel.settings (
     , FOREIGN KEY (instance_id, org_id) REFERENCES zitadel.organizations(instance_id, id)
 );
 
-CREATE UNIQUE INDEX idx_settings_unique_type ON zitadel.settings (instance_id, org_id, type) NULLS NOT DISTINCT WHERE type != 'label';
-CREATE UNIQUE INDEX idx_settings_label_unique_type ON zitadel.settings (instance_id, org_id, type, label_state) NULLS NOT DISTINCT WHERE type = 'label';
+CREATE UNIQUE INDEX idx_settings_unique_type ON zitadel.settings (instance_id, org_id, type, owner_type) NULLS NOT DISTINCT WHERE type != 'label';
+CREATE UNIQUE INDEX idx_settings_label_unique_type ON zitadel.settings (instance_id, org_id, type, owner_type, label_state) NULLS NOT DISTINCT WHERE type = 'label';
 
 CREATE INDEX idx_settings_type ON zitadel.settings(instance_id, type, label_state) NULLS NOT DISTINCT;
 

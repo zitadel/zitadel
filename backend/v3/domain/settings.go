@@ -71,8 +71,7 @@ const (
 )
 
 type LoginSettings struct {
-	AllowUserNamePassword *bool `json:"allowUsernamePassword,omitempty"`
-	// AllowRegister              bool             `json:"allowRegister,omitempty"`
+	AllowUserNamePassword      *bool             `json:"allowUsernamePassword,omitempty"`
 	AllowRegister              *bool             `json:"allowRegister,omitempty"`
 	AllowExternalIDP           *bool             `json:"allowExternalIdp,omitempty"`
 	ForceMFA                   *bool             `json:"forceMfa,omitempty"`
@@ -200,15 +199,15 @@ type SecuritySetting struct {
 	Settings SecuritySettings
 }
 
-type OrgSettings struct {
+type OrganizationSettings struct {
 	OrganizationScopedUsernames    bool     `json:"organizationScopedUsernames,omitempty"`
 	OldOrganizationScopedUsernames bool     `json:"oldOrganizationScopedUsernames,omitempty"`
 	UsernameChanges                []string `json:"usernameChanges,omitempty"`
 }
 
-type OrgSetting struct {
+type OrganizationSetting struct {
 	*Setting
-	Settings OrgSettings
+	Settings OrganizationSettings
 }
 
 type settingsColumns interface {
@@ -277,9 +276,9 @@ type SettingsRepository interface {
 	GetDomain(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*DomainSetting, error)
 	UpdateDomain(ctx context.Context, client database.QueryExecutor, setting *DomainSetting, changes ...database.Change) (int64, error)
 
-	CreateOrg(ctx context.Context, client database.QueryExecutor, setting *OrgSetting) error
-	GetOrg(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*OrgSetting, error)
-	UpdateOrg(ctx context.Context, client database.QueryExecutor, setting *OrgSetting, changes ...database.Change) (int64, error)
+	CreateOrg(ctx context.Context, client database.QueryExecutor, setting *OrganizationSetting) error
+	GetOrg(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*OrganizationSetting, error)
+	UpdateOrg(ctx context.Context, client database.QueryExecutor, setting *OrganizationSetting, changes ...database.Change) (int64, error)
 
 	// Create is used for events reduction
 	Create(ctx context.Context, client database.QueryExecutor, setting *Setting) error
@@ -298,4 +297,68 @@ type LoginRepository interface {
 
 	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*LoginSetting, error)
 	Set(ctx context.Context, client database.QueryExecutor, setting *LoginSetting, changes ...database.Change) error
+}
+
+type LabelRepository interface {
+	settingsColumns
+	settingsConditions
+	settingsChanges
+
+	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*LabelSetting, error)
+	Set(ctx context.Context, client database.QueryExecutor, setting *LabelSetting, changes ...database.Change) error
+	// ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *LabelSetting) error
+}
+
+type PasswordComplexityRepository interface {
+	settingsColumns
+	settingsConditions
+	settingsChanges
+
+	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*PasswordComplexitySetting, error)
+	Set(ctx context.Context, client database.QueryExecutor, setting *PasswordComplexitySetting, changes ...database.Change) error
+}
+
+type PasswordExpiryRepository interface {
+	settingsColumns
+	settingsConditions
+	settingsChanges
+
+	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*PasswordExpirySetting, error)
+	Set(ctx context.Context, client database.QueryExecutor, setting *PasswordExpirySetting, changes ...database.Change) error
+}
+
+type LockoutRepository interface {
+	settingsColumns
+	settingsConditions
+	settingsChanges
+
+	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*LockoutSetting, error)
+	Set(ctx context.Context, client database.QueryExecutor, setting *LockoutSetting, changes ...database.Change) error
+}
+
+type SecurityRepository interface {
+	settingsColumns
+	settingsConditions
+	settingsChanges
+
+	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*SecuritySetting, error)
+	Set(ctx context.Context, client database.QueryExecutor, setting *SecuritySetting, changes ...database.Change) error
+}
+
+type DomainRepository interface {
+	settingsColumns
+	settingsConditions
+	settingsChanges
+
+	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*DomainSetting, error)
+	Set(ctx context.Context, client database.QueryExecutor, setting *DomainSetting, changes ...database.Change) error
+}
+
+type OrganizationSettingRepository interface {
+	settingsColumns
+	settingsConditions
+	settingsChanges
+
+	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*OrganizationSetting, error)
+	Set(ctx context.Context, client database.QueryExecutor, setting *OrganizationSetting, changes ...database.Change) error
 }

@@ -90,10 +90,10 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  org.LabelPolicyRemovedEventType,
 					Reduce: s.reduceLabelPolicyRemoved,
 				},
-				{
-					Event:  org.LabelPolicyActivatedEventType,
-					Reduce: s.reduceLabelActivated,
-				},
+				// {
+				// 	Event:  org.LabelPolicyActivatedEventType,
+				// 	Reduce: s.reduceLabelActivated,
+				// },
 				{
 					Event:  org.LabelPolicyLogoAddedEventType,
 					Reduce: s.reduceLabelLogoAdded,
@@ -244,10 +244,10 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  instance.LabelPolicyChangedEventType,
 					Reduce: s.reduceLabelChanged,
 				},
-				{
-					Event:  instance.LabelPolicyActivatedEventType,
-					Reduce: s.reduceLabelActivated,
-				},
+				// {
+				// 	Event:  instance.LabelPolicyActivatedEventType,
+				// 	Reduce: s.reduceLabelActivated,
+				// },
 				{
 					Event:  instance.LabelPolicyLogoAddedEventType,
 					Reduce: s.reduceLabelLogoAdded,
@@ -376,6 +376,7 @@ func (s *settingsRelationalProjection) reduceLoginPolicyAdded(event eventstore.E
 			UpdatedAt:  &policyEvent.Creation,
 		}
 		err = settingsRepo.Create(ctx, v3_sql.SQLTx(tx), &setting)
+		fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ADDDING setting.InstanceID = %+v\n", setting.InstanceID)
 		return err
 	}), nil
 }
@@ -405,10 +406,6 @@ func (s *settingsRelationalProjection) reduceLoginPolicyChanged(event eventstore
 
 		loginRepo := repository.LoginRepository()
 
-		// setting, err := settingsRepo.GetLogin(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
-		// if err != nil {
-		// 	return zerrors.ThrowInternal(err, "HANDL-r7k9m", "error accessing login policy record")
-		// }
 		setting := &domain.LoginSetting{
 			Setting: &domain.Setting{
 				InstanceID: policyEvent.Agg.InstanceID,
@@ -428,7 +425,9 @@ func (s *settingsRelationalProjection) reduceLoginPolicyChanged(event eventstore
 			setting.Settings.AllowExternalIDP = policyEvent.AllowExternalIDP
 		}
 		if policyEvent.ForceMFA != nil {
-			setting.Settings.ForceMFA = policyEvent.ForceMFA
+			// setting.Settings.ForceMFA = policyEvent.ForceMFA
+			forceMFA := *policyEvent.ForceMFA
+			setting.Settings.ForceMFA = &forceMFA
 		}
 		if policyEvent.ForceMFALocalOnly != nil {
 			setting.Settings.ForceMFALocalOnly = policyEvent.ForceMFALocalOnly
@@ -473,8 +472,10 @@ func (s *settingsRelationalProjection) reduceLoginPolicyChanged(event eventstore
 
 		setting.UpdatedAt = &policyEvent.Creation
 
-		fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BEFORE")
 		err := loginRepo.Set(ctx, v3_sql.SQLTx(tx), setting, loginRepo.SetUpdatedAt(&policyEvent.Creation))
+
+		fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> UPDATING setting.InstanceID = %+v\n", setting.InstanceID)
+		fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> err = %+v\n", err)
 		return err
 	}), nil
 }
@@ -752,12 +753,15 @@ func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) 
 func (s *settingsRelationalProjection) reduceLabelChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LabelPolicyChangedEvent
+	var ownerType domain.OwnerType
 	switch e := event.(type) {
 	case *org.LabelPolicyChangedEvent:
 		policyEvent = e.LabelPolicyChangedEvent
 		orgId = &policyEvent.Aggregate().ResourceOwner
+		ownerType = domain.OwnerTypeOrganization
 	case *instance.LabelPolicyChangedEvent:
 		policyEvent = e.LabelPolicyChangedEvent
+		ownerType = domain.OwnerTypeInstance
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-qgVug", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyChangedEventType, instance.LabelPolicyChangedEventType})
 	}
@@ -768,11 +772,21 @@ func (s *settingsRelationalProjection) reduceLabelChanged(event eventstore.Event
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-lhb9y", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository()
+		// settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetLabel(ctx, v3_sql.SQLTx(tx), event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
-		if err != nil {
-			return zerrors.ThrowInternal(err, "HANDL-r879m", "error accessing login policy record")
+		// setting, err := settingsRepo.GetLabel(ctx, v3_sql.SQLTx(tx), event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
+		// if err != nil {
+		// 	return zerrors.ThrowInternal(err, "HANDL-r879m", "error accessing login policy record")
+		// }
+
+		settingsRepo := repository.LabelRepository()
+
+		setting := &domain.LabelSetting{
+			Setting: &domain.Setting{
+				InstanceID: policyEvent.Agg.InstanceID,
+				OrgID:      orgId,
+				OwnerType:  ownerType,
+			},
 		}
 
 		if policyEvent.PrimaryColor != nil {
@@ -812,7 +826,7 @@ func (s *settingsRelationalProjection) reduceLabelChanged(event eventstore.Event
 			setting.Settings.ThemeMode = domain.LabelPolicyThemeMode(*policyEvent.ThemeMode)
 		}
 
-		_, err = settingsRepo.UpdateLabel(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
+		err := settingsRepo.Set(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
@@ -889,15 +903,18 @@ func (s *settingsRelationalProjection) reduceLabelActivated(event eventstore.Eve
 
 func (p *settingsRelationalProjection) reduceLabelLogoAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
+	var ownerType domain.OwnerType
 	switch e := event.(type) {
 	case *org.LabelPolicyLogoAddedEvent:
 		orgId = &e.Aggregate().ID
+		ownerType = domain.OwnerTypeOrganization
 	case *instance.LabelPolicyLogoAddedEvent:
-	// ok
+		ownerType = domain.OwnerTypeInstance
 	case *org.LabelPolicyLogoDarkAddedEvent:
 		orgId = &e.Aggregate().ID
+		ownerType = domain.OwnerTypeOrganization
 	case *instance.LabelPolicyLogoDarkAddedEvent:
-	// ok
+		ownerType = domain.OwnerTypeInstance
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-4UbiP", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyLogoAddedEventType, instance.LabelPolicyLogoAddedEventType, org.LabelPolicyLogoDarkAddedEventType, instance.LabelPolicyLogoDarkAddedEventType})
 	}
@@ -907,11 +924,21 @@ func (p *settingsRelationalProjection) reduceLabelLogoAdded(event eventstore.Eve
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
-		settingsRepo := repository.SettingsRepository()
+		// settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetLabel(ctx, v3_sql.SQLTx(tx), event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
-		if err != nil {
-			return zerrors.ThrowInternal(err, "HANDL-y7dDm", "error accessing login policy record")
+		// setting, err := settingsRepo.GetLabel(ctx, v3_sql.SQLTx(tx), event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
+		// if err != nil {
+		// 	return zerrors.ThrowInternal(err, "HANDL-y7dDm", "error accessing login policy record")
+		// }
+
+		settingsRepo := repository.LabelRepository()
+
+		setting := &domain.LabelSetting{
+			Setting: &domain.Setting{
+				InstanceID: event.Aggregate().InstanceID,
+				OrgID:      orgId,
+				OwnerType:  ownerType,
+			},
 		}
 
 		switch e := event.(type) {
@@ -927,20 +954,25 @@ func (p *settingsRelationalProjection) reduceLabelLogoAdded(event eventstore.Eve
 
 		CreatedAt := event.CreatedAt()
 
-		_, err = settingsRepo.UpdateLabel(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
+		err := settingsRepo.Set(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
 
 func (p *settingsRelationalProjection) reduceLogoRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
+	var ownerType domain.OwnerType
 	switch event.(type) {
 	case *org.LabelPolicyLogoRemovedEvent:
 		orgId = &event.Aggregate().ID
+		ownerType = domain.OwnerTypeOrganization
 	case *instance.LabelPolicyLogoRemovedEvent:
+		ownerType = domain.OwnerTypeInstance
 	case *org.LabelPolicyLogoDarkRemovedEvent:
 		orgId = &event.Aggregate().ID
+		ownerType = domain.OwnerTypeOrganization
 	case *instance.LabelPolicyLogoDarkRemovedEvent:
+		ownerType = domain.OwnerTypeInstance
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-kg8H4", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyLogoRemovedEventType, instance.LabelPolicyLogoRemovedEventType, org.LabelPolicyLogoDarkRemovedEventType, instance.LabelPolicyLogoDarkRemovedEventType})
 	}
@@ -950,11 +982,20 @@ func (p *settingsRelationalProjection) reduceLogoRemoved(event eventstore.Event)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
-		settingsRepo := repository.SettingsRepository()
+		// settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetLabel(ctx, v3_sql.SQLTx(tx), event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
-		if err != nil {
-			return zerrors.ThrowInternal(err, "HANDL-d7L9s", "error accessing login policy record")
+		// setting, err := settingsRepo.GetLabel(ctx, v3_sql.SQLTx(tx), event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
+		// if err != nil {
+		// 	return zerrors.ThrowInternal(err, "HANDL-d7L9s", "error accessing login policy record")
+		// }
+		settingsRepo := repository.LabelRepository()
+
+		setting := &domain.LabelSetting{
+			Setting: &domain.Setting{
+				InstanceID: event.Aggregate().InstanceID,
+				OrgID:      orgId,
+				OwnerType:  ownerType,
+			},
 		}
 
 		switch event.(type) {
@@ -970,20 +1011,26 @@ func (p *settingsRelationalProjection) reduceLogoRemoved(event eventstore.Event)
 
 		CreatedAt := event.CreatedAt()
 
-		_, err = settingsRepo.UpdateLabel(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
+		// _, err = settingsRepo.UpdateLabel(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
+		err := settingsRepo.Set(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
 
 func (p *settingsRelationalProjection) reduceIconAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
+	var ownerType domain.OwnerType
 	switch event.(type) {
 	case *org.LabelPolicyIconAddedEvent:
 		orgId = &event.Aggregate().ID
+		ownerType = domain.OwnerTypeOrganization
 	case *instance.LabelPolicyIconAddedEvent:
+		ownerType = domain.OwnerTypeInstance
 	case *org.LabelPolicyIconDarkAddedEvent:
 		orgId = &event.Aggregate().ID
+		ownerType = domain.OwnerTypeOrganization
 	case *instance.LabelPolicyIconDarkAddedEvent:
+		ownerType = domain.OwnerTypeInstance
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-e2JFz", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyIconAddedEventType, instance.LabelPolicyIconAddedEventType, org.LabelPolicyIconDarkAddedEventType, instance.LabelPolicyIconDarkAddedEventType})
 	}
@@ -993,11 +1040,21 @@ func (p *settingsRelationalProjection) reduceIconAdded(event eventstore.Event) (
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
-		settingsRepo := repository.SettingsRepository()
+		// settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetLabel(ctx, v3_sql.SQLTx(tx), event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
-		if err != nil {
-			return zerrors.ThrowInternal(err, "HANDL-s7a9m", "error accessing login policy record")
+		// setting, err := settingsRepo.GetLabel(ctx, v3_sql.SQLTx(tx), event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
+		// if err != nil {
+		// 	return zerrors.ThrowInternal(err, "HANDL-s7a9m", "error accessing login policy record")
+		// }
+
+		settingsRepo := repository.LabelRepository()
+
+		setting := &domain.LabelSetting{
+			Setting: &domain.Setting{
+				InstanceID: event.Aggregate().InstanceID,
+				OrgID:      orgId,
+				OwnerType:  ownerType,
+			},
 		}
 
 		switch e := event.(type) {
@@ -1029,20 +1086,26 @@ func (p *settingsRelationalProjection) reduceIconAdded(event eventstore.Event) (
 
 		CreatedAt := event.CreatedAt()
 
-		_, err = settingsRepo.UpdateLabel(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
+		// _, err = settingsRepo.UpdateLabel(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
+		err := settingsRepo.Set(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
 
 func (p *settingsRelationalProjection) reduceIconRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
+	var ownerType domain.OwnerType
 	switch event.(type) {
 	case *org.LabelPolicyIconRemovedEvent:
 		orgId = &event.Aggregate().ID
+		ownerType = domain.OwnerTypeOrganization
 	case *instance.LabelPolicyIconRemovedEvent:
+		ownerType = domain.OwnerTypeInstance
 	case *org.LabelPolicyIconDarkRemovedEvent:
 		orgId = &event.Aggregate().ID
+		ownerType = domain.OwnerTypeOrganization
 	case *instance.LabelPolicyIconDarkRemovedEvent:
+		ownerType = domain.OwnerTypeInstance
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-gfgbY", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyIconRemovedEventType, instance.LabelPolicyIconRemovedEventType, org.LabelPolicyIconDarkRemovedEventType, instance.LabelPolicyIconDarkRemovedEventType})
 	}
@@ -1052,11 +1115,21 @@ func (p *settingsRelationalProjection) reduceIconRemoved(event eventstore.Event)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
-		settingsRepo := repository.SettingsRepository()
+		// settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetLabel(ctx, v3_sql.SQLTx(tx), event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
-		if err != nil {
-			return zerrors.ThrowInternal(err, "HANDL-B7L9m", "error accessing login policy record")
+		// setting, err := settingsRepo.GetLabel(ctx, v3_sql.SQLTx(tx), event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
+		// if err != nil {
+		// 	return zerrors.ThrowInternal(err, "HANDL-B7L9m", "error accessing login policy record")
+		// }
+
+		settingsRepo := repository.LabelRepository()
+
+		setting := &domain.LabelSetting{
+			Setting: &domain.Setting{
+				InstanceID: event.Aggregate().InstanceID,
+				OrgID:      orgId,
+				OwnerType:  ownerType,
+			},
 		}
 
 		switch event.(type) {
@@ -1072,17 +1145,21 @@ func (p *settingsRelationalProjection) reduceIconRemoved(event eventstore.Event)
 
 		CreatedAt := event.CreatedAt()
 
-		_, err = settingsRepo.UpdateLabel(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
+		// _, err = settingsRepo.UpdateLabel(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
+		err := settingsRepo.Set(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
 
 func (p *settingsRelationalProjection) reduceFontAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
+	var ownerType domain.OwnerType
 	switch event.(type) {
 	case *org.LabelPolicyFontAddedEvent:
 		orgId = &event.Aggregate().ID
+		ownerType = domain.OwnerTypeOrganization
 	case *instance.LabelPolicyFontAddedEvent:
+		ownerType = domain.OwnerTypeInstance
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-65i9W", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyFontAddedEventType, instance.LabelPolicyFontAddedEventType})
 	}
@@ -1092,11 +1169,21 @@ func (p *settingsRelationalProjection) reduceFontAdded(event eventstore.Event) (
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
-		settingsRepo := repository.SettingsRepository()
+		// settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetLabel(ctx, v3_sql.SQLTx(tx), event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
-		if err != nil {
-			return zerrors.ThrowInternal(err, "HANDL-H7S7m", "error accessing login policy record")
+		// setting, err := settingsRepo.GetLabel(ctx, v3_sql.SQLTx(tx), event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
+		// if err != nil {
+		// 	return zerrors.ThrowInternal(err, "HANDL-H7S7m", "error accessing login policy record")
+		// }
+
+		settingsRepo := repository.LabelRepository()
+
+		setting := &domain.LabelSetting{
+			Setting: &domain.Setting{
+				InstanceID: event.Aggregate().InstanceID,
+				OrgID:      orgId,
+				OwnerType:  ownerType,
+			},
 		}
 
 		switch e := event.(type) {
@@ -1108,17 +1195,21 @@ func (p *settingsRelationalProjection) reduceFontAdded(event eventstore.Event) (
 
 		CreatedAt := event.CreatedAt()
 
-		_, err = settingsRepo.UpdateLabel(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
+		// _, err = settingsRepo.UpdateLabel(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
+		err := settingsRepo.Set(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
 
 func (p *settingsRelationalProjection) reduceFontRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
+	var ownerType domain.OwnerType
 	switch event.(type) {
 	case *org.LabelPolicyFontRemovedEvent:
 		orgId = &event.Aggregate().ID
+		ownerType = domain.OwnerTypeInstance
 	case *instance.LabelPolicyFontRemovedEvent:
+		ownerType = domain.OwnerTypeInstance
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-xf32J", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyFontRemovedEventType, instance.LabelPolicyFontRemovedEventType})
 	}
@@ -1128,18 +1219,28 @@ func (p *settingsRelationalProjection) reduceFontRemoved(event eventstore.Event)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
-		settingsRepo := repository.SettingsRepository()
+		// settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetLabel(ctx, v3_sql.SQLTx(tx), event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
-		if err != nil {
-			return zerrors.ThrowInternal(err, "HANDL-77kMm", "error accessing login policy record")
+		// setting, err := settingsRepo.GetLabel(ctx, v3_sql.SQLTx(tx), event.Aggregate().InstanceID, orgId, domain.LabelStatePreview)
+		// if err != nil {
+		// 	return zerrors.ThrowInternal(err, "HANDL-77kMm", "error accessing login policy record")
+		// }
+		settingsRepo := repository.LabelRepository()
+
+		setting := &domain.LabelSetting{
+			Setting: &domain.Setting{
+				InstanceID: event.Aggregate().InstanceID,
+				OrgID:      orgId,
+				OwnerType:  ownerType,
+			},
 		}
 
 		setting.Settings.LabelPolicyFontURL = nil
 
 		CreatedAt := event.CreatedAt()
 
-		_, err = settingsRepo.UpdateLabel(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
+		// _, err = settingsRepo.UpdateLabel(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
+		err := settingsRepo.Set(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
@@ -1188,12 +1289,15 @@ func (p *settingsRelationalProjection) reducePassedComplexityAdded(event eventst
 func (s *settingsRelationalProjection) reducePasswordComplexityChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.PasswordComplexityPolicyChangedEvent
+	var ownerType domain.OwnerType
 	switch e := event.(type) {
 	case *org.PasswordComplexityPolicyChangedEvent:
 		policyEvent = e.PasswordComplexityPolicyChangedEvent
 		orgId = &policyEvent.Aggregate().ResourceOwner
+		ownerType = domain.OwnerTypeOrganization
 	case *instance.PasswordComplexityPolicyChangedEvent:
 		policyEvent = e.PasswordComplexityPolicyChangedEvent
+		ownerType = domain.OwnerTypeInstance
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-cf3Xb", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordComplexityPolicyChangedEventType, instance.PasswordComplexityPolicyChangedEventType})
 	}
@@ -1204,11 +1308,14 @@ func (s *settingsRelationalProjection) reducePasswordComplexityChanged(event eve
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rLrfy", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository()
+		settingsRepo := repository.PasswordComplexityRepository()
 
-		setting, err := settingsRepo.GetPasswordComplexity(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
-		if err != nil {
-			return zerrors.ThrowInternal(err, "HANDL-rXK9m", "error accessing login policy record")
+		setting := &domain.PasswordComplexitySetting{
+			Setting: &domain.Setting{
+				InstanceID: policyEvent.Agg.InstanceID,
+				OrgID:      orgId,
+				OwnerType:  ownerType,
+			},
 		}
 
 		if policyEvent.MinLength != nil {
@@ -1229,7 +1336,7 @@ func (s *settingsRelationalProjection) reducePasswordComplexityChanged(event eve
 
 		CreatedAt := event.CreatedAt()
 
-		_, err = settingsRepo.UpdatePasswordComplexity(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
+		err := settingsRepo.Set(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
 }
@@ -1299,12 +1406,15 @@ func (p *settingsRelationalProjection) reducePasswordPolicyAdded(event eventstor
 func (p *settingsRelationalProjection) reducePasswordPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.PasswordAgePolicyChangedEvent
+	var ownerType domain.OwnerType
 	switch e := event.(type) {
 	case *org.PasswordAgePolicyChangedEvent:
 		policyEvent = e.PasswordAgePolicyChangedEvent
 		orgId = &policyEvent.Aggregate().ResourceOwner
+		ownerType = domain.OwnerTypeOrganization
 	case *instance.PasswordAgePolicyChangedEvent:
 		policyEvent = e.PasswordAgePolicyChangedEvent
+		ownerType = domain.OwnerTypeInstance
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-i7FZt", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordAgePolicyChangedEventType, instance.PasswordAgePolicyChangedEventType})
 	}
@@ -1314,11 +1424,19 @@ func (p *settingsRelationalProjection) reducePasswordPolicyChanged(event eventst
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-Mlk6y", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository()
+		settingsRepo := repository.PasswordExpiryRepository()
 
-		setting, err := settingsRepo.GetPasswordExpiry(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
-		if err != nil {
-			return zerrors.ThrowInternal(err, "HANDL-z7k3m", "error accessing login policy record")
+		// setting, err := settingsRepo.GetPasswordExpiry(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
+		// if err != nil {
+		// 	return zerrors.ThrowInternal(err, "HANDL-z7k3m", "error accessing login policy record")
+		// }
+
+		setting := &domain.PasswordExpirySetting{
+			Setting: &domain.Setting{
+				InstanceID: policyEvent.Agg.InstanceID,
+				OrgID:      orgId,
+				OwnerType:  ownerType,
+			},
 		}
 
 		if policyEvent.ExpireWarnDays != nil {
@@ -1328,7 +1446,7 @@ func (p *settingsRelationalProjection) reducePasswordPolicyChanged(event eventst
 			setting.Settings.MaxAgeDays = *policyEvent.MaxAgeDays
 		}
 
-		_, err = settingsRepo.UpdatePasswordExpiry(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
+		err := settingsRepo.Set(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
@@ -1438,12 +1556,15 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyAdded(event eventstore
 func (p *settingsRelationalProjection) reduceLockoutPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LockoutPolicyChangedEvent
+	var ownerType domain.OwnerType
 	switch e := event.(type) {
 	case *org.LockoutPolicyChangedEvent:
 		policyEvent = e.LockoutPolicyChangedEvent
 		orgId = &policyEvent.Aggregate().ResourceOwner
+		ownerType = domain.OwnerTypeOrganization
 	case *instance.LockoutPolicyChangedEvent:
 		policyEvent = e.LockoutPolicyChangedEvent
+		ownerType = domain.OwnerTypeInstance
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-gT3BQ", "reduce.wrong.event.type, %v", []eventstore.EventType{org.LockoutPolicyChangedEventType, instance.LockoutPolicyChangedEventType})
 	}
@@ -1454,12 +1575,20 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyChanged(event eventsto
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rbsxy", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository()
+		settingsRepo := repository.LockoutRepository()
 
-		setting, err := settingsRepo.GetLockout(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
-		if err != nil {
-			return zerrors.ThrowInternal(err, "HANDL-rPkxm", "error accessing login policy record")
+		setting := &domain.LockoutSetting{
+			Setting: &domain.Setting{
+				InstanceID: policyEvent.Agg.InstanceID,
+				OrgID:      orgId,
+				OwnerType:  ownerType,
+			},
 		}
+
+		// setting, err := settingsRepo.GetLockout(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
+		// if err != nil {
+		// 	return zerrors.ThrowInternal(err, "HANDL-rPkxm", "error accessing login policy record")
+		// }
 
 		if policyEvent.MaxPasswordAttempts != nil {
 			setting.Settings.MaxPasswordAttempts = *policyEvent.MaxPasswordAttempts
@@ -1471,7 +1600,7 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyChanged(event eventsto
 			setting.Settings.ShowLockOutFailures = *policyEvent.ShowLockOutFailures
 		}
 
-		_, err = settingsRepo.UpdateLockout(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
+		err := settingsRepo.Set(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
@@ -1521,12 +1650,15 @@ func (p *settingsRelationalProjection) reduceDomainPolicyAdded(event eventstore.
 func (s *settingsRelationalProjection) reduceDomainPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.DomainPolicyChangedEvent
+	var ownerType domain.OwnerType
 	switch e := event.(type) {
 	case *org.DomainPolicyChangedEvent:
 		policyEvent = e.DomainPolicyChangedEvent
 		orgId = &policyEvent.Aggregate().ResourceOwner
+		ownerType = domain.OwnerTypeOrganization
 	case *instance.DomainPolicyChangedEvent:
 		policyEvent = e.DomainPolicyChangedEvent
+		ownerType = domain.OwnerTypeInstance
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-qgVug", "reduce.wrong.event.type %v", []eventstore.EventType{org.DomainPolicyChangedEventType, instance.DomainPolicyChangedEventType})
 	}
@@ -1537,11 +1669,14 @@ func (s *settingsRelationalProjection) reduceDomainPolicyChanged(event eventstor
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rbsxy", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository()
+		settingsRepo := repository.DomainRepository()
 
-		setting, err := settingsRepo.GetDomain(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
-		if err != nil {
-			return zerrors.ThrowInternal(err, "HANDL-rPkxm", "error accessing login policy record")
+		setting := &domain.DomainSetting{
+			Setting: &domain.Setting{
+				InstanceID: policyEvent.Agg.InstanceID,
+				OrgID:      orgId,
+				OwnerType:  ownerType,
+			},
 		}
 
 		if policyEvent.UserLoginMustBeDomain != nil {
@@ -1554,7 +1689,7 @@ func (s *settingsRelationalProjection) reduceDomainPolicyChanged(event eventstor
 			setting.Settings.SMTPSenderAddressMatchesInstanceDomain = *policyEvent.SMTPSenderAddressMatchesInstanceDomain
 		}
 
-		_, err = settingsRepo.UpdateDomain(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
+		err := settingsRepo.Set(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
