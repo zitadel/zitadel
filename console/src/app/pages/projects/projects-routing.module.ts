@@ -29,6 +29,15 @@ const routes: Routes = [
     loadChildren: () => import('../app-create/app-create.module'),
   },
   {
+    path: 'app-quick-create',
+    canActivate: [roleGuard],
+    data: {
+      animation: 'AddPage',
+      roles: ['project.app.write'],
+    },
+    loadChildren: () => import('../app-quick-create/app-quick-create.module'),
+  },
+  {
     path: ':projectid',
     loadChildren: () => import('./owned-projects/owned-projects.module'),
   },

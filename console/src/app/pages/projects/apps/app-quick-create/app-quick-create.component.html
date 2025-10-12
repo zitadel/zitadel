@@ -1,0 +1,587 @@
+<cnsl-create-layout
+  title="{{ 'APP.PAGES.CREATE' | translate }}"
+  class="app-create-wrapper"
+  [createSteps]="
+    !pro
+      ? appType?.value?.createType === AppCreateType.OIDC
+        ? appType?.value.oidcAppType !== OIDCAppType.OIDC_APP_TYPE_NATIVE
+          ? 4
+          : 3
+        : appType?.value?.createType === AppCreateType.API
+          ? 3
+          : appType?.value?.createType === AppCreateType.SAML
+            ? 3
+            : 0
+      : 0
+  "
+  [currentCreateStep]="currentCreateStep"
+  (closed)="close()"
+>
+  <h1>{{ 'APP.PAGES.CREATE_DESC_TITLE' | translate }}</h1>
+  <mat-progress-bar class="progress-bar" color="primary" *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+
+  <mat-checkbox class="proswitch" color="primary" [(ngModel)]="pro">
+    {{ 'APP.PROSWITCH' | translate }}
+  </mat-checkbox>
+
+  <mat-horizontal-stepper
+    class="stepper {{ 'last-edited-step-' + stepper.selectedIndex }}"
+    *ngIf="!pro"
+    linear
+    #stepper
+    labelPosition="bottom"
+    (selectionChange)="changeStep($event)"
+  >
+    <mat-step [stepControl]="firstFormGroup" [editable]="true">
+      <form [formGroup]="firstFormGroup">
+        <ng-template matStepLabel>{{ 'APP.NAMEANDTYPESECTION' | translate }}</ng-template>
+
+        <p class="step-title">{{ 'APP.TITLEFIRST' | translate }}</p>
+        <cnsl-form-field class="name-formfield">
+          <cnsl-label>{{ 'APP.NAME' | translate }}</cnsl-label>
+          <input cnslInput cdkFocusInitial formControlName="name" />
+        </cnsl-form-field>
+
+        <p class="step-title">{{ 'APP.TYPETITLE' | translate }}</p>
+
+        <cnsl-type-radio [types]="appTypes" (selectedType)="appType?.setValue($event)" [selected]="appType?.value">
+        </cnsl-type-radio>
+        <div class="app-create-actions">
+          <button
+            mat-raised-button
+            [disabled]="firstFormGroup.invalid"
+            color="primary"
+            matStepperNext
+            data-e2e="continue-button-nameandtype"
+          >
+            {{ 'ACTIONS.CONTINUE' | translate }}
+          </button>
+        </div>
+      </form>
+    </mat-step>
+
+    <!-- skip for SAML applications -->
+    <mat-step
+      *ngIf="appType?.value?.createType === AppCreateType.OIDC || appType?.value?.createType === AppCreateType.API"
+      [stepControl]="secondFormGroup"
+      [editable]="true"
+    >
+      <form [formGroup]="secondFormGroup">
+        <ng-template matStepLabel>{{ 'APP.AUTHMETHODSECTION' | translate }}</ng-template>
+
+        <cnsl-auth-method-radio
+          [authMethods]="authMethods"
+          [selected]="authMethod?.value"
+          [isOIDC]="appType?.value?.createType === AppCreateType.OIDC"
+          (selectedMethod)="authMethod?.setValue($event)"
+        >
+        </cnsl-auth-method-radio>
+
+        <div class="app-create-actions">
+          <button class="bck-button" mat-stroked-button matStepperPrevious>{{ 'ACTIONS.BACK' | translate }}</button>
+          <button
+            mat-raised-button
+            color="primary"
+            [disabled]="secondFormGroup.invalid"
+            matStepperNext
+            data-e2e="continue-button-authmethod"
+          >
+            {{ 'ACTIONS.CONTINUE' | translate }}
+          </button>
+        </div>
+      </form>
+    </mat-step>
+    <!-- show redirect step only for OIDC apps -->
+    <mat-step
+      *ngIf="appType?.value?.createType === AppCreateType.OIDC && authMethod?.value !== 'DEVICECODE'"
+      [editable]="true"
+    >
+      <ng-template matStepLabel>{{ 'APP.OIDC.REDIRECTSECTION' | translate }}</ng-template>
+
+      <p class="step-title">{{ 'APP.OIDC.REDIRECTTITLE' | translate }}</p>
+      <p
+        class="step-description cnsl-secondary-text"
+        *ngIf="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+      >
+        {{ 'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate }}
+      </p>
+      <p class="step-description cnsl-secondary-text" *ngIf="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_WEB">
+        {{ 'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate }}
+      </p>
+
+      <mat-slide-toggle
+        color="primary"
+        [(ngModel)]="devMode"
+        [ngModelOptions]="{ standalone: true }"
+        matTooltip="{{ 'APP.OIDC.DEVMODEDESC' | translate }}"
+      >
+        {{ 'APP.OIDC.DEVMODE' | translate }}
+      </mat-slide-toggle>
+
+      <cnsl-redirect-uris
+        class="redirect-section"
+        [disabled]="false"
+        [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+        [(ngModel)]="redirectUris"
+        [getValues]="requestRedirectValuesSubject$"
+        title="{{ 'APP.OIDC.REDIRECT' | translate }}"
+        [devMode]="devMode"
+        data-e2e="redirect-uris"
+      >
+      </cnsl-redirect-uris>
+
+      <p class="step-title">{{ 'APP.OIDC.POSTREDIRECTTITLE' | translate }}</p>
+      <p
+        class="step-description cnsl-secondary-text"
+        *ngIf="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+      >
+        {{ 'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate }}
+      </p>
+      <p
+        class="step-description cnsl-secondary-text"
+        *ngIf="
+          appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_WEB ||
+          appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_USER_AGENT
+        "
+      >
+        {{ 'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate }}
+      </p>
+
+      <cnsl-redirect-uris
+        class="redirect-section"
+        [disabled]="false"
+        [(ngModel)]="postLogoutUrisList"
+        [getValues]="requestRedirectValuesSubject$"
+        title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
+        [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+        [devMode]="devMode"
+        data-e2e="postlogout-uris"
+      >
+      </cnsl-redirect-uris>
+
+      <div class="app-create-actions">
+        <button mat-stroked-button class="bck-button" matStepperPrevious>{{ 'ACTIONS.BACK' | translate }}</button>
+        <button mat-raised-button color="primary" matStepperNext data-e2e="continue-button-redirecturis">
+          {{ 'ACTIONS.CONTINUE' | translate }}
+        </button>
+      </div>
+    </mat-step>
+
+    <mat-step *ngIf="appType?.value?.createType === AppCreateType.SAML" [editable]="true">
+      <ng-template matStepLabel>{{ 'APP.SAML.CONFIGSECTION' | translate }}</ng-template>
+
+      <h3 class="title cnsl-secondary-text">
+        {{ 'APP.SAML.CHOOSEMETADATASOURCE' | translate }}
+      </h3>
+
+      <div class="cnsl-secondary-text metadata-option">
+        <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT1' | translate }}</span>
+        <form [formGroup]="samlConfigForm">
+          <cnsl-form-field class="formfield">
+            <cnsl-label></cnsl-label>
+            <input cnslInput formControlName="metadataUrl" placeholder="https://" />
+          </cnsl-form-field>
+        </form>
+      </div>
+
+      <div class="cnsl-secondary-text metadata-option">
+        <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT2' | translate }}</span>
+
+        <form>
+          <input
+            #xmlFileInput
+            style="display: none"
+            class="file-input"
+            type="file"
+            accept="text/xml,application/xml"
+            (change)="onDropXML($any($event.target).files)"
+          />
+          <button
+            type="button"
+            class="upload-button"
+            mat-stroked-button
+            (click)="$event.preventDefault(); xmlFileInput.click()"
+          >
+            {{ 'APP.SAML.UPLOAD' | translate }}
+          </button>
+        </form>
+      </div>
+
+      <div class="cnsl-secondary-text metadata-option">
+        <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT3' | translate }}</span>
+        <form [formGroup]="samlConfigForm">
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'APP.SAML.ENTITYID' | translate }}</cnsl-label>
+            <input cnslInput formControlName="entityId" placeholder="https://" />
+          </cnsl-form-field>
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'APP.SAML.ACSURL' | translate }}</cnsl-label>
+            <input cnslInput formControlName="acsURL" placeholder="https://" />
+          </cnsl-form-field>
+        </form>
+      </div>
+
+      <div
+        class="saml-xml"
+        [ngClass]="{ disabled: !!metadataUrl?.value }"
+        *ngIf="decodedBase64 && samlAppRequest.toObject().metadataXml && !samlAppRequest.toObject().metadataUrl"
+      >
+        <!-- <p class="preview-text cnsl-secondary-text">PREVIEW</p> -->
+        <ngx-codemirror
+          [(ngModel)]="decodedBase64"
+          [ngModelOptions]="{ standalone: true }"
+          [options]="{
+            lineNumbers: true,
+            theme: 'material',
+            mode: 'application/xml',
+          }"
+        ></ngx-codemirror>
+      </div>
+
+      <div class="app-create-actions">
+        <button mat-stroked-button class="bck-button" matStepperPrevious>{{ 'ACTIONS.BACK' | translate }}</button>
+        <button mat-raised-button color="primary" matStepperNext [attr.data-e2e]="'continue-button-redirecturis'">
+          {{ 'ACTIONS.CONTINUE' | translate }}
+        </button>
+      </div>
+    </mat-step>
+
+    <mat-step>
+      <ng-template matStepLabel>{{ 'APP.OIDC.OVERVIEWSECTION' | translate }}</ng-template>
+      <p class="step-title">{{ 'APP.OIDC.OVERVIEWTITLE' | translate }}</p>
+      <div class="row">
+        <span class="left cnsl-secondary-text">
+          {{ 'APP.NAME' | translate }}
+        </span>
+        <span class="right">
+          {{ name?.value }}
+        </span>
+      </div>
+
+      <ng-container *ngIf="appType?.value?.createType === AppCreateType.OIDC">
+        <div class="row">
+          <span class="left cnsl-secondary-text">
+            {{ 'APP.TYPE' | translate }}
+          </span>
+          <span class="right">
+            {{ 'APP.OIDC.APPTYPE.' + oidcAppRequest.toObject().appType | translate }}
+          </span>
+        </div>
+        <div class="row">
+          <span class="left cnsl-secondary-text">
+            {{ 'APP.GRANT' | translate }}
+          </span>
+          <span
+            class="right"
+            *ngIf="oidcAppRequest.toObject().grantTypesList && oidcAppRequest.toObject().grantTypesList.length > 0"
+          >
+            [<span *ngFor="let element of oidcAppRequest.toObject().grantTypesList; index as i">
+              {{ 'APP.OIDC.GRANT.' + element | translate }}
+              {{ i < oidcAppRequest.toObject().grantTypesList.length - 1 ? ', ' : '' }} </span
+            >]
+          </span>
+        </div>
+        <div class="row">
+          <span class="left cnsl-secondary-text">
+            {{ 'APP.OIDC.RESPONSETYPE' | translate }}
+          </span>
+          <span
+            class="right"
+            *ngIf="oidcAppRequest.toObject().responseTypesList && oidcAppRequest.toObject().responseTypesList.length > 0"
+          >
+            [<span *ngFor="let element of oidcAppRequest.toObject().responseTypesList; index as i">
+              {{ 'APP.OIDC.RESPONSE.' + element | translate }}
+              {{ i < oidcAppRequest.toObject().responseTypesList.length - 1 ? ', ' : '' }} </span
+            >]
+          </span>
+        </div>
+
+        <div class="row">
+          <span class="left cnsl-secondary-text">
+            {{ 'APP.AUTHMETHOD' | translate }}
+          </span>
+          <span class="right">
+            <span>
+              {{ 'APP.OIDC.AUTHMETHOD.' + oidcAppRequest.toObject().authMethodType | translate }}
+            </span>
+          </span>
+        </div>
+
+        <div class="row" *ngIf="appType?.value?.createType === AppCreateType.OIDC && authMethod?.value !== 'DEVICECODE'">
+          <span class="left cnsl-secondary-text">
+            {{ 'APP.OIDC.REDIRECT' | translate }}
+          </span>
+          <span
+            class="right"
+            *ngIf="oidcAppRequest.toObject().redirectUrisList && oidcAppRequest.toObject().redirectUrisList.length > 0"
+          >
+            [<span *ngFor="let redirect of oidcAppRequest.toObject().redirectUrisList; index as i">
+              {{ redirect }}
+              {{ i < oidcAppRequest.toObject().redirectUrisList.length - 1 ? ', ' : '' }} </span
+            >]
+          </span>
+        </div>
+
+        <div class="row" *ngIf="appType?.value?.createType === AppCreateType.OIDC && authMethod?.value !== 'DEVICECODE'">
+          <span class="left cnsl-secondary-text">
+            {{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}
+          </span>
+          <span
+            class="right"
+            *ngIf="
+              oidcAppRequest.toObject().postLogoutRedirectUrisList &&
+              oidcAppRequest.toObject().postLogoutRedirectUrisList.length > 0
+            "
+          >
+            [<span *ngFor="let redirect of oidcAppRequest.toObject().postLogoutRedirectUrisList; index as i">
+              {{ redirect }}
+              {{ i < oidcAppRequest.toObject().postLogoutRedirectUrisList.length - 1 ? ', ' : '' }} </span
+            >]
+          </span>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="appType?.value?.createType === AppCreateType.OIDC">
+        <div class="row">
+          <span class="left cnsl-secondary-text">
+            {{ 'APP.OIDC.DEVMODE' | translate }}
+          </span>
+          <span class="right">
+            <span>
+              {{ devMode ? ('APP.OIDC.DEVMODE_ENABLED' | translate) : ('APP.OIDC.DEVMODE_DISABLED' | translate) }}
+            </span>
+          </span>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="appType?.value?.createType === AppCreateType.API">
+        <div class="row">
+          <span class="left cnsl-secondary-text">
+            {{ 'APP.AUTHMETHOD' | translate }}
+          </span>
+          <span class="right">
+            <span>
+              {{ 'APP.API.AUTHMETHOD.' + apiAppRequest.toObject().authMethodType | translate }}
+            </span>
+          </span>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="appType?.value?.createType === AppCreateType.SAML">
+        <div class="row">
+          <span class="left cnsl-secondary-text">
+            {{ 'APP.SAML.METADATA' | translate }}
+          </span>
+          <span class="right">
+            <span *ngIf="metadataUrl?.value">
+              {{ metadataUrl?.value }}
+            </span>
+            <span *ngIf="samlAppRequest.toObject().metadataXml">
+              {{ 'APP.SAML.METADATAFROMFILE' | translate }}
+            </span>
+          </span>
+        </div>
+        <div class="row">
+          <span class="left cnsl-secondary-text">
+            {{ 'APP.SAML.CERTIFICATE' | translate }}
+          </span>
+          <a
+            *ngIf="samlCertificateURL$ | async as samlCertificateURL"
+            href="{{ samlCertificateURL }}"
+            class="cert"
+            rel="noreferrer"
+            download
+            >{{ 'APP.SAML.DOWNLOADCERT' | translate }}</a
+          >
+        </div>
+      </ng-container>
+
+      <div class="app-create-actions">
+        <button mat-stroked-button matStepperPrevious class="bck-button">{{ 'ACTIONS.BACK' | translate }}</button>
+        <button mat-raised-button class="create-button" color="primary" (click)="createApp()" data-e2e="create-button">
+          {{ 'ACTIONS.CREATE' | translate }}
+        </button>
+      </div>
+    </mat-step>
+
+    <!-- Icon override -->
+    <ng-template matStepperIcon="edit">
+      <mat-icon>check</mat-icon>
+    </ng-template>
+  </mat-horizontal-stepper>
+
+  <div *ngIf="pro" class="dev">
+    <form [formGroup]="form" (ngSubmit)="createApp()" data-e2e="create-app-wizzard-3">
+      <div class="content">
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'APP.NAME' | translate }}</cnsl-label>
+          <input cnslInput formControlName="name" />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'APP.TYPE' | translate }}</cnsl-label>
+          <mat-select formControlName="appType">
+            <mat-option *ngFor="let appType of appTypes" [value]="appType">
+              {{ appType.titleI18nKey | translate }}
+            </mat-option>
+          </mat-select>
+        </cnsl-form-field>
+
+        <ng-container *ngIf="formappType?.value?.createType === AppCreateType.OIDC">
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'APP.OIDC.GRANTTYPE' | translate }}</cnsl-label>
+            <mat-select formControlName="grantTypesList" multiple>
+              <mat-option *ngFor="let grant of oidcGrantTypes" [value]="grant.type">
+                {{ 'APP.OIDC.GRANT.' + grant.type | translate }}
+              </mat-option>
+            </mat-select>
+          </cnsl-form-field>
+
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'APP.OIDC.RESPONSETYPE' | translate }}</cnsl-label>
+            <mat-select formControlName="responseTypesList" multiple>
+              <mat-option *ngFor="let type of oidcResponseTypes" [value]="type.type">
+                {{ 'APP.OIDC.RESPONSE.' + type.type | translate }}
+              </mat-option>
+            </mat-select>
+          </cnsl-form-field>
+        </ng-container>
+
+        <ng-container *ngIf="formappType?.value?.createType !== AppCreateType.SAML">
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'APP.AUTHMETHOD' | translate }}</cnsl-label>
+            <mat-select formControlName="authMethodType">
+              <mat-option *ngFor="let type of authMethodTypes" [value]="type.type">
+                <span *ngIf="type.oidc">{{ 'APP.OIDC.AUTHMETHOD.' + type.type | translate }}</span>
+                <span *ngIf="type.api">{{ 'APP.API.AUTHMETHOD.' + type.type | translate }}</span>
+              </mat-option>
+            </mat-select>
+          </cnsl-form-field>
+        </ng-container>
+      </div>
+
+      <div class="content">
+        <ng-container *ngIf="formappType?.value?.createType === AppCreateType.SAML">
+          <div class="saml">
+            <h3 class="title cnsl-secondary-text">
+              {{ 'APP.SAML.CHOOSEMETADATASOURCE' | translate }}
+            </h3>
+            <div class="cnsl-secondary-text metadata-option">
+              <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT1' | translate }}</span>
+              <form [formGroup]="samlConfigForm">
+                <cnsl-form-field class="formfield">
+                  <cnsl-label></cnsl-label>
+                  <input cnslInput formControlName="metadataUrl" placeholder="https://" />
+                </cnsl-form-field>
+              </form>
+            </div>
+
+            <div class="cnsl-secondary-text metadata-option">
+              <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT2' | translate }}</span>
+
+              <form>
+                <input
+                  #xmlFileInput
+                  style="display: none"
+                  class="file-input"
+                  type="file"
+                  accept="text/xml,application/xml"
+                  (change)="onDropXML($any($event.target).files)"
+                />
+                <button
+                  type="button"
+                  class="upload-button"
+                  mat-stroked-button
+                  (click)="$event.preventDefault(); xmlFileInput.click()"
+                >
+                  {{ 'APP.SAML.UPLOAD' | translate }}
+                </button>
+              </form>
+            </div>
+
+            <div class="cnsl-secondary-text metadata-option">
+              <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT3' | translate }}</span>
+              <form [formGroup]="samlConfigForm">
+                <cnsl-form-field class="formfield">
+                  <cnsl-label>{{ 'APP.SAML.ENTITYID' | translate }}</cnsl-label>
+                  <input cnslInput formControlName="entityId" placeholder="https://" />
+                </cnsl-form-field>
+                <cnsl-form-field class="formfield">
+                  <cnsl-label>{{ 'APP.SAML.ACSURL' | translate }}</cnsl-label>
+                  <input cnslInput formControlName="acsURL" placeholder="https://" />
+                </cnsl-form-field>
+              </form>
+            </div>
+
+            <div
+              class="saml-xml"
+              [ngClass]="{ disabled: !!metadataUrl?.value }"
+              *ngIf="decodedBase64 && samlAppRequest.toObject().metadataXml && !samlAppRequest.toObject().metadataUrl"
+            >
+              <ngx-codemirror
+                [(ngModel)]="decodedBase64"
+                [ngModelOptions]="{ standalone: true }"
+                [options]="{
+                  lineNumbers: true,
+                  theme: 'material',
+                  mode: 'application/xml',
+                }"
+              ></ngx-codemirror>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <div
+        class="content"
+        *ngIf="
+          formappType?.value?.createType === AppCreateType.OIDC &&
+          !(oidcAppRequest.toObject().appType === OIDCAppType.OIDC_APP_TYPE_NATIVE && grantTypesListContainsOnlyDeviceCode)
+        "
+      >
+        <div class="formfield full-width">
+          <mat-slide-toggle
+            color="primary"
+            [(ngModel)]="devMode"
+            [ngModelOptions]="{ standalone: true }"
+            matTooltip="{{ 'APP.OIDC.DEVMODEDESC' | translate }}"
+          >
+            {{ 'APP.OIDC.DEVMODE' | translate }}
+          </mat-slide-toggle>
+          <cnsl-redirect-uris
+            class="redirect-section"
+            [disabled]="false"
+            [(ngModel)]="redirectUris"
+            [ngModelOptions]="{ standalone: true }"
+            [getValues]="requestRedirectValuesSubject$"
+            title="{{ 'APP.OIDC.REDIRECT' | translate }}"
+            [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+          >
+          </cnsl-redirect-uris>
+
+          <cnsl-redirect-uris
+            class="redirect-section"
+            [disabled]="false"
+            [(ngModel)]="postLogoutUrisList"
+            [ngModelOptions]="{ standalone: true }"
+            title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
+            [getValues]="requestRedirectValuesSubject$"
+            [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+          >
+          </cnsl-redirect-uris>
+        </div>
+      </div>
+
+      <button
+        color="primary"
+        mat-raised-button
+        class="continue-button"
+        [disabled]="form.invalid"
+        cdkFocusInitial
+        type="submit"
+      >
+        {{ 'ACTIONS.CREATE' | translate }}
+      </button>
+    </form>
+  </div>
+</cnsl-create-layout>
