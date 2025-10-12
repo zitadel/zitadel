@@ -150,19 +150,33 @@ func (s *settings) List(ctx context.Context, client database.QueryExecutor, opts
 	return scanSettings(ctx, client, &builder)
 }
 
-func (s *settings) CreateLogin(ctx context.Context, client database.QueryExecutor, setting *domain.LoginSetting) error {
+// login
+type loginSettings struct {
+	domain.SettingsRepository
+}
+
+func LoginRepository() domain.LoginRepository {
+	return &loginSettings{
+		&settings{},
+	}
+}
+
+var _ domain.LoginRepository = (*loginSettings)(nil)
+
+func (s *loginSettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.LoginSetting, changes ...database.Change) error {
 	if setting == nil {
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypeLogin
-	return s.createSetting(ctx, client, setting.Setting, &setting.Settings)
+	fmt.Printf("[DEBUGPRINT] SEEETT [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> setting.OwnerType = %+v\n", setting.OwnerType)
+	return createSetting(ctx, client, setting.Setting, &setting.Settings)
 }
 
-func (s *settings) GetLogin(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*domain.LoginSetting, error) {
+func (s *loginSettings) Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*domain.LoginSetting, error) {
 	loginSetting := &domain.LoginSetting{}
 	var err error
 
-	loginSetting.Setting, err = s.Get(ctx, client, instanceID, orgID, domain.SettingTypeLogin)
+	loginSetting.Setting, err = s.SettingsRepository.Get(ctx, client, instanceID, orgID, domain.SettingTypeLogin)
 	if err != nil {
 		return nil, err
 	}
@@ -175,9 +189,9 @@ func (s *settings) GetLogin(ctx context.Context, client database.QueryExecutor, 
 	return loginSetting, nil
 }
 
-func (s *settings) UpdateLogin(ctx context.Context, client database.QueryExecutor, setting *domain.LoginSetting, changes ...database.Change) (int64, error) {
-	return s.updateSetting(ctx, client, setting.Setting, &setting.Settings, changes...)
-}
+// func (s *settings) UpdateLogin(ctx context.Context, client database.QueryExecutor, setting *domain.LoginSetting, changes ...database.Change) (int64, error) {
+// 	return s.updateSetting(ctx, client, setting.Setting, &setting.Settings, changes...)
+// }
 
 func (s *settings) CreateLabel(ctx context.Context, client database.QueryExecutor, setting *domain.LabelSetting) error {
 	if setting == nil {
@@ -188,7 +202,7 @@ func (s *settings) CreateLabel(ctx context.Context, client database.QueryExecuto
 	}
 
 	setting.Type = domain.SettingTypeLabel
-	return s.createSetting(ctx, client, setting.Setting, &setting.Settings)
+	return createSetting(ctx, client, setting.Setting, &setting.Settings)
 }
 
 func (s *settings) GetLabel(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, state domain.LabelState) (*domain.LabelSetting, error) {
@@ -247,7 +261,7 @@ func (s *settings) CreatePasswordComplexity(ctx context.Context, client database
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypePasswordComplexity
-	return s.createSetting(ctx, client, setting.Setting, &setting.Settings)
+	return createSetting(ctx, client, setting.Setting, &setting.Settings)
 }
 
 func (s *settings) GetPasswordComplexity(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*domain.PasswordComplexitySetting, error) {
@@ -276,7 +290,7 @@ func (s *settings) CreatePasswordExpiry(ctx context.Context, client database.Que
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypePasswordExpiry
-	return s.createSetting(ctx, client, setting.Setting, &setting.Settings)
+	return createSetting(ctx, client, setting.Setting, &setting.Settings)
 }
 
 func (s *settings) GetPasswordExpiry(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*domain.PasswordExpirySetting, error) {
@@ -305,7 +319,7 @@ func (s *settings) CreateSecurity(ctx context.Context, client database.QueryExec
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypeSecurity
-	return s.createSetting(ctx, client, setting.Setting, &setting.Settings)
+	return createSetting(ctx, client, setting.Setting, &setting.Settings)
 }
 
 func (s *settings) GetSecurity(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*domain.SecuritySetting, error) {
@@ -334,7 +348,7 @@ func (s *settings) CreateLockout(ctx context.Context, client database.QueryExecu
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypeLockout
-	return s.createSetting(ctx, client, setting.Setting, &setting.Settings)
+	return createSetting(ctx, client, setting.Setting, &setting.Settings)
 }
 
 func (s *settings) GetLockout(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*domain.LockoutSetting, error) {
@@ -363,7 +377,7 @@ func (s *settings) CreateDomain(ctx context.Context, client database.QueryExecut
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypeDomain
-	return s.createSetting(ctx, client, setting.Setting, &setting.Settings)
+	return createSetting(ctx, client, setting.Setting, &setting.Settings)
 }
 
 func (s *settings) GetDomain(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*domain.DomainSetting, error) {
@@ -392,7 +406,7 @@ func (s *settings) CreateOrg(ctx context.Context, client database.QueryExecutor,
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypeOrganization
-	return s.createSetting(ctx, client, setting.Setting, &setting.Settings)
+	return createSetting(ctx, client, setting.Setting, &setting.Settings)
 }
 
 func (s *settings) GetOrg(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*domain.OrgSetting, error) {
@@ -468,12 +482,23 @@ func (s *settings) Create(ctx context.Context, client database.QueryExecutor, se
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.ID, &setting.CreatedAt, &setting.UpdatedAt)
 }
 
+// const createSettingStmt = `INSERT INTO zitadel.settings` +
+// 	` (instance_id, org_id, type, owner_type, label_state, settings)` +
+// 	` VALUES ($1, $2, $3, $4, $5, $6)` +
+// 	` RETURNING id, created_at, updated_at`
+
 const createSettingStmt = `INSERT INTO zitadel.settings` +
 	` (instance_id, org_id, type, owner_type, label_state, settings)` +
 	` VALUES ($1, $2, $3, $4, $5, $6)` +
+	` ON CONFLICT (instance_id, org_id, type) WHERE type != 'label' DO UPDATE SET` +
+	` settings = zitadel.settings.settings || EXCLUDED.settings` +
 	` RETURNING id, created_at, updated_at`
 
-func (s *settings) createSetting(ctx context.Context, client database.QueryExecutor, setting *domain.Setting, settings any) error {
+// const createSettingStmt = `INSERT INTO zitadel.settings` +
+// 	` (instance_id, org_id, type, owner_type, label_state, settings)` +
+// 	` VALUES ($1, $2, $3, $4, $5, $6)`
+
+func createSetting(ctx context.Context, client database.QueryExecutor, setting *domain.Setting, settings any) error {
 	builder := database.StatementBuilder{}
 
 	settingJSON, err := json.Marshal(settings)

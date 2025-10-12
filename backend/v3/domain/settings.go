@@ -71,23 +71,24 @@ const (
 )
 
 type LoginSettings struct {
-	AllowUserNamePassword      bool             `json:"allowUsernamePassword,omitempty"`
-	AllowRegister              bool             `json:"allowRegister,omitempty"`
-	AllowExternalIDP           bool             `json:"allowExternalIdp,omitempty"`
-	ForceMFA                   bool             `json:"forceMfa,omitempty"`
-	ForceMFALocalOnly          bool             `json:"forceMfaLocalOnly,omitempty"`
-	HidePasswordReset          bool             `json:"hidePasswordReset,omitempty"`
-	IgnoreUnknownUsernames     bool             `json:"ignoreUnknownUsernames,omitempty"`
-	AllowDomainDiscovery       bool             `json:"allowDomainDiscovery,omitempty"`
-	DisableLoginWithEmail      bool             `json:"disableLoginWithEmail,omitempty"`
-	DisableLoginWithPhone      bool             `json:"disableLoginWithPhone,omitempty"`
-	PasswordlessType           PasswordlessType `json:"passwordlessType,omitempty"`
-	DefaultRedirectURI         string           `json:"defaultRedirectUri,omitempty"`
-	PasswordCheckLifetime      time.Duration    `json:"passwordCheckLifetime,omitempty"`
-	ExternalLoginCheckLifetime time.Duration    `json:"externalLoginCheckLifetime,omitempty"`
-	MFAInitSkipLifetime        time.Duration    `json:"mfaInitSkipLifetime,omitempty"`
-	SecondFactorCheckLifetime  time.Duration    `json:"secondFactorCheckLifetime,omitempty"`
-	MultiFactorCheckLifetime   time.Duration    `json:"multiFactorCheckLifetime,omitempty"`
+	AllowUserNamePassword *bool `json:"allowUsernamePassword,omitempty"`
+	// AllowRegister              bool             `json:"allowRegister,omitempty"`
+	AllowRegister              *bool             `json:"allowRegister,omitempty"`
+	AllowExternalIDP           *bool             `json:"allowExternalIdp,omitempty"`
+	ForceMFA                   *bool             `json:"forceMfa,omitempty"`
+	ForceMFALocalOnly          *bool             `json:"forceMfaLocalOnly,omitempty"`
+	HidePasswordReset          *bool             `json:"hidePasswordReset,omitempty"`
+	IgnoreUnknownUsernames     *bool             `json:"ignoreUnknownUsernames,omitempty"`
+	AllowDomainDiscovery       *bool             `json:"allowDomainDiscovery,omitempty"`
+	DisableLoginWithEmail      *bool             `json:"disableLoginWithEmail,omitempty"`
+	DisableLoginWithPhone      *bool             `json:"disableLoginWithPhone,omitempty"`
+	PasswordlessType           *PasswordlessType `json:"passwordlessType,omitempty"`
+	DefaultRedirectURI         string            `json:"defaultRedirectUri,omitempty"`
+	PasswordCheckLifetime      time.Duration     `json:"passwordCheckLifetime,omitempty"`
+	ExternalLoginCheckLifetime time.Duration     `json:"externalLoginCheckLifetime,omitempty"`
+	MFAInitSkipLifetime        time.Duration     `json:"mfaInitSkipLifetime,omitempty"`
+	SecondFactorCheckLifetime  time.Duration     `json:"secondFactorCheckLifetime,omitempty"`
+	MultiFactorCheckLifetime   time.Duration     `json:"multiFactorCheckLifetime,omitempty"`
 
 	MFAType           []MultiFactorType  `json:"mfaType"`
 	SecondFactorTypes []SecondFactorType `json:"secondFactors"`
@@ -247,9 +248,9 @@ type SettingsRepository interface {
 	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, typ SettingType, opts ...database.QueryOption) (*Setting, error)
 	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Setting, error)
 
-	CreateLogin(ctx context.Context, client database.QueryExecutor, setting *LoginSetting) error
-	GetLogin(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*LoginSetting, error)
-	UpdateLogin(ctx context.Context, client database.QueryExecutor, setting *LoginSetting, changes ...database.Change) (int64, error)
+	// CreateLogin(ctx context.Context, client database.QueryExecutor, setting *LoginSetting, changes ...database.Change) error
+	// GetLogin(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*LoginSetting, error)
+	// UpdateLogin(ctx context.Context, client database.QueryExecutor, setting *LoginSetting, changes ...database.Change) (int64, error)
 
 	CreateLabel(ctx context.Context, client database.QueryExecutor, setting *LabelSetting) error
 	GetLabel(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, state LabelState) (*LabelSetting, error)
@@ -291,7 +292,10 @@ type SettingsRepository interface {
 }
 
 type LoginRepository interface {
-	Create(ctx context.Context, client database.QueryExecutor, setting *LoginSetting) error
+	settingsColumns
+	settingsConditions
+	settingsChanges
+
 	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*LoginSetting, error)
-	Set(ctx context.Context, client database.QueryExecutor, setting *LoginSetting, changes ...database.Change) (int64, error)
+	Set(ctx context.Context, client database.QueryExecutor, setting *LoginSetting, changes ...database.Change) error
 }

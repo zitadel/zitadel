@@ -30,7 +30,7 @@ var picture []byte
 var font []byte
 
 func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
-	settingsRepo := repository.SettingsRepository()
+	loginRepo := repository.LoginRepository()
 
 	t.Run("test adding login settings reduces", func(t *testing.T) {
 		ctx := t.Context()
@@ -38,9 +38,9 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		newInstance := integration.NewInstance(t.Context())
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			setting, err := settingsRepo.GetLogin(
+			setting, err := loginRepo.Get(
 				ctx, pool,
 				newInstance.ID(),
 				nil)
@@ -48,7 +48,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 
 			// event instance.policy.login.added
 			// these values are found in default.yaml
-			assert.Equal(t, true, setting.IsDefault)
+			assert.Equal(t, domain.OwnerTypeInstance, setting.OwnerType)
 			assert.Equal(t, true, setting.Settings.AllowRegister)
 			assert.Equal(t, true, setting.Settings.AllowExternalIDP)
 			assert.Equal(t, domain.PasswordlessTypeAllowed, setting.Settings.PasswordlessType)
@@ -78,11 +78,11 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 			HidePasswordReset:          true,
 			IgnoreUnknownUsernames:     true,
 			DefaultRedirectUri:         "http://www.example.com",
-			PasswordCheckLifetime:      durationpb.New(time.Minute * 20),
-			ExternalLoginCheckLifetime: durationpb.New(time.Minute * 21),
-			MfaInitSkipLifetime:        durationpb.New(time.Minute * 22),
-			SecondFactorCheckLifetime:  durationpb.New(time.Minute * 23),
-			MultiFactorCheckLifetime:   durationpb.New(time.Minute * 24),
+			PasswordCheckLifetime:      durationpb.New(time.Second * 20 * 20),
+			ExternalLoginCheckLifetime: durationpb.New(time.Second * 20 * 21),
+			MfaInitSkipLifetime:        durationpb.New(time.Second * 20 * 22),
+			SecondFactorCheckLifetime:  durationpb.New(time.Second * 20 * 23),
+			MultiFactorCheckLifetime:   durationpb.New(time.Second * 20 * 24),
 			AllowDomainDiscovery:       false,
 			DisableLoginWithEmail:      true,
 			DisableLoginWithPhone:      true,
@@ -91,33 +91,34 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			setting, err := settingsRepo.GetLogin(
+			setting, err := loginRepo.Get(
 				ctx, pool,
 				newInstance.ID(),
 				nil)
 			require.NoError(t, err)
 
 			// event instance.policy.login.changed
-			assert.Equal(t, true, setting.IsDefault)
-			assert.Equal(t, false, setting.Settings.AllowRegister)
-			assert.Equal(t, true, setting.Settings.AllowExternalIDP)
-			assert.Equal(t, true, setting.Settings.ForceMFA)
-			assert.Equal(t, domain.PasswordlessTypeNotAllowed, setting.Settings.PasswordlessType)
-			assert.Equal(t, true, setting.Settings.HidePasswordReset)
-			assert.Equal(t, true, setting.Settings.IgnoreUnknownUsernames)
+			assert.Equal(t, domain.OwnerTypeInstance, setting.OwnerType)
+			assert.Equal(t, false, *setting.Settings.AllowRegister)
+			// TODO AllowExternalIDP check fails
+			assert.Equal(t, true, *setting.Settings.AllowExternalIDP)
+			assert.Equal(t, true, *setting.Settings.ForceMFA)
+			assert.Equal(t, domain.PasswordlessTypeNotAllowed, *setting.Settings.PasswordlessType)
+			assert.Equal(t, true, *setting.Settings.HidePasswordReset)
+			assert.Equal(t, true, *setting.Settings.IgnoreUnknownUsernames)
 			assert.Equal(t, "http://www.example.com", setting.Settings.DefaultRedirectURI)
-			assert.Equal(t, false, setting.Settings.AllowDomainDiscovery)
-			assert.Equal(t, false, setting.Settings.AllowUserNamePassword)
-			assert.Equal(t, time.Duration(time.Minute*20), setting.Settings.PasswordCheckLifetime)
-			assert.Equal(t, time.Duration(time.Minute*21), setting.Settings.ExternalLoginCheckLifetime)
-			assert.Equal(t, time.Duration(time.Minute*22), setting.Settings.MFAInitSkipLifetime)
-			assert.Equal(t, time.Duration(time.Minute*23), setting.Settings.SecondFactorCheckLifetime)
-			assert.Equal(t, time.Duration(time.Minute*24), setting.Settings.MultiFactorCheckLifetime)
-			assert.Equal(t, true, setting.Settings.DisableLoginWithEmail)
-			assert.Equal(t, true, setting.Settings.DisableLoginWithPhone)
-			assert.Equal(t, true, setting.Settings.ForceMFALocalOnly)
+			assert.Equal(t, false, *setting.Settings.AllowDomainDiscovery)
+			assert.Equal(t, false, *setting.Settings.AllowUserNamePassword)
+			assert.Equal(t, time.Duration(time.Second*20*20), setting.Settings.PasswordCheckLifetime)
+			assert.Equal(t, time.Duration(time.Second*20*21), setting.Settings.ExternalLoginCheckLifetime)
+			assert.Equal(t, time.Duration(time.Second*20*22), setting.Settings.MFAInitSkipLifetime)
+			assert.Equal(t, time.Duration(time.Second*20*23), setting.Settings.SecondFactorCheckLifetime)
+			assert.Equal(t, time.Duration(time.Second*20*24), setting.Settings.MultiFactorCheckLifetime)
+			assert.Equal(t, true, *setting.Settings.DisableLoginWithEmail)
+			assert.Equal(t, true, *setting.Settings.DisableLoginWithPhone)
+			assert.Equal(t, true, *setting.Settings.ForceMFALocalOnly)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -129,9 +130,9 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 
 		// check inital MFAType value
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			setting, err := settingsRepo.GetLogin(
+			setting, err := loginRepo.Get(
 				ctx, pool,
 				newInstance.ID(),
 				nil)
@@ -146,9 +147,9 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			setting, err := settingsRepo.GetLogin(
+			setting, err := loginRepo.Get(
 				ctx, pool,
 				newInstance.ID(),
 				nil)
@@ -166,9 +167,9 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		after := time.Now()
 
 		// add MFAType
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			setting, err := settingsRepo.GetLogin(
+			setting, err := loginRepo.Get(
 				ctx, pool,
 				newInstance.ID(),
 				nil)
@@ -189,9 +190,9 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 
 		// get current second factor types
 		var secondFactorTypes []domain.SecondFactorType
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			setting, err := settingsRepo.GetLogin(
+			setting, err := loginRepo.Get(
 				ctx, pool,
 				newInstance.ID(),
 				nil)
@@ -211,9 +212,9 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		secondFactorTypes = append(secondFactorTypes, domain.SecondFactorType(policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS))
 
 		// check new second factor type is added
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			setting, err := settingsRepo.GetLogin(
+			setting, err := loginRepo.Get(
 				ctx, pool,
 				newInstance.ID(),
 				nil)
@@ -235,9 +236,9 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		secondFactorTypes = secondFactorTypes[0 : len(secondFactorTypes)-1]
 
 		// check new second factor type is removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			setting, err := settingsRepo.GetLogin(
+			setting, err := loginRepo.Get(
 				ctx, pool,
 				newInstance.ID(),
 				nil)
@@ -256,9 +257,9 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		SystemCTX := integration.WithSystemAuthorization(ctx)
 
 		// check login settings exist
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			setting, err := settingsRepo.GetLogin(
+			setting, err := loginRepo.Get(
 				ctx, pool,
 				newInstance.ID(),
 				nil)
@@ -274,9 +275,9 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// check login settings removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			_, err := settingsRepo.GetLogin(
+			_, err := loginRepo.Get(
 				ctx, pool,
 				newInstance.ID(),
 				nil)
@@ -296,7 +297,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		newInstance := integration.NewInstance(t.Context())
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx, pool,
@@ -307,7 +308,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 			// event instance.policy.label.added
 			// these values are found in default.yaml
-			assert.Equal(t, true, setting.IsDefault)
+			assert.Equal(t, domain.OwnerTypeInstance, setting.OwnerType)
 			assert.Equal(t, "#5469d4", setting.Settings.PrimaryColor)
 			assert.Equal(t, "#fafafa", setting.Settings.BackgroundColor)
 			assert.Equal(t, "#cd3d56", setting.Settings.WarnColor)
@@ -364,7 +365,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx, pool,
@@ -374,7 +375,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event instance.policy.label.change
-			assert.Equal(t, true, setting.IsDefault)
+			assert.Equal(t, domain.OwnerTypeInstance, setting.OwnerType)
 			assert.Equal(t, "#055000", setting.Settings.PrimaryColor)
 			assert.Equal(t, "#055000", setting.Settings.BackgroundColor)
 			assert.Equal(t, "#055000", setting.Settings.WarnColor)
@@ -405,7 +406,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx, pool,
@@ -441,7 +442,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx, pool,
@@ -477,7 +478,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx, pool,
@@ -511,7 +512,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		require.Equal(t, 200, out.StatusCode())
 
 		// check light logo set
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx, pool,
@@ -533,7 +534,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		after := time.Now()
 
 		// check light logo removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx, pool,
@@ -567,7 +568,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		require.Equal(t, 200, out.StatusCode())
 
 		// check dark logo set
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx, pool,
@@ -589,7 +590,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		after := time.Now()
 
 		// check dark logo removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx, pool,
@@ -625,7 +626,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx, pool,
@@ -661,7 +662,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx, pool,
@@ -695,7 +696,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		require.Equal(t, 200, out.StatusCode())
 
 		// check light icon set
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx, pool,
@@ -717,7 +718,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		after := time.Now()
 
 		// check light icon removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx, pool,
@@ -751,7 +752,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		require.Equal(t, 200, out.StatusCode())
 
 		// check dark icon set
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx, pool,
@@ -773,7 +774,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		after := time.Now()
 
 		// check dark icon removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx, pool,
@@ -809,7 +810,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx, pool,
@@ -842,7 +843,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx, pool,
@@ -864,7 +865,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		after := time.Now()
 
 		// check font policy removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx, pool,
@@ -887,7 +888,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		SystemCTX := integration.WithSystemAuthorization(ctx)
 
 		// check label preview settings exist
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx, pool,
@@ -900,7 +901,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// check label activated settings exist
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLabel(
 				ctx, pool,
@@ -918,7 +919,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		})
 
 		// check label preview settings deleted
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			_, err := settingsRepo.GetLabel(
 				ctx, pool,
@@ -930,7 +931,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// check label activated settings deleted
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			_, err := settingsRepo.GetLabel(
 				ctx, pool,
@@ -954,7 +955,7 @@ func TestServer_TestPasswordComplexitySettingsReduces(t *testing.T) {
 		newInstance := integration.NewInstance(t.Context())
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetPasswordComplexity(
 				ctx, pool,
@@ -964,7 +965,7 @@ func TestServer_TestPasswordComplexitySettingsReduces(t *testing.T) {
 
 			// event instance.policy.password.complexity.added
 			// these values are found in default.yaml
-			assert.Equal(t, true, setting.IsDefault)
+			assert.Equal(t, domain.OwnerTypeInstance, setting.OwnerType)
 			assert.Equal(t, uint64(8), setting.Settings.MinLength)
 			assert.Equal(t, true, setting.Settings.HasUppercase)
 			assert.Equal(t, true, setting.Settings.HasLowercase)
@@ -991,7 +992,7 @@ func TestServer_TestPasswordComplexitySettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetPasswordComplexity(
 				ctx, pool,
@@ -1000,7 +1001,7 @@ func TestServer_TestPasswordComplexitySettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event instance.policy.password.complexity.changed
-			assert.Equal(t, true, setting.IsDefault)
+			assert.Equal(t, domain.OwnerTypeInstance, setting.OwnerType)
 			assert.Equal(t, uint64(5), setting.Settings.MinLength)
 			assert.Equal(t, true, setting.Settings.HasUppercase)
 			assert.Equal(t, true, setting.Settings.HasLowercase)
@@ -1017,7 +1018,7 @@ func TestServer_TestPasswordComplexitySettingsReduces(t *testing.T) {
 		SystemCTX := integration.WithSystemAuthorization(ctx)
 
 		// check login settings exist
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetPasswordComplexity(
 				ctx, pool,
@@ -1035,7 +1036,7 @@ func TestServer_TestPasswordComplexitySettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// check password complexity settings removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			_, err := settingsRepo.GetPasswordComplexity(
 				ctx, pool,
@@ -1058,7 +1059,7 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 		newInstance := integration.NewInstance(t.Context())
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetPasswordExpiry(
 				ctx, pool,
@@ -1067,7 +1068,7 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event instance.policy.password.age.added
-			assert.Equal(t, true, setting.IsDefault)
+			assert.Equal(t, domain.OwnerTypeInstance, setting.OwnerType)
 			assert.Equal(t, uint64(0), setting.Settings.ExpireWarnDays)
 			assert.Equal(t, uint64(0), setting.Settings.MaxAgeDays)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
@@ -1089,7 +1090,7 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetPasswordExpiry(
 				ctx, pool,
@@ -1098,7 +1099,7 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event instance.policy.password.age.changed
-			assert.Equal(t, true, setting.IsDefault)
+			assert.Equal(t, domain.OwnerTypeInstance, setting.OwnerType)
 			assert.Equal(t, uint64(30), setting.Settings.ExpireWarnDays)
 			assert.Equal(t, uint64(30), setting.Settings.MaxAgeDays)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
@@ -1112,7 +1113,7 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 		SystemCTX := integration.WithSystemAuthorization(ctx)
 
 		// check login settings exist
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetPasswordExpiry(
 				ctx, pool,
@@ -1130,7 +1131,7 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// check password complexity settings removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			_, err := settingsRepo.GetPasswordExpiry(
 				ctx, pool,
@@ -1153,7 +1154,7 @@ func TestServer_TestDomainSettingsReduces(t *testing.T) {
 		newInstance := integration.NewInstance(t.Context())
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetDomain(
 				ctx, pool,
@@ -1162,7 +1163,7 @@ func TestServer_TestDomainSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event instance.policy.domain.added
-			assert.Equal(t, true, setting.IsDefault)
+			assert.Equal(t, domain.OwnerTypeInstance, setting.OwnerType)
 			assert.Equal(t, false, setting.Settings.SMTPSenderAddressMatchesInstanceDomain)
 			assert.Equal(t, false, setting.Settings.UserLoginMustBeDomain)
 			assert.Equal(t, false, setting.Settings.ValidateOrgDomains)
@@ -1186,7 +1187,7 @@ func TestServer_TestDomainSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetDomain(
 				ctx, pool,
@@ -1195,7 +1196,7 @@ func TestServer_TestDomainSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event instance.policy.changed
-			assert.Equal(t, true, setting.IsDefault)
+			assert.Equal(t, domain.OwnerTypeInstance, setting.OwnerType)
 			assert.Equal(t, true, setting.Settings.SMTPSenderAddressMatchesInstanceDomain)
 			assert.Equal(t, true, setting.Settings.UserLoginMustBeDomain)
 			assert.Equal(t, true, setting.Settings.ValidateOrgDomains)
@@ -1210,7 +1211,7 @@ func TestServer_TestDomainSettingsReduces(t *testing.T) {
 		SystemCTX := integration.WithSystemAuthorization(ctx)
 
 		// check login settings exist
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetDomain(
 				ctx, pool,
@@ -1228,7 +1229,7 @@ func TestServer_TestDomainSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// check domain settings removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			_, err := settingsRepo.GetDomain(
 				ctx, pool,
@@ -1251,7 +1252,7 @@ func TestServer_TestLockoutSettingsReduces(t *testing.T) {
 		newInstance := integration.NewInstance(t.Context())
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLockout(
 				ctx, pool,
@@ -1260,7 +1261,7 @@ func TestServer_TestLockoutSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event instance.policy.lockout.added
-			assert.Equal(t, true, setting.IsDefault)
+			assert.Equal(t, domain.OwnerTypeInstance, setting.OwnerType)
 			assert.Equal(t, uint64(0), setting.Settings.MaxOTPAttempts)
 			assert.Equal(t, uint64(0), setting.Settings.MaxPasswordAttempts)
 			assert.Equal(t, true, setting.Settings.ShowLockOutFailures)
@@ -1283,7 +1284,7 @@ func TestServer_TestLockoutSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLockout(
 				ctx, pool,
@@ -1292,7 +1293,7 @@ func TestServer_TestLockoutSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event instance.policy.lockout.changed
-			assert.Equal(t, true, setting.IsDefault)
+			assert.Equal(t, domain.OwnerTypeInstance, setting.OwnerType)
 			assert.Equal(t, uint64(5), setting.Settings.MaxOTPAttempts)
 			assert.Equal(t, uint64(5), setting.Settings.MaxPasswordAttempts)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
@@ -1306,7 +1307,7 @@ func TestServer_TestLockoutSettingsReduces(t *testing.T) {
 		SystemCTX := integration.WithSystemAuthorization(ctx)
 
 		// check login settings exist
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetLockout(
 				ctx, pool,
@@ -1324,7 +1325,7 @@ func TestServer_TestLockoutSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// check password complexity settings removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			_, err := settingsRepo.GetLockout(
 				ctx, pool,
@@ -1356,7 +1357,7 @@ func TestServer_TestSecuritySettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetSecurity(
 				ctx, pool,
@@ -1382,7 +1383,7 @@ func TestServer_TestSecuritySettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		after = time.Now()
 
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetSecurity(
 				ctx, pool,
@@ -1414,7 +1415,7 @@ func TestServer_TestSecuritySettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// 2. check security instance exists
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.GetSecurity(
 				ctx, pool,

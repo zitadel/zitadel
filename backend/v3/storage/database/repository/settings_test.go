@@ -1082,6 +1082,7 @@ func TestUpdateSetting(t *testing.T) {
 			},
 			// expect nothing to get updated
 			rowsAffected: 0,
+			err:          new(database.ForeignKeyError),
 		},
 		{
 			name: "update setting with non existent org id",
@@ -1115,6 +1116,7 @@ func TestUpdateSetting(t *testing.T) {
 			},
 			// expect nothing to get updated
 			rowsAffected: 0,
+			err:          new(database.ForeignKeyError),
 		},
 		{
 			name: "update setting with wrong type",
@@ -1171,20 +1173,25 @@ func TestUpdateSetting(t *testing.T) {
 			setting := tt.testFunc(t, tx)
 
 			// update setting
-			rowsAffected, err := settingRepo.UpdateLabel(
+			// rowsAffected, err := settingRepo.UpdateLabel(
+			err = settingRepo.CreateLabel(
 				t.Context(), tx,
 				setting,
 			)
 			afterUpdate := time.Now()
+			assert.ErrorIs(t, err, tt.err)
+			if err != nil {
+				return
+			}
 			require.NoError(t, err)
 
-			assert.Equal(t, tt.rowsAffected, rowsAffected)
+			// assert.Equal(t, tt.rowsAffected, rowsAffected)
 
 			assert.ErrorIs(t, err, tt.err)
 
-			if rowsAffected == 0 {
-				return
-			}
+			// if rowsAffected == 0 {
+			// 	return
+			// }
 
 			// check updatedSetting values
 			updatedSetting, err := settingRepo.GetLabel(

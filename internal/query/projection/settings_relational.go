@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/url"
 	"slices"
 
@@ -382,13 +383,16 @@ func (s *settingsRelationalProjection) reduceLoginPolicyAdded(event eventstore.E
 //nolint:gocognit
 func (s *settingsRelationalProjection) reduceLoginPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
+	var ownerType domain.OwnerType
 	var policyEvent policy.LoginPolicyChangedEvent
 	switch e := event.(type) {
 	case *instance.LoginPolicyChangedEvent:
 		policyEvent = e.LoginPolicyChangedEvent
+		ownerType = domain.OwnerTypeInstance
 	case *org.LoginPolicyChangedEvent:
 		policyEvent = e.LoginPolicyChangedEvent
 		orgId = &policyEvent.Aggregate().ResourceOwner
+		ownerType = domain.OwnerTypeOrganization
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-BHd86", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyChangedEventType, instance.LoginPolicyChangedEventType})
 	}
@@ -399,45 +403,54 @@ func (s *settingsRelationalProjection) reduceLoginPolicyChanged(event eventstore
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rLk9y", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository()
+		loginRepo := repository.LoginRepository()
 
-		setting, err := settingsRepo.GetLogin(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
-		if err != nil {
-			return zerrors.ThrowInternal(err, "HANDL-r7k9m", "error accessing login policy record")
+		// setting, err := settingsRepo.GetLogin(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
+		// if err != nil {
+		// 	return zerrors.ThrowInternal(err, "HANDL-r7k9m", "error accessing login policy record")
+		// }
+		setting := &domain.LoginSetting{
+			Setting: &domain.Setting{
+				InstanceID: policyEvent.Agg.InstanceID,
+				OrgID:      orgId,
+				OwnerType:  ownerType,
+			},
 		}
 
 		if policyEvent.AllowRegister != nil {
-			setting.Settings.AllowRegister = *policyEvent.AllowRegister
+			// setting.Settings.AllowRegister = *policyEvent.AllowRegister
+			setting.Settings.AllowRegister = policyEvent.AllowRegister
 		}
 		if policyEvent.AllowUserNamePassword != nil {
-			setting.Settings.AllowUserNamePassword = *policyEvent.AllowUserNamePassword
+			setting.Settings.AllowUserNamePassword = policyEvent.AllowUserNamePassword
 		}
 		if policyEvent.AllowExternalIDP != nil {
-			setting.Settings.AllowExternalIDP = *policyEvent.AllowExternalIDP
+			setting.Settings.AllowExternalIDP = policyEvent.AllowExternalIDP
 		}
 		if policyEvent.ForceMFA != nil {
-			setting.Settings.ForceMFA = *policyEvent.ForceMFA
+			setting.Settings.ForceMFA = policyEvent.ForceMFA
 		}
 		if policyEvent.ForceMFALocalOnly != nil {
-			setting.Settings.ForceMFALocalOnly = *policyEvent.ForceMFALocalOnly
+			setting.Settings.ForceMFALocalOnly = policyEvent.ForceMFALocalOnly
 		}
 		if policyEvent.PasswordlessType != nil {
-			setting.Settings.PasswordlessType = domain.PasswordlessType(*policyEvent.PasswordlessType)
+			passwordlessType := domain.PasswordlessType(*policyEvent.PasswordlessType)
+			setting.Settings.PasswordlessType = &passwordlessType
 		}
 		if policyEvent.HidePasswordReset != nil {
-			setting.Settings.HidePasswordReset = *policyEvent.HidePasswordReset
+			setting.Settings.HidePasswordReset = policyEvent.HidePasswordReset
 		}
 		if policyEvent.IgnoreUnknownUsernames != nil {
-			setting.Settings.IgnoreUnknownUsernames = *policyEvent.IgnoreUnknownUsernames
+			setting.Settings.IgnoreUnknownUsernames = policyEvent.IgnoreUnknownUsernames
 		}
 		if policyEvent.AllowDomainDiscovery != nil {
-			setting.Settings.AllowDomainDiscovery = *policyEvent.AllowDomainDiscovery
+			setting.Settings.AllowDomainDiscovery = policyEvent.AllowDomainDiscovery
 		}
 		if policyEvent.DisableLoginWithEmail != nil {
-			setting.Settings.DisableLoginWithEmail = *policyEvent.DisableLoginWithEmail
+			setting.Settings.DisableLoginWithEmail = policyEvent.DisableLoginWithEmail
 		}
 		if policyEvent.DisableLoginWithPhone != nil {
-			setting.Settings.DisableLoginWithPhone = *policyEvent.DisableLoginWithPhone
+			setting.Settings.DisableLoginWithPhone = policyEvent.DisableLoginWithPhone
 		}
 		if policyEvent.DefaultRedirectURI != nil {
 			setting.Settings.DefaultRedirectURI = *policyEvent.DefaultRedirectURI
@@ -460,20 +473,24 @@ func (s *settingsRelationalProjection) reduceLoginPolicyChanged(event eventstore
 
 		setting.UpdatedAt = &policyEvent.Creation
 
-		_, err = settingsRepo.UpdateLogin(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
+		fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BEFORE")
+		err := loginRepo.Set(ctx, v3_sql.SQLTx(tx), setting, loginRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
 
 func (s *settingsRelationalProjection) reduceMFAAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
+	var ownerType domain.OwnerType
 	var policyEvent policy.MultiFactorAddedEvent
 	switch e := event.(type) {
 	case *instance.LoginPolicyMultiFactorAddedEvent:
 		policyEvent = e.MultiFactorAddedEvent
+		ownerType = domain.OwnerTypeInstance
 	case *org.LoginPolicyMultiFactorAddedEvent:
 		policyEvent = e.MultiFactorAddedEvent
 		orgId = &policyEvent.Aggregate().ID
+		ownerType = domain.OwnerTypeOrganization
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-WghuV", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyMultiFactorAddedEventType, instance.LoginPolicyMultiFactorAddedEventType})
 	}
@@ -484,11 +501,14 @@ func (s *settingsRelationalProjection) reduceMFAAdded(event eventstore.Event) (*
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rLw7y", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository()
+		loginRepo := repository.LoginRepository()
 
-		setting, err := settingsRepo.GetLogin(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
-		if err != nil {
-			return zerrors.ThrowInternal(err, "HANDL-u7k7m", "error accessing login policy record")
+		setting := &domain.LoginSetting{
+			Setting: &domain.Setting{
+				InstanceID: policyEvent.Agg.InstanceID,
+				OrgID:      orgId,
+				OwnerType:  ownerType,
+			},
 		}
 
 		if slices.Contains(setting.Settings.MFAType, domain.MultiFactorType(policyEvent.MFAType)) {
@@ -497,20 +517,23 @@ func (s *settingsRelationalProjection) reduceMFAAdded(event eventstore.Event) (*
 
 		setting.Settings.MFAType = append(setting.Settings.MFAType, domain.MultiFactorType(policyEvent.MFAType))
 
-		_, err = settingsRepo.UpdateLogin(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
+		err := loginRepo.Set(ctx, v3_sql.SQLTx(tx), setting, loginRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
 
 func (s *settingsRelationalProjection) reduceMFARemoved(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
+	var ownerType domain.OwnerType
 	var policyEvent policy.MultiFactorRemovedEvent
 	switch e := event.(type) {
 	case *instance.LoginPolicyMultiFactorRemovedEvent:
 		policyEvent = e.MultiFactorRemovedEvent
+		ownerType = domain.OwnerTypeInstance
 	case *org.LoginPolicyMultiFactorRemovedEvent:
 		policyEvent = e.MultiFactorRemovedEvent
 		orgId = &policyEvent.Aggregate().ResourceOwner
+		ownerType = domain.OwnerTypeOrganization
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-cHU7u", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyMultiFactorRemovedEventType, instance.LoginPolicyMultiFactorRemovedEventType})
 	}
@@ -521,11 +544,14 @@ func (s *settingsRelationalProjection) reduceMFARemoved(event eventstore.Event) 
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rLi9y", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository()
+		loginRepo := repository.LoginRepository()
 
-		setting, err := settingsRepo.GetLogin(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
-		if err != nil {
-			return zerrors.ThrowInternal(err, "HANDL-l7o9m", "error accessing login policy record")
+		setting := &domain.LoginSetting{
+			Setting: &domain.Setting{
+				InstanceID: policyEvent.Agg.InstanceID,
+				OrgID:      orgId,
+				OwnerType:  ownerType,
+			},
 		}
 
 		setting.Settings.MFAType = slices.DeleteFunc(setting.Settings.MFAType, func(mfaType domain.MultiFactorType) bool {
@@ -534,7 +560,7 @@ func (s *settingsRelationalProjection) reduceMFARemoved(event eventstore.Event) 
 
 		setting.UpdatedAt = &policyEvent.Creation
 
-		_, err = settingsRepo.UpdateLogin(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
+		err := loginRepo.Set(ctx, v3_sql.SQLTx(tx), setting, loginRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
@@ -563,13 +589,16 @@ func (*settingsRelationalProjection) reduceLoginPolicyRemoved(event eventstore.E
 
 func (s *settingsRelationalProjection) reduceSecondFactorAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
+	var ownerType domain.OwnerType
 	var policyEvent policy.SecondFactorAddedEvent
 	switch e := event.(type) {
 	case *instance.LoginPolicySecondFactorAddedEvent:
 		policyEvent = e.SecondFactorAddedEvent
+		ownerType = domain.OwnerTypeInstance
 	case *org.LoginPolicySecondFactorAddedEvent:
 		policyEvent = e.SecondFactorAddedEvent
 		orgId = &policyEvent.Aggregate().ResourceOwner
+		ownerType = domain.OwnerTypeOrganization
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-apB2E", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicySecondFactorAddedEventType, instance.LoginPolicySecondFactorAddedEventType})
 	}
@@ -582,9 +611,18 @@ func (s *settingsRelationalProjection) reduceSecondFactorAdded(event eventstore.
 
 		settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetLogin(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
-		if err != nil {
-			return zerrors.ThrowInternal(err, "HANDL-H7m9m", "error accessing login policy record")
+		// setting, err := settingsRepo.GetLogin(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
+		// if err != nil {
+		// 	return zerrors.ThrowInternal(err, "HANDL-H7m9m", "error accessing login policy record")
+		// }
+		loginRepo := repository.LoginRepository()
+
+		setting := &domain.LoginSetting{
+			Setting: &domain.Setting{
+				InstanceID: policyEvent.Agg.InstanceID,
+				OrgID:      orgId,
+				OwnerType:  ownerType,
+			},
 		}
 
 		if slices.Contains(setting.Settings.SecondFactorTypes, domain.SecondFactorType(policyEvent.MFAType)) {
@@ -595,20 +633,23 @@ func (s *settingsRelationalProjection) reduceSecondFactorAdded(event eventstore.
 
 		setting.Settings.SecondFactorTypes = append(setting.Settings.SecondFactorTypes, domain.SecondFactorType(policyEvent.MFAType))
 
-		_, err = settingsRepo.UpdateLogin(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
+		err := loginRepo.Set(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
 
 func (s *settingsRelationalProjection) reduceSecondFactorRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
+	var ownerType domain.OwnerType
 	var policyEvent policy.SecondFactorRemovedEvent
 	switch e := event.(type) {
 	case *instance.LoginPolicySecondFactorRemovedEvent:
 		policyEvent = e.SecondFactorRemovedEvent
+		ownerType = domain.OwnerTypeInstance
 	case *org.LoginPolicySecondFactorRemovedEvent:
 		policyEvent = e.SecondFactorRemovedEvent
 		orgId = &policyEvent.Aggregate().ResourceOwner
+		ownerType = domain.OwnerTypeOrganization
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-bYpmA", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicySecondFactorRemovedEventType, instance.LoginPolicySecondFactorRemovedEventType})
 	}
@@ -619,18 +660,28 @@ func (s *settingsRelationalProjection) reduceSecondFactorRemoved(event eventstor
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rnd0y", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.SettingsRepository()
+		// settingsRepo := repository.SettingsRepository()
 
-		setting, err := settingsRepo.GetLogin(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
-		if err != nil {
-			return zerrors.ThrowInternal(err, "HANDL-rsk9m", "error accessing login policy record")
+		// setting, err := settingsRepo.GetLogin(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
+		// if err != nil {
+		// 	return zerrors.ThrowInternal(err, "HANDL-rsk9m", "error accessing login policy record")
+		// }
+		loginRepo := repository.LoginRepository()
+
+		setting := &domain.LoginSetting{
+			Setting: &domain.Setting{
+				InstanceID: policyEvent.Agg.InstanceID,
+				OrgID:      orgId,
+				OwnerType:  ownerType,
+			},
 		}
 
 		setting.Settings.SecondFactorTypes = slices.DeleteFunc(setting.Settings.SecondFactorTypes, func(secondFactorType domain.SecondFactorType) bool {
 			return secondFactorType == domain.SecondFactorType(policyEvent.MFAType)
 		})
 
-		_, err = settingsRepo.UpdateLogin(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
+		// _, err = settingsRepo.UpdateLogin(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
+		err := loginRepo.Set(ctx, v3_sql.SQLTx(tx), setting, loginRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
 }
