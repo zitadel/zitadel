@@ -21,6 +21,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/filter/v2"
 	v2 "github.com/zitadel/zitadel/pkg/grpc/metadata/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
@@ -451,273 +452,271 @@ func TestServer_ListUsers(t *testing.T) {
 		want    *user.ListUsersResponse
 		wantErr bool
 	}{
-		/*
-			{
-				name: "list user by id, no permission machine user",
-				args: args{
-					UserCTX,
-					&user.ListUsersRequest{},
-					func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-						info := createUser(ctx, orgResp.OrganizationId, false)
-						request.Queries = append(request.Queries, InUserIDsQuery([]string{info.UserID}))
-						return []userAttr{}
-					},
-				},
-				want: &user.ListUsersResponse{
-					Details: &object.ListDetails{
-						TotalResult: 0,
-						Timestamp:   timestamppb.Now(),
-					},
-					SortingColumn: 0,
-					Result:        []*user.User{},
+		{
+			name: "list user by id, no permission machine user",
+			args: args{
+				UserCTX,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					info := createUser(ctx, orgResp.OrganizationId, false)
+					request.Queries = append(request.Queries, InUserIDsQuery([]string{info.UserID}))
+					return []userAttr{}
 				},
 			},
-			{
-				name: "list user by id, no permission human user",
-				args: func() args {
-					info := createUser(IamCTX, orgResp.OrganizationId, true)
-					// create session to get token
-					userID := info.UserID
-					createResp, err := Instance.Client.SessionV2.CreateSession(IamCTX, &session.CreateSessionRequest{
-						Checks: &session.Checks{
-							User: &session.CheckUser{
-								Search: &session.CheckUser_UserId{UserId: userID},
-							},
-							Password: &session.CheckPassword{
-								Password: integration.UserPassword,
-							},
-						},
-					})
-					if err != nil {
-						require.NoError(t, err)
-					}
-					// use token to get ctx
-					HumanCTX := integration.WithAuthorizationToken(IamCTX, createResp.GetSessionToken())
-					return args{
-						HumanCTX,
-						&user.ListUsersRequest{},
-						func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-							return []userAttr{info}
-						},
-					}
-				}(),
-				want: &user.ListUsersResponse{ // human user should return itself when calling ListUsers() even if it has no permissions
-					Details: &object.ListDetails{
-						TotalResult: 1,
-						Timestamp:   timestamppb.Now(),
-					},
-					SortingColumn: 0,
-					Result: []*user.User{
-						{
-							State: user.UserState_USER_STATE_ACTIVE,
-							Type: &user.User_Human{
-								Human: &user.HumanUser{
-									Profile: &user.HumanProfile{
-										GivenName:         "Mickey",
-										FamilyName:        "Mouse",
-										NickName:          gu.Ptr("Mickey"),
-										DisplayName:       gu.Ptr("Mickey Mouse"),
-										PreferredLanguage: gu.Ptr("nl"),
-										Gender:            user.Gender_GENDER_MALE.Enum(),
-									},
-									Email: &user.HumanEmail{
-										IsVerified: true,
-									},
-									Phone: &user.HumanPhone{
-										IsVerified: true,
-									},
-									PasswordChangeRequired: true,
-									PasswordChanged:        timestamppb.Now(),
-								},
-							},
-						},
-					},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+					Timestamp:   timestamppb.Now(),
 				},
+				SortingColumn: 0,
+				Result:        []*user.User{},
 			},
-			{
-				name: "list user by id, ok",
-				args: args{
-					IamCTX,
+		},
+		{
+			name: "list user by id, no permission human user",
+			args: func() args {
+				info := createUser(IamCTX, orgResp.OrganizationId, true)
+				// create session to get token
+				userID := info.UserID
+				createResp, err := Instance.Client.SessionV2.CreateSession(IamCTX, &session.CreateSessionRequest{
+					Checks: &session.Checks{
+						User: &session.CheckUser{
+							Search: &session.CheckUser_UserId{UserId: userID},
+						},
+						Password: &session.CheckPassword{
+							Password: integration.UserPassword,
+						},
+					},
+				})
+				if err != nil {
+					require.NoError(t, err)
+				}
+				// use token to get ctx
+				HumanCTX := integration.WithAuthorizationToken(IamCTX, createResp.GetSessionToken())
+				return args{
+					HumanCTX,
 					&user.ListUsersRequest{},
 					func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-						info := createUser(ctx, orgResp.OrganizationId, false)
-						request.Queries = []*user.SearchQuery{}
-						request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
-						request.Queries = append(request.Queries, InUserIDsQuery([]string{info.UserID}))
 						return []userAttr{info}
 					},
+				}
+			}(),
+			want: &user.ListUsersResponse{ // human user should return itself when calling ListUsers() even if it has no permissions
+				Details: &object.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
 				},
-				want: &user.ListUsersResponse{
-					Details: &object.ListDetails{
-						TotalResult: 1,
-						Timestamp:   timestamppb.Now(),
+				SortingColumn: 0,
+				Result: []*user.User{
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
+								},
+								PasswordChangeRequired: true,
+								PasswordChanged:        timestamppb.Now(),
+							},
+						},
 					},
-					SortingColumn: 0,
-					Result: []*user.User{
-						{
-							State: user.UserState_USER_STATE_ACTIVE,
-							Type: &user.User_Human{
-								Human: &user.HumanUser{
-									Profile: &user.HumanProfile{
-										GivenName:         "Mickey",
-										FamilyName:        "Mouse",
-										NickName:          gu.Ptr("Mickey"),
-										DisplayName:       gu.Ptr("Mickey Mouse"),
-										PreferredLanguage: gu.Ptr("nl"),
-										Gender:            user.Gender_GENDER_MALE.Enum(),
-									},
-									Email: &user.HumanEmail{
-										IsVerified: true,
-									},
-									Phone: &user.HumanPhone{
-										IsVerified: true,
-									},
+				},
+			},
+		},
+		{
+			name: "list user by id, ok",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					info := createUser(ctx, orgResp.OrganizationId, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
+					request.Queries = append(request.Queries, InUserIDsQuery([]string{info.UserID}))
+					return []userAttr{info}
+				},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result: []*user.User{
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
 								},
 							},
 						},
 					},
 				},
 			},
-			{
-				name: "list user by id, passwordChangeRequired, ok",
-				args: args{
-					IamCTX,
-					&user.ListUsersRequest{},
-					func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-						info := createUser(ctx, orgResp.OrganizationId, true)
-						request.Queries = []*user.SearchQuery{}
-						request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
-						request.Queries = append(request.Queries, InUserIDsQuery([]string{info.UserID}))
-						return []userAttr{info}
-					},
+		},
+		{
+			name: "list user by id, passwordChangeRequired, ok",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					info := createUser(ctx, orgResp.OrganizationId, true)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
+					request.Queries = append(request.Queries, InUserIDsQuery([]string{info.UserID}))
+					return []userAttr{info}
 				},
-				want: &user.ListUsersResponse{
-					Details: &object.ListDetails{
-						TotalResult: 1,
-						Timestamp:   timestamppb.Now(),
-					},
-					SortingColumn: 0,
-					Result: []*user.User{
-						{
-							State: user.UserState_USER_STATE_ACTIVE,
-							Type: &user.User_Human{
-								Human: &user.HumanUser{
-									Profile: &user.HumanProfile{
-										GivenName:         "Mickey",
-										FamilyName:        "Mouse",
-										NickName:          gu.Ptr("Mickey"),
-										DisplayName:       gu.Ptr("Mickey Mouse"),
-										PreferredLanguage: gu.Ptr("nl"),
-										Gender:            user.Gender_GENDER_MALE.Enum(),
-									},
-									Email: &user.HumanEmail{
-										IsVerified: true,
-									},
-									Phone: &user.HumanPhone{
-										IsVerified: true,
-									},
-									PasswordChangeRequired: true,
-									PasswordChanged:        timestamppb.Now(),
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result: []*user.User{
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
 								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
+								},
+								PasswordChangeRequired: true,
+								PasswordChanged:        timestamppb.Now(),
 							},
 						},
 					},
 				},
 			},
-			{
-				name: "list user by id and meta key multiple, ok",
-				args: args{
-					IamCTX,
-					&user.ListUsersRequest{},
-					func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-						infos := createUsers(ctx, orgResp.OrganizationId, 3, false)
-						request.Queries = []*user.SearchQuery{}
-						request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
-						request.Queries = append(request.Queries, InUserIDsQuery(infos.userIDs()))
+		},
+		{
+			name: "list user by id and meta key multiple, ok",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					infos := createUsers(ctx, orgResp.OrganizationId, 3, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
+					request.Queries = append(request.Queries, InUserIDsQuery(infos.userIDs()))
 
-						Instance.SetUserMetadata(ctx, infos[0].UserID, "my meta", "my value 1")
-						Instance.SetUserMetadata(ctx, infos[1].UserID, "my meta 2", "my value 3")
-						Instance.SetUserMetadata(ctx, infos[2].UserID, "my meta", "my value 2")
+					Instance.SetUserMetadata(ctx, infos[0].UserID, "my meta", "my value 1")
+					Instance.SetUserMetadata(ctx, infos[1].UserID, "my meta 2", "my value 3")
+					Instance.SetUserMetadata(ctx, infos[2].UserID, "my meta", "my value 2")
 
-						request.Queries = append(request.Queries, MetadataKeyContainsQuery("my meta"))
-						request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
-						return infos
-					},
+					request.Queries = append(request.Queries, MetadataKeyContainsQuery("my meta"))
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
+					return infos
 				},
-				want: &user.ListUsersResponse{
-					Details: &object.ListDetails{
-						TotalResult: 3,
-						Timestamp:   timestamppb.Now(),
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 3,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
+				Result: []*user.User{
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
+								},
+							},
+						},
 					},
-					SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
-					Result: []*user.User{
-						{
-							State: user.UserState_USER_STATE_ACTIVE,
-							Type: &user.User_Human{
-								Human: &user.HumanUser{
-									Profile: &user.HumanProfile{
-										GivenName:         "Mickey",
-										FamilyName:        "Mouse",
-										NickName:          gu.Ptr("Mickey"),
-										DisplayName:       gu.Ptr("Mickey Mouse"),
-										PreferredLanguage: gu.Ptr("nl"),
-										Gender:            user.Gender_GENDER_MALE.Enum(),
-									},
-									Email: &user.HumanEmail{
-										IsVerified: true,
-									},
-									Phone: &user.HumanPhone{
-										IsVerified: true,
-									},
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
 								},
 							},
 						},
-						{
-							State: user.UserState_USER_STATE_ACTIVE,
-							Type: &user.User_Human{
-								Human: &user.HumanUser{
-									Profile: &user.HumanProfile{
-										GivenName:         "Mickey",
-										FamilyName:        "Mouse",
-										NickName:          gu.Ptr("Mickey"),
-										DisplayName:       gu.Ptr("Mickey Mouse"),
-										PreferredLanguage: gu.Ptr("nl"),
-										Gender:            user.Gender_GENDER_MALE.Enum(),
-									},
-									Email: &user.HumanEmail{
-										IsVerified: true,
-									},
-									Phone: &user.HumanPhone{
-										IsVerified: true,
-									},
+					},
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
 								},
-							},
-						},
-						{
-							State: user.UserState_USER_STATE_ACTIVE,
-							Type: &user.User_Human{
-								Human: &user.HumanUser{
-									Profile: &user.HumanProfile{
-										GivenName:         "Mickey",
-										FamilyName:        "Mouse",
-										NickName:          gu.Ptr("Mickey"),
-										DisplayName:       gu.Ptr("Mickey Mouse"),
-										PreferredLanguage: gu.Ptr("nl"),
-										Gender:            user.Gender_GENDER_MALE.Enum(),
-									},
-									Email: &user.HumanEmail{
-										IsVerified: true,
-									},
-									Phone: &user.HumanPhone{
-										IsVerified: true,
-									},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
 								},
 							},
 						},
 					},
 				},
 			},
-		*/
+		},
 		{
 			// https://github.com/zitadel/zitadel/issues/10825
 			name: "list user with metadata by IDs with offset and limit, ok",
@@ -736,6 +735,7 @@ func TestServer_ListUsers(t *testing.T) {
 							Instance.SetUserMetadata(ctx, user.UserID, fmt.Sprintf("key-%d", i), fmt.Sprintf("value-%d", i))
 						}
 					}
+					infos = infos[1:] // prevent panic in user ID setting below
 
 					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
 					request.Query = &object.ListQuery{
@@ -797,192 +797,190 @@ func TestServer_ListUsers(t *testing.T) {
 				},
 			},
 		},
-		/*
-			{
-				name: "list user by username, ok",
-				args: args{
-					IamCTX,
-					&user.ListUsersRequest{},
-					func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-						info := createUser(ctx, orgResp.OrganizationId, false)
-						request.Queries = []*user.SearchQuery{}
-						request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
-						request.Queries = append(request.Queries, UsernameQuery(info.Username))
+		{
+			name: "list user by username, ok",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					info := createUser(ctx, orgResp.OrganizationId, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
+					request.Queries = append(request.Queries, UsernameQuery(info.Username))
 
-						request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
-						return []userAttr{info}
-					},
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
+					return []userAttr{info}
 				},
-				want: &user.ListUsersResponse{
-					Details: &object.ListDetails{
-						TotalResult: 1,
-						Timestamp:   timestamppb.Now(),
-					},
-					SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
-					Result: []*user.User{
-						{
-							State: user.UserState_USER_STATE_ACTIVE,
-							Type: &user.User_Human{
-								Human: &user.HumanUser{
-									Profile: &user.HumanProfile{
-										GivenName:         "Mickey",
-										FamilyName:        "Mouse",
-										NickName:          gu.Ptr("Mickey"),
-										DisplayName:       gu.Ptr("Mickey Mouse"),
-										PreferredLanguage: gu.Ptr("nl"),
-										Gender:            user.Gender_GENDER_MALE.Enum(),
-									},
-									Email: &user.HumanEmail{
-										IsVerified: true,
-									},
-									Phone: &user.HumanPhone{
-										IsVerified: true,
-									},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
+				Result: []*user.User{
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
 								},
 							},
 						},
 					},
 				},
 			},
-			{
-				name: "list user in emails, ok",
-				args: args{
-					IamCTX,
-					&user.ListUsersRequest{},
-					func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-						info := createUser(ctx, orgResp.OrganizationId, false)
-						request.Queries = []*user.SearchQuery{}
-						request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
-						request.Queries = append(request.Queries, InUserEmailsQuery([]string{info.Username}))
-						request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
-						return []userAttr{info}
-					},
+		},
+		{
+			name: "list user in emails, ok",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					info := createUser(ctx, orgResp.OrganizationId, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
+					request.Queries = append(request.Queries, InUserEmailsQuery([]string{info.Username}))
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
+					return []userAttr{info}
 				},
-				want: &user.ListUsersResponse{
-					Details: &object.ListDetails{
-						TotalResult: 1,
-						Timestamp:   timestamppb.Now(),
-					},
-					SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
-					Result: []*user.User{
-						{
-							State: user.UserState_USER_STATE_ACTIVE,
-							Type: &user.User_Human{
-								Human: &user.HumanUser{
-									Profile: &user.HumanProfile{
-										GivenName:         "Mickey",
-										FamilyName:        "Mouse",
-										NickName:          gu.Ptr("Mickey"),
-										DisplayName:       gu.Ptr("Mickey Mouse"),
-										PreferredLanguage: gu.Ptr("nl"),
-										Gender:            user.Gender_GENDER_MALE.Enum(),
-									},
-									Email: &user.HumanEmail{
-										IsVerified: true,
-									},
-									Phone: &user.HumanPhone{
-										IsVerified: true,
-									},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
+				Result: []*user.User{
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
 								},
 							},
 						},
 					},
 				},
 			},
-			{
-				name: "list user by emails and meta value multiple, ok",
-				args: args{
-					IamCTX,
-					&user.ListUsersRequest{},
-					func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-						infos := createUsers(ctx, orgResp.OrganizationId, 3, false)
-						request.Queries = []*user.SearchQuery{}
-						request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
-						request.Queries = append(request.Queries, InUserEmailsQuery(infos.emails()))
+		},
+		{
+			name: "list user by emails and meta value multiple, ok",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					infos := createUsers(ctx, orgResp.OrganizationId, 3, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
+					request.Queries = append(request.Queries, InUserEmailsQuery(infos.emails()))
 
-						Instance.SetUserMetadata(ctx, infos[0].UserID, "my meta 1", "my value")
-						Instance.SetUserMetadata(ctx, infos[0].UserID, "my meta 2", "my value")
-						Instance.SetUserMetadata(ctx, infos[1].UserID, "my meta 2", "my value")
-						Instance.SetUserMetadata(ctx, infos[2].UserID, "my meta", "my value")
+					Instance.SetUserMetadata(ctx, infos[0].UserID, "my meta 1", "my value")
+					Instance.SetUserMetadata(ctx, infos[0].UserID, "my meta 2", "my value")
+					Instance.SetUserMetadata(ctx, infos[1].UserID, "my meta 2", "my value")
+					Instance.SetUserMetadata(ctx, infos[2].UserID, "my meta", "my value")
 
-						request.Queries = append(request.Queries, MetadataValueQuery("my value"))
-						request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
+					request.Queries = append(request.Queries, MetadataValueQuery("my value"))
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
 
-						return infos
-					},
+					return infos
 				},
-				want: &user.ListUsersResponse{
-					Details: &object.ListDetails{
-						TotalResult: 3,
-						Timestamp:   timestamppb.Now(),
-					},
-					SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
-					Result: []*user.User{
-						{
-							State: user.UserState_USER_STATE_ACTIVE,
-							Type: &user.User_Human{
-								Human: &user.HumanUser{
-									Profile: &user.HumanProfile{
-										GivenName:         "Mickey",
-										FamilyName:        "Mouse",
-										NickName:          gu.Ptr("Mickey"),
-										DisplayName:       gu.Ptr("Mickey Mouse"),
-										PreferredLanguage: gu.Ptr("nl"),
-										Gender:            user.Gender_GENDER_MALE.Enum(),
-									},
-									Email: &user.HumanEmail{
-										IsVerified: true,
-									},
-									Phone: &user.HumanPhone{
-										IsVerified: true,
-									},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 3,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
+				Result: []*user.User{
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
 								},
 							},
-						}, {
-							State: user.UserState_USER_STATE_ACTIVE,
-							Type: &user.User_Human{
-								Human: &user.HumanUser{
-									Profile: &user.HumanProfile{
-										GivenName:         "Mickey",
-										FamilyName:        "Mouse",
-										NickName:          gu.Ptr("Mickey"),
-										DisplayName:       gu.Ptr("Mickey Mouse"),
-										PreferredLanguage: gu.Ptr("nl"),
-										Gender:            user.Gender_GENDER_MALE.Enum(),
-									},
-									Email: &user.HumanEmail{
-										IsVerified: true,
-									},
-									Phone: &user.HumanPhone{
-										IsVerified: true,
-									},
+						},
+					}, {
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
 								},
 							},
-						}, {
-							State: user.UserState_USER_STATE_ACTIVE,
-							Type: &user.User_Human{
-								Human: &user.HumanUser{
-									Profile: &user.HumanProfile{
-										GivenName:         "Mickey",
-										FamilyName:        "Mouse",
-										NickName:          gu.Ptr("Mickey"),
-										DisplayName:       gu.Ptr("Mickey Mouse"),
-										PreferredLanguage: gu.Ptr("nl"),
-										Gender:            user.Gender_GENDER_MALE.Enum(),
-									},
-									Email: &user.HumanEmail{
-										IsVerified: true,
-									},
-									Phone: &user.HumanPhone{
-										IsVerified: true,
-									},
+						},
+					}, {
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
 								},
 							},
 						},
 					},
 				},
 			},
-		*/
+		},
 		{
 			// https://github.com/zitadel/zitadel/issues/10825
 			name: "list user with metadata by emails with offset and limit, ok",
@@ -1001,6 +999,7 @@ func TestServer_ListUsers(t *testing.T) {
 							Instance.SetUserMetadata(ctx, user.UserID, fmt.Sprintf("key-%d", i), fmt.Sprintf("value-%d", i))
 						}
 					}
+					infos = infos[1:] // prevent panic in user ID setting below
 
 					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
 					request.Query = &object.ListQuery{
@@ -1061,282 +1060,280 @@ func TestServer_ListUsers(t *testing.T) {
 				},
 			},
 		},
-		/*
-			{
-				name: "list user in emails no found, ok",
-				args: args{
-					IamCTX,
-					&user.ListUsersRequest{
-						Queries: []*user.SearchQuery{
-							OrganizationIdQuery(orgResp.OrganizationId),
-							InUserEmailsQuery([]string{"notfound"}),
-						},
-					},
-					func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-						return []userAttr{}
+		{
+			name: "list user in emails no found, ok",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{
+					Queries: []*user.SearchQuery{
+						OrganizationIdQuery(orgResp.OrganizationId),
+						InUserEmailsQuery([]string{"notfound"}),
 					},
 				},
-				want: &user.ListUsersResponse{
-					Details: &object.ListDetails{
-						TotalResult: 0,
-						Timestamp:   timestamppb.Now(),
-					},
-					SortingColumn: 0,
-					Result:        []*user.User{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					return []userAttr{}
 				},
 			},
-			{
-				name: "list user phone, ok",
-				args: args{
-					IamCTX,
-					&user.ListUsersRequest{},
-					func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-						info := createUser(ctx, orgResp.OrganizationId, false)
-						request.Queries = []*user.SearchQuery{}
-						request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
-						request.Queries = append(request.Queries, PhoneQuery(info.Phone))
-						return []userAttr{info}
-					},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+					Timestamp:   timestamppb.Now(),
 				},
-				want: &user.ListUsersResponse{
-					Details: &object.ListDetails{
-						TotalResult: 1,
-						Timestamp:   timestamppb.Now(),
-					},
-					SortingColumn: 0,
-					Result: []*user.User{
-						{
-							State: user.UserState_USER_STATE_ACTIVE,
-							Type: &user.User_Human{
-								Human: &user.HumanUser{
-									Profile: &user.HumanProfile{
-										GivenName:         "Mickey",
-										FamilyName:        "Mouse",
-										NickName:          gu.Ptr("Mickey"),
-										DisplayName:       gu.Ptr("Mickey Mouse"),
-										PreferredLanguage: gu.Ptr("nl"),
-										Gender:            user.Gender_GENDER_MALE.Enum(),
-									},
-									Email: &user.HumanEmail{
-										IsVerified: true,
-									},
-									Phone: &user.HumanPhone{
-										IsVerified: true,
-									},
+				SortingColumn: 0,
+				Result:        []*user.User{},
+			},
+		},
+		{
+			name: "list user phone, ok",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					info := createUser(ctx, orgResp.OrganizationId, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
+					request.Queries = append(request.Queries, PhoneQuery(info.Phone))
+					return []userAttr{info}
+				},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result: []*user.User{
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
 								},
 							},
 						},
 					},
 				},
 			},
-			{
-				name: "list user in emails no found, ok",
-				args: args{
-					IamCTX,
-					&user.ListUsersRequest{
-						Queries: []*user.SearchQuery{
-							OrganizationIdQuery(orgResp.OrganizationId),
-							InUserEmailsQuery([]string{"notfound"}),
-						},
-					},
-					func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-						return []userAttr{}
+		},
+		{
+			name: "list user in emails no found, ok",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{
+					Queries: []*user.SearchQuery{
+						OrganizationIdQuery(orgResp.OrganizationId),
+						InUserEmailsQuery([]string{"notfound"}),
 					},
 				},
-				want: &user.ListUsersResponse{
-					Details: &object.ListDetails{
-						TotalResult: 0,
-						Timestamp:   timestamppb.Now(),
-					},
-					SortingColumn: 0,
-					Result:        []*user.User{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					return []userAttr{}
 				},
 			},
-			{
-				name: "list user resourceowner multiple, ok",
-				args: args{
-					IamCTX,
-					&user.ListUsersRequest{},
-					func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-						orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result:        []*user.User{},
+			},
+		},
+		{
+			name: "list user resourceowner multiple, ok",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
 
-						infos := createUsers(ctx, orgResp.OrganizationId, 3, false)
-						request.Queries = []*user.SearchQuery{}
-						request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
-						request.Queries = append(request.Queries, InUserEmailsQuery(infos.emails()))
-						request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
-						return infos
-					},
+					infos := createUsers(ctx, orgResp.OrganizationId, 3, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
+					request.Queries = append(request.Queries, InUserEmailsQuery(infos.emails()))
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
+					return infos
 				},
-				want: &user.ListUsersResponse{
-					Details: &object.ListDetails{
-						TotalResult: 3,
-						Timestamp:   timestamppb.Now(),
-					},
-					SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
-					Result: []*user.User{
-						{
-							State: user.UserState_USER_STATE_ACTIVE,
-							Type: &user.User_Human{
-								Human: &user.HumanUser{
-									Profile: &user.HumanProfile{
-										GivenName:         "Mickey",
-										FamilyName:        "Mouse",
-										NickName:          gu.Ptr("Mickey"),
-										DisplayName:       gu.Ptr("Mickey Mouse"),
-										PreferredLanguage: gu.Ptr("nl"),
-										Gender:            user.Gender_GENDER_MALE.Enum(),
-									},
-									Email: &user.HumanEmail{
-										IsVerified: true,
-									},
-									Phone: &user.HumanPhone{
-										IsVerified: true,
-									},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 3,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
+				Result: []*user.User{
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
 								},
 							},
-						}, {
-							State: user.UserState_USER_STATE_ACTIVE,
-							Type: &user.User_Human{
-								Human: &user.HumanUser{
-									Profile: &user.HumanProfile{
-										GivenName:         "Mickey",
-										FamilyName:        "Mouse",
-										NickName:          gu.Ptr("Mickey"),
-										DisplayName:       gu.Ptr("Mickey Mouse"),
-										PreferredLanguage: gu.Ptr("nl"),
-										Gender:            user.Gender_GENDER_MALE.Enum(),
-									},
-									Email: &user.HumanEmail{
-										IsVerified: true,
-									},
-									Phone: &user.HumanPhone{
-										IsVerified: true,
-									},
+						},
+					}, {
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
 								},
 							},
-						}, {
-							State: user.UserState_USER_STATE_ACTIVE,
-							Type: &user.User_Human{
-								Human: &user.HumanUser{
-									Profile: &user.HumanProfile{
-										GivenName:         "Mickey",
-										FamilyName:        "Mouse",
-										NickName:          gu.Ptr("Mickey"),
-										DisplayName:       gu.Ptr("Mickey Mouse"),
-										PreferredLanguage: gu.Ptr("nl"),
-										Gender:            user.Gender_GENDER_MALE.Enum(),
-									},
-									Email: &user.HumanEmail{
-										IsVerified: true,
-									},
-									Phone: &user.HumanPhone{
-										IsVerified: true,
-									},
+						},
+					}, {
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
 								},
 							},
 						},
 					},
 				},
 			},
-			{
-				name: "list user with org query",
-				args: args{
-					IamCTX,
-					&user.ListUsersRequest{},
-					func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-						orgRespForOrgTests := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
-						info := createUser(ctx, orgRespForOrgTests.OrganizationId, false)
-						request.Queries = []*user.SearchQuery{}
-						request.Queries = append(request.Queries, OrganizationIdQuery(orgRespForOrgTests.OrganizationId))
-						request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
-						return []userAttr{info, {}}
-					},
+		},
+		{
+			name: "list user with org query",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
+					info := createUser(ctx, orgRespForOrgTests.OrganizationId, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgRespForOrgTests.OrganizationId))
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
+					return []userAttr{info, {}}
 				},
-				want: &user.ListUsersResponse{
-					Details: &object.ListDetails{
-						TotalResult: 2,
-						Timestamp:   timestamppb.Now(),
-					},
-					SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
-					Result: []*user.User{
-						{
-							State: user.UserState_USER_STATE_ACTIVE,
-							Type: &user.User_Human{
-								Human: &user.HumanUser{
-									Profile: &user.HumanProfile{
-										GivenName:         "Mickey",
-										FamilyName:        "Mouse",
-										NickName:          gu.Ptr("Mickey"),
-										DisplayName:       gu.Ptr("Mickey Mouse"),
-										PreferredLanguage: gu.Ptr("nl"),
-										Gender:            user.Gender_GENDER_MALE.Enum(),
-									},
-									Email: &user.HumanEmail{
-										IsVerified: true,
-									},
-									Phone: &user.HumanPhone{
-										IsVerified: true,
-									},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 2,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
+				Result: []*user.User{
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
 								},
 							},
 						},
-						// this is the admin of the org craated in Instance.CreateOrganization()
-						nil,
 					},
+					// this is the admin of the org craated in Instance.CreateOrganization()
+					nil,
 				},
 			},
-			{
-				name: "list user with wrong org query",
-				args: args{
-					IamCTX,
-					&user.ListUsersRequest{},
-					func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-						orgRespForOrgTests := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
-						orgRespForOrgTests2 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
-						createUser(ctx, orgRespForOrgTests.OrganizationId, false)
-						request.Queries = []*user.SearchQuery{}
-						request.Queries = append(request.Queries, OrganizationIdQuery(orgRespForOrgTests2.OrganizationId))
-						return []userAttr{{}}
-					},
-				},
-				want: &user.ListUsersResponse{
-					Details: &object.ListDetails{
-						TotalResult: 0,
-						Timestamp:   timestamppb.Now(),
-					},
-					SortingColumn: 0,
-					Result: []*user.User{
-						// this is the admin of the org craated in Instance.CreateOrganization()
-						nil,
-					},
+		},
+		{
+			name: "list user with wrong org query",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
+					orgRespForOrgTests2 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
+					createUser(ctx, orgRespForOrgTests.OrganizationId, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgRespForOrgTests2.OrganizationId))
+					return []userAttr{{}}
 				},
 			},
-			{
-				name: "when no users matching meta key should return empty list",
-				args: args{
-					IamCTX,
-					&user.ListUsersRequest{},
-					func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-						createUser(ctx, orgResp.OrganizationId, false)
-						request.Queries = []*user.SearchQuery{}
-						request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
-						request.Queries = append(request.Queries, MetadataKeyContainsQuery("some non-existent meta"))
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result: []*user.User{
+					// this is the admin of the org craated in Instance.CreateOrganization()
+					nil,
+				},
+			},
+		},
+		{
+			name: "when no users matching meta key should return empty list",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					createUser(ctx, orgResp.OrganizationId, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
+					request.Queries = append(request.Queries, MetadataKeyContainsQuery("some non-existent meta"))
 
-						request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
-						return []userAttr{}
-					},
-				},
-				want: &user.ListUsersResponse{
-					Details: &object.ListDetails{
-						TotalResult: 0,
-						Timestamp:   timestamppb.Now(),
-					},
-					SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
-					Result:        []*user.User{},
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
+					return []userAttr{}
 				},
 			},
-		*/
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
+				Result:        []*user.User{},
+			},
+		},
 	}
 	for _, f := range permissionCheckV2Settings {
 		for _, tc := range tt {
