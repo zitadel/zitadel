@@ -4,6 +4,7 @@ package instance_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -129,6 +130,7 @@ func TestListInstances(t *testing.T) {
 	instances[0], instances[1], instances[2], instances[3], instances[4] = inst, inst2, inst3, inst4, inst5
 
 	t.Cleanup(func() {
+		inst.Client.FeatureV2.ResetInstanceFeatures(ctxWithSysAuthZ, &feature.ResetInstanceFeaturesRequest{})
 		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 		inst2.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst2.ID()})
 		inst3.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst3.ID()})
@@ -137,6 +139,8 @@ func TestListInstances(t *testing.T) {
 	})
 
 	orgOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
+
+	relTableState := integration.RelationalTablesEnableMatrix()
 
 	tt := []struct {
 		testName          string
@@ -191,26 +195,33 @@ func TestListInstances(t *testing.T) {
 		},
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.testName, func(t *testing.T) {
-			// Test
-			res, err := inst.Client.InstanceV2Beta.ListInstances(tc.inputContext, tc.inputRequest)
-
-			// Verify
-			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
-			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
-
-			if tc.expectedErrorMsg == "" {
-				require.NotNil(t, res)
-
-				require.Len(t, res.GetInstances(), len(tc.expectedInstances))
-
-				for i, ins := range res.GetInstances() {
-					assert.Equal(t, tc.expectedInstances[i], ins.GetId())
-				}
-			}
+	for _, stateCase := range relTableState {
+		integration.EnsureInstanceFeature(t, ctx, inst, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
 		})
+
+		for _, tc := range tt {
+			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tc.testName), func(t *testing.T) {
+				// Test
+				res, err := inst.Client.InstanceV2Beta.ListInstances(tc.inputContext, tc.inputRequest)
+
+				// Verify
+				assert.Equal(t, tc.expectedErrorCode, status.Code(err))
+				assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
+
+				if tc.expectedErrorMsg == "" {
+					require.NotNil(t, res)
+
+					require.Len(t, res.GetInstances(), len(tc.expectedInstances))
+
+					for i, ins := range res.GetInstances() {
+						assert.Equal(t, tc.expectedInstances[i], ins.GetId())
+					}
+				}
+			})
+		}
 	}
+
 }
 
 func TestListCustomDomains(t *testing.T) {
