@@ -108,6 +108,8 @@ message AuthorizationsSearchFilter {
     // Search for authorizations by the ID of the project grant the user was granted the authorization for.
     // This will also include authorizations granted for project grants of the same project.
     zitadel.filter.v2beta.IDFilter project_grant_id = 11;
+    // Search for authorizations by the IDs of the users who were granted the authorizations.
+    zitadel.filter.v2beta.InIDsFilter in_user_ids = 12;
   }
 }
 

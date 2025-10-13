@@ -52,9 +52,8 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
       }),
       requestId,
     })
-      .catch((error) => {
-        setError("Could not verify password");
-        console.error("Error verifying password:", error);
+      .catch(() => {
+        setError(t("verify.errors.couldNotVerifyPassword"));
         return;
       })
       .finally(() => {
@@ -82,7 +81,7 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
       requestId,
     })
       .catch(() => {
-        setError("Could not reset password");
+        setError(t("verify.errors.couldNotResetPassword"));
         return;
       })
       .finally(() => {
@@ -94,7 +93,7 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
       return;
     }
 
-    setInfo("Password was reset. Please check your email.");
+    setInfo(t("verify.info.passwordResetSent"));
 
     const params = new URLSearchParams({
       loginName: loginName,
