@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 type Props = {
   darkSrc?: string;
   lightSrc?: string;
@@ -12,24 +10,12 @@ export function Logo({ lightSrc, darkSrc, height = 40, width = 147.5 }: Props) {
     <>
       {darkSrc && (
         <div className="hidden dark:flex">
-          <Image
-            height={height}
-            width={width}
-            src={darkSrc}
-            alt="logo"
-            priority={true}
-          />
+          <img height={height} width={width} src={darkSrc} alt="logo" />
         </div>
       )}
       {lightSrc && (
         <div className="flex dark:hidden">
-          <Image
-            height={height}
-            width={width}
-            priority={true}
-            src={lightSrc}
-            alt="logo"
-          />
+          <img height={height} width={width} src={lightSrc} alt="logo" />
         </div>
       )}
     </>

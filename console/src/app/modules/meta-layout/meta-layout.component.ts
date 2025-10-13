@@ -7,6 +7,7 @@ import { map } from 'rxjs/operators';
   selector: 'cnsl-meta-layout',
   templateUrl: './meta-layout.component.html',
   styleUrls: ['./meta-layout.component.scss'],
+  standalone: false,
 })
 export class MetaLayoutComponent {
   constructor(private breakpointObserver: BreakpointObserver) {

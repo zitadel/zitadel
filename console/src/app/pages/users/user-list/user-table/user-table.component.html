@@ -2,7 +2,7 @@
   <cnsl-refresh-table
     *ngIf="type$ | async as type"
     [loading]="loading()"
-    (refreshed)="this.refresh$.next(true)"
+    (refreshed)="refresh$.next(true)"
     [hideRefresh]="true"
     [timestamp]="(users$ | async)?.details?.timestamp"
     [selection]="selection"
@@ -61,7 +61,7 @@
     <cnsl-filter-user
       actions
       *ngIf="!selection.hasValue()"
-      (filterChanged)="this.searchQueries$.next($any($event))"
+      (filterChanged)="searchQueries$.next($any($event))"
       (filterOpen)="filterOpen = $event"
     ></cnsl-filter-user>
     <ng-template cnslHasRole [hasRole]="['user.write']" actions>

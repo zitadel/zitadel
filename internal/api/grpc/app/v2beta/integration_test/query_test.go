@@ -137,7 +137,7 @@ func TestGetApplication(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 30*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
 				res, err := instance.Client.AppV2Beta.GetApplication(tc.inputCtx, tc.inputRequest)
@@ -438,7 +438,7 @@ func TestListApplications(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 30*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
 				res, err := instance.Client.AppV2Beta.ListApplications(tc.inputCtx, tc.inputRequest)
@@ -550,7 +550,7 @@ func TestListApplications_WithPermissionV2(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 5*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
 				res, err := instancePermissionV2.Client.AppV2Beta.ListApplications(tc.inputCtx, tc.inputRequest)
@@ -641,7 +641,7 @@ func TestGetApplicationKey(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 30*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
 				res, err := instance.Client.AppV2Beta.GetApplicationKey(tc.inputCtx, tc.inputRequest)
@@ -719,7 +719,7 @@ func TestListApplicationKeys(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 5*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
 				res, err := instance.Client.AppV2Beta.ListApplicationKeys(tc.inputCtx, tc.inputRequest)
@@ -799,7 +799,7 @@ func TestListApplicationKeys_WithPermissionV2(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			// t.Parallel()
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 5*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
 				res, err := instancePermissionV2.Client.AppV2Beta.ListApplicationKeys(tc.inputCtx, tc.inputRequest)

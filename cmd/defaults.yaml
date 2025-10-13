@@ -118,6 +118,7 @@ Database:
     Host: localhost # ZITADEL_DATABASE_POSTGRES_HOST
     Port: 5432 # ZITADEL_DATABASE_POSTGRES_PORT
     Database: zitadel # ZITADEL_DATABASE_POSTGRES_DATABASE
+    AwaitInitialConn: 0m # ZITADEL_DATABASE_POSTGRES_AWAITINITIALCONN
     MaxOpenConns: 10 # ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS
     MaxIdleConns: 5 # ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS
     MaxConnLifetime: 30m # ZITADEL_DATABASE_POSTGRES_MAXCONNLIFETIME
@@ -1242,6 +1243,9 @@ ServicePing:
     ResourceCount:
       Enabled: true # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_ENABLED
       # The number of counts that are sent in one batch.
+      # The bulk size is used to prevent large requests that might fail due to their size.
+      # Each report will log its size before sending it to the endpoint,
+      # so you can adjust the bulk size if you see that the requests are too large.
       BulkSize: 10000 # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_BULKSIZE
 
 InternalAuthZ:

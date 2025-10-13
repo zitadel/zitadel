@@ -1298,6 +1298,17 @@ func TestServer_LockUser(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "no permission, error",
+			args: args{
+				UserCTX,
+				&user.LockUserRequest{
+					UserId: Instance.Users.Get(integration.UserTypeNoPermission).ID,
+				},
+				func(request *user.LockUserRequest) error { return nil },
+			},
+			wantErr: true,
+		},
+		{
 			name: "lock, ok",
 			args: args{
 				CTX,
@@ -1400,6 +1411,17 @@ func TestServer_UnLockUser(t *testing.T) {
 				CTX,
 				&user.UnlockUserRequest{
 					UserId: "notexisting",
+				},
+				func(request *user.UnlockUserRequest) error { return nil },
+			},
+			wantErr: true,
+		},
+		{
+			name: "no permission, error",
+			args: args{
+				UserCTX,
+				&user.UnlockUserRequest{
+					UserId: Instance.Users.Get(integration.UserTypeNoPermission).ID,
 				},
 				func(request *user.UnlockUserRequest) error { return nil },
 			},
@@ -1514,6 +1536,17 @@ func TestServer_DeactivateUser(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "no permission, error",
+			args: args{
+				UserCTX,
+				&user.DeactivateUserRequest{
+					UserId: Instance.Users.Get(integration.UserTypeNoPermission).ID,
+				},
+				func(request *user.DeactivateUserRequest) error { return nil },
+			},
+			wantErr: true,
+		},
+		{
 			name: "deactivate, ok",
 			args: args{
 				CTX,
@@ -1616,6 +1649,17 @@ func TestServer_ReactivateUser(t *testing.T) {
 				CTX,
 				&user.ReactivateUserRequest{
 					UserId: "notexisting",
+				},
+				func(request *user.ReactivateUserRequest) error { return nil },
+			},
+			wantErr: true,
+		},
+		{
+			name: "no permission, error",
+			args: args{
+				UserCTX,
+				&user.ReactivateUserRequest{
+					UserId: Instance.Users.Get(integration.UserTypeNoPermission).ID,
 				},
 				func(request *user.ReactivateUserRequest) error { return nil },
 			},
@@ -1727,6 +1771,17 @@ func TestServer_DeleteUser(t *testing.T) {
 					UserId: "notexisting",
 				},
 				nil,
+			},
+			wantErr: true,
+		},
+		{
+			name: "no permission, error",
+			args: args{
+				UserCTX,
+				&user.DeleteUserRequest{
+					UserId: Instance.Users.Get(integration.UserTypeNoPermission).ID,
+				},
+				func(request *user.DeleteUserRequest) {},
 			},
 			wantErr: true,
 		},
@@ -1939,7 +1994,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 				parametersEqual: map[string]string{
 					"client_id":     "clientID",
 					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Instance.Domain + ":8080/idps/callback",
+					"redirect_uri":  "http://" + Instance.Domain + ":8082/idps/callback",
 					"response_type": "code",
 					"scope":         "openid profile email",
 				},
@@ -1970,7 +2025,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 				parametersEqual: map[string]string{
 					"client_id":     "clientID",
 					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Instance.Domain + ":8080/idps/callback",
+					"redirect_uri":  "http://" + Instance.Domain + ":8082/idps/callback",
 					"response_type": "code",
 					"scope":         "openid profile email",
 				},
@@ -2001,7 +2056,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 				parametersEqual: map[string]string{
 					"client_id":     "clientID",
 					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Instance.Domain + ":8080/idps/callback",
+					"redirect_uri":  "http://" + Instance.Domain + ":8082/idps/callback",
 					"response_type": "code",
 					"scope":         "openid profile email",
 				},
@@ -2032,7 +2087,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 				parametersEqual: map[string]string{
 					"client_id":     "clientID",
 					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Instance.Domain + ":8080/idps/callback",
+					"redirect_uri":  "http://" + Instance.Domain + ":8082/idps/callback",
 					"response_type": "code",
 					"scope":         "openid profile email",
 				},

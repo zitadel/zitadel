@@ -45,7 +45,7 @@ func (c *Commands) ChangeUserMachine(ctx context.Context, machine *ChangeMachine
 		return err
 	}
 	if machine.Changed() {
-		if err := c.checkPermissionUpdateUser(ctx, existingMachine.ResourceOwner, existingMachine.AggregateID); err != nil {
+		if err := c.checkPermissionUpdateUser(ctx, existingMachine.ResourceOwner, existingMachine.AggregateID, true); err != nil {
 			return err
 		}
 	}
