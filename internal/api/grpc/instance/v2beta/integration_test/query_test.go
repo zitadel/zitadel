@@ -4,7 +4,6 @@ package instance_test
 
 import (
 	"context"
-	"slices"
 	"testing"
 	"time"
 
@@ -121,26 +120,23 @@ func TestListInstances(t *testing.T) {
 
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
 
-	instances := make([]*integration.Instance, 2)
+	instances := make([]*integration.Instance, 5)
 	inst := integration.NewInstance(ctxWithSysAuthZ)
 	inst2 := integration.NewInstance(ctxWithSysAuthZ)
-	instances[0], instances[1] = inst, inst2
+	inst3 := integration.NewInstance(ctxWithSysAuthZ)
+	inst4 := integration.NewInstance(ctxWithSysAuthZ)
+	inst5 := integration.NewInstance(ctxWithSysAuthZ)
+	instances[0], instances[1], instances[2], instances[3], instances[4] = inst, inst2, inst3, inst4, inst5
 
 	t.Cleanup(func() {
 		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
-		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst2.ID()})
+		inst2.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst2.ID()})
+		inst3.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst3.ID()})
+		inst4.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst4.ID()})
+		inst5.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst5.ID()})
 	})
 
-	// Sort in descending order
-	slices.SortFunc(instances, func(i1, i2 *integration.Instance) int {
-		res := i1.Instance.Details.CreationDate.AsTime().Compare(i2.Instance.Details.CreationDate.AsTime())
-		if res == 0 {
-			return res
-		}
-		return -res
-	})
-
-	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
+	orgOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
 
 	tt := []struct {
 		testName          string
@@ -171,20 +167,27 @@ func TestListInstances(t *testing.T) {
 		{
 			testName: "when valid request with filter should return paginated response",
 			inputRequest: &instance.ListInstancesRequest{
-				Pagination:    &filter.PaginationRequest{Offset: 0, Limit: 10},
+				Pagination:    &filter.PaginationRequest{Offset: 1, Limit: 3},
 				SortingColumn: instance.FieldName_FIELD_NAME_CREATION_DATE.Enum(),
 				Queries: []*instance.Query{
 					{
 						Query: &instance.Query_IdQuery{
 							IdQuery: &instance.IdsQuery{
-								Ids: []string{inst.ID(), inst2.ID()},
+								Ids: []string{inst.ID(), inst2.ID(), inst3.ID(), inst4.ID(), inst5.ID()},
+							},
+						},
+					},
+					{
+						Query: &instance.Query_DomainQuery{
+							DomainQuery: &instance.DomainsQuery{
+								Domains: []string{inst4.Domain, inst3.Domain, inst2.Domain, inst.Domain},
 							},
 						},
 					},
 				},
 			},
 			inputContext:      ctxWithSysAuthZ,
-			expectedInstances: []string{inst2.ID(), inst.ID()},
+			expectedInstances: []string{inst3.ID(), inst2.ID(), inst.ID()},
 		},
 	}
 
