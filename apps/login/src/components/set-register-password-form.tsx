@@ -71,7 +71,7 @@ export function SetRegisterPasswordForm({
       password: values.password,
     })
       .catch(() => {
-        setError("Could not register user");
+        setError(t("errors.couldNotRegisterUser"));
         return;
       })
       .finally(() => {

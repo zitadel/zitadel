@@ -43,6 +43,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   selector: 'cnsl-instance',
   templateUrl: './instance.component.html',
   styleUrls: ['./instance.component.scss'],
+  standalone: false,
 })
 export class InstanceComponent {
   protected instance?: InstanceDetail.AsObject;

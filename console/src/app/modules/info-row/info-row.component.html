@@ -21,14 +21,14 @@
   <div class="info-wrapper">
     <p class="info-row-title">{{ 'USER.DETAILS.DATECREATED' | translate }}</p>
     <p *ngIf="creationDate" class="info-row-desc">
-      {{ creationDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}
+      {{ creationDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
     </p>
   </div>
 
   <div class="info-wrapper">
     <p class="info-row-title">{{ 'USER.DETAILS.DATECHANGED' | translate }}</p>
     <p *ngIf="changeDate" class="info-row-desc">
-      {{ changeDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}
+      {{ changeDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
     </p>
   </div>
 
@@ -97,14 +97,14 @@
   <div class="info-wrapper">
     <p class="info-row-title">{{ 'ORG.PAGES.CREATIONDATE' | translate }}</p>
     <p *ngIf="instance?.details?.creationDate as creationDate" class="info-row-desc">
-      {{ creationDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}
+      {{ creationDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
     </p>
   </div>
 
   <div class="info-wrapper">
     <p class="info-row-title">{{ 'ORG.PAGES.DATECHANGED' | translate }}</p>
     <p *ngIf="instance?.details?.changeDate as changeDate" class="info-row-desc">
-      {{ changeDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}
+      {{ changeDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
     </p>
   </div>
 </div>
@@ -144,14 +144,14 @@
   <div class="info-wrapper">
     <p class="info-row-title">{{ 'ORG.PAGES.CREATIONDATE' | translate }}</p>
     <p *ngIf="org?.details?.creationDate as creationDate" class="info-row-desc">
-      {{ creationDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}
+      {{ creationDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
     </p>
   </div>
 
   <div class="info-wrapper">
     <p class="info-row-title">{{ 'ORG.PAGES.DATECHANGED' | translate }}</p>
     <p *ngIf="org?.details?.changeDate as changeDate" class="info-row-desc">
-      {{ changeDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}
+      {{ changeDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
     </p>
   </div>
 </div>
@@ -179,14 +179,14 @@
   <div class="info-wrapper">
     <p class="info-row-title">{{ 'PROJECT.PAGES.CREATEDON' | translate }}</p>
     <p *ngIf="project?.details?.creationDate as creationDate" class="info-row-desc">
-      {{ creationDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}
+      {{ creationDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
     </p>
   </div>
 
   <div class="info-wrapper">
     <p class="info-row-title">{{ 'PROJECT.PAGES.LASTMODIFIED' | translate }}</p>
     <p *ngIf="project?.details?.changeDate as changeDate" class="info-row-desc">
-      {{ changeDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}
+      {{ changeDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
     </p>
   </div>
 </div>
@@ -219,14 +219,14 @@
   <div class="info-wrapper">
     <p class="info-row-title">{{ 'PROJECT.PAGES.CREATEDON' | translate }}</p>
     <p *ngIf="grantedProject?.details?.creationDate as creationDate" class="info-row-desc">
-      {{ creationDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}
+      {{ creationDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
     </p>
   </div>
 
   <div class="info-wrapper">
     <p class="info-row-title">{{ 'PROJECT.PAGES.LASTMODIFIED' | translate }}</p>
     <p *ngIf="grantedProject?.details?.changeDate as changeDate" class="info-row-desc">
-      {{ changeDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}
+      {{ changeDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
     </p>
   </div>
 </div>
@@ -265,14 +265,14 @@
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'APP.PAGES.DATECREATED' | translate }}</p>
       <p *ngIf="app?.details?.creationDate as creationDate" class="info-row-desc">
-        {{ creationDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}
+        {{ creationDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
       </p>
     </div>
 
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'APP.PAGES.DATECHANGED' | translate }}</p>
       <p *ngIf="app?.details?.changeDate as changeDate" class="info-row-desc">
-        {{ changeDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}
+        {{ changeDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
       </p>
     </div>
 
@@ -318,14 +318,14 @@
   <div class="info-wrapper">
     <p class="info-row-title">{{ 'IDP.DETAIL.DATECREATED' | translate }}</p>
     <p class="info-row-desc" *ngIf="idp?.details?.creationDate as creationDate">
-      {{ creationDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}
+      {{ creationDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
     </p>
   </div>
 
   <div class="info-wrapper">
     <p class="info-row-title">{{ 'IDP.DETAIL.DATECHANGED' | translate }}</p>
     <p class="info-row-desc" *ngIf="idp?.details?.changeDate as changeDate">
-      {{ changeDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}
+      {{ changeDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
     </p>
   </div>
 
