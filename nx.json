@@ -1,0 +1,54 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "nxCloudId": "688a9021d48dce0efe0f119f",
+  "workspaceLayout": {
+    "libsDir": "packages"
+  },
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*"
+    ]
+  },
+  "targetDefaults": {
+    "generate": {
+      "cache": true,
+      "inputs": [
+        "default"
+      ]
+    },
+    "build": {
+      "cache": true,
+      "inputs": [
+        "default"
+      ],
+      "dependsOn": [
+        "^build",
+        "generate"
+      ]
+    },
+    "lint": {
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    },
+    "test": {
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    },
+    "test-unit": {
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    },
+    "test-integration": {
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    }
+  }
+}

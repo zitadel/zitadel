@@ -452,7 +452,7 @@ module.exports = {
     },
   ],
   markdown: {
-    mermaid:true,
+    mermaid: true,
   },
   themes: [
     "docusaurus-theme-github-codeblock",

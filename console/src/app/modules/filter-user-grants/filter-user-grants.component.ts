@@ -24,6 +24,7 @@ enum SubQuery {
   selector: 'cnsl-filter-user-grants',
   templateUrl: './filter-user-grants.component.html',
   styleUrls: ['./filter-user-grants.component.scss'],
+  standalone: false,
 })
 export class FilterUserGrantsComponent extends FilterComponent implements OnInit {
   public SubQuery: any = SubQuery;
