@@ -21,6 +21,7 @@ import { NewOrganizationService } from '../../../services/new-organization.servi
   selector: 'cnsl-domain-policy',
   templateUrl: './domain-policy.component.html',
   styleUrls: ['./domain-policy.component.scss'],
+  standalone: false,
 })
 export class DomainPolicyComponent implements OnInit, OnDestroy {
   private managementService!: ManagementService;

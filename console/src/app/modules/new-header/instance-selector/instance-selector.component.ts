@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Output, Input } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
-import { Router, RouterLink } from '@angular/router';
 import { InstanceDetail } from '@zitadel/proto/zitadel/instance_pb';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { heroCog8ToothSolid } from '@ng-icons/heroicons/solid';
@@ -14,9 +13,8 @@ import { CommonModule } from '@angular/common';
   selector: 'cnsl-instance-selector',
   templateUrl: './instance-selector.component.html',
   styleUrls: ['./instance-selector.component.scss'],
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslateModule, MatButtonModule, RouterLink, NgIconComponent, CommonModule],
+  imports: [TranslateModule, MatButtonModule, NgIconComponent, CommonModule],
   providers: [provideIcons({ heroCog8ToothSolid, heroChevronRight })],
 })
 export class InstanceSelectorComponent {
