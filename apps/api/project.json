@@ -115,9 +115,7 @@
         "test-unit": {
             "description": "Runs the unit tests with coverage",
             "dependsOn": [
-                "generate-stubs",
-                "generate-assets",
-                "generate-statik"
+                "generate"
             ],
             "command": "go test -race -coverprofile=profile.api.test-unit.cov -coverpkg=./internal/...  ./...",
             "inputs": [
@@ -131,9 +129,7 @@
         "test-integration-build": {
             "description": "Builds the test binary for integration tests.",
             "dependsOn": [
-                "generate-stubs",
-                "generate-assets",
-                "generate-statik"
+                "generate"
             ],
             "command": "go build -cover -race -tags integration -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.test main.go",
             "cache": true,
@@ -361,9 +357,8 @@
         "pack-darwin-amd64": {
             "description": "Packages the API for Darwin AMD64 (Intel) architecture",
             "dependsOn": [
-                "generate-stubs",
-                "generate-assets",
-                "generate-statik"
+                "generate",
+                "build-console"
             ],
             "command": "GOOS=darwin GOARCH=amd64 nx run @zitadel/api:pack-platform",
             "cache": true,
@@ -379,9 +374,8 @@
         "pack-darwin-arm64": {
             "description": "Packages the API for Darwin ARM64 (Apple Silicon) architecture",
             "dependsOn": [
-                "generate-stubs",
-                "generate-assets",
-                "generate-statik"
+                "generate",
+                "build-console"
             ],
             "command": "GOOS=darwin GOARCH=arm64 nx run @zitadel/api:pack-platform",
             "cache": true,
@@ -397,9 +391,8 @@
         "pack-linux-amd64": {
             "description": "Packages the API for Linux AMD64 architecture",
             "dependsOn": [
-                "generate-stubs",
-                "generate-assets",
-                "generate-statik"
+                "generate",
+                "build-console"
             ],
             "command": "GOOS=linux GOARCH=amd64 nx run @zitadel/api:pack-platform",
             "cache": true,
@@ -415,9 +408,8 @@
         "pack-linux-arm64": {
             "description": "Packages the API for Linux ARM64 architecture",
             "dependsOn": [
-                "generate-stubs",
-                "generate-assets",
-                "generate-statik"
+                "generate",
+                "build-console"
             ],
             "command": "GOOS=linux GOARCH=arm64 nx run @zitadel/api:pack-platform",
             "cache": true,
@@ -433,9 +425,8 @@
         "pack-windows-amd64": {
             "description": "Packages the API for Windows AMD64 architecture",
             "dependsOn": [
-                "generate-stubs",
-                "generate-assets",
-                "generate-statik"
+                "generate",
+                "build-console"
             ],
             "command": "GOOS=windows GOARCH=amd64 nx run @zitadel/api:pack-platform",
             "cache": true,
@@ -451,9 +442,8 @@
         "pack-windows-arm64": {
             "description": "Packages the API for Windows ARM64 architecture",
             "dependsOn": [
-                "generate-stubs",
-                "generate-assets",
-                "generate-statik"
+                "generate",
+                "build-console"
             ],
             "command": "GOOS=windows GOARCH=arm64 nx run @zitadel/api:pack-platform",
             "cache": true,
