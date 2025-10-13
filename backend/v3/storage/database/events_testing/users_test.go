@@ -727,7 +727,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			// event user.domain.claimed
+			// event user.username.changed
 			assert.Equal(t, username, user.Username)
 		}, retryDuration, tick)
 	})
@@ -1209,6 +1209,78 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 			assert.Nil(t, user.AvatarKey)
 			assert.WithinRange(t, user.UpdatedAt, before, after)
 		}, retryDuration, tick)
+	})
+
+	password := gofakeit.Password(true, true, true, true, true, 5)
+	t.Run("test human user password change reduced", func(t *testing.T) {
+		createUserReq := &v2beta_user.AddHumanUserRequest{
+			// UserId: gu.Ptr("tester"),
+			Organization: &object.Organization{
+				Org: &object.Organization_OrgId{
+					OrgId: orgID,
+				},
+			},
+			Profile: &v2beta_user.SetHumanProfile{
+				GivenName:         "Donald",
+				FamilyName:        "Duck",
+				NickName:          gu.Ptr("Dukkie"),
+				DisplayName:       gu.Ptr("Donald Duck"),
+				PreferredLanguage: gu.Ptr("en"),
+				Gender:            v2beta_user.Gender_GENDER_DIVERSE.Enum(),
+			},
+			Email: &v2beta_user.SetHumanEmail{
+				Email: gofakeit.Email(),
+			},
+			Phone: &v2beta_user.SetHumanPhone{},
+			Metadata: []*v2beta_user.SetMetadataEntry{
+				{
+					Key:   "somekey",
+					Value: []byte("somevalue"),
+				},
+			},
+			PasswordType: &v2beta_user.AddHumanUserRequest_Password{
+				Password: &v2beta_user.Password{
+					Password:       password,
+					ChangeRequired: true,
+				},
+			},
+		}
+		res, err := UserClient.AddHumanUser(IAMCTX, createUserReq)
+		require.NoError(t, err)
+
+		userID := res.UserId
+
+		// make sure user exists
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			user, err := userRepo.GetHuman(
+				CTX,
+				pool,
+				database.WithCondition(database.And(
+					userRepo.Human().InstanceIDCondition(instanceID),
+					userRepo.Human().OrgIDCondition(orgID),
+					userRepo.Human().IDCondition(userID),
+				)),
+			)
+			require.NoError(t, err)
+
+			assert.NotNil(t, user)
+		}, retryDuration, tick)
+
+		// // change user password
+		// _, err = UserClient.UpdateHumanUser(IAMCTX, &v2beta_user.UpdateHumanUserRequest{
+		// 	UserId: userID,
+		// 	Password: &v2beta_user.SetPassword{
+		// 		PasswordType: &v2beta_user.SetPassword_Password{
+		// 			Password: &v2beta_user.Password{
+		// 				Password:       gofakeit.Password(true, true, true, true, true, 5),
+		// 				ChangeRequired: true,
+		// 			},
+		// 		},
+		// 		Verification: &v2beta_user.SetPassword_CurrentPassword{},
+		// 	},
+		// })
+		// require.NoError(t, err)
 	})
 }
 

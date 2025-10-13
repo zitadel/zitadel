@@ -1187,30 +1187,61 @@ func (p *userRelationalProjection) reduceHumanPasswordChanged(event eventstore.E
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-jqXUY", "reduce.wrong.event.type %s", user.HumanPasswordChangedType)
 	}
-	return handler.NewMultiStatement(
-		e,
-		handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(HumanPasswordChangeRequired, e.ChangeRequired),
-				handler.NewCol(HumanPasswordChanged, &sql.NullTime{Time: e.CreatedAt(), Valid: true}),
-			},
-			[]handler.Condition{
-				handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
-				handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
-			},
-			handler.WithTableSuffix(UserHumanSuffix),
-		),
-		handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(NotifyPasswordSetCol, true),
-			},
-			[]handler.Condition{
-				handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),
-				handler.NewCond(NotifyInstanceIDCol, e.Aggregate().InstanceID),
-			},
-			handler.WithTableSuffix(UserNotifySuffix),
-		),
-	), nil
+	fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> PASSWORD CHANGE")
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		userRepo := repository.UserRepository()
+
+		noOfRecordsUpdated, err := userRepo.Human().Security().Update(ctx, v3_sql.SQLTx(tx),
+			database.And(
+				userRepo.Human().InstanceIDCondition(e.Aggregate().InstanceID),
+				userRepo.Human().IDCondition(e.Aggregate().ID),
+			),
+			// TODO
+			// userRepo.Human().SetUsername(e.UserName),
+			userRepo.Human().Security().SetPasswordChangeRequired(e.ChangeRequired),
+			userRepo.Human().Security().SetPasswordChanged(e.CreatedAt()),
+			userRepo.Human().SetUpdatedAt(e.CreationDate()),
+		)
+		if err != nil {
+			return err
+		}
+		if noOfRecordsUpdated == 0 {
+			return zerrors.ThrowNotFound(nil, "HANDL-SD3fs", "Errors.User.NotFound")
+		} else if noOfRecordsUpdated > 1 {
+			tx.Rollback()
+			// TODO add "Errors.User.TooManyEntries"
+			return zerrors.ThrowInternal(nil, "HANDL-Df3fs", "Errors.User.TooManyEntries")
+		}
+		return nil
+	}), nil
+	// return handler.NewMultiStatement(
+	// 	e,
+	// 	handler.AddUpdateStatement(
+	// 		[]handler.Column{
+	// 			handler.NewCol(HumanPasswordChangeRequired, e.ChangeRequired),
+	// 			handler.NewCol(HumanPasswordChanged, &sql.NullTime{Time: e.CreatedAt(), Valid: true}),
+	// 		},
+	// 		[]handler.Condition{
+	// 			handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
+	// 			handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
+	// 		},
+	// 		handler.WithTableSuffix(UserHumanSuffix),
+	// 	),
+	// 	handler.AddUpdateStatement(
+	// 		[]handler.Column{
+	// 			handler.NewCol(NotifyPasswordSetCol, true),
+	// 		},
+	// 		[]handler.Condition{
+	// 			handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),
+	// 			handler.NewCond(NotifyInstanceIDCol, e.Aggregate().InstanceID),
+	// 		},
+	// 		handler.WithTableSuffix(UserNotifySuffix),
+	// 	),
+	// ), nil
 }
 
 func (p *userRelationalProjection) reduceMachineSecretSet(event eventstore.Event) (*handler.Statement, error) {

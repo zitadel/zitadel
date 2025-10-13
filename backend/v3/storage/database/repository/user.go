@@ -10,15 +10,18 @@ import (
 )
 
 var (
-	_ domain.UserRepository    = (*user)(nil)
-	_ domain.HumanRepository   = (*human)(nil)
-	_ domain.MachineRepository = (*machine)(nil)
+	_ domain.UserRepository          = (*user)(nil)
+	_ domain.HumanRepository         = (*human)(nil)
+	_ domain.HumanSecurityRepository = (*security)(nil)
+	_ domain.MachineRepository       = (*machine)(nil)
 )
 
 type (
-	contact struct{}
-	human   struct {
+	contact  struct{}
+	security struct{}
+	human    struct {
 		contact
+		security
 	}
 	machine struct{}
 	user    struct {
@@ -42,12 +45,20 @@ func (m machine) unqualifiedTableName() string {
 	return "machine_users"
 }
 
-func (h human) qualifiedTableName() string {
+func (h *human) qualifiedTableName() string {
 	return "zitadel.human_users"
 }
 
 func (h human) unqualifiedTableName() string {
 	return "human_users"
+}
+
+func (s security) qualifiedTableName() string {
+	return "zitadel.human_security"
+}
+
+func (s security) unqualifiedTableName() string {
+	return "human_security"
 }
 
 func (c contact) qualifiedTableName() string {
@@ -168,6 +179,31 @@ func (h human) AvatarKeyColumn() database.Column {
 	return database.NewColumn(h.unqualifiedTableName(), "avatar_key")
 }
 
+// security
+func (s security) InstanceIDColumn() database.Column {
+	return database.NewColumn(s.unqualifiedTableName(), "instance_id")
+}
+
+func (s security) OrgIDColumn() database.Column {
+	return database.NewColumn(s.unqualifiedTableName(), "org_id")
+}
+
+func (s security) UserIDColumn() database.Column {
+	return database.NewColumn(s.unqualifiedTableName(), "id")
+}
+
+func (s security) PasswordChangeRequiredColumn() database.Column {
+	return database.NewColumn(s.unqualifiedTableName(), "password_change_required")
+}
+
+func (s security) PasswordChangedColumn() database.Column {
+	return database.NewColumn(s.unqualifiedTableName(), "password_changed")
+}
+
+func (s security) MFAInitSkippedColumn() database.Column {
+	return database.NewColumn(s.unqualifiedTableName(), "mfa_init_skipped")
+}
+
 // -------------------------------------------------------------
 // conditions
 // -------------------------------------------------------------
@@ -278,6 +314,31 @@ func (h human) AvatarKeyCondition(key string) database.Condition {
 	return database.NewTextCondition(h.AvatarKeyColumn(), database.TextOperationEqual, key)
 }
 
+// security
+func (s security) InstanceIDCondition(instanceID string) database.Condition {
+	return database.NewTextCondition(s.InstanceIDColumn(), database.TextOperationEqual, instanceID)
+}
+
+func (s security) OrgIDCondition(orgID string) database.Condition {
+	return database.NewTextCondition(s.OrgIDColumn(), database.TextOperationEqual, orgID)
+}
+
+func (s security) UserIDCondition(userID string) database.Condition {
+	return database.NewTextCondition(s.UserIDColumn(), database.TextOperationEqual, userID)
+}
+
+func (s security) PassswordChangeRequiredCondition(required bool) database.Condition {
+	return database.NewBooleanCondition(s.PasswordChangeRequiredColumn(), required)
+}
+
+func (s security) PasswordChangeCondition(op database.NumberOperation, time time.Time) database.Condition {
+	return database.NewNumberCondition(s.PasswordChangedColumn(), op, time)
+}
+
+func (s security) MFAInitSkippedCondition(skipped bool) database.Condition {
+	return database.NewBooleanCondition(s.PasswordChangeRequiredColumn(), skipped)
+}
+
 // -------------------------------------------------------------
 // changes
 // -------------------------------------------------------------
@@ -366,6 +427,23 @@ func (u user) Human() domain.HumanRepository {
 
 func (u user) Machine() domain.MachineRepository {
 	return &machine{}
+}
+
+func (h human) Security() domain.HumanSecurityRepository {
+	return &security{}
+}
+
+// security
+func (s security) SetPasswordChangeRequired(required bool) database.Change {
+	return database.NewChange(s.PasswordChangeRequiredColumn(), required)
+}
+
+func (s security) SetPasswordChanged(time time.Time) database.Change {
+	return database.NewChange(s.PasswordChangedColumn(), time)
+}
+
+func (s security) SetMFAInitSkipped(skipped bool) database.Change {
+	return database.NewChange(s.MFAInitSkippedColumn(), skipped)
 }
 
 // Create Human could have been done in one statement using CTE(s), but because a user may or may not email + phone or just email, this would require more code to handle
@@ -505,6 +583,7 @@ func (c contact) Set(ctx context.Context, client database.QueryExecutor, contact
 	return 0, nil
 }
 
+// TODO use LeftJoin()
 const queryHumanUserStmt = `SELECT zitadel.human_users.instance_id, zitadel.human_users.org_id, id, username, username_org_unique, state,` +
 	` first_name, last_name, nick_name, display_name, preferred_language, gender, avatar_key,` +
 	` created_at, updated_at,` +
@@ -711,6 +790,59 @@ func (u user) DeleteMachine(ctx context.Context, client database.QueryExecutor, 
 
 	var builder database.StatementBuilder
 	builder.WriteString(`DELETE FROM zitadel.machine_users`)
+	writeCondition(&builder, condition)
+
+	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+const querySecuirtyStmt = `SELECT zitadel.human_security.instance_id, zitadel.human_security.org_id, zitadel.human_security.user_id,` +
+	` password_change_required, password_changed, mfa_init_skipped FROM zitadel.human_security`
+
+func (s security) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.HumanSecurity, error) {
+	builder := database.StatementBuilder{}
+	builder.WriteString(querMachineUserStmt)
+
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	human := human{}
+	database.WithLeftJoin(
+		human.qualifiedTableName(),
+		database.And(
+			database.NewColumnCondition(s.InstanceIDColumn(), human.InstanceIDColumn()),
+			database.NewColumnCondition(s.OrgIDColumn(), human.OrgIDColumn()),
+			database.NewColumnCondition(s.UserIDColumn(), human.OrgIDColumn()),
+		),
+	)(options)
+
+	options.Write(&builder)
+
+	return getOne[domain.HumanSecurity](ctx, client, &builder)
+}
+
+func (s security) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+	if len(changes) == 0 {
+		return 0, database.ErrNoChanges
+	}
+
+	human := human{}
+	if !condition.IsRestrictingColumn(human.InstanceIDColumn()) {
+		return 0, database.NewMissingConditionError(human.InstanceIDColumn())
+	}
+
+	// if !condition.IsRestrictingColumn(human.OrgIDColumn()) {
+	// 	return 0, database.NewMissingConditionError(human.OrgIDColumn())
+	// }
+
+	if !condition.IsRestrictingColumn(human.UserIDColumn()) {
+		return 0, database.NewMissingConditionError(human.UserIDColumn())
+	}
+
+	var builder database.StatementBuilder
+	builder.WriteString(`UPDATE zitadel.human_security SET `)
+	database.Changes(changes).Write(&builder)
 	writeCondition(&builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)

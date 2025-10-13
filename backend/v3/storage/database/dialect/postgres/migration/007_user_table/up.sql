@@ -35,7 +35,7 @@ CREATE TABLE zitadel.machine_users(
     name TEXT NOT NULL CHECK (name <> '')
     , description TEXT
     , secret TEXT
-    , access_token_type UNSIGNED INTEGER CHECK
+    , access_token_type INTEGER
 
     , PRIMARY KEY (instance_id, org_id, id)
     , FOREIGN KEY (instance_id) REFERENCES zitadel.instances(id)

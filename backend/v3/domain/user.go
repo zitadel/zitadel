@@ -163,6 +163,8 @@ type HumanRepository interface {
 	humanColumns
 	humanConditions
 	humanChanges
+
+	Security() HumanSecurityRepository
 }
 
 //go:generate enumer -type ContactType -transform lower -trimprefix ContactType -sql
@@ -187,23 +189,59 @@ type HumanContact struct {
 
 // human security
 type HumanSecurity struct {
-	// InstanceID string `json:"instanceId,omitempty" db:"instance_id"`
-	// OrgID      string `json:"orgId,omitempty" db:"org_id"`
-	// UserId     string `json:"userId,omitempty" db:"user_id"`
+	InstanceID string `json:"instanceId,omitempty" db:"instance_id"`
+	OrgID      string `json:"orgId,omitempty" db:"org_id"`
+	UserId     string `json:"userId,omitempty" db:"user_id"`
 
 	PasswordChangeRequired bool       `json:"passwordChangeRequired,omitempty" db:"password_change_required"`
 	PasswordChange         *time.Time `json:"passwordChange,omitempty" db:"password_change"`
 	MFAInitSkipped         bool       `json:"mfaInitSkipped,omitempty" db:"mfa_init_skipped"`
 }
 
+type HumanSecurityRepository interface {
+	humanSecurityColumns
+	humanSecurityConditions
+	humanSecurityChanges
+
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*HumanSecurity, error)
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
+}
+
+type humanSecurityColumns interface {
+	InstanceIDColumn() database.Column
+	OrgIDColumn() database.Column
+	UserIDColumn() database.Column
+	PasswordChangeRequiredColumn() database.Column
+	PasswordChangedColumn() database.Column
+	MFAInitSkippedColumn() database.Column
+}
+
+type humanSecurityConditions interface {
+	InstanceIDCondition(instanceID string) database.Condition
+	OrgIDCondition(orgID string) database.Condition
+	UserIDCondition(userID string) database.Condition
+	PassswordChangeRequiredCondition(required bool) database.Condition
+	PasswordChangeCondition(op database.NumberOperation, time time.Time) database.Condition
+	MFAInitSkippedCondition(skipped bool) database.Condition
+}
+
+type humanSecurityChanges interface {
+	// SetInstanceID(instanceID string) database.Change
+	// SetOrgID(orgID string) database.Change
+	// SetUserID(userID string) database.Change
+	SetPasswordChangeRequired(required bool) database.Change
+	SetPasswordChanged(time time.Time) database.Change
+	SetMFAInitSkipped(skipped bool) database.Change
+}
+
 type humanContactColumns interface {
-	InstanceIDCondition() database.Column
-	OrgIDCondition() database.Column
-	UserIDCondition() database.Column
+	InstanceIDColumn() database.Column
+	OrgIDColumn() database.Column
+	UserIDColumn() database.Column
 	TypeCondition() database.Column
-	CurrentValueCondition() database.Column
-	VerifiedCondition() database.Column
-	UnverifiedValueCondition() database.Column
+	CurrentValueColumn() database.Column
+	VerifiedColumn() database.Column
+	UnverifiedValueColumn() database.Column
 }
 
 type humanContactConditions interface {
