@@ -22,7 +22,7 @@ CREATE TYPE zitadel.owner_type AS ENUM (
 
 CREATE TABLE zitadel.settings (
     instance_id TEXT NOT NULL
-    , org_id TEXT
+    , organization_id TEXT
     , id TEXT NOT NULL CHECK (id <> '') DEFAULT gen_random_uuid()
     , type zitadel.settings_type NOT NULL
     , owner_type zitadel.owner_type NOT NULL
@@ -34,11 +34,11 @@ CREATE TABLE zitadel.settings (
 
     , PRIMARY KEY (instance_id, id)
     , FOREIGN KEY (instance_id) REFERENCES zitadel.instances(id)
-    , FOREIGN KEY (instance_id, org_id) REFERENCES zitadel.organizations(instance_id, id)
+    , FOREIGN KEY (instance_id, organization_id) REFERENCES zitadel.organizations(instance_id, id)
 );
 
-CREATE UNIQUE INDEX idx_settings_unique_type ON zitadel.settings (instance_id, org_id, type, owner_type) NULLS NOT DISTINCT WHERE type != 'label';
-CREATE UNIQUE INDEX idx_settings_label_unique_type ON zitadel.settings (instance_id, org_id, type, owner_type, label_state) NULLS NOT DISTINCT WHERE type = 'label';
+CREATE UNIQUE INDEX idx_settings_unique_type ON zitadel.settings (instance_id, organization_id, type, owner_type) NULLS NOT DISTINCT WHERE type != 'label';
+CREATE UNIQUE INDEX idx_settings_label_unique_type ON zitadel.settings (instance_id, organization_id, type, owner_type, label_state) NULLS NOT DISTINCT WHERE type = 'label';
 
 CREATE INDEX idx_settings_type ON zitadel.settings(instance_id, type, label_state) NULLS NOT DISTINCT;
 

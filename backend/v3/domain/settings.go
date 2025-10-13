@@ -37,7 +37,7 @@ const (
 type Setting struct {
 	ID         string          `json:"id,omitempty" db:"id"`
 	InstanceID string          `json:"instanceId,omitempty" db:"instance_id"`
-	OrgID      *string         `json:"orgId,omitempty" db:"org_id"`
+	OrgID      *string         `json:"organizationId,omitempty" db:"organization_id"`
 	Type       SettingType     `json:"type,omitempty" db:"type"`
 	OwnerType  OwnerType       `json:"ownerType,omitempty" db:"owner_type"`
 	LabelState *LabelState     `json:"labelState,omitempty" db:"label_state"`
