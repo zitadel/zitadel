@@ -7,6 +7,7 @@ const LABELPOLICY_LOCALSTORAGE_KEY = 'labelPolicyOnSignout';
   selector: 'cnsl-signedout',
   templateUrl: './signedout.component.html',
   styleUrls: ['./signedout.component.scss'],
+  standalone: false,
 })
 export class SignedoutComponent {
   public dark: boolean = true;

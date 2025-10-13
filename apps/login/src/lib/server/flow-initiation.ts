@@ -14,10 +14,7 @@ import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import { idpTypeToSlug } from "@/lib/idp";
 import { create } from "@zitadel/client";
 import { Prompt } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
-import {
-  CreateCallbackRequestSchema,
-  SessionSchema,
-} from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
+import { CreateCallbackRequestSchema, SessionSchema } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
@@ -62,7 +59,7 @@ export interface FlowInitiationParams {
  */
 export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Promise<NextResponse> {
   const { serviceUrl, requestId, sessions, sessionCookies, request } = params;
-  
+
   const { authRequest } = await getAuthRequest({
     serviceUrl,
     authRequestId: requestId.replace("oidc_", ""),
@@ -85,11 +82,14 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       if (orgDomainScope) {
         const matched = ORG_DOMAIN_SCOPE_REGEX.exec(orgDomainScope);
         const orgDomain = matched?.[1] ?? "";
+
+        console.log("Extracted org domain:", orgDomain);
         if (orgDomain) {
           const orgs = await getOrgsByDomain({
             serviceUrl,
             domain: orgDomain,
           });
+
           if (orgs.result && orgs.result.length === 1) {
             organization = orgs.result[0].id ?? "";
             suffix = orgDomain;
@@ -347,6 +347,10 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       loginNameUrl.searchParams.append("organization", organization);
     }
 
+    if (suffix) {
+      loginNameUrl.searchParams.append("suffix", suffix);
+    }
+
     return NextResponse.redirect(loginNameUrl);
   }
 }
@@ -356,7 +360,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
  */
 export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Promise<NextResponse> {
   const { serviceUrl, requestId, sessions, sessionCookies, request } = params;
-  
+
   const { samlRequest } = await getSAMLRequest({
     serviceUrl,
     samlRequestId: requestId.replace("saml_", ""),
@@ -416,7 +420,7 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
         },
       }),
     });
-    
+
     if (url && binding.case === "redirect") {
       return NextResponse.redirect(url);
     } else if (url && binding.case === "post") {

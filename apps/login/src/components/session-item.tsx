@@ -1,7 +1,7 @@
 "use client";
 
 import { sendLoginname } from "@/lib/server/loginname";
-import { clearSession, continueWithSession } from "@/lib/server/session";
+import { clearSession, continueWithSession, ContinueWithSessionCommand } from "@/lib/server/session";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { Timestamp, timestampDate } from "@zitadel/client";
@@ -21,9 +21,7 @@ export function isSessionValid(session: Partial<Session>): {
   const validPasskey = session?.factors?.webAuthN?.verifiedAt;
   const validIDP = session?.factors?.intent?.verifiedAt;
 
-  const stillValid = session.expirationDate
-    ? timestampDate(session.expirationDate) > new Date()
-    : true;
+  const stillValid = session.expirationDate ? timestampDate(session.expirationDate) > new Date() : true;
 
   const verifiedAt = validPassword || validPasskey || validIDP;
   const valid = !!((validPassword || validPasskey || validIDP) && stillValid);
@@ -31,15 +29,7 @@ export function isSessionValid(session: Partial<Session>): {
   return { valid, verifiedAt };
 }
 
-export function SessionItem({
-  session,
-  reload,
-  requestId,
-}: {
-  session: Session;
-  reload: () => void;
-  requestId?: string;
-}) {
+export function SessionItem({ session, reload, requestId }: { session: Session; reload: () => void; requestId?: string }) {
   const currentLocale = useLocale();
   moment.locale(currentLocale === "zh" ? "zh-cn" : currentLocale);
 
@@ -73,10 +63,21 @@ export function SessionItem({
         <button
           onClick={async () => {
             if (valid && session?.factors?.user) {
-              await continueWithSession({
-                ...session,
-                requestId: requestId,
-              });
+              const sessionPayload: ContinueWithSessionCommand = session;
+              if (requestId) {
+                sessionPayload.requestId = requestId;
+              }
+
+              const callbackResponse = await continueWithSession(sessionPayload);
+
+              if (callbackResponse && "error" in callbackResponse) {
+                setError(callbackResponse.error);
+                return;
+              }
+
+              if (callbackResponse && "redirect" in callbackResponse) {
+                return router.push(callbackResponse.redirect);
+              }
             } else if (session.factors?.user) {
               setLoading(true);
               const res = await sendLoginname({
@@ -114,9 +115,7 @@ export function SessionItem({
 
           <div className="flex flex-col items-start overflow-hidden">
             <span className="">{session.factors?.user?.displayName}</span>
-            <span className="text-ellipsis text-xs opacity-80">
-              {session.factors?.user?.loginName}
-            </span>
+            <span className="text-ellipsis text-xs opacity-80">{session.factors?.user?.loginName}</span>
             {valid ? (
               <span className="text-ellipsis text-xs opacity-80">
                 <Translated i18nKey="verified" namespace="accounts" />{" "}
@@ -126,8 +125,7 @@ export function SessionItem({
               verifiedAt && (
                 <span className="text-ellipsis text-xs opacity-80">
                   <Translated i18nKey="expired" namespace="accounts" />{" "}
-                  {session.expirationDate &&
-                    moment(timestampDate(session.expirationDate)).fromNow()}
+                  {session.expirationDate && moment(timestampDate(session.expirationDate)).fromNow()}
                 </span>
               )
             )}

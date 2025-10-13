@@ -24,6 +24,8 @@ import { getServiceUrlFromHeaders } from "../service-url";
 import { loadMostRecentSession } from "../session";
 import { checkMFAFactors } from "../verify-helper";
 import { createSessionAndUpdateCookie } from "./cookie";
+import { getOriginalHostWithProtocol } from "./host";
+import { getTranslations } from "next-intl/server";
 
 export async function verifyTOTP(code: string, loginName?: string, organization?: string) {
   const _headers = await headers();
@@ -58,6 +60,7 @@ type VerifyUserByEmailCommand = {
 };
 
 export async function sendVerification(command: VerifyUserByEmailCommand) {
+  const t = await getTranslations("verify");
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -68,7 +71,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
         verificationCode: command.code,
       }).catch((error) => {
         console.warn(error);
-        return { error: "Could not verify invite" };
+        return { error: t("errors.couldNotVerifyInvite") };
       })
     : await verifyEmail({
         serviceUrl,
@@ -76,7 +79,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
         verificationCode: command.code,
       }).catch((error) => {
         console.warn(error);
-        return { error: "Could not verify email" };
+        return { error: t("errors.couldNotVerifyEmail") };
       });
 
   if ("error" in verifyResponse) {
@@ -84,7 +87,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   }
 
   if (!verifyResponse) {
-    return { error: "Could not verify" };
+    return { error: t("errors.couldNotVerify") };
   }
 
   let session: Session | undefined;
@@ -94,7 +97,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   });
 
   if (!userResponse || !userResponse.user) {
-    return { error: "Could not load user" };
+    return { error: t("errors.couldNotLoadUser") };
   }
 
   const user = userResponse.user;
@@ -125,7 +128,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   });
 
   if (!authMethodResponse || !authMethodResponse.authMethodTypes) {
-    return { error: "Could not load possible authenticators" };
+    return { error: t("errors.couldNotLoadAuthenticators") };
   }
 
   // if no authmethods are found on the user, redirect to set one up
@@ -147,7 +150,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     }
 
     if (!session) {
-      return { error: "Could not create session" };
+      return { error: t("errors.couldNotCreateSession") };
     }
 
     const params = new URLSearchParams({
@@ -248,13 +251,10 @@ type resendVerifyEmailCommand = {
 };
 
 export async function resendVerification(command: resendVerifyEmailCommand) {
+  const t = await getTranslations("verify");
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
-
-  if (!host) {
-    return { error: "No host found" };
-  }
+  const hostWithProtocol = await getOriginalHostWithProtocol();
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
@@ -263,19 +263,19 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
         serviceUrl,
         userId: command.userId,
         urlTemplate:
-          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+          `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
           (command.requestId ? `&requestId=${command.requestId}` : ""),
       }).catch((error) => {
         if (error.code === 9) {
-          return { error: "User is already verified!" };
+          return { error: t("errors.userAlreadyVerified") };
         }
-        return { error: "Could not resend invite" };
+        return { error: t("errors.couldNotResendInvite") };
       })
     : zitadelSendEmailCode({
         userId: command.userId,
         serviceUrl,
         urlTemplate:
-          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+          `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
           (command.requestId ? `&requestId=${command.requestId}` : ""),
       });
 }

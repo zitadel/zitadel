@@ -65,7 +65,6 @@ export type ToggleStateKeys = keyof ToggleStates;
     FeatureToggleComponent,
     LoginV2FeatureToggleComponent,
   ],
-  standalone: true,
   selector: 'cnsl-features',
   templateUrl: './features.component.html',
   styleUrls: ['./features.component.scss'],
