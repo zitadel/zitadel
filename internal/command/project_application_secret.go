@@ -10,12 +10,12 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) ChangeApplicationSecret(ctx context.Context, projectID, appID, resourceOwner string) (secret string, changeDate time.Time, err error) {
-	if projectID == "" || appID == "" {
+func (c *Commands) ChangeApplicationSecret(ctx context.Context, projectID, applicationID, resourceOwner string) (secret string, changeDate time.Time, err error) {
+	if projectID == "" || applicationID == "" {
 		return "", time.Time{}, zerrors.ThrowInvalidArgument(nil, "COMMAND-KJ29c", "Errors.IDMissing")
 	}
 
-	existingApplication, err := c.getApplicationSecretWriteModel(ctx, projectID, appID, resourceOwner)
+	existingApplication, err := c.getApplicationSecretWriteModel(ctx, projectID, applicationID, resourceOwner)
 	if err != nil {
 		return "", time.Time{}, err
 	}
@@ -35,9 +35,9 @@ func (c *Commands) ChangeApplicationSecret(ctx context.Context, projectID, appID
 	projectAgg := ProjectAggregateFromWriteModelWithCTX(ctx, &existingApplication.WriteModel)
 
 	var command eventstore.Command
-	command = project_repo.NewOIDCConfigSecretChangedEvent(ctx, projectAgg, appID, encodedHash)
+	command = project_repo.NewOIDCConfigSecretChangedEvent(ctx, projectAgg, applicationID, encodedHash)
 	if existingApplication.IsAPI {
-		command = project_repo.NewAPIConfigSecretChangedEvent(ctx, projectAgg, appID, encodedHash)
+		command = project_repo.NewAPIConfigSecretChangedEvent(ctx, projectAgg, applicationID, encodedHash)
 	}
 	if err = c.pushAppendAndReduce(ctx, existingApplication, command); err != nil {
 		return "", time.Time{}, err
@@ -46,11 +46,11 @@ func (c *Commands) ChangeApplicationSecret(ctx context.Context, projectID, appID
 	return plain, existingApplication.ChangeDate, nil
 }
 
-func (c *Commands) getApplicationSecretWriteModel(ctx context.Context, projectID, appID, resourceOwner string) (_ *ApplicationSecretWriteModel, err error) {
+func (c *Commands) getApplicationSecretWriteModel(ctx context.Context, projectID, applicationID, resourceOwner string) (_ *ApplicationSecretWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	appWriteModel := NewApplicationSecretWriteModel(projectID, appID, resourceOwner)
+	appWriteModel := NewApplicationSecretWriteModel(projectID, applicationID, resourceOwner)
 	err = c.eventstore.FilterToQueryReducer(ctx, appWriteModel)
 	if err != nil {
 		return nil, err
