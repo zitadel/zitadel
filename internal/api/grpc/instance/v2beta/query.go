@@ -27,6 +27,10 @@ func (s *Server) GetInstance(ctx context.Context, request *connect.Request[insta
 }
 
 func (s *Server) ListInstances(ctx context.Context, req *connect.Request[instance.ListInstancesRequest]) (*connect.Response[instance.ListInstancesResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.ListInstances(ctx, req.Msg)
+	}
+
 	queries, err := ListInstancesRequestToModel(req.Msg, s.systemDefaults)
 	if err != nil {
 		return nil, err

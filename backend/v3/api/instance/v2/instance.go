@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 )
 
@@ -68,6 +69,31 @@ func UpdateInstance(ctx context.Context, request *instance.UpdateInstanceRequest
 			// TODO(IAM-Marco): Change this with the real update date when InstanceRepo.Update()
 			// returns the timestamp
 			ChangeDate: timestamppb.Now(),
+		},
+	}, nil
+}
+
+func ListInstances(ctx context.Context, request *instance.ListInstancesRequest) (*connect.Response[instance.ListInstancesResponse], error) {
+	instancesListCmd := domain.NewListInstancesCommand(request)
+
+	err := domain.Invoke(
+		ctx,
+		instancesListCmd,
+		domain.WithInstanceRepo(repository.InstanceRepository()),
+		domain.WithInstanceDomainRepo(repository.InstanceDomainRepository()),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	instances := instancesListCmd.ResultToGRPC()
+	return &connect.Response[instance.ListInstancesResponse]{
+		Msg: &instance.ListInstancesResponse{
+			Instances: instances,
+			Pagination: &filter.PaginationResponse{
+				TotalResult:  uint64(len(instances)),
+				AppliedLimit: uint64(request.GetPagination().GetLimit()),
+			},
 		},
 	}, nil
 }
