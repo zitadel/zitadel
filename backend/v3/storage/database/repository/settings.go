@@ -122,8 +122,7 @@ func (s *settings) Get(ctx context.Context, client database.QueryExecutor, insta
 	options.Write(&builder)
 	// writeCondition(&builder, database.And(cond...))
 
-	// fmt.Printf("[DEBUGPRINT] [settings.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> builder.String() = %+v\n", builder.String())
-	return scanSetting(ctx, client, &builder)
+	return getOne[domain.Setting](ctx, client, &builder)
 }
 
 func (s *settings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Setting, error) {
@@ -146,7 +145,7 @@ func (s *settings) List(ctx context.Context, client database.QueryExecutor, opts
 	orderBy := database.OrderBy(s.CreatedAtColumn())
 	orderBy.Write(&builder)
 
-	return scanSettings(ctx, client, &builder)
+	return getMany[domain.Setting](ctx, client, &builder)
 }
 
 // login
@@ -745,9 +744,8 @@ const eventCreateSettingStmt = `INSERT INTO zitadel.settings` +
 	` RETURNING id, created_at, updated_at`
 
 func (s *settings) Create(ctx context.Context, client database.QueryExecutor, setting *domain.Setting) error {
-	builder := database.StatementBuilder{}
-
-	builder.AppendArgs(
+	builder := database.NewStatementBuilder(
+		eventCreateSettingStmt,
 		setting.InstanceID,
 		setting.OrgID,
 		setting.Type,
@@ -756,7 +754,6 @@ func (s *settings) Create(ctx context.Context, client database.QueryExecutor, se
 		string(setting.Settings),
 		setting.CreatedAt,
 		setting.UpdatedAt)
-	builder.WriteString(eventCreateSettingStmt)
 
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.ID, &setting.CreatedAt, &setting.UpdatedAt)
 }
@@ -779,22 +776,19 @@ const createSettingStmt = `INSERT INTO zitadel.settings` +
 // 	` VALUES ($1, $2, $3, $4, $5, $6)`
 
 func createSetting(ctx context.Context, client database.QueryExecutor, setting *domain.Setting, settings any) error {
-	builder := database.StatementBuilder{}
-
 	settingJSON, err := json.Marshal(settings)
 	if err != nil {
 		return err
 	}
 
-	builder.AppendArgs(
+	builder := database.NewStatementBuilder(
+		createSettingStmt,
 		setting.InstanceID,
 		setting.OrgID,
 		setting.Type,
 		setting.OwnerType,
 		setting.LabelState,
 		string(settingJSON))
-
-	builder.WriteString(createSettingStmt)
 
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.ID, &setting.CreatedAt, &setting.UpdatedAt)
 }
@@ -841,36 +835,4 @@ func (s *settings) DeleteSettingsForOrg(ctx context.Context, client database.Que
 	writeCondition(&builder, database.And(conditions...))
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
-}
-
-func scanSetting(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Setting, error) {
-	setting := &domain.Setting{}
-
-	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
-	if err != nil {
-		return nil, err
-	}
-
-	err = rows.(database.CollectableRows).CollectExactlyOneRow(setting)
-	if err != nil {
-		return nil, err
-	}
-
-	return setting, err
-}
-
-func scanSettings(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.Setting, error) {
-	settings := []*domain.Setting{}
-
-	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
-	if err != nil {
-		return nil, err
-	}
-
-	err = rows.(database.CollectableRows).Collect(&settings)
-	if err != nil {
-		return nil, err
-	}
-
-	return settings, nil
 }
