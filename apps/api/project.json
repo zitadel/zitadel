@@ -302,7 +302,8 @@
                     "PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/api/ui/login/statik/generate.go",
                     "PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/notification/statik/generate.go",
                     "PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/statik/generate.go"
-                ]
+                ],
+                "parallel": false
             },
             "cache": true,
             "inputs": [
