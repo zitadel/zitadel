@@ -24,9 +24,8 @@ type Server struct {
 	checkPermission domain.PermissionCheck
 }
 
-type Config struct{}
-
 func CreateServer(
+	systemDefaults systemdefaults.SystemDefaults,
 	command *command.Commands,
 	query *query.Queries,
 	checkPermission domain.PermissionCheck,
@@ -35,6 +34,7 @@ func CreateServer(
 		command:         command,
 		query:           query,
 		checkPermission: checkPermission,
+		systemDefaults:  systemDefaults,
 	}
 }
 

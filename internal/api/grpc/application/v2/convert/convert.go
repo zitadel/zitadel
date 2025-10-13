@@ -16,18 +16,18 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/application/v2"
 )
 
-func AppToPb(query_app *query.App) *application.Application {
-	if query_app == nil {
+func AppToPb(queryApp *query.App) *application.Application {
+	if queryApp == nil {
 		return &application.Application{}
 	}
 
 	return &application.Application{
-		ApplicationId: query_app.ID,
-		CreationDate:  timestamppb.New(query_app.CreationDate),
-		ChangeDate:    timestamppb.New(query_app.ChangeDate),
-		State:         appStateToPb(query_app.State),
-		Name:          query_app.Name,
-		Configuration: appConfigToPb(query_app),
+		ApplicationId: queryApp.ID,
+		CreationDate:  timestamppb.New(queryApp.CreationDate),
+		ChangeDate:    timestamppb.New(queryApp.ChangeDate),
+		State:         appStateToPb(queryApp.State),
+		Name:          queryApp.Name,
+		Configuration: appConfigToPb(queryApp),
 	}
 }
 

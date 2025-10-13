@@ -51,7 +51,7 @@ func (s *Server) CreateApplication(ctx context.Context, req *connect.Request[app
 				OidcConfiguration: &application.CreateOIDCApplicationResponse{
 					ClientId:           oidcApp.ClientID,
 					ClientSecret:       oidcApp.ClientSecretString,
-					NoneCompliant:      oidcApp.Compliance.NoneCompliant,
+					NonCompliant:       oidcApp.Compliance.NoneCompliant,
 					ComplianceProblems: convert.ComplianceProblemsToLocalizedMessages(oidcApp.Compliance.Problems),
 				},
 			},

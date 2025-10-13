@@ -558,7 +558,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, app_v2beta.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, application.CreateServer(commands, queries, permissionCheck)); err != nil {
+	if err := apis.RegisterService(ctx, application.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, group_v2.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {

@@ -85,10 +85,10 @@ message OIDCConfiguration {
   // Future versions might introduce breaking changes.
   OIDCVersion version = 8;
 
-  // NoneCompliant specifies whether the config is OIDC compliant. A production configuration SHOULD be compliant.
+  // NonCompliant specifies whether the config is OIDC compliant. A production configuration SHOULD be compliant.
   // Non-compliant configurations can run into interoperability issues with OIDC libraries and tools.
   // Compliance problems are listed in the compliance_problems field.
-  bool none_compliant = 9;
+  bool non_compliant = 9;
 
   // ComplianceProblems lists the problems for non-compliant configurations.
   // In case of a compliant configuration, this list is empty.
@@ -140,7 +140,7 @@ message OIDCConfiguration {
   // This is used to prevent CORS issues in browsers.
   // If the origin of the request is not in this list, the request will be rejected.
   // This is especially important for SPAs.
-  // Not that this is a generated list from the redirect_uris and additional_origins.
+  // Note that this is a generated list from the redirect_uris and additional_origins.
   // If you use the application from another origin, you have to add it to the additional_origins.
   repeated string allowed_origins = 18 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "[\"https://console.zitadel.ch\"]"}];
 

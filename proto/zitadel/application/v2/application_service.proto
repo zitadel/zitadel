@@ -18,7 +18,7 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/application/v2;application";
 
 // Service to manage applications.
-// The service provides methods to create, update, delete and list application and application keys.
+// This service provides methods to create, update, delete and list application and application keys.
 service ApplicationService {
   // Create Application
   //
@@ -193,7 +193,7 @@ message CreateApplicationRequest {
   ];
 
   // Optionally, provide the unique ID of the new application. If omitted, the system will generate one for you,
-  // which is the recommended way. The generated ID wil be returned in the response.
+  // which is the recommended way. The generated ID will be returned in the response.
   string application_id = 2 [(validate.rules).string = {max_len: 200}];
 
   // Publicly visible name of the application. This might be presented to users if they sign in.
@@ -266,7 +266,7 @@ message CreateOIDCApplicationRequest {
   // ApplicationType defines the OAuth2/OIDC client type and their ability to maintain
   // confidentiality of their credentials.
   // This influences the allowed grant types and the required authentication method.
-  OIDCApplicationType app_type = 4 [(validate.rules).enum = {defined_only: true}];
+  OIDCApplicationType application_type = 4 [(validate.rules).enum = {defined_only: true}];
 
   // The authentication method type used by the application to authenticate at the token endpoint.
   OIDCAuthMethodType auth_method_type = 5 [(validate.rules).enum = {defined_only: true}];
@@ -354,10 +354,10 @@ message CreateOIDCApplicationResponse {
   // A new client_secret can be generated using the GenerateClientSecret endpoint.
   string client_secret = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"gjoq34589uasgh\""}];
 
-  // NoneCompliant specifies whether the config is OIDC compliant. A production configuration SHOULD be compliant.
+  // NonCompliant specifies whether the config is OIDC compliant. A production configuration SHOULD be compliant.
   // Non-compliant configurations can run into interoperability issues with OIDC libraries and tools.
   // Compliance problems are listed in the compliance_problems field.
-  bool none_compliant = 3;
+  bool non_compliant = 3;
 
   // ComplianceProblems lists the problems for non-compliant configurations.
   // In case of a compliant configuration, this list is empty.
@@ -489,7 +489,7 @@ message UpdateOIDCApplicationConfigurationRequest {
   // confidentiality of their credentials.
   // This influences the allowed grant types and the required authentication method.
   // If not set, the application type will not be changed.
-  optional OIDCApplicationType app_type = 4 [(validate.rules).enum = {defined_only: true}];
+  optional OIDCApplicationType application_type = 4 [(validate.rules).enum = {defined_only: true}];
 
   // The authentication method type used by the application to authenticate at the token endpoint.
   // If not set, the authentication method type will not be changed.
@@ -759,7 +759,7 @@ message CreateApplicationKeyResponse {
   // The unique ID of the newly created application key.
   string key_id = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"28746028909593987\""}];
 
-  // The timestamp of the application creation.
+  // The timestamp of the application key creation.
   google.protobuf.Timestamp creation_date = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2024-12-18T07:50:47.492Z\""}];
 
   // KeyDetails contains the serialized private key and additional information depending on the key type.

@@ -1,8 +1,6 @@
 package convert
 
 import (
-	"strings"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
@@ -59,40 +57,4 @@ func apiAuthMethodTypeToPb(methodType domain.APIAuthMethodType) application.APIA
 	default:
 		return application.APIAuthMethodType_API_AUTH_METHOD_TYPE_BASIC
 	}
-}
-
-func GetApplicationKeyQueriesRequestToDomain(orgID, projectID, appID string) ([]query.SearchQuery, error) {
-	var searchQueries []query.SearchQuery
-
-	orgID, projectID, appID = strings.TrimSpace(orgID), strings.TrimSpace(projectID), strings.TrimSpace(appID)
-
-	if orgID != "" {
-		resourceOwner, err := query.NewAuthNKeyResourceOwnerQuery(orgID)
-		if err != nil {
-			return nil, err
-		}
-
-		searchQueries = append(searchQueries, resourceOwner)
-	}
-
-	if projectID != "" {
-		aggregateID, err := query.NewAuthNKeyAggregateIDQuery(projectID)
-		if err != nil {
-			return nil, err
-		}
-
-		searchQueries = append(searchQueries, aggregateID)
-	}
-
-	if appID != "" {
-		objectID, err := query.NewAuthNKeyObjectIDQuery(appID)
-
-		if err != nil {
-			return nil, err
-		}
-
-		searchQueries = append(searchQueries, objectID)
-	}
-
-	return searchQueries, nil
 }

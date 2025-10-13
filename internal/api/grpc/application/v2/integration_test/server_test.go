@@ -123,7 +123,7 @@ func createOIDCAppWithName(t *testing.T, baseURI, projectID string) (*applicatio
 				RedirectUris:           []string{"http://example.com"},
 				ResponseTypes:          []application.OIDCResponseType{application.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
 				GrantTypes:             []application.OIDCGrantType{application.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE},
-				AppType:                application.OIDCApplicationType_OIDC_APP_TYPE_WEB,
+				ApplicationType:        application.OIDCApplicationType_OIDC_APP_TYPE_WEB,
 				AuthMethodType:         application.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_BASIC,
 				PostLogoutRedirectUris: []string{"http://example.com/home"},
 				Version:                application.OIDCVersion_OIDC_VERSION_1_0,

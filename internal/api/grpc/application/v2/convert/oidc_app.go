@@ -24,7 +24,7 @@ func CreateOIDCAppRequestToDomain(name, projectID string, req *application.Creat
 		RedirectUris:             req.GetRedirectUris(),
 		ResponseTypes:            oidcResponseTypesToDomain(req.GetResponseTypes()),
 		GrantTypes:               oidcGrantTypesToDomain(req.GetGrantTypes()),
-		ApplicationType:          gu.Ptr(oidcApplicationTypeToDomain(req.GetAppType())),
+		ApplicationType:          gu.Ptr(oidcApplicationTypeToDomain(req.GetApplicationType())),
 		AuthMethodType:           gu.Ptr(oidcAuthMethodTypeToDomain(req.GetAuthMethodType())),
 		PostLogoutRedirectUris:   req.GetPostLogoutRedirectUris(),
 		DevMode:                  &req.DevelopmentMode,
@@ -54,7 +54,7 @@ func UpdateOIDCAppConfigRequestToDomain(appID, projectID string, app *applicatio
 		RedirectUris:             app.RedirectUris,
 		ResponseTypes:            oidcResponseTypesToDomain(app.ResponseTypes),
 		GrantTypes:               oidcGrantTypesToDomain(app.GrantTypes),
-		ApplicationType:          oidcApplicationTypeToDomainPtr(app.AppType),
+		ApplicationType:          oidcApplicationTypeToDomainPtr(app.ApplicationType),
 		AuthMethodType:           oidcAuthMethodTypeToDomainPtr(app.AuthMethodType),
 		PostLogoutRedirectUris:   app.PostLogoutRedirectUris,
 		DevMode:                  app.DevelopmentMode,
@@ -130,8 +130,9 @@ func oidcApplicationTypeToDomain(appType application.OIDCApplicationType) domain
 		return domain.OIDCApplicationTypeUserAgent
 	case application.OIDCApplicationType_OIDC_APP_TYPE_NATIVE:
 		return domain.OIDCApplicationTypeNative
+	default:
+		return domain.OIDCApplicationTypeWeb
 	}
-	return domain.OIDCApplicationTypeWeb
 }
 
 func oidcAuthMethodTypeToDomainPtr(authType *application.OIDCAuthMethodType) *domain.OIDCAuthMethodType {
@@ -198,7 +199,7 @@ func appOIDCConfigToPb(oidcApp *query.OIDCApp) *application.Application_OidcConf
 			AuthMethodType:           oidcAuthMethodTypeToPb(oidcApp.AuthMethodType),
 			PostLogoutRedirectUris:   oidcApp.PostLogoutRedirectURIs,
 			Version:                  application.OIDCVersion_OIDC_VERSION_1_0,
-			NoneCompliant:            len(oidcApp.ComplianceProblems) != 0,
+			NonCompliant:             len(oidcApp.ComplianceProblems) != 0,
 			ComplianceProblems:       ComplianceProblemsToLocalizedMessages(oidcApp.ComplianceProblems),
 			DevelopmentMode:          oidcApp.IsDevMode,
 			AccessTokenType:          oidcTokenTypeToPb(oidcApp.AccessTokenType),

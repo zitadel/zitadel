@@ -10,22 +10,22 @@ import (
 type ApplicationSecretWriteModel struct {
 	eventstore.WriteModel
 
-	AppID        string
-	ClientID     string
-	HashedSecret string
+	ApplicationID string
+	ClientID      string
+	HashedSecret  string
 
 	State         domain.AppState
 	SecretAllowed bool
 	IsAPI         bool
 }
 
-func NewApplicationSecretWriteModel(projectID, appID, resourceOwner string) *ApplicationSecretWriteModel {
+func NewApplicationSecretWriteModel(projectID, applicationID, resourceOwner string) *ApplicationSecretWriteModel {
 	return &ApplicationSecretWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   projectID,
 			ResourceOwner: resourceOwner,
 		},
-		AppID: appID,
+		ApplicationID: applicationID,
 	}
 }
 
@@ -33,47 +33,47 @@ func (wm *ApplicationSecretWriteModel) AppendEvents(events ...eventstore.Event) 
 	for _, event := range events {
 		switch e := event.(type) {
 		case *project.ApplicationRemovedEvent:
-			if e.AppID != wm.AppID {
+			if e.AppID != wm.ApplicationID {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
 		case *project.OIDCConfigAddedEvent:
-			if e.AppID != wm.AppID {
+			if e.AppID != wm.ApplicationID {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
 		case *project.OIDCConfigChangedEvent:
-			if e.AppID != wm.AppID {
+			if e.AppID != wm.ApplicationID {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
 		case *project.APIConfigAddedEvent:
-			if e.AppID != wm.AppID {
+			if e.AppID != wm.ApplicationID {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
 		case *project.APIConfigChangedEvent:
-			if e.AppID != wm.AppID {
+			if e.AppID != wm.ApplicationID {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
 		case *project.OIDCConfigSecretChangedEvent:
-			if e.AppID != wm.AppID {
+			if e.AppID != wm.ApplicationID {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
 		case *project.OIDCConfigSecretHashUpdatedEvent:
-			if e.AppID != wm.AppID {
+			if e.AppID != wm.ApplicationID {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
 		case *project.APIConfigSecretChangedEvent:
-			if e.AppID != wm.AppID {
+			if e.AppID != wm.ApplicationID {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
 		case *project.APIConfigSecretHashUpdatedEvent:
-			if e.AppID != wm.AppID {
+			if e.AppID != wm.ApplicationID {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
