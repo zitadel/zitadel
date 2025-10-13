@@ -7,7 +7,6 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -59,8 +58,4 @@ func (s *Server) MethodPrefix() string {
 
 func (s *Server) AuthMethods() authz.MethodMapping {
 	return internal_permission.InternalPermissionService_AuthMethods
-}
-
-func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
-	return internal_permission.RegisterInternalPermissionServiceHandler
 }
