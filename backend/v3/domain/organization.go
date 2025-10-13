@@ -47,7 +47,7 @@ type organizationConditions interface {
 	// PrimaryKeyCondition returns a filter on the primary key fields.
 	PrimaryKeyCondition(instanceID, organizationID string) database.Condition
 	// IDCondition returns an equal filter on the id field.
-	IDCondition(instanceID string) database.Condition
+	IDCondition(orgID string) database.Condition
 	// NameCondition returns a filter on the name field.
 	NameCondition(op database.TextOperation, name string) database.Condition
 	// InstanceIDCondition returns a filter on the instance id field.
