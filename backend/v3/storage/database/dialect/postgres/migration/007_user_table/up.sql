@@ -34,6 +34,8 @@ CREATE UNIQUE INDEX ON zitadel.users(instance_id, username) WHERE username_org_u
 CREATE TABLE zitadel.machine_users(
     name TEXT NOT NULL CHECK (name <> '')
     , description TEXT
+    , secret TEXT
+    , access_token_type UNSIGNED INTEGER CHECK
 
     , PRIMARY KEY (instance_id, org_id, id)
     , FOREIGN KEY (instance_id) REFERENCES zitadel.instances(id)

@@ -94,6 +94,7 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.UserUserNameChangedType,
 					Reduce: p.reduceUserNameChanged,
 				},
+				// TODO
 				{
 					Event:  user.UserDomainClaimedType,
 					Reduce: p.reduceDomainClaimed,
@@ -152,27 +153,26 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 				// 			Reduce: p.reduceHumanEmailVerified,
 				// 		},
 				///////////////////////////////////////////////////////////////////////////////// TARGET
-				// TODO
-				// {
-				// 	Event:  user.HumanAvatarAddedType,
-				// 	Reduce: p.reduceHumanAvatarAdded,
-				// },
-				// 		{
-				// 			Event:  user.HumanAvatarRemovedType,
-				// 			Reduce: p.reduceHumanAvatarRemoved,
-				// 		},
+				{
+					Event:  user.HumanAvatarAddedType,
+					Reduce: p.reduceHumanAvatarAdded,
+				},
+				{
+					Event:  user.HumanAvatarRemovedType,
+					Reduce: p.reduceHumanAvatarRemoved,
+				},
 				{
 					Event:  user.MachineAddedEventType,
 					Reduce: p.reduceMachineAdded,
 				},
-				// 		{
-				// 			Event:  user.MachineChangedEventType,
-				// 			Reduce: p.reduceMachineChanged,
-				// 		},
-				// 		{
-				// 			Event:  user.HumanPasswordChangedType,
-				// 			Reduce: p.reduceHumanPasswordChanged,
-				// 		},
+				{
+					Event:  user.MachineChangedEventType,
+					Reduce: p.reduceMachineChanged,
+				},
+				{
+					Event:  user.HumanPasswordChangedType,
+					Reduce: p.reduceHumanPasswordChanged,
+				},
 				// 		{
 				// 			Event:  user.MachineSecretSetType,
 				// 			Reduce: p.reduceMachineSecretSet,
@@ -299,6 +299,7 @@ func (u *userRelationalProjection) reduceHumanAdded(event eventstore.Event) (*ha
 				},
 			},
 		)
+		fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  ADDD HUMAN err = %+v\n", err)
 		return err
 	}), nil
 }
@@ -1063,6 +1064,7 @@ func (p *userRelationalProjection) reduceHumanAvatarAdded(event eventstore.Event
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-eDEdt", "reduce.wrong.event.type %s", user.HumanAvatarAddedType)
 	}
+	fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> NEW ADVATAR")
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1070,12 +1072,15 @@ func (p *userRelationalProjection) reduceHumanAvatarAdded(event eventstore.Event
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		userRepo := repository.UserRepository()
+
 		noOfRecordsUpdated, err := userRepo.UpdateHuman(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				userRepo.Human().InstanceIDCondition(e.Aggregate().InstanceID),
 				userRepo.Human().IDCondition(e.Aggregate().ID),
 			),
-			userRepo.Human().SetAvatarKey(e.StoreKey),
+			// TODO
+			// userRepo.Human().SetUsername(e.UserName),
+			userRepo.Human().SetAvatarKey(&e.StoreKey),
 			userRepo.Human().SetUpdatedAt(e.CreationDate()),
 		)
 		if err != nil {
@@ -1122,29 +1127,59 @@ func (p *userRelationalProjection) reduceHumanAvatarRemoved(event eventstore.Eve
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-KhETX", "reduce.wrong.event.type %s", user.HumanAvatarRemovedType)
 	}
 
-	return handler.NewMultiStatement(
-		e,
-		handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(UserChangeDateCol, e.CreationDate()),
-				handler.NewCol(UserSequenceCol, e.Sequence()),
-			},
-			[]handler.Condition{
-				handler.NewCond(UserIDCol, e.Aggregate().ID),
-				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
-			},
-		),
-		handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(HumanAvatarURLCol, nil),
-			},
-			[]handler.Condition{
-				handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
-				handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
-			},
-			handler.WithTableSuffix(UserHumanSuffix),
-		),
-	), nil
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		userRepo := repository.UserRepository()
+
+		noOfRecordsUpdated, err := userRepo.UpdateHuman(ctx, v3_sql.SQLTx(tx),
+			database.And(
+				userRepo.Human().InstanceIDCondition(e.Aggregate().InstanceID),
+				userRepo.Human().IDCondition(e.Aggregate().ID),
+			),
+			// TODO
+			// userRepo.Human().SetUsername(e.UserName),
+			userRepo.Human().SetAvatarKey(nil),
+			userRepo.Human().SetUpdatedAt(e.CreationDate()),
+		)
+		if err != nil {
+			return err
+		}
+		if noOfRecordsUpdated == 0 {
+			return zerrors.ThrowNotFound(nil, "HANDL-SD3fs", "Errors.User.NotFound")
+		} else if noOfRecordsUpdated > 1 {
+			tx.Rollback()
+			// TODO add "Errors.User.TooManyEntries"
+			return zerrors.ThrowInternal(nil, "HANDL-Df3fs", "Errors.User.TooManyEntries")
+		}
+		return nil
+	}), nil
+
+	// return handler.NewMultiStatement(
+	// 	e,
+	// 	handler.AddUpdateStatement(
+	// 		[]handler.Column{
+	// 			handler.NewCol(UserChangeDateCol, e.CreationDate()),
+	// 			handler.NewCol(UserSequenceCol, e.Sequence()),
+	// 		},
+	// 		[]handler.Condition{
+	// 			handler.NewCond(UserIDCol, e.Aggregate().ID),
+	// 			handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
+	// 		},
+	// 	),
+	// 	handler.AddUpdateStatement(
+	// 		[]handler.Column{
+	// 			handler.NewCol(HumanAvatarURLCol, nil),
+	// 		},
+	// 		[]handler.Condition{
+	// 			handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
+	// 			handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
+	// 		},
+	// 		handler.WithTableSuffix(UserHumanSuffix),
+	// 	),
+	// ), nil
 }
 
 func (p *userRelationalProjection) reduceHumanPasswordChanged(event eventstore.Event) (*handler.Statement, error) {
@@ -1275,32 +1310,39 @@ func (p *userRelationalProjection) reduceMachineAdded(event eventstore.Event) (*
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-q7ier", "reduce.wrong.event.type %s", user.MachineAddedEventType)
 	}
 
-	return handler.NewMultiStatement(
-		e,
-		handler.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(UserIDCol, e.Aggregate().ID),
-				handler.NewCol(UserCreationDateCol, e.CreationDate()),
-				handler.NewCol(UserChangeDateCol, e.CreationDate()),
-				handler.NewCol(UserResourceOwnerCol, e.Aggregate().ResourceOwner),
-				handler.NewCol(UserInstanceIDCol, e.Aggregate().InstanceID),
-				handler.NewCol(UserStateCol, domain.UserStateActive),
-				handler.NewCol(UserSequenceCol, e.Sequence()),
-				handler.NewCol(UserUsernameCol, e.UserName),
-				// handler.NewCol(UserTypeCol, domain.UserTypeMachine),
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		userRepo := repository.UserRepository()
+
+		var description *string
+		if e.Description != "" {
+			description = &e.Description
+		}
+
+		_, err := userRepo.CreateMachine(ctx, v3_sql.SQLTx(tx),
+			&domain.Machine{
+				Name:            e.Name,
+				Description:     description,
+				AccessTokenType: domain.AccessTokenType(e.AccessTokenType),
+				User: domain.User{
+					ID:         e.Aggregate().ID,
+					InstanceID: e.Aggregate().InstanceID,
+					OrgID:      e.Aggregate().ResourceOwner,
+					Username:   e.UserName,
+					// TODO check when to set username unique
+					// UsernameOrgUnique: false,
+					State:     domain.UserStateActive,
+					CreatedAt: e.CreationDate(),
+					UpdatedAt: e.CreationDate(),
+				},
 			},
-		),
-		handler.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(MachineUserIDCol, e.Aggregate().ID),
-				handler.NewCol(MachineUserInstanceIDCol, e.Aggregate().InstanceID),
-				handler.NewCol(MachineNameCol, e.Name),
-				handler.NewCol(MachineDescriptionCol, &sql.NullString{String: e.Description, Valid: e.Description != ""}),
-				handler.NewCol(MachineAccessTokenTypeCol, e.AccessTokenType),
-			},
-			handler.WithTableSuffix(UserMachineSuffix),
-		),
-	), nil
+		)
+		fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  ADDD HUMAN err = %+v\n", err)
+		return err
+	}), nil
 }
 
 func (p *userRelationalProjection) reduceMachineChanged(event eventstore.Event) (*handler.Statement, error) {
@@ -1308,42 +1350,70 @@ func (p *userRelationalProjection) reduceMachineChanged(event eventstore.Event) 
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.MachineChangedEventType)
 	}
+	userRepo := repository.UserRepository()
 
-	cols := make([]handler.Column, 0, 2)
+	changes := make([]database.Change, 0, 3)
 	if e.Name != nil {
-		cols = append(cols, handler.NewCol(MachineNameCol, *e.Name))
+		changes = append(changes, userRepo.Machine().SetName(*e.Name))
 	}
 	if e.Description != nil {
-		cols = append(cols, handler.NewCol(MachineDescriptionCol, *e.Description))
+		changes = append(changes, userRepo.Machine().SetDescription(*e.Description))
 	}
 	if e.AccessTokenType != nil {
-		cols = append(cols, handler.NewCol(MachineAccessTokenTypeCol, e.AccessTokenType))
+		changes = append(changes, userRepo.Machine().SetAccessTokenType(domain.AccessTokenType(*e.AccessTokenType)))
 	}
-	if len(cols) == 0 {
+	if len(changes) == 0 {
 		return handler.NewNoOpStatement(e), nil
 	}
 
-	return handler.NewMultiStatement(
-		e,
-		handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(UserChangeDateCol, e.CreationDate()),
-				handler.NewCol(UserSequenceCol, e.Sequence()),
-			},
-			[]handler.Condition{
-				handler.NewCond(UserIDCol, e.Aggregate().ID),
-				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
-			},
-		),
-		handler.AddUpdateStatement(
-			cols,
-			[]handler.Condition{
-				handler.NewCond(MachineUserIDCol, e.Aggregate().ID),
-				handler.NewCond(MachineUserInstanceIDCol, e.Aggregate().InstanceID),
-			},
-			handler.WithTableSuffix(UserMachineSuffix),
-		),
-	), nil
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CHANGE USER")
+
+		noOfRecordsUpdated, err := userRepo.UpdateMachine(ctx, v3_sql.SQLTx(tx),
+			database.And(
+				userRepo.Machine().InstanceIDCondition(e.Aggregate().InstanceID),
+				userRepo.Machine().IDCondition(e.Aggregate().ID),
+			),
+			changes...,
+		)
+		if err != nil {
+			return err
+		}
+		if noOfRecordsUpdated == 0 {
+			return zerrors.ThrowNotFound(nil, "HANDL-SD3fs", "Errors.User.NotFound")
+		} else if noOfRecordsUpdated > 1 {
+			tx.Rollback()
+			// TODO add "Errors.User.TooManyEntries"
+			return zerrors.ThrowInternal(nil, "HANDL-Df3fs", "Errors.User.TooManyEntries")
+		}
+		return nil
+	}), nil
+
+	// return handler.NewMultiStatement(
+	// 	e,
+	// 	handler.AddUpdateStatement(
+	// 		[]handler.Column{
+	// 			handler.NewCol(UserChangeDateCol, e.CreationDate()),
+	// 			handler.NewCol(UserSequenceCol, e.Sequence()),
+	// 		},
+	// 		[]handler.Condition{
+	// 			handler.NewCond(UserIDCol, e.Aggregate().ID
+	// 			handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
+	// 		},
+	// 	),
+	// 	handler.AddUpdateStatement(
+	// 		cols,
+	// 		[]handler.Condition{
+	// 			handler.NewCond(MachineUserIDCol, e.Aggregate().ID),
+	// 			handler.NewCond(MachineUserInstanceIDCol, e.Aggregate().InstanceID),
+	// 		},
+	// 		handler.WithTableSuffix(UserMachineSuffix),
+	// 	),
+	// ), nil
 }
 
 func (p *userRelationalProjection) reduceUnsetMFAInitSkipped(e eventstore.Event) (*handler.Statement, error) {

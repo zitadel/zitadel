@@ -64,29 +64,44 @@ type userChanges interface {
 	SetUpdatedAt(updatedAt time.Time) database.Change
 }
 
+//go:generate enumer -type AccessTokenType -transform lower -trimprefix AccessTokenType
+type AccessTokenType uint8
+
+const (
+	AccessTokenTypeBearer AccessTokenType = iota
+	AccessTokenTypeJWT
+)
+
 // machine user
 type Machine struct {
 	User
-	Name        string  `json:"name,omitempty" db:"name"`
-	Description *string `json:"description,omitempty" db:"description"`
+	Name            string          `json:"name,omitempty" db:"name"`
+	Description     *string         `json:"description,omitempty" db:"description"`
+	Secret          *string         `json:"secret,omitempty" db:"secret"`
+	AccessTokenType AccessTokenType `json:"accessTokenType,omitempty" db:"access_token_type"`
 }
 
 type machineColumns interface {
 	userColumns
 	NameColumn() database.Column
 	DescriptionColumn() database.Column
+	SecretColumn() database.Column
+	AccessTokenTypeColumn() database.Column
 }
 
 type machineConditions interface {
 	userConditions
 	NameCondition(op database.TextOperation, name string) database.Condition
 	DescriptionCondition(op database.TextOperation, description string) database.Condition
+	AccessTokenTypeCondition(accessTokenType AccessTokenType) database.Condition
 }
 
 type machineChanges interface {
 	userChanges
 	SetName(name string) database.Change
 	SetDescription(description string) database.Change
+	SetSecret(secret *string) database.Change
+	SetAccessTokenType(accessTokenType AccessTokenType) database.Change
 }
 
 type MachineRepository interface {
@@ -110,6 +125,7 @@ type Human struct {
 	PreferredLanguage string  `json:"preferredLanguage,omitempty" db:"preferred_language"`
 	Gender            uint8   `json:"gender,omitempty" db:"gender"`
 	AvatarKey         *string `json:"avataryKey,omitempty" db:"avatar_key"`
+	Avatar            []byte  `json:"avatar,omitempty" db:"avatar"`
 }
 
 type humanColumns interface {
@@ -130,7 +146,6 @@ type humanConditions interface {
 	DisplayNameCondition(op database.TextOperation, name string) database.Condition
 	PreferredLanguageCondition(language string) database.Condition
 	GenderCondition(gender uint8) database.Condition
-	AvatarKeyCondition(key string) database.Condition
 }
 
 type humanChanges interface {
@@ -141,7 +156,7 @@ type humanChanges interface {
 	SetDisplayName(name string) database.Change
 	SetPreferredLanguage(language string) database.Change
 	SetGender(gender uint8) database.Change
-	SetAvatarKey(key string) database.Change
+	SetAvatarKey(key *string) database.Change
 }
 
 type HumanRepository interface {

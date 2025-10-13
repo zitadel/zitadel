@@ -99,6 +99,14 @@ func (m machine) DescriptionColumn() database.Column {
 	return database.NewColumn(m.unqualifiedTableName(), "description")
 }
 
+func (m machine) SecretColumn() database.Column {
+	return database.NewColumn(m.unqualifiedTableName(), "secret")
+}
+
+func (m machine) AccessTokenTypeColumn() database.Column {
+	return database.NewColumn(m.unqualifiedTableName(), "access_token_type")
+}
+
 // human
 func (h human) InstanceIDColumn() database.Column {
 	return database.NewColumn(h.unqualifiedTableName(), "instance_id")
@@ -205,6 +213,10 @@ func (m machine) DescriptionCondition(op database.TextOperation, description str
 	return database.NewTextCondition(m.DescriptionColumn(), op, description)
 }
 
+func (m machine) AccessTokenTypeCondition(accessTokenType domain.AccessTokenType) database.Condition {
+	return database.NewNumberCondition(m.AccessTokenTypeColumn(), database.NumberOperationEqual, uint8(accessTokenType))
+}
+
 // human
 func (h human) InstanceIDCondition(instanceID string) database.Condition {
 	return database.NewTextCondition(h.InstanceIDColumn(), database.TextOperationEqual, instanceID)
@@ -295,6 +307,14 @@ func (m machine) SetUpdatedAt(updatedAt time.Time) database.Change {
 	return database.NewChange(m.UpdatedAtColumn(), updatedAt)
 }
 
+func (m machine) SetSecret(secret *string) database.Change {
+	return database.NewChangePtr(m.SecretColumn(), secret)
+}
+
+func (m machine) SetAccessTokenType(accessTokenType domain.AccessTokenType) database.Change {
+	return database.NewChange(m.AccessTokenTypeColumn(), uint8(accessTokenType))
+}
+
 // human
 func (h human) SetUsername(username string) database.Change {
 	return database.NewChange(h.UsernameColumn(), username)
@@ -332,8 +352,8 @@ func (h human) SetGender(gender uint8) database.Change {
 	return database.NewChange(h.GenderColumn(), gender)
 }
 
-func (h human) SetAvatarKey(key string) database.Change {
-	return database.NewChange(h.AvatarKeyColumn(), key)
+func (h human) SetAvatarKey(key *string) database.Change {
+	return database.NewChangePtr(h.AvatarKeyColumn(), key)
 }
 
 func (h human) SetUpdatedAt(updatedAt time.Time) database.Change {

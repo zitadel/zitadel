@@ -33,6 +33,8 @@ func ValidateDomain(domain, token, verifier string, checkType CheckType) error {
 
 func ValidateDomainHTTP(domain, token, verifier string) error {
 	resp, err := http.Get(tokenUrlHTTP(domain, token))
+	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> err = %+v\n", err)
+	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> domain = %+v\n", domain)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "HTTP-BH42h", "Errors.Internal")
 	}
