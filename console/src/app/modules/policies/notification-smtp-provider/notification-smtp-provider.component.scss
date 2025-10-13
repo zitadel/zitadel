@@ -2,7 +2,7 @@
 
 @mixin smtp-settings-theme($theme) {
   $primary: map-get($theme, primary);
-  $primary-color: mat.get-color-from-palette($primary, 500);
+  $primary-color: mat.m2-get-color-from-palette($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);

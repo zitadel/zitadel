@@ -11,6 +11,7 @@ import { ToastService } from 'src/app/services/toast.service';
   selector: 'cnsl-add-flow-dialog',
   templateUrl: './add-flow-dialog.component.html',
   styleUrls: ['./add-flow-dialog.component.scss'],
+  standalone: false,
 })
 export class AddFlowDialogComponent {
   public flowType?: FlowType.AsObject;

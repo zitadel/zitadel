@@ -1,11 +1,13 @@
+@use 'sass:map';
+
 @mixin input-theme($theme) {
-  $primary: map-get($theme, primary);
-  $primary-color: map-get($primary, 500);
-  $primary-light-color: map-get($primary, 200);
-  $warn: map-get($theme, warn);
-  $warn-color: map-get($warn, 500);
-  $foreground: map-get($theme, foreground);
-  $is-dark-theme: map-get($theme, is-dark);
+  $primary: map.get($theme, primary);
+  $primary-color: map.get($primary, 500);
+  $primary-light-color: map.get($primary, 200);
+  $warn: map.get($theme, warn);
+  $warn-color: map.get($warn, 500);
+  $foreground: map.get($theme, foreground);
+  $is-dark-theme: map.get($theme, is-dark);
 
   [cnslInput],
   .mat-mdc-select {
@@ -28,7 +30,7 @@
       background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1),
       color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     width: 100%;
-    color: map-get($foreground, text);
+    color: map.get($foreground, text);
     margin-bottom: 2px;
 
     &:hover {
@@ -58,7 +60,7 @@
 
   [cnslInput]::placeholder {
     font-size: 14px;
-    color: map-get($foreground, placeholder-text);
+    color: map.get($foreground, placeholder-text);
     font-style: italic;
   }
 
