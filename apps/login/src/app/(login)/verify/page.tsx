@@ -120,14 +120,29 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="verify.title" namespace="verify" />
         </h1>
-        <p className="ztdl-p mb-6 block">
+        <p className="ztdl-p">
           <Translated i18nKey="verify.description" namespace="verify" />
         </p>
 
+        {sessionFactors ? (
+          <UserAvatar
+            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
+            displayName={sessionFactors.factors?.user?.displayName}
+            showDropdown
+            searchParams={searchParams}
+          ></UserAvatar>
+        ) : (
+          user && (
+            <UserAvatar loginName={user.preferredLoginName} displayName={human?.profile?.displayName} showDropdown={false} />
+          )
+        )}
+      </div>
+
+      <div className="w-full">
         {!id && (
           <div className="py-4">
             <Alert>
@@ -142,19 +157,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
               <Translated i18nKey="verify.codeSent" namespace="verify" />
             </Alert>
           </div>
-        )}
-
-        {sessionFactors ? (
-          <UserAvatar
-            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
-            displayName={sessionFactors.factors?.user?.displayName}
-            showDropdown
-            searchParams={searchParams}
-          ></UserAvatar>
-        ) : (
-          user && (
-            <UserAvatar loginName={user.preferredLoginName} displayName={human?.profile?.displayName} showDropdown={false} />
-          )
         )}
 
         <VerifyForm

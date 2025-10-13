@@ -16,6 +16,7 @@ import { NewOrganizationService } from '../../services/new-organization.service'
   selector: 'cnsl-user-grant-create',
   templateUrl: './user-grant-create.component.html',
   styleUrls: ['./user-grant-create.component.scss'],
+  standalone: false,
 })
 export class UserGrantCreateComponent implements OnDestroy {
   public context!: UserGrantContext;
