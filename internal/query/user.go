@@ -634,11 +634,8 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, p
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareUsersQuery(queries.SortingColumn)
-	query = userPermissionCheckV2(ctx, query, permissionCheckV2, queries.Queries)
-	stmt, args, err := queries.toQuery(query).Where(sq.Eq{
-		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}).ToSql()
+	query, scan := queries.prepareUsersQuery(ctx, permissionCheckV2)
+	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatement")
 	}
@@ -724,14 +721,6 @@ func (q *Queries) SearchClaimedUserIDsOfOrgDomain(ctx context.Context, domain, o
 	)
 
 	return userIDs, err
-}
-
-func (q *UserSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
-	query = q.SearchRequest.toQuery(query)
-	for _, q := range q.Queries {
-		query = q.toQuery(query)
-	}
-	return query
 }
 
 func (r *UserSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
@@ -1270,144 +1259,171 @@ func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 		}
 }
 
-func prepareUsersQuery(orderBy Column) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
-	return sq.Select(
-			UserIDCol.identifier(),
-			UserCreationDateCol.identifier(),
-			UserChangeDateCol.identifier(),
-			UserResourceOwnerCol.identifier(),
-			UserSequenceCol.identifier(),
-			UserStateCol.identifier(),
-			UserTypeCol.identifier(),
-			UserUsernameCol.identifier(),
-			userLoginNamesListCol.identifier(),
-			userPreferredLoginNameCol.identifier(),
-			HumanUserIDCol.identifier(),
-			HumanFirstNameCol.identifier(),
-			HumanLastNameCol.identifier(),
-			HumanNickNameCol.identifier(),
-			HumanDisplayNameCol.identifier(),
-			HumanPreferredLanguageCol.identifier(),
-			HumanGenderCol.identifier(),
-			HumanAvatarURLCol.identifier(),
-			HumanEmailCol.identifier(),
-			HumanIsEmailVerifiedCol.identifier(),
-			HumanPhoneCol.identifier(),
-			HumanIsPhoneVerifiedCol.identifier(),
-			HumanPasswordChangeRequiredCol.identifier(),
-			HumanPasswordChangedCol.identifier(),
-			HumanMFAInitSkippedCol.identifier(),
-			MachineUserIDCol.identifier(),
-			MachineNameCol.identifier(),
-			MachineDescriptionCol.identifier(),
-			MachineSecretCol.identifier(),
-			MachineAccessTokenTypeCol.identifier(),
-			orderBy.orderBy(),
-			countColumn.identifier()).
-			Distinct().
-			From(userTable.identifier()).
-			LeftJoin(join(HumanUserIDCol, UserIDCol)).
-			LeftJoin(join(MachineUserIDCol, UserIDCol)).
-			LeftJoin(join(UserMetadataUserIDCol, UserIDCol)).
-			JoinClause(joinLoginNames).
-			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*Users, error) {
-			users := make([]*User, 0)
-			var count uint64
-			for rows.Next() {
-				u := new(User)
-				loginNames := database.TextArray[string]{}
-				preferredLoginName := sql.NullString{}
+// prepareUsersQuery creates the select query for searching users and returns a matching scan function.
+// Permissions, filters and sorting are applied in a `SELECT FROM` distinct sub-select.
+// The count over window function and limit are applied in the outer query.
+// It is not possible to pass more filters to the returned query, as they need to be applied in the sub-select.
+func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionCheckV2 bool) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+	if q.SortingColumn.isZero() {
+		q.SortingColumn = UserIDCol
+	}
 
-				human, machine := sqlHuman{}, sqlMachine{}
-				var orderByValue any
+	// start building the sub-select
+	query := sq.Select(
+		UserIDCol.identifier(),
+		UserCreationDateCol.identifier(),
+		UserChangeDateCol.identifier(),
+		UserResourceOwnerCol.identifier(),
+		UserSequenceCol.identifier(),
+		UserStateCol.identifier(),
+		UserTypeCol.identifier(),
+		UserUsernameCol.identifier(),
+		userLoginNamesListCol.identifier(),
+		userPreferredLoginNameCol.identifier(),
+		HumanUserIDCol.identifier(),
+		HumanFirstNameCol.identifier(),
+		HumanLastNameCol.identifier(),
+		HumanNickNameCol.identifier(),
+		HumanDisplayNameCol.identifier(),
+		HumanPreferredLanguageCol.identifier(),
+		HumanGenderCol.identifier(),
+		HumanAvatarURLCol.identifier(),
+		HumanEmailCol.identifier(),
+		HumanIsEmailVerifiedCol.identifier(),
+		HumanPhoneCol.identifier(),
+		HumanIsPhoneVerifiedCol.identifier(),
+		HumanPasswordChangeRequiredCol.identifier(),
+		HumanPasswordChangedCol.identifier(),
+		HumanMFAInitSkippedCol.identifier(),
+		MachineUserIDCol.identifier(),
+		MachineNameCol.identifier(),
+		MachineDescriptionCol.identifier(),
+		MachineSecretCol.identifier(),
+		MachineAccessTokenTypeCol.identifier(),
+		q.SortingColumn.orderBy()).
+		Distinct().
+		From(userTable.identifier()).
+		LeftJoin(join(HumanUserIDCol, UserIDCol)).
+		LeftJoin(join(MachineUserIDCol, UserIDCol)).
+		LeftJoin(join(UserMetadataUserIDCol, UserIDCol)).
+		JoinClause(joinLoginNames).
+		Where(sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()})
 
-				err := rows.Scan(
-					&u.ID,
-					&u.CreationDate,
-					&u.ChangeDate,
-					&u.ResourceOwner,
-					&u.Sequence,
-					&u.State,
-					&u.Type,
-					&u.Username,
-					&loginNames,
-					&preferredLoginName,
+	query = userPermissionCheckV2(ctx, query, permissionCheckV2, q.Queries)
+	// apply requested filters
+	for _, q := range q.Queries {
+		query = q.toQuery(query)
+	}
+	// apply sorting in the sub-select,because the identifier is fully qualified.
+	query = q.consumeSorting(query)
 
-					&human.humanID,
-					&human.firstName,
-					&human.lastName,
-					&human.nickName,
-					&human.displayName,
-					&human.preferredLanguage,
-					&human.gender,
-					&human.avatarKey,
-					&human.email,
-					&human.isEmailVerified,
-					&human.phone,
-					&human.isPhoneVerified,
-					&human.passwordChangeRequired,
-					&human.passwordChanged,
-					&human.mfaInitSkipped,
+	// set the sub-select as source for the outer query
+	query = sq.Select(
+		"*",
+		countColumn.identifier(),
+	).FromSelect(query, "results")
 
-					&machine.machineID,
-					&machine.name,
-					&machine.description,
-					&machine.encodedSecret,
-					&machine.accessTokenType,
+	// apply limit and offset in the outer query
+	query = q.toQuery(query)
+	query = query.PlaceholderFormat(sq.Dollar)
 
-					&orderByValue,
-					&count,
-				)
-				if err != nil {
-					return nil, err
-				}
+	return query, func(rows *sql.Rows) (*Users, error) {
+		users := make([]*User, 0)
+		var count uint64
+		for rows.Next() {
+			u := new(User)
+			loginNames := database.TextArray[string]{}
+			preferredLoginName := sql.NullString{}
 
-				u.LoginNames = loginNames
-				if preferredLoginName.Valid {
-					u.PreferredLoginName = preferredLoginName.String
-				}
+			human, machine := sqlHuman{}, sqlMachine{}
+			var orderByValue any
 
-				if human.humanID.Valid {
-					u.Human = &Human{
-						FirstName:              human.firstName.String,
-						LastName:               human.lastName.String,
-						NickName:               human.nickName.String,
-						DisplayName:            human.displayName.String,
-						AvatarKey:              human.avatarKey.String,
-						PreferredLanguage:      language.Make(human.preferredLanguage.String),
-						Gender:                 domain.Gender(human.gender.Int32),
-						Email:                  domain.EmailAddress(human.email.String),
-						IsEmailVerified:        human.isEmailVerified.Bool,
-						Phone:                  domain.PhoneNumber(human.phone.String),
-						IsPhoneVerified:        human.isPhoneVerified.Bool,
-						PasswordChangeRequired: human.passwordChangeRequired.Bool,
-						PasswordChanged:        human.passwordChanged.Time,
-						MFAInitSkipped:         human.mfaInitSkipped.Time,
-					}
-				} else if machine.machineID.Valid {
-					u.Machine = &Machine{
-						Name:            machine.name.String,
-						Description:     machine.description.String,
-						EncodedSecret:   machine.encodedSecret.String,
-						AccessTokenType: domain.OIDCTokenType(machine.accessTokenType.Int32),
-					}
-				}
+			err := rows.Scan(
+				&u.ID,
+				&u.CreationDate,
+				&u.ChangeDate,
+				&u.ResourceOwner,
+				&u.Sequence,
+				&u.State,
+				&u.Type,
+				&u.Username,
+				&loginNames,
+				&preferredLoginName,
 
-				users = append(users, u)
+				&human.humanID,
+				&human.firstName,
+				&human.lastName,
+				&human.nickName,
+				&human.displayName,
+				&human.preferredLanguage,
+				&human.gender,
+				&human.avatarKey,
+				&human.email,
+				&human.isEmailVerified,
+				&human.phone,
+				&human.isPhoneVerified,
+				&human.passwordChangeRequired,
+				&human.passwordChanged,
+				&human.mfaInitSkipped,
+
+				&machine.machineID,
+				&machine.name,
+				&machine.description,
+				&machine.encodedSecret,
+				&machine.accessTokenType,
+
+				&orderByValue,
+				&count,
+			)
+			if err != nil {
+				return nil, err
 			}
 
-			if err := rows.Close(); err != nil {
-				return nil, zerrors.ThrowInternal(err, "QUERY-frhbd", "Errors.Query.CloseRows")
+			u.LoginNames = loginNames
+			if preferredLoginName.Valid {
+				u.PreferredLoginName = preferredLoginName.String
 			}
 
-			return &Users{
-				Users: users,
-				SearchResponse: SearchResponse{
-					Count: count,
-				},
-			}, nil
+			if human.humanID.Valid {
+				u.Human = &Human{
+					FirstName:              human.firstName.String,
+					LastName:               human.lastName.String,
+					NickName:               human.nickName.String,
+					DisplayName:            human.displayName.String,
+					AvatarKey:              human.avatarKey.String,
+					PreferredLanguage:      language.Make(human.preferredLanguage.String),
+					Gender:                 domain.Gender(human.gender.Int32),
+					Email:                  domain.EmailAddress(human.email.String),
+					IsEmailVerified:        human.isEmailVerified.Bool,
+					Phone:                  domain.PhoneNumber(human.phone.String),
+					IsPhoneVerified:        human.isPhoneVerified.Bool,
+					PasswordChangeRequired: human.passwordChangeRequired.Bool,
+					PasswordChanged:        human.passwordChanged.Time,
+					MFAInitSkipped:         human.mfaInitSkipped.Time,
+				}
+			} else if machine.machineID.Valid {
+				u.Machine = &Machine{
+					Name:            machine.name.String,
+					Description:     machine.description.String,
+					EncodedSecret:   machine.encodedSecret.String,
+					AccessTokenType: domain.OIDCTokenType(machine.accessTokenType.Int32),
+				}
+			}
+
+			users = append(users, u)
 		}
+
+		if err := rows.Close(); err != nil {
+			return nil, zerrors.ThrowInternal(err, "QUERY-frhbd", "Errors.Query.CloseRows")
+		}
+
+		return &Users{
+			Users: users,
+			SearchResponse: SearchResponse{
+				Count: count,
+			},
+		}, nil
+	}
 }
 
 type sqlHuman struct {

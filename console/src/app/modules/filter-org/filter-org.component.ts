@@ -26,6 +26,7 @@ enum SubQuery {
   selector: 'cnsl-filter-org',
   templateUrl: './filter-org.component.html',
   styleUrls: ['./filter-org.component.scss'],
+  standalone: false,
 })
 export class FilterOrgComponent extends FilterComponent implements OnInit {
   public SubQuery: any = SubQuery;

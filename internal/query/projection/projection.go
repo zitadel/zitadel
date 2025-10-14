@@ -89,16 +89,22 @@ var (
 	HostedLoginTranslationProjection    *handler.Handler
 	OrganizationSettingsProjection      *handler.Handler
 
-	InstanceRelationalProjection           *handler.Handler
-	OrganizationRelationalProjection       *handler.Handler
-	InstanceDomainRelationalProjection     *handler.Handler
-	OrganizationDomainRelationalProjection *handler.Handler
+	InstanceRelationalProjection             *handler.Handler
+	OrganizationRelationalProjection         *handler.Handler
+	InstanceDomainRelationalProjection       *handler.Handler
+	OrganizationDomainRelationalProjection   *handler.Handler
+	IDPTemplateRelationalProjection          *handler.Handler
+	ProjectRelationalProjection              *handler.Handler
+	ProjectRoleRelationalProjection          *handler.Handler
+	OrganizationMetadataRelationalProjection *handler.Handler
 
 	ProjectGrantFields      *handler.FieldHandler
 	OrgDomainVerifiedFields *handler.FieldHandler
 	InstanceDomainFields    *handler.FieldHandler
 	MembershipFields        *handler.FieldHandler
 	PermissionFields        *handler.FieldHandler
+
+	GroupProjection *handler.Handler
 )
 
 type projection interface {
@@ -204,10 +210,16 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	PermissionFields = newFillPermissionFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsPermission]))
 	// Don't forget to add the new field handler to [ProjectInstanceFields]
 
+	GroupProjection = newGroupProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["groups"]))
+
 	InstanceRelationalProjection = newInstanceRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instances_relational"]))
 	OrganizationRelationalProjection = newOrgRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organizations_relational"]))
 	InstanceDomainRelationalProjection = newInstanceDomainRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instance_domains_relational"]))
 	OrganizationDomainRelationalProjection = newOrgDomainRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organization_domains_relational"]))
+	IDPTemplateRelationalProjection = newIDPTemplateRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_templates_relational"]))
+	ProjectRelationalProjection = newProjectRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects_relational"]))
+	ProjectRoleRelationalProjection = newProjectRoleRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_roles_relational"]))
+	OrganizationMetadataRelationalProjection = newOrgMetadataRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organization_metadata_relational"]))
 
 	newProjectionsList()
 	newFieldsList()
@@ -390,10 +402,15 @@ func newProjectionsList() {
 		DebugEventsProjection,
 		HostedLoginTranslationProjection,
 		OrganizationSettingsProjection,
+		GroupProjection,
 
 		InstanceRelationalProjection,
 		OrganizationRelationalProjection,
 		InstanceDomainRelationalProjection,
 		OrganizationDomainRelationalProjection,
+		IDPTemplateRelationalProjection,
+		ProjectRelationalProjection,
+		ProjectRoleRelationalProjection,
+		OrganizationMetadataRelationalProjection,
 	}
 }

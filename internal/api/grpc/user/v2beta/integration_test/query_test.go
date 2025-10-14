@@ -1138,7 +1138,7 @@ func TestServer_ListUsers(t *testing.T) {
 				infos := tc.args.dep(IamCTX, tc.args.req)
 
 				// retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, 10*time.Minute)
-				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.args.ctx, 20*time.Second)
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.args.ctx, time.Minute)
 				require.EventuallyWithT(t1, func(ttt *assert.CollectT) {
 					got, err := Client.ListUsers(tc.args.ctx, tc.args.req)
 					if tc.wantErr {

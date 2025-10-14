@@ -239,7 +239,7 @@ func TestServer_CreateAdministrator(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: "notexisting",
+							OrganizationId: "notexisting",
 						},
 					},
 				}
@@ -263,7 +263,7 @@ func TestServer_CreateAdministrator(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				}
@@ -289,7 +289,7 @@ func TestServer_CreateAdministrator(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				}
@@ -333,6 +333,13 @@ func TestServer_CreateAdministrator_Permission(t *testing.T) {
 	instance.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), orgResp.GetOrganizationId(), userProjectGrantResp.GetUserId())
 	patProjectGrantResp := instance.CreatePersonalAccessToken(iamOwnerCtx, userProjectGrantResp.GetUserId())
 	projectGrantOwnerCtx := integration.WithAuthorizationToken(CTX, patProjectGrantResp.Token)
+
+	grantedProjectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
+	userGrantedProjectResp := instance.CreateMachineUser(iamOwnerCtx)
+	instance.CreateProjectMembership(t, iamOwnerCtx, grantedProjectResp.GetId(), userGrantedProjectResp.GetUserId())
+	patGrantedProjectResp := instance.CreatePersonalAccessToken(iamOwnerCtx, userGrantedProjectResp.GetUserId())
+	grantedProjectOwnerCtx := integration.WithAuthorizationToken(CTX, patGrantedProjectResp.Token)
+	instance.CreateProjectGrant(iamOwnerCtx, t, grantedProjectResp.GetId(), instance.DefaultOrg.GetId())
 
 	type want struct {
 		creationDate bool
@@ -509,6 +516,50 @@ func TestServer_CreateAdministrator_Permission(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "project grant, org owner, ok",
+			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+			prepare: func(request *internal_permission.CreateAdministratorRequest) {
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
+
+				request.UserId = userResp.GetId()
+			},
+			req: &internal_permission.CreateAdministratorRequest{
+				Resource: &internal_permission.ResourceType{
+					Resource: &internal_permission.ResourceType_ProjectGrant_{
+						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
+							ProjectId:      grantedProjectResp.GetId(),
+							OrganizationId: instance.DefaultOrg.GetId(),
+						},
+					},
+				},
+				Roles: []string{"PROJECT_GRANT_OWNER"},
+			},
+			want: want{
+				creationDate: true,
+			},
+		},
+		{
+			name: "project grant, project owner, error",
+			ctx:  grantedProjectOwnerCtx,
+			prepare: func(request *internal_permission.CreateAdministratorRequest) {
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
+
+				request.UserId = userResp.GetId()
+			},
+			req: &internal_permission.CreateAdministratorRequest{
+				Resource: &internal_permission.ResourceType{
+					Resource: &internal_permission.ResourceType_ProjectGrant_{
+						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
+							ProjectId:      grantedProjectResp.GetId(),
+							OrganizationId: instance.DefaultOrg.GetId(),
+						},
+					},
+				},
+				Roles: []string{"PROJECT_GRANT_OWNER"},
+			},
+			wantErr: true,
+		},
+		{
 			name: "project grant, project grant owner, ok",
 			ctx:  projectGrantOwnerCtx,
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
@@ -521,7 +572,7 @@ func TestServer_CreateAdministrator_Permission(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				},
@@ -544,7 +595,7 @@ func TestServer_CreateAdministrator_Permission(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				},
@@ -869,7 +920,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: "notexisting",
+							OrganizationId: "notexisting",
 						},
 					},
 				}
@@ -894,7 +945,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				}
@@ -922,7 +973,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				}
@@ -949,7 +1000,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				}
@@ -1192,7 +1243,7 @@ func TestServer_UpdateAdministrator_Permission(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				},
@@ -1215,7 +1266,7 @@ func TestServer_UpdateAdministrator_Permission(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				},
@@ -1236,7 +1287,7 @@ func TestServer_UpdateAdministrator_Permission(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				},
@@ -1487,7 +1538,7 @@ func TestServer_DeleteAdministrator(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: "notexisting",
+							OrganizationId: "notexisting",
 						},
 					},
 				}
@@ -1512,7 +1563,7 @@ func TestServer_DeleteAdministrator(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				}
@@ -1538,7 +1589,7 @@ func TestServer_DeleteAdministrator(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				}
@@ -1766,7 +1817,7 @@ func TestServer_DeleteAdministrator_Permission(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				},
@@ -1788,7 +1839,7 @@ func TestServer_DeleteAdministrator_Permission(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				},
@@ -1808,7 +1859,7 @@ func TestServer_DeleteAdministrator_Permission(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				},
