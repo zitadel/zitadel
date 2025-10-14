@@ -32,7 +32,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 		{
 			name: "user does not exist",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddIDPLinkRequest{
 					UserId: "userID",
 					IdpLink: &user.IDPLink{
@@ -48,7 +48,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 		{
 			name: "idp does not exist",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddIDPLinkRequest{
 					UserId: Instance.Users.Get(integration.UserTypeOrgOwner).ID,
 					IdpLink: &user.IDPLink{
@@ -64,7 +64,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 		{
 			name: "add link",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddIDPLinkRequest{
 					UserId: Instance.Users.Get(integration.UserTypeOrgOwner).ID,
 					IdpLink: &user.IDPLink{
@@ -149,7 +149,7 @@ func TestServer_ListIDPLinks(t *testing.T) {
 		{
 			name: "list links, no permission, org",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.ListIDPLinksRequest{
 					UserId: userOrgResp.GetUserId(),
 				},
@@ -230,7 +230,7 @@ func TestServer_ListIDPLinks(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(OrgCTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := Client.ListIDPLinks(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
@@ -291,7 +291,7 @@ func TestServer_RemoveIDPLink(t *testing.T) {
 		{
 			name: "remove link, no permission, org",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.RemoveIDPLinkRequest{
 					UserId:       userOrgResp.GetUserId(),
 					IdpId:        orgIdpResp.Id,
