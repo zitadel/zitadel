@@ -1324,7 +1324,7 @@ func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionChe
 	).FromSelect(query, "results")
 
 	// apply limit and offset in the outer query
-	query = q.SearchRequest.toQuery(query)
+	query = q.toQuery(query)
 	query = query.PlaceholderFormat(sq.Dollar)
 
 	return query, func(rows *sql.Rows) (*Users, error) {
