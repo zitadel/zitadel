@@ -5,12 +5,7 @@ import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
-import {
-  getBrandingSettings,
-  getLoginSettings,
-  getPasswordComplexitySettings,
-  getUserByID,
-} from "@/lib/zitadel";
+import { getBrandingSettings, getLoginSettings, getPasswordComplexitySettings, getUserByID } from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { Metadata } from "next";
@@ -19,16 +14,13 @@ import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("password");
-  return { title: t('set.title')};
+  return { title: t("set.title") };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
-  const { userId, loginName, organization, requestId, code, initial } =
-    searchParams;
+  const { userId, loginName, organization, requestId, code, initial } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -76,12 +68,8 @@ export default async function Page(props: {
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
-        <h1>
-          {session?.factors?.user?.displayName ?? (
-            <Translated i18nKey="set.title" namespace="password" />
-          )}
-        </h1>
+      <div className="flex flex-col space-y-4">
+        <h1>{session?.factors?.user?.displayName ?? <Translated i18nKey="set.title" namespace="password" />}</h1>
         <p className="ztdl-p mb-6 block">
           <Translated i18nKey="set.description" namespace="password" />
         </p>
@@ -110,16 +98,16 @@ export default async function Page(props: {
             searchParams={searchParams}
           ></UserAvatar>
         ) : null}
+      </div>
 
+      <div className="w-full">
         {!initial && (
           <Alert type={AlertType.INFO}>
             <Translated i18nKey="set.codeSent" namespace="password" />
           </Alert>
         )}
 
-        {passwordComplexity &&
-        (loginName ?? user?.preferredLoginName) &&
-        (userId ?? session?.factors?.user?.id) ? (
+        {passwordComplexity && (loginName ?? user?.preferredLoginName) && (userId ?? session?.factors?.user?.id) ? (
           <SetPasswordForm
             code={code}
             userId={userId ?? (session?.factors?.user?.id as string)}

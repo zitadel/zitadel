@@ -52,6 +52,7 @@ func createOrganizationWithCustomOrgID(ctx context.Context, name string, orgID s
 //	relTableState := integration.RelationalTablesEnableMatrix()
 //
 // See TestServer_ListOrganizations in org/v2beta/integration_test
+// See https://github.com/zitadel/zitadel/issues/10219
 func TestServer_ListOrganizations(t *testing.T) {
 	type args struct {
 		ctx context.Context

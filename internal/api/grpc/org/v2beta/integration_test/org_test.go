@@ -322,7 +322,7 @@ func TestServer_UpdateOrganization(t *testing.T) {
 				name: "update org with new name",
 				req: &v2beta_org.UpdateOrganizationRequest{
 					Id:   orgs[0+(i*cases)].GetId(),
-					Name: "new org name",
+					Name: fmt.Sprintf("new org name %d", i),
 				},
 			},
 			{

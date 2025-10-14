@@ -179,22 +179,15 @@ func (d *DeleteOrgCommand) Validate(ctx context.Context, opts *CommandOpts) (err
 	}
 
 	orgRepo := opts.organizationRepo
-	org, err := orgRepo.Get(ctx, pool,
+	_, errGetOrg := orgRepo.Get(ctx, pool,
 		database.WithCondition(database.And(
 			orgRepo.IDCondition(d.ID),
 			orgRepo.InstanceIDCondition(instance.InstanceID()),
 		)))
-	if err != nil {
-		return err
-	}
-	wantedStates := map[OrgState]bool{
-		OrgStateActive:   true,
-		OrgStateInactive: true,
-	}
-
-	// TODO(IAM-Marco): I'm not sure this is needed on relational.
-	if !wantedStates[org.State] {
-		err = zerrors.ThrowNotFound(nil, "DOM-8KYOH3", "Errors.Org.NotFound")
+	if errGetOrg != nil {
+		if errors.Is(errGetOrg, &database.NoRowFoundError{}) {
+			err = zerrors.ThrowNotFound(errGetOrg, "DOM-8KYOH3", "Errors.Org.NotFound")
+		}
 		return err
 	}
 

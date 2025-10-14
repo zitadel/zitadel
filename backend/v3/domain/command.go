@@ -11,6 +11,8 @@ import (
 // Commander is all that is needed to implement the command pattern.
 // It is the interface all manipulations need to implement.
 // If possible it should also be used for queries. We will find out if this is possible in the future.
+//
+//go:generate mockgen -typed -package domainmock -destination ./mock/commander.mock.go . Commander
 type Commander interface {
 	Execute(ctx context.Context, opts *CommandOpts) (err error)
 	Validate(ctx context.Context, opts *CommandOpts) (err error)
@@ -32,6 +34,7 @@ type CommandOpts struct {
 	DB      database.QueryExecutor
 	Invoker Invoker
 
+	Permissions            PermissionChecker
 	organizationRepo       OrganizationRepository
 	organizationDomainRepo OrganizationDomainRepository
 
@@ -132,8 +135,9 @@ func DefaultOpts(invoker Invoker) *CommandOpts {
 		invoker = &noopInvoker{}
 	}
 	return &CommandOpts{
-		DB:      pool,
-		Invoker: invoker,
+		DB:          pool,
+		Invoker:     invoker,
+		Permissions: &noopPermissionChecker{}, // prevent panics for now
 	}
 }
 

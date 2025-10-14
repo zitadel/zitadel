@@ -53,11 +53,8 @@ func UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org
 	// TODO(IAM-Marco) Finish implementation in https://github.com/zitadel/zitadel/issues/10447
 	domainAddCmd := domain.NewAddOrgDomainCommand(request.Msg.GetId(), request.Msg.GetName())
 	domainSetPrimaryCmd := domain.NewSetPrimaryOrgDomainCommand(request.Msg.GetId(), request.Msg.GetName())
-	// TODO(IAM-Marco) Check if passing the pointer is actually working to retrieve the domain name and the DomainVerified
 	domainRemoveCmd := domain.NewRemoveOrgDomainCommand(request.Msg.GetId(), orgUpdtCmd.OldDomainName, orgUpdtCmd.IsOldDomainVerified)
 
-	// TODO(IAM-Marco): I noticed while debugging that this is calling twice the commands (I think?)
-	// It's hard to debug, I haven't spent too much into it. Only drawback is pushing events twice.
 	batchCmd := domain.BatchCommands(orgUpdtCmd, domainAddCmd, domainSetPrimaryCmd, domainRemoveCmd)
 
 	err := domain.Invoke(ctx, batchCmd, domain.WithOrganizationRepo(repository.OrganizationRepository()))
@@ -68,7 +65,7 @@ func UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org
 	return &connect.Response[v2beta_org.UpdateOrganizationResponse]{
 		Msg: &v2beta_org.UpdateOrganizationResponse{
 			// TODO(IAM-Marco): Change this with the real update date when OrganizationRepo.Update()
-			// returns the timestamp
+			// returns the timestamp. See https://github.com/zitadel/zitadel/issues/10881
 			ChangeDate: timestamppb.Now(),
 		},
 	}, nil
@@ -98,7 +95,7 @@ func ListOrganizations(ctx context.Context, request *connect.Request[v2_org.List
 	}, nil
 }
 
-// TODO(IAM-Marco): Remove in V5
+// TODO(IAM-Marco): Remove in V5 (see https://github.com/zitadel/zitadel/issues/10877)
 func ListOrganizationsBeta(ctx context.Context, request *connect.Request[v2beta_org.ListOrganizationsRequest]) (*connect.Response[v2beta_org.ListOrganizationsResponse], error) {
 	orgListCmd := domain.NewListOrgsCommand(convert.OrganizationBetaRequestToV2Request(request.Msg))
 
@@ -136,7 +133,7 @@ func DeleteOrganization(ctx context.Context, request *connect.Request[v2beta_org
 	return &connect.Response[v2beta_org.DeleteOrganizationResponse]{
 		Msg: &v2beta_org.DeleteOrganizationResponse{
 			// TODO(IAM-Marco): Change this with the real update date when OrganizationRepo.Delete()
-			// returns the timestamp
+			// returns the timestamp. See https://github.com/zitadel/zitadel/issues/10881
 			DeletionDate: timestamppb.Now(),
 		},
 	}, nil
@@ -155,7 +152,7 @@ func DeactivateOrganization(ctx context.Context, request *connect.Request[v2beta
 	return &connect.Response[v2beta_org.DeactivateOrganizationResponse]{
 		Msg: &v2beta_org.DeactivateOrganizationResponse{
 			// TODO(IAM-Marco): Change this with the real update date when OrganizationRepo.Update()
-			// returns the timestamp
+			// returns the timestamp. See https://github.com/zitadel/zitadel/issues/10881
 			ChangeDate: timestamppb.Now(),
 		},
 	}, nil
@@ -174,7 +171,7 @@ func ActivateOrganization(ctx context.Context, request *connect.Request[v2beta_o
 	return &connect.Response[v2beta_org.ActivateOrganizationResponse]{
 		Msg: &v2beta_org.ActivateOrganizationResponse{
 			// TODO(IAM-Marco): Change this with the real update date when OrganizationRepo.Update()
-			// returns the timestamp
+			// returns the timestamp. See https://github.com/zitadel/zitadel/issues/10881
 			ChangeDate: timestamppb.Now(),
 		},
 	}, nil

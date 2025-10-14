@@ -154,7 +154,7 @@ func (l *ListOrgsCommand) orgToGRPC(org *Organization) *v2_org.Organization {
 	}
 }
 
-// TODO(IAM-Marco): Remove in V5
+// TODO(IAM-Marco): Remove in V5 (see https://github.com/zitadel/zitadel/issues/10877)
 func (l *ListOrgsCommand) ResultToGRPCBeta() []*v2beta_org.Organization {
 	toReturn := make([]*v2beta_org.Organization, len(l.Result))
 
@@ -165,7 +165,7 @@ func (l *ListOrgsCommand) ResultToGRPCBeta() []*v2beta_org.Organization {
 	return toReturn
 }
 
-// TODO(IAM-Marco): Remove in V5
+// TODO(IAM-Marco): Remove in V5 (see https://github.com/zitadel/zitadel/issues/10877)
 func (l *ListOrgsCommand) orgToGRPCBeta(org *Organization) *v2beta_org.Organization {
 	return &v2beta_org.Organization{
 		Id:           org.ID,
