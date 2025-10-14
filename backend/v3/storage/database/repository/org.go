@@ -30,7 +30,7 @@ func OrganizationRepository() domain.OrganizationRepository {
 
 const queryOrganizationStmt = `SELECT organizations.id, organizations.name, organizations.instance_id, organizations.state, organizations.created_at, organizations.updated_at` +
 	` , jsonb_agg(json_build_object('instanceId', org_domains.instance_id, 'orgId', org_domains.org_id, 'domain', org_domains.domain, 'isVerified', org_domains.is_verified, 'isPrimary', org_domains.is_primary, 'validationType', org_domains.validation_type, 'createdAt', org_domains.created_at, 'updatedAt', org_domains.updated_at)) FILTER (WHERE org_domains.org_id IS NOT NULL) AS domains` +
-	` , jsonb_agg(json_build_object('instanceId', org_metadata.instance_id, 'orgId', org_metadata.org_id, 'key', org_metadata.key, 'value', encode(org_metadata.value, 'base64'), 'createdAt', org_metadata.created_at, 'updatedAt', org_metadata.updated_at)) FILTER (WHERE org_metadata.org_id IS NOT NULL) AS metadata` +
+	` , jsonb_agg(json_build_object('instanceId', organization_metadata.instance_id, 'orgId', organization_metadata.organization_id, 'key', organization_metadata.key, 'value', encode(organization_metadata.value, 'base64'), 'createdAt', organization_metadata.created_at, 'updatedAt', organization_metadata.updated_at)) FILTER (WHERE organization_metadata.organization_id IS NOT NULL) AS metadata` +
 	` FROM zitadel.organizations`
 
 // Get implements [domain.OrganizationRepository].
@@ -192,7 +192,7 @@ func (o org) ExistsDomain(cond database.Condition) database.Condition {
 	)
 }
 
-// ExistsMetadata creates a correlated [database.Exists] condition on org_metadata.
+// ExistsMetadata creates a correlated [database.Exists] condition on organization_metadata.
 // Use this when you want to filter organizations by a metadata condition but still return all metadata
 // of the organization in the aggregated result.
 // Example usage:
@@ -211,7 +211,7 @@ func (o org) ExistsMetadata(cond database.Condition) database.Condition {
 		o.metadataRepo.qualifiedTableName(),
 		database.And(
 			database.NewColumnCondition(o.InstanceIDColumn(), o.metadataRepo.InstanceIDColumn()),
-			database.NewColumnCondition(o.IDColumn(), o.metadataRepo.OrgIDColumn()),
+			database.NewColumnCondition(o.IDColumn(), o.metadataRepo.OrganizationIDColumn()),
 			cond,
 		),
 	)
@@ -339,13 +339,13 @@ func (o org) joinMetadata() database.QueryOption {
 	columns := make([]database.Condition, 0, 3)
 	columns = append(columns,
 		database.NewColumnCondition(o.InstanceIDColumn(), o.metadataRepo.InstanceIDColumn()),
-		database.NewColumnCondition(o.IDColumn(), o.metadataRepo.OrgIDColumn()),
+		database.NewColumnCondition(o.IDColumn(), o.metadataRepo.OrganizationIDColumn()),
 	)
 
 	// If metadata should not be joined, we make sure to return null for the metadata columns
 	// the query optimizer of the dialect should optimize this away if no metadata are requested
 	if !o.shouldLoadMetadata {
-		columns = append(columns, database.IsNull(o.metadataRepo.OrgIDColumn()))
+		columns = append(columns, database.IsNull(o.metadataRepo.OrganizationIDColumn()))
 	}
 
 	return database.WithLeftJoin(

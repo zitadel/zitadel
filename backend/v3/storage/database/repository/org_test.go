@@ -1138,7 +1138,7 @@ func TestGetOrganizationWithSubResources(t *testing.T) {
 
 		metadata := []*domain.OrganizationMetadata{
 			{
-				OrgID: org.ID,
+				OrganizationID: org.ID,
 				Metadata: domain.Metadata{
 					InstanceID: org.InstanceID,
 					Key:        "key1",
@@ -1146,7 +1146,7 @@ func TestGetOrganizationWithSubResources(t *testing.T) {
 				},
 			},
 			{
-				OrgID: org.ID,
+				OrganizationID: org.ID,
 				Metadata: domain.Metadata{
 					InstanceID: org.InstanceID,
 					Key:        "key2",

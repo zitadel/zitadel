@@ -61,7 +61,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						orgMetadataRepo.InstanceIDCondition(Instance.Instance.Id),
-						orgMetadataRepo.OrgIDCondition(org.Id),
+						orgMetadataRepo.OrganizationIDCondition(org.Id),
 						orgMetadataRepo.KeyCondition(database.TextOperationStartsWith, "test-"),
 					),
 				),
@@ -72,35 +72,35 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[0].InstanceID)
-		assert.Equal(t, org.Id, gottenMetadata[0].OrgID)
+		assert.Equal(t, org.Id, gottenMetadata[0].OrganizationID)
 		assert.Equal(t, "test-1-bool", gottenMetadata[0].Key)
 		assert.Equal(t, []byte(`false`), gottenMetadata[0].Value)
 		assert.WithinRange(t, gottenMetadata[0].CreatedAt, beforeAdd, afterAdd)
 		assert.WithinRange(t, gottenMetadata[0].UpdatedAt, beforeAdd, afterAdd)
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[1].InstanceID)
-		assert.Equal(t, org.Id, gottenMetadata[1].OrgID)
+		assert.Equal(t, org.Id, gottenMetadata[1].OrganizationID)
 		assert.Equal(t, "test-2-number", gottenMetadata[1].Key)
 		assert.Equal(t, []byte(`123`), gottenMetadata[1].Value)
 		assert.WithinRange(t, gottenMetadata[1].CreatedAt, beforeAdd, afterAdd)
 		assert.WithinRange(t, gottenMetadata[1].UpdatedAt, beforeAdd, afterAdd)
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[2].InstanceID)
-		assert.Equal(t, org.Id, gottenMetadata[2].OrgID)
+		assert.Equal(t, org.Id, gottenMetadata[2].OrganizationID)
 		assert.Equal(t, "test-3-object", gottenMetadata[2].Key)
 		assert.JSONEq(t, `{"text":"value", "number":123, "bool": false}`, string(gottenMetadata[2].Value))
 		assert.WithinRange(t, gottenMetadata[2].CreatedAt, beforeAdd, afterAdd)
 		assert.WithinRange(t, gottenMetadata[2].UpdatedAt, beforeAdd, afterAdd)
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[3].InstanceID)
-		assert.Equal(t, org.Id, gottenMetadata[3].OrgID)
+		assert.Equal(t, org.Id, gottenMetadata[3].OrganizationID)
 		assert.Equal(t, "test-4-text", gottenMetadata[3].Key)
 		assert.Equal(t, []byte(`"test-value"`), gottenMetadata[3].Value)
 		assert.WithinRange(t, gottenMetadata[3].CreatedAt, beforeAdd, afterAdd)
 		assert.WithinRange(t, gottenMetadata[3].UpdatedAt, beforeAdd, afterAdd)
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[4].InstanceID)
-		assert.Equal(t, org.Id, gottenMetadata[4].OrgID)
+		assert.Equal(t, org.Id, gottenMetadata[4].OrganizationID)
 		assert.Equal(t, "test-5-bytes", gottenMetadata[4].Key)
 		assert.Equal(t, []byte(`test-value`), gottenMetadata[4].Value)
 		assert.WithinRange(t, gottenMetadata[4].CreatedAt, beforeAdd, afterAdd)
@@ -132,7 +132,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						orgMetadataRepo.InstanceIDCondition(Instance.Instance.Id),
-						orgMetadataRepo.OrgIDCondition(org.Id),
+						orgMetadataRepo.OrganizationIDCondition(org.Id),
 						orgMetadataRepo.KeyCondition(database.TextOperationStartsWith, "test-"),
 					),
 				),
@@ -143,7 +143,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[0].InstanceID)
-		assert.Equal(t, org.Id, gottenMetadata[0].OrgID)
+		assert.Equal(t, org.Id, gottenMetadata[0].OrganizationID)
 		assert.Equal(t, "test-1-bool", gottenMetadata[0].Key)
 		assert.Equal(t, []byte(`false`), gottenMetadata[0].Value)
 		assert.WithinRange(t, gottenMetadata[0].CreatedAt, beforeAdd, afterAdd)
@@ -168,7 +168,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						orgMetadataRepo.InstanceIDCondition(Instance.Instance.Id),
-						orgMetadataRepo.OrgIDCondition(org.Id),
+						orgMetadataRepo.OrganizationIDCondition(org.Id),
 						orgMetadataRepo.KeyCondition(database.TextOperationStartsWith, "test-"),
 					),
 				),
@@ -180,7 +180,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[0].InstanceID)
-		assert.Equal(t, org.Id, gottenMetadata[0].OrgID)
+		assert.Equal(t, org.Id, gottenMetadata[0].OrganizationID)
 		assert.Equal(t, "test-1-bool", gottenMetadata[0].Key)
 		assert.Equal(t, []byte(`true`), gottenMetadata[0].Value)
 		assert.WithinRange(t, gottenMetadata[0].CreatedAt, beforeAdd, afterAdd)
@@ -224,7 +224,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						orgMetadataRepo.InstanceIDCondition(Instance.Instance.Id),
-						orgMetadataRepo.OrgIDCondition(org.Id),
+						orgMetadataRepo.OrganizationIDCondition(org.Id),
 					),
 				),
 			)
@@ -264,7 +264,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						orgMetadataRepo.InstanceIDCondition(Instance.Instance.Id),
-						orgMetadataRepo.OrgIDCondition(org.Id),
+						orgMetadataRepo.OrganizationIDCondition(org.Id),
 					),
 				),
 			)
@@ -284,7 +284,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						orgMetadataRepo.InstanceIDCondition(Instance.Instance.Id),
-						orgMetadataRepo.OrgIDCondition(org.Id),
+						orgMetadataRepo.OrganizationIDCondition(org.Id),
 					),
 				),
 			)

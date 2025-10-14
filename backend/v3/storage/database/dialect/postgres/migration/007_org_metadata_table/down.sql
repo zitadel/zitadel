@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS zitadel.org_metadata;
+DROP TABLE IF EXISTS zitadel.organization_metadata;

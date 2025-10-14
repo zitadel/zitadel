@@ -65,7 +65,7 @@ func (p *orgMetadataRelationalProjection) reduceSet(event eventstore.Event) (*ha
 				CreatedAt:  e.CreationDate(),
 				UpdatedAt:  e.CreationDate(),
 			},
-			OrgID: e.Aggregate().ResourceOwner,
+			OrganizationID: e.Aggregate().ResourceOwner,
 		})
 	}), nil
 }
@@ -84,7 +84,7 @@ func (p *orgMetadataRelationalProjection) reduceRemoved(event eventstore.Event) 
 		_, err := domainRepo.Remove(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
-				domainRepo.OrgIDCondition(e.Aggregate().ResourceOwner),
+				domainRepo.OrganizationIDCondition(e.Aggregate().ResourceOwner),
 				domainRepo.KeyCondition(database.TextOperationEqual, e.Key),
 			),
 		)
@@ -106,7 +106,7 @@ func (p *orgMetadataRelationalProjection) reduceRemovedAll(event eventstore.Even
 		_, err := domainRepo.Remove(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
-				domainRepo.OrgIDCondition(e.Aggregate().ResourceOwner),
+				domainRepo.OrganizationIDCondition(e.Aggregate().ResourceOwner),
 			),
 		)
 		return err

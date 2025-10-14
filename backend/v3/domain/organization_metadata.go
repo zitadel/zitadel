@@ -8,21 +8,21 @@ import (
 
 type OrganizationMetadata struct {
 	Metadata
-	OrgID string `json:"orgId,omitempty" db:"org_id"`
+	OrganizationID string `json:"orgId,omitempty" db:"organization_id"`
 }
 
 type organizationMetadataColumns interface {
 	MetadataColumns
-	// OrgIDColumn returns the column for the org id field.
-	OrgIDColumn() database.Column
+	// OrganizationIDColumn returns the column for the org id field.
+	OrganizationIDColumn() database.Column
 }
 
 type organizationMetadataConditions interface {
 	MetadataConditions
 	// PrimaryKeyCondition returns the condition for the primary key fields.
 	PrimaryKeyCondition(instanceID, orgID, key string) database.Condition
-	// OrgIDCondition returns a filter on the org id field.
-	OrgIDCondition(orgID string) database.Condition
+	// OrganizationIDCondition returns a filter on the org id field.
+	OrganizationIDCondition(orgID string) database.Condition
 }
 
 type OrganizationMetadataRepository interface {
