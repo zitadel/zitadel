@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"slices"
 	"testing"
 	"time"
@@ -717,6 +718,86 @@ func TestServer_ListUsers(t *testing.T) {
 			},
 		},
 		{
+			// https://github.com/zitadel/zitadel/issues/10825
+			name: "list user with metadata by IDs with offset and limit, ok",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					infos := createUsers(ctx, orgResp.OrganizationId, 3, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
+					request.Queries = append(request.Queries, InUserIDsQuery(infos.userIDs()))
+
+					// With the original bug, this would multiply the "TotalResult" by 2.
+					for _, user := range infos {
+						for i := 0; i < 2; i++ {
+							Instance.SetUserMetadata(ctx, user.UserID, fmt.Sprintf("key-%d", i), fmt.Sprintf("value-%d", i))
+						}
+					}
+					infos = infos[1:] // prevent panic in user ID setting below
+
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
+					request.Query = &object.ListQuery{
+						Offset: 1,
+						Limit:  2,
+					}
+					return infos
+				},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 3,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
+				Result: []*user.User{
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
+								},
+							},
+						},
+					},
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "list user by username, ok",
 			args: args{
 				IamCTX,
@@ -857,6 +938,85 @@ func TestServer_ListUsers(t *testing.T) {
 							},
 						},
 					}, {
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
+								},
+							},
+						},
+					}, {
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			// https://github.com/zitadel/zitadel/issues/10825
+			name: "list user with metadata by emails with offset and limit, ok",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					infos := createUsers(ctx, orgResp.OrganizationId, 3, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
+					request.Queries = append(request.Queries, InUserEmailsQuery(infos.emails()))
+
+					// With the original bug, this would multiply the "TotalResult" by 2.
+					for _, user := range infos {
+						for i := 0; i < 2; i++ {
+							Instance.SetUserMetadata(ctx, user.UserID, fmt.Sprintf("key-%d", i), fmt.Sprintf("value-%d", i))
+						}
+					}
+					infos = infos[1:] // prevent panic in user ID setting below
+
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
+					request.Query = &object.ListQuery{
+						Offset: 1,
+						Limit:  2,
+					}
+					return infos
+				},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 3,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
+				Result: []*user.User{
+					{
 						State: user.UserState_USER_STATE_ACTIVE,
 						Type: &user.User_Human{
 							Human: &user.HumanUser{
