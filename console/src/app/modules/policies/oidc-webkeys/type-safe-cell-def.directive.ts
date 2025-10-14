@@ -6,6 +6,7 @@ import { CdkCellDef } from '@angular/cdk/table';
 @Directive({
   selector: '[cnslCellDef]',
   providers: [{ provide: CdkCellDef, useExisting: TypeSafeCellDefDirective }],
+  standalone: false,
 })
 export class TypeSafeCellDefDirective<T> extends MatCellDef {
   @Input({ required: true }) cnslCellDefDataSource!: DataSource<T>;

@@ -23,6 +23,7 @@ import { AddActionDialogComponent } from '../add-action-dialog/add-action-dialog
   selector: 'cnsl-action-table',
   templateUrl: './action-table.component.html',
   styleUrls: ['./action-table.component.scss'],
+  standalone: false,
 })
 export class ActionTableComponent implements OnInit {
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;

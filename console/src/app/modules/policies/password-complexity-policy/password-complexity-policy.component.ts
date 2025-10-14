@@ -15,6 +15,7 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
   selector: 'cnsl-password-complexity-policy',
   templateUrl: './password-complexity-policy.component.html',
   styleUrls: ['./password-complexity-policy.component.scss'],
+  standalone: false,
 })
 export class PasswordComplexityPolicyComponent implements OnInit {
   @Input() public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
