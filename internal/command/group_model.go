@@ -18,10 +18,6 @@ type GroupWriteModel struct {
 	State domain.GroupState
 }
 
-func (g *GroupWriteModel) GetWriteModel() *eventstore.WriteModel {
-	return &g.WriteModel
-}
-
 // NewGroupWriteModel initializes a new instance of GroupWriteModel from the given Group.
 func NewGroupWriteModel(id, orgID string) *GroupWriteModel {
 	return &GroupWriteModel{
