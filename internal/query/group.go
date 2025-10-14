@@ -101,12 +101,14 @@ func (q *Queries) SearchGroups(ctx context.Context, queries *GroupSearchQuery, p
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	groups, err := q.searchGroups(ctx, queries)
+	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+
+	groups, err := q.searchGroups(ctx, queries, permissionCheckV2)
 	if err != nil {
 		return nil, err
 	}
-	if permissionCheck != nil {
-		groupsCheckPermission(ctx, groups, permissionCheck) // todo: permission check v2?
+	if permissionCheck != nil && !permissionCheckV2 {
+		groupsCheckPermission(ctx, groups, permissionCheck)
 	}
 	return groups, nil
 }
@@ -193,11 +195,12 @@ func prepareGroupQuery() (sq.SelectBuilder, func(*sql.Row) (*Group, error)) {
 		}
 }
 
-func (q *Queries) searchGroups(ctx context.Context, queries *GroupSearchQuery) (groups *Groups, err error) {
+func (q *Queries) searchGroups(ctx context.Context, queries *GroupSearchQuery, permissionCheckV2 bool) (groups *Groups, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareGroupsQuery()
+	query = groupPermissionCheckV2(ctx, query, queries.Queries, permissionCheckV2)
 	eq := sq.And{
 		sq.Eq{
 			GroupColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -217,6 +220,21 @@ func (q *Queries) searchGroups(ctx context.Context, queries *GroupSearchQuery) (
 	}
 	groups.State, err = q.latestState(ctx, groupsTable)
 	return groups, err
+}
+
+func groupPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, queries []SearchQuery, permissionCheckV2 bool) sq.SelectBuilder {
+	if !permissionCheckV2 {
+		return query
+	}
+
+	join, args := PermissionClause(
+		ctx,
+		GroupColumnResourceOwner,
+		domain.PermissionGroupRead,
+		SingleOrgPermissionOption(queries),
+		OwnedRowsPermissionOption(GroupColumnID),
+	)
+	return query.JoinClause(join, args...)
 }
 
 func prepareGroupsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Groups, error)) {
