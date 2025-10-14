@@ -207,7 +207,7 @@ func TestServer_ListGroups(t *testing.T) {
 			},
 			want: &group_v2.ListGroupsResponse{
 				Pagination: &filter.PaginationResponse{
-					TotalResult:  0,
+					TotalResult:  1,
 					AppliedLimit: 100,
 				},
 				Groups: []*group_v2.Group{},
@@ -234,7 +234,7 @@ func TestServer_ListGroups(t *testing.T) {
 			},
 			want: &group_v2.ListGroupsResponse{
 				Pagination: &filter.PaginationResponse{
-					TotalResult:  0,
+					TotalResult:  1,
 					AppliedLimit: 100,
 				},
 				Groups: []*group_v2.Group{},
