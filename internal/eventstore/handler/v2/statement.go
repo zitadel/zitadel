@@ -51,7 +51,7 @@ func (h *Handler) eventsToStatements(tx *sql.Tx, events []eventstore.Event, curr
 			if shouldContinue := h.handleFailedStmt(tx, failureFromEvent(event, err)); shouldContinue {
 				continue
 			}
-			return statements, err
+			return statements, &executionError{err}
 		}
 		offset++
 		if !previousPosition.Equal(event.Position()) {

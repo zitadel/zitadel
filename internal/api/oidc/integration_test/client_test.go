@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/client"
@@ -25,20 +24,15 @@ import (
 )
 
 func TestServer_Introspect(t *testing.T) {
-	project := Instance.CreateProject(CTX, t, "", gofakeit.AppName(), false, false)
-	app, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
-	require.NoError(t, err)
-
-	wantAudience := []string{app.GetClientId(), project.GetId()}
-
 	tests := []struct {
 		name    string
-		api     func(*testing.T) (apiID string, resourceServer rs.ResourceServer)
+		api     func(*testing.T) (clientID string, audience []string, resourceServer rs.ResourceServer)
 		wantErr bool
 	}{
 		{
 			name: "client assertion",
-			api: func(t *testing.T) (string, rs.ResourceServer) {
+			api: func(t *testing.T) (string, []string, rs.ResourceServer) {
+				project := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
 				api, err := Instance.CreateAPIClientJWT(CTX, project.GetId())
 				require.NoError(t, err)
 				keyResp, err := Instance.Client.Mgmt.AddAppKey(CTX, &management.AddAppKeyRequest{
@@ -48,63 +42,81 @@ func TestServer_Introspect(t *testing.T) {
 					ExpirationDate: nil,
 				})
 				require.NoError(t, err)
+
+				app, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
+				require.NoError(t, err)
+
 				resourceServer, err := Instance.CreateResourceServerJWTProfile(CTX, keyResp.GetKeyDetails())
 				require.NoError(t, err)
-				return api.GetClientId(), resourceServer
+				return app.GetClientId(), []string{app.GetClientId(), project.GetId(), api.GetClientId()}, resourceServer
 			},
 		},
 		{
 			name: "client credentials",
-			api: func(t *testing.T) (string, rs.ResourceServer) {
+			api: func(t *testing.T) (string, []string, rs.ResourceServer) {
+				project := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
 				api, err := Instance.CreateAPIClientBasic(CTX, project.GetId())
 				require.NoError(t, err)
+				app, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
+				require.NoError(t, err)
+
 				resourceServer, err := Instance.CreateResourceServerClientCredentials(CTX, api.GetClientId(), api.GetClientSecret())
 				require.NoError(t, err)
-				return api.GetClientId(), resourceServer
+				return app.GetClientId(), []string{app.GetClientId(), project.GetId(), api.GetClientId()}, resourceServer
 			},
 		},
 		{
 			name: "client invalid id, error",
-			api: func(t *testing.T) (string, rs.ResourceServer) {
+			api: func(t *testing.T) (string, []string, rs.ResourceServer) {
+				project := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
+				app, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
+				require.NoError(t, err)
+
 				api, err := Instance.CreateAPIClientBasic(CTX, project.GetId())
 				require.NoError(t, err)
 				resourceServer, err := Instance.CreateResourceServerClientCredentials(CTX, "xxxxx", api.GetClientSecret())
 				require.NoError(t, err)
-				return api.GetClientId(), resourceServer
+				return app.GetClientId(), []string{app.GetClientId(), project.GetId(), api.GetClientId()}, resourceServer
 			},
 			wantErr: true,
 		},
 		{
 			name: "client invalid secret, error",
-			api: func(t *testing.T) (string, rs.ResourceServer) {
+			api: func(t *testing.T) (string, []string, rs.ResourceServer) {
+				project := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
+				app, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
+				require.NoError(t, err)
+
 				api, err := Instance.CreateAPIClientBasic(CTX, project.GetId())
 				require.NoError(t, err)
 				resourceServer, err := Instance.CreateResourceServerClientCredentials(CTX, api.GetClientId(), "xxxxx")
 				require.NoError(t, err)
-				return api.GetClientId(), resourceServer
+				return app.GetClientId(), []string{app.GetClientId(), project.GetId(), api.GetClientId()}, resourceServer
 			},
 			wantErr: true,
 		},
 		{
 			name: "client credentials on jwt client, error",
-			api: func(t *testing.T) (string, rs.ResourceServer) {
+			api: func(t *testing.T) (string, []string, rs.ResourceServer) {
+				project := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
+				app, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
+				require.NoError(t, err)
+
 				api, err := Instance.CreateAPIClientJWT(CTX, project.GetId())
 				require.NoError(t, err)
 				resourceServer, err := Instance.CreateResourceServerClientCredentials(CTX, api.GetClientId(), "xxxxx")
 				require.NoError(t, err)
-				return api.GetClientId(), resourceServer
+				return app.GetClientId(), []string{app.GetClientId(), project.GetId(), api.GetClientId()}, resourceServer
 			},
 			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			apiID, resourceServer := tt.api(t)
-			// wantAudience grows for every API we add to the project.
-			wantAudience = append(wantAudience, apiID)
+			clientID, wantAudience, resourceServer := tt.api(t)
 
 			scope := []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopeOfflineAccess, oidc_api.ScopeResourceOwner}
-			authRequestID := createAuthRequest(t, Instance, app.GetClientId(), redirectURI, scope...)
+			authRequestID := createAuthRequest(t, Instance, clientID, redirectURI, scope...)
 			sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 			linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: authRequestID,
@@ -119,7 +131,7 @@ func TestServer_Introspect(t *testing.T) {
 
 			// code exchange
 			code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-			tokens, err := exchangeTokens(t, Instance, app.GetClientId(), code, redirectURI)
+			tokens, err := exchangeTokens(t, Instance, clientID, code, redirectURI)
 			require.NoError(t, err)
 			assertTokens(t, tokens, true)
 			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
@@ -133,7 +145,7 @@ func TestServer_Introspect(t *testing.T) {
 
 			require.NoError(t, err)
 			assertIntrospection(t, introspection,
-				Instance.OIDCIssuer(), app.GetClientId(),
+				Instance.OIDCIssuer(), clientID,
 				scope, wantAudience,
 				tokens.Expiry, tokens.Expiry.Add(-12*time.Hour))
 		})
@@ -188,8 +200,8 @@ func assertIntrospection(
 // with clients that have different authentication methods.
 func TestServer_VerifyClient(t *testing.T) {
 	sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
-	project := Instance.CreateProject(CTX, t, "", gofakeit.AppName(), false, false)
-	projectInactive := Instance.CreateProject(CTX, t, "", gofakeit.AppName(), false, false)
+	project := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
+	projectInactive := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
 
 	inactiveClient, err := Instance.CreateOIDCInactivateClient(CTX, redirectURI, logoutRedirectURI, project.GetId())
 	require.NoError(t, err)

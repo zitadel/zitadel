@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -97,12 +96,12 @@ func TestServer_AddSecret(t *testing.T) {
 }
 
 func TestServer_AddSecret_Permission(t *testing.T) {
-	otherOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
+	otherOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 	otherOrgUser, err := Instance.Client.UserV2.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
 		UserType: &user.CreateUserRequest_Machine_{
 			Machine: &user.CreateUserRequest_Machine{
-				Name: gofakeit.Name(),
+				Name: integration.Username(),
 			},
 		},
 	})
@@ -244,12 +243,12 @@ func TestServer_RemoveSecret(t *testing.T) {
 }
 
 func TestServer_RemoveSecret_Permission(t *testing.T) {
-	otherOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
+	otherOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 	otherOrgUser, err := Instance.Client.UserV2.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
 		UserType: &user.CreateUserRequest_Machine_{
 			Machine: &user.CreateUserRequest_Machine{
-				Name: gofakeit.Name(),
+				Name: integration.Username(),
 			},
 		},
 	})

@@ -20,6 +20,7 @@ import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
   selector: 'cnsl-machine-keys',
   templateUrl: './machine-keys.component.html',
   styleUrls: ['./machine-keys.component.scss'],
+  standalone: false,
 })
 export class MachineKeysComponent implements OnInit {
   @Input() userId?: string;

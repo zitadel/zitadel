@@ -6,11 +6,11 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"slices"
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -75,7 +75,7 @@ func setPermissionCheckV2Flag(t *testing.T, setFlag bool) {
 }
 
 func TestServer_GetUserByID(t *testing.T) {
-	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
+	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 	type args struct {
 		ctx context.Context
 		req *user.GetUserByIDRequest
@@ -239,7 +239,7 @@ func TestServer_GetUserByID(t *testing.T) {
 }
 
 func TestServer_GetUserByID_Permission(t *testing.T) {
-	newOrgOwnerEmail := gofakeit.Email()
+	newOrgOwnerEmail := integration.Email()
 	newOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), newOrgOwnerEmail)
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
 	type args struct {
@@ -422,7 +422,7 @@ func createUser(ctx context.Context, orgID string, passwordChangeRequired bool) 
 
 func createUserWithUserName(ctx context.Context, username string, orgID string, passwordChangeRequired bool) userAttr {
 	// used as default country prefix
-	phone := "+41" + gofakeit.Phone()
+	phone := integration.Phone()
 	resp := Instance.CreateHumanUserVerified(ctx, orgID, username, phone)
 	info := userAttr{resp.GetUserId(), username, phone, nil, resp.GetDetails()}
 	// as the change date of the creation is the creation date
@@ -440,7 +440,7 @@ func TestServer_ListUsers(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
+	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 	type args struct {
 		ctx context.Context
 		req *user.ListUsersRequest
@@ -718,6 +718,86 @@ func TestServer_ListUsers(t *testing.T) {
 			},
 		},
 		{
+			// https://github.com/zitadel/zitadel/issues/10825
+			name: "list user with metadata by IDs with offset and limit, ok",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					infos := createUsers(ctx, orgResp.OrganizationId, 3, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
+					request.Queries = append(request.Queries, InUserIDsQuery(infos.userIDs()))
+
+					// With the original bug, this would multiply the "TotalResult" by 2.
+					for _, user := range infos {
+						for i := 0; i < 2; i++ {
+							Instance.SetUserMetadata(ctx, user.UserID, fmt.Sprintf("key-%d", i), fmt.Sprintf("value-%d", i))
+						}
+					}
+					infos = infos[1:] // prevent panic in user ID setting below
+
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
+					request.Query = &object.ListQuery{
+						Offset: 1,
+						Limit:  2,
+					}
+					return infos
+				},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 3,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
+				Result: []*user.User{
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
+								},
+							},
+						},
+					},
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "list user by username, ok",
 			args: args{
 				IamCTX,
@@ -902,6 +982,85 @@ func TestServer_ListUsers(t *testing.T) {
 			},
 		},
 		{
+			// https://github.com/zitadel/zitadel/issues/10825
+			name: "list user with metadata by emails with offset and limit, ok",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					infos := createUsers(ctx, orgResp.OrganizationId, 3, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
+					request.Queries = append(request.Queries, InUserEmailsQuery(infos.emails()))
+
+					// With the original bug, this would multiply the "TotalResult" by 2.
+					for _, user := range infos {
+						for i := 0; i < 2; i++ {
+							Instance.SetUserMetadata(ctx, user.UserID, fmt.Sprintf("key-%d", i), fmt.Sprintf("value-%d", i))
+						}
+					}
+					infos = infos[1:] // prevent panic in user ID setting below
+
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
+					request.Query = &object.ListQuery{
+						Offset: 1,
+						Limit:  2,
+					}
+					return infos
+				},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 3,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
+				Result: []*user.User{
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
+								},
+							},
+						},
+					}, {
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "list user in emails no found, ok",
 			args: args{
 				IamCTX,
@@ -997,7 +1156,7 @@ func TestServer_ListUsers(t *testing.T) {
 				IamCTX,
 				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-					orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
+					orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
 
 					infos := createUsers(ctx, orgResp.OrganizationId, 3, false)
 					request.Queries = []*user.SearchQuery{}
@@ -1084,7 +1243,7 @@ func TestServer_ListUsers(t *testing.T) {
 				IamCTX,
 				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
+					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 					info := createUser(ctx, orgRespForOrgTests.OrganizationId, false)
 					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgRespForOrgTests.OrganizationId))
@@ -1131,8 +1290,8 @@ func TestServer_ListUsers(t *testing.T) {
 				IamCTX,
 				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
-					orgRespForOrgTests2 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
+					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
+					orgRespForOrgTests2 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 					createUser(ctx, orgRespForOrgTests.OrganizationId, false)
 					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgRespForOrgTests2.OrganizationId))
@@ -1182,7 +1341,7 @@ func TestServer_ListUsers(t *testing.T) {
 				setPermissionCheckV2Flag(t, f.SetFlag)
 				infos := tc.args.dep(IamCTX, tc.args.req)
 
-				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.args.ctx, 20*time.Second)
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.args.ctx, time.Minute)
 				require.EventuallyWithT(t1, func(ttt *assert.CollectT) {
 					got, err := Client.ListUsers(tc.args.ctx, tc.args.req)
 					if tc.wantErr {
@@ -1234,9 +1393,9 @@ func TestServer_SystemUsers_ListUsers(t *testing.T) {
 		require.NoError(t, err)
 	}()
 
-	org1 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
+	org1 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 	org2 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), "org2@zitadel.com")
-	org3 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
+	org3 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 	_ = createUserWithUserName(IamCTX, "Test_SystemUsers_ListUser1@zitadel.com", org1.OrganizationId, false)
 	_ = createUserWithUserName(IamCTX, "Test_SystemUsers_ListUser2@zitadel.com", org2.OrganizationId, false)
 	_ = createUserWithUserName(IamCTX, "Test_SystemUsers_ListUser3@zitadel.com", org3.OrganizationId, false)

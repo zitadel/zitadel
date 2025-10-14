@@ -4,21 +4,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "build:login:standalone": "NEXT_PUBLIC_BASE_PATH=/ui/v2/login NEXT_OUTPUT_MODE=standalone next build",
-    "start": "next start",
-    "lint": "pnpm run '/^lint:check:.*$/'",
-    "lint:check:next": "next lint",
-    "lint:check:prettier": "prettier --check .",
-    "lint:fix": "prettier --write .",
-    "test:unit": "vitest --run",
+    "build": "NEXT_OUTPUT_MODE=standalone next build && cp -r public scripts/* .next/standalone/ && cp -r .next/static .next/standalone/apps/login/.next/ && rm .next/standalone/apps/login/.env",
+    "build-vercel": "next build",
+    "dev": "HOSTNAME=127.0.0.1 ./scripts/entrypoint.sh next dev",
+    "prod": "cd ./.next/standalone && HOSTNAME=127.0.0.1 ./entrypoint.sh node apps/login/server.js",
+    "lint-check-next": "next lint",
+    "lint-check-prettier": "prettier --check .",
+    "lint-fix": "prettier --write .",
+    "test-unit": "vitest --run",
     "lint-staged": "lint-staged",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .next",
-    "test:integration:login": "wait-on --simultaneous 1 http://localhost:3001/ui/v2/login/verify?userId=221394658884845598&code=abc && cypress run",
-    "test:acceptance": "dotenv -e ../login/.env.test.local playwright",
-    "test:acceptance:setup": "cd ../.. && make login_test_acceptance_setup_env && NODE_ENV=test turbo run test:acceptance:setup:dev",
-    "test:acceptance:setup:dev": "cd ../.. && make login_test_acceptance_setup_dev"
+    "clean": "rm -rf node_modules .next cypress"
   },
   "pnpm": {
     "overrides": {
@@ -36,9 +31,6 @@
     "@heroicons/react": "2.1.3",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@tailwindcss/forms": "0.5.7",
-    "@vercel/analytics": "^1.2.2",
-    "@zitadel/client": "latest",
-    "@zitadel/proto": "latest",
     "clsx": "1.2.1",
     "copy-to-clipboard": "^3.3.3",
     "deepmerge": "^4.3.1",
@@ -75,11 +67,13 @@
     "@typescript-eslint/parser": "^7.0.0",
     "@vercel/git-hooks": "1.0.0",
     "@vitejs/plugin-react": "^4.4.1",
+    "@zitadel/client": "workspace:*",
+    "@zitadel/proto": "workspace:*",
     "autoprefixer": "10.4.21",
     "concurrently": "^9.1.2",
-    "cypress": "^14.5.2",
+    "cypress": "^14.5.4",
     "dotenv-cli": "^8.0.0",
-    "env-cmd": "^10.0.0",
+    "env-cmd": "^10.1.0",
     "eslint": "^8.57.0",
     "eslint-config-next": "15.4.0-canary.86",
     "eslint-config-prettier": "^9.1.0",
@@ -99,7 +93,6 @@
     "ts-proto": "^2.7.0",
     "typescript": "^5.8.3",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^2.0.0",
-    "wait-on": "^7.2.0"
+    "vitest": "^2.0.0"
   }
 }

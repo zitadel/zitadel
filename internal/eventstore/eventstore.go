@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"sort"
 	"time"
@@ -10,6 +11,8 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
+	new_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -91,6 +94,19 @@ func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error
 // PushWithClient pushes the events in a single transaction using the provided database client
 // an event needs at least an aggregate
 func (es *Eventstore) PushWithClient(ctx context.Context, client database.ContextQueryExecuter, cmds ...Command) ([]Event, error) {
+	var dbClient new_db.QueryExecutor
+	switch client := client.(type) {
+	case *sql.DB:
+		dbClient = new_sql.SQLPool(client)
+	case *sql.Tx:
+		dbClient = new_sql.SQLTx(client)
+	case *sql.Conn:
+		dbClient = new_sql.SQLConn(client)
+	}
+	return es.PushWithNewClient(ctx, dbClient, cmds...)
+}
+
+func (es *Eventstore) PushWithNewClient(ctx context.Context, client new_db.QueryExecutor, cmds ...Command) ([]Event, error) {
 	if es.PushTimeout > 0 {
 		var cancel func()
 		ctx, cancel = context.WithTimeout(ctx, es.PushTimeout)
@@ -108,7 +124,7 @@ retry:
 	for i := 0; i <= es.maxRetries; i++ {
 		events, err = es.pusher.Push(ctx, client, cmds...)
 		// if there is a transaction passed the calling function needs to retry
-		if _, ok := client.(database.Tx); ok {
+		if _, ok := client.(new_db.Transaction); ok {
 			break retry
 		}
 		var pgErr *pgconn.PgError
@@ -284,9 +300,7 @@ type Pusher interface {
 	// Health checks if the connection to the storage is available
 	Health(ctx context.Context) error
 	// Push stores the actions
-	Push(ctx context.Context, client database.ContextQueryExecuter, commands ...Command) (_ []Event, err error)
-	// Client returns the underlying database connection
-	Client() *database.DB
+	Push(ctx context.Context, client new_db.QueryExecutor, commands ...Command) (_ []Event, err error)
 }
 
 type FillFieldsEvent interface {

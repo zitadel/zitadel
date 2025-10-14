@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -54,7 +53,7 @@ func TestServer_GetTarget(t *testing.T) {
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
-					name := gofakeit.Name()
+					name := integration.TargetName()
 					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeWebhook, false)
 					request.Id = resp.GetId()
 					response.Target.Id = resp.GetId()
@@ -81,7 +80,7 @@ func TestServer_GetTarget(t *testing.T) {
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
-					name := gofakeit.Name()
+					name := integration.TargetName()
 					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeAsync, false)
 					request.Id = resp.GetId()
 					response.Target.Id = resp.GetId()
@@ -108,7 +107,7 @@ func TestServer_GetTarget(t *testing.T) {
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
-					name := gofakeit.Name()
+					name := integration.TargetName()
 					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeWebhook, true)
 					request.Id = resp.GetId()
 					response.Target.Id = resp.GetId()
@@ -137,7 +136,7 @@ func TestServer_GetTarget(t *testing.T) {
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
-					name := gofakeit.Name()
+					name := integration.TargetName()
 					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeCall, false)
 					request.Id = resp.GetId()
 					response.Target.Id = resp.GetId()
@@ -166,7 +165,7 @@ func TestServer_GetTarget(t *testing.T) {
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
-					name := gofakeit.Name()
+					name := integration.TargetName()
 					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeCall, true)
 					request.Id = resp.GetId()
 					response.Target.Id = resp.GetId()
@@ -261,7 +260,7 @@ func TestServer_ListTargets(t *testing.T) {
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.ListTargetsRequest, response *action.ListTargetsResponse) {
-					name := gofakeit.Name()
+					name := integration.TargetName()
 					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeWebhook, false)
 					request.Filters[0].Filter = &action.TargetSearchFilter_InTargetIdsFilter{
 						InTargetIdsFilter: &action.InTargetIDsFilter{
@@ -301,7 +300,7 @@ func TestServer_ListTargets(t *testing.T) {
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.ListTargetsRequest, response *action.ListTargetsResponse) {
-					name := gofakeit.Name()
+					name := integration.TargetName()
 					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeWebhook, false)
 					request.Filters[0].Filter = &action.TargetSearchFilter_TargetNameFilter{
 						TargetNameFilter: &action.TargetNameFilter{
@@ -342,9 +341,9 @@ func TestServer_ListTargets(t *testing.T) {
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.ListTargetsRequest, response *action.ListTargetsResponse) {
-					name1 := gofakeit.Name()
-					name2 := gofakeit.Name()
-					name3 := gofakeit.Name()
+					name1 := integration.TargetName()
+					name2 := integration.TargetName()
+					name3 := integration.TargetName()
 					resp1 := instance.CreateTarget(ctx, t, name1, "https://example.com", target_domain.TargetTypeWebhook, false)
 					resp2 := instance.CreateTarget(ctx, t, name2, "https://example.com", target_domain.TargetTypeCall, true)
 					resp3 := instance.CreateTarget(ctx, t, name3, "https://example.com", target_domain.TargetTypeAsync, false)

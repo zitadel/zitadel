@@ -3,6 +3,7 @@
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
 
@@ -21,6 +22,7 @@ import {
   startIdentityProviderFlow,
 } from "../zitadel";
 import { createSessionAndUpdateCookie } from "./cookie";
+import { getOriginalHost } from "./host";
 
 export type SendLoginnameCommand = {
   loginName: string;
@@ -34,11 +36,8 @@ const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 export async function sendLoginname(command: SendLoginnameCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
 
-  if (!host) {
-    throw new Error("Could not get domain");
-  }
+  const t = await getTranslations("loginname");
 
   const loginSettingsByContext = await getLoginSettings({
     serviceUrl,
@@ -46,7 +45,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   });
 
   if (!loginSettingsByContext) {
-    return { error: "Could not get login settings" };
+    return { error: t("errors.couldNotGetLoginSettings") };
   }
 
   let searchUsersRequest: SearchUsersCommand = {
@@ -64,7 +63,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   }
 
   if (!("result" in searchResult)) {
-    return { error: "Could not search users" };
+    return { error: t("errors.couldNotSearchUsers") };
   }
 
   const { result: potentialUsers } = searchResult;
@@ -80,11 +79,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     if (identityProviders.length === 1) {
       const _headers = await headers();
       const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-      const host = _headers.get("host");
-
-      if (!host) {
-        return { error: "Could not get host" };
-      }
+      const host = await getOriginalHost();
 
       const identityProviderType = identityProviders[0].type;
 
@@ -116,7 +111,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       });
 
       if (!url) {
-        return { error: "Could not start IDP flow" };
+        return { error: t("errors.couldNotStartIDPFlow") };
       }
 
       return { redirect: url };
@@ -134,11 +129,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     if (identityProviders.length === 1) {
       const _headers = await headers();
       const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-      const host = _headers.get("host");
-
-      if (!host) {
-        return { error: "Could not get host" };
-      }
+      const host = await getOriginalHost();
 
       const identityProviderId = identityProviders[0].idpId;
 
@@ -150,7 +141,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       const idpType = idp?.type;
 
       if (!idp || !idpType) {
-        throw new Error("Could not find identity provider");
+        throw new Error(t("errors.couldNotFindIdentityProvider"));
       }
 
       const identityProviderType = idpTypeToIdentityProviderType(idpType);
@@ -182,7 +173,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       });
 
       if (!url) {
-        return { error: "Could not start IDP flow" };
+        return { error: t("errors.couldNotStartIDPFlow") };
       }
 
       return { redirect: url };
@@ -190,7 +181,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   };
 
   if (potentialUsers.length > 1) {
-    return { error: "More than one user found. Provide a unique identifier." };
+    return { error: t("errors.moreThanOneUserFound") };
   } else if (potentialUsers.length == 1 && potentialUsers[0].userId) {
     const user = potentialUsers[0];
     const userId = potentialUsers[0].userId;
@@ -208,15 +199,15 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     // recheck login settings after user discovery, as the search might have been done without org scope
     if (userLoginSettings?.disableLoginWithEmail && userLoginSettings?.disableLoginWithPhone) {
       if (user.preferredLoginName !== concatLoginname) {
-        return { error: "User not found in the system!" };
+        return { error: t("errors.userNotFound") };
       }
     } else if (userLoginSettings?.disableLoginWithEmail) {
       if (user.preferredLoginName !== concatLoginname || humanUser?.phone?.phone !== command.loginName) {
-        return { error: "User not found in the system!" };
+        return { error: t("errors.userNotFound") };
       }
     } else if (userLoginSettings?.disableLoginWithPhone) {
       if (user.preferredLoginName !== concatLoginname || humanUser?.email?.email !== command.loginName) {
-        return { error: "User not found in the system!" };
+        return { error: t("errors.userNotFound") };
       }
     }
 
@@ -224,18 +215,29 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       user: { search: { case: "userId", value: userId } },
     });
 
-    const session = await createSessionAndUpdateCookie({
+    const sessionOrError = await createSessionAndUpdateCookie({
       checks,
       requestId: command.requestId,
+    }).catch((error) => {
+      if (error?.rawMessage === "Errors.User.NotActive (SESSION-Gj4ko)") {
+        return { error: t("errors.userNotActive") };
+      }
+      throw error;
     });
 
+    if ("error" in sessionOrError) {
+      return sessionOrError;
+    }
+
+    const session = sessionOrError;
+
     if (!session.factors?.user?.id) {
-      return { error: "Could not create session for user" };
+      return { error: t("errors.couldNotCreateSession") };
     }
 
     // TODO: check if handling of userstate INITIAL is needed
     if (user.state === UserState.INITIAL) {
-      return { error: "Initial User not supported" };
+      return { error: t("errors.initialUserNotSupported") };
     }
 
     const methods = await listAuthenticationMethodTypes({
@@ -267,8 +269,14 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       switch (method) {
         case AuthenticationMethodType.PASSWORD: // user has only password as auth method
           if (!userLoginSettings?.allowUsernamePassword) {
+            // Check if user has IDPs available as alternative, that could eventually be used to register/link.
+            const idpResp = await redirectUserToIDP(userId);
+            if (idpResp?.redirect) {
+              return idpResp;
+            }
+
             return {
-              error: "Username Password not allowed! Contact your administrator for more information.",
+              error: t("errors.usernamePasswordNotAllowed"),
             };
           }
 
@@ -293,7 +301,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         case AuthenticationMethodType.PASSKEY: // AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY
           if (userLoginSettings?.passkeysType === PasskeysType.NOT_ALLOWED) {
             return {
-              error: "Passkeys not allowed! Contact your administrator for more information.",
+              error: t("errors.passkeysNotAllowed"),
             };
           }
 
@@ -324,7 +332,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSKEY)) {
         const passkeyParams = new URLSearchParams({
           loginName: session.factors?.user?.loginName,
-          altPassword: `${methods.authMethodTypes.includes(1)}`, // show alternative password option
+          altPassword: `${methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD) && userLoginSettings?.allowUsernamePassword}`, // show alternative password option only if allowed
         });
 
         if (command.requestId) {
@@ -339,7 +347,14 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       } else if (methods.authMethodTypes.includes(AuthenticationMethodType.IDP)) {
         return redirectUserToIDP(userId);
       } else if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)) {
-        // user has no passkey setup and login settings allow passkeys
+        // Check if password authentication is allowed
+        if (!userLoginSettings?.allowUsernamePassword) {
+          return {
+            error: "Username Password not allowed! Contact your administrator for more information.",
+          };
+        }
+
+        // user has no passkey setup and login settings allow passwords
         const paramsPasswordDefault = new URLSearchParams({
           loginName: session.factors?.user?.loginName,
         });
@@ -365,7 +380,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     if (resp) {
       return resp;
     }
-    return { error: "User not found in the system" };
+    return { error: t("errors.userNotFound") };
   } else if (loginSettingsByContext?.allowRegister && loginSettingsByContext?.allowUsernamePassword) {
     let orgToRegisterOn: string | undefined = command.organization;
 
@@ -428,5 +443,5 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   // fallbackToPassword
 
-  return { error: "User not found in the system" };
+  return { error: t("errors.userNotFound") };
 }

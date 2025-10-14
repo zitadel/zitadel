@@ -18,12 +18,10 @@ export async function loginSuccess(
         <p className="ztdl-p">
           <Translated i18nKey="loginSuccess.description" namespace="idp" />
         </p>
+      </div>
 
-        <IdpSignin
-          userId={userId}
-          idpIntent={idpIntent}
-          requestId={requestId}
-        />
+      <div className="w-full">
+        <IdpSignin userId={userId} idpIntent={idpIntent} requestId={requestId} />
       </div>
     </DynamicTheme>
   );

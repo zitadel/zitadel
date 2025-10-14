@@ -11,6 +11,7 @@ import { FormBuilder, FormControl, Validators } from '@angular/forms';
   selector: 'cnsl-project-create',
   templateUrl: './project-create.component.html',
   styleUrls: ['./project-create.component.scss'],
+  standalone: false,
 })
 export class ProjectCreateComponent {
   protected readonly form: ReturnType<typeof this.buildForm>;
