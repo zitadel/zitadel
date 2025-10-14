@@ -114,14 +114,11 @@ func (o orgMetadata) Set(ctx context.Context, client database.QueryExecutor, met
 
 // Remove implements [domain.OrganizationMetadataRepository].
 func (o orgMetadata) Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	var builder database.StatementBuilder
-	if !condition.IsRestrictingColumn(o.InstanceIDColumn()) {
-		return 0, database.NewMissingConditionError(o.InstanceIDColumn())
-	}
-	if !condition.IsRestrictingColumn(o.OrgIDColumn()) {
-		return 0, database.NewMissingConditionError(o.OrgIDColumn())
+	if err := checkPKCondition(o, condition); err != nil {
+		return 0, err
 	}
 
+	var builder database.StatementBuilder
 	builder.WriteString(`DELETE FROM zitadel.org_metadata `)
 	writeCondition(&builder, condition)
 
@@ -131,6 +128,15 @@ func (o orgMetadata) Remove(ctx context.Context, client database.QueryExecutor, 
 // -------------------------------------------------------------
 // conditions
 // -------------------------------------------------------------
+
+// PrimaryKeyCondition implements [domain.OrganizationMetadataRepository].
+func (o orgMetadata) PrimaryKeyCondition(instanceID string, orgID string, key string) database.Condition {
+	return database.And(
+		o.InstanceIDCondition(instanceID),
+		o.OrgIDCondition(orgID),
+		o.KeyCondition(database.TextOperationEqual, key),
+	)
+}
 
 // InstanceIDCondition implements [domain.OrganizationMetadataRepository].
 func (o orgMetadata) InstanceIDCondition(instanceID string) database.Condition {
@@ -155,6 +161,11 @@ func (o orgMetadata) ValueCondition(op database.BytesOperation, value []byte) da
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
+
+// PrimaryKeyColumns implements [domain.OrganizationMetadataRepository].
+func (o orgMetadata) PrimaryKeyColumns() []database.Column {
+	return []database.Column{o.InstanceIDColumn(), o.OrgIDColumn(), o.KeyColumn()}
+}
 
 // CreatedAtColumn implements [domain.OrganizationMetadataRepository].
 func (o orgMetadata) CreatedAtColumn() database.Column {

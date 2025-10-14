@@ -18,6 +18,8 @@ type Metadata struct {
 }
 
 type MetadataColumns interface {
+	// PrimaryKeyColumns returns the columns for the primary key.
+	PrimaryKeyColumns() []database.Column
 	// InstanceIDColumn returns the column for the instance id field.
 	InstanceIDColumn() database.Column
 	// KeyColumn returns the column for the key field.

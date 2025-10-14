@@ -19,6 +19,8 @@ type organizationMetadataColumns interface {
 
 type organizationMetadataConditions interface {
 	MetadataConditions
+	// PrimaryKeyCondition returns the condition for the primary key fields.
+	PrimaryKeyCondition(instanceID, orgID, key string) database.Condition
 	// OrgIDCondition returns a filter on the org id field.
 	OrgIDCondition(orgID string) database.Condition
 }
