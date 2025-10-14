@@ -9,9 +9,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/target"
@@ -130,7 +130,7 @@ func TestCommands_AddTarget(t *testing.T) {
 						target.NewAddedEvent(context.Background(),
 							target.NewAggregate("id1", "instance"),
 							"name",
-							domain.TargetTypeWebhook,
+							target_domain.TargetTypeWebhook,
 							"https://example.com",
 							time.Second,
 							false,
@@ -153,7 +153,7 @@ func TestCommands_AddTarget(t *testing.T) {
 					Name:       "name",
 					Endpoint:   "https://example.com",
 					Timeout:    time.Second,
-					TargetType: domain.TargetTypeWebhook,
+					TargetType: target_domain.TargetTypeWebhook,
 				},
 				resourceOwner: "instance",
 			},
@@ -177,7 +177,7 @@ func TestCommands_AddTarget(t *testing.T) {
 				ctx: context.Background(),
 				add: &AddTarget{
 					Name:       "name",
-					TargetType: domain.TargetTypeWebhook,
+					TargetType: target_domain.TargetTypeWebhook,
 					Timeout:    time.Second,
 					Endpoint:   "https://example.com",
 				},
@@ -204,7 +204,7 @@ func TestCommands_AddTarget(t *testing.T) {
 				ctx: context.Background(),
 				add: &AddTarget{
 					Name:       "name",
-					TargetType: domain.TargetTypeWebhook,
+					TargetType: target_domain.TargetTypeWebhook,
 					Timeout:    time.Second,
 					Endpoint:   "https://example.com",
 				},
@@ -235,7 +235,7 @@ func TestCommands_AddTarget(t *testing.T) {
 				ctx: context.Background(),
 				add: &AddTarget{
 					Name:             "name",
-					TargetType:       domain.TargetTypeWebhook,
+					TargetType:       target_domain.TargetTypeWebhook,
 					Endpoint:         "https://example.com",
 					Timeout:          time.Second,
 					InterruptOnError: true,
@@ -419,7 +419,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "id1",
 					},
-					TargetType: gu.Ptr(domain.TargetTypeWebhook),
+					TargetType: gu.Ptr(target_domain.TargetTypeWebhook),
 				},
 				resourceOwner: "instance",
 			},
@@ -505,7 +505,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 							[]target.Changes{
 								target.ChangeName("name", "name2"),
 								target.ChangeEndpoint("https://example2.com"),
-								target.ChangeTargetType(domain.TargetTypeCall),
+								target.ChangeTargetType(target_domain.TargetTypeCall),
 								target.ChangeTimeout(10 * time.Second),
 								target.ChangeInterruptOnError(true),
 								target.ChangeSigningKey(&crypto.CryptoValue{
@@ -529,7 +529,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 					},
 					Name:                 gu.Ptr("name2"),
 					Endpoint:             gu.Ptr("https://example2.com"),
-					TargetType:           gu.Ptr(domain.TargetTypeCall),
+					TargetType:           gu.Ptr(target_domain.TargetTypeCall),
 					Timeout:              gu.Ptr(10 * time.Second),
 					InterruptOnError:     gu.Ptr(true),
 					ExpirationSigningKey: true,

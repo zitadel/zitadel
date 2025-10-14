@@ -37,7 +37,6 @@ import {
   combineLatestWith,
   defer,
   EMPTY,
-  identity,
   mergeWith,
   Observable,
   ObservedValueOf,
@@ -82,6 +81,7 @@ type UserWithHumanType = Omit<UserV2, 'type'> & { type: { case: 'human'; value: 
   selector: 'cnsl-user-detail',
   templateUrl: './user-detail.component.html',
   styleUrls: ['./user-detail.component.scss'],
+  standalone: false,
 })
 export class UserDetailComponent implements OnInit {
   public user$: Observable<UserQuery>;

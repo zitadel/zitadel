@@ -89,7 +89,7 @@ describe("verify invite", () => {
     });
   });
 
-  it.only("shows authenticators after successful invite verification", () => {
+  it("shows authenticators after successful invite verification", () => {
     stub("zitadel.user.v2.UserService", "VerifyInviteCode");
 
     cy.visit("/verify?userId=221394658884845598&code=abc&invite=true");

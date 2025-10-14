@@ -17,6 +17,7 @@ import { Location } from '@angular/common';
   selector: 'cnsl-app-create',
   templateUrl: './app-create.component.html',
   styleUrls: ['./app-create.component.scss'],
+  standalone: false,
 })
 export class AppCreateComponent implements OnDestroy {
   public InfoSectionType: any = InfoSectionType;

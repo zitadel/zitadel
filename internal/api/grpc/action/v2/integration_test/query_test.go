@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	"github.com/zitadel/zitadel/internal/domain"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/filter/v2"
@@ -54,7 +54,7 @@ func TestServer_GetTarget(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
 					name := integration.TargetName()
-					resp := instance.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, false)
+					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeWebhook, false)
 					request.Id = resp.GetId()
 					response.Target.Id = resp.GetId()
 					response.Target.Name = name
@@ -81,7 +81,7 @@ func TestServer_GetTarget(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
 					name := integration.TargetName()
-					resp := instance.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeAsync, false)
+					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeAsync, false)
 					request.Id = resp.GetId()
 					response.Target.Id = resp.GetId()
 					response.Target.Name = name
@@ -108,7 +108,7 @@ func TestServer_GetTarget(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
 					name := integration.TargetName()
-					resp := instance.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, true)
+					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeWebhook, true)
 					request.Id = resp.GetId()
 					response.Target.Id = resp.GetId()
 					response.Target.Name = name
@@ -137,7 +137,7 @@ func TestServer_GetTarget(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
 					name := integration.TargetName()
-					resp := instance.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeCall, false)
+					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeCall, false)
 					request.Id = resp.GetId()
 					response.Target.Id = resp.GetId()
 					response.Target.Name = name
@@ -166,7 +166,7 @@ func TestServer_GetTarget(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
 					name := integration.TargetName()
-					resp := instance.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeCall, true)
+					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeCall, true)
 					request.Id = resp.GetId()
 					response.Target.Id = resp.GetId()
 					response.Target.Name = name
@@ -261,7 +261,7 @@ func TestServer_ListTargets(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.ListTargetsRequest, response *action.ListTargetsResponse) {
 					name := integration.TargetName()
-					resp := instance.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, false)
+					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeWebhook, false)
 					request.Filters[0].Filter = &action.TargetSearchFilter_InTargetIdsFilter{
 						InTargetIdsFilter: &action.InTargetIDsFilter{
 							TargetIds: []string{resp.GetId()},
@@ -301,7 +301,7 @@ func TestServer_ListTargets(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.ListTargetsRequest, response *action.ListTargetsResponse) {
 					name := integration.TargetName()
-					resp := instance.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, false)
+					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeWebhook, false)
 					request.Filters[0].Filter = &action.TargetSearchFilter_TargetNameFilter{
 						TargetNameFilter: &action.TargetNameFilter{
 							TargetName: name,
@@ -344,9 +344,9 @@ func TestServer_ListTargets(t *testing.T) {
 					name1 := integration.TargetName()
 					name2 := integration.TargetName()
 					name3 := integration.TargetName()
-					resp1 := instance.CreateTarget(ctx, t, name1, "https://example.com", domain.TargetTypeWebhook, false)
-					resp2 := instance.CreateTarget(ctx, t, name2, "https://example.com", domain.TargetTypeCall, true)
-					resp3 := instance.CreateTarget(ctx, t, name3, "https://example.com", domain.TargetTypeAsync, false)
+					resp1 := instance.CreateTarget(ctx, t, name1, "https://example.com", target_domain.TargetTypeWebhook, false)
+					resp2 := instance.CreateTarget(ctx, t, name2, "https://example.com", target_domain.TargetTypeCall, true)
+					resp3 := instance.CreateTarget(ctx, t, name3, "https://example.com", target_domain.TargetTypeAsync, false)
 					request.Filters[0].Filter = &action.TargetSearchFilter_InTargetIdsFilter{
 						InTargetIdsFilter: &action.InTargetIDsFilter{
 							TargetIds: []string{resp1.GetId(), resp2.GetId(), resp3.GetId()},
@@ -445,7 +445,7 @@ func assertPaginationResponse(t *assert.CollectT, expected *filter.PaginationRes
 func TestServer_ListExecutions(t *testing.T) {
 	instance := integration.NewInstance(CTX)
 	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false)
+	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false)
 
 	type args struct {
 		ctx context.Context
@@ -523,7 +523,7 @@ func TestServer_ListExecutions(t *testing.T) {
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.ListExecutionsRequest, response *action.ListExecutionsResponse) {
-					target := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false)
+					target := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false)
 					// add target as Filter to the request
 					request.Filters[0] = &action.ExecutionSearchFilter{
 						Filter: &action.ExecutionSearchFilter_TargetFilter{

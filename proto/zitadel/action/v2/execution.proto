@@ -15,20 +15,27 @@ import "google/protobuf/timestamp.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/action/v2;action";
 
 message Execution {
+  // The condition under which the execution is triggered.
   Condition condition = 1;
+
   // The timestamp of the execution creation.
   google.protobuf.Timestamp creation_date = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2024-12-18T07:50:47.492Z\"";
     }
   ];
+
   // The timestamp of the last change to the execution.
   google.protobuf.Timestamp change_date = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
     }
   ];
+
   // Ordered list of targets called during the execution.
+  // The order of the targets in this list defines the order of execution.
+  // If one of the targets fails, depending on the target's type and settings,
+  // the execution might be interrupted and the following targets will not be called.
   repeated string targets = 4;
 }
 
@@ -39,10 +46,13 @@ message Condition {
 
     // Condition-type to execute if a request on the defined API point happens.
     RequestExecution request = 1;
+
     // Condition-type to execute on response if a request on the defined API point happens.
     ResponseExecution response = 2;
+
     // Condition-type to execute if function is used, replaces actions v1.
     FunctionExecution function = 3;
+
     // Condition-type to execute if an event is created in the system.
     EventExecution event = 4;
   }
@@ -52,7 +62,9 @@ message RequestExecution {
   // Condition for the request execution. Only one is possible.
   oneof condition{
     option (validate.required) = true;
-    // GRPC-method as condition.
+
+    // Define a GRPC-method as condition.
+    // When a request to this method happens, the execution is triggered.
     string method = 1 [
       (validate.rules).string = {min_len: 1, max_len: 1000},
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -61,7 +73,9 @@ message RequestExecution {
         example: "\"/zitadel.session.v2.SessionService/ListSessions\"";
       }
     ];
-    // GRPC-service as condition.
+
+    // Define a GRPC-service as condition.
+    // When a request to any method of this service happens, the execution is triggered.
     string service = 2 [
       (validate.rules).string = {min_len: 1, max_len: 1000},
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -70,7 +84,9 @@ message RequestExecution {
         example: "\"zitadel.session.v2.SessionService\"";
       }
     ];
-    // All calls to any available services and methods as condition.
+
+    // Define all calls as condition.
+    // When a call to any available service happens, the execution is triggered.
     bool all = 3 [(validate.rules).bool = {const: true}];
   }
 }
@@ -79,7 +95,9 @@ message ResponseExecution {
   // Condition for the response execution. Only one is possible.
   oneof condition{
     option (validate.required) = true;
-    // GRPC-method as condition.
+
+    // Define a GRPC-method as condition.
+    // Before a response is returned to the client from this method, the execution is triggered.
     string method = 1 [
       (validate.rules).string = {min_len: 1, max_len: 1000},
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -88,7 +106,9 @@ message ResponseExecution {
         example: "\"/zitadel.session.v2.SessionService/ListSessions\"";
       }
     ];
-    // GRPC-service as condition.
+
+    // Define a GRPC-service as condition.
+    // Before a response is returned to the client from any method of this service, the execution is triggered.
     string service = 2 [
       (validate.rules).string = {min_len: 1, max_len: 1000},
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -97,7 +117,10 @@ message ResponseExecution {
         example: "\"zitadel.session.v2.SessionService\"";
       }
     ];
-    // All calls to any available services and methods as condition.
+
+    // Define all calls as condition.
+    // Before a response is returned to the client from any available service,
+    // the execution is triggered.
     bool all = 3 [(validate.rules).bool = {const: true}];
   }
 }
@@ -111,7 +134,9 @@ message EventExecution {
   // Condition for the event execution. Only one is possible.
   oneof condition{
     option (validate.required) = true;
-    // Event name as condition.
+
+    // Define a specific event as condition.
+    // After this event is created, the execution is triggered.
     string event = 1 [
       (validate.rules).string = {min_len: 1, max_len: 1000},
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -120,7 +145,9 @@ message EventExecution {
         example: "\"user.human.added\"";
       }
     ];
-    // Event group as condition, all events under this group.
+
+    // Define an event group as condition.
+    // After any event under this group is created, the execution is triggered.
     string group = 2 [
       (validate.rules).string = {min_len: 1, max_len: 1000},
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -129,7 +156,9 @@ message EventExecution {
         example: "\"user.human\"";
       }
     ];
-    // all events as condition.
+
+    // Define all events as condition.
+    // After any event is created, the execution is triggered.
     bool all = 3 [(validate.rules).bool = {const: true}];
   }
 }

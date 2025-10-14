@@ -27,8 +27,37 @@
     "description": "Geben Sie Ihre Anmeldedaten ein.",
     "register": "Neuen Benutzer registrieren",
     "submit": "Weiter",
+    "labels": {
+      "loginname": "Loginname",
+      "username": "Benutzername",
+      "usernameOrPhoneNumber": "Benutzername oder Telefonnummer",
+      "usernameOrEmail": "Benutzername oder E-Mail"
+    },
     "required": {
       "loginName": "Dieses Feld ist erforderlich"
+    },
+    "errors": {
+      "internalError": "Ein interner Fehler ist aufgetreten",
+      "couldNotGetLoginSettings": "Anmeldeeinstellungen konnten nicht abgerufen werden",
+      "couldNotSearchUsers": "Benutzer konnten nicht durchsucht werden",
+      "couldNotGetDomain": "Domain konnte nicht abgerufen werden",
+      "couldNotGetHost": "Host konnte nicht abgerufen werden",
+      "couldNotStartIDPFlow": "IDP-Ablauf konnte nicht gestartet werden",
+      "moreThanOneUserFound": "Mehr als ein Benutzer gefunden. Bitte geben Sie einen eindeutigen Identifikator an.",
+      "userNotFound": "Benutzer im System nicht gefunden",
+      "couldNotCreateSession": "Sitzung für Benutzer konnte nicht erstellt werden",
+      "initialUserNotSupported": "Initialer Benutzer wird nicht unterstützt",
+      "usernamePasswordNotAllowed": "Benutzername und Passwort nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator.",
+      "passkeysNotAllowed": "Passkeys nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator.",
+      "couldNotFindIdentityProvider": "Identitätsanbieter konnte nicht gefunden werden.",
+      "userNotActive": "Das Benutzerkonto ist inaktiv. Wenden Sie sich für weitere Informationen an Ihren Administrator."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Ein Fehler ist aufgetreten",
+      "multipleUsersFound": "Mehrere Benutzer gefunden",
+      "userNotFound": "Benutzer im System nicht gefunden"
     }
   },
   "password": {
@@ -37,8 +66,18 @@
       "description": "Geben Sie Ihr Passwort ein.",
       "resetPassword": "Passwort zurücksetzen",
       "submit": "Weiter",
+      "labels": {
+        "password": "Passwort"
+      },
       "required": {
         "password": "Dieses Feld ist erforderlich"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden",
+        "couldNotResetPassword": "Passwort konnte nicht zurückgesetzt werden"
+      },
+      "info": {
+        "passwordResetSent": "Passwort wurde zurückgesetzt. Bitte prüfen Sie Ihre E-Mails"
       }
     },
     "set": {
@@ -48,20 +87,67 @@
       "noCodeReceived": "Keinen Code erhalten?",
       "resend": "Erneut senden",
       "submit": "Weiter",
+      "labels": {
+        "code": "Code",
+        "newPassword": "Neues Passwort",
+        "confirmPassword": "Neues Passwort wiederholen"
+      },
       "required": {
         "code": "Dieses Feld ist erforderlich",
         "newPassword": "Bitte geben Sie ein Passwort ein!",
         "confirmPassword": "Dieses Feld ist erforderlich"
+      },
+      "errors": {
+        "couldNotSetPassword": "Passwort konnte nicht gesetzt werden",
+        "couldNotResetPassword": "Passwort konnte nicht zurückgesetzt werden",
+        "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden"
       }
     },
     "change": {
       "title": "Passwort ändern",
       "description": "Legen Sie das Passwort für Ihr Konto fest",
       "submit": "Weiter",
+      "labels": {
+        "newPassword": "Neues Passwort",
+        "confirmPassword": "Neues Passwort wiederholen"
+      },
       "required": {
         "newPassword": "Bitte geben Sie ein neues Passwort ein!",
         "confirmPassword": "Dieses Feld ist erforderlich"
+      },
+      "errors": {
+        "couldNotChangePassword": "Passwort konnte nicht geändert werden",
+        "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden",
+        "unknownError": "Unbekannter Fehler"
       }
+    },
+    "complexity": {
+      "length": "Muss mindestens {minLength} Zeichen lang sein.",
+      "hasSymbol": "Muss ein Symbol enthalten.",
+      "hasNumber": "Muss eine Zahl enthalten.",
+      "hasUppercase": "Muss einen Großbuchstaben enthalten.",
+      "hasLowercase": "Muss einen Kleinbuchstaben enthalten.",
+      "equals": "Passwortbestätigung stimmt überein.",
+      "matches": "Stimmt überein",
+      "doesNotMatch": "Stimmt nicht überein"
+    },
+    "errors": {
+      "noHostFound": "Kein Host gefunden",
+      "couldNotSendResetLink": "Passwort-Zurücksetzungslink konnte nicht gesendet werden",
+      "couldNotCreateSessionForUser": "Sitzung für Benutzer konnte nicht erstellt werden",
+      "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden",
+      "failedToAuthenticate": "Authentifizierung fehlgeschlagen. Sie haben {failedAttempts} von {maxPasswordAttempts} Passwortversuchen.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Authentifizierung fehlgeschlagen.",
+      "accountLockedContactAdmin": " Kontaktieren Sie Ihren Administrator, um Ihr Konto zu entsperren",
+      "userNotFound": "Benutzer nicht im System gefunden",
+      "initialUserNotSupported": "Initialbenutzer wird nicht unterstützt",
+      "userInitialStateNotSupported": "Anfangszustand des Benutzers wird nicht unterstützt",
+      "codeOrVerificationRequired": "Sie müssen einen Code angeben oder eine gültige Benutzerverifizierung durchführen",
+      "verificationRequired": "Die Benutzerverifizierung muss durchgeführt werden",
+      "couldNotLoadSession": "Sitzung konnte nicht geladen werden",
+      "couldNotLoadAuthMethods": "Authentifizierungsmethoden konnten nicht geladen werden",
+      "failedPrecondition": "Vorbedingung fehlgeschlagen",
+      "sessionNotValid": "Sitzung ist nicht gültig"
     }
   },
   "idp": {
@@ -101,9 +187,11 @@
   "ldap": {
     "title": "LDAP Login",
     "description": "Geben Sie Ihre LDAP-Anmeldedaten ein.",
-    "username": "Benutzername",
-    "password": "Passwort",
     "submit": "Weiter",
+    "labels": {
+      "username": "Benutzername",
+      "password": "Passwort"
+    },
     "required": {
       "username": "Dieses Feld ist erforderlich",
       "password": "Dieses Feld ist erforderlich"
@@ -130,6 +218,9 @@
       "noCodeReceived": "Keinen Code erhalten?",
       "resendCode": "Code erneut senden",
       "submit": "Weiter",
+      "labels": {
+        "code": "Code"
+      },
       "required": {
         "code": "Dieses Feld ist erforderlich"
       }
@@ -141,6 +232,9 @@
       "emailDescription": "Geben Sie Ihre E-Mail-Adresse ein, um einen Code per E-Mail zu erhalten.",
       "totpRegisterDescription": "Scannen Sie den QR-Code oder navigieren Sie manuell zur URL.",
       "submit": "Weiter",
+      "labels": {
+        "code": "Code"
+      },
       "required": {
         "code": "Dieses Feld ist erforderlich"
       }
@@ -178,7 +272,7 @@
   "register": {
     "methods": {
       "passkey": "Passkey",
-      "password": "Password"
+      "password": "Passwort"
     },
     "disabled": {
       "title": "Registrierung deaktiviert",
@@ -196,20 +290,35 @@
     "termsOfService": "Nutzungsbedingungen",
     "privacyPolicy": "Datenschutzrichtlinie",
     "submit": "Weiter",
-    "orUseIDP": "oder verwenden Sie einen Identitätsanbieter",
     "password": {
       "title": "Passwort festlegen",
       "description": "Legen Sie das Passwort für Ihr Konto fest",
       "submit": "Weiter",
+      "labels": {
+        "password": "Passwort",
+        "confirmPassword": "Neues Passwort wiederholen"
+      },
       "required": {
         "password": "Bitte geben Sie ein Passwort ein!",
         "confirmPassword": "Dieses Feld ist erforderlich"
       }
     },
+    "labels": {
+      "firstname": "Vorname",
+      "lastname": "Nachname",
+      "email": "E-Mail"
+    },
     "required": {
       "firstname": "Dieses Feld ist erforderlich",
       "lastname": "Dieses Feld ist erforderlich",
       "email": "Dieses Feld ist erforderlich"
+    },
+    "errors": {
+      "couldNotCreateUser": "Benutzer konnte nicht erstellt werden",
+      "couldNotCreateSession": "Sitzung konnte nicht erstellt werden",
+      "userNotFound": "Benutzer nicht im System gefunden",
+      "couldNotLinkIDP": "IDP konnte nicht mit dem Benutzer verknüpft werden",
+      "couldNotRegisterUser": "Benutzer konnte nicht registriert werden"
     }
   },
   "invite": {
@@ -247,9 +356,25 @@
       "resendCode": "Code erneut senden",
       "codeSent": "Ein Code wurde gerade an Ihre E-Mail-Adresse gesendet.",
       "submit": "Weiter",
+      "labels": {
+        "code": "Code"
+      },
       "required": {
         "code": "Dieses Feld ist erforderlich"
       }
+    },
+    "errors": {
+      "couldNotResendEmail": "E-Mail konnte nicht erneut gesendet werden",
+      "couldNotVerifyUser": "Benutzer konnte nicht verifiziert werden",
+      "couldNotVerifyInvite": "Einladung konnte nicht verifiziert werden",
+      "couldNotVerifyEmail": "E-Mail konnte nicht verifiziert werden",
+      "couldNotVerify": "Konnte nicht verifizieren",
+      "couldNotLoadUser": "Benutzer konnte nicht geladen werden",
+      "couldNotLoadAuthenticators": "Mögliche Authentifikatoren konnten nicht geladen werden",
+      "couldNotCreateSession": "Sitzung konnte nicht erstellt werden",
+      "noHostFound": "Kein Host gefunden",
+      "userAlreadyVerified": "Benutzer ist bereits verifiziert!",
+      "couldNotResendInvite": "Einladung konnte nicht erneut gesendet werden"
     }
   },
   "authenticator": {
@@ -264,6 +389,9 @@
       "title": "Gerätecode",
       "description": "Geben Sie den Code ein.",
       "submit": "Weiter",
+      "labels": {
+        "code": "Code"
+      },
       "required": {
         "code": "Dieses Feld ist erforderlich"
       }

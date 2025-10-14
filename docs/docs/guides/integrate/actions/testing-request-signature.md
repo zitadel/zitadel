@@ -72,6 +72,12 @@ func main() {
 }
 ```
 
+:::info  
+The example above runs only on your local machine (`localhost`).  
+To test it with Zitadel, you must make your listener reachable from the internet.  
+You can do this by using **Webhook.site** (see [Creating a Listener with Webhook.site](./webhook-site-setup)).  
+:::
+
 ## Create target
 
 As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as webhook, the target can be created as follows:
@@ -110,7 +116,7 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
 --data-raw '{
     "condition": {
         "request": {
-            "method": "/zitadel.user.v2.UserService/AddHumanUser"
+            "method": "/zitadel.user.v2.UserService/CreateUser"
         }
     },
     "targets": [
@@ -125,17 +131,27 @@ Now that you have set up the target and execution, you can test it by creating a
 by calling the ZITADEL API to create a human user.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
+curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/new' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
 --data-raw '{
-    "profile": {
-        "givenName": "Example_given",
-        "familyName": "Example_family"
-    },
-    "email": {
-        "email": "example@example.com"
+    "organizationId": "336392597046099971",
+    "human":
+    {
+        "profile":
+        {
+            "givenName": "Minnie",
+            "familyName": "Mouse",
+            "nickName": "Mini",
+            "displayName": "Minnie Mouse",
+            "preferredLanguage": "en",
+            "gender": "GENDER_FEMALE"
+        },
+        "email":
+        {
+            "email": "mini@mouse.com"
+        }
     }
 }'
 ```
@@ -143,22 +159,48 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
 Your server should now print out something like the following. Check out
 the [Sent information Request](./usage#sent-information-request) payload description.
 
-```shell
+```json
 {
-  "fullMethod": "/zitadel.user.v2.UserService/AddHumanUser",
-  "instanceID": "262851882718855632",
-  "orgID": "262851882718921168",
-  "projectID": "262851882719052240",
-  "userID": "262851882718986704",
-  "request": {
-    "profile": {
-      "given_name": "Example_given",
-      "family_name": "Example_family"
+    "fullMethod": "/zitadel.user.v2.UserService/CreateUser",
+    "instanceID": "336392597046034435",
+    "orgID": "336392597046099971",
+    "projectID": "336392597046165507",
+    "userID": "336392597046755331",
+    "request":
+    {
+        "organizationId": "336392597046099971",
+        "human":
+        {
+            "profile":
+            {
+                "givenName": "Minnie",
+                "familyName": "Mouse",
+                "nickName": "Mini",
+                "displayName": "Minnie Mouse",
+                "preferredLanguage": "en",
+                "gender": "GENDER_FEMALE"
+            },
+            "email":
+            {
+                "email": "mini1@mouse.com"
+            }
+        }
     },
-    "email": {
-      "email": "example@example.com"
+    "headers":
+    {
+        "Content-Type":
+        [
+            "application/grpc"
+        ],
+        "Host":
+        [
+            "localhost:8080"
+        ],
+        "X-Forwarded-Host":
+        [
+            "localhost:8080"
+        ]
     }
-  }
 }
 ```
 

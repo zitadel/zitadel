@@ -1521,7 +1521,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ketika flag ini diaktifkan, konsol menggunakan API Pengguna V2 untuk membuat pengguna baru. Dengan API V2, pengguna yang baru dibuat dimulai tanpa keadaan awal.",
       "LOGINV2": "Login V2",
       "LOGINV2_DESCRIPTION": "Mengaktifkan ini akan mengaktifkan antarmuka login baru berbasis TypeScript dengan keamanan, performa, dan kustomisasi yang lebih baik.",
-      "LOGINV2_BASEURI": "URI dasar"
+      "LOGINV2_BASEURI": "URI dasar",
+      "ENABLERELATIONALTABLES": "Tabel Relasional",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Aktifkan ini untuk menggunakan tabel relasional alih-alih proyeksi untuk menyimpan data. Saat ini, toggle ini tidak berfungsi."
     },
     "DIALOG": {
       "RESET": {
@@ -2150,6 +2152,7 @@
       "METADATAURL": "URL metadata",
       "BINDING": "Mengikat",
       "SIGNEDREQUEST": "Permintaan yang Ditandatangani",
+      "SIGNATUREALGORITHM": "Algoritma tanda tangan",
       "NAMEIDFORMAT": "Format ID Nama",
       "TRANSIENTMAPPINGATTRIBUTENAME": "Nama Atribut Pemetaan Khusus",
       "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Nama atribut alternatif untuk memetakan pengguna jika `format nameid` yang dikembalikan adalah `sementara`, mis. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"

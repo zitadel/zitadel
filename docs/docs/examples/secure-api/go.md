@@ -98,7 +98,7 @@ https://github.com/zitadel/zitadel-go/blob/next/example/api/http/main.go
 ```
 
 You will need to provide some values for the program to run:
-- `domain`: Your ZITADEL instance domain, e.g. https://my-domain.zitadel.cloud
+- `domain`: Your ZITADEL custom domain, e.g. https://my-domain.zitadel.cloud
 - `key`: The path to the downloaded key.json
 - `port`: The port on which the API will be accessible, default it 8089
 

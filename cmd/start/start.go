@@ -24,6 +24,7 @@ import (
 	"github.com/zitadel/saml/pkg/provider"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/encryption"
@@ -42,6 +43,7 @@ import (
 	authorization_v2beta "github.com/zitadel/zitadel/internal/api/grpc/authorization/v2beta"
 	feature_v2 "github.com/zitadel/zitadel/internal/api/grpc/feature/v2"
 	feature_v2beta "github.com/zitadel/zitadel/internal/api/grpc/feature/v2beta"
+	group_v2 "github.com/zitadel/zitadel/internal/api/grpc/group/v2"
 	idp_v2 "github.com/zitadel/zitadel/internal/api/grpc/idp/v2"
 	instance "github.com/zitadel/zitadel/internal/api/grpc/instance/v2beta"
 	internal_permission_v2beta "github.com/zitadel/zitadel/internal/api/grpc/internal_permission/v2beta"
@@ -170,9 +172,15 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	if err != nil {
 		return err
 	}
+	q, err := queue.NewQueue(&queue.Config{
+		Client: dbClient,
+	})
+	if err != nil {
+		return err
+	}
 
-	config.Eventstore.Pusher = new_es.NewEventstore(dbClient)
-	config.Eventstore.Searcher = new_es.NewEventstore(dbClient)
+	config.Eventstore.Pusher = new_es.NewEventstore(dbClient, new_es.WithExecutionQueueOption(q))
+	config.Eventstore.Searcher = new_es.NewEventstore(dbClient, new_es.WithExecutionQueueOption(q))
 	config.Eventstore.Querier = old_es.NewPostgres(dbClient)
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
 	eventstoreV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(dbClient, &es_v4_pg.Config{
@@ -199,6 +207,8 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.OIDC,
 		keys.SAML,
 		keys.Target,
+		keys.SMS,
+		keys.SMTP,
 		config.InternalAuthZ.RolePermissionMappings,
 		sessionTokenVerifier,
 		func(q *query.Queries) domain.PermissionCheck {
@@ -282,13 +292,6 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	actionsLogstoreSvc := logstore.New(queries, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
 	actions.SetLogstoreService(actionsLogstoreSvc)
 
-	q, err := queue.NewQueue(&queue.Config{
-		Client: dbClient,
-	})
-	if err != nil {
-		return err
-	}
-
 	notification.Register(
 		ctx,
 		config.Projections.Customizations["notifications"],
@@ -315,12 +318,9 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	notification.Start(ctx)
 
 	execution.Register(
-		ctx,
-		config.Projections.Customizations["execution_handler"],
 		config.Executions,
-		queries,
-		eventstoreClient.EventTypes(),
 		q,
+		keys.Target,
 	)
 	execution.Start(ctx)
 
@@ -440,7 +440,22 @@ func startAPIs(
 		http_util.WithMaxAge(int(math.Floor(config.Quotas.Access.ExhaustedCookieMaxAge.Seconds()))),
 	)
 	limitingAccessInterceptor := middleware.NewAccessInterceptor(accessSvc, exhaustedCookieHandler, &config.Quotas.Access.AccessConfig)
-	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.SystemAuthZ, config.InternalAuthZ, tlsConfig, config.ExternalDomain, append(config.InstanceHostHeaders, config.PublicHostHeaders...), limitingAccessInterceptor)
+	translator := i18n.NewZitadelTranslator(language.English)
+	apis, err := api.New(
+		ctx,
+		config.Port,
+		router,
+		queries,
+		verifier,
+		config.SystemAuthZ,
+		config.InternalAuthZ,
+		tlsConfig,
+		config.ExternalDomain,
+		append(config.InstanceHostHeaders, config.PublicHostHeaders...),
+		limitingAccessInterceptor,
+		keys.Target,
+		translator,
+	)
 	if err != nil {
 		return nil, fmt.Errorf("error creating api %w", err)
 	}
@@ -542,10 +557,26 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, app.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
+	if err := apis.RegisterService(ctx, group_v2.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
+		return nil, err
+	}
 
-	instanceInterceptor := middleware.InstanceInterceptor(queries, config.ExternalDomain, login.IgnoreInstanceEndpoints...)
+	instanceInterceptor := middleware.InstanceInterceptor(queries, config.ExternalDomain, translator, login.IgnoreInstanceEndpoints...)
 	assetsCache := middleware.AssetsCacheInterceptor(config.AssetStorage.Cache.MaxAge, config.AssetStorage.Cache.SharedMaxAge)
-	apis.RegisterHandlerOnPrefix(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.SystemAuthZ, config.InternalAuthZ, id.SonyFlakeGenerator(), store, queries, middleware.CallDurationHandler, instanceInterceptor.Handler, assetsCache.Handler, limitingAccessInterceptor.Handle))
+	apis.RegisterHandlerOnPrefix(assets.HandlerPrefix, assets.NewHandler(
+		commands,
+		verifier,
+		config.SystemAuthZ,
+		config.InternalAuthZ,
+		id.SonyFlakeGenerator(),
+		store,
+		queries,
+		middleware.CallDurationHandler,
+		instanceInterceptor.Handler,
+		assetsCache.Handler,
+		limitingAccessInterceptor.Handle,
+		translator,
+	))
 
 	federatedLogoutsCache, err := connector.StartCache[federatedlogout.Index, string, *federatedlogout.FederatedLogout](ctx, []federatedlogout.Index{federatedlogout.IndexRequestID}, cache.PurposeFederatedLogout, cacheConnectors.Config.FederatedLogouts, cacheConnectors)
 	if err != nil {
@@ -582,6 +613,7 @@ func startAPIs(
 		queries,
 		authRepo,
 		keys.OIDC,
+		keys.Target,
 		keys.OIDCKey,
 		eventstore,
 		userAgentInterceptor,
@@ -596,7 +628,7 @@ func startAPIs(
 	}
 	apis.RegisterHandlerPrefixes(oidcServer, oidcPrefixes...)
 
-	samlProvider, err := saml.NewProvider(config.SAML, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.SAML, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor, limitingAccessInterceptor)
+	samlProvider, err := saml.NewProvider(config.SAML, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.SAML, keys.Target, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor, limitingAccessInterceptor)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start saml provider: %w", err)
 	}
@@ -610,6 +642,7 @@ func startAPIs(
 			verifier,
 			keys.User,
 			&config.SCIM,
+			translator,
 			instanceInterceptor.HandlerFuncWithError,
 			middleware.AuthorizationInterceptor(verifier, config.SystemAuthZ, config.InternalAuthZ).HandlerFuncWithError))
 

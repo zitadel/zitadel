@@ -26,6 +26,7 @@ const (
 	ForwardedHost          = "x-forwarded-host"
 	ForwardedProto         = "x-forwarded-proto"
 	Forwarded              = "forwarded"
+	Host                   = "host"
 	ZitadelForwarded       = "x-zitadel-forwarded"
 	XUserAgent             = "x-user-agent"
 	XGrpcWeb               = "x-grpc-web"

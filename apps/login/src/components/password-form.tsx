@@ -26,16 +26,11 @@ type Props = {
   requestId?: string;
 };
 
-export function PasswordForm({
-  loginSettings,
-  loginName,
-  organization,
-  requestId,
-}: Props) {
+export function PasswordForm({ loginSettings, loginName, organization, requestId }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
   });
-  
+
   const t = useTranslations("password");
 
   const [info, setInfo] = useState<string>("");
@@ -58,7 +53,7 @@ export function PasswordForm({
       requestId,
     })
       .catch(() => {
-        setError("Could not verify password");
+        setError(t("verify.errors.couldNotVerifyPassword"));
         return;
       })
       .finally(() => {
@@ -86,7 +81,7 @@ export function PasswordForm({
       requestId,
     })
       .catch(() => {
-        setError("Could not reset password");
+        setError(t("verify.errors.couldNotResetPassword"));
         return;
       })
       .finally(() => {
@@ -98,7 +93,7 @@ export function PasswordForm({
       return;
     }
 
-    setInfo("Password was reset. Please check your email.");
+    setInfo(t("verify.info.passwordResetSent"));
 
     const params = new URLSearchParams({
       loginName: loginName,
@@ -122,7 +117,7 @@ export function PasswordForm({
           type="password"
           autoComplete="password"
           {...register("password", { required: t("verify.required.password") })}
-          label="Password"
+          label={t("verify.labels.password")}
           data-testid="password-text-input"
         />
         {!loginSettings?.hidePasswordReset && (
@@ -137,14 +132,7 @@ export function PasswordForm({
           </button>
         )}
 
-        {loginName && (
-          <input
-            type="hidden"
-            name="loginName"
-            autoComplete="username"
-            value={loginName}
-          />
-        )}
+        {loginName && <input type="hidden" name="loginName" autoComplete="username" value={loginName} />}
       </div>
 
       {info && (
@@ -170,8 +158,7 @@ export function PasswordForm({
           onClick={handleSubmit(submitPassword)}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
-          <Translated i18nKey="verify.submit" namespace="password" />
+          {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="verify.submit" namespace="password" />
         </Button>
       </div>
     </form>

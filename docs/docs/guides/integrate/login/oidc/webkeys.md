@@ -296,7 +296,7 @@ Next month, Key ID 6 will be activated, an new key added and Key ID 2 can be del
 ## JSON web key set
 
 The JSON web key set (JWKS) endpoint serves all available public keys for the instance on
-`{your_domain}/oauth/v2/keys`. This includes activated, newly non-activated and deactivated web keys. The response format is defined in [RFC7517, section 5: JWK Set Format](https://www.rfc-editor.org/rfc/rfc7517#section-5).
+`${CUSTOM_DOMAIN}/oauth/v2/keys`. This includes activated, newly non-activated and deactivated web keys. The response format is defined in [RFC7517, section 5: JWK Set Format](https://www.rfc-editor.org/rfc/rfc7517#section-5).
 
 And looks like:
 

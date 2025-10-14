@@ -68,7 +68,8 @@ func emailProviderToPb(config *query.SMTPConfig) settings_pb.EmailConfig {
 func httpToPb(http *query.HTTP) *settings_pb.EmailProvider_Http {
 	return &settings_pb.EmailProvider_Http{
 		Http: &settings_pb.EmailProviderHTTP{
-			Endpoint: http.Endpoint,
+			Endpoint:   http.Endpoint,
+			SigningKey: http.SigningKey,
 		},
 	}
 }
@@ -76,11 +77,12 @@ func httpToPb(http *query.HTTP) *settings_pb.EmailProvider_Http {
 func smtpToPb(config *query.SMTP) *settings_pb.EmailProvider_Smtp {
 	return &settings_pb.EmailProvider_Smtp{
 		Smtp: &settings_pb.EmailProviderSMTP{
-			Tls:           config.TLS,
-			Host:          config.Host,
-			User:          config.User,
-			SenderAddress: config.SenderAddress,
-			SenderName:    config.SenderName,
+			Tls:            config.TLS,
+			Host:           config.Host,
+			User:           config.User,
+			SenderAddress:  config.SenderAddress,
+			SenderName:     config.SenderName,
+			ReplyToAddress: config.ReplyToAddress,
 		},
 	}
 }
@@ -123,11 +125,14 @@ func addEmailProviderHTTPToConfig(ctx context.Context, req *admin_pb.AddEmailPro
 }
 
 func updateEmailProviderHTTPToConfig(ctx context.Context, req *admin_pb.UpdateEmailProviderHTTPRequest) *command.ChangeSMTPConfigHTTP {
+	// TODO handle expiration, currently only immediate expiration is supported
+	expirationSigningKey := req.GetExpirationSigningKey() != nil
 	return &command.ChangeSMTPConfigHTTP{
-		ResourceOwner: authz.GetInstance(ctx).InstanceID(),
-		ID:            req.Id,
-		Description:   req.Description,
-		Endpoint:      req.Endpoint,
+		ResourceOwner:        authz.GetInstance(ctx).InstanceID(),
+		ID:                   req.Id,
+		Description:          req.Description,
+		Endpoint:             req.Endpoint,
+		ExpirationSigningKey: expirationSigningKey,
 	}
 }
 

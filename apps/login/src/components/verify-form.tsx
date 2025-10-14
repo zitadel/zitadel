@@ -57,7 +57,7 @@ export function VerifyForm({
       isInvite: isInvite,
     })
       .catch(() => {
-        setError("Could not resend email");
+        setError(t("errors.couldNotResendEmail"));
         return;
       })
       .finally(() => {
@@ -87,7 +87,7 @@ export function VerifyForm({
         requestId: requestId,
       })
         .catch(() => {
-          setError("Could not verify user");
+          setError(t("errors.couldNotVerifyUser"));
           return;
         })
         .finally(() => {
@@ -139,7 +139,7 @@ export function VerifyForm({
             type="text"
             autoComplete="one-time-code"
             {...register("code", { required: t("verify.required.code") })}
-            label="Code"
+            label={t("verify.labels.code")}
             data-testid="code-text-input"
           />
         </div>

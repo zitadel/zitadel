@@ -23,5 +23,5 @@ func (mig *InstancePositionIndex) Execute(ctx context.Context, _ eventstore.Even
 }
 
 func (mig *InstancePositionIndex) String() string {
-	return "54_instance_position_index_again"
+	return "54_instance_position_index_remove_again"
 }

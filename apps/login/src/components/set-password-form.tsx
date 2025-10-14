@@ -77,7 +77,7 @@ export function SetPasswordForm({
       requestId,
     })
       .catch(() => {
-        setError("Could not reset password");
+        setError(t("set.errors.couldNotResetPassword"));
         return;
       })
       .finally(() => {
@@ -104,7 +104,7 @@ export function SetPasswordForm({
 
     const changeResponse = await changePassword(payload)
       .catch(() => {
-        setError("Could not set password");
+        setError(t("set.errors.couldNotSetPassword"));
         return;
       })
       .finally(() => {
@@ -117,7 +117,7 @@ export function SetPasswordForm({
     }
 
     if (!changeResponse) {
-      setError("Could not set password");
+      setError(t("set.errors.couldNotSetPassword"));
       return;
     }
 
@@ -141,7 +141,7 @@ export function SetPasswordForm({
       requestId,
     })
       .catch(() => {
-        setError("Could not verify password");
+        setError(t("set.errors.couldNotVerifyPassword"));
         return;
       })
       .finally(() => {
@@ -221,7 +221,7 @@ export function SetPasswordForm({
               {...register("code", {
                 required: t("set.required.code"),
               })}
-              label="Code"
+              label={t("set.labels.code")}
               autoComplete="one-time-code"
               error={errors.code?.message as string}
               data-testid="code-text-input"
@@ -236,7 +236,7 @@ export function SetPasswordForm({
             {...register("password", {
               required: t("set.required.newPassword"),
             })}
-            label="New Password"
+            label={t("set.labels.newPassword")}
             error={errors.password?.message as string}
             data-testid="password-set-text-input"
           />
@@ -249,7 +249,7 @@ export function SetPasswordForm({
             {...register("confirmPassword", {
               required: t("set.required.confirmPassword"),
             })}
-            label="Confirm Password"
+            label={t("set.labels.confirmPassword")}
             error={errors.confirmPassword?.message as string}
             data-testid="password-set-confirm-text-input"
           />

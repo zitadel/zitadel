@@ -27,32 +27,32 @@
     <table class="table" mat-table [dataSource]="dataSource">
       <ng-container matColumnDef="type">
         <th mat-header-cell *matHeaderCellDef>{{ 'USER.MFA.TABLETYPE' | translate }}</th>
-        <td mat-cell *matCellDef="let mfa">
-          <span *ngIf="mfa.otp !== undefined">TOTP (Time-based One-Time Password)</span>
-          <span *ngIf="mfa.u2f !== undefined">U2F (Universal 2nd Factor)</span>
-          <span *ngIf="mfa.otpSms !== undefined">One-Time Password SMS</span>
-          <span *ngIf="mfa.otpEmail !== undefined">One-Time Password Email</span>
+        <td mat-cell *cnslCellDef="let mfa; dataSource: dataSource" [ngSwitch]="mfa.type.case">
+          <span *ngSwitchCase="'otp'">TOTP (Time-based One-Time Password)</span>
+          <span *ngSwitchCase="'u2f'">U2F (Universal 2nd Factor)</span>
+          <span *ngSwitchCase="'otpSms'">One-Time Password SMS</span>
+          <span *ngSwitchCase="'otpEmail'">One-Time Password Email</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>{{ 'USER.MFA.NAME' | translate }}</th>
-        <td mat-cell *matCellDef="let mfa">
-          <span *ngIf="mfa?.u2f?.name" class="centered">
-            {{ mfa.u2f.name }}
+        <td mat-cell *cnslCellDef="let mfa; dataSource: dataSource">
+          <span *ngIf="mfaName(mfa) as name" class="centered">
+            {{ name }}
           </span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="state">
         <th mat-header-cell *matHeaderCellDef>{{ 'USER.MFA.TABLESTATE' | translate }}</th>
-        <td mat-cell *matCellDef="let mfa">
+        <td mat-cell *cnslCellDef="let mfa; dataSource: dataSource">
           <span class="centered">
             <span
               class="state"
               [ngClass]="{
-                active: mfa.state === AuthFactorState.AUTH_FACTOR_STATE_READY,
-                inactive: mfa.state === AuthFactorState.AUTH_FACTOR_STATE_NOT_READY,
+                active: mfa.state === AuthFactorState.READY,
+                inactive: mfa.state === AuthFactorState.NOT_READY,
               }"
               >{{ 'USER.MFA.STATE.' + mfa.state | translate }}</span
             >
@@ -62,7 +62,7 @@
 
       <ng-container matColumnDef="actions" stickyEnd>
         <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let mfa">
+        <td mat-cell *cnslCellDef="let mfa; dataSource: dataSource">
           <cnsl-table-actions>
             <button
               actions

@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/zitadel/oidc/v3/pkg/client"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/client/rs"
@@ -135,7 +134,7 @@ func (i *Instance) CreateOIDCInactivateProjectClient(ctx context.Context, redire
 }
 
 func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, t *testing.T, redirectURI string, loginVersion *app.LoginVersion) (*management.AddOIDCAppResponse, error) {
-	project := i.CreateProject(ctx, t, "", gofakeit.AppName(), false, false)
+	project := i.CreateProject(ctx, t, "", ProjectName(), false, false)
 
 	resp, err := i.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
 		ProjectId:                project.GetId(),
@@ -176,7 +175,7 @@ func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, t *testing.
 }
 
 func (i *Instance) CreateOIDCTokenExchangeClient(ctx context.Context, t *testing.T) (client *management.AddOIDCAppResponse, keyData []byte, err error) {
-	project := i.CreateProject(ctx, t, "", gofakeit.AppName(), false, false)
+	project := i.CreateProject(ctx, t, "", ProjectName(), false, false)
 	return i.CreateOIDCWebClientJWT(ctx, "", "", project.GetId(), app.OIDCGrantType_OIDC_GRANT_TYPE_TOKEN_EXCHANGE, app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE, app.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN)
 }
 
@@ -373,7 +372,7 @@ func CheckRedirect(req *http.Request) (*url.URL, error) {
 }
 
 func (i *Instance) CreateOIDCCredentialsClient(ctx context.Context) (machine *management.AddMachineUserResponse, name, clientID, clientSecret string, err error) {
-	name = gofakeit.Username()
+	name = Username()
 	machine, err = i.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
 		Name:            name,
 		UserName:        name,
@@ -392,7 +391,7 @@ func (i *Instance) CreateOIDCCredentialsClient(ctx context.Context) (machine *ma
 }
 
 func (i *Instance) CreateOIDCCredentialsClientInactive(ctx context.Context) (machine *management.AddMachineUserResponse, name, clientID, clientSecret string, err error) {
-	name = gofakeit.Username()
+	name = Username()
 	machine, err = i.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
 		Name:            name,
 		UserName:        name,
@@ -417,7 +416,7 @@ func (i *Instance) CreateOIDCCredentialsClientInactive(ctx context.Context) (mac
 }
 
 func (i *Instance) CreateOIDCJWTProfileClient(ctx context.Context, keyLifetime time.Duration) (machine *management.AddMachineUserResponse, name string, keyData []byte, err error) {
-	name = gofakeit.Username()
+	name = Username()
 	machine, err = i.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
 		Name:            name,
 		UserName:        name,

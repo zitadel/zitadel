@@ -22,7 +22,7 @@ import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("mfa");
-  return { title: t('set.title')};
+  return { title: t("set.title") };
 }
 
 function isSessionValid(session: Partial<Session>): {
@@ -31,23 +31,19 @@ function isSessionValid(session: Partial<Session>): {
 } {
   const validPassword = session?.factors?.password?.verifiedAt;
   const validPasskey = session?.factors?.webAuthN?.verifiedAt;
-  const stillValid = session.expirationDate
-    ? timestampDate(session.expirationDate) > new Date()
-    : true;
+  const validIDP = session?.factors?.intent?.verifiedAt;
+  const stillValid = session.expirationDate ? timestampDate(session.expirationDate) > new Date() : true;
 
-  const verifiedAt = validPassword || validPasskey;
-  const valid = !!((validPassword || validPasskey) && stillValid);
+  const verifiedAt = validPassword || validPasskey || validIDP;
+  const valid = !!((validPassword || validPasskey || validIDP) && stillValid);
 
   return { valid, verifiedAt };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
-  const { loginName, checkAfter, force, requestId, organization, sessionId } =
-    searchParams;
+  const { loginName, checkAfter, force, requestId, organization, sessionId } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -68,8 +64,7 @@ export default async function Page(props: {
       userId,
     }).then((methods) => {
       return getUserByID({ serviceUrl, userId }).then((user) => {
-        const humanUser =
-          user.user?.type.case === "human" ? user.user?.type.value : undefined;
+        const humanUser = user.user?.type.case === "human" ? user.user?.type.value : undefined;
 
         return {
           id: session.id,
@@ -83,10 +78,7 @@ export default async function Page(props: {
     });
   }
 
-  async function loadSessionByLoginname(
-    loginName?: string,
-    organization?: string,
-  ) {
+  async function loadSessionByLoginname(loginName?: string, organization?: string) {
     return loadMostRecentSession({
       serviceUrl,
       sessionParams: {
@@ -122,7 +114,7 @@ export default async function Page(props: {
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="set.title" namespace="mfa" />
         </h1>
@@ -139,23 +131,23 @@ export default async function Page(props: {
             searchParams={searchParams}
           ></UserAvatar>
         )}
+      </div>
 
-        {!(loginName || sessionId) && (
-          <Alert>
-            <Translated i18nKey="unknownContext" namespace="error" />
-          </Alert>
-        )}
+      <div className="w-full">
+        <div className="flex flex-col space-y-4">
+          {!(loginName || sessionId) && (
+            <Alert>
+              <Translated i18nKey="unknownContext" namespace="error" />
+            </Alert>
+          )}
 
-        {!valid && (
-          <Alert>
-            <Translated i18nKey="sessionExpired" namespace="error" />
-          </Alert>
-        )}
+          {!valid && (
+            <Alert>
+              <Translated i18nKey="sessionExpired" namespace="error" />
+            </Alert>
+          )}
 
-        {isSessionValid(sessionWithData).valid &&
-          loginSettings &&
-          sessionWithData &&
-          sessionWithData.factors?.user?.id && (
+          {valid && loginSettings && sessionWithData && sessionWithData.factors?.user?.id && (
             <ChooseSecondFactorToSetup
               userId={sessionWithData.factors?.user?.id}
               loginName={loginName}
@@ -171,9 +163,10 @@ export default async function Page(props: {
             ></ChooseSecondFactorToSetup>
           )}
 
-        <div className="mt-8 flex w-full flex-row items-center">
-          <BackButton />
-          <span className="flex-grow"></span>
+          <div className="mt-8 flex w-full flex-row items-center">
+            <BackButton />
+            <span className="flex-grow"></span>
+          </div>
         </div>
       </div>
     </DynamicTheme>

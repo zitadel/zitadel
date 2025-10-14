@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
@@ -902,8 +903,10 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 
 func TestCommandSide_AddSMTPConfigHTTP(t *testing.T) {
 	type fields struct {
-		eventstore  func(t *testing.T) *eventstore.Eventstore
-		idGenerator id.Generator
+		eventstore                  func(t *testing.T) *eventstore.Eventstore
+		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
+		defaultSecretGenerators     *SecretGenerators
+		idGenerator                 id.Generator
 	}
 	type args struct {
 		http *AddSMTPConfigHTTP
@@ -944,10 +947,18 @@ func TestCommandSide_AddSMTPConfigHTTP(t *testing.T) {
 							"configid",
 							"test",
 							"endpoint",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("12345678"),
+							},
 						),
 					),
 				),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "configid"),
+				idGenerator:                 id_mock.NewIDGeneratorExpectIDs(t, "configid"),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("12345678", time.Hour),
+				defaultSecretGenerators:     &SecretGenerators{},
 			},
 			args: args{
 				http: &AddSMTPConfigHTTP{
@@ -966,8 +977,10 @@ func TestCommandSide_AddSMTPConfigHTTP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore(t),
-				idGenerator: tt.fields.idGenerator,
+				eventstore:                  tt.fields.eventstore(t),
+				idGenerator:                 tt.fields.idGenerator,
+				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
+				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
 			}
 			err := r.AddSMTPConfigHTTP(context.Background(), tt.args.http)
 			if tt.res.err == nil {
@@ -986,7 +999,9 @@ func TestCommandSide_AddSMTPConfigHTTP(t *testing.T) {
 
 func TestCommandSide_ChangeSMTPConfigHTTP(t *testing.T) {
 	type fields struct {
-		eventstore func(t *testing.T) *eventstore.Eventstore
+		eventstore                  func(t *testing.T) *eventstore.Eventstore
+		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
+		defaultSecretGenerators     *SecretGenerators
 	}
 	type args struct {
 		http *ChangeSMTPConfigHTTP
@@ -1063,6 +1078,12 @@ func TestCommandSide_ChangeSMTPConfigHTTP(t *testing.T) {
 								"ID",
 								"test",
 								"endpoint",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("12345678"),
+								},
 							),
 						),
 					),
@@ -1094,6 +1115,12 @@ func TestCommandSide_ChangeSMTPConfigHTTP(t *testing.T) {
 								"ID",
 								"",
 								"endpoint",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("12345678"),
+								},
 							),
 						),
 					),
@@ -1103,16 +1130,25 @@ func TestCommandSide_ChangeSMTPConfigHTTP(t *testing.T) {
 							"ID",
 							"test",
 							"endpoint2",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("87654321"),
+							},
 						),
 					),
 				),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("87654321", time.Hour),
+				defaultSecretGenerators:     &SecretGenerators{},
 			},
 			args: args{
 				http: &ChangeSMTPConfigHTTP{
-					ResourceOwner: "INSTANCE",
-					ID:            "ID",
-					Description:   "test",
-					Endpoint:      "endpoint2",
+					ResourceOwner:        "INSTANCE",
+					ID:                   "ID",
+					Description:          "test",
+					Endpoint:             "endpoint2",
+					ExpirationSigningKey: true,
 				},
 			},
 			res: res{
@@ -1125,7 +1161,9 @@ func TestCommandSide_ChangeSMTPConfigHTTP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:                  tt.fields.eventstore(t),
+				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
+				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
 			}
 			err := r.ChangeSMTPConfigHTTP(context.Background(), tt.args.http)
 			if tt.res.err == nil {
@@ -1300,6 +1338,12 @@ func TestCommandSide_ActivateSMTPConfig(t *testing.T) {
 								"ID",
 								"test",
 								"endpoint",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("12345678"),
+								},
 							),
 						),
 					),
@@ -1511,6 +1555,12 @@ func TestCommandSide_DeactivateSMTPConfig(t *testing.T) {
 								"ID",
 								"test",
 								"endpoint",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("12345678"),
+								},
 							),
 						),
 						eventFromEventPusher(
@@ -1677,6 +1727,12 @@ func TestCommandSide_RemoveSMTPConfig(t *testing.T) {
 								"ID",
 								"test",
 								"endpoint",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("12345678"),
+								},
 							),
 						),
 					),
@@ -2051,10 +2107,11 @@ func newSMTPConfigChangedEvent(ctx context.Context, id, description string, tls 
 	return event
 }
 
-func newSMTPConfigHTTPChangedEvent(ctx context.Context, id, description, endpoint string) *instance.SMTPConfigHTTPChangedEvent {
+func newSMTPConfigHTTPChangedEvent(ctx context.Context, id, description, endpoint string, signingKey *crypto.CryptoValue) *instance.SMTPConfigHTTPChangedEvent {
 	changes := []instance.SMTPConfigHTTPChanges{
 		instance.ChangeSMTPConfigHTTPDescription(description),
 		instance.ChangeSMTPConfigHTTPEndpoint(endpoint),
+		instance.ChangeSMTPConfigHTTPSigningKey(signingKey),
 	}
 	event, _ := instance.NewSMTPConfigHTTPChangeEvent(ctx,
 		&instance.NewAggregate("INSTANCE").Aggregate,

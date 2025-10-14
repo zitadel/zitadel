@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
@@ -187,7 +186,7 @@ func TestListCustomDomains(t *testing.T) {
 	inst := integration.NewInstance(ctxWithSysAuthZ)
 
 	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
-	d1, d2 := "custom."+gofakeit.DomainName(), "custom."+gofakeit.DomainName()
+	d1, d2 := "custom."+integration.DomainName(), "custom."+integration.DomainName()
 
 	_, err := inst.Client.InstanceV2Beta.AddCustomDomain(ctxWithSysAuthZ, &instance.AddCustomDomainRequest{InstanceId: inst.ID(), Domain: d1})
 	require.Nil(t, err)
@@ -256,21 +255,24 @@ func TestListCustomDomains(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
-			// Test
-			res, err := inst.Client.InstanceV2Beta.ListCustomDomains(tc.inputContext, tc.inputRequest)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputContext, time.Minute)
+			require.EventuallyWithT(t, func(collect *assert.CollectT) {
+				// Test
+				res, err := inst.Client.InstanceV2Beta.ListCustomDomains(tc.inputContext, tc.inputRequest)
 
-			// Verify
-			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
-			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
+				// Verify
+				assert.Equal(collect, tc.expectedErrorCode, status.Code(err))
+				assert.Equal(collect, tc.expectedErrorMsg, status.Convert(err).Message())
 
-			if tc.expectedErrorMsg == "" {
-				domains := []string{}
-				for _, d := range res.GetDomains() {
-					domains = append(domains, d.GetDomain())
+				if tc.expectedErrorMsg == "" {
+					domains := []string{}
+					for _, d := range res.GetDomains() {
+						domains = append(domains, d.GetDomain())
+					}
+
+					assert.Subset(collect, domains, tc.expectedDomains)
 				}
-
-				assert.Subset(t, domains, tc.expectedDomains)
-			}
+			}, retryDuration, tick)
 		})
 	}
 }
@@ -286,7 +288,7 @@ func TestListTrustedDomains(t *testing.T) {
 	inst := integration.NewInstance(ctxWithSysAuthZ)
 
 	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
-	d1, d2 := "trusted."+gofakeit.DomainName(), "trusted."+gofakeit.DomainName()
+	d1, d2 := "trusted."+integration.DomainName(), "trusted."+integration.DomainName()
 
 	_, err := inst.Client.InstanceV2Beta.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: inst.ID(), Domain: d1})
 	require.Nil(t, err)
@@ -348,23 +350,26 @@ func TestListTrustedDomains(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
-			// Test
-			res, err := inst.Client.InstanceV2Beta.ListTrustedDomains(tc.inputContext, tc.inputRequest)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputContext, time.Minute)
+			require.EventuallyWithT(t, func(collect *assert.CollectT) {
+				// Test
+				res, err := inst.Client.InstanceV2Beta.ListTrustedDomains(tc.inputContext, tc.inputRequest)
 
-			// Verify
-			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
-			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
+				// Verify
+				assert.Equal(collect, tc.expectedErrorCode, status.Code(err))
+				assert.Equal(collect, tc.expectedErrorMsg, status.Convert(err).Message())
 
-			if tc.expectedErrorMsg == "" {
-				require.NotNil(t, res)
+				if tc.expectedErrorMsg == "" {
+					require.NotNil(t, res)
 
-				domains := []string{}
-				for _, d := range res.GetTrustedDomain() {
-					domains = append(domains, d.GetDomain())
+					domains := []string{}
+					for _, d := range res.GetTrustedDomain() {
+						domains = append(domains, d.GetDomain())
+					}
+
+					assert.Subset(collect, domains, tc.expectedDomains)
 				}
-
-				assert.Subset(t, domains, tc.expectedDomains)
-			}
+			}, retryDuration, tick)
 		})
 	}
 }

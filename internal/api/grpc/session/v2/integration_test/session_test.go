@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/pquerna/otp/totp"
 	"github.com/stretchr/testify/assert"
@@ -28,7 +27,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func verifyCurrentSession(t *testing.T, id, token string, sequence uint64, window time.Duration, metadata map[string][]byte, userAgent *session.UserAgent, expirationWindow time.Duration, userID string, factors ...wantFactor) *session.Session {
+func verifyCurrentSession(t *testing.T, id, token string, sequence uint64, creationDate, changeDate *timestamppb.Timestamp, metadata map[string][]byte, userAgent *session.UserAgent, expirationWindow time.Duration, userID string, factors ...wantFactor) *session.Session {
 	t.Helper()
 	require.NotEmpty(t, id)
 	require.NotEmpty(t, token)
@@ -40,19 +39,21 @@ func verifyCurrentSession(t *testing.T, id, token string, sequence uint64, windo
 	require.NoError(t, err)
 	s := resp.GetSession()
 	want := &session.Session{
-		Id:        id,
-		Sequence:  sequence,
-		Metadata:  metadata,
-		UserAgent: userAgent,
+		Id:           id,
+		Sequence:     sequence,
+		Metadata:     metadata,
+		UserAgent:    userAgent,
+		CreationDate: creationDate,
+		ChangeDate:   changeDate,
 	}
-	verifySession(t, s, want, window, expirationWindow, userID, factors...)
+	verifySession(t, s, want, expirationWindow, userID, factors...)
 	return s
 }
 
-func verifySession(t assert.TestingT, s *session.Session, want *session.Session, window time.Duration, expirationWindow time.Duration, userID string, factors ...wantFactor) {
+func verifySession(t assert.TestingT, s *session.Session, want *session.Session, expirationWindow time.Duration, userID string, factors ...wantFactor) {
 	assert.Equal(t, want.Id, s.GetId())
-	assert.WithinRange(t, s.GetCreationDate().AsTime(), time.Now().Add(-window), time.Now().Add(window))
-	assert.WithinRange(t, s.GetChangeDate().AsTime(), time.Now().Add(-window), time.Now().Add(window))
+	assert.WithinRange(t, s.GetCreationDate().AsTime(), want.CreationDate.AsTime(), want.CreationDate.AsTime())
+	assert.WithinRange(t, s.GetChangeDate().AsTime(), want.ChangeDate.AsTime(), want.ChangeDate.AsTime())
 	assert.Equal(t, want.Sequence, s.GetSequence())
 	assert.Equal(t, want.Metadata, s.GetMetadata())
 
@@ -65,7 +66,7 @@ func verifySession(t assert.TestingT, s *session.Session, want *session.Session,
 		assert.WithinRange(t, s.GetExpirationDate().AsTime(), time.Now().Add(-expirationWindow), time.Now().Add(expirationWindow))
 	}
 
-	verifyFactors(t, s.GetFactors(), window, userID, factors)
+	verifyFactors(t, s.GetFactors(), want.CreationDate, want.ChangeDate, userID, factors)
 }
 
 type wantFactor int
@@ -81,44 +82,46 @@ const (
 	wantOTPEmailFactor
 )
 
-func verifyFactors(t assert.TestingT, factors *session.Factors, window time.Duration, userID string, want []wantFactor) {
+func verifyFactors(t assert.TestingT, factors *session.Factors, creationDate, changeDate *timestamppb.Timestamp, userID string, want []wantFactor) {
+	creationDateWithSkew := creationDate.AsTime().Add(-250 * time.Millisecond) // account for offset because from check (set by application servercreationDateWithSkew db)
+	changeDateWithSkew := changeDate.AsTime().Add(250 * time.Millisecond)      // account for offset because from check (set by application server) and change date (set by db)
 	for _, w := range want {
 		switch w {
 		case wantUserFactor:
 			uf := factors.GetUser()
 			assert.NotNil(t, uf)
-			assert.WithinRange(t, uf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
+			assert.WithinRange(t, uf.GetVerifiedAt().AsTime(), creationDateWithSkew, changeDateWithSkew)
 			assert.Equal(t, userID, uf.GetId())
 		case wantPasswordFactor:
 			pf := factors.GetPassword()
 			assert.NotNil(t, pf)
-			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
+			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), creationDateWithSkew, changeDateWithSkew)
 		case wantWebAuthNFactor:
 			pf := factors.GetWebAuthN()
 			assert.NotNil(t, pf)
-			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
+			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), creationDateWithSkew, changeDateWithSkew)
 			assert.False(t, pf.GetUserVerified())
 		case wantWebAuthNFactorUserVerified:
 			pf := factors.GetWebAuthN()
 			assert.NotNil(t, pf)
-			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
+			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), creationDateWithSkew, changeDateWithSkew)
 			assert.True(t, pf.GetUserVerified())
 		case wantTOTPFactor:
 			pf := factors.GetTotp()
 			assert.NotNil(t, pf)
-			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
+			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), creationDateWithSkew, changeDateWithSkew)
 		case wantIntentFactor:
 			pf := factors.GetIntent()
 			assert.NotNil(t, pf)
-			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
+			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), creationDateWithSkew, changeDateWithSkew)
 		case wantOTPSMSFactor:
 			pf := factors.GetOtpSms()
 			assert.NotNil(t, pf)
-			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
+			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), creationDateWithSkew, changeDateWithSkew)
 		case wantOTPEmailFactor:
 			pf := factors.GetOtpEmail()
 			assert.NotNil(t, pf)
-			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
+			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), creationDateWithSkew, changeDateWithSkew)
 		}
 	}
 }
@@ -264,7 +267,7 @@ func TestServer_CreateSession(t *testing.T) {
 
 func TestServer_CreateSession_lock_user(t *testing.T) {
 	// create a separate org so we don't interfere with any other test
-	org := Instance.CreateOrganization(IAMOwnerCTX, integration.OrganizationName(), gofakeit.Email())
+	org := Instance.CreateOrganization(IAMOwnerCTX, integration.OrganizationName(), integration.Email())
 	userID := org.CreatedAdmins[0].GetUserId()
 	Instance.SetUserPassword(IAMOwnerCTX, userID, integration.UserPassword, false)
 
@@ -319,7 +322,7 @@ func TestServer_CreateSession_webauthn(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
-	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId())
+	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), createResp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId())
 
 	assertionData, err := Instance.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetWebAuthN().GetPublicKeyCredentialRequestOptions(), true)
 	require.NoError(t, err)
@@ -334,7 +337,7 @@ func TestServer_CreateSession_webauthn(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
-	verifyCurrentSession(t, createResp.GetSessionId(), updateResp.GetSessionToken(), updateResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId(), wantUserFactor, wantWebAuthNFactorUserVerified)
+	verifyCurrentSession(t, createResp.GetSessionId(), updateResp.GetSessionToken(), updateResp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), updateResp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId(), wantUserFactor, wantWebAuthNFactorUserVerified)
 }
 
 func TestServer_CreateSession_successfulIntent(t *testing.T) {
@@ -349,7 +352,7 @@ func TestServer_CreateSession_successfulIntent(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
-	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId())
+	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), createResp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId())
 
 	intentID, token, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "id", User.GetUserId(), time.Now().Add(time.Hour))
 	require.NoError(t, err)
@@ -363,7 +366,7 @@ func TestServer_CreateSession_successfulIntent(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
-	verifyCurrentSession(t, createResp.GetSessionId(), updateResp.GetSessionToken(), updateResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId(), wantUserFactor, wantIntentFactor)
+	verifyCurrentSession(t, createResp.GetSessionId(), updateResp.GetSessionToken(), updateResp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), updateResp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId(), wantUserFactor, wantIntentFactor)
 }
 
 func TestServer_CreateSession_successfulIntent_instant(t *testing.T) {
@@ -385,7 +388,7 @@ func TestServer_CreateSession_successfulIntent_instant(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
-	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId(), wantUserFactor, wantIntentFactor)
+	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), createResp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId(), wantUserFactor, wantIntentFactor)
 }
 
 func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
@@ -413,7 +416,7 @@ func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
-	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId(), wantUserFactor, wantIntentFactor)
+	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), createResp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId(), wantUserFactor, wantIntentFactor)
 }
 
 func TestServer_CreateSession_startedIntentFalseToken(t *testing.T) {
@@ -429,7 +432,7 @@ func TestServer_CreateSession_startedIntentFalseToken(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
-	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId())
+	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), createResp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId())
 
 	intent := Instance.CreateIntent(CTX, idpID)
 	_, err = Client.SetSession(LoginCTX, &session.SetSessionRequest{
@@ -456,7 +459,7 @@ func TestServer_CreateSession_reuseIntent(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
-	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId())
+	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), createResp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId())
 
 	intentID, token, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "id", User.GetUserId(), time.Now().Add(time.Hour))
 	require.NoError(t, err)
@@ -470,7 +473,7 @@ func TestServer_CreateSession_reuseIntent(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
-	verifyCurrentSession(t, createResp.GetSessionId(), updateResp.GetSessionToken(), updateResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId(), wantUserFactor, wantIntentFactor)
+	verifyCurrentSession(t, createResp.GetSessionId(), updateResp.GetSessionToken(), updateResp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), updateResp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId(), wantUserFactor, wantIntentFactor)
 
 	// the reuse of the intent token is not allowed, not even on the same session
 	session2, err := Client.SetSession(LoginCTX, &session.SetSessionRequest{
@@ -498,7 +501,7 @@ func TestServer_CreateSession_expiredIntent(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
-	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId())
+	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), createResp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId())
 
 	intentID, token, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "id", User.GetUserId(), time.Now().Add(time.Second))
 	require.NoError(t, err)
@@ -556,7 +559,7 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{})
 	require.NoError(t, err)
 	sessionToken := createResp.GetSessionToken()
-	verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, "")
+	verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, createResp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), createResp.GetDetails().GetChangeDate(), nil, nil, 0, "")
 
 	t.Run("check user", func(t *testing.T) {
 		resp, err := Client.SetSession(LoginCTX, &session.SetSessionRequest{
@@ -571,7 +574,7 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 		})
 		require.NoError(t, err)
 		sessionToken = resp.GetSessionToken()
-		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, userExisting.GetUserId(), wantUserFactor)
+		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), resp.GetDetails().GetChangeDate(), nil, nil, 0, userExisting.GetUserId(), wantUserFactor)
 	})
 
 	t.Run("check webauthn, user verified (passkey)", func(t *testing.T) {
@@ -585,7 +588,7 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 			},
 		})
 		require.NoError(t, err)
-		verifyCurrentSession(t, createResp.GetSessionId(), resp.GetSessionToken(), resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, userExisting.GetUserId())
+		verifyCurrentSession(t, createResp.GetSessionId(), resp.GetSessionToken(), resp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), resp.GetDetails().GetChangeDate(), nil, nil, 0, userExisting.GetUserId())
 		sessionToken = resp.GetSessionToken()
 
 		assertionData, err := Instance.WebAuthN.CreateAssertionResponse(resp.GetChallenges().GetWebAuthN().GetPublicKeyCredentialRequestOptions(), true)
@@ -601,7 +604,7 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 		})
 		require.NoError(t, err)
 		sessionToken = resp.GetSessionToken()
-		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, userExisting.GetUserId(), wantUserFactor, wantWebAuthNFactorUserVerified)
+		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), resp.GetDetails().GetChangeDate(), nil, nil, 0, userExisting.GetUserId(), wantUserFactor, wantWebAuthNFactorUserVerified)
 	})
 
 	userAuthCtx := integration.WithAuthorizationToken(CTX, sessionToken)
@@ -623,14 +626,14 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 		})
 		require.NoError(t, err)
 		sessionToken = resp.GetSessionToken()
-		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, userExisting.GetUserId(), wantUserFactor, wantTOTPFactor)
+		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), resp.GetDetails().GetChangeDate(), nil, nil, 0, userExisting.GetUserId(), wantUserFactor, wantTOTPFactor)
 	})
 
 	userImport := Instance.CreateHumanUserWithTOTP(CTX, totpSecret)
 	createRespImport, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{})
 	require.NoError(t, err)
 	sessionTokenImport := createRespImport.GetSessionToken()
-	verifyCurrentSession(t, createRespImport.GetSessionId(), sessionTokenImport, createRespImport.GetDetails().GetSequence(), time.Minute, nil, nil, 0, "")
+	verifyCurrentSession(t, createRespImport.GetSessionId(), sessionTokenImport, createRespImport.GetDetails().GetSequence(), createRespImport.GetDetails().GetChangeDate(), createRespImport.GetDetails().GetChangeDate(), nil, nil, 0, "")
 
 	t.Run("check user", func(t *testing.T) {
 		resp, err := Client.SetSession(LoginCTX, &session.SetSessionRequest{
@@ -645,7 +648,7 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 		})
 		require.NoError(t, err)
 		sessionTokenImport = resp.GetSessionToken()
-		verifyCurrentSession(t, createRespImport.GetSessionId(), sessionTokenImport, resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, userImport.GetUserId(), wantUserFactor)
+		verifyCurrentSession(t, createRespImport.GetSessionId(), sessionTokenImport, resp.GetDetails().GetSequence(), createRespImport.GetDetails().GetChangeDate(), resp.GetDetails().GetChangeDate(), nil, nil, 0, userImport.GetUserId(), wantUserFactor)
 	})
 	t.Run("check TOTP", func(t *testing.T) {
 		code, err := totp.GenerateCode(totpSecret, time.Now())
@@ -660,7 +663,7 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 		})
 		require.NoError(t, err)
 		sessionTokenImport = resp.GetSessionToken()
-		verifyCurrentSession(t, createRespImport.GetSessionId(), sessionTokenImport, resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, userImport.GetUserId(), wantUserFactor, wantTOTPFactor)
+		verifyCurrentSession(t, createRespImport.GetSessionId(), sessionTokenImport, resp.GetDetails().GetSequence(), createRespImport.GetDetails().GetChangeDate(), resp.GetDetails().GetChangeDate(), nil, nil, 0, userImport.GetUserId(), wantUserFactor, wantTOTPFactor)
 	})
 }
 
@@ -669,7 +672,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{})
 	require.NoError(t, err)
 	sessionToken := createResp.GetSessionToken()
-	verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId())
+	verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, createResp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), createResp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId())
 
 	t.Run("check user", func(t *testing.T) {
 		resp, err := Client.SetSession(LoginCTX, &session.SetSessionRequest{
@@ -684,7 +687,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 		})
 		require.NoError(t, err)
 		sessionToken = resp.GetSessionToken()
-		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId(), wantUserFactor)
+		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), resp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId(), wantUserFactor)
 	})
 
 	t.Run("check webauthn, user verified (passkey)", func(t *testing.T) {
@@ -698,7 +701,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 			},
 		})
 		require.NoError(t, err)
-		verifyCurrentSession(t, createResp.GetSessionId(), resp.GetSessionToken(), resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId())
+		verifyCurrentSession(t, createResp.GetSessionId(), resp.GetSessionToken(), resp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), resp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId())
 		sessionToken = resp.GetSessionToken()
 
 		assertionData, err := Instance.WebAuthN.CreateAssertionResponse(resp.GetChallenges().GetWebAuthN().GetPublicKeyCredentialRequestOptions(), true)
@@ -714,7 +717,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 		})
 		require.NoError(t, err)
 		sessionToken = resp.GetSessionToken()
-		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId(), wantUserFactor, wantWebAuthNFactorUserVerified)
+		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), resp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId(), wantUserFactor, wantWebAuthNFactorUserVerified)
 	})
 
 	userAuthCtx := integration.WithAuthorizationToken(CTX, sessionToken)
@@ -740,7 +743,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 					},
 				})
 				require.NoError(t, err)
-				verifyCurrentSession(t, createResp.GetSessionId(), resp.GetSessionToken(), resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId())
+				verifyCurrentSession(t, createResp.GetSessionId(), resp.GetSessionToken(), resp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), resp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId())
 				sessionToken = resp.GetSessionToken()
 
 				assertionData, err := Instance.WebAuthN.CreateAssertionResponse(resp.GetChallenges().GetWebAuthN().GetPublicKeyCredentialRequestOptions(), false)
@@ -756,7 +759,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 				})
 				require.NoError(t, err)
 				sessionToken = resp.GetSessionToken()
-				verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId(), wantUserFactor, wantWebAuthNFactor)
+				verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), resp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId(), wantUserFactor, wantWebAuthNFactor)
 			})
 		}
 	})
@@ -774,7 +777,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 		})
 		require.NoError(t, err)
 		sessionToken = resp.GetSessionToken()
-		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId(), wantUserFactor, wantWebAuthNFactor, wantTOTPFactor)
+		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), resp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId(), wantUserFactor, wantWebAuthNFactor, wantTOTPFactor)
 	})
 
 	t.Run("check OTP SMS", func(t *testing.T) {
@@ -785,7 +788,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 			},
 		})
 		require.NoError(t, err)
-		verifyCurrentSession(t, createResp.GetSessionId(), resp.GetSessionToken(), resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId())
+		verifyCurrentSession(t, createResp.GetSessionId(), resp.GetSessionToken(), resp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), resp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId())
 		sessionToken = resp.GetSessionToken()
 
 		otp := resp.GetChallenges().GetOtpSms()
@@ -801,7 +804,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 		})
 		require.NoError(t, err)
 		sessionToken = resp.GetSessionToken()
-		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId(), wantUserFactor, wantWebAuthNFactor, wantOTPSMSFactor)
+		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), resp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId(), wantUserFactor, wantWebAuthNFactor, wantOTPSMSFactor)
 	})
 
 	t.Run("check OTP Email", func(t *testing.T) {
@@ -814,7 +817,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 			},
 		})
 		require.NoError(t, err)
-		verifyCurrentSession(t, createResp.GetSessionId(), resp.GetSessionToken(), resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId())
+		verifyCurrentSession(t, createResp.GetSessionId(), resp.GetSessionToken(), resp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), resp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId())
 		sessionToken = resp.GetSessionToken()
 
 		otp := resp.GetChallenges().GetOtpEmail()
@@ -830,7 +833,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 		})
 		require.NoError(t, err)
 		sessionToken = resp.GetSessionToken()
-		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId(), wantUserFactor, wantWebAuthNFactor, wantOTPEmailFactor)
+		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), resp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId(), wantUserFactor, wantWebAuthNFactor, wantOTPEmailFactor)
 	})
 }
 

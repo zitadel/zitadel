@@ -53,6 +53,10 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 						context.Background(), aggregate,
 						feature_v2.SystemUserSchemaEventType, false,
 					)),
+					eventFromEventPusher(feature_v2.NewSetEvent(
+						context.Background(), aggregate,
+						feature_v2.SystemEnableRelationalTables, false,
+					)),
 				),
 			),
 			want: &SystemFeatures{
@@ -64,6 +68,10 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 					Value: false,
 				},
 				UserSchema: FeatureSource[bool]{
+					Level: feature.LevelSystem,
+					Value: false,
+				},
+				EnableRelationalTables: FeatureSource[bool]{
 					Level: feature.LevelSystem,
 					Value: false,
 				},

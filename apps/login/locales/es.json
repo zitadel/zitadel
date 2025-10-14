@@ -27,8 +27,37 @@
     "description": "Introduce tus datos de acceso.",
     "register": "Registrar nuevo usuario",
     "submit": "Continuar",
+    "labels": {
+      "loginname": "Nombre de inicio de sesión",
+      "username": "Nombre de usuario",
+      "usernameOrPhoneNumber": "Nombre de usuario o número de teléfono",
+      "usernameOrEmail": "Nombre de usuario o correo electrónico"
+    },
     "required": {
       "loginName": "Este campo es obligatorio"
+    },
+    "errors": {
+      "internalError": "Se produjo un error interno",
+      "couldNotGetLoginSettings": "No se pudieron obtener los ajustes de inicio de sesión",
+      "couldNotSearchUsers": "No se pudieron buscar usuarios",
+      "couldNotGetDomain": "No se pudo obtener el dominio",
+      "couldNotGetHost": "No se pudo obtener el host",
+      "couldNotStartIDPFlow": "No se pudo iniciar el flujo de IDP",
+      "moreThanOneUserFound": "Se encontró más de un usuario. Proporcione un identificador único.",
+      "userNotFound": "Usuario no encontrado en el sistema",
+      "couldNotCreateSession": "No se pudo crear la sesión para el usuario",
+      "initialUserNotSupported": "Usuario inicial no admitido",
+      "usernamePasswordNotAllowed": "El inicio de sesión con usuario y contraseña no está permitido. Contacte con su administrador para más información.",
+      "passkeysNotAllowed": "Las passkeys no están permitidas. Contacte con su administrador para más información.",
+      "couldNotFindIdentityProvider": "No se pudo encontrar el proveedor de identidad.",
+      "userNotActive": "El usuario no está activo. Contacte con su administrador para más información."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Ocurrió un error",
+      "multipleUsersFound": "Se encontraron varios usuarios",
+      "userNotFound": "Usuario no encontrado en el sistema"
     }
   },
   "password": {
@@ -37,8 +66,18 @@
       "description": "Introduce tu contraseña.",
       "resetPassword": "Restablecer contraseña",
       "submit": "Continuar",
+      "labels": {
+        "password": "Contraseña"
+      },
       "required": {
         "password": "Este campo es obligatorio"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "No se pudo verificar la contraseña",
+        "couldNotResetPassword": "No se pudo restablecer la contraseña"
+      },
+      "info": {
+        "passwordResetSent": "Se restableció la contraseña. Por favor, revise su correo electrónico"
       }
     },
     "set": {
@@ -48,20 +87,67 @@
       "noCodeReceived": "¿No recibiste un código?",
       "resend": "Reenviar código",
       "submit": "Continuar",
+      "labels": {
+        "code": "Código",
+        "newPassword": "Nueva contraseña",
+        "confirmPassword": "Confirmar contraseña"
+      },
       "required": {
         "code": "Este campo es obligatorio",
         "newPassword": "¡Debes proporcionar una contraseña!",
         "confirmPassword": "Este campo es obligatorio"
+      },
+      "errors": {
+        "couldNotSetPassword": "No se pudo establecer la contraseña",
+        "couldNotResetPassword": "No se pudo restablecer la contraseña",
+        "couldNotVerifyPassword": "No se pudo verificar la contraseña"
       }
     },
     "change": {
       "title": "Cambiar Contraseña",
       "description": "Establece la contraseña para tu cuenta",
       "submit": "Continuar",
+      "labels": {
+        "newPassword": "Nueva contraseña",
+        "confirmPassword": "Confirmar contraseña"
+      },
       "required": {
         "newPassword": "¡Debes proporcionar una nueva contraseña!",
         "confirmPassword": "Este campo es obligatorio"
+      },
+      "errors": {
+        "couldNotChangePassword": "No se pudo cambiar la contraseña",
+        "couldNotVerifyPassword": "No se pudo verificar la contraseña",
+        "unknownError": "Error desconocido"
       }
+    },
+    "complexity": {
+      "length": "Debe tener al menos {minLength} caracteres de longitud.",
+      "hasSymbol": "Debe incluir un símbolo.",
+      "hasNumber": "Debe incluir un número.",
+      "hasUppercase": "Debe incluir una letra mayúscula.",
+      "hasLowercase": "Debe incluir una letra minúscula.",
+      "equals": "La confirmación de la contraseña coincide.",
+      "matches": "Coincide",
+      "doesNotMatch": "No coincide"
+    },
+    "errors": {
+      "noHostFound": "No se encontró el host",
+      "couldNotSendResetLink": "No se pudo enviar el enlace de restablecimiento de contraseña",
+      "couldNotCreateSessionForUser": "No se pudo crear la sesión para el usuario",
+      "couldNotVerifyPassword": "No se pudo verificar la contraseña",
+      "failedToAuthenticate": "Error al autenticar. Tuvo {failedAttempts} de {maxPasswordAttempts} intentos de contraseña.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Error al autenticar.",
+      "accountLockedContactAdmin": " Comuníquese con su administrador para desbloquear su cuenta",
+      "userNotFound": "Usuario no encontrado en el sistema",
+      "initialUserNotSupported": "Usuario inicial no compatible",
+      "userInitialStateNotSupported": "El estado inicial del usuario no es compatible",
+      "codeOrVerificationRequired": "Debe proporcionar un código o tener una verificación de usuario válida",
+      "verificationRequired": "Se debe realizar la verificación de usuario",
+      "couldNotLoadSession": "No se pudo cargar la sesión",
+      "couldNotLoadAuthMethods": "No se pudieron cargar los métodos de autenticación",
+      "failedPrecondition": "Precondición fallida",
+      "sessionNotValid": "La sesión no es válida"
     }
   },
   "idp": {
@@ -101,9 +187,11 @@
   "ldap": {
     "title": "Iniciar sesión con LDAP",
     "description": "Introduce tus credenciales LDAP.",
-    "username": "Nombre de usuario",
-    "password": "Contraseña",
     "submit": "Continuar",
+    "labels": {
+      "username": "Nombre de usuario",
+      "password": "Contraseña"
+    },
     "required": {
       "username": "Este campo es obligatorio",
       "password": "Este campo es obligatorio"
@@ -130,6 +218,9 @@
       "noCodeReceived": "¿No recibiste un código?",
       "resendCode": "Reenviar código",
       "submit": "Continuar",
+      "labels": {
+        "code": "Código"
+      },
       "required": {
         "code": "Este campo es obligatorio"
       }
@@ -141,6 +232,9 @@
       "emailDescription": "Introduce tu dirección de correo electrónico para recibir un código por correo electrónico.",
       "totpRegisterDescription": "Escanea el código QR o navega manualmente a la URL.",
       "submit": "Continuar",
+      "labels": {
+        "code": "Código"
+      },
       "required": {
         "code": "Este campo es obligatorio"
       }
@@ -196,20 +290,35 @@
     "termsOfService": "Términos de Servicio",
     "privacyPolicy": "Política de Privacidad",
     "submit": "Continuar",
-    "orUseIDP": "o usa un Proveedor de Identidad",
     "password": {
       "title": "Establecer Contraseña",
       "description": "Establece la contraseña para tu cuenta",
       "submit": "Continuar",
+      "labels": {
+        "password": "Contraseña",
+        "confirmPassword": "Confirmar contraseña"
+      },
       "required": {
         "password": "¡Debes proporcionar una contraseña!",
         "confirmPassword": "Este campo es obligatorio"
       }
     },
+    "labels": {
+      "firstname": "Nombre",
+      "lastname": "Apellidos",
+      "email": "Correo electrónico"
+    },
     "required": {
       "firstname": "Este campo es obligatorio",
       "lastname": "Este campo es obligatorio",
       "email": "Este campo es obligatorio"
+    },
+    "errors": {
+      "couldNotCreateUser": "No se pudo crear el usuario",
+      "couldNotCreateSession": "No se pudo crear la sesión",
+      "userNotFound": "Usuario no encontrado en el sistema",
+      "couldNotLinkIDP": "No se pudo vincular el IdP al usuario",
+      "couldNotRegisterUser": "No se pudo registrar el usuario"
     }
   },
   "invite": {
@@ -247,9 +356,25 @@
       "resendCode": "Reenviar código",
       "codeSent": "Se ha enviado un código a tu dirección de correo electrónico.",
       "submit": "Continuar",
+      "labels": {
+        "code": "Código"
+      },
       "required": {
         "code": "Este campo es obligatorio"
       }
+    },
+    "errors": {
+      "couldNotResendEmail": "No se pudo reenviar el correo electrónico",
+      "couldNotVerifyUser": "No se pudo verificar al usuario",
+      "couldNotVerifyInvite": "No se pudo verificar la invitación",
+      "couldNotVerifyEmail": "No se pudo verificar el correo electrónico",
+      "couldNotVerify": "No se pudo verificar",
+      "couldNotLoadUser": "No se pudo cargar al usuario",
+      "couldNotLoadAuthenticators": "No se pudieron cargar los autenticadores posibles",
+      "couldNotCreateSession": "No se pudo crear la sesión",
+      "noHostFound": "No se encontró el host",
+      "userAlreadyVerified": "¡El usuario ya está verificado!",
+      "couldNotResendInvite": "No se pudo reenviar la invitación"
     }
   },
   "authenticator": {
@@ -264,6 +389,9 @@
       "title": "Código del dispositivo",
       "description": "Introduce el código.",
       "submit": "Continuar",
+      "labels": {
+        "code": "Código"
+      },
       "required": {
         "code": "Este campo es obligatorio"
       }
