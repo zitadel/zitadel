@@ -33,6 +33,7 @@ type Invoker interface {
 type CommandOpts struct {
 	DB                     database.QueryExecutor
 	Invoker                Invoker
+	Permissions            PermissionChecker
 	organizationRepo       OrganizationRepository
 	organizationDomainRepo OrganizationDomainRepository
 	projectRepo            ProjectRepository
@@ -121,8 +122,9 @@ func DefaultOpts(invoker Invoker) *CommandOpts {
 		invoker = &noopInvoker{}
 	}
 	return &CommandOpts{
-		DB:      pool,
-		Invoker: invoker,
+		DB:          pool,
+		Invoker:     invoker,
+		Permissions: &noopPermissionChecker{}, // prevent panics for now
 	}
 }
 
