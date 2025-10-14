@@ -2,89 +2,73 @@ package group
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 const (
-	uniqueGroupUserType       = "group_user"
-	GroupUserAddedEventType   = groupEventTypePrefix + "user.added"
-	GroupUserRemovedEventType = groupEventTypePrefix + "user.removed"
+	GroupUsersAddedEventType   = groupEventTypePrefix + "users.added"
+	GroupUsersRemovedEventType = groupEventTypePrefix + "users.removed"
 )
 
-func NewAddGroupUserUniqueConstraint(groupID, userID string) *eventstore.UniqueConstraint {
-	return eventstore.NewAddEventUniqueConstraint(
-		uniqueGroupUserType,
-		fmt.Sprintf("%s:%s", groupID, userID),
-		"Errors.Group.User.AlreadyExists",
-	)
-}
-
-func NewRemoveGroupUserUniqueConstraint(groupID, userID string) *eventstore.UniqueConstraint {
-	return eventstore.NewRemoveUniqueConstraint(
-		uniqueGroupUserType,
-		fmt.Sprintf("%s:%s", groupID, userID))
-}
-
-type GroupUserAddedEvent struct {
+type GroupUsersAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserID string `json:"userId"`
+	UserIDs []string `json:"userId"`
 }
 
-func NewGroupUserAddedEvent(ctx context.Context, aggregate *eventstore.Aggregate, userID string) *GroupUserAddedEvent {
-	return &GroupUserAddedEvent{
+func NewGroupUsersAddedEvent(ctx context.Context, aggregate *eventstore.Aggregate, userIDs []string) *GroupUsersAddedEvent {
+	return &GroupUsersAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			GroupUserAddedEventType,
+			GroupUsersAddedEventType,
 		),
-		UserID: userID,
+		UserIDs: userIDs,
 	}
 }
 
-func (e *GroupUserAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+func (e *GroupUsersAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = *event
 }
 
-func (e *GroupUserAddedEvent) Payload() interface{} {
+func (e *GroupUsersAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *GroupUserAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddGroupUserUniqueConstraint(e.Aggregate().ID, e.UserID)}
+func (e *GroupUsersAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
 }
 
-type GroupUserRemovedEvent struct {
+type GroupUsersRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserID string `json:"userId"`
+	UserIDs []string `json:"userId"`
 }
 
-func NewGroupUserRemovedEvent(
+func NewGroupUsersRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	userID string,
-) *GroupUserRemovedEvent {
-	return &GroupUserRemovedEvent{
+	userIDs []string,
+) *GroupUsersRemovedEvent {
+	return &GroupUsersRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			GroupUserRemovedEventType,
+			GroupUsersRemovedEventType,
 		),
-		UserID: userID,
+		UserIDs: userIDs,
 	}
 }
 
-func (e *GroupUserRemovedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+func (e *GroupUsersRemovedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = *event
 }
 
-func (e *GroupUserRemovedEvent) Payload() interface{} {
+func (e *GroupUsersRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *GroupUserRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveGroupUserUniqueConstraint(e.Aggregate().ID, e.UserID)}
+func (e *GroupUsersRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
 }

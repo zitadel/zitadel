@@ -11,15 +11,3 @@ const (
 func (g GroupState) Exists() bool {
 	return g != GroupStateRemoved && g != GroupStateUnspecified
 }
-
-type GroupUserState int32
-
-const (
-	GroupUserStateUnspecified GroupUserState = iota
-	GroupUserStateActive
-	GroupUserStateRemoved
-)
-
-func (g GroupUserState) Exists() bool {
-	return g != GroupUserStateRemoved && g != GroupUserStateUnspecified
-}

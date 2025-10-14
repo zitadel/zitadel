@@ -6,7 +6,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore"
 	repo "github.com/zitadel/zitadel/internal/repository/group"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -21,7 +20,7 @@ func (c *Commands) AddUsersToGroup(ctx context.Context, groupID string, userIDs 
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	// check whether the group exists
+	// precondition: check whether the group exists
 	group, err := c.getGroupWriteModelByID(ctx, groupID, "")
 	if err != nil {
 		return nil, err
@@ -31,7 +30,7 @@ func (c *Commands) AddUsersToGroup(ctx context.Context, groupID string, userIDs 
 	}
 
 	// check whether the requester has permissions to add users to the group
-	err = c.checkPermissionCreateGroup(ctx, group.ResourceOwner, group.AggregateID)
+	err = c.checkPermissionAddUserToGroup(ctx, group.ResourceOwner, group.AggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -49,10 +48,7 @@ func (c *Commands) AddUsersToGroup(ctx context.Context, groupID string, userIDs 
 }
 
 func (c *Commands) addUsersToGroup(ctx context.Context, resourceOwner, groupID string, userIDs []string) (*domain.ObjectDetails, []string, error) {
-	var failedUserIDs []string
-	var groupUserWriteModel *GroupUserWriteModel
-	var events []eventstore.Command
-
+	var failedUserIDs, usersIDsToAdd []string
 	for _, userID := range userIDs {
 		// check whether the user exists in the same organization as the group
 		userResourceOwner, err := c.checkUserExists(ctx, userID, "")
@@ -62,52 +58,46 @@ func (c *Commands) addUsersToGroup(ctx context.Context, resourceOwner, groupID s
 				"group_id", groupID,
 				"user_resource_owner", userResourceOwner,
 				"group_resource_owner", resourceOwner,
-			).WithError(err).Error("failed to add user to group")
+			).WithError(err).Error("user does not exist or is not in the same organization as the group")
 			failedUserIDs = append(failedUserIDs, userID)
 			continue
 		}
-
-		// check whether the user is already a member of the group
-		wm, err := c.getGroupUserWriteModel(ctx, resourceOwner, groupID, userID)
-		if err != nil {
-			// failed to get the writemodel
-			logging.WithFields("user_id", userID, "group_id", groupID).WithError(err).Error("failed to add user to group")
-			failedUserIDs = append(failedUserIDs, userID)
-			continue
-		}
-		if wm.State.Exists() {
-			// the user is already a member of the group
-			continue
-		}
-
-		// add the user to the group
-		events = append(
-			events,
-			repo.NewGroupUserAddedEvent(
-				ctx,
-				GroupAggregateFromWriteModel(ctx, &wm.WriteModel),
-				userID,
-			),
-		)
-		groupUserWriteModel = wm
+		usersIDsToAdd = append(usersIDsToAdd, userID)
 	}
 
-	// no users were added
-	if len(events) == 0 {
+	if len(usersIDsToAdd) == 0 {
 		return nil, failedUserIDs, nil
 	}
 
-	details, err := c.pushAppendAndReduceDetails(ctx,
-		groupUserWriteModel,
-		events...)
+	groupUsersWriteModel, err := c.getGroupUsersWriteModel(ctx, resourceOwner, groupID, usersIDsToAdd)
 	if err != nil {
 		return nil, failedUserIDs, err
 	}
-	return details, failedUserIDs, nil
+	// filter out users who already exist in the group
+	usersIDsToAdd = groupUsersWriteModel.userIDsToAdd()
+	if len(usersIDsToAdd) == 0 {
+		// all users already exist in the group; desired state achieved
+		return writeModelToObjectDetails(&groupUsersWriteModel.WriteModel), failedUserIDs, nil
+	}
+
+	// add users to the group
+	err = c.pushAppendAndReduce(ctx,
+		groupUsersWriteModel,
+		repo.NewGroupUsersAddedEvent(
+			ctx,
+			GroupAggregateFromWriteModel(ctx, &groupUsersWriteModel.WriteModel),
+			usersIDsToAdd,
+		),
+	)
+	if err != nil {
+		return nil, failedUserIDs, err
+	}
+
+	return writeModelToObjectDetails(&groupUsersWriteModel.WriteModel), failedUserIDs, nil
 }
 
-func (c *Commands) getGroupUserWriteModel(ctx context.Context, resourceOwner, groupID, userID string) (*GroupUserWriteModel, error) {
-	groupUserWriteModel := NewGroupUserWriteModel(resourceOwner, groupID, userID)
+func (c *Commands) getGroupUsersWriteModel(ctx context.Context, resourceOwner, groupID string, userIDs []string) (*GroupUsersWriteModel, error) {
+	groupUserWriteModel := NewGroupUsersWriteModel(resourceOwner, groupID, userIDs)
 	err := c.eventstore.FilterToQueryReducer(ctx, groupUserWriteModel)
 	if err != nil {
 		return nil, err
