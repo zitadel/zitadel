@@ -128,7 +128,15 @@ func resourceFilterToQuery(q *internal_permission.ResourceFilter) (query.SearchQ
 	case *internal_permission.ResourceFilter_OrganizationId:
 		return query.NewMembershipOrgIDQuery(r.OrganizationId)
 	case *internal_permission.ResourceFilter_ProjectId:
-		return query.NewMembershipProjectIDQuery(r.ProjectId)
+		projectIDQuery, err := query.NewMembershipProjectIDQuery(r.ProjectId)
+		if err != nil {
+			return nil, err
+		}
+		notGrantedQuery, err := query.NewMembershipNotGrantedSearchQuery()
+		if err != nil {
+			return nil, err
+		}
+		return query.NewAndQuery(projectIDQuery, notGrantedQuery)
 	case *internal_permission.ResourceFilter_ProjectGrant_:
 		projectIDQuery, err := query.NewMembershipProjectIDQuery(r.ProjectGrant.GetProjectId())
 		if err != nil {

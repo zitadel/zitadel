@@ -19,6 +19,7 @@ import (
 var (
 	CTX                  context.Context
 	instance             *integration.Instance
+	instanceQuery        *integration.Instance
 	instancePermissionV2 *integration.Instance
 )
 
@@ -28,6 +29,7 @@ func TestMain(m *testing.M) {
 		defer cancel()
 		CTX = ctx
 		instance = integration.NewInstance(ctx)
+		instanceQuery = integration.NewInstance(ctx) // create a separate one for queries to avoid side effects
 		instancePermissionV2 = integration.NewInstance(CTX)
 		return m.Run()
 	}())
