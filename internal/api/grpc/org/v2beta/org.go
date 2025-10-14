@@ -3,7 +3,6 @@ package org
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -193,7 +192,6 @@ func (s *Server) GenerateOrganizationDomainValidation(ctx context.Context, req *
 
 func (s *Server) VerifyOrganizationDomain(ctx context.Context, request *connect.Request[org.VerifyOrganizationDomainRequest]) (*connect.Response[org.VerifyOrganizationDomainResponse], error) {
 	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, request.Msg.GetDomain(), request.Msg.GetOrganizationId())
-	fmt.Printf("[DEBUGPRINT] [users_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> userIDs = %+v\n", userIDs)
 	if err != nil {
 		return nil, err
 	}

@@ -189,9 +189,9 @@ type HumanContact struct {
 
 // human security
 type HumanSecurity struct {
-	InstanceID string `json:"instanceId,omitempty" db:"instance_id"`
-	OrgID      string `json:"orgId,omitempty" db:"org_id"`
-	UserId     string `json:"userId,omitempty" db:"user_id"`
+	// InstanceID string `json:"instanceId,omitempty" db:"instance_id"`
+	// OrgID      string `json:"orgId,omitempty" db:"org_id"`
+	// UserId     string `json:"userId,omitempty" db:"user_id"`
 
 	PasswordChangeRequired bool       `json:"passwordChangeRequired,omitempty" db:"password_change_required"`
 	PasswordChange         *time.Time `json:"passwordChange,omitempty" db:"password_change"`
@@ -203,6 +203,7 @@ type HumanSecurityRepository interface {
 	humanSecurityConditions
 	humanSecurityChanges
 
+	Create(ctx context.Context, client database.QueryExecutor, user *Human) error
 	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*HumanSecurity, error)
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 }

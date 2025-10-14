@@ -3,7 +3,6 @@ package projection
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"time"
 
 	"github.com/muhlemmer/gu"
@@ -253,6 +252,7 @@ func (u *userRelationalProjection) reduceHumanAdded(event eventstore.Event) (*ha
 		}
 		userRepo := repository.UserRepository()
 
+		// TODO add password
 		_, err := userRepo.CreateHuman(ctx, v3_sql.SQLTx(tx),
 			&domain.Human{
 				FirstName:         e.FirstName,
@@ -299,7 +299,6 @@ func (u *userRelationalProjection) reduceHumanAdded(event eventstore.Event) (*ha
 				},
 			},
 		)
-		fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  ADDD HUMAN err = %+v\n", err)
 		return err
 	}), nil
 }
@@ -309,7 +308,6 @@ func (p *userRelationalProjection) reduceHumanRegistered(event eventstore.Event)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xhD3q", "reduce.wrong.event.type %s", user.HumanRegisteredType)
 	}
-	fmt.Println("[DEBUGPRINT] [users_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> HUMAN REGISTERED REDUCE")
 
 	passwordSet := crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -370,7 +368,6 @@ func (p *userRelationalProjection) reduceHumanRegistered(event eventstore.Event)
 }
 
 func (p *userRelationalProjection) reduceHumanInitCodeAdded(event eventstore.Event) (*handler.Statement, error) {
-	fmt.Println("[DEBUGPRINT] [users_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> INITAL")
 	e, ok := event.(*user.HumanInitialCodeAddedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-vv7Qs", "reduce.wrong.event.type %s", user.HumanInitialCodeAddedType)
@@ -405,7 +402,6 @@ func (p *userRelationalProjection) reduceHumanInitCodeSucceeded(event eventstore
 }
 
 func (p *userRelationalProjection) reduceUserLocked(event eventstore.Event) (*handler.Statement, error) {
-	fmt.Println("[DEBUGPRINT] [users_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> LOCKED")
 	e, ok := event.(*user.UserLockedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-eUn8f", "reduce.wrong.event.type %s", user.UserLockedType)
@@ -500,7 +496,6 @@ func (p *userRelationalProjection) reduceUserUnlocked(event eventstore.Event) (*
 }
 
 func (p *userRelationalProjection) reduceUserDeactivated(event eventstore.Event) (*handler.Statement, error) {
-	fmt.Println("[DEBUGPRINT] [users_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DEACTIVATED")
 	e, ok := event.(*user.UserDeactivatedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-6BNjj", "reduce.wrong.event.type %s", user.UserDeactivatedType)
@@ -599,7 +594,6 @@ func (p *userRelationalProjection) reduceUserReactivated(event eventstore.Event)
 }
 
 func (p *userRelationalProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
-	fmt.Println("[DEBUGPRINT] [users_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> USER DELETED")
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-BQB2t", "reduce.wrong.event.type %s", user.UserRemovedType)
@@ -641,7 +635,6 @@ func (p *userRelationalProjection) reduceUserRemoved(event eventstore.Event) (*h
 }
 
 func (p *userRelationalProjection) reduceUserNameChanged(event eventstore.Event) (*handler.Statement, error) {
-	fmt.Println("[DEBUGPRINT] [users_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> USERNAME CHANGE")
 	e, ok := event.(*user.UsernameChangedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-QNKyV", "reduce.wrong.event.type %s", user.UserUserNameChangedType)
@@ -694,8 +687,6 @@ func (p *userRelationalProjection) reduceDomainClaimed(event eventstore.Event) (
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ASwf3", "reduce.wrong.event.type %s", user.UserDomainClaimedType)
 	}
-	fmt.Println("[DEBUGPRINT] [users_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DOMAIN CLAIMED")
-	fmt.Printf("[DEBUGPRINT] [users_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> e.UserName = %+v\n", e.UserName)
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1064,7 +1055,6 @@ func (p *userRelationalProjection) reduceHumanAvatarAdded(event eventstore.Event
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-eDEdt", "reduce.wrong.event.type %s", user.HumanAvatarAddedType)
 	}
-	fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> NEW ADVATAR")
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1187,7 +1177,6 @@ func (p *userRelationalProjection) reduceHumanPasswordChanged(event eventstore.E
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-jqXUY", "reduce.wrong.event.type %s", user.HumanPasswordChangedType)
 	}
-	fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> PASSWORD CHANGE")
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
@@ -1197,14 +1186,14 @@ func (p *userRelationalProjection) reduceHumanPasswordChanged(event eventstore.E
 
 		noOfRecordsUpdated, err := userRepo.Human().Security().Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
-				userRepo.Human().InstanceIDCondition(e.Aggregate().InstanceID),
-				userRepo.Human().IDCondition(e.Aggregate().ID),
+				userRepo.Human().Security().InstanceIDCondition(e.Aggregate().InstanceID),
+				userRepo.Human().Security().UserIDCondition(e.Aggregate().ID),
 			),
 			// TODO
 			// userRepo.Human().SetUsername(e.UserName),
 			userRepo.Human().Security().SetPasswordChangeRequired(e.ChangeRequired),
 			userRepo.Human().Security().SetPasswordChanged(e.CreatedAt()),
-			userRepo.Human().SetUpdatedAt(e.CreationDate()),
+			// userRepo.Human().SetUpdatedAt(e.CreationDate()),
 		)
 		if err != nil {
 			return err
@@ -1371,7 +1360,6 @@ func (p *userRelationalProjection) reduceMachineAdded(event eventstore.Event) (*
 				},
 			},
 		)
-		fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  ADDD HUMAN err = %+v\n", err)
 		return err
 	}), nil
 }
@@ -1402,7 +1390,6 @@ func (p *userRelationalProjection) reduceMachineChanged(event eventstore.Event) 
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
-		fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CHANGE USER")
 
 		noOfRecordsUpdated, err := userRepo.UpdateMachine(ctx, v3_sql.SQLTx(tx),
 			database.And(

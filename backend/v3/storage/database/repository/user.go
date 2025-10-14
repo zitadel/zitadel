@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -472,10 +471,10 @@ func (u user) CreateHuman(ctx context.Context, client database.QueryExecutor, us
 		}()
 	}
 
-	err = u.CreateHumanSecurity(ctx, client, user)
-	if err != nil {
-		return nil, err
-	}
+	humanSecurityCreateErrChann := make(chan error, 1)
+	go func() {
+		humanSecurityCreateErrChann <- u.Human().Security().Create(ctx, client, user)
+	}()
 
 	if err := <-humanEmailContactCreateErrChann; err != nil {
 		return nil, err
@@ -487,6 +486,9 @@ func (u user) CreateHuman(ctx context.Context, client database.QueryExecutor, us
 		}
 	}
 
+	if err := <-humanSecurityCreateErrChann; err != nil {
+		return nil, err
+	}
 	return user, nil
 }
 
@@ -497,7 +499,6 @@ const createHumaneStmt = `INSERT INTO zitadel.human_users (instance_id, org_id, 
 
 func (u user) createHuman(ctx context.Context, client database.QueryExecutor, user *domain.Human) (*domain.Human, error) {
 	builder := database.StatementBuilder{}
-	fmt.Printf("[DEBUGPRINT] [users_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> user.State = %+v\n", user.State)
 	builder.AppendArgs(user.User.InstanceID, user.User.OrgID, user.ID, user.Username, user.UsernameOrgUnique, user.State)
 	builder.AppendArgs(user.FirstName, user.LastName, user.NickName, user.DisplayName, user.PreferredLanguage, user.Gender, user.AvatarKey)
 
@@ -518,23 +519,6 @@ func (u user) CreateHumanContact(ctx context.Context, client database.QueryExecu
 
 	builder.WriteString(createHumaneContactStmt)
 
-	// return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
-	_, err := client.Exec(ctx, builder.String(), builder.Args()...)
-	return err
-}
-
-const createHumaneSecuirtyStmt = `INSERT INTO zitadel.human_security (instance_id, org_id, user_id,` +
-	` password_change_required, password_changed, mfa_init_skipped)` +
-	` VALUES($1, $2, $3, $4, $5, $6)`
-
-func (u user) CreateHumanSecurity(ctx context.Context, client database.QueryExecutor, user *domain.Human) error {
-	builder := database.StatementBuilder{}
-	builder.AppendArgs(user.User.InstanceID, user.User.OrgID, user.ID)
-	builder.AppendArgs(user.HumanSecurity.PasswordChangeRequired, user.HumanSecurity.PasswordChange, user.HumanSecurity.MFAInitSkipped)
-
-	builder.WriteString(createHumaneSecuirtyStmt)
-
-	// return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
 	_, err := client.Exec(ctx, builder.String(), builder.Args()...)
 	return err
 }
@@ -563,19 +547,6 @@ func (u user) UpdateHuman(ctx context.Context, client database.QueryExecutor, co
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
-
-// func (h human) GetHumanTableChanges(changes ...database.Change) []*database.Change {
-// 	var humanChanges []*database.Change
-// 	for _, change := range changes {
-// 		if change.IsOnTable(h.contact.qualifiedTableName()) {
-// 			if humanChanges == nil {
-// 				humanChanges = make([]*database.Change, 0, len(changes))
-// 			}
-// 			humanChanges = append(humanChanges, &change)
-// 		}
-// 	}
-// 	return humanChanges
-// }
 
 func (c contact) Set(ctx context.Context, client database.QueryExecutor, contact domain.HumanContact) (int64, error) {
 	// 	for _, opt := range opts {
@@ -795,6 +766,20 @@ func (u user) DeleteMachine(ctx context.Context, client database.QueryExecutor, 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
+const createHumanSecurityStmt = `INSERT INTO zitadel.human_security (instance_id, org_id, user_id, password_change_required, password_changed, mfa_init_skipped)` +
+	` VALUES($1, $2, $3, $4, $5, $6)`
+
+func (s security) Create(ctx context.Context, client database.QueryExecutor, user *domain.Human) error {
+	builder := database.StatementBuilder{}
+	builder.AppendArgs(user.User.InstanceID, user.User.OrgID, user.ID, user.HumanSecurity.PasswordChangeRequired,
+		user.HumanSecurity.PasswordChange, user.HumanSecurity.MFAInitSkipped)
+
+	builder.WriteString(createHumanSecurityStmt)
+
+	_, err := client.Exec(ctx, builder.String(), builder.Args()...)
+	return err
+}
+
 const querySecuirtyStmt = `SELECT zitadel.human_security.instance_id, zitadel.human_security.org_id, zitadel.human_security.user_id,` +
 	` password_change_required, password_changed, mfa_init_skipped FROM zitadel.human_security`
 
@@ -827,17 +812,16 @@ func (s security) Update(ctx context.Context, client database.QueryExecutor, con
 		return 0, database.ErrNoChanges
 	}
 
-	human := human{}
-	if !condition.IsRestrictingColumn(human.InstanceIDColumn()) {
-		return 0, database.NewMissingConditionError(human.InstanceIDColumn())
+	if !condition.IsRestrictingColumn(s.InstanceIDColumn()) {
+		return 0, database.NewMissingConditionError(s.InstanceIDColumn())
 	}
 
 	// if !condition.IsRestrictingColumn(human.OrgIDColumn()) {
 	// 	return 0, database.NewMissingConditionError(human.OrgIDColumn())
 	// }
 
-	if !condition.IsRestrictingColumn(human.UserIDColumn()) {
-		return 0, database.NewMissingConditionError(human.UserIDColumn())
+	if !condition.IsRestrictingColumn(s.UserIDColumn()) {
+		return 0, database.NewMissingConditionError(s.UserIDColumn())
 	}
 
 	var builder database.StatementBuilder

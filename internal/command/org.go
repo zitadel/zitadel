@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -96,14 +95,12 @@ func (o *OrgSetup) Validate() (err error) {
 }
 
 func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID string, allowInitialMail bool, userIDs ...string) (_ *CreatedOrg, err error) {
-	fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SET UP OWG WITH ID 1")
 	cmds := c.newOrgSetupCommands(ctx, orgID, o)
 	for _, admin := range o.Admins {
 		if err = cmds.setupOrgAdmin(admin, allowInitialMail); err != nil {
 			return nil, err
 		}
 	}
-	fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SET UP OWG WITH ID 2")
 	if err = cmds.addCustomDomain(o.CustomDomain, userIDs); err != nil {
 		return nil, err
 	}
@@ -204,7 +201,6 @@ func (c *orgSetupCommands) push(ctx context.Context) (_ *CreatedOrg, err error) 
 
 	events, err := c.commands.eventstore.Push(ctx, cmds...)
 	if err != nil {
-		fmt.Printf("[DEBUGPRINT] [main.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> err>>>>>>>>>>>>>> = %+v\n", err)
 		return nil, err
 	}
 
@@ -268,7 +264,6 @@ func (c *orgSetupCommands) createdMachineAdmin(admin *OrgSetupAdmin) *CreatedOrg
 }
 
 func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, allowInitialMail bool, userIDs ...string) (*CreatedOrg, error) {
-	fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SET UP ORG")
 	if err := o.Validate(); err != nil {
 		return nil, err
 	}
@@ -280,7 +275,6 @@ func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, allowInitialMail b
 			return nil, err
 		}
 	}
-	fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SET UP ORG 1")
 
 	// because users can choose their own ID, we must check that an org with the same ID does not already exist
 	existingOrg, err := c.getOrgWriteModelByID(ctx, o.OrgID)
@@ -290,7 +284,6 @@ func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, allowInitialMail b
 	if existingOrg.State.Exists() {
 		return nil, zerrors.ThrowAlreadyExists(nil, "ORG-laho2n", "Errors.Org.AlreadyExisting")
 	}
-	fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SET UP ORG 2")
 
 	return c.setUpOrgWithIDs(ctx, o, o.OrgID, allowInitialMail, userIDs...)
 }
