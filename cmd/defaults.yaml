@@ -581,8 +581,8 @@ Login:
     BasePath: "/ui/v2/login"
     PasswordSetPath: "/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}"
     EmailCodePath: "/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}"
-    OTPEmailPath: "/otp/verify?code={{.Code}}&userID={{.UserID}}&sessionId={{.SessionID}}"
-    PasskeySetPath: "/passkey/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}"
+    OTPEmailPath: "/otp/email?code={{.Code}}&userID={{.UserID}}&sessionId={{.SessionID}}"
+    PasskeySetPath: "/passkey/set?codeId={{.CodeID}}&code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}"
 
 Console:
   ShortCache:
