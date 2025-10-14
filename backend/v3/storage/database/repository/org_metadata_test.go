@@ -591,6 +591,12 @@ func TestSetOrganizationMetadata(t *testing.T) {
 	})
 
 	t.Run("overwrite organization metadata", func(t *testing.T) {
+		tx, err := tx.Begin(t.Context())
+		require.NoError(t, err)
+		defer func() {
+			require.NoError(t, tx.Rollback(t.Context()))
+		}()
+
 		err = metadataRepo.Set(t.Context(), tx, &domain.OrganizationMetadata{
 			OrganizationID: orgID,
 			Metadata: domain.Metadata{
@@ -919,6 +925,7 @@ func TestRemoveOrganizationMetadata(t *testing.T) {
 			database.And(
 				metadataRepo.InstanceIDCondition(instanceID),
 				metadataRepo.OrganizationIDCondition(orgA.ID),
+				metadataRepo.KeyCondition(database.TextOperationStartsWith, "urn:zitadel:key"),
 			),
 		)
 		require.NoError(t, err)
