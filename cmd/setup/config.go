@@ -163,6 +163,7 @@ type Steps struct {
 	s64ChangePushPosition                   *ChangePushPosition
 	s65FixUserMetadata5Index                *FixUserMetadata5Index
 	s66RecordServicePingResourceEvents      *RecordServicePingResourceEvents
+	s67AnalyticsEvents                      *AnalyticsEvents
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

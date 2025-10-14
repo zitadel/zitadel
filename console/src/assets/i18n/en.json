@@ -386,9 +386,9 @@
         "action": "Create project"
       },
       "APPLICATION_CREATED": {
-        "title": "Register your app",
-        "description": "Register your web, native, api or saml application and setup an authentication flow.",
-        "action": "Register app"
+        "title": "Create your app",
+        "description": "Create your web, native, api or saml application and setup an authentication flow.",
+        "action": "Create app"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
         "title": "Log in to your app",

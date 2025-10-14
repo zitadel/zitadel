@@ -15,6 +15,7 @@ import (
 )
 
 func (s *Server) CreateProject(ctx context.Context, req *connect.Request[project_pb.CreateProjectRequest]) (*connect.Response[project_pb.CreateProjectResponse], error) {
+	// TODO add milestone here
 	add := projectCreateToCommand(req.Msg)
 	project, err := s.command.AddProject(ctx, add)
 	if err != nil {

@@ -79,7 +79,7 @@ Thank you for your interest in contributing! As you might know there is more tha
 
 Please give us and our community the chance to get rid of security vulnerabilities by responsibly disclosing these issues to [security@zitadel.com](mailto:security@zitadel.com).
 
-The strongest part of a community is the possibility to share thoughts. That's why we try to react as soon as possible to your ideas, thoughts and feedback. We love to discuss as much as possible in an open space like in the [issues](https://github.com/zitadel/zitadel/issues) and [discussions](https://github.com/zitadel/zitadel/discussions) section here or in our [chat](https://zitadel.com/chat), but we understand your doubts and provide further contact options [here](https://zitadel.com/contact).
+Your thoughts and feedback make the community stronger! That's why we try to react as quickly as possible to your ideas and comments. We discuss as much as possible in an open space like in the [issues](https://github.com/zitadel/zitadel/issues) and [discussions](https://github.com/zitadel/zitadel/discussions) section here or in our [chat](https://zitadel.com/chat), but we understand your doubts and provide further contact options [here](https://zitadel.com/contact).
 
 If you want to give an answer or be part of discussions please be kind. Treat others like you want to be treated. Read more about our code of conduct [here](CODE_OF_CONDUCT.md).
 

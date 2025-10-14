@@ -16,6 +16,7 @@ export class OnboardingComponent {
     public adminService: AdminService,
     public themeService: ThemeService,
   ) {
+    console.log("OnboardingComponent constructor")
     this.adminService.loadMilestones.next(ONBOARDING_MILESTONES);
   }
 }

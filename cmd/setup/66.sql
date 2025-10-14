@@ -10,6 +10,10 @@ CREATE TABLE IF NOT EXISTS projections.service_ping_resource_events
     occurred_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- TODO - the purpose of this is really just to figure out if onboarding works. We don't necessarily want
+-- 50,000 events when 50,000 users are created. WE need to determine if we should handle this via scheduled truncation, 
+-- only adding to a certain number of rows, or only logging during onboarding somehow.
+
 -- Trigger function to insert an entry whenever a row is inserted/updated/deleted
 -- Arguments (TG_ARGV):
 -- 1. parent_type (TEXT)
