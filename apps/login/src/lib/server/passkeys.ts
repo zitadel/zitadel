@@ -18,6 +18,7 @@ import {
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
+import { getTranslations } from "next-intl/server";
 import { getMostRecentSessionCookie, getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
 import { getServiceUrlFromHeaders } from "../service-url";
 import { checkEmailVerification, checkUserVerification } from "../verify-helper";
@@ -257,6 +258,9 @@ type SendPasskeyCommand = {
 
 export async function sendPasskey(command: SendPasskeyCommand) {
   let { loginName, sessionId, organization, checks, requestId } = command;
+
+  const t = await getTranslations("passkey");
+
   const recentSession = sessionId
     ? await getSessionCookieById({ sessionId })
     : loginName
@@ -265,7 +269,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
 
   if (!recentSession) {
     return {
-      error: "Could not find session",
+      error: t("verify.errors.couldNotFindSession"),
     };
   }
 
@@ -300,7 +304,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
   });
 
   if (!session || !session?.factors?.user?.id) {
-    return { error: "Could not update session" };
+    return { error: t("verify.errors.couldNotUpdateSession") };
   }
 
   const userResponse = await getUserByID({
@@ -309,7 +313,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
   });
 
   if (!userResponse.user) {
-    return { error: "User not found in the system" };
+    return { error: t("verify.errors.userNotFound") };
   }
 
   const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
@@ -338,4 +342,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
       loginSettings?.defaultRedirectUri,
     );
   }
+
+  // Fallback error if we couldn't determine where to redirect
+  return { error: t("verify.errors.couldNotDetermineRedirect") };
 }

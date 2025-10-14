@@ -13,6 +13,7 @@ import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_p
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
+import { getTranslations } from "next-intl/server";
 import { completeFlowOrGetUrl } from "../client";
 import {
   getMostRecentSessionCookie,
@@ -74,6 +75,8 @@ export async function continueWithSession({ requestId, ...session }: ContinueWit
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
+  const t = await getTranslations("error");
+
   const loginSettings = await getLoginSettings({
     serviceUrl,
     organization: session.factors?.user?.organizationId,
@@ -97,6 +100,9 @@ export async function continueWithSession({ requestId, ...session }: ContinueWit
       loginSettings?.defaultRedirectUri,
     );
   }
+
+  // Fallback error if we couldn't determine where to redirect
+  return { error: t("couldNotContinueSession") };
 }
 
 export type UpdateSessionCommand = {
