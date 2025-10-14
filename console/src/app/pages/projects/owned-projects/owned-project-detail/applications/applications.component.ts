@@ -13,6 +13,7 @@ import { ProjectApplicationsDataSource } from './applications-datasource';
   selector: 'cnsl-applications',
   templateUrl: './applications.component.html',
   styleUrls: ['./applications.component.scss'],
+  standalone: false,
 })
 export class ApplicationsComponent implements AfterViewInit, OnInit {
   @Input() public projectId: string = '';

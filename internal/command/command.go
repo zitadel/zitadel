@@ -294,7 +294,12 @@ func samlCertificateAndKeyGenerator(keySize int, lifetime time.Duration) func(id
 			SerialNumber: big.NewInt(int64(serial)),
 			Subject: pkix.Name{
 				Organization: []string{"ZITADEL"},
+				CommonName:   fmt.Sprintf("ZITADEL SP %s", id),
 				SerialNumber: id,
+			},
+			Issuer: pkix.Name{
+				Organization: []string{"ZITADEL"},
+				CommonName:   "ZITADEL",
 			},
 			NotBefore:             now,
 			NotAfter:              now.Add(lifetime),

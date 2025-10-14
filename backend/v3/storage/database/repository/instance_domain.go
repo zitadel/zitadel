@@ -10,9 +10,18 @@ import (
 
 var _ domain.InstanceDomainRepository = (*instanceDomain)(nil)
 
-type instanceDomain struct {
-	repository
-	*instance
+type instanceDomain struct{}
+
+func InstanceDomainRepository() domain.InstanceDomainRepository {
+	return new(instanceDomain)
+}
+
+func (instanceDomain) qualifiedTableName() string {
+	return "zitadel.instance_domains"
+}
+
+func (instanceDomain) unqualifiedTableName() string {
+	return "instance_domains"
 }
 
 // -------------------------------------------------------------
@@ -23,8 +32,7 @@ const queryInstanceDomainStmt = `SELECT instance_domains.instance_id, instance_d
 	`FROM zitadel.instance_domains`
 
 // Get implements [domain.InstanceDomainRepository].
-// Subtle: this method shadows the method ([domain.InstanceRepository]).Get of instanceDomain.instance.
-func (i *instanceDomain) Get(ctx context.Context, opts ...database.QueryOption) (*domain.InstanceDomain, error) {
+func (i instanceDomain) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.InstanceDomain, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
@@ -34,12 +42,11 @@ func (i *instanceDomain) Get(ctx context.Context, opts ...database.QueryOption) 
 	builder.WriteString(queryInstanceDomainStmt)
 	options.Write(&builder)
 
-	return scanInstanceDomain(ctx, i.client, &builder)
+	return scanInstanceDomain(ctx, client, &builder)
 }
 
 // List implements [domain.InstanceDomainRepository].
-// Subtle: this method shadows the method ([domain.InstanceRepository]).List of instanceDomain.instance.
-func (i *instanceDomain) List(ctx context.Context, opts ...database.QueryOption) ([]*domain.InstanceDomain, error) {
+func (i instanceDomain) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.InstanceDomain, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
@@ -49,11 +56,11 @@ func (i *instanceDomain) List(ctx context.Context, opts ...database.QueryOption)
 	builder.WriteString(queryInstanceDomainStmt)
 	options.Write(&builder)
 
-	return scanInstanceDomains(ctx, i.client, &builder)
+	return scanInstanceDomains(ctx, client, &builder)
 }
 
 // Add implements [domain.InstanceDomainRepository].
-func (i *instanceDomain) Add(ctx context.Context, domain *domain.AddInstanceDomain) error {
+func (i instanceDomain) Add(ctx context.Context, client database.QueryExecutor, domain *domain.AddInstanceDomain) error {
 	var (
 		builder              database.StatementBuilder
 		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
@@ -69,33 +76,41 @@ func (i *instanceDomain) Add(ctx context.Context, domain *domain.AddInstanceDoma
 	builder.WriteArgs(domain.InstanceID, domain.Domain, domain.IsPrimary, domain.IsGenerated, domain.Type, createdAt, updatedAt)
 	builder.WriteString(`) RETURNING created_at, updated_at`)
 
-	return i.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&domain.CreatedAt, &domain.UpdatedAt)
+	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&domain.CreatedAt, &domain.UpdatedAt)
 }
 
 // Update implements [domain.InstanceDomainRepository].
-// Subtle: this method shadows the method ([domain.InstanceRepository]).Update of instanceDomain.instance.
-func (i *instanceDomain) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error) {
+func (i instanceDomain) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+	if !condition.IsRestrictingColumn(i.InstanceIDColumn()) {
+		return 0, database.NewMissingConditionError(i.InstanceIDColumn())
+	}
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}
-	var builder database.StatementBuilder
+	if !database.Changes(changes).IsOnColumn(i.UpdatedAtColumn()) {
+		changes = append(changes, database.NewChange(i.UpdatedAtColumn(), database.NullInstruction))
+	}
 
+	var builder database.StatementBuilder
 	builder.WriteString(`UPDATE zitadel.instance_domains SET `)
 	database.Changes(changes).Write(&builder)
 
 	writeCondition(&builder, condition)
 
-	return i.client.Exec(ctx, builder.String(), builder.Args()...)
+	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
 // Remove implements [domain.InstanceDomainRepository].
-func (i *instanceDomain) Remove(ctx context.Context, condition database.Condition) (int64, error) {
-	var builder database.StatementBuilder
+func (i instanceDomain) Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	if !condition.IsRestrictingColumn(i.InstanceIDColumn()) {
+		return 0, database.NewMissingConditionError(i.InstanceIDColumn())
+	}
 
+	var builder database.StatementBuilder
 	builder.WriteString(`DELETE FROM zitadel.instance_domains WHERE `)
 	condition.Write(&builder)
 
-	return i.client.Exec(ctx, builder.String(), builder.Args()...)
+	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
 // -------------------------------------------------------------
@@ -146,40 +161,38 @@ func (i instanceDomain) TypeCondition(typ domain.DomainType) database.Condition 
 // -------------------------------------------------------------
 
 // CreatedAtColumn implements [domain.InstanceDomainRepository].
-// Subtle: this method shadows the method ([domain.InstanceRepository]).CreatedAtColumn of instanceDomain.instance.
-func (instanceDomain) CreatedAtColumn() database.Column {
-	return database.NewColumn("instance_domains", "created_at")
+func (i instanceDomain) CreatedAtColumn() database.Column {
+	return database.NewColumn(i.unqualifiedTableName(), "created_at")
 }
 
 // DomainColumn implements [domain.InstanceDomainRepository].
-func (instanceDomain) DomainColumn() database.Column {
-	return database.NewColumn("instance_domains", "domain")
+func (i instanceDomain) DomainColumn() database.Column {
+	return database.NewColumn(i.unqualifiedTableName(), "domain")
 }
 
 // InstanceIDColumn implements [domain.InstanceDomainRepository].
-func (instanceDomain) InstanceIDColumn() database.Column {
-	return database.NewColumn("instance_domains", "instance_id")
+func (i instanceDomain) InstanceIDColumn() database.Column {
+	return database.NewColumn(i.unqualifiedTableName(), "instance_id")
 }
 
 // IsPrimaryColumn implements [domain.InstanceDomainRepository].
-func (instanceDomain) IsPrimaryColumn() database.Column {
-	return database.NewColumn("instance_domains", "is_primary")
+func (i instanceDomain) IsPrimaryColumn() database.Column {
+	return database.NewColumn(i.unqualifiedTableName(), "is_primary")
 }
 
 // UpdatedAtColumn implements [domain.InstanceDomainRepository].
-// Subtle: this method shadows the method ([domain.InstanceRepository]).UpdatedAtColumn of instanceDomain.instance.
-func (instanceDomain) UpdatedAtColumn() database.Column {
-	return database.NewColumn("instance_domains", "updated_at")
+func (i instanceDomain) UpdatedAtColumn() database.Column {
+	return database.NewColumn(i.unqualifiedTableName(), "updated_at")
 }
 
 // IsGeneratedColumn implements [domain.InstanceDomainRepository].
-func (instanceDomain) IsGeneratedColumn() database.Column {
-	return database.NewColumn("instance_domains", "is_generated")
+func (i instanceDomain) IsGeneratedColumn() database.Column {
+	return database.NewColumn(i.unqualifiedTableName(), "is_generated")
 }
 
 // TypeColumn implements [domain.InstanceDomainRepository].
-func (instanceDomain) TypeColumn() database.Column {
-	return database.NewColumn("instance_domains", "type")
+func (i instanceDomain) TypeColumn() database.Column {
+	return database.NewColumn(i.unqualifiedTableName(), "type")
 }
 
 // -------------------------------------------------------------

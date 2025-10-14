@@ -12,6 +12,7 @@ export const CNSL_ERROR = new InjectionToken<CnslErrorDirective>('CnslError');
     '[attr.id]': 'id',
   },
   providers: [{ provide: CNSL_ERROR, useExisting: CnslErrorDirective }],
+  standalone: false,
 })
 export class CnslErrorDirective {
   @Input() id: string = `cnsl-error-${nextUniqueId++}`;
