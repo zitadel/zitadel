@@ -34,6 +34,7 @@ function dateToTs(date: Date): Timestamp {
   selector: 'cnsl-filter-events',
   templateUrl: './filter-events.component.html',
   styleUrls: ['./filter-events.component.scss'],
+  standalone: false,
 })
 export class FilterEventsComponent implements OnInit {
   // Make enum available in template

@@ -96,12 +96,12 @@ func TestServer_GetGroup(t *testing.T) {
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := instance.Client.GroupV2.GetGroup(tt.args.ctx, tt.args.req)
 				if tt.wantErrCode != codes.OK {
-					require.Error(t, err)
-					assert.Equal(t, tt.wantErrCode, status.Code(err))
-					assert.Equal(t, tt.wantErrMsg, status.Convert(err).Message())
+					require.Error(ttt, err)
+					assert.Equal(ttt, tt.wantErrCode, status.Code(err))
+					assert.Equal(ttt, tt.wantErrMsg, status.Convert(err).Message())
 					return
 				}
-				require.NoError(t, err)
+				require.NoError(ttt, err)
 				assert.EqualExportedValues(t, tt.want.Group, got.Group, "want: %v, got: %v", tt.want.Group, got.Group)
 			}, retryDuration, tick, "timeout waiting for expected result")
 		})
@@ -350,19 +350,19 @@ func TestServer_ListGroups(t *testing.T) {
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := instance.Client.GroupV2.ListGroups(tt.args.ctx, tt.args.req)
 				if tt.wantErrCode != codes.OK {
-					require.Error(t, err)
-					assert.Equal(t, tt.wantErrCode, status.Code(err))
-					assert.Equal(t, tt.wantErrMsg, status.Convert(err).Message())
+					require.Error(ttt, err)
+					assert.Equal(ttt, tt.wantErrCode, status.Code(err))
+					assert.Equal(ttt, tt.wantErrMsg, status.Convert(err).Message())
 					return
 				}
-				require.NoError(t, err)
-				if assert.Len(t, got.Groups, len(tt.want.Groups)) {
+				require.NoError(ttt, err)
+				if assert.Len(ttt, got.Groups, len(tt.want.Groups)) {
 					for i := range got.Groups {
-						assert.EqualExportedValues(t, tt.want.Groups[i], got.Groups[i], "want: %v, got: %v", tt.want.Groups[i], got.Groups[i])
+						assert.EqualExportedValues(ttt, tt.want.Groups[i], got.Groups[i], "want: %v, got: %v", tt.want.Groups[i], got.Groups[i])
 					}
 				}
-				assert.Equal(t, tt.want.Pagination.AppliedLimit, got.Pagination.AppliedLimit)
-				assert.Equal(t, tt.want.Pagination.TotalResult, got.Pagination.TotalResult)
+				assert.Equal(ttt, tt.want.Pagination.AppliedLimit, got.Pagination.AppliedLimit)
+				assert.Equal(ttt, tt.want.Pagination.TotalResult, got.Pagination.TotalResult)
 			}, retryDuration, tick, "timeout waiting for expected result")
 		})
 	}

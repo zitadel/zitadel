@@ -39,7 +39,8 @@
     <mat-button-toggle-group
       *ngIf="previewData && data"
       class="buttongroup"
-      [(ngModel)]="view === View.CURRENT ? data.themeMode : previewData.themeMode"
+      [ngModel]="view === View.CURRENT ? data.themeMode : previewData.themeMode"
+      (ngModelChange)="view === View.CURRENT ? data.themeMode : (previewData.themeMode = $event)"
       (change)="toggleThemeMode()"
       [disabled]="
         view === View.CURRENT ||
@@ -676,7 +677,10 @@
                     | hasRole
                     | async) === false
                 "
-                [(ngModel)]="view === View.CURRENT ? data.hideLoginNameSuffix : previewData.hideLoginNameSuffix"
+                [ngModel]="view === View.CURRENT ? data.hideLoginNameSuffix : previewData.hideLoginNameSuffix"
+                (ngModelChange)="
+                  view === View.CURRENT ? data.hideLoginNameSuffix : (previewData.hideLoginNameSuffix = $event)
+                "
                 (change)="savePolicy()"
               >
                 {{ 'POLICY.DATA.HIDELOGINNAMESUFFIX' | translate }}
@@ -690,7 +694,8 @@
               <mat-checkbox
                 class="toggle"
                 color="primary"
-                [(ngModel)]="view === View.CURRENT ? data.disableWatermark : previewData.disableWatermark"
+                [ngModel]="view === View.CURRENT ? data.disableWatermark : previewData.disableWatermark"
+                (ngModelChange)="view === View.CURRENT ? data.disableWatermark : (previewData.disableWatermark = $event)"
                 (change)="savePolicy()"
                 [disabled]="
                   view === View.CURRENT ||
