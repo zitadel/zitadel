@@ -11,24 +11,38 @@ import (
 type UserState uint8
 
 const (
-	UserStateInital UserState = iota
+	UserStateInitial UserState = iota
 	UserStateActive
 	UserStateInactive
 	UserStateLocked
 	UserStateSuspended
 )
 
-// user
+// User represents a user in the system.
+// It can be a human user or a machine user.
+// Meaning that either Human or Machine is set, the other is nil.
 type User struct {
-	InstanceID        string    `json:"instanceId,omitempty" db:"instance_id"`
-	OrgID             string    `json:"orgId,omitempty" db:"org_id"`
-	ID                string    `json:"id,omitempty" db:"id"`
-	Username          string    `json:"username,omitempty" db:"username"`
-	UsernameOrgUnique bool      `json:"usernameOrgUnique,omitempty" db:"username_org_unique"`
-	State             UserState `json:"state,omitempty" db:"state"`
+	InstanceID          string    `json:"instanceId,omitempty" db:"instance_id"`
+	OrgID               string    `json:"orgId,omitempty" db:"org_id"`
+	ID                  string    `json:"id,omitempty" db:"id"`
+	Username            string    `json:"username,omitempty" db:"username"`
+	IsUsernameOrgUnique bool      `json:"usernameOrgUnique,omitempty" db:"username_org_unique"`
+	State               UserState `json:"state,omitempty" db:"state"`
+
+	*Machine `db:"machine`
+	*Human   `db:"human`
 
 	CreatedAt time.Time `json:"createdAt,omitzero" db:"created_at"`
 	UpdatedAt time.Time `json:"updatedAt,omitzero" db:"updated_at"`
+}
+
+type UserRepository interface {
+	Human() HumanRepository
+	Machine() MachineRepository
+
+	Get() User
+	List() []User
+	Delete() error
 }
 
 type userColumns interface {
@@ -108,6 +122,9 @@ type MachineRepository interface {
 	machineColumns
 	machineConditions
 	machineChanges
+
+	Create(ctx context.Context, client database.QueryExecutor, user *Machine) error
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 }
 
 // human user
@@ -124,7 +141,7 @@ type Human struct {
 	DisplayName       string  `json:"displayName,omitempty" db:"display_name"`
 	PreferredLanguage string  `json:"preferredLanguage,omitempty" db:"preferred_language"`
 	Gender            uint8   `json:"gender,omitempty" db:"gender"`
-	AvatarKey         *string `json:"avataryKey,omitempty" db:"avatar_key"`
+	AvatarKey         *string `json:"avatarKey,omitempty" db:"avatar_key"`
 	Avatar            []byte  `json:"avatar,omitempty" db:"avatar"`
 }
 
@@ -163,6 +180,9 @@ type HumanRepository interface {
 	humanColumns
 	humanConditions
 	humanChanges
+
+	Create(ctx context.Context, client database.QueryExecutor, user *Human) error
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 
 	Security() HumanSecurityRepository
 }
@@ -263,21 +283,4 @@ type humanContactChanges interface {
 	SetCurrentValue(value string) database.Change
 	SetVerified(verified bool) database.Change
 	SetUnverifiedValue(value string) database.Change
-}
-
-type UserRepository interface {
-	Human() HumanRepository
-	Machine() MachineRepository
-
-	CreateHuman(ctx context.Context, client database.QueryExecutor, user *Human) (*Human, error)
-	UpdateHuman(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
-	GetHuman(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Human, error)
-	ListHuman(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Human, error)
-	DeleteHuman(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
-
-	CreateMachine(ctx context.Context, client database.QueryExecutor, user *Machine) (*Machine, error)
-	UpdateMachine(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
-	GetMachine(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Machine, error)
-	ListMachine(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Machine, error)
-	DeleteMachine(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }

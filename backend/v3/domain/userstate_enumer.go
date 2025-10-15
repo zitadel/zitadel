@@ -25,18 +25,18 @@ func (i UserState) String() string {
 // Re-run the stringer command to generate them again.
 func _UserStateNoOp() {
 	var x [1]struct{}
-	_ = x[UserStateInital-(0)]
+	_ = x[UserStateInitial-(0)]
 	_ = x[UserStateActive-(1)]
 	_ = x[UserStateInactive-(2)]
 	_ = x[UserStateLocked-(3)]
 	_ = x[UserStateSuspended-(4)]
 }
 
-var _UserStateValues = []UserState{UserStateInital, UserStateActive, UserStateInactive, UserStateLocked, UserStateSuspended}
+var _UserStateValues = []UserState{UserStateInitial, UserStateActive, UserStateInactive, UserStateLocked, UserStateSuspended}
 
 var _UserStateNameToValueMap = map[string]UserState{
-	_UserStateName[0:6]:        UserStateInital,
-	_UserStateLowerName[0:6]:   UserStateInital,
+	_UserStateName[0:6]:        UserStateInitial,
+	_UserStateLowerName[0:6]:   UserStateInitial,
 	_UserStateName[6:12]:       UserStateActive,
 	_UserStateLowerName[6:12]:  UserStateActive,
 	_UserStateName[12:20]:      UserStateInactive,

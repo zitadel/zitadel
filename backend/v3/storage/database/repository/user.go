@@ -499,7 +499,7 @@ const createHumaneStmt = `INSERT INTO zitadel.human_users (instance_id, org_id, 
 
 func (u user) createHuman(ctx context.Context, client database.QueryExecutor, user *domain.Human) (*domain.Human, error) {
 	builder := database.StatementBuilder{}
-	builder.AppendArgs(user.User.InstanceID, user.User.OrgID, user.ID, user.Username, user.UsernameOrgUnique, user.State)
+	builder.AppendArgs(user.User.InstanceID, user.User.OrgID, user.ID, user.Username, user.IsUsernameOrgUnique, user.State)
 	builder.AppendArgs(user.FirstName, user.LastName, user.NickName, user.DisplayName, user.PreferredLanguage, user.Gender, user.AvatarKey)
 
 	builder.WriteString(createHumaneStmt)
@@ -656,7 +656,7 @@ const createMachineStmt = `INSERT INTO zitadel.machine_users (instance_id, org_i
 
 func (u user) CreateMachine(ctx context.Context, client database.QueryExecutor, user *domain.Machine) (*domain.Machine, error) {
 	builder := database.StatementBuilder{}
-	builder.AppendArgs(user.InstanceID, user.OrgID, user.ID, user.Username, user.UsernameOrgUnique, user.State)
+	builder.AppendArgs(user.InstanceID, user.OrgID, user.ID, user.Username, user.IsUsernameOrgUnique, user.State)
 	builder.AppendArgs(user.Name, user.Description)
 
 	builder.WriteString(createMachineStmt)

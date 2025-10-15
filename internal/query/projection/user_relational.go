@@ -375,7 +375,7 @@ func (p *userRelationalProjection) reduceHumanInitCodeAdded(event eventstore.Eve
 	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(UserStateCol, domain.UserStateInital),
+			handler.NewCol(UserStateCol, domain.UserStateInitial),
 		},
 		[]handler.Condition{
 			handler.NewCond(UserIDCol, e.Aggregate().ID),

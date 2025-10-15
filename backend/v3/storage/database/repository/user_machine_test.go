@@ -74,7 +74,7 @@ func TestCreateMachineUser(t *testing.T) {
 						InstanceID:        instanceID,
 						OrgID:             orgID,
 						Username:          gofakeit.Username(),
-						UsernameOrgUnique: true,
+						IsUsernameOrgUnique: true,
 						State:             domain.UserStateActive,
 					},
 					Name:        gofakeit.Name(),
@@ -97,7 +97,7 @@ func TestCreateMachineUser(t *testing.T) {
 					InstanceID:        instanceID,
 					OrgID:             orgID,
 					Username:          gofakeit.Username(),
-					UsernameOrgUnique: true,
+					IsUsernameOrgUnique: true,
 					State:             domain.UserStateActive,
 				},
 				Name: gofakeit.Name(),
@@ -112,7 +112,7 @@ func TestCreateMachineUser(t *testing.T) {
 					InstanceID: instanceID,
 					OrgID:      orgID,
 					// Username:          gofakeit.Username(),
-					UsernameOrgUnique: true,
+					IsUsernameOrgUnique: true,
 					State:             domain.UserStateActive,
 				},
 				Name: gofakeit.Name(),
@@ -127,7 +127,7 @@ func TestCreateMachineUser(t *testing.T) {
 					InstanceID:        instanceID,
 					OrgID:             orgID,
 					Username:          gofakeit.Username(),
-					UsernameOrgUnique: true,
+					IsUsernameOrgUnique: true,
 					State:             domain.UserStateActive,
 				},
 				Name: gofakeit.Name(),
@@ -150,7 +150,7 @@ func TestCreateMachineUser(t *testing.T) {
 					InstanceID:        instanceID,
 					OrgID:             orgID,
 					Username:          gofakeit.Username(),
-					UsernameOrgUnique: false,
+					IsUsernameOrgUnique: false,
 					State:             domain.UserStateActive,
 				},
 				Name: gofakeit.Name(),
@@ -173,7 +173,7 @@ func TestCreateMachineUser(t *testing.T) {
 					InstanceID:        instanceID,
 					OrgID:             newOrgID,
 					Username:          gofakeit.Username(),
-					UsernameOrgUnique: true,
+					IsUsernameOrgUnique: true,
 					State:             domain.UserStateActive,
 				},
 				Name: gofakeit.Name(),
@@ -218,7 +218,7 @@ func TestCreateMachineUser(t *testing.T) {
 					InstanceID:        instanceID,
 					OrgID:             newOrgID,
 					Username:          gofakeit.Username(),
-					UsernameOrgUnique: false,
+					IsUsernameOrgUnique: false,
 					State:             domain.UserStateActive,
 				},
 				Name: gofakeit.Name(),
@@ -257,7 +257,7 @@ func TestCreateMachineUser(t *testing.T) {
 					InstanceID:        instanceID,
 					OrgID:             newOrgID,
 					Username:          gofakeit.Username(),
-					UsernameOrgUnique: true,
+					IsUsernameOrgUnique: true,
 					State:             domain.UserStateActive,
 				},
 				Name: gofakeit.Name(),
@@ -301,7 +301,7 @@ func TestCreateMachineUser(t *testing.T) {
 					InstanceID:        instanceID,
 					OrgID:             newOrgID,
 					Username:          gofakeit.Username(),
-					UsernameOrgUnique: false,
+					IsUsernameOrgUnique: false,
 					State:             domain.UserStateActive,
 				},
 				Name: gofakeit.Name(),
@@ -341,7 +341,7 @@ func TestCreateMachineUser(t *testing.T) {
 					InstanceID:        newInstanceID,
 					OrgID:             newOrgID,
 					Username:          gofakeit.Username(),
-					UsernameOrgUnique: true,
+					IsUsernameOrgUnique: true,
 					State:             domain.UserStateActive,
 				},
 				Name: gofakeit.Name(),
@@ -400,7 +400,7 @@ func TestCreateMachineUser(t *testing.T) {
 					InstanceID:        newInstanceID,
 					OrgID:             newOrgID,
 					Username:          gofakeit.Username(),
-					UsernameOrgUnique: false,
+					IsUsernameOrgUnique: false,
 					State:             domain.UserStateActive,
 				},
 				Name: gofakeit.Name(),
@@ -457,7 +457,7 @@ func TestCreateMachineUser(t *testing.T) {
 					InstanceID:        instanceID,
 					OrgID:             orgID,
 					Username:          gofakeit.Username(),
-					UsernameOrgUnique: true,
+					IsUsernameOrgUnique: true,
 					State:             domain.UserStateActive,
 				},
 				// Name: gofakeit.Name(),
@@ -472,7 +472,7 @@ func TestCreateMachineUser(t *testing.T) {
 					InstanceID:        instanceID,
 					OrgID:             orgID,
 					Username:          gofakeit.Username(),
-					UsernameOrgUnique: true,
+					IsUsernameOrgUnique: true,
 					State:             domain.UserStateActive,
 				},
 				// Name:         gofakeit.Name(),
@@ -519,7 +519,7 @@ func TestCreateMachineUser(t *testing.T) {
 			assert.Equal(t, tt.user.State, createdUser.State)
 			assert.Equal(t, tt.user.ID, createdUser.ID)
 			assert.Equal(t, tt.user.Username, createdUser.Username)
-			assert.Equal(t, tt.user.UsernameOrgUnique, createdUser.UsernameOrgUnique)
+			assert.Equal(t, tt.user.IsUsernameOrgUnique, createdUser.UsernameOrgUnique)
 			assert.Equal(t, tt.user.State, createdUser.State)
 
 			// machine
@@ -593,7 +593,7 @@ func TestUpdateMachineUser(t *testing.T) {
 							InstanceID:        instanceID,
 							OrgID:             orgID,
 							Username:          "username",
-							UsernameOrgUnique: false,
+							IsUsernameOrgUnique: false,
 							State:             domain.UserStateActive,
 						},
 						Name: gofakeit.Name(),
@@ -625,7 +625,7 @@ func TestUpdateMachineUser(t *testing.T) {
 							InstanceID:        instanceID,
 							OrgID:             orgID,
 							Username:          "username",
-							UsernameOrgUnique: false,
+							IsUsernameOrgUnique: false,
 							State:             domain.UserStateActive,
 						},
 						Name: gofakeit.Name(),
@@ -656,7 +656,7 @@ func TestUpdateMachineUser(t *testing.T) {
 							InstanceID:        instanceID,
 							OrgID:             orgID,
 							Username:          "username",
-							UsernameOrgUnique: false,
+							IsUsernameOrgUnique: false,
 							State:             domain.UserStateActive,
 						},
 						Name: gofakeit.Name(),
@@ -664,7 +664,7 @@ func TestUpdateMachineUser(t *testing.T) {
 
 					user, err := userRepo.CreateMachine(t.Context(), tx, user)
 					require.NoError(t, err)
-					user.UsernameOrgUnique = true
+					user.IsUsernameOrgUnique = true
 					return user
 				},
 				condition: database.And(
@@ -688,7 +688,7 @@ func TestUpdateMachineUser(t *testing.T) {
 							InstanceID:        instanceID,
 							OrgID:             orgID,
 							Username:          "username",
-							UsernameOrgUnique: false,
+							IsUsernameOrgUnique: false,
 							State:             domain.UserStateActive,
 						},
 						Name: gofakeit.Name(),
@@ -720,7 +720,7 @@ func TestUpdateMachineUser(t *testing.T) {
 							InstanceID:        instanceID,
 							OrgID:             orgID,
 							Username:          "username",
-							UsernameOrgUnique: false,
+							IsUsernameOrgUnique: false,
 							State:             domain.UserStateActive,
 						},
 						Name: gofakeit.Name(),
@@ -753,7 +753,7 @@ func TestUpdateMachineUser(t *testing.T) {
 							InstanceID:        instanceID,
 							OrgID:             orgID,
 							Username:          "username",
-							UsernameOrgUnique: false,
+							IsUsernameOrgUnique: false,
 							State:             domain.UserStateActive,
 						},
 						Name: "first_name",
@@ -785,7 +785,7 @@ func TestUpdateMachineUser(t *testing.T) {
 							InstanceID:        instanceID,
 							OrgID:             orgID,
 							Username:          "username",
-							UsernameOrgUnique: false,
+							IsUsernameOrgUnique: false,
 							State:             domain.UserStateActive,
 						},
 						Name: "name",
@@ -816,7 +816,7 @@ func TestUpdateMachineUser(t *testing.T) {
 							InstanceID:        instanceID,
 							OrgID:             orgID,
 							Username:          gofakeit.Username(),
-							UsernameOrgUnique: false,
+							IsUsernameOrgUnique: false,
 							State:             domain.UserStateActive,
 						},
 						Name:        gofakeit.Username(),
@@ -888,7 +888,7 @@ func TestUpdateMachineUser(t *testing.T) {
 			assert.Equal(t, createdUser.State, user.State)
 			assert.Equal(t, createdUser.ID, user.ID)
 			assert.Equal(t, createdUser.Username, user.Username)
-			assert.Equal(t, createdUser.UsernameOrgUnique, user.UsernameOrgUnique)
+			assert.Equal(t, createdUser.IsUsernameOrgUnique, user.UsernameOrgUnique)
 			assert.Equal(t, createdUser.State, user.State)
 
 			// machine
@@ -946,7 +946,7 @@ func TestGetMachineUser(t *testing.T) {
 			InstanceID:        instanceID,
 			OrgID:             orgID,
 			Username:          gofakeit.Username(),
-			UsernameOrgUnique: true,
+			IsUsernameOrgUnique: true,
 			State:             domain.UserStateActive,
 		},
 		Name: gofakeit.Name(),
@@ -1001,7 +1001,7 @@ func TestGetMachineUser(t *testing.T) {
 							InstanceID:        newInstanceId,
 							OrgID:             newOrgId,
 							Username:          gofakeit.Username(),
-							UsernameOrgUnique: true,
+							IsUsernameOrgUnique: true,
 							State:             domain.UserStateActive,
 						},
 						Name:        gofakeit.Name(),
@@ -1123,7 +1123,7 @@ func TestGetMachineUser(t *testing.T) {
 								InstanceID:        newInstanceId,
 								OrgID:             newOrgId,
 								Username:          gofakeit.Username(),
-								UsernameOrgUnique: true,
+								IsUsernameOrgUnique: true,
 								State:             domain.UserStateInactive,
 							},
 							Name: gofakeit.Name(),
@@ -1188,7 +1188,7 @@ func TestGetMachineUser(t *testing.T) {
 			assert.Equal(t, user.State, returnedUser.State)
 			assert.Equal(t, user.ID, returnedUser.ID)
 			assert.Equal(t, user.Username, returnedUser.Username)
-			assert.Equal(t, user.UsernameOrgUnique, returnedUser.UsernameOrgUnique)
+			assert.Equal(t, user.IsUsernameOrgUnique, returnedUser.UsernameOrgUnique)
 			assert.Equal(t, user.State, returnedUser.State)
 			assert.Equal(t, user.CreatedAt, returnedUser.CreatedAt)
 			assert.Equal(t, user.UpdatedAt, returnedUser.UpdatedAt)
@@ -1246,7 +1246,7 @@ func TestListMachineUser(t *testing.T) {
 			InstanceID:        instanceID,
 			OrgID:             orgID,
 			Username:          gofakeit.Username(),
-			UsernameOrgUnique: true,
+			IsUsernameOrgUnique: true,
 			State:             domain.UserStateActive,
 		},
 		Name: gofakeit.Name(),
@@ -1304,7 +1304,7 @@ func TestListMachineUser(t *testing.T) {
 								InstanceID:        newInstanceId,
 								OrgID:             newOrgId,
 								Username:          gofakeit.Username(),
-								UsernameOrgUnique: true,
+								IsUsernameOrgUnique: true,
 								State:             domain.UserStateActive,
 							},
 							Name: gofakeit.Name(),
@@ -1336,7 +1336,7 @@ func TestListMachineUser(t *testing.T) {
 								InstanceID:        newInstanceId,
 								OrgID:             newOrgId,
 								Username:          gofakeit.Username(),
-								UsernameOrgUnique: true,
+								IsUsernameOrgUnique: true,
 								State:             domain.UserStateActive,
 							},
 							Name: gofakeit.Name(),
@@ -1397,7 +1397,7 @@ func TestListMachineUser(t *testing.T) {
 								InstanceID:        newInstanceId,
 								OrgID:             newOrgId,
 								Username:          gofakeit.Username(),
-								UsernameOrgUnique: true,
+								IsUsernameOrgUnique: true,
 								State:             domain.UserStateActive,
 							},
 							Name: gofakeit.Name(),
@@ -1459,7 +1459,7 @@ func TestListMachineUser(t *testing.T) {
 								InstanceID:        newInstanceId,
 								OrgID:             newOrgId,
 								Username:          gofakeit.Username(),
-								UsernameOrgUnique: true,
+								IsUsernameOrgUnique: true,
 								State:             domain.UserStateActive,
 							},
 							Name: gofakeit.Name(),
@@ -1521,7 +1521,7 @@ func TestListMachineUser(t *testing.T) {
 								InstanceID:        newInstanceId,
 								OrgID:             newOrgId,
 								Username:          gofakeit.Username(),
-								UsernameOrgUnique: true,
+								IsUsernameOrgUnique: true,
 								State:             domain.UserStateActive,
 							},
 							Name: gofakeit.Name(),
@@ -1584,7 +1584,7 @@ func TestListMachineUser(t *testing.T) {
 								InstanceID:        newInstanceId,
 								OrgID:             newOrgId,
 								Username:          gofakeit.Username(),
-								UsernameOrgUnique: true,
+								IsUsernameOrgUnique: true,
 								State:             domain.UserStateInactive,
 							},
 							Name: gofakeit.Name(),
@@ -1646,7 +1646,7 @@ func TestListMachineUser(t *testing.T) {
 								InstanceID:        newInstanceId,
 								OrgID:             newOrgId,
 								Username:          gofakeit.Username(),
-								UsernameOrgUnique: true,
+								IsUsernameOrgUnique: true,
 								State:             domain.UserStateInactive,
 							},
 							Name: gofakeit.Name(),
@@ -1700,7 +1700,7 @@ func TestListMachineUser(t *testing.T) {
 				assert.Equal(t, returnedUsers[i].State, user.State)
 				assert.Equal(t, returnedUsers[i].ID, user.ID)
 				assert.Equal(t, returnedUsers[i].Username, user.Username)
-				assert.Equal(t, returnedUsers[i].UsernameOrgUnique, user.UsernameOrgUnique)
+				assert.Equal(t, returnedUsers[i].UsernameOrgUnique, user.IsUsernameOrgUnique)
 				assert.Equal(t, returnedUsers[i].State, user.State)
 				assert.Equal(t, returnedUsers[i].CreatedAt, user.CreatedAt)
 				assert.Equal(t, returnedUsers[i].UpdatedAt, user.UpdatedAt)
@@ -1798,7 +1798,7 @@ func TestDeleteMachineUser(t *testing.T) {
 								InstanceID:        newInstanceId,
 								OrgID:             newOrgId,
 								Username:          gofakeit.Username(),
-								UsernameOrgUnique: true,
+								IsUsernameOrgUnique: true,
 								State:             domain.UserStateInactive,
 							},
 							Name: gofakeit.Name(),
@@ -1854,7 +1854,7 @@ func TestDeleteMachineUser(t *testing.T) {
 								InstanceID:        newInstanceId,
 								OrgID:             newOrgId,
 								Username:          gofakeit.Username(),
-								UsernameOrgUnique: true,
+								IsUsernameOrgUnique: true,
 								State:             domain.UserStateInactive,
 							},
 							Name: gofakeit.Name(),
@@ -1911,7 +1911,7 @@ func TestDeleteMachineUser(t *testing.T) {
 								InstanceID:        newInstanceId,
 								OrgID:             newOrgId,
 								Username:          gofakeit.Username(),
-								UsernameOrgUnique: true,
+								IsUsernameOrgUnique: true,
 								State:             domain.UserStateInactive,
 							},
 							Name: gofakeit.Name(),
@@ -1968,7 +1968,7 @@ func TestDeleteMachineUser(t *testing.T) {
 								InstanceID:        newInstanceId,
 								OrgID:             newOrgId,
 								Username:          gofakeit.Username(),
-								UsernameOrgUnique: true,
+								IsUsernameOrgUnique: true,
 								State:             domain.UserStateInactive,
 							},
 							Name: gofakeit.Name(),
@@ -2061,7 +2061,7 @@ func TestDeleteMachineUser(t *testing.T) {
 								InstanceID:        newInstanceId,
 								OrgID:             newOrgId,
 								Username:          gofakeit.Username(),
-								UsernameOrgUnique: true,
+								IsUsernameOrgUnique: true,
 								State:             domain.UserStateInactive,
 							},
 							Name: gofakeit.Name(),
