@@ -367,7 +367,8 @@ var (
 		"password_set",
 		"count",
 	}
-	usersQuery = `SELECT DISTINCT projections.users14.id,` +
+	usersQuery = `SELECT *, COUNT(*) OVER () FROM (` +
+		`SELECT DISTINCT projections.users14.id,` +
 		` projections.users14.creation_date,` +
 		` projections.users14.change_date,` +
 		` projections.users14.resource_owner,` +
@@ -397,13 +398,14 @@ var (
 		` projections.users14_machines.description,` +
 		` projections.users14_machines.secret,` +
 		` projections.users14_machines.access_token_type,` +
-		` projections.users14.id,` +
-		` COUNT(*) OVER ()` +
+		` projections.users14.id` +
 		` FROM projections.users14` +
 		` LEFT JOIN projections.users14_humans ON projections.users14.id = projections.users14_humans.user_id AND projections.users14.instance_id = projections.users14_humans.instance_id` +
 		` LEFT JOIN projections.users14_machines ON projections.users14.id = projections.users14_machines.user_id AND projections.users14.instance_id = projections.users14_machines.instance_id` +
 		` LEFT JOIN projections.user_metadata5 ON projections.users14.id = projections.user_metadata5.user_id AND projections.users14.instance_id = projections.user_metadata5.instance_id` +
-		` LEFT JOIN LATERAL (SELECT ARRAY_AGG(ln.login_name ORDER BY ln.login_name) AS login_names, MAX(CASE WHEN ln.is_primary THEN ln.login_name ELSE NULL END) AS preferred_login_name FROM projections.login_names3 AS ln WHERE ln.user_id = projections.users14.id AND ln.instance_id = projections.users14.instance_id) AS login_names ON TRUE`
+		` LEFT JOIN LATERAL (SELECT ARRAY_AGG(ln.login_name ORDER BY ln.login_name) AS login_names, MAX(CASE WHEN ln.is_primary THEN ln.login_name ELSE NULL END) AS preferred_login_name FROM projections.login_names3 AS ln WHERE ln.user_id = projections.users14.id AND ln.instance_id = projections.users14.instance_id) AS login_names ON TRUE` +
+		` WHERE projections.users14.instance_id = $1 ORDER BY projections.users14.id DESC` +
+		`) AS results`
 	usersCols = []string{
 		"id",
 		"creation_date",
@@ -949,7 +951,8 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareUsersQuery no result",
 			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
-				return prepareUsersQuery(UserIDCol)
+				q := &UserSearchQueries{}
+				return q.prepareUsersQuery(t.Context(), false)
 			},
 			want: want{
 				sqlExpectations: mockQuery(
@@ -969,7 +972,8 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareUsersQuery one result",
 			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
-				return prepareUsersQuery(UserIDCol)
+				q := &UserSearchQueries{}
+				return q.prepareUsersQuery(t.Context(), false)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -1053,7 +1057,8 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareUsersQuery one result, no sorting",
 			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
-				return prepareUsersQuery(Column{})
+				q := &UserSearchQueries{}
+				return q.prepareUsersQuery(t.Context(), false)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -1135,13 +1140,19 @@ func Test_UserPrepares(t *testing.T) {
 			},
 		},
 		{
-			name: "prepareUsersQuery multiple results",
+			name: "prepareUsersQuery multiple results, offset and limit",
 			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
-				return prepareUsersQuery(UserIDCol)
+				q := &UserSearchQueries{
+					SearchRequest: SearchRequest{
+						Offset: 1,
+						Limit:  2,
+					},
+				}
+				return q.prepareUsersQuery(t.Context(), false)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(usersQuery),
+					regexp.QuoteMeta(usersQuery+` LIMIT 2 OFFSET 1`),
 					usersCols,
 					[][]driver.Value{
 						{
@@ -1274,7 +1285,8 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareUsersQuery sql err",
 			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
-				return prepareUsersQuery(UserIDCol)
+				q := &UserSearchQueries{}
+				return q.prepareUsersQuery(t.Context(), false)
 			},
 			want: want{
 				sqlExpectations: mockQueryErr(

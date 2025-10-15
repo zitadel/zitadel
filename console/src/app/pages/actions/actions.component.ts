@@ -12,6 +12,7 @@ const TARGETS: SidenavSetting = { id: 'targets', i18nKey: 'MENU.TARGETS' };
   templateUrl: './actions.component.html',
   styleUrls: ['./actions.component.scss'],
   animations: [enterAnimations],
+  standalone: false,
 })
 export class ActionsComponent {
   public settingsList: SidenavSetting[] = [ACTIONS, TARGETS];
