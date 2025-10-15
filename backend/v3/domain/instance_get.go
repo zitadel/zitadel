@@ -42,13 +42,17 @@ func (g *GetInstanceQuery) String() string {
 }
 
 // Validate implements [Validator].
-func (g *GetInstanceQuery) Validate(ctx context.Context, _ *InvokeOpts) (err error) {
+func (g *GetInstanceQuery) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
 	g.ID = strings.TrimSpace(g.ID)
 	if g.ID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-32a0o2", "invalid instance ID")
 	}
 	if g.ID != authz.GetInstance(ctx).InstanceID() {
 		return zerrors.ThrowPermissionDenied(nil, "DOM-n0SvVB", "input instance ID doesn't match context instance")
+	}
+
+	if authZErr := opts.Permissions.CheckInstancePermission(ctx, InstanceReadPermission); authZErr != nil {
+		return zerrors.ThrowPermissionDenied(authZErr, "DOM-Uq6b00", "permission denied")
 	}
 
 	return nil
