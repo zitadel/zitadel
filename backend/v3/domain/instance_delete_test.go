@@ -23,15 +23,13 @@ import (
 
 func TestDeleteInstanceCommand_Validate(t *testing.T) {
 	t.Parallel()
+	permissionErr := errors.New("permission error")
 	tt := []struct {
-		name          string
-		inputID       string
-		expectedError error
+		name              string
+		permissionChecker func(ctrl *gomock.Controller) domain.PermissionChecker
+		inputID           string
+		expectedError     error
 	}{
-		{
-			name:    "valid id",
-			inputID: "instance-1",
-		},
 		{
 			name:          "empty id",
 			inputID:       "",
@@ -42,6 +40,35 @@ func TestDeleteInstanceCommand_Validate(t *testing.T) {
 			inputID:       "   ",
 			expectedError: zerrors.ThrowInvalidArgument(nil, "DOM-VpQ9lF", "Errors.Invalid.Argument"),
 		},
+		{
+			name: "when user is missing permission should return permission denied",
+			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionChecker {
+				permChecker := domainmock.NewMockPermissionChecker(ctrl)
+
+				permChecker.EXPECT().
+					CheckInstancePermission(gomock.Any(), domain.InstanceWritePermission).
+					Times(1).
+					Return(permissionErr)
+
+				return permChecker
+			},
+			expectedError: zerrors.ThrowPermissionDenied(permissionErr, "DOM-Yz8f1X", "permission denied"),
+			inputID:       "instance-1",
+		},
+		{
+			name: "valid id",
+			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionChecker {
+				permChecker := domainmock.NewMockPermissionChecker(ctrl)
+
+				permChecker.EXPECT().
+					CheckInstancePermission(gomock.Any(), domain.InstanceWritePermission).
+					Times(1).
+					Return(nil)
+
+				return permChecker
+			},
+			inputID: "instance-1",
+		},
 	}
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
@@ -49,8 +76,14 @@ func TestDeleteInstanceCommand_Validate(t *testing.T) {
 			// Given
 			d := &domain.DeleteInstanceCommand{ID: tc.inputID}
 
+			cmdOpts := &domain.CommandOpts{}
+			if tc.permissionChecker != nil {
+				ctrl := gomock.NewController(t)
+				cmdOpts.Permissions = tc.permissionChecker(ctrl)
+			}
+
 			// Test
-			err := d.Validate(context.Background(), nil)
+			err := d.Validate(context.Background(), cmdOpts)
 
 			// Verify
 			assert.Equal(t, tc.expectedError, err)
