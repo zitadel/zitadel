@@ -12,6 +12,10 @@ import { registerUser } from "./register";
 import * as zitadelModule from "../zitadel";
 import * as cookieModule from "./cookie";
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import type { AddHumanUserResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import type { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import type { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import type { GetUserByIDResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 // Mock all dependencies
 vi.mock("../zitadel");
@@ -53,13 +57,13 @@ describe("registerUser server action", () => {
       // Mock add user response
       vi.mocked(zitadelModule.addHumanUser).mockResolvedValue({
         userId: mockUserId,
-      } as any);
+      } as AddHumanUserResponse);
 
       // Mock login settings
       vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
         passkeysType: PasskeysType.ALLOWED,
         allowRegister: true,
-      } as any);
+      } as LoginSettings);
 
       // Mock session creation
       vi.mocked(cookieModule.createSessionAndUpdateCookie).mockResolvedValue({
@@ -71,7 +75,7 @@ describe("registerUser server action", () => {
             organizationId: mockOrganization,
           },
         },
-      } as any);
+      } as Session);
 
       const result = await registerUser({
         email: mockEmail,
@@ -96,14 +100,14 @@ describe("registerUser server action", () => {
       // Mock add user response
       vi.mocked(zitadelModule.addHumanUser).mockResolvedValue({
         userId: mockUserId,
-      } as any);
+      } as AddHumanUserResponse);
 
       // Mock login settings
       vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
         allowRegister: true,
         allowUsernamePassword: true,
         passwordCheckLifetime: { seconds: BigInt(300) },
-      } as any);
+      } as LoginSettings);
 
       // Mock session creation
       vi.mocked(cookieModule.createSessionAndUpdateCookie).mockResolvedValue({
@@ -115,7 +119,7 @@ describe("registerUser server action", () => {
             organizationId: mockOrganization,
           },
         },
-      } as any);
+      } as Session);
 
       // Mock user retrieval
       vi.mocked(zitadelModule.getUserByID).mockResolvedValue({
@@ -131,12 +135,12 @@ describe("registerUser server action", () => {
             },
           },
         },
-      } as any);
+      } as GetUserByIDResponse);
 
       const { completeFlowOrGetUrl } = await import("../client");
       vi.mocked(completeFlowOrGetUrl).mockResolvedValue({
         redirect: "/dashboard",
-      } as any);
+      } as { redirect: string });
 
       const result = await registerUser({
         email: mockEmail,
@@ -177,13 +181,13 @@ describe("registerUser server action", () => {
     it("should return error when session creation fails", async () => {
       vi.mocked(zitadelModule.addHumanUser).mockResolvedValue({
         userId: mockUserId,
-      } as any);
+      } as AddHumanUserResponse);
 
       vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
         allowRegister: true,
-      } as any);
+      } as LoginSettings);
 
-      vi.mocked(cookieModule.createSessionAndUpdateCookie).mockResolvedValue(undefined as any);
+      vi.mocked(cookieModule.createSessionAndUpdateCookie).mockResolvedValue(undefined as unknown as Session);
 
       const result = await registerUser({
         email: mockEmail,
@@ -201,11 +205,11 @@ describe("registerUser server action", () => {
 
       vi.mocked(zitadelModule.addHumanUser).mockResolvedValue({
         userId: mockUserId,
-      } as any);
+      } as AddHumanUserResponse);
 
       vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
         allowRegister: true,
-      } as any);
+      } as LoginSettings);
 
       vi.mocked(cookieModule.createSessionAndUpdateCookie).mockResolvedValue({
         id: "session-id",
@@ -216,11 +220,11 @@ describe("registerUser server action", () => {
             organizationId: mockOrganization,
           },
         },
-      } as any);
+      } as Session);
 
       vi.mocked(zitadelModule.getUserByID).mockResolvedValue({
         user: undefined,
-      } as any);
+      } as GetUserByIDResponse);
 
       const result = await registerUser({
         email: mockEmail,

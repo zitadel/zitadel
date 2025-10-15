@@ -11,6 +11,13 @@ import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { sendVerification } from "./verify";
 import * as zitadelModule from "../zitadel";
 import * as sessionModule from "../session";
+import type { VerifyEmailResponse, VerifyInviteCodeResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import type {
+  GetUserByIDResponse,
+  ListAuthenticationMethodTypesResponse,
+} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import type { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import type { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 
 // Mock all dependencies
 vi.mock("../zitadel");
@@ -82,7 +89,7 @@ describe("sendVerification server action", () => {
     });
 
     it("should return error when email verification returns error", async () => {
-      // Mock verification returning error
+      // Mock verification returning error (simulating error case)
       vi.mocked(zitadelModule.verifyEmail).mockResolvedValue({
         error: "Invalid code",
       } as any);
@@ -100,12 +107,12 @@ describe("sendVerification server action", () => {
       // Mock successful verification
       vi.mocked(zitadelModule.verifyEmail).mockResolvedValue({
         details: {},
-      } as any);
+      } as VerifyEmailResponse);
 
       // Mock user lookup failure
       vi.mocked(zitadelModule.getUserByID).mockResolvedValue({
         user: undefined,
-      } as any);
+      } as GetUserByIDResponse);
 
       const result = await sendVerification({
         userId: mockUserId,
@@ -142,7 +149,7 @@ describe("sendVerification server action", () => {
       // Mock successful invite verification
       vi.mocked(zitadelModule.verifyInviteCode).mockResolvedValue({
         details: {},
-      } as any);
+      } as VerifyInviteCodeResponse);
 
       // Mock user
       vi.mocked(zitadelModule.getUserByID).mockResolvedValue({
@@ -161,7 +168,7 @@ describe("sendVerification server action", () => {
             },
           },
         },
-      } as any);
+      } as GetUserByIDResponse);
 
       await sendVerification({
         userId: mockUserId,
@@ -203,25 +210,25 @@ describe("sendVerification server action", () => {
             },
           },
         },
-      } as any);
+      } as GetUserByIDResponse);
 
       // Mock authentication methods - user has methods
       vi.mocked(zitadelModule.listAuthenticationMethodTypes).mockResolvedValue({
         authMethodTypes: [1], // PASSWORD
-      } as any);
+      } as ListAuthenticationMethodTypesResponse);
 
       // Mock login settings
       vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
         allowUsernamePassword: true,
-      } as any);
+      } as LoginSettings);
 
       // Mock session - return undefined as it will be created later in the flow
-      vi.mocked(sessionModule.loadMostRecentSession).mockResolvedValue(undefined);
+      vi.mocked(sessionModule.loadMostRecentSession).mockResolvedValue(undefined as unknown as Session);
 
       const { completeFlowOrGetUrl } = await import("../client");
       vi.mocked(completeFlowOrGetUrl).mockResolvedValue({
         redirect: "/dashboard",
-      } as any);
+      } as { redirect: string });
 
       const result = await sendVerification({
         userId: mockUserId,
