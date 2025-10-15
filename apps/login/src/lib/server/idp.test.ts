@@ -69,9 +69,7 @@ describe("redirectToIdp", () => {
       formData.append("organization", "org123");
       formData.append("postErrorRedirectUrl", "https://app.example.com/error");
 
-      mockStartIdentityProviderFlow.mockResolvedValue(
-        "https://idp.example.com/auth",
-      );
+      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
 
       try {
         await redirectToIdp(undefined, formData);
@@ -84,12 +82,8 @@ describe("redirectToIdp", () => {
         serviceUrl: "https://api.example.com",
         idpId: "idp123",
         urls: {
-          successUrl: expect.stringContaining(
-            "postErrorRedirectUrl=https%3A%2F%2Fapp.example.com%2Ferror",
-          ),
-          failureUrl: expect.stringContaining(
-            "postErrorRedirectUrl=https%3A%2F%2Fapp.example.com%2Ferror",
-          ),
+          successUrl: expect.stringContaining("postErrorRedirectUrl=https%3A%2F%2Fapp.example.com%2Ferror"),
+          failureUrl: expect.stringContaining("postErrorRedirectUrl=https%3A%2F%2Fapp.example.com%2Ferror"),
         },
       });
 
@@ -100,15 +94,11 @@ describe("redirectToIdp", () => {
 
       expect(successUrl).toContain("requestId=req123");
       expect(successUrl).toContain("organization=org123");
-      expect(successUrl).toContain(
-        "postErrorRedirectUrl=https%3A%2F%2Fapp.example.com%2Ferror",
-      );
+      expect(successUrl).toContain("postErrorRedirectUrl=https%3A%2F%2Fapp.example.com%2Ferror");
 
       expect(failureUrl).toContain("requestId=req123");
       expect(failureUrl).toContain("organization=org123");
-      expect(failureUrl).toContain(
-        "postErrorRedirectUrl=https%3A%2F%2Fapp.example.com%2Ferror",
-      );
+      expect(failureUrl).toContain("postErrorRedirectUrl=https%3A%2F%2Fapp.example.com%2Ferror");
     });
 
     test("should not include postErrorRedirectUrl in URLs when not provided", async () => {
@@ -118,9 +108,7 @@ describe("redirectToIdp", () => {
       formData.append("requestId", "req123");
       formData.append("organization", "org123");
 
-      mockStartIdentityProviderFlow.mockResolvedValue(
-        "https://idp.example.com/auth",
-      );
+      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
 
       try {
         await redirectToIdp(undefined, formData);
@@ -149,9 +137,7 @@ describe("redirectToIdp", () => {
       formData.append("provider", "google");
       formData.append("postErrorRedirectUrl", "");
 
-      mockStartIdentityProviderFlow.mockResolvedValue(
-        "https://idp.example.com/auth",
-      );
+      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
 
       try {
         await redirectToIdp(undefined, formData);
@@ -180,9 +166,7 @@ describe("redirectToIdp", () => {
         expect(error.message).toContain("REDIRECT: /idp/ldap?");
         expect(error.message).toContain("requestId=req123");
         expect(error.message).toContain("organization=org123");
-        expect(error.message).toContain(
-          "postErrorRedirectUrl=%2Fcustom-error",
-        );
+        expect(error.message).toContain("postErrorRedirectUrl=%2Fcustom-error");
       }
     });
 
@@ -190,14 +174,9 @@ describe("redirectToIdp", () => {
       const formData = new FormData();
       formData.append("id", "idp123");
       formData.append("provider", "google");
-      formData.append(
-        "postErrorRedirectUrl",
-        "https://app.example.com/error?code=123&message=test",
-      );
+      formData.append("postErrorRedirectUrl", "https://app.example.com/error?code=123&message=test");
 
-      mockStartIdentityProviderFlow.mockResolvedValue(
-        "https://idp.example.com/auth",
-      );
+      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
 
       try {
         await redirectToIdp(undefined, formData);
@@ -226,9 +205,7 @@ describe("redirectToIdp", () => {
       formData.append("linkOnly", "true");
       formData.append("postErrorRedirectUrl", "/custom-error");
 
-      mockStartIdentityProviderFlow.mockResolvedValue(
-        "https://idp.example.com/auth",
-      );
+      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
 
       try {
         await redirectToIdp(undefined, formData);
@@ -254,9 +231,7 @@ describe("redirectToIdp", () => {
       formData.append("provider", "github");
       formData.append("postErrorRedirectUrl", "/loginname");
 
-      mockStartIdentityProviderFlow.mockResolvedValue(
-        "https://idp.example.com/auth",
-      );
+      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
 
       try {
         await redirectToIdp(undefined, formData);
@@ -266,12 +241,8 @@ describe("redirectToIdp", () => {
       }
 
       const callArgs = mockStartIdentityProviderFlow.mock.calls[0][0];
-      expect(callArgs.urls.successUrl).toContain(
-        "postErrorRedirectUrl=%2Floginname",
-      );
-      expect(callArgs.urls.failureUrl).toContain(
-        "postErrorRedirectUrl=%2Floginname",
-      );
+      expect(callArgs.urls.successUrl).toContain("postErrorRedirectUrl=%2Floginname");
+      expect(callArgs.urls.failureUrl).toContain("postErrorRedirectUrl=%2Floginname");
     });
   });
 
@@ -293,9 +264,7 @@ describe("redirectToIdp", () => {
       formData.append("id", "idp123");
       formData.append("provider", "google");
 
-      mockStartIdentityProviderFlow.mockResolvedValue(
-        "https://idp.example.com/auth",
-      );
+      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
 
       try {
         await redirectToIdp(undefined, formData);
