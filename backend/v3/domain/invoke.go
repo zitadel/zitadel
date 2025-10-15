@@ -53,8 +53,9 @@ func Invoke(ctx context.Context, cmd Commander, opts ...InvokeOpt) error {
 		),
 	)
 	commandOpts := &CommandOpts{
-		Invoker: invoker.collector,
-		DB:      pool,
+		Invoker:     invoker.collector,
+		DB:          pool,
+		Permissions: &noopPermissionChecker{},
 	}
 	for _, opt := range opts {
 		opt(commandOpts)
