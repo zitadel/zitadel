@@ -216,7 +216,7 @@ func TestUpdateInstanceCommand_Execute(t *testing.T) {
 			},
 			inputID:       "instance-1",
 			inputName:     "test instance update",
-			expectedError: zerrors.ThrowInternal(domain.NewMultipleObjecstUpdatedError(1, 2), "DOM-HlrNmD", "unexpected number of rows updated"),
+			expectedError: zerrors.ThrowInternal(domain.NewMultipleObjectsUpdatedError(1, 2), "DOM-HlrNmD", "unexpected number of rows updated"),
 		},
 		{
 			testName: "when instance update returns 1 row updated should return no error and set non-primary verified domain",
