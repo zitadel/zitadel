@@ -20,6 +20,7 @@ var (
 	EmptyCTX             context.Context
 	IAMCTX               context.Context
 	Instance             *integration.Instance
+	InstanceQuery        *integration.Instance
 	InstancePermissionV2 *integration.Instance
 )
 
@@ -29,6 +30,7 @@ func TestMain(m *testing.M) {
 		defer cancel()
 		EmptyCTX = ctx
 		Instance = integration.NewInstance(ctx)
+		InstanceQuery = integration.NewInstance(ctx) // use a separate instance for queries to avoid side effects
 		IAMCTX = Instance.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
 		InstancePermissionV2 = integration.NewInstance(ctx)
 		return m.Run()

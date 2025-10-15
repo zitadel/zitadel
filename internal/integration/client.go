@@ -965,20 +965,23 @@ func (i *Instance) ActivateProjectGrant(ctx context.Context, t *testing.T, proje
 	return resp
 }
 
-func (i *Instance) CreateAuthorizationProject(t *testing.T, ctx context.Context, projectID, userID string) *authorization_v2.CreateAuthorizationResponse {
+func (i *Instance) CreateAuthorizationProject(t *testing.T, ctx context.Context, projectID, userID, organizationID string, roles ...string) *authorization_v2.CreateAuthorizationResponse {
 	resp, err := i.Client.AuthorizationV2.CreateAuthorization(ctx, &authorization_v2.CreateAuthorizationRequest{
-		UserId:    userID,
-		ProjectId: projectID,
+		UserId:         userID,
+		ProjectId:      projectID,
+		OrganizationId: organizationID,
+		RoleKeys:       roles,
 	})
 	require.NoError(t, err)
 	return resp
 }
 
-func (i *Instance) CreateAuthorizationProjectGrant(t *testing.T, ctx context.Context, projectID, orgID, userID string) *authorization_v2.CreateAuthorizationResponse {
+func (i *Instance) CreateAuthorizationProjectGrant(t *testing.T, ctx context.Context, projectID, organizationID, userID string, roles ...string) *authorization_v2.CreateAuthorizationResponse {
 	resp, err := i.Client.AuthorizationV2.CreateAuthorization(ctx, &authorization_v2.CreateAuthorizationRequest{
 		UserId:         userID,
 		ProjectId:      projectID,
-		OrganizationId: orgID,
+		OrganizationId: organizationID,
+		RoleKeys:       roles,
 	})
 	require.NoError(t, err)
 	return resp
