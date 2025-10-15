@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
-  const { organization, requestId, postErrorRedirectUrl } = searchParams;
+  const { organization, postErrorRedirectUrl } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -36,15 +36,6 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     organization: organization ?? defaultOrganization,
   });
 
-  // Build the redirect URL with preserved parameters
-  let redirectUrl = postErrorRedirectUrl || "/loginname";
-  if (redirectUrl === "/loginname") {
-    const params = new URLSearchParams();
-    if (requestId) params.set("requestId", requestId);
-    if (organization) params.set("organization", organization);
-    redirectUrl = `/loginname?${params.toString()}`;
-  }
-
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
@@ -61,12 +52,14 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           </Alert>
         </div>
 
-        <Link
-          href={redirectUrl}
-          className="bg-primary-light-500 hover:bg-primary-light-400 dark:bg-primary-dark-500 dark:hover:bg-primary-dark-400 w-full rounded-md px-4 py-3 text-center transition-all"
-        >
-          <Translated i18nKey="accountNotFound.backToLogin" namespace="idp" />
-        </Link>
+        {postErrorRedirectUrl && (
+          <Link
+            href={postErrorRedirectUrl}
+            className="bg-primary-light-500 hover:bg-primary-light-400 dark:bg-primary-dark-500 dark:hover:bg-primary-dark-400 w-full rounded-md px-4 py-3 text-center transition-all"
+          >
+            <Translated i18nKey="accountNotFound.backToLogin" namespace="idp" />
+          </Link>
+        )}
       </div>
     </DynamicTheme>
   );

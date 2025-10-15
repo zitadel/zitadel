@@ -195,7 +195,6 @@ export default async function Page(props: { searchParams: Promise<Record<string 
               requestId={requestId}
               organization={sessionWithData.factors?.user?.organizationId}
               linkOnly={true} // tell the callback function to just link the IDP and not login, to get an error when user is already available
-              postErrorRedirectUrl="/authenticator/set"
             ></SignInWithIdp>
           </>
         )}
