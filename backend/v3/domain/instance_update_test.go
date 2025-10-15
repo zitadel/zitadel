@@ -22,11 +22,13 @@ func TestUpdateInstanceCommand_Validate(t *testing.T) {
 	t.Parallel()
 	txInitErr := errors.New("tx init error")
 	getErr := errors.New("get error")
+	permissionErr := errors.New("permission error")
 
 	tt := []struct {
 		testName          string
 		queryExecutor     func(ctrl *gomock.Controller) database.QueryExecutor
 		instanceRepo      func(ctrl *gomock.Controller) domain.InstanceRepository
+		permissionChecker func(ctrl *gomock.Controller) domain.PermissionChecker
 		inputInstanceID   string
 		inputInstanceName string
 		expectedError     error
@@ -58,7 +60,33 @@ func TestUpdateInstanceCommand_Validate(t *testing.T) {
 			expectedError:     txInitErr,
 		},
 		{
+			testName: "when user is missing permission should return permission denied",
+			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionChecker {
+				permChecker := domainmock.NewMockPermissionChecker(ctrl)
+
+				permChecker.EXPECT().
+					CheckInstancePermission(gomock.Any(), domain.InstanceWritePermission).
+					Times(1).
+					Return(permissionErr)
+
+				return permChecker
+			},
+			inputInstanceID:   "instance-1",
+			inputInstanceName: "test instance update",
+			expectedError:     zerrors.ThrowPermissionDenied(permissionErr, "DOM-M5ObLP", "permission denied"),
+		},
+		{
 			testName: "when retrieving instance fails should return error",
+			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionChecker {
+				permChecker := domainmock.NewMockPermissionChecker(ctrl)
+
+				permChecker.EXPECT().
+					CheckInstancePermission(gomock.Any(), domain.InstanceWritePermission).
+					Times(1).
+					Return(nil)
+
+				return permChecker
+			},
 			instanceRepo: func(ctrl *gomock.Controller) domain.InstanceRepository {
 				repo := domainmock.NewInstanceRepo(ctrl)
 				repo.EXPECT().
@@ -77,6 +105,16 @@ func TestUpdateInstanceCommand_Validate(t *testing.T) {
 		},
 		{
 			testName: "when instance name is not changed should return name not changed error",
+			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionChecker {
+				permChecker := domainmock.NewMockPermissionChecker(ctrl)
+
+				permChecker.EXPECT().
+					CheckInstancePermission(gomock.Any(), domain.InstanceWritePermission).
+					Times(1).
+					Return(nil)
+
+				return permChecker
+			},
 			instanceRepo: func(ctrl *gomock.Controller) domain.InstanceRepository {
 				repo := domainmock.NewInstanceRepo(ctrl)
 				repo.EXPECT().
@@ -96,6 +134,16 @@ func TestUpdateInstanceCommand_Validate(t *testing.T) {
 		},
 		{
 			testName: "when instance name is changed should validate successfully and return no error",
+			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionChecker {
+				permChecker := domainmock.NewMockPermissionChecker(ctrl)
+
+				permChecker.EXPECT().
+					CheckInstancePermission(gomock.Any(), domain.InstanceWritePermission).
+					Times(1).
+					Return(nil)
+
+				return permChecker
+			},
 			instanceRepo: func(ctrl *gomock.Controller) domain.InstanceRepository {
 				repo := domainmock.NewInstanceRepo(ctrl)
 				repo.EXPECT().
@@ -130,6 +178,9 @@ func TestUpdateInstanceCommand_Validate(t *testing.T) {
 			}
 			if tc.queryExecutor != nil {
 				opts.DB = tc.queryExecutor(ctrl)
+			}
+			if tc.permissionChecker != nil {
+				opts.Permissions = tc.permissionChecker(ctrl)
 			}
 
 			err := cmd.Validate(ctx, opts)
