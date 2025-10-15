@@ -7,7 +7,42 @@
         </a>
         <div class="cnsl-title-row-wrapper">
           <div class="cnsl-title-row">
-            <h2 data-e2e="top-view-title" class="cnsl-title">{{ title }}</h2>
+            <div class="cnsl-title-container">
+              <input
+                *ngIf="isEditingTitle && titleEditable"
+                class="cnsl-title cnsl-title-input"
+                [(ngModel)]="editingTitleValue"
+                (keydown.enter)="saveTitleEdit()"
+                (keydown.escape)="cancelTitleEdit()"
+                (blur)="saveTitleEdit()"
+                [placeholder]="titlePlaceholder"
+                autoResizeInput
+                maxlength="200"
+                #titleEditInput
+              />
+
+              <h2
+                *ngIf="!isEditingTitle"
+                data-e2e="top-view-title"
+                class="cnsl-title"
+                [class.cnsl-title-editable]="titleEditable"
+                (click)="titleEditable && startTitleEdit()"
+                [matTooltip]="titleEditable ? 'Click to edit' : ''"
+              >
+                {{ title }}
+                <mat-icon class="cnsl-title-edit-icon" *ngIf="titleEditable">edit</mat-icon>
+              </h2>
+
+              <div class="cnsl-title-edit-buttons" *ngIf="isEditingTitle && titleEditable">
+                <button mat-icon-button (click)="saveTitleEdit()" matTooltip="Save">
+                  <mat-icon>check</mat-icon>
+                </button>
+                <button mat-icon-button (click)="cancelTitleEdit()" matTooltip="Cancel">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </div>
+
             <div
               class="cnsl-state-dot"
               *ngIf="isActive || isInactive"

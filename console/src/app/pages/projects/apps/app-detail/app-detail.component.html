@@ -59,23 +59,349 @@
     </div>
   </cnsl-info-section>
 
-  <div
-    class="compliance"
-    *ngIf="app && app.oidcConfig && app.oidcConfig.complianceProblemsList && app.oidcConfig.complianceProblemsList?.length"
-  >
-    <h2 class="compliance-title">{{ 'APP.COMPLIANCE' | translate }}</h2>
-    <cnsl-info-section class="problem" [type]="InfoSectionType.ALERT">
-      <ul style="margin: 0">
-        <li style="margin: 0 0 0.5rem 0" *ngFor="let problem of app.oidcConfig?.complianceProblemsList || []">
-          {{ problem.localizedMessage }}
-        </li>
-      </ul>
-    </cnsl-info-section>
-  </div>
-
   <div class="app-main-content">
     <cnsl-meta-layout>
       <cnsl-sidenav [(setting)]="currentSetting" [settingsList]="settingsList">
+        <ng-container *ngIf="currentSetting.id === 'overview'">
+          <cnsl-card [collapsible]="false" title="{{ 'APP.OVERVIEW_DETAIL.TITLE' | translate }}">
+            <div class="overview-content">
+              <div class="auth-status-section">
+                <div
+                  class="status-indicator"
+                  [ngClass]="{
+                    'status-authenticated': isAuthenticated() === true,
+                    'status-not-authenticated': isAuthenticated() === false,
+                    'status-loading': isAuthenticated() === null,
+                  }"
+                >
+                  <div class="status-icon">
+                    <i class="las" *ngIf="isAuthenticated() === null">la-spinner la-spin</i>
+                    <i class="las la-check-circle" *ngIf="isAuthenticated() === true"></i>
+                    <i class="las la-exclamation-circle" *ngIf="isAuthenticated() === false"></i>
+                  </div>
+                  <div class="status-text">
+                    <span *ngIf="isAuthenticated() === null">{{
+                      'APP.OVERVIEW_DETAIL.AUTH_STATUS_CHECKING' | translate
+                    }}</span>
+                    <span *ngIf="isAuthenticated() === true">{{
+                      'APP.OVERVIEW_DETAIL.AUTH_STATUS_SUCCESS' | translate
+                    }}</span>
+                    <span *ngIf="isAuthenticated() === false">{{
+                      'APP.OVERVIEW_DETAIL.AUTH_STATUS_PENDING' | translate
+                    }}</span>
+                    <span class="status-description" *ngIf="isAuthenticated() === false">
+                      {{ 'APP.OVERVIEW_DETAIL.AUTH_STATUS_PENDING_DESC' | translate }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="isAuthenticated() === true" class="authenticated-state">
+                <div class="env-vars-section prominent">
+                  <h4>{{ 'APP.OVERVIEW_DETAIL.ENVVARS' | translate }}</h4>
+                  <p>{{ 'APP.OVERVIEW_DETAIL.ENVVARS_AUTHENTICATED_DESC' | translate }}</p>
+                  <cnsl-env-vars-block
+                    [envVars]="envVarsArray"
+                    [availableFormats]="['env', 'json', 'yaml']"
+                    defaultFormat="env"
+                  ></cnsl-env-vars-block>
+                </div>
+              </div>
+
+              <div *ngIf="isAuthenticated() === false" class="integration-flow">
+                <h3>{{ 'APP.OVERVIEW_DETAIL.GETSTARTED' | translate }}</h3>
+                <p>{{ 'APP.OVERVIEW_DETAIL.GETSTARTED_DESC' | translate }}</p>
+
+                <div class="scenarios-section">
+                  <div class="scenario-header">
+                    <div class="header-content">
+                      <h4>{{ 'APP.OVERVIEW_DETAIL.QUICKSTART' | translate }}</h4>
+                      <p class="subtitle">{{ 'APP.OVERVIEW_DETAIL.QUICKSTART_SUBTITLE' | translate }}</p>
+                    </div>
+                  </div>
+
+                  <div class="scenario-toggle">
+                    <button mat-button [class.active]="selectedScenario === 'new'" (click)="switchScenario('new')">
+                      <span class="icon">🚀</span>
+                      {{ 'APP.OVERVIEW_DETAIL.SCENARIO_NEW_TOGGLE' | translate }}
+                    </button>
+                    <button mat-button [class.active]="selectedScenario === 'existing'" (click)="switchScenario('existing')">
+                      <span class="icon"><i class="las la-code"></i></span>
+                      {{ 'APP.OVERVIEW_DETAIL.SCENARIO_EXISTING_TOGGLE' | translate }}
+                    </button>
+                  </div>
+
+                  <div class="scenario-card new-app-scenario" *ngIf="selectedScenario === 'new'">
+                    <div class="scenario-content">
+                      <div class="scenario-description">
+                        <p>{{ 'APP.OVERVIEW_DETAIL.SCENARIO_NEW_DESC' | translate }}</p>
+                      </div>
+
+                      <div class="integration-steps">
+                        <!-- Step 1: Clone Example (only if example available) -->
+                        <div class="step-item" *ngIf="hasExample()">
+                          <div class="step-number">1</div>
+                          <div class="step-content">
+                            <h6>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP1_TITLE' | translate }}</h6>
+                            <p>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP1_DESC' | translate }}</p>
+
+                            <div class="code-block">
+                              <div class="code-header">
+                                <span>{{ 'APP.OVERVIEW_DETAIL.TERMINAL' | translate }}</span>
+                                <button
+                                  mat-icon-button
+                                  [disabled]="copied === 'clone'"
+                                  (click)="copyToClipboard(getCloneCommand(), 'clone')"
+                                  matTooltip="{{ 'ACTIONS.COPY' | translate }}"
+                                >
+                                  <i class="las" [ngClass]="copied === 'clone' ? 'la-check text-green-500' : 'la-copy'"></i>
+                                </button>
+                              </div>
+                              <pre class="code-content">{{ getCloneCommand() }}</pre>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Generic guidance for frameworks without examples -->
+                        <div class="step-item" *ngIf="!hasAnyFrameworkContent()">
+                          <div class="step-number">1</div>
+                          <div class="step-content">
+                            <h6>{{ 'APP.OVERVIEW_DETAIL.GENERIC_NEW_TITLE' | translate }}</h6>
+                            <div class="generic-guidance">
+                              <p>{{ 'APP.OVERVIEW_DETAIL.GENERIC_NEW_NOTE' | translate }}</p>
+                              <div class="generic-links">
+                                <a
+                                  href="https://zitadel.com/docs/examples"
+                                  target="_blank"
+                                  mat-raised-button
+                                  color="primary"
+                                >
+                                  <i class="las la-code"></i>
+                                  {{ 'APP.OVERVIEW_DETAIL.BROWSE_EXAMPLES' | translate }}
+                                </a>
+                                <a href="https://zitadel.com/docs/guides/integrate" target="_blank" mat-stroked-button>
+                                  <i class="las la-puzzle-piece"></i>
+                                  {{ 'APP.OVERVIEW_DETAIL.INTEGRATION_GUIDE' | translate }}
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Step 2: Environment Variables (always shown) -->
+                        <div class="step-item">
+                          <div class="step-number">{{ hasExample() ? '2' : '1' }}</div>
+                          <div class="step-content">
+                            <h6>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP2_TITLE' | translate }}</h6>
+                            <p>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP2_DESC' | translate }}</p>
+                            <cnsl-env-vars-block
+                              [envVars]="envVarsArray"
+                              [availableFormats]="['env', 'json', 'yaml']"
+                              defaultFormat="env"
+                            ></cnsl-env-vars-block>
+                          </div>
+                        </div>
+
+                        <!-- Step 3: Build and Run (only if build commands available) -->
+                        <div class="step-item" *ngIf="hasBuildCommands()">
+                          <div class="step-number">{{ hasExample() ? '3' : '2' }}</div>
+                          <div class="step-content">
+                            <h6>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP3_TITLE' | translate }}</h6>
+                            <p>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP3_DESC' | translate }}</p>
+                            <div class="framework-actions">
+                              <div class="code-block">
+                                <div class="code-header">
+                                  <span>{{ 'APP.OVERVIEW_DETAIL.TERMINAL' | translate }}</span>
+                                  <button
+                                    mat-icon-button
+                                    [disabled]="copied === 'build'"
+                                    (click)="copyToClipboard(getBuildCommand(), 'build')"
+                                    matTooltip="{{ 'ACTIONS.COPY' | translate }}"
+                                  >
+                                    <i
+                                      class="las"
+                                      [ngClass]="copied === 'build' ? 'la-check text-green-500' : 'la-copy'"
+                                    ></i>
+                                  </button>
+                                </div>
+                                <pre class="code-content">{{ getBuildCommand() }}</pre>
+                              </div>
+                              <p>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP3_DESC2' | translate }}</p>
+                              <div class="code-block">
+                                <div class="code-header">
+                                  <span>{{ 'APP.OVERVIEW_DETAIL.TERMINAL' | translate }}</span>
+                                  <button
+                                    mat-icon-button
+                                    [disabled]="copied === 'run'"
+                                    (click)="copyToClipboard(getRunCommand(), 'run')"
+                                    matTooltip="{{ 'ACTIONS.COPY' | translate }}"
+                                  >
+                                    <i class="las" [ngClass]="copied === 'run' ? 'la-check text-green-500' : 'la-copy'"></i>
+                                  </button>
+                                </div>
+                                <pre class="code-content">{{ getRunCommand() }}</pre>
+                              </div>
+                              <a [href]="getFrameworkInfo()?.exampleLink" target="_blank" mat-raised-button color="primary">
+                                {{ 'APP.OVERVIEW_DETAIL.VIEWDOCS' | translate }}
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Final step: View Documentation (always shown if any framework content exists) -->
+                        <div class="step-item" *ngIf="hasAnyFrameworkContent() && getFrameworkInfo()?.docsLink">
+                          <div class="step-number">{{ (hasExample() ? 1 : 0) + (hasBuildCommands() ? 1 : 0) + 2 }}</div>
+                          <div class="step-content">
+                            <h6>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP_DOCS_TITLE' | translate }}</h6>
+                            <p>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP_DOCS_DESC' | translate }}</p>
+                            <a [href]="getFrameworkInfo()?.docsLink" target="_blank" mat-raised-button color="primary">
+                              <i class="las la-book"></i>
+                              {{ 'APP.OVERVIEW_DETAIL.VIEWDOCS' | translate }}
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="scenario-card existing-app-scenario" *ngIf="selectedScenario === 'existing'">
+                    <div class="scenario-content">
+                      <div class="scenario-description">
+                        <p>{{ 'APP.OVERVIEW_DETAIL.SCENARIO_EXISTING_DESC' | translate }}</p>
+                      </div>
+
+                      <div class="integration-steps">
+                        <!-- Step 1: Install SDK (only if SDK available) -->
+                        <div class="step-item" *ngIf="hasSdk()">
+                          <div class="step-number">1</div>
+                          <div class="step-content">
+                            <h6>{{ 'APP.OVERVIEW_DETAIL.EXISTING_STEP1_TITLE' | translate }}</h6>
+                            <p>{{ 'APP.OVERVIEW_DETAIL.EXISTING_STEP1_DESC' | translate }}</p>
+
+                            <div class="code-block">
+                              <div class="code-header">
+                                <span>{{ 'APP.OVERVIEW_DETAIL.TERMINAL' | translate }}</span>
+                                <button
+                                  mat-icon-button
+                                  [disabled]="copied === 'sdk'"
+                                  (click)="copyToClipboard(getSdkCommand(), 'sdk')"
+                                  matTooltip="{{ 'ACTIONS.COPY' | translate }}"
+                                >
+                                  <i class="las" [ngClass]="copied === 'sdk' ? 'la-check text-green-500' : 'la-copy'"></i>
+                                </button>
+                              </div>
+                              <pre class="code-content">{{ getSdkCommand() }}</pre>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Generic guidance for frameworks without SDK -->
+                        <div class="step-item" *ngIf="!hasSdk() && !hasAnyFrameworkContent()">
+                          <div class="step-number">1</div>
+                          <div class="step-content">
+                            <h6>{{ 'APP.OVERVIEW_DETAIL.GENERIC_EXISTING_TITLE' | translate }}</h6>
+                            <div class="generic-guidance">
+                              <p>{{ 'APP.OVERVIEW_DETAIL.GENERIC_EXISTING_NOTE' | translate }}</p>
+                              <div class="generic-links">
+                                <a
+                                  href="https://zitadel.com/docs/guides/integrate"
+                                  target="_blank"
+                                  mat-raised-button
+                                  color="primary"
+                                >
+                                  <i class="las la-puzzle-piece"></i>
+                                  {{ 'APP.OVERVIEW_DETAIL.INTEGRATION_GUIDE' | translate }}
+                                </a>
+                                <a href="https://zitadel.com/docs/apis" target="_blank" mat-stroked-button>
+                                  <i class="las la-cogs"></i>
+                                  {{ 'APP.OVERVIEW_DETAIL.API_DOCS' | translate }}
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="step-item">
+                          <div class="step-number">{{ hasSdk() ? '2' : '1' }}</div>
+                          <div class="step-content">
+                            <h6>{{ 'APP.OVERVIEW_DETAIL.EXISTING_STEP2_TITLE' | translate }}</h6>
+                            <cnsl-env-vars-block
+                              [envVars]="envVarsArray"
+                              [availableFormats]="['env', 'json', 'yaml']"
+                              defaultFormat="env"
+                            ></cnsl-env-vars-block>
+                          </div>
+                        </div>
+
+                        <!-- Final step: View Documentation (always shown if framework content exists) -->
+                        <div class="step-item" *ngIf="hasAnyFrameworkContent() && getFrameworkInfo()?.docsLink">
+                          <div class="step-number">{{ hasSdk() ? '3' : '2' }}</div>
+                          <div class="step-content">
+                            <h6>{{ 'APP.OVERVIEW_DETAIL.EXISTING_STEP_DOCS_TITLE' | translate }}</h6>
+                            <p>{{ 'APP.OVERVIEW_DETAIL.EXISTING_STEP_DOCS_DESC' | translate }}</p>
+                            <a [href]="getFrameworkInfo()?.docsLink" target="_blank" mat-raised-button color="primary">
+                              <i class="las la-book"></i>
+                              {{ 'APP.OVERVIEW_DETAIL.VIEWDOCS' | translate }}
+                            </a>
+                          </div>
+                        </div>
+                        <div class="step-item">
+                          <div class="step-number">3</div>
+                          <div class="step-content">
+                            <h6>{{ 'APP.OVERVIEW_DETAIL.EXISTING_STEP3_TITLE' | translate }}</h6>
+                            <p>{{ 'APP.OVERVIEW_DETAIL.EXISTING_STEP3_DESC' | translate }}</p>
+
+                            <div class="integration-resources">
+                              <div class="resource-links">
+                                <a
+                                  [href]="getFrameworkInfo()?.exampleLink || 'https://zitadel.com/docs/guides/integrate'"
+                                  target="_blank"
+                                  mat-raised-button
+                                  color="primary"
+                                >
+                                  {{ 'APP.OVERVIEW_DETAIL.INTEGRATION_GUIDE' | translate }}
+                                </a>
+                                <a
+                                  [href]="getFrameworkInfo()?.docsLink || 'https://zitadel.com/docs/sdks'"
+                                  target="_blank"
+                                  mat-stroked-button
+                                >
+                                  {{ 'APP.OVERVIEW_DETAIL.VIEW_SDKS' | translate }}
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="next-steps-section">
+                <h4>{{ 'APP.OVERVIEW_DETAIL.NEXTSTEPS' | translate }}</h4>
+                <div class="steps-grid">
+                  <div class="step-card" (click)="switchToTab('configuration')">
+                    <i class="las la-cog"></i>
+                    <h5>{{ 'APP.OVERVIEW_DETAIL.CONFIGURE' | translate }}</h5>
+                    <p>{{ 'APP.OVERVIEW_DETAIL.CONFIGURE_DESC' | translate }}</p>
+                  </div>
+                  <div class="step-card" (click)="switchToTab('redirect-uris')" *ngIf="app?.oidcConfig">
+                    <i class="las la-external-link-alt"></i>
+                    <h5>{{ 'APP.OVERVIEW_DETAIL.REDIRECTS' | translate }}</h5>
+                    <p>{{ 'APP.OVERVIEW_DETAIL.REDIRECTS_DESC' | translate }}</p>
+                  </div>
+                  <div class="step-card" (click)="switchToTab('urls')">
+                    <i class="las la-link"></i>
+                    <h5>{{ 'APP.OVERVIEW_DETAIL.URLS' | translate }}</h5>
+                    <p>{{ 'APP.OVERVIEW_DETAIL.URLS_DESC' | translate }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </cnsl-card>
+        </ng-container>
+
         <ng-container *ngIf="currentSetting.id === 'configuration'">
           <cnsl-card *ngIf="oidcForm && app?.oidcConfig" title=" {{ 'APP.OIDC.TITLE' | translate }}">
             <div
@@ -521,6 +847,19 @@
       </cnsl-sidenav>
 
       <div metainfo>
+        <div
+          class="compliance"
+          *ngIf="
+            app && app.oidcConfig && app.oidcConfig.complianceProblemsList && app.oidcConfig.complianceProblemsList?.length
+          "
+        >
+          <h2 class="compliance-title">{{ 'APP.COMPLIANCE' | translate }}</h2>
+          <div *ngFor="let problem of app.oidcConfig?.complianceProblemsList || []">
+            <cnsl-info-section class="problem" [type]="InfoSectionType.ALERT">
+              {{ problem.localizedMessage }}
+            </cnsl-info-section>
+          </div>
+        </div>
         <cnsl-changes *ngIf="app" [changeType]="ChangeType.APP" [id]="app.id" [secId]="projectId"></cnsl-changes>
       </div>
     </cnsl-meta-layout>

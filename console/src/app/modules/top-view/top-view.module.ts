@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
@@ -16,6 +17,7 @@ import { TopViewComponent } from './top-view.component';
     CommonModule,
     RouterModule,
     BackModule,
+    FormsModule,
     MatMenuModule,
     MatIconModule,
     MatButtonModule,

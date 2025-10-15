@@ -4,7 +4,13 @@ import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
 import { ProjectAutocompleteType } from 'src/app/modules/search-project-autocomplete/search-project-autocomplete.component';
-import { AddProjectRequest, AddProjectResponse, AddOIDCAppRequest } from 'src/app/proto/generated/zitadel/management_pb';
+import {
+  AddProjectRequest,
+  AddProjectResponse,
+  AddOIDCAppRequest,
+  AddProjectRoleRequest,
+  AddUserGrantRequest,
+} from 'src/app/proto/generated/zitadel/management_pb';
 import { GrantedProject, Project } from 'src/app/proto/generated/zitadel/project_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -13,7 +19,9 @@ import frameworkDefinition from '../../../../../docs/frameworks.json';
 import { NavigationService } from 'src/app/services/navigation.service';
 import { Location } from '@angular/common';
 import { ToastService } from 'src/app/services/toast.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { OIDC_CONFIGURATIONS } from 'src/app/utils/framework';
+import { generateRandomProjectName, generateFrameworkAppName } from 'src/app/utils/name-generator';
 
 @Component({
   selector: 'cnsl-app-quick-create',
@@ -92,6 +100,7 @@ export class AppQuickCreateComponent implements OnDestroy {
     activatedRoute: ActivatedRoute,
     private _location: Location,
     private navigation: NavigationService,
+    private authService: GrpcAuthService,
   ) {
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,
@@ -171,7 +180,7 @@ export class AppQuickCreateComponent implements OnDestroy {
     this.loading = true;
     const request = new AddOIDCAppRequest();
     request.setProjectId(projectId);
-    request.setName(`My ${this.framework()?.title} App` || 'My App');
+    request.setName(generateFrameworkAppName(this.framework()?.title));
     request.setDevMode(true);
     request.setAppType(OIDC_CONFIGURATIONS[this.framework()?.id || 'other']?.getAppType());
     request.setAuthMethodType(OIDC_CONFIGURATIONS[this.framework()?.id || 'other']?.getAuthMethodType());
@@ -189,7 +198,9 @@ export class AppQuickCreateComponent implements OnDestroy {
         this.showRenameWarning.next(false);
         this.toast.showInfo('APP.TOAST.CREATED', true);
 
-        this.router.navigate(['projects', projectId, 'apps', resp.appId], { queryParams: { new: true } });
+        this.router.navigate(['projects', projectId, 'apps', resp.appId], {
+          queryParams: { new: true, framework: this.framework()?.id },
+        });
       })
       .catch((error) => {
         if (error.code === 6) {
@@ -202,23 +213,56 @@ export class AppQuickCreateComponent implements OnDestroy {
 
   public createProjectAndContinue(frameworkId?: string) {
     const project = new AddProjectRequest();
-    project.setName('my-new-project-5');
+    project.setName(generateRandomProjectName());
     this.framework.set(this.frameworks.find((f) => f.id === frameworkId));
 
     return this.mgmtService
       .addProject(project.toObject())
       .then((resp: AddProjectResponse.AsObject) => {
         this.error.set('');
+        this.projectId = resp.id;
+
+        // Create admin role and grant it to the current user
+        return this.setupAdminRoleAndGrant(resp.id);
+      })
+      .then(() => {
         if (frameworkId === 'other' || !frameworkId) {
-          this.router.navigate(['/projects', resp.id, 'apps', 'create']);
+          this.router.navigate(['/projects', this.projectId, 'apps', 'create']);
         } else {
-          this.projectId = resp.id;
-          this.createApp(resp.id);
+          this.createApp(this.projectId);
         }
       })
       .catch((error) => {
         const { message } = error;
         this.error.set(message);
       });
+  }
+
+  private async setupAdminRoleAndGrant(projectId: string): Promise<void> {
+    try {
+      // Create universal admin role
+      await this.mgmtService.addProjectRole(projectId, 'admin', 'Administrator', 'Management');
+
+      // Grant admin role to the current user
+      await this.grantAdminRoleToCurrentUser(projectId);
+    } catch (error) {
+      console.warn('Failed to setup admin role and authorization:', error);
+      // Don't fail the entire flow if role creation fails
+      // The user can still manually set up roles later
+    }
+  }
+
+  private async grantAdminRoleToCurrentUser(projectId: string): Promise<void> {
+    try {
+      // Get current user info from the auth service
+      const userInfo = await this.authService.getMyUser();
+
+      if (userInfo && userInfo.user?.id) {
+        await this.mgmtService.addUserGrant(userInfo.user.id, ['admin'], projectId);
+      }
+    } catch (error) {
+      console.warn('Failed to grant admin role to current user:', error);
+      // Don't fail if the grant creation fails
+    }
   }
 }

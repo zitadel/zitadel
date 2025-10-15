@@ -1,15 +1,17 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { AbstractControl, FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import frameworks from '../../../../../../../docs/frameworks.json';
 import { Buffer } from 'buffer';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { mergeMap, Subject, Subscription } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { map, shareReplay, startWith, switchMap, take, takeUntil } from 'rxjs/operators';
+import { EnvVar } from 'src/app/components/env-vars-block/env-vars-block.component';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
@@ -42,9 +44,13 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { AdminService } from 'src/app/services/admin.service';
 
-import { EnvironmentService } from 'src/app/services/environment.service';
+import { Environment, EnvironmentService } from 'src/app/services/environment.service';
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
+import { ListMilestonesRequest } from 'src/app/proto/generated/zitadel/admin_pb';
+import { ListQuery } from 'src/app/proto/generated/zitadel/object_pb';
+import { MilestoneQuery, IsReachedQuery, MilestoneType } from 'src/app/proto/generated/zitadel/milestone/v1/milestone_pb';
 import {
   BASIC_AUTH_METHOD,
   CODE_METHOD,
@@ -180,10 +186,125 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public InfoSectionType = InfoSectionType;
   public copied: string = '';
 
-  public settingsList: SidenavSetting[] = [{ id: 'configuration', i18nKey: 'APP.CONFIGURATION' }];
+  public settingsList: SidenavSetting[] = [
+    { id: 'overview', i18nKey: 'APP.OVERVIEW' },
+    { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
+  ];
   public currentSetting = this.settingsList[0];
+  public framework: string | null = null;
 
   public isNew = signal<boolean>(false);
+  public selectedScenario: 'new' | 'existing' = 'new';
+  public isAuthenticated = signal<boolean | null>(null); // null = loading
+
+  private appDataSubject = new Subject<void>();
+
+  public environmentVariables$ = this.appDataSubject.pipe(
+    startWith(null),
+    switchMap(() => this.envSvc.env),
+    map((env: Environment) => {
+      if (!this.app) return '';
+
+      const issuer = env?.issuer || 'https://your-domain.zitadel.cloud';
+      const clientId = this.clientId?.value || 'your-client-id';
+      let envVars = `ZITADEL_DOMAIN=${issuer}\n`;
+      envVars += `ZITADEL_CLIENT_ID=${clientId}\n`;
+      envVars += `ZITADEL_PROJECT_ID=${this.projectId}\n`;
+
+      if (this.app.oidcConfig) {
+        if (
+          this.app.oidcConfig.authMethodType === OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC ||
+          this.app.oidcConfig.authMethodType === OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_POST
+        ) {
+          envVars += `ZITADEL_CLIENT_SECRET=your-client-secret\n`;
+        }
+
+        const redirectUris = this.app.oidcConfig.redirectUrisList || [];
+        if (redirectUris.length > 0) {
+          envVars += `ZITADEL_CALLBACK_URL=${redirectUris[0]}\n`;
+        }
+
+        const postLogoutUris = this.app.oidcConfig.postLogoutRedirectUrisList || [];
+        if (postLogoutUris.length > 0) {
+          envVars += `ZITADEL_POST_LOGOUT_URL=${postLogoutUris[0]}\n`;
+        }
+      }
+
+      return envVars;
+    }),
+  );
+
+  public envVarsArray: EnvVar[] = [];
+
+  private async updateEnvVars(): Promise<void> {
+    try {
+      const env = await this.envSvc.env.pipe(take(1)).toPromise();
+
+      if (!this.app || !env) {
+        this.envVarsArray = [];
+        return;
+      }
+
+      const issuer = env.issuer || 'https://your-domain.zitadel.cloud';
+      const clientId = this.app.oidcConfig?.clientId || 'your-client-id';
+      const envVars: EnvVar[] = [
+        {
+          key: 'ZITADEL_ISSUER',
+          value: issuer,
+          // description: 'The ZITADEL issuer URL for your instance',
+        },
+        {
+          key: 'ZITADEL_CLIENT_ID',
+          value: clientId,
+          // description: 'Your application client ID',
+        },
+        {
+          key: 'ZITADEL_PROJECT_ID',
+          value: this.projectId,
+          // description: 'The project ID containing your application',
+        },
+      ];
+
+      if (this.app.oidcConfig) {
+        if (
+          this.app.oidcConfig.authMethodType === OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC ||
+          this.app.oidcConfig.authMethodType === OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_POST
+        ) {
+          envVars.push({
+            key: 'ZITADEL_CLIENT_SECRET',
+            value: 'your-client-secret',
+            // description: 'Your application client secret (replace with actual secret)',
+          });
+        }
+
+        const redirectUris = this.app.oidcConfig.redirectUrisList || [];
+        if (redirectUris.length > 0) {
+          envVars.push({
+            key: 'ZITADEL_REDIRECT_URL',
+            value: redirectUris[0],
+            // description: 'Primary redirect URI for authentication callbacks',
+          });
+        }
+
+        const postLogoutUris = this.app.oidcConfig.postLogoutRedirectUrisList || [];
+        if (postLogoutUris.length > 0) {
+          envVars.push({
+            key: 'ZITADEL_POST_LOGOUT_URL',
+            value: postLogoutUris[0],
+            // description: 'URI to redirect to after logout',
+          });
+        }
+      }
+
+      this.envVarsArray = envVars;
+      console.log('Updated envVarsArray:', this.envVarsArray.length, 'variables');
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error('Error updating env vars:', error);
+      this.envVarsArray = [];
+      this.cdr.detectChanges();
+    }
+  }
 
   constructor(
     private envSvc: EnvironmentService,
@@ -197,6 +318,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     private authService: GrpcAuthService,
     private router: Router,
     private breadcrumbService: BreadcrumbService,
+    private adminService: AdminService,
+    private cdr: ChangeDetectorRef,
   ) {
     this.oidcForm = this.fb.group({
       devMode: [{ value: false, disabled: true }],
@@ -234,6 +357,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     this.samlForm.valueChanges.subscribe(() => {
       if (!this.app) {
         this.app = new App().toObject();
+        this.updateEnvVars();
       }
 
       let minimalMetadata =
@@ -298,18 +422,22 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     const projectId = this.route.snapshot.paramMap.get('projectid');
     const appId = this.route.snapshot.paramMap.get('appid');
     const isNew = this.route.snapshot.queryParamMap.get('new');
+    const framework = this.route.snapshot.queryParamMap.get('framework');
 
     this.isNew.set(isNew === 'true');
+    this.framework = framework;
 
     if (projectId && appId) {
       this.projectId = projectId;
       this.appId = appId;
       this.getData(projectId, appId).then();
+      this.checkAuthenticationStatus();
     }
   }
 
   public ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.appDataSubject.complete();
   }
 
   private async getData(projectId: string, appId: string): Promise<void> {
@@ -326,6 +454,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
           .then((app) => {
             if (app.app) {
               this.app = app.app;
+              console.log('Setting app data:', { name: app.app.name, clientId: app.app.oidcConfig?.clientId });
+              this.updateEnvVars();
 
               // TODO: duplicates should be handled in the API
               if (this.app.oidcConfig?.complianceProblemsList && this.app.oidcConfig?.complianceProblemsList.length) {
@@ -364,12 +494,14 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                   this.app.oidcConfig.grantTypesList[0] === OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE
                 ) {
                   this.settingsList = [
+                    { id: 'overview', i18nKey: 'APP.OVERVIEW' },
                     { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
                     { id: 'token', i18nKey: 'APP.TOKEN' },
                     { id: 'urls', i18nKey: 'APP.URLS' },
                   ];
                 } else {
                   this.settingsList = [
+                    { id: 'overview', i18nKey: 'APP.OVERVIEW' },
                     { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
                     { id: 'token', i18nKey: 'APP.TOKEN' },
                     { id: 'redirect-uris', i18nKey: 'APP.OIDC.REDIRECTSECTIONTITLE' },
@@ -393,10 +525,14 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.initialAuthMethod = this.authMethodFromPartialConfig({ api: this.app.apiConfig });
 
                 if (this.initialAuthMethod === 'BASIC') {
-                  this.settingsList = [{ id: 'urls', i18nKey: 'APP.URLS' }];
+                  this.settingsList = [
+                    { id: 'overview', i18nKey: 'APP.OVERVIEW' },
+                    { id: 'urls', i18nKey: 'APP.URLS' },
+                  ];
                   this.currentSetting = this.settingsList[0];
                 } else {
                   this.settingsList = [
+                    { id: 'overview', i18nKey: 'APP.OVERVIEW' },
                     { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
                     { id: 'urls', i18nKey: 'APP.URLS' },
                   ];
@@ -411,6 +547,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 }
               } else if (this.app.samlConfig) {
                 this.settingsList = [
+                  { id: 'overview', i18nKey: 'APP.OVERVIEW' },
                   { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
                   { id: 'urls', i18nKey: 'APP.URLS' },
                 ];
@@ -479,6 +616,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                   this.authMethods = this.authMethods.filter((element) => element !== CUSTOM_METHOD);
                 }
               });
+
+              this.appDataSubject.next();
             }
           })
           .catch((error) => {
@@ -741,10 +880,14 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             this.currentAuthMethod = this.authMethodFromPartialConfig(config);
 
             if (this.currentAuthMethod === 'BASIC') {
-              this.settingsList = [{ id: 'urls', i18nKey: 'APP.URLS' }];
+              this.settingsList = [
+                { id: 'overview', i18nKey: 'APP.OVERVIEW' },
+                { id: 'urls', i18nKey: 'APP.URLS' },
+              ];
               this.currentSetting = this.settingsList[0];
             } else {
               this.settingsList = [
+                { id: 'overview', i18nKey: 'APP.OVERVIEW' },
                 { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
                 { id: 'urls', i18nKey: 'APP.URLS' },
               ];
@@ -958,6 +1101,197 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       if (this.app.samlConfig) {
         this.app.samlConfig.metadataXml = base64;
       }
+    }
+  }
+
+  public getEnvironmentVariables(): string {
+    if (!this.app) return '';
+
+    let issuer = 'https://your-domain.zitadel.cloud';
+
+    this.envSvc.env.pipe(take(1)).subscribe((env) => {
+      if (env && env.issuer) {
+        issuer = env.issuer;
+      }
+    });
+
+    let envVars = `ZITADEL_ISSUER=${issuer}\n`;
+    const clientId = this.clientId?.value || 'your-client-id';
+    envVars += `ZITADEL_CLIENT_ID=${clientId}\n`;
+    envVars += `ZITADEL_PROJECT_ID=${this.projectId}\n`;
+
+    if (this.app.oidcConfig) {
+      if (
+        this.app.oidcConfig.authMethodType === OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC ||
+        this.app.oidcConfig.authMethodType === OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_POST
+      ) {
+        envVars += `ZITADEL_CLIENT_SECRET=your-client-secret\n`;
+      }
+
+      const redirectUris = this.app.oidcConfig.redirectUrisList || [];
+      if (redirectUris.length > 0) {
+        envVars += `ZITADEL_REDIRECT_URI=${redirectUris[0]}\n`;
+      }
+
+      const postLogoutUris = this.app.oidcConfig.postLogoutRedirectUrisList || [];
+      if (postLogoutUris.length > 0) {
+        envVars += `ZITADEL_POST_LOGOUT_REDIRECT_URI=${postLogoutUris[0]}\n`;
+      }
+    }
+
+    return envVars;
+  }
+
+  public getFrameworkInfo(): {
+    id?: string;
+    title: string;
+    example?: string;
+    imgSrcDark?: string;
+    imgSrcLight?: string;
+    docsLink?: string;
+    sdk?: boolean;
+    sdkLink?: string;
+    sdkCommand?: string;
+    exampleLink?: string;
+    client?: boolean;
+    startCommand?: string;
+    buildCommand?: string;
+    sdkName?: string;
+  } | null {
+    if (!this.framework) return null;
+
+    const frameworkInfo = frameworks.find((f) => f.id === this.framework);
+
+    return frameworkInfo || null;
+  }
+
+  public getCloneCommand(existing?: boolean): string {
+    const frameworkInfo = this.getFrameworkInfo();
+    if (!frameworkInfo) {
+      return 'git clone https://github.com/zitadel/zitadel-examples';
+    }
+
+    if (existing && frameworkInfo.sdk && frameworkInfo.sdkCommand) {
+      return frameworkInfo.sdkCommand;
+    }
+
+    return `git clone ${frameworkInfo.example}`;
+  }
+
+  public getBuildCommand(): string {
+    const frameworkInfo = this.getFrameworkInfo();
+    if (!frameworkInfo) {
+      return 'cd <your-repo> && npm install';
+    }
+
+    const example = frameworkInfo.example?.split('/').pop()?.replace('.git', '') || 'your-repo';
+
+    return `cd ${example}\n${frameworkInfo.buildCommand}` || 'cd <your-repo> && npm install';
+  }
+
+  public getRunCommand(): string {
+    const frameworkInfo = this.getFrameworkInfo();
+    if (!frameworkInfo) {
+      return 'npm start';
+    }
+
+    return frameworkInfo.startCommand || 'npm start';
+  }
+
+  public getSdkCommand(): string {
+    const frameworkInfo = this.getFrameworkInfo();
+    if (!frameworkInfo || !frameworkInfo.sdkCommand) {
+      return 'npm install @zitadel/your-sdk';
+    }
+
+    return frameworkInfo.sdkCommand || 'npm install @zitadel/your-sdk';
+  }
+
+  // Helper methods to determine available content for framework
+  public hasExample(): boolean {
+    const frameworkInfo = this.getFrameworkInfo();
+    return !!frameworkInfo?.example;
+  }
+
+  public hasSdk(): boolean {
+    const frameworkInfo = this.getFrameworkInfo();
+    return !!(frameworkInfo?.sdk || frameworkInfo?.sdkCommand);
+  }
+
+  public hasBuildCommands(): boolean {
+    const frameworkInfo = this.getFrameworkInfo();
+    return !!(frameworkInfo?.buildCommand && frameworkInfo?.startCommand);
+  }
+
+  public hasAnyFrameworkContent(): boolean {
+    return this.hasExample() || this.hasSdk() || this.hasBuildCommands();
+  }
+
+  public copyToClipboard(text: string, type: string): void {
+    navigator.clipboard.writeText(text).then(() => {
+      this.copied = type;
+      setTimeout(() => {
+        this.copied = '';
+      }, 2000);
+    });
+  }
+
+  public copyEnvironmentVariables(): void {
+    this.environmentVariables$.pipe(take(1)).subscribe((envVars: string) => {
+      this.copyToClipboard(envVars, 'env');
+    });
+  }
+
+  public downloadEnvironmentVariables(): void {
+    this.environmentVariables$.pipe(take(1)).subscribe((envVars: string) => {
+      const blob = new Blob([envVars], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = '.env';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      this.copied = 'download';
+      setTimeout(() => {
+        this.copied = '';
+      }, 2000);
+    });
+  }
+
+  public switchToTab(tabId: string): void {
+    const setting = this.settingsList.find((s) => s.id === tabId);
+    if (setting) {
+      this.currentSetting = setting;
+    }
+  }
+
+  public switchScenario(scenario: 'new' | 'existing'): void {
+    this.selectedScenario = scenario;
+  }
+
+  private async checkAuthenticationStatus(): Promise<void> {
+    try {
+      const milestonesListQuery = new ListQuery();
+      milestonesListQuery.setAsc(true);
+      milestonesListQuery.setLimit(20);
+
+      const milestoneIsReachedQuery = new IsReachedQuery().setReached(true);
+      const milestonesQuery = new MilestoneQuery().setIsReachedQuery(milestoneIsReachedQuery);
+      const milestonesReq = new ListMilestonesRequest().setQuery(milestonesListQuery).setQueriesList([milestonesQuery]);
+
+      const response = await this.adminService.listMilestones(milestonesReq);
+
+      const isAuthMilestoneReached = response.resultList.some(
+        (milestone) => milestone.type === MilestoneType.MILESTONE_TYPE_AUTHENTICATION_SUCCEEDED_ON_APPLICATION,
+      );
+
+      this.isAuthenticated.set(isAuthMilestoneReached);
+    } catch (error) {
+      console.error('Failed to check authentication status:', error);
+      this.isAuthenticated.set(false);
     }
   }
 }
