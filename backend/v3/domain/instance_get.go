@@ -53,13 +53,17 @@ func (g *GetInstanceCommand) String() string {
 }
 
 // Validate implements Commander.
-func (g *GetInstanceCommand) Validate(ctx context.Context, _ *CommandOpts) (err error) {
+func (g *GetInstanceCommand) Validate(ctx context.Context, opts *CommandOpts) (err error) {
 	instanceID := strings.TrimSpace(g.ID)
 	if instanceID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-32a0o2", "invalid instance ID")
 	}
 	if instanceID != authz.GetInstance(ctx).InstanceID() {
 		return zerrors.ThrowPermissionDenied(nil, "DOM-n0SvVB", "input instance ID doesn't match context instance")
+	}
+
+	if authZErr := opts.Permissions.CheckInstancePermission(ctx, InstanceReadPermission); authZErr != nil {
+		return zerrors.ThrowPermissionDenied(authZErr, "DOM-Uq6b00", "permission denied")
 	}
 
 	return nil
