@@ -49,7 +49,7 @@ export class OrgContextComponent implements OnInit {
   @Input({ required: true }) public org!: Organization;
   @ViewChild('input', { static: false }) input!: ElementRef;
   @Output() public closedCard: EventEmitter<void> = new EventEmitter();
-  @Output() public setOrg: EventEmitter<Org.AsObject> = new EventEmitter();
+  @Output() public setOrg: EventEmitter<string> = new EventEmitter();
 
   constructor(
     public authService: AuthenticationService,
@@ -67,8 +67,8 @@ export class OrgContextComponent implements OnInit {
     this.init();
   }
 
-  public setActiveOrg(org: Org.AsObject) {
-    this.setOrg.emit(org);
+  protected setActiveOrg(org: Org.AsObject) {
+    this.setOrg.emit(org.id);
     this.closedCard.emit();
   }
 

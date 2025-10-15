@@ -74,7 +74,6 @@ import { ThemeService } from './services/theme.service';
 import { ToastService } from './services/toast.service';
 import { LanguagesService } from './services/languages.service';
 import { PosthogService } from './services/posthog.service';
-import { NewHeaderComponent } from './modules/new-header/new-header.component';
 import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
 import { withDevtools } from '@tanstack/angular-query-experimental/devtools';
 import { CdkOverlayOrigin } from '@angular/cdk/overlay';
@@ -178,7 +177,6 @@ const authConfig: AuthConfig = {
     MatDialogModule,
     KeyboardShortcutsModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: false }),
-    NewHeaderComponent,
     CdkOverlayOrigin,
   ],
   providers: [
