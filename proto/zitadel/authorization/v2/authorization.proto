@@ -115,8 +115,8 @@ message AuthorizationsSearchFilter {
     // Search for authorizations by their state.
     StateQuery state = 3;
 
-    // Search for authorizations by the ID of the user who was granted the authorization.
-    zitadel.filter.v2.IDFilter user_id = 4;
+    // Search for authorizations by the IDs of the users who were granted the authorizations.
+    zitadel.filter.v2.InIDsFilter in_user_ids = 4;
 
     // Search for authorizations by the ID of the organisation the user is part of.
     zitadel.filter.v2.IDFilter user_organization_id = 5;

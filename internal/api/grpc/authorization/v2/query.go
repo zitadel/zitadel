@@ -91,8 +91,8 @@ func AuthorizationSearchFilterToQuery(query *authorization.AuthorizationsSearchF
 		return AuthorizationOrganizationIDQueryToModel(q.OrganizationId)
 	case *authorization.AuthorizationsSearchFilter_State:
 		return AuthorizationStateQueryToModel(q.State)
-	case *authorization.AuthorizationsSearchFilter_UserId:
-		return AuthorizationUserUserIDQueryToModel(q.UserId)
+	case *authorization.AuthorizationsSearchFilter_InUserIds:
+		return AuthorizationInUserIDsQueryToModel(q.InUserIds)
 	case *authorization.AuthorizationsSearchFilter_UserOrganizationId:
 		return AuthorizationUserOrganizationIDQueryToModel(q.UserOrganizationId)
 	case *authorization.AuthorizationsSearchFilter_UserPreferredLoginName:
@@ -144,8 +144,8 @@ func AuthorizationUserNameQueryToModel(q *authorization.UserPreferredLoginNameQu
 	return query.NewUserGrantUsernameQuery(q.LoginName, filter.TextMethodPbToQuery(q.Method))
 }
 
-func AuthorizationUserUserIDQueryToModel(q *filter_pb.IDFilter) (query.SearchQuery, error) {
-	return query.NewUserGrantUserIDSearchQuery(q.Id)
+func AuthorizationInUserIDsQueryToModel(q *filter_pb.InIDsFilter) (query.SearchQuery, error) {
+	return query.NewUserGrantInUserIDsSearchQuery(q.Ids)
 }
 
 func AuthorizationUserOrganizationIDQueryToModel(q *filter_pb.IDFilter) (query.SearchQuery, error) {

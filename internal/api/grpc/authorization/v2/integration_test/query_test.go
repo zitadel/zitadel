@@ -90,9 +90,9 @@ func TestServer_ListAuthorizations(t *testing.T) {
 				req: &authorization.ListAuthorizationsRequest{
 					Filters: []*authorization.AuthorizationsSearchFilter{
 						{
-							Filter: &authorization.AuthorizationsSearchFilter_UserId{
-								UserId: &filter.IDFilter{
-									Id: user1.GetId(),
+							Filter: &authorization.AuthorizationsSearchFilter_InUserIds{
+								InUserIds: &filter.InIDsFilter{
+									Ids: []string{user1.GetId()},
 								},
 							},
 						},
@@ -108,9 +108,9 @@ func TestServer_ListAuthorizations(t *testing.T) {
 				req: &authorization.ListAuthorizationsRequest{
 					Filters: []*authorization.AuthorizationsSearchFilter{
 						{
-							Filter: &authorization.AuthorizationsSearchFilter_UserId{
-								UserId: &filter.IDFilter{
-									Id: user1.GetId(),
+							Filter: &authorization.AuthorizationsSearchFilter_InUserIds{
+								InUserIds: &filter.InIDsFilter{
+									Ids: []string{user1.GetId()},
 								},
 							},
 						},
@@ -132,9 +132,9 @@ func TestServer_ListAuthorizations(t *testing.T) {
 				req: &authorization.ListAuthorizationsRequest{
 					Filters: []*authorization.AuthorizationsSearchFilter{
 						{
-							Filter: &authorization.AuthorizationsSearchFilter_UserId{
-								UserId: &filter.IDFilter{
-									Id: "notexisting",
+							Filter: &authorization.AuthorizationsSearchFilter_InUserIds{
+								InUserIds: &filter.InIDsFilter{
+									Ids: []string{"notexisting"},
 								},
 							},
 						},
@@ -180,9 +180,9 @@ func TestServer_ListAuthorizations(t *testing.T) {
 				req: &authorization.ListAuthorizationsRequest{
 					Filters: []*authorization.AuthorizationsSearchFilter{
 						{
-							Filter: &authorization.AuthorizationsSearchFilter_UserId{
-								UserId: &filter.IDFilter{
-									Id: user3.GetId(),
+							Filter: &authorization.AuthorizationsSearchFilter_InUserIds{
+								InUserIds: &filter.InIDsFilter{
+									Ids: []string{user3.GetId()},
 								},
 							},
 						},
@@ -206,9 +206,9 @@ func TestServer_ListAuthorizations(t *testing.T) {
 				req: &authorization.ListAuthorizationsRequest{
 					Filters: []*authorization.AuthorizationsSearchFilter{
 						{
-							Filter: &authorization.AuthorizationsSearchFilter_UserId{
-								UserId: &filter.IDFilter{
-									Id: user3.GetId(),
+							Filter: &authorization.AuthorizationsSearchFilter_InUserIds{
+								InUserIds: &filter.InIDsFilter{
+									Ids: []string{user3.GetId()},
 								},
 							},
 						},
@@ -232,9 +232,9 @@ func TestServer_ListAuthorizations(t *testing.T) {
 				req: &authorization.ListAuthorizationsRequest{
 					Filters: []*authorization.AuthorizationsSearchFilter{
 						{
-							Filter: &authorization.AuthorizationsSearchFilter_UserId{
-								UserId: &filter.IDFilter{
-									Id: user3.GetId(),
+							Filter: &authorization.AuthorizationsSearchFilter_InUserIds{
+								InUserIds: &filter.InIDsFilter{
+									Ids: []string{user3.GetId()},
 								},
 							},
 						},
@@ -333,15 +333,15 @@ func TestServer_ListAuthorizations(t *testing.T) {
 			},
 		},
 		{
-			name: "filter by userID",
+			name: "filter by userIDs",
 			args: args{
 				ctx: iamOwnerCtx,
 				req: &authorization.ListAuthorizationsRequest{
 					Filters: []*authorization.AuthorizationsSearchFilter{
 						{
-							Filter: &authorization.AuthorizationsSearchFilter_UserId{
-								UserId: &filter.IDFilter{
-									Id: user1.GetId(),
+							Filter: &authorization.AuthorizationsSearchFilter_InUserIds{
+								InUserIds: &filter.InIDsFilter{
+									Ids: []string{user1.GetId(), user2.GetId()},
 								},
 							},
 						},
@@ -350,10 +350,12 @@ func TestServer_ListAuthorizations(t *testing.T) {
 			},
 			want: &authorization.ListAuthorizationsResponse{
 				Pagination: &filter.PaginationResponse{
-					TotalResult:  1,
+					TotalResult:  3,
 					AppliedLimit: 100,
 				},
 				Authorizations: []*authorization.Authorization{
+					authorizationUser2Project2,
+					authorizationUser2Project1,
 					authorizationUser1Project1,
 				},
 			},
@@ -365,9 +367,9 @@ func TestServer_ListAuthorizations(t *testing.T) {
 				req: &authorization.ListAuthorizationsRequest{
 					Filters: []*authorization.AuthorizationsSearchFilter{
 						{
-							Filter: &authorization.AuthorizationsSearchFilter_UserId{
-								UserId: &filter.IDFilter{
-									Id: user3.GetId(),
+							Filter: &authorization.AuthorizationsSearchFilter_InUserIds{
+								InUserIds: &filter.InIDsFilter{
+									Ids: []string{user3.GetId()},
 								},
 							},
 						},
@@ -667,9 +669,9 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 				req: &authorization.ListAuthorizationsRequest{
 					Filters: []*authorization.AuthorizationsSearchFilter{
 						{
-							Filter: &authorization.AuthorizationsSearchFilter_UserId{
-								UserId: &filter.IDFilter{
-									Id: user1.GetId(),
+							Filter: &authorization.AuthorizationsSearchFilter_InUserIds{
+								InUserIds: &filter.InIDsFilter{
+									Ids: []string{user1.GetId()},
 								},
 							},
 						},
@@ -685,9 +687,9 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 				req: &authorization.ListAuthorizationsRequest{
 					Filters: []*authorization.AuthorizationsSearchFilter{
 						{
-							Filter: &authorization.AuthorizationsSearchFilter_UserId{
-								UserId: &filter.IDFilter{
-									Id: user1.GetId(),
+							Filter: &authorization.AuthorizationsSearchFilter_InUserIds{
+								InUserIds: &filter.InIDsFilter{
+									Ids: []string{user1.GetId()},
 								},
 							},
 						},
@@ -709,9 +711,9 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 				req: &authorization.ListAuthorizationsRequest{
 					Filters: []*authorization.AuthorizationsSearchFilter{
 						{
-							Filter: &authorization.AuthorizationsSearchFilter_UserId{
-								UserId: &filter.IDFilter{
-									Id: "notexisting",
+							Filter: &authorization.AuthorizationsSearchFilter_InUserIds{
+								InUserIds: &filter.InIDsFilter{
+									Ids: []string{"notexisting"},
 								},
 							},
 						},
@@ -757,9 +759,9 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 				req: &authorization.ListAuthorizationsRequest{
 					Filters: []*authorization.AuthorizationsSearchFilter{
 						{
-							Filter: &authorization.AuthorizationsSearchFilter_UserId{
-								UserId: &filter.IDFilter{
-									Id: user3.GetId(),
+							Filter: &authorization.AuthorizationsSearchFilter_InUserIds{
+								InUserIds: &filter.InIDsFilter{
+									Ids: []string{user3.GetId()},
 								},
 							},
 						},
@@ -783,9 +785,9 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 				req: &authorization.ListAuthorizationsRequest{
 					Filters: []*authorization.AuthorizationsSearchFilter{
 						{
-							Filter: &authorization.AuthorizationsSearchFilter_UserId{
-								UserId: &filter.IDFilter{
-									Id: user3.GetId(),
+							Filter: &authorization.AuthorizationsSearchFilter_InUserIds{
+								InUserIds: &filter.InIDsFilter{
+									Ids: []string{user3.GetId()},
 								},
 							},
 						},
@@ -809,9 +811,9 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 				req: &authorization.ListAuthorizationsRequest{
 					Filters: []*authorization.AuthorizationsSearchFilter{
 						{
-							Filter: &authorization.AuthorizationsSearchFilter_UserId{
-								UserId: &filter.IDFilter{
-									Id: user3.GetId(),
+							Filter: &authorization.AuthorizationsSearchFilter_InUserIds{
+								InUserIds: &filter.InIDsFilter{
+									Ids: []string{user3.GetId()},
 								},
 							},
 						},
@@ -910,15 +912,15 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 			},
 		},
 		{
-			name: "filter by userID",
+			name: "filter by userIDs",
 			args: args{
 				ctx: iamOwnerCtx,
 				req: &authorization.ListAuthorizationsRequest{
 					Filters: []*authorization.AuthorizationsSearchFilter{
 						{
-							Filter: &authorization.AuthorizationsSearchFilter_UserId{
-								UserId: &filter.IDFilter{
-									Id: user1.GetId(),
+							Filter: &authorization.AuthorizationsSearchFilter_InUserIds{
+								InUserIds: &filter.InIDsFilter{
+									Ids: []string{user1.GetId(), user2.GetId()},
 								},
 							},
 						},
@@ -927,10 +929,12 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 			},
 			want: &authorization.ListAuthorizationsResponse{
 				Pagination: &filter.PaginationResponse{
-					TotalResult:  1,
+					TotalResult:  3,
 					AppliedLimit: 100,
 				},
 				Authorizations: []*authorization.Authorization{
+					authorizationUser2Project2,
+					authorizationUser2Project1,
 					authorizationUser1Project1,
 				},
 			},
@@ -942,9 +946,9 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 				req: &authorization.ListAuthorizationsRequest{
 					Filters: []*authorization.AuthorizationsSearchFilter{
 						{
-							Filter: &authorization.AuthorizationsSearchFilter_UserId{
-								UserId: &filter.IDFilter{
-									Id: user3.GetId(),
+							Filter: &authorization.AuthorizationsSearchFilter_InUserIds{
+								InUserIds: &filter.InIDsFilter{
+									Ids: []string{user3.GetId()},
 								},
 							},
 						},
