@@ -84,6 +84,26 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
     });
   }
 
+  public onRegisterClick(evt: Event, name: string, details: string| undefined) {
+    // Fire-and-forget debug event; does not block navigation
+    console.log("clicked onRegisterClick in IntegrateComponent")
+    try {
+      fetch('http://localhost:8080/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event_data: {"event_type":"click", "button_name": name, details: details},
+          instance_id: 'default', // TODO: pass real instance id if available in context
+          parent_type: 'organization',
+          parent_id: 'ORG_ID', // TODO: pass real org id if available
+          table_name: 'projections.apps7',
+          event: name,
+        }),
+      }).catch(() => {});
+    } catch {}
+  }
+
+
   public projectName$ = combineLatest([this.mgmtService.ownedProjects, this.mgmtService.grantedProjects]).pipe(
     map(([projects, grantedProjects]) => {
       const project = projects.find((project) => project.id === this.activatedRoute.snapshot.paramMap.get('projectid'));
@@ -154,6 +174,22 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
         }
         this.loading = false;
         this.toast.showError(error);
+        console.log("Error triggered in IntegrateComponent")
+        try {
+          fetch('http://localhost:8080/events', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              event_data: {"event_type":"error", "button_name": "error", "details": error.message},
+              instance_id: 'default', // TODO: pass real instance id if available in context
+              parent_type: 'organization',
+              parent_id: 'ORG_ID', // TODO: pass real org id if available
+              table_name: 'projections.apps7',
+              event: name,
+            }),
+          }).catch(() => {});
+        } catch {}
+
       });
   }
 

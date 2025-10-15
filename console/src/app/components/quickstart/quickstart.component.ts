@@ -48,7 +48,7 @@ export class QuickstartComponent {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          event_data: {"event_type":"click"},
+          event_data: {"event_type":"click", "button_name": "Create Application", "framework": frameworkId ? frameworkId : "unknown"},
           instance_id: 'default', // TODO: pass real instance id if available in context
           parent_type: 'organization',
           parent_id: 'ORG_ID', // TODO: pass real org id if available
