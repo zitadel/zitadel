@@ -78,7 +78,14 @@
         </svg>
 
         <div class="org-context">
-          <a *ngIf="org() as org" matRipple [matRippleUnbounded]="false" class="org-link" id="orglink" [routerLink]="['/org']">
+          <a
+            *ngIf="org() as org"
+            matRipple
+            [matRippleUnbounded]="false"
+            class="org-link"
+            id="orglink"
+            [routerLink]="['/org']"
+          >
             {{ org.name ? org.name : 'NO NAME' }}</a
           >
 
