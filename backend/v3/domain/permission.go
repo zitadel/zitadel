@@ -2,6 +2,13 @@ package domain
 
 import "context"
 
+const (
+	InstanceReadPermission      = "instance.read"
+	InstanceWritePermission     = "instance.write"
+	OrganizationReadPermission  = "organization.read"
+	OrganizationWritePermission = "organization.write"
+)
+
 // PermissionRepository is the interface that manages and checks Zitadel permissions.
 //
 // TODO(muhlemmer): This just defines the checker methods, rest to be done later.
