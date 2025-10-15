@@ -154,8 +154,9 @@ func Test_secondFactorTypeToPb(t *testing.T) {
 		want settings.SecondFactorType
 	}{
 		{
+			// making sure it doesn't break existing mappings
 			args: args{domain.SecondFactorTypeTOTP},
-			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP, // making sure it doesn't break existing mappings
+			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP, //nolint:staticcheck
 		},
 		{
 			args: args{domain.SecondFactorTypeTOTP},
