@@ -48,6 +48,51 @@ func (c *Commands) AddUsersToGroup(ctx context.Context, groupID string, userIDs 
 	}, nil
 }
 
+func (c *Commands) RemoveUsersFromGroup(ctx context.Context, groupID string, userIDs []string) (_ *domain.ObjectDetails, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	// precondition: check whether the group exists
+	group, err := c.getGroupWriteModelByID(ctx, groupID, "")
+	if err != nil {
+		return nil, err
+	}
+	if !group.State.Exists() {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "CMDGRP-JRBnLw", "Errors.Group.NotFound")
+	}
+
+	// check whether the requester has permissions to remove users from the group
+	err = c.checkPermissionRemoveUserFromGroup(ctx, group.ResourceOwner, group.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	groupUsersWriteModel, err := c.getGroupUsersWriteModel(ctx, group.ResourceOwner, groupID, userIDs)
+	if err != nil {
+		return nil, err
+	}
+	userIDsToRemove := groupUsersWriteModel.userIDsToRemove()
+	if len(userIDsToRemove) == 0 {
+		// the userIDs are already removed from the group; desired state achieved
+		return writeModelToObjectDetails(&groupUsersWriteModel.WriteModel), nil
+	}
+
+	// remove users from the group
+	err = c.pushAppendAndReduce(ctx,
+		groupUsersWriteModel,
+		repo.NewGroupUsersRemovedEvent(
+			ctx,
+			GroupAggregateFromWriteModel(ctx, &groupUsersWriteModel.WriteModel),
+			userIDsToRemove,
+		),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return writeModelToObjectDetails(&groupUsersWriteModel.WriteModel), nil
+}
+
 func (c *Commands) addUsersToGroup(ctx context.Context, resourceOwner, groupID string, userIDs []string) (*domain.ObjectDetails, []string, error) {
 	var failedUserIDs, usersIDsToAdd []string
 	for _, userID := range userIDs {

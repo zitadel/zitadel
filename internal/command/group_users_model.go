@@ -64,3 +64,13 @@ func (g *GroupUsersWriteModel) userIDsToAdd() []string {
 	}
 	return userIDsToAdd
 }
+
+func (g *GroupUsersWriteModel) userIDsToRemove() []string {
+	userIDsToRemove := make([]string, 0)
+	for _, userID := range g.UserIDs {
+		if slices.Contains(g.existingUserIDs, userID) {
+			userIDsToRemove = append(userIDsToRemove, userID)
+		}
+	}
+	return userIDsToRemove
+}
