@@ -117,6 +117,13 @@ func (l *ListInstancesCommand) String() string {
 
 // Validate implements Commander.
 func (l *ListInstancesCommand) Validate(ctx context.Context, opts *CommandOpts) (err error) {
+	// TODO(IAM-Marco): This is likely wrong, because it's checking the read permission of
+	// the instance in context. In here, instead we should probably loop through all retrieved
+	// instances and check their permissions.
+	if authZErr := opts.Permissions.CheckInstancePermission(ctx, InstanceReadPermission); authZErr != nil {
+		return zerrors.ThrowPermissionDenied(authZErr, "DOM-cuT6Ws", "permission denied")
+	}
+
 	return nil
 }
 
