@@ -17,6 +17,8 @@ type PermissionRepository interface {
 }
 
 // PermissionChecker defines the methods needed to check permissions.
+//
+//go:generate mockgen -typed -package domainmock -destination ./mock/permission.mock.go . PermissionChecker
 type PermissionChecker interface {
 	// Check if the authenticated user has the given permission on instance level.
 	CheckInstancePermission(ctx context.Context, permission string) error
