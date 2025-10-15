@@ -419,7 +419,7 @@ module.exports = {
           },
           authorization_v2: {
             specPath:
-              ".artifacts/openapi3/zitadel/authorization/v2beta/authorization_service.openapi.yaml",
+              ".artifacts/openapi3/zitadel/authorization/v2/authorization_service.openapi.yaml",
             outputDir: "docs/apis/resources/authorization_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
