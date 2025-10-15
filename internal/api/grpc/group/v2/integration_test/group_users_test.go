@@ -36,7 +36,6 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 		name              string
 		ctx               context.Context
 		req               *group_v2.AddUsersToGroupRequest
-		wantResp          bool
 		wantFailedUserIDs []string
 		wantErrCode       codes.Code
 		wantErrMsg        string
@@ -106,7 +105,6 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 				Id:      defOrgGroup.GetId(),
 				UserIds: []string{defOrgUser.GetUserId()},
 			},
-			wantResp: true,
 		},
 		{
 			name: "some users already in the group, ok",
@@ -115,7 +113,6 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 				Id:      group.GetId(),
 				UserIds: []string{user1.GetUserId(), user2.GetUserId(), user3.GetUserId()},
 			},
-			wantResp: true,
 		},
 		{
 			name: "some users not found, ok",
@@ -124,7 +121,6 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 				Id:      group.GetId(),
 				UserIds: []string{user1.GetUserId(), user2.GetUserId(), "randomUser"},
 			},
-			wantResp:          true,
 			wantFailedUserIDs: []string{"randomUser"},
 		},
 		{
@@ -134,7 +130,6 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 				Id:      group.GetId(),
 				UserIds: []string{"randomUser1", "randomUser2"},
 			},
-			wantResp:          true,
 			wantFailedUserIDs: []string{"randomUser1", "randomUser2"},
 		},
 		{
@@ -144,7 +139,6 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 				Id:      group.GetId(),
 				UserIds: []string{user1.GetUserId(), user2.GetUserId(), defOrgUser.GetUserId()},
 			},
-			wantResp:          true,
 			wantFailedUserIDs: []string{defOrgUser.GetUserId()},
 		},
 		{
@@ -154,7 +148,6 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 				Id:      group.GetId(),
 				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
 			},
-			wantResp: true,
 		},
 	}
 	for _, tt := range tests {
@@ -168,9 +161,158 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 				return
 			}
 			require.NoError(t, err)
-			require.True(t, tt.wantResp)
 			require.NotEmpty(t, got.GetChangeDate())
 			assert.Equal(t, tt.wantFailedUserIDs, got.FailedUserIds)
+		})
+	}
+}
+
+func TestServer_RemoveUsersFromGroup(t *testing.T) {
+	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	// group and user in the default org
+	defOrgGroup := instance.CreateGroup(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.GroupName())
+	defOrgUser := instance.CreateHumanUserVerified(iamOwnerCtx, instance.DefaultOrg.GetId(), integration.Email(), integration.Phone())
+
+	// add user to the group in def org
+	_, err := instance.Client.GroupV2.AddUsersToGroup(iamOwnerCtx, &group_v2.AddUsersToGroupRequest{
+		Id:      defOrgGroup.GetId(),
+		UserIds: []string{defOrgUser.GetUserId()},
+	})
+	require.NoError(t, err)
+
+	// org1
+	org1 := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+	// group in org1
+	group := instance.CreateGroup(iamOwnerCtx, t, org1.GetOrganizationId(), integration.GroupName())
+	// user1 in org1
+	user1 := instance.CreateHumanUserVerified(iamOwnerCtx, org1.OrganizationId, integration.Email(), integration.Phone())
+	// user2 in org1
+	user2 := instance.CreateHumanUserVerified(iamOwnerCtx, org1.OrganizationId, integration.Email(), integration.Phone())
+
+	// add user1 and user2 to the group
+	_, err = instance.Client.GroupV2.AddUsersToGroup(iamOwnerCtx, &group_v2.AddUsersToGroupRequest{
+		Id:      group.GetId(),
+		UserIds: []string{user1.GetUserId(), user2.GetUserId()},
+	})
+	require.NoError(t, err)
+
+	tests := []struct {
+		name           string
+		ctx            context.Context
+		req            *group_v2.RemoveUsersFromGroupRequest
+		wantChangeDate bool
+		wantErrCode    codes.Code
+		wantErrMsg     string
+	}{
+		{
+			name: "unauthenticated, error",
+			ctx:  context.Background(),
+			req: &group_v2.RemoveUsersFromGroupRequest{
+				Id:      group.GetId(),
+				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
+			},
+			wantErrCode: codes.Unauthenticated,
+			wantErrMsg:  "auth header missing",
+		},
+		{
+			name: "missing id, error",
+			ctx:  iamOwnerCtx,
+			req: &group_v2.RemoveUsersFromGroupRequest{
+				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
+			},
+			wantErrCode: codes.InvalidArgument,
+			wantErrMsg:  "invalid RemoveUsersFromGroupRequest.Id: value length must be between 1 and 200 runes, inclusive",
+		},
+		{
+			name: "missing user ids, error",
+			ctx:  iamOwnerCtx,
+			req: &group_v2.RemoveUsersFromGroupRequest{
+				Id: group.GetId(),
+			},
+			wantErrCode: codes.InvalidArgument,
+			wantErrMsg:  "invalid RemoveUsersFromGroupRequest.UserIds: value must contain at least 1 item(s)",
+		},
+		{
+			name: "group does not exist, error",
+			ctx:  iamOwnerCtx,
+			req: &group_v2.RemoveUsersFromGroupRequest{
+				Id:      "randomGroup",
+				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
+			},
+			wantErrCode: codes.FailedPrecondition,
+			wantErrMsg:  "Errors.Group.NotFound (CMDGRP-JRBnLw)",
+		},
+		{
+			name: "missing permission, error",
+			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
+			req: &group_v2.RemoveUsersFromGroupRequest{
+				Id:      group.GetId(),
+				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
+			},
+			wantErrCode: codes.NotFound,
+			wantErrMsg:  "membership not found (AUTHZ-cdgFk)",
+		},
+		{
+			name: "organization owner, missing permission, error",
+			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+			req: &group_v2.RemoveUsersFromGroupRequest{
+				Id:      group.GetId(),
+				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
+			},
+			wantErrCode: codes.NotFound,
+			wantErrMsg:  "membership not found (AUTHZ-cdgFk)",
+		},
+		{
+			name: "organization owner, with permission, ok",
+			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+			req: &group_v2.RemoveUsersFromGroupRequest{
+				Id:      defOrgGroup.GetId(),
+				UserIds: []string{defOrgUser.GetUserId()},
+			},
+			wantChangeDate: true,
+		},
+		{
+			name: "users not in the group, ok",
+			ctx:  iamOwnerCtx,
+			req: &group_v2.RemoveUsersFromGroupRequest{
+				Id:      group.GetId(),
+				UserIds: []string{"user3", "user4"},
+			},
+			wantChangeDate: true,
+		},
+		{
+			name: "some users not in the group, ok",
+			ctx:  iamOwnerCtx,
+			req: &group_v2.RemoveUsersFromGroupRequest{
+				Id:      group.GetId(),
+				UserIds: []string{user1.GetUserId(), defOrgUser.GetUserId(), "user3"},
+			},
+			wantChangeDate: true,
+		},
+		{
+			name: "users removed, ok",
+			ctx:  iamOwnerCtx,
+			req: &group_v2.RemoveUsersFromGroupRequest{
+				Id:      group.GetId(),
+				UserIds: []string{user2.GetUserId()},
+			},
+			wantChangeDate: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := instance.Client.GroupV2.RemoveUsersFromGroup(tt.ctx, tt.req)
+			if tt.wantErrCode != codes.OK {
+				require.Error(t, err)
+				require.Empty(t, got.GetChangeDate())
+				assert.Equal(t, tt.wantErrCode, status.Code(err))
+				assert.Equal(t, tt.wantErrMsg, status.Convert(err).Message())
+				return
+			}
+			require.NoError(t, err)
+			if tt.wantChangeDate {
+				require.NotEmpty(t, got.GetChangeDate())
+			}
 		})
 	}
 }
