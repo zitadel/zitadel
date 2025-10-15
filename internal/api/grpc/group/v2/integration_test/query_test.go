@@ -187,7 +187,7 @@ func TestServer_ListGroups(t *testing.T) {
 			wantErrMsg:  "auth header missing",
 		},
 		{
-			name: "no permission, error",
+			name: "no permission, empty list, TotalResult count returned",
 			args: args{
 				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 				dep: func(req *group_v2.ListGroupsRequest, resp *group_v2.ListGroupsResponse) {
@@ -214,7 +214,7 @@ func TestServer_ListGroups(t *testing.T) {
 			},
 		},
 		{
-			name: "org owner, missing permission, empty list",
+			name: "org owner, missing permission, empty list, TotalResult count returned",
 			args: args{
 				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(req *group_v2.ListGroupsRequest, resp *group_v2.ListGroupsResponse) {
@@ -494,6 +494,357 @@ func TestServer_ListGroups(t *testing.T) {
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamOwnerCtx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := instance.Client.GroupV2.ListGroups(tt.args.ctx, tt.args.req)
+				if tt.wantErrCode != codes.OK {
+					require.Error(ttt, err)
+					assert.Equal(ttt, tt.wantErrCode, status.Code(err))
+					assert.Equal(ttt, tt.wantErrMsg, status.Convert(err).Message())
+					return
+				}
+				require.NoError(ttt, err)
+				if assert.Len(ttt, got.Groups, len(tt.want.Groups)) {
+					for i := range got.Groups {
+						assert.EqualExportedValues(ttt, tt.want.Groups[i], got.Groups[i], "want: %v, got: %v", tt.want.Groups[i], got.Groups[i])
+					}
+				}
+				assert.Equal(ttt, tt.want.Pagination.AppliedLimit, got.Pagination.AppliedLimit)
+				assert.Equal(ttt, tt.want.Pagination.TotalResult, got.Pagination.TotalResult)
+			}, retryDuration, tick, "timeout waiting for expected result")
+		})
+	}
+}
+
+func TestServer_ListGroups_WithPermissionV2(t *testing.T) {
+	ensureFeaturePermissionV2Enabled(t, instancePermissionV2)
+	iamOwnerCtx := instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	type args struct {
+		ctx context.Context
+		req *group_v2.ListGroupsRequest
+		dep func(*group_v2.ListGroupsRequest, *group_v2.ListGroupsResponse)
+	}
+	tests := []struct {
+		name        string
+		args        args
+		want        *group_v2.ListGroupsResponse
+		wantErrCode codes.Code
+		wantErrMsg  string
+	}{
+		{
+			name: "list groups, unauthenticated",
+			args: args{
+				ctx: CTX,
+				req: &group_v2.ListGroupsRequest{},
+			},
+			wantErrCode: codes.Unauthenticated,
+			wantErrMsg:  "auth header missing",
+		},
+		{
+			name: "no permission, empty list, TotalResult count set to 0",
+			args: args{
+				ctx: instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
+				dep: func(req *group_v2.ListGroupsRequest, resp *group_v2.ListGroupsResponse) {
+					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+					groupName := integration.GroupName()
+					group1 := instancePermissionV2.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), groupName)
+
+					req.Filters[0].Filter = &group_v2.GroupsSearchFilter_GroupIds{
+						GroupIds: &filter.InIDsFilter{
+							Ids: []string{group1.GetId()},
+						},
+					}
+				},
+				req: &group_v2.ListGroupsRequest{
+					Filters: []*group_v2.GroupsSearchFilter{{}},
+				},
+			},
+			want: &group_v2.ListGroupsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  0,
+					AppliedLimit: 100,
+				},
+				Groups: []*group_v2.Group{},
+			},
+		},
+		{
+			name: "org owner, missing permission, empty list, TotalResult count set to 0",
+			args: args{
+				ctx: instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+				dep: func(req *group_v2.ListGroupsRequest, resp *group_v2.ListGroupsResponse) {
+					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+					groupName := integration.GroupName()
+					group1 := instancePermissionV2.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), groupName)
+
+					req.Filters[0].Filter = &group_v2.GroupsSearchFilter_GroupIds{
+						GroupIds: &filter.InIDsFilter{
+							Ids: []string{group1.GetId()},
+						},
+					}
+				},
+				req: &group_v2.ListGroupsRequest{
+					Filters: []*group_v2.GroupsSearchFilter{{}},
+				},
+			},
+			want: &group_v2.ListGroupsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  0,
+					AppliedLimit: 100,
+				},
+				Groups: []*group_v2.Group{},
+			},
+		},
+		{
+			name: "org owner, with permission, ok",
+			args: args{
+				ctx: instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+				dep: func(req *group_v2.ListGroupsRequest, resp *group_v2.ListGroupsResponse) {
+					groupName := integration.GroupName()
+					group1 := instancePermissionV2.CreateGroup(iamOwnerCtx, t, instancePermissionV2.DefaultOrg.GetId(), groupName)
+
+					req.Filters[0].Filter = &group_v2.GroupsSearchFilter_GroupIds{
+						GroupIds: &filter.InIDsFilter{
+							Ids: []string{group1.GetId()},
+						},
+					}
+					resp.Groups[0] = &group_v2.Group{
+						Id:             group1.GetId(),
+						Name:           groupName,
+						Description:    "",
+						OrganizationId: instancePermissionV2.DefaultOrg.GetId(),
+						CreationDate:   group1.GetCreationDate(),
+						ChangeDate:     group1.GetCreationDate(),
+					}
+				},
+				req: &group_v2.ListGroupsRequest{
+					Filters: []*group_v2.GroupsSearchFilter{{}},
+				},
+			},
+			want: &group_v2.ListGroupsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  1,
+					AppliedLimit: 100,
+				},
+				Groups: []*group_v2.Group{
+					{},
+				},
+			},
+		},
+		{
+			name: "instance owner, group ID not found",
+			args: args{
+				ctx: iamOwnerCtx,
+				req: &group_v2.ListGroupsRequest{
+					Filters: []*group_v2.GroupsSearchFilter{
+						{
+							Filter: &group_v2.GroupsSearchFilter_GroupIds{
+								GroupIds: &filter.InIDsFilter{
+									Ids: []string{"random-group"},
+								},
+							},
+						},
+					},
+				},
+			},
+			want: &group_v2.ListGroupsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  0,
+					AppliedLimit: 100,
+				},
+			},
+		},
+		{
+			name: "list single group by ID, ok",
+			args: args{
+				ctx: iamOwnerCtx,
+				dep: func(req *group_v2.ListGroupsRequest, resp *group_v2.ListGroupsResponse) {
+					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+					groupName := integration.GroupName()
+					group1 := instancePermissionV2.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), groupName)
+
+					resp.Groups[0] = &group_v2.Group{
+						Id:             group1.GetId(),
+						Name:           groupName,
+						Description:    "",
+						OrganizationId: orgResp.GetOrganizationId(),
+						CreationDate:   group1.GetCreationDate(),
+						ChangeDate:     group1.GetCreationDate(),
+					}
+					req.Filters[0].Filter = &group_v2.GroupsSearchFilter_GroupIds{
+						GroupIds: &filter.InIDsFilter{
+							Ids: []string{group1.GetId()},
+						},
+					}
+				},
+				req: &group_v2.ListGroupsRequest{
+					Filters: []*group_v2.GroupsSearchFilter{{}},
+				},
+			},
+			want: &group_v2.ListGroupsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  1,
+					AppliedLimit: 100,
+				},
+				Groups: []*group_v2.Group{
+					{},
+				},
+			},
+		},
+		{
+			name: "list multiple groups by IDs, ok",
+			args: args{
+				ctx: iamOwnerCtx,
+				dep: func(req *group_v2.ListGroupsRequest, resp *group_v2.ListGroupsResponse) {
+					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+					groupName1 := integration.GroupName()
+					group1 := instancePermissionV2.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), groupName1)
+
+					resp.Groups[1] = &group_v2.Group{
+						Id:             group1.GetId(),
+						Name:           groupName1,
+						Description:    "",
+						OrganizationId: orgResp.GetOrganizationId(),
+						CreationDate:   group1.GetCreationDate(),
+						ChangeDate:     group1.GetCreationDate(),
+					}
+					groupName2 := integration.GroupName()
+					group2 := instancePermissionV2.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), groupName2)
+
+					resp.Groups[0] = &group_v2.Group{
+						Id:             group2.GetId(),
+						Name:           groupName2,
+						Description:    "",
+						OrganizationId: orgResp.GetOrganizationId(),
+						CreationDate:   group2.GetCreationDate(),
+						ChangeDate:     group2.GetCreationDate(),
+					}
+					req.Filters[0].Filter = &group_v2.GroupsSearchFilter_GroupIds{
+						GroupIds: &filter.InIDsFilter{
+							Ids: []string{group1.GetId(), group2.GetId()},
+						},
+					}
+				},
+				req: &group_v2.ListGroupsRequest{
+					Filters: []*group_v2.GroupsSearchFilter{{}},
+				},
+			},
+			want: &group_v2.ListGroupsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  2,
+					AppliedLimit: 100,
+				},
+				Groups: []*group_v2.Group{
+					{}, {},
+				},
+			},
+		},
+		{
+			name: "list group by name, ok",
+			args: args{
+				ctx: iamOwnerCtx,
+				dep: func(req *group_v2.ListGroupsRequest, resp *group_v2.ListGroupsResponse) {
+					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+					groupName := integration.GroupName()
+					group1 := instancePermissionV2.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), groupName)
+
+					resp.Groups[0] = &group_v2.Group{
+						Id:             group1.GetId(),
+						Name:           groupName,
+						Description:    "",
+						OrganizationId: orgResp.GetOrganizationId(),
+						CreationDate:   group1.GetCreationDate(),
+						ChangeDate:     group1.GetCreationDate(),
+					}
+					req.Filters[0].Filter = &group_v2.GroupsSearchFilter_NameFilter{
+						NameFilter: &group_v2.GroupNameFilter{
+							Name: groupName,
+						},
+					}
+				},
+				req: &group_v2.ListGroupsRequest{
+					Filters: []*group_v2.GroupsSearchFilter{{}},
+				},
+			},
+			want: &group_v2.ListGroupsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  1,
+					AppliedLimit: 100,
+				},
+				Groups: []*group_v2.Group{
+					{},
+				},
+			},
+		},
+		{
+			name: "list by organization ID, ok",
+			args: args{
+				ctx: iamOwnerCtx,
+				dep: func(req *group_v2.ListGroupsRequest, resp *group_v2.ListGroupsResponse) {
+					org1 := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+					groupName2 := integration.GroupName()
+					group2 := instancePermissionV2.CreateGroup(iamOwnerCtx, t, org1.GetOrganizationId(), groupName2)
+
+					resp.Groups[2] = &group_v2.Group{
+						Id:             group2.GetId(),
+						Name:           groupName2,
+						Description:    "",
+						OrganizationId: org1.GetOrganizationId(),
+						CreationDate:   group2.GetCreationDate(),
+						ChangeDate:     group2.GetCreationDate(),
+					}
+					groupName1 := integration.GroupName()
+					group1 := instancePermissionV2.CreateGroup(iamOwnerCtx, t, org1.GetOrganizationId(), groupName1)
+
+					resp.Groups[1] = &group_v2.Group{
+						Id:             group1.GetId(),
+						Name:           groupName1,
+						Description:    "",
+						OrganizationId: org1.GetOrganizationId(),
+						CreationDate:   group1.GetCreationDate(),
+						ChangeDate:     group1.GetCreationDate(),
+					}
+					groupName0 := integration.GroupName()
+					group0 := instancePermissionV2.CreateGroup(iamOwnerCtx, t, org1.GetOrganizationId(), groupName0)
+
+					resp.Groups[0] = &group_v2.Group{
+						Id:             group0.GetId(),
+						Name:           groupName0,
+						Description:    "",
+						OrganizationId: org1.GetOrganizationId(),
+						CreationDate:   group0.GetCreationDate(),
+						ChangeDate:     group0.GetCreationDate(),
+					}
+					org2 := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+					org2GroupName0 := integration.GroupName()
+					_ = instancePermissionV2.CreateGroup(iamOwnerCtx, t, org2.GetOrganizationId(), org2GroupName0)
+
+					req.Filters[0].Filter = &group_v2.GroupsSearchFilter_OrganizationId{
+						OrganizationId: &filter.IDFilter{
+							Id: org1.GetOrganizationId(),
+						},
+					}
+				},
+				req: &group_v2.ListGroupsRequest{
+					Filters: []*group_v2.GroupsSearchFilter{{}},
+				},
+			},
+			want: &group_v2.ListGroupsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  3,
+					AppliedLimit: 100,
+				},
+				Groups: []*group_v2.Group{
+					{}, {}, {},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.dep != nil {
+				tt.args.dep(tt.args.req, tt.want)
+			}
+
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamOwnerCtx, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := instancePermissionV2.Client.GroupV2.ListGroups(tt.args.ctx, tt.args.req)
 				if tt.wantErrCode != codes.OK {
 					require.Error(ttt, err)
 					assert.Equal(ttt, tt.wantErrCode, status.Code(err))
