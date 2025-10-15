@@ -1,6 +1,7 @@
 package domain_test
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dbmock"
 	noopdb "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/noop"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 )
@@ -264,6 +266,65 @@ func TestListInstancesCommand_Execute(t *testing.T) {
 			// Verify
 			assert.Equal(t, tc.expectedError, err)
 			assert.ElementsMatch(t, tc.expectedInstances, cmd.Result())
+
+		})
+	}
+}
+
+func TestListInstancesCommand_Validate(t *testing.T) {
+	t.Parallel()
+	permissionErr := errors.New("permission error")
+	tt := []struct {
+		name              string
+		permissionChecker func(ctrl *gomock.Controller) domain.PermissionChecker
+		expectedError     error
+	}{
+		{
+			name: "when user is missing permission should return permission denied",
+			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionChecker {
+				permChecker := domainmock.NewMockPermissionChecker(ctrl)
+
+				permChecker.EXPECT().
+					CheckInstancePermission(gomock.Any(), domain.InstanceReadPermission).
+					Times(1).
+					Return(permissionErr)
+
+				return permChecker
+			},
+			expectedError: zerrors.ThrowPermissionDenied(permissionErr, "DOM-cuT6Ws", "permission denied"),
+		},
+		{
+			name: "when valid permission should return no error",
+			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionChecker {
+				permChecker := domainmock.NewMockPermissionChecker(ctrl)
+
+				permChecker.EXPECT().
+					CheckInstancePermission(gomock.Any(), domain.InstanceReadPermission).
+					Times(1).
+					Return(nil)
+
+				return permChecker
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			// Given
+			l := &domain.ListInstancesQuery{}
+
+			cmdOpts := &domain.InvokeOpts{}
+			if tc.permissionChecker != nil {
+				ctrl := gomock.NewController(t)
+				cmdOpts.Permissions = tc.permissionChecker(ctrl)
+			}
+
+			// Test
+			err := l.Validate(context.Background(), cmdOpts)
+
+			// Verify
+			assert.Equal(t, tc.expectedError, err)
 
 		})
 	}
