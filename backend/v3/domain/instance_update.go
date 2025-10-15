@@ -77,6 +77,10 @@ func (u *UpdateInstanceCommand) Validate(ctx context.Context, opts *InvokeOpts) 
 		return zerrors.ThrowInvalidArgument(nil, "DOM-FPJcLC", "invalid instance name")
 	}
 
+	if authZErr := opts.Permissions.CheckInstancePermission(ctx, InstanceWritePermission); authZErr != nil {
+		return zerrors.ThrowPermissionDenied(authZErr, "DOM-M5ObLP", "permission denied")
+	}
+
 	instanceRepo := opts.instanceRepo
 
 	instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.IDCondition(u.ID)))
