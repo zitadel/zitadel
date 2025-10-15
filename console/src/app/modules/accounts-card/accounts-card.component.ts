@@ -38,6 +38,7 @@ interface V1AndV2Session {
   selector: 'cnsl-accounts-card',
   templateUrl: './accounts-card.component.html',
   styleUrls: ['./accounts-card.component.scss'],
+  standalone: false,
 })
 export class AccountsCardComponent {
   @Input({ required: true })

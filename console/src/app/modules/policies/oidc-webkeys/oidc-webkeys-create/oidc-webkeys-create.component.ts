@@ -10,6 +10,7 @@ type RawValue<T extends FormGroup> = ReturnType<T['getRawValue']>;
   selector: 'cnsl-oidc-webkeys-create',
   templateUrl: './oidc-webkeys-create.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class OidcWebKeysCreateComponent {
   protected readonly keyType: WritableSignal<NonNullable<WebKey['key']['case']>> = signal('rsa');

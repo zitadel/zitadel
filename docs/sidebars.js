@@ -125,6 +125,11 @@ module.exports = {
           label: "Pylon",
           href: "https://github.com/getcronit/pylon",
         },
+        {
+          type: "link",
+          label: "Vanilla-JS",
+          href: "https://github.com/zitadel/zitadel-vanilla-js",
+        },
       ],
     },
     {
@@ -355,7 +360,7 @@ module.exports = {
             "guides/integrate/login-ui/oidc-standard",
             "guides/integrate/login-ui/saml-standard",
             "guides/integrate/login-ui/device-auth",
-            "guides/integrate/login-ui/typescript-repo",
+            "guides/integrate/login-ui/login-app",
           ],
         },
         {

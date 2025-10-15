@@ -18,6 +18,7 @@ import { ProjectGrantMembersDataSource } from './project-grant-members-datasourc
   selector: 'cnsl-project-grant-detail',
   templateUrl: './project-grant-detail.component.html',
   styleUrls: ['./project-grant-detail.component.scss'],
+  standalone: false,
 })
 export class ProjectGrantDetailComponent {
   public INITIALPAGESIZE: number = 25;

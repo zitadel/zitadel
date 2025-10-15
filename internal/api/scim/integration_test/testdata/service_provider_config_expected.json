@@ -4,7 +4,7 @@
   ],
   "meta": {
     "resourceType": "ServiceProviderConfig",
-    "location": "http://{domain}:8080/scim/v2/{orgId}/ServiceProviderConfig"
+    "location": "http://{domain}:8082/scim/v2/{orgId}/ServiceProviderConfig"
   },
   "documentationUri": "https://zitadel.com/docs/guides/manage/user/scim2",
   "patch": {
