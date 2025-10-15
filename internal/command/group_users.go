@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/logging"
 
@@ -66,7 +67,8 @@ func (c *Commands) addUsersToGroup(ctx context.Context, resourceOwner, groupID s
 	}
 
 	if len(usersIDsToAdd) == 0 {
-		return nil, failedUserIDs, nil
+		// todo: or send an error?
+		return &domain.ObjectDetails{EventDate: time.Now().UTC()}, failedUserIDs, nil
 	}
 
 	groupUsersWriteModel, err := c.getGroupUsersWriteModel(ctx, resourceOwner, groupID, usersIDsToAdd)

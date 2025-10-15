@@ -75,6 +75,7 @@ const (
 	PermissionGroupRead                = "group.read"
 	PermissionGroupDelete              = "group.delete"
 	PermissionGroupUserWrite           = "group.user.write"
+	PermissionGroupUserRead            = "group.user.read"
 	PermissionGroupUserDelete          = "group.user.delete"
 )
 
