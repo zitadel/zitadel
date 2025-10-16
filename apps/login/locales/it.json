@@ -182,6 +182,18 @@
     "completeRegister": {
       "title": "Completa la registrazione",
       "description": "Completa la registrazione del tuo account."
+    },
+    "accountNotFound": {
+      "title": "Account non trovato",
+      "description": "Non siamo riusciti a trovare un account associato alle tue credenziali del provider di identità.",
+      "info": "Nessun account esistente è stato trovato. Accedi con un account esistente o contatta il tuo amministratore per assistenza.",
+      "backToLogin": "Torna al login"
+    },
+    "registrationFailed": {
+      "title": "Registrazione non disponibile",
+      "description": "Non siamo riusciti a completare il processo di registrazione.",
+      "info": "Impossibile determinare l'organizzazione per la registrazione. Contatta il tuo amministratore per assistenza.",
+      "backToLogin": "Torna al login"
     }
   },
   "ldap": {

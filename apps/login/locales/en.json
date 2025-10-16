@@ -182,6 +182,18 @@
     "completeRegister": {
       "title": "Complete your data",
       "description": "You need to complete your registration by providing your email address and name."
+    },
+    "accountNotFound": {
+      "title": "Account Not Found",
+      "description": "We couldn't find an account associated with your identity provider credentials.",
+      "info": "No existing account was found. Please sign in with an existing account or contact your administrator for assistance.",
+      "backToLogin": "Back to Login"
+    },
+    "registrationFailed": {
+      "title": "Registration Not Available",
+      "description": "We couldn't complete the registration process.",
+      "info": "Unable to determine the organization for registration. Please contact your administrator for assistance.",
+      "backToLogin": "Back to Login"
     }
   },
   "ldap": {
