@@ -825,6 +825,8 @@ github.com/zitadel/oidc/v3 v3.42.0 h1:cqlCYIEapmDprp5a5hUl9ivkUOu1SQxOqbrKdalHqG
 github.com/zitadel/oidc/v3 v3.42.0/go.mod h1:Y/rY7mHTzMGrZgf7REgQZFWxySlaSVqqFdBmNZq+9wA=
 github.com/zitadel/passwap v0.9.0 h1:QvDK8OHKdb73C0m+mwXvu87UJSBqix3oFwTVENHdv80=
 github.com/zitadel/passwap v0.9.0/go.mod h1:6QzwFjDkIr3FfudzSogTOx5Ydhq4046dRJtDM/kX+G8=
+github.com/zitadel/passwap v0.10.0 h1:aB8qjUzQHW1tz3ebqv8nEJpeJw00sAy+xLasU7nxt34=
+github.com/zitadel/passwap v0.10.0/go.mod h1:Jn7sqawaxrwRL24byEJ1CVIAmznR6LsMsKcCfO/dIsg=
 github.com/zitadel/saml v0.3.6 h1:wH82hHe7PW/43+kMFS2wYKdUXCiJovO8Rfx1MbD6MdE=
 github.com/zitadel/saml v0.3.6/go.mod h1:ybs3e4tIWdYgSYBpuCsvf3T4FNDfbXYM+GPv5vIpHYk=
 github.com/zitadel/schema v1.3.1 h1:QT3kwiRIRXXLVAs6gCK/u044WmUVh6IlbLXUsn6yRQU=
