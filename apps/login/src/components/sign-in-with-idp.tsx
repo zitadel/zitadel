@@ -21,6 +21,7 @@ export interface SignInWithIDPProps {
   organization?: string;
   linkOnly?: boolean;
   postErrorRedirectUrl?: string;
+  showLabel?: boolean;
 }
 
 export function SignInWithIdp({
@@ -29,6 +30,7 @@ export function SignInWithIdp({
   organization,
   linkOnly,
   postErrorRedirectUrl,
+  showLabel = true,
 }: Readonly<SignInWithIDPProps>) {
   const [state, action, _isPending] = useActionState(redirectToIdp, {});
 
@@ -66,9 +68,11 @@ export function SignInWithIdp({
 
   return (
     <div className="flex w-full flex-col space-y-2 text-sm">
-      <p className="ztdl-p text-center">
-        <Translated i18nKey="orSignInWith" namespace="idp" />
-      </p>
+      {showLabel && (
+        <p className="ztdl-p text-center">
+          <Translated i18nKey="orSignInWith" namespace="idp" />
+        </p>
+      )}
       {!!identityProviders?.length && identityProviders?.map(renderIDPButton)}
       {state?.error && (
         <div className="py-4">

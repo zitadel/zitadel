@@ -23,7 +23,8 @@ type Organization struct {
 	CreatedAt  time.Time `json:"createdAt,omitzero" db:"created_at"`
 	UpdatedAt  time.Time `json:"updatedAt,omitzero" db:"updated_at"`
 
-	Domains []*OrganizationDomain `json:"domains,omitempty" db:"-"` // domains need to be handled separately
+	Domains  []*OrganizationDomain   `json:"domains,omitempty" db:"-"`  // domains need to be handled separately
+	Metadata []*OrganizationMetadata `json:"metadata,omitempty" db:"-"` // metadata need to be handled separately
 }
 
 // organizationColumns define all the columns of the instance table.
@@ -54,6 +55,8 @@ type organizationConditions interface {
 	StateCondition(state OrgState) database.Condition
 	// ExistsDomain returns a filter on the organizations domains.
 	ExistsDomain(cond database.Condition) database.Condition
+	// ExistsMetadata returns a filter on the organizations metadata.
+	ExistsMetadata(cond database.Condition) database.Condition
 }
 
 // organizationChanges define all the changes for the instance table.
@@ -80,6 +83,9 @@ type OrganizationRepository interface {
 	// LoadDomains loads the domains of the given organizations.
 	// If it is called the [Organization].Domains field will be set on future calls to Get or List.
 	LoadDomains() OrganizationRepository
+	// LoadMetadata loads the metadata of the given organizations.
+	// If it is called the [Organization].Metadata field will be set on future calls to Get or List.
+	LoadMetadata() OrganizationRepository
 }
 
 type CreateOrganization struct {

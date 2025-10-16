@@ -158,7 +158,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="title" namespace="authenticator" />
         </h1>
@@ -173,7 +173,9 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           showDropdown
           searchParams={searchParams}
         ></UserAvatar>
+      </div>
 
+      <div className="w-full">
         {loginSettings && (
           <ChooseAuthenticatorToSetup
             authMethods={sessionWithData.authMethods}

@@ -60,14 +60,16 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="title" namespace="loginname" />
         </h1>
         <p className="ztdl-p">
           <Translated i18nKey="description" namespace="loginname" />
         </p>
+      </div>
 
+      <div className="w-full">
         <UsernameForm
           loginName={loginName}
           requestId={requestId}

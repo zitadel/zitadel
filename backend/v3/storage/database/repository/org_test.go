@@ -1132,4 +1132,75 @@ func TestGetOrganizationWithSubResources(t *testing.T) {
 			assert.Len(t, returnedOrg.Domains, 0)
 		})
 	})
+
+	t.Run("metadata", func(t *testing.T) {
+		metadataRepo := repository.OrganizationMetadataRepository()
+
+		metadata := []*domain.OrganizationMetadata{
+			{
+				OrganizationID: org.ID,
+				Metadata: domain.Metadata{
+					InstanceID: org.InstanceID,
+					Key:        "key1",
+					Value:      []byte("value1"),
+				},
+			},
+			{
+				OrganizationID: org.ID,
+				Metadata: domain.Metadata{
+					InstanceID: org.InstanceID,
+					Key:        "key2",
+					Value:      []byte("value2"),
+				},
+			},
+		}
+		err = metadataRepo.Set(t.Context(), tx, metadata...)
+		require.NoError(t, err)
+
+		t.Run("org by metadata key", func(t *testing.T) {
+			orgRepo := orgRepo.LoadMetadata()
+
+			returnedOrg, err := orgRepo.Get(t.Context(), tx,
+				database.WithCondition(
+					database.And(
+						orgRepo.InstanceIDCondition(instanceId),
+						orgRepo.ExistsMetadata(metadataRepo.KeyCondition(database.TextOperationEqual, "key1")),
+					),
+				),
+			)
+			require.NoError(t, err)
+			assert.Equal(t, org.ID, returnedOrg.ID)
+			assert.Len(t, returnedOrg.Metadata, 2)
+		})
+
+		t.Run("org by metadata value", func(t *testing.T) {
+			orgRepo := orgRepo.LoadMetadata()
+
+			returnedOrg, err := orgRepo.Get(t.Context(), tx,
+				database.WithCondition(
+					database.And(
+						orgRepo.InstanceIDCondition(instanceId),
+						orgRepo.ExistsMetadata(metadataRepo.ValueCondition(database.BytesOperationEqual, []byte("value1"))),
+					),
+				),
+			)
+			require.NoError(t, err)
+			assert.Equal(t, org.ID, returnedOrg.ID)
+			assert.Len(t, returnedOrg.Metadata, 2)
+		})
+
+		t.Run("ensure org by metadata key works without LoadMetadata", func(t *testing.T) {
+			returnedOrg, err := orgRepo.Get(t.Context(), tx,
+				database.WithCondition(
+					database.And(
+						orgRepo.InstanceIDCondition(instanceId),
+						orgRepo.ExistsMetadata(metadataRepo.KeyCondition(database.TextOperationEqual, "key1")),
+					),
+				),
+			)
+			require.NoError(t, err)
+			assert.Equal(t, org.ID, returnedOrg.ID)
+			assert.Len(t, returnedOrg.Metadata, 0)
+		})
+	})
 }
