@@ -127,7 +127,7 @@
           [disabled]="loading || !framework()"
           class="create-button"
           color="primary"
-          (click)="createApp(); onRegisterClick($event, 'Create Application', framework()?.id)"
+          (click)="createApp(); analyticsService.emitAnalyticsEvent($event, 'click', 'Create Application', {'framework': framework()?.id})"
           data-e2e="create-button"
         >
           {{ 'ACTIONS.CREATE' | translate }}

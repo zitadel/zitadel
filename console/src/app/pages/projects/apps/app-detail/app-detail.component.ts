@@ -58,6 +58,7 @@ import {
   POST_METHOD,
 } from '../authmethods';
 import { AuthMethodDialogComponent } from './auth-method-dialog/auth-method-dialog.component';
+import { AnalyticsService } from 'src/app/services/analytics.service';
 
 const MAX_ALLOWED_SIZE = 1 * 1024 * 1024;
 
@@ -112,27 +113,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       };
     }),
   );
-
-
-  public onRegisterClick(evt: Event, name: string, details: string| undefined) {
-    // Fire-and-forget debug event; does not block navigation
-    console.log("clicked onRegisterClick in AppDetailComponent")
-    try {
-      fetch('http://localhost:8080/events', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          event_data: {"event_type":"click", "button_name": name, details: details},
-          instance_id: 'default', // TODO: pass real instance id if available in context
-          parent_type: 'organization',
-          parent_id: 'ORG_ID', // TODO: pass real org id if available
-          table_name: 'projections.apps7',
-          event: name,
-        }),
-      }).catch(() => {});
-    } catch {}
-  }
-
 
 
   public wellknownURLs$ = this.envSvc.wellknown.pipe(
@@ -219,6 +199,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     private authService: GrpcAuthService,
     private router: Router,
     private breadcrumbService: BreadcrumbService,
+    public analyticsService: AnalyticsService,
   ) {
     this.oidcForm = this.fb.group({
       devMode: [{ value: false, disabled: true }],

@@ -4,7 +4,7 @@
     <p class="description">{{ 'QUICKSTART.DESCRIPTION' | translate }}</p>
 
     <div class="btn-wrapper">
-      <a mat-raised-button color="primary" [routerLink]="['/projects', 'app-create']" (click)="onRegisterClick($event)">{{
+      <a mat-raised-button color="primary" [routerLink]="['/projects', 'app-create']" (click)="analyticsService.emitAnalyticsEvent($event, 'click', 'button', 'QUICKSTART.BTN_START')">{{
         'QUICKSTART.BTN_START' | translate
       }}</a>
       <a mat-stroked-button color="primary" href="https://zitadel.com/docs/sdk-examples/introduction" target="_blank">{{
@@ -14,7 +14,7 @@
   </div>
   <div class="quickstart-card-wrapper">
     <ng-container *ngFor="let framework of frameworks.slice(0, 18)">
-      <a [routerLink]="['/projects', 'app-create']" [queryParams]="{ framework: framework.id }" class="quickstart-card card" (click)="onRegisterClick($event, framework.id)">
+      <a [routerLink]="['/projects', 'app-create']" [queryParams]="{ framework: framework.id }" class="quickstart-card card" (click)="analyticsService.emitAnalyticsEvent($event, 'click', 'card', {'framework_id': framework.id})">
         <img class="dark-only" *ngIf="framework.imgSrcDark" [src]="framework.imgSrcDark" alt="{{ framework.title }}" />
         <img class="light-only" *ngIf="framework.imgSrcLight" [src]="framework.imgSrcLight" alt="{{ framework.title }}" />
       </a>

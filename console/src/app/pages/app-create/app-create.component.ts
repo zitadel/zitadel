@@ -12,6 +12,7 @@ import { Framework } from 'src/app/components/quickstart/quickstart.component';
 import frameworkDefinition from '../../../../../docs/frameworks.json';
 import { NavigationService } from 'src/app/services/navigation.service';
 import { Location } from '@angular/common';
+import { AnalyticsService } from 'src/app/services/analytics.service';
 
 @Component({
   selector: 'cnsl-app-create',
@@ -50,6 +51,7 @@ export class AppCreateComponent implements OnDestroy {
     activatedRoute: ActivatedRoute,
     private _location: Location,
     private navigation: NavigationService,
+    public analyticsService: AnalyticsService,
   ) {
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,
@@ -145,25 +147,6 @@ export class AppCreateComponent implements OnDestroy {
         const { message } = error;
         this.error.set(message);
       });
-  }
-
-  public onRegisterClick(evt: Event, name: string, details: string) {
-    // Fire-and-forget debug event; does not block navigation
-    console.log("clicked onRegisterClick")
-    try {
-      fetch('http://localhost:8080/events', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          event_data: {"event_type":"click", "button_name": name, details: details},
-          instance_id: 'default', // TODO: pass real instance id if available in context
-          parent_type: 'organization',
-          parent_id: 'ORG_ID', // TODO: pass real org id if available
-          table_name: 'projections.apps7',
-          event: name,
-        }),
-      }).catch(() => {});
-    } catch {}
   }
 
 }

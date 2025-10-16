@@ -34,6 +34,7 @@ import { Framework } from 'src/app/components/quickstart/quickstart.component';
 import { OIDC_CONFIGURATIONS } from 'src/app/utils/framework';
 import { NavigationService } from 'src/app/services/navigation.service';
 import { NameDialogComponent } from 'src/app/modules/name-dialog/name-dialog.component';
+import { AnalyticsService } from 'src/app/services/analytics.service';
 
 @Component({
   selector: 'cnsl-integrate',
@@ -62,6 +63,7 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
     private _location: Location,
     private breadcrumbService: BreadcrumbService,
     public navigation: NavigationService,
+    public analyticsService: AnalyticsService,
   ) {
     effect(() => {
       const fwId = this.framework()?.id;
@@ -84,24 +86,6 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
     });
   }
 
-  public onRegisterClick(evt: Event, name: string, details: string| undefined) {
-    // Fire-and-forget debug event; does not block navigation
-    console.log("clicked onRegisterClick in IntegrateComponent")
-    try {
-      fetch('http://localhost:8080/events', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          event_data: {"event_type":"click", "button_name": name, details: details},
-          instance_id: 'default', // TODO: pass real instance id if available in context
-          parent_type: 'organization',
-          parent_id: 'ORG_ID', // TODO: pass real org id if available
-          table_name: 'projections.apps7',
-          event: name,
-        }),
-      }).catch(() => {});
-    } catch {}
-  }
 
 
   public projectName$ = combineLatest([this.mgmtService.ownedProjects, this.mgmtService.grantedProjects]).pipe(

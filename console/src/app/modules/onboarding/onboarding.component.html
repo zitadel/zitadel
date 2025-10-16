@@ -29,7 +29,8 @@
         [queryParams]="{ id: action[1].fragment }"
         class="action-card card"
         [ngClass]="{ done: action[1].reached !== undefined }"
-        (click)="onRegisterClick($event, 'onboarding_action_clicked', action[0])"
+
+        (click)="analyticsService.emitAnalyticsEvent($event, 'click', 'onboarding_action_clicked', action[0])"
       >
         <ng-template
           [ngTemplateOutlet]="onboardingContent"
@@ -42,8 +43,8 @@
         [href]="action[1].link"
         class="action-card card"
         [ngClass]="{ done: action[1].reached !== undefined }"
-        target="_blank"        
-        (click)="onRegisterClick($event, 'onboarding_action_external_clicked', action[0])"
+        target="_blank"
+        (click)="analyticsService.emitAnalyticsEvent($event, 'click', 'onboarding_action_external_clicked', action[0])"
       >
         <ng-template
           [ngTemplateOutlet]="onboardingContent"

@@ -4,7 +4,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageLocation, StorageService } from 'src/app/services/storage.service';
-
+import { AnalyticsService } from 'src/app/services/analytics.service';
 import { NewOrganizationService } from '../../services/new-organization.service';
 
 export interface SettingLinks {
@@ -157,6 +157,7 @@ export class ShortcutsComponent implements OnDestroy {
     private storageService: StorageService,
     private mgmtService: ManagementService,
     private newOrganizationService: NewOrganizationService,
+    public analyticsService: AnalyticsService,
   ) {
     effect(() => {
       const orgId = this.newOrganizationService.orgId();
@@ -166,29 +167,6 @@ export class ShortcutsComponent implements OnDestroy {
       }
     });
   }
-
-
-
-  public onRegisterClick(evt: Event, name: string, details: string| undefined) {
-    // Fire-and-forget debug event; does not block navigation
-    console.log("clicked onRegisterClick in ShortcutsComponent")
-    try {
-      fetch('http://localhost:8080/events', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          event_data: {"event_type":"click", "button_name": name, details: details},
-          instance_id: 'default', // TODO: pass real instance id if available in context
-          parent_type: 'organization',
-          parent_id: 'ORG_ID', // TODO: pass real org id if available
-          table_name: 'projections.apps7',
-          event: name,
-        }),
-      }).catch(() => {});
-    } catch {}
-  }
-
-
 
   public loadProjectShortcuts(): void {
     this.mgmtService.ownedProjects.pipe(takeUntil(this.destroy$)).subscribe((projects) => {
