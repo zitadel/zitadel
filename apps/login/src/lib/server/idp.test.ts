@@ -29,7 +29,6 @@ describe("redirectToIdp", () => {
   let mockGetServiceUrlFromHeaders: any;
   let mockGetOriginalHost: any;
   let mockStartIdentityProviderFlow: any;
-  let mockRedirect: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -46,7 +45,6 @@ describe("redirectToIdp", () => {
     mockGetServiceUrlFromHeaders = vi.mocked(getServiceUrlFromHeaders);
     mockGetOriginalHost = vi.mocked(getOriginalHost);
     mockStartIdentityProviderFlow = vi.mocked(startIdentityProviderFlow);
-    mockRedirect = vi.mocked(redirect);
 
     // Default mock implementations
     mockHeaders.mockResolvedValue({} as any);
