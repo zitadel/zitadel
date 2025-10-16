@@ -45,9 +45,7 @@ func (g *GroupUsersWriteModel) Reduce() error {
 			}
 		case *group.GroupUsersRemovedEvent:
 			for _, userID := range e.UserIDs {
-				if _, ok := g.existingUserIDs[userID]; ok {
-					delete(g.existingUserIDs, userID)
-				}
+				delete(g.existingUserIDs, userID)
 			}
 		}
 	}
