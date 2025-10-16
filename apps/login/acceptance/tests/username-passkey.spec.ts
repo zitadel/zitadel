@@ -1,33 +1,12 @@
-import { faker } from "@faker-js/faker";
-import { test as base } from "@playwright/test";
-import dotenv from "dotenv";
-import path from "path";
-import { loginScreenExpect, loginWithPasskey } from "./login";
-import { PasskeyUser } from "./user";
+import { AuthFactorState } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { test } from "./fixtures.js";
+import { loginScreenExpect, loginWithPasskey } from "./login.js";
+import { AuthFactors } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
-// Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, "../../login/.env.test.local") });
-
-const test = base.extend<{ user: PasskeyUser }>({
-  user: async ({ page }, use) => {
-    const user = new PasskeyUser({
-      email: faker.internet.email(),
-      isEmailVerified: true,
-      firstName: faker.person.firstName(),
-      lastName: faker.person.lastName(),
-      organization: "",
-      phone: faker.phone.number(),
-      isPhoneVerified: false,
-    });
-    await user.ensure(page);
-    await use(user);
-    await user.cleanup();
-  },
-});
-
-test("username and passkey login", async ({ user, page }) => {
-  await loginWithPasskey(page, user.getAuthenticatorId(), user.getUsername());
-  await loginScreenExpect(page, user.getFullName());
+test("username and passkey login", async ({ userRegistrator, page }) => {
+  const authId = await userRegistrator.registerWithPasskey();
+  await loginWithPasskey(page, authId, userRegistrator.username!);
+  await loginScreenExpect(page, userRegistrator.fullName!);
 });
 
 test("username and passkey login, multiple auth methods", async ({ page }) => {

@@ -1,4 +1,4 @@
-import test from "@playwright/test";
+import { test } from "@playwright/test";
 
 test("login with GitLab IDP", async ({ page }) => {
   test.skip();
