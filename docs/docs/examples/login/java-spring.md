@@ -122,7 +122,7 @@ https://github.com/zitadel/zitadel-java/blob/main/web/src/main/resources/templat
 
 **tasks.html**
 
-The tasks page allows to interact with the Spring Boot API example and display / add new tasks.
+The tasks page allows you to interact with the Spring Boot API example and display / add new tasks.
 
 ```html reference
 https://github.com/zitadel/zitadel-java/blob/main/web/src/main/resources/templates/tasks.html

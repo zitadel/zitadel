@@ -17,7 +17,7 @@ The following flow shows you the different components you need to enable OAuth2 
 6. Your application starts a polling mechanism to check if the user has approved the device authorization request on the token endpoint
 7. When the user opens the browser at the verification_uri, he can enter the user_code, or it's automatically filled in, if they scan the QR code
 8. Request the device authorization request from the ZITADEL API using the user_code
-9. Your login UI allows to approve or deny the device request
+9. Your login UI allows you to approve or deny the device request
 10. In case they approved, authenticate the user in your login UI by creating and updating a session with all the checks you need.
 11. Inform ZITADEL about the decision:
     1. Authorize the device authorization request by sending the session and the previously retrieved id of the device authorization request to the ZITADEL API

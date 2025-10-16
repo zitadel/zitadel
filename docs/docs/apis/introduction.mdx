@@ -45,7 +45,7 @@ The [OIDC Playground](https://zitadel.com/playgrounds/oidc) is for testing OpenI
 
 ### Custom
 
-ZITADEL allows to authenticate users by creating a session with the [Session API](/docs/apis/resources/session_service_v2), get OIDC authentication request details with the [OIDC service API](/docs/apis/resources/oidc_service_v2) or get SAML request details with the [SAML service API](/docs/apis/resources/saml_service_v2).
+ZITADEL allows you to authenticate users by creating a session with the [Session API](/docs/apis/resources/session_service_v2), get OIDC authentication request details with the [OIDC service API](/docs/apis/resources/oidc_service_v2) or get SAML request details with the [SAML service API](/docs/apis/resources/saml_service_v2).
 User authorizations can be [retrieved as roles from our APIs](/docs/guides/integrate/retrieve-user-roles).
 
 Refer to our guide to learn how to [build your own login UI](/docs/guides/integrate/login-ui)
@@ -66,7 +66,7 @@ You might need to use the existing [service-based](#zitadel-apis-service-based) 
 ## ZITADEL APIs (service-based)
 
 :::info Prefer resource-based API
-ZITADEL APIs were organized by UseCase/Context, such as Auth API for authenticated users and Management API for organization managers.
+ZITADEL APIs were originally organized by UseCase/Context, such as Auth API for authenticated users and Management API for organization managers.
 This led to confusion about which API to use, particularly for requests that could be useful across multiple APIs but with different filters.
 For instance, SearchUsers on an Instance Level or on an Organization Level.
 
@@ -111,7 +111,7 @@ API Reference:
 
 ### Management
 
-The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights.
+The management API is as the name states the interface where systems can mutate IAM objects like organizations, projects, clients, users and so on if they have the necessary access rights.
 To identify the current organization you can send a header `x-zitadel-orgid` or if no header is set, the organization of the authenticated user is set.
 
 </div>
@@ -207,7 +207,7 @@ API Reference:
 
 ### Assets
 
-The Assets API allows you to up- and download all kinds of assets. This can be files such as logos, fonts or user avatar.
+The Assets API allows you to up- and download all kinds of assets. These can be files such as logos, fonts or user avatar.
 
 </div>
 <div>

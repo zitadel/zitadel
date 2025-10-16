@@ -40,12 +40,12 @@ The API layer consist of the multiple APIs provided by Zitadel. Each serves a de
 All APIs of Zitadel are always available as gRCP, gRPC-web and REST service. 
 The only exception is the [OpenID Connect & OAuth](/apis/openidoauth/endpoints) and [Asset API](/apis/introduction#assets) due their unique nature.
 
-- [OpenID Connect & OAuth](/apis/openidoauth/endpoints) - allows to request authentication and authorization of Zitadel
-- [SAML](/apis/saml/endpoints) - allows to request authentication and authorization of Zitadel through the SAML standard
+- [OpenID Connect & OAuth](/apis/openidoauth/endpoints) - allows you to request authentication and authorization of Zitadel
+- [SAML](/apis/saml/endpoints) - allows you to request authentication and authorization of Zitadel through the SAML standard
 - [Authentication API](/apis/introduction#authentication) - allow a user to do operation in its own context
 - [Management API](/apis/introduction#management) - allows an admin or machine to manage the Zitadel resources on an organization level
 - [Administration API](/apis/introduction#administration) - allows an admin or machine to manage the Zitadel resources on an instance level
-- [System API](/apis/introduction#system) - allows to create and change new Zitadel instances
+- [System API](/apis/introduction#system) - allows you to create and change new Zitadel instances
 - [Asset API](/apis/introduction#assets) - is used to upload and download static assets
 
 ### Core Layer

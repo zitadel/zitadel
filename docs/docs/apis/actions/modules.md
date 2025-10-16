@@ -16,7 +16,7 @@ This module provides functionality to call REST APIs.
 
 ### `fetch()` function
 
-This function allows to call HTTP servers. The function does NOT fulfil the [Fetch API specification](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
+This function allows you to call HTTP servers. The function does NOT fulfil the [Fetch API specification](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
 
 #### Parameters
 
@@ -104,7 +104,7 @@ This module provides functionality to generate a UUID
 
 ### `uuid.vX()` function
 
-This function generates a UUID using [google/uuid](https://github.com/google/uuid). `vX` allows to define the UUID version:
+This function generates a UUID using [google/uuid](https://github.com/google/uuid). `vX` allows you to define the UUID version:
 
 - `uuid.v1()` *string*  
   Generates a UUID version 1, based on date-time and MAC address

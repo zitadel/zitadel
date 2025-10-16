@@ -386,7 +386,7 @@
         "action": "Create project"
       },
       "APPLICATION_CREATED": {
-        "title": "Create your app",
+        "title": "Create your application",
         "description": "Create your web, native, api or saml application and setup an authentication flow.",
         "action": "Create app"
       },
@@ -1624,7 +1624,7 @@
       "ALLOWEDORIGINS": "Allowed URLs",
       "IMPERSONATIONTITLE": "Impersonation",
       "IMPERSONATIONENABLED": "Allow Impersonation",
-      "IMPERSONATIONDESCRIPTION": "This setting allows to use impersonation in principle. Note that the impersonator needs the appropriate `*_IMPERSONATOR` roles assigned as well."
+      "IMPERSONATIONDESCRIPTION": "This setting allows you to use impersonation in principle. Note that the impersonator needs the appropriate `*_IMPERSONATOR` roles assigned as well."
     },
     "FEATURES": {
       "LOGINDEFAULTORG": "Login Default Org",

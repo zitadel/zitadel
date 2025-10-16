@@ -21,6 +21,27 @@ export class OnboardingCardComponent implements OnInit {
     this.dismissedCard.emit();
   }
 
+  public onRegisterClick(evt: Event, name: string, details: string| undefined) {
+    // Fire-and-forget debug event; does not block navigation
+    console.log("clicked onRegisterClick in OnboardingCardComponent")
+    try {
+      fetch('http://localhost:8080/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event_data: {"event_type":"click", "button_name": name, details: details},
+          instance_id: 'default', // TODO: pass real instance id if available in context
+          parent_type: 'organization',
+          parent_id: 'ORG_ID', // TODO: pass real org id if available
+          table_name: 'projections.apps7',
+          event: name,
+        }),
+      }).catch(() => {});
+    } catch {}
+  }
+
+
+
   ngOnInit() {
     console.log("OnboardingCardComponent constructor ngOnInit")
     this.adminService.loadMilestones.next(ONBOARDING_MILESTONES);

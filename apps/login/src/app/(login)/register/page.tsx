@@ -64,7 +64,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     orgId: organization,
   }).then((resp) => {
     return resp.identityProviders.filter((idp) => {
-      return idp.options?.isAutoCreation || idp.options?.isCreationAllowed; // check if IDP allows to create account automatically or manual creation is allowed
+      return idp.options?.isAutoCreation || idp.options?.isCreationAllowed; // check if IDP allows you to create account automatically or manual creation is allowed
     });
   });
 

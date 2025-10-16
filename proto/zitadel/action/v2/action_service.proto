@@ -477,7 +477,7 @@ message CreateTargetRequest {
     // In case of an error status code (non 2xx) and interrupt_on_error is set to true,
     // the execution will be aborted and no further targets will be called.
     // In case of a successful status code (2xx) the body will be parsed and mapped.
-    // This allows to modify the payload of request and response executions.
+    // This allows you to modify the payload of request and response executions.
     RESTCall rest_call = 3;
 
     // The HTTP call to this target will be a POST request.
@@ -580,7 +580,7 @@ message UpdateTargetRequest {
     // In case of an error status code (non 2xx) and interrupt_on_error is set to true,
     // the execution will be aborted and no further targets will be called.
     // In case of a successful status code (2xx) the body will be parsed and mapped.
-    // This allows to modify the payload of request and response executions.
+    // This allows you to modify the payload of request and response executions.
     RESTCall rest_call = 4;
 
     // The HTTP call to this target will be a POST request.

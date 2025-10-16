@@ -5,13 +5,13 @@
       <button
         [matTooltip]="(editState ? 'ACTIONS.SAVE' : 'ACTIONS.EDIT') | translate"
         class="shortcut-btn"
-        (click)="editState = !editState"
+        (click)="editState = !editState; onRegisterClick($event, editState ? 'save_shortcuts' : 'edit_shortcuts', undefined)"
         mat-icon-button
       >
         <i *ngIf="!editState" class="las la-pen"></i>
         <i *ngIf="editState" class="las la-check"></i>
       </button>
-      <button matTooltip="{{ 'ACTIONS.RESETDEFAULT' | translate }}" (click)="reset()" *ngIf="editState" mat-icon-button>
+      <button matTooltip="{{ 'ACTIONS.RESETDEFAULT' | translate }}" (click)="reset(); onRegisterClick($event, 'reset_shortcuts', undefined)" *ngIf="editState" mat-icon-button>
         <i *ngIf="editState" class="las la-undo-alt"></i>
       </button>
     </div>

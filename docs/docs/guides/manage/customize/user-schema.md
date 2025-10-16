@@ -138,7 +138,7 @@ curl -X PUT "https://$CUSTOM-DOMAIN/v3alpha/user_schemas/$SCHEMA_ID" \
 
 To check the state of existing schemas you can simply [list them](/apis/resources/user_schema_service_v3/user-schema-service-list-user-schemas).
 In this case we will query for the one with state `active`. Check out the api documentation for detailed information on possible filters.
-The API also allows to retrieve a single [schema by ID](/apis/resources/user_schema_service_v3/user-schema-service-get-user-schema-by-id).
+The API also allows you to retrieve a single [schema by ID](/apis/resources/user_schema_service_v3/user-schema-service-get-user-schema-by-id).
 
 ```bash
 curl -X POST "https://$CUSTOM-DOMAIN/v3alpha/user_schemas/search" \

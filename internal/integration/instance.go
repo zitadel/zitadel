@@ -38,7 +38,7 @@ const (
 // UserType provides constants that give
 // a short explanation with the purpose
 // a service user.
-// This allows to pre-create users with
+// This allows you to pre-create users with
 // different permissions and reuse them.
 type UserType int
 
