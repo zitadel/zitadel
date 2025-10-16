@@ -192,10 +192,11 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
           const res = await sendLoginname(command);
 
-          if (res && "redirect" in res && res?.redirect) {
+          if ("redirect" in res) {
             const absoluteUrl = constructUrl(request, res.redirect);
             return NextResponse.redirect(absoluteUrl.toString());
           }
+          // If error, fall through to show loginname page
         } catch (error) {
           console.error("Failed to execute sendLoginname:", error);
         }

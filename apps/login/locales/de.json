@@ -50,7 +50,9 @@
       "usernamePasswordNotAllowed": "Benutzername und Passwort nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator.",
       "passkeysNotAllowed": "Passkeys nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator.",
       "couldNotFindIdentityProvider": "Identitätsanbieter konnte nicht gefunden werden.",
-      "userNotActive": "Das Benutzerkonto ist inaktiv. Wenden Sie sich für weitere Informationen an Ihren Administrator."
+      "userNotActive": "Das Benutzerkonto ist inaktiv. Wenden Sie sich für weitere Informationen an Ihren Administrator.",
+      "noSuitableIDPFound": "Kein geeigneter Identitätsanbieter für die Authentifizierung gefunden.",
+      "noAuthenticationMethodAvailable": "Keine Authentifizierungsmethode für diesen Benutzer verfügbar."
     }
   },
   "zitadel": {

@@ -50,7 +50,9 @@
       "usernamePasswordNotAllowed": "Logowanie przy użyciu nazwy użytkownika i hasła jest niedozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
       "passkeysNotAllowed": "Klucze dostępu są niedozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
       "couldNotFindIdentityProvider": "Nie udało się znaleźć dostawcy tożsamości.",
-      "userNotActive": "Użytkownik jest nieaktywny. Skontaktuj się z administratorem, aby uzyskać więcej informacji."
+      "userNotActive": "Użytkownik jest nieaktywny. Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
+      "noSuitableIDPFound": "Nie znaleziono odpowiedniego dostawcy tożsamości do uwierzytelnienia.",
+      "noAuthenticationMethodAvailable": "Brak dostępnej metody uwierzytelniania dla tego użytkownika."
     }
   },
   "zitadel": {

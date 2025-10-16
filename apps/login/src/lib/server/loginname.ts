@@ -81,7 +81,7 @@ async function handleAuthenticationMethodRouting(params: {
   requestId?: string;
   serviceUrl: string;
   t: Awaited<ReturnType<typeof getTranslations<"loginname">>>;
-}): Promise<{ redirect: string } | { error: string } | undefined> {
+}): Promise<{ redirect: string } | { error: string }> {
   const { methods, userLoginSettings, loginName, userId, organization, requestId, serviceUrl, t } = params;
 
   if (methods.authMethodTypes.length == 1) {
@@ -157,7 +157,12 @@ async function handleAuthenticationMethodRouting(params: {
           return { error: resp.error };
         }
 
-        return resp;
+        if (resp && "redirect" in resp) {
+          return resp;
+        }
+
+        // IDP is the user's only auth method but no suitable IDP found
+        return { error: t("errors.noSuitableIDPFound") };
     }
   } else {
     // prefer passkey in favor of other methods
@@ -177,13 +182,20 @@ async function handleAuthenticationMethodRouting(params: {
 
       return { redirect: "/passkey?" + passkeyParams };
     } else if (methods.authMethodTypes.includes(AuthenticationMethodType.IDP)) {
-      return redirectUserToIDP({
+      const idpResp = await redirectUserToIDP({
         serviceUrl,
         userId,
         organization,
         requestId,
         t,
       });
+
+      if (idpResp) {
+        return idpResp;
+      }
+
+      // IDP is one of the user's auth methods but no suitable IDP found
+      return { error: t("errors.noSuitableIDPFound") };
     } else if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)) {
       // Check if password authentication is allowed
       if (!userLoginSettings?.allowUsernamePassword) {
@@ -210,11 +222,18 @@ async function handleAuthenticationMethodRouting(params: {
       };
     }
   }
+
+  // No matching authentication method found (should not happen in normal cases)
+  return { error: t("errors.noAuthenticationMethodAvailable") };
 }
 
 /**
  * Helper function to redirect user to their identity provider.
  * Checks user-specific IDP links first, then falls back to organization-level active IDPs.
+ * Returns:
+ * - { redirect: string } if exactly one IDP is found and flow started successfully
+ * - { error: string } if IDP was found but flow failed to start
+ * - undefined if no suitable IDP is found (0 or 2+ IDPs) - allows caller to handle fallback
  */
 async function redirectUserToIDP(params: {
   serviceUrl: string;
@@ -343,9 +362,12 @@ async function redirectUserToIDP(params: {
 
     return { redirect: url };
   }
+
+  // No suitable IDP found (0 or multiple IDPs) - return undefined to allow caller to handle fallback
+  return undefined;
 }
 
-export async function sendLoginname(command: SendLoginnameCommand) {
+export async function sendLoginname(command: SendLoginnameCommand): Promise<{ redirect: string } | { error: string }> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -463,7 +485,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
 
     // Route to appropriate authentication method
-    const authMethodRoute = await handleAuthenticationMethodRouting({
+    return handleAuthenticationMethodRouting({
       methods,
       userLoginSettings,
       loginName: session.factors?.user?.loginName as string,
@@ -473,10 +495,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       serviceUrl,
       t,
     });
-
-    if (authMethodRoute) {
-      return authMethodRoute;
-    }
   }
 
   // user not found, check if register is enabled on instance / organization context

@@ -50,7 +50,9 @@
       "usernamePasswordNotAllowed": "El inicio de sesión con usuario y contraseña no está permitido. Contacte con su administrador para más información.",
       "passkeysNotAllowed": "Las passkeys no están permitidas. Contacte con su administrador para más información.",
       "couldNotFindIdentityProvider": "No se pudo encontrar el proveedor de identidad.",
-      "userNotActive": "El usuario no está activo. Contacte con su administrador para más información."
+      "userNotActive": "El usuario no está activo. Contacte con su administrador para más información.",
+      "noSuitableIDPFound": "No se encontró un proveedor de identidad adecuado para la autenticación.",
+      "noAuthenticationMethodAvailable": "No hay ningún método de autenticación disponible para este usuario."
     }
   },
   "zitadel": {
