@@ -380,6 +380,46 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "all users added (with duplicate users), ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter( // to get the group write model
+						eventFromEventPusher(
+							addNewGroupEvent("group1", "org1"),
+						),
+					),
+					expectFilter( // to get the user write model for user1
+						eventFromEventPusher(
+							addNewUserEvent("user1", "org1"),
+						),
+					),
+					expectFilter( // to get the user write model for user2
+						eventFromEventPusher(
+							addNewUserEvent("user2", "org1"),
+						),
+					),
+					expectFilter(), // to get the group user write model for user2
+					expectPush(
+						group.NewGroupUsersAddedEvent(context.Background(),
+							&group.NewAggregate("group1", "org1").Aggregate,
+							[]string{"user1", "user2"},
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				groupID: "group1",
+				userIDs: []string{"user1", "user2", "user2", "user1"},
+			},
+			want: &AddUsersToGroupResponse{
+				ObjectDetails: &domain.ObjectDetails{
+					ID:            "group1",
+					ResourceOwner: "org1",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -521,6 +561,38 @@ func TestCommands_RemoveUsersFromGroup(t *testing.T) {
 			args: args{
 				groupID: "group1",
 				userIDs: []string{"user1", "user2"},
+			},
+			want: &domain.ObjectDetails{
+				ResourceOwner: "org1",
+				ID:            "group1",
+			},
+		},
+		{
+			name: "remove users (with duplicates), ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter( // to get the group write model
+						eventFromEventPusher(
+							addNewGroupEvent("group1", "org1"),
+						),
+					),
+					expectFilter( // to get the group user write model
+						eventFromEventPusher(
+							addNewGroupUsersAddedEvent("group1", "org1", []string{"user1", "user2"}),
+						),
+					),
+					expectPush(
+						group.NewGroupUsersRemovedEvent(context.Background(),
+							&group.NewAggregate("group1", "org1").Aggregate,
+							[]string{"user1", "user2"},
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				groupID: "group1",
+				userIDs: []string{"user1", "user2", "user1", "user2", "user1", "user2"},
 			},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "org1",
