@@ -20,6 +20,7 @@ export interface SignInWithIDPProps {
   requestId?: string;
   organization?: string;
   linkOnly?: boolean;
+  postErrorRedirectUrl?: string;
   showLabel?: boolean;
 }
 
@@ -28,6 +29,7 @@ export function SignInWithIdp({
   requestId,
   organization,
   linkOnly,
+  postErrorRedirectUrl,
   showLabel = true,
 }: Readonly<SignInWithIDPProps>) {
   const [state, action, _isPending] = useActionState(redirectToIdp, {});
@@ -58,6 +60,7 @@ export function SignInWithIdp({
         <input type="hidden" name="requestId" value={requestId} />
         <input type="hidden" name="organization" value={organization} />
         <input type="hidden" name="linkOnly" value={linkOnly ? "true" : "false"} />
+        {postErrorRedirectUrl && <input type="hidden" name="postErrorRedirectUrl" value={postErrorRedirectUrl} />}
         <Component key={id} name={name} />
       </form>
     ) : null;
