@@ -1,0 +1,9 @@
+@import 'captcha_base';
+
+#captcha {
+    @include captcha-base;
+}
+
+#captcha div {
+    margin: 0 auto;
+}

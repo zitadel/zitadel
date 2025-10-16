@@ -611,6 +611,12 @@ Errors:
     FeatureDisabled: Web キー機能が無効です
     NoActive: アクティブな Web キーが見つかりません
     NotFound: Web キーが見つかりません
+  Captcha:
+    InitializationFailed: Captchaの初期化に失敗しました
+    InvalidCaptcha: Captchaの検証に失敗しました。トークンが無効か期限切れです
+    MissingToken: Captchaトークンが見つかりません
+    UnexpectedType: 設定内の予期しないCaptchaタイプです
+    ValidationFailed: Captchaトークンの検証中にエラーが発生しました
 
 AggregateTypes:
   action: アクション

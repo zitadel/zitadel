@@ -2368,6 +2368,34 @@
     "USEPKCE": "Usa PKCE",
     "USEPKCE_DESC": "Determina si los parámetros code_challenge y code_challenge_method son incluidos en la solicitud de autenticación."
   },
+  "CAPTCHA": {
+    "TITLE": "Validación Captcha",
+    "DESCRIPTION": "Añade Captcha a los formularios de registro e inicio de sesión.",
+    "REGISTER": {
+      "TITLE": "Habilitar para registro",
+      "DESCRIPTION": "Habilitar Captcha para el formulario de registro."
+    },
+    "LOGIN": {
+      "TITLE": "Habilitar para inicio de sesión",
+      "DESCRIPTION": "Habilitar Captcha para el formulario de inicio de sesión."
+    },
+    "METHOD": {
+      "TITLE": "Método de Captcha",
+      "DESCRIPTION": "Seleccione el método de Captcha a usar.",
+      "CONFIG": {
+        "SITE_KEY": {
+          "LABEL": "Clave de sitio reCaptcha"
+        },
+        "SECRET_KEY": {
+          "LABEL": "Clave secreta reCaptcha"
+        }
+      },
+      "LIST": {
+        "1": "Deshabilitado",
+        "2": "Recaptcha"
+      }
+    }
+  },
   "MFA": {
     "LIST": {
       "MULTIFACTORTITLE": "Acceso sin contraseña",

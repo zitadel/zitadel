@@ -599,6 +599,12 @@ Errors:
     FeatureDisabled: Функция веб-ключа отключена
     NoActive: Активный веб-ключ не найден
     NotFound: Веб-ключ не найден
+  Captcha:
+    InitializationFailed: Не удалось инициализировать Captcha
+    InvalidCaptcha: Ошибка проверки Captcha. Токен недействителен или истёк
+    MissingToken: Отсутствует токен Captcha
+    UnexpectedType: Неожиданный тип Captcha в конфигурации
+    ValidationFailed: Произошла ошибка при проверке Captcha токена
 
 AggregateTypes:
   action: Действие

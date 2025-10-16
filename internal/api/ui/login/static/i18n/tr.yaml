@@ -527,5 +527,11 @@ Errors:
       RegistrationNotAllowed: Kayıt olmasına izin verilmiyor
   DeviceAuth:
     NotExisting: Kullanıcı Kodu mevcut değil
+  Captcha:
+    InitializationFailed: Captcha başlatılamadı
+    InvalidCaptcha: Captcha doğrulaması başarısız. Jeton geçersiz veya süresi dolmuş
+    MissingToken: Captcha jetonu eksik
+    UnexpectedType: Yapılandırmada beklenmeyen Captcha türü
+    ValidationFailed: Captcha jetonunu doğrularken bir hata oluştu
 
 optional: (isteğe bağlı)

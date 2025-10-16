@@ -252,6 +252,31 @@ message LoginPolicy {
             description: "if activated, only local authenticated users are forced to use MFA. Authentication through IDPs won't prompt a MFA step in the login."
         }
     ];
+    bool enable_registration_captcha = 23 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "if activated, a captcha will be shown and required during user registration."
+        }
+    ];
+    bool enable_login_captcha = 24 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "if activated, a captcha will be shown and required during user login."
+        }
+    ];
+    CaptchaType captcha_type = 25 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines the captcha type"
+        }
+    ];
+    string captcha_site_key = 26 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "captcha key for the site, required depending on the captcha type"
+        }
+    ];
+    string captcha_secret_key = 27 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "captcha secret key for the API validation, required depending on the captcha type"
+        }
+    ];
 }
 
 enum SecondFactorType {
@@ -272,6 +297,13 @@ enum PasswordlessType {
     PASSWORDLESS_TYPE_NOT_ALLOWED = 0;
     PASSWORDLESS_TYPE_ALLOWED = 1;
     //PLANNED: PASSWORDLESS_TYPE_WITH_CERT
+}
+
+enum CaptchaType {
+  CAPTCHA_TYPE_UNSPECIFIED = 0;
+  CAPTCHA_TYPE_DISABLED = 1;
+  CAPTCHA_TYPE_RECAPTCHA = 2;
+  // PLANNED: others captcha types
 }
 
 message PasswordComplexityPolicy {

@@ -610,6 +610,12 @@ Errors:
     FeatureDisabled: Webnyckelfunktion inaktiverad
     NoActive: Ingen aktiv webbnyckel hittades
     NotFound: Webnyckel hittades inte
+  Captcha:
+    InitializationFailed: Misslyckades att initialisera Captcha
+    InvalidCaptcha: Captcha-verifieringen misslyckades. Token är ogiltig eller har gått ut
+    MissingToken: Captcha-token saknas
+    UnexpectedType: Oväntad Captcha-typ i konfigurationen
+    ValidationFailed: Ett fel uppstod vid validering av Captcha-token
 
 AggregateTypes:
   action: Åtgärd

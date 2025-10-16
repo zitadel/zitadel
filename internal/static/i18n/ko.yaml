@@ -483,7 +483,7 @@ Errors:
     NotActive: 작업이 활성화되지 않았습니다
     NotInactive: 작업이 비활성화되지 않았습니다
     MaxAllowed: 추가 활성 작업이 허용되지 않습니다
-    NotEnabled: "\"작업\" 기능이 활성화되지 않았습니다"
+    NotEnabled: '"작업" 기능이 활성화되지 않았습니다'
   Flow:
     FlowTypeMissing: FlowType이 누락되었습니다
     Empty: 플로우가 이미 비어 있습니다
@@ -579,7 +579,7 @@ Errors:
     Failed: 실행 실패
     ResponseIsNotValidJSON: 응답이 유효한 JSON이 아닙니다
   UserSchema:
-    NotEnabled: "\"사용자 스키마\" 기능이 활성화되지 않았습니다"
+    NotEnabled: '"사용자 스키마" 기능이 활성화되지 않았습니다'
     Type:
       Missing: 사용자 스키마 유형이 누락되었습니다
       AlreadyExists: 사용자 스키마 유형이 이미 존재합니다
@@ -611,6 +611,12 @@ Errors:
     FeatureDisabled: 웹 키 기능이 비활성화되었습니다
     NoActive: 활성 웹 키가 없습니다
     NotFound: 웹 키를 찾을 수 없습니다
+  Captcha:
+    InitializationFailed: Captcha를 초기화할 수 없습니다
+    InvalidCaptcha: Captcha 검증에 실패했습니다. 토큰이 유효하지 않거나 만료되었습니다
+    MissingToken: Captcha 토큰이 없습니다
+    UnexpectedType: 구성에 예기치 않은 Captcha 유형이 있습니다
+    ValidationFailed: Captcha 토큰을 검증하는 중 오류가 발생했습니다
 
 AggregateTypes:
   action: 작업
@@ -1365,7 +1371,6 @@ EventTypes:
         code:
           added: 전화번호 인증 코드 생성됨
           sent: 전화번호 인증 코드 전송됨
-
 
   web_key:
     added: 웹 키 추가됨

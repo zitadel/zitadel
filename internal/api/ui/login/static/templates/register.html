@@ -69,6 +69,10 @@
             {{ template "password-complexity-policy-description" . }}
         </div>
 
+        {{if hasCaptcha}}
+        <div id="captcha" class="g-recaptcha" data-theme="dark" data-sitekey="{{ .CaptchaSiteKey }}" data-action="LOGIN"></div>
+        {{end}}
+
         {{ if or .TOSLink .PrivacyLink }}
         <div class="lgn-field">
             <label class="lgn-label">{{t "RegistrationUser.TosAndPrivacyLabel"}}</label>
@@ -118,5 +122,9 @@
 <script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
 <script src="{{ resourceUrl "scripts/password_policy_check.js" }}"></script>
 <script src="{{ resourceUrl "scripts/register_check.js" }}"></script>
+
+{{if hasCaptcha}}
+<script src="https://www.google.com/recaptcha/enterprise.js?render=explicit" async defer></script>
+{{end}}
 
 {{template "main-bottom" .}}

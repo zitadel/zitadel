@@ -473,7 +473,7 @@ Errors:
       NoOptionAllowed: Sem új felhasználó létrehozása, sem összekapcsolás nem engedélyezett ezen a szolgáltatón. Kérjük, lépj kapcsolatba az adminisztrátoroddal.
       LoginFailedSwitchLocal: |
         Az egyéni azonosító szolgáltatóhoz való bejelentkezés sikertelen volt. Visszatérés a helyi bejelentkezéshez.
-        
+
         Hiba részletei: {{.Details}}
     GrantRequired: Bejelentkezés nem lehetséges. A felhasználónak legalább egy jogosultsággal kell rendelkeznie az alkalmazáson. Kérlek, lépj kapcsolatba az adminisztrátoroddal.
     ProjectRequired: Bejelentkezés nem lehetséges. A felhasználó szervezetének engedélyezve kell lennie a projektre. Kérlek, lépj kapcsolatba az adminisztrátoroddal.
@@ -487,4 +487,11 @@ Errors:
       RegistrationNotAllowed: A regisztráció nem engedélyezett
   DeviceAuth:
     NotExisting: A felhasználói kód nem létezik
+  Captcha:
+    InitializationFailed: A Captcha inicializálása sikertelen
+    InvalidCaptcha: A Captcha ellenőrzése sikertelen. A token érvénytelen vagy lejárt
+    MissingToken: Hiányzik a Captcha token
+    UnexpectedType: Váratlan Captcha típus a konfigurációban
+    ValidationFailed: Hiba történt a Captcha token ellenőrzése közben
+
 optional: (opcionális)

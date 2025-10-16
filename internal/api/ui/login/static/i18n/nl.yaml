@@ -527,5 +527,11 @@ Errors:
       RegistrationNotAllowed: Registratie is niet toegestaan
   DeviceAuth:
     NotExisting: Gebruikerscode bestaat niet
+  Captcha:
+    InitializationFailed: Initialiseren van Captcha mislukt
+    InvalidCaptcha: Verificatie van Captcha mislukt. De token is ongeldig of verlopen
+    MissingToken: Captcha-token ontbreekt
+    UnexpectedType: Onverwacht Captcha-type in de configuratie
+    ValidationFailed: Er is een fout opgetreden bij het valideren van de Captcha-token
 
 optional: (optioneel)

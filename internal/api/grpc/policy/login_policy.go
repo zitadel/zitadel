@@ -33,6 +33,11 @@ func ModelLoginPolicyToPb(policy *query.LoginPolicy) *policy_pb.LoginPolicy {
 		MfaInitSkipLifetime:        durationpb.New(time.Duration(policy.MFAInitSkipLifetime)),
 		SecondFactorCheckLifetime:  durationpb.New(time.Duration(policy.SecondFactorCheckLifetime)),
 		MultiFactorCheckLifetime:   durationpb.New(time.Duration(policy.MultiFactorCheckLifetime)),
+		EnableRegistrationCaptcha:  policy.EnableRegistrationCaptcha,
+		EnableLoginCaptcha:         policy.EnableLoginCaptcha,
+		CaptchaType:                ModelCaptchaTypeToPb(policy.CaptchaType),
+		CaptchaSiteKey:             policy.CaptchaSiteKey,
+		CaptchaSecretKey:           policy.CaptchaSecretKey,
 		SecondFactors:              ModelSecondFactorTypesToPb(policy.SecondFactors),
 		MultiFactors:               ModelMultiFactorTypesToPb(policy.MultiFactors),
 		Idps:                       idp_grpc.IDPLoginPolicyLinksToPb(policy.IDPLinks),
@@ -64,5 +69,27 @@ func ModelPasswordlessTypeToPb(passwordlessType domain.PasswordlessType) policy_
 		return policy_pb.PasswordlessType_PASSWORDLESS_TYPE_NOT_ALLOWED
 	default:
 		return policy_pb.PasswordlessType_PASSWORDLESS_TYPE_NOT_ALLOWED
+	}
+}
+
+func CaptchaTypeToDomain(captchaType policy_pb.CaptchaType) domain.CaptchaType {
+	switch captchaType {
+	case policy_pb.CaptchaType_CAPTCHA_TYPE_DISABLED:
+		return domain.CaptchaTypeDisabled
+	case policy_pb.CaptchaType_CAPTCHA_TYPE_RECAPTCHA:
+		return domain.CaptchaTypeReCaptcha
+	default:
+		return -1
+	}
+}
+
+func ModelCaptchaTypeToPb(captchaType domain.CaptchaType) policy_pb.CaptchaType {
+	switch captchaType {
+	case domain.CaptchaTypeDisabled:
+		return policy_pb.CaptchaType_CAPTCHA_TYPE_DISABLED
+	case domain.CaptchaTypeReCaptcha:
+		return policy_pb.CaptchaType_CAPTCHA_TYPE_RECAPTCHA
+	default:
+		return policy_pb.CaptchaType_CAPTCHA_TYPE_DISABLED
 	}
 }

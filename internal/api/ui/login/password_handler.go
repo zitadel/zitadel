@@ -3,6 +3,7 @@ package login
 import (
 	"net/http"
 
+	"github.com/zitadel/zitadel/internal/captcha"
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
@@ -23,6 +24,9 @@ func (l *Login) renderPassword(w http.ResponseWriter, r *http.Request, authReq *
 				return !authReq.LoginPolicy.HidePasswordReset
 			}
 			return true
+		},
+		"hasCaptcha": func() bool {
+			return authReq != nil && authReq.LoginPolicy != nil && authReq.LoginPolicy.EnableLoginCaptcha && authReq.LoginPolicy.CaptchaType != domain.CaptchaTypeDisabled && authReq.LoginPolicy.CaptchaSiteKey != ""
 		},
 	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplPassword], data, funcs)
@@ -52,5 +56,13 @@ func (l *Login) handlePasswordCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderPassword(w, r, authReq, err)
 		return
 	}
+
+	if authReq.LoginPolicy.CaptchaType != domain.CaptchaTypeDisabled && authReq.LoginPolicy.EnableLoginCaptcha {
+		if err := captcha.VerifyCaptcha(r, authReq); err != nil {
+			l.renderPassword(w, r, authReq, err)
+			return
+		}
+	}
+
 	l.renderNextStep(w, r, authReq)
 }

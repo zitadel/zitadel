@@ -27,6 +27,11 @@ func updateLoginPolicyToCommand(p *admin_pb.UpdateLoginPolicyRequest) *command.C
 		MFAInitSkipLifetime:        p.MfaInitSkipLifetime.AsDuration(),
 		SecondFactorCheckLifetime:  p.SecondFactorCheckLifetime.AsDuration(),
 		MultiFactorCheckLifetime:   p.MultiFactorCheckLifetime.AsDuration(),
+		EnableRegistrationCaptcha:  p.EnableRegistrationCaptcha,
+		EnableLoginCaptcha:         p.EnableLoginCaptcha,
+		CaptchaType:                policy_grpc.CaptchaTypeToDomain(p.CaptchaType),
+		CaptchaSiteKey:             p.CaptchaSiteKey,
+		CaptchaSecretKey:           p.CaptchaSecretKey,
 	}
 }
 

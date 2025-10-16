@@ -31,6 +31,11 @@ type LoginPolicy struct {
 	MultiFactorCheckLifetime   time.Duration
 	DisableLoginWithEmail      bool
 	DisableLoginWithPhone      bool
+	EnableRegistrationCaptcha  bool
+	EnableLoginCaptcha         bool
+	CaptchaType                CaptchaType
+	CaptchaSiteKey             string
+	CaptchaSecretKey           string
 }
 
 func ValidateDefaultRedirectURI(rawURL string) bool {
@@ -74,6 +79,7 @@ func (p IDPProvider) DisplayName() string {
 }
 
 type PasswordlessType int32
+type CaptchaType int32
 
 const (
 	PasswordlessTypeNotAllowed PasswordlessType = iota
@@ -82,8 +88,20 @@ const (
 	passwordlessCount
 )
 
+const (
+	CaptchaTypeUnspecified CaptchaType = iota
+	CaptchaTypeDisabled
+	CaptchaTypeReCaptcha
+
+	captchaCount
+)
+
 func (f PasswordlessType) Valid() bool {
 	return f >= 0 && f < passwordlessCount
+}
+
+func (f CaptchaType) Valid() bool {
+	return f >= 1 && f < captchaCount
 }
 
 // HasSecondFactors is used in html rendering
