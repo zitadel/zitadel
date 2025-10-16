@@ -1,4 +1,5 @@
 import { Alert, AlertType } from "@/components/alert";
+import { Button } from "@/components/button";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
@@ -53,11 +54,10 @@ export default async function Page(props: { searchParams: Promise<Record<string 
         </div>
 
         {postErrorRedirectUrl && (
-          <Link
-            href={postErrorRedirectUrl}
-            className="bg-primary-light-500 hover:bg-primary-light-400 dark:bg-primary-dark-500 dark:hover:bg-primary-dark-400 w-full rounded-md px-4 py-3 text-center transition-all"
-          >
-            <Translated i18nKey="registrationFailed.backToLogin" namespace="idp" />
+          <Link href={postErrorRedirectUrl}>
+            <Button className="bg-primary-light-500 hover:bg-primary-light-400 dark:bg-primary-dark-500 dark:hover:bg-primary-dark-400 w-full rounded-md px-4 py-3 text-center transition-all">
+              <Translated i18nKey="registrationFailed.backToLogin" namespace="idp" />
+            </Button>
           </Link>
         )}
       </div>
