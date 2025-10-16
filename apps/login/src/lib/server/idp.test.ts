@@ -35,7 +35,6 @@ describe("redirectToIdp", () => {
 
     // Import mocked modules
     const { headers } = await import("next/headers");
-    const { redirect } = await import("next/navigation");
     const { getServiceUrlFromHeaders } = await import("../service-url");
     const { getOriginalHost } = await import("./host");
     const { startIdentityProviderFlow } = await import("../zitadel");
