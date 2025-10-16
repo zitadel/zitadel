@@ -125,6 +125,11 @@ module.exports = {
           label: "Pylon",
           href: "https://github.com/getcronit/pylon",
         },
+        {
+          type: "link",
+          label: "Vanilla-JS",
+          href: "https://github.com/zitadel/zitadel-vanilla-js",
+        },
       ],
     },
     {
@@ -355,7 +360,7 @@ module.exports = {
             "guides/integrate/login-ui/oidc-standard",
             "guides/integrate/login-ui/saml-standard",
             "guides/integrate/login-ui/device-auth",
-            "guides/integrate/login-ui/typescript-repo",
+            "guides/integrate/login-ui/login-app",
           ],
         },
         {
@@ -528,6 +533,10 @@ module.exports = {
               type: "doc",
               id: "guides/integrate/actions/migrate-from-v1",
             },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/webhook-site-setup",
+            },
           ],
         },
         {
@@ -638,7 +647,16 @@ module.exports = {
       label: "Support",
       collapsed: true,
       items: [
-        "support/software-release-cycles-support",
+        {
+          type: "link",
+          label: "Support States",
+          href: "https://help.zitadel.com/zitadel-support-states"
+        },
+        {
+          type: "link",
+          label: "Zitadel Release Cycle",
+          href: "https://help.zitadel.com/zitadel-software-release-cycle"
+        },
         "support/troubleshooting",
         {
           type: "category",

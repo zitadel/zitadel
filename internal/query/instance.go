@@ -15,7 +15,6 @@ import (
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -218,7 +217,7 @@ func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost s
 	publicDomain := strings.Split(publicHost, ":")[0]     // remove possible port
 
 	instance, ok := q.caches.instance.Get(ctx, instanceIndexByHost, instanceDomain)
-	if ok && instance.ZitadelVersion == build.Version() {
+	if ok {
 		return instance, instance.checkDomain(instanceDomain, publicDomain)
 	}
 	instance, scan := scanAuthzInstance()
@@ -241,7 +240,7 @@ func (q *Queries) InstanceByID(ctx context.Context, id string) (_ authz.Instance
 	}()
 
 	instance, ok := q.caches.instance.Get(ctx, instanceIndexByID, id)
-	if ok && instance.ZitadelVersion == build.Version() {
+	if ok {
 		return instance, nil
 	}
 
@@ -250,7 +249,6 @@ func (q *Queries) InstanceByID(ctx context.Context, id string) (_ authz.Instance
 	logging.OnError(err).WithField("instance_id", id).Warn("instance by ID")
 
 	if err == nil {
-		instance.ZitadelVersion = build.Version()
 		q.caches.instance.Set(ctx, instance)
 	}
 	return instance, err
@@ -478,7 +476,6 @@ type authzInstance struct {
 	ExternalDomains  database.TextArray[string] `json:"external_domains,omitempty"`
 	TrustedDomains   database.TextArray[string] `json:"trusted_domains,omitempty"`
 	ExecutionTargets target_domain.Router       `json:"execution_targets,omitzero"`
-	ZitadelVersion   string                     `json:"zitadel_version,omitempty"`
 }
 
 type csp struct {

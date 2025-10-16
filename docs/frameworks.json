@@ -164,5 +164,11 @@
 		"imgSrcDark": "/docs/img/tech/pylon.svg",
 		"docsLink": "https://github.com/getcronit/pylon",
 		"external": true
+	},
+		{
+		"title": "Vanilla-JS",
+		"imgSrcDark": "/docs/img/tech/javascript.svg",
+		"docsLink": "https://github.com/zitadel/zitadel-vanilla-js",
+		"external": true
 	}
 ]
