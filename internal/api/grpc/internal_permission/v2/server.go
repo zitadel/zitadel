@@ -24,7 +24,6 @@ type Server struct {
 	checkPermission domain.PermissionCheck
 }
 
-
 func CreateServer(
 	systemDefaults systemdefaults.SystemDefaults,
 	command *command.Commands,

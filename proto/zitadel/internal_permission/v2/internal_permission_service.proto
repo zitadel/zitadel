@@ -20,6 +20,9 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2;
 // If you want to manage permissions and roles within your project or application,
 // please use the AuthorizationsService.
 service InternalPermissionService {
+
+  // List Administrators
+  //
   // ListAdministrators returns all administrators and their roles matching the request and the caller's permissions to retrieve.
   //
   // Required permissions depend on the resource type:
@@ -34,6 +37,8 @@ service InternalPermissionService {
     };
   }
 
+  // Create Administrator
+  //
   // CreateAdministrator grants an administrator role to a user for a specific resource.
   //
   // Note that the roles are specific to the resource type.
@@ -51,6 +56,8 @@ service InternalPermissionService {
     };
   }
 
+  // Update Administrator
+  //
   // UpdateAdministrator updates the specific administrator role.
   //
   // Note that any role previously granted to the user and not present in the request will be revoked.
@@ -66,6 +73,8 @@ service InternalPermissionService {
     };
   }
 
+  // Delete Administrator
+  //
   // DeleteAdministrator revokes an administrator role from a user.
   //
   // In case the administrator role is not found, the request will return a successful response as
@@ -85,7 +94,7 @@ service InternalPermissionService {
 }
 
 message ListAdministratorsRequest {
-  // List limitations and ordering.
+  // Paginate through the results using a limit, offset and sorting.
   optional zitadel.filter.v2.PaginationRequest pagination = 1;
 
   // The field the result is sorted by. The default is the creation date.
@@ -102,21 +111,6 @@ message ListAdministratorsResponse {
 
   // Administrators contains the list of administrators matching the request.
   repeated Administrator administrators = 2;
-}
-
-message GetAdministratorRequest {
-  // ID is the unique identifier of the administrator.
-  string id = 1 [
-    (validate.rules).string = {
-      min_len: 1
-      max_len: 200
-    },
-    (google.api.field_behavior) = REQUIRED
-  ];
-}
-
-message GetAdministratorResponse {
-  Administrator administrator = 1;
 }
 
 message CreateAdministratorRequest {

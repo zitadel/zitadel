@@ -83,7 +83,7 @@ message ProjectGrant {
   // ProjectName is the name of the project the project grant belongs to.
   string project_name = 3;
 
-  // OrganizationID is the ID of the organization the project grant belongs to.
+  // OrganizationID is the ID of the organization the project belongs to.
   string organization_id = 4;
 
   // GrantedOrganizationID is the ID of the organization the project grant belongs to.
