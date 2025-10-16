@@ -167,8 +167,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         params.set("requestId", command.requestId);
       }
 
-      if (command.organization || organization) {
-        params.set("organization", command.organization ?? (organization as string));
+      if (organization) {
+        params.set("organization", organization);
       }
 
       const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
@@ -254,6 +254,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       return { error: t("errors.initialUserNotSupported") };
     }
 
+    // Resolve organization from command or session
+    const organization = command.organization ?? session.factors?.user?.organizationId;
+
     const methods = await listAuthenticationMethodTypes({
       serviceUrl,
       userId: session.factors?.user?.id,
@@ -271,8 +274,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         params.append("requestId", command.requestId);
       }
 
-      if (command.organization || session.factors?.user?.organizationId) {
-        params.append("organization", command.organization ?? (session.factors?.user?.organizationId as string));
+      if (organization) {
+        params.append("organization", organization);
       }
 
       return { redirect: `/verify?` + params };
@@ -284,10 +287,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         case AuthenticationMethodType.PASSWORD: // user has only password as auth method
           if (!userLoginSettings?.allowUsernamePassword) {
             // Check if user has IDPs available as alternative, that could eventually be used to register/link.
-            const idpResp = await redirectUserToIDP(
-              userId,
-              command.organization ?? user.details?.resourceOwner ?? session.factors?.user?.organizationId,
-            );
+            const idpResp = await redirectUserToIDP(userId, organization);
             if (idpResp?.redirect) {
               return idpResp;
             }
@@ -303,8 +303,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
           // TODO: does this have to be checked in loginSettings.allowDomainDiscovery
 
-          if (command.organization || session.factors?.user?.organizationId) {
-            paramsPassword.append("organization", command.organization ?? session.factors?.user?.organizationId);
+          if (organization) {
+            paramsPassword.append("organization", organization);
           }
 
           if (command.requestId) {
@@ -329,17 +329,14 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             paramsPasskey.append("requestId", command.requestId);
           }
 
-          if (command.organization || session.factors?.user?.organizationId) {
-            paramsPasskey.append("organization", command.organization ?? session.factors?.user?.organizationId);
+          if (organization) {
+            paramsPasskey.append("organization", organization);
           }
 
           return { redirect: "/passkey?" + paramsPasskey };
 
         case AuthenticationMethodType.IDP:
-          const resp = await redirectUserToIDP(
-            userId,
-            command.organization ?? user.details?.resourceOwner ?? session.factors?.user?.organizationId,
-          );
+          const resp = await redirectUserToIDP(userId, organization);
 
           if (resp?.error) {
             return { error: resp.error };
@@ -359,16 +356,13 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           passkeyParams.append("requestId", command.requestId);
         }
 
-        if (command.organization || session.factors?.user?.organizationId) {
-          passkeyParams.append("organization", command.organization ?? session.factors?.user?.organizationId);
+        if (organization) {
+          passkeyParams.append("organization", organization);
         }
 
         return { redirect: "/passkey?" + passkeyParams };
       } else if (methods.authMethodTypes.includes(AuthenticationMethodType.IDP)) {
-        return redirectUserToIDP(
-          userId,
-          command.organization ?? user.details?.resourceOwner ?? session.factors?.user?.organizationId,
-        );
+        return redirectUserToIDP(userId, organization);
       } else if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)) {
         // Check if password authentication is allowed
         if (!userLoginSettings?.allowUsernamePassword) {
@@ -386,8 +380,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           paramsPasswordDefault.append("requestId", command.requestId);
         }
 
-        if (command.organization || session.factors?.user?.organizationId) {
-          paramsPasswordDefault.append("organization", command.organization ?? session.factors?.user?.organizationId);
+        if (organization) {
+          paramsPasswordDefault.append("organization", organization);
         }
 
         return {
