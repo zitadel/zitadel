@@ -31,6 +31,8 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 	user2 := instance.CreateHumanUserVerified(iamOwnerCtx, org1.OrganizationId, integration.Email(), integration.Phone())
 	// user3 in org1
 	user3 := instance.CreateHumanUserVerified(iamOwnerCtx, org1.OrganizationId, integration.Email(), integration.Phone())
+	// user4 in org1
+	user4 := instance.CreateHumanUserVerified(iamOwnerCtx, org1.OrganizationId, integration.Email(), integration.Phone())
 
 	tests := []struct {
 		name              string
@@ -149,6 +151,14 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
 			},
 		},
+		{
+			name: "add all users to group (with duplicate user IDs), ok",
+			ctx:  iamOwnerCtx,
+			req: &group_v2.AddUsersToGroupRequest{
+				Id:      group.GetId(),
+				UserIds: []string{user1.GetUserId(), user4.GetUserId(), user4.GetUserId()},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -188,11 +198,13 @@ func TestServer_RemoveUsersFromGroup(t *testing.T) {
 	user1 := instance.CreateHumanUserVerified(iamOwnerCtx, org1.OrganizationId, integration.Email(), integration.Phone())
 	// user2 in org1
 	user2 := instance.CreateHumanUserVerified(iamOwnerCtx, org1.OrganizationId, integration.Email(), integration.Phone())
+	// user3 in org1
+	user3 := instance.CreateHumanUserVerified(iamOwnerCtx, org1.OrganizationId, integration.Email(), integration.Phone())
 
-	// add user1 and user2 to the group
+	// add user1, user2, user3 to the group
 	_, err = instance.Client.GroupV2.AddUsersToGroup(iamOwnerCtx, &group_v2.AddUsersToGroupRequest{
 		Id:      group.GetId(),
-		UserIds: []string{user1.GetUserId(), user2.GetUserId()},
+		UserIds: []string{user1.GetUserId(), user2.GetUserId(), user3.GetUserId()},
 	})
 	require.NoError(t, err)
 
@@ -295,6 +307,15 @@ func TestServer_RemoveUsersFromGroup(t *testing.T) {
 			req: &group_v2.RemoveUsersFromGroupRequest{
 				Id:      group.GetId(),
 				UserIds: []string{user2.GetUserId()},
+			},
+			wantChangeDate: true,
+		},
+		{
+			name: "users removed (with duplicate user IDs), ok",
+			ctx:  iamOwnerCtx,
+			req: &group_v2.RemoveUsersFromGroupRequest{
+				Id:      group.GetId(),
+				UserIds: []string{user3.GetUserId(), user3.GetUserId()},
 			},
 			wantChangeDate: true,
 		},

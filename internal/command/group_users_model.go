@@ -1,8 +1,6 @@
 package command
 
 import (
-	"slices"
-
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/group"
 )
@@ -11,7 +9,7 @@ type GroupUsersWriteModel struct {
 	eventstore.WriteModel
 
 	UserIDs         []string
-	existingUserIDs []string
+	existingUserIDs map[string]struct{}
 }
 
 func NewGroupUsersWriteModel(resourceOwner, groupID string, userIDs []string) *GroupUsersWriteModel {
@@ -20,7 +18,8 @@ func NewGroupUsersWriteModel(resourceOwner, groupID string, userIDs []string) *G
 			AggregateID:   groupID,
 			ResourceOwner: resourceOwner,
 		},
-		UserIDs: userIDs,
+		UserIDs:         userIDs,
+		existingUserIDs: make(map[string]struct{}),
 	}
 }
 
@@ -39,15 +38,15 @@ func (g *GroupUsersWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *group.GroupUsersAddedEvent:
 			for _, userID := range e.UserIDs {
-				if !slices.Contains(g.existingUserIDs, userID) {
-					g.existingUserIDs = append(g.existingUserIDs, userID)
+				if _, ok := g.existingUserIDs[userID]; !ok {
+					g.existingUserIDs[userID] = struct{}{}
 				}
+
 			}
 		case *group.GroupUsersRemovedEvent:
 			for _, userID := range e.UserIDs {
-				i := slices.Index(g.existingUserIDs, userID)
-				if i >= 0 {
-					g.existingUserIDs = slices.Delete(g.existingUserIDs, i, i+1)
+				if _, ok := g.existingUserIDs[userID]; ok {
+					delete(g.existingUserIDs, userID)
 				}
 			}
 		}
@@ -58,7 +57,7 @@ func (g *GroupUsersWriteModel) Reduce() error {
 func (g *GroupUsersWriteModel) userIDsToAdd() []string {
 	userIDsToAdd := make([]string, 0)
 	for _, userID := range g.UserIDs {
-		if !slices.Contains(g.existingUserIDs, userID) {
+		if _, ok := g.existingUserIDs[userID]; !ok {
 			userIDsToAdd = append(userIDsToAdd, userID)
 		}
 	}
@@ -68,7 +67,7 @@ func (g *GroupUsersWriteModel) userIDsToAdd() []string {
 func (g *GroupUsersWriteModel) userIDsToRemove() []string {
 	userIDsToRemove := make([]string, 0)
 	for _, userID := range g.UserIDs {
-		if slices.Contains(g.existingUserIDs, userID) {
+		if _, ok := g.existingUserIDs[userID]; ok {
 			userIDsToRemove = append(userIDsToRemove, userID)
 		}
 	}

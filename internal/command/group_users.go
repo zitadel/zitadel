@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"slices"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -67,7 +68,10 @@ func (c *Commands) RemoveUsersFromGroup(ctx context.Context, groupID string, use
 		return nil, err
 	}
 
-	groupUsersWriteModel, err := c.getGroupUsersWriteModel(ctx, group.ResourceOwner, groupID, userIDs)
+	// remove duplicate userIDs
+	uniqueUserIDs := removeDuplicateUserIDs(userIDs)
+
+	groupUsersWriteModel, err := c.getGroupUsersWriteModel(ctx, group.ResourceOwner, groupID, uniqueUserIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -94,8 +98,12 @@ func (c *Commands) RemoveUsersFromGroup(ctx context.Context, groupID string, use
 }
 
 func (c *Commands) addUsersToGroup(ctx context.Context, resourceOwner, groupID string, userIDs []string) (*domain.ObjectDetails, []string, error) {
-	var failedUserIDs, usersIDsToAdd []string
-	for _, userID := range userIDs {
+	var failedUserIDs, userIDsToAdd []string
+
+	// remove duplicate userIDs
+	uniqueUserIDs := removeDuplicateUserIDs(userIDs)
+
+	for _, userID := range uniqueUserIDs {
 		// check whether the user exists in the same organization as the group
 		userResourceOwner, err := c.checkUserExists(ctx, userID, "")
 		if err != nil || userResourceOwner != resourceOwner {
@@ -108,21 +116,21 @@ func (c *Commands) addUsersToGroup(ctx context.Context, resourceOwner, groupID s
 			failedUserIDs = append(failedUserIDs, userID)
 			continue
 		}
-		usersIDsToAdd = append(usersIDsToAdd, userID)
+		userIDsToAdd = append(userIDsToAdd, userID)
 	}
 
-	if len(usersIDsToAdd) == 0 {
+	if len(userIDsToAdd) == 0 {
 		// todo: or send an error?
 		return &domain.ObjectDetails{EventDate: time.Now().UTC()}, failedUserIDs, nil
 	}
 
-	groupUsersWriteModel, err := c.getGroupUsersWriteModel(ctx, resourceOwner, groupID, usersIDsToAdd)
+	groupUsersWriteModel, err := c.getGroupUsersWriteModel(ctx, resourceOwner, groupID, userIDsToAdd)
 	if err != nil {
 		return nil, failedUserIDs, err
 	}
 	// filter out users who already exist in the group
-	usersIDsToAdd = groupUsersWriteModel.userIDsToAdd()
-	if len(usersIDsToAdd) == 0 {
+	userIDsToAdd = groupUsersWriteModel.userIDsToAdd()
+	if len(userIDsToAdd) == 0 {
 		// all users already exist in the group; desired state achieved
 		return writeModelToObjectDetails(&groupUsersWriteModel.WriteModel), failedUserIDs, nil
 	}
@@ -133,7 +141,7 @@ func (c *Commands) addUsersToGroup(ctx context.Context, resourceOwner, groupID s
 		repo.NewGroupUsersAddedEvent(
 			ctx,
 			GroupAggregateFromWriteModel(ctx, &groupUsersWriteModel.WriteModel),
-			usersIDsToAdd,
+			userIDsToAdd,
 		),
 	)
 	if err != nil {
@@ -150,4 +158,10 @@ func (c *Commands) getGroupUsersWriteModel(ctx context.Context, resourceOwner, g
 		return nil, err
 	}
 	return groupUserWriteModel, nil
+}
+
+func removeDuplicateUserIDs(userIDs []string) []string {
+	uniqueUserIDs := append([]string(nil), userIDs...)
+	slices.Sort(uniqueUserIDs)
+	return slices.Compact(uniqueUserIDs)
 }
