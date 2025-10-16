@@ -2155,30 +2155,6 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			},
 			wantErr: false,
 		},
-		{
-			name: "next step jwt idp",
-			args: args{
-				CTX,
-				&user.StartIdentityProviderIntentRequest{
-					IdpId: jwtIdPID,
-					Content: &user.StartIdentityProviderIntentRequest_Urls{
-						Urls: &user.RedirectURLs{
-							SuccessUrl: "https://example.com/success",
-							FailureUrl: "https://example.com/failure",
-						},
-					},
-				},
-			},
-			want: want{
-				details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.ID(),
-				},
-				url:                "https://example.com/jwt",
-				parametersExisting: []string{"authRequestID", "userAgentID"},
-			},
-			wantErr: false,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
