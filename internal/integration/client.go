@@ -87,7 +87,7 @@ type Client struct {
 	InstanceV2Beta           instance.InstanceServiceClient
 	AppV2Beta                app.AppServiceClient
 	InternalPermissionv2Beta internal_permission_v2beta.InternalPermissionServiceClient
-	AuthorizationV2Beta      authorization_v2beta.AuthorizationServiceClient
+	AuthorizationV2Beta      authorization_v2beta.AuthorizationServiceClient //nolint:staticcheck // deprecated, but still used in tests
 	AuthorizationV2          authorization_v2.AuthorizationServiceClient
 	GroupV2                  group_v2.GroupServiceClient
 }

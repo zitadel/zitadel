@@ -46,7 +46,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 			},
 		},
 		{
-			name: "add authorization, project owned, PROJECT_OWNER, no org id, ok",
+			name: "add authorization, project owned, PROJECT_OWNER, no org id, error",
 			args: args{
 				func(t *testing.T, request *authorization.CreateAuthorizationRequest) context.Context {
 					selfOrgId := Instance.CreateOrganization(IAMCTX, integration.OrganizationName(), integration.Email()).OrganizationId
@@ -61,6 +61,7 @@ func TestServer_CreateAuthorization(t *testing.T) {
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
 			},
+			wantErr: true,
 		},
 		{
 			name: "add authorization, project owned, ORG_OWNER, ok",
@@ -277,9 +278,10 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					preparedAuthorization, err := Instance.Client.AuthorizationV2.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
-						UserId:    Instance.Users.Get(integration.UserTypeIAMOwner).ID,
-						ProjectId: projectId,
-						RoleKeys:  []string{projectRole1, projectRole2},
+						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
+						ProjectId:      projectId,
+						RoleKeys:       []string{projectRole1, projectRole2},
+						OrganizationId: selfOrgId,
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
@@ -303,9 +305,10 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					preparedAuthorization, err := Instance.Client.AuthorizationV2.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
-						UserId:    Instance.Users.Get(integration.UserTypeIAMOwner).ID,
-						ProjectId: projectId,
-						RoleKeys:  []string{projectRole1, projectRole2},
+						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
+						ProjectId:      projectId,
+						RoleKeys:       []string{projectRole1, projectRole2},
+						OrganizationId: selfOrgId,
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
@@ -330,9 +333,10 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					preparedAuthorization, err := Instance.Client.AuthorizationV2.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
-						UserId:    Instance.Users.Get(integration.UserTypeIAMOwner).ID,
-						ProjectId: projectId,
-						RoleKeys:  []string{projectRole1, projectRole2},
+						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
+						ProjectId:      projectId,
+						RoleKeys:       []string{projectRole1, projectRole2},
+						OrganizationId: selfOrgId,
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
@@ -491,9 +495,10 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					preparedAuthorization, err := Instance.Client.AuthorizationV2.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
-						UserId:    Instance.Users.Get(integration.UserTypeIAMOwner).ID,
-						ProjectId: projectId,
-						RoleKeys:  []string{projectRole1, projectRole2},
+						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
+						ProjectId:      projectId,
+						RoleKeys:       []string{projectRole1, projectRole2},
+						OrganizationId: selfOrgId,
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
@@ -516,9 +521,10 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					preparedAuthorization, err := Instance.Client.AuthorizationV2.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
-						UserId:    Instance.Users.Get(integration.UserTypeIAMOwner).ID,
-						ProjectId: projectId,
-						RoleKeys:  []string{projectRole1, projectRole2},
+						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
+						ProjectId:      projectId,
+						RoleKeys:       []string{projectRole1, projectRole2},
+						OrganizationId: selfOrgId,
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
@@ -600,9 +606,10 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					preparedAuthorization, err := Instance.Client.AuthorizationV2.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
-						UserId:    Instance.Users.Get(integration.UserTypeIAMOwner).ID,
-						ProjectId: projectId,
-						RoleKeys:  []string{projectRole1, projectRole2},
+						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
+						ProjectId:      projectId,
+						RoleKeys:       []string{projectRole1, projectRole2},
+						OrganizationId: selfOrgId,
 					})
 					require.NoError(t, err)
 					_, err = Instance.Client.AuthorizationV2.DeleteAuthorization(IAMCTX, &authorization.DeleteAuthorizationRequest{
@@ -665,9 +672,10 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					preparedAuthorization, err := Instance.Client.AuthorizationV2.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
-						UserId:    Instance.Users.Get(integration.UserTypeIAMOwner).ID,
-						ProjectId: projectId,
-						RoleKeys:  []string{projectRole1, projectRole2},
+						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
+						ProjectId:      projectId,
+						RoleKeys:       []string{projectRole1, projectRole2},
+						OrganizationId: selfOrgId,
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
@@ -690,9 +698,10 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					preparedAuthorization, err := Instance.Client.AuthorizationV2.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
-						UserId:    Instance.Users.Get(integration.UserTypeIAMOwner).ID,
-						ProjectId: projectId,
-						RoleKeys:  []string{projectRole1, projectRole2},
+						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
+						ProjectId:      projectId,
+						RoleKeys:       []string{projectRole1, projectRole2},
+						OrganizationId: selfOrgId,
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
@@ -773,9 +782,10 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					preparedAuthorization, err := Instance.Client.AuthorizationV2.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
-						UserId:    Instance.Users.Get(integration.UserTypeIAMOwner).ID,
-						ProjectId: projectId,
-						RoleKeys:  []string{projectRole1, projectRole2},
+						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
+						ProjectId:      projectId,
+						RoleKeys:       []string{projectRole1, projectRole2},
+						OrganizationId: selfOrgId,
 					})
 					require.NoError(t, err)
 					_, err = Instance.Client.AuthorizationV2.DeactivateAuthorization(IAMCTX, &authorization.DeactivateAuthorizationRequest{
@@ -838,9 +848,10 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					preparedAuthorization, err := Instance.Client.AuthorizationV2.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
-						UserId:    Instance.Users.Get(integration.UserTypeIAMOwner).ID,
-						ProjectId: projectId,
-						RoleKeys:  []string{projectRole1, projectRole2},
+						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
+						ProjectId:      projectId,
+						RoleKeys:       []string{projectRole1, projectRole2},
+						OrganizationId: selfOrgId,
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
@@ -867,9 +878,10 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					preparedAuthorization, err := Instance.Client.AuthorizationV2.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
-						UserId:    Instance.Users.Get(integration.UserTypeIAMOwner).ID,
-						ProjectId: projectId,
-						RoleKeys:  []string{projectRole1, projectRole2},
+						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
+						ProjectId:      projectId,
+						RoleKeys:       []string{projectRole1, projectRole2},
+						OrganizationId: selfOrgId,
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
@@ -961,9 +973,10 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					preparedAuthorization, err := Instance.Client.AuthorizationV2.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
-						UserId:    Instance.Users.Get(integration.UserTypeIAMOwner).ID,
-						ProjectId: projectId,
-						RoleKeys:  []string{projectRole1, projectRole2},
+						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
+						ProjectId:      projectId,
+						RoleKeys:       []string{projectRole1, projectRole2},
+						OrganizationId: selfOrgId,
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
