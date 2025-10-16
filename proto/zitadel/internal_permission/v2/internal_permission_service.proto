@@ -66,7 +66,7 @@ service InternalPermissionService {
     };
   }
 
-  // DeleteAdministrator revokes a administrator role from a user.
+  // DeleteAdministrator revokes an administrator role from a user.
   //
   // In case the administrator role is not found, the request will return a successful response as
   // the desired state is already achieved.
@@ -196,7 +196,7 @@ message CreateAdministratorResponse {
 }
 
 message UpdateAdministratorRequest {
-  // UserID is the ID of the user who should have his administrator roles updated.
+  // UserID is the ID of the user whose administrator roles should be updated.
   string user_id = 1 [(validate.rules).string = {
     min_len: 1
     max_len: 200
@@ -224,7 +224,7 @@ message UpdateAdministratorResponse {
 }
 
 message DeleteAdministratorRequest {
-  // UserID is the ID of the user who should have his administrator roles removed.
+  // UserID is the ID of the user whose administrator roles should be removed.
   string user_id = 1 [(validate.rules).string = {
     min_len: 1
     max_len: 200
