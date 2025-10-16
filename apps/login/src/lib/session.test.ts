@@ -243,7 +243,12 @@ describe("isSessionValid", () => {
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
 
       expect(result).toBe(false);
-      expect(consoleSpy).toHaveBeenCalledWith("Session has no valid MFA factor. Configured methods:", expect.any(Array), "Session factors:", expect.any(Object));
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "Session has no valid MFA factor. Configured methods:",
+        expect.any(Array),
+        "Session factors:",
+        expect.any(Object),
+      );
       consoleSpy.mockRestore();
     });
 
