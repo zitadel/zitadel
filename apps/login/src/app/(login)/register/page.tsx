@@ -71,7 +71,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   if (!loginSettings?.allowRegister) {
     return (
       <DynamicTheme branding={branding}>
-        <div className="flex flex-col items-center space-y-4">
+        <div className="flex flex-col space-y-4">
           <h1>
             <Translated i18nKey="disabled.title" namespace="register" />
           </h1>
@@ -79,20 +79,23 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             <Translated i18nKey="disabled.description" namespace="register" />
           </p>
         </div>
+        <div className="w-full"></div>
       </DynamicTheme>
     );
   }
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="title" namespace="register" />
         </h1>
         <p className="ztdl-p">
           <Translated i18nKey="description" namespace="register" />
         </p>
+      </div>
 
+      <div className="w-full">
         {!organization && (
           <Alert>
             <Translated i18nKey="unknownContext" namespace="error" />
