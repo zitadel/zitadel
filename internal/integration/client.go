@@ -32,6 +32,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
+	internal_permission_v2 "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2"
 	internal_permission_v2beta "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
@@ -85,6 +86,7 @@ type Client struct {
 	InstanceV2Beta           instance.InstanceServiceClient
 	AppV2Beta                app.AppServiceClient
 	InternalPermissionv2Beta internal_permission_v2beta.InternalPermissionServiceClient
+	InternalPermissionV2     internal_permission_v2.InternalPermissionServiceClient
 	AuthorizationV2Beta      authorization.AuthorizationServiceClient
 }
 
@@ -129,6 +131,7 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		InstanceV2Beta:           instance.NewInstanceServiceClient(cc),
 		AppV2Beta:                app.NewAppServiceClient(cc),
 		InternalPermissionv2Beta: internal_permission_v2beta.NewInternalPermissionServiceClient(cc),
+		InternalPermissionV2:     internal_permission_v2.NewInternalPermissionServiceClient(cc),
 		AuthorizationV2Beta:      authorization.NewAuthorizationServiceClient(cc),
 	}
 	return client, client.pollHealth(ctx)
