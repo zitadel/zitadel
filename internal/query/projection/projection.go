@@ -89,13 +89,14 @@ var (
 	HostedLoginTranslationProjection    *handler.Handler
 	OrganizationSettingsProjection      *handler.Handler
 
-	InstanceRelationalProjection           *handler.Handler
-	OrganizationRelationalProjection       *handler.Handler
-	InstanceDomainRelationalProjection     *handler.Handler
-	OrganizationDomainRelationalProjection *handler.Handler
-	IDPTemplateRelationalProjection        *handler.Handler
-	ProjectRelationalProjection            *handler.Handler
-	ProjectRoleRelationalProjection        *handler.Handler
+	InstanceRelationalProjection             *handler.Handler
+	OrganizationRelationalProjection         *handler.Handler
+	InstanceDomainRelationalProjection       *handler.Handler
+	OrganizationDomainRelationalProjection   *handler.Handler
+	IDPTemplateRelationalProjection          *handler.Handler
+	ProjectRelationalProjection              *handler.Handler
+	ProjectRoleRelationalProjection          *handler.Handler
+	OrganizationMetadataRelationalProjection *handler.Handler
 
 	ProjectGrantFields      *handler.FieldHandler
 	OrgDomainVerifiedFields *handler.FieldHandler
@@ -218,6 +219,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	IDPTemplateRelationalProjection = newIDPTemplateRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_templates_relational"]))
 	ProjectRelationalProjection = newProjectRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects_relational"]))
 	ProjectRoleRelationalProjection = newProjectRoleRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_roles_relational"]))
+	OrganizationMetadataRelationalProjection = newOrgMetadataRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organization_metadata_relational"]))
 
 	newProjectionsList()
 	newFieldsList()
@@ -409,5 +411,6 @@ func newProjectionsList() {
 		IDPTemplateRelationalProjection,
 		ProjectRelationalProjection,
 		ProjectRoleRelationalProjection,
+		OrganizationMetadataRelationalProjection,
 	}
 }
