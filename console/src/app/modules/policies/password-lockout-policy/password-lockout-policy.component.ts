@@ -16,6 +16,7 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
   selector: 'cnsl-password-lockout-policy',
   templateUrl: './password-lockout-policy.component.html',
   styleUrls: ['./password-lockout-policy.component.scss'],
+  standalone: false,
 })
 export class PasswordLockoutPolicyComponent implements OnInit {
   @Input() public service!: ManagementService | AdminService;
