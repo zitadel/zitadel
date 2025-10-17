@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"sort"
 	"strings"
@@ -377,19 +376,14 @@ func (a *API) handleEvents(w http.ResponseWriter, r *http.Request) {
 	config := setup.MustNewConfig(viper.GetViper())
 	dbClient, err := database.Connect(config.Database, false)
 	if err != nil {
-		fmt.Println(err)
-		// return
+		return
 	}
-	fmt.Println(dbClient)
 	ctx := r.Context()
-	fmt.Println(ctx)
 	if r.Method == http.MethodOptions {
-
 		// TODO: Be more logical in what origins are allowed
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		fmt.Println(w.Header())
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
@@ -407,16 +401,15 @@ func (a *API) handleEvents(w http.ResponseWriter, r *http.Request) {
 
 	var event Event
 	err = json.NewDecoder(r.Body).Decode(&event)
-	fmt.Println("event")
-	fmt.Println(event)
-	fmt.Println(err)
 	if err != nil {
-		fmt.Println(err)
 		http.Error(w, "Bad request: unable to parse JSON", http.StatusBadRequest)
 		return
 	}
 	_, err = dbClient.ExecContext(ctx, insertEventStmt, event.Data)
-	fmt.Println(err)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write([]byte(`{"status":"received"}`))
