@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/passwap"
 	"github.com/zitadel/passwap/argon2"
 	"github.com/zitadel/passwap/bcrypt"
+	"github.com/zitadel/passwap/drupal7"
 	"github.com/zitadel/passwap/md5"
 	"github.com/zitadel/passwap/md5plain"
 	"github.com/zitadel/passwap/md5salted"
@@ -57,6 +58,7 @@ const (
 	HashNameSha2      HashName = "sha2"      // hash and verify
 	HashNameScrypt    HashName = "scrypt"    // hash and verify
 	HashNamePBKDF2    HashName = "pbkdf2"    // hash and verify
+	HashNameDrupal7   HashName = "drupal7"   // verify only, Drupal 7 legacy hashes
 )
 
 type HashMode string
@@ -137,6 +139,10 @@ var knowVerifiers = map[HashName]prefixVerifier{
 		prefixes: []string{phpass.IdentifierP, phpass.IdentifierH},
 		verifier: phpass.Verifier,
 	},
+	HashNameDrupal7: {
+		prefixes: []string{drupal7.Identifier},
+		verifier: drupal7.Verifier,
+	},
 }
 
 func (c *HashConfig) buildVerifiers() (verifiers []verifier.Verifier, prefixes []string, err error) {
@@ -174,7 +180,7 @@ func (c *HasherConfig) buildHasher() (hasher passwap.Hasher, prefixes []string, 
 		return c.sha2()
 	case "":
 		return nil, nil, fmt.Errorf("missing hasher algorithm")
-	case HashNameArgon2, HashNameMd5, HashNameMd5Plain, HashNameMd5Salted, HashNamePHPass:
+	case HashNameArgon2, HashNameMd5, HashNameMd5Plain, HashNameMd5Salted, HashNamePHPass, HashNameDrupal7:
 		fallthrough
 	default:
 		return nil, nil, fmt.Errorf("invalid algorithm %q", c.Algorithm)

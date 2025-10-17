@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/passwap/argon2"
 	"github.com/zitadel/passwap/bcrypt"
+	"github.com/zitadel/passwap/drupal7"
 	"github.com/zitadel/passwap/md5"
 	"github.com/zitadel/passwap/md5salted"
 	"github.com/zitadel/passwap/pbkdf2"
@@ -248,6 +249,19 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 				Verifiers: []HashName{HashNameArgon2, HashNameMd5, HashNameScrypt, HashNameMd5Plain, HashNameMd5Salted},
 			},
 			wantPrefixes: []string{bcrypt.Prefix, argon2.Prefix, md5.Prefix, scrypt.Prefix, scrypt.Prefix_Linux, md5salted.Prefix},
+		},
+		{
+			name: "drupal7 verifier",
+			fields: fields{
+				Hasher: HasherConfig{
+					Algorithm: HashNameBcrypt,
+					Params: map[string]any{
+						"cost": 3,
+					},
+				},
+				Verifiers: []HashName{HashNameDrupal7},
+			},
+			wantPrefixes: []string{bcrypt.Prefix, drupal7.Identifier},
 		},
 		{
 			name: "scrypt, error",
