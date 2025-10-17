@@ -22,9 +22,9 @@ type Commander interface {
 	Executor
 }
 
-//go:generate mockgen -typed -package domainmock -destination ./mock/querier.mock.go . Querier
-
 // Querier used to query data.
+//
+//go:generate mockgen -typed -package domainmock -destination ./mock/querier.mock.go . Querier
 type Querier[T any] interface {
 	Validator
 	Executor
