@@ -13,6 +13,7 @@ plugins:
     out: .artifacts/openapi3
     strategy: all
     opt:
+      - allow-get
       - short-service-tags
       - ignore-googleapi-http
       - base=base.yaml

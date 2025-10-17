@@ -90,6 +90,10 @@ func NewMembershipGrantedOrgIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(ProjectGrantColumnGrantedOrgID, id, TextEquals)
 }
 
+func NewMembershipNotGrantedSearchQuery() (SearchQuery, error) {
+	return NewIsNullQuery(ProjectGrantColumnGrantedOrgID)
+}
+
 func NewMembershipProjectIDQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(ProjectMemberProjectID, value, TextEquals)
 }

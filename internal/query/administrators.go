@@ -192,7 +192,6 @@ func (q *Queries) searchAdministrators(ctx context.Context, queries *MembershipS
 		return nil, err
 	}
 	queryArgs = append(queryArgs, args...)
-
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
 		administrators, err = scan(rows)
 		return err

@@ -8,21 +8,24 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "zitadel/settings/v2/settings.proto";
 
 message LockoutSettings {
+  // The amount of failed password attempts before the account gets locked.
+  // Attempts are reset as soon as the password is entered correctly or the password is reset.
+  // If set to 0 the account will never be locked.
   uint64 max_password_attempts = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Maximum password check attempts before the account gets locked. Attempts are reset as soon as the password is entered correctly or the password is reset. If set to 0 the account will never be locked."
       example: "\"10\""
     }
   ];
-  // resource_owner_type returns if the settings is managed on the organization or on the instance
-  ResourceOwnerType resource_owner_type = 2 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "resource_owner_type returns if the settings is managed on the organization or on the instance";
-    }
-  ];
+
+  // ResourceOwnerType returns if the settings is managed on the organization explicitly or
+  // fell back on the instance settings.
+  ResourceOwnerType resource_owner_type = 2;
+
+  // THe amount of failed OTP (TOTP, SMS, Email) attempts before the account gets locked.
+  // Attempts are reset as soon as the OTP is entered correctly.
+  // If set to 0 the account will never be locked.
   uint64 max_otp_attempts = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Maximum failed attempts for a single OTP type (TOTP, SMS, Email) before the account gets locked. Attempts are reset as soon as the OTP is entered correctly. If set to 0 the account will never be locked."
       example: "\"10\""
     }
   ];

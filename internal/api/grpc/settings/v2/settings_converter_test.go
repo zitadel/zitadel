@@ -55,6 +55,7 @@ func Test_loginSettingsToPb(t *testing.T) {
 
 	want := &settings.LoginSettings{
 		AllowUsernamePassword:      true,
+		AllowLocalAuthentication:   true,
 		AllowRegister:              true,
 		AllowExternalIdp:           true,
 		ForceMfa:                   true,
@@ -153,8 +154,13 @@ func Test_secondFactorTypeToPb(t *testing.T) {
 		want settings.SecondFactorType
 	}{
 		{
+			// making sure it doesn't break existing mappings
 			args: args{domain.SecondFactorTypeTOTP},
-			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP,
+			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP, //nolint:staticcheck
+		},
+		{
+			args: args{domain.SecondFactorTypeTOTP},
+			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_TOTP,
 		},
 		{
 			args: args{domain.SecondFactorTypeU2F},

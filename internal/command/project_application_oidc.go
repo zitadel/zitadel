@@ -318,6 +318,7 @@ func (c *Commands) UpdateOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 	return result, nil
 }
 
+// Deprecated: use [ChangeApplicationSecret], which supports both OIDC and API applications.
 func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, appID, resourceOwner string) (*domain.OIDCApp, error) {
 	if projectID == "" || appID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-99i83", "Errors.IDMissing")
