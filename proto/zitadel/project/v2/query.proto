@@ -226,6 +226,7 @@ message ProjectRole {
 
   // Group allows grouping roles for display purposes. Zitadel will not handle it in any way.
   // It can be used to group roles in a UI to allow easier management for administrators.
+  // This attribute is not to be confused with groups as a collection of users.
   string group = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"people\""}];
 }
 

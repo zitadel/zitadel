@@ -545,8 +545,9 @@ message AddProjectRoleRequest {
     }
   ];
 
-  // The group is only used for display purposes. Zitadel will not handle it in any way.
+  // Group allows grouping roles for display purposes. Zitadel will not handle it in any way.
   // It can be used to group roles in a UI to allow easier management for administrators.
+  // This attribute is not to be confused with groups as a collection of users.
   optional string group = 4 [
     (validate.rules).string = {max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -602,9 +603,10 @@ message UpdateProjectRoleRequest {
     }
   ];
 
-  // The group is only used for display purposes. Zitadel will not handle it in any way.
+  // Group allows grouping roles for display purposes. Zitadel will not handle it in any way.
   // It can be used to group roles in a UI to allow easier management for administrators.
   // If omitted, the group will remain unchanged.
+  // This attribute is not to be confused with groups as a collection of users.
   optional string group = 4 [
     (validate.rules).string = {max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
