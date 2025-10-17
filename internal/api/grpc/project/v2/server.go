@@ -12,7 +12,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/pkg/grpc/project/v2"
-
 	"github.com/zitadel/zitadel/pkg/grpc/project/v2/projectconnect"
 )
 
