@@ -95,3 +95,22 @@ enum FieldName {
   FIELD_NAME_CREATION_DATE = 3;
   FIELD_NAME_CHANGE_DATE = 4;
 }
+
+message GroupUsersSearchFilter {
+  oneof filter {
+    option (validate.required) = true;
+
+    // Search for groups by user IDs
+    zitadel.filter.v2.InIDsFilter user_ids = 1;
+    // Search for users in groups by group IDs
+    zitadel.filter.v2.InIDsFilter group_ids = 2;
+  }
+}
+
+enum GroupUserFieldName {
+  GROUP_USER_FIELD_NAME_UNSPECIFIED = 0;
+  GROUP_USER_FIELD_NAME_USER_ID = 1;
+  GROUP_USER_FIELD_NAME_GROUP_ID = 2;
+  GROUP_USER_FIELD_NAME_CREATION_DATE = 3;
+  GROUP_USER_FIELD_NAME_CHANGE_DATE = 4;
+}

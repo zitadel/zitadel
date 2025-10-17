@@ -3,32 +3,20 @@ package command
 import (
 	"context"
 	"slices"
-	"time"
-
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	repo "github.com/zitadel/zitadel/internal/repository/group"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type AddUsersToGroupResponse struct {
-	*domain.ObjectDetails
-	FailedUserIDs []string
-}
-
-func (c *Commands) AddUsersToGroup(ctx context.Context, groupID string, userIDs []string) (_ *AddUsersToGroupResponse, err error) {
+func (c *Commands) AddUsersToGroup(ctx context.Context, groupID string, userIDs []string) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	// precondition: check whether the group exists
-	group, err := c.getGroupWriteModelByID(ctx, groupID, "")
+	group, err := c.checkGroupExists(ctx, groupID, userIDs)
 	if err != nil {
 		return nil, err
-	}
-	if !group.State.Exists() {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "CMDGRP-eQfeur", "Errors.Group.NotFound")
 	}
 
 	// check whether the requester has permissions to add users to the group
@@ -38,15 +26,7 @@ func (c *Commands) AddUsersToGroup(ctx context.Context, groupID string, userIDs 
 	}
 
 	// add the users to the group
-	details, failedUserIDs, err := c.addUsersToGroup(ctx, group.ResourceOwner, group.AggregateID, userIDs)
-	if err != nil {
-		return nil, err
-	}
-
-	return &AddUsersToGroupResponse{
-		FailedUserIDs: failedUserIDs,
-		ObjectDetails: details,
-	}, nil
+	return c.addUsersToGroup(ctx, group)
 }
 
 func (c *Commands) RemoveUsersFromGroup(ctx context.Context, groupID string, userIDs []string) (_ *domain.ObjectDetails, err error) {
@@ -54,12 +34,9 @@ func (c *Commands) RemoveUsersFromGroup(ctx context.Context, groupID string, use
 	defer func() { span.EndWithError(err) }()
 
 	// precondition: check whether the group exists
-	group, err := c.getGroupWriteModelByID(ctx, groupID, "")
+	group, err := c.checkGroupExists(ctx, groupID, userIDs)
 	if err != nil {
 		return nil, err
-	}
-	if !group.State.Exists() {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "CMDGRP-JRBnLw", "Errors.Group.NotFound")
 	}
 
 	// check whether the requester has permissions to remove users from the group
@@ -68,100 +45,68 @@ func (c *Commands) RemoveUsersFromGroup(ctx context.Context, groupID string, use
 		return nil, err
 	}
 
-	// remove duplicate userIDs
-	uniqueUserIDs := removeDuplicateUserIDs(userIDs)
-
-	groupUsersWriteModel, err := c.getGroupUsersWriteModel(ctx, group.ResourceOwner, groupID, uniqueUserIDs)
-	if err != nil {
-		return nil, err
-	}
-	userIDsToRemove := groupUsersWriteModel.userIDsToRemove()
+	userIDsToRemove := group.getUserIDsToRemove()
 	if len(userIDsToRemove) == 0 {
-		// the userIDs are already removed from the group; desired state achieved
-		return writeModelToObjectDetails(&groupUsersWriteModel.WriteModel), nil
+		// the userIDs are not present in the group; desired state achieved
+		return writeModelToObjectDetails(&group.WriteModel), nil
 	}
 
 	// remove users from the group
-	err = c.pushAppendAndReduce(ctx,
-		groupUsersWriteModel,
+	return c.pushAppendAndReduceDetails(ctx,
+		group,
 		repo.NewGroupUsersRemovedEvent(
 			ctx,
-			GroupAggregateFromWriteModel(ctx, &groupUsersWriteModel.WriteModel),
+			GroupAggregateFromWriteModel(ctx, &group.WriteModel),
 			userIDsToRemove,
-		),
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return writeModelToObjectDetails(&groupUsersWriteModel.WriteModel), nil
+		))
 }
 
-func (c *Commands) addUsersToGroup(ctx context.Context, resourceOwner, groupID string, userIDs []string) (*domain.ObjectDetails, []string, error) {
-	var failedUserIDs, userIDsToAdd []string
+func (c *Commands) addUsersToGroup(ctx context.Context, group *GroupWriteModel) (*domain.ObjectDetails, error) {
+	userIDsToAdd := group.getUserIDsToAdd()
+	if len(userIDsToAdd) == 0 {
+		// no new users to add
+		return writeModelToObjectDetails(&group.WriteModel), nil
+	}
 
-	// remove duplicate userIDs
-	uniqueUserIDs := removeDuplicateUserIDs(userIDs)
-
-	for _, userID := range uniqueUserIDs {
+	// precondition: check whether the users exist
+	for _, userID := range userIDsToAdd {
 		// check whether the user exists in the same organization as the group
-		userResourceOwner, err := c.checkUserExists(ctx, userID, "")
-		if err != nil || userResourceOwner != resourceOwner {
-			logging.WithFields(
-				"user_id", userID,
-				"group_id", groupID,
-				"user_resource_owner", userResourceOwner,
-				"group_resource_owner", resourceOwner,
-			).WithError(err).Error("user does not exist or is not in the same organization as the group")
-			failedUserIDs = append(failedUserIDs, userID)
-			continue
+		_, err := c.checkUserExists(ctx, userID, group.ResourceOwner)
+		if err != nil {
+			return nil, err
 		}
-		userIDsToAdd = append(userIDsToAdd, userID)
-	}
-
-	if len(userIDsToAdd) == 0 {
-		// todo: or send an error?
-		return &domain.ObjectDetails{EventDate: time.Now().UTC()}, failedUserIDs, nil
-	}
-
-	groupUsersWriteModel, err := c.getGroupUsersWriteModel(ctx, resourceOwner, groupID, userIDsToAdd)
-	if err != nil {
-		return nil, failedUserIDs, err
-	}
-	// filter out users who already exist in the group
-	userIDsToAdd = groupUsersWriteModel.userIDsToAdd()
-	if len(userIDsToAdd) == 0 {
-		// all users already exist in the group; desired state achieved
-		return writeModelToObjectDetails(&groupUsersWriteModel.WriteModel), failedUserIDs, nil
 	}
 
 	// add users to the group
-	err = c.pushAppendAndReduce(ctx,
-		groupUsersWriteModel,
+	return c.pushAppendAndReduceDetails(ctx,
+		group,
 		repo.NewGroupUsersAddedEvent(
 			ctx,
-			GroupAggregateFromWriteModel(ctx, &groupUsersWriteModel.WriteModel),
+			GroupAggregateFromWriteModel(ctx, &group.WriteModel),
 			userIDsToAdd,
 		),
 	)
-	if err != nil {
-		return nil, failedUserIDs, err
-	}
-
-	return writeModelToObjectDetails(&groupUsersWriteModel.WriteModel), failedUserIDs, nil
 }
 
-func (c *Commands) getGroupUsersWriteModel(ctx context.Context, resourceOwner, groupID string, userIDs []string) (*GroupUsersWriteModel, error) {
-	groupUserWriteModel := NewGroupUsersWriteModel(resourceOwner, groupID, userIDs)
-	err := c.eventstore.FilterToQueryReducer(ctx, groupUserWriteModel)
-	if err != nil {
-		return nil, err
+// getUserIDsToAdd returns the userIDs that are not already in the group
+func (g *GroupWriteModel) getUserIDsToAdd() []string {
+	userIDsToAdd := make([]string, 0)
+	for _, userID := range g.UserIDs {
+		if _, ok := g.existingUserIDs[userID]; !ok && !slices.Contains(userIDsToAdd, userID) {
+			userIDsToAdd = append(userIDsToAdd, userID)
+		}
 	}
-	return groupUserWriteModel, nil
+	return userIDsToAdd
 }
 
-func removeDuplicateUserIDs(userIDs []string) []string {
-	uniqueUserIDs := append([]string(nil), userIDs...)
-	slices.Sort(uniqueUserIDs)
-	return slices.Compact(uniqueUserIDs)
+// getUserIDsToRemove returns the userIDs that are in the group and should be removed
+// if a userID is not in the group, the desired state has already been achieved
+func (g *GroupWriteModel) getUserIDsToRemove() []string {
+	userIDsToRemove := make([]string, 0)
+	for _, userID := range g.UserIDs {
+		if _, ok := g.existingUserIDs[userID]; ok && !slices.Contains(userIDsToRemove, userID) {
+			userIDsToRemove = append(userIDsToRemove, userID)
+		}
+	}
+	return userIDsToRemove
 }

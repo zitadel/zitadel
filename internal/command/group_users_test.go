@@ -4,9 +4,7 @@ import (
 	"context"
 	"errors"
 	"testing"
-	"time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -33,7 +31,7 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    *AddUsersToGroupResponse
+		want    *domain.ObjectDetails
 		wantErr func(error) bool
 	}{
 		{
@@ -82,7 +80,7 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 			wantErr: zerrors.IsPermissionDenied,
 		},
 		{
-			name: "all users failed to be added (not found), ok",
+			name: "user not found, error",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -91,7 +89,6 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 						),
 					),
 					expectFilter(), // to get the user write model for user1
-					expectFilter(), // to get the user write model for user2
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
@@ -99,125 +96,7 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 				groupID: "group1",
 				userIDs: []string{"user1", "user2"},
 			},
-			want: &AddUsersToGroupResponse{
-				FailedUserIDs: []string{"user1", "user2"},
-				ObjectDetails: &domain.ObjectDetails{
-					EventDate: time.Now().UTC(),
-				},
-			},
-		},
-		{
-			name: "some users failed to be added (user in a different organization), ok",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							addNewGroupEvent("group1", "org1"),
-						),
-					),
-					expectFilter( // to get the user write model for user1
-						eventFromEventPusher(
-							addNewUserEvent("user1", "org1"),
-						),
-					),
-					expectFilter( // to get the user write model for user2
-						eventFromEventPusher(
-							addNewUserEvent("user2", "org2"),
-						),
-					),
-					expectFilter(), // to get the group users write model
-					expectPush(
-						group.NewGroupUsersAddedEvent(context.Background(),
-							&group.NewAggregate("group1", "org1").Aggregate,
-							[]string{"user1"},
-						),
-					),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				groupID: "group1",
-				userIDs: []string{"user1", "user2"},
-			},
-			want: &AddUsersToGroupResponse{
-				FailedUserIDs: []string{"user2"},
-				ObjectDetails: &domain.ObjectDetails{
-					ID:            "group1",
-					ResourceOwner: "org1",
-				},
-			},
-		},
-		{
-			name: "some users failed to be added (user in a different organization), ok",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter( // to get the group write model
-						eventFromEventPusher(
-							addNewGroupEvent("group1", "org1"),
-						),
-					),
-					expectFilter( // to get the user write model to check if user1 exists
-						eventFromEventPusher(
-							addNewUserEvent("user1", "org1"),
-						),
-					),
-					expectFilter( // to get the user write model to check if user2 exists
-						eventFromEventPusher(
-							addNewUserEvent("user2", "org2"),
-						),
-					),
-					expectFilter(), // to get the group user write model
-					expectPush(
-						group.NewGroupUsersAddedEvent(context.Background(),
-							&group.NewAggregate("group1", "org1").Aggregate,
-							[]string{"user1"},
-						),
-					),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				groupID: "group1",
-				userIDs: []string{"user1", "user2"},
-			},
-			want: &AddUsersToGroupResponse{
-				FailedUserIDs: []string{"user2"},
-				ObjectDetails: &domain.ObjectDetails{
-					ID:            "group1",
-					ResourceOwner: "org1",
-				},
-			},
-		},
-		{
-			name: "failed to filter group user write model events, error",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter( // to get the group write model
-						eventFromEventPusher(
-							addNewGroupEvent("group1", "org1"),
-						),
-					),
-					expectFilter( // to get the user write model to check if user1 exists
-						eventFromEventPusher(
-							addNewUserEvent("user1", "org1"),
-						),
-					),
-					expectFilter( // to get the user write model to check if user2 exists
-						eventFromEventPusher(
-							addNewUserEvent("user2", "org2"),
-						),
-					),
-					expectFilterError(filterErr), // to get the group user write model
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				groupID: "group1",
-				userIDs: []string{"user1", "user2"},
-			},
-			wantErr: func(err error) bool {
-				return errors.Is(err, filterErr)
-			},
+			wantErr: zerrors.IsPreconditionFailed,
 		},
 		{
 			name: "some users already exist in the group, ok",
@@ -227,23 +106,13 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 						eventFromEventPusher(
 							addNewGroupEvent("group1", "org1"),
 						),
+						eventFromEventPusher(
+							addNewGroupUsersAddedEvent("group1", "org1", []string{"user1"}),
+						),
 					),
 					expectFilter( // to get the user write model to check if user1 exists
 						eventFromEventPusher(
-							addNewUserEvent("user1", "org1"),
-						),
-					),
-					expectFilter( // to get the user write model to check if user2 exists
-						eventFromEventPusher(
 							addNewUserEvent("user2", "org1"),
-						),
-					),
-					expectFilter( // to get the group user write model with user1 already added
-						eventFromEventPusher(
-							group.NewGroupUsersAddedEvent(context.Background(),
-								&group.NewAggregate("group1", "org1").Aggregate,
-								[]string{"user1"},
-							),
 						),
 					),
 					expectPush(
@@ -259,11 +128,9 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 				groupID: "group1",
 				userIDs: []string{"user1", "user2"},
 			},
-			want: &AddUsersToGroupResponse{
-				ObjectDetails: &domain.ObjectDetails{
-					ID:            "group1",
-					ResourceOwner: "org1",
-				},
+			want: &domain.ObjectDetails{
+				ID:            "group1",
+				ResourceOwner: "org1",
 			},
 		},
 		{
@@ -274,23 +141,8 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 						eventFromEventPusher(
 							addNewGroupEvent("group1", "org1"),
 						),
-					),
-					expectFilter( // to get the user write model to check if user1 exists
 						eventFromEventPusher(
-							addNewUserEvent("user1", "org1"),
-						),
-					),
-					expectFilter( // to get the user write model to check if user2 exists
-						eventFromEventPusher(
-							addNewUserEvent("user2", "org1"),
-						),
-					),
-					expectFilter( // to get the group user write model with user1 already added
-						eventFromEventPusher(
-							group.NewGroupUsersAddedEvent(context.Background(),
-								&group.NewAggregate("group1", "org1").Aggregate,
-								[]string{"user1", "user2"},
-							),
+							addNewGroupUsersAddedEvent("group1", "org1", []string{"user1", "user2"}),
 						),
 					),
 				),
@@ -300,11 +152,9 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 				groupID: "group1",
 				userIDs: []string{"user1", "user2"},
 			},
-			want: &AddUsersToGroupResponse{
-				ObjectDetails: &domain.ObjectDetails{
-					ID:            "group1",
-					ResourceOwner: "org1",
-				},
+			want: &domain.ObjectDetails{
+				ID:            "group1",
+				ResourceOwner: "org1",
 			},
 		},
 		{
@@ -321,7 +171,6 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 							addNewUserEvent("user1", "org1"),
 						),
 					),
-					expectFilter(), // to get the group user write model for user1
 					expectPushFailed(
 						pushErr,
 						group.NewGroupUsersAddedEvent(context.Background(),
@@ -359,7 +208,6 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 							addNewUserEvent("user2", "org1"),
 						),
 					),
-					expectFilter(), // to get the group user write model for user2
 					expectPush(
 						group.NewGroupUsersAddedEvent(context.Background(),
 							&group.NewAggregate("group1", "org1").Aggregate,
@@ -373,11 +221,9 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 				groupID: "group1",
 				userIDs: []string{"user1", "user2"},
 			},
-			want: &AddUsersToGroupResponse{
-				ObjectDetails: &domain.ObjectDetails{
-					ID:            "group1",
-					ResourceOwner: "org1",
-				},
+			want: &domain.ObjectDetails{
+				ID:            "group1",
+				ResourceOwner: "org1",
 			},
 		},
 		{
@@ -399,7 +245,6 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 							addNewUserEvent("user2", "org1"),
 						),
 					),
-					expectFilter(), // to get the group user write model for user2
 					expectPush(
 						group.NewGroupUsersAddedEvent(context.Background(),
 							&group.NewAggregate("group1", "org1").Aggregate,
@@ -413,11 +258,9 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 				groupID: "group1",
 				userIDs: []string{"user1", "user2", "user2", "user1"},
 			},
-			want: &AddUsersToGroupResponse{
-				ObjectDetails: &domain.ObjectDetails{
-					ID:            "group1",
-					ResourceOwner: "org1",
-				},
+			want: &domain.ObjectDetails{
+				ID:            "group1",
+				ResourceOwner: "org1",
 			},
 		},
 	}
@@ -434,8 +277,7 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 				require.True(t, tt.wantErr(err))
 				return
 			}
-			assert.Equal(t, tt.want.FailedUserIDs, got.FailedUserIDs)
-			require.NotNil(t, got.ObjectDetails)
+			assertObjectDetails(t, tt.want, got)
 		})
 	}
 
@@ -515,27 +357,6 @@ func TestCommands_RemoveUsersFromGroup(t *testing.T) {
 			wantErr: zerrors.IsPermissionDenied,
 		},
 		{
-			name: "failed to filter group user write model events, error",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter( // to get the group write model
-						eventFromEventPusher(
-							addNewGroupEvent("group1", "org1"),
-						),
-					),
-					expectFilterError(filterErr), // to get the group user write model
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				groupID: "group1",
-				userIDs: []string{"user1", "user2"},
-			},
-			wantErr: func(err error) bool {
-				return errors.Is(err, filterErr)
-			},
-		},
-		{
 			name: "remove users, ok",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -543,8 +364,6 @@ func TestCommands_RemoveUsersFromGroup(t *testing.T) {
 						eventFromEventPusher(
 							addNewGroupEvent("group1", "org1"),
 						),
-					),
-					expectFilter( // to get the group user write model
 						eventFromEventPusher(
 							addNewGroupUsersAddedEvent("group1", "org1", []string{"user1", "user2"}),
 						),
@@ -575,8 +394,6 @@ func TestCommands_RemoveUsersFromGroup(t *testing.T) {
 						eventFromEventPusher(
 							addNewGroupEvent("group1", "org1"),
 						),
-					),
-					expectFilter( // to get the group user write model
 						eventFromEventPusher(
 							addNewGroupUsersAddedEvent("group1", "org1", []string{"user1", "user2"}),
 						),
@@ -607,8 +424,6 @@ func TestCommands_RemoveUsersFromGroup(t *testing.T) {
 						eventFromEventPusher(
 							addNewGroupEvent("group1", "org1"),
 						),
-					),
-					expectFilter( // to get the group user write model
 						eventFromEventPusher(
 							addNewGroupUsersAddedEvent("group1", "org1", []string{"user1", "user2"}),
 						),
@@ -639,8 +454,6 @@ func TestCommands_RemoveUsersFromGroup(t *testing.T) {
 						eventFromEventPusher(
 							addNewGroupEvent("group1", "org1"),
 						),
-					),
-					expectFilter( // to get the group user write model
 						eventFromEventPusher(
 							addNewGroupUsersAddedEvent("group1", "org1", []string{"user1", "user2"}),
 						),
@@ -665,8 +478,6 @@ func TestCommands_RemoveUsersFromGroup(t *testing.T) {
 						eventFromEventPusher(
 							addNewGroupEvent("group1", "org1"),
 						),
-					),
-					expectFilter( // to get the group user write model
 						eventFromEventPusher(
 							addNewGroupUsersAddedEvent("group1", "org1", []string{"user1", "user2"}),
 						),
@@ -702,7 +513,7 @@ func TestCommands_RemoveUsersFromGroup(t *testing.T) {
 				require.True(t, tt.wantErr(err))
 				return
 			}
-			assert.Equal(t, tt.want, got)
+			assertObjectDetails(t, tt.want, got)
 		})
 	}
 }
