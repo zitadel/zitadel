@@ -905,15 +905,13 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Internal Permissions (Beta)",
+              label: "Internal Permissions",
               link: {
                 type: "generated-index",
-                title: "Internal Permission Service API (Beta)",
+                title: "Internal Permission Service API",
                 slug: "/apis/resources/internal_permission_service_v2",
                 description:
-                  "This API is intended to manage internal permissions in ZITADEL.\n" +
-                  "\n" +
-                  "This API is in beta state. It can AND will continue breaking until a stable version is released.\n"
+                  "This API provides methods to manage permissions for resource and and their management in ZITADEL itself also known as \"administrators\"."
               },
               items: sidebar_api_internal_permission_service_v2,
             },
