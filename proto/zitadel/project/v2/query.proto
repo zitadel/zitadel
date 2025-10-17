@@ -12,31 +12,31 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/project/v2;project";
 
 message ProjectGrant {
   // The unique identifier of the organization which granted the project to the granted_organization_id.
-  string organization_id = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629012906488334\""}];
+  string organization_id = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629012906488334\""}];
 
   // The timestamp of the granted project creation.
-  google.protobuf.Timestamp creation_date = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2024-12-18T07:50:47.492Z\""}];
+  google.protobuf.Timestamp creation_date = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2024-12-18T07:50:47.492Z\""}];
 
   // The timestamp of the last change to the granted project (e.g. creation, activation, deactivation).
-  google.protobuf.Timestamp change_date = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2025-01-23T10:34:18.051Z\""}];
+  google.protobuf.Timestamp change_date = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2025-01-23T10:34:18.051Z\""}];
 
   // The ID of the organization the project is granted to.
-  string granted_organization_id = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629023906488334\""}];
+  string granted_organization_id = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629023906488334\""}];
 
   // The name of the organization the project is granted to.
-  string granted_organization_name = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"Some Organization\""}];
+  string granted_organization_name = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"Some Organization\""}];
 
   // The roles granted to the organization for self-management of the project.
-  repeated string granted_role_keys = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "[\"role.super.man\"]"}];
+  repeated string granted_role_keys = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "[\"role.super.man\"]"}];
 
   // The ID of the granted project.
-  string project_id = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629023906488334\""}];
+  string project_id = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629023906488334\""}];
 
   // The name of the granted project.
-  string project_name = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"ZITADEL\""}];
+  string project_name = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"ZITADEL\""}];
 
   // Describes the current state of the granted project.
-  ProjectGrantState state = 10;
+  ProjectGrantState state = 9;
 }
 
 enum ProjectGrantState {
@@ -46,45 +46,47 @@ enum ProjectGrantState {
 }
 
 message Project {
-  // The unique identifier of the project.
+  // ProjectID is the unique identifier of the project.
   string project_id = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629012906488334\""}];
 
-  // The unique identifier of the organization the project belongs to.
+  // OrganizationID is the unique identifier of the organization the project belongs to.
   string organization_id = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629012906488334\""}];
 
-  // The timestamp of the project creation.
+  // CreationDate is the timestamp of the project creation.
   google.protobuf.Timestamp creation_date = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2024-12-18T07:50:47.492Z\""}];
 
-  // The timestamp of the last change to the project (e.g. creation, activation, deactivation).
+  // ChangeDate is the timestamp of the last change to the project (e.g. creation, activation, deactivation).
   google.protobuf.Timestamp change_date = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2025-01-23T10:34:18.051Z\""}];
 
-  // The name of the project. This might be presented to users, e.g. in sign-in flows.
+  // Name is the name of the project. This might be presented to users, e.g. in sign-in flows.
   string name = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"ip_allow_list\""}];
 
-  // Describes the current state of the project.
+  // State describes the current state of the project.
   ProjectState state = 6;
 
-  // Describes if the roles of the user should be added to the token.
+  // ProjectRoleAssertion is a boolean flag that describes if the roles of the user should be added to the token.
   bool project_role_assertion = 7;
 
-  // When enabled ZITADEL will check if a user has an authorization to use this project assigned when login into an application of this project.
+  // AuthorizationRequired is a boolean flag that can be enabled to check if a user has
+  // an authorization to use this project assigned when login into an application of this project.
   bool authorization_required = 8;
 
-  // When enabled ZITADEL will check if the organization of the user, that is trying to log in, has access to this project (either owns the project or is granted).
+  // ProjectAccessRequired is a boolean flag that can be enabled to check if the organization of the user,
+  // that is trying to log in, has access to this project (either owns the project or is granted).
   bool project_access_required = 9;
 
-  // Defines from where the private labeling should be triggered.
+  // PrivateLabelingSetting defines from where the private labeling should be triggered.
   PrivateLabelingSetting private_labeling_setting = 10;
 
-  // The ID of the organization the project is granted to.
+  // GrantedOrganizationID is the ID of the organization the project is granted to.
   // In case the project is not granted, this field is unset.
   optional string granted_organization_id = 12 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629023906488334\""}];
 
-  // The name of the organization the project is granted to.
+  // GrantedOrganizationName is the name of the organization the project is granted to.
   // In case the project is not granted, this field is unset.
   optional string granted_organization_name = 13 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"Some Organization\""}];
 
-  // Describes the current state of the granted project.
+  // GrantedProjectState describes the current state of the granted project.
   // In case the project is not granted, this field is set to GrantedProjectState.GRANTED_PROJECT_STATE_UNSPECIFIED.
   GrantedProjectState granted_state = 14;
 }
@@ -160,7 +162,7 @@ message ProjectNameFilter {
 }
 
 message ProjectOrganizationIDFilter {
-  // The ID of the organization to query for.
+  // OrganizationID Is the ID of the organization to query for.
   string organization_id = 1 [
     (validate.rules).string = {max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -206,23 +208,23 @@ message ProjectGrantSearchFilter {
 }
 
 message ProjectRole {
-  // ID of the project the role belongs to.
+  // ProjectID is the ID of the project the role belongs to.
   string project_id = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629026806489455\""}];
 
   // Key of the project role. The key identifies the role. It's the only relevant attribute for ZITADEL and
   // will be used for authorization checks and as claim in tokens and user info responses.
   string key = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"role.super.man\""}];
 
-  // The timestamp of the project role creation.
+  // CreationDate is the timestamp of the project role creation.
   google.protobuf.Timestamp creation_date = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2024-12-18T07:50:47.492Z\""}];
 
-  // The timestamp of the last change to the project role.
+  // ChangeDate is the timestamp of the last change to the project role.
   google.protobuf.Timestamp change_date = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2025-01-23T10:34:18.051Z\""}];
 
-  // Human readable name for the role, which might be displayed to users.
+  // DisplayName is a human readable name for the role, which might be displayed to users.
   string display_name = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"Super man\""}];
 
-  // The group is only used for display purposes. Zitadel will not handle it in any way.
+  // Group allows grouping roles for display purposes. Zitadel will not handle it in any way.
   // It can be used to group roles in a UI to allow easier management for administrators.
   string group = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"people\""}];
 }

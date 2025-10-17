@@ -11,7 +11,8 @@ import (
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/pkg/grpc/project/v2"
+	project "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
+
 	"github.com/zitadel/zitadel/pkg/grpc/project/v2/projectconnect"
 )
 
@@ -24,8 +25,6 @@ type Server struct {
 
 	checkPermission domain.PermissionCheck
 }
-
-type Config struct{}
 
 func CreateServer(
 	systemDefaults systemdefaults.SystemDefaults,

@@ -140,7 +140,7 @@ func (s *Server) DeactivateProject(ctx context.Context, req *connect.Request[pro
 }
 
 func (s *Server) ActivateProject(ctx context.Context, req *connect.Request[project_pb.ActivateProjectRequest]) (*connect.Response[project_pb.ActivateProjectResponse], error) {
-	details, err := s.command.ReactivateProject(ctx, req.Msg.GetId(), "")
+	details, err := s.command.ReactivateProject(ctx, req.Msg.GetProjectId(), "")
 	if err != nil {
 		return nil, err
 	}
