@@ -2185,7 +2185,7 @@ service ManagementService {
 
     // List ZITADEL Permissions
     //
-    // Deprecated: use [ListAdministrators](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-list-administrators.api.mdx) instead.
+    // Deprecated: use [ListAdministrators](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-list-administrators.api.mdx) instead.
     //
     // Show all the permissions the user has in ZITADEL (ZITADEL Manager).
     rpc ListUserMemberships(ListUserMembershipsRequest) returns (ListUserMembershipsResponse) {
@@ -2799,7 +2799,7 @@ service ManagementService {
 
     // List Organization Members
     //
-    // Deprecated: use [ListAdministrators](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-list-administrators.api.mdx) instead.
+    // Deprecated: use [ListAdministrators](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-list-administrators.api.mdx) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the organization level, matching the search queries. The search queries will be AND linked.
     rpc ListOrgMembers(ListOrgMembersRequest) returns (ListOrgMembersResponse) {
@@ -2830,7 +2830,7 @@ service ManagementService {
 
     // Add Organization Member
     //
-    // Deprecated: use [CreateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-create-administrator.api.mdx) instead.
+    // Deprecated: use [CreateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-create-administrator.api.mdx) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list on the organization level with one or multiple roles.
     rpc AddOrgMember(AddOrgMemberRequest) returns (AddOrgMemberResponse) {
@@ -2861,7 +2861,7 @@ service ManagementService {
 
     // Update Organization Member
     //
-    // Deprecated: use [UpdateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-update-administrator.api.mdx) instead.
+    // Deprecated: use [UpdateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-update-administrator.api.mdx) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove).
     rpc UpdateOrgMember(UpdateOrgMemberRequest) returns (UpdateOrgMemberResponse) {
@@ -2892,7 +2892,7 @@ service ManagementService {
 
     // Remove Organization Member
     //
-    // Deprecated: use [DeleteAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-delete-administrator.api.mdx) instead.
+    // Deprecated: use [DeleteAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-delete-administrator.api.mdx) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an instance level. The user can still have roles on another level (iam, project).
     rpc RemoveOrgMember(RemoveOrgMemberRequest) returns (RemoveOrgMemberResponse) {
@@ -3415,7 +3415,7 @@ service ManagementService {
 
     // List Project Members
     //
-    // Deprecated: use [ListAdministrators](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-list-administrators.api.mdx) instead.
+    // Deprecated: use [ListAdministrators](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-list-administrators.api.mdx) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the project level, matching the search queries. The search queries will be AND linked.
     rpc ListProjectMembers(ListProjectMembersRequest) returns (ListProjectMembersResponse) {
@@ -3447,7 +3447,7 @@ service ManagementService {
 
     // Add Project Member
     //
-    // Deprecated: use [CreateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-create-administrator.api.mdx) instead.
+    // Deprecated: use [CreateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-create-administrator.api.mdx) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list on the project level with one or multiple roles.
     rpc AddProjectMember(AddProjectMemberRequest) returns (AddProjectMemberResponse) {
@@ -3479,7 +3479,7 @@ service ManagementService {
 
     // Update Project Member
     //
-    // Deprecated: use [UpdateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-update-administrator.api.mdx) instead.
+    // Deprecated: use [UpdateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-update-administrator.api.mdx) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove).
     rpc UpdateProjectMember(UpdateProjectMemberRequest) returns (UpdateProjectMemberResponse) {
@@ -3511,7 +3511,7 @@ service ManagementService {
 
     // Remove Project Member
     //
-    // Deprecated: use [DeleteAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-delete-administrator.api.mdx) instead.
+    // Deprecated: use [DeleteAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-delete-administrator.api.mdx) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an project level. The user can still have roles on another level (iam, organization).
     rpc RemoveProjectMember(RemoveProjectMemberRequest) returns (RemoveProjectMemberResponse) {
@@ -4386,7 +4386,7 @@ service ManagementService {
 
     // List Project Grant Members
     //
-    // Deprecated: use [ListAdministrators](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-list-administrators.api.mdx) instead.
+    // Deprecated: use [ListAdministrators](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-list-administrators.api.mdx) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the project grant level, matching the search queries. The search queries will be AND linked.
     rpc ListProjectGrantMembers(ListProjectGrantMembersRequest) returns (ListProjectGrantMembersResponse) {
@@ -4417,7 +4417,7 @@ service ManagementService {
 
     // Add Project Grant Member
     //
-    // Deprecated: use [CreateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-create-administrator.api.mdx) instead.
+    // Deprecated: use [CreateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-create-administrator.api.mdx) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the project grant level, matching the search queries. The search queries will be AND linked.
     rpc AddProjectGrantMember(AddProjectGrantMemberRequest) returns (AddProjectGrantMemberResponse) {
@@ -4448,7 +4448,7 @@ service ManagementService {
 
     // Update Project Grant Member
     //
-    // Deprecated: use [UpdateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-update-administrator.api.mdx) instead.
+    // Deprecated: use [UpdateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-update-administrator.api.mdx) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove).
     rpc UpdateProjectGrantMember(UpdateProjectGrantMemberRequest) returns (UpdateProjectGrantMemberResponse) {
@@ -4479,7 +4479,7 @@ service ManagementService {
 
     // Remove Project Grant Member
     //
-    // Deprecated: use [DeleteAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-delete-administrator.api.mdx) instead.
+    // Deprecated: use [DeleteAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-delete-administrator.api.mdx) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on a project grant level. The user can still have roles on another level (iam, organization, project).
     rpc RemoveProjectGrantMember(RemoveProjectGrantMemberRequest) returns (RemoveProjectGrantMemberResponse) {
