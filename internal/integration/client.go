@@ -87,7 +87,7 @@ type Client struct {
 	SCIM                     *scim.Client
 	Projectv2Beta            project_v2beta.ProjectServiceClient
 	InstanceV2Beta           instance_v2beta.InstanceServiceClient //nolint:staticcheck // deprecated but still used in tests
-	InstanceV2               instance_v2.InstanceServiceCli
+	InstanceV2               instance_v2.InstanceServiceClient
 	AppV2Beta                app_v2beta.AppServiceClient
 	ApplicationV2            application.ApplicationServiceClient
 	InternalPermissionv2Beta internal_permission_v2beta.InternalPermissionServiceClient
