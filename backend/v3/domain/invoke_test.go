@@ -24,16 +24,16 @@ var _ eventstore.LegacyEventstore = (*testLegacyEventstore)(nil)
 
 type invokeTestCommand struct {
 	events  []legacy_es.Command
-	execute func(ctx context.Context, opts *CommandOpts) error
+	execute func(ctx context.Context, opts *InvokeOpts) error
 }
 
 // Events implements Commander.
-func (i *invokeTestCommand) Events(ctx context.Context, opts *CommandOpts) ([]legacy_es.Command, error) {
+func (i *invokeTestCommand) Events(ctx context.Context, opts *InvokeOpts) ([]legacy_es.Command, error) {
 	return i.events, nil
 }
 
 // Execute implements Commander.
-func (i *invokeTestCommand) Execute(ctx context.Context, opts *CommandOpts) (err error) {
+func (i *invokeTestCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	if i.execute == nil {
 		return nil
 	}
@@ -46,7 +46,7 @@ func (i *invokeTestCommand) String() string {
 }
 
 // Validate implements Commander.
-func (i *invokeTestCommand) Validate(ctx context.Context, opts *CommandOpts) (err error) {
+func (i *invokeTestCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
 	return nil
 }
 
@@ -130,7 +130,7 @@ func Test_eventCollector_Invoke(t *testing.T) {
 			expectedErr: nil,
 			command: &invokeTestCommand{
 				events: []legacy_es.Command{&invokeTestEvent{id: "1"}},
-				execute: func(ctx context.Context, opts *CommandOpts) error {
+				execute: func(ctx context.Context, opts *InvokeOpts) error {
 					return opts.Invoke(ctx, &invokeTestCommand{
 						events: []legacy_es.Command{&invokeTestEvent{id: "2"}},
 					})
@@ -146,7 +146,7 @@ func Test_eventCollector_Invoke(t *testing.T) {
 			name:        "only sub commands with events",
 			expectedErr: nil,
 			command: &invokeTestCommand{
-				execute: func(ctx context.Context, opts *CommandOpts) error {
+				execute: func(ctx context.Context, opts *InvokeOpts) error {
 					return opts.Invoke(ctx, &invokeTestCommand{
 						events: []legacy_es.Command{&invokeTestEvent{id: "2"}},
 					})
@@ -173,7 +173,7 @@ func Test_eventCollector_Invoke(t *testing.T) {
 			pool.EXPECT().Begin(gomock.Any(), gomock.Any()).Return(tx, nil).AnyTimes()
 
 			i := newEventStoreInvoker(nil)
-			opts := CommandOpts{
+			opts := InvokeOpts{
 				Invoker: i,
 				DB:      pool,
 			}

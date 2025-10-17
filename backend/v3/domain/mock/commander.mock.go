@@ -42,7 +42,7 @@ func (m *MockCommander) EXPECT() *MockCommanderMockRecorder {
 }
 
 // Events mocks base method.
-func (m *MockCommander) Events(arg0 context.Context, arg1 *domain.CommandOpts) ([]eventstore.Command, error) {
+func (m *MockCommander) Events(arg0 context.Context, arg1 *domain.InvokeOpts) ([]eventstore.Command, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Events", arg0, arg1)
 	ret0, _ := ret[0].([]eventstore.Command)
@@ -69,19 +69,19 @@ func (c *MockCommanderEventsCall) Return(arg0 []eventstore.Command, arg1 error) 
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockCommanderEventsCall) Do(f func(context.Context, *domain.CommandOpts) ([]eventstore.Command, error)) *MockCommanderEventsCall {
+func (c *MockCommanderEventsCall) Do(f func(context.Context, *domain.InvokeOpts) ([]eventstore.Command, error)) *MockCommanderEventsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockCommanderEventsCall) DoAndReturn(f func(context.Context, *domain.CommandOpts) ([]eventstore.Command, error)) *MockCommanderEventsCall {
+func (c *MockCommanderEventsCall) DoAndReturn(f func(context.Context, *domain.InvokeOpts) ([]eventstore.Command, error)) *MockCommanderEventsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // Execute mocks base method.
-func (m *MockCommander) Execute(arg0 context.Context, arg1 *domain.CommandOpts) error {
+func (m *MockCommander) Execute(arg0 context.Context, arg1 *domain.InvokeOpts) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Execute", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -107,13 +107,13 @@ func (c *MockCommanderExecuteCall) Return(arg0 error) *MockCommanderExecuteCall 
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockCommanderExecuteCall) Do(f func(context.Context, *domain.CommandOpts) error) *MockCommanderExecuteCall {
+func (c *MockCommanderExecuteCall) Do(f func(context.Context, *domain.InvokeOpts) error) *MockCommanderExecuteCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockCommanderExecuteCall) DoAndReturn(f func(context.Context, *domain.CommandOpts) error) *MockCommanderExecuteCall {
+func (c *MockCommanderExecuteCall) DoAndReturn(f func(context.Context, *domain.InvokeOpts) error) *MockCommanderExecuteCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -157,7 +157,7 @@ func (c *MockCommanderStringCall) DoAndReturn(f func() string) *MockCommanderStr
 }
 
 // Validate mocks base method.
-func (m *MockCommander) Validate(arg0 context.Context, arg1 *domain.CommandOpts) error {
+func (m *MockCommander) Validate(arg0 context.Context, arg1 *domain.InvokeOpts) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Validate", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -183,13 +183,13 @@ func (c *MockCommanderValidateCall) Return(arg0 error) *MockCommanderValidateCal
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockCommanderValidateCall) Do(f func(context.Context, *domain.CommandOpts) error) *MockCommanderValidateCall {
+func (c *MockCommanderValidateCall) Do(f func(context.Context, *domain.InvokeOpts) error) *MockCommanderValidateCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockCommanderValidateCall) DoAndReturn(f func(context.Context, *domain.CommandOpts) error) *MockCommanderValidateCall {
+func (c *MockCommanderValidateCall) DoAndReturn(f func(context.Context, *domain.InvokeOpts) error) *MockCommanderValidateCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

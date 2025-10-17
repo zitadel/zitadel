@@ -295,7 +295,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			cmd := domain.NewUpdateOrgCommand(tc.inputID, tc.inputName)
 
-			opts := &domain.CommandOpts{
+			opts := &domain.InvokeOpts{
 				DB: new(noopdb.Pool),
 			}
 			if tc.orgRepo != nil {
@@ -428,7 +428,7 @@ func TestUpdateOrgCommand_Validate(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			cmd := domain.NewUpdateOrgCommand(tc.inputOrgID, tc.inputOrgName)
 
-			opts := &domain.CommandOpts{
+			opts := &domain.InvokeOpts{
 				DB: new(noopdb.Pool),
 			}
 			if tc.orgRepo != nil {
@@ -484,7 +484,7 @@ func TestUpdateOrgCommand_Events(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			events, err := tt.cmd.Events(context.Background(), &domain.CommandOpts{})
+			events, err := tt.cmd.Events(context.Background(), &domain.InvokeOpts{})
 			require.Nil(t, err)
 			assert.Len(t, events, tt.expectedCount)
 		})

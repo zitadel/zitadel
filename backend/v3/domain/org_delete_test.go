@@ -196,7 +196,7 @@ func TestDeleteOrgCommand_Validate(t *testing.T) {
 			// Given
 			d := domain.NewDeleteOrgCommand(tc.inputOrganizationID)
 			ctrl := gomock.NewController(t)
-			opts := &domain.CommandOpts{DB: new(noopdb.Pool)}
+			opts := &domain.InvokeOpts{DB: new(noopdb.Pool)}
 
 			if tc.mockTx != nil {
 				opts.DB = tc.mockTx(ctrl)
@@ -408,7 +408,7 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 			// Given
 			d := domain.NewDeleteOrgCommand(tc.inputOrganizationID)
 			ctrl := gomock.NewController(t)
-			opts := &domain.CommandOpts{DB: new(noopdb.Pool)}
+			opts := &domain.InvokeOpts{DB: new(noopdb.Pool)}
 
 			if tc.mockTx != nil {
 				opts.DB = tc.mockTx(ctrl)
@@ -473,7 +473,7 @@ func TestDeleteOrgCommand_Events(t *testing.T) {
 
 			// Given
 			ctrl := gomock.NewController(t)
-			opts := &domain.CommandOpts{DB: new(noopdb.Pool)}
+			opts := &domain.InvokeOpts{DB: new(noopdb.Pool)}
 
 			if tc.mockTx != nil {
 				opts.DB = tc.mockTx(ctrl)

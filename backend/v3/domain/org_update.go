@@ -21,7 +21,7 @@ type UpdateOrgCommand struct {
 }
 
 // Events implements Commander.
-func (u *UpdateOrgCommand) Events(ctx context.Context, opts *CommandOpts) ([]eventstore.Command, error) {
+func (u *UpdateOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
 	toReturn := []eventstore.Command{}
 
 	if u.OldDomainName != nil && *u.OldDomainName != u.Name {
@@ -40,7 +40,7 @@ func NewUpdateOrgCommand(id, name string) *UpdateOrgCommand {
 	}
 }
 
-func (u *UpdateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err error) {
+func (u *UpdateOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	close, err := opts.EnsureTx(ctx)
 	if err != nil {
 		return err
@@ -93,7 +93,7 @@ func (u *UpdateOrgCommand) String() string {
 	return "UpdateOrgCommand"
 }
 
-func (u *UpdateOrgCommand) Validate(ctx context.Context, opts *CommandOpts) error {
+func (u *UpdateOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) error {
 	if u.ID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-lEMhVC", "invalid organization ID")
 	}

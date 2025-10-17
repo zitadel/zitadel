@@ -26,7 +26,7 @@ func NewDeleteOrgCommand(organizationID string) *DeleteOrgCommand {
 //
 // TODO(IAM-Marco): Finish implementation when policies, org settings, idp links and entities repositories
 // are implemented
-func (d *DeleteOrgCommand) Events(ctx context.Context, opts *CommandOpts) ([]eventstore.Command, error) {
+func (d *DeleteOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
 	closeFunc, err := opts.EnsureTx(ctx)
 	if err != nil {
 		return nil, err
@@ -98,7 +98,7 @@ func (d *DeleteOrgCommand) Events(ctx context.Context, opts *CommandOpts) ([]eve
 }
 
 // Execute implements Commander.
-func (d *DeleteOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err error) {
+func (d *DeleteOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	closeFunc, err := opts.EnsureTx(ctx)
 	if err != nil {
 		return err
@@ -146,7 +146,7 @@ func (d *DeleteOrgCommand) String() string {
 }
 
 // Validate implements Commander.
-func (d *DeleteOrgCommand) Validate(ctx context.Context, opts *CommandOpts) (err error) {
+func (d *DeleteOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
 	instance := authz.GetInstance(ctx)
 
 	if d.ID == instance.DefaultOrganisationID() {

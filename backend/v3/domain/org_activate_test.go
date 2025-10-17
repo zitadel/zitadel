@@ -27,7 +27,7 @@ func TestActivateOrgCommand_Events(t *testing.T) {
 	activateCmd := domain.NewActivateOrgCommand("some-id")
 
 	// Test
-	actual, err := activateCmd.Events(context.Background(), &domain.CommandOpts{})
+	actual, err := activateCmd.Events(context.Background(), &domain.InvokeOpts{})
 
 	// Verify
 
@@ -159,7 +159,7 @@ func TestActivateOrgCommand_Validate(t *testing.T) {
 			cmd := domain.NewActivateOrgCommand(tc.inputOrgID)
 			ctx := authz.NewMockContext("instance-1", "", "")
 			ctrl := gomock.NewController(t)
-			opts := &domain.CommandOpts{
+			opts := &domain.InvokeOpts{
 				DB: new(noopdb.Pool),
 			}
 			if tc.orgRepo != nil {
@@ -289,7 +289,7 @@ func TestActivateOrgCommand_Execute(t *testing.T) {
 				ID: tc.inputID,
 			}
 
-			opts := &domain.CommandOpts{
+			opts := &domain.InvokeOpts{
 				DB: new(noopdb.Pool),
 			}
 			if tc.orgRepo != nil {

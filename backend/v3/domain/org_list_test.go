@@ -67,7 +67,7 @@ func TestListOrgsCommand_sorting(t *testing.T) {
 			// Given
 			ctrl := gomock.NewController(t)
 			orgRepo := domainmock.NewOrgRepo(ctrl)
-			l := &domain.ListOrgsCommand{
+			l := &domain.ListOrgsQuery{
 				Request: tc.request,
 			}
 			opts := &database.QueryOpts{}
@@ -119,7 +119,7 @@ func TestListOrgsCommand_pagination(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			// Given
-			l := &domain.ListOrgsCommand{
+			l := &domain.ListOrgsQuery{
 				Request: tc.request,
 			}
 			opts := &database.QueryOpts{}
@@ -263,7 +263,7 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 							orgRepo.IDCondition("org-1"),
 							orgRepo.IDCondition("org-2"),
 							orgRepo.NameCondition(database.TextOperationEqual, "Named Org"),
-							orgRepo.StateCondition(domain.OrgStateActive),
+							orgRepo.StateCondition(OrgStateActive),
 							orgRepo.InstanceIDCondition("instance-1"),
 						))),
 
@@ -330,10 +330,10 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 			// Given
 			ctx := authz.NewMockContext("instance-1", "org-1", "")
 			ctrl := gomock.NewController(t)
-			cmd := &domain.ListOrgsCommand{
+			cmd := &domain.ListOrgsQuery{
 				Request: tc.inputRequest,
 			}
-			opts := &domain.CommandOpts{
+			opts := &domain.InvokeOpts{
 				DB: new(noopdb.Pool),
 			}
 			if tc.repos != nil {
@@ -350,7 +350,7 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 
 			// Verify
 			assert.Equal(t, tc.expectedError, err)
-			assert.ElementsMatch(t, tc.expectedOrganizations, cmd.Result)
+			assert.ElementsMatch(t, tc.expectedOrganizations, cmd.Result())
 		})
 	}
 }
@@ -381,7 +381,7 @@ func TestListOrgsCommand_ResultToGRPC(t *testing.T) {
 					UpdatedAt: now,
 					Domains: []*domain.OrganizationDomain{
 						{Domain: "wrong selected domain"},
-						{Domain: "domain.example.com", IsPrimary: true},
+						{Domain: "example.com", IsPrimary: true},
 					},
 				},
 				{
@@ -405,7 +405,7 @@ func TestListOrgsCommand_ResultToGRPC(t *testing.T) {
 						ChangeDate:   timestamppb.New(now),
 						CreationDate: timestamppb.New(yesterday),
 					},
-					PrimaryDomain: "domain.example.com",
+					PrimaryDomain: "example.com",
 				},
 				{
 					Id:    "org-2",
@@ -425,7 +425,7 @@ func TestListOrgsCommand_ResultToGRPC(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			cmd := &domain.ListOrgsCommand{
+			cmd := &domain.ListOrgsQuery{
 				Result: tc.orgs,
 			}
 
