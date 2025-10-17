@@ -6,26 +6,6 @@ import (
 	"strings"
 )
 
-type InvokeOpt func(*InvokeOpts)
-
-func WithOrganizationRepo(repo OrganizationRepository) InvokeOpt {
-	return func(opts *InvokeOpts) {
-		opts.organizationRepo = repo
-	}
-}
-
-func WithOrganizationDomainRepo(repo OrganizationDomainRepository) InvokeOpt {
-	return func(opts *InvokeOpts) {
-		opts.organizationDomainRepo = repo
-	}
-}
-
-func WithProjectRepo(repo ProjectRepository) InvokeOpt {
-	return func(opts *InvokeOpts) {
-		opts.projectRepo = repo
-	}
-}
-
 type Executor interface {
 	Execute(ctx context.Context, opts *InvokeOpts) (err error)
 	fmt.Stringer

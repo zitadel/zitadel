@@ -337,9 +337,9 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 				DB: new(noopdb.Pool),
 			}
 			if tc.repos != nil {
-				org, domain := tc.repos(ctrl, tc.queryParams...)
-				opts.SetOrgRepo(org)
-				opts.SetOrgDomainRepo(domain)
+				orgRepo, domainRepo := tc.repos(ctrl, tc.queryParams...)
+				domain.WithOrganizationRepo(orgRepo)
+				domain.WithOrganizationDomainRepo(domainRepo)
 			}
 			if tc.queryExecutor != nil {
 				opts.DB = tc.queryExecutor(ctrl)

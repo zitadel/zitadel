@@ -6,6 +6,26 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
+type InvokeOpt func(*InvokeOpts)
+
+func WithOrganizationRepo(repo OrganizationRepository) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.organizationRepo = repo
+	}
+}
+
+func WithOrganizationDomainRepo(repo OrganizationDomainRepository) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.organizationDomainRepo = repo
+	}
+}
+
+func WithProjectRepo(repo ProjectRepository) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.projectRepo = repo
+	}
+}
+
 // InvokeOpts are passed to each command
 // they provide common fields used by commands like the database client.
 type InvokeOpts struct {
@@ -15,20 +35,6 @@ type InvokeOpts struct {
 	organizationRepo       OrganizationRepository
 	organizationDomainRepo OrganizationDomainRepository
 	projectRepo            ProjectRepository
-}
-
-// Setters for tests
-
-func (opts *InvokeOpts) SetOrgRepo(repo OrganizationRepository) {
-	opts.organizationRepo = repo
-}
-
-func (opts *InvokeOpts) SetOrgDomainRepo(repo OrganizationDomainRepository) {
-	opts.organizationDomainRepo = repo
-}
-
-func (opts *InvokeOpts) SetProjectRepo(repo ProjectRepository) {
-	opts.projectRepo = repo
 }
 
 type ensureTxOpts struct {
