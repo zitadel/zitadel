@@ -142,7 +142,7 @@ func TestDeactivateOrgCommand_Validate(t *testing.T) {
 				DB: new(noopdb.Pool),
 			}
 			if tc.orgRepo != nil {
-				domain.WithOrganizationRepo(tc.orgRepo(ctrl))
+				domain.WithOrganizationRepo(tc.orgRepo(ctrl))(opts)
 			}
 			if tc.queryExecutor != nil {
 				opts.DB = tc.queryExecutor(ctrl)
@@ -272,7 +272,7 @@ func TestDeactivateOrgCommand_Execute(t *testing.T) {
 				DB: new(noopdb.Pool),
 			}
 			if tc.orgRepo != nil {
-				domain.WithOrganizationRepo(tc.orgRepo(ctrl))
+				domain.WithOrganizationRepo(tc.orgRepo(ctrl))(opts)
 			}
 			if tc.queryExecutor != nil {
 				opts.DB = tc.queryExecutor(ctrl)

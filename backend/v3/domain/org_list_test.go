@@ -336,8 +336,8 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 			}
 			if tc.repos != nil {
 				orgRepo, domainRepo := tc.repos(ctrl, tc.queryParams...)
-				domain.WithOrganizationRepo(orgRepo)
-				domain.WithOrganizationDomainRepo(domainRepo)
+				domain.WithOrganizationRepo(orgRepo)(opts)
+				domain.WithOrganizationDomainRepo(domainRepo)(opts)
 			}
 			if tc.queryExecutor != nil {
 				opts.DB = tc.queryExecutor(ctrl)

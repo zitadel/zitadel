@@ -36,7 +36,7 @@ type Querier[T any] interface {
 // Invoke provides a way to execute commands within the domain package.
 // It uses a chain of responsibility pattern to handle the command execution.
 // The default chain includes logging, tracing, and event publishing.
-// If you want to invoke multiple commands in a single transaction, you can use the [commandBatch].
+// If you want to invoke multiple commands in a single transaction, you can use the [batchExecutor].
 func Invoke(ctx context.Context, executor Executor, opts ...InvokeOpt) error {
 	invokeOpts := &InvokeOpts{
 		Invoker: newEventStoreInvoker(

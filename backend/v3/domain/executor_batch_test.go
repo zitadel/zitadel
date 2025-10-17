@@ -11,7 +11,7 @@ import (
 	domainmock "github.com/zitadel/zitadel/backend/v3/domain/mock"
 )
 
-func TestBatchCommands(t *testing.T) {
+func TestBatchExecutors(t *testing.T) {
 	// Given
 	mockCtrl := gomock.NewController(t)
 	mockCmd1 := domainmock.NewMockCommander(mockCtrl)

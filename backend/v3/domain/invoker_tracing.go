@@ -15,7 +15,7 @@ func newTraceInvoker(next Invoker) *traceInvoker {
 }
 
 func (i *traceInvoker) Invoke(ctx context.Context, executor Executor, opts *InvokeOpts) (err error) {
-	ctx, span := tracer.Start(ctx, fmt.Sprintf("%T", executor.String()))
+	ctx, span := tracer.Start(ctx, fmt.Sprintf("%T", executor))
 	defer func() {
 		if err != nil {
 			span.RecordError(err)

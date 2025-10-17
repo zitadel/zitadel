@@ -202,10 +202,10 @@ func TestDeleteOrgCommand_Validate(t *testing.T) {
 				opts.DB = tc.mockTx(ctrl)
 			}
 			if tc.orgRepo != nil {
-				domain.WithOrganizationRepo(tc.orgRepo(ctrl))
+				domain.WithOrganizationRepo(tc.orgRepo(ctrl))(opts)
 			}
 			if tc.projectRepo != nil {
-				domain.WithProjectRepo(tc.projectRepo(ctrl))
+				domain.WithProjectRepo(tc.projectRepo(ctrl))(opts)
 			}
 
 			// Test
@@ -414,7 +414,7 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 				opts.DB = tc.mockTx(ctrl)
 			}
 			if tc.orgRepo != nil {
-				domain.WithOrganizationRepo(tc.orgRepo(ctrl))
+				domain.WithOrganizationRepo(tc.orgRepo(ctrl))(opts)
 			}
 
 			// Test

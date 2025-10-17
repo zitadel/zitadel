@@ -45,7 +45,7 @@ type EnsureTransactionOpt func(*ensureTxOpts)
 
 // EnsureTx ensures that the DB is a transaction. If it is not, it will start a new transaction.
 // The returned close function will end the transaction. If the DB is already a transaction, the close function
-// will do nothing because another [Commander] is already responsible for ending the transaction.
+// will be a noop because another [Executor] is already responsible for ending the transaction.
 func (o *InvokeOpts) EnsureTx(ctx context.Context, opts ...EnsureTransactionOpt) (close func(context.Context, error) error, err error) {
 	beginner, ok := o.DB.(database.Beginner)
 	if !ok {
@@ -75,7 +75,7 @@ func (o *InvokeOpts) EnsureTx(ctx context.Context, opts ...EnsureTransactionOpt)
 
 // EnsureClient ensures that the o.DB is a client. If it is not, it will get a new client from the [database.Pool].
 // The returned close function will release the client. If the o.DB is already a client or transaction, the close function
-// will do nothing because another [Commander] is already responsible for releasing the client.
+// will do nothing because another [Executor] is already responsible for releasing the client.
 func (o *InvokeOpts) EnsureClient(ctx context.Context) (close func(_ context.Context) error, err error) {
 	pool, ok := o.DB.(database.Pool)
 	if !ok {

@@ -7,7 +7,7 @@ import (
 	legacy_es "github.com/zitadel/zitadel/internal/eventstore"
 )
 
-// eventStoreInvoker checks if the [Commander].Events function returns any events.
+// eventStoreInvoker checks if the [EventProducer].Events function returns any events.
 // If it does, it collects the events and publishes them to the event store.
 type eventStoreInvoker struct {
 	collector *eventCollector
@@ -19,12 +19,15 @@ func newEventStoreInvoker(next Invoker) *eventStoreInvoker {
 
 type EventProducer interface {
 	// Events returns the events that should be pushed to the event store after the command is executed.
-	// If the command does not produce events, it should return nil or an empty slice.
+	// If the command does not produce events, it should `return nil, nil`.
 	Events(ctx context.Context, opts *InvokeOpts) ([]legacy_es.Command, error)
 }
 
 func (i *eventStoreInvoker) Invoke(ctx context.Context, executor Executor, opts *InvokeOpts) (err error) {
 	close, err := opts.EnsureTx(ctx)
+	if err != nil {
+		return err
+	}
 	defer func() { err = close(ctx, err) }()
 
 	err = i.collector.Invoke(ctx, executor, opts)
