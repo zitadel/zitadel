@@ -44,7 +44,7 @@ func Test_InstancesToPb(t *testing.T) {
 		{
 			Id:   "instance1",
 			Name: "Instance One",
-			Domains: []*instance.Domain{
+			CustomDomains: []*instance.CustomDomain{
 				{
 					Domain:       "example.com",
 					Primary:      true,
@@ -81,8 +81,8 @@ func Test_ListInstancesRequestToModel(t *testing.T) {
 			maxQueryLimit: 1,
 			inputRequest: &instance.ListInstancesRequest{
 				Pagination:    &filter.PaginationRequest{Limit: 10, Offset: 0, Asc: true},
-				SortingColumn: instance.FieldName_FIELD_NAME_ID.Enum(),
-				Queries:       []*instance.Query{{Query: &instance.Query_IdQuery{IdQuery: &instance.IdsQuery{Ids: []string{"instance1", "instance2"}}}}},
+				SortingColumn: instance.FieldName_FIELD_NAME_ID,
+				Filters:       []*instance.Filter{{Filter: &instance.Filter_InIdsFilter{InIdsFilter: &filter.InIDsFilter{Ids: []string{"instance1", "instance2"}}}}},
 			},
 			expectedError: zerrors.ThrowInvalidArgumentf(errors.New("given: 10, allowed: 1"), "QUERY-4M0fs", "Errors.Query.LimitExceeded"),
 		},
@@ -90,8 +90,8 @@ func Test_ListInstancesRequestToModel(t *testing.T) {
 			testName: "when valid request should return instance search query model",
 			inputRequest: &instance.ListInstancesRequest{
 				Pagination:    &filter.PaginationRequest{Limit: 10, Offset: 0, Asc: true},
-				SortingColumn: instance.FieldName_FIELD_NAME_ID.Enum(),
-				Queries:       []*instance.Query{{Query: &instance.Query_IdQuery{IdQuery: &instance.IdsQuery{Ids: []string{"instance1", "instance2"}}}}},
+				SortingColumn: instance.FieldName_FIELD_NAME_ID,
+				Filters:       []*instance.Filter{{Filter: &instance.Filter_InIdsFilter{InIdsFilter: &filter.InIDsFilter{Ids: []string{"instance1", "instance2"}}}}},
 			},
 			expectedResult: &query.InstanceSearchQueries{
 				SearchRequest: query.SearchRequest{
@@ -168,15 +168,15 @@ func Test_instanceQueryToModel(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		searchQuery *instance.Query
+		searchQuery *instance.Filter
 		want        query.SearchQuery
 		wantErr     bool
 	}{
 		{
 			name: "ID Query",
-			searchQuery: &instance.Query{
-				Query: &instance.Query_IdQuery{
-					IdQuery: &instance.IdsQuery{
+			searchQuery: &instance.Filter{
+				Filter: &instance.Filter_InIdsFilter{
+					InIdsFilter: &filter.InIDsFilter{
 						Ids: []string{"instance1"},
 					},
 				},
@@ -186,9 +186,9 @@ func Test_instanceQueryToModel(t *testing.T) {
 		},
 		{
 			name: "Domain Query",
-			searchQuery: &instance.Query{
-				Query: &instance.Query_DomainQuery{
-					DomainQuery: &instance.DomainsQuery{
+			searchQuery: &instance.Filter{
+				Filter: &instance.Filter_CustomDomainsFilter{
+					CustomDomainsFilter: &instance.CustomDomainsFilter{
 						Domains: []string{"example.com"},
 					},
 				},
@@ -198,8 +198,8 @@ func Test_instanceQueryToModel(t *testing.T) {
 		},
 		{
 			name: "Invalid Query",
-			searchQuery: &instance.Query{
-				Query: nil,
+			searchQuery: &instance.Filter{
+				Filter: nil,
 			},
 			want:    nil,
 			wantErr: true,
@@ -241,10 +241,10 @@ func Test_ListCustomDomainsRequestToModel(t *testing.T) {
 			inputRequest: &instance.ListCustomDomainsRequest{
 				Pagination:    &filter.PaginationRequest{Limit: 10, Offset: 0, Asc: true},
 				SortingColumn: instance.DomainFieldName_DOMAIN_FIELD_NAME_DOMAIN,
-				Queries: []*instance.DomainSearchQuery{
+				Filters: []*instance.CustomDomainFilter{
 					{
-						Query: &instance.DomainSearchQuery_DomainQuery{
-							DomainQuery: &instance.DomainQuery{
+						Filter: &instance.CustomDomainFilter_DomainFilter{
+							DomainFilter: &instance.DomainFilter{
 								Method: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS,
 								Domain: "example.com",
 							},
@@ -260,14 +260,15 @@ func Test_ListCustomDomainsRequestToModel(t *testing.T) {
 			inputRequest: &instance.ListCustomDomainsRequest{
 				Pagination:    &filter.PaginationRequest{Limit: 10, Offset: 0, Asc: true},
 				SortingColumn: instance.DomainFieldName_DOMAIN_FIELD_NAME_PRIMARY,
-				Queries: []*instance.DomainSearchQuery{
+				Filters: []*instance.CustomDomainFilter{
 					{
-						Query: &instance.DomainSearchQuery_DomainQuery{
-							DomainQuery: &instance.DomainQuery{Method: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS, Domain: "example.com"}},
+						Filter: &instance.CustomDomainFilter_DomainFilter{
+							DomainFilter: &instance.DomainFilter{Method: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS, Domain: "example.com"}},
 					},
 					{
-						Query: &instance.DomainSearchQuery_GeneratedQuery{
-							GeneratedQuery: &instance.DomainGeneratedQuery{Generated: false}},
+						Filter: &instance.CustomDomainFilter_GeneratedFilter{
+							GeneratedFilter: false,
+						},
 					},
 				},
 			},
@@ -286,9 +287,9 @@ func Test_ListCustomDomainsRequestToModel(t *testing.T) {
 			inputRequest: &instance.ListCustomDomainsRequest{
 				Pagination:    &filter.PaginationRequest{Limit: 10, Offset: 0, Asc: true},
 				SortingColumn: instance.DomainFieldName_DOMAIN_FIELD_NAME_GENERATED,
-				Queries: []*instance.DomainSearchQuery{
+				Filters: []*instance.CustomDomainFilter{
 					{
-						Query: nil,
+						Filter: nil,
 					},
 				},
 			},
@@ -328,10 +329,10 @@ func Test_ListTrustedDomainsRequestToModel(t *testing.T) {
 			inputRequest: &instance.ListTrustedDomainsRequest{
 				Pagination:    &filter.PaginationRequest{Limit: 10, Offset: 0, Asc: true},
 				SortingColumn: instance.TrustedDomainFieldName_TRUSTED_DOMAIN_FIELD_NAME_DOMAIN,
-				Queries: []*instance.TrustedDomainSearchQuery{
+				Filters: []*instance.TrustedDomainFilter{
 					{
-						Query: &instance.TrustedDomainSearchQuery_DomainQuery{
-							DomainQuery: &instance.DomainQuery{
+						Filter: &instance.TrustedDomainFilter_DomainFilter{
+							DomainFilter: &instance.DomainFilter{
 								Method: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS,
 								Domain: "example.com",
 							},
@@ -347,10 +348,10 @@ func Test_ListTrustedDomainsRequestToModel(t *testing.T) {
 			inputRequest: &instance.ListTrustedDomainsRequest{
 				Pagination:    &filter.PaginationRequest{Limit: 10, Offset: 0, Asc: true},
 				SortingColumn: instance.TrustedDomainFieldName_TRUSTED_DOMAIN_FIELD_NAME_CREATION_DATE,
-				Queries: []*instance.TrustedDomainSearchQuery{
+				Filters: []*instance.TrustedDomainFilter{
 					{
-						Query: &instance.TrustedDomainSearchQuery_DomainQuery{
-							DomainQuery: &instance.DomainQuery{Method: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS, Domain: "example.com"}},
+						Filter: &instance.TrustedDomainFilter_DomainFilter{
+							DomainFilter: &instance.DomainFilter{Method: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS, Domain: "example.com"}},
 					},
 				},
 			},
@@ -365,9 +366,9 @@ func Test_ListTrustedDomainsRequestToModel(t *testing.T) {
 			name: "when invalid query should return error",
 			inputRequest: &instance.ListTrustedDomainsRequest{
 				Pagination: &filter.PaginationRequest{Limit: 10, Offset: 0, Asc: true},
-				Queries: []*instance.TrustedDomainSearchQuery{
+				Filters: []*instance.TrustedDomainFilter{
 					{
-						Query: nil,
+						Filter: nil,
 					},
 				},
 			},
