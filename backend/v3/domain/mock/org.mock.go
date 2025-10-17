@@ -22,6 +22,7 @@ import (
 type MockOrganizationRepository struct {
 	ctrl     *gomock.Controller
 	recorder *MockOrganizationRepositoryMockRecorder
+	isgomock struct{}
 }
 
 // MockOrganizationRepositoryMockRecorder is the mock recorder for MockOrganizationRepository.
@@ -42,17 +43,17 @@ func (m *MockOrganizationRepository) EXPECT() *MockOrganizationRepositoryMockRec
 }
 
 // Create mocks base method.
-func (m *MockOrganizationRepository) Create(arg0 context.Context, arg1 database.QueryExecutor, arg2 *domain.Organization) error {
+func (m *MockOrganizationRepository) Create(ctx context.Context, client database.QueryExecutor, org *domain.Organization) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "Create", ctx, client, org)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockOrganizationRepositoryMockRecorder) Create(arg0, arg1, arg2 any) *MockOrganizationRepositoryCreateCall {
+func (mr *MockOrganizationRepositoryMockRecorder) Create(ctx, client, org any) *MockOrganizationRepositoryCreateCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockOrganizationRepository)(nil).Create), arg0, arg1, arg2)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockOrganizationRepository)(nil).Create), ctx, client, org)
 	return &MockOrganizationRepositoryCreateCall{Call: call}
 }
 
@@ -118,18 +119,18 @@ func (c *MockOrganizationRepositoryCreatedAtColumnCall) DoAndReturn(f func() dat
 }
 
 // Delete mocks base method.
-func (m *MockOrganizationRepository) Delete(arg0 context.Context, arg1 database.QueryExecutor, arg2 database.Condition) (int64, error) {
+func (m *MockOrganizationRepository) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Delete", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "Delete", ctx, client, condition)
 	ret0, _ := ret[0].(int64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Delete indicates an expected call of Delete.
-func (mr *MockOrganizationRepositoryMockRecorder) Delete(arg0, arg1, arg2 any) *MockOrganizationRepositoryDeleteCall {
+func (mr *MockOrganizationRepositoryMockRecorder) Delete(ctx, client, condition any) *MockOrganizationRepositoryDeleteCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockOrganizationRepository)(nil).Delete), arg0, arg1, arg2)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockOrganizationRepository)(nil).Delete), ctx, client, condition)
 	return &MockOrganizationRepositoryDeleteCall{Call: call}
 }
 
@@ -157,17 +158,17 @@ func (c *MockOrganizationRepositoryDeleteCall) DoAndReturn(f func(context.Contex
 }
 
 // ExistsDomain mocks base method.
-func (m *MockOrganizationRepository) ExistsDomain(arg0 database.Condition) database.Condition {
+func (m *MockOrganizationRepository) ExistsDomain(cond database.Condition) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ExistsDomain", arg0)
+	ret := m.ctrl.Call(m, "ExistsDomain", cond)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // ExistsDomain indicates an expected call of ExistsDomain.
-func (mr *MockOrganizationRepositoryMockRecorder) ExistsDomain(arg0 any) *MockOrganizationRepositoryExistsDomainCall {
+func (mr *MockOrganizationRepositoryMockRecorder) ExistsDomain(cond any) *MockOrganizationRepositoryExistsDomainCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExistsDomain", reflect.TypeOf((*MockOrganizationRepository)(nil).ExistsDomain), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExistsDomain", reflect.TypeOf((*MockOrganizationRepository)(nil).ExistsDomain), cond)
 	return &MockOrganizationRepositoryExistsDomainCall{Call: call}
 }
 
@@ -194,11 +195,49 @@ func (c *MockOrganizationRepositoryExistsDomainCall) DoAndReturn(f func(database
 	return c
 }
 
-// Get mocks base method.
-func (m *MockOrganizationRepository) Get(arg0 context.Context, arg1 database.QueryExecutor, arg2 ...database.QueryOption) (*domain.Organization, error) {
+// ExistsMetadata mocks base method.
+func (m *MockOrganizationRepository) ExistsMetadata(cond database.Condition) database.Condition {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1}
-	for _, a := range arg2 {
+	ret := m.ctrl.Call(m, "ExistsMetadata", cond)
+	ret0, _ := ret[0].(database.Condition)
+	return ret0
+}
+
+// ExistsMetadata indicates an expected call of ExistsMetadata.
+func (mr *MockOrganizationRepositoryMockRecorder) ExistsMetadata(cond any) *MockOrganizationRepositoryExistsMetadataCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExistsMetadata", reflect.TypeOf((*MockOrganizationRepository)(nil).ExistsMetadata), cond)
+	return &MockOrganizationRepositoryExistsMetadataCall{Call: call}
+}
+
+// MockOrganizationRepositoryExistsMetadataCall wrap *gomock.Call
+type MockOrganizationRepositoryExistsMetadataCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockOrganizationRepositoryExistsMetadataCall) Return(arg0 database.Condition) *MockOrganizationRepositoryExistsMetadataCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockOrganizationRepositoryExistsMetadataCall) Do(f func(database.Condition) database.Condition) *MockOrganizationRepositoryExistsMetadataCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockOrganizationRepositoryExistsMetadataCall) DoAndReturn(f func(database.Condition) database.Condition) *MockOrganizationRepositoryExistsMetadataCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// Get mocks base method.
+func (m *MockOrganizationRepository) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Organization, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, client}
+	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Get", varargs...)
@@ -208,9 +247,9 @@ func (m *MockOrganizationRepository) Get(arg0 context.Context, arg1 database.Que
 }
 
 // Get indicates an expected call of Get.
-func (mr *MockOrganizationRepositoryMockRecorder) Get(arg0, arg1 any, arg2 ...any) *MockOrganizationRepositoryGetCall {
+func (mr *MockOrganizationRepositoryMockRecorder) Get(ctx, client any, opts ...any) *MockOrganizationRepositoryGetCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1}, arg2...)
+	varargs := append([]any{ctx, client}, opts...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockOrganizationRepository)(nil).Get), varargs...)
 	return &MockOrganizationRepositoryGetCall{Call: call}
 }
@@ -277,17 +316,17 @@ func (c *MockOrganizationRepositoryIDColumnCall) DoAndReturn(f func() database.C
 }
 
 // IDCondition mocks base method.
-func (m *MockOrganizationRepository) IDCondition(arg0 string) database.Condition {
+func (m *MockOrganizationRepository) IDCondition(instanceID string) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IDCondition", arg0)
+	ret := m.ctrl.Call(m, "IDCondition", instanceID)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // IDCondition indicates an expected call of IDCondition.
-func (mr *MockOrganizationRepositoryMockRecorder) IDCondition(arg0 any) *MockOrganizationRepositoryIDConditionCall {
+func (mr *MockOrganizationRepositoryMockRecorder) IDCondition(instanceID any) *MockOrganizationRepositoryIDConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IDCondition", reflect.TypeOf((*MockOrganizationRepository)(nil).IDCondition), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IDCondition", reflect.TypeOf((*MockOrganizationRepository)(nil).IDCondition), instanceID)
 	return &MockOrganizationRepositoryIDConditionCall{Call: call}
 }
 
@@ -353,17 +392,17 @@ func (c *MockOrganizationRepositoryInstanceIDColumnCall) DoAndReturn(f func() da
 }
 
 // InstanceIDCondition mocks base method.
-func (m *MockOrganizationRepository) InstanceIDCondition(arg0 string) database.Condition {
+func (m *MockOrganizationRepository) InstanceIDCondition(instanceID string) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "InstanceIDCondition", arg0)
+	ret := m.ctrl.Call(m, "InstanceIDCondition", instanceID)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // InstanceIDCondition indicates an expected call of InstanceIDCondition.
-func (mr *MockOrganizationRepositoryMockRecorder) InstanceIDCondition(arg0 any) *MockOrganizationRepositoryInstanceIDConditionCall {
+func (mr *MockOrganizationRepositoryMockRecorder) InstanceIDCondition(instanceID any) *MockOrganizationRepositoryInstanceIDConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InstanceIDCondition", reflect.TypeOf((*MockOrganizationRepository)(nil).InstanceIDCondition), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InstanceIDCondition", reflect.TypeOf((*MockOrganizationRepository)(nil).InstanceIDCondition), instanceID)
 	return &MockOrganizationRepositoryInstanceIDConditionCall{Call: call}
 }
 
@@ -391,10 +430,10 @@ func (c *MockOrganizationRepositoryInstanceIDConditionCall) DoAndReturn(f func(s
 }
 
 // List mocks base method.
-func (m *MockOrganizationRepository) List(arg0 context.Context, arg1 database.QueryExecutor, arg2 ...database.QueryOption) ([]*domain.Organization, error) {
+func (m *MockOrganizationRepository) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Organization, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1}
-	for _, a := range arg2 {
+	varargs := []any{ctx, client}
+	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "List", varargs...)
@@ -404,9 +443,9 @@ func (m *MockOrganizationRepository) List(arg0 context.Context, arg1 database.Qu
 }
 
 // List indicates an expected call of List.
-func (mr *MockOrganizationRepositoryMockRecorder) List(arg0, arg1 any, arg2 ...any) *MockOrganizationRepositoryListCall {
+func (mr *MockOrganizationRepositoryMockRecorder) List(ctx, client any, opts ...any) *MockOrganizationRepositoryListCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1}, arg2...)
+	varargs := append([]any{ctx, client}, opts...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockOrganizationRepository)(nil).List), varargs...)
 	return &MockOrganizationRepositoryListCall{Call: call}
 }
@@ -472,6 +511,44 @@ func (c *MockOrganizationRepositoryLoadDomainsCall) DoAndReturn(f func() domain.
 	return c
 }
 
+// LoadMetadata mocks base method.
+func (m *MockOrganizationRepository) LoadMetadata() domain.OrganizationRepository {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LoadMetadata")
+	ret0, _ := ret[0].(domain.OrganizationRepository)
+	return ret0
+}
+
+// LoadMetadata indicates an expected call of LoadMetadata.
+func (mr *MockOrganizationRepositoryMockRecorder) LoadMetadata() *MockOrganizationRepositoryLoadMetadataCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadMetadata", reflect.TypeOf((*MockOrganizationRepository)(nil).LoadMetadata))
+	return &MockOrganizationRepositoryLoadMetadataCall{Call: call}
+}
+
+// MockOrganizationRepositoryLoadMetadataCall wrap *gomock.Call
+type MockOrganizationRepositoryLoadMetadataCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockOrganizationRepositoryLoadMetadataCall) Return(arg0 domain.OrganizationRepository) *MockOrganizationRepositoryLoadMetadataCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockOrganizationRepositoryLoadMetadataCall) Do(f func() domain.OrganizationRepository) *MockOrganizationRepositoryLoadMetadataCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockOrganizationRepositoryLoadMetadataCall) DoAndReturn(f func() domain.OrganizationRepository) *MockOrganizationRepositoryLoadMetadataCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // NameColumn mocks base method.
 func (m *MockOrganizationRepository) NameColumn() database.Column {
 	m.ctrl.T.Helper()
@@ -511,17 +588,17 @@ func (c *MockOrganizationRepositoryNameColumnCall) DoAndReturn(f func() database
 }
 
 // NameCondition mocks base method.
-func (m *MockOrganizationRepository) NameCondition(arg0 database.TextOperation, arg1 string) database.Condition {
+func (m *MockOrganizationRepository) NameCondition(op database.TextOperation, name string) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "NameCondition", arg0, arg1)
+	ret := m.ctrl.Call(m, "NameCondition", op, name)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // NameCondition indicates an expected call of NameCondition.
-func (mr *MockOrganizationRepositoryMockRecorder) NameCondition(arg0, arg1 any) *MockOrganizationRepositoryNameConditionCall {
+func (mr *MockOrganizationRepositoryMockRecorder) NameCondition(op, name any) *MockOrganizationRepositoryNameConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NameCondition", reflect.TypeOf((*MockOrganizationRepository)(nil).NameCondition), arg0, arg1)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NameCondition", reflect.TypeOf((*MockOrganizationRepository)(nil).NameCondition), op, name)
 	return &MockOrganizationRepositoryNameConditionCall{Call: call}
 }
 
@@ -549,17 +626,17 @@ func (c *MockOrganizationRepositoryNameConditionCall) DoAndReturn(f func(databas
 }
 
 // SetName mocks base method.
-func (m *MockOrganizationRepository) SetName(arg0 string) database.Change {
+func (m *MockOrganizationRepository) SetName(name string) database.Change {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetName", arg0)
+	ret := m.ctrl.Call(m, "SetName", name)
 	ret0, _ := ret[0].(database.Change)
 	return ret0
 }
 
 // SetName indicates an expected call of SetName.
-func (mr *MockOrganizationRepositoryMockRecorder) SetName(arg0 any) *MockOrganizationRepositorySetNameCall {
+func (mr *MockOrganizationRepositoryMockRecorder) SetName(name any) *MockOrganizationRepositorySetNameCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetName", reflect.TypeOf((*MockOrganizationRepository)(nil).SetName), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetName", reflect.TypeOf((*MockOrganizationRepository)(nil).SetName), name)
 	return &MockOrganizationRepositorySetNameCall{Call: call}
 }
 
@@ -587,17 +664,17 @@ func (c *MockOrganizationRepositorySetNameCall) DoAndReturn(f func(string) datab
 }
 
 // SetState mocks base method.
-func (m *MockOrganizationRepository) SetState(arg0 domain.OrgState) database.Change {
+func (m *MockOrganizationRepository) SetState(state domain.OrgState) database.Change {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetState", arg0)
+	ret := m.ctrl.Call(m, "SetState", state)
 	ret0, _ := ret[0].(database.Change)
 	return ret0
 }
 
 // SetState indicates an expected call of SetState.
-func (mr *MockOrganizationRepositoryMockRecorder) SetState(arg0 any) *MockOrganizationRepositorySetStateCall {
+func (mr *MockOrganizationRepositoryMockRecorder) SetState(state any) *MockOrganizationRepositorySetStateCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetState", reflect.TypeOf((*MockOrganizationRepository)(nil).SetState), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetState", reflect.TypeOf((*MockOrganizationRepository)(nil).SetState), state)
 	return &MockOrganizationRepositorySetStateCall{Call: call}
 }
 
@@ -663,17 +740,17 @@ func (c *MockOrganizationRepositoryStateColumnCall) DoAndReturn(f func() databas
 }
 
 // StateCondition mocks base method.
-func (m *MockOrganizationRepository) StateCondition(arg0 domain.OrgState) database.Condition {
+func (m *MockOrganizationRepository) StateCondition(state domain.OrgState) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "StateCondition", arg0)
+	ret := m.ctrl.Call(m, "StateCondition", state)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // StateCondition indicates an expected call of StateCondition.
-func (mr *MockOrganizationRepositoryMockRecorder) StateCondition(arg0 any) *MockOrganizationRepositoryStateConditionCall {
+func (mr *MockOrganizationRepositoryMockRecorder) StateCondition(state any) *MockOrganizationRepositoryStateConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StateCondition", reflect.TypeOf((*MockOrganizationRepository)(nil).StateCondition), arg0)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StateCondition", reflect.TypeOf((*MockOrganizationRepository)(nil).StateCondition), state)
 	return &MockOrganizationRepositoryStateConditionCall{Call: call}
 }
 
@@ -701,10 +778,10 @@ func (c *MockOrganizationRepositoryStateConditionCall) DoAndReturn(f func(domain
 }
 
 // Update mocks base method.
-func (m *MockOrganizationRepository) Update(arg0 context.Context, arg1 database.QueryExecutor, arg2 database.Condition, arg3 ...database.Change) (int64, error) {
+func (m *MockOrganizationRepository) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1, arg2}
-	for _, a := range arg3 {
+	varargs := []any{ctx, client, condition}
+	for _, a := range changes {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Update", varargs...)
@@ -714,9 +791,9 @@ func (m *MockOrganizationRepository) Update(arg0 context.Context, arg1 database.
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockOrganizationRepositoryMockRecorder) Update(arg0, arg1, arg2 any, arg3 ...any) *MockOrganizationRepositoryUpdateCall {
+func (mr *MockOrganizationRepositoryMockRecorder) Update(ctx, client, condition any, changes ...any) *MockOrganizationRepositoryUpdateCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1, arg2}, arg3...)
+	varargs := append([]any{ctx, client, condition}, changes...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockOrganizationRepository)(nil).Update), varargs...)
 	return &MockOrganizationRepositoryUpdateCall{Call: call}
 }

@@ -6,20 +6,21 @@ import (
 	"strings"
 )
 
-// executorBatch is a batch of commands.
-// It uses the [Invoker] provided by the opts to execute each command.
-type executorBatch struct {
+// batchExecutor is a batch of [Executor]s.
+// It uses the [Invoker]s provided by the opts to execute each [Executor].
+// The [Executor] is sent to all [Invoker]s before moving to the next [Executor].
+type batchExecutor struct {
 	executors []Executor
 }
 
-func BatchExecutor(executors ...Executor) *executorBatch {
-	return &executorBatch{
+func BatchExecutor(executors ...Executor) *batchExecutor {
+	return &batchExecutor{
 		executors: executors,
 	}
 }
 
 // String implements [Executor].
-func (cmd *executorBatch) String() string {
+func (cmd *batchExecutor) String() string {
 	names := make([]string, len(cmd.executors))
 	for i, c := range cmd.executors {
 		names[i] = c.String()
@@ -28,7 +29,7 @@ func (cmd *executorBatch) String() string {
 }
 
 // Execute implements [Executor].
-func (b *executorBatch) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
+func (b *batchExecutor) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	for _, cmd := range b.executors {
 		if err = opts.Invoke(ctx, cmd); err != nil {
 			return err
@@ -37,4 +38,4 @@ func (b *executorBatch) Execute(ctx context.Context, opts *InvokeOpts) (err erro
 	return nil
 }
 
-var _ Executor = (*executorBatch)(nil)
+var _ Executor = (*batchExecutor)(nil)

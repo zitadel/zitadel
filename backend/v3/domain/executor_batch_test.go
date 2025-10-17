@@ -18,15 +18,19 @@ func TestBatchCommands(t *testing.T) {
 	mockCmd2 := domainmock.NewMockCommander(mockCtrl)
 	mockCmd3 := domainmock.NewMockCommander(mockCtrl)
 
+	mockCmd1.EXPECT().String().Return("cmd1").AnyTimes()
+	mockCmd2.EXPECT().String().Return("cmd2").AnyTimes()
+	mockCmd3.EXPECT().String().Return("cmd3").AnyTimes()
+
 	gomock.InOrder(
 		mockCmd1.EXPECT().Validate(gomock.Any(), gomock.Any()).Times(1),
-		mockCmd2.EXPECT().Validate(gomock.Any(), gomock.Any()).Times(1),
-		mockCmd3.EXPECT().Validate(gomock.Any(), gomock.Any()).Times(1),
 		mockCmd1.EXPECT().Execute(gomock.Any(), gomock.Any()).Times(1),
-		mockCmd2.EXPECT().Execute(gomock.Any(), gomock.Any()).Times(1),
-		mockCmd3.EXPECT().Execute(gomock.Any(), gomock.Any()).Times(1),
 		mockCmd1.EXPECT().Events(gomock.Any(), gomock.Any()).Times(1),
+		mockCmd2.EXPECT().Validate(gomock.Any(), gomock.Any()).Times(1),
+		mockCmd2.EXPECT().Execute(gomock.Any(), gomock.Any()).Times(1),
 		mockCmd2.EXPECT().Events(gomock.Any(), gomock.Any()).Times(1),
+		mockCmd3.EXPECT().Validate(gomock.Any(), gomock.Any()).Times(1),
+		mockCmd3.EXPECT().Execute(gomock.Any(), gomock.Any()).Times(1),
 		mockCmd3.EXPECT().Events(gomock.Any(), gomock.Any()).Times(1),
 	)
 

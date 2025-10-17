@@ -90,6 +90,8 @@ type projectChanges interface {
 	SetUsedLabelingSettingOwner(usedLabelingSettingOwner int16) database.Change
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/project.mock.go . ProjectRepository
+
 // ProjectRepository manages projects and project roles.
 type ProjectRepository interface {
 	projectColumns

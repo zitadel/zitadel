@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/commander.mock.go . Executor
 type Executor interface {
 	Execute(ctx context.Context, opts *InvokeOpts) (err error)
 	fmt.Stringer
@@ -20,6 +21,8 @@ type Commander interface {
 	EventProducer
 	Executor
 }
+
+//go:generate mockgen -typed -package domainmock -destination ./mock/querier.mock.go . Querier
 
 // Querier used to query data.
 type Querier[T any] interface {
