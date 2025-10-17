@@ -6,6 +6,7 @@ import { supportedLanguages } from 'src/app/utils/language';
 
 @Pipe({
   name: 'localizedDate',
+  standalone: false,
 })
 export class LocalizedDatePipe implements PipeTransform {
   constructor(private translateService: TranslateService) {}

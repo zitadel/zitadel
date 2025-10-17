@@ -20,6 +20,7 @@ import {
   updateHuman,
 } from "@/lib/zitadel";
 import { ConnectError, create } from "@zitadel/client";
+import { redirect } from "next/navigation";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
@@ -72,7 +73,7 @@ export default async function Page(props: {
 }) {
   const params = await props.params;
   const searchParams = await props.searchParams;
-  let { id, token, requestId, organization, link } = searchParams;
+  let { id, token, requestId, organization, link, postErrorRedirectUrl } = searchParams;
   const { provider } = params;
 
   const _headers = await headers();
@@ -275,7 +276,12 @@ export default async function Page(props: {
     }
 
     if (!orgToRegisterOn) {
-      return loginFailed(branding, "No organization found for registration");
+      // Redirect to registration-failed page - couldn't determine organization for registration
+      const queryParams = new URLSearchParams();
+      if (requestId) queryParams.set("requestId", requestId);
+      if (organization) queryParams.set("organization", organization);
+      if (postErrorRedirectUrl) queryParams.set("postErrorRedirectUrl", postErrorRedirectUrl);
+      redirect(`/idp/${provider}/registration-failed?${queryParams.toString()}`);
     }
 
     return completeIDP({
@@ -293,19 +299,27 @@ export default async function Page(props: {
   if (newUser) {
     return (
       <DynamicTheme branding={branding}>
-        <div className="flex flex-col items-center space-y-4">
+        <div className="flex flex-col space-y-4">
           <h1>
             <Translated i18nKey="registerSuccess.title" namespace="idp" />
           </h1>
           <p className="ztdl-p">
             <Translated i18nKey="registerSuccess.description" namespace="idp" />
           </p>
+        </div>
+
+        <div className="w-full">
           <IdpSignin userId={newUser.userId} idpIntent={{ idpIntentId: id, idpIntentToken: token }} requestId={requestId} />
         </div>
       </DynamicTheme>
     );
   }
 
-  // return login failed if no linking or creation is allowed and no user was found
-  return loginFailed(branding, "No user found");
+  // Redirect to account-not-found page with postErrorRedirectUrl
+  // This provides a graceful fallback when no user was found and creation/linking is not allowed
+  const queryParams = new URLSearchParams();
+  if (requestId) queryParams.set("requestId", requestId);
+  if (organization) queryParams.set("organization", organization);
+  if (postErrorRedirectUrl) queryParams.set("postErrorRedirectUrl", postErrorRedirectUrl);
+  redirect(`/idp/${provider}/account-not-found?${queryParams.toString()}`);
 }

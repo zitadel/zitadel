@@ -22,6 +22,7 @@ import { SmtpTestDialogComponent } from '../smtp-test-dialog/smtp-test-dialog.co
   selector: 'cnsl-smtp-table',
   templateUrl: './smtp-table.component.html',
   styleUrls: ['./smtp-table.component.scss'],
+  standalone: false,
 })
 export class SMTPTableComponent implements OnInit {
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
