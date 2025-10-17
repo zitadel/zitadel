@@ -15,7 +15,6 @@ import (
 )
 
 func (s *Server) CreateApplication(ctx context.Context, req *connect.Request[app.CreateApplicationRequest]) (*connect.Response[app.CreateApplicationResponse], error) {
-	// TODO add milestone here
 	switch t := req.Msg.GetCreationRequestType().(type) {
 	case *app.CreateApplicationRequest_ApiRequest:
 		apiApp, err := s.command.AddAPIApplication(ctx, convert.CreateAPIApplicationRequestToDomain(req.Msg.GetName(), req.Msg.GetProjectId(), req.Msg.GetId(), t.ApiRequest), "")
@@ -35,7 +34,6 @@ func (s *Server) CreateApplication(ctx context.Context, req *connect.Request[app
 		}), nil
 
 	case *app.CreateApplicationRequest_OidcRequest:
-		// TODO add milestone here
 		oidcAppRequest, err := convert.CreateOIDCAppRequestToDomain(req.Msg.GetName(), req.Msg.GetProjectId(), req.Msg.GetOidcRequest())
 		if err != nil {
 			return nil, err
