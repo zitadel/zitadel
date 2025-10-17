@@ -318,6 +318,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
       userId: session?.factors?.user?.id,
     });
   } catch (error) {
+    console.error("Error fetching user by ID:", error);
     return { error: t("verify.errors.couldNotGetUser") };
   }
 
