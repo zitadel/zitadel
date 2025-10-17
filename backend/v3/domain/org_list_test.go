@@ -263,7 +263,7 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 							orgRepo.IDCondition("org-1"),
 							orgRepo.IDCondition("org-2"),
 							orgRepo.NameCondition(database.TextOperationEqual, "Named Org"),
-							orgRepo.StateCondition(OrgStateActive),
+							orgRepo.StateCondition(domain.OrgStateActive),
 							orgRepo.InstanceIDCondition("instance-1"),
 						))),
 
