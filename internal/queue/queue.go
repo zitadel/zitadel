@@ -67,12 +67,6 @@ func (q *Queue) Start(ctx context.Context) (err error) {
 	return q.client.Start(ctx)
 }
 
-// The actual execution of the Service Ping Report is triggered by enqueuing a job of type ServicePingReport
-// into the queue (see serviceping.Worker and its registration). The worker is registered here, but the
-// actual "run" happens when a job is inserted and processed by the worker. For example, see
-// internal/serviceping/worker.go: the Work method of the Worker is called by the queue system when a job is available.
-//
-// This method registers workers (including the ServicePingReport worker) to the queue system.
 func (q *Queue) AddWorkers(w ...Worker) {
 	if q == nil {
 		logging.Info("skip adding workers because queue is not set")

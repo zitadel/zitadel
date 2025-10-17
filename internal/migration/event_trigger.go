@@ -10,10 +10,8 @@ const (
 )
 
 // EventTrigger registers triggers that record INSERT/UPDATE/DELETE
-// occurrences into projections.service_ping_resource_events using
-// projections.record_service_ping_resource_event.
-//
-// This migration repeats when any of the arguments are changed.
+// occurrences into projections.service_ping_resource_events
+
 func EventTrigger(
 	db *database.DB,
 	table string,
@@ -56,23 +54,3 @@ func EventTriggerConditional(
 		templateName: eventTriggerTmpl,
 	}
 }
-
-// // String implements [Migration] and [fmt.Stringer].
-// func (m *triggerMigration) String() string {
-// 	// keep existing format but distinguish by template name
-// 	return fmt.Sprintf("repeatable_%s_%s", m.Resource, m.templateName)
-// }
-
-// Execute implements [Migration] (delegates to shared templates executor)
-// func (m *triggerMigration) Execute(ctx context.Context, _ eventstore.Event) error {
-// 	var query strings.Builder
-// 	err := templates.ExecuteTemplate(&query, m.templateName, m.triggerConfig)
-// 	if err != nil {
-// 		return fmt.Errorf("%s: execute trigger template: %w", m, err)
-// 	}
-// 	_, err = m.db.ExecContext(ctx, query.String())
-// 	if err != nil {
-// 		return fmt.Errorf("%s: exec trigger query: %w", m, err)
-// 	}
-// 	return nil
-// }

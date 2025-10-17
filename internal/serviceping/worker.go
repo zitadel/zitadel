@@ -57,10 +57,6 @@ type Queue interface {
 
 // Register implements the [queue.Worker] interface.
 func (w *Worker) Register(workers *river.Workers, queues map[string]river.QueueConfig) {
-	// river.AddWorker registers this worker (w) to handle jobs of type ServicePingReport in the river.Workers registry.
-	// The worker is triggered whenever a ServicePingReport job is enqueued in the "service_ping_report" queue.
-	// Jobs of this type are enqueued by calling the Insert method of the Queue interface with a ServicePingReport as the job argument.
-	// To find where jobs are enqueued, search for usages of Insert with QueueName ("service_ping_report") or for Insert calls with ServicePingReport as the argument.
 	river.AddWorker[*ServicePingReport](workers, w)
 	queues[QueueName] = river.QueueConfig{
 		MaxWorkers: 1, // for now, we only use a single worker to prevent too much side effects on other queues

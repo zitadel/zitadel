@@ -20,7 +20,7 @@
   <h1>{{ 'APP.PAGES.CREATE_DESC_TITLE' | translate }}</h1>
   <mat-progress-bar class="progress-bar" color="primary" *ngIf="loading" mode="indeterminate"></mat-progress-bar>
 
-  <mat-checkbox class="proswitch" color="primary" [(ngModel)]="pro">
+  <mat-checkbox class="proswitch" color="primary" [(ngModel)]="pro" (click)="analyticsService.emitAnalyticsEvent($event, 'click', 'proswitch toggle', {'new_value': pro})">
     {{ 'APP.PROSWITCH' | translate }}
   </mat-checkbox>
 
@@ -398,7 +398,7 @@
 
       <div class="app-create-actions">
         <button mat-stroked-button matStepperPrevious class="bck-button">{{ 'ACTIONS.BACK' | translate }}</button>
-        <button mat-raised-button class="create-button" color="primary" (click)="createApp()" data-e2e="create-button">
+        <button mat-raised-button class="create-button" color="primary" (click)="createApp(); analyticsService.emitAnalyticsEvent($event, 'click', 'app-create-button-project-page', {})" data-e2e="create-button">
           {{ 'ACTIONS.CREATE' | translate }}
         </button>
       </div>

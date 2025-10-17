@@ -41,6 +41,7 @@ import {
 } from '../authmethods';
 import { API_TYPE, AppCreateType, NATIVE_TYPE, RadioItemAppType, SAML_TYPE, USER_AGENT_TYPE, WEB_TYPE } from '../authtypes';
 import { EnvironmentService } from 'src/app/services/environment.service';
+import { AnalyticsService } from 'src/app/services/analytics.service';
 
 const MAX_ALLOWED_SIZE = 1 * 1024 * 1024;
 
@@ -133,6 +134,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     private _location: Location,
     private breadcrumbService: BreadcrumbService,
     private envSvc: EnvironmentService,
+    public analyticsService: AnalyticsService,
   ) {
     this.form = this.fb.group({
       name: ['', [requiredValidator]],

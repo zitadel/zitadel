@@ -3,7 +3,6 @@ CREATE SCHEMA IF NOT EXISTS analytics;
 CREATE TABLE IF NOT EXISTS analytics.events
 (
     id BIGSERIAL PRIMARY KEY,
-    instance_id TEXT NOT NULL,
-    event JSONB NOT NULL,
-    occurred_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    occurred_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    event_data JSONB NOT NULL
 );
