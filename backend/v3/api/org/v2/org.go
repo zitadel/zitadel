@@ -55,7 +55,7 @@ func UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org
 	domainSetPrimaryCmd := domain.NewSetPrimaryOrgDomainCommand(request.Msg.GetId(), request.Msg.GetName())
 	domainRemoveCmd := domain.NewRemoveOrgDomainCommand(request.Msg.GetId(), orgUpdtCmd.OldDomainName, orgUpdtCmd.IsOldDomainVerified)
 
-	batchCmd := domain.BatchExecutors(orgUpdtCmd, domainAddCmd, domainSetPrimaryCmd, domainRemoveCmd)
+	batchCmd := domain.BatchExecutor(orgUpdtCmd, domainAddCmd, domainSetPrimaryCmd, domainRemoveCmd)
 
 	err := domain.Invoke(ctx, batchCmd, domain.WithOrganizationRepo(repository.OrganizationRepository()))
 	if err != nil {
