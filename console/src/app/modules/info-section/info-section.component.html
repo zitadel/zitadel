@@ -11,7 +11,7 @@
   <i *ngIf="type === infoSectionType.WARN" class="icon las la-exclamation"></i>
   <i *ngIf="type === infoSectionType.ALERT" class="icon las la-exclamation"></i>
 
-  <div class="info-section-content">
+  <div class="info-section-content" (click)="analyticsService.emitAnalyticsEvent($event, 'click', 'info_section_clicked', {})">
     <ng-content></ng-content>
   </div>
 </div>

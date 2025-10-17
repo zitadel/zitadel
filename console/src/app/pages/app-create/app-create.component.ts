@@ -12,6 +12,7 @@ import { Framework } from 'src/app/components/quickstart/quickstart.component';
 import frameworkDefinition from '../../../../../docs/frameworks.json';
 import { NavigationService } from 'src/app/services/navigation.service';
 import { Location } from '@angular/common';
+import { AnalyticsService } from 'src/app/services/analytics.service';
 
 @Component({
   selector: 'cnsl-app-create',
@@ -50,6 +51,7 @@ export class AppCreateComponent implements OnDestroy {
     activatedRoute: ActivatedRoute,
     private _location: Location,
     private navigation: NavigationService,
+    public analyticsService: AnalyticsService,
   ) {
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,
@@ -146,4 +148,5 @@ export class AppCreateComponent implements OnDestroy {
         this.error.set(message);
       });
   }
+
 }

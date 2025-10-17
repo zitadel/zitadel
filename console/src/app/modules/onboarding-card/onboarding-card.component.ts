@@ -1,6 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { AdminService } from 'src/app/services/admin.service';
+import { AnalyticsService } from 'src/app/services/analytics.service';
 import { ONBOARDING_MILESTONES } from 'src/app/utils/onboarding';
 
 @Component({
@@ -15,7 +16,10 @@ export class OnboardingCardComponent implements OnInit {
   public actions = this.adminService.progressMilestones;
   @Output() public dismissedCard: EventEmitter<void> = new EventEmitter();
 
-  constructor(public adminService: AdminService) {}
+  constructor(
+    public adminService: AdminService,
+    public analyticsService: AnalyticsService
+  ) {}
 
   public dismiss(): void {
     this.dismissedCard.emit();

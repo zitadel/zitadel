@@ -15,15 +15,15 @@ import (
 const (
 	expCountTriggerQuery = `-- In case the old trigger exists, drop it to prevent duplicated counts.
 	DROP TRIGGER IF EXISTS count_resource ON table;
-	
+
 	CREATE OR REPLACE TRIGGER count_resource_insert
     AFTER INSERT
     ON table
     FOR EACH ROW
 	-- Only count if the conditions are met in the newly added row.
     EXECUTE FUNCTION projections.count_resource(
-        'instance', 
-        'instance_id', 
+        'instance',
+        'instance_id',
         'parent_id',
         'resource'
     );
@@ -34,8 +34,8 @@ const (
     FOR EACH ROW
     -- Only count down if the conditions were met in the old / deleted row.
     EXECUTE FUNCTION projections.count_resource(
-        'instance', 
-        'instance_id', 
+        'instance',
+        'instance_id',
         'parent_id',
         'resource'
     );
@@ -72,7 +72,7 @@ UPDATE SET updated_at = now(), amount = EXCLUDED.amount;`
 
 	expCountTriggerConditionalQuery = `-- In case the old trigger exists, drop it to prevent duplicated counts.
 	DROP TRIGGER IF EXISTS count_resource ON table;
-	
+
 	CREATE OR REPLACE TRIGGER count_resource_insert
     AFTER INSERT
     ON table
@@ -80,8 +80,8 @@ UPDATE SET updated_at = now(), amount = EXCLUDED.amount;`
     -- Only count if the conditions are met in the newly added row.
 	WHEN ((NEW.col1 = 'value1' OR NEW.col2 = 'value1'))
     EXECUTE FUNCTION projections.count_resource(
-        'instance', 
-        'instance_id', 
+        'instance',
+        'instance_id',
         'parent_id',
         'resource'
     );
@@ -93,8 +93,8 @@ UPDATE SET updated_at = now(), amount = EXCLUDED.amount;`
     -- Only count down if the conditions were met in the old / deleted row.
 	WHEN ((OLD.col1 = 'value1' OR OLD.col2 = 'value1'))
     EXECUTE FUNCTION projections.count_resource(
-        'instance', 
-        'instance_id', 
+        'instance',
+        'instance_id',
         'parent_id',
         'resource'
     );
@@ -106,8 +106,8 @@ UPDATE SET updated_at = now(), amount = EXCLUDED.amount;`
 	-- Only count up if the conditions are met in the new state, but were not in the old.
 	WHEN ((NEW.col1 = 'value1' OR NEW.col2 = 'value1') AND (OLD.col1 <> 'value1' AND OLD.col2 <> 'value1'))
     EXECUTE FUNCTION projections.count_resource(
-        'instance', 
-        'instance_id', 
+        'instance',
+        'instance_id',
         'parent_id',
         'resource',
 		'UP'
@@ -120,8 +120,8 @@ UPDATE SET updated_at = now(), amount = EXCLUDED.amount;`
 	-- Only count down if the conditions are not met in the new state, but were in the old.
 	WHEN ((NEW.col1 <> 'value1' AND NEW.col2 <> 'value1') AND (OLD.col1 = 'value1' OR OLD.col2 = 'value1'))
     EXECUTE FUNCTION projections.count_resource(
-        'instance', 
-        'instance_id', 
+        'instance',
+        'instance_id',
         'parent_id',
         'resource',
 		'DOWN'
@@ -163,8 +163,8 @@ UPDATE SET updated_at = now(), amount = EXCLUDED.amount;`
     ON table
     FOR EACH ROW
     EXECUTE FUNCTION projections.delete_parent_counts(
-        'instance', 
-        'instance_id', 
+        'instance',
+        'instance_id',
         'parent_id'
     );`
 )

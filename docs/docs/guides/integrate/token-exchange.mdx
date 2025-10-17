@@ -125,7 +125,7 @@ When scope is omitted in the request, it is taken from the `subject_token`. If t
 
 #### Audience
 
-Audience is an optional parameter that allows to decrease the audience of the requested token. When supplied it may never contain an audience which was not already present in either the `subject_token` or `actor_token` combined.
+Audience is an optional parameter that allows you to decrease the audience of the requested token. When supplied it may never contain an audience which was not already present in either the `subject_token` or `actor_token` combined.
 This is to prevent applications from one project or organization authorizing themselves access to applications of another project or organization and circumventing current ZITADEL authorization schemas.
 
 When audience is omitted in the request, it is taken from the `subject_token`. If the `subject_token` doesn't carry any audience (some types can't), it is taken from the `actor_token`. All allowed token types for the `actor_token` typically have an audience.

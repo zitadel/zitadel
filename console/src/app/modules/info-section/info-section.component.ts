@@ -1,4 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { inject } from '@angular/core';
+import { AnalyticsService } from 'src/app/services/analytics.service';
 
 export enum InfoSectionType {
   INFO = 'INFO',
@@ -18,4 +20,8 @@ export class InfoSectionComponent {
   @Input() fitWidth: boolean = false;
 
   protected readonly infoSectionType = InfoSectionType;
+
+  public analyticsService = inject(AnalyticsService);
+
+
 }

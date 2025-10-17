@@ -64,7 +64,7 @@ func (p *Provider) keysEndpoint() string {
 
 type ProviderOptions func(*Provider)
 
-// WithTenant allows to set a [TenantType] (can also be a Tenant ID)
+// WithTenant allows you to set a [TenantType] (can also be a Tenant ID)
 // default is CommonTenant
 func WithTenant(tenantType TenantType) ProviderOptions {
 	return func(p *Provider) {
@@ -72,14 +72,14 @@ func WithTenant(tenantType TenantType) ProviderOptions {
 	}
 }
 
-// WithEmailVerified allows to set every email received as verified
+// WithEmailVerified allows you to set every email received as verified
 func WithEmailVerified() ProviderOptions {
 	return func(p *Provider) {
 		p.emailVerified = true
 	}
 }
 
-// WithOAuthOptions allows to specify [oauth.ProviderOpts] like [oauth.WithLinkingAllowed]
+// WithOAuthOptions allows you to specify [oauth.ProviderOpts] like [oauth.WithLinkingAllowed]
 func WithOAuthOptions(opts ...oauth.ProviderOpts) ProviderOptions {
 	return func(p *Provider) {
 		p.options = append(p.options, opts...)

@@ -21,6 +21,7 @@
         [queryParams]="{ id: action[1].fragment }"
         class="action-element"
         [ngClass]="{ done: action[1].reached !== undefined }"
+        (click)="analyticsService.emitAnalyticsEvent($event, 'click', 'onboarding_action_clicked', {action: action[0]})"
       >
         <div class="state-circle">
           <mat-icon

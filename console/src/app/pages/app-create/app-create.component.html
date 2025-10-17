@@ -39,7 +39,7 @@
         mat-raised-button
         class="continue-button"
         [disabled]="(!project && !projectName) || !(framework() || customFramework())"
-        (click)="project && project.name === projectName ? goToAppIntegratePage() : createProjectAndContinue()"
+        (click)="project && project.name === projectName ? goToAppIntegratePage() : createProjectAndContinue(); analyticsService.emitAnalyticsEvent($event, 'click',  'Continue with project Name', {isZitadelProject: 'ZITADEL' === projectName})"
       >
         {{
           !project && !projectName

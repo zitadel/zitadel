@@ -6,6 +6,8 @@ import frameworkDefinition from '../../../../../docs/frameworks.json';
 import { MatButtonModule } from '@angular/material/button';
 import type { getFramework } from '@netlify/build-info';
 import { OIDC_CONFIGURATIONS } from 'src/app/utils/framework';
+import { inject } from '@angular/core';
+import { AnalyticsService } from 'src/app/services/analytics.service';
 
 type FrameworkName = Parameters<typeof getFramework>[0];
 
@@ -30,6 +32,7 @@ export type Framework = FrameworkDefinition & {
   imports: [TranslateModule, RouterModule, CommonModule, MatButtonModule],
 })
 export class QuickstartComponent {
+  public analyticsService = inject(AnalyticsService);
   public frameworks: FrameworkDefinition[] = frameworkDefinition
     .filter((f) => f.id && OIDC_CONFIGURATIONS[f.id])
     .map((f) => {
@@ -39,4 +42,5 @@ export class QuickstartComponent {
         imgSrcLight: `assets${f.imgSrcLight ? f.imgSrcLight : f.imgSrcDark}`,
       };
     });
+
 }

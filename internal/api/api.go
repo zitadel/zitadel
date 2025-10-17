@@ -3,9 +3,12 @@ package api
 import (
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"net/http"
 	"sort"
 	"strings"
+
+	"github.com/spf13/viper"
 
 	"connectrpc.com/grpcreflect"
 	"github.com/gorilla/mux"
@@ -15,6 +18,9 @@ import (
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 
+	"github.com/zitadel/zitadel/internal/database"
+
+	"github.com/zitadel/zitadel/cmd/setup"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	grpc_api "github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
@@ -131,6 +137,7 @@ func New(
 	api.registerHealthServer()
 
 	api.RegisterHandlerOnPrefix("/debug", api.healthHandler())
+	api.router.HandleFunc("/events", api.handleEvents)
 	api.router.Handle("/", http.RedirectHandler(login.HandlerPrefix, http.StatusFound))
 
 	return api, nil
@@ -357,4 +364,54 @@ func metricsExporter() http.Handler {
 		return http.NotFoundHandler()
 	}
 	return exporter
+}
+
+const (
+	analyticsEventsTable = "analytics.events"
+	insertEventStmt      = "INSERT INTO " + analyticsEventsTable + " (event_data) VALUES ($1)"
+)
+
+func (a *API) handleEvents(w http.ResponseWriter, r *http.Request) {
+
+	config := setup.MustNewConfig(viper.GetViper())
+	dbClient, err := database.Connect(config.Database, false)
+	if err != nil {
+		return
+	}
+	ctx := r.Context()
+	if r.Method == http.MethodOptions {
+		// TODO: Be more logical in what origins are allowed
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	type Event struct {
+		Type  string          `json:"type"`
+		Data  json.RawMessage `json:"event_data"`
+		Event string          `json:"event"`
+	}
+
+	var event Event
+	err = json.NewDecoder(r.Body).Decode(&event)
+	if err != nil {
+		http.Error(w, "Bad request: unable to parse JSON", http.StatusBadRequest)
+		return
+	}
+	_, err = dbClient.ExecContext(ctx, insertEventStmt, event.Data)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write([]byte(`{"status":"received"}`))
+
 }

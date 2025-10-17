@@ -82,8 +82,8 @@ The following hash algorithms are supported:
 :::info
 ZITADEL updates stored hashes when the configured algorithm or its parameters are updated,
 the first time verification succeeds.
-This allows to increase cost along with growing computing power.
-ZITADEL allows to import user passwords from systems that use any of the above hashing algorithms.
+This allows you to increase cost along with growing computing power.
+ZITADEL allows you to import user passwords from systems that use any of the above hashing algorithms.
 
 Note however that by default, only `bcrypt` is enabled. 
 Further `Verifiers` must be enabled in the [configuration](/self-hosting/manage/configure) by the system administrator. 

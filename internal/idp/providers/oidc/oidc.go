@@ -65,7 +65,7 @@ func WithIDTokenMapping() ProviderOpts {
 	}
 }
 
-// WithRelyingPartyOption allows to set an additional [rp.Option] like [rp.WithPKCE].
+// WithRelyingPartyOption allows you to set an additional [rp.Option] like [rp.WithPKCE].
 func WithRelyingPartyOption(option rp.Option) ProviderOpts {
 	return func(p *Provider) {
 		p.options = append(p.options, option)

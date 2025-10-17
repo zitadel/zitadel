@@ -40,6 +40,7 @@ func (p *AddProject) IsValid() error {
 }
 
 func (c *Commands) AddProject(ctx context.Context, add *AddProject) (_ *domain.ObjectDetails, err error) {
+	// TODO - add milestone here
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

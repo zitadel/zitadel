@@ -35,6 +35,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api"
 	"github.com/zitadel/zitadel/internal/api/assets"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
+	int_events "github.com/zitadel/zitadel/internal/api/events"
 	action_v2 "github.com/zitadel/zitadel/internal/api/grpc/action/v2"
 	action_v2_beta "github.com/zitadel/zitadel/internal/api/grpc/action/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/admin"
@@ -326,7 +327,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	)
 	execution.Start(ctx)
 
-	// the service ping and it's workers need to be registered before starting the queue
+	// the service ping and its workers need to be registered before starting the queue
 	if err := serviceping.Register(ctx, q, queries, eventstoreClient, config.ServicePing); err != nil {
 		return err
 	}
@@ -611,6 +612,11 @@ func startAPIs(
 		return nil, fmt.Errorf("unable to start openapi handler: %w", err)
 	}
 	apis.RegisterHandlerOnPrefix(openapi.HandlerPrefix, openAPIHandler)
+
+	// Simple events endpoint for capturing analytics events
+	if h, err := int_events.Start(dbClient); err == nil {
+		apis.RegisterHandlerOnPrefix("/events", h)
+	}
 
 	oidcServer, err := oidc.NewServer(
 		ctx,

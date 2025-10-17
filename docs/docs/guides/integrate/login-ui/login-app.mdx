@@ -41,7 +41,7 @@ It does so by redirecting to `/login`.
 The Login app is then able to load an [AuthRequest](/docs/apis/resources/oidc_service_v2/oidc-service-get-auth-request#get-oidc-auth-request-details).
 
 The Auth Request defines how users proceed to authenticate. If no special prompts or scopes are set, the Login app brings up the `/loginname` page.
-The /loginname page allows to enter loginname or email of a user which is then used to search for a user.
+The /loginname page allows you to enter loginname or email of a user which is then used to search for a user.
 If the user is found, a session is created and set as cookie, then the user is redirected to the available authentication method page.
 While the users continues and provides more information, the cookie is hydrated with this information until a final state is reached.
 
@@ -98,7 +98,7 @@ The application can then request a token calling the /token endpoint of the Logi
 
 #### Self service
 
-The self service part of the application allows to load the Login app without an OIDC flow.
+The self service part of the application allows you to load the Login app without an OIDC flow.
 Authenticated users are directly able to self service their account.
 
 - [ ] Change user information

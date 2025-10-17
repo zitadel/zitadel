@@ -4,7 +4,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageLocation, StorageService } from 'src/app/services/storage.service';
-
+import { AnalyticsService } from 'src/app/services/analytics.service';
 import { NewOrganizationService } from '../../services/new-organization.service';
 
 export interface SettingLinks {
@@ -157,6 +157,7 @@ export class ShortcutsComponent implements OnDestroy {
     private storageService: StorageService,
     private mgmtService: ManagementService,
     private newOrganizationService: NewOrganizationService,
+    public analyticsService: AnalyticsService,
   ) {
     effect(() => {
       const orgId = this.newOrganizationService.orgId();

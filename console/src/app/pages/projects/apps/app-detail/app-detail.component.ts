@@ -58,6 +58,7 @@ import {
   POST_METHOD,
 } from '../authmethods';
 import { AuthMethodDialogComponent } from './auth-method-dialog/auth-method-dialog.component';
+import { AnalyticsService } from 'src/app/services/analytics.service';
 
 const MAX_ALLOWED_SIZE = 1 * 1024 * 1024;
 
@@ -197,6 +198,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     private authService: GrpcAuthService,
     private router: Router,
     private breadcrumbService: BreadcrumbService,
+    public analyticsService: AnalyticsService,
   ) {
     this.oidcForm = this.fb.group({
       devMode: [{ value: false, disabled: true }],

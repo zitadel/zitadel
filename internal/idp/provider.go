@@ -35,17 +35,17 @@ type User interface {
 	GetProfile() string
 }
 
-// Parameter allows to pass specific parameter to the BeginAuth function
+// Parameter allows you to pass specific parameter to the BeginAuth function
 type Parameter interface {
 	setValue()
 }
 
-// UserAgentID allows to pass the user agent ID of the auth request to BeginAuth
+// UserAgentID allows you to pass the user agent ID of the auth request to BeginAuth
 type UserAgentID string
 
 func (p UserAgentID) setValue() {}
 
-// LoginHintParam allows to pass a login_hint to BeginAuth
+// LoginHintParam allows you to pass a login_hint to BeginAuth
 type LoginHintParam string
 
 func (p LoginHintParam) setValue() {}

@@ -309,7 +309,7 @@ type FillFieldsEvent interface {
 }
 
 type Searcher interface {
-	// Search allows to search for specific fields of objects
+	// Search allows you to search for specific fields of objects
 	// The instance id is taken from the context
 	// The list of conditions are combined with AND
 	// The search fields are combined with OR

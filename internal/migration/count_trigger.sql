@@ -9,8 +9,8 @@ CREATE OR REPLACE TRIGGER count_{{ .Resource }}_insert
     -- Only count if the conditions are met in the newly added row.
     {{if .Conditions}}WHEN ({{.Conditions.ToSQL "NEW" true}}){{end}}
     EXECUTE FUNCTION projections.count_resource(
-        '{{ .ParentType }}', 
-        '{{ .InstanceIDColumn }}', 
+        '{{ .ParentType }}',
+        '{{ .InstanceIDColumn }}',
         '{{ .ParentIDColumn }}',
         '{{ .Resource }}'
     );

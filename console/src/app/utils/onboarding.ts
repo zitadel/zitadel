@@ -41,6 +41,14 @@ export const ONBOARDING_MILESTONES: OnboardingActions[] = [
     lightcolor: purplelight,
   },
   {
+    order: 2,
+    milestoneType: MilestoneType.MILESTONE_TYPE_APPLICATION_CREATED,
+    link: '/projects/app-create',
+    iconClasses: 'lab la-openid',
+    darkcolor: purpledark,
+    lightcolor: purplelight,
+  },
+  {
     order: 3,
     milestoneType: MilestoneType.MILESTONE_TYPE_AUTHENTICATION_SUCCEEDED_ON_APPLICATION,
     link: 'https://zitadel.com/docs/guides/integrate/login-users',
