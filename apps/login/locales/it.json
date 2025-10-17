@@ -245,7 +245,23 @@
       "title": "Autenticati con una passkey",
       "description": "Il tuo dispositivo chiederà la tua impronta digitale, il volto o il blocco schermo",
       "usePassword": "Usa password",
-      "submit": "Continua"
+      "submit": "Continua",
+      "errors": {
+        "couldNotRequestChallenge": "Impossibile richiedere la sfida passkey",
+        "couldNotVerifyPasskey": "Impossibile verificare la passkey",
+        "noResponseReceived": "Verifica passkey fallita - nessuna risposta ricevuta",
+        "noRedirectProvided": "Verifica passkey completata ma nessun reindirizzamento fornito",
+        "couldNotRetrievePasskey": "Si è verificato un errore durante il recupero della passkey",
+        "verificationCancelled": "La verifica della passkey è stata annullata",
+        "verificationFailed": "Si è verificato un errore durante la verifica della passkey",
+        "couldNotFindSession": "Impossibile trovare la sessione",
+        "couldNotUpdateSession": "Impossibile aggiornare la sessione",
+        "userNotFound": "Utente non trovato nel sistema",
+        "couldNotDetermineRedirect": "Impossibile determinare l'URL di reindirizzamento dopo la verifica passkey",
+        "couldNotSetSession": "Impossibile impostare la sessione",
+        "couldNotGetUser": "Impossibile recuperare i dati dell'utente",
+        "couldNotRetrieveSessionCookie": "Impossibile recuperare il cookie di sessione"
+      }
     },
     "set": {
       "title": "Configura una passkey",
@@ -416,6 +432,7 @@
     "unknownContext": "Impossibile ottenere il contesto dell'utente. Assicurati di inserire prima il nome utente o di fornire un loginName come parametro di ricerca.",
     "sessionExpired": "La tua sessione attuale è scaduta. Effettua nuovamente l'accesso.",
     "failedLoading": "Impossibile caricare i dati. Riprova.",
-    "tryagain": "Riprova"
+    "tryagain": "Riprova",
+    "couldNotContinueSession": "Impossibile continuare con la sessione - informazioni utente mancanti"
   }
 }

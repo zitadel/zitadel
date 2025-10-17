@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
-  const { userId, loginName, prompt, organization, requestId, code, id } = searchParams;
+  const { userId, loginName, prompt, organization, requestId, code, codeId } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -114,7 +114,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             organization={organization}
             requestId={requestId}
             code={code}
-            codeId={id}
+            codeId={codeId}
           />
         )}
       </div>
