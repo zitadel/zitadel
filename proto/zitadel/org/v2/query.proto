@@ -81,6 +81,20 @@ message OrganizationIDQuery {
 enum OrganizationFieldName {
   ORGANIZATION_FIELD_NAME_UNSPECIFIED = 0;
   ORGANIZATION_FIELD_NAME_NAME = 1;
+  ORGANIZATION_FIELD_NAME_CREATION_DATE = 2;
 }
 
 message DefaultOrganizationQuery {}
+
+message DomainSearchFilter {
+  oneof filter {
+    option (validate.required) = true;
+    OrganizationDomainQuery domain_filter = 1;
+  }
+}
+
+enum DomainFieldName {
+  DOMAIN_FIELD_NAME_UNSPECIFIED = 0;
+  DOMAIN_FIELD_NAME_NAME = 1;
+  DOMAIN_FIELD_NAME_CREATION_DATE = 2;
+}
