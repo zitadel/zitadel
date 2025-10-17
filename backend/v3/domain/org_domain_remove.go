@@ -14,7 +14,7 @@ type RemoveOrgDomainCommand struct {
 }
 
 // Events implements Commander.
-func (r *RemoveOrgDomainCommand) Events(ctx context.Context, opts *CommandOpts) ([]eventstore.Command, error) {
+func (r *RemoveOrgDomainCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
 	// TODO(IAM-Marco) Finish implementation in https://github.com/zitadel/zitadel/issues/10447
 	oldDomainName := ""
 	isVerified := false
@@ -39,7 +39,7 @@ func NewRemoveOrgDomainCommand(orgID string, domainName *string, isDomainVerifie
 }
 
 // Execute implements Commander.
-func (r *RemoveOrgDomainCommand) Execute(ctx context.Context, opts *CommandOpts) (err error) {
+func (r *RemoveOrgDomainCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	return nil
 }
 
@@ -49,7 +49,7 @@ func (r *RemoveOrgDomainCommand) String() string {
 }
 
 // Validate implements Commander.
-func (r *RemoveOrgDomainCommand) Validate(ctx context.Context, opts *CommandOpts) (err error) {
+func (r *RemoveOrgDomainCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
 	return nil
 }
 

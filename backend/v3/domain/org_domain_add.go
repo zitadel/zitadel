@@ -14,7 +14,7 @@ type AddOrgDomainCommand struct {
 }
 
 // Events implements Commander.
-func (a *AddOrgDomainCommand) Events(ctx context.Context, opts *CommandOpts) ([]eventstore.Command, error) {
+func (a *AddOrgDomainCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
 	// TODO(IAM-Marco) Finish implementation in https://github.com/zitadel/zitadel/issues/10447
 	return []eventstore.Command{
 		org.NewDomainAddedEvent(ctx, &org.NewAggregate(a.OrgID).Aggregate, a.Name),
@@ -30,7 +30,7 @@ func NewAddOrgDomainCommand(orgID, domainName string) *AddOrgDomainCommand {
 }
 
 // Execute implements Commander.
-func (a *AddOrgDomainCommand) Execute(ctx context.Context, opts *CommandOpts) (err error) {
+func (a *AddOrgDomainCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	return nil
 }
 
@@ -40,7 +40,7 @@ func (a *AddOrgDomainCommand) String() string {
 }
 
 // Validate implements Commander.
-func (a *AddOrgDomainCommand) Validate(ctx context.Context, opts *CommandOpts) (err error) {
+func (a *AddOrgDomainCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
 	return nil
 }
 

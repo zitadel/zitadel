@@ -55,7 +55,7 @@ func UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org
 	domainSetPrimaryCmd := domain.NewSetPrimaryOrgDomainCommand(request.Msg.GetId(), request.Msg.GetName())
 	domainRemoveCmd := domain.NewRemoveOrgDomainCommand(request.Msg.GetId(), orgUpdtCmd.OldDomainName, orgUpdtCmd.IsOldDomainVerified)
 
-	batchCmd := domain.BatchCommands(orgUpdtCmd, domainAddCmd, domainSetPrimaryCmd, domainRemoveCmd)
+	batchCmd := domain.BatchExecutors(orgUpdtCmd, domainAddCmd, domainSetPrimaryCmd, domainRemoveCmd)
 
 	err := domain.Invoke(ctx, batchCmd, domain.WithOrganizationRepo(repository.OrganizationRepository()))
 	if err != nil {
@@ -72,7 +72,7 @@ func UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org
 }
 
 func ListOrganizations(ctx context.Context, request *connect.Request[v2_org.ListOrganizationsRequest]) (*connect.Response[v2_org.ListOrganizationsResponse], error) {
-	orgListCmd := domain.NewListOrgsCommand(request.Msg)
+	orgListCmd := domain.NewListOrgsQuery(request.Msg)
 
 	err := domain.Invoke(ctx, orgListCmd,
 		domain.WithOrganizationRepo(repository.OrganizationRepository()),
@@ -97,7 +97,7 @@ func ListOrganizations(ctx context.Context, request *connect.Request[v2_org.List
 
 // TODO(IAM-Marco): Remove in V5 (see https://github.com/zitadel/zitadel/issues/10877)
 func ListOrganizationsBeta(ctx context.Context, request *connect.Request[v2beta_org.ListOrganizationsRequest]) (*connect.Response[v2beta_org.ListOrganizationsResponse], error) {
-	orgListCmd := domain.NewListOrgsCommand(convert.OrganizationBetaRequestToV2Request(request.Msg))
+	orgListCmd := domain.NewListOrgsQuery(convert.OrganizationBetaRequestToV2Request(request.Msg))
 
 	err := domain.Invoke(ctx, orgListCmd,
 		domain.WithOrganizationRepo(repository.OrganizationRepository()),

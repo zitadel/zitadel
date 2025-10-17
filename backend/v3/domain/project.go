@@ -91,6 +91,8 @@ type projectChanges interface {
 }
 
 // ProjectRepository manages projects and project roles.
+//
+//go:generate mockgen -typed -package domainmock -destination ./mock/project.mock.go . ProjectRepository
 type ProjectRepository interface {
 	projectColumns
 	projectConditions
