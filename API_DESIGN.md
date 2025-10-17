@@ -53,7 +53,7 @@ Please check out the structure Buf style guide for more information about the fo
 As a rule of thumb, redundant API methods are deprecated.
 
 - The proto option `grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation.deprecated` MUST be set to true.
-- One or more links to recommended replacement methods MUST be added to the deprecation message as a proto comment above the rpc spec.
+- One or more links to recommended replacement methods CAN be added to the deprecation message as a proto comment above the rpc spec.
 - Guidance for switching to the recommended methods for common use cases SHOULD be added as a proto comment above the rpc spec.
 
 #### Example

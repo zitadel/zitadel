@@ -24,8 +24,6 @@ type Server struct {
 	assetsAPIDomain func(context.Context) string
 }
 
-type Config struct{}
-
 func CreateServer(
 	command *command.Commands,
 	query *query.Queries,
