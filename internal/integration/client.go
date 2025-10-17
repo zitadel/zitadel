@@ -34,6 +34,7 @@ import (
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
 	instance_v2 "github.com/zitadel/zitadel/pkg/grpc/instance/v2"
 	instance_v2beta "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
+	internal_permission_v2 "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2"
 	internal_permission_v2beta "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
@@ -88,6 +89,7 @@ type Client struct {
 	InstanceV2               instance_v2.InstanceServiceClient
 	AppV2Beta                app.AppServiceClient
 	InternalPermissionv2Beta internal_permission_v2beta.InternalPermissionServiceClient
+	InternalPermissionV2     internal_permission_v2.InternalPermissionServiceClient
 	AuthorizationV2Beta      authorization.AuthorizationServiceClient
 	GroupV2                  group_v2.GroupServiceClient
 }
@@ -134,6 +136,7 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		InstanceV2:               instance_v2.NewInstanceServiceClient(cc),
 		AppV2Beta:                app.NewAppServiceClient(cc),
 		InternalPermissionv2Beta: internal_permission_v2beta.NewInternalPermissionServiceClient(cc),
+		InternalPermissionV2:     internal_permission_v2.NewInternalPermissionServiceClient(cc),
 		AuthorizationV2Beta:      authorization.NewAuthorizationServiceClient(cc),
 		GroupV2:                  group_v2.NewGroupServiceClient(cc),
 	}
