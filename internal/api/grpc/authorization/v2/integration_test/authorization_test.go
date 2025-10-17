@@ -524,7 +524,7 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
 						ProjectId:      projectId,
 						RoleKeys:       []string{projectRole1, projectRole2},
-						OrganizationId: selfOrgId,
+						OrganizationId: foreignOrgId,
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
@@ -701,7 +701,7 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
 						ProjectId:      projectId,
 						RoleKeys:       []string{projectRole1, projectRole2},
-						OrganizationId: selfOrgId,
+						OrganizationId: foreignOrgId,
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
@@ -881,7 +881,7 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
 						ProjectId:      projectId,
 						RoleKeys:       []string{projectRole1, projectRole2},
-						OrganizationId: selfOrgId,
+						OrganizationId: foreignOrgId,
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
