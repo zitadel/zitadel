@@ -82,7 +82,7 @@ describe("LoginPasskey Component", () => {
       renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
 
       await waitFor(() => {
-        expect(screen.getByText("Challenge failed")).toBeInTheDocument();
+        expect(screen.getByText("Could not request passkey challenge")).toBeInTheDocument();
       });
     });
 
