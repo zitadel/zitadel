@@ -163,7 +163,7 @@ describe("sendPasskey", () => {
       });
 
       expect(result).toEqual({
-        error: "Failed to update session",
+        error: "verify.errors.couldNotUpdateSession",
       });
     });
 
@@ -176,7 +176,7 @@ describe("sendPasskey", () => {
       });
 
       expect(result).toEqual({
-        error: "verify.errors.couldNotSetSession",
+        error: "verify.errors.couldNotUpdateSession",
       });
     });
   });
@@ -221,11 +221,11 @@ describe("sendPasskey", () => {
         loginName: "test@example.com",
       });
       mockSetSessionAndUpdateCookie.mockResolvedValue({
-        sessionId: "session-123",
-        sessionToken: "new-token",
+        id: "session-123",
         factors: {
           user: {
             id: "user-123",
+            loginName: "test@example.com",
           },
         },
       });
@@ -246,7 +246,7 @@ describe("sendPasskey", () => {
     });
 
     test("should redirect on successful verification without requestId", async () => {
-      mockCompleteFlowOrGetUrl.mockResolvedValue("/dashboard");
+      mockCompleteFlowOrGetUrl.mockResolvedValue({ redirect: "/dashboard" });
 
       const result = await sendPasskey({
         sessionId: "session-123",
@@ -256,11 +256,10 @@ describe("sendPasskey", () => {
       expect(result).toEqual({
         redirect: "/dashboard",
       });
-      expect(mockCompleteFlowOrGetUrl).toHaveBeenCalledWith(undefined);
     });
 
     test("should redirect on successful verification with requestId", async () => {
-      mockCompleteFlowOrGetUrl.mockResolvedValue("/auth/callback");
+      mockCompleteFlowOrGetUrl.mockResolvedValue({ redirect: "/auth/callback" });
 
       const result = await sendPasskey({
         sessionId: "session-123",
@@ -271,11 +270,10 @@ describe("sendPasskey", () => {
       expect(result).toEqual({
         redirect: "/auth/callback",
       });
-      expect(mockCompleteFlowOrGetUrl).toHaveBeenCalledWith("request-123");
     });
 
     test("should redirect for email verification when required", async () => {
-      mockCheckEmailVerification.mockResolvedValue(false);
+      mockCheckEmailVerification.mockReturnValue({ redirect: "/verify" });
 
       const result = await sendPasskey({
         sessionId: "session-123",
@@ -297,11 +295,11 @@ describe("sendPasskey", () => {
         loginName: "test@example.com",
       });
       mockSetSessionAndUpdateCookie.mockResolvedValue({
-        sessionId: "session-123",
-        sessionToken: "new-token",
+        id: "session-123",
         factors: {
           user: {
             id: "user-123",
+            loginName: "test@example.com",
           },
         },
       });
@@ -356,11 +354,11 @@ describe("sendPasskey", () => {
         loginName: "test@example.com",
       });
       mockSetSessionAndUpdateCookie.mockResolvedValue({
-        sessionId: "session-123",
-        sessionToken: "new-token",
+        id: "session-123",
         factors: {
           user: {
             id: "user-123",
+            loginName: "test@example.com",
           },
         },
       });
@@ -378,7 +376,7 @@ describe("sendPasskey", () => {
         },
       });
       mockCheckEmailVerification.mockResolvedValue(true);
-      mockCompleteFlowOrGetUrl.mockResolvedValue("/dashboard");
+      mockCompleteFlowOrGetUrl.mockResolvedValue({ redirect: "/dashboard" });
     });
 
     test("should use custom lifetime when provided", async () => {

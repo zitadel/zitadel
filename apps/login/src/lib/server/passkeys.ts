@@ -281,11 +281,15 @@ export async function sendPasskey(command: SendPasskeyCommand) {
     organization,
   });
 
-  let lifetime = checks?.webAuthN
-    ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
-    : checks?.otpEmail || checks?.otpSms
-      ? loginSettings?.secondFactorCheckLifetime
-      : undefined;
+  let lifetime = command.lifetime; // Use provided lifetime first
+
+  if (!lifetime) {
+    lifetime = checks?.webAuthN
+      ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
+      : checks?.otpEmail || checks?.otpSms
+        ? loginSettings?.secondFactorCheckLifetime
+        : undefined;
+  }
 
   if (!lifetime) {
     console.warn("No passkey lifetime provided, defaulting to 24 hours");
@@ -307,10 +311,15 @@ export async function sendPasskey(command: SendPasskeyCommand) {
     return { error: t("verify.errors.couldNotUpdateSession") };
   }
 
-  const userResponse = await getUserByID({
-    serviceUrl,
-    userId: session?.factors?.user?.id,
-  });
+  let userResponse;
+  try {
+    userResponse = await getUserByID({
+      serviceUrl,
+      userId: session?.factors?.user?.id,
+    });
+  } catch (error) {
+    return { error: t("verify.errors.couldNotGetUser") };
+  }
 
   if (!userResponse.user) {
     return { error: t("verify.errors.userNotFound") };
@@ -324,8 +333,9 @@ export async function sendPasskey(command: SendPasskeyCommand) {
     return emailVerificationCheck;
   }
 
+  let redirectResult;
   if (requestId && session.id) {
-    return completeFlowOrGetUrl(
+    redirectResult = await completeFlowOrGetUrl(
       {
         sessionId: session.id,
         requestId: requestId,
@@ -334,13 +344,22 @@ export async function sendPasskey(command: SendPasskeyCommand) {
       loginSettings?.defaultRedirectUri,
     );
   } else if (session?.factors?.user?.loginName) {
-    return completeFlowOrGetUrl(
+    redirectResult = await completeFlowOrGetUrl(
       {
         loginName: session.factors.user.loginName,
         organization: organization,
       },
       loginSettings?.defaultRedirectUri,
     );
+  }
+
+  // Check if we got a valid redirect result
+  if (redirectResult && typeof redirectResult === "object" && "redirect" in redirectResult && redirectResult.redirect) {
+    return redirectResult;
+  }
+
+  if (redirectResult && typeof redirectResult === "object" && "error" in redirectResult) {
+    return redirectResult;
   }
 
   // Fallback error if we couldn't determine where to redirect
