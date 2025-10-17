@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
-	project "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/project/v2"
 
 	"github.com/zitadel/zitadel/pkg/grpc/project/v2/projectconnect"
 )

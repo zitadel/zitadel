@@ -958,7 +958,7 @@ func TestServer_ActivateProject(t *testing.T) {
 			name: "missing permission",
 			prepare: func(request *project.ActivateProjectRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
-				request.Id = projectResp.GetId()
+				request.ProjectId = projectResp.GetId()
 			},
 			args: args{
 				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
@@ -969,7 +969,7 @@ func TestServer_ActivateProject(t *testing.T) {
 		{
 			name: "not existing",
 			prepare: func(request *project.ActivateProjectRequest) {
-				request.Id = "notexisting"
+				request.ProjectId = "notexisting"
 				return
 			},
 			args: args{
@@ -982,7 +982,7 @@ func TestServer_ActivateProject(t *testing.T) {
 			name: "no change, ok",
 			prepare: func(request *project.ActivateProjectRequest) {
 				projectID := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false).GetId()
-				request.Id = projectID
+				request.ProjectId = projectID
 			},
 			args: args{
 				ctx: iamOwnerCtx,
@@ -994,7 +994,7 @@ func TestServer_ActivateProject(t *testing.T) {
 			name: "change, ok",
 			prepare: func(request *project.ActivateProjectRequest) {
 				projectID := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false).GetId()
-				request.Id = projectID
+				request.ProjectId = projectID
 				instance.DeactivateProject(iamOwnerCtx, t, projectID)
 			},
 			args: args{
@@ -1052,7 +1052,7 @@ func TestServer_ActivateProject_Permission(t *testing.T) {
 			name: "unauthenticated",
 			prepare: func(request *project.ActivateProjectRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
-				request.Id = projectResp.GetId()
+				request.ProjectId = projectResp.GetId()
 				instance.DeactivateProject(iamOwnerCtx, t, projectResp.GetId())
 			},
 			args: args{
@@ -1065,7 +1065,7 @@ func TestServer_ActivateProject_Permission(t *testing.T) {
 			name: "missing permission",
 			prepare: func(request *project.ActivateProjectRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
-				request.Id = projectResp.GetId()
+				request.ProjectId = projectResp.GetId()
 				instance.DeactivateProject(iamOwnerCtx, t, projectResp.GetId())
 			},
 			args: args{
@@ -1078,7 +1078,7 @@ func TestServer_ActivateProject_Permission(t *testing.T) {
 			name: "organization owner, other org",
 			prepare: func(request *project.ActivateProjectRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
-				request.Id = projectResp.GetId()
+				request.ProjectId = projectResp.GetId()
 				instance.DeactivateProject(iamOwnerCtx, t, projectResp.GetId())
 			},
 			args: args{
@@ -1091,7 +1091,7 @@ func TestServer_ActivateProject_Permission(t *testing.T) {
 			name: "organization owner",
 			prepare: func(request *project.ActivateProjectRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
-				request.Id = projectResp.GetId()
+				request.ProjectId = projectResp.GetId()
 				instance.DeactivateProject(iamOwnerCtx, t, projectResp.GetId())
 			},
 			args: args{
@@ -1107,7 +1107,7 @@ func TestServer_ActivateProject_Permission(t *testing.T) {
 			name: "instance owner",
 			prepare: func(request *project.ActivateProjectRequest) {
 				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
-				request.Id = projectResp.GetId()
+				request.ProjectId = projectResp.GetId()
 				instance.DeactivateProject(iamOwnerCtx, t, projectResp.GetId())
 			},
 			args: args{
