@@ -79,7 +79,7 @@ Thank you for your interest in contributing! As you might know there is more tha
 
 Please give us and our community the chance to get rid of security vulnerabilities by responsibly disclosing these issues to [security@zitadel.com](mailto:security@zitadel.com).
 
-Your thoughts and feedback make the community stronger! That's why we try to react as quickly as possible to your ideas and comments. We discuss as much as possible in an open space like in the [issues](https://github.com/zitadel/zitadel/issues) and [discussions](https://github.com/zitadel/zitadel/discussions) section here or in our [chat](https://zitadel.com/chat), but we understand your doubts and provide further contact options [here](https://zitadel.com/contact).
+Your thoughts and feedback make the community stronger! That's why we try to react as quickly as possible to your ideas and comments. We love to discuss as much as possible in an open space like in the [issues](https://github.com/zitadel/zitadel/issues) and [discussions](https://github.com/zitadel/zitadel/discussions) section here or in our [chat](https://zitadel.com/chat), but we understand your doubts and provide further contact options [here](https://zitadel.com/contact).
 
 If you want to give an answer or be part of discussions please be kind. Treat others like you want to be treated. Read more about our code of conduct [here](CODE_OF_CONDUCT.md).
 
@@ -241,22 +241,6 @@ Optionally start the Login in another terminal
 pnpm nx run @zitadel/login:prod
 ```
 
-> Note: With this command, several steps are executed.
-> For speeding up rebuilds, you can reexecute only specific steps you think are necessary based on your changes.
-> Generating gRPC stubs: `make core_api`
-> Running unit tests: `make core_unit_test`
-> Generating the console: `make console_build console_move`
-> Build the binary: `make compile`
-
-You can now run and debug the binary in `./zitadel` using your favourite IDE, for example [GoLand](https://www.jetbrains.com/go/).
-
-Or, from the CLI, run
-```baseh
-./zitadel start-from-init --masterkey MasterkeyNeedsToHave32Characters --tlsMode disabled
-```
-
-You can test if Zitadel does what you expect by using the UI at http://localhost:8080/ui/console.
-Also, you can verify the data by running `psql "host=localhost dbname=zitadel sslmode=disable"` and running SQL queries.
 Run the local development database.
 
 ```bash
@@ -308,11 +292,6 @@ pnpm nx run @zitadel/api:test-unit
 
 ### Run API Integration Tests
 
-Integration tests are run as gRPC clients against a running Zitadel server binary.
-The server binary is typically [built with coverage enabled](https://go.dev/doc/build-cover).
-It is also possible to run a Zitadel sever in a debugger and run the integrations tests like that. In order to run the server, a database is required.
-
-In order to prepare the local system, the following will bring up the database, builds a coverage binary, initializes the database and starts the server.
 API tests are run as gRPC clients against a running Zitadel server binary.
 The server binary is [built with coverage enabled](https://go.dev/doc/build-cover).
 
@@ -372,22 +351,6 @@ pnpm nx run @zitadel/devcontainer:compose down db-api-integration cache-api-inte
 To test the whole system, including the Console UI and the Login UI, run the Functional UI tests.
 
 ```bash
-make core_integration_server_stop core_integration_db_down
-```
-
-The test binary has the race detector enabled. `core_core_integration_server_stop` checks for any race logs reported by Go and will print them along with a `66` exit code when found. Note that the actual race condition may have happened anywhere during the server lifetime, including start, stop or serving gRPC requests during tests.
-
-### Run Local End-to-End Tests
-
-To test the whole system, including the console UI and the login UI, run the E2E tests.
-
-```bash
-# Build the production docker image
-export Zitadel_IMAGE=zitadel:local GOOS=linux
-make docker_image
-
-# If you made changes in the e2e directory, make sure you reformat the files
-pnpm turbo lint:fix --filter=e2e
 # If you made changes in the tests/functional-ui directory, make sure you reformat the files
 pnpm nx run @zitadel/functional-ui:lint-fix
 
@@ -518,25 +481,7 @@ In another terminal, start the API
 pnpm nx run @zitadel/api:prod
 ```
 
-
-When Zitadel accepts traffic, navigate to http://localhost:8080/ui/console/projects?login_hint=zitadel-admin@zitadel.localhost and log in with  _Password1!_.
-Proceed [with configuring your console redirect URIs](console-redirect).
-
-#### <a name="console-redirect"></a> Configure Console redirect URI
-
-To allow console access via http://localhost:4200, you have to configure the Zitadel backend.
-
-1. Navigate to /ui/console/projects in your target Zitadel instance.
-3. Select the _Zitadel_ project.
-4. Select the _Console_ application.
-5. Select _Redirect Settings_
-6. Add _http://<span because="breaks the link"></span>localhost:4200/auth/callback_ to the _Redirect URIs_
-7. Add _http://<span because="breaks the link"></span>localhost:4200/signedout_ to the _Post Logout URIs_
-8. Select the _Save_ button
-
-#### Develop
-
-Run the local console development server.
+In another terminal, start the Login
 
 ```bash
 pnpm nx run @zitadel/login:prod
@@ -666,8 +611,8 @@ The documentation server will be available at http://localhost:3000 with live re
 #### Style guide
 
 - **Code with variables**: Make sure that code snippets can be used by setting environment variables, instead of manually replacing a placeholder.
-- **Embedded files**: When embedding mdx files, make sure the template is prefixed by "\_" (lowdash). The content will be rendered inside the parent page, but is not accessible individually (eg, by search).
-- **Don't repeat yourself**: When using the same content in multiple places, save and manage the content as a separate file and make use of embedded files to import it into other docs pages.
+- **Embedded files**: When embedding mdx files, make sure the template ist prefixed by "\_" (lowdash). The content will be rendered inside the parent page, but is not accessible individually (eg, by search).
+- **Don't repeat yourself**: When using the same content in multiple places, save and manage the content as separate file and make use of embedded files to import it into other docs pages.
 - **Embedded code**: You can embed code snippets from a repository. See the [plugin](https://github.com/saucelabs/docusaurus-theme-github-codeblock#usage) for usage.
 
 Following the [Google style guide](https://developers.google.com/style) is highly recommended. Its clear and concise guidelines ensure consistency and effective communication within the wider developer community.
@@ -694,79 +639,7 @@ pnpm nx run @zitadel/docs:build
 
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
 
-### <a name="troubleshoot-frontend"></a>Troubleshoot Frontend Quality Checks
-
-To debug and fix failing tasks, execute them individually using the `--filter` flag.
-
-We recommend using [one of the dev containers](dev-containers) to reproduce pipeline issues.
-
-```bash
-# to reproduce linting error in the console:
-pnpm lint --filter=console
-# To fix them:
-pnpm lint:fix --filter=console
-```
-
-More tasks that are runnable on-demand.
-Some tasks have variants like `pnpm test:e2e:angulargolang`,
-others support arguments and flags like `pnpm test:integration run --spec apps/login/integration/integration/login.cy.ts`.
-For the turbo commands, check your options with `pnpm turbo --help`
-
-| Command                   | Description                                              | Example                                                                                                                                                    |
-| ------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pnpm turbo run generate` | Generate stubs from Proto files                          | Generate API docs: `pnpm turbo run generate --filter zitadel-docs`                                                                                         |
-| `pnpm turbo build`        | Build runnable JavaScript code                           | Regenerate the proto stubs and build the @zitadel/client package: `pnpm turbo build --filter @zitadel/client`                                              |
-| `pnpm turbo quality`      | Reproduce the pipeline quality checks                    | Run login-related quality checks `pnpm turbo quality --filter './apps/login/*' --filter './packages/*'`                                                    |
-| `pnpm turbo lint`         | Check linting issues                                     | Check login-related linting issues for differences with main `pnpm turbo lint --filter=[main...HEAD] --filter .'/apps/login/**/*' --filter './packages/*'` |
-| `pnpm turbo lint:fix`     | Fix linting issues                                       | Fix console-relevant linting issues `pnpm turbo lint:fix --filter console --filter './packages/*' --filter zitadel-e2e`                                    |
-| `pnpm turbo test:unit`    | Run unit tests. Rerun on file changes                    | Run unit tests in all packages in and watch for file changes `pnpm turbo watch test:unit`                                                                  |
-| `pnpm turbo test:e2e`     | Run the Cypress CLI for console e2e tests                | Test interactively against the console in a local dev server and Zitadel in a container: `pnpm turbo test:e2e:angular open`                                |
-| `pnpm turbo down`         | Remove containers and volumes                            | Shut down containers from the integration test setup `pnpm turbo down`                                                                                     |
-| `pnpm turbo clean`        | Remove downloaded dependencies and other generated files | Remove generated docs  `pnpm turbo clean --filter zitadel-docs`                                                                                            |
-
-## <a name="dev-containers"></>Developing Zitadel with Dev Containers
-
-You can use dev containers if you'd like to make sure you have the same development environment like the corresponding GitHub PR checks use.
-The following dev containers are available:
-
-- **.devcontainer/base/devcontainer.json**: Contains everything you need to run whatever you want.
-- **.devcontainer/turbo-lint-unit/devcontainer.json**: Runs a dev container that executes frontent linting and unit tests and then exits. This is useful to reproduce the corresponding GitHub PR check.
-- **.devcontainer/turbo-lint-unit-debug/devcontainer.json**: Runs a dev container that executes frontent linting and unit tests in watch mode. You can fix the errors right away and have immediate feedback.
-- **.devcontainer/login-integration/devcontainer.json**: Runs a dev container that executes login integration tests and then exits. This is useful to reproduce the corresponding GitHub PR check.
-- **.devcontainer/login-integration-debug/devcontainer.json**: Runs a dev container that spins up the login in a hot-reloading dev server and executes login integration tests interactively. You can fix the errors right away and have immediate feedback.
-
-You can also run the GitHub PR checks locally in dev containers without having to connect to a dev container.
-
-
-The following pnpm commands use the [devcontainer CLI](https://github.com/devcontainers/cli/) and exit when the checks are done.
-The minimal system requirements are having Docker and the devcontainers CLI installed.
-If you don't have the node_modules installed already, you need to install the devcontainers CLI manually. Run `npm i -g @devcontainers/cli@0.80.0`. Alternatively, the [official Microsoft VS Code extension for Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) offers a command `Dev Containers: Install devcontainer CLI`
-
-
-```bash
-npm run devcontainer:lint-unit
-npm run devcontainer:integration:login
-```
-
-If you don't have NPM installed, copy and execute the scripts from the package.json directly.
-
-To connect to a dev container to have full IDE support, follow the instructions provided by your code editor/IDE to initiate the dev container.
-This typically involves opening the "Command Palette" or similar functionality and searching for commands related to "Dev Containers" or "Remote Containers".
-The quick start guide for VS Code can found [here](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container)
-
-For example, to build and run the Zitadel binary in a dev container, connect your IDE to the dev container described in .devcontainer/base/devcontainer.json.
-Run the following commands inside the container to start Zitadel.
-
-```bash
-make compile && ./zitadel start-from-init --masterkey MasterkeyNeedsToHave32Characters --tlsMode disabled
-```
-
-Zitadel serves traffic as soon as you can see the following log line:
-
-`INFO[0001] server is listening on [::]:8080`
-
-
-## <a name="contribute-translations"></a>Contribute Translations
+## Contribute Translations
 
 Zitadel loads translations from four files:
 
@@ -776,7 +649,7 @@ Zitadel loads translations from four files:
 - [Common texts](./internal/static/i18n) for success or error toasts
 
 You may edit the texts in these files or create a new file for additional language support. Make sure you set the locale (ISO 639-1 code) as the name of the new language file.
-Please make sure that the languages within the files remain in their own language, e.g. German must always be `Deutsch`.
+Please make sure that the languages within the files remain in their own language, e.g. German must always be `Deutsch.
 If you have added support for a new language, please also ensure that it is added in the list of languages in all the other language files.
 
 You also have to add some changes to the following files:
@@ -801,7 +674,7 @@ We want to deliver a new release every second week. So we plan everything in two
 Each Tuesday we estimate new issues and on Wednesday the last sprint will be reviewed and the next one will be planned.
 After a sprint ends a new version of Zitadel will be released, and publish to [Zitadel Cloud](https://zitadel.cloud) the following Monday.
 
-If there are critical or urgent issues we will have a look at it earlier than two weeks.
+If there are some critical or urgent issues we will have a look at it earlier, than the two weeks.
 To show the community the needed information, each issue gets attributes and labels.
 
 ### About the attributes
