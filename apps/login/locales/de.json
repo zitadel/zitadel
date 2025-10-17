@@ -182,6 +182,18 @@
     "completeRegister": {
       "title": "Registrierung abschließen",
       "description": "Bitte vervollständige die Registrierung, um dein Konto zu erstellen."
+    },
+    "accountNotFound": {
+      "title": "Konto nicht gefunden",
+      "description": "Wir konnten kein Konto finden, das mit Ihren Identitätsanbieter-Anmeldedaten verknüpft ist.",
+      "info": "Es wurde kein bestehendes Konto gefunden. Bitte melden Sie sich mit einem bestehenden Konto an oder wenden Sie sich an Ihren Administrator.",
+      "backToLogin": "Zurück zur Anmeldung"
+    },
+    "registrationFailed": {
+      "title": "Registrierung nicht verfügbar",
+      "description": "Wir konnten den Registrierungsprozess nicht abschließen.",
+      "info": "Die Organisation für die Registrierung konnte nicht ermittelt werden. Bitte wenden Sie sich an Ihren Administrator.",
+      "backToLogin": "Zurück zur Anmeldung"
     }
   },
   "ldap": {

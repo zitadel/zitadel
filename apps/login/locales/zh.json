@@ -182,6 +182,18 @@
     "completeRegister": {
       "title": "完成注册",
       "description": "完成您的账户注册。"
+    },
+    "accountNotFound": {
+      "title": "未找到账户",
+      "description": "我们无法找到与您的身份提供商凭据关联的账户。",
+      "info": "未找到现有账户。请使用现有账户登录或联系您的管理员寻求帮助。",
+      "backToLogin": "返回登录"
+    },
+    "registrationFailed": {
+      "title": "注册不可用",
+      "description": "我们无法完成注册过程。",
+      "info": "无法确定注册的组织。请联系您的管理员寻求帮助。",
+      "backToLogin": "返回登录"
     }
   },
   "ldap": {

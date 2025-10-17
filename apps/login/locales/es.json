@@ -182,6 +182,18 @@
     "completeRegister": {
       "title": "Completar registro",
       "description": "Para completar el registro, debes establecer una contraseña."
+    },
+    "accountNotFound": {
+      "title": "Cuenta no encontrada",
+      "description": "No pudimos encontrar una cuenta asociada con tus credenciales del proveedor de identidad.",
+      "info": "No se encontró ninguna cuenta existente. Por favor, inicia sesión con una cuenta existente o contacta a tu administrador para obtener asistencia.",
+      "backToLogin": "Volver al inicio de sesión"
+    },
+    "registrationFailed": {
+      "title": "Registro no disponible",
+      "description": "No pudimos completar el proceso de registro.",
+      "info": "No se pudo determinar la organización para el registro. Por favor, contacta a tu administrador para obtener asistencia.",
+      "backToLogin": "Volver al inicio de sesión"
     }
   },
   "ldap": {
