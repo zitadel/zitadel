@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-//go:generate mockgen -typed -package domainmock -destination ./mock/commander.mock.go . Executor
+//go:generate mockgen -typed -package domainmock -destination ./mock/executor.mock.go . Executor
 type Executor interface {
 	Execute(ctx context.Context, opts *InvokeOpts) (err error)
 	fmt.Stringer
