@@ -47,7 +47,7 @@ func TestServer_GetGroup(t *testing.T) {
 				req: &group_v2.GetGroupRequest{},
 			},
 			wantErrCode: codes.InvalidArgument,
-			wantErrMsg:  "invalid GetGroupRequest.Id: value length must be between 1 and 200 characters, inclusive",
+			wantErrMsg:  "invalid GetGroupRequest.Id: value length must be between 1 and 200 runes, inclusive",
 		},
 		{
 			name: "get group, not found",

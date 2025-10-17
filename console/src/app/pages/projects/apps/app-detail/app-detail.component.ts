@@ -114,7 +114,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }),
   );
 
-
   public wellknownURLs$ = this.envSvc.wellknown.pipe(
     map((wellknown) => {
       return [

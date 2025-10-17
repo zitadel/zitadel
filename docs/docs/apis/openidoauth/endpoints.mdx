@@ -174,7 +174,7 @@ the error will be display directly to the user on the auth server
 
 `${CUSTOM_DOMAIN}/oauth/v2/token`
 
-The token_endpoint will as the name suggests return various tokens (access, id and refresh) depending on the used `grant_type`.
+The token_endpoint will return various tokens (access, id and refresh) depending on the used `grant_type`.
 When using [`authorization_code`](#authorization-code-grant-code-exchange) flow call this endpoint after receiving the code from the authorization_endpoint.
 When using [`refresh_token`](#authorization-code-grant-code-exchange) or [`urn:ietf:params:oauth:grant-type:jwt-bearer` (JWT Profile)](#jwt-profile-grant) you will call this endpoint directly.
 

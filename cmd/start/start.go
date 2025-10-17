@@ -613,7 +613,7 @@ func startAPIs(
 	}
 	apis.RegisterHandlerOnPrefix(openapi.HandlerPrefix, openAPIHandler)
 
-	// Simple events endpoint for debugging service ping resource events
+	// Simple events endpoint for capturing analytics events
 	if h, err := int_events.Start(dbClient); err == nil {
 		apis.RegisterHandlerOnPrefix("/events", h)
 	}

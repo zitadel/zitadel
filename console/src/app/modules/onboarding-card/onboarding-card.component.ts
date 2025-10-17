@@ -26,7 +26,6 @@ export class OnboardingCardComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log("OnboardingCardComponent constructor ngOnInit")
     this.adminService.loadMilestones.next(ONBOARDING_MILESTONES);
   }
 }

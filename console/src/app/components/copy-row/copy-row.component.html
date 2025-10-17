@@ -7,7 +7,6 @@
     cnslCopyToClipboard
     [valueToCopy]="value"
     (copiedValue)="copied.set($event)"
-    (click)="analyticsService.emitAnalyticsEvent($event, 'click', 'copy-row-button', {})"
   >
     {{ value }}
   </button>

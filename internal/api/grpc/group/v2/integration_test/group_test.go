@@ -51,7 +51,7 @@ func TestServer_CreateGroup(t *testing.T) {
 				Name: integration.GroupName(),
 			},
 			wantErrorCode: codes.InvalidArgument,
-			wantErrMsg:    "invalid CreateGroupRequest.OrganizationId: value length must be between 1 and 200 characters, inclusive",
+			wantErrMsg:    "invalid CreateGroupRequest.OrganizationId: value length must be between 1 and 200 runes, inclusive",
 		},
 		{
 			name: "organization not found, error",
@@ -242,7 +242,7 @@ func TestServer_DeleteGroup(t *testing.T) {
 				Id: "",
 			},
 			wantErrCode: codes.InvalidArgument,
-			wantErrMsg:  "invalid DeleteGroupRequest.Id: value length must be between 1 and 200 characters, inclusive",
+			wantErrMsg:  "invalid DeleteGroupRequest.Id: value length must be between 1 and 200 runes, inclusive",
 		},
 		{
 			name: "group not found, ok",

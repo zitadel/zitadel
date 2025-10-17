@@ -23,9 +23,9 @@ import (
 )
 
 const (
-	QueueName = "service_ping_report"
-	// minInterval = 30 * time.Minute
-	minInterval = 1 * time.Minute // Debug - set frequent service pings
+	QueueName   = "service_ping_report"
+	minInterval = 30 * time.Minute
+	// minInterval = 1 * time.Minute // Debug - set frequent service pings
 )
 
 var (
