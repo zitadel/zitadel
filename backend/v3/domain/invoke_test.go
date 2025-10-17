@@ -27,12 +27,12 @@ type invokeTestCommand struct {
 	execute func(ctx context.Context, opts *InvokeOpts) error
 }
 
-// Events implements Commander.
+// Events implements [Commander].
 func (i *invokeTestCommand) Events(ctx context.Context, opts *InvokeOpts) ([]legacy_es.Command, error) {
 	return i.events, nil
 }
 
-// Execute implements Commander.
+// Execute implements [Commander].
 func (i *invokeTestCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	if i.execute == nil {
 		return nil
@@ -40,12 +40,12 @@ func (i *invokeTestCommand) Execute(ctx context.Context, opts *InvokeOpts) (err 
 	return i.execute(ctx, opts)
 }
 
-// String implements Commander.
+// String implements [Commander].
 func (i *invokeTestCommand) String() string {
 	return "invokeTestCommand"
 }
 
-// Validate implements Commander.
+// Validate implements [Commander].
 func (i *invokeTestCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
 	return nil
 }
@@ -157,6 +157,27 @@ func Test_eventCollector_Invoke(t *testing.T) {
 				assert.Equal(t, "2", events[0].Aggregate().ID)
 			},
 		},
+		{
+			name:        "executor batch all commands",
+			expectedErr: nil,
+			command: &invokeTestCommand{
+				execute: func(ctx context.Context, opts *InvokeOpts) error {
+					return opts.Invoke(ctx, BatchExecutors(
+						&invokeTestCommand{
+							events: []legacy_es.Command{&invokeTestEvent{id: "2"}},
+						},
+						&invokeTestCommand{
+							events: []legacy_es.Command{&invokeTestEvent{id: "3"}},
+						},
+					))
+				},
+			},
+			assertCollectedEvents: func(t *testing.T, events []legacy_es.Command) {
+				require.Len(t, events, 2)
+				assert.Equal(t, "2", events[0].Aggregate().ID)
+				assert.Equal(t, "3", events[1].Aggregate().ID)
+			},
+		},
 	}
 
 	SetLegacyEventstore(new(testLegacyEventstore))
@@ -165,9 +186,7 @@ func Test_eventCollector_Invoke(t *testing.T) {
 
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
-
 			pool := dbmock.NewMockPool(ctrl)
-
 			tx := dbmock.NewMockTransaction(ctrl)
 			tx.EXPECT().End(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 			pool.EXPECT().Begin(gomock.Any(), gomock.Any()).Return(tx, nil).AnyTimes()

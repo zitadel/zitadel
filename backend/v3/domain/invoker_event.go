@@ -10,11 +10,12 @@ import (
 // eventStoreInvoker checks if the [EventProducer].Events function returns any events.
 // If it does, it collects the events and publishes them to the event store.
 type eventStoreInvoker struct {
+	next      Invoker
 	collector *eventCollector
 }
 
 func newEventStoreInvoker(next Invoker) *eventStoreInvoker {
-	return &eventStoreInvoker{collector: &eventCollector{next: next}}
+	return &eventStoreInvoker{next: next}
 }
 
 type EventProducer interface {
@@ -24,16 +25,26 @@ type EventProducer interface {
 }
 
 func (i *eventStoreInvoker) Invoke(ctx context.Context, executor Executor, opts *InvokeOpts) (err error) {
+	if _, ok := executor.(EventProducer); !ok {
+		return i.execute(ctx, executor, opts)
+	}
+
+	if i.collector != nil {
+		return i.collector.Invoke(ctx, executor, opts)
+	}
+
 	close, err := opts.EnsureTx(ctx)
 	if err != nil {
 		return err
 	}
 	defer func() { err = close(ctx, err) }()
 
-	err = i.collector.Invoke(ctx, executor, opts)
-	if err != nil {
+	i.collector = &eventCollector{next: i.next}
+
+	if err = i.collector.Invoke(ctx, executor, opts); err != nil {
 		return err
 	}
+
 	if len(i.collector.events) > 0 {
 		err = eventstore.Publish(ctx, legacyEventstore, opts.DB, i.collector.events...)
 		if err != nil {
@@ -43,11 +54,19 @@ func (i *eventStoreInvoker) Invoke(ctx context.Context, executor Executor, opts 
 	return nil
 }
 
+func (i *eventStoreInvoker) execute(ctx context.Context, executor Executor, opts *InvokeOpts) error {
+	if i.next != nil {
+		return i.next.Invoke(ctx, executor, opts)
+	}
+	return executor.Execute(ctx, opts)
+}
+
 // eventCollector collects events from all commands. The [eventStoreInvoker] pushes the collected events after all commands are executed.
 // The events are collected after the command got executed, the collector ensures that the command is executed in the same transaction as writing the events.
 type eventCollector struct {
-	next   Invoker
-	events []legacy_es.Command
+	next          Invoker
+	events        []legacy_es.Command
+	shouldPrepend bool
 }
 
 func (i *eventCollector) Invoke(ctx context.Context, executor Executor, opts *InvokeOpts) (err error) {
@@ -59,14 +78,13 @@ func (i *eventCollector) Invoke(ctx context.Context, executor Executor, opts *In
 		return executor.Execute(ctx, opts)
 	}
 
-	close, err := opts.EnsureTx(ctx)
-	if err != nil {
-		return err
-	}
-	defer func() { err = close(ctx, err) }()
+	shouldPrepend := i.shouldPrepend
+	i.shouldPrepend = false
 
 	if i.next != nil {
+		i.shouldPrepend = true
 		err = i.next.Invoke(ctx, executor, opts)
+		i.shouldPrepend = false
 	} else {
 		err = executor.Execute(ctx, opts)
 	}
@@ -78,7 +96,11 @@ func (i *eventCollector) Invoke(ctx context.Context, executor Executor, opts *In
 		return err
 	}
 
-	i.events = append(collectedEvents, i.events...)
+	if shouldPrepend {
+		i.events = append(collectedEvents, i.events...)
+	} else {
+		i.events = append(i.events, collectedEvents...)
+	}
 
 	return err
 }

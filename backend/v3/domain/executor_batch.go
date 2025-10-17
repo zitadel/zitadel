@@ -13,7 +13,7 @@ type batchExecutor struct {
 	executors []Executor
 }
 
-func BatchExecutor(executors ...Executor) *batchExecutor {
+func BatchExecutors(executors ...Executor) *batchExecutor {
 	return &batchExecutor{
 		executors: executors,
 	}

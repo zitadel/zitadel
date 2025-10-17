@@ -34,7 +34,7 @@ func TestBatchExecutors(t *testing.T) {
 		mockCmd3.EXPECT().Events(gomock.Any(), gomock.Any()).Times(1),
 	)
 
-	batcher := domain.BatchExecutor(mockCmd1, mockCmd2, mockCmd3)
+	batcher := domain.BatchExecutors(mockCmd1, mockCmd2, mockCmd3)
 
 	// Test
 	err := domain.Invoke(context.Background(), batcher)
