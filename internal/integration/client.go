@@ -24,7 +24,8 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
 	action_v2beta "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
-	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
+	app_v2beta "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/application/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	authorization_v2 "github.com/zitadel/zitadel/pkg/grpc/authorization/v2"
 	authorization_v2beta "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
@@ -34,6 +35,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
+	internal_permission_v2 "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2"
 	internal_permission_v2beta "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
@@ -85,8 +87,10 @@ type Client struct {
 	SCIM                     *scim.Client
 	Projectv2Beta            project_v2beta.ProjectServiceClient
 	InstanceV2Beta           instance.InstanceServiceClient
-	AppV2Beta                app.AppServiceClient
+	AppV2Beta                app_v2beta.AppServiceClient
+	ApplicationV2            application.ApplicationServiceClient
 	InternalPermissionv2Beta internal_permission_v2beta.InternalPermissionServiceClient
+	InternalPermissionV2     internal_permission_v2.InternalPermissionServiceClient
 	AuthorizationV2Beta      authorization_v2beta.AuthorizationServiceClient //nolint:staticcheck // deprecated, but still used in tests
 	AuthorizationV2          authorization_v2.AuthorizationServiceClient
 	GroupV2                  group_v2.GroupServiceClient
@@ -131,8 +135,10 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		SCIM:                     scim.NewScimClient(target),
 		Projectv2Beta:            project_v2beta.NewProjectServiceClient(cc),
 		InstanceV2Beta:           instance.NewInstanceServiceClient(cc),
-		AppV2Beta:                app.NewAppServiceClient(cc),
+		AppV2Beta:                app_v2beta.NewAppServiceClient(cc),
+		ApplicationV2:            application.NewApplicationServiceClient(cc),
 		InternalPermissionv2Beta: internal_permission_v2beta.NewInternalPermissionServiceClient(cc),
+		InternalPermissionV2:     internal_permission_v2.NewInternalPermissionServiceClient(cc),
 		AuthorizationV2Beta:      authorization_v2beta.NewAuthorizationServiceClient(cc),
 		AuthorizationV2:          authorization_v2.NewAuthorizationServiceClient(cc),
 		GroupV2:                  group_v2.NewGroupServiceClient(cc),

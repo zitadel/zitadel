@@ -19,7 +19,7 @@ const sidebar_api_webkey_service_v2 = require("./docs/apis/resources/webkey_serv
 const sidebar_api_instance_service_v2 = require("./docs/apis/resources/instance_service_v2/sidebar.ts").default
 const sidebar_api_authorization_service_v2 = require("./docs/apis/resources/authorization_service_v2/sidebar.ts").default
 const sidebar_api_internal_permission_service_v2 = require("./docs/apis/resources/internal_permission_service_v2/sidebar.ts").default
-const sidebar_api_app_v2 = require("./docs/apis/resources/application_service_v2/sidebar.ts").default
+const sidebar_api_application_v2 = require("./docs/apis/resources/application_service_v2/sidebar.ts").default
 
 module.exports = {
   guides: [
@@ -874,19 +874,17 @@ module.exports = {
             },
             {
               type: "category",
-              label: "App (Beta)",
+              label: "Application",
               link: {
                 type: "generated-index",
-                title: "Application Service API (Beta)",
+                title: "Application Service API",
                 slug: "/apis/resources/application_service_v2",
                 description:
                   "This API lets you manage Zitadel applications (API, SAML, OIDC).\n" +
                   "\n" +
-                  "The API offers generic endpoints that work for all app types (API, SAML, OIDC), " +
-                  "\n" +
-                  "This API is in beta state. It can AND will continue breaking until a stable version is released.\n"
+                  "The API offers generic endpoints that work for all app types (API, SAML, OIDC), "
               },
-              items: sidebar_api_app_v2,
+              items: sidebar_api_application_v2,
             },
             {
               type: "category",
@@ -905,15 +903,13 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Internal Permissions (Beta)",
+              label: "Internal Permissions",
               link: {
                 type: "generated-index",
-                title: "Internal Permission Service API (Beta)",
+                title: "Internal Permission Service API",
                 slug: "/apis/resources/internal_permission_service_v2",
                 description:
-                  "This API is intended to manage internal permissions in ZITADEL.\n" +
-                  "\n" +
-                  "This API is in beta state. It can AND will continue breaking until a stable version is released.\n"
+                  "This API provides methods to manage permissions for resource and and their management in ZITADEL itself also known as \"administrators\"."
               },
               items: sidebar_api_internal_permission_service_v2,
             },
