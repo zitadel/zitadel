@@ -16,8 +16,7 @@ func (s *Server) AddUsersToGroup(ctx context.Context, c *connect.Request[group_v
 		return nil, err
 	}
 	return connect.NewResponse(&group_v2.AddUsersToGroupResponse{
-		FailedUserIds: addUsersResp.FailedUserIDs,
-		ChangeDate:    timestamppb.New(addUsersResp.EventDate),
+		ChangeDate: timestamppb.New(addUsersResp.EventDate),
 	}), nil
 }
 
@@ -31,6 +30,6 @@ func (s *Server) RemoveUsersFromGroup(ctx context.Context, c *connect.Request[gr
 	}), nil
 }
 
-func (s *Server) ListUsersInGroup(ctx context.Context, c *connect.Request[group_v2.ListUsersInGroupRequest]) (*connect.Response[group_v2.ListUsersInGroupResponse], error) {
+func (s *Server) ListGroupUsers(ctx context.Context, c *connect.Request[group_v2.ListGroupUsersRequest]) (*connect.Response[group_v2.ListGroupUsersResponse], error) {
 	return nil, zerrors.ThrowUnimplemented(nil, "GRPC-7000", "not implemented")
 }

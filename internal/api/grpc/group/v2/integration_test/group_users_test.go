@@ -35,12 +35,12 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 	user4 := instance.CreateHumanUserVerified(iamOwnerCtx, org1.OrganizationId, integration.Email(), integration.Phone())
 
 	tests := []struct {
-		name              string
-		ctx               context.Context
-		req               *group_v2.AddUsersToGroupRequest
-		wantFailedUserIDs []string
-		wantErrCode       codes.Code
-		wantErrMsg        string
+		name           string
+		ctx            context.Context
+		req            *group_v2.AddUsersToGroupRequest
+		wantChangeDate bool
+		wantErrCode    codes.Code
+		wantErrMsg     string
 	}{
 		{
 			name: "unauthenticated, error",
@@ -115,6 +115,7 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 				Id:      group.GetId(),
 				UserIds: []string{user1.GetUserId(), user2.GetUserId(), user3.GetUserId()},
 			},
+			wantChangeDate: true,
 		},
 		{
 			name: "some users not found, ok",
@@ -123,16 +124,8 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 				Id:      group.GetId(),
 				UserIds: []string{user1.GetUserId(), user2.GetUserId(), "randomUser"},
 			},
-			wantFailedUserIDs: []string{"randomUser"},
-		},
-		{
-			name: "no users were found, ok",
-			ctx:  iamOwnerCtx,
-			req: &group_v2.AddUsersToGroupRequest{
-				Id:      group.GetId(),
-				UserIds: []string{"randomUser1", "randomUser2"},
-			},
-			wantFailedUserIDs: []string{"randomUser1", "randomUser2"},
+			wantErrCode: codes.FailedPrecondition,
+			wantErrMsg:  "User could not be found (COMMAND-uXHNj)",
 		},
 		{
 			name: "user in a different org not added, ok",
@@ -141,7 +134,8 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 				Id:      group.GetId(),
 				UserIds: []string{user1.GetUserId(), user2.GetUserId(), defOrgUser.GetUserId()},
 			},
-			wantFailedUserIDs: []string{defOrgUser.GetUserId()},
+			wantErrCode: codes.FailedPrecondition,
+			wantErrMsg:  "User could not be found (COMMAND-uXHNj)",
 		},
 		{
 			name: "add all users to group, ok",
@@ -150,6 +144,7 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 				Id:      group.GetId(),
 				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
 			},
+			wantChangeDate: true,
 		},
 		{
 			name: "add all users to group (with duplicate user IDs), ok",
@@ -158,6 +153,7 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 				Id:      group.GetId(),
 				UserIds: []string{user1.GetUserId(), user4.GetUserId(), user4.GetUserId()},
 			},
+			wantChangeDate: true,
 		},
 	}
 	for _, tt := range tests {
@@ -171,8 +167,9 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 				return
 			}
 			require.NoError(t, err)
-			require.NotEmpty(t, got.GetChangeDate())
-			assert.Equal(t, tt.wantFailedUserIDs, got.FailedUserIds)
+			if tt.wantChangeDate {
+				require.NotEmpty(t, got.GetChangeDate())
+			}
 		})
 	}
 }
@@ -252,7 +249,7 @@ func TestServer_RemoveUsersFromGroup(t *testing.T) {
 				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
 			},
 			wantErrCode: codes.FailedPrecondition,
-			wantErrMsg:  "Errors.Group.NotFound (CMDGRP-JRBnLw)",
+			wantErrMsg:  "Errors.Group.NotFound (CMDGRP-eQfeur)",
 		},
 		{
 			name: "missing permission, error",

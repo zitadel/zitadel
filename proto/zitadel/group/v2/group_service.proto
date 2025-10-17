@@ -333,13 +333,13 @@ service GroupService {
     };
   }
 
-  // List Users
+  // List Group Users
   //
-  // Lists all the users in a group.
+  // Allows searching for groups based on user IDs, or retrieving users based on group IDs
   //
   // Required permissions:
   //   - group.user.read
-  rpc ListUsersInGroup(ListUsersInGroupRequest) returns (ListUsersInGroupResponse) {
+  rpc ListGroupUsers(ListGroupUsersRequest) returns (ListGroupUsersResponse) {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
@@ -532,10 +532,6 @@ message AddUsersToGroupRequest {
 }
 
 message AddUsersToGroupResponse {
-  // FailedUserIDs is the list of IDs of users who could not be added to the group.
-  // todo: do we need to add a failure reason?
-  repeated string failed_user_ids = 1;
-
   // ChangeDate is the timestamp when the users are added.
   google.protobuf.Timestamp change_date = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -572,21 +568,21 @@ message RemoveUsersFromGroupResponse {
   ];
 }
 
-message ListUsersInGroupRequest {
-  // ID of the group from which users should be retrieved.
-  string id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"69629012906488334\"";
-    },
-    (google.api.field_behavior) = REQUIRED
-  ];
+message ListGroupUsersRequest {
+  // GroupUsersSearchFilter defines the criteria to list the user groups.
+  repeated GroupUsersSearchFilter filters = 1;
 
-  // UserIDs is a list IDs of the users to be retrieved in the provided group.
-  repeated zitadel.filter.v2.InIDsFilter user_ids = 2;
+  // Pagination and sorting.
+  zitadel.filter.v2.PaginationRequest pagination = 2;
+
+  // SortingColumn defines the field the result is sorted by.
+  optional GroupUserFieldName sorting_column = 3;
 }
 
-message ListUsersInGroupResponse {
+message ListGroupUsersResponse {
   // Users is the list of users present in the requested group, matching the search criteria
   repeated zitadel.authorization.v2beta.User users = 1;
+
+  // Contains the total number of users matching the query and the applied limit.
+  zitadel.filter.v2.PaginationResponse pagination = 2;
 }
