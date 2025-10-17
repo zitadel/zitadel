@@ -138,8 +138,6 @@ func New(
 	api.registerHealthServer()
 
 	api.RegisterHandlerOnPrefix("/debug", api.healthHandler())
-	// api.RegisterHandlerOnPrefix("/events", handleEvents)
-	// api.router.HandleFunc("/events", handleEvents)
 	api.router.HandleFunc("/events", api.handleEvents)
 	api.router.Handle("/", http.RedirectHandler(login.HandlerPrefix, http.StatusFound))
 
@@ -423,30 +421,4 @@ func (a *API) handleEvents(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write([]byte(`{"status":"received"}`))
 
-	// if err != nil {
-
-	// 	body, err := io.ReadAll(r.Body)
-	// 	if err != nil {
-	// 		http.Error(w, "Bad request: unable to read body", http.StatusBadRequest)
-	// 		return
-	// 	}
-	// 	if err := json.Unmarshal(body, &event); err != nil {
-	// 		http.Error(w, "Bad request", http.StatusBadRequest)
-	// 		return
-	// 	}
-
-	// 	_, err = dbClient.ExecContext(ctx, insertEventStmt, event.Type, event.Data)
-
-	// 	// This puts the data from the event in to the event var
-	// 	// TODO: Process or store the event as needed
-
-	// 	// if err := a.queries.InsertAnalyticsEvent(ctx, event.Type, body); err != nil {
-	// 	// 	logging.WithError(err).Error("failed to insert analytics event")
-	// 	// 	http.Error(w, "Internal server error", http.StatusInternalServerError)
-	// 	// 	return
-	// 	// }
-	// 	w.Header().Set("Content-Type", "application/json")
-	// 	w.WriteHeader(http.StatusOK)
-	// 	_, _ = w.Write([]byte(`{"status":"received"}`))
-	// }
 }
