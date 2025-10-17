@@ -110,6 +110,10 @@ func scanActiveUserAgentUserIDs(rows *sql.Rows) (userAgentID string, sessions ma
 		if err != nil {
 			return "", nil, err
 		}
+		// Sessions created before back-channel logout implementation and never updated
+		// since then, don't have an ID.
+		// In this case, we use the userID as sessionID to ensure uniqueness in the map.
+		// The ID will not be used for logout process itself.
 		if !sessionID.Valid {
 			sessionID.String = userID
 		}
