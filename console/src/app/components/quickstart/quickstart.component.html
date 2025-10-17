@@ -4,10 +4,10 @@
     <p class="description">{{ 'QUICKSTART.DESCRIPTION' | translate }}</p>
 
     <div class="btn-wrapper">
-      <a mat-raised-button color="primary" [routerLink]="['/projects', 'app-create']" (click)="analyticsService.emitAnalyticsEvent($event, 'click', 'button', 'QUICKSTART.BTN_START')">{{
+      <a mat-raised-button color="primary" [routerLink]="['/projects', 'app-create']" (click)="analyticsService.emitAnalyticsEvent($event, 'click', 'QUICKSTART.BTN_START', {})">{{
         'QUICKSTART.BTN_START' | translate
       }}</a>
-      <a mat-stroked-button color="primary" href="https://zitadel.com/docs/sdk-examples/introduction" target="_blank">{{
+      <a mat-stroked-button color="primary" href="https://zitadel.com/docs/sdk-examples/introduction" target="_blank" (click)="analyticsService.emitAnalyticsEvent($event, 'click', 'QUICKSTART.BTN_LEARNMORE', {})">{{
         'QUICKSTART.BTN_LEARNMORE' | translate
       }}</a>
     </div>

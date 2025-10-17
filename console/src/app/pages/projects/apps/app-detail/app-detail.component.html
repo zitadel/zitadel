@@ -86,7 +86,7 @@
               <h3>{{ currentRadioItemAuthType.titleI18nKey | translate }}</h3>
               <p>{{ currentRadioItemAuthType.descI18nKey | translate }}</p>
               <span class="fill-space"></span>
-              <button mat-icon-button (click)="changeAuthMethod(); analyticsService.emitAnalyticsEvent($event,  'click', 'edit_auth_method', currentRadioItemAuthType.descI18nKey)"><i class="las la-pen"></i></button>
+              <button mat-icon-button (click)="changeAuthMethod(); analyticsService.emitAnalyticsEvent($event,  'click', 'edit_auth_method', {desc: currentRadioItemAuthType.descI18nKey})"><i class="las la-pen"></i></button>
             </div>
 
             <form [formGroup]="oidcForm" (ngSubmit)="saveOIDCApp()">
