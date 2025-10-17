@@ -100,7 +100,8 @@ func ActiveUserSessionsBySessionID(ctx context.Context, db *database.DB, session
 func scanActiveUserAgentUserIDs(rows *sql.Rows) (userAgentID string, sessions map[string]string, err error) {
 	sessions = make(map[string]string)
 	for rows.Next() {
-		var userID, sessionID string
+		var userID string
+		var sessionID sql.NullString
 		err := rows.Scan(
 			&userAgentID,
 			&userID,
@@ -109,7 +110,10 @@ func scanActiveUserAgentUserIDs(rows *sql.Rows) (userAgentID string, sessions ma
 		if err != nil {
 			return "", nil, err
 		}
-		sessions[sessionID] = userID
+		if !sessionID.Valid {
+			sessionID.String = userID
+		}
+		sessions[sessionID.String] = userID
 	}
 	if err := rows.Close(); err != nil {
 		return "", nil, zerrors.ThrowInternal(err, "VIEW-Sbrws", "Errors.Query.CloseRows")
