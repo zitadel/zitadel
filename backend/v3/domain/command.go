@@ -11,11 +11,14 @@ import (
 // Commander is all that is needed to implement the command pattern.
 // It is the interface all manipulations need to implement.
 // If possible it should also be used for queries. We will find out if this is possible in the future.
+//
+//go:generate mockgen -typed -package domainmock -destination ./mock/commander.mock.go . Commander
 type Commander interface {
 	Execute(ctx context.Context, opts *CommandOpts) (err error)
+	Validate(ctx context.Context, opts *CommandOpts) (err error)
 	// Events returns the events that should be pushed to the event store after the command is executed.
 	// If the command does not produce events, it should return nil or an empty slice.
-	Events(ctx context.Context) []legacy_es.Command
+	Events(ctx context.Context, opts *CommandOpts) ([]legacy_es.Command, error)
 	fmt.Stringer
 }
 
@@ -26,11 +29,41 @@ type Invoker interface {
 }
 
 // CommandOpts are passed to each command
-// it provides common fields used by commands like the database client.
+// they provide common fields used by commands like the database client.
 type CommandOpts struct {
-	DB          database.QueryExecutor
-	Invoker     Invoker
-	Permissions PermissionChecker
+	DB      database.QueryExecutor
+	Invoker Invoker
+
+	Permissions            PermissionChecker
+	organizationRepo       OrganizationRepository
+	organizationDomainRepo OrganizationDomainRepository
+
+	projectRepo ProjectRepository
+
+	instanceRepo       InstanceRepository
+	instanceDomainRepo InstanceDomainRepository
+}
+
+// Setters for tests
+
+func (opts *CommandOpts) SetOrgRepo(repo OrganizationRepository) {
+	opts.organizationRepo = repo
+}
+
+func (opts *CommandOpts) SetOrgDomainRepo(repo OrganizationDomainRepository) {
+	opts.organizationDomainRepo = repo
+}
+
+func (opts *CommandOpts) SetProjectRepo(repo ProjectRepository) {
+	opts.projectRepo = repo
+}
+
+func (opts *CommandOpts) SetInstanceRepo(repo InstanceRepository) {
+	opts.instanceRepo = repo
+}
+
+func (opts *CommandOpts) SetInstanceDomainRepo(repo InstanceDomainRepository) {
+	opts.instanceDomainRepo = repo
 }
 
 type ensureTxOpts struct {
@@ -115,14 +148,18 @@ type commandBatch struct {
 }
 
 // Events implements Commander.
-func (cmd *commandBatch) Events(ctx context.Context) []legacy_es.Command {
+func (cmd *commandBatch) Events(ctx context.Context, opts *CommandOpts) ([]legacy_es.Command, error) {
 	commands := make([]legacy_es.Command, 0, len(cmd.Commands))
 	for _, c := range cmd.Commands {
-		if e := c.Events(ctx); len(e) > 0 {
+		e, err := c.Events(ctx, opts)
+		if err != nil {
+			return nil, err
+		}
+		if len(e) > 0 {
 			commands = append(commands, e...)
 		}
 	}
-	return commands
+	return commands, nil
 }
 
 func BatchCommands(cmds ...Commander) *commandBatch {
@@ -138,7 +175,16 @@ func (cmd *commandBatch) String() string {
 
 func (b *commandBatch) Execute(ctx context.Context, opts *CommandOpts) (err error) {
 	for _, cmd := range b.Commands {
-		if err = opts.Invoke(ctx, cmd); err != nil {
+		if err = cmd.Execute(ctx, opts); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (b *commandBatch) Validate(ctx context.Context, opts *CommandOpts) (err error) {
+	for _, cmd := range b.Commands {
+		if err = cmd.Validate(ctx, opts); err != nil {
 			return err
 		}
 	}

@@ -8,17 +8,59 @@ import (
 	legacy_es "github.com/zitadel/zitadel/internal/eventstore"
 )
 
+type InvokeOpt func(*CommandOpts)
+
+func WithOrganizationRepo(repo OrganizationRepository) InvokeOpt {
+	return func(opts *CommandOpts) {
+		opts.organizationRepo = repo
+	}
+}
+
+func WithOrganizationDomainRepo(repo OrganizationDomainRepository) InvokeOpt {
+	return func(opts *CommandOpts) {
+		opts.organizationDomainRepo = repo
+	}
+}
+
+func WithProjectRepo(repo ProjectRepository) InvokeOpt {
+	return func(opts *CommandOpts) {
+		opts.projectRepo = repo
+	}
+}
+
+func WithInstanceRepo(repo InstanceRepository) InvokeOpt {
+	return func(opts *CommandOpts) {
+		opts.instanceRepo = repo
+	}
+}
+
+func WithInstanceDomainRepo(repo InstanceDomainRepository) InvokeOpt {
+	return func(opts *CommandOpts) {
+		opts.instanceDomainRepo = repo
+	}
+}
+
 // Invoke provides a way to execute commands within the domain package.
 // It uses a chain of responsibility pattern to handle the command execution.
 // The default chain includes logging, tracing, and event publishing.
 // If you want to invoke multiple commands in a single transaction, you can use the [commandBatch].
-func Invoke(ctx context.Context, cmd Commander) error {
-	invoker := newEventStoreInvoker(newLoggingInvoker(newTraceInvoker(nil)))
-	opts := &CommandOpts{
-		Invoker: invoker.collector,
-		DB:      pool,
+func Invoke(ctx context.Context, cmd Commander, opts ...InvokeOpt) error {
+	invoker := newEventStoreInvoker(
+		newLoggingInvoker(
+			newTraceInvoker(
+				newValidatorInvoker(nil),
+			),
+		),
+	)
+	commandOpts := &CommandOpts{
+		Invoker:     invoker.collector,
+		DB:          pool,
+		Permissions: &noopPermissionChecker{},
 	}
-	return invoker.Invoke(ctx, cmd, opts)
+	for _, opt := range opts {
+		opt(commandOpts)
+	}
+	return invoker.Invoke(ctx, cmd, commandOpts)
 }
 
 // eventStoreInvoker checks if the [Commander].Events function returns any events.
@@ -32,6 +74,9 @@ func newEventStoreInvoker(next Invoker) *eventStoreInvoker {
 }
 
 func (i *eventStoreInvoker) Invoke(ctx context.Context, command Commander, opts *CommandOpts) (err error) {
+	close, err := opts.EnsureTx(ctx)
+	defer func() { err = close(ctx, err) }()
+
 	err = i.collector.Invoke(ctx, command, opts)
 	if err != nil {
 		return err
@@ -67,7 +112,12 @@ func (i *eventCollector) Invoke(ctx context.Context, command Commander, opts *Co
 	if err != nil {
 		return err
 	}
-	i.events = append(command.Events(ctx), i.events...)
+	collectedEvents, err := command.Events(ctx, opts)
+	if err != nil {
+		return err
+	}
+
+	i.events = append(collectedEvents, i.events...)
 
 	return
 }
@@ -131,6 +181,26 @@ func (i *noopInvoker) Invoke(ctx context.Context, command Commander, opts *Comma
 	if i.next != nil {
 		return i.next.Invoke(ctx, command, opts)
 	}
+	return command.Execute(ctx, opts)
+}
+
+type validatorInvoker struct {
+	next Invoker
+}
+
+func newValidatorInvoker(next Invoker) *validatorInvoker {
+	return &validatorInvoker{next: next}
+}
+
+func (i *validatorInvoker) Invoke(ctx context.Context, command Commander, opts *CommandOpts) error {
+	if err := command.Validate(ctx, opts); err != nil {
+		return err
+	}
+
+	if i.next != nil {
+		return i.next.Invoke(ctx, command, opts)
+	}
+
 	return command.Execute(ctx, opts)
 }
 
