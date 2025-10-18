@@ -24,15 +24,7 @@ services:
       ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel
       ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel
       ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
-      
-      # By configuring a login client, the setup job creates a user of type machine with the role IAM_LOGIN_CLIENT.
-      # It writes a PAT to the path specified in ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH.
-      # The PAT is passed to the login container via the environment variable ZITADEL_SERVICE_USER_TOKEN_FILE.
-      ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH: /current-dir/login-client.pat
-      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED: false
-      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_USERNAME: login-client
-      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_NAME: Automatically Initialized IAM_LOGIN_CLIENT
-      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_PAT_EXPIRATIONDATE: '2029-01-01T00:00:00Z'
+
       # Activate the login v2 on an installation from scratch.
       # To activate the login v2 on an existing installation, read the "What's next" section.
       ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED: true # To use the login v1, set this to false.
@@ -41,6 +33,19 @@ services:
       ZITADEL_OIDC_DEFAULTLOGINURLV2: http://localhost:3000/ui/v2/login/login?authRequest=
       ZITADEL_OIDC_DEFAULTLOGOUTURLV2: http://localhost:3000/ui/v2/login/logout?post_logout_redirect=
       ZITADEL_SAML_DEFAULTLOGINURLV2: http://localhost:3000/ui/v2/login/login?samlRequest=
+
+      # By configuring SystemAPIUsers, Zitadel holds a list of public keys, which can be used to validate signed JWTs.
+      # With this the login can communicate with the API, but still has limited permissions through the Roles "IAM_LOGIN_CLIENT".
+      ZITADEL_SYSTEMAPIUSERS: '{"login-system-user":{"Path":"/current-dir/login-system-user.pub","Memberships":[{"MemberType":"System","Roles":["IAM_LOGIN_CLIENT"]}]}}'
+
+      # By configuring a login client, the setup job creates a user of type machine with the role IAM_LOGIN_CLIENT.
+      # It writes a PAT to the path specified in ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH.
+      # The PAT can be passed to the login container via the environment variable ZITADEL_SERVICE_USER_TOKEN_FILE, for example.
+      # ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH: /current-dir/login-client.pat
+      # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED: false
+      # ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_USERNAME: login-client
+      # ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_NAME: Automatically Initialized IAM_LOGIN_CLIENT
+      # ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_PAT_EXPIRATIONDATE: '2029-01-01T00:00:00Z'
 
       # By configuring a machine, the setup job creates a user of type machine with the role IAM_OWNER.
       # It writes a personal access token (PAT) to the path specified in ZITADEL_FIRSTINSTANCE_PATPATH.
@@ -94,7 +99,12 @@ services:
     environment:
       - ZITADEL_API_URL=http://localhost:8080
       - NEXT_PUBLIC_BASE_PATH=/ui/v2/login
-      - ZITADEL_SERVICE_USER_TOKEN_FILE=/current-dir/login-client.pat
+      # Provide a private key so that the login can communicate with the API securely, this private key will be used to create a singed JWT that can be validated by the API
+      - AUDIENCE=http://localhost:8080
+      - SYSTEM_USER_ID=login-system-user
+      - SYSTEM_USER_PRIVATE_KEY_FILE=/current-dir/login-system-user-key.pem
+      # You could also provide a PAT instead of a private key
+      # - ZITADEL_SERVICE_USER_TOKEN_FILE=/current-dir/login-client.pat
     network_mode: service:zitadel
     user: "0"
     volumes:
