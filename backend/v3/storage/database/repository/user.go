@@ -135,6 +135,13 @@ func (u user) SetUsername(username string) database.Change {
 // conditions
 // -------------------------------------------------------------
 
+func (u user) PrimaryKeyCondition(instanceID, userID string) database.Condition {
+	return database.And(
+		u.InstanceIDCondition(instanceID),
+		u.IDCondition(userID),
+	)
+}
+
 // InstanceIDCondition implements [domain.userConditions].
 func (u user) InstanceIDCondition(instanceID string) database.Condition {
 	return database.NewTextCondition(u.InstanceIDColumn(), database.TextOperationEqual, instanceID)
@@ -181,6 +188,14 @@ func (u user) DeletedAtCondition(op database.NumberOperation, deletedAt time.Tim
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
+
+// PrimaryKeyColumns implements [domain.Repository].
+func (u user) PrimaryKeyColumns() []database.Column {
+	return []database.Column{
+		u.InstanceIDColumn(),
+		u.IDColumn(),
+	}
+}
 
 // InstanceIDColumn implements [domain.userColumns].
 func (user) InstanceIDColumn() database.Column {

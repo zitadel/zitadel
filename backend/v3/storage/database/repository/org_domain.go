@@ -157,6 +157,14 @@ func (o orgDomain) SetUpdatedAt(updatedAt time.Time) database.Change {
 // conditions
 // -------------------------------------------------------------
 
+func (o orgDomain) PrimaryKeyCondition(instanceID, orgID, domain string) database.Condition {
+	return database.And(
+		o.InstanceIDCondition(instanceID),
+		o.OrgIDCondition(orgID),
+		o.DomainCondition(database.TextOperationEqual, domain),
+	)
+}
+
 // DomainCondition implements [domain.OrganizationDomainRepository].
 func (o orgDomain) DomainCondition(op database.TextOperation, domain string) database.Condition {
 	return database.NewTextCondition(o.DomainColumn(), op, domain)
@@ -186,6 +194,15 @@ func (o orgDomain) OrgIDCondition(orgID string) database.Condition {
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
+
+// PrimaryKeyColumns implements [domain.Repository].
+func (o orgDomain) PrimaryKeyColumns() []database.Column {
+	return []database.Column{
+		o.InstanceIDColumn(),
+		o.OrgIDColumn(),
+		o.DomainColumn(),
+	}
+}
 
 // CreatedAtColumn implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).CreatedAtColumn of orgDomain.org.

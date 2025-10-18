@@ -92,8 +92,8 @@ func (p *instanceDomainRelationalProjection) reduceDomainPrimarySet(event events
 
 		_, err := domainRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
+				domainRepo.PrimaryKeyCondition(e.Domain),
 				domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
-				domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),
 				domainRepo.TypeCondition(domain.DomainTypeCustom),
 			),
 			domainRepo.SetPrimary(),
@@ -116,8 +116,8 @@ func (p *instanceDomainRelationalProjection) reduceCustomDomainRemoved(event eve
 		domainRepo := repository.InstanceDomainRepository()
 		_, err := domainRepo.Remove(ctx, v3_sql.SQLTx(tx),
 			database.And(
+				domainRepo.PrimaryKeyCondition(e.Domain),
 				domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
-				domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),
 				domainRepo.TypeCondition(domain.DomainTypeCustom),
 			),
 		)
@@ -158,8 +158,8 @@ func (p *instanceDomainRelationalProjection) reduceTrustedDomainRemoved(event ev
 		domainRepo := repository.InstanceDomainRepository()
 		_, err := domainRepo.Remove(ctx, v3_sql.SQLTx(tx),
 			database.And(
+				domainRepo.PrimaryKeyCondition(e.Domain),
 				domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
-				domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),
 				domainRepo.TypeCondition(domain.DomainTypeTrusted),
 			),
 		)

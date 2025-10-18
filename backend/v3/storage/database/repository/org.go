@@ -148,6 +148,13 @@ func (o org) SetState(state domain.OrgState) database.Change {
 // conditions
 // -------------------------------------------------------------
 
+func (o org) PrimaryKeyCondition(instanceID, orgID string) database.Condition {
+	return database.And(
+		o.InstanceIDCondition(instanceID),
+		o.IDCondition(orgID),
+	)
+}
+
 // IDCondition implements [domain.organizationConditions].
 func (o org) IDCondition(id string) database.Condition {
 	return database.NewTextCondition(o.IDColumn(), database.TextOperationEqual, id)
@@ -220,6 +227,14 @@ func (o org) ExistsMetadata(cond database.Condition) database.Condition {
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
+
+// PrimaryKeyColumns implements [domain.Repository].
+func (o org) PrimaryKeyColumns() []database.Column {
+	return []database.Column{
+		o.InstanceIDColumn(),
+		o.IDColumn(),
+	}
+}
 
 // IDColumn implements [domain.organizationColumns].
 func (o org) IDColumn() database.Column {

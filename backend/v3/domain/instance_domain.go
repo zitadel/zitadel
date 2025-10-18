@@ -47,6 +47,8 @@ type instanceDomainColumns interface {
 
 type instanceDomainConditions interface {
 	domainConditions
+	// PrimaryKeyCondition returns a filter on the primary key fields.
+	PrimaryKeyCondition(domain string) database.Condition
 	// TypeCondition returns a filter for the type field.
 	TypeCondition(typ DomainType) database.Condition
 }
@@ -58,6 +60,8 @@ type instanceDomainChanges interface {
 }
 
 type InstanceDomainRepository interface {
+	Repository
+
 	instanceDomainColumns
 	instanceDomainConditions
 	instanceDomainChanges
