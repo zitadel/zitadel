@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -27,4 +28,23 @@ func EnsureInstanceFeature(t *testing.T, ctx context.Context, instance *Instance
 		retryDuration,
 		tick,
 		"timed out waiting for ensuring instance feature")
+}
+
+type RelationalTableFeatureMatrix struct {
+	State      string
+	FeatureSet *feature.SetInstanceFeaturesRequest
+}
+
+// TODO(IAM-Marco): Once we have gotten rid of eventstore, this can be removed
+func RelationalTablesEnableMatrix() []RelationalTableFeatureMatrix {
+	return []RelationalTableFeatureMatrix{
+		{
+			State:      "when relational tables are enabled",
+			FeatureSet: &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)},
+		},
+		{
+			State:      "when relational tables are disabled",
+			FeatureSet: &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(false)},
+		},
+	}
 }

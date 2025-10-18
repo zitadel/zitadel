@@ -5,6 +5,7 @@ import (
 
 	"connectrpc.com/connect"
 
+	orgv2 "github.com/zitadel/zitadel/backend/v3/api/org/v2"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -14,6 +15,10 @@ import (
 )
 
 func (s *Server) ListOrganizations(ctx context.Context, req *connect.Request[org.ListOrganizationsRequest]) (*connect.Response[org.ListOrganizationsResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return orgv2.ListOrganizations(ctx, req)
+	}
+
 	queries, err := listOrgRequestToModel(ctx, req)
 	if err != nil {
 		return nil, err
