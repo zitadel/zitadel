@@ -860,15 +860,13 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Project (Beta)",
+              label: "Project",
               link: {
                 type: "generated-index",
-                title: "Project Service API (Beta)",
+                title: "Project Service API",
                 slug: "/apis/resources/project_service_v2",
                 description:
-                  "This API is intended to manage projects and subresources for ZITADEL. \n" +
-                  "\n" +
-                  "This service is in beta state. It can AND will continue breaking until a stable version is released.",
+                  "This API is intended to manage projects and subresources for ZITADEL."
               },
               items: sidebar_api_project_service_v2,
             },

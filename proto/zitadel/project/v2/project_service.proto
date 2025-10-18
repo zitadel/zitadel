@@ -1,0 +1,901 @@
+syntax = "proto3";
+
+package zitadel.project.v2;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+
+import "zitadel/project/v2/query.proto";
+import "google/protobuf/timestamp.proto";
+import "zitadel/filter/v2/filter.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/project/v2;project";
+
+// Service to manage projects.
+service ProjectService {
+
+  // Create Project
+  //
+  // Create a new project. A project is a vessel to group applications, roles and
+  // authorizations. Every project belongs to exactly one organization, but
+  // can be granted to other organizations for self-management of their authorizations.
+  //
+  // Required permission:
+  //   - `project.create`
+  rpc CreateProject (CreateProjectRequest) returns (CreateProjectResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // Update Project
+  //
+  // Update an existing project.
+  //
+  // Required permission:
+  //   - `project.write`
+  rpc UpdateProject (UpdateProjectRequest) returns (UpdateProjectResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // Delete Project
+  //
+  // Delete an existing project.
+  // In case the project is not found, the request will return a successful response as
+  // the desired state is already achieved.
+  //
+  // Required permission:
+  //   - `project.delete`
+  rpc DeleteProject (DeleteProjectRequest) returns (DeleteProjectResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // Get Project
+  //
+  // Returns the project identified by the requested ID.
+  //
+  // Required permission:
+  //   - `project.read`
+  rpc GetProject (GetProjectRequest) returns (GetProjectResponse) {
+   option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "project.read"
+      }
+    };
+  }
+
+  // List Projects
+  //
+  // List all matching projects. By default all projects of the instance that the caller
+  // has permission to read are returned.
+  // Make sure to include a limit and sorting for pagination.
+  //
+  // Required permission:
+  //   - `project.read`
+  rpc ListProjects (ListProjectsRequest) returns (ListProjectsResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "project.read"
+      }
+    };
+  }
+
+  // Deactivate Project
+  //
+  // Set the state of a project to deactivated. Request returns no error if the project is already deactivated.
+  // Applications under deactivated projects are not able to login anymore.
+  //
+  // Required permission:
+  //   - `project.write`
+  rpc DeactivateProject (DeactivateProjectRequest) returns (DeactivateProjectResponse) {
+   option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // Activate Project
+  //
+  // Set the state of a project to active. Request returns no error if the project is already activated.
+  //
+  // Required permission:
+  //   - `project.write`
+  rpc ActivateProject (ActivateProjectRequest) returns (ActivateProjectResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // Add Project Role
+  //
+  // Add a new project role to a project. The key must be unique within the project.
+  //
+  // Required permission:
+  //   - `project.role.write`
+  rpc AddProjectRole (AddProjectRoleRequest) returns (AddProjectRoleResponse) {
+   option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // Update Project Role
+  //
+  // Change a project role. The key is not editable. If a key should change, remove the role and create a new one.
+  //
+  // Required permission:
+  //   - `project.role.write`
+  rpc UpdateProjectRole (UpdateProjectRoleRequest) returns (UpdateProjectRoleResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // Remove Project Role
+  //
+  // Removes the role from the project and on every resource it has a dependency.
+  // This includes project grants and user grants.
+  //
+  // Required permission:
+  //   - `project.role.write`
+  rpc RemoveProjectRole (RemoveProjectRoleRequest) returns (RemoveProjectRoleResponse) {
+   option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // List Project Roles
+  //
+  // Returns all roles of a project matching the search query.
+  //
+  // Required permission:
+  //   - `project.role.read`
+  rpc ListProjectRoles (ListProjectRolesRequest) returns (ListProjectRolesResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "project.role.read"
+      }
+    };
+  }
+
+  // Create Project Grant
+  //
+  // Grant a project to another organization.
+  // The project grant will allow the granted organization to access the project and manage
+  // the authorizations for its users.
+  //
+  // Required permission:
+  //   - `project.grant.create`
+  rpc CreateProjectGrant (CreateProjectGrantRequest) returns (CreateProjectGrantResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // Update Project Grant
+  //
+  // Change the roles of the project that is granted to another organization.
+  // The project grant will allow the granted organization to access the project and manage
+  // the authorizations for its users.
+  //
+  // Required permission:
+  //   - `project.grant.write`
+  rpc UpdateProjectGrant (UpdateProjectGrantRequest) returns (UpdateProjectGrantResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // Delete Project Grant
+  //
+  // Delete a project grant. All user grants for this project grant will also be removed.
+  // A user will not have access to the project afterward (if permissions are checked).
+  // In case the project grant is not found, the request will return a successful response as
+  // the desired state is already achieved.
+  //
+  // Required permission:
+  //   - `project.grant.delete`
+  rpc DeleteProjectGrant (DeleteProjectGrantRequest) returns (DeleteProjectGrantResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // Deactivate Project Grant
+  //
+  // Set the state of the project grant to deactivated.
+  // Applications under deactivated projects grants are not able to login anymore.
+  //
+  // Required permission:
+  //   - `project.grant.write`
+  rpc DeactivateProjectGrant(DeactivateProjectGrantRequest) returns (DeactivateProjectGrantResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // Activate Project Grant
+  //
+  // Set the state of the project grant to activated.
+  //
+  // Required permission:
+  //   - `project.grant.write`
+  rpc ActivateProjectGrant(ActivateProjectGrantRequest) returns (ActivateProjectGrantResponse) {
+   option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // List Project Grants
+  //
+  // Returns a list of project grants. A project grant is when the organization grants its project
+  // to another organization.
+  //
+  // Required permission:
+  //   - `project.grant.read`
+  rpc ListProjectGrants(ListProjectGrantsRequest) returns (ListProjectGrantsResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "project.grant.read"
+      }
+    };
+  }
+}
+
+message CreateProjectRequest {
+  // OrganizationID is the unique identifier of the organization the project belongs to.
+  string organization_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+
+  // ProjectID is the unique identifier of the new project. This field is optional.
+  // If omitted, the system will generate a unique ID for you. This is the
+  // recommended way. The generated ID will be returned in the response.
+  optional string project_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+
+  // Name of the project. This might be presented to users, e.g. in sign-in flows.
+  string name = 3 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"MyProject\"";
+    }
+  ];
+
+  // ProjectRoleAssertion is a  setting that can be enabled to have role information
+  // included in the user info endpoint.
+  // It is also dependent on your application settings to include it in tokens and other types.
+  bool project_role_assertion = 4;
+
+  // AuthorizationRequired is a boolean flag that can be enabled to check if a user has
+  // an authorization to use this project assigned when login into an application of this project.
+  bool authorization_required = 5;
+
+  // ProjectAccessRequired is a boolean flag that can be enabled to check if the organization
+  // of the user, that is trying to log in,
+  // has access to this project (either owns the project or is granted).
+  bool project_access_required = 6;
+
+  // PrivateLabelingSetting is a setting that defines which private labeling/branding should
+  // trigger when getting to a login of this project.
+  PrivateLabelingSetting private_labeling_setting = 7 [
+    (validate.rules).enum = {defined_only: true}
+  ];
+}
+
+message CreateProjectResponse {
+  // ProjectID is the unique identifier of the newly created project.
+  string project_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+
+  // CreationDate is the timestamp of the project creation.
+  google.protobuf.Timestamp creation_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+}
+
+message UpdateProjectRequest {
+  // ProjectID is the unique identifier of the project to be updated.
+  string project_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+
+  // Name is used to update the name of the project. This field is optional.
+  // If omitted, the name will remain unchanged.
+  optional string name = 2  [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"MyProject-Updated\"";
+    }
+  ];
+
+  // ProjectRoleAssertion is a setting that can be enabled to have role information
+  // included in the user info endpoint.
+  // It is also dependent on your application settings to include it in tokens and other types.
+  // If omitted, the setting will remain unchanged.
+  optional bool project_role_assertion = 3;
+
+  // AuthorizationRequired is a boolean flag that can be enabled to check if a user has
+  // a role of this project assigned when logging into an application of this project.
+  // If omitted, the setting will remain unchanged.
+  optional bool authorization_required = 4;
+
+  // ProjectAccessRequired is a boolean flag that can be enabled to check if the organization
+  // of the user has a grant to this project.
+  // If omitted, the setting will remain unchanged.
+  optional bool project_access_required = 5;
+
+  // PrivateLabelingSetting is a setting that defines which private labeling/branding should
+  // trigger when getting to a login of this project.
+  // If omitted, the setting will remain unchanged.
+  optional PrivateLabelingSetting private_labeling_setting = 6 [
+    (validate.rules).enum = {defined_only: true}
+  ];
+}
+
+message UpdateProjectResponse {
+  // ChangeDate is the timestamp of the change of the project.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message DeleteProjectRequest {
+  // ProjectID is the unique identifier of the project to be deleted.
+  string project_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message DeleteProjectResponse {
+  // DeletionDate is the timestamp of the deletion of the project.
+  // Note that the deletion date is only guaranteed to be set if the deletion was successful during the request.
+  // In case the deletion occurred in a previous request, the deletion date might be empty.
+  google.protobuf.Timestamp deletion_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message GetProjectRequest {
+  // ProjectID is the unique identifier of the project to be retrieved.
+  string project_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message GetProjectResponse {
+  // Project is the project that matches the project ID used in the request.
+  Project project = 1;
+}
+
+message ListProjectsRequest {
+  // Pagination can be used to list limitations and ordering.
+  optional zitadel.filter.v2.PaginationRequest pagination = 1;
+
+  // SortingColumn is the field the result is sorted by. The default is the creation date.
+  // Beware that if you change this, your result pagination might be inconsistent.
+  optional ProjectFieldName sorting_column = 2;
+
+  // Filters define the criteria to query for.
+  repeated ProjectSearchFilter filters = 3;
+}
+
+message ListProjectsResponse {
+  // Pagination contains the total number of projects matching the query and the applied limit.
+  zitadel.filter.v2.PaginationResponse pagination = 1;
+
+  // Projects is a list of projects matching the query.
+  repeated Project projects = 2;
+}
+
+message DeactivateProjectRequest {
+  // ProjectID is the unique identifier of the project.
+  string project_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message DeactivateProjectResponse {
+  // ChangeDate is the timestamp of the change of the project.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message ActivateProjectRequest {
+  // ProjectID is the unique identifier of the project.
+  string project_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message ActivateProjectResponse {
+  // ChangeDate is the timestamp of the change of the project.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message AddProjectRoleRequest {
+  // ProjectID is the unique identifier of the project.
+  string project_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+
+  // RoleKey identifies the role. It's the only relevant attribute for ZITADEL and
+  // will be used for authorization checks and as claim in tokens and user info responses.
+  string role_key = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"ADMIN\"";
+    }
+  ];
+
+  // DisplayName is a human readable name for the role, which might be displayed to users.
+  string display_name = 3 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"Administrator\"";
+    }
+  ];
+
+  // Group allows grouping roles for display purposes. Zitadel will not handle it in any way.
+  // It can be used to group roles in a UI to allow easier management for administrators.
+  // This attribute is not to be confused with groups as a collection of users.
+  optional string group = 4 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"Admins\"";
+    }
+  ];
+}
+
+message AddProjectRoleResponse {
+  // CreationDate is the timestamp of the project role creation.
+  google.protobuf.Timestamp creation_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+}
+
+message UpdateProjectRoleRequest {
+  // ProjectID is the unique identifier of the project.
+  string project_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+
+  // RoleKey identifies the role. It's the only relevant attribute for ZITADEL and
+  // will be used for authorization checks and as claim in tokens and user info responses.
+  // It cannot be changed. If you need a different key, remove the role and create a new one.
+  string role_key = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"ADMIN\"";
+    }
+  ];
+
+  // DisplayName is the human readable name for the role, which might be displayed to users.
+  // If omitted, the name will remain unchanged.
+  optional string display_name = 3 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"Administrator\"";
+    }
+  ];
+
+  // Group allows grouping roles for display purposes. Zitadel will not handle it in any way.
+  // It can be used to group roles in a UI to allow easier management for administrators.
+  // If omitted, the group will remain unchanged.
+  // This attribute is not to be confused with groups as a collection of users.
+  optional string group = 4 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"Admins\"";
+    }
+  ];
+}
+
+message UpdateProjectRoleResponse {
+  // ChangeDate is the timestamp of the change of the project role.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message RemoveProjectRoleRequest {
+  // ProjectID is the unique identifier of the project.
+  string project_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+
+  // RoleKey is the key of the role to be removed.
+  // All dependencies of this role will be removed as well, including project grants and user grants.
+  // If the role is not found, the request will return a successful response as the desired state is already achieved.
+  string role_key = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"ADMIN\"";
+    }
+  ];
+}
+
+message RemoveProjectRoleResponse {
+  // RemovalDate is the timestamp of the removal of the project role.
+  // Note that the removal date is only guaranteed to be set if the removal was successful during the request.
+  // In case the removal occurred in a previous request, the removal date might be empty.
+  google.protobuf.Timestamp removal_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message ListProjectRolesRequest {
+  // ProjectID is the unique identifier of the project.
+  string project_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+
+  // Pagination can be used to list limitations and ordering.
+  optional zitadel.filter.v2.PaginationRequest pagination = 2;
+
+  // SortingColumn is the field the result is sorted by. The default is the creation date.
+  // Beware that if you change this, your result pagination might be inconsistent.
+  optional ProjectRoleFieldName sorting_column = 3;
+
+  // Filters define the criteria to query for.
+  repeated ProjectRoleSearchFilter filters = 4;
+}
+
+message ListProjectRolesResponse {
+  // Pagination contains the total number of project roles matching the query and the applied limit.
+  zitadel.filter.v2.PaginationResponse pagination = 1;
+
+  // ProjectRoles is a list of roles matching the query.
+  repeated ProjectRole project_roles = 2;
+}
+
+
+message CreateProjectGrantRequest {
+  // ProjectID is the unique identifier of the project.
+  string project_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+
+  // GrantedOrganizationID is the unique identifier of the organization the project will be granted to.
+  string granted_organization_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"28746028909593987\""
+    }
+  ];
+
+  // RoleKeys is a list of roles to be granted to the organization for self management.
+  // The roles are identified by their keys.
+  repeated string role_keys = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"RoleKey1\", \"RoleKey2\"]";
+    }
+  ];
+}
+
+message CreateProjectGrantResponse {
+  // CreationDate is the timestamp of the project grant creation.
+  google.protobuf.Timestamp creation_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+}
+
+message UpdateProjectGrantRequest {
+  // ProjectID is the unique identifier of the project.
+  string project_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+
+  // GrantedOrganizationID is the unique identifier of the organization the project was granted to.
+  string granted_organization_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"28746028909593987\""
+    }
+  ];
+
+  // RoleKeys is a list of roles to be granted to the organization for self management.
+  // The roles are identified by their keys.
+  // Any roles not included in this list will be removed from the project grant.
+  // If you want to add a role, make sure to include all other existing roles as well.
+  // If any previous role is removed, all user grants for this project grant with this role will be removed as well.
+  repeated string role_keys = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"RoleKey1\", \"RoleKey2\"]";
+    }
+  ];
+}
+
+message UpdateProjectGrantResponse {
+  // ChangeDate is the timestamp of the change of the project grant.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message DeleteProjectGrantRequest {
+  // ProjectID is the unique identifier of the project.
+  string project_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+
+  // GrantedOrganizationID is the unique identifier of the organization the project was granted to.
+  string granted_organization_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"28746028909593987\""
+    }
+  ];
+}
+
+message DeleteProjectGrantResponse {
+  // DeletionDate is the timestamp of the deletion of the project grant.
+  // Note that the deletion date is only guaranteed to be set if the deletion was successful during the request.
+  // In case the deletion occurred in a previous request, the deletion date might be empty.
+  google.protobuf.Timestamp deletion_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message DeactivateProjectGrantRequest {
+  // ProjectID is the unique identifier of the project.
+  string project_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+
+  // GrantedOrganizationID is the unique identifier of the organization the project was granted to.
+  string granted_organization_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"28746028909593987\""
+    }
+  ];
+}
+
+message DeactivateProjectGrantResponse {
+  // ChangeDate is the timestamp of the change of the project grant.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message ActivateProjectGrantRequest {
+  // ProjectID is the unique identifier of the project.
+  string project_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+
+  // GrantedOrganizationID is the unique identifier of the organization the project was granted to.
+  string granted_organization_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"28746028909593987\""
+    }
+  ];
+}
+
+message ActivateProjectGrantResponse {
+  // ChangeDate is the timestamp of the change of the project grant.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message ListProjectGrantsRequest {
+  // Pagination can be used to list limitations and ordering.
+  optional zitadel.filter.v2.PaginationRequest pagination = 1;
+
+  // SortingColumn is the field the result is sorted by. The default is the creation date.
+  // Beware that if you change this, your result pagination might be inconsistent.
+  optional ProjectGrantFieldName sorting_column = 2;
+
+  // Filters define the criteria to query for.
+  repeated ProjectGrantSearchFilter filters = 3;
+}
+
+message ListProjectGrantsResponse {
+  // Pagination contains the total number of project grants matching the query and the applied limit.
+  zitadel.filter.v2.PaginationResponse pagination = 1;
+
+  // ProjectGrants is a list of project grants matching the query.
+  repeated ProjectGrant project_grants = 2;
+}
