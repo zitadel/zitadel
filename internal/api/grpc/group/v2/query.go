@@ -15,7 +15,7 @@ import (
 
 // GetGroup returns a group that matches the group ID in the request
 func (s *Server) GetGroup(ctx context.Context, req *connect.Request[group_v2.GetGroupRequest]) (*connect.Response[group_v2.GetGroupResponse], error) {
-	group, err := s.query.GetGroupByID(ctx, req.Msg.GetId())
+	group, err := s.query.GetGroupByID(ctx, req.Msg.GetId(), s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func (s *Server) ListGroups(ctx context.Context, req *connect.Request[group_v2.L
 	if err != nil {
 		return nil, err
 	}
-	resp, err := s.query.SearchGroups(ctx, queries)
+	resp, err := s.query.SearchGroups(ctx, queries, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
