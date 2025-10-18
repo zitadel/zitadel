@@ -410,7 +410,7 @@ module.exports = {
           },
           instance_v2: {
             specPath:
-              ".artifacts/openapi3/zitadel/instance/v2beta/instance_service.openapi.yaml",
+              ".artifacts/openapi3/zitadel/instance/v2/instance_service.openapi.yaml",
             outputDir: "docs/apis/resources/instance_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",

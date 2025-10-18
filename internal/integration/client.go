@@ -33,7 +33,8 @@ import (
 	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
-	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
+	instance_v2 "github.com/zitadel/zitadel/pkg/grpc/instance/v2"
+	instance_v2beta "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	internal_permission_v2 "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2"
 	internal_permission_v2beta "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
@@ -85,7 +86,8 @@ type Client struct {
 	SAMLv2                   saml_pb.SAMLServiceClient
 	SCIM                     *scim.Client
 	Projectv2Beta            project_v2beta.ProjectServiceClient
-	InstanceV2Beta           instance.InstanceServiceClient
+	InstanceV2Beta           instance_v2beta.InstanceServiceClient //nolint:staticcheck // deprecated but still used in tests
+	InstanceV2               instance_v2.InstanceServiceClient
 	AppV2Beta                app_v2beta.AppServiceClient
 	ApplicationV2            application.ApplicationServiceClient
 	InternalPermissionv2Beta internal_permission_v2beta.InternalPermissionServiceClient
@@ -132,7 +134,8 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		SAMLv2:                   saml_pb.NewSAMLServiceClient(cc),
 		SCIM:                     scim.NewScimClient(target),
 		Projectv2Beta:            project_v2beta.NewProjectServiceClient(cc),
-		InstanceV2Beta:           instance.NewInstanceServiceClient(cc),
+		InstanceV2Beta:           instance_v2beta.NewInstanceServiceClient(cc),
+		InstanceV2:               instance_v2.NewInstanceServiceClient(cc),
 		AppV2Beta:                app_v2beta.NewAppServiceClient(cc),
 		ApplicationV2:            application.NewApplicationServiceClient(cc),
 		InternalPermissionv2Beta: internal_permission_v2beta.NewInternalPermissionServiceClient(cc),

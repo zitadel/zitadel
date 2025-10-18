@@ -28,6 +28,7 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	instance_pb "github.com/zitadel/zitadel/pkg/grpc/instance/v2"
 	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
@@ -192,7 +193,7 @@ func (a *API) registerConnectServer(service server.ConnectServer) {
 		connect_middleware.CallDurationHandler(),
 		connect_middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
 		connect_middleware.NoCacheInterceptor(),
-		connect_middleware.InstanceInterceptor(a.queries, a.externalDomain, a.translator, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName),
+		connect_middleware.InstanceInterceptor(a.queries, a.externalDomain, a.translator, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName, instance_pb.InstanceService_ServiceDesc.ServiceName),
 		connect_middleware.AccessStorageInterceptor(a.accessInterceptor.AccessService()),
 		connect_middleware.ErrorHandler(),
 		connect_middleware.LimitsInterceptor(system_pb.SystemService_ServiceDesc.ServiceName),
