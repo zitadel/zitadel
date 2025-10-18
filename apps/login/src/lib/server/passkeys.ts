@@ -18,6 +18,7 @@ import {
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
+import { getTranslations } from "next-intl/server";
 import { getMostRecentSessionCookie, getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
 import { getServiceUrlFromHeaders } from "../service-url";
 import { checkEmailVerification, checkUserVerification } from "../verify-helper";
@@ -257,6 +258,9 @@ type SendPasskeyCommand = {
 
 export async function sendPasskey(command: SendPasskeyCommand) {
   let { loginName, sessionId, organization, checks, requestId } = command;
+
+  const t = await getTranslations("passkey");
+
   const recentSession = sessionId
     ? await getSessionCookieById({ sessionId })
     : loginName
@@ -265,7 +269,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
 
   if (!recentSession) {
     return {
-      error: "Could not find session",
+      error: t("verify.errors.couldNotFindSession"),
     };
   }
 
@@ -277,11 +281,15 @@ export async function sendPasskey(command: SendPasskeyCommand) {
     organization,
   });
 
-  let lifetime = checks?.webAuthN
-    ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
-    : checks?.otpEmail || checks?.otpSms
-      ? loginSettings?.secondFactorCheckLifetime
-      : undefined;
+  let lifetime = command.lifetime; // Use provided lifetime first
+
+  if (!lifetime) {
+    lifetime = checks?.webAuthN
+      ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
+      : checks?.otpEmail || checks?.otpSms
+        ? loginSettings?.secondFactorCheckLifetime
+        : undefined;
+  }
 
   if (!lifetime) {
     console.warn("No passkey lifetime provided, defaulting to 24 hours");
@@ -300,16 +308,22 @@ export async function sendPasskey(command: SendPasskeyCommand) {
   });
 
   if (!session || !session?.factors?.user?.id) {
-    return { error: "Could not update session" };
+    return { error: t("verify.errors.couldNotUpdateSession") };
   }
 
-  const userResponse = await getUserByID({
-    serviceUrl,
-    userId: session?.factors?.user?.id,
-  });
+  let userResponse;
+  try {
+    userResponse = await getUserByID({
+      serviceUrl,
+      userId: session?.factors?.user?.id,
+    });
+  } catch (error) {
+    console.error("Error fetching user by ID:", error);
+    return { error: t("verify.errors.couldNotGetUser") };
+  }
 
   if (!userResponse.user) {
-    return { error: "User not found in the system" };
+    return { error: t("verify.errors.userNotFound") };
   }
 
   const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
@@ -320,8 +334,9 @@ export async function sendPasskey(command: SendPasskeyCommand) {
     return emailVerificationCheck;
   }
 
+  let redirectResult;
   if (requestId && session.id) {
-    return completeFlowOrGetUrl(
+    redirectResult = await completeFlowOrGetUrl(
       {
         sessionId: session.id,
         requestId: requestId,
@@ -330,7 +345,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
       loginSettings?.defaultRedirectUri,
     );
   } else if (session?.factors?.user?.loginName) {
-    return completeFlowOrGetUrl(
+    redirectResult = await completeFlowOrGetUrl(
       {
         loginName: session.factors.user.loginName,
         organization: organization,
@@ -338,4 +353,16 @@ export async function sendPasskey(command: SendPasskeyCommand) {
       loginSettings?.defaultRedirectUri,
     );
   }
+
+  // Check if we got a valid redirect result
+  if (redirectResult && typeof redirectResult === "object" && "redirect" in redirectResult && redirectResult.redirect) {
+    return redirectResult;
+  }
+
+  if (redirectResult && typeof redirectResult === "object" && "error" in redirectResult) {
+    return redirectResult;
+  }
+
+  // Fallback error if we couldn't determine where to redirect
+  return { error: t("verify.errors.couldNotDetermineRedirect") };
 }
