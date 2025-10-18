@@ -46,10 +46,11 @@ export async function loginWithOIDCAndSession({
 
       const res = await sendLoginname(command);
 
-      if (res && "redirect" in res && res?.redirect) {
+      if ("redirect" in res) {
         console.log("Redirecting to re-authenticate:", res.redirect);
         return { redirect: res.redirect };
       }
+      // If error, continue with existing session logic
     }
 
     const cookie = sessionCookies.find((cookie) => cookie.id === selectedSession?.id);

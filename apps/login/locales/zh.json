@@ -50,7 +50,9 @@
       "usernamePasswordNotAllowed": "不允许使用用户名和密码！请联系管理员了解更多信息。",
       "passkeysNotAllowed": "不允许使用 Passkey！请联系管理员了解更多信息。",
       "couldNotFindIdentityProvider": "找不到身份提供者。",
-      "userNotActive": "用户未激活。请联系管理员了解更多信息。"
+      "userNotActive": "用户未激活。请联系管理员了解更多信息。",
+      "noSuitableIDPFound": "未找到合适的身份提供者进行身份验证。",
+      "noAuthenticationMethodAvailable": "此用户没有可用的身份验证方法。"
     }
   },
   "zitadel": {

@@ -50,7 +50,9 @@
       "usernamePasswordNotAllowed": "Username Password not allowed! Contact your administrator for more information.",
       "passkeysNotAllowed": "Passkeys not allowed! Contact your administrator for more information.",
       "couldNotFindIdentityProvider": "Could not find identity provider.",
-      "userNotActive": "User is not active. Contact your administrator for more information."
+      "userNotActive": "User is not active. Contact your administrator for more information.",
+      "noSuitableIDPFound": "No suitable identity provider found for authentication.",
+      "noAuthenticationMethodAvailable": "No authentication method available for this user."
     }
   },
   "zitadel": {
