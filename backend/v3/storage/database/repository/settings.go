@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	db_json "github.com/zitadel/zitadel/backend/v3/storage/database/json"
 )
 
 type settings struct{}
@@ -42,6 +44,10 @@ func (settings) OrgIDColumn() database.Column {
 
 func (settings) TypeColumn() database.Column {
 	return database.NewColumn("settings", "type")
+}
+
+func (settings) OwnerTypeColumn() database.Column {
+	return database.NewColumn("settings", "owner_type")
 }
 
 func (settings) LabelStateColumn() database.Column {
@@ -83,6 +89,10 @@ func (s settings) TypeCondition(typ domain.SettingType) database.Condition {
 	return database.NewTextCondition(s.TypeColumn(), database.TextOperationEqual, typ.String())
 }
 
+func (s settings) OwnerTypeCondition(typ domain.OwnerType) database.Condition {
+	return database.NewTextCondition(s.OwnerTypeColumn(), database.TextOperationEqual, typ.String())
+}
+
 func (s settings) LabelStateCondition(typ domain.LabelState) database.Condition {
 	return database.NewTextCondition(s.LabelStateColumn(), database.TextOperationEqual, typ.String())
 }
@@ -106,6 +116,23 @@ func (s settings) SetUpdatedAt(updatedAt *time.Time) database.Change {
 const querySettingStmt = `SELECT instance_id, organization_id, id, type, owner_type, label_state, settings,` +
 	` created_at, updated_at` +
 	` FROM zitadel.settings`
+
+func (s *settings) Get_(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Setting, error) {
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	if !options.Condition.IsRestrictingColumn(s.LabelStateColumn()) {
+		return nil, database.NewMissingConditionError(s.LabelStateColumn())
+	}
+
+	var builder database.StatementBuilder
+	builder.WriteString(querySettingStmt)
+	options.Write(&builder)
+
+	return getOne[domain.Setting](ctx, client, &builder)
+}
 
 func (s *settings) Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, typ domain.SettingType, opts ...database.QueryOption) (*domain.Setting, error) {
 	builder := database.StatementBuilder{}
@@ -183,12 +210,10 @@ func (s *loginSettings) Get(ctx context.Context, client database.QueryExecutor, 
 		return nil, err
 	}
 
-	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> loginSetting.Setting.Settings = %+v\n", string(loginSetting.Setting.Settings))
 	err = json.Unmarshal(loginSetting.Setting.Settings, &loginSetting.Settings)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> loginSetting.Settings.ForceMFA = %+v\n", loginSetting.Settings.ForceMFA)
 
 	return loginSetting, nil
 }
@@ -196,6 +221,82 @@ func (s *loginSettings) Get(ctx context.Context, client database.QueryExecutor, 
 // label
 type labelSettings struct {
 	domain.SettingsRepository
+}
+
+// -------------------------------------------------------------
+// label changes
+// -------------------------------------------------------------
+
+func (l labelSettings) SetLabelSettings(changes ...db_json.JSONFieldChange) database.Change {
+	return db_json.NewJsonChange(l.SettingsColumn(), changes...)
+}
+
+func (l labelSettings) SetPrimaryColorField(value string) db_json.JSONFieldChange {
+	return db_json.NewChange("'{primaryColor}'", value)
+}
+
+func (l labelSettings) SetBackgroundColorField(value string) db_json.JSONFieldChange {
+	return db_json.NewChange("'{backgroundColor}'", value)
+}
+
+func (l labelSettings) SetWarnColorField(value string) db_json.JSONFieldChange {
+	return db_json.NewChange("'{warnColor}'", value)
+}
+
+func (l labelSettings) SetFontColorField(value string) db_json.JSONFieldChange {
+	return db_json.NewChange("'{fontColor}'", value)
+}
+
+func (l labelSettings) SetPrimaryCcolorDarkField(value string) db_json.JSONFieldChange {
+	return db_json.NewChange("'{primaryColorDark}'", value)
+}
+
+func (l labelSettings) SetBackgroundColorDarkField(value string) db_json.JSONFieldChange {
+	return db_json.NewChange("'{backgroundColorDark}'", value)
+}
+
+func (l labelSettings) SetWarnColorDarkField(value string) db_json.JSONFieldChange {
+	return db_json.NewChange("'{warnColorDark}'", value)
+}
+
+func (l labelSettings) SetFontColorDarkField(value string) db_json.JSONFieldChange {
+	return db_json.NewChange("'{fontColorDark}'", value)
+}
+
+func (l labelSettings) SetHideLoginNameSuffixField(value bool) db_json.JSONFieldChange {
+	return db_json.NewChange("'{hideLoginNameSuffix}'", value)
+}
+
+func (l labelSettings) SetErrorMsgPopupField(value bool) db_json.JSONFieldChange {
+	return db_json.NewChange("'{errorMsgPopup}'", value)
+}
+
+func (l labelSettings) SetDisableWatermarkField(value bool) db_json.JSONFieldChange {
+	return db_json.NewChange("'{disableMsgPopup}'", value)
+}
+
+func (l labelSettings) SetThemeModeField(value domain.LabelPolicyThemeMode) db_json.JSONFieldChange {
+	return db_json.NewChange("'{themeMode}'", value)
+}
+
+func (l labelSettings) SetLabelPolicyLightLogoURL(value *url.URL) db_json.JSONFieldChange {
+	return db_json.NewChange("'{labelPolicyLightLogoURL}'", value)
+}
+
+func (l labelSettings) SetLabelPolicyDarkLogoURL(value *url.URL) db_json.JSONFieldChange {
+	return db_json.NewChange("'{labelPolicyDarkLogoURL}'", value)
+}
+
+func (l labelSettings) SetLabelPolicyLightIconURL(value *url.URL) db_json.JSONFieldChange {
+	return db_json.NewChange("'{labelPolicyLightIconURL}'", value)
+}
+
+func (l labelSettings) SetLabelPolicyDarkIconURL(value *url.URL) db_json.JSONFieldChange {
+	return db_json.NewChange("'{labelPolicyDarkIconURL}'", value)
+}
+
+func (l labelSettings) SetLabelPolicyFontURL(value *url.URL) db_json.JSONFieldChange {
+	return db_json.NewChange("'{labelPolicyLightFontURL}'", value)
 }
 
 func LabelRepository() domain.LabelRepository {
@@ -206,30 +307,79 @@ func LabelRepository() domain.LabelRepository {
 
 var _ domain.LabelRepository = (*labelSettings)(nil)
 
-func (s *labelSettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.LabelSetting, changes ...database.Change) error {
-	if setting == nil {
-		return ErrSettingObjectMustNotBeNil
+const createLabelSettingStmt = `INSERT INTO zitadel.settings` +
+	` (instance_id, organization_id, type, owner_type, label_state, settings)` +
+	` VALUES ($1, $2, $3, $4, $5, $6)` +
+	` ON CONFLICT (instance_id, organization_id, type, owner_type, label_state) WHERE type = 'label' DO UPDATE SET` +
+	` settings = EXCLUDED.settings` +
+	` RETURNING id, created_at, updated_at`
+
+func (s *labelSettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.LabelSetting) error {
+	settingJSON, err := json.Marshal(setting.Settings)
+	if err != nil {
+		return err
 	}
-	setting.Type = domain.SettingTypeLabel
-	return createSetting(ctx, client, setting.Setting, &setting.Settings)
+
+	builder := database.NewStatementBuilder(
+		createLabelSettingStmt,
+		setting.InstanceID,
+		setting.OrgID,
+		setting.Type,
+		setting.OwnerType,
+		setting.LabelState,
+		string(settingJSON))
+
+	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.ID, &setting.CreatedAt, &setting.UpdatedAt)
 }
 
-func (s *labelSettings) Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*domain.LabelSetting, error) {
+func (s *labelSettings) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+	// var instanceID any
+	// if instanceID = condition.GetValue(s.InstanceIDColumn()); instanceID == nil {
+	// 	return 0, database.NewMissingConditionError(s.InstanceIDColumn())
+	// }
+
+	// var orgID any
+	// if orgID = condition.GetValue(s.OrgIDColumn()); orgID == nil {
+	// 	return 0, database.NewMissingConditionError(s.OrgIDColumn())
+	// }
+
+	// var ownerType any
+	// if ownerType = condition.GetValue(s.OwnerTypeColumn()); ownerType == nil {
+	// 	return 0, database.NewMissingConditionError(s.OwnerTypeColumn())
+	// }
+
+	// var labelState any
+	// if labelState = condition.GetValue(s.LabelStateColumn()); labelState == nil {
+	// 	return 0, database.NewMissingConditionError(s.LabelStateColumn())
+	// }
+
+	builder := database.StatementBuilder{}
+	builder.WriteString(`UPDATE zitadel.settings SET `)
+	database.Changes(changes).Write(&builder)
+	writeCondition(&builder, condition)
+
+	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+func (s *labelSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.LabelSetting, error) {
 	labelSetting := &domain.LabelSetting{}
 	var err error
 
-	labelSetting.Setting, err = s.SettingsRepository.Get(ctx, client, instanceID, orgID, domain.SettingTypeLabel)
+	labelSetting.Setting, err = s.SettingsRepository.Get_(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> labelSetting.Setting.Settings = %+v\n", labelSetting.Setting.Settings)
 	err = json.Unmarshal(labelSetting.Setting.Settings, &labelSetting.Settings)
 	if err != nil {
 		return nil, err
 	}
 
 	return labelSetting, nil
+}
+
+func (s *labelSettings) Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	return s.SettingsRepository.Delete(ctx, client, condition)
 }
 
 func (s *settings) UpdateLogin(ctx context.Context, client database.QueryExecutor, setting *domain.LoginSetting, changes ...database.Change) (int64, error) {
@@ -272,6 +422,12 @@ func (s *settings) UpdateLabel(ctx context.Context, client database.QueryExecuto
 	}
 	return s.updateSetting(ctx, client, setting.Setting, &setting.Settings, changes...)
 }
+
+// INSERT INTO zitadel.settings (instance_id, org_id, type, label_state, settings, updated_at, created_at)
+// SELECT instance_id, org_id, type, $1, settings, $2, $3 FROM zitadel.settings AS copy_table
+// WHERE (copy_table.type = $4) AND (copy_table.instance_id = $5) AND (copy_table.org_id IS NULL) AND (copy_table.label_state = $6)
+// ON CONFLICT (instance_id, org_id, type, label_state) WHERE (type = $7)
+// DO UPDATE SET (instance_id, org_id, type, label_state, settings, updated_at, created_at) = (EXCLUDED.instance_id, EXCLUDED.org_id, EXCLUDED.type, $1, EXCLUDED.settings, $2, $3)
 
 const activatedLabelSettingStmt = `INSERT INTO zitadel.settings` +
 	` (instance_id, organization_id, type, owner_type, label_state, settings)` +
@@ -354,7 +510,6 @@ func (s *passwordComplexitySettings) Get(ctx context.Context, client database.Qu
 		return nil, err
 	}
 
-	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> passwordComplexitySetting.Setting.Settings = %+v\n", passwordComplexitySetting.Setting.Settings)
 	err = json.Unmarshal(passwordComplexitySetting.Setting.Settings, &passwordComplexitySetting.Settings)
 	if err != nil {
 		return nil, err
@@ -431,7 +586,6 @@ func (s *lockoutSettings) Get(ctx context.Context, client database.QueryExecutor
 		return nil, err
 	}
 
-	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> lockoutSetting.Setting.Settings = %+v\n", lockoutSetting.Setting.Settings)
 	err = json.Unmarshal(lockoutSetting.Setting.Settings, &lockoutSetting.Settings)
 	if err != nil {
 		return nil, err
@@ -470,7 +624,6 @@ func (s *securitySettings) Get(ctx context.Context, client database.QueryExecuto
 		return nil, err
 	}
 
-	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> securitySetting.Setting.Settings = %+v\n", securitySetting.Setting.Settings)
 	err = json.Unmarshal(securitySetting.Setting.Settings, &securitySetting.Settings)
 	if err != nil {
 		return nil, err
@@ -509,7 +662,6 @@ func (s *DomainSettings) Get(ctx context.Context, client database.QueryExecutor,
 		return nil, err
 	}
 
-	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DomainSetting.Setting.Settings = %+v\n", DomainSetting.Setting.Settings)
 	err = json.Unmarshal(DomainSetting.Setting.Settings, &DomainSetting.Settings)
 	if err != nil {
 		return nil, err
@@ -548,7 +700,6 @@ func (s *organizationSettings) Get(ctx context.Context, client database.QueryExe
 		return nil, err
 	}
 
-	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> organizationSetting.Setting.Settings = %+v\n", organizationSetting.Setting.Settings)
 	err = json.Unmarshal(organizationSetting.Setting.Settings, &organizationSetting.Settings)
 	if err != nil {
 		return nil, err
@@ -767,13 +918,12 @@ const createSettingStmt = `INSERT INTO zitadel.settings` +
 	` (instance_id, organization_id, type, owner_type, label_state, settings)` +
 	` VALUES ($1, $2, $3, $4, $5, $6)` +
 	` ON CONFLICT (instance_id, organization_id, type, owner_type) WHERE type != 'label' DO UPDATE SET` +
-	` settings = zitadel.settings.settings || EXCLUDED.settings::JSONB` +
-	// ` settings =  EXCLUDED.settings::JSONB` +
+	` settings =  EXCLUDED.settings::JSONB` +
 	` RETURNING id, created_at, updated_at`
 
 // const createSettingStmt = `INSERT INTO zitadel.settings` +
 // 	` (instance_id, organization_id, type, owner_type, label_state, settings)` +
-// 	` VALUES ($1, $2, $3, $4, $5, $6)`
+// 	` VALUES ($1, $2, $3, $4, $5, $6)j
 
 func createSetting(ctx context.Context, client database.QueryExecutor, setting *domain.Setting, settings any) error {
 	settingJSON, err := json.Marshal(settings)
@@ -793,18 +943,22 @@ func createSetting(ctx context.Context, client database.QueryExecutor, setting *
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.ID, &setting.CreatedAt, &setting.UpdatedAt)
 }
 
-func (s *settings) Delete(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, typ domain.SettingType) (int64, error) {
-	builder := database.StatementBuilder{}
+// func (s *settings) Delete(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, typ domain.SettingType) (int64, error) {
+func (s *settings) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	// options := new(database.QueryOpts)
+	// for _, opt := range opts {
+	// 	opt(options)
+	// }
 
-	builder.WriteString(`DELETE FROM zitadel.settings`)
-
-	conditions := []database.Condition{
-		s.TypeCondition(typ),
-		s.InstanceIDCondition(instanceID),
-		s.OrgIDCondition(orgID),
+	if condition.IsRestrictingColumn(s.LabelStateColumn()) {
+		return 0, database.NewMissingConditionError(s.LabelStateColumn())
 	}
-	writeCondition(&builder, database.And(conditions...))
 
+	var builder database.StatementBuilder
+	builder.WriteString(`DELETE FROM zitadel.settings`)
+	// options.Write(&builder)
+
+	writeCondition(&builder, condition)
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 

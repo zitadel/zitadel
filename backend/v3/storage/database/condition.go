@@ -1,5 +1,18 @@
 package database
 
+type WriteCondition interface {
+	Write(builder *StatementBuilder)
+}
+
+// type Conditions interface {
+// 	Write(builder *StatementBuilder)
+// 	// IsRestrictingColumn is used to check if the condition filters for a specific column.
+// 	// It acts as a save guard database operations that should be specific on the given column.
+// 	IsRestrictingColumn(col Column) bool
+
+// 	GetValue(col Column) any
+// }
+
 // Condition represents a SQL condition.
 // Its written after the WHERE keyword in a SQL statement.
 type Condition interface {
@@ -7,7 +20,20 @@ type Condition interface {
 	// IsRestrictingColumn is used to check if the condition filters for a specific column.
 	// It acts as a save guard database operations that should be specific on the given column.
 	IsRestrictingColumn(col Column) bool
+
+	GetValue(col Column) any
 }
+
+// type condition interface {
+// 	Write(builder *StatementBuilder)
+// 	// IsRestrictingColumn is used to check if the condition filters for a specific column.
+// 	// It acts as a save guard database operations that should be specific on the given column.
+// 	IsRestrictingColumn(col Column) bool
+
+// 	GetValue(col Column) any
+// }
+
+// var _ Condition = condition(nil)
 
 type and struct {
 	conditions []Condition
@@ -40,6 +66,15 @@ func (a and) IsRestrictingColumn(col Column) bool {
 		}
 	}
 	return false
+}
+
+func (a and) GetValue(col Column) any {
+	for _, condition := range a.conditions {
+		if !condition.IsRestrictingColumn(col) {
+			return condition.GetValue(col)
+		}
+	}
+	return nil
 }
 
 var _ Condition = (*and)(nil)
@@ -78,6 +113,15 @@ func (o or) IsRestrictingColumn(col Column) bool {
 	return true
 }
 
+func (o or) GetValue(col Column) any {
+	for _, condition := range o.conditions {
+		if !condition.IsRestrictingColumn(col) {
+			return condition.GetValue(col)
+		}
+	}
+	return nil
+}
+
 var _ Condition = (*or)(nil)
 
 type isNull struct {
@@ -99,6 +143,10 @@ func IsNull(column Column) *isNull {
 // It returns false because it cannot be used for restricting a column.
 func (i isNull) IsRestrictingColumn(col Column) bool {
 	return false
+}
+
+func (i isNull) GetValue(col Column) any {
+	return "IS NULL"
 }
 
 var _ Condition = (*isNull)(nil)
@@ -124,11 +172,16 @@ func (i isNotNull) IsRestrictingColumn(col Column) bool {
 	return false
 }
 
+func (i isNotNull) GetValue(col Column) any {
+	return "IS NOT NULL"
+}
+
 var _ Condition = (*isNotNull)(nil)
 
 type valueCondition struct {
 	write func(builder *StatementBuilder)
 	col   Column
+	value any
 }
 
 // NewTextCondition creates a condition that compares a text column with a value.
@@ -139,6 +192,7 @@ func NewTextCondition[T Text](col Column, op TextOperation, value T) Condition {
 		write: func(builder *StatementBuilder) {
 			writeTextOperation[T](builder, col, op, value)
 		},
+		value: value,
 	}
 }
 
@@ -149,6 +203,7 @@ func NewTextIgnoreCaseCondition[T Text](col Column, op TextOperation, value T) C
 		write: func(builder *StatementBuilder) {
 			writeTextOperation[T](builder, LowerColumn(col), op, LowerValue(value))
 		},
+		value: value,
 	}
 }
 
@@ -159,6 +214,7 @@ func NewNumberCondition[V Number](col Column, op NumberOperation, value V) Condi
 		write: func(builder *StatementBuilder) {
 			writeNumberOperation[V](builder, col, op, value)
 		},
+		value: value,
 	}
 }
 
@@ -169,6 +225,7 @@ func NewBooleanCondition[V Boolean](col Column, value V) Condition {
 		write: func(builder *StatementBuilder) {
 			writeBooleanOperation[V](builder, col, value)
 		},
+		value: value,
 	}
 }
 
@@ -179,6 +236,7 @@ func NewBytesCondition[V Bytes](col Column, op BytesOperation, value any) Condit
 		write: func(builder *StatementBuilder) {
 			writeBytesOperation[V](builder, col, op, value)
 		},
+		value: value,
 	}
 }
 
@@ -202,6 +260,10 @@ func (c valueCondition) Write(builder *StatementBuilder) {
 // IsRestrictingColumn implements [Condition].
 func (i valueCondition) IsRestrictingColumn(col Column) bool {
 	return i.col.Equals(col)
+}
+
+func (i valueCondition) GetValue(col Column) any {
+	return i.value
 }
 
 var _ Condition = (*valueCondition)(nil)
@@ -234,6 +296,10 @@ func (e existsCondition) Write(builder *StatementBuilder) {
 func (e existsCondition) IsRestrictingColumn(col Column) bool {
 	// Forward to the inner condition so safety checks (like instance_id presence) can still work.
 	return e.condition.IsRestrictingColumn(col)
+}
+
+func (e existsCondition) GetValue(col Column) any {
+	return e.condition.GetValue(col)
 }
 
 var _ Condition = (*existsCondition)(nil)

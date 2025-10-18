@@ -4,7 +4,6 @@ package events_test
 
 import (
 	"context"
-	"log"
 	"os"
 	"testing"
 	"time"
@@ -16,7 +15,6 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
-	v2beta "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
@@ -51,14 +49,14 @@ func TestMain(m *testing.M) {
 		AdminClient = Instance.Client.Admin
 		MgmtClient = Instance.Client.Mgmt
 
-		defer func() {
-			_, err := Instance.Client.InstanceV2Beta.DeleteInstance(CTX, &v2beta.DeleteInstanceRequest{
-				InstanceId: Instance.Instance.Id,
-			})
-			if err != nil {
-				log.Printf("Failed to delete instance on cleanup: %v\n", err)
-			}
-		}()
+		// defer func() {
+		// 	_, err := Instance.Client.InstanceV2Beta.DeleteInstance(CTX, &v2beta.DeleteInstanceRequest{
+		// 		InstanceId: Instance.Instance.Id,
+		// 	})
+		// 	if err != nil {
+		// 		log.Printf("Failed to delete instance on cleanup: %v\n", err)
+		// 	}
+		// }()
 
 		var err error
 		dbConfig, err := pgxpool.ParseConfig(ConnString)

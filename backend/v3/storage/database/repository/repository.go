@@ -8,7 +8,7 @@ import (
 
 func writeCondition(
 	builder *database.StatementBuilder,
-	condition database.Condition,
+	condition database.WriteCondition,
 ) {
 	if condition == nil {
 		return

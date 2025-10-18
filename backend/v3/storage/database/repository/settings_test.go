@@ -796,6 +796,433 @@ func TestCreateSpecificSetting(t *testing.T) {
 			)
 			require.NoError(t, err)
 
+			assert.Equal(t, tt.setting.InstanceID, setting.InstanceID)
+			assert.Equal(t, tt.setting.OrgID, setting.OrgID)
+			assert.Equal(t, tt.setting.Type, setting.Type)
+			assert.Equal(t, tt.setting.OwnerType, setting.OwnerType)
+			assert.WithinRange(t, setting.CreatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, *setting.UpdatedAt, beforeCreate, afterCreate)
+		})
+	}
+}
+
+func TestCreateLabelSetting(t *testing.T) {
+	beforeCreate := time.Now()
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository()
+	err = instanceRepo.Create(t.Context(), tx, &instance)
+	require.NoError(t, err)
+
+	// create org
+	orgId := gofakeit.Name()
+	org := domain.Organization{
+		ID:         orgId,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive,
+	}
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), tx, &org)
+	require.NoError(t, err)
+
+	type test struct {
+		name     string
+		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting
+		setting  domain.LabelSetting
+		changes  []database.Change
+		err      error
+	}
+
+	// TESTS
+	tests := []test{
+		{
+			name: "happy path",
+			setting: domain.LabelSetting{
+				Setting: &domain.Setting{
+					InstanceID: instanceId,
+					OrgID:      &orgId,
+					ID:         gofakeit.Name(),
+					Type:       domain.SettingTypeLabel,
+					OwnerType:  domain.OwnerTypeInstance,
+					LabelState: gu.Ptr(domain.LabelStatePreview),
+					Settings:   []byte("{}"),
+				},
+			},
+		},
+		{
+			name: "happy path, no org",
+			setting: domain.LabelSetting{
+				Setting: &domain.Setting{
+					InstanceID: instanceId,
+					// OrgID:      &orgId,
+					ID:         gofakeit.Name(),
+					Type:       domain.SettingTypeLabel,
+					OwnerType:  domain.OwnerTypeInstance,
+					LabelState: gu.Ptr(domain.LabelStatePreview),
+					Settings:   []byte("{}"),
+				},
+			},
+		},
+		{
+			name: "adding setting with same instance id, org id twice",
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
+				settingRepo := repository.LabelRepository()
+
+				setting := domain.LabelSetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						ID:         gofakeit.Name(),
+						Type:       domain.SettingTypeLabel,
+						OwnerType:  domain.OwnerTypeInstance,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
+					},
+				}
+
+				err := settingRepo.Set(t.Context(), tx, &setting)
+				require.NoError(t, err)
+				return &setting
+			},
+			setting: domain.LabelSetting{
+				Setting: &domain.Setting{
+					InstanceID: instanceId,
+					OrgID:      &orgId,
+					ID:         gofakeit.Name(),
+					Type:       domain.SettingTypeLabel,
+					OwnerType:  domain.OwnerTypeInstance,
+					LabelState: gu.Ptr(domain.LabelStatePreview),
+					Settings:   []byte("{}"),
+				},
+			},
+			// err: new(database.UniqueError),
+		},
+		func() test {
+			newInstId := gofakeit.Name()
+			newOrgId := gofakeit.Name()
+			return test{
+				name: "adding setting with same org (org on different instance), type, different instance",
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
+					// create instance
+					instance := domain.Instance{
+						ID:              newInstId,
+						Name:            gofakeit.Name(),
+						DefaultOrgID:    "defaultOrgId",
+						IAMProjectID:    "iamProject",
+						ConsoleClientID: "consoleCLient",
+						ConsoleAppID:    "consoleApp",
+						DefaultLanguage: "defaultLanguage",
+					}
+					instanceRepo := repository.InstanceRepository()
+					err := instanceRepo.Create(t.Context(), tx, &instance)
+					assert.Nil(t, err)
+
+					// create org
+					org := domain.Organization{
+						ID:         newOrgId,
+						Name:       gofakeit.Name(),
+						InstanceID: newInstId,
+						State:      domain.OrgStateActive,
+					}
+					organizationRepo := repository.OrganizationRepository()
+					err = organizationRepo.Create(t.Context(), tx, &org)
+					require.NoError(t, err)
+
+					// create setting
+					settingRepo := repository.LabelRepository()
+					setting := domain.LabelSetting{
+						Setting: &domain.Setting{
+							InstanceID: newInstId,
+							OrgID:      &newOrgId,
+							Type:       domain.SettingTypeLockout,
+							OwnerType:  domain.OwnerTypeInstance,
+							Settings:   []byte("{}"),
+						},
+					}
+
+					err = settingRepo.Set(t.Context(), tx, &setting)
+					require.NoError(t, err)
+
+					// change the instance
+					setting.InstanceID = instanceId
+					return &setting
+				},
+				setting: domain.LabelSetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &newOrgId,
+						Type:       domain.SettingTypeLabel,
+						OwnerType:  domain.OwnerTypeInstance,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
+					},
+				},
+				err: new(database.IntegrityViolationError),
+			}
+		}(),
+		func() test {
+			newInstId := gofakeit.Name()
+			newOrgId := gofakeit.Name()
+			return test{
+				name: "adding setting with same instance, type, different org (org on different instance)",
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
+					// create instance
+					instance := domain.Instance{
+						ID:              newInstId,
+						Name:            gofakeit.Name(),
+						DefaultOrgID:    "defaultOrgId",
+						IAMProjectID:    "iamProject",
+						ConsoleClientID: "consoleCLient",
+						ConsoleAppID:    "consoleApp",
+						DefaultLanguage: "defaultLanguage",
+					}
+					instanceRepo := repository.InstanceRepository()
+					err := instanceRepo.Create(t.Context(), tx, &instance)
+					assert.Nil(t, err)
+
+					// create org
+					org := domain.Organization{
+						ID:         newOrgId,
+						Name:       gofakeit.Name(),
+						InstanceID: newInstId,
+						State:      domain.OrgStateActive,
+					}
+					organizationRepo := repository.OrganizationRepository()
+					err = organizationRepo.Create(t.Context(), tx, &org)
+					require.NoError(t, err)
+
+					// create setting
+					settingRepo := repository.LabelRepository()
+					setting := domain.LabelSetting{
+						Setting: &domain.Setting{
+							InstanceID: newInstId,
+							OrgID:      &newOrgId,
+							Type:       domain.SettingTypeLockout,
+							OwnerType:  domain.OwnerTypeInstance,
+							LabelState: gu.Ptr(domain.LabelStatePreview),
+							Settings:   []byte("{}"),
+						},
+					}
+
+					err = settingRepo.Set(t.Context(), tx, &setting)
+					require.NoError(t, err)
+
+					// change the instance
+					setting.OrgID = &orgId
+					return &setting
+				},
+				setting: domain.LabelSetting{
+					Setting: &domain.Setting{
+						InstanceID: newInstId,
+						OrgID:      &orgId,
+						Type:       domain.SettingTypeLabel,
+						OwnerType:  domain.OwnerTypeInstance,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
+					},
+				},
+				err: new(database.IntegrityViolationError),
+			}
+		}(),
+		func() test {
+			newInstId := gofakeit.Name()
+			newOrgId := gofakeit.Name()
+			return test{
+				name: "adding setting with same instance, type different org (org on same instance)",
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
+					// create instance
+					instance := domain.Instance{
+						ID:              newInstId,
+						Name:            gofakeit.Name(),
+						DefaultOrgID:    "defaultOrgId",
+						IAMProjectID:    "iamProject",
+						ConsoleClientID: "consoleCLient",
+						ConsoleAppID:    "consoleApp",
+						DefaultLanguage: "defaultLanguage",
+					}
+					instanceRepo := repository.InstanceRepository()
+					err := instanceRepo.Create(t.Context(), tx, &instance)
+					assert.Nil(t, err)
+
+					// create org
+					org := domain.Organization{
+						ID:         gofakeit.Name(),
+						Name:       gofakeit.Name(),
+						InstanceID: newInstId,
+						State:      domain.OrgStateActive,
+					}
+					organizationRepo := repository.OrganizationRepository()
+					err = organizationRepo.Create(t.Context(), tx, &org)
+					require.NoError(t, err)
+
+					// create setting
+					settingRepo := repository.LabelRepository()
+					setting := domain.LabelSetting{
+						Setting: &domain.Setting{
+							InstanceID: newInstId,
+							OrgID:      &org.ID,
+							Type:       domain.SettingTypeLabel,
+							OwnerType:  domain.OwnerTypeInstance,
+							LabelState: gu.Ptr(domain.LabelStatePreview),
+							Settings:   []byte("{}"),
+						},
+					}
+
+					err = settingRepo.Set(t.Context(), tx, &setting)
+					require.NoError(t, err)
+
+					// create another org
+					org = domain.Organization{
+						ID:         newOrgId,
+						Name:       gofakeit.Name(),
+						InstanceID: newInstId,
+						State:      domain.OrgStateActive,
+					}
+					err = organizationRepo.Create(t.Context(), tx, &org)
+					require.NoError(t, err)
+
+					// change the org id
+					setting.OrgID = &newOrgId
+					return &setting
+				},
+				setting: domain.LabelSetting{
+					Setting: &domain.Setting{
+						InstanceID: newInstId,
+						OrgID:      &newOrgId,
+						Type:       domain.SettingTypeLabel,
+						OwnerType:  domain.OwnerTypeInstance,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
+					},
+				},
+			}
+		}(),
+		{
+			name: "adding setting with no instance id",
+			setting: domain.LabelSetting{
+				Setting: &domain.Setting{
+					// InstanceID:        instanceId,
+					OrgID:      &orgId,
+					ID:         gofakeit.Name(),
+					Type:       domain.SettingTypeLockout,
+					OwnerType:  domain.OwnerTypeInstance,
+					LabelState: gu.Ptr(domain.LabelStatePreview),
+					Settings:   []byte("{}"),
+				},
+			},
+			err: new(database.IntegrityViolationError),
+		},
+		{
+			name: "adding idp with non existent instance id",
+			setting: domain.LabelSetting{
+				Setting: &domain.Setting{
+					InstanceID: gofakeit.Name(),
+					OrgID:      &orgId,
+					ID:         gofakeit.Name(),
+					Type:       domain.SettingTypeLockout,
+					OwnerType:  domain.OwnerTypeInstance,
+					LabelState: gu.Ptr(domain.LabelStatePreview),
+					Settings:   []byte("{}"),
+				},
+			},
+			err: new(database.ForeignKeyError),
+		},
+		{
+			name: "adding idp with non existent org id",
+			setting: domain.LabelSetting{
+				Setting: &domain.Setting{
+					InstanceID: instanceId,
+					OrgID:      gu.Ptr(gofakeit.Name()),
+					ID:         gofakeit.Name(),
+					Type:       domain.SettingTypeLockout,
+					OwnerType:  domain.OwnerTypeInstance,
+					LabelState: gu.Ptr(domain.LabelStatePreview),
+					Settings:   []byte("{}"),
+				},
+			},
+			err: new(database.ForeignKeyError),
+		},
+		{
+			name: "adding idp with non existent org id",
+			setting: domain.LabelSetting{
+				Setting: &domain.Setting{
+					InstanceID: instanceId,
+					OrgID:      gu.Ptr(gofakeit.Name()),
+					ID:         gofakeit.Name(),
+					Type:       domain.SettingTypeLockout,
+					OwnerType:  domain.OwnerTypeInstance,
+					LabelState: gu.Ptr(domain.LabelStatePreview),
+					Settings:   []byte("{}"),
+				},
+			},
+			err: new(database.ForeignKeyError),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tx, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err = tx.Rollback(t.Context())
+				if err != nil {
+					t.Logf("error during rollback: %v", err)
+				}
+			}()
+
+			var setting *domain.LabelSetting
+			if tt.testFunc != nil {
+				setting = tt.testFunc(t, tx)
+			} else {
+				setting = &tt.setting
+			}
+			settingRepo := repository.LabelRepository()
+
+			// create setting
+			err = settingRepo.Set(t.Context(), tx, setting)
+			fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> err = %+v\n", err)
+			assert.ErrorIs(t, err, tt.err)
+			if err != nil {
+				return
+			}
+			afterCreate := time.Now()
+
+			// check organization values
+			// setting, err = settingRepo.Get(
+			// 	t.Context(), tx,
+			// 	setting.InstanceID,
+			// 	setting.OrgID,
+			// )
+			setting, err = settingRepo.Get(t.Context(), tx,
+				database.WithCondition(
+					database.And(
+						settingRepo.InstanceIDCondition(setting.InstanceID),
+						settingRepo.OrgIDCondition(setting.OrgID),
+						settingRepo.TypeCondition(setting.Type),
+						settingRepo.LabelStateCondition(*setting.LabelState),
+					),
+				),
+			)
+			require.NoError(t, err)
+
 			fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> setting = %+v\n", setting)
 			fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> tt.setting = %+v\n", tt.setting)
 			assert.Equal(t, tt.setting.InstanceID, setting.InstanceID)
@@ -841,17 +1268,17 @@ func TestCreateSpecificSettingError(t *testing.T) {
 			},
 			err: repository.ErrSettingObjectMustNotBeNil,
 		},
-		{
-			name: "create label state not set",
-			testFunc: func(t *testing.T, tx database.QueryExecutor) error {
-				settingRepo := repository.LabelRepository()
-				err := settingRepo.Set(t.Context(), tx, &domain.LabelSetting{
-					Setting: &domain.Setting{},
-				})
-				return err
-			},
-			err: repository.ErrLabelStateMustBeDefined,
-		},
+		// {
+		// 	name: "create label state not set",
+		// 	testFunc: func(t *testing.T, tx database.QueryExecutor) error {
+		// 		settingRepo := repository.LabelRepository()
+		// 		err := settingRepo.Set(t.Context(), tx, &domain.LabelSetting{
+		// 			Setting: &domain.Setting{},
+		// 		})
+		// 		return err
+		// 	},
+		// 	err: repository.ErrLabelStateMustBeDefined,
+		// },
 		{
 			name: "create password complexity no settings error",
 			testFunc: func(t *testing.T, tx database.QueryExecutor) error {

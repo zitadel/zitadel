@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	db_json "github.com/zitadel/zitadel/backend/v3/storage/database/json"
 )
 
 //go:generate enumer -type SettingType -transform snake -trimprefix SettingType -sql
@@ -128,13 +129,38 @@ type LabelSettings struct {
 	DisableWatermark    bool                 `json:"disableMsgPopup,omitempty"`
 	ThemeMode           LabelPolicyThemeMode `json:"themeMode,omitempty"`
 
-	LabelPolicyLightLogoURL *string `json:"labelPolicyLightLogoURL,omitempty"`
-	LabelPolicyDarkLogoURL  *string `json:"labelPolicyDarkLogoURL,omitempty"`
+	LabelPolicyLightLogoURL *url.URL `json:"labelPolicyLightLogoURL,omitempty"`
+	LabelPolicyDarkLogoURL  *url.URL `json:"labelPolicyDarkLogoURL,omitempty"`
 
 	LabelPolicyLightIconURL *url.URL `json:"labelPolicyLightIconURL,omitempty"`
 	LabelPolicyDarkIconURL  *url.URL `json:"labelPolicyDarkIconURL,omitempty"`
 
-	LabelPolicyFontURL *string `json:"labelPolicyLightFontURL,omitempty"`
+	LabelPolicyFontURL *url.URL `json:"labelPolicyLightFontURL,omitempty"`
+}
+
+type labelSettingsJSONFieldsChanges interface {
+	SetPrimaryColorField(value string) db_json.JSONFieldChange
+	SetBackgroundColorField(value string) db_json.JSONFieldChange
+	SetWarnColorField(value string) db_json.JSONFieldChange
+	SetFontColorField(value string) db_json.JSONFieldChange
+	SetPrimaryCcolorDarkField(value string) db_json.JSONFieldChange
+	SetBackgroundColorDarkField(value string) db_json.JSONFieldChange
+	SetWarnColorDarkField(value string) db_json.JSONFieldChange
+	SetFontColorDarkField(value string) db_json.JSONFieldChange
+	SetHideLoginNameSuffixField(value bool) db_json.JSONFieldChange
+	SetErrorMsgPopupField(value bool) db_json.JSONFieldChange
+	SetDisableWatermarkField(value bool) db_json.JSONFieldChange
+	SetThemeModeField(value LabelPolicyThemeMode) db_json.JSONFieldChange
+	SetLabelPolicyLightLogoURL(value *url.URL) db_json.JSONFieldChange
+	SetLabelPolicyDarkLogoURL(value *url.URL) db_json.JSONFieldChange
+	SetLabelPolicyLightIconURL(value *url.URL) db_json.JSONFieldChange
+	SetLabelPolicyDarkIconURL(value *url.URL) db_json.JSONFieldChange
+	SetLabelPolicyFontURL(value *url.URL) db_json.JSONFieldChange
+}
+
+type labelSettingsJsonChanges interface {
+	labelSettingsJSONFieldsChanges
+	SetLabelSettings(changes ...db_json.JSONFieldChange) database.Change
 }
 
 type LabelSetting struct {
@@ -215,6 +241,7 @@ type settingsColumns interface {
 	InstanceIDColumn() database.Column
 	OrgIDColumn() database.Column
 	TypeColumn() database.Column
+	OwnerTypeColumn() database.Column
 	LabelStateColumn() database.Column
 	SettingsColumn() database.Column
 	CreatedAtColumn() database.Column
@@ -226,6 +253,7 @@ type settingsConditions interface {
 	OrgIDCondition(id *string) database.Condition
 	IDCondition(id string) database.Condition
 	TypeCondition(typ SettingType) database.Condition
+	OwnerTypeCondition(typ OwnerType) database.Condition
 	LabelStateCondition(typ LabelState) database.Condition
 }
 
@@ -282,12 +310,15 @@ type SettingsRepository interface {
 
 	// Create is used for events reduction
 	Create(ctx context.Context, client database.QueryExecutor, setting *Setting) error
-	Delete(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, typ SettingType) (int64, error)
+	// Delete(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, typ SettingType) (int64, error)
+	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 
 	// DeleteSettingsForInstance is used when a Instance is deleted
 	DeleteSettingsForInstance(ctx context.Context, client database.QueryExecutor, instanceID string) (int64, error)
 	// DeleteSettingsForOrg is used ehwn an Organization is deleted
 	DeleteSettingsForOrg(ctx context.Context, client database.QueryExecutor, orgID string) (int64, error)
+
+	Get_(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Setting, error)
 }
 
 type LoginRepository interface {
@@ -304,8 +335,13 @@ type LabelRepository interface {
 	settingsConditions
 	settingsChanges
 
-	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*LabelSetting, error)
-	Set(ctx context.Context, client database.QueryExecutor, setting *LabelSetting, changes ...database.Change) error
+	labelSettingsJsonChanges
+
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*LabelSetting, error)
+	// Set(ctx context.Context, client database.QueryExecutor, conditions database.Condition, changes ...database.Change) error
+	Set(ctx context.Context, client database.QueryExecutor, setting *LabelSetting) error
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
+	Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 	// ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *LabelSetting) error
 }
 
