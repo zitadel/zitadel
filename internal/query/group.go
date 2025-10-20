@@ -232,7 +232,6 @@ func groupPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, queries
 		GroupColumnResourceOwner,
 		domain.PermissionGroupRead,
 		SingleOrgPermissionOption(queries),
-		OwnedRowsPermissionOption(GroupColumnID),
 	)
 	return query.JoinClause(join, args...)
 }
