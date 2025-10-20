@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"strings"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -94,10 +95,10 @@ func (u *UpdateOrgCommand) String() string {
 }
 
 func (u *UpdateOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) error {
-	if u.ID == "" {
+	if u.ID = strings.TrimSpace(u.ID); u.ID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-lEMhVC", "invalid organization ID")
 	}
-	if u.Name == "" {
+	if u.Name = strings.TrimSpace(u.Name); u.Name == "" {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-wfUntW", "invalid organization name")
 	}
 

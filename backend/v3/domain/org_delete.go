@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -149,6 +150,7 @@ func (d *DeleteOrgCommand) String() string {
 func (d *DeleteOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
 	instance := authz.GetInstance(ctx)
 
+	d.ID = strings.TrimSpace(d.ID)
 	if d.ID == instance.DefaultOrganisationID() {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-LCkE69", "Errors.Org.DefaultOrgNotDeletable")
 	}

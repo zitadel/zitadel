@@ -68,7 +68,7 @@ func (d *DeactivateOrgCommand) String() string {
 
 // Validate implements [Commander].
 func (d *DeactivateOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
-	if strings.TrimSpace(d.ID) == "" {
+	if d.ID = strings.TrimSpace(d.ID); d.ID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-Qc3T1r", "invalid organization ID")
 	}
 
