@@ -5,6 +5,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
 import "zitadel/filter/v2/filter.proto";
+import "zitadel/authorization/v2beta/authorization.proto";
 
 package zitadel.group.v2;
 
@@ -47,6 +48,39 @@ message Group {
   ];
 
   // Timestamp when the user group was created
+  google.protobuf.Timestamp creation_date = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message GroupUser {
+  // GroupID is the unique identifier of the user group.
+  string group_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\""
+    }
+  ];
+
+  // OrganizationID is the unique identifier of the organization to which the group belongs.
+  string organization_id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629098906488334\""
+    }
+  ];
+
+  // InstanceID is the unique identifier of the instance to which the group belongs.
+  string instance_id = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629098906488334\""
+    }
+  ];
+
+  // User represents the user in the user group.
+  zitadel.authorization.v2beta.User user = 4;
+
+  // CreationDate is the timestamp when the user was added to the group.
   google.protobuf.Timestamp creation_date = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
@@ -112,5 +146,4 @@ enum GroupUserFieldName {
   GROUP_USER_FIELD_NAME_USER_ID = 1;
   GROUP_USER_FIELD_NAME_GROUP_ID = 2;
   GROUP_USER_FIELD_NAME_CREATION_DATE = 3;
-  GROUP_USER_FIELD_NAME_CHANGE_DATE = 4;
 }
