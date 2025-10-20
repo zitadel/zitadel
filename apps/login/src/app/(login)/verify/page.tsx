@@ -51,8 +51,8 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         urlTemplate:
           `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
           (requestId ? `&requestId=${requestId}` : ""),
-      }).catch((error) => {
-        console.error("Could not send invitation email", error);
+      }).catch((apiError) => {
+        console.error("Could not send invitation email", apiError);
         error = "inviteSendFailed";
       });
     } else {
@@ -61,8 +61,8 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         urlTemplate:
           `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
           (requestId ? `&requestId=${requestId}` : ""),
-      }).catch((error) => {
-        console.error("Could not send verification email", error);
+      }).catch((apiError) => {
+        console.error("Could not send verification email", apiError);
         error = "emailSendFailed";
       });
     }
