@@ -8,7 +8,7 @@ import (
 
 type Pool struct{}
 
-// Ping implements database.Pool.
+// Ping implements [database.Pool].
 func (n *Pool) Ping(ctx context.Context) error {
 	return nil
 }
