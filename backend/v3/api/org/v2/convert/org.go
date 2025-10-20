@@ -1,11 +1,17 @@
 package convert
 
 import (
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	v2_org "github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
+/*
+ * GRPC Beta v2 to GRPC v2
+ */
 func OrganizationBetaRequestToV2Request(in *v2beta_org.ListOrganizationsRequest) *v2_org.ListOrganizationsRequest {
 	return &v2_org.ListOrganizationsRequest{
 		Query: &object.ListQuery{
@@ -82,9 +88,65 @@ func organizationStateBetaToV2(in v2beta_org.OrgState) v2_org.OrganizationState 
 		return v2_org.OrganizationState_ORGANIZATION_STATE_ACTIVE
 	case v2beta_org.OrgState_ORG_STATE_INACTIVE:
 		return v2_org.OrganizationState_ORGANIZATION_STATE_INACTIVE
-	case v2beta_org.OrgState_ORG_STATE_UNSPECIFIED, v2beta_org.OrgState_ORG_STATE_REMOVED:
+	case v2beta_org.OrgState_ORG_STATE_REMOVED:
+		return v2_org.OrganizationState_ORGANIZATION_STATE_REMOVED
+	case v2beta_org.OrgState_ORG_STATE_UNSPECIFIED:
 		fallthrough
 	default:
 		return v2_org.OrganizationState_ORGANIZATION_STATE_UNSPECIFIED
+	}
+}
+
+/*
+ * Domain Model to GRPC v2
+ */
+
+func DomainOrganizationListModelToGRPCResponse(orgs []*domain.Organization) []*v2_org.Organization {
+	toReturn := make([]*v2_org.Organization, len(orgs))
+
+	for i, org := range orgs {
+		toReturn[i] = domainOrganizationModelToGRPCResponse(org)
+	}
+
+	return toReturn
+}
+
+func domainOrganizationModelToGRPCResponse(org *domain.Organization) *v2_org.Organization {
+	return &v2_org.Organization{
+		Id: org.ID,
+		Details: &object.Details{
+			ChangeDate:   timestamppb.New(org.UpdatedAt),
+			CreationDate: timestamppb.New(org.CreatedAt),
+		},
+		State:         v2_org.OrganizationState(org.State),
+		Name:          org.Name,
+		PrimaryDomain: org.PrimaryDomain(),
+	}
+}
+
+/*
+ * Domain Model to GRPC v2 beta
+ */
+
+// TODO(IAM-Marco): Remove in V5 (see https://github.com/zitadel/zitadel/issues/10877)
+func DomainOrganizationListModelToGRPCBetaResponse(orgs []*domain.Organization) []*v2beta_org.Organization {
+	toReturn := make([]*v2beta_org.Organization, len(orgs))
+
+	for i, org := range orgs {
+		toReturn[i] = domainOrganizationModelToGRPCBetaResponse(org)
+	}
+
+	return toReturn
+}
+
+// TODO(IAM-Marco): Remove in V5 (see https://github.com/zitadel/zitadel/issues/10877)
+func domainOrganizationModelToGRPCBetaResponse(org *domain.Organization) *v2beta_org.Organization {
+	return &v2beta_org.Organization{
+		Id:            org.ID,
+		ChangedDate:   timestamppb.New(org.UpdatedAt),
+		CreationDate:  timestamppb.New(org.CreatedAt),
+		State:         v2beta_org.OrgState(org.State),
+		Name:          org.Name,
+		PrimaryDomain: org.PrimaryDomain(),
 	}
 }

@@ -82,10 +82,10 @@ func ListOrganizations(ctx context.Context, request *connect.Request[v2_org.List
 		return nil, err
 	}
 
-	orgs := orgListCmd.ResultToGRPC()
+	orgs := convert.DomainOrganizationListModelToGRPCResponse(orgListCmd.Result())
 	return &connect.Response[v2_org.ListOrganizationsResponse]{
 		Msg: &v2_org.ListOrganizationsResponse{
-			Result: orgListCmd.ResultToGRPC(),
+			Result: orgs,
 			Details: &object.ListDetails{
 				// TODO(IAM-Marco): Return correct result once permissions are in place
 				TotalResult: uint64(len(orgs)),
@@ -107,7 +107,7 @@ func ListOrganizationsBeta(ctx context.Context, request *connect.Request[v2beta_
 		return nil, err
 	}
 
-	orgs := orgListCmd.ResultToGRPCBeta()
+	orgs := convert.DomainOrganizationListModelToGRPCBetaResponse(orgListCmd.Result())
 	return &connect.Response[v2beta_org.ListOrganizationsResponse]{
 		Msg: &v2beta_org.ListOrganizationsResponse{
 			Organizations: orgs,
