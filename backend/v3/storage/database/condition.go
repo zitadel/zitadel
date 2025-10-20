@@ -16,7 +16,7 @@ type and struct {
 	conditions []Condition
 }
 
-// Matches implements Condition.
+// Matches implements [Condition].
 func (a *and) Matches(x any) bool {
 	toMatch, ok := x.(*and)
 	if !ok {
@@ -33,7 +33,7 @@ func (a *and) Matches(x any) bool {
 	return true
 }
 
-// String implements Condition.
+// String implements [Condition].
 func (a *and) String() string {
 	return "database.and"
 }
@@ -73,7 +73,7 @@ type or struct {
 	conditions []Condition
 }
 
-// Matches implements Condition.
+// Matches implements [Condition].
 func (o *or) Matches(x any) bool {
 	toMatch, ok := x.(*or)
 	if !ok {
@@ -90,7 +90,7 @@ func (o *or) Matches(x any) bool {
 	return true
 }
 
-// String implements Condition.
+// String implements [Condition].
 func (o *or) String() string {
 	return "database.or"
 }
@@ -131,7 +131,7 @@ type isNull struct {
 	column Column
 }
 
-// Matches implements Condition.
+// Matches implements [Condition].
 func (i *isNull) Matches(x any) bool {
 	toMatch, ok := x.(*isNull)
 	if !ok {
@@ -140,7 +140,7 @@ func (i *isNull) Matches(x any) bool {
 	return i.column.Matches(toMatch.column)
 }
 
-// String implements Condition.
+// String implements [Condition].
 func (i *isNull) String() string {
 	return "database.isNull"
 }
@@ -168,7 +168,7 @@ type isNotNull struct {
 	column Column
 }
 
-// Matches implements Condition.
+// Matches implements [Condition].
 func (i *isNotNull) Matches(x any) bool {
 	toMatch, ok := x.(*isNotNull)
 	if !ok {
@@ -177,7 +177,7 @@ func (i *isNotNull) Matches(x any) bool {
 	return i.column.Matches(toMatch.column)
 }
 
-// String implements Condition.
+// String implements [Condition].
 func (i *isNotNull) String() string {
 	return "database.isNotNull"
 }
@@ -206,7 +206,7 @@ type valueCondition struct {
 	col   Column
 }
 
-// Matches implements Condition.
+// Matches implements [Condition].
 func (c valueCondition) Matches(x any) bool {
 	toMatch, ok := x.(valueCondition)
 	if !ok {
@@ -215,7 +215,7 @@ func (c valueCondition) Matches(x any) bool {
 	return c.String() == toMatch.String()
 }
 
-// String implements Condition.
+// String implements [Condition].
 func (c valueCondition) String() string {
 	return "database.valueCondition"
 }
@@ -302,13 +302,13 @@ type existsCondition struct {
 	condition Condition
 }
 
-// Matches implements Condition.
+// Matches implements [Condition].
 func (e *existsCondition) Matches(x any) bool {
 	// Unimplemented
 	return false
 }
 
-// String implements Condition.
+// String implements [Condition].
 func (e *existsCondition) String() string {
 	return "unimplemented"
 }

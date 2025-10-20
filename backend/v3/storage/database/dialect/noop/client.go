@@ -8,7 +8,7 @@ import (
 
 type Client struct{}
 
-// Ping implements database.Client.
+// Ping implements [database.Client].
 func (n *Client) Ping(ctx context.Context) error {
 	return nil
 }

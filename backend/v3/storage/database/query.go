@@ -120,7 +120,7 @@ type QueryOpts struct {
 	Permission string
 }
 
-// Matches implements gomock.Matcher.
+// Matches implements [gomock.Matcher].
 func (q *QueryOpts) Matches(x any) bool {
 	// Check if the optFunc can be converted to a QueryOption
 	optFunc, ok := x.(QueryOption)
@@ -159,7 +159,7 @@ func (q *QueryOpts) Matches(x any) bool {
 	return inputBuilder.String() == expectedBuilder.String()
 }
 
-// String implements gomock.Matcher.
+// String implements [gomock.Matcher].
 func (q *QueryOpts) String() string {
 	return fmt.Sprintf("QueryOpts: {%v,%v,%v,%v,%v,%v,%v}\n",
 		q.Condition,

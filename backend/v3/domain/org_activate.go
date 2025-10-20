@@ -22,12 +22,12 @@ func NewActivateOrgCommand(organizationID string) *ActivateOrgCommand {
 	return &ActivateOrgCommand{ID: organizationID}
 }
 
-// Events implements Commander.
+// Events implements [Commander].
 func (d *ActivateOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
 	return []eventstore.Command{org.NewOrgReactivatedEvent(ctx, &org.NewAggregate(d.ID).Aggregate)}, nil
 }
 
-// Execute implements Commander.
+// Execute implements [Commander].
 func (d *ActivateOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	close, err := opts.EnsureTx(ctx)
 	if err != nil {
@@ -61,12 +61,12 @@ func (d *ActivateOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err
 	return nil
 }
 
-// String implements Commander.
+// String implements [Commander].
 func (d *ActivateOrgCommand) String() string {
 	return "ActivateOrgCommand"
 }
 
-// Validate implements Commander.
+// Validate implements [Commander].
 func (d *ActivateOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
 	if strings.TrimSpace(d.ID) == "" {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-hJuuAv", "invalid organization ID")
@@ -79,6 +79,7 @@ func (d *ActivateOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (er
 	defer func() { err = close(ctx, err) }()
 	organizationRepo := opts.organizationRepo
 
+	// TODO: lock entry as soon as https://github.com/zitadel/zitadel/issues/10930 is done
 	org, err := organizationRepo.Get(ctx, pool, database.WithCondition(
 		database.And(
 			organizationRepo.IDCondition(d.ID),

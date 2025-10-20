@@ -4,7 +4,7 @@ import "go.uber.org/mock/gomock"
 
 type Columns []Column
 
-// Matches implements Column.
+// Matches implements [Column].
 func (c Columns) Matches(x any) bool {
 	for _, col := range c {
 		if !col.Matches(x) {
@@ -15,7 +15,7 @@ func (c Columns) Matches(x any) bool {
 	return true
 }
 
-// String implements Column.
+// String implements [Column].
 func (c Columns) String() string {
 	return "database.Columns"
 }
@@ -135,13 +135,13 @@ type functionColumn struct {
 	col Column
 }
 
-// Matches implements Column.
+// Matches implements [Column].
 func (c *functionColumn) Matches(x any) bool {
 	// Unimplemented
 	return false
 }
 
-// String implements Column.
+// String implements [Column].
 func (c *functionColumn) String() string {
 	return "unimplemented"
 }
