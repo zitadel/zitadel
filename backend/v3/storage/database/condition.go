@@ -212,7 +212,13 @@ func (c valueCondition) Matches(x any) bool {
 	if !ok {
 		return false
 	}
-	return c.String() == toMatch.String()
+	if !c.col.Matches(toMatch.col) {
+		return false
+	}
+	var expectedStatement, inputStatement StatementBuilder
+	c.write(&expectedStatement)
+	toMatch.write(&inputStatement)
+	return expectedStatement.String() == inputStatement.String()
 }
 
 // String implements [Condition].
