@@ -122,20 +122,24 @@ type QueryOpts struct {
 
 // Matches implements [gomock.Matcher].
 func (q *QueryOpts) Matches(x any) bool {
-	// Check if the optFunc can be converted to a QueryOption
-	optFunc, ok := x.(QueryOption)
+	//first check if the x is a [QueryOpt]
+	inputOpts, ok := x.(*QueryOpts)
 	if !ok {
-		return false
+		// second possibility is a [QueryOption]
+		optFunc, ok := x.(QueryOption)
+		if !ok {
+			return false
+		}
+
+		// QueryOption is a function that takes a *QueryOpts in input and fills it with its data.
+		// QueryOption data is not accessible because it's a function, so we exploit this "hack"
+		// to read the data.
+		inputOpts = new(QueryOpts)
+		optFunc(inputOpts)
 	}
 
-	// QueryOption is a function that takes a *QueryOpts in input and fills it with its data.
-	// QueryOption data is not accessible because it's a function, so we exploit this "hack"
-	// to read the data.
-	inputOpts := &QueryOpts{}
-	optFunc(inputOpts)
-
 	// inputOpts now contains the actual data but made of other interfaces and functions/decorator.
-	// Doing a reflect.DeepEqual() will fail because you will endup into comparing functions
+	// Doing a reflect.DeepEqual() will fail because you will end up into comparing functions
 	// which is not possible (comparison is successful only if both functions are nil).
 	// So we exploit the Write() method of QueryOpts to fill up the StatementBuilders:
 	// these objects are basically string builders, so we can leverage their String()
