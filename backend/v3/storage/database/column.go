@@ -137,13 +137,22 @@ type functionColumn struct {
 
 // Matches implements [Column].
 func (c *functionColumn) Matches(x any) bool {
-	// Unimplemented
-	return false
+	toMatch, ok := x.(*functionColumn)
+	if !ok || toMatch.fn != c.fn {
+		return false
+	}
+	if toMatch.col == nil {
+		return c.col == nil
+	}
+	if c.col == nil {
+		return false
+	}
+	return toMatch.col.Matches(c.col)
 }
 
 // String implements [Column].
 func (c *functionColumn) String() string {
-	return "unimplemented"
+	return "database.functionColumn"
 }
 
 type function string
