@@ -72,12 +72,6 @@ func (d *DeactivateOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (
 		return zerrors.ThrowInvalidArgument(nil, "DOM-Qc3T1r", "invalid organization ID")
 	}
 
-	close, err := opts.EnsureTx(ctx)
-	if err != nil {
-		return err
-	}
-	defer func() { err = close(ctx, err) }()
-
 	organizationRepo := opts.organizationRepo
 
 	org, err := organizationRepo.Get(ctx, pool, database.WithCondition(

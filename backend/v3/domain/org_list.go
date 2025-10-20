@@ -30,12 +30,6 @@ func NewListOrgsQuery(inputRequest *v2_org.ListOrganizationsRequest) *ListOrgsQu
 
 // Execute implements [Querier].
 func (l *ListOrgsQuery) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
-	close, err := opts.EnsureTx(ctx)
-	if err != nil {
-		return err
-	}
-	defer func() { err = close(ctx, err) }()
-
 	organizationRepo := opts.organizationRepo.LoadDomains()
 	domainRepo := opts.organizationDomainRepo
 

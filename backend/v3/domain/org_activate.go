@@ -72,11 +72,6 @@ func (d *ActivateOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (er
 		return zerrors.ThrowInvalidArgument(nil, "DOM-hJuuAv", "invalid organization ID")
 	}
 
-	close, err := opts.EnsureTx(ctx)
-	if err != nil {
-		return err
-	}
-	defer func() { err = close(ctx, err) }()
 	organizationRepo := opts.organizationRepo
 
 	// TODO: lock entry as soon as https://github.com/zitadel/zitadel/issues/10930 is done

@@ -107,7 +107,7 @@ func (d *DeleteOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 	defer func() { err = closeFunc(ctx, err) }()
 	instance := authz.GetInstance(ctx)
 
-	orgRepo := opts.organizationRepo
+	orgRepo := opts.organizationRepo.LoadDomains()
 
 	orgToDelete, err := orgRepo.Get(ctx, pool, database.WithCondition(database.And(
 		orgRepo.IDCondition(d.ID),
@@ -153,13 +153,6 @@ func (d *DeleteOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-LCkE69", "Errors.Org.DefaultOrgNotDeletable")
 	}
 
-	closeFunc, err := opts.EnsureTx(ctx)
-	if err != nil {
-		return err
-	}
-
-	defer func() { err = closeFunc(ctx, err) }()
-
 	// Check if the ZITADEL project exists on the input organization
 	projectRepo := opts.projectRepo
 	_, getErr := projectRepo.Get(ctx, pool,
@@ -172,7 +165,7 @@ func (d *DeleteOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 	if getErr == nil {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-X7YXxC", "Errors.Org.ZitadelOrgNotDeletable")
 	}
-	// "database.NoRowFoundError" error means the project does not exist, return other errors in case it's not that
+	// [database.NoRowFoundError] error means the project does not exist, return other errors in case it's not that
 	if !errors.Is(getErr, &database.NoRowFoundError{}) {
 		err = getErr
 		return err

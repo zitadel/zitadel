@@ -38,12 +38,10 @@ func TestDeactivateOrgCommand_Events(t *testing.T) {
 func TestDeactivateOrgCommand_Validate(t *testing.T) {
 	t.Parallel()
 	getErr := errors.New("get error")
-	txInitErr := errors.New("tx init error")
 
 	tt := []struct {
-		testName      string
-		queryExecutor func(ctrl *gomock.Controller) database.QueryExecutor
-		orgRepo       func(ctrl *gomock.Controller) domain.OrganizationRepository
+		testName string
+		orgRepo  func(ctrl *gomock.Controller) domain.OrganizationRepository
 
 		inputOrgID    string
 		expectedError error
@@ -56,19 +54,6 @@ func TestDeactivateOrgCommand_Validate(t *testing.T) {
 			testName:      "whitespace org id",
 			inputOrgID:    "   ",
 			expectedError: zerrors.ThrowInvalidArgument(nil, "DOM-Qc3T1r", "invalid organization ID"),
-		},
-		{
-			testName: "when EnsureTx fails should return error",
-			queryExecutor: func(ctrl *gomock.Controller) database.QueryExecutor {
-				mockDB := dbmock.NewMockPool(ctrl)
-				mockDB.EXPECT().
-					Begin(gomock.Any(), gomock.Any()).
-					Times(1).
-					Return(nil, txInitErr)
-				return mockDB
-			},
-			expectedError: txInitErr,
-			inputOrgID:    "org-1",
 		},
 		{
 			testName: "when retrieving org fails with generic error should return error",
@@ -143,9 +128,6 @@ func TestDeactivateOrgCommand_Validate(t *testing.T) {
 			}
 			if tc.orgRepo != nil {
 				domain.WithOrganizationRepo(tc.orgRepo(ctrl))(opts)
-			}
-			if tc.queryExecutor != nil {
-				opts.DB = tc.queryExecutor(ctrl)
 			}
 
 			// Test

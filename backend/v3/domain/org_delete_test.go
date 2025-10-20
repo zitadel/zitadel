@@ -21,12 +21,10 @@ import (
 func TestDeleteOrgCommand_Validate(t *testing.T) {
 	t.Parallel()
 	ctx := authz.NewMockContext("inst-1", "org-default", gofakeit.UUID(), authz.WithMockProjectID("prj-1"))
-	txInitErr := errors.New("tx init error")
 	getErr := errors.New("get error")
 
 	tt := []struct {
 		testName            string
-		mockTx              func(ctrl *gomock.Controller) database.QueryExecutor
 		orgRepo             func(ctrl *gomock.Controller) domain.OrganizationRepository
 		projectRepo         func(ctrl *gomock.Controller) domain.ProjectRepository
 		inputOrganizationID string
@@ -37,18 +35,6 @@ func TestDeleteOrgCommand_Validate(t *testing.T) {
 
 			inputOrganizationID: "org-default",
 			expectedError:       zerrors.ThrowPreconditionFailed(nil, "DOM-LCkE69", "Errors.Org.DefaultOrgNotDeletable"),
-		},
-		{
-			testName: "when EnsureTx fails should return error",
-			mockTx: func(ctrl *gomock.Controller) database.QueryExecutor {
-				mockDB := dbmock.NewMockPool(ctrl)
-				mockDB.EXPECT().
-					Begin(gomock.Any(), gomock.Any()).
-					Times(1).
-					Return(nil, txInitErr)
-				return mockDB
-			},
-			expectedError: txInitErr,
 		},
 		{
 			testName:            "when fetching project fails with NON precondition error should return error",
@@ -198,9 +184,6 @@ func TestDeleteOrgCommand_Validate(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			opts := &domain.InvokeOpts{DB: new(noopdb.Pool)}
 
-			if tc.mockTx != nil {
-				opts.DB = tc.mockTx(ctrl)
-			}
 			if tc.orgRepo != nil {
 				domain.WithOrganizationRepo(tc.orgRepo(ctrl))(opts)
 			}
@@ -251,6 +234,12 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 			testName: "when retrieving organization fails should return error",
 			orgRepo: func(ctrl *gomock.Controller) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
+
+				repo.EXPECT().
+					LoadDomains().
+					Times(1).
+					Return(repo)
+
 				repo.EXPECT().
 					Get(
 						gomock.Any(),
@@ -273,6 +262,12 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 			testName: "when delete organization fails should return error",
 			orgRepo: func(ctrl *gomock.Controller) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
+
+				repo.EXPECT().
+					LoadDomains().
+					Times(1).
+					Return(repo)
+
 				repo.EXPECT().
 					Get(
 						gomock.Any(),
@@ -307,6 +302,12 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 			testName: "when more than one row deleted should return internal error",
 			orgRepo: func(ctrl *gomock.Controller) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
+
+				repo.EXPECT().
+					LoadDomains().
+					Times(1).
+					Return(repo)
+
 				repo.EXPECT().
 					Get(
 						gomock.Any(),
@@ -340,6 +341,12 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 			testName: "when no rows deleted should return not found error",
 			orgRepo: func(ctrl *gomock.Controller) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
+
+				repo.EXPECT().
+					LoadDomains().
+					Times(1).
+					Return(repo)
+
 				repo.EXPECT().
 					Get(
 						gomock.Any(),
@@ -373,6 +380,12 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 			testName: "when one row deleted should execute successfully",
 			orgRepo: func(ctrl *gomock.Controller) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
+
+				repo.EXPECT().
+					LoadDomains().
+					Times(1).
+					Return(repo)
+
 				repo.EXPECT().
 					Get(
 						gomock.Any(),

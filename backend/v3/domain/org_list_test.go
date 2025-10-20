@@ -136,14 +136,12 @@ func TestListOrgsCommand_pagination(t *testing.T) {
 
 func TestListOrgsCommand_Execute(t *testing.T) {
 	t.Parallel()
-	txInitErr := errors.New("tx init error")
 	listErr := errors.New("list mock error")
 
 	tt := []struct {
 		testName string
 
-		queryExecutor func(ctrl *gomock.Controller) database.QueryExecutor
-		repos         func(ctrl *gomock.Controller, queryParams ...database.QueryOption) (domain.OrganizationRepository, domain.OrganizationDomainRepository)
+		repos func(ctrl *gomock.Controller, queryParams ...database.QueryOption) (domain.OrganizationRepository, domain.OrganizationDomainRepository)
 
 		queryParams  []database.QueryOption
 		inputRequest *org.ListOrganizationsRequest
@@ -151,18 +149,6 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 		expectedOrganizations []*domain.Organization
 		expectedError         error
 	}{
-		{
-			testName: "when EnsureTx fails should return error",
-			queryExecutor: func(ctrl *gomock.Controller) database.QueryExecutor {
-				mockDB := dbmock.NewMockPool(ctrl)
-				mockDB.EXPECT().
-					Begin(gomock.Any(), gomock.Any()).
-					Times(1).
-					Return(nil, txInitErr)
-				return mockDB
-			},
-			expectedError: txInitErr,
-		},
 		{
 			testName: "when condition parsing fails should return error",
 			repos: func(ctrl *gomock.Controller, _ ...database.QueryOption) (domain.OrganizationRepository, domain.OrganizationDomainRepository) {
@@ -338,9 +324,6 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 				orgRepo, domainRepo := tc.repos(ctrl, tc.queryParams...)
 				domain.WithOrganizationRepo(orgRepo)(opts)
 				domain.WithOrganizationDomainRepo(domainRepo)(opts)
-			}
-			if tc.queryExecutor != nil {
-				opts.DB = tc.queryExecutor(ctrl)
 			}
 
 			// Test
