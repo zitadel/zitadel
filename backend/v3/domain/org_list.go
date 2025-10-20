@@ -3,14 +3,10 @@ package domain
 import (
 	"context"
 
-	"google.golang.org/protobuf/types/known/timestamppb"
-
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	v2_org "github.com/zitadel/zitadel/pkg/grpc/org/v2"
-	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
 type ListOrgsQuery struct {
@@ -129,50 +125,3 @@ func (l *ListOrgsQuery) Validate(_ context.Context, _ *InvokeOpts) (err error) {
 }
 
 var _ Querier[[]*Organization] = (*ListOrgsQuery)(nil)
-
-func (l *ListOrgsQuery) ResultToGRPC() []*v2_org.Organization {
-	toReturn := make([]*v2_org.Organization, len(l.result))
-
-	for i, org := range l.result {
-		toReturn[i] = l.orgToGRPC(org)
-	}
-
-	return toReturn
-}
-
-func (l *ListOrgsQuery) orgToGRPC(org *Organization) *v2_org.Organization {
-	return &v2_org.Organization{
-		Id: org.ID,
-		Details: &object.Details{
-			ChangeDate:   timestamppb.New(org.UpdatedAt),
-			CreationDate: timestamppb.New(org.CreatedAt),
-		},
-		State:         v2_org.OrganizationState(org.State),
-		Name:          org.Name,
-		PrimaryDomain: org.PrimaryDomain(),
-	}
-}
-
-// TODO(IAM-Marco): Remove in V5 (see https://github.com/zitadel/zitadel/issues/10877)
-func (l *ListOrgsQuery) ResultToGRPCBeta() []*v2beta_org.Organization {
-	toReturn := make([]*v2beta_org.Organization, len(l.result))
-
-	for i, org := range l.result {
-		toReturn[i] = l.orgToGRPCBeta(org)
-	}
-
-	return toReturn
-}
-
-// TODO(IAM-Marco): Remove in V5 (see https://github.com/zitadel/zitadel/issues/10877)
-func (l *ListOrgsQuery) orgToGRPCBeta(org *Organization) *v2beta_org.Organization {
-	return &v2beta_org.Organization{
-		Id:           org.ID,
-		ChangedDate:  timestamppb.New(org.UpdatedAt),
-		CreationDate: timestamppb.New(org.CreatedAt),
-
-		State:         v2beta_org.OrgState(org.State),
-		Name:          org.Name,
-		PrimaryDomain: org.PrimaryDomain(),
-	}
-}
