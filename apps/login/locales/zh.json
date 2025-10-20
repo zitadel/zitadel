@@ -386,7 +386,9 @@
       "couldNotCreateSession": "无法创建会话",
       "noHostFound": "未找到主机",
       "userAlreadyVerified": "用户已验证！",
-      "couldNotResendInvite": "无法重新发送邀请"
+      "couldNotResendInvite": "无法重新发送邀请",
+      "inviteSendFailed": "发送邀请邮件失败",
+      "emailSendFailed": "发送验证邮件失败"
     }
   },
   "authenticator": {
