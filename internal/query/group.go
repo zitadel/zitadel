@@ -201,10 +201,8 @@ func (q *Queries) searchGroups(ctx context.Context, queries *GroupSearchQuery, p
 
 	query, scan := prepareGroupsQuery()
 	query = groupPermissionCheckV2(ctx, query, queries.Queries, permissionCheckV2)
-	eq := sq.And{
-		sq.Eq{
-			GroupColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		},
+	eq := sq.Eq{
+		GroupColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
