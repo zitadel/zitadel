@@ -182,6 +182,18 @@
     "completeRegister": {
       "title": "Ukończ rejestrację",
       "description": "Ukończ rejestrację swojego konta."
+    },
+    "accountNotFound": {
+      "title": "Nie znaleziono konta",
+      "description": "Nie mogliśmy znaleźć konta powiązanego z danymi logowania Twojego dostawcy tożsamości.",
+      "info": "Nie znaleziono istniejącego konta. Zaloguj się przy użyciu istniejącego konta lub skontaktuj się z administratorem w celu uzyskania pomocy.",
+      "backToLogin": "Powrót do logowania"
+    },
+    "registrationFailed": {
+      "title": "Rejestracja niedostępna",
+      "description": "Nie mogliśmy ukończyć procesu rejestracji.",
+      "info": "Nie można określić organizacji do rejestracji. Skontaktuj się z administratorem w celu uzyskania pomocy.",
+      "backToLogin": "Powrót do logowania"
     }
   },
   "ldap": {
