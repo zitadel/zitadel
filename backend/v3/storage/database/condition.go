@@ -302,7 +302,7 @@ func (i valueCondition) IsRestrictingColumn(col Column) bool {
 var _ Condition = (*valueCondition)(nil)
 
 // existsCondition is a helper to write an EXISTS (SELECT 1 FROM <table> WHERE <condition>) clause.
-// It implements Condition so it can be composed with other conditions using And/Or.
+// It implements [Condition] so it can be composed with other conditions using And/Or.
 type existsCondition struct {
 	table     string
 	condition Condition
