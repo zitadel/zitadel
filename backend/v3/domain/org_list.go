@@ -7,34 +7,33 @@ import (
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	v2_org "github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
-type ListOrgsCommand struct {
+type ListOrgsQuery struct {
 	BaseCommand
 	Request *v2_org.ListOrganizationsRequest
 
-	Result []*Organization
+	result []*Organization
 }
 
-func NewListOrgsCommand(inputRequest *v2_org.ListOrganizationsRequest) *ListOrgsCommand {
-	return &ListOrgsCommand{
+// Result implements [Querier].
+func (l *ListOrgsQuery) Result() []*Organization {
+	return l.result
+}
+
+func NewListOrgsQuery(inputRequest *v2_org.ListOrganizationsRequest) *ListOrgsQuery {
+	return &ListOrgsQuery{
 		BaseCommand: BaseCommand{},
 		Request:     inputRequest,
 	}
 }
 
-// Events implements Commander.
-func (l *ListOrgsCommand) Events(_ context.Context, _ *CommandOpts) ([]eventstore.Command, error) {
-	return nil, nil
-}
-
-// Execute implements Commander.
-func (l *ListOrgsCommand) Execute(ctx context.Context, opts *CommandOpts) (err error) {
+// Execute implements [Querier].
+func (l *ListOrgsQuery) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	close, err := opts.EnsureTx(ctx)
 	if err != nil {
 		return err
@@ -52,11 +51,11 @@ func (l *ListOrgsCommand) Execute(ctx context.Context, opts *CommandOpts) (err e
 		return err
 	}
 
-	l.Result, err = organizationRepo.List(ctx, pool, conditions, sorting, limit, pagination)
+	l.result, err = organizationRepo.List(ctx, pool, conditions, sorting, limit, pagination)
 	return err
 }
 
-func (l *ListOrgsCommand) Sorting(orgRepo OrganizationRepository) database.QueryOption {
+func (l *ListOrgsQuery) Sorting(orgRepo OrganizationRepository) database.QueryOption {
 	var sortingCol database.Column
 	switch l.Request.GetSortingColumn() {
 	case v2_org.OrganizationFieldName_ORGANIZATION_FIELD_NAME_NAME:
@@ -75,12 +74,12 @@ func (l *ListOrgsCommand) Sorting(orgRepo OrganizationRepository) database.Query
 	return database.WithOrderBy(orderDirection, sortingCol)
 }
 
-func (l *ListOrgsCommand) Pagination() (database.QueryOption, database.QueryOption) {
+func (l *ListOrgsQuery) Pagination() (database.QueryOption, database.QueryOption) {
 	return database.WithLimit(l.Request.GetQuery().GetLimit()),
 		database.WithOffset(uint32(l.Request.GetQuery().GetOffset()))
 }
 
-func (l *ListOrgsCommand) conditions(ctx context.Context, orgRepo OrganizationRepository, domainRepo OrganizationDomainRepository) (database.QueryOption, error) {
+func (l *ListOrgsQuery) conditions(ctx context.Context, orgRepo OrganizationRepository, domainRepo OrganizationDomainRepository) (database.QueryOption, error) {
 	conditions := make([]database.Condition, len(l.Request.GetQueries()))
 	instance := authz.GetInstance(ctx)
 
@@ -119,29 +118,29 @@ func (l *ListOrgsCommand) conditions(ctx context.Context, orgRepo OrganizationRe
 	)), nil
 }
 
-// String implements Commander.
-func (l *ListOrgsCommand) String() string {
-	return "ListOrgsCommand"
+// String implements [Querier].
+func (l *ListOrgsQuery) String() string {
+	return "ListOrgsQuery"
 }
 
-// Validate implements Commander.
-func (l *ListOrgsCommand) Validate(_ context.Context, _ *CommandOpts) (err error) {
+// Validate implements [Querier].
+func (l *ListOrgsQuery) Validate(_ context.Context, _ *InvokeOpts) (err error) {
 	return nil
 }
 
-var _ Commander = (*ListOrgsCommand)(nil)
+var _ Querier[[]*Organization] = (*ListOrgsQuery)(nil)
 
-func (l *ListOrgsCommand) ResultToGRPC() []*v2_org.Organization {
-	toReturn := make([]*v2_org.Organization, len(l.Result))
+func (l *ListOrgsQuery) ResultToGRPC() []*v2_org.Organization {
+	toReturn := make([]*v2_org.Organization, len(l.result))
 
-	for i, org := range l.Result {
+	for i, org := range l.result {
 		toReturn[i] = l.orgToGRPC(org)
 	}
 
 	return toReturn
 }
 
-func (l *ListOrgsCommand) orgToGRPC(org *Organization) *v2_org.Organization {
+func (l *ListOrgsQuery) orgToGRPC(org *Organization) *v2_org.Organization {
 	return &v2_org.Organization{
 		Id: org.ID,
 		Details: &object.Details{
@@ -155,10 +154,10 @@ func (l *ListOrgsCommand) orgToGRPC(org *Organization) *v2_org.Organization {
 }
 
 // TODO(IAM-Marco): Remove in V5 (see https://github.com/zitadel/zitadel/issues/10877)
-func (l *ListOrgsCommand) ResultToGRPCBeta() []*v2beta_org.Organization {
-	toReturn := make([]*v2beta_org.Organization, len(l.Result))
+func (l *ListOrgsQuery) ResultToGRPCBeta() []*v2beta_org.Organization {
+	toReturn := make([]*v2beta_org.Organization, len(l.result))
 
-	for i, org := range l.Result {
+	for i, org := range l.result {
 		toReturn[i] = l.orgToGRPCBeta(org)
 	}
 
@@ -166,7 +165,7 @@ func (l *ListOrgsCommand) ResultToGRPCBeta() []*v2beta_org.Organization {
 }
 
 // TODO(IAM-Marco): Remove in V5 (see https://github.com/zitadel/zitadel/issues/10877)
-func (l *ListOrgsCommand) orgToGRPCBeta(org *Organization) *v2beta_org.Organization {
+func (l *ListOrgsQuery) orgToGRPCBeta(org *Organization) *v2beta_org.Organization {
 	return &v2beta_org.Organization{
 		Id:           org.ID,
 		ChangedDate:  timestamppb.New(org.UpdatedAt),

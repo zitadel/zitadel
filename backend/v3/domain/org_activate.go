@@ -23,12 +23,12 @@ func NewActivateOrgCommand(organizationID string) *ActivateOrgCommand {
 }
 
 // Events implements Commander.
-func (d *ActivateOrgCommand) Events(ctx context.Context, opts *CommandOpts) ([]eventstore.Command, error) {
+func (d *ActivateOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
 	return []eventstore.Command{org.NewOrgReactivatedEvent(ctx, &org.NewAggregate(d.ID).Aggregate)}, nil
 }
 
 // Execute implements Commander.
-func (d *ActivateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err error) {
+func (d *ActivateOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	close, err := opts.EnsureTx(ctx)
 	if err != nil {
 		return err
@@ -67,7 +67,7 @@ func (d *ActivateOrgCommand) String() string {
 }
 
 // Validate implements Commander.
-func (d *ActivateOrgCommand) Validate(ctx context.Context, opts *CommandOpts) (err error) {
+func (d *ActivateOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
 	if strings.TrimSpace(d.ID) == "" {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-hJuuAv", "invalid organization ID")
 	}

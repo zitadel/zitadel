@@ -27,7 +27,7 @@ func TestDeactivateOrgCommand_Events(t *testing.T) {
 	deactivateCmd := domain.NewDeactivateOrgCommand("some-id")
 
 	// Test
-	actual, err := deactivateCmd.Events(context.Background(), &domain.CommandOpts{})
+	actual, err := deactivateCmd.Events(context.Background(), &domain.InvokeOpts{})
 
 	// Verify
 
@@ -138,11 +138,11 @@ func TestDeactivateOrgCommand_Validate(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			cmd := domain.NewDeactivateOrgCommand(tc.inputOrgID)
 
-			opts := &domain.CommandOpts{
+			opts := &domain.InvokeOpts{
 				DB: new(noopdb.Pool),
 			}
 			if tc.orgRepo != nil {
-				opts.SetOrgRepo(tc.orgRepo(ctrl))
+				domain.WithOrganizationRepo(tc.orgRepo(ctrl))(opts)
 			}
 			if tc.queryExecutor != nil {
 				opts.DB = tc.queryExecutor(ctrl)
@@ -268,11 +268,11 @@ func TestDeactivateOrgCommand_Execute(t *testing.T) {
 				ID: tc.inputID,
 			}
 
-			opts := &domain.CommandOpts{
+			opts := &domain.InvokeOpts{
 				DB: new(noopdb.Pool),
 			}
 			if tc.orgRepo != nil {
-				opts.SetOrgRepo(tc.orgRepo(ctrl))
+				domain.WithOrganizationRepo(tc.orgRepo(ctrl))(opts)
 			}
 			if tc.queryExecutor != nil {
 				opts.DB = tc.queryExecutor(ctrl)

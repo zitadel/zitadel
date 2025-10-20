@@ -22,6 +22,7 @@ import (
 type MockCommander struct {
 	ctrl     *gomock.Controller
 	recorder *MockCommanderMockRecorder
+	isgomock struct{}
 }
 
 // MockCommanderMockRecorder is the mock recorder for MockCommander.
@@ -42,18 +43,18 @@ func (m *MockCommander) EXPECT() *MockCommanderMockRecorder {
 }
 
 // Events mocks base method.
-func (m *MockCommander) Events(arg0 context.Context, arg1 *domain.CommandOpts) ([]eventstore.Command, error) {
+func (m *MockCommander) Events(ctx context.Context, opts *domain.InvokeOpts) ([]eventstore.Command, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Events", arg0, arg1)
+	ret := m.ctrl.Call(m, "Events", ctx, opts)
 	ret0, _ := ret[0].([]eventstore.Command)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Events indicates an expected call of Events.
-func (mr *MockCommanderMockRecorder) Events(arg0, arg1 any) *MockCommanderEventsCall {
+func (mr *MockCommanderMockRecorder) Events(ctx, opts any) *MockCommanderEventsCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Events", reflect.TypeOf((*MockCommander)(nil).Events), arg0, arg1)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Events", reflect.TypeOf((*MockCommander)(nil).Events), ctx, opts)
 	return &MockCommanderEventsCall{Call: call}
 }
 
@@ -69,29 +70,29 @@ func (c *MockCommanderEventsCall) Return(arg0 []eventstore.Command, arg1 error) 
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockCommanderEventsCall) Do(f func(context.Context, *domain.CommandOpts) ([]eventstore.Command, error)) *MockCommanderEventsCall {
+func (c *MockCommanderEventsCall) Do(f func(context.Context, *domain.InvokeOpts) ([]eventstore.Command, error)) *MockCommanderEventsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockCommanderEventsCall) DoAndReturn(f func(context.Context, *domain.CommandOpts) ([]eventstore.Command, error)) *MockCommanderEventsCall {
+func (c *MockCommanderEventsCall) DoAndReturn(f func(context.Context, *domain.InvokeOpts) ([]eventstore.Command, error)) *MockCommanderEventsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // Execute mocks base method.
-func (m *MockCommander) Execute(arg0 context.Context, arg1 *domain.CommandOpts) error {
+func (m *MockCommander) Execute(ctx context.Context, opts *domain.InvokeOpts) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Execute", arg0, arg1)
+	ret := m.ctrl.Call(m, "Execute", ctx, opts)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Execute indicates an expected call of Execute.
-func (mr *MockCommanderMockRecorder) Execute(arg0, arg1 any) *MockCommanderExecuteCall {
+func (mr *MockCommanderMockRecorder) Execute(ctx, opts any) *MockCommanderExecuteCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Execute", reflect.TypeOf((*MockCommander)(nil).Execute), arg0, arg1)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Execute", reflect.TypeOf((*MockCommander)(nil).Execute), ctx, opts)
 	return &MockCommanderExecuteCall{Call: call}
 }
 
@@ -101,19 +102,19 @@ type MockCommanderExecuteCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockCommanderExecuteCall) Return(arg0 error) *MockCommanderExecuteCall {
-	c.Call = c.Call.Return(arg0)
+func (c *MockCommanderExecuteCall) Return(err error) *MockCommanderExecuteCall {
+	c.Call = c.Call.Return(err)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockCommanderExecuteCall) Do(f func(context.Context, *domain.CommandOpts) error) *MockCommanderExecuteCall {
+func (c *MockCommanderExecuteCall) Do(f func(context.Context, *domain.InvokeOpts) error) *MockCommanderExecuteCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockCommanderExecuteCall) DoAndReturn(f func(context.Context, *domain.CommandOpts) error) *MockCommanderExecuteCall {
+func (c *MockCommanderExecuteCall) DoAndReturn(f func(context.Context, *domain.InvokeOpts) error) *MockCommanderExecuteCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -157,17 +158,17 @@ func (c *MockCommanderStringCall) DoAndReturn(f func() string) *MockCommanderStr
 }
 
 // Validate mocks base method.
-func (m *MockCommander) Validate(arg0 context.Context, arg1 *domain.CommandOpts) error {
+func (m *MockCommander) Validate(ctx context.Context, opts *domain.InvokeOpts) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Validate", arg0, arg1)
+	ret := m.ctrl.Call(m, "Validate", ctx, opts)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Validate indicates an expected call of Validate.
-func (mr *MockCommanderMockRecorder) Validate(arg0, arg1 any) *MockCommanderValidateCall {
+func (mr *MockCommanderMockRecorder) Validate(ctx, opts any) *MockCommanderValidateCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Validate", reflect.TypeOf((*MockCommander)(nil).Validate), arg0, arg1)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Validate", reflect.TypeOf((*MockCommander)(nil).Validate), ctx, opts)
 	return &MockCommanderValidateCall{Call: call}
 }
 
@@ -177,19 +178,19 @@ type MockCommanderValidateCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockCommanderValidateCall) Return(arg0 error) *MockCommanderValidateCall {
-	c.Call = c.Call.Return(arg0)
+func (c *MockCommanderValidateCall) Return(err error) *MockCommanderValidateCall {
+	c.Call = c.Call.Return(err)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockCommanderValidateCall) Do(f func(context.Context, *domain.CommandOpts) error) *MockCommanderValidateCall {
+func (c *MockCommanderValidateCall) Do(f func(context.Context, *domain.InvokeOpts) error) *MockCommanderValidateCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockCommanderValidateCall) DoAndReturn(f func(context.Context, *domain.CommandOpts) error) *MockCommanderValidateCall {
+func (c *MockCommanderValidateCall) DoAndReturn(f func(context.Context, *domain.InvokeOpts) error) *MockCommanderValidateCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
