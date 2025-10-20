@@ -212,6 +212,7 @@ func (c *Commands) UpdateAPIApplication(ctx context.Context, apiApp *domain.APIA
 	return apiWriteModelToAPIConfig(existingAPI), nil
 }
 
+// Deprecated: use [ChangeApplicationSecret], which supports both OIDC and API applications.
 func (c *Commands) ChangeAPIApplicationSecret(ctx context.Context, projectID, appID, resourceOwner string) (*domain.APIApp, error) {
 	if projectID == "" || appID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-99i83", "Errors.IDMissing")
