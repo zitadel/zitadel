@@ -13,7 +13,6 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 import "zitadel/filter/v2/filter.proto";
 import "zitadel/group/v2/group.proto";
-import "zitadel/authorization/v2beta/authorization.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/group/v2;group";
 
@@ -580,8 +579,8 @@ message ListGroupUsersRequest {
 }
 
 message ListGroupUsersResponse {
-  // Users is the list of users present in the requested group, matching the search criteria
-  repeated zitadel.authorization.v2beta.User users = 1;
+  // GroupUsers is the list of users present in the requested group, matching the search criteria
+  repeated GroupUser group_users = 1;
 
   // Contains the total number of users matching the query and the applied limit.
   zitadel.filter.v2.PaginationResponse pagination = 2;
