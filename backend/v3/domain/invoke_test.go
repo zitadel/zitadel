@@ -138,8 +138,8 @@ func Test_eventCollector_Invoke(t *testing.T) {
 			},
 			assertCollectedEvents: func(t *testing.T, events []legacy_es.Command) {
 				require.Len(t, events, 2)
-				assert.Equal(t, "1", events[0].Aggregate().ID)
-				assert.Equal(t, "2", events[1].Aggregate().ID)
+				assert.Equal(t, "1", events[1].Aggregate().ID)
+				assert.Equal(t, "2", events[0].Aggregate().ID)
 			},
 		},
 		{
