@@ -13,6 +13,8 @@ import (
 /*
  * GRPC Beta v2 to GRPC v2
  */
+
+// TODO(IAM-Marco): Remove in V5 (see https://github.com/zitadel/zitadel/issues/10877)
 func OrganizationBetaRequestToV2Request(in *v2beta_org.ListOrganizationsRequest) *v2_org.ListOrganizationsRequest {
 	return &v2_org.ListOrganizationsRequest{
 		Query: &grpc_object.ListQuery{
