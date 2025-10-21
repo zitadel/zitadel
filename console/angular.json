@@ -22,20 +22,33 @@
               "base": "dist/console"
             },
             "index": "src/index.html",
-            "polyfills": ["zone.js"],
+            "polyfills": [
+              "zone.js"
+            ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
               "src/assets",
               "src/manifest.webmanifest",
-              { "glob": "**/*", "input": "../docs/static/img/tech", "output": "assets/docs/img/tech" }
+              {
+                "glob": "**/*",
+                "input": "../docs/static/img/tech",
+                "output": "assets/docs/img/tech"
+              }
             ],
-            "styles": ["src/styles.scss"],
-            "scripts": ["./node_modules/tinycolor2/dist/tinycolor-min.js"],
+            "styles": [
+              "src/styles.scss"
+            ],
+            "scripts": [
+              "./node_modules/tinycolor2/dist/tinycolor-min.js"
+            ],
             "stylePreprocessorOptions": {
               "sass": {
-                "silenceDeprecations": ["import", "mixed-decls"]
+                "silenceDeprecations": [
+                  "import",
+                  "mixed-decls"
+                ]
               },
               "includePaths": [
                 "node_modules",
@@ -148,7 +161,19 @@
             "inlineStyleLanguage": "scss",
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": ["src/styles.scss"],
-            "scripts": []
+            "scripts": [],
+            "stylePreprocessorOptions": {
+              "sass": {
+                "silenceDeprecations": [
+                  "import",
+                  "mixed-decls"
+                ]
+              },
+              "includePaths": [
+                "node_modules",
+                "."
+              ]
+            }
           }
         },
         "lint": {
@@ -162,7 +187,9 @@
   },
   "cli": {
     "analytics": false,
-    "schematicCollections": ["@angular-eslint/schematics"],
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ],
     "packageManager": "pnpm"
   },
   "schematics": {
