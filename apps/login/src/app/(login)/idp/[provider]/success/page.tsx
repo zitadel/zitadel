@@ -179,22 +179,21 @@ export default async function Page(props: {
     const email = addHumanUser?.email?.email;
 
     if (options.autoLinking === AutoLinkingOption.EMAIL && email) {
-      foundUser = await listUsers({ serviceUrl, email }).then((response) => {
+      foundUser = await listUsers({ serviceUrl, email, organizationId: organization }).then((response) => {
         return response.result ? response.result[0] : null;
       });
     } else if (options.autoLinking === AutoLinkingOption.USERNAME) {
-      foundUser = await listUsers(
-        options.autoLinking === AutoLinkingOption.USERNAME
-          ? { serviceUrl, userName: idpInformation.userName }
-          : { serviceUrl, email },
-      ).then((response) => {
-        return response.result ? response.result[0] : null;
-      });
+      foundUser = await listUsers({ serviceUrl, userName: idpInformation.userName, organizationId: organization }).then(
+        (response) => {
+          return response.result ? response.result[0] : null;
+        },
+      );
     } else {
       foundUser = await listUsers({
         serviceUrl,
         userName: idpInformation.userName,
         email,
+        organizationId: organization,
       }).then((response) => {
         return response.result ? response.result[0] : null;
       });
