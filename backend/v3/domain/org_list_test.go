@@ -168,7 +168,7 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 				},
 				},
 			},
-			expectedError: zerrors.ThrowInvalidArgument(domain.NewUnexpectedTextQueryOperationError(object.TextQueryMethod(99)), "DOM-iBRBVe", "List.Query.Invalid"),
+			expectedError: zerrors.ThrowInvalidArgument(nil, "OBJ-iBRBVe", "invalid text query method"),
 		},
 		{
 			testName: "when listing orgs fails should return error",
