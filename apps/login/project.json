@@ -144,12 +144,12 @@
         },
         "commands": [
           "mkdir -p ${PACK_DIR}",
-          "tar -czvf ${PACK_DIR}/zitadel-login-standalone.tar.gz -C ${STANDALONE_DIR} ."
+          "tar -czvf ${PACK_DIR}/zitadel-login.tar.gz -C ${STANDALONE_DIR} ."
         ]
       },
       "cache": true,
       "outputs": [
-        "{workspaceRoot}/.artifacts/pack/zitadel-login-*.tar.gz"
+        "{workspaceRoot}/.artifacts/pack/zitadel-login.tar.gz"
       ]
     }
   }
