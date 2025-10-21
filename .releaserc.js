@@ -13,31 +13,31 @@ module.exports = {
         successComment: false,
         assets: [
           {
-            path: ".artifacts/zitadel-linux-amd64/zitadel-linux-amd64.tar.gz",
+            path: ".artifacts/pack/zitadel-linux-amd64/zitadel-linux-amd64.tar.gz",
             label: "zitadel-linux-amd64.tar.gz",
           },
           {
-            path: ".artifacts/zitadel-linux-arm64/zitadel-linux-arm64.tar.gz",
+            path: ".artifacts/pack/zitadel-linux-arm64/zitadel-linux-arm64.tar.gz",
             label: "zitadel-linux-arm64.tar.gz",
           },
           {
-            path: ".artifacts/zitadel-windows-amd64/zitadel-windows-amd64.tar.gz",
+            path: ".artifacts/pack/zitadel-windows-amd64/zitadel-windows-amd64.tar.gz",
             label: "zitadel-windows-amd64.tar.gz",
           },
           {
-            path: ".artifacts/zitadel-windows-arm64/zitadel-windows-arm64.tar.gz",
+            path: ".artifacts/pack/zitadel-windows-arm64/zitadel-windows-arm64.tar.gz",
             label: "zitadel-windows-arm64.tar.gz",
           },
           {
-            path: ".artifacts/zitadel-darwin-amd64/zitadel-darwin-amd64.tar.gz",
+            path: ".artifacts/pack/zitadel-darwin-amd64/zitadel-darwin-amd64.tar.gz",
             label: "zitadel-darwin-amd64.tar.gz",
           },
           {
-            path: ".artifacts/zitadel-darwin-arm64/zitadel-darwin-arm64.tar.gz",
+            path: ".artifacts/pack/zitadel-darwin-arm64/zitadel-darwin-arm64.tar.gz",
             label: "zitadel-darwin-arm64.tar.gz",
           },
           {
-            path: ".artifacts/checksums.txt",
+            path: ".artifacts/pack/checksums.txt",
             label: "checksums.txt",
           }
         ],
