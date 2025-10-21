@@ -249,6 +249,7 @@ describe("sendLoginname", () => {
           authMethodTypes: [AuthenticationMethodType.PASSWORD],
         });
         mockListIDPLinks.mockResolvedValue({ result: [] });
+        mockGetActiveIdentityProviders.mockResolvedValue({ identityProviders: [] });
 
         const result = await sendLoginname({
           loginName: "user@example.com",
@@ -256,6 +257,29 @@ describe("sendLoginname", () => {
 
         expect(result).toEqual({
           error: "errors.usernamePasswordNotAllowed",
+        });
+      });
+
+      test("should redirect to organization IDP when password not allowed, no user IDP links, but organization has active IDP", async () => {
+        mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: false });
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSWORD],
+        });
+        mockListIDPLinks.mockResolvedValue({ result: [] });
+        mockGetActiveIdentityProviders.mockResolvedValue({
+          identityProviders: [{ id: "org-idp-123", type: 0 }],
+        });
+        mockIdpTypeToSlug.mockReturnValue("google");
+        mockStartIdentityProviderFlow.mockResolvedValue("https://org-idp.example.com/auth");
+
+        const result = await sendLoginname({
+          loginName: "user@example.com",
+        });
+
+        expect(result).toEqual({ redirect: "https://org-idp.example.com/auth" });
+        expect(mockGetActiveIdentityProviders).toHaveBeenCalledWith({
+          serviceUrl: "https://api.example.com",
+          orgId: "org123", // User's organization from resourceOwner
         });
       });
 
@@ -373,6 +397,7 @@ describe("sendLoginname", () => {
           authMethodTypes: [AuthenticationMethodType.PASSWORD],
         });
         mockListIDPLinks.mockResolvedValue({ result: [] });
+        mockGetActiveIdentityProviders.mockResolvedValue({ identityProviders: [] });
 
         const result = await sendLoginname({
           loginName: "user@example.com",

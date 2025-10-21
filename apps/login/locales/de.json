@@ -386,7 +386,9 @@
       "couldNotCreateSession": "Sitzung konnte nicht erstellt werden",
       "noHostFound": "Kein Host gefunden",
       "userAlreadyVerified": "Benutzer ist bereits verifiziert!",
-      "couldNotResendInvite": "Einladung konnte nicht erneut gesendet werden"
+      "couldNotResendInvite": "Einladung konnte nicht erneut gesendet werden",
+      "inviteSendFailed": "Einladungs-E-Mail konnte nicht gesendet werden",
+      "emailSendFailed": "Verifizierungs-E-Mail konnte nicht gesendet werden"
     }
   },
   "authenticator": {
