@@ -2,6 +2,9 @@
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "name": "@zitadel/api",
     "projectType": "application",
+    "release": {
+        "version": {}
+    },
     "namedInputs": {
         "sources": [
             "{workspaceRoot}/cmd/**/*.go",

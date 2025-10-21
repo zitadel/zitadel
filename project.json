@@ -1,6 +1,32 @@
 {
   "$schema": "./node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
+  "release": {
+    "groups": {
+      "api": {
+        "projects": [
+          "@zitadel/api"
+        ],
+        "docker": true
+      },
+      "login": {
+        "projects": [
+          "@zitadel/login"
+        ],
+        "docker": true
+      },
+      "packages": {
+        "projects": [
+          "@zitadel/client",
+          "@zitadel/proto"
+        ]
+      }
+    },
+    "workspaceChangelog": {
+      "createRelease": "github",
+      "file": false
+    }
+  },
   "targets": {
     "db": {
       "continuous": true,
