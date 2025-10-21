@@ -50,14 +50,14 @@ import (
 // }
 
 func UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org.UpdateOrganizationRequest]) (*connect.Response[v2beta_org.UpdateOrganizationResponse], error) {
-	orgUpdtCmd := domain.NewUpdateOrgCommand(request.Msg.GetId(), request.Msg.GetName())
+	orgUpdateCmd := domain.NewUpdateOrgCommand(request.Msg.GetId(), request.Msg.GetName())
 
 	// TODO(IAM-Marco) Finish implementation in https://github.com/zitadel/zitadel/issues/10447
 	domainAddCmd := domain.NewAddOrgDomainCommand(request.Msg.GetId(), request.Msg.GetName())
 	domainSetPrimaryCmd := domain.NewSetPrimaryOrgDomainCommand(request.Msg.GetId(), request.Msg.GetName())
-	domainRemoveCmd := domain.NewRemoveOrgDomainCommand(request.Msg.GetId(), orgUpdtCmd.OldDomainName, orgUpdtCmd.IsOldDomainVerified)
+	domainRemoveCmd := domain.NewRemoveOrgDomainCommand(request.Msg.GetId(), orgUpdateCmd.OldDomainName, orgUpdateCmd.IsOldDomainVerified)
 
-	batchCmd := domain.BatchExecutors(orgUpdtCmd, domainAddCmd, domainSetPrimaryCmd, domainRemoveCmd)
+	batchCmd := domain.BatchExecutors(orgUpdateCmd, domainAddCmd, domainSetPrimaryCmd, domainRemoveCmd)
 
 	err := domain.Invoke(ctx, batchCmd, domain.WithOrganizationRepo(repository.OrganizationRepository()))
 	if err != nil {
@@ -74,9 +74,9 @@ func UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org
 }
 
 func ListOrganizations(ctx context.Context, request *connect.Request[v2_org.ListOrganizationsRequest]) (*connect.Response[v2_org.ListOrganizationsResponse], error) {
-	orgListCmd := domain.NewListOrgsQuery(request.Msg)
+	orgListQuery := domain.NewListOrgsQuery(request.Msg)
 
-	err := domain.Invoke(ctx, orgListCmd,
+	err := domain.Invoke(ctx, orgListQuery,
 		domain.WithOrganizationRepo(repository.OrganizationRepository()),
 		domain.WithOrganizationDomainRepo(repository.OrganizationDomainRepository()),
 	)
@@ -84,7 +84,7 @@ func ListOrganizations(ctx context.Context, request *connect.Request[v2_org.List
 		return nil, err
 	}
 
-	orgs := convert.DomainOrganizationListModelToGRPCResponse(orgListCmd.Result())
+	orgs := convert.DomainOrganizationListModelToGRPCResponse(orgListQuery.Result())
 	return &connect.Response[v2_org.ListOrganizationsResponse]{
 		Msg: &v2_org.ListOrganizationsResponse{
 			Result: orgs,
@@ -99,9 +99,9 @@ func ListOrganizations(ctx context.Context, request *connect.Request[v2_org.List
 
 // TODO(IAM-Marco): Remove in V5 (see https://github.com/zitadel/zitadel/issues/10877)
 func ListOrganizationsBeta(ctx context.Context, request *connect.Request[v2beta_org.ListOrganizationsRequest]) (*connect.Response[v2beta_org.ListOrganizationsResponse], error) {
-	orgListCmd := domain.NewListOrgsQuery(convert.OrganizationBetaRequestToV2Request(request.Msg))
+	orgListQuery := domain.NewListOrgsQuery(convert.OrganizationBetaRequestToV2Request(request.Msg))
 
-	err := domain.Invoke(ctx, orgListCmd,
+	err := domain.Invoke(ctx, orgListQuery,
 		domain.WithOrganizationRepo(repository.OrganizationRepository()),
 		domain.WithOrganizationDomainRepo(repository.OrganizationDomainRepository()),
 	)
@@ -109,7 +109,7 @@ func ListOrganizationsBeta(ctx context.Context, request *connect.Request[v2beta_
 		return nil, err
 	}
 
-	orgs := convert.DomainOrganizationListModelToGRPCBetaResponse(orgListCmd.Result())
+	orgs := convert.DomainOrganizationListModelToGRPCBetaResponse(orgListQuery.Result())
 	return &connect.Response[v2beta_org.ListOrganizationsResponse]{
 		Msg: &v2beta_org.ListOrganizationsResponse{
 			Organizations: orgs,
@@ -165,9 +165,9 @@ func DeactivateOrganization(ctx context.Context, request *connect.Request[v2beta
 }
 
 func ActivateOrganization(ctx context.Context, request *connect.Request[v2beta_org.ActivateOrganizationRequest]) (*connect.Response[v2beta_org.ActivateOrganizationResponse], error) {
-	orgDeactivateCmd := domain.NewActivateOrgCommand(request.Msg.GetId())
+	orgActivateCmd := domain.NewActivateOrgCommand(request.Msg.GetId())
 
-	err := domain.Invoke(ctx, orgDeactivateCmd,
+	err := domain.Invoke(ctx, orgActivateCmd,
 		domain.WithOrganizationRepo(repository.OrganizationRepository()),
 	)
 	if err != nil {

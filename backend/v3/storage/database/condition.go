@@ -227,7 +227,7 @@ func (c valueCondition) String() string {
 }
 
 // NewTextCondition creates a condition that compares a text column with a value.
-// If you want to use ignore case operations, consider using [NewTextIgnoreCaseCondition].
+// if `op.IsIgnoreCaseOperation()` is true the response is created using [NewTextIgnoreCaseCondition]
 func NewTextCondition[T Text](col Column, op TextOperation, value T) Condition {
 	if op.IsIgnoreCaseOperation() {
 		return NewTextIgnoreCaseCondition(col, op.Value(), value)
