@@ -14,7 +14,7 @@ const (
 type GroupUsersAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserIDs []string `json:"userId"`
+	UserIDs []string `json:"userIds"`
 }
 
 func NewGroupUsersAddedEvent(ctx context.Context, aggregate *eventstore.Aggregate, userIDs []string) *GroupUsersAddedEvent {
@@ -43,7 +43,7 @@ func (e *GroupUsersAddedEvent) UniqueConstraints() []*eventstore.UniqueConstrain
 type GroupUsersRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserIDs []string `json:"userId"`
+	UserIDs []string `json:"userIds"`
 }
 
 func NewGroupUsersRemovedEvent(
