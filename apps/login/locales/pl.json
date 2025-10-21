@@ -386,7 +386,9 @@
       "couldNotCreateSession": "Nie udało się utworzyć sesji",
       "noHostFound": "Nie znaleziono hosta",
       "userAlreadyVerified": "Użytkownik jest już zweryfikowany!",
-      "couldNotResendInvite": "Nie udało się ponownie wysłać zaproszenia"
+      "couldNotResendInvite": "Nie udało się ponownie wysłać zaproszenia",
+      "inviteSendFailed": "Nie udało się wysłać wiadomości e-mail z zaproszeniem",
+      "emailSendFailed": "Nie udało się wysłać wiadomości e-mail weryfikacyjnej"
     }
   },
   "authenticator": {
