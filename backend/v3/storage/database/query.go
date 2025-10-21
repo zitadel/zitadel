@@ -122,7 +122,7 @@ type QueryOpts struct {
 
 // Matches implements [gomock.Matcher].
 func (q *QueryOpts) Matches(x any) bool {
-	//first check if the x is a [QueryOpt]
+	// first check if the x is a [QueryOpt]
 	inputOpts, ok := x.(*QueryOpts)
 	if !ok {
 		// second possibility is a [QueryOption]
