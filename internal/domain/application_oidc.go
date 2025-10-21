@@ -14,7 +14,7 @@ import (
 const (
 	httpScheme        = "http://"
 	httpsScheme       = "https://"
-localhostHostname = "localhost"
+	localhostHostname = "localhost"
 )
 
 type OIDCApp struct {
@@ -379,6 +379,14 @@ func containsCustom(uris []string) bool {
 	return false
 }
 
+// onlyLocalhostIsHttp returns true if:
+//
+//   - input string slice is empty
+//   - all URIs in the string slice are localhost/loopback URIs (in all possible forms)
+//
+// It will return false if:
+//   - any of the input URIs cannot be parsed
+//   - any of the input URIs is not localhost/loopback
 func onlyLocalhostIsHttp(uris []string) bool {
 	for _, uri := range uris {
 		url, err := url.ParseRequestURI(uri)
