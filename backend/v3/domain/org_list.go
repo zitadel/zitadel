@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/backend/v3/api/object"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -10,7 +11,6 @@ import (
 )
 
 type ListOrgsQuery struct {
-	BaseCommand
 	Request *v2_org.ListOrganizationsRequest
 
 	result []*Organization
@@ -23,8 +23,7 @@ func (l *ListOrgsQuery) Result() []*Organization {
 
 func NewListOrgsQuery(inputRequest *v2_org.ListOrganizationsRequest) *ListOrgsQuery {
 	return &ListOrgsQuery{
-		BaseCommand: BaseCommand{},
-		Request:     inputRequest,
+		Request: inputRequest,
 	}
 }
 
@@ -79,7 +78,7 @@ func (l *ListOrgsQuery) conditions(ctx context.Context, orgRepo OrganizationRepo
 		case *v2_org.SearchQuery_DefaultQuery:
 			conditions[i] = orgRepo.IDCondition(instance.DefaultOrganisationID())
 		case *v2_org.SearchQuery_DomainQuery:
-			method, err := l.TextOperationMapper(assertedType.DomainQuery.GetMethod())
+			method, err := object.TextQueryMethodToTextOperation(assertedType.DomainQuery.GetMethod())
 			if err != nil {
 				return nil, err
 			}
@@ -91,7 +90,7 @@ func (l *ListOrgsQuery) conditions(ctx context.Context, orgRepo OrganizationRepo
 		case *v2_org.SearchQuery_IdQuery:
 			conditions[i] = orgRepo.IDCondition(assertedType.IdQuery.GetId())
 		case *v2_org.SearchQuery_NameQuery:
-			method, err := l.TextOperationMapper(assertedType.NameQuery.GetMethod())
+			method, err := object.TextQueryMethodToTextOperation(assertedType.NameQuery.GetMethod())
 			if err != nil {
 				return nil, err
 			}

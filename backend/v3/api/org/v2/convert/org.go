@@ -3,8 +3,9 @@ package convert
 import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/backend/v3/api/object"
 	"github.com/zitadel/zitadel/backend/v3/domain"
-	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	grpc_object "github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	v2_org "github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
@@ -14,7 +15,7 @@ import (
  */
 func OrganizationBetaRequestToV2Request(in *v2beta_org.ListOrganizationsRequest) *v2_org.ListOrganizationsRequest {
 	return &v2_org.ListOrganizationsRequest{
-		Query: &object.ListQuery{
+		Query: &grpc_object.ListQuery{
 			Offset: in.GetPagination().GetOffset(),
 			Limit:  in.GetPagination().GetLimit(),
 			Asc:    in.GetPagination().GetAsc(),
@@ -53,7 +54,7 @@ func organizationQueryBetaToV2(query *v2beta_org.OrganizationSearchFilter) *v2_o
 		toReturn.Query = &v2_org.SearchQuery_DomainQuery{
 			DomainQuery: &v2_org.OrganizationDomainQuery{
 				Domain: assertedType.DomainFilter.GetDomain(),
-				Method: TextQueryMethodBetaToV2(assertedType.DomainFilter.GetMethod()),
+				Method: object.TextQueryMethodBetaToV2(assertedType.DomainFilter.GetMethod()),
 			},
 		}
 
@@ -67,7 +68,7 @@ func organizationQueryBetaToV2(query *v2beta_org.OrganizationSearchFilter) *v2_o
 		toReturn.Query = &v2_org.SearchQuery_NameQuery{
 			NameQuery: &v2_org.OrganizationNameQuery{
 				Name:   assertedType.NameFilter.GetName(),
-				Method: TextQueryMethodBetaToV2(assertedType.NameFilter.GetMethod()),
+				Method: object.TextQueryMethodBetaToV2(assertedType.NameFilter.GetMethod()),
 			},
 		}
 	case *v2beta_org.OrganizationSearchFilter_StateFilter:
@@ -114,7 +115,7 @@ func DomainOrganizationListModelToGRPCResponse(orgs []*domain.Organization) []*v
 func domainOrganizationModelToGRPCResponse(org *domain.Organization) *v2_org.Organization {
 	return &v2_org.Organization{
 		Id: org.ID,
-		Details: &object.Details{
+		Details: &grpc_object.Details{
 			ChangeDate:   timestamppb.New(org.UpdatedAt),
 			CreationDate: timestamppb.New(org.CreatedAt),
 		},
