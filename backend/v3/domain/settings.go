@@ -72,26 +72,52 @@ const (
 )
 
 type LoginSettings struct {
-	AllowUserNamePassword      *bool             `json:"allowUsernamePassword,omitempty"`
-	AllowRegister              *bool             `json:"allowRegister,omitempty"`
-	AllowExternalIDP           *bool             `json:"allowExternalIdp,omitempty"`
-	ForceMFA                   *bool             `json:"forceMfa,omitempty"`
-	ForceMFALocalOnly          *bool             `json:"forceMfaLocalOnly,omitempty"`
-	HidePasswordReset          *bool             `json:"hidePasswordReset,omitempty"`
-	IgnoreUnknownUsernames     *bool             `json:"ignoreUnknownUsernames,omitempty"`
-	AllowDomainDiscovery       *bool             `json:"allowDomainDiscovery,omitempty"`
-	DisableLoginWithEmail      *bool             `json:"disableLoginWithEmail,omitempty"`
-	DisableLoginWithPhone      *bool             `json:"disableLoginWithPhone,omitempty"`
-	PasswordlessType           *PasswordlessType `json:"passwordlessType,omitempty"`
-	DefaultRedirectURI         string            `json:"defaultRedirectUri,omitempty"`
-	PasswordCheckLifetime      time.Duration     `json:"passwordCheckLifetime,omitempty"`
-	ExternalLoginCheckLifetime time.Duration     `json:"externalLoginCheckLifetime,omitempty"`
-	MFAInitSkipLifetime        time.Duration     `json:"mfaInitSkipLifetime,omitempty"`
-	SecondFactorCheckLifetime  time.Duration     `json:"secondFactorCheckLifetime,omitempty"`
-	MultiFactorCheckLifetime   time.Duration     `json:"multiFactorCheckLifetime,omitempty"`
+	AllowUserNamePassword      bool             `json:"allowUsernamePassword,omitempty"`
+	AllowRegister              bool             `json:"allowRegister,omitempty"`
+	AllowExternalIDP           bool             `json:"allowExternalIdp,omitempty"`
+	ForceMFA                   bool             `json:"forceMfa,omitempty"`
+	ForceMFALocalOnly          bool             `json:"forceMFALocalOnly,omitempty"`
+	HidePasswordReset          bool             `json:"hidePasswordReset,omitempty"`
+	IgnoreUnknownUsernames     bool             `json:"ignoreUnknownUsernames,omitempty"`
+	AllowDomainDiscovery       bool             `json:"allowDomainDiscovery,omitempty"`
+	DisableLoginWithEmail      bool             `json:"disableLoginWithEmail,omitempty"`
+	DisableLoginWithPhone      bool             `json:"disableLoginWithPhone,omitempty"`
+	PasswordlessType           PasswordlessType `json:"passwordlessType,omitempty"`
+	DefaultRedirectURI         string           `json:"defaultRedirectUri,omitempty"`
+	PasswordCheckLifetime      time.Duration    `json:"passwordCheckLifetime,omitempty"`
+	ExternalLoginCheckLifetime time.Duration    `json:"externalLoginCheckLifetime,omitempty"`
+	MFAInitSkipLifetime        time.Duration    `json:"mfaInitSkipLifetime,omitempty"`
+	SecondFactorCheckLifetime  time.Duration    `json:"secondFactorCheckLifetime,omitempty"`
+	MultiFactorCheckLifetime   time.Duration    `json:"multiFactorCheckLifetime,omitempty"`
 
 	MFAType           []MultiFactorType  `json:"mfaType"`
 	SecondFactorTypes []SecondFactorType `json:"secondFactors"`
+}
+type loginSettingsJSONFieldsChanges interface {
+	SetAllowUserNamePasswordField(value bool) db_json.JSONFieldChange
+	SetAllowRegisterField(value bool) db_json.JSONFieldChange
+	SetAllowExternalIDPField(value bool) db_json.JSONFieldChange
+	SetForceMFAField(value bool) db_json.JSONFieldChange
+	SetForceMFALocalOnlyField(value bool) db_json.JSONFieldChange
+	SetHidePasswordResetField(value bool) db_json.JSONFieldChange
+	SetIgnoreUnknownUsernamesField(value bool) db_json.JSONFieldChange
+	SetAllowDomainDiscoveryField(value bool) db_json.JSONFieldChange
+	SetDisableLoginWithEmailField(value bool) db_json.JSONFieldChange
+	SetDisableLoginWithPhoneField(value bool) db_json.JSONFieldChange
+	SetPasswordlessTypeField(value PasswordlessType) db_json.JSONFieldChange
+	SetDefaultRedirectURIField(value string) db_json.JSONFieldChange
+	SetPasswordCheckLifetimeField(value time.Duration) db_json.JSONFieldChange
+	SetExternalLoginCheckLifetimeField(value time.Duration) db_json.JSONFieldChange
+	SetMFAInitSkipLifetimeField(value time.Duration) db_json.JSONFieldChange
+	SetSecondFactorCheckLifetimeField(value time.Duration) db_json.JSONFieldChange
+	SetMultiFactorCheckLifetimeField(value time.Duration) db_json.JSONFieldChange
+	SetMFATypeField(value []MultiFactorType) db_json.JSONFieldChange
+	SetSecondFactorTypesField(value []SecondFactorType) db_json.JSONFieldChange
+}
+
+type loginSettingsJsonChanges interface {
+	loginSettingsJSONFieldsChanges
+	// SetLabelSettings(changes ...db_json.JSONFieldChange) database.Change
 }
 
 type LoginSetting struct {
@@ -160,7 +186,6 @@ type labelSettingsJSONFieldsChanges interface {
 
 type labelSettingsJsonChanges interface {
 	labelSettingsJSONFieldsChanges
-	SetLabelSettings(changes ...db_json.JSONFieldChange) database.Change
 }
 
 type LabelSetting struct {
@@ -176,6 +201,19 @@ type PasswordComplexitySettings struct {
 	HasSymbol    bool   `json:"hasSymbol,omitempty"`
 }
 
+type passwordComplexityJSONFieldsChanges interface {
+	SetMinLengthField(value uint64) db_json.JSONFieldChange
+	SetHasLowercaseField(value bool) db_json.JSONFieldChange
+	SetHasUppercaseField(value bool) db_json.JSONFieldChange
+	SetHasNumberField(value bool) db_json.JSONFieldChange
+	SetHasSymbolField(value bool) db_json.JSONFieldChange
+}
+
+type passwordComplexitySettingsJsonChanges interface {
+	passwordComplexityJSONFieldsChanges
+	// SetLabelSettings(changes ...db_json.JSONFieldChange) database.Change
+}
+
 type PasswordComplexitySetting struct {
 	*Setting
 	Settings PasswordComplexitySettings
@@ -184,6 +222,16 @@ type PasswordComplexitySetting struct {
 type PasswordExpirySettings struct {
 	ExpireWarnDays uint64 `json:"expireWarnDays,omitempty"`
 	MaxAgeDays     uint64 `json:"maxAgeDays,omitempty"`
+}
+
+type passwordExpiryJSONFieldChanges interface {
+	SetExpireWarnDays(value uint64) db_json.JSONFieldChange
+	SetMaxAgeDays(value uint64) db_json.JSONFieldChange
+}
+
+type passwordExpirySettingsJsonChanges interface {
+	passwordExpiryJSONFieldChanges
+	// SetLabelSettings(changes ...db_json.JSONFieldChange) database.Change
 }
 
 type PasswordExpirySetting struct {
@@ -197,6 +245,17 @@ type LockoutSettings struct {
 	ShowLockOutFailures bool   `json:"showLockOutFailures,omitempty"`
 }
 
+type lockoutJSONFieldChanges interface {
+	SetMaxPasswordAttempts(value uint64) db_json.JSONFieldChange
+	SetMaxOTPAttempts(value uint64) db_json.JSONFieldChange
+	SetShowLockOutFailures(value bool) db_json.JSONFieldChange
+}
+
+type lockoutSettingsJsonChanges interface {
+	lockoutJSONFieldChanges
+	// SetLabelSettings(changes ...db_json.JSONFieldChange) database.Change
+}
+
 type LockoutSetting struct {
 	*Setting
 	Settings LockoutSettings
@@ -206,6 +265,17 @@ type DomainSettings struct {
 	UserLoginMustBeDomain                  bool `json:"userLoginMustBeDomain,omitempty"`
 	ValidateOrgDomains                     bool `json:"validateOrgDomains,omitempty"`
 	SMTPSenderAddressMatchesInstanceDomain bool `json:"smtpSenderAddressMatchesInstanceDomain,omitempty"`
+}
+
+type domainJSONFieldChanges interface {
+	SetUserLoginMustBeDomain(value bool) db_json.JSONFieldChange
+	SetValidateOrgDomains(value bool) db_json.JSONFieldChange
+	SetSMTPSenderAddressMatchesInstanceDomain(value bool) db_json.JSONFieldChange
+}
+
+type domainSettingsJsonChanges interface {
+	domainJSONFieldChanges
+	// SetLabelSettings(changes ...db_json.JSONFieldChange) database.Change
 }
 
 type DomainSetting struct {
@@ -220,6 +290,18 @@ type SecuritySettings struct {
 	EnableImpersonation   bool     `json:"enableImpersonation,omitempty"`
 }
 
+type securityJSONFieldChanges interface {
+	SetEnabled(value bool) db_json.JSONFieldChange
+	SetEnableIframeEmbedding(value bool) db_json.JSONFieldChange
+	SetAllowedOrigins(value []string) db_json.JSONFieldChange
+	SetEnableImpersonation(value bool) db_json.JSONFieldChange
+}
+
+type securitySettingsJsonChanges interface {
+	securityJSONFieldChanges
+	// SetLabelSettings(changes ...db_json.JSONFieldChange) database.Change
+}
+
 type SecuritySetting struct {
 	*Setting
 	Settings SecuritySettings
@@ -229,6 +311,17 @@ type OrganizationSettings struct {
 	OrganizationScopedUsernames    bool     `json:"organizationScopedUsernames,omitempty"`
 	OldOrganizationScopedUsernames bool     `json:"oldOrganizationScopedUsernames,omitempty"`
 	UsernameChanges                []string `json:"usernameChanges,omitempty"`
+}
+
+type organizationJSONFieldChanges interface {
+	SetOrganizationScopedUsernames(value bool) db_json.JSONFieldChange
+	SetOldOrganizationScopedUsernames(value bool) db_json.JSONFieldChange
+	SetUsernameChanges(value []string) db_json.JSONFieldChange
+}
+
+type organizationSettingsJsonChanges interface {
+	organizationJSONFieldChanges
+	// SetLabelSettings(changes ...db_json.JSONFieldChange) database.Change
 }
 
 type OrganizationSetting struct {
@@ -246,6 +339,7 @@ type settingsColumns interface {
 	SettingsColumn() database.Column
 	CreatedAtColumn() database.Column
 	UpdatedAtColumn() database.Column
+	SetLabelSettings(changes ...db_json.JSONFieldChange) database.Change
 }
 
 type settingsConditions interface {
@@ -272,41 +366,34 @@ type SettingsRepository interface {
 	settingsConditions
 	settingsChanges
 
-	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, typ SettingType, opts ...database.QueryOption) (*Setting, error)
+	// Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, typ SettingType, opts ...database.QueryOption) (*Setting, error)
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Setting, error)
 	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Setting, error)
 
 	// CreateLogin(ctx context.Context, client database.QueryExecutor, setting *LoginSetting, changes ...database.Change) error
 	// GetLogin(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*LoginSetting, error)
-	// UpdateLogin(ctx context.Context, client database.QueryExecutor, setting *LoginSetting, changes ...database.Change) (int64, error)
 
 	CreateLabel(ctx context.Context, client database.QueryExecutor, setting *LabelSetting) error
-	GetLabel(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, state LabelState) (*LabelSetting, error)
-	UpdateLabel(ctx context.Context, client database.QueryExecutor, setting *LabelSetting, changes ...database.Change) (int64, error)
+	// GetLabel(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, state LabelState) (*LabelSetting, error)
 	ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *LabelSetting) error
 
 	CreatePasswordComplexity(ctx context.Context, client database.QueryExecutor, setting *PasswordComplexitySetting) error
-	GetPasswordComplexity(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*PasswordComplexitySetting, error)
-	UpdatePasswordComplexity(ctx context.Context, client database.QueryExecutor, setting *PasswordComplexitySetting, changes ...database.Change) (int64, error)
+	// GetPasswordComplexity(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*PasswordComplexitySetting, error)
 
 	CreatePasswordExpiry(ctx context.Context, client database.QueryExecutor, setting *PasswordExpirySetting) error
-	GetPasswordExpiry(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*PasswordExpirySetting, error)
-	UpdatePasswordExpiry(ctx context.Context, client database.QueryExecutor, setting *PasswordExpirySetting, changes ...database.Change) (int64, error)
+	// GetPasswordExpiry(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*PasswordExpirySetting, error)
 
 	CreateLockout(ctx context.Context, client database.QueryExecutor, setting *LockoutSetting) error
-	GetLockout(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*LockoutSetting, error)
-	UpdateLockout(ctx context.Context, client database.QueryExecutor, setting *LockoutSetting, changes ...database.Change) (int64, error)
+	// GetLockout(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*LockoutSetting, error)
 
 	CreateSecurity(ctx context.Context, client database.QueryExecutor, setting *SecuritySetting) error
-	GetSecurity(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*SecuritySetting, error)
-	UpdateSecurity(ctx context.Context, client database.QueryExecutor, setting *SecuritySetting, changes ...database.Change) (int64, error)
+	// GetSecurity(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*SecuritySetting, error)
 
 	CreateDomain(ctx context.Context, client database.QueryExecutor, setting *DomainSetting) error
-	GetDomain(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*DomainSetting, error)
-	UpdateDomain(ctx context.Context, client database.QueryExecutor, setting *DomainSetting, changes ...database.Change) (int64, error)
+	// GetDomain(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*DomainSetting, error)
 
 	CreateOrg(ctx context.Context, client database.QueryExecutor, setting *OrganizationSetting) error
-	GetOrg(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*OrganizationSetting, error)
-	UpdateOrg(ctx context.Context, client database.QueryExecutor, setting *OrganizationSetting, changes ...database.Change) (int64, error)
+	// GetOrg(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*OrganizationSetting, error)
 
 	// Create is used for events reduction
 	Create(ctx context.Context, client database.QueryExecutor, setting *Setting) error
@@ -319,15 +406,19 @@ type SettingsRepository interface {
 	DeleteSettingsForOrg(ctx context.Context, client database.QueryExecutor, orgID string) (int64, error)
 
 	Get_(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Setting, error)
+	Update_(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 }
 
 type LoginRepository interface {
 	settingsColumns
 	settingsConditions
 	settingsChanges
+	loginSettingsJsonChanges
 
-	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*LoginSetting, error)
+	// Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*LoginSetting, error)
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*LoginSetting, error)
 	Set(ctx context.Context, client database.QueryExecutor, setting *LoginSetting, changes ...database.Change) error
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 }
 
 type LabelRepository interface {
@@ -338,7 +429,6 @@ type LabelRepository interface {
 	labelSettingsJsonChanges
 
 	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*LabelSetting, error)
-	// Set(ctx context.Context, client database.QueryExecutor, conditions database.Condition, changes ...database.Change) error
 	Set(ctx context.Context, client database.QueryExecutor, setting *LabelSetting) error
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
@@ -350,8 +440,13 @@ type PasswordComplexityRepository interface {
 	settingsConditions
 	settingsChanges
 
-	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*PasswordComplexitySetting, error)
-	Set(ctx context.Context, client database.QueryExecutor, setting *PasswordComplexitySetting, changes ...database.Change) error
+	passwordComplexitySettingsJsonChanges
+
+	// Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*PasswordComplexitySetting, error)
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*PasswordComplexitySetting, error)
+	// Set(ctx context.Context, client database.QueryExecutor, setting *PasswordComplexitySetting) error
+	// Set(ctx context.Context, client database.QueryExecutor, setting *PasswordComplexitySetting, changes ...database.Change) error
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 }
 
 type PasswordExpiryRepository interface {
@@ -359,8 +454,11 @@ type PasswordExpiryRepository interface {
 	settingsConditions
 	settingsChanges
 
-	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*PasswordExpirySetting, error)
+	passwordExpirySettingsJsonChanges
+
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*PasswordExpirySetting, error)
 	Set(ctx context.Context, client database.QueryExecutor, setting *PasswordExpirySetting, changes ...database.Change) error
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 }
 
 type LockoutRepository interface {
@@ -368,8 +466,11 @@ type LockoutRepository interface {
 	settingsConditions
 	settingsChanges
 
-	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*LockoutSetting, error)
+	lockoutSettingsJsonChanges
+
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*LockoutSetting, error)
 	Set(ctx context.Context, client database.QueryExecutor, setting *LockoutSetting, changes ...database.Change) error
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 }
 
 type SecurityRepository interface {
@@ -377,8 +478,11 @@ type SecurityRepository interface {
 	settingsConditions
 	settingsChanges
 
-	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*SecuritySetting, error)
+	securitySettingsJsonChanges
+
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*SecuritySetting, error)
 	Set(ctx context.Context, client database.QueryExecutor, setting *SecuritySetting, changes ...database.Change) error
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 }
 
 type DomainRepository interface {
@@ -386,8 +490,11 @@ type DomainRepository interface {
 	settingsConditions
 	settingsChanges
 
-	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*DomainSetting, error)
+	domainSettingsJsonChanges
+
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*DomainSetting, error)
 	Set(ctx context.Context, client database.QueryExecutor, setting *DomainSetting, changes ...database.Change) error
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 }
 
 type OrganizationSettingRepository interface {
@@ -395,6 +502,9 @@ type OrganizationSettingRepository interface {
 	settingsConditions
 	settingsChanges
 
-	Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*OrganizationSetting, error)
+	organizationSettingsJsonChanges
+
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*OrganizationSetting, error)
 	Set(ctx context.Context, client database.QueryExecutor, setting *OrganizationSetting, changes ...database.Change) error
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 }

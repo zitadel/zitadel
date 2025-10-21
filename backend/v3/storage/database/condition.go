@@ -140,9 +140,9 @@ func IsNull(column Column) *isNull {
 }
 
 // IsRestrictingColumn implements [Condition].
-// It returns false because it cannot be used for restricting a column.
+// It returns true, because column = NULL is in itself a restriction
 func (i isNull) IsRestrictingColumn(col Column) bool {
-	return false
+	return true
 }
 
 func (i isNull) GetValue(col Column) any {
