@@ -41,8 +41,6 @@ jobs:
       dry_run: true
 
   pack:
-    runs-on:
-      group: zitadel-public
     environment: ${{ github.ref_protected == 'true' && 'Protected' || null }}
     needs: version
     permissions:
