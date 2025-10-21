@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	http  = "http://"
-	https = "https://"
+	httpScheme  = "http://"
+	httpsScheme = "https://"
 )
 
 type OIDCApp struct {
@@ -291,7 +291,7 @@ func CheckRedirectUrisCode(compliance *Compliance, appType *OIDCApplicationType,
 	if urlsAreHttps(redirectUris) {
 		return
 	}
-	if urlContainsPrefix(redirectUris, http) {
+	if urlContainsPrefix(redirectUris, httpScheme) {
 		if appType != nil && *appType == OIDCApplicationTypeUserAgent {
 			compliance.NoneCompliant = true
 			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb")
@@ -315,7 +315,7 @@ func CheckRedirectUrisImplicit(compliance *Compliance, appType *OIDCApplicationT
 		compliance.NoneCompliant = true
 		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.CustomNotAllowed")
 	}
-	if urlContainsPrefix(redirectUris, http) {
+	if urlContainsPrefix(redirectUris, httpScheme) {
 		if appType != nil && *appType == OIDCApplicationTypeNative {
 			if !onlyLocalhostIsHttp(redirectUris) {
 				compliance.NoneCompliant = true
@@ -336,7 +336,7 @@ func CheckRedirectUrisImplicitAndCode(compliance *Compliance, appType *OIDCAppli
 		compliance.NoneCompliant = true
 		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.CustomNotAllowed")
 	}
-	if urlContainsPrefix(redirectUris, http) {
+	if urlContainsPrefix(redirectUris, httpScheme) {
 		if appType != nil && *appType == OIDCApplicationTypeUserAgent {
 			compliance.NoneCompliant = true
 			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb")
@@ -353,7 +353,7 @@ func CheckRedirectUrisImplicitAndCode(compliance *Compliance, appType *OIDCAppli
 
 func urlsAreHttps(uris []string) bool {
 	for _, uri := range uris {
-		if !strings.HasPrefix(uri, https) {
+		if !strings.HasPrefix(uri, httpsScheme) {
 			return false
 		}
 	}
@@ -371,7 +371,7 @@ func urlContainsPrefix(uris []string, prefix string) bool {
 
 func containsCustom(uris []string) bool {
 	for _, uri := range uris {
-		if !strings.HasPrefix(uri, http) && !strings.HasPrefix(uri, https) {
+		if !strings.HasPrefix(uri, httpScheme) && !strings.HasPrefix(uri, httpsScheme) {
 			return true
 		}
 	}
