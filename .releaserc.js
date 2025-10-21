@@ -12,6 +12,7 @@ module.exports = {
       {
         draftRelease: true,
         successComment: false,
+        releaseBodyTemplate: "DUMMY_RELEASE_NOTES.md",
         assets: [
           {
             path: ".artifacts/pack/zitadel-linux-amd64.tar.gz",
