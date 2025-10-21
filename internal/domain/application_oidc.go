@@ -12,8 +12,9 @@ import (
 )
 
 const (
-	httpScheme  = "http://"
-	httpsScheme = "https://"
+	httpScheme        = "http://"
+	httpsScheme       = "https://"
+localhostHostname = "localhost"
 )
 
 type OIDCApp struct {
@@ -389,7 +390,7 @@ func onlyLocalhostIsHttp(uris []string) bool {
 		if url.Scheme == "http" {
 			hostname := url.Hostname()
 
-			if hostname == "localhost" {
+			if hostname == localhostHostname {
 				continue
 			}
 
