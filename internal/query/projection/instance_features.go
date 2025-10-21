@@ -104,6 +104,10 @@ func (*instanceFeatureProjection) Reducers() []handler.AggregateReducer {
 				Event:  instance.InstanceRemovedEventType,
 				Reduce: reduceInstanceRemovedHelper(InstanceDomainInstanceIDCol),
 			},
+			{
+				Event:  feature_v2.InstanceEnableRelationalTables,
+				Reduce: reduceInstanceSetFeature[bool],
+			},
 		},
 	}}
 }

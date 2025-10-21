@@ -11,7 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
@@ -200,28 +199,28 @@ func TestReplaceUser(t *testing.T) {
 		},
 		{
 			name:        "not authenticated",
-			body:        withUsername(minimalUserJson, gofakeit.Username()),
+			body:        withUsername(minimalUserJson, integration.Username()),
 			ctx:         context.Background(),
 			wantErr:     true,
 			errorStatus: http.StatusUnauthorized,
 		},
 		{
 			name:        "no permissions",
-			body:        withUsername(minimalUserJson, gofakeit.Username()),
+			body:        withUsername(minimalUserJson, integration.Username()),
 			ctx:         Instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
 			wantErr:     true,
 			errorStatus: http.StatusNotFound,
 		},
 		{
 			name:             "another org",
-			body:             withUsername(minimalUserJson, gofakeit.Username()),
+			body:             withUsername(minimalUserJson, integration.Username()),
 			replaceUserOrgID: SecondaryOrganization.OrganizationId,
 			wantErr:          true,
 			errorStatus:      http.StatusNotFound,
 		},
 		{
 			name:             "another org with permissions",
-			body:             withUsername(minimalUserJson, gofakeit.Username()),
+			body:             withUsername(minimalUserJson, integration.Username()),
 			replaceUserOrgID: SecondaryOrganization.OrganizationId,
 			ctx:              Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner),
 			wantErr:          true,
@@ -231,7 +230,7 @@ func TestReplaceUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// use iam owner => we don't want to test permissions of the create endpoint.
-			createdUser, err := Instance.Client.SCIM.Users.Create(Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner), Instance.DefaultOrg.Id, withUsername(fullUserJson, gofakeit.Username()))
+			createdUser, err := Instance.Client.SCIM.Users.Create(Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner), Instance.DefaultOrg.Id, withUsername(fullUserJson, integration.Username()))
 			require.NoError(t, err)
 
 			ctx := tt.ctx
@@ -290,7 +289,7 @@ func TestReplaceUser(t *testing.T) {
 
 func TestReplaceUser_removeOldMetadata(t *testing.T) {
 	// ensure old metadata is removed correctly
-	username := gofakeit.Username()
+	username := integration.Username()
 	createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, username))
 	require.NoError(t, err)
 
@@ -315,10 +314,10 @@ func TestReplaceUser_removeOldMetadata(t *testing.T) {
 
 func TestReplaceUser_emailType(t *testing.T) {
 	// ensure old metadata is removed correctly
-	createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, gofakeit.Username()))
+	createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, integration.Username()))
 	require.NoError(t, err)
 
-	replacedUsername := gofakeit.Username()
+	replacedUsername := integration.Username()
 	_, err = Instance.Client.SCIM.Users.Replace(CTX, Instance.DefaultOrg.Id, createdUser.ID, withUsername(minimalUserWithEmailTypeReplaceJson, replacedUsername))
 	require.NoError(t, err)
 
@@ -340,7 +339,7 @@ func TestReplaceUser_emailType(t *testing.T) {
 }
 
 func TestReplaceUser_scopedExternalID(t *testing.T) {
-	createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, gofakeit.Username()))
+	createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, integration.Username()))
 	require.NoError(t, err)
 	callingUserId, callingUserPat, err := Instance.CreateMachineUserPATWithMembership(CTX, "ORG_OWNER")
 	require.NoError(t, err)

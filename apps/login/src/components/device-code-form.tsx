@@ -66,7 +66,7 @@ export function DeviceCodeForm({ userCode }: { userCode?: string }) {
             type="text"
             autoComplete="one-time-code"
             {...register("userCode", { required: t("usercode.required.code") })}
-            label="Code"
+            label={t("usercode.labels.code")}
             data-testid="code-text-input"
           />
         </div>
@@ -89,7 +89,7 @@ export function DeviceCodeForm({ userCode }: { userCode?: string }) {
             data-testid="submit-button"
           >
             {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
-            <Translated i18nKey="verify.submit" namespace="verify" />
+            <Translated i18nKey="usercode.submit" namespace="device" />
           </Button>
         </div>
       </form>

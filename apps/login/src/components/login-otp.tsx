@@ -1,6 +1,6 @@
 "use client";
 
-import { getNextUrl } from "@/lib/client";
+import { completeFlowOrGetUrl } from "@/lib/client";
 import { updateSession } from "@/lib/server/session";
 import { create } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
@@ -33,16 +33,7 @@ type Inputs = {
   code: string;
 };
 
-export function LoginOTP({
-  host,
-  loginName,
-  sessionId,
-  requestId,
-  organization,
-  method,
-  code,
-  loginSettings,
-}: Props) {
+export function LoginOTP({ host, loginName, sessionId, requestId, organization, method, code, loginSettings }: Props) {
   const t = useTranslations("otp");
 
   const [error, setError] = useState<string>("");
@@ -190,29 +181,33 @@ export function LoginOTP({
         // Wait for 2 seconds to avoid eventual consistency issues with an OTP code being verified in the /login endpoint
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
-        const url =
-          requestId && response.sessionId
-            ? await getNextUrl(
-                {
+        // Use unified approach that handles both OIDC/SAML and regular flows
+        if (response.factors?.user) {
+          const callbackResponse = await completeFlowOrGetUrl(
+            requestId && response.sessionId
+              ? {
                   sessionId: response.sessionId,
                   requestId: requestId,
                   organization: response.factors?.user?.organizationId,
+                }
+              : {
+                  loginName: response.factors.user.loginName,
+                  organization: response.factors?.user?.organizationId,
                 },
-                loginSettings?.defaultRedirectUri,
-              )
-            : response.factors?.user
-              ? await getNextUrl(
-                  {
-                    loginName: response.factors.user.loginName,
-                    organization: response.factors?.user?.organizationId,
-                  },
-                  loginSettings?.defaultRedirectUri,
-                )
-              : null;
+            loginSettings?.defaultRedirectUri,
+          );
+          setLoading(false);
 
-        setLoading(false);
-        if (url) {
-          router.push(url);
+          if ("error" in callbackResponse) {
+            setError(callbackResponse.error);
+            return;
+          }
+
+          if ("redirect" in callbackResponse) {
+            return router.push(callbackResponse.redirect);
+          }
+        } else {
+          setLoading(false);
         }
       }
     });
@@ -253,7 +248,7 @@ export function LoginOTP({
         <TextInput
           type="text"
           {...register("code", { required: t("verify.required.code") })}
-          label="Code"
+          label={t("verify.labels.code")}
           autoComplete="one-time-code"
           data-testid="code-text-input"
         />
@@ -278,8 +273,7 @@ export function LoginOTP({
           })}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
-          <Translated i18nKey="verify.submit" namespace="otp" />
+          {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="verify.submit" namespace="otp" />
         </Button>
       </div>
     </form>

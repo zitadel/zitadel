@@ -1,0 +1,15 @@
+<cnsl-form-field class="full-width">
+  <cnsl-label>{{ label | translate }}</cnsl-label>
+  <input #input cnslInput type="text" placeholder="" [formControl]="control" [matAutocomplete]="autocomplete" />
+
+  <mat-autocomplete requireSelection #autocomplete="matAutocomplete">
+    <mat-option *ngIf="items === undefined" class="is-loading">
+      <mat-spinner diameter="30"></mat-spinner>
+    </mat-option>
+    <mat-option *ngFor="let item of items | filter: input | async" [value]="item">
+      <span>{{ item }}</span>
+    </mat-option>
+  </mat-autocomplete>
+
+  <ng-content></ng-content>
+</cnsl-form-field>

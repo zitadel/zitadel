@@ -26,6 +26,7 @@ func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) (*command
 		EnableBackChannelLogout:        req.EnableBackChannelLogout,
 		LoginV2:                        loginV2,
 		PermissionCheckV2:              req.PermissionCheckV2,
+		EnableRelationalTables:         req.EnableRelationalTables,
 	}, nil
 }
 
@@ -40,6 +41,7 @@ func systemFeaturesToPb(f *query.SystemFeatures) *feature_pb.GetSystemFeaturesRe
 		EnableBackChannelLogout:        featureSourceToFlagPb(&f.EnableBackChannelLogout),
 		LoginV2:                        loginV2ToLoginV2FlagPb(f.LoginV2),
 		PermissionCheckV2:              featureSourceToFlagPb(&f.PermissionCheckV2),
+		EnableRelationalTables:         featureSourceToFlagPb(&f.EnableRelationalTables),
 	}
 }
 
@@ -59,6 +61,7 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) (*com
 		LoginV2:                        loginV2,
 		PermissionCheckV2:              req.PermissionCheckV2,
 		ConsoleUseV2UserApi:            req.ConsoleUseV2UserApi,
+		EnableRelationalTables:         req.EnableRelationalTables,
 	}, nil
 }
 
@@ -75,6 +78,7 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		LoginV2:                        loginV2ToLoginV2FlagPb(f.LoginV2),
 		PermissionCheckV2:              featureSourceToFlagPb(&f.PermissionCheckV2),
 		ConsoleUseV2UserApi:            featureSourceToFlagPb(&f.ConsoleUseV2UserApi),
+		EnableRelationalTables:         featureSourceToFlagPb(&f.EnableRelationalTables),
 	}
 }
 

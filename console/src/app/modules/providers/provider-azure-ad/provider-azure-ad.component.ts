@@ -36,6 +36,7 @@ import { ProviderNextService } from '../provider-next/provider-next.service';
 @Component({
   selector: 'cnsl-provider-azure-ad',
   templateUrl: './provider-azure-ad.component.html',
+  standalone: false,
 })
 export class ProviderAzureADComponent {
   public showOptional: boolean = false;

@@ -70,7 +70,7 @@ export function ChangePasswordForm({
       password: values.password,
     })
       .catch(() => {
-        setError("Could not change password");
+        setError(t("change.errors.couldNotChangePassword"));
         return;
       })
       .finally(() => {
@@ -81,13 +81,13 @@ export function ChangePasswordForm({
       setError(
         typeof changeResponse.error === "string"
           ? changeResponse.error
-          : "Unknown error",
+          : t("change.errors.unknownError")
       );
       return;
     }
 
     if (!changeResponse) {
-      setError("Could not change password");
+      setError(t("change.errors.couldNotChangePassword"));
       return;
     }
 
@@ -102,7 +102,7 @@ export function ChangePasswordForm({
       requestId,
     })
       .catch(() => {
-        setError("Could not verify password");
+        setError(t("change.errors.couldNotVerifyPassword"));
         return;
       })
       .finally(() => {
@@ -161,7 +161,7 @@ export function ChangePasswordForm({
             {...register("password", {
               required: t("change.required.newPassword"),
             })}
-            label="New Password"
+            label={t("change.labels.newPassword")}
             error={errors.password?.message as string}
             data-testid="password-change-text-input"
           />
@@ -174,7 +174,7 @@ export function ChangePasswordForm({
             {...register("confirmPassword", {
               required: t("change.required.confirmPassword"),
             })}
-            label="Confirm Password"
+            label={t("change.labels.confirmPassword")}
             error={errors.confirmPassword?.message as string}
             data-testid="password-change-confirm-text-input"
           />

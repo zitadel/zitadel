@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/integration"
@@ -69,7 +68,7 @@ func TestServer_CreateAdministrator(t *testing.T) {
 			name: "already existing, error",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateInstanceMembership(t, iamOwnerCtx, userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -87,7 +86,7 @@ func TestServer_CreateAdministrator(t *testing.T) {
 			name: "instance, ok",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				request.UserId = userResp.GetId()
 			},
 			req: &internal_permission.CreateAdministratorRequest{
@@ -106,7 +105,7 @@ func TestServer_CreateAdministrator(t *testing.T) {
 			name: "instance, not existing roles",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				request.UserId = userResp.GetId()
 			},
 			req: &internal_permission.CreateAdministratorRequest{
@@ -123,7 +122,7 @@ func TestServer_CreateAdministrator(t *testing.T) {
 			name: "org, not existing",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				request.UserId = userResp.GetId()
 			},
 			req: &internal_permission.CreateAdministratorRequest{
@@ -140,7 +139,7 @@ func TestServer_CreateAdministrator(t *testing.T) {
 			name: "org, ok",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				request.UserId = userResp.GetId()
 			},
 			req: &internal_permission.CreateAdministratorRequest{
@@ -159,7 +158,7 @@ func TestServer_CreateAdministrator(t *testing.T) {
 			name: "org, no existing roles",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				request.UserId = userResp.GetId()
 			},
 			req: &internal_permission.CreateAdministratorRequest{
@@ -176,7 +175,7 @@ func TestServer_CreateAdministrator(t *testing.T) {
 			name: "project, not existing",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				request.UserId = userResp.GetId()
 			},
 			req: &internal_permission.CreateAdministratorRequest{
@@ -193,7 +192,7 @@ func TestServer_CreateAdministrator(t *testing.T) {
 			name: "project, ok",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 
 				request.UserId = userResp.GetId()
@@ -214,7 +213,7 @@ func TestServer_CreateAdministrator(t *testing.T) {
 			name: "project, not existing roles",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 
 				request.UserId = userResp.GetId()
@@ -233,14 +232,14 @@ func TestServer_CreateAdministrator(t *testing.T) {
 			name: "project grant, not existing",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 				request.UserId = userResp.GetId()
 				request.Resource = &internal_permission.ResourceType{
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: "notexisting",
+							OrganizationId: "notexisting",
 						},
 					},
 				}
@@ -254,9 +253,9 @@ func TestServer_CreateAdministrator(t *testing.T) {
 			name: "project grant, ok",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
-				orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 
 				request.UserId = userResp.GetId()
@@ -264,7 +263,7 @@ func TestServer_CreateAdministrator(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				}
@@ -280,9 +279,9 @@ func TestServer_CreateAdministrator(t *testing.T) {
 			name: "project grant, not existing roles",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
-				orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 
 				request.UserId = userResp.GetId()
@@ -290,7 +289,7 @@ func TestServer_CreateAdministrator(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				}
@@ -321,7 +320,7 @@ func TestServer_CreateAdministrator(t *testing.T) {
 
 func TestServer_CreateAdministrator_Permission(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	userProjectResp := instance.CreateMachineUser(iamOwnerCtx)
 	projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
@@ -334,6 +333,13 @@ func TestServer_CreateAdministrator_Permission(t *testing.T) {
 	instance.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), orgResp.GetOrganizationId(), userProjectGrantResp.GetUserId())
 	patProjectGrantResp := instance.CreatePersonalAccessToken(iamOwnerCtx, userProjectGrantResp.GetUserId())
 	projectGrantOwnerCtx := integration.WithAuthorizationToken(CTX, patProjectGrantResp.Token)
+
+	grantedProjectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
+	userGrantedProjectResp := instance.CreateMachineUser(iamOwnerCtx)
+	instance.CreateProjectMembership(t, iamOwnerCtx, grantedProjectResp.GetId(), userGrantedProjectResp.GetUserId())
+	patGrantedProjectResp := instance.CreatePersonalAccessToken(iamOwnerCtx, userGrantedProjectResp.GetUserId())
+	grantedProjectOwnerCtx := integration.WithAuthorizationToken(CTX, patGrantedProjectResp.Token)
+	instance.CreateProjectGrant(iamOwnerCtx, t, grantedProjectResp.GetId(), instance.DefaultOrg.GetId())
 
 	type want struct {
 		creationDate bool
@@ -350,7 +356,7 @@ func TestServer_CreateAdministrator_Permission(t *testing.T) {
 			name: "unauthenticated",
 			ctx:  CTX,
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				request.UserId = userResp.GetId()
 			},
 			req: &internal_permission.CreateAdministratorRequest{
@@ -367,7 +373,7 @@ func TestServer_CreateAdministrator_Permission(t *testing.T) {
 			name: "missing permission",
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				request.UserId = userResp.GetId()
 			},
 			req: &internal_permission.CreateAdministratorRequest{
@@ -384,7 +390,7 @@ func TestServer_CreateAdministrator_Permission(t *testing.T) {
 			name: "instance, missing permission, org owner",
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				request.UserId = userResp.GetId()
 			},
 			req: &internal_permission.CreateAdministratorRequest{
@@ -401,7 +407,7 @@ func TestServer_CreateAdministrator_Permission(t *testing.T) {
 			name: "instance, instance owner, ok",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				request.UserId = userResp.GetId()
 			},
 			req: &internal_permission.CreateAdministratorRequest{
@@ -420,7 +426,7 @@ func TestServer_CreateAdministrator_Permission(t *testing.T) {
 			name: "org, instance owner, ok",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				request.UserId = userResp.GetId()
 			},
 			req: &internal_permission.CreateAdministratorRequest{
@@ -439,7 +445,7 @@ func TestServer_CreateAdministrator_Permission(t *testing.T) {
 			name: "org, org owner, ok",
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				request.UserId = userResp.GetId()
 			},
 			req: &internal_permission.CreateAdministratorRequest{
@@ -458,7 +464,7 @@ func TestServer_CreateAdministrator_Permission(t *testing.T) {
 			name: "org, missing permission",
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				request.UserId = userResp.GetId()
 			},
 			req: &internal_permission.CreateAdministratorRequest{
@@ -475,7 +481,7 @@ func TestServer_CreateAdministrator_Permission(t *testing.T) {
 			name: "project, project owner, ok",
 			ctx:  projectOwnerCtx,
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 
 				request.UserId = userResp.GetId()
 			},
@@ -495,7 +501,7 @@ func TestServer_CreateAdministrator_Permission(t *testing.T) {
 			name: "project, missing permission",
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 
 				request.UserId = userResp.GetId()
 			},
@@ -510,10 +516,54 @@ func TestServer_CreateAdministrator_Permission(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "project grant, org owner, ok",
+			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+			prepare: func(request *internal_permission.CreateAdministratorRequest) {
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
+
+				request.UserId = userResp.GetId()
+			},
+			req: &internal_permission.CreateAdministratorRequest{
+				Resource: &internal_permission.ResourceType{
+					Resource: &internal_permission.ResourceType_ProjectGrant_{
+						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
+							ProjectId:      grantedProjectResp.GetId(),
+							OrganizationId: instance.DefaultOrg.GetId(),
+						},
+					},
+				},
+				Roles: []string{"PROJECT_GRANT_OWNER"},
+			},
+			want: want{
+				creationDate: true,
+			},
+		},
+		{
+			name: "project grant, project owner, error",
+			ctx:  grantedProjectOwnerCtx,
+			prepare: func(request *internal_permission.CreateAdministratorRequest) {
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
+
+				request.UserId = userResp.GetId()
+			},
+			req: &internal_permission.CreateAdministratorRequest{
+				Resource: &internal_permission.ResourceType{
+					Resource: &internal_permission.ResourceType_ProjectGrant_{
+						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
+							ProjectId:      grantedProjectResp.GetId(),
+							OrganizationId: instance.DefaultOrg.GetId(),
+						},
+					},
+				},
+				Roles: []string{"PROJECT_GRANT_OWNER"},
+			},
+			wantErr: true,
+		},
+		{
 			name: "project grant, project grant owner, ok",
 			ctx:  projectGrantOwnerCtx,
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 
 				request.UserId = userResp.GetId()
 			},
@@ -522,7 +572,7 @@ func TestServer_CreateAdministrator_Permission(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				},
@@ -536,7 +586,7 @@ func TestServer_CreateAdministrator_Permission(t *testing.T) {
 			name: "project grant, missing permission",
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 
 				request.UserId = userResp.GetId()
 			},
@@ -545,7 +595,7 @@ func TestServer_CreateAdministrator_Permission(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				},
@@ -640,7 +690,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 			name: "instance, no change",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateInstanceMembership(t, iamOwnerCtx, userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -661,7 +711,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 			name: "instance, ok",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateInstanceMembership(t, iamOwnerCtx, userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -682,7 +732,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 			name: "instance, not existing roles",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateInstanceMembership(t, iamOwnerCtx, userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -700,7 +750,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 			name: "org, not existing",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				request.UserId = userResp.GetId()
 			},
 			req: &internal_permission.UpdateAdministratorRequest{
@@ -717,7 +767,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 			name: "org, ok",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateOrgMembership(t, iamOwnerCtx, instance.DefaultOrg.Id, userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -738,7 +788,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 			name: "org, no change",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateOrgMembership(t, iamOwnerCtx, instance.DefaultOrg.Id, userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -759,7 +809,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 			name: "org, no existing roles",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateOrgMembership(t, iamOwnerCtx, instance.DefaultOrg.Id, userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -777,7 +827,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 			name: "project, not existing",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				request.UserId = userResp.GetId()
 			},
 			req: &internal_permission.UpdateAdministratorRequest{
@@ -794,7 +844,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 			name: "project, ok",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 				instance.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetId(), userResp.GetId())
 
@@ -817,7 +867,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 			name: "project, no change",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 				instance.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetId(), userResp.GetId())
 
@@ -840,7 +890,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 			name: "project, not existing roles",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 				instance.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetId(), userResp.GetId())
 
@@ -860,9 +910,9 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 			name: "project grant, not existing",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
-				orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 
 				request.UserId = userResp.GetId()
@@ -870,7 +920,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: "notexisting",
+							OrganizationId: "notexisting",
 						},
 					},
 				}
@@ -884,9 +934,9 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 			name: "project grant, ok",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
-				orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 				instance.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), orgResp.GetOrganizationId(), userResp.GetId())
 
@@ -895,7 +945,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				}
@@ -912,9 +962,9 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 			name: "project grant, no change",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
-				orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 				instance.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), orgResp.GetOrganizationId(), userResp.GetId())
 
@@ -923,7 +973,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				}
@@ -940,9 +990,9 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 			name: "project grant, not existing roles",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
-				orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 
 				request.UserId = userResp.GetId()
@@ -950,7 +1000,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				}
@@ -985,7 +1035,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 
 func TestServer_UpdateAdministrator_Permission(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	userProjectResp := instance.CreateMachineUser(iamOwnerCtx)
 	projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
@@ -1014,7 +1064,7 @@ func TestServer_UpdateAdministrator_Permission(t *testing.T) {
 			name: "unauthenticated",
 			ctx:  CTX,
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateInstanceMembership(t, iamOwnerCtx, userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1032,7 +1082,7 @@ func TestServer_UpdateAdministrator_Permission(t *testing.T) {
 			name: "missing permission",
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateInstanceMembership(t, iamOwnerCtx, userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1050,7 +1100,7 @@ func TestServer_UpdateAdministrator_Permission(t *testing.T) {
 			name: "instance, missing permission, org owner",
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateInstanceMembership(t, iamOwnerCtx, userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1068,7 +1118,7 @@ func TestServer_UpdateAdministrator_Permission(t *testing.T) {
 			name: "instance, instance owner, ok",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateInstanceMembership(t, iamOwnerCtx, userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1088,7 +1138,7 @@ func TestServer_UpdateAdministrator_Permission(t *testing.T) {
 			name: "org, instance owner, ok",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateOrgMembership(t, iamOwnerCtx, instance.DefaultOrg.Id, userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1108,7 +1158,7 @@ func TestServer_UpdateAdministrator_Permission(t *testing.T) {
 			name: "org, org owner, ok",
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateOrgMembership(t, iamOwnerCtx, instance.DefaultOrg.Id, userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1128,7 +1178,7 @@ func TestServer_UpdateAdministrator_Permission(t *testing.T) {
 			name: "org, missing permission",
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateOrgMembership(t, iamOwnerCtx, instance.DefaultOrg.Id, userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1146,7 +1196,7 @@ func TestServer_UpdateAdministrator_Permission(t *testing.T) {
 			name: "project, project owner, ok",
 			ctx:  projectOwnerCtx,
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetId(), userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1166,7 +1216,7 @@ func TestServer_UpdateAdministrator_Permission(t *testing.T) {
 			name: "project, missing permission",
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetId(), userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1184,7 +1234,7 @@ func TestServer_UpdateAdministrator_Permission(t *testing.T) {
 			name: "project grant, project grant owner, ok",
 			ctx:  projectGrantOwnerCtx,
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), orgResp.GetOrganizationId(), userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1193,7 +1243,7 @@ func TestServer_UpdateAdministrator_Permission(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				},
@@ -1207,7 +1257,7 @@ func TestServer_UpdateAdministrator_Permission(t *testing.T) {
 			name: "project grant, missing permission",
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), orgResp.GetOrganizationId(), userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1216,7 +1266,7 @@ func TestServer_UpdateAdministrator_Permission(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				},
@@ -1228,7 +1278,7 @@ func TestServer_UpdateAdministrator_Permission(t *testing.T) {
 			name: "project grant, project owner, error",
 			ctx:  projectOwnerCtx,
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), orgResp.GetOrganizationId(), userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1237,7 +1287,7 @@ func TestServer_UpdateAdministrator_Permission(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				},
@@ -1305,7 +1355,7 @@ func TestServer_DeleteAdministrator(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				request.UserId = userResp.GetId()
 				return creationDate, time.Now().UTC()
 			},
@@ -1323,7 +1373,7 @@ func TestServer_DeleteAdministrator(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateInstanceMembership(t, iamOwnerCtx, userResp.GetId())
 				instance.DeleteInstanceMembership(t, iamOwnerCtx, userResp.GetId())
 				request.UserId = userResp.GetId()
@@ -1343,7 +1393,7 @@ func TestServer_DeleteAdministrator(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateInstanceMembership(t, iamOwnerCtx, userResp.GetId())
 				request.UserId = userResp.GetId()
 				return creationDate, time.Time{}
@@ -1362,7 +1412,7 @@ func TestServer_DeleteAdministrator(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				request.UserId = userResp.GetId()
 				return creationDate, time.Now().UTC()
 			},
@@ -1380,7 +1430,7 @@ func TestServer_DeleteAdministrator(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateOrgMembership(t, iamOwnerCtx, instance.DefaultOrg.Id, userResp.GetId())
 				request.UserId = userResp.GetId()
 				return creationDate, time.Time{}
@@ -1399,7 +1449,7 @@ func TestServer_DeleteAdministrator(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateOrgMembership(t, iamOwnerCtx, instance.DefaultOrg.Id, userResp.GetId())
 				instance.DeleteOrgMembership(t, iamOwnerCtx, userResp.GetId())
 				request.UserId = userResp.GetId()
@@ -1419,7 +1469,7 @@ func TestServer_DeleteAdministrator(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				request.UserId = userResp.GetId()
 				return creationDate, time.Now().UTC()
 			},
@@ -1437,7 +1487,7 @@ func TestServer_DeleteAdministrator(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 				instance.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetId(), userResp.GetId())
 
@@ -1457,7 +1507,7 @@ func TestServer_DeleteAdministrator(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 				instance.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetId(), userResp.GetId())
 				instance.DeleteProjectMembership(t, iamOwnerCtx, projectResp.GetId(), userResp.GetId())
@@ -1478,9 +1528,9 @@ func TestServer_DeleteAdministrator(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
-				orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 
 				request.UserId = userResp.GetId()
@@ -1488,7 +1538,7 @@ func TestServer_DeleteAdministrator(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: "notexisting",
+							OrganizationId: "notexisting",
 						},
 					},
 				}
@@ -1502,9 +1552,9 @@ func TestServer_DeleteAdministrator(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
-				orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 				instance.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), orgResp.GetOrganizationId(), userResp.GetId())
 
@@ -1513,7 +1563,7 @@ func TestServer_DeleteAdministrator(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				}
@@ -1527,9 +1577,9 @@ func TestServer_DeleteAdministrator(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
-				orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 				instance.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), orgResp.GetOrganizationId(), userResp.GetId())
 				instance.DeleteProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), orgResp.GetOrganizationId(), userResp.GetId())
@@ -1539,7 +1589,7 @@ func TestServer_DeleteAdministrator(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				}
@@ -1568,7 +1618,7 @@ func TestServer_DeleteAdministrator(t *testing.T) {
 
 func TestServer_DeleteAdministrator_Permission(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	userProjectResp := instance.CreateMachineUser(iamOwnerCtx)
 	projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
@@ -1597,7 +1647,7 @@ func TestServer_DeleteAdministrator_Permission(t *testing.T) {
 			name: "unauthenticated",
 			ctx:  CTX,
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateInstanceMembership(t, iamOwnerCtx, userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1614,7 +1664,7 @@ func TestServer_DeleteAdministrator_Permission(t *testing.T) {
 			name: "missing permission",
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateInstanceMembership(t, iamOwnerCtx, userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1631,7 +1681,7 @@ func TestServer_DeleteAdministrator_Permission(t *testing.T) {
 			name: "instance, missing permission, org owner",
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateInstanceMembership(t, iamOwnerCtx, userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1648,7 +1698,7 @@ func TestServer_DeleteAdministrator_Permission(t *testing.T) {
 			name: "instance, instance owner, ok",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateInstanceMembership(t, iamOwnerCtx, userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1667,7 +1717,7 @@ func TestServer_DeleteAdministrator_Permission(t *testing.T) {
 			name: "org, instance owner, ok",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateOrgMembership(t, iamOwnerCtx, instance.DefaultOrg.Id, userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1686,7 +1736,7 @@ func TestServer_DeleteAdministrator_Permission(t *testing.T) {
 			name: "org, org owner, ok",
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateOrgMembership(t, iamOwnerCtx, instance.DefaultOrg.Id, userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1705,7 +1755,7 @@ func TestServer_DeleteAdministrator_Permission(t *testing.T) {
 			name: "org, missing permission",
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateOrgMembership(t, iamOwnerCtx, instance.DefaultOrg.Id, userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1722,7 +1772,7 @@ func TestServer_DeleteAdministrator_Permission(t *testing.T) {
 			name: "project, project owner, ok",
 			ctx:  projectOwnerCtx,
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetId(), userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1741,7 +1791,7 @@ func TestServer_DeleteAdministrator_Permission(t *testing.T) {
 			name: "project, missing permission",
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetId(), userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1758,7 +1808,7 @@ func TestServer_DeleteAdministrator_Permission(t *testing.T) {
 			name: "project grant, project grant owner, ok",
 			ctx:  projectGrantOwnerCtx,
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), orgResp.GetOrganizationId(), userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1767,7 +1817,7 @@ func TestServer_DeleteAdministrator_Permission(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				},
@@ -1780,7 +1830,7 @@ func TestServer_DeleteAdministrator_Permission(t *testing.T) {
 			name: "project grant, missing permission",
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), orgResp.GetOrganizationId(), userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1789,7 +1839,7 @@ func TestServer_DeleteAdministrator_Permission(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				},
@@ -1800,7 +1850,7 @@ func TestServer_DeleteAdministrator_Permission(t *testing.T) {
 			name: "project grant, project owner, error",
 			ctx:  projectOwnerCtx,
 			prepare: func(request *internal_permission.DeleteAdministratorRequest) {
-				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
 				instance.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), orgResp.GetOrganizationId(), userResp.GetId())
 				request.UserId = userResp.GetId()
 			},
@@ -1809,7 +1859,7 @@ func TestServer_DeleteAdministrator_Permission(t *testing.T) {
 					Resource: &internal_permission.ResourceType_ProjectGrant_{
 						ProjectGrant: &internal_permission.ResourceType_ProjectGrant{
 							ProjectId:      projectResp.GetId(),
-							ProjectGrantId: orgResp.GetOrganizationId(),
+							OrganizationId: orgResp.GetOrganizationId(),
 						},
 					},
 				},

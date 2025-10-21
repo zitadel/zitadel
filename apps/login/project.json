@@ -1,0 +1,156 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "prod": {
+      "description": "Runs the Next.js Login application in production mode from the standalone build",
+      "continuous": true,
+      "dependsOn": [
+        "build"
+      ],
+      "defaultConfiguration": "default",
+      "configurations": {
+        "default": {},
+        "test-login-integration": {}
+      }
+    },
+    "dev": {
+      "description": "Runs the Next.js Login application in development mode with hot-reloading",
+      "continuous": true,
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "build": {
+      "description": "Builds the Next.js Login application in standalone mode for production",
+      "cache": true,
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "default",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "!{projectRoot}/.env.*",
+        "!{projectRoot}/.local.env",
+        "!{projectRoot}/integration/**/*",
+        "!{projectRoot}/acceptance/**/*",
+        "!{projectRoot}/cypress.config.ts"
+      ],
+      "outputs": [
+        "{projectRoot}/.next/standalone"
+      ]
+    },
+    "build-vercel": {
+      "description": "Builds the Next.js Login application for Vercel deployment",
+      "cache": true,
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "default",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "!{projectRoot}/.env.*",
+        "!{projectRoot}/.local.env",
+        "!{projectRoot}/integration/**/*",
+        "!{projectRoot}/acceptance/**/*",
+        "!{projectRoot}/cypress.config.ts"
+      ],
+      "outputs": [
+        "{projectRoot}/.next",
+        "!{projectRoot}/.next/cache",
+        "!{projectRoot}/.next/standalone"
+      ]
+    },
+    "lint": {
+      "description": "Runs all linters",
+      "dependsOn": [
+        "lint-check-*"
+      ]
+    },
+    "lint-check-prettier": {
+      "description": "Checks code formatting with Prettier",
+      "cache": true,
+      "inputs": [
+        "default"
+      ]
+    },
+    "lint-check-next": {
+      "description": "Runs Next.js specific lint checks",
+      "cache": true,
+      "inputs": [
+        "default"
+      ]
+    },
+    "test": {
+      "description": "Runs all tests (unit and integration)",
+      "dependsOn": [
+        "test-unit",
+        "test-integration"
+      ]
+    },
+    "test-unit": {
+      "description": "Runs unit tests using Vitest",
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "test-integration-run-login": {
+      "description": "Runs the Login application under test. It has its own target, separate from test-integration, because it's a continuous task.",
+      "dependsOn": [
+        "build"
+      ],
+      "continuous": true,
+      "command": "nx run @zitadel/login:prod:test-login-integration --excludeTaskDependencies"
+    },
+    "test-integration": {
+      "description": "Runs integration tests using Cypress against a running Login and a mocked API",
+      "dependsOn": [
+        "test-integration-run-login",
+        "@zitadel/login-api-mock:build",
+        "@zitadel/login-api-mock:serve"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "parallel": false,
+        "commands": [
+          "pnpm cypress install",
+          "pnpm wait-on --verbose --interval 2000 --simultaneous 1 --timeout 30m \"tcp:${API_MOCK_STUBS_HOST}:22220\" \"http-get://localhost:3001/ui/v2/login/verify?userId=221394658884845598&code=abc\"",
+          "DISPLAY='' pnpm cypress run --headless",
+          "nx run @zitadel/login:test-integration-stop"
+        ]
+      },
+      "inputs": [
+        "default",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "!{projectRoot}/acceptance/**/*",
+        { "env": "LOGIN_BASE_URL" }
+      ]
+    },
+    "test-integration-stop": {
+        "description": "Stops the gRPC mock container used for integration tests.",
+        "command": "nx run @zitadel/login-api-mock:down"
+    },
+    "pack": {
+      "description": "Packages the standalone Login application build into an archive",
+      "dependsOn": [
+        "build"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "parallel": false,
+        "env": {
+          "STANDALONE_DIR": "{projectRoot}/.next/standalone",
+          "PACK_DIR": "{workspaceRoot}/.artifacts/pack"
+        },
+        "commands": [
+          "mkdir -p ${PACK_DIR}",
+          "tar -czvf ${PACK_DIR}/zitadel-login-standalone.tar.gz -C ${STANDALONE_DIR} ."
+        ]
+      },
+      "cache": true,
+      "outputs": [
+        "{workspaceRoot}/.artifacts/pack/zitadel-login-*.tar.gz"
+      ]
+    }
+  }
+}

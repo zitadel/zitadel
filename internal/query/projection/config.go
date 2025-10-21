@@ -17,6 +17,7 @@ type Config struct {
 	ActiveInstancer       interface {
 		ActiveInstances() []string
 	}
+	MaxParallelTriggers uint16
 }
 
 type CustomConfig struct {

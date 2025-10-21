@@ -13,23 +13,16 @@ import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("u2f");
-  return { title: t('verify.title')};
+  return { title: t("verify.title") };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
   const { loginName, requestId, sessionId, organization } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
 
   const branding = await getBrandingSettings({
     serviceUrl,
@@ -37,17 +30,13 @@ export default async function Page(props: {
   });
 
   const sessionFactors = sessionId
-    ? await loadSessionById(serviceUrl, sessionId, organization)
+    ? await loadSessionById(sessionId, organization)
     : await loadMostRecentSession({
         serviceUrl,
         sessionParams: { loginName, organization },
       });
 
-  async function loadSessionById(
-    host: string,
-    sessionId: string,
-    organization?: string,
-  ) {
+  async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
       serviceUrl,
@@ -62,10 +51,14 @@ export default async function Page(props: {
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="verify.title" namespace="u2f" />
         </h1>
+
+        <p className="ztdl-p mb-6 block">
+          <Translated i18nKey="verify.description" namespace="u2f" />
+        </p>
 
         {sessionFactors && (
           <UserAvatar
@@ -75,16 +68,15 @@ export default async function Page(props: {
             searchParams={searchParams}
           ></UserAvatar>
         )}
-        <p className="ztdl-p mb-6 block">
-          <Translated i18nKey="verify.description" namespace="u2f" />
-        </p>
 
         {!(loginName || sessionId) && (
           <Alert>
             <Translated i18nKey="unknownContext" namespace="error" />
           </Alert>
         )}
+      </div>
 
+      <div className="w-full">
         {(loginName || sessionId) && (
           <LoginPasskey
             loginName={loginName}

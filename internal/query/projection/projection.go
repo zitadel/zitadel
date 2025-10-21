@@ -89,11 +89,22 @@ var (
 	HostedLoginTranslationProjection    *handler.Handler
 	OrganizationSettingsProjection      *handler.Handler
 
+	InstanceRelationalProjection             *handler.Handler
+	OrganizationRelationalProjection         *handler.Handler
+	InstanceDomainRelationalProjection       *handler.Handler
+	OrganizationDomainRelationalProjection   *handler.Handler
+	IDPTemplateRelationalProjection          *handler.Handler
+	ProjectRelationalProjection              *handler.Handler
+	ProjectRoleRelationalProjection          *handler.Handler
+	OrganizationMetadataRelationalProjection *handler.Handler
+
 	ProjectGrantFields      *handler.FieldHandler
 	OrgDomainVerifiedFields *handler.FieldHandler
 	InstanceDomainFields    *handler.FieldHandler
 	MembershipFields        *handler.FieldHandler
 	PermissionFields        *handler.FieldHandler
+
+	GroupProjection *handler.Handler
 )
 
 type projection interface {
@@ -120,6 +131,14 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 		TransactionDuration: config.TransactionDuration,
 		ActiveInstancer:     config.ActiveInstancer,
 	}
+
+	if config.MaxParallelTriggers == 0 {
+		config.MaxParallelTriggers = uint16(sqlClient.Pool.Config().MaxConns / 3)
+	}
+	if sqlClient.Pool.Config().MaxConns <= int32(config.MaxParallelTriggers) {
+		logging.WithFields("database.MaxOpenConnections", sqlClient.Pool.Config().MaxConns, "projections.MaxParallelTriggers", config.MaxParallelTriggers).Fatal("Number of max parallel triggers must be lower than max open connections")
+	}
+	handler.StartWorkerPool(config.MaxParallelTriggers)
 
 	OrgProjection = newOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
 	OrgMetadataProjection = newOrgMetadataProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_metadata"]))
@@ -191,6 +210,17 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	PermissionFields = newFillPermissionFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsPermission]))
 	// Don't forget to add the new field handler to [ProjectInstanceFields]
 
+	GroupProjection = newGroupProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["groups"]))
+
+	InstanceRelationalProjection = newInstanceRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instances_relational"]))
+	OrganizationRelationalProjection = newOrgRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organizations_relational"]))
+	InstanceDomainRelationalProjection = newInstanceDomainRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instance_domains_relational"]))
+	OrganizationDomainRelationalProjection = newOrgDomainRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organization_domains_relational"]))
+	IDPTemplateRelationalProjection = newIDPTemplateRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_templates_relational"]))
+	ProjectRelationalProjection = newProjectRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects_relational"]))
+	ProjectRoleRelationalProjection = newProjectRoleRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_roles_relational"]))
+	OrganizationMetadataRelationalProjection = newOrgMetadataRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organization_metadata_relational"]))
+
 	newProjectionsList()
 	newFieldsList()
 	return nil
@@ -214,7 +244,7 @@ func Start(ctx context.Context) error {
 	for _, projection := range projections {
 		table := projection.String()
 		if projectionTableMap[table] {
-			return fmt.Errorf("projeciton for %s already added", table)
+			return fmt.Errorf("projection for %s already added", table)
 		}
 		projectionTableMap[table] = true
 
@@ -372,5 +402,15 @@ func newProjectionsList() {
 		DebugEventsProjection,
 		HostedLoginTranslationProjection,
 		OrganizationSettingsProjection,
+		GroupProjection,
+
+		InstanceRelationalProjection,
+		OrganizationRelationalProjection,
+		InstanceDomainRelationalProjection,
+		OrganizationDomainRelationalProjection,
+		IDPTemplateRelationalProjection,
+		ProjectRelationalProjection,
+		ProjectRoleRelationalProjection,
+		OrganizationMetadataRelationalProjection,
 	}
 }

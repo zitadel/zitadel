@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/logging"
@@ -20,18 +19,22 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/integration/scim"
 	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
 	action_v2beta "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
-	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
+	app_v2beta "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/application/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	authorization "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	feature_v2beta "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
+	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
+	internal_permission_v2 "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2"
 	internal_permission_v2beta "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
@@ -83,9 +86,12 @@ type Client struct {
 	SCIM                     *scim.Client
 	Projectv2Beta            project_v2beta.ProjectServiceClient
 	InstanceV2Beta           instance.InstanceServiceClient
-	AppV2Beta                app.AppServiceClient
+	AppV2Beta                app_v2beta.AppServiceClient
+	ApplicationV2            application.ApplicationServiceClient
 	InternalPermissionv2Beta internal_permission_v2beta.InternalPermissionServiceClient
+	InternalPermissionV2     internal_permission_v2.InternalPermissionServiceClient
 	AuthorizationV2Beta      authorization.AuthorizationServiceClient
+	GroupV2                  group_v2.GroupServiceClient
 }
 
 func NewDefaultClient(ctx context.Context) (*Client, error) {
@@ -127,9 +133,12 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		SCIM:                     scim.NewScimClient(target),
 		Projectv2Beta:            project_v2beta.NewProjectServiceClient(cc),
 		InstanceV2Beta:           instance.NewInstanceServiceClient(cc),
-		AppV2Beta:                app.NewAppServiceClient(cc),
+		AppV2Beta:                app_v2beta.NewAppServiceClient(cc),
+		ApplicationV2:            application.NewApplicationServiceClient(cc),
 		InternalPermissionv2Beta: internal_permission_v2beta.NewInternalPermissionServiceClient(cc),
+		InternalPermissionV2:     internal_permission_v2.NewInternalPermissionServiceClient(cc),
 		AuthorizationV2Beta:      authorization.NewAuthorizationServiceClient(cc),
+		GroupV2:                  group_v2.NewGroupServiceClient(cc),
 	}
 	return client, client.pollHealth(ctx)
 }
@@ -959,8 +968,28 @@ func (i *Instance) ActivateProjectGrant(ctx context.Context, t *testing.T, proje
 	return resp
 }
 
-func (i *Instance) CreateProjectUserGrant(t *testing.T, ctx context.Context, projectID, userID string) *mgmt.AddUserGrantResponse {
-	resp, err := i.Client.Mgmt.AddUserGrant(ctx, &mgmt.AddUserGrantRequest{
+func (i *Instance) CreateAuthorizationProject(t *testing.T, ctx context.Context, projectID, userID string) *authorization.CreateAuthorizationResponse {
+	resp, err := i.Client.AuthorizationV2Beta.CreateAuthorization(ctx, &authorization.CreateAuthorizationRequest{
+		UserId:    userID,
+		ProjectId: projectID,
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) CreateAuthorizationProjectGrant(t *testing.T, ctx context.Context, projectID, orgID, userID string) *authorization.CreateAuthorizationResponse {
+	resp, err := i.Client.AuthorizationV2Beta.CreateAuthorization(ctx, &authorization.CreateAuthorizationRequest{
+		UserId:         userID,
+		ProjectId:      projectID,
+		OrganizationId: gu.Ptr(orgID),
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) CreateProjectUserGrant(t *testing.T, ctx context.Context, orgID, projectID, userID string) *mgmt.AddUserGrantResponse {
+	//nolint:staticcheck
+	resp, err := i.Client.Mgmt.AddUserGrant(SetOrgID(ctx, orgID), &mgmt.AddUserGrantRequest{
 		UserId:    userID,
 		ProjectId: projectID,
 	})
@@ -969,6 +998,7 @@ func (i *Instance) CreateProjectUserGrant(t *testing.T, ctx context.Context, pro
 }
 
 func (i *Instance) CreateProjectGrantUserGrant(ctx context.Context, orgID, projectID, projectGrantID, userID string) *mgmt.AddUserGrantResponse {
+	//nolint:staticcheck
 	resp, err := i.Client.Mgmt.AddUserGrant(SetOrgID(ctx, orgID), &mgmt.AddUserGrantRequest{
 		UserId:         userID,
 		ProjectId:      projectID,
@@ -997,13 +1027,17 @@ func (i *Instance) DeleteInstanceMembership(t *testing.T, ctx context.Context, u
 	require.NoError(t, err)
 }
 
-func (i *Instance) CreateOrgMembership(t *testing.T, ctx context.Context, orgID, userID string) *internal_permission_v2beta.CreateAdministratorResponse {
+// CreateOrgMembership creates an org membership with the given roles. If no roles are provided, the user will be assigned the "org.owner" role.
+func (i *Instance) CreateOrgMembership(t *testing.T, ctx context.Context, orgID, userID string, roles ...string) *internal_permission_v2beta.CreateAdministratorResponse {
+	if len(roles) == 0 {
+		roles = []string{domain.RoleOrgOwner}
+	}
 	resp, err := i.Client.InternalPermissionv2Beta.CreateAdministrator(ctx, &internal_permission_v2beta.CreateAdministratorRequest{
 		Resource: &internal_permission_v2beta.ResourceType{
 			Resource: &internal_permission_v2beta.ResourceType_OrganizationId{OrganizationId: orgID},
 		},
 		UserId: userID,
-		Roles:  []string{domain.RoleOrgOwner},
+		Roles:  roles,
 	})
 	require.NoError(t, err)
 	return resp
@@ -1036,12 +1070,12 @@ func (i *Instance) DeleteProjectMembership(t *testing.T, ctx context.Context, pr
 	require.NoError(t, err)
 }
 
-func (i *Instance) CreateProjectGrantMembership(t *testing.T, ctx context.Context, projectID, grantID, userID string) *internal_permission_v2beta.CreateAdministratorResponse {
+func (i *Instance) CreateProjectGrantMembership(t *testing.T, ctx context.Context, projectID, orgID, userID string) *internal_permission_v2beta.CreateAdministratorResponse {
 	resp, err := i.Client.InternalPermissionv2Beta.CreateAdministrator(ctx, &internal_permission_v2beta.CreateAdministratorRequest{
 		Resource: &internal_permission_v2beta.ResourceType{
 			Resource: &internal_permission_v2beta.ResourceType_ProjectGrant_{ProjectGrant: &internal_permission_v2beta.ResourceType_ProjectGrant{
 				ProjectId:      projectID,
-				ProjectGrantId: grantID,
+				OrganizationId: orgID,
 			}},
 		},
 		UserId: userID,
@@ -1051,12 +1085,12 @@ func (i *Instance) CreateProjectGrantMembership(t *testing.T, ctx context.Contex
 	return resp
 }
 
-func (i *Instance) DeleteProjectGrantMembership(t *testing.T, ctx context.Context, projectID, grantID, userID string) {
+func (i *Instance) DeleteProjectGrantMembership(t *testing.T, ctx context.Context, projectID, orgID, userID string) {
 	_, err := i.Client.InternalPermissionv2Beta.DeleteAdministrator(ctx, &internal_permission_v2beta.DeleteAdministratorRequest{
 		Resource: &internal_permission_v2beta.ResourceType{
 			Resource: &internal_permission_v2beta.ResourceType_ProjectGrant_{ProjectGrant: &internal_permission_v2beta.ResourceType_ProjectGrant{
 				ProjectId:      projectID,
-				ProjectGrantId: grantID,
+				OrganizationId: orgID,
 			}},
 		},
 		UserId: userID,
@@ -1064,9 +1098,9 @@ func (i *Instance) DeleteProjectGrantMembership(t *testing.T, ctx context.Contex
 	require.NoError(t, err)
 }
 
-func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoint string, ty domain.TargetType, interrupt bool) *action.CreateTargetResponse {
+func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoint string, ty target_domain.TargetType, interrupt bool) *action.CreateTargetResponse {
 	if name == "" {
-		name = gofakeit.Name()
+		name = TargetName()
 	}
 	req := &action.CreateTargetRequest{
 		Name:     name,
@@ -1074,19 +1108,19 @@ func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoin
 		Timeout:  durationpb.New(5 * time.Second),
 	}
 	switch ty {
-	case domain.TargetTypeWebhook:
+	case target_domain.TargetTypeWebhook:
 		req.TargetType = &action.CreateTargetRequest_RestWebhook{
 			RestWebhook: &action.RESTWebhook{
 				InterruptOnError: interrupt,
 			},
 		}
-	case domain.TargetTypeCall:
+	case target_domain.TargetTypeCall:
 		req.TargetType = &action.CreateTargetRequest_RestCall{
 			RestCall: &action.RESTCall{
 				InterruptOnError: interrupt,
 			},
 		}
-	case domain.TargetTypeAsync:
+	case target_domain.TargetTypeAsync:
 		req.TargetType = &action.CreateTargetRequest_RestAsync{
 			RestAsync: &action.RESTAsync{},
 		}
@@ -1259,4 +1293,21 @@ func (i *Instance) ActivateSchemaUser(ctx context.Context, orgID string, userID 
 	})
 	logging.OnError(err).Fatal("reactivate user")
 	return user
+}
+
+func (i *Instance) CreateGroup(ctx context.Context, t *testing.T, orgID, name string) *group_v2.CreateGroupResponse {
+	resp, err := i.Client.GroupV2.CreateGroup(ctx, &group_v2.CreateGroupRequest{
+		OrganizationId: orgID,
+		Name:           name,
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) DeleteGroup(ctx context.Context, t *testing.T, id string) *group_v2.DeleteGroupResponse {
+	resp, err := i.Client.GroupV2.DeleteGroup(ctx, &group_v2.DeleteGroupRequest{
+		Id: id,
+	})
+	require.NoError(t, err)
+	return resp
 }

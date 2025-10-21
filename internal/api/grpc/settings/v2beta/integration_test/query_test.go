@@ -7,13 +7,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
-	"github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
+	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
+	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
 )
 
 func TestServer_ListOrganizationSettings(t *testing.T) {
@@ -36,7 +35,7 @@ func TestServer_ListOrganizationSettings(t *testing.T) {
 			args: args{
 				ctx: CTX,
 				dep: func(request *settings.ListOrganizationSettingsRequest, response *settings.ListOrganizationSettingsResponse) {
-					orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					instance.SetOrganizationSettings(iamOwnerCtx, t, orgResp.GetOrganizationId(), true)
 
 					request.Filters[0].Filter = &settings.OrganizationSettingsSearchFilter_InOrganizationIdsFilter{
@@ -56,7 +55,7 @@ func TestServer_ListOrganizationSettings(t *testing.T) {
 			args: args{
 				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 				dep: func(request *settings.ListOrganizationSettingsRequest, response *settings.ListOrganizationSettingsResponse) {
-					orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					instance.SetOrganizationSettings(iamOwnerCtx, t, orgResp.GetOrganizationId(), true)
 
 					request.Filters[0].Filter = &settings.OrganizationSettingsSearchFilter_InOrganizationIdsFilter{
@@ -82,7 +81,7 @@ func TestServer_ListOrganizationSettings(t *testing.T) {
 			args: args{
 				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(request *settings.ListOrganizationSettingsRequest, response *settings.ListOrganizationSettingsResponse) {
-					orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					instance.SetOrganizationSettings(iamOwnerCtx, t, orgResp.GetOrganizationId(), true)
 
 					request.Filters[0].Filter = &settings.OrganizationSettingsSearchFilter_InOrganizationIdsFilter{
@@ -131,7 +130,7 @@ func TestServer_ListOrganizationSettings(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *settings.ListOrganizationSettingsRequest, response *settings.ListOrganizationSettingsResponse) {
-					orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					settingsResp := instance.SetOrganizationSettings(iamOwnerCtx, t, orgResp.GetOrganizationId(), true)
 
 					request.Filters[0].Filter = &settings.OrganizationSettingsSearchFilter_InOrganizationIdsFilter{
@@ -163,11 +162,11 @@ func TestServer_ListOrganizationSettings(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *settings.ListOrganizationSettingsRequest, response *settings.ListOrganizationSettingsResponse) {
-					orgResp1 := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+					orgResp1 := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					settingsResp1 := instance.SetOrganizationSettings(iamOwnerCtx, t, orgResp1.GetOrganizationId(), true)
-					orgResp2 := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+					orgResp2 := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					settingsResp2 := instance.SetOrganizationSettings(iamOwnerCtx, t, orgResp2.GetOrganizationId(), true)
-					orgResp3 := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+					orgResp3 := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					settingsResp3 := instance.SetOrganizationSettings(iamOwnerCtx, t, orgResp3.GetOrganizationId(), true)
 
 					request.Filters[0].Filter = &settings.OrganizationSettingsSearchFilter_InOrganizationIdsFilter{
@@ -211,11 +210,11 @@ func TestServer_ListOrganizationSettings(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *settings.ListOrganizationSettingsRequest, response *settings.ListOrganizationSettingsResponse) {
-					orgResp1 := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+					orgResp1 := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					instance.SetOrganizationSettings(iamOwnerCtx, t, orgResp1.GetOrganizationId(), false)
-					orgResp2 := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+					orgResp2 := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					settingsResp2 := instance.SetOrganizationSettings(iamOwnerCtx, t, orgResp2.GetOrganizationId(), true)
-					orgResp3 := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+					orgResp3 := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					instance.SetOrganizationSettings(iamOwnerCtx, t, orgResp3.GetOrganizationId(), false)
 
 					request.Filters[0].Filter = &settings.OrganizationSettingsSearchFilter_InOrganizationIdsFilter{

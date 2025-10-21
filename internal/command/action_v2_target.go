@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/repository/target"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -17,7 +18,7 @@ type AddTarget struct {
 	models.ObjectRoot
 
 	Name             string
-	TargetType       domain.TargetType
+	TargetType       target_domain.TargetType
 	Endpoint         string
 	Timeout          time.Duration
 	InterruptOnError bool
@@ -90,7 +91,7 @@ type ChangeTarget struct {
 	models.ObjectRoot
 
 	Name             *string
-	TargetType       *domain.TargetType
+	TargetType       *target_domain.TargetType
 	Endpoint         *string
 	Timeout          *time.Duration
 	InterruptOnError *bool

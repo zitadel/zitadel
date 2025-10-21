@@ -27,6 +27,9 @@ func Start(dbClient *database.DB, amountOfCachedAuthRequests uint16) *AuthReques
 	cache := &AuthRequestCache{
 		client: dbClient,
 	}
+	if amountOfCachedAuthRequests == 0 {
+		return cache
+	}
 	idCache, err := lru.New[string, *domain.AuthRequest](int(amountOfCachedAuthRequests))
 	logging.OnError(err).Info("auth request cache disabled")
 	if err == nil {
