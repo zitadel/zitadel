@@ -215,7 +215,7 @@ func DownloadHandleFunc(s AssetsService, downloader Downloader) func(http.Respon
 		if ownerPath != "" {
 			splitPath := strings.Split(r.RequestURI, ownerPath+"/")
 			if len(splitPath) < 2 {
-				s.ErrorHandler()(w, r, fmt.Errorf("file not found: %v", r.RequestURI), http.StatusNotFound)
+				s.ErrorHandler()(w, r, fmt.Errorf("invalid request URI format: %v", r.RequestURI), http.StatusBadRequest)
 				return
 			}
 			path = splitPath[1]
