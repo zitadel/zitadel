@@ -354,23 +354,6 @@
                 ]
             }
         },
-        "pack-darwin-amd64": {
-            "description": "Packages the API for Darwin AMD64 (Intel) architecture",
-            "dependsOn": [
-                "generate",
-                "build-console"
-            ],
-            "command": "GOOS=darwin GOARCH=amd64 nx run @zitadel/api:pack-platform",
-            "cache": true,
-            "inputs": [
-                "pack",
-                { "env": "ZITADEL_VERSION" }
-            ],
-            "outputs": [
-                "{workspaceRoot}/.artifacts/pack/zitadel-darwin-amd64.tar.gz",
-                "{workspaceRoot}/.artifacts/bin/darwin/amd64/zitadel"
-            ]
-        },
         "pack-darwin-arm64": {
             "description": "Packages the API for Darwin ARM64 (Apple Silicon) architecture",
             "dependsOn": [
@@ -405,23 +388,6 @@
                 "{workspaceRoot}/.artifacts/bin/linux/amd64/zitadel"
             ]
         },
-        "pack-linux-arm64": {
-            "description": "Packages the API for Linux ARM64 architecture",
-            "dependsOn": [
-                "generate",
-                "build-console"
-            ],
-            "command": "GOOS=linux GOARCH=arm64 nx run @zitadel/api:pack-platform",
-            "cache": true,
-            "inputs": [
-                "pack",
-                { "env": "ZITADEL_VERSION" }
-            ],
-            "outputs": [
-                "{workspaceRoot}/.artifacts/pack/zitadel-linux-arm64.tar.gz",
-                "{workspaceRoot}/.artifacts/bin/linux/arm64/zitadel"
-            ]
-        },
         "pack-windows-amd64": {
             "description": "Packages the API for Windows AMD64 architecture",
             "dependsOn": [
@@ -437,23 +403,6 @@
             "outputs": [
                 "{workspaceRoot}/.artifacts/pack/zitadel-windows-amd64.tar.gz",
                 "{workspaceRoot}/.artifacts/bin/windows/amd64/zitadel.exe"
-            ]
-        },
-        "pack-windows-arm64": {
-            "description": "Packages the API for Windows ARM64 architecture",
-            "dependsOn": [
-                "generate",
-                "build-console"
-            ],
-            "command": "GOOS=windows GOARCH=arm64 nx run @zitadel/api:pack-platform",
-            "cache": true,
-            "inputs": [
-                "pack",
-                { "env": "ZITADEL_VERSION" }
-            ],
-            "outputs": [
-                "{workspaceRoot}/.artifacts/pack/zitadel-windows-arm64.tar.gz",
-                "{workspaceRoot}/.artifacts/bin/windows/arm64/zitadel.exe"
             ]
         }
     }

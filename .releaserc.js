@@ -18,20 +18,8 @@ module.exports = {
             label: "zitadel-linux-amd64.tar.gz",
           },
           {
-            path: ".artifacts/pack/zitadel-linux-arm64/zitadel-linux-arm64.tar.gz",
-            label: "zitadel-linux-arm64.tar.gz",
-          },
-          {
             path: ".artifacts/pack/zitadel-windows-amd64/zitadel-windows-amd64.tar.gz",
             label: "zitadel-windows-amd64.tar.gz",
-          },
-          {
-            path: ".artifacts/pack/zitadel-windows-arm64/zitadel-windows-arm64.tar.gz",
-            label: "zitadel-windows-arm64.tar.gz",
-          },
-          {
-            path: ".artifacts/pack/zitadel-darwin-amd64/zitadel-darwin-amd64.tar.gz",
-            label: "zitadel-darwin-amd64.tar.gz",
           },
           {
             path: ".artifacts/pack/zitadel-darwin-arm64/zitadel-darwin-arm64.tar.gz",
