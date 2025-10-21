@@ -6,6 +6,7 @@ import { PasswordComplexityPolicy } from '@zitadel/proto/zitadel/policy_pb';
   selector: 'cnsl-password-complexity-view',
   templateUrl: './password-complexity-view.component.html',
   styleUrls: ['./password-complexity-view.component.scss'],
+  standalone: false,
 })
 export class PasswordComplexityViewComponent {
   @Input() public password: AbstractControl | null = null;
