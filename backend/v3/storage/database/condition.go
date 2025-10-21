@@ -1,16 +1,41 @@
 package database
 
+import "go.uber.org/mock/gomock"
+
 // Condition represents a SQL condition.
 // Its written after the WHERE keyword in a SQL statement.
 type Condition interface {
+	gomock.Matcher
 	Write(builder *StatementBuilder)
 	// IsRestrictingColumn is used to check if the condition filters for a specific column.
-	// It acts as a save guard database operations that should be specific on the given column.
+	// It acts as a safeguard database operations that should be specific on the given column.
 	IsRestrictingColumn(col Column) bool
 }
 
 type and struct {
 	conditions []Condition
+}
+
+// Matches implements [Condition].
+func (a *and) Matches(x any) bool {
+	toMatch, ok := x.(*and)
+	if !ok {
+		return false
+	}
+	if len(a.conditions) != len(toMatch.conditions) {
+		return false
+	}
+	for i, condition := range a.conditions {
+		if !condition.Matches(toMatch.conditions[i]) {
+			return false
+		}
+	}
+	return true
+}
+
+// String implements [Condition].
+func (a *and) String() string {
+	return "database.and"
 }
 
 // Write implements [Condition].
@@ -46,6 +71,28 @@ var _ Condition = (*and)(nil)
 
 type or struct {
 	conditions []Condition
+}
+
+// Matches implements [Condition].
+func (o *or) Matches(x any) bool {
+	toMatch, ok := x.(*or)
+	if !ok {
+		return false
+	}
+	if len(o.conditions) != len(toMatch.conditions) {
+		return false
+	}
+	for i, condition := range o.conditions {
+		if !condition.Matches(toMatch.conditions[i]) {
+			return false
+		}
+	}
+	return true
+}
+
+// String implements [Condition].
+func (o *or) String() string {
+	return "database.or"
 }
 
 // Write implements [Condition].
@@ -84,6 +131,20 @@ type isNull struct {
 	column Column
 }
 
+// Matches implements [Condition].
+func (i *isNull) Matches(x any) bool {
+	toMatch, ok := x.(*isNull)
+	if !ok {
+		return false
+	}
+	return i.column.Matches(toMatch.column)
+}
+
+// String implements [Condition].
+func (i *isNull) String() string {
+	return "database.isNull"
+}
+
 // Write implements [Condition].
 func (i isNull) Write(builder *StatementBuilder) {
 	i.column.WriteQualified(builder)
@@ -105,6 +166,20 @@ var _ Condition = (*isNull)(nil)
 
 type isNotNull struct {
 	column Column
+}
+
+// Matches implements [Condition].
+func (i *isNotNull) Matches(x any) bool {
+	toMatch, ok := x.(*isNotNull)
+	if !ok {
+		return false
+	}
+	return i.column.Matches(toMatch.column)
+}
+
+// String implements [Condition].
+func (i *isNotNull) String() string {
+	return "database.isNotNull"
 }
 
 // Write implements [Condition].
@@ -131,9 +206,32 @@ type valueCondition struct {
 	col   Column
 }
 
+// Matches implements [Condition].
+func (c valueCondition) Matches(x any) bool {
+	toMatch, ok := x.(valueCondition)
+	if !ok {
+		return false
+	}
+	if !c.col.Matches(toMatch.col) {
+		return false
+	}
+	var expectedStatement, inputStatement StatementBuilder
+	c.write(&expectedStatement)
+	toMatch.write(&inputStatement)
+	return expectedStatement.String() == inputStatement.String()
+}
+
+// String implements [Condition].
+func (c valueCondition) String() string {
+	return "database.valueCondition"
+}
+
 // NewTextCondition creates a condition that compares a text column with a value.
-// If you want to use ignore case operations, consider using [NewTextIgnoreCaseCondition].
+// if `op.IsIgnoreCaseOperation()` is true the response is created using [NewTextIgnoreCaseCondition]
 func NewTextCondition[T Text](col Column, op TextOperation, value T) Condition {
+	if op.IsIgnoreCaseOperation() {
+		return NewTextIgnoreCaseCondition(col, op.Value(), value)
+	}
 	return valueCondition{
 		col: col,
 		write: func(builder *StatementBuilder) {
@@ -207,10 +305,21 @@ func (i valueCondition) IsRestrictingColumn(col Column) bool {
 var _ Condition = (*valueCondition)(nil)
 
 // existsCondition is a helper to write an EXISTS (SELECT 1 FROM <table> WHERE <condition>) clause.
-// It implements Condition so it can be composed with other conditions using And/Or.
+// It implements [Condition] so it can be composed with other conditions using And/Or.
 type existsCondition struct {
 	table     string
 	condition Condition
+}
+
+// Matches implements [Condition].
+func (e *existsCondition) Matches(x any) bool {
+	// Unimplemented
+	return false
+}
+
+// String implements [Condition].
+func (e *existsCondition) String() string {
+	return "unimplemented"
 }
 
 // Exists creates a condition that checks for the existence of rows in a subquery.

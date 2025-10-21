@@ -386,7 +386,9 @@
       "couldNotCreateSession": "Не удалось создать сеанс",
       "noHostFound": "Хост не найден",
       "userAlreadyVerified": "Пользователь уже подтверждён!",
-      "couldNotResendInvite": "Не удалось повторно отправить приглашение"
+      "couldNotResendInvite": "Не удалось повторно отправить приглашение",
+      "inviteSendFailed": "Не удалось отправить письмо с приглашением",
+      "emailSendFailed": "Не удалось отправить письмо с подтверждением"
     }
   },
   "authenticator": {
