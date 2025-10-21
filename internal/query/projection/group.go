@@ -75,7 +75,7 @@ func (g *groupProjection) Reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: group.AggregateType,
+			Aggregate: org.AggregateType,
 			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.OrgRemovedEventType,

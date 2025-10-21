@@ -6,7 +6,6 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/zerrors"
 	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 )
 
@@ -28,8 +27,4 @@ func (s *Server) RemoveUsersFromGroup(ctx context.Context, c *connect.Request[gr
 	return connect.NewResponse(&group_v2.RemoveUsersFromGroupResponse{
 		ChangeDate: timestamppb.New(details.EventDate),
 	}), nil
-}
-
-func (s *Server) ListGroupUsers(ctx context.Context, c *connect.Request[group_v2.ListGroupUsersRequest]) (*connect.Response[group_v2.ListGroupUsersResponse], error) {
-	return nil, zerrors.ThrowUnimplemented(nil, "GRPC-7000", "not implemented")
 }
