@@ -42,9 +42,9 @@ jobs:
     with:
       node_version: "22"
       semantic_version: "23.0.7"
-      image_name_github_api: "ghcr.io/eliobischof/zitadel"
+      image_name_github_api: "ghcr.io/zitadel/zitadel"
       image_name_google_api: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
-      image_name_github_login: "ghcr.io/eliobischof/zitadel-login"
+      image_name_github_login: "ghcr.io/zitadel/zitadel-login"
       image_name_google_login: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel-login"
 
   release:
@@ -55,6 +55,7 @@ jobs:
       issues: write
       pull-requests: write
     needs:
+      - lint_test_build
       - pack
     if: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
@@ -63,7 +64,7 @@ jobs:
       APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
     with:
       semantic_version: "23.0.7"
-      image_name_github_api: "ghcr.io/eliobischof/zitadel"
+      image_name_github_api: "ghcr.io/zitadel/zitadel"
       image_name_google_api: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
-      image_name_github_login: "ghcr.io/eliobischof/zitadel-login"
+      image_name_github_login: "ghcr.io/zitadel/zitadel-login"
       image_name_google_login: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel-login"

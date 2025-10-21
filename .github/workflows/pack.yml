@@ -41,7 +41,8 @@ jobs:
       dry_run: true
 
   pack:
-    runs-on: ubuntu-22.04
+    runs-on:
+      group: zitadel-public
     environment: ${{ github.ref_protected == 'true' && 'Protected' || null }}
     needs: version
     permissions:
@@ -97,12 +98,19 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to Google Artifact Registry
+        uses: docker/login-action@v3
+        with:
+          registry: europe-docker.pkg.dev
+          username: _json_key_base64
+          password: ${{ secrets.GCR_JSON_KEY_BASE64 }}
       - name: Generate Standard Tags and Labels from the GitHub Context for the API Scratch Container Image
         id: scratch-meta
         uses: docker/metadata-action@v5
         with:
           images: |
             ${{ inputs.image_name_github_api }}
+            ${{ inputs.image_name_google_api }}
           labels: ${{ env.default_labels}}
           tags: |
             type=sha,prefix=,suffix=,format=long
@@ -126,6 +134,7 @@ jobs:
         with:
           images: |
             ${{ inputs.image_name_github_api }}
+            ${{ inputs.image_name_google_api }}
           labels: ${{ env.default_labels}}
           tags: |
             type=sha,prefix=,suffix=-debug,format=long
@@ -150,6 +159,7 @@ jobs:
         with:
           images: |
             ${{ inputs.image_name_github_login }}
+            ${{ inputs.image_name_google_login }}
           labels: |
             org.opencontainers.image.licenses=MIT
             ${{ env.default_labels}}
