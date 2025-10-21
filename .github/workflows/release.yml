@@ -84,13 +84,13 @@ jobs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    -
-      name: Login to Google Artifact Registry
-      uses: docker/login-action@v3
-      with:
-        registry: europe-docker.pkg.dev
-        username: _json_key_base64
-        password: ${{ secrets.GCR_JSON_KEY_BASE64 }}
+#    -
+#      name: Login to Google Artifact Registry
+#      uses: docker/login-action@v3
+#      with:
+#        registry: europe-docker.pkg.dev
+#        username: _json_key_base64
+#        password: ${{ secrets.GCR_JSON_KEY_BASE64 }}
     -
       name: Publish ${{ needs.version.outputs.version }}
       run: |
@@ -101,14 +101,8 @@ jobs:
           --tag ${{ inputs.image_name_github_api }}:${{ needs.version.outputs.version }}-debug \
           ${{ inputs.image_name_github_api }}:${{ github.sha }}-debug
         docker buildx imagetools create \
-          --tag ${{ inputs.image_name_google_api }}:${{ needs.version.outputs.version }} \
-          ${{ inputs.image_name_google_api }}:${{ github.sha }}
-        docker buildx imagetools create \
           --tag ${{ inputs.image_name_github_login }}:${{ needs.version.outputs.version }} \
           ${{ inputs.image_name_github_login }}:${{ github.sha }}
-        docker buildx imagetools create \
-          --tag ${{ inputs.image_name_google_login }}:${{ needs.version.outputs.version }} \
-          ${{ inputs.image_name_google_login }}:${{ github.sha }}
     -
       name: Publish latest
       if: ${{ github.ref_name == 'next' }}
@@ -135,13 +129,13 @@ jobs:
       with:
         app_id: ${{ secrets.APP_ID }}
         private_key: ${{ secrets.APP_PRIVATE_KEY }}
-    - name: Trigger Homebrew
-      env:
-        VERSION: ${{ needs.version.outputs.version }}
-        RUN_ID: ${{ github.run_id }}
-        GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-      run: |
-        gh workflow -R zitadel/homebrew-tap run update.yml -f runId=${RUN_ID} -f version=${VERSION}
+#    - name: Trigger Homebrew
+#      env:
+#        VERSION: ${{ needs.version.outputs.version }}
+#        RUN_ID: ${{ github.run_id }}
+#        GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+#      run: |
+#        gh workflow -R zitadel/homebrew-tap run update.yml -f runId=${RUN_ID} -f version=${VERSION}
 
   helm-chart:
     runs-on: ubuntu-22.04
@@ -155,13 +149,13 @@ jobs:
         with:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
-      - name: Trigger Chart Bump
-        env:
-          VERSION: ${{ needs.version.outputs.version }}
-          RUN_ID: ${{ github.run_id }}
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-        run: |
-          gh workflow -R zitadel/zitadel-charts run bump.yml
+#      - name: Trigger Chart Bump
+#        env:
+#          VERSION: ${{ needs.version.outputs.version }}
+#          RUN_ID: ${{ github.run_id }}
+#          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+#        run: |
+#          gh workflow -R zitadel/zitadel-charts run bump.yml
 
   npm-packages:
     runs-on: ubuntu-latest
