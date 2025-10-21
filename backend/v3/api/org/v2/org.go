@@ -2,12 +2,14 @@ package orgv2
 
 import (
 	"context"
+	"errors"
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/backend/v3/api/org/v2/convert"
 	"github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
@@ -127,6 +129,10 @@ func DeleteOrganization(ctx context.Context, request *connect.Request[v2beta_org
 		domain.WithProjectRepo(repository.ProjectRepository()),
 	)
 	if err != nil {
+		var notFoundError *database.NoRowFoundError
+		if errors.As(err, &notFoundError) {
+			return connect.NewResponse(&v2beta_org.DeleteOrganizationResponse{}), nil
+		}
 		return nil, err
 	}
 
