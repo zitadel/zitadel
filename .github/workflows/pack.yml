@@ -41,6 +41,7 @@ jobs:
       dry_run: true
 
   pack:
+    runs-on: ubuntu-22.04
     environment: ${{ github.ref_protected == 'true' && 'Protected' || null }}
     needs: version
     permissions:
