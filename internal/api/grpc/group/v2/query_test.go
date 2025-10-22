@@ -20,7 +20,7 @@ import (
 )
 
 func Test_ListGroupsRequestToModel(t *testing.T) {
-
+	t.Parallel()
 	groupIDsSearchQuery, err := query.NewGroupIDsSearchQuery([]string{"group1", "group2"})
 	require.NoError(t, err)
 
@@ -76,6 +76,7 @@ func Test_ListGroupsRequestToModel(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			sysDefaults := systemdefaults.SystemDefaults{MaxQueryLimit: tt.maxQueryLimit}
 			got, err := listGroupsRequestToModel(tt.req, sysDefaults)
 			if tt.wantErr != nil {
@@ -89,6 +90,7 @@ func Test_ListGroupsRequestToModel(t *testing.T) {
 }
 
 func Test_GroupSearchFiltersToQuery(t *testing.T) {
+	t.Parallel()
 	groupIDsSearchQuery, err := query.NewGroupIDsSearchQuery([]string{"group1", "group2"})
 	require.NoError(t, err)
 	groupNameSearchQuery, err := query.NewGroupNameSearchQuery("mygroup", query.TextStartsWith)
@@ -142,6 +144,7 @@ func Test_GroupSearchFiltersToQuery(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			got, err := groupSearchFiltersToQuery(tt.filters)
 			if tt.wantErr != nil {
 				assert.Equal(t, tt.wantErr, err)
@@ -154,6 +157,7 @@ func Test_GroupSearchFiltersToQuery(t *testing.T) {
 }
 
 func Test_GroupFieldNameToSortingColumn(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name  string
 		field *group_v2.FieldName
@@ -192,6 +196,7 @@ func Test_GroupFieldNameToSortingColumn(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			got := groupFieldNameToSortingColumn(tt.field)
 			assert.Equal(t, tt.want, got)
 		})
@@ -199,6 +204,7 @@ func Test_GroupFieldNameToSortingColumn(t *testing.T) {
 }
 
 func Test_GroupsToPb(t *testing.T) {
+	t.Parallel()
 	timeNow := time.Now().UTC()
 	tests := []struct {
 		name   string
@@ -258,6 +264,7 @@ func Test_GroupsToPb(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			got := groupsToPb(tt.groups)
 			assert.Equal(t, tt.want, got)
 		})
@@ -265,7 +272,7 @@ func Test_GroupsToPb(t *testing.T) {
 }
 
 func Test_ListGroupUsersRequestToModel(t *testing.T) {
-
+	t.Parallel()
 	groupIDsSearchQuery, err := query.NewGroupUsersGroupIDsSearchQuery([]string{"group1", "group2"})
 	require.NoError(t, err)
 
@@ -346,6 +353,7 @@ func Test_ListGroupUsersRequestToModel(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			sysDefaults := systemdefaults.SystemDefaults{MaxQueryLimit: tt.maxQueryLimit}
 			got, err := listGroupUsersRequestToModel(tt.req, sysDefaults)
 			if tt.wantErr != nil {
@@ -359,6 +367,7 @@ func Test_ListGroupUsersRequestToModel(t *testing.T) {
 }
 
 func Test_GroupUsersSearchFiltersToQuery(t *testing.T) {
+	t.Parallel()
 	groupIDsSearchQuery, err := query.NewGroupUsersGroupIDsSearchQuery([]string{"group1", "group2"})
 	require.NoError(t, err)
 
@@ -402,6 +411,7 @@ func Test_GroupUsersSearchFiltersToQuery(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			got, err := groupUsersSearchFiltersToQuery(tt.filters)
 			if tt.wantErr != nil {
 				assert.Equal(t, tt.wantErr, err)
@@ -414,6 +424,7 @@ func Test_GroupUsersSearchFiltersToQuery(t *testing.T) {
 }
 
 func Test_GroupUsersFieldNameToSortingColumn(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name  string
 		field *group_v2.GroupUserFieldName
@@ -447,6 +458,7 @@ func Test_GroupUsersFieldNameToSortingColumn(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			got := groupUsersFieldNameToSortingColumn(tt.field)
 			assert.Equal(t, tt.want, got)
 		})
@@ -454,6 +466,7 @@ func Test_GroupUsersFieldNameToSortingColumn(t *testing.T) {
 }
 
 func Test_GroupUsersToPb(t *testing.T) {
+	t.Parallel()
 	timeNow := time.Now().UTC()
 	tests := []struct {
 		name       string
@@ -547,6 +560,7 @@ func Test_GroupUsersToPb(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			got := groupUsersToPb(tt.groupUsers)
 			assert.Equal(t, tt.want, got)
 		})
