@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/pquerna/otp/totp"
 	"github.com/stretchr/testify/assert"
@@ -264,10 +263,7 @@ func TestServer_CreateSession(t *testing.T) {
 
 func TestServer_CreateSession_lock_user(t *testing.T) {
 	// create a separate org so we don't interfere with any other test
-	org := Instance.CreateOrganization(IAMOwnerCTX,
-		fmt.Sprintf("TestServer_CreateSession_lock_user_%s", gofakeit.AppName()),
-		gofakeit.Email(),
-	)
+	org := Instance.CreateOrganization(IAMOwnerCTX, integration.OrganizationName(), integration.Email())
 	userID := org.CreatedAdmins[0].GetUserId()
 	Instance.SetUserPassword(IAMOwnerCTX, userID, integration.UserPassword, false)
 
@@ -341,7 +337,7 @@ func TestServer_CreateSession_webauthn(t *testing.T) {
 }
 
 func TestServer_CreateSession_successfulIntent(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
+	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, integration.IDPName()).GetId()
 	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
@@ -370,7 +366,7 @@ func TestServer_CreateSession_successfulIntent(t *testing.T) {
 }
 
 func TestServer_CreateSession_successfulIntent_instant(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
+	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, integration.IDPName()).GetId()
 
 	intentID, token, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "id", User.GetUserId(), time.Now().Add(time.Hour))
 	require.NoError(t, err)
@@ -392,7 +388,7 @@ func TestServer_CreateSession_successfulIntent_instant(t *testing.T) {
 }
 
 func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
+	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, integration.IDPName()).GetId()
 
 	// successful intent without known / linked user
 	idpUserID := "id"
@@ -421,7 +417,7 @@ func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
 }
 
 func TestServer_CreateSession_startedIntentFalseToken(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
+	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, integration.IDPName()).GetId()
 
 	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
@@ -449,7 +445,7 @@ func TestServer_CreateSession_startedIntentFalseToken(t *testing.T) {
 }
 
 func TestServer_CreateSession_reuseIntent(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
+	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, integration.IDPName()).GetId()
 	createResp, err := Client.CreateSession(IAMOwnerCTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
@@ -491,7 +487,7 @@ func TestServer_CreateSession_reuseIntent(t *testing.T) {
 }
 
 func TestServer_CreateSession_expiredIntent(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
+	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, integration.IDPName()).GetId()
 	createResp, err := Client.CreateSession(IAMOwnerCTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{

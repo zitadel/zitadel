@@ -29,6 +29,7 @@ import { ProviderNextService } from '../provider-next/provider-next.service';
 @Component({
   selector: 'cnsl-provider-gitlab',
   templateUrl: './provider-gitlab.component.html',
+  standalone: false,
 })
 export class ProviderGitlabComponent {
   public showOptional: boolean = false;

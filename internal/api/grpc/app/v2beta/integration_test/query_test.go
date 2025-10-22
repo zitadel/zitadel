@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
@@ -42,7 +41,7 @@ func TestGetApplication(t *testing.T) {
 		CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
 			SamlRequest: &app.CreateSAMLApplicationRequest{
 				LoginVersion: &app.LoginVersion{Version: &app.LoginVersion_LoginV1{LoginV1: &app.LoginV1{}}},
-				Metadata:     &app.CreateSAMLApplicationRequest_MetadataXml{MetadataXml: samlMetadataGen(gofakeit.URL())},
+				Metadata:     &app.CreateSAMLApplicationRequest_MetadataXml{MetadataXml: samlMetadataGen(integration.URL())},
 			},
 		},
 	})
@@ -85,7 +84,7 @@ func TestGetApplication(t *testing.T) {
 			testName: "when unknown app ID should return not found error",
 			inputCtx: IAMOwnerCtx,
 			inputRequest: &app.GetApplicationRequest{
-				Id: gofakeit.Sentence(2),
+				Id: integration.ID(),
 			},
 
 			expectedErrorType: codes.NotFound,
@@ -138,7 +137,7 @@ func TestGetApplication(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 30*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
 				res, err := instance.Client.AppV2Beta.GetApplication(tc.inputCtx, tc.inputRequest)
@@ -170,9 +169,9 @@ func TestListApplications(t *testing.T) {
 	createdDeactivatedApiApp, deactivatedApiAppName := createAPIAppWithName(t, IAMOwnerCtx, instance, p.GetId())
 	deactivateApp(t, createdDeactivatedApiApp, p.GetId())
 
-	_, createdSAMLApp, samlAppName := createSAMLAppWithName(t, gofakeit.URL(), p.GetId())
+	_, createdSAMLApp, samlAppName := createSAMLAppWithName(t, integration.URL(), p.GetId())
 
-	createdOIDCApp, oidcAppName := createOIDCAppWithName(t, gofakeit.URL(), p.GetId())
+	createdOIDCApp, oidcAppName := createOIDCAppWithName(t, integration.URL(), p.GetId())
 
 	type appWithName struct {
 		app  *app.CreateApplicationResponse
@@ -439,7 +438,7 @@ func TestListApplications(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 30*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
 				res, err := instance.Client.AppV2Beta.ListApplications(tc.inputCtx, tc.inputRequest)
@@ -551,7 +550,7 @@ func TestListApplications_WithPermissionV2(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 5*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
 				res, err := instancePermissionV2.Client.AppV2Beta.ListApplications(tc.inputCtx, tc.inputRequest)
@@ -593,7 +592,7 @@ func TestGetApplicationKey(t *testing.T) {
 			testName: "when unknown app ID should return not found error",
 			inputCtx: IAMOwnerCtx,
 			inputRequest: &app.GetApplicationKeyRequest{
-				Id: gofakeit.Sentence(2),
+				Id: integration.ID(),
 			},
 
 			expectedErrorType: codes.NotFound,
@@ -642,7 +641,7 @@ func TestGetApplicationKey(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 30*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
 				res, err := instance.Client.AppV2Beta.GetApplicationKey(tc.inputCtx, tc.inputRequest)
@@ -669,13 +668,12 @@ func TestListApplicationKeys(t *testing.T) {
 	tomorrow := time.Now().AddDate(0, 0, 1)
 	in2Days := tomorrow.AddDate(0, 0, 1)
 	in3Days := in2Days.AddDate(0, 0, 1)
+	in4Days := in3Days.AddDate(0, 0, 1)
 
-	appKey1 := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp1.GetAppId(), in2Days)
-	appKey2 := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp1.GetAppId(), in3Days)
+	appKey1 := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp1.GetAppId(), in3Days)
+	appKey2 := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp1.GetAppId(), in4Days)
 	appKey3 := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp1.GetAppId(), tomorrow)
-	appKey4 := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp2.GetAppId(), tomorrow)
-
-	t.Parallel()
+	appKey4 := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp2.GetAppId(), in2Days)
 
 	tt := []struct {
 		testName     string
@@ -720,7 +718,7 @@ func TestListApplicationKeys(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 5*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
 				res, err := instance.Client.AppV2Beta.ListApplicationKeys(tc.inputCtx, tc.inputRequest)
@@ -729,7 +727,6 @@ func TestListApplicationKeys(t *testing.T) {
 				require.Equal(ttt, tc.expectedErrorType, status.Code(err))
 				if tc.expectedErrorType == codes.OK {
 					require.Len(ttt, res.GetKeys(), len(tc.expectedAppKeysIDs))
-
 					for i, k := range res.GetKeys() {
 						assert.Equal(ttt, tc.expectedAppKeysIDs[i], k.GetId())
 					}
@@ -800,7 +797,7 @@ func TestListApplicationKeys_WithPermissionV2(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			// t.Parallel()
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 5*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
 				res, err := instancePermissionV2.Client.AppV2Beta.ListApplicationKeys(tc.inputCtx, tc.inputRequest)

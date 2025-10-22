@@ -118,6 +118,7 @@ Database:
     Host: localhost # ZITADEL_DATABASE_POSTGRES_HOST
     Port: 5432 # ZITADEL_DATABASE_POSTGRES_PORT
     Database: zitadel # ZITADEL_DATABASE_POSTGRES_DATABASE
+    AwaitInitialConn: 0m # ZITADEL_DATABASE_POSTGRES_AWAITINITIALCONN
     MaxOpenConns: 10 # ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS
     MaxIdleConns: 5 # ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS
     MaxConnLifetime: 30m # ZITADEL_DATABASE_POSTGRES_MAXCONNLIFETIME
@@ -1146,7 +1147,7 @@ DefaultInstance:
     # EnableBackChannelLogout: false # ZITADEL_DEFAULTINSTANCE_FEATURES_ENABLEBACKCHANNELLOGOUT
     LoginV2:
       Required: true # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED
-    #  BaseURI: "" # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI
+      BaseURI: # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI
     # PermissionCheckV2: false # ZITADEL_DEFAULTINSTANCE_FEATURES_PERMISSIONCHECKV2
     ConsoleUseV2UserApi: true # ZITADEL_DEFAULTINSTANCE_FEATURES_CONSOLEUSEV2USERAPI
     # EnableRelationalTables: false # ZITADEL_DEFAULTINSTANCE_FEATURES_ENABLERELATIONALTABLES
@@ -1242,6 +1243,9 @@ ServicePing:
     ResourceCount:
       Enabled: true # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_ENABLED
       # The number of counts that are sent in one batch.
+      # The bulk size is used to prevent large requests that might fail due to their size.
+      # Each report will log its size before sending it to the endpoint,
+      # so you can adjust the bulk size if you see that the requests are too large.
       BulkSize: 10000 # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_BULKSIZE
 
 InternalAuthZ:
@@ -1375,6 +1379,10 @@ InternalAuthZ:
         - "userschema.read"
         - "userschema.write"
         - "userschema.delete"
+        - "group.create"
+        - "group.write"
+        - "group.read"
+        - "group.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -1411,6 +1419,7 @@ InternalAuthZ:
         - "action.execution.read"
         - "userschema.read"
         - "session.read"
+        - "group.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"
@@ -1470,6 +1479,10 @@ InternalAuthZ:
         - "project.grant.member.delete"
         - "session.read"
         - "session.delete"
+        - "group.create"
+        - "group.write"
+        - "group.read"
+        - "group.delete"
     - Role: "IAM_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -1498,6 +1511,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "session.read"
         - "session.delete"
+        - "group.read"
     - Role: "IAM_ADMIN_IMPERSONATOR"
       Permissions:
         - "admin.impersonation"
@@ -1562,6 +1576,10 @@ InternalAuthZ:
         - "project.grant.member.delete"
         - "session.read"
         - "session.delete"
+        - "group.create"
+        - "group.write"
+        - "group.read"
+        - "group.delete"
     - Role: "IAM_LOGIN_CLIENT"
       Permissions:
         - "iam.read"
@@ -1600,6 +1618,7 @@ InternalAuthZ:
         - "session.link"
         - "session.delete"
         - "userschema.read"
+        - "group.read"
     - Role: "ORG_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -1619,6 +1638,7 @@ InternalAuthZ:
         - "project.role.read"
         - "session.read"
         - "session.delete"
+        - "group.read"
     - Role: "ORG_OWNER_VIEWER"
       Permissions:
         - "org.read"
@@ -1640,6 +1660,7 @@ InternalAuthZ:
         - "project.grant.read"
         - "project.grant.member.read"
         - "project.grant.user.grant.read"
+        - "group.read"
     - Role: "ORG_SETTINGS_MANAGER"
       Permissions:
         - "org.read"
@@ -1670,6 +1691,7 @@ InternalAuthZ:
         - "project.app.read"
         - "project.grant.read"
         - "project.grant.member.read"
+        - "group.read"
     - Role: "ORG_PROJECT_PERMISSION_EDITOR"
       Permissions:
         - "org.read"
@@ -1935,6 +1957,10 @@ SystemAuthZ:
         - "userschema.read"
         - "userschema.write"
         - "userschema.delete"
+        - "group.create"
+        - "group.write"
+        - "group.read"
+        - "group.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -1971,6 +1997,7 @@ SystemAuthZ:
         - "action.execution.read"
         - "userschema.read"
         - "session.read"
+        - "group.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"
@@ -2030,6 +2057,10 @@ SystemAuthZ:
         - "project.grant.member.delete"
         - "session.read"
         - "session.delete"
+        - "group.create"
+        - "group.write"
+        - "group.read"
+        - "group.delete"
     - Role: "IAM_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -2058,6 +2089,7 @@ SystemAuthZ:
         - "project.grant.member.read"
         - "session.read"
         - "session.delete"
+        - "group.read"
     - Role: "IAM_ADMIN_IMPERSONATOR"
       Permissions:
         - "admin.impersonation"
@@ -2103,6 +2135,7 @@ SystemAuthZ:
         - "session.link"
         - "session.delete"
         - "userschema.read"
+        - "group.read"
 
 # If a new projection is introduced it will be prefilled during the setup process (if enabled)
 # This can prevent serving outdated data after a version upgrade, but might require a longer setup / upgrade process:

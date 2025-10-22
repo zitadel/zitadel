@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 	"github.com/muhlemmer/gu"
@@ -18,7 +17,10 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
+	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	project_v2beta "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
 	saml_pb "github.com/zitadel/zitadel/pkg/grpc/saml/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
@@ -48,13 +50,13 @@ func TestServer_GetSAMLRequest(t *testing.T) {
 		{
 			name: "success, redirect binding",
 			dep: func() (time.Time, string, error) {
-				return Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, gofakeit.BitcoinAddress(), saml.HTTPRedirectBinding)
+				return Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, integration.RelayState(), saml.HTTPRedirectBinding)
 			},
 		},
 		{
 			name: "success, post binding",
 			dep: func() (time.Time, string, error) {
-				return Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeLogin].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+				return Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeLogin].ID, acsPost, integration.RelayState(), saml.HTTPPostBinding)
 			},
 		},
 	}
@@ -120,7 +122,7 @@ func TestServer_CreateResponse(t *testing.T) {
 			ctx:  LoginCTX,
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
-					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, gofakeit.BitcoinAddress(), saml.HTTPRedirectBinding)
+					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, integration.RelayState(), saml.HTTPRedirectBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -138,7 +140,7 @@ func TestServer_CreateResponse(t *testing.T) {
 			ctx:  LoginCTX,
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
-					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, gofakeit.BitcoinAddress(), saml.HTTPRedirectBinding)
+					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, integration.RelayState(), saml.HTTPRedirectBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -156,7 +158,7 @@ func TestServer_CreateResponse(t *testing.T) {
 			ctx:  LoginCTX,
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
-					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeLogin].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeLogin].ID, acsPost, integration.RelayState(), saml.HTTPPostBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -185,7 +187,7 @@ func TestServer_CreateResponse(t *testing.T) {
 			ctx:  LoginCTX,
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
-					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeLogin].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeLogin].ID, acsPost, integration.RelayState(), saml.HTTPPostBinding)
 					require.NoError(t, err)
 					Instance.FailSAMLAuthRequest(LoginCTX, authRequestID, saml_pb.ErrorReason_ERROR_REASON_AUTH_N_FAILED)
 					return authRequestID
@@ -204,7 +206,7 @@ func TestServer_CreateResponse(t *testing.T) {
 			ctx:  LoginCTX,
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
-					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeLogin].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeLogin].ID, acsPost, integration.RelayState(), saml.HTTPPostBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -230,7 +232,7 @@ func TestServer_CreateResponse(t *testing.T) {
 			ctx:  CTX,
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
-					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeLogin].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeLogin].ID, acsPost, integration.RelayState(), saml.HTTPPostBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -248,7 +250,7 @@ func TestServer_CreateResponse(t *testing.T) {
 			ctx:  LoginCTX,
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
-					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, gofakeit.BitcoinAddress(), saml.HTTPRedirectBinding)
+					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, integration.RelayState(), saml.HTTPRedirectBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -274,7 +276,7 @@ func TestServer_CreateResponse(t *testing.T) {
 			ctx:  LoginCTX,
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
-					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeLogin].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeLogin].ID, acsPost, integration.RelayState(), saml.HTTPPostBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -303,7 +305,7 @@ func TestServer_CreateResponse(t *testing.T) {
 			ctx:  LoginCTX,
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
-					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeLogin].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeLogin].ID, acsPost, integration.RelayState(), saml.HTTPPostBinding)
 					require.NoError(t, err)
 					Instance.SuccessfulSAMLAuthRequest(LoginCTX, Instance.Users[integration.UserTypeLogin].ID, authRequestID)
 					return authRequestID
@@ -322,7 +324,7 @@ func TestServer_CreateResponse(t *testing.T) {
 			ctx:  CTX,
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
-					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeLogin].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeLogin].ID, acsPost, integration.RelayState(), saml.HTTPPostBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -377,10 +379,10 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				projectID, _, sp := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, true, true)
 				projectID2, _, _ := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, true, true)
 
-				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
 				Instance.CreateProjectGrant(ctx, t, projectID2, orgResp.GetOrganizationId())
-				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
-				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
+				createProjectUserGrant(ctx, t, Instance.DefaultOrg.GetId(), projectID, user.GetUserId())
 
 				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
@@ -391,10 +393,10 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 			dep: func(ctx context.Context, t *testing.T) *saml_pb.CreateResponseRequest {
 				projectID, _, sp := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, true, true)
 
-				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
 				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
-				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
-				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
+				createProjectUserGrant(ctx, t, Instance.DefaultOrg.GetId(), projectID, user.GetUserId())
 
 				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
@@ -413,10 +415,10 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 			dep: func(ctx context.Context, t *testing.T) *saml_pb.CreateResponseRequest {
 				projectID, _, sp := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, true, true)
 
-				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
 				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
-				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
-				Instance.CreateProjectGrantUserGrant(ctx, orgResp.GetOrganizationId(), projectID, orgResp.GetOrganizationId(), user.GetUserId())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
+				createProjectGrantUserGrant(ctx, t, projectID, orgResp.GetOrganizationId(), user.GetUserId())
 
 				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
@@ -435,8 +437,8 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 			dep: func(ctx context.Context, t *testing.T) *saml_pb.CreateResponseRequest {
 				_, _, sp := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, true, true)
 
-				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
-				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
 				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
 			wantErr: true,
@@ -456,9 +458,9 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 			dep: func(ctx context.Context, t *testing.T) *saml_pb.CreateResponseRequest {
 				projectID, _, sp := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, true, true)
 
-				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
-				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
-				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
+				createProjectUserGrant(ctx, t, Instance.DefaultOrg.GetId(), projectID, user.GetUserId())
 
 				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
@@ -470,7 +472,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				projectID, _, sp := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, true, true)
 
 				user := Instance.CreateHumanUser(ctx)
-				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
+				createProjectUserGrant(ctx, t, Instance.DefaultOrg.GetId(), projectID, user.GetUserId())
 
 				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
@@ -489,7 +491,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				projectID, _, sp := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, true, false)
 
 				user := Instance.CreateHumanUser(ctx)
-				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
+				createProjectUserGrant(ctx, t, Instance.DefaultOrg.GetId(), projectID, user.GetUserId())
 
 				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
@@ -516,9 +518,9 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 			name: "projectRoleCheck, usergrant and different resourceowner",
 			dep: func(ctx context.Context, t *testing.T) *saml_pb.CreateResponseRequest {
 				projectID, _, sp := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, true, false)
-				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
-				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
-				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
+				createProjectUserGrant(ctx, t, Instance.DefaultOrg.GetId(), projectID, user.GetUserId())
 
 				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
@@ -535,8 +537,8 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 			name: "projectRoleCheck, no usergrant and different resourceowner",
 			dep: func(ctx context.Context, t *testing.T) *saml_pb.CreateResponseRequest {
 				_, _, sp := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, true, false)
-				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
-				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
 
 				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
@@ -547,10 +549,10 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 			dep: func(ctx context.Context, t *testing.T) *saml_pb.CreateResponseRequest {
 				projectID, _, sp := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, true, false)
 
-				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
 				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
-				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
-				Instance.CreateProjectGrantUserGrant(ctx, orgResp.GetOrganizationId(), projectID, orgResp.GetOrganizationId(), user.GetUserId())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
+				createProjectGrantUserGrant(ctx, t, projectID, orgResp.GetOrganizationId(), user.GetUserId())
 
 				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
@@ -568,9 +570,9 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 			dep: func(ctx context.Context, t *testing.T) *saml_pb.CreateResponseRequest {
 				projectID, _, sp := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, true, false)
 
-				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
 				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
-				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
 
 				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
@@ -597,8 +599,8 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 			name: "hasProjectCheck, different resourceowner",
 			dep: func(ctx context.Context, t *testing.T) *saml_pb.CreateResponseRequest {
 				_, _, sp := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, false, true)
-				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
-				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
 
 				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
@@ -608,9 +610,9 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 			name: "hasProjectCheck, different resourceowner with project grant",
 			dep: func(ctx context.Context, t *testing.T) *saml_pb.CreateResponseRequest {
 				projectID, _, sp := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, false, true)
-				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
-				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
-				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
+				createProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
 
 				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
@@ -664,7 +666,7 @@ func createSession(ctx context.Context, t *testing.T, userID string) *session.Cr
 }
 
 func createSessionAndSmlRequestForCallback(ctx context.Context, t *testing.T, sp *samlsp.Middleware, loginClient string, acsRedirect saml.Endpoint, userID, binding string) *saml_pb.CreateResponseRequest {
-	_, authRequestID, err := Instance.CreateSAMLAuthRequest(sp, loginClient, acsRedirect, gofakeit.BitcoinAddress(), binding)
+	_, authRequestID, err := Instance.CreateSAMLAuthRequest(sp, loginClient, acsRedirect, integration.RelayState(), binding)
 	require.NoError(t, err)
 	sessionResp := createSession(ctx, t, userID)
 	return &saml_pb.CreateResponseRequest{
@@ -679,7 +681,7 @@ func createSessionAndSmlRequestForCallback(ctx context.Context, t *testing.T, sp
 }
 
 func createSAMLSP(t *testing.T, idpMetadata *saml.EntityDescriptor, binding string) (string, *samlsp.Middleware) {
-	rootURL := "example." + gofakeit.DomainName()
+	rootURL := "example." + integration.DomainName()
 	spMiddleware, err := integration.CreateSAMLSP("https://"+rootURL, idpMetadata, binding)
 	require.NoError(t, err)
 	return rootURL, spMiddleware
@@ -691,4 +693,50 @@ func createSAMLApplication(ctx context.Context, t *testing.T, idpMetadata *saml.
 	_, err := Instance.CreateSAMLClient(ctx, project.GetId(), sp)
 	require.NoError(t, err)
 	return project.GetId(), rootURL, sp
+}
+
+func createProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string) {
+	Instance.CreateProjectGrant(ctx, t, projectID, grantedOrgID)
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(collect *assert.CollectT) {
+		resp, err := Instance.Client.Projectv2Beta.ListProjectGrants(ctx, &project_v2beta.ListProjectGrantsRequest{
+			Filters: []*project_v2beta.ProjectGrantSearchFilter{
+				{Filter: &project_v2beta.ProjectGrantSearchFilter_InProjectIdsFilter{InProjectIdsFilter: &filter.InIDsFilter{
+					Ids: []string{projectID},
+				}}},
+				{Filter: &project_v2beta.ProjectGrantSearchFilter_ProjectGrantResourceOwnerFilter{ProjectGrantResourceOwnerFilter: &filter.IDFilter{
+					Id: grantedOrgID,
+				}}},
+			},
+		})
+		assert.NoError(collect, err)
+		assert.Len(collect, resp.GetProjectGrants(), 1)
+	}, retryDuration, tick)
+}
+
+func createProjectUserGrant(ctx context.Context, t *testing.T, orgID, projectID, userID string) {
+	resp := Instance.CreateAuthorizationProject(t, ctx, projectID, userID)
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(collect *assert.CollectT) {
+		_, err := Instance.Client.Mgmt.GetUserGrantByID(integration.SetOrgID(ctx, orgID), &mgmt.GetUserGrantByIDRequest{
+			UserId:  userID,
+			GrantId: resp.GetId(),
+		})
+		assert.NoError(collect, err)
+	}, retryDuration, tick)
+}
+
+func createProjectGrantUserGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID, userID string) {
+	resp := Instance.CreateAuthorizationProjectGrant(t, ctx, projectID, grantedOrgID, userID)
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(collect *assert.CollectT) {
+		_, err := Instance.Client.Mgmt.GetUserGrantByID(integration.SetOrgID(ctx, grantedOrgID), &mgmt.GetUserGrantByIDRequest{
+			UserId:  userID,
+			GrantId: resp.GetId(),
+		})
+		assert.NoError(collect, err)
+	}, retryDuration, tick)
 }

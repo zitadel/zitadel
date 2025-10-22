@@ -19,7 +19,7 @@ const sidebar_api_webkey_service_v2 = require("./docs/apis/resources/webkey_serv
 const sidebar_api_instance_service_v2 = require("./docs/apis/resources/instance_service_v2/sidebar.ts").default
 const sidebar_api_authorization_service_v2 = require("./docs/apis/resources/authorization_service_v2/sidebar.ts").default
 const sidebar_api_internal_permission_service_v2 = require("./docs/apis/resources/internal_permission_service_v2/sidebar.ts").default
-const sidebar_api_app_v2 = require("./docs/apis/resources/application_service_v2/sidebar.ts").default
+const sidebar_api_application_v2 = require("./docs/apis/resources/application_service_v2/sidebar.ts").default
 
 module.exports = {
   guides: [
@@ -124,6 +124,11 @@ module.exports = {
           type: "link",
           label: "Pylon",
           href: "https://github.com/getcronit/pylon",
+        },
+        {
+          type: "link",
+          label: "Vanilla-JS",
+          href: "https://github.com/zitadel/zitadel-vanilla-js",
         },
       ],
     },
@@ -355,7 +360,7 @@ module.exports = {
             "guides/integrate/login-ui/oidc-standard",
             "guides/integrate/login-ui/saml-standard",
             "guides/integrate/login-ui/device-auth",
-            "guides/integrate/login-ui/typescript-repo",
+            "guides/integrate/login-ui/login-app",
           ],
         },
         {
@@ -528,6 +533,10 @@ module.exports = {
               type: "doc",
               id: "guides/integrate/actions/migrate-from-v1",
             },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/webhook-site-setup",
+            },
           ],
         },
         {
@@ -638,7 +647,16 @@ module.exports = {
       label: "Support",
       collapsed: true,
       items: [
-        "support/software-release-cycles-support",
+        {
+          type: "link",
+          label: "Support States",
+          href: "https://help.zitadel.com/zitadel-support-states"
+        },
+        {
+          type: "link",
+          label: "Zitadel Release Cycle",
+          href: "https://help.zitadel.com/zitadel-software-release-cycle"
+        },
         "support/troubleshooting",
         {
           type: "category",
@@ -856,19 +874,17 @@ module.exports = {
             },
             {
               type: "category",
-              label: "App (Beta)",
+              label: "Application",
               link: {
                 type: "generated-index",
-                title: "Application Service API (Beta)",
+                title: "Application Service API",
                 slug: "/apis/resources/application_service_v2",
                 description:
                   "This API lets you manage Zitadel applications (API, SAML, OIDC).\n" +
                   "\n" +
-                  "The API offers generic endpoints that work for all app types (API, SAML, OIDC), " +
-                  "\n" +
-                  "This API is in beta state. It can AND will continue breaking until a stable version is released.\n"
+                  "The API offers generic endpoints that work for all app types (API, SAML, OIDC), "
               },
-              items: sidebar_api_app_v2,
+              items: sidebar_api_application_v2,
             },
             {
               type: "category",
@@ -889,15 +905,13 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Internal Permissions (Beta)",
+              label: "Internal Permissions",
               link: {
                 type: "generated-index",
-                title: "Internal Permission Service API (Beta)",
+                title: "Internal Permission Service API",
                 slug: "/apis/resources/internal_permission_service_v2",
                 description:
-                  "This API is intended to manage internal permissions in ZITADEL.\n" +
-                  "\n" +
-                  "This API is in beta state. It can AND will continue breaking until a stable version is released.\n"
+                  "This API provides methods to manage permissions for resource and and their management in ZITADEL itself also known as \"administrators\"."
               },
               items: sidebar_api_internal_permission_service_v2,
             },

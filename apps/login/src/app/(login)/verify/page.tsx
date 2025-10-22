@@ -4,6 +4,7 @@ import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
 import { sendEmailCode, sendInviteEmailCode } from "@/lib/server/verify";
+import { getOriginalHostWithProtocol } from "@/lib/server/host";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getUserByID } from "@/lib/zitadel";
@@ -14,14 +15,13 @@ import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("verify");
-  return { title: t('verify.title')};
+  return { title: t("verify.title") };
 }
 
 export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
 
-  const { userId, loginName, code, organization, requestId, invite, send } =
-    searchParams;
+  const { userId, loginName, code, organization, requestId, invite, send } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -36,36 +36,34 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   let human: HumanUser | undefined;
   let id: string | undefined;
 
+  let error: string | undefined;
+
   const doSend = send === "true";
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
   async function sendEmail(userId: string) {
-    const host = _headers.get("host");
-
-    if (!host || typeof host !== "string") {
-      throw new Error("No host found");
-    }
+    const hostWithProtocol = await getOriginalHostWithProtocol();
 
     if (invite === "true") {
       await sendInviteEmailCode({
         userId,
         urlTemplate:
-          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+          `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
           (requestId ? `&requestId=${requestId}` : ""),
-      }).catch((error) => {
-        console.error("Could not send invitation email", error);
-        throw Error("Failed to send invitation email");
+      }).catch((apiError) => {
+        console.error("Could not send invitation email", apiError);
+        error = "inviteSendFailed";
       });
     } else {
       await sendEmailCode({
         userId,
         urlTemplate:
-          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+          `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
           (requestId ? `&requestId=${requestId}` : ""),
-      }).catch((error) => {
-        console.error("Could not send verification email", error);
-        throw Error("Failed to send verification email");
+      }).catch((apiError) => {
+        console.error("Could not send verification email", apiError);
+        error = "emailSendFailed";
       });
     }
   }
@@ -124,13 +122,36 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="verify.title" namespace="verify" />
         </h1>
-        <p className="ztdl-p mb-6 block">
+        <p className="ztdl-p">
           <Translated i18nKey="verify.description" namespace="verify" />
         </p>
+
+        {sessionFactors ? (
+          <UserAvatar
+            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
+            displayName={sessionFactors.factors?.user?.displayName}
+            showDropdown
+            searchParams={searchParams}
+          ></UserAvatar>
+        ) : (
+          user && (
+            <UserAvatar loginName={user.preferredLoginName} displayName={human?.profile?.displayName} showDropdown={false} />
+          )
+        )}
+      </div>
+
+      <div className="w-full">
+        {error && (
+          <div className="py-4">
+            <Alert>
+              <Translated i18nKey={`errors.${error}`} namespace="verify" />
+            </Alert>
+          </div>
+        )}
 
         {!id && (
           <div className="py-4">
@@ -146,23 +167,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
               <Translated i18nKey="verify.codeSent" namespace="verify" />
             </Alert>
           </div>
-        )}
-
-        {sessionFactors ? (
-          <UserAvatar
-            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
-            displayName={sessionFactors.factors?.user?.displayName}
-            showDropdown
-            searchParams={searchParams}
-          ></UserAvatar>
-        ) : (
-          user && (
-            <UserAvatar
-              loginName={user.preferredLoginName}
-              displayName={human?.profile?.displayName}
-              showDropdown={false}
-            />
-          )
         )}
 
         <VerifyForm

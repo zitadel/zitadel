@@ -24,7 +24,10 @@ import (
 	"github.com/zitadel/saml/pkg/provider"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
+	"golang.org/x/text/language"
 
+	new_domain "github.com/zitadel/zitadel/backend/v3/domain"
+	v3_postgres "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/encryption"
 	"github.com/zitadel/zitadel/cmd/key"
@@ -37,13 +40,16 @@ import (
 	action_v2 "github.com/zitadel/zitadel/internal/api/grpc/action/v2"
 	action_v2_beta "github.com/zitadel/zitadel/internal/api/grpc/action/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/admin"
-	app "github.com/zitadel/zitadel/internal/api/grpc/app/v2beta"
+	app_v2beta "github.com/zitadel/zitadel/internal/api/grpc/app/v2beta"
+	application "github.com/zitadel/zitadel/internal/api/grpc/application/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/auth"
 	authorization_v2beta "github.com/zitadel/zitadel/internal/api/grpc/authorization/v2beta"
 	feature_v2 "github.com/zitadel/zitadel/internal/api/grpc/feature/v2"
 	feature_v2beta "github.com/zitadel/zitadel/internal/api/grpc/feature/v2beta"
+	group_v2 "github.com/zitadel/zitadel/internal/api/grpc/group/v2"
 	idp_v2 "github.com/zitadel/zitadel/internal/api/grpc/idp/v2"
 	instance "github.com/zitadel/zitadel/internal/api/grpc/instance/v2beta"
+	internal_permission_v2 "github.com/zitadel/zitadel/internal/api/grpc/internal_permission/v2"
 	internal_permission_v2beta "github.com/zitadel/zitadel/internal/api/grpc/internal_permission/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
 	oidc_v2 "github.com/zitadel/zitadel/internal/api/grpc/oidc/v2"
@@ -161,6 +167,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	if err != nil {
 		return fmt.Errorf("cannot start DB client for queries: %w", err)
 	}
+	new_domain.SetPool(v3_postgres.PGxPool(dbClient.Pool))
 
 	keyStorage, err := cryptoDB.NewKeyStorage(dbClient, masterKey)
 	if err != nil {
@@ -185,6 +192,8 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		MaxRetries: config.Eventstore.MaxRetries,
 	}))
 
+	new_domain.SetLegacyEventstore(eventstoreClient)
+
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
 	cacheConnectors, err := connector.StartConnectors(config.Caches, dbClient)
 	if err != nil {
@@ -205,6 +214,8 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.OIDC,
 		keys.SAML,
 		keys.Target,
+		keys.SMS,
+		keys.SMTP,
 		config.InternalAuthZ.RolePermissionMappings,
 		sessionTokenVerifier,
 		func(q *query.Queries) domain.PermissionCheck {
@@ -436,7 +447,22 @@ func startAPIs(
 		http_util.WithMaxAge(int(math.Floor(config.Quotas.Access.ExhaustedCookieMaxAge.Seconds()))),
 	)
 	limitingAccessInterceptor := middleware.NewAccessInterceptor(accessSvc, exhaustedCookieHandler, &config.Quotas.Access.AccessConfig)
-	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.SystemAuthZ, config.InternalAuthZ, tlsConfig, config.ExternalDomain, append(config.InstanceHostHeaders, config.PublicHostHeaders...), limitingAccessInterceptor, keys.Target)
+	translator := i18n.NewZitadelTranslator(language.English)
+	apis, err := api.New(
+		ctx,
+		config.Port,
+		router,
+		queries,
+		verifier,
+		config.SystemAuthZ,
+		config.InternalAuthZ,
+		tlsConfig,
+		config.ExternalDomain,
+		append(config.InstanceHostHeaders, config.PublicHostHeaders...),
+		limitingAccessInterceptor,
+		keys.Target,
+		translator,
+	)
 	if err != nil {
 		return nil, fmt.Errorf("error creating api %w", err)
 	}
@@ -493,7 +519,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, session_v2.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, settings_v2.CreateServer(commands, queries)); err != nil {
+	if err := apis.RegisterService(ctx, settings_v2.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, org_v2.CreateServer(commands, queries, permissionCheck)); err != nil {
@@ -517,6 +543,9 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, internal_permission_v2beta.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
+	if err := apis.RegisterService(ctx, internal_permission_v2.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
+		return nil, err
+	}
 	if err := apis.RegisterService(ctx, userschema_v3_alpha.CreateServer(config.SystemDefaults, commands, queries)); err != nil {
 		return nil, err
 	}
@@ -535,13 +564,32 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, authorization_v2beta.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, app.CreateServer(commands, queries, permissionCheck)); err != nil {
+	if err := apis.RegisterService(ctx, app_v2beta.CreateServer(commands, queries, permissionCheck)); err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterService(ctx, application.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterService(ctx, group_v2.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
 
-	instanceInterceptor := middleware.InstanceInterceptor(queries, config.ExternalDomain, login.IgnoreInstanceEndpoints...)
+	instanceInterceptor := middleware.InstanceInterceptor(queries, config.ExternalDomain, translator, login.IgnoreInstanceEndpoints...)
 	assetsCache := middleware.AssetsCacheInterceptor(config.AssetStorage.Cache.MaxAge, config.AssetStorage.Cache.SharedMaxAge)
-	apis.RegisterHandlerOnPrefix(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.SystemAuthZ, config.InternalAuthZ, id.SonyFlakeGenerator(), store, queries, middleware.CallDurationHandler, instanceInterceptor.Handler, assetsCache.Handler, limitingAccessInterceptor.Handle))
+	apis.RegisterHandlerOnPrefix(assets.HandlerPrefix, assets.NewHandler(
+		commands,
+		verifier,
+		config.SystemAuthZ,
+		config.InternalAuthZ,
+		id.SonyFlakeGenerator(),
+		store,
+		queries,
+		middleware.CallDurationHandler,
+		instanceInterceptor.Handler,
+		assetsCache.Handler,
+		limitingAccessInterceptor.Handle,
+		translator,
+	))
 
 	federatedLogoutsCache, err := connector.StartCache[federatedlogout.Index, string, *federatedlogout.FederatedLogout](ctx, []federatedlogout.Index{federatedlogout.IndexRequestID}, cache.PurposeFederatedLogout, cacheConnectors.Config.FederatedLogouts, cacheConnectors)
 	if err != nil {
@@ -607,6 +655,7 @@ func startAPIs(
 			verifier,
 			keys.User,
 			&config.SCIM,
+			translator,
 			instanceInterceptor.HandlerFuncWithError,
 			middleware.AuthorizationInterceptor(verifier, config.SystemAuthZ, config.InternalAuthZ).HandlerFuncWithError))
 

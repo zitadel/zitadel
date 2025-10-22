@@ -60,7 +60,7 @@ export function UsernameForm({
       suffix,
     })
       .catch(() => {
-        setError("An internal error occurred");
+        setError(t("errors.internalError"));
         return;
       })
       .finally(() => {

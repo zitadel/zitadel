@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/group"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -39,29 +40,36 @@ func (c *Commands) newPermissionCheck(ctx context.Context, permission string, ag
 	}
 }
 
-func (c *Commands) checkPermissionOnUser(ctx context.Context, permission string) PermissionCheck {
+func (c *Commands) checkPermissionOnUser(ctx context.Context, permission string, allowSelfManagement bool) PermissionCheck {
 	return func(resourceOwner, aggregateID string) error {
-		if aggregateID != "" && aggregateID == authz.GetCtxData(ctx).UserID {
+		if allowSelfManagement && aggregateID != "" && aggregateID == authz.GetCtxData(ctx).UserID {
 			return nil
 		}
 		return c.newPermissionCheck(ctx, permission, user.AggregateType)(resourceOwner, aggregateID)
 	}
 }
 
-func (c *Commands) NewPermissionCheckUserWrite(ctx context.Context) PermissionCheck {
-	return c.checkPermissionOnUser(ctx, domain.PermissionUserWrite)
+func (c *Commands) NewPermissionCheckUserWrite(ctx context.Context, allowSelfManagement bool) PermissionCheck {
+	return c.checkPermissionOnUser(ctx, domain.PermissionUserWrite, allowSelfManagement)
 }
 
 func (c *Commands) checkPermissionDeleteUser(ctx context.Context, resourceOwner, userID string) error {
-	return c.checkPermissionOnUser(ctx, domain.PermissionUserDelete)(resourceOwner, userID)
+	err := c.checkPermissionOnUser(ctx, domain.PermissionUserDelete, false)(resourceOwner, userID)
+	if err == nil {
+		return nil
+	}
+	if userID != authz.GetCtxData(ctx).UserID {
+		return err
+	}
+	return c.checkPermissionOnUser(ctx, domain.PermissionUserDeleteSelf, false)(resourceOwner, userID)
 }
 
-func (c *Commands) checkPermissionUpdateUser(ctx context.Context, resourceOwner, userID string) error {
-	return c.NewPermissionCheckUserWrite(ctx)(resourceOwner, userID)
+func (c *Commands) checkPermissionUpdateUser(ctx context.Context, resourceOwner, userID string, allowSelfManagement bool) error {
+	return c.NewPermissionCheckUserWrite(ctx, allowSelfManagement)(resourceOwner, userID)
 }
 
 func (c *Commands) checkPermissionUpdateUserCredentials(ctx context.Context, resourceOwner, userID string) error {
-	return c.checkPermissionOnUser(ctx, domain.PermissionUserCredentialWrite)(resourceOwner, userID)
+	return c.checkPermissionOnUser(ctx, domain.PermissionUserCredentialWrite, true)(resourceOwner, userID)
 }
 
 func (c *Commands) checkPermissionCreateProject(ctx context.Context, resourceOwner, projectID string) error {
@@ -126,19 +134,11 @@ func (c *Commands) checkPermissionDeleteProjectMember(ctx context.Context, resou
 }
 
 func (c *Commands) checkPermissionUpdateProjectGrantMember(ctx context.Context, grantedOrgID, projectGrantID string) (err error) {
-	// TODO: add permission check for project grant owners
-	//if err := c.newPermissionCheck(ctx, domain.PermissionProjectGrantMemberWrite, project.AggregateType)(resourceOwner, projectGrantID); err != nil {
 	return c.newPermissionCheck(ctx, domain.PermissionProjectGrantMemberWrite, project.AggregateType)(grantedOrgID, projectGrantID)
-	//}
-	//return nil
 }
 
 func (c *Commands) checkPermissionDeleteProjectGrantMember(ctx context.Context, grantedOrgID, projectGrantID string) (err error) {
-	// TODO: add permission check for project grant owners
-	//if err := c.newPermissionCheck(ctx, domain.PermissionProjectGrantMemberDelete, project.AggregateType)(resourceOwner, projectGrantID); err != nil {
 	return c.newPermissionCheck(ctx, domain.PermissionProjectGrantMemberDelete, project.AggregateType)(grantedOrgID, projectGrantID)
-	//}
-	//return nil
 }
 
 func (c *Commands) newUserGrantPermissionCheck(ctx context.Context, permission string) UserGrantPermissionCheck {
@@ -159,4 +159,16 @@ func (c *Commands) NewPermissionCheckUserGrantWrite(ctx context.Context) UserGra
 
 func (c *Commands) NewPermissionCheckUserGrantDelete(ctx context.Context) UserGrantPermissionCheck {
 	return c.newUserGrantPermissionCheck(ctx, domain.PermissionUserGrantDelete)
+}
+
+func (c *Commands) checkPermissionCreateGroup(ctx context.Context, resourceOwner, groupID string) error {
+	return c.newPermissionCheck(ctx, domain.PermissionGroupCreate, group.AggregateType)(resourceOwner, groupID)
+}
+
+func (c *Commands) checkPermissionUpdateGroup(ctx context.Context, resourceOwner, groupID string) error {
+	return c.newPermissionCheck(ctx, domain.PermissionGroupWrite, group.AggregateType)(resourceOwner, groupID)
+}
+
+func (c *Commands) checkPermissionDeleteGroup(ctx context.Context, resourceOwner, groupID string) error {
+	return c.newPermissionCheck(ctx, domain.PermissionGroupDelete, group.AggregateType)(resourceOwner, groupID)
 }

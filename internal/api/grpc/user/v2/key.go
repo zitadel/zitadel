@@ -19,7 +19,7 @@ func (s *Server) AddKey(ctx context.Context, req *connect.Request[user.AddKeyReq
 		},
 		ExpirationDate:  req.Msg.GetExpirationDate().AsTime(),
 		Type:            domain.AuthNKeyTypeJSON,
-		PermissionCheck: s.command.NewPermissionCheckUserWrite(ctx),
+		PermissionCheck: s.command.NewPermissionCheckUserWrite(ctx, true),
 	}
 	newMachineKey.PublicKey = req.Msg.GetPublicKey()
 
@@ -50,7 +50,7 @@ func (s *Server) RemoveKey(ctx context.Context, req *connect.Request[user.Remove
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: req.Msg.GetUserId(),
 		},
-		PermissionCheck: s.command.NewPermissionCheckUserWrite(ctx),
+		PermissionCheck: s.command.NewPermissionCheckUserWrite(ctx, true),
 		KeyID:           req.Msg.GetKeyId(),
 	}
 	objectDetails, err := s.command.RemoveUserMachineKey(ctx, machineKey)

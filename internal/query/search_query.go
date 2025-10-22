@@ -23,6 +23,8 @@ type SearchRequest struct {
 	Limit         uint64
 	SortingColumn Column
 	Asc           bool
+
+	sortingConsumed bool
 }
 
 func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -32,15 +34,20 @@ func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	if req.Limit > 0 {
 		query = query.Limit(req.Limit)
 	}
+	return req.consumeSorting(query)
+}
 
-	if !req.SortingColumn.isZero() {
+// consumeSorting sets the sorting column to the query once.
+// subsequent calls will not set the sorting column again.
+func (req *SearchRequest) consumeSorting(query sq.SelectBuilder) sq.SelectBuilder {
+	if !req.sortingConsumed && !req.SortingColumn.isZero() {
 		clause := req.SortingColumn.orderBy()
 		if !req.Asc {
 			clause += " DESC"
 		}
 		query = query.OrderByClause(clause)
+		req.sortingConsumed = true
 	}
-
 	return query
 }
 
@@ -648,13 +655,12 @@ func (q *BytesQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 func (q *BytesQuery) comp() sq.Sqlizer {
 	switch q.Compare {
 	case BytesEquals:
-		return sq.Eq{q.Column.identifier(): q.Value}
+		return sq.Expr("sha256("+q.Column.identifier()+") = sha256(?)", q.Value)
 	case BytesNotEquals:
-		return sq.NotEq{q.Column.identifier(): q.Value}
+		return sq.Expr("sha256("+q.Column.identifier()+") <> sha256(?)", q.Value)
 	case bytesCompareMax:
 		return nil
 	}
-
 	return nil
 }
 

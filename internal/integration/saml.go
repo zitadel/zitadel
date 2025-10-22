@@ -13,7 +13,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 	"github.com/zitadel/logging"
@@ -117,7 +116,7 @@ func (i *Instance) CreateSAMLClientLoginVersion(ctx context.Context, projectID s
 
 	resp, err := i.Client.Mgmt.AddSAMLApp(ctx, &management.AddSAMLAppRequest{
 		ProjectId:    projectID,
-		Name:         fmt.Sprintf("app-%s", gofakeit.AppName()),
+		Name:         ApplicationName(),
 		Metadata:     &management.AddSAMLAppRequest_MetadataXml{MetadataXml: spMetadata},
 		LoginVersion: loginVersion,
 	})

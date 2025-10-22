@@ -183,9 +183,10 @@ func (e *SMSConfigTwilioTokenChangedEvent) UniqueConstraints() []*eventstore.Uni
 type SMSConfigHTTPAddedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	ID          string `json:"id,omitempty"`
-	Description string `json:"description,omitempty"`
-	Endpoint    string `json:"endpoint,omitempty"`
+	ID          string              `json:"id,omitempty"`
+	Description string              `json:"description,omitempty"`
+	Endpoint    string              `json:"endpoint,omitempty"`
+	SigningKey  *crypto.CryptoValue `json:"signingKey"`
 }
 
 func NewSMSConfigHTTPAddedEvent(
@@ -194,6 +195,7 @@ func NewSMSConfigHTTPAddedEvent(
 	id,
 	description,
 	endpoint string,
+	signingKey *crypto.CryptoValue,
 ) *SMSConfigHTTPAddedEvent {
 	return &SMSConfigHTTPAddedEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
@@ -204,6 +206,7 @@ func NewSMSConfigHTTPAddedEvent(
 		ID:          id,
 		Description: description,
 		Endpoint:    endpoint,
+		SigningKey:  signingKey,
 	}
 }
 
@@ -222,9 +225,10 @@ func (e *SMSConfigHTTPAddedEvent) UniqueConstraints() []*eventstore.UniqueConstr
 type SMSConfigHTTPChangedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	ID          string  `json:"id,omitempty"`
-	Description *string `json:"description,omitempty"`
-	Endpoint    *string `json:"endpoint,omitempty"`
+	ID          string              `json:"id,omitempty"`
+	Description *string             `json:"description,omitempty"`
+	Endpoint    *string             `json:"endpoint,omitempty"`
+	SigningKey  *crypto.CryptoValue `json:"signingKey,omitempty"`
 }
 
 func NewSMSConfigHTTPChangedEvent(
@@ -260,6 +264,11 @@ func ChangeSMSConfigHTTPDescription(description string) func(event *SMSConfigHTT
 func ChangeSMSConfigHTTPEndpoint(endpoint string) func(event *SMSConfigHTTPChangedEvent) {
 	return func(e *SMSConfigHTTPChangedEvent) {
 		e.Endpoint = &endpoint
+	}
+}
+func ChangeSMSConfigHTTPSigningKey(signingKey *crypto.CryptoValue) func(event *SMSConfigHTTPChangedEvent) {
+	return func(e *SMSConfigHTTPChangedEvent) {
+		e.SigningKey = signingKey
 	}
 }
 

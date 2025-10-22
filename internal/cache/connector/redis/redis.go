@@ -38,21 +38,23 @@ var (
 )
 
 type redisCache[I, K comparable, V cache.Entry[I, K]] struct {
-	db        int
-	config    *cache.Config
-	indices   []I
-	connector *Connector
-	logger    *slog.Logger
+	db             int
+	zitadelVersion string
+	config         *cache.Config
+	indices        []I
+	connector      *Connector
+	logger         *slog.Logger
 }
 
 // NewCache returns a cache that stores and retrieves object using single Redis.
-func NewCache[I, K comparable, V cache.Entry[I, K]](config cache.Config, client *Connector, db int, indices []I) cache.Cache[I, K, V] {
+func NewCache[I, K comparable, V cache.Entry[I, K]](config cache.Config, zitadelVersion string, client *Connector, db int, indices []I) cache.Cache[I, K, V] {
 	return &redisCache[I, K, V]{
-		config:    &config,
-		db:        db,
-		indices:   indices,
-		connector: client,
-		logger:    config.Log.Slog(),
+		config:         &config,
+		zitadelVersion: zitadelVersion,
+		db:             db,
+		indices:        indices,
+		connector:      client,
+		logger:         config.Log.Slog(),
 	}
 }
 
@@ -166,7 +168,7 @@ func (c *redisCache[I, K, V]) Truncate(ctx context.Context) (err error) {
 func (c *redisCache[I, K, V]) redisIndexKeys(index I, keys ...K) []string {
 	out := make([]string, len(keys))
 	for i, k := range keys {
-		out[i] = fmt.Sprintf("%v:%v", index, k)
+		out[i] = fmt.Sprintf("%s:%v:%v", c.zitadelVersion, index, k)
 	}
 	return out
 }

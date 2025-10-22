@@ -13,7 +13,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
@@ -50,7 +49,7 @@ func init() {
 
 func TestBulk(t *testing.T) {
 	iamOwnerCtx := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	secondaryOrg := Instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	secondaryOrg := Instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	createdSecondaryOrgUser := createHumanUser(t, iamOwnerCtx, secondaryOrg.OrganizationId, 0)
 	bulkMinimalUpdateSecondaryOrgJson := test.Must(json.Marshal(buildMinimalUpdateRequest(createdSecondaryOrgUser.UserId)))
@@ -480,7 +479,7 @@ func TestBulk(t *testing.T) {
 		},
 		{
 			name: "fail on errors",
-			body: withUsername(bulkFailOnErrorsJson, gofakeit.Username()),
+			body: withUsername(bulkFailOnErrorsJson, integration.Username()),
 			want: &scim.BulkResponse{
 				Schemas: []schemas.ScimSchemaType{schemas.IdBulkResponse},
 				Operations: []*scim.BulkResponseOperation{
@@ -680,7 +679,7 @@ func buildTooManyOperationsRequest() *scim.BulkRequest {
 		req.Operations[i] = &scim.BulkRequestOperation{
 			Method: http.MethodPost,
 			Path:   "/Users",
-			Data:   withUsername(minimalUserJson, gofakeit.Username()),
+			Data:   withUsername(minimalUserJson, integration.Username()),
 		}
 	}
 
