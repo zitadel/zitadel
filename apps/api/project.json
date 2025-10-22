@@ -27,9 +27,9 @@
             "executor": "nx:run-commands",
             "options": {
                 "env": {
-                    "VERSION": "{workspaceVersion}"
+                    "ZITADEL_VERSION": "{workspaceVersion}"
                 },
-                "command": "echo ${VERSION} && pnpm nx run-many --projects @zitadel/api --targets pack-linux-amd64"
+                "command": "echo ${ZITADEL_VERSION} && pnpm nx run-many --projects @zitadel/api --targets pack-linux-amd64"
             }
         },
         "prod": {
