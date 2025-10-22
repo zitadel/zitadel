@@ -14,6 +14,10 @@
       "conventionalCommits": true,
       "versionActionsOptions": {
         "skipLockFileUpdate": true
+      },
+      "git": {
+        "commit": false,
+        "tag": true
       }
     },
     "projectsRelationship": "fixed",
@@ -27,10 +31,6 @@
         "createRelease": "github",
         "file": false
       }
-    },
-    "git": {
-      "commit": false,
-      "tag": true
     }
   },
   "targetDefaults": {
