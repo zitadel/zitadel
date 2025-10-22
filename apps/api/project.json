@@ -463,10 +463,9 @@
         },
         "nx-release-publish": {
             "dependsOn": [
-                "pack-*",
-                "!pack-platform"
+                "pack-*-*"
             ],
-            "command": "bash -c \"gh release upload $(cat ./artifacts/next-version.txt) ./.artifacts/pack/zitadel-api-*.tar.gz\""
+            "command": "bash -c \"gh release upload $(cat ./.artifacts/next-version.txt) ./.artifacts/pack/zitadel-api-*-*.tar.gz\""
         }
     }
 }
