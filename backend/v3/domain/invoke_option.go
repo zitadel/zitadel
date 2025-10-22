@@ -26,6 +26,12 @@ func WithProjectRepo(repo ProjectRepository) InvokeOpt {
 	}
 }
 
+func WithInstanceRepo(repo InstanceRepository) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.instanceRepo = repo
+	}
+}
+
 // InvokeOpts are passed to each command
 // they provide common fields used by commands like the database client.
 type InvokeOpts struct {
@@ -35,6 +41,7 @@ type InvokeOpts struct {
 	organizationRepo       OrganizationRepository
 	organizationDomainRepo OrganizationDomainRepository
 	projectRepo            ProjectRepository
+	instanceRepo           InstanceRepository
 }
 
 type ensureTxOpts struct {
