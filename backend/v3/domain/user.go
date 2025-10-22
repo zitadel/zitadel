@@ -27,6 +27,8 @@ type userColumns interface {
 
 // userConditions define all the conditions for the user table.
 type userConditions interface {
+	// PrimaryKeyCondition returns a filter on the primary key fields.
+	PrimaryKeyCondition(instanceID, userID string) database.Condition
 	// InstanceIDCondition returns an equal filter on the instance id field.
 	InstanceIDCondition(instanceID string) database.Condition
 	// OrgIDCondition returns an equal filter on the org id field.
@@ -53,6 +55,8 @@ type userChanges interface {
 
 // UserRepository is the interface for the user repository.
 type UserRepository interface {
+	Repository
+
 	userColumns
 	userConditions
 	userChanges
