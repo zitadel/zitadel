@@ -100,6 +100,14 @@ func TestWrite(t *testing.T) {
 			},
 		},
 		{
+			name: "text condition with ignore case",
+			cond: NewTextCondition(NewColumn("table", "column1"), TextOperationEqualIgnoreCase, "some text"),
+			want: want{
+				stmt: "LOWER(table.column1) = LOWER($1)",
+				args: []any{"some text"},
+			},
+		},
+		{
 			name: "text ignore case condition",
 			cond: NewTextIgnoreCaseCondition(NewColumn("table", "column1"), TextOperationNotEqual, "some TEXT"),
 			want: want{
