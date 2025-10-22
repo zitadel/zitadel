@@ -3,8 +3,8 @@ CREATE TABLE zitadel.project_grants(
     , id TEXT NOT NULL
 
     , project_id TEXT NOT NULL
-    , granted_organization_id TEXT NOT NULL
     , granting_organization_id TEXT NOT NULL
+    , granted_organization_id TEXT NOT NULL
 
     , created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     , updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
