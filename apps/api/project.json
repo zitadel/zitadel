@@ -26,7 +26,10 @@
         "nx-release-publish": {
             "executor": "nx:run-commands",
             "options": {
-                "command": "VERSION={workspaceVersion} pnpm nx run-many -project @zitadel/api -targets pack-linux-* pack-darwin-* pack-windows-*"
+                "env": {
+                    "VERSION": "{workspaceVersion}"
+                },
+                "command": "echo ${VERSION} && pnpm nx run-many -project @zitadel/api -targets pack-linux-* pack-darwin-* pack-windows-*"
             }
         },
         "prod": {
