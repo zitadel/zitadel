@@ -17,32 +17,17 @@
     },
     "nx-release-publish": {
       "dependsOn": [
-        "pack"
+        "@zitadel/api:nx-release-publish",
+        "@zitadel/login:nx-release-publish"
       ],
-      "command": "bash -c 'gh release upload $(cat ./artifacts/next-version.txt) ./.artifacts/pack/*'"
-    },
-    "pack": {
-        "description": "Creates package archives for the API across all platforms and for the Login component, then generates a checksums.txt file containing the SHA256 checksums for all created archives.",
-        "dependsOn": [
-            "@zitadel/api:pack-linux-*",
-            "@zitadel/api:pack-darwin-*",
-            "@zitadel/api:pack-windows-*",
-            "@zitadel/login:pack"
-        ],
-        "executor": "nx:run-commands",
-        "options": {
-            "parallel": false,
-            "commands": [
-                "sha256sum .artifacts/pack/zitadel-*-*.tar.gz > .artifacts/pack/checksums.txt"
-            ]
-        },
-        "cache": true,
-        "inputs": [
-            "{workspaceRoot}/.artifacts/pack/zitadel-*-*.tar.gz"
-        ],
-        "outputs": [
-            "{workspaceRoot}/.artifacts/pack/checksums.txt"
+      "executor": "nx:run-commands",
+      "options": {
+        "parallel": false,
+        "commands": [
+          "sha256sum .artifacts/pack/* > .artifacts/pack/checksums.txt",
+          "bash -c 'gh release upload $(cat ./artifacts/next-version.txt) ./.artifacts/pack/checksums.txt'"
         ]
-    }    
+      }
+    }
   }
 }
