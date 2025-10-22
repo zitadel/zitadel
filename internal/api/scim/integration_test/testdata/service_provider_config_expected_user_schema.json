@@ -4,7 +4,7 @@
   ],
   "meta": {
     "resourceType": "Schema",
-    "location": "http://{domain}:8080/scim/v2/{orgId}/Schemas/urn:ietf:params:scim:schemas:core:2.0:User"
+    "location": "http://{domain}:8082/scim/v2/{orgId}/Schemas/urn:ietf:params:scim:schemas:core:2.0:User"
   },
   "id": "urn:ietf:params:scim:schemas:core:2.0:User",
   "name": "User",

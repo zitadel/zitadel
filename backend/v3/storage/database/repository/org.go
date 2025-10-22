@@ -14,8 +14,10 @@ import (
 var _ domain.OrganizationRepository = (*org)(nil)
 
 type org struct {
-	shouldLoadDomains bool
-	domainRepo        orgDomain
+	shouldLoadDomains  bool
+	domainRepo         orgDomain
+	shouldLoadMetadata bool
+	metadataRepo       orgMetadata
 }
 
 func (o org) unqualifiedTableName() string {
@@ -28,12 +30,14 @@ func OrganizationRepository() domain.OrganizationRepository {
 
 const queryOrganizationStmt = `SELECT organizations.id, organizations.name, organizations.instance_id, organizations.state, organizations.created_at, organizations.updated_at` +
 	` , jsonb_agg(json_build_object('instanceId', org_domains.instance_id, 'orgId', org_domains.org_id, 'domain', org_domains.domain, 'isVerified', org_domains.is_verified, 'isPrimary', org_domains.is_primary, 'validationType', org_domains.validation_type, 'createdAt', org_domains.created_at, 'updatedAt', org_domains.updated_at)) FILTER (WHERE org_domains.org_id IS NOT NULL) AS domains` +
+	` , jsonb_agg(json_build_object('instanceId', organization_metadata.instance_id, 'orgId', organization_metadata.organization_id, 'key', organization_metadata.key, 'value', encode(organization_metadata.value, 'base64'), 'createdAt', organization_metadata.created_at, 'updatedAt', organization_metadata.updated_at)) FILTER (WHERE organization_metadata.organization_id IS NOT NULL) AS metadata` +
 	` FROM zitadel.organizations`
 
 // Get implements [domain.OrganizationRepository].
 func (o org) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Organization, error) {
 	opts = append(opts,
 		o.joinDomains(),
+		o.joinMetadata(),
 		database.WithGroupBy(o.InstanceIDColumn(), o.IDColumn()),
 	)
 
@@ -57,6 +61,7 @@ func (o org) Get(ctx context.Context, client database.QueryExecutor, opts ...dat
 func (o org) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Organization, error) {
 	opts = append(opts,
 		o.joinDomains(),
+		o.joinMetadata(),
 		database.WithGroupBy(o.InstanceIDColumn(), o.IDColumn()),
 	)
 
@@ -143,6 +148,13 @@ func (o org) SetState(state domain.OrgState) database.Change {
 // conditions
 // -------------------------------------------------------------
 
+func (o org) PrimaryKeyCondition(instanceID, orgID string) database.Condition {
+	return database.And(
+		o.InstanceIDCondition(instanceID),
+		o.IDCondition(orgID),
+	)
+}
+
 // IDCondition implements [domain.organizationConditions].
 func (o org) IDCondition(id string) database.Condition {
 	return database.NewTextCondition(o.IDColumn(), database.TextOperationEqual, id)
@@ -187,9 +199,42 @@ func (o org) ExistsDomain(cond database.Condition) database.Condition {
 	)
 }
 
+// ExistsMetadata creates a correlated [database.Exists] condition on organization_metadata.
+// Use this when you want to filter organizations by a metadata condition but still return all metadata
+// of the organization in the aggregated result.
+// Example usage:
+//
+//	metadataRepo := orgRepo.Metadata(true) // ensure metadata are loaded/aggregated
+//	org, _ := orgRepo.Get(ctx,
+//	    database.WithCondition(
+//	        database.And(
+//	            orgRepo.InstanceIDCondition(instanceID),
+//	            orgRepo.MetadataExists(metadataRepo.KeyCondition(database.TextOperationEqual, "urn:zitadel:org:custom:my-key")),
+//	        ),
+//	    ),
+//	)
+func (o org) ExistsMetadata(cond database.Condition) database.Condition {
+	return database.Exists(
+		o.metadataRepo.qualifiedTableName(),
+		database.And(
+			database.NewColumnCondition(o.InstanceIDColumn(), o.metadataRepo.InstanceIDColumn()),
+			database.NewColumnCondition(o.IDColumn(), o.metadataRepo.OrganizationIDColumn()),
+			cond,
+		),
+	)
+}
+
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
+
+// PrimaryKeyColumns implements [domain.Repository].
+func (o org) PrimaryKeyColumns() []database.Column {
+	return []database.Column{
+		o.InstanceIDColumn(),
+		o.IDColumn(),
+	}
+}
 
 // IDColumn implements [domain.organizationColumns].
 func (o org) IDColumn() database.Column {
@@ -227,7 +272,8 @@ func (o org) UpdatedAtColumn() database.Column {
 
 type rawOrg struct {
 	*domain.Organization
-	Domains JSONArray[domain.OrganizationDomain] `json:"domains,omitempty" db:"domains"`
+	Domains  JSONArray[domain.OrganizationDomain]   `json:"domains,omitempty" db:"domains"`
+	Metadata JSONArray[domain.OrganizationMetadata] `json:"metadata,omitempty" db:"metadata"`
 }
 
 func scanOrganization(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Organization, error) {
@@ -241,6 +287,7 @@ func scanOrganization(ctx context.Context, querier database.Querier, builder *da
 		return nil, err
 	}
 	org.Organization.Domains = org.Domains
+	org.Organization.Metadata = org.Metadata
 
 	return org.Organization, nil
 }
@@ -260,6 +307,7 @@ func scanOrganizations(ctx context.Context, querier database.Querier, builder *d
 	for i, org := range orgs {
 		result[i] = org.Organization
 		result[i].Domains = org.Domains
+		result[i].Metadata = org.Metadata
 	}
 
 	return result, nil
@@ -271,7 +319,8 @@ func scanOrganizations(ctx context.Context, querier database.Querier, builder *d
 
 func (o org) LoadDomains() domain.OrganizationRepository {
 	return &org{
-		shouldLoadDomains: true,
+		shouldLoadDomains:  true,
+		shouldLoadMetadata: o.shouldLoadMetadata,
 	}
 }
 
@@ -290,6 +339,32 @@ func (o org) joinDomains() database.QueryOption {
 
 	return database.WithLeftJoin(
 		o.domainRepo.qualifiedTableName(),
+		database.And(columns...),
+	)
+}
+
+func (o org) LoadMetadata() domain.OrganizationRepository {
+	return &org{
+		shouldLoadDomains:  o.shouldLoadDomains,
+		shouldLoadMetadata: true,
+	}
+}
+
+func (o org) joinMetadata() database.QueryOption {
+	columns := make([]database.Condition, 0, 3)
+	columns = append(columns,
+		database.NewColumnCondition(o.InstanceIDColumn(), o.metadataRepo.InstanceIDColumn()),
+		database.NewColumnCondition(o.IDColumn(), o.metadataRepo.OrganizationIDColumn()),
+	)
+
+	// If metadata should not be joined, we make sure to return null for the metadata columns
+	// the query optimizer of the dialect should optimize this away if no metadata are requested
+	if !o.shouldLoadMetadata {
+		columns = append(columns, database.IsNull(o.metadataRepo.OrganizationIDColumn()))
+	}
+
+	return database.WithLeftJoin(
+		o.metadataRepo.qualifiedTableName(),
 		database.And(columns...),
 	)
 }

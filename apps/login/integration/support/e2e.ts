@@ -18,7 +18,7 @@ Cypress.on('uncaught:exception', (err, runnable) => {
   return true;
 });
 
-const url = Cypress.env("CORE_MOCK_STUBS_URL") || "http://localhost:22220/v1/stubs";
+const url = Cypress.env("API_MOCK_STUBS_URL");
 
 function removeStub(service: string, method: string) {
   return cy.request({
