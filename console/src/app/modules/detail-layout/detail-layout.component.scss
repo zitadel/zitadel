@@ -1,8 +1,10 @@
+@use 'sass:map';
+
 @mixin detail-layout-theme($theme) {
-  $primary: map-get($theme, primary);
-  $primary-color: map-get($primary, 500);
-  $is-dark-theme: map-get($theme, is-dark);
-  $lighter-color: rgba(map-get($primary, 300), 0.5);
+  $primary: map.get($theme, primary);
+  $primary-color: map.get($primary, 500);
+  $is-dark-theme: map.get($theme, is-dark);
+  $lighter-color: rgba(map.get($primary, 300), 0.5);
 
   .detail-layout-head {
     margin-bottom: 2rem;

@@ -1,3 +1,5 @@
+@use 'sass:map';
+
 .cnsl-cr-row {
   display: flex;
   align-items: center;
@@ -7,10 +9,10 @@
 }
 
 @mixin copy-row-theme($theme) {
-  $is-dark-theme: map-get($theme, is-dark);
-  $foreground: map-get($theme, foreground);
-  $button-text-color: map-get($foreground, text);
-  $button-disabled-text-color: map-get($foreground, disabled-button);
+  $is-dark-theme: map.get($theme, is-dark);
+  $foreground: map.get($theme, foreground);
+  $button-text-color: map.get($foreground, text);
+  $button-disabled-text-color: map.get($foreground, disabled-button);
 
   .cnsl-cr-copy {
     flex-grow: 1;

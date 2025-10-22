@@ -1,9 +1,11 @@
+@use 'sass:map';
+
 @mixin instance-selector-theme($theme) {
-  $background: map-get($theme, background);
-  $is-dark-theme: map-get($theme, is-dark);
+  $background: map.get($theme, background);
+  $is-dark-theme: map.get($theme, is-dark);
 
   .instance-selector-container {
-    background: map-get($background, footer);
+    background: map.get($background, footer);
     height: 100%;
     display: flex;
     flex-direction: column;

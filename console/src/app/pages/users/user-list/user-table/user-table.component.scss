@@ -1,6 +1,8 @@
+@use 'sass:map';
+
 @mixin user-table-theme($theme) {
-  $foreground: map-get($theme, foreground);
-  $is-dark-theme: map-get($theme, is-dark);
+  $foreground: map.get($theme, foreground);
+  $is-dark-theme: map.get($theme, is-dark);
 
   .user-toggle-group {
     display: flex;

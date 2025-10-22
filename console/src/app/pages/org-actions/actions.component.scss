@@ -1,3 +1,5 @@
+@use 'sass:map';
+
 .actions-title-row {
   display: flex;
   align-items: center;
@@ -16,11 +18,11 @@
 }
 
 @mixin actions-theme($theme) {
-  $foreground: map-get($theme, foreground);
-  $background: map-get($theme, background);
-  $is-dark-theme: map-get($theme, is-dark);
-  $primary: map-get($theme, primary);
-  $primary-color: map-get($primary, 500);
+  $foreground: map.get($theme, foreground);
+  $background: map.get($theme, background);
+  $is-dark-theme: map.get($theme, is-dark);
+  $primary: map.get($theme, primary);
+  $primary-color: map.get($primary, 500);
 
   .actions-enlarged-container {
     h1 {

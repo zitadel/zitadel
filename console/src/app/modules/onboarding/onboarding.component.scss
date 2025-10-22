@@ -1,18 +1,20 @@
+@use 'sass:map';
+
 @mixin onboarding-theme($theme) {
-  $primary: map-get($theme, primary);
-  $warn: map-get($theme, warn);
-  $background: map-get($theme, background);
-  $accent: map-get($theme, accent);
-  $primary-color: map-get($primary, 500);
+  $primary: map.get($theme, primary);
+  $warn: map.get($theme, warn);
+  $background: map.get($theme, background);
+  $accent: map.get($theme, accent);
+  $primary-color: map.get($primary, 500);
 
-  $warn-color: map-get($warn, 500);
-  $accent-color: map-get($accent, 500);
-  $foreground: map-get($theme, foreground);
-  $is-dark-theme: map-get($theme, is-dark);
-  $back: map-get($background, background);
+  $warn-color: map.get($warn, 500);
+  $accent-color: map.get($accent, 500);
+  $foreground: map.get($theme, foreground);
+  $is-dark-theme: map.get($theme, is-dark);
+  $back: map.get($background, background);
 
-  $list-background-color: map-get($background, 300);
-  $card-background-color: map-get($background, cards);
+  $list-background-color: map.get($background, 300);
+  $card-background-color: map.get($background, cards);
   $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
   $border-selected-color: if($is-dark-theme, #fff, #000);
 
@@ -103,7 +105,7 @@
             .text-block {
               display: flex;
               flex-direction: column;
-              color: map-get($foreground, text);
+              color: map.get($foreground, text);
               padding-top: 1rem;
               flex: 1;
 
@@ -141,7 +143,7 @@
           width: 1.5rem;
           border-radius: 50vw;
           margin-right: 1rem;
-          background-color: if($is-dark-theme, map-get($background, state), #e4e7e4);
+          background-color: if($is-dark-theme, map.get($background, state), #e4e7e4);
           box-shadow: 0 0 3px #0000001a;
           border: 1px solid rgba(#8795a1, 0.2);
 
@@ -160,7 +162,7 @@
             font-size: 1.2rem;
             height: 1.2rem;
             width: 1.2rem;
-            color: map-get($foreground, text);
+            color: map.get($foreground, text);
             opacity: 0.3;
           }
         }
@@ -171,7 +173,7 @@
           justify-content: flex-end;
           font-size: 14px;
           margin-bottom: 0.5rem;
-          color: map-get($primary, 400);
+          color: map.get($primary, 400);
 
           .icon {
             margin-left: 0rem;

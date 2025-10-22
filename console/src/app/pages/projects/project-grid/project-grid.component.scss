@@ -1,8 +1,10 @@
+@use 'sass:map';
+
 @mixin project-grid-theme($theme) {
-  $foreground: map-get($theme, foreground);
+  $foreground: map.get($theme, foreground);
 
   .view-toggle {
-    border-bottom: 1px solid map-get($foreground, divider);
+    border-bottom: 1px solid map.get($foreground, divider);
   }
 }
 

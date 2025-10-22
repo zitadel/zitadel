@@ -1,5 +1,7 @@
+@use 'sass:map';
+
 @mixin domain-verification-theme($theme) {
-  $is-dark-theme: map-get($theme, is-dark);
+  $is-dark-theme: map.get($theme, is-dark);
   $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
 
   .entry {

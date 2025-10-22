@@ -1,9 +1,10 @@
 @use '@angular/material' as mat;
+@use 'sass:map';
 
 @mixin smtp-provider-theme($theme) {
-  $is-dark-theme: map-get($theme, is-dark);
-  $background: map-get($theme, background);
-  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map.get($theme, is-dark);
+  $background: map.get($theme, background);
+  $foreground: map.get($theme, foreground);
 
   .stepper {
     background: inherit !important;
