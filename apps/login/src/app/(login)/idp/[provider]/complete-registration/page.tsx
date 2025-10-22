@@ -13,20 +13,7 @@ export default async function CompleteRegistrationPage(props: {
   params: Promise<{ provider: string }>;
 }) {
   const searchParams = await props.searchParams;
-  const {
-    id,
-    requestId,
-    organization,
-    idpId,
-    idpUserId,
-    idpUserName,
-    username,
-    givenName,
-    familyName,
-    displayName,
-    email,
-    phone,
-  } = searchParams;
+  const { id, requestId, organization, idpId, idpUserId, idpUserName, givenName, familyName, email } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
