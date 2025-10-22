@@ -19,5 +19,6 @@
     "tsx": "^4.20.6",
     "wait-on": "^9.0.1",
     "yargs": "^18.0.0"
-  }
+  },
+  "version": "1.0.0-release-archives.13"
 }

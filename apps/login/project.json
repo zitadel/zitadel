@@ -156,7 +156,7 @@
         "dependsOn": [
             "pack"
         ],
-        "command": "bash -c \"gh release upload v$(cat ./artifacts/next-version.txt) ./.artifacts/pack/zitadel-login.tar.gz\""
+        "command": "bash -c \"gh release upload v$(cat ./.artifacts/next-version.txt) ./.artifacts/pack/zitadel-login.tar.gz\""
     }
   }
 }
