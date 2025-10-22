@@ -302,7 +302,7 @@ service GroupService {
   // Add Users
   //
   // Adds one or more users to a group.
-  // The users should be in the same organization as the group. // todo: review
+  // The users should be in the same organization as the group.
   // The request will not fail if some of the users could not be added to the group,
   // and a list of failed user IDs is available in the response.
   //
