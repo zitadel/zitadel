@@ -5,7 +5,6 @@ import (
 	"database/sql"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
-	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	old_domain "github.com/zitadel/zitadel/internal/domain"
@@ -87,11 +86,7 @@ func (p *orgDomainRelationalProjection) reducePrimarySet(event eventstore.Event)
 		}
 		domainRepo := repository.OrganizationDomainRepository()
 		_, err := domainRepo.Update(ctx, v3_sql.SQLTx(tx),
-			database.And(
-				domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
-				domainRepo.OrgIDCondition(e.Aggregate().ResourceOwner),
-				domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),
-			),
+			domainRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ResourceOwner, e.Domain),
 			domainRepo.SetPrimary(),
 			domainRepo.SetUpdatedAt(e.CreationDate()),
 		)
@@ -111,11 +106,7 @@ func (p *orgDomainRelationalProjection) reduceRemoved(event eventstore.Event) (*
 		}
 		domainRepo := repository.OrganizationDomainRepository()
 		_, err := domainRepo.Remove(ctx, v3_sql.SQLTx(tx),
-			database.And(
-				domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
-				domainRepo.OrgIDCondition(e.Aggregate().ResourceOwner),
-				domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),
-			),
+			domainRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ResourceOwner, e.Domain),
 		)
 		return err
 	}), nil
@@ -143,11 +134,7 @@ func (p *orgDomainRelationalProjection) reduceVerificationAdded(event eventstore
 		domainRepo := repository.OrganizationDomainRepository()
 
 		_, err := domainRepo.Update(ctx, v3_sql.SQLTx(tx),
-			database.And(
-				domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
-				domainRepo.OrgIDCondition(e.Aggregate().ResourceOwner),
-				domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),
-			),
+			domainRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ResourceOwner, e.Domain),
 			domainRepo.SetValidationType(validationType),
 			domainRepo.SetUpdatedAt(e.CreationDate()),
 		)
@@ -168,11 +155,7 @@ func (p *orgDomainRelationalProjection) reduceVerified(event eventstore.Event) (
 		domainRepo := repository.OrganizationDomainRepository()
 
 		_, err := domainRepo.Update(ctx, v3_sql.SQLTx(tx),
-			database.And(
-				domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
-				domainRepo.OrgIDCondition(e.Aggregate().ResourceOwner),
-				domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),
-			),
+			domainRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ResourceOwner, e.Domain),
 			domainRepo.SetVerified(),
 			domainRepo.SetUpdatedAt(e.CreationDate()),
 		)
