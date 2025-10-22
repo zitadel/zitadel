@@ -94,6 +94,5 @@
     "typescript": "^5.8.3",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^2.0.0"
-  },
-  "version": "1.0.0-release-archives.15"
+  }
 }

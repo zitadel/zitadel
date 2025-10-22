@@ -18,7 +18,8 @@
       "git": {
         "commit": false,
         "tag": true
-      }
+      },
+      "manifestRootsToUpdate": []
     },
     "projectsRelationship": "fixed",
     "projects": [
