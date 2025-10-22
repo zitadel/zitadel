@@ -151,6 +151,12 @@
       "outputs": [
         "{workspaceRoot}/.artifacts/pack/zitadel-login.tar.gz"
       ]
+    },
+    "nx-release-publish": {
+        "dependsOn": [
+            "pack"
+        ],
+        "command": "bash -c \"gh release upload $(cat ./artifacts/next-version.txt) ./.artifacts/pack/zitadel-login.tar.gz\""
     }
   }
 }

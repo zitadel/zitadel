@@ -369,7 +369,7 @@
             "cache": true,
             "inputs": [
                 "pack",
-                { "env": "ZITADEL_VERSION" }
+                { "runtime": "cat .artifacts/next-version.txt" }
             ],
             "outputs": [
                 "{workspaceRoot}/.artifacts/pack/zitadel-api-darwin-amd64.tar.gz",
@@ -386,7 +386,7 @@
             "cache": true,
             "inputs": [
                 "pack",
-                { "env": "ZITADEL_VERSION" }
+                { "runtime": "cat .artifacts/next-version.txt" }
             ],
             "outputs": [
                 "{workspaceRoot}/.artifacts/pack/zitadel-api-darwin-arm64.tar.gz",
@@ -403,7 +403,7 @@
             "cache": true,
             "inputs": [
                 "pack",
-                { "env": "ZITADEL_VERSION" }
+                { "runtime": "cat .artifacts/next-version.txt" }
             ],
             "outputs": [
                 "{workspaceRoot}/.artifacts/pack/zitadel-api-linux-amd64.tar.gz",
@@ -420,7 +420,7 @@
             "cache": true,
             "inputs": [
                 "pack",
-                { "env": "ZITADEL_VERSION" }
+                { "runtime": "cat .artifacts/next-version.txt" }
             ],
             "outputs": [
                 "{workspaceRoot}/.artifacts/pack/zitadel-api-linux-arm64.tar.gz",
@@ -437,7 +437,7 @@
             "cache": true,
             "inputs": [
                 "pack",
-                { "env": "ZITADEL_VERSION" }
+                { "runtime": "cat .artifacts/next-version.txt" }
             ],
             "outputs": [
                 "{workspaceRoot}/.artifacts/pack/zitadel-api-windows-amd64.tar.gz",
@@ -454,19 +454,19 @@
             "cache": true,
             "inputs": [
                 "pack",
-                { "env": "ZITADEL_VERSION" }
+                { "runtime": "cat .artifacts/next-version.txt" }
             ],
             "outputs": [
                 "{workspaceRoot}/.artifacts/pack/zitadel-api-windows-arm64.tar.gz",
                 "{workspaceRoot}/.artifacts/bin/windows/arm64/zitadel.exe"
             ]
+        },
+        "nx-release-publish": {
+            "dependsOn": [
+                "pack-*",
+                "!pack-platform"
+            ],
+            "command": "bash -c \"gh release upload $(cat ./artifacts/next-version.txt) ./.artifacts/pack/zitadel-api-*.tar.gz\""
         }
-    },
-    "nx-release-publish": {
-      "dependsOn": [
-        "pack-*",
-        "!pack-platform"
-      ],
-      "command": "bash -c 'gh release upload $(cat ./artifacts/next-version.txt) ./.artifacts/pack/zitadel-api-*.tar.gz'"
     }
 }

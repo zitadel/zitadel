@@ -25,7 +25,7 @@
         "parallel": false,
         "commands": [
           "sha256sum .artifacts/pack/* > .artifacts/pack/checksums.txt",
-          "bash -c 'gh release upload $(cat ./artifacts/next-version.txt) ./.artifacts/pack/checksums.txt'"
+          "bash -c \"gh release upload $(cat ./artifacts/next-version.txt) ./.artifacts/pack/checksums.txt\""
         ]
       }
     }
