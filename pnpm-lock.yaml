@@ -575,9 +575,6 @@ importers:
       '@connectrpc/connect-web':
         specifier: ^2.0.0
         version: 2.0.4(@bufbuild/protobuf@2.6.3)(@connectrpc/connect@2.0.4(@bufbuild/protobuf@2.6.3))
-      '@zitadel/proto':
-        specifier: workspace:*
-        version: link:../zitadel-proto
       jose:
         specifier: ^5.3.0
         version: 5.10.0
@@ -597,6 +594,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^8.35.1
         version: 8.43.0(eslint@8.57.1)(typescript@5.9.2)
+      '@zitadel/proto':
+        specifier: workspace:*
+        version: link:../zitadel-proto
       eslint:
         specifier: ^8.57.0
         version: 8.57.1

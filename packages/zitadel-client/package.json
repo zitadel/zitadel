@@ -76,10 +76,10 @@
     "@connectrpc/connect": "^2.0.0",
     "@connectrpc/connect-node": "^2.0.0",
     "@connectrpc/connect-web": "^2.0.0",
-    "@zitadel/proto": "workspace:*",
     "jose": "^5.3.0"
   },
   "devDependencies": {
+    "@zitadel/proto": "workspace:*",
     "@bufbuild/protocompile": "^0.0.1",
     "@bufbuild/buf": "^1.53.0",
     "@types/node": "^24.0.14",
@@ -90,5 +90,6 @@
     "tsup": "^8.4.0",
     "typescript": "^5.8.3",
     "vitest": "^2.0.0"
-  }
+  },
+  "version": "1.0.0-release-archives.3"
 }
