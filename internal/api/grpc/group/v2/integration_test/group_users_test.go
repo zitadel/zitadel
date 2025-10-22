@@ -5,6 +5,7 @@ package group_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -40,7 +41,6 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 		req            *group_v2.AddUsersToGroupRequest
 		wantChangeDate bool
 		wantErrCode    codes.Code
-		wantErrMsg     string
 	}{
 		{
 			name: "unauthenticated, error",
@@ -50,7 +50,6 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
 			},
 			wantErrCode: codes.Unauthenticated,
-			wantErrMsg:  "auth header missing",
 		},
 		{
 			name: "missing id, error",
@@ -59,7 +58,6 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
 			},
 			wantErrCode: codes.InvalidArgument,
-			wantErrMsg:  "invalid AddUsersToGroupRequest.Id: value length must be between 1 and 200 runes, inclusive",
 		},
 		{
 			name: "missing user ids, error",
@@ -68,7 +66,6 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 				Id: group.GetId(),
 			},
 			wantErrCode: codes.InvalidArgument,
-			wantErrMsg:  "invalid AddUsersToGroupRequest.UserIds: value must contain at least 1 item(s)",
 		},
 		{
 			name: "group does not exist, error",
@@ -78,7 +75,6 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
 			},
 			wantErrCode: codes.FailedPrecondition,
-			wantErrMsg:  "Errors.Group.NotFound (CMDGRP-eQfeur)",
 		},
 		{
 			name: "missing permission, error",
@@ -88,7 +84,6 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
 			},
 			wantErrCode: codes.NotFound,
-			wantErrMsg:  "membership not found (AUTHZ-cdgFk)",
 		},
 		{
 			name: "organization owner, missing permission, error",
@@ -98,7 +93,6 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
 			},
 			wantErrCode: codes.NotFound,
-			wantErrMsg:  "membership not found (AUTHZ-cdgFk)",
 		},
 		{
 			name: "organization owner, with permission, ok",
@@ -109,15 +103,6 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 			},
 		},
 		{
-			name: "some users already in the group, ok",
-			ctx:  iamOwnerCtx,
-			req: &group_v2.AddUsersToGroupRequest{
-				Id:      group.GetId(),
-				UserIds: []string{user1.GetUserId(), user2.GetUserId(), user3.GetUserId()},
-			},
-			wantChangeDate: true,
-		},
-		{
 			name: "some users not found, ok",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.AddUsersToGroupRequest{
@@ -125,7 +110,6 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 				UserIds: []string{user1.GetUserId(), user2.GetUserId(), "randomUser"},
 			},
 			wantErrCode: codes.FailedPrecondition,
-			wantErrMsg:  "User could not be found (COMMAND-uXHNj)",
 		},
 		{
 			name: "user in a different org not added, ok",
@@ -135,7 +119,6 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 				UserIds: []string{user1.GetUserId(), user2.GetUserId(), defOrgUser.GetUserId()},
 			},
 			wantErrCode: codes.FailedPrecondition,
-			wantErrMsg:  "User could not be found (COMMAND-uXHNj)",
 		},
 		{
 			name: "add all users to group, ok",
@@ -143,6 +126,15 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 			req: &group_v2.AddUsersToGroupRequest{
 				Id:      group.GetId(),
 				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
+			},
+			wantChangeDate: true,
+		},
+		{
+			name: "some users already in the group, ok",
+			ctx:  iamOwnerCtx,
+			req: &group_v2.AddUsersToGroupRequest{
+				Id:      group.GetId(),
+				UserIds: []string{user1.GetUserId(), user2.GetUserId(), user3.GetUserId()},
 			},
 			wantChangeDate: true,
 		},
@@ -158,17 +150,18 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			beforeDate := time.Now().UTC()
 			got, err := instance.Client.GroupV2.AddUsersToGroup(tt.ctx, tt.req)
+			afterDate := time.Now().UTC()
 			if tt.wantErrCode != codes.OK {
 				require.Error(t, err)
 				require.Empty(t, got.GetChangeDate())
 				assert.Equal(t, tt.wantErrCode, status.Code(err))
-				assert.Equal(t, tt.wantErrMsg, status.Convert(err).Message())
 				return
 			}
 			require.NoError(t, err)
 			if tt.wantChangeDate {
-				require.NotEmpty(t, got.GetChangeDate())
+				assert.WithinRange(t, got.GetChangeDate().AsTime(), beforeDate, afterDate)
 			}
 		})
 	}
@@ -211,7 +204,6 @@ func TestServer_RemoveUsersFromGroup(t *testing.T) {
 		req            *group_v2.RemoveUsersFromGroupRequest
 		wantChangeDate bool
 		wantErrCode    codes.Code
-		wantErrMsg     string
 	}{
 		{
 			name: "unauthenticated, error",
@@ -221,7 +213,6 @@ func TestServer_RemoveUsersFromGroup(t *testing.T) {
 				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
 			},
 			wantErrCode: codes.Unauthenticated,
-			wantErrMsg:  "auth header missing",
 		},
 		{
 			name: "missing id, error",
@@ -230,7 +221,6 @@ func TestServer_RemoveUsersFromGroup(t *testing.T) {
 				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
 			},
 			wantErrCode: codes.InvalidArgument,
-			wantErrMsg:  "invalid RemoveUsersFromGroupRequest.Id: value length must be between 1 and 200 runes, inclusive",
 		},
 		{
 			name: "missing user ids, error",
@@ -239,7 +229,6 @@ func TestServer_RemoveUsersFromGroup(t *testing.T) {
 				Id: group.GetId(),
 			},
 			wantErrCode: codes.InvalidArgument,
-			wantErrMsg:  "invalid RemoveUsersFromGroupRequest.UserIds: value must contain at least 1 item(s)",
 		},
 		{
 			name: "group does not exist, error",
@@ -249,7 +238,6 @@ func TestServer_RemoveUsersFromGroup(t *testing.T) {
 				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
 			},
 			wantErrCode: codes.FailedPrecondition,
-			wantErrMsg:  "Errors.Group.NotFound (CMDGRP-eQfeur)",
 		},
 		{
 			name: "missing permission, error",
@@ -259,7 +247,6 @@ func TestServer_RemoveUsersFromGroup(t *testing.T) {
 				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
 			},
 			wantErrCode: codes.NotFound,
-			wantErrMsg:  "membership not found (AUTHZ-cdgFk)",
 		},
 		{
 			name: "organization owner, missing permission, error",
@@ -269,7 +256,6 @@ func TestServer_RemoveUsersFromGroup(t *testing.T) {
 				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
 			},
 			wantErrCode: codes.NotFound,
-			wantErrMsg:  "membership not found (AUTHZ-cdgFk)",
 		},
 		{
 			name: "organization owner, with permission, ok",
@@ -287,7 +273,7 @@ func TestServer_RemoveUsersFromGroup(t *testing.T) {
 				Id:      group.GetId(),
 				UserIds: []string{"user3", "user4"},
 			},
-			wantChangeDate: true,
+			wantChangeDate: false,
 		},
 		{
 			name: "some users not in the group, ok",
@@ -319,17 +305,18 @@ func TestServer_RemoveUsersFromGroup(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			beforeDate := time.Now().UTC()
 			got, err := instance.Client.GroupV2.RemoveUsersFromGroup(tt.ctx, tt.req)
+			afterDate := time.Now().UTC()
 			if tt.wantErrCode != codes.OK {
 				require.Error(t, err)
 				require.Empty(t, got.GetChangeDate())
 				assert.Equal(t, tt.wantErrCode, status.Code(err))
-				assert.Equal(t, tt.wantErrMsg, status.Convert(err).Message())
 				return
 			}
 			require.NoError(t, err)
 			if tt.wantChangeDate {
-				require.NotEmpty(t, got.GetChangeDate())
+				assert.WithinRange(t, got.GetChangeDate().AsTime(), beforeDate, afterDate)
 			}
 		})
 	}

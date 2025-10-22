@@ -39,17 +39,17 @@ func (g *GroupWriteModel) GetWriteModel() *eventstore.WriteModel {
 
 // Query constructs a search query for retrieving group-related events based on the GroupWriteModel attributes.
 func (g *GroupWriteModel) Query() *eventstore.SearchQueryBuilder {
+	eventTypes := make([]eventstore.EventType, 0)
+	eventTypes = append(eventTypes, group.GroupAddedEventType, group.GroupChangedEventType, group.GroupRemovedEventType)
+	if g.UserIDs != nil {
+		eventTypes = append(eventTypes, group.GroupUsersAddedEventType, group.GroupUsersRemovedEventType)
+	}
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(g.ResourceOwner).
 		AddQuery().
 		AggregateTypes(group.AggregateType).
 		AggregateIDs(g.AggregateID).
-		EventTypes(
-			group.GroupAddedEventType,
-			group.GroupChangedEventType,
-			group.GroupRemovedEventType,
-			group.GroupUsersAddedEventType,
-			group.GroupUsersRemovedEventType).Builder()
+		EventTypes(eventTypes...).Builder()
 }
 
 func (g *GroupWriteModel) Reduce() error {

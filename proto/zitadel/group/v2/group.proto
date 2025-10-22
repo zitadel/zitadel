@@ -70,18 +70,11 @@ message GroupUser {
     }
   ];
 
-  // InstanceID is the unique identifier of the instance to which the group belongs.
-  string instance_id = 3 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"69629098906488334\""
-    }
-  ];
-
   // User represents the user in the user group.
-  zitadel.authorization.v2beta.User user = 4;
+  zitadel.authorization.v2beta.User user = 3;
 
   // CreationDate is the timestamp when the user was added to the group.
-  google.protobuf.Timestamp creation_date = 6 [
+  google.protobuf.Timestamp creation_date = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
     }
