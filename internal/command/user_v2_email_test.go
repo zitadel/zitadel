@@ -439,7 +439,7 @@ func TestCommands_ResendUserEmailCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -556,7 +556,7 @@ func TestCommands_SendUserEmailCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -647,7 +647,7 @@ func TestCommands_ResendUserEmailCodeURLTemplate(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -778,7 +778,7 @@ func TestCommands_SendUserEmailCodeURLTemplate(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -858,7 +858,7 @@ func TestCommands_ResendUserEmailReturnCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -975,7 +975,7 @@ func TestCommands_SendUserEmailReturnCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -1312,7 +1312,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 							&user.NewAggregate("user1", "org1").Aggregate,
 							"email-changed@test.ch",
 						),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -1370,7 +1370,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 							&user.NewAggregate("user1", "org1").Aggregate,
 							"email-changed@test.ch",
 						),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -1428,7 +1428,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 							&user.NewAggregate("user1", "org1").Aggregate,
 							"email-changed@test.ch",
 						),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -1525,7 +1525,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -1570,7 +1570,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 						),
 					),
 					expectPush(
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -1622,7 +1622,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -1636,7 +1636,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 						),
 					),
 					expectPush(
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -1721,7 +1721,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 						),
 					),
 					expectPush(
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -1775,7 +1775,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 						),
 					),
 					expectPush(
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -1924,7 +1924,7 @@ func TestCommands_VerifyUserEmail(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -2039,7 +2039,7 @@ func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -2086,7 +2086,7 @@ func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
 							),
 						),
 						eventFromEventPusherWithCreationDateNow(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,

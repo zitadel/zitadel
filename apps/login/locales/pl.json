@@ -257,7 +257,23 @@
       "title": "Uwierzytelnij się za pomocą klucza dostępu",
       "description": "Twoje urządzenie poprosi o użycie odcisku palca, rozpoznawania twarzy lub blokady ekranu.",
       "usePassword": "Użyj hasła",
-      "submit": "Kontynuuj"
+      "submit": "Kontynuuj",
+      "errors": {
+        "couldNotRequestChallenge": "Nie można zażądać wyzwania klucza dostępu",
+        "couldNotVerifyPasskey": "Nie można zweryfikować klucza dostępu",
+        "noResponseReceived": "Weryfikacja klucza dostępu nie powiodła się - nie otrzymano odpowiedzi",
+        "noRedirectProvided": "Weryfikacja klucza dostępu zakończona, ale nie podano przekierowania",
+        "couldNotRetrievePasskey": "Wystąpił błąd podczas pobierania klucza dostępu",
+        "verificationCancelled": "Weryfikacja klucza dostępu została anulowana",
+        "verificationFailed": "Wystąpił błąd podczas weryfikacji klucza dostępu",
+        "couldNotFindSession": "Nie można znaleźć sesji",
+        "couldNotUpdateSession": "Nie można zaktualizować sesji",
+        "userNotFound": "Użytkownik nie znaleziony w systemie",
+        "couldNotDetermineRedirect": "Nie można określić adresu URL przekierowania po weryfikacji klucza dostępu",
+        "couldNotSetSession": "Nie można ustawić sesji",
+        "couldNotGetUser": "Nie można pobrać danych użytkownika",
+        "couldNotRetrieveSessionCookie": "Nie można pobrać pliku cookie sesji"
+      }
     },
     "set": {
       "title": "Skonfiguruj klucz dostępu",
@@ -430,6 +446,7 @@
     "unknownContext": "Nie udało się pobrać kontekstu użytkownika. Upewnij się, że najpierw wprowadziłeś nazwę użytkownika lub podałeś login jako parametr wyszukiwania.",
     "sessionExpired": "Twoja sesja wygasła. Zaloguj się ponownie.",
     "failedLoading": "Nie udało się załadować danych. Spróbuj ponownie.",
-    "tryagain": "Spróbuj ponownie"
+    "tryagain": "Spróbuj ponownie",
+    "couldNotContinueSession": "Nie można kontynuować sesji - brakujące informacje o użytkowniku"
   }
 }
