@@ -15,7 +15,9 @@
     },
     "projectsRelationship": "fixed",
     "projects": [
-      "@zitadel/api"
+      "@zitadel/api",
+      "@zitadel/login",
+      "@zitadel/zitadel"
     ],
     "changelog": {
       "workspaceChangelog": {
