@@ -2,9 +2,6 @@
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "name": "@zitadel/api",
     "projectType": "application",
-    "release": {
-        "docker": true
-    },
     "namedInputs": {
         "sources": [
             "{workspaceRoot}/cmd/**/*.go",
@@ -26,6 +23,12 @@
         ]
     },
     "targets": {
+        "nx-release-publish": {
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "VERSION={workspaceVersion} pnpm nx run-many -project @zitadel/api -targets pack-linux-* pack-darwin-* pack-windows-*"
+            }
+        },
         "prod": {
             "description": "Runs the Go-based API backend in production mode",
             "continuous": true,

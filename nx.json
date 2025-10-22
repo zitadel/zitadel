@@ -15,10 +15,7 @@
     },
     "projectsRelationship": "fixed",
     "projects": [
-          "@zitadel/api",
-          "@zitadel/login",
-          "@zitadel/client",
-          "@zitadel/proto"
+      "@zitadel/api"
     ],
     "changelog": {
       "workspaceChangelog": {
@@ -27,22 +24,6 @@
       }
     }
   },
-  "plugins": [
-    {
-      "plugin": "@nx/js/typescript",
-      "options": {
-        "typecheck": {
-          "targetName": "typecheck"
-        },
-        "build": {
-          "targetName": "build",
-          "configName": "tsconfig.lib.json",
-          "buildDepsName": "build-deps",
-          "watchDepsName": "watch-deps"
-        }
-      }
-    }
-  ],
   "targetDefaults": {
     "generate": {
       "cache": true,
@@ -84,5 +65,21 @@
       ],
       "cache": true
     }
-  }
+  },
+  "plugins": [
+    {
+      "plugin": "@nx/js/typescript",
+      "options": {
+        "typecheck": {
+          "targetName": "typecheck"
+        },
+        "build": {
+          "targetName": "build",
+          "configName": "tsconfig.lib.json",
+          "buildDepsName": "build-deps",
+          "watchDepsName": "watch-deps"
+        }
+      }
+    }
+  ]
 }
