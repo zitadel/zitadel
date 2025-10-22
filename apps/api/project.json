@@ -29,7 +29,7 @@
                 "env": {
                     "VERSION": "{workspaceVersion}"
                 },
-                "command": "echo ${VERSION} && pnpm nx run-many -project @zitadel/api -targets pack-linux-* pack-darwin-* pack-windows-*"
+                "command": "echo ${VERSION} && pnpm nx run-many --projects @zitadel/api --targets pack-linux-amd64 pack-darwin-amd64 pack-windows-amd64"
             }
         },
         "prod": {
