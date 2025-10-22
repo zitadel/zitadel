@@ -46,7 +46,8 @@ func Invoke(ctx context.Context, executor Executor, opts ...InvokeOpt) error {
 				),
 			),
 		),
-		DB: pool,
+		DB:          pool,
+		Permissions: &noopPermissionChecker{},
 	}
 	for _, opt := range opts {
 		opt(invokeOpts)
