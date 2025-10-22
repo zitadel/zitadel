@@ -484,7 +484,6 @@ func Test_GroupUsersToPb(t *testing.T) {
 				{
 					GroupID:            "group1",
 					ResourceOwner:      "org1",
-					InstanceID:         "instance1",
 					CreationDate:       timeNow,
 					Sequence:           1,
 					UserID:             "user1",
@@ -495,7 +494,6 @@ func Test_GroupUsersToPb(t *testing.T) {
 				{
 					GroupID:            "group1",
 					ResourceOwner:      "org1",
-					InstanceID:         "instance1",
 					CreationDate:       timeNow,
 					Sequence:           1,
 					UserID:             "user2",
@@ -506,7 +504,6 @@ func Test_GroupUsersToPb(t *testing.T) {
 				{
 					GroupID:            "group2",
 					ResourceOwner:      "org1",
-					InstanceID:         "instance1",
 					CreationDate:       timeNow,
 					Sequence:           1,
 					UserID:             "user1",
@@ -519,7 +516,6 @@ func Test_GroupUsersToPb(t *testing.T) {
 				{
 					GroupId:        "group1",
 					OrganizationId: "org1",
-					InstanceId:     "instance1",
 					User: &authorization.User{
 						Id:                 "user1",
 						DisplayName:        "user1",
@@ -532,7 +528,6 @@ func Test_GroupUsersToPb(t *testing.T) {
 				{
 					GroupId:        "group1",
 					OrganizationId: "org1",
-					InstanceId:     "instance1",
 					User: &authorization.User{
 						Id:                 "user2",
 						DisplayName:        "user2",
@@ -545,7 +540,6 @@ func Test_GroupUsersToPb(t *testing.T) {
 				{
 					GroupId:        "group2",
 					OrganizationId: "org1",
-					InstanceId:     "instance1",
 					User: &authorization.User{
 						Id:                 "user1",
 						DisplayName:        "user1",

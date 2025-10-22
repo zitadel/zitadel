@@ -19,7 +19,6 @@ var (
 			", projections.users14_humans.display_name" +
 			", projections.login_names3.login_name" +
 			", projections.group_users1.resource_owner" +
-			", projections.group_users1.instance_id" +
 			", projections.users14_humans.avatar_key" +
 			", projections.group_users1.creation_date" +
 			", projections.group_users1.sequence" +
@@ -35,7 +34,6 @@ var (
 		"display_name",
 		"login_name",
 		"resource_owner",
-		"instance_id",
 		"avatar_key",
 		"creation_date",
 		"sequence",
@@ -81,7 +79,6 @@ func Test_GroupUsersPrepares(t *testing.T) {
 							"display-name",
 							"login-name",
 							"resource-owner",
-							"instance-id",
 							"avatar-key",
 							testNow,
 							1,
@@ -98,7 +95,6 @@ func Test_GroupUsersPrepares(t *testing.T) {
 						GroupID:            "group-id",
 						UserID:             "user-id",
 						ResourceOwner:      "resource-owner",
-						InstanceID:         "instance-id",
 						CreationDate:       testNow,
 						Sequence:           1,
 						PreferredLoginName: "login-name",
@@ -122,7 +118,6 @@ func Test_GroupUsersPrepares(t *testing.T) {
 							"display-name-1",
 							"login-name-1",
 							"resource-owner",
-							"instance-id",
 							"avatar-key",
 							testNow,
 							1,
@@ -133,7 +128,6 @@ func Test_GroupUsersPrepares(t *testing.T) {
 							"display-name-2",
 							"login-name-2",
 							"resource-owner",
-							"instance-id",
 							"avatar-key",
 							testNow,
 							1,
@@ -150,7 +144,6 @@ func Test_GroupUsersPrepares(t *testing.T) {
 						GroupID:            "group-id-1",
 						UserID:             "user-id-1",
 						ResourceOwner:      "resource-owner",
-						InstanceID:         "instance-id",
 						CreationDate:       testNow,
 						Sequence:           1,
 						PreferredLoginName: "login-name-1",
@@ -161,7 +154,6 @@ func Test_GroupUsersPrepares(t *testing.T) {
 						GroupID:            "group-id-1",
 						UserID:             "user-id-2",
 						ResourceOwner:      "resource-owner",
-						InstanceID:         "instance-id",
 						CreationDate:       testNow,
 						Sequence:           1,
 						PreferredLoginName: "login-name-2",

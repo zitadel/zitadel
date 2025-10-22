@@ -962,7 +962,6 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					resp.GroupUsers[0] = &group_v2.GroupUser{
 						GroupId:        groupID,
 						OrganizationId: instance.DefaultOrg.GetId(),
-						InstanceId:     instance.Instance.GetId(),
 						User: &authorization.User{
 							Id:                 user0.User.GetUserId(),
 							OrganizationId:     user0.User.Details.ResourceOwner,
@@ -974,7 +973,6 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					resp.GroupUsers[1] = &group_v2.GroupUser{
 						GroupId:        groupID,
 						OrganizationId: instance.DefaultOrg.GetId(),
-						InstanceId:     instance.Instance.GetId(),
 						User: &authorization.User{
 							Id:                 user1.User.GetUserId(),
 							OrganizationId:     instance.DefaultOrg.GetId(),
@@ -1042,7 +1040,6 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					resp.GroupUsers[0] = &group_v2.GroupUser{
 						GroupId:        group1,
 						OrganizationId: orgResp.GetOrganizationId(),
-						InstanceId:     instance.Instance.GetId(),
 						User: &authorization.User{
 							Id:                 group1User0.User.GetUserId(),
 							OrganizationId:     group1User0.User.Details.ResourceOwner,
@@ -1054,7 +1051,6 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					resp.GroupUsers[1] = &group_v2.GroupUser{
 						GroupId:        group1,
 						OrganizationId: orgResp.GetOrganizationId(),
-						InstanceId:     instance.Instance.GetId(),
 						User: &authorization.User{
 							Id:                 group1User1.User.GetUserId(),
 							OrganizationId:     group1User1.User.Details.ResourceOwner,
@@ -1066,7 +1062,6 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					resp.GroupUsers[2] = &group_v2.GroupUser{
 						GroupId:        group0,
 						OrganizationId: orgResp.GetOrganizationId(),
-						InstanceId:     instance.Instance.GetId(),
 						User: &authorization.User{
 							Id:                 group0User0.User.GetUserId(),
 							OrganizationId:     group0User0.User.Details.ResourceOwner,
@@ -1078,7 +1073,6 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					resp.GroupUsers[3] = &group_v2.GroupUser{
 						GroupId:        group0,
 						OrganizationId: orgResp.GetOrganizationId(),
-						InstanceId:     instance.Instance.GetId(),
 						User: &authorization.User{
 							Id:                 group0User1.User.GetUserId(),
 							OrganizationId:     group0User1.User.Details.ResourceOwner,
@@ -1126,7 +1120,6 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					resp.GroupUsers[0] = &group_v2.GroupUser{
 						GroupId:        group1,
 						OrganizationId: org1.GetOrganizationId(),
-						InstanceId:     instance.Instance.GetId(),
 						User: &authorization.User{
 							Id:                 group1User1.User.GetUserId(),
 							OrganizationId:     group1User1.User.Details.ResourceOwner,
@@ -1138,7 +1131,6 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					resp.GroupUsers[1] = &group_v2.GroupUser{
 						GroupId:        group0,
 						OrganizationId: org0.GetOrganizationId(),
-						InstanceId:     instance.Instance.GetId(),
 						User: &authorization.User{
 							Id:                 group0User0.User.GetUserId(),
 							OrganizationId:     group0User0.User.Details.ResourceOwner,
@@ -1293,7 +1285,6 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 					resp.GroupUsers[0] = &group_v2.GroupUser{
 						GroupId:        groupID,
 						OrganizationId: instancePermissionV2.DefaultOrg.GetId(),
-						InstanceId:     instancePermissionV2.Instance.GetId(),
 						User: &authorization.User{
 							Id:                 user0.User.GetUserId(),
 							OrganizationId:     user0.User.Details.ResourceOwner,
@@ -1305,7 +1296,6 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 					resp.GroupUsers[1] = &group_v2.GroupUser{
 						GroupId:        groupID,
 						OrganizationId: instancePermissionV2.DefaultOrg.GetId(),
-						InstanceId:     instancePermissionV2.Instance.GetId(),
 						User: &authorization.User{
 							Id:                 user1.User.GetUserId(),
 							OrganizationId:     instancePermissionV2.DefaultOrg.GetId(),
@@ -1373,7 +1363,6 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 					resp.GroupUsers[0] = &group_v2.GroupUser{
 						GroupId:        group1,
 						OrganizationId: orgResp.GetOrganizationId(),
-						InstanceId:     instancePermissionV2.Instance.GetId(),
 						User: &authorization.User{
 							Id:                 group1User0.User.GetUserId(),
 							OrganizationId:     group1User0.User.Details.ResourceOwner,
@@ -1385,7 +1374,6 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 					resp.GroupUsers[1] = &group_v2.GroupUser{
 						GroupId:        group1,
 						OrganizationId: orgResp.GetOrganizationId(),
-						InstanceId:     instancePermissionV2.Instance.GetId(),
 						User: &authorization.User{
 							Id:                 group1User1.User.GetUserId(),
 							OrganizationId:     group1User1.User.Details.ResourceOwner,
@@ -1397,7 +1385,6 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 					resp.GroupUsers[2] = &group_v2.GroupUser{
 						GroupId:        group0,
 						OrganizationId: orgResp.GetOrganizationId(),
-						InstanceId:     instancePermissionV2.Instance.GetId(),
 						User: &authorization.User{
 							Id:                 group0User0.User.GetUserId(),
 							OrganizationId:     group0User0.User.Details.ResourceOwner,
@@ -1409,7 +1396,6 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 					resp.GroupUsers[3] = &group_v2.GroupUser{
 						GroupId:        group0,
 						OrganizationId: orgResp.GetOrganizationId(),
-						InstanceId:     instancePermissionV2.Instance.GetId(),
 						User: &authorization.User{
 							Id:                 group0User1.User.GetUserId(),
 							OrganizationId:     group0User1.User.Details.ResourceOwner,
@@ -1456,7 +1442,6 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 					resp.GroupUsers[0] = &group_v2.GroupUser{
 						GroupId:        group0,
 						OrganizationId: instancePermissionV2.DefaultOrg.GetId(),
-						InstanceId:     instancePermissionV2.Instance.GetId(),
 						User: &authorization.User{
 							Id:                 group0User0.User.GetUserId(),
 							OrganizationId:     group0User0.User.Details.ResourceOwner,

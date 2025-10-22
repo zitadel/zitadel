@@ -209,7 +209,6 @@ func groupUserToPb(gu *query.GroupUser) *group_v2.GroupUser {
 	return &group_v2.GroupUser{
 		GroupId:        gu.GroupID,
 		OrganizationId: gu.ResourceOwner,
-		InstanceId:     gu.InstanceID,
 		User: &authorization_v2beta.User{
 			Id:                 gu.UserID,
 			PreferredLoginName: gu.PreferredLoginName,

@@ -54,7 +54,6 @@ type GroupUsers struct {
 type GroupUser struct {
 	GroupID       string
 	ResourceOwner string
-	InstanceID    string
 	CreationDate  time.Time
 	Sequence      uint64
 
@@ -136,7 +135,6 @@ func prepareGroupUsersQuery() (query sq.SelectBuilder, scan func(*sql.Rows) (*Gr
 			HumanDisplayNameCol.identifier(),
 			LoginNameNameCol.identifier(),
 			GroupUsersColumnResourceOwner.identifier(),
-			GroupUsersColumnInstanceID.identifier(),
 			HumanAvatarURLCol.identifier(),
 			GroupUsersColumnCreationDate.identifier(),
 			GroupUsersColumnSequence.identifier(),
@@ -165,7 +163,6 @@ func prepareGroupUsersQuery() (query sq.SelectBuilder, scan func(*sql.Rows) (*Gr
 					&displayName,
 					&preferredLoginName,
 					&g.ResourceOwner,
-					&g.InstanceID,
 					&avatarURL,
 					&g.CreationDate,
 					&g.Sequence,
