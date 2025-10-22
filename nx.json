@@ -12,14 +12,10 @@
   "release": {
     "version": {
       "conventionalCommits": true,
+      "currentVersionResolver": "git-tag",
       "versionActionsOptions": {
         "skipLockFileUpdate": true
-      },
-      "git": {
-        "commit": false,
-        "tag": true
-      },
-      "manifestRootsToUpdate": []
+      }
     },
     "projectsRelationship": "fixed",
     "projects": [
