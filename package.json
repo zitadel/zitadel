@@ -2,8 +2,9 @@
   "packageManager": "pnpm@10.13.1",
   "private": true,
   "name": "@zitadel/zitadel",
+  "type": "module",
   "scripts": {
-    "release": "tsx ./release.ts",
+    "release": "tsx release.ts",
     "clean:all": "pnpm run clean && rm -rf .nx node_modules"
   },
   "devDependencies": {

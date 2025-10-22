@@ -1,4 +1,6 @@
 import { releaseChangelog, releasePublish, releaseVersion } from 'nx/release';
+import { writeFileSync, mkdirSync } from 'fs';
+import { dirname } from 'path';
 import yargs from 'yargs';
 
 (async () => {
@@ -30,21 +32,30 @@ import yargs from 'yargs';
     verbose: options.verbose,
   });
 
+  // If no version change is needed, exit early
+  if (!workspaceVersion) {
+    console.log('\nNo version changes detected. Skipping changelog and publish steps.\n');
+    process.exit(0);
+  }
+  
+  // Write the version to a file so the nx-release-publish targets can read it
+  const versionFilePath = "./.artifacts/next-version.txt";
+  mkdirSync(dirname(versionFilePath), { recursive: true });
+  writeFileSync(versionFilePath, workspaceVersion, 'utf-8');
+  console.log(`\nWrote version ${workspaceVersion} to ${versionFilePath}\n`);
+
   await releaseChangelog({
     versionData: projectsVersionData,
     version: workspaceVersion,
     dryRun: options.dryRun,
     verbose: options.verbose,
+    gitCommit: false,
   });
 
   // publishResults contains a map of project names and their exit codes
   const publishResults = await releasePublish({
     dryRun: options.dryRun,
     verbose: options.verbose,
-    // You can optionally pass through the version data (e.g. if you are using a custom publish executor that needs to be aware of versions)
-    // It will then be provided to the publish executor options as `nxReleaseVersionData`
-    // This is not required for the default @nx/js publish executor
-    versionData: projectsVersionData,
   });
 
   process.exit(

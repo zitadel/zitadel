@@ -15,6 +15,12 @@
         "@zitadel/console:clean"
       ]
     },
+    "nx-release-publish": {
+      "dependsOn": [
+        "pack"
+      ],
+      "command": "bash -c 'gh release upload $(cat ./artifacts/next-version.txt) ./.artifacts/pack/*'"
+    },
     "pack": {
         "description": "Creates package archives for the API across all platforms and for the Login component, then generates a checksums.txt file containing the SHA256 checksums for all created archives.",
         "dependsOn": [
