@@ -3,7 +3,7 @@
     "name": "@zitadel/api",
     "projectType": "application",
     "release": {
-        "version": {}
+        "docker": true
     },
     "namedInputs": {
         "sources": [
