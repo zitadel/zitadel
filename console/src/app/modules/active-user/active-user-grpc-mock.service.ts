@@ -9,7 +9,7 @@ import {
 } from '@zitadel/proto/zitadel/analytics/v2beta/active_user_service_pb';
 import { create, MessageInitShape } from '@bufbuild/protobuf';
 import { dateToTimestamp, PrecisionType } from './active-user.service';
-import { TimestampToDatePipe } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date.pipe';
+import { TimestampToDatePipe } from '@/pipes/timestamp-to-date-pipe/timestamp-to-date.pipe';
 import { TimestampSchema, Timestamp } from '@bufbuild/protobuf/wkt';
 
 export class ActiveUserGrpcMockService implements Client<typeof ActiveUserServiceGrpc> {

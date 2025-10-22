@@ -1,7 +1,8 @@
 import { ActiveUserGrpcMockService } from './active-user-grpc-mock.service';
 import { dateToTimestamp } from './active-user.service';
 import moment from 'moment';
-import { TimestampToDatePipe } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date.pipe';
+import { TimestampToDatePipe } from '@/pipes/timestamp-to-date-pipe/timestamp-to-date.pipe';
+import {expect} from "vitest";
 
 describe('ActiveUserGrpcMockService', () => {
   let service: ActiveUserGrpcMockService;
@@ -21,13 +22,13 @@ describe('ActiveUserGrpcMockService', () => {
       endingDateInclusive: dateToTimestamp(new Date('2023-01-10')),
     });
 
-    await expect(entries.length).toBe(10);
+    expect(entries.length).toBe(10);
     for (let i = 1; i < entries.length; i++) {
       const previousEntry = timestampToDate.transform(entries[i - 1].date!);
       const entry = timestampToDate.transform(entries[i].date!);
 
       const diff = moment(entry).diff(moment(previousEntry), 'days');
-      await expect(diff).toBe(1);
+      expect(diff).toBe(1);
     }
   });
 
@@ -41,27 +42,27 @@ describe('ActiveUserGrpcMockService', () => {
       endingDateInclusive: dateToTimestamp(new Date('2023-10-01')),
     });
 
-    await expect(entries.length).toBe(10);
+    expect(entries.length).toBe(10);
     for (let i = 1; i < entries.length; i++) {
       const previousEntry = timestampToDate.transform(entries[i - 1].date!);
       const entry = timestampToDate.transform(entries[i].date!);
 
       const diff = moment(entry).diff(moment(previousEntry), 'months');
-      await expect(diff).toBe(1);
+      expect(diff).toBe(1);
     }
   });
 
   it('#listActiveUsers should throw error on invalid request', async () => {
-    await expectAsync(service.listActiveUsers({})).toBeRejectedWith(new Error('Invalid request'));
-    await expectAsync(
+    await expect(service.listActiveUsers({})).rejects.toThrowError(new Error('Invalid request'));
+    await expect(
       service.listActiveUsers({
         precision: {
           case: 'dailyPrecision',
           value: {},
         },
       }),
-    ).toBeRejectedWith(new Error('Invalid request'));
-    await expectAsync(
+    ).rejects.toThrowError(new Error('Invalid request'));
+    await expect(
       service.listActiveUsers({
         precision: {
           case: 'dailyPrecision',
@@ -71,8 +72,8 @@ describe('ActiveUserGrpcMockService', () => {
           seconds: BigInt(9),
         },
       }),
-    ).toBeRejectedWith(new Error('Invalid request'));
-    await expectAsync(
+    ).rejects.toThrowError(new Error('Invalid request'));
+    await expect(
       service.listActiveUsers({
         precision: {
           case: 'dailyPrecision',
@@ -82,6 +83,6 @@ describe('ActiveUserGrpcMockService', () => {
           seconds: BigInt(9),
         },
       }),
-    ).toBeRejectedWith(new Error('Invalid request'));
+    ).rejects.toThrowError(new Error('Invalid request'));
   });
 });

@@ -11,9 +11,10 @@
     "isolatedModules": true,
     "emitDecoratorMetadata": false,
     "module": "preserve",
-    "baseUrl": ".",
+    "baseUrl": "./",
     "paths": {
-      "src/app/*": ["src/app/*"]
+      "src/app/*": ["src/app/*"],
+      "@/*": ["src/app/*"]
     }
   },
   "angularCompilerOptions": {
