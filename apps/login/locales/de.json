@@ -194,6 +194,23 @@
       "description": "Wir konnten den Registrierungsprozess nicht abschließen.",
       "info": "Die Organisation für die Registrierung konnte nicht ermittelt werden. Bitte wenden Sie sich an Ihren Administrator.",
       "backToLogin": "Zurück zur Anmeldung"
+    },
+    "processing": {
+      "message": "Authentifizierung wird verarbeitet...",
+      "noRedirect": "Keine Weiterleitung oder Fehler vom Server erhalten",
+      "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
+    },
+    "errors": {
+      "missingParameters": "Erforderliche Parameter fehlen",
+      "missingIdpInfo": "IDP-Informationen fehlen",
+      "idpNotFound": "Identitätsanbieter nicht gefunden",
+      "linkingNotAllowed": "Verknüpfung ist für diesen Identitätsanbieter nicht erlaubt",
+      "linkingFailed": "Verknüpfung des Identitätsanbieters zum Konto fehlgeschlagen",
+      "autoLinkingFailed": "Automatische Verknüpfung des Kontos fehlgeschlagen",
+      "userCreationFailed": "Erstellen des Benutzerkontos fehlgeschlagen",
+      "orgResolutionFailed": "Organisation für Registrierung konnte nicht ermittelt werden",
+      "sessionCreationFailed": "Sitzung konnte nicht erstellt oder Weiterleitung konnte nicht ermittelt werden",
+      "unknownError": "Ein unbekannter Fehler ist aufgetreten"
     }
   },
   "ldap": {

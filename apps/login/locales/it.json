@@ -194,6 +194,23 @@
       "description": "Non siamo riusciti a completare il processo di registrazione.",
       "info": "Impossibile determinare l'organizzazione per la registrazione. Contatta il tuo amministratore per assistenza.",
       "backToLogin": "Torna al login"
+    },
+    "processing": {
+      "message": "Elaborazione autenticazione in corso...",
+      "noRedirect": "Nessun reindirizzamento o errore ricevuto dal server",
+      "unexpectedError": "Si è verificato un errore imprevisto"
+    },
+    "errors": {
+      "missingParameters": "Parametri richiesti mancanti",
+      "missingIdpInfo": "Informazioni IDP mancanti",
+      "idpNotFound": "Provider di identità non trovato",
+      "linkingNotAllowed": "Il collegamento non è consentito per questo provider di identità",
+      "linkingFailed": "Collegamento del provider di identità all'account non riuscito",
+      "autoLinkingFailed": "Collegamento automatico dell'account non riuscito",
+      "userCreationFailed": "Creazione dell'account utente non riuscita",
+      "orgResolutionFailed": "Impossibile determinare l'organizzazione per la registrazione",
+      "sessionCreationFailed": "Impossibile creare la sessione o determinare il reindirizzamento",
+      "unknownError": "Si è verificato un errore sconosciuto"
     }
   },
   "ldap": {

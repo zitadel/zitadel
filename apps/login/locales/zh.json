@@ -194,6 +194,23 @@
       "description": "我们无法完成注册过程。",
       "info": "无法确定注册的组织。请联系您的管理员寻求帮助。",
       "backToLogin": "返回登录"
+    },
+    "processing": {
+      "message": "正在处理身份验证...",
+      "noRedirect": "未从服务器收到重定向或错误",
+      "unexpectedError": "发生意外错误"
+    },
+    "errors": {
+      "missingParameters": "缺少必需参数",
+      "missingIdpInfo": "缺少身份提供商信息",
+      "idpNotFound": "未找到身份提供商",
+      "linkingNotAllowed": "此身份提供商不允许关联",
+      "linkingFailed": "无法将身份提供商关联到账户",
+      "autoLinkingFailed": "无法自动关联账户",
+      "userCreationFailed": "无法创建用户账户",
+      "orgResolutionFailed": "无法确定注册的组织",
+      "sessionCreationFailed": "无法创建会话或确定重定向",
+      "unknownError": "发生未知错误"
     }
   },
   "ldap": {
