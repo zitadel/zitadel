@@ -44,6 +44,7 @@ var (
 )
 
 func Test_GroupUsersPrepares(t *testing.T) {
+	t.Parallel()
 	type want struct {
 		sqlExpectations sqlExpectation
 		err             checkErr
@@ -190,6 +191,7 @@ func Test_GroupUsersPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}

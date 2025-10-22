@@ -42,7 +42,7 @@ func (*groupUsersProjection) Init() *old_handler.Check {
 			handler.NewColumn(GroupUsersColumnSequence, handler.ColumnTypeInt64),
 			handler.NewColumn(GroupUsersColumnCreationDate, handler.ColumnTypeTimestamp),
 		},
-			handler.NewPrimaryKey(GroupColumnInstanceID, GroupUsersColumnGroupID, GroupUsersColumnUserID),
+			handler.NewPrimaryKey(GroupUsersColumnInstanceID, GroupUsersColumnGroupID, GroupUsersColumnUserID),
 			handler.WithIndex(handler.NewIndex("user_id", []string{GroupUsersColumnUserID})),
 			handler.WithIndex(handler.NewIndex("group_id", []string{GroupUsersColumnGroupID})),
 		),

@@ -3,7 +3,6 @@ package query
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"slices"
 	"time"
 
@@ -115,7 +114,6 @@ func (q *Queries) searchGroupUsers(ctx context.Context, queries *GroupUsersSearc
 		},
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
-	fmt.Println(stmt, args)
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-TTlfF6", "Errors.Query.InvalidRequest")
 	}
