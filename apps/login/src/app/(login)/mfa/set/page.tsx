@@ -114,7 +114,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="set.title" namespace="mfa" />
         </h1>
@@ -131,38 +131,42 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             searchParams={searchParams}
           ></UserAvatar>
         )}
+      </div>
 
-        {!(loginName || sessionId) && (
-          <Alert>
-            <Translated i18nKey="unknownContext" namespace="error" />
-          </Alert>
-        )}
+      <div className="w-full">
+        <div className="flex flex-col space-y-4">
+          {!(loginName || sessionId) && (
+            <Alert>
+              <Translated i18nKey="unknownContext" namespace="error" />
+            </Alert>
+          )}
 
-        {!valid && (
-          <Alert>
-            <Translated i18nKey="sessionExpired" namespace="error" />
-          </Alert>
-        )}
+          {!valid && (
+            <Alert>
+              <Translated i18nKey="sessionExpired" namespace="error" />
+            </Alert>
+          )}
 
-        {valid && loginSettings && sessionWithData && sessionWithData.factors?.user?.id && (
-          <ChooseSecondFactorToSetup
-            userId={sessionWithData.factors?.user?.id}
-            loginName={loginName}
-            sessionId={sessionWithData.id}
-            requestId={requestId}
-            organization={organization}
-            loginSettings={loginSettings}
-            userMethods={sessionWithData.authMethods ?? []}
-            phoneVerified={sessionWithData.phoneVerified ?? false}
-            emailVerified={sessionWithData.emailVerified ?? false}
-            checkAfter={checkAfter === "true"}
-            force={force === "true"}
-          ></ChooseSecondFactorToSetup>
-        )}
+          {valid && loginSettings && sessionWithData && sessionWithData.factors?.user?.id && (
+            <ChooseSecondFactorToSetup
+              userId={sessionWithData.factors?.user?.id}
+              loginName={loginName}
+              sessionId={sessionWithData.id}
+              requestId={requestId}
+              organization={organization}
+              loginSettings={loginSettings}
+              userMethods={sessionWithData.authMethods ?? []}
+              phoneVerified={sessionWithData.phoneVerified ?? false}
+              emailVerified={sessionWithData.emailVerified ?? false}
+              checkAfter={checkAfter === "true"}
+              force={force === "true"}
+            ></ChooseSecondFactorToSetup>
+          )}
 
-        <div className="mt-8 flex w-full flex-row items-center">
-          <BackButton />
-          <span className="flex-grow"></span>
+          <div className="mt-8 flex w-full flex-row items-center">
+            <BackButton />
+            <span className="flex-grow"></span>
+          </div>
         </div>
       </div>
     </DynamicTheme>

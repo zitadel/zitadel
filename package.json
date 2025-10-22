@@ -1,19 +1,15 @@
 {
   "packageManager": "pnpm@10.13.1",
   "private": true,
-  "name": "zitadel-monorepo",
+  "name": "@zitadel/zitadel",
   "scripts": {
-    "generate": "turbo run generate",
     "changeset": "changeset",
-    "devcontainer:lint-unit": "FAIL_COMMANDS_ON_ERRORS=true devcontainer up --prebuild --config .devcontainer/turbo-lint-unit/devcontainer.json --workspace-folder .",
-    "devcontainer:integration:login": "FAIL_COMMANDS_ON_ERRORS=true devcontainer up --prebuild --config .devcontainer/login-integration/devcontainer.json --workspace-folder .",
-    "clean": "turbo run clean",
-    "clean:all": "pnpm run clean && rm -rf .turbo node_modules"
+    "clean:all": "pnpm run clean && rm -rf .nx node_modules"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.5",
-    "@devcontainers/cli": "^0.80.0",
+    "nx": "21.6.1",
     "sass": "^1.64.1",
-    "turbo": "2.5.5"
+    "wait-on": "^9.0.1"
   }
 }

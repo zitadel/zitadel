@@ -29,6 +29,7 @@ import { ProviderNextService } from '../provider-next/provider-next.service';
 @Component({
   selector: 'cnsl-provider-jwt',
   templateUrl: './provider-jwt.component.html',
+  standalone: false,
 })
 export class ProviderJWTComponent {
   public showOptional: boolean = false;

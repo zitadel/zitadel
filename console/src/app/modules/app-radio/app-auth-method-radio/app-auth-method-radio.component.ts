@@ -25,6 +25,7 @@ export interface RadioItemAuthType {
   selector: 'cnsl-auth-method-radio',
   templateUrl: './app-auth-method-radio.component.html',
   styleUrls: ['./app-auth-method-radio.component.scss'],
+  standalone: false,
 })
 export class AppAuthMethodRadioComponent {
   @Input() current: string = '';

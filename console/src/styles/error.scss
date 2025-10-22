@@ -1,7 +1,9 @@
+@use 'sass:map';
+
 @mixin cnsl-error-theme($theme) {
-  $warn: map-get($theme, warn);
-  $warn-color: map-get($warn, 500);
-  $is-dark-theme: map-get($theme, is-dark);
+  $warn: map.get($theme, warn);
+  $warn-color: map.get($warn, 500);
+  $is-dark-theme: map.get($theme, is-dark);
 
   .cnsl-error {
     display: block;
