@@ -171,18 +171,18 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 				// 	Event:  user.HumanPasswordChangedType,
 				// 	Reduce: p.reduceHumanPasswordChanged,
 				// },
-				// 		{
-				// 			Event:  user.MachineSecretSetType,
-				// 			Reduce: p.reduceMachineSecretSet,
-				// 		},
-				// 		{
-				// 			Event:  user.MachineSecretHashUpdatedType,
-				// 			Reduce: p.reduceMachineSecretHashUpdated,
-				// 		},
-				// 		{
-				// 			Event:  user.MachineSecretRemovedType,
-				// 			Reduce: p.reduceMachineSecretRemoved,
-				// 		},
+				{
+					Event:  user.MachineSecretSetType,
+					Reduce: p.reduceMachineSecretSet,
+				},
+				{
+					Event:  user.MachineSecretHashUpdatedType,
+					Reduce: p.reduceMachineSecretHashUpdated,
+				},
+				{
+					Event:  user.MachineSecretRemovedType,
+					Reduce: p.reduceMachineSecretRemoved,
+				},
 				// 		{
 				// 			Event:  user.UserV1MFAOTPVerifiedType,
 				// 			Reduce: p.reduceUnsetMFAInitSkipped,
@@ -988,96 +988,71 @@ func (p *userRelationalProjection) reduceHumanAvatarRemoved(event eventstore.Eve
 // 	// ), nil
 // }
 
-// func (p *userRelationalProjection) reduceMachineSecretSet(event eventstore.Event) (*handler.Statement, error) {
-// 	e, ok := event.(*user.MachineSecretSetEvent)
-// 	if !ok {
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x0p1n1i", "reduce.wrong.event.type %s", user.MachineSecretSetType)
-// 	}
-// 	return handler.NewMultiStatement(
-// 		e,
-// 		handler.AddUpdateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(UserChangeDateCol, e.CreationDate()),
-// 				handler.NewCol(UserSequenceCol, e.Sequence()),
-// 			},
-// 			[]handler.Condition{
-// 				handler.NewCond(UserIDCol, e.Aggregate().ID),
-// 				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
-// 			},
-// 		),
-// 		handler.AddUpdateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(MachineSecretCol, crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)),
-// 			},
-// 			[]handler.Condition{
-// 				handler.NewCond(MachineUserIDCol, e.Aggregate().ID),
-// 				handler.NewCond(MachineUserInstanceIDCol, e.Aggregate().InstanceID),
-// 			},
-// 			handler.WithTableSuffix(UserMachineSuffix),
-// 		),
-// 	), nil
-// }
+func (p *userRelationalProjection) reduceMachineSecretSet(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.MachineSecretSetEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x0p1n1i", "reduce.wrong.event.type %s", user.MachineSecretSetType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.UserRepository().Machine()
 
-// func (p *userRelationalProjection) reduceMachineSecretHashUpdated(event eventstore.Event) (*handler.Statement, error) {
-// 	e, ok := event.(*user.MachineSecretHashUpdatedEvent)
-// 	if !ok {
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Wieng4u", "reduce.wrong.event.type %s", user.MachineSecretHashUpdatedType)
-// 	}
-// 	return handler.NewMultiStatement(
-// 		e,
-// 		handler.AddUpdateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(UserChangeDateCol, e.CreationDate()),
-// 				handler.NewCol(UserSequenceCol, e.Sequence()),
-// 			},
-// 			[]handler.Condition{
-// 				handler.NewCond(UserIDCol, e.Aggregate().ID),
-// 				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
-// 			},
-// 		),
-// 		handler.AddUpdateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(MachineSecretCol, e.HashedSecret),
-// 			},
-// 			[]handler.Condition{
-// 				handler.NewCond(MachineUserIDCol, e.Aggregate().ID),
-// 				handler.NewCond(MachineUserInstanceIDCol, e.Aggregate().InstanceID),
-// 			},
-// 			handler.WithTableSuffix(UserMachineSuffix),
-// 		),
-// 	), nil
-// }
+		secret := crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)
 
-// func (p *userRelationalProjection) reduceMachineSecretRemoved(event eventstore.Event) (*handler.Statement, error) {
-// 	e, ok := event.(*user.MachineSecretRemovedEvent)
-// 	if !ok {
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x0p6n1i", "reduce.wrong.event.type %s", user.MachineSecretRemovedType)
-// 	}
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.SetSecret(&secret),
+			repo.SetUpdatedAt(e.CreationDate()),
+		)
+		return err
+	}), nil
+}
 
-// 	return handler.NewMultiStatement(
-// 		e,
-// 		handler.AddUpdateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(UserChangeDateCol, e.CreationDate()),
-// 				handler.NewCol(UserSequenceCol, e.Sequence()),
-// 			},
-// 			[]handler.Condition{
-// 				handler.NewCond(UserIDCol, e.Aggregate().ID),
-// 				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
-// 			},
-// 		),
-// 		handler.AddUpdateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(MachineSecretCol, nil),
-// 			},
-// 			[]handler.Condition{
-// 				handler.NewCond(MachineUserIDCol, e.Aggregate().ID),
-// 				handler.NewCond(MachineUserInstanceIDCol, e.Aggregate().InstanceID),
-// 			},
-// 			handler.WithTableSuffix(UserMachineSuffix),
-// 		),
-// 	), nil
-// }
+func (p *userRelationalProjection) reduceMachineSecretHashUpdated(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.MachineSecretHashUpdatedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Wieng4u", "reduce.wrong.event.type %s", user.MachineSecretHashUpdatedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.UserRepository().Machine()
+
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.SetSecret(&e.HashedSecret),
+			repo.SetUpdatedAt(e.CreationDate()),
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceMachineSecretRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.MachineSecretRemovedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x0p6n1i", "reduce.wrong.event.type %s", user.MachineSecretRemovedType)
+	}
+
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.UserRepository().Machine()
+
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.SetSecret(nil),
+			repo.SetUpdatedAt(e.CreationDate()),
+		)
+		return err
+	}), nil
+}
 
 func (p *userRelationalProjection) reduceMachineAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.MachineAddedEvent)

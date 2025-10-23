@@ -42,6 +42,7 @@ type machineChanges interface {
 	SetName(name string) database.Change
 	// SetDescription sets the description, nil to clear it
 	SetDescription(description *string) database.Change
+	// SetSecret sets the secret, nil to clear it
 	SetSecret(secret *string) database.Change
 	SetAccessTokenType(accessTokenType AccessTokenType) database.Change
 }
