@@ -2,6 +2,7 @@ module.exports = {
   branches: [
     { name: "next" },
     { name: "next-rc", prerelease: "rc" },
+    { name: "release-archives-clean", prerelease: "ignore-me" },
   ],
   plugins: [
     "@semantic-release/commit-analyzer",
@@ -11,33 +12,38 @@ module.exports = {
       {
         draftRelease: true,
         successComment: false,
+        releaseBodyTemplate: "IGNORE THIS RELEASE\n\nThis is a temporary test-release that will be deleted soon.",
         assets: [
           {
-            path: ".artifacts/zitadel-linux-amd64/zitadel-linux-amd64.tar.gz",
+            path: ".artifacts/pack/zitadel-linux-amd64.tar.gz",
             label: "zitadel-linux-amd64.tar.gz",
           },
           {
-            path: ".artifacts/zitadel-linux-arm64/zitadel-linux-arm64.tar.gz",
+            path: ".artifacts/pack/zitadel-linux-arm64.tar.gz",
             label: "zitadel-linux-arm64.tar.gz",
           },
           {
-            path: ".artifacts/zitadel-windows-amd64/zitadel-windows-amd64.tar.gz",
+            path: ".artifacts/pack/zitadel-windows-amd64.tar.gz",
             label: "zitadel-windows-amd64.tar.gz",
           },
           {
-            path: ".artifacts/zitadel-windows-arm64/zitadel-windows-arm64.tar.gz",
+            path: ".artifacts/pack/zitadel-windows-arm64.tar.gz",
             label: "zitadel-windows-arm64.tar.gz",
           },
           {
-            path: ".artifacts/zitadel-darwin-amd64/zitadel-darwin-amd64.tar.gz",
+            path: ".artifacts/pack/zitadel-darwin-amd64.tar.gz",
             label: "zitadel-darwin-amd64.tar.gz",
           },
           {
-            path: ".artifacts/zitadel-darwin-arm64/zitadel-darwin-arm64.tar.gz",
+            path: ".artifacts/pack/zitadel-darwin-arm64.tar.gz",
             label: "zitadel-darwin-arm64.tar.gz",
           },
           {
-            path: ".artifacts/checksums.txt",
+            path: ".artifacts/pack/zitadel-login.tar.gz",
+            label: "zitadel-login.tar.gz",
+          },
+          {
+            path: ".artifacts/pack/checksums.txt",
             label: "checksums.txt",
           }
         ],
