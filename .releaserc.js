@@ -14,34 +14,34 @@ module.exports = {
         assets: [
           {
             path: ".artifacts/pack/zitadel-api-linux-amd64.tar.gz",
-            label: "zitadel-api-linux-amd64.tar.gz",
+            label: "zitadel-linux-amd64.tar.gz",
           },
           {
             path: ".artifacts/pack/zitadel-api-linux-arm64.tar.gz",
-            label: "zitadel-api-linux-arm64.tar.gz",
+            label: "zitadel-linux-arm64.tar.gz",
           },
           {
             path: ".artifacts/pack/zitadel-api-windows-amd64.tar.gz",
-            label: "zitadel-api-windows-amd64.tar.gz",
+            label: "zitadel-windows-amd64.tar.gz",
           },
           {
             path: ".artifacts/pack/zitadel-api-windows-arm64.tar.gz",
-            label: "zitadel-api-windows-arm64.tar.gz",
+            label: "zitadel-windows-arm64.tar.gz",
           },
           {
             path: ".artifacts/pack/zitadel-api-darwin-amd64.tar.gz",
-            label: "zitadel-api-darwin-amd64.tar.gz",
+            label: "zitadel-darwin-amd64.tar.gz",
           },
           {
             path: ".artifacts/pack/zitadel-api-darwin-arm64.tar.gz",
-            label: "zitadel-api-darwin-arm64.tar.gz",
+            label: "zitadel-darwin-arm64.tar.gz",
           },
           {
             path: ".artifacts/pack/zitadel-login.tar.gz",
             label: "zitadel-login.tar.gz",
           },
           {
-            path: ".artifacts/checksums.txt",
+            path: ".artifacts/pack/checksums.txt",
             label: "checksums.txt",
           }
         ],
