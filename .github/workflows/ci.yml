@@ -26,6 +26,7 @@ jobs:
     permissions:
       contents: read
     with:
+      go_version: "1.25"
       node_version: "22"
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -40,6 +41,7 @@ jobs:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
     if: ${{ github.event_name == 'workflow_dispatch' }}
     with:
+      go_version: "1.25"
       node_version: "22"
       semantic_version: "23.0.7"
       image_name_github_api: "ghcr.io/zitadel/zitadel"
