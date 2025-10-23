@@ -26,10 +26,10 @@ jobs:
         language: [go,javascript]
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
     - if: matrix.language == 'go'
       name: Install Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         go-version-file: go.mod
     - if: matrix.language == 'go'
@@ -42,7 +42,7 @@ jobs:
         pnpm nx run-many --nxBail --projects @zitadel/api --targets generate-stubs generate-statik generate-assets
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
+      uses: github/codeql-action/init@v4
       # Override language selection by uncommenting this and choosing your languages
       with:
         languages: ${{ matrix.language }}
@@ -60,6 +60,6 @@ jobs:
     # autobuild does not work anymore
     # and to be able to compile without an actual console build, we just need a placeholder in the console dist folder
     - name: Autobuild
-      uses: github/codeql-action/autobuild@v3
+      uses: github/codeql-action/autobuild@v4
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+      uses: github/codeql-action/analyze@v4
