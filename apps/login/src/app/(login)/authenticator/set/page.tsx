@@ -193,6 +193,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             </div>
 
             <SignInWithIdp
+              showLabel={false}
               identityProviders={identityProviders}
               requestId={requestId}
               organization={sessionWithData.factors?.user?.organizationId}
