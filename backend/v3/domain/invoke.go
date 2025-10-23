@@ -46,7 +46,8 @@ func Invoke(ctx context.Context, executor Executor, opts ...InvokeOpt) error {
 				),
 			),
 		),
-		DB:          pool,
+		DB: pool,
+		// TODO(IAM-Marco): enable permission checker as soon as its implemented. Tracked in https://github.com/zitadel/zitadel/issues/10219
 		Permissions: &noopPermissionChecker{},
 	}
 	for _, opt := range opts {

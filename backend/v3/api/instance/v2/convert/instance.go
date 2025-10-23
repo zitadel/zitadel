@@ -4,6 +4,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/cmd/build"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 )
 
@@ -28,7 +29,7 @@ func DomainInstanceModelToGRPCResponse(inst *domain.Instance) *instance.Instance
 		CreationDate: timestamppb.New(inst.CreatedAt),
 		State:        instance.State_STATE_RUNNING, // TODO(IAM-Marco): Not sure what to put here
 		Name:         inst.Name,
-		Version:      "",
+		Version:      build.Version(),
 		Domains:      domainInstanceDomainListModelToGRPCResponse(inst.Domains),
 	}
 }

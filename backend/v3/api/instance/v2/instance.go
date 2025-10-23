@@ -92,6 +92,7 @@ func ListInstances(ctx context.Context, request *connect.Request[instance.ListIn
 		Msg: &instance.ListInstancesResponse{
 			Instances: convert.DomainInstanceListModelToGRPCResponse(instances),
 			Pagination: &filter.PaginationResponse{
+				// TODO(IAM-Marco): return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10955
 				TotalResult:  uint64(len(instances)),
 				AppliedLimit: uint64(request.Msg.GetPagination().GetLimit()),
 			},
