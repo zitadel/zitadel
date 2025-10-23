@@ -24,7 +24,7 @@
     },
     "targets": {
         "prod": {
-            "description": "Runs the Go-based API backend in production mode",
+            "description": "Runs the Go-based API backend in production mode ",
             "continuous": true,
             "dependsOn": [
                 "build"
