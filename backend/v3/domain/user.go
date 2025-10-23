@@ -46,6 +46,8 @@ const (
 )
 
 type UserRepository interface {
+	Repository
+
 	userColumns
 	userConditions
 	userChanges

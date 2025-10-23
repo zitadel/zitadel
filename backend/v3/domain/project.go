@@ -30,8 +30,6 @@ type Project struct {
 }
 
 type projectColumns interface {
-	// PrimaryKeyColumns returns the columns for the primary key fields
-	PrimaryKeyColumns() []database.Column
 	// InstanceIDColumn returns the column for the instance id field
 	InstanceIDColumn() database.Column
 	// OrganizationIDColumn returns the column for the organization id field
@@ -91,7 +89,11 @@ type projectChanges interface {
 }
 
 // ProjectRepository manages projects and project roles.
+//
+//go:generate mockgen -typed -package domainmock -destination ./mock/project.mock.go . ProjectRepository
 type ProjectRepository interface {
+	Repository
+
 	projectColumns
 	projectConditions
 	projectChanges

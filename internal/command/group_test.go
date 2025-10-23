@@ -26,8 +26,9 @@ func TestCommands_CreateGroup(t *testing.T) {
 	idGeneratorErr := errors.New("id generator error")
 
 	type fields struct {
-		eventstore  func(t *testing.T) *eventstore.Eventstore
-		idGenerator id.Generator
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		idGenerator     id.Generator
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx         context.Context
@@ -51,6 +52,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 				group: &CreateGroup{
 					ObjectRoot: models.ObjectRoot{
 						ResourceOwner: "org1",
+						AggregateID:   "1234",
 					},
 					Name:        " ",
 					Description: "example group",
@@ -66,6 +68,9 @@ func TestCommands_CreateGroup(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				group: &CreateGroup{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "1234",
+					},
 					Name:        "example",
 					Description: "example group",
 				},
@@ -73,17 +78,38 @@ func TestCommands_CreateGroup(t *testing.T) {
 			wantErr: zerrors.IsErrorInvalidArgument,
 		},
 		{
-			name: "org not found, precondition error",
+			name: "missing permissions, error",
 			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(),
-				),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
 				group: &CreateGroup{
 					ObjectRoot: models.ObjectRoot{
 						ResourceOwner: "org1",
+						AggregateID:   "1234",
+					},
+					Name:        "example",
+					Description: "example group",
+				},
+			},
+			wantErr: zerrors.IsPermissionDenied,
+		},
+		{
+			name: "org not found, precondition error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx: context.Background(),
+				group: &CreateGroup{
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+						AggregateID:   "1234",
 					},
 					Name:        "example",
 					Description: "example group",
@@ -94,16 +120,8 @@ func TestCommands_CreateGroup(t *testing.T) {
 		{
 			name: "failed to generate group id, error",
 			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								"org1",
-							),
-						),
-					),
-				),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -144,6 +162,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -164,12 +183,14 @@ func TestCommands_CreateGroup(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilterError(filterErr),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
 				group: &CreateGroup{
 					ObjectRoot: models.ObjectRoot{
 						ResourceOwner: "org1",
+						AggregateID:   "1234",
 					},
 					Name:        "example",
 					Description: "example group",
@@ -193,6 +214,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 					),
 					expectFilterError(filterErr),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -233,6 +255,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -272,6 +295,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -312,6 +336,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -347,8 +372,9 @@ func TestCommands_CreateGroup(t *testing.T) {
 			}
 
 			c := &Commands{
-				eventstore:  tt.fields.eventstore(t),
-				idGenerator: tt.fields.idGenerator,
+				eventstore:      tt.fields.eventstore(t),
+				idGenerator:     tt.fields.idGenerator,
+				checkPermission: tt.fields.checkPermission,
 			}
 
 			got, err := c.CreateGroup(tt.args.ctx, tt.args.group)
@@ -370,7 +396,8 @@ func TestCommands_UpdateGroup(t *testing.T) {
 	pushErr := errors.New("push error")
 
 	type fields struct {
-		eventstore func(t *testing.T) *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx   context.Context
@@ -435,6 +462,33 @@ func TestCommands_UpdateGroup(t *testing.T) {
 			},
 		},
 		{
+			name: "missing permission, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							group.NewGroupAddedEvent(context.Background(),
+								&group.NewAggregate("1234", "org1").Aggregate,
+								"group1",
+								"group1 description",
+							),
+						),
+					)),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx: context.Background(),
+				group: &UpdateGroup{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "1234",
+					},
+					Name:        gu.Ptr("updated name"),
+					Description: gu.Ptr("updated description"),
+				},
+			},
+			wantErr: zerrors.IsPermissionDenied,
+		},
+		{
 			name: "failed to push group changed event, error",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -459,6 +513,7 @@ func TestCommands_UpdateGroup(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -485,6 +540,7 @@ func TestCommands_UpdateGroup(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -524,6 +580,7 @@ func TestCommands_UpdateGroup(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -562,6 +619,7 @@ func TestCommands_UpdateGroup(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -601,6 +659,7 @@ func TestCommands_UpdateGroup(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -623,7 +682,8 @@ func TestCommands_UpdateGroup(t *testing.T) {
 			t.Parallel()
 
 			c := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := c.UpdateGroup(tt.args.ctx, tt.args.group)
 			if tt.wantErr == nil {
@@ -644,7 +704,8 @@ func TestCommands_DeleteGroup(t *testing.T) {
 	pushErr := errors.New("push error")
 
 	type fields struct {
-		eventstore func(t *testing.T) *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx     context.Context
@@ -688,13 +749,35 @@ func TestCommands_DeleteGroup(t *testing.T) {
 			},
 		},
 		{
+			name: "missing permission, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							group.NewGroupAddedEvent(context.Background(),
+								&group.NewAggregate("1234", "org1").Aggregate,
+								"group1",
+								"group1 description",
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx:     context.Background(),
+				groupID: "1234",
+			},
+			wantErr: zerrors.IsPermissionDenied,
+		},
+		{
 			name: "failed to push group delete event, error",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							group.NewGroupAddedEvent(context.Background(),
-								&group.NewAggregate("1234", "").Aggregate,
+								&group.NewAggregate("1234", "org1").Aggregate,
 								"group1",
 								"group1 description",
 							),
@@ -703,11 +786,12 @@ func TestCommands_DeleteGroup(t *testing.T) {
 					expectPushFailed(
 						pushErr,
 						group.NewGroupRemovedEvent(context.Background(),
-							&group.NewAggregate("1234", "").Aggregate,
+							&group.NewAggregate("1234", "org1").Aggregate,
 							"group1",
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:     context.Background(),
@@ -724,7 +808,7 @@ func TestCommands_DeleteGroup(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							group.NewGroupAddedEvent(context.Background(),
-								&group.NewAggregate("1234", "").Aggregate,
+								&group.NewAggregate("1234", "org1").Aggregate,
 								"group1",
 								"group1 description",
 							),
@@ -733,19 +817,21 @@ func TestCommands_DeleteGroup(t *testing.T) {
 					expectPush(
 						eventFromEventPusher(
 							group.NewGroupRemovedEvent(context.Background(),
-								&group.NewAggregate("1234", "").Aggregate,
+								&group.NewAggregate("1234", "org1").Aggregate,
 								"group1",
 							),
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:     context.Background(),
 				groupID: "1234",
 			},
 			want: &domain.ObjectDetails{
-				ID: "1234",
+				ID:            "1234",
+				ResourceOwner: "org1",
 			},
 		},
 	}
@@ -755,7 +841,8 @@ func TestCommands_DeleteGroup(t *testing.T) {
 			t.Parallel()
 
 			c := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := c.DeleteGroup(tt.args.ctx, tt.args.groupID)
 			if tt.wantErr == nil {

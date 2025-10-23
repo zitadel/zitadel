@@ -40,6 +40,24 @@ func (u user) Create(ctx context.Context, client database.QueryExecutor, user *d
 	return database.NewCheckError(u.unqualifiedTableName(), "type", errors.New("no type specified"))
 }
 
+// Update implements [domain.UserRepository].
+func (u *user) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+	if len(changes) == 0 {
+		return 0, database.ErrNoChanges
+	}
+	if err := checkPKCondition(u, condition); err != nil {
+		return 0, err
+	}
+	if !database.Changes(changes).IsOnColumn(u.UpdatedAtColumn()) {
+		changes = append(changes, database.NewChange(u.UpdatedAtColumn(), database.NullInstruction))
+	}
+	builder := database.NewStatementBuilder(`UPDATE zitadel.users SET `)
+	database.Changes(changes).Write(builder)
+	writeCondition(builder, condition)
+
+	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
 // Delete implements [domain.UserRepository].
 func (u user) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	if err := checkPKCondition(u, condition); err != nil {
