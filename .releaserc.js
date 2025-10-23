@@ -2,7 +2,6 @@ module.exports = {
   branches: [
     { name: "next" },
     { name: "next-rc", prerelease: "rc" },
-    { name: "release-archives-clean", prerelease: "ignore-me" },
   ],
   plugins: [
     "@semantic-release/commit-analyzer",
@@ -12,7 +11,6 @@ module.exports = {
       {
         draftRelease: true,
         successComment: false,
-        releaseBodyTemplate: "IGNORE THIS RELEASE\n\nThis is a temporary test-release that will be deleted soon.",
         assets: [
           {
             path: ".artifacts/pack/zitadel-linux-amd64.tar.gz",
