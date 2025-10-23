@@ -12,6 +12,7 @@ module.exports = {
       {
         draftRelease: true,
         successComment: false,
+        releaseBodyTemplate: "IGNORE THIS RELEASE\n\nThis is a temporary test-release that will be deleted soon.",
         assets: [
           {
             path: ".artifacts/pack/zitadel-linux-amd64.tar.gz",
