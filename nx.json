@@ -12,21 +12,27 @@
   "release": {
     "version": {
       "conventionalCommits": true,
-      "currentVersionResolver": "git-tag",
-      "versionActionsOptions": {
-        "skipLockFileUpdate": true
+      "git": {
+        "commit": false,
+        "stageChanges": false,
+        "tag": false
       }
     },
-    "projectsRelationship": "fixed",
     "projects": [
       "@zitadel/api",
       "@zitadel/login",
       "@zitadel/zitadel"
     ],
+    "projectsRelationship": "fixed",
     "changelog": {
+      "git": {
+        "commit": false,
+        "stageChanges": false,
+        "tag": false
+      },
       "workspaceChangelog": {
         "createRelease": "github",
-        "file": false
+        "file": false        
       }
     }
   },

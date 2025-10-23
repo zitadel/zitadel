@@ -14,7 +14,7 @@ import yargs from 'yargs';
     .option('dryRun', {
       alias: 'd',
       description:
-        'Whether or not to perform a dry-run of the release process, defaults to true',
+        'Whether or not to perform a dry-run of the release process, defaults to false',
       type: 'boolean',
       default: false,
     })
@@ -37,6 +37,13 @@ import yargs from 'yargs';
     console.log('\nNo version changes detected. Skipping changelog and publish steps.\n');
     process.exit(0);
   }
+
+  // Restore package.json files to prevent version updates
+  if (!options.dryRun) {
+    const { execSync } = await import('child_process');
+    console.log('\nRestoring package.json files...\n');
+    execSync('git restore package.json apps/login/package.json', { stdio: 'inherit' });
+  }
   
   // Write the version to a file so the nx-release-publish targets can read it
   const versionFilePath = "./.artifacts/next-version.txt";
@@ -48,14 +55,13 @@ import yargs from 'yargs';
     versionData: projectsVersionData,
     version: workspaceVersion,
     dryRun: options.dryRun,
-    verbose: options.verbose,
-    gitCommit: false,
+    verbose: options.verbose
   });
 
   // publishResults contains a map of project names and their exit codes
   const publishResults = await releasePublish({
     dryRun: options.dryRun,
-    verbose: options.verbose,
+    verbose: options.verbose
   });
 
   process.exit(
