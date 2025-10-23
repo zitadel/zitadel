@@ -4,6 +4,8 @@ import { dirname } from 'path';
 import { execSync } from 'child_process';
 import yargs from 'yargs';
 
+const versionFilePath = "./.artifacts/next-version.txt";
+
 (async () => {
   const options = await yargs(process.argv.slice(2))
     .version(false) // don't use the default meaning of version in yargs
@@ -49,7 +51,6 @@ import yargs from 'yargs';
   
   // Write the version to a file so the nx-release-publish targets can read it
   // This is needed to compile the version into the release artifacts, like the API
-  const versionFilePath = "./.artifacts/next-version.txt";
   mkdirSync(dirname(versionFilePath), { recursive: true });
   writeFileSync(versionFilePath, workspaceVersion, 'utf-8');
   console.log(`\nWrote version ${workspaceVersion} to ${versionFilePath}\n`);
