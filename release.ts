@@ -1,6 +1,7 @@
 import { releaseChangelog, releasePublish, releaseVersion } from 'nx/release';
 import { writeFileSync, mkdirSync } from 'fs';
 import { dirname } from 'path';
+import { execSync } from 'child_process';
 import yargs from 'yargs';
 
 (async () => {
@@ -38,14 +39,16 @@ import yargs from 'yargs';
     process.exit(0);
   }
 
-  // Restore package.json files to prevent version updates
+  // Restore git tracked changes
+  // This prevents accidental commits of version changes
+  // Unfortunately, Nx can't be configured to avoid modifying files during versioning
   if (!options.dryRun) {
-    const { execSync } = await import('child_process');
-    console.log('\nRestoring package.json files...\n');
-    execSync('git restore package.json apps/login/package.json', { stdio: 'inherit' });
+    console.log('\nRestoring all git tracked changes...\n');
+    execSync('git restore .', { stdio: 'inherit' });
   }
   
   // Write the version to a file so the nx-release-publish targets can read it
+  // This is needed to compile the version into the release artifacts, like the API
   const versionFilePath = "./.artifacts/next-version.txt";
   mkdirSync(dirname(versionFilePath), { recursive: true });
   writeFileSync(versionFilePath, workspaceVersion, 'utf-8');
