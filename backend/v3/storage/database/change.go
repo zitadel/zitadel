@@ -36,6 +36,10 @@ func NewChangePtr[V Value](col Column, value *V) Change {
 	return NewChange(col, *value)
 }
 
+func NewChangeToNull(col Column) Change {
+	return NewChange(col, NullInstruction)
+}
+
 // Write implements [Change].
 func (c change[V]) Write(builder *StatementBuilder) {
 	c.column.WriteUnqualified(builder)

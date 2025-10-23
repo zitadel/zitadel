@@ -18,7 +18,7 @@ const (
 	UserStateSuspended
 )
 
-// User represents a user in the system.
+// User represents a the polymorphic user in the system.
 // It can be a human user or a machine user.
 // Meaning that either Human or Machine is set, the other is nil.
 type User struct {
@@ -29,23 +29,42 @@ type User struct {
 	IsUsernameOrgUnique bool      `json:"usernameOrgUnique,omitempty" db:"username_org_unique"`
 	State               UserState `json:"state,omitempty" db:"state"`
 
-	*Machine `db:"machine`
-	*Human   `db:"human`
+	*Machine `db:"machine"`
+	*Human   `db:"human"`
 
 	CreatedAt time.Time `json:"createdAt,omitzero" db:"created_at"`
 	UpdatedAt time.Time `json:"updatedAt,omitzero" db:"updated_at"`
 }
 
-type UserRepository interface {
-	Human() HumanRepository
-	Machine() MachineRepository
+// UserType defines the type of user
+// It is used for List and Get methods of the [UserRepository] to filter users by type.
+type UserType uint8
 
-	Get() User
-	List() []User
-	Delete() error
+const (
+	UserTypeHuman UserType = iota + 1
+	UserTypeMachine
+)
+
+type UserRepository interface {
+	userColumns
+	userConditions
+	userChanges
+
+	Human() HumanUserRepository
+	Machine() MachineUserRepository
+
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOpts) *User
+	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOpts) []*User
+	// DISCUSS(adlerhurst): Instead of having this method the Create methods could be on the sub-repositories?
+	// The sub repos should then get the CreateMachineCommand or CreateHumanCommand as parameter instead of the User.
+	// Passing the command instead of the object would generally simplify the domain logic for creation.
+	Create(ctx context.Context, client database.QueryExecutor, user *User) error
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
+	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }
 
 type userColumns interface {
+	PrimaryKeyColumns() []database.Column
 	InstanceIDColumn() database.Column
 	OrgIDColumn() database.Column
 	IDColumn() database.Column
@@ -54,9 +73,11 @@ type userColumns interface {
 	StateColumn() database.Column
 	CreatedAtColumn() database.Column
 	UpdatedAtColumn() database.Column
+	TypeCondition(userType UserType) database.Condition
 }
 
 type userConditions interface {
+	PrimaryKeyCondition(instanceID, userID string) database.Condition
 	InstanceIDCondition(instanceID string) database.Condition
 	OrgIDCondition(orgID string) database.Condition
 	IDCondition(userID string) database.Condition
@@ -68,219 +89,8 @@ type userConditions interface {
 }
 
 type userChanges interface {
-	// SetInstanceID(instanceID string) database.Condition
-	// SetOrgID(orgID string) database.Condition
-	// SetID(userID string) database.Condition
 	SetUsername(username string) database.Change
-	SetUsernameOrgUnique(op bool) database.Change
+	SetUsernameOrgUnique(usernameOrgUnique bool) database.Change
 	SetState(state UserState) database.Change
-	// SetCreatedAt(op database.NumberOperation, createdAt time.Time) database.Condition
 	SetUpdatedAt(updatedAt time.Time) database.Change
-}
-
-//go:generate enumer -type AccessTokenType -transform lower -trimprefix AccessTokenType
-type AccessTokenType uint8
-
-const (
-	AccessTokenTypeBearer AccessTokenType = iota
-	AccessTokenTypeJWT
-)
-
-// machine user
-type Machine struct {
-	User
-	Name            string          `json:"name,omitempty" db:"name"`
-	Description     *string         `json:"description,omitempty" db:"description"`
-	Secret          *string         `json:"secret,omitempty" db:"secret"`
-	AccessTokenType AccessTokenType `json:"accessTokenType,omitempty" db:"access_token_type"`
-}
-
-type machineColumns interface {
-	userColumns
-	NameColumn() database.Column
-	DescriptionColumn() database.Column
-	SecretColumn() database.Column
-	AccessTokenTypeColumn() database.Column
-}
-
-type machineConditions interface {
-	userConditions
-	NameCondition(op database.TextOperation, name string) database.Condition
-	DescriptionCondition(op database.TextOperation, description string) database.Condition
-	AccessTokenTypeCondition(accessTokenType AccessTokenType) database.Condition
-}
-
-type machineChanges interface {
-	userChanges
-	SetName(name string) database.Change
-	SetDescription(description string) database.Change
-	SetSecret(secret *string) database.Change
-	SetAccessTokenType(accessTokenType AccessTokenType) database.Change
-}
-
-type MachineRepository interface {
-	machineColumns
-	machineConditions
-	machineChanges
-
-	Create(ctx context.Context, client database.QueryExecutor, user *Machine) error
-	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
-}
-
-// human user
-type Human struct {
-	User
-	HumanEmailContact HumanContact  `db:"email"`
-	HumanPhoneContact *HumanContact `db:"phone"`
-
-	HumanSecurity
-
-	FirstName         string  `json:"firstName,omitempty" db:"first_name"`
-	LastName          string  `json:"lastName,omitempty" db:"last_name"`
-	NickName          string  `json:"nickName,omitempty" db:"nick_name"`
-	DisplayName       string  `json:"displayName,omitempty" db:"display_name"`
-	PreferredLanguage string  `json:"preferredLanguage,omitempty" db:"preferred_language"`
-	Gender            uint8   `json:"gender,omitempty" db:"gender"`
-	AvatarKey         *string `json:"avatarKey,omitempty" db:"avatar_key"`
-	Avatar            []byte  `json:"avatar,omitempty" db:"avatar"`
-}
-
-type humanColumns interface {
-	userColumns
-	FirstNameColumn() database.Column
-	LastNameColumn() database.Column
-	DisplayNameColumn() database.Column
-	PreferredLanguageColumn() database.Column
-	GenderColumn() database.Column
-	AvatarKeyColumn() database.Column
-}
-
-type humanConditions interface {
-	userConditions
-	FirstNameCondition(op database.TextOperation, name string) database.Condition
-	LastNameCondition(op database.TextOperation, name string) database.Condition
-	NickNameCondition(op database.TextOperation, name string) database.Condition
-	DisplayNameCondition(op database.TextOperation, name string) database.Condition
-	PreferredLanguageCondition(language string) database.Condition
-	GenderCondition(gender uint8) database.Condition
-}
-
-type humanChanges interface {
-	userChanges
-	SetFirstName(name string) database.Change
-	SetLastName(name string) database.Change
-	SetNickName(name string) database.Change
-	SetDisplayName(name string) database.Change
-	SetPreferredLanguage(language string) database.Change
-	SetGender(gender uint8) database.Change
-	SetAvatarKey(key *string) database.Change
-}
-
-type HumanRepository interface {
-	humanColumns
-	humanConditions
-	humanChanges
-
-	Create(ctx context.Context, client database.QueryExecutor, user *Human) error
-	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
-
-	Security() HumanSecurityRepository
-}
-
-//go:generate enumer -type ContactType -transform lower -trimprefix ContactType -sql
-type ContactType uint8
-
-const (
-	ContactTypeUnspecified ContactType = iota
-	ContactTypeEmail
-	ContactTypePhone
-)
-
-// human contact type
-type HumanContact struct {
-	// InstanceID      string      `json:"instanceId,omitempty" db:"instance_id"`
-	// OrgID           string      `json:"orgId,omitempty" db:"org_id"`
-	// UserId          string      `json:"userId,omitempty" db:"user_id"`
-	Type            *ContactType `json:"type,omitempty" db:"type"`
-	Value           *string      `json:"value,omitempty" db:"value"`
-	IsVerified      *bool        `json:"isVerified,omitempty" db:"is_verified"`
-	UnverifiedValue *string      `json:"unverifiedValue,omitempty" db:"unverified_value"`
-}
-
-// human security
-type HumanSecurity struct {
-	// InstanceID string `json:"instanceId,omitempty" db:"instance_id"`
-	// OrgID      string `json:"orgId,omitempty" db:"org_id"`
-	// UserId     string `json:"userId,omitempty" db:"user_id"`
-
-	PasswordChangeRequired bool       `json:"passwordChangeRequired,omitempty" db:"password_change_required"`
-	PasswordChange         *time.Time `json:"passwordChange,omitempty" db:"password_change"`
-	MFAInitSkipped         bool       `json:"mfaInitSkipped,omitempty" db:"mfa_init_skipped"`
-}
-
-type HumanSecurityRepository interface {
-	humanSecurityColumns
-	humanSecurityConditions
-	humanSecurityChanges
-
-	Create(ctx context.Context, client database.QueryExecutor, user *Human) error
-	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*HumanSecurity, error)
-	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
-}
-
-type humanSecurityColumns interface {
-	InstanceIDColumn() database.Column
-	OrgIDColumn() database.Column
-	UserIDColumn() database.Column
-	PasswordChangeRequiredColumn() database.Column
-	PasswordChangedColumn() database.Column
-	MFAInitSkippedColumn() database.Column
-}
-
-type humanSecurityConditions interface {
-	InstanceIDCondition(instanceID string) database.Condition
-	OrgIDCondition(orgID string) database.Condition
-	UserIDCondition(userID string) database.Condition
-	PassswordChangeRequiredCondition(required bool) database.Condition
-	PasswordChangeCondition(op database.NumberOperation, time time.Time) database.Condition
-	MFAInitSkippedCondition(skipped bool) database.Condition
-}
-
-type humanSecurityChanges interface {
-	// SetInstanceID(instanceID string) database.Change
-	// SetOrgID(orgID string) database.Change
-	// SetUserID(userID string) database.Change
-	SetPasswordChangeRequired(required bool) database.Change
-	SetPasswordChanged(time time.Time) database.Change
-	SetMFAInitSkipped(skipped bool) database.Change
-}
-
-type humanContactColumns interface {
-	InstanceIDColumn() database.Column
-	OrgIDColumn() database.Column
-	UserIDColumn() database.Column
-	TypeCondition() database.Column
-	CurrentValueColumn() database.Column
-	VerifiedColumn() database.Column
-	UnverifiedValueColumn() database.Column
-}
-
-type humanContactConditions interface {
-	InstanceIDCondition(instanceID string) database.Condition
-	OrgIDCondition(orgID string) database.Condition
-	UserIDCondition(userID string) database.Condition
-	TypeCondition(typ ContactType) database.Condition
-	CurrentValueCondition(value string) database.Condition
-	VerifiedCondition(verified bool) database.Condition
-	UnverifiedValueCondition(value string) database.Condition
-}
-
-type humanContactChanges interface {
-	SetInstanceID(instanceID string) database.Change
-	SetOrgID(orgID string) database.Change
-	SetUserID(userID string) database.Change
-	SetType(typ ContactType) database.Change
-	SetCurrentValue(value string) database.Change
-	SetVerified(verified bool) database.Change
-	SetUnverifiedValue(value string) database.Change
 }

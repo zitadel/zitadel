@@ -43,14 +43,23 @@ func TestChangeWrite(t *testing.T) {
 			},
 		},
 		{
+			name:   "change to NULL",
+			change: NewChangeToNull(NewColumn("table", "column")),
+			want: want{
+				stmt: "column = NULL",
+				args: nil,
+			},
+		},
+		{
 			name: "multiple changes",
 			change: NewChanges(
 				NewChange(NewColumn("table", "column1"), "value1"),
 				NewChangePtr[int](NewColumn("table", "column2"), nil),
 				NewChange(NewColumn("table", "column3"), 123),
+				NewChangeToNull(NewColumn("table", "column4")),
 			),
 			want: want{
-				stmt: "column1 = $1, column2 = NULL, column3 = $2",
+				stmt: "column1 = $1, column2 = NULL, column3 = $2, column4 = NULL",
 				args: []any{"value1", 123},
 			},
 		},
