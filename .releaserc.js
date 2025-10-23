@@ -2,6 +2,7 @@ module.exports = {
   branches: [
     { name: "next" },
     { name: "next-rc", prerelease: "rc" },
+    { name: "release-archives-clean", prerelease: "ignore-me" },
   ],
   plugins: [
     "@semantic-release/commit-analyzer",
