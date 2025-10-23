@@ -22,7 +22,19 @@
             "runtime"
         ]
     },
+    "release": {
+        "docker": {
+            "repositoryName": "eliobischof/api"
+        }
+    },
     "targets": {
+        "nx-release-publish": {
+            "description": "Publishes the packaged binaries to a GitHub release",
+            "dependsOn": [
+                "pack-*-*"
+            ],
+            "command": "bash -c \"gh release upload v$(cat ./.artifacts/next-version.txt) ./.artifacts/pack/zitadel-*-*.tar.gz\""
+        },
         "prod": {
             "description": "Runs the Go-based API backend in production mode ",
             "continuous": true,
@@ -459,13 +471,6 @@
                 "{workspaceRoot}/.artifacts/pack/zitadel-windows-arm64.tar.gz",
                 "{workspaceRoot}/.artifacts/bin/windows/arm64/zitadel.exe"
             ]
-        },
-        "nx-release-publish": {
-            "description": "Publishes the packaged binaries to a GitHub release",
-            "dependsOn": [
-                "pack-*-*"
-            ],
-            "command": "bash -c \"gh release upload v$(cat ./.artifacts/next-version.txt) ./.artifacts/pack/zitadel-*-*.tar.gz\""
         }
     }
 }

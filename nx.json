@@ -18,6 +18,9 @@
         "tag": false
       }
     },
+    "docker": {
+      "registryUrl": "ghcr.io"
+    },
     "projects": [
       "@zitadel/api",
       "@zitadel/login",
