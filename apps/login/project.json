@@ -153,13 +153,14 @@
       ]
     },
     "nx-release-publish": {
-        "dependsOn": [
-            "pack"
-        ],
-        "options": {
-          "packageRoot": ".next/standalone"
-        },
-        "command": "bash -c \"gh release upload v$(cat ./.artifacts/next-version.txt) ./.artifacts/pack/zitadel-login.tar.gz\""
+      "description": "Publishes the packaged Login application to a GitHub release",
+      "dependsOn": [
+          "pack"
+      ],
+      "options": {
+        "packageRoot": ".next/standalone"
+      },
+      "command": "bash -c \"gh release upload v$(cat ./.artifacts/next-version.txt) ./.artifacts/pack/zitadel-login.tar.gz\""
     }
   }
 }
