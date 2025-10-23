@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/group"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -158,4 +159,16 @@ func (c *Commands) NewPermissionCheckUserGrantWrite(ctx context.Context) UserGra
 
 func (c *Commands) NewPermissionCheckUserGrantDelete(ctx context.Context) UserGrantPermissionCheck {
 	return c.newUserGrantPermissionCheck(ctx, domain.PermissionUserGrantDelete)
+}
+
+func (c *Commands) checkPermissionCreateGroup(ctx context.Context, resourceOwner, groupID string) error {
+	return c.newPermissionCheck(ctx, domain.PermissionGroupCreate, group.AggregateType)(resourceOwner, groupID)
+}
+
+func (c *Commands) checkPermissionUpdateGroup(ctx context.Context, resourceOwner, groupID string) error {
+	return c.newPermissionCheck(ctx, domain.PermissionGroupWrite, group.AggregateType)(resourceOwner, groupID)
+}
+
+func (c *Commands) checkPermissionDeleteGroup(ctx context.Context, resourceOwner, groupID string) error {
+	return c.newPermissionCheck(ctx, domain.PermissionGroupDelete, group.AggregateType)(resourceOwner, groupID)
 }
