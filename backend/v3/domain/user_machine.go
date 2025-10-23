@@ -10,7 +10,8 @@ import (
 type AccessTokenType uint8
 
 const (
-	AccessTokenTypeBearer AccessTokenType = iota
+	AccessTokenTypeUnspecified AccessTokenType = iota
+	AccessTokenTypeBearer
 	AccessTokenTypeJWT
 )
 
