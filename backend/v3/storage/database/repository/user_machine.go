@@ -98,7 +98,7 @@ func (m userMachine) SetName(name string) database.Change {
 
 // SetSecret implements [domain.MachineUserRepository].
 func (m userMachine) SetSecret(secret *string) database.Change {
-	panic("unimplemented")
+	return database.NewChangePtr(m.SecretColumn(), secret)
 }
 
 // SetState implements [domain.MachineUserRepository].
