@@ -82,12 +82,13 @@ func Test_GroupReduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.groups1 SET (name, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.groups1 SET (name, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (resource_owner = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								"updated-group-name",
 								anyArg{},
 								uint64(15),
 								"agg-id",
+								"ro-id",
 								"instance-id",
 							},
 						},
@@ -116,12 +117,13 @@ func Test_GroupReduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.groups1 SET (description, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.groups1 SET (description, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (resource_owner = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								"updated-group-description",
 								anyArg{},
 								uint64(15),
 								"agg-id",
+								"ro-id",
 								"instance-id",
 							},
 						},
@@ -150,9 +152,10 @@ func Test_GroupReduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.groups1 WHERE (id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.groups1 WHERE (id = $1) AND (resource_owner = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"ro-id",
 								"instance-id",
 							},
 						},

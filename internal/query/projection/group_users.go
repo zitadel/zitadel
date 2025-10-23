@@ -127,6 +127,7 @@ func (g *groupUsersProjection) reduceGroupUsersRemoved(event eventstore.Event) (
 			[]handler.Condition{
 				handler.NewCond(GroupUsersColumnGroupID, e.Aggregate().ID),
 				handler.NewCond(GroupUsersColumnUserID, userID),
+				handler.NewCond(GroupUsersColumnResourceOwner, e.Aggregate().ResourceOwner),
 				handler.NewCond(GroupUsersColumnInstanceID, e.Aggregate().InstanceID),
 			},
 		))
@@ -144,6 +145,7 @@ func (g *groupUsersProjection) reduceGroupRemoved(event eventstore.Event) (*hand
 		e,
 		[]handler.Condition{
 			handler.NewCond(GroupUsersColumnGroupID, e.Aggregate().ID),
+			handler.NewCond(GroupUsersColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCond(GroupUsersColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil

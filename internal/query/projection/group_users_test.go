@@ -99,12 +99,12 @@ func Test_GroupUsersReduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.group_users1 WHERE (group_id = $1) AND (user_id = $2) AND (instance_id = $3)",
-							expectedArgs: []interface{}{"agg-id", "user-id-1", "instance-id"},
+							expectedStmt: "DELETE FROM projections.group_users1 WHERE (group_id = $1) AND (user_id = $2) AND (resource_owner = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{"agg-id", "user-id-1", "ro-id", "instance-id"},
 						},
 						{
-							expectedStmt: "DELETE FROM projections.group_users1 WHERE (group_id = $1) AND (user_id = $2) AND (instance_id = $3)",
-							expectedArgs: []interface{}{"agg-id", "user-id-2", "instance-id"},
+							expectedStmt: "DELETE FROM projections.group_users1 WHERE (group_id = $1) AND (user_id = $2) AND (resource_owner = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{"agg-id", "user-id-2", "ro-id", "instance-id"},
 						},
 					},
 				},
@@ -128,8 +128,8 @@ func Test_GroupUsersReduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.group_users1 WHERE (group_id = $1) AND (instance_id = $2)",
-							expectedArgs: []interface{}{"agg-id", "instance-id"},
+							expectedStmt: "DELETE FROM projections.group_users1 WHERE (group_id = $1) AND (resource_owner = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{"agg-id", "ro-id", "instance-id"},
 						},
 					},
 				},
