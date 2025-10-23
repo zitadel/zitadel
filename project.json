@@ -23,9 +23,10 @@
       "executor": "nx:run-commands",
       "options": {
         "parallel": false,
+        "cwd": "{workspaceRoot}/.artifacts/pack",
         "commands": [
-          "sha256sum .artifacts/pack/* > .artifacts/pack/checksums.txt",
-          "bash -c \"gh release upload v$(cat ./.artifacts/next-version.txt) ./.artifacts/pack/checksums.txt\""
+          "sha256sum * > checksums.txt",
+          "bash -c \"gh release upload v$(cat ../next-version.txt) checksums.txt\""
         ]
       }
     }
