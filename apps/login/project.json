@@ -144,7 +144,7 @@
         },
         "commands": [
           "mkdir -p ${PACK_DIR}",
-          "tar -czvf ${PACK_DIR}/zitadel-login.tar.gz -C ${STANDALONE_DIR} ."
+          "tar -czf ${PACK_DIR}/zitadel-login.tar.gz -C ${STANDALONE_DIR} ."
         ]
       },
       "cache": true,
