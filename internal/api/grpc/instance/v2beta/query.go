@@ -13,7 +13,7 @@ import (
 
 func (s *Server) GetInstance(ctx context.Context, request *connect.Request[instance.GetInstanceRequest]) (*connect.Response[instance.GetInstanceResponse], error) {
 	if authz.GetFeatures(ctx).EnableRelationalTables {
-		return instancev2.GetInstance(ctx, request.Msg.GetInstanceId())
+		return instancev2.GetInstance(ctx, request)
 	}
 
 	inst, err := s.query.Instance(ctx, true)
@@ -28,7 +28,7 @@ func (s *Server) GetInstance(ctx context.Context, request *connect.Request[insta
 
 func (s *Server) ListInstances(ctx context.Context, req *connect.Request[instance.ListInstancesRequest]) (*connect.Response[instance.ListInstancesResponse], error) {
 	if authz.GetFeatures(ctx).EnableRelationalTables {
-		return instancev2.ListInstances(ctx, req.Msg)
+		return instancev2.ListInstances(ctx, req)
 	}
 
 	queries, err := ListInstancesRequestToModel(req.Msg, s.systemDefaults)

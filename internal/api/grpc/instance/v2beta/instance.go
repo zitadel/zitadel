@@ -13,7 +13,7 @@ import (
 
 func (s *Server) DeleteInstance(ctx context.Context, request *connect.Request[instance.DeleteInstanceRequest]) (*connect.Response[instance.DeleteInstanceResponse], error) {
 	if authz.GetFeatures(ctx).EnableRelationalTables {
-		return instancev2.DeleteInstance(ctx, request.Msg.GetInstanceId())
+		return instancev2.DeleteInstance(ctx, request)
 	}
 
 	obj, err := s.command.RemoveInstance(ctx, request.Msg.GetInstanceId())
@@ -29,7 +29,7 @@ func (s *Server) DeleteInstance(ctx context.Context, request *connect.Request[in
 
 func (s *Server) UpdateInstance(ctx context.Context, request *connect.Request[instance.UpdateInstanceRequest]) (*connect.Response[instance.UpdateInstanceResponse], error) {
 	if authz.GetFeatures(ctx).EnableRelationalTables {
-		return instancev2.UpdateInstance(ctx, request.Msg)
+		return instancev2.UpdateInstance(ctx, request)
 	}
 
 	obj, err := s.command.UpdateInstance(ctx, request.Msg.GetInstanceName())

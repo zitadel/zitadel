@@ -16,8 +16,8 @@ import (
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 )
 
-func DeleteInstance(ctx context.Context, instanceID string) (*connect.Response[instance.DeleteInstanceResponse], error) {
-	instanceDeleteCmd := domain.NewDeleteInstanceCommand(instanceID)
+func DeleteInstance(ctx context.Context, request *connect.Request[instance.DeleteInstanceRequest]) (*connect.Response[instance.DeleteInstanceResponse], error) {
+	instanceDeleteCmd := domain.NewDeleteInstanceCommand(request.Msg.GetInstanceId())
 
 	err := domain.Invoke(ctx, instanceDeleteCmd, domain.WithInstanceRepo(repository.InstanceRepository()))
 
@@ -37,8 +37,8 @@ func DeleteInstance(ctx context.Context, instanceID string) (*connect.Response[i
 	}, nil
 }
 
-func GetInstance(ctx context.Context, instanceID string) (*connect.Response[instance.GetInstanceResponse], error) {
-	instanceGetCmd := domain.NewGetInstanceCommand(instanceID)
+func GetInstance(ctx context.Context, request *connect.Request[instance.GetInstanceRequest]) (*connect.Response[instance.GetInstanceResponse], error) {
+	instanceGetCmd := domain.NewGetInstanceCommand(request.Msg.GetInstanceId())
 
 	err := domain.Invoke(ctx, instanceGetCmd, domain.WithInstanceRepo(repository.InstanceRepository()))
 
@@ -56,8 +56,8 @@ func GetInstance(ctx context.Context, instanceID string) (*connect.Response[inst
 	}, nil
 }
 
-func UpdateInstance(ctx context.Context, request *instance.UpdateInstanceRequest) (*connect.Response[instance.UpdateInstanceResponse], error) {
-	instanceUpdateCmd := domain.NewUpdateInstanceCommand(request.GetInstanceId(), request.GetInstanceName())
+func UpdateInstance(ctx context.Context, request *connect.Request[instance.UpdateInstanceRequest]) (*connect.Response[instance.UpdateInstanceResponse], error) {
+	instanceUpdateCmd := domain.NewUpdateInstanceCommand(request.Msg.GetInstanceId(), request.Msg.GetInstanceName())
 
 	err := domain.Invoke(ctx, instanceUpdateCmd, domain.WithInstanceRepo(repository.InstanceRepository()))
 
@@ -74,8 +74,8 @@ func UpdateInstance(ctx context.Context, request *instance.UpdateInstanceRequest
 	}, nil
 }
 
-func ListInstances(ctx context.Context, request *instance.ListInstancesRequest) (*connect.Response[instance.ListInstancesResponse], error) {
-	instancesListCmd := domain.NewListInstancesCommand(request)
+func ListInstances(ctx context.Context, request *connect.Request[instance.ListInstancesRequest]) (*connect.Response[instance.ListInstancesResponse], error) {
+	instancesListCmd := domain.NewListInstancesCommand(request.Msg)
 
 	err := domain.Invoke(
 		ctx,
@@ -93,7 +93,7 @@ func ListInstances(ctx context.Context, request *instance.ListInstancesRequest) 
 			Instances: convert.DomainInstanceListModelToGRPCResponse(instances),
 			Pagination: &filter.PaginationResponse{
 				TotalResult:  uint64(len(instances)),
-				AppliedLimit: uint64(request.GetPagination().GetLimit()),
+				AppliedLimit: uint64(request.Msg.GetPagination().GetLimit()),
 			},
 		},
 	}, nil
