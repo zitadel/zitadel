@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -ex
 
 for os in linux darwin windows; do
     for arch in amd64 arm64; do
