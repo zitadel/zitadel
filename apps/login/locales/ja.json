@@ -287,6 +287,21 @@
       "required": {
         "code": "必須項目です"
       }
+    },
+    "errors": {
+      "couldNotResendEmail": "メールを再送信できませんでした",
+      "couldNotVerifyUser": "ユーザーを確認できませんでした",
+      "couldNotVerifyInvite": "招待を確認できませんでした",
+      "couldNotVerifyEmail": "メールアドレスを確認できませんでした",
+      "couldNotVerify": "確認できませんでした",
+      "couldNotLoadUser": "ユーザーを読み込めませんでした",
+      "couldNotLoadAuthenticators": "認証方法を読み込めませんでした",
+      "couldNotCreateSession": "セッションを作成できませんでした",
+      "noHostFound": "ホストが見つかりません",
+      "userAlreadyVerified": "ユーザーは既に確認済みです！",
+      "couldNotResendInvite": "招待を再送信できませんでした",
+      "inviteSendFailed": "招待メールの送信に失敗しました",
+      "emailSendFailed": "確認メールの送信に失敗しました"
     }
   },
   "authenticator": {
