@@ -29,6 +29,14 @@
           "bash -c \"gh release upload ${ZITADEL_VERSION} checksums.txt\""
         ]
       }
+    },
+    "local-registry": {
+      "executor": "@nx/js:verdaccio",
+      "options": {
+        "port": 4873,
+        "config": ".verdaccio/config.yml",
+        "storage": "tmp/local-registry/storage"
+      }
     }
   }
 }
