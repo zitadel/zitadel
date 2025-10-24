@@ -19,7 +19,11 @@
       }
     },
     "projects": [
-      "@zitadel/proto"
+      "@zitadel/api",
+      "@zitadel/login",
+      "@zitadel/proto",
+      "@zitadel/client",
+      "@zitadel/zitadel"
     ],
     "projectsRelationship": "fixed",
     "changelog": {
