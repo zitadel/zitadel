@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	allowDomainRunes = regexp.MustCompile("^[a-zA-Z0-9\\.\\-]+$")
+	allowDomainRunes = regexp.MustCompile(`^[a-zA-Z0-9\.\-]+$`)
 )
 
 func (c *Commands) AddInstanceDomain(ctx context.Context, instanceDomain string) (*domain.ObjectDetails, error) {
