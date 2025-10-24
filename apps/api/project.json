@@ -18,11 +18,6 @@
             "!{workspaceRoot}/**/integration_test/**/*"
         ]
     },
-    "release": {
-        "docker": {
-            "repositoryName": "eliobischof/api"
-        }
-    },
     "targets": {
         "nx-release-publish": {
             "description": "Publishes cross-compiled binary tarballs to the GitHub release and publishes Docker images for production and for debugging.",

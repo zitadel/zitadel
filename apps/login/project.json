@@ -1,10 +1,5 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "release": {
-      "docker": {
-          "repositoryName": "eliobischof/login"
-      }
-  },
   "targets": {
     "nx-release-publish": {
       "description": "Publishes the packaged Login application to a GitHub release",

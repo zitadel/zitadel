@@ -14,7 +14,7 @@ const versionEnvVar = "ZITADEL_VERSION";
         'Explicit version specifier to use, if overriding conventional commits',
       type: 'string',
     })
-    .option('dryRun', {
+    .option('dry-run', {
       alias: 'd',
       description:
         'Whether or not to perform a dry-run of the release process, defaults to false',
@@ -41,20 +41,14 @@ const versionEnvVar = "ZITADEL_VERSION";
     process.exit(0);
   }
 
-  // Restore git tracked changes
-  // This prevents accidental commits of version changes
-  // Unfortunately, Nx can't be configured to avoid modifying files during versioning
-  if (!options.dryRun) {
-    console.log('\nRestoring all git tracked changes...\n');
-    execSync('git restore .', { stdio: 'inherit' });
-  }
-
   // Write the version to an env variable so subsequent steps can read it.
   // This is needed in the following places:
   // - to compile the version into the API binary (nx-release-publish target)
   // - to resolve the docker versionScheme v{env.ZITADEL_VERSION}
   // - to upload GitHub release assets by referencing a release by its tag v{env.ZITADEL_VERSION}
-  process.env[versionEnvVar] = `v${workspaceVersion}`;
+  const zitadelVersion = options.version || process.env.ZITADEL_VERSION || `v${workspaceVersion}`;
+  console.log(`\nUsing environment variable ${versionEnvVar}=${zitadelVersion}\n`);
+  process.env[versionEnvVar] = zitadelVersion;
 
   await releaseChangelog({
     versionData: projectsVersionData,
