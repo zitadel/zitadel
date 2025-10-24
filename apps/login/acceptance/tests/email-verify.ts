@@ -1,8 +1,8 @@
 import { Page } from "@playwright/test";
-import { emailVerifyScreen } from "./email-verify-screen";
+import { emailVerifyScreen } from "./email-verify-screen.js";
 
 export async function startEmailVerify(page: Page, loginname: string) {
-  await page.goto("./verify");
+  await page.goto("/ui/v2/login/verify");
 }
 
 export async function emailVerify(page: Page, code: string) {

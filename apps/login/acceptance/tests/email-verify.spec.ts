@@ -1,58 +1,37 @@
-import { faker } from "@faker-js/faker";
-import { test as base } from "@playwright/test";
-import dotenv from "dotenv";
-import path from "path";
-import { emailVerify, emailVerifyResend } from "./email-verify";
-import { emailVerifyScreenExpect } from "./email-verify-screen";
-import { loginScreenExpect, loginWithPassword } from "./login";
-import { getCodeFromSink } from "./sink";
-import { PasswordUser } from "./user";
+import { emailVerify, emailVerifyResend } from "./email-verify.js";
+import { emailVerifyScreenExpect } from "./email-verify-screen.js";
+import { loginScreenExpect, loginWithPassword } from "./login.js";
+import { eventualEmailOTP } from "./mock.js";
+import { test } from "./fixtures.js";
 
-// Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, "../../login/.env.test.local") });
-
-const test = base.extend<{ user: PasswordUser }>({
-  user: async ({ page }, use) => {
-    const user = new PasswordUser({
-      email: faker.internet.email(),
-      isEmailVerified: false,
-      firstName: faker.person.firstName(),
-      lastName: faker.person.lastName(),
-      organization: "",
-      phone: faker.phone.number(),
-      isPhoneVerified: false,
-      password: "Password1!",
-      passwordChangeRequired: false,
-    });
-    await user.ensure(page);
-    await use(user);
-    await user.cleanup();
-  },
-});
-
-test("user email not verified, verify", async ({ user, page }) => {
-  await loginWithPassword(page, user.getUsername(), user.getPassword());
-  const c = await getCodeFromSink(user.getUsername());
-  await emailVerify(page, c);
+test("user email not verified, verify", async ({ userCreator, page }) => {
+  // Create user with password but unverified email
+  await userCreator.withEmailUnverified().create();
+  console.log("Created user", userCreator.username);
+  await loginWithPassword(page, userCreator.username, userCreator.password);
+  const code = await eventualEmailOTP(userCreator.username);
+  await emailVerify(page, code);
   // wait for resend of the code
   await page.waitForTimeout(2000);
-  await loginScreenExpect(page, user.getFullName());
+  await loginScreenExpect(page, userCreator.fullName);
 });
 
-test("user email not verified, resend, verify", async ({ user, page }) => {
-  await loginWithPassword(page, user.getUsername(), user.getPassword());
+test("user email not verified, resend, verify", async ({ userCreator, page }) => {
+  await userCreator.withEmailUnverified().create();
+  await loginWithPassword(page, userCreator.username, userCreator.password);
   // auto-redirect on /verify
   await emailVerifyResend(page);
-  const c = await getCodeFromSink(user.getUsername());
+  const code = await eventualEmailOTP(userCreator.username);
   // wait for resend of the code
   await page.waitForTimeout(2000);
-  await emailVerify(page, c);
-  await loginScreenExpect(page, user.getFullName());
+  await emailVerify(page, code);
+  await loginScreenExpect(page, userCreator.fullName);
 });
 
-test("user email not verified, resend, old code", async ({ user, page }) => {
-  await loginWithPassword(page, user.getUsername(), user.getPassword());
-  const c = await getCodeFromSink(user.getUsername());
+test("user email not verified, resend, old code", async ({ userCreator, page }) => {
+  await userCreator.withEmailUnverified().create();
+  await loginWithPassword(page, userCreator.username, userCreator.password);
+  const c = await eventualEmailOTP(userCreator.username);
   await emailVerifyResend(page);
   // wait for resend of the code
   await page.waitForTimeout(2000);
@@ -60,8 +39,9 @@ test("user email not verified, resend, old code", async ({ user, page }) => {
   await emailVerifyScreenExpect(page, c);
 });
 
-test("user email not verified, wrong code", async ({ user, page }) => {
-  await loginWithPassword(page, user.getUsername(), user.getPassword());
+test("user email not verified, wrong code", async ({ userCreator, page }) => {
+  await userCreator.withEmailUnverified().create();
+  await loginWithPassword(page, userCreator.username, userCreator.password);
   // auto-redirect on /verify
   const code = "wrong";
   await emailVerify(page, code);

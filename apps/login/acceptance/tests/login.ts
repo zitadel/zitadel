@@ -1,11 +1,9 @@
 import { expect, Page } from "@playwright/test";
-import { code, otpFromSink } from "./code";
-import { loginname } from "./loginname";
-import { password } from "./password";
-import { totp } from "./zitadel";
+import { loginname } from "./loginname.js";
+import { password } from "./password.js";
 
 export async function startLogin(page: Page) {
-  await page.goto(`./loginname`);
+  await page.goto(`/ui/v2/login/loginname`);
 }
 
 export async function loginWithPassword(page: Page, username: string, pw: string) {
@@ -23,19 +21,4 @@ export async function loginWithPasskey(page: Page, authenticatorId: string, user
 export async function loginScreenExpect(page: Page, fullName: string) {
   await expect(page).toHaveURL(/.*signedin.*/);
   await expect(page.getByRole("heading")).toContainText(fullName);
-}
-
-export async function loginWithPasswordAndEmailOTP(page: Page, username: string, password: string, email: string) {
-  await loginWithPassword(page, username, password);
-  await otpFromSink(page, email);
-}
-
-export async function loginWithPasswordAndPhoneOTP(page: Page, username: string, password: string, phone: string) {
-  await loginWithPassword(page, username, password);
-  await otpFromSink(page, phone);
-}
-
-export async function loginWithPasswordAndTOTP(page: Page, username: string, password: string, secret: string) {
-  await loginWithPassword(page, username, password);
-  await code(page, totp(secret));
 }
