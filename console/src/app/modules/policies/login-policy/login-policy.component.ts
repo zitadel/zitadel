@@ -23,7 +23,7 @@ import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { LoginMethodComponentType } from './factor-table/factor-table.component';
 import { map, takeUntil } from 'rxjs/operators';
-import { LoginPolicyService } from '../../../services/login-policy.service';
+import { LoginPolicyService } from 'src/app/services/login-policy.service';
 
 const minValueValidator = (minValue: number) => (control: AbstractControl) => {
   const value = control.value;

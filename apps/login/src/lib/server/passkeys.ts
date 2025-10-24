@@ -283,7 +283,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
       ? loginSettings?.secondFactorCheckLifetime
       : undefined;
 
-  if (!lifetime) {
+  if (!lifetime || !lifetime.seconds) {
     console.warn("No passkey lifetime provided, defaulting to 24 hours");
 
     lifetime = {
