@@ -46,7 +46,7 @@ export async function redirectToIdp(prevState: RedirectToIdpState, formData: For
     serviceUrl,
     host,
     idpId,
-    successUrl: `/idp/${provider}/success?` + params.toString(),
+    successUrl: `/idp/${provider}/process?` + params.toString(),
     failureUrl: `/idp/${provider}/failure?` + params.toString(),
   });
 

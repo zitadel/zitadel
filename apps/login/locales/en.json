@@ -194,6 +194,23 @@
       "description": "We couldn't complete the registration process.",
       "info": "Unable to determine the organization for registration. Please contact your administrator for assistance.",
       "backToLogin": "Back to Login"
+    },
+    "processing": {
+      "message": "Processing authentication...",
+      "noRedirect": "No redirect or error returned from server",
+      "unexpectedError": "An unexpected error occurred"
+    },
+    "errors": {
+      "missingParameters": "Missing required parameters",
+      "missingIdpInfo": "IDP information missing",
+      "idpNotFound": "Identity provider not found",
+      "linkingNotAllowed": "Linking is not allowed for this identity provider",
+      "linkingFailed": "Failed to link identity provider to account",
+      "autoLinkingFailed": "Failed to automatically link account",
+      "userCreationFailed": "Failed to create user account",
+      "orgResolutionFailed": "Could not determine organization for registration",
+      "sessionCreationFailed": "Could not create session or determine redirect",
+      "unknownError": "An unknown error occurred"
     }
   },
   "ldap": {

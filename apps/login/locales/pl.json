@@ -194,6 +194,23 @@
       "description": "Nie mogliśmy ukończyć procesu rejestracji.",
       "info": "Nie można określić organizacji do rejestracji. Skontaktuj się z administratorem w celu uzyskania pomocy.",
       "backToLogin": "Powrót do logowania"
+    },
+    "processing": {
+      "message": "Przetwarzanie uwierzytelniania...",
+      "noRedirect": "Nie otrzymano przekierowania ani błędu z serwera",
+      "unexpectedError": "Wystąpił nieoczekiwany błąd"
+    },
+    "errors": {
+      "missingParameters": "Brakuje wymaganych parametrów",
+      "missingIdpInfo": "Brak informacji IDP",
+      "idpNotFound": "Dostawca tożsamości nie znaleziony",
+      "linkingNotAllowed": "Łączenie nie jest dozwolone dla tego dostawcy tożsamości",
+      "linkingFailed": "Nie udało się połączyć dostawcy tożsamości z kontem",
+      "autoLinkingFailed": "Nie udało się automatycznie połączyć konta",
+      "userCreationFailed": "Nie udało się utworzyć konta użytkownika",
+      "orgResolutionFailed": "Nie można określić organizacji do rejestracji",
+      "sessionCreationFailed": "Nie można utworzyć sesji lub określić przekierowania",
+      "unknownError": "Wystąpił nieznany błąd"
     }
   },
   "ldap": {
