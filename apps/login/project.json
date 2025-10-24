@@ -14,7 +14,7 @@
       "dependsOn": [
         "build"
       ],
-      "command": "docker buildx build --file ./apps/api/Dockerfile --push --platform linux/amd64,linux/arm64 -t ghcr.io/eliobischof/login:${ZITADEL_VERSION} ."
+      "command": "docker buildx build --push --platform linux/amd64,linux/arm64 -t ghcr.io/eliobischof/login:${ZITADEL_VERSION} ./apps/login"
     },
     "prod": {
       "description": "Runs the Next.js Login application in production mode from the standalone build",
