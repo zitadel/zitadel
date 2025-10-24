@@ -248,6 +248,10 @@
             "description": "Installs the binaries needed for generating code. We avoid using go tools so the dev tool dependencies don't interfere with the prod dependencies.",
             "executor": "nx:run-commands",
             "options": {
+                "env": {
+                    "GOOS": "",
+                    "GOARCH": ""
+                },
                 "commands": [
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/dmarkham/enumer@v1.5.11",
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install go.uber.org/mock/mockgen@v0.4.0",
