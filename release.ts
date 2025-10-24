@@ -1,12 +1,10 @@
 import { releaseChangelog, releasePublish, releaseVersion } from 'nx/release';
-import { writeFileSync, mkdirSync } from 'fs';
-import { dirname } from 'path';
-import { execSync } from 'child_process';
 import yargs from 'yargs';
 
 const versionEnvVar = "ZITADEL_VERSION";
 
 (async () => {
+
   const options = await yargs(process.argv.slice(2))
     .version(false) // don't use the default meaning of version in yargs
     .option('version', {
