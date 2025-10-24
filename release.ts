@@ -4,7 +4,7 @@ import { dirname } from 'path';
 import { execSync } from 'child_process';
 import yargs from 'yargs';
 
-const versionFilePath = "./.artifacts/next-version.txt";
+const versionEnvVar = "ZITADEL_VERSION";
 
 (async () => {
   const options = await yargs(process.argv.slice(2))
@@ -30,7 +30,7 @@ const versionFilePath = "./.artifacts/next-version.txt";
     .parseAsync();
 
   const { workspaceVersion, projectsVersionData } = await releaseVersion({
-    specifier: options.version,
+    specifier: options.version || process.env.ZITADEL_VERSION,
     dryRun: options.dryRun,
     verbose: options.verbose,
   });
@@ -48,12 +48,13 @@ const versionFilePath = "./.artifacts/next-version.txt";
     console.log('\nRestoring all git tracked changes...\n');
     execSync('git restore .', { stdio: 'inherit' });
   }
-  
-  // Write the version to a file so the nx-release-publish targets can read it
-  // This is needed to compile the version into the release artifacts, like the API
-  mkdirSync(dirname(versionFilePath), { recursive: true });
-  writeFileSync(versionFilePath, workspaceVersion, 'utf-8');
-  console.log(`\nWrote version ${workspaceVersion} to ${versionFilePath}\n`);
+
+  // Write the version to an env variable so subsequent steps can read it.
+  // This is needed in the following places:
+  // - to compile the version into the API binary (nx-release-publish target)
+  // - to resolve the docker versionScheme v{env.ZITADEL_VERSION}
+  // - to upload GitHub release assets by referencing a release by its tag v{env.ZITADEL_VERSION}
+  process.env[versionEnvVar] = `v${workspaceVersion}`;
 
   await releaseChangelog({
     versionData: projectsVersionData,

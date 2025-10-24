@@ -26,7 +26,7 @@
         "cwd": "{workspaceRoot}/.artifacts/pack",
         "commands": [
           "sha256sum * > checksums.txt",
-          "bash -c \"gh release upload v$(cat ../next-version.txt) checksums.txt\""
+          "bash -c \"gh release upload ${ZITADEL_VERSION} checksums.txt\""
         ]
       }
     }

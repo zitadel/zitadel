@@ -19,7 +19,12 @@
       }
     },
     "docker": {
-      "registryUrl": "ghcr.io"
+      "registryUrl": "ghcr.io",
+      "versionSchemes": {
+        "prod": "{env.ZITADEL_VERSION}",
+        "qa": "{currentDate|YYMM.DD}-staging.{shortCommitSha}",
+        "pr": "{env.BUILD_NUMBER}-{shortCommitSha}"
+      }      
     },
     "projects": [
       "@zitadel/api",
