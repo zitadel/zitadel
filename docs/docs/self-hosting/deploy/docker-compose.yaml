@@ -1,4 +1,20 @@
 services:
+  init:
+    image: alpine/openssl:latest
+    entrypoint: /bin/sh -c
+    command:
+      - |
+        # if there is no private key provided generate private and public key
+        if [ ! -f "/current-dir/login-system-user.pem" ]; 
+        then 
+        openssl genrsa -traditional -out /current-dir/login-system-user.pem 2048 &&
+        openssl rsa -in /current-dir/login-system-user.pem -outform PEM -pubout -out /current-dir/login-system-user.pub &&
+        openssl pkcs8 -topk8 -in /current-dir/login-system-user.pem -nocrypt | base64 > /current-dir/login-system-user-key.pem 
+        fi
+    user: "0"
+    volumes:
+      - .:/current-dir:delegated
+
   zitadel:
     restart: unless-stopped
     image: ghcr.io/zitadel/zitadel:latest
@@ -89,6 +105,8 @@ services:
     networks:
       - zitadel
     depends_on:
+      init:
+        condition: service_completed_successfully
       db:
         condition: service_healthy
 
@@ -110,6 +128,8 @@ services:
     volumes:
       - .:/current-dir:ro
     depends_on:
+      init:
+        condition: service_completed_successfully
       zitadel:
         condition: service_healthy
         restart: false

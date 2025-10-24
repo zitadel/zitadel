@@ -35,17 +35,11 @@ The following commands set up services for a PostgreSQL database, a Zitadel API 
     ```shell
     docker compose pull
     ```
-3. Generate a private key and public key, which you can then mount to the Zitadel API and Zitadel login so that they can communicate.
-    ```shell
-    openssl genrsa -traditional -out login-system-user.pem 2048
-    openssl rsa -in login-system-user.pem -outform PEM -pubout -out login-system-user.pub
-    openssl pkcs8 -topk8 -in login-system-user.pem -nocrypt | base64 > login-system-user-key.pem
-    ```
-4. Run the PostgreSQL database, the Zitadel API, and the Zitadel login.
+3. Run the Zitadel initialization, PostgreSQL database, the Zitadel API, and the Zitadel login.
     ```shell
     docker compose up --detach --wait
     ```
-5. Verify the containers are running and healthy.
+4. Verify the containers are running and healthy.
     ```shell
     docker compose ps
     ```
