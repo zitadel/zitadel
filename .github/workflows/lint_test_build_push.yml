@@ -64,6 +64,7 @@ jobs:
       - name: Lint, Test, Build and Push
         env:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
+          ZITADEL_VERSION: ${{ github.sha }}
         run: pnpm nx affected --nxBail --targets lint test build push --exclude @zitadel/docs
       - name: Suggest Pipeline Fix By Nx Cloud AI
         if: failure() || cancelled()
