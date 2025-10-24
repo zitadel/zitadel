@@ -19,7 +19,9 @@
       }
     },
     "projects": [
-      "@zitadel/api"
+      "@zitadel/api",
+      "@zitadel/login",
+      "@zitadel/zitadel"
     ],
     "projectsRelationship": "fixed",
     "changelog": {

@@ -4,12 +4,16 @@
     "nx-release-publish": {
       "description": "Publishes the packaged Login application to a GitHub release",
       "dependsOn": [
-          "pack"
+        "pack",
+        "build"
       ],
+      "executor": "nx:run-commands",
       "options": {
-        "packageRoot": ".next/standalone"
-      },
-      "command": "bash -c \"gh release upload ${ZITADEL_VERSION} ./.artifacts/pack/zitadel-login.tar.gz\""
+        "commands": [
+          "bash -c \"gh release upload ${ZITADEL_VERSION} ./.artifacts/pack/zitadel-login.tar.gz\"",
+          "docker buildx build  --file ./apps/api/Dockerfile --push --platform linux/amd64,linux/arm64 -t ghcr.io/eliobischof/login:${ZITADEL_VERSION} ."
+        ]
+      }
     },
     "prod": {
       "description": "Runs the Next.js Login application in production mode from the standalone build",
@@ -133,12 +137,14 @@
         "default",
         "{workspaceRoot}/pnpm-lock.yaml",
         "!{projectRoot}/acceptance/**/*",
-        { "env": "LOGIN_BASE_URL" }
+        {
+          "env": "LOGIN_BASE_URL"
+        }
       ]
     },
     "test-integration-stop": {
-        "description": "Stops the gRPC mock container used for integration tests.",
-        "command": "nx run @zitadel/login-api-mock:down"
+      "description": "Stops the gRPC mock container used for integration tests.",
+      "command": "nx run @zitadel/login-api-mock:down"
     },
     "pack": {
       "description": "Packages the standalone Login application build into an archive",
