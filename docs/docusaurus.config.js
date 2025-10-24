@@ -401,7 +401,7 @@ module.exports = {
             },
           },
           application_v2: {
-            specPath: ".artifacts/openapi3/zitadel/app/v2beta/app_service.openapi.yaml",
+            specPath: ".artifacts/openapi3/zitadel/application/v2/application_service.openapi.yaml",
             outputDir: "docs/apis/resources/application_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",

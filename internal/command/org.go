@@ -396,6 +396,7 @@ func (c *Commands) addOrgWithIDAndMember(ctx context.Context, name, userID, reso
 
 func (c *Commands) ChangeOrg(ctx context.Context, orgID, name string) (*domain.ObjectDetails, error) {
 	name = strings.TrimSpace(name)
+	orgID = strings.TrimSpace(orgID)
 	if orgID == "" || name == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "EVENT-Mf9sd", "Errors.Org.Invalid")
 	}

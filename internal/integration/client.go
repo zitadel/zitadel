@@ -24,7 +24,8 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
 	action_v2beta "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
-	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
+	app_v2beta "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/application/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	authorization "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
@@ -85,7 +86,8 @@ type Client struct {
 	SCIM                     *scim.Client
 	Projectv2Beta            project_v2beta.ProjectServiceClient
 	InstanceV2Beta           instance.InstanceServiceClient
-	AppV2Beta                app.AppServiceClient
+	AppV2Beta                app_v2beta.AppServiceClient
+	ApplicationV2            application.ApplicationServiceClient
 	InternalPermissionv2Beta internal_permission_v2beta.InternalPermissionServiceClient
 	InternalPermissionV2     internal_permission_v2.InternalPermissionServiceClient
 	AuthorizationV2Beta      authorization.AuthorizationServiceClient
@@ -131,7 +133,8 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		SCIM:                     scim.NewScimClient(target),
 		Projectv2Beta:            project_v2beta.NewProjectServiceClient(cc),
 		InstanceV2Beta:           instance.NewInstanceServiceClient(cc),
-		AppV2Beta:                app.NewAppServiceClient(cc),
+		AppV2Beta:                app_v2beta.NewAppServiceClient(cc),
+		ApplicationV2:            application.NewApplicationServiceClient(cc),
 		InternalPermissionv2Beta: internal_permission_v2beta.NewInternalPermissionServiceClient(cc),
 		InternalPermissionV2:     internal_permission_v2.NewInternalPermissionServiceClient(cc),
 		AuthorizationV2Beta:      authorization.NewAuthorizationServiceClient(cc),
