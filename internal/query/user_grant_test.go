@@ -21,6 +21,7 @@ var (
 			", projections.user_grants5.sequence" +
 			", projections.user_grants5.grant_id" +
 			", projections.user_grants5.roles" +
+			", roles.role_information" +
 			", projections.user_grants5.state" +
 			", projections.user_grants5.user_id" +
 			", projections.users14.username" +
@@ -52,6 +53,7 @@ var (
 			" LEFT JOIN projections.project_grants4 ON projections.user_grants5.grant_id = projections.project_grants4.grant_id AND projections.user_grants5.instance_id = projections.project_grants4.instance_id AND projections.project_grants4.project_id = projections.user_grants5.project_id" +
 			" LEFT JOIN projections.orgs1 AS granted_orgs ON projections.project_grants4.granted_org_id = granted_orgs.id AND projections.project_grants4.instance_id = granted_orgs.instance_id" +
 			" LEFT JOIN projections.login_names3 ON projections.user_grants5.user_id = projections.login_names3.user_id AND projections.user_grants5.instance_id = projections.login_names3.instance_id" +
+			" LEFT JOIN LATERAL (SELECT JSON_AGG( JSON_BUILD_OBJECT( 'role_key', pr.role_key, 'display_name', pr.display_name, 'group_name', pr.group_name ) ) as role_information FROM projections.project_roles4 pr WHERE pr.instance_id = projections.user_grants5.instance_id AND pr.project_id = projections.user_grants5.project_id AND pr.role_key = ANY(projections.user_grants5.roles)) as roles ON true " +
 			" WHERE projections.login_names3.is_primary = $1")
 	userGrantCols = []string{
 		"id",
@@ -60,6 +62,7 @@ var (
 		"sequence",
 		"grant_id",
 		"roles",
+		"role_information",
 		"state",
 		"user_id",
 		"username",
@@ -90,6 +93,7 @@ var (
 			", projections.user_grants5.sequence" +
 			", projections.user_grants5.grant_id" +
 			", projections.user_grants5.roles" +
+			", roles.role_information" +
 			", projections.user_grants5.state" +
 			", projections.user_grants5.user_id" +
 			", projections.users14.username" +
@@ -122,6 +126,7 @@ var (
 			" LEFT JOIN projections.project_grants4 ON projections.user_grants5.grant_id = projections.project_grants4.grant_id AND projections.user_grants5.instance_id = projections.project_grants4.instance_id AND projections.project_grants4.project_id = projections.user_grants5.project_id" +
 			" LEFT JOIN projections.orgs1 AS granted_orgs ON projections.project_grants4.granted_org_id = granted_orgs.id AND projections.project_grants4.instance_id = granted_orgs.instance_id" +
 			" LEFT JOIN projections.login_names3 ON projections.user_grants5.user_id = projections.login_names3.user_id AND projections.user_grants5.instance_id = projections.login_names3.instance_id" +
+			" LEFT JOIN LATERAL (SELECT JSON_AGG( JSON_BUILD_OBJECT( 'role_key', pr.role_key, 'display_name', pr.display_name, 'group_name', pr.group_name ) ) as role_information FROM projections.project_roles4 pr WHERE pr.instance_id = projections.user_grants5.instance_id AND pr.project_id = projections.user_grants5.project_id AND pr.role_key = ANY(projections.user_grants5.roles)) as roles ON true " +
 			" WHERE projections.login_names3.is_primary = $1")
 	userGrantsCols = append(
 		userGrantCols,
@@ -172,6 +177,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						20211111,
 						"grant-id",
 						database.TextArray[string]{"role-key"},
+						`[{"display_name":"displayName","group_name":"groupName","role_key":"role-key"}]`,
 						domain.UserGrantStateActive,
 						"user-id",
 						"username",
@@ -203,6 +209,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 				ChangeDate:              testNow,
 				Sequence:                20211111,
 				Roles:                   database.TextArray[string]{"role-key"},
+				RoleInformation:         []Role{{Key: "role-key", DisplayName: "displayName", GroupName: "groupName"}},
 				GrantID:                 "grant-id",
 				State:                   domain.UserGrantStateActive,
 				UserID:                  "user-id",
@@ -242,6 +249,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						20211111,
 						"grant-id",
 						database.TextArray[string]{"role-key"},
+						`[{"display_name":"displayName","group_name":"groupName","role_key":"role-key"}]`,
 						domain.UserGrantStateActive,
 						"user-id",
 						"username",
@@ -273,6 +281,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 				ChangeDate:              testNow,
 				Sequence:                20211111,
 				Roles:                   database.TextArray[string]{"role-key"},
+				RoleInformation:         []Role{{Key: "role-key", DisplayName: "displayName", GroupName: "groupName"}},
 				GrantID:                 "grant-id",
 				State:                   domain.UserGrantStateActive,
 				UserID:                  "user-id",
@@ -312,6 +321,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						20211111,
 						"grant-id",
 						database.TextArray[string]{"role-key"},
+						`[{"display_name":"displayName","group_name":"groupName","role_key":"role-key"}]`,
 						domain.UserGrantStateActive,
 						"user-id",
 						"username",
@@ -343,6 +353,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 				ChangeDate:              testNow,
 				Sequence:                20211111,
 				Roles:                   database.TextArray[string]{"role-key"},
+				RoleInformation:         []Role{{Key: "role-key", DisplayName: "displayName", GroupName: "groupName"}},
 				GrantID:                 "grant-id",
 				State:                   domain.UserGrantStateActive,
 				UserID:                  "user-id",
@@ -382,6 +393,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						20211111,
 						"grant-id",
 						database.TextArray[string]{"role-key"},
+						`[{"display_name":"displayName","group_name":"groupName","role_key":"role-key"}]`,
 						domain.UserGrantStateActive,
 						"user-id",
 						"username",
@@ -413,6 +425,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 				ChangeDate:              testNow,
 				Sequence:                20211111,
 				Roles:                   database.TextArray[string]{"role-key"},
+				RoleInformation:         []Role{{Key: "role-key", DisplayName: "displayName", GroupName: "groupName"}},
 				GrantID:                 "grant-id",
 				State:                   domain.UserGrantStateActive,
 				UserID:                  "user-id",
@@ -452,6 +465,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						20211111,
 						"grant-id",
 						database.TextArray[string]{"role-key"},
+						`[{"display_name":"displayName","group_name":"groupName","role_key":"role-key"}]`,
 						domain.UserGrantStateActive,
 						"user-id",
 						"username",
@@ -483,6 +497,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 				ChangeDate:              testNow,
 				Sequence:                20211111,
 				Roles:                   database.TextArray[string]{"role-key"},
+				RoleInformation:         []Role{{Key: "role-key", DisplayName: "displayName", GroupName: "groupName"}},
 				GrantID:                 "grant-id",
 				State:                   domain.UserGrantStateActive,
 				UserID:                  "user-id",
@@ -552,6 +567,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 							20211111,
 							"grant-id",
 							database.TextArray[string]{"role-key"},
+							`[{"display_name":"displayName","group_name":"groupName","role_key":"role-key"}]`,
 							domain.UserGrantStateActive,
 							"user-id",
 							"username",
@@ -589,6 +605,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						ChangeDate:              testNow,
 						Sequence:                20211111,
 						Roles:                   database.TextArray[string]{"role-key"},
+						RoleInformation:         []Role{{Key: "role-key", DisplayName: "displayName", GroupName: "groupName"}},
 						GrantID:                 "grant-id",
 						State:                   domain.UserGrantStateActive,
 						UserID:                  "user-id",
@@ -631,6 +648,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 							20211111,
 							"grant-id",
 							database.TextArray[string]{"role-key"},
+							`[{"display_name":"displayName","group_name":"groupName","role_key":"role-key"}]`,
 							domain.UserGrantStateActive,
 							"user-id",
 							"username",
@@ -668,6 +686,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						ChangeDate:              testNow,
 						Sequence:                20211111,
 						Roles:                   database.TextArray[string]{"role-key"},
+						RoleInformation:         []Role{{Key: "role-key", DisplayName: "displayName", GroupName: "groupName"}},
 						GrantID:                 "grant-id",
 						State:                   domain.UserGrantStateActive,
 						UserID:                  "user-id",
@@ -710,6 +729,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 							20211111,
 							"grant-id",
 							database.TextArray[string]{"role-key"},
+							`[{"display_name":"displayName","group_name":"groupName","role_key":"role-key"}]`,
 							domain.UserGrantStateActive,
 							"user-id",
 							"username",
@@ -747,6 +767,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						ChangeDate:              testNow,
 						Sequence:                20211111,
 						Roles:                   database.TextArray[string]{"role-key"},
+						RoleInformation:         []Role{{Key: "role-key", DisplayName: "displayName", GroupName: "groupName"}},
 						GrantID:                 "grant-id",
 						State:                   domain.UserGrantStateActive,
 						UserID:                  "user-id",
@@ -789,6 +810,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 							20211111,
 							"grant-id",
 							database.TextArray[string]{"role-key"},
+							`[{"display_name":"displayName","group_name":"groupName","role_key":"role-key"}]`,
 							domain.UserGrantStateActive,
 							"user-id",
 							"username",
@@ -826,6 +848,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						ChangeDate:              testNow,
 						Sequence:                20211111,
 						Roles:                   database.TextArray[string]{"role-key"},
+						RoleInformation:         []Role{{Key: "role-key", DisplayName: "displayName", GroupName: "groupName"}},
 						GrantID:                 "grant-id",
 						State:                   domain.UserGrantStateActive,
 						UserID:                  "user-id",
@@ -868,6 +891,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 							20211111,
 							"grant-id",
 							database.TextArray[string]{"role-key"},
+							`[{"display_name":"displayName","group_name":"groupName","role_key":"role-key"}]`,
 							domain.UserGrantStateActive,
 							"user-id",
 							"username",
@@ -905,6 +929,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						ChangeDate:              testNow,
 						Sequence:                20211111,
 						Roles:                   database.TextArray[string]{"role-key"},
+						RoleInformation:         []Role{{Key: "role-key", DisplayName: "displayName", GroupName: "groupName"}},
 						GrantID:                 "grant-id",
 						State:                   domain.UserGrantStateActive,
 						UserID:                  "user-id",
@@ -947,6 +972,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 							20211111,
 							"grant-id",
 							database.TextArray[string]{"role-key"},
+							`[{"display_name":"displayName","group_name":"groupName","role_key":"role-key"}]`,
 							domain.UserGrantStateActive,
 							"user-id",
 							"username",
@@ -977,6 +1003,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 							20211111,
 							"grant-id",
 							database.TextArray[string]{"role-key"},
+							`[{"display_name":"displayName","group_name":"groupName","role_key":"role-key"}]`,
 							domain.UserGrantStateActive,
 							"user-id",
 							"username",
@@ -1014,6 +1041,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						ChangeDate:              testNow,
 						Sequence:                20211111,
 						Roles:                   database.TextArray[string]{"role-key"},
+						RoleInformation:         []Role{{Key: "role-key", DisplayName: "displayName", GroupName: "groupName"}},
 						GrantID:                 "grant-id",
 						State:                   domain.UserGrantStateActive,
 						UserID:                  "user-id",
@@ -1044,6 +1072,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						ChangeDate:              testNow,
 						Sequence:                20211111,
 						Roles:                   database.TextArray[string]{"role-key"},
+						RoleInformation:         []Role{{Key: "role-key", DisplayName: "displayName", GroupName: "groupName"}},
 						GrantID:                 "grant-id",
 						State:                   domain.UserGrantStateActive,
 						UserID:                  "user-id",

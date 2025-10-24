@@ -961,12 +961,12 @@ func createProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrg
 	}, retryDuration, tick)
 }
 
-func createProjectUserGrant(ctx context.Context, t *testing.T, orgID, projectID, userID string) {
-	resp := Instance.CreateAuthorizationProject(t, ctx, projectID, userID)
+func createProjectUserGrant(ctx context.Context, t *testing.T, organizationID, projectID, userID string) {
+	resp := Instance.CreateAuthorizationProject(t, ctx, projectID, userID, organizationID)
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	require.EventuallyWithT(t, func(collect *assert.CollectT) {
-		_, err := Instance.Client.Mgmt.GetUserGrantByID(integration.SetOrgID(ctx, orgID), &mgmt.GetUserGrantByIDRequest{
+		_, err := Instance.Client.Mgmt.GetUserGrantByID(integration.SetOrgID(ctx, organizationID), &mgmt.GetUserGrantByIDRequest{
 			UserId:  userID,
 			GrantId: resp.GetId(),
 		})
