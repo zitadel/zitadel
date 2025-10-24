@@ -29,7 +29,7 @@
                 "generate",
                 "build-console"
             ],
-            "command": "bash -c 'EXT=\"\"; if [ \"$(go env GOOS)\" = \"windows\" ]; then EXT=\".exe\"; fi; echo \"Building for $(go env GOOS)-$(go env GOARCH)...\"; echo \"github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD)\ngithub.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\")\ngithub.com/zitadel/zitadel/cmd/build.version=${ZITADEL_VERSION}\" > .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel$EXT'",
+            "command": "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; echo \"Building for $GOOS-$GOARCH...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$GOOS/$GOARCH/zitadel$EXT -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\") -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_VERSION}\"'",
             "inputs": [
                 { "runtime": "go env GOOS" },
                 { "runtime": "go env GOARCH" },
