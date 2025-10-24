@@ -2193,7 +2193,8 @@
       "1": "Kata Sandi Sekali Pakai oleh Aplikasi Authenticator (TOTP)",
       "2": "Sidik Jari, Kunci Keamanan, ID Wajah dan lainnya",
       "3": "Kata Sandi Satu Kali melalui Email (Email OTP)",
-      "4": "Kata Sandi Satu Kali melalui SMS (SMS OTP)"
+      "4": "Kata Sandi Satu Kali melalui SMS (SMS OTP)",
+      "5": "Kode Pemulihan"
     }
   },
   "LOGINPOLICY": {

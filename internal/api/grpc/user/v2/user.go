@@ -339,6 +339,8 @@ func authMethodTypeToPb(methodType domain.UserAuthMethodType) user.Authenticatio
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_OTP_EMAIL
 	case domain.UserAuthMethodTypeUnspecified:
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_UNSPECIFIED
+	case domain.UserAuthMethodTypeRecoveryCode:
+		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_RECOVERY_CODE
 	default:
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_UNSPECIFIED
 	}

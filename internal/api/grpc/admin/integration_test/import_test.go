@@ -491,6 +491,180 @@ func TestServer_ImportData(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "success with recovery codes",
+			req: &admin.ImportDataRequest{
+				Data: &admin.ImportDataRequest_DataOrgs{
+					DataOrgs: &admin.ImportDataOrg{
+						Orgs: []*admin.DataOrg{
+							{
+								OrgId: orgIDs[7],
+								Org: &management.AddOrgRequest{
+									Name: integration.OrganizationName(),
+								},
+								HumanUsers: []*v1.DataHumanUser{
+									{
+										UserId: userIDs[3],
+										User: &management.ImportHumanUserRequest{
+											UserName: integration.Username(),
+											Profile: &management.ImportHumanUserRequest_Profile{
+												FirstName:         integration.FirstName(),
+												LastName:          integration.LastName(),
+												DisplayName:       integration.Username(),
+												PreferredLanguage: integration.Language(),
+											},
+											Email: &management.ImportHumanUserRequest_Email{
+												Email:           integration.Email(),
+												IsEmailVerified: true,
+											},
+											RecoveryCodes: []*management.ImportHumanUserRequest_RecoveryCode{
+												{CodeType: &management.ImportHumanUserRequest_RecoveryCode_Raw{Raw: "code-001"}},
+												{CodeType: &management.ImportHumanUserRequest_RecoveryCode_Raw{Raw: "code-002"}},
+												{CodeType: &management.ImportHumanUserRequest_RecoveryCode_Raw{Raw: "code-003"}},
+											},
+										},
+									},
+									{
+										UserId: userIDs[4],
+										User: &management.ImportHumanUserRequest{
+											UserName: integration.Username(),
+											Profile: &management.ImportHumanUserRequest_Profile{
+												FirstName:         integration.FirstName(),
+												LastName:          integration.LastName(),
+												DisplayName:       integration.Username(),
+												PreferredLanguage: integration.Language(),
+											},
+											Email: &management.ImportHumanUserRequest_Email{
+												Email:           integration.Email(),
+												IsEmailVerified: true,
+											},
+											RecoveryCodes: []*management.ImportHumanUserRequest_RecoveryCode{
+												{CodeType: &management.ImportHumanUserRequest_RecoveryCode_Raw{Raw: "code-101"}},
+												{CodeType: &management.ImportHumanUserRequest_RecoveryCode_Hash{Hash: "$2a$12$3UWLT4aUQsgO/Jn/rydRmuqF39JTXox6G4dwea/UOvbstI/Qba20y"}},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				Timeout: (5 * time.Minute).String(),
+			},
+			want: &admin.ImportDataResponse{
+				Success: &admin.ImportDataSuccess{
+					Orgs: []*admin.ImportDataSuccessOrg{
+						{
+							OrgId:        orgIDs[7],
+							HumanUserIds: userIDs[3:5],
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "empty recovery codes",
+			req: &admin.ImportDataRequest{
+				Data: &admin.ImportDataRequest_DataOrgs{
+					DataOrgs: &admin.ImportDataOrg{
+						Orgs: []*admin.DataOrg{
+							{
+								OrgId: orgIDs[8],
+								Org: &management.AddOrgRequest{
+									Name: integration.OrganizationName(),
+								},
+								HumanUsers: []*v1.DataHumanUser{
+									{
+										UserId: userIDs[5],
+										User: &management.ImportHumanUserRequest{
+											UserName: integration.Username(),
+											Profile: &management.ImportHumanUserRequest_Profile{
+												FirstName:         integration.FirstName(),
+												LastName:          integration.LastName(),
+												DisplayName:       integration.Username(),
+												PreferredLanguage: integration.Language(),
+											},
+											Email: &management.ImportHumanUserRequest_Email{
+												Email:           integration.Email(),
+												IsEmailVerified: true,
+											},
+											RecoveryCodes: []*management.ImportHumanUserRequest_RecoveryCode{},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				Timeout: time.Minute.String(),
+			},
+			want: &admin.ImportDataResponse{
+				Success: &admin.ImportDataSuccess{
+					Orgs: []*admin.ImportDataSuccessOrg{
+						{
+							OrgId:        orgIDs[8],
+							HumanUserIds: userIDs[5:6],
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "invalid recovery code hash",
+			req: &admin.ImportDataRequest{
+				Data: &admin.ImportDataRequest_DataOrgs{
+					DataOrgs: &admin.ImportDataOrg{
+						Orgs: []*admin.DataOrg{
+							{
+								OrgId: orgIDs[9],
+								Org: &management.AddOrgRequest{
+									Name: integration.OrganizationName(),
+								},
+								HumanUsers: []*v1.DataHumanUser{
+									{
+										UserId: userIDs[6],
+										User: &management.ImportHumanUserRequest{
+											UserName: integration.Username(),
+											Profile: &management.ImportHumanUserRequest_Profile{
+												FirstName:         integration.FirstName(),
+												LastName:          integration.LastName(),
+												DisplayName:       integration.Username(),
+												PreferredLanguage: integration.Language(),
+											},
+											Email: &management.ImportHumanUserRequest_Email{
+												Email:           integration.Email(),
+												IsEmailVerified: true,
+											},
+											RecoveryCodes: []*management.ImportHumanUserRequest_RecoveryCode{
+												{CodeType: &management.ImportHumanUserRequest_RecoveryCode_Hash{Hash: "invalid-hash"}},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				Timeout: time.Minute.String(),
+			},
+			want: &admin.ImportDataResponse{
+				Success: &admin.ImportDataSuccess{
+					Orgs: []*admin.ImportDataSuccessOrg{
+						{
+							OrgId:        orgIDs[9],
+							HumanUserIds: userIDs[6:7],
+						},
+					},
+				},
+				Errors: []*admin.ImportDataError{
+					{
+						Type:    "human_user_recovery_codes",
+						Id:      userIDs[6],
+						Message: "ID=DOMAIN-JDk4t Message=Errors.Hash.NotSupported",
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
