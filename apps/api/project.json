@@ -21,7 +21,58 @@
     "targets": {
         "nx-release-publish": {
             "description": "Publishes cross-compiled binary tarballs to the GitHub release and publishes Docker images for production and for debugging.",
-            "command": "{projectRoot}/nx-release-publish.sh"
+            "dependsOn": [
+                "pack-linux-darwin-windows",
+                "push",
+                "push-debug"
+            ],
+            "command": "gh release upload ${ZITADEL_VERSION} ./.artifacts/pack/zitadel-*-*.tar.gz"
+        },
+        "push": {
+            "description": "Builds and pushes the Login Docker image to GitHub Container Registry",
+            "dependsOn": [
+                "build-linux"
+            ],
+            "command": "docker buildx build --file ./apps/api/Dockerfile --push --platform linux/amd64,linux/arm64 -t ghcr.io/eliobischof/login:${ZITADEL_VERSION} ."
+        },
+        "push-debug": {
+            "description": "Builds and pushes the Login Docker image to GitHub Container Registry",
+            "dependsOn": [
+                "build-linux"
+            ],
+            "command": "docker buildx build  --file ./apps/api/Dockerfile --push --platform linux/amd64,linux/arm64 -t ghcr.io/eliobischof/api:${ZITADEL_VERSION}-debug --target builder ."
+        },
+        "build-linux": {
+            "description": "Builds the Go-based API backend for Linux (amd64 and arm64) into executable binaries.",
+            "dependsOn": [
+                "generate",
+                "build-console"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "parallel": false,
+                "commands": [
+                    "GOOS=linux GOARCH=amd64 nx run @zitadel/api:build",
+                    "GOOS=linux GOARCH=arm64 nx run @zitadel/api:build"
+                ]
+            }
+        },
+        "build-darwin-windows": {
+            "description": "Builds the Go-based API backend for Darwin (amd64 and arm64) and Windows (amd64) into executable binaries.",
+            "dependsOn": [
+                "generate",
+                "build-console"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "parallel": false,
+                "commands": [
+                    "GOOS=darwin GOARCH=amd64 nx run @zitadel/api:build",
+                    "GOOS=darwin GOARCH=arm64 nx run @zitadel/api:build",
+                    "GOOS=windows GOARCH=amd64 nx run @zitadel/api:build",
+                    "GOOS=windows GOARCH=arm64 nx run @zitadel/api:build"
+                ]
+            }
         },
         "build": {
             "description": "Compiles the Go-based API backend into an executable binary.",
@@ -64,6 +115,25 @@
             "outputs": [
                 "{workspaceRoot}/.artifacts/pack/zitadel-*-*.tar.gz"
             ]
+        },
+        "pack-linux-darwin-windows": {
+            "description": "Packages the binary for the Linux, Darwin, and Windows platforms.",
+            "dependsOn": [
+                "build-linux",
+                "build-darwin-windows"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "parallel": true,
+                "commands": [
+                    "GOOS=linux GOARCH=amd64 nx run @zitadel/api:pack --excludeTaskDependencies",
+                    "GOOS=linux GOARCH=arm64 nx run @zitadel/api:pack --excludeTaskDependencies",
+                    "GOOS=darwin GOARCH=amd64 nx run @zitadel/api:pack --excludeTaskDependencies",
+                    "GOOS=darwin GOARCH=arm64 nx run @zitadel/api:pack --excludeTaskDependencies",
+                    "GOOS=windows GOARCH=amd64 nx run @zitadel/api:pack --excludeTaskDependencies",
+                    "GOOS=windows GOARCH=arm64 nx run @zitadel/api:pack --excludeTaskDependencies"
+                ]
+            }
         },
         "prod": {
             "description": "Runs the Go-based API backend in production mode ",

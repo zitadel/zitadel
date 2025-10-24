@@ -5,15 +5,16 @@
       "description": "Publishes the packaged Login application to a GitHub release",
       "dependsOn": [
         "pack",
+        "push"
+      ],
+      "command": "bash -c \"gh release upload ${ZITADEL_VERSION} ./.artifacts/pack/zitadel-login.tar.gz\""
+    },
+    "push": {
+      "description": "Builds and pushes the Login Docker image to GitHub Container Registry",
+      "dependsOn": [
         "build"
       ],
-      "executor": "nx:run-commands",
-      "options": {
-        "commands": [
-          "bash -c \"gh release upload ${ZITADEL_VERSION} ./.artifacts/pack/zitadel-login.tar.gz\"",
-          "docker buildx build  --file ./apps/api/Dockerfile --push --platform linux/amd64,linux/arm64 -t ghcr.io/eliobischof/login:${ZITADEL_VERSION} ."
-        ]
-      }
+      "command": "docker buildx build --file ./apps/api/Dockerfile --push --platform linux/amd64,linux/arm64 -t ghcr.io/eliobischof/login:${ZITADEL_VERSION} ."
     },
     "prod": {
       "description": "Runs the Next.js Login application in production mode from the standalone build",

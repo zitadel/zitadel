@@ -20,8 +20,8 @@ permissions:
   pull-requests: write
 
 jobs:
-  lint_test_build:
-    uses: ./.github/workflows/lint_test_build.yml
+  lint_test_build_push:
+    uses: ./.github/workflows/lint_test_build_push.yml
     if: ${{ github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
     permissions:
       contents: read
@@ -32,23 +32,6 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       NX_CLOUD_ACCESS_TOKEN_READONLY: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
 
-  pack:
-    uses: ./.github/workflows/pack.yml
-    permissions:
-      contents: write
-      packages: write
-    secrets:
-      GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
-    if: ${{ github.event_name == 'workflow_dispatch' }}
-    with:
-      go_version: "1.25"
-      node_version: "22"
-      semantic_version: "23.0.7"
-      image_name_github_api: "ghcr.io/eliobischof/zitadel"
-      image_name_google_api: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
-      image_name_github_login: "ghcr.io/eliobischof/zitadel-login"
-      image_name_google_login: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel-login"
-
   release:
     uses: ./.github/workflows/release.yml
     permissions:
@@ -56,14 +39,16 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
-    needs:
-      - pack
-    if: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
       APP_ID: ${{ secrets.APP_ID }}
       APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    needs:
+      - lint_test_build_push
     with:
+      go_version: "1.25"
+      node_version: "22"
       semantic_version: "23.0.7"
       image_name_github_api: "ghcr.io/eliobischof/zitadel"
       image_name_google_api: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"

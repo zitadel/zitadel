@@ -1,4 +1,4 @@
-name: Lint Test Build
+name: Lint Test Build Push
 
 on: 
   workflow_call: 
@@ -16,9 +16,9 @@ on:
         required: true
 
 jobs:
-  lint_test_build:
-    name: Lint, Test and Build
-    runs-on: depot-ubuntu-22.04-16
+  lint_test_build_push:
+    name: Lint, Test, Build and Push
+    runs-on: ubuntu-22.04
     environment: ${{ github.ref_protected == 'true' && 'Protected' || null }}
     steps:
       - name: Checkout Repository
@@ -61,10 +61,10 @@ jobs:
         working-directory: apps/login
       - name: Set SHAs for nx affected commands
         uses: nrwl/nx-set-shas@v4
-      - name: Lint, Test and Build
+      - name: Lint, Test, Build and Push
         env:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
-        run: pnpm nx affected  --nxBail --targets lint test build --exclude @zitadel/docs
+        run: pnpm nx affected --nxBail --targets lint test build push --exclude @zitadel/docs
       - name: Suggest Pipeline Fix By Nx Cloud AI
         if: failure() || cancelled()
         env:
