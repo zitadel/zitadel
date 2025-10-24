@@ -276,11 +276,11 @@ func (s *Server) AddIDPLink(ctx context.Context, req *connect.Request[user.AddID
 }
 
 func (s *Server) DeleteUser(ctx context.Context, req *connect.Request[user.DeleteUserRequest]) (_ *connect.Response[user.DeleteUserResponse], err error) {
-	memberships, grants, err := s.removeUserDependencies(ctx, req.Msg.GetUserId())
+	memberships, grants, groupIDs, err := s.removeUserDependencies(ctx, req.Msg.GetUserId())
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.RemoveUserV2(ctx, req.Msg.GetUserId(), "", memberships, grants...)
+	details, err := s.command.RemoveUserV2(ctx, req.Msg.GetUserId(), "", memberships, grants, groupIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -289,28 +289,32 @@ func (s *Server) DeleteUser(ctx context.Context, req *connect.Request[user.Delet
 	}), nil
 }
 
-func (s *Server) removeUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, error) {
+func (s *Server) removeUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, []string, error) {
 	userGrantUserQuery, err := query.NewUserGrantUserIDSearchQuery(userID)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{userGrantUserQuery},
 	}, true, nil)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	membershipsUserQuery, err := query.NewMembershipUserIDQuery(userID)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	memberships, err := s.query.Memberships(ctx, &query.MembershipSearchQuery{
 		Queries: []query.SearchQuery{membershipsUserQuery},
 	}, false)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
-	return cascadingMemberships(memberships.Memberships), userGrantsToIDs(grants.UserGrants), nil
+	groupIDs, err := s.getGroupsByUserID(ctx, userID)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	return cascadingMemberships(memberships.Memberships), userGrantsToIDs(grants.UserGrants), groupIDs, nil
 }
 
 func cascadingMemberships(memberships []*query.Membership) []*command.CascadingMembership {
@@ -644,4 +648,28 @@ func authMethodTypeToPb(methodType domain.UserAuthMethodType) user.Authenticatio
 	default:
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_UNSPECIFIED
 	}
+}
+
+func (s *Server) getGroupsByUserID(ctx context.Context, userID string) ([]string, error) {
+	groupUserQuery, err := query.NewGroupUsersUserIDsSearchQuery([]string{userID})
+	if err != nil {
+		return nil, err
+	}
+	groupUsers, err := s.query.SearchGroupUsers(ctx,
+		&query.GroupUsersSearchQuery{
+			Queries: []query.SearchQuery{
+				groupUserQuery,
+			},
+		}, nil)
+	if err != nil {
+		return nil, err
+	}
+	if len(groupUsers.GroupUsers) == 0 {
+		return nil, nil
+	}
+	groupIDs := make([]string, 0, len(groupUsers.GroupUsers))
+	for _, groupUser := range groupUsers.GroupUsers {
+		groupIDs = append(groupIDs, groupUser.GroupID)
+	}
+	return groupIDs, nil
 }

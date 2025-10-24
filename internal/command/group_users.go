@@ -5,6 +5,7 @@ import (
 	"slices"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	repo "github.com/zitadel/zitadel/internal/repository/group"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -109,4 +110,22 @@ func (g *GroupWriteModel) getUserIDsToRemove() []string {
 		}
 	}
 	return userIDsToRemove
+}
+
+// removeUserFromGroups returns the events to remove a user from multiple groups.
+// This is needed when a user is deleted and subsequently needs to be removed from all groups.
+// Note: Ensure that the groupIDs are retrieved via SearchGroupUsers before calling this method
+func (c *Commands) removeUserFromGroups(ctx context.Context, userID string, groupIDs []string, resourceOwner string) ([]eventstore.Command, error) {
+	events := make([]eventstore.Command, 0, len(groupIDs))
+	for _, groupID := range groupIDs {
+		events = append(
+			events,
+			repo.NewGroupUsersRemovedEvent(
+				ctx,
+				&repo.NewAggregate(groupID, resourceOwner).Aggregate,
+				[]string{userID},
+			),
+		)
+	}
+	return events, nil
 }
