@@ -51,7 +51,7 @@ func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserReques
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.RemoveUser(ctx, ctxData.UserID, ctxData.ResourceOwner, cascadingMemberships(memberships.Memberships), groupIDs, userGrantsToIDs(grants.UserGrants))
+	details, err := s.command.RemoveUser(ctx, ctxData.UserID, ctxData.ResourceOwner, cascadingMemberships(memberships.Memberships), userGrantsToIDs(grants.UserGrants), groupIDs)
 	if err != nil {
 		return nil, err
 	}
