@@ -39,12 +39,12 @@ type RelationalTableFeatureMatrix struct {
 func RelationalTablesEnableMatrix() []RelationalTableFeatureMatrix {
 	return []RelationalTableFeatureMatrix{
 		{
-			State:      "when relational tables are enabled",
-			FeatureSet: &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)},
-		},
-		{
 			State:      "when relational tables are disabled",
 			FeatureSet: &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(false)},
+		},
+		{
+			State:      "when relational tables are enabled",
+			FeatureSet: &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)},
 		},
 	}
 }

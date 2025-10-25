@@ -22,6 +22,10 @@ func NewOrgDomainRepo(ctrl *gomock.Controller) *OrgDomainRepo {
 	}
 }
 
+func (r *OrgDomainRepo) EXPECT() *MockOrganizationDomainRepositoryMockRecorder {
+	return r.mock.EXPECT()
+}
+
 func (r *OrgDomainRepo) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.OrganizationDomain, error) {
 	return r.mock.Get(ctx, client, opts...)
 

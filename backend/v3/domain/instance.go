@@ -94,6 +94,8 @@ type instanceChanges interface {
 }
 
 // InstanceRepository is the interface for the instance repository.
+//
+//go:generate mockgen -typed -package domainmock -destination ./mock/instance.mock.go . InstanceRepository
 type InstanceRepository interface {
 	Repository
 
