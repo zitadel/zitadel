@@ -40,8 +40,8 @@ type Querier[T any] interface {
 // The default chain includes logging, tracing, and event publishing.
 // If you want to invoke multiple commands in a single transaction, you can use the [batchExecutor].
 func Invoke(ctx context.Context, executor Executor, opts ...InvokeOpt) error {
-	invokeOpts := &InvokeOpts{
-		Invoker: NewLoggingInvoker(
+	invokeOpts := DefaultOpts(
+		NewLoggingInvoker(
 			NewTraceInvoker(
 				NewEventStoreInvoker(
 					NewTransactionInvoker(
@@ -50,7 +50,7 @@ func Invoke(ctx context.Context, executor Executor, opts ...InvokeOpt) error {
 				),
 			),
 		),
-	}
+	)
 	for _, opt := range opts {
 		opt(invokeOpts)
 	}

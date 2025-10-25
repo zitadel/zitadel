@@ -16,6 +16,7 @@ func NewTransactionInvoker(next Invoker) *transactionInvoker {
 	}
 }
 
+//go:generate mockgen -destination=mock/transactional.mock.go -package=domainmock . Transactional
 type Transactional interface {
 	RequiresTransaction() bool
 }
