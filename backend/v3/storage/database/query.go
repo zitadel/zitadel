@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"reflect"
+	"slices"
 
 	"go.uber.org/mock/gomock"
 )
@@ -148,17 +149,13 @@ func (q *QueryOpts) Matches(x any) bool {
 	inputOpts.Write(inputBuilder)
 	q.Write(expectedBuilder)
 
-	if len(inputBuilder.Args()) != len(expectedBuilder.Args()) {
-		return false
-	}
-
-	for i := range inputBuilder.Args() {
-		argIn, argExp := inputBuilder.Args()[i], expectedBuilder.Args()[i]
-
-		isEqual := reflect.DeepEqual(argIn, argExp)
-		if !isEqual {
-			return false
+	if slices.CompareFunc(inputBuilder.Args(), expectedBuilder.Args(), func(input, expected any) int {
+		if reflect.DeepEqual(input, expected) {
+			return 0
 		}
+		return -1
+	}) != 0 {
+		return false
 	}
 	return inputBuilder.String() == expectedBuilder.String()
 }

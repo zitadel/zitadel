@@ -182,7 +182,8 @@ func TestDeleteOrgCommand_Validate(t *testing.T) {
 			// Given
 			d := domain.NewDeleteOrgCommand(tc.inputOrganizationID)
 			ctrl := gomock.NewController(t)
-			opts := &domain.InvokeOpts{DB: new(noopdb.Pool)}
+			opts := &domain.InvokeOpts{}
+			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
 
 			if tc.orgRepo != nil {
 				domain.WithOrganizationRepo(tc.orgRepo(ctrl))(opts)
@@ -204,7 +205,6 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 	t.Parallel()
 
 	ctx := authz.NewMockContext("inst-1", "org-1", gofakeit.UUID())
-	txInitErr := errors.New("tx init error")
 	deleteErr := errors.New("delete error")
 	getErr := errors.New("get error")
 
@@ -218,18 +218,6 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 		expectedError   error
 		expectedOrgName string
 	}{
-		{
-			testName: "when EnsureTx fails should return error",
-			mockTx: func(ctrl *gomock.Controller) database.QueryExecutor {
-				mockDB := dbmock.NewMockPool(ctrl)
-				mockDB.EXPECT().
-					Begin(gomock.Any(), gomock.Any()).
-					Times(1).
-					Return(nil, txInitErr)
-				return mockDB
-			},
-			expectedError: txInitErr,
-		},
 		{
 			testName: "when retrieving organization fails should return error",
 			orgRepo: func(ctrl *gomock.Controller) domain.OrganizationRepository {
@@ -419,23 +407,23 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 			// Given
-			d := domain.NewDeleteOrgCommand(tc.inputOrganizationID)
+			cmd := domain.NewDeleteOrgCommand(tc.inputOrganizationID)
 			ctrl := gomock.NewController(t)
-			opts := &domain.InvokeOpts{DB: new(noopdb.Pool)}
-
+			opts := &domain.InvokeOpts{}
+			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
 			if tc.mockTx != nil {
-				opts.DB = tc.mockTx(ctrl)
+				domain.WithQueryExecutor(tc.mockTx(ctrl))(opts)
 			}
 			if tc.orgRepo != nil {
 				domain.WithOrganizationRepo(tc.orgRepo(ctrl))(opts)
 			}
 
 			// Test
-			err := d.Execute(ctx, opts)
+			err := opts.Invoke(ctx, cmd)
 
 			// Verify
 			assert.Equal(t, tc.expectedError, err)
-			assert.Equal(t, tc.expectedOrgName, d.OrganizationName)
+			assert.Equal(t, tc.expectedOrgName, cmd.OrganizationName)
 		})
 	}
 }
@@ -444,7 +432,6 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 func TestDeleteOrgCommand_Events(t *testing.T) {
 	t.Parallel()
 	ctx := authz.NewMockContext("inst-1", "org-1", gofakeit.UUID())
-	txInitErr := errors.New("tx init error")
 
 	tt := []struct {
 		testName      string
@@ -453,19 +440,6 @@ func TestDeleteOrgCommand_Events(t *testing.T) {
 		expectedError error
 		expectedCount int
 	}{
-		{
-			testName: "when EnsureTx fails should return error",
-			mockTx: func(ctrl *gomock.Controller) database.QueryExecutor {
-				mockDB := dbmock.NewMockPool(ctrl)
-				mockDB.EXPECT().
-					Begin(gomock.Any(), gomock.Any()).
-					Times(1).
-					Return(nil, txInitErr)
-				return mockDB
-			},
-			command:       domain.NewDeleteOrgCommand("org-1"),
-			expectedError: txInitErr,
-		},
 		{
 			testName: "should create org removed event",
 			command: &domain.DeleteOrgCommand{
@@ -486,10 +460,11 @@ func TestDeleteOrgCommand_Events(t *testing.T) {
 
 			// Given
 			ctrl := gomock.NewController(t)
-			opts := &domain.InvokeOpts{DB: new(noopdb.Pool)}
+			opts := &domain.InvokeOpts{}
+			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
 
 			if tc.mockTx != nil {
-				opts.DB = tc.mockTx(ctrl)
+				domain.WithQueryExecutor(tc.mockTx(ctrl))(opts)
 			}
 
 			// Test

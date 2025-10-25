@@ -23,20 +23,17 @@ func NewDeleteOrgCommand(organizationID string) *DeleteOrgCommand {
 	return &DeleteOrgCommand{ID: organizationID}
 }
 
+// RequiresTransaction implements [Transactional].
+func (d *DeleteOrgCommand) RequiresTransaction() bool { return true }
+
 // Events implements [Commander].
 //
 // TODO(IAM-Marco): Finish implementation when policies, org settings, idp links and entities repositories
 // are implemented
 func (d *DeleteOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
-	closeFunc, err := opts.EnsureTx(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer func() { err = closeFunc(ctx, err) }()
-
 	usernames := []string{}
-	// userRepo := opts.usersRepo(pool)
-	// users, err := userRepo.List(ctx, database.WithCondition(opts.organizationRepo(pool).IDCondition(d.ID)))
+	// userRepo := opts.usersRepo(opts.DB())
+	// users, err := userRepo.List(ctx, database.WithCondition(opts.organizationRepo(opts.DB()).IDCondition(d.ID)))
 	// if err != nil {
 	// 	return nil, err
 	// }
@@ -44,13 +41,13 @@ func (d *DeleteOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]even
 	// 	usernames = append(usernames, u.UserID)
 	// }
 
-	// domainPolicyRepo := opts.domainPolicyRepo(pool)
+	// domainPolicyRepo := opts.domainPolicyRepo(opts.DB())
 	// policy, err := domainPolicyRepo.Get(ctx, instanceID, d.ID)
 	// if err != nil {
 	// 	return nil, err
 	// }
 
-	// orgSettingsRepo := opts.organizationSettingsRepo(pool)
+	// orgSettingsRepo := opts.organizationSettingsRepo(opts.DB())
 	// orgSettings, err := orgSettingsRepo.Get(ctx, d.ID)
 	// if err != nil {
 	// 	return nil, err
@@ -64,7 +61,7 @@ func (d *DeleteOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]even
 	}
 
 	externalIDPLinks := []*internal_domain.UserIDPLink{}
-	// idpLinksRepo := opts.idpLinksRepo(pool)
+	// idpLinksRepo := opts.idpLinksRepo(opts.DB())
 	// idpLinks, err := idpLinksRepo.List(ctx, d.ID)
 	// if err != nil {
 	// 	return nil, err
@@ -75,7 +72,7 @@ func (d *DeleteOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]even
 	// }
 
 	samlEntityIDs := []string{}
-	// entityIDsRepo := opts.entityIDsRepo(pool)
+	// entityIDsRepo := opts.entityIDsRepo(opts.DB())
 	// entityIDs, err := entityIDsRepo.List(ctx, d.ID)
 	// if err != nil {
 	// 	return nil, err
@@ -100,17 +97,11 @@ func (d *DeleteOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]even
 
 // Execute implements [Commander].
 func (d *DeleteOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
-	closeFunc, err := opts.EnsureTx(ctx)
-	if err != nil {
-		return err
-	}
-
-	defer func() { err = closeFunc(ctx, err) }()
 	instance := authz.GetInstance(ctx)
 
 	orgRepo := opts.organizationRepo.LoadDomains()
 
-	orgToDelete, err := orgRepo.Get(ctx, pool, database.WithCondition(database.And(
+	orgToDelete, err := orgRepo.Get(ctx, opts.DB(), database.WithCondition(database.And(
 		orgRepo.IDCondition(d.ID),
 		orgRepo.InstanceIDCondition(instance.InstanceID()),
 	)))
@@ -120,7 +111,7 @@ func (d *DeleteOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 	d.OrganizationName = orgToDelete.Name
 	d.Domains = orgToDelete.Domains
 
-	deletedRows, err := orgRepo.Delete(ctx, pool,
+	deletedRows, err := orgRepo.Delete(ctx, opts.DB(),
 		database.And(
 			orgRepo.IDCondition(d.ID),
 			orgRepo.InstanceIDCondition(authz.GetInstance(ctx).InstanceID()),
@@ -157,7 +148,7 @@ func (d *DeleteOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 
 	// Check if the ZITADEL project exists on the input organization
 	projectRepo := opts.projectRepo
-	_, getErr := projectRepo.Get(ctx, pool,
+	_, getErr := projectRepo.Get(ctx, opts.DB(),
 		database.WithCondition(database.And(
 			projectRepo.IDCondition(instance.ProjectID()),
 			projectRepo.OrganizationIDCondition(d.ID),
@@ -174,7 +165,7 @@ func (d *DeleteOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 	}
 
 	orgRepo := opts.organizationRepo
-	_, errGetOrg := orgRepo.Get(ctx, pool,
+	_, errGetOrg := orgRepo.Get(ctx, opts.DB(),
 		database.WithCondition(database.And(
 			orgRepo.IDCondition(d.ID),
 			orgRepo.InstanceIDCondition(instance.InstanceID()),
@@ -189,4 +180,7 @@ func (d *DeleteOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 	return err
 }
 
-var _ Commander = (*DeleteOrgCommand)(nil)
+var (
+	_ Commander     = (*DeleteOrgCommand)(nil)
+	_ Transactional = (*DeleteOrgCommand)(nil)
+)

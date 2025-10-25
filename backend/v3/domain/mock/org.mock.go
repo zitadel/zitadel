@@ -316,17 +316,17 @@ func (c *MockOrganizationRepositoryIDColumnCall) DoAndReturn(f func() database.C
 }
 
 // IDCondition mocks base method.
-func (m *MockOrganizationRepository) IDCondition(instanceID string) database.Condition {
+func (m *MockOrganizationRepository) IDCondition(orgID string) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IDCondition", instanceID)
+	ret := m.ctrl.Call(m, "IDCondition", orgID)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // IDCondition indicates an expected call of IDCondition.
-func (mr *MockOrganizationRepositoryMockRecorder) IDCondition(instanceID any) *MockOrganizationRepositoryIDConditionCall {
+func (mr *MockOrganizationRepositoryMockRecorder) IDCondition(orgID any) *MockOrganizationRepositoryIDConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IDCondition", reflect.TypeOf((*MockOrganizationRepository)(nil).IDCondition), instanceID)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IDCondition", reflect.TypeOf((*MockOrganizationRepository)(nil).IDCondition), orgID)
 	return &MockOrganizationRepositoryIDConditionCall{Call: call}
 }
 
@@ -621,6 +621,82 @@ func (c *MockOrganizationRepositoryNameConditionCall) Do(f func(database.TextOpe
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockOrganizationRepositoryNameConditionCall) DoAndReturn(f func(database.TextOperation, string) database.Condition) *MockOrganizationRepositoryNameConditionCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// PrimaryKeyColumns mocks base method.
+func (m *MockOrganizationRepository) PrimaryKeyColumns() []database.Column {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PrimaryKeyColumns")
+	ret0, _ := ret[0].([]database.Column)
+	return ret0
+}
+
+// PrimaryKeyColumns indicates an expected call of PrimaryKeyColumns.
+func (mr *MockOrganizationRepositoryMockRecorder) PrimaryKeyColumns() *MockOrganizationRepositoryPrimaryKeyColumnsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PrimaryKeyColumns", reflect.TypeOf((*MockOrganizationRepository)(nil).PrimaryKeyColumns))
+	return &MockOrganizationRepositoryPrimaryKeyColumnsCall{Call: call}
+}
+
+// MockOrganizationRepositoryPrimaryKeyColumnsCall wrap *gomock.Call
+type MockOrganizationRepositoryPrimaryKeyColumnsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockOrganizationRepositoryPrimaryKeyColumnsCall) Return(arg0 []database.Column) *MockOrganizationRepositoryPrimaryKeyColumnsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockOrganizationRepositoryPrimaryKeyColumnsCall) Do(f func() []database.Column) *MockOrganizationRepositoryPrimaryKeyColumnsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockOrganizationRepositoryPrimaryKeyColumnsCall) DoAndReturn(f func() []database.Column) *MockOrganizationRepositoryPrimaryKeyColumnsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// PrimaryKeyCondition mocks base method.
+func (m *MockOrganizationRepository) PrimaryKeyCondition(instanceID, organizationID string) database.Condition {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PrimaryKeyCondition", instanceID, organizationID)
+	ret0, _ := ret[0].(database.Condition)
+	return ret0
+}
+
+// PrimaryKeyCondition indicates an expected call of PrimaryKeyCondition.
+func (mr *MockOrganizationRepositoryMockRecorder) PrimaryKeyCondition(instanceID, organizationID any) *MockOrganizationRepositoryPrimaryKeyConditionCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PrimaryKeyCondition", reflect.TypeOf((*MockOrganizationRepository)(nil).PrimaryKeyCondition), instanceID, organizationID)
+	return &MockOrganizationRepositoryPrimaryKeyConditionCall{Call: call}
+}
+
+// MockOrganizationRepositoryPrimaryKeyConditionCall wrap *gomock.Call
+type MockOrganizationRepositoryPrimaryKeyConditionCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockOrganizationRepositoryPrimaryKeyConditionCall) Return(arg0 database.Condition) *MockOrganizationRepositoryPrimaryKeyConditionCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockOrganizationRepositoryPrimaryKeyConditionCall) Do(f func(string, string) database.Condition) *MockOrganizationRepositoryPrimaryKeyConditionCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockOrganizationRepositoryPrimaryKeyConditionCall) DoAndReturn(f func(string, string) database.Condition) *MockOrganizationRepositoryPrimaryKeyConditionCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

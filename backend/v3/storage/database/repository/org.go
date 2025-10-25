@@ -102,6 +102,7 @@ func (o org) Update(ctx context.Context, client database.QueryExecutor, conditio
 	if !condition.IsRestrictingColumn(o.InstanceIDColumn()) {
 		return 0, database.NewMissingConditionError(o.InstanceIDColumn())
 	}
+	// TODO: PR check
 	if !database.Changes(changes).IsOnColumn(o.UpdatedAtColumn()) {
 		changes = append(changes, database.NewChange(o.UpdatedAtColumn(), database.NullInstruction))
 	}

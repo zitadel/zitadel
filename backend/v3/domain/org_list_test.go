@@ -317,9 +317,8 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 			cmd := &domain.ListOrgsQuery{
 				Request: tc.inputRequest,
 			}
-			opts := &domain.InvokeOpts{
-				DB: new(noopdb.Pool),
-			}
+			opts := &domain.InvokeOpts{}
+			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
 			if tc.repos != nil {
 				orgRepo, domainRepo := tc.repos(ctrl, tc.queryParams...)
 				domain.WithOrganizationRepo(orgRepo)(opts)
@@ -327,7 +326,7 @@ func TestListOrgsCommand_Execute(t *testing.T) {
 			}
 
 			// Test
-			err := cmd.Execute(ctx, opts)
+			err := opts.Invoke(ctx, cmd)
 
 			// Verify
 			assert.Equal(t, tc.expectedError, err)

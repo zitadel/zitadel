@@ -145,8 +145,9 @@ func TestActivateOrgCommand_Validate(t *testing.T) {
 			ctx := authz.NewMockContext("instance-1", "", "")
 			ctrl := gomock.NewController(t)
 			opts := &domain.InvokeOpts{
-				DB: new(noopdb.Pool),
+				Invoker: domain.NewTransactionInvoker(nil),
 			}
+			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
 			if tc.orgRepo != nil {
 				domain.WithOrganizationRepo(tc.orgRepo(ctrl))(opts)
 			}
@@ -272,17 +273,19 @@ func TestActivateOrgCommand_Execute(t *testing.T) {
 			}
 
 			opts := &domain.InvokeOpts{
-				DB: new(noopdb.Pool),
+				Invoker: domain.NewTransactionInvoker(nil),
 			}
+			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
+
 			if tc.orgRepo != nil {
 				domain.WithOrganizationRepo(tc.orgRepo(ctrl))(opts)
 			}
 			if tc.queryExecutor != nil {
-				opts.DB = tc.queryExecutor(ctrl)
+				domain.WithQueryExecutor(tc.queryExecutor(ctrl))(opts)
 			}
 
 			// Test
-			err := cmd.Execute(ctx, opts)
+			err := opts.Invoke(ctx, cmd)
 
 			// Verify
 			assert.Equal(t, tc.expectedError, err)

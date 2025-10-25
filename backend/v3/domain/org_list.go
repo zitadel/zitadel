@@ -40,7 +40,7 @@ func (l *ListOrgsQuery) Execute(ctx context.Context, opts *InvokeOpts) (err erro
 		return err
 	}
 
-	l.result, err = organizationRepo.List(ctx, pool, conditions, sorting, limit, pagination)
+	l.result, err = organizationRepo.List(ctx, opts.DB(), conditions, sorting, limit, pagination)
 	return err
 }
 

@@ -21,18 +21,24 @@ type UpdateOrgCommand struct {
 	IsOldDomainVerified *bool   `json:"is_old_domain_primary"`
 }
 
+// RequiresTransaction implements [Transactional].
+func (cmd *UpdateOrgCommand) RequiresTransaction() bool { return true }
+
 // Events implements Commander.
-func (u *UpdateOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
+func (cmd *UpdateOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
 	toReturn := []eventstore.Command{}
 
-	if u.OldDomainName != nil && *u.OldDomainName != u.Name {
-		toReturn = append(toReturn, org.NewOrgChangedEvent(ctx, &org.NewAggregate(u.ID).Aggregate, *u.OldDomainName, u.Name))
+	if cmd.OldDomainName != nil && *cmd.OldDomainName != cmd.Name {
+		toReturn = append(toReturn, org.NewOrgChangedEvent(ctx, &org.NewAggregate(cmd.ID).Aggregate, *cmd.OldDomainName, cmd.Name))
 	}
 
 	return toReturn, nil
 }
 
-var _ Commander = (*UpdateOrgCommand)(nil)
+var (
+	_ Commander     = (*UpdateOrgCommand)(nil)
+	_ Transactional = (*UpdateOrgCommand)(nil)
+)
 
 func NewUpdateOrgCommand(id, name string) *UpdateOrgCommand {
 	return &UpdateOrgCommand{
@@ -41,18 +47,12 @@ func NewUpdateOrgCommand(id, name string) *UpdateOrgCommand {
 	}
 }
 
-func (u *UpdateOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
-	close, err := opts.EnsureTx(ctx)
-	if err != nil {
-		return err
-	}
-	defer func() { err = close(ctx, err) }()
-
+func (cmd *UpdateOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	organizationRepo := opts.organizationRepo.LoadDomains()
 
-	org, err := organizationRepo.Get(ctx, pool, database.WithCondition(
+	org, err := organizationRepo.Get(ctx, opts.DB(), database.WithCondition(
 		database.And(
-			organizationRepo.IDCondition(u.ID),
+			organizationRepo.IDCondition(cmd.ID),
 			organizationRepo.InstanceIDCondition(authz.GetInstance(ctx).InstanceID()),
 		),
 	))
@@ -60,19 +60,19 @@ func (u *UpdateOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 		return err
 	}
 
-	err = u.setDomainInfos(ctx, org)
+	err = cmd.setDomainInfos(ctx, org)
 	if err != nil {
 		return err
 	}
 
 	updateCount, err := organizationRepo.Update(
 		ctx,
-		pool,
+		opts.DB(),
 		database.And(
 			organizationRepo.IDCondition(org.ID),
 			organizationRepo.InstanceIDCondition(org.InstanceID),
 		),
-		database.NewChange(organizationRepo.NameColumn(), u.Name),
+		database.NewChange(organizationRepo.NameColumn(), cmd.Name),
 	)
 	if err != nil {
 		return err
@@ -90,45 +90,36 @@ func (u *UpdateOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 	return err
 }
 
-func (u *UpdateOrgCommand) String() string {
+func (cmd *UpdateOrgCommand) String() string {
 	return "UpdateOrgCommand"
 }
 
-func (u *UpdateOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) error {
-	if u.ID = strings.TrimSpace(u.ID); u.ID == "" {
+func (cmd *UpdateOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) error {
+	if cmd.ID = strings.TrimSpace(cmd.ID); cmd.ID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-lEMhVC", "invalid organization ID")
 	}
-	if u.Name = strings.TrimSpace(u.Name); u.Name == "" {
+	if cmd.Name = strings.TrimSpace(cmd.Name); cmd.Name == "" {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-wfUntW", "invalid organization name")
 	}
 
-	close, err := opts.EnsureTx(ctx)
-	if err != nil {
-		return err
-	}
-	defer func() { err = close(ctx, err) }()
-
 	organizationRepo := opts.organizationRepo
 
-	org, err := organizationRepo.Get(ctx, pool, database.WithCondition(
-		database.And(
-			organizationRepo.IDCondition(u.ID),
-			organizationRepo.InstanceIDCondition(authz.GetInstance(ctx).InstanceID()),
-		),
-	))
+	org, err := organizationRepo.Get(ctx, opts.DB(),
+		database.WithCondition(
+			opts.organizationRepo.PrimaryKeyCondition(authz.GetInstance(ctx).InstanceID(), cmd.ID),
+		))
 	if err != nil {
 		return err
 	}
 
-	if org.Name == u.Name {
-		err = zerrors.ThrowPreconditionFailed(nil, "DOM-nDzwIu", "Errors.Org.NotChanged")
-		return err
+	if org.Name == cmd.Name {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-nDzwIu", "Errors.Org.NotChanged")
 	}
 
 	return nil
 }
 
-func (u *UpdateOrgCommand) setDomainInfos(ctx context.Context, org *Organization) error {
+func (cmd *UpdateOrgCommand) setDomainInfos(ctx context.Context, org *Organization) error {
 	iamDomain := http_utils.DomainContext(ctx).RequestedDomain()
 	oldDomainName, err := domain.NewIAMDomainName(org.Name, iamDomain)
 	if err != nil {
@@ -137,8 +128,8 @@ func (u *UpdateOrgCommand) setDomainInfos(ctx context.Context, org *Organization
 
 	for _, d := range org.Domains {
 		if d.Domain == oldDomainName && !d.IsPrimary {
-			u.IsOldDomainVerified = &d.IsVerified
-			u.OldDomainName = &d.Domain
+			cmd.IsOldDomainVerified = &d.IsVerified
+			cmd.OldDomainName = &d.Domain
 			return nil
 		}
 	}

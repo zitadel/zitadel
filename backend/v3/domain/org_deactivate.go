@@ -12,7 +12,10 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-var _ Commander = (*DeactivateOrgCommand)(nil)
+var (
+	_ Commander     = (*DeactivateOrgCommand)(nil)
+	_ Transactional = (*DeactivateOrgCommand)(nil)
+)
 
 type DeactivateOrgCommand struct {
 	ID string `json:"id"`
@@ -27,35 +30,29 @@ func (d *DeactivateOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]
 	return []eventstore.Command{org.NewOrgDeactivatedEvent(ctx, &org.NewAggregate(d.ID).Aggregate)}, nil
 }
 
+// RequiresTransaction implements [Transactional].
+func (d *DeactivateOrgCommand) RequiresTransaction() bool { return true }
+
 // Execute implements [Commander].
 func (d *DeactivateOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
-	close, err := opts.EnsureTx(ctx)
-	if err != nil {
-		return err
-	}
-	defer func() { err = close(ctx, err) }()
-
 	organizationRepo := opts.organizationRepo
 
-	updateCount, err := organizationRepo.Update(ctx, pool,
+	updateCount, err := organizationRepo.Update(ctx, opts.DB(),
 		database.And(
 			organizationRepo.IDCondition(d.ID),
 			organizationRepo.InstanceIDCondition(authz.GetInstance(ctx).InstanceID()),
 		),
 		database.NewChange(organizationRepo.StateColumn(), OrgStateInactive),
 	)
-
 	if err != nil {
 		return err
 	}
 
 	if updateCount == 0 {
-		err = zerrors.ThrowNotFound(nil, "DOM-vWPy7D", "Errors.Org.NotFound")
-		return err
+		return zerrors.ThrowNotFound(nil, "DOM-vWPy7D", "Errors.Org.NotFound")
 	}
 	if updateCount > 1 {
-		err = zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(1, updateCount), "DOM-dXl1kJ", "unexpected number of rows updated")
-		return err
+		return zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(1, updateCount), "DOM-dXl1kJ", "unexpected number of rows updated")
 	}
 
 	return nil
@@ -74,7 +71,7 @@ func (d *DeactivateOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (
 
 	organizationRepo := opts.organizationRepo
 
-	org, err := organizationRepo.Get(ctx, pool, database.WithCondition(
+	org, err := organizationRepo.Get(ctx, opts.DB(), database.WithCondition(
 		database.And(
 			organizationRepo.IDCondition(d.ID),
 			organizationRepo.InstanceIDCondition(authz.GetInstance(ctx).InstanceID()),
