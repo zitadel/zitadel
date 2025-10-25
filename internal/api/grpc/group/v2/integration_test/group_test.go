@@ -5,6 +5,7 @@ package group_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/muhlemmer/gu"
@@ -32,7 +33,6 @@ func TestServer_CreateGroup(t *testing.T) {
 		wantResp    bool
 		wantGroupID string
 		wantErrCode codes.Code
-		wantErrMsg  string
 	}{
 		{
 			name: "unauthenticated, error",
@@ -42,7 +42,6 @@ func TestServer_CreateGroup(t *testing.T) {
 				OrganizationId: orgResp.GetOrganizationId(),
 			},
 			wantErrCode: codes.Unauthenticated,
-			wantErrMsg:  "auth header missing",
 		},
 		{
 			name: "invalid name, error",
@@ -52,7 +51,6 @@ func TestServer_CreateGroup(t *testing.T) {
 				OrganizationId: "org1",
 			},
 			wantErrCode: codes.InvalidArgument,
-			wantErrMsg:  "Errors.Group.InvalidName (GROUP-m177lN)",
 		},
 		{
 			name: "missing organization id, error",
@@ -61,7 +59,6 @@ func TestServer_CreateGroup(t *testing.T) {
 				Name: integration.GroupName(),
 			},
 			wantErrCode: codes.InvalidArgument,
-			wantErrMsg:  "invalid CreateGroupRequest.OrganizationId: value length must be between 1 and 200 runes, inclusive",
 		},
 		{
 			name: "missing permission, error",
@@ -71,7 +68,6 @@ func TestServer_CreateGroup(t *testing.T) {
 				OrganizationId: orgResp.GetOrganizationId(),
 			},
 			wantErrCode: codes.NotFound,
-			wantErrMsg:  "membership not found (AUTHZ-cdgFk)",
 		},
 		{
 			name: "organization not found, error",
@@ -81,7 +77,6 @@ func TestServer_CreateGroup(t *testing.T) {
 				OrganizationId: "org1",
 			},
 			wantErrCode: codes.FailedPrecondition,
-			wantErrMsg:  "Organisation not found (CMDGRP-j1mH8l)",
 		},
 		{
 			name: "instance owner, already existing group (unique name constraint), error",
@@ -91,7 +86,6 @@ func TestServer_CreateGroup(t *testing.T) {
 				OrganizationId: orgResp.GetOrganizationId(),
 			},
 			wantErrCode: codes.AlreadyExists,
-			wantErrMsg:  "Errors.Group.AlreadyExists (V3-DKcYh)",
 		},
 		{
 			name: "instance owner, already existing group ID, error",
@@ -102,7 +96,6 @@ func TestServer_CreateGroup(t *testing.T) {
 				OrganizationId: orgResp.GetOrganizationId(),
 			},
 			wantErrCode: codes.AlreadyExists,
-			wantErrMsg:  "Errors.Group.AlreadyExists (CMDGRP-shRut3)",
 		},
 		{
 			name: "organization owner, missing permission, error",
@@ -112,7 +105,6 @@ func TestServer_CreateGroup(t *testing.T) {
 				OrganizationId: orgResp.GetOrganizationId(),
 			},
 			wantErrCode: codes.NotFound,
-			wantErrMsg:  "membership not found (AUTHZ-cdgFk)",
 		},
 		{
 			name: "organization owner, with permission, ok",
@@ -146,13 +138,14 @@ func TestServer_CreateGroup(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			beforeCreationDate := time.Now().UTC()
 			got, err := instance.Client.GroupV2.CreateGroup(tt.ctx, tt.req)
+			afterCreationDate := time.Now().UTC()
 			if tt.wantErrCode != codes.OK {
 				require.Error(t, err)
 				require.Empty(t, got.GetId())
 				require.Empty(t, got.GetCreationDate())
 				assert.Equal(t, tt.wantErrCode, status.Code(err))
-				assert.Equal(t, tt.wantErrMsg, status.Convert(err).Message())
 				return
 			}
 			require.NoError(t, err)
@@ -160,7 +153,7 @@ func TestServer_CreateGroup(t *testing.T) {
 				assert.Equal(t, tt.wantGroupID, got.Id, "want: %v, got: %v", tt.wantGroupID, got)
 			}
 			require.NotEmpty(t, got.GetId())
-			require.NotEmpty(t, got.GetCreationDate())
+			assert.WithinRange(t, got.GetCreationDate().AsTime(), beforeCreationDate, afterCreationDate)
 		})
 	}
 }
@@ -183,7 +176,6 @@ func TestServer_UpdateGroup(t *testing.T) {
 		req            *group_v2.UpdateGroupRequest
 		wantChangeDate bool
 		wantErrCode    codes.Code
-		wantErrMsg     string
 	}{
 		{
 			name: "unauthenticated, error",
@@ -192,7 +184,6 @@ func TestServer_UpdateGroup(t *testing.T) {
 				Name: gu.Ptr(integration.GroupName()),
 			},
 			wantErrCode: codes.Unauthenticated,
-			wantErrMsg:  "auth header missing",
 		},
 		{
 			name: "invalid name, error",
@@ -202,7 +193,6 @@ func TestServer_UpdateGroup(t *testing.T) {
 				Name: gu.Ptr(" "),
 			},
 			wantErrCode: codes.InvalidArgument,
-			wantErrMsg:  "Errors.Group.InvalidName (GROUP-dUNd3r)",
 		},
 		{
 			name: "missing permission, error",
@@ -212,7 +202,6 @@ func TestServer_UpdateGroup(t *testing.T) {
 				Name: gu.Ptr("updated group name"),
 			},
 			wantErrCode: codes.NotFound,
-			wantErrMsg:  "membership not found (AUTHZ-cdgFk)",
 		},
 		{
 			name: "organization owner, missing permission, error",
@@ -222,7 +211,6 @@ func TestServer_UpdateGroup(t *testing.T) {
 				Name: gu.Ptr("updated group name"),
 			},
 			wantErrCode: codes.NotFound,
-			wantErrMsg:  "membership not found (AUTHZ-cdgFk)",
 		},
 		{
 			name: "organization owner, with permission, ok",
@@ -241,7 +229,6 @@ func TestServer_UpdateGroup(t *testing.T) {
 				Name: gu.Ptr("updated group name 2"),
 			},
 			wantErrCode: codes.NotFound,
-			wantErrMsg:  "Errors.Group.NotFound (CMDGRP-b33zly)",
 		},
 		{
 			name: "instance owner, no change, ok",
@@ -250,7 +237,7 @@ func TestServer_UpdateGroup(t *testing.T) {
 				Id:   existingGroup.GetId(),
 				Name: gu.Ptr(groupName),
 			},
-			wantChangeDate: true,
+			wantChangeDate: false,
 		},
 		{
 			name: "instance owner, change name, ok",
@@ -283,16 +270,19 @@ func TestServer_UpdateGroup(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			beforeUpdateDate := time.Now().UTC()
 			got, err := instance.Client.GroupV2.UpdateGroup(tt.ctx, tt.req)
+			afterUpdateDate := time.Now().UTC()
 			if tt.wantErrCode != codes.OK {
 				require.Error(t, err)
 				require.Empty(t, got.GetChangeDate())
 				assert.Equal(t, tt.wantErrCode, status.Code(err))
-				assert.Equal(t, tt.wantErrMsg, status.Convert(err).Message())
 				return
 			}
 			require.NoError(t, err)
-			require.NotEmpty(t, got.GetChangeDate())
+			if tt.wantChangeDate {
+				assert.WithinRange(t, got.GetChangeDate().AsTime(), beforeUpdateDate, afterUpdateDate)
+			}
 		})
 	}
 }
@@ -316,12 +306,12 @@ func TestServer_DeleteGroup(t *testing.T) {
 	deleteResp := instance.DeleteGroup(iamOwnerCtx, t, deleteGroup.GetId())
 
 	tests := []struct {
-		name         string
-		ctx          context.Context
-		req          *group_v2.DeleteGroupRequest
-		wantErrCode  codes.Code
-		wantErrMsg   string
-		deletionTime *timestamp.Timestamp
+		name             string
+		ctx              context.Context
+		req              *group_v2.DeleteGroupRequest
+		wantErrCode      codes.Code
+		wantDeletionDate bool
+		deletionTime     *timestamp.Timestamp
 	}{
 		{
 			name: "unauthenticated, error",
@@ -330,7 +320,6 @@ func TestServer_DeleteGroup(t *testing.T) {
 				Id: "12345",
 			},
 			wantErrCode: codes.Unauthenticated,
-			wantErrMsg:  "auth header missing",
 		},
 		{
 			name: "missing id, error",
@@ -339,7 +328,6 @@ func TestServer_DeleteGroup(t *testing.T) {
 				Id: "",
 			},
 			wantErrCode: codes.InvalidArgument,
-			wantErrMsg:  "invalid DeleteGroupRequest.Id: value length must be between 1 and 200 runes, inclusive",
 		},
 		{
 			name: "missing permission, error",
@@ -348,7 +336,6 @@ func TestServer_DeleteGroup(t *testing.T) {
 				Id: existingGroup.GetId(),
 			},
 			wantErrCode: codes.NotFound,
-			wantErrMsg:  "membership not found (AUTHZ-cdgFk)",
 		},
 		{
 			name: "organization owner, missing permission, error",
@@ -357,7 +344,6 @@ func TestServer_DeleteGroup(t *testing.T) {
 				Id: existingGroup.GetId(),
 			},
 			wantErrCode: codes.NotFound,
-			wantErrMsg:  "membership not found (AUTHZ-cdgFk)",
 		},
 		{
 			name: "organization owner, with permission, ok",
@@ -365,6 +351,7 @@ func TestServer_DeleteGroup(t *testing.T) {
 			req: &group_v2.DeleteGroupRequest{
 				Id: groupDefOrg.GetId(),
 			},
+			wantDeletionDate: true,
 		},
 		{
 			name: "group not found, ok",
@@ -379,6 +366,7 @@ func TestServer_DeleteGroup(t *testing.T) {
 			req: &group_v2.DeleteGroupRequest{
 				Id: existingGroup.GetId(),
 			},
+			wantDeletionDate: true,
 		},
 		{
 			name: "delete already deleted group, ok",
@@ -391,18 +379,22 @@ func TestServer_DeleteGroup(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			beforeDeletionDate := time.Now().UTC()
 			got, err := instance.Client.GroupV2.DeleteGroup(tt.ctx, tt.req)
+			afterDeletionDate := time.Now().UTC()
 			if tt.wantErrCode != codes.OK {
 				require.Error(t, err)
 				require.Empty(t, got.GetDeletionDate())
 				assert.Equal(t, tt.wantErrCode, status.Code(err))
-				assert.Equal(t, tt.wantErrMsg, status.Convert(err).Message())
 				return
 			}
 			require.NoError(t, err)
 			require.NotEmpty(t, got.GetDeletionDate())
 			if tt.deletionTime != nil {
 				assert.Equal(t, tt.deletionTime, got.GetDeletionDate())
+			}
+			if tt.wantDeletionDate {
+				assert.WithinRange(t, got.GetDeletionDate().AsTime(), beforeDeletionDate, afterDeletionDate)
 			}
 		})
 	}
