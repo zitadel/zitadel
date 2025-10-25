@@ -1,9 +1,11 @@
+@use 'sass:map';
+
 @mixin granted-project-detail-theme($theme) {
-  $foreground: map-get($theme, foreground);
-  $background: map-get($theme, background);
-  $is-dark-theme: map-get($theme, is-dark);
-  $warn: map-get($theme, warn);
-  $warn-color: map-get($warn, 500);
+  $foreground: map.get($theme, foreground);
+  $background: map.get($theme, background);
+  $is-dark-theme: map.get($theme, is-dark);
+  $warn: map.get($theme, warn);
+  $warn-color: map.get($warn, 500);
 
   .zitadel-warning {
     font-size: 14px;

@@ -2,11 +2,11 @@
 @use '@angular/material/core/m2/palette' as m2;
 @use 'sass:map';
 // https://github.com/lipis/flag-icons/issues/1395
-@forward '../node_modules/flag-icons/sass/variables' with (
+@forward '../../node_modules/flag-icons/sass/variables' with (
   $flag-icons-use-square: false
 );
-@use '../node_modules/flag-icons/sass/flag-icons-base';
-@use '../node_modules/flag-icons/sass/flag-icons-list';
+@use '../../node_modules/flag-icons/sass/flag-icons-base';
+@use '../../node_modules/flag-icons/sass/flag-icons-list';
 
 @import 'codemirror/lib/codemirror.css';
 @import './component-themes';

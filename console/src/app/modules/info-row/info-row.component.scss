@@ -1,8 +1,10 @@
+@use 'sass:map';
+
 @mixin info-row-theme($theme) {
-  $foreground: map-get($theme, foreground);
-  $button-text-color: map-get($foreground, text);
-  $button-disabled-text-color: map-get($foreground, disabled-button);
-  $secondary-text: map-get($foreground, secondary-text);
+  $foreground: map.get($theme, foreground);
+  $button-text-color: map.get($foreground, text);
+  $button-disabled-text-color: map.get($foreground, disabled-button);
+  $secondary-text: map.get($foreground, secondary-text);
 
   .info-row {
     display: flex;

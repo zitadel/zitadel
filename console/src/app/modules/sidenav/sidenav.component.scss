@@ -1,7 +1,9 @@
+@use 'sass:map';
+
 @mixin sidenav-theme($theme) {
-  $foreground: map-get($theme, foreground);
-  $background: map-get($theme, background);
-  $is-dark-theme: map-get($theme, is-dark);
+  $foreground: map.get($theme, foreground);
+  $background: map.get($theme, background);
+  $is-dark-theme: map.get($theme, is-dark);
 
   .sidenav-container {
     display: grid;
@@ -17,7 +19,7 @@
         .sidenav-sticky-rel {
           margin-left: -2rem;
           padding-left: 2rem;
-          background: map-get($background, footer);
+          background: map.get($background, footer);
         }
       }
 
@@ -67,7 +69,7 @@
           padding: 0.75rem 0;
           font-size: 15px;
           cursor: pointer;
-          color: map-get($foreground, text);
+          color: map.get($foreground, text);
           display: flex;
           align-items: center;
 
@@ -82,7 +84,7 @@
           }
 
           .warn-icon {
-            color: map-get($background, alert);
+            color: map.get($background, alert);
             margin-left: 0.5rem;
             font-size: 1.2rem;
             height: 1.2rem;

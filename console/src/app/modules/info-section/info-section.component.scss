@@ -1,9 +1,11 @@
+@use 'sass:map';
+
 @mixin info-section-theme($theme) {
-  $primary: map-get($theme, primary);
-  $background: map-get($theme, background);
-  $foreground: map-get($theme, foreground);
-  $primary-color: map-get($primary, 500);
-  $is-dark-theme: map-get($theme, is-dark);
+  $primary: map.get($theme, primary);
+  $background: map.get($theme, background);
+  $foreground: map.get($theme, foreground);
+  $primary-color: map.get($primary, 500);
+  $is-dark-theme: map.get($theme, is-dark);
 
   .info-section-row {
     display: flex;
@@ -32,29 +34,29 @@
     }
 
     &.info {
-      background-color: map-get($background, infosection);
-      color: map-get($foreground, infosection);
+      background-color: map.get($background, infosection);
+      color: map.get($foreground, infosection);
 
       .icon {
-        color: map-get($foreground, infosection);
+        color: map.get($foreground, infosection);
       }
     }
 
     &.warn {
-      background-color: map-get($background, warninfosection);
-      color: map-get($foreground, warninfosection);
+      background-color: map.get($background, warninfosection);
+      color: map.get($foreground, warninfosection);
 
       .icon {
-        color: map-get($foreground, warninfosection);
+        color: map.get($foreground, warninfosection);
       }
     }
 
     &.alert {
-      background-color: map-get($background, alertinfosection);
-      color: map-get($foreground, alertinfosection);
+      background-color: map.get($background, alertinfosection);
+      color: map.get($foreground, alertinfosection);
 
       .icon {
-        color: map-get($foreground, alertinfosection);
+        color: map.get($foreground, alertinfosection);
       }
     }
   }

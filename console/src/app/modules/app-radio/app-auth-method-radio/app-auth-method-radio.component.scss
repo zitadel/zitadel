@@ -1,3 +1,5 @@
+@use 'sass:map';
+
 .auth-method-radio-button-wrapper {
   display: flex;
   flex-direction: row;
@@ -17,10 +19,10 @@
 }
 
 @mixin app-auth-method-radio-theme($theme) {
-  $primary: map-get($theme, primary);
-  $primary-color: map-get($primary, 500);
-  $is-dark-theme: map-get($theme, is-dark);
-  $background: map-get($theme, background);
+  $primary: map.get($theme, primary);
+  $primary-color: map.get($primary, 500);
+  $is-dark-theme: map.get($theme, is-dark);
+  $background: map.get($theme, background);
   $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
 
   input[type='radio'] {
@@ -50,7 +52,7 @@
     border: 1px solid $border-color;
     display: flex;
     flex-direction: column;
-    background-color: map-get($background, cards);
+    background-color: map.get($background, cards);
     flex: 0 1 230px;
     box-sizing: border-box;
     cursor: pointer;
