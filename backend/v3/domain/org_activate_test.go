@@ -182,7 +182,7 @@ func TestActivateOrgCommand_Execute(t *testing.T) {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(),
-						repo.PrimaryKeyCondition("instance-1", "org1"),
+						repo.PrimaryKeyCondition("instance-1", "org-1"),
 						repo.SetState(domain.OrgStateActive),
 					).
 					Times(1).
@@ -199,7 +199,7 @@ func TestActivateOrgCommand_Execute(t *testing.T) {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(),
-						repo.PrimaryKeyCondition("instance-1", "org1"),
+						repo.PrimaryKeyCondition("instance-1", "org-1"),
 						repo.SetState(domain.OrgStateActive)).
 					Times(1).
 					Return(int64(0), nil)
@@ -213,7 +213,7 @@ func TestActivateOrgCommand_Execute(t *testing.T) {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(),
-						repo.PrimaryKeyCondition("instance-1", "org1"),
+						repo.PrimaryKeyCondition("instance-1", "org-1"),
 						repo.SetState(domain.OrgStateActive)).
 					Times(1).
 					Return(int64(2), nil)
@@ -228,7 +228,7 @@ func TestActivateOrgCommand_Execute(t *testing.T) {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(),
-						repo.PrimaryKeyCondition("instance-1", "org1"),
+						repo.PrimaryKeyCondition("instance-1", "org-1"),
 						repo.SetState(domain.OrgStateActive)).
 					Times(1).
 					Return(int64(1), nil)
