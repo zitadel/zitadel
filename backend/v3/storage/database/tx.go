@@ -14,7 +14,7 @@ type Transaction interface {
 	// If err is not nil, and rollback is successful, the original err is returned.
 	// If err is not nil, and rollback fails, the two errors are joined using [errors.Join].
 	End(ctx context.Context, err error) error
-
+	// Begin starts a sub transaction.
 	Begin(ctx context.Context) (Transaction, error)
 
 	QueryExecutor

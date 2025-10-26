@@ -4,12 +4,13 @@ import (
 	"context"
 )
 
-// transactionInvoker ensures that [InvokeOpts].DB is a [database.Transaction].
-// if a new transaction is started, it will be committed or rolled back after the command execution.
+// transactionInvoker ensures that [InvokeOpts].DB() returns a [database.Transaction].
+// if a new transaction is started, it will be committed or rolled back after the [Executor] execution.
 type transactionInvoker struct {
 	invoker
 }
 
+// NewTransactionInvoker creates a new [transactionInvoker].
 func NewTransactionInvoker(next Invoker) *transactionInvoker {
 	return &transactionInvoker{
 		invoker: invoker{next: next},

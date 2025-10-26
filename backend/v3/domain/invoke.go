@@ -75,6 +75,8 @@ func (i invoker) execute(ctx context.Context, executor Executor, opts *InvokeOpt
 }
 
 // ensureTx ensures that the InvokeOpts has a transaction.
+//
+// If [Commander] or [Querier] requires a transaction implement [Transactional]
 // the close function ends the transaction and resets [InvokeOpts].db.
 // If a new transaction is started, it returns a function to end the transaction.
 // The caller is responsible to call the returned function to end the transaction.

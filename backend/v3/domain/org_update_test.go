@@ -319,8 +319,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 }
 
 func TestUpdateOrgCommand_Validate(t *testing.T) {
-	// t.Parallel()
-	// txInitErr := errors.New("tx init error")
+	t.Parallel()
 	getErr := errors.New("get error")
 
 	tt := []struct {
@@ -401,6 +400,7 @@ func TestUpdateOrgCommand_Validate(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
 			// Given
 			ctx := authz.NewMockContext("instance-1", "", "")
 			ctrl := gomock.NewController(t)

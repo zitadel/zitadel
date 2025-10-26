@@ -335,10 +335,10 @@ func Test_eventCollector_Invoke(t *testing.T) {
 			queryExecutor: func(ctrl *gomock.Controller) database.QueryExecutor {
 				pool := dbmock.NewMockPool(ctrl)
 				tx := dbmock.NewMockTransaction(ctrl)
-				// gomock.InOrder(
-				pool.EXPECT().Begin(gomock.Any(), gomock.Any()).Return(tx, nil).Times(1)
-				tx.EXPECT().End(gomock.Any(), assert.AnError).Return(assert.AnError).Times(1)
-				// )
+				gomock.InOrder(
+					pool.EXPECT().Begin(gomock.Any(), gomock.Any()).Return(tx, nil).Times(1),
+					tx.EXPECT().End(gomock.Any(), assert.AnError).Return(assert.AnError).Times(1),
+				)
 				return pool
 			},
 			assertCollectedEvents: func(t *testing.T, events []legacy_es.Command) {
