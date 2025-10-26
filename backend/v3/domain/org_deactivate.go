@@ -26,22 +26,19 @@ func NewDeactivateOrgCommand(organizationID string) *DeactivateOrgCommand {
 }
 
 // Events implements [Commander].
-func (d *DeactivateOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
-	return []eventstore.Command{org.NewOrgDeactivatedEvent(ctx, &org.NewAggregate(d.ID).Aggregate)}, nil
+func (cmd *DeactivateOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
+	return []eventstore.Command{org.NewOrgDeactivatedEvent(ctx, &org.NewAggregate(cmd.ID).Aggregate)}, nil
 }
 
 // RequiresTransaction implements [Transactional].
-func (d *DeactivateOrgCommand) RequiresTransaction() {}
+func (cmd *DeactivateOrgCommand) RequiresTransaction() {}
 
 // Execute implements [Commander].
-func (d *DeactivateOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
+func (cmd *DeactivateOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	organizationRepo := opts.organizationRepo
 
 	updateCount, err := organizationRepo.Update(ctx, opts.DB(),
-		database.And(
-			organizationRepo.IDCondition(d.ID),
-			organizationRepo.InstanceIDCondition(authz.GetInstance(ctx).InstanceID()),
-		),
+		organizationRepo.PrimaryKeyCondition(authz.GetInstance(ctx).InstanceID(), cmd.ID),
 		database.NewChange(organizationRepo.StateColumn(), OrgStateInactive),
 	)
 	if err != nil {
@@ -59,23 +56,20 @@ func (d *DeactivateOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (e
 }
 
 // String implements [Commander].
-func (d *DeactivateOrgCommand) String() string {
+func (DeactivateOrgCommand) String() string {
 	return "DeactivateOrgCommand"
 }
 
 // Validate implements [Commander].
-func (d *DeactivateOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
-	if d.ID = strings.TrimSpace(d.ID); d.ID == "" {
+func (cmd *DeactivateOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
+	if cmd.ID = strings.TrimSpace(cmd.ID); cmd.ID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-Qc3T1r", "invalid organization ID")
 	}
 
 	organizationRepo := opts.organizationRepo
 
 	org, err := organizationRepo.Get(ctx, opts.DB(), database.WithCondition(
-		database.And(
-			organizationRepo.IDCondition(d.ID),
-			organizationRepo.InstanceIDCondition(authz.GetInstance(ctx).InstanceID()),
-		),
+		organizationRepo.PrimaryKeyCondition(authz.GetInstance(ctx).InstanceID(), cmd.ID),
 	))
 	if err != nil {
 		var notFoundError *database.NoRowFoundError

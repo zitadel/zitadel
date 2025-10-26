@@ -51,10 +51,7 @@ func (cmd *UpdateOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err
 	organizationRepo := opts.organizationRepo.LoadDomains()
 
 	org, err := organizationRepo.Get(ctx, opts.DB(), database.WithCondition(
-		database.And(
-			organizationRepo.IDCondition(cmd.ID),
-			organizationRepo.InstanceIDCondition(authz.GetInstance(ctx).InstanceID()),
-		),
+		organizationRepo.PrimaryKeyCondition(authz.GetInstance(ctx).InstanceID(), cmd.ID),
 	))
 	if err != nil {
 		return err
@@ -68,10 +65,7 @@ func (cmd *UpdateOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err
 	updateCount, err := organizationRepo.Update(
 		ctx,
 		opts.DB(),
-		database.And(
-			organizationRepo.IDCondition(org.ID),
-			organizationRepo.InstanceIDCondition(org.InstanceID),
-		),
+		organizationRepo.PrimaryKeyCondition(org.InstanceID, org.ID),
 		database.NewChange(organizationRepo.NameColumn(), cmd.Name),
 	)
 	if err != nil {

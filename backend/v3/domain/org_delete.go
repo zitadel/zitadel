@@ -24,13 +24,13 @@ func NewDeleteOrgCommand(organizationID string) *DeleteOrgCommand {
 }
 
 // RequiresTransaction implements [Transactional].
-func (d *DeleteOrgCommand) RequiresTransaction() {}
+func (cmd *DeleteOrgCommand) RequiresTransaction() {}
 
 // Events implements [Commander].
 //
 // TODO(IAM-Marco): Finish implementation when policies, org settings, idp links and entities repositories
 // are implemented
-func (d *DeleteOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
+func (cmd *DeleteOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
 	usernames := []string{}
 	// userRepo := opts.usersRepo(opts.DB())
 	// users, err := userRepo.List(ctx, database.WithCondition(opts.organizationRepo(opts.DB()).IDCondition(d.ID)))
@@ -55,8 +55,8 @@ func (d *DeleteOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]even
 	// areUsernamesOrganizationScoped := policy.UserLoginMustBeDomain || orgSettings.UsernamesUnique
 	areUsernamesOrganizationScoped := false
 
-	domainNames := make([]string, len(d.Domains))
-	for i, domain := range d.Domains {
+	domainNames := make([]string, len(cmd.Domains))
+	for i, domain := range cmd.Domains {
 		domainNames[i] = domain.Domain
 	}
 
@@ -84,8 +84,8 @@ func (d *DeleteOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]even
 	return []eventstore.Command{
 		org.NewOrgRemovedEvent(
 			ctx,
-			&org.NewAggregate(d.ID).Aggregate,
-			d.OrganizationName,
+			&org.NewAggregate(cmd.ID).Aggregate,
+			cmd.OrganizationName,
 			usernames,
 			areUsernamesOrganizationScoped,
 			domainNames,
@@ -96,26 +96,22 @@ func (d *DeleteOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]even
 }
 
 // Execute implements [Commander].
-func (d *DeleteOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
+func (cmd *DeleteOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	instance := authz.GetInstance(ctx)
 
 	orgRepo := opts.organizationRepo.LoadDomains()
 
-	orgToDelete, err := orgRepo.Get(ctx, opts.DB(), database.WithCondition(database.And(
-		orgRepo.IDCondition(d.ID),
-		orgRepo.InstanceIDCondition(instance.InstanceID()),
-	)))
+	orgToDelete, err := orgRepo.Get(ctx, opts.DB(), database.WithCondition(
+		orgRepo.PrimaryKeyCondition(instance.InstanceID(), cmd.ID),
+	))
 	if err != nil {
 		return err
 	}
-	d.OrganizationName = orgToDelete.Name
-	d.Domains = orgToDelete.Domains
+	cmd.OrganizationName = orgToDelete.Name
+	cmd.Domains = orgToDelete.Domains
 
 	deletedRows, err := orgRepo.Delete(ctx, opts.DB(),
-		database.And(
-			orgRepo.IDCondition(d.ID),
-			orgRepo.InstanceIDCondition(authz.GetInstance(ctx).InstanceID()),
-		),
+		orgRepo.PrimaryKeyCondition(authz.GetInstance(ctx).InstanceID(), cmd.ID),
 	)
 	if err != nil {
 		return err
@@ -133,16 +129,16 @@ func (d *DeleteOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 }
 
 // String implements [Commander].
-func (d *DeleteOrgCommand) String() string {
+func (DeleteOrgCommand) String() string {
 	return "DeleteOrgCommand"
 }
 
 // Validate implements [Commander].
-func (d *DeleteOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
+func (cmd *DeleteOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
 	instance := authz.GetInstance(ctx)
 
-	d.ID = strings.TrimSpace(d.ID)
-	if d.ID == instance.DefaultOrganisationID() {
+	cmd.ID = strings.TrimSpace(cmd.ID)
+	if cmd.ID == instance.DefaultOrganisationID() {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-LCkE69", "Errors.Org.DefaultOrgNotDeletable")
 	}
 
@@ -151,7 +147,7 @@ func (d *DeleteOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 	_, getErr := projectRepo.Get(ctx, opts.DB(),
 		database.WithCondition(database.And(
 			projectRepo.IDCondition(instance.ProjectID()),
-			projectRepo.OrganizationIDCondition(d.ID),
+			projectRepo.OrganizationIDCondition(cmd.ID),
 			projectRepo.InstanceIDCondition(instance.InstanceID()),
 		)),
 	)
@@ -166,10 +162,9 @@ func (d *DeleteOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 
 	orgRepo := opts.organizationRepo
 	_, errGetOrg := orgRepo.Get(ctx, opts.DB(),
-		database.WithCondition(database.And(
-			orgRepo.IDCondition(d.ID),
-			orgRepo.InstanceIDCondition(instance.InstanceID()),
-		)))
+		database.WithCondition(
+			orgRepo.PrimaryKeyCondition(instance.InstanceID(), cmd.ID),
+		))
 	if errGetOrg != nil {
 		if errors.Is(errGetOrg, &database.NoRowFoundError{}) {
 			err = zerrors.ThrowNotFound(errGetOrg, "DOM-8KYOH3", "Errors.Org.NotFound")

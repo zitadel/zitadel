@@ -28,10 +28,7 @@ func createOrg(t *testing.T) *org.CreateOrganizationResponse {
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(t.Context(), time.Minute)
 	assert.EventuallyWithT(t, func(tc *assert.CollectT) {
 		_, err := orgRepo.Get(t.Context(), pool,
-			database.WithCondition(database.And(
-				orgRepo.InstanceIDCondition(Instance.Instance.Id),
-				orgRepo.IDCondition(org.GetId())),
-			),
+			database.WithCondition(orgRepo.PrimaryKeyCondition(Instance.Instance.Id, org.GetId())),
 		)
 		assert.NoError(tc, err)
 	}, retryDuration, tick)

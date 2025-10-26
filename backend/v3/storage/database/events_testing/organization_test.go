@@ -43,12 +43,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(tt *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX, pool,
-				database.WithCondition(
-					database.And(
-						orgRepo.IDCondition(org.GetId()),
-						orgRepo.InstanceIDCondition(instanceID),
-					),
-				),
+				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, org.GetId())),
 			)
 			require.NoError(tt, err)
 
@@ -93,12 +88,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX, pool,
-				database.WithCondition(
-					database.And(
-						orgRepo.IDCondition(organization.Id),
-						orgRepo.InstanceIDCondition(instanceID),
-					),
-				),
+				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetId())),
 			)
 			require.NoError(t, err)
 
@@ -138,12 +128,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX, pool,
-				database.WithCondition(
-					database.And(
-						orgRepo.IDCondition(organization.Id),
-						orgRepo.InstanceIDCondition(instanceID),
-					),
-				),
+				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetId())),
 			)
 			require.NoError(t, err)
 
@@ -182,12 +167,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX, pool,
-				database.WithCondition(
-					database.And(
-						orgRepo.IDCondition(organization.Id),
-						orgRepo.InstanceIDCondition(instanceID),
-					),
-				),
+				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetId())),
 			)
 			require.NoError(t, err)
 			assert.Equal(t, domain.OrgStateInactive, organization.State)
@@ -204,12 +184,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX, pool,
-				database.WithCondition(
-					database.And(
-						orgRepo.IDCondition(organization.Id),
-						orgRepo.InstanceIDCondition(instanceID),
-					),
-				),
+				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetId())),
 			)
 			require.NoError(t, err)
 
@@ -234,12 +209,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			_, err := orgRepo.Get(CTX, pool,
-				database.WithCondition(
-					database.And(
-						orgRepo.IDCondition(organization.Id),
-						orgRepo.InstanceIDCondition(instanceID),
-					),
-				),
+				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetId())),
 			)
 			require.NoError(t, err)
 		}, retryDuration, tick)
@@ -253,12 +223,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX, pool,
-				database.WithCondition(
-					database.And(
-						orgRepo.IDCondition(organization.Id),
-						orgRepo.InstanceIDCondition(instanceID),
-					),
-				),
+				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetId())),
 			)
 			require.ErrorIs(t, err, new(database.NoRowFoundError))
 

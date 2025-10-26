@@ -100,7 +100,7 @@ func TestDeleteOrgCommand_Validate(t *testing.T) {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
-						database.And(repo.IDCondition("org-1"), repo.InstanceIDCondition("inst-1")),
+						repo.PrimaryKeyCondition("inst-1", "org-1"),
 					))).
 					Times(1).
 					Return(nil, database.NewNoRowFoundError(getErr))
@@ -131,7 +131,7 @@ func TestDeleteOrgCommand_Validate(t *testing.T) {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
-						database.And(repo.IDCondition("org-1"), repo.InstanceIDCondition("inst-1")),
+						repo.PrimaryKeyCondition("inst-1", "org-1"),
 					))).
 					Times(1).
 					Return(&domain.Organization{
@@ -164,7 +164,7 @@ func TestDeleteOrgCommand_Validate(t *testing.T) {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
-						database.And(repo.IDCondition("org-1"), repo.InstanceIDCondition("inst-1")),
+						repo.PrimaryKeyCondition("inst-1", "org-1"),
 					))).
 					Times(1).
 					Return(&domain.Organization{
@@ -233,10 +233,7 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 						gomock.Any(),
 						gomock.Any(),
 						dbmock.QueryOptions(database.WithCondition(
-							database.And(
-								repo.IDCondition("org-1"),
-								repo.InstanceIDCondition("inst-1"),
-							),
+							repo.PrimaryKeyCondition("inst-1", "org-1"),
 						)),
 					).
 					Times(1).
@@ -261,10 +258,7 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 						gomock.Any(),
 						gomock.Any(),
 						dbmock.QueryOptions(database.WithCondition(
-							database.And(
-								repo.IDCondition("org-1"),
-								repo.InstanceIDCondition("inst-1"),
-							),
+							repo.PrimaryKeyCondition("inst-1", "org-1"),
 						)),
 					).
 					Times(1).
@@ -274,9 +268,7 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 					}, nil)
 				repo.EXPECT().
 					Delete(gomock.Any(), gomock.Any(),
-						database.And(
-							repo.IDCondition("org-1"),
-							repo.InstanceIDCondition("inst-1")),
+						repo.PrimaryKeyCondition("inst-1", "org-1"),
 					).
 					Times(1).
 					Return(int64(0), deleteErr)
@@ -301,10 +293,7 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 						gomock.Any(),
 						gomock.Any(),
 						dbmock.QueryOptions(database.WithCondition(
-							database.And(
-								repo.IDCondition("org-1"),
-								repo.InstanceIDCondition("inst-1"),
-							),
+							repo.PrimaryKeyCondition("inst-1", "org-1"),
 						)),
 					).
 					Times(1).
@@ -313,10 +302,7 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 						Name: "organization 1",
 					}, nil)
 				repo.EXPECT().
-					Delete(gomock.Any(), gomock.Any(), database.And(
-						repo.IDCondition("org-1"),
-						repo.InstanceIDCondition("inst-1")),
-					).
+					Delete(gomock.Any(), gomock.Any(), repo.PrimaryKeyCondition("inst-1", "org-1")).
 					Times(1).
 					Return(int64(2), nil)
 				return repo
@@ -340,10 +326,7 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 						gomock.Any(),
 						gomock.Any(),
 						dbmock.QueryOptions(database.WithCondition(
-							database.And(
-								repo.IDCondition("org-1"),
-								repo.InstanceIDCondition("inst-1"),
-							),
+							repo.PrimaryKeyCondition("inst-1", "org-1"),
 						)),
 					).
 					Times(1).
@@ -352,10 +335,7 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 						Name: "organization 1",
 					}, nil)
 				repo.EXPECT().
-					Delete(gomock.Any(), gomock.Any(), database.And(
-						repo.IDCondition("org-1"),
-						repo.InstanceIDCondition("inst-1")),
-					).
+					Delete(gomock.Any(), gomock.Any(), repo.PrimaryKeyCondition("inst-1", "org-1")).
 					Times(1).
 					Return(int64(0), nil)
 				return repo
@@ -379,10 +359,7 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 						gomock.Any(),
 						gomock.Any(),
 						dbmock.QueryOptions(database.WithCondition(
-							database.And(
-								repo.IDCondition("org-1"),
-								repo.InstanceIDCondition("inst-1"),
-							),
+							repo.PrimaryKeyCondition("inst-1", "org-1"),
 						)),
 					).
 					Times(1).
@@ -391,10 +368,7 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 						Name: "organization 1",
 					}, nil)
 				repo.EXPECT().
-					Delete(gomock.Any(), gomock.Any(), database.And(
-						repo.IDCondition("org-1"),
-						repo.InstanceIDCondition("inst-1")),
-					).
+					Delete(gomock.Any(), gomock.Any(), repo.PrimaryKeyCondition("inst-1", "org-1")).
 					Times(1).
 					Return(int64(1), nil)
 				return repo

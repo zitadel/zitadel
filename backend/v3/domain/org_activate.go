@@ -38,10 +38,7 @@ func (cmd *ActivateOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (e
 	organizationRepo := opts.organizationRepo
 
 	updateCount, err := organizationRepo.Update(ctx, opts.DB(),
-		database.And(
-			organizationRepo.IDCondition(cmd.ID),
-			organizationRepo.InstanceIDCondition(authz.GetInstance(ctx).InstanceID()),
-		),
+		organizationRepo.PrimaryKeyCondition(authz.GetInstance(ctx).InstanceID(), cmd.ID),
 		database.NewChange(organizationRepo.StateColumn(), OrgStateActive),
 	)
 
@@ -76,10 +73,7 @@ func (cmd *ActivateOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (
 
 	// TODO: lock entry as soon as https://github.com/zitadel/zitadel/issues/10930 is done
 	org, err := organizationRepo.Get(ctx, opts.DB(), database.WithCondition(
-		database.And(
-			organizationRepo.IDCondition(cmd.ID),
-			organizationRepo.InstanceIDCondition(authz.GetInstance(ctx).InstanceID()),
-		),
+		organizationRepo.PrimaryKeyCondition(authz.GetInstance(ctx).InstanceID(), cmd.ID),
 	))
 	if err != nil {
 		var notFoundError *database.NoRowFoundError
