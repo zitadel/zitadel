@@ -31,7 +31,7 @@ func (d *DeactivateOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]
 }
 
 // RequiresTransaction implements [Transactional].
-func (d *DeactivateOrgCommand) RequiresTransaction() bool { return true }
+func (d *DeactivateOrgCommand) RequiresTransaction() {}
 
 // Execute implements [Commander].
 func (d *DeactivateOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {

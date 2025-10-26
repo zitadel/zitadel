@@ -39,27 +39,9 @@ func Test_transactionInvoker_Invoke(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name: "transactional false executor does not start a transaction",
-			executor: func(ctrl *gomock.Controller) domain.Executor {
-				transactional := domainmock.NewMockTransactional(ctrl)
-				transactional.EXPECT().RequiresTransaction().Return(false)
-				executor := domainmock.NewMockExecutor(ctrl)
-				executor.EXPECT().Execute(gomock.Any(), gomock.Any()).Return(nil)
-				return &testTransactionalExecutor{
-					Transactional: transactional,
-					Executor:      executor,
-				}
-			},
-			db: func(ctrl *gomock.Controller) database.Pool {
-				return dbmock.NewMockPool(ctrl)
-			},
-			wantErr: nil,
-		},
-		{
 			name: "transactional executor starts a transaction execution successful",
 			executor: func(ctrl *gomock.Controller) domain.Executor {
 				transactional := domainmock.NewMockTransactional(ctrl)
-				transactional.EXPECT().RequiresTransaction().Return(true)
 				executor := domainmock.NewMockExecutor(ctrl)
 				executor.EXPECT().Execute(gomock.Any(), gomock.Any()).Return(nil)
 				return &testTransactionalExecutor{
@@ -80,7 +62,6 @@ func Test_transactionInvoker_Invoke(t *testing.T) {
 			name: "transactional executor starts a transaction execution failed",
 			executor: func(ctrl *gomock.Controller) domain.Executor {
 				transactional := domainmock.NewMockTransactional(ctrl)
-				transactional.EXPECT().RequiresTransaction().Return(true)
 				executor := domainmock.NewMockExecutor(ctrl)
 				executor.EXPECT().Execute(gomock.Any(), gomock.Any()).Return(assert.AnError)
 				return &testTransactionalExecutor{

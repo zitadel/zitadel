@@ -18,12 +18,12 @@ func NewTransactionInvoker(next Invoker) *transactionInvoker {
 
 //go:generate mockgen -destination=mock/transactional.mock.go -package=domainmock . Transactional
 type Transactional interface {
-	RequiresTransaction() bool
+	RequiresTransaction()
 }
 
 // Invoke implements [Invoker].
 func (i *transactionInvoker) Invoke(ctx context.Context, executor Executor, opts *InvokeOpts) (err error) {
-	if transactional, ok := executor.(Transactional); !ok || !transactional.RequiresTransaction() {
+	if _, ok := executor.(Transactional); !ok {
 		return i.execute(ctx, executor, opts)
 	}
 

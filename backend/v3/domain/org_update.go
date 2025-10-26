@@ -22,7 +22,7 @@ type UpdateOrgCommand struct {
 }
 
 // RequiresTransaction implements [Transactional].
-func (cmd *UpdateOrgCommand) RequiresTransaction() bool { return true }
+func (cmd *UpdateOrgCommand) RequiresTransaction() {}
 
 // Events implements Commander.
 func (cmd *UpdateOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {

@@ -24,7 +24,7 @@ func NewDeleteOrgCommand(organizationID string) *DeleteOrgCommand {
 }
 
 // RequiresTransaction implements [Transactional].
-func (d *DeleteOrgCommand) RequiresTransaction() bool { return true }
+func (d *DeleteOrgCommand) RequiresTransaction() {}
 
 // Events implements [Commander].
 //

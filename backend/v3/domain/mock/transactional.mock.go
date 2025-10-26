@@ -40,11 +40,9 @@ func (m *MockTransactional) EXPECT() *MockTransactionalMockRecorder {
 }
 
 // RequiresTransaction mocks base method.
-func (m *MockTransactional) RequiresTransaction() bool {
+func (m *MockTransactional) RequiresTransaction() {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RequiresTransaction")
-	ret0, _ := ret[0].(bool)
-	return ret0
+	m.ctrl.Call(m, "RequiresTransaction")
 }
 
 // RequiresTransaction indicates an expected call of RequiresTransaction.

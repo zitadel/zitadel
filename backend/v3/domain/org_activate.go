@@ -26,7 +26,7 @@ func NewActivateOrgCommand(organizationID string) *ActivateOrgCommand {
 }
 
 // RequiresTransaction implements [Transactional].
-func (cmd *ActivateOrgCommand) RequiresTransaction() bool { return true }
+func (cmd *ActivateOrgCommand) RequiresTransaction() {}
 
 // Events implements [Commander].
 func (cmd *ActivateOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
