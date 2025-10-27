@@ -81,12 +81,15 @@ func Test_transactionInvoker_Invoke(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		ctrl := gomock.NewController(t)
-		opts := &domain.InvokeOpts{}
-		domain.WithQueryExecutor(tt.db(ctrl))(opts)
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			ctrl := gomock.NewController(t)
+			opts := &domain.InvokeOpts{}
+			domain.WithQueryExecutor(tt.db(ctrl))(opts)
 
-		invoker := domain.NewTransactionInvoker(nil)
-		gotErr := invoker.Invoke(t.Context(), tt.executor(ctrl), opts)
-		require.ErrorIs(t, gotErr, tt.wantErr)
+			invoker := domain.NewTransactionInvoker(nil)
+			gotErr := invoker.Invoke(t.Context(), tt.executor(ctrl), opts)
+			require.ErrorIs(t, gotErr, tt.wantErr)
+		})
 	}
 }
