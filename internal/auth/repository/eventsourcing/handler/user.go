@@ -48,7 +48,6 @@ func newUser(
 func (*User) Name() string {
 	return userTable
 }
-
 func (u *User) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{

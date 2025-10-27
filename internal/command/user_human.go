@@ -395,7 +395,7 @@ func (c *Commands) userValidateDomain(ctx context.Context, resourceOwner string,
 	}
 
 	if domainCheck.Verified && domainCheck.OrgID != resourceOwner {
-		// return zerrors.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername")
 	}
 
 	return nil
