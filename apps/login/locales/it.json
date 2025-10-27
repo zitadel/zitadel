@@ -159,18 +159,6 @@
     "signInWithAzureAD": "Accedi con AzureAD",
     "signInWithGithub": "Accedi con GitHub",
     "signInWithGitlab": "Accedi con GitLab",
-    "loginSuccess": {
-      "title": "Accesso riuscito",
-      "description": "Accesso effettuato con successo!"
-    },
-    "linkingSuccess": {
-      "title": "Account collegato",
-      "description": "Hai collegato con successo il tuo account!"
-    },
-    "registerSuccess": {
-      "title": "Registrazione riuscita",
-      "description": "Registrazione effettuata con successo!"
-    },
     "loginError": {
       "title": "Accesso fallito",
       "description": "Si è verificato un errore durante il tentativo di accesso."
@@ -194,6 +182,23 @@
       "description": "Non siamo riusciti a completare il processo di registrazione.",
       "info": "Impossibile determinare l'organizzazione per la registrazione. Contatta il tuo amministratore per assistenza.",
       "backToLogin": "Torna al login"
+    },
+    "processing": {
+      "message": "Elaborazione autenticazione in corso...",
+      "noRedirect": "Nessun reindirizzamento o errore ricevuto dal server",
+      "unexpectedError": "Si è verificato un errore imprevisto"
+    },
+    "errors": {
+      "missingParameters": "Parametri richiesti mancanti",
+      "missingIdpInfo": "Informazioni IDP mancanti",
+      "idpNotFound": "Provider di identità non trovato",
+      "linkingNotAllowed": "Il collegamento non è consentito per questo provider di identità",
+      "linkingFailed": "Collegamento del provider di identità all'account non riuscito",
+      "autoLinkingFailed": "Collegamento automatico dell'account non riuscito",
+      "userCreationFailed": "Creazione dell'account utente non riuscita",
+      "orgResolutionFailed": "Impossibile determinare l'organizzazione per la registrazione",
+      "sessionCreationFailed": "Impossibile creare la sessione o determinare il reindirizzamento",
+      "unknownError": "Si è verificato un errore sconosciuto"
     }
   },
   "ldap": {
@@ -386,7 +391,9 @@
       "couldNotCreateSession": "Impossibile creare la sessione",
       "noHostFound": "Nessun host trovato",
       "userAlreadyVerified": "L'utente è già verificato!",
-      "couldNotResendInvite": "Impossibile reinviare l'invito"
+      "couldNotResendInvite": "Impossibile reinviare l'invito",
+      "inviteSendFailed": "Impossibile inviare l'email di invito",
+      "emailSendFailed": "Impossibile inviare l'email di verifica"
     }
   },
   "authenticator": {

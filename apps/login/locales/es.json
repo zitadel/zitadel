@@ -159,18 +159,6 @@
     "signInWithAzureAD": "Iniciar sesión con AzureAD",
     "signInWithGithub": "Iniciar sesión con GitHub",
     "signInWithGitlab": "Iniciar sesión con GitLab",
-    "loginSuccess": {
-      "title": "Inicio de sesión exitoso",
-      "description": "¡Has iniciado sesión con éxito!"
-    },
-    "linkingSuccess": {
-      "title": "Cuenta vinculada",
-      "description": "¡Has vinculado tu cuenta con éxito!"
-    },
-    "registerSuccess": {
-      "title": "Registro exitoso",
-      "description": "¡Te has registrado con éxito!"
-    },
     "loginError": {
       "title": "Error de inicio de sesión",
       "description": "Ocurrió un error al intentar iniciar sesión."
@@ -194,6 +182,23 @@
       "description": "No pudimos completar el proceso de registro.",
       "info": "No se pudo determinar la organización para el registro. Por favor, contacta a tu administrador para obtener asistencia.",
       "backToLogin": "Volver al inicio de sesión"
+    },
+    "processing": {
+      "message": "Procesando autenticación...",
+      "noRedirect": "No se recibió redirección ni error del servidor",
+      "unexpectedError": "Ocurrió un error inesperado"
+    },
+    "errors": {
+      "missingParameters": "Faltan parámetros requeridos",
+      "missingIdpInfo": "Falta información del IDP",
+      "idpNotFound": "Proveedor de identidad no encontrado",
+      "linkingNotAllowed": "La vinculación no está permitida para este proveedor de identidad",
+      "linkingFailed": "Error al vincular el proveedor de identidad con la cuenta",
+      "autoLinkingFailed": "Error al vincular automáticamente la cuenta",
+      "userCreationFailed": "Error al crear la cuenta de usuario",
+      "orgResolutionFailed": "No se pudo determinar la organización para el registro",
+      "sessionCreationFailed": "No se pudo crear la sesión o determinar la redirección",
+      "unknownError": "Ocurrió un error desconocido"
     }
   },
   "ldap": {
@@ -386,7 +391,9 @@
       "couldNotCreateSession": "No se pudo crear la sesión",
       "noHostFound": "No se encontró el host",
       "userAlreadyVerified": "¡El usuario ya está verificado!",
-      "couldNotResendInvite": "No se pudo reenviar la invitación"
+      "couldNotResendInvite": "No se pudo reenviar la invitación",
+      "inviteSendFailed": "No se pudo enviar el correo de invitación",
+      "emailSendFailed": "No se pudo enviar el correo de verificación"
     }
   },
   "authenticator": {
