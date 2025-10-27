@@ -6,10 +6,16 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	instancev2 "github.com/zitadel/zitadel/backend/v3/api/instance/v2"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 )
 
 func (s *Server) AddCustomDomain(ctx context.Context, req *connect.Request[instance.AddCustomDomainRequest]) (*connect.Response[instance.AddCustomDomainResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.AddCustomDomain(ctx, req)
+	}
+
 	details, err := s.command.AddInstanceDomain(ctx, req.Msg.GetDomain())
 	if err != nil {
 		return nil, err
