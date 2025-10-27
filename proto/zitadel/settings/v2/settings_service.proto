@@ -19,6 +19,7 @@ import "google/protobuf/struct.proto";
 import "zitadel/settings/v2/settings.proto";
 import "google/protobuf/timestamp.proto";
 import "zitadel/filter/v2/filter.proto";
+import "zitadel/settings/v2/organization_settings.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
 
@@ -112,7 +113,12 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 service SettingsService {
 
-  // Get basic information over the instance
+  // Get General Settings
+  //
+  // Get basic information of the instance like the default organization, default language and supported languages.
+  //
+  // Required permissions:
+  //   - `policy.read`
   rpc GetGeneralSettings (GetGeneralSettingsRequest) returns (GetGeneralSettingsResponse) {
     option (google.api.http) = {
       get: "/v2/settings"
@@ -125,8 +131,6 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get basic information over the instance";
-      description: "Return the basic information of the instance for the requested context"
       responses: {
         key: "200"
         value: {
@@ -136,7 +140,14 @@ service SettingsService {
     };
   }
 
-  // Get the login settings
+  // Get Login Settings
+  //
+  // Get the login settings for the requested context.
+  // This can be the instance or an organization. In case of an organization,
+  // the returned settings will fall back to the instance settings if not explicitly set on the organization.
+  //
+  // Required permissions:
+  //   - `policy.read`
   rpc GetLoginSettings (GetLoginSettingsRequest) returns (GetLoginSettingsResponse) {
     option (google.api.http) = {
       get: "/v2/settings/login"
@@ -149,8 +160,6 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the login settings";
-      description: "Return the settings for the requested context"
       responses: {
         key: "200"
         value: {
@@ -160,7 +169,21 @@ service SettingsService {
     };
   }
 
-  // Get the current active identity providers
+  // Get Active Identity Providers
+  //
+  // Get the current active identity providers for the requested context.
+  // This can be the instance or an organization. In case of an organization,
+  // the returned identity providers will fall back to the active instance identity providers
+  // if not explicitly set on the organization.
+  //
+  // Optionally, filter the identity providers by their allowed actions:
+  //   - creation_allowed: only return identity providers that are allowed for user creation
+  //   - linking_allowed: only return identity providers that are allowed for linking to existing users
+  //   - auto_creation: only return identity providers that are allowed for automatic user creation
+  //   - auto_linking: only return identity providers that are allowed for automatic linking to existing users
+  //
+  // Required permissions:
+  //   - `policy.read`
   rpc GetActiveIdentityProviders (GetActiveIdentityProvidersRequest) returns (GetActiveIdentityProvidersResponse) {
     option (google.api.http) = {
       get: "/v2/settings/login/idps"
@@ -173,8 +196,6 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the current active identity providers";
-      description: "Return the current active identity providers for the requested context"
       responses: {
         key: "200"
         value: {
@@ -184,7 +205,14 @@ service SettingsService {
     };
   }
 
-  // Get the password complexity settings
+  // Get Password Complexity Settings
+  //
+  // Get the password complexity settings for the requested context.
+  // This can be the instance or an organization. In case of an organization,
+  // the returned settings will fall back to the instance settings if not explicitly set on the organization.
+  //
+  // Required permissions:
+  //   - `policy.read`
   rpc GetPasswordComplexitySettings (GetPasswordComplexitySettingsRequest) returns (GetPasswordComplexitySettingsResponse) {
     option (google.api.http) = {
       get: "/v2/settings/password/complexity"
@@ -197,8 +225,6 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the password complexity settings";
-      description: "Return the password complexity settings for the requested context"
       responses: {
         key: "200"
         value: {
@@ -208,7 +234,14 @@ service SettingsService {
     };
   }
 
-  // Get the password expiry settings
+  // Get Password Expiry Settings
+  //
+  // Get the password expiry settings for the requested context.
+  // This can be the instance or an organization. In case of an organization,
+  // the returned settings will fall back to the instance settings if not explicitly set on the organization.
+  //
+  // Required permissions:
+  //   - `policy.read`
   rpc GetPasswordExpirySettings (GetPasswordExpirySettingsRequest) returns (GetPasswordExpirySettingsResponse) {
     option (google.api.http) = {
       get: "/v2/settings/password/expiry"
@@ -221,8 +254,6 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the password expiry settings";
-      description: "Return the password expiry settings for the requested context"
       responses: {
         key: "200"
         value: {
@@ -232,7 +263,14 @@ service SettingsService {
     };
   }
 
-  // Get the current active branding settings
+  // Get Branding Settings
+  //
+  // Get the current active branding settings for the requested context.
+  // This can be the instance or an organization. In case of an organization,
+  // the returned settings will fall back to the instance settings if not explicitly set on the organization.
+  //
+  // Required permissions:
+  //   - `policy.read`
   rpc GetBrandingSettings (GetBrandingSettingsRequest) returns (GetBrandingSettingsResponse) {
     option (google.api.http) = {
       get: "/v2/settings/branding"
@@ -245,8 +283,6 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the current active branding settings";
-      description: "Return the current active branding settings for the requested context"
       responses: {
         key: "200"
         value: {
@@ -256,7 +292,14 @@ service SettingsService {
     };
   }
 
-  // Get the domain settings
+  // Get Domain Settings
+  //
+  // Get the domain settings for the requested context.
+  // This can be the instance or an organization. In case of an organization,
+  // the returned settings will fall back to the instance settings if not explicitly set on the organization.
+  //
+  // Required permissions:
+  //   - `policy.read`
   rpc GetDomainSettings (GetDomainSettingsRequest) returns (GetDomainSettingsResponse) {
     option (google.api.http) = {
       get: "/v2/settings/domain"
@@ -269,8 +312,6 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the domain settings";
-      description: "Return the domain settings for the requested context"
       responses: {
         key: "200"
         value: {
@@ -280,7 +321,14 @@ service SettingsService {
     };
   }
 
-  // Get the legal and support settings
+  // Get Legal and Support Settings
+  //
+  // Get the legal and support settings for the requested context.
+  // This can be the instance or an organization. In case of an organization,
+  // the returned settings will fall back to the instance settings if not explicitly set on the organization.
+  //
+  // Required permissions:
+  //   - `policy.read`
   rpc GetLegalAndSupportSettings (GetLegalAndSupportSettingsRequest) returns (GetLegalAndSupportSettingsResponse) {
     option (google.api.http) = {
       get: "/v2/settings/legal_support"
@@ -293,8 +341,6 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the legal and support settings";
-      description: "Return the legal settings for the requested context"
       responses: {
         key: "200"
         value: {
@@ -304,7 +350,16 @@ service SettingsService {
     };
   }
 
-  // Get the lockout settings
+  // Get Lockout Settings
+  //
+  // Get the lockout settings for the requested context.
+  // This can be the instance or an organization. In case of an organization,
+  // the returned settings will fall back to the instance settings if not explicitly set on the organization.
+  //
+  // Lockout settings define how many failed attempts are allowed before a user is locked out.
+  //
+  // Required permissions:
+  //   - `policy.read`
   rpc GetLockoutSettings (GetLockoutSettingsRequest) returns (GetLockoutSettingsResponse) {
     option (google.api.http) = {
       get: "/v2/settings/lockout"
@@ -317,8 +372,6 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the lockout settings";
-      description: "Return the lockout settings for the requested context, which define when a user will be locked"
       responses: {
         key: "200"
         value: {
@@ -328,7 +381,13 @@ service SettingsService {
     };
   }
 
-  // Get the security settings
+  // Get Security Settings
+  //
+  // Get the security settings of the ZITADEL instance.
+  // Security settings include settings like enabling impersonation and embedded iframe settings.
+  //
+  // Required permissions:
+  //   - `iam.policy.read`
   rpc GetSecuritySettings(GetSecuritySettingsRequest) returns (GetSecuritySettingsResponse) {
     option (google.api.http) = {
       get: "/v2/settings/security";
@@ -339,15 +398,14 @@ service SettingsService {
         permission: "iam.policy.read"
       }
     };
-
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Settings";
-      summary: "Get Security Settings";
-      description: "Returns the security settings of the ZITADEL instance."
-    };
   }
 
-  // Set the security settings
+  // Set Security Settings
+  //
+  // Set the security settings of the instance.
+  //
+  // Required permissions:
+  //   - `iam.policy.write`
   rpc SetSecuritySettings(SetSecuritySettingsRequest) returns (SetSecuritySettingsResponse) {
     option (google.api.http) = {
       put: "/v2/policies/security";
@@ -359,11 +417,98 @@ service SettingsService {
         permission: "iam.policy.write"
       }
     };
+  }
+
+  // Set Organization Settings
+  //
+  // Sets the settings specific to an organization.
+  // Organization scopes usernames defines that the usernames have to be unique in the organization scope,
+  // can only be changed if the usernames of the users are unique in the scope.
+  //
+  // Required permissions:
+  //   - `iam.policy.write`
+  rpc SetOrganizationSettings(SetOrganizationSettingsRequest) returns (SetOrganizationSettingsResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The translations was successfully set.";
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      post: "/v2/settings/organization";
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // Delete Organization Settings
+  //
+  // Delete the settings specific to an organization.
+  //
+  // Required permissions:
+  //   - `iam.policy.delete`
+  rpc DeleteOrganizationSettings(DeleteOrganizationSettingsRequest) returns (DeleteOrganizationSettingsResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The translations was successfully set.";
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      delete: "/v2/settings/organization";
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // List Organization Settings
+  //
+  // Returns a list of organization settings.
+  //
+  // Required permission:
+  //   - `iam.policy.read`
+  //   - `org.policy.read`
+  rpc ListOrganizationSettings(ListOrganizationSettingsRequest) returns (ListOrganizationSettingsResponse) {
+    option (google.api.http) = {
+      post: "/v2/settings/organization/search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Settings";
-      summary: "Set Security Settings";
-      description: "Set the security settings of the ZITADEL instance."
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all project grants matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+        };
+      };
     };
   }
 
@@ -432,6 +577,10 @@ service SettingsService {
 }
 
 message GetLoginSettingsRequest {
+  // Specify the context for which the login settings should be returned.
+  // This can be the instance or an organization.
+  // In case of an organization, the returned settings will fall back to the instance settings
+  // if not explicitly set on the organization.
   zitadel.object.v2.RequestContext ctx = 1;
 }
 
@@ -441,6 +590,10 @@ message GetLoginSettingsResponse {
 }
 
 message GetPasswordComplexitySettingsRequest {
+  // Specify the context for which the password complexity settings should be returned.
+  // This can be the instance or an organization.
+  // In case of an organization, the returned settings will fall back to the instance settings
+  // if not explicitly set on the organization.
   zitadel.object.v2.RequestContext ctx = 1;
 }
 
@@ -450,6 +603,10 @@ message GetPasswordComplexitySettingsResponse {
 }
 
 message GetPasswordExpirySettingsRequest {
+  // Specify the context for which the password expiry settings should be returned.
+  // This can be the instance or an organization.
+  // In case of an organization, the returned settings will fall back to the instance settings
+  // if not explicitly set on the organization.
   zitadel.object.v2.RequestContext ctx = 1;
 }
 
@@ -459,6 +616,10 @@ message GetPasswordExpirySettingsResponse {
 }
 
 message GetBrandingSettingsRequest {
+  // Specify the context for which the branding settings should be returned.
+  // This can be the instance or an organization.
+  // In case of an organization, the returned settings will fall back to the instance settings
+  // if not explicitly set on the organization.
   zitadel.object.v2.RequestContext ctx = 1;
 }
 
@@ -468,6 +629,10 @@ message GetBrandingSettingsResponse {
 }
 
 message GetDomainSettingsRequest {
+  // Specify the context for which the domain settings should be returned.
+  // This can be the instance or an organization.
+  // In case of an organization, the returned settings will fall back to the instance settings
+  // if not explicitly set on the organization.
   zitadel.object.v2.RequestContext ctx = 1;
 }
 
@@ -477,6 +642,10 @@ message GetDomainSettingsResponse {
 }
 
 message GetLegalAndSupportSettingsRequest {
+  // Specify the context for which the legal and support settings should be returned.
+  // This can be the instance or an organization.
+  // In case of an organization, the returned settings will fall back to the instance settings
+  // if not explicitly set on the organization.
   zitadel.object.v2.RequestContext ctx = 1;
 }
 
@@ -486,6 +655,10 @@ message GetLegalAndSupportSettingsResponse {
 }
 
 message GetLockoutSettingsRequest {
+  // Specify the context for which the lockout settings should be returned.
+  // This can be the instance or an organization.
+  // In case of an organization, the returned settings will fall back to the instance settings
+  // if not explicitly set on the organization.
   zitadel.object.v2.RequestContext ctx = 1;
 }
 
@@ -495,6 +668,10 @@ message GetLockoutSettingsResponse {
 }
 
 message GetActiveIdentityProvidersRequest {
+  // Specify the context for which the active identity providers should be returned.
+  // This can be the instance or an organization.
+  // In case of an organization, the returned providers will fall back to the instance providers
+  // if not explicitly set on the organization.
   zitadel.object.v2.RequestContext ctx = 1;
   optional bool creation_allowed = 2;
   optional bool linking_allowed = 3;
@@ -510,25 +687,32 @@ message GetActiveIdentityProvidersResponse {
 message GetGeneralSettingsRequest {}
 
 message GetGeneralSettingsResponse {
-  string default_org_id = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "default organization for the current context"
-    }
-  ];
+  // The unique identifier of the default organization.
+  // The default organization is used to assign new users to an organization if no other organization is specified.
+  // Deprecated: use default_organization_id instead.
+  string default_org_id = 1;
+
+  // The default language is use if no other language is specified or detected.
+  // The format is a BCP 47 language tag (e.g. "en", "de", "fr-CH").
   string default_language = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "default language for the current context"
       example: "\"en\""
     }
   ];
+
+  // The list of supported languages.
+  // The format is a BCP 47 language tag (e.g. "en", "de", "fr-CH").
   repeated string supported_languages = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[\"en\", \"de\", \"it\"]"
     }
   ];
+
+  // The unique identifier of the default organization.
+  // The default organization is used to assign new users to an organization if no other organization is specified.
+  string default_organization_id = 4;
 }
 
-// This is an empty request
 message GetSecuritySettingsRequest{}
 
 message GetSecuritySettingsResponse{
@@ -537,25 +721,89 @@ message GetSecuritySettingsResponse{
 }
 
 message SetSecuritySettingsRequest{
+  // EmbeddedIframeSettings defines if the login UI can be embedded in an iframe
+  // and which origins are allowed to do so.
   EmbeddedIframeSettings embedded_iframe = 1;
-  bool enable_impersonation = 2 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "allows users to impersonate other users. The impersonator needs the appropriate `*_IMPERSONATOR` roles assigned as well"
-    }
-  ];
+
+  // If enabled, users are allowed to impersonate other users.
+  // The impersonator needs the appropriate `*_IMPERSONATOR` roles assigned as well".
+  bool enable_impersonation = 2;
 }
 
 message SetSecuritySettingsResponse{
   zitadel.object.v2.Details details = 1;
 }
 
+
+message SetOrganizationSettingsRequest {
+  // Organization ID in which this settings are set.
+  string organization_id = 1;
+
+  // Force the usernames in the organization to be unique,
+  // only possible to set if the existing users already have unique usernames in the organization context.
+  optional bool organization_scoped_usernames = 2;
+}
+
+message SetOrganizationSettingsResponse {
+  // The timestamp of the set of the organization settings.
+  google.protobuf.Timestamp set_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message DeleteOrganizationSettingsRequest {
+  // Organization ID in which this settings are set.
+  string organization_id = 1;
+}
+
+message DeleteOrganizationSettingsResponse {
+  // The timestamp of the deletion of the organization settings.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message ListOrganizationSettingsRequest{
+  // List limitations and ordering.
+  optional zitadel.filter.v2.PaginationRequest pagination = 1;
+
+  // The field the result is sorted by. The default is the creation date.
+  // Beware that if you change this, your result pagination might be inconsistent.
+  optional OrganizationSettingsFieldName sorting_column = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"ORGANIZATION_SETTINGS_FIELD_NAME_CREATION_DATE\""
+    }
+  ];
+
+  // Define the criteria to query for.
+  repeated OrganizationSettingsSearchFilter filters = 4;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"pagination\":{\"offset\":0,\"limit\":0,\"asc\":true},\"sortingColumn\":\"ORGANIZATION_SETTINGS_FIELD_NAME_CREATION_DATE\",\"filters\":[{\"inOrganizationIdsFilter\":{\"ids\":[\"28746028909593987\"]}}]}";
+  };
+}
+
+message ListOrganizationSettingsResponse {
+  zitadel.filter.v2.PaginationResponse pagination = 1;
+  repeated OrganizationSettings organization_settings = 2;
+}
+
 message GetHostedLoginTranslationRequest {
+  // Specify the level from which the translation should be returned.
+  // If the requested level doesn't contain all translations, and ignore_inheritance is set to false
+  // a merging process fallbacks onto the higher levels ensuring all keys in the file have a translation.
   oneof level {
     bool system = 1 [(validate.rules).bool = {const: true}];
     bool instance = 2 [(validate.rules).bool = {const: true}];
     string organization_id = 3;
   }
 
+  // The locale of the translations to be returned.
+  // Needs to be a BCP 47 language tag (e.g. "en", "de", "fr-CH").
   string locale = 4 [
     (validate.rules).string = {min_len: 2},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -579,20 +827,27 @@ message GetHostedLoginTranslationResponse {
     }
   ];
 
+  // Translations contains the translations in the requested language.
   google.protobuf.Struct translations = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "{\"common\":{\"back\":\"Indietro\"},\"accounts\":{\"title\":\"Account\",\"description\":\"Seleziona l'account che desideri utilizzare.\",\"addAnother\":\"Aggiungi un altro account\",\"noResults\":\"Nessun account trovato\"}}";
-      description: "Translations contains the translations in the request language.";
     }
   ];
 }
 
 message SetHostedLoginTranslationRequest {
+  // Specify the level on which the translation should be set.
+  // Only instance or organization level is allowed.
+  // System level translations can't be modified.
+  // In case of organization level, the organization_id needs to be set.
+  // If a translation already exists on the specified level, it will be overwritten.
   oneof level {
     bool instance = 1 [(validate.rules).bool = {const: true}];
     string organization_id = 2;
   }
 
+  // The locale of the translations to be set.
+  // Needs to be a BCP 47 language tag (e.g. "en", "de", "fr-CH").
   string locale = 3 [
     (validate.rules).string = {min_len: 2},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -601,10 +856,10 @@ message SetHostedLoginTranslationRequest {
     }
   ];
 
+  // Translations should contain the translations in the specified locale.
   google.protobuf.Struct translations = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "{\"common\":{\"back\":\"Indietro\"},\"accounts\":{\"title\":\"Account\",\"description\":\"Seleziona l'account che desideri utilizzare.\",\"addAnother\":\"Aggiungi un altro account\",\"noResults\":\"Nessun account trovato\"}}";
-      description: "Translations should contain the translations in the specified locale.";
     }
   ];
 }

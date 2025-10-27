@@ -401,7 +401,7 @@ module.exports = {
             },
           },
           application_v2: {
-            specPath: ".artifacts/openapi3/zitadel/app/v2beta/app_service.openapi.yaml",
+            specPath: ".artifacts/openapi3/zitadel/application/v2/application_service.openapi.yaml",
             outputDir: "docs/apis/resources/application_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -428,7 +428,7 @@ module.exports = {
           },
           internal_permission_v2: {
             specPath:
-              ".artifacts/openapi3/zitadel/internal_permission/v2beta/internal_permission_service.openapi.yaml",
+              ".artifacts/openapi3/zitadel/internal_permission/v2/internal_permission_service.openapi.yaml",
             outputDir: "docs/apis/resources/internal_permission_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",

@@ -136,6 +136,10 @@ func (i instanceDomain) SetType(typ domain.DomainType) database.Change {
 // conditions
 // -------------------------------------------------------------
 
+func (i instanceDomain) PrimaryKeyCondition(domain string) database.Condition {
+	return i.DomainCondition(database.TextOperationEqual, domain)
+}
+
 // DomainCondition implements [domain.InstanceDomainRepository].
 func (i instanceDomain) DomainCondition(op database.TextOperation, domain string) database.Condition {
 	return database.NewTextCondition(i.DomainColumn(), op, domain)
@@ -159,6 +163,13 @@ func (i instanceDomain) TypeCondition(typ domain.DomainType) database.Condition 
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
+
+// PrimaryKeyColumns implements [domain.Repository].
+func (i instanceDomain) PrimaryKeyColumns() []database.Column {
+	return []database.Column{
+		i.DomainColumn(),
+	}
+}
 
 // CreatedAtColumn implements [domain.InstanceDomainRepository].
 func (i instanceDomain) CreatedAtColumn() database.Column {

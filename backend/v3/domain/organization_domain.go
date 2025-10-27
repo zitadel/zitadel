@@ -47,6 +47,9 @@ type organizationDomainColumns interface {
 
 type organizationDomainConditions interface {
 	domainConditions
+
+	// PrimaryKeyCondition returns a filter on the primary key fields.
+	PrimaryKeyCondition(instanceID, orgID, domain string) database.Condition
 	// OrgIDCondition returns a filter on the org id field.
 	OrgIDCondition(orgID string) database.Condition
 	// IsVerifiedCondition returns a filter on the is verified field.
@@ -62,7 +65,11 @@ type organizationDomainChanges interface {
 	SetValidationType(verificationType DomainValidationType) database.Change
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/org_domain.mock.go . OrganizationDomainRepository
+
 type OrganizationDomainRepository interface {
+	Repository
+
 	organizationDomainColumns
 	organizationDomainConditions
 	organizationDomainChanges
