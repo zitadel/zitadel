@@ -15,6 +15,9 @@ type UpdateInstanceCommand struct {
 	Name string `json:"name"`
 }
 
+// RequiresTransaction implements [Transactional].
+func (u *UpdateInstanceCommand) RequiresTransaction() {}
+
 // Events implements Commander.
 func (u *UpdateInstanceCommand) Events(ctx context.Context, _ *InvokeOpts) ([]eventstore.Command, error) {
 	return []eventstore.Command{
@@ -22,7 +25,10 @@ func (u *UpdateInstanceCommand) Events(ctx context.Context, _ *InvokeOpts) ([]ev
 	}, nil
 }
 
-var _ Commander = (*UpdateInstanceCommand)(nil)
+var (
+	_ Commander     = (*UpdateInstanceCommand)(nil)
+	_ Transactional = (*UpdateInstanceCommand)(nil)
+)
 
 func NewUpdateInstanceCommand(id, name string) *UpdateInstanceCommand {
 	return &UpdateInstanceCommand{
@@ -33,12 +39,6 @@ func NewUpdateInstanceCommand(id, name string) *UpdateInstanceCommand {
 
 // Execute implements [Commander]
 func (u *UpdateInstanceCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
-	close, err := opts.EnsureTx(ctx)
-	if err != nil {
-		return err
-	}
-	defer func() { err = close(ctx, err) }()
-
 	instanceRepo := opts.instanceRepo
 
 	updateCount, err := instanceRepo.Update(

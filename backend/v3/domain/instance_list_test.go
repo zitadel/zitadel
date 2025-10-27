@@ -101,8 +101,7 @@ func TestListInstancesCommand_Execute(t *testing.T) {
 	tt := []struct {
 		testName string
 
-		queryExecutor func(ctrl *gomock.Controller) database.QueryExecutor
-		repos         func(ctrl *gomock.Controller, queryParams ...database.QueryOption) (domain.InstanceRepository, domain.InstanceDomainRepository)
+		repos func(ctrl *gomock.Controller, queryParams ...database.QueryOption) (domain.InstanceRepository, domain.InstanceDomainRepository)
 
 		queryParams  []database.QueryOption
 		inputRequest *instance.ListInstancesRequest
@@ -249,15 +248,13 @@ func TestListInstancesCommand_Execute(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			cmd := domain.NewListInstancesCommand(tc.inputRequest)
 			opts := &domain.InvokeOpts{
-				DB: new(noopdb.Pool),
+				Invoker: domain.NewTransactionInvoker(nil),
 			}
+			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
 			if tc.repos != nil {
 				inst, instDomain := tc.repos(ctrl, tc.queryParams...)
 				domain.WithInstanceRepo(inst)(opts)
 				domain.WithInstanceDomainRepo(instDomain)(opts)
-			}
-			if tc.queryExecutor != nil {
-				opts.DB = tc.queryExecutor(ctrl)
 			}
 
 			// Test

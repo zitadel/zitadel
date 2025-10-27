@@ -160,7 +160,7 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
 
     let lifetime = loginSettings.passwordCheckLifetime;
 
-    if (!lifetime) {
+    if (!lifetime || !lifetime.seconds) {
       console.warn("No password lifetime provided, defaulting to 24 hours");
       lifetime = {
         seconds: BigInt(60 * 60 * 24), // default to 24 hours

@@ -63,10 +63,7 @@ func TestActivateOrgCommand_Validate(t *testing.T) {
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(
 						database.WithCondition(
-							database.And(
-								repo.IDCondition("org-1"),
-								repo.InstanceIDCondition("instance-1"),
-							),
+							repo.PrimaryKeyCondition("instance-1", "org-1"),
 						))).
 					Times(1).
 					Return(nil, getErr)
@@ -82,10 +79,7 @@ func TestActivateOrgCommand_Validate(t *testing.T) {
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(
 						database.WithCondition(
-							database.And(
-								repo.IDCondition("org-1"),
-								repo.InstanceIDCondition("instance-1"),
-							),
+							repo.PrimaryKeyCondition("instance-1", "org-1"),
 						))).
 					Times(1).
 					Return(nil, database.NewNoRowFoundError(getErr))
@@ -100,10 +94,7 @@ func TestActivateOrgCommand_Validate(t *testing.T) {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
-						database.And(
-							repo.IDCondition("org-1"),
-							repo.InstanceIDCondition("instance-1"),
-						),
+						repo.PrimaryKeyCondition("instance-1", "org-1"),
 					))).
 					Times(1).
 					Return(&domain.Organization{
@@ -121,10 +112,7 @@ func TestActivateOrgCommand_Validate(t *testing.T) {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
-						database.And(
-							repo.IDCondition("org-1"),
-							repo.InstanceIDCondition("instance-1"),
-						),
+						repo.PrimaryKeyCondition("instance-1", "org-1"),
 					))).
 					Times(1).
 					Return(&domain.Organization{
@@ -145,8 +133,9 @@ func TestActivateOrgCommand_Validate(t *testing.T) {
 			ctx := authz.NewMockContext("instance-1", "", "")
 			ctrl := gomock.NewController(t)
 			opts := &domain.InvokeOpts{
-				DB: new(noopdb.Pool),
+				Invoker: domain.NewTransactionInvoker(nil),
 			}
+			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
 			if tc.orgRepo != nil {
 				domain.WithOrganizationRepo(tc.orgRepo(ctrl))(opts)
 			}
@@ -193,10 +182,7 @@ func TestActivateOrgCommand_Execute(t *testing.T) {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(),
-						database.And(
-							repo.IDCondition("org-1"),
-							repo.InstanceIDCondition("instance-1"),
-						),
+						repo.PrimaryKeyCondition("instance-1", "org-1"),
 						repo.SetState(domain.OrgStateActive),
 					).
 					Times(1).
@@ -213,10 +199,7 @@ func TestActivateOrgCommand_Execute(t *testing.T) {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(),
-						database.And(
-							repo.IDCondition("org-1"),
-							repo.InstanceIDCondition("instance-1"),
-						),
+						repo.PrimaryKeyCondition("instance-1", "org-1"),
 						repo.SetState(domain.OrgStateActive)).
 					Times(1).
 					Return(int64(0), nil)
@@ -230,10 +213,7 @@ func TestActivateOrgCommand_Execute(t *testing.T) {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(),
-						database.And(
-							repo.IDCondition("org-1"),
-							repo.InstanceIDCondition("instance-1"),
-						),
+						repo.PrimaryKeyCondition("instance-1", "org-1"),
 						repo.SetState(domain.OrgStateActive)).
 					Times(1).
 					Return(int64(2), nil)
@@ -248,10 +228,7 @@ func TestActivateOrgCommand_Execute(t *testing.T) {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(),
-						database.And(
-							repo.IDCondition("org-1"),
-							repo.InstanceIDCondition("instance-1"),
-						),
+						repo.PrimaryKeyCondition("instance-1", "org-1"),
 						repo.SetState(domain.OrgStateActive)).
 					Times(1).
 					Return(int64(1), nil)
@@ -272,17 +249,19 @@ func TestActivateOrgCommand_Execute(t *testing.T) {
 			}
 
 			opts := &domain.InvokeOpts{
-				DB: new(noopdb.Pool),
+				Invoker: domain.NewTransactionInvoker(nil),
 			}
+			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
+
 			if tc.orgRepo != nil {
 				domain.WithOrganizationRepo(tc.orgRepo(ctrl))(opts)
 			}
 			if tc.queryExecutor != nil {
-				opts.DB = tc.queryExecutor(ctrl)
+				domain.WithQueryExecutor(tc.queryExecutor(ctrl))(opts)
 			}
 
 			// Test
-			err := cmd.Execute(ctx, opts)
+			err := opts.Invoke(ctx, cmd)
 
 			// Verify
 			assert.Equal(t, tc.expectedError, err)

@@ -155,8 +155,9 @@ func TestUpdateInstanceCommand_Validate(t *testing.T) {
 			cmd := domain.NewUpdateInstanceCommand(tc.inputInstanceID, tc.inputInstanceName)
 
 			opts := &domain.InvokeOpts{
-				DB: new(noopdb.Pool),
+				Invoker: domain.NewTransactionInvoker(nil),
 			}
+			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
 			if tc.instanceRepo != nil {
 				domain.WithInstanceRepo(tc.instanceRepo(ctrl))(opts)
 			}
@@ -173,32 +174,18 @@ func TestUpdateInstanceCommand_Validate(t *testing.T) {
 func TestUpdateInstanceCommand_Execute(t *testing.T) {
 	t.Parallel()
 
-	txInitErr := errors.New("tx init error")
 	updateErr := errors.New("update error")
 
 	tt := []struct {
 		testName string
 
-		queryExecutor func(ctrl *gomock.Controller) database.QueryExecutor
-		instanceRepo  func(ctrl *gomock.Controller) domain.InstanceRepository
+		instanceRepo func(ctrl *gomock.Controller) domain.InstanceRepository
 
 		inputID   string
 		inputName string
 
 		expectedError error
 	}{
-		{
-			testName: "when EnsureTx fails should return error",
-			queryExecutor: func(ctrl *gomock.Controller) database.QueryExecutor {
-				mockDB := dbmock.NewMockPool(ctrl)
-				mockDB.EXPECT().
-					Begin(gomock.Any(), gomock.Any()).
-					Times(1).
-					Return(nil, txInitErr)
-				return mockDB
-			},
-			expectedError: txInitErr,
-		},
 		{
 			testName: "when instance update fails should return error",
 			instanceRepo: func(ctrl *gomock.Controller) domain.InstanceRepository {
@@ -278,13 +265,11 @@ func TestUpdateInstanceCommand_Execute(t *testing.T) {
 			cmd := domain.NewUpdateInstanceCommand(tc.inputID, tc.inputName)
 
 			opts := &domain.InvokeOpts{
-				DB: new(noopdb.Pool),
+				Invoker: domain.NewTransactionInvoker(nil),
 			}
+			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
 			if tc.instanceRepo != nil {
 				domain.WithInstanceRepo(tc.instanceRepo(ctrl))(opts)
-			}
-			if tc.queryExecutor != nil {
-				opts.DB = tc.queryExecutor(ctrl)
 			}
 
 			// Test

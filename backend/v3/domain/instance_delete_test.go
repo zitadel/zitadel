@@ -118,13 +118,11 @@ func TestDeleteInstanceCommand_Execute(t *testing.T) {
 	t.Parallel()
 
 	ctx := authz.NewMockContext("inst-1", "org-1", gofakeit.UUID())
-	txInitErr := errors.New("tx init error")
 	deleteErr := errors.New("delete error")
 	getErr := errors.New("get error")
 
 	tests := []struct {
 		testName     string
-		mockTx       func(ctrl *gomock.Controller) database.QueryExecutor
 		instanceRepo func(ctrl *gomock.Controller) domain.InstanceRepository
 
 		inputInstanceID string
@@ -133,18 +131,6 @@ func TestDeleteInstanceCommand_Execute(t *testing.T) {
 		expectedInstanceName    string
 		expectedInstanceDomains []string
 	}{
-		{
-			testName: "when EnsureTx fails should return error",
-			mockTx: func(ctrl *gomock.Controller) database.QueryExecutor {
-				mockDB := dbmock.NewMockPool(ctrl)
-				mockDB.EXPECT().
-					Begin(gomock.Any(), gomock.Any()).
-					Times(1).
-					Return(nil, txInitErr)
-				return mockDB
-			},
-			expectedError: txInitErr,
-		},
 		{
 			testName: "when retrieving instance fails should return error",
 			instanceRepo: func(ctrl *gomock.Controller) domain.InstanceRepository {
@@ -337,11 +323,11 @@ func TestDeleteInstanceCommand_Execute(t *testing.T) {
 			// Given
 			d := domain.NewDeleteInstanceCommand(tc.inputInstanceID)
 			ctrl := gomock.NewController(t)
-			opts := &domain.InvokeOpts{DB: new(noopdb.Pool)}
-
-			if tc.mockTx != nil {
-				opts.DB = tc.mockTx(ctrl)
+			opts := &domain.InvokeOpts{
+				Invoker: domain.NewTransactionInvoker(nil),
 			}
+			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
+
 			if tc.instanceRepo != nil {
 				domain.WithInstanceRepo(tc.instanceRepo(ctrl))(opts)
 			}

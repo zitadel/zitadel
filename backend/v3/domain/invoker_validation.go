@@ -5,11 +5,15 @@ import (
 )
 
 type validatorInvoker struct {
-	next Invoker
+	invoker
 }
 
-func newValidatorInvoker(next Invoker) *validatorInvoker {
-	return &validatorInvoker{next: next}
+// NewValidatorInvoker creates a new [validatorInvoker].
+// It is responsible for calling the [Validator.Validate] function before executing the [Executor].
+func NewValidatorInvoker(next Invoker) *validatorInvoker {
+	return &validatorInvoker{
+		invoker: invoker{next: next},
+	}
 }
 
 type Validator interface {
@@ -23,9 +27,5 @@ func (i *validatorInvoker) Invoke(ctx context.Context, executor Executor, opts *
 		}
 	}
 
-	if i.next != nil {
-		return i.next.Invoke(ctx, executor, opts)
-	}
-
-	return executor.Execute(ctx, opts)
+	return i.execute(ctx, executor, opts)
 }

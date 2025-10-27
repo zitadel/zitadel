@@ -193,7 +193,10 @@ func TestGetInstanceCommand_Execute(t *testing.T) {
 			// Given
 			g := domain.NewGetInstanceCommand(tc.inputInstanceID)
 			ctrl := gomock.NewController(t)
-			opts := &domain.InvokeOpts{DB: new(noopdb.Pool)}
+			opts := &domain.InvokeOpts{
+				Invoker: domain.NewTransactionInvoker(nil),
+			}
+			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
 
 			if tc.instanceRepo != nil {
 				domain.WithInstanceRepo(tc.instanceRepo(ctrl))(opts)

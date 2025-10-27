@@ -18,6 +18,9 @@ type DeleteInstanceCommand struct {
 	InstanceName    string
 }
 
+// RequiresTransaction implements [Transactional].
+func (d *DeleteInstanceCommand) RequiresTransaction() {}
+
 func NewDeleteInstanceCommand(instanceID string) *DeleteInstanceCommand {
 	return &DeleteInstanceCommand{ID: instanceID}
 }
@@ -35,13 +38,6 @@ func (d *DeleteInstanceCommand) Events(ctx context.Context, opts *InvokeOpts) ([
 
 // Execute implements [Commander].
 func (d *DeleteInstanceCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
-	closeFunc, err := opts.EnsureTx(ctx)
-	if err != nil {
-		return err
-	}
-
-	defer func() { err = closeFunc(ctx, err) }()
-
 	instanceRepo := opts.instanceRepo.LoadDomains()
 
 	instanceToDelete, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.IDCondition(d.ID)))
@@ -91,4 +87,7 @@ func (d *DeleteInstanceCommand) Validate(ctx context.Context, opts *InvokeOpts) 
 	return nil
 }
 
-var _ Commander = (*DeleteInstanceCommand)(nil)
+var (
+	_ Commander     = (*DeleteInstanceCommand)(nil)
+	_ Transactional = (*DeleteInstanceCommand)(nil)
+)
