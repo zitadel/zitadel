@@ -256,6 +256,10 @@
     "verify": {
       "title": "使用密钥认证",
       "description": "您的设备将请求指纹、面部识别或屏幕锁",
+      "info": {
+        "description": "使用您设置的密钥进行安全认证。",
+        "link": "了解更多关于密钥"
+      },
       "usePassword": "使用密码",
       "submit": "继续",
       "errors": {

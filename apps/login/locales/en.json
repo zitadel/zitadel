@@ -256,6 +256,10 @@
     "verify": {
       "title": "Authenticate with a passkey",
       "description": "Your device will ask for your fingerprint, face, or screen lock",
+      "info": {
+        "description": "Use the passkey you set up to authenticate securely. ",
+        "link": "Learn more about Passkeys"
+      },
       "usePassword": "Use password",
       "submit": "Continue",
       "errors": {
