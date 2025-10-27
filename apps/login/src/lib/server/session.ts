@@ -148,7 +148,7 @@ export async function updateSession(options: UpdateSessionCommand) {
       ? loginSettings?.secondFactorCheckLifetime
       : undefined;
 
-  if (!lifetime) {
+  if (!lifetime || !lifetime.seconds) {
     console.warn("No lifetime provided for session, defaulting to 24 hours");
     lifetime = {
       seconds: BigInt(60 * 60 * 24), // default to 24 hours
