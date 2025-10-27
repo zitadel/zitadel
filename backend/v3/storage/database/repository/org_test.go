@@ -247,12 +247,7 @@ func TestCreateOrganization(t *testing.T) {
 
 			// check organization values
 			organization, err = organizationRepo.Get(t.Context(), savepoint,
-				database.WithCondition(
-					database.And(
-						organizationRepo.IDCondition(organization.ID),
-						organizationRepo.InstanceIDCondition(organization.InstanceID),
-					),
-				),
+				database.WithCondition(organizationRepo.PrimaryKeyCondition(organization.InstanceID, organization.ID)),
 			)
 			require.NoError(t, err)
 
@@ -342,12 +337,7 @@ func TestUpdateOrganization(t *testing.T) {
 				require.NoError(t, err)
 
 				// delete instance
-				_, err = organizationRepo.Delete(t.Context(), tx,
-					database.And(
-						organizationRepo.InstanceIDCondition(org.InstanceID),
-						organizationRepo.IDCondition(org.ID),
-					),
-				)
+				_, err = organizationRepo.Delete(t.Context(), tx, organizationRepo.PrimaryKeyCondition(org.InstanceID, org.ID))
 				require.NoError(t, err)
 
 				return &org
@@ -399,10 +389,7 @@ func TestUpdateOrganization(t *testing.T) {
 
 			// update org
 			rowsAffected, err := organizationRepo.Update(t.Context(), tx,
-				database.And(
-					organizationRepo.InstanceIDCondition(createdOrg.InstanceID),
-					organizationRepo.IDCondition(createdOrg.ID),
-				),
+				organizationRepo.PrimaryKeyCondition(createdOrg.InstanceID, createdOrg.ID),
 				tt.update...,
 			)
 			afterUpdate := time.Now()
@@ -417,10 +404,7 @@ func TestUpdateOrganization(t *testing.T) {
 			// check organization values
 			organization, err := organizationRepo.Get(t.Context(), tx,
 				database.WithCondition(
-					database.And(
-						organizationRepo.IDCondition(createdOrg.ID),
-						organizationRepo.InstanceIDCondition(createdOrg.InstanceID),
-					),
+					organizationRepo.PrimaryKeyCondition(createdOrg.InstanceID, createdOrg.ID),
 				),
 			)
 			require.NoError(t, err)

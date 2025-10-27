@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/backend/v3/storage/eventstore"
 )
 
 type InvokeOpt func(*InvokeOpts)
@@ -26,10 +27,33 @@ func WithProjectRepo(repo ProjectRepository) InvokeOpt {
 	}
 }
 
+// WithQueryExecutor sets the database client to be used by the command.
+// If not set, the default pool will be used.
+// This is mainly used for testing.
+func WithQueryExecutor(executor database.QueryExecutor) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.db = executor
+	}
+}
+
+// WithLegacyEventstore sets the eventstore to be used by the command.
+// If not set, the default one will be used.
+// This is mainly used for testing.
+func WithLegacyEventstore(es eventstore.LegacyEventstore) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.legacyEventstore = es
+	}
+}
+
 // InvokeOpts are passed to each command
-// they provide common fields used by commands like the database client.
 type InvokeOpts struct {
-	DB                     database.QueryExecutor
+	// db is the database client.
+	// [Executor]s MUST NOT access this field directly, use [InvokeOpts.DB] to access it.
+	//
+	// [Invoker]s may manipulate this field for example changing it to a transaction.
+	// Its their responsibility to restore it after ending the transaction.
+	db                     database.QueryExecutor
+	legacyEventstore       eventstore.LegacyEventstore
 	Invoker                Invoker
 	Permissions            PermissionChecker
 	organizationRepo       OrganizationRepository
@@ -37,61 +61,20 @@ type InvokeOpts struct {
 	projectRepo            ProjectRepository
 }
 
-type ensureTxOpts struct {
-	*database.TransactionOptions
+func (o *InvokeOpts) DB() database.QueryExecutor {
+	if o.db != nil {
+		return o.db
+	}
+	o.db = pool
+	return o.db
 }
 
-type EnsureTransactionOpt func(*ensureTxOpts)
-
-// EnsureTx ensures that the DB is a transaction. If it is not, it will start a new transaction.
-// The returned close function will end the transaction. If the DB is already a transaction, the close function
-// will be a noop because another [Executor] is already responsible for ending the transaction.
-func (o *InvokeOpts) EnsureTx(ctx context.Context, opts ...EnsureTransactionOpt) (close func(context.Context, error) error, err error) {
-	beginner, ok := o.DB.(database.Beginner)
-	if !ok {
-		// db is already a transaction
-		return func(_ context.Context, err error) error {
-			return err
-		}, nil
+func (o *InvokeOpts) LegacyEventstore() eventstore.LegacyEventstore {
+	if o.legacyEventstore != nil {
+		return o.legacyEventstore
 	}
-
-	txOpts := &ensureTxOpts{
-		TransactionOptions: new(database.TransactionOptions),
-	}
-	for _, opt := range opts {
-		opt(txOpts)
-	}
-
-	tx, err := beginner.Begin(ctx, txOpts.TransactionOptions)
-	if err != nil {
-		return nil, err
-	}
-	o.DB = tx
-
-	return func(ctx context.Context, err error) error {
-		return tx.End(ctx, err)
-	}, nil
-}
-
-// EnsureClient ensures that the o.DB is a client. If it is not, it will get a new client from the [database.Pool].
-// The returned close function will release the client. If the o.DB is already a client or transaction, the close function
-// will do nothing because another [Executor] is already responsible for releasing the client.
-func (o *InvokeOpts) EnsureClient(ctx context.Context) (close func(_ context.Context) error, err error) {
-	pool, ok := o.DB.(database.Pool)
-	if !ok {
-		// o.DB is already a client
-		return func(_ context.Context) error {
-			return nil
-		}, nil
-	}
-	client, err := pool.Acquire(ctx)
-	if err != nil {
-		return nil, err
-	}
-	o.DB = client
-	return func(ctx context.Context) error {
-		return client.Release(ctx)
-	}, nil
+	o.legacyEventstore = legacyEventstore
+	return o.legacyEventstore
 }
 
 func (o *InvokeOpts) Invoke(ctx context.Context, executor Executor) error {
@@ -106,7 +89,6 @@ func DefaultOpts(invoker Invoker) *InvokeOpts {
 		invoker = &noopInvoker{}
 	}
 	return &InvokeOpts{
-		DB:          pool,
 		Invoker:     invoker,
 		Permissions: &noopPermissionChecker{}, // prevent panics for now
 	}
