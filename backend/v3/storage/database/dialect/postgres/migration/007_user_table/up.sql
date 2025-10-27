@@ -1,6 +1,22 @@
 -- ------------------------------------------------------------
 -- table definitions
 -- ------------------------------------------------------------
+CREATE TABLE zitadel.verifications(
+    instance_id TEXT NOT NULL
+    , id TEXT NOT NULL
+
+    , value TEXT NOT NULL
+    , code BYTES NOT NULL
+
+    , expiry TIMESTAMPTZ
+    , failed_attempts SMALLINT NOT NULL DEFAULT 0
+
+    , created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    , updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+
+    , PRIMARY KEY (instance_id, id)
+    , FOREIGN KEY (instance_id) REFERENCES zitadel.instances(id) ON DELETE CASCADE
+);
 
 CREATE TYPE zitadel.user_state AS ENUM (
     'initial'
@@ -58,8 +74,14 @@ CREATE TABLE zitadel.human_users(
     , gender SMALLINT 
     , avatar_key TEXT
 
+    , password BYTES
+    , password_change_required BOOLEAN NOT NULL DEFAULT FALSE
+    , password_verified_at TIMESTAMPTZ
+    , unverified_password_id TEXT
+
     , PRIMARY KEY (instance_id, organization_id, id)
     , FOREIGN KEY (instance_id, organization_id) REFERENCES zitadel.organizations
+    , FOREIGN KEY (instance_id, unverified_password_id) REFERENCES zitadel.verifications(instance_id, id) ON DELETE SET NULL
 ) INHERITS (zitadel.users);
 
 CREATE UNIQUE INDEX ON zitadel.human_users(instance_id, organization_id, username) WHERE username_org_unique IS TRUE; --TODO(adlerhurst): does that work if a username is already present on a user without org unique?
@@ -75,23 +97,6 @@ CREATE TYPE zitadel.human_contact_type AS ENUM (
 
 CREATE INDEX idx_human_contacts_value ON zitadel.human_contacts(instance_id, value);
 CREATE INDEX idx_human_contacts_value_lower ON zitadel.human_contacts(instance_id, lower(value)) WHERE type = 'email';
-
-CREATE TABLE zitadel.verifications(
-    instance_id TEXT NOT NULL
-    , id TEXT NOT NULL
-
-    , value TEXT NOT NULL
-    , code BYTES NOT NULL
-
-    , expiry TIMESTAMPTZ NOT NULL
-    , failed_attempts SMALLINT NOT NULL DEFAULT 0
-
-    , created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-    , updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-
-    , PRIMARY KEY (instance_id, id)
-    , FOREIGN KEY (instance_id) REFERENCES zitadel.instances(id) ON DELETE CASCADE
-);
 
 CREATE TABLE zitadel.human_contacts(
     instance_id TEXT NOT NULL

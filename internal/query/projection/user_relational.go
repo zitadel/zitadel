@@ -166,10 +166,10 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.MachineChangedEventType,
 					Reduce: p.reduceMachineChanged,
 				},
-				// {
-				// 	Event:  user.HumanPasswordChangedType,
-				// 	Reduce: p.reduceHumanPasswordChanged,
-				// },
+				{
+					Event:  user.HumanPasswordChangedType,
+					Reduce: p.reduceHumanPasswordChanged,
+				},
 				{
 					Event:  user.MachineSecretSetType,
 					Reduce: p.reduceMachineSecretSet,
@@ -901,66 +901,29 @@ func (p *userRelationalProjection) reduceHumanAvatarRemoved(event eventstore.Eve
 	}), nil
 }
 
-// func (p *userRelationalProjection) reduceHumanPasswordChanged(event eventstore.Event) (*handler.Statement, error) {
-// 	e, ok := event.(*user.HumanPasswordChangedEvent)
-// 	if !ok {
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-jqXUY", "reduce.wrong.event.type %s", user.HumanPasswordChangedType)
-// 	}
-// 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-// 		tx, ok := ex.(*sql.Tx)
-// 		if !ok {
-// 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
-// 		}
-// 		userRepo := repository.UserRepository()
+func (p *userRelationalProjection) reduceHumanPasswordChanged(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanPasswordChangedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-jqXUY", "reduce.wrong.event.type %s", user.HumanPasswordChangedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
 
-// 		noOfRecordsUpdated, err := userRepo.Human().Security().Update(ctx, v3_sql.SQLTx(tx),
-// 			database.And(
-// 				userRepo.Human().Security().InstanceIDCondition(e.Aggregate().InstanceID),
-// 				userRepo.Human().Security().UserIDCondition(e.Aggregate().ID),
-// 			),
-// 			// TODO
-// 			// userRepo.Human().SetUsername(e.UserName),
-// 			userRepo.Human().Security().SetPasswordChangeRequired(e.ChangeRequired),
-// 			userRepo.Human().Security().SetPasswordChanged(e.CreatedAt()),
-// 			// userRepo.Human().SetUpdatedAt(e.CreationDate()),
-// 		)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		if noOfRecordsUpdated == 0 {
-// 			return zerrors.ThrowNotFound(nil, "HANDL-SD3fs", "Errors.User.NotFound")
-// 		} else if noOfRecordsUpdated > 1 {
-// 			tx.Rollback()
-// 			// TODO add "Errors.User.TooManyEntries"
-// 			return zerrors.ThrowInternal(nil, "HANDL-Df3fs", "Errors.User.TooManyEntries")
-// 		}
-// 		return nil
-// 	}), nil
-// 	// return handler.NewMultiStatement(
-// 	// 	e,
-// 	// 	handler.AddUpdateStatement(
-// 	// 		[]handler.Column{
-// 	// 			handler.NewCol(HumanPasswordChangeRequired, e.ChangeRequired),
-// 	// 			handler.NewCol(HumanPasswordChanged, &sql.NullTime{Time: e.CreatedAt(), Valid: true}),
-// 	// 		},
-// 	// 		[]handler.Condition{
-// 	// 			handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
-// 	// 			handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
-// 	// 		},
-// 	// 		handler.WithTableSuffix(UserHumanSuffix),
-// 	// 	),
-// 	// 	handler.AddUpdateStatement(
-// 	// 		[]handler.Column{
-// 	// 			handler.NewCol(NotifyPasswordSetCol, true),
-// 	// 		},
-// 	// 		[]handler.Condition{
-// 	// 			handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),
-// 	// 			handler.NewCond(NotifyInstanceIDCol, e.Aggregate().InstanceID),
-// 	// 		},
-// 	// 		handler.WithTableSuffix(UserNotifySuffix),
-// 	// 	),
-// 	// ), nil
-// }
+		password := crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)
+
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.SetPasswordChangeRequired(e.ChangeRequired),
+			repo.SetPassword([]byte(password), e.CreatedAt()),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
+}
 
 func (p *userRelationalProjection) reduceMachineSecretSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.MachineSecretSetEvent)

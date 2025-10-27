@@ -14,6 +14,10 @@ var _ domain.HumanUserRepository = (*userHuman)(nil)
 
 type userHuman struct{}
 
+func HumanUserRepository() domain.HumanUserRepository {
+	return &userHuman{}
+}
+
 func (h userHuman) unqualifiedTableName() string {
 	return "human_users"
 }
@@ -144,6 +148,19 @@ func (u userHuman) SetUsername(username string) database.Change {
 // SetUsernameOrgUnique implements [domain.HumanUserRepository].
 func (u userHuman) SetUsernameOrgUnique(usernameOrgUnique bool) database.Change {
 	return database.NewChange(u.UsernameOrgUniqueColumn(), usernameOrgUnique)
+}
+
+// SetPassword implements [domain.HumanUserRepository].
+func (h *userHuman) SetPassword(password []byte, verifiedAt time.Time) database.Change {
+	changes := database.Changes{
+		database.NewChange(h.PasswordColumn(), password),
+	}
+	if verifiedAt.IsZero() {
+		changes = append(changes, database.NewChange(h.PasswordVerifiedAtColumn(), database.DefaultInstruction))
+		return changes
+	}
+	return append(changes, database.NewChange(h.PasswordVerifiedAtColumn(), verifiedAt))
+
 }
 
 // -------------------------------------------------------------
@@ -355,6 +372,16 @@ func (u userHuman) UsernameOrgUniqueColumn() database.Column {
 // NicknameColumn implements [domain.HumanUserRepository].
 func (h userHuman) NicknameColumn() database.Column {
 	return database.NewColumn("user_humans", "nick_name")
+}
+
+// PasswordColumn implements [domain.HumanUserRepository].
+func (h *userHuman) PasswordColumn() database.Column {
+	return database.NewColumn("human_users", "password")
+}
+
+// PasswordVerifiedAtColumn implements [domain.HumanUserRepository].
+func (h *userHuman) PasswordVerifiedAtColumn() database.Column {
+	return database.NewColumn("human_users", "password_verified_at")
 }
 
 // // FirstNameColumn implements [domain.humanColumns].

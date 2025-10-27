@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"time"
 
 	"golang.org/x/text/language"
 
@@ -42,6 +43,9 @@ type humanColumns interface {
 	PreferredLanguageColumn() database.Column
 	GenderColumn() database.Column
 	AvatarKeyColumn() database.Column
+
+	PasswordColumn() database.Column
+	PasswordVerifiedAtColumn() database.Column
 }
 
 type humanConditions interface {
@@ -63,6 +67,10 @@ type humanChanges interface {
 	// nil and [GenderUnspecified] are treated as unset
 	SetGender(gender *Gender) database.Change
 	SetAvatarKey(key *string) database.Change
+
+	SetPasswordChangeRequired(required bool) database.Change
+	// SetPassword sets the password hash, if verifiedAt is Zero, NOW() is used
+	SetPassword(password []byte, verifiedAt time.Time) database.Change
 }
 
 type HumanUserRepository interface {
