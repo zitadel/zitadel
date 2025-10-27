@@ -1,0 +1,433 @@
+{
+  "common": {
+    "back": "Geri",
+    "title": "Zitadel ile Giriş"
+  },
+  "accounts": {
+    "title": "Hesaplar",
+    "description": "Kullanmak istediğiniz hesabı seçin.",
+    "addAnother": "Başka hesap ekle",
+    "noResults": "Hesap bulunamadı",
+    "verified": "doğrulandı",
+    "expired": "süresi doldu"
+  },
+  "logout": {
+    "title": "Çıkış",
+    "description": "Oturumu sonlandırmak için bir hesaba tıklayın",
+    "noResults": "Hesap bulunamadı",
+    "clear": "Oturumu Sonlandır",
+    "verifiedAt": "Son aktif: {time}",
+    "success": {
+      "title": "Çıkış başarılı",
+      "description": "Başarıyla çıkış yaptınız."
+    }
+  },
+  "loginname": {
+    "title": "Tekrar hoş geldiniz!",
+    "description": "Giriş bilgilerinizi girin.",
+    "register": "Yeni kullanıcı kaydet",
+    "submit": "Devam",
+    "labels": {
+      "loginname": "Kullanıcı adı",
+      "username": "Kullanıcı adı",
+      "usernameOrPhoneNumber": "Kullanıcı adı veya telefon numarası",
+      "usernameOrEmail": "Kullanıcı adı veya e-posta"
+    },
+    "required": {
+      "loginName": "Bu alan zorunludur"
+    },
+    "errors": {
+      "internalError": "Bir iç hata oluştu",
+      "couldNotGetLoginSettings": "Giriş ayarları alınamadı",
+      "couldNotSearchUsers": "Kullanıcılar aranamadı",
+      "couldNotGetDomain": "Alan adı alınamadı",
+      "couldNotGetHost": "Host alınamadı",
+      "couldNotStartIDPFlow": "IDP akışı başlatılamadı",
+      "moreThanOneUserFound": "Birden fazla kullanıcı bulundu. Benzersiz bir tanımlayıcı sağlayın.",
+      "userNotFound": "Kullanıcı sistemde bulunamadı",
+      "couldNotCreateSession": "Kullanıcı için oturum oluşturulamadı",
+      "initialUserNotSupported": "İlk kullanıcı desteklenmiyor",
+      "usernamePasswordNotAllowed": "Kullanıcı adı ve şifre izin verilmiyor! Daha fazla bilgi için yöneticinizle iletişime geçin.",
+      "passkeysNotAllowed": "Passkey'ler izin verilmiyor! Daha fazla bilgi için yöneticinizle iletişime geçin.",
+      "couldNotFindIdentityProvider": "Kimlik sağlayıcı bulunamadı.",
+      "userNotActive": "Kullanıcı aktif değil. Daha fazla bilgi için yöneticinizle iletişime geçin."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Bir hata oluştu",
+      "multipleUsersFound": "Birden fazla kullanıcı bulundu",
+      "userNotFound": "Kullanıcı sistemde bulunamadı"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "Şifre",
+      "description": "Şifrenizi girin.",
+      "resetPassword": "Şifreyi Sıfırla",
+      "submit": "Devam",
+      "labels": {
+        "password": "Şifre"
+      },
+      "required": {
+        "password": "Bu alan zorunludur"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "Şifre doğrulanamadı",
+        "couldNotResetPassword": "Şifre sıfırlanamadı"
+      },
+      "info": {
+        "passwordResetSent": "Şifre sıfırlandı. Lütfen e-postanızı kontrol edin"
+      }
+    },
+    "set": {
+      "title": "Şifre Belirle",
+      "description": "Hesabınız için şifre belirleyin",
+      "codeSent": "E-posta adresinize bir kod gönderildi.",
+      "noCodeReceived": "Kod almadınız mı?",
+      "resend": "Kodu tekrar gönder",
+      "submit": "Devam",
+      "labels": {
+        "code": "Kod",
+        "newPassword": "Yeni Şifre",
+        "confirmPassword": "Şifreyi Onayla"
+      },
+      "required": {
+        "code": "Bu alan zorunludur",
+        "newPassword": "Bir şifre sağlamalısınız!",
+        "confirmPassword": "Bu alan zorunludur"
+      },
+      "errors": {
+        "couldNotSetPassword": "Şifre belirlenemedi",
+        "couldNotResetPassword": "Şifre sıfırlanamadı",
+        "couldNotVerifyPassword": "Şifre doğrulanamadı"
+      }
+    },
+    "change": {
+      "title": "Şifre Değiştir",
+      "description": "Hesabınız için şifre belirleyin",
+      "submit": "Devam",
+      "labels": {
+        "newPassword": "Yeni Şifre",
+        "confirmPassword": "Şifreyi Onayla"
+      },
+      "required": {
+        "newPassword": "Yeni bir şifre sağlamalısınız!",
+        "confirmPassword": "Bu alan zorunludur"
+      },
+      "errors": {
+        "couldNotChangePassword": "Şifre değiştirilemedi",
+        "couldNotVerifyPassword": "Şifre doğrulanamadı",
+        "unknownError": "Bilinmeyen hata"
+      }
+    },
+    "complexity": {
+      "length": "En az {minLength} karakter uzunluğunda olmalıdır.",
+      "hasSymbol": "Bir sembol içermelidir.",
+      "hasNumber": "Bir sayı içermelidir.",
+      "hasUppercase": "Bir büyük harf içermelidir.",
+      "hasLowercase": "Bir küçük harf içermelidir.",
+      "equals": "Şifre onayı eşleşti.",
+      "matches": "Eşleşiyor",
+      "doesNotMatch": "Eşleşmiyor"
+    },
+    "errors": {
+      "noHostFound": "Host bulunamadı",
+      "couldNotSendResetLink": "Şifre Sıfırlama Bağlantısı gönderilemedi",
+      "couldNotCreateSessionForUser": "Kullanıcı için oturum oluşturulamadı",
+      "couldNotVerifyPassword": "Şifre doğrulanamadı",
+      "failedToAuthenticate": "Kimlik doğrulama başarısız. {maxPasswordAttempts} denemeden {failedAttempts} tanesini kullandınız.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Kimlik doğrulama başarısız.",
+      "accountLockedContactAdmin": " Hesabınızın kilidini açmak için yöneticinizle iletişime geçin",
+      "userNotFound": "Kullanıcı sistemde bulunamadı",
+      "initialUserNotSupported": "İlk kullanıcı desteklenmiyor",
+      "userInitialStateNotSupported": "Kullanıcı İlk Durumu desteklenmiyor",
+      "codeOrVerificationRequired": "Bir kod sağlamalı veya geçerli bir Kullanıcı Doğrulama Kontrolüne sahip olmalısınız",
+      "verificationRequired": "Kullanıcı Doğrulama Kontrolü yapılmalıdır",
+      "couldNotLoadSession": "Oturum yüklenemedi",
+      "couldNotLoadAuthMethods": "Kimlik doğrulama yöntemleri yüklenemedi",
+      "failedPrecondition": "Ön koşul başarısız",
+      "sessionNotValid": "Oturum geçerli değil"
+    }
+  },
+  "idp": {
+    "title": "SSO ile Giriş",
+    "description": "Giriş yapmak için aşağıdaki sağlayıcılardan birini seçin",
+    "orSignInWith": "veya şununla giriş yapın",
+    "signInWithApple": "Apple ile Giriş",
+    "signInWithGoogle": "Google ile Giriş",
+    "signInWithAzureAD": "AzureAD ile Giriş",
+    "signInWithGithub": "GitHub ile Giriş",
+    "signInWithGitlab": "GitLab ile Giriş",
+    "loginSuccess": {
+      "title": "Giriş başarılı",
+      "description": "Başarıyla giriş yaptınız!"
+    },
+    "linkingSuccess": {
+      "title": "Hesap bağlandı",
+      "description": "Hesabınızı başarıyla bağladınız!"
+    },
+    "registerSuccess": {
+      "title": "Kayıt başarılı",
+      "description": "Başarıyla kayıt oldunuz!"
+    },
+    "loginError": {
+      "title": "Giriş başarısız",
+      "description": "Giriş yapılmaya çalışılırken bir hata oluştu."
+    },
+    "linkingError": {
+      "title": "Hesap bağlama başarısız",
+      "description": "Hesabınız bağlanmaya çalışılırken bir hata oluştu."
+    },
+    "completeRegister": {
+      "title": "Bilgilerinizi tamamlayın",
+      "description": "E-posta adresinizi ve adınızı sağlayarak kaydınızı tamamlamalısınız."
+    },
+    "accountNotFound": {
+      "title": "Hesap Bulunamadı",
+      "description": "Kimlik sağlayıcı bilgilerinizle ilişkili bir hesap bulamadık.",
+      "info": "Mevcut bir hesap bulunamadı. Lütfen mevcut bir hesapla giriş yapın veya yardım için yöneticinizle iletişime geçin.",
+      "backToLogin": "Girişe Dön"
+    },
+    "registrationFailed": {
+      "title": "Kayıt Kullanılamıyor",
+      "description": "Kayıt işlemini tamamlayamadık.",
+      "info": "Kayıt için organizasyon belirlenemedi. Lütfen yardım için yöneticinizle iletişime geçin.",
+      "backToLogin": "Girişe Dön"
+    }
+  },
+  "ldap": {
+    "title": "LDAP Girişi",
+    "description": "LDAP bilgilerinizi girin.",
+    "submit": "Devam",
+    "labels": {
+      "username": "Kullanıcı adı",
+      "password": "Şifre"
+    },
+    "required": {
+      "username": "Bu alan zorunludur",
+      "password": "Bu alan zorunludur"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "Kimliğinizi doğrulayın",
+      "description": "Aşağıdaki faktörlerden birini seçin.",
+      "noResults": "Kurulum için ikinci faktör mevcut değil."
+    },
+    "set": {
+      "title": "2 Faktörlü Doğrulama Kur",
+      "description": "Aşağıdaki ikinci faktörlerden birini seçin.",
+      "skip": "Atla"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "2 Faktörlü Doğrulama",
+      "totpDescription": "Kimlik doğrulama uygulamanızdaki kodu girin.",
+      "smsDescription": "SMS ile aldığınız kodu girin.",
+      "emailDescription": "E-posta ile aldığınız kodu girin.",
+      "noCodeReceived": "Kod almadınız mı?",
+      "resendCode": "Kodu tekrar gönder",
+      "submit": "Devam",
+      "labels": {
+        "code": "Kod"
+      },
+      "required": {
+        "code": "Bu alan zorunludur"
+      }
+    },
+    "set": {
+      "title": "2 Faktörlü Doğrulama Kur",
+      "totpDescription": "QR kodunu kimlik doğrulama uygulamanızla tarayın.",
+      "smsDescription": "SMS ile kod almak için telefon numaranızı girin.",
+      "emailDescription": "E-posta ile kod almak için e-posta adresinizi girin.",
+      "totpRegisterDescription": "QR Kodunu tarayın veya URL'ye manuel olarak gidin.",
+      "submit": "Devam",
+      "labels": {
+        "code": "Kod"
+      },
+      "required": {
+        "code": "Bu alan zorunludur"
+      }
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "Passkey ile kimlik doğrulama",
+      "description": "Cihazınız parmak izinizi, yüzünüzü veya ekran kilidinizi isteyecektir",
+      "usePassword": "Şifre kullan",
+      "submit": "Devam"
+    },
+    "set": {
+      "title": "Passkey kur",
+      "description": "Cihazınız parmak izinizi, yüzünüzü veya ekran kilidinizi isteyecektir",
+      "info": {
+        "description": "Passkey, parmak izi, Apple FaceID veya benzeri gibi bir cihazdaki kimlik doğrulama yöntemidir. ",
+        "link": "Şifresiz Kimlik Doğrulama"
+      },
+      "skip": "Atla",
+      "submit": "Devam"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "2 Faktörlü Doğrulama",
+      "description": "Hesabınızı cihazınızla doğrulayın."
+    },
+    "set": {
+      "title": "2 Faktörlü Doğrulama Kur",
+      "description": "İkinci faktör olarak bir cihaz kurun.",
+      "submit": "Devam"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "Passkey",
+      "password": "Şifre"
+    },
+    "disabled": {
+      "title": "Kayıt devre dışı",
+      "description": "Kayıt devre dışı. Lütfen yöneticinizle iletişime geçin."
+    },
+    "missingdata": {
+      "title": "Eksik veri",
+      "description": "Kayıt olmak için e-posta, ad ve soyadı sağlayın."
+    },
+    "title": "Kayıt",
+    "description": "ZITADEL hesabınızı oluşturun.",
+    "noMethodAvailableWarning": "Kullanılabilir kimlik doğrulama yöntemi yok. Lütfen yöneticinizle iletişime geçin.",
+    "selectMethod": "Kimlik doğrulaması yapmak istediğiniz yöntemi seçin",
+    "agreeTo": "Kayıt olmak için şartları ve koşulları kabul etmelisiniz",
+    "termsOfService": "Hizmet Şartları",
+    "privacyPolicy": "Gizlilik Politikası",
+    "submit": "Devam",
+    "password": {
+      "title": "Şifre Belirle",
+      "description": "Hesabınız için şifre belirleyin",
+      "submit": "Devam",
+      "labels": {
+        "password": "Şifre",
+        "confirmPassword": "Şifreyi Onayla"
+      },
+      "required": {
+        "password": "Bir şifre sağlamalısınız!",
+        "confirmPassword": "Bu alan zorunludur"
+      }
+    },
+    "labels": {
+      "firstname": "Ad",
+      "lastname": "Soyad",
+      "email": "E-posta"
+    },
+    "required": {
+      "firstname": "Bu alan zorunludur",
+      "lastname": "Bu alan zorunludur",
+      "email": "Bu alan zorunludur"
+    },
+    "errors": {
+      "couldNotCreateUser": "Kullanıcı oluşturulamadı",
+      "couldNotCreateSession": "Oturum oluşturulamadı",
+      "userNotFound": "Kullanıcı sistemde bulunamadı",
+      "couldNotLinkIDP": "IDP kullanıcıya bağlanamadı",
+      "couldNotRegisterUser": "Kullanıcı kayıt edilemedi"
+    }
+  },
+  "invite": {
+    "title": "Kullanıcı Davet Et",
+    "description": "Davet etmek istediğiniz kullanıcının e-posta adresini ve adını sağlayın.",
+    "info": "Kullanıcı, daha fazla talimat içeren bir e-posta alacaktır.",
+    "notAllowed": "Ayarlarınız kullanıcı davet etmenize izin vermiyor.",
+    "submit": "Devam",
+    "success": {
+      "title": "Kullanıcı davet edildi",
+      "description": "E-posta başarıyla gönderildi.",
+      "verified": "Kullanıcı davet edildi ve e-postasını zaten doğruladı.",
+      "notVerifiedYet": "Kullanıcı davet edildi. Daha fazla talimat içeren bir e-posta alacaktır.",
+      "submit": "Başka kullanıcı davet et"
+    }
+  },
+  "signedin": {
+    "title": "Hoş geldin {user}!",
+    "description": "Giriş yaptınız.",
+    "continue": "Devam",
+    "error": {
+      "title": "Hata",
+      "description": "Giriş yapılmaya çalışılırken bir hata oluştu."
+    }
+  },
+  "verify": {
+    "userIdMissing": "userId sağlanmadı!",
+    "successTitle": "Kullanıcı doğrulandı",
+    "successDescription": "Kullanıcı başarıyla doğrulandı.",
+    "setupAuthenticator": "Kimlik doğrulayıcı kur",
+    "verify": {
+      "title": "Kullanıcıyı doğrula",
+      "description": "Doğrulama e-postasında sağlanan Kodu girin.",
+      "noCodeReceived": "Kod almadınız mı?",
+      "resendCode": "Kodu tekrar gönder",
+      "codeSent": "E-posta adresinize bir kod gönderildi.",
+      "submit": "Devam",
+      "labels": {
+        "code": "Kod"
+      },
+      "required": {
+        "code": "Bu alan zorunludur"
+      }
+    },
+    "errors": {
+      "couldNotResendEmail": "E-posta yeniden gönderilemedi",
+      "couldNotVerifyUser": "Kullanıcı doğrulanamadı",
+      "couldNotVerifyInvite": "Davet doğrulanamadı",
+      "couldNotVerifyEmail": "E-posta doğrulanamadı",
+      "couldNotVerify": "Doğrulanamadı",
+      "couldNotLoadUser": "Kullanıcı yüklenemedi",
+      "couldNotLoadAuthenticators": "Olası kimlik doğrulayıcılar yüklenemedi",
+      "couldNotCreateSession": "Oturum oluşturulamadı",
+      "noHostFound": "Host bulunamadı",
+      "userAlreadyVerified": "Kullanıcı zaten doğrulanmış!",
+      "couldNotResendInvite": "Davet yeniden gönderilemedi"
+    }
+  },
+  "authenticator": {
+    "title": "Kimlik doğrulama yöntemi seçin",
+    "description": "Kimlik doğrulaması yapmak istediğiniz yöntemi seçin",
+    "noMethodsAvailable": "Kullanılabilir kimlik doğrulama yöntemi yok",
+    "allSetup": "Zaten bir kimlik doğrulayıcı kurdunuz!",
+    "linkWithIDP": "veya bir Kimlik Sağlayıcı ile bağlantı kurun"
+  },
+  "device": {
+    "usercode": {
+      "title": "Cihaz kodu",
+      "description": "Uygulamanızda veya cihazınızda görüntülenen kodu girin.",
+      "submit": "Devam",
+      "labels": {
+        "code": "Kod"
+      },
+      "required": {
+        "code": "Bu alan zorunludur"
+      }
+    },
+    "request": {
+      "title": "{appName} bağlanmak istiyor",
+      "description": "{appName} şunlara erişim sahibi olacak:",
+      "disclaimer": "İzin Ver'e tıklayarak, {appName} ve Zitadel'in bilgilerinizi kendi hizmet şartları ve gizlilik politikalarına uygun olarak kullanmasına izin vermiş olursunuz. Bu erişimi istediğiniz zaman iptal edebilirsiniz.",
+      "submit": "İzin Ver",
+      "deny": "Reddet"
+    },
+    "scope": {
+      "openid": "Kimliğinizi doğrulayın.",
+      "email": "E-posta adresinizi görüntüleyin.",
+      "profile": "Tam profil bilgilerinizi görüntüleyin.",
+      "offline_access": "Hesabınıza çevrimdışı erişime izin verin."
+    }
+  },
+  "error": {
+    "noUserCode": "Kullanıcı kodu sağlanmadı!",
+    "noDeviceRequest": "Cihaz isteği bulunamadı.",
+    "unknownContext": "Kullanıcının bağlamı alınamadı. Önce kullanıcı adını girdiğinizden emin olun veya searchParam olarak bir loginName sağlayın.",
+    "sessionExpired": "Mevcut oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.",
+    "failedLoading": "Veri yüklenemedi. Lütfen tekrar deneyin.",
+    "tryagain": "Tekrar Dene"
+  }
+}
