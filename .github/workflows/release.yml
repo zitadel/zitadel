@@ -9,21 +9,6 @@ on:
       node_version:
         required: true
         type: string
-      image_name_github_api:
-        required: true
-        type: string
-      image_name_github_login:
-        required: true
-        type: string
-      image_name_google_api:
-        required: true
-        type: string
-      image_name_google_login:
-        required: true
-        type: string
-      semantic_version:
-        required: false
-        type: string
     secrets:
       GCR_JSON_KEY_BASE64:
         description: 'base64 endcrypted key to connect to Google'
