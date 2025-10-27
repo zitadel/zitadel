@@ -386,7 +386,9 @@
       "couldNotCreateSession": "No se pudo crear la sesión",
       "noHostFound": "No se encontró el host",
       "userAlreadyVerified": "¡El usuario ya está verificado!",
-      "couldNotResendInvite": "No se pudo reenviar la invitación"
+      "couldNotResendInvite": "No se pudo reenviar la invitación",
+      "inviteSendFailed": "No se pudo enviar el correo de invitación",
+      "emailSendFailed": "No se pudo enviar el correo de verificación"
     }
   },
   "authenticator": {

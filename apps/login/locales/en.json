@@ -386,7 +386,9 @@
       "couldNotCreateSession": "Could not create session",
       "noHostFound": "No host found",
       "userAlreadyVerified": "User is already verified!",
-      "couldNotResendInvite": "Could not resend invite"
+      "couldNotResendInvite": "Could not resend invite",
+      "inviteSendFailed": "Failed to send invitation email",
+      "emailSendFailed": "Failed to send verification email"
     }
   },
   "authenticator": {
