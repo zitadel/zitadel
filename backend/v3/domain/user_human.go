@@ -18,6 +18,16 @@ const (
 	GenderDiverse
 )
 
+type SetPasswordVerification interface{}
+
+type SetPasswordVerificationCurrentPassword struct {
+	CurrentPassword []byte
+}
+
+type SetPasswordVerificationVerificationCode struct {
+	VerificationCode string
+}
+
 type Human struct {
 	// HumanEmailContact HumanContact  `db:"email"`
 	// HumanPhoneContact *HumanContact `db:"phone"`

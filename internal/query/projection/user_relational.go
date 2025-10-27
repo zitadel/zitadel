@@ -226,16 +226,18 @@ func (u *userRelationalProjection) reduceHumanAdded(event eventstore.Event) (*ha
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-HbYn4", "reduce.wrong.event.type %s", user.HumanAddedType)
 	}
-	passwordSet := crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		userRepo := repository.UserRepository()
+		humanRepo := userRepo.Human()
+
+		v3Tx := v3_sql.SQLTx(tx)
 
 		// TODO add password
-		return userRepo.Create(ctx, v3_sql.SQLTx(tx), &domain.User{
+		err := userRepo.Create(ctx, v3Tx, &domain.User{
 			InstanceID: e.Aggregate().InstanceID,
 			OrgID:      e.Aggregate().ResourceOwner,
 			ID:         e.Aggregate().ID,
@@ -252,6 +254,18 @@ func (u *userRelationalProjection) reduceHumanAdded(event eventstore.Event) (*ha
 				Gender:            gu.Ptr(mapHumanGender(e.Gender)),
 			},
 		})
+		if err != nil {
+			return err
+		}
+		if password := crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash); password != "" {
+			_, err = humanRepo.Update(ctx, v3Tx,
+				humanRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+				humanRepo.SetPassword([]byte(password), e.CreatedAt()),
+				humanRepo.SetPasswordChangeRequired(e.ChangeRequired),
+				humanRepo.SetUpdatedAt(e.CreatedAt()),
+			)
+		}
+		return err
 		// &domain.Human{
 		// 	FirstName:         e.FirstName,
 		// 	LastName:          e.LastName,

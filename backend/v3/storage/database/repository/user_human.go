@@ -18,7 +18,7 @@ func HumanUserRepository() domain.HumanUserRepository {
 	return &userHuman{}
 }
 
-func (h userHuman) unqualifiedTableName() string {
+func (u userHuman) unqualifiedTableName() string {
 	return "human_users"
 }
 
@@ -83,6 +83,16 @@ func (u userHuman) Update(ctx context.Context, client database.QueryExecutor, co
 	writeCondition(builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+// ResetPassword implements [domain.HumanUserRepository].
+func (u userHuman) ResetPassword(ctx context.Context, client database.QueryExecutor, condition database.Condition, code []byte) (int64, error) {
+	panic("unimplemented")
+}
+
+// SetPassword implements [domain.HumanUserRepository].
+func (u userHuman) SetPassword(ctx context.Context, client database.QueryExecutor, condition database.Condition, password []byte, verification domain.SetPasswordVerification) (int64, error) {
+	panic("unimplemented")
 }
 
 // -------------------------------------------------------------
@@ -150,16 +160,21 @@ func (u userHuman) SetUsernameOrgUnique(usernameOrgUnique bool) database.Change 
 	return database.NewChange(u.UsernameOrgUniqueColumn(), usernameOrgUnique)
 }
 
+// SetPasswordChangeRequired implements [domain.HumanUserRepository].
+func (u *userHuman) SetPasswordChangeRequired(required bool) database.Change {
+	return database.NewChange(u.PasswordChangeRequiredColumn(), required)
+}
+
 // SetPassword implements [domain.HumanUserRepository].
-func (h *userHuman) SetPassword(password []byte, verifiedAt time.Time) database.Change {
+func (u *userHuman) SetPassword(password []byte, verifiedAt time.Time) database.Change {
 	changes := database.Changes{
-		database.NewChange(h.PasswordColumn(), password),
+		database.NewChange(u.PasswordColumn(), password),
 	}
 	if verifiedAt.IsZero() {
-		changes = append(changes, database.NewChange(h.PasswordVerifiedAtColumn(), database.DefaultInstruction))
+		changes = append(changes, database.NewChange(u.PasswordVerifiedAtColumn(), database.DefaultInstruction))
 		return changes
 	}
-	return append(changes, database.NewChange(h.PasswordVerifiedAtColumn(), verifiedAt))
+	return append(changes, database.NewChange(u.PasswordVerifiedAtColumn(), verifiedAt))
 
 }
 
@@ -168,15 +183,15 @@ func (h *userHuman) SetPassword(password []byte, verifiedAt time.Time) database.
 // -------------------------------------------------------------
 
 // PrimaryKeyCondition implements domain.HumanUserRepository.
-func (h userHuman) PrimaryKeyCondition(instanceID string, userID string) database.Condition {
+func (u userHuman) PrimaryKeyCondition(instanceID string, userID string) database.Condition {
 	return database.And(
-		h.InstanceIDCondition(instanceID),
-		h.IDCondition(userID),
+		u.InstanceIDCondition(instanceID),
+		u.IDCondition(userID),
 	)
 }
 
 // TypeCondition implements domain.HumanUserRepository.
-func (h userHuman) TypeCondition(userType domain.UserType) database.Condition {
+func (u userHuman) TypeCondition(userType domain.UserType) database.Condition {
 	// TODO(adlerhurst): it doesn't make sense to have this method on userHuman
 	return user{}.TypeCondition(userType)
 }
@@ -292,10 +307,10 @@ func (u userHuman) UsernameOrgUniqueCondition(condition bool) database.Condition
 // -------------------------------------------------------------
 
 // PrimaryKeyColumns implements domain.HumanUserRepository.
-func (h userHuman) PrimaryKeyColumns() []database.Column {
+func (u userHuman) PrimaryKeyColumns() []database.Column {
 	return []database.Column{
-		h.InstanceIDColumn(),
-		h.IDColumn(),
+		u.InstanceIDColumn(),
+		u.IDColumn(),
 	}
 }
 
@@ -370,18 +385,23 @@ func (u userHuman) UsernameOrgUniqueColumn() database.Column {
 }
 
 // NicknameColumn implements [domain.HumanUserRepository].
-func (h userHuman) NicknameColumn() database.Column {
-	return database.NewColumn("user_humans", "nick_name")
+func (u userHuman) NicknameColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "nick_name")
 }
 
 // PasswordColumn implements [domain.HumanUserRepository].
-func (h *userHuman) PasswordColumn() database.Column {
-	return database.NewColumn("human_users", "password")
+func (u userHuman) PasswordColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "password")
 }
 
 // PasswordVerifiedAtColumn implements [domain.HumanUserRepository].
-func (h *userHuman) PasswordVerifiedAtColumn() database.Column {
-	return database.NewColumn("human_users", "password_verified_at")
+func (u userHuman) PasswordVerifiedAtColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "password_verified_at")
+}
+
+// PasswordChangeRequiredColumn implements [domain.HumanUserRepository].
+func (u userHuman) PasswordChangeRequiredColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "password_change_required")
 }
 
 // // FirstNameColumn implements [domain.humanColumns].
