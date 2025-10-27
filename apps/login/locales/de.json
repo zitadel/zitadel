@@ -261,8 +261,28 @@
     "verify": {
       "title": "Mit einem Passkey authentifizieren",
       "description": "Ihr Gerät wird nach Ihrem Fingerabdruck, Gesicht oder Bildschirmsperre fragen",
+      "info": {
+        "description": "Verwenden Sie den von Ihnen eingerichteten Passkey, um sich sicher zu authentifizieren. ",
+        "link": "Mehr über Passkeys erfahren"
+      },
       "usePassword": "Passwort verwenden",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "errors": {
+        "couldNotRequestChallenge": "Passkey-Challenge konnte nicht angefordert werden",
+        "couldNotVerifyPasskey": "Passkey konnte nicht verifiziert werden",
+        "noResponseReceived": "Passkey-Verifizierung fehlgeschlagen - keine Antwort erhalten",
+        "noRedirectProvided": "Passkey-Verifizierung abgeschlossen, aber keine Weiterleitung bereitgestellt",
+        "couldNotRetrievePasskey": "Fehler beim Abrufen des Passkeys",
+        "verificationCancelled": "Passkey-Verifizierung wurde abgebrochen",
+        "verificationFailed": "Fehler bei der Passkey-Verifizierung",
+        "couldNotFindSession": "Sitzung konnte nicht gefunden werden",
+        "couldNotUpdateSession": "Sitzung konnte nicht aktualisiert werden",
+        "userNotFound": "Benutzer nicht im System gefunden",
+        "couldNotDetermineRedirect": "Weiterleitungs-URL nach Passkey-Verifizierung konnte nicht ermittelt werden",
+        "couldNotSetSession": "Sitzung konnte nicht gesetzt werden",
+        "couldNotGetUser": "Benutzerdaten konnten nicht abgerufen werden",
+        "couldNotRetrieveSessionCookie": "Sitzungs-Cookie konnte nicht abgerufen werden"
+      }
     },
     "set": {
       "title": "Passkey einrichten",
@@ -435,6 +455,7 @@
     "unknownContext": "Der Kontext des Benutzers konnte nicht ermittelt werden. Stellen Sie sicher, dass Sie zuerst den Benutzernamen eingeben oder einen loginName als Suchparameter angeben.",
     "sessionExpired": "Ihre aktuelle Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
     "failedLoading": "Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
-    "tryagain": "Erneut versuchen"
+    "tryagain": "Erneut versuchen",
+    "couldNotContinueSession": "Sitzung konnte nicht fortgesetzt werden - fehlende Benutzerinformationen"
   }
 }

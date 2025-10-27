@@ -62,10 +62,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(
 						database.WithCondition(
-							database.And(
-								repo.IDCondition("org-1"),
-								repo.InstanceIDCondition("instance-1"),
-							),
+							repo.PrimaryKeyCondition("instance-1", "org-1"),
 						))).
 					Times(1).
 					Return(nil, getErr)
@@ -85,10 +82,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 					Return(repo)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
-						database.And(
-							repo.IDCondition("org-1"),
-							repo.InstanceIDCondition("instance-1"),
-						),
+						repo.PrimaryKeyCondition("instance-1", "org-1"),
 					))).
 					Times(1).
 					Return(&domain.Organization{
@@ -117,10 +111,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 					Return(repo)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
-						database.And(
-							repo.IDCondition("org-1"),
-							repo.InstanceIDCondition("instance-1"),
-						),
+						repo.PrimaryKeyCondition("instance-1", "org-1"),
 					))).
 					Times(1).
 					Return(&domain.Organization{
@@ -136,10 +127,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(),
-						database.And(
-							repo.IDCondition("org-1"),
-							repo.InstanceIDCondition("instance-1"),
-						),
+						repo.PrimaryKeyCondition("instance-1", "org-1"),
 						repo.SetName("test org update"),
 					).
 					Times(1).
@@ -162,10 +150,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 					Return(repo)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
-						database.And(
-							repo.IDCondition("org-1"),
-							repo.InstanceIDCondition("instance-1"),
-						),
+						repo.PrimaryKeyCondition("instance-1", "org-1"),
 					))).
 					Times(1).
 					Return(&domain.Organization{
@@ -182,10 +167,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(),
-						database.And(
-							repo.IDCondition("org-1"),
-							repo.InstanceIDCondition("instance-1"),
-						),
+						repo.PrimaryKeyCondition("instance-1", "org-1"),
 						repo.SetName("test org update")).
 					Times(1).
 					Return(int64(0), nil)
@@ -205,10 +187,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 					Return(repo)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
-						database.And(
-							repo.IDCondition("org-1"),
-							repo.InstanceIDCondition("instance-1"),
-						),
+						repo.PrimaryKeyCondition("instance-1", "org-1"),
 					))).
 					Times(1).
 					Return(&domain.Organization{
@@ -225,10 +204,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(),
-						database.And(
-							repo.IDCondition("org-1"),
-							repo.InstanceIDCondition("instance-1"),
-						),
+						repo.PrimaryKeyCondition("instance-1", "org-1"),
 						repo.SetName("test org update")).
 					Times(1).
 					Return(int64(2), nil)
@@ -250,10 +226,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 					Return(repo)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
-						database.And(
-							repo.IDCondition("org-1"),
-							repo.InstanceIDCondition("instance-1"),
-						),
+						repo.PrimaryKeyCondition("instance-1", "org-1"),
 					))).
 					Times(1).
 					Return(&domain.Organization{
@@ -270,10 +243,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(),
-						database.And(
-							repo.IDCondition("org-1"),
-							repo.InstanceIDCondition("instance-1"),
-						),
+						repo.PrimaryKeyCondition("instance-1", "org-1"),
 						repo.SetName("test org update")).
 					Times(1).
 					Return(int64(1), nil)
@@ -296,17 +266,19 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			cmd := domain.NewUpdateOrgCommand(tc.inputID, tc.inputName)
 
 			opts := &domain.InvokeOpts{
-				DB: new(noopdb.Pool),
+				Invoker: domain.NewTransactionInvoker(nil),
 			}
+			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
+
 			if tc.orgRepo != nil {
 				domain.WithOrganizationRepo(tc.orgRepo(ctrl))(opts)
 			}
 			if tc.queryExecutor != nil {
-				opts.DB = tc.queryExecutor(ctrl)
+				domain.WithQueryExecutor(tc.queryExecutor(ctrl))(opts)
 			}
 
 			// Test
-			err := cmd.Execute(ctx, opts)
+			err := opts.Invoke(ctx, cmd)
 
 			// Verify
 			assert.Equal(t, tc.expectedError, err)
@@ -318,7 +290,6 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 
 func TestUpdateOrgCommand_Validate(t *testing.T) {
 	t.Parallel()
-	txInitErr := errors.New("tx init error")
 	getErr := errors.New("get error")
 
 	tt := []struct {
@@ -336,24 +307,10 @@ func TestUpdateOrgCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowInvalidArgument(nil, "DOM-lEMhVC", "invalid organization ID"),
 		},
 		{
-			testName:      "when no name shuld return invalid argument error",
+			testName:      "when no name should return invalid argument error",
 			inputOrgID:    "test-id",
 			inputOrgName:  "",
 			expectedError: zerrors.ThrowInvalidArgument(nil, "DOM-wfUntW", "invalid organization name"),
-		},
-		{
-			testName: "when EnsureTx fails should return error",
-			queryExecutor: func(ctrl *gomock.Controller) database.QueryExecutor {
-				mockDB := dbmock.NewMockPool(ctrl)
-				mockDB.EXPECT().
-					Begin(gomock.Any(), gomock.Any()).
-					Times(1).
-					Return(nil, txInitErr)
-				return mockDB
-			},
-			inputOrgID:    "test-id",
-			inputOrgName:  "test-name",
-			expectedError: txInitErr,
 		},
 		{
 			testName: "when retrieving org fails should return error",
@@ -362,10 +319,7 @@ func TestUpdateOrgCommand_Validate(t *testing.T) {
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(
 						database.WithCondition(
-							database.And(
-								repo.IDCondition("org-1"),
-								repo.InstanceIDCondition("instance-1"),
-							),
+							repo.PrimaryKeyCondition("instance-1", "org-1"),
 						))).
 					Times(1).
 					Return(nil, getErr)
@@ -381,10 +335,7 @@ func TestUpdateOrgCommand_Validate(t *testing.T) {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
-						database.And(
-							repo.IDCondition("org-1"),
-							repo.InstanceIDCondition("instance-1"),
-						),
+						repo.PrimaryKeyCondition("instance-1", "org-1"),
 					))).
 					Times(1).
 					Return(&domain.Organization{
@@ -403,10 +354,7 @@ func TestUpdateOrgCommand_Validate(t *testing.T) {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
-						database.And(
-							repo.IDCondition("org-1"),
-							repo.InstanceIDCondition("instance-1"),
-						),
+						repo.PrimaryKeyCondition("instance-1", "org-1"),
 					))).
 					Times(1).
 					Return(&domain.Organization{
@@ -426,19 +374,21 @@ func TestUpdateOrgCommand_Validate(t *testing.T) {
 			// Given
 			ctx := authz.NewMockContext("instance-1", "", "")
 			ctrl := gomock.NewController(t)
+
 			cmd := domain.NewUpdateOrgCommand(tc.inputOrgID, tc.inputOrgName)
 
 			opts := &domain.InvokeOpts{
-				DB: new(noopdb.Pool),
+				Invoker: domain.NewTransactionInvoker(domain.NewValidatorInvoker(nil)),
 			}
+			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
 			if tc.orgRepo != nil {
 				domain.WithOrganizationRepo(tc.orgRepo(ctrl))(opts)
 			}
 			if tc.queryExecutor != nil {
-				opts.DB = tc.queryExecutor(ctrl)
+				domain.WithQueryExecutor(tc.queryExecutor(ctrl))(opts)
 			}
-
 			err := cmd.Validate(ctx, opts)
+
 			assert.Equal(t, tc.expectedError, err)
 		})
 	}
