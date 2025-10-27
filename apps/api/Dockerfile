@@ -29,7 +29,7 @@ LABEL org.opencontainers.image.documentation="https://zitadel.com/docs" \
       org.opencontainers.image.licenses="AGPL-3.0" \
       org.opencontainers.image.source="https://github.com/zitadel/zitadel" \
       org.opencontainers.image.title="Zitadel API" \
-      org.opencontainers.image.url="https://github.com/zitadel/api" \
+      org.opencontainers.image.url="https://github.com/zitadel/zitadel" \
       org.opencontainers.image.vendor="ZITADEL"
 
 COPY --from=builder /etc/passwd /etc/passwd

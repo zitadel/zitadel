@@ -22,7 +22,7 @@
         "nx-release-publish": {
             "description": "Publishes cross-compiled binary tarballs to the GitHub release and publishes Docker images for production and for debugging.",
             "dependsOn": [
-                "pack-linux-darwin-windows"
+                "pack-all"
             ],
             "command": "bash -c \"[[ \"${NX_DRY_RUN}\" -ne \"true\" ]] && gh release upload ${ZITADEL_RELEASE_VERSION} ./.artifacts/pack/zitadel-*-*.tar.gz\""
         },
@@ -126,7 +126,7 @@
                 "{workspaceRoot}/.artifacts/pack/zitadel-*-*.tar.gz"
             ]
         },
-        "pack-linux-darwin-windows": {
+        "pack-all": {
             "description": "Packages the binary for the Linux, Darwin, and Windows platforms.",
             "dependsOn": [
                 "build-linux",
@@ -134,7 +134,7 @@
             ],
             "executor": "nx:run-commands",
             "options": {
-                "parallel": true,
+                "parallel": false,
                 "commands": [
                     "GOOS=linux GOARCH=amd64 nx run @zitadel/api:pack --excludeTaskDependencies",
                     "GOOS=linux GOARCH=arm64 nx run @zitadel/api:pack --excludeTaskDependencies",

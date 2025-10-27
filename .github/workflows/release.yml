@@ -1,4 +1,4 @@
-name: Package und Publish Archives and Images
+name: Release
 
 on:
   workflow_call:

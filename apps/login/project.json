@@ -4,8 +4,7 @@
     "nx-release-publish": {
       "description": "Publishes the packaged Login application to a GitHub release",
       "dependsOn": [
-        "pack",
-        "push"
+        "pack"
       ],
       "command": "bash -c \"[[ \"${NX_DRY_RUN}\" -ne \"true\" ]] && gh release upload ${ZITADEL_RELEASE_VERSION} ./.artifacts/pack/zitadel-login.tar.gz\""
     },
