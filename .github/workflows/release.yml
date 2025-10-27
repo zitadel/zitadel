@@ -35,11 +35,6 @@ on:
         description: 'GH App Private Key to request token for homebrew update'
         required: true
 
-env:
-  default_labels: |
-    org.opencontainers.image.documentation=https://zitadel.com/docs
-    org.opencontainers.image.vendor=ZITADEL
-
 jobs:
   release:
     runs-on: ubuntu-22.04
@@ -82,59 +77,10 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Pack API and Login
+      - name: Release API and Login
         env:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
-        run: pnpm release
-
-
-
-#      - name: Generate Standard Tags and Labels from the GitHub Context for the API Scratch Container Image
-#        id: scratch-meta
-#        uses: docker/metadata-action@v5
-#        with:
-#          images: |
-#            ${{ inputs.image_name_github_api }}
-#          labels: ${{ env.default_labels}}
-#          tags: |
-#            type=sha,prefix=,suffix=,format=long
-#      - name: Generate Standard Tags and Labels from the GitHub Context for the API Debug Container Image
-#        id: debug-meta
-#        uses: docker/metadata-action@v5
-#        with:
-#          images: |
-#            ${{ inputs.image_name_github_api }}
-#          labels: ${{ env.default_labels}}
-#          tags: |
-#            type=sha,prefix=,suffix=-debug,format=long
-#      - name: Generate Standard Tags and Labels from the GitHub Context for the Login Container Image
-#        id: login-meta
-#        uses: docker/metadata-action@v5
-#        with:
-#          images: |
-#            ${{ inputs.image_name_github_login }}
-#          labels: |
-#            org.opencontainers.image.licenses=MIT
-#            ${{ env.default_labels}}
-#          tags: |
-#            type=sha,prefix=,suffix=,format=long
-
-
-
-
-#    -
-#      name: Publish latest
-#      if: ${{ github.ref_name == 'next' }}
-#      run: |
-#        docker buildx imagetools create \
-#          --tag ${{ inputs.image_name_github_api }}:latest \
-#          ${{ inputs.image_name_github_api }}:${{ github.sha }}
-#        docker buildx imagetools create \
-#          --tag ${{ inputs.image_name_github_api }}:latest-debug \
-#          ${{ inputs.image_name_github_api }}:${{ github.sha }}-debug
-#        docker buildx imagetools create \
-#          --tag ${{ inputs.image_name_github_login }}:latest \
-#          ${{ inputs.image_name_github_login }}:${{ github.sha }}
+        run: pnpm release --dry-run false
 
 #  homebrew-tap:
 #    runs-on: ubuntu-22.04

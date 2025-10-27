@@ -22,25 +22,35 @@
         "nx-release-publish": {
             "description": "Publishes cross-compiled binary tarballs to the GitHub release and publishes Docker images for production and for debugging.",
             "dependsOn": [
-                "pack-linux-darwin-windows",
-                "push",
-                "push-debug"
+                "pack-linux-darwin-windows"
             ],
-            "command": "gh release upload ${ZITADEL_VERSION} ./.artifacts/pack/zitadel-*-*.tar.gz"
+            "command": "bash -c \"[[ \"${NX_DRY_RUN}\" -ne \"true\" ]] && gh release upload ${ZITADEL_RELEASE_VERSION} ./.artifacts/pack/zitadel-*-*.tar.gz\""
         },
-        "push": {
-            "description": "Builds and pushes the Login Docker image to GitHub Container Registry",
+        "build-docker": {
+            "description": "Builds the API Docker image for production",
             "dependsOn": [
                 "build-linux"
             ],
-            "command": "docker buildx build --file ./apps/api/Dockerfile --push --platform linux/amd64,linux/arm64 -t ghcr.io/eliobischof/login:${ZITADEL_VERSION} ."
+            "executor": "nx:run-commands",
+            "options": {
+                "env": {
+                    "BAKE_FILE": "{projectRoot}/docker-bake.hcl"
+                },
+                "command": "docker buildx bake api --file ${BAKE_FILE}"
+            }
         },
-        "push-debug": {
-            "description": "Builds and pushes the Login Docker image to GitHub Container Registry",
+        "build-docker-debug": {
+            "description": "Builds the API Docker image for debugging",
             "dependsOn": [
                 "build-linux"
             ],
-            "command": "docker buildx build  --file ./apps/api/Dockerfile --push --platform linux/amd64,linux/arm64 -t ghcr.io/eliobischof/api:${ZITADEL_VERSION}-debug --target builder ."
+            "executor": "nx:run-commands",
+            "options": {
+                "env": {
+                    "BAKE_FILE": "{projectRoot}/docker-bake.hcl"
+                },
+                "command": "docker buildx bake --target api-debug --file ${BAKE_FILE}"
+            }
         },
         "build-linux": {
             "description": "Builds the Go-based API backend for Linux (amd64 and arm64) into executable binaries.",
@@ -80,11 +90,11 @@
                 "generate",
                 "build-console"
             ],
-            "command": "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; echo \"Building for $GOOS-$GOARCH...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$GOOS/$GOARCH/zitadel$EXT -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\") -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_VERSION}\"'",
+            "command": "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; echo \"Building for $GOOS-$GOARCH...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$GOOS/$GOARCH/zitadel$EXT -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\") -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_RELEASE_VERSION}\"'",
             "inputs": [
                 { "runtime": "go env GOOS" },
                 { "runtime": "go env GOARCH" },
-                { "env": "ZITADEL_VERSION" },
+                { "env": "ZITADEL_RELEASE_VERSION" },
                 "runtime"
             ],
             "outputs": [
@@ -92,7 +102,7 @@
             ]
         },
         "pack": {
-            "description": "Packages the binary for the platform defined by GOOS and GOARCH environment variables. The version is taken from the ZITADEL_VERSION environment variable.",
+            "description": "Packages the binary for the platform defined by GOOS and GOARCH environment variables. The version is taken from the ZITADEL_RELEASE_VERSION environment variable.",
             "dependsOn": [
                 "build"
             ],

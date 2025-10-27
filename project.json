@@ -2,6 +2,21 @@
   "$schema": "./node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "targets": {
+    "nx-release-publish": {
+      "dependsOn": [
+        "@zitadel/api:nx-release-publish",
+        "@zitadel/login:nx-release-publish"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "parallel": false,
+        "cwd": "{workspaceRoot}/.artifacts/pack",
+        "commands": [
+          "sha256sum * > checksums.txt",
+          "bash -c \"[[ \"${NX_DRY_RUN}\" -ne \"true\" ]] && gh release upload ${ZITADEL_RELEASE_VERSION} checksums.txt\""
+        ]
+      }
+    },
     "db": {
       "continuous": true,
       "description": "Runs a local Postgres database for development",
@@ -15,27 +30,12 @@
         "@zitadel/console:clean"
       ]
     },
-    "nx-release-publish": {
-      "dependsOn": [
-        "@zitadel/api:nx-release-publish",
-        "@zitadel/login:nx-release-publish"
-      ],
-      "executor": "nx:run-commands",
-      "options": {
-        "parallel": false,
-        "cwd": "{workspaceRoot}/.artifacts/pack",
-        "commands": [
-          "sha256sum * > checksums.txt",
-          "bash -c \"gh release upload ${ZITADEL_VERSION} checksums.txt\""
-        ]
-      }
-    },
-    "local-registry": {
+    "local-npm-registry": {
       "executor": "@nx/js:verdaccio",
       "options": {
         "port": 4873,
         "config": ".verdaccio/config.yml",
-        "storage": "tmp/local-registry/storage"
+        "storage": ".artifacts/local-npm-registry/storage"
       }
     }
   }

@@ -16,8 +16,8 @@ on:
         required: true
 
 jobs:
-  lint_test_build_push:
-    name: Lint, Test, Build and Push
+  lint_test_build:
+    name: Lint, Test and Build
     runs-on: ubuntu-22.04
     environment: ${{ github.ref_protected == 'true' && 'Protected' || null }}
     steps:
@@ -64,7 +64,6 @@ jobs:
       - name: Lint, Test, Build and Push
         env:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
-          ZITADEL_VERSION: ${{ github.sha }}
         run: pnpm nx affected --nxBail --targets lint test build push --exclude @zitadel/docs
       - name: Suggest Pipeline Fix By Nx Cloud AI
         if: failure() || cancelled()

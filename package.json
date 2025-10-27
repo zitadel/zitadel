@@ -4,7 +4,7 @@
   "name": "@zitadel/zitadel",
   "type": "module",
   "scripts": {
-    "release": "tsx release.ts",
+    "release": "tsx release/release.ts",
     "clean:all": "pnpm run clean && rm -rf .nx node_modules"
   },
   "devDependencies": {
@@ -13,6 +13,7 @@
     "@swc-node/register": "~1.9.1",
     "@swc/core": "~1.5.7",
     "@swc/helpers": "~0.5.11",
+    "@types/node": "^24.9.1",
     "@types/yargs": "^17.0.33",
     "nx": "21.6.1",
     "sass": "^1.64.1",
@@ -20,6 +21,5 @@
     "verdaccio": "^6.0.5",
     "wait-on": "^9.0.1",
     "yargs": "^18.0.0"
-  },
-  "dependencies": {}
+  }
 }
