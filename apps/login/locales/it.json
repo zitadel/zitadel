@@ -256,6 +256,10 @@
     "verify": {
       "title": "Autenticati con una passkey",
       "description": "Il tuo dispositivo chiederà la tua impronta digitale, il volto o il blocco schermo",
+      "info": {
+        "description": "Usa la passkey che hai configurato per autenticarti in modo sicuro. ",
+        "link": "Scopri di più sulle Passkey"
+      },
       "usePassword": "Usa password",
       "submit": "Continua",
       "errors": {
