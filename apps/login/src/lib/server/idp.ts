@@ -90,9 +90,9 @@ async function startIDPFlow(command: StartIDPFlowCommand) {
 
 export type CreateNewSessionCommand = {
   userId: string;
-  idpIntent?: {
-    idpIntentId?: string;
-    idpIntentToken?: string;
+  idpIntent: {
+    idpIntentId: string;
+    idpIntentToken: string;
   };
   loginName?: string;
   password?: string;
@@ -125,7 +125,7 @@ export async function createNewSessionFromIdpIntent(command: CreateNewSessionCom
 
   const session = await createSessionForIdpAndUpdateCookie({
     userId: command.userId,
-    idpIntent: command.idpIntent || { idpIntentId: undefined, idpIntentToken: undefined },
+    idpIntent: command.idpIntent,
     requestId: command.requestId,
     lifetime: loginSettings?.externalLoginCheckLifetime,
   });
