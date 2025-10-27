@@ -22,9 +22,9 @@ type Inputs =
 type Props = {
   organization: string;
   requestId?: string;
-  idpIntent?: {
-    idpIntentId?: string;
-    idpIntentToken?: string;
+  idpIntent: {
+    idpIntentId: string;
+    idpIntentToken: string;
   };
   defaultValues?: {
     firstname?: string;
