@@ -159,18 +159,6 @@
     "signInWithAzureAD": "Mit AzureAD anmelden",
     "signInWithGithub": "Mit GitHub anmelden",
     "signInWithGitlab": "Mit GitLab anmelden",
-    "loginSuccess": {
-      "title": "Anmeldung erfolgreich",
-      "description": "Sie haben sich erfolgreich angemeldet!"
-    },
-    "linkingSuccess": {
-      "title": "Konto verknüpft",
-      "description": "Sie haben Ihr Konto erfolgreich verknüpft!"
-    },
-    "registerSuccess": {
-      "title": "Registrierung erfolgreich",
-      "description": "Sie haben sich erfolgreich registriert!"
-    },
     "loginError": {
       "title": "Anmeldung fehlgeschlagen",
       "description": "Beim Anmelden ist ein Fehler aufgetreten."

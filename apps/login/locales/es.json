@@ -159,18 +159,6 @@
     "signInWithAzureAD": "Iniciar sesión con AzureAD",
     "signInWithGithub": "Iniciar sesión con GitHub",
     "signInWithGitlab": "Iniciar sesión con GitLab",
-    "loginSuccess": {
-      "title": "Inicio de sesión exitoso",
-      "description": "¡Has iniciado sesión con éxito!"
-    },
-    "linkingSuccess": {
-      "title": "Cuenta vinculada",
-      "description": "¡Has vinculado tu cuenta con éxito!"
-    },
-    "registerSuccess": {
-      "title": "Registro exitoso",
-      "description": "¡Te has registrado con éxito!"
-    },
     "loginError": {
       "title": "Error de inicio de sesión",
       "description": "Ocurrió un error al intentar iniciar sesión."

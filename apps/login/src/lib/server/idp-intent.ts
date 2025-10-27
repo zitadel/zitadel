@@ -135,9 +135,10 @@ export async function processIDPCallback({
     const options = idp?.config?.options;
 
     // Build base redirect params
-    const buildRedirectParams = (additionalParams?: Record<string, string>) => {
+    const buildRedirectParams = (additionalParams?: Record<string, string>, includeToken: boolean = false) => {
       const params = new URLSearchParams();
       params.set("id", id);
+      if (includeToken) params.set("token", token);
       if (requestId) params.set("requestId", requestId);
       if (organization) params.set("organization", organization);
       if (postErrorRedirectUrl) params.set("postErrorRedirectUrl", postErrorRedirectUrl);
@@ -399,19 +400,21 @@ export async function processIDPCallback({
       }
 
       // Store user data for manual registration form
-      const params = buildRedirectParams({
-        organization: orgToRegisterOn,
-        idpId: idpInformation.idpId,
-        idpUserId: idpInformation.userId || "",
-        idpUserName: idpInformation.userName || "",
-        // User data for pre-filling form
-        username: addHumanUser.username || "",
-        givenName: addHumanUser.profile?.givenName || "",
-        familyName: addHumanUser.profile?.familyName || "",
-        displayName: addHumanUser.profile?.displayName || "",
-        email: addHumanUser.email?.email || "",
-        phone: addHumanUser.phone?.phone || "",
-      });
+      // Note: includeToken=true because the session hasn't been created yet
+      // The token will be needed when registerUserAndLinkToIDP creates the session
+      const params = buildRedirectParams(
+        {
+          organization: orgToRegisterOn,
+          idpId: idpInformation.idpId,
+          idpUserId: idpInformation.userId || "",
+          idpUserName: idpInformation.userName || "",
+          // User data for pre-filling form
+          givenName: addHumanUser.profile?.givenName || "",
+          familyName: addHumanUser.profile?.familyName || "",
+          email: addHumanUser.email?.email || "",
+        },
+        true,
+      ); // includeToken=true
       return { redirect: `/idp/${provider}/complete-registration?${params}` };
     }
 

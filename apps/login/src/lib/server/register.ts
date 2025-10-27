@@ -144,9 +144,9 @@ type RegisterUserAndLinkToIDPommand = {
   lastName: string;
   organization: string;
   requestId?: string;
-  idpIntent: {
-    idpIntentId: string;
-    idpIntentToken: string;
+  idpIntent?: {
+    idpIntentId?: string;
+    idpIntentToken?: string;
   };
   idpUserId: string;
   idpId: string;
@@ -198,7 +198,7 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
   const session = await createSessionForIdpAndUpdateCookie({
     requestId: command.requestId,
     userId: addUserResponse.userId, // the user we just created
-    idpIntent: command.idpIntent,
+    idpIntent: command.idpIntent || { idpIntentId: undefined, idpIntentToken: undefined },
     lifetime: loginSettings?.externalLoginCheckLifetime,
   });
 

@@ -91,18 +91,6 @@
     "signInWithAzureAD": "AzureADでサインイン",
     "signInWithGithub": "GitHubでサインイン",
     "signInWithGitlab": "GitLabでサインイン",
-    "loginSuccess": {
-      "title": "ログイン成功",
-      "description": "正常にログインしました！"
-    },
-    "linkingSuccess": {
-      "title": "アカウント連携完了",
-      "description": "アカウントの連携が完了しました！"
-    },
-    "registerSuccess": {
-      "title": "登録完了",
-      "description": "正常に登録されました！"
-    },
     "loginError": {
       "title": "ログイン失敗",
       "description": "ログインの際にエラーが発生しました。"

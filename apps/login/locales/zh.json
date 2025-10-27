@@ -159,18 +159,6 @@
     "signInWithAzureAD": "用 AzureAD 登录",
     "signInWithGithub": "用 GitHub 登录",
     "signInWithGitlab": "用 GitLab 登录",
-    "loginSuccess": {
-      "title": "登录成功",
-      "description": "您已成功登录！"
-    },
-    "linkingSuccess": {
-      "title": "账户已链接",
-      "description": "您已成功链接您的账户！"
-    },
-    "registerSuccess": {
-      "title": "注册成功",
-      "description": "您已成功注册！"
-    },
     "loginError": {
       "title": "登录失败",
       "description": "登录时发生错误。"

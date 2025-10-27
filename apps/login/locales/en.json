@@ -159,18 +159,6 @@
     "signInWithAzureAD": "Sign in with AzureAD",
     "signInWithGithub": "Sign in with GitHub",
     "signInWithGitlab": "Sign in with GitLab",
-    "loginSuccess": {
-      "title": "Login successful",
-      "description": "You have successfully been loggedIn!"
-    },
-    "linkingSuccess": {
-      "title": "Account linked",
-      "description": "You have successfully linked your account!"
-    },
-    "registerSuccess": {
-      "title": "Registration successful",
-      "description": "You have successfully registered!"
-    },
     "loginError": {
       "title": "Login failed",
       "description": "An error occurred while trying to login."

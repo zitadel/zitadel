@@ -159,18 +159,6 @@
     "signInWithAzureAD": "Войти через AzureAD",
     "signInWithGithub": "Войти через GitHub",
     "signInWithGitlab": "Войти через GitLab",
-    "loginSuccess": {
-      "title": "Вход выполнен успешно",
-      "description": "Вы успешно вошли в систему!"
-    },
-    "linkingSuccess": {
-      "title": "Аккаунт привязан",
-      "description": "Аккаунт успешно привязан!"
-    },
-    "registerSuccess": {
-      "title": "Регистрация завершена",
-      "description": "Вы успешно зарегистрировались!"
-    },
     "loginError": {
       "title": "Ошибка входа",
       "description": "Произошла ошибка при попытке входа."

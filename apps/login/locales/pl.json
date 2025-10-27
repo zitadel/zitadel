@@ -159,18 +159,6 @@
     "signInWithAzureAD": "Zaloguj się przez AzureAD",
     "signInWithGithub": "Zaloguj się przez GitHub",
     "signInWithGitlab": "Zaloguj się przez GitLab",
-    "loginSuccess": {
-      "title": "Logowanie udane",
-      "description": "Zostałeś pomyślnie zalogowany!"
-    },
-    "linkingSuccess": {
-      "title": "Konto powiązane",
-      "description": "Pomyślnie powiązałeś swoje konto!"
-    },
-    "registerSuccess": {
-      "title": "Rejestracja udana",
-      "description": "Pomyślnie się zarejestrowałeś!"
-    },
     "loginError": {
       "title": "Logowanie nieudane",
       "description": "Wystąpił błąd podczas próby logowania."

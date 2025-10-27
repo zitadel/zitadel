@@ -159,18 +159,6 @@
     "signInWithAzureAD": "Accedi con AzureAD",
     "signInWithGithub": "Accedi con GitHub",
     "signInWithGitlab": "Accedi con GitLab",
-    "loginSuccess": {
-      "title": "Accesso riuscito",
-      "description": "Accesso effettuato con successo!"
-    },
-    "linkingSuccess": {
-      "title": "Account collegato",
-      "description": "Hai collegato con successo il tuo account!"
-    },
-    "registerSuccess": {
-      "title": "Registrazione riuscita",
-      "description": "Registrazione effettuata con successo!"
-    },
     "loginError": {
       "title": "Accesso fallito",
       "description": "Si è verificato un errore durante il tentativo di accesso."

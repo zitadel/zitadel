@@ -13,7 +13,7 @@ export default async function CompleteRegistrationPage(props: {
   params: Promise<{ provider: string }>;
 }) {
   const searchParams = await props.searchParams;
-  const { id, requestId, organization, idpId, idpUserId, idpUserName, givenName, familyName, email } = searchParams;
+  const { id, token, requestId, organization, idpId, idpUserId, idpUserName, givenName, familyName, email } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -23,7 +23,7 @@ export default async function CompleteRegistrationPage(props: {
     organization,
   });
 
-  if (!id || !idpId || !organization || !idpUserId || !idpUserName) {
+  if (!id || !token || !idpId || !organization || !idpUserId || !idpUserName) {
     throw new Error("Missing required parameters");
   }
 
@@ -50,7 +50,10 @@ export default async function CompleteRegistrationPage(props: {
           }}
           requestId={requestId}
           organization={organization}
-          idpIntent={{ idpIntentId: id, idpIntentToken: "processed" }}
+          idpIntent={{
+            idpIntentId: id,
+            idpIntentToken: token,
+          }}
         />
       </div>
     </DynamicTheme>

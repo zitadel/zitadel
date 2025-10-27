@@ -623,12 +623,12 @@ describe("processIDPCallback", () => {
 
       expect(result.redirect).toContain("/idp/google/complete-registration");
       expect(result.redirect).toContain("id=intent123");
+      expect(result.redirect).toContain("token=token123");
       expect(result.redirect).toContain("requestId=req123");
       expect(result.redirect).toContain("organization=org123");
       expect(result.redirect).toContain("idpId=idp123");
       expect(result.redirect).toContain("idpUserId=user123");
       expect(result.redirect).toContain("idpUserName=testuser");
-      expect(result.redirect).toContain("username=testuser");
       expect(result.redirect).toContain("givenName=Test");
       expect(result.redirect).toContain("familyName=User");
       expect(result.redirect).toContain("email=test%40example.com");
