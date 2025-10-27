@@ -50,7 +50,7 @@ export async function createSessionAndUpdateCookie(command: {
 
   let sessionLifetime = command.lifetime;
 
-  if (!sessionLifetime) {
+  if (!sessionLifetime || !sessionLifetime.seconds) {
     console.warn("No session lifetime provided, using default of 24 hours.");
 
     sessionLifetime = {
@@ -123,7 +123,7 @@ export async function createSessionForIdpAndUpdateCookie({
 
   let sessionLifetime = lifetime;
 
-  if (!sessionLifetime) {
+  if (!sessionLifetime || !sessionLifetime.seconds) {
     console.warn("No IDP session lifetime provided, using default of 24 hours.");
 
     sessionLifetime = {
