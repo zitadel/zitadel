@@ -93,11 +93,10 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.UserUserNameChangedType,
 					Reduce: p.reduceUsernameChanged,
 				},
-				// // TODO
-				// {
-				// 	Event:  user.UserDomainClaimedType,
-				// 	Reduce: p.reduceDomainClaimed,
-				// },
+				{
+					Event:  user.UserDomainClaimedType,
+					Reduce: p.reduceDomainClaimed,
+				},
 				{
 					Event:  user.HumanProfileChangedType,
 					Reduce: p.reduceHumanProfileChanged,
@@ -549,53 +548,28 @@ func (p *userRelationalProjection) reduceUsernameChanged(event eventstore.Event)
 	}), nil
 }
 
-// func (p *userRelationalProjection) reduceDomainClaimed(event eventstore.Event) (*handler.Statement, error) {
-// 	e, ok := event.(*user.DomainClaimedEvent)
-// 	if !ok {
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ASwf3", "reduce.wrong.event.type %s", user.UserDomainClaimedType)
-// 	}
+func (p *userRelationalProjection) reduceDomainClaimed(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.DomainClaimedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ASwf3", "reduce.wrong.event.type %s", user.UserDomainClaimedType)
+	}
 
-// 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-// 		tx, ok := ex.(*sql.Tx)
-// 		if !ok {
-// 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
-// 		}
-// 		userRepo := repository.UserRepository()
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		userRepo := repository.UserRepository()
 
-// 		noOfRecordsUpdated, err := userRepo.UpdateHuman(ctx, v3_sql.SQLTx(tx),
-// 			database.And(
-// 				userRepo.Human().InstanceIDCondition(e.Aggregate().InstanceID),
-// 				userRepo.Human().IDCondition(e.Aggregate().ID),
-// 			),
-// 			userRepo.Human().SetUsername(e.UserName),
-// 			userRepo.Human().SetUpdatedAt(e.CreationDate()),
-// 		)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		if noOfRecordsUpdated == 0 {
-// 			return zerrors.ThrowNotFound(nil, "HANDL-SD3fs", "Errors.User.NotFound")
-// 		} else if noOfRecordsUpdated > 1 {
-// 			tx.Rollback()
-// 			// TODO add "Errors.User.TooManyEntries"
-// 			return zerrors.ThrowInternal(nil, "HANDL-Df3fs", "Errors.User.TooManyEntries")
-// 		}
-// 		return nil
-// 	}), nil
+		_, err := userRepo.Update(ctx, v3_sql.SQLTx(tx),
+			userRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			userRepo.SetUsername(e.UserName),
+			userRepo.SetUpdatedAt(e.CreatedAt()),
+		)
 
-// 	// return handler.NewUpdateStatement(
-// 	// 	e,
-// 	// 	[]handler.Column{
-// 	// 		handler.NewCol(UserChangeDateCol, e.CreationDate()),
-// 	// 		handler.NewCol(UserUsernameCol, e.UserName),
-// 	// 		handler.NewCol(UserSequenceCol, e.Sequence()),
-// 	// 	},
-// 	// 	[]handler.Condition{
-// 	// 		handler.NewCond(UserIDCol, e.Aggregate().ID),
-// 	// 		handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
-// 	// 	},
-// 	// ), nil
-// }
+		return err
+	}), nil
+}
 
 func (p *userRelationalProjection) reduceHumanProfileChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanProfileChangedEvent)

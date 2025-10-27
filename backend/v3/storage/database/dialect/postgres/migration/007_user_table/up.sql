@@ -73,32 +73,52 @@ CREATE TYPE zitadel.human_contact_type AS ENUM (
     , 'phone'
 );
 
-CREATE TABLE zitadel.human_contacts(
-    instance_id TEXT NOT NULL
-    , user_id TEXT NOT NULL
-    , type zitadel.human_contact_type NOT NULL
-    , value TEXT
-    , is_verified BOOLEAN NOT NULL DEFAULT FALSE
-    , unverified_value TEXT -- if a user wants to update the info but its not yet verified, verification is done in a separate issue
-
-    , PRIMARY KEY (instance_id, user_id, type)
-    , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.human_users(instance_id, id) ON DELETE CASCADE
-);
-
 CREATE INDEX idx_human_contacts_value ON zitadel.human_contacts(instance_id, value);
 CREATE INDEX idx_human_contacts_value_lower ON zitadel.human_contacts(instance_id, lower(value)) WHERE type = 'email';
 
-CREATE TABLE zitadel.human_security(
+CREATE TABLE zitadel.verifications(
+    instance_id TEXT NOT NULL
+    , id TEXT NOT NULL
+
+    , value TEXT NOT NULL
+    , code BYTES NOT NULL
+
+    , expiry TIMESTAMPTZ NOT NULL
+    , failed_attempts SMALLINT NOT NULL DEFAULT 0
+
+    , created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    , updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+
+    , PRIMARY KEY (instance_id, id)
+    , FOREIGN KEY (instance_id) REFERENCES zitadel.instances(id) ON DELETE CASCADE
+);
+
+CREATE TABLE zitadel.human_contacts(
     instance_id TEXT NOT NULL
     , user_id TEXT NOT NULL
+    
+    , type zitadel.human_contact_type NOT NULL
+    , value TEXT
+    , verified_at TIMESTAMPTZ
+    , unverified_value_id TEXT
 
-    , password_change_required BOOLEAN NOT NULL DEFAULT FALSE
-    , password_changed TIMESTAMPTZ
-    , mfa_init_skipped BOOLEAN NOT NULL DEFAULT FALSE
-
-    , PRIMARY KEY (instance_id, user_id)
+    , PRIMARY KEY (instance_id, user_id, type)
     , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.human_users(instance_id, id) ON DELETE CASCADE
+    , FOREIGN KEY (instance_id, unverified_value_id) REFERENCES zitadel.verifications(instance_id, id) ON DELETE SET NULL
 );
+
+
+-- CREATE TABLE zitadel.human_security(
+--     instance_id TEXT NOT NULL
+--     , user_id TEXT NOT NULL
+
+--     , password_change_required BOOLEAN NOT NULL DEFAULT FALSE
+--     , password_changed TIMESTAMPTZ
+--     , mfa_init_skipped BOOLEAN NOT NULL DEFAULT FALSE
+
+--     , PRIMARY KEY (instance_id, user_id)
+--     , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.human_users(instance_id, id) ON DELETE CASCADE
+-- );
 
 -- ------------------------------------------------------------
 -- function definitions
