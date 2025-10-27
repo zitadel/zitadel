@@ -107,20 +107,25 @@ export async function registerPasskeyLink(
       if (!hasValidUserVerificationCheck) {
         return { error: "User Verification Check has to be done" };
       }
+    }
 
-      if (!command.code) {
-        // request a new code if no code is provided
-        const codeResponse = await createPasskeyRegistrationLink({
-          serviceUrl,
-          userId: currentUserId,
-        });
+    // Generate registration code if not provided
+    if (command.code && command.codeId) {
+      registerCode = {
+        id: command.codeId,
+        code: command.code,
+      };
+    } else {
+      const codeResponse = await createPasskeyRegistrationLink({
+        serviceUrl,
+        userId: currentUserId,
+      });
 
-        if (!codeResponse?.code?.code) {
-          return { error: "Could not create registration link" };
-        }
-
-        registerCode = codeResponse.code;
+      if (!codeResponse?.code?.code) {
+        return { error: "Could not create registration link" };
       }
+
+      registerCode = codeResponse.code;
     }
   } else if (command.userId && command.code && command.codeId) {
     currentUserId = command.userId;
