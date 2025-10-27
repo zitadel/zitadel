@@ -36,6 +36,9 @@ func WithQueryExecutor(executor database.QueryExecutor) InvokeOpt {
 	}
 }
 
+// WithLegacyEventstore sets the eventstore to be used by the command.
+// If not set, the default one will be used.
+// This is mainly used for testing.
 func WithLegacyEventstore(es eventstore.LegacyEventstore) InvokeOpt {
 	return func(opts *InvokeOpts) {
 		opts.legacyEventstore = es
@@ -43,10 +46,9 @@ func WithLegacyEventstore(es eventstore.LegacyEventstore) InvokeOpt {
 }
 
 // InvokeOpts are passed to each command
-// they provide common fields used by commands like the database client.
 type InvokeOpts struct {
 	// db is the database client.
-	// [Executor]s MUST NOT access this field directly, use DB() to access it.
+	// [Executor]s MUST NOT access this field directly, use [InvokeOpts.DB] to access it.
 	//
 	// [Invoker]s may manipulate this field for example changing it to a transaction.
 	// Its their responsibility to restore it after ending the transaction.

@@ -20,6 +20,7 @@ type testTransactionalExecutor struct {
 }
 
 func Test_transactionInvoker_Invoke(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name     string
 		executor func(ctrl *gomock.Controller) domain.Executor
@@ -80,7 +81,8 @@ func Test_transactionInvoker_Invoke(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+            t.Parallel()
+			ctrl := gomock.NewController(t)
 			ctrl := gomock.NewController(t)
 			opts := &domain.InvokeOpts{}
 			domain.WithQueryExecutor(tt.db(ctrl))(opts)

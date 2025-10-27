@@ -12,7 +12,9 @@ import (
 )
 
 func TestBatchExecutors(t *testing.T) {
-	t.Run("successful", func(t *testing.T) {
+	t.Parallel()
+	t.Run("when commands are batched should run in expected order and return no error", func(t *testing.T) {
+		t.Parallel()
 		// Given
 		mockCtrl := gomock.NewController(t)
 		mockCmd1 := domainmock.NewMockCommander(mockCtrl)
@@ -41,7 +43,8 @@ func TestBatchExecutors(t *testing.T) {
 		require.True(t, mockCtrl.Satisfied())
 	})
 
-	t.Run("failing", func(t *testing.T) {
+	t.Run("when batched commands fail should return error from invoker", func(t *testing.T) {
+		t.Parallel()
 		mockCtrl := gomock.NewController(t)
 		mockCmd1 := domainmock.NewMockCommander(mockCtrl)
 		mockCmd2 := domainmock.NewMockCommander(mockCtrl)

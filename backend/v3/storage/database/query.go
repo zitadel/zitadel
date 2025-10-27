@@ -149,12 +149,14 @@ func (q *QueryOpts) Matches(x any) bool {
 	inputOpts.Write(inputBuilder)
 	q.Write(expectedBuilder)
 
-	if slices.CompareFunc(inputBuilder.Args(), expectedBuilder.Args(), func(input, expected any) int {
+	deepEq := func(input, expected any) int {
 		if reflect.DeepEqual(input, expected) {
 			return 0
 		}
 		return -1
-	}) != 0 {
+	}
+
+	if slices.CompareFunc(inputBuilder.Args(), expectedBuilder.Args(), deepEq) != 0 {
 		return false
 	}
 	return inputBuilder.String() == expectedBuilder.String()

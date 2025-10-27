@@ -9,7 +9,7 @@ type validatorInvoker struct {
 }
 
 // NewValidatorInvoker creates a new [validatorInvoker].
-// It is responsible for calling the [Validator].Validate function before executing the [Executor].
+// It is responsible for calling the [Validator.Validate] function before executing the [Executor].
 func NewValidatorInvoker(next Invoker) *validatorInvoker {
 	return &validatorInvoker{
 		invoker: invoker{next: next},
