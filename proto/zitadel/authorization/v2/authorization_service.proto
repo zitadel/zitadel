@@ -135,7 +135,7 @@ message ListAuthorizationsRequest {
 }
 
 message ListAuthorizationsResponse {
-  // Details contains the pagination information.
+  // Contains the pagination information.
   zitadel.filter.v2.PaginationResponse pagination = 1;
 
   // Authorizations contains the list of authorizations matching the request.

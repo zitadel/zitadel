@@ -109,7 +109,7 @@ message AuthorizationsSearchFilter {
     // Search for authorizations by their IDs.
     zitadel.filter.v2.InIDsFilter authorization_ids = 1;
 
-    // Search for authorizations granted an organizations authorizations by its ID.
+    // Search for authorizations by the ID of the organization it was granted for.
     zitadel.filter.v2.IDFilter organization_id = 2;
 
     // Search for authorizations by their state.
