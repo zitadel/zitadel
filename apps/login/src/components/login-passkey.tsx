@@ -65,6 +65,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
           setLoading(false);
         });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function updateSessionForChallenge(
@@ -144,7 +145,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
       listItem.id = coerceToArrayBuffer(listItem.id, "publicKey.allowCredentials.id");
     });
 
-    navigator.credentials
+    return navigator.credentials
       .get({
         publicKey,
       })

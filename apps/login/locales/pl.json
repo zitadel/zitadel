@@ -261,10 +261,6 @@
     "verify": {
       "title": "Uwierzytelnij się za pomocą klucza dostępu",
       "description": "Twoje urządzenie poprosi o użycie odcisku palca, rozpoznawania twarzy lub blokady ekranu.",
-      "info": {
-        "description": "Użyj skonfigurowanego klucza dostępu, aby bezpiecznie się uwierzytelnić. ",
-        "link": "Dowiedz się więcej o kluczach dostępu"
-      },
       "usePassword": "Użyj hasła",
       "submit": "Kontynuuj",
       "errors": {
