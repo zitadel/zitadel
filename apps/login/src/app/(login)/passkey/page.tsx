@@ -1,4 +1,4 @@
-import { Alert, AlertType } from "@/components/alert";
+import { Alert } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { LoginPasskey } from "@/components/login-passkey";
 import { Translated } from "@/components/translated";
