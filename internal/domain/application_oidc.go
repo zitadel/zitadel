@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"net/netip"
+	"net/url"
 	"slices"
 	"strings"
 	"time"
@@ -10,16 +12,9 @@ import (
 )
 
 const (
-	http                          = "http://"
-	httpLocalhostWithPort         = "http://localhost:"
-	httpLocalhostWithoutPort      = "http://localhost/"
-	httpLoopbackV4WithPort        = "http://127.0.0.1:"
-	httpLoopbackV4WithoutPort     = "http://127.0.0.1/"
-	httpLoopbackV6WithPort        = "http://[::1]:"
-	httpLoopbackV6WithoutPort     = "http://[::1]/"
-	httpLoopbackV6LongWithPort    = "http://[0:0:0:0:0:0:0:1]:"
-	httpLoopbackV6LongWithoutPort = "http://[0:0:0:0:0:0:0:1]/"
-	https                         = "https://"
+	httpScheme        = "http://"
+	httpsScheme       = "https://"
+	localhostHostname = "localhost"
 )
 
 type OIDCApp struct {
@@ -297,7 +292,7 @@ func CheckRedirectUrisCode(compliance *Compliance, appType *OIDCApplicationType,
 	if urlsAreHttps(redirectUris) {
 		return
 	}
-	if urlContainsPrefix(redirectUris, http) {
+	if urlContainsPrefix(redirectUris, httpScheme) {
 		if appType != nil && *appType == OIDCApplicationTypeUserAgent {
 			compliance.NoneCompliant = true
 			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb")
@@ -321,7 +316,7 @@ func CheckRedirectUrisImplicit(compliance *Compliance, appType *OIDCApplicationT
 		compliance.NoneCompliant = true
 		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.CustomNotAllowed")
 	}
-	if urlContainsPrefix(redirectUris, http) {
+	if urlContainsPrefix(redirectUris, httpScheme) {
 		if appType != nil && *appType == OIDCApplicationTypeNative {
 			if !onlyLocalhostIsHttp(redirectUris) {
 				compliance.NoneCompliant = true
@@ -342,7 +337,7 @@ func CheckRedirectUrisImplicitAndCode(compliance *Compliance, appType *OIDCAppli
 		compliance.NoneCompliant = true
 		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.CustomNotAllowed")
 	}
-	if urlContainsPrefix(redirectUris, http) {
+	if urlContainsPrefix(redirectUris, httpScheme) {
 		if appType != nil && *appType == OIDCApplicationTypeUserAgent {
 			compliance.NoneCompliant = true
 			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb")
@@ -359,7 +354,7 @@ func CheckRedirectUrisImplicitAndCode(compliance *Compliance, appType *OIDCAppli
 
 func urlsAreHttps(uris []string) bool {
 	for _, uri := range uris {
-		if !strings.HasPrefix(uri, https) {
+		if !strings.HasPrefix(uri, httpsScheme) {
 			return false
 		}
 	}
@@ -377,31 +372,50 @@ func urlContainsPrefix(uris []string, prefix string) bool {
 
 func containsCustom(uris []string) bool {
 	for _, uri := range uris {
-		if !strings.HasPrefix(uri, http) && !strings.HasPrefix(uri, https) {
+		if !strings.HasPrefix(uri, httpScheme) && !strings.HasPrefix(uri, httpsScheme) {
 			return true
 		}
 	}
 	return false
 }
 
+// onlyLocalhostIsHttp returns true if:
+//
+//   - input string slice is empty
+//   - all parseable URIs with scheme `http` in the string slice are localhost/loopback URIs (in all possible forms)
+//
+// It will return false if:
+//   - any of the input URIs cannot be parsed
+//   - any of the parseable input URIs with scheme `http` is not localhost/loopback
 func onlyLocalhostIsHttp(uris []string) bool {
 	for _, uri := range uris {
-		if strings.HasPrefix(uri, http) && !isHTTPLoopbackLocalhost(uri) {
+		url, err := url.ParseRequestURI(uri)
+
+		if err != nil {
+			return false
+		}
+
+		if url.Scheme == "http" {
+			hostname := url.Hostname()
+
+			if hostname == localhostHostname {
+				continue
+			}
+
+			address, err := netip.ParseAddr(hostname)
+
+			if err != nil {
+				return false
+			}
+
+			if address.IsLoopback() {
+				continue
+			}
+
 			return false
 		}
 	}
 	return true
-}
-
-func isHTTPLoopbackLocalhost(uri string) bool {
-	return strings.HasPrefix(uri, httpLocalhostWithoutPort) ||
-		strings.HasPrefix(uri, httpLocalhostWithPort) ||
-		strings.HasPrefix(uri, httpLoopbackV4WithoutPort) ||
-		strings.HasPrefix(uri, httpLoopbackV4WithPort) ||
-		strings.HasPrefix(uri, httpLoopbackV6WithoutPort) ||
-		strings.HasPrefix(uri, httpLoopbackV6WithPort) ||
-		strings.HasPrefix(uri, httpLoopbackV6LongWithoutPort) ||
-		strings.HasPrefix(uri, httpLoopbackV6LongWithPort)
 }
 
 func OIDCOriginAllowList(redirectURIs, additionalOrigins []string) ([]string, error) {

@@ -213,7 +213,12 @@ func DownloadHandleFunc(s AssetsService, downloader Downloader) func(http.Respon
 		resourceOwner := downloader.ResourceOwner(ctx, ownerPath)
 		path := ""
 		if ownerPath != "" {
-			path = strings.Split(r.RequestURI, ownerPath+"/")[1]
+			splitPath := strings.Split(r.RequestURI, ownerPath+"/")
+			if len(splitPath) < 2 {
+				s.ErrorHandler()(w, r, fmt.Errorf("invalid request URI format: %v", r.RequestURI), http.StatusNotFound)
+				return
+			}
+			path = splitPath[1]
 		}
 		objectName, err := downloader.ObjectName(ctx, path)
 		if err != nil {
