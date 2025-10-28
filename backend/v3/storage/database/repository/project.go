@@ -62,31 +62,11 @@ func (project) Create(ctx context.Context, client database.QueryExecutor, projec
 }
 
 func (p project) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	if len(changes) == 0 {
-		return 0, database.ErrNoChanges
-	}
-	if err := checkPKCondition(p, condition); err != nil {
-		return 0, err
-	}
-	if !database.Changes(changes).IsOnColumn(p.UpdatedAtColumn()) {
-		changes = append(changes, database.NewChange(p.UpdatedAtColumn(), database.NullInstruction))
-	}
-	builder := database.NewStatementBuilder(`UPDATE zitadel.projects SET `)
-	database.Changes(changes).Write(builder)
-	writeCondition(builder, condition)
-
-	return client.Exec(ctx, builder.String(), builder.Args()...)
+	return updateOne(ctx, client, p, condition, changes...)
 }
 
 func (p project) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	if err := checkPKCondition(p, condition); err != nil {
-		return 0, err
-	}
-
-	builder := database.NewStatementBuilder(`DELETE FROM zitadel.projects `)
-	writeCondition(builder, condition)
-
-	return client.Exec(ctx, builder.String(), builder.Args()...)
+	return deleteOne(ctx, client, p, condition)
 }
 
 // -------------------------------------------------------------

@@ -123,3 +123,20 @@ func createProject(t *testing.T, tx database.Transaction, instanceID, orgID stri
 
 	return project.ID
 }
+
+func createProjectGrant(t *testing.T, tx database.Transaction, instanceID, grantingOrgID, projectID, grantedOrgID string) (grantID string) {
+	t.Helper()
+	projectGrant := domain.ProjectGrant{
+		InstanceID:             instanceID,
+		GrantingOrganizationID: grantingOrgID,
+		ProjectID:              projectID,
+		GrantedOrganizationID:  grantedOrgID,
+		ID:                     gofakeit.UUID(),
+		State:                  domain.ProjectGrantStateActive,
+	}
+	projectGrantRepo := repository.ProjectGrantRepository()
+	err := projectGrantRepo.Create(t.Context(), tx, &projectGrant)
+	require.NoError(t, err)
+
+	return projectGrant.ID
+}
