@@ -74,6 +74,10 @@ const (
 	PermissionInstanceWrite            = "iam.write"
 	PermissionSystemInstanceRead       = "system.instance.read"
 	PermissionSystemInstanceWrite      = "system.instance.write"
+	PermissionGroupCreate              = "group.create"
+	PermissionGroupWrite               = "group.write"
+	PermissionGroupRead                = "group.read"
+	PermissionGroupDelete              = "group.delete"
 )
 
 // ProjectPermissionCheck is used as a check for preconditions dependent on application, project, user resourceowner and usergrants.
