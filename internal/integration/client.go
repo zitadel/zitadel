@@ -27,7 +27,8 @@ import (
 	app_v2beta "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/application/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
-	authorization "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
+	authorization_v2 "github.com/zitadel/zitadel/pkg/grpc/authorization/v2"
+	authorization_v2beta "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	feature_v2beta "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
@@ -89,7 +90,8 @@ type Client struct {
 	ApplicationV2            application.ApplicationServiceClient
 	InternalPermissionv2Beta internal_permission_v2beta.InternalPermissionServiceClient
 	InternalPermissionV2     internal_permission_v2.InternalPermissionServiceClient
-	AuthorizationV2Beta      authorization.AuthorizationServiceClient
+	AuthorizationV2Beta      authorization_v2beta.AuthorizationServiceClient //nolint:staticcheck // deprecated, but still used in tests
+	AuthorizationV2          authorization_v2.AuthorizationServiceClient
 }
 
 func NewDefaultClient(ctx context.Context) (*Client, error) {
@@ -135,7 +137,8 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		ApplicationV2:            application.NewApplicationServiceClient(cc),
 		InternalPermissionv2Beta: internal_permission_v2beta.NewInternalPermissionServiceClient(cc),
 		InternalPermissionV2:     internal_permission_v2.NewInternalPermissionServiceClient(cc),
-		AuthorizationV2Beta:      authorization.NewAuthorizationServiceClient(cc),
+		AuthorizationV2Beta:      authorization_v2beta.NewAuthorizationServiceClient(cc),
+		AuthorizationV2:          authorization_v2.NewAuthorizationServiceClient(cc),
 	}
 	return client, client.pollHealth(ctx)
 }
@@ -944,20 +947,23 @@ func (i *Instance) ActivateProjectGrant(ctx context.Context, t *testing.T, proje
 	return resp
 }
 
-func (i *Instance) CreateAuthorizationProject(t *testing.T, ctx context.Context, projectID, userID string) *authorization.CreateAuthorizationResponse {
-	resp, err := i.Client.AuthorizationV2Beta.CreateAuthorization(ctx, &authorization.CreateAuthorizationRequest{
-		UserId:    userID,
-		ProjectId: projectID,
+func (i *Instance) CreateAuthorizationProject(t *testing.T, ctx context.Context, projectID, userID, organizationID string, roles ...string) *authorization_v2.CreateAuthorizationResponse {
+	resp, err := i.Client.AuthorizationV2.CreateAuthorization(ctx, &authorization_v2.CreateAuthorizationRequest{
+		UserId:         userID,
+		ProjectId:      projectID,
+		OrganizationId: organizationID,
+		RoleKeys:       roles,
 	})
 	require.NoError(t, err)
 	return resp
 }
 
-func (i *Instance) CreateAuthorizationProjectGrant(t *testing.T, ctx context.Context, projectID, orgID, userID string) *authorization.CreateAuthorizationResponse {
-	resp, err := i.Client.AuthorizationV2Beta.CreateAuthorization(ctx, &authorization.CreateAuthorizationRequest{
+func (i *Instance) CreateAuthorizationProjectGrant(t *testing.T, ctx context.Context, projectID, organizationID, userID string, roles ...string) *authorization_v2.CreateAuthorizationResponse {
+	resp, err := i.Client.AuthorizationV2.CreateAuthorization(ctx, &authorization_v2.CreateAuthorizationRequest{
 		UserId:         userID,
 		ProjectId:      projectID,
-		OrganizationId: gu.Ptr(orgID),
+		OrganizationId: organizationID,
+		RoleKeys:       roles,
 	})
 	require.NoError(t, err)
 	return resp
