@@ -43,7 +43,7 @@ func (u *UpdateInstanceCommand) Execute(ctx context.Context, opts *InvokeOpts) (
 
 	updateCount, err := instanceRepo.Update(
 		ctx,
-		pool,
+		opts.DB(),
 		u.ID,
 		database.NewChange(instanceRepo.NameColumn(), u.Name),
 	)
@@ -83,7 +83,7 @@ func (u *UpdateInstanceCommand) Validate(ctx context.Context, opts *InvokeOpts) 
 
 	instanceRepo := opts.instanceRepo
 
-	instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.IDCondition(u.ID)))
+	instance, err := instanceRepo.Get(ctx, opts.DB(), database.WithCondition(instanceRepo.IDCondition(u.ID)))
 	if err != nil {
 		return err
 	}

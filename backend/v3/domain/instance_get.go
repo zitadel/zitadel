@@ -27,7 +27,7 @@ func NewGetInstanceCommand(instanceID string) *GetInstanceQuery {
 func (g *GetInstanceQuery) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	instanceRepo := opts.instanceRepo.LoadDomains()
 
-	instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.IDCondition(g.ID)))
+	instance, err := instanceRepo.Get(ctx, opts.DB(), database.WithCondition(instanceRepo.IDCondition(g.ID)))
 	if err != nil {
 		return err
 	}

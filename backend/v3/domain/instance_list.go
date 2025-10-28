@@ -39,7 +39,7 @@ func (l *ListInstancesQuery) Execute(ctx context.Context, opts *InvokeOpts) (err
 		return err
 	}
 
-	instances, err := instanceRepo.List(ctx, pool, conds, sorting, limit, offset)
+	instances, err := instanceRepo.List(ctx, opts.DB(), conds, sorting, limit, offset)
 	if err != nil {
 		return err
 	}

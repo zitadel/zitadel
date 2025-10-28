@@ -44,7 +44,7 @@ func (d *DeleteInstanceCommand) Events(ctx context.Context, opts *InvokeOpts) ([
 func (d *DeleteInstanceCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	instanceRepo := opts.instanceRepo.LoadDomains()
 
-	instanceToDelete, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.IDCondition(d.ID)))
+	instanceToDelete, err := instanceRepo.Get(ctx, opts.DB(), database.WithCondition(instanceRepo.IDCondition(d.ID)))
 	if err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func (d *DeleteInstanceCommand) Execute(ctx context.Context, opts *InvokeOpts) (
 
 	d.InstanceName = instanceToDelete.Name
 
-	deletedRows, err := instanceRepo.Delete(ctx, pool, instanceToDelete.ID)
+	deletedRows, err := instanceRepo.Delete(ctx, opts.DB(), instanceToDelete.ID)
 	if err != nil {
 		return err
 	}
