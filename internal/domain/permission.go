@@ -78,6 +78,9 @@ const (
 	PermissionGroupWrite               = "group.write"
 	PermissionGroupRead                = "group.read"
 	PermissionGroupDelete              = "group.delete"
+	PermissionGroupUserWrite           = "group.user.write"
+	PermissionGroupUserRead            = "group.user.read"
+	PermissionGroupUserDelete          = "group.user.delete"
 )
 
 // ProjectPermissionCheck is used as a check for preconditions dependent on application, project, user resourceowner and usergrants.
