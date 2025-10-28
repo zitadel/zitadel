@@ -261,10 +261,6 @@
     "verify": {
       "title": "Autenticar con una clave de acceso",
       "description": "Tu dispositivo pedirá tu huella digital, rostro o bloqueo de pantalla",
-      "info": {
-        "description": "Usa la clave de acceso que configuraste para autenticarte de forma segura. ",
-        "link": "Más información sobre claves de acceso"
-      },
       "usePassword": "Usar contraseña",
       "submit": "Continuar",
       "errors": {
