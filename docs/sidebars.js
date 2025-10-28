@@ -860,15 +860,13 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Project (Beta)",
+              label: "Project",
               link: {
                 type: "generated-index",
-                title: "Project Service API (Beta)",
+                title: "Project Service API",
                 slug: "/apis/resources/project_service_v2",
                 description:
-                  "This API is intended to manage projects and subresources for ZITADEL. \n" +
-                  "\n" +
-                  "This service is in beta state. It can AND will continue breaking until a stable version is released.",
+                  "This API is intended to manage projects and subresources for ZITADEL."
               },
               items: sidebar_api_project_service_v2,
             },
@@ -888,18 +886,16 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Authorizations (Beta)",
+              label: "Authorizations",
               link: {
                 type: "generated-index",
-                title: "Authorization Service API (Beta)",
+                title: "Authorization Service API",
                 slug: "/apis/resources/authorization_service_v2",
                 description:
                   "AuthorizationService provides methods to manage authorizations for users within your projects and applications.\n" +
                   "\n" +
                   "For managing permissions and roles for ZITADEL internal resources, like organizations, projects,\n" +
-                  "users, etc., please use the InternalPermissionService." +
-                  "\n" +
-                  "This API is in beta state. It can AND will continue breaking until a stable version is released.\n"
+                  "users, etc., please use the InternalPermissionService."
               },
               items: sidebar_api_authorization_service_v2,
             },
