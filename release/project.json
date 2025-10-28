@@ -1,0 +1,22 @@
+{
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "name": "@zitadel/release",
+  "projectType": "application",
+  "sourceRoot": "release",
+  "targets": {
+    "test-unit": {
+      "description": "Runs unit tests for the release script",
+      "inputs": [
+        "default",
+        "{workspaceRoot}/pnpm-lock.yaml"
+      ]
+    },
+    "lint": {
+      "description": "Runs TypeScript type checking",
+      "inputs": [
+        "default",
+        "{workspaceRoot}/pnpm-lock.yaml"
+      ]
+    }
+  }
+}

@@ -641,6 +641,25 @@ importers:
         specifier: ^11.0.0
         version: 11.0.3
 
+  release:
+    dependencies:
+      yargs:
+        specifier: ^18.0.0
+        version: 18.0.0
+    devDependencies:
+      '@types/node':
+        specifier: ^24.9.1
+        version: 24.9.1
+      '@types/yargs':
+        specifier: ^17.0.33
+        version: 17.0.33
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.2
+      vitest:
+        specifier: ^2.0.0
+        version: 2.1.9(@types/node@24.9.1)(jsdom@26.1.0)(less@4.1.3)(lightningcss@1.30.1)(sass@1.92.1)(terser@5.44.0)
+
   tests/functional-ui:
     devDependencies:
       '@types/node':
@@ -15319,7 +15338,7 @@ snapshots:
       '@babel/types': 7.28.4
       '@jridgewell/remapping': 2.3.5
       convert-source-map: 2.0.0
-      debug: 4.4.1
+      debug: 4.4.1(supports-color@5.5.0)
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -15379,7 +15398,7 @@ snapshots:
       '@babel/core': 7.28.4
       '@babel/helper-compilation-targets': 7.27.2
       '@babel/helper-plugin-utils': 7.27.1
-      debug: 4.4.1
+      debug: 4.4.1(supports-color@5.5.0)
       lodash.debounce: 4.0.8
       resolve: 1.22.10
     transitivePeerDependencies:
@@ -16087,7 +16106,7 @@ snapshots:
       '@babel/parser': 7.28.4
       '@babel/template': 7.27.2
       '@babel/types': 7.28.4
-      debug: 4.4.1
+      debug: 4.4.1(supports-color@5.5.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -20144,7 +20163,7 @@ snapshots:
       '@swc-node/sourcemap-support': 0.5.1
       '@swc/core': 1.5.29(@swc/helpers@0.5.17)
       colorette: 2.0.20
-      debug: 4.4.1
+      debug: 4.4.1(supports-color@5.5.0)
       pirates: 4.0.7
       tslib: 2.8.1
       typescript: 5.9.2
@@ -21165,7 +21184,7 @@ snapshots:
       '@verdaccio/core': 8.0.0-next-8.23
       '@verdaccio/loaders': 8.0.0-next-8.13
       '@verdaccio/signature': 8.0.0-next-8.15
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@8.1.1)
       lodash: 4.17.21
       verdaccio-htpasswd: 13.0.0-next-8.23
     transitivePeerDependencies:
@@ -21174,7 +21193,7 @@ snapshots:
   '@verdaccio/config@8.0.0-next-8.23':
     dependencies:
       '@verdaccio/core': 8.0.0-next-8.23
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@8.1.1)
       js-yaml: 4.1.0
       lodash: 4.17.21
       minimatch: 7.4.6
@@ -21211,7 +21230,7 @@ snapshots:
     dependencies:
       '@verdaccio/core': 8.0.0-next-8.23
       '@verdaccio/logger': 8.0.0-next-8.23
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@8.1.1)
       got-cjs: 12.5.4
       handlebars: 4.7.8
     transitivePeerDependencies:
@@ -21220,7 +21239,7 @@ snapshots:
   '@verdaccio/loaders@8.0.0-next-8.13':
     dependencies:
       '@verdaccio/core': 8.0.0-next-8.23
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@8.1.1)
       lodash: 4.17.21
     transitivePeerDependencies:
       - supports-color
@@ -21231,7 +21250,7 @@ snapshots:
       '@verdaccio/file-locking': 10.3.1
       '@verdaccio/streams': 10.2.1
       async: 3.2.6
-      debug: 4.4.1
+      debug: 4.4.1(supports-color@5.5.0)
       lodash: 4.17.21
       lowdb: 1.0.0
       mkdirp: 1.0.4
@@ -21243,7 +21262,7 @@ snapshots:
       '@verdaccio/core': 8.0.0-next-8.23
       '@verdaccio/logger-prettify': 8.0.0-next-8.4
       colorette: 2.0.20
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -21268,7 +21287,7 @@ snapshots:
       '@verdaccio/config': 8.0.0-next-8.23
       '@verdaccio/core': 8.0.0-next-8.23
       '@verdaccio/url': 13.0.0-next-8.23
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@8.1.1)
       express: 4.21.2
       express-rate-limit: 5.5.1
       lodash: 4.17.21
@@ -21283,7 +21302,7 @@ snapshots:
     dependencies:
       '@verdaccio/config': 8.0.0-next-8.23
       '@verdaccio/core': 8.0.0-next-8.23
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@8.1.1)
       jsonwebtoken: 9.0.2
     transitivePeerDependencies:
       - supports-color
@@ -21294,7 +21313,7 @@ snapshots:
     dependencies:
       '@verdaccio/core': 8.0.0-next-8.23
       '@verdaccio/url': 13.0.0-next-8.23
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@8.1.1)
       gunzip-maybe: 1.4.2
       tar-stream: 3.1.7
     transitivePeerDependencies:
@@ -21306,7 +21325,7 @@ snapshots:
   '@verdaccio/url@13.0.0-next-8.23':
     dependencies:
       '@verdaccio/core': 8.0.0-next-8.23
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@8.1.1)
       lodash: 4.17.21
       validator: 13.12.0
     transitivePeerDependencies:
@@ -21356,6 +21375,14 @@ snapshots:
       magic-string: 0.30.19
     optionalDependencies:
       vite: 5.4.20(@types/node@24.3.1)(less@4.1.3)(lightningcss@1.30.1)(sass@1.92.1)(terser@5.44.0)
+
+  '@vitest/mocker@2.1.9(vite@5.4.20(@types/node@24.9.1)(less@4.1.3)(lightningcss@1.30.1)(sass@1.92.1)(terser@5.44.0))':
+    dependencies:
+      '@vitest/spy': 2.1.9
+      estree-walker: 3.0.3
+      magic-string: 0.30.19
+    optionalDependencies:
+      vite: 5.4.20(@types/node@24.9.1)(less@4.1.3)(lightningcss@1.30.1)(sass@1.92.1)(terser@5.44.0)
 
   '@vitest/pretty-format@2.1.9':
     dependencies:
@@ -21554,7 +21581,7 @@ snapshots:
 
   agent-base@6.0.2:
     dependencies:
-      debug: 4.4.1
+      debug: 4.4.1(supports-color@5.5.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -21880,7 +21907,7 @@ snapshots:
 
   axios@1.12.2:
     dependencies:
-      follow-redirects: 1.15.11
+      follow-redirects: 1.15.11(debug@4.4.1)
       form-data: 4.0.4
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
@@ -23295,7 +23322,7 @@ snapshots:
   detect-port@1.6.1:
     dependencies:
       address: 1.2.2
-      debug: 4.4.1
+      debug: 4.4.1(supports-color@5.5.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -24483,8 +24510,6 @@ snapshots:
 
   flatted@3.3.3: {}
 
-  follow-redirects@1.15.11: {}
-
   follow-redirects@1.15.11(debug@4.4.1):
     optionalDependencies:
       debug: 4.4.1(supports-color@5.5.0)
@@ -25282,7 +25307,7 @@ snapshots:
   http-proxy-agent@7.0.2:
     dependencies:
       agent-base: 7.1.4
-      debug: 4.4.1
+      debug: 4.4.3
     transitivePeerDependencies:
       - supports-color
 
@@ -25326,14 +25351,14 @@ snapshots:
   https-proxy-agent@5.0.1:
     dependencies:
       agent-base: 6.0.2
-      debug: 4.4.1
+      debug: 4.4.1(supports-color@5.5.0)
     transitivePeerDependencies:
       - supports-color
 
   https-proxy-agent@7.0.6:
     dependencies:
       agent-base: 7.1.4
-      debug: 4.4.1
+      debug: 4.4.3
     transitivePeerDependencies:
       - supports-color
 
@@ -31760,7 +31785,7 @@ snapshots:
       '@verdaccio/file-locking': 13.0.0-next-8.6
       apache-md5: 1.1.8
       bcryptjs: 2.4.3
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@8.1.1)
       http-errors: 2.0.0
       unix-crypt-td-js: 1.1.4
     transitivePeerDependencies:
@@ -31789,7 +31814,7 @@ snapshots:
       clipanion: 4.0.0-rc.4(typanion@3.14.0)
       compression: 1.8.1
       cors: 2.8.5
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@8.1.1)
       envinfo: 7.15.0
       express: 4.21.2
       lodash: 4.17.21
@@ -31878,6 +31903,24 @@ snapshots:
       - supports-color
       - terser
 
+  vite-node@2.1.9(@types/node@24.9.1)(less@4.1.3)(lightningcss@1.30.1)(sass@1.92.1)(terser@5.44.0):
+    dependencies:
+      cac: 6.7.14
+      debug: 4.4.1
+      es-module-lexer: 1.7.0
+      pathe: 1.1.2
+      vite: 5.4.20(@types/node@24.9.1)(less@4.1.3)(lightningcss@1.30.1)(sass@1.92.1)(terser@5.44.0)
+    transitivePeerDependencies:
+      - '@types/node'
+      - less
+      - lightningcss
+      - sass
+      - sass-embedded
+      - stylus
+      - sugarss
+      - supports-color
+      - terser
+
   vite-tsconfig-paths@5.1.4(typescript@5.9.2)(vite@7.1.5(@types/node@22.18.1)(jiti@2.5.1)(less@4.1.3)(lightningcss@1.30.1)(sass@1.92.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)):
     dependencies:
       debug: 4.4.1(supports-color@5.5.0)
@@ -31909,6 +31952,19 @@ snapshots:
       rollup: 4.50.1
     optionalDependencies:
       '@types/node': 24.3.1
+      fsevents: 2.3.3
+      less: 4.1.3
+      lightningcss: 1.30.1
+      sass: 1.92.1
+      terser: 5.44.0
+
+  vite@5.4.20(@types/node@24.9.1)(less@4.1.3)(lightningcss@1.30.1)(sass@1.92.1)(terser@5.44.0):
+    dependencies:
+      esbuild: 0.21.5
+      postcss: 8.5.3
+      rollup: 4.50.1
+    optionalDependencies:
+      '@types/node': 24.9.1
       fsevents: 2.3.3
       less: 4.1.3
       lightningcss: 1.30.1
@@ -32012,6 +32068,42 @@ snapshots:
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 24.3.1
+      jsdom: 26.1.0
+    transitivePeerDependencies:
+      - less
+      - lightningcss
+      - msw
+      - sass
+      - sass-embedded
+      - stylus
+      - sugarss
+      - supports-color
+      - terser
+
+  vitest@2.1.9(@types/node@24.9.1)(jsdom@26.1.0)(less@4.1.3)(lightningcss@1.30.1)(sass@1.92.1)(terser@5.44.0):
+    dependencies:
+      '@vitest/expect': 2.1.9
+      '@vitest/mocker': 2.1.9(vite@5.4.20(@types/node@24.9.1)(less@4.1.3)(lightningcss@1.30.1)(sass@1.92.1)(terser@5.44.0))
+      '@vitest/pretty-format': 2.1.9
+      '@vitest/runner': 2.1.9
+      '@vitest/snapshot': 2.1.9
+      '@vitest/spy': 2.1.9
+      '@vitest/utils': 2.1.9
+      chai: 5.3.3
+      debug: 4.4.1
+      expect-type: 1.2.2
+      magic-string: 0.30.19
+      pathe: 1.1.2
+      std-env: 3.9.0
+      tinybench: 2.9.0
+      tinyexec: 0.3.2
+      tinypool: 1.1.1
+      tinyrainbow: 1.2.0
+      vite: 5.4.20(@types/node@24.9.1)(less@4.1.3)(lightningcss@1.30.1)(sass@1.92.1)(terser@5.44.0)
+      vite-node: 2.1.9(@types/node@24.9.1)(less@4.1.3)(lightningcss@1.30.1)(sass@1.92.1)(terser@5.44.0)
+      why-is-node-running: 2.3.0
+    optionalDependencies:
+      '@types/node': 24.9.1
       jsdom: 26.1.0
     transitivePeerDependencies:
       - less
