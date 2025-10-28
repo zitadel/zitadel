@@ -67,6 +67,13 @@ const (
 	PermissionUserGrantWrite           = "user.grant.write"
 	PermissionUserGrantRead            = "user.grant.read"
 	PermissionUserGrantDelete          = "user.grant.delete"
+	PermissionIAMPolicyWrite           = "iam.policy.write"
+	PermissionIAMPolicyDelete          = "iam.policy.delete"
+	PermissionPolicyRead               = "policy.read"
+	PermissionInstanceRead             = "iam.read"
+	PermissionInstanceWrite            = "iam.write"
+	PermissionSystemInstanceRead       = "system.instance.read"
+	PermissionSystemInstanceWrite      = "system.instance.write"
 )
 
 // ProjectPermissionCheck is used as a check for preconditions dependent on application, project, user resourceowner and usergrants.

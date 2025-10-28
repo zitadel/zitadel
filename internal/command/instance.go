@@ -751,17 +751,25 @@ func setupMessageTexts(validations *[]preparation.Validation, setupMessageTexts 
 }
 
 func (c *Commands) UpdateInstance(ctx context.Context, name string) (*domain.ObjectDetails, error) {
+	name = strings.TrimSpace(name)
+	if name == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "INST-092mid", "Errors.Invalid.Argument")
+	}
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.prepareUpdateInstance(instanceAgg, strings.TrimSpace(name))
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	writeModel, err := getInstanceWriteModel(ctx, c.eventstore.Filter) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
-	if err != nil {
+	if !writeModel.State.Exists() {
+		return nil, zerrors.ThrowNotFound(nil, "INST-nuso2m", "Errors.Instance.NotFound")
+	}
+	if writeModel.Name == name {
+		return writeModelToObjectDetails(&writeModel.WriteModel), nil
+	}
+	if err := c.pushAppendAndReduce(ctx, writeModel, instance.NewInstanceChangedEvent(ctx, &instanceAgg.Aggregate, name)); err != nil {
 		return nil, err
 	}
-	return pushedEventsToObjectDetails(events), nil
+	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
 func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage language.Tag) (*domain.ObjectDetails, error) {
@@ -893,27 +901,6 @@ func (c *Commands) setIAMProject(ctx context.Context, iamAgg *eventstore.Aggrega
 		return nil, zerrors.ThrowPreconditionFailed(nil, "IAM-EGbw2", "Errors.IAM.IAMProjectAlreadySet")
 	}
 	return instance.NewIAMProjectSetEvent(ctx, iamAgg, projectID), nil
-}
-
-func (c *Commands) prepareUpdateInstance(a *instance.Aggregate, name string) preparation.Validation {
-	return func() (preparation.CreateCommands, error) {
-		if name == "" {
-			return nil, zerrors.ThrowInvalidArgument(nil, "INST-092mid", "Errors.Invalid.Argument")
-		}
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel, err := getInstanceWriteModel(ctx, filter)
-			if err != nil {
-				return nil, err
-			}
-			if !writeModel.State.Exists() {
-				return nil, zerrors.ThrowNotFound(nil, "INST-nuso2m", "Errors.Instance.NotFound")
-			}
-			if writeModel.Name == name {
-				return nil, zerrors.ThrowPreconditionFailed(nil, "INST-alpxism", "Errors.Instance.NotChanged")
-			}
-			return []eventstore.Command{instance.NewInstanceChangedEvent(ctx, &a.Aggregate, name)}, nil
-		}, nil
-	}
 }
 
 func (c *Commands) prepareSetDefaultLanguage(a *instance.Aggregate, defaultLanguage language.Tag) preparation.Validation {

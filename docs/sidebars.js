@@ -825,15 +825,13 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Instance (Beta)",
+              label: "Instance",
               link: {
                 type: "generated-index",
-                title: "Instance Service API (Beta)",
+                title: "Instance Service API",
                 slug: "/apis/resources/instance_service_v2",
                 description:
                   "This API is intended to manage instances, custom domains and trusted domains in ZITADEL.\n" +
-                  "\n" +
-                  "This service is in beta state. It can AND will continue breaking until a stable version is released.\n" +
                   "\n" +
                   "This v2 of the API provides the same functionalities as the v1, but organised on a per resource basis.\n" +
                   "The whole functionality related to domains (custom and trusted) has been moved under this instance API."

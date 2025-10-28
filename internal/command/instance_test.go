@@ -1404,7 +1404,7 @@ func TestCommandSide_setUpInstance(t *testing.T) {
 
 func TestCommandSide_UpdateInstance(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx  context.Context
@@ -1423,9 +1423,7 @@ func TestCommandSide_UpdateInstance(t *testing.T) {
 		{
 			name: "empty name, invalid error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:  authz.WithInstanceID(context.Background(), "INSTANCE"),
@@ -1438,8 +1436,7 @@ func TestCommandSide_UpdateInstance(t *testing.T) {
 		{
 			name: "instance not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -1454,8 +1451,7 @@ func TestCommandSide_UpdateInstance(t *testing.T) {
 		{
 			name: "instance removed, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewInstanceAddedEvent(
@@ -1485,8 +1481,7 @@ func TestCommandSide_UpdateInstance(t *testing.T) {
 		{
 			name: "no changes, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewInstanceAddedEvent(
@@ -1503,14 +1498,15 @@ func TestCommandSide_UpdateInstance(t *testing.T) {
 				name: "INSTANCE",
 			},
 			res: res{
-				err: zerrors.IsPreconditionFailed,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
 			},
 		},
 		{
 			name: "instance change, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
@@ -1542,7 +1538,7 @@ func TestCommandSide_UpdateInstance(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.UpdateInstance(tt.args.ctx, tt.args.name)
 			if tt.res.err == nil {
