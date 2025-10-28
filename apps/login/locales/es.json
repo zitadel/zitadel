@@ -159,18 +159,6 @@
     "signInWithAzureAD": "Iniciar sesión con AzureAD",
     "signInWithGithub": "Iniciar sesión con GitHub",
     "signInWithGitlab": "Iniciar sesión con GitLab",
-    "loginSuccess": {
-      "title": "Inicio de sesión exitoso",
-      "description": "¡Has iniciado sesión con éxito!"
-    },
-    "linkingSuccess": {
-      "title": "Cuenta vinculada",
-      "description": "¡Has vinculado tu cuenta con éxito!"
-    },
-    "registerSuccess": {
-      "title": "Registro exitoso",
-      "description": "¡Te has registrado con éxito!"
-    },
     "loginError": {
       "title": "Error de inicio de sesión",
       "description": "Ocurrió un error al intentar iniciar sesión."
@@ -194,6 +182,23 @@
       "description": "No pudimos completar el proceso de registro.",
       "info": "No se pudo determinar la organización para el registro. Por favor, contacta a tu administrador para obtener asistencia.",
       "backToLogin": "Volver al inicio de sesión"
+    },
+    "processing": {
+      "message": "Procesando autenticación...",
+      "noRedirect": "No se recibió redirección ni error del servidor",
+      "unexpectedError": "Ocurrió un error inesperado"
+    },
+    "errors": {
+      "missingParameters": "Faltan parámetros requeridos",
+      "missingIdpInfo": "Falta información del IDP",
+      "idpNotFound": "Proveedor de identidad no encontrado",
+      "linkingNotAllowed": "La vinculación no está permitida para este proveedor de identidad",
+      "linkingFailed": "Error al vincular el proveedor de identidad con la cuenta",
+      "autoLinkingFailed": "Error al vincular automáticamente la cuenta",
+      "userCreationFailed": "Error al crear la cuenta de usuario",
+      "orgResolutionFailed": "No se pudo determinar la organización para el registro",
+      "sessionCreationFailed": "No se pudo crear la sesión o determinar la redirección",
+      "unknownError": "Ocurrió un error desconocido"
     }
   },
   "ldap": {
@@ -256,8 +261,28 @@
     "verify": {
       "title": "Autenticar con una clave de acceso",
       "description": "Tu dispositivo pedirá tu huella digital, rostro o bloqueo de pantalla",
+      "info": {
+        "description": "Usa la clave de acceso que configuraste para autenticarte de forma segura. ",
+        "link": "Más información sobre claves de acceso"
+      },
       "usePassword": "Usar contraseña",
-      "submit": "Continuar"
+      "submit": "Continuar",
+      "errors": {
+        "couldNotRequestChallenge": "No se pudo solicitar el desafío de clave de acceso",
+        "couldNotVerifyPasskey": "No se pudo verificar la clave de acceso",
+        "noResponseReceived": "Verificación de clave de acceso fallida - no se recibió respuesta",
+        "noRedirectProvided": "Verificación de clave de acceso completada pero no se proporcionó redirección",
+        "couldNotRetrievePasskey": "Ocurrió un error al recuperar la clave de acceso",
+        "verificationCancelled": "La verificación de clave de acceso fue cancelada",
+        "verificationFailed": "Ocurrió un error durante la verificación de clave de acceso",
+        "couldNotFindSession": "No se pudo encontrar la sesión",
+        "couldNotUpdateSession": "No se pudo actualizar la sesión",
+        "userNotFound": "Usuario no encontrado en el sistema",
+        "couldNotDetermineRedirect": "No se pudo determinar la URL de redirección después de la verificación de clave de acceso",
+        "couldNotSetSession": "No se pudo establecer la sesión",
+        "couldNotGetUser": "No se pudieron recuperar los datos del usuario",
+        "couldNotRetrieveSessionCookie": "No se pudo recuperar la cookie de sesión"
+      }
     },
     "set": {
       "title": "Configurar una clave de acceso",
@@ -430,6 +455,7 @@
     "unknownContext": "No se pudo obtener el contexto del usuario. Asegúrate de ingresar primero el nombre de usuario o proporcionar un loginName como parámetro de búsqueda.",
     "sessionExpired": "Tu sesión actual ha expirado. Por favor, inicia sesión de nuevo.",
     "failedLoading": "No se pudieron cargar los datos. Por favor, inténtalo de nuevo.",
-    "tryagain": "Intentar de nuevo"
+    "tryagain": "Intentar de nuevo",
+    "couldNotContinueSession": "No se pudo continuar con la sesión - falta información del usuario"
   }
 }

@@ -7,11 +7,13 @@ import (
 
 // traceInvoker decorates each command with tracing.
 type traceInvoker struct {
-	next Invoker
+	invoker
 }
 
-func newTraceInvoker(next Invoker) *traceInvoker {
-	return &traceInvoker{next: next}
+func NewTraceInvoker(next Invoker) *traceInvoker {
+	return &traceInvoker{
+		invoker: invoker{next: next},
+	}
 }
 
 func (i *traceInvoker) Invoke(ctx context.Context, executor Executor, opts *InvokeOpts) (err error) {
@@ -23,8 +25,5 @@ func (i *traceInvoker) Invoke(ctx context.Context, executor Executor, opts *Invo
 		span.End()
 	}()
 
-	if i.next != nil {
-		return i.next.Invoke(ctx, executor, opts)
-	}
-	return executor.Execute(ctx, opts)
+	return i.execute(ctx, executor, opts)
 }

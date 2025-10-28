@@ -12,7 +12,10 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-var _ Commander = (*ActivateOrgCommand)(nil)
+var (
+	_ Commander     = (*ActivateOrgCommand)(nil)
+	_ Transactional = (*ActivateOrgCommand)(nil)
+)
 
 type ActivateOrgCommand struct {
 	ID string `json:"id"`
@@ -22,26 +25,20 @@ func NewActivateOrgCommand(organizationID string) *ActivateOrgCommand {
 	return &ActivateOrgCommand{ID: organizationID}
 }
 
+// RequiresTransaction implements [Transactional].
+func (cmd *ActivateOrgCommand) RequiresTransaction() {}
+
 // Events implements [Commander].
-func (d *ActivateOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
-	return []eventstore.Command{org.NewOrgReactivatedEvent(ctx, &org.NewAggregate(d.ID).Aggregate)}, nil
+func (cmd *ActivateOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
+	return []eventstore.Command{org.NewOrgReactivatedEvent(ctx, &org.NewAggregate(cmd.ID).Aggregate)}, nil
 }
 
 // Execute implements [Commander].
-func (d *ActivateOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
-	close, err := opts.EnsureTx(ctx)
-	if err != nil {
-		return err
-	}
-	defer func() { err = close(ctx, err) }()
-
+func (cmd *ActivateOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	organizationRepo := opts.organizationRepo
 
-	updateCount, err := organizationRepo.Update(ctx, pool,
-		database.And(
-			organizationRepo.IDCondition(d.ID),
-			organizationRepo.InstanceIDCondition(authz.GetInstance(ctx).InstanceID()),
-		),
+	updateCount, err := organizationRepo.Update(ctx, opts.DB(),
+		organizationRepo.PrimaryKeyCondition(authz.GetInstance(ctx).InstanceID(), cmd.ID),
 		database.NewChange(organizationRepo.StateColumn(), OrgStateActive),
 	)
 
@@ -62,24 +59,21 @@ func (d *ActivateOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err
 }
 
 // String implements [Commander].
-func (d *ActivateOrgCommand) String() string {
+func (cmd *ActivateOrgCommand) String() string {
 	return "ActivateOrgCommand"
 }
 
 // Validate implements [Commander].
-func (d *ActivateOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
-	if d.ID = strings.TrimSpace(d.ID); d.ID == "" {
+func (cmd *ActivateOrgCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
+	if cmd.ID = strings.TrimSpace(cmd.ID); cmd.ID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-hJuuAv", "invalid organization ID")
 	}
 
 	organizationRepo := opts.organizationRepo
 
 	// TODO: lock entry as soon as https://github.com/zitadel/zitadel/issues/10930 is done
-	org, err := organizationRepo.Get(ctx, pool, database.WithCondition(
-		database.And(
-			organizationRepo.IDCondition(d.ID),
-			organizationRepo.InstanceIDCondition(authz.GetInstance(ctx).InstanceID()),
-		),
+	org, err := organizationRepo.Get(ctx, opts.DB(), database.WithCondition(
+		organizationRepo.PrimaryKeyCondition(authz.GetInstance(ctx).InstanceID(), cmd.ID),
 	))
 	if err != nil {
 		var notFoundError *database.NoRowFoundError

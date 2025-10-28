@@ -91,18 +91,6 @@
     "signInWithAzureAD": "AzureADでサインイン",
     "signInWithGithub": "GitHubでサインイン",
     "signInWithGitlab": "GitLabでサインイン",
-    "loginSuccess": {
-      "title": "ログイン成功",
-      "description": "正常にログインしました！"
-    },
-    "linkingSuccess": {
-      "title": "アカウント連携完了",
-      "description": "アカウントの連携が完了しました！"
-    },
-    "registerSuccess": {
-      "title": "登録完了",
-      "description": "正常に登録されました！"
-    },
     "loginError": {
       "title": "ログイン失敗",
       "description": "ログインの際にエラーが発生しました。"
@@ -114,6 +102,35 @@
     "completeRegister": {
       "title": "データを完成させる",
       "description": "メールアドレスと名前を入力して登録を完了してください。"
+    },
+    "accountNotFound": {
+      "title": "アカウントが見つかりません",
+      "description": "アイデンティティプロバイダの認証情報に関連付けられたアカウントが見つかりませんでした。",
+      "info": "既存のアカウントが見つかりませんでした。既存のアカウントでサインインするか、管理者にお問い合わせください。",
+      "backToLogin": "ログインに戻る"
+    },
+    "registrationFailed": {
+      "title": "登録が利用できません",
+      "description": "登録プロセスを完了できませんでした。",
+      "info": "登録する組織を特定できませんでした。管理者にお問い合わせください。",
+      "backToLogin": "ログインに戻る"
+    },
+    "processing": {
+      "message": "認証を処理しています...",
+      "noRedirect": "サーバーからリダイレクトまたはエラーが返されませんでした",
+      "unexpectedError": "予期しないエラーが発生しました"
+    },
+    "errors": {
+      "missingParameters": "必要なパラメータが不足しています",
+      "missingIdpInfo": "IDP情報が不足しています",
+      "idpNotFound": "アイデンティティプロバイダが見つかりません",
+      "linkingNotAllowed": "このアイデンティティプロバイダとの連携は許可されていません",
+      "linkingFailed": "アイデンティティプロバイダのアカウントへの連携に失敗しました",
+      "autoLinkingFailed": "アカウントの自動連携に失敗しました",
+      "userCreationFailed": "ユーザーアカウントの作成に失敗しました",
+      "orgResolutionFailed": "登録する組織を特定できませんでした",
+      "sessionCreationFailed": "セッションの作成またはリダイレクトの決定に失敗しました",
+      "unknownError": "不明なエラーが発生しました"
     }
   },
   "ldap": {
