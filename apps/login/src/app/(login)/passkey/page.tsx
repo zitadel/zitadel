@@ -84,11 +84,13 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           </span>
         </Alert>
 
-        {!(loginName || sessionId) ? (
+        {!(loginName || sessionId) && (
           <Alert>
             <Translated i18nKey="unknownContext" namespace="error" />
           </Alert>
-        ) : (
+        )}
+
+        {(loginName || sessionId) && (
           <LoginPasskey
             loginName={loginName}
             sessionId={sessionId}
