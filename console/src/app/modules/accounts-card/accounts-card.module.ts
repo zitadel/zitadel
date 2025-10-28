@@ -8,10 +8,20 @@ import { TranslateModule } from '@ngx-translate/core';
 
 import { AvatarModule } from '../avatar/avatar.module';
 import { AccountsCardComponent } from './accounts-card.component';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [AccountsCardComponent],
-  imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressBarModule, RouterModule, AvatarModule, TranslateModule],
+  imports: [
+    CommonModule,
+    MatIconModule,
+    MatButtonModule,
+    MatProgressBarModule,
+    RouterModule,
+    AvatarModule,
+    MatTooltipModule,
+    TranslateModule,
+  ],
   exports: [AccountsCardComponent],
 })
 export class AccountsCardModule {}
