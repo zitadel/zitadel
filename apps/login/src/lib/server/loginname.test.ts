@@ -62,6 +62,7 @@ describe("sendLoginname", () => {
   let mockGetActiveIdentityProviders: any;
   let mockGetIDPByID: any;
   let mockIdpTypeToSlug: any;
+  let mockGetOrgsByDomain: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -77,6 +78,7 @@ describe("sendLoginname", () => {
       listIDPLinks,
       startIdentityProviderFlow,
       getActiveIdentityProviders,
+      getOrgsByDomain,
     } = await import("../zitadel");
     const { createSessionAndUpdateCookie } = await import("./cookie");
     const { getOriginalHost } = await import("./host");
@@ -96,6 +98,7 @@ describe("sendLoginname", () => {
     mockGetActiveIdentityProviders = vi.mocked(getActiveIdentityProviders);
     mockGetIDPByID = vi.mocked(getIDPByID);
     mockIdpTypeToSlug = vi.mocked(idpTypeToSlug);
+    mockGetOrgsByDomain = vi.mocked(getOrgsByDomain);
 
     // Default mock implementations
     mockHeaders.mockResolvedValue({} as any);
@@ -107,6 +110,8 @@ describe("sendLoginname", () => {
       name: "Google",
       type: "GOOGLE",
     });
+    // Default: org discovery returns empty result
+    mockGetOrgsByDomain.mockResolvedValue({ result: [] });
   });
 
   afterEach(() => {

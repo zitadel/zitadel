@@ -391,44 +391,42 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
   }
 
-  // user not found, check if register is enabled on instance / organization context
-  if (loginSettingsByContext?.allowRegister && !loginSettingsByContext?.allowUsernamePassword) {
-    const resp = await redirectUserToIDP(undefined, command.organization);
-    if (resp) {
-      return resp;
-    }
-    return { error: t("errors.userNotFound") };
-  } else if (loginSettingsByContext?.allowRegister && loginSettingsByContext?.allowUsernamePassword) {
-    let orgToRegisterOn: string | undefined = command.organization;
+  // user not found, perform organization discovery if no org context provided
+  let discoveredOrganization = command.organization;
 
-    if (
-      !loginSettingsByContext?.ignoreUnknownUsernames &&
-      !orgToRegisterOn &&
-      command.loginName &&
-      ORG_SUFFIX_REGEX.test(command.loginName)
-    ) {
-      const matched = ORG_SUFFIX_REGEX.exec(command.loginName);
-      const suffix = matched?.[1] ?? "";
+  if (!discoveredOrganization && command.loginName && ORG_SUFFIX_REGEX.test(command.loginName)) {
+    const matched = ORG_SUFFIX_REGEX.exec(command.loginName);
+    const suffix = matched?.[1] ?? "";
 
-      // this just returns orgs where the suffix is set as primary domain
-      const orgs = await getOrgsByDomain({
-        serviceUrl,
-        domain: suffix,
-      });
-      const orgToCheckForDiscovery = orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
+    // this just returns orgs where the suffix is set as primary domain
+    const orgs = await getOrgsByDomain({
+      serviceUrl,
+      domain: suffix,
+    });
+    const orgToCheckForDiscovery = orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
 
+    if (orgToCheckForDiscovery) {
       const orgLoginSettings = await getLoginSettings({
         serviceUrl,
         organization: orgToCheckForDiscovery,
       });
       if (orgLoginSettings?.allowDomainDiscovery) {
-        orgToRegisterOn = orgToCheckForDiscovery;
+        discoveredOrganization = orgToCheckForDiscovery;
       }
     }
+  }
 
+  // user not found, check if register is enabled on instance / organization context
+  if (loginSettingsByContext?.allowRegister && !loginSettingsByContext?.allowUsernamePassword) {
+    const resp = await redirectUserToIDP(undefined, discoveredOrganization);
+    if (resp) {
+      return resp;
+    }
+    return { error: t("errors.userNotFound") };
+  } else if (loginSettingsByContext?.allowRegister && loginSettingsByContext?.allowUsernamePassword) {
     // do not register user if ignoreUnknownUsernames is set
-    if (orgToRegisterOn && !loginSettingsByContext?.ignoreUnknownUsernames) {
-      const params = new URLSearchParams({ organization: orgToRegisterOn });
+    if (discoveredOrganization && !loginSettingsByContext?.ignoreUnknownUsernames) {
+      const params = new URLSearchParams({ organization: discoveredOrganization });
 
       if (command.requestId) {
         params.set("requestId", command.requestId);
@@ -451,8 +449,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       paramsPasswordDefault.append("requestId", command.requestId);
     }
 
-    if (command.organization) {
-      paramsPasswordDefault.append("organization", command.organization);
+    if (discoveredOrganization) {
+      paramsPasswordDefault.append("organization", discoveredOrganization);
     }
 
     return { redirect: "/password?" + paramsPasswordDefault };
