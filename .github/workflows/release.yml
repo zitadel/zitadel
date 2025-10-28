@@ -62,7 +62,8 @@ jobs:
       - name: Release API and Login
         env:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
-        run: pnpm release --dry-run false
+          ZITADEL_RELEASE_ORG: "${{ github.repository_owner }}"
+        run: pnpm release --no-dry-run
 
 #  homebrew-tap:
 #    runs-on: ubuntu-22.04

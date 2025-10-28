@@ -25,21 +25,22 @@ import { platform, arch } from 'node:os';
 import { beforeAll, describe, expect, test } from 'vitest';
 
 const E2E_TEST_DIR = '/tmp/zitadel-e2e-test';
-const testRepoEnvVar = "ZITADEL_RELEASE_E2E_TEST_REPO";
-const testBranchEnvVar = "ZITADEL_RELEASE_E2E_TEST_BRANCH";
-const expectReleaseVersionEnvVar = "ZITADEL_RELEASE_E2E_EXPECT_VERSION";
-const expectGitHubReleaseEnvVar = "ZITADEL_RELEASE_E2E_EXPECT_GITHUB_RELEASE";
-const expectLatestReleaseEnvVar = "ZITADEL_RELEASE_E2E_EXPECT_LATEST";
-const REQUIRED_ENV_VARS = [testRepoEnvVar, testBranchEnvVar];
+const TEST_REPO_ENV_VAR = "ZITADEL_RELEASE_E2E_TEST_REPO";
+const TEST_BRANCH_ENV_VAR = "ZITADEL_RELEASE_E2E_TEST_BRANCH";
+const EXPECT_RELEASE_VERSION_ENV_VAR = "ZITADEL_RELEASE_E2E_EXPECT_VERSION";
+const EXPECT_GITHUB_RELEASE_ENV_VAR = "ZITADEL_RELEASE_E2E_EXPECT_GITHUB_RELEASE";
+const EXPECT_LATEST_RELEASE_ENV_VAR = "ZITADEL_RELEASE_E2E_EXPECT_LATEST";
+const REQUIRED_ENV_VARS = [TEST_REPO_ENV_VAR, TEST_BRANCH_ENV_VAR, EXPECT_RELEASE_VERSION_ENV_VAR, EXPECT_GITHUB_RELEASE_ENV_VAR, EXPECT_LATEST_RELEASE_ENV_VAR];
 
 // Check if E2E tests should run
 // Ensure all required environment variables are set
 // Ensure E2E_TEST_REPO is not on the zitadel organization
-const shouldRunE2E = REQUIRED_ENV_VARS.every(envVar => process.env[envVar]) && !process.env[testRepoEnvVar]?.startsWith('zitadel/');
+const SHOULD_RUN_E2E = REQUIRED_ENV_VARS.every(envVar => process.env[envVar]) && !process.env[TEST_REPO_ENV_VAR]?.startsWith('zitadel/');
 
 // Get platform-specific info
 const GOOS = platform() === 'darwin' ? 'darwin' : platform() === 'win32' ? 'windows' : 'linux';
 const GOARCH = arch() === 'x64' ? 'amd64' : arch() === 'arm64' ? 'arm64' : arch();
+const GITHUB_RELEASE_GITHUB_ORG = process.env[TEST_REPO_ENV_VAR]?.split('/')[0] || '';
 
 // Helper to run commands in the test repo
 function runInTestRepo(command: string, options: { silent?: boolean; ignoreError?: boolean } = {}): string {
@@ -48,6 +49,10 @@ function runInTestRepo(command: string, options: { silent?: boolean; ignoreError
             cwd: E2E_TEST_DIR,
             encoding: 'utf-8',
             stdio: options.silent ? 'pipe' : 'inherit',
+            env: {
+                ...process.env,
+                ZITADEL_RELEASE_GITHUB_ORG: GITHUB_RELEASE_GITHUB_ORG,
+            },
         }).trim();
     } catch (error: any) {
         if (options.ignoreError) {
@@ -67,6 +72,10 @@ function runCommand(command: string, cwd: string = E2E_TEST_DIR): { stdout: stri
         cwd,
         encoding: 'utf-8',
         shell: true,
+        env: {
+            ...process.env,
+            ZITADEL_RELEASE_GITHUB_ORG: GITHUB_RELEASE_GITHUB_ORG,
+        },
     });
     return {
         stdout: result.stdout || '',
@@ -75,18 +84,21 @@ function runCommand(command: string, cwd: string = E2E_TEST_DIR): { stdout: stri
     };
 }
 
-describe.skipIf(shouldRunE2E)('Release E2E (Real Fork)', () => {
+describe.skipIf(SHOULD_RUN_E2E)('Release E2E (Real Fork)', () => {
     test('should skip E2E tests when environment variables are not set correctly', () => {
         console.log('Skipping E2E tests. To run them, ensure the following environment variables are set:');
-        console.log(`- ${testRepoEnvVar}`);
-        console.log(`- ${testBranchEnvVar}`);
+        console.log(`- ${TEST_REPO_ENV_VAR}`);
+        console.log(`- ${TEST_BRANCH_ENV_VAR}`);
+        console.log(`- ${EXPECT_RELEASE_VERSION_ENV_VAR}`);
+        console.log(`- ${EXPECT_GITHUB_RELEASE_ENV_VAR}`);
+        console.log(`- ${EXPECT_LATEST_RELEASE_ENV_VAR}`);
         console.log('Also ensure that the test repository is not under the "zitadel" organization.');
     });
 });
 
-describe.skipIf(!shouldRunE2E)('Release E2E (Real Fork)', () => {
-    const testRepo = process.env[testRepoEnvVar]!;
-    const testBranch = process.env[testBranchEnvVar]!;
+describe.skipIf(!SHOULD_RUN_E2E)('Release E2E (Real Fork)', () => {
+    const testRepo = process.env[TEST_REPO_ENV_VAR]!;
+    const testBranch = process.env[TEST_BRANCH_ENV_VAR]!;
     const testcodeBranch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
 
     beforeAll(async () => {
@@ -146,20 +158,20 @@ describe.skipIf(!shouldRunE2E)('Release E2E (Real Fork)', () => {
 
     test('should run unit tests before release', () => {
         console.log('  Running unit tests...');
-        runInTestRepo('pnpm nx test-unit @zitadel/release');
+        runInTestRepo('pnpm nx run @zitadel/release:test-unit');
         console.log('✓ Unit tests passed');
     }, 120000); // 2 minute timeout
 
     test('should run release process in dry run mode', async () => {
         // Run release in dry-run mode first to validate
         console.log('  Testing with dry-run...');
-        runInTestRepo('pnpm nx release @zitadel/release -- --dryRun');
+        runInTestRepo('pnpm nx run @zitadel/release:release -- --dry-run');
         console.log('  ✓ Dry-run completed successfully');
     }, 120000); // 2 minute timeout
 
     test('should run full release process', async () => {
         console.log('\n🚀 Running full release process...')
-        runInTestRepo('pnpm nx release @zitadel/release -- --no-dryRun')
+        runInTestRepo('pnpm nx run @zitadel/release:release -- --no-dry-run')
         console.log('✓ Full release process completed');
     }, 600000); // 10 minute timeout
 
@@ -169,7 +181,7 @@ describe.skipIf(!shouldRunE2E)('Release E2E (Real Fork)', () => {
         // Extract registry and repository from test repo
         const [owner] = testRepo.split('/');
         const registry = 'ghcr.io';
-        const testTag = process.env[expectReleaseVersionEnvVar];
+        const testTag = process.env[EXPECT_RELEASE_VERSION_ENV_VAR];
 
         // Expected images
         const expectedImages = [
@@ -178,7 +190,7 @@ describe.skipIf(!shouldRunE2E)('Release E2E (Real Fork)', () => {
         ];
 
         // Add 'latest' tag if this is a main branch release
-        if (process.env[expectLatestReleaseEnvVar] == 'true') {
+        if (process.env[EXPECT_LATEST_RELEASE_ENV_VAR] == 'true') {
             expectedImages.push(
                 { name: 'zitadel', tag: 'latest' },
                 { name: 'login', tag: 'latest' }
@@ -209,9 +221,9 @@ describe.skipIf(!shouldRunE2E)('Release E2E (Real Fork)', () => {
         console.log('✓ All Docker images verified');
     }, 600000); // 10 minute timeout for Docker operations
 
-    test.skipIf(process.env[expectGitHubReleaseEnvVar] === 'true')('should verify GitHub release exists with correct assets', async () => {
+    test.skipIf(process.env[EXPECT_GITHUB_RELEASE_ENV_VAR] === 'true')('should verify GitHub release exists with correct assets', async () => {
         console.log('Verifying GitHub release...');
-        const testTag = process.env[expectReleaseVersionEnvVar]!;
+        const testTag = process.env[EXPECT_RELEASE_VERSION_ENV_VAR]!;
 
         // Get release information
         const releaseInfo = runInTestRepo(
@@ -243,9 +255,9 @@ describe.skipIf(!shouldRunE2E)('Release E2E (Real Fork)', () => {
         console.log('  ✓ Login tarball found');
     }, 60000);
 
-    test.skipIf(process.env[expectGitHubReleaseEnvVar] === 'true')('should download and test binary', async () => {
+    test.skipIf(process.env[EXPECT_GITHUB_RELEASE_ENV_VAR] === 'true')('should download and test binary', async () => {
         console.log('\n📥 Downloading and testing binary...');
-        const testTag = process.env[expectReleaseVersionEnvVar]!;
+        const testTag = process.env[EXPECT_RELEASE_VERSION_ENV_VAR]!;
 
         const artifactsDir = `${E2E_TEST_DIR}/.e2e-artifacts`;
         mkdirSync(artifactsDir, { recursive: true });
