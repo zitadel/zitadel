@@ -159,18 +159,6 @@
     "signInWithAzureAD": "Sign in with AzureAD",
     "signInWithGithub": "Sign in with GitHub",
     "signInWithGitlab": "Sign in with GitLab",
-    "loginSuccess": {
-      "title": "Login successful",
-      "description": "You have successfully been loggedIn!"
-    },
-    "linkingSuccess": {
-      "title": "Account linked",
-      "description": "You have successfully linked your account!"
-    },
-    "registerSuccess": {
-      "title": "Registration successful",
-      "description": "You have successfully registered!"
-    },
     "loginError": {
       "title": "Login failed",
       "description": "An error occurred while trying to login."
@@ -194,6 +182,23 @@
       "description": "We couldn't complete the registration process.",
       "info": "Unable to determine the organization for registration. Please contact your administrator for assistance.",
       "backToLogin": "Back to Login"
+    },
+    "processing": {
+      "message": "Processing authentication...",
+      "noRedirect": "No redirect or error returned from server",
+      "unexpectedError": "An unexpected error occurred"
+    },
+    "errors": {
+      "missingParameters": "Missing required parameters",
+      "missingIdpInfo": "IDP information missing",
+      "idpNotFound": "Identity provider not found",
+      "linkingNotAllowed": "Linking is not allowed for this identity provider",
+      "linkingFailed": "Failed to link identity provider to account",
+      "autoLinkingFailed": "Failed to automatically link account",
+      "userCreationFailed": "Failed to create user account",
+      "orgResolutionFailed": "Could not determine organization for registration",
+      "sessionCreationFailed": "Could not create session or determine redirect",
+      "unknownError": "An unknown error occurred"
     }
   },
   "ldap": {
@@ -256,8 +261,25 @@
     "verify": {
       "title": "Authenticate with a passkey",
       "description": "Your device will ask for your fingerprint, face, or screen lock",
+      "info": {
+        "description": "Use the passkey you set up to authenticate securely. ",
+        "link": "Learn more about Passkeys"
+      },
       "usePassword": "Use password",
-      "submit": "Continue"
+      "submit": "Continue",
+      "errors": {
+        "couldNotRequestChallenge": "Could not request passkey challenge",
+        "couldNotVerifyPasskey": "Could not verify passkey",
+        "noResponseReceived": "Passkey verification failed - no response received",
+        "noRedirectProvided": "Passkey verification completed but no redirect was provided",
+        "couldNotRetrievePasskey": "An error occurred while retrieving passkey",
+        "verificationCancelled": "Passkey verification was cancelled",
+        "verificationFailed": "An error occurred during passkey verification",
+        "couldNotFindSession": "Could not find session",
+        "couldNotUpdateSession": "Could not update session",
+        "userNotFound": "User not found in the system",
+        "couldNotDetermineRedirect": "Could not determine redirect URL after passkey verification"
+      }
     },
     "set": {
       "title": "Setup a passkey",
@@ -386,7 +408,9 @@
       "couldNotCreateSession": "Could not create session",
       "noHostFound": "No host found",
       "userAlreadyVerified": "User is already verified!",
-      "couldNotResendInvite": "Could not resend invite"
+      "couldNotResendInvite": "Could not resend invite",
+      "inviteSendFailed": "Failed to send invitation email",
+      "emailSendFailed": "Failed to send verification email"
     }
   },
   "authenticator": {
@@ -428,6 +452,7 @@
     "unknownContext": "Could not get the context of the user. Make sure to enter the username first or provide a loginName as searchParam.",
     "sessionExpired": "Your current session has expired. Please login again.",
     "failedLoading": "Failed to load data. Please try again.",
-    "tryagain": "Try Again"
+    "tryagain": "Try Again",
+    "couldNotContinueSession": "Could not continue with session - missing user information"
   }
 }
