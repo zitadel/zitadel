@@ -42,7 +42,7 @@ func (a *AddInstanceDomainCommand) Events(ctx context.Context, _ *InvokeOpts) ([
 // Execute implements [Commander].
 func (a *AddInstanceDomainCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	instanceRepo := opts.instanceDomainRepo
-	err = instanceRepo.Add(ctx, pool, &AddInstanceDomain{
+	err = instanceRepo.Add(ctx, opts.DB(), &AddInstanceDomain{
 		InstanceID:  a.InstanceID,
 		Domain:      a.DomainName,
 		IsPrimary:   gu.Ptr(false),
@@ -87,7 +87,7 @@ func (a *AddInstanceDomainCommand) Validate(ctx context.Context, opts *InvokeOpt
 	}
 
 	domainRepo := opts.instanceDomainRepo
-	_, err = domainRepo.Get(ctx, pool, database.WithCondition(domainRepo.DomainCondition(database.TextOperationEqual, a.DomainName)))
+	_, err = domainRepo.Get(ctx, opts.DB(), database.WithCondition(domainRepo.DomainCondition(database.TextOperationEqual, a.DomainName)))
 	if err == nil {
 		return zerrors.ThrowAlreadyExists(nil, "DOM-CvQ8tf", "Errors.Instance.Domain.AlreadyExists")
 	}
