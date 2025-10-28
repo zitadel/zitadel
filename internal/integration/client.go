@@ -1323,3 +1323,12 @@ func (i *Instance) DeleteGroup(ctx context.Context, t *testing.T, id string) *gr
 	require.NoError(t, err)
 	return resp
 }
+
+func (i *Instance) AddUsersToGroup(ctx context.Context, t *testing.T, groupID string, userIDs []string) *group_v2.AddUsersToGroupResponse {
+	resp, err := i.Client.GroupV2.AddUsersToGroup(ctx, &group_v2.AddUsersToGroupRequest{
+		Id:      groupID,
+		UserIds: userIDs,
+	})
+	require.NoError(t, err)
+	return resp
+}
