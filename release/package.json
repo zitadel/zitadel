@@ -5,8 +5,8 @@
   "type": "module",
   "description": "Release tooling for ZITADEL",
   "scripts": {
-    "test-unit": "vitest run",
-    "test-unit-watch": "vitest",
+    "test-unit": "vitest run --testNamePattern='Release Unit'",
+    "test-e2e": "vitest run --testNamePattern='Release E2E'",
     "lint": "pnpm tsc --noEmit"
   },
   "dependencies": {

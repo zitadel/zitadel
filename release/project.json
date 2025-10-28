@@ -4,6 +4,12 @@
   "projectType": "application",
   "sourceRoot": "release",
   "targets": {
+    "test": {
+      "description": "Runs the tests for the release project. It is an alias for test-unit.",
+      "dependsOn": [
+        "test-unit"
+      ]
+    },
     "test-unit": {
       "description": "Runs unit tests for the release script",
       "inputs": [

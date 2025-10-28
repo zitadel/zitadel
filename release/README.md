@@ -21,6 +21,15 @@ Run tests in watch mode during development:
 pnpm nx test-unit-watch @zitadel/release
 ```
 
+## Running E2E Tests
+
+Run end-to-end tests against a real forked repository:
+```bash
+pnpm nx test-e2e @zitadel/release
+```
+
+See [E2E_TESTING.md](./E2E_TESTING.md) for detailed setup instructions and prerequisites.
+
 ## Running the Release
 
 Execute the release process:
