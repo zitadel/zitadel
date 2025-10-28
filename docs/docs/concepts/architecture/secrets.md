@@ -72,12 +72,13 @@ The following hash algorithms are supported:
 - md5plain: md5 digest of a password without salt [^2]
 - md5salted: md5 digest of a salted password [^2]
 - phpass: md5 digest with PHPass algorithm (used in WordPress) [^2]
+- drupal7: Custom hashing format used in Drupal 7 [^2]
 - sha2: implementation of crypt(3) SHA-256 & SHA-512
 - scrypt
 - pbkdf2
 
 [^1]: argon2 algorithms are currently disabled on ZITADEL Cloud due to its steep memory requirements.
-[^2]: md5 is insecure and can only be used to import and verify users, not hash new passwords.
+[^2]: md5 and drupal7 are insecure and can only be used to import and verify users, not hash new passwords.
 
 :::info
 ZITADEL updates stored hashes when the configured algorithm or its parameters are updated,
