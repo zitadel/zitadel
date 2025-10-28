@@ -33,8 +33,8 @@ CREATE TABLE zitadel.settings (
     , updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 
     , PRIMARY KEY (instance_id, id)
-    , FOREIGN KEY (instance_id) REFERENCES zitadel.instances(id)
-    , FOREIGN KEY (instance_id, organization_id) REFERENCES zitadel.organizations(instance_id, id)
+    , FOREIGN KEY (instance_id) REFERENCES zitadel.instances(id) ON DELETE CASCADE
+    , FOREIGN KEY (instance_id, organization_id) REFERENCES zitadel.organizations(instance_id, id) ON DELETE CASCADE
 );
 
 CREATE UNIQUE INDEX idx_settings_unique_type ON zitadel.settings (instance_id, organization_id, type, owner_type) NULLS NOT DISTINCT WHERE type != 'label';

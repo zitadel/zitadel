@@ -2,68 +2,68 @@ package json
 
 import (
 	"encoding/json"
-	"strings"
+	"fmt"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-var _ database.Change = (*change)(nil)
+var _ database.Change = (*jsonChanges)(nil)
 
-type JSONFieldChange struct {
+type JsonUpdate interface {
+	writeUpdate(builder *database.StatementBuilder, changes jsonChanges, i int) error
+	getPathValue() (string, string, error)
+}
+
+type FieldChange struct {
 	path  string
 	value any
 }
 
-func NewChange(path string, value any) JSONFieldChange {
-	return JSONFieldChange{
+func NewFieldChange(path string, value any) JsonUpdate {
+	return &FieldChange{
 		path:  path,
 		value: value,
 	}
 }
 
-type change struct {
-	column  database.Column
-	changes []JSONFieldChange
-}
-
-var _ database.Change = (*change)(nil)
-
-func NewJsonChange(col database.Column, changes ...JSONFieldChange) database.Change {
-	return &change{
-		column:  col,
-		changes: changes,
-	}
-}
-
-// func (c change) Write(builder *database.StatementBuilder) error {
-// 	return c.WriteUpdate(builder)
-// }
-
-func (c change) Write(builder *database.StatementBuilder) error {
-	c.column.WriteUnqualified(builder)
-	builder.WriteString(" = ")
-
-	return c.writeUpdate(builder, len(c.changes)-1)
-}
-
-func (c change) writeUpdate(builder *database.StatementBuilder, i int) error {
-	k, v := c.changes[i].path, c.changes[i].value
+func (c *FieldChange) getPathValue() (string, string, error) {
+	path, v := c.path, c.value
 
 	value, err := json.Marshal(v)
 	if err != nil {
+		return "", "", err
+	}
+
+	// var out string
+	// if valueString, ok := v.(string); ok {
+	// 	out = "\"" + string(valueString) + "\""
+	// } else {
+	// 	out = string(value)
+	// }
+
+	// return path, out, nil
+
+	return path, string(value), nil
+}
+
+func (c *FieldChange) writeUpdate(builder *database.StatementBuilder, changes jsonChanges, i int) error {
+	path, value, err := c.getPathValue()
+	if err != nil {
 		return err
 	}
+
+	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> path = %+v\n", path)
 	builder.WriteString("jsonb_set_lax(")
-	if i == 0 {
-		c.column.WriteUnqualified(builder)
+	// if i == 0 {
+	if i < 0 {
+		changes.column.WriteQualified(builder)
 	} else {
-		c.writeUpdate(builder, i-1)
+		changes.changes[i].writeUpdate(builder, changes, i-1)
 	}
-	builder.WriteString(", " + k)
-	if value == nil {
-		builder.WriteString(", " + strings.ToUpper(string(value)))
+	builder.WriteString(", " + path)
+	if value == "null" {
+		builder.WriteString(", " + string(value))
 	} else {
-		// builder.WriteString(", '" + string(value) + "'")
 		builder.WriteString(", '" + string(value) + "'")
 	}
 	builder.WriteString(", " + "true")
@@ -74,8 +74,169 @@ func (c change) writeUpdate(builder *database.StatementBuilder, i int) error {
 	return nil
 }
 
-// IsOnColumn implements [JSONFieldChange].
-func (c change) IsOnColumn(col database.Column) bool {
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+type ArrayChange struct {
+	path   string
+	value  any
+	remove bool
+}
+
+func NewArrayChange(path string, value any, remove bool) JsonUpdate {
+	return &ArrayChange{
+		path:   path,
+		value:  value,
+		remove: true,
+	}
+}
+
+func (c *ArrayChange) getPathValue() (string, string, error) {
+	path, v := c.path, c.value
+
+	value, err := json.Marshal(v)
+	if err != nil {
+		return "", "", err
+	}
+
+	return path, string(value), nil
+}
+
+func (c *ArrayChange) writeUpdate(builder *database.StatementBuilder, changes jsonChanges, i int) error {
+	path, value, err := c.getPathValue()
+	if err != nil {
+		return err
+	}
+
+	// jsonb_set(properties, '{attributes}', (properties->'attributes') - 'is_new');
+	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> path = %+v\n", path)
+
+	if c.remove {
+		builder.WriteString("jsonb_set(")
+		//
+		if i < 0 {
+			changes.column.WriteQualified(builder)
+		} else {
+			// changes.changes[i-1].writeUpdate(builder, changes, i-1)
+			c.writeUpdate(builder, changes, i-1)
+		}
+		//
+		builder.WriteString(", '{" + path + "}'")
+		//
+		builder.WriteString(", " + "(")
+		changes.column.WriteUnqualified(builder)
+		builder.WriteString("->'" + path + "')")
+		builder.WriteString(" - ")
+		if len(value) > 2 && value[0] == '"' && value[len(value)-1] == '"' {
+			builder.WriteString("'" + value[1:len(value)-1] + "'")
+		} else {
+			builder.WriteString(value)
+		}
+		builder.WriteString(")")
+	} else {
+
+		builder.WriteString("jsonb_insert(")
+		//
+		if i == 0 {
+			changes.column.WriteUnqualified(builder)
+		} else {
+			changes.changes[i-1].writeUpdate(builder, changes, i-1)
+		}
+		//
+		builder.WriteString(", " + "(CASE WHEN (SELECT ")
+		changes.column.WriteUnqualified(builder)
+		builder.WriteString(" ? '" + path + "') THEN")
+		builder.WriteString(" '{" + path + ", -1}'")
+		builder.WriteString(" ELSE '{" + path + "}'")
+		builder.WriteString(" END)::TEXT[]")
+		//
+		builder.WriteString(", " + "(CASE WHEN (SELECT ")
+		changes.column.WriteUnqualified(builder)
+		builder.WriteString(" ? '" + path + "') THEN")
+		builder.WriteString(" '" + value + "'::JSONB")
+		builder.WriteString(" ELSE jsonb_build_array(")
+		if len(value) > 2 && value[0] == '"' && value[len(value)-1] == '"' {
+			builder.WriteString("'" + value[1:len(value)-1] + "'")
+		} else {
+			builder.WriteString(value)
+		}
+		builder.WriteString(")")
+		builder.WriteString(" END)::JSONB")
+		//
+		builder.WriteString(", " + "true")
+
+		builder.WriteString(")")
+	}
+
+	return nil
+}
+
+var _ JsonUpdate = (*ArrayChange)(nil)
+
+// func JSONArrayRemove(path string, value any) JSONFieldChange {
+// 			path:  path,
+// 		value: value,
+// 	}
+// }
+
+type jsonChanges struct {
+	column  database.Column
+	changes []JsonUpdate
+}
+
+var _ database.Change = (*jsonChanges)(nil)
+
+func NewJsonChanges(col database.Column, changes ...JsonUpdate) database.Change {
+	return &jsonChanges{
+		column:  col,
+		changes: changes,
+	}
+}
+
+// func (c change) Write(builder *database.StatementBuilder) error {
+// 	return c.WriteUpdate(builder)
+// }
+
+func (c jsonChanges) Write(builder *database.StatementBuilder) error {
+	c.column.WriteUnqualified(builder)
+	builder.WriteString(" = ")
+
+	if c.changes == nil {
+		return nil
+	}
+	// return c.writeUpdate(builder, len(c.changes)-1)
+	// return c.changes[len(c.changes)-1].writeUpdate(builder, c, len(c.changes)-2)
+	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> len(c.changes) = %+v\n", len(c.changes))
+	return c.changes[len(c.changes)-1].writeUpdate(builder, c, len(c.changes)-1)
+}
+
+// func (c jsonChanges) writeUpdate(builder *database.StatementBuilder, i int) error {
+// 	path, v := c.changes[i].path, c.changes[i].value
+
+// 	value, err := json.Marshal(v)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	builder.WriteString("jsonb_set_lax(")
+// 	if i == 0 {
+// 		c.column.WriteUnqualified(builder)
+// 	} else {
+// 		c.writeUpdate(builder, i-1)
+// 	}
+// 	builder.WriteString(", " + path)
+// 	if value == nil {
+// 		builder.WriteString(", " + string(value))
+// 	} else {
+// 		builder.WriteString(", '" + string(value) + "'")
+// 	}
+// 	builder.WriteString(", " + "true")
+// 	builder.WriteString(", 'delete_key'")
+
+// 	builder.WriteString(")")
+
+// 	return nil
+// }
+
+func (c jsonChanges) IsOnColumn(col database.Column) bool {
 	return c.column.Equals(col)
 }
 

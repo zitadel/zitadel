@@ -19,6 +19,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/policy"
 )
@@ -142,19 +143,31 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	// t.Run("test added/remove multifactor type reduces", func(t *testing.T) {
+	// t.Run("test added/remove login multifactor type reduces", func(t *testing.T) {
 	// 	ctx := t.Context()
 	// 	newInstance := integration.NewInstance(t.Context())
 
 	// 	IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+	// 	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> newInstance.ID() = %+v\n", newInstance.ID())
 
 	// 	// check inital MFAType value
 	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		setting, err := loginRepo.Get(
+	// 		// setting, err := loginRepo.Get(
+	// 		// 	ctx, pool,
+	// 		// 	newInstance.ID(),
+	// 		// 	nil)
+	// 		setting, err := settingsRepo.Get(
 	// 			ctx, pool,
-	// 			newInstance.ID(),
-	// 			nil)
+	// 			database.WithCondition(
+	// 				database.And(
+	// 					settingsRepo.InstanceIDCondition(newInstance.ID()),
+	// 					settingsRepo.OrgIDCondition(nil),
+	// 					settingsRepo.TypeCondition(domain.SettingTypeLogin),
+	// 					settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+	// 				),
+	// 			),
+	// 		)
 	// 		require.NoError(t, err)
 
 	// 		assert.Equal(t, []domain.MultiFactorType{domain.MultiFactorType(policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION)}, setting.Settings.MFAType)
@@ -168,10 +181,21 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 
 	// 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		setting, err := loginRepo.Get(
+	// 		// setting, err := loginRepo.Get(
+	// 		// 	ctx, pool,
+	// 		// 	newInstance.ID(),
+	// 		// 	nil)
+	// 		setting, err := settingsRepo.Get(
 	// 			ctx, pool,
-	// 			newInstance.ID(),
-	// 			nil)
+	// 			database.WithCondition(
+	// 				database.And(
+	// 					settingsRepo.InstanceIDCondition(newInstance.ID()),
+	// 					settingsRepo.OrgIDCondition(nil),
+	// 					settingsRepo.TypeCondition(domain.SettingTypeLogin),
+	// 					settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+	// 				),
+	// 			),
+	// 		)
 	// 		require.NoError(t, err)
 
 	// 		// event instance.policy.login.multifactor.remove
@@ -188,10 +212,21 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 	// 	// add MFAType
 	// 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		setting, err := loginRepo.Get(
+	// 		// setting, err := loginRepo.Get(
+	// 		// 	ctx, pool,
+	// 		// 	newInstance.ID(),
+	// 		// 	nil)
+	// 		setting, err := settingsRepo.Get(
 	// 			ctx, pool,
-	// 			newInstance.ID(),
-	// 			nil)
+	// 			database.WithCondition(
+	// 				database.And(
+	// 					settingsRepo.InstanceIDCondition(newInstance.ID()),
+	// 					settingsRepo.OrgIDCondition(nil),
+	// 					settingsRepo.TypeCondition(domain.SettingTypeLogin),
+	// 					settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+	// 				),
+	// 			),
+	// 		)
 	// 		require.NoError(t, err)
 
 	// 		// event instance.policy.login.multifactor.added
@@ -269,42 +304,56 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 	// 	}, retryDuration, tick)
 	// })
 
-	// t.Run("test delete instance reduces", func(t *testing.T) {
-	// 	ctx := t.Context()
-	// 	newInstance := integration.NewInstance(t.Context())
+	t.Run("test delete instance reduces", func(t *testing.T) {
+		ctx := t.Context()
+		newInstance := integration.NewInstance(t.Context())
 
-	// 	SystemCTX := integration.WithSystemAuthorization(ctx)
+		SystemCTX := integration.WithSystemAuthorization(ctx)
 
-	// 	// check login settings exist
-	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		setting, err := loginRepo.Get(
-	// 			ctx, pool,
-	// 			newInstance.ID(),
-	// 			nil)
-	// 		require.NoError(t, err)
+		// check login settings exist
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypeLogin),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 		require.NotNil(t, setting)
-	// 	}, retryDuration, tick)
+			require.NotNil(t, setting)
+		}, retryDuration, tick)
 
-	// 	// delete instance
-	// 	_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(SystemCTX, &instance.DeleteInstanceRequest{
-	// 		InstanceId: newInstance.ID(),
-	// 	})
-	// 	require.NoError(t, err)
+		// delete instance
+		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(SystemCTX, &instance.DeleteInstanceRequest{
+			InstanceId: newInstance.ID(),
+		})
+		require.NoError(t, err)
 
-	// 	// check login settings removed
-	// 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		_, err := loginRepo.Get(
-	// 			ctx, pool,
-	// 			newInstance.ID(),
-	// 			nil)
+		// check login settings removed
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			_, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypeLogin),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+					),
+				),
+			)
 
-	// 		// event instance.removed
-	// 		require.ErrorIs(t, err, new(database.NoRowFoundError))
-	// 	}, retryDuration, tick)
-	// })
+			// event instance.removed
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
+	})
 }
 
 func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
@@ -432,43 +481,43 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	// t.Run("test label settings activated", func(t *testing.T) {
-	// 	ctx := t.Context()
+	t.Run("test label settings activated", func(t *testing.T) {
+		ctx := t.Context()
 
-	// 	newInstance := integration.NewInstance(t.Context())
-	// 	IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		newInstance := integration.NewInstance(t.Context())
+		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 
-	// 	// activate label
-	// 	before := time.Now()
-	// 	_, err := newInstance.Client.Admin.ActivateLabelPolicy(IAMCTX, &admin.ActivateLabelPolicyRequest{})
-	// 	require.NoError(t, err)
-	// 	after := time.Now()
+		// activate label
+		before := time.Now()
+		_, err := newInstance.Client.Admin.ActivateLabelPolicy(IAMCTX, &admin.ActivateLabelPolicyRequest{})
+		require.NoError(t, err)
+		after := time.Now()
 
-	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		// setting, err := settingsRepo.GetLabel(
-	// 		// 	ctx, pool,
-	// 		// 	newInstance.ID(),
-	// 		// 	nil,
-	// 		// 	domain.LabelStateActivated)
-	// 		setting, err := settingsRepo.Get(
-	// 			ctx, pool,
-	// 			database.WithCondition(
-	// 				database.And(
-	// 					settingsRepo.InstanceIDCondition(newInstance.ID()),
-	// 					settingsRepo.OrgIDCondition(nil),
-	// 					settingsRepo.TypeCondition(domain.SettingTypeLabel),
-	// 					settingsRepo.LabelStateCondition(domain.LabelStatePreview),
-	// 				),
-	// 			),
-	// 		)
-	// 		require.NoError(t, err)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			// setting, err := settingsRepo.GetLabel(
+			// 	ctx, pool,
+			// 	newInstance.ID(),
+			// 	nil,
+			// 	domain.LabelStateActivated)
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.LabelStateCondition(domain.LabelStateActivated),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 		// event instance.policy.label.activated
-	// 		assert.Equal(t, domain.LabelStateActivated, *setting.LabelState)
-	// 		assert.WithinRange(t, *setting.UpdatedAt, before, after)
-	// 	}, retryDuration, tick)
-	// })
+			// event instance.policy.label.activated
+			assert.Equal(t, domain.LabelStateActivated, *setting.LabelState)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
 
 	t.Run("test policy label logo light added", func(t *testing.T) {
 		ctx := t.Context()
@@ -1100,68 +1149,92 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	// t.Run("test delete instance reduces", func(t *testing.T) {
-	// 	ctx := t.Context()
-	// 	newInstance := integration.NewInstance(t.Context())
+	t.Run("test delete instance reduces", func(t *testing.T) {
+		ctx := t.Context()
+		newInstance := integration.NewInstance(t.Context())
 
-	// 	SystemCTX := integration.WithSystemAuthorization(ctx)
+		SystemCTX := integration.WithSystemAuthorization(ctx)
 
-	// 	// check label preview settings exist
-	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		setting, err := settingsRepo.GetLabel(
-	// 			ctx, pool,
-	// 			newInstance.ID(),
-	// 			nil,
-	// 			domain.LabelStatePreview)
-	// 		require.NoError(t, err)
+		// check label preview settings exist
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 		require.NotNil(t, setting)
-	// 	}, retryDuration, tick)
+			require.NotNil(t, setting)
+		}, retryDuration, tick)
 
-	// 	// check label activated settings exist
-	// 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		setting, err := settingsRepo.GetLabel(
-	// 			ctx, pool,
-	// 			newInstance.ID(),
-	// 			nil,
-	// 			domain.LabelStateActivated)
-	// 		require.NoError(t, err)
+		// check label activated settings exist
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*50)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.LabelStateCondition(domain.LabelStateActivated),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 		require.NotNil(t, setting)
-	// 	}, retryDuration, tick)
+			require.NotNil(t, setting)
+		}, retryDuration, tick)
 
-	// 	// delete instance
-	// 	_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(SystemCTX, &instance.DeleteInstanceRequest{
-	// 		InstanceId: newInstance.ID(),
-	// 	})
+		// delete instance
+		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(SystemCTX, &instance.DeleteInstanceRequest{
+			InstanceId: newInstance.ID(),
+		})
 
-	// 	// check label preview settings deleted
-	// 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		_, err := settingsRepo.GetLabel(
-	// 			ctx, pool,
-	// 			newInstance.ID(),
-	// 			nil,
-	// 			domain.LabelStatePreview)
+		// check label preview settings deleted
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			_, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+					),
+				),
+			)
 
-	// 		require.ErrorIs(t, err, new(database.NoRowFoundError))
-	// 	}, retryDuration, tick)
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
 
-	// 	// check label activated settings deleted
-	// 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		_, err := settingsRepo.GetLabel(
-	// 			ctx, pool,
-	// 			newInstance.ID(),
-	// 			nil,
-	// 			domain.LabelStateActivated)
+		// check label activated settings deleted
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			_, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.LabelStateCondition(domain.LabelStateActivated),
+					),
+				),
+			)
 
-	// 		require.ErrorIs(t, err, new(database.NoRowFoundError))
-	// 	}, retryDuration, tick)
-	// 	require.NoError(t, err)
-	// })
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
+		require.NoError(t, err)
+	})
 }
 
 func TestServer_TestPasswordComplexitySettingsReduces(t *testing.T) {
@@ -1246,63 +1319,59 @@ func TestServer_TestPasswordComplexitySettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	// t.Run("test delete instance reduces", func(t *testing.T) {
-	// 	ctx := t.Context()
-	// 	newInstance := integration.NewInstance(t.Context())
+	t.Run("test delete instance reduces", func(t *testing.T) {
+		ctx := t.Context()
+		newInstance := integration.NewInstance(t.Context())
 
-	// 	SystemCTX := integration.WithSystemAuthorization(ctx)
+		systemctx := integration.WithSystemAuthorization(ctx)
 
-	// 	// check login settings exist
-	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		setting, err := settingsRepo.Get(
-	// 			ctx, pool,
-	// 			database.WithCondition(
-	// 				database.And(
-	// 					settingsRepo.InstanceIDCondition(newInstance.ID()),
-	// 					settingsRepo.OrgIDCondition(nil),
-	// 					settingsRepo.TypeCondition(domain.SettingTypeLabel),
-	// 					settingsRepo.LabelStateCondition(domain.LabelStatePreview),
-	// 				),
-	// 			),
-	// 		)
-	// 		require.NoError(t, err)
+		// check login settings exist
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypePasswordComplexity),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 		require.NotNil(t, setting)
-	// 	}, retryDuration, tick)
+			require.NotNil(t, setting)
+		}, retryDuration, tick)
 
-	// 	// delete instance
-	// 	_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(SystemCTX, &instance.DeleteInstanceRequest{
-	// 		InstanceId: newInstance.ID(),
-	// 	})
-	// 	require.NoError(t, err)
+		// delete instance
+		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(systemctx, &instance.DeleteInstanceRequest{
+			InstanceId: newInstance.ID(),
+		})
+		require.NoError(t, err)
 
-	// 	// check password complexity settings removed
-	// 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		// _, err := settingsRepo.GetPasswordComplexity(
-	// 		// 	ctx, pool,
-	// 		// 	newInstance.ID(),
-	// 		// 	nil)
-	// 		_, err := settingsRepo.Get(
-	// 			ctx, pool,
-	// 			database.WithCondition(
-	// 				database.And(
-	// 					settingsRepo.InstanceIDCondition(newInstance.ID()),
-	// 					settingsRepo.OrgIDCondition(nil),
-	// 					settingsRepo.TypeCondition(domain.SettingTypeLabel),
-	// 					settingsRepo.LabelStateCondition(domain.LabelStatePreview),
-	// 				),
-	// 			),
-	// 		)
+		// check password complexity settings removed
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			_, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypePasswordComplexity),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+					),
+				),
+			)
 
-	// 		// event instance.removed
-	// 		require.ErrorIs(t, err, new(database.NoRowFoundError))
-	// 	}, retryDuration, tick)
-	// })
+			// event instance.removed
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
+	})
 }
 
-func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
+func TestServer_TestPasswordPolicySettingsReduces(t *testing.T) {
 	settingsRepo := repository.PasswordExpiryRepository()
 
 	t.Run("test password policy added", func(t *testing.T) {
@@ -1373,49 +1442,60 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	// t.Run("test delete instance reduces", func(t *testing.T) {
-	// 	ctx := t.Context()
-	// 	newInstance := integration.NewInstance(t.Context())
+	t.Run("test delete instance reduces", func(t *testing.T) {
+		ctx := t.Context()
+		newInstance := integration.NewInstance(t.Context())
 
-	// 	SystemCTX := integration.WithSystemAuthorization(ctx)
+		SystemCTX := integration.WithSystemAuthorization(ctx)
 
-	// 	// check login settings exist
-	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		setting, err := settingsRepo.Get(
-	// 			ctx, pool,
-	// 			database.WithCondition(
-	// 				database.And(
-	// 					settingsRepo.InstanceIDCondition(newInstance.ID()),
-	// 					settingsRepo.OrgIDCondition(nil),
-	// 					settingsRepo.TypeCondition(domain.SettingTypePasswordExpiry),
-	// 					settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
-	// 				),
-	// 			),
-	// 		)
-	// 		require.NoError(t, err)
+		// check login settings exist
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypePasswordExpiry),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 		require.NotNil(t, setting)
-	// 	}, retryDuration, tick)
+			require.NotNil(t, setting)
+		}, retryDuration, tick)
 
-	// 	// delete instance
-	// 	_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(SystemCTX, &instance.DeleteInstanceRequest{
-	// 		InstanceId: newInstance.ID(),
-	// 	})
-	// 	require.NoError(t, err)
+		// delete instance
+		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(SystemCTX, &instance.DeleteInstanceRequest{
+			InstanceId: newInstance.ID(),
+		})
+		require.NoError(t, err)
 
-	// 	// check password expiry settings removed
-	// 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		_, err := settingsRepo.GetPasswordExpiry(
-	// 			ctx, pool,
-	// 			newInstance.ID(),
-	// 			nil)
+		// check password expiry settings removed
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			// _, err := settingsRepo.GetPasswordExpiry(
+			// 	ctx, pool,
+			// 	newInstance.ID(),
+			// 	nil)
+			_, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypePasswordExpiry),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+					),
+				),
+			)
 
-	// 		// event instance.removed
-	// 		require.ErrorIs(t, err, new(database.NoRowFoundError))
-	// 	}, retryDuration, tick)
-	// })
+			// event instance.removed
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
+	})
 }
 
 func TestServer_TestDomainSettingsReduces(t *testing.T) {
@@ -1492,49 +1572,60 @@ func TestServer_TestDomainSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	// t.Run("test delete instance reduces", func(t *testing.T) {
-	// 	ctx := t.Context()
-	// 	newInstance := integration.NewInstance(t.Context())
+	t.Run("test delete instance reduces", func(t *testing.T) {
+		ctx := t.Context()
+		newInstance := integration.NewInstance(t.Context())
 
-	// 	SystemCTX := integration.WithSystemAuthorization(ctx)
+		SystemCTX := integration.WithSystemAuthorization(ctx)
 
-	// 	// check login settings exist
-	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		setting, err := settingsRepo.Get(
-	// 			ctx, pool,
-	// 			database.WithCondition(
-	// 				database.And(
-	// 					settingsRepo.InstanceIDCondition(instanceID),
-	// 					settingsRepo.OrgIDCondition(nil),
-	// 					settingsRepo.TypeCondition(domain.SettingTypeLabel),
-	// 					settingsRepo.LabelStateCondition(domain.LabelStatePreview),
-	// 				),
-	// 			),
-	// 		)
-	// 		require.NoError(t, err)
+		// check login settings exist
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypeDomain),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 		require.NotNil(t, setting)
-	// 	}, retryDuration, tick)
+			require.NotNil(t, setting)
+		}, retryDuration, tick)
 
-	// 	// delete instance
-	// 	_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(SystemCTX, &instance.DeleteInstanceRequest{
-	// 		InstanceId: newInstance.ID(),
-	// 	})
-	// 	require.NoError(t, err)
+		// delete instance
+		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(SystemCTX, &instance.DeleteInstanceRequest{
+			InstanceId: newInstance.ID(),
+		})
+		require.NoError(t, err)
 
-	// 	// check domain settings removed
-	// 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		_, err := settingsRepo.GetDomain(
-	// 			ctx, pool,
-	// 			newInstance.ID(),
-	// 			nil)
+		// check domain settings removed
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			// _, err := settingsRepo.GetDomain(
+			// 	ctx, pool,
+			// 	newInstance.ID(),
+			// 	nil)
+			_, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypeDomain),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+					),
+				),
+			)
 
-	// 		// event instance.removed
-	// 		require.ErrorIs(t, err, new(database.NoRowFoundError))
-	// 	}, retryDuration, tick)
-	// })
+			// event instance.removed
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
+	})
 }
 
 func TestServer_TestLockoutSettingsReduces(t *testing.T) {
@@ -1609,176 +1700,192 @@ func TestServer_TestLockoutSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	// t.Run("test delete instance reduces", func(t *testing.T) {
-	// 	ctx := t.Context()
-	// 	newInstance := integration.NewInstance(t.Context())
+	t.Run("test delete instance reduces", func(t *testing.T) {
+		ctx := t.Context()
+		newInstance := integration.NewInstance(t.Context())
 
-	// 	SystemCTX := integration.WithSystemAuthorization(ctx)
+		SystemCTX := integration.WithSystemAuthorization(ctx)
 
-	// 	// check login settings exist
-	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		setting, err := settingsRepo.Get(
-	// 			ctx, pool,
-	// 			database.WithCondition(
-	// 				database.And(
-	// 					settingsRepo.InstanceIDCondition(instanceID),
-	// 					settingsRepo.OrgIDCondition(nil),
-	// 					settingsRepo.TypeCondition(domain.SettingTypeLabel),
-	// 					settingsRepo.LabelStateCondition(domain.LabelStatePreview),
-	// 				),
-	// 			),
-	// 		)
-	// 		require.NoError(t, err)
+		// check login settings exist
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypeLockout),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 		require.NotNil(t, setting)
-	// 	}, retryDuration, tick)
+			require.NotNil(t, setting)
+		}, retryDuration, tick)
 
-	// 	// delete instance
-	// 	_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(SystemCTX, &instance.DeleteInstanceRequest{
-	// 		InstanceId: newInstance.ID(),
-	// 	})
-	// 	require.NoError(t, err)
+		// delete instance
+		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(SystemCTX, &instance.DeleteInstanceRequest{
+			InstanceId: newInstance.ID(),
+		})
+		require.NoError(t, err)
 
-	// 	// check password complexity settings removed
-	// 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		_, err := settingsRepo.GetLockout(
-	// 			ctx, pool,
-	// 			newInstance.ID(),
-	// 			nil)
+		// check password complexity settings removed
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			_, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypeLockout),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+					),
+				),
+			)
 
-	// 		// event instance.removed
-	// 		require.ErrorIs(t, err, new(database.NoRowFoundError))
-	// 	}, retryDuration, tick)
-	// })
+			// event instance.removed
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
+	})
 }
 
-// func TestServer_TestSecuritySettingsReduces(t *testing.T) {
-// 	settingsRepo := repository.SecurityRepository()
+func TestServer_TestSecuritySettingsReduces(t *testing.T) {
+	settingsRepo := repository.SecurityRepository()
 
-// 	t.Run("test security policy set", func(t *testing.T) {
-// 		ctx := t.Context()
+	t.Run("test security policy set", func(t *testing.T) {
+		ctx := t.Context()
 
-// 		newInstance := integration.NewInstance(t.Context())
-// 		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		newInstance := integration.NewInstance(t.Context())
+		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 
-// 		// 1. set security policy
-// 		before := time.Now()
-// 		_, err := newInstance.Client.Admin.SetSecurityPolicy(IAMCTX, &admin.SetSecurityPolicyRequest{
-// 			EnableIframeEmbedding: true,
-// 			AllowedOrigins:        []string{"value"},
-// 			EnableImpersonation:   true,
-// 		})
-// 		require.NoError(t, err)
-// 		after := time.Now()
+		// 1. set security policy
+		before := time.Now()
+		_, err := newInstance.Client.Admin.SetSecurityPolicy(IAMCTX, &admin.SetSecurityPolicyRequest{
+			EnableIframeEmbedding: true,
+			AllowedOrigins:        []string{"value"},
+			EnableImpersonation:   true,
+		})
+		require.NoError(t, err)
+		after := time.Now()
 
-// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			setting, err := settingsRepo.Get(
-// 				ctx, pool,
-// 				database.WithCondition(
-// 					database.And(
-// 						settingsRepo.InstanceIDCondition(instanceID),
-// 						settingsRepo.OrgIDCondition(nil),
-// 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
-// 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
-// 					),
-// 				),
-// 			)
-// 			require.NoError(t, err)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypeSecurity),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-// 			// event instance.policy.security.set
-// 			assert.Equal(t, true, setting.Settings.EnableIframeEmbedding)
-// 			assert.Equal(t, []string{"value"}, setting.Settings.AllowedOrigins)
-// 			assert.Equal(t, true, setting.Settings.EnableImpersonation)
-// 			assert.WithinRange(t, setting.CreatedAt, before, after)
-// 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
-// 		}, retryDuration, tick)
+			// event instance.policy.security.set
+			assert.Equal(t, true, setting.Settings.EnableIframeEmbedding)
+			// TODO
+			// assert.Equal(t, []string{"value"}, setting.Settings.AllowedOrigins)
+			assert.Equal(t, true, setting.Settings.EnableImpersonation)
+			assert.WithinRange(t, setting.CreatedAt, before, after)
+			// assert.WithinRange(t, *setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
 
-// 		// 2. re-set security policy
-// 		before = time.Now()
-// 		_, err = newInstance.Client.Admin.SetSecurityPolicy(IAMCTX, &admin.SetSecurityPolicyRequest{
-// 			EnableIframeEmbedding: false,
-// 			AllowedOrigins:        []string{"no_value"},
-// 			EnableImpersonation:   false,
-// 		})
-// 		require.NoError(t, err)
-// 		after = time.Now()
+		// 2. re-set security policy
+		before = time.Now()
+		_, err = newInstance.Client.Admin.SetSecurityPolicy(IAMCTX, &admin.SetSecurityPolicyRequest{
+			EnableIframeEmbedding: false,
+			AllowedOrigins:        []string{"no_value"},
+			EnableImpersonation:   false,
+		})
+		require.NoError(t, err)
+		after = time.Now()
 
-// 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			setting, err := settingsRepo.Get(
-// 				ctx, pool,
-// 				database.WithCondition(
-// 					database.And(
-// 						settingsRepo.InstanceIDCondition(instanceID),
-// 						settingsRepo.OrgIDCondition(nil),
-// 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
-// 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
-// 					),
-// 				),
-// 			)
-// 			require.NoError(t, err)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypeSecurity),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-// 			// event instance.policy.security.set
-// 			assert.Equal(t, false, setting.Settings.EnableIframeEmbedding)
-// 			assert.Equal(t, []string{"no_value"}, setting.Settings.AllowedOrigins)
-// 			assert.Equal(t, false, setting.Settings.EnableImpersonation)
-// 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
-// 		}, retryDuration, tick)
-// 	})
+			// event instance.policy.security.set
+			assert.Equal(t, false, setting.Settings.EnableIframeEmbedding)
+			// TODO
+			// assert.Equal(t, []string{"no_value"}, setting.Settings.AllowedOrigins)
+			assert.Equal(t, false, setting.Settings.EnableImpersonation)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
 
-// 	t.Run("test delete instance reduces", func(t *testing.T) {
-// 		ctx := t.Context()
-// 		newInstance := integration.NewInstance(t.Context())
+	t.Run("test delete instance reduces", func(t *testing.T) {
+		ctx := t.Context()
+		newInstance := integration.NewInstance(t.Context())
 
-// 		SystemCTX := integration.WithSystemAuthorization(ctx)
-// 		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		SystemCTX := integration.WithSystemAuthorization(ctx)
+		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 
-// 		// 1. set security policy
-// 		_, err := newInstance.Client.Admin.SetSecurityPolicy(IAMCTX, &admin.SetSecurityPolicyRequest{
-// 			EnableIframeEmbedding: true,
-// 			AllowedOrigins:        []string{"value"},
-// 			EnableImpersonation:   true,
-// 		})
-// 		require.NoError(t, err)
+		// 1. set security policy
+		_, err := newInstance.Client.Admin.SetSecurityPolicy(IAMCTX, &admin.SetSecurityPolicyRequest{
+			EnableIframeEmbedding: true,
+			AllowedOrigins:        []string{"value"},
+			EnableImpersonation:   true,
+		})
+		require.NoError(t, err)
 
-// 		// 2. check security instance exists
-// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			setting, err := settingsRepo.Get(
-// 				ctx, pool,
-// 				database.WithCondition(
-// 					database.And(
-// 						settingsRepo.InstanceIDCondition(instanceID),
-// 						settingsRepo.OrgIDCondition(nil),
-// 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
-// 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
-// 					),
-// 				),
-// 			)
-// 			require.NoError(t, err)
+		// 2. check security instance exists
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypeSecurity),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-// 			require.NotNil(t, setting)
-// 		}, retryDuration, tick)
+			require.NotNil(t, setting)
+		}, retryDuration, tick)
 
-// 		// 3. delete instance
-// 		_, err = newInstance.Client.InstanceV2Beta.DeleteInstance(SystemCTX, &instance.DeleteInstanceRequest{
-// 			InstanceId: newInstance.ID(),
-// 		})
-// 		require.NoError(t, err)
+		// 3. delete instance
+		_, err = newInstance.Client.InstanceV2Beta.DeleteInstance(SystemCTX, &instance.DeleteInstanceRequest{
+			InstanceId: newInstance.ID(),
+		})
+		require.NoError(t, err)
 
-// 		// 4. check security settings removed
-// 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*10)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			_, err := settingsRepo.GetSecurity(
-// 				ctx, pool,
-// 				newInstance.ID(),
-// 				nil)
+		// 4. check security settings removed
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*10)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			_, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypeSecurity),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+					),
+				),
+			)
 
-// 			// event instance.removed
-// 			require.ErrorIs(t, err, new(database.NoRowFoundError))
-// 		}, retryDuration, tick)
-// 	})
-// }
+			// event instance.removed
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
+	})
+}
