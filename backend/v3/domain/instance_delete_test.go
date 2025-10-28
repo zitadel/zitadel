@@ -94,14 +94,10 @@ func TestDeleteInstanceCommand_Validate(t *testing.T) {
 func TestDeleteInstanceCommand_Events(t *testing.T) {
 	t.Parallel()
 	// Given
-	cmd := &domain.DeleteInstanceCommand{
-		ID:              "instance-1",
-		InstanceName:    "instance-name",
-		InstanceDomains: []string{"domain1.com", "domain2.com"},
-	}
+	cmd := domain.NewDeleteInstanceCommand("instance-1")
 	expectedEvents := []eventstore.Command{
-		instance.NewInstanceRemovedEvent(context.Background(), &instance.NewAggregate(cmd.ID).Aggregate, cmd.InstanceName, cmd.InstanceDomains),
-		milestone.NewReachedEvent(context.Background(), milestone.NewInstanceAggregate(cmd.ID), milestone.InstanceDeleted),
+		instance.NewInstanceRemovedEvent(context.Background(), &instance.NewAggregate("instance-1").Aggregate, "instance-1", []string{}),
+		milestone.NewReachedEvent(context.Background(), milestone.NewInstanceAggregate("instance-1"), milestone.InstanceDeleted),
 	}
 
 	// Test

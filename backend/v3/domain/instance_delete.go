@@ -14,8 +14,12 @@ import (
 type DeleteInstanceCommand struct {
 	ID string `json:"id"`
 
+	// InstanceDomains is public for testing purposes
+	// do not use this field
 	InstanceDomains []string
-	InstanceName    string
+	// InstanceName is public for testing purposes
+	// do not use this field
+	InstanceName string
 }
 
 // RequiresTransaction implements [Transactional].
