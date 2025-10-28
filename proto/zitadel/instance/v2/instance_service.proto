@@ -18,7 +18,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/instance/v2;instance";
 // Service to manage instances and their domains.
 // The service provides methods to create, update, delete and list instances and their domains.
 //
-// Other than most services in ZITADEL, the instance service allows accessing data not only from
+// Contrary to most services in ZITADEL, the instance service allows accessing data not only from
 // the current instance, but also from other instances.
 service InstanceService {
 
@@ -159,7 +159,7 @@ service InstanceService {
   // email templates, and more.
   // This can be used in cases where the API is accessed through a different domain
   // than the instance domain, e.g. proxy setups and custom login UIs.
-  // Other than custom domains, are not used to route requests to this instance
+  // Unlike custom domain, trusted domains are not used to route requests to this instance
   // and therefore do not need to be uniquely assigned to an instance.
   //
   // Required permissions:
@@ -249,6 +249,7 @@ message GetInstanceRequest {
 }
 
 message GetInstanceResponse {
+  // The instance matching the instance ID
   zitadel.instance.v2.Instance instance = 1;
 }
 
@@ -308,7 +309,7 @@ message ListInstancesResponse {
 }
 
 message AddCustomDomainRequest {
-  // // InstanceID is the unique ID of the instance to which the domain will be added.
+  // InstanceID is the unique ID of the instance to which the domain will be added.
   string instance_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -421,7 +422,7 @@ message AddTrustedDomainRequest {
   // email templates, and more.
   // This can be used in cases where the API is accessed through a different domain
   // than the instance domain, e.g. proxy setups and custom login UIs.
-  // Other than custom domains, are not used to route requests to this instance
+  // Unlike custom domains, trusted domains are not used to route requests to this instance
   // and therefore do not need to be uniquely assigned to an instance.
   string trusted_domain = 2 [
     (validate.rules).string = {min_len: 1, max_len: 253},

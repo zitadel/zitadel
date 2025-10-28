@@ -905,27 +905,6 @@ func (c *Commands) setIAMProject(ctx context.Context, iamAgg *eventstore.Aggrega
 	return instance.NewIAMProjectSetEvent(ctx, iamAgg, projectID), nil
 }
 
-func (c *Commands) prepareUpdateInstance(a *instance.Aggregate, name string) preparation.Validation {
-	return func() (preparation.CreateCommands, error) {
-		if name == "" {
-			return nil, zerrors.ThrowInvalidArgument(nil, "INST-092mid", "Errors.Invalid.Argument")
-		}
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel, err := getInstanceWriteModel(ctx, filter)
-			if err != nil {
-				return nil, err
-			}
-			if !writeModel.State.Exists() {
-				return nil, zerrors.ThrowNotFound(nil, "INST-nuso2m", "Errors.Instance.NotFound")
-			}
-			if writeModel.Name == name {
-				return nil, nil
-			}
-			return []eventstore.Command{instance.NewInstanceChangedEvent(ctx, &a.Aggregate, name)}, nil
-		}, nil
-	}
-}
-
 func (c *Commands) prepareSetDefaultLanguage(a *instance.Aggregate, defaultLanguage language.Tag) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if err := domain.LanguageIsDefined(defaultLanguage); err != nil {
