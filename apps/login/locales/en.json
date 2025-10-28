@@ -262,7 +262,20 @@
       "title": "Authenticate with a passkey",
       "description": "Your device will ask for your fingerprint, face, or screen lock",
       "usePassword": "Use password",
-      "submit": "Continue"
+      "submit": "Continue",
+      "errors": {
+        "couldNotRequestChallenge": "Could not request passkey challenge",
+        "couldNotVerifyPasskey": "Could not verify passkey",
+        "noResponseReceived": "Passkey verification failed - no response received",
+        "noRedirectProvided": "Passkey verification completed but no redirect was provided",
+        "couldNotRetrievePasskey": "An error occurred while retrieving passkey",
+        "verificationCancelled": "Passkey verification was cancelled",
+        "verificationFailed": "An error occurred during passkey verification",
+        "couldNotFindSession": "Could not find session",
+        "couldNotUpdateSession": "Could not update session",
+        "userNotFound": "User not found in the system",
+        "couldNotDetermineRedirect": "Could not determine redirect URL after passkey verification"
+      }
     },
     "set": {
       "title": "Setup a passkey",
@@ -435,6 +448,7 @@
     "unknownContext": "Could not get the context of the user. Make sure to enter the username first or provide a loginName as searchParam.",
     "sessionExpired": "Your current session has expired. Please login again.",
     "failedLoading": "Failed to load data. Please try again.",
-    "tryagain": "Try Again"
+    "tryagain": "Try Again",
+    "couldNotContinueSession": "Could not continue with session - missing user information"
   }
 }

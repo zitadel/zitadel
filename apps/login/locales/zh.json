@@ -262,7 +262,23 @@
       "title": "使用密钥认证",
       "description": "您的设备将请求指纹、面部识别或屏幕锁",
       "usePassword": "使用密码",
-      "submit": "继续"
+      "submit": "继续",
+      "errors": {
+        "couldNotRequestChallenge": "无法请求密钥挑战",
+        "couldNotVerifyPasskey": "无法验证密钥",
+        "noResponseReceived": "密钥验证失败 - 未收到响应",
+        "noRedirectProvided": "密钥验证完成但未提供重定向",
+        "couldNotRetrievePasskey": "检索密钥时发生错误",
+        "verificationCancelled": "密钥验证已取消",
+        "verificationFailed": "密钥验证期间发生错误",
+        "couldNotFindSession": "找不到会话",
+        "couldNotUpdateSession": "无法更新会话",
+        "userNotFound": "系统中未找到用户",
+        "couldNotDetermineRedirect": "密钥验证后无法确定重定向URL",
+        "couldNotSetSession": "无法设置会话",
+        "couldNotGetUser": "无法检索用户数据",
+        "couldNotRetrieveSessionCookie": "无法检索会话Cookie"
+      }
     },
     "set": {
       "title": "设置密钥",
@@ -435,6 +451,7 @@
     "unknownContext": "无法获取用户的上下文。请先输入用户名或提供 loginName 作为搜索参数。",
     "sessionExpired": "当前会话已过期，请重新登录。",
     "failedLoading": "加载数据失败，请再试一次。",
-    "tryagain": "重试"
+    "tryagain": "重试",
+    "couldNotContinueSession": "无法继续会话 - 缺少用户信息"
   }
 }
