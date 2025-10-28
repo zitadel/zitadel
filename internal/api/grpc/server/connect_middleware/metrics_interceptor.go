@@ -75,7 +75,10 @@ func RegisterGrpcTotalRequestCounter(ctx context.Context) {
 }
 
 func RegisterGrpcRequestCodeCounter(ctx context.Context, path string, err error) {
-	statusCode := connect.CodeOf(err)
+	statusCode := connect.Code(codes.OK)
+	if err != nil {
+		statusCode = connect.CodeOf(err)
+	}
 	var labels = map[string]attribute.Value{
 		GrpcMethod: attribute.StringValue(path),
 		ReturnCode: attribute.IntValue(runtime.HTTPStatusFromCode(codes.Code(statusCode))),

@@ -7,6 +7,8 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	orgv2 "github.com/zitadel/zitadel/backend/v3/api/org/v2"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	metadata "github.com/zitadel/zitadel/internal/api/grpc/metadata/v2beta"
 	object "github.com/zitadel/zitadel/internal/api/grpc/object/v2beta"
 	user "github.com/zitadel/zitadel/internal/api/grpc/user/v2beta"
@@ -31,6 +33,10 @@ func (s *Server) CreateOrganization(ctx context.Context, request *connect.Reques
 }
 
 func (s *Server) UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org.UpdateOrganizationRequest]) (*connect.Response[v2beta_org.UpdateOrganizationResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return orgv2.UpdateOrganization(ctx, request)
+	}
+
 	org, err := s.command.ChangeOrg(ctx, request.Msg.GetId(), request.Msg.GetName())
 	if err != nil {
 		return nil, err
@@ -42,6 +48,10 @@ func (s *Server) UpdateOrganization(ctx context.Context, request *connect.Reques
 }
 
 func (s *Server) ListOrganizations(ctx context.Context, request *connect.Request[v2beta_org.ListOrganizationsRequest]) (*connect.Response[v2beta_org.ListOrganizationsResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return orgv2.ListOrganizationsBeta(ctx, request)
+	}
+
 	queries, err := listOrgRequestToModel(s.systemDefaults, request.Msg)
 	if err != nil {
 		return nil, err
@@ -60,6 +70,10 @@ func (s *Server) ListOrganizations(ctx context.Context, request *connect.Request
 }
 
 func (s *Server) DeleteOrganization(ctx context.Context, request *connect.Request[v2beta_org.DeleteOrganizationRequest]) (*connect.Response[v2beta_org.DeleteOrganizationResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return orgv2.DeleteOrganization(ctx, request)
+	}
+
 	details, err := s.command.RemoveOrg(ctx, request.Msg.GetId())
 	if err != nil {
 		var notFoundError *zerrors.NotFoundError
@@ -112,6 +126,10 @@ func (s *Server) DeleteOrganizationMetadata(ctx context.Context, request *connec
 }
 
 func (s *Server) DeactivateOrganization(ctx context.Context, request *connect.Request[org.DeactivateOrganizationRequest]) (*connect.Response[org.DeactivateOrganizationResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return orgv2.DeactivateOrganization(ctx, request)
+	}
+
 	objectDetails, err := s.command.DeactivateOrg(ctx, request.Msg.GetId())
 	if err != nil {
 		return nil, err
@@ -122,6 +140,10 @@ func (s *Server) DeactivateOrganization(ctx context.Context, request *connect.Re
 }
 
 func (s *Server) ActivateOrganization(ctx context.Context, request *connect.Request[org.ActivateOrganizationRequest]) (*connect.Response[org.ActivateOrganizationResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return orgv2.ActivateOrganization(ctx, request)
+	}
+
 	objectDetails, err := s.command.ReactivateOrg(ctx, request.Msg.GetId())
 	if err != nil {
 		return nil, err
