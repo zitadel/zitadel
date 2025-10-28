@@ -54,6 +54,7 @@ import (
 	oidc_v2beta "github.com/zitadel/zitadel/internal/api/grpc/oidc/v2beta"
 	org_v2 "github.com/zitadel/zitadel/internal/api/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/internal/api/grpc/org/v2beta"
+	project_v2 "github.com/zitadel/zitadel/internal/api/grpc/project/v2"
 	project_v2beta "github.com/zitadel/zitadel/internal/api/grpc/project/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/resources/debug_events/debug_events"
 	user_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/resources/user/v3alpha"
@@ -533,6 +534,9 @@ func startAPIs(
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, project_v2beta.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterService(ctx, project_v2.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, internal_permission_v2beta.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {

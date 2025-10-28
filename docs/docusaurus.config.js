@@ -391,9 +391,9 @@ module.exports = {
               categoryLinkSource: "auto",
             },
           },
-          project_v2beta: {
+          project_v2: {
             specPath:
-              ".artifacts/openapi3/zitadel/project/v2beta/project_service.openapi.yaml",
+              ".artifacts/openapi3/zitadel/project/v2/project_service.openapi.yaml",
             outputDir: "docs/apis/resources/project_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
