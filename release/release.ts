@@ -105,16 +105,11 @@ export async function parseReleaseOptions(argv: string[]): Promise<ReleaseOption
 export function configureGithubRepo(options: ReleaseOptions): void {
   const repo = options.githubRepo;
   if (repo.trim() !== 'zitadel/zitadel') {
-    // Verify neither GH_TOKEN nor GITHUB_TOKEN are set to avoid accidental releases to the main repository
-    if (process.env['GH_TOKEN'] || process.env['GITHUB_TOKEN']) {
-      throw new Error(`When specifying a custom GitHub repository (${repo}), neither GH_TOKEN nor GITHUB_TOKEN must be set to avoid accidental releases to the main repository.`);
+    if (repo.trim().split('/')[0] === 'zitadel') {
+      throw new Error('GitHub organization must not be zitadel when releasing to a different repository than zitadel/zitadel.');
     }
-    // Verify the gh CLI is authenticated and defaults to the specified repository
-    if (!execSync('gh auth status', { stdio: 'pipe' }).toString().includes('Logged in ')) {
-      throw new Error(`When specifying a custom GitHub repository (${repo}), the gh CLI must be authenticated to avoid accidental releases to the main repository.`);
-    }
-    if (execSync('gh repo view | head -1', { stdio: 'pipe' }).toString() !== `${repo.trim()}\n`) {
-      throw new Error(`When specifying a custom GitHub repository (${repo}), the gh CLI must default to the specified repository to avoid accidental releases to the main repository. Run "gh repo set-default ${repo}" to set the default repository.`);
+    if (execSync('gh repo view --json isFork --jq .isFork', { stdio: 'pipe' }).toString() !== 'true\n') {
+      throw new Error(`GitHub repository ${repo} of the current directory must be a fork of zitadel/zitadel.`);
     }
   }
   process.env[githubOrgEnvVar] = repo;
