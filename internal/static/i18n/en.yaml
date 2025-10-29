@@ -152,6 +152,7 @@ Errors:
       NotSet: User has not set a password
       NotChanged: New password cannot be the same as your current password
       NotSupported: Password hash encoding not supported. Check out https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
+      NoVerificationTokenOrCurrentPassword: Cannot change password without verification token or current password
     PasswordComplexityPolicy:
       NotFound: Password policy not found
       MinLength: Password is too short
@@ -1365,6 +1366,8 @@ EventTypes:
         code:
           added: Phone number verification code generated
           sent: Phone number verification code sent
+
+
   web_key:
     added: Web Key added
     activated: Web Key activated

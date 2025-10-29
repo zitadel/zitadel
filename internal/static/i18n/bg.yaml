@@ -153,6 +153,7 @@ Errors:
       NotSet: Потребителят не е задал парола
       NotChanged: Новата парола не може да съвпада с текущата парола
       NotSupported: Хеш кодирането на паролата не се поддържа. Вижте https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
+      NoVerificationTokenOrCurrentPassword: Не може да се промени паролата без токен за потвърждение или текуща парола
     PasswordComplexityPolicy:
       NotFound: Политиката за парола не е намерена
       MinLength: Паролата е твърде кратка

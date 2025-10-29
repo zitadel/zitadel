@@ -1383,6 +1383,8 @@ service UserService {
   // Deprecated: [Update the users password](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
   //
   // Change the password of a user with either a verification code or the current password..
+  //
+  // Organization Admins can change passwords for their users without verification code or current password
   rpc SetPassword (SetPasswordRequest) returns (SetPasswordResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/password"
