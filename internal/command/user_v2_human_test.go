@@ -2100,6 +2100,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 		checkPermission             domain.PermissionCheck
 		defaultSecretGenerators     *SecretGenerators
 		defaultEmailCodeURLTemplate func(ctx context.Context) string
+		tarpit                      Tarpit
 	}
 	type args struct {
 		ctx     context.Context
@@ -2135,6 +2136,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2160,6 +2162,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2181,6 +2184,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2224,6 +2228,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2251,6 +2256,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2278,6 +2284,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2326,6 +2333,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2360,6 +2368,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2415,6 +2424,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				checkPermission:             newMockPermissionCheckAllowed(),
 				newCode:                     mockEncryptedCode("emailCode", time.Hour),
 				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
+				tarpit:                      expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2445,6 +2455,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2474,6 +2485,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2511,6 +2523,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2546,6 +2559,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2596,6 +2610,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				checkPermission:             newMockPermissionCheckAllowed(),
 				newCode:                     mockEncryptedCode("emailCode", time.Hour),
 				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
+				tarpit:                      expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2678,6 +2693,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				checkPermission:             newMockPermissionCheckAllowed(),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneCode", time.Hour),
 				defaultSecretGenerators:     defaultGenerators,
+				tarpit:                      expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2753,6 +2769,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				checkPermission:             newMockPermissionCheckAllowed(),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneCode", time.Hour),
 				defaultSecretGenerators:     defaultGenerators,
+				tarpit:                      expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2783,6 +2800,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2820,6 +2838,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2855,6 +2874,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2934,6 +2954,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				checkPermission:             newMockPermissionCheckAllowed(),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneCode", time.Hour),
 				defaultSecretGenerators:     defaultGenerators,
+				tarpit:                      expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2961,6 +2982,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				eventstore:         expectEventstore(),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2994,6 +3016,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3026,6 +3049,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(), // recheck of user locking relevant events
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -3041,6 +3065,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3065,6 +3090,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				eventstore:         expectEventstore(),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3099,6 +3125,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				userPasswordHasher: mockPasswordHasher("x"),
 				checkPermission:    newMockPermissionCheckNotAllowed(),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3153,6 +3180,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				userPasswordHasher: mockPasswordHasher("x"),
 				checkPermission:    newMockPermissionCheckAllowed(),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3186,6 +3214,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(), // recheck of user locking relevant events
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -3209,6 +3238,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3243,9 +3273,27 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(), // recheck of user locking relevant events
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLockoutPolicyAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								0,
+								0,
+								false,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanPasswordCheckFailedEvent(context.Background(),
+							&userAgg.Aggregate,
+							nil,
+						),
+					),
 				),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(1),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3317,6 +3365,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3371,6 +3420,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3435,6 +3485,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3493,6 +3544,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3515,7 +3567,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			},
 		},
 		{
-			name: "change human password and password encoded, password code, encoded used",
+			name: "change human password encoded, old password, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -3567,15 +3619,15 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:            "passwordnotused",
+						OldPassword:         "password",
 						EncodedPasswordHash: "$plain$x$password2",
-						PasswordCode:        "code",
 						ChangeRequired:      true,
 					},
 				},
@@ -3601,6 +3653,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
 				userEncryption:              tt.args.codeAlg,
 				defaultEmailCodeURLTemplate: tt.fields.defaultEmailCodeURLTemplate,
+				tarpit:                      tt.fields.tarpit.tarpit,
 			}
 			err := r.ChangeUserHuman(tt.args.ctx, tt.args.human, tt.args.codeAlg)
 			if tt.res.err == nil {
@@ -3616,6 +3669,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				assert.Equal(t, tt.res.wantEmailCode, tt.args.human.EmailCode)
 				assert.Equal(t, tt.res.wantPhoneCode, tt.args.human.PhoneCode)
 			}
+			tt.fields.tarpit.metExpectedCalls(t)
 		})
 	}
 }

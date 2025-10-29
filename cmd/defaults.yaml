@@ -740,6 +740,15 @@ SystemDefaults:
       # If this is empty, the issuer is the requested domain
       # This is helpful in scenarios with multiple ZITADEL environments or virtual instances
       Issuer: "ZITADEL" # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_OTP_ISSUER
+  Tarpit:
+    # The amount of failed attempts, the tarpit should start.
+    MinFailedAttempts: 5 # ZITADEL_SYSTEMDEFAULTS_TARPIT_MINFAILEDATTEMPTS
+    # The seconds that will be added per step.
+    StepDuration: 1s # ZITADEL_SYSTEMDEFAULTS_TARPIT_STEPDURATION
+    # The failed attempts that are needed to increase the tarpit by one step.
+    StepSize: 5 # ZITADEL_SYSTEMDEFAULTS_TARPIT_STEPSIZE
+    # The maximum duration the tarpit can reach.
+    MaxDuration: 10s # ZITADEL_SYSTEMDEFAULTS_TARPIT_MAXDURATION
   DomainVerification:
     VerificationGenerator:
       Length: 32 # ZITADEL_SYSTEMDEFAULTS_DOMAINVERIFICATION_VERIFICATIONGENERATOR_LENGTH
