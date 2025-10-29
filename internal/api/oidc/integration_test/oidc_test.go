@@ -123,7 +123,7 @@ func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 
 func Test_ZITADEL_API_missing_mfa_2fa_setup(t *testing.T) {
 	clientID, _ := createClient(t, Instance)
-	org := Instance.CreateOrganization(CTXIAM, integration.OrganizationName(), integration.Email())
+	org := Instance.CreateOrganization(CTXIAM, fmt.Sprintf("ZITADEL_API_MISSING_MFA_2fa_setup_%s", gofakeit.AppName()), gofakeit.Email())
 	userID := org.CreatedAdmins[0].GetUserId()
 	Instance.SetUserPassword(CTXIAM, userID, integration.UserPassword, false)
 	Instance.RegisterUserU2F(CTXIAM, userID)
