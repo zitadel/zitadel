@@ -203,7 +203,7 @@ export async function executeRelease(
 
   configureGithubRepo(options);
 
-  setupDefaultEnvironmentVariables(gitInfo.sha);
+  setupDefaultEnvironmentVariables(gitInfo.sha, options.dryRun);
 
   const conventionalCommits = shouldUseConventionalCommits(gitInfo.branch);
   console.log(`Determined conventional commits = ${conventionalCommits} based on git branch = ${gitInfo.branch}`);

@@ -194,7 +194,7 @@ describe('executeDockerBuild', () => {
     executeDockerBuild(true, false);
 
     expect(mockExecSync).toHaveBeenCalledWith(
-      expect.stringContaining('build-docker-debug'),
+      expect.stringContaining('api-debug'),
       expect.any(Object)
     );
   });
@@ -224,7 +224,7 @@ describe('executeDockerBuild', () => {
     executeDockerBuild(true, false);
 
     const call = mockExecSync.mock.calls[0][0] as string;
-    expect(call).toContain('build-docker-debug');
+    expect(call).toContain('api-debug');
   });
 
   test('excludes --push flag when dryRun is true', () => {
