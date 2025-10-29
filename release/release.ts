@@ -110,7 +110,7 @@ export function configureGithubRepo(options: ReleaseOptions): void {
       throw new Error(`When specifying a custom GitHub repository (${repo}), neither GH_TOKEN nor GITHUB_TOKEN must be set to avoid accidental releases to the main repository.`);
     }
     // Verify the gh CLI is authenticated and defaults to the specified repository
-    if (!execSync('gh auth status', { stdio: 'pipe' }).toString().includes('Logged in to GitHub.com as')) {
+    if (!execSync('gh auth status', { stdio: 'pipe' }).toString().includes('Logged in ')) {
       throw new Error(`When specifying a custom GitHub repository (${repo}), the gh CLI must be authenticated to avoid accidental releases to the main repository.`);
     }
     if (execSync('gh repo view | head -1', { stdio: 'pipe' }).toString() !== `${repo.trim()}\n`) {
