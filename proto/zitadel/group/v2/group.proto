@@ -5,6 +5,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
 import "zitadel/filter/v2/filter.proto";
+import "zitadel/authorization/v2beta/authorization.proto";
 
 package zitadel.group.v2;
 
@@ -54,6 +55,32 @@ message Group {
   ];
 }
 
+message GroupUser {
+  // GroupID is the unique identifier of the user group.
+  string group_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\""
+    }
+  ];
+
+  // OrganizationID is the unique identifier of the organization to which the group belongs.
+  string organization_id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629098906488334\""
+    }
+  ];
+
+  // User represents the user in the user group.
+  zitadel.authorization.v2beta.User user = 3;
+
+  // CreationDate is the timestamp when the user was added to the group.
+  google.protobuf.Timestamp creation_date = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
 message GroupsSearchFilter {
   oneof filter {
     option (validate.required) = true;
@@ -94,4 +121,22 @@ enum FieldName {
   FIELD_NAME_NAME = 2;
   FIELD_NAME_CREATION_DATE = 3;
   FIELD_NAME_CHANGE_DATE = 4;
+}
+
+message GroupUsersSearchFilter {
+  oneof filter {
+    option (validate.required) = true;
+
+    // Search for groups by user IDs
+    zitadel.filter.v2.InIDsFilter user_ids = 1;
+    // Search for users in groups by group IDs
+    zitadel.filter.v2.InIDsFilter group_ids = 2;
+  }
+}
+
+enum GroupUserFieldName {
+  GROUP_USER_FIELD_NAME_UNSPECIFIED = 0;
+  GROUP_USER_FIELD_NAME_USER_ID = 1;
+  GROUP_USER_FIELD_NAME_GROUP_ID = 2;
+  GROUP_USER_FIELD_NAME_CREATION_DATE = 3;
 }

@@ -205,3 +205,75 @@ func Test_composeOrigin(t *testing.T) {
 		})
 	}
 }
+
+func Test_sanitizeHost(t *testing.T) {
+	type args struct {
+		rawHost string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "normal host",
+			args: args{rawHost: "example.com"},
+			want: "example.com",
+		},
+		{
+			name: "host with port",
+			args: args{rawHost: "example.com:8080"},
+			want: "example.com:8080",
+		},
+		{
+			name: "ipv4",
+			args: args{rawHost: "192.168.1.1"},
+			want: "192.168.1.1",
+		},
+		{
+			name: "ipv4 with port",
+			args: args{rawHost: "192.168.1.1:8080"},
+			want: "192.168.1.1:8080",
+		},
+		{
+			name: "ipv6",
+			args: args{rawHost: "[2001:0db8:85a3:0000:0000:8a2e:0370:7334]"},
+			want: "[2001:0db8:85a3:0000:0000:8a2e:0370:7334]",
+		},
+		{
+			name: "ipv6 with port",
+			args: args{rawHost: "[2001:0db8:85a3:0000:0000:8a2e:0370:7334]:8080"},
+			want: "[2001:0db8:85a3:0000:0000:8a2e:0370:7334]:8080",
+		},
+		{
+			name: "host with trailing colon",
+			args: args{rawHost: "example.com:"},
+			want: "",
+		},
+		{
+			name: "host with invalid port",
+			args: args{rawHost: "example.com:port"},
+			want: "",
+		},
+		{
+			name: "invalid host",
+			args: args{rawHost: "localhost:@attacker.com"},
+			want: "",
+		},
+		{
+			name: "invalid host",
+			args: args{rawHost: "localhost:@attacker.com:8080"},
+			want: "",
+		},
+		{
+			name: "empty host",
+			args: args{rawHost: ""},
+			want: "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, sanitizeHost(tt.args.rawHost), "sanitizeHost(%v)", tt.args.rawHost)
+		})
+	}
+}

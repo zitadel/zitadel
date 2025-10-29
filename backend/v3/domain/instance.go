@@ -65,6 +65,8 @@ type instanceColumns interface {
 
 // instanceConditions define all the conditions for the instance table.
 type instanceConditions interface {
+	// PrimaryKeyCondition returns a filter on the primary key fields.
+	PrimaryKeyCondition(instanceID string) database.Condition
 	// IDCondition returns an equal filter on the id field.
 	IDCondition(instanceID string) database.Condition
 	// NameCondition returns a filter on the name field.
@@ -92,7 +94,11 @@ type instanceChanges interface {
 }
 
 // InstanceRepository is the interface for the instance repository.
+//
+//go:generate mockgen -typed -package domainmock -destination ./mock/instance.mock.go . InstanceRepository
 type InstanceRepository interface {
+	Repository
+
 	instanceColumns
 	instanceConditions
 	instanceChanges

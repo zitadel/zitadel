@@ -106,9 +106,13 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 };
 
 // Service to manage projects.
+//
+// Deprecated: use project service v2 instead. This service will be removed in the next major version of ZITADEL.
 service ProjectService {
 
   // Create Project
+  //
+  // Deprecated: please move to the corresponding endpoint under project service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // Create a new Project.
   //
@@ -127,6 +131,7 @@ service ProjectService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -143,6 +148,8 @@ service ProjectService {
   }
 
   // Update Project
+  //
+  // Deprecated: please move to the corresponding endpoint under project service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // Update an existing project.
   //
@@ -161,6 +168,7 @@ service ProjectService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -177,6 +185,8 @@ service ProjectService {
   }
 
   // Delete Project
+  //
+  // Deprecated: please move to the corresponding endpoint under project service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // Delete an existing project.
   // In case the project is not found, the request will return a successful response as
@@ -196,6 +206,7 @@ service ProjectService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -206,6 +217,8 @@ service ProjectService {
   }
 
   // Get Project
+  //
+  // Deprecated: please move to the corresponding endpoint under project service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // Returns the project identified by the requested ID.
   //
@@ -223,6 +236,7 @@ service ProjectService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -239,6 +253,8 @@ service ProjectService {
   }
 
   // List Projects
+  //
+  // Deprecated: please move to the corresponding endpoint under project service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // List all matching projects. By default all projects of the instance that the caller has permission to read are returned.
   // Make sure to include a limit and sorting for pagination.
@@ -258,6 +274,7 @@ service ProjectService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -274,6 +291,8 @@ service ProjectService {
   }
 
   // Deactivate Project
+  //
+  // Deprecated: please move to the corresponding endpoint under project service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // Set the state of a project to deactivated. Request returns no error if the project is already deactivated.
   // Applications under deactivated projects are not able to login anymore.
@@ -293,6 +312,7 @@ service ProjectService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -309,6 +329,8 @@ service ProjectService {
   }
 
   // Activate Project
+  //
+  // Deprecated: please move to the corresponding endpoint under project service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // Set the state of a project to active. Request returns no error if the project is already activated.
   //
@@ -327,6 +349,7 @@ service ProjectService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -343,6 +366,8 @@ service ProjectService {
   }
 
   // Add Project Role
+  //
+  // Deprecated: please move to the corresponding endpoint under project service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // Add a new project role to a project. The key must be unique within the project.
   //
@@ -361,6 +386,7 @@ service ProjectService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -377,6 +403,8 @@ service ProjectService {
   }
 
   // Update Project Role
+  //
+  // Deprecated: please move to the corresponding endpoint under project service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // Change a project role. The key is not editable. If a key should change, remove the role and create a new one.
   //
@@ -395,6 +423,7 @@ service ProjectService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -412,6 +441,8 @@ service ProjectService {
 
   // Remove Project Role
   //
+  // Deprecated: please move to the corresponding endpoint under project service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Removes the role from the project and on every resource it has a dependency. This includes project grants and user grants.
   //
   // Required permission:
@@ -428,6 +459,7 @@ service ProjectService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -445,6 +477,8 @@ service ProjectService {
 
   // List Project Roles
   //
+  // Deprecated: please move to the corresponding endpoint under project service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Returns all roles of a project matching the search query.
   //
   // Required permission:
@@ -461,6 +495,7 @@ service ProjectService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -477,6 +512,8 @@ service ProjectService {
   }
 
   // Create Project Grant
+  //
+  // Deprecated: please move to the corresponding endpoint under project service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // Grant a project to another organization.
   // The project grant will allow the granted organization to access the project and manage the authorizations for its users.
@@ -496,6 +533,7 @@ service ProjectService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -512,6 +550,8 @@ service ProjectService {
   }
 
   // Update Project Grant
+  //
+  // Deprecated: please move to the corresponding endpoint under project service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // Change the roles of the project that is granted to another organization.
   // The project grant will allow the granted organization to access the project and manage the authorizations for its users.
@@ -531,6 +571,7 @@ service ProjectService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -547,6 +588,8 @@ service ProjectService {
   }
 
   // Delete Project Grant
+  //
+  // Deprecated: please move to the corresponding endpoint under project service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // Delete a project grant. All user grants for this project grant will also be removed.
   // A user will not have access to the project afterward (if permissions are checked).
@@ -567,6 +610,7 @@ service ProjectService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -577,6 +621,8 @@ service ProjectService {
   }
 
   // Deactivate Project Grant
+  //
+  // Deprecated: please move to the corresponding endpoint under project service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // Set the state of the project grant to deactivated.
   // Applications under deactivated projects grants are not able to login anymore.
@@ -596,6 +642,7 @@ service ProjectService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -606,6 +653,8 @@ service ProjectService {
   }
 
   // Activate Project Grant
+  //
+  // Deprecated: please move to the corresponding endpoint under project service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // Set the state of the project grant to activated.
   //
@@ -624,6 +673,7 @@ service ProjectService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -634,6 +684,8 @@ service ProjectService {
   }
 
   // List Project Grants
+  //
+  // Deprecated: please move to the corresponding endpoint under project service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // Returns a list of project grants. A project grant is when the organization grants its project to another organization.
   //
@@ -652,6 +704,7 @@ service ProjectService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -697,11 +750,11 @@ message CreateProjectRequest {
       example: "\"MyProject\"";
     }
   ];
-  // Enable this setting to have role information included in the user info endpoint. It is also dependent on your application settings to include it in tokens and other types.
+  // Enable this setting to provide role information to your application. For OpenID Connect, the roles can be requested from the UserInfo endpoint or sent in the ID or Access Token, based on your application's configuration.
   bool project_role_assertion = 4;
-  // When enabled ZITADEL will check if a user has an authorization to use this project assigned when login into an application of this project.
+  //Deny authentication if the user has no authorization assigned to this project. Authorizations to the project without assigned a specific role to the user are allowed.
   bool authorization_required = 5;
-  // When enabled ZITADEL will check if the organization of the user, that is trying to log in, has access to this project (either owns the project or is granted).
+  // Before a user can be authenticated, it is verified that their affiliated organization has been granted access to this project. Authentication is not permitted for users from unauthorized organizations.
   bool project_access_required = 6;
   // Define which private labeling/branding should trigger when getting to a login of this project.
   PrivateLabelingSetting private_labeling_setting = 7 [
