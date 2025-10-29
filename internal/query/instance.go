@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"slices"
-	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -202,20 +201,17 @@ var (
 	instanceByIDQuery string
 )
 
-func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost string) (_ authz.Instance, err error) {
+func (q *Queries) InstanceByHost(ctx context.Context, instanceDomain, publicDomain string) (_ authz.Instance, err error) {
 	var instance *authzInstance
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("unable to get instance by host: instanceHost %s, publicHost %s: %w", instanceHost, publicHost, err)
+			err = fmt.Errorf("unable to get instance by domain: instanceDomain %s, publicHostname %s: %w", instanceDomain, publicDomain, err)
 		} else {
 			q.caches.activeInstances.Add(instance.ID, true)
 		}
 		span.EndWithError(err)
 	}()
-
-	instanceDomain := strings.Split(instanceHost, ":")[0] // remove possible port
-	publicDomain := strings.Split(publicHost, ":")[0]     // remove possible port
 
 	instance, ok := q.caches.instance.Get(ctx, instanceIndexByHost, instanceDomain)
 	if ok && instance.ZitadelVersion == build.Version() {
