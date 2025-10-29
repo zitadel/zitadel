@@ -15,6 +15,8 @@ const isLatestEnvVar = "ZITADEL_RELEASE_IS_LATEST";
 // ZITADEL_RELEASE_PUSH is used in docker-bake-release.hcl to determine whether to push the docker images.
 // It is false for dry runs and true otherwise.
 const doPushEnvVar = "ZITADEL_RELEASE_PUSH";
+// ZITADEL_RELEASE_GITHUB_ORG is used to specify the GitHub organization for which Docker images should be created.
+const githubOrgEnvVar = "ZITADEL_RELEASE_GITHUB_ORG";
 
 export interface GitInfo {
   branch: string;
@@ -74,17 +76,43 @@ export async function parseReleaseOptions(argv: string[]): Promise<ReleaseOption
       default: true,
     })
     .option('verbose', {
+      alias: 'v',
       description:
         'Whether or not to enable verbose logging, defaults to false',
       type: 'boolean',
       default: false,
     })
+    .option('github-repo', {
+      alias: 'r',
+      description:
+        'The GitHub repository for which the release should be created, defaults to zitadel/zitadel',
+        type: 'string'
+    })
     .parseAsync();
   
   return {
     dryRun: result.dryRun,
-    verbose: result.verbose,
+    verbose: result.verbose,    
   };
+}
+
+// configureGithubRepo makes sure that we can release to a different GitHub repository than zitadel/zitadel for testing purposes.
+export function configureGithubRepo(repo: string = 'zitadel/zitadel'): void {
+  if (repo.trim() !== 'zitadel/zitadel') {
+    // Verify neither GH_TOKEN nor GITHUB_TOKEN are set to avoid accidental releases to the main repository
+    if (process.env['GH_TOKEN'] || process.env['GITHUB_TOKEN']) {
+      throw new Error(`When specifying a custom GitHub repository (${repo}), neither GH_TOKEN nor GITHUB_TOKEN must be set to avoid accidental releases to the main repository.`);
+    }
+    // Verify the gh CLI is authenticated and defaults to the specified repository
+    if (!execSync('gh auth status', { stdio: 'pipe' }).toString().includes('Logged in to GitHub.com as')) {
+      throw new Error(`When specifying a custom GitHub repository (${repo}), the gh CLI must be authenticated to avoid accidental releases to the main repository.`);
+    }
+    if (!execSync('gh repo view', { stdio: 'pipe' }).toString().includes(`Repository: ${repo}`)) {
+      throw new Error(`When specifying a custom GitHub repository (${repo}), the gh CLI must default to the specified repository to avoid accidental releases to the main repository.`);
+    }
+  }
+  process.env[githubOrgEnvVar] = repo;
+  console.log(`Setting ${githubOrgEnvVar}=${process.env[githubOrgEnvVar]} for Docker image creation`);
 }
 
 /**
@@ -146,7 +174,7 @@ export async function executeRelease(
 
   const { workspaceVersion, projectsVersionData } = await releaseVersion({
     dryRun: options.dryRun,
-    verbose: options.verbose,
+    verbose: options.verbose,    
   });
 
   if (!workspaceVersion) {
