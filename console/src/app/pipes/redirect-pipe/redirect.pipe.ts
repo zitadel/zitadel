@@ -6,32 +6,27 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class RedirectPipe implements PipeTransform {
   public transform(uri: string, isNative: boolean): boolean {
+    let parsedURI = URL.parse(uri);
+    if (parsedURI === null) {
+      return false;
+    }
     if (isNative) {
-      if (
-        uri.startsWith('http://localhost/') ||
-        uri.startsWith('http://localhost:') ||
-        uri.startsWith('http://127.0.0.1') ||
-        uri.startsWith('http://[::1]') ||
-        uri.startsWith('http://[0:0:0:0:0:0:0:1]') ||
-        uri.startsWith('https://localhost/') ||
-        uri.startsWith('https://localhost:') ||
-        uri.startsWith('https://127.0.0.1') ||
-        uri.startsWith('https://[::1]') ||
-        uri.startsWith('https://[0:0:0:0:0:0:0:1]')
-      ) {
-        return true;
-      }
-      if (!uri.startsWith('https://') && !uri.startsWith('http://')) {
-        return true;
+      if (parsedURI.protocol === 'http:' || parsedURI.protocol === 'https:') {
+        let hostname = parsedURI.hostname;
+        if (
+          hostname === 'localhost' ||
+          hostname === '127.0.0.1' ||
+          hostname === '[::1]'
+        ) {
+          return true;
+        } else {
+          return false;
+        }
       } else {
-        return false;
+        return true;
       }
     } else {
-      if (uri.startsWith('https://')) {
-        return true;
-      } else {
-        return false;
-      }
+      return parsedURI.protocol === 'https:'
     }
   }
 }
