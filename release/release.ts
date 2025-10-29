@@ -190,7 +190,7 @@ export async function executeRelease(
     versionData: projectsVersionData,
     version: workspaceVersion,
     dryRun: options.dryRun,
-    verbose: options.verbose
+    verbose: options.verbose,
   });
 
   const publishResults = await releasePublish({
