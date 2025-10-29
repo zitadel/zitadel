@@ -53,6 +53,7 @@ func (c *FieldChange) writeUpdate(builder *database.StatementBuilder, changes js
 	}
 
 	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> path = %+v\n", path)
+	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m i = %+v\n", i)
 	builder.WriteString("jsonb_set_lax(")
 	// if i == 0 {
 	if i < 0 {
@@ -206,7 +207,7 @@ func (c jsonChanges) Write(builder *database.StatementBuilder) error {
 	// return c.writeUpdate(builder, len(c.changes)-1)
 	// return c.changes[len(c.changes)-1].writeUpdate(builder, c, len(c.changes)-2)
 	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> len(c.changes) = %+v\n", len(c.changes))
-	return c.changes[len(c.changes)-1].writeUpdate(builder, c, len(c.changes)-1)
+	return c.changes[len(c.changes)-1].writeUpdate(builder, c, len(c.changes)-2)
 }
 
 // func (c jsonChanges) writeUpdate(builder *database.StatementBuilder, i int) error {

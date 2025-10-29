@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/url"
 	"time"
 
@@ -156,39 +155,16 @@ func (s *settings) Get(ctx context.Context, client database.QueryExecutor, opts 
 	return getOne[domain.Setting](ctx, client, &builder)
 }
 
-// func (s *settings) Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, typ domain.SettingType, opts ...database.QueryOption) (*domain.Setting, error) {
-// 	builder := database.StatementBuilder{}
-
-// 	options := new(database.QueryOpts)
-// 	for _, opt := range opts {
-// 		opt(options)
-// 	}
-
-// 	s.checkMandatoryCondtions(options.Condition)
-
-// 	builder.WriteString(querySettingStmt)
-
-// 	options.Write(&builder)
-
-// 	return getOne[domain.Setting](ctx, client, &builder)
-// }
-
 func (s *settings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Setting, error) {
 	builder := database.StatementBuilder{}
 
 	builder.WriteString(querySettingStmt)
 
-	// if conditions != nil {
-	// 	writeCondition(&builder, database.And(conditions...))
-	// }
-
-	// if opts != nil {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
 	}
 	options.Write(&builder)
-	// }
 
 	orderBy := database.OrderBy(s.CreatedAtColumn())
 	orderBy.Write(&builder)
@@ -293,7 +269,7 @@ func LoginRepository() domain.LoginRepository {
 
 var _ domain.LoginRepository = (*loginSettings)(nil)
 
-func (s *loginSettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.LoginSetting, changes ...database.Change) error {
+func (s *loginSettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.LoginSetting) error {
 	// if setting == nil {
 	// 	return ErrSettingObjectMustNotBeNil
 	// }
@@ -302,7 +278,6 @@ func (s *loginSettings) Set(ctx context.Context, client database.QueryExecutor, 
 	// if err != nil {
 	// 	return err
 	// }
-	// fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> string(settingJSON = %+v\n", string(settingJSON))
 	// return createSetting(ctx, client, setting.Setting, &setting.Settings)
 	if setting == nil {
 		return ErrSettingObjectMustNotBeNil
@@ -320,7 +295,6 @@ func (s *loginSettings) Get(ctx context.Context, client database.QueryExecutor, 
 		return nil, err
 	}
 
-	fmt.Printf("[DEBUGPRINT] [settings_relational.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> loginSetting.Setting = %+v\n", string(loginSetting.Setting.Settings))
 	err = json.Unmarshal(loginSetting.Setting.Settings, &loginSetting.Settings)
 	if err != nil {
 		return nil, err
@@ -426,6 +400,9 @@ const createLabelSettingStmt = `INSERT INTO zitadel.settings` +
 	` RETURNING id, created_at, updated_at`
 
 func (s *labelSettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.LabelSetting) error {
+	if setting == nil {
+		return ErrSettingObjectMustNotBeNil
+	}
 	settingJSON, err := json.Marshal(setting.Settings)
 	if err != nil {
 		return err
@@ -448,8 +425,6 @@ func (s *labelSettings) Update(ctx context.Context, client database.QueryExecuto
 	builder.WriteString(`UPDATE zitadel.settings SET `)
 	database.Changes(changes).Write(&builder)
 	writeCondition(&builder, condition)
-
-	fmt.Printf("[DEBUGPRINT] [settings_relational.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  builder.String() = %+v\n", builder.String())
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
@@ -527,37 +502,6 @@ func (s *labelSettings) ActivateLabelSettingEvent(ctx context.Context, client da
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-// func (s *settings) GetLabel(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, state domain.LabelState) (*domain.LabelSetting, error) {
-// 	labelSetting := &domain.LabelSetting{}
-// 	var err error
-
-// 	stateCond := database.WithCondition(s.LabelStateCondition(state))
-// 	labelSetting.Setting, err = s.Get(ctx, client, instanceID, orgID, domain.SettingTypeLabel, stateCond)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	err = json.Unmarshal(labelSetting.Setting.Settings, &labelSetting.Settings)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return labelSetting, nil
-// }
-
-// func (s *settings) UpdateLabel(ctx context.Context, client database.QueryExecutor, setting *domain.LabelSetting, changes ...database.Change) (int64, error) {
-// 	if setting.LabelState == nil {
-// 		return 0, ErrLabelStateMustBeDefined
-// 	}
-// 	return s.updateSetting(ctx, client, setting.Setting, &setting.Settings, changes...)
-// }
-
-// INSERT INTO zitadel.settings (instance_id, org_id, type, label_state, settings, updated_at, created_at)
-// SELECT instance_id, org_id, type, $1, settings, $2, $3 FROM zitadel.settings AS copy_table
-// WHERE (copy_table.type = $4) AND (copy_table.instance_id = $5) AND (copy_table.org_id IS NULL) AND (copy_table.label_state = $6)
-// ON CONFLICT (instance_id, org_id, type, label_state) WHERE (type = $7)
-// DO UPDATE SET (instance_id, org_id, type, label_state, settings, updated_at, created_at) = (EXCLUDED.instance_id, EXCLUDED.org_id, EXCLUDED.type, $1, EXCLUDED.settings, $2, $3)
-
 const activatedLabelSettingStmt = `INSERT INTO zitadel.settings` +
 	` (instance_id, organization_id, type, owner_type, label_state, settings)` +
 	` VALUES ($1, $2, 'label', $3, 'activated', $4)` +
@@ -591,23 +535,6 @@ func (s *settings) CreatePasswordComplexity(ctx context.Context, client database
 	setting.Type = domain.SettingTypePasswordComplexity
 	return createSetting(ctx, client, setting.Setting, &setting.Settings)
 }
-
-// func (s *settings) GetPasswordComplexity(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*domain.PasswordComplexitySetting, error) {
-// 	passwordComplexitySetting := &domain.PasswordComplexitySetting{}
-// 	var err error
-
-// 	passwordComplexitySetting.Setting, err = s.Get(ctx, client, instanceID, orgID, domain.SettingTypePasswordComplexity)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	err = json.Unmarshal(passwordComplexitySetting.Setting.Settings, &passwordComplexitySetting.Settings)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return passwordComplexitySetting, nil
-// }
 
 // passwordComplexity
 type passwordComplexitySettings struct {
@@ -646,7 +573,7 @@ func PasswordComplexityRepository() domain.PasswordComplexityRepository {
 
 var _ domain.PasswordComplexityRepository = (*passwordComplexitySettings)(nil)
 
-func (s *passwordComplexitySettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.PasswordComplexitySetting, changes ...database.Change) error {
+func (s *passwordComplexitySettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.PasswordComplexitySetting) error {
 	if setting == nil {
 		return ErrSettingObjectMustNotBeNil
 	}
@@ -663,7 +590,6 @@ func (s *passwordComplexitySettings) Get(ctx context.Context, client database.Qu
 		return nil, err
 	}
 
-	fmt.Printf("[DEBUGPRINT] [settings_relational.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> string(passwordComplexitySetting.Setting.Settings = %+v\n", string(passwordComplexitySetting.Setting.Settings))
 	err = json.Unmarshal(passwordComplexitySetting.Setting.Settings, &passwordComplexitySetting.Settings)
 	if err != nil {
 		return nil, err
@@ -701,7 +627,7 @@ func PasswordExpiryRepository() domain.PasswordExpiryRepository {
 
 var _ domain.PasswordExpiryRepository = (*passwordExpirySettings)(nil)
 
-func (s *passwordExpirySettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.PasswordExpirySetting, changes ...database.Change) error {
+func (s *passwordExpirySettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.PasswordExpirySetting) error {
 	if setting == nil {
 		return ErrSettingObjectMustNotBeNil
 	}
@@ -759,7 +685,7 @@ func LockoutRepository() domain.LockoutRepository {
 
 var _ domain.LockoutRepository = (*lockoutSettings)(nil)
 
-func (s *lockoutSettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.LockoutSetting, changes ...database.Change) error {
+func (s *lockoutSettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.LockoutSetting) error {
 	if setting == nil {
 		return ErrSettingObjectMustNotBeNil
 	}
@@ -821,12 +747,13 @@ func SecurityRepository() domain.SecurityRepository {
 
 var _ domain.SecurityRepository = (*securitySettings)(nil)
 
-func (s *securitySettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.SecuritySetting, changes ...database.Change) error {
+func (s *securitySettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.SecuritySetting) error {
 	if setting == nil {
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypeSecurity
-	return createSetting(ctx, client, setting.Setting, &setting.Settings, changes...)
+	// return createSetting(ctx, client, setting.Setting, &setting.Settings, changes...)
+	return createSetting(ctx, client, setting.Setting, &setting.Settings)
 }
 
 func (s *securitySettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.SecuritySetting, error) {
@@ -854,7 +781,7 @@ func (s *securitySettings) Reset(ctx context.Context, client database.QueryExecu
 	return s.SettingsRepository.Delete(ctx, client, condition)
 }
 
-const createSecuritySettingEventStmt = `INSERT INTO zitadel.settings` +
+const setSecuritySettingEventStmt = `INSERT INTO zitadel.settings` +
 	` (instance_id, organization_id, type, owner_type, settings, created_at)` +
 	` VALUES ($1, $2, 'security', $3, $4, $5)` +
 	` ON CONFLICT (instance_id, organization_id, type, owner_type) WHERE type != 'label' DO UPDATE SET `
@@ -870,10 +797,10 @@ func (s *securitySettings) SetEvent(ctx context.Context, client database.QueryEx
 	}
 
 	builder := database.NewStatementBuilder(
-		createSecuritySettingEventStmt,
+		setSecuritySettingEventStmt,
 		setting.InstanceID,
 		setting.OrgID,
-		// setting.Type,
+		// domain.SettingTypeSecurity,
 		setting.OwnerType,
 		string(settingJSON),
 		setting.CreatedAt)
@@ -908,7 +835,7 @@ func DomainRepository() domain.DomainRepository {
 
 var _ domain.DomainRepository = (*domainSettings)(nil)
 
-func (s *domainSettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.DomainSetting, changes ...database.Change) error {
+func (s *domainSettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.DomainSetting) error {
 	if setting == nil {
 		return ErrSettingObjectMustNotBeNil
 	}
@@ -950,14 +877,6 @@ func (l organizationSettings) SetOrganizationScopedUsernames(value bool) db_json
 	return db_json.NewFieldChange("'{organizationScopedUsernames}'", value)
 }
 
-func (l organizationSettings) SetOldOrganizationScopedUsernames(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{oldOrganizationScopedUsernames}'", value)
-}
-
-func (l organizationSettings) SetUsernameChanges(value []string) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{usernameChanges}'", value)
-}
-
 func OrganizationSettingRepository() domain.OrganizationSettingRepository {
 	return &organizationSettings{
 		&settings{},
@@ -966,7 +885,7 @@ func OrganizationSettingRepository() domain.OrganizationSettingRepository {
 
 var _ domain.OrganizationSettingRepository = (*organizationSettings)(nil)
 
-func (s *organizationSettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.OrganizationSetting, changes ...database.Change) error {
+func (s *organizationSettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.OrganizationSetting) error {
 	if setting == nil {
 		return ErrSettingObjectMustNotBeNil
 	}
@@ -999,7 +918,36 @@ func (s *organizationSettings) Reset(ctx context.Context, client database.QueryE
 	return s.SettingsRepository.Delete(ctx, client, condition)
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const setOrganizationSettingEventStmt = `INSERT INTO zitadel.settings` +
+	` (instance_id, organization_id, type, owner_type, settings, created_at)` +
+	` VALUES ($1, $2, 'organization', $3, $4, $5)` +
+	` ON CONFLICT (instance_id, organization_id, type, owner_type) WHERE type != 'label'` +
+	` DO UPDATE SET settings = EXCLUDED.settings, updated_at = $5`
+
+// func (s *organizationSettings) SetEvent(ctx context.Context, client database.QueryExecutor, setting *domain.OrganizationSetting, changes ...database.Change) (int64, error) {
+func (s *organizationSettings) SetEvent(ctx context.Context, client database.QueryExecutor, setting *domain.OrganizationSetting) (int64, error) {
+	if setting == nil {
+		return 0, ErrSettingObjectMustNotBeNil
+	}
+
+	settingJSON, err := json.Marshal(setting.Settings)
+	if err != nil {
+		return 0, err
+	}
+
+	builder := database.NewStatementBuilder(
+		setOrganizationSettingEventStmt,
+		setting.InstanceID,
+		setting.OrgID,
+		// domain.SettingTypeOrganization,
+		setting.OwnerType,
+		string(settingJSON),
+		setting.CreatedAt)
+
+	// database.Changes(changes).Write(builder)
+
+	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
 
 func (s *settings) CreatePasswordExpiry(ctx context.Context, client database.QueryExecutor, setting *domain.PasswordExpirySetting) error {
 	if setting == nil {
@@ -1009,23 +957,6 @@ func (s *settings) CreatePasswordExpiry(ctx context.Context, client database.Que
 	return createSetting(ctx, client, setting.Setting, &setting.Settings)
 }
 
-// func (s *settings) GetPasswordExpiry(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*domain.PasswordExpirySetting, error) {
-// 	passwordPolicySetting := &domain.PasswordExpirySetting{}
-// 	var err error
-
-// 	passwordPolicySetting.Setting, err = s.Get(ctx, client, instanceID, orgID, domain.SettingTypePasswordExpiry)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	err = json.Unmarshal(passwordPolicySetting.Setting.Settings, &passwordPolicySetting.Settings)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return passwordPolicySetting, nil
-// }
-
 func (s *settings) CreateSecurity(ctx context.Context, client database.QueryExecutor, setting *domain.SecuritySetting) error {
 	if setting == nil {
 		return ErrSettingObjectMustNotBeNil
@@ -1033,23 +964,6 @@ func (s *settings) CreateSecurity(ctx context.Context, client database.QueryExec
 	setting.Type = domain.SettingTypeSecurity
 	return createSetting(ctx, client, setting.Setting, &setting.Settings)
 }
-
-// func (s *settings) GetSecurity(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*domain.SecuritySetting, error) {
-// 	securitySetting := &domain.SecuritySetting{}
-// 	var err error
-
-// 	securitySetting.Setting, err = s.Get(ctx, client, instanceID, orgID, domain.SettingTypeSecurity)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	err = json.Unmarshal(securitySetting.Setting.Settings, &securitySetting.Settings)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return securitySetting, nil
-// }
 
 func (s *settings) CreateLockout(ctx context.Context, client database.QueryExecutor, setting *domain.LockoutSetting) error {
 	if setting == nil {
@@ -1059,23 +973,6 @@ func (s *settings) CreateLockout(ctx context.Context, client database.QueryExecu
 	return createSetting(ctx, client, setting.Setting, &setting.Settings)
 }
 
-// func (s *settings) GetLockout(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*domain.LockoutSetting, error) {
-// 	lockoutSetting := &domain.LockoutSetting{}
-// 	var err error
-
-// 	lockoutSetting.Setting, err = s.Get(ctx, client, instanceID, orgID, domain.SettingTypeLockout)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	err = json.Unmarshal(lockoutSetting.Setting.Settings, &lockoutSetting.Settings)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return lockoutSetting, nil
-// }
-
 func (s *settings) CreateDomain(ctx context.Context, client database.QueryExecutor, setting *domain.DomainSetting) error {
 	if setting == nil {
 		return ErrSettingObjectMustNotBeNil
@@ -1084,23 +981,6 @@ func (s *settings) CreateDomain(ctx context.Context, client database.QueryExecut
 	return createSetting(ctx, client, setting.Setting, &setting.Settings)
 }
 
-// func (s *settings) GetDomain(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*domain.DomainSetting, error) {
-// 	lockoutSetting := &domain.DomainSetting{}
-// 	var err error
-
-// 	lockoutSetting.Setting, err = s.Get(ctx, client, instanceID, orgID, domain.SettingTypeDomain)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	err = json.Unmarshal(lockoutSetting.Setting.Settings, &lockoutSetting.Settings)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return lockoutSetting, nil
-// }
-
 func (s *settings) CreateOrg(ctx context.Context, client database.QueryExecutor, setting *domain.OrganizationSetting) error {
 	if setting == nil {
 		return ErrSettingObjectMustNotBeNil
@@ -1108,23 +988,6 @@ func (s *settings) CreateOrg(ctx context.Context, client database.QueryExecutor,
 	setting.Type = domain.SettingTypeOrganization
 	return createSetting(ctx, client, setting.Setting, &setting.Settings)
 }
-
-// func (s *settings) GetOrg(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*domain.OrganizationSetting, error) {
-// 	orgSetting := &domain.OrganizationSetting{}
-// 	var err error
-
-// 	orgSetting.Setting, err = s.Get(ctx, client, instanceID, orgID, domain.SettingTypeOrganization)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	err = json.Unmarshal(orgSetting.Setting.Settings, &orgSetting.Settings)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return orgSetting, nil
-// }
 
 func (s *settings) Update_(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
 	if err := s.checkMandatoryCondtions(condition); err != nil {
@@ -1137,8 +1000,6 @@ func (s *settings) Update_(ctx context.Context, client database.QueryExecutor, c
 		return 0, err
 	}
 	writeCondition(&builder, condition)
-	fmt.Printf("[DEBUGPRINT] [settings_relational.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> builder.String() = %+v\n", builder.String())
-	fmt.Printf("[DEBUGPRINT] [settings_relational.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> builder.Args()... = %+v\n", builder.Args()...)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
@@ -1193,20 +1054,11 @@ func (s *settings) Create(ctx context.Context, client database.QueryExecutor, se
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.ID, &setting.CreatedAt, &setting.UpdatedAt)
 }
 
-// const createSettingStmt = `INSERT INTO zitadel.settings` +
-// 	` (instance_id, organization_id, type, owner_type, label_state, settings)` +
-// 	` VALUES ($1, $2, $3, $4, $5, $6)` +
-// 	` RETURNING id, created_at, updated_at`
-
 const createSettingStmt = `INSERT INTO zitadel.settings` +
 	` (instance_id, organization_id, type, owner_type, label_state, settings)` +
 	` VALUES ($1, $2, $3, $4, $5, $6)` +
 	` ON CONFLICT (instance_id, organization_id, type, owner_type) WHERE type != 'label' DO UPDATE SET` +
 	` settings =  EXCLUDED.settings::JSONB `
-
-// const createSettingStmt = `INSERT INTO zitadel.settings` +
-// 	` (instance_id, organization_id, type, owner_type, label_state, settings)` +
-// 	` VALUES ($1, $2, $3, $4, $5, $6)j
 
 func createSetting(ctx context.Context, client database.QueryExecutor, setting *domain.Setting, settings any, changes ...database.Change) error {
 	settingJSON, err := json.Marshal(settings)
@@ -1227,20 +1079,21 @@ func createSetting(ctx context.Context, client database.QueryExecutor, setting *
 
 	builder.WriteString(` RETURNING id, created_at, updated_at`)
 
-	fmt.Printf("[DEBUGPRINT] [settings_relational.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SETTINGS CREATE builder.Args()... = %+v\n", builder.String())
-
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.ID, &setting.CreatedAt, &setting.UpdatedAt)
 }
 
-// func (s *settings) Delete(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, typ domain.SettingType) (int64, error) {
 func (s *settings) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	// options := new(database.QueryOpts)
 	// for _, opt := range opts {
 	// 	opt(options)
 	// }
 
-	if condition.IsRestrictingColumn(s.LabelStateColumn()) {
-		return 0, database.NewMissingConditionError(s.LabelStateColumn())
+	// if condition.IsRestrictingColumn(s.LabelStateColumn()) {
+	// 	return 0, database.NewMissingConditionError(s.LabelStateColumn())
+	// }
+	// TODO label
+	if err := s.checkMandatoryCondtions(condition); err != nil {
+		return 0, err
 	}
 
 	var builder database.StatementBuilder

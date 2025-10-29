@@ -309,15 +309,15 @@ type SecuritySetting struct {
 }
 
 type OrganizationSettings struct {
-	OrganizationScopedUsernames    bool     `json:"organizationScopedUsernames,omitempty"`
-	OldOrganizationScopedUsernames bool     `json:"oldOrganizationScopedUsernames,omitempty"`
-	UsernameChanges                []string `json:"usernameChanges,omitempty"`
+	OrganizationScopedUsernames bool `json:"organizationScopedUsernames,omitempty"`
+	// OldOrganizationScopedUsernames bool     `json:"oldOrganizationScopedUsernames,omitempty"`
+	// UsernameChanges                []string `json:"usernameChanges,omitempty"`
 }
 
 type organizationJsonUpdates interface {
 	SetOrganizationScopedUsernames(value bool) db_json.JsonUpdate
-	SetOldOrganizationScopedUsernames(value bool) db_json.JsonUpdate
-	SetUsernameChanges(value []string) db_json.JsonUpdate
+	// SetOldOrganizationScopedUsernames(value bool) db_json.JsonUpdate
+	// SetUsernameChanges(value []string) db_json.JsonUpdate
 }
 
 type organizationSettingsJsonChanges interface {
@@ -418,7 +418,7 @@ type LoginRepository interface {
 
 	// Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*LoginSetting, error)
 	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*LoginSetting, error)
-	Set(ctx context.Context, client database.QueryExecutor, setting *LoginSetting, changes ...database.Change) error
+	Set(ctx context.Context, client database.QueryExecutor, setting *LoginSetting) error
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 }
 
@@ -433,7 +433,7 @@ type LabelRepository interface {
 	Set(ctx context.Context, client database.QueryExecutor, setting *LabelSetting) error
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
-	// ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *LabelSetting) error
+	ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *LabelSetting) error
 	ActivateLabelSettingEvent(ctx context.Context, client database.QueryExecutor, condition database.Condition, UpdateAt time.Time) (int64, error)
 }
 
@@ -448,6 +448,8 @@ type PasswordComplexityRepository interface {
 	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*PasswordComplexitySetting, error)
 	// Set(ctx context.Context, client database.QueryExecutor, setting *PasswordComplexitySetting) error
 	// Set(ctx context.Context, client database.QueryExecutor, setting *PasswordComplexitySetting, changes ...database.Change) error
+	// Set(ctx context.Context, client database.QueryExecutor, setting *PasswordExpirySetting, changes ...database.Change) error
+	Set(ctx context.Context, client database.QueryExecutor, setting *PasswordComplexitySetting) error
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }
@@ -460,7 +462,7 @@ type PasswordExpiryRepository interface {
 	passwordExpirySettingsJsonChanges
 
 	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*PasswordExpirySetting, error)
-	Set(ctx context.Context, client database.QueryExecutor, setting *PasswordExpirySetting, changes ...database.Change) error
+	Set(ctx context.Context, client database.QueryExecutor, setting *PasswordExpirySetting) error
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }
@@ -473,7 +475,7 @@ type LockoutRepository interface {
 	lockoutSettingsJsonChanges
 
 	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*LockoutSetting, error)
-	Set(ctx context.Context, client database.QueryExecutor, setting *LockoutSetting, changes ...database.Change) error
+	Set(ctx context.Context, client database.QueryExecutor, setting *LockoutSetting) error
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }
@@ -486,7 +488,7 @@ type SecurityRepository interface {
 	securitySettingsJsonChanges
 
 	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*SecuritySetting, error)
-	Set(ctx context.Context, client database.QueryExecutor, setting *SecuritySetting, changes ...database.Change) error
+	Set(ctx context.Context, client database.QueryExecutor, setting *SecuritySetting) error
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 	SetEvent(ctx context.Context, client database.QueryExecutor, setting *SecuritySetting, changes ...database.Change) (int64, error)
@@ -500,7 +502,7 @@ type DomainRepository interface {
 	domainSettingsJsonChanges
 
 	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*DomainSetting, error)
-	Set(ctx context.Context, client database.QueryExecutor, setting *DomainSetting, changes ...database.Change) error
+	Set(ctx context.Context, client database.QueryExecutor, setting *DomainSetting) error
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }
@@ -513,7 +515,8 @@ type OrganizationSettingRepository interface {
 	organizationSettingsJsonChanges
 
 	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*OrganizationSetting, error)
-	Set(ctx context.Context, client database.QueryExecutor, setting *OrganizationSetting, changes ...database.Change) error
+	Set(ctx context.Context, client database.QueryExecutor, setting *OrganizationSetting) error
+	SetEvent(ctx context.Context, client database.QueryExecutor, setting *OrganizationSetting) (int64, error)
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }

@@ -101,10 +101,6 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := settingsRepo.Get(
-			// 	ctx, pool,
-			// 	newInstance.ID(),
-			// 	nil)
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -1237,7 +1233,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 	})
 }
 
-func TestServer_TestPasswordComplexitySettingsReduces(t *testing.T) {
+func TestServer_TestInstancePasswordComplexitySettingsReduces(t *testing.T) {
 	settingsRepo := repository.PasswordComplexityRepository()
 
 	t.Run("test password complexity added", func(t *testing.T) {
@@ -1371,7 +1367,7 @@ func TestServer_TestPasswordComplexitySettingsReduces(t *testing.T) {
 	})
 }
 
-func TestServer_TestPasswordPolicySettingsReduces(t *testing.T) {
+func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 	settingsRepo := repository.PasswordExpiryRepository()
 
 	t.Run("test password policy added", func(t *testing.T) {
@@ -1498,7 +1494,7 @@ func TestServer_TestPasswordPolicySettingsReduces(t *testing.T) {
 	})
 }
 
-func TestServer_TestDomainSettingsReduces(t *testing.T) {
+func TestServer_TestInstanceDomainSettingsReduces(t *testing.T) {
 	settingsRepo := repository.DomainRepository()
 
 	t.Run("test domain policy added", func(t *testing.T) {
@@ -1628,7 +1624,7 @@ func TestServer_TestDomainSettingsReduces(t *testing.T) {
 	})
 }
 
-func TestServer_TestLockoutSettingsReduces(t *testing.T) {
+func TestServer_TestInstanceLockoutSettingsReduces(t *testing.T) {
 	settingsRepo := repository.LockoutRepository()
 
 	t.Run("test lockout policy added", func(t *testing.T) {
@@ -1752,7 +1748,7 @@ func TestServer_TestLockoutSettingsReduces(t *testing.T) {
 	})
 }
 
-func TestServer_TestSecuritySettingsReduces(t *testing.T) {
+func TestServer_TestInstanceSecuritySettingsReduces(t *testing.T) {
 	settingsRepo := repository.SecurityRepository()
 
 	t.Run("test security policy set", func(t *testing.T) {
