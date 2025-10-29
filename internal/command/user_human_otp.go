@@ -170,6 +170,7 @@ func (c *Commands) HumanCheckMFATOTP(ctx context.Context, userID, code, resource
 		c.eventstore.FilterToQueryReducer,
 		c.multifactors.OTP.CryptoMFA,
 		authRequestDomainToAuthRequestInfo(authRequest),
+		c.tarpit,
 	)
 
 	_, pushErr := c.eventstore.Push(ctx, commands...)
@@ -183,6 +184,7 @@ func checkTOTP(
 	queryReducer func(ctx context.Context, r eventstore.QueryReducer) error,
 	alg crypto.EncryptionAlgorithm,
 	optionalAuthRequestInfo *user.AuthRequestInfo,
+	tarpit func(failedAttempts uint64),
 ) ([]eventstore.Command, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing")
@@ -222,6 +224,7 @@ func checkTOTP(
 	if lockoutPolicy.MaxOTPAttempts > 0 && existingOTP.CheckFailedCount+1 >= lockoutPolicy.MaxOTPAttempts {
 		commands = append(commands, user.NewUserLockedEvent(ctx, userAgg))
 	}
+	tarpit(existingOTP.CheckFailedCount + 1)
 	return commands, verifyErr
 }
 
@@ -374,6 +377,7 @@ func (c *Commands) HumanCheckOTPSMS(ctx context.Context, userID, code, resourceO
 		c.phoneCodeVerifier,
 		succeededEvent,
 		failedEvent,
+		c.tarpit,
 	)
 	if len(commands) > 0 {
 		_, pushErr := c.eventstore.Push(ctx, commands...)
@@ -508,6 +512,7 @@ func (c *Commands) HumanCheckOTPEmail(ctx context.Context, userID, code, resourc
 		nil, // email currently always uses local code checks
 		succeededEvent,
 		failedEvent,
+		c.tarpit,
 	)
 	if len(commands) > 0 {
 		_, pushErr := c.eventstore.Push(ctx, commands...)
@@ -576,6 +581,7 @@ func checkOTP(
 	alg crypto.EncryptionAlgorithm,
 	getCodeVerifier func(ctx context.Context, id string) (senders.CodeGenerator, error),
 	checkSucceededEvent, checkFailedEvent func(ctx context.Context, aggregate *eventstore.Aggregate, info *user.AuthRequestInfo) eventstore.Command,
+	tarpit func(failedAttempts uint64),
 ) ([]eventstore.Command, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-S453v", "Errors.User.UserIDMissing")
@@ -627,6 +633,7 @@ func checkOTP(
 	if lockoutPolicy != nil && lockoutPolicy.MaxOTPAttempts > 0 && existingOTP.CheckFailedCount()+1 >= lockoutPolicy.MaxOTPAttempts {
 		commands = append(commands, user.NewUserLockedEvent(ctx, userAgg))
 	}
+	tarpit(existingOTP.CheckFailedCount() + 1)
 	return commands, verifyErr
 }
 

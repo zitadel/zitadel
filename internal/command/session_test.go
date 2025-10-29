@@ -1128,6 +1128,7 @@ func TestCheckTOTP(t *testing.T) {
 	type fields struct {
 		sessionWriteModel *SessionWriteModel
 		eventstore        func(*testing.T) *eventstore.Eventstore
+		tarpit            Tarpit
 	}
 
 	tests := []struct {
@@ -1146,6 +1147,7 @@ func TestCheckTOTP(t *testing.T) {
 					aggregate: sessAgg,
 				},
 				eventstore: expectEventstore(),
+				tarpit:     expectTarpit(0),
 			},
 			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing"),
 		},
@@ -1161,6 +1163,7 @@ func TestCheckTOTP(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilterError(io.ErrClosedPipe),
 				),
+				tarpit: expectTarpit(0),
 			},
 			wantErr: io.ErrClosedPipe,
 		},
@@ -1180,6 +1183,7 @@ func TestCheckTOTP(t *testing.T) {
 						),
 					),
 				),
+				tarpit: expectTarpit(0),
 			},
 			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-3Mif9s", "Errors.User.MFA.OTP.NotReady"),
 		},
@@ -1206,6 +1210,7 @@ func TestCheckTOTP(t *testing.T) {
 						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 0, 0, false)),
 					),
 				),
+				tarpit: expectTarpit(1),
 			},
 			wantErrorCommands: []eventstore.Command{
 				user.NewHumanOTPCheckFailedEvent(ctx, userAgg, nil),
@@ -1235,6 +1240,7 @@ func TestCheckTOTP(t *testing.T) {
 						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 1, 1, false)),
 					),
 				),
+				tarpit: expectTarpit(1),
 			},
 			wantErrorCommands: []eventstore.Command{
 				user.NewHumanOTPCheckFailedEvent(ctx, userAgg, nil),
@@ -1262,6 +1268,7 @@ func TestCheckTOTP(t *testing.T) {
 					),
 					expectFilter(), // recheck
 				),
+				tarpit: expectTarpit(0),
 			},
 			wantEventCommands: []eventstore.Command{
 				user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil),
@@ -1290,6 +1297,7 @@ func TestCheckTOTP(t *testing.T) {
 						user.NewUserLockedEvent(ctx, userAgg),
 					),
 				),
+				tarpit: expectTarpit(0),
 			},
 			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SF3fg", "Errors.User.Locked"),
 		},
@@ -1301,11 +1309,13 @@ func TestCheckTOTP(t *testing.T) {
 				eventstore:        tt.fields.eventstore(t),
 				totpAlg:           cryptoAlg,
 				now:               func() time.Time { return testNow },
+				tarpit:            tt.fields.tarpit.tarpit,
 			}
 			gotCmds, err := CheckTOTP(tt.code)(ctx, cmd)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.wantErrorCommands, gotCmds)
 			assert.Equal(t, tt.wantEventCommands, cmd.eventCommands)
+			tt.fields.tarpit.metExpectedCalls(t)
 		})
 	}
 }

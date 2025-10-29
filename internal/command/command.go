@@ -70,6 +70,7 @@ type Commands struct {
 	defaultRefreshTokenLifetime     time.Duration
 	defaultRefreshTokenIdleLifetime time.Duration
 	phoneCodeVerifier               func(ctx context.Context, id string) (senders.CodeGenerator, error)
+	tarpit                          func(failedAttempts uint64)
 
 	multifactors            domain.MultifactorConfigs
 	webauthnConfig          *webauthn_helper.Config
@@ -207,6 +208,7 @@ func StartCommands(
 		repo.newHashedSecret = newHashedSecretWithDefault(secretHasher, defaultSecretGenerators.ClientSecret)
 	}
 	repo.phoneCodeVerifier = repo.phoneCodeVerifierFromConfig
+	repo.tarpit = defaults.Tarpit.Tarpit()
 	return repo, nil
 }
 
