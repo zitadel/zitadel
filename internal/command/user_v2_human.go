@@ -475,7 +475,7 @@ func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Com
 	}
 	// ...or old password
 	if password.OldPassword != "" {
-		verification = c.checkCurrentPassword(password.Password, password.EncodedPasswordHash, password.OldPassword, wm.PasswordEncodedHash)
+		verification = c.checkCurrentPassword(password.Password, password.EncodedPasswordHash, password.OldPassword, wm, c.tarpit)
 	}
 	cmd, err := c.setPasswordCommand(
 		ctx,

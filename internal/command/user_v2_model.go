@@ -80,6 +80,26 @@ type UserV2WriteModel struct {
 	Metadata           map[string][]byte
 }
 
+func (wm *UserV2WriteModel) GetUserState() domain.UserState {
+	return wm.UserState
+}
+
+func (wm *UserV2WriteModel) GetPasswordCheckFailedCount() uint64 {
+	return wm.PasswordCheckFailedCount
+}
+
+func (wm *UserV2WriteModel) GetEncodedHash() string {
+	return wm.PasswordEncodedHash
+}
+
+func (wm *UserV2WriteModel) GetResourceOwner() string {
+	return wm.ResourceOwner
+}
+
+func (wm *UserV2WriteModel) GetWriteModel() *eventstore.WriteModel {
+	return &wm.WriteModel
+}
+
 func NewUserExistsWriteModel(userID, resourceOwner string) *UserV2WriteModel {
 	return newUserV2WriteModel(userID, resourceOwner, WithHuman(), WithMachine())
 }
@@ -284,6 +304,7 @@ func (wm *UserV2WriteModel) Reduce() error {
 		case *user.HumanPasswordChangedEvent:
 			wm.PasswordEncodedHash = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 			wm.PasswordChangeRequired = e.ChangeRequired
+			wm.PasswordCheckFailedCount = 0
 			wm.EmptyPasswordCode()
 		case *user.HumanPasswordCodeAddedEvent:
 			wm.SetPasswordCode(e)
