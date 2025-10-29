@@ -42,7 +42,7 @@ func checkPKCondition(
 	)
 }
 
-func getOne[Target any](ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*Target, error) {
+func get[Target any](ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*Target, error) {
 	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func getOne[Target any](ctx context.Context, querier database.Querier, builder *
 	return &target, nil
 }
 
-func getMany[Target any](ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*Target, error) {
+func list[Target any](ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*Target, error) {
 	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
@@ -69,10 +69,10 @@ func getMany[Target any](ctx context.Context, querier database.Querier, builder 
 type updatable interface {
 	PrimaryKeyColumns() []database.Column
 	UpdatedAtColumn() database.Column
-	unqualifiedTableName() string
+	qualifiedTableName() string
 }
 
-func updateOne[Target updatable](ctx context.Context, client database.QueryExecutor, target Target, condition database.Condition, changes ...database.Change) (int64, error) {
+func update[Target updatable](ctx context.Context, client database.QueryExecutor, target Target, condition database.Condition, changes ...database.Change) (int64, error) {
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}
@@ -82,7 +82,7 @@ func updateOne[Target updatable](ctx context.Context, client database.QueryExecu
 	if !database.Changes(changes).IsOnColumn(target.UpdatedAtColumn()) {
 		changes = append(changes, database.NewChange(target.UpdatedAtColumn(), database.NullInstruction))
 	}
-	builder := database.NewStatementBuilder(`UPDATE zitadel.` + target.unqualifiedTableName() + ` SET `)
+	builder := database.NewStatementBuilder(`UPDATE ` + target.qualifiedTableName() + ` SET `)
 	database.Changes(changes).Write(builder)
 	writeCondition(builder, condition)
 
@@ -91,15 +91,15 @@ func updateOne[Target updatable](ctx context.Context, client database.QueryExecu
 
 type deletable interface {
 	PrimaryKeyColumns() []database.Column
-	unqualifiedTableName() string
+	qualifiedTableName() string
 }
 
-func deleteOne[Target deletable](ctx context.Context, client database.QueryExecutor, target Target, condition database.Condition) (int64, error) {
+func delete[Target deletable](ctx context.Context, client database.QueryExecutor, target Target, condition database.Condition) (int64, error) {
 	if err := checkPKCondition(target, condition); err != nil {
 		return 0, err
 	}
 
-	builder := database.NewStatementBuilder(`DELETE FROM zitadel.` + target.unqualifiedTableName() + ` `)
+	builder := database.NewStatementBuilder(`DELETE FROM ` + target.qualifiedTableName() + ` `)
 	writeCondition(builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)

@@ -20,6 +20,10 @@ type org struct {
 	metadataRepo       orgMetadata
 }
 
+func (o org) qualifiedTableName() string {
+	return "zitadel." + o.unqualifiedTableName()
+}
+
 func (o org) unqualifiedTableName() string {
 	return "organizations"
 }

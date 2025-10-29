@@ -18,7 +18,7 @@ func (p projectGrantRole) List(ctx context.Context, client database.QueryExecuto
 	if err != nil {
 		return nil, err
 	}
-	return getMany[domain.ProjectGrantRole](ctx, client, builder)
+	return list[domain.ProjectGrantRole](ctx, client, builder)
 }
 
 const insertProjectGrantRoleStmt = `INSERT INTO zitadel.project_grant_roles(

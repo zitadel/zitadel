@@ -28,7 +28,7 @@ func (p projectGrant) Get(ctx context.Context, client database.QueryExecutor, op
 	if err != nil {
 		return nil, err
 	}
-	return getOne[domain.ProjectGrant](ctx, client, builder)
+	return get[domain.ProjectGrant](ctx, client, builder)
 }
 
 func (p projectGrant) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.ProjectGrant, error) {
@@ -36,7 +36,7 @@ func (p projectGrant) List(ctx context.Context, client database.QueryExecutor, o
 	if err != nil {
 		return nil, err
 	}
-	return getMany[domain.ProjectGrant](ctx, client, builder)
+	return list[domain.ProjectGrant](ctx, client, builder)
 }
 
 const insertProjectGrantStmt = `INSERT INTO zitadel.project_grants(
@@ -59,11 +59,11 @@ func (projectGrant) Create(ctx context.Context, client database.QueryExecutor, p
 }
 
 func (p projectGrant) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	return updateOne[projectGrant](ctx, client, p, condition, changes...)
+	return update(ctx, client, p, condition, changes...)
 }
 
 func (p projectGrant) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	return deleteOne[projectGrant](ctx, client, p, condition)
+	return delete(ctx, client, p, condition)
 }
 
 // -------------------------------------------------------------
@@ -123,6 +123,10 @@ func (p projectGrant) StateCondition(state domain.ProjectGrantState) database.Co
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
+
+func (p projectGrant) qualifiedTableName() string {
+	return "zitadel." + p.unqualifiedTableName()
+}
 
 func (projectGrant) unqualifiedTableName() string {
 	return "project_grants"

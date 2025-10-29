@@ -19,7 +19,7 @@ func (p projectRole) Get(ctx context.Context, client database.QueryExecutor, opt
 	if err != nil {
 		return nil, err
 	}
-	return getOne[domain.ProjectRole](ctx, client, builder)
+	return get[domain.ProjectRole](ctx, client, builder)
 }
 
 func (p projectRole) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.ProjectRole, error) {
@@ -27,7 +27,7 @@ func (p projectRole) List(ctx context.Context, client database.QueryExecutor, op
 	if err != nil {
 		return nil, err
 	}
-	return getMany[domain.ProjectRole](ctx, client, builder)
+	return list[domain.ProjectRole](ctx, client, builder)
 }
 
 const insertProjectRoleStmt = `INSERT INTO zitadel.project_roles(
