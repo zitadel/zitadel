@@ -4,11 +4,10 @@
   "name": "@zitadel/zitadel",
   "type": "module",
   "scripts": {
-    "release": "tsx release/release.ts",
-    "clean:all": "pnpm run clean && rm -rf .nx node_modules"
+    "clean:all": "pnpm run clean && rm -rf .nx node_modules",
+    "release": "tsx release/release.ts"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.29.5",
     "@nx/js": "21.6.1",
     "@swc-node/register": "~1.9.1",
     "@swc/core": "~1.5.7",

@@ -4,6 +4,7 @@
   "type": "module",
   "description": "Release tooling for ZITADEL",
   "scripts": {
+    "release": "tsx release.ts",
     "test-unit": "vitest run",
     "lint": "pnpm tsc --noEmit"
   },
