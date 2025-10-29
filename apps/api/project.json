@@ -26,125 +26,6 @@
             ],
             "command": "bash -c \"[[ \"${NX_DRY_RUN}\" -ne \"true\" ]] && gh release upload ${ZITADEL_RELEASE_VERSION} ./.artifacts/pack/zitadel-*-*.tar.gz\""
         },
-        "build-docker": {
-            "description": "Builds the API Docker image for production",
-            "dependsOn": [
-                "build-linux"
-            ],
-            "executor": "nx:run-commands",
-            "options": {
-                "env": {
-                    "BAKE_FILE": "{projectRoot}/docker-bake.hcl"
-                },
-                "command": "docker buildx bake api --file ${BAKE_FILE}"
-            }
-        },
-        "build-docker-debug": {
-            "description": "Builds the API Docker image for debugging",
-            "dependsOn": [
-                "build-linux"
-            ],
-            "executor": "nx:run-commands",
-            "options": {
-                "env": {
-                    "BAKE_FILE": "{projectRoot}/docker-bake.hcl"
-                },
-                "command": "docker buildx bake --target api-debug --file ${BAKE_FILE}"
-            }
-        },
-        "build-linux": {
-            "description": "Builds the Go-based API backend for Linux (amd64 and arm64) into executable binaries.",
-            "dependsOn": [
-                "generate",
-                "build-console"
-            ],
-            "executor": "nx:run-commands",
-            "options": {
-                "parallel": false,
-                "commands": [
-                    "GOOS=linux GOARCH=amd64 nx run @zitadel/api:build",
-                    "GOOS=linux GOARCH=arm64 nx run @zitadel/api:build"
-                ]
-            }
-        },
-        "build-darwin-windows": {
-            "description": "Builds the Go-based API backend for Darwin (amd64 and arm64) and Windows (amd64) into executable binaries.",
-            "dependsOn": [
-                "generate",
-                "build-console"
-            ],
-            "executor": "nx:run-commands",
-            "options": {
-                "parallel": false,
-                "commands": [
-                    "GOOS=darwin GOARCH=amd64 nx run @zitadel/api:build",
-                    "GOOS=darwin GOARCH=arm64 nx run @zitadel/api:build",
-                    "GOOS=windows GOARCH=amd64 nx run @zitadel/api:build",
-                    "GOOS=windows GOARCH=arm64 nx run @zitadel/api:build"
-                ]
-            }
-        },
-        "build": {
-            "description": "Compiles the Go-based API backend into an executable binary.",
-            "dependsOn": [
-                "generate",
-                "build-console"
-            ],
-            "command": "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; echo \"Building for $GOOS-$GOARCH...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$GOOS/$GOARCH/zitadel$EXT -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\") -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_RELEASE_VERSION}\"'",
-            "inputs": [
-                { "runtime": "go env GOOS" },
-                { "runtime": "go env GOARCH" },
-                { "env": "ZITADEL_RELEASE_VERSION" },
-                "runtime"
-            ],
-            "outputs": [
-                "{workspaceRoot}/.artifacts/bin/*/*/zitadel"
-            ]
-        },
-        "pack": {
-            "description": "Packages the binary for the platform defined by GOOS and GOARCH environment variables. The version is taken from the ZITADEL_RELEASE_VERSION environment variable.",
-            "dependsOn": [
-                "build"
-            ],
-            "executor": "nx:run-commands",
-            "options": {
-                "parallel": false,
-                "commands": [
-                    "mkdir -p .artifacts/pack",
-                    "bash -c 'EXT=\"\"; if [ \"$(go env GOOS)\" = \"windows\" ]; then EXT=\".exe\"; fi; FOLDER=\"zitadel-$(go env GOOS)-$(go env GOARCH)\"; mkdir -p \".artifacts/pack/$FOLDER\"; cp README.md LICENSE \".artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel$EXT\" \".artifacts/pack/$FOLDER/\"; tar -czvf \".artifacts/pack/$FOLDER.tar.gz\" -C .artifacts/pack \"$FOLDER\"; rm -rf \".artifacts/pack/$FOLDER\"'"
-                ]
-            },
-            "cache": true,
-            "inputs": [
-                { "runtime": "go env GOOS" },
-                { "runtime": "go env GOARCH" },
-                "sources",
-                "{workspaceRoot}/README.md",
-                "{workspaceRoot}/LICENSE"
-            ],
-            "outputs": [
-                "{workspaceRoot}/.artifacts/pack/zitadel-*-*.tar.gz"
-            ]
-        },
-        "pack-all": {
-            "description": "Packages the binary for the Linux, Darwin, and Windows platforms.",
-            "dependsOn": [
-                "build-linux",
-                "build-darwin-windows"
-            ],
-            "executor": "nx:run-commands",
-            "options": {
-                "parallel": false,
-                "commands": [
-                    "GOOS=linux GOARCH=amd64 nx run @zitadel/api:pack --excludeTaskDependencies",
-                    "GOOS=linux GOARCH=arm64 nx run @zitadel/api:pack --excludeTaskDependencies",
-                    "GOOS=darwin GOARCH=amd64 nx run @zitadel/api:pack --excludeTaskDependencies",
-                    "GOOS=darwin GOARCH=arm64 nx run @zitadel/api:pack --excludeTaskDependencies",
-                    "GOOS=windows GOARCH=amd64 nx run @zitadel/api:pack --excludeTaskDependencies",
-                    "GOOS=windows GOARCH=arm64 nx run @zitadel/api:pack --excludeTaskDependencies"
-                ]
-            }
-        },
         "prod": {
             "description": "Runs the Go-based API backend in production mode ",
             "continuous": true,
@@ -176,6 +57,23 @@
                     }
                 }
             }
+        },
+        "build": {
+            "description": "Compiles the Go-based API backend into an executable binary.",
+            "dependsOn": [
+                "generate",
+                "build-console"
+            ],
+            "command": "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; echo \"Building for $GOOS-$GOARCH...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$GOOS/$GOARCH/zitadel$EXT -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\") -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_RELEASE_VERSION}\"'",
+            "inputs": [
+                { "runtime": "go env GOOS" },
+                { "runtime": "go env GOARCH" },
+                { "env": "ZITADEL_RELEASE_VERSION" },
+                "runtime"
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/bin/*/*/zitadel"
+            ]
         },
         "generate": {
             "description": "Generates the code needed to start a full-featured API: gRPC and OpenAPI stubs, static files for the embedded login v1, asset routes and documentation.",
@@ -317,9 +215,6 @@
             ],
             "command": "cp -r console/dist/console/* internal/api/ui/console/static",
             "cache": true,
-            "inputs": [
-                "{workspaceRoot}/console/dist/console/**/*"
-            ],
             "outputs": [
                 "{workspaceRoot}/internal/api/ui/console/static"
             ]
@@ -455,6 +350,108 @@
                 "generate-install"
             ],
             "command": "PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate ./..."
+        },
+        "build-docker": {
+            "description": "Builds the API Docker image for production",
+            "dependsOn": [
+                "build-linux"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "env": {
+                    "BAKE_FILE": "{projectRoot}/docker-bake.hcl"
+                },
+                "command": "docker buildx bake api --file ${BAKE_FILE}"
+            }
+        },
+        "build-docker-debug": {
+            "description": "Builds the API Docker image for debugging",
+            "dependsOn": [
+                "build-linux"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "env": {
+                    "BAKE_FILE": "{projectRoot}/docker-bake.hcl"
+                },
+                "command": "docker buildx bake --target api-debug --file ${BAKE_FILE}"
+            }
+        },
+        "build-linux": {
+            "description": "Builds the Go-based API backend for Linux (amd64 and arm64) into executable binaries.",
+            "dependsOn": [
+                "generate",
+                "build-console"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "parallel": false,
+                "commands": [
+                    "GOOS=linux GOARCH=amd64 nx run @zitadel/api:build",
+                    "GOOS=linux GOARCH=arm64 nx run @zitadel/api:build"
+                ]
+            }
+        },
+        "build-darwin-windows": {
+            "description": "Builds the Go-based API backend for Darwin (amd64 and arm64) and Windows (amd64) into executable binaries.",
+            "dependsOn": [
+                "generate",
+                "build-console"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "parallel": false,
+                "commands": [
+                    "GOOS=darwin GOARCH=amd64 nx run @zitadel/api:build",
+                    "GOOS=darwin GOARCH=arm64 nx run @zitadel/api:build",
+                    "GOOS=windows GOARCH=amd64 nx run @zitadel/api:build",
+                    "GOOS=windows GOARCH=arm64 nx run @zitadel/api:build"
+                ]
+            }
+        },        
+        "pack": {
+            "description": "Packages the binary for the platform defined by GOOS and GOARCH environment variables. The version is taken from the ZITADEL_RELEASE_VERSION environment variable.",
+            "dependsOn": [
+                "build"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "parallel": false,
+                "commands": [
+                    "mkdir -p .artifacts/pack",
+                    "bash -c 'EXT=\"\"; if [ \"$(go env GOOS)\" = \"windows\" ]; then EXT=\".exe\"; fi; FOLDER=\"zitadel-$(go env GOOS)-$(go env GOARCH)\"; mkdir -p \".artifacts/pack/$FOLDER\"; cp README.md LICENSE \".artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel$EXT\" \".artifacts/pack/$FOLDER/\"; tar -czvf \".artifacts/pack/$FOLDER.tar.gz\" -C .artifacts/pack \"$FOLDER\"; rm -rf \".artifacts/pack/$FOLDER\"'"
+                ]
+            },
+            "cache": true,
+            "inputs": [
+                { "runtime": "go env GOOS" },
+                { "runtime": "go env GOARCH" },
+                "sources",
+                "{workspaceRoot}/README.md",
+                "{workspaceRoot}/LICENSE"
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/pack/zitadel-*-*.tar.gz"
+            ]
+        },
+        "pack-all": {
+            "description": "Packages the binary for the Linux, Darwin, and Windows platforms.",
+            "dependsOn": [
+                "build-linux",
+                "build-darwin-windows"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "parallel": false,
+                "commands": [
+                    "GOOS=linux GOARCH=amd64 nx run @zitadel/api:pack --excludeTaskDependencies",
+                    "GOOS=linux GOARCH=arm64 nx run @zitadel/api:pack --excludeTaskDependencies",
+                    "GOOS=darwin GOARCH=amd64 nx run @zitadel/api:pack --excludeTaskDependencies",
+                    "GOOS=darwin GOARCH=arm64 nx run @zitadel/api:pack --excludeTaskDependencies",
+                    "GOOS=windows GOARCH=amd64 nx run @zitadel/api:pack --excludeTaskDependencies",
+                    "GOOS=windows GOARCH=arm64 nx run @zitadel/api:pack --excludeTaskDependencies"
+                ]
+            }
         }
     }
 }

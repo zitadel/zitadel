@@ -18,8 +18,7 @@ on:
 jobs:
   lint_test_build:
     name: Lint, Test and Build
-    runs-on: ubuntu-22.04
-    environment: ${{ github.ref_protected == 'true' && 'Protected' || null }}
+    runs-on: depot-ubuntu-22.04-16
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4

@@ -20,7 +20,6 @@ on:
 jobs:
   release:
     runs-on: ubuntu-22.04
-    environment: ${{ github.ref_protected == 'true' && 'Protected' || null }}
     permissions:
       contents: write
       packages: write
