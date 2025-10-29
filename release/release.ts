@@ -113,8 +113,8 @@ export function configureGithubRepo(options: ReleaseOptions): void {
     if (!execSync('gh auth status', { stdio: 'pipe' }).toString().includes('Logged in to GitHub.com as')) {
       throw new Error(`When specifying a custom GitHub repository (${repo}), the gh CLI must be authenticated to avoid accidental releases to the main repository.`);
     }
-    if (!execSync('gh repo view', { stdio: 'pipe' }).toString().includes(`Repository: ${repo}`)) {
-      throw new Error(`When specifying a custom GitHub repository (${repo}), the gh CLI must default to the specified repository to avoid accidental releases to the main repository.`);
+    if (execSync('gh repo view | head -1', { stdio: 'pipe' }).toString() !== `${repo.trim()}\n`) {
+      throw new Error(`When specifying a custom GitHub repository (${repo}), the gh CLI must default to the specified repository to avoid accidental releases to the main repository. Run "gh repo set-default ${repo}" to set the default repository.`);
     }
   }
   process.env[githubOrgEnvVar] = repo;
