@@ -56,7 +56,6 @@ export class UserCreateV2Component implements OnInit {
   private readonly passwordComplexityPolicy$: Observable<PasswordComplexityPolicy>;
   protected readonly authenticationFactor$: Observable<AuthenticationFactor>;
   private readonly useLoginV2$: Observable<LoginV2FeatureFlag | undefined>;
-  private orgId = this.organizationService.getOrgId();
 
   constructor(
     private readonly router: Router,
@@ -70,7 +69,6 @@ export class UserCreateV2Component implements OnInit {
     private readonly route: ActivatedRoute,
     protected readonly location: Location,
     private readonly authService: GrpcAuthService,
-    private readonly organizationService: NewOrganizationService,
   ) {
     this.userForm = this.buildUserForm();
 
@@ -186,11 +184,11 @@ export class UserCreateV2Component implements OnInit {
   private async createUserV2Try(authenticationFactor: AuthenticationFactor) {
     this.loading.set(true);
 
-    this.organizationService.getOrgId();
+    const activeOrg = await this.authService.getActiveOrg();
     const userValues = this.userForm.getRawValue();
 
     const humanReq: MessageInitShape<typeof AddHumanUserRequestSchema> = {
-      organization: { org: { case: 'orgId', value: this.orgId() } },
+      organization: { org: { case: 'orgId', value: activeOrg.id } },
       username: userValues.username,
       profile: {
         givenName: userValues.givenName,
