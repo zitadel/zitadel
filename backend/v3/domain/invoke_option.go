@@ -27,6 +27,18 @@ func WithProjectRepo(repo ProjectRepository) InvokeOpt {
 	}
 }
 
+func WithInstanceRepo(repo InstanceRepository) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.instanceRepo = repo
+	}
+}
+
+func WithInstanceDomainRepo(repo InstanceDomainRepository) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.instanceDomainRepo = repo
+	}
+}
+
 // WithQueryExecutor sets the database client to be used by the command.
 // If not set, the default pool will be used.
 // This is mainly used for testing.
@@ -59,6 +71,8 @@ type InvokeOpts struct {
 	organizationRepo       OrganizationRepository
 	organizationDomainRepo OrganizationDomainRepository
 	projectRepo            ProjectRepository
+	instanceRepo           InstanceRepository
+	instanceDomainRepo     InstanceDomainRepository
 }
 
 func (o *InvokeOpts) DB() database.QueryExecutor {
