@@ -3,6 +3,9 @@
   "namedInputs": {
     "sources": ["{projectRoot}/src/**/*"]
   },
+  "release": {
+    "version": {}
+  },
   "targets": {
     "test": {
       "description": "Tests the TypeScript client library. It is an alias for test-unit.",

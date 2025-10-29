@@ -2,6 +2,21 @@
   "$schema": "./node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "targets": {
+    "nx-release-publish": {
+      "dependsOn": [
+        "@zitadel/api:nx-release-publish",
+        "@zitadel/login:nx-release-publish"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "parallel": false,
+        "cwd": "{workspaceRoot}/.artifacts/pack",
+        "commands": [
+          "sha256sum * > checksums.txt",
+          "bash -c \"[[ \"${NX_DRY_RUN}\" -ne \"true\" ]] && gh release upload ${ZITADEL_RELEASE_VERSION} checksums.txt\""
+        ]
+      }
+    },
     "db": {
       "continuous": true,
       "description": "Runs a local Postgres database for development",
@@ -15,28 +30,13 @@
         "@zitadel/console:clean"
       ]
     },
-    "pack": {
-        "description": "Creates package archives for the API across all platforms and for the Login component, then generates a checksums.txt file containing the SHA256 checksums for all created archives.",
-        "dependsOn": [
-            "@zitadel/api:pack-linux-*",
-            "@zitadel/api:pack-darwin-*",
-            "@zitadel/api:pack-windows-*",
-            "@zitadel/login:pack"
-        ],
-        "executor": "nx:run-commands",
-        "options": {
-            "parallel": false,
-            "commands": [
-                "sha256sum .artifacts/pack/zitadel-*.tar.gz > .artifacts/pack/checksums.txt"
-            ]
-        },
-        "cache": true,
-        "inputs": [
-            "{workspaceRoot}/.artifacts/pack/zitadel-*.tar.gz"
-        ],
-        "outputs": [
-            "{workspaceRoot}/.artifacts/pack/checksums.txt"
-        ]
-    }    
+    "local-npm-registry": {
+      "executor": "@nx/js:verdaccio",
+      "options": {
+        "port": 4873,
+        "config": ".verdaccio/config.yml",
+        "storage": ".artifacts/local-npm-registry/storage"
+      }
+    }
   }
 }

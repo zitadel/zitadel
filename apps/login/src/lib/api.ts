@@ -1,5 +1,6 @@
 import { newSystemToken } from "@zitadel/client/node";
 
+// systemAPIToken returns a system token for server-to-server communication
 export async function systemAPIToken() {
   const token = {
     audience: process.env.AUDIENCE,
