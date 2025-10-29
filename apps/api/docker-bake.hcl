@@ -11,5 +11,5 @@ target "api" {
 target "api-debug" {
     inherits = [ "release", "api" ]
     target = "builder"
-    tags = [ "zitadel-api:local-debug" ]
+    tags = [ "zitadel-api-debug:local" ]
 }

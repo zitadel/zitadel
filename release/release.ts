@@ -1,7 +1,6 @@
 import { execSync } from 'node:child_process';
 import { releaseVersion, releaseChangelog, releasePublish } from 'nx/release';
 import yargs from 'yargs';
-import { config } from 'yargs';
 
 // ZITADEL_RELEASE_VERSION defaults to git SHA if not a conventional commit release.
 // It is needed in the following places:
@@ -13,9 +12,6 @@ const versionEnvVar = "ZITADEL_RELEASE_VERSION";
 const revisionEnvVar = "ZITADEL_RELEASE_REVISION";
 // ZITADEL_RELEASE_IS_LATEST is used in docker-bake-release.hcl to determine whether to tag the docker images as latest
 const isLatestEnvVar = "ZITADEL_RELEASE_IS_LATEST";
-// ZITADEL_RELEASE_PUSH is used in docker-bake-release.hcl to determine whether to push the docker images.
-// It is false for dry runs and true otherwise.
-const doPushEnvVar = "ZITADEL_RELEASE_PUSH";
 // ZITADEL_RELEASE_GITHUB_ORG is used to specify the GitHub organization for which Docker images should be created.
 const githubOrgEnvVar = "ZITADEL_RELEASE_GITHUB_ORG";
 
@@ -35,7 +31,6 @@ export interface EnvironmentConfig {
   versionEnvVar: string;
   revisionEnvVar: string;
   isLatestEnvVar: string;
-  doPushEnvVar: string;
 }
 
 /**
@@ -117,45 +112,65 @@ export function configureGithubRepo(options: ReleaseOptions): void {
   console.log(`Setting ${githubOrgEnvVar}=${process.env[githubOrgEnvVar]} for Docker image creation`);
 }
 
+export function setupDefaultEnvironmentVariables(
+  gitSha: string,
+): void {
+  process.env[revisionEnvVar] = gitSha;
+  process.env[versionEnvVar] = gitSha;
+  process.env[isLatestEnvVar] = 'false';
+  console.log(`Setting default ${revisionEnvVar}=${process.env[revisionEnvVar]}`);
+  console.log(`Setting default ${versionEnvVar}=${process.env[versionEnvVar]}`);
+  console.log(`Setting default ${isLatestEnvVar}=${process.env[isLatestEnvVar]}`);
+}
+
 /**
  * Sets up environment variables for the release process.
  */
-export function setupEnvironmentVariables(
+export function setupWorkspaceVersionEnvironmentVariables(
   config: EnvironmentConfig,
   gitInfo: GitInfo,
-  options: ReleaseOptions,
-  conventionalCommits: boolean,
-  workspaceVersion?: string
+  workspaceVersion?: string | null
 ): void {
-  process.env[config.revisionEnvVar] = gitInfo.sha;
-  console.log(`Setting ${config.revisionEnvVar}=${process.env[config.revisionEnvVar]} for docker image labels`);
 
-  process.env[config.doPushEnvVar] = options.dryRun ? 'false' : 'true';
-  console.log(`Setting ${config.doPushEnvVar}=${process.env[config.doPushEnvVar]} based on dryRun = ${options.dryRun}`);
-
-  if (!conventionalCommits) {
-    process.env[config.versionEnvVar] = gitInfo.sha;
-    process.env[config.isLatestEnvVar] = 'false';
-  } else if (workspaceVersion) {
-    process.env[config.versionEnvVar] = `v${workspaceVersion}`;
-    const workspaceVersionIsHigherThanBeforeOrEqual = workspaceVersion.localeCompare(gitInfo.highestVersionBefore, undefined, { numeric: true, sensitivity: 'base' }) >= 0;
-    process.env[config.isLatestEnvVar] = workspaceVersionIsHigherThanBeforeOrEqual ? 'true' : 'false';
+  if (!workspaceVersion) {
+    throw new Error('Could not determine workspace version. No relevant changes found in conventional commits.');
   }
+
+  const versionMatch = workspaceVersion.match(/^(\d+)\.(\d+)\.(\d+)$/); // Ensure it's in semver format
+  if (!versionMatch) {
+    throw new Error(`Workspace version ${workspaceVersion} is not a valid semver (e.g., 1.2.3).`);
+  }
+  const [, major, minor] = versionMatch;
+
+  const branchMatch = gitInfo.branch.match(/^v(\d+)\.(x|\d+)(?:\.x)?$/);
+  if (!branchMatch) {
+    throw new Error(`Branch ${gitInfo.branch} is not a valid maintenance branch (e.g., v1.x or v1.2.x).`);
+  }
+  const [, branchMajor, branchMinor] = branchMatch;
+
+  if (parseInt(major, 10) !== parseInt(branchMajor, 10) || (branchMinor !== 'x' && parseInt(minor, 10) !== parseInt(branchMinor, 10))) {
+    throw new Error(`Workspace version ${workspaceVersion} does not match the maintenance branch ${gitInfo.branch}.`);
+  }
+
+  process.env[config.versionEnvVar] = `v${workspaceVersion}`;
+  console.log(`Overwriting ${config.versionEnvVar}=${process.env[config.versionEnvVar]} based on workspace version ${workspaceVersion}  according to conventional commits`);
+  const workspaceVersionIsHigherThanBeforeOrEqual = workspaceVersion.localeCompare(gitInfo.highestVersionBefore, undefined, { numeric: true, sensitivity: 'base' }) >= 0;
+  process.env[config.isLatestEnvVar] = workspaceVersionIsHigherThanBeforeOrEqual ? 'true' : 'false';
+  console.log(`Overwriting ${config.isLatestEnvVar}=${process.env[config.isLatestEnvVar]} because ${config.versionEnvVar}=${process.env[config.versionEnvVar]} is ${workspaceVersionIsHigherThanBeforeOrEqual ? 'higher than or equal to' : 'lower than'} the previously highest regular semantic tag v${gitInfo.highestVersionBefore}`);
 }
 
 /**
  * Executes docker build commands with the appropriate configuration.
  */
-export function executeDockerBuild(conventionalCommits: boolean): void {
-  const baseCommand = 'pnpm nx run-many --target build-docker';
+export function executeDockerBuild(conventionalCommits: boolean, dryRun: boolean): void {
+  const baseCommand = 'pnpm nx run-many --tuiAutoExit 3 --target build-docker';
   const debugTarget = conventionalCommits ? ' build-docker-debug' : '';
   const bakeFiles = ' --file release/docker-bake-release.hcl --file apps/api/docker-bake-release.hcl --file apps/login/docker-bake-release.hcl';
+  const pushFlag = dryRun ? '' : ' --push';
+  console.log(`Executing docker build with command: ${baseCommand}${debugTarget}${bakeFiles}${pushFlag}\n from directory: ${process.cwd()}`);
 
-  execSync(`${baseCommand}${debugTarget}${bakeFiles}`, {
-    stdio: 'inherit', env: {
-      ...process.env,
-      NX_TUI_AUTO_EXIT: 'true',
-    }
+  execSync(`${baseCommand}${debugTarget}${bakeFiles}${pushFlag}`, {
+    stdio: 'inherit', env: process.env, cwd: process.cwd()
   });
 }
 
@@ -171,14 +186,14 @@ export async function executeRelease(
 
   configureGithubRepo(options);
 
+  setupDefaultEnvironmentVariables(gitInfo.sha);
+
   const conventionalCommits = shouldUseConventionalCommits(gitInfo.branch);
   console.log(`Determined conventional commits = ${conventionalCommits} based on git branch = ${gitInfo.branch}`);
 
-  setupEnvironmentVariables(envConfig, gitInfo, options, conventionalCommits);
-
   if (!conventionalCommits) {
     console.log(`Skipping GitHub release creation based on conventionalCommits=${conventionalCommits}. Instead setting ${envConfig.versionEnvVar}=${process.env[envConfig.versionEnvVar]} ${envConfig.isLatestEnvVar}=${process.env[envConfig.isLatestEnvVar]} and running the build-docker targets with additional docker-bake-release.hcl files to push SHA tagged Docker images for production.\n`);
-    executeDockerBuild(conventionalCommits);
+    executeDockerBuild(false, options.dryRun);
     return 0;
   }
 
@@ -187,14 +202,10 @@ export async function executeRelease(
     verbose: options.verbose,
   });
 
-  if (!workspaceVersion) {
-    throw new Error('Could not determine workspace version. No relevant changes found in conventional commits.');
-  }
-
-  setupEnvironmentVariables(envConfig, gitInfo, options, conventionalCommits, workspaceVersion);
+  setupWorkspaceVersionEnvironmentVariables(envConfig, gitInfo, workspaceVersion);
   console.log(`Setting ${envConfig.versionEnvVar}=${process.env[envConfig.versionEnvVar]}`);
   console.log(`Setting ${envConfig.isLatestEnvVar}=${process.env[envConfig.isLatestEnvVar]} because ${envConfig.versionEnvVar}=${process.env[envConfig.versionEnvVar]} is higher or equal to the previously highest regular semantic tag v${gitInfo.highestVersionBefore}. Running the build-docker and build-docker-debug targets with additional docker-bake-release.hcl files to push Docker images.\n`);
-  executeDockerBuild(conventionalCommits);
+  executeDockerBuild(true, options.dryRun);
 
   await releaseChangelog({
     versionData: projectsVersionData,
@@ -221,8 +232,7 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<numb
   const envConfig: EnvironmentConfig = {
     versionEnvVar,
     revisionEnvVar,
-    isLatestEnvVar,
-    doPushEnvVar,
+    isLatestEnvVar
   };
 
   return executeRelease(gitInfo, options, envConfig);

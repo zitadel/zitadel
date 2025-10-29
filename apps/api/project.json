@@ -374,7 +374,7 @@
                 "env": {
                     "BAKE_FILE": "{projectRoot}/docker-bake.hcl"
                 },
-                "command": "docker buildx bake --target api-debug --file ${BAKE_FILE}"
+                "command": "docker buildx bake api-debug --file ${BAKE_FILE}"
             }
         },
         "build-linux": {
