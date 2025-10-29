@@ -53,7 +53,7 @@ export function determineGitInfo(): GitInfo {
   // :refname is needed to sort by tag name instead of commit date
   // head -n 1 gets the first line of the output, which is the highest version tag
   const highestVersionBefore = execSync('git tag --list "v[0-9]*.[0-9]*.[0-9]*" --sort=-v:refname | head -n 1').toString().trim().replace(/^v/, '');
-  
+
   return { branch, sha, highestVersionBefore };
 }
 
@@ -93,7 +93,7 @@ export async function parseReleaseOptions(argv: string[]): Promise<ReleaseOption
     })
     .demandOption('githubRepo', 'GitHub repository is required')
     .parseAsync();
-  
+
   return {
     dryRun: result.dryRun,
     verbose: result.verbose,
@@ -104,15 +104,16 @@ export async function parseReleaseOptions(argv: string[]): Promise<ReleaseOption
 // configureGithubRepo makes sure that we can release to a different GitHub repository than zitadel/zitadel for testing purposes.
 export function configureGithubRepo(options: ReleaseOptions): void {
   const repo = options.githubRepo;
+  const org = repo.trim().split('/')[0];
   if (repo.trim() !== 'zitadel/zitadel') {
-    if (repo.trim().split('/')[0] === 'zitadel') {
+    if (org === 'zitadel') {
       throw new Error('GitHub organization must not be zitadel when releasing to a different repository than zitadel/zitadel.');
     }
     if (execSync('gh repo view --json isFork --jq .isFork', { stdio: 'pipe' }).toString() !== 'true\n') {
       throw new Error(`GitHub repository ${repo} of the current directory must be a fork of zitadel/zitadel.`);
     }
   }
-  process.env[githubOrgEnvVar] = repo;
+  process.env[githubOrgEnvVar] = org;
   console.log(`Setting ${githubOrgEnvVar}=${process.env[githubOrgEnvVar]} for Docker image creation`);
 }
 
@@ -149,8 +150,13 @@ export function executeDockerBuild(conventionalCommits: boolean): void {
   const baseCommand = 'pnpm nx run-many --target build-docker';
   const debugTarget = conventionalCommits ? ' build-docker-debug' : '';
   const bakeFiles = ' --file release/docker-bake-release.hcl --file apps/api/docker-bake-release.hcl --file apps/login/docker-bake-release.hcl';
-  
-  execSync(`${baseCommand}${debugTarget}${bakeFiles}`, { stdio: 'inherit', env: process.env });
+
+  execSync(`${baseCommand}${debugTarget}${bakeFiles}`, {
+    stdio: 'inherit', env: {
+      ...process.env,
+      NX_TUI_AUTO_EXIT: 'true',
+    }
+  });
 }
 
 /**
@@ -178,13 +184,13 @@ export async function executeRelease(
 
   const { workspaceVersion, projectsVersionData } = await releaseVersion({
     dryRun: options.dryRun,
-    verbose: options.verbose,    
+    verbose: options.verbose,
   });
 
   if (!workspaceVersion) {
     throw new Error('Could not determine workspace version. No relevant changes found in conventional commits.');
   }
-  
+
   setupEnvironmentVariables(envConfig, gitInfo, options, conventionalCommits, workspaceVersion);
   console.log(`Setting ${envConfig.versionEnvVar}=${process.env[envConfig.versionEnvVar]}`);
   console.log(`Setting ${envConfig.isLatestEnvVar}=${process.env[envConfig.isLatestEnvVar]} because ${envConfig.versionEnvVar}=${process.env[envConfig.versionEnvVar]} is higher or equal to the previously highest regular semantic tag v${gitInfo.highestVersionBefore}. Running the build-docker and build-docker-debug targets with additional docker-bake-release.hcl files to push Docker images.\n`);
@@ -199,7 +205,7 @@ export async function executeRelease(
 
   const publishResults = await releasePublish({
     dryRun: options.dryRun,
-    verbose: options.verbose,    
+    verbose: options.verbose
   });
 
   return Object.values(publishResults).every((result) => result.code === 0) ? 0 : 1;
