@@ -131,12 +131,42 @@ describe('setupWorkspaceVersionEnvironmentVariables', () => {
     ).toThrowError();
   });
 
-  test('throws error if workspaceVersion does not match maintenance branch', () => {
+  test('sets env vars for matching minor maintenance branch and version', () => {
+    setupWorkspaceVersionEnvironmentVariables(
+      mockConfig,
+      { ...mockGitInfo, branch: 'v2.5.x' },
+      '2.5.1'
+    );
+
+    expect(process.env.ZITADEL_RELEASE_VERSION).toBe('v2.5.1');
+  });
+
+  test('sets env vars for matching major maintenance branch and version', () => {
+    setupWorkspaceVersionEnvironmentVariables(
+      mockConfig,
+      { ...mockGitInfo, branch: 'v3.x' },
+      '3.0.2'
+    );
+    
+    expect(process.env.ZITADEL_RELEASE_VERSION).toBe('v3.0.2');
+  });
+
+  test('throws error if major workspaceVersion does not match major maintenance branch', () => {
     expect(() =>
       setupWorkspaceVersionEnvironmentVariables(
         mockConfig,
         { ...mockGitInfo, branch: 'v2.x' },
         '3.0.0'
+      )
+    ).toThrowError();
+  });
+
+  test('throws error if minor workspaceVersion does not match minor maintenance branch', () => {
+    expect(() =>
+      setupWorkspaceVersionEnvironmentVariables(
+        mockConfig,
+        { ...mockGitInfo, branch: 'v2.5.x' },
+        '2.6.0'
       )
     ).toThrowError();
   });
