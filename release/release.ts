@@ -1,6 +1,7 @@
 import { execSync } from 'node:child_process';
 import { releaseVersion, releaseChangelog, releasePublish } from 'nx/release';
 import yargs from 'yargs';
+import { config } from 'yargs';
 
 // ZITADEL_RELEASE_VERSION defaults to git SHA if not a conventional commit release.
 // It is needed in the following places:
@@ -27,6 +28,7 @@ export interface GitInfo {
 export interface ReleaseOptions {
   dryRun: boolean;
   verbose: boolean;
+  githubRepo: string;
 }
 
 export interface EnvironmentConfig {
@@ -82,22 +84,26 @@ export async function parseReleaseOptions(argv: string[]): Promise<ReleaseOption
       type: 'boolean',
       default: false,
     })
-    .option('github-repo', {
+    .option('githubRepo', {
       alias: 'r',
       description:
         'The GitHub repository for which the release should be created, defaults to zitadel/zitadel',
-        type: 'string'
+      type: 'string',
+      requiresArg: true,
     })
+    .demandOption('githubRepo', 'GitHub repository is required')
     .parseAsync();
   
   return {
     dryRun: result.dryRun,
-    verbose: result.verbose,    
+    verbose: result.verbose,
+    githubRepo: result.githubRepo,
   };
 }
 
 // configureGithubRepo makes sure that we can release to a different GitHub repository than zitadel/zitadel for testing purposes.
-export function configureGithubRepo(repo: string = 'zitadel/zitadel'): void {
+export function configureGithubRepo(options: ReleaseOptions): void {
+  const repo = options.githubRepo;
   if (repo.trim() !== 'zitadel/zitadel') {
     // Verify neither GH_TOKEN nor GITHUB_TOKEN are set to avoid accidental releases to the main repository
     if (process.env['GH_TOKEN'] || process.env['GITHUB_TOKEN']) {
@@ -161,6 +167,9 @@ export async function executeRelease(
   options: ReleaseOptions,
   envConfig: EnvironmentConfig
 ): Promise<number> {
+
+  configureGithubRepo(options);
+
   const conventionalCommits = shouldUseConventionalCommits(gitInfo.branch);
   console.log(`Determined conventional commits = ${conventionalCommits} based on git branch = ${gitInfo.branch}`);
 
@@ -207,7 +216,7 @@ export async function executeRelease(
 export async function main(argv: string[] = process.argv.slice(2)): Promise<number> {
   const gitInfo = determineGitInfo();
   const options = await parseReleaseOptions(argv);
-  
+
   const envConfig: EnvironmentConfig = {
     versionEnvVar,
     revisionEnvVar,
