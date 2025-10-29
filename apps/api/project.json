@@ -24,7 +24,7 @@
             "dependsOn": [
                 "pack-all"
             ],
-            "command": "bash -c \"[[ \"${NX_DRY_RUN}\" -ne \"true\" ]] && gh release upload ${ZITADEL_RELEASE_VERSION} ./.artifacts/pack/zitadel-*-*.tar.gz\""
+            "command": "bash -c \"[[ \\\"${NX_DRY_RUN}\\\" != \\\"true\\\" ]] && gh release upload ${ZITADEL_RELEASE_VERSION} ./.artifacts/pack/zitadel-*-*.tar.gz\""
         },
         "prod": {
             "description": "Runs the Go-based API backend in production mode ",

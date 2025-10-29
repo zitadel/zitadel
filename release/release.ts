@@ -136,6 +136,10 @@ export function setupWorkspaceVersionEnvironmentVariables(
     throw new Error('Could not determine workspace version. No relevant changes found in conventional commits.');
   }
 
+  if (!process.env["GITHUB_TOKEN"] && !process.env["GH_TOKEN"]) {
+    throw new Error('GITHUB_TOKEN or GH_TOKEN env must be set with a classic PAT and scope write:packages to create a release.');
+  }
+
   const versionMatch = workspaceVersion.match(/^(\d+)\.(\d+)\.(\d+)$/); // Ensure it's in semver format
   if (!versionMatch) {
     throw new Error(`Workspace version ${workspaceVersion} is not a valid semver (e.g., 1.2.3).`);

@@ -60,7 +60,7 @@ describe('shouldUseConventionalCommits', () => {
 describe('setupWorkspaceVersionEnvironmentVariables', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env = { ...originalEnv };
+    process.env = { ...originalEnv, GITHUB_TOKEN: 'classic pat with package:write' };
     // Clear relevant env vars
     delete process.env.ZITADEL_RELEASE_VERSION;
     delete process.env.ZITADEL_RELEASE_REVISION;
@@ -167,6 +167,17 @@ describe('setupWorkspaceVersionEnvironmentVariables', () => {
         mockConfig,
         { ...mockGitInfo, branch: 'v2.5.x' },
         '2.6.0'
+      )
+    ).toThrowError();
+  });
+
+  test('throws error if neither GITHUB_TOKEN nor GITHUB_API_TOKEN is set', () => {
+    process.env = { ...originalEnv };
+    expect(() =>
+      setupWorkspaceVersionEnvironmentVariables(
+        mockConfig,
+        mockGitInfo,
+        '2.0.0'
       )
     ).toThrowError();
   });
@@ -355,7 +366,7 @@ describe('configureGithubRepo', () => {
 describe('executeRelease', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env = { ...originalEnv };
+    process.env = { ...originalEnv, GITHUB_TOKEN: 'classic pat with package:write' };
     delete process.env.ZITADEL_RELEASE_VERSION;
     delete process.env.ZITADEL_RELEASE_REVISION;
     delete process.env.ZITADEL_RELEASE_IS_LATEST;

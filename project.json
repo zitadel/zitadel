@@ -13,7 +13,7 @@
         "cwd": "{workspaceRoot}/.artifacts/pack",
         "commands": [
           "sha256sum * > checksums.txt",
-          "bash -c \"[[ \"${NX_DRY_RUN}\" -ne \"true\" ]] && gh release upload ${ZITADEL_RELEASE_VERSION} checksums.txt\""
+          "bash -c \"[[ \\\"${NX_DRY_RUN}\\\" != \\\"true\\\" ]] && gh release upload ${ZITADEL_RELEASE_VERSION} checksums.txt\""
         ]
       }
     },
