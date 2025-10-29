@@ -26,7 +26,10 @@ type Instance interface {
 }
 
 type InstanceVerifier interface {
-	InstanceByHost(ctx context.Context, host, publicDomain string) (Instance, error)
+	// InstanceByHost returns the instance for the given instanceDomain or publicDomain.
+	// Previously it used the host (hostname[:port]) to find the instance, but is now using the domain (hostname) only.
+	// For preventing issues in backports, the name of the method is not changed.
+	InstanceByHost(ctx context.Context, instanceDomain, publicDomain string) (Instance, error)
 	InstanceByID(ctx context.Context, id string) (Instance, error)
 }
 
