@@ -496,9 +496,12 @@ describe("sendLoginname", () => {
           allowUsernamePassword: true,
           ignoreUnknownUsernames: false,
         })
-        // Mock login settings for discovered org
+        // Mock login settings for discovered org - must include all necessary flags
         .mockResolvedValueOnce({
           allowDomainDiscovery: true,
+          allowRegister: true,
+          allowUsernamePassword: true,
+          ignoreUnknownUsernames: false,
         });
 
       // Mock org discovery to return one org with matching domain
@@ -532,20 +535,22 @@ describe("sendLoginname", () => {
           allowRegister: true,
           allowUsernamePassword: false,
         })
-        // Mock login settings for discovered org
+        // Mock login settings for discovered org - must include all necessary flags
         .mockResolvedValueOnce({
           allowDomainDiscovery: true,
+          allowRegister: true,
+          allowUsernamePassword: false,
         });
 
       // Mock org discovery to return one org with matching domain
       mockGetOrgsByDomain.mockResolvedValue({
-        result: [{ id: "12345678910", name: "Example Org" }],
+        result: [{ id: "discovered-org-456", name: "Example Org" }],
       });
 
       mockGetActiveIdentityProviders.mockResolvedValue({
         identityProviders: [{ id: "idp123", type: "OIDC" }],
       });
-      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth?org=12345678910");
+      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth?org=discovered-org-456");
 
       const result = await sendLoginname({
         loginName: "user@company.com",
@@ -553,7 +558,7 @@ describe("sendLoginname", () => {
         // No organization parameter
       });
 
-      expect(result).toEqual({ redirect: "https://idp.example.com/auth?org=12345678910" });
+      expect(result).toEqual({ redirect: "https://idp.example.com/auth?org=discovered-org-456" });
 
       // Verify org discovery was called
       expect(mockGetOrgsByDomain).toHaveBeenCalledWith({
@@ -564,7 +569,7 @@ describe("sendLoginname", () => {
       // Verify IDP redirect was called with discovered org
       expect(mockGetActiveIdentityProviders).toHaveBeenCalledWith({
         serviceUrl: "https://api.example.com",
-        orgId: "12345678910",
+        orgId: "discovered-org-456",
       });
     });
 

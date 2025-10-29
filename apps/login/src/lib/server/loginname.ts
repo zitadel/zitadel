@@ -393,6 +393,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   // user not found, perform organization discovery if no org context provided
   let discoveredOrganization = command.organization;
+  let effectiveLoginSettings = loginSettingsByContext;
 
   if (!discoveredOrganization && command.loginName && ORG_SUFFIX_REGEX.test(command.loginName)) {
     const matched = ORG_SUFFIX_REGEX.exec(command.loginName);
@@ -412,20 +413,22 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       });
       if (orgLoginSettings?.allowDomainDiscovery) {
         discoveredOrganization = orgToCheckForDiscovery;
+        // Use the discovered organization's login settings for subsequent checks
+        effectiveLoginSettings = orgLoginSettings;
       }
     }
   }
 
   // user not found, check if register is enabled on instance / organization context
-  if (loginSettingsByContext?.allowRegister && !loginSettingsByContext?.allowUsernamePassword) {
+  if (effectiveLoginSettings?.allowRegister && !effectiveLoginSettings?.allowUsernamePassword) {
     const resp = await redirectUserToIDP(undefined, discoveredOrganization);
     if (resp) {
       return resp;
     }
     return { error: t("errors.userNotFound") };
-  } else if (loginSettingsByContext?.allowRegister && loginSettingsByContext?.allowUsernamePassword) {
+  } else if (effectiveLoginSettings?.allowRegister && effectiveLoginSettings?.allowUsernamePassword) {
     // do not register user if ignoreUnknownUsernames is set
-    if (discoveredOrganization && !loginSettingsByContext?.ignoreUnknownUsernames) {
+    if (discoveredOrganization && !effectiveLoginSettings?.ignoreUnknownUsernames) {
       const params = new URLSearchParams({ organization: discoveredOrganization });
 
       if (command.requestId) {
@@ -440,7 +443,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
   }
 
-  if (loginSettingsByContext?.ignoreUnknownUsernames) {
+  if (effectiveLoginSettings?.ignoreUnknownUsernames) {
     const paramsPasswordDefault = new URLSearchParams({
       loginName: command.loginName,
     });
@@ -455,8 +458,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     return { redirect: "/password?" + paramsPasswordDefault };
   }
-
-  // fallbackToPassword
 
   return { error: t("errors.userNotFound") };
 }
