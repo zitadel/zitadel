@@ -59,15 +59,30 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   const searchResult = await searchUsers(searchUsersRequest);
 
+  // Safety check: ensure searchResult is defined
+  if (!searchResult) {
+    console.error("searchUsers returned undefined or null");
+    return { error: t("errors.couldNotSearchUsers") };
+  }
+
   if ("error" in searchResult && searchResult.error) {
+    console.log("searchUsers returned error, returning early:", searchResult.error);
     return searchResult;
   }
 
   if (!("result" in searchResult)) {
+    console.log("searchUsers has no result field");
     return { error: t("errors.couldNotSearchUsers") };
   }
 
   const { result: potentialUsers } = searchResult;
+
+  // Additional safety check: treat undefined result as empty array
+  const users = potentialUsers ?? [];
+
+  if (users.length === 0) {
+    console.log("No users found, will proceed with org discovery");
+  }
 
   const redirectUserToIDP = async (userId?: string, organization?: string) => {
     // If userId is provided, check for user-specific IDP links first
@@ -194,11 +209,12 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
   };
 
-  if (potentialUsers.length > 1) {
+  if (users.length > 1) {
+    console.log("multiple users found, returning error");
     return { error: t("errors.moreThanOneUserFound") };
-  } else if (potentialUsers.length == 1 && potentialUsers[0].userId) {
-    const user = potentialUsers[0];
-    const userId = potentialUsers[0].userId;
+  } else if (users.length == 1 && users[0].userId) {
+    const user = users[0];
+    const userId = users[0].userId;
 
     const userLoginSettings = await getLoginSettings({
       serviceUrl,
@@ -208,7 +224,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     // compare with the concatenated suffix when set
     const concatLoginname = command.suffix ? `${command.loginName}@${command.suffix}` : command.loginName;
 
-    const humanUser = potentialUsers[0].type.case === "human" ? potentialUsers[0].type.value : undefined;
+    const humanUser = users[0].type.case === "human" ? users[0].type.value : undefined;
 
     // recheck login settings after user discovery, as the search might have been done without org scope
     if (userLoginSettings?.disableLoginWithEmail && userLoginSettings?.disableLoginWithPhone) {
@@ -391,6 +407,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
   }
 
+  console.log("user not found (0 potential users), checking registration options");
+
   // user not found, perform organization discovery if no org context provided
   let discoveredOrganization = command.organization;
   let effectiveLoginSettings = loginSettingsByContext;
@@ -399,36 +417,68 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     const matched = ORG_SUFFIX_REGEX.exec(command.loginName);
     const suffix = matched?.[1] ?? "";
 
+    console.log("suffix discovered from loginName:", suffix);
     // this just returns orgs where the suffix is set as primary domain
     const orgs = await getOrgsByDomain({
       serviceUrl,
       domain: suffix,
     });
+    console.log("orgs found by domain:", orgs.result?.length ?? 0);
+
     const orgToCheckForDiscovery = orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
 
     if (orgToCheckForDiscovery) {
+      console.log("checking if org allows domain discovery:", orgToCheckForDiscovery);
       const orgLoginSettings = await getLoginSettings({
         serviceUrl,
         organization: orgToCheckForDiscovery,
       });
+      console.log("org login settings:", {
+        allowDomainDiscovery: orgLoginSettings?.allowDomainDiscovery,
+        allowRegister: orgLoginSettings?.allowRegister,
+        allowUsernamePassword: orgLoginSettings?.allowUsernamePassword,
+      });
+
       if (orgLoginSettings?.allowDomainDiscovery) {
+        console.log("org discovery successful, using org:", orgToCheckForDiscovery);
         discoveredOrganization = orgToCheckForDiscovery;
         // Use the discovered organization's login settings for subsequent checks
         effectiveLoginSettings = orgLoginSettings;
+      } else {
+        console.log("org does not allow domain discovery");
       }
+    } else {
+      console.log("no single org found for discovery (found:", orgs.result?.length ?? 0, ")");
     }
+  } else {
+    console.log("no org discovery attempted:", {
+      hasDiscoveredOrg: !!discoveredOrganization,
+      hasLoginName: !!command.loginName,
+      regexMatches: command.loginName ? ORG_SUFFIX_REGEX.test(command.loginName) : false,
+    });
   }
+
+  console.log("effective login settings for registration check:", {
+    allowRegister: effectiveLoginSettings?.allowRegister,
+    allowUsernamePassword: effectiveLoginSettings?.allowUsernamePassword,
+    ignoreUnknownUsernames: effectiveLoginSettings?.ignoreUnknownUsernames,
+    discoveredOrganization,
+  });
 
   // user not found, check if register is enabled on instance / organization context
   if (effectiveLoginSettings?.allowRegister && !effectiveLoginSettings?.allowUsernamePassword) {
+    console.log("redirecting to IDP (register allowed, password not allowed)");
     const resp = await redirectUserToIDP(undefined, discoveredOrganization);
     if (resp) {
       return resp;
     }
+    console.log("IDP redirect failed, returning user not found");
     return { error: t("errors.userNotFound") };
   } else if (effectiveLoginSettings?.allowRegister && effectiveLoginSettings?.allowUsernamePassword) {
+    console.log("register and password both allowed");
     // do not register user if ignoreUnknownUsernames is set
     if (discoveredOrganization && !effectiveLoginSettings?.ignoreUnknownUsernames) {
+      console.log("redirecting to registration page with org:", discoveredOrganization);
       const params = new URLSearchParams({ organization: discoveredOrganization });
 
       if (command.requestId) {
@@ -440,10 +490,16 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       }
 
       return { redirect: "/register?" + params };
+    } else {
+      console.log("not redirecting to register:", {
+        hasDiscoveredOrg: !!discoveredOrganization,
+        ignoreUnknownUsernames: effectiveLoginSettings?.ignoreUnknownUsernames,
+      });
     }
   }
 
   if (effectiveLoginSettings?.ignoreUnknownUsernames) {
+    console.log("ignoreUnknownUsernames is true, redirecting to password");
     const paramsPasswordDefault = new URLSearchParams({
       loginName: command.loginName,
     });
@@ -459,5 +515,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     return { redirect: "/password?" + paramsPasswordDefault };
   }
 
+  console.log("no valid registration option found, returning user not found");
   return { error: t("errors.userNotFound") };
 }
