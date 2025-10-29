@@ -14,6 +14,9 @@ const revisionEnvVar = "ZITADEL_RELEASE_REVISION";
 const isLatestEnvVar = "ZITADEL_RELEASE_IS_LATEST";
 // ZITADEL_RELEASE_GITHUB_ORG is used to specify the GitHub organization for which Docker images should be created.
 const githubOrgEnvVar = "ZITADEL_RELEASE_GITHUB_ORG";
+// NX_DRY_RUN is used to determine whether to perform a dry-run of the release process
+// If NX_DRY_RUN is true, the nx-release-publish targets don't try to upload assets to a GitHub release
+const dryRunEnvVar = "NX_DRY_RUN";
 
 export interface GitInfo {
   branch: string;
@@ -114,12 +117,15 @@ export function configureGithubRepo(options: ReleaseOptions): void {
 
 export function setupDefaultEnvironmentVariables(
   gitSha: string,
+  dryRun: boolean
 ): void {
+  process.env[dryRunEnvVar] = dryRun ? 'true' : 'false';
+  console.log(`Setting default ${dryRunEnvVar}=${process.env[dryRunEnvVar]}`);
   process.env[revisionEnvVar] = gitSha;
-  process.env[versionEnvVar] = gitSha;
-  process.env[isLatestEnvVar] = 'false';
   console.log(`Setting default ${revisionEnvVar}=${process.env[revisionEnvVar]}`);
+  process.env[versionEnvVar] = gitSha;
   console.log(`Setting default ${versionEnvVar}=${process.env[versionEnvVar]}`);
+  process.env[isLatestEnvVar] = 'false';
   console.log(`Setting default ${isLatestEnvVar}=${process.env[isLatestEnvVar]}`);
 }
 
@@ -167,13 +173,20 @@ export function setupWorkspaceVersionEnvironmentVariables(
  * Executes docker build commands with the appropriate configuration.
  */
 export function executeDockerBuild(conventionalCommits: boolean, dryRun: boolean): void {
-  const baseCommand = 'pnpm nx run-many --tuiAutoExit 3 --target build-docker';
-  const debugTarget = conventionalCommits ? ' build-docker-debug' : '';
-  const bakeFiles = ' --file release/docker-bake-release.hcl --file apps/api/docker-bake-release.hcl --file apps/login/docker-bake-release.hcl';
-  const pushFlag = dryRun ? '' : ' --push';
-  console.log(`Executing docker build with command: ${baseCommand}${debugTarget}${bakeFiles}${pushFlag}\n from directory: ${process.cwd()}`);
+  const nxCommand = 'pnpm nx run-many --tuiAutoExit 3 --target build-docker';
+  let bakeArgs = ' --file release/docker-bake-release.hcl --file apps/api/docker-bake-release.hcl --file apps/login/docker-bake-release.hcl';
+  if (!dryRun) {
+    console.log('Docker images will be pushed to the registry after build, because dryRun is false.');
+    bakeArgs += ' --push';
+  }
+  if (conventionalCommits) {
+    console.log('Publishing Debug API image as conventional commits were detected.');
+    bakeArgs += ' api-debug';
+  }
+  bakeArgs = `--args=\"${bakeArgs}\"`;
+  console.log(`Executing docker build with command: ${nxCommand}${bakeArgs}\n from directory: ${process.cwd()}`);
 
-  execSync(`${baseCommand}${debugTarget}${bakeFiles}${pushFlag}`, {
+  execSync(`${nxCommand}${bakeArgs}`, {
     stdio: 'inherit', env: process.env, cwd: process.cwd()
   });
 }
