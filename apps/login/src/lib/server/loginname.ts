@@ -417,26 +417,18 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     const matched = ORG_SUFFIX_REGEX.exec(command.loginName);
     const suffix = matched?.[1] ?? "";
 
-    console.log("suffix discovered from loginName:", suffix);
     // this just returns orgs where the suffix is set as primary domain
     const orgs = await getOrgsByDomain({
       serviceUrl,
       domain: suffix,
     });
-    console.log("orgs found by domain:", orgs.result?.length ?? 0);
 
     const orgToCheckForDiscovery = orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
 
     if (orgToCheckForDiscovery) {
-      console.log("checking if org allows domain discovery:", orgToCheckForDiscovery);
       const orgLoginSettings = await getLoginSettings({
         serviceUrl,
         organization: orgToCheckForDiscovery,
-      });
-      console.log("org login settings:", {
-        allowDomainDiscovery: orgLoginSettings?.allowDomainDiscovery,
-        allowRegister: orgLoginSettings?.allowRegister,
-        allowUsernamePassword: orgLoginSettings?.allowUsernamePassword,
       });
 
       if (orgLoginSettings?.allowDomainDiscovery) {
@@ -448,22 +440,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         console.log("org does not allow domain discovery");
       }
     } else {
-      console.log("no single org found for discovery (found:", orgs.result?.length ?? 0, ")");
+      console.log("no single org found for discovery");
     }
-  } else {
-    console.log("no org discovery attempted:", {
-      hasDiscoveredOrg: !!discoveredOrganization,
-      hasLoginName: !!command.loginName,
-      regexMatches: command.loginName ? ORG_SUFFIX_REGEX.test(command.loginName) : false,
-    });
   }
-
-  console.log("effective login settings for registration check:", {
-    allowRegister: effectiveLoginSettings?.allowRegister,
-    allowUsernamePassword: effectiveLoginSettings?.allowUsernamePassword,
-    ignoreUnknownUsernames: effectiveLoginSettings?.ignoreUnknownUsernames,
-    discoveredOrganization,
-  });
 
   // user not found, check if register is enabled on instance / organization context
   if (effectiveLoginSettings?.allowRegister && !effectiveLoginSettings?.allowUsernamePassword) {
