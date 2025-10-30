@@ -32,8 +32,8 @@ jobs:
       uses: actions/download-artifact@v4
       if: ${{ !inputs.dry_run }}
       with:
-        path: .artifacts
-        pattern: "{checksums.txt,zitadel-*}"
+        name: zitadel-archives
+        path: .artifacts/pack
     -
       name: Run Semantic Release
       uses: cycjimmy/semantic-release-action@v4

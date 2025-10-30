@@ -1,6 +1,24 @@
 package database
 
+import "go.uber.org/mock/gomock"
+
 type Columns []Column
+
+// Matches implements [Column].
+func (c Columns) Matches(x any) bool {
+	for _, col := range c {
+		if !col.Matches(x) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// String implements [Column].
+func (c Columns) String() string {
+	return "database.Columns"
+}
 
 // WriteQualified implements [Column].
 // Columns are separated by ", ".
@@ -45,6 +63,7 @@ var _ Column = (Columns)(nil)
 
 // Column represents a column in a database table.
 type Column interface {
+	gomock.Matcher
 	// WriteQualified writes the column with the table name as prefix.
 	WriteQualified(builder *StatementBuilder)
 	// WriteUnqualified writes the column without the table name as prefix.
@@ -56,6 +75,20 @@ type Column interface {
 type column struct {
 	table string
 	name  string
+}
+
+// Matches implements [Column].
+func (c column) Matches(x any) bool {
+	toMatch, ok := x.(*column)
+	if !ok {
+		return false
+	}
+	return c.table == toMatch.table && c.name == toMatch.name
+}
+
+// String implements [Column].
+func (c column) String() string {
+	return "database.column"
 }
 
 func NewColumn(table, name string) Column {
@@ -100,6 +133,26 @@ func SHA256Column(col Column) Column {
 type functionColumn struct {
 	fn  function
 	col Column
+}
+
+// Matches implements [Column].
+func (c *functionColumn) Matches(x any) bool {
+	toMatch, ok := x.(*functionColumn)
+	if !ok || toMatch.fn != c.fn {
+		return false
+	}
+	if toMatch.col == nil {
+		return c.col == nil
+	}
+	if c.col == nil {
+		return false
+	}
+	return toMatch.col.Matches(c.col)
+}
+
+// String implements [Column].
+func (c *functionColumn) String() string {
+	return "database.functionColumn"
 }
 
 type function string

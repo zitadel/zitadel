@@ -120,7 +120,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           idpId: activeIdps[0].id,
           urls: {
             successUrl:
-              `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/idp/${provider}/success?` +
+              `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/idp/${provider}/process?` +
               new URLSearchParams(params),
             failureUrl:
               `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/idp/${provider}/failure?` +
@@ -178,7 +178,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         idpId: idp.id,
         urls: {
           successUrl:
-            `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/idp/${provider}/success?` +
+            `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/idp/${provider}/process?` +
             new URLSearchParams(params),
           failureUrl:
             `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/idp/${provider}/failure?` +
@@ -267,7 +267,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       const params = new URLSearchParams({
         loginName: session.factors?.user?.loginName as string,
         send: "true", // set this to true to request a new code immediately
-        invite: "true", // humanUser?.email?.isVerified ? "false" : "true", // sendInviteEmailCode results in an error if user is already initialized
+        invite: humanUser?.email?.isVerified ? "false" : "true", // sendInviteEmailCode results in an error if user is already initialized
       });
 
       if (command.requestId) {
