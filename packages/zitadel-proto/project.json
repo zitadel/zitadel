@@ -9,7 +9,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
-        "command": "npm pkg set name=\"@${ZITADEL_RELEASE_GITHUB_ORG}/proto\""
+        "command": "npm pkg set name=\"@${ZITADEL_RELEASE_GITHUB_ORG}/proto\" repository=\"https://github.com/${ZITADEL_RELEASE_GITHUB_REPO}\""
       }
     },
     "generate": {

@@ -14,6 +14,8 @@ const revisionEnvVar = "ZITADEL_RELEASE_REVISION";
 const isLatestEnvVar = "ZITADEL_RELEASE_IS_LATEST";
 // ZITADEL_RELEASE_GITHUB_ORG is used to specify the GitHub organization for which Docker images should be created.
 const githubOrgEnvVar = "ZITADEL_RELEASE_GITHUB_ORG";
+// ZITADEL_RELEASE_GITHUB_REPO is used to link npm packages to the repository they are published to.
+const githubRepoEnvVar = "ZITADEL_RELEASE_GITHUB_REPO";
 // NX_DRY_RUN is used to determine whether to perform a dry-run of the release process
 // If NX_DRY_RUN is true, the nx-release-publish targets don't try to upload assets to a GitHub release
 const dryRunEnvVar = "NX_DRY_RUN";
@@ -107,6 +109,8 @@ export function configureGithubRepo(options: ReleaseOptions) {
   }
   process.env[githubOrgEnvVar] = org;
   console.log(`Setting ${githubOrgEnvVar}=${process.env[githubOrgEnvVar]} for Docker image creation`);
+  process.env[githubRepoEnvVar] = repo;
+  console.log(`Setting ${githubRepoEnvVar}=${process.env[githubRepoEnvVar]} for npm package publication`);
 }
 
 export function setupDefaultEnvironmentVariables(
