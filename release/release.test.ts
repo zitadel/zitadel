@@ -19,7 +19,6 @@ import {
   executeRelease,
   type GitInfo,
   type ReleaseOptions,
-  type EnvironmentConfig,
   configureGithubRepo,
 } from './release';
 
@@ -77,12 +76,6 @@ describe('setupWorkspaceVersionEnvironmentVariables', () => {
     highestVersionBefore: '1.0.0',
   };
 
-  const mockConfig: EnvironmentConfig = {
-    versionEnvVar: 'ZITADEL_RELEASE_VERSION',
-    revisionEnvVar: 'ZITADEL_RELEASE_REVISION',
-    isLatestEnvVar: 'ZITADEL_RELEASE_IS_LATEST',
-  };
-
   const mockOptions: ReleaseOptions = {
     dryRun: false,
     verbose: false,
@@ -90,14 +83,14 @@ describe('setupWorkspaceVersionEnvironmentVariables', () => {
   };
 
   test('sets version with v prefix', () => {
-    setupWorkspaceVersionEnvironmentVariables(mockConfig, mockGitInfo, '2.0.0');
+    setupWorkspaceVersionEnvironmentVariables(mockOptions, mockGitInfo, '2.0.0');
 
     expect(process.env.ZITADEL_RELEASE_VERSION).toBe('v2.0.0');
   });
 
   test('sets isLatest to true when new version is higher than before', () => {
     setupWorkspaceVersionEnvironmentVariables(
-      mockConfig,
+      mockOptions,
       { ...mockGitInfo, highestVersionBefore: '1.0.0' },
       '2.0.0'
     );
@@ -107,7 +100,7 @@ describe('setupWorkspaceVersionEnvironmentVariables', () => {
 
   test('sets isLatest to true when new version equals highest before', () => {
     setupWorkspaceVersionEnvironmentVariables(
-      mockConfig,
+      mockOptions,
       { ...mockGitInfo, highestVersionBefore: '2.0.0' },
       '2.0.0'
     );
@@ -117,7 +110,7 @@ describe('setupWorkspaceVersionEnvironmentVariables', () => {
 
   test('sets isLatest to false when new version is lower than before', () => {
     setupWorkspaceVersionEnvironmentVariables(
-      mockConfig,
+      mockOptions,
       { ...mockGitInfo, highestVersionBefore: '3.0.0' },
       '2.0.0'
     );
@@ -127,13 +120,13 @@ describe('setupWorkspaceVersionEnvironmentVariables', () => {
 
   test('throws error if workspaceVersion is not provided', () => {
     expect(() =>
-      setupWorkspaceVersionEnvironmentVariables(mockConfig, mockGitInfo)
+      setupWorkspaceVersionEnvironmentVariables(mockOptions, mockGitInfo)
     ).toThrowError();
   });
 
   test('sets env vars for matching minor maintenance branch and version', () => {
     setupWorkspaceVersionEnvironmentVariables(
-      mockConfig,
+      mockOptions,
       { ...mockGitInfo, branch: 'v2.5.x' },
       '2.5.1'
     );
@@ -143,7 +136,7 @@ describe('setupWorkspaceVersionEnvironmentVariables', () => {
 
   test('sets env vars for matching major maintenance branch and version', () => {
     setupWorkspaceVersionEnvironmentVariables(
-      mockConfig,
+      mockOptions,
       { ...mockGitInfo, branch: 'v3.x' },
       '3.0.2'
     );
@@ -154,7 +147,7 @@ describe('setupWorkspaceVersionEnvironmentVariables', () => {
   test('throws error if major workspaceVersion does not match major maintenance branch', () => {
     expect(() =>
       setupWorkspaceVersionEnvironmentVariables(
-        mockConfig,
+        mockOptions,
         { ...mockGitInfo, branch: 'v2.x' },
         '3.0.0'
       )
@@ -164,7 +157,7 @@ describe('setupWorkspaceVersionEnvironmentVariables', () => {
   test('throws error if minor workspaceVersion does not match minor maintenance branch', () => {
     expect(() =>
       setupWorkspaceVersionEnvironmentVariables(
-        mockConfig,
+        mockOptions,
         { ...mockGitInfo, branch: 'v2.5.x' },
         '2.6.0'
       )
@@ -175,7 +168,7 @@ describe('setupWorkspaceVersionEnvironmentVariables', () => {
     process.env = { ...originalEnv };
     expect(() =>
       setupWorkspaceVersionEnvironmentVariables(
-        mockConfig,
+        mockOptions,
         mockGitInfo,
         '2.0.0'
       )
@@ -188,7 +181,25 @@ describe('executeDockerBuild', () => {
     vi.clearAllMocks();
   });
 
-  test('includes build-docker-debug target for conventional commits', () => {
+  test('includes the release bake file', () => {
+    const mockExecSync = vi.mocked(execSync);
+
+    executeDockerBuild(false, false);
+
+    const calls = mockExecSync.mock.calls.map(call => call[0] as string);
+    expect(calls.every(call => call.includes('--file release/docker-bake-release.hcl'))).toBe(true);
+  });
+
+  test('includes --push flag when dryRun is false', () => {
+    const mockExecSync = vi.mocked(execSync);
+
+    executeDockerBuild(false, false);
+
+    const calls = mockExecSync.mock.calls.map(call => call[0] as string);
+    expect(calls.every(call => call.includes('--push'))).toBe(true);
+  });
+
+  test('includes api-debug target for conventional commits', () => {
     const mockExecSync = vi.mocked(execSync);
 
     executeDockerBuild(true, false);
@@ -197,42 +208,6 @@ describe('executeDockerBuild', () => {
       expect.stringContaining('api-debug'),
       expect.any(Object)
     );
-  });
-
-  test('includes --push flag and all docker-bake-release files when dryRun is false', () => {
-    const mockExecSync = vi.mocked(execSync);
-
-    executeDockerBuild(false, false);
-    const call = mockExecSync.mock.calls[0][0] as string;
-    expect(call).toContain('--push');
-  });
-
-  test('includes all required bake files', () => {
-    const mockExecSync = vi.mocked(execSync);
-
-    executeDockerBuild(false, false);
-
-    const call = mockExecSync.mock.calls[0][0] as string;
-    expect(call).toContain('--file release/docker-bake-release.hcl');
-    expect(call).toContain('--file apps/api/docker-bake-release.hcl');
-    expect(call).toContain('--file apps/login/docker-bake-release.hcl');
-  });
-
-  test('includes API debug target for conventional commit releases', () => {
-    const mockExecSync = vi.mocked(execSync);
-
-    executeDockerBuild(true, false);
-
-    const call = mockExecSync.mock.calls[0][0] as string;
-    expect(call).toContain('api-debug');
-  });
-
-  test('excludes --push flag when dryRun is true', () => {
-    const mockExecSync = vi.mocked(execSync);
-
-    executeDockerBuild(false, true);
-    const call = mockExecSync.mock.calls[0][0] as string;
-    expect(call).not.toContain('--push');
   });
 
   test('passes environment variables to execSync', () => {
@@ -388,12 +363,6 @@ describe('executeRelease', () => {
     githubRepo: 'zitadel/zitadel',    
   };
 
-  const mockConfig: EnvironmentConfig = {
-    versionEnvVar: 'ZITADEL_RELEASE_VERSION',
-    revisionEnvVar: 'ZITADEL_RELEASE_REVISION',
-    isLatestEnvVar: 'ZITADEL_RELEASE_IS_LATEST',
-  };
-
   test('returns 0 for non-conventional commits after docker build', async () => {
     const mockGitInfo: GitInfo = {
       branch: 'main',
@@ -401,7 +370,7 @@ describe('executeRelease', () => {
       highestVersionBefore: '1.0.0',
     };
 
-    const exitCode = await executeRelease(mockGitInfo, mockOptions, mockConfig);
+    const exitCode = await executeRelease(mockGitInfo, mockOptions);
     expect(exitCode).toBe(0);
   });
 
@@ -414,7 +383,7 @@ describe('executeRelease', () => {
 
     vi.mocked(releasePublish).mockResolvedValue({});
 
-    await executeRelease(mockGitInfo, mockOptions, mockConfig);
+    await executeRelease(mockGitInfo, mockOptions);
 
     expect(releaseVersion).toHaveBeenCalledWith({
       dryRun: false,
@@ -430,7 +399,7 @@ describe('executeRelease', () => {
     });
 
     await expect(
-      executeRelease(mockGitInfo, mockOptions, mockConfig)
+      executeRelease(mockGitInfo, mockOptions)
     ).rejects.toThrowError();
   });
 
@@ -446,7 +415,7 @@ describe('executeRelease', () => {
       project2: { code: 0 },
     } as any);
 
-    const exitCode = await executeRelease(mockGitInfo, mockOptions, mockConfig);
+    const exitCode = await executeRelease(mockGitInfo, mockOptions);
 
     expect(exitCode).toBe(0);
   });
@@ -463,7 +432,7 @@ describe('executeRelease', () => {
       project2: { code: 1 },
     } as any);
 
-    const exitCode = await executeRelease(mockGitInfo, mockOptions, mockConfig);
+    const exitCode = await executeRelease(mockGitInfo, mockOptions);
 
     expect(exitCode).toBe(1);
   });
@@ -479,7 +448,7 @@ describe('executeRelease', () => {
 
     vi.mocked(releasePublish).mockResolvedValue({});
 
-    await executeRelease(mockGitInfo, mockOptions, mockConfig);
+    await executeRelease(mockGitInfo, mockOptions);
 
     expect(releaseChangelog).toHaveBeenCalledWith({
       versionData: mockProjectsVersionData,

@@ -3,10 +3,14 @@
   "namedInputs": {
     "sources": ["{projectRoot}/src/**/*"]
   },
-  "release": {
-    "version": {}
-  },
   "targets": {
+    "nx-release-publish": {
+      "description": "Sets the package name to the GitHub org scope for publishing to GitHub Packages. This allows to publish the package on forks.",
+      "dependsOn": [
+        "build"
+      ],
+      "command": "npm pkg set name=\"@${ZITADEL_RELEASE_GITHUB_ORG}/client\""
+    },
     "test": {
       "description": "Tests the TypeScript client library. It is an alias for test-unit.",
       "dependsOn": [

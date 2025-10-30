@@ -1,6 +1,13 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
+    "nx-release-publish": {
+      "description": "Sets the package name to the GitHub org scope for publishing to GitHub Packages. This allows to publish the package on forks.",
+      "dependsOn": [
+        "generate"
+      ],
+      "command": "npm pkg set name=\"@${ZITADEL_RELEASE_GITHUB_ORG}/proto\""
+    },
     "generate": {
       "inputs": [
         "default",
