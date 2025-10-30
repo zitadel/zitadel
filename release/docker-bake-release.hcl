@@ -11,14 +11,8 @@ variable "ZITADEL_RELEASE_IS_LATEST" {
     default = false
 }
 
-variable "ZITADEL_RELEASE_PUSH" {
-    type    = bool
-    default = false
-}
-
-target "release-common" {
+target "release" {
     platforms = [ "linux/amd64", "linux/arm64" ]
-    push = ZITADEL_RELEASE_PUSH
     labels = {
         "org.opencontainers.image.created" = timestamp()
         "org.opencontainers.image.version" = ZITADEL_RELEASE_VERSION
