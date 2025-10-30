@@ -13,10 +13,12 @@ export type FrameworkDefinition = {
   id?: FrameworkName | string;
   title: string;
   description?: string;
+  ecosystem?: string;
   imgSrcDark: string;
   imgSrcLight?: string;
   docsLink: string;
   external?: boolean;
+  client?: boolean;
 };
 
 export type Framework = FrameworkDefinition & {

@@ -1,72 +1,116 @@
 <cnsl-create-layout title="{{ 'APP.PAGES.CREATE' | translate }}" (closed)="close()">
-  <div class="app-create-main-content">
-    <cnsl-framework-change *ngIf="initialParam()" (frameworkChanged)="framework.set($event)"></cnsl-framework-change>
-    <div class="content-wrapper" [ngClass]="{ reverse: initialParam() }">
-      <div>
-        <h1>{{ 'APP.PAGES.QUICK_CREATE_TITLE' | translate }}</h1>
-        <p>{{ 'APP.PAGES.QUICK_CREATE_DESC' | translate }}</p>
+  <div class="app-create-wrapper">
+    <div class="app-create-main-content">
+      <cnsl-framework-change *ngIf="initialParam()" (frameworkChanged)="framework.set($event)"></cnsl-framework-change>
+      <div class="content-wrapper" [ngClass]="{ reverse: initialParam() }">
+        <div>
+          <h1>{{ 'APP.PAGES.QUICK_CREATE_FRAMEWORK' | translate }}</h1>
+          <p>{{ 'APP.PAGES.QUICK_CREATE_FRAMEWORK_DESC' | translate }}</p>
 
-        <!-- <cnsl-search-project-autocomplete
-          class="block"
-          [autocompleteType]="ProjectAutocompleteType.PROJECT_OWNED"
-          (selectionChanged)="selectProject($any($event))"
-          (valueChanged)="projectName = $any($event)"
-        >
-        </cnsl-search-project-autocomplete> -->
+          <!-- <cnsl-search-project-autocomplete
+            class="block"
+            [autocompleteType]="ProjectAutocompleteType.PROJECT_OWNED"
+            (selectionChanged)="selectProject($any($event))"
+            (valueChanged)="projectName = $any($event)"
+          >
+          </cnsl-search-project-autocomplete> -->
 
-        <!-- <p>{{ 'APP.PAGES.CREATE_NEW_PROJECT' | translate }}</p> -->
-      </div>
-
-      <div *ngIf="!initialParam()">
-        <h2>{{ 'APP.PAGES.QUICK_CREATE_FRAMEWORK' | translate }}</h2>
-        <p>{{ 'APP.PAGES.QUICK_CREATE_FRAMEWORK_DESC' | translate }}</p>
-
-        <div class="framework-wrapper">
-          <ng-container *ngFor="let framework of frameworks.slice(0, 18)">
-            <button
-              (click)="createProjectAndContinue(framework.id)"
-              class="framework-card card"
-              title="{{ framework.title }}"
-            >
-              <img class="dark-only" *ngIf="framework.imgSrcDark" [src]="framework.imgSrcDark" alt="{{ framework.title }}" />
-              <span class="framework-name">{{ framework.title }}</span>
-            </button>
-          </ng-container>
+          <!-- <p>{{ 'APP.PAGES.CREATE_NEW_PROJECT' | translate }}</p> -->
         </div>
 
-        <!-- <div class="framework-search-wrapper">
-          <p class="search-label">{{ 'APP.PAGES.FRAMEWORK_NOT_LISTED' | translate }}</p>
-          <cnsl-framework-autocomplete
-            *ngIf="frameworks"
-            [frameworkId]="framework()?.id"
-            [frameworks]="frameworks"
-            [withCustom]="true"
-            (selectionChanged)="findFramework($event)"
-          ></cnsl-framework-autocomplete>
-        </div> -->
+        <div *ngIf="!initialParam()">
+          <div class="framework-wrapper">
+            <ng-container *ngFor="let framework of frameworks.slice(0, 18)">
+              <button
+                (click)="selectFrameworkForPreview(framework)"
+                class="framework-card card"
+                [class.selected]="selectedFramework()?.id === framework.id"
+                title="{{ framework.title }}"
+              >
+                <img *ngIf="themeService.isDarkTheme | async" [src]="framework.imgSrcDark" alt="{{ framework.title }}" />
+                <img
+                  *ngIf="!(themeService.isDarkTheme | async) && framework.imgSrcLight"
+                  [src]="framework.imgSrcLight"
+                  alt="{{ framework.title }}"
+                />
+              </button>
+            </ng-container>
+          </div>
+
+          <!-- <div class="framework-search-wrapper">
+            <p class="search-label">{{ 'APP.PAGES.FRAMEWORK_NOT_LISTED' | translate }}</p>
+            <cnsl-framework-autocomplete
+              *ngIf="frameworks"
+              [frameworkId]="framework()?.id"
+              [frameworks]="frameworks"
+              [withCustom]="true"
+              (selectionChanged)="findFramework($event)"
+            ></cnsl-framework-autocomplete>
+          </div> -->
+        </div>
       </div>
-    </div>
 
-    <cnsl-info-section *ngIf="error()" [type]="InfoSectionType.WARN"
-      ><span class="error-msg">{{ error() }}</span></cnsl-info-section
-    >
-
-    <div class="app-create-btn-container">
-      <button
-        color="primary"
-        mat-raised-button
-        class="continue-button"
-        [disabled]="!(framework() || customFramework())"
-        (click)="project && project.name === projectName ? goToAppIntegratePage() : createProjectAndContinue()"
+      <cnsl-info-section *ngIf="error()" [type]="InfoSectionType.WARN"
+        ><span class="error-msg">{{ error() }}</span></cnsl-info-section
       >
-        {{
-          !project && !projectName
-            ? ('ACTIONS.CONTINUE' | translate)
-            : project && project.name === projectName
-              ? ('ACTIONS.CONTINUEWITH' | translate: { value: project.name })
-              : ('QUICKSTART.CREATEPROJECTFORAPP' | translate: { value: projectName })
-        }}
-      </button>
+    </div>
+    <div class="framework-details-panel" *ngIf="selectedFramework()">
+      <div class="panel-header">
+        <div class="panel-title-section">
+          <img
+            class="framework-logo"
+            *ngIf="themeService.isDarkTheme | async"
+            [src]="selectedFramework()!.imgSrcDark"
+            alt="{{ selectedFramework()!.title }}"
+          />
+          <img
+            class="framework-logo"
+            *ngIf="!(themeService.isDarkTheme | async) && selectedFramework()!.imgSrcLight"
+            [src]="selectedFramework()!.imgSrcLight"
+            alt="{{ selectedFramework()!.title }}"
+          />
+          <h2>{{ selectedFramework()!.title }}</h2>
+        </div>
+        <button mat-icon-button (click)="selectedFramework.set(undefined)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="panel-content">
+        <div class="detail-section" *ngIf="selectedFramework()!.ecosystem">
+          <h3>Ecosystem</h3>
+          <p>{{ selectedFramework()!.ecosystem }}</p>
+        </div>
+
+        <div class="detail-section" *ngIf="selectedFramework()!.description">
+          <h3>Description</h3>
+          <p>{{ selectedFramework()!.description }}</p>
+        </div>
+
+        <div class="detail-section" *ngIf="getAppTypeLabel(selectedFramework()!.id)">
+          <h3>Application Type</h3>
+          <p>{{ getAppTypeLabel(selectedFramework()!.id) }}</p>
+        </div>
+
+        <div class="detail-section" *ngIf="getAuthMethod(selectedFramework()!.id)">
+          <h3>Authentication</h3>
+          <p>{{ getAuthMethod(selectedFramework()!.id) }}</p>
+        </div>
+
+        <div class="detail-section" *ngIf="selectedFramework()!.docsLink">
+          <h3>Documentation</h3>
+          <a [href]="selectedFramework()!.docsLink" target="_blank" rel="noopener noreferrer">
+            View Documentation <mat-icon inline>open_in_new</mat-icon>
+          </a>
+        </div>
+      </div>
+
+      <div class="panel-actions">
+        <button mat-stroked-button (click)="selectedFramework.set(undefined)">Cancel</button>
+        <button color="primary" mat-raised-button (click)="createProjectAndContinue(selectedFramework()!.id)">
+          Continue with {{ selectedFramework()!.title }}
+        </button>
+      </div>
     </div>
   </div>
 </cnsl-create-layout>

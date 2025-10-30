@@ -22,6 +22,10 @@ import { ToastService } from 'src/app/services/toast.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { OIDC_CONFIGURATIONS } from 'src/app/utils/framework';
 import { generateRandomProjectName, generateFrameworkAppName } from 'src/app/utils/name-generator';
+import { ThemeService } from 'src/app/services/theme.service';
+import { OIDCAppType, OIDCAuthMethodType } from 'src/app/proto/generated/zitadel/app_pb';
+import { MatDialog } from '@angular/material/dialog';
+import { AppSecretDialogComponent } from 'src/app/pages/projects/apps/app-secret-dialog/app-secret-dialog.component';
 
 @Component({
   selector: 'cnsl-app-quick-create',
@@ -42,6 +46,7 @@ export class AppQuickCreateComponent implements OnDestroy {
 
   public error = signal('');
   public framework = signal<Framework | undefined>(undefined);
+  public selectedFramework = signal<Framework | undefined>(undefined);
   public customFramework = signal<boolean>(false);
   public initialParam = signal<string>('');
   public destroy$: Subject<void> = new Subject();
@@ -50,6 +55,7 @@ export class AppQuickCreateComponent implements OnDestroy {
   public showRenameWarning: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   public frameworks: Framework[] = frameworkDefinition
+    .filter((f) => !f.client) // Filter out client libraries/SDKs
     .map((f) => {
       return {
         ...f,
@@ -59,7 +65,6 @@ export class AppQuickCreateComponent implements OnDestroy {
       };
     })
     .sort((a, b) => {
-      // Define popularity order (most popular first)
       const popularityOrder = [
         'react',
         'next',
@@ -101,6 +106,8 @@ export class AppQuickCreateComponent implements OnDestroy {
     private _location: Location,
     private navigation: NavigationService,
     private authService: GrpcAuthService,
+    public themeService: ThemeService,
+    private dialog: MatDialog,
   ) {
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,
@@ -124,6 +131,43 @@ export class AppQuickCreateComponent implements OnDestroy {
     } else {
       this.customFramework.set(true);
     }
+  }
+
+  public selectFrameworkForPreview(framework: Framework) {
+    this.selectedFramework.set(framework);
+  }
+
+  public getAppTypeLabel(frameworkId?: string): string {
+    if (!frameworkId) return '';
+    const config = OIDC_CONFIGURATIONS[frameworkId];
+    if (!config) return '';
+
+    const appType = config.getAppType();
+    switch (appType) {
+      case OIDCAppType.OIDC_APP_TYPE_WEB:
+        return 'Web Application';
+      case OIDCAppType.OIDC_APP_TYPE_USER_AGENT:
+        return 'User Agent (SPA)';
+      case OIDCAppType.OIDC_APP_TYPE_NATIVE:
+        return 'Native Application';
+      default:
+        return '';
+    }
+  }
+
+  public getAuthMethod(frameworkId?: string): string {
+    if (!frameworkId) return '';
+    const config = OIDC_CONFIGURATIONS[frameworkId];
+    if (!config) return '';
+
+    const authMethod = config.getAuthMethodType();
+
+    if (authMethod === OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE) {
+      return 'OIDC with PKCE';
+    } else if (authMethod === OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC) {
+      return 'OIDC with Client Secret';
+    }
+    return 'OIDC';
   }
 
   ngOnDestroy(): void {
@@ -182,8 +226,10 @@ export class AppQuickCreateComponent implements OnDestroy {
     request.setProjectId(projectId);
     request.setName(generateFrameworkAppName(this.framework()?.title));
     request.setDevMode(true);
+
+    const authMethodType = OIDC_CONFIGURATIONS[this.framework()?.id || 'other']?.getAuthMethodType();
     request.setAppType(OIDC_CONFIGURATIONS[this.framework()?.id || 'other']?.getAppType());
-    request.setAuthMethodType(OIDC_CONFIGURATIONS[this.framework()?.id || 'other']?.getAuthMethodType());
+    request.setAuthMethodType(authMethodType);
     request.setResponseTypesList(OIDC_CONFIGURATIONS[this.framework()?.id || 'other']?.getResponseTypesList());
     request.setGrantTypesList(OIDC_CONFIGURATIONS[this.framework()?.id || 'other']?.getGrantTypesList());
     request.setRedirectUrisList(OIDC_CONFIGURATIONS[this.framework()?.id || 'other']?.getRedirectUrisList());
@@ -191,12 +237,23 @@ export class AppQuickCreateComponent implements OnDestroy {
       OIDC_CONFIGURATIONS[this.framework()?.id || 'other']?.getPostLogoutRedirectUrisList(),
     );
 
+    const usesClientSecret = authMethodType === OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC;
+
     this.mgmtService
       .addOIDCApp(request)
       .then((resp) => {
         this.loading = false;
         this.showRenameWarning.next(false);
         this.toast.showInfo('APP.TOAST.CREATED', true);
+
+        if (usesClientSecret && resp.clientSecret) {
+          this.dialog.open(AppSecretDialogComponent, {
+            data: {
+              clientSecret: resp.clientSecret,
+            },
+            width: '800px',
+          });
+        }
 
         this.router.navigate(['projects', projectId, 'apps', resp.appId], {
           queryParams: { new: true, framework: this.framework()?.id },

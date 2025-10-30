@@ -100,6 +100,15 @@
                 <div class="env-vars-section prominent">
                   <h4>{{ 'APP.OVERVIEW_DETAIL.ENVVARS' | translate }}</h4>
                   <p>{{ 'APP.OVERVIEW_DETAIL.ENVVARS_AUTHENTICATED_DESC' | translate }}</p>
+                  <cnsl-info-section *ngIf="requiresClientSecret()" class="client-secret-note">
+                    <span>
+                      {{ 'APP.OVERVIEW_DETAIL.NEW_STEP2_CLIENT_SECRET_NOTE' | translate }}
+                      <a (click)="regenerateOIDCClientSecret()" class="secret-link">{{
+                        'APP.OVERVIEW_DETAIL.NEW_STEP2_CLIENT_SECRET_LINK' | translate
+                      }}</a
+                      >.
+                    </span>
+                  </cnsl-info-section>
                   <cnsl-env-vars-block
                     [envVars]="envVarsArray"
                     [availableFormats]="['env', 'json', 'yaml']"
@@ -109,9 +118,6 @@
               </div>
 
               <div *ngIf="isAuthenticated() === false" class="integration-flow">
-                <h3>{{ 'APP.OVERVIEW_DETAIL.GETSTARTED' | translate }}</h3>
-                <p>{{ 'APP.OVERVIEW_DETAIL.GETSTARTED_DESC' | translate }}</p>
-
                 <div class="scenarios-section">
                   <div class="scenario-header">
                     <div class="header-content">
@@ -194,6 +200,15 @@
                           <div class="step-content">
                             <h6>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP2_TITLE' | translate }}</h6>
                             <p>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP2_DESC' | translate }}</p>
+                            <cnsl-info-section *ngIf="requiresClientSecret()" class="client-secret-note">
+                              <span>
+                                {{ 'APP.OVERVIEW_DETAIL.NEW_STEP2_CLIENT_SECRET_NOTE' | translate }}
+                                <a (click)="regenerateOIDCClientSecret()" class="secret-link">{{
+                                  'APP.OVERVIEW_DETAIL.NEW_STEP2_CLIENT_SECRET_LINK' | translate
+                                }}</a
+                                >.
+                              </span>
+                            </cnsl-info-section>
                             <cnsl-env-vars-block
                               [envVars]="envVarsArray"
                               [availableFormats]="['env', 'json', 'yaml']"
@@ -241,8 +256,18 @@
                                 </div>
                                 <pre class="code-content">{{ getRunCommand() }}</pre>
                               </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="step-item" *ngIf="hasBuildCommands()">
+                          <div class="step-number">{{ hasExample() ? '4' : '3' }}</div>
+                          <div class="step-content">
+                            <h6>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP4_TITLE' | translate }}</h6>
+                            <p>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP4_DESC' | translate }}</p>
+                            <div class="framework-actions">
                               <a [href]="getFrameworkInfo()?.exampleLink" target="_blank" mat-raised-button color="primary">
-                                {{ 'APP.OVERVIEW_DETAIL.VIEWDOCS' | translate }}
+                                {{ 'APP.OVERVIEW_DETAIL.STEP4_ACTION' | translate }}
                               </a>
                             </div>
                           </div>
@@ -255,7 +280,6 @@
                             <h6>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP_DOCS_TITLE' | translate }}</h6>
                             <p>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP_DOCS_DESC' | translate }}</p>
                             <a [href]="getFrameworkInfo()?.docsLink" target="_blank" mat-raised-button color="primary">
-                              <i class="las la-book"></i>
                               {{ 'APP.OVERVIEW_DETAIL.VIEWDOCS' | translate }}
                             </a>
                           </div>
@@ -325,6 +349,15 @@
                           <div class="step-number">{{ hasSdk() ? '2' : '1' }}</div>
                           <div class="step-content">
                             <h6>{{ 'APP.OVERVIEW_DETAIL.EXISTING_STEP2_TITLE' | translate }}</h6>
+                            <cnsl-info-section *ngIf="requiresClientSecret()" class="client-secret-note">
+                              <span>
+                                {{ 'APP.OVERVIEW_DETAIL.NEW_STEP2_CLIENT_SECRET_NOTE' | translate }}
+                                <a (click)="regenerateOIDCClientSecret()" class="secret-link">{{
+                                  'APP.OVERVIEW_DETAIL.NEW_STEP2_CLIENT_SECRET_LINK' | translate
+                                }}</a
+                                >.
+                              </span>
+                            </cnsl-info-section>
                             <cnsl-env-vars-block
                               [envVars]="envVarsArray"
                               [availableFormats]="['env', 'json', 'yaml']"
@@ -339,8 +372,12 @@
                           <div class="step-content">
                             <h6>{{ 'APP.OVERVIEW_DETAIL.EXISTING_STEP_DOCS_TITLE' | translate }}</h6>
                             <p>{{ 'APP.OVERVIEW_DETAIL.EXISTING_STEP_DOCS_DESC' | translate }}</p>
-                            <a [href]="getFrameworkInfo()?.docsLink" target="_blank" mat-raised-button color="primary">
-                              <i class="las la-book"></i>
+                            <a
+                              [href]="hasSdk() ? getFrameworkInfo()?.sdkDocLink : getFrameworkInfo()?.docsLink"
+                              target="_blank"
+                              mat-raised-button
+                              color="primary"
+                            >
                               {{ 'APP.OVERVIEW_DETAIL.VIEWDOCS' | translate }}
                             </a>
                           </div>
@@ -357,16 +394,9 @@
                                   [href]="getFrameworkInfo()?.exampleLink || 'https://zitadel.com/docs/guides/integrate'"
                                   target="_blank"
                                   mat-raised-button
-                                  color="primary"
+                                  color="secondary"
                                 >
                                   {{ 'APP.OVERVIEW_DETAIL.INTEGRATION_GUIDE' | translate }}
-                                </a>
-                                <a
-                                  [href]="getFrameworkInfo()?.docsLink || 'https://zitadel.com/docs/sdks'"
-                                  target="_blank"
-                                  mat-stroked-button
-                                >
-                                  {{ 'APP.OVERVIEW_DETAIL.VIEW_SDKS' | translate }}
                                 </a>
                               </div>
                             </div>

@@ -276,13 +276,29 @@
 
     .env-vars-section {
       margin: 2rem 0;
+
+      .client-secret-note {
+        margin: 1rem 0;
+        font-size: 0.875rem;
+
+        .secret-link {
+          color: map-get($primary-color, 500);
+          text-decoration: underline;
+          cursor: pointer;
+          font-weight: 500;
+
+          &:hover {
+            color: map-get($primary-color, 700);
+          }
+        }
+      }
     }
 
     .code-block {
       background: map-get($background, card);
       border: 1px solid $divider-color;
       border-radius: 8px;
-      margin: 1rem 0;
+      width: 100%;
 
       .code-header {
         padding: 0.5rem 0.75rem;
@@ -435,18 +451,6 @@
                 color: map-get($primary-color, 500);
               }
             }
-
-            .framework-actions {
-              display: flex;
-              gap: 1rem;
-              flex-wrap: wrap;
-
-              a {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-              }
-            }
           }
 
           .clone-section {
@@ -487,6 +491,7 @@
               display: flex;
               align-items: flex-start;
               margin: 1.5rem 0;
+              width: 100%;
 
               .step-number {
                 background: map-get($primary-color, 500);
@@ -505,9 +510,34 @@
 
               .step-content {
                 flex: 1;
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                gap: 0.5rem;
+                justify-content: flex-start;
+                align-items: flex-start;
+
+                .framework-actions {
+                  display: flex;
+                  width: 100%;
+                  flex-direction: column;
+                  gap: 0.5rem;
+                  justify-content: flex-start;
+                  align-items: flex-start;
+
+                  .code-block {
+                    width: 100%;
+                  }
+
+                  a {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                  }
+                }
 
                 h6 {
-                  margin: 0 0 0.5rem 0;
+                  margin: 0;
                   font-size: 1rem;
                   font-weight: 600;
                   color: map-get($primary-color, 500);
@@ -519,13 +549,27 @@
                   opacity: 0.8;
                   line-height: 1.4;
                 }
+
+                .client-secret-note {
+                  margin: 1rem 0;
+                  font-size: 0.875rem;
+
+                  .secret-link {
+                    color: map-get($primary-color, 500);
+                    text-decoration: underline;
+                    cursor: pointer;
+                    font-weight: 500;
+
+                    &:hover {
+                      color: map-get($primary-color, 700);
+                    }
+                  }
+                }
               }
             }
           }
 
           .integration-resources {
-            margin-top: 1.5rem;
-
             .resource-links {
               display: flex;
               gap: 1rem;
@@ -576,7 +620,7 @@
         background: map-get($background, card);
         border: 1px solid $divider-color;
         border-radius: 8px;
-        margin: 1rem 0 0 0;
+        width: 100%;
 
         .code-header {
           padding: 0.5rem 0.75rem;
@@ -656,6 +700,7 @@
       .env-vars-section.prominent {
         .code-block {
           border: 2px solid map-get($primary-color, 500);
+          width: 100%;
           background-color: rgba(map-get($primary-color, 500), 0.05);
         }
       }

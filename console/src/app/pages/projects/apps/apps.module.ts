@@ -40,7 +40,6 @@ import { AdditionalOriginsComponent } from './additional-origins/additional-orig
 import { AppCreateComponent } from './app-create/app-create.component';
 import { AppDetailComponent } from './app-detail/app-detail.component';
 import { AuthMethodDialogComponent } from './app-detail/auth-method-dialog/auth-method-dialog.component';
-import { AppSecretDialogComponent } from './app-secret-dialog/app-secret-dialog.component';
 import { AppsRoutingModule } from './apps-routing.module';
 import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
 import { IntegrateAppComponent } from './integrate/integrate.component';
@@ -53,7 +52,6 @@ import { EnvVarsBlockModule } from 'src/app/components/env-vars-block/env-vars-b
   declarations: [
     AppCreateComponent,
     AppDetailComponent,
-    AppSecretDialogComponent,
     RedirectUrisComponent,
     IntegrateAppComponent,
     AdditionalOriginsComponent,

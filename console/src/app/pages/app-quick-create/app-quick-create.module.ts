@@ -3,11 +3,14 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 import { CreateLayoutModule } from 'src/app/modules/create-layout/create-layout.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
@@ -32,13 +35,16 @@ import { FrameworkChangeComponent } from 'src/app/components/framework-change/fr
     InfoSectionModule,
     InputModule,
     MatButtonModule,
+    MatDialogModule,
     MatIconModule,
+    MatTooltipModule,
     SearchProjectAutocompleteModule,
     MatSelectModule,
     CreateLayoutModule,
     HasRolePipeModule,
     TranslateModule,
     HasRoleModule,
+    CopyToClipboardModule,
   ],
 })
 export default class AppCreateModule {}

@@ -1157,6 +1157,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     startCommand?: string;
     buildCommand?: string;
     sdkName?: string;
+    sdkDocLink?: string;
   } | null {
     if (!this.framework) return null;
 
@@ -1225,6 +1226,14 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public hasAnyFrameworkContent(): boolean {
     return this.hasExample() || this.hasSdk() || this.hasBuildCommands();
+  }
+
+  public requiresClientSecret(): boolean {
+    return !!(
+      this.app?.oidcConfig &&
+      (this.app.oidcConfig.authMethodType === OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC ||
+        this.app.oidcConfig.authMethodType === OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_POST)
+    );
   }
 
   public copyToClipboard(text: string, type: string): void {

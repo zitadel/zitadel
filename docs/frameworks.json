@@ -1,37 +1,70 @@
 [
   {
-    "id": "client-php",
-    "title": "PHP",
-    "imgSrcDark": "/docs/img/tech/php.svg",
-    "docsLink": "/docs/sdk-examples/client-libraries/php",
-    "client": true
+    "id": "angular",
+    "title": "Angular",
+    "ecosystem": "JavaScript/TypeScript",
+    "description": "AuthJS/OIDC/PKCE example",
+    "imgSrcDark": "/docs/img/tech/angular.svg",
+    "imgSrcLight": "/docs/img/tech/angular.svg",
+    "docsLink": "",
+    "example": "https://github.com/zitadel/example-auth-angular.git",
+    "buildCommand": "npm run build",
+    "startCommand": "npm start",
+    "localhost": "http://localhost:3000",
+    "external": false
   },
   {
-    "id": "client-java",
-    "title": "Java",
-    "imgSrcDark": "/docs/img/tech/java.svg",
-    "docsLink": "/docs/sdk-examples/client-libraries/java",
-    "client": true
+    "id": "astro",
+    "title": "Astro",
+    "ecosystem": "JavaScript/TypeScript",
+    "description": "AuthJS/OIDC/PKCE example",
+    "imgSrcDark": "/docs/img/tech/astrojs-white.svg",
+    "imgSrcLight": "/docs/img/tech/astrojs.svg",
+    "docsLink": "",
+    "example": "https://github.com/zitadel/example-auth-astro.git",
+    "buildCommand": "npm run build",
+    "startCommand": "npm run preview",
+    "localhost": "http://localhost:3000",
+    "external": false
   },
   {
     "id": "client-go",
     "title": "Go",
     "imgSrcDark": "/docs/img/tech/golang.svg",
+    "imgSrcLight": "/docs/img/tech/golang.svg",
     "docsLink": "/docs/sdk-examples/go",
     "client": true,
     "sdk": true
   },
   {
-    "id": "client-ruby",
-    "title": "Ruby",
-    "imgSrcDark": "/docs/img/tech/ruby.svg",
-    "docsLink": "/docs/sdk-examples/client-libraries/ruby",
+    "id": "client-java",
+    "title": "Java",
+    "imgSrcDark": "/docs/img/tech/java.svg",
+    "imgSrcLight": "/docs/img/tech/java.svg",
+    "docsLink": "/docs/sdk-examples/client-libraries/java",
+    "client": true
+  },
+  {
+    "id": "client-node",
+    "title": "Node.js",
+    "imgSrcDark": "/docs/img/tech/nodejs.svg",
+    "imgSrcLight": "/docs/img/tech/nodejs.svg",
+    "docsLink": "/docs/sdk-examples/client-libraries/node",
+    "client": true
+  },
+  {
+    "id": "client-php",
+    "title": "PHP",
+    "imgSrcDark": "/docs/img/tech/php.svg",
+    "imgSrcLight": "/docs/img/tech/php.svg",
+    "docsLink": "/docs/sdk-examples/client-libraries/php",
     "client": true
   },
   {
     "id": "client-python",
     "title": "Python",
     "imgSrcDark": "/docs/img/tech/python.svg",
+    "imgSrcLight": "/docs/img/tech/python.svg",
     "docsLink": "/docs/sdk-examples/client-libraries/python",
     "client": true,
     "sdk": true,
@@ -40,170 +73,196 @@
     "sdkCommand": "pip install zitadel_client"
   },
   {
-    "id": "client-node",
-    "title": "Node.js",
-    "imgSrcDark": "/docs/img/tech/nodejs.svg",
-    "docsLink": "/docs/sdk-examples/client-libraries/node",
+    "id": "client-ruby",
+    "title": "Ruby",
+    "imgSrcDark": "/docs/img/tech/ruby.svg",
+    "imgSrcLight": "/docs/img/tech/ruby.svg",
+    "docsLink": "/docs/sdk-examples/client-libraries/ruby",
     "client": true
-  },
-  {
-    "id": "angular",
-    "title": "Angular",
-    "description": "This preset sets up an OIDC configuration with Authentication Code Flow, secured by PKCE",
-    "imgSrcLight": "/docs/img/tech/angular.svg",
-    "imgSrcDark": "/docs/img/tech/angular.svg",
-    "docsLink": "/docs/sdk-examples/angular",
-    "exampleLink": "/docs/examples/login/angular#create-and-configure-the-auth-service",
-    "example": "https://github.com/zitadel/zitadel-angular.git",
-    "sdkCommand": "npm install angular-oauth2-oidc",
-    "buildCommand": "npm install",
-    "startCommand": "ng serve",
-    "localhost": "http://localhost:4200"
-  },
-  {
-    "id": "flutter",
-    "title": "Flutter",
-    "imgSrcDark": "/docs/img/tech/flutter.svg",
-    "docsLink": "/docs/sdk-examples/flutter",
-    "example": "https://github.com/zitadel/zitadel_flutter.git"
-  },
-  {
-    "title": "Go",
-    "imgSrcDark": "/docs/img/tech/golang.svg",
-    "docsLink": "/docs/sdk-examples/go"
-  },
-  {
-    "id": "spring",
-    "title": "Spring",
-    "imgSrcDark": "/docs/img/tech/spring.svg",
-    "docsLink": "/docs/sdk-examples/java"
-  },
-  {
-    "id": "nestjs",
-    "title": "NestJS",
-    "imgSrcDark": "/docs/img/tech/nestjs.svg",
-    "docsLink": "/docs/sdk-examples/nestjs",
-    "example": "https://github.com/zitadel/example-auth-nestjs.git",
-    "buildCommand": "npm install",
-    "startCommand": "npm start",
-    "localhost": "http://localhost:3000"
-  },
-  {
-    "id": "next",
-    "title": "Next.js",
-    "imgSrcDark": "/docs/img/tech/nextjs.svg",
-    "imgSrcLight": "/docs/img/tech/nextjslight.svg",
-    "docsLink": "/docs/sdk-examples/nextjs",
-    "example": "https://github.com/zitadel/zitadel-nextjs-b2b.git"
   },
   {
     "id": "django",
     "title": "Python Django",
+    "ecosystem": "Python",
+    "description": "Django OIDC web example",
     "imgSrcDark": "/docs/img/tech/django.svg",
-    "docsLink": "/docs/sdk-examples/python-django"
+    "imgSrcLight": "/docs/img/tech/django.svg",
+    "docsLink": "/docs/sdk-examples/python-django",
+    "example": "https://github.com/zitadel/example-python-django-oidc.git",
+    "startCommand": "python manage.py runserver",
+    "localhost": "http://localhost:8000/",
+    "external": false
   },
   {
+    "id": "flask",
     "title": "Python Flask",
-    "imgSrcDark": "/docs/img/tech/flask.svg",
+    "ecosystem": "Python",
+    "description": "Flask API example",
+    "imgSrcDark": "/docs/img/tech/flask-white.svg",
     "imgSrcLight": "/docs/img/tech/flask.svg",
-    "docsLink": "/docs/sdk-examples/python-flask"
+    "docsLink": "/docs/sdk-examples/python-flask",
+    "example": "https://github.com/zitadel/example-api-python3-flask.git",
+    "startCommand": "python3 server.py",
+    "localhost": "http://127.0.0.1:5000",
+    "external": false
+  },
+  {
+    "id": "flutter",
+    "title": "Flutter",
+    "ecosystem": "Mobile",
+    "description": "Flutter example app (Android/iOS/Web)",
+    "imgSrcDark": "/docs/img/tech/flutter.svg",
+    "imgSrcLight": "/docs/img/tech/flutter.svg",
+    "docsLink": "/docs/sdk-examples/flutter",
+    "example": "https://github.com/zitadel/zitadel_flutter.git",
+    "external": false
+  },
+  {
+    "id": "hono",
+    "title": "Hono",
+    "ecosystem": "JavaScript/TypeScript",
+    "description": "AuthJS/OIDC/PKCE example",
+    "imgSrcDark": "/docs/img/tech/hono.svg",
+    "imgSrcLight": "/docs/img/tech/hono.svg",
+    "docsLink": "",
+    "example": "https://github.com/zitadel/example-auth-hono.git",
+    "buildCommand": "npm run build",
+    "startCommand": "npm start",
+    "localhost": "http://localhost:3000",
+    "external": false
+  },
+  {
+    "id": "nestjs",
+    "title": "NestJS",
+    "ecosystem": "JavaScript/TypeScript",
+    "description": "AuthJS/OIDC/PKCE example",
+    "imgSrcDark": "/docs/img/tech/nestjs.svg",
+    "imgSrcLight": "/docs/img/tech/nestjs.svg",
+    "docsLink": "/docs/sdk-examples/nestjs",
+    "example": "https://github.com/zitadel/example-auth-nestjs.git",
+    "buildCommand": "npm run build",
+    "startCommand": "npm start",
+    "localhost": "http://localhost:3000",
+    "external": false
+  },
+  {
+    "id": "next",
+    "title": "Next.js",
+    "ecosystem": "JavaScript/TypeScript",
+    "description": "AuthJS/OIDC/PKCE example",
+    "imgSrcDark": "/docs/img/tech/nextjs-white.svg",
+    "imgSrcLight": "/docs/img/tech/nextjs.svg",
+    "docsLink": "/docs/sdk-examples/nextjs",
+    "example": "https://github.com/zitadel/example-auth-nextjs.git",
+    "buildCommand": "npm run build",
+    "startCommand": "npm start",
+    "localhost": "http://localhost:3000",
+    "external": false
+  },
+  {
+    "id": "nuxtjs",
+    "title": "Nuxt.js",
+    "ecosystem": "JavaScript/TypeScript",
+    "description": "AuthJS/OIDC/PKCE example",
+    "imgSrcDark": "/docs/img/tech/nuxtjs.svg",
+    "imgSrcLight": "/docs/img/tech/nuxtjs.svg",
+    "docsLink": "",
+    "example": "https://github.com/zitadel/example-auth-nuxtjs.git",
+    "buildCommand": "npm run build",
+    "startCommand": "npm run preview",
+    "localhost": "http://localhost:3000",
+    "external": false
   },
   {
     "id": "react",
     "title": "React",
-    "description": "This preset sets up an OIDC configuration with Authentication Code Flow, secured by PKCE",
+    "ecosystem": "JavaScript/TypeScript",
+    "description": "Authenticate your ZITADEL users within your React applications",
     "imgSrcDark": "/docs/img/tech/react.svg",
+    "imgSrcLight": "/docs/img/tech/react.svg",
     "docsLink": "/docs/sdk-examples/react",
-    "exampleLink": "/docs/examples/login/react#create-and-configure-the-auth-service",
     "example": "https://github.com/zitadel/zitadel-react.git",
+    "exampleLink": "/docs/examples/login/react#create-and-configure-the-auth-service",
     "sdk": true,
-    "sdkPackage": "https://www.npmjs.com/package/@zitadel/react",
-    "sdkName": "@zitadel/react",
     "sdkCommand": "npm install @zitadel/react",
+    "sdkName": "@zitadel/react",
+    "sdkPackage": "https://www.npmjs.com/package/@zitadel/react",
+    "localhost": "http://localhost:3000",
+    "external": false,
     "buildCommand": "(cd ./lib && yarn && yarn build) && yarn",
-    "startCommand": "yarn start",
-    "localhost": "http://localhost:3000"
+    "startCommand": "yarn dev"
+  },
+  {
+    "id": "solidstart",
+    "title": "SolidStart",
+    "ecosystem": "JavaScript/TypeScript",
+    "description": "AuthJS/OIDC/PKCE example",
+    "imgSrcDark": "/docs/img/tech/solidstart.svg",
+    "imgSrcLight": "/docs/img/tech/solidstart.svg",
+    "docsLink": "",
+    "example": "https://github.com/zitadel/example-auth-solidstart.git",
+    "buildCommand": "npm run build",
+    "startCommand": "npm start",
+    "localhost": "http://localhost:3000",
+    "external": false
+  },
+  {
+    "id": "sveltekit",
+    "title": "SvelteKit",
+    "ecosystem": "JavaScript/TypeScript",
+    "description": "AuthJS/OIDC/PKCE example",
+    "imgSrcDark": "/docs/img/tech/svelte.svg",
+    "imgSrcLight": "/docs/img/tech/svelte.svg",
+    "docsLink": "",
+    "example": "https://github.com/zitadel/example-auth-sveltekit.git",
+    "buildCommand": "npm run build",
+    "startCommand": "npm run preview",
+    "localhost": "http://localhost:3000",
+    "external": false
+  },
+  {
+    "id": "spring-boot",
+    "title": "Spring Boot",
+    "ecosystem": "Java",
+    "description": "Java Spring Boot example",
+    "imgSrcDark": "/docs/img/tech/spring.svg",
+    "imgSrcLight": "/docs/img/tech/spring.svg",
+    "docsLink": "/docs/sdk-examples/java",
+    "example": "https://github.com/zitadel/zitadel-java.git",
+    "buildCommand": "mvn clean package -DskipTests",
+    "localhost": "http://localhost:18080/",
+    "external": false
   },
   {
     "id": "symfony",
     "title": "Symfony",
-    "imgSrcDark": "/docs/img/tech/symfony.svg",
-    "docsLink": "/docs/sdk-examples/symfony"
+    "ecosystem": "PHP",
+    "description": "Symfony OIDC example",
+    "imgSrcDark": "/docs/img/tech/symfony-white.svg",
+    "imgSrcLight": "/docs/img/tech/symfony.svg",
+    "docsLink": "/docs/sdk-examples/symfony",
+    "example": "https://github.com/zitadel/example-symfony-oidc.git",
+    "startCommand": "symfony server:start --no-tls",
+    "localhost": "http://localhost:8000",
+    "external": false
   },
   {
     "id": "vue",
     "title": "Vue.js",
-    "description": "This preset sets up an OIDC configuration with Authentication Code Flow, secured by PKCE",
+    "ecosystem": "JavaScript/TypeScript",
+    "description": "AuthJS/OIDC/PKCE example",
     "imgSrcDark": "/docs/img/tech/vue.svg",
+    "imgSrcLight": "/docs/img/tech/vue.svg",
     "docsLink": "/docs/sdk-examples/vue",
-    "example": "https://github.com/zitadel/zitadel-vue.git",
+    "example": "https://github.com/zitadel/example-auth-vue.git",
+    "buildCommand": "npm run build",
+    "startCommand": "npm run preview",
+    "localhost": "http://localhost:3000",
+    "external": false,
     "sdk": true,
-    "sdkPackage": "https://www.npmjs.com/package/@zitadel/vue",
-    "sdkName": "@zitadel/vue",
     "sdkCommand": "npm install @zitadel/vue",
-    "buildCommand": "yarn",
-    "startCommand": "yarn dev",
-    "localhost": "http://localhost:8080"
-  },
-  {
-    "title": "Dart",
-    "imgSrcDark": "/docs/img/tech/dart.svg",
-    "docsLink": "https://github.com/smartive/zitadel-dart",
-    "external": true,
-    "client": true,
-    "sdk": true
-  },
-  {
-    "title": "Elixir",
-    "imgSrcDark": "/docs/img/tech/elixir.svg",
-    "docsLink": "https://github.com/maennchen/zitadel_api",
-    "external": true
-  },
-  {
-    "title": "FastAPI",
-    "imgSrcDark": "/docs/img/tech/fastapi.svg",
-    "docsLink": "https://github.com/cleanenergyexchange/fastapi-zitadel-auth",
-    "external": true
-  },
-  {
-    "title": "NextAuth",
-    "imgSrcDark": "/docs/img/tech/nextjs.svg",
-    "imgSrcLight": "/docs/img/tech/nextjslight.svg",
-    "docsLink": "https://next-auth.js.org/providers/zitadel",
-    "external": true
-  },
-  {
-    "title": ".Net",
-    "imgSrcDark": "/docs/img/tech/dotnet.svg",
-    "docsLink": "https://github.com/smartive/zitadel-net",
-    "external": true,
-    "client": true
-  },
-  {
-    "title": "Passport.js",
-    "imgSrcDark": "/docs/img/tech/passportjs.svg",
-    "docsLink": "https://github.com/buehler/node-passport-zitadel",
-    "external": true
-  },
-  {
-    "title": "Rust",
-    "imgSrcLight": "/docs/img/tech/rust.svg",
-    "imgSrcDark": "/docs/img/tech/rustlight.svg",
-    "docsLink": "https://github.com/smartive/zitadel-rust",
-    "client": true,
-    "external": true
-  },
-  {
-    "title": "Pylon",
-    "imgSrcDark": "/docs/img/tech/pylon.svg",
-    "docsLink": "https://github.com/getcronit/pylon",
-    "external": true
-  },
-  {
-    "title": "Vanilla-JS",
-    "imgSrcDark": "/docs/img/tech/javascript.svg",
-    "docsLink": "https://github.com/zitadel/zitadel-vanilla-js",
-    "external": true,
-    "example": "https://github.com/zitadel/zitadel-vanilla-js.git"
+    "sdkName": "@zitadel/vue",
+    "sdkDocLink": "/docs/examples/login/vue#vue-setup",
+    "sdkPackage": "https://www.npmjs.com/package/@zitadel/vue"
   }
 ]

@@ -25,6 +25,7 @@
       border: 1px solid map-get($foreground, divider);
       border-radius: 8px;
       overflow: hidden;
+      width: 100%;
       background: map-get($background, card);
 
       .code-header {
@@ -82,7 +83,7 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            
+
             // Override Material Design button styles
             &.mat-icon-button {
               width: 36px !important;
@@ -98,14 +99,14 @@
               height: 18px !important;
               text-align: center;
               vertical-align: middle;
-              
+
               // Force consistent sizing for all Line Awesome icons
               &.las {
                 font-size: 18px !important;
                 width: 18px !important;
                 height: 18px !important;
                 line-height: 18px !important;
-                
+
                 &.la-copy,
                 &.la-download,
                 &.la-check {
