@@ -42,13 +42,7 @@ CREATE TABLE zitadel.project_grant_roles(
     , project_org_id TEXT NOT NULL
     , project_id TEXT NOT NULL
 
-    , PRIMARY KEY (instance_id, grant_id, role_key)
+    , PRIMARY KEY (instance_id, grant_id, key)
     , FOREIGN KEY (instance_id, grant_id) REFERENCES zitadel.project_grants(instance_id, id) ON DELETE CASCADE
-    , FOREIGN KEY (instance_id, project_org_id, project_id, role_key) REFERENCES zitadel.project_roles(instance_id, organization_id, project_id, key) ON DELETE CASCADE
+    , FOREIGN KEY (instance_id, project_org_id, project_id, key) REFERENCES zitadel.project_roles(instance_id, organization_id, project_id, key) ON DELETE CASCADE
 );
-
-CREATE TRIGGER trg_set_updated_at_project_grants
-    BEFORE UPDATE ON zitadel.project_grants_roles
-    FOR EACH ROW
-    WHEN (NEW.updated_at IS NULL)
-EXECUTE FUNCTION zitadel.set_updated_at();

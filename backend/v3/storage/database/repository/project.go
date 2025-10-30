@@ -24,7 +24,7 @@ func (project) Role() domain.ProjectRoleRepository {
 }
 
 func (p project) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Project, error) {
-	builder, err := p.prepareQuery(opts)
+	builder, err := p.prepareGetQuery(opts)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func (p project) Get(ctx context.Context, client database.QueryExecutor, opts ..
 }
 
 func (p project) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Project, error) {
-	builder, err := p.prepareQuery(opts)
+	builder, err := p.prepareListQuery(opts)
 	if err != nil {
 		return nil, err
 	}
@@ -120,6 +120,10 @@ func (p project) OrganizationIDCondition(organizationID string) database.Conditi
 	return database.NewTextCondition(p.OrganizationIDColumn(), database.TextOperationEqual, organizationID)
 }
 
+func (p project) GrantedOrganizationIDCondition(organizationID string) database.Condition {
+	return database.NewTextCondition(p.GrantedOrganizationIDColumn(), database.TextOperationEqual, organizationID)
+}
+
 func (p project) IDCondition(projectID string) database.Condition {
 	return database.NewTextCondition(p.IDColumn(), database.TextOperationEqual, projectID)
 }
@@ -154,6 +158,10 @@ func (p project) InstanceIDColumn() database.Column {
 
 func (p project) OrganizationIDColumn() database.Column {
 	return database.NewColumn(p.unqualifiedTableName(), "organization_id")
+}
+
+func (p project) GrantedOrganizationIDColumn() database.Column {
+	return database.NewColumn(p.unqualifiedTableName(), "granted_organization_id")
 }
 
 func (p project) IDColumn() database.Column {
@@ -207,10 +215,13 @@ const queryProjectStmt = `SELECT
 	projects.should_assert_role,
 	projects.is_authorization_required,
 	projects.is_project_access_required,
-	projects.used_labeling_setting_owner
+	projects.used_labeling_setting_owner,
+	NULL::TEXT AS grant_id, 
+	NULL::TEXT AS granted_organization_id,  
+	NULL::zitadel.project_grant_state AS grant_state    
 	FROM zitadel.projects`
 
-func (p project) prepareQuery(opts []database.QueryOption) (*database.StatementBuilder, error) {
+func (p project) prepareGetQuery(opts []database.QueryOption) (*database.StatementBuilder, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
@@ -219,6 +230,64 @@ func (p project) prepareQuery(opts []database.QueryOption) (*database.StatementB
 		return nil, err
 	}
 	builder := database.NewStatementBuilder(queryProjectStmt)
+	options.Write(builder)
+
+	return builder, nil
+}
+
+const queryGrantedProjectStmt = `SELECT
+	projects.instance_id,	
+	projects.organization_id,
+	projects.id as id,
+	grants.created_at,
+	grants.updated_at,
+	projects.name,
+	projects.state,
+	projects.should_assert_role,
+	projects.is_authorization_required,
+	projects.is_project_access_required,
+	projects.used_labeling_setting_owner,
+	grants.id AS grant_id,
+	grants.granted_organization_id,
+	grants.state as grant_state
+	FROM zitadel.projects 
+	INNER JOIN zitadel.project_grants as grants
+	    ON grants.instance_id = projects.instance_id 
+	    AND grants.granting_organization_id = projects.organization_id
+	    AND grants.project_id = projects.id`
+
+const queryProjectsUnionStmt = `SELECT
+	projects.instance_id,	
+	projects.organization_id,
+	projects.id as id,
+	projects.created_at,
+	projects.updated_at,
+	projects.name,
+	projects.state,
+	projects.should_assert_role,
+	projects.is_authorization_required,
+	projects.is_project_access_required,
+	projects.used_labeling_setting_owner,
+	projects.grant_id,
+	projects.granted_organization_id,
+	projects.grant_state	
+	FROM (` +
+	queryProjectStmt +
+	` UNION ALL ` +
+	queryGrantedProjectStmt +
+	`) AS projects`
+
+func (p project) prepareListQuery(opts []database.QueryOption) (*database.StatementBuilder, error) {
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+	if err := checkRestrictingColumns(options.Condition, p.InstanceIDColumn()); err != nil {
+		return nil, err
+	}
+	builder := database.NewStatementBuilder(
+		queryProjectsUnionStmt,
+	)
 	options.Write(builder)
 
 	return builder, nil
