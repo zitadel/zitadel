@@ -24,7 +24,15 @@
             "dependsOn": [
                 "pack-all"
             ],
-            "command": "bash -c \"[[ \\\"${NX_DRY_RUN}\\\" != \\\"true\\\" ]] && gh release upload ${ZITADEL_RELEASE_VERSION} ./.artifacts/pack/zitadel-*-*.tar.gz\""
+            "executor": "nx:run-commands",
+            "options": {
+                "commands": [
+                    {
+                        "forwardAllArgs": false,
+                        "command": "bash -c \"[[ \\\"${NX_DRY_RUN}\\\" == \\\"true\\\" ]] || gh release upload ${ZITADEL_RELEASE_VERSION} ./.artifacts/pack/zitadel-*-*.tar.gz\""
+                    }
+                ]
+            }
         },
         "prod": {
             "description": "Runs the Go-based API backend in production mode ",
@@ -66,9 +74,15 @@
             ],
             "command": "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; echo \"Building for $GOOS-$GOARCH...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$GOOS/$GOARCH/zitadel$EXT -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\") -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_RELEASE_VERSION}\"'",
             "inputs": [
-                { "runtime": "go env GOOS" },
-                { "runtime": "go env GOARCH" },
-                { "env": "ZITADEL_RELEASE_VERSION" },
+                {
+                    "runtime": "go env GOOS"
+                },
+                {
+                    "runtime": "go env GOARCH"
+                },
+                {
+                    "env": "ZITADEL_RELEASE_VERSION"
+                },
                 "runtime"
             ],
             "outputs": [
@@ -83,13 +97,17 @@
                 "generate-statik"
             ]
         },
-        "lint-install":{
+        "lint-install": {
             "description": "Installs golangci-lint binary for linting. Using go install is not recommended in the official docs, because this can produce non-deterministic results.",
             "cache": true,
             "command": "curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b .artifacts/bin/$(go env GOOS)/$(go env GOARCH) v2.5.0",
             "inputs": [
-                { "runtime": "go env GOOS" },
-                { "runtime": "go env GOARCH" }
+                {
+                    "runtime": "go env GOOS"
+                },
+                {
+                    "runtime": "go env GOARCH"
+                }
             ],
             "outputs": [
                 "{workspaceRoot}/.artifacts/bin/*/*/golangci-lint"
@@ -138,8 +156,12 @@
             "command": "go build -cover -race -tags integration -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.test main.go",
             "cache": true,
             "inputs": [
-                { "runtime": "go env GOOS" },
-                { "runtime": "go env GOARCH" },
+                {
+                    "runtime": "go env GOOS"
+                },
+                {
+                    "runtime": "go env GOARCH"
+                },
                 "sources",
                 "{workspaceRoot}/internal/integration/**",
                 "{workspaceRoot}/go*"
@@ -194,8 +216,12 @@
                 ]
             },
             "inputs": [
-                { "runtime": "go env GOOS" },
-                { "runtime": "go env GOARCH" },
+                {
+                    "runtime": "go env GOOS"
+                },
+                {
+                    "runtime": "go env GOARCH"
+                },
                 "sources",
                 "{workspaceRoot}/internal/integration/**",
                 "{workspaceRoot}/go*"
@@ -232,7 +258,6 @@
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install go.uber.org/mock/mockgen@v0.4.0",
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install golang.org/x/tools/cmd/stringer@v0.36.0",
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/rakyll/statik@v0.1.7",
-
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/bufbuild/buf/cmd/buf@v1.45.0",
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.1",
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1",
@@ -241,15 +266,18 @@
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/envoyproxy/protoc-gen-validate@v1.1.0",
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.18.1",
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.1",
-
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install ./internal/protoc/protoc-gen-authoption",
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install ./internal/protoc/protoc-gen-zitadel"
                 ]
             },
             "cache": true,
             "inputs": [
-                { "runtime": "go env GOOS" },
-                { "runtime": "go env GOARCH" },
+                {
+                    "runtime": "go env GOOS"
+                },
+                {
+                    "runtime": "go env GOARCH"
+                },
                 "{workspaceRoot}/internal/protoc/protoc-gen-authoption/**/*",
                 "{workspaceRoot}/internal/protoc/protoc-gen-zitadel/**/*"
             ],
@@ -258,7 +286,6 @@
                 "{workspaceRoot}/.artifacts/bin/*/*/mockgen",
                 "{workspaceRoot}/.artifacts/bin/*/*/stringer",
                 "{workspaceRoot}/.artifacts/bin/*/*/statik",
-
                 "{workspaceRoot}/.artifacts/bin/*/*/buf",
                 "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-go",
                 "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-go-grpc",
@@ -266,7 +293,6 @@
                 "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-openapiv2",
                 "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-validate",
                 "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-connect-go",
-
                 "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-authoption",
                 "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-zitadel"
             ]
@@ -314,8 +340,12 @@
             },
             "cache": true,
             "inputs": [
-                { "runtime": "go env GOOS" },
-                { "runtime": "go env GOARCH" },
+                {
+                    "runtime": "go env GOOS"
+                },
+                {
+                    "runtime": "go env GOARCH"
+                },
                 "{workspaceRoot}/internal/statik/generate.go",
                 "{workspaceRoot}/internal/notification/statik/generate.go",
                 "{workspaceRoot}/internal/api/ui/login/static/resources/generate.go",
@@ -374,8 +404,8 @@
             "options": {
                 "parallel": false,
                 "commands": [
-                    "GOOS=linux GOARCH=amd64 nx run @zitadel/api:build",
-                    "GOOS=linux GOARCH=arm64 nx run @zitadel/api:build"
+                    "GOOS=linux GOARCH=amd64 nx run @zitadel/api:build --excludeTaskDependencies",
+                    "GOOS=linux GOARCH=arm64 nx run @zitadel/api:build --excludeTaskDependencies"
                 ]
             }
         },
@@ -389,13 +419,13 @@
             "options": {
                 "parallel": false,
                 "commands": [
-                    "GOOS=darwin GOARCH=amd64 nx run @zitadel/api:build",
-                    "GOOS=darwin GOARCH=arm64 nx run @zitadel/api:build",
-                    "GOOS=windows GOARCH=amd64 nx run @zitadel/api:build",
-                    "GOOS=windows GOARCH=arm64 nx run @zitadel/api:build"
+                    "GOOS=darwin GOARCH=amd64 nx run @zitadel/api:build --excludeTaskDependencies",
+                    "GOOS=darwin GOARCH=arm64 nx run @zitadel/api:build --excludeTaskDependencies",
+                    "GOOS=windows GOARCH=amd64 nx run @zitadel/api:build --excludeTaskDependencies",
+                    "GOOS=windows GOARCH=arm64 nx run @zitadel/api:build --excludeTaskDependencies"
                 ]
             }
-        },        
+        },
         "pack": {
             "description": "Packages the binary for the platform defined by GOOS and GOARCH environment variables. The version is taken from the ZITADEL_RELEASE_VERSION environment variable.",
             "dependsOn": [
@@ -411,8 +441,12 @@
             },
             "cache": true,
             "inputs": [
-                { "runtime": "go env GOOS" },
-                { "runtime": "go env GOARCH" },
+                {
+                    "runtime": "go env GOOS"
+                },
+                {
+                    "runtime": "go env GOARCH"
+                },
                 "sources",
                 "{workspaceRoot}/README.md",
                 "{workspaceRoot}/LICENSE"

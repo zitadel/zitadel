@@ -182,7 +182,7 @@ export function executeDockerBuild(conventionalCommits: boolean, dryRun: boolean
  * Executes docker build commands with the appropriate configuration.
  */
 export function executeDockerBuildForProject(dryRun: boolean, nxProject: string, projectBakeArgs: string): void {
-  const nxCommand = `pnpm nx run ${nxProject}:build-docker --tuiAutoExit 3`;
+  const nxCommand = `pnpm nx run ${nxProject}:build-docker --no-tui`;
   let bakeArgs = `--file release/docker-bake-release.hcl ${projectBakeArgs}`;
   if (!dryRun) {
     console.log('Docker images will be pushed to the registry after build, because dryRun is false.');
@@ -193,6 +193,15 @@ export function executeDockerBuildForProject(dryRun: boolean, nxProject: string,
   execSync(`${nxCommand}${bakeArgs}`, {
     stdio: 'inherit', env: process.env
   });
+}
+
+function resetChangedFiles(): void {
+  try {
+    execSync('git checkout .npmrc package.json packages/zitadel-client/package.json packages/zitadel-proto/package.json apps/login/package.json', { stdio: 'inherit' });
+    console.log('Reset changed files to clean state.');
+  } catch (error) {
+    console.error('Failed to reset changed files:', error);
+  }
 }
 
 /**
@@ -237,9 +246,15 @@ export async function executeRelease(
   const publishResults = await releasePublish({
     dryRun: options.dryRun,
     verbose: options.verbose,
+    tag: process.env[isLatestEnvVar] == 'true' ? 'latest' : gitInfo.branch.replaceAll('.', '-'),
   });
-
-  return Object.values(publishResults).every((result) => result.code === 0) ? 0 : 1;
+  
+  const code = Object.values(publishResults).every((result) => result.code === 0) ? 0 : 1;
+  if (code === 0) {
+    console.log(`Release process completed successfully for version ${workspaceVersion}. Resetting changed files.`);
+    resetChangedFiles();
+  }
+  return code;
 }
 
 /**

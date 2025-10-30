@@ -1,11 +1,16 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "@zitadel/proto",
   "targets": {
     "nx-release-publish": {
       "description": "Sets the package name to the GitHub org scope for publishing to GitHub Packages. This allows to publish the package on forks.",
       "dependsOn": [
-        "generate"
-      ],
+        "generate",
+        "link-to-repo"
+      ]
+    },
+    "link-to-repo": {
+      "description": "Sets the package name to the GitHub org scope for publishing to GitHub Packages. Also links the package to the GitHub repository. This allows to publish the package on forks.",
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
