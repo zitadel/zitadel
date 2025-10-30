@@ -34,15 +34,6 @@ func (c *FieldChange) getPathValue() (string, string, error) {
 		return "", "", err
 	}
 
-	// var out string
-	// if valueString, ok := v.(string); ok {
-	// 	out = "\"" + string(valueString) + "\""
-	// } else {
-	// 	out = string(value)
-	// }
-
-	// return path, out, nil
-
 	return path, string(value), nil
 }
 
@@ -52,8 +43,6 @@ func (c *FieldChange) writeUpdate(builder *database.StatementBuilder, changes js
 		return err
 	}
 
-	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> path = %+v\n", path)
-	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m i = %+v\n", i)
 	builder.WriteString("jsonb_set_lax(")
 	// if i == 0 {
 	if i < 0 {
@@ -74,8 +63,6 @@ func (c *FieldChange) writeUpdate(builder *database.StatementBuilder, changes js
 
 	return nil
 }
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 type ArrayChange struct {
 	path   string
@@ -108,32 +95,28 @@ func (c *ArrayChange) writeUpdate(builder *database.StatementBuilder, changes js
 		return err
 	}
 
-	// jsonb_set(properties, '{attributes}', (properties->'attributes') - 'is_new');
-	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> path = %+v\n", path)
-
-	if c.remove {
-		builder.WriteString("jsonb_set(")
-		//
-		if i < 0 {
-			changes.column.WriteQualified(builder)
-		} else {
-			// changes.changes[i-1].writeUpdate(builder, changes, i-1)
-			c.writeUpdate(builder, changes, i-1)
-		}
-		//
-		builder.WriteString(", '{" + path + "}'")
-		//
-		builder.WriteString(", " + "(")
-		changes.column.WriteUnqualified(builder)
-		builder.WriteString("->'" + path + "')")
-		builder.WriteString(" - ")
-		if len(value) > 2 && value[0] == '"' && value[len(value)-1] == '"' {
-			builder.WriteString("'" + value[1:len(value)-1] + "'")
-		} else {
-			builder.WriteString(value)
-		}
-		builder.WriteString(")")
+	builder.WriteString("zitadel.jsonb_array_remove(")
+	//
+	if i < 0 {
+		changes.column.WriteQualified(builder)
 	} else {
+		c.writeUpdate(builder, changes, i-1)
+	}
+	//
+	builder.WriteString(", '{" + path + "}'")
+	//
+	builder.WriteString(", " + "(")
+	changes.column.WriteUnqualified(builder)
+	builder.WriteString("->'" + path + "')")
+	builder.WriteString(" - ")
+	if len(value) > 2 && value[0] == '"' && value[len(value)-1] == '"' {
+		builder.WriteString("'" + value[1:len(value)-1] + "'")
+	} else {
+		builder.WriteString(value)
+	}
+	builder.WriteString(")")
+
+	if !c.remove {
 
 		builder.WriteString("jsonb_insert(")
 		//

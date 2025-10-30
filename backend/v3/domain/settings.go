@@ -118,7 +118,6 @@ type loginSettingsJSONFieldsChanges interface {
 
 type loginSettingsJsonChanges interface {
 	loginSettingsJSONFieldsChanges
-	// SetLabelSettings(changes ...db_json.JsonUpdate) database.Change
 }
 
 type LoginSetting struct {
@@ -170,7 +169,7 @@ type labelSettingsJSONFieldsChanges interface {
 	SetBackgroundColorField(value string) db_json.JsonUpdate
 	SetWarnColorField(value string) db_json.JsonUpdate
 	SetFontColorField(value string) db_json.JsonUpdate
-	SetPrimaryCcolorDarkField(value string) db_json.JsonUpdate
+	SetPrimaryColorDarkField(value string) db_json.JsonUpdate
 	SetBackgroundColorDarkField(value string) db_json.JsonUpdate
 	SetWarnColorDarkField(value string) db_json.JsonUpdate
 	SetFontColorDarkField(value string) db_json.JsonUpdate
@@ -212,7 +211,6 @@ type passwordComplexityJSONFieldsChanges interface {
 
 type passwordComplexitySettingsJsonChanges interface {
 	passwordComplexityJSONFieldsChanges
-	// SetLabelSettings(changes ...db_json.JsonUpdate) database.Change
 }
 
 type PasswordComplexitySetting struct {
@@ -232,7 +230,6 @@ type passwordExpiryJsonUpdates interface {
 
 type passwordExpirySettingsJsonChanges interface {
 	passwordExpiryJsonUpdates
-	// SetLabelSettings(changes ...db_json.JsonUpdate) database.Change
 }
 
 type PasswordExpirySetting struct {
@@ -254,7 +251,6 @@ type lockoutJsonUpdates interface {
 
 type lockoutSettingsJsonChanges interface {
 	lockoutJsonUpdates
-	// SetLabelSettings(changes ...db_json.JsonUpdate) database.Change
 }
 
 type LockoutSetting struct {
@@ -276,7 +272,6 @@ type domainJsonUpdates interface {
 
 type domainSettingsJsonChanges interface {
 	domainJsonUpdates
-	// SetLabelSettings(changes ...db_json.JsonUpdate) database.Change
 }
 
 type DomainSetting struct {
@@ -300,7 +295,6 @@ type securityJsonUpdates interface {
 
 type securitySettingsJsonChanges interface {
 	securityJsonUpdates
-	// SetLabelSettings(changes ...db_json.JsonUpdate) database.Change
 }
 
 type SecuritySetting struct {
@@ -310,19 +304,14 @@ type SecuritySetting struct {
 
 type OrganizationSettings struct {
 	OrganizationScopedUsernames bool `json:"organizationScopedUsernames,omitempty"`
-	// OldOrganizationScopedUsernames bool     `json:"oldOrganizationScopedUsernames,omitempty"`
-	// UsernameChanges                []string `json:"usernameChanges,omitempty"`
 }
 
 type organizationJsonUpdates interface {
 	SetOrganizationScopedUsernames(value bool) db_json.JsonUpdate
-	// SetOldOrganizationScopedUsernames(value bool) db_json.JsonUpdate
-	// SetUsernameChanges(value []string) db_json.JsonUpdate
 }
 
 type organizationSettingsJsonChanges interface {
 	organizationJsonUpdates
-	// SetLabelSettings(changes ...db_json.JsonUpdate) database.Change
 }
 
 type OrganizationSetting struct {
@@ -367,47 +356,14 @@ type SettingsRepository interface {
 	settingsConditions
 	settingsChanges
 
-	// Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, typ SettingType, opts ...database.QueryOption) (*Setting, error)
 	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Setting, error)
 	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Setting, error)
 
-	// CreateLogin(ctx context.Context, client database.QueryExecutor, setting *LoginSetting, changes ...database.Change) error
-	// GetLogin(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*LoginSetting, error)
-
-	CreateLabel(ctx context.Context, client database.QueryExecutor, setting *LabelSetting) error
-	// GetLabel(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, state LabelState) (*LabelSetting, error)
-	ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *LabelSetting) error
-
-	CreatePasswordComplexity(ctx context.Context, client database.QueryExecutor, setting *PasswordComplexitySetting) error
-	// GetPasswordComplexity(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*PasswordComplexitySetting, error)
-
-	CreatePasswordExpiry(ctx context.Context, client database.QueryExecutor, setting *PasswordExpirySetting) error
-	// GetPasswordExpiry(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*PasswordExpirySetting, error)
-
-	CreateLockout(ctx context.Context, client database.QueryExecutor, setting *LockoutSetting) error
-	// GetLockout(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*LockoutSetting, error)
-
-	CreateSecurity(ctx context.Context, client database.QueryExecutor, setting *SecuritySetting) error
-	// GetSecurity(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*SecuritySetting, error)
-
-	CreateDomain(ctx context.Context, client database.QueryExecutor, setting *DomainSetting) error
-	// GetDomain(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*DomainSetting, error)
-
-	CreateOrg(ctx context.Context, client database.QueryExecutor, setting *OrganizationSetting) error
-	// GetOrg(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*OrganizationSetting, error)
-
 	// Create is used for events reduction
 	Create(ctx context.Context, client database.QueryExecutor, setting *Setting) error
-	// Delete(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string, typ SettingType) (int64, error)
 	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 
-	// DeleteSettingsForInstance is used when a Instance is deleted
-	DeleteSettingsForInstance(ctx context.Context, client database.QueryExecutor, instanceID string) (int64, error)
-	// DeleteSettingsForOrg is used ehwn an Organization is deleted
-	DeleteSettingsForOrg(ctx context.Context, client database.QueryExecutor, orgID string) (int64, error)
-
-	Get_(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Setting, error)
-	Update_(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 }
 
 type LoginRepository interface {
@@ -416,7 +372,6 @@ type LoginRepository interface {
 	settingsChanges
 	loginSettingsJsonChanges
 
-	// Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*LoginSetting, error)
 	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*LoginSetting, error)
 	Set(ctx context.Context, client database.QueryExecutor, setting *LoginSetting) error
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
@@ -444,11 +399,7 @@ type PasswordComplexityRepository interface {
 
 	passwordComplexitySettingsJsonChanges
 
-	// Get(ctx context.Context, client database.QueryExecutor, instanceID string, orgID *string) (*PasswordComplexitySetting, error)
 	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*PasswordComplexitySetting, error)
-	// Set(ctx context.Context, client database.QueryExecutor, setting *PasswordComplexitySetting) error
-	// Set(ctx context.Context, client database.QueryExecutor, setting *PasswordComplexitySetting, changes ...database.Change) error
-	// Set(ctx context.Context, client database.QueryExecutor, setting *PasswordExpirySetting, changes ...database.Change) error
 	Set(ctx context.Context, client database.QueryExecutor, setting *PasswordComplexitySetting) error
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)

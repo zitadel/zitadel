@@ -817,7 +817,7 @@ func (s *settingsRelationalProjection) reduceLabelChanged(event eventstore.Event
 			changes = append(changes, settingsRepo.SetFontColorField(*policyEvent.FontColor))
 		}
 		if policyEvent.PrimaryColorDark != nil {
-			changes = append(changes, settingsRepo.SetPrimaryCcolorDarkField(*policyEvent.PrimaryColorDark))
+			changes = append(changes, settingsRepo.SetPrimaryColorDarkField(*policyEvent.PrimaryColorDark))
 		}
 		if policyEvent.BackgroundColorDark != nil {
 			changes = append(changes, settingsRepo.SetBackgroundColorDarkField(*policyEvent.BackgroundColorDark))

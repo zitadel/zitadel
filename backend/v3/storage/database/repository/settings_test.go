@@ -1,7 +1,6 @@
 package repository_test
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -409,7 +408,7 @@ func TestCreateGenericSetting(t *testing.T) {
 	}
 }
 
-// NOTE all create functions are just a wrapper around repository.createSetting()
+// NOTE all Set.*() functions are just a wrapper around repository.createSetting()
 // for the sake of testing, CreatePasswordExpiry was used, but the underlying code is the same
 // across all Create.*() functions
 func TestCreateSpecificSetting(t *testing.T) {
@@ -549,7 +548,7 @@ func TestCreateSpecificSetting(t *testing.T) {
 					require.NoError(t, err)
 
 					// create setting
-					settingRepo := repository.SettingsRepository()
+					settingRepo := repository.PasswordExpiryRepository()
 					setting := domain.PasswordExpirySetting{
 						Setting: &domain.Setting{
 							InstanceID: newInstId,
@@ -560,7 +559,8 @@ func TestCreateSpecificSetting(t *testing.T) {
 						},
 					}
 
-					err = settingRepo.CreatePasswordExpiry(t.Context(), tx, &setting)
+					// err = settingRepo.CreatePasswordExpiry(t.Context(), tx, &setting)
+					err = settingRepo.Set(t.Context(), tx, &setting)
 					require.NoError(t, err)
 
 					// change the instance
@@ -611,7 +611,7 @@ func TestCreateSpecificSetting(t *testing.T) {
 					require.NoError(t, err)
 
 					// create setting
-					settingRepo := repository.SettingsRepository()
+					settingRepo := repository.PasswordExpiryRepository()
 					setting := domain.PasswordExpirySetting{
 						Setting: &domain.Setting{
 							InstanceID: newInstId,
@@ -622,7 +622,7 @@ func TestCreateSpecificSetting(t *testing.T) {
 						},
 					}
 
-					err = settingRepo.CreatePasswordExpiry(t.Context(), tx, &setting)
+					err = settingRepo.Set(t.Context(), tx, &setting)
 					require.NoError(t, err)
 
 					// change the instance
@@ -673,7 +673,7 @@ func TestCreateSpecificSetting(t *testing.T) {
 					require.NoError(t, err)
 
 					// create setting
-					settingRepo := repository.SettingsRepository()
+					settingRepo := repository.PasswordExpiryRepository()
 					setting := domain.PasswordExpirySetting{
 						Setting: &domain.Setting{
 							InstanceID: newInstId,
@@ -684,7 +684,7 @@ func TestCreateSpecificSetting(t *testing.T) {
 						},
 					}
 
-					err = settingRepo.CreatePasswordExpiry(t.Context(), tx, &setting)
+					err = settingRepo.Set(t.Context(), tx, &setting)
 					require.NoError(t, err)
 
 					// create another org
@@ -822,7 +822,8 @@ func TestCreateSpecificSetting(t *testing.T) {
 	}
 }
 
-func TestCreateLabelSetting(t *testing.T) {
+// Label has different indexes, so needs to have its own test case for Set
+func TestSetLabelSetting(t *testing.T) {
 	beforeCreate := time.Now()
 	tx, err := pool.Begin(t.Context(), nil)
 	require.NoError(t, err)
@@ -930,7 +931,6 @@ func TestCreateLabelSetting(t *testing.T) {
 					Settings:   []byte("{}"),
 				},
 			},
-			// err: new(database.UniqueError),
 		},
 		func() test {
 			newInstId := gofakeit.Name()
@@ -1214,33 +1214,25 @@ func TestCreateLabelSetting(t *testing.T) {
 
 			// create setting
 			err = settingRepo.Set(t.Context(), tx, setting)
-			fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> err = %+v\n", err)
 			assert.ErrorIs(t, err, tt.err)
 			if err != nil {
 				return
 			}
 			afterCreate := time.Now()
 
-			// check organization values
-			// setting, err = settingRepo.Get(
-			// 	t.Context(), tx,
-			// 	setting.InstanceID,
-			// 	setting.OrgID,
-			// )
 			setting, err = settingRepo.Get(t.Context(), tx,
 				database.WithCondition(
 					database.And(
 						settingRepo.InstanceIDCondition(setting.InstanceID),
 						settingRepo.OrgIDCondition(setting.OrgID),
 						settingRepo.TypeCondition(setting.Type),
+						settingRepo.OwnerTypeCondition(setting.OwnerType),
 						settingRepo.LabelStateCondition(*setting.LabelState),
 					),
 				),
 			)
 			require.NoError(t, err)
 
-			fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> setting = %+v\n", setting)
-			fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> tt.setting = %+v\n", tt.setting)
 			assert.Equal(t, tt.setting.InstanceID, setting.InstanceID)
 			assert.Equal(t, tt.setting.OrgID, setting.OrgID)
 			assert.Equal(t, tt.setting.Type, setting.Type)
@@ -1251,7 +1243,7 @@ func TestCreateLabelSetting(t *testing.T) {
 	}
 }
 
-func TestCreateSpecificSettingError(t *testing.T) {
+func TestSetSettingsError(t *testing.T) {
 	tx, err := pool.Begin(t.Context(), nil)
 	require.NoError(t, err)
 	defer func() {
@@ -1407,7 +1399,7 @@ func TestUpdateSetting(t *testing.T) {
 	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
-	settingRepo := repository.SettingsRepository()
+	settingRepo := repository.LabelRepository()
 
 	tests := []struct {
 		name         string
@@ -1443,7 +1435,7 @@ func TestUpdateSetting(t *testing.T) {
 						ThemeMode:           domain.LabelPolicyThemeAuto,
 					},
 				}
-				err := settingRepo.CreateLabel(t.Context(), tx, &setting)
+				err := settingRepo.Set(t.Context(), tx, &setting)
 				require.NoError(t, err)
 
 				// update settings values
@@ -1492,7 +1484,7 @@ func TestUpdateSetting(t *testing.T) {
 						ThemeMode:           domain.LabelPolicyThemeAuto,
 					},
 				}
-				err := settingRepo.CreateLabel(t.Context(), tx, &setting)
+				err := settingRepo.Set(t.Context(), tx, &setting)
 				require.NoError(t, err)
 
 				// update settings values
@@ -1610,7 +1602,7 @@ func TestUpdateSetting(t *testing.T) {
 						ThemeMode:           domain.LabelPolicyThemeAuto,
 					},
 				}
-				err := settingRepo.CreateLabel(t.Context(), tx, &setting)
+				err := settingRepo.Set(t.Context(), tx, &setting)
 				require.NoError(t, err)
 
 				// change type
@@ -1631,8 +1623,6 @@ func TestUpdateSetting(t *testing.T) {
 					t.Logf("error during rollback: %v", err)
 				}
 			}()
-
-			settingRepo := repository.LabelRepository()
 
 			setting := tt.testFunc(t, tx)
 
@@ -1657,13 +1647,8 @@ func TestUpdateSetting(t *testing.T) {
 			// 	return
 			// }
 
-			// check updatedSetting values
-			// TODO fix this
 			updatedSetting, err := settingRepo.Get(
 				t.Context(), tx,
-				// setting.InstanceID,
-				// setting.OrgID,
-				// *setting.LabelState,
 				database.WithCondition(
 					database.And(
 						settingRepo.InstanceIDCondition(setting.InstanceID),
@@ -1688,222 +1673,223 @@ func TestUpdateSetting(t *testing.T) {
 	}
 }
 
-// // TODO
-// // NOTE all the Get.*() functions are a wrapper around Get()
-// func TestGetSetting(t *testing.T) {
-// 	tx, err := pool.Begin(t.Context(), nil)
-// 	require.NoError(t, err)
-// 	defer func() {
-// 		err = tx.Rollback(t.Context())
-// 		if err != nil {
-// 			t.Logf("error during rollback: %v", err)
-// 		}
-// 	}()
+// TODO
+// NOTE all the Get.*() functions are a wrapper around Get()
+func TestGetSetting(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
 
-// 	now := time.Now()
-// 	// create instance
-// 	instanceId := gofakeit.Name()
-// 	instance := domain.Instance{
-// 		ID:              instanceId,
-// 		Name:            gofakeit.Name(),
-// 		DefaultOrgID:    "defaultOrgId",
-// 		IAMProjectID:    "iamProject",
-// 		ConsoleClientID: "consoleCLient",
-// 		ConsoleAppID:    "consoleApp",
-// 		DefaultLanguage: "defaultLanguage",
-// 	}
-// 	instanceRepo := repository.InstanceRepository()
-// 	err = instanceRepo.Create(t.Context(), tx, &instance)
-// 	require.NoError(t, err)
+	now := time.Now()
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository()
+	err = instanceRepo.Create(t.Context(), tx, &instance)
+	require.NoError(t, err)
 
-// 	// create org
-// 	orgId := gofakeit.Name()
-// 	org := domain.Organization{
-// 		ID:         orgId,
-// 		Name:       gofakeit.Name(),
-// 		InstanceID: instanceId,
-// 		State:      domain.OrgStateActive,
-// 	}
-// 	organizationRepo := repository.OrganizationRepository()
-// 	err = organizationRepo.Create(t.Context(), tx, &org)
-// 	require.NoError(t, err)
+	// create org
+	orgId := gofakeit.Name()
+	org := domain.Organization{
+		ID:         orgId,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive,
+	}
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), tx, &org)
+	require.NoError(t, err)
 
-// 	// create setting
-// 	// this setting is created as an additional org which should NOT
-// 	// be returned in the results of the tests
-// 	preExistingSetting := domain.Setting{
-// 		InstanceID: instanceId,
-// 		OrgID:      &orgId,
-// 		ID:         gofakeit.Name(),
-// 		Type:       domain.SettingTypePasswordExpiry,
-// 		OwnerType:  domain.OwnerTypeInstance,
-// 		Settings:   []byte("{}"),
-// 		CreatedAt:  now,
-// 		UpdatedAt:  &now,
-// 	}
-// 	settingRepo := repository.SettingsRepository()
-// 	err = settingRepo.Create(t.Context(), tx, &preExistingSetting)
-// 	require.NoError(t, err)
+	// create setting
+	// this setting is created as an additional org which should NOT
+	// be returned in the results of the tests
+	preExistingSetting := domain.Setting{
+		InstanceID: instanceId,
+		OrgID:      &orgId,
+		ID:         gofakeit.Name(),
+		Type:       domain.SettingTypePasswordExpiry,
+		OwnerType:  domain.OwnerTypeInstance,
+		Settings:   []byte("{}"),
+		CreatedAt:  now,
+		UpdatedAt:  &now,
+	}
+	settingRepo := repository.SettingsRepository()
+	err = settingRepo.Create(t.Context(), tx, &preExistingSetting)
+	require.NoError(t, err)
 
-// 	type test struct {
-// 		name                       string
-// 		testFunc                   func(t *testing.T, tx database.QueryExecutor) *domain.Setting
-// 		settingIdentifierCondition database.Condition
-// 		err                        error
-// 	}
+	type test struct {
+		name                       string
+		testFunc                   func(t *testing.T, tx database.QueryExecutor) *domain.Setting
+		settingIdentifierCondition database.Condition
+		err                        error
+	}
 
-// 	tests := []test{
-// 		{
-// 			name: "happy path get using type",
-// 			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Setting {
-// 				setting := domain.Setting{
-// 					InstanceID: instanceId,
-// 					OrgID:      &orgId,
-// 					Type:       domain.SettingTypeLogin,
-// 					OwnerType:  domain.OwnerTypeInstance,
-// 					Settings:   []byte("{}"),
-// 					CreatedAt:  now,
-// 					UpdatedAt:  &now,
-// 				}
+	tests := []test{
+		{
+			name: "happy path get using type",
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Setting {
+				setting := domain.Setting{
+					InstanceID: instanceId,
+					OrgID:      &orgId,
+					Type:       domain.SettingTypeLogin,
+					OwnerType:  domain.OwnerTypeInstance,
+					Settings:   []byte("{}"),
+					CreatedAt:  now,
+					UpdatedAt:  &now,
+				}
 
-// 				err := settingRepo.Create(t.Context(), tx, &setting)
-// 				require.NoError(t, err)
-// 				return &setting
-// 			},
-// 			settingIdentifierCondition: settingRepo.TypeCondition(domain.SettingTypeLogin),
-// 		},
-// 		{
-// 			name: "happy path get using type, no org",
-// 			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Setting {
-// 				setting := domain.Setting{
-// 					InstanceID: instanceId,
-// 					// OrgID:      &orgId,
-// 					Type:      domain.SettingTypeLogin,
-// 					OwnerType: domain.OwnerTypeInstance,
-// 					Settings:  []byte("{}"),
-// 					CreatedAt: now,
-// 					UpdatedAt: &now,
-// 				}
+				err := settingRepo.Create(t.Context(), tx, &setting)
+				require.NoError(t, err)
+				return &setting
+			},
+			settingIdentifierCondition: settingRepo.TypeCondition(domain.SettingTypeLogin),
+		},
+		{
+			name: "happy path get using type, no org",
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Setting {
+				setting := domain.Setting{
+					InstanceID: instanceId,
+					// OrgID:      &orgId,
+					Type:      domain.SettingTypeLogin,
+					OwnerType: domain.OwnerTypeInstance,
+					Settings:  []byte("{}"),
+					CreatedAt: now,
+					UpdatedAt: &now,
+				}
 
-// 				err := settingRepo.Create(t.Context(), tx, &setting)
-// 				require.NoError(t, err)
-// 				return &setting
-// 			},
-// 			settingIdentifierCondition: settingRepo.TypeCondition(domain.SettingTypeLogin),
-// 		},
-// 		{
-// 			name: "get using non existent id",
-// 			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Setting {
-// 				setting := domain.Setting{
-// 					InstanceID: instanceId,
-// 					OrgID:      &orgId,
-// 					ID:         gofakeit.Name(),
+				err := settingRepo.Create(t.Context(), tx, &setting)
+				require.NoError(t, err)
+				return &setting
+			},
+			settingIdentifierCondition: settingRepo.TypeCondition(domain.SettingTypeLogin),
+		},
+		{
+			name: "get using non existent id",
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Setting {
+				setting := domain.Setting{
+					InstanceID: instanceId,
+					OrgID:      &orgId,
+					ID:         gofakeit.Name(),
 
-// 					Type:      domain.SettingTypeDomain,
-// 					OwnerType: domain.OwnerTypeInstance,
-// 					Settings:  []byte("{}"),
-// 					CreatedAt: now,
-// 					UpdatedAt: &now,
-// 				}
+					Type:      domain.SettingTypeDomain,
+					OwnerType: domain.OwnerTypeInstance,
+					Settings:  []byte("{}"),
+					CreatedAt: now,
+					UpdatedAt: &now,
+				}
 
-// 				err := settingRepo.Create(t.Context(), tx, &setting)
-// 				require.NoError(t, err)
-// 				return &setting
-// 			},
-// 			settingIdentifierCondition: settingRepo.IDCondition("non-existent-id"),
-// 			err:                        new(database.NoRowFoundError),
-// 		},
-// 		func() test {
-// 			return test{
-// 				name: "non existent orgID",
-// 				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Setting {
-// 					setting := domain.Setting{
-// 						InstanceID: instanceId,
-// 						OrgID:      &orgId,
-// 						Type:       domain.SettingTypePasswordComplexity,
-// 						OwnerType:  domain.OwnerTypeInstance,
-// 						Settings:   []byte("{}"),
-// 						CreatedAt:  now,
-// 						UpdatedAt:  &now,
-// 					}
+				err := settingRepo.Create(t.Context(), tx, &setting)
+				require.NoError(t, err)
+				return &setting
+			},
+			settingIdentifierCondition: settingRepo.IDCondition("non-existent-id"),
+			err:                        new(database.NoRowFoundError),
+		},
+		func() test {
+			return test{
+				name: "non existent orgID",
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Setting {
+					setting := domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						Type:       domain.SettingTypePasswordComplexity,
+						OwnerType:  domain.OwnerTypeInstance,
+						Settings:   []byte("{}"),
+						CreatedAt:  now,
+						UpdatedAt:  &now,
+					}
 
-// 					err := settingRepo.Create(t.Context(), tx, &setting)
-// 					require.NoError(t, err)
-// 					setting.OrgID = gu.Ptr("non-existent-orgID")
-// 					return &setting
-// 				},
-// 				err: new(database.NoRowFoundError),
-// 			}
-// 		}(),
-// 		func() test {
-// 			return test{
-// 				name: "non existent instanceID",
-// 				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Setting {
-// 					setting := domain.Setting{
-// 						InstanceID: instanceId,
-// 						OrgID:      &orgId,
-// 						Type:       domain.SettingTypeLockout,
-// 						OwnerType:  domain.OwnerTypeInstance,
-// 						Settings:   []byte("{}"),
-// 						CreatedAt:  now,
-// 						UpdatedAt:  &now,
-// 					}
+					err := settingRepo.Create(t.Context(), tx, &setting)
+					require.NoError(t, err)
+					setting.OrgID = gu.Ptr("non-existent-orgID")
+					return &setting
+				},
+				err: new(database.NoRowFoundError),
+			}
+		}(),
+		func() test {
+			return test{
+				name: "non existent instanceID",
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Setting {
+					setting := domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						Type:       domain.SettingTypeLockout,
+						OwnerType:  domain.OwnerTypeInstance,
+						Settings:   []byte("{}"),
+						CreatedAt:  now,
+						UpdatedAt:  &now,
+					}
 
-// 					err := settingRepo.Create(t.Context(), tx, &setting)
-// 					require.NoError(t, err)
-// 					setting.InstanceID = "non-existent-instanceID"
-// 					return &setting
-// 				},
-// 				err: new(database.NoRowFoundError),
-// 			}
-// 		}(),
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			tx, err := tx.Begin(t.Context())
-// 			require.NoError(t, err)
-// 			defer func() {
-// 				err = tx.Rollback(t.Context())
-// 				if err != nil {
-// 					t.Logf("error during rollback: %v", err)
-// 				}
-// 			}()
+					err := settingRepo.Create(t.Context(), tx, &setting)
+					require.NoError(t, err)
+					setting.InstanceID = "non-existent-instanceID"
+					return &setting
+				},
+				err: new(database.NoRowFoundError),
+			}
+		}(),
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tx, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err = tx.Rollback(t.Context())
+				if err != nil {
+					t.Logf("error during rollback: %v", err)
+				}
+			}()
 
-// 			var setting *domain.Setting
-// 			if tt.testFunc != nil {
-// 				setting = tt.testFunc(t, tx)
-// 			}
+			var setting *domain.Setting
+			if tt.testFunc != nil {
+				setting = tt.testFunc(t, tx)
+			}
 
-// 			// get setting
-// 			returnedSetting, err := settingRepo.Get(t.Context(), tx,
-// 				// setting.InstanceID,
-// 				// setting.OrgID,
-// 				// setting.Type,
-// 				database.WithCondition(
-// 					database.And(
-// 						settingRepo.InstanceIDCondition(setting.InstanceID),
-// 						settingRepo.OrgIDCondition(setting.OrgID),
-// 						settingRepo.TypeCondition(setting.Type),
-// 						settingRepo.OwnerTypeCondition(setting.OwnerType),
-// 						settingRepo.LabelStateCondition(*setting.LabelState),
-// 					),
-// 				),
-// 			)
-// 			if err != nil {
-// 				require.ErrorIs(t, tt.err, err)
-// 				return
-// 			}
+			// get setting
+			returnedSetting, err := settingRepo.Get(t.Context(), tx,
+				database.WithCondition(
+					database.And(
+						settingRepo.InstanceIDCondition(setting.InstanceID),
+						settingRepo.OrgIDCondition(setting.OrgID),
+						settingRepo.TypeCondition(setting.Type),
+						settingRepo.OwnerTypeCondition(setting.OwnerType),
+						settingRepo.LabelStateCondition(*setting.LabelState),
+					),
+				),
+			)
+			if err != nil {
+				require.ErrorIs(t, tt.err, err)
+				return
+			}
 
-// 			assert.Equal(t, returnedSetting.InstanceID, setting.InstanceID)
-// 			assert.Equal(t, returnedSetting.OrgID, setting.OrgID)
-// 			assert.Equal(t, returnedSetting.ID, setting.ID)
-// 			assert.Equal(t, returnedSetting.Type, setting.Type)
-// 			assert.Equal(t, returnedSetting.OwnerType, setting.OwnerType)
+			assert.Equal(t, returnedSetting.InstanceID, setting.InstanceID)
+			assert.Equal(t, returnedSetting.OrgID, setting.OrgID)
+			assert.Equal(t, returnedSetting.ID, setting.ID)
+			assert.Equal(t, returnedSetting.Type, setting.Type)
+			assert.Equal(t, returnedSetting.OwnerType, setting.OwnerType)
 
-// 			assert.Equal(t, returnedSetting.Settings, setting.Settings)
-// 		})
-// 	}
-// }
+			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+		})
+	}
+}
+
+// -------------------------------------------------------------
+// Get Specific Settings
+// -------------------------------------------------------------
 
 // testing that values written to the db are successfully retrieved
 func TestCreateGetLoginPolicySetting(t *testing.T) {
@@ -2009,8 +1995,6 @@ func TestCreateGetLoginPolicySetting(t *testing.T) {
 
 			// get setting
 			returnedSetting, err := settingRepo.Get(t.Context(), tx,
-				// setting.InstanceID,
-				// setting.OrgID,
 				database.WithCondition(
 					database.And(
 						settingRepo.InstanceIDCondition(setting.InstanceID),
@@ -2037,7 +2021,7 @@ func TestCreateGetLoginPolicySetting(t *testing.T) {
 }
 
 // testing that values written to the db are successfully retrieved
-func TestGetLabelPolicySetting(t *testing.T) {
+func TestCreateGetLabelPolicySetting(t *testing.T) {
 	tx, err := pool.Begin(t.Context(), nil)
 	require.NoError(t, err)
 	defer func() {
@@ -2870,6 +2854,1177 @@ func TestCreateGetOrgPolicySetting(t *testing.T) {
 			if tt.testFunc != nil {
 				setting = tt.testFunc(t, tx)
 			}
+
+			// get setting
+			returnedSetting, err := settingRepo.Get(t.Context(), tx,
+				database.WithCondition(
+					database.And(
+						settingRepo.InstanceIDCondition(setting.InstanceID),
+						settingRepo.OrgIDCondition(setting.OrgID),
+						settingRepo.TypeCondition(setting.Type),
+						settingRepo.OwnerTypeCondition(setting.OwnerType),
+						settingRepo.LabelStateCondition(*setting.LabelState),
+					),
+				),
+			)
+			if err != nil {
+				require.ErrorIs(t, tt.err, err)
+				return
+			}
+
+			assert.Equal(t, returnedSetting.InstanceID, setting.InstanceID)
+			assert.Equal(t, returnedSetting.OrgID, setting.OrgID)
+			assert.Equal(t, returnedSetting.ID, setting.ID)
+			assert.Equal(t, returnedSetting.Type, setting.Type)
+			assert.Equal(t, returnedSetting.OwnerType, setting.OwnerType)
+
+			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+		})
+	}
+}
+
+// -------------------------------------------------------------
+// Update Specific Settings
+// -------------------------------------------------------------
+
+func TestCreateUpdateLoginPolicySetting(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository()
+	err = instanceRepo.Create(t.Context(), tx, &instance)
+	require.NoError(t, err)
+
+	// create org
+	orgId := gofakeit.Name()
+	org := domain.Organization{
+		ID:         orgId,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive,
+	}
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), tx, &org)
+	require.NoError(t, err)
+
+	settingRepo := repository.LoginRepository()
+
+	type test struct {
+		name     string
+		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.LoginSetting
+		changes  database.Changes
+		err      error
+	}
+	tests := []test{
+		{
+			name: "happy path",
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LoginSetting {
+				setting := domain.LoginSetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						Type:       domain.SettingTypeLabel,
+						OwnerType:  domain.OwnerTypeInstance,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
+					},
+					Settings: domain.LoginSettings{
+						AllowUserNamePassword:      true,
+						AllowRegister:              true,
+						AllowExternalIDP:           true,
+						ForceMFA:                   true,
+						ForceMFALocalOnly:          true,
+						HidePasswordReset:          true,
+						IgnoreUnknownUsernames:     true,
+						AllowDomainDiscovery:       true,
+						DisableLoginWithEmail:      true,
+						DisableLoginWithPhone:      true,
+						PasswordlessType:           domain.PasswordlessTypeAllowed,
+						DefaultRedirectURI:         "wwww.example.com",
+						PasswordCheckLifetime:      time.Second * 50,
+						ExternalLoginCheckLifetime: time.Second * 50,
+						MFAInitSkipLifetime:        time.Second * 50,
+						SecondFactorCheckLifetime:  time.Second * 50,
+						MultiFactorCheckLifetime:   time.Second * 50,
+					},
+				}
+
+				setting.Settings = domain.LoginSettings{
+					AllowUserNamePassword:      false,
+					AllowRegister:              false,
+					AllowExternalIDP:           false,
+					ForceMFA:                   false,
+					ForceMFALocalOnly:          false,
+					HidePasswordReset:          false,
+					IgnoreUnknownUsernames:     false,
+					AllowDomainDiscovery:       false,
+					DisableLoginWithEmail:      false,
+					DisableLoginWithPhone:      false,
+					PasswordlessType:           domain.PasswordlessTypeNotAllowed,
+					DefaultRedirectURI:         "www.not-example.com",
+					PasswordCheckLifetime:      time.Minute,
+					ExternalLoginCheckLifetime: time.Minute,
+					MFAInitSkipLifetime:        time.Minute,
+					SecondFactorCheckLifetime:  time.Minute,
+					MultiFactorCheckLifetime:   time.Minute,
+				}
+				err := settingRepo.Set(t.Context(), tx, &setting)
+				require.NoError(t, err)
+				return &setting
+			},
+			changes: database.Changes{
+				settingRepo.SetLabelSettings(
+					settingRepo.SetAllowDomainDiscoveryField(false),
+					settingRepo.SetAllowRegisterField(false),
+					settingRepo.SetAllowExternalIDPField(false),
+					settingRepo.SetForceMFAField(false),
+					settingRepo.SetForceMFALocalOnlyField(false),
+					settingRepo.SetIgnoreUnknownUsernamesField(false),
+					settingRepo.SetAllowDomainDiscoveryField(false),
+					settingRepo.SetDisableLoginWithEmailField(false),
+					settingRepo.SetDisableLoginWithPhoneField(false),
+					settingRepo.SetPasswordlessTypeField(domain.PasswordlessTypeNotAllowed),
+					settingRepo.SetDefaultRedirectURIField("www.not-example.com"),
+					settingRepo.SetPasswordCheckLifetimeField(time.Minute),
+					settingRepo.SetExternalLoginCheckLifetimeField(time.Minute),
+					settingRepo.SetMFAInitSkipLifetimeField(time.Minute),
+					settingRepo.SetSecondFactorCheckLifetimeField(time.Minute),
+					settingRepo.SetMFAInitSkipLifetimeField(time.Minute),
+				),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tx, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err = tx.Rollback(t.Context())
+				if err != nil {
+					t.Logf("error during rollback: %v", err)
+				}
+			}()
+
+			var setting *domain.LoginSetting
+			if tt.testFunc != nil {
+				setting = tt.testFunc(t, tx)
+			}
+
+			_, err = settingRepo.Update(t.Context(), tx,
+				database.And(
+					settingRepo.InstanceIDCondition(setting.InstanceID),
+					settingRepo.OrgIDCondition(setting.OrgID),
+					settingRepo.TypeCondition(setting.Type),
+					settingRepo.OwnerTypeCondition(setting.OwnerType),
+					settingRepo.LabelStateCondition(*setting.LabelState),
+				),
+				tt.changes,
+			)
+			require.NoError(t, err)
+
+			// get setting
+			returnedSetting, err := settingRepo.Get(t.Context(), tx,
+				database.WithCondition(
+					database.And(
+						settingRepo.InstanceIDCondition(setting.InstanceID),
+						settingRepo.OrgIDCondition(setting.OrgID),
+						settingRepo.TypeCondition(setting.Type),
+						settingRepo.OwnerTypeCondition(setting.OwnerType),
+						settingRepo.LabelStateCondition(*setting.LabelState),
+					),
+				),
+			)
+			if err != nil {
+				require.ErrorIs(t, tt.err, err)
+				return
+			}
+
+			assert.Equal(t, returnedSetting.InstanceID, setting.InstanceID)
+			assert.Equal(t, returnedSetting.OrgID, setting.OrgID)
+			assert.Equal(t, returnedSetting.ID, setting.ID)
+			assert.Equal(t, returnedSetting.Type, setting.Type)
+
+			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+		})
+	}
+}
+
+func TestCreateUpdateLabelPolicySetting(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository()
+	err = instanceRepo.Create(t.Context(), tx, &instance)
+	require.NoError(t, err)
+
+	// create org
+	orgId := gofakeit.Name()
+	org := domain.Organization{
+		ID:         orgId,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive,
+	}
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), tx, &org)
+	require.NoError(t, err)
+
+	settingRepo := repository.LabelRepository()
+
+	type test struct {
+		name     string
+		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting
+		changes  database.Changes
+		err      error
+	}
+
+	tests := []test{
+		{
+			name: "happy path",
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
+				setting := domain.LabelSetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						Type:       domain.SettingTypeLabel,
+						OwnerType:  domain.OwnerTypeOrganization,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+					},
+					Settings: domain.LabelSettings{
+						PrimaryColor:        "value",
+						BackgroundColor:     "value",
+						WarnColor:           "value",
+						FontColor:           "value",
+						PrimaryColorDark:    "value",
+						BackgroundColorDark: "value",
+						WarnColorDark:       "value",
+						FontColorDark:       "value",
+						HideLoginNameSuffix: true,
+						ErrorMsgPopup:       true,
+						DisableWatermark:    true,
+						ThemeMode:           domain.LabelPolicyThemeDark,
+					},
+				}
+
+				setting.Settings = domain.LabelSettings{
+					PrimaryColor:        "new_value",
+					BackgroundColor:     "new_value",
+					WarnColor:           "new_value",
+					FontColor:           "new_value",
+					PrimaryColorDark:    "new_value",
+					BackgroundColorDark: "new_value",
+					WarnColorDark:       "new_value",
+					FontColorDark:       "new_value",
+					HideLoginNameSuffix: false,
+					ErrorMsgPopup:       false,
+					DisableWatermark:    false,
+					ThemeMode:           domain.LabelPolicyThemeAuto,
+				}
+
+				err := settingRepo.Set(t.Context(), tx, &setting)
+				require.NoError(t, err)
+				return &setting
+			},
+			changes: database.Changes{
+				settingRepo.SetLabelSettings(
+					settingRepo.SetPrimaryColorField("new_value"),
+					settingRepo.SetBackgroundColorField("new_value"),
+					settingRepo.SetWarnColorField("new_value"),
+					settingRepo.SetFontColorField("new_value"),
+					settingRepo.SetPrimaryColorDarkField("new_value"),
+					settingRepo.SetBackgroundColorDarkField("new_value"),
+					settingRepo.SetWarnColorDarkField("new_value"),
+					settingRepo.SetFontColorDarkField("new_value"),
+					settingRepo.SetHideLoginNameSuffixField(false),
+					settingRepo.SetErrorMsgPopupField(false),
+					settingRepo.SetDisableWatermarkField(false),
+					settingRepo.SetThemeModeField(domain.LabelPolicyThemeAuto),
+				),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tx, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err = tx.Rollback(t.Context())
+				if err != nil {
+					t.Logf("error during rollback: %v", err)
+				}
+			}()
+
+			var setting *domain.LabelSetting
+			if tt.testFunc != nil {
+				setting = tt.testFunc(t, tx)
+			}
+
+			_, err = settingRepo.Update(t.Context(), tx,
+				database.And(
+					settingRepo.InstanceIDCondition(setting.InstanceID),
+					settingRepo.OrgIDCondition(setting.OrgID),
+					settingRepo.TypeCondition(setting.Type),
+					settingRepo.OwnerTypeCondition(setting.OwnerType),
+					settingRepo.LabelStateCondition(*setting.LabelState),
+				),
+				tt.changes,
+			)
+			require.NoError(t, err)
+
+			// get setting
+			returnedSetting, err := settingRepo.Get(t.Context(), tx,
+				database.WithCondition(
+					database.And(
+						settingRepo.InstanceIDCondition(setting.InstanceID),
+						settingRepo.OrgIDCondition(setting.OrgID),
+						settingRepo.TypeCondition(setting.Type),
+						settingRepo.OwnerTypeCondition(setting.OwnerType),
+						settingRepo.LabelStateCondition(*setting.LabelState),
+					),
+				),
+			)
+			if err != nil {
+				require.ErrorIs(t, tt.err, err)
+				return
+			}
+
+			assert.Equal(t, returnedSetting.InstanceID, setting.InstanceID)
+			assert.Equal(t, returnedSetting.OrgID, setting.OrgID)
+			assert.Equal(t, returnedSetting.ID, setting.ID)
+			assert.Equal(t, returnedSetting.Type, setting.Type)
+			assert.Equal(t, returnedSetting.OwnerType, setting.OwnerType)
+
+			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+		})
+	}
+}
+
+func TestCreateUpdatePasswordComplexityPolicySetting(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository()
+	err = instanceRepo.Create(t.Context(), tx, &instance)
+	require.NoError(t, err)
+
+	// create org
+	orgId := gofakeit.Name()
+	org := domain.Organization{
+		ID:         orgId,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive,
+	}
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), tx, &org)
+	require.NoError(t, err)
+
+	settingRepo := repository.PasswordComplexityRepository()
+
+	type test struct {
+		name     string
+		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.PasswordComplexitySetting
+		changes  database.Changes
+		err      error
+	}
+	tests := []test{
+		{
+			name: "happy path",
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.PasswordComplexitySetting {
+				setting := domain.PasswordComplexitySetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						Type:       domain.SettingTypeLabel,
+						OwnerType:  domain.OwnerTypeInstance,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
+					},
+					Settings: domain.PasswordComplexitySettings{
+						MinLength:    89,
+						HasLowercase: true,
+						HasUppercase: true,
+						HasNumber:    true,
+						HasSymbol:    true,
+					},
+				}
+
+				setting.Settings = domain.PasswordComplexitySettings{
+					MinLength:    200,
+					HasLowercase: false,
+					HasUppercase: false,
+					HasNumber:    false,
+					HasSymbol:    false,
+				}
+
+				err := settingRepo.Set(t.Context(), tx, &setting)
+				require.NoError(t, err)
+				return &setting
+			},
+			changes: database.Changes{
+				settingRepo.SetLabelSettings(
+					settingRepo.SetMinLengthField(200),
+					settingRepo.SetHasLowercaseField(false),
+					settingRepo.SetHasUppercaseField(false),
+					settingRepo.SetHasNumberField(false),
+					settingRepo.SetHasSymbolField(false),
+				),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tx, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err = tx.Rollback(t.Context())
+				if err != nil {
+					t.Logf("error during rollback: %v", err)
+				}
+			}()
+
+			var setting *domain.PasswordComplexitySetting
+			if tt.testFunc != nil {
+				setting = tt.testFunc(t, tx)
+			}
+
+			_, err = settingRepo.Update(t.Context(), tx,
+				database.And(
+					settingRepo.InstanceIDCondition(setting.InstanceID),
+					settingRepo.OrgIDCondition(setting.OrgID),
+					settingRepo.TypeCondition(setting.Type),
+					settingRepo.OwnerTypeCondition(setting.OwnerType),
+					settingRepo.LabelStateCondition(*setting.LabelState),
+				),
+				tt.changes,
+			)
+			require.NoError(t, err)
+
+			// get setting
+			returnedSetting, err := settingRepo.Get(t.Context(), tx,
+				database.WithCondition(
+					database.And(
+						settingRepo.InstanceIDCondition(setting.InstanceID),
+						settingRepo.OrgIDCondition(setting.OrgID),
+						settingRepo.TypeCondition(setting.Type),
+						settingRepo.OwnerTypeCondition(setting.OwnerType),
+						settingRepo.LabelStateCondition(*setting.LabelState),
+					),
+				),
+			)
+			if err != nil {
+				require.ErrorIs(t, tt.err, err)
+				return
+			}
+
+			assert.Equal(t, returnedSetting.InstanceID, setting.InstanceID)
+			assert.Equal(t, returnedSetting.OrgID, setting.OrgID)
+			assert.Equal(t, returnedSetting.ID, setting.ID)
+			assert.Equal(t, returnedSetting.Type, setting.Type)
+			assert.Equal(t, returnedSetting.OwnerType, setting.OwnerType)
+
+			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+		})
+	}
+}
+
+func TestCreateUpdatePasswordExpiryPolicySetting(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository()
+	err = instanceRepo.Create(t.Context(), tx, &instance)
+	require.NoError(t, err)
+
+	// create org
+	orgId := gofakeit.Name()
+	org := domain.Organization{
+		ID:         orgId,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive,
+	}
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), tx, &org)
+	require.NoError(t, err)
+
+	settingRepo := repository.PasswordExpiryRepository()
+
+	type test struct {
+		name     string
+		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.PasswordExpirySetting
+		changes  database.Changes
+		err      error
+	}
+	tests := []test{
+		{
+			name: "happy path",
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.PasswordExpirySetting {
+				setting := domain.PasswordExpirySetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						Type:       domain.SettingTypeLabel,
+						OwnerType:  domain.OwnerTypeInstance,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
+					},
+					Settings: domain.PasswordExpirySettings{
+						ExpireWarnDays: 30,
+						MaxAgeDays:     30,
+					},
+				}
+
+				setting.Settings = domain.PasswordExpirySettings{
+					ExpireWarnDays: 200,
+					MaxAgeDays:     200,
+				}
+
+				err = settingRepo.Set(t.Context(), tx, &setting)
+				require.NoError(t, err)
+				return &setting
+			},
+			changes: database.Changes{
+				settingRepo.SetLabelSettings(
+					settingRepo.SetExpireWarnDays(200),
+					settingRepo.SetMaxAgeDays(200),
+				),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tx, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err = tx.Rollback(t.Context())
+				if err != nil {
+					t.Logf("error during rollback: %v", err)
+				}
+			}()
+
+			var setting *domain.PasswordExpirySetting
+			if tt.testFunc != nil {
+				setting = tt.testFunc(t, tx)
+			}
+
+			_, err = settingRepo.Update(t.Context(), tx,
+				database.And(
+					settingRepo.InstanceIDCondition(setting.InstanceID),
+					settingRepo.OrgIDCondition(setting.OrgID),
+					settingRepo.TypeCondition(setting.Type),
+					settingRepo.OwnerTypeCondition(setting.OwnerType),
+					settingRepo.LabelStateCondition(*setting.LabelState),
+				),
+				tt.changes,
+			)
+			require.NoError(t, err)
+
+			// get setting
+			returnedSetting, err := settingRepo.Get(t.Context(), tx,
+				database.WithCondition(
+					database.And(
+						settingRepo.InstanceIDCondition(setting.InstanceID),
+						settingRepo.OrgIDCondition(setting.OrgID),
+						settingRepo.TypeCondition(setting.Type),
+						settingRepo.OwnerTypeCondition(setting.OwnerType),
+						settingRepo.LabelStateCondition(*setting.LabelState),
+					),
+				),
+			)
+			if err != nil {
+				require.ErrorIs(t, tt.err, err)
+				return
+			}
+
+			assert.Equal(t, returnedSetting.InstanceID, setting.InstanceID)
+			assert.Equal(t, returnedSetting.OrgID, setting.OrgID)
+			assert.Equal(t, returnedSetting.ID, setting.ID)
+			assert.Equal(t, returnedSetting.Type, setting.Type)
+			assert.Equal(t, returnedSetting.OwnerType, setting.OwnerType)
+
+			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+		})
+	}
+}
+
+func TestCreateUpdateLockoutPolicySetting(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository()
+	err = instanceRepo.Create(t.Context(), tx, &instance)
+	require.NoError(t, err)
+
+	// create org
+	orgId := gofakeit.Name()
+	org := domain.Organization{
+		ID:         orgId,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive,
+	}
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), tx, &org)
+	require.NoError(t, err)
+
+	settingRepo := repository.LockoutRepository()
+
+	type test struct {
+		name     string
+		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.LockoutSetting
+		changes  database.Changes
+		err      error
+	}
+	tests := []test{
+		{
+			name: "happy path",
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LockoutSetting {
+				setting := domain.LockoutSetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						Type:       domain.SettingTypeLabel,
+						OwnerType:  domain.OwnerTypeInstance,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
+					},
+					Settings: domain.LockoutSettings{
+						MaxPasswordAttempts: 50,
+						MaxOTPAttempts:      50,
+						ShowLockOutFailures: true,
+					},
+				}
+
+				setting.Settings = domain.LockoutSettings{
+					MaxPasswordAttempts: 100,
+					MaxOTPAttempts:      100,
+					ShowLockOutFailures: false,
+				}
+
+				err := settingRepo.Set(t.Context(), tx, &setting)
+				require.NoError(t, err)
+				return &setting
+			},
+			changes: database.Changes{
+				settingRepo.SetLabelSettings(
+					settingRepo.SetMaxPasswordAttempts(100),
+					settingRepo.SetMaxOTPAttempts(100),
+					settingRepo.SetShowLockOutFailures(false),
+				),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tx, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err = tx.Rollback(t.Context())
+				if err != nil {
+					t.Logf("error during rollback: %v", err)
+				}
+			}()
+
+			var setting *domain.LockoutSetting
+			if tt.testFunc != nil {
+				setting = tt.testFunc(t, tx)
+			}
+
+			_, err = settingRepo.Update(t.Context(), tx,
+				database.And(
+					settingRepo.InstanceIDCondition(setting.InstanceID),
+					settingRepo.OrgIDCondition(setting.OrgID),
+					settingRepo.TypeCondition(setting.Type),
+					settingRepo.OwnerTypeCondition(setting.OwnerType),
+					settingRepo.LabelStateCondition(*setting.LabelState),
+				),
+				tt.changes,
+			)
+			require.NoError(t, err)
+
+			// get setting
+			returnedSetting, err := settingRepo.Get(t.Context(), tx,
+				database.WithCondition(
+					database.And(
+						settingRepo.InstanceIDCondition(setting.InstanceID),
+						settingRepo.OrgIDCondition(setting.OrgID),
+						settingRepo.TypeCondition(setting.Type),
+						settingRepo.OwnerTypeCondition(setting.OwnerType),
+						settingRepo.LabelStateCondition(*setting.LabelState),
+					),
+				),
+			)
+			if err != nil {
+				require.ErrorIs(t, tt.err, err)
+				return
+			}
+
+			assert.Equal(t, returnedSetting.InstanceID, setting.InstanceID)
+			assert.Equal(t, returnedSetting.OrgID, setting.OrgID)
+			assert.Equal(t, returnedSetting.ID, setting.ID)
+			assert.Equal(t, returnedSetting.Type, setting.Type)
+			assert.Equal(t, returnedSetting.OwnerType, setting.OwnerType)
+
+			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+		})
+	}
+}
+
+func TestCreateUpdateSecurityPolicySetting(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository()
+	err = instanceRepo.Create(t.Context(), tx, &instance)
+	require.NoError(t, err)
+
+	// create org
+	orgId := gofakeit.Name()
+	org := domain.Organization{
+		ID:         orgId,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive,
+	}
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), tx, &org)
+	require.NoError(t, err)
+
+	settingRepo := repository.SecurityRepository()
+
+	type test struct {
+		name     string
+		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.SecuritySetting
+		changes  database.Changes
+		err      error
+	}
+	tests := []test{
+		{
+			name: "happy path",
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.SecuritySetting {
+				setting := domain.SecuritySetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						Type:       domain.SettingTypeLabel,
+						OwnerType:  domain.OwnerTypeInstance,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
+					},
+					Settings: domain.SecuritySettings{
+						Enabled:               true,
+						EnableIframeEmbedding: true,
+						AllowedOrigins:        []string{"value"},
+						EnableImpersonation:   true,
+					},
+				}
+
+				setting.Settings = domain.SecuritySettings{
+					Enabled:               false,
+					EnableIframeEmbedding: false,
+					// AllowedOrigins:        []string{"new_value"},
+					EnableImpersonation: false,
+				}
+
+				err := settingRepo.Set(t.Context(), tx, &setting)
+				require.NoError(t, err)
+				return &setting
+			},
+			changes: database.Changes{
+				settingRepo.SetLabelSettings(
+					settingRepo.SetEnabled(false),
+					settingRepo.SetEnableIframeEmbedding(false),
+					// TODO
+					// settingRepo.SetAllowedOrigins(false),
+					settingRepo.SetEnableImpersonation(false),
+				),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var setting *domain.SecuritySetting
+			if tt.testFunc != nil {
+				setting = tt.testFunc(t, tx)
+			}
+
+			_, err = settingRepo.Update(t.Context(), tx,
+				database.And(
+					settingRepo.InstanceIDCondition(setting.InstanceID),
+					settingRepo.OrgIDCondition(setting.OrgID),
+					settingRepo.TypeCondition(setting.Type),
+					settingRepo.OwnerTypeCondition(setting.OwnerType),
+					settingRepo.LabelStateCondition(*setting.LabelState),
+				),
+				tt.changes,
+			)
+			require.NoError(t, err)
+
+			// get setting
+			returnedSetting, err := settingRepo.Get(t.Context(), tx,
+				database.WithCondition(
+					database.And(
+						settingRepo.InstanceIDCondition(setting.InstanceID),
+						settingRepo.OrgIDCondition(setting.OrgID),
+						settingRepo.TypeCondition(setting.Type),
+						settingRepo.OwnerTypeCondition(setting.OwnerType),
+						settingRepo.LabelStateCondition(*setting.LabelState),
+					),
+				),
+			)
+			if err != nil {
+				require.ErrorIs(t, tt.err, err)
+				return
+			}
+
+			assert.Equal(t, returnedSetting.InstanceID, setting.InstanceID)
+			assert.Equal(t, returnedSetting.OrgID, setting.OrgID)
+			assert.Equal(t, returnedSetting.ID, setting.ID)
+			assert.Equal(t, returnedSetting.Type, setting.Type)
+			assert.Equal(t, returnedSetting.OwnerType, setting.OwnerType)
+
+			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+		})
+	}
+}
+
+func TestCreateUpdateDomainPolicySetting(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository()
+	err = instanceRepo.Create(t.Context(), tx, &instance)
+	require.NoError(t, err)
+
+	// create org
+	orgId := gofakeit.Name()
+	org := domain.Organization{
+		ID:         orgId,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive,
+	}
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), tx, &org)
+	require.NoError(t, err)
+
+	settingRepo := repository.DomainRepository()
+
+	type test struct {
+		name     string
+		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.DomainSetting
+		changes  database.Changes
+		err      error
+	}
+	tests := []test{
+		{
+			name: "happy path",
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.DomainSetting {
+				setting := domain.DomainSetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						Type:       domain.SettingTypeLabel,
+						OwnerType:  domain.OwnerTypeInstance,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
+					},
+					Settings: domain.DomainSettings{
+						UserLoginMustBeDomain:                  true,
+						ValidateOrgDomains:                     true,
+						SMTPSenderAddressMatchesInstanceDomain: true,
+					},
+				}
+
+				setting.Settings = domain.DomainSettings{
+					UserLoginMustBeDomain:                  false,
+					ValidateOrgDomains:                     false,
+					SMTPSenderAddressMatchesInstanceDomain: false,
+				}
+
+				err := settingRepo.Set(t.Context(), tx, &setting)
+				require.NoError(t, err)
+				return &setting
+			},
+			changes: database.Changes{
+				settingRepo.SetLabelSettings(
+					settingRepo.SetUserLoginMustBeDomain(false),
+					settingRepo.SetValidateOrgDomains(false),
+					settingRepo.SetSMTPSenderAddressMatchesInstanceDomain(false),
+				),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var setting *domain.DomainSetting
+			if tt.testFunc != nil {
+				setting = tt.testFunc(t, tx)
+			}
+
+			_, err = settingRepo.Update(t.Context(), tx,
+				database.And(
+					settingRepo.InstanceIDCondition(setting.InstanceID),
+					settingRepo.OrgIDCondition(setting.OrgID),
+					settingRepo.TypeCondition(setting.Type),
+					settingRepo.OwnerTypeCondition(setting.OwnerType),
+					settingRepo.LabelStateCondition(*setting.LabelState),
+				),
+				tt.changes,
+			)
+			require.NoError(t, err)
+
+			// get setting
+			returnedSetting, err := settingRepo.Get(t.Context(), tx,
+				database.WithCondition(
+					database.And(
+						settingRepo.InstanceIDCondition(setting.InstanceID),
+						settingRepo.OrgIDCondition(setting.OrgID),
+						settingRepo.TypeCondition(setting.Type),
+						settingRepo.OwnerTypeCondition(setting.OwnerType),
+						settingRepo.LabelStateCondition(*setting.LabelState),
+					),
+				),
+			)
+			if err != nil {
+				require.ErrorIs(t, tt.err, err)
+				return
+			}
+
+			assert.Equal(t, returnedSetting.InstanceID, setting.InstanceID)
+			assert.Equal(t, returnedSetting.OrgID, setting.OrgID)
+			assert.Equal(t, returnedSetting.ID, setting.ID)
+			assert.Equal(t, returnedSetting.Type, setting.Type)
+			assert.Equal(t, returnedSetting.OwnerType, setting.OwnerType)
+
+			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+		})
+	}
+}
+
+func TestCreateUpdateOrgPolicySetting(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err = tx.Rollback(t.Context())
+		if err != nil {
+			t.Logf("error during rollback: %v", err)
+		}
+	}()
+
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository()
+	err = instanceRepo.Create(t.Context(), tx, &instance)
+	require.NoError(t, err)
+
+	// create org
+	orgId := gofakeit.Name()
+	org := domain.Organization{
+		ID:         orgId,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive,
+	}
+	organizationRepo := repository.OrganizationRepository()
+	err = organizationRepo.Create(t.Context(), tx, &org)
+	require.NoError(t, err)
+
+	settingRepo := repository.OrganizationSettingRepository()
+
+	type test struct {
+		name     string
+		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.OrganizationSetting
+		changes  database.Changes
+		err      error
+	}
+	tests := []test{
+		{
+			name: "happy path",
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.OrganizationSetting {
+				setting := domain.OrganizationSetting{
+					Setting: &domain.Setting{
+						InstanceID: instanceId,
+						OrgID:      &orgId,
+						Type:       domain.SettingTypeLabel,
+						OwnerType:  domain.OwnerTypeInstance,
+						LabelState: gu.Ptr(domain.LabelStatePreview),
+						Settings:   []byte("{}"),
+					},
+					Settings: domain.OrganizationSettings{
+						OrganizationScopedUsernames: true,
+					},
+				}
+
+				setting.Settings = domain.OrganizationSettings{
+					OrganizationScopedUsernames: false,
+				}
+
+				err := settingRepo.Set(t.Context(), tx, &setting)
+				require.NoError(t, err)
+				return &setting
+			},
+			changes: database.Changes{
+				settingRepo.SetLabelSettings(
+					settingRepo.SetOrganizationScopedUsernames(false),
+				),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var setting *domain.OrganizationSetting
+			if tt.testFunc != nil {
+				setting = tt.testFunc(t, tx)
+			}
+
+			_, err = settingRepo.Update(t.Context(), tx,
+				database.And(
+					settingRepo.InstanceIDCondition(setting.InstanceID),
+					settingRepo.OrgIDCondition(setting.OrgID),
+					settingRepo.TypeCondition(setting.Type),
+					settingRepo.OwnerTypeCondition(setting.OwnerType),
+					settingRepo.LabelStateCondition(*setting.LabelState),
+				),
+				tt.changes,
+			)
+			require.NoError(t, err)
 
 			// get setting
 			returnedSetting, err := settingRepo.Get(t.Context(), tx,
@@ -3964,6 +5119,7 @@ func TestActivateLabelSettings(t *testing.T) {
 						settingRepo.InstanceIDCondition(setting.InstanceID),
 						settingRepo.OrgIDCondition(setting.OrgID),
 						settingRepo.TypeCondition(setting.Type),
+						settingRepo.OwnerTypeCondition(setting.OwnerType),
 						settingRepo.LabelStateCondition(domain.LabelStateActivated),
 					),
 				),
