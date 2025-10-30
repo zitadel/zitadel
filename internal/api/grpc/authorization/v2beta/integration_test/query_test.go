@@ -487,17 +487,17 @@ func createAuthorization(ctx context.Context, instance *integration.Instance, t 
 	return createAuthorizationForProject(ctx, instance, t, orgID, userID, projectName, projectResp.GetId())
 }
 
-func createAuthorizationForProject(ctx context.Context, instance *integration.Instance, t *testing.T, orgID, userID, projectName, projectID string) *authorization.Authorization {
+func createAuthorizationForProject(ctx context.Context, instance *integration.Instance, t *testing.T, organizationID, userID, projectName, projectID string) *authorization.Authorization {
 	userResp, err := instance.Client.UserV2.GetUserByID(ctx, &user.GetUserByIDRequest{UserId: userID})
 	require.NoError(t, err)
 
-	authResp := instance.CreateAuthorizationProject(t, ctx, projectID, userID)
+	authResp := instance.CreateAuthorizationProject(t, ctx, projectID, userID, organizationID)
 	return &authorization.Authorization{
 		Id:                    authResp.GetId(),
 		ProjectId:             projectID,
 		ProjectName:           projectName,
-		ProjectOrganizationId: orgID,
-		OrganizationId:        orgID,
+		ProjectOrganizationId: organizationID,
+		OrganizationId:        organizationID,
 		CreationDate:          authResp.GetCreationDate(),
 		ChangeDate:            authResp.GetCreationDate(),
 		State:                 1,
