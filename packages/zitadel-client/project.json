@@ -9,7 +9,11 @@
       "dependsOn": [
         "build"
       ],
-      "command": "npm pkg set name=\"@${ZITADEL_RELEASE_GITHUB_ORG}/client\""
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "npm pkg set name=\"@${ZITADEL_RELEASE_GITHUB_ORG}/client\""
+      }
     },
     "test": {
       "description": "Tests the TypeScript client library. It is an alias for test-unit.",
