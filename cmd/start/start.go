@@ -43,12 +43,14 @@ import (
 	app_v2beta "github.com/zitadel/zitadel/internal/api/grpc/app/v2beta"
 	application "github.com/zitadel/zitadel/internal/api/grpc/application/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/auth"
+	authorization_v2 "github.com/zitadel/zitadel/internal/api/grpc/authorization/v2"
 	authorization_v2beta "github.com/zitadel/zitadel/internal/api/grpc/authorization/v2beta"
 	feature_v2 "github.com/zitadel/zitadel/internal/api/grpc/feature/v2"
 	feature_v2beta "github.com/zitadel/zitadel/internal/api/grpc/feature/v2beta"
 	group_v2 "github.com/zitadel/zitadel/internal/api/grpc/group/v2"
 	idp_v2 "github.com/zitadel/zitadel/internal/api/grpc/idp/v2"
-	instance "github.com/zitadel/zitadel/internal/api/grpc/instance/v2beta"
+	instance_v2 "github.com/zitadel/zitadel/internal/api/grpc/instance/v2"
+	instance_v2beta "github.com/zitadel/zitadel/internal/api/grpc/instance/v2beta"
 	internal_permission_v2 "github.com/zitadel/zitadel/internal/api/grpc/internal_permission/v2"
 	internal_permission_v2beta "github.com/zitadel/zitadel/internal/api/grpc/internal_permission/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
@@ -56,6 +58,7 @@ import (
 	oidc_v2beta "github.com/zitadel/zitadel/internal/api/grpc/oidc/v2beta"
 	org_v2 "github.com/zitadel/zitadel/internal/api/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/internal/api/grpc/org/v2beta"
+	project_v2 "github.com/zitadel/zitadel/internal/api/grpc/project/v2"
 	project_v2beta "github.com/zitadel/zitadel/internal/api/grpc/project/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/resources/debug_events/debug_events"
 	user_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/resources/user/v3alpha"
@@ -486,7 +489,10 @@ func startAPIs(
 	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain), tlsConfig); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, instance.CreateServer(commands, queries, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain)); err != nil {
+	if err := apis.RegisterService(ctx, instance_v2beta.CreateServer(commands, queries, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain)); err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterService(ctx, instance_v2.CreateServer(commands, queries, config.DefaultInstance, config.ExternalDomain, permissionCheck)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.DatabaseName(), commands, queries, keys.User, config.AuditLogRetention), tlsConfig); err != nil {
@@ -540,6 +546,9 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, project_v2beta.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
+	if err := apis.RegisterService(ctx, project_v2.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
+		return nil, err
+	}
 	if err := apis.RegisterService(ctx, internal_permission_v2beta.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
@@ -562,6 +571,9 @@ func startAPIs(
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, authorization_v2beta.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterService(ctx, authorization_v2.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, app_v2beta.CreateServer(commands, queries, permissionCheck)); err != nil {
