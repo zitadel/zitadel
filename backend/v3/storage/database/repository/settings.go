@@ -476,12 +476,6 @@ func (s *labelSettings) ActivateLabelSetting(ctx context.Context, client databas
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.ID, &setting.CreatedAt, &setting.UpdatedAt)
 }
 
-// INSERT INTO zitadel.settings (instance_id, org_id, type, label_state, settings, updated_at, created_at)
-// SELECT instance_id, org_id, type, $1, settings, $2, $3 FROM zitadel.settings AS copy_table
-// WHERE (copy_table.type = $4) AND (copy_table.instance_id = $5) AND (copy_table.org_id IS NULL) AND (copy_table.label_state = $6)
-// ON CONFLICT (instance_id, org_id, type, label_state) WHERE (type = $7)
-// DO UPDATE SET (instance_id, org_id, type, label_state, settings, updated_at, created_at) = (EXCLUDED.instance_id, EXCLUDED.org_id, EXCLUDED.type, $1, EXCLUDED.settings, $2, $3)
-
 const activatedLabelSettingEventStmtStart = `INSERT INTO zitadel.settings` +
 	` (instance_id, organization_id, type, owner_type, label_state, settings, created_at)` +
 	` SELECT instance_id, organization_id, type, owner_type, 'activated', settings, $1 FROM zitadel.settings`

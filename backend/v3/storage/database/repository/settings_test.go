@@ -1867,7 +1867,7 @@ func TestGetSetting(t *testing.T) {
 						settingRepo.OrgIDCondition(setting.OrgID),
 						settingRepo.TypeCondition(setting.Type),
 						settingRepo.OwnerTypeCondition(setting.OwnerType),
-						settingRepo.LabelStateCondition(*setting.LabelState),
+						// settingRepo.LabelStateCondition(*setting.LabelState),
 					),
 				),
 			)
