@@ -162,16 +162,16 @@ func (u userHuman) SetPasswordChangeRequired(required bool) database.Change {
 
 // IncrementFailedPasswordAttempts implements [domain.HumanUserRepository].
 func (u userHuman) IncrementFailedPasswordAttempts() database.Change {
-	return database.NewIncrementColumnChange(u.failedPasswordAttemptsColumn())
+	return database.NewIncrementColumnChange(u.FailedPasswordAttemptsColumn())
 }
 
 // ResetFailedPasswordAttempts implements [domain.HumanUserRepository].
 func (u userHuman) ResetFailedPasswordAttempts() database.Change {
-	return database.NewChange(u.failedPasswordAttemptsColumn(), 0)
+	return database.NewChange(u.FailedPasswordAttemptsColumn(), 0)
 }
 
 func (u userHuman) setPassword(password string) database.Change {
-	return database.NewChange(u.passwordColumn(), password)
+	return database.NewChange(u.PasswordColumn(), password)
 }
 
 func (u userHuman) setPasswordVerifiedAt(verifiedAt time.Time) database.Change {
@@ -193,18 +193,18 @@ func (u userHuman) PasswordVerifiedAtColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "password_verified_at")
 }
 
+func (u userHuman) FailedPasswordAttemptsColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "failed_password_attempts")
+}
+
+func (u userHuman) PasswordColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "password")
+}
+
 func (u userHuman) passwordChangeRequiredColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "password_change_required")
 }
 
-func (u userHuman) failedPasswordAttemptsColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "failed_password_attempts")
-}
-
 func (u userHuman) passwordVerificationIDColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "password_verification_id")
-}
-
-func (u userHuman) passwordColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "password")
 }

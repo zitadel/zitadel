@@ -126,6 +126,7 @@ type HumanUserRepository interface {
 
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 
+	// SetPassword sets the password based on the given verification type.
 	SetPassword(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
 
 	// ResetPassword(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *Verification) (int64, error)
