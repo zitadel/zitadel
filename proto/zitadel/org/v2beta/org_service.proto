@@ -803,7 +803,7 @@ message DeleteOrganizationDomainResponse {
 }
 
 message GenerateOrganizationDomainValidationRequest {
-  // Organization Id for the Organization which doman to be validated.
+  // Organization Id for the Organization which domain to be validated.
   string organization_id = 1 [
 
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -814,7 +814,7 @@ message GenerateOrganizationDomainValidationRequest {
       example: "\"69629012906488334\"";
     }
   ];
-  // The domain which to be deleted.
+  // The domain to validate
   string domain = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -843,7 +843,7 @@ message GenerateOrganizationDomainValidationResponse {
 }
 
 message VerifyOrganizationDomainRequest {
-  // Organization Id for the Organization doman to be verified.
+  // Organization Id for the Organization domain to be verified.
   string organization_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -853,7 +853,7 @@ message VerifyOrganizationDomainRequest {
       example: "\"69629012906488334\"";
     }
   ];
-  // Organization Id for the Organization doman to be verified.
+  // Organization Id for the Organization domain to be verified.
   string domain = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -880,7 +880,7 @@ message Metadata {
   bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
 }
 message SetOrganizationMetadataRequest{
-  // Organization Id for the Organization doman to be verified.
+  // Organization Id for the Organization domain to be verified.
   string organization_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -910,7 +910,7 @@ message SetOrganizationMetadataResponse{
 }
 
 message ListOrganizationMetadataRequest {
-  // Organization ID of Orgalization which metadata is to be listed.
+  // Organization ID of Organization which metadata is to be listed.
   string organization_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -935,7 +935,7 @@ message ListOrganizationMetadataResponse {
 }
 
 message DeleteOrganizationMetadataRequest {
-  // Organization ID of Orgalization which metadata is to be deleted is stored on.
+  // Organization ID of Organization which metadata is to be deleted is stored on.
   string organization_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,

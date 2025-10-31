@@ -97,6 +97,7 @@ var (
 	ProjectRelationalProjection              *handler.Handler
 	ProjectRoleRelationalProjection          *handler.Handler
 	OrganizationMetadataRelationalProjection *handler.Handler
+	UserRelationalProjection                 *handler.Handler
 
 	ProjectGrantFields      *handler.FieldHandler
 	OrgDomainVerifiedFields *handler.FieldHandler
@@ -222,6 +223,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	ProjectRelationalProjection = newProjectRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects_relational"]))
 	ProjectRoleRelationalProjection = newProjectRoleRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_roles_relational"]))
 	OrganizationMetadataRelationalProjection = newOrgMetadataRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organization_metadata_relational"]))
+	UserRelationalProjection = newUserRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_relational"]))
 
 	newProjectionsList()
 	newFieldsList()
@@ -412,6 +414,7 @@ func newProjectionsList() {
 		InstanceDomainRelationalProjection,
 		OrganizationDomainRelationalProjection,
 		IDPTemplateRelationalProjection,
+		UserRelationalProjection,
 		ProjectRelationalProjection,
 		ProjectRoleRelationalProjection,
 		OrganizationMetadataRelationalProjection,
