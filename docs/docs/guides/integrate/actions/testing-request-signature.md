@@ -41,7 +41,7 @@ import (
 	"github.com/zitadel/zitadel-go/v3/pkg/actions"
 )
 
-const signingKey = "encryptedSigningKey" // encrypted signing key received after creating the target
+const signingKey = "somekey" // signing key received after creating the target
 const signingHeader = "ZITADEL-Signature"
 
 // webhook HandleFunc to read the request body and then print out the contents
@@ -97,7 +97,6 @@ curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/actions/targets' \
   },
   "endpoint": "http://localhost:8090/webhook",
   "timeout": "10s",
-  "signing_key": "somekey"
 }'
 ```
 
@@ -105,8 +104,8 @@ Example response after creating the target:
 ```json
 {
     "id": "344649040681500814",
-    "creationDate": "2025-10-31T15:00:36.432595Z",
-    "signingKey": "encryptedSigningKey"
+    "creationDate": "2025-10-31T15:00:36.432595dZ",
+    "signingKey": "somekey"
 }
 ```
 Save the returned ID to set in the execution. Use the `signingKey` to validate the request signature.
@@ -205,6 +204,10 @@ the [Sent information Request](./usage#sent-information-request) payload descrip
     "Host":
     [
       "localhost:8080"
+    ],
+    "X-Forwarded-For":
+    [
+      "::1"
     ],
     "X-Forwarded-Host":
     [
