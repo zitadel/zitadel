@@ -65,3 +65,42 @@ func getMany[Target any](ctx context.Context, querier database.Querier, builder 
 	}
 	return targets, nil
 }
+
+type updatable interface {
+	PrimaryKeyColumns() []database.Column
+	UpdatedAtColumn() database.Column
+	unqualifiedTableName() string
+}
+
+func updateOne[Target updatable](ctx context.Context, client database.QueryExecutor, target Target, condition database.Condition, changes ...database.Change) (int64, error) {
+	if len(changes) == 0 {
+		return 0, database.ErrNoChanges
+	}
+	if err := checkPKCondition(target, condition); err != nil {
+		return 0, err
+	}
+	if !database.Changes(changes).IsOnColumn(target.UpdatedAtColumn()) {
+		changes = append(changes, database.NewChange(target.UpdatedAtColumn(), database.NullInstruction))
+	}
+	builder := database.NewStatementBuilder(`UPDATE zitadel.` + target.unqualifiedTableName() + ` SET `)
+	database.Changes(changes).Write(builder)
+	writeCondition(builder, condition)
+
+	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+type deletable interface {
+	PrimaryKeyColumns() []database.Column
+	unqualifiedTableName() string
+}
+
+func deleteOne[Target deletable](ctx context.Context, client database.QueryExecutor, target Target, condition database.Condition) (int64, error) {
+	if err := checkPKCondition(target, condition); err != nil {
+		return 0, err
+	}
+
+	builder := database.NewStatementBuilder(`DELETE FROM zitadel.` + target.unqualifiedTableName() + ` `)
+	writeCondition(builder, condition)
+
+	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
