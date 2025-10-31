@@ -124,7 +124,7 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 				id:                "123",
 			},
 			expect:  mockQueryScanErr(expQuery, cols, nil, "123", "instanceID"),
-			wantErr: zerrors.ThrowNotFound(sql.ErrNoRows, "QUERY-Thee9", "Errors.AuthRequest.NotExisting"),
+			wantErr: zerrors.ThrowNotFound(sql.ErrNoRows, "QUERY-rojec", "Errors.AuthRequest.NotExisting"),
 		},
 		{
 			name: "query error",
