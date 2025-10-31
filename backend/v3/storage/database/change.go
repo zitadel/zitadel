@@ -123,3 +123,42 @@ func (c Changes) String() string {
 }
 
 var _ Change = Changes(nil)
+
+type incrementColumnChange struct {
+	column Column
+}
+
+func NewIncrementColumnChange(col Column) Change {
+	return &incrementColumnChange{
+		column: col,
+	}
+}
+
+// IsOnColumn implements [Change].
+func (i *incrementColumnChange) IsOnColumn(col Column) bool {
+	return i.column.Equals(col)
+}
+
+// Matches implements [Change].
+func (i *incrementColumnChange) Matches(x any) bool {
+	toMatch, ok := x.(*incrementColumnChange)
+	if !ok {
+		return false
+	}
+	return i.column.Equals(toMatch.column)
+}
+
+// String implements [Change].
+func (i *incrementColumnChange) String() string {
+	return "database.incrementColumnChange"
+}
+
+// Write implements [Change].
+func (i *incrementColumnChange) Write(builder *StatementBuilder) {
+	i.column.WriteQualified(builder)
+	builder.WriteString(" = ")
+	i.column.WriteQualified(builder)
+	builder.WriteString(" + 1")
+}
+
+var _ Change = (*incrementColumnChange)(nil)

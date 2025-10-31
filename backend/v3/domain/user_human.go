@@ -18,15 +18,28 @@ const (
 	GenderDiverse
 )
 
-type SetPasswordVerification interface{}
-
-type SetPasswordVerificationCurrentPassword struct {
-	CurrentPassword []byte
+type SetPasswordVerification interface {
+	isSetPasswordVerification()
 }
+
+type SetPasswordVerificationCurrentPasswordChecked struct {
+	VerifiedAt time.Time
+}
+
+func (s SetPasswordVerificationCurrentPasswordChecked) isSetPasswordVerification() {}
 
 type SetPasswordVerificationVerificationCode struct {
-	VerificationCode string
+	VerifiedAt time.Time
 }
+
+func (s SetPasswordVerificationVerificationCode) isSetPasswordVerification() {}
+
+// TODO(adlerhurst): is there a code present in that case?
+type SetPasswordVerificationChangeRequired struct {
+	VerifiedAt time.Time
+}
+
+func (s SetPasswordVerificationChangeRequired) isSetPasswordVerification() {}
 
 type Human struct {
 	// HumanEmailContact HumanContact  `db:"email"`
@@ -56,6 +69,13 @@ type humanColumns interface {
 
 	PasswordColumn() database.Column
 	PasswordVerifiedAtColumn() database.Column
+	FailedPasswordAttemptsColumn() database.Column
+
+	EmailColumn() database.Column
+	EmailVerifiedAtColumn() database.Column
+
+	// PhoneColumn() database.Column
+	// PhoneVerifiedAtColumn() database.Column
 }
 
 type humanConditions interface {
@@ -64,6 +84,9 @@ type humanConditions interface {
 	LastNameCondition(op database.TextOperation, name string) database.Condition
 	NicknameCondition(op database.TextOperation, name string) database.Condition
 	DisplayNameCondition(op database.TextOperation, name string) database.Condition
+
+	EmailCondition(op database.TextOperation, email string) database.Condition
+	// PhoneCondition(op database.TextOperation, phone string) database.Condition
 }
 
 type humanChanges interface {
@@ -79,8 +102,21 @@ type humanChanges interface {
 	SetAvatarKey(key *string) database.Change
 
 	SetPasswordChangeRequired(required bool) database.Change
-	// SetPassword sets the password hash, if verifiedAt is Zero, NOW() is used
-	SetPassword(password []byte, verifiedAt time.Time) database.Change
+	IncrementFailedPasswordAttempts() database.Change
+	ResetFailedPasswordAttempts() database.Change
+
+	// // SetEmailVerified sets the email verified at to NOW()
+	// SetEmailVerified() database.Change
+	// // SetEmailVerifiedAt sets the email verified at the given time.
+	// // If verifiedAt is Zero it behaves like [humanChanges.SetEmailVerified]
+	// SetEmailVerifiedAt(verifiedAt time.Time) database.Change
+
+	// // SetPhoneVerified sets the phone verified at to NOW()
+	// SetPhoneVerified() database.Change
+	// // SetPhoneVerifiedAt sets the phone verified at the given time.
+	// // If verifiedAt is Zero it behaves like [humanChanges.SetPhoneVerified]
+	// SetPhoneVerifiedAt(verifiedAt time.Time) database.Change
+	// RemovePhone() database.Change
 }
 
 type HumanUserRepository interface {
@@ -90,100 +126,23 @@ type HumanUserRepository interface {
 
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 
-	// Security() HumanSecurityRepository
+	SetPassword(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
+
+	// ResetPassword(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *Verification) (int64, error)
+	// GetPasswordVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
+	// IncrementFailedPasswordVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+	// // SetPasswordVerified sets the password previously unverified to verified and removed the password verification.
+	// VerifyPassword(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+	// // SetPasswordVerifiedAt sets the password previously unverified to verified at the given time and removed the password verification.
+	// // If verifiedAt is Zero it behaves like [humanChanges.SetPasswordVerified]
+	// VerifyPasswordAt(ctx context.Context, client database.QueryExecutor, condition database.Condition, verifiedAt time.Time) (int64, error)
+
+	// SetEmail(ctx context.Context, client database.QueryExecutor, condition database.Condition, email string, verification VerificationType) (int64, error)
+	// UpdateEmailVerificationCode(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *VerificationTypeUpdateVerification) (int64, error)
+	// IncrementFailedEmailVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+	// GetEmailVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
+
+	// SetPhone(ctx context.Context, client database.QueryExecutor, condition database.Condition, phone string, verification VerificationType) (int64, error)
+	// SetPhoneVerificationCode(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *Verification) (int64, error)
+	// IncrementFailedPhoneVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }
-
-//go:generate enumer -type ContactType -transform lower -trimprefix ContactType -sql
-// type ContactType uint8
-
-// const (
-// 	ContactTypeUnspecified ContactType = iota
-// 	ContactTypeEmail
-// 	ContactTypePhone
-// )
-
-// // human contact type
-// type HumanContact struct {
-// 	// InstanceID      string      `json:"instanceId,omitempty" db:"instance_id"`
-// 	// OrgID           string      `json:"orgId,omitempty" db:"org_id"`
-// 	// UserId          string      `json:"userId,omitempty" db:"user_id"`
-// 	Type            *ContactType `json:"type,omitempty" db:"type"`
-// 	Value           *string      `json:"value,omitempty" db:"value"`
-// 	IsVerified      *bool        `json:"isVerified,omitempty" db:"is_verified"`
-// 	UnverifiedValue *string      `json:"unverifiedValue,omitempty" db:"unverified_value"`
-// }
-
-// // human security
-// type HumanSecurity struct {
-// 	// InstanceID string `json:"instanceId,omitempty" db:"instance_id"`
-// 	// OrgID      string `json:"orgId,omitempty" db:"org_id"`
-// 	// UserId     string `json:"userId,omitempty" db:"user_id"`
-
-// 	PasswordChangeRequired bool       `json:"passwordChangeRequired,omitempty" db:"password_change_required"`
-// 	PasswordChange         *time.Time `json:"passwordChange,omitempty" db:"password_change"`
-// 	MFAInitSkipped         bool       `json:"mfaInitSkipped,omitempty" db:"mfa_init_skipped"`
-// }
-
-// type HumanSecurityRepository interface {
-// 	humanSecurityColumns
-// 	humanSecurityConditions
-// 	humanSecurityChanges
-
-// 	Create(ctx context.Context, client database.QueryExecutor, user *Human) error
-// 	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*HumanSecurity, error)
-// 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
-// }
-
-// type humanSecurityColumns interface {
-// 	InstanceIDColumn() database.Column
-// 	OrgIDColumn() database.Column
-// 	UserIDColumn() database.Column
-// 	PasswordChangeRequiredColumn() database.Column
-// 	PasswordChangedColumn() database.Column
-// 	MFAInitSkippedColumn() database.Column
-// }
-
-// type humanSecurityConditions interface {
-// 	InstanceIDCondition(instanceID string) database.Condition
-// 	OrgIDCondition(orgID string) database.Condition
-// 	UserIDCondition(userID string) database.Condition
-// 	PasswordChangeRequiredCondition(required bool) database.Condition
-// 	PasswordChangeCondition(op database.NumberOperation, time time.Time) database.Condition
-// 	MFAInitSkippedCondition(skipped bool) database.Condition
-// }
-
-// type humanSecurityChanges interface {
-// 	SetPasswordChangeRequired(required bool) database.Change
-// 	SetPasswordChanged(time time.Time) database.Change
-// 	SetMFAInitSkipped(skipped bool) database.Change
-// }
-
-// type humanContactColumns interface {
-// 	InstanceIDColumn() database.Column
-// 	OrgIDColumn() database.Column
-// 	UserIDColumn() database.Column
-// 	TypeCondition() database.Column
-// 	CurrentValueColumn() database.Column
-// 	VerifiedColumn() database.Column
-// 	UnverifiedValueColumn() database.Column
-// }
-
-// type humanContactConditions interface {
-// 	InstanceIDCondition(instanceID string) database.Condition
-// 	OrgIDCondition(orgID string) database.Condition
-// 	UserIDCondition(userID string) database.Condition
-// 	TypeCondition(typ ContactType) database.Condition
-// 	CurrentValueCondition(value string) database.Condition
-// 	VerifiedCondition(verified bool) database.Condition
-// 	UnverifiedValueCondition(value string) database.Condition
-// }
-
-// type humanContactChanges interface {
-// 	SetInstanceID(instanceID string) database.Change
-// 	SetOrgID(orgID string) database.Change
-// 	SetUserID(userID string) database.Change
-// 	SetType(typ ContactType) database.Change
-// 	SetCurrentValue(value string) database.Change
-// 	SetVerified(verified bool) database.Change
-// 	SetUnverifiedValue(value string) database.Change
-// }

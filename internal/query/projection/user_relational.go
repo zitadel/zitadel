@@ -3,6 +3,7 @@ package projection
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/muhlemmer/gu"
 
@@ -53,6 +54,7 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.HumanRegisteredType,
 					Reduce: p.reduceHumanRegistered,
 				},
+
 				// {
 				// 	Event:  user.HumanInitialCodeAddedType,
 				// 	Reduce: p.reduceHumanInitCodeAdded,
@@ -89,6 +91,7 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.UserRemovedType,
 					Reduce: p.reduceUserRemoved,
 				},
+
 				{
 					Event:  user.UserUserNameChangedType,
 					Reduce: p.reduceUsernameChanged,
@@ -97,6 +100,7 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.UserDomainClaimedType,
 					Reduce: p.reduceDomainClaimed,
 				},
+
 				{
 					Event:  user.HumanProfileChangedType,
 					Reduce: p.reduceHumanProfileChanged,
@@ -105,51 +109,81 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.UserV1ProfileChangedType,
 					Reduce: p.reduceHumanProfileChanged,
 				},
-				// TODO
-				// {
-				// 	Event:  user.HumanPhoneChangedType,
-				// 	Reduce: p.reduceHumanPhoneChanged,
-				// },
-				// {
-				// 	Event:  user.UserV1PhoneChangedType,
-				// 	Reduce: p.reduceHumanPhoneChanged,
-				// },
-				// TODO
-				// 		{
-				// 			Event:  user.HumanPhoneRemovedType,
-				// 			Reduce: p.reduceHumanPhoneRemoved,
-				// 		},
-				// 		{
-				// 			Event:  user.UserV1PhoneRemovedType,
-				// 			Reduce: p.reduceHumanPhoneRemoved,
-				// 		},
-				// TODO
-				// 		{
-				// 			Event:  user.HumanPhoneVerifiedType,
-				// 			Reduce: p.reduceHumanPhoneVerified,
-				// 		},
-				// 		{
-				// 			Event:  user.UserV1PhoneVerifiedType,
-				// 			Reduce: p.reduceHumanPhoneVerified,
-				// 		},
-				// TODO
-				// 		{
-				// 			Event:  user.HumanEmailChangedType,
-				// 			Reduce: p.reduceHumanEmailChanged,
-				// 		},
-				// 		{
-				// 			Event:  user.UserV1EmailChangedType,
-				// 			Reduce: p.reduceHumanEmailChanged,
-				// 		},
-				// TODO
-				// 		{
-				// 			Event:  user.HumanEmailVerifiedType,
-				// 			Reduce: p.reduceHumanEmailVerified,
-				// 		},
-				// 		{
-				// 			Event:  user.UserV1EmailVerifiedType,
-				// 			Reduce: p.reduceHumanEmailVerified,
-				// 		},
+
+				{
+					Event:  user.HumanEmailChangedType,
+					Reduce: p.reduceHumanEmailChanged,
+				},
+				{
+					Event:  user.UserV1EmailChangedType,
+					Reduce: p.reduceHumanEmailChanged,
+				},
+				{
+					Event:  user.HumanEmailVerifiedType,
+					Reduce: p.reduceHumanEmailVerified,
+				},
+				{
+					Event:  user.UserV1EmailVerifiedType,
+					Reduce: p.reduceHumanEmailVerified,
+				},
+				{
+					Event:  user.HumanEmailCodeAddedType,
+					Reduce: p.reduceHumanEmailCodeAdded,
+				},
+				{
+					Event:  user.UserV1EmailCodeAddedType,
+					Reduce: p.reduceHumanEmailCodeAdded,
+				},
+				{
+					Event:  user.HumanEmailVerificationFailedType,
+					Reduce: p.reduceHumanEmailVerificationFailed,
+				},
+				{
+					Event:  user.UserV1EmailVerificationFailedType,
+					Reduce: p.reduceHumanEmailVerificationFailed,
+				},
+
+				{
+					Event:  user.HumanPhoneChangedType,
+					Reduce: p.reduceHumanPhoneChanged,
+				},
+				{
+					Event:  user.UserV1PhoneChangedType,
+					Reduce: p.reduceHumanPhoneChanged,
+				},
+				{
+					Event:  user.HumanPhoneRemovedType,
+					Reduce: p.reduceHumanPhoneRemoved,
+				},
+				{
+					Event:  user.UserV1PhoneRemovedType,
+					Reduce: p.reduceHumanPhoneRemoved,
+				},
+				{
+					Event:  user.HumanPhoneVerifiedType,
+					Reduce: p.reduceHumanPhoneVerified,
+				},
+				{
+					Event:  user.UserV1PhoneVerifiedType,
+					Reduce: p.reduceHumanPhoneVerified,
+				},
+				{
+					Event:  user.HumanPhoneCodeAddedType,
+					Reduce: p.reduceHumanPhoneCodeAdded,
+				},
+				{
+					Event:  user.UserV1PhoneCodeAddedType,
+					Reduce: p.reduceHumanPhoneCodeAdded,
+				},
+				{
+					Event:  user.HumanPhoneVerificationFailedType,
+					Reduce: p.reduceHumanPhoneVerificationFailed,
+				},
+				{
+					Event:  user.UserV1PhoneVerificationFailedType,
+					Reduce: p.reduceHumanPhoneVerificationFailed,
+				},
+
 				{
 					Event:  user.HumanAvatarAddedType,
 					Reduce: p.reduceHumanAvatarAdded,
@@ -158,6 +192,28 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.HumanAvatarRemovedType,
 					Reduce: p.reduceHumanAvatarRemoved,
 				},
+
+				{
+					Event:  user.HumanPasswordChangedType,
+					Reduce: p.reduceHumanPasswordChanged,
+				},
+				{
+					Event:  user.HumanPasswordCodeAddedType,
+					Reduce: p.reduceHumanPasswordCodeAdded,
+				},
+				{
+					Event:  user.HumanPasswordCheckSucceededType,
+					Reduce: p.reduceHumanPasswordCheckSucceeded,
+				},
+				{
+					Event:  user.HumanPasswordCheckFailedType,
+					Reduce: p.reduceHumanPasswordCheckFailed,
+				},
+				{
+					Event:  user.HumanPasswordHashUpdatedType,
+					Reduce: p.reduceHumanPasswordHashUpdated,
+				},
+
 				{
 					Event:  user.MachineAddedEventType,
 					Reduce: p.reduceMachineAdded,
@@ -165,10 +221,6 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  user.MachineChangedEventType,
 					Reduce: p.reduceMachineChanged,
-				},
-				{
-					Event:  user.HumanPasswordChangedType,
-					Reduce: p.reduceHumanPasswordChanged,
 				},
 				{
 					Event:  user.MachineSecretSetType,
@@ -231,12 +283,11 @@ func (u *userRelationalProjection) reduceHumanAdded(event eventstore.Event) (*ha
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
+		v3Tx := v3_sql.SQLTx(tx)
+
 		userRepo := repository.UserRepository()
 		humanRepo := userRepo.Human()
 
-		v3Tx := v3_sql.SQLTx(tx)
-
-		// TODO add password
 		err := userRepo.Create(ctx, v3Tx, &domain.User{
 			InstanceID: e.Aggregate().InstanceID,
 			OrgID:      e.Aggregate().ResourceOwner,
@@ -260,7 +311,8 @@ func (u *userRelationalProjection) reduceHumanAdded(event eventstore.Event) (*ha
 		if password := crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash); password != "" {
 			_, err = humanRepo.Update(ctx, v3Tx,
 				humanRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-				humanRepo.SetPassword([]byte(password), e.CreatedAt()),
+				humanRepo.SetPassword([]byte(password)),
+				humanRepo.SetPasswordVerifiedAt(e.CreatedAt()),
 				humanRepo.SetPasswordChangeRequired(e.ChangeRequired),
 				humanRepo.SetUpdatedAt(e.CreatedAt()),
 			)
@@ -319,14 +371,17 @@ func (p *userRelationalProjection) reduceHumanRegistered(event eventstore.Event)
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xhD3q", "reduce.wrong.event.type %s", user.HumanRegisteredType)
 	}
 
-	// passwordSet := crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
+		v3Tx := v3_sql.SQLTx(tx)
+
 		userRepo := repository.UserRepository()
-		return userRepo.Create(ctx, v3_sql.SQLTx(tx), &domain.User{
+		humanRepo := userRepo.Human()
+
+		err := userRepo.Create(ctx, v3Tx, &domain.User{
 			InstanceID: e.Aggregate().InstanceID,
 			OrgID:      e.Aggregate().ResourceOwner,
 			ID:         e.Aggregate().ID,
@@ -343,6 +398,19 @@ func (p *userRelationalProjection) reduceHumanRegistered(event eventstore.Event)
 				Gender:            gu.Ptr(mapHumanGender(e.Gender)),
 			},
 		})
+		if err != nil {
+			return err
+		}
+		if password := crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash); password != "" {
+			_, err = humanRepo.Update(ctx, v3Tx,
+				humanRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+				humanRepo.SetPassword([]byte(password)),
+				humanRepo.SetPasswordVerifiedAt(e.CreatedAt()),
+				humanRepo.SetPasswordChangeRequired(e.ChangeRequired),
+				humanRepo.SetUpdatedAt(e.CreatedAt()),
+			)
+		}
+		return err
 		// _, err := userRepo.CreateHuman(ctx, v3_sql.SQLTx(tx),
 		// 	&domain.Human{
 		// 		FirstName:         e.FirstName,
@@ -794,40 +862,29 @@ func (p *userRelationalProjection) reduceHumanProfileChanged(event eventstore.Ev
 // 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-KwiHa", "reduce.wrong.event.type %s", user.HumanEmailChangedType)
 // 	}
 
-// 	return handler.NewMultiStatement(
-// 		e,
-// 		handler.AddUpdateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(UserChangeDateCol, e.CreationDate()),
-// 				handler.NewCol(UserSequenceCol, e.Sequence()),
-// 			},
-// 			[]handler.Condition{
-// 				handler.NewCond(UserIDCol, e.Aggregate().ID),
-// 				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
-// 			},
-// 		),
-// 		handler.AddUpdateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(HumanEmailCol, e.EmailAddress),
-// 				handler.NewCol(HumanIsEmailVerifiedCol, false),
-// 			},
-// 			[]handler.Condition{
-// 				handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
-// 				handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
-// 			},
-// 			handler.WithTableSuffix(UserHumanSuffix),
-// 		),
-// 		handler.AddUpdateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(NotifyLastEmailCol, &sql.NullString{String: string(e.EmailAddress), Valid: e.EmailAddress != ""}),
-// 			},
-// 			[]handler.Condition{
-// 				handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),
-// 				handler.NewCond(NotifyInstanceIDCol, e.Aggregate().InstanceID),
-// 			},
-// 			handler.WithTableSuffix(UserNotifySuffix),
-// 		),
-// 	), nil
+// 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+// 		tx, ok := ex.(*sql.Tx)
+// 		if !ok {
+// 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+// 		}
+// 		v3Tx := v3_sql.SQLTx(tx)
+// 		repo := repository.UserRepository().Human()
+
+// 		_, err := repo.SetEmail(ctx, v3Tx,
+// 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+// 			string(e.EmailAddress),
+// 			&domain.VerificationTypeUpdateVerification{},
+// 		)
+// 		if err != nil {
+// 			return err
+// 		}
+
+// 		_, err = repo.Update(ctx, v3_sql.SQLTx(tx),
+// 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+// 			repo.SetUpdatedAt(e.CreatedAt()),
+// 		)
+// 		return err
+// 	}), nil
 // }
 
 // func (p *userRelationalProjection) reduceHumanEmailVerified(event eventstore.Event) (*handler.Statement, error) {
@@ -836,39 +893,189 @@ func (p *userRelationalProjection) reduceHumanProfileChanged(event eventstore.Ev
 // 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-JzcDq", "reduce.wrong.event.type %s", user.HumanEmailVerifiedType)
 // 	}
 
-// 	return handler.NewMultiStatement(
-// 		e,
-// 		handler.AddUpdateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(UserChangeDateCol, e.CreationDate()),
-// 				handler.NewCol(UserSequenceCol, e.Sequence()),
+// 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+// 		tx, ok := ex.(*sql.Tx)
+// 		if !ok {
+// 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+// 		}
+// 		repo := repository.UserRepository().Human()
+
+// 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+// 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+// 			repo.SetEmailVerifiedAt(e.CreatedAt()),
+// 			repo.SetUpdatedAt(e.CreatedAt()),
+// 		)
+// 		return err
+// 	}), nil
+// }
+
+// func (p *userRelationalProjection) reduceHumanEmailCodeAdded(event eventstore.Event) (*handler.Statement, error) {
+// 	e, ok := event.(*user.HumanEmailCodeAddedEvent)
+// 	if !ok {
+// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-JzcDq", "reduce.wrong.event.type %s", user.HumanEmailCodeAddedType)
+// 	}
+
+// 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+// 		tx, ok := ex.(*sql.Tx)
+// 		if !ok {
+// 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+// 		}
+// 		repo := repository.UserRepository().Human()
+
+// 		_, err := repo.UpdateEmailVerificationCode(ctx, v3_sql.SQLTx(tx),
+// 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+// 			&domain.VerificationTypeUpdateVerification{
+// 				Code:   &e.Code.Crypted,
+// 				Expiry: &e.Expiry,
 // 			},
-// 			[]handler.Condition{
-// 				handler.NewCond(UserIDCol, e.Aggregate().ID),
-// 				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
+// 		)
+// 		return err
+// 	}), nil
+// }
+
+// func (p *userRelationalProjection) reduceHumanEmailVerificationFailed(event eventstore.Event) (*handler.Statement, error) {
+// 	e, ok := event.(*user.HumanEmailVerificationFailedEvent)
+// 	if !ok {
+// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-JzcDq", "reduce.wrong.event.type %s", user.HumanEmailVerificationFailedType)
+// 	}
+
+// 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+// 		tx, ok := ex.(*sql.Tx)
+// 		if !ok {
+// 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+// 		}
+// 		repo := repository.UserRepository().Human()
+
+// 		_, err := repo.IncrementFailedEmailVerificationAttempts(ctx, v3_sql.SQLTx(tx),
+// 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+// 		)
+// 		return err
+// 	}), nil
+// }
+
+// func (p *userRelationalProjection) reduceHumanPhoneChanged(event eventstore.Event) (*handler.Statement, error) {
+// 	e, ok := event.(*user.HumanPhoneChangedEvent)
+// 	if !ok {
+// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-KwiHa", "reduce.wrong.event.type %s", user.HumanPhoneChangedType)
+// 	}
+
+// 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+// 		tx, ok := ex.(*sql.Tx)
+// 		if !ok {
+// 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+// 		}
+// 		v3Tx := v3_sql.SQLTx(tx)
+// 		userRepo := repository.UserRepository()
+// 		humanRepo := userRepo.Human()
+
+// 		_, err := humanRepo.SetPhone(ctx, v3Tx,
+// 			humanRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+// 			string(e.PhoneNumber),
+// 			&domain.VerificationTypeUpdateVerification{},
+// 		)
+// 		if err != nil {
+// 			return err
+// 		}
+
+// 		_, err = userRepo.Update(ctx, v3_sql.SQLTx(tx),
+// 			userRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+// 			userRepo.SetUpdatedAt(e.CreatedAt()),
+// 		)
+// 		return err
+// 	}), nil
+// }
+
+// func (p *userRelationalProjection) reduceHumanPhoneRemoved(event eventstore.Event) (*handler.Statement, error) {
+// 	e, ok := event.(*user.HumanPhoneRemovedEvent)
+// 	if !ok {
+// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-KwiHa", "reduce.wrong.event.type %s", user.HumanPhoneRemovedType)
+// 	}
+
+// 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+// 		tx, ok := ex.(*sql.Tx)
+// 		if !ok {
+// 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+// 		}
+// 		repo := repository.UserRepository().Human()
+
+// 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+// 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+// 			repo.RemovePhone(),
+// 			repo.SetUpdatedAt(e.CreatedAt()),
+// 		)
+// 		return err
+// 	}), nil
+// }
+
+// func (p *userRelationalProjection) reduceHumanPhoneVerified(event eventstore.Event) (*handler.Statement, error) {
+// 	e, ok := event.(*user.HumanPhoneVerifiedEvent)
+// 	if !ok {
+// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-JzcDq", "reduce.wrong.event.type %s", user.HumanPhoneVerifiedType)
+// 	}
+
+// 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+// 		tx, ok := ex.(*sql.Tx)
+// 		if !ok {
+// 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+// 		}
+// 		repo := repository.UserRepository().Human()
+
+// 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+// 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+// 			repo.SetPhoneVerifiedAt(e.CreatedAt()),
+// 			repo.SetUpdatedAt(e.CreatedAt()),
+// 		)
+// 		return err
+// 	}), nil
+// }
+
+// func (p *userRelationalProjection) reduceHumanPhoneCodeAdded(event eventstore.Event) (*handler.Statement, error) {
+// 	e, ok := event.(*user.HumanPhoneCodeAddedEvent)
+// 	if !ok {
+// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-JzcDq", "reduce.wrong.event.type %s", user.HumanPhoneCodeAddedType)
+// 	}
+
+// 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+// 		tx, ok := ex.(*sql.Tx)
+// 		if !ok {
+// 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+// 		}
+// 		repo := repository.UserRepository().Human()
+
+// 		var expiresAt *time.Time
+// 		if e.Expiry > 0 {
+// 			expiresAt = gu.Ptr(e.CreatedAt().Add(e.Expiry))
+// 		}
+
+// 		_, err := repo.SetPhoneVerificationCode(ctx, v3_sql.SQLTx(tx),
+// 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+// 			&domain.Verification{
+// 				Code:      &e.Code.Crypted,
+// 				ExpiresAt: expiresAt,
 // 			},
-// 		),
-// 		handler.AddUpdateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(HumanIsEmailVerifiedCol, true),
-// 			},
-// 			[]handler.Condition{
-// 				handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
-// 				handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
-// 			},
-// 			handler.WithTableSuffix(UserHumanSuffix),
-// 		),
-// 		handler.AddUpdateStatement(
-// 			[]handler.Column{
-// 				handler.NewCopyCol(NotifyVerifiedEmailCol, NotifyLastEmailCol),
-// 			},
-// 			[]handler.Condition{
-// 				handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),
-// 				handler.NewCond(NotifyInstanceIDCol, e.Aggregate().InstanceID),
-// 			},
-// 			handler.WithTableSuffix(UserNotifySuffix),
-// 		),
-// 	), nil
+// 		)
+// 		return err
+// 	}), nil
+// }
+
+// func (p *userRelationalProjection) reduceHumanPhoneVerificationFailed(event eventstore.Event) (*handler.Statement, error) {
+// 	e, ok := event.(*user.HumanPhoneVerificationFailedEvent)
+// 	if !ok {
+// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-JzcDq", "reduce.wrong.event.type %s", user.HumanPhoneVerificationFailedType)
+// 	}
+
+// 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+// 		tx, ok := ex.(*sql.Tx)
+// 		if !ok {
+// 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+// 		}
+// 		repo := repository.UserRepository().Human()
+
+// 		_, err := repo.IncrementFailedPhoneVerificationAttempts(ctx, v3_sql.SQLTx(tx),
+// 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+// 		)
+// 		return err
+// 	}), nil
 // }
 
 func (p *userRelationalProjection) reduceHumanAvatarAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -929,11 +1136,116 @@ func (p *userRelationalProjection) reduceHumanPasswordChanged(event eventstore.E
 
 		password := crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 
-		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.SetPassword(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			&domain.VerificationTypeVerifiedValue{
+				Value:      password,
+				VerifiedAt: gu.Ptr(e.CreatedAt()),
+			},
+		)
+
+		if err != nil {
+			return err
+		}
+
+		_, err = repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.SetPasswordChangeRequired(e.ChangeRequired),
-			repo.SetPassword([]byte(password), e.CreatedAt()),
 			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceHumanPasswordCodeAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanPasswordCodeAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.HumanPasswordCodeAddedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+
+		var expiry *time.Duration
+		if e.Expiry > 0 {
+			expiry = &e.Expiry
+		}
+
+		_, err := repo.SetPassword(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			&domain.VerificationTypeSet{
+				CreatedAt: gu.Ptr(e.CreatedAt()),
+				Code:      &e.Code.Crypted,
+				Expiry:    expiry,
+			},
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceHumanPasswordCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanPasswordCheckSucceededEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.HumanPasswordCheckSucceededType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.ResetFailedPasswordAttempts(),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceHumanPasswordCheckFailed(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanPasswordCheckFailedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.HumanPasswordCheckFailedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.IncrementFailedPasswordAttempts(),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceHumanPasswordHashUpdated(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanPasswordHashUpdatedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.HumanPasswordHashUpdatedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+
+		_, err := repo.SetPassword(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			&domain.VerificationTypeVerifiedValue{
+				Value:      e.EncodedHash,
+				VerifiedAt: gu.Ptr(e.CreatedAt()),
+			},
 		)
 		return err
 	}), nil
