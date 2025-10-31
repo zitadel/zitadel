@@ -73,6 +73,13 @@ func WithPermissionCheck(permission string) QueryOption {
 	}
 }
 
+// WithResultLock sets the lock mode for the query results.
+func WithResultLock(lock ResultLock) QueryOption {
+	return func(opts *QueryOpts) {
+		opts.Lock = lock
+	}
+}
+
 type joinType string
 
 const (
@@ -90,6 +97,29 @@ type OrderDirection uint8
 const (
 	OrderDirectionAsc OrderDirection = iota
 	OrderDirectionDesc
+)
+
+type ResultLock uint8
+
+const (
+	ResultLockNone ResultLock = iota
+	// ResultLockForUpdate locks the selected rows for update.
+	// Use this lock if you do not update the primary key of the selected rows.
+	// See [FOR NO KEY UPDATE](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS) for additional information.
+	// This prevents other transactions from modifying or deleting the rows
+	// until the current transaction is committed or rolled back.
+	ResultLockForUpdate
+	// ResultLockForPrimaryKeyUpdate locks the selected rows for update.
+	// Use this lock if you update the primary key of the selected rows.
+	// See [FOR UPDATE](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS) for additional information.
+	// This prevents other transactions from modifying or deleting the rows
+	// until the current transaction is committed or rolled back.
+	ResultLockForPrimaryKeyUpdate
+	// ResultLockForShare locks the selected rows for share.
+	// See [FOR SHARE](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS) for additional information.
+	// This prevents other transactions from modifying or deleting the rows
+	// until the current transaction is committed or rolled back.
+	ResultLockForShare
 )
 
 // QueryOpts holds the options for a query.
@@ -119,6 +149,8 @@ type QueryOpts struct {
 	// Permission required to read or write the resource.
 	// When unset, no permission check is made.
 	Permission string
+	// Lock defines if the results should be locked for update or share during the transaction.
+	Lock ResultLock
 }
 
 // Matches implements [gomock.Matcher].
@@ -184,6 +216,7 @@ func (opts *QueryOpts) Write(builder *StatementBuilder) {
 	opts.WriteOrderBy(builder)
 	opts.WriteLimit(builder)
 	opts.WriteOffset(builder)
+	opts.WriteLock(builder)
 }
 
 func (opts *QueryOpts) WriteCondition(builder *StatementBuilder) {
@@ -245,5 +278,20 @@ func (opts *QueryOpts) WriteLeftJoins(builder *StatementBuilder) {
 		builder.WriteString(join.table)
 		builder.WriteString(" ON ")
 		join.columns.Write(builder)
+	}
+}
+
+func (opts *QueryOpts) WriteLock(builder *StatementBuilder) {
+	switch opts.Lock {
+	case ResultLockForPrimaryKeyUpdate:
+		builder.WriteString(" FOR UPDATE")
+	case ResultLockForUpdate:
+		builder.WriteString(" FOR NO KEY UPDATE")
+	case ResultLockForShare:
+		builder.WriteString(" FOR SHARE")
+	case ResultLockNone:
+		fallthrough
+	default:
+		// no lock
 	}
 }
