@@ -2,6 +2,31 @@
   "$schema": "./node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "targets": {
+    "nx-release-publish": {
+      "description": "Uploads checksums for all released artifacts to the GitHub release and configures the org scope for GitHub Packages.",
+      "dependsOn": [
+        "@zitadel/api:nx-release-publish",
+        "@zitadel/login:nx-release-publish"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "parallel": false,
+        "commands": [
+          {
+            "forwardAllArgs": false,
+            "command": "cd .artifacts/pack && rm -f checksums.txt && sha256sum * > checksums.txt"
+          },
+          {
+            "forwardAllArgs": false,
+            "command": "bash -c \"[[ \\\"${NX_DRY_RUN}\\\" == \\\"true\\\" ]] || gh release upload ${ZITADEL_RELEASE_VERSION} .artifacts/pack/checksums.txt\""
+          },
+          {
+            "forwardAllArgs": false,
+            "command": "echo @${ZITADEL_RELEASE_GITHUB_ORG}:registry=https://npm.pkg.github.com >> ./.npmrc"
+          }
+        ]
+      }
+    },
     "db": {
       "continuous": true,
       "description": "Runs a local Postgres database for development",
@@ -15,28 +40,13 @@
         "@zitadel/console:clean"
       ]
     },
-    "pack": {
-        "description": "Creates package archives for the API across all platforms and for the Login component, then generates a checksums.txt file containing the SHA256 checksums for all created archives.",
-        "dependsOn": [
-            "@zitadel/api:pack-linux-*",
-            "@zitadel/api:pack-darwin-*",
-            "@zitadel/api:pack-windows-*",
-            "@zitadel/login:pack"
-        ],
-        "executor": "nx:run-commands",
-        "options": {
-            "parallel": false,
-            "commands": [
-                "sha256sum .artifacts/pack/zitadel-*.tar.gz > .artifacts/pack/checksums.txt"
-            ]
-        },
-        "cache": true,
-        "inputs": [
-            "{workspaceRoot}/.artifacts/pack/zitadel-*.tar.gz"
-        ],
-        "outputs": [
-            "{workspaceRoot}/.artifacts/pack/checksums.txt"
-        ]
-    }    
+    "local-npm-registry": {
+      "executor": "@nx/js:verdaccio",
+      "options": {
+        "port": 4873,
+        "config": ".verdaccio/config.yml",
+        "storage": ".artifacts/local-npm-registry/storage"
+      }
+    }
   }
 }

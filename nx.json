@@ -9,6 +9,39 @@
       "{projectRoot}/**/*"
     ]
   },
+  "release": {
+    "version": {
+      "conventionalCommits": true,
+      "git": {
+        "commit": false,
+        "stageChanges": false,
+        "tag": false
+      }
+    },
+    "projects": [
+      "@zitadel/api",
+      "@zitadel/login",
+      "@zitadel/proto",
+      "@zitadel/client",
+      "@zitadel/zitadel"
+    ],
+    "projectsRelationship": "fixed",
+    "changelog": {
+      "git": {
+        "commit": false,
+        "stageChanges": false,
+        "tag": false
+      },
+      "workspaceChangelog": {
+        "createRelease": "github",
+        "file": false,
+        "renderOptions": {
+          "authors": false,
+          "applyUsernameToAuthors": false
+        }
+      }
+    }
+  },
   "targetDefaults": {
     "generate": {
       "cache": true,
@@ -50,5 +83,21 @@
       ],
       "cache": true
     }
-  }
+  },
+  "plugins": [
+    {
+      "plugin": "@nx/js/typescript",
+      "options": {
+        "typecheck": {
+          "targetName": "typecheck"
+        },
+        "build": {
+          "targetName": "build",
+          "configName": "tsconfig.lib.json",
+          "buildDepsName": "build-deps",
+          "watchDepsName": "watch-deps"
+        }
+      }
+    }
+  ]
 }
