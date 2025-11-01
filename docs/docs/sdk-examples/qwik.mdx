@@ -1,0 +1,90 @@
+---
+title: Qwik
+sidebar_label: Qwik
+framework_url: https://qwik.dev
+auth_library: "@auth/core"
+auth_library_url: https://www.npmjs.com/package/@auth/core
+example_repo: https://github.com/zitadel/example-auth-qwik
+auth_flow: pkce
+status: stable
+---
+
+## Overview
+
+[Qwik](https://qwik.dev) is a framework for building resumable web applications with instant-on interactivity and optimal performance. This example demonstrates how to integrate **Zitadel** using the **[OAuth 2.0 PKCE flow](/docs/concepts/pkce)** to authenticate users securely and maintain sessions across the app.
+
+#### Auth library
+
+This example uses **[@auth/qwik](https://www.npmjs.com/package/@auth/qwik)**, a Qwik adapter for **[@auth/core](https://www.npmjs.com/package/@auth/core)** (formerly Auth.js/NextAuth.js), which implements the [OpenID Connect (OIDC)](https://zitadel.com/docs/apis/openidoauth/endpoints) flow, manages [PKCE](/docs/concepts/pkce), performs token exchange, and exposes helpers for [session state](https://zitadel.com/docs/concepts/sessions). The core library handles authentication across multiple frameworks and provides secure [token storage](https://zitadel.com/docs/concepts/tokens) with automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) capabilities.
+
+---
+
+## What this example demonstrates
+
+This [Qwik](https://qwik.dev) application showcases a complete authentication implementation using [ZITADEL](https://zitadel.com/docs) with the [Authorization Code Flow with PKCE](/docs/concepts/pkce). The example includes secure sign-in functionality that redirects users to ZITADEL's hosted login page, handles the OAuth callback to exchange authorization codes for [access tokens](https://zitadel.com/docs/concepts/tokens), and manages [sessions](https://zitadel.com/docs/concepts/sessions) with [JWT tokens](https://zitadel.com/docs/apis/openidoauth/endpoints#json-web-token-jwt-profile) stored in encrypted server-side cookies.
+
+Route protection is implemented using [Qwik City's](https://qwik.dev/docs/qwikcity) `onRequest` handler, which performs server-side authentication checks before rendering protected pages. Unauthenticated users attempting to access secured routes are automatically redirected to the login page with a callback URL to return them to their intended destination after successful authentication. The application displays comprehensive user profile information including standard [OIDC claims](https://zitadel.com/docs/apis/openidoauth/claims) like name and email, as well as ZITADEL-specific claims such as [organization membership](https://zitadel.com/docs/guides/manage/console/organizations) and [project roles](https://zitadel.com/docs/guides/manage/console/projects).
+
+Sign-out functionality implements **[federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)** through ZITADEL's end-session endpoint, ensuring that users are logged out from both the application and ZITADEL's [single sign-on session](https://zitadel.com/docs/concepts/sessions). The logout process includes [CSRF protection](https://zitadel.com/docs/guides/integrate/login/oidc/logout#csrf-protection) using state parameters validated through secure cookies, followed by proper cleanup of session data and redirection back to the application.
+
+---
+
+## Getting started
+
+### Prerequisites
+
+Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the **[PKCE Application Setup guide](/docs/guides/integrate/login/oidc/pkce-setup)** to:
+
+1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects)
+2. Configure it to use the [PKCE authentication method](/docs/concepts/pkce)
+3. Set up your redirect URIs (e.g., `http://localhost:3000/auth/callback/zitadel` for development)
+4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/api/auth/logout/callback`)
+5. Copy your **Client ID** for use in the next steps
+
+> **Note:** Make sure to enable **Dev Mode** in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
+
+### Run the example
+
+Once you have your [Zitadel application](https://zitadel.com/docs/guides/integrate/login/oidc/) configured:
+
+1. Clone the [repository](https://github.com/zitadel/example-auth-qwik).
+2. Create a `.env.local` file and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/overview):
+   ```
+   VITE_PORT=3000
+   VITE_SESSION_SECRET=your-very-secret-and-strong-session-key
+   VITE_SESSION_DURATION=3600
+   VITE_ZITADEL_DOMAIN=https://your-instance.zitadel.cloud
+   VITE_ZITADEL_CLIENT_ID=your_client_id_from_console
+   VITE_ZITADEL_CLIENT_SECRET=your-randomly-generated-client-secret
+   VITE_ZITADEL_CALLBACK_URL=http://localhost:3000/auth/callback/zitadel
+   VITE_ZITADEL_POST_LOGOUT_URL=http://localhost:3000/api/auth/logout/callback
+   ```
+   Replace these values with:
+	- Your actual Zitadel instance URL (the **Issuer** from your [application settings](https://zitadel.com/docs/guides/integrate/login/oidc/))
+	- The **Client ID** you copied when creating the application
+	- A randomly generated session secret (generate using: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
+	- A randomly generated client secret value (Auth.js requires this for internal configuration)
+	- The **redirect URI** you configured in the PKCE setup (must match exactly)
+	- The **post-logout redirect URI** you configured (must match exactly)
+3. Install dependencies using [npm](https://www.npmjs.com) and start the development server:
+   ```bash
+   npm install
+   npm run dev
+   ```
+
+The application will be available at `http://localhost:3000`.
+
+---
+
+## Learn more and resources
+
+* **Zitadel documentation:** [https://zitadel.com/docs](https://zitadel.com/docs)
+* **PKCE concept:** /docs/concepts/pkce
+* **PKCE application setup:** /docs/guides/integrate/login/oidc/pkce-setup
+* **Federated logout:** [https://zitadel.com/docs/guides/integrate/login/oidc/logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
+* **OIDC integration guide:** [https://zitadel.com/docs/guides/integrate/login/oidc/](https://zitadel.com/docs/guides/integrate/login/oidc/)
+* **Framework docs:** https://qwik.dev
+* **Auth library (@auth/core):** https://www.npmjs.com/package/@auth/core
+* **Qwik adapter (@auth/qwik):** https://www.npmjs.com/package/@auth/qwik
+* **Example repository:** https://github.com/zitadel/example-auth-qwik
+* **All framework examples:** /docs/examples

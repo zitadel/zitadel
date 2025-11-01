@@ -1,0 +1,86 @@
+---
+title: Fastify
+sidebar_label: Fastify
+framework_url: https://fastify.dev
+auth_library: "@auth/core"
+auth_library_url: https://www.npmjs.com/package/@auth/core
+example_repo: https://github.com/zitadel/example-auth-fastify
+auth_flow: pkce
+status: stable
+---
+
+## Overview
+
+[Fastify](https://fastify.dev) is a fast and low overhead web framework for Node.js, designed for building efficient server-side applications. This example demonstrates how to integrate **[ZITADEL](https://zitadel.com/docs)** using the **[OAuth 2.0 PKCE flow](/docs/concepts/pkce)** to authenticate users securely and maintain sessions across your application.
+
+#### Auth library
+
+This example uses **[@mridang/fastify-auth](https://www.npmjs.com/package/@mridang/fastify-auth)**, a [Fastify](https://fastify.dev) plugin that wraps **[@auth/core](https://www.npmjs.com/package/@auth/core)** (formerly Auth.js). The underlying [@auth/core](https://authjs.dev) library implements the [OpenID Connect (OIDC)](https://zitadel.com/docs/apis/openidoauth/endpoints) flow, manages [PKCE](/docs/concepts/pkce), performs secure token exchange, and provides session management helpers. This integration leverages the **[@auth/core/providers/zitadel](https://authjs.dev/reference/core/providers/zitadel)** provider specifically designed for ZITADEL authentication.
+
+---
+
+## What this example demonstrates
+
+This example shows a complete authentication implementation using [Fastify](https://fastify.dev) with [server-side rendering](https://fastify.dev) via [@fastify/view](https://www.npmjs.com/package/@fastify/view) and [Handlebars](https://handlebarsjs.com) templates. The application implements secure user authentication through [ZITADEL](https://zitadel.com/docs) using the industry-standard [PKCE flow](/docs/concepts/pkce), which prevents authorization code interception attacks without requiring client secrets.
+
+The example includes a custom sign-in page that initiates the [OAuth 2.0](https://zitadel.com/docs/guides/integrate/login/oidc/oauth-recommended-flows) authentication flow, automatic [callback handling](https://zitadel.com/docs/guides/integrate/login/oidc/) with secure [token exchange](https://zitadel.com/docs/apis/openidoauth/endpoints), and [JWT-based session management](https://zitadel.com/docs/concepts/tokens) with [@fastify/cookie](https://www.npmjs.com/package/@fastify/cookie). Protected routes use the `requireAuth` middleware to automatically redirect unauthenticated users to the sign-in flow, ensuring only authenticated users can access sensitive areas. The profile page displays comprehensive user information including [OIDC claims](https://zitadel.com/docs/apis/openidoauth/claims) and [session metadata](https://zitadel.com/docs/concepts/tokens).
+
+The application also demonstrates proper **[federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)** by terminating sessions both locally and with ZITADEL's [end-session endpoint](https://zitadel.com/docs/guides/integrate/login/oidc/logout), complete with CSRF protection using state parameters. Additionally, it includes automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/endpoints) using [refresh tokens](https://zitadel.com/docs/concepts/tokens) to maintain long-lived sessions without requiring users to re-authenticate. The example uses [ZITADEL-specific scopes](https://zitadel.com/docs/apis/openidoauth/scopes) like `urn:zitadel:iam:user:metadata` and `urn:zitadel:iam:org:projects:roles` to access extended user attributes and role information for implementing [role-based access control (RBAC)](https://zitadel.com/docs/guides/manage/console/roles).
+
+---
+
+## Getting started
+
+### Prerequisites
+
+Before running this example, you need to create and configure a PKCE application in the [ZITADEL Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the **[PKCE Application Setup guide](/docs/guides/integrate/login/oidc/pkce-setup)** to:
+
+1. Create a new Web application in your [ZITADEL project](https://zitadel.com/docs/guides/manage/console/projects)
+2. Configure it to use the [PKCE authentication method](/docs/concepts/pkce)
+3. Set up your redirect URIs (e.g., `http://localhost:3000/auth/callback` for development)
+4. Configure post-logout redirect URIs (e.g., `http://localhost:3000`)
+5. Copy your **Client ID** for use in the next steps
+6. Optionally enable [refresh tokens](https://zitadel.com/docs/concepts/tokens) in Token Settings for long-lived sessions
+
+> **Note:** Make sure to enable **Dev Mode** in the [ZITADEL Console](https://zitadel.com/docs/guides/manage/console/overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
+
+### Run the example
+
+Once you have your [ZITADEL application](https://zitadel.com/docs/guides/integrate/login/oidc/) configured:
+
+1. Clone the [repository](https://github.com/zitadel/example-auth-fastify).
+2. Create a `.env` file (copy from `.env.example`) and configure it with the values from your [ZITADEL application](https://zitadel.com/docs/guides/manage/console/overview). **Use these exact environment variable names:**
+   ```
+   NODE_ENV=development
+   PORT=3000
+   SESSION_SECRET=your-very-secret-and-strong-session-key
+   SESSION_DURATION=3600
+   ZITADEL_DOMAIN=https://your-zitadel-domain
+   ZITADEL_CLIENT_ID=your-zitadel-application-client-id
+   ZITADEL_CLIENT_SECRET=
+   ZITADEL_CALLBACK_URL=http://localhost:3000/auth/callback
+   ZITADEL_POST_LOGIN_URL=/profile
+   ZITADEL_POST_LOGOUT_URL=http://localhost:3000
+   ```
+   Replace these values with:
+	- Your actual [ZITADEL instance URL](https://zitadel.com/docs/guides/manage/console/overview) for `ZITADEL_DOMAIN` (the issuer)
+	- The **Client ID** you copied when creating the application for `ZITADEL_CLIENT_ID`
+	- The **redirect URI** you configured in the PKCE setup for `ZITADEL_CALLBACK_URL` (must match exactly)
+	- The **post-logout redirect URI** for `ZITADEL_POST_LOGOUT_URL`
+	- A strong random string for `SESSION_SECRET` (generate using: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
+3. Install dependencies using [npm](https://www.npmjs.com) with `npm install` and start the development server with `npm run dev` to verify the authentication flow end-to-end.
+
+---
+
+## Learn more and resources
+
+* **ZITADEL documentation:** [https://zitadel.com/docs](https://zitadel.com/docs)
+* **PKCE concept:** /docs/concepts/pkce
+* **PKCE application setup:** /docs/guides/integrate/login/oidc/pkce-setup
+* **Federated logout:** [https://zitadel.com/docs/guides/integrate/login/oidc/logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
+* **OIDC integration guide:** [https://zitadel.com/docs/guides/integrate/login/oidc/](https://zitadel.com/docs/guides/integrate/login/oidc/)
+* **Fastify documentation:** https://fastify.dev
+* **Auth.js (Auth/Core):** https://www.npmjs.com/package/@auth/core
+* **Fastify Auth plugin:** https://www.npmjs.com/package/@mridang/fastify-auth
+* **Example repository:** https://github.com/zitadel/example-auth-fastify
+* **All framework examples:** /docs/examples
