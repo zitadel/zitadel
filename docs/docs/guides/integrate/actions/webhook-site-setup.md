@@ -117,7 +117,7 @@ See [Set an execution](/apis/resources/action_service_v2/action-service-set-exec
 Here, `<TargetID returned>` is the `id` from the previous step.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
+curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/executions' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
