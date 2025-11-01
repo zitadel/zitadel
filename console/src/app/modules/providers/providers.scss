@@ -1,9 +1,11 @@
+@use 'sass:map';
+
 @mixin identity-provider-theme($theme) {
-  $is-dark-theme: map-get($theme, is-dark);
-  $background: map-get($theme, background);
-  $foreground: map-get($theme, foreground);
-  $button-text-color: map-get($foreground, text);
-  $button-disabled-text-color: map-get($foreground, disabled-button);
+  $is-dark-theme: map.get($theme, is-dark);
+  $background: map.get($theme, background);
+  $foreground: map.get($theme, foreground);
+  $button-text-color: map.get($foreground, text);
+  $button-disabled-text-color: map.get($foreground, disabled-button);
 
   .identity-provider-desc {
     font-size: 14px;
@@ -91,7 +93,7 @@
       box-sizing: border-box;
       border-radius: 0.5rem;
       margin-top: 0.5rem;
-      border: 1px solid map-get($foreground, divider);
+      border: 1px solid map.get($foreground, divider);
       display: flex;
       justify-content: center;
       align-items: center;

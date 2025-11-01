@@ -1,3 +1,5 @@
+@use 'sass:map';
+
 .change-header {
   display: flex;
   justify-content: space-between;
@@ -19,12 +21,12 @@
 }
 
 @mixin changes-theme($theme) {
-  $is-dark-theme: map-get($theme, is-dark);
-  $foreground: map-get($theme, foreground);
-  $secondary-text: map-get($foreground, secondary-text);
+  $is-dark-theme: map.get($theme, is-dark);
+  $foreground: map.get($theme, foreground);
+  $secondary-text: map.get($foreground, secondary-text);
 
   .scroll-container {
-    border-bottom: 1px solid map-get($foreground, divider);
+    border-bottom: 1px solid map.get($foreground, divider);
     margin-bottom: 0.5rem;
     box-sizing: border-box;
 

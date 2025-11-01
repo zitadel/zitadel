@@ -1,3 +1,5 @@
+@use 'sass:map';
+
 .keyboard-shortcuts {
   padding: 1.5rem;
   border-radius: 6px !important;
@@ -88,15 +90,15 @@
 }
 
 @mixin keyboard-shortcuts-theme($theme) {
-  $primary: map-get($theme, primary);
-  $background: map-get($theme, background);
-  $foreground: map-get($theme, foreground);
-  $text-color: map-get($foreground, text);
-  $accent: map-get($theme, accent);
-  $is-dark-theme: map-get($theme, is-dark);
-  $accent-color: map-get($primary, 500);
-  $back: map-get($background, background);
-  $card-background-color: map-get($background, cards);
+  $primary: map.get($theme, primary);
+  $background: map.get($theme, background);
+  $foreground: map.get($theme, foreground);
+  $text-color: map.get($foreground, text);
+  $accent: map.get($theme, accent);
+  $is-dark-theme: map.get($theme, is-dark);
+  $accent-color: map.get($primary, 500);
+  $back: map.get($background, background);
+  $card-background-color: map.get($background, cards);
 
   .keyboard-shortcuts {
     .title {
@@ -120,7 +122,7 @@
             }
           }
           &:not(:last-child) {
-            border-bottom: 1px solid map-get($foreground, dividers);
+            border-bottom: 1px solid map.get($foreground, dividers);
           }
         }
       }

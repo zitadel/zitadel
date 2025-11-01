@@ -1,11 +1,12 @@
 @use '@angular/material' as mat;
+@use 'sass:map';
 
 @mixin smtp-settings-theme($theme) {
-  $primary: map-get($theme, primary);
+  $primary: map.get($theme, primary);
   $primary-color: mat.m2-get-color-from-palette($primary, 500);
-  $is-dark-theme: map-get($theme, is-dark);
-  $background: map-get($theme, background);
-  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map.get($theme, is-dark);
+  $background: map.get($theme, background);
+  $foreground: map.get($theme, foreground);
 
   .cnsl-smtp-table-wrapper {
     display: block;
@@ -45,7 +46,7 @@
       box-sizing: border-box;
       transition: box-shadow 0.1s ease-in;
       align-items: center;
-      color: map-get($foreground, text);
+      color: map.get($foreground, text);
 
       .coming-soon-label {
         position: absolute;

@@ -1,0 +1,10 @@
+@if (activeUser.data(); as average) {
+  {{ average }}
+}
+
+<mat-date-range-input [rangePicker]="picker">
+  <input matStartDate placeholder="Start date" [formControl]="form.controls.start">
+  <input matEndDate placeholder="End date" [formControl]="form.controls.end">
+</mat-date-range-input>
+<mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+<mat-date-range-picker #picker></mat-date-range-picker>
