@@ -179,6 +179,16 @@ func Test_userInfoToOIDC(t *testing.T) {
 		Name:          "orgName",
 		PrimaryDomain: "orgDomain",
 	}
+	userGroups := []query.UserInfoUserGroup{
+		{
+			Name: "group1",
+			ID:   "group1-id",
+		},
+		{
+			Name: "group2",
+			ID:   "group2-id",
+		},
+	}
 	humanUserInfo := &query.OIDCUserInfo{
 		User: &query.User{
 			ID:                 "human1",
@@ -226,6 +236,7 @@ func Test_userInfoToOIDC(t *testing.T) {
 				UserResourceOwner: "org1",
 			},
 		},
+		UserGroups: userGroups,
 	}
 	machineUserInfo := &query.OIDCUserInfo{
 		User: &query.User{
@@ -500,6 +511,28 @@ func Test_userInfoToOIDC(t *testing.T) {
 					ClaimResourceOwnerID:            "orgID",
 					ClaimResourceOwnerName:          "orgName",
 					ClaimResourceOwnerPrimaryDomain: "orgDomain",
+				},
+			},
+		},
+		{
+			name: "human, scope user groups, found",
+			args: args{
+				user:  humanUserInfo,
+				scope: []string{ScopeUserGroups},
+			},
+			want: &oidc.UserInfo{
+				Subject: "human1",
+				Claims: map[string]any{
+					ClaimUserGroups: []query.UserInfoUserGroup{
+						{
+							Name: "group1",
+							ID:   "group1-id",
+						},
+						{
+							Name: "group2",
+							ID:   "group2-id",
+						},
+					},
 				},
 			},
 		},

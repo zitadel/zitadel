@@ -190,6 +190,8 @@ func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []st
 			setUserInfoMetadata(user.Metadata, out)
 		case ScopeResourceOwner:
 			setUserInfoOrgClaims(user, out)
+		case ScopeUserGroups:
+			setUserInfoUserGroups(user.UserGroups, out)
 		default:
 			if claim, ok := strings.CutPrefix(s, domain.OrgDomainPrimaryScope); ok {
 				out.AppendClaims(domain.OrgDomainPrimaryClaim, claim)
@@ -285,6 +287,13 @@ func setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
 			userInfo.AppendClaims(fmt.Sprintf(ClaimProjectRolesFormat, projectID), roles)
 		}
 	}
+}
+
+func setUserInfoUserGroups(userGroups []query.UserInfoUserGroup, out *oidc.UserInfo) {
+	if len(userGroups) == 0 {
+		return
+	}
+	out.AppendClaims(ClaimUserGroups, userGroups)
 }
 
 //nolint:gocognit

@@ -32,6 +32,8 @@ const (
 	ClaimResourceOwnerName          = ScopeResourceOwner + ":name"
 	ClaimResourceOwnerPrimaryDomain = ScopeResourceOwner + ":primary_domain"
 	ClaimActionLogFormat            = "urn:zitadel:iam:action:%s:log"
+	ScopeUserGroups                 = "urn:zitadel:iam:user:groups"
+	ClaimUserGroups                 = ScopeUserGroups
 
 	oidcCtx = "oidc"
 )
