@@ -1,0 +1,84 @@
+.title {
+  font-size: 1.2rem;
+  margin-top: 0;
+}
+
+.description {
+  margin-bottom: 1rem;
+  color: var(--theme-text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.action {
+  display: flex;
+  justify-content: flex-end;
+
+  .ok-button {
+    margin-left: 0.5rem;
+  }
+}
+
+.row {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+
+  .left,
+  .right {
+    font-size: 14px;
+    flex: 1 0 auto;
+  }
+
+  .left {
+    margin-right: 1rem;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .right {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+.copy-button {
+  flex-shrink: 0;
+  transition: color 0.3s ease;
+
+  &:disabled {
+    color: var(--theme-success) !important;
+  }
+}
+
+.signing-key-text {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.75rem;
+  word-break: break-all;
+  white-space: pre-wrap;
+  color: var(--theme-text-primary);
+  background: transparent;
+  flex: 1;
+  padding: 0.25rem 0;
+}
+
+// Responsive design
+@media (max-width: 600px) {
+  .signing-key-text {
+    font-size: 0.6875rem;
+  }
+
+  .row .right {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .copy-button {
+    align-self: flex-end;
+  }
+}
