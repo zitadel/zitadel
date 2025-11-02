@@ -1083,6 +1083,7 @@ func (s *settings) CheckMandatoryCondtions(condition database.Condition) error {
 		return database.NewMissingConditionError(s.InstanceIDColumn())
 	}
 	if !condition.IsRestrictingColumn(s.OrgIDColumn()) {
+		fmt.Println("\033[45m[DBUGPRINT]\033[0m[:1]\033[45m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m errror")
 		return database.NewMissingConditionError(s.OrgIDColumn())
 	}
 	if !condition.IsRestrictingColumn(s.TypeColumn()) {
