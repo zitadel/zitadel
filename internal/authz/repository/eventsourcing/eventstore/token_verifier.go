@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
@@ -177,6 +178,7 @@ func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMeth
 	if len(authMethods) == 0 {
 		return zerrors.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "authentication required")
 	}
+	// if the user has MFA, we don't need to check any mfa requirements
 	if domain.HasMFA(authMethods) {
 		return nil
 	}
@@ -184,17 +186,36 @@ func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMeth
 	if err != nil {
 		return err
 	}
+	// machine users do not have interactive logins, so we don't check for MFA requirements
 	if requirements.UserType == domain.UserTypeMachine {
 		return nil
 	}
-	if domain.RequiresMFA(
-		requirements.ForceMFA,
-		requirements.ForceMFALocalOnly,
-		!hasIDPAuthentication(authMethods),
-	) {
+	// we'll only require 2FA factors, that are allowed by the policy
+	allowedFactors := allowed2FAFactors(requirements.AllowedSecondFactors, requirements.SetUpFactors)
+	// if either the user has set up a factor that is allowed by the policy
+	// or the policy requires MFA, we'll require it and can directly return the error
+	// since the token/session was not authenticated with MFA
+	if domain.Has2FA(allowedFactors) ||
+		domain.RequiresMFA(
+			requirements.ForceMFA,
+			requirements.ForceMFALocalOnly,
+			!hasIDPAuthentication(authMethods),
+		) {
 		return zerrors.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "mfa required")
 	}
 	return nil
+}
+
+func allowed2FAFactors(factors []domain.SecondFactorType, authMethods []domain.UserAuthMethodType) []domain.UserAuthMethodType {
+	allowedFactors := make([]domain.UserAuthMethodType, 0, len(factors))
+	for _, method := range authMethods {
+		factorType := domain.AuthMethodToSecondFactor(method)
+		if factorType != domain.SecondFactorTypeUnspecified &&
+			slices.Contains(factors, factorType) {
+			allowedFactors = append(allowedFactors, method)
+		}
+	}
+	return allowedFactors
 }
 
 func hasIDPAuthentication(authMethods []domain.UserAuthMethodType) bool {
