@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/url"
 	"time"
 
@@ -161,83 +162,87 @@ type loginSettings struct {
 // -------------------------------------------------------------
 
 func (l loginSettings) SetAllowUserNamePasswordField(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{allowUsernamePassword}'", value)
+	return db_json.NewFieldChange([]string{"allowUsernamePassword"}, value)
 }
 
 func (l loginSettings) SetAllowRegisterField(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{allowRegister}'", value)
+	return db_json.NewFieldChange([]string{"allowRegister"}, value)
 }
 
 func (l loginSettings) SetAllowExternalIDPField(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{allowExternalIdp}'", value)
+	return db_json.NewFieldChange([]string{"allowExternalIdp"}, value)
 }
 
 func (l loginSettings) SetForceMFAField(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{forceMfa}'", value)
+	return db_json.NewFieldChange([]string{"forceMfa"}, value)
 }
 
 func (l loginSettings) SetForceMFALocalOnlyField(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{forceMFALocalOnly}'", value)
+	return db_json.NewFieldChange([]string{"forceMFALocalOnly"}, value)
 }
 
 func (l loginSettings) SetHidePasswordResetField(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{hidePasswordReset}'", value)
+	return db_json.NewFieldChange([]string{"hidePasswordReset"}, value)
 }
 
 func (l loginSettings) SetIgnoreUnknownUsernamesField(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{ignoreUnknownUsernames}'", value)
+	return db_json.NewFieldChange([]string{"ignoreUnknownUsernames"}, value)
 }
 
 func (l loginSettings) SetAllowDomainDiscoveryField(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{allowDomainDiscovery}'", value)
+	return db_json.NewFieldChange([]string{"allowDomainDiscovery"}, value)
 }
 
 func (l loginSettings) SetDisableLoginWithEmailField(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{disableLoginWithEmail}'", value)
+	return db_json.NewFieldChange([]string{"disableLoginWithEmail"}, value)
 }
 
 func (l loginSettings) SetDisableLoginWithPhoneField(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{disableLoginWithPhone}'", value)
+	return db_json.NewFieldChange([]string{"disableLoginWithPhone"}, value)
 }
 
 func (l loginSettings) SetPasswordlessTypeField(value domain.PasswordlessType) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{passwordlessType}'", value)
+	return db_json.NewFieldChange([]string{"passwordlessType"}, value)
 }
 
 func (l loginSettings) SetDefaultRedirectURIField(value string) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{defaultRedirectUri}'", value)
+	return db_json.NewFieldChange([]string{"defaultRedirectUri"}, value)
 }
 
 func (l loginSettings) SetPasswordCheckLifetimeField(value time.Duration) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{passwordCheckLifetime}'", value)
+	return db_json.NewFieldChange([]string{"passwordCheckLifetime"}, value)
 }
 
 func (l loginSettings) SetExternalLoginCheckLifetimeField(value time.Duration) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{externalLoginCheckLifetime}'", value)
+	return db_json.NewFieldChange([]string{"externalLoginCheckLifetime"}, value)
 }
 
 func (l loginSettings) SetMFAInitSkipLifetimeField(value time.Duration) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{mfaInitSkipLifetime}'", value)
+	return db_json.NewFieldChange([]string{"mfaInitSkipLifetime"}, value)
 }
 
 func (l loginSettings) SetSecondFactorCheckLifetimeField(value time.Duration) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{secondFactorCheckLifetime}'", value)
+	return db_json.NewFieldChange([]string{"secondFactorCheckLifetime"}, value)
 }
 
 func (l loginSettings) SetMultiFactorCheckLifetimeField(value time.Duration) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{multiFactorCheckLifetime}'", value)
+	return db_json.NewFieldChange([]string{"multiFactorCheckLifetime"}, value)
 }
 
-func (l loginSettings) AddMFAType(value domain.MultiFactorType) db_json.JsonUpdate {
-	return db_json.NewArrayChange("mfaType", value, false)
+func (l loginSettings) AddMFAType(value domain.MultiFactorType) []db_json.JsonUpdate {
+	return db_json.NewArrayChange([]string{"mfaType"}, value, false)
 }
 
-func (l loginSettings) RemoveMFAType(value domain.MultiFactorType) db_json.JsonUpdate {
-	return db_json.NewArrayChange("mfaType", value, true)
+func (l loginSettings) RemoveMFAType(value domain.MultiFactorType) []db_json.JsonUpdate {
+	return db_json.NewArrayChange([]string{"mfaType"}, value, true)
 }
 
-func (l loginSettings) SetSecondFactorTypesField(value []domain.SecondFactorType) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{secondFactors}'", value)
+func (l loginSettings) AddSecondFactorTypesField(value domain.SecondFactorType) []db_json.JsonUpdate {
+	return db_json.NewArrayChange([]string{"secondFactors"}, value, false)
+}
+
+func (l loginSettings) RemoveSecondFactorTypesField(value domain.SecondFactorType) []db_json.JsonUpdate {
+	return db_json.NewArrayChange([]string{"secondFactors"}, value, true)
 }
 
 func LoginRepository() domain.LoginRepository {
@@ -287,71 +292,71 @@ type labelSettings struct {
 // -------------------------------------------------------------
 
 func (l labelSettings) SetPrimaryColorField(value string) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{primaryColor}'", value)
+	return db_json.NewFieldChange([]string{"primaryColor"}, value)
 }
 
 func (l labelSettings) SetBackgroundColorField(value string) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{backgroundColor}'", value)
+	return db_json.NewFieldChange([]string{"backgroundColor"}, value)
 }
 
 func (l labelSettings) SetWarnColorField(value string) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{warnColor}'", value)
+	return db_json.NewFieldChange([]string{"warnColor"}, value)
 }
 
 func (l labelSettings) SetFontColorField(value string) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{fontColor}'", value)
+	return db_json.NewFieldChange([]string{"fontColor"}, value)
 }
 
 func (l labelSettings) SetPrimaryColorDarkField(value string) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{primaryColorDark}'", value)
+	return db_json.NewFieldChange([]string{"primaryColorDark"}, value)
 }
 
 func (l labelSettings) SetBackgroundColorDarkField(value string) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{backgroundColorDark}'", value)
+	return db_json.NewFieldChange([]string{"backgroundColorDark"}, value)
 }
 
 func (l labelSettings) SetWarnColorDarkField(value string) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{warnColorDark}'", value)
+	return db_json.NewFieldChange([]string{"warnColorDark"}, value)
 }
 
 func (l labelSettings) SetFontColorDarkField(value string) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{fontColorDark}'", value)
+	return db_json.NewFieldChange([]string{"fontColorDark"}, value)
 }
 
 func (l labelSettings) SetHideLoginNameSuffixField(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{hideLoginNameSuffix}'", value)
+	return db_json.NewFieldChange([]string{"hideLoginNameSuffix"}, value)
 }
 
 func (l labelSettings) SetErrorMsgPopupField(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{errorMsgPopup}'", value)
+	return db_json.NewFieldChange([]string{"errorMsgPopup"}, value)
 }
 
 func (l labelSettings) SetDisableWatermarkField(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{disableMsgPopup}'", value)
+	return db_json.NewFieldChange([]string{"disableMsgPopup"}, value)
 }
 
 func (l labelSettings) SetThemeModeField(value domain.LabelPolicyThemeMode) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{themeMode}'", value)
+	return db_json.NewFieldChange([]string{"themeMode"}, value)
 }
 
 func (l labelSettings) SetLabelPolicyLightLogoURL(value *url.URL) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{labelPolicyLightLogoURL}'", value)
+	return db_json.NewFieldChange([]string{"labelPolicyLightLogoURL"}, value)
 }
 
 func (l labelSettings) SetLabelPolicyDarkLogoURL(value *url.URL) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{labelPolicyDarkLogoURL}'", value)
+	return db_json.NewFieldChange([]string{"labelPolicyDarkLogoURL"}, value)
 }
 
 func (l labelSettings) SetLabelPolicyLightIconURL(value *url.URL) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{labelPolicyLightIconURL}'", value)
+	return db_json.NewFieldChange([]string{"labelPolicyLightIconURL"}, value)
 }
 
 func (l labelSettings) SetLabelPolicyDarkIconURL(value *url.URL) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{labelPolicyDarkIconURL}'", value)
+	return db_json.NewFieldChange([]string{"labelPolicyDarkIconURL"}, value)
 }
 
 func (l labelSettings) SetLabelPolicyFontURL(value *url.URL) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{labelPolicyLightFontURL}'", value)
+	return db_json.NewFieldChange([]string{"labelPolicyLightFontURL"}, value)
 }
 
 func LabelRepository() domain.LabelRepository {
@@ -395,6 +400,7 @@ func (s *labelSettings) Update(ctx context.Context, client database.QueryExecuto
 	builder.WriteString(`UPDATE zitadel.settings SET `)
 	database.Changes(changes).Write(&builder)
 	writeCondition(&builder, condition)
+	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m builder.String() = %+v\n", builder.String())
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
@@ -554,23 +560,23 @@ type passwordComplexitySettings struct {
 // -------------------------------------------------------------
 
 func (l passwordComplexitySettings) SetMinLengthField(value uint64) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{minLength}'", value)
+	return db_json.NewFieldChange([]string{"minLength"}, value)
 }
 
 func (l passwordComplexitySettings) SetHasLowercaseField(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{hasLowercase}'", value)
+	return db_json.NewFieldChange([]string{"hasLowercase"}, value)
 }
 
 func (l passwordComplexitySettings) SetHasUppercaseField(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{hasUppercase}'", value)
+	return db_json.NewFieldChange([]string{"hasUppercase"}, value)
 }
 
 func (l passwordComplexitySettings) SetHasNumberField(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{hasNumber}'", value)
+	return db_json.NewFieldChange([]string{"hasNumber"}, value)
 }
 
 func (l passwordComplexitySettings) SetHasSymbolField(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{hasSymbol}'", value)
+	return db_json.NewFieldChange([]string{"hasSymbol"}, value)
 }
 
 func PasswordComplexityRepository() domain.PasswordComplexityRepository {
@@ -620,11 +626,11 @@ type passwordExpirySettings struct {
 }
 
 func (l passwordExpirySettings) SetExpireWarnDays(value uint64) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{expireWarnDays}'", value)
+	return db_json.NewFieldChange([]string{"expireWarnDays"}, value)
 }
 
 func (l passwordExpirySettings) SetMaxAgeDays(value uint64) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{maxAgeDays}'", value)
+	return db_json.NewFieldChange([]string{"maxAgeDays"}, value)
 }
 
 func PasswordExpiryRepository() domain.PasswordExpiryRepository {
@@ -674,15 +680,15 @@ type lockoutSettings struct {
 }
 
 func (l lockoutSettings) SetMaxPasswordAttempts(value uint64) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{maxPasswordAttempts}'", value)
+	return db_json.NewFieldChange([]string{"maxPasswordAttempts"}, value)
 }
 
 func (l lockoutSettings) SetMaxOTPAttempts(value uint64) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{maxOtpAttempts}'", value)
+	return db_json.NewFieldChange([]string{"maxOtpAttempts"}, value)
 }
 
 func (l lockoutSettings) SetShowLockOutFailures(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{showLockOutFailures}'", value)
+	return db_json.NewFieldChange([]string{"showLockOutFailures"}, value)
 }
 
 func LockoutRepository() domain.LockoutRepository {
@@ -732,19 +738,19 @@ type securitySettings struct {
 }
 
 func (l securitySettings) SetEnabled(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{enabled}'", value)
+	return db_json.NewFieldChange([]string{"enabled"}, value)
 }
 
 func (l securitySettings) SetEnableIframeEmbedding(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{enableIframe_embedding}'", value)
+	return db_json.NewFieldChange([]string{"enableIframe_embedding"}, value)
 }
 
 func (l securitySettings) SetAllowedOrigins(value []string) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{allowedOrigins}'", value)
+	return db_json.NewFieldChange([]string{"allowedOrigins"}, value)
 }
 
 func (l securitySettings) SetEnableImpersonation(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{enableImpersonation}'", value)
+	return db_json.NewFieldChange([]string{"enableImpersonation"}, value)
 }
 
 func SecurityRepository() domain.SecurityRepository {
@@ -823,15 +829,15 @@ type domainSettings struct {
 }
 
 func (l domainSettings) SetUserLoginMustBeDomain(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{userLoginMustBeDomain}'", value)
+	return db_json.NewFieldChange([]string{"userLoginMustBeDomain"}, value)
 }
 
 func (l domainSettings) SetValidateOrgDomains(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{validateOrgDomains}'", value)
+	return db_json.NewFieldChange([]string{"validateOrgDomains"}, value)
 }
 
 func (l domainSettings) SetSMTPSenderAddressMatchesInstanceDomain(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{smtpSenderAddressMatchesInstanceDomain}'", value)
+	return db_json.NewFieldChange([]string{"smtpSenderAddressMatchesInstanceDomain"}, value)
 }
 
 func DomainRepository() domain.DomainRepository {
@@ -881,7 +887,7 @@ type organizationSettings struct {
 }
 
 func (l organizationSettings) SetOrganizationScopedUsernames(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange("'{organizationScopedUsernames}'", value)
+	return db_json.NewFieldChange([]string{"organizationScopedUsernames"}, value)
 }
 
 func OrganizationSettingRepository() domain.OrganizationSettingRepository {
@@ -967,6 +973,7 @@ func (s *settings) Update(ctx context.Context, client database.QueryExecutor, co
 		return 0, err
 	}
 	writeCondition(&builder, condition)
+	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m builder.String() = %+v\n", builder.String())
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }

@@ -139,166 +139,194 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	// t.Run("test added/remove login multifactor type reduces", func(t *testing.T) {
-	// 	ctx := t.Context()
-	// 	newInstance := integration.NewInstance(t.Context())
+	t.Run("test added/remove login multifactor type reduces", func(t *testing.T) {
+		ctx := t.Context()
+		newInstance := integration.NewInstance(t.Context())
 
-	// 	IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-	// 	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> newInstance.ID() = %+v\n", newInstance.ID())
+		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 
-	// 	// check inital MFAType value
-	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		// setting, err := loginRepo.Get(
-	// 		// 	ctx, pool,
-	// 		// 	newInstance.ID(),
-	// 		// 	nil)
-	// 		setting, err := settingsRepo.Get(
-	// 			ctx, pool,
-	// 			database.WithCondition(
-	// 				database.And(
-	// 					settingsRepo.InstanceIDCondition(newInstance.ID()),
-	// 					settingsRepo.OrgIDCondition(nil),
-	// 					settingsRepo.TypeCondition(domain.SettingTypeLogin),
-	// 					settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
-	// 				),
-	// 			),
-	// 		)
-	// 		require.NoError(t, err)
+		// check inital MFAType value
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			// setting, err := loginRepo.Get(
+			// 	ctx, pool,
+			// 	newInstance.ID(),
+			// 	nil)
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypeLogin),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 		assert.Equal(t, []domain.MultiFactorType{domain.MultiFactorType(policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION)}, setting.Settings.MFAType)
-	// 	}, retryDuration, tick)
+			assert.Equal(t, []domain.MultiFactorType{domain.MultiFactorType(policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION)}, setting.Settings.MFAType)
+		}, retryDuration, tick)
 
-	// 	// remove MFAType
-	// 	_, err := newInstance.Client.Admin.RemoveMultiFactorFromLoginPolicy(IAMCTX, &admin.RemoveMultiFactorFromLoginPolicyRequest{
-	// 		Type: policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION,
-	// 	})
-	// 	require.NoError(t, err)
+		// remove MFAType
+		_, err := newInstance.Client.Admin.RemoveMultiFactorFromLoginPolicy(IAMCTX, &admin.RemoveMultiFactorFromLoginPolicyRequest{
+			Type: policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION,
+		})
+		require.NoError(t, err)
 
-	// 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		// setting, err := loginRepo.Get(
-	// 		// 	ctx, pool,
-	// 		// 	newInstance.ID(),
-	// 		// 	nil)
-	// 		setting, err := settingsRepo.Get(
-	// 			ctx, pool,
-	// 			database.WithCondition(
-	// 				database.And(
-	// 					settingsRepo.InstanceIDCondition(newInstance.ID()),
-	// 					settingsRepo.OrgIDCondition(nil),
-	// 					settingsRepo.TypeCondition(domain.SettingTypeLogin),
-	// 					settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
-	// 				),
-	// 			),
-	// 		)
-	// 		require.NoError(t, err)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			// setting, err := loginRepo.Get(
+			// 	ctx, pool,
+			// 	newInstance.ID(),
+			// 	nil)
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypeLogin),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 		// event instance.policy.login.multifactor.remove
-	// 		assert.Equal(t, []domain.MultiFactorType{}, setting.Settings.MFAType)
-	// 	}, retryDuration, tick)
+			// event instance.policy.login.multifactor.remove
+			assert.Equal(t, []domain.MultiFactorType{}, setting.Settings.MFAType)
+		}, retryDuration, tick)
 
-	// 	before := time.Now()
-	// 	_, err = newInstance.Client.Admin.AddMultiFactorToLoginPolicy(IAMCTX, &admin.AddMultiFactorToLoginPolicyRequest{
-	// 		Type: policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION,
-	// 	})
-	// 	require.NoError(t, err)
-	// 	after := time.Now()
+		before := time.Now()
+		_, err = newInstance.Client.Admin.AddMultiFactorToLoginPolicy(IAMCTX, &admin.AddMultiFactorToLoginPolicyRequest{
+			Type: policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION,
+		})
+		require.NoError(t, err)
+		after := time.Now()
 
-	// 	// add MFAType
-	// 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		// setting, err := loginRepo.Get(
-	// 		// 	ctx, pool,
-	// 		// 	newInstance.ID(),
-	// 		// 	nil)
-	// 		setting, err := settingsRepo.Get(
-	// 			ctx, pool,
-	// 			database.WithCondition(
-	// 				database.And(
-	// 					settingsRepo.InstanceIDCondition(newInstance.ID()),
-	// 					settingsRepo.OrgIDCondition(nil),
-	// 					settingsRepo.TypeCondition(domain.SettingTypeLogin),
-	// 					settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
-	// 				),
-	// 			),
-	// 		)
-	// 		require.NoError(t, err)
+		// add MFAType
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			// setting, err := loginRepo.Get(
+			// 	ctx, pool,
+			// 	newInstance.ID(),
+			// 	nil)
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypeLogin),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 		// event instance.policy.login.multifactor.added
-	// 		assert.Equal(t, []domain.MultiFactorType{domain.MultiFactorType(policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION)}, setting.Settings.MFAType)
-	// 		assert.WithinRange(t, *setting.UpdatedAt, before, after)
-	// 	}, retryDuration, tick)
-	// })
+			// event instance.policy.login.multifactor.added
+			assert.Equal(t, []domain.MultiFactorType{domain.MultiFactorType(policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION)}, setting.Settings.MFAType)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
 
-	// t.Run("test added/removed second multifactor reduces", func(t *testing.T) {
-	// 	ctx := t.Context()
-	// 	before := time.Now()
-	// 	newInstance := integration.NewInstance(t.Context())
+	t.Run("test added/removed second multifactor reduces", func(t *testing.T) {
+		ctx := t.Context()
+		before := time.Now()
+		newInstance := integration.NewInstance(t.Context())
 
-	// 	IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 
-	// 	// get current second factor types
-	// 	var secondFactorTypes []domain.SecondFactorType
-	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		setting, err := loginRepo.Get(
-	// 			ctx, pool,
-	// 			newInstance.ID(),
-	// 			nil)
-	// 		require.NoError(t, err)
+		// get current second factor types
+		var secondFactorTypes []domain.SecondFactorType
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypeLogin),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 		secondFactorTypes = setting.Settings.SecondFactorTypes
-	// 	}, retryDuration, tick)
+			secondFactorTypes = setting.Settings.SecondFactorTypes
+		}, retryDuration, tick)
 
-	// 	// add new second factor type
-	// 	before = time.Now()
-	// 	_, err := newInstance.Client.Admin.AddSecondFactorToLoginPolicy(IAMCTX, &admin.AddSecondFactorToLoginPolicyRequest{
-	// 		Type: policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS,
-	// 	})
-	// 	require.NoError(t, err)
-	// 	after := time.Now()
+		// add new second factor type
+		before = time.Now()
+		_, err := newInstance.Client.Admin.AddSecondFactorToLoginPolicy(IAMCTX, &admin.AddSecondFactorToLoginPolicyRequest{
+			Type: policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS,
+		})
+		require.NoError(t, err)
+		after := time.Now()
 
-	// 	secondFactorTypes = append(secondFactorTypes, domain.SecondFactorType(policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS))
+		secondFactorTypes = append(secondFactorTypes, domain.SecondFactorType(policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS))
 
-	// 	// check new second factor type is added
-	// 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		setting, err := loginRepo.Get(
-	// 			ctx, pool,
-	// 			newInstance.ID(),
-	// 			nil)
-	// 		require.NoError(t, err)
+		// check new second factor type is added
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			// setting, err := loginRepo.Get(
+			// 	ctx, pool,
+			// 	newInstance.ID(),
+			// 	nil)
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypeLogin),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 		// event instance.policy.login.multifactor.secondfactor.added
-	// 		assert.Equal(t, secondFactorTypes, setting.Settings.SecondFactorTypes)
-	// 		assert.WithinRange(t, *setting.UpdatedAt, before, after)
-	// 	}, retryDuration, tick)
+			// event instance.policy.login.multifactor.secondfactor.added
+			assert.Equal(t, secondFactorTypes, setting.Settings.SecondFactorTypes)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
 
-	// 	// remove second factor type
-	// 	before = time.Now()
-	// 	_, err = newInstance.Client.Admin.RemoveSecondFactorFromLoginPolicy(IAMCTX, &admin.RemoveSecondFactorFromLoginPolicyRequest{
-	// 		Type: policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS,
-	// 	})
-	// 	require.NoError(t, err)
-	// 	after = time.Now()
+		// remove second factor type
+		before = time.Now()
+		_, err = newInstance.Client.Admin.RemoveSecondFactorFromLoginPolicy(IAMCTX, &admin.RemoveSecondFactorFromLoginPolicyRequest{
+			Type: policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS,
+		})
+		require.NoError(t, err)
+		after = time.Now()
 
-	// 	secondFactorTypes = secondFactorTypes[0 : len(secondFactorTypes)-1]
+		secondFactorTypes = secondFactorTypes[0 : len(secondFactorTypes)-1]
 
-	// 	// check new second factor type is removed
-	// 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		setting, err := loginRepo.Get(
-	// 			ctx, pool,
-	// 			newInstance.ID(),
-	// 			nil)
-	// 		require.NoError(t, err)
+		// check new second factor type is removed
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			// setting, err := loginRepo.Get(
+			// 	ctx, pool,
+			// 	newInstance.ID(),
+			// 	nil)
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(nil),
+						settingsRepo.TypeCondition(domain.SettingTypeLogin),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeInstance),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 		// event instance.policy.login.multifactor.secondfactor.removed
-	// 		assert.Equal(t, secondFactorTypes, setting.Settings.SecondFactorTypes)
-	// 		assert.WithinRange(t, *setting.UpdatedAt, before, after)
-	// 	}, retryDuration, tick)
-	// })
+			// event instance.policy.login.multifactor.secondfactor.removed
+			assert.Equal(t, secondFactorTypes, setting.Settings.SecondFactorTypes)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
 
 	t.Run("test delete instance reduces", func(t *testing.T) {
 		ctx := t.Context()

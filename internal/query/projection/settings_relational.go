@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
-	"slices"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -69,15 +68,15 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  org.LoginPolicyRemovedEventType,
 					Reduce: s.reduceLoginPolicyRemoved,
 				},
-				// 		{
-				// 			Event:  org.LoginPolicySecondFactorAddedEventType,
-				// 			Reduce: s.reduceSecondFactorAdded,
-				// 		},
-				// 		{
-				// 			Event:  org.LoginPolicySecondFactorRemovedEventType,
-				// 			Reduce: s.reduceSecondFactorRemoved,
-				// 		},
-				// 		// label
+				{
+					Event:  org.LoginPolicySecondFactorAddedEventType,
+					Reduce: s.reduceSecondFactorAdded,
+				},
+				{
+					Event:  org.LoginPolicySecondFactorRemovedEventType,
+					Reduce: s.reduceSecondFactorRemoved,
+				},
+				// label
 				{
 					Event:  org.LabelPolicyAddedEventType,
 					Reduce: s.reduceLabelAdded,
@@ -220,22 +219,22 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  instance.LoginPolicyChangedEventType,
 					Reduce: s.reduceLoginPolicyChanged,
 				},
-				// {
-				// 	Event:  instance.LoginPolicyMultiFactorAddedEventType,
-				// 	Reduce: s.reduceMFAAdded,
-				// },
+				{
+					Event:  instance.LoginPolicyMultiFactorAddedEventType,
+					Reduce: s.reduceMFAAdded,
+				},
 				{
 					Event:  instance.LoginPolicyMultiFactorRemovedEventType,
 					Reduce: s.reduceMFARemoved,
 				},
-				// 		{
-				// 			Event:  instance.LoginPolicySecondFactorAddedEventType,
-				// 			Reduce: s.reduceSecondFactorAdded,
-				// 		},
-				// 		{
-				// 			Event:  instance.LoginPolicySecondFactorRemovedEventType,
-				// 			Reduce: s.reduceSecondFactorRemoved,
-				// 		},
+				{
+					Event:  instance.LoginPolicySecondFactorAddedEventType,
+					Reduce: s.reduceSecondFactorAdded,
+				},
+				{
+					Event:  instance.LoginPolicySecondFactorRemovedEventType,
+					Reduce: s.reduceSecondFactorRemoved,
+				},
 				// 		// Label
 				{
 					Event:  instance.LabelPolicyAddedEventType,
@@ -515,6 +514,7 @@ func (s *settingsRelationalProjection) reduceMFAAdded(event eventstore.Event) (*
 		// err := settingsRepo.Set(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 
 		change := settingsRepo.AddMFAType(domain.MultiFactorType(policyEvent.MFAType))
+
 		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Agg.InstanceID),
@@ -522,7 +522,7 @@ func (s *settingsRelationalProjection) reduceMFAAdded(event eventstore.Event) (*
 				settingsRepo.TypeCondition(domain.SettingTypeLogin),
 				settingsRepo.OwnerTypeCondition(ownerType),
 			),
-			settingsRepo.SetLabelSettings(change),
+			settingsRepo.SetLabelSettings(change...),
 			settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  err = %+v\n", err)
 		return err
@@ -553,22 +553,8 @@ func (s *settingsRelationalProjection) reduceMFARemoved(event eventstore.Event) 
 
 		settingsRepo := repository.LoginRepository()
 
-		setting := &domain.LoginSetting{
-			Setting: &domain.Setting{
-				InstanceID: policyEvent.Agg.InstanceID,
-				OrgID:      orgId,
-				OwnerType:  ownerType,
-			},
-		}
-
-		setting.Settings.MFAType = slices.DeleteFunc(setting.Settings.MFAType, func(mfaType domain.MultiFactorType) bool {
-			return mfaType == domain.MultiFactorType(policyEvent.MFAType)
-		})
-
-		setting.UpdatedAt = &policyEvent.Creation
-
-		// err := loginRepo.Set(ctx, v3_sql.SQLTx(tx), setting, loginRepo.SetUpdatedAt(&policyEvent.Creation))
 		change := settingsRepo.RemoveMFAType(domain.MultiFactorType(policyEvent.MFAType))
+
 		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Agg.InstanceID),
@@ -576,7 +562,7 @@ func (s *settingsRelationalProjection) reduceMFARemoved(event eventstore.Event) 
 				settingsRepo.TypeCondition(domain.SettingTypeLogin),
 				settingsRepo.OwnerTypeCondition(ownerType),
 			),
-			settingsRepo.SetLabelSettings(change),
+			settingsRepo.SetLabelSettings(change...),
 			settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  err = %+v\n", err)
 		return err
@@ -609,104 +595,105 @@ func (*settingsRelationalProjection) reduceLoginPolicyRemoved(event eventstore.E
 	}), nil
 }
 
-// func (s *settingsRelationalProjection) reduceSecondFactorAdded(event eventstore.Event) (*handler.Statement, error) {
-// 	var orgId *string
-// 	var ownerType domain.OwnerType
-// 	var policyEvent policy.SecondFactorAddedEvent
-// 	switch e := event.(type) {
-// 	case *instance.LoginPolicySecondFactorAddedEvent:
-// 		policyEvent = e.SecondFactorAddedEvent
-// 		ownerType = domain.OwnerTypeInstance
-// 	case *org.LoginPolicySecondFactorAddedEvent:
-// 		policyEvent = e.SecondFactorAddedEvent
-// 		orgId = &policyEvent.Aggregate().ResourceOwner
-// 		ownerType = domain.OwnerTypeOrganization
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-apB2E", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicySecondFactorAddedEventType, instance.LoginPolicySecondFactorAddedEventType})
-// 	}
+func (s *settingsRelationalProjection) reduceSecondFactorAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
+	var ownerType domain.OwnerType
+	var policyEvent policy.SecondFactorAddedEvent
+	switch e := event.(type) {
+	case *instance.LoginPolicySecondFactorAddedEvent:
+		policyEvent = e.SecondFactorAddedEvent
+		ownerType = domain.OwnerTypeInstance
+	case *org.LoginPolicySecondFactorAddedEvent:
+		policyEvent = e.SecondFactorAddedEvent
+		orgId = &policyEvent.Aggregate().ResourceOwner
+		ownerType = domain.OwnerTypeOrganization
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-apB2E", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicySecondFactorAddedEventType, instance.LoginPolicySecondFactorAddedEventType})
+	}
 
-// 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-// 		tx, ok := ex.(*sql.Tx)
-// 		if !ok {
-// 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iLk4m", "reduce.wrong.db.pool %T", ex)
-// 		}
+	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iLk4m", "reduce.wrong.db.pool %T", ex)
+		}
 
-// 		settingsRepo := repository.SettingsRepository()
+		settingsRepo := repository.LoginRepository()
 
-// 		// setting, err := settingsRepo.GetLogin(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
-// 		// if err != nil {
-// 		// 	return zerrors.ThrowInternal(err, "HANDL-H7m9m", "error accessing login policy record")
-// 		// }
-// 		loginRepo := repository.LoginRepository()
+		// setting, err := settingsRepo.GetLogin(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
+		// if err != nil {
+		// 	return zerrors.ThrowInternal(err, "HANDL-H7m9m", "error accessing login policy record")
+		// }
+		loginRepo := repository.LoginRepository()
 
-// 		setting := &domain.LoginSetting{
-// 			Setting: &domain.Setting{
-// 				InstanceID: policyEvent.Agg.InstanceID,
-// 				OrgID:      orgId,
-// 				OwnerType:  ownerType,
-// 			},
-// 		}
+		change := settingsRepo.SetLabelSettings(
+			settingsRepo.AddSecondFactorTypesField(domain.SecondFactorType(policyEvent.MFAType))...,
+		)
 
-// 		if slices.Contains(setting.Settings.SecondFactorTypes, domain.SecondFactorType(policyEvent.MFAType)) {
-// 			return nil
-// 		}
+		effectedRows, err := loginRepo.Update(ctx, v3_sql.SQLTx(tx),
+			database.And(
+				settingsRepo.InstanceIDCondition(policyEvent.Aggregate().InstanceID),
+				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.TypeCondition(domain.SettingTypeLogin),
+				settingsRepo.OwnerTypeCondition(ownerType),
+			),
+			change,
+			settingsRepo.SetUpdatedAt(&policyEvent.Creation))
+		fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m effectedRows = %+v\n", effectedRows)
+		fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m SECOND Add err = %+v\n", err)
 
-// 		setting.UpdatedAt = &policyEvent.Creation
+		return err
+	}), nil
+}
 
-// 		setting.Settings.SecondFactorTypes = append(setting.Settings.SecondFactorTypes, domain.SecondFactorType(policyEvent.MFAType))
+func (s *settingsRelationalProjection) reduceSecondFactorRemoved(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
+	var ownerType domain.OwnerType
+	var policyEvent policy.SecondFactorRemovedEvent
+	switch e := event.(type) {
+	case *instance.LoginPolicySecondFactorRemovedEvent:
+		policyEvent = e.SecondFactorRemovedEvent
+		ownerType = domain.OwnerTypeInstance
+	case *org.LoginPolicySecondFactorRemovedEvent:
+		policyEvent = e.SecondFactorRemovedEvent
+		orgId = &policyEvent.Aggregate().ResourceOwner
+		ownerType = domain.OwnerTypeOrganization
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-bYpmA", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicySecondFactorRemovedEventType, instance.LoginPolicySecondFactorRemovedEventType})
+	}
 
-// 		err := loginRepo.Set(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
-// 		return err
-// 	}), nil
-// }
+	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rnd0y", "reduce.wrong.db.pool %T", ex)
+		}
 
-// func (s *settingsRelationalProjection) reduceSecondFactorRemoved(event eventstore.Event) (*handler.Statement, error) {
-// 	var orgId *string
-// 	var ownerType domain.OwnerType
-// 	var policyEvent policy.SecondFactorRemovedEvent
-// 	switch e := event.(type) {
-// 	case *instance.LoginPolicySecondFactorRemovedEvent:
-// 		policyEvent = e.SecondFactorRemovedEvent
-// 		ownerType = domain.OwnerTypeInstance
-// 	case *org.LoginPolicySecondFactorRemovedEvent:
-// 		policyEvent = e.SecondFactorRemovedEvent
-// 		orgId = &policyEvent.Aggregate().ResourceOwner
-// 		ownerType = domain.OwnerTypeOrganization
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-bYpmA", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicySecondFactorRemovedEventType, instance.LoginPolicySecondFactorRemovedEventType})
-// 	}
+		// settingsRepo := repository.SettingsRepository()
 
-// 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-// 		tx, ok := ex.(*sql.Tx)
-// 		if !ok {
-// 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rnd0y", "reduce.wrong.db.pool %T", ex)
-// 		}
+		// setting, err := settingsRepo.GetLogin(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
+		// if err != nil {
+		// 	return zerrors.ThrowInternal(err, "HANDL-rsk9m", "error accessing login policy record")
+		// }
+		settingsRepo := repository.LoginRepository()
 
-// 		// settingsRepo := repository.SettingsRepository()
+		change := settingsRepo.SetLabelSettings(
+			settingsRepo.RemoveSecondFactorTypesField(domain.SecondFactorType(policyEvent.MFAType))...,
+		)
 
-// 		// setting, err := settingsRepo.GetLogin(ctx, v3_sql.SQLTx(tx), policyEvent.Agg.InstanceID, orgId)
-// 		// if err != nil {
-// 		// 	return zerrors.ThrowInternal(err, "HANDL-rsk9m", "error accessing login policy record")
-// 		// }
-// 		loginRepo := repository.LoginRepository()
+		effectedRows, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
+			database.And(
+				settingsRepo.InstanceIDCondition(policyEvent.Agg.InstanceID),
+				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.TypeCondition(domain.SettingTypeLogin),
+				settingsRepo.OwnerTypeCondition(ownerType),
+			),
+			change,
+			settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 
-// 		setting := &domain.LoginSetting{
-// 			Setting: &domain.Setting{
-// 				InstanceID: policyEvent.Agg.InstanceID,
-// 				OrgID:      orgId,
-// 				OwnerType:  ownerType,
-// 			},
-// 		}
-
-// 		setting.Settings.SecondFactorTypes = slices.DeleteFunc(setting.Settings.SecondFactorTypes, func(secondFactorType domain.SecondFactorType) bool {
-// 			return secondFactorType == domain.SecondFactorType(policyEvent.MFAType)
-// 		})
-
-// 		// _, err = settingsRepo.UpdateLogin(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
-// 		err := loginRepo.Set(ctx, v3_sql.SQLTx(tx), setting, loginRepo.SetUpdatedAt(&policyEvent.Creation))
-// 		return err
-// 	}), nil
-// }
+		fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m effectedRows = %+v\n", effectedRows)
+		fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m SECOND REMOVE err = %+v\n", err)
+		return err
+	}), nil
+}
 
 // func (s *settingsRelationalProjection) reduceInstanceRemoved(event eventstore.Event) (*handler.Statement, error) {
 // 	removeInstanceEvent, ok := event.(*instance.InstanceRemovedEvent)

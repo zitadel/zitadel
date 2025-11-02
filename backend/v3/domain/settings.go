@@ -111,9 +111,10 @@ type loginSettingsJSONFieldsChanges interface {
 	SetMFAInitSkipLifetimeField(value time.Duration) db_json.JsonUpdate
 	SetSecondFactorCheckLifetimeField(value time.Duration) db_json.JsonUpdate
 	SetMultiFactorCheckLifetimeField(value time.Duration) db_json.JsonUpdate
-	AddMFAType(value MultiFactorType) db_json.JsonUpdate
-	RemoveMFAType(value MultiFactorType) db_json.JsonUpdate
-	SetSecondFactorTypesField(value []SecondFactorType) db_json.JsonUpdate
+	AddMFAType(value MultiFactorType) []db_json.JsonUpdate
+	RemoveMFAType(value MultiFactorType) []db_json.JsonUpdate
+	AddSecondFactorTypesField(value SecondFactorType) []db_json.JsonUpdate
+	RemoveSecondFactorTypesField(value SecondFactorType) []db_json.JsonUpdate
 }
 
 type loginSettingsJsonChanges interface {

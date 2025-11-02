@@ -1,6 +1,7 @@
 package repository_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -2963,8 +2964,11 @@ func TestCreateUpdateLoginPolicySetting(t *testing.T) {
 						MFAInitSkipLifetime:        time.Second * 50,
 						SecondFactorCheckLifetime:  time.Second * 50,
 						MultiFactorCheckLifetime:   time.Second * 50,
+						// MFAType:                    []domain.MultiFactorType{domain.MultiFactorTypeUnspecified},
 					},
 				}
+				err := settingRepo.Set(t.Context(), tx, &setting)
+				require.NoError(t, err)
 
 				setting.Settings = domain.LoginSettings{
 					AllowUserNamePassword:      false,
@@ -2984,18 +2988,21 @@ func TestCreateUpdateLoginPolicySetting(t *testing.T) {
 					MFAInitSkipLifetime:        time.Minute,
 					SecondFactorCheckLifetime:  time.Minute,
 					MultiFactorCheckLifetime:   time.Minute,
+
+					// TODO
+					// MFAType: []domain.MultiFactorType{domain.MultiFactorTypeU2FWithPIN},
 				}
-				err := settingRepo.Set(t.Context(), tx, &setting)
-				require.NoError(t, err)
 				return &setting
 			},
 			changes: database.Changes{
 				settingRepo.SetLabelSettings(
+					settingRepo.SetAllowUserNamePasswordField(false),
 					settingRepo.SetAllowDomainDiscoveryField(false),
 					settingRepo.SetAllowRegisterField(false),
 					settingRepo.SetAllowExternalIDPField(false),
 					settingRepo.SetForceMFAField(false),
 					settingRepo.SetForceMFALocalOnlyField(false),
+					settingRepo.SetHidePasswordResetField(false),
 					settingRepo.SetIgnoreUnknownUsernamesField(false),
 					settingRepo.SetAllowDomainDiscoveryField(false),
 					settingRepo.SetDisableLoginWithEmailField(false),
@@ -3006,7 +3013,11 @@ func TestCreateUpdateLoginPolicySetting(t *testing.T) {
 					settingRepo.SetExternalLoginCheckLifetimeField(time.Minute),
 					settingRepo.SetMFAInitSkipLifetimeField(time.Minute),
 					settingRepo.SetSecondFactorCheckLifetimeField(time.Minute),
-					settingRepo.SetMFAInitSkipLifetimeField(time.Minute),
+					settingRepo.SetMultiFactorCheckLifetimeField(time.Minute),
+					// TODO
+					// settingRepo.AddMFAType(domain.MultiFactorTypeU2FWithPIN),
+					// settingRepo.RemoveMFAType(domain.MultiFactorTypeU2FWithPIN),
+					// settingRepo.RemoveMFAType(domain.MultiFactorTypeUnspecified),
 				),
 			},
 		},
@@ -3057,10 +3068,12 @@ func TestCreateUpdateLoginPolicySetting(t *testing.T) {
 				return
 			}
 
-			assert.Equal(t, returnedSetting.InstanceID, setting.InstanceID)
-			assert.Equal(t, returnedSetting.OrgID, setting.OrgID)
-			assert.Equal(t, returnedSetting.ID, setting.ID)
-			assert.Equal(t, returnedSetting.Type, setting.Type)
+			fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m setting.Settings.MFAType = %+v\n", setting.Settings.MFAType)
+			fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m returnedSetting.Settings.MFAType = %+v\n", returnedSetting.Settings.MFAType)
+			assert.Equal(t, setting.InstanceID, returnedSetting.InstanceID)
+			assert.Equal(t, setting.OrgID, returnedSetting.OrgID)
+			assert.Equal(t, setting.ID, returnedSetting.ID)
+			assert.Equal(t, setting.Type, returnedSetting.Type)
 
 			assert.Equal(t, returnedSetting.Settings, setting.Settings)
 		})
@@ -3140,6 +3153,8 @@ func TestCreateUpdateLabelPolicySetting(t *testing.T) {
 						ThemeMode:           domain.LabelPolicyThemeDark,
 					},
 				}
+				err := settingRepo.Set(t.Context(), tx, &setting)
+				require.NoError(t, err)
 
 				setting.Settings = domain.LabelSettings{
 					PrimaryColor:        "new_value",
@@ -3156,8 +3171,6 @@ func TestCreateUpdateLabelPolicySetting(t *testing.T) {
 					ThemeMode:           domain.LabelPolicyThemeAuto,
 				}
 
-				err := settingRepo.Set(t.Context(), tx, &setting)
-				require.NoError(t, err)
 				return &setting
 			},
 			changes: database.Changes{
@@ -3300,6 +3313,8 @@ func TestCreateUpdatePasswordComplexityPolicySetting(t *testing.T) {
 						HasSymbol:    true,
 					},
 				}
+				err := settingRepo.Set(t.Context(), tx, &setting)
+				require.NoError(t, err)
 
 				setting.Settings = domain.PasswordComplexitySettings{
 					MinLength:    200,
@@ -3309,8 +3324,6 @@ func TestCreateUpdatePasswordComplexityPolicySetting(t *testing.T) {
 					HasSymbol:    false,
 				}
 
-				err := settingRepo.Set(t.Context(), tx, &setting)
-				require.NoError(t, err)
 				return &setting
 			},
 			changes: database.Changes{
@@ -3444,14 +3457,14 @@ func TestCreateUpdatePasswordExpiryPolicySetting(t *testing.T) {
 						MaxAgeDays:     30,
 					},
 				}
+				err = settingRepo.Set(t.Context(), tx, &setting)
+				require.NoError(t, err)
 
 				setting.Settings = domain.PasswordExpirySettings{
 					ExpireWarnDays: 200,
 					MaxAgeDays:     200,
 				}
 
-				err = settingRepo.Set(t.Context(), tx, &setting)
-				require.NoError(t, err)
 				return &setting
 			},
 			changes: database.Changes{
@@ -3583,6 +3596,8 @@ func TestCreateUpdateLockoutPolicySetting(t *testing.T) {
 						ShowLockOutFailures: true,
 					},
 				}
+				err := settingRepo.Set(t.Context(), tx, &setting)
+				require.NoError(t, err)
 
 				setting.Settings = domain.LockoutSettings{
 					MaxPasswordAttempts: 100,
@@ -3590,8 +3605,6 @@ func TestCreateUpdateLockoutPolicySetting(t *testing.T) {
 					ShowLockOutFailures: false,
 				}
 
-				err := settingRepo.Set(t.Context(), tx, &setting)
-				require.NoError(t, err)
 				return &setting
 			},
 			changes: database.Changes{
@@ -3725,16 +3738,16 @@ func TestCreateUpdateSecurityPolicySetting(t *testing.T) {
 						EnableImpersonation:   true,
 					},
 				}
+				err := settingRepo.Set(t.Context(), tx, &setting)
+				require.NoError(t, err)
 
 				setting.Settings = domain.SecuritySettings{
 					Enabled:               false,
 					EnableIframeEmbedding: false,
-					// AllowedOrigins:        []string{"new_value"},
-					EnableImpersonation: false,
+					AllowedOrigins:        []string{"new_value"},
+					EnableImpersonation:   false,
 				}
 
-				err := settingRepo.Set(t.Context(), tx, &setting)
-				require.NoError(t, err)
 				return &setting
 			},
 			changes: database.Changes{
@@ -3742,7 +3755,7 @@ func TestCreateUpdateSecurityPolicySetting(t *testing.T) {
 					settingRepo.SetEnabled(false),
 					settingRepo.SetEnableIframeEmbedding(false),
 					// TODO
-					// settingRepo.SetAllowedOrigins(false),
+					// settingRepo.SetAllowedOrigins([]),
 					settingRepo.SetEnableImpersonation(false),
 				),
 			},
@@ -3860,6 +3873,8 @@ func TestCreateUpdateDomainPolicySetting(t *testing.T) {
 						SMTPSenderAddressMatchesInstanceDomain: true,
 					},
 				}
+				err := settingRepo.Set(t.Context(), tx, &setting)
+				require.NoError(t, err)
 
 				setting.Settings = domain.DomainSettings{
 					UserLoginMustBeDomain:                  false,
@@ -3867,8 +3882,6 @@ func TestCreateUpdateDomainPolicySetting(t *testing.T) {
 					SMTPSenderAddressMatchesInstanceDomain: false,
 				}
 
-				err := settingRepo.Set(t.Context(), tx, &setting)
-				require.NoError(t, err)
 				return &setting
 			},
 			changes: database.Changes{
@@ -3990,13 +4003,13 @@ func TestCreateUpdateOrgPolicySetting(t *testing.T) {
 						OrganizationScopedUsernames: true,
 					},
 				}
+				err := settingRepo.Set(t.Context(), tx, &setting)
+				require.NoError(t, err)
 
 				setting.Settings = domain.OrganizationSettings{
 					OrganizationScopedUsernames: false,
 				}
 
-				err := settingRepo.Set(t.Context(), tx, &setting)
-				require.NoError(t, err)
 				return &setting
 			},
 			changes: database.Changes{

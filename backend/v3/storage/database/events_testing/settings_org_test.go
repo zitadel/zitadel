@@ -16,9 +16,11 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/policy"
+	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 )
 
@@ -191,187 +193,260 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	// 	t.Run("test added/remove multifactor type reduces", func(t *testing.T) {
-	// 		ctx := t.Context()
-	// 		newInstance := integration.NewInstance(t.Context())
+	t.Run("test added/remove multifactor type reduces", func(t *testing.T) {
+		ctx := t.Context()
+		newInstance := integration.NewInstance(t.Context())
 
-	// 		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-	// 		// create org + login policy
-	// 		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
-	// 			Name: gofakeit.Name(),
-	// 		})
-	// 		require.NoError(t, err)
-	// 		IAMCTX = integration.SetOrgID(IAMCTX, organization.Id)
-	// 		_, err = newInstance.Client.Mgmt.AddCustomLoginPolicy(IAMCTX, &management.AddCustomLoginPolicyRequest{
-	// 			AllowUsernamePassword:      false,
-	// 			AllowRegister:              false,
-	// 			AllowExternalIdp:           false,
-	// 			ForceMfa:                   false,
-	// 			PasswordlessType:           policy.PasswordlessType_PASSWORDLESS_TYPE_NOT_ALLOWED,
-	// 			HidePasswordReset:          false,
-	// 			IgnoreUnknownUsernames:     false,
-	// 			DefaultRedirectUri:         "http://www.example.com",
-	// 			PasswordCheckLifetime:      durationpb.New(time.Second * 10),
-	// 			ExternalLoginCheckLifetime: durationpb.New(time.Second * 10),
-	// 			MfaInitSkipLifetime:        durationpb.New(time.Second * 10),
-	// 			SecondFactorCheckLifetime:  durationpb.New(time.Second * 10),
-	// 			MultiFactorCheckLifetime:   durationpb.New(time.Second * 10),
-	// 			AllowDomainDiscovery:       false,
-	// 			DisableLoginWithEmail:      false,
-	// 			DisableLoginWithPhone:      false,
-	// 			ForceMfaLocalOnly:          false,
-	// 		})
-	// 		require.NoError(t, err)
-	// 		IAMCTX = integration.SetOrgID(IAMCTX, organization.Id)
+		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		// create org + login policy
+		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
+			Name: gofakeit.Name(),
+		})
+		require.NoError(t, err)
+		orgId := organization.Id
+		IAMCTX = integration.SetOrgID(IAMCTX, organization.Id)
 
-	// 		// check initial MFAType value
-	// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
-	// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 			setting, err := settingsRepo.GetLogin(
-	// 				ctx, pool,
-	// 				newInstance.ID(),
-	// 				&organization.Id)
-	// 			require.NoError(t, err)
+		_, err = newInstance.Client.Mgmt.AddCustomLoginPolicy(IAMCTX, &management.AddCustomLoginPolicyRequest{
+			AllowUsernamePassword:      false,
+			AllowRegister:              false,
+			AllowExternalIdp:           false,
+			ForceMfa:                   false,
+			PasswordlessType:           policy.PasswordlessType_PASSWORDLESS_TYPE_NOT_ALLOWED,
+			HidePasswordReset:          false,
+			IgnoreUnknownUsernames:     false,
+			DefaultRedirectUri:         "http://www.example.com",
+			PasswordCheckLifetime:      durationpb.New(time.Second * 10),
+			ExternalLoginCheckLifetime: durationpb.New(time.Second * 10),
+			MfaInitSkipLifetime:        durationpb.New(time.Second * 10),
+			SecondFactorCheckLifetime:  durationpb.New(time.Second * 10),
+			MultiFactorCheckLifetime:   durationpb.New(time.Second * 10),
+			AllowDomainDiscovery:       false,
+			DisableLoginWithEmail:      false,
+			DisableLoginWithPhone:      false,
+			ForceMfaLocalOnly:          false,
+		})
+		require.NoError(t, err)
+		IAMCTX = integration.SetOrgID(IAMCTX, organization.Id)
 
-	// 			assert.Nil(t, setting.Settings.MFAType)
-	// 		}, retryDuration, tick)
+		// check initial MFAType value
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			// setting, err := settingsRepo.GetLogin(
+			// 	ctx, pool,
+			// 	newInstance.ID(),
+			// 	&organization.Id)
+			// require.NoError(t, err)
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeLogin),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 		// add MFAType
-	// 		before := time.Now()
-	// 		_, err = newInstance.Client.Mgmt.AddMultiFactorToLoginPolicy(IAMCTX, &management.AddMultiFactorToLoginPolicyRequest{
-	// 			Type: policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION,
-	// 		})
-	// 		require.NoError(t, err)
-	// 		after := time.Now().Add(time.Second * 30)
+			assert.Nil(t, setting.Settings.MFAType)
+		}, retryDuration, tick)
 
-	// 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
-	// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 			setting, err := settingsRepo.GetLogin(
-	// 				ctx, pool,
-	// 				newInstance.ID(),
-	// 				&organization.Id)
-	// 			require.NoError(t, err)
+		// add MFAType
+		before := time.Now()
+		_, err = newInstance.Client.Mgmt.AddMultiFactorToLoginPolicy(IAMCTX, &management.AddMultiFactorToLoginPolicyRequest{
+			Type: policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION,
+		})
+		require.NoError(t, err)
+		after := time.Now().Add(time.Second * 30)
 
-	// 			// event org.policy.login.multifactor.added
-	// 			assert.Equal(t, []domain.MultiFactorType{domain.MultiFactorType(policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION)}, setting.Settings.MFAType)
-	// 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
-	// 		}, retryDuration, tick)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			// setting, err := settingsRepo.GetLogin(
+			// 	ctx, pool,
+			// 	newInstance.ID(),
+			// 	&organization.Id)
+			// require.NoError(t, err)
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeLogin),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 		// remove MFAType
-	// 		_, err = newInstance.Client.Mgmt.RemoveMultiFactorFromLoginPolicy(IAMCTX, &management.RemoveMultiFactorFromLoginPolicyRequest{
-	// 			Type: policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION,
-	// 		})
-	// 		require.NoError(t, err)
+			// event org.policy.login.multifactor.added
+			assert.Equal(t, []domain.MultiFactorType{domain.MultiFactorType(policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION)}, setting.Settings.MFAType)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
 
-	// 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
-	// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 			setting, err := settingsRepo.GetLogin(
-	// 				ctx, pool,
-	// 				newInstance.ID(),
-	// 				&organization.Id)
-	// 			require.NoError(t, err)
+		// remove MFAType
+		_, err = newInstance.Client.Mgmt.RemoveMultiFactorFromLoginPolicy(IAMCTX, &management.RemoveMultiFactorFromLoginPolicyRequest{
+			Type: policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION,
+		})
+		require.NoError(t, err)
 
-	// 			// event org.policy.login.multifactor.remove
-	// 			assert.Equal(t, []domain.MultiFactorType{}, setting.Settings.MFAType)
-	// 		}, retryDuration, tick)
-	// 	})
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			// setting, err := settingsRepo.GetLogin(
+			// 	ctx, pool,
+			// 	newInstance.ID(),
+			// 	&organization.Id)
+			// require.NoError(t, err)
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeLogin),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 	t.Run("test added/removed second multifactor reduces", func(t *testing.T) {
-	// 		ctx := t.Context()
+			// event org.policy.login.multifactor.remove
+			assert.Equal(t, []domain.MultiFactorType{}, setting.Settings.MFAType)
+		}, retryDuration, tick)
+	})
 
-	// 		newInstance := integration.NewInstance(t.Context())
+	t.Run("test added/removed second multifactor reduces", func(t *testing.T) {
+		ctx := t.Context()
 
-	// 		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-	// 		// create org + login policy
-	// 		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
-	// 			Name: gofakeit.Name(),
-	// 		})
-	// 		require.NoError(t, err)
-	// 		IAMCTX = integration.SetOrgID(IAMCTX, organization.Id)
-	// 		_, err = newInstance.Client.Mgmt.AddCustomLoginPolicy(IAMCTX, &management.AddCustomLoginPolicyRequest{
-	// 			AllowUsernamePassword:      false,
-	// 			AllowRegister:              false,
-	// 			AllowExternalIdp:           false,
-	// 			ForceMfa:                   false,
-	// 			PasswordlessType:           policy.PasswordlessType_PASSWORDLESS_TYPE_NOT_ALLOWED,
-	// 			HidePasswordReset:          false,
-	// 			IgnoreUnknownUsernames:     false,
-	// 			DefaultRedirectUri:         "http://www.example.com",
-	// 			PasswordCheckLifetime:      durationpb.New(time.Second * 10),
-	// 			ExternalLoginCheckLifetime: durationpb.New(time.Second * 10),
-	// 			MfaInitSkipLifetime:        durationpb.New(time.Second * 10),
-	// 			SecondFactorCheckLifetime:  durationpb.New(time.Second * 10),
-	// 			MultiFactorCheckLifetime:   durationpb.New(time.Second * 10),
-	// 			AllowDomainDiscovery:       false,
-	// 			DisableLoginWithEmail:      false,
-	// 			DisableLoginWithPhone:      false,
-	// 			ForceMfaLocalOnly:          false,
-	// 		})
-	// 		require.NoError(t, err)
-	// 		IAMCTX = integration.SetOrgID(IAMCTX, organization.Id)
+		newInstance := integration.NewInstance(t.Context())
 
-	// 		before := time.Now()
-	// 		// get current second factor types
-	// 		var secondFactorTypes []domain.SecondFactorType
-	// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
-	// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 			setting, err := settingsRepo.GetLogin(
-	// 				ctx, pool,
-	// 				newInstance.ID(),
-	// 				&organization.Id)
-	// 			require.NoError(t, err)
+		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		// create org + login policy
+		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
+			Name: gofakeit.Name(),
+		})
+		require.NoError(t, err)
+		orgId := organization.Id
+		IAMCTX = integration.SetOrgID(IAMCTX, organization.Id)
 
-	// 			secondFactorTypes = setting.Settings.SecondFactorTypes
-	// 		}, retryDuration, tick)
+		_, err = newInstance.Client.Mgmt.AddCustomLoginPolicy(IAMCTX, &management.AddCustomLoginPolicyRequest{
+			AllowUsernamePassword:      false,
+			AllowRegister:              false,
+			AllowExternalIdp:           false,
+			ForceMfa:                   false,
+			PasswordlessType:           policy.PasswordlessType_PASSWORDLESS_TYPE_NOT_ALLOWED,
+			HidePasswordReset:          false,
+			IgnoreUnknownUsernames:     false,
+			DefaultRedirectUri:         "http://www.example.com",
+			PasswordCheckLifetime:      durationpb.New(time.Second * 10),
+			ExternalLoginCheckLifetime: durationpb.New(time.Second * 10),
+			MfaInitSkipLifetime:        durationpb.New(time.Second * 10),
+			SecondFactorCheckLifetime:  durationpb.New(time.Second * 10),
+			MultiFactorCheckLifetime:   durationpb.New(time.Second * 10),
+			AllowDomainDiscovery:       false,
+			DisableLoginWithEmail:      false,
+			DisableLoginWithPhone:      false,
+			ForceMfaLocalOnly:          false,
+		})
+		require.NoError(t, err)
+		IAMCTX = integration.SetOrgID(IAMCTX, organization.Id)
 
-	// 		// add new second factor type
-	// 		before = time.Now()
-	// 		_, err = newInstance.Client.Mgmt.AddSecondFactorToLoginPolicy(IAMCTX, &management.AddSecondFactorToLoginPolicyRequest{
-	// 			Type: policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS,
-	// 		})
-	// 		require.NoError(t, err)
-	// 		after := time.Now().Add(time.Second * 30)
+		before := time.Now()
+		// get current second factor types
+		var secondFactorTypes []domain.SecondFactorType
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			// setting, err := settingsRepo.GetLogin(
+			// 	ctx, pool,
+			// 	newInstance.ID(),
+			// 	&organization.Id)
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeLogin),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 		secondFactorTypes = append(secondFactorTypes, domain.SecondFactorType(policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS))
+			secondFactorTypes = setting.Settings.SecondFactorTypes
+		}, retryDuration, tick)
 
-	// 		// check new second factor type is added
-	// 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
-	// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 			setting, err := settingsRepo.GetLogin(
-	// 				ctx, pool,
-	// 				newInstance.ID(),
-	// 				&organization.Id)
-	// 			require.NoError(t, err)
+		// add new second factor type
+		before = time.Now()
+		_, err = newInstance.Client.Mgmt.AddSecondFactorToLoginPolicy(IAMCTX, &management.AddSecondFactorToLoginPolicyRequest{
+			Type: policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS,
+		})
+		require.NoError(t, err)
+		after := time.Now().Add(time.Second * 30)
 
-	// 			// event org.policy.login.multifactor.secondfactor.added
-	// 			assert.Equal(t, secondFactorTypes, setting.Settings.SecondFactorTypes)
-	// 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
-	// 		}, retryDuration, tick)
+		secondFactorTypes = append(secondFactorTypes, domain.SecondFactorType(policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS))
 
-	// 		// remove second factor type
-	// 		before = time.Now()
-	// 		_, err = newInstance.Client.Mgmt.RemoveSecondFactorFromLoginPolicy(IAMCTX, &management.RemoveSecondFactorFromLoginPolicyRequest{
-	// 			Type: policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS,
-	// 		})
-	// 		require.NoError(t, err)
-	// 		after = time.Now()
+		// check new second factor type is added
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			// setting, err := settingsRepo.GetLogin(
+			// 	ctx, pool,
+			// 	newInstance.ID(),
+			// 	&organization.Id)
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeLogin),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 		secondFactorTypes = secondFactorTypes[0 : len(secondFactorTypes)-1]
+			// event org.policy.login.multifactor.secondfactor.added
+			assert.Equal(t, secondFactorTypes, setting.Settings.SecondFactorTypes)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
 
-	// 		// check new second factor type is removed
-	// 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
-	// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 			setting, err := settingsRepo.GetLogin(
-	// 				ctx, pool,
-	// 				newInstance.ID(),
-	// 				&organization.Id)
-	// 			require.NoError(t, err)
+		// remove second factor type
+		before = time.Now()
+		_, err = newInstance.Client.Mgmt.RemoveSecondFactorFromLoginPolicy(IAMCTX, &management.RemoveSecondFactorFromLoginPolicyRequest{
+			Type: policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS,
+		})
+		require.NoError(t, err)
+		after = time.Now()
 
-	// 			// event org.policy.login.multifactor.secondfactor.removed
-	// 			assert.Equal(t, secondFactorTypes, setting.Settings.SecondFactorTypes)
-	// 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
-	// 		}, retryDuration, tick)
-	// 	})
+		secondFactorTypes = secondFactorTypes[0 : len(secondFactorTypes)-1]
+
+		// check new second factor type is removed
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			// setting, err := settingsRepo.GetLogin(
+			// 	ctx, pool,
+			// 	newInstance.ID(),
+			// 	&organization.Id)
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeLogin),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
+			require.NoError(t, err)
+
+			// event org.policy.login.multifactor.secondfactor.removed
+			assert.Equal(t, secondFactorTypes, setting.Settings.SecondFactorTypes)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
 
 	t.Run("test login settings removed reduces", func(t *testing.T) {
 		ctx := t.Context()
@@ -513,272 +588,272 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 	settingsRepo := repository.LabelRepository()
 
-	// t.Run("test adding label settings reduces", func(t *testing.T) {
-	// 	ctx := t.Context()
+	t.Run("test adding label settings reduces", func(t *testing.T) {
+		ctx := t.Context()
 
-	// 	newInstance := integration.NewInstance(t.Context())
-	// 	IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-	// 	organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
-	// 		Name: gofakeit.Name(),
-	// 	})
-	// 	require.NoError(t, err)
-	// 	orgId := organization.Id
-	// 	IAMCTX = integration.SetOrgID(IAMCTX, orgId)
+		newInstance := integration.NewInstance(t.Context())
+		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
+			Name: gofakeit.Name(),
+		})
+		require.NoError(t, err)
+		orgId := organization.Id
+		IAMCTX = integration.SetOrgID(IAMCTX, orgId)
 
-	// 	before := time.Now()
-	// 	_, err = newInstance.Client.Mgmt.AddCustomLabelPolicy(IAMCTX, &management.AddCustomLabelPolicyRequest{
-	// 		PrimaryColor:        "#055090",
-	// 		HideLoginNameSuffix: false,
-	// 		WarnColor:           "#055090",
-	// 		BackgroundColor:     "#055090",
-	// 		FontColor:           "#055090",
-	// 		PrimaryColorDark:    "#055090",
-	// 		BackgroundColorDark: "#055090",
-	// 		WarnColorDark:       "#055090",
-	// 		FontColorDark:       "#055090",
-	// 		DisableWatermark:    false,
-	// 		ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-	// 	})
-	// 	require.NoError(t, err)
-	// 	after := time.Now().Add(time.Second * 30)
+		before := time.Now()
+		_, err = newInstance.Client.Mgmt.AddCustomLabelPolicy(IAMCTX, &management.AddCustomLabelPolicyRequest{
+			PrimaryColor:        "#055090",
+			HideLoginNameSuffix: false,
+			WarnColor:           "#055090",
+			BackgroundColor:     "#055090",
+			FontColor:           "#055090",
+			PrimaryColorDark:    "#055090",
+			BackgroundColorDark: "#055090",
+			WarnColorDark:       "#055090",
+			FontColorDark:       "#055090",
+			DisableWatermark:    false,
+			ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
+		})
+		require.NoError(t, err)
+		after := time.Now().Add(time.Second * 30)
 
-	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		setting, err := settingsRepo.Get(
-	// 			ctx, pool,
-	// 			database.WithCondition(
-	// 				database.And(
-	// 					settingsRepo.InstanceIDCondition(newInstance.ID()),
-	// 					settingsRepo.OrgIDCondition(&orgId),
-	// 					settingsRepo.TypeCondition(domain.SettingTypeLabel),
-	// 					settingsRepo.LabelStateCondition(domain.LabelStatePreview),
-	// 					settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-	// 				),
-	// 			),
-	// 		)
-	// 		require.NoError(t, err)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 		// event org.policy.label.added
-	// 		assert.Equal(t, domain.OwnerTypeOrganization, setting.OwnerType)
-	// 		assert.Equal(t, "#055090", setting.Settings.PrimaryColor)
-	// 		assert.Equal(t, "#055090", setting.Settings.BackgroundColor)
-	// 		assert.Equal(t, "#055090", setting.Settings.WarnColor)
-	// 		assert.Equal(t, "#055090", setting.Settings.FontColor)
-	// 		assert.Equal(t, "#055090", setting.Settings.PrimaryColorDark)
-	// 		assert.Equal(t, "#055090", setting.Settings.BackgroundColorDark)
-	// 		assert.Equal(t, "#055090", setting.Settings.WarnColorDark)
-	// 		assert.Equal(t, "#055090", setting.Settings.WarnColorDark)
-	// 		assert.Equal(t, "#055090", setting.Settings.FontColorDark)
-	// 		assert.Equal(t, false, setting.Settings.HideLoginNameSuffix)
-	// 		assert.Equal(t, false, setting.Settings.ErrorMsgPopup)
-	// 		assert.Equal(t, false, setting.Settings.DisableWatermark)
-	// 		assert.Equal(t, domain.LabelPolicyThemeDark, setting.Settings.ThemeMode)
-	// 		assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
-	// 		assert.WithinRange(t, setting.CreatedAt, before, after)
-	// 		assert.WithinRange(t, *setting.UpdatedAt, before, after)
-	// 	}, retryDuration, tick)
-	// })
+			// event org.policy.label.added
+			assert.Equal(t, domain.OwnerTypeOrganization, setting.OwnerType)
+			assert.Equal(t, "#055090", setting.Settings.PrimaryColor)
+			assert.Equal(t, "#055090", setting.Settings.BackgroundColor)
+			assert.Equal(t, "#055090", setting.Settings.WarnColor)
+			assert.Equal(t, "#055090", setting.Settings.FontColor)
+			assert.Equal(t, "#055090", setting.Settings.PrimaryColorDark)
+			assert.Equal(t, "#055090", setting.Settings.BackgroundColorDark)
+			assert.Equal(t, "#055090", setting.Settings.WarnColorDark)
+			assert.Equal(t, "#055090", setting.Settings.WarnColorDark)
+			assert.Equal(t, "#055090", setting.Settings.FontColorDark)
+			assert.Equal(t, false, setting.Settings.HideLoginNameSuffix)
+			assert.Equal(t, false, setting.Settings.ErrorMsgPopup)
+			assert.Equal(t, false, setting.Settings.DisableWatermark)
+			assert.Equal(t, domain.LabelPolicyThemeDark, setting.Settings.ThemeMode)
+			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
+			assert.WithinRange(t, setting.CreatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
 
-	// t.Run("test policy label change", func(t *testing.T) {
-	// 	ctx := t.Context()
+	t.Run("test policy label change", func(t *testing.T) {
+		ctx := t.Context()
 
-	// 	newInstance := integration.NewInstance(t.Context())
-	// 	IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-	// 	organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
-	// 		Name: gofakeit.Name(),
-	// 	})
-	// 	require.NoError(t, err)
-	// 	orgId := organization.Id
-	// 	IAMCTX = integration.SetOrgID(IAMCTX, orgId)
+		newInstance := integration.NewInstance(t.Context())
+		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
+			Name: gofakeit.Name(),
+		})
+		require.NoError(t, err)
+		orgId := organization.Id
+		IAMCTX = integration.SetOrgID(IAMCTX, orgId)
 
-	// 	_, err = newInstance.Client.Mgmt.AddCustomLabelPolicy(IAMCTX, &management.AddCustomLabelPolicyRequest{
-	// 		PrimaryColor:        "#055090",
-	// 		HideLoginNameSuffix: false,
-	// 		WarnColor:           "#055090",
-	// 		BackgroundColor:     "#055090",
-	// 		FontColor:           "#055090",
-	// 		PrimaryColorDark:    "#055090",
-	// 		BackgroundColorDark: "#055090",
-	// 		WarnColorDark:       "#055090",
-	// 		FontColorDark:       "#055090",
-	// 		DisableWatermark:    false,
-	// 		ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-	// 	})
-	// 	require.NoError(t, err)
+		_, err = newInstance.Client.Mgmt.AddCustomLabelPolicy(IAMCTX, &management.AddCustomLabelPolicyRequest{
+			PrimaryColor:        "#055090",
+			HideLoginNameSuffix: false,
+			WarnColor:           "#055090",
+			BackgroundColor:     "#055090",
+			FontColor:           "#055090",
+			PrimaryColorDark:    "#055090",
+			BackgroundColorDark: "#055090",
+			WarnColorDark:       "#055090",
+			FontColorDark:       "#055090",
+			DisableWatermark:    false,
+			ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
+		})
+		require.NoError(t, err)
 
-	// 	before := time.Now()
-	// 	_, err = newInstance.Client.Mgmt.UpdateCustomLabelPolicy(IAMCTX, &management.UpdateCustomLabelPolicyRequest{
-	// 		PrimaryColor:        "#055000",
-	// 		HideLoginNameSuffix: true,
-	// 		WarnColor:           "#055000",
-	// 		BackgroundColor:     "#055000",
-	// 		FontColor:           "#055000",
-	// 		PrimaryColorDark:    "#055000",
-	// 		BackgroundColorDark: "#055000",
-	// 		WarnColorDark:       "#055000",
-	// 		FontColorDark:       "#055000",
-	// 		DisableWatermark:    true,
-	// 		ThemeMode:           policy.ThemeMode_THEME_MODE_LIGHT,
-	// 	})
-	// 	require.NoError(t, err)
-	// 	after := time.Now().Add(time.Second * 30)
+		before := time.Now()
+		_, err = newInstance.Client.Mgmt.UpdateCustomLabelPolicy(IAMCTX, &management.UpdateCustomLabelPolicyRequest{
+			PrimaryColor:        "#055000",
+			HideLoginNameSuffix: true,
+			WarnColor:           "#055000",
+			BackgroundColor:     "#055000",
+			FontColor:           "#055000",
+			PrimaryColorDark:    "#055000",
+			BackgroundColorDark: "#055000",
+			WarnColorDark:       "#055000",
+			FontColorDark:       "#055000",
+			DisableWatermark:    true,
+			ThemeMode:           policy.ThemeMode_THEME_MODE_LIGHT,
+		})
+		require.NoError(t, err)
+		after := time.Now().Add(time.Second * 30)
 
-	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		setting, err := settingsRepo.Get(
-	// 			ctx, pool,
-	// 			database.WithCondition(
-	// 				database.And(
-	// 					settingsRepo.InstanceIDCondition(newInstance.ID()),
-	// 					settingsRepo.OrgIDCondition(&orgId),
-	// 					settingsRepo.TypeCondition(domain.SettingTypeLabel),
-	// 					settingsRepo.LabelStateCondition(domain.LabelStatePreview),
-	// 					settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-	// 				),
-	// 			),
-	// 		)
-	// 		require.NoError(t, err)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 		// event org.policy.label.change
-	// 		assert.Equal(t, domain.OwnerTypeOrganization, setting.OwnerType)
-	// 		assert.Equal(t, "#055000", setting.Settings.PrimaryColor)
-	// 		assert.Equal(t, "#055000", setting.Settings.BackgroundColor)
-	// 		assert.Equal(t, "#055000", setting.Settings.WarnColor)
-	// 		assert.Equal(t, "#055000", setting.Settings.FontColor)
-	// 		assert.Equal(t, "#055000", setting.Settings.PrimaryColorDark)
-	// 		assert.Equal(t, "#055000", setting.Settings.BackgroundColorDark)
-	// 		assert.Equal(t, "#055000", setting.Settings.WarnColorDark)
-	// 		assert.Equal(t, "#055000", setting.Settings.WarnColorDark)
-	// 		assert.Equal(t, "#055000", setting.Settings.FontColorDark)
-	// 		assert.Equal(t, true, setting.Settings.HideLoginNameSuffix)
-	// 		assert.Equal(t, false, setting.Settings.ErrorMsgPopup)
-	// 		assert.Equal(t, true, setting.Settings.DisableWatermark)
-	// 		assert.Equal(t, domain.LabelPolicyThemeLight, setting.Settings.ThemeMode)
-	// 		assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
-	// 		assert.WithinRange(t, *setting.UpdatedAt, before, after)
-	// 	}, retryDuration, tick)
-	// })
+			// event org.policy.label.change
+			assert.Equal(t, domain.OwnerTypeOrganization, setting.OwnerType)
+			assert.Equal(t, "#055000", setting.Settings.PrimaryColor)
+			assert.Equal(t, "#055000", setting.Settings.BackgroundColor)
+			assert.Equal(t, "#055000", setting.Settings.WarnColor)
+			assert.Equal(t, "#055000", setting.Settings.FontColor)
+			assert.Equal(t, "#055000", setting.Settings.PrimaryColorDark)
+			assert.Equal(t, "#055000", setting.Settings.BackgroundColorDark)
+			assert.Equal(t, "#055000", setting.Settings.WarnColorDark)
+			assert.Equal(t, "#055000", setting.Settings.WarnColorDark)
+			assert.Equal(t, "#055000", setting.Settings.FontColorDark)
+			assert.Equal(t, true, setting.Settings.HideLoginNameSuffix)
+			assert.Equal(t, false, setting.Settings.ErrorMsgPopup)
+			assert.Equal(t, true, setting.Settings.DisableWatermark)
+			assert.Equal(t, domain.LabelPolicyThemeLight, setting.Settings.ThemeMode)
+			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
 
-	// t.Run("test label settings activated", func(t *testing.T) {
-	// 	ctx := t.Context()
+	t.Run("test label settings activated", func(t *testing.T) {
+		ctx := t.Context()
 
-	// 	newInstance := integration.NewInstance(t.Context())
-	// 	IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-	// 	organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
-	// 		Name: gofakeit.Name(),
-	// 	})
-	// 	require.NoError(t, err)
-	// 	orgId := organization.Id
-	// 	IAMCTX = integration.SetOrgID(IAMCTX, orgId)
+		newInstance := integration.NewInstance(t.Context())
+		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
+			Name: gofakeit.Name(),
+		})
+		require.NoError(t, err)
+		orgId := organization.Id
+		IAMCTX = integration.SetOrgID(IAMCTX, orgId)
 
-	// 	_, err = newInstance.Client.Mgmt.AddCustomLabelPolicy(IAMCTX, &management.AddCustomLabelPolicyRequest{
-	// 		PrimaryColor:        "#055090",
-	// 		HideLoginNameSuffix: false,
-	// 		WarnColor:           "#055090",
-	// 		BackgroundColor:     "#055090",
-	// 		FontColor:           "#055090",
-	// 		PrimaryColorDark:    "#055090",
-	// 		BackgroundColorDark: "#055090",
-	// 		WarnColorDark:       "#055090",
-	// 		FontColorDark:       "#055090",
-	// 		DisableWatermark:    false,
-	// 		ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-	// 	})
-	// 	require.NoError(t, err)
+		_, err = newInstance.Client.Mgmt.AddCustomLabelPolicy(IAMCTX, &management.AddCustomLabelPolicyRequest{
+			PrimaryColor:        "#055090",
+			HideLoginNameSuffix: false,
+			WarnColor:           "#055090",
+			BackgroundColor:     "#055090",
+			FontColor:           "#055090",
+			PrimaryColorDark:    "#055090",
+			BackgroundColorDark: "#055090",
+			WarnColorDark:       "#055090",
+			FontColorDark:       "#055090",
+			DisableWatermark:    false,
+			ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
+		})
+		require.NoError(t, err)
 
-	// 	// check label policy exists in preview
-	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		// setting, err := settingsRepo.Get(
-	// 		// 	ctx, pool,
-	// 		// 	database.WithCondition(
-	// 		// 		database.And(
-	// 		// 			settingsRepo.InstanceIDCondition(instanceID),
-	// 		// 			settingsRepo.OrgIDCondition(nil),
-	// 		// 			settingsRepo.TypeCondition(domain.SettingTypeLabel),
-	// 		// 			settingsRepo.LabelStateCondition(domain.LabelStatePreview),
-	// 		// 		),
-	// 		// 	),
-	// 		// )
-	// 		setting, err := settingsRepo.Get(
-	// 			ctx, pool,
-	// 			database.WithCondition(
-	// 				database.And(
-	// 					settingsRepo.InstanceIDCondition(newInstance.ID()),
-	// 					settingsRepo.OrgIDCondition(&orgId),
-	// 					settingsRepo.TypeCondition(domain.SettingTypeLabel),
-	// 					settingsRepo.LabelStateCondition(domain.LabelStatePreview),
-	// 					settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-	// 				),
-	// 			),
-	// 		)
-	// 		require.NoError(t, err)
+		// check label policy exists in preview
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			// setting, err := settingsRepo.Get(
+			// 	ctx, pool,
+			// 	database.WithCondition(
+			// 		database.And(
+			// 			settingsRepo.InstanceIDCondition(instanceID),
+			// 			settingsRepo.OrgIDCondition(nil),
+			// 			settingsRepo.TypeCondition(domain.SettingTypeLabel),
+			// 			settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+			// 		),
+			// 	),
+			// )
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 		assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
-	// 	}, retryDuration, tick)
+			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
+		}, retryDuration, tick)
 
-	// 	// check label policy does not exists in activated
-	// 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		// _, err := settingsRepo.GetLabel(
-	// 		// 	ctx, pool,
-	// 		// 	newInstance.ID(),
-	// 		// 	&organization.Id,
-	// 		// 	domain.LabelStateActivated)
-	// 		_, err := settingsRepo.Get(
-	// 			ctx, pool,
-	// 			database.WithCondition(
-	// 				database.And(
-	// 					settingsRepo.InstanceIDCondition(newInstance.ID()),
-	// 					settingsRepo.OrgIDCondition(&orgId),
-	// 					settingsRepo.TypeCondition(domain.SettingTypeLabel),
-	// 					settingsRepo.LabelStateCondition(domain.LabelStateActivated),
-	// 					settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-	// 				),
-	// 			),
-	// 		)
+		// check label policy does not exists in activated
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			// _, err := settingsRepo.GetLabel(
+			// 	ctx, pool,
+			// 	newInstance.ID(),
+			// 	&organization.Id,
+			// 	domain.LabelStateActivated)
+			_, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.LabelStateCondition(domain.LabelStateActivated),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
 
-	// 		require.ErrorIs(t, err, new(database.NoRowFoundError))
-	// 	}, retryDuration, tick)
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
 
-	// 	// activate label
-	// 	before := time.Now()
-	// 	_, err = newInstance.Client.Mgmt.ActivateCustomLabelPolicy(IAMCTX, &management.ActivateCustomLabelPolicyRequest{})
-	// 	require.NoError(t, err)
-	// 	after := time.Now().Add(time.Second * 30)
+		// activate label
+		before := time.Now()
+		_, err = newInstance.Client.Mgmt.ActivateCustomLabelPolicy(IAMCTX, &management.ActivateCustomLabelPolicyRequest{})
+		require.NoError(t, err)
+		after := time.Now().Add(time.Second * 30)
 
-	// 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		// setting, err := settingsRepo.Get(
-	// 		// 	ctx, pool,
-	// 		// 	database.WithCondition(
-	// 		// 		database.And(
-	// 		// 			settingsRepo.InstanceIDCondition(instanceID),
-	// 		// 			settingsRepo.OrgIDCondition(nil),
-	// 		// 			settingsRepo.TypeCondition(domain.SettingTypeLabel),
-	// 		// 			settingsRepo.LabelStateCondition(domain.LabelStatePreview),
-	// 		// 		),
-	// 		// 	),
-	// 		// )
-	// 		setting, err := settingsRepo.Get(
-	// 			ctx, pool,
-	// 			database.WithCondition(
-	// 				database.And(
-	// 					settingsRepo.InstanceIDCondition(newInstance.ID()),
-	// 					settingsRepo.OrgIDCondition(&orgId),
-	// 					settingsRepo.TypeCondition(domain.SettingTypeLabel),
-	// 					settingsRepo.LabelStateCondition(domain.LabelStateActivated),
-	// 					settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-	// 				),
-	// 			),
-	// 		)
-	// 		require.NoError(t, err)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			// setting, err := settingsRepo.Get(
+			// 	ctx, pool,
+			// 	database.WithCondition(
+			// 		database.And(
+			// 			settingsRepo.InstanceIDCondition(instanceID),
+			// 			settingsRepo.OrgIDCondition(nil),
+			// 			settingsRepo.TypeCondition(domain.SettingTypeLabel),
+			// 			settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+			// 		),
+			// 	),
+			// )
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.LabelStateCondition(domain.LabelStateActivated),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-	// 		// event org.policy.label.activated
-	// 		assert.Equal(t, domain.LabelStateActivated, *setting.LabelState)
-	// 		assert.WithinRange(t, *setting.UpdatedAt, before, after)
-	// 	}, retryDuration, tick)
-	// })
+			// event org.policy.label.activated
+			assert.Equal(t, domain.LabelStateActivated, *setting.LabelState)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
 
 	t.Run("test policy label logo light added", func(t *testing.T) {
 		ctx := t.Context()
@@ -2579,437 +2654,500 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 	})
 }
 
-// func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
-// 	settingsRepo := repository.SettingsRepository()
+func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
+	settingsRepo := repository.DomainRepository()
 
-// 	t.Run("test domain policy added", func(t *testing.T) {
-// 		ctx := t.Context()
+	t.Run("test domain policy added", func(t *testing.T) {
+		ctx := t.Context()
 
-// 		newInstance := integration.NewInstance(t.Context())
-// 		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-// 		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
-// 			Name: gofakeit.Name(),
-// 		})
-// 		require.NoError(t, err)
+		newInstance := integration.NewInstance(t.Context())
+		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
+			Name: gofakeit.Name(),
+		})
+		require.NoError(t, err)
+		orgId := organization.Id
 
-// 		before := time.Now()
-// 		_, err = newInstance.Client.Admin.AddCustomDomainPolicy(IAMCTX, &admin.AddCustomDomainPolicyRequest{
-// 			OrgId:                                  organization.Id,
-// 			UserLoginMustBeDomain:                  false,
-// 			ValidateOrgDomains:                     false,
-// 			SmtpSenderAddressMatchesInstanceDomain: false,
-// 		})
-// 		require.NoError(t, err)
-// 		after := time.Now().Add(time.Second * 30)
+		before := time.Now()
+		_, err = newInstance.Client.Admin.AddCustomDomainPolicy(IAMCTX, &admin.AddCustomDomainPolicyRequest{
+			OrgId:                                  organization.Id,
+			UserLoginMustBeDomain:                  false,
+			ValidateOrgDomains:                     false,
+			SmtpSenderAddressMatchesInstanceDomain: false,
+		})
+		require.NoError(t, err)
+		after := time.Now().Add(time.Second * 30)
 
-// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			setting, err := settingsRepo.Get(
-// 				ctx, pool,
-// 				database.WithCondition(
-// 					database.And(
-// 						settingsRepo.InstanceIDCondition(instanceID),
-// 						settingsRepo.OrgIDCondition(nil),
-// 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
-// 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
-// 					),
-// 				),
-// 			)
-// 			require.NoError(t, err)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeDomain),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-// 			// event org.policy.domain.added
-// 			assert.Equal(t, domain.OwnerTypeOrganization, setting.OwnerType)
-// 			assert.Equal(t, false, setting.Settings.SMTPSenderAddressMatchesInstanceDomain)
-// 			assert.Equal(t, false, setting.Settings.UserLoginMustBeDomain)
-// 			assert.Equal(t, false, setting.Settings.ValidateOrgDomains)
-// 			assert.WithinRange(t, setting.CreatedAt, before, after)
-// 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
-// 		}, retryDuration, tick)
-// 	})
+			// event org.policy.domain.added
+			assert.Equal(t, domain.OwnerTypeOrganization, setting.OwnerType)
+			assert.Equal(t, false, setting.Settings.SMTPSenderAddressMatchesInstanceDomain)
+			assert.Equal(t, false, setting.Settings.UserLoginMustBeDomain)
+			assert.Equal(t, false, setting.Settings.ValidateOrgDomains)
+			assert.WithinRange(t, setting.CreatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
 
-// 	t.Run("test domain policy changed", func(t *testing.T) {
-// 		ctx := t.Context()
+	t.Run("test domain policy changed", func(t *testing.T) {
+		ctx := t.Context()
 
-// 		newInstance := integration.NewInstance(t.Context())
-// 		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-// 		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
-// 			Name: gofakeit.Name(),
-// 		})
-// 		require.NoError(t, err)
+		newInstance := integration.NewInstance(t.Context())
+		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
+			Name: gofakeit.Name(),
+		})
+		require.NoError(t, err)
+		orgId := organization.Id
 
-// 		// add domain policy
-// 		_, err = newInstance.Client.Admin.AddCustomDomainPolicy(IAMCTX, &admin.AddCustomDomainPolicyRequest{
-// 			OrgId:                                  organization.Id,
-// 			UserLoginMustBeDomain:                  false,
-// 			ValidateOrgDomains:                     false,
-// 			SmtpSenderAddressMatchesInstanceDomain: false,
-// 		})
-// 		require.NoError(t, err)
+		// add domain policy
+		_, err = newInstance.Client.Admin.AddCustomDomainPolicy(IAMCTX, &admin.AddCustomDomainPolicyRequest{
+			OrgId:                                  organization.Id,
+			UserLoginMustBeDomain:                  false,
+			ValidateOrgDomains:                     false,
+			SmtpSenderAddressMatchesInstanceDomain: false,
+		})
+		require.NoError(t, err)
 
-// 		// update domain policy
-// 		before := time.Now()
-// 		_, err = newInstance.Client.Admin.UpdateCustomDomainPolicy(IAMCTX, &admin.UpdateCustomDomainPolicyRequest{
-// 			OrgId:                                  organization.Id,
-// 			UserLoginMustBeDomain:                  true,
-// 			ValidateOrgDomains:                     true,
-// 			SmtpSenderAddressMatchesInstanceDomain: true,
-// 		})
-// 		require.NoError(t, err)
-// 		after := time.Now().Add(time.Second * 30)
+		// update domain policy
+		before := time.Now()
+		_, err = newInstance.Client.Admin.UpdateCustomDomainPolicy(IAMCTX, &admin.UpdateCustomDomainPolicyRequest{
+			OrgId:                                  organization.Id,
+			UserLoginMustBeDomain:                  true,
+			ValidateOrgDomains:                     true,
+			SmtpSenderAddressMatchesInstanceDomain: true,
+		})
+		require.NoError(t, err)
+		after := time.Now().Add(time.Second * 30)
 
-// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			setting, err := settingsRepo.Get(
-// 				ctx, pool,
-// 				database.WithCondition(
-// 					database.And(
-// 						settingsRepo.InstanceIDCondition(instanceID),
-// 						settingsRepo.OrgIDCondition(nil),
-// 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
-// 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
-// 					),
-// 				),
-// 			)
-// 			require.NoError(t, err)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeDomain),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-// 			// event org.policy.domain.changed
-// 			assert.Equal(t, domain.OwnerTypeOrganization, setting.OwnerType)
-// 			assert.Equal(t, true, setting.Settings.SMTPSenderAddressMatchesInstanceDomain)
-// 			assert.Equal(t, true, setting.Settings.UserLoginMustBeDomain)
-// 			assert.Equal(t, true, setting.Settings.ValidateOrgDomains)
-// 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
-// 		}, retryDuration, tick)
-// 	})
+			// event org.policy.domain.changed
+			assert.Equal(t, domain.OwnerTypeOrganization, setting.OwnerType)
+			assert.Equal(t, true, setting.Settings.SMTPSenderAddressMatchesInstanceDomain)
+			assert.Equal(t, true, setting.Settings.UserLoginMustBeDomain)
+			assert.Equal(t, true, setting.Settings.ValidateOrgDomains)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
 
-// 	t.Run("test remove domain policy reduces", func(t *testing.T) {
-// 		ctx := t.Context()
+	t.Run("test remove domain policy reduces", func(t *testing.T) {
+		ctx := t.Context()
 
-// 		newInstance := integration.NewInstance(t.Context())
-// 		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-// 		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
-// 			Name: gofakeit.Name(),
-// 		})
-// 		require.NoError(t, err)
-// 		// IAMCTX = integration.SetOrgID(IAMCTX, organization.Id)
+		newInstance := integration.NewInstance(t.Context())
+		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
+			Name: gofakeit.Name(),
+		})
+		require.NoError(t, err)
+		orgId := organization.Id
+		// IAMCTX = integration.SetOrgID(IAMCTX, organization.Id)
 
-// 		// add domain policy
-// 		_, err = newInstance.Client.Admin.AddCustomDomainPolicy(IAMCTX, &admin.AddCustomDomainPolicyRequest{
-// 			OrgId:                                  organization.Id,
-// 			UserLoginMustBeDomain:                  false,
-// 			ValidateOrgDomains:                     false,
-// 			SmtpSenderAddressMatchesInstanceDomain: false,
-// 		})
-// 		require.NoError(t, err)
+		// add domain policy
+		_, err = newInstance.Client.Admin.AddCustomDomainPolicy(IAMCTX, &admin.AddCustomDomainPolicyRequest{
+			OrgId:                                  organization.Id,
+			UserLoginMustBeDomain:                  false,
+			ValidateOrgDomains:                     false,
+			SmtpSenderAddressMatchesInstanceDomain: false,
+		})
+		require.NoError(t, err)
 
-// 		// check login settings exist
-// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			setting, err := settingsRepo.Get(
-// 				ctx, pool,
-// 				database.WithCondition(
-// 					database.And(
-// 						settingsRepo.InstanceIDCondition(instanceID),
-// 						settingsRepo.OrgIDCondition(nil),
-// 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
-// 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
-// 					),
-// 				),
-// 			)
-// 			require.NoError(t, err)
+		// check login settings exist
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeDomain),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-// 			require.NotNil(t, setting)
-// 		}, retryDuration, tick)
+			require.NotNil(t, setting)
+		}, retryDuration, tick)
 
-// 		// remove domain policy org
-// 		_, err = newInstance.Client.Admin.ResetCustomDomainPolicyToDefault(IAMCTX, &admin.ResetCustomDomainPolicyToDefaultRequest{
-// 			OrgId: organization.Id,
-// 		})
-// 		require.NoError(t, err)
+		// remove domain policy org
+		_, err = newInstance.Client.Admin.ResetCustomDomainPolicyToDefault(IAMCTX, &admin.ResetCustomDomainPolicyToDefaultRequest{
+			OrgId: organization.Id,
+		})
+		require.NoError(t, err)
 
-// 		// check domain settings removed
-// 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			_, err := settingsRepo.GetDomain(
-// 				ctx, pool,
-// 				newInstance.ID(),
-// 				&organization.Id)
+		// check domain settings removed
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			// _, err := settingsRepo.GetDomain(
+			// 	ctx, pool,
+			// 	newInstance.ID(),
+			// 	&organization.Id)
+			_, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeDomain),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
 
-// 			// event org.policy.domain.removed
-// 			require.ErrorIs(t, err, new(database.NoRowFoundError))
-// 		}, retryDuration, tick)
-// 	})
+			// event org.policy.domain.removed
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
+	})
 
-// 	t.Run("test delete org reduces", func(t *testing.T) {
-// 		ctx := t.Context()
+	t.Run("test delete org reduces", func(t *testing.T) {
+		ctx := t.Context()
 
-// 		newInstance := integration.NewInstance(t.Context())
-// 		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-// 		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
-// 			Name: gofakeit.Name(),
-// 		})
-// 		require.NoError(t, err)
+		newInstance := integration.NewInstance(t.Context())
+		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
+			Name: gofakeit.Name(),
+		})
+		require.NoError(t, err)
+		orgId := organization.Id
 
-// 		// add domain policy
-// 		_, err = newInstance.Client.Admin.AddCustomDomainPolicy(IAMCTX, &admin.AddCustomDomainPolicyRequest{
-// 			OrgId:                                  organization.Id,
-// 			UserLoginMustBeDomain:                  false,
-// 			ValidateOrgDomains:                     false,
-// 			SmtpSenderAddressMatchesInstanceDomain: false,
-// 		})
-// 		require.NoError(t, err)
+		// add domain policy
+		_, err = newInstance.Client.Admin.AddCustomDomainPolicy(IAMCTX, &admin.AddCustomDomainPolicyRequest{
+			OrgId:                                  organization.Id,
+			UserLoginMustBeDomain:                  false,
+			ValidateOrgDomains:                     false,
+			SmtpSenderAddressMatchesInstanceDomain: false,
+		})
+		require.NoError(t, err)
 
-// 		// check login settings exist
-// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			setting, err := settingsRepo.Get(
-// 				ctx, pool,
-// 				database.WithCondition(
-// 					database.And(
-// 						settingsRepo.InstanceIDCondition(instanceID),
-// 						settingsRepo.OrgIDCondition(nil),
-// 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
-// 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
-// 					),
-// 				),
-// 			)
-// 			require.NoError(t, err)
+		// check login settings exist
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeDomain),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-// 			require.NotNil(t, setting)
-// 		}, retryDuration, tick)
+			require.NotNil(t, setting)
+		}, retryDuration, tick)
 
-// 		// add delete org
-// 		_, err = newInstance.Client.OrgV2beta.DeleteOrganization(IAMCTX, &v2beta_org.DeleteOrganizationRequest{
-// 			Id: organization.Id,
-// 		})
-// 		require.NoError(t, err)
+		// add delete org
+		_, err = newInstance.Client.OrgV2beta.DeleteOrganization(IAMCTX, &v2beta_org.DeleteOrganizationRequest{
+			Id: organization.Id,
+		})
+		require.NoError(t, err)
 
-// 		// check password complexity settings removed
-// 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			_, err := settingsRepo.GetDomain(
-// 				ctx, pool,
-// 				newInstance.ID(),
-// 				&organization.Id)
+		// check password complexity settings removed
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			// _, err := settingsRepo.GetDomain(
+			// 	ctx, pool,
+			// 	newInstance.ID(),
+			// 	&organization.Id)
+			_, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeDomain),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
 
-// 			// event org.removed
-// 			require.ErrorIs(t, err, new(database.NoRowFoundError))
-// 		}, retryDuration, tick)
-// 	})
-// }
+			// event org.removed
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
+	})
+}
 
-// func TestServer_TestOrgSettingsReduces(t *testing.T) {
-// 	settingsRepo := repository.SettingsRepository()
+func TestServer_TestOrgSettingsReduces(t *testing.T) {
+	settingsRepo := repository.OrganizationSettingRepository()
 
-// 	t.Run("test add org settings added", func(t *testing.T) {
-// 		ctx := t.Context()
+	t.Run("test add org settings added", func(t *testing.T) {
+		ctx := t.Context()
 
-// 		newInstance := integration.NewInstance(t.Context())
-// 		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-// 		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
-// 			Name: gofakeit.Name(),
-// 		})
-// 		require.NoError(t, err)
-// 		IAMCTX = integration.SetOrgID(IAMCTX, organization.Id)
+		newInstance := integration.NewInstance(t.Context())
+		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
+			Name: gofakeit.Name(),
+		})
+		require.NoError(t, err)
+		orgId := organization.Id
+		IAMCTX = integration.SetOrgID(IAMCTX, organization.Id)
 
-// 		organizationScopedUsernames := true
-// 		before := time.Now()
-// 		_, err = newInstance.Client.SettingsV2beta.SetOrganizationSettings(IAMCTX, &settings.SetOrganizationSettingsRequest{
-// 			OrganizationId:              organization.Id,
-// 			OrganizationScopedUsernames: &organizationScopedUsernames,
-// 		})
-// 		require.NoError(t, err)
-// 		after := time.Now().Add(time.Second * 30)
+		organizationScopedUsernames := true
+		before := time.Now()
+		_, err = newInstance.Client.SettingsV2beta.SetOrganizationSettings(IAMCTX, &settings.SetOrganizationSettingsRequest{
+			OrganizationId:              organization.Id,
+			OrganizationScopedUsernames: &organizationScopedUsernames,
+		})
+		require.NoError(t, err)
+		after := time.Now().Add(time.Second * 30)
 
-// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			setting, err := settingsRepo.Get(
-// 				ctx, pool,
-// 				database.WithCondition(
-// 					database.And(
-// 						settingsRepo.InstanceIDCondition(instanceID),
-// 						settingsRepo.OrgIDCondition(nil),
-// 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
-// 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
-// 					),
-// 				),
-// 			)
-// 			require.NoError(t, err)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeOrganization),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-// 			// event settings.organization.set
-// 			assert.Equal(t, organizationScopedUsernames, setting.Settings.OrganizationScopedUsernames)
-// 			assert.WithinRange(t, setting.CreatedAt, before, after)
-// 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
-// 		}, retryDuration, tick)
-// 	})
+			// event settings.organization.set
+			assert.Equal(t, organizationScopedUsernames, setting.Settings.OrganizationScopedUsernames)
+			assert.WithinRange(t, setting.CreatedAt, before, after)
+			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
 
-// 	t.Run("test organization settings removed reduces", func(t *testing.T) {
-// 		ctx := t.Context()
+	t.Run("test organization settings removed reduces", func(t *testing.T) {
+		ctx := t.Context()
 
-// 		newInstance := integration.NewInstance(t.Context())
-// 		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-// 		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
-// 			Name: gofakeit.Name(),
-// 		})
-// 		require.NoError(t, err)
-// 		IAMCTX = integration.SetOrgID(IAMCTX, organization.Id)
+		newInstance := integration.NewInstance(t.Context())
+		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
+			Name: gofakeit.Name(),
+		})
+		require.NoError(t, err)
+		orgId := organization.Id
+		IAMCTX = integration.SetOrgID(IAMCTX, organization.Id)
 
-// 		// create organization setting
-// 		organizationScopedUsernames := true
-// 		_, err = newInstance.Client.SettingsV2beta.SetOrganizationSettings(IAMCTX, &settings.SetOrganizationSettingsRequest{
-// 			OrganizationId:              organization.Id,
-// 			OrganizationScopedUsernames: &organizationScopedUsernames,
-// 		})
-// 		require.NoError(t, err)
+		// create organization setting
+		organizationScopedUsernames := true
+		_, err = newInstance.Client.SettingsV2beta.SetOrganizationSettings(IAMCTX, &settings.SetOrganizationSettingsRequest{
+			OrganizationId:              organization.Id,
+			OrganizationScopedUsernames: &organizationScopedUsernames,
+		})
+		require.NoError(t, err)
 
-// 		// check organization settings exist
-// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			setting, err := settingsRepo.Get(
-// 				ctx, pool,
-// 				database.WithCondition(
-// 					database.And(
-// 						settingsRepo.InstanceIDCondition(instanceID),
-// 						settingsRepo.OrgIDCondition(nil),
-// 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
-// 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
-// 					),
-// 				),
-// 			)
-// 			require.NoError(t, err)
+		// check organization settings exist
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeOrganization),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-// 			require.NotNil(t, setting)
-// 		}, retryDuration, tick)
+			require.NotNil(t, setting)
+		}, retryDuration, tick)
 
-// 		// delete organization setting
-// 		_, err = newInstance.Client.SettingsV2beta.DeleteOrganizationSettings(IAMCTX, &settings.DeleteOrganizationSettingsRequest{
-// 			OrganizationId: organization.Id,
-// 		})
-// 		require.NoError(t, err)
+		// delete organization setting
+		_, err = newInstance.Client.SettingsV2beta.DeleteOrganizationSettings(IAMCTX, &settings.DeleteOrganizationSettingsRequest{
+			OrganizationId: organization.Id,
+		})
+		require.NoError(t, err)
 
-// 		// check organization settings removed
-// 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			_, err := settingsRepo.GetOrg(
-// 				ctx, pool,
-// 				newInstance.ID(),
-// 				&organization.Id)
+		// check organization settings removed
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			// _, err := settingsRepo.GetOrg(
+			// 	ctx, pool,
+			// 	newInstance.ID(),
+			// 	&organization.Id)
+			_, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeOrganization),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
 
-// 			// event settings.organization.removed
-// 			require.ErrorIs(t, err, new(database.NoRowFoundError))
-// 		}, retryDuration, tick)
-// 	})
+			// event settings.organization.removed
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
+	})
 
-// 	t.Run("test organization removed reduces", func(t *testing.T) {
-// 		ctx := t.Context()
+	t.Run("test organization removed reduces", func(t *testing.T) {
+		ctx := t.Context()
 
-// 		newInstance := integration.NewInstance(t.Context())
-// 		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-// 		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
-// 			Name: gofakeit.Name(),
-// 		})
-// 		require.NoError(t, err)
-// 		IAMCTX = integration.SetOrgID(IAMCTX, organization.Id)
+		newInstance := integration.NewInstance(t.Context())
+		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
+			Name: gofakeit.Name(),
+		})
+		require.NoError(t, err)
+		orgId := organization.Id
+		IAMCTX = integration.SetOrgID(IAMCTX, organization.Id)
 
-// 		// create organization setting
-// 		organizationScopedUsernames := true
-// 		_, err = newInstance.Client.SettingsV2beta.SetOrganizationSettings(IAMCTX, &settings.SetOrganizationSettingsRequest{
-// 			OrganizationId:              organization.Id,
-// 			OrganizationScopedUsernames: &organizationScopedUsernames,
-// 		})
-// 		require.NoError(t, err)
+		// create organization setting
+		organizationScopedUsernames := true
+		_, err = newInstance.Client.SettingsV2beta.SetOrganizationSettings(IAMCTX, &settings.SetOrganizationSettingsRequest{
+			OrganizationId:              organization.Id,
+			OrganizationScopedUsernames: &organizationScopedUsernames,
+		})
+		require.NoError(t, err)
 
-// 		// check organization settings exist
-// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			setting, err := settingsRepo.Get(
-// 				ctx, pool,
-// 				database.WithCondition(
-// 					database.And(
-// 						settingsRepo.InstanceIDCondition(instanceID),
-// 						settingsRepo.OrgIDCondition(nil),
-// 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
-// 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
-// 					),
-// 				),
-// 			)
-// 			require.NoError(t, err)
+		// check organization settings exist
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeOrganization),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-// 			require.NotNil(t, setting)
-// 		}, retryDuration, tick)
+			require.NotNil(t, setting)
+		}, retryDuration, tick)
 
-// 		// add delete org
-// 		_, err = newInstance.Client.OrgV2beta.DeleteOrganization(IAMCTX, &v2beta_org.DeleteOrganizationRequest{
-// 			Id: organization.Id,
-// 		})
-// 		require.NoError(t, err)
+		// add delete org
+		_, err = newInstance.Client.OrgV2beta.DeleteOrganization(IAMCTX, &v2beta_org.DeleteOrganizationRequest{
+			Id: organization.Id,
+		})
+		require.NoError(t, err)
 
-// 		// check organization settings removed
-// 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			_, err := settingsRepo.GetOrg(
-// 				ctx, pool,
-// 				newInstance.ID(),
-// 				&organization.Id)
+		// check organization settings removed
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			// _, err := settingsRepo.GetOrg(
+			// 	ctx, pool,
+			// 	newInstance.ID(),
+			// 	&organization.Id)
+			_, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeOrganization),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
 
-// 			// event org.removed
-// 			require.ErrorIs(t, err, new(database.NoRowFoundError))
-// 		}, retryDuration, tick)
-// 	})
+			// event org.removed
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
+	})
 
-// 	t.Run("test delete org reduces", func(t *testing.T) {
-// 		ctx := t.Context()
+	t.Run("test delete org reduces", func(t *testing.T) {
+		ctx := t.Context()
 
-// 		newInstance := integration.NewInstance(t.Context())
-// 		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-// 		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
-// 			Name: gofakeit.Name(),
-// 		})
-// 		require.NoError(t, err)
-// 		IAMCTX = integration.SetOrgID(IAMCTX, organization.Id)
+		newInstance := integration.NewInstance(t.Context())
+		IAMCTX := newInstance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		organization, err := newInstance.Client.OrgV2beta.CreateOrganization(IAMCTX, &v2beta_org.CreateOrganizationRequest{
+			Name: gofakeit.Name(),
+		})
+		require.NoError(t, err)
+		orgId := organization.Id
+		IAMCTX = integration.SetOrgID(IAMCTX, organization.Id)
 
-// 		// create organization setting
-// 		organizationScopedUsernames := true
-// 		_, err = newInstance.Client.SettingsV2beta.SetOrganizationSettings(IAMCTX, &settings.SetOrganizationSettingsRequest{
-// 			OrganizationId:              organization.Id,
-// 			OrganizationScopedUsernames: &organizationScopedUsernames,
-// 		})
-// 		require.NoError(t, err)
+		// create organization setting
+		organizationScopedUsernames := true
+		_, err = newInstance.Client.SettingsV2beta.SetOrganizationSettings(IAMCTX, &settings.SetOrganizationSettingsRequest{
+			OrganizationId:              organization.Id,
+			OrganizationScopedUsernames: &organizationScopedUsernames,
+		})
+		require.NoError(t, err)
 
-// 		// check organization settings exist
-// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			setting, err := settingsRepo.Get(
-// 				ctx, pool,
-// 				database.WithCondition(
-// 					database.And(
-// 						settingsRepo.InstanceIDCondition(instanceID),
-// 						settingsRepo.OrgIDCondition(nil),
-// 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
-// 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
-// 					),
-// 				),
-// 			)
-// 			require.NoError(t, err)
+		// check organization settings exist
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeOrganization),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
+			require.NoError(t, err)
 
-// 			require.NotNil(t, setting)
-// 		}, retryDuration, tick)
+			require.NotNil(t, setting)
+		}, retryDuration, tick)
 
-// 		// add delete org
-// 		_, err = newInstance.Client.OrgV2beta.DeleteOrganization(IAMCTX, &v2beta_org.DeleteOrganizationRequest{
-// 			Id: organization.Id,
-// 		})
-// 		require.NoError(t, err)
+		// add delete org
+		_, err = newInstance.Client.OrgV2beta.DeleteOrganization(IAMCTX, &v2beta_org.DeleteOrganizationRequest{
+			Id: organization.Id,
+		})
+		require.NoError(t, err)
 
-// 		// check organization settings removed
-// 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
-// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-// 			_, err := settingsRepo.GetOrg(
-// 				ctx, pool,
-// 				newInstance.ID(),
-// 				&organization.Id)
+		// check organization settings removed
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			// _, err := settingsRepo.GetOrg(
+			// 	ctx, pool,
+			// 	newInstance.ID(),
+			// 	&organization.Id)
+			_, err := settingsRepo.Get(
+				ctx, pool,
+				database.WithCondition(
+					database.And(
+						settingsRepo.InstanceIDCondition(newInstance.ID()),
+						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.TypeCondition(domain.SettingTypeOrganization),
+						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+					),
+				),
+			)
 
-//			// event settings.organization.removed
-//			require.ErrorIs(t, err, new(database.NoRowFoundError))
-//		}, retryDuration, tick)
-//	})
-// }
+			// event settings.organization.removed
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
+	})
+}
