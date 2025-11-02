@@ -3,7 +3,6 @@ package json
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
@@ -62,6 +61,7 @@ func (c *FieldChange) writeUpdate(builder *database.StatementBuilder, changes js
 	if err != nil {
 		return err
 	}
+	fmt.Println("\033[45m[DBUGPRINT]\033[0m[:1]\033[45m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m inside writeUpdate()")
 
 	builder.WriteString("jsonb_set_lax(")
 	if i < 0 {
@@ -81,6 +81,10 @@ func (c *FieldChange) writeUpdate(builder *database.StatementBuilder, changes js
 	builder.WriteString(")")
 
 	return nil
+}
+
+type jsonArrayValues interface {
+	~int64 | ~string
 }
 
 type ArrayChange struct {
@@ -119,6 +123,39 @@ func NewArrayChange(path []string, value any, remove bool) []JsonUpdate {
 func (c *ArrayChange) getPathValue() ([]string, string, error) {
 	path, v := c.path, c.value
 
+	// var outValue string
+	// switch v := v.(type) {
+	// case string:
+	// 	value, err := json.Marshal(v)
+	// 	if err != nil {
+	// 		return nil, "", err
+	// 	}
+	// 	outValue = string(value) + "::TEXT"
+	// case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+	// 	value, err := json.Marshal(v)
+	// 	if err != nil {
+	// 		return nil, "", err
+	// 	}
+	// 	outValue = string(value) + "::INTEGER"
+	// case float32, float64:
+	// 	value, err := json.Marshal(v)
+	// 	if err != nil {
+	// 		return nil, "", err
+	// 	}
+	// 	outValue = string(value) + "::NUMERIC"
+	// case bool:
+	// 	value, err := json.Marshal(v)
+	// 	if err != nil {
+	// 		return nil, "", err
+	// 	}
+	// 	outValue = string(value) + "::BOOL"
+	// default:
+	// 	fmt.Println("\033[45m[DBUGPRINT]\033[0m[:1]\033[45m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m BAD TYPE")
+	// 	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m v = %+v\n", v)
+	// 	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m v = %p\n", v)
+	// 	return nil, "", errors.New("bad type")
+	// }
+
 	value, err := json.Marshal(v)
 	if err != nil {
 		return nil, "", err
@@ -134,6 +171,68 @@ func (c *ArrayChange) writeUpdate(builder *database.StatementBuilder, changes js
 	} else {
 		return c.addToArray(builder, changes, i)
 	}
+}
+
+func (c *ArrayChange) addToArray(builder *database.StatementBuilder, changes jsonChanges, i int) error {
+	fmt.Println("\033[45m[DBUGPRINT]\033[0m[:1]\033[45m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m ADD")
+	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m i = %+v\n", i)
+	path, value, err := c.getPathValue()
+	if err != nil {
+		return err
+	}
+	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m value = %+v\n", value)
+
+	// builder.WriteString("jsonb_insert(")
+	// //
+	// if i < 0 {
+	// 	changes.column.WriteQualified(builder)
+	// } else {
+	// 	changes.changes[i].writeUpdate(builder, changes, i-1)
+	// }
+	// //
+	// builder.WriteString(", " + "(CASE WHEN (SELECT ")
+	// changes.column.WriteQualified(builder)
+	// builder.WriteString(" ?& '" + writePath(path) + "') THEN")
+	// builder.WriteString(" '{" + strings.Join(path, "'") + ", -1}'")
+	// builder.WriteString(" ELSE '{" + strings.Join(path, ",") + "}'")
+	// builder.WriteString(" END)::TEXT[]")
+	// //
+	// builder.WriteString(", " + "(CASE WHEN (SELECT ")
+	// changes.column.WriteQualified(builder)
+	// builder.WriteString(" ?& '" + writePath(path) + "') THEN")
+	// builder.WriteString(" '" + value + "'::JSONB")
+	// builder.WriteString(" ELSE jsonb_build_array(")
+	// if len(value) > 2 && value[0] == '"' && value[len(value)-1] == '"' {
+	// 	builder.WriteString("'" + value[1:len(value)-1] + "'")
+	// } else {
+	// 	builder.WriteString(value)
+	// }
+	// builder.WriteString(")")
+	// builder.WriteString(" END)::JSONB")
+	// //
+	// builder.WriteString(", " + "true")
+
+	// builder.WriteString(")")
+	builder.WriteString("zitadel.jsonb_array_append(")
+	//
+	if i < 0 {
+		changes.column.WriteQualified(builder)
+	} else {
+		changes.changes[i].writeUpdate(builder, changes, i-1)
+	}
+	//
+	builder.WriteString(", ")
+	builder.WriteArg(path)
+	builder.WriteString(", ")
+	builder.WriteArg(value)
+	if len(value) > 2 && value[0] == '"' && value[len(value)-1] == '"' {
+		builder.WriteString("::TEXT")
+	} else {
+		builder.WriteString("::NUMERIC")
+	}
+
+	builder.WriteString(")")
+
 	return nil
 }
 
@@ -145,19 +244,7 @@ func (c *ArrayChange) removeFromArray(builder *database.StatementBuilder, change
 		return err
 	}
 
-	// outt = jsonb_set(source, path,
-	//  (CASE WHEN (SELECT source ?& path) THEN
-	//    COALESCE(
-	//    (SELECT jsonb_agg(v)
-	//    FROM jsonb_array_elements(source #>path) AS elem(v)
-	//    WHERE v::TEXT <> value::TEXT),
-	//    jsonb_build_array())
-	//  ELSE
-	//    jsonb_build_array()
-	//  END)::JSONB, true);
-
-	// builder.WriteString(">>>>> " + strconv.Itoa(i) + " Start <<<<<")
-	builder.WriteString("jsonb_set(")
+	builder.WriteString("zitadel.jsonb_array_remove(")
 	//
 	if i < 0 {
 		changes.column.WriteQualified(builder)
@@ -165,83 +252,12 @@ func (c *ArrayChange) removeFromArray(builder *database.StatementBuilder, change
 		changes.changes[i].writeUpdate(builder, changes, i-1)
 	}
 	//
-	builder.WriteString(", '" + writePath(path))
-	//
-	builder.WriteString("', " + "(CASE WHEN (SELECT ")
-	changes.column.WriteUnqualified(builder)
-	builder.WriteString(" ?& '" + writePath(path) + "') THEN")
-	builder.WriteString(" COALESCE(")
-	builder.WriteString(" (SELECT jsonb_agg(v)")
-	builder.WriteString(" FROM jsonb_array_elements(")
-	changes.column.WriteUnqualified(builder)
-	builder.WriteString(" #>")
-	builder.WriteString(" '" + writePath(path) + "') AS elem(v)")
-	builder.WriteString(" WHERE v::TEXT <> " + value + "::TEXT)")
-	builder.WriteString(", jsonb_build_array()) ")
-	builder.WriteString(" ELSE jsonb_build_array() ")
-	builder.WriteString(" END)::JSONB, true")
+	builder.WriteString(", ")
+	builder.WriteArg(path)
+	builder.WriteString(", ")
+	builder.WriteArg(value)
+	builder.WriteString("::TEXT")
 	builder.WriteString(")")
-	// builder.WriteString(">>>>> " + strconv.Itoa(i) + " End <<<<<")
-
-	return nil
-}
-
-func (c *ArrayChange) addToArray(builder *database.StatementBuilder, changes jsonChanges, i int) error {
-	fmt.Println("\033[45m[DBUGPRINT]\033[0m[:1]\033[45m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m ADD")
-	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m i = %+v\n", i)
-	path, value, err := c.getPathValue()
-	if err != nil {
-		return err
-	}
-
-	// 	SET properties = jsonb_insert(
-	//   properties,
-	//   (CASE WHEN (SELECT properties ? 'attributes') THEN
-	//   '{attributes, -1}'
-	//   ELSE
-	//   '{attributes}'
-	//   END)::TEXT[],
-	//   (CASE WHEN (SELECT properties ? 'attributes') THEN
-	//   '"3sdfdf8"'::JSONB
-	//   ELSE
-	//   jsonb_build_array('value')
-	//   END),
-	//   true
-	// )
-
-	// builder.WriteString(">>>>> " + strconv.Itoa(i) + " Start <<<<<")
-	builder.WriteString("jsonb_insert(")
-	//
-	if i < 0 {
-		changes.column.WriteQualified(builder)
-	} else {
-		changes.changes[i].writeUpdate(builder, changes, i-1)
-	}
-	//
-	builder.WriteString(", " + "(CASE WHEN (SELECT ")
-	changes.column.WriteQualified(builder)
-	builder.WriteString(" ?& '" + writePath(path) + "') THEN")
-	builder.WriteString(" '{" + strings.Join(path, "'") + ", -1}'")
-	builder.WriteString(" ELSE '{" + strings.Join(path, ",") + "}'")
-	builder.WriteString(" END)::TEXT[]")
-	//
-	builder.WriteString(", " + "(CASE WHEN (SELECT ")
-	changes.column.WriteQualified(builder)
-	builder.WriteString(" ?& '" + writePath(path) + "') THEN")
-	builder.WriteString(" '" + value + "'::JSONB")
-	builder.WriteString(" ELSE jsonb_build_array(")
-	if len(value) > 2 && value[0] == '"' && value[len(value)-1] == '"' {
-		builder.WriteString("'" + value[1:len(value)-1] + "'")
-	} else {
-		builder.WriteString(value)
-	}
-	builder.WriteString(")")
-	builder.WriteString(" END)::JSONB")
-	//
-	builder.WriteString(", " + "true")
-
-	builder.WriteString(")")
-	// builder.WriteString(">>>>> " + strconv.Itoa(i) + " End <<<<<")
 
 	return nil
 }
