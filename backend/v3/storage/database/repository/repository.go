@@ -3,12 +3,13 @@ package repository
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
 func writeCondition(
 	builder *database.StatementBuilder,
-	condition database.WriteCondition,
+	condition database.Condition,
 ) {
 	if condition == nil {
 		return
@@ -29,14 +30,10 @@ func checkRestrictingColumns(
 	return nil
 }
 
-type pkRepository interface {
-	PrimaryKeyColumns() []database.Column
-}
-
 // checkPKCondition checks if the Primary Key columns are part of the condition.
 // This can ensure only a single row is affected by updates and deletes.
 func checkPKCondition(
-	repo pkRepository,
+	repo domain.Repository,
 	condition database.Condition,
 ) error {
 	return checkRestrictingColumns(
@@ -68,3 +65,4 @@ func getMany[Target any](ctx context.Context, querier database.Querier, builder 
 	}
 	return targets, nil
 }
+

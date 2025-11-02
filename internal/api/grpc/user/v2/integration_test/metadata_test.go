@@ -18,7 +18,7 @@ import (
 )
 
 func TestServer_SetUserMetadata(t *testing.T) {
-	iamOwnerCTX := Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	iamOwnerCTX := Instance.WithAuthorizationToken(OrgCTX, integration.UserTypeIAMOwner)
 
 	tests := []struct {
 		name    string
@@ -32,7 +32,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 			name: "missing permission",
 			ctx:  Instance.WithAuthorizationToken(context.Background(), integration.UserTypeNoPermission),
 			dep: func(req *user.SetUserMetadataRequest) {
-				req.UserId = Instance.CreateUserTypeHuman(CTX, integration.Email()).GetId()
+				req.UserId = Instance.CreateUserTypeHuman(OrgCTX, integration.Email()).GetId()
 			},
 			req: &user.SetUserMetadataRequest{
 				Metadata: []*user.Metadata{{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))}},
@@ -43,7 +43,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 			name: "set user metadata",
 			ctx:  iamOwnerCTX,
 			dep: func(req *user.SetUserMetadataRequest) {
-				req.UserId = Instance.CreateUserTypeHuman(CTX, integration.Email()).GetId()
+				req.UserId = Instance.CreateUserTypeHuman(OrgCTX, integration.Email()).GetId()
 			},
 			req: &user.SetUserMetadataRequest{
 				Metadata: []*user.Metadata{{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))}},
@@ -54,7 +54,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 			name: "set user metadata, multiple",
 			ctx:  iamOwnerCTX,
 			dep: func(req *user.SetUserMetadataRequest) {
-				req.UserId = Instance.CreateUserTypeHuman(CTX, integration.Email()).GetId()
+				req.UserId = Instance.CreateUserTypeHuman(OrgCTX, integration.Email()).GetId()
 			},
 			req: &user.SetUserMetadataRequest{
 				Metadata: []*user.Metadata{
@@ -76,7 +76,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 		},
 		{
 			name: "update user metadata",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
+			ctx:  Instance.WithAuthorizationToken(OrgCTX, integration.UserTypeIAMOwner),
 			dep: func(req *user.SetUserMetadataRequest) {
 				req.UserId = Instance.CreateUserTypeHuman(iamOwnerCTX, integration.Email()).GetId()
 				Instance.SetUserMetadata(iamOwnerCTX, req.UserId, "key1", "value1")
@@ -88,7 +88,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 		},
 		{
 			name: "update user metadata with same value",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
+			ctx:  Instance.WithAuthorizationToken(OrgCTX, integration.UserTypeIAMOwner),
 			dep: func(req *user.SetUserMetadataRequest) {
 				req.UserId = Instance.CreateUserTypeHuman(iamOwnerCTX, integration.Email()).GetId()
 				Instance.SetUserMetadata(iamOwnerCTX, req.UserId, "key1", "value1")
@@ -131,7 +131,7 @@ func assertSetUserMetadataResponse(t *testing.T, creationDate, changeDate time.T
 }
 
 func TestServer_ListUserMetadata(t *testing.T) {
-	iamOwnerCTX := Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	iamOwnerCTX := Instance.WithAuthorizationToken(OrgCTX, integration.UserTypeIAMOwner)
 
 	type args struct {
 		ctx context.Context
@@ -140,13 +140,12 @@ func TestServer_ListUserMetadata(t *testing.T) {
 	}
 
 	tests := []struct {
-		name    string
-		args    args
-		want    *user.ListUserMetadataResponse
-		wantErr bool
+		name string
+		args args
+		want *user.ListUserMetadataResponse
 	}{
 		{
-			name: "missing permission",
+			name: "missing permission, actual TotalResult count returned",
 			args: args{
 				ctx: Instance.WithAuthorizationToken(context.Background(), integration.UserTypeNoPermission),
 				dep: func(ctx context.Context, request *user.ListUserMetadataRequest, response *user.ListUserMetadataResponse) {
@@ -156,7 +155,12 @@ func TestServer_ListUserMetadata(t *testing.T) {
 				},
 				req: &user.ListUserMetadataRequest{},
 			},
-			wantErr: true,
+			want: &user.ListUserMetadataResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  1,
+					AppliedLimit: 100,
+				},
+			},
 		},
 		{
 			name: "list request",
@@ -194,7 +198,7 @@ func TestServer_ListUserMetadata(t *testing.T) {
 					userID := Instance.CreateUserTypeHuman(iamOwnerCTX, integration.Email()).GetId()
 					request.UserId = userID
 					key := "key1"
-					response.Metadata[0] = setUserMetadata(iamOwnerCTX, userID, key, "value1")
+					response.Metadata[0] = setUserMetadata(iamOwnerCTX, Instance, userID, key, "value1")
 					Instance.SetUserMetadata(iamOwnerCTX, userID, "key2", "value2")
 					Instance.SetUserMetadata(iamOwnerCTX, userID, "key3", "value3")
 					request.Filters[0] = &metadata.MetadataSearchFilter{
@@ -223,9 +227,9 @@ func TestServer_ListUserMetadata(t *testing.T) {
 					userID := Instance.CreateUserTypeHuman(iamOwnerCTX, integration.Email()).GetId()
 					request.UserId = userID
 
-					response.Metadata[2] = setUserMetadata(iamOwnerCTX, userID, "key1", "value1")
-					response.Metadata[1] = setUserMetadata(iamOwnerCTX, userID, "key2", "value2")
-					response.Metadata[0] = setUserMetadata(iamOwnerCTX, userID, "key3", "value3")
+					response.Metadata[2] = setUserMetadata(iamOwnerCTX, Instance, userID, "key1", "value1")
+					response.Metadata[1] = setUserMetadata(iamOwnerCTX, Instance, userID, "key2", "value2")
+					response.Metadata[0] = setUserMetadata(iamOwnerCTX, Instance, userID, "key3", "value3")
 				},
 				req: &user.ListUserMetadataRequest{},
 			},
@@ -249,10 +253,6 @@ func TestServer_ListUserMetadata(t *testing.T) {
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamOwnerCTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, listErr := Instance.Client.UserV2.ListUserMetadata(tt.args.ctx, tt.args.req)
-				if tt.wantErr {
-					require.Error(ttt, listErr)
-					return
-				}
 				require.NoError(ttt, listErr)
 				// always first check length, otherwise its failed anyway
 				if assert.Len(ttt, got.Metadata, len(tt.want.Metadata)) {
@@ -264,8 +264,143 @@ func TestServer_ListUserMetadata(t *testing.T) {
 	}
 }
 
-func setUserMetadata(ctx context.Context, userID, key, value string) *metadata.Metadata {
-	metadataResp := Instance.SetUserMetadata(ctx, userID, key, value)
+func TestServer_ListUserMetadata_WithPermissionV2(t *testing.T) {
+	ensureFeaturePermissionV2Enabled(t, InstancePermissionV2)
+	iamOwnerCTX := InstancePermissionV2.WithAuthorizationToken(OrgCTX, integration.UserTypeIAMOwner)
+
+	type args struct {
+		ctx context.Context
+		dep func(context.Context, *user.ListUserMetadataRequest, *user.ListUserMetadataResponse)
+		req *user.ListUserMetadataRequest
+	}
+
+	tests := []struct {
+		name string
+		args args
+		want *user.ListUserMetadataResponse
+	}{
+		{
+			name: "missing permission, TotalResult set to 0",
+			args: args{
+				ctx: InstancePermissionV2.WithAuthorizationToken(context.Background(), integration.UserTypeNoPermission),
+				dep: func(ctx context.Context, request *user.ListUserMetadataRequest, response *user.ListUserMetadataResponse) {
+					userID := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCTX, integration.Email()).GetId()
+					request.UserId = userID
+					InstancePermissionV2.SetUserMetadata(iamOwnerCTX, userID, "key1", "value1")
+				},
+				req: &user.ListUserMetadataRequest{},
+			},
+			want: &user.ListUserMetadataResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  0,
+					AppliedLimit: 100,
+				},
+			},
+		},
+		{
+			name: "list request",
+			args: args{
+				ctx: iamOwnerCTX,
+				dep: func(ctx context.Context, request *user.ListUserMetadataRequest, response *user.ListUserMetadataResponse) {
+					userID := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCTX, integration.Email()).GetId()
+					request.UserId = userID
+					metadataResp := InstancePermissionV2.SetUserMetadata(iamOwnerCTX, userID, "key1", "value1")
+
+					response.Metadata[0] = &metadata.Metadata{
+						CreationDate: metadataResp.GetSetDate(),
+						ChangeDate:   metadataResp.GetSetDate(),
+						Key:          "key1",
+						Value:        []byte(base64.StdEncoding.EncodeToString([]byte("value1"))),
+					}
+				},
+				req: &user.ListUserMetadataRequest{},
+			},
+			want: &user.ListUserMetadataResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  1,
+					AppliedLimit: 100,
+				},
+				Metadata: []*metadata.Metadata{
+					{},
+				},
+			},
+		},
+		{
+			name: "list request single key",
+			args: args{
+				ctx: iamOwnerCTX,
+				dep: func(ctx context.Context, request *user.ListUserMetadataRequest, response *user.ListUserMetadataResponse) {
+					userID := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCTX, integration.Email()).GetId()
+					request.UserId = userID
+					key := "key1"
+					response.Metadata[0] = setUserMetadata(iamOwnerCTX, InstancePermissionV2, userID, key, "value1")
+					InstancePermissionV2.SetUserMetadata(iamOwnerCTX, userID, "key2", "value2")
+					InstancePermissionV2.SetUserMetadata(iamOwnerCTX, userID, "key3", "value3")
+					request.Filters[0] = &metadata.MetadataSearchFilter{
+						Filter: &metadata.MetadataSearchFilter_KeyFilter{KeyFilter: &metadata.MetadataKeyFilter{Key: key}},
+					}
+				},
+				req: &user.ListUserMetadataRequest{
+					Filters: []*metadata.MetadataSearchFilter{{}},
+				},
+			},
+			want: &user.ListUserMetadataResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  1,
+					AppliedLimit: 100,
+				},
+				Metadata: []*metadata.Metadata{
+					{},
+				},
+			},
+		},
+		{
+			name: "list multiple keys",
+			args: args{
+				ctx: iamOwnerCTX,
+				dep: func(ctx context.Context, request *user.ListUserMetadataRequest, response *user.ListUserMetadataResponse) {
+					userID := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCTX, integration.Email()).GetId()
+					request.UserId = userID
+
+					response.Metadata[2] = setUserMetadata(iamOwnerCTX, InstancePermissionV2, userID, "key1", "value1")
+					response.Metadata[1] = setUserMetadata(iamOwnerCTX, InstancePermissionV2, userID, "key2", "value2")
+					response.Metadata[0] = setUserMetadata(iamOwnerCTX, InstancePermissionV2, userID, "key3", "value3")
+				},
+				req: &user.ListUserMetadataRequest{},
+			},
+			want: &user.ListUserMetadataResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  3,
+					AppliedLimit: 100,
+				},
+				Metadata: []*metadata.Metadata{
+					{}, {}, {},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.dep != nil {
+				tt.args.dep(tt.args.ctx, tt.args.req, tt.want)
+			}
+
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamOwnerCTX, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, listErr := InstancePermissionV2.Client.UserV2.ListUserMetadata(tt.args.ctx, tt.args.req)
+				require.NoError(ttt, listErr)
+				// always first check length, otherwise its failed anyway
+				if assert.Len(ttt, got.Metadata, len(tt.want.Metadata)) {
+					assert.EqualExportedValues(ttt, got.Metadata, tt.want.Metadata)
+				}
+				assertPaginationResponse(ttt, tt.want.Pagination, got.Pagination)
+			}, retryDuration, tick, "timeout waiting for expected execution result")
+		})
+	}
+}
+
+func setUserMetadata(ctx context.Context, instance *integration.Instance, userID, key, value string) *metadata.Metadata {
+	metadataResp := instance.SetUserMetadata(ctx, userID, key, value)
 	return &metadata.Metadata{
 		CreationDate: metadataResp.GetSetDate(),
 		ChangeDate:   metadataResp.GetSetDate(),
@@ -280,7 +415,7 @@ func assertPaginationResponse(t *assert.CollectT, expected *filter.PaginationRes
 }
 
 func TestServer_DeleteUserMetadata(t *testing.T) {
-	iamOwnerCTX := Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	iamOwnerCTX := Instance.WithAuthorizationToken(OrgCTX, integration.UserTypeIAMOwner)
 
 	tests := []struct {
 		name             string

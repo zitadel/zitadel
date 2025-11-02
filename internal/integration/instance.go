@@ -78,7 +78,7 @@ func (m UserMap) Get(typ UserType) *User {
 }
 
 // Host returns the primary host of zitadel, on which the first instance is served.
-// http://localhost:8080 by default
+// http://localhost:8082 by default
 func (c *Config) Host() string {
 	return fmt.Sprintf("%s:%d", c.Hostname, c.Port)
 }

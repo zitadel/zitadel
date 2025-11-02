@@ -278,6 +278,14 @@ func NewJsonChanges(col database.Column, changes ...JsonUpdate) database.Change 
 	}
 }
 
+func (c *jsonChanges) Matches(x any) bool {
+	return false
+}
+
+func (c *jsonChanges) String() string {
+	return ""
+}
+
 func (c jsonChanges) Write(builder *database.StatementBuilder) error {
 	c.column.WriteUnqualified(builder)
 	builder.WriteString(" = ")

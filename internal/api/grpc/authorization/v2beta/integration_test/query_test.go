@@ -285,6 +285,39 @@ func TestServer_ListAuthorizations(t *testing.T) {
 			},
 		},
 		{
+			name: "list single id in ids, project and project grant, multiple",
+			args: args{
+				ctx: iamOwnerCtx,
+				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
+					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx, integration.Email())
+
+					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_InUserIds{
+						InUserIds: &filter.InIDsFilter{
+							Ids: []string{userResp.GetId()},
+						},
+					}
+					response.Authorizations[5] = createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), false)
+					response.Authorizations[4] = createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), false)
+					response.Authorizations[3] = createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), false)
+					response.Authorizations[2] = createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), true)
+					response.Authorizations[1] = createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), true)
+					response.Authorizations[0] = createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), true)
+				},
+				req: &authorization.ListAuthorizationsRequest{
+					Filters: []*authorization.AuthorizationsSearchFilter{{}},
+				},
+			},
+			want: &authorization.ListAuthorizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  6,
+					AppliedLimit: 100,
+				},
+				Authorizations: []*authorization.Authorization{
+					{}, {}, {}, {}, {}, {},
+				},
+			},
+		},
+		{
 			name: "list single id, project and project grant, multiple",
 			args: args{
 				ctx: iamOwnerCtx,
@@ -454,17 +487,17 @@ func createAuthorization(ctx context.Context, instance *integration.Instance, t 
 	return createAuthorizationForProject(ctx, instance, t, orgID, userID, projectName, projectResp.GetId())
 }
 
-func createAuthorizationForProject(ctx context.Context, instance *integration.Instance, t *testing.T, orgID, userID, projectName, projectID string) *authorization.Authorization {
+func createAuthorizationForProject(ctx context.Context, instance *integration.Instance, t *testing.T, organizationID, userID, projectName, projectID string) *authorization.Authorization {
 	userResp, err := instance.Client.UserV2.GetUserByID(ctx, &user.GetUserByIDRequest{UserId: userID})
 	require.NoError(t, err)
 
-	authResp := instance.CreateAuthorizationProject(t, ctx, projectID, userID)
+	authResp := instance.CreateAuthorizationProject(t, ctx, projectID, userID, organizationID)
 	return &authorization.Authorization{
 		Id:                    authResp.GetId(),
 		ProjectId:             projectID,
 		ProjectName:           projectName,
-		ProjectOrganizationId: orgID,
-		OrganizationId:        orgID,
+		ProjectOrganizationId: organizationID,
+		OrganizationId:        organizationID,
 		CreationDate:          authResp.GetCreationDate(),
 		ChangeDate:            authResp.GetCreationDate(),
 		State:                 1,

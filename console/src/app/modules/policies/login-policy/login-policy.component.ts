@@ -23,7 +23,7 @@ import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { LoginMethodComponentType } from './factor-table/factor-table.component';
 import { map, takeUntil } from 'rxjs/operators';
-import { LoginPolicyService } from '../../../services/login-policy.service';
+import { LoginPolicyService } from 'src/app/services/login-policy.service';
 
 const minValueValidator = (minValue: number) => (control: AbstractControl) => {
   const value = control.value;
@@ -37,6 +37,7 @@ const minValueValidator = (minValue: number) => (control: AbstractControl) => {
   selector: 'cnsl-login-policy',
   templateUrl: './login-policy.component.html',
   styleUrls: ['./login-policy.component.scss'],
+  standalone: false,
 })
 export class LoginPolicyComponent implements OnInit, OnDestroy {
   public LoginMethodComponentType: any = LoginMethodComponentType;
@@ -340,15 +341,21 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
     }
   }
 
-  public addFactor(request: Promise<unknown>): void {
-    // create policy before types can be added
-    const task: Promise<unknown> = this.isDefault
-      ? this.updateData().then(() => {
-          return request;
-        })
-      : request;
+  public beforeAddFactor(callback: () => void): void {
+    if (this.isDefault) {
+      // create policy before types can be added
+      this.updateData()
+        .then(() => callback())
+        .catch((error) => {
+          this.toast.showError(error);
+        });
+    } else {
+      callback();
+    }
+  }
 
-    task
+  public addFactor(request: Promise<unknown>): void {
+    request
       .then(() => {
         this.toast.showInfo('MFA.TOAST.ADDED', true);
         setTimeout(() => {

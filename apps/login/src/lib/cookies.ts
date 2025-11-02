@@ -23,15 +23,15 @@ type SessionCookie<T> = Cookie & T;
 async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[], iFrameEnabled: boolean = false) {
   const cookiesList = await cookies();
 
-  // Use "none" for iframe compatibility, otherwise "strict" as default
+  // "none" is required for iframe embedding (with secure flag)
   let resolvedSameSite: "lax" | "strict" | "none";
 
   if (iFrameEnabled) {
     // When embedded in iframe, must use "none" with secure flag
     resolvedSameSite = "none";
   } else {
-    // Production and other environments: use strict for better security
-    resolvedSameSite = "strict";
+    // This allows cookies during top-level navigation while blocking cross-origin requests
+    resolvedSameSite = "lax";
   }
 
   return cookiesList.set({
@@ -273,6 +273,7 @@ export async function getAllSessions<T>(cleanup: boolean = false): Promise<Sessi
       return sessions;
     }
   } else {
+    console.log("getAllSessions: No session cookie found, returning empty array");
     return [];
   }
 }

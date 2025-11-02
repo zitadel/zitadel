@@ -668,13 +668,12 @@ func TestListApplicationKeys(t *testing.T) {
 	tomorrow := time.Now().AddDate(0, 0, 1)
 	in2Days := tomorrow.AddDate(0, 0, 1)
 	in3Days := in2Days.AddDate(0, 0, 1)
+	in4Days := in3Days.AddDate(0, 0, 1)
 
-	appKey1 := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp1.GetAppId(), in2Days)
-	appKey2 := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp1.GetAppId(), in3Days)
+	appKey1 := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp1.GetAppId(), in3Days)
+	appKey2 := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp1.GetAppId(), in4Days)
 	appKey3 := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp1.GetAppId(), tomorrow)
-	appKey4 := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp2.GetAppId(), tomorrow)
-
-	t.Parallel()
+	appKey4 := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp2.GetAppId(), in2Days)
 
 	tt := []struct {
 		testName     string
@@ -728,7 +727,6 @@ func TestListApplicationKeys(t *testing.T) {
 				require.Equal(ttt, tc.expectedErrorType, status.Code(err))
 				if tc.expectedErrorType == codes.OK {
 					require.Len(ttt, res.GetKeys(), len(tc.expectedAppKeysIDs))
-
 					for i, k := range res.GetKeys() {
 						assert.Equal(ttt, tc.expectedAppKeysIDs[i], k.GetId())
 					}

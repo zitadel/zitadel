@@ -3,7 +3,9 @@ package query
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"slices"
 	"time"
 
@@ -21,11 +23,12 @@ import (
 
 type UserGrant struct {
 	// ID represents the aggregate id (id of the user grant)
-	ID           string                     `json:"id,omitempty"`
-	CreationDate time.Time                  `json:"creation_date,omitempty"`
-	ChangeDate   time.Time                  `json:"change_date,omitempty"`
-	Sequence     uint64                     `json:"sequence,omitempty"`
-	Roles        database.TextArray[string] `json:"roles,omitempty"`
+	ID              string                     `json:"id,omitempty"`
+	CreationDate    time.Time                  `json:"creation_date,omitempty"`
+	ChangeDate      time.Time                  `json:"change_date,omitempty"`
+	Sequence        uint64                     `json:"sequence,omitempty"`
+	Roles           database.TextArray[string] `json:"roles,omitempty"`
+	RoleInformation []Role                     `json:"-"`
 	// GrantID represents the project grant id
 	GrantID string                `json:"grant_id,omitempty"`
 	State   domain.UserGrantState `json:"state,omitempty"`
@@ -54,6 +57,12 @@ type UserGrant struct {
 	GrantedOrgID     string `json:"granted_org_id,omitempty"`
 	GrantedOrgName   string `json:"granted_org_name,omitempty"`
 	GrantedOrgDomain string `json:"granted_org_domain,omitempty"`
+}
+
+type Role struct {
+	Key         string `json:"role_key,omitempty"`
+	DisplayName string `json:"display_name,omitempty"`
+	GroupName   string `json:"group_name,omitempty"`
 }
 
 type UserGrants struct {
@@ -112,6 +121,14 @@ func userGrantPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, ena
 
 func NewUserGrantUserIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(UserGrantUserID, id, TextEquals)
+}
+
+func NewUserGrantInUserIDsSearchQuery(ids []string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
+		list[i] = value
+	}
+	return NewListQuery(UserGrantUserID, list, ListIn)
 }
 
 func NewUserGrantProjectIDSearchQuery(id string) (SearchQuery, error) {
@@ -382,6 +399,7 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 			UserGrantSequence.identifier(),
 			UserGrantGrantID.identifier(),
 			UserGrantRoles.identifier(),
+			"roles.role_information",
 			UserGrantState.identifier(),
 
 			UserGrantUserID.identifier(),
@@ -418,6 +436,7 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 			LeftJoin(join(ProjectGrantColumnGrantID, UserGrantGrantID) + " AND " + ProjectGrantColumnProjectID.identifier() + " = " + UserGrantProjectID.identifier()).
 			LeftJoin(join(GrantedOrgColumnId, ProjectGrantColumnGrantedOrgID)).
 			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID)).
+			LeftJoin("LATERAL (" + rolesInfoQuery + ") as roles ON true").
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),
@@ -425,6 +444,8 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 			g := new(UserGrant)
 
 			var (
+				roles []byte
+
 				username           sql.NullString
 				firstName          sql.NullString
 				userType           sql.NullInt32
@@ -455,6 +476,7 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 				&g.Sequence,
 				&g.GrantID,
 				&g.Roles,
+				&roles,
 				&g.State,
 
 				&g.UserID,
@@ -488,6 +510,12 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 				}
 				return nil, zerrors.ThrowInternal(err, "QUERY-oQPcP", "Errors.Internal")
 			}
+			if len(roles) > 0 {
+				err = json.Unmarshal(roles, &g.RoleInformation)
+				if err != nil {
+					return nil, err
+				}
+			}
 
 			g.Username = username.String
 			g.UserType = domain.UserType(userType.Int32)
@@ -519,6 +547,7 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 			UserGrantSequence.identifier(),
 			UserGrantGrantID.identifier(),
 			UserGrantRoles.identifier(),
+			"roles.role_information",
 			UserGrantState.identifier(),
 
 			UserGrantUserID.identifier(),
@@ -557,6 +586,7 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 			LeftJoin(join(ProjectGrantColumnGrantID, UserGrantGrantID) + " AND " + ProjectGrantColumnProjectID.identifier() + " = " + UserGrantProjectID.identifier()).
 			LeftJoin(join(GrantedOrgColumnId, ProjectGrantColumnGrantedOrgID)).
 			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID)).
+			LeftJoin("LATERAL (" + rolesInfoQuery + ") as roles ON true").
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),
@@ -567,6 +597,8 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 				g := new(UserGrant)
 
 				var (
+					roles []byte
+
 					username           sql.NullString
 					userType           sql.NullInt32
 					userOwner          sql.NullString
@@ -597,6 +629,7 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 					&g.Sequence,
 					&g.GrantID,
 					&g.Roles,
+					&roles,
 					&g.State,
 
 					&g.UserID,
@@ -628,6 +661,12 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 				)
 				if err != nil {
 					return nil, err
+				}
+				if len(roles) > 0 {
+					err = json.Unmarshal(roles, &g.RoleInformation)
+					if err != nil {
+						return nil, err
+					}
 				}
 
 				g.Username = username.String
@@ -664,3 +703,21 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 			}, nil
 		}
 }
+
+var rolesInfoQuery = fmt.Sprintf(
+	`SELECT JSON_AGG(
+                 JSON_BUILD_OBJECT(
+                     'role_key', pr.role_key,
+                     'display_name', pr.display_name,
+                     'group_name', pr.group_name
+                 )
+             ) as role_information
+			 FROM %[1]s pr
+			 WHERE pr.instance_id = %[2]s
+			   AND pr.project_id = %[3]s
+			   AND pr.role_key = ANY(%[4]s)`,
+	projectRolesTable.identifier(),
+	UserGrantInstanceID.identifier(),
+	UserGrantProjectID.identifier(),
+	UserGrantRoles.identifier(),
+)

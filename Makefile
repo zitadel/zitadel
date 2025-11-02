@@ -133,6 +133,8 @@ core_integration_setup:
 core_integration_server_start: core_integration_setup
 	GORACE="log_path=tmp/race.log" \
 	./zitadel.test start --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/postgres.yaml \
+	  > tmp/zitadel.log 2>&1 \
+	  & printf $$! > tmp/zitadel.pid
 
 .PHONY: core_integration_test_packages
 core_integration_test_packages:

@@ -170,6 +170,10 @@ func (i instance) SetConsoleAppID(id string) database.Change {
 // conditions
 // -------------------------------------------------------------
 
+func (i instance) PrimaryKeyCondition(instanceID string) database.Condition {
+	return i.IDCondition(instanceID)
+}
+
 // IDCondition implements [domain.instanceConditions].
 func (i instance) IDCondition(id string) database.Condition {
 	return database.NewTextCondition(i.IDColumn(), database.TextOperationEqual, id)
@@ -206,6 +210,11 @@ func (i instance) ExistsDomain(cond database.Condition) database.Condition {
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
+
+// PrimaryKeyColumns implements [domain.Repository].
+func (i instance) PrimaryKeyColumns() []database.Column {
+	return []database.Column{i.IDColumn()}
+}
 
 // IDColumn implements [domain.instanceColumns].
 func (i instance) IDColumn() database.Column {
