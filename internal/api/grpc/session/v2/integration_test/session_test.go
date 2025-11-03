@@ -970,6 +970,17 @@ func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 	}, retryDuration, tick)
 }
 
+func Test_ZITADEL_API_missing_mfa(t *testing.T) {
+	mfaUser := createFullUser(CTX)
+	registerTOTP(CTX, t, mfaUser.GetUserId())
+	id, token, _, _ := Instance.CreatePasswordSession(t, LoginCTX, mfaUser.GetUserId(), integration.UserPassword)
+	ctx := integration.WithAuthorizationToken(context.Background(), token)
+
+	sessionResp, err := Instance.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
+	require.Error(t, err)
+	require.Nil(t, sessionResp)
+}
+
 func Test_ZITADEL_API_success(t *testing.T) {
 	id, token, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, User.GetUserId())
 	ctx := integration.WithAuthorizationToken(context.Background(), token)

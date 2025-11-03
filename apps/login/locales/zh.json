@@ -159,18 +159,6 @@
     "signInWithAzureAD": "用 AzureAD 登录",
     "signInWithGithub": "用 GitHub 登录",
     "signInWithGitlab": "用 GitLab 登录",
-    "loginSuccess": {
-      "title": "登录成功",
-      "description": "您已成功登录！"
-    },
-    "linkingSuccess": {
-      "title": "账户已链接",
-      "description": "您已成功链接您的账户！"
-    },
-    "registerSuccess": {
-      "title": "注册成功",
-      "description": "您已成功注册！"
-    },
     "loginError": {
       "title": "登录失败",
       "description": "登录时发生错误。"
@@ -194,6 +182,23 @@
       "description": "我们无法完成注册过程。",
       "info": "无法确定注册的组织。请联系您的管理员寻求帮助。",
       "backToLogin": "返回登录"
+    },
+    "processing": {
+      "message": "正在处理身份验证...",
+      "noRedirect": "未从服务器收到重定向或错误",
+      "unexpectedError": "发生意外错误"
+    },
+    "errors": {
+      "missingParameters": "缺少必需参数",
+      "missingIdpInfo": "缺少身份提供商信息",
+      "idpNotFound": "未找到身份提供商",
+      "linkingNotAllowed": "此身份提供商不允许关联",
+      "linkingFailed": "无法将身份提供商关联到账户",
+      "autoLinkingFailed": "无法自动关联账户",
+      "userCreationFailed": "无法创建用户账户",
+      "orgResolutionFailed": "无法确定注册的组织",
+      "sessionCreationFailed": "无法创建会话或确定重定向",
+      "unknownError": "发生未知错误"
     }
   },
   "ldap": {
@@ -257,7 +262,23 @@
       "title": "使用密钥认证",
       "description": "您的设备将请求指纹、面部识别或屏幕锁",
       "usePassword": "使用密码",
-      "submit": "继续"
+      "submit": "继续",
+      "errors": {
+        "couldNotRequestChallenge": "无法请求密钥挑战",
+        "couldNotVerifyPasskey": "无法验证密钥",
+        "noResponseReceived": "密钥验证失败 - 未收到响应",
+        "noRedirectProvided": "密钥验证完成但未提供重定向",
+        "couldNotRetrievePasskey": "检索密钥时发生错误",
+        "verificationCancelled": "密钥验证已取消",
+        "verificationFailed": "密钥验证期间发生错误",
+        "couldNotFindSession": "找不到会话",
+        "couldNotUpdateSession": "无法更新会话",
+        "userNotFound": "系统中未找到用户",
+        "couldNotDetermineRedirect": "密钥验证后无法确定重定向URL",
+        "couldNotSetSession": "无法设置会话",
+        "couldNotGetUser": "无法检索用户数据",
+        "couldNotRetrieveSessionCookie": "无法检索会话Cookie"
+      }
     },
     "set": {
       "title": "设置密钥",
@@ -430,6 +451,7 @@
     "unknownContext": "无法获取用户的上下文。请先输入用户名或提供 loginName 作为搜索参数。",
     "sessionExpired": "当前会话已过期，请重新登录。",
     "failedLoading": "加载数据失败，请再试一次。",
-    "tryagain": "重试"
+    "tryagain": "重试",
+    "couldNotContinueSession": "无法继续会话 - 缺少用户信息"
   }
 }

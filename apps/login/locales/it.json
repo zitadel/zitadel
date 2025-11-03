@@ -159,18 +159,6 @@
     "signInWithAzureAD": "Accedi con AzureAD",
     "signInWithGithub": "Accedi con GitHub",
     "signInWithGitlab": "Accedi con GitLab",
-    "loginSuccess": {
-      "title": "Accesso riuscito",
-      "description": "Accesso effettuato con successo!"
-    },
-    "linkingSuccess": {
-      "title": "Account collegato",
-      "description": "Hai collegato con successo il tuo account!"
-    },
-    "registerSuccess": {
-      "title": "Registrazione riuscita",
-      "description": "Registrazione effettuata con successo!"
-    },
     "loginError": {
       "title": "Accesso fallito",
       "description": "Si è verificato un errore durante il tentativo di accesso."
@@ -194,6 +182,23 @@
       "description": "Non siamo riusciti a completare il processo di registrazione.",
       "info": "Impossibile determinare l'organizzazione per la registrazione. Contatta il tuo amministratore per assistenza.",
       "backToLogin": "Torna al login"
+    },
+    "processing": {
+      "message": "Elaborazione autenticazione in corso...",
+      "noRedirect": "Nessun reindirizzamento o errore ricevuto dal server",
+      "unexpectedError": "Si è verificato un errore imprevisto"
+    },
+    "errors": {
+      "missingParameters": "Parametri richiesti mancanti",
+      "missingIdpInfo": "Informazioni IDP mancanti",
+      "idpNotFound": "Provider di identità non trovato",
+      "linkingNotAllowed": "Il collegamento non è consentito per questo provider di identità",
+      "linkingFailed": "Collegamento del provider di identità all'account non riuscito",
+      "autoLinkingFailed": "Collegamento automatico dell'account non riuscito",
+      "userCreationFailed": "Creazione dell'account utente non riuscita",
+      "orgResolutionFailed": "Impossibile determinare l'organizzazione per la registrazione",
+      "sessionCreationFailed": "Impossibile creare la sessione o determinare il reindirizzamento",
+      "unknownError": "Si è verificato un errore sconosciuto"
     }
   },
   "ldap": {
@@ -257,7 +262,23 @@
       "title": "Autenticati con una passkey",
       "description": "Il tuo dispositivo chiederà la tua impronta digitale, il volto o il blocco schermo",
       "usePassword": "Usa password",
-      "submit": "Continua"
+      "submit": "Continua",
+      "errors": {
+        "couldNotRequestChallenge": "Impossibile richiedere la sfida passkey",
+        "couldNotVerifyPasskey": "Impossibile verificare la passkey",
+        "noResponseReceived": "Verifica passkey fallita - nessuna risposta ricevuta",
+        "noRedirectProvided": "Verifica passkey completata ma nessun reindirizzamento fornito",
+        "couldNotRetrievePasskey": "Si è verificato un errore durante il recupero della passkey",
+        "verificationCancelled": "La verifica della passkey è stata annullata",
+        "verificationFailed": "Si è verificato un errore durante la verifica della passkey",
+        "couldNotFindSession": "Impossibile trovare la sessione",
+        "couldNotUpdateSession": "Impossibile aggiornare la sessione",
+        "userNotFound": "Utente non trovato nel sistema",
+        "couldNotDetermineRedirect": "Impossibile determinare l'URL di reindirizzamento dopo la verifica passkey",
+        "couldNotSetSession": "Impossibile impostare la sessione",
+        "couldNotGetUser": "Impossibile recuperare i dati dell'utente",
+        "couldNotRetrieveSessionCookie": "Impossibile recuperare il cookie di sessione"
+      }
     },
     "set": {
       "title": "Configura una passkey",
@@ -430,6 +451,7 @@
     "unknownContext": "Impossibile ottenere il contesto dell'utente. Assicurati di inserire prima il nome utente o di fornire un loginName come parametro di ricerca.",
     "sessionExpired": "La tua sessione attuale è scaduta. Effettua nuovamente l'accesso.",
     "failedLoading": "Impossibile caricare i dati. Riprova.",
-    "tryagain": "Riprova"
+    "tryagain": "Riprova",
+    "couldNotContinueSession": "Impossibile continuare con la sessione - informazioni utente mancanti"
   }
 }
