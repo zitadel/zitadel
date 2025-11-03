@@ -14,10 +14,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
-	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
+	instance_v2beta "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 )
 
-func DeleteInstance(ctx context.Context, request *connect.Request[instance.DeleteInstanceRequest]) (*connect.Response[instance.DeleteInstanceResponse], error) {
+func DeleteInstanceBeta(ctx context.Context, request *connect.Request[instance_v2beta.DeleteInstanceRequest]) (*connect.Response[instance_v2beta.DeleteInstanceResponse], error) {
 	instanceDeleteCmd := domain.NewDeleteInstanceCommand(request.Msg.GetInstanceId())
 
 	err := domain.Invoke(ctx, instanceDeleteCmd, domain.WithInstanceRepo(repository.InstanceRepository()))
@@ -29,8 +29,8 @@ func DeleteInstance(ctx context.Context, request *connect.Request[instance.Delet
 		return nil, err
 	}
 
-	return &connect.Response[instance.DeleteInstanceResponse]{
-		Msg: &instance.DeleteInstanceResponse{
+	return &connect.Response[instance_v2beta.DeleteInstanceResponse]{
+		Msg: &instance_v2beta.DeleteInstanceResponse{
 			// TODO(IAM-Marco): Change this with the real update date when OrganizationRepo.Update()
 			// returns the timestamp
 			DeletionDate: timestamppb.Now(),
@@ -38,7 +38,7 @@ func DeleteInstance(ctx context.Context, request *connect.Request[instance.Delet
 	}, nil
 }
 
-func GetInstance(ctx context.Context, request *connect.Request[instance.GetInstanceRequest]) (*connect.Response[instance.GetInstanceResponse], error) {
+func GetInstanceBeta(ctx context.Context, request *connect.Request[instance_v2beta.GetInstanceRequest]) (*connect.Response[instance_v2beta.GetInstanceResponse], error) {
 	instanceGetCmd := domain.NewGetInstanceCommand(request.Msg.GetInstanceId())
 
 	err := domain.Invoke(ctx, instanceGetCmd, domain.WithInstanceRepo(repository.InstanceRepository()))
@@ -50,14 +50,14 @@ func GetInstance(ctx context.Context, request *connect.Request[instance.GetInsta
 		return nil, err
 	}
 
-	return &connect.Response[instance.GetInstanceResponse]{
-		Msg: &instance.GetInstanceResponse{
+	return &connect.Response[instance_v2beta.GetInstanceResponse]{
+		Msg: &instance_v2beta.GetInstanceResponse{
 			Instance: convert.DomainInstanceModelToGRPCResponse(instanceGetCmd.Result()),
 		},
 	}, nil
 }
 
-func UpdateInstance(ctx context.Context, request *connect.Request[instance.UpdateInstanceRequest]) (*connect.Response[instance.UpdateInstanceResponse], error) {
+func UpdateInstanceBeta(ctx context.Context, request *connect.Request[instance_v2beta.UpdateInstanceRequest]) (*connect.Response[instance_v2beta.UpdateInstanceResponse], error) {
 	instanceUpdateCmd := domain.NewUpdateInstanceCommand(request.Msg.GetInstanceId(), request.Msg.GetInstanceName())
 
 	err := domain.Invoke(ctx, instanceUpdateCmd, domain.WithInstanceRepo(repository.InstanceRepository()))
@@ -66,8 +66,8 @@ func UpdateInstance(ctx context.Context, request *connect.Request[instance.Updat
 		return nil, err
 	}
 
-	return &connect.Response[instance.UpdateInstanceResponse]{
-		Msg: &instance.UpdateInstanceResponse{
+	return &connect.Response[instance_v2beta.UpdateInstanceResponse]{
+		Msg: &instance_v2beta.UpdateInstanceResponse{
 			// TODO(IAM-Marco): Change this with the real update date when InstanceRepo.Update()
 			// returns the timestamp
 			ChangeDate: timestamppb.Now(),
@@ -75,7 +75,7 @@ func UpdateInstance(ctx context.Context, request *connect.Request[instance.Updat
 	}, nil
 }
 
-func ListInstances(ctx context.Context, request *connect.Request[instance.ListInstancesRequest]) (*connect.Response[instance.ListInstancesResponse], error) {
+func ListInstancesBeta(ctx context.Context, request *connect.Request[instance_v2beta.ListInstancesRequest]) (*connect.Response[instance_v2beta.ListInstancesResponse], error) {
 	instancesListCmd := domain.NewListInstancesCommand(request.Msg)
 
 	err := domain.Invoke(
@@ -89,8 +89,8 @@ func ListInstances(ctx context.Context, request *connect.Request[instance.ListIn
 	}
 
 	instances := instancesListCmd.Result()
-	return &connect.Response[instance.ListInstancesResponse]{
-		Msg: &instance.ListInstancesResponse{
+	return &connect.Response[instance_v2beta.ListInstancesResponse]{
+		Msg: &instance_v2beta.ListInstancesResponse{
 			Instances: convert.DomainInstanceListModelToGRPCResponse(instances),
 			Pagination: &filter.PaginationResponse{
 				// TODO(IAM-Marco): return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10955
@@ -101,7 +101,7 @@ func ListInstances(ctx context.Context, request *connect.Request[instance.ListIn
 	}, nil
 }
 
-func AddCustomDomain(ctx context.Context, request *connect.Request[instance.AddCustomDomainRequest]) (*connect.Response[instance.AddCustomDomainResponse], error) {
+func AddCustomDomain(ctx context.Context, request *connect.Request[instance_v2beta.AddCustomDomainRequest]) (*connect.Response[instance_v2beta.AddCustomDomainResponse], error) {
 	addCustomDomainCmd := domain.NewAddInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetDomain())
 	oidcConfigUpdateCmd := domain.NewOIDCConfigurationUpdate(request.Msg.GetDomain(), authz.GetInstance(ctx).ProjectID(), authz.GetInstance(ctx).ConsoleApplicationID())
 
@@ -121,8 +121,8 @@ func AddCustomDomain(ctx context.Context, request *connect.Request[instance.AddC
 		return nil, err
 	}
 
-	return &connect.Response[instance.AddCustomDomainResponse]{
-		Msg: &instance.AddCustomDomainResponse{
+	return &connect.Response[instance_v2beta.AddCustomDomainResponse]{
+		Msg: &instance_v2beta.AddCustomDomainResponse{
 			// TODO(IAM-Marco): Return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10881
 			CreationDate: timestamppb.Now(),
 		},
