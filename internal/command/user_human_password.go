@@ -103,7 +103,7 @@ func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPasswor
 		"",
 		userAgentID,
 		changeRequired,
-		c.checkCurrentPassword(newPassword, "", oldPassword, wm.EncodedHash),
+		c.checkCurrentPassword(newPassword, "", oldPassword, wm, c.tarpit),
 	)
 }
 
@@ -140,23 +140,49 @@ func (c *Commands) setPasswordWithVerifyCode(
 	}
 }
 
+type HumanPasswordCheckWriteModel interface {
+	GetUserState() domain.UserState
+	GetPasswordCheckFailedCount() uint64
+	GetEncodedHash() string
+	GetResourceOwner() string
+	GetWriteModel() *eventstore.WriteModel
+	eventstore.QueryReducer
+}
+
 // checkCurrentPassword returns a password check as [setPasswordVerification] implementation
 func (c *Commands) checkCurrentPassword(
-	newPassword, newEncodedPassword, currentPassword, currentEncodePassword string,
+	newPassword, newEncodedPassword, currentPassword string,
+	wm HumanPasswordCheckWriteModel,
+	tarpit func(failedAttempts uint64),
 ) setPasswordVerification {
-	// in case the new password is already encoded, we only need to verify the current
-	if newEncodedPassword != "" {
-		return func(ctx context.Context) (_ string, err error) {
-			_, spanPasswap := tracing.NewNamedSpan(ctx, "passwap.Verify")
-			_, err = c.userPasswordHasher.Verify(currentEncodePassword, currentPassword)
-			spanPasswap.EndWithError(err)
-			return "", convertPasswapErr(err)
+	return func(ctx context.Context) (_ string, err error) {
+		verify := func(hash, password string) (string, error) {
+			// in case the new password is already encoded, we only need to verify the current
+			if newEncodedPassword != "" {
+				_, spanPasswap := tracing.NewNamedSpan(ctx, "passwap.Verify")
+				_, err = c.userPasswordHasher.Verify(hash, password)
+				spanPasswap.EndWithError(err)
+				return "", convertPasswapErr(err)
+			}
+			// otherwise, let's directly verify and return the new generated hash, so we can reuse it in the event
+			return c.verifyAndUpdatePassword(ctx, hash, password, newPassword)
 		}
-	}
-
-	// otherwise let's directly verify and return the new generate hash, so we can reuse it in the event
-	return func(ctx context.Context) (string, error) {
-		return c.verifyAndUpdatePassword(ctx, currentEncodePassword, currentPassword, newPassword)
+		commands, updated, err := verifyPasswordWithLockoutPolicy(ctx, wm, currentPassword, c.eventstore, verify, nil, tarpit)
+		// The verification was successful, and we might have an updated hash.
+		if err == nil {
+			return updated, nil
+		}
+		// If we get here, the verification failed, either due to a precondition (e.g. user not found or locked)
+		// or due to a wrong password.
+		// If the former, we just return the error.
+		if len(commands) == 0 {
+			return "", err
+		}
+		// If the latter, there's at least a failed password check event to push or additionally a lock event.
+		// We push these events, but return the original error (which might contain details about the failed attempts).
+		_, pushErr := c.eventstore.Push(ctx, commands...)
+		logging.OnError(pushErr).Error("error create password check failed event")
+		return "", err
 	}
 }
 
@@ -344,7 +370,11 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 	if !loginPolicy.AllowUsernamePassword {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-Dft32", "Errors.Org.LoginPolicy.UsernamePasswordNotAllowed")
 	}
-	commands, err := checkPassword(ctx, userID, password, c.eventstore, c.userPasswordHasher, authRequestDomainToAuthRequestInfo(authRequest))
+	var tarpit func(failedAttempts uint64)
+	if !loginPolicy.IgnoreUnknownUsernames {
+		tarpit = c.tarpit
+	}
+	commands, err := checkPassword(ctx, userID, password, c.eventstore, c.userPasswordHasher, authRequestDomainToAuthRequestInfo(authRequest), tarpit)
 	if len(commands) == 0 {
 		return err
 	}
@@ -353,7 +383,7 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 	return err
 }
 
-func checkPassword(ctx context.Context, userID, password string, es *eventstore.Eventstore, hasher *crypto.Hasher, optionalAuthRequestInfo *user.AuthRequestInfo) ([]eventstore.Command, error) {
+func checkPassword(ctx context.Context, userID, password string, es *eventstore.Eventstore, hasher *crypto.Hasher, optionalAuthRequestInfo *user.AuthRequestInfo, tarpit func(failedAttempts uint64)) ([]eventstore.Command, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sfw3f", "Errors.User.UserIDMissing")
 	}
@@ -362,36 +392,49 @@ func checkPassword(ctx context.Context, userID, password string, es *eventstore.
 	if err != nil {
 		return nil, err
 	}
-	if !wm.UserState.Exists() {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-3n77z", "Errors.User.NotFound")
+	commands, _, err := verifyPasswordWithLockoutPolicy(ctx, wm, password, es, hasher.Verify, optionalAuthRequestInfo, tarpit)
+	return commands, err
+}
+
+func verifyPasswordWithLockoutPolicy(
+	ctx context.Context,
+	wm HumanPasswordCheckWriteModel,
+	password string,
+	es *eventstore.Eventstore,
+	verify func(hash string, password string) (newHash string, err error),
+	optionalAuthRequestInfo *user.AuthRequestInfo,
+	tarpit func(failedAttempts uint64),
+) ([]eventstore.Command, string, error) {
+	if !wm.GetUserState().Exists() {
+		return nil, "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-3n77z", "Errors.User.NotFound")
 	}
-	if wm.UserState == domain.UserStateLocked {
+	if wm.GetUserState() == domain.UserStateLocked {
 		wrongPasswordError := &commandErrors.WrongPasswordError{
-			FailedAttempts: int32(wm.PasswordCheckFailedCount),
+			FailedAttempts: int32(wm.GetPasswordCheckFailedCount()),
 		}
-		return nil, zerrors.ThrowPreconditionFailed(wrongPasswordError, "COMMAND-JLK35", "Errors.User.Locked")
+		return nil, "", zerrors.ThrowPreconditionFailed(wrongPasswordError, "COMMAND-JLK35", "Errors.User.Locked")
 	}
-	if wm.EncodedHash == "" {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-3nJ4t", "Errors.User.Password.NotSet")
+	if wm.GetEncodedHash() == "" {
+		return nil, "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-3nJ4t", "Errors.User.Password.NotSet")
 	}
 
-	userAgg := UserAggregateFromWriteModel(&wm.WriteModel)
+	userAgg := UserAggregateFromWriteModel(wm.GetWriteModel())
 	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
-	updated, err := hasher.Verify(wm.EncodedHash, password)
+	updated, err := verify(wm.GetEncodedHash(), password)
 	spanPasswordComparison.EndWithError(err)
-	err = convertLoginPasswapErr(wm.PasswordCheckFailedCount+1, err)
+	err = convertLoginPasswapErr(wm.GetPasswordCheckFailedCount()+1, err)
 	commands := make([]eventstore.Command, 0, 2)
 
 	// recheck for additional events (failed password checks or locks)
 	recheckErr := es.FilterToQueryReducer(ctx, wm)
 	if recheckErr != nil {
-		return nil, recheckErr
+		return nil, "", recheckErr
 	}
-	if wm.UserState == domain.UserStateLocked {
+	if wm.GetUserState() == domain.UserStateLocked {
 		wrongPasswordError := &commandErrors.WrongPasswordError{
-			FailedAttempts: int32(wm.PasswordCheckFailedCount),
+			FailedAttempts: int32(wm.GetPasswordCheckFailedCount()),
 		}
-		return nil, zerrors.ThrowPreconditionFailed(wrongPasswordError, "COMMAND-SFA3t", "Errors.User.Locked")
+		return nil, "", zerrors.ThrowPreconditionFailed(wrongPasswordError, "COMMAND-SFA3t", "Errors.User.Locked")
 	}
 
 	if err == nil {
@@ -399,17 +442,23 @@ func checkPassword(ctx context.Context, userID, password string, es *eventstore.
 		if updated != "" {
 			commands = append(commands, user.NewHumanPasswordHashUpdatedEvent(ctx, userAgg, updated))
 		}
-		return commands, nil
+		return commands, updated, nil
 	}
 
 	commands = append(commands, user.NewHumanPasswordCheckFailedEvent(ctx, userAgg, optionalAuthRequestInfo))
 
-	lockoutPolicy, lockoutErr := getLockoutPolicy(ctx, wm.ResourceOwner, es.FilterToQueryReducer)
+	lockoutPolicy, lockoutErr := getLockoutPolicy(ctx, wm.GetResourceOwner(), es.FilterToQueryReducer)
 	logging.OnError(lockoutErr).Error("unable to get lockout policy")
-	if lockoutPolicy != nil && lockoutPolicy.MaxPasswordAttempts > 0 && wm.PasswordCheckFailedCount+1 >= lockoutPolicy.MaxPasswordAttempts {
+	if lockoutPolicy != nil && lockoutPolicy.MaxPasswordAttempts > 0 && wm.GetPasswordCheckFailedCount()+1 >= lockoutPolicy.MaxPasswordAttempts {
 		commands = append(commands, user.NewUserLockedEvent(ctx, userAgg))
 	}
-	return commands, err
+	// in case the login policy ignores unknown usernames,
+	// we do not slow down the response time with a tarpit
+	// since this would leak the user existence
+	if tarpit != nil {
+		tarpit(wm.GetPasswordCheckFailedCount() + 1)
+	}
+	return commands, "", err
 }
 
 func (c *Commands) passwordWriteModel(ctx context.Context, userID, resourceOwner string) (writeModel *HumanPasswordWriteModel, err error) {
