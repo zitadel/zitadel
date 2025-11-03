@@ -3,11 +3,18 @@ package initialise
 import (
 	"context"
 	"database/sql"
+	"database/sql/driver"
 	"errors"
 	"testing"
 )
 
 func Test_verifyGrant(t *testing.T) {
+	err := ReadStmts()
+	if err != nil {
+		t.Errorf("unable to read stmts: %v", err)
+		t.FailNow()
+	}
+
 	type args struct {
 		db       db
 		database string
@@ -22,6 +29,9 @@ func Test_verifyGrant(t *testing.T) {
 			name: "doesn't exists, create fails",
 			args: args{
 				db: prepareDB(t,
+					expectQuery("SELECT current_user", nil, []string{"current_user"}, [][]driver.Value{
+						{"admin"},
+					}),
 					expectExec("GRANT ALL ON DATABASE \"zitadel\" TO \"zitadel-user\"", sql.ErrTxDone),
 				),
 				database: "zitadel",
@@ -33,6 +43,9 @@ func Test_verifyGrant(t *testing.T) {
 			name: "correct",
 			args: args{
 				db: prepareDB(t,
+					expectQuery("SELECT current_user", nil, []string{"current_user"}, [][]driver.Value{
+						{"admin"},
+					}),
 					expectExec("GRANT ALL ON DATABASE \"zitadel\" TO \"zitadel-user\"", nil),
 				),
 				database: "zitadel",
@@ -44,7 +57,23 @@ func Test_verifyGrant(t *testing.T) {
 			name: "already exists",
 			args: args{
 				db: prepareDB(t,
+					expectQuery("SELECT current_user", nil, []string{"current_user"}, [][]driver.Value{
+						{"admin"},
+					}),
 					expectExec("GRANT ALL ON DATABASE \"zitadel\" TO \"zitadel-user\"", nil),
+				),
+				database: "zitadel",
+				username: "zitadel-user",
+			},
+			targetErr: nil,
+		},
+		{
+			name: "same user, skip grant",
+			args: args{
+				db: prepareDB(t,
+					expectQuery("SELECT current_user", nil, []string{"current_user"}, [][]driver.Value{
+						{"zitadel-user"},
+					}),
 				),
 				database: "zitadel",
 				username: "zitadel-user",
