@@ -1546,7 +1546,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "우크라이나어"
       }
     },
     "SMTP": {
@@ -1796,7 +1797,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "우크라이나어"
       },
       "KEYS": {
         "emailVerificationDoneText": "이메일 인증 완료",
@@ -2773,7 +2775,8 @@
     "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română",
-    "tr": "Türkçe"
+    "tr": "Türkçe",
+    "uk": "우크라이나어"
   },
   "MEMBER": {
     "ADD": "매니저 추가",

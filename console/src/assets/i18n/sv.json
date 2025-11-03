@@ -1550,7 +1550,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Ukrainska"
       }
     },
     "SMTP": {
@@ -1800,7 +1801,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Ukrainska"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-postverifiering klar",
@@ -2780,7 +2782,8 @@
     "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română",
-    "tr": "Türkçe"
+    "tr": "Türkçe",
+    "uk": "Ukrainska"
   },
   "MEMBER": {
     "ADD": "Lägg till en administratör",
