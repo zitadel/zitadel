@@ -9,7 +9,10 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
-	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
+	filter_v2 "github.com/zitadel/zitadel/pkg/grpc/filter/v2"
+	filter_v2beta "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
+	instance_v2 "github.com/zitadel/zitadel/pkg/grpc/instance/v2"
+	instance_v2beta "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 )
 
 func TestDomainInstanceModelToGRPCResponse(t *testing.T) {
@@ -54,14 +57,14 @@ func TestDomainInstanceModelToGRPCResponse(t *testing.T) {
 		},
 	}
 
-	expectedInstance := &instance.Instance{
+	expectedInstance := &instance_v2beta.Instance{
 		Id:           "instance-1",
 		ChangeDate:   timestamppb.New(now),
 		CreationDate: timestamppb.New(yesterday),
-		State:        instance.State_STATE_RUNNING,
+		State:        instance_v2beta.State_STATE_RUNNING,
 		Name:         "Instance One",
 		Version:      "",
-		Domains: []*instance.Domain{
+		Domains: []*instance_v2beta.Domain{
 			{
 				InstanceId:   "instance-1",
 				CreationDate: timestamppb.New(yesterday),
@@ -107,12 +110,12 @@ func TestDomainInstanceListModelToGRPCResponse(t *testing.T) {
 	tt := []struct {
 		testName       string
 		inputResult    []*domain.Instance
-		expectedResult []*instance.Instance
+		expectedResult []*instance_v2beta.Instance
 	}{
 		{
 			testName:       "empty result",
 			inputResult:    []*domain.Instance{},
-			expectedResult: []*instance.Instance{},
+			expectedResult: []*instance_v2beta.Instance{},
 		},
 		{
 			testName: "single instance without domains",
@@ -125,14 +128,14 @@ func TestDomainInstanceListModelToGRPCResponse(t *testing.T) {
 					Domains:   nil,
 				},
 			},
-			expectedResult: []*instance.Instance{
+			expectedResult: []*instance_v2beta.Instance{
 				{
 					Id:           "instance1",
 					Name:         "test-instance",
 					CreationDate: timestamppb.New(now),
 					ChangeDate:   timestamppb.New(now),
-					State:        instance.State_STATE_RUNNING,
-					Domains:      []*instance.Domain{},
+					State:        instance_v2beta.State_STATE_RUNNING,
+					Domains:      []*instance_v2beta.Domain{},
 				},
 			},
 		},
@@ -162,14 +165,14 @@ func TestDomainInstanceListModelToGRPCResponse(t *testing.T) {
 					Domains:   nil,
 				},
 			},
-			expectedResult: []*instance.Instance{
+			expectedResult: []*instance_v2beta.Instance{
 				{
 					Id:           "instance1",
 					Name:         "test-instance-1",
 					CreationDate: timestamppb.New(now),
 					ChangeDate:   timestamppb.New(now),
-					State:        instance.State_STATE_RUNNING,
-					Domains: []*instance.Domain{
+					State:        instance_v2beta.State_STATE_RUNNING,
+					Domains: []*instance_v2beta.Domain{
 						{
 							InstanceId:   "instance1",
 							Domain:       "domain1.com",
@@ -184,8 +187,8 @@ func TestDomainInstanceListModelToGRPCResponse(t *testing.T) {
 					Name:         "test-instance-2",
 					CreationDate: timestamppb.New(now),
 					ChangeDate:   timestamppb.New(now),
-					State:        instance.State_STATE_RUNNING,
-					Domains:      []*instance.Domain{},
+					State:        instance_v2beta.State_STATE_RUNNING,
+					Domains:      []*instance_v2beta.Domain{},
 				},
 			},
 		},
@@ -199,6 +202,141 @@ func TestDomainInstanceListModelToGRPCResponse(t *testing.T) {
 
 			// Verify
 			assert.Equal(t, tc.expectedResult, result)
+		})
+	}
+}
+func TestListInstancesBetaRequestToV2Request(t *testing.T) {
+	t.Parallel()
+
+	tt := []struct {
+		name    string
+		request *instance_v2beta.ListInstancesRequest
+		want    *instance_v2.ListInstancesRequest
+	}{
+		{
+			name: "empty request",
+			request: &instance_v2beta.ListInstancesRequest{
+				Pagination: &filter_v2beta.PaginationRequest{},
+			},
+			want: &instance_v2.ListInstancesRequest{
+				Pagination:    &filter_v2.PaginationRequest{},
+				SortingColumn: instance_v2.FieldName_FIELD_NAME_UNSPECIFIED,
+				Filters:       []*instance_v2.Filter{},
+			},
+		},
+		{
+			name: "request with all fields",
+			request: &instance_v2beta.ListInstancesRequest{
+				Pagination: &filter_v2beta.PaginationRequest{
+					Offset: 10,
+					Limit:  20,
+					Asc:    true,
+				},
+				SortingColumn: gu.Ptr(instance_v2beta.FieldName_FIELD_NAME_NAME),
+				Queries: []*instance_v2beta.Query{
+					{
+						Query: &instance_v2beta.Query_DomainQuery{
+							DomainQuery: &instance_v2beta.DomainsQuery{
+								Domains: []string{"domain1.com", "domain2.com"},
+							},
+						},
+					},
+					{
+						Query: &instance_v2beta.Query_IdQuery{
+							IdQuery: &instance_v2beta.IdsQuery{
+								Ids: []string{"id1", "id2"},
+							},
+						},
+					},
+				},
+			},
+			want: &instance_v2.ListInstancesRequest{
+				Pagination: &filter_v2.PaginationRequest{
+					Offset: 10,
+					Limit:  20,
+					Asc:    true,
+				},
+				SortingColumn: instance_v2.FieldName_FIELD_NAME_NAME,
+				Filters: []*instance_v2.Filter{
+					{
+						Filter: &instance_v2.Filter_CustomDomainsFilter{
+							CustomDomainsFilter: &instance_v2.CustomDomainsFilter{
+								Domains: []string{"domain1.com", "domain2.com"},
+							},
+						},
+					},
+					{
+						Filter: &instance_v2.Filter_InIdsFilter{
+							InIdsFilter: &filter_v2.InIDsFilter{
+								Ids: []string{"id1", "id2"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "request with different sorting field",
+			request: &instance_v2beta.ListInstancesRequest{
+				Pagination:    &filter_v2beta.PaginationRequest{},
+				SortingColumn: gu.Ptr(instance_v2beta.FieldName_FIELD_NAME_CREATION_DATE),
+			},
+			want: &instance_v2.ListInstancesRequest{
+				Pagination:    &filter_v2.PaginationRequest{},
+				SortingColumn: instance_v2.FieldName_FIELD_NAME_CREATION_DATE,
+				Filters:       []*instance_v2.Filter{},
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			got := ListInstancesBetaRequestToV2Request(tc.request)
+			assert.Equal(t, tc.want, got)
+		})
+	}
+}
+func TestListInstancesBetaSortingColToV2Request(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name      string
+		fieldName *instance_v2beta.FieldName
+		want      instance_v2.FieldName
+	}{
+		{
+			name:      "nil field name",
+			fieldName: nil,
+			want:      instance_v2.FieldName_FIELD_NAME_UNSPECIFIED,
+		},
+		{
+			name:      "creation date field",
+			fieldName: gu.Ptr(instance_v2beta.FieldName_FIELD_NAME_CREATION_DATE),
+			want:      instance_v2.FieldName_FIELD_NAME_CREATION_DATE,
+		},
+		{
+			name:      "id field",
+			fieldName: gu.Ptr(instance_v2beta.FieldName_FIELD_NAME_ID),
+			want:      instance_v2.FieldName_FIELD_NAME_ID,
+		},
+		{
+			name:      "name field",
+			fieldName: gu.Ptr(instance_v2beta.FieldName_FIELD_NAME_NAME),
+			want:      instance_v2.FieldName_FIELD_NAME_NAME,
+		},
+		{
+			name:      "unspecified field",
+			fieldName: gu.Ptr(instance_v2beta.FieldName_FIELD_NAME_UNSPECIFIED),
+			want:      instance_v2.FieldName_FIELD_NAME_UNSPECIFIED,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			got := listInstancesBetaSortingColToV2Request(tt.fieldName)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
