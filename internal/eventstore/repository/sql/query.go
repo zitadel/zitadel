@@ -12,6 +12,7 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -65,6 +66,32 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	if where == "" || query == "" {
 		return zerrors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
+
+	var contextQuerier interface {
+		QueryContext(context.Context, func(rows *sql.Rows) error, string, ...interface{}) error
+		ExecContext(context.Context, string, ...any) (sql.Result, error)
+	}
+	contextQuerier = criteria.Client()
+	if q.Tx != nil {
+		contextQuerier = &tx{Tx: q.Tx}
+	}
+
+	if q.AwaitOpenTransactions && q.Columns == eventstore.ColumnsEvent {
+		instanceID := authz.GetInstance(ctx).InstanceID()
+		if q.InstanceID != nil {
+			instanceID = q.InstanceID.Value.(string)
+		}
+
+		_, err = contextQuerier.ExecContext(ctx,
+			"select pg_advisory_lock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1)), pg_advisory_unlock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))",
+			instanceID,
+		)
+		if err != nil {
+			return err
+		}
+
+		where += awaitOpenTransactions(useV1)
+	}
 	query += where
 
 	// instead of using the max function of the database (which doesn't work for postgres)
@@ -100,27 +127,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 		query += " OFFSET ?"
 	}
 
-	if q.LockRows {
-		query += " FOR UPDATE"
-		switch q.LockOption {
-		case eventstore.LockOptionWait: // default behavior
-		case eventstore.LockOptionNoWait:
-			query += " NOWAIT"
-		case eventstore.LockOptionSkipLocked:
-			query += " SKIP LOCKED"
-
-		}
-	}
-
 	query = criteria.placeholder(query)
-
-	var contextQuerier interface {
-		QueryContext(context.Context, func(rows *sql.Rows) error, string, ...interface{}) error
-	}
-	contextQuerier = criteria.Client()
-	if q.Tx != nil {
-		contextQuerier = &tx{Tx: q.Tx}
-	}
 
 	err = contextQuerier.QueryContext(ctx,
 		func(rows *sql.Rows) error {
@@ -287,22 +294,6 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 			clauses += "aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE " + excludeAggregateIDsClauses + ")"
 		}
 		args = append(args, excludeAggregateIDsArgs...)
-	}
-
-	if query.AwaitOpenTransactions {
-		instanceIDs := make(database.TextArray[string], 0, 3)
-		if query.InstanceID != nil {
-			instanceIDs = append(instanceIDs, query.InstanceID.Value.(string))
-		} else if query.InstanceIDs != nil {
-			instanceIDs = append(instanceIDs, query.InstanceIDs.Value.(database.TextArray[string])...)
-		}
-
-		for i := range instanceIDs {
-			instanceIDs[i] = "zitadel_es_pusher_" + instanceIDs[i]
-		}
-
-		clauses += awaitOpenTransactions(useV1)
-		args = append(args, instanceIDs)
 	}
 
 	if clauses == "" {

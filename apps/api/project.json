@@ -1,0 +1,461 @@
+{
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "name": "@zitadel/api",
+    "projectType": "application",
+    "namedInputs": {
+        "sources": [
+            "{workspaceRoot}/cmd/**/*.go",
+            "{workspaceRoot}/internal/**/*.go",
+            "{workspaceRoot}/proto/**/*.go",
+            "{workspaceRoot}/pkg/**/*.go",
+            "{workspaceRoot}/main.go"
+        ],
+        "runtime": [
+            "sources",
+            "{workspaceRoot}/go*",
+            "!{workspaceRoot}/internal/integration/**/*",
+            "!{workspaceRoot}/**/*_test.go",
+            "!{workspaceRoot}/**/integration_test/**/*"
+        ],
+        "pack": [
+            { "env": "VERSION" },
+            "runtime"
+        ]
+    },
+    "targets": {
+        "prod": {
+            "description": "Runs the Go-based API backend in production mode",
+            "continuous": true,
+            "dependsOn": [
+                "build"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "parallel": false,
+                "commands": [
+                    "./.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} start-from-init --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters"
+                ]
+            },
+            "defaultConfiguration": "default",
+            "configurations": {
+                "default": {
+                    "env": {
+                        "API_CONFIG_FILE": "{projectRoot}/prod-default.yaml"
+                    }
+                },
+                "test-integration-api": {
+                    "env": {
+                        "API_CONFIG_FILE": "{projectRoot}/test-integration-api.yaml"
+                    }
+                },
+                "test-functional-ui": {
+                    "env": {
+                        "API_CONFIG_FILE": "{projectRoot}/test-functional-ui.yaml"
+                    }
+                }
+            }
+        },
+        "build": {
+            "description": "Compiles the Go-based API backend into an executable binary.",
+            "dependsOn": [
+                "generate",
+                "build-console"
+            ],
+            "command": "bash -c 'CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.local -ldflags=\"-s -w\"'",
+            "inputs": [
+                { "runtime": "go env GOOS" },
+                { "runtime": "go env GOARCH" },
+                "runtime"
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/bin/*/*/zitadel.local"
+            ]
+        },
+        "generate": {
+            "description": "Generates the code needed to start a full-featured API: gRPC and OpenAPI stubs, static files for the embedded login v1, asset routes and documentation.",
+            "dependsOn": [
+                "generate-stubs",
+                "generate-assets",
+                "generate-statik"
+            ]
+        },
+        "lint-install":{
+            "description": "Installs golangci-lint binary for linting. Using go install is not recommended in the official docs, because this can produce non-deterministic results.",
+            "cache": true,
+            "command": "curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b .artifacts/bin/$(go env GOOS)/$(go env GOARCH) v2.5.0",
+            "inputs": [
+                { "runtime": "go env GOOS" },
+                { "runtime": "go env GOARCH" }
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/bin/*/*/golangci-lint"
+            ]
+        },
+        "lint": {
+            "description": "Lints the Go code with golangci-lint using the configuration in .golangci.yaml",
+            "dependsOn": [
+                "lint-install",
+                "generate-stubs",
+                "generate-assets"
+            ],
+            "command": "PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" golangci-lint run --timeout 15m --config ./.golangci.yaml --verbose",
+            "cache": true,
+            "inputs": [
+                "sources",
+                "{workspaceRoot}/.golangci.yaml"
+            ]
+        },
+        "test": {
+            "description": "Runs all tests (unit and integration)",
+            "dependsOn": [
+                "test-unit",
+                "test-integration"
+            ]
+        },
+        "test-unit": {
+            "description": "Runs the unit tests with coverage",
+            "dependsOn": [
+                "generate"
+            ],
+            "command": "go test -race -coverprofile=profile.api.test-unit.cov -coverpkg=./internal/...  ./...",
+            "inputs": [
+                "sources",
+                "{workspaceRoot}/go*"
+            ],
+            "outputs": [
+                "{workspaceRoot}/profile.api.test-unit.cov"
+            ]
+        },
+        "test-integration-build": {
+            "description": "Builds the test binary for integration tests.",
+            "dependsOn": [
+                "generate"
+            ],
+            "command": "go build -cover -race -tags integration -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.test main.go",
+            "cache": true,
+            "inputs": [
+                { "runtime": "go env GOOS" },
+                { "runtime": "go env GOARCH" },
+                "sources",
+                "{workspaceRoot}/internal/integration/**",
+                "{workspaceRoot}/go*"
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/bin/*/*/zitadel.test"
+            ]
+        },
+        "test-integration-run-db": {
+            "description": "Runs the database and cache for integration tests.",
+            "continuous": true,
+            "command": "nx run @zitadel/devcontainer:compose up --force-recreate --renew-anon-volumes db-api-integration cache-api-integration"
+        },
+        "test-integration-run-api": {
+            "description": "Runs the API server for the integration tests.",
+            "continuous": true,
+            "dependsOn": [
+                "test-integration-build"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "env": {
+                    "ZITADEL_BINARY": "zitadel.test",
+                    "GOCOVERDIR": "{workspaceRoot}/.artifacts/api-test-integration/coverage",
+                    "GORACE": "log_path=.artifacts/api-test-integration/race.log"
+                },
+                "parallel": false,
+                "commands": [
+                    "rm -rf .artifacts/api-test-integration",
+                    "mkdir -p ${GOCOVERDIR}",
+                    "nx run @zitadel/api:prod:test-integration-api --excludeTaskDependencies"
+                ]
+            }
+        },
+        "test-integration": {
+            "description": "Runs the integration tests sequentially with coverage and race condition detection. Go test caching is disabled, because the tests run against an out-of-process API.",
+            "dependsOn": [
+                "test-integration-run-db",
+                "test-integration-run-api"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "parallel": false,
+                "env": {
+                    "GOCOVERDIR": "{workspaceRoot}/.artifacts/api-test-integration/coverage"
+                },
+                "commands": [
+                    "wait-on --verbose --interval 2000 --simultaneous 1 --timeout 30m \"${ZITADEL_API_URL}/debug/ready\"",
+                    "bash -c 'go test -race -count 1 -tags integration -timeout 60m -parallel 1 $(go list -tags integration ./... | grep -e \"integration_test\" -e \"events_testing\")'",
+                    "go tool covdata textfmt -i=$GOCOVERDIR -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/...,github.com/zitadel/zitadel/backend/... -o profile.api.test-integration.cov",
+                    "nx run @zitadel/api:test-integration-stop"
+                ]
+            },
+            "inputs": [
+                { "runtime": "go env GOOS" },
+                { "runtime": "go env GOARCH" },
+                "sources",
+                "{workspaceRoot}/internal/integration/**",
+                "{workspaceRoot}/go*"
+            ],
+            "outputs": [
+                "{workspaceRoot}/profile.api.test-integration.cov"
+            ]
+        },
+        "test-integration-stop": {
+            "description": "Stops the database and cache containers used for integration tests.",
+            "command": "nx run @zitadel/devcontainer:compose down --volumes db-api-integration cache-api-integration"
+        },
+        "build-console": {
+            "description": "Builds the Console and copies its static files to the API.",
+            "dependsOn": [
+                "@zitadel/console:build"
+            ],
+            "command": "cp -r console/dist/console/* internal/api/ui/console/static",
+            "cache": true,
+            "outputs": [
+                "{workspaceRoot}/internal/api/ui/console/static"
+            ]
+        },
+        "generate-install": {
+            "description": "Installs the binaries needed for generating code. We avoid using go tools so the dev tool dependencies don't interfere with the prod dependencies.",
+            "executor": "nx:run-commands",
+            "options": {
+                "commands": [
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/dmarkham/enumer@v1.5.11",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install go.uber.org/mock/mockgen@v0.4.0",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install golang.org/x/tools/cmd/stringer@v0.36.0",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/rakyll/statik@v0.1.7",
+
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/bufbuild/buf/cmd/buf@v1.45.0",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.1",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.22.0",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.22.0",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/envoyproxy/protoc-gen-validate@v1.1.0",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.18.1",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.1",
+
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install ./internal/protoc/protoc-gen-authoption",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install ./internal/protoc/protoc-gen-zitadel"
+                ]
+            },
+            "cache": true,
+            "inputs": [
+                { "runtime": "go env GOOS" },
+                { "runtime": "go env GOARCH" },
+                "{workspaceRoot}/internal/protoc/protoc-gen-authoption/**/*",
+                "{workspaceRoot}/internal/protoc/protoc-gen-zitadel/**/*"
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/bin/*/*/enumer",
+                "{workspaceRoot}/.artifacts/bin/*/*/mockgen",
+                "{workspaceRoot}/.artifacts/bin/*/*/stringer",
+                "{workspaceRoot}/.artifacts/bin/*/*/statik",
+
+                "{workspaceRoot}/.artifacts/bin/*/*/buf",
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-go",
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-go-grpc",
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-grpc-gateway",
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-openapiv2",
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-validate",
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-connect-go",
+
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-authoption",
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-zitadel"
+            ]
+        },
+        "generate-stubs": {
+            "description": "Generates the gRPC and OpenAPI stubs from the proto files.",
+            "dependsOn": [
+                "generate-install"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "parallel": false,
+                "commands": [
+                    "bash -c 'PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" buf generate'",
+                    "mkdir -p pkg/grpc openapi/v2/zitadel",
+                    "cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/** pkg/grpc/",
+                    "cp -r .artifacts/grpc/zitadel/ openapi/v2/zitadel"
+                ]
+            },
+            "cache": true,
+            "inputs": [
+                "{workspaceRoot}/proto/**/*",
+                "{workspaceRoot}/buf.gen.yaml",
+                "{workspaceRoot}/buf.yaml"
+            ],
+            "outputs": [
+                "{workspaceRoot}/pkg/grpc/**/*",
+                "{workspaceRoot}/openapi/v2/zitadel/**/*"
+            ]
+        },
+        "generate-statik": {
+            "description": "Generates statik files for embedding static resources",
+            "dependsOn": [
+                "generate-install"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "commands": [
+                    "PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/api/ui/login/static/resources/generate.go",
+                    "PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/api/ui/login/statik/generate.go",
+                    "PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/notification/statik/generate.go",
+                    "PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/statik/generate.go"
+                ],
+                "parallel": false
+            },
+            "cache": true,
+            "inputs": [
+                { "runtime": "go env GOOS" },
+                { "runtime": "go env GOARCH" },
+                "{workspaceRoot}/internal/statik/generate.go",
+                "{workspaceRoot}/internal/notification/statik/generate.go",
+                "{workspaceRoot}/internal/api/ui/login/static/resources/generate.go",
+                "{workspaceRoot}/internal/api/ui/login/statik/generate.go"
+            ],
+            "outputs": [
+                "{workspaceRoot}/internal/statik/statik.go",
+                "{workspaceRoot}/internal/notification/statik/statik.go",
+                "{workspaceRoot}/internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css*",
+                "{workspaceRoot}/internal/api/ui/login/statik/statik.go"
+            ]
+        },
+        "generate-assets": {
+            "description": "Generates asset routes and documentation",
+            "dependsOn": [
+                "generate-install"
+            ],
+            "command": "mkdir -p docs/apis/assets && go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=docs/apis/assets/assets.md",
+            "cache": true,
+            "inputs": [
+                "{workspaceRoot}/internal/api/assets/generator/asset_generator.go"
+            ],
+            "outputs": [
+                "{workspaceRoot}/internal/api/assets/authz.go",
+                "{workspaceRoot}/internal/api/assets/router.go",
+                "{workspaceRoot}/docs/apis/assets/assets.md"
+            ]
+        },
+        "generate-go": {
+            "description": "Generates Go using Go native generation tools. This only needs to be run if sources for //go:generate  files change, like for Stringer, Enumer, Mockgen etc.",
+            "dependsOn": [
+                "generate-install"
+            ],
+            "command": "PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate ./..."
+        },
+        "pack-platform": {
+            "description": "Cross-compiles the binary and packages it for the platform defined by GOOS and GOARCH environment variables. The version is taken from the ZITADEL_VERSION environment variable.",
+            "executor": "nx:run-commands",
+            "options": {
+                "parallel": false,
+                "commands": [
+                    "mkdir -p .artifacts/pack .artifacts/bin/$GOOS/$GOARCH",
+                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; echo \"Building for $GOOS-$GOARCH...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$GOOS/$GOARCH/zitadel$EXT -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\") -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_VERSION}\"'",
+                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; FOLDER=\"zitadel-$GOOS-$GOARCH\"; mkdir -p \".artifacts/pack/$FOLDER\"; cp README.md LICENSE \".artifacts/bin/$GOOS/$GOARCH/zitadel$EXT\" \".artifacts/pack/$FOLDER/\"; tar -czvf \".artifacts/pack/$FOLDER.tar.gz\" -C .artifacts/pack \"$FOLDER\"; rm -rf \".artifacts/pack/$FOLDER\"'"
+                ]
+            }
+        },
+        "pack-darwin-amd64": {
+            "description": "Packages the API for Darwin AMD64 (Intel) architecture",
+            "dependsOn": [
+                "generate",
+                "build-console"
+            ],
+            "command": "GOOS=darwin GOARCH=amd64 nx run @zitadel/api:pack-platform",
+            "cache": true,
+            "inputs": [
+                "pack",
+                { "env": "ZITADEL_VERSION" }
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/pack/zitadel-darwin-amd64.tar.gz",
+                "{workspaceRoot}/.artifacts/bin/darwin/amd64/zitadel"
+            ]
+        },
+        "pack-darwin-arm64": {
+            "description": "Packages the API for Darwin ARM64 (Apple Silicon) architecture",
+            "dependsOn": [
+                "generate",
+                "build-console"
+            ],
+            "command": "GOOS=darwin GOARCH=arm64 nx run @zitadel/api:pack-platform",
+            "cache": true,
+            "inputs": [
+                "pack",
+                { "env": "ZITADEL_VERSION" }
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/pack/zitadel-darwin-arm64.tar.gz",
+                "{workspaceRoot}/.artifacts/bin/darwin/arm64/zitadel"
+            ]
+        },
+        "pack-linux-amd64": {
+            "description": "Packages the API for Linux AMD64 architecture",
+            "dependsOn": [
+                "generate",
+                "build-console"
+            ],
+            "command": "GOOS=linux GOARCH=amd64 nx run @zitadel/api:pack-platform",
+            "cache": true,
+            "inputs": [
+                "pack",
+                { "env": "ZITADEL_VERSION" }
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/pack/zitadel-linux-amd64.tar.gz",
+                "{workspaceRoot}/.artifacts/bin/linux/amd64/zitadel"
+            ]
+        },
+        "pack-linux-arm64": {
+            "description": "Packages the API for Linux ARM64 architecture",
+            "dependsOn": [
+                "generate",
+                "build-console"
+            ],
+            "command": "GOOS=linux GOARCH=arm64 nx run @zitadel/api:pack-platform",
+            "cache": true,
+            "inputs": [
+                "pack",
+                { "env": "ZITADEL_VERSION" }
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/pack/zitadel-linux-arm64.tar.gz",
+                "{workspaceRoot}/.artifacts/bin/linux/arm64/zitadel"
+            ]
+        },
+        "pack-windows-amd64": {
+            "description": "Packages the API for Windows AMD64 architecture",
+            "dependsOn": [
+                "generate",
+                "build-console"
+            ],
+            "command": "GOOS=windows GOARCH=amd64 nx run @zitadel/api:pack-platform",
+            "cache": true,
+            "inputs": [
+                "pack",
+                { "env": "ZITADEL_VERSION" }
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/pack/zitadel-windows-amd64.tar.gz",
+                "{workspaceRoot}/.artifacts/bin/windows/amd64/zitadel.exe"
+            ]
+        },
+        "pack-windows-arm64": {
+            "description": "Packages the API for Windows ARM64 architecture",
+            "dependsOn": [
+                "generate",
+                "build-console"
+            ],
+            "command": "GOOS=windows GOARCH=arm64 nx run @zitadel/api:pack-platform",
+            "cache": true,
+            "inputs": [
+                "pack",
+                { "env": "ZITADEL_VERSION" }
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/pack/zitadel-windows-arm64.tar.gz",
+                "{workspaceRoot}/.artifacts/bin/windows/arm64/zitadel.exe"
+            ]
+        }
+    }
+}

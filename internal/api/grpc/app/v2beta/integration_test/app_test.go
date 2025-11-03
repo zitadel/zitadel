@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
@@ -23,7 +22,7 @@ func TestCreateApplication(t *testing.T) {
 
 	t.Parallel()
 
-	notExistingProjectID := gofakeit.UUID()
+	notExistingProjectID := integration.ID()
 
 	tt := []struct {
 		testName        string
@@ -95,7 +94,7 @@ func TestCreateApplication(t *testing.T) {
 			inputCtx: IAMOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
 				ProjectId: p.GetId(),
-				Name:      gofakeit.AppName(),
+				Name:      integration.ApplicationName(),
 				CreationRequestType: &app.CreateApplicationRequest_OidcRequest{
 					OidcRequest: &app.CreateOIDCApplicationRequest{
 						RedirectUris:           []string{"http://example.com"},
@@ -125,7 +124,7 @@ func TestCreateApplication(t *testing.T) {
 			inputCtx: IAMOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
 				ProjectId: notExistingProjectID,
-				Name:      gofakeit.AppName(),
+				Name:      integration.ApplicationName(),
 				CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
 					SamlRequest: &app.CreateSAMLApplicationRequest{
 						Metadata: &app.CreateSAMLApplicationRequest_MetadataUrl{
@@ -148,11 +147,11 @@ func TestCreateApplication(t *testing.T) {
 			inputCtx: IAMOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
 				ProjectId: p.GetId(),
-				Name:      gofakeit.AppName(),
+				Name:      integration.ApplicationName(),
 				CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
 					SamlRequest: &app.CreateSAMLApplicationRequest{
 						Metadata: &app.CreateSAMLApplicationRequest_MetadataXml{
-							MetadataXml: samlMetadataGen(gofakeit.URL()),
+							MetadataXml: samlMetadataGen(integration.URL()),
 						},
 						LoginVersion: &app.LoginVersion{
 							Version: &app.LoginVersion_LoginV2{
@@ -217,7 +216,7 @@ func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 			inputCtx: LoginUserCtx,
 			creationRequest: &app.CreateApplicationRequest{
 				ProjectId: p.GetId(),
-				Name:      gofakeit.AppName(),
+				Name:      integration.ApplicationName(),
 				CreationRequestType: &app.CreateApplicationRequest_OidcRequest{
 					OidcRequest: &app.CreateOIDCApplicationRequest{
 						RedirectUris:           []string{"http://example.com"},
@@ -247,11 +246,11 @@ func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 			inputCtx: LoginUserCtx,
 			creationRequest: &app.CreateApplicationRequest{
 				ProjectId: p.GetId(),
-				Name:      gofakeit.AppName(),
+				Name:      integration.ApplicationName(),
 				CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
 					SamlRequest: &app.CreateSAMLApplicationRequest{
 						Metadata: &app.CreateSAMLApplicationRequest_MetadataXml{
-							MetadataXml: samlMetadataGen(gofakeit.URL()),
+							MetadataXml: samlMetadataGen(integration.URL()),
 						},
 						LoginVersion: &app.LoginVersion{
 							Version: &app.LoginVersion_LoginV2{
@@ -286,7 +285,7 @@ func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 			inputCtx: OrgOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
 				ProjectId: p.GetId(),
-				Name:      gofakeit.AppName(),
+				Name:      integration.ApplicationName(),
 				CreationRequestType: &app.CreateApplicationRequest_OidcRequest{
 					OidcRequest: &app.CreateOIDCApplicationRequest{
 						RedirectUris:           []string{"http://example.com"},
@@ -316,11 +315,11 @@ func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 			inputCtx: OrgOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
 				ProjectId: p.GetId(),
-				Name:      gofakeit.AppName(),
+				Name:      integration.ApplicationName(),
 				CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
 					SamlRequest: &app.CreateSAMLApplicationRequest{
 						Metadata: &app.CreateSAMLApplicationRequest_MetadataXml{
-							MetadataXml: samlMetadataGen(gofakeit.URL()),
+							MetadataXml: samlMetadataGen(integration.URL()),
 						},
 						LoginVersion: &app.LoginVersion{
 							Version: &app.LoginVersion_LoginV2{
@@ -355,7 +354,7 @@ func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 			inputCtx: projectOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
 				ProjectId: p.GetId(),
-				Name:      gofakeit.AppName(),
+				Name:      integration.ApplicationName(),
 				CreationRequestType: &app.CreateApplicationRequest_OidcRequest{
 					OidcRequest: &app.CreateOIDCApplicationRequest{
 						RedirectUris:           []string{"http://example.com"},
@@ -385,11 +384,11 @@ func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 			inputCtx: projectOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
 				ProjectId: p.GetId(),
-				Name:      gofakeit.AppName(),
+				Name:      integration.ApplicationName(),
 				CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
 					SamlRequest: &app.CreateSAMLApplicationRequest{
 						Metadata: &app.CreateSAMLApplicationRequest_MetadataXml{
-							MetadataXml: samlMetadataGen(gofakeit.URL()),
+							MetadataXml: samlMetadataGen(integration.URL()),
 						},
 						LoginVersion: &app.LoginVersion{
 							Version: &app.LoginVersion_LoginV2{
@@ -422,8 +421,8 @@ func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 }
 
 func TestUpdateApplication(t *testing.T) {
-	orgNotInCtx := instance.CreateOrganization(IAMOwnerCtx, integration.OrganizationName(), gofakeit.Email())
-	pNotInCtx := instance.CreateProject(IAMOwnerCtx, t, orgNotInCtx.GetOrganizationId(), gofakeit.AppName(), false, false)
+	orgNotInCtx := instance.CreateOrganization(IAMOwnerCtx, integration.OrganizationName(), integration.Email())
+	pNotInCtx := instance.CreateProject(IAMOwnerCtx, t, orgNotInCtx.GetOrganizationId(), integration.ApplicationName(), false, false)
 
 	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 
@@ -461,7 +460,7 @@ func TestUpdateApplication(t *testing.T) {
 		},
 	}
 
-	samlMetas := samlMetadataGen(gofakeit.URL())
+	samlMetas := samlMetadataGen(integration.URL())
 	reqForSAMLAppCreation := &app.CreateApplicationRequest_SamlRequest{
 		SamlRequest: &app.CreateSAMLApplicationRequest{
 			Metadata: &app.CreateSAMLApplicationRequest_MetadataXml{
@@ -479,28 +478,28 @@ func TestUpdateApplication(t *testing.T) {
 
 	appForNameChange, appNameChangeErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId:           p.GetId(),
-		Name:                gofakeit.AppName(),
+		Name:                integration.ApplicationName(),
 		CreationRequestType: reqForAppNameCreation,
 	})
 	require.Nil(t, appNameChangeErr)
 
 	appForAPIConfigChange, appAPIConfigChangeErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId:           p.GetId(),
-		Name:                gofakeit.AppName(),
+		Name:                integration.ApplicationName(),
 		CreationRequestType: reqForAPIAppCreation,
 	})
 	require.Nil(t, appAPIConfigChangeErr)
 
 	appForOIDCConfigChange, appOIDCConfigChangeErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId:           p.GetId(),
-		Name:                gofakeit.AppName(),
+		Name:                integration.ApplicationName(),
 		CreationRequestType: reqForOIDCAppCreation,
 	})
 	require.Nil(t, appOIDCConfigChangeErr)
 
 	appForSAMLConfigChange, appSAMLConfigChangeErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId:           p.GetId(),
-		Name:                gofakeit.AppName(),
+		Name:                integration.ApplicationName(),
 		CreationRequestType: reqForSAMLAppCreation,
 	})
 	require.Nil(t, appSAMLConfigChangeErr)
@@ -649,7 +648,7 @@ func TestUpdateApplication_WithDifferentPermissions(t *testing.T) {
 
 	appForNameChange, appNameChangeErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId:           p.GetId(),
-		Name:                gofakeit.AppName(),
+		Name:                integration.ApplicationName(),
 		CreationRequestType: reqForAppNameCreation,
 	})
 	require.Nil(t, appNameChangeErr)
@@ -683,7 +682,7 @@ func TestUpdateApplication_WithDifferentPermissions(t *testing.T) {
 				ProjectId: p.GetId(),
 				Id:        appForNameChange.GetAppId(),
 
-				Name: gofakeit.AppName(),
+				Name: integration.ApplicationName(),
 			},
 		},
 		{
@@ -737,7 +736,7 @@ func TestUpdateApplication_WithDifferentPermissions(t *testing.T) {
 				ProjectId: p.GetId(),
 				Id:        appForNameChange.GetAppId(),
 
-				Name: gofakeit.AppName(),
+				Name: integration.ApplicationName(),
 			},
 		},
 		{
@@ -791,7 +790,7 @@ func TestUpdateApplication_WithDifferentPermissions(t *testing.T) {
 				ProjectId: p.GetId(),
 				Id:        appForNameChange.GetAppId(),
 
-				Name: gofakeit.AppName(),
+				Name: integration.ApplicationName(),
 			},
 			expectedErrorType: codes.PermissionDenied,
 		},
@@ -864,7 +863,7 @@ func TestDeleteApplication(t *testing.T) {
 
 	appToDelete, appNameChangeErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId:           p.GetId(),
-		Name:                gofakeit.AppName(),
+		Name:                integration.ApplicationName(),
 		CreationRequestType: reqForAppNameCreation,
 	})
 	require.Nil(t, appNameChangeErr)
@@ -882,7 +881,7 @@ func TestDeleteApplication(t *testing.T) {
 			inputCtx: IAMOwnerCtx,
 			deleteRequest: &app.DeleteApplicationRequest{
 				ProjectId: p.GetId(),
-				Id:        gofakeit.Sentence(2),
+				Id:        integration.ID(),
 			},
 			expectedErrorType: codes.NotFound,
 		},
@@ -984,7 +983,7 @@ func TestDeactivateApplication(t *testing.T) {
 
 	appToDeactivate, appCreateErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId:           p.GetId(),
-		Name:                gofakeit.AppName(),
+		Name:                integration.ApplicationName(),
 		CreationRequestType: reqForAppNameCreation,
 	})
 	require.NoError(t, appCreateErr)
@@ -1003,7 +1002,7 @@ func TestDeactivateApplication(t *testing.T) {
 			inputCtx: IAMOwnerCtx,
 			deleteRequest: &app.DeactivateApplicationRequest{
 				ProjectId: p.GetId(),
-				Id:        gofakeit.Sentence(2),
+				Id:        integration.ID(),
 			},
 			expectedErrorType: codes.NotFound,
 		},
@@ -1105,7 +1104,7 @@ func TestReactivateApplication(t *testing.T) {
 
 	appToReactivate, appCreateErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId:           p.GetId(),
-		Name:                gofakeit.AppName(),
+		Name:                integration.ApplicationName(),
 		CreationRequestType: reqForAppNameCreation,
 	})
 	require.Nil(t, appCreateErr)
@@ -1130,7 +1129,7 @@ func TestReactivateApplication(t *testing.T) {
 			inputCtx: IAMOwnerCtx,
 			reactivateRequest: &app.ReactivateApplicationRequest{
 				ProjectId: p.GetId(),
-				Id:        gofakeit.Sentence(2),
+				Id:        integration.ID(),
 			},
 			expectedErrorType: codes.NotFound,
 		},
@@ -1238,7 +1237,7 @@ func TestRegenerateClientSecret(t *testing.T) {
 
 	apiAppToRegen, apiAppCreateErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId:           p.GetId(),
-		Name:                gofakeit.AppName(),
+		Name:                integration.ApplicationName(),
 		CreationRequestType: reqForApiAppCreation,
 	})
 	require.Nil(t, apiAppCreateErr)
@@ -1266,7 +1265,7 @@ func TestRegenerateClientSecret(t *testing.T) {
 
 	oidcAppToRegen, oidcAppCreateErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId:           p.GetId(),
-		Name:                gofakeit.AppName(),
+		Name:                integration.ApplicationName(),
 		CreationRequestType: reqForOIDCAppCreation,
 	})
 	require.Nil(t, oidcAppCreateErr)
@@ -1286,7 +1285,7 @@ func TestRegenerateClientSecret(t *testing.T) {
 			inputCtx: IAMOwnerCtx,
 			regenRequest: &app.RegenerateClientSecretRequest{
 				ProjectId:     p.GetId(),
-				ApplicationId: gofakeit.Sentence(2),
+				ApplicationId: integration.ID(),
 			},
 			expectedErrorType: codes.InvalidArgument,
 		},
@@ -1295,7 +1294,7 @@ func TestRegenerateClientSecret(t *testing.T) {
 			inputCtx: IAMOwnerCtx,
 			regenRequest: &app.RegenerateClientSecretRequest{
 				ProjectId:     p.GetId(),
-				ApplicationId: gofakeit.Sentence(2),
+				ApplicationId: integration.ID(),
 				AppType:       &app.RegenerateClientSecretRequest_IsApi{},
 			},
 			expectedErrorType: codes.NotFound,

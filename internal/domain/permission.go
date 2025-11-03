@@ -30,6 +30,7 @@ const (
 	PermissionUserWrite                = "user.write"
 	PermissionUserRead                 = "user.read"
 	PermissionUserDelete               = "user.delete"
+	PermissionUserDeleteSelf           = "user.self.delete"
 	PermissionUserCredentialWrite      = "user.credential.write"
 	PermissionSessionWrite             = "session.write"
 	PermissionSessionRead              = "session.read"
@@ -69,6 +70,17 @@ const (
 	PermissionIAMPolicyWrite           = "iam.policy.write"
 	PermissionIAMPolicyDelete          = "iam.policy.delete"
 	PermissionPolicyRead               = "policy.read"
+	PermissionInstanceRead             = "iam.read"
+	PermissionInstanceWrite            = "iam.write"
+	PermissionSystemInstanceRead       = "system.instance.read"
+	PermissionSystemInstanceWrite      = "system.instance.write"
+	PermissionGroupCreate              = "group.create"
+	PermissionGroupWrite               = "group.write"
+	PermissionGroupRead                = "group.read"
+	PermissionGroupDelete              = "group.delete"
+	PermissionGroupUserWrite           = "group.user.write"
+	PermissionGroupUserRead            = "group.user.read"
+	PermissionGroupUserDelete          = "group.user.delete"
 )
 
 // ProjectPermissionCheck is used as a check for preconditions dependent on application, project, user resourceowner and usergrants.

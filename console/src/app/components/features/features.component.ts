@@ -36,6 +36,7 @@ const FEATURE_KEYS = [
   'oidcTokenExchange',
   'permissionCheckV2',
   'userSchema',
+  'enableRelationalTables',
 ] as const;
 
 export type ToggleState = { source: Source; enabled: boolean };
@@ -64,7 +65,6 @@ export type ToggleStateKeys = keyof ToggleStates;
     FeatureToggleComponent,
     LoginV2FeatureToggleComponent,
   ],
-  standalone: true,
   selector: 'cnsl-features',
   templateUrl: './features.component.html',
   styleUrls: ['./features.component.scss'],

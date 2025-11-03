@@ -1940,6 +1940,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 		eventstore        func(*testing.T) *eventstore.Eventstore
 		userEncryption    crypto.EncryptionAlgorithm
 		phoneCodeVerifier func(ctx context.Context, id string) (senders.CodeGenerator, error)
+		tarpit            Tarpit
 	}
 	type (
 		args struct {
@@ -1964,6 +1965,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 			name: "userid missing, invalid argument error",
 			fields: fields{
 				eventstore: expectEventstore(),
+				tarpit:     expectTarpit(0),
 			},
 			args: args{
 				ctx:           ctx,
@@ -1979,6 +1981,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 			name: "code missing, invalid argument error",
 			fields: fields{
 				eventstore: expectEventstore(),
+				tarpit:     expectTarpit(0),
 			},
 			args: args{
 				ctx:           ctx,
@@ -1996,6 +1999,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				tarpit: expectTarpit(0),
 			},
 			args: args{
 				ctx:           ctx,
@@ -2019,6 +2023,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 						),
 					),
 				),
+				tarpit: expectTarpit(0),
 			},
 			args: args{
 				ctx:           ctx,
@@ -2088,6 +2093,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 					),
 				),
 				userEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				tarpit:         expectTarpit(1),
 			},
 			args: args{
 				ctx:           ctx,
@@ -2169,6 +2175,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 					),
 				),
 				userEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				tarpit:         expectTarpit(1),
 			},
 			args: args{
 				ctx:           ctx,
@@ -2239,6 +2246,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 					),
 				),
 				userEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				tarpit:         expectTarpit(0),
 			},
 			args: args{
 				ctx:           ctx,
@@ -2301,6 +2309,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 					),
 				),
 				userEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				tarpit:         expectTarpit(0),
 			},
 			args: args{
 				ctx:           ctx,
@@ -2380,6 +2389,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 					sender.EXPECT().VerifyCode("verificationID", "code").Return(nil)
 					return sender, nil
 				},
+				tarpit: expectTarpit(0),
 			},
 			args: args{
 				ctx:           ctx,
@@ -2409,9 +2419,11 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 				eventstore:        tt.fields.eventstore(t),
 				userEncryption:    tt.fields.userEncryption,
 				phoneCodeVerifier: tt.fields.phoneCodeVerifier,
+				tarpit:            tt.fields.tarpit.tarpit,
 			}
 			err := r.HumanCheckOTPSMS(tt.args.ctx, tt.args.userID, tt.args.code, tt.args.resourceOwner, tt.args.authRequest)
 			assert.ErrorIs(t, err, tt.res.err)
+			tt.fields.tarpit.metExpectedCalls(t)
 		})
 	}
 }
@@ -3115,6 +3127,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 	type fields struct {
 		eventstore     func(*testing.T) *eventstore.Eventstore
 		userEncryption crypto.EncryptionAlgorithm
+		tarpit         Tarpit
 	}
 	type (
 		args struct {
@@ -3139,6 +3152,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 			name: "userid missing, invalid argument error",
 			fields: fields{
 				eventstore: expectEventstore(),
+				tarpit:     expectTarpit(0),
 			},
 			args: args{
 				ctx:           ctx,
@@ -3154,6 +3168,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 			name: "code missing, invalid argument error",
 			fields: fields{
 				eventstore: expectEventstore(),
+				tarpit:     expectTarpit(0),
 			},
 			args: args{
 				ctx:           ctx,
@@ -3171,6 +3186,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				tarpit: expectTarpit(0),
 			},
 			args: args{
 				ctx:           ctx,
@@ -3194,6 +3210,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 						),
 					),
 				),
+				tarpit: expectTarpit(0),
 			},
 			args: args{
 				ctx:           ctx,
@@ -3262,6 +3279,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 					),
 				),
 				userEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				tarpit:         expectTarpit(1),
 			},
 			args: args{
 				ctx:           ctx,
@@ -3342,6 +3360,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 					),
 				),
 				userEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				tarpit:         expectTarpit(1),
 			},
 			args: args{
 				ctx:           ctx,
@@ -3411,6 +3430,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 					),
 				),
 				userEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				tarpit:         expectTarpit(0),
 			},
 			args: args{
 				ctx:           ctx,
@@ -3472,6 +3492,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 					),
 				),
 				userEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				tarpit:         expectTarpit(0),
 			},
 			args: args{
 				ctx:           ctx,
@@ -3498,9 +3519,11 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 			r := &Commands{
 				eventstore:     tt.fields.eventstore(t),
 				userEncryption: tt.fields.userEncryption,
+				tarpit:         tt.fields.tarpit.tarpit,
 			}
 			err := r.HumanCheckOTPEmail(tt.args.ctx, tt.args.userID, tt.args.code, tt.args.resourceOwner, tt.args.authRequest)
 			assert.ErrorIs(t, err, tt.res.err)
+			tt.fields.tarpit.metExpectedCalls(t)
 		})
 	}
 }

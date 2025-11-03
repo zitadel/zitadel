@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -39,7 +38,7 @@ func TestServer_ListOrgMemberRoles(t *testing.T) {
 }
 
 func TestServer_ListOrgMembers(t *testing.T) {
-	user := Instance.CreateHumanUserVerified(OrgCTX, Instance.DefaultOrg.Id, gofakeit.Email(), gofakeit.Phone())
+	user := Instance.CreateHumanUserVerified(OrgCTX, Instance.DefaultOrg.Id, integration.Email(), integration.Phone())
 	_, err := Client.AddOrgMember(OrgCTX, &mgmt_pb.AddOrgMemberRequest{
 		UserId: user.GetUserId(),
 		Roles:  iamRoles[1:],
@@ -120,7 +119,7 @@ func TestServer_ListOrgMembers(t *testing.T) {
 }
 
 func TestServer_AddOrgMember(t *testing.T) {
-	user := Instance.CreateHumanUserVerified(OrgCTX, Instance.DefaultOrg.Id, gofakeit.Email(), gofakeit.Phone())
+	user := Instance.CreateHumanUserVerified(OrgCTX, Instance.DefaultOrg.Id, integration.Email(), integration.Phone())
 	type args struct {
 		ctx context.Context
 		req *mgmt_pb.AddOrgMemberRequest
@@ -194,7 +193,7 @@ func TestServer_AddOrgMember(t *testing.T) {
 }
 
 func TestServer_UpdateOrgMember(t *testing.T) {
-	user := Instance.CreateHumanUserVerified(OrgCTX, Instance.DefaultOrg.Id, gofakeit.Email(), gofakeit.Phone())
+	user := Instance.CreateHumanUserVerified(OrgCTX, Instance.DefaultOrg.Id, integration.Email(), integration.Phone())
 	_, err := Client.AddOrgMember(OrgCTX, &mgmt_pb.AddOrgMemberRequest{
 		UserId: user.GetUserId(),
 		Roles:  []string{"ORG_OWNER"},
@@ -275,7 +274,7 @@ func TestServer_UpdateOrgMember(t *testing.T) {
 }
 
 func TestServer_RemoveIAMMember(t *testing.T) {
-	user := Instance.CreateHumanUserVerified(OrgCTX, Instance.DefaultOrg.Id, gofakeit.Email(), gofakeit.Phone())
+	user := Instance.CreateHumanUserVerified(OrgCTX, Instance.DefaultOrg.Id, integration.Email(), integration.Phone())
 	_, err := Client.AddOrgMember(OrgCTX, &mgmt_pb.AddOrgMemberRequest{
 		UserId: user.GetUserId(),
 		Roles:  []string{"ORG_OWNER"},

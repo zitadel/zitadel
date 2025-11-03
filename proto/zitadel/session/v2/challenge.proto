@@ -18,28 +18,37 @@ enum UserVerificationRequirement {
 
 message RequestChallenges {
   message WebAuthN {
+    // The domain on which the session was created. Will be used in the WebAuthN challenge.
+    // It must be either the exact domain or a top-level domain of the origin of the request.
+    // For example if the request is coming from "login.example.com", the domain can be
+    // "login.example.com" or "example.com", but not "other.com" or "sub.login.example.com".
+    // See also: https://www.w3.org/TR/webauthn/#relying-party-identifier
     string domain = 1 [
       (validate.rules).string = {min_len: 1, max_len: 200},
-      (google.api.field_behavior) = REQUIRED,
-      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "\"Domain on which the session was created. Will be used in the WebAuthN challenge.\"";
-      }
+      (google.api.field_behavior) = REQUIRED
     ];
+
+    // User verification that is required during validation.
+    // When set to `USER_VERIFICATION_REQUIREMENT_REQUIRED` the behaviour is for passkey authentication.
+    // Other values will mean U2F.
+    // See also: https://www.w3.org/TR/webauthn/#enum-userVerificationRequirement
+    // If either the value is set to USER_VERIFICATION_REQUIREMENT_REQUIRED or the user verification
+    // is passed as part of the authentication ceremony, the user_verified flag will be set in the resulting webauthn factor.
     UserVerificationRequirement user_verification_requirement = 2 [
       (validate.rules).enum = {
         defined_only: true,
         not_in: [0]
       },
-      (google.api.field_behavior) = REQUIRED,
-      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "\"User verification that is required during validation. When set to `USER_VERIFICATION_REQUIREMENT_REQUIRED` the behaviour is for passkey authentication. Other values will mean U2F\"";
-        ref: "https://www.w3.org/TR/webauthn/#enum-userVerificationRequirement";
-      }
+      (google.api.field_behavior) = REQUIRED
     ];
   }
+
   message OTPSMS {
+    // Request the code to be returned instead of sending an SMS.
+    // This is useful for testing or in case you want to send the code yourself.
     bool return_code = 1;
   }
+
   message OTPEmail {
     message SendCode {
       // Optionally set a url_template, which will be used in the mail sent by ZITADEL to guide the user to your verification page.
@@ -64,16 +73,27 @@ message RequestChallenges {
     }
   }
 
+  // WebAuthN requests a challenge to be used in the WebAuthN authentication ceremony.
+  // They can be used for both passkey and U2F authentication.
+  // They're required for a webauthn check at the SetSession endpoint.
   optional WebAuthN web_auth_n = 1;
+
+  // OTPSMS requests a code to be sent via SMS to the user's primary phone.
+  // It is required for an OTP check at the SetSession endpoint.
   optional OTPSMS otp_sms = 2;
+
+  // OTPEmail requests a code to be sent via email to the user's primary email address.
+  // It is required for an OTP check at the SetSession endpoint.
   optional OTPEmail otp_email = 3;
 }
 
 message Challenges {
+  // WebAuthN contains the options for the Assertion Generation (dictionary PublicKeyCredentialRequestOptions).
+  // Generated helper methods transform the field to JSON, for use in a WebauthN client.
+  // See also: https://www.w3.org/TR/webauthn/#dictdef-publickeycredentialrequestoptions
   message WebAuthN {
     google.protobuf.Struct public_key_credential_request_options = 1 [
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "Options for Assertion Generaration (dictionary PublicKeyCredentialRequestOptions). Generated helper methods transform the field to JSON, for use in a WebauthN client. See also: https://www.w3.org/TR/webauthn/#dictdef-publickeycredentialrequestoptions"
         example: "{\"publicKey\":{\"allowCredentials\":[{\"id\":\"ATmqBg-99qyOZk2zloPdJQyS2R7IkFT7v9Hoos_B_nM\",\"type\":\"public-key\"}],\"challenge\":\"GAOHYz2jE69kJMYo6Laij8yWw9-dKKgbViNhfuy0StA\",\"rpId\":\"localhost\",\"timeout\":300000,\"userVerification\":\"required\"}}"
       }
     ];

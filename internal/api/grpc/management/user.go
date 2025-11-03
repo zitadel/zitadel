@@ -168,7 +168,7 @@ func (s *Server) GetUserMetadata(ctx context.Context, req *mgmt_pb.GetUserMetada
 
 func (s *Server) SetUserMetadata(ctx context.Context, req *mgmt_pb.SetUserMetadataRequest) (*mgmt_pb.SetUserMetadataResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.SetUserMetadata(ctx, &domain.Metadata{Key: req.Key, Value: req.Value}, req.Id, ctxData.OrgID)
+	result, err := s.command.SetUserMetadata(ctx, &domain.Metadata{Key: req.Key, Value: req.Value}, req.Id, ctxData.OrgID, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -183,7 +183,7 @@ func (s *Server) SetUserMetadata(ctx context.Context, req *mgmt_pb.SetUserMetada
 
 func (s *Server) BulkSetUserMetadata(ctx context.Context, req *mgmt_pb.BulkSetUserMetadataRequest) (*mgmt_pb.BulkSetUserMetadataResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.BulkSetUserMetadata(ctx, req.Id, ctxData.OrgID, BulkSetUserMetadataToDomain(req)...)
+	result, err := s.command.BulkSetUserMetadata(ctx, req.Id, ctxData.OrgID, nil, BulkSetUserMetadataToDomain(req)...) // permission has already been checked
 	if err != nil {
 		return nil, err
 	}
@@ -194,7 +194,7 @@ func (s *Server) BulkSetUserMetadata(ctx context.Context, req *mgmt_pb.BulkSetUs
 
 func (s *Server) RemoveUserMetadata(ctx context.Context, req *mgmt_pb.RemoveUserMetadataRequest) (*mgmt_pb.RemoveUserMetadataResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.RemoveUserMetadata(ctx, req.Key, req.Id, ctxData.OrgID)
+	result, err := s.command.RemoveUserMetadata(ctx, req.Key, req.Id, ctxData.OrgID, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -205,7 +205,7 @@ func (s *Server) RemoveUserMetadata(ctx context.Context, req *mgmt_pb.RemoveUser
 
 func (s *Server) BulkRemoveUserMetadata(ctx context.Context, req *mgmt_pb.BulkRemoveUserMetadataRequest) (*mgmt_pb.BulkRemoveUserMetadataResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.BulkRemoveUserMetadata(ctx, req.Id, ctxData.OrgID, req.Keys...)
+	result, err := s.command.BulkRemoveUserMetadata(ctx, req.Id, ctxData.OrgID, nil, req.Keys...)
 	if err != nil {
 		return nil, err
 	}
@@ -349,11 +349,11 @@ func (s *Server) UnlockUser(ctx context.Context, req *mgmt_pb.UnlockUserRequest)
 }
 
 func (s *Server) RemoveUser(ctx context.Context, req *mgmt_pb.RemoveUserRequest) (*mgmt_pb.RemoveUserResponse, error) {
-	memberships, grants, err := s.removeUserDependencies(ctx, req.Id)
+	memberships, grants, groupIDs, err := s.removeUserDependencies(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, memberships, grants...)
+	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, memberships, grants, groupIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -362,28 +362,32 @@ func (s *Server) RemoveUser(ctx context.Context, req *mgmt_pb.RemoveUserRequest)
 	}, nil
 }
 
-func (s *Server) removeUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, error) {
+func (s *Server) removeUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, []string, error) {
 	userGrantUserQuery, err := query.NewUserGrantUserIDSearchQuery(userID)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{userGrantUserQuery},
 	}, true, nil)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	membershipsUserQuery, err := query.NewMembershipUserIDQuery(userID)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	memberships, err := s.query.Memberships(ctx, &query.MembershipSearchQuery{
 		Queries: []query.SearchQuery{membershipsUserQuery},
 	}, false)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
-	return cascadingMemberships(memberships.Memberships), userGrantsToIDs(grants.UserGrants), nil
+	groupIDs, err := s.getGroupsByUserID(ctx, userID)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	return cascadingMemberships(memberships.Memberships), userGrantsToIDs(grants.UserGrants), groupIDs, nil
 }
 
 func (s *Server) UpdateUserName(ctx context.Context, req *mgmt_pb.UpdateUserNameRequest) (*mgmt_pb.UpdateUserNameResponse, error) {
@@ -976,4 +980,28 @@ func userGrantsToIDs(userGrants []*query.UserGrant) []string {
 		converted[i] = grant.ID
 	}
 	return converted
+}
+
+func (s *Server) getGroupsByUserID(ctx context.Context, userID string) ([]string, error) {
+	groupUserQuery, err := query.NewGroupUsersUserIDsSearchQuery([]string{userID})
+	if err != nil {
+		return nil, err
+	}
+	groupUsers, err := s.query.SearchGroupUsers(ctx,
+		&query.GroupUsersSearchQuery{
+			Queries: []query.SearchQuery{
+				groupUserQuery,
+			},
+		}, nil)
+	if err != nil {
+		return nil, err
+	}
+	if len(groupUsers.GroupUsers) == 0 {
+		return nil, nil
+	}
+	groupIDs := make([]string, 0, len(groupUsers.GroupUsers))
+	for _, groupUser := range groupUsers.GroupUsers {
+		groupIDs = append(groupIDs, groupUser.GroupID)
+	}
+	return groupIDs, nil
 }

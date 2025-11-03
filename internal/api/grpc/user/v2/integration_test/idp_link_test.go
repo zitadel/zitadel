@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
@@ -33,7 +32,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 		{
 			name: "user does not exist",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddIDPLinkRequest{
 					UserId: "userID",
 					IdpLink: &user.IDPLink{
@@ -49,7 +48,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 		{
 			name: "idp does not exist",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddIDPLinkRequest{
 					UserId: Instance.Users.Get(integration.UserTypeOrgOwner).ID,
 					IdpLink: &user.IDPLink{
@@ -65,7 +64,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 		{
 			name: "add link",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddIDPLinkRequest{
 					UserId: Instance.Users.Get(integration.UserTypeOrgOwner).ID,
 					IdpLink: &user.IDPLink{
@@ -98,20 +97,20 @@ func TestServer_AddIDPLink(t *testing.T) {
 }
 
 func TestServer_ListIDPLinks(t *testing.T) {
-	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
+	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 
 	instanceIdpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
-	userInstanceResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, gofakeit.Email(), gofakeit.Phone())
+	userInstanceResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, integration.Email(), integration.Phone())
 	_, err := Instance.CreateUserIDPlink(IamCTX, userInstanceResp.GetUserId(), "external_instance", instanceIdpResp.Id, "externalUsername_instance")
 	require.NoError(t, err)
 
 	ctxOrg := metadata.AppendToOutgoingContext(IamCTX, "x-zitadel-orgid", orgResp.GetOrganizationId())
 	orgIdpResp := Instance.AddOrgGenericOAuthProvider(ctxOrg, orgResp.OrganizationId)
-	userOrgResp := Instance.CreateHumanUserVerified(ctxOrg, orgResp.OrganizationId, gofakeit.Email(), gofakeit.Phone())
+	userOrgResp := Instance.CreateHumanUserVerified(ctxOrg, orgResp.OrganizationId, integration.Email(), integration.Phone())
 	_, err = Instance.CreateUserIDPlink(ctxOrg, userOrgResp.GetUserId(), "external_org", orgIdpResp.Id, "externalUsername_org")
 	require.NoError(t, err)
 
-	userMultipleResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, gofakeit.Email(), gofakeit.Phone())
+	userMultipleResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, integration.Email(), integration.Phone())
 	_, err = Instance.CreateUserIDPlink(IamCTX, userMultipleResp.GetUserId(), "external_multi", instanceIdpResp.Id, "externalUsername_multi")
 	require.NoError(t, err)
 	_, err = Instance.CreateUserIDPlink(ctxOrg, userMultipleResp.GetUserId(), "external_multi", orgIdpResp.Id, "externalUsername_multi")
@@ -150,7 +149,7 @@ func TestServer_ListIDPLinks(t *testing.T) {
 		{
 			name: "list links, no permission, org",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.ListIDPLinksRequest{
 					UserId: userOrgResp.GetUserId(),
 				},
@@ -231,7 +230,7 @@ func TestServer_ListIDPLinks(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(OrgCTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := Client.ListIDPLinks(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
@@ -252,20 +251,20 @@ func TestServer_ListIDPLinks(t *testing.T) {
 }
 
 func TestServer_RemoveIDPLink(t *testing.T) {
-	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
+	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 
 	instanceIdpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
-	userInstanceResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, gofakeit.Email(), gofakeit.Phone())
+	userInstanceResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, integration.Email(), integration.Phone())
 	_, err := Instance.CreateUserIDPlink(IamCTX, userInstanceResp.GetUserId(), "external_instance", instanceIdpResp.Id, "externalUsername_instance")
 	require.NoError(t, err)
 
 	ctxOrg := metadata.AppendToOutgoingContext(IamCTX, "x-zitadel-orgid", orgResp.GetOrganizationId())
 	orgIdpResp := Instance.AddOrgGenericOAuthProvider(ctxOrg, orgResp.OrganizationId)
-	userOrgResp := Instance.CreateHumanUserVerified(ctxOrg, orgResp.OrganizationId, gofakeit.Email(), gofakeit.Phone())
+	userOrgResp := Instance.CreateHumanUserVerified(ctxOrg, orgResp.OrganizationId, integration.Email(), integration.Phone())
 	_, err = Instance.CreateUserIDPlink(ctxOrg, userOrgResp.GetUserId(), "external_org", orgIdpResp.Id, "externalUsername_org")
 	require.NoError(t, err)
 
-	userNoLinkResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, gofakeit.Email(), gofakeit.Phone())
+	userNoLinkResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, integration.Email(), integration.Phone())
 
 	type args struct {
 		ctx context.Context
@@ -292,7 +291,7 @@ func TestServer_RemoveIDPLink(t *testing.T) {
 		{
 			name: "remove link, no permission, org",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.RemoveIDPLinkRequest{
 					UserId:       userOrgResp.GetUserId(),
 					IdpId:        orgIdpResp.Id,

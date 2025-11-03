@@ -41,7 +41,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/user/v2"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
@@ -129,6 +129,12 @@ func main() {
 	http.ListenAndServe(":8090", nil)
 }
 ```
+
+:::info  
+The example above runs only on your local machine (`localhost`).  
+To test it with Zitadel, you must make your listener reachable from the internet.  
+You can do this by using **Webhook.site** (see [Creating a Listener with Webhook.site](./webhook-site-setup)).  
+:::
 
 ## Create target
 

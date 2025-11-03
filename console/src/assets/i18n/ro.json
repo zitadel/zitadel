@@ -1652,7 +1652,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "Când acest indicator este activat, consola utilizează API-ul de utilizator V2 pentru a crea utilizatori noi. Cu API-ul V2, utilizatorii nou creați încep fără o stare inițială.",
       "LOGINV2": "Autentificare V2",
       "LOGINV2_DESCRIPTION": "Activarea acestei opțiuni pornește noua interfață de autentificare bazată pe TypeScript, cu securitate, performanță și personalizare îmbunătățite.",
-      "LOGINV2_BASEURI": "URI de bază"
+      "LOGINV2_BASEURI": "URI de bază",
+      "ENABLERELATIONALTABLES": "Tabele relaționale",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Activați acest lucru pentru a utiliza tabele relaționale în loc de proiecții pentru stocarea datelor. În prezent, acest comutator nu face nimic."
     },
     "DIALOG": {
       "RESET": {

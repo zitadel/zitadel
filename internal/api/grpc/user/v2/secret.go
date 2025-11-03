@@ -12,7 +12,7 @@ import (
 
 func (s *Server) AddSecret(ctx context.Context, req *connect.Request[user.AddSecretRequest]) (*connect.Response[user.AddSecretResponse], error) {
 	newSecret := &command.GenerateMachineSecret{
-		PermissionCheck: s.command.NewPermissionCheckUserWrite(ctx),
+		PermissionCheck: s.command.NewPermissionCheckUserWrite(ctx, true),
 	}
 	details, err := s.command.GenerateMachineSecret(ctx, req.Msg.GetUserId(), "", newSecret)
 	if err != nil {
@@ -29,7 +29,7 @@ func (s *Server) RemoveSecret(ctx context.Context, req *connect.Request[user.Rem
 		ctx,
 		req.Msg.GetUserId(),
 		"",
-		s.command.NewPermissionCheckUserWrite(ctx),
+		s.command.NewPermissionCheckUserWrite(ctx, true),
 	)
 	if err != nil {
 		return nil, err

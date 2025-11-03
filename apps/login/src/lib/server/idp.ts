@@ -3,28 +3,24 @@
 import {
   getLoginSettings,
   getUserByID,
+  listAuthenticationMethodTypes,
   startIdentityProviderFlow,
   startLDAPIdentityProviderFlow,
 } from "@/lib/zitadel";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { getNextUrl } from "../client";
+import { completeFlowOrGetUrl } from "../client";
 import { getServiceUrlFromHeaders } from "../service-url";
-import { checkEmailVerification } from "../verify-helper";
+import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
+import { getOriginalHost } from "./host";
 
 export type RedirectToIdpState = { error?: string | null } | undefined;
 
-export async function redirectToIdp(
-  prevState: RedirectToIdpState,
-  formData: FormData,
-): Promise<RedirectToIdpState> {
+export async function redirectToIdp(prevState: RedirectToIdpState, formData: FormData): Promise<RedirectToIdpState> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
-  if (!host) {
-    return { error: "Could not get host" };
-  }
+  const host = await getOriginalHost();
 
   const params = new URLSearchParams();
 
@@ -33,10 +29,12 @@ export async function redirectToIdp(
   const organization = formData.get("organization") as string;
   const idpId = formData.get("id") as string;
   const provider = formData.get("provider") as string;
+  const postErrorRedirectUrl = formData.get("postErrorRedirectUrl") as string;
 
   if (linkOnly) params.set("link", "true");
   if (requestId) params.set("requestId", requestId);
   if (organization) params.set("organization", organization);
+  if (postErrorRedirectUrl) params.set("postErrorRedirectUrl", postErrorRedirectUrl);
 
   // redirect to LDAP page where username and password is requested
   if (provider === "ldap") {
@@ -48,7 +46,7 @@ export async function redirectToIdp(
     serviceUrl,
     host,
     idpId,
-    successUrl: `/idp/${provider}/success?` + params.toString(),
+    successUrl: `/idp/${provider}/process?` + params.toString(),
     failureUrl: `/idp/${provider}/failure?` + params.toString(),
   });
 
@@ -90,7 +88,7 @@ async function startIDPFlow(command: StartIDPFlowCommand) {
   return { redirect: url };
 }
 
-type CreateNewSessionCommand = {
+export type CreateNewSessionCommand = {
   userId: string;
   idpIntent: {
     idpIntentId: string;
@@ -102,17 +100,10 @@ type CreateNewSessionCommand = {
   requestId?: string;
 };
 
-export async function createNewSessionFromIdpIntent(
-  command: CreateNewSessionCommand,
-) {
+export async function createNewSessionFromIdpIntent(command: CreateNewSessionCommand) {
   const _headers = await headers();
 
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
-
-  if (!host) {
-    return { error: "Could not get domain" };
-  }
 
   if (!command.userId || !command.idpIntent) {
     throw new Error("No userId or loginName provided");
@@ -143,30 +134,41 @@ export async function createNewSessionFromIdpIntent(
     return { error: "Could not create session" };
   }
 
-  const humanUser =
-    userResponse.user.type.case === "human"
-      ? userResponse.user.type.value
-      : undefined;
+  const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
 
   // check to see if user was verified
-  const emailVerificationCheck = checkEmailVerification(
-    session,
-    humanUser,
-    command.organization,
-    command.requestId,
-  );
+  const emailVerificationCheck = checkEmailVerification(session, humanUser, command.organization, command.requestId);
 
   if (emailVerificationCheck?.redirect) {
     return emailVerificationCheck;
   }
 
-  // TODO: check if user has MFA methods
-  // const mfaFactorCheck = checkMFAFactors(session, loginSettings, authMethods, organization, requestId);
-  // if (mfaFactorCheck?.redirect) {
-  //   return mfaFactorCheck;
-  // }
+  // check if user has MFA methods
+  let authMethods;
+  if (session.factors?.user?.id) {
+    const response = await listAuthenticationMethodTypes({
+      serviceUrl,
+      userId: session.factors.user.id,
+    });
+    if (response.authMethodTypes && response.authMethodTypes.length) {
+      authMethods = response.authMethodTypes;
+    }
+  }
 
-  const url = await getNextUrl(
+  const mfaFactorCheck = await checkMFAFactors(
+    serviceUrl,
+    session,
+    loginSettings,
+    authMethods || [], // Pass empty array if no auth methods
+    command.organization,
+    command.requestId,
+  );
+
+  if (mfaFactorCheck?.redirect) {
+    return mfaFactorCheck;
+  }
+
+  return completeFlowOrGetUrl(
     command.requestId && session.id
       ? {
           sessionId: session.id,
@@ -179,10 +181,6 @@ export async function createNewSessionFromIdpIntent(
         },
     loginSettings?.defaultRedirectUri,
   );
-
-  if (url) {
-    return { redirect: url };
-  }
 }
 
 type createNewSessionForLDAPCommand = {
@@ -192,17 +190,10 @@ type createNewSessionForLDAPCommand = {
   link: boolean;
 };
 
-export async function createNewSessionForLDAP(
-  command: createNewSessionForLDAPCommand,
-) {
+export async function createNewSessionForLDAP(command: createNewSessionForLDAPCommand) {
   const _headers = await headers();
 
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
-
-  if (!host) {
-    return { error: "Could not get domain" };
-  }
 
   if (!command.username || !command.password) {
     return { error: "No username or password provided" };
@@ -215,11 +206,7 @@ export async function createNewSessionForLDAP(
     password: command.password,
   });
 
-  if (
-    !response ||
-    response.nextStep.case !== "idpIntent" ||
-    !response.nextStep.value
-  ) {
+  if (!response || response.nextStep.case !== "idpIntent" || !response.nextStep.value) {
     return { error: "Could not start LDAP identity provider flow" };
   }
 

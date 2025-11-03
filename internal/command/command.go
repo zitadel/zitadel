@@ -70,6 +70,7 @@ type Commands struct {
 	defaultRefreshTokenLifetime     time.Duration
 	defaultRefreshTokenIdleLifetime time.Duration
 	phoneCodeVerifier               func(ctx context.Context, id string) (senders.CodeGenerator, error)
+	tarpit                          func(failedAttempts uint64)
 
 	multifactors            domain.MultifactorConfigs
 	webauthnConfig          *webauthn_helper.Config
@@ -214,6 +215,7 @@ func StartCommands(
 		repo.newHashedSecret = newHashedSecretWithDefault(secretHasher, defaultSecretGenerators.ClientSecret)
 	}
 	repo.phoneCodeVerifier = repo.phoneCodeVerifierFromConfig
+	repo.tarpit = defaults.Tarpit.Tarpit()
 	return repo, nil
 }
 
@@ -294,7 +296,12 @@ func samlCertificateAndKeyGenerator(keySize int, lifetime time.Duration) func(id
 			SerialNumber: big.NewInt(int64(serial)),
 			Subject: pkix.Name{
 				Organization: []string{"ZITADEL"},
+				CommonName:   fmt.Sprintf("ZITADEL SP %s", id),
 				SerialNumber: id,
+			},
+			Issuer: pkix.Name{
+				Organization: []string{"ZITADEL"},
+				CommonName:   "ZITADEL",
 			},
 			NotBefore:             now,
 			NotAfter:              now.Add(lifetime),

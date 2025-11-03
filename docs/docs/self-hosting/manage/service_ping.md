@@ -37,15 +37,19 @@ The following resources are counted:
 - Organizations
 - Projects per organization
 - Users per organization
+- Users of type machine per organization
+- SCIM provisioned users per organization
 - Instance Administrators
 - Identity Providers
 - LDAP Identity Providers
 - Actions (V1)
 - Targets and set up executions
 - Login Policies
+- MFA enforcement (if either MFA is required for local or all users through the login policy)
 - Password Complexity Policies
 - Password Expiry Policies
 - Lockout Policies
+- Notification Policies with option "Password change" enabled
 
 The list might be extended in the future to include more resources.
 
@@ -81,3 +85,12 @@ This defines how many attempts the Service Ping feature will make to send data t
 for a specific interval and report. If one report fails, it will be retried up to this number of times. 
 Other reports will still be handled in parallel and have their own retry count. This means if the base information 
 only succeeded after three attempts, the resource count still has five attempts to be sent. 
+
+### BulkSize
+
+Certain reports, like the resource counts, can generate a lot of data. To prevent sending too much data in one request,
+the data is split into smaller chunks. This setting defines the maximum number of items that will be
+sent in one request. If there are more items, they will be sent in multiple requests.
+
+The size of the request is limited by the maximum request size of the central endpoint.
+Each report will log its size before sending it, so you can adjust the bulk size if needed.

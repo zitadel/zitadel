@@ -130,7 +130,7 @@ func (q *Queries) checkAndLock(tx *sql.Tx, projectionName string) (name string, 
 		From(currentStateTable.identifier()).
 		Where(sq.Eq{
 			CurrentStateColProjectionName.identifier(): projectionName,
-		}).Suffix("FOR UPDATE").
+		}).Suffix("FOR NO KEY UPDATE").
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {

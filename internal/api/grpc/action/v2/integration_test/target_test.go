@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -38,7 +37,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "missing permission",
 			ctx:  instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.CreateTargetRequest{
-				Name: gofakeit.Name(),
+				Name: integration.TargetName(),
 			},
 			wantErr: true,
 		},
@@ -54,7 +53,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "empty type",
 			ctx:  isolatedIAMOwnerCTX,
 			req: &action.CreateTargetRequest{
-				Name:       gofakeit.Name(),
+				Name:       integration.TargetName(),
 				TargetType: nil,
 			},
 			wantErr: true,
@@ -63,7 +62,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "empty webhook url",
 			ctx:  isolatedIAMOwnerCTX,
 			req: &action.CreateTargetRequest{
-				Name: gofakeit.Name(),
+				Name: integration.TargetName(),
 				TargetType: &action.CreateTargetRequest_RestWebhook{
 					RestWebhook: &action.RESTWebhook{},
 				},
@@ -74,7 +73,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "empty request response url",
 			ctx:  isolatedIAMOwnerCTX,
 			req: &action.CreateTargetRequest{
-				Name: gofakeit.Name(),
+				Name: integration.TargetName(),
 				TargetType: &action.CreateTargetRequest_RestCall{
 					RestCall: &action.RESTCall{},
 				},
@@ -85,7 +84,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "empty timeout",
 			ctx:  isolatedIAMOwnerCTX,
 			req: &action.CreateTargetRequest{
-				Name:     gofakeit.Name(),
+				Name:     integration.TargetName(),
 				Endpoint: "https://example.com",
 				TargetType: &action.CreateTargetRequest_RestWebhook{
 					RestWebhook: &action.RESTWebhook{},
@@ -111,7 +110,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "async, ok",
 			ctx:  isolatedIAMOwnerCTX,
 			req: &action.CreateTargetRequest{
-				Name:     gofakeit.Name(),
+				Name:     integration.TargetName(),
 				Endpoint: "https://example.com",
 				TargetType: &action.CreateTargetRequest_RestAsync{
 					RestAsync: &action.RESTAsync{},
@@ -128,7 +127,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "webhook, ok",
 			ctx:  isolatedIAMOwnerCTX,
 			req: &action.CreateTargetRequest{
-				Name:     gofakeit.Name(),
+				Name:     integration.TargetName(),
 				Endpoint: "https://example.com",
 				TargetType: &action.CreateTargetRequest_RestWebhook{
 					RestWebhook: &action.RESTWebhook{
@@ -147,7 +146,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "webhook, interrupt on error, ok",
 			ctx:  isolatedIAMOwnerCTX,
 			req: &action.CreateTargetRequest{
-				Name:     gofakeit.Name(),
+				Name:     integration.TargetName(),
 				Endpoint: "https://example.com",
 				TargetType: &action.CreateTargetRequest_RestWebhook{
 					RestWebhook: &action.RESTWebhook{
@@ -166,7 +165,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "call, ok",
 			ctx:  isolatedIAMOwnerCTX,
 			req: &action.CreateTargetRequest{
-				Name:     gofakeit.Name(),
+				Name:     integration.TargetName(),
 				Endpoint: "https://example.com",
 				TargetType: &action.CreateTargetRequest_RestCall{
 					RestCall: &action.RESTCall{
@@ -186,7 +185,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "call, interruptOnError, ok",
 			ctx:  isolatedIAMOwnerCTX,
 			req: &action.CreateTargetRequest{
-				Name:     gofakeit.Name(),
+				Name:     integration.TargetName(),
 				Endpoint: "https://example.com",
 				TargetType: &action.CreateTargetRequest_RestCall{
 					RestCall: &action.RESTCall{
@@ -269,7 +268,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 			args: args{
 				ctx: instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 				req: &action.UpdateTargetRequest{
-					Name: gu.Ptr(gofakeit.Name()),
+					Name: gu.Ptr(integration.TargetName()),
 				},
 			},
 			wantErr: true,
@@ -282,7 +281,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
 				req: &action.UpdateTargetRequest{
-					Name: gu.Ptr(gofakeit.Name()),
+					Name: gu.Ptr(integration.TargetName()),
 				},
 			},
 			wantErr: true,
@@ -314,7 +313,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
 				req: &action.UpdateTargetRequest{
-					Name: gu.Ptr(gofakeit.Name()),
+					Name: gu.Ptr(integration.TargetName()),
 				},
 			},
 			want: want{

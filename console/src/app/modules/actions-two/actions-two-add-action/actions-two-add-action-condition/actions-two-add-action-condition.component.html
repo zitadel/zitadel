@@ -14,68 +14,31 @@
     </div>
 
     <p class="condition-description">{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_SERVICE.TITLE' | translate }}</p>
-
-    <cnsl-form-field class="full-width">
-      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_SERVICE.DESCRIPTION' | translate }}</cnsl-label>
-      <input
-        cnslInput
-        type="text"
-        placeholder=""
-        [formControl]="form.form.controls.service"
-        [matAutocomplete]="autoservice"
-      />
-
-      <mat-autocomplete #autoservice="matAutocomplete">
-        <mat-option *ngIf="(executionServices$ | async) === null" class="is-loading">
-          <mat-spinner diameter="30"></mat-spinner>
-        </mat-option>
-        <mat-option *ngFor="let service of executionServices$ | async" [value]="service">
-          <span>{{ service }}</span>
-        </mat-option>
-      </mat-autocomplete>
-    </cnsl-form-field>
+    <cnsl-actions-two-add-action-autocomplete-input
+      label="ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_SERVICE.DESCRIPTION"
+      [items]="listExecutionServicesQuery.data()"
+      [control]="form.form.controls.service"
+    ></cnsl-actions-two-add-action-autocomplete-input>
 
     <p class="condition-description">{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_METHOD.TITLE' | translate }}</p>
 
-    <cnsl-form-field class="full-width">
-      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_METHOD.DESCRIPTION' | translate }}</cnsl-label>
-      <input cnslInput type="text" placeholder="" [formControl]="form.form.controls.method" [matAutocomplete]="automethod" />
-
-      <mat-autocomplete #automethod="matAutocomplete">
-        <mat-option *ngIf="(executionMethods$ | async) === null" class="is-loading">
-          <mat-spinner diameter="30"></mat-spinner>
-        </mat-option>
-        <mat-option *ngFor="let method of executionMethods$ | async" [value]="method">
-          <span>{{ method }}</span>
-        </mat-option>
-      </mat-autocomplete>
-    </cnsl-form-field>
+    <cnsl-actions-two-add-action-autocomplete-input
+      label="ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_METHOD.DESCRIPTION"
+      [items]="filteredExecutionMethods()"
+      [control]="form.form.controls.method"
+    ></cnsl-actions-two-add-action-autocomplete-input>
   </ng-container>
 
   <ng-container *ngIf="form.case === 'function'">
-    <cnsl-form-field class="full-width">
-      <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.FUNCTIONNAME.TITLE' | translate }}</cnsl-label>
-      <input
-        cnslInput
-        type="text"
-        placeholder=""
-        [formControl]="form.form.controls.name"
-        [matAutocomplete]="autofunctionname"
-      />
-
-      <mat-autocomplete #autofunctionname="matAutocomplete">
-        <mat-option *ngIf="(executionFunctions$ | async) === null" class="is-loading">
-          <mat-spinner diameter="30"></mat-spinner>
-        </mat-option>
-        <mat-option *ngFor="let function of executionFunctions$ | async" [value]="function">
-          <span>{{ function }}</span>
-        </mat-option>
-      </mat-autocomplete>
-
+    <cnsl-actions-two-add-action-autocomplete-input
+      label="ACTIONSTWO.EXECUTION.DIALOG.CONDITION.FUNCTIONNAME.TITLE"
+      [items]="listExecutionFunctionsQuery.data()"
+      [control]="form.form.controls.name"
+    >
       <span class="name-hint cnsl-secondary-text" cnslHint>{{
         'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.FUNCTIONNAME.DESCRIPTION' | translate
       }}</span>
-    </cnsl-form-field>
+    </cnsl-actions-two-add-action-autocomplete-input>
   </ng-container>
 
   <ng-container *ngIf="form.case === 'event'">
@@ -94,14 +57,14 @@
 
     <cnsl-form-field class="full-width">
       <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_GROUP.DESCRIPTION' | translate }}</cnsl-label>
-      <input cnslInput type="text" placeholder="" #nameInput [formControl]="form.form.controls.group" />
+      <input cnslInput type="text" placeholder="" [formControl]="form.form.controls.group" />
     </cnsl-form-field>
 
     <p class="condition-description">{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_EVENT.TITLE' | translate }}</p>
 
     <cnsl-form-field class="full-width">
       <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.DIALOG.CONDITION.SELECT_EVENT.DESCRIPTION' | translate }}</cnsl-label>
-      <input cnslInput type="text" placeholder="" #nameInput [formControl]="form.form.controls.event" />
+      <input cnslInput type="text" placeholder="" [formControl]="form.form.controls.event" />
     </cnsl-form-field>
   </ng-container>
 

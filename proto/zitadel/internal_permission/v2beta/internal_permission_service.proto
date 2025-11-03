@@ -111,8 +111,12 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 //
 // If you want to manage permissions and roles within your project or application,
 // please use the AuthorizationsService.
+//
+// Deprecated: use internal permission service v2 instead. This service will be removed in the next major version of ZITADEL.
 service InternalPermissionService {
   // ListAdministrators returns all administrators and its roles matching the request and necessary permissions.
+  //
+  // Deprecated: please move to the corresponding endpoint under internal permission service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // Required permissions depend on the resource type:
   //   - "iam.member.read" for instance administrators
@@ -133,6 +137,7 @@ service InternalPermissionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -149,6 +154,8 @@ service InternalPermissionService {
   }
 
   // CreateAdministrator grants a administrator role to a user for a specific resource.
+  //
+  // Deprecated: please move to the corresponding endpoint under internal permission service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // Note that the roles are specific to the resource type.
   // This means that if you want to grant a user the administrator role for an organization and a project,
@@ -172,6 +179,7 @@ service InternalPermissionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -188,6 +196,8 @@ service InternalPermissionService {
   }
 
   // UpdateAdministrator updates the specific administrator role.
+  //
+  // Deprecated: please move to the corresponding endpoint under internal permission service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // Note that any role previously granted to the user and not present in the request will be revoked.
   //
@@ -209,6 +219,7 @@ service InternalPermissionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -225,6 +236,8 @@ service InternalPermissionService {
   }
 
   // DeleteAdministrator revokes a administrator role from a user.
+  //
+  // Deprecated: please move to the corresponding endpoint under internal permission service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // In case the administrator role is not found, the request will return a successful response as
   // the desired state is already achieved.
@@ -247,6 +260,7 @@ service InternalPermissionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -313,10 +327,12 @@ message CreateAdministratorRequest {
 
 message ResourceType {
   message ProjectGrant {
+    reserved "project_grant_id";
+    reserved 2;
     // ProjectID is required to grant administrator privileges for a specific project.
     string project_id = 1;
-    // ProjectGrantID is required to grant administrator privileges for a specific project grant.
-    string project_grant_id = 2;
+    // OrganizationID is required to grant administrator privileges for a specific project grant.
+    string organization_id = 3;
   }
 
   // Resource is the type of the resource the administrator roles should be granted for.

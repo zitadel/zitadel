@@ -1654,7 +1654,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "このフラグが有効化されると、コンソールはV2ユーザーAPIを使用して新しいユーザーを作成します。V2 APIでは、新しく作成されたユーザーは初期状態なしで開始します。",
       "LOGINV2": "ログイン V2",
       "LOGINV2_DESCRIPTION": "これを有効にすると、セキュリティ、パフォーマンス、およびカスタマイズ性が向上した、TypeScript ベースの新しいログイン UI が有効になります。",
-      "LOGINV2_BASEURI": "ベースURI"
+      "LOGINV2_BASEURI": "ベースURI",
+      "ENABLERELATIONALTABLES": "リレーショナルテーブル",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "データを保存するためにプロジェクションの代わりにリレーショナルテーブルを使用するには、これを有効にします。現在、このトグルは何もしません。"
     },
     "DIALOG": {
       "RESET": {

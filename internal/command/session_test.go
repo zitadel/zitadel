@@ -306,16 +306,14 @@ func TestCommands_CreateSession(t *testing.T) {
 func TestCommands_UpdateSession(t *testing.T) {
 	type fields struct {
 		eventstore      func(*testing.T) *eventstore.Eventstore
-		tokenVerifier   func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
 		checkPermission domain.PermissionCheck
 	}
 	type args struct {
-		ctx          context.Context
-		sessionID    string
-		sessionToken string
-		checks       []SessionCommand
-		metadata     map[string][]byte
-		lifetime     time.Duration
+		ctx       context.Context
+		sessionID string
+		checks    []SessionCommand
+		metadata  map[string][]byte
+		lifetime  time.Duration
 	}
 	type res struct {
 		want *SessionChanged
@@ -339,37 +337,6 @@ func TestCommands_UpdateSession(t *testing.T) {
 			},
 			res{
 				err: zerrors.ThrowInternal(nil, "id", "filter failed"),
-			},
-		},
-		{
-			"invalid session token",
-			fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(),
-								&session.NewAggregate("sessionID", "instance1").Aggregate,
-								&domain.UserAgent{
-									FingerprintID: gu.Ptr("fp1"),
-									IP:            net.ParseIP("1.2.3.4"),
-									Description:   gu.Ptr("firefox"),
-									Header:        http.Header{"foo": []string{"bar"}},
-								},
-							)),
-						eventFromEventPusher(
-							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
-								"tokenID")),
-					),
-				),
-				tokenVerifier: newMockTokenVerifierInvalid(),
-			},
-			args{
-				ctx:          context.Background(),
-				sessionID:    "sessionID",
-				sessionToken: "invalid",
-			},
-			res{
-				err: zerrors.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid"),
 			},
 		},
 		{
@@ -422,14 +389,11 @@ func TestCommands_UpdateSession(t *testing.T) {
 								"tokenID")),
 					),
 				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return nil
-				},
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx:          context.Background(),
-				sessionID:    "sessionID",
-				sessionToken: "token",
+				ctx:       context.Background(),
+				sessionID: "sessionID",
 			},
 			res{
 				want: &SessionChanged{
@@ -446,11 +410,10 @@ func TestCommands_UpdateSession(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:           tt.fields.eventstore(t),
-				sessionTokenVerifier: tt.fields.tokenVerifier,
-				checkPermission:      tt.fields.checkPermission,
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := c.UpdateSession(tt.args.ctx, tt.args.sessionID, tt.args.sessionToken, tt.args.checks, tt.args.metadata, tt.args.lifetime)
+			got, err := c.UpdateSession(tt.args.ctx, tt.args.sessionID, tt.args.checks, tt.args.metadata, tt.args.lifetime)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.want, got)
 		})
@@ -1128,6 +1091,7 @@ func TestCheckTOTP(t *testing.T) {
 	type fields struct {
 		sessionWriteModel *SessionWriteModel
 		eventstore        func(*testing.T) *eventstore.Eventstore
+		tarpit            Tarpit
 	}
 
 	tests := []struct {
@@ -1146,6 +1110,7 @@ func TestCheckTOTP(t *testing.T) {
 					aggregate: sessAgg,
 				},
 				eventstore: expectEventstore(),
+				tarpit:     expectTarpit(0),
 			},
 			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing"),
 		},
@@ -1161,6 +1126,7 @@ func TestCheckTOTP(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilterError(io.ErrClosedPipe),
 				),
+				tarpit: expectTarpit(0),
 			},
 			wantErr: io.ErrClosedPipe,
 		},
@@ -1180,6 +1146,7 @@ func TestCheckTOTP(t *testing.T) {
 						),
 					),
 				),
+				tarpit: expectTarpit(0),
 			},
 			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-3Mif9s", "Errors.User.MFA.OTP.NotReady"),
 		},
@@ -1206,6 +1173,7 @@ func TestCheckTOTP(t *testing.T) {
 						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 0, 0, false)),
 					),
 				),
+				tarpit: expectTarpit(1),
 			},
 			wantErrorCommands: []eventstore.Command{
 				user.NewHumanOTPCheckFailedEvent(ctx, userAgg, nil),
@@ -1235,6 +1203,7 @@ func TestCheckTOTP(t *testing.T) {
 						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 1, 1, false)),
 					),
 				),
+				tarpit: expectTarpit(1),
 			},
 			wantErrorCommands: []eventstore.Command{
 				user.NewHumanOTPCheckFailedEvent(ctx, userAgg, nil),
@@ -1262,6 +1231,7 @@ func TestCheckTOTP(t *testing.T) {
 					),
 					expectFilter(), // recheck
 				),
+				tarpit: expectTarpit(0),
 			},
 			wantEventCommands: []eventstore.Command{
 				user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil),
@@ -1290,6 +1260,7 @@ func TestCheckTOTP(t *testing.T) {
 						user.NewUserLockedEvent(ctx, userAgg),
 					),
 				),
+				tarpit: expectTarpit(0),
 			},
 			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SF3fg", "Errors.User.Locked"),
 		},
@@ -1301,11 +1272,13 @@ func TestCheckTOTP(t *testing.T) {
 				eventstore:        tt.fields.eventstore(t),
 				totpAlg:           cryptoAlg,
 				now:               func() time.Time { return testNow },
+				tarpit:            tt.fields.tarpit.tarpit,
 			}
 			gotCmds, err := CheckTOTP(tt.code)(ctx, cmd)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.wantErrorCommands, gotCmds)
 			assert.Equal(t, tt.wantEventCommands, cmd.eventCommands)
+			tt.fields.tarpit.metExpectedCalls(t)
 		})
 	}
 }
