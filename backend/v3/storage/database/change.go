@@ -17,6 +17,65 @@ type Change interface {
 	IsOnColumn(col Column) bool
 }
 
+// NewChange creates a new Change for the given column and value.
+// If you want to set a column to NULL, use [NewChangePtr].
+func NewChange[V Value](col Column, value V) Change {
+	return &change[V]{
+		column: col,
+		value:  value,
+	}
+}
+
+// NewChangePtr creates a new Change for the given column and value pointer.
+// If the value pointer is nil, the column will be set to NULL.
+func NewChangePtr[V Value](col Column, value *V) Change {
+	if value == nil {
+		return NewChange(col, NullInstruction)
+	}
+	return NewChange(col, *value)
+}
+
+func NewChangeToNull(col Column) Change {
+	return NewChange(col, NullInstruction)
+}
+
+func NewChangeToColumn(to, from Column) Change {
+	return &changeToColumn{to: to, from: from}
+}
+
+type changeToColumn struct {
+	to   Column
+	from Column
+}
+
+// IsOnColumn implements [Change].
+func (c *changeToColumn) IsOnColumn(col Column) bool {
+	return c.to.Equals(col)
+}
+
+// Matches implements [Change].
+func (c *changeToColumn) Matches(x any) bool {
+	toMatch, ok := x.(*changeToColumn)
+	if !ok {
+		return false
+	}
+	return c.to.Equals(toMatch.to) && c.from.Equals(toMatch.from)
+}
+
+// String implements [Change].
+func (c *changeToColumn) String() string {
+	return "database.changeToColumn"
+}
+
+// Write implements [Change].
+func (c *changeToColumn) Write(builder *StatementBuilder) {
+	c.to.WriteUnqualified(builder)
+	builder.WriteString(" = ")
+	c.from.WriteQualified(builder)
+}
+
+var _ Change = (*changeToColumn)(nil)
+
 type change[V Value] struct {
 	column Column
 	value  V
@@ -42,28 +101,6 @@ var (
 	_ Change         = (*change[string])(nil)
 	_ gomock.Matcher = (*change[string])(nil)
 )
-
-// NewChange creates a new Change for the given column and value.
-// If you want to set a column to NULL, use [NewChangePtr].
-func NewChange[V Value](col Column, value V) Change {
-	return &change[V]{
-		column: col,
-		value:  value,
-	}
-}
-
-// NewChangePtr creates a new Change for the given column and value pointer.
-// If the value pointer is nil, the column will be set to NULL.
-func NewChangePtr[V Value](col Column, value *V) Change {
-	if value == nil {
-		return NewChange(col, NullInstruction)
-	}
-	return NewChange(col, *value)
-}
-
-func NewChangeToNull(col Column) Change {
-	return NewChange(col, NullInstruction)
-}
 
 // Write implements [Change].
 func (c change[V]) Write(builder *StatementBuilder) {

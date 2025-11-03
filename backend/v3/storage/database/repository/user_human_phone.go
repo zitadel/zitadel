@@ -8,46 +8,46 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-func (u userHuman) SetEmail(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification domain.VerificationType) (int64, error) {
+func (u userHuman) SetPhone(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification domain.VerificationType) (int64, error) {
 	switch v := verification.(type) {
 	case *domain.VerificationTypeSuccessful:
-		return u.setEmailFromSuccessfulVerification(ctx, client, condition, v)
+		return u.setPhoneFromSuccessfulVerification(ctx, client, condition, v)
 	case *domain.VerificationTypeSkipVerification:
-		return u.setEmailSkipVerification(ctx, client, condition, v)
+		return u.setPhoneSkipVerification(ctx, client, condition, v)
 	case *domain.VerificationTypeInitCode:
-		return u.initEmailVerification(ctx, client, condition, v)
+		return u.initPhoneVerification(ctx, client, condition, v)
 	case *domain.VerificationTypeUpdate:
-		return u.updateEmailVerification(ctx, client, condition, v)
+		return u.updatePhoneVerification(ctx, client, condition, v)
 	}
 	panic("unknown verification type")
 }
 
-func (u userHuman) GetEmailVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*domain.Verification, error) {
+func (u userHuman) GetPhoneVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*domain.Verification, error) {
 	return u.verification.get(ctx, client, database.Exists(
 		u.unqualifiedTableName(),
 		database.And(
 			database.NewColumnCondition(u.InstanceIDColumn(), u.verification.InstanceIDColumn()),
-			database.NewColumnCondition(u.emailVerificationIDColumn(), u.verification.IDColumn()),
+			database.NewColumnCondition(u.phoneVerificationIDColumn(), u.verification.IDColumn()),
 			condition,
 		),
 	))
 }
 
-func (u userHuman) IncrementEmailVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+func (u userHuman) IncrementPhoneVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	var builder database.StatementBuilder
 	builder.WriteString("UPDATE zitadel.verifications SET ")
 	database.NewIncrementColumnChange(u.verification.FailedAttemptsColumn()).Write(&builder)
 	builder.WriteString(" FROM zitadel.human_users WHERE ")
 	database.And(
 		database.NewColumnCondition(u.verification.InstanceIDColumn(), u.InstanceIDColumn()),
-		database.NewColumnCondition(u.verification.IDColumn(), u.emailVerificationIDColumn()),
+		database.NewColumnCondition(u.verification.IDColumn(), u.phoneVerificationIDColumn()),
 		condition,
 	).Write(&builder)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-func (u userHuman) setEmailFromSuccessfulVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *domain.VerificationTypeSuccessful) (int64, error) {
+func (u userHuman) setPhoneFromSuccessfulVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *domain.VerificationTypeSuccessful) (int64, error) {
 	var builder database.StatementBuilder
 	builder.WriteString("WITH found_verification AS (SELECT ")
 	database.Columns{
@@ -62,27 +62,27 @@ func (u userHuman) setEmailFromSuccessfulVerification(ctx context.Context, clien
 	builder.WriteString(" ON ")
 	database.And(
 		database.NewColumnCondition(u.InstanceIDColumn(), u.verification.InstanceIDColumn()),
-		database.NewColumnCondition(u.emailVerificationIDColumn(), u.verification.IDColumn()),
+		database.NewColumnCondition(u.phoneVerificationIDColumn(), u.verification.IDColumn()),
 	).Write(&builder)
 	writeCondition(&builder, condition)
 
 	builder.WriteString(") UPDATE zitadel.human_users SET ")
 	database.NewChanges(
 		u.SetUpdatedAt(verification.VerifiedAt),
-		database.NewChangeToColumn(u.EmailColumn(), database.NewColumn("found_verification", "value")),
-		u.setEmailVerifiedAt(verification.VerifiedAt),
-		u.clearEmailVerificationID(),
+		database.NewChangeToColumn(u.PhoneColumn(), database.NewColumn("found_verification", "value")),
+		u.setPhoneVerifiedAt(verification.VerifiedAt),
+		u.clearPhoneVerificationID(),
 	).Write(&builder)
 	builder.WriteString(" FROM zitadel.found_verification")
 	writeCondition(&builder, database.And(
 		database.NewColumnCondition(u.InstanceIDColumn(), database.NewColumn("found_verification", "instance_id")),
-		database.NewColumnCondition(u.emailVerificationIDColumn(), database.NewColumn("found_verification", "id")),
+		database.NewColumnCondition(u.phoneVerificationIDColumn(), database.NewColumn("found_verification", "id")),
 	))
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-func (u userHuman) setEmailSkipVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *domain.VerificationTypeSkipVerification) (int64, error) {
+func (u userHuman) setPhoneSkipVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *domain.VerificationTypeSkipVerification) (int64, error) {
 	var builder database.StatementBuilder
 
 	var verifiedAt time.Time
@@ -93,16 +93,16 @@ func (u userHuman) setEmailSkipVerification(ctx context.Context, client database
 	builder.WriteString("UPDATE zitadel.human_users SET ")
 	database.NewChanges(
 		u.SetUpdatedAt(verifiedAt),
-		u.setEmail(verification.Value),
-		u.setEmailVerifiedAt(verifiedAt),
-		u.clearEmailVerificationID(),
+		u.setPhone(verification.Value),
+		u.setPhoneVerifiedAt(verifiedAt),
+		u.clearPhoneVerificationID(),
 	).Write(&builder)
 	writeCondition(&builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-func (u userHuman) initEmailVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *domain.VerificationTypeInitCode) (int64, error) {
+func (u userHuman) initPhoneVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *domain.VerificationTypeInitCode) (int64, error) {
 	var builder database.StatementBuilder
 
 	var createdAt any = database.NowInstruction
@@ -126,13 +126,13 @@ func (u userHuman) initEmailVerification(ctx context.Context, client database.Qu
 		" FROM found_user u" +
 			" RETURNING id" +
 			") " +
-			"UPDATE zitadel.human_users SET email_verification_id = (SELECT id FROM verification) WHERE (instance_id, id) IN (SELECT instance_id, id FROM found_user)",
+			"UPDATE zitadel.human_users SET phone_verification_id = (SELECT id FROM verification) WHERE (instance_id, id) IN (SELECT instance_id, id FROM found_user)",
 	)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-func (u userHuman) updateEmailVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *domain.VerificationTypeUpdate) (int64, error) {
+func (u userHuman) updatePhoneVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *domain.VerificationTypeUpdate) (int64, error) {
 	var builder database.StatementBuilder
 
 	changes := make(database.Changes, 0, 3)
@@ -147,7 +147,7 @@ func (u userHuman) updateEmailVerification(ctx context.Context, client database.
 	builder.WriteString("WITH found_verification AS ( SELECT verifications.* FROM zitadel.human_users JOIN zitadel.verifications ON ")
 	database.And(
 		database.NewColumnCondition(u.InstanceIDColumn(), u.verification.InstanceIDColumn()),
-		database.NewColumnCondition(u.emailVerificationIDColumn(), u.verification.IDColumn()),
+		database.NewColumnCondition(u.phoneVerificationIDColumn(), u.verification.IDColumn()),
 	).Write(&builder)
 	writeCondition(&builder, condition)
 
@@ -166,40 +166,48 @@ func (u userHuman) updateEmailVerification(ctx context.Context, client database.
 // changes
 // -------------------------------------------------------------
 
-func (u userHuman) setEmail(email string) database.Change {
-	return database.NewChange(u.EmailColumn(), email)
+func (u userHuman) RemovePhone() database.Change {
+	return database.NewChanges(
+		database.NewChange(u.PhoneColumn(), database.NullInstruction),
+		database.NewChange(u.PhoneVerifiedAtColumn(), database.NullInstruction),
+		u.clearPhoneVerificationID(),
+	)
 }
 
-func (u userHuman) setEmailVerifiedAt(verifiedAt time.Time) database.Change {
+func (u userHuman) setPhone(phone string) database.Change {
+	return database.NewChange(u.PhoneColumn(), phone)
+}
+
+func (u userHuman) setPhoneVerifiedAt(verifiedAt time.Time) database.Change {
 	if verifiedAt.IsZero() {
-		return database.NewChange(u.EmailVerifiedAtColumn(), database.NowInstruction)
+		return database.NewChange(u.PhoneVerifiedAtColumn(), database.NowInstruction)
 	}
-	return database.NewChange(u.EmailVerifiedAtColumn(), verifiedAt)
+	return database.NewChange(u.PhoneVerifiedAtColumn(), verifiedAt)
 }
 
-func (u userHuman) clearEmailVerificationID() database.Change {
-	return database.NewChangeToNull(u.emailVerificationIDColumn())
+func (u userHuman) clearPhoneVerificationID() database.Change {
+	return database.NewChangeToNull(u.phoneVerificationIDColumn())
 }
 
 // -------------------------------------------------------------
 // conditions
 // -------------------------------------------------------------
 
-func (u userHuman) EmailCondition(op database.TextOperation, email string) database.Condition {
-	return database.NewTextCondition(u.EmailColumn(), op, email)
+func (u userHuman) PhoneCondition(op database.TextOperation, phone string) database.Condition {
+	return database.NewTextCondition(u.PhoneColumn(), op, phone)
 }
 
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
 
-func (u userHuman) EmailVerifiedAtColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "email_verified_at")
+func (u userHuman) PhoneVerifiedAtColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "phone_verified_at")
 }
-func (u userHuman) EmailColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "email")
+func (u userHuman) PhoneColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "phone")
 }
 
-func (u userHuman) emailVerificationIDColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "email_verification_id")
+func (u userHuman) phoneVerificationIDColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "phone_verification_id")
 }

@@ -13,36 +13,51 @@ type VerificationType interface {
 	isVerificationType()
 }
 
-type VerificationTypeIsVerified struct {
+// VerificationTypeSuccessful indicates that the verification was successful.
+// The Value of the verification is used as the new value to be set.
+// If VerifiedAt is zero, the current time will be used.
+type VerificationTypeSuccessful struct {
 	VerifiedAt time.Time
 }
 
-func (v *VerificationTypeIsVerified) isVerificationType() {}
+func (v *VerificationTypeSuccessful) isVerificationType() {}
 
-var _ VerificationType = (*VerificationTypeIsVerified)(nil)
-
-// VerificationTypeSet is used to update an existing verification
-// It sets the fields which are not nil
-type VerificationTypeSet struct {
-	CreatedAt *time.Time
-	Expiry    *time.Duration
-	Code      *[]byte
-	Value     *string
-}
-
-func (v *VerificationTypeSet) isVerificationType() {}
-
-var _ VerificationType = (*VerificationTypeSet)(nil)
-
-// VerificationTypeVerifiedValue is used to skip the verification process by directly setting the verified value
-// It includes updating the updatedAt field of the object based on VerifiedAt.
-type VerificationTypeVerifiedValue struct {
-	Value string
-	// VerifiedAt is the time when the verification was completed
-	// If nil or [time.Time.IsZero], NOW() will be used
+// VerificationTypeSkipVerification indicates that the verification is skipped.
+// The Value is used as the new value to be set.
+// If VerifiedAt is zero, the current time will be used.
+type VerificationTypeSkipVerification struct {
 	VerifiedAt *time.Time
+	Value      string
 }
 
-func (v *VerificationTypeVerifiedValue) isVerificationType() {}
+func (v *VerificationTypeSkipVerification) isVerificationType() {}
 
-var _ VerificationType = (*VerificationTypeVerifiedValue)(nil)
+var _ VerificationType = (*VerificationTypeSkipVerification)(nil)
+
+var _ VerificationType = (*VerificationTypeSuccessful)(nil)
+
+// VerificationTypeInitCode indicates that a verification is started
+type VerificationTypeInitCode struct {
+	Code  []byte
+	Value *string
+	// CreatedAt is the time when the verification was created.
+	// If zero, the current time will be used.
+	CreatedAt time.Time
+	Expiry    *time.Duration
+}
+
+func (v *VerificationTypeInitCode) isVerificationType() {}
+
+var _ VerificationType = (*VerificationTypeInitCode)(nil)
+
+// VerificationTypeUpdate indicates that a verification is updated.
+// The fields that are non-nil will be updated.
+type VerificationTypeUpdate struct {
+	Code   []byte
+	Value  *string
+	Expiry *time.Duration
+}
+
+func (v *VerificationTypeUpdate) isVerificationType() {}
+
+var _ VerificationType = (*VerificationTypeUpdate)(nil)

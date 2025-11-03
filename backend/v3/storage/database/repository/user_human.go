@@ -13,7 +13,8 @@ import (
 var _ domain.HumanUserRepository = (*userHuman)(nil)
 
 type userHuman struct {
-	userHumanEmail
+	// userHumanEmail
+	verification
 	// userHumanPhone
 }
 
@@ -135,6 +136,9 @@ func (u userHuman) SetState(state domain.UserState) database.Change {
 
 // SetUpdatedAt implements [domain.HumanUserRepository].
 func (u userHuman) SetUpdatedAt(updatedAt time.Time) database.Change {
+	if updatedAt.IsZero() {
+		return database.NewChange(u.UpdatedAtColumn(), database.NowInstruction)
+	}
 	return database.NewChange(u.UpdatedAtColumn(), updatedAt)
 }
 

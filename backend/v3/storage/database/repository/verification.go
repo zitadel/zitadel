@@ -18,7 +18,7 @@ func (v verification) unqualifiedTableName() string {
 	return "verifications"
 }
 
-func (v verification) tableName() string {
+func (v verification) qualifiedTableName() string {
 	return "zitadel." + v.unqualifiedTableName()
 }
 
@@ -47,11 +47,11 @@ func (v verification) SetCode(code []byte) database.Change {
 	return database.NewChange(v.CodeColumn(), code)
 }
 
-func (v verification) setExpiresAt(expiry time.Duration) database.Change {
+func (v verification) setExpiry(expiry time.Duration) database.Change {
 	if expiry == 0 {
-		return database.NewChangeToNull(v.ExpiresAtColumn())
+		return database.NewChangeToNull(v.ExpiryColumn())
 	}
-	return database.NewChange(v.ExpiresAtColumn(), expiry)
+	return database.NewChange(v.ExpiryColumn(), expiry)
 }
 
 func (v verification) IncreaseFailedAttempts() database.Change {
@@ -104,7 +104,7 @@ func (v verification) CodeColumn() database.Column {
 	return database.NewColumn(v.unqualifiedTableName(), "code")
 }
 
-func (v verification) ExpiresAtColumn() database.Column {
+func (v verification) ExpiryColumn() database.Column {
 	return database.NewColumn(v.unqualifiedTableName(), "expires_at")
 }
 

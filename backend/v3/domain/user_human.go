@@ -72,10 +72,7 @@ type humanColumns interface {
 	FailedPasswordAttemptsColumn() database.Column
 
 	EmailColumn() database.Column
-	EmailVerifiedAtColumn() database.Column
-
-	// PhoneColumn() database.Column
-	// PhoneVerifiedAtColumn() database.Column
+	PhoneColumn() database.Column
 }
 
 type humanConditions interface {
@@ -86,7 +83,7 @@ type humanConditions interface {
 	DisplayNameCondition(op database.TextOperation, name string) database.Condition
 
 	EmailCondition(op database.TextOperation, email string) database.Condition
-	// PhoneCondition(op database.TextOperation, phone string) database.Condition
+	PhoneCondition(op database.TextOperation, phone string) database.Condition
 }
 
 type humanChanges interface {
@@ -105,18 +102,7 @@ type humanChanges interface {
 	IncrementFailedPasswordAttempts() database.Change
 	ResetFailedPasswordAttempts() database.Change
 
-	// // SetEmailVerified sets the email verified at to NOW()
-	// SetEmailVerified() database.Change
-	// // SetEmailVerifiedAt sets the email verified at the given time.
-	// // If verifiedAt is Zero it behaves like [humanChanges.SetEmailVerified]
-	// SetEmailVerifiedAt(verifiedAt time.Time) database.Change
-
-	// // SetPhoneVerified sets the phone verified at to NOW()
-	// SetPhoneVerified() database.Change
-	// // SetPhoneVerifiedAt sets the phone verified at the given time.
-	// // If verifiedAt is Zero it behaves like [humanChanges.SetPhoneVerified]
-	// SetPhoneVerifiedAt(verifiedAt time.Time) database.Change
-	// RemovePhone() database.Change
+	RemovePhone() database.Change
 }
 
 type HumanUserRepository interface {
@@ -128,22 +114,14 @@ type HumanUserRepository interface {
 
 	// SetPassword sets the password based on the given verification type.
 	SetPassword(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
+	GetPasswordVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
+	IncrementPasswordVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 
-	// ResetPassword(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *Verification) (int64, error)
-	// GetPasswordVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
-	// IncrementFailedPasswordVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
-	// // SetPasswordVerified sets the password previously unverified to verified and removed the password verification.
-	// VerifyPassword(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
-	// // SetPasswordVerifiedAt sets the password previously unverified to verified at the given time and removed the password verification.
-	// // If verifiedAt is Zero it behaves like [humanChanges.SetPasswordVerified]
-	// VerifyPasswordAt(ctx context.Context, client database.QueryExecutor, condition database.Condition, verifiedAt time.Time) (int64, error)
+	SetEmail(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
+	GetEmailVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
+	IncrementEmailVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 
-	// SetEmail(ctx context.Context, client database.QueryExecutor, condition database.Condition, email string, verification VerificationType) (int64, error)
-	// UpdateEmailVerificationCode(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *VerificationTypeUpdateVerification) (int64, error)
-	// IncrementFailedEmailVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
-	// GetEmailVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
-
-	// SetPhone(ctx context.Context, client database.QueryExecutor, condition database.Condition, phone string, verification VerificationType) (int64, error)
-	// SetPhoneVerificationCode(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *Verification) (int64, error)
-	// IncrementFailedPhoneVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+	SetPhone(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
+	GetPhoneVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
+	IncrementPhoneVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }
