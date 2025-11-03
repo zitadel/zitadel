@@ -1,19 +1,21 @@
 services:
-  init:
+  ensure-system-user-key-pair:
     image: alpine/openssl:latest
     entrypoint: /bin/sh -c
     command:
       - |
         # if there is no private key provided generate private and public key
-        if [ ! -f "/current-dir/login-system-user.pem" ]; 
+        if [ ! -f "/current-dir/login-system-user-base64.pem" || ! -f "/current-dir/login-system-user.pub" ]; 
         then 
-        openssl genrsa -traditional -out /current-dir/login-system-user.pem 2048 &&
-        openssl rsa -in /current-dir/login-system-user.pem -outform PEM -pubout -out /current-dir/login-system-user.pub &&
-        openssl pkcs8 -topk8 -in /current-dir/login-system-user.pem -nocrypt | base64 > /current-dir/login-system-user-key.pem 
+          openssl genrsa -traditional -out /current-dir/login-system-user.pem 2048 &&
+          openssl rsa -in /current-dir/login-system-user.pem -outform PEM -pubout -out /current-dir/login-system-user.pub &&
+          openssl pkcs8 -topk8 -in /current-dir/login-system-user.pem -nocrypt | base64 > /current-dir/login-system-user-base64.pem 
+          chown 1001 /current-dir/login-system-user-base64.pem;
+          chown 1000 /current-dir/login-system-user.pub;
+          chmod 640 /current-dir/login-system-user-base64.pem /current-dir/login-system-user.pub;
         fi
-    user: "0"
     volumes:
-      - .:/current-dir:delegated
+      - .:/current-dir
 
   zitadel:
     restart: unless-stopped
@@ -50,11 +52,11 @@ services:
       ZITADEL_OIDC_DEFAULTLOGOUTURLV2: http://localhost:3000/ui/v2/login/logout?post_logout_redirect=
       ZITADEL_SAML_DEFAULTLOGINURLV2: http://localhost:3000/ui/v2/login/login?samlRequest=
 
-      # By configuring SystemAPIUsers, Zitadel holds a list of public keys, which can be used to validate signed JWTs.
-      # With this the login can communicate with the API, but still has limited permissions through the Roles "IAM_LOGIN_CLIENT".
+      # The Login authenticates at the API with a system users private key.
+      # The corresponding public key in ZITADEL_SYSTEMAPIUSERS grants the necessary permissions with the role IAM_LOGIN_CLIENT.
       ZITADEL_SYSTEMAPIUSERS: '{"login-system-user":{"Path":"/current-dir/login-system-user.pub","Memberships":[{"MemberType":"System","Roles":["IAM_LOGIN_CLIENT"]}]}}'
 
-      # By configuring a login client, the setup job creates a user of type machine with the role IAM_LOGIN_CLIENT.
+      # By alternatively configuring a login client, the setup job creates a user of type machine with the role IAM_LOGIN_CLIENT.
       # It writes a PAT to the path specified in ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH.
       # The PAT can be passed to the login container via the environment variable ZITADEL_SERVICE_USER_TOKEN_FILE, for example.
       # ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH: /current-dir/login-client.pat
@@ -96,16 +98,15 @@ services:
       timeout: 60s
       retries: 5
       start_period: 10s
-    user: "0"
     volumes:
-      - .:/current-dir:delegated
+      - .:/current-dir
     ports:
       - 8080:8080
-      - 3000:3000
     networks:
-      - zitadel
+      - frontend
+      - backend
     depends_on:
-      init:
+      ensure-system-user-key-pair:
         condition: service_completed_successfully
       db:
         condition: service_healthy
@@ -113,26 +114,26 @@ services:
   login:
     restart: unless-stopped
     image: ghcr.io/zitadel/zitadel-login:latest
-    # If you can't use the network_mode service:zitadel, you can pass the environment variables ZITADEL_API_URL=http://zitadel:8080 and CUSTOM_REQUEST_HEADERS=Host:localhost instead.
     environment:
-      - ZITADEL_API_URL=http://localhost:8080
       - NEXT_PUBLIC_BASE_PATH=/ui/v2/login
-      # Provide a private key so that the login can communicate with the API securely, this private key will be used to create a singed JWT that can be validated by the API
+      - ZITADEL_API_URL=http://zitadel:8080
+      - CUSTOM_REQUEST_HEADERS=x-zitadel-instance-host:localhost
       - AUDIENCE=http://localhost:8080
       - SYSTEM_USER_ID=login-system-user
-      - SYSTEM_USER_PRIVATE_KEY_FILE=/current-dir/login-system-user-key.pem
-      # You could also provide a PAT instead of a private key
+      # Provide a base64-encoded system user private key for authentication at the API.
+      # This private key is used to create a signed JWT which is validated by the API using the key pair's public key configured in ZITADEL_SYSTEMAPIUSERS. 
+      - SYSTEM_USER_PRIVATE_KEY_FILE=/current-dir/login-system-user-base64.pem
+      # Alternatively, provide a personal access token for a machine user instead of a system user private key
       # - ZITADEL_SERVICE_USER_TOKEN_FILE=/current-dir/login-client.pat
-    network_mode: service:zitadel
-    user: "0"
     volumes:
-      - .:/current-dir:ro
+      - .:/current-dir
+    ports:
+      - 3000:3000
+    networks:
+      - frontend
     depends_on:
-      init:
+      ensure-system-user-key-pair:
         condition: service_completed_successfully
-      zitadel:
-        condition: service_healthy
-        restart: false
 
   db:
     restart: unless-stopped
@@ -153,14 +154,15 @@ services:
       retries: 5
       start_period: 20s
     networks:
-      - zitadel
+      - backend
     ports:
       - 5432:5432
     volumes:
-      - 'data:/var/lib/postgresql/data:rw'
+      - 'data:/var/lib/postgresql/data'
 
 networks:
-  zitadel:
+  backend:
+  frontend:
 
 volumes:
   data:
