@@ -37,7 +37,7 @@ var ConnString = fmt.Sprintf(
 	getEnv("ZITADEL_DATABASE_POSTGRES_PORT", "5433"),
 	getEnv("ZITADEL_DATABASE_POSTGRES_USER", "postgres"),
 	getEnv("ZITADEL_DATABASE_POSTGRES_PASSWORD", "postgres"),
-	getEnv("ZITADEL_DATABASE_POSTGRES_DATABASE", "zitadel"),
+	getEnv("ZITADEL_DATABASE_POSTGRES_DATABASE", "zitddddadeiiilaldsf_iiisfdsfsfddi"),
 	getEnv("ZITADEL_DATABASE_POSTGRES_SSL_MODE", "disable"),
 )
 

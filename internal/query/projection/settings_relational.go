@@ -368,13 +368,13 @@ func (s *settingsRelationalProjection) reduceLoginPolicyAdded(event eventstore.E
 		}
 		settingsRepo := repository.SettingsRepository()
 		setting := domain.Setting{
-			InstanceID: policyEvent.Aggregate().InstanceID,
-			OrganizationID:      orgId,
-			Type:       domain.SettingTypeLogin,
-			OwnerType:  ownerType,
-			Settings:   settingJSON,
-			CreatedAt:  policyEvent.CreationDate(),
-			UpdatedAt:  &policyEvent.Creation,
+			InstanceID:     policyEvent.Aggregate().InstanceID,
+			OrganizationID: orgId,
+			Type:           domain.SettingTypeLogin,
+			OwnerType:      ownerType,
+			Settings:       settingJSON,
+			CreatedAt:      policyEvent.CreationDate(),
+			UpdatedAt:      &policyEvent.Creation,
 		}
 		err = settingsRepo.Create(ctx, v3_sql.SQLTx(tx), &setting)
 		return err
@@ -522,7 +522,7 @@ func (s *settingsRelationalProjection) reduceMFAAdded(event eventstore.Event) (*
 				settingsRepo.TypeCondition(domain.SettingTypeLogin),
 				settingsRepo.OwnerTypeCondition(ownerType),
 			),
-			settingsRepo.SetLabelSettings(change...),
+			settingsRepo.SetLabelSettings(change),
 			settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  err = %+v\n", err)
 		return err
@@ -562,7 +562,7 @@ func (s *settingsRelationalProjection) reduceMFARemoved(event eventstore.Event) 
 				settingsRepo.TypeCondition(domain.SettingTypeLogin),
 				settingsRepo.OwnerTypeCondition(ownerType),
 			),
-			settingsRepo.SetLabelSettings(change...),
+			settingsRepo.SetLabelSettings(change),
 			settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  err = %+v\n", err)
 		return err
@@ -626,7 +626,7 @@ func (s *settingsRelationalProjection) reduceSecondFactorAdded(event eventstore.
 		loginRepo := repository.LoginRepository()
 
 		change := settingsRepo.SetLabelSettings(
-			settingsRepo.AddSecondFactorTypesField(domain.SecondFactorType(policyEvent.MFAType))...,
+			settingsRepo.AddSecondFactorTypesField(domain.SecondFactorType(policyEvent.MFAType)),
 		)
 
 		effectedRows, err := loginRepo.Update(ctx, v3_sql.SQLTx(tx),
@@ -676,7 +676,7 @@ func (s *settingsRelationalProjection) reduceSecondFactorRemoved(event eventstor
 		settingsRepo := repository.LoginRepository()
 
 		change := settingsRepo.SetLabelSettings(
-			settingsRepo.RemoveSecondFactorTypesField(domain.SecondFactorType(policyEvent.MFAType))...,
+			settingsRepo.RemoveSecondFactorTypesField(domain.SecondFactorType(policyEvent.MFAType)),
 		)
 
 		effectedRows, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
@@ -744,14 +744,14 @@ func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) 
 		labelStatePreview := domain.LabelStatePreview
 		settingsRepo := repository.SettingsRepository()
 		setting := domain.Setting{
-			InstanceID: policyEvent.Aggregate().InstanceID,
-			OrganizationID:      orgId,
-			OwnerType:  ownerType,
-			Type:       domain.SettingTypeLabel,
-			LabelState: &labelStatePreview,
-			Settings:   settings,
-			CreatedAt:  policyEvent.CreationDate(),
-			UpdatedAt:  &policyEvent.Creation,
+			InstanceID:     policyEvent.Aggregate().InstanceID,
+			OrganizationID: orgId,
+			OwnerType:      ownerType,
+			Type:           domain.SettingTypeLabel,
+			LabelState:     &labelStatePreview,
+			Settings:       settings,
+			CreatedAt:      policyEvent.CreationDate(),
+			UpdatedAt:      &policyEvent.Creation,
 		}
 		err = settingsRepo.Create(ctx, v3_sql.SQLTx(tx), &setting)
 		return err
@@ -1380,13 +1380,13 @@ func (p *settingsRelationalProjection) reducePassedComplexityAdded(event eventst
 		}
 		settingsRepo := repository.SettingsRepository()
 		newSetting := domain.Setting{
-			InstanceID: policyEvent.Aggregate().InstanceID,
-			OrganizationID:      orgId,
-			Type:       domain.SettingTypePasswordComplexity,
-			OwnerType:  ownerType,
-			Settings:   settingJSON,
-			CreatedAt:  policyEvent.CreationDate(),
-			UpdatedAt:  &policyEvent.Creation,
+			InstanceID:     policyEvent.Aggregate().InstanceID,
+			OrganizationID: orgId,
+			Type:           domain.SettingTypePasswordComplexity,
+			OwnerType:      ownerType,
+			Settings:       settingJSON,
+			CreatedAt:      policyEvent.CreationDate(),
+			UpdatedAt:      &policyEvent.Creation,
 		}
 		err = settingsRepo.Create(ctx, v3_sql.SQLTx(tx), &newSetting)
 		return err
@@ -1512,13 +1512,13 @@ func (p *settingsRelationalProjection) reducePasswordPolicyAdded(event eventstor
 		}
 		settingsRepo := repository.SettingsRepository()
 		setting := domain.Setting{
-			InstanceID: policyEvent.Aggregate().InstanceID,
-			OrganizationID:      orgId,
-			Type:       domain.SettingTypePasswordExpiry,
-			OwnerType:  ownerType,
-			Settings:   settings,
-			CreatedAt:  policyEvent.CreationDate(),
-			UpdatedAt:  &policyEvent.Creation,
+			InstanceID:     policyEvent.Aggregate().InstanceID,
+			OrganizationID: orgId,
+			Type:           domain.SettingTypePasswordExpiry,
+			OwnerType:      ownerType,
+			Settings:       settings,
+			CreatedAt:      policyEvent.CreationDate(),
+			UpdatedAt:      &policyEvent.Creation,
 		}
 		err = settingsRepo.Create(ctx, v3_sql.SQLTx(tx), &setting)
 		return err
@@ -1686,13 +1686,13 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyAdded(event eventstore
 		}
 		settingsRepo := repository.SettingsRepository()
 		setting := domain.Setting{
-			InstanceID: policyEvent.Aggregate().InstanceID,
-			OrganizationID:      orgId,
-			Type:       domain.SettingTypeLockout,
-			OwnerType:  ownerType,
-			Settings:   settings,
-			CreatedAt:  policyEvent.CreationDate(),
-			UpdatedAt:  &policyEvent.Creation,
+			InstanceID:     policyEvent.Aggregate().InstanceID,
+			OrganizationID: orgId,
+			Type:           domain.SettingTypeLockout,
+			OwnerType:      ownerType,
+			Settings:       settings,
+			CreatedAt:      policyEvent.CreationDate(),
+			UpdatedAt:      &policyEvent.Creation,
 		}
 		err = settingsRepo.Create(ctx, v3_sql.SQLTx(tx), &setting)
 		return err
@@ -1783,13 +1783,13 @@ func (p *settingsRelationalProjection) reduceDomainPolicyAdded(event eventstore.
 		}
 		settingsRepo := repository.SettingsRepository()
 		setting := domain.Setting{
-			InstanceID: policyEvent.Aggregate().InstanceID,
-			OrganizationID:      orgId,
-			Type:       domain.SettingTypeDomain,
-			OwnerType:  ownerType,
-			Settings:   settingJSON,
-			CreatedAt:  policyEvent.CreationDate(),
-			UpdatedAt:  &policyEvent.Creation,
+			InstanceID:     policyEvent.Aggregate().InstanceID,
+			OrganizationID: orgId,
+			Type:           domain.SettingTypeDomain,
+			OwnerType:      ownerType,
+			Settings:       settingJSON,
+			CreatedAt:      policyEvent.CreationDate(),
+			UpdatedAt:      &policyEvent.Creation,
 		}
 		err = settingsRepo.Create(ctx, v3_sql.SQLTx(tx), &setting)
 		return err
@@ -1824,9 +1824,9 @@ func (s *settingsRelationalProjection) reduceDomainPolicyChanged(event eventstor
 
 		setting := &domain.DomainSetting{
 			Setting: &domain.Setting{
-				InstanceID: policyEvent.Agg.InstanceID,
-				OrganizationID:      orgId,
-				OwnerType:  ownerType,
+				InstanceID:     policyEvent.Agg.InstanceID,
+				OrganizationID: orgId,
+				OwnerType:      ownerType,
 			},
 		}
 
@@ -1835,11 +1835,11 @@ func (s *settingsRelationalProjection) reduceDomainPolicyChanged(event eventstor
 			changes = append(changes, settingsRepo.SetUserLoginMustBeDomain(*policyEvent.UserLoginMustBeDomain))
 		}
 		if policyEvent.ValidateOrgDomains != nil {
-			setting.Settings.ValidateOrgDomains = *policyEvent.ValidateOrgDomains
+			setting.ValidateOrgDomains = *policyEvent.ValidateOrgDomains
 			changes = append(changes, settingsRepo.SetValidateOrgDomains(*policyEvent.ValidateOrgDomains))
 		}
 		if policyEvent.SMTPSenderAddressMatchesInstanceDomain != nil {
-			setting.Settings.SMTPSenderAddressMatchesInstanceDomain = *policyEvent.SMTPSenderAddressMatchesInstanceDomain
+			setting.SMTPSenderAddressMatchesInstanceDomain = *policyEvent.SMTPSenderAddressMatchesInstanceDomain
 			changes = append(changes, settingsRepo.SetSMTPSenderAddressMatchesInstanceDomain(*policyEvent.SMTPSenderAddressMatchesInstanceDomain))
 		}
 
@@ -1907,23 +1907,24 @@ func (s *settingsRelationalProjection) reduceSecurityPolicySet(event eventstore.
 			},
 		}
 
-		changes := make([]db_json.JsonUpdate, 0, 4)
+		changes := make([]db_json.JsonUpdate, 0, 8)
 
 		if e.EnableIframeEmbedding != nil {
-			setting.Settings.EnableIframeEmbedding = *e.EnableIframeEmbedding
+			setting.EnableIframeEmbedding = *e.EnableIframeEmbedding
 			changes = append(changes, settingsRepo.SetEnableIframeEmbedding((*e.EnableIframeEmbedding)))
 		}
 		if e.Enabled != nil {
-			setting.Settings.Enabled = *e.Enabled
+			setting.Enabled = *e.Enabled
 			changes = append(changes, settingsRepo.SetEnabled((*e.Enabled)))
 		}
 		if e.AllowedOrigins != nil {
-			setting.Settings.AllowedOrigins = *e.AllowedOrigins
-			// TODO
-			// changes = append(changes, settingsRepo.SetAllowedOrigins(*e.AllowedOrigins))
+			setting.AllowedOrigins = *e.AllowedOrigins
+			for _, origin := range *e.AllowedOrigins {
+				changes = append(changes, settingsRepo.AddAllowedOrigins(origin))
+			}
 		}
 		if e.EnableImpersonation != nil {
-			setting.Settings.EnableImpersonation = *e.EnableImpersonation
+			setting.EnableImpersonation = *e.EnableImpersonation
 			changes = append(changes, settingsRepo.SetEnableImpersonation(*e.EnableImpersonation))
 		}
 
@@ -1948,17 +1949,15 @@ func (s *settingsRelationalProjection) reduceOrganizationSettingsSet(event event
 
 		setting := &domain.OrganizationSetting{
 			Setting: &domain.Setting{
-				InstanceID: e.Aggregate().InstanceID,
-				OrganizationID:      &e.Aggregate().ID,
-				Type:       domain.SettingTypeOrganization,
-				OwnerType:  domain.OwnerTypeOrganization,
+				InstanceID:     e.Aggregate().InstanceID,
+				OrganizationID: &e.Aggregate().ID,
+				Type:           domain.SettingTypeOrganization,
+				OwnerType:      domain.OwnerTypeOrganization,
 				// Settings:   payload,
 				CreatedAt: e.CreatedAt(),
 				UpdatedAt: &e.Creation,
 			},
-			Settings: domain.OrganizationSettings{
-				OrganizationScopedUsernames: e.OrganizationScopedUsernames,
-			},
+			OrganizationScopedUsernames: e.OrganizationScopedUsernames,
 		}
 
 		_, err := settingsRepo.SetEvent(ctx, v3_sql.SQLTx(tx), setting)

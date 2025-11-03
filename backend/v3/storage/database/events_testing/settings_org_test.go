@@ -81,16 +81,16 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			// event org.policy.login.added
 			// these values are found in default.yaml
 			assert.Equal(t, domain.OwnerTypeOrganization, setting.OwnerType)
-			assert.Equal(t, false, setting.Settings.AllowRegister)
-			assert.Equal(t, false, setting.Settings.AllowExternalIDP)
-			assert.Equal(t, domain.PasswordlessTypeNotAllowed, setting.Settings.PasswordlessType)
-			assert.Equal(t, false, setting.Settings.AllowDomainDiscovery)
-			assert.Equal(t, false, setting.Settings.AllowUserNamePassword)
-			assert.Equal(t, time.Duration(time.Second*10), setting.Settings.PasswordCheckLifetime)
-			assert.Equal(t, time.Duration(time.Second*10), setting.Settings.ExternalLoginCheckLifetime)
-			assert.Equal(t, time.Duration(time.Second*10), setting.Settings.MFAInitSkipLifetime)
-			assert.Equal(t, time.Duration(time.Second*10), setting.Settings.SecondFactorCheckLifetime)
-			assert.Equal(t, time.Duration(time.Second*10), setting.Settings.MultiFactorCheckLifetime)
+			assert.Equal(t, false, setting.AllowRegister)
+			assert.Equal(t, false, setting.AllowExternalIDP)
+			assert.Equal(t, domain.PasswordlessTypeNotAllowed, setting.PasswordlessType)
+			assert.Equal(t, false, setting.AllowDomainDiscovery)
+			assert.Equal(t, false, setting.AllowUserNamePassword)
+			assert.Equal(t, time.Duration(time.Second*10), setting.PasswordCheckLifetime)
+			assert.Equal(t, time.Duration(time.Second*10), setting.ExternalLoginCheckLifetime)
+			assert.Equal(t, time.Duration(time.Second*10), setting.MFAInitSkipLifetime)
+			assert.Equal(t, time.Duration(time.Second*10), setting.SecondFactorCheckLifetime)
+			assert.Equal(t, time.Duration(time.Second*10), setting.MultiFactorCheckLifetime)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -172,23 +172,23 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 
 			// event org.policy.login.changed
 			assert.Equal(t, domain.OwnerTypeOrganization, setting.OwnerType)
-			assert.Equal(t, true, setting.Settings.AllowRegister)
-			assert.Equal(t, true, setting.Settings.AllowExternalIDP)
-			assert.Equal(t, true, setting.Settings.ForceMFA)
-			assert.Equal(t, domain.PasswordlessTypeAllowed, setting.Settings.PasswordlessType)
-			assert.Equal(t, true, setting.Settings.HidePasswordReset)
-			assert.Equal(t, true, setting.Settings.IgnoreUnknownUsernames)
-			assert.Equal(t, "http://www.new_example.com", setting.Settings.DefaultRedirectURI)
-			assert.Equal(t, true, setting.Settings.AllowDomainDiscovery)
-			assert.Equal(t, true, setting.Settings.AllowUserNamePassword)
-			assert.Equal(t, time.Duration(time.Second*5*20), setting.Settings.PasswordCheckLifetime)
-			assert.Equal(t, time.Duration(time.Second*5*21), setting.Settings.ExternalLoginCheckLifetime)
-			assert.Equal(t, time.Duration(time.Second*5*22), setting.Settings.MFAInitSkipLifetime)
-			assert.Equal(t, time.Duration(time.Second*5*23), setting.Settings.SecondFactorCheckLifetime)
-			assert.Equal(t, time.Duration(time.Second*5*24), setting.Settings.MultiFactorCheckLifetime)
-			assert.Equal(t, true, setting.Settings.DisableLoginWithEmail)
-			assert.Equal(t, true, setting.Settings.DisableLoginWithPhone)
-			assert.Equal(t, true, setting.Settings.ForceMFALocalOnly)
+			assert.Equal(t, true, setting.AllowRegister)
+			assert.Equal(t, true, setting.AllowExternalIDP)
+			assert.Equal(t, true, setting.ForceMFA)
+			assert.Equal(t, domain.PasswordlessTypeAllowed, setting.PasswordlessType)
+			assert.Equal(t, true, setting.HidePasswordReset)
+			assert.Equal(t, true, setting.IgnoreUnknownUsernames)
+			assert.Equal(t, "http://www.new_example.com", setting.DefaultRedirectURI)
+			assert.Equal(t, true, setting.AllowDomainDiscovery)
+			assert.Equal(t, true, setting.AllowUserNamePassword)
+			assert.Equal(t, time.Duration(time.Second*5*20), setting.PasswordCheckLifetime)
+			assert.Equal(t, time.Duration(time.Second*5*21), setting.ExternalLoginCheckLifetime)
+			assert.Equal(t, time.Duration(time.Second*5*22), setting.MFAInitSkipLifetime)
+			assert.Equal(t, time.Duration(time.Second*5*23), setting.SecondFactorCheckLifetime)
+			assert.Equal(t, time.Duration(time.Second*5*24), setting.MultiFactorCheckLifetime)
+			assert.Equal(t, true, setting.DisableLoginWithEmail)
+			assert.Equal(t, true, setting.DisableLoginWithPhone)
+			assert.Equal(t, true, setting.ForceMFALocalOnly)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -249,7 +249,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			assert.Nil(t, setting.Settings.MFAType)
+			assert.Nil(t, setting.MFAType)
 		}, retryDuration, tick)
 
 		// add MFAType
@@ -281,7 +281,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.login.multifactor.added
-			assert.Equal(t, []domain.MultiFactorType{domain.MultiFactorType(policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION)}, setting.Settings.MFAType)
+			assert.Equal(t, []domain.MultiFactorType{domain.MultiFactorType(policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION)}, setting.MFAType)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 
@@ -312,7 +312,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.login.multifactor.remove
-			assert.Equal(t, []domain.MultiFactorType{}, setting.Settings.MFAType)
+			assert.Equal(t, []domain.MultiFactorType{}, setting.MFAType)
 		}, retryDuration, tick)
 	})
 
@@ -374,7 +374,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			secondFactorTypes = setting.Settings.SecondFactorTypes
+			secondFactorTypes = setting.SecondFactorTypes
 		}, retryDuration, tick)
 
 		// add new second factor type
@@ -408,7 +408,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.login.multifactor.secondfactor.added
-			assert.Equal(t, secondFactorTypes, setting.Settings.SecondFactorTypes)
+			assert.Equal(t, secondFactorTypes, setting.SecondFactorTypes)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 
@@ -443,7 +443,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.login.multifactor.secondfactor.removed
-			assert.Equal(t, secondFactorTypes, setting.Settings.SecondFactorTypes)
+			assert.Equal(t, secondFactorTypes, setting.SecondFactorTypes)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -635,19 +635,19 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 
 			// event org.policy.label.added
 			assert.Equal(t, domain.OwnerTypeOrganization, setting.OwnerType)
-			assert.Equal(t, "#055090", setting.Settings.PrimaryColor)
-			assert.Equal(t, "#055090", setting.Settings.BackgroundColor)
-			assert.Equal(t, "#055090", setting.Settings.WarnColor)
-			assert.Equal(t, "#055090", setting.Settings.FontColor)
-			assert.Equal(t, "#055090", setting.Settings.PrimaryColorDark)
-			assert.Equal(t, "#055090", setting.Settings.BackgroundColorDark)
-			assert.Equal(t, "#055090", setting.Settings.WarnColorDark)
-			assert.Equal(t, "#055090", setting.Settings.WarnColorDark)
-			assert.Equal(t, "#055090", setting.Settings.FontColorDark)
-			assert.Equal(t, false, setting.Settings.HideLoginNameSuffix)
-			assert.Equal(t, false, setting.Settings.ErrorMsgPopup)
-			assert.Equal(t, false, setting.Settings.DisableWatermark)
-			assert.Equal(t, domain.LabelPolicyThemeDark, setting.Settings.ThemeMode)
+			assert.Equal(t, "#055090", setting.PrimaryColor)
+			assert.Equal(t, "#055090", setting.BackgroundColor)
+			assert.Equal(t, "#055090", setting.WarnColor)
+			assert.Equal(t, "#055090", setting.FontColor)
+			assert.Equal(t, "#055090", setting.PrimaryColorDark)
+			assert.Equal(t, "#055090", setting.BackgroundColorDark)
+			assert.Equal(t, "#055090", setting.WarnColorDark)
+			assert.Equal(t, "#055090", setting.WarnColorDark)
+			assert.Equal(t, "#055090", setting.FontColorDark)
+			assert.Equal(t, false, setting.HideLoginNameSuffix)
+			assert.Equal(t, false, setting.ErrorMsgPopup)
+			assert.Equal(t, false, setting.DisableWatermark)
+			assert.Equal(t, domain.LabelPolicyThemeDark, setting.ThemeMode)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
@@ -716,19 +716,19 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 
 			// event org.policy.label.change
 			assert.Equal(t, domain.OwnerTypeOrganization, setting.OwnerType)
-			assert.Equal(t, "#055000", setting.Settings.PrimaryColor)
-			assert.Equal(t, "#055000", setting.Settings.BackgroundColor)
-			assert.Equal(t, "#055000", setting.Settings.WarnColor)
-			assert.Equal(t, "#055000", setting.Settings.FontColor)
-			assert.Equal(t, "#055000", setting.Settings.PrimaryColorDark)
-			assert.Equal(t, "#055000", setting.Settings.BackgroundColorDark)
-			assert.Equal(t, "#055000", setting.Settings.WarnColorDark)
-			assert.Equal(t, "#055000", setting.Settings.WarnColorDark)
-			assert.Equal(t, "#055000", setting.Settings.FontColorDark)
-			assert.Equal(t, true, setting.Settings.HideLoginNameSuffix)
-			assert.Equal(t, false, setting.Settings.ErrorMsgPopup)
-			assert.Equal(t, true, setting.Settings.DisableWatermark)
-			assert.Equal(t, domain.LabelPolicyThemeLight, setting.Settings.ThemeMode)
+			assert.Equal(t, "#055000", setting.PrimaryColor)
+			assert.Equal(t, "#055000", setting.BackgroundColor)
+			assert.Equal(t, "#055000", setting.WarnColor)
+			assert.Equal(t, "#055000", setting.FontColor)
+			assert.Equal(t, "#055000", setting.PrimaryColorDark)
+			assert.Equal(t, "#055000", setting.BackgroundColorDark)
+			assert.Equal(t, "#055000", setting.WarnColorDark)
+			assert.Equal(t, "#055000", setting.WarnColorDark)
+			assert.Equal(t, "#055000", setting.FontColorDark)
+			assert.Equal(t, true, setting.HideLoginNameSuffix)
+			assert.Equal(t, false, setting.ErrorMsgPopup)
+			assert.Equal(t, true, setting.DisableWatermark)
+			assert.Equal(t, domain.LabelPolicyThemeLight, setting.ThemeMode)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -872,7 +872,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		client := resty.New()
 		out, err := client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
-			Delete("http://localhost:8080" + "/management/v1" + "/policies/label")
+			Delete("http://localhost:8082" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
 
 		// add label policy
@@ -895,7 +895,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
 			SetBody(setLabelPolicyPayload).
-			Post("http://localhost:8080" + "/management/v1" + "/policies/label")
+			Post("http://localhost:8082" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -905,7 +905,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 			SetHeader("x-zitadel-orgid", orgId).
-			Post("http://localhost:8080" + "/assets/v1" + "/org/policy/label/logo")
+			Post("http://localhost:8082" + "/assets/v1" + "/org/policy/label/logo")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -928,7 +928,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.logo.added
-			assert.NotNil(t, setting.Settings.LabelPolicyLightLogoURL)
+			assert.NotNil(t, setting.LabelPolicyLightLogoURL)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -951,7 +951,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		client := resty.New()
 		out, err := client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
-			Delete("http://localhost:8080" + "/management/v1" + "/policies/label")
+			Delete("http://localhost:8082" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -975,7 +975,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
 			SetBody(setLabelPolicyPayload).
-			Post("http://localhost:8080" + "/management/v1" + "/policies/label")
+			Post("http://localhost:8082" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -985,7 +985,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 			SetHeader("x-zitadel-orgid", orgId).
-			Post("http://localhost:8080" + "/assets/v1" + "/org/policy/label/logo/dark")
+			Post("http://localhost:8082" + "/assets/v1" + "/org/policy/label/logo/dark")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1008,7 +1008,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.logo.dark.added
-			assert.NotNil(t, setting.Settings.LabelPolicyDarkLogoURL)
+			assert.NotNil(t, setting.LabelPolicyDarkLogoURL)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1031,7 +1031,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		client := resty.New()
 		out, err := client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
-			Delete("http://localhost:8080" + "/management/v1" + "/policies/label")
+			Delete("http://localhost:8082" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1055,7 +1055,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
 			SetBody(setLabelPolicyPayload).
-			Post("http://localhost:8080" + "/management/v1" + "/policies/label")
+			Post("http://localhost:8082" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1064,7 +1064,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 			SetHeader("x-zitadel-orgid", orgId).
-			Post("http://localhost:8080" + "/assets/v1" + "/org/policy/label/logo")
+			Post("http://localhost:8082" + "/assets/v1" + "/org/policy/label/logo")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1085,7 +1085,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			assert.NotNil(t, setting.Settings.LabelPolicyLightLogoURL)
+			assert.NotNil(t, setting.LabelPolicyLightLogoURL)
 		}, retryDuration, tick)
 
 		// remote logo light
@@ -1093,7 +1093,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		client = resty.New()
 		out, err = client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
-			Delete("http://localhost:8080" + "/management/v1" + "/policies/label/logo")
+			Delete("http://localhost:8082" + "/management/v1" + "/policies/label/logo")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 		after := time.Now().Add(time.Second * 30)
@@ -1116,7 +1116,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.logo.removed
-			assert.Nil(t, setting.Settings.LabelPolicyLightLogoURL)
+			assert.Nil(t, setting.LabelPolicyLightLogoURL)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1139,7 +1139,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		client := resty.New()
 		out, err := client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
-			Delete("http://localhost:8080" + "/management/v1" + "/policies/label")
+			Delete("http://localhost:8082" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1163,7 +1163,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
 			SetBody(setLabelPolicyPayload).
-			Post("http://localhost:8080" + "/management/v1" + "/policies/label")
+			Post("http://localhost:8082" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1172,7 +1172,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 			SetHeader("x-zitadel-orgid", orgId).
-			Post("http://localhost:8080" + "/assets/v1" + "/org/policy/label/logo/dark")
+			Post("http://localhost:8082" + "/assets/v1" + "/org/policy/label/logo/dark")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1193,7 +1193,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			assert.NotNil(t, setting.Settings.LabelPolicyDarkLogoURL)
+			assert.NotNil(t, setting.LabelPolicyDarkLogoURL)
 		}, retryDuration, tick)
 
 		// remote logo dark
@@ -1201,7 +1201,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		client = resty.New()
 		out, err = client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
-			Delete("http://localhost:8080" + "/management/v1" + "/policies/label/logo_dark")
+			Delete("http://localhost:8082" + "/management/v1" + "/policies/label/logo_dark")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 		after := time.Now().Add(time.Second * 30)
@@ -1224,7 +1224,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.logo.dark.removed
-			assert.Nil(t, setting.Settings.LabelPolicyDarkLogoURL)
+			assert.Nil(t, setting.LabelPolicyDarkLogoURL)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1247,7 +1247,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		client := resty.New()
 		out, err := client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
-			Delete("http://localhost:8080" + "/management/v1" + "/policies/label")
+			Delete("http://localhost:8082" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1271,7 +1271,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
 			SetBody(setLabelPolicyPayload).
-			Post("http://localhost:8080" + "/management/v1" + "/policies/label")
+			Post("http://localhost:8082" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1281,7 +1281,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 			SetHeader("x-zitadel-orgid", orgId).
-			Post("http://localhost:8080" + "/assets/v1" + "/org/policy/label/icon")
+			Post("http://localhost:8082" + "/assets/v1" + "/org/policy/label/icon")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1304,7 +1304,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.icon.added
-			assert.NotNil(t, setting.Settings.LabelPolicyLightIconURL)
+			assert.NotNil(t, setting.LabelPolicyLightIconURL)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1327,7 +1327,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		client := resty.New()
 		out, err := client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
-			Delete("http://localhost:8080" + "/management/v1" + "/policies/label")
+			Delete("http://localhost:8082" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
 
 		// add label policy
@@ -1350,7 +1350,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
 			SetBody(setLabelPolicyPayload).
-			Post("http://localhost:8080" + "/management/v1" + "/policies/label")
+			Post("http://localhost:8082" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1360,7 +1360,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 			SetHeader("x-zitadel-orgid", orgId).
-			Post("http://localhost:8080" + "/assets/v1" + "/org/policy/label/icon/dark")
+			Post("http://localhost:8082" + "/assets/v1" + "/org/policy/label/icon/dark")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1383,7 +1383,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.icon.dark.added
-			assert.NotNil(t, setting.Settings.LabelPolicyDarkIconURL)
+			assert.NotNil(t, setting.LabelPolicyDarkIconURL)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1406,7 +1406,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		client := resty.New()
 		out, err := client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
-			Delete("http://localhost:8080" + "/management/v1" + "/policies/label")
+			Delete("http://localhost:8082" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1430,7 +1430,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
 			SetBody(setLabelPolicyPayload).
-			Post("http://localhost:8080" + "/management/v1" + "/policies/label")
+			Post("http://localhost:8082" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1439,7 +1439,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 			SetHeader("x-zitadel-orgid", orgId).
-			Post("http://localhost:8080" + "/assets/v1" + "/org/policy/label/icon")
+			Post("http://localhost:8082" + "/assets/v1" + "/org/policy/label/icon")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1460,7 +1460,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			assert.NotNil(t, setting.Settings.LabelPolicyLightIconURL)
+			assert.NotNil(t, setting.LabelPolicyLightIconURL)
 		}, retryDuration, tick)
 
 		// remote icon light
@@ -1468,7 +1468,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		client = resty.New()
 		out, err = client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
-			Delete("http://localhost:8080" + "/management/v1" + "/policies/label/icon")
+			Delete("http://localhost:8082" + "/management/v1" + "/policies/label/icon")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 		after := time.Now().Add(time.Second * 30)
@@ -1491,7 +1491,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.icon.removed
-			assert.Nil(t, setting.Settings.LabelPolicyLightIconURL)
+			assert.Nil(t, setting.LabelPolicyLightIconURL)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1514,7 +1514,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		client := resty.New()
 		out, err := client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
-			Delete("http://localhost:8080" + "/management/v1" + "/policies/label")
+			Delete("http://localhost:8082" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1538,7 +1538,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
 			SetBody(setLabelPolicyPayload).
-			Post("http://localhost:8080" + "/management/v1" + "/policies/label")
+			Post("http://localhost:8082" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1547,7 +1547,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 			SetHeader("x-zitadel-orgid", orgId).
-			Post("http://localhost:8080" + "/assets/v1" + "/org/policy/label/icon/dark")
+			Post("http://localhost:8082" + "/assets/v1" + "/org/policy/label/icon/dark")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1568,8 +1568,8 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			// assert.Equal(t, domain.LabelPolicyThemeLight, setting.Settings.LabelPolicyLightLogoURL)
-			assert.NotNil(t, setting.Settings.LabelPolicyDarkIconURL)
+			// assert.Equal(t, domain.LabelPolicyThemeLight, setting.LabelPolicyLightLogoURL)
+			assert.NotNil(t, setting.LabelPolicyDarkIconURL)
 		}, retryDuration, tick)
 
 		// remote icon dark
@@ -1577,7 +1577,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		client = resty.New()
 		out, err = client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
-			Delete("http://localhost:8080" + "/management/v1" + "/policies/label/icon_dark")
+			Delete("http://localhost:8082" + "/management/v1" + "/policies/label/icon_dark")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 		after := time.Now().Add(time.Second * 30)
@@ -1600,7 +1600,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.icon.dark.removed
-			assert.Nil(t, setting.Settings.LabelPolicyDarkIconURL)
+			assert.Nil(t, setting.LabelPolicyDarkIconURL)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1623,7 +1623,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		client := resty.New()
 		out, err := client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
-			Delete("http://localhost:8080" + "/management/v1" + "/policies/label")
+			Delete("http://localhost:8082" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1647,7 +1647,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
 			SetBody(setLabelPolicyPayload).
-			Post("http://localhost:8080" + "/management/v1" + "/policies/label")
+			Post("http://localhost:8082" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1657,7 +1657,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(font)).
 			SetHeader("x-zitadel-orgid", orgId).
-			Post("http://localhost:8080" + "/assets/v1" + "/org/policy/label/font")
+			Post("http://localhost:8082" + "/assets/v1" + "/org/policy/label/font")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1680,7 +1680,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.font.added
-			assert.NotNil(t, setting.Settings.LabelPolicyFontURL)
+			assert.NotNil(t, setting.LabelPolicyFontURL)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1703,7 +1703,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		client := resty.New()
 		out, err := client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
-			Delete("http://localhost:8080" + "/management/v1" + "/policies/label")
+			Delete("http://localhost:8082" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1727,7 +1727,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
 			SetBody(setLabelPolicyPayload).
-			Post("http://localhost:8080" + "/management/v1" + "/policies/label")
+			Post("http://localhost:8082" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1736,7 +1736,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(font)).
 			SetHeader("x-zitadel-orgid", orgId).
-			Post("http://localhost:8080" + "/assets/v1" + "/org/policy/label/font")
+			Post("http://localhost:8082" + "/assets/v1" + "/org/policy/label/font")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 
@@ -1756,7 +1756,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			assert.NotNil(t, setting.Settings.LabelPolicyFontURL)
+			assert.NotNil(t, setting.LabelPolicyFontURL)
 		}, retryDuration, tick)
 
 		// remote font policy
@@ -1764,7 +1764,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		client = resty.New()
 		out, err = client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgId).
-			Delete("http://localhost:8080" + "/management/v1" + "/policies/label/font")
+			Delete("http://localhost:8082" + "/management/v1" + "/policies/label/font")
 		require.NoError(t, err)
 		require.Equal(t, 200, out.StatusCode())
 		after := time.Now().Add(time.Second * 30)
@@ -1787,7 +1787,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.font.removed
-			assert.Nil(t, setting.Settings.LabelPolicyFontURL)
+			assert.Nil(t, setting.LabelPolicyFontURL)
 			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1993,11 +1993,11 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 
 			// event org.policy.password.complexity.added
 			assert.Equal(t, domain.OwnerTypeOrganization, setting.OwnerType)
-			assert.Equal(t, uint64(10), setting.Settings.MinLength)
-			assert.Equal(t, true, setting.Settings.HasUppercase)
-			assert.Equal(t, true, setting.Settings.HasLowercase)
-			assert.Equal(t, true, setting.Settings.HasNumber)
-			assert.Equal(t, true, setting.Settings.HasSymbol)
+			assert.Equal(t, uint64(10), setting.MinLength)
+			assert.Equal(t, true, setting.HasUppercase)
+			assert.Equal(t, true, setting.HasLowercase)
+			assert.Equal(t, true, setting.HasNumber)
+			assert.Equal(t, true, setting.HasSymbol)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -2054,11 +2054,11 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 
 			// event org.policy.password.complexity.changed
 			assert.Equal(t, domain.OwnerTypeOrganization, setting.OwnerType)
-			assert.Equal(t, uint64(5), setting.Settings.MinLength)
-			assert.Equal(t, true, setting.Settings.HasUppercase)
-			assert.Equal(t, true, setting.Settings.HasLowercase)
-			assert.Equal(t, true, setting.Settings.HasNumber)
-			assert.Equal(t, true, setting.Settings.HasSymbol)
+			assert.Equal(t, uint64(5), setting.MinLength)
+			assert.Equal(t, true, setting.HasUppercase)
+			assert.Equal(t, true, setting.HasLowercase)
+			assert.Equal(t, true, setting.HasNumber)
+			assert.Equal(t, true, setting.HasSymbol)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -2245,8 +2245,8 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 
 			// event org.policy.password.age.added
 			assert.Equal(t, domain.OwnerTypeOrganization, setting.OwnerType)
-			assert.Equal(t, uint64(10), setting.Settings.ExpireWarnDays)
-			assert.Equal(t, uint64(10), setting.Settings.MaxAgeDays)
+			assert.Equal(t, uint64(10), setting.ExpireWarnDays)
+			assert.Equal(t, uint64(10), setting.MaxAgeDays)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -2295,8 +2295,8 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 
 			// event org.policy.password.age.changed
 			assert.Equal(t, domain.OwnerTypeOrganization, setting.OwnerType)
-			assert.Equal(t, uint64(40), setting.Settings.ExpireWarnDays)
-			assert.Equal(t, uint64(40), setting.Settings.MaxAgeDays)
+			assert.Equal(t, uint64(40), setting.ExpireWarnDays)
+			assert.Equal(t, uint64(40), setting.MaxAgeDays)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -2470,8 +2470,8 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 
 			// event org.policy.lockout.added
 			assert.Equal(t, domain.OwnerTypeOrganization, setting.OwnerType)
-			assert.Equal(t, uint64(1), setting.Settings.MaxOTPAttempts)
-			assert.Equal(t, uint64(1), setting.Settings.MaxPasswordAttempts)
+			assert.Equal(t, uint64(1), setting.MaxOTPAttempts)
+			assert.Equal(t, uint64(1), setting.MaxPasswordAttempts)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -2519,8 +2519,8 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 
 			// event org.policy.lockout.changed
 			assert.Equal(t, domain.OwnerTypeOrganization, setting.OwnerType)
-			assert.Equal(t, uint64(5), setting.Settings.MaxOTPAttempts)
-			assert.Equal(t, uint64(5), setting.Settings.MaxPasswordAttempts)
+			assert.Equal(t, uint64(5), setting.MaxOTPAttempts)
+			assert.Equal(t, uint64(5), setting.MaxPasswordAttempts)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -2695,9 +2695,9 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 
 			// event org.policy.domain.added
 			assert.Equal(t, domain.OwnerTypeOrganization, setting.OwnerType)
-			assert.Equal(t, false, setting.Settings.SMTPSenderAddressMatchesInstanceDomain)
-			assert.Equal(t, false, setting.Settings.UserLoginMustBeDomain)
-			assert.Equal(t, false, setting.Settings.ValidateOrgDomains)
+			assert.Equal(t, false, setting.SMTPSenderAddressMatchesInstanceDomain)
+			assert.Equal(t, false, setting.UserLoginMustBeDomain)
+			assert.Equal(t, false, setting.ValidateOrgDomains)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -2751,9 +2751,9 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 
 			// event org.policy.domain.changed
 			assert.Equal(t, domain.OwnerTypeOrganization, setting.OwnerType)
-			assert.Equal(t, true, setting.Settings.SMTPSenderAddressMatchesInstanceDomain)
-			assert.Equal(t, true, setting.Settings.UserLoginMustBeDomain)
-			assert.Equal(t, true, setting.Settings.ValidateOrgDomains)
+			assert.Equal(t, true, setting.SMTPSenderAddressMatchesInstanceDomain)
+			assert.Equal(t, true, setting.UserLoginMustBeDomain)
+			assert.Equal(t, true, setting.ValidateOrgDomains)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -2938,7 +2938,7 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event settings.organization.set
-			assert.Equal(t, organizationScopedUsernames, setting.Settings.OrganizationScopedUsernames)
+			assert.Equal(t, organizationScopedUsernames, setting.OrganizationScopedUsernames)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)

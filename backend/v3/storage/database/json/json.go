@@ -93,15 +93,15 @@ type ArrayChange struct {
 	remove bool
 }
 
-func NewArrayChange(path []string, value any, remove bool) []JsonUpdate {
+func NewArrayChange(path []string, value any, remove bool) JsonUpdate {
 	// if remove {
-	return []JsonUpdate{
-		&ArrayChange{
-			path:   path,
-			value:  value,
-			remove: remove,
-		},
+	// return []JsonUpdate{
+	return &ArrayChange{
+		path:   path,
+		value:  value,
+		remove: remove,
 	}
+	// }
 	// } else {
 	// 	return []JsonUpdate{
 	// 		// first remove so we don't have duplicates in the array

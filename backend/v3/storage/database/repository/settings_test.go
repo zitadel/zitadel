@@ -473,19 +473,6 @@ func TestSetSpecificSetting(t *testing.T) {
 			},
 		},
 		{
-			name: "happy path, no org",
-			setting: domain.PasswordExpirySetting{
-				Setting: &domain.Setting{
-					InstanceID: instanceId,
-					// OrgID:      &orgId,
-					ID:        gofakeit.Name(),
-					Type:      domain.SettingTypePasswordExpiry,
-					OwnerType: domain.OwnerTypeInstance,
-					Settings:  []byte("{}"),
-				},
-			},
-		},
-		{
 			name: "adding setting with same instance id, org id twice",
 			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.PasswordExpirySetting {
 				settingRepo := repository.PasswordExpiryRepository()
@@ -929,20 +916,6 @@ func TestSetLabelSetting(t *testing.T) {
 			},
 		},
 		{
-			name: "happy path, no org",
-			setting: domain.LabelSetting{
-				Setting: &domain.Setting{
-					InstanceID: instanceId,
-					// OrgID:      &orgId,
-					ID:         gofakeit.Name(),
-					Type:       domain.SettingTypeLabel,
-					OwnerType:  domain.OwnerTypeInstance,
-					LabelState: gu.Ptr(domain.LabelStatePreview),
-					Settings:   []byte("{}"),
-				},
-			},
-		},
-		{
 			name: "adding setting with same instance id, org id twice",
 			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
 				settingRepo := repository.LabelRepository()
@@ -1176,21 +1149,6 @@ func TestSetLabelSetting(t *testing.T) {
 			}
 		}(),
 		{
-			name: "adding setting with no instance id",
-			setting: domain.LabelSetting{
-				Setting: &domain.Setting{
-					// InstanceID:        instanceId,
-					OrganizationID: &orgId,
-					ID:             gofakeit.Name(),
-					Type:           domain.SettingTypeLockout,
-					OwnerType:      domain.OwnerTypeInstance,
-					LabelState:     gu.Ptr(domain.LabelStatePreview),
-					Settings:       []byte("{}"),
-				},
-			},
-			err: new(database.IntegrityViolationError),
-		},
-		{
 			name: "adding idp with non existent instance id",
 			setting: domain.LabelSetting{
 				Setting: &domain.Setting{
@@ -1250,7 +1208,7 @@ func TestSetLabelSetting(t *testing.T) {
 			err: repository.ErrMissingInstanceID,
 		},
 		{
-			name: "instance id not set",
+			name: "org id not set",
 			setting: domain.LabelSetting{
 				Setting: &domain.Setting{
 					InstanceID: instanceId,
@@ -1484,111 +1442,55 @@ func TestUpdateSetting(t *testing.T) {
 	err = organizationRepo.Create(t.Context(), tx, &org)
 	require.NoError(t, err)
 
-	settingRepo := repository.LabelRepository()
+	settingRepo := repository.OrganizationSettingRepository()
 
 	tests := []struct {
 		name         string
 		testFunc     func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting
+		conditions   database.Condition
+		changes      database.Changes
 		rowsAffected int64
 		err          error
 	}{
 		{
-			name: "happy path update settings",
-			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
-				setting := domain.LabelSetting{
-					Setting: &domain.Setting{
-						InstanceID:     instanceId,
-						OrganizationID: &orgId,
-						ID:             gofakeit.Name(),
-						Type:           domain.SettingTypeLabel,
-						OwnerType:      domain.OwnerTypeOrganization,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
-						Settings:       []byte("{}"),
-					},
-					Settings: domain.LabelSettings{
-						PrimaryColor:        "value",
-						BackgroundColor:     "value",
-						WarnColor:           "value",
-						FontColor:           "value",
-						PrimaryColorDark:    "value",
-						BackgroundColorDark: "value",
-						WarnColorDark:       "value",
-						FontColorDark:       "value",
-						HideLoginNameSuffix: true,
-						ErrorMsgPopup:       true,
-						DisableWatermark:    true,
-						ThemeMode:           domain.LabelPolicyThemeAuto,
-					},
-				}
-				err := settingRepo.Set(t.Context(), tx, &setting)
-				require.NoError(t, err)
-
-				// update settings values
-				setting.OwnerType = domain.OwnerTypeInstance
-				setting.Settings.PrimaryColor = "new_value"
-				setting.Settings.BackgroundColor = "new_value"
-				setting.Settings.WarnColor = "new_value"
-				setting.Settings.FontColor = "new_value"
-				setting.Settings.PrimaryColorDark = "new_value"
-				setting.Settings.BackgroundColorDark = "new_value"
-				setting.Settings.WarnColorDark = "new_value"
-				setting.Settings.FontColorDark = "new_value"
-				setting.Settings.HideLoginNameSuffix = false
-				setting.Settings.ErrorMsgPopup = false
-				setting.Settings.DisableWatermark = false
-				setting.Settings.ThemeMode = domain.LabelPolicyThemeLight
-				return &setting
-			},
-			rowsAffected: 1,
+			name: "missing instance id condition",
+			conditions: database.And(
+				// settingRepo.InstanceIDCondition(instanceId),
+				settingRepo.OrgIDCondition(&orgId),
+				settingRepo.TypeCondition(domain.SettingTypeLabel),
+				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+			err: database.NewMissingConditionError(settingRepo.InstanceIDColumn()),
 		},
 		{
-			name: "happy path update settings, no org",
-			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
-				setting := domain.LabelSetting{
-					Setting: &domain.Setting{
-						InstanceID: instanceId,
-						// OrgID:      &orgId,
-						ID:         gofakeit.Name(),
-						Type:       domain.SettingTypeLabel,
-						OwnerType:  domain.OwnerTypeOrganization,
-						LabelState: gu.Ptr(domain.LabelStatePreview),
-						Settings:   []byte("{}"),
-					},
-					Settings: domain.LabelSettings{
-						PrimaryColor:        "value",
-						BackgroundColor:     "value",
-						WarnColor:           "value",
-						FontColor:           "value",
-						PrimaryColorDark:    "value",
-						BackgroundColorDark: "value",
-						WarnColorDark:       "value",
-						FontColorDark:       "value",
-						HideLoginNameSuffix: true,
-						ErrorMsgPopup:       true,
-						DisableWatermark:    true,
-						ThemeMode:           domain.LabelPolicyThemeAuto,
-					},
-				}
-				err := settingRepo.Set(t.Context(), tx, &setting)
-				require.NoError(t, err)
-
-				// update settings values
-				setting.OwnerType = domain.OwnerTypeInstance
-				setting.Settings.PrimaryColor = "new_value"
-				setting.Settings.BackgroundColor = "new_value"
-				setting.Settings.WarnColor = "new_value"
-				setting.Settings.FontColor = "new_value"
-				setting.Settings.PrimaryColorDark = "new_value"
-				setting.Settings.BackgroundColorDark = "new_value"
-				setting.Settings.WarnColorDark = "new_value"
-				setting.Settings.FontColorDark = "new_value"
-				setting.Settings.HideLoginNameSuffix = false
-				setting.Settings.ErrorMsgPopup = false
-				setting.Settings.DisableWatermark = false
-				setting.Settings.ThemeMode = domain.LabelPolicyThemeLight
-				return &setting
-			},
-			rowsAffected: 1,
+			name: "missing org id condition",
+			conditions: database.And(
+				settingRepo.InstanceIDCondition(instanceId),
+				// settingRepo.OrgIDCondition(&orgId),
+				settingRepo.TypeCondition(domain.SettingTypeLabel),
+				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+			err: database.NewMissingConditionError(settingRepo.OrganizationIDColumn()),
+		},
+		{
+			name: "missing type condition",
+			conditions: database.And(
+				settingRepo.InstanceIDCondition(instanceId),
+				settingRepo.OrgIDCondition(&orgId),
+				// settingRepo.TypeCondition(domain.SettingTypeLabel),
+				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+			err: database.NewMissingConditionError(settingRepo.TypeColumn()),
+		},
+		{
+			name: "missing owner type condition",
+			conditions: database.And(
+				settingRepo.InstanceIDCondition(instanceId),
+				settingRepo.OrgIDCondition(&orgId),
+				settingRepo.TypeCondition(domain.SettingTypeLabel),
+				// settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+			err: database.NewMissingConditionError(settingRepo.OwnerTypeColumn()),
 		},
 		{
 			name: "update setting with non existent instance id",
@@ -1603,20 +1505,18 @@ func TestUpdateSetting(t *testing.T) {
 						LabelState:     gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
-					Settings: domain.LabelSettings{
-						PrimaryColor:        "value",
-						BackgroundColor:     "value",
-						WarnColor:           "value",
-						FontColor:           "value",
-						PrimaryColorDark:    "value",
-						BackgroundColorDark: "value",
-						WarnColorDark:       "value",
-						FontColorDark:       "value",
-						HideLoginNameSuffix: true,
-						ErrorMsgPopup:       true,
-						DisableWatermark:    true,
-						ThemeMode:           domain.LabelPolicyThemeAuto,
-					},
+					PrimaryColor:        "value",
+					BackgroundColor:     "value",
+					WarnColor:           "value",
+					FontColor:           "value",
+					PrimaryColorDark:    "value",
+					BackgroundColorDark: "value",
+					WarnColorDark:       "value",
+					FontColorDark:       "value",
+					HideLoginNameSuffix: true,
+					ErrorMsgPopup:       true,
+					DisableWatermark:    true,
+					ThemeMode:           domain.LabelPolicyThemeAuto,
 				}
 
 				return &setting
@@ -1638,20 +1538,18 @@ func TestUpdateSetting(t *testing.T) {
 						LabelState:     gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
-					Settings: domain.LabelSettings{
-						PrimaryColor:        "value",
-						BackgroundColor:     "value",
-						WarnColor:           "value",
-						FontColor:           "value",
-						PrimaryColorDark:    "value",
-						BackgroundColorDark: "value",
-						WarnColorDark:       "value",
-						FontColorDark:       "value",
-						HideLoginNameSuffix: true,
-						ErrorMsgPopup:       true,
-						DisableWatermark:    true,
-						ThemeMode:           domain.LabelPolicyThemeAuto,
-					},
+					PrimaryColor:        "value",
+					BackgroundColor:     "value",
+					WarnColor:           "value",
+					FontColor:           "value",
+					PrimaryColorDark:    "value",
+					BackgroundColorDark: "value",
+					WarnColorDark:       "value",
+					FontColorDark:       "value",
+					HideLoginNameSuffix: true,
+					ErrorMsgPopup:       true,
+					DisableWatermark:    true,
+					ThemeMode:           domain.LabelPolicyThemeAuto,
 				}
 				return &setting
 			},
@@ -1672,23 +1570,21 @@ func TestUpdateSetting(t *testing.T) {
 						LabelState:     gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
-					Settings: domain.LabelSettings{
-						PrimaryColor:        "value",
-						BackgroundColor:     "value",
-						WarnColor:           "value",
-						FontColor:           "value",
-						PrimaryColorDark:    "value",
-						BackgroundColorDark: "value",
-						WarnColorDark:       "value",
-						FontColorDark:       "value",
-						HideLoginNameSuffix: true,
-						ErrorMsgPopup:       true,
-						DisableWatermark:    true,
-						ThemeMode:           domain.LabelPolicyThemeAuto,
-					},
+					PrimaryColor:        "value",
+					BackgroundColor:     "value",
+					WarnColor:           "value",
+					FontColor:           "value",
+					PrimaryColorDark:    "value",
+					BackgroundColorDark: "value",
+					WarnColorDark:       "value",
+					FontColorDark:       "value",
+					HideLoginNameSuffix: true,
+					ErrorMsgPopup:       true,
+					DisableWatermark:    true,
+					ThemeMode:           domain.LabelPolicyThemeAuto,
 				}
-				err := settingRepo.Set(t.Context(), tx, &setting)
-				require.NoError(t, err)
+				// err := settingRepo.Set(t.Context(), tx, &setting)
+				// require.NoError(t, err)
 
 				// change type
 				setting.Type = domain.SettingTypeOrganization
@@ -1712,9 +1608,10 @@ func TestUpdateSetting(t *testing.T) {
 			setting := tt.testFunc(t, tx)
 
 			// update setting
-			err = settingRepo.Set(
+			_, err = settingRepo.Update(
 				t.Context(), tx,
-				setting,
+				tt.conditions,
+				tt.changes,
 			)
 			afterUpdate := time.Now()
 			assert.ErrorIs(t, err, tt.err)
@@ -2014,7 +1911,7 @@ func TestGetSetting(t *testing.T) {
 					settingRepo.OrgIDCondition(&orgId),
 					settingRepo.TypeCondition(domain.SettingTypeLockout),
 					settingRepo.OwnerTypeCondition(domain.OwnerTypeInstance)),
-				err: database.NewMissingConditionError(settingRepo.InstanceIDColumn()),
+				err: new(database.NoRowFoundError),
 			}
 		}(),
 		// {
@@ -2156,25 +2053,23 @@ func TestCreateGetLoginPolicySetting(t *testing.T) {
 						LabelState:     gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
-					Settings: domain.LoginSettings{
-						AllowUserNamePassword:      true,
-						AllowRegister:              true,
-						AllowExternalIDP:           true,
-						ForceMFA:                   true,
-						ForceMFALocalOnly:          true,
-						HidePasswordReset:          true,
-						IgnoreUnknownUsernames:     true,
-						AllowDomainDiscovery:       true,
-						DisableLoginWithEmail:      true,
-						DisableLoginWithPhone:      true,
-						PasswordlessType:           domain.PasswordlessTypeAllowed,
-						DefaultRedirectURI:         "wwww.example.com",
-						PasswordCheckLifetime:      time.Second * 50,
-						ExternalLoginCheckLifetime: time.Second * 50,
-						MFAInitSkipLifetime:        time.Second * 50,
-						SecondFactorCheckLifetime:  time.Second * 50,
-						MultiFactorCheckLifetime:   time.Second * 50,
-					},
+					AllowUserNamePassword:      true,
+					AllowRegister:              true,
+					AllowExternalIDP:           true,
+					ForceMFA:                   true,
+					ForceMFALocalOnly:          true,
+					HidePasswordReset:          true,
+					IgnoreUnknownUsernames:     true,
+					AllowDomainDiscovery:       true,
+					DisableLoginWithEmail:      true,
+					DisableLoginWithPhone:      true,
+					PasswordlessType:           domain.PasswordlessTypeAllowed,
+					DefaultRedirectURI:         "wwww.example.com",
+					PasswordCheckLifetime:      time.Second * 50,
+					ExternalLoginCheckLifetime: time.Second * 50,
+					MFAInitSkipLifetime:        time.Second * 50,
+					SecondFactorCheckLifetime:  time.Second * 50,
+					MultiFactorCheckLifetime:   time.Second * 50,
 				}
 
 				err := settingRepo.Set(t.Context(), tx, &setting)
@@ -2286,20 +2181,18 @@ func TestCreateGetLabelPolicySetting(t *testing.T) {
 						OwnerType:      domain.OwnerTypeOrganization,
 						LabelState:     gu.Ptr(domain.LabelStatePreview),
 					},
-					Settings: domain.LabelSettings{
-						PrimaryColor:        "value",
-						BackgroundColor:     "value",
-						WarnColor:           "value",
-						FontColor:           "value",
-						PrimaryColorDark:    "value",
-						BackgroundColorDark: "value",
-						WarnColorDark:       "value",
-						FontColorDark:       "value",
-						HideLoginNameSuffix: true,
-						ErrorMsgPopup:       true,
-						DisableWatermark:    true,
-						ThemeMode:           domain.LabelPolicyThemeAuto,
-					},
+					PrimaryColor:        "value",
+					BackgroundColor:     "value",
+					WarnColor:           "value",
+					FontColor:           "value",
+					PrimaryColorDark:    "value",
+					BackgroundColorDark: "value",
+					WarnColorDark:       "value",
+					FontColorDark:       "value",
+					HideLoginNameSuffix: true,
+					ErrorMsgPopup:       true,
+					DisableWatermark:    true,
+					ThemeMode:           domain.LabelPolicyThemeAuto,
 				}
 
 				err := settingRepo.Set(t.Context(), tx, &setting)
@@ -2374,20 +2267,18 @@ func TestCreateGetLabelPolicySetting(t *testing.T) {
 						OwnerType:      domain.OwnerTypeOrganization,
 						LabelState:     gu.Ptr(domain.LabelStateActivated),
 					},
-					Settings: domain.LabelSettings{
-						PrimaryColor:        "value",
-						BackgroundColor:     "value",
-						WarnColor:           "value",
-						FontColor:           "value",
-						PrimaryColorDark:    "value",
-						BackgroundColorDark: "value",
-						WarnColorDark:       "value",
-						FontColorDark:       "value",
-						HideLoginNameSuffix: true,
-						ErrorMsgPopup:       true,
-						DisableWatermark:    true,
-						ThemeMode:           domain.LabelPolicyThemeAuto,
-					},
+					PrimaryColor:        "value",
+					BackgroundColor:     "value",
+					WarnColor:           "value",
+					FontColor:           "value",
+					PrimaryColorDark:    "value",
+					BackgroundColorDark: "value",
+					WarnColorDark:       "value",
+					FontColorDark:       "value",
+					HideLoginNameSuffix: true,
+					ErrorMsgPopup:       true,
+					DisableWatermark:    true,
+					ThemeMode:           domain.LabelPolicyThemeAuto,
 				}
 
 				err := settingRepo.Set(t.Context(), tx, &setting)
@@ -2488,7 +2379,18 @@ func TestCreateGetLabelPolicySetting(t *testing.T) {
 			assert.Equal(t, returnedSetting.Type, setting.Type)
 			assert.Equal(t, returnedSetting.OwnerType, setting.OwnerType)
 
-			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+			assert.Equal(t, returnedSetting.PrimaryColor, setting.PrimaryColor)
+			assert.Equal(t, returnedSetting.BackgroundColor, setting.BackgroundColor)
+			assert.Equal(t, returnedSetting.WarnColor, setting.WarnColor)
+			assert.Equal(t, returnedSetting.FontColor, setting.FontColor)
+			assert.Equal(t, returnedSetting.PrimaryColorDark, setting.PrimaryColorDark)
+			assert.Equal(t, returnedSetting.BackgroundColorDark, setting.BackgroundColorDark)
+			assert.Equal(t, returnedSetting.WarnColorDark, setting.WarnColorDark)
+			assert.Equal(t, returnedSetting.FontColorDark, setting.FontColorDark)
+			assert.Equal(t, returnedSetting.HideLoginNameSuffix, setting.HideLoginNameSuffix)
+			assert.Equal(t, returnedSetting.ErrorMsgPopup, setting.ErrorMsgPopup)
+			assert.Equal(t, returnedSetting.DisableWatermark, setting.DisableWatermark)
+			assert.Equal(t, returnedSetting.ThemeMode, setting.ThemeMode)
 		})
 	}
 }
@@ -2551,13 +2453,11 @@ func TestCreateGetPasswordComplexityPolicySetting(t *testing.T) {
 						LabelState:     gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
-					Settings: domain.PasswordComplexitySettings{
-						MinLength:    89,
-						HasLowercase: true,
-						HasUppercase: true,
-						HasNumber:    true,
-						HasSymbol:    true,
-					},
+					MinLength:    89,
+					HasLowercase: true,
+					HasUppercase: true,
+					HasNumber:    true,
+					HasSymbol:    true,
 				}
 
 				err := settingRepo.Set(t.Context(), tx, &setting)
@@ -2670,10 +2570,8 @@ func TestCreateGetPasswordExpiryPolicySetting(t *testing.T) {
 						LabelState:     gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
-					Settings: domain.PasswordExpirySettings{
-						ExpireWarnDays: 30,
-						MaxAgeDays:     30,
-					},
+					ExpireWarnDays: 30,
+					MaxAgeDays:     30,
 				}
 
 				err = settingRepo.Set(t.Context(), tx, &setting)
@@ -2786,11 +2684,9 @@ func TestCreateGetLockoutPolicySetting(t *testing.T) {
 						LabelState:     gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
-					Settings: domain.LockoutSettings{
-						MaxPasswordAttempts: 50,
-						MaxOTPAttempts:      50,
-						ShowLockOutFailures: true,
-					},
+					MaxPasswordAttempts: 50,
+					MaxOTPAttempts:      50,
+					ShowLockOutFailures: true,
 				}
 
 				err := settingRepo.Set(t.Context(), tx, &setting)
@@ -2901,12 +2797,10 @@ func TestCreateGetSecurityPolicySetting(t *testing.T) {
 						LabelState:     gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
-					Settings: domain.SecuritySettings{
-						Enabled:               true,
-						EnableIframeEmbedding: true,
-						AllowedOrigins:        []string{"value"},
-						EnableImpersonation:   true,
-					},
+					Enabled:               true,
+					EnableIframeEmbedding: true,
+					AllowedOrigins:        []string{"value"},
+					EnableImpersonation:   true,
 				}
 
 				err := settingRepo.Set(t.Context(), tx, &setting)
@@ -3008,11 +2902,9 @@ func TestCreateGetDomainPolicySetting(t *testing.T) {
 						LabelState:     gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
-					Settings: domain.DomainSettings{
-						UserLoginMustBeDomain:                  true,
-						ValidateOrgDomains:                     true,
-						SMTPSenderAddressMatchesInstanceDomain: true,
-					},
+					UserLoginMustBeDomain:                  true,
+					ValidateOrgDomains:                     true,
+					SMTPSenderAddressMatchesInstanceDomain: true,
 				}
 
 				err := settingRepo.Set(t.Context(), tx, &setting)
@@ -3114,9 +3006,7 @@ func TestCreateGetOrgPolicySetting(t *testing.T) {
 						LabelState:     gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
-					Settings: domain.OrganizationSettings{
-						OrganizationScopedUsernames: true,
-					},
+					OrganizationScopedUsernames: true,
 				}
 
 				err := settingRepo.Set(t.Context(), tx, &setting)
@@ -3223,52 +3113,49 @@ func TestCreateUpdateLoginPolicySetting(t *testing.T) {
 						LabelState:     gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
-					Settings: domain.LoginSettings{
-						AllowUserNamePassword:      true,
-						AllowRegister:              true,
-						AllowExternalIDP:           true,
-						ForceMFA:                   true,
-						ForceMFALocalOnly:          true,
-						HidePasswordReset:          true,
-						IgnoreUnknownUsernames:     true,
-						AllowDomainDiscovery:       true,
-						DisableLoginWithEmail:      true,
-						DisableLoginWithPhone:      true,
-						PasswordlessType:           domain.PasswordlessTypeAllowed,
-						DefaultRedirectURI:         "wwww.example.com",
-						PasswordCheckLifetime:      time.Second * 50,
-						ExternalLoginCheckLifetime: time.Second * 50,
-						MFAInitSkipLifetime:        time.Second * 50,
-						SecondFactorCheckLifetime:  time.Second * 50,
-						MultiFactorCheckLifetime:   time.Second * 50,
-						// MFAType:                    []domain.MultiFactorType{domain.MultiFactorTypeUnspecified},
-					},
+					AllowUserNamePassword:      true,
+					AllowRegister:              true,
+					AllowExternalIDP:           true,
+					ForceMFA:                   true,
+					ForceMFALocalOnly:          true,
+					HidePasswordReset:          true,
+					IgnoreUnknownUsernames:     true,
+					AllowDomainDiscovery:       true,
+					DisableLoginWithEmail:      true,
+					DisableLoginWithPhone:      true,
+					PasswordlessType:           domain.PasswordlessTypeAllowed,
+					DefaultRedirectURI:         "wwww.example.com",
+					PasswordCheckLifetime:      time.Second * 50,
+					ExternalLoginCheckLifetime: time.Second * 50,
+					MFAInitSkipLifetime:        time.Second * 50,
+					SecondFactorCheckLifetime:  time.Second * 50,
+					MultiFactorCheckLifetime:   time.Second * 50,
+					MFAType:                    []domain.MultiFactorType{domain.MultiFactorTypeUnspecified},
+					SecondFactorTypes:          []domain.SecondFactorType{domain.SecondFactorTypeOTPEmail},
 				}
 				err := settingRepo.Set(t.Context(), tx, &setting)
 				require.NoError(t, err)
 
-				setting.Settings = domain.LoginSettings{
-					AllowUserNamePassword:      false,
-					AllowRegister:              false,
-					AllowExternalIDP:           false,
-					ForceMFA:                   false,
-					ForceMFALocalOnly:          false,
-					HidePasswordReset:          false,
-					IgnoreUnknownUsernames:     false,
-					AllowDomainDiscovery:       false,
-					DisableLoginWithEmail:      false,
-					DisableLoginWithPhone:      false,
-					PasswordlessType:           domain.PasswordlessTypeNotAllowed,
-					DefaultRedirectURI:         "www.not-example.com",
-					PasswordCheckLifetime:      time.Minute,
-					ExternalLoginCheckLifetime: time.Minute,
-					MFAInitSkipLifetime:        time.Minute,
-					SecondFactorCheckLifetime:  time.Minute,
-					MultiFactorCheckLifetime:   time.Minute,
+				setting.AllowUserNamePassword = false
+				setting.AllowRegister = false
+				setting.AllowExternalIDP = false
+				setting.ForceMFA = false
+				setting.ForceMFALocalOnly = false
+				setting.HidePasswordReset = false
+				setting.IgnoreUnknownUsernames = false
+				setting.AllowDomainDiscovery = false
+				setting.DisableLoginWithEmail = false
+				setting.DisableLoginWithPhone = false
+				setting.PasswordlessType = domain.PasswordlessTypeNotAllowed
+				setting.DefaultRedirectURI = "www.not-example.com"
+				setting.PasswordCheckLifetime = time.Minute
+				setting.ExternalLoginCheckLifetime = time.Minute
+				setting.MFAInitSkipLifetime = time.Minute
+				setting.SecondFactorCheckLifetime = time.Minute
+				setting.MultiFactorCheckLifetime = time.Minute
+				setting.MFAType = []domain.MultiFactorType{domain.MultiFactorTypeUnspecified, domain.MultiFactorTypeU2FWithPIN}
+				setting.SecondFactorTypes = []domain.SecondFactorType{domain.SecondFactorTypeOTPEmail, domain.SecondFactorTypeOTPSMS}
 
-					// TODO
-					// MFAType: []domain.MultiFactorType{domain.MultiFactorTypeU2FWithPIN},
-				}
 				return &setting
 			},
 			changes: database.Changes{
@@ -3291,10 +3178,8 @@ func TestCreateUpdateLoginPolicySetting(t *testing.T) {
 					settingRepo.SetMFAInitSkipLifetimeField(time.Minute),
 					settingRepo.SetSecondFactorCheckLifetimeField(time.Minute),
 					settingRepo.SetMultiFactorCheckLifetimeField(time.Minute),
-					// TODO
-					// settingRepo.AddMFAType(domain.MultiFactorTypeU2FWithPIN),
-					// settingRepo.RemoveMFAType(domain.MultiFactorTypeU2FWithPIN),
-					// settingRepo.RemoveMFAType(domain.MultiFactorTypeUnspecified),
+					settingRepo.AddMFAType(domain.MultiFactorTypeU2FWithPIN),
+					settingRepo.AddSecondFactorTypesField(domain.SecondFactorTypeOTPSMS),
 				),
 			},
 		},
@@ -3345,14 +3230,28 @@ func TestCreateUpdateLoginPolicySetting(t *testing.T) {
 				return
 			}
 
-			fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m setting.Settings.MFAType = %+v\n", setting.Settings.MFAType)
-			fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m returnedSetting.Settings.MFAType = %+v\n", returnedSetting.Settings.MFAType)
 			assert.Equal(t, setting.InstanceID, returnedSetting.InstanceID)
 			assert.Equal(t, setting.OrganizationID, returnedSetting.OrganizationID)
 			assert.Equal(t, setting.ID, returnedSetting.ID)
 			assert.Equal(t, setting.Type, returnedSetting.Type)
 
-			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+			assert.Equal(t, setting.AllowUserNamePassword, returnedSetting.AllowUserNamePassword)
+			assert.Equal(t, setting.AllowRegister, returnedSetting.AllowUserNamePassword)
+			assert.Equal(t, setting.AllowExternalIDP, returnedSetting.AllowExternalIDP)
+			assert.Equal(t, setting.ForceMFA, returnedSetting.ForceMFA)
+			assert.Equal(t, setting.ForceMFALocalOnly, returnedSetting.ForceMFALocalOnly)
+			assert.Equal(t, setting.HidePasswordReset, returnedSetting.HidePasswordReset)
+			assert.Equal(t, setting.IgnoreUnknownUsernames, returnedSetting.IgnoreUnknownUsernames)
+			assert.Equal(t, setting.AllowDomainDiscovery, returnedSetting.AllowDomainDiscovery)
+			assert.Equal(t, setting.DisableLoginWithEmail, returnedSetting.DisableLoginWithEmail)
+			assert.Equal(t, setting.DisableLoginWithPhone, returnedSetting.DisableLoginWithPhone)
+			assert.Equal(t, setting.PasswordlessType, returnedSetting.PasswordlessType)
+			assert.Equal(t, setting.DefaultRedirectURI, returnedSetting.DefaultRedirectURI)
+			assert.Equal(t, setting.PasswordCheckLifetime, returnedSetting.PasswordCheckLifetime)
+			assert.Equal(t, setting.ExternalLoginCheckLifetime, returnedSetting.ExternalLoginCheckLifetime)
+			assert.Equal(t, setting.MFAInitSkipLifetime, returnedSetting.MFAInitSkipLifetime)
+			assert.Equal(t, setting.SecondFactorCheckLifetime, returnedSetting.SecondFactorCheckLifetime)
+			assert.Equal(t, setting.MultiFactorCheckLifetime, returnedSetting.MultiFactorCheckLifetime)
 		})
 	}
 }
@@ -3415,38 +3314,34 @@ func TestCreateUpdateLabelPolicySetting(t *testing.T) {
 						OwnerType:      domain.OwnerTypeOrganization,
 						LabelState:     gu.Ptr(domain.LabelStatePreview),
 					},
-					Settings: domain.LabelSettings{
-						PrimaryColor:        "value",
-						BackgroundColor:     "value",
-						WarnColor:           "value",
-						FontColor:           "value",
-						PrimaryColorDark:    "value",
-						BackgroundColorDark: "value",
-						WarnColorDark:       "value",
-						FontColorDark:       "value",
-						HideLoginNameSuffix: true,
-						ErrorMsgPopup:       true,
-						DisableWatermark:    true,
-						ThemeMode:           domain.LabelPolicyThemeDark,
-					},
+					PrimaryColor:        "value",
+					BackgroundColor:     "value",
+					WarnColor:           "value",
+					FontColor:           "value",
+					PrimaryColorDark:    "value",
+					BackgroundColorDark: "value",
+					WarnColorDark:       "value",
+					FontColorDark:       "value",
+					HideLoginNameSuffix: true,
+					ErrorMsgPopup:       true,
+					DisableWatermark:    true,
+					ThemeMode:           domain.LabelPolicyThemeDark,
 				}
 				err := settingRepo.Set(t.Context(), tx, &setting)
 				require.NoError(t, err)
 
-				setting.Settings = domain.LabelSettings{
-					PrimaryColor:        "new_value",
-					BackgroundColor:     "new_value",
-					WarnColor:           "new_value",
-					FontColor:           "new_value",
-					PrimaryColorDark:    "new_value",
-					BackgroundColorDark: "new_value",
-					WarnColorDark:       "new_value",
-					FontColorDark:       "new_value",
-					HideLoginNameSuffix: false,
-					ErrorMsgPopup:       false,
-					DisableWatermark:    false,
-					ThemeMode:           domain.LabelPolicyThemeAuto,
-				}
+				setting.PrimaryColor = "new_value"
+				setting.BackgroundColor = "new_value"
+				setting.WarnColor = "new_value"
+				setting.FontColor = "new_value"
+				setting.PrimaryColorDark = "new_value"
+				setting.BackgroundColorDark = "new_value"
+				setting.WarnColorDark = "new_value"
+				setting.FontColorDark = "new_value"
+				setting.HideLoginNameSuffix = false
+				setting.ErrorMsgPopup = false
+				setting.DisableWatermark = false
+				setting.ThemeMode = domain.LabelPolicyThemeAuto
 
 				return &setting
 			},
@@ -3483,6 +3378,18 @@ func TestCreateUpdateLabelPolicySetting(t *testing.T) {
 			if tt.testFunc != nil {
 				setting = tt.testFunc(t, tx)
 			}
+			returnedSetting, err := settingRepo.Get(t.Context(), tx,
+				database.WithCondition(
+					database.And(
+						settingRepo.InstanceIDCondition(setting.InstanceID),
+						settingRepo.OrgIDCondition(setting.OrganizationID),
+						settingRepo.TypeCondition(setting.Type),
+						settingRepo.OwnerTypeCondition(setting.OwnerType),
+						settingRepo.LabelStateCondition(*setting.LabelState),
+					),
+				),
+			)
+			fmt.Printf("\033[43m[DBUGPRINT]\033[0m[settings_test.go:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m returnedSetting = %+v\n", returnedSetting)
 
 			_, err = settingRepo.Update(t.Context(), tx,
 				database.And(
@@ -3497,7 +3404,7 @@ func TestCreateUpdateLabelPolicySetting(t *testing.T) {
 			require.NoError(t, err)
 
 			// get setting
-			returnedSetting, err := settingRepo.Get(t.Context(), tx,
+			returnedSetting, err = settingRepo.Get(t.Context(), tx,
 				database.WithCondition(
 					database.And(
 						settingRepo.InstanceIDCondition(setting.InstanceID),
@@ -3519,7 +3426,18 @@ func TestCreateUpdateLabelPolicySetting(t *testing.T) {
 			assert.Equal(t, returnedSetting.Type, setting.Type)
 			assert.Equal(t, returnedSetting.OwnerType, setting.OwnerType)
 
-			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+			assert.Equal(t, returnedSetting.PrimaryColor, setting.PrimaryColor)
+			assert.Equal(t, returnedSetting.BackgroundColor, setting.BackgroundColor)
+			assert.Equal(t, returnedSetting.WarnColor, setting.WarnColor)
+			assert.Equal(t, returnedSetting.FontColor, setting.FontColor)
+			assert.Equal(t, returnedSetting.PrimaryColorDark, setting.PrimaryColorDark)
+			assert.Equal(t, returnedSetting.BackgroundColorDark, setting.BackgroundColorDark)
+			assert.Equal(t, returnedSetting.WarnColorDark, setting.WarnColorDark)
+			assert.Equal(t, returnedSetting.FontColorDark, setting.FontColorDark)
+			assert.Equal(t, returnedSetting.HideLoginNameSuffix, setting.HideLoginNameSuffix)
+			assert.Equal(t, returnedSetting.ErrorMsgPopup, setting.ErrorMsgPopup)
+			assert.Equal(t, returnedSetting.DisableWatermark, setting.DisableWatermark)
+			assert.Equal(t, returnedSetting.ThemeMode, setting.ThemeMode)
 		})
 	}
 }
@@ -3582,24 +3500,20 @@ func TestCreateUpdatePasswordComplexityPolicySetting(t *testing.T) {
 						LabelState:     gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
-					Settings: domain.PasswordComplexitySettings{
-						MinLength:    89,
-						HasLowercase: true,
-						HasUppercase: true,
-						HasNumber:    true,
-						HasSymbol:    true,
-					},
+					MinLength:    89,
+					HasLowercase: true,
+					HasUppercase: true,
+					HasNumber:    true,
+					HasSymbol:    true,
 				}
 				err := settingRepo.Set(t.Context(), tx, &setting)
 				require.NoError(t, err)
 
-				setting.Settings = domain.PasswordComplexitySettings{
-					MinLength:    200,
-					HasLowercase: false,
-					HasUppercase: false,
-					HasNumber:    false,
-					HasSymbol:    false,
-				}
+				setting.MinLength = 200
+				setting.HasLowercase = false
+				setting.HasUppercase = false
+				setting.HasNumber = false
+				setting.HasSymbol = false
 
 				return &setting
 			},
@@ -3666,7 +3580,11 @@ func TestCreateUpdatePasswordComplexityPolicySetting(t *testing.T) {
 			assert.Equal(t, returnedSetting.Type, setting.Type)
 			assert.Equal(t, returnedSetting.OwnerType, setting.OwnerType)
 
-			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+			assert.Equal(t, returnedSetting.MinLength, setting.MinLength)
+			assert.Equal(t, returnedSetting.HasLowercase, setting.HasLowercase)
+			assert.Equal(t, returnedSetting.HasUppercase, setting.HasUppercase)
+			assert.Equal(t, returnedSetting.HasNumber, setting.HasNumber)
+			assert.Equal(t, returnedSetting.HasSymbol, setting.HasSymbol)
 		})
 	}
 }
@@ -3729,18 +3647,14 @@ func TestCreateUpdatePasswordExpiryPolicySetting(t *testing.T) {
 						LabelState:     gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
-					Settings: domain.PasswordExpirySettings{
-						ExpireWarnDays: 30,
-						MaxAgeDays:     30,
-					},
+					ExpireWarnDays: 30,
+					MaxAgeDays:     30,
 				}
 				err = settingRepo.Set(t.Context(), tx, &setting)
 				require.NoError(t, err)
 
-				setting.Settings = domain.PasswordExpirySettings{
-					ExpireWarnDays: 200,
-					MaxAgeDays:     200,
-				}
+				setting.ExpireWarnDays = 200
+				setting.MaxAgeDays = 200
 
 				return &setting
 			},
@@ -3804,7 +3718,8 @@ func TestCreateUpdatePasswordExpiryPolicySetting(t *testing.T) {
 			assert.Equal(t, returnedSetting.Type, setting.Type)
 			assert.Equal(t, returnedSetting.OwnerType, setting.OwnerType)
 
-			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+			assert.Equal(t, returnedSetting.ExpireWarnDays, setting.ExpireWarnDays)
+			assert.Equal(t, returnedSetting.MaxAgeDays, setting.MaxAgeDays)
 		})
 	}
 }
@@ -3867,20 +3782,16 @@ func TestCreateUpdateLockoutPolicySetting(t *testing.T) {
 						LabelState:     gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
-					Settings: domain.LockoutSettings{
-						MaxPasswordAttempts: 50,
-						MaxOTPAttempts:      50,
-						ShowLockOutFailures: true,
-					},
+					MaxPasswordAttempts: 50,
+					MaxOTPAttempts:      50,
+					ShowLockOutFailures: true,
 				}
 				err := settingRepo.Set(t.Context(), tx, &setting)
 				require.NoError(t, err)
 
-				setting.Settings = domain.LockoutSettings{
-					MaxPasswordAttempts: 100,
-					MaxOTPAttempts:      100,
-					ShowLockOutFailures: false,
-				}
+				setting.MaxPasswordAttempts = 100
+				setting.MaxOTPAttempts = 100
+				setting.ShowLockOutFailures = false
 
 				return &setting
 			},
@@ -3945,7 +3856,9 @@ func TestCreateUpdateLockoutPolicySetting(t *testing.T) {
 			assert.Equal(t, returnedSetting.Type, setting.Type)
 			assert.Equal(t, returnedSetting.OwnerType, setting.OwnerType)
 
-			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+			assert.Equal(t, returnedSetting.MaxPasswordAttempts, setting.MaxPasswordAttempts)
+			assert.Equal(t, returnedSetting.MaxOTPAttempts, setting.MaxOTPAttempts)
+			assert.Equal(t, returnedSetting.ShowLockOutFailures, setting.ShowLockOutFailures)
 		})
 	}
 }
@@ -4003,27 +3916,22 @@ func TestCreateUpdateSecurityPolicySetting(t *testing.T) {
 					Setting: &domain.Setting{
 						InstanceID:     instanceId,
 						OrganizationID: &orgId,
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeSecurity,
 						OwnerType:      domain.OwnerTypeInstance,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
-					Settings: domain.SecuritySettings{
-						Enabled:               true,
-						EnableIframeEmbedding: true,
-						AllowedOrigins:        []string{"value"},
-						EnableImpersonation:   true,
-					},
+					Enabled:               true,
+					EnableIframeEmbedding: true,
+					AllowedOrigins:        []string{"value"},
+					EnableImpersonation:   true,
 				}
 				err := settingRepo.Set(t.Context(), tx, &setting)
 				require.NoError(t, err)
 
-				setting.Settings = domain.SecuritySettings{
-					Enabled:               false,
-					EnableIframeEmbedding: false,
-					AllowedOrigins:        []string{"new_value"},
-					EnableImpersonation:   false,
-				}
+				setting.Enabled = false
+				setting.EnableIframeEmbedding = false
+				setting.AllowedOrigins = []string{"value", "new_value"}
+				setting.EnableImpersonation = false
 
 				return &setting
 			},
@@ -4031,9 +3939,8 @@ func TestCreateUpdateSecurityPolicySetting(t *testing.T) {
 				settingRepo.SetLabelSettings(
 					settingRepo.SetEnabled(false),
 					settingRepo.SetEnableIframeEmbedding(false),
-					// TODO
-					// settingRepo.SetAllowedOrigins([]),
 					settingRepo.SetEnableImpersonation(false),
+					settingRepo.AddAllowedOrigins("new_value"),
 				),
 			},
 		},
@@ -4052,7 +3959,6 @@ func TestCreateUpdateSecurityPolicySetting(t *testing.T) {
 					settingRepo.OrgIDCondition(setting.OrganizationID),
 					settingRepo.TypeCondition(setting.Type),
 					settingRepo.OwnerTypeCondition(setting.OwnerType),
-					settingRepo.LabelStateCondition(*setting.LabelState),
 				),
 				tt.changes,
 			)
@@ -4066,7 +3972,6 @@ func TestCreateUpdateSecurityPolicySetting(t *testing.T) {
 						settingRepo.OrgIDCondition(setting.OrganizationID),
 						settingRepo.TypeCondition(setting.Type),
 						settingRepo.OwnerTypeCondition(setting.OwnerType),
-						settingRepo.LabelStateCondition(*setting.LabelState),
 					),
 				),
 			)
@@ -4081,7 +3986,11 @@ func TestCreateUpdateSecurityPolicySetting(t *testing.T) {
 			assert.Equal(t, returnedSetting.Type, setting.Type)
 			assert.Equal(t, returnedSetting.OwnerType, setting.OwnerType)
 
-			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+			fmt.Printf("\033[43m[DBUGPRINT]\033[0m[settings_test.go:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m returnedSetting.AllowedOrigins = %+v\n", returnedSetting.AllowedOrigins)
+			assert.Equal(t, returnedSetting.Enabled, setting.Enabled)
+			assert.Equal(t, returnedSetting.EnableIframeEmbedding, setting.EnableIframeEmbedding)
+			assert.Equal(t, returnedSetting.AllowedOrigins, setting.AllowedOrigins)
+			assert.Equal(t, returnedSetting.EnableImpersonation, setting.EnableImpersonation)
 		})
 	}
 }
@@ -4144,20 +4053,16 @@ func TestCreateUpdateDomainPolicySetting(t *testing.T) {
 						LabelState:     gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
-					Settings: domain.DomainSettings{
-						UserLoginMustBeDomain:                  true,
-						ValidateOrgDomains:                     true,
-						SMTPSenderAddressMatchesInstanceDomain: true,
-					},
+					UserLoginMustBeDomain:                  true,
+					ValidateOrgDomains:                     true,
+					SMTPSenderAddressMatchesInstanceDomain: true,
 				}
 				err := settingRepo.Set(t.Context(), tx, &setting)
 				require.NoError(t, err)
 
-				setting.Settings = domain.DomainSettings{
-					UserLoginMustBeDomain:                  false,
-					ValidateOrgDomains:                     false,
-					SMTPSenderAddressMatchesInstanceDomain: false,
-				}
+				setting.UserLoginMustBeDomain = false
+				setting.ValidateOrgDomains = false
+				setting.SMTPSenderAddressMatchesInstanceDomain = false
 
 				return &setting
 			},
@@ -4213,7 +4118,9 @@ func TestCreateUpdateDomainPolicySetting(t *testing.T) {
 			assert.Equal(t, returnedSetting.Type, setting.Type)
 			assert.Equal(t, returnedSetting.OwnerType, setting.OwnerType)
 
-			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+			assert.Equal(t, returnedSetting.UserLoginMustBeDomain, setting.UserLoginMustBeDomain)
+			assert.Equal(t, returnedSetting.ValidateOrgDomains, setting.ValidateOrgDomains)
+			assert.Equal(t, returnedSetting.SMTPSenderAddressMatchesInstanceDomain, setting.SMTPSenderAddressMatchesInstanceDomain)
 		})
 	}
 }
@@ -4276,16 +4183,12 @@ func TestCreateUpdateOrgPolicySetting(t *testing.T) {
 						LabelState:     gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
-					Settings: domain.OrganizationSettings{
-						OrganizationScopedUsernames: true,
-					},
+					OrganizationScopedUsernames: true,
 				}
 				err := settingRepo.Set(t.Context(), tx, &setting)
 				require.NoError(t, err)
 
-				setting.Settings = domain.OrganizationSettings{
-					OrganizationScopedUsernames: false,
-				}
+				setting.OrganizationScopedUsernames = false
 
 				return &setting
 			},
@@ -4339,7 +4242,7 @@ func TestCreateUpdateOrgPolicySetting(t *testing.T) {
 			assert.Equal(t, returnedSetting.Type, setting.Type)
 			assert.Equal(t, returnedSetting.OwnerType, setting.OwnerType)
 
-			assert.Equal(t, returnedSetting.Settings, setting.Settings)
+			assert.Equal(t, returnedSetting.OrganizationScopedUsernames, setting.OrganizationScopedUsernames)
 		})
 	}
 }

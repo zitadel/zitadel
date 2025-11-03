@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/url"
 	"time"
 
@@ -235,19 +236,19 @@ func (l loginSettings) SetMultiFactorCheckLifetimeField(value time.Duration) db_
 	return db_json.NewFieldChange([]string{"multiFactorCheckLifetime"}, value)
 }
 
-func (l loginSettings) AddMFAType(value domain.MultiFactorType) []db_json.JsonUpdate {
+func (l loginSettings) AddMFAType(value domain.MultiFactorType) db_json.JsonUpdate {
 	return db_json.NewArrayChange([]string{"mfaType"}, value, false)
 }
 
-func (l loginSettings) RemoveMFAType(value domain.MultiFactorType) []db_json.JsonUpdate {
+func (l loginSettings) RemoveMFAType(value domain.MultiFactorType) db_json.JsonUpdate {
 	return db_json.NewArrayChange([]string{"mfaType"}, value, true)
 }
 
-func (l loginSettings) AddSecondFactorTypesField(value domain.SecondFactorType) []db_json.JsonUpdate {
+func (l loginSettings) AddSecondFactorTypesField(value domain.SecondFactorType) db_json.JsonUpdate {
 	return db_json.NewArrayChange([]string{"secondFactors"}, value, false)
 }
 
-func (l loginSettings) RemoveSecondFactorTypesField(value domain.SecondFactorType) []db_json.JsonUpdate {
+func (l loginSettings) RemoveSecondFactorTypesField(value domain.SecondFactorType) db_json.JsonUpdate {
 	return db_json.NewArrayChange([]string{"secondFactors"}, value, true)
 }
 
@@ -264,7 +265,7 @@ func (s *loginSettings) Set(ctx context.Context, client database.QueryExecutor, 
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypeLockout
-	return createSetting(ctx, client, setting.Setting, &setting.Settings)
+	return createSetting(ctx, client, setting.Setting, setting)
 }
 
 func (s *loginSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.LoginSetting, error) {
@@ -276,7 +277,7 @@ func (s *loginSettings) Get(ctx context.Context, client database.QueryExecutor, 
 		return nil, err
 	}
 
-	err = json.Unmarshal(loginSetting.Setting.Settings, &loginSetting.Settings)
+	err = json.Unmarshal(loginSetting.Setting.Settings, &loginSetting)
 	if err != nil {
 		return nil, err
 	}
@@ -403,7 +404,7 @@ func (s *labelSettings) Set(ctx context.Context, client database.QueryExecutor, 
 		return ErrMissingOwnerType
 	}
 
-	settingJSON, err := json.Marshal(setting.Settings)
+	settingJSON, err := json.Marshal(setting)
 	if err != nil {
 		return err
 	}
@@ -438,7 +439,7 @@ func (s *labelSettings) Get(ctx context.Context, client database.QueryExecutor, 
 		return nil, err
 	}
 
-	err = json.Unmarshal(labelSetting.Setting.Settings, &labelSetting.Settings)
+	err = json.Unmarshal(labelSetting.Setting.Settings, &labelSetting)
 	if err != nil {
 		return nil, err
 	}
@@ -484,13 +485,13 @@ func (s *settings) CreateLabel(ctx context.Context, client database.QueryExecuto
 	}
 
 	setting.Type = domain.SettingTypeLabel
-	return createSetting(ctx, client, setting.Setting, &setting.Settings)
+	return createSetting(ctx, client, setting.Setting, setting)
 }
 
 func (s *labelSettings) ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *domain.LabelSetting) error {
 	builder := database.StatementBuilder{}
 
-	settingJSON, err := json.Marshal(setting.Settings)
+	settingJSON, err := json.Marshal(setting)
 	if err != nil {
 		return err
 	}
@@ -550,7 +551,7 @@ const activatedLabelSettingStmt = `INSERT INTO zitadel.settings` +
 func (s *settings) ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *domain.LabelSetting) error {
 	builder := database.StatementBuilder{}
 
-	settingJSON, err := json.Marshal(setting.Settings)
+	settingJSON, err := json.Marshal(setting)
 	if err != nil {
 		return err
 	}
@@ -571,7 +572,7 @@ func (s *settings) CreatePasswordComplexity(ctx context.Context, client database
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypePasswordComplexity
-	return createSetting(ctx, client, setting.Setting, &setting.Settings)
+	return createSetting(ctx, client, setting.Setting, setting)
 }
 
 // passwordComplexity
@@ -616,7 +617,7 @@ func (s *passwordComplexitySettings) Set(ctx context.Context, client database.Qu
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypePasswordComplexity
-	return createSetting(ctx, client, setting.Setting, &setting.Settings)
+	return createSetting(ctx, client, setting.Setting, setting)
 }
 
 func (s *passwordComplexitySettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.PasswordComplexitySetting, error) {
@@ -628,7 +629,7 @@ func (s *passwordComplexitySettings) Get(ctx context.Context, client database.Qu
 		return nil, err
 	}
 
-	err = json.Unmarshal(passwordComplexitySetting.Setting.Settings, &passwordComplexitySetting.Settings)
+	err = json.Unmarshal(passwordComplexitySetting.Settings, &passwordComplexitySetting)
 	if err != nil {
 		return nil, err
 	}
@@ -670,7 +671,7 @@ func (s *passwordExpirySettings) Set(ctx context.Context, client database.QueryE
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypePasswordExpiry
-	return createSetting(ctx, client, setting.Setting, &setting.Settings)
+	return createSetting(ctx, client, setting.Setting, setting)
 }
 
 func (s *passwordExpirySettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.PasswordExpirySetting, error) {
@@ -682,7 +683,7 @@ func (s *passwordExpirySettings) Get(ctx context.Context, client database.QueryE
 		return nil, err
 	}
 
-	err = json.Unmarshal(passwordExpirySetting.Setting.Settings, &passwordExpirySetting.Settings)
+	err = json.Unmarshal(passwordExpirySetting.Setting.Settings, &passwordExpirySetting)
 	if err != nil {
 		return nil, err
 	}
@@ -728,7 +729,7 @@ func (s *lockoutSettings) Set(ctx context.Context, client database.QueryExecutor
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypeLockout
-	return createSetting(ctx, client, setting.Setting, &setting.Settings)
+	return createSetting(ctx, client, setting.Setting, setting)
 }
 
 func (s *lockoutSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.LockoutSetting, error) {
@@ -740,7 +741,7 @@ func (s *lockoutSettings) Get(ctx context.Context, client database.QueryExecutor
 		return nil, err
 	}
 
-	err = json.Unmarshal(lockoutSetting.Setting.Settings, &lockoutSetting.Settings)
+	err = json.Unmarshal(lockoutSetting.Setting.Settings, &lockoutSetting)
 	if err != nil {
 		return nil, err
 	}
@@ -769,8 +770,12 @@ func (l securitySettings) SetEnableIframeEmbedding(value bool) db_json.JsonUpdat
 	return db_json.NewFieldChange([]string{"enableIframe_embedding"}, value)
 }
 
-func (l securitySettings) SetAllowedOrigins(value []string) db_json.JsonUpdate {
-	return db_json.NewFieldChange([]string{"allowedOrigins"}, value)
+func (l securitySettings) AddAllowedOrigins(value string) db_json.JsonUpdate {
+	return db_json.NewArrayChange([]string{"allowedOrigins"}, value, false)
+}
+
+func (l securitySettings) RemoveAllowedOrigins(value string) db_json.JsonUpdate {
+	return db_json.NewArrayChange([]string{"allowedOrigins"}, value, true)
 }
 
 func (l securitySettings) SetEnableImpersonation(value bool) db_json.JsonUpdate {
@@ -790,7 +795,9 @@ func (s *securitySettings) Set(ctx context.Context, client database.QueryExecuto
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypeSecurity
-	return createSetting(ctx, client, setting.Setting, &setting.Settings)
+	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[settings_test.go:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m setting = %+v\n", setting)
+	// return createSetting(ctx, client, setting.Setting, &setting.Settings)
+	return createSetting(ctx, client, setting.Setting, setting)
 }
 
 func (s *securitySettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.SecuritySetting, error) {
@@ -802,7 +809,7 @@ func (s *securitySettings) Get(ctx context.Context, client database.QueryExecuto
 		return nil, err
 	}
 
-	err = json.Unmarshal(securitySetting.Setting.Settings, &securitySetting.Settings)
+	err = json.Unmarshal(securitySetting.Setting.Settings, &securitySetting)
 	if err != nil {
 		return nil, err
 	}
@@ -828,7 +835,7 @@ func (s *securitySettings) SetEvent(ctx context.Context, client database.QueryEx
 		return 0, ErrSettingObjectMustNotBeNil
 	}
 
-	settingJSON, err := json.Marshal(setting.Settings)
+	settingJSON, err := json.Marshal(setting)
 	if err != nil {
 		return 0, err
 	}
@@ -877,7 +884,7 @@ func (s *domainSettings) Set(ctx context.Context, client database.QueryExecutor,
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypeDomain
-	return createSetting(ctx, client, setting.Setting, &setting.Settings)
+	return createSetting(ctx, client, setting.Setting, setting)
 }
 
 func (s *domainSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.DomainSetting, error) {
@@ -889,7 +896,7 @@ func (s *domainSettings) Get(ctx context.Context, client database.QueryExecutor,
 		return nil, err
 	}
 
-	err = json.Unmarshal(DomainSetting.Setting.Settings, &DomainSetting.Settings)
+	err = json.Unmarshal(DomainSetting.Setting.Settings, &DomainSetting)
 	if err != nil {
 		return nil, err
 	}
@@ -927,7 +934,7 @@ func (s *organizationSettings) Set(ctx context.Context, client database.QueryExe
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypeOrganization
-	return createSetting(ctx, client, setting.Setting, &setting.Settings)
+	return createSetting(ctx, client, setting.Setting, setting)
 }
 
 func (s *organizationSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.OrganizationSetting, error) {
@@ -939,7 +946,7 @@ func (s *organizationSettings) Get(ctx context.Context, client database.QueryExe
 		return nil, err
 	}
 
-	err = json.Unmarshal(organizationSetting.Setting.Settings, &organizationSetting.Settings)
+	err = json.Unmarshal(organizationSetting.Setting.Settings, &organizationSetting)
 	if err != nil {
 		return nil, err
 	}
@@ -967,7 +974,7 @@ func (s *organizationSettings) SetEvent(ctx context.Context, client database.Que
 		return 0, ErrSettingObjectMustNotBeNil
 	}
 
-	settingJSON, err := json.Marshal(setting.Settings)
+	settingJSON, err := json.Marshal(setting)
 	if err != nil {
 		return 0, err
 	}
@@ -1055,11 +1062,6 @@ const createSettingStmt = `INSERT INTO zitadel.settings` +
 	` settings =  EXCLUDED.settings::JSONB `
 
 func createSetting(ctx context.Context, client database.QueryExecutor, setting *domain.Setting, settings any, changes ...database.Change) error {
-	settingJSON, err := json.Marshal(settings)
-	if err != nil {
-		return err
-	}
-
 	if setting.InstanceID == "" {
 		return ErrMissingInstanceID
 	}
@@ -1078,12 +1080,20 @@ func createSetting(ctx context.Context, client database.QueryExecutor, setting *
 		return ErrMissingOwnerType
 	}
 
+	settingJSON, err := json.Marshal(settings)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[settings_test.go:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m string(settingJSON) = %+v\n", string(settingJSON))
+
 	builder := database.NewStatementBuilder(
 		createSettingStmt,
 		setting.InstanceID,
 		setting.OrganizationID,
 		setting.Type,
 		setting.OwnerType,
+		// TODO
 		setting.LabelState,
 		string(settingJSON))
 

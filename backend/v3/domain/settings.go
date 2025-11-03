@@ -71,7 +71,36 @@ const (
 	SecondFactorTypeOTPSMS
 )
 
-type LoginSettings struct {
+type loginSettingsJSONFieldsChanges interface {
+	SetAllowUserNamePasswordField(value bool) db_json.JsonUpdate
+	SetAllowRegisterField(value bool) db_json.JsonUpdate
+	SetAllowExternalIDPField(value bool) db_json.JsonUpdate
+	SetForceMFAField(value bool) db_json.JsonUpdate
+	SetForceMFALocalOnlyField(value bool) db_json.JsonUpdate
+	SetHidePasswordResetField(value bool) db_json.JsonUpdate
+	SetIgnoreUnknownUsernamesField(value bool) db_json.JsonUpdate
+	SetAllowDomainDiscoveryField(value bool) db_json.JsonUpdate
+	SetDisableLoginWithEmailField(value bool) db_json.JsonUpdate
+	SetDisableLoginWithPhoneField(value bool) db_json.JsonUpdate
+	SetPasswordlessTypeField(value PasswordlessType) db_json.JsonUpdate
+	SetDefaultRedirectURIField(value string) db_json.JsonUpdate
+	SetPasswordCheckLifetimeField(value time.Duration) db_json.JsonUpdate
+	SetExternalLoginCheckLifetimeField(value time.Duration) db_json.JsonUpdate
+	SetMFAInitSkipLifetimeField(value time.Duration) db_json.JsonUpdate
+	SetSecondFactorCheckLifetimeField(value time.Duration) db_json.JsonUpdate
+	SetMultiFactorCheckLifetimeField(value time.Duration) db_json.JsonUpdate
+	AddMFAType(value MultiFactorType) db_json.JsonUpdate
+	RemoveMFAType(value MultiFactorType) db_json.JsonUpdate
+	AddSecondFactorTypesField(value SecondFactorType) db_json.JsonUpdate
+	RemoveSecondFactorTypesField(value SecondFactorType) db_json.JsonUpdate
+}
+
+type loginSettingsJsonChanges interface {
+	loginSettingsJSONFieldsChanges
+}
+
+type LoginSetting struct {
+	*Setting
 	AllowUserNamePassword      bool             `json:"allowUsernamePassword,omitempty"`
 	AllowRegister              bool             `json:"allowRegister,omitempty"`
 	AllowExternalIDP           bool             `json:"allowExternalIdp,omitempty"`
@@ -93,38 +122,6 @@ type LoginSettings struct {
 	MFAType           []MultiFactorType  `json:"mfaType"`
 	SecondFactorTypes []SecondFactorType `json:"secondFactors"`
 }
-type loginSettingsJSONFieldsChanges interface {
-	SetAllowUserNamePasswordField(value bool) db_json.JsonUpdate
-	SetAllowRegisterField(value bool) db_json.JsonUpdate
-	SetAllowExternalIDPField(value bool) db_json.JsonUpdate
-	SetForceMFAField(value bool) db_json.JsonUpdate
-	SetForceMFALocalOnlyField(value bool) db_json.JsonUpdate
-	SetHidePasswordResetField(value bool) db_json.JsonUpdate
-	SetIgnoreUnknownUsernamesField(value bool) db_json.JsonUpdate
-	SetAllowDomainDiscoveryField(value bool) db_json.JsonUpdate
-	SetDisableLoginWithEmailField(value bool) db_json.JsonUpdate
-	SetDisableLoginWithPhoneField(value bool) db_json.JsonUpdate
-	SetPasswordlessTypeField(value PasswordlessType) db_json.JsonUpdate
-	SetDefaultRedirectURIField(value string) db_json.JsonUpdate
-	SetPasswordCheckLifetimeField(value time.Duration) db_json.JsonUpdate
-	SetExternalLoginCheckLifetimeField(value time.Duration) db_json.JsonUpdate
-	SetMFAInitSkipLifetimeField(value time.Duration) db_json.JsonUpdate
-	SetSecondFactorCheckLifetimeField(value time.Duration) db_json.JsonUpdate
-	SetMultiFactorCheckLifetimeField(value time.Duration) db_json.JsonUpdate
-	AddMFAType(value MultiFactorType) []db_json.JsonUpdate
-	RemoveMFAType(value MultiFactorType) []db_json.JsonUpdate
-	AddSecondFactorTypesField(value SecondFactorType) []db_json.JsonUpdate
-	RemoveSecondFactorTypesField(value SecondFactorType) []db_json.JsonUpdate
-}
-
-type loginSettingsJsonChanges interface {
-	loginSettingsJSONFieldsChanges
-}
-
-type LoginSetting struct {
-	*Setting
-	Settings LoginSettings
-}
 
 type LabelPolicyThemeMode int32
 
@@ -141,29 +138,6 @@ const (
 	LabelStatePreview LabelState = iota + 1
 	LabelStateActivated
 )
-
-type LabelSettings struct {
-	PrimaryColor        string               `json:"primaryColor,omitempty"`
-	BackgroundColor     string               `json:"backgroundColor,omitempty"`
-	WarnColor           string               `json:"warnColor,omitempty"`
-	FontColor           string               `json:"fontColor,omitempty"`
-	PrimaryColorDark    string               `json:"primaryColorDark,omitempty"`
-	BackgroundColorDark string               `json:"backgroundColorDark,omitempty"`
-	WarnColorDark       string               `json:"warnColorDark,omitempty"`
-	FontColorDark       string               `json:"fontColorDark,omitempty"`
-	HideLoginNameSuffix bool                 `json:"hideLoginNameSuffix,omitempty"`
-	ErrorMsgPopup       bool                 `json:"errorMsgPopup,omitempty"`
-	DisableWatermark    bool                 `json:"disableMsgPopup,omitempty"`
-	ThemeMode           LabelPolicyThemeMode `json:"themeMode,omitempty"`
-
-	LabelPolicyLightLogoURL *url.URL `json:"labelPolicyLightLogoURL,omitempty"`
-	LabelPolicyDarkLogoURL  *url.URL `json:"labelPolicyDarkLogoURL,omitempty"`
-
-	LabelPolicyLightIconURL *url.URL `json:"labelPolicyLightIconURL,omitempty"`
-	LabelPolicyDarkIconURL  *url.URL `json:"labelPolicyDarkIconURL,omitempty"`
-
-	LabelPolicyFontURL *url.URL `json:"labelPolicyLightFontURL,omitempty"`
-}
 
 type labelSettingsJSONFieldsChanges interface {
 	SetPrimaryColorField(value string) db_json.JsonUpdate
@@ -191,15 +165,26 @@ type labelSettingsJsonChanges interface {
 
 type LabelSetting struct {
 	*Setting
-	Settings LabelSettings
-}
+	PrimaryColor        string               `json:"primaryColor,omitempty"`
+	BackgroundColor     string               `json:"backgroundColor,omitempty"`
+	WarnColor           string               `json:"warnColor,omitempty"`
+	FontColor           string               `json:"fontColor,omitempty"`
+	PrimaryColorDark    string               `json:"primaryColorDark,omitempty"`
+	BackgroundColorDark string               `json:"backgroundColorDark,omitempty"`
+	WarnColorDark       string               `json:"warnColorDark,omitempty"`
+	FontColorDark       string               `json:"fontColorDark,omitempty"`
+	HideLoginNameSuffix bool                 `json:"hideLoginNameSuffix,omitempty"`
+	ErrorMsgPopup       bool                 `json:"errorMsgPopup,omitempty"`
+	DisableWatermark    bool                 `json:"disableMsgPopup,omitempty"`
+	ThemeMode           LabelPolicyThemeMode `json:"themeMode,omitempty"`
 
-type PasswordComplexitySettings struct {
-	MinLength    uint64 `json:"minLength,omitempty"`
-	HasLowercase bool   `json:"hasLowercase,omitempty"`
-	HasUppercase bool   `json:"hasUppercase,omitempty"`
-	HasNumber    bool   `json:"hasNumber,omitempty"`
-	HasSymbol    bool   `json:"hasSymbol,omitempty"`
+	LabelPolicyLightLogoURL *url.URL `json:"labelPolicyLightLogoURL,omitempty"`
+	LabelPolicyDarkLogoURL  *url.URL `json:"labelPolicyDarkLogoURL,omitempty"`
+
+	LabelPolicyLightIconURL *url.URL `json:"labelPolicyLightIconURL,omitempty"`
+	LabelPolicyDarkIconURL  *url.URL `json:"labelPolicyDarkIconURL,omitempty"`
+
+	LabelPolicyFontURL *url.URL `json:"labelPolicyLightFontURL,omitempty"`
 }
 
 type passwordComplexityJSONFieldsChanges interface {
@@ -216,12 +201,12 @@ type passwordComplexitySettingsJsonChanges interface {
 
 type PasswordComplexitySetting struct {
 	*Setting
-	Settings PasswordComplexitySettings
-}
-
-type PasswordExpirySettings struct {
-	ExpireWarnDays uint64 `json:"expireWarnDays,omitempty"`
-	MaxAgeDays     uint64 `json:"maxAgeDays,omitempty"`
+	// Settings PasswordComplexitySettings
+	MinLength    uint64 `json:"minLength,omitempty"`
+	HasLowercase bool   `json:"hasLowercase,omitempty"`
+	HasUppercase bool   `json:"hasUppercase,omitempty"`
+	HasNumber    bool   `json:"hasNumber,omitempty"`
+	HasSymbol    bool   `json:"hasSymbol,omitempty"`
 }
 
 type passwordExpiryJsonUpdates interface {
@@ -235,13 +220,8 @@ type passwordExpirySettingsJsonChanges interface {
 
 type PasswordExpirySetting struct {
 	*Setting
-	Settings PasswordExpirySettings
-}
-
-type LockoutSettings struct {
-	MaxPasswordAttempts uint64 `json:"maxPasswordAttempts,omitempty"`
-	MaxOTPAttempts      uint64 `json:"maxOtpAttempts,omitempty"`
-	ShowLockOutFailures bool   `json:"showLockOutFailures,omitempty"`
+	ExpireWarnDays uint64 `json:"expireWarnDays,omitempty"`
+	MaxAgeDays     uint64 `json:"maxAgeDays,omitempty"`
 }
 
 type lockoutJsonUpdates interface {
@@ -256,13 +236,9 @@ type lockoutSettingsJsonChanges interface {
 
 type LockoutSetting struct {
 	*Setting
-	Settings LockoutSettings
-}
-
-type DomainSettings struct {
-	UserLoginMustBeDomain                  bool `json:"userLoginMustBeDomain,omitempty"`
-	ValidateOrgDomains                     bool `json:"validateOrgDomains,omitempty"`
-	SMTPSenderAddressMatchesInstanceDomain bool `json:"smtpSenderAddressMatchesInstanceDomain,omitempty"`
+	MaxPasswordAttempts uint64 `json:"maxPasswordAttempts,omitempty"`
+	MaxOTPAttempts      uint64 `json:"maxOtpAttempts,omitempty"`
+	ShowLockOutFailures bool   `json:"showLockOutFailures,omitempty"`
 }
 
 type domainJsonUpdates interface {
@@ -277,20 +253,16 @@ type domainSettingsJsonChanges interface {
 
 type DomainSetting struct {
 	*Setting
-	Settings DomainSettings
-}
-
-type SecuritySettings struct {
-	Enabled               bool     `json:"enabled,omitempty"`
-	EnableIframeEmbedding bool     `json:"enableIframe_embedding,omitempty"`
-	AllowedOrigins        []string `json:"allowedOrigins,omitempty"`
-	EnableImpersonation   bool     `json:"enableImpersonation,omitempty"`
+	UserLoginMustBeDomain                  bool `json:"userLoginMustBeDomain,omitempty"`
+	ValidateOrgDomains                     bool `json:"validateOrgDomains,omitempty"`
+	SMTPSenderAddressMatchesInstanceDomain bool `json:"smtpSenderAddressMatchesInstanceDomain,omitempty"`
 }
 
 type securityJsonUpdates interface {
 	SetEnabled(value bool) db_json.JsonUpdate
 	SetEnableIframeEmbedding(value bool) db_json.JsonUpdate
-	SetAllowedOrigins(value []string) db_json.JsonUpdate
+	AddAllowedOrigins(value string) db_json.JsonUpdate
+	RemoveAllowedOrigins(value string) db_json.JsonUpdate
 	SetEnableImpersonation(value bool) db_json.JsonUpdate
 }
 
@@ -300,11 +272,10 @@ type securitySettingsJsonChanges interface {
 
 type SecuritySetting struct {
 	*Setting
-	Settings SecuritySettings
-}
-
-type OrganizationSettings struct {
-	OrganizationScopedUsernames bool `json:"organizationScopedUsernames,omitempty"`
+	Enabled               bool     `json:"enabled,omitempty"`
+	EnableIframeEmbedding bool     `json:"enableIframe_embedding,omitempty"`
+	AllowedOrigins        []string `json:"allowedOrigins,omitempty"`
+	EnableImpersonation   bool     `json:"enableImpersonation,omitempty"`
 }
 
 type organizationJsonUpdates interface {
@@ -317,7 +288,7 @@ type organizationSettingsJsonChanges interface {
 
 type OrganizationSetting struct {
 	*Setting
-	Settings OrganizationSettings
+	OrganizationScopedUsernames bool `json:"organizationScopedUsernames,omitempty"`
 }
 
 type settingsColumns interface {
