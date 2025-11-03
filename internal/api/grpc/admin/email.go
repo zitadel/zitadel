@@ -55,8 +55,9 @@ func (s *Server) AddEmailProviderHTTP(ctx context.Context, req *admin_pb.AddEmai
 		return nil, err
 	}
 	return &admin_pb.AddEmailProviderHTTPResponse{
-		Details: object.DomainToChangeDetailsPb(config.Details),
-		Id:      config.ID,
+		Details:    object.DomainToChangeDetailsPb(config.Details),
+		Id:         config.ID,
+		SigningKey: config.SigningKey,
 	}, nil
 }
 
@@ -66,7 +67,8 @@ func (s *Server) UpdateEmailProviderHTTP(ctx context.Context, req *admin_pb.Upda
 		return nil, err
 	}
 	return &admin_pb.UpdateEmailProviderHTTPResponse{
-		Details: object.DomainToChangeDetailsPb(config.Details),
+		Details:    object.DomainToChangeDetailsPb(config.Details),
+		SigningKey: config.SigningKey,
 	}, nil
 }
 

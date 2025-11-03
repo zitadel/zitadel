@@ -4,17 +4,18 @@ package instance_test
 
 import (
 	"context"
-	"slices"
+	"fmt"
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
@@ -28,43 +29,76 @@ func TestGetInstance(t *testing.T) {
 	defer cancel()
 
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
-	inst := integration.NewInstance(ctxWithSysAuthZ)
-	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
+	instEventStore := integration.NewInstance(ctxWithSysAuthZ)
+	orgOwnerCtxES := instEventStore.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
+
+	instRelational := integration.NewInstance(ctxWithSysAuthZ)
+	orgOwnerCtxREL := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
+	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)}, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+		assert.True(tCollect, got.GetEnableRelationalTables().GetEnabled())
+	})
 
 	t.Cleanup(func() {
-		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+		instRelational.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: instRelational.ID()})
+		instEventStore.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: instEventStore.ID()})
 	})
 
 	tt := []struct {
 		testName           string
+		instance           *integration.Instance
 		inputContext       context.Context
 		expectedInstanceID string
 		expectedErrorMsg   string
 		expectedErrorCode  codes.Code
 	}{
 		{
-			testName:          "when unauthN context should return unauthN error",
+			testName:          "eventstore instance - when unauthN context should return unauthN error",
 			inputContext:      context.Background(),
+			instance:          instEventStore,
 			expectedErrorCode: codes.Unauthenticated,
 			expectedErrorMsg:  "auth header missing",
 		},
 		{
-			testName:          "when unauthZ context should return unauthZ error",
-			inputContext:      orgOwnerCtx,
+			testName:          "eventstore instance - when unauthZ context should return unauthZ error",
+			inputContext:      orgOwnerCtxES,
+			instance:          instEventStore,
 			expectedErrorCode: codes.PermissionDenied,
 			expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
 		},
 		{
-			testName:           "when request succeeds should return matching instance",
+			testName:           "eventstore instance - when request succeeds should return matching instance",
 			inputContext:       ctxWithSysAuthZ,
-			expectedInstanceID: inst.ID(),
+			instance:           instEventStore,
+			expectedInstanceID: instEventStore.ID(),
+		},
+
+		// Relational
+		{
+			testName:          "relational instance - when unauthN context should return unauthN error",
+			inputContext:      context.Background(),
+			instance:          instRelational,
+			expectedErrorCode: codes.Unauthenticated,
+			expectedErrorMsg:  "auth header missing",
+		},
+		{
+			testName:          "relational instance - when unauthZ context should return unauthZ error",
+			inputContext:      orgOwnerCtxREL,
+			instance:          instRelational,
+			expectedErrorCode: codes.PermissionDenied,
+			expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
+		},
+		{
+			testName:           "relational instance - when request succeeds should return matching instance",
+			inputContext:       ctxWithSysAuthZ,
+			instance:           instRelational,
+			expectedInstanceID: instRelational.ID(),
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
 			// Test
-			res, err := inst.Client.InstanceV2Beta.GetInstance(tc.inputContext, &instance.GetInstanceRequest{InstanceId: inst.ID()})
+			res, err := tc.instance.Client.InstanceV2Beta.GetInstance(tc.inputContext, &instance.GetInstanceRequest{InstanceId: tc.instance.ID()})
 
 			// Verify
 			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
@@ -87,26 +121,26 @@ func TestListInstances(t *testing.T) {
 
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
 
-	instances := make([]*integration.Instance, 2)
+	instances := make([]*integration.Instance, 5)
 	inst := integration.NewInstance(ctxWithSysAuthZ)
 	inst2 := integration.NewInstance(ctxWithSysAuthZ)
-	instances[0], instances[1] = inst, inst2
+	inst3 := integration.NewInstance(ctxWithSysAuthZ)
+	inst4 := integration.NewInstance(ctxWithSysAuthZ)
+	inst5 := integration.NewInstance(ctxWithSysAuthZ)
+	instances[0], instances[1], instances[2], instances[3], instances[4] = inst, inst2, inst3, inst4, inst5
 
 	t.Cleanup(func() {
+		inst.Client.FeatureV2.ResetInstanceFeatures(ctxWithSysAuthZ, &feature.ResetInstanceFeaturesRequest{})
 		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
-		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst2.ID()})
+		inst2.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst2.ID()})
+		inst3.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst3.ID()})
+		inst4.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst4.ID()})
+		inst5.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst5.ID()})
 	})
 
-	// Sort in descending order
-	slices.SortFunc(instances, func(i1, i2 *integration.Instance) int {
-		res := i1.Instance.Details.CreationDate.AsTime().Compare(i2.Instance.Details.CreationDate.AsTime())
-		if res == 0 {
-			return res
-		}
-		return -res
-	})
+	orgOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
 
-	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
+	relTableState := integration.RelationalTablesEnableMatrix()
 
 	tt := []struct {
 		testName          string
@@ -137,43 +171,57 @@ func TestListInstances(t *testing.T) {
 		{
 			testName: "when valid request with filter should return paginated response",
 			inputRequest: &instance.ListInstancesRequest{
-				Pagination:    &filter.PaginationRequest{Offset: 0, Limit: 10},
+				Pagination:    &filter.PaginationRequest{Offset: 1, Limit: 3},
 				SortingColumn: instance.FieldName_FIELD_NAME_CREATION_DATE.Enum(),
 				Queries: []*instance.Query{
 					{
 						Query: &instance.Query_IdQuery{
 							IdQuery: &instance.IdsQuery{
-								Ids: []string{inst.ID(), inst2.ID()},
+								Ids: []string{inst.ID(), inst2.ID(), inst3.ID(), inst4.ID(), inst5.ID()},
+							},
+						},
+					},
+					{
+						Query: &instance.Query_DomainQuery{
+							DomainQuery: &instance.DomainsQuery{
+								Domains: []string{inst4.Domain, inst3.Domain, inst2.Domain, inst.Domain},
 							},
 						},
 					},
 				},
 			},
 			inputContext:      ctxWithSysAuthZ,
-			expectedInstances: []string{inst2.ID(), inst.ID()},
+			expectedInstances: []string{inst3.ID(), inst2.ID(), inst.ID()},
 		},
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.testName, func(t *testing.T) {
-			// Test
-			res, err := inst.Client.InstanceV2Beta.ListInstances(tc.inputContext, tc.inputRequest)
-
-			// Verify
-			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
-			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
-
-			if tc.expectedErrorMsg == "" {
-				require.NotNil(t, res)
-
-				require.Len(t, res.GetInstances(), len(tc.expectedInstances))
-
-				for i, ins := range res.GetInstances() {
-					assert.Equal(t, tc.expectedInstances[i], ins.GetId())
-				}
-			}
+	for _, stateCase := range relTableState {
+		integration.EnsureInstanceFeature(t, ctx, inst, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
 		})
+
+		for _, tc := range tt {
+			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tc.testName), func(t *testing.T) {
+				// Test
+				res, err := inst.Client.InstanceV2Beta.ListInstances(tc.inputContext, tc.inputRequest)
+
+				// Verify
+				assert.Equal(t, tc.expectedErrorCode, status.Code(err))
+				assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
+
+				if tc.expectedErrorMsg == "" {
+					require.NotNil(t, res)
+
+					require.Len(t, res.GetInstances(), len(tc.expectedInstances))
+
+					for i, ins := range res.GetInstances() {
+						assert.Equal(t, tc.expectedInstances[i], ins.GetId())
+					}
+				}
+			})
+		}
 	}
+
 }
 
 func TestListCustomDomains(t *testing.T) {
@@ -187,7 +235,7 @@ func TestListCustomDomains(t *testing.T) {
 	inst := integration.NewInstance(ctxWithSysAuthZ)
 
 	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
-	d1, d2 := "custom."+gofakeit.DomainName(), "custom."+gofakeit.DomainName()
+	d1, d2 := "custom."+integration.DomainName(), "custom."+integration.DomainName()
 
 	_, err := inst.Client.InstanceV2Beta.AddCustomDomain(ctxWithSysAuthZ, &instance.AddCustomDomainRequest{InstanceId: inst.ID(), Domain: d1})
 	require.Nil(t, err)
@@ -256,21 +304,24 @@ func TestListCustomDomains(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
-			// Test
-			res, err := inst.Client.InstanceV2Beta.ListCustomDomains(tc.inputContext, tc.inputRequest)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputContext, time.Minute)
+			require.EventuallyWithT(t, func(collect *assert.CollectT) {
+				// Test
+				res, err := inst.Client.InstanceV2Beta.ListCustomDomains(tc.inputContext, tc.inputRequest)
 
-			// Verify
-			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
-			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
+				// Verify
+				assert.Equal(collect, tc.expectedErrorCode, status.Code(err))
+				assert.Equal(collect, tc.expectedErrorMsg, status.Convert(err).Message())
 
-			if tc.expectedErrorMsg == "" {
-				domains := []string{}
-				for _, d := range res.GetDomains() {
-					domains = append(domains, d.GetDomain())
+				if tc.expectedErrorMsg == "" {
+					domains := []string{}
+					for _, d := range res.GetDomains() {
+						domains = append(domains, d.GetDomain())
+					}
+
+					assert.Subset(collect, domains, tc.expectedDomains)
 				}
-
-				assert.Subset(t, domains, tc.expectedDomains)
-			}
+			}, retryDuration, tick)
 		})
 	}
 }
@@ -286,7 +337,7 @@ func TestListTrustedDomains(t *testing.T) {
 	inst := integration.NewInstance(ctxWithSysAuthZ)
 
 	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
-	d1, d2 := "trusted."+gofakeit.DomainName(), "trusted."+gofakeit.DomainName()
+	d1, d2 := "trusted."+integration.DomainName(), "trusted."+integration.DomainName()
 
 	_, err := inst.Client.InstanceV2Beta.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: inst.ID(), Domain: d1})
 	require.Nil(t, err)
@@ -348,23 +399,26 @@ func TestListTrustedDomains(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
-			// Test
-			res, err := inst.Client.InstanceV2Beta.ListTrustedDomains(tc.inputContext, tc.inputRequest)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputContext, time.Minute)
+			require.EventuallyWithT(t, func(collect *assert.CollectT) {
+				// Test
+				res, err := inst.Client.InstanceV2Beta.ListTrustedDomains(tc.inputContext, tc.inputRequest)
 
-			// Verify
-			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
-			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
+				// Verify
+				assert.Equal(collect, tc.expectedErrorCode, status.Code(err))
+				assert.Equal(collect, tc.expectedErrorMsg, status.Convert(err).Message())
 
-			if tc.expectedErrorMsg == "" {
-				require.NotNil(t, res)
+				if tc.expectedErrorMsg == "" {
+					require.NotNil(t, res)
 
-				domains := []string{}
-				for _, d := range res.GetTrustedDomain() {
-					domains = append(domains, d.GetDomain())
+					domains := []string{}
+					for _, d := range res.GetTrustedDomain() {
+						domains = append(domains, d.GetDomain())
+					}
+
+					assert.Subset(collect, domains, tc.expectedDomains)
 				}
-
-				assert.Subset(t, domains, tc.expectedDomains)
-			}
+			}, retryDuration, tick)
 		})
 	}
 }

@@ -26,9 +26,9 @@ func TestMain(m *testing.M) {
 		Instance = integration.NewInstance(ctx)
 
 		CTX = ctx
-		AdminCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-		UserTypeLoginCtx = Instance.WithAuthorization(ctx, integration.UserTypeLogin)
-		OrgOwnerCtx = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
+		AdminCTX = Instance.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
+		UserTypeLoginCtx = Instance.WithAuthorizationToken(ctx, integration.UserTypeLogin)
+		OrgOwnerCtx = Instance.WithAuthorizationToken(ctx, integration.UserTypeOrgOwner)
 
 		Client = Instance.Client.SettingsV2
 		return m.Run()

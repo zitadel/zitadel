@@ -343,6 +343,7 @@ func TestCommandSide_userExistsWriteModel(t *testing.T) {
 								"username",
 								"changed",
 								true,
+								false,
 							),
 						),
 					),

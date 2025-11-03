@@ -3,6 +3,8 @@ package org
 import (
 	"context"
 
+	"connectrpc.com/connect"
+
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/user/v2"
 	"github.com/zitadel/zitadel/internal/command"
@@ -10,8 +12,8 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 )
 
-func (s *Server) AddOrganization(ctx context.Context, request *org.AddOrganizationRequest) (*org.AddOrganizationResponse, error) {
-	orgSetup, err := addOrganizationRequestToCommand(request)
+func (s *Server) AddOrganization(ctx context.Context, request *connect.Request[org.AddOrganizationRequest]) (*connect.Response[org.AddOrganizationResponse], error) {
+	orgSetup, err := addOrganizationRequestToCommand(request.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +70,7 @@ func addOrganizationRequestAdminToCommand(admin *org.AddOrganizationRequest_Admi
 	}
 }
 
-func createdOrganizationToPb(createdOrg *command.CreatedOrg) (_ *org.AddOrganizationResponse, err error) {
+func createdOrganizationToPb(createdOrg *command.CreatedOrg) (_ *connect.Response[org.AddOrganizationResponse], err error) {
 	admins := make([]*org.AddOrganizationResponse_CreatedAdmin, 0, len(createdOrg.OrgAdmins))
 	for _, admin := range createdOrg.OrgAdmins {
 		admin, ok := admin.(*command.CreatedOrgAdmin)
@@ -80,9 +82,9 @@ func createdOrganizationToPb(createdOrg *command.CreatedOrg) (_ *org.AddOrganiza
 			})
 		}
 	}
-	return &org.AddOrganizationResponse{
+	return connect.NewResponse(&org.AddOrganizationResponse{
 		Details:        object.DomainToDetailsPb(createdOrg.ObjectDetails),
 		OrganizationId: createdOrg.ObjectDetails.ResourceOwner,
 		CreatedAdmins:  admins,
-	}, nil
+	}), nil
 }

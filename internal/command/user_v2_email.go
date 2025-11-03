@@ -148,12 +148,17 @@ func (c *Commands) changeUserEmailWithGeneratorEvents(ctx context.Context, userI
 	if err != nil {
 		return nil, err
 	}
-	if err = c.checkPermissionUpdateUser(ctx, cmd.aggregate.ResourceOwner, userID); err != nil {
+	if err = c.checkPermissionUpdateUser(ctx, cmd.aggregate.ResourceOwner, userID, true); err != nil {
 		return nil, err
 	}
 	if err = cmd.Change(ctx, domain.EmailAddress(email)); err != nil {
 		return nil, err
 	}
+
+	if urlTmpl == "" {
+		urlTmpl = c.defaultEmailCodeURLTemplate(ctx)
+	}
+
 	if err = cmd.AddGeneratedCode(ctx, gen, urlTmpl, returnCode); err != nil {
 		return nil, err
 	}
@@ -165,12 +170,17 @@ func (c *Commands) sendUserEmailCodeWithGeneratorEvents(ctx context.Context, use
 	if err != nil {
 		return nil, err
 	}
-	if err = c.checkPermissionUpdateUser(ctx, cmd.aggregate.ResourceOwner, userID); err != nil {
+	if err = c.checkPermissionUpdateUser(ctx, cmd.aggregate.ResourceOwner, userID, true); err != nil {
 		return nil, err
 	}
 	if existingCheck && cmd.model.Code == nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "EMAIL-5w5ilin4yt", "Errors.User.Code.Empty")
 	}
+
+	if urlTmpl == "" {
+		urlTmpl = c.defaultEmailCodeURLTemplate(ctx)
+	}
+
 	if err = cmd.AddGeneratedCode(ctx, gen, urlTmpl, returnCode); err != nil {
 		return nil, err
 	}

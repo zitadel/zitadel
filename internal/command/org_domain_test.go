@@ -1050,6 +1050,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 							org.NewDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org2").Aggregate,
 								false, false, false))),
+					expectFilterOrganizationSettings("org2", false, false),
 					expectPush(
 						org.NewDomainVerifiedEvent(context.Background(),
 							&org.NewAggregate("org1").Aggregate,
@@ -1060,6 +1061,93 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 							"tempid@temporary.zitadel.ch",
 							"username@domain.ch",
 							false,
+						),
+					),
+				),
+				alg:                  crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				domainValidationFunc: validDomainVerification,
+				idGenerator:          id_mock.NewIDGeneratorExpectIDs(t, "tempid"),
+			},
+			args: args{
+				ctx: context.Background(),
+				domain: &domain.OrgDomain{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "org1",
+					},
+					Domain:         "domain.ch",
+					ValidationType: domain.OrgDomainValidationTypeDNS,
+				},
+				claimedUserIDs: []string{"user1"},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "domain verification, claimed users, orgScopedUsername, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"name",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"domain.ch",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainVerificationAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"domain.ch",
+								domain.OrgDomainValidationTypeDNS,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("a"),
+								},
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org2").Aggregate,
+								"username@domain.ch",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email",
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org2").Aggregate,
+								false, false, false))),
+					expectFilterOrganizationSettings("org2", true, true),
+					expectPush(
+						org.NewDomainVerifiedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"domain.ch",
+						),
+						user.NewDomainClaimedEvent(http.WithRequestedHost(context.Background(), "zitadel.ch"),
+							&user.NewAggregate("user1", "org2").Aggregate,
+							"tempid@temporary.zitadel.ch",
+							"username@domain.ch",
+							true,
 						),
 					),
 				),

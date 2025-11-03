@@ -3,6 +3,7 @@ package org
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	// TODO fix below
@@ -71,7 +72,7 @@ func OrgStateToPb(state domain.OrgState) v2beta_org.OrgState {
 	}
 }
 
-func createdOrganizationToPb(createdOrg *command.CreatedOrg) (_ *org.CreateOrganizationResponse, err error) {
+func createdOrganizationToPb(createdOrg *command.CreatedOrg) (_ *connect.Response[org.CreateOrganizationResponse], err error) {
 	admins := make([]*org.OrganizationAdmin, len(createdOrg.OrgAdmins))
 	for i, admin := range createdOrg.OrgAdmins {
 		switch admin := admin.(type) {
@@ -95,11 +96,11 @@ func createdOrganizationToPb(createdOrg *command.CreatedOrg) (_ *org.CreateOrgan
 			}
 		}
 	}
-	return &org.CreateOrganizationResponse{
+	return connect.NewResponse(&org.CreateOrganizationResponse{
 		CreationDate:       timestamppb.New(createdOrg.ObjectDetails.EventDate),
 		Id:                 createdOrg.ObjectDetails.ResourceOwner,
 		OrganizationAdmins: admins,
-	}, nil
+	}), nil
 }
 
 func OrgViewsToPb(orgs []*query.Org) []*v2beta_org.Organization {

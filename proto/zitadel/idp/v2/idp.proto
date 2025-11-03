@@ -64,6 +64,13 @@ enum SAMLBinding {
   SAML_BINDING_ARTIFACT = 3;
 }
 
+enum SAMLSignatureAlgorithm {
+  SAML_SIGNATURE_UNSPECIFIED = 0;
+  SAML_SIGNATURE_RSA_SHA1 = 1;
+  SAML_SIGNATURE_RSA_SHA256 = 2;
+  SAML_SIGNATURE_RSA_SHA512 = 3;
+}
+
 enum SAMLNameIDFormat {
   SAML_NAME_ID_FORMAT_UNSPECIFIED = 0;
   SAML_NAME_ID_FORMAT_EMAIL_ADDRESS = 1;
@@ -306,6 +313,9 @@ message SAMLConfig {
   // Boolean weather federated logout is enabled. If enabled, ZITADEL will send a logout request to the identity provider,
   // if the user terminates the session in ZITADEL. Be sure to provide a SLO endpoint as part of the metadata.
   optional bool federated_logout_enabled = 6;
+  // Specify a Signature Algorithm that should used to sign SAML requests and responses.
+  // Can be set only if `with_signed_request` is set.
+  SAMLSignatureAlgorithm signature_algorithm = 7;
 }
 
 message AzureADConfig {

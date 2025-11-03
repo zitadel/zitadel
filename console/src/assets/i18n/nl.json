@@ -1545,7 +1545,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       }
     },
     "SMTP": {
@@ -1624,12 +1625,8 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Standaard inlogorganisatie",
       "LOGINDEFAULTORG_DESCRIPTION": "Als er geen organisatiecontext is ingesteld, gebruikt de inlog-UI de instellingen van de standaardorganisatie (en niet van de instantie)",
-      "OIDCLEGACYINTROSPECTION": "Oude OIDC-introspectie",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "We hebben onlangs het introspectie-endpoint opnieuw gefactoreerd omwille van de prestaties. Deze functie kan worden gebruikt om terug te keren naar de oude implementatie als er onverwachte bugs optreden.",
       "OIDCTOKENEXCHANGE": "OIDC-tokenuitwisseling",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Schakel het experimentele type verlening urn:ietf:params:oauth:grant-type:token-exchange in voor het OIDC-tokenendpoint. Tokenuitwisseling kan worden gebruikt om tokens met een kleinere scope op te vragen of om zich voor te doen als andere gebruikers. Raadpleeg het beveiligingsbeleid om impersonation op een instantie toe te staan.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC-triggers voor introspectieprojecties",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Schakel projectietriggers in tijdens een introspectieverzoek. Dit kan dienen als een tijdelijke oplossing als er merkbare consistentieproblemen optreden in het introspectieantwoord, maar het kan wel prestaties beïnvloeden. We zijn van plan om triggers voor introspectieverzoeken in de toekomst te verwijderen.",
       "USERSCHEMA": "Gebruikerschema",
       "USERSCHEMA_DESCRIPTION": "Met gebruikerschema's kunt u de dataschema's van gebruikers beheren. Als de vlag is ingeschakeld, kunt u de nieuwe API en zijn functies gebruiken.",
       "ACTIONS": "Acties",
@@ -1638,14 +1635,10 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Als het vlagje is ingeschakeld, kunt u een enkele sessie beëindigen via de login-gebruikersinterface door een id_token met een `sid`-claim als id_token_hint op het eindpunt end_session te verstrekken. Houd er rekening mee dat momenteel alle sessies van dezelfde gebruikersagent (browser) worden beëindigd in de login-gebruikersinterface. Sessies die worden beheerd via de Session API staan al toe om individuele sessies te beëindigen.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Ouderfout",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Als de vlag is ingeschakeld, wordt de OIDC-ouderfout in de console geregistreerd.",
-      "DISABLEUSERTOKENEVENT": "Gebruikerstokengebeurtenis uitschakelen",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Backchannel Logout inschakelen",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "De Back-Channel Logout implementeert OpenID Connect Back-Channel Logout 1.0 en kan worden gebruikt om clients te informeren over het beëindigen van de sessie bij de OpenID-provider.",
       "PERMISSIONCHECKV2": "Permissiecontrole V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Als de vlag is ingeschakeld, kunt u de nieuwe API en de bijbehorende functies gebruiken.",
-      "WEBKEY": "Websleutel",
-      "WEBKEY_DESCRIPTION": "Als de vlag is ingeschakeld, kunt u de nieuwe API en de bijbehorende functies gebruiken.",
       "STATES": {
         "INHERITED": "Overgenomen",
         "ENABLED": "Ingeschakeld",
@@ -1661,7 +1654,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wanneer deze vlag is ingeschakeld, gebruikt de console de V2 User API om nieuwe gebruikers aan te maken. Met de V2 API beginnen nieuw aangemaakte gebruikers zonder een initiële status.",
       "LOGINV2": "Inloggen V2",
       "LOGINV2_DESCRIPTION": "Door dit in te schakelen wordt de nieuwe TypeScript-gebaseerde login-UI geactiveerd met verbeterde beveiliging, prestaties en aanpasbaarheid.",
-      "LOGINV2_BASEURI": "Basis-URI"
+      "LOGINV2_BASEURI": "Basis-URI",
+      "ENABLERELATIONALTABLES": "Relationele tabellen",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Schakel dit in om relationele tabellen te gebruiken in plaats van projecties voor het opslaan van gegevens. Momenteel doet deze schakelaar niets."
     },
     "DIALOG": {
       "RESET": {
@@ -1800,7 +1795,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-mail verificatie voltooid",
@@ -2375,7 +2371,8 @@
       "METADATAXML": "Metadata Xml",
       "METADATAURL": "Metadata URL",
       "BINDING": "Binding",
-      "SIGNEDREQUEST": "Ondertekend Verzoek"
+      "SIGNEDREQUEST": "Ondertekend Verzoek",
+      "SIGNATUREALGORITHM": "Handtekeningalgoritme"
     },
     "TOAST": {
       "SAVED": "Succesvol opgeslagen.",
@@ -2772,7 +2769,8 @@
     "id": "Bahasa Indonesia",
     "hu": "Magyar",
     "ko": "한국어",
-    "ro": "Română"
+    "ro": "Română",
+    "tr": "Türkçe"
   },
   "MEMBER": {
     "ADD": "Voeg een Manager toe",

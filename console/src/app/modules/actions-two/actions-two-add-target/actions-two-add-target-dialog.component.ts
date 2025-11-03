@@ -22,7 +22,6 @@ type TargetTypes = ActionTwoAddTargetDialogComponent['targetTypes'][number];
   selector: 'cnsl-actions-two-add-target-dialog',
   templateUrl: './actions-two-add-target-dialog.component.html',
   styleUrls: ['./actions-two-add-target-dialog.component.scss'],
-  standalone: true,
   imports: [
     CommonModule,
     MatButtonModule,
@@ -89,7 +88,7 @@ export class ActionTwoAddTargetDialogComponent {
       nanos: 0,
     };
 
-    const targetType: Extract<MessageInitShape<typeof CreateTargetRequestSchema>['targetType'], { case: TargetTypes }> =
+    const targetType: MessageInitShape<typeof CreateTargetRequestSchema>['targetType'] =
       type === 'restWebhook'
         ? { case: type, value: { interruptOnError } }
         : type === 'restCall'

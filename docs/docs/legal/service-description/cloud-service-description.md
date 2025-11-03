@@ -17,7 +17,7 @@ This annex of the [Framework Agreement](../terms-of-service) describes the servi
 You will benefit from the same software as the open-source project, but we take care of the hosting, maintenance, backup, scaling, and operational security. The cloud service is managed and maintained by the team that also develops the software.
 
 When creating a new instance, you are able to choose a [data location](#data-location).
-We follow a single-provider strategy by minimizing the involved [sub-processors](../subprocessors.md) to increase security, compliance, and performance of our services. [Billing](./billing.md) is based on effective usage of our services.
+We follow a single-provider strategy by minimizing the involved [sub-processors](../subprocessors.md) to increase security, compliance, and performance of our services. [Billing](https://help.zitadel.com/pricing-and-billing-of-zitadel-services) is based on effective usage of our services.
 
 ### Enterprise license / self-hosted
 

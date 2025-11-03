@@ -1,16 +1,25 @@
 package webauthn
 
 import (
+	"context"
+
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
 
+	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
-func WebAuthNsToCredentials(webAuthNs []*domain.WebAuthNToken, rpID string) []webauthn.Credential {
+func WebAuthNsToCredentials(ctx context.Context, webAuthNs []*domain.WebAuthNToken, rpID string) []webauthn.Credential {
 	creds := make([]webauthn.Credential, 0)
 	for _, webAuthN := range webAuthNs {
-		if webAuthN.State == domain.MFAStateReady && webAuthN.RPID == rpID {
+		// only add credentials that are ready and
+		// either match the rpID or
+		// if they were added through Console / old login UI, there is no stored rpID set;
+		// then we check if the requested rpID matches the instance domain
+		if webAuthN.State == domain.MFAStateReady &&
+			(webAuthN.RPID == rpID ||
+				(webAuthN.RPID == "" && rpID == http.DomainContext(ctx).InstanceDomain())) {
 			creds = append(creds, webauthn.Credential{
 				ID:              webAuthN.KeyID,
 				PublicKey:       webAuthN.PublicKey,

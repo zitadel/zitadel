@@ -49,7 +49,7 @@ func (c *Commands) requestPasswordReset(ctx context.Context, userID string, retu
 	if model.UserState == domain.UserStateInitial {
 		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sfe4g", "Errors.User.NotInitialised")
 	}
-	if err = c.checkPermissionUpdateUser(ctx, model.ResourceOwner, userID); err != nil {
+	if err = c.checkPermissionUpdateUser(ctx, model.ResourceOwner, userID, true); err != nil {
 		return nil, nil, err
 	}
 	var passwordCode *EncryptedCode
@@ -61,6 +61,9 @@ func (c *Commands) requestPasswordReset(ctx context.Context, userID string, retu
 	}
 	if err != nil {
 		return nil, nil, err
+	}
+	if urlTmpl == "" {
+		urlTmpl = c.defaultPasswordSetURLTemplate(ctx)
 	}
 	cmd := user.NewHumanPasswordCodeAddedEventV2(ctx, UserAggregateFromWriteModelCtx(ctx, &model.WriteModel), passwordCode.CryptedCode(), passwordCode.CodeExpiry(), notificationType, urlTmpl, returnCode, generatorID)
 

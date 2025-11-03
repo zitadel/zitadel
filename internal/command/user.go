@@ -43,10 +43,15 @@ func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName s
 	if err = c.userValidateDomain(ctx, orgID, userName, domainPolicy.UserLoginMustBeDomain); err != nil {
 		return nil, err
 	}
+	orgScopedUsernames, err := c.checkOrganizationScopedUsernames(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
 
 	pushedEvents, err := c.eventstore.Push(ctx,
-		user.NewUsernameChangedEvent(ctx, userAgg, existingUser.UserName, userName, domainPolicy.UserLoginMustBeDomain))
+		user.NewUsernameChangedEvent(ctx, userAgg, existingUser.UserName, userName, domainPolicy.UserLoginMustBeDomain, orgScopedUsernames))
 	if err != nil {
 		return nil, err
 	}
@@ -172,7 +177,7 @@ func (c *Commands) UnlockUser(ctx context.Context, userID, resourceOwner string)
 	return writeModelToObjectDetails(&existingUser.WriteModel), nil
 }
 
-func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string, cascadingUserMemberships []*CascadingMembership, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string, cascadingUserMemberships []*CascadingMembership, cascadingGrantIDs, cascadingGroupIDs []string) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
 	}
@@ -189,12 +194,16 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-3M9fs", "Errors.Org.DomainPolicy.NotExisting")
 	}
+	orgScopedUsername, err := c.checkOrganizationScopedUsernames(ctx, existingUser.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
 	var events []eventstore.Command
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
-	events = append(events, user.NewUserRemovedEvent(ctx, userAgg, existingUser.UserName, existingUser.IDPLinks, domainPolicy.UserLoginMustBeDomain))
+	events = append(events, user.NewUserRemovedEvent(ctx, userAgg, existingUser.UserName, existingUser.IDPLinks, domainPolicy.UserLoginMustBeDomain || orgScopedUsername))
 
 	for _, grantID := range cascadingGrantIDs {
-		removeEvent, _, err := c.removeUserGrant(ctx, grantID, "", true)
+		removeEvent, _, err := c.removeUserGrant(ctx, grantID, "", true, false, nil)
 		if err != nil {
 			logging.WithFields("usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
 			continue
@@ -208,6 +217,15 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 			return nil, err
 		}
 		events = append(events, membershipEvents...)
+	}
+
+	// remove user from user groups
+	if len(cascadingGroupIDs) > 0 {
+		groupUserEvents, err := c.removeUserFromGroups(ctx, userID, cascadingGroupIDs, resourceOwner)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, groupUserEvents...)
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
@@ -269,6 +287,11 @@ func (c *Commands) userDomainClaimed(ctx context.Context, userID string) (events
 		return nil, nil, err
 	}
 
+	organizationScopedUsername, err := c.checkOrganizationScopedUsernames(ctx, existingUser.ResourceOwner)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	id, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, nil, err
@@ -279,7 +302,8 @@ func (c *Commands) userDomainClaimed(ctx context.Context, userID string) (events
 			userAgg,
 			fmt.Sprintf("%s@temporary.%s", id, http_util.DomainContext(ctx).RequestedDomain()),
 			existingUser.UserName,
-			domainPolicy.UserLoginMustBeDomain),
+			domainPolicy.UserLoginMustBeDomain || organizationScopedUsername,
+		),
 	}, changedUserGrant, nil
 }
 
@@ -295,6 +319,12 @@ func (c *Commands) prepareUserDomainClaimed(ctx context.Context, filter preparat
 	if err != nil {
 		return nil, err
 	}
+
+	organizationScopedUsername, err := checkOrganizationScopedUsernames(ctx, filter, userWriteModel.ResourceOwner, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	userAgg := UserAggregateFromWriteModel(&userWriteModel.WriteModel)
 
 	id, err := c.idGenerator.Next()
@@ -307,7 +337,8 @@ func (c *Commands) prepareUserDomainClaimed(ctx context.Context, filter preparat
 		userAgg,
 		fmt.Sprintf("%s@temporary.%s", id, http_util.DomainContext(ctx).RequestedDomain()),
 		userWriteModel.UserName,
-		domainPolicy.UserLoginMustBeDomain), nil
+		domainPolicy.UserLoginMustBeDomain || organizationScopedUsername,
+	), nil
 }
 
 func (c *Commands) UserDomainClaimedSent(ctx context.Context, orgID, userID string) (err error) {
@@ -327,18 +358,18 @@ func (c *Commands) UserDomainClaimedSent(ctx context.Context, orgID, userID stri
 	return err
 }
 
-func (c *Commands) checkUserExists(ctx context.Context, userID, resourceOwner string) (err error) {
+func (c *Commands) checkUserExists(ctx context.Context, userID, resourceOwner string) (_ string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if !isUserStateExists(existingUser.UserState) {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-uXHNj", "Errors.User.NotFound")
+		return "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-uXHNj", "Errors.User.NotFound")
 	}
-	return nil
+	return existingUser.ResourceOwner, nil
 }
 
 func (c *Commands) userWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *UserWriteModel, err error) {

@@ -119,10 +119,10 @@ func TestProvider_BeginAuth(t *testing.T) {
 			}
 			if tt.want.err == nil {
 				a.NoError(err)
-				wantHeaders, wantContent := tt.want.session.GetAuth(ctx)
-				gotHeaders, gotContent := session.GetAuth(ctx)
-				a.Equal(wantHeaders, gotHeaders)
-				a.Equal(wantContent, gotContent)
+				wantAuth, wantErr := tt.want.session.GetAuth(ctx)
+				gotAuth, gotErr := session.GetAuth(ctx)
+				a.Equal(wantAuth, gotAuth)
+				a.ErrorIs(gotErr, wantErr)
 			}
 		})
 	}

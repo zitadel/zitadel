@@ -19,9 +19,17 @@ We provide this list for informational purposes and to foster community engageme
 
 import { Frameworks } from "../../src/components/frameworks";
 
+## Clients
+
+<Frameworks filter={(framework) => framework.client === true } />
+
+## SDKs
+
+<Frameworks filter={(framework) => framework.sdk === true } />
+
 ## Resources
 
-<Frameworks />
+<Frameworks filter={(framework) => framework.client === false || framework.client == null} />
 
 To further streamline your setup, simply visit the console in ZITADEL where you can select one of the languages or frameworks. This will allow you to instantly set up the configuration for that specific sample in ZITADEL, ensuring you have everything you need to get started right away.
 

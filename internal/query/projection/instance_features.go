@@ -65,14 +65,6 @@ func (*instanceFeatureProjection) Reducers() []handler.AggregateReducer {
 				Reduce: reduceInstanceSetFeature[bool],
 			},
 			{
-				Event:  feature_v2.InstanceTriggerIntrospectionProjectionsEventType,
-				Reduce: reduceInstanceSetFeature[bool],
-			},
-			{
-				Event:  feature_v2.InstanceLegacyIntrospectionEventType,
-				Reduce: reduceInstanceSetFeature[bool],
-			},
-			{
 				Event:  feature_v2.InstanceUserSchemaEventType,
 				Reduce: reduceInstanceSetFeature[bool],
 			},
@@ -85,19 +77,11 @@ func (*instanceFeatureProjection) Reducers() []handler.AggregateReducer {
 				Reduce: reduceInstanceSetFeature[[]feature.ImprovedPerformanceType],
 			},
 			{
-				Event:  feature_v2.InstanceWebKeyEventType,
-				Reduce: reduceInstanceSetFeature[bool],
-			},
-			{
 				Event:  feature_v2.InstanceDebugOIDCParentErrorEventType,
 				Reduce: reduceInstanceSetFeature[bool],
 			},
 			{
 				Event:  feature_v2.InstanceOIDCSingleV1SessionTerminationEventType,
-				Reduce: reduceInstanceSetFeature[bool],
-			},
-			{
-				Event:  feature_v2.InstanceDisableUserTokenEvent,
 				Reduce: reduceInstanceSetFeature[bool],
 			},
 			{
@@ -119,6 +103,10 @@ func (*instanceFeatureProjection) Reducers() []handler.AggregateReducer {
 			{
 				Event:  instance.InstanceRemovedEventType,
 				Reduce: reduceInstanceRemovedHelper(InstanceDomainInstanceIDCol),
+			},
+			{
+				Event:  feature_v2.InstanceEnableRelationalTables,
+				Reduce: reduceInstanceSetFeature[bool],
 			},
 		},
 	}}

@@ -11,7 +11,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/zitadel/logging"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
@@ -79,7 +78,7 @@ func (m UserMap) Get(typ UserType) *User {
 }
 
 // Host returns the primary host of zitadel, on which the first instance is served.
-// http://localhost:8080 by default
+// http://localhost:8082 by default
 func (c *Config) Host() string {
 	return fmt.Sprintf("%s:%d", c.Hostname, c.Port)
 }
@@ -263,7 +262,7 @@ func (i *Instance) setOrganization(ctx context.Context) {
 
 func (i *Instance) createMachineUser(ctx context.Context, userType UserType) (userID string) {
 	mustAwait(func() error {
-		username := gofakeit.Username()
+		username := Username()
 		userResp, err := i.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
 			UserName:        username,
 			Name:            username,
@@ -294,11 +293,14 @@ func (i *Instance) createWebAuthNClient() {
 	i.WebAuthN = webauthn.NewClient(i.Config.WebAuthNName, i.Domain, http_util.BuildOrigin(i.Host(), i.Config.Secure))
 }
 
+// Deprecated: WithAuthorization is misleading, as we have Zitadel resources called authorization now.
+// It is aliased to WithAuthorizationToken, which sets the Authorization header with a Bearer token.
+// Use WithAuthorizationToken directly instead.
 func (i *Instance) WithAuthorization(ctx context.Context, u UserType) context.Context {
-	return i.WithInstanceAuthorization(ctx, u)
+	return i.WithAuthorizationToken(ctx, u)
 }
 
-func (i *Instance) WithInstanceAuthorization(ctx context.Context, u UserType) context.Context {
+func (i *Instance) WithAuthorizationToken(ctx context.Context, u UserType) context.Context {
 	return WithAuthorizationToken(ctx, i.Users.Get(u).Token)
 }
 

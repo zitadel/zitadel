@@ -1,18 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SortDirection } from '@angular/material/sort';
 import { OAuthService } from 'angular-oauth2-oidc';
-import {
-  BehaviorSubject,
-  combineLatestWith,
-  EMPTY,
-  identity,
-  mergeWith,
-  NEVER,
-  Observable,
-  of,
-  shareReplay,
-  Subject,
-} from 'rxjs';
+import { BehaviorSubject, combineLatestWith, EMPTY, identity, mergeWith, NEVER, Observable, of, shareReplay } from 'rxjs';
 import { catchError, distinctUntilChanged, filter, finalize, map, startWith, switchMap, tap, timeout } from 'rxjs/operators';
 
 import {
@@ -96,21 +85,18 @@ import {
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
 import { MetadataQuery } from '../proto/generated/zitadel/metadata_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
-import { Org, OrgFieldName, OrgIDQuery, OrgQuery } from '../proto/generated/zitadel/org_pb';
+import { OrgFieldName, OrgQuery } from '../proto/generated/zitadel/org_pb';
 import { LabelPolicy, PrivacyPolicy } from '../proto/generated/zitadel/policy_pb';
 import { Gender, MembershipQuery, User, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
 import { GrpcService } from './grpc.service';
-import { StorageKey, StorageLocation, StorageService } from './storage.service';
-
-const ORG_LIMIT = 10;
+import { NewOrganizationService } from './new-organization.service';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GrpcAuthService {
-  private _activeOrgChanged: Subject<Org.AsObject | undefined> = new Subject();
   public user: Observable<User.AsObject | undefined>;
-  private triggerPermissionsRefresh: Subject<void> = new Subject();
   public zitadelPermissions: Observable<string[]>;
 
   public labelpolicy$!: Observable<LabelPolicy.AsObject>;
@@ -121,26 +107,27 @@ export class GrpcAuthService {
     PrivacyPolicy.AsObject | undefined
   >(undefined);
 
-  public cachedOrgs: BehaviorSubject<Org.AsObject[]> = new BehaviorSubject<Org.AsObject[]>([]);
   private cachedLabelPolicies: { [orgId: string]: LabelPolicy.AsObject } = {};
   private cachedPrivacyPolicies: { [orgId: string]: PrivacyPolicy.AsObject } = {};
 
   constructor(
     private readonly grpcService: GrpcService,
     private oauthService: OAuthService,
-    private storage: StorageService,
+    newOrganizationService: NewOrganizationService,
   ) {
-    this.labelpolicy$ = this.activeOrgChanged.pipe(
+    const activeOrg = toObservable(newOrganizationService.orgId);
+
+    this.labelpolicy$ = activeOrg.pipe(
       tap(() => this.labelPolicyLoading$.next(true)),
-      switchMap((org) => this.getMyLabelPolicy(org ? org.id : '')),
+      switchMap((org) => this.getMyLabelPolicy(org ?? '')),
       tap(() => this.labelPolicyLoading$.next(false)),
       finalize(() => this.labelPolicyLoading$.next(false)),
       filter((policy) => !!policy),
       shareReplay({ refCount: true, bufferSize: 1 }),
     );
 
-    this.privacypolicy$ = this.activeOrgChanged.pipe(
-      switchMap((org) => this.getMyPrivacyPolicy(org ? org.id : '')),
+    this.privacypolicy$ = activeOrg.pipe(
+      switchMap((org) => this.getMyPrivacyPolicy(org ?? '')),
       filter((policy) => !!policy),
       catchError((err) => {
         console.error(err);
@@ -161,7 +148,7 @@ export class GrpcAuthService {
     );
 
     this.zitadelPermissions = this.user.pipe(
-      combineLatestWith(this.activeOrgChanged),
+      combineLatestWith(activeOrg),
       // ignore errors from observables
       catchError(() => of(true)),
       // make sure observable never completes
@@ -195,85 +182,6 @@ export class GrpcAuthService {
       req.setQueriesList(queryList);
     }
     return this.grpcService.auth.listMyMetadata(req, null).then((resp) => resp.toObject());
-  }
-
-  public async getActiveOrg(id?: string): Promise<Org.AsObject> {
-    if (id) {
-      const find = this.cachedOrgs.getValue().find((tmp) => tmp.id === id);
-      if (find) {
-        this.setActiveOrg(find);
-        return Promise.resolve(find);
-      } else {
-        const orgQuery = new OrgQuery();
-        const orgIdQuery = new OrgIDQuery();
-        orgIdQuery.setId(id);
-        orgQuery.setIdQuery(orgIdQuery);
-
-        const orgs = (await this.listMyProjectOrgs(ORG_LIMIT, 0, [orgQuery])).resultList;
-        if (orgs.length === 1) {
-          this.setActiveOrg(orgs[0]);
-          return Promise.resolve(orgs[0]);
-        } else {
-          // throw error if the org was specifically requested but not found
-          return Promise.reject(new Error('requested organization not found'));
-        }
-      }
-    } else {
-      let orgs = this.cachedOrgs.getValue();
-      const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.local);
-
-      if (org) {
-        orgs = (await this.listMyProjectOrgs(ORG_LIMIT, 0)).resultList;
-        this.cachedOrgs.next(orgs);
-
-        const find = this.cachedOrgs.getValue().find((tmp) => tmp.id === id);
-        if (find) {
-          this.setActiveOrg(find);
-          return Promise.resolve(find);
-        } else {
-          const orgQuery = new OrgQuery();
-          const orgIdQuery = new OrgIDQuery();
-          orgIdQuery.setId(org.id);
-          orgQuery.setIdQuery(orgIdQuery);
-
-          const specificOrg = (await this.listMyProjectOrgs(ORG_LIMIT, 0, [orgQuery])).resultList;
-          if (specificOrg.length === 1) {
-            this.setActiveOrg(specificOrg[0]);
-            return Promise.resolve(specificOrg[0]);
-          }
-        }
-      } else {
-        orgs = (await this.listMyProjectOrgs(ORG_LIMIT, 0)).resultList;
-        this.cachedOrgs.next(orgs);
-      }
-
-      if (orgs.length === 0) {
-        this._activeOrgChanged.next(undefined);
-        return Promise.reject(new Error('No organizations found!'));
-      }
-
-      const orgToSet = orgs.find((element) => element.id !== '0' && element.name !== '');
-      if (orgToSet) {
-        this.setActiveOrg(orgToSet);
-        return Promise.resolve(orgToSet);
-      }
-      return Promise.resolve(orgs[0]);
-    }
-  }
-
-  public get activeOrgChanged(): Observable<Org.AsObject | undefined> {
-    return this._activeOrgChanged.asObservable();
-  }
-
-  public setActiveOrg(org: Org.AsObject): void {
-    // Set organization in localstorage to get the last used organization in a new tab
-    this.storage.setItem(StorageKey.organization, org, StorageLocation.local);
-    this.storage.setItem(StorageKey.organization, org, StorageLocation.session);
-    this._activeOrgChanged.next(org);
-  }
-
-  private loadPermissions(): void {
-    this.triggerPermissionsRefresh.next();
   }
 
   /**
@@ -343,11 +251,6 @@ export class GrpcAuthService {
 
   public getMyUser(): Promise<GetMyUserResponse.AsObject> {
     return this.grpcService.auth.getMyUser(new GetMyUserRequest(), null).then((resp) => resp.toObject());
-  }
-
-  public async revalidateOrgs() {
-    const orgs = (await this.listMyProjectOrgs(ORG_LIMIT, 0)).resultList;
-    this.cachedOrgs.next(orgs);
   }
 
   public listMyProjectOrgs(

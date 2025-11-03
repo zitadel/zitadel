@@ -1546,7 +1546,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       }
     },
     "SMTP": {
@@ -1625,12 +1626,8 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Organização Padrão de Login",
       "LOGINDEFAULTORG_DESCRIPTION": "A interface de login utilizará as configurações da organização padrão (e não da instância) se nenhum contexto de organização estiver definido",
-      "OIDCLEGACYINTROSPECTION": "Introspecção Legada OIDC",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Recentemente refatoramos o endpoint de introspecção por motivos de performance. Esse recurso pode ser usado para reverter para a implementação legada caso surjam bugs inesperados.",
       "OIDCTOKENEXCHANGE": "Troca de Token OIDC",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Habilita o tipo de concessão experimental urn:ietf:params:oauth:grant-type:token-exchange para o endpoint de token OIDC. A troca de token pode ser usada para solicitar tokens com escopo menor ou personificar outros usuários. Consulte a política de segurança para permitir a personificação em uma instância.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Projeções de Introspecção com Gatilho OIDC",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Habilita gatilhos de projeção durante uma solicitação de introspecção. Isso pode funcionar como uma solução alternativa se houver problemas de consistência perceptíveis na resposta de introspecção, mas pode impactar o desempenho. Planejamos remover gatilhos para solicitações de introspecção no futuro.",
       "USERSCHEMA": "Esquema de Usuário",
       "USERSCHEMAS_DESCRIPTION": "Esquemas de Usuário permitem gerenciar esquemas de dados do usuário. Se o sinalizador estiver ativado, você poderá usar a nova API e seus recursos.",
       "ACTIONS": "Ações",
@@ -1639,14 +1636,10 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Se a bandeira estiver habilitada, você poderá encerrar uma sessão única da interface do usuário de login fornecendo um id_token com uma reivindicação `sid como id_token_hint no ponto final de end_session. Observe que atualmente todas as sessões do mesmo agente de usuário (navegador) são encerradas na interface do usuário de login. As sessões gerenciadas por meio da API de sessão já permitem o encerramento de sessões individuais.",
       "DEBUGOIDCPARENTERROR": "Erro de Depuração do Pai OIDC",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Se a bandeira estiver ativada, o erro do pai OIDC será registrado no console.",
-      "DISABLEUSERTOKENEVENT": "Desativar Evento de Token de Usuário",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Ativar Logout de Backchannel",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "O Logout de Back-Channel implementa o OpenID Connect Back-Channel Logout 1.0 e pode ser usado para notificar os clientes sobre a terminação da sessão no Provedor de OpenID.",
       "PERMISSIONCHECKV2": "Verificação de Permissão V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Se a bandeira estiver ativada, você poderá usar a nova API e seus recursos.",
-      "WEBKEY": "Chave Web",
-      "WEBKEY_DESCRIPTION": "Se a bandeira estiver ativada, você poderá usar a nova API e seus recursos.",
       "STATES": {
         "INHERITED": "Herdade",
         "ENABLED": "Habilitado",
@@ -1662,7 +1655,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "Quando esta opção está ativada, o console utiliza a API V2 de Usuários para criar novos usuários. Com a API V2, os novos usuários criados começam sem um estado inicial.",
       "LOGINV2": "Login V2",
       "LOGINV2_DESCRIPTION": "Ativar esta opção ativa a nova interface de login baseada em TypeScript, com melhorias na segurança, desempenho e personalização.",
-      "LOGINV2_BASEURI": "URI base"
+      "LOGINV2_BASEURI": "URI base",
+      "ENABLERELATIONALTABLES": "Tabelas relacionais",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Ative isso para usar tabelas relacionais em vez de projeções para armazenar dados. Atualmente, este interruptor não faz nada."
     },
     "DIALOG": {
       "RESET": {
@@ -1801,7 +1796,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verificação de email concluída",
@@ -2750,7 +2746,8 @@
     "id": "Bahasa Indonesia",
     "hu": "Magyar",
     "ko": "한국어",
-    "ro": "Română"
+    "ro": "Română",
+    "tr": "Türkçe"
   },
   "MEMBER": {
     "ADD": "Adicionar um Gerente",

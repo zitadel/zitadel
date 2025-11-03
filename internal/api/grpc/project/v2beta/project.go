@@ -3,6 +3,7 @@ package project
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"github.com/muhlemmer/gu"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -13,8 +14,8 @@ import (
 	project_pb "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
 )
 
-func (s *Server) CreateProject(ctx context.Context, req *project_pb.CreateProjectRequest) (*project_pb.CreateProjectResponse, error) {
-	add := projectCreateToCommand(req)
+func (s *Server) CreateProject(ctx context.Context, req *connect.Request[project_pb.CreateProjectRequest]) (*connect.Response[project_pb.CreateProjectResponse], error) {
+	add := projectCreateToCommand(req.Msg)
 	project, err := s.command.AddProject(ctx, add)
 	if err != nil {
 		return nil, err
@@ -23,10 +24,10 @@ func (s *Server) CreateProject(ctx context.Context, req *project_pb.CreateProjec
 	if !project.EventDate.IsZero() {
 		creationDate = timestamppb.New(project.EventDate)
 	}
-	return &project_pb.CreateProjectResponse{
+	return connect.NewResponse(&project_pb.CreateProjectResponse{
 		Id:           add.AggregateID,
 		CreationDate: creationDate,
-	}, nil
+	}), nil
 }
 
 func projectCreateToCommand(req *project_pb.CreateProjectRequest) *command.AddProject {
@@ -60,8 +61,8 @@ func privateLabelingSettingToDomain(setting project_pb.PrivateLabelingSetting) d
 	}
 }
 
-func (s *Server) UpdateProject(ctx context.Context, req *project_pb.UpdateProjectRequest) (*project_pb.UpdateProjectResponse, error) {
-	project, err := s.command.ChangeProject(ctx, projectUpdateToCommand(req))
+func (s *Server) UpdateProject(ctx context.Context, req *connect.Request[project_pb.UpdateProjectRequest]) (*connect.Response[project_pb.UpdateProjectResponse], error) {
+	project, err := s.command.ChangeProject(ctx, projectUpdateToCommand(req.Msg))
 	if err != nil {
 		return nil, err
 	}
@@ -69,9 +70,9 @@ func (s *Server) UpdateProject(ctx context.Context, req *project_pb.UpdateProjec
 	if !project.EventDate.IsZero() {
 		changeDate = timestamppb.New(project.EventDate)
 	}
-	return &project_pb.UpdateProjectResponse{
+	return connect.NewResponse(&project_pb.UpdateProjectResponse{
 		ChangeDate: changeDate,
-	}, nil
+	}), nil
 }
 
 func projectUpdateToCommand(req *project_pb.UpdateProjectRequest) *command.ChangeProject {
@@ -91,13 +92,13 @@ func projectUpdateToCommand(req *project_pb.UpdateProjectRequest) *command.Chang
 	}
 }
 
-func (s *Server) DeleteProject(ctx context.Context, req *project_pb.DeleteProjectRequest) (*project_pb.DeleteProjectResponse, error) {
-	userGrantIDs, err := s.userGrantsFromProject(ctx, req.Id)
+func (s *Server) DeleteProject(ctx context.Context, req *connect.Request[project_pb.DeleteProjectRequest]) (*connect.Response[project_pb.DeleteProjectResponse], error) {
+	userGrantIDs, err := s.userGrantsFromProject(ctx, req.Msg.GetId())
 	if err != nil {
 		return nil, err
 	}
 
-	deletedAt, err := s.command.DeleteProject(ctx, req.Id, "", userGrantIDs...)
+	deletedAt, err := s.command.DeleteProject(ctx, req.Msg.GetId(), "", userGrantIDs...)
 	if err != nil {
 		return nil, err
 	}
@@ -105,9 +106,9 @@ func (s *Server) DeleteProject(ctx context.Context, req *project_pb.DeleteProjec
 	if !deletedAt.IsZero() {
 		deletionDate = timestamppb.New(deletedAt)
 	}
-	return &project_pb.DeleteProjectResponse{
+	return connect.NewResponse(&project_pb.DeleteProjectResponse{
 		DeletionDate: deletionDate,
-	}, nil
+	}), nil
 }
 
 func (s *Server) userGrantsFromProject(ctx context.Context, projectID string) ([]string, error) {
@@ -117,15 +118,15 @@ func (s *Server) userGrantsFromProject(ctx context.Context, projectID string) ([
 	}
 	userGrants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{projectQuery},
-	}, false)
+	}, false, nil)
 	if err != nil {
 		return nil, err
 	}
 	return userGrantsToIDs(userGrants.UserGrants), nil
 }
 
-func (s *Server) DeactivateProject(ctx context.Context, req *project_pb.DeactivateProjectRequest) (*project_pb.DeactivateProjectResponse, error) {
-	details, err := s.command.DeactivateProject(ctx, req.Id, "")
+func (s *Server) DeactivateProject(ctx context.Context, req *connect.Request[project_pb.DeactivateProjectRequest]) (*connect.Response[project_pb.DeactivateProjectResponse], error) {
+	details, err := s.command.DeactivateProject(ctx, req.Msg.GetId(), "")
 	if err != nil {
 		return nil, err
 	}
@@ -133,13 +134,13 @@ func (s *Server) DeactivateProject(ctx context.Context, req *project_pb.Deactiva
 	if !details.EventDate.IsZero() {
 		changeDate = timestamppb.New(details.EventDate)
 	}
-	return &project_pb.DeactivateProjectResponse{
+	return connect.NewResponse(&project_pb.DeactivateProjectResponse{
 		ChangeDate: changeDate,
-	}, nil
+	}), nil
 }
 
-func (s *Server) ActivateProject(ctx context.Context, req *project_pb.ActivateProjectRequest) (*project_pb.ActivateProjectResponse, error) {
-	details, err := s.command.ReactivateProject(ctx, req.Id, "")
+func (s *Server) ActivateProject(ctx context.Context, req *connect.Request[project_pb.ActivateProjectRequest]) (*connect.Response[project_pb.ActivateProjectResponse], error) {
+	details, err := s.command.ReactivateProject(ctx, req.Msg.GetId(), "")
 	if err != nil {
 		return nil, err
 	}
@@ -147,9 +148,9 @@ func (s *Server) ActivateProject(ctx context.Context, req *project_pb.ActivatePr
 	if !details.EventDate.IsZero() {
 		changeDate = timestamppb.New(details.EventDate)
 	}
-	return &project_pb.ActivateProjectResponse{
+	return connect.NewResponse(&project_pb.ActivateProjectResponse{
 		ChangeDate: changeDate,
-	}, nil
+	}), nil
 }
 
 func userGrantsToIDs(userGrants []*query.UserGrant) []string {

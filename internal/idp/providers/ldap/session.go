@@ -39,7 +39,7 @@ func NewSession(provider *Provider, username, password string) *Session {
 }
 
 // GetAuth implements the [idp.Session] interface.
-func (s *Session) GetAuth(ctx context.Context) (string, bool) {
+func (s *Session) GetAuth(ctx context.Context) (idp.Auth, error) {
 	return idp.Redirect(s.loginUrl)
 }
 
@@ -216,12 +216,12 @@ func trySearchAndUserBind(
 
 	user := sr.Entries[0]
 	// Bind as the user to verify their password
-	userDN, err := ldap.ParseDN(user.DN)
+	_, err = ldap.ParseDN(user.DN)
 	if err != nil {
 		logging.WithFields("userDN", user.DN).WithError(err).Info("ldap user parse DN failed")
 		return nil, err
 	}
-	if err = conn.Bind(userDN.String(), password); err != nil {
+	if err = conn.Bind(user.DN, password); err != nil {
 		logging.WithFields("userDN", user.DN).WithError(err).Info("ldap user bind failed")
 		return nil, ErrFailedLogin
 	}

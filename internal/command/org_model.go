@@ -1,6 +1,8 @@
 package command
 
 import (
+	"context"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -62,4 +64,8 @@ func (wm *OrgWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func OrgAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
 	return eventstore.AggregateFromWriteModel(wm, org.AggregateType, org.AggregateVersion)
+}
+
+func OrgAggregateFromWriteModelWithCTX(ctx context.Context, wm *eventstore.WriteModel) *eventstore.Aggregate {
+	return org.AggregateFromWriteModel(ctx, wm)
 }

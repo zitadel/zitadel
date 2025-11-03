@@ -20,12 +20,13 @@ import (
 )
 
 type FirstInstance struct {
-	InstanceName    string
-	DefaultLanguage language.Tag
-	Org             command.InstanceOrgSetup
-	MachineKeyPath  string
-	PatPath         string
-	Features        *command.InstanceFeatures
+	InstanceName       string
+	DefaultLanguage    language.Tag
+	Org                command.InstanceOrgSetup
+	MachineKeyPath     string
+	PatPath            string
+	LoginClientPatPath string
+	Features           *command.InstanceFeatures
 
 	Skip bool
 
@@ -91,6 +92,8 @@ func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error
 		0,
 		0,
 		nil,
+		nil,
+		nil,
 	)
 	if err != nil {
 		return err
@@ -121,16 +124,18 @@ func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error
 		}
 	}
 
-	_, token, key, _, err := cmd.SetUpInstance(ctx, &mig.instanceSetup)
+	_, token, key, loginClientToken, _, err := cmd.SetUpInstance(ctx, &mig.instanceSetup)
 	if err != nil {
 		return err
 	}
-	if mig.instanceSetup.Org.Machine != nil &&
+	if (mig.instanceSetup.Org.Machine != nil &&
 		((mig.instanceSetup.Org.Machine.Pat != nil && token == "") ||
-			(mig.instanceSetup.Org.Machine.MachineKey != nil && key == nil)) {
+			(mig.instanceSetup.Org.Machine.MachineKey != nil && key == nil))) ||
+		(mig.instanceSetup.Org.LoginClient != nil &&
+			(mig.instanceSetup.Org.LoginClient.Pat != nil && loginClientToken == "")) {
 		return err
 	}
-	return mig.outputMachineAuthentication(key, token)
+	return mig.outputMachineAuthentication(key, token, loginClientToken)
 }
 
 func (mig *FirstInstance) verifyEncryptionKeys(ctx context.Context) (*crypto_db.Database, error) {
@@ -150,7 +155,7 @@ func (mig *FirstInstance) verifyEncryptionKeys(ctx context.Context) (*crypto_db.
 	return keyStorage, nil
 }
 
-func (mig *FirstInstance) outputMachineAuthentication(key *command.MachineKey, token string) error {
+func (mig *FirstInstance) outputMachineAuthentication(key *command.MachineKey, token, loginClientToken string) error {
 	if key != nil {
 		keyDetails, err := key.Detail()
 		if err != nil {
@@ -162,6 +167,11 @@ func (mig *FirstInstance) outputMachineAuthentication(key *command.MachineKey, t
 	}
 	if token != "" {
 		if err := outputStdoutOrPath(mig.PatPath, token); err != nil {
+			return err
+		}
+	}
+	if loginClientToken != "" {
+		if err := outputStdoutOrPath(mig.LoginClientPatPath, loginClientToken); err != nil {
 			return err
 		}
 	}

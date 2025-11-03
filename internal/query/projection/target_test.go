@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/target"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -51,7 +51,7 @@ func TestTargetProjection_reduces(t *testing.T) {
 								uint64(15),
 								"name",
 								"https://example.com",
-								domain.TargetTypeWebhook,
+								target_domain.TargetTypeWebhook,
 								3 * time.Second,
 								true,
 								anyArg{},
@@ -86,7 +86,7 @@ func TestTargetProjection_reduces(t *testing.T) {
 								uint64(15),
 								"ro-id",
 								"name2",
-								domain.TargetTypeWebhook,
+								target_domain.TargetTypeWebhook,
 								"https://example.com",
 								3 * time.Second,
 								true,

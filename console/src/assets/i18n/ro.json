@@ -1543,7 +1543,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       }
     },
     "SMTP": {
@@ -1622,12 +1623,8 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Organizație implicită de conectare",
       "LOGINDEFAULTORG_DESCRIPTION": "UI-ul de conectare va utiliza setările organizației implicite (și nu din instanță) dacă nu este setat niciun context de organizație",
-      "OIDCLEGACYINTROSPECTION": "Introspecție OIDC Legacy",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Am refactorizat recent endpointul de introspecție din motive de performanță. Această caracteristică poate fi utilizată pentru a reveni la implementarea legacy dacă apar erori neașteptate.",
       "OIDCTOKENEXCHANGE": "Schimb de token OIDC",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Activați tipul de grant experimental urn:ietf:params:oauth:grant-type:token-exchange pentru endpointul token OIDC. Schimbul de tokenuri poate fi utilizat pentru a solicita tokenuri cu o rază de acțiune mai mică sau pentru a impersona alți utilizatori. Consultați politica de securitate pentru a permite impersonarea pe o instanță.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Proiecții de introspecție OIDC Trigger",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Activați declanșatoarele de proiecție în timpul unei solicitări de introspecție. Acest lucru poate acționa ca o soluție dacă există probleme notabile de consistență în răspunsul de introspecție, dar poate avea un impact asupra performanței. Planificăm să eliminăm declanșatoarele pentru solicitările de introspecție în viitor.",
       "USERSCHEMA": "Schema de utilizator",
       "USERSCHEMA_DESCRIPTION": "Schemele de utilizator permit gestionarea schemelor de date ale utilizatorului. Dacă indicatorul este activat, veți putea utiliza noul API și caracteristicile sale.",
       "ACTIONS": "Acțiuni",
@@ -1636,14 +1633,10 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Dacă indicatorul este activat, veți putea termina o singură sesiune din UI-ul de conectare furnizând un id_token cu o revendicare sid ca id_token_hint pe endpointul end_session. Rețineți că în prezent toate sesiunile de la același agent utilizator (browser) sunt terminate în UI-ul de conectare. Sesiunile gestionate prin API-ul Session permit deja terminarea sesiunilor individuale.",
       "DEBUGOIDCPARENTERROR": "Eroare de Depanare Părinte OIDC",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Dacă steagul este activat, eroarea părinte OIDC va fi înregistrată în consolă.",
-      "DISABLEUSERTOKENEVENT": "Dezactivează Evenimentul Token Utilizator",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Activează Logout Backchannel",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Logout-ul Back-Channel implementează OpenID Connect Back-Channel Logout 1.0 și poate fi folosit pentru a notifica clienții despre terminarea sesiunii la Producătorul OpenID.",
       "PERMISSIONCHECKV2": "Verificare Permisiuni V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Dacă steagul este activat, veți putea folosi noua API și funcțiile sale.",
-      "WEBKEY": "Cheie Web",
-      "WEBKEY_DESCRIPTION": "Dacă steagul este activat, veți putea folosi noua API și funcțiile sale.",
       "STATES": {
         "INHERITED": "Moșteniți",
         "ENABLED": "Activat",
@@ -1659,7 +1652,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "Când acest indicator este activat, consola utilizează API-ul de utilizator V2 pentru a crea utilizatori noi. Cu API-ul V2, utilizatorii nou creați încep fără o stare inițială.",
       "LOGINV2": "Autentificare V2",
       "LOGINV2_DESCRIPTION": "Activarea acestei opțiuni pornește noua interfață de autentificare bazată pe TypeScript, cu securitate, performanță și personalizare îmbunătățite.",
-      "LOGINV2_BASEURI": "URI de bază"
+      "LOGINV2_BASEURI": "URI de bază",
+      "ENABLERELATIONALTABLES": "Tabele relaționale",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Activați acest lucru pentru a utiliza tabele relaționale în loc de proiecții pentru stocarea datelor. În prezent, acest comutator nu face nimic."
     },
     "DIALOG": {
       "RESET": {
@@ -1798,7 +1793,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verificarea e-mailului efectuată",
@@ -2374,6 +2370,7 @@
       "METADATAURL": "URL metadata",
       "BINDING": "Legare",
       "SIGNEDREQUEST": "Solicitare semnată",
+      "SIGNATUREALGORITHM": "Algoritm de semnătură",
       "NAMEIDFORMAT": "Format ID nume",
       "TRANSIENTMAPPINGATTRIBUTENAME": "Nume atribut mapare personalizat",
       "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Nume alternativ de atribut pentru a mapa utilizatorul în cazul în care nameid-format returnat este tranzitoriu, de exemplu, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
@@ -2775,7 +2772,8 @@
     "id": "Bahasa Indonesia",
     "hu": "Magyar",
     "ko": "한국어",
-    "ro": "Română"
+    "ro": "Română",
+    "tr": "Türkçe"
   },
   "MEMBER": {
     "ADD": "Adăugați un manager",

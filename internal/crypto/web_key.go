@@ -7,6 +7,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"encoding/json"
+	"fmt"
 
 	"github.com/go-jose/go-jose/v4"
 	"github.com/muhlemmer/gu"
@@ -219,6 +220,8 @@ func generateWebKey(keyID string, genConfig WebKeyConfig) (private, public *jose
 		key, err = ecdsa.GenerateKey(conf.GetCurve(), rand.Reader)
 	case *WebKeyED25519Config:
 		_, key, err = ed25519.GenerateKey(rand.Reader)
+	default:
+		return nil, nil, fmt.Errorf("unknown webkey config type %T", genConfig)
 	}
 	if err != nil {
 		return nil, nil, err

@@ -115,6 +115,8 @@ service OrganizationService {
   //
   // Required permission:
   //  - `org.create`
+  //
+  // Deprecated: Use [AddOrganization](/apis/resources/org_service_v2/organization-service-add-organization.api.mdx) instead to create an organization.
   rpc CreateOrganization(CreateOrganizationRequest) returns (CreateOrganizationResponse) {
     option (google.api.http) = {
       post: "/v2beta/organizations"
@@ -127,7 +129,7 @@ service OrganizationService {
       }
     };
 
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
         key: "200";
         value: {
@@ -140,6 +142,7 @@ service OrganizationService {
           description: "The organization to create already exists.";
         }
       };
+      deprecated: true;
     };
   }
 
@@ -190,6 +193,8 @@ service OrganizationService {
   //
   // Required permission:
   //  - `iam.read`
+  //
+  // Deprecated: Use [ListOrganizations](/apis/resources/org_service_v2/organization-service-list-organizations.api.mdx) instead to list organizations.
   rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse) {
     option (google.api.http) = {
         post: "/v2beta/organizations/search";
@@ -206,6 +211,7 @@ service OrganizationService {
       responses: {
         key: "200";
       };
+      deprecated: true;
     };
   }
 

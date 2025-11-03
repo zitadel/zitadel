@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -69,12 +68,11 @@ func (t *telemetryPusher) Reducers() []handler.AggregateReducer {
 }
 
 func (t *telemetryPusher) pushMilestones(event eventstore.Event) (*handler.Statement, error) {
-	ctx := call.WithTimestamp(context.Background())
 	e, ok := event.(*milestone.ReachedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-lDTs5", "reduce.wrong.event.type %s", event.Type())
 	}
-	return handler.NewStatement(event, func(handler.Executer, string) error {
+	return handler.NewStatement(event, func(ctx context.Context, _ handler.Executer, _ string) error {
 		// Do not push the milestone again if this was a migration event.
 		if e.ReachedDate != nil {
 			return nil

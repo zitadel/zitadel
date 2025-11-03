@@ -60,7 +60,7 @@ func (c *Commands) AddProject(ctx context.Context, add *AddProject) (_ *domain.O
 	if isProjectStateExists(wm.State) {
 		return nil, zerrors.ThrowAlreadyExists(nil, "COMMAND-opamwu", "Errors.Project.AlreadyExisting")
 	}
-	if err := c.checkPermissionUpdateProject(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
+	if err := c.checkPermissionCreateProject(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
 		return nil, err
 	}
 
@@ -346,7 +346,7 @@ func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner s
 	}
 
 	for _, grantID := range cascadingUserGrantIDs {
-		event, _, err := c.removeUserGrant(ctx, grantID, "", true)
+		event, _, err := c.removeUserGrant(ctx, grantID, "", true, false, nil)
 		if err != nil {
 			logging.WithFields("id", "COMMAND-b8Djf", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
 			continue
@@ -398,7 +398,7 @@ func (c *Commands) DeleteProject(ctx context.Context, id, resourceOwner string, 
 		),
 	}
 	for _, grantID := range cascadingUserGrantIDs {
-		event, _, err := c.removeUserGrant(ctx, grantID, "", true)
+		event, _, err := c.removeUserGrant(ctx, grantID, "", true, false, nil)
 		if err != nil {
 			logging.WithFields("id", "COMMAND-b8Djf", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
 			continue

@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"slices"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -120,22 +121,14 @@ func (wm *ProjectWriteModel) NewChangedEvent(
 }
 
 func isProjectStateExists(state domain.ProjectState) bool {
-	return !hasProjectState(state, domain.ProjectStateRemoved, domain.ProjectStateUnspecified)
+	return !slices.Contains([]domain.ProjectState{domain.ProjectStateRemoved, domain.ProjectStateUnspecified}, state)
 }
 
+// Deprecated: use ProjectAggregateFromWriteModelWithCTX
 func ProjectAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
 	return eventstore.AggregateFromWriteModel(wm, project.AggregateType, project.AggregateVersion)
 }
 
 func ProjectAggregateFromWriteModelWithCTX(ctx context.Context, wm *eventstore.WriteModel) *eventstore.Aggregate {
 	return project.AggregateFromWriteModel(ctx, wm)
-}
-
-func hasProjectState(check domain.ProjectState, states ...domain.ProjectState) bool {
-	for _, state := range states {
-		if check == state {
-			return true
-		}
-	}
-	return false
 }

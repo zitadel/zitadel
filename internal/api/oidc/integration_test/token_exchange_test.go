@@ -52,13 +52,6 @@ func setTokenExchangeFeature(t *testing.T, instance *integration.Instance, value
 	time.Sleep(time.Second)
 }
 
-func resetFeatures(t *testing.T, instance *integration.Instance) {
-	iamCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	_, err := instance.Client.FeatureV2.ResetInstanceFeatures(iamCTX, &feature.ResetInstanceFeaturesRequest{})
-	require.NoError(t, err)
-	time.Sleep(time.Second)
-}
-
 func setImpersonationPolicy(t *testing.T, instance *integration.Instance, value bool) {
 	iamCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 

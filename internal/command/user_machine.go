@@ -61,8 +61,12 @@ func AddMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validati
 			if err != nil {
 				return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-3M9fs", "Errors.Org.DomainPolicy.NotFound")
 			}
+			orgScopedUsername, err := checkOrganizationScopedUsernames(ctx, filter, a.ResourceOwner, nil)
+			if err != nil {
+				return nil, err
+			}
 			return []eventstore.Command{
-				user.NewMachineAddedEvent(ctx, &a.Aggregate, machine.Username, machine.Name, machine.Description, domainPolicy.UserLoginMustBeDomain, machine.AccessTokenType),
+				user.NewMachineAddedEvent(ctx, &a.Aggregate, machine.Username, machine.Name, machine.Description, domainPolicy.UserLoginMustBeDomain || orgScopedUsername, machine.AccessTokenType),
 			}, nil
 		}, nil
 	}

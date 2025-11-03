@@ -48,6 +48,18 @@ const (
 	tmplExternalNotFoundOption = "externalnotfoundoption"
 )
 
+var (
+	samlFormPost = template.Must(template.New("saml-post-form").Parse(`<!DOCTYPE html><html><body>
+<form method="post" action="{{.URL}}" id="SAMLRequestForm">
+{{range $key, $value := .Fields}}
+<input type="hidden" name="{{$key}}" value="{{$value}}" />
+{{end}}
+<input id="SAMLSubmitButton" type="submit" value="Submit" />
+</form>
+<script>document.getElementById('SAMLSubmitButton').style.visibility="hidden";document.getElementById('SAMLRequestForm').submit();</script>
+</body></html>`))
+)
+
 type externalIDPData struct {
 	IDPConfigID string `schema:"idpConfigID"`
 }
@@ -201,15 +213,21 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		l.externalAuthFailed(w, r, authReq, err)
 		return
 	}
-
-	content, redirect := session.GetAuth(r.Context())
-	if redirect {
-		http.Redirect(w, r, content, http.StatusFound)
+	auth, err := session.GetAuth(r.Context())
+	if err != nil {
+		l.renderInternalError(w, r, authReq, err)
 		return
 	}
-	_, err = w.Write([]byte(content))
-	if err != nil {
-		l.renderError(w, r, authReq, err)
+	switch a := auth.(type) {
+	case *idp.RedirectAuth:
+		http.Redirect(w, r, a.RedirectURL, http.StatusFound)
+		return
+	case *idp.FormAuth:
+		err = samlFormPost.Execute(w, a)
+		if err != nil {
+			l.renderError(w, r, authReq, err)
+			return
+		}
 		return
 	}
 }
@@ -303,14 +321,14 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = oauth.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
+		session = github.NewSession(provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGitHubEnterprise:
 		provider, err := l.githubEnterpriseProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = oauth.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
+		session = github.NewSession(provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGitLab:
 		provider, err := l.gitlabProvider(r.Context(), identityProvider)
 		if err != nil {
@@ -492,7 +510,7 @@ func (l *Login) handleExternalUserAuthenticated(
 		}
 	}
 	if len(externalUser.Metadatas) > 0 {
-		_, err = l.command.BulkSetUserMetadata(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, externalUser.Metadatas...)
+		err = l.bulkSetUserMetadata(r.Context(), authReq.UserID, authReq.UserOrgID, externalUser.Metadatas)
 		if err != nil && !userLinked {
 			l.renderError(w, r, authReq, err)
 			return
@@ -505,7 +523,7 @@ func (l *Login) handleExternalUserAuthenticated(
 // The decision, which information will be checked is based on the IdP template option.
 // The function returns a boolean whether a user was found or not.
 // If single a user was found, it will be automatically linked.
-func (l *Login) checkAutoLinking(r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser) (bool, error) {
+func (l *Login) checkAutoLinking(r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser, human *domain.Human) (bool, error) {
 	queries := make([]query.SearchQuery, 0, 2)
 	switch provider.AutoLinking {
 	case domain.AutoLinkingOptionUnspecified:
@@ -514,7 +532,7 @@ func (l *Login) checkAutoLinking(r *http.Request, authReq *domain.AuthRequest, p
 	case domain.AutoLinkingOptionUsername:
 		// if we're checking for usernames there are to options:
 		//
-		// If no specific org has been requested (by id or domain scope), we'll check the provided username against
+		// If no specific org has been requested (by id or domain scope), we'll check the provided username (loginname) against
 		// all existing loginnames and directly use that result to either prompt or continue with other idp options.
 		if authReq.RequestedOrgID == "" {
 			user, err := l.query.GetNotifyUserByLoginName(r.Context(), false, externalUser.PreferredUsername)
@@ -526,8 +544,9 @@ func (l *Login) checkAutoLinking(r *http.Request, authReq *domain.AuthRequest, p
 			}
 			return true, nil
 		}
-		// If a specific org has been requested, we'll check the provided username against usernames (of that org).
-		usernameQuery, err := query.NewUserUsernameSearchQuery(externalUser.PreferredUsername, query.TextEqualsIgnoreCase)
+		// If a specific org has been requested, we'll check the username (org policy (suffixed or not) is already applied)
+		// against usernames (of that org).
+		usernameQuery, err := query.NewUserUsernameSearchQuery(human.Username, query.TextEqualsIgnoreCase)
 		if err != nil {
 			return false, nil
 		}
@@ -559,7 +578,7 @@ func (l *Login) checkAutoLinking(r *http.Request, authReq *domain.AuthRequest, p
 }
 
 func (l *Login) autoLinkUser(r *http.Request, authReq *domain.AuthRequest, user *query.NotifyUser) error {
-	if err := l.authRepo.SelectUser(r.Context(), authReq.ID, user.ID, authReq.AgentID); err != nil {
+	if err := l.authRepo.SelectUser(r.Context(), authReq.ID, user.ID, authReq.AgentID, false); err != nil {
 		return err
 	}
 	if err := l.authRepo.LinkExternalUsers(r.Context(), authReq.ID, authReq.AgentID, domain.BrowserInfoFromRequest(r)); err != nil {
@@ -587,7 +606,7 @@ func (l *Login) createOrLinkUser(w http.ResponseWriter, r *http.Request, authReq
 	human, idpLink, _ := mapExternalUserToLoginUser(externalUser, orgIAMPolicy.UserLoginMustBeDomain)
 	// let's check if auto-linking is enabled and if the user would be found by the corresponding option
 	if provider.AutoLinking != domain.AutoLinkingOptionUnspecified {
-		userLinked, err = l.checkAutoLinking(r, authReq, provider, externalUser)
+		userLinked, err = l.checkAutoLinking(r, authReq, provider, externalUser, human)
 		if err != nil {
 			l.renderError(w, r, authReq, err)
 			return false
@@ -1094,22 +1113,26 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 }
 
 func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*saml.Provider, error) {
-	key, err := crypto.Decrypt(identityProvider.SAMLIDPTemplate.Key, l.idpConfigAlg)
+	key, err := crypto.Decrypt(identityProvider.Key, l.idpConfigAlg)
 	if err != nil {
 		return nil, err
 	}
 	opts := make([]saml.ProviderOpts, 0, 6)
-	if identityProvider.SAMLIDPTemplate.WithSignedRequest {
+	if identityProvider.WithSignedRequest {
 		opts = append(opts, saml.WithSignedRequest())
 	}
-	if identityProvider.SAMLIDPTemplate.Binding != "" {
-		opts = append(opts, saml.WithBinding(identityProvider.SAMLIDPTemplate.Binding))
+	if identityProvider.Binding != "" {
+		opts = append(opts, saml.WithBinding(identityProvider.Binding))
 	}
-	if identityProvider.SAMLIDPTemplate.NameIDFormat.Valid {
-		opts = append(opts, saml.WithNameIDFormat(identityProvider.SAMLIDPTemplate.NameIDFormat.V))
+	if identityProvider.WithSignedRequest &&
+		identityProvider.SignatureAlgorithm != "" {
+		opts = append(opts, saml.WithSignatureAlgorithm(identityProvider.SignatureAlgorithm))
 	}
-	if identityProvider.SAMLIDPTemplate.TransientMappingAttributeName != "" {
-		opts = append(opts, saml.WithTransientMappingAttributeName(identityProvider.SAMLIDPTemplate.TransientMappingAttributeName))
+	if identityProvider.NameIDFormat.Valid {
+		opts = append(opts, saml.WithNameIDFormat(identityProvider.NameIDFormat.V))
+	}
+	if identityProvider.TransientMappingAttributeName != "" {
+		opts = append(opts, saml.WithTransientMappingAttributeName(identityProvider.TransientMappingAttributeName))
 	}
 	opts = append(opts,
 		saml.WithEntityID(http_utils.DomainContext(ctx).Origin()+"/idps/"+identityProvider.ID+"/saml/metadata"),
@@ -1135,8 +1158,8 @@ func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTem
 	return saml.New(
 		identityProvider.Name,
 		l.baseURL(ctx)+EndpointExternalLogin+"/",
-		identityProvider.SAMLIDPTemplate.Metadata,
-		identityProvider.SAMLIDPTemplate.Certificate,
+		identityProvider.Metadata,
+		identityProvider.Certificate,
 		key,
 		opts...,
 	)
@@ -1242,7 +1265,8 @@ func (l *Login) appendUserGrants(ctx context.Context, userGrants []*domain.UserG
 		return nil
 	}
 	for _, grant := range userGrants {
-		_, err := l.command.AddUserGrant(setContext(ctx, resourceOwner), grant, resourceOwner)
+		grant.ResourceOwner = resourceOwner
+		_, err := l.command.AddUserGrant(setContext(ctx, resourceOwner), grant, nil)
 		if err != nil {
 			return err
 		}
@@ -1300,6 +1324,8 @@ func tokens(session idp.Session) *oidc.Tokens[*oidc.IDTokenClaims] {
 		return s.Tokens
 	case *oauth.Session:
 		return s.Tokens
+	case *github.Session:
+		return s.Tokens()
 	case *azuread.Session:
 		return s.Tokens()
 	case *apple.Session:

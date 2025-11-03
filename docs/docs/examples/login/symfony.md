@@ -375,7 +375,7 @@ OIDC_CLIENT_ID="248680248240075805@dev"
 OIDC_CLIENT_SECRET="BJPhEJULSUXseC4geqg5Yg4wWMoy7RgZKar86mbIpt8ZekC5kixMzYGcXLDeeJv7"
 ```
 
-> The well-known URL needs to be adjusted to your own instance domain.
+> The well-known URL needs to be adjusted to your own custom domain.
 
 Activate the route that is used as callback by the OIDC bundle:
 

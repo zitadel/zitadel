@@ -11,4 +11,5 @@ type Config struct {
 	Pusher   Pusher
 	Querier  Querier
 	Searcher Searcher
+	Queue    ExecutionQueue
 }

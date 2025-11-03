@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/repository/target"
 )
 
@@ -15,7 +16,7 @@ type TargetWriteModel struct {
 	eventstore.WriteModel
 
 	Name             string
-	TargetType       domain.TargetType
+	TargetType       target_domain.TargetType
 	Endpoint         string
 	Timeout          time.Duration
 	InterruptOnError bool
@@ -86,7 +87,7 @@ func (wm *TargetWriteModel) NewChangedEvent(
 	ctx context.Context,
 	agg *eventstore.Aggregate,
 	name *string,
-	targetType *domain.TargetType,
+	targetType *target_domain.TargetType,
 	endpoint *string,
 	timeout *time.Duration,
 	interruptOnError *bool,

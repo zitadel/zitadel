@@ -5,11 +5,10 @@ import (
 	"testing"
 	"time"
 
-	"golang.org/x/text/language"
-
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -339,12 +338,13 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 		},
 	}
 	type fields struct {
-		checkPermission             domain.PermissionCheck
-		eventstore                  func(t *testing.T) *eventstore.Eventstore
-		userEncryption              crypto.EncryptionAlgorithm
-		newCode                     encrypedCodeFunc
-		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
-		defaultSecretGenerators     *SecretGenerators
+		checkPermission               domain.PermissionCheck
+		eventstore                    func(t *testing.T) *eventstore.Eventstore
+		userEncryption                crypto.EncryptionAlgorithm
+		newCode                       encrypedCodeFunc
+		newEncryptedCodeWithDefault   encryptedCodeWithDefaultFunc
+		defaultSecretGenerators       *SecretGenerators
+		defaultPasswordSetURLTemplate func(ctx context.Context) string
 	}
 	type args struct {
 		ctx              context.Context
@@ -460,14 +460,15 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 							},
 							10*time.Minute,
 							domain.NotificationTypeEmail,
-							"",
+							"http://example.com/{{.user}}/password/{{.code}}",
 							false,
 							"",
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockEncryptedCode("code", 10*time.Minute),
+				checkPermission:               newMockPermissionCheckAllowed(),
+				newCode:                       mockEncryptedCode("code", 10*time.Minute),
+				defaultPasswordSetURLTemplate: func(ctx context.Context) string { return "http://example.com/{{.user}}/password/{{.code}}" },
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -686,14 +687,15 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 							},
 							10*time.Minute,
 							domain.NotificationTypeEmail,
-							"",
+							"http://example.com/{{.user}}/password/{{.code}}",
 							true,
 							"",
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockEncryptedCode("code", 10*time.Minute),
+				checkPermission:               newMockPermissionCheckAllowed(),
+				newCode:                       mockEncryptedCode("code", 10*time.Minute),
+				defaultPasswordSetURLTemplate: func(ctx context.Context) string { return "http://example.com/{{.user}}/password/{{.code}}" },
 			},
 			args: args{
 				ctx:        context.Background(),
@@ -711,12 +713,13 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				checkPermission:             tt.fields.checkPermission,
-				eventstore:                  tt.fields.eventstore(t),
-				userEncryption:              tt.fields.userEncryption,
-				newEncryptedCode:            tt.fields.newCode,
-				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
-				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
+				checkPermission:               tt.fields.checkPermission,
+				eventstore:                    tt.fields.eventstore(t),
+				userEncryption:                tt.fields.userEncryption,
+				newEncryptedCode:              tt.fields.newCode,
+				newEncryptedCodeWithDefault:   tt.fields.newEncryptedCodeWithDefault,
+				defaultSecretGenerators:       tt.fields.defaultSecretGenerators,
+				defaultPasswordSetURLTemplate: tt.fields.defaultPasswordSetURLTemplate,
 			}
 
 			got, gotPlainCode, err := c.requestPasswordReset(tt.args.ctx, tt.args.userID, tt.args.returnCode, tt.args.urlTmpl, tt.args.notificationType)

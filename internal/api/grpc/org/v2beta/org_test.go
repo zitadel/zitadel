@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"connectrpc.com/connect"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -138,7 +139,7 @@ func Test_createdOrganizationToPb(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *org.CreateOrganizationResponse
+		want    *connect.Response[org.CreateOrganizationResponse]
 		wantErr error
 	}{
 		{
@@ -159,7 +160,7 @@ func Test_createdOrganizationToPb(t *testing.T) {
 					},
 				},
 			},
-			want: &org.CreateOrganizationResponse{
+			want: connect.NewResponse(&org.CreateOrganizationResponse{
 				CreationDate: timestamppb.New(now),
 				Id:           "orgID",
 				OrganizationAdmins: []*org.OrganizationAdmin{
@@ -173,7 +174,7 @@ func Test_createdOrganizationToPb(t *testing.T) {
 						},
 					},
 				},
-			},
+			}),
 		},
 	}
 	for _, tt := range tests {

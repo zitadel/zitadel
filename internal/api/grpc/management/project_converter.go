@@ -104,12 +104,22 @@ func ProjectGrantsToIDs(projectGrants *query.ProjectGrants) []string {
 	return converted
 }
 
-func AddProjectMemberRequestToDomain(req *mgmt_pb.AddProjectMemberRequest) *domain.Member {
-	return domain.NewMember(req.ProjectId, req.UserId, req.Roles...)
+func AddProjectMemberRequestToCommand(req *mgmt_pb.AddProjectMemberRequest, orgID string) *command.AddProjectMember {
+	return &command.AddProjectMember{
+		ResourceOwner: orgID,
+		ProjectID:     req.ProjectId,
+		UserID:        req.UserId,
+		Roles:         req.Roles,
+	}
 }
 
-func UpdateProjectMemberRequestToDomain(req *mgmt_pb.UpdateProjectMemberRequest) *domain.Member {
-	return domain.NewMember(req.ProjectId, req.UserId, req.Roles...)
+func UpdateProjectMemberRequestToCommand(req *mgmt_pb.UpdateProjectMemberRequest, orgID string) *command.ChangeProjectMember {
+	return &command.ChangeProjectMember{
+		ResourceOwner: orgID,
+		ProjectID:     req.ProjectId,
+		UserID:        req.UserId,
+		Roles:         req.Roles,
+	}
 }
 
 func listProjectRequestToModel(req *mgmt_pb.ListProjectsRequest) (*query.ProjectSearchQueries, error) {

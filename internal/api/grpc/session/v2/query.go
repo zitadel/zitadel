@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"connectrpc.com/connect"
 	"github.com/muhlemmer/gu"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -26,18 +27,18 @@ var (
 	}
 )
 
-func (s *Server) GetSession(ctx context.Context, req *session.GetSessionRequest) (*session.GetSessionResponse, error) {
-	res, err := s.query.SessionByID(ctx, true, req.GetSessionId(), req.GetSessionToken(), s.checkPermission)
+func (s *Server) GetSession(ctx context.Context, req *connect.Request[session.GetSessionRequest]) (*connect.Response[session.GetSessionResponse], error) {
+	res, err := s.query.SessionByID(ctx, true, req.Msg.GetSessionId(), req.Msg.GetSessionToken(), s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
-	return &session.GetSessionResponse{
+	return connect.NewResponse(&session.GetSessionResponse{
 		Session: sessionToPb(res),
-	}, nil
+	}), nil
 }
 
-func (s *Server) ListSessions(ctx context.Context, req *session.ListSessionsRequest) (*session.ListSessionsResponse, error) {
-	queries, err := listSessionsRequestToQuery(ctx, req)
+func (s *Server) ListSessions(ctx context.Context, req *connect.Request[session.ListSessionsRequest]) (*connect.Response[session.ListSessionsResponse], error) {
+	queries, err := listSessionsRequestToQuery(ctx, req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -45,10 +46,10 @@ func (s *Server) ListSessions(ctx context.Context, req *session.ListSessionsRequ
 	if err != nil {
 		return nil, err
 	}
-	return &session.ListSessionsResponse{
+	return connect.NewResponse(&session.ListSessionsResponse{
 		Details:  object.ToListDetails(sessions.SearchResponse),
 		Sessions: sessionsToPb(sessions.Sessions),
-	}, nil
+	}), nil
 }
 
 func listSessionsRequestToQuery(ctx context.Context, req *session.ListSessionsRequest) (*query.SessionsSearchQueries, error) {
@@ -109,6 +110,8 @@ func sessionQueryToQuery(ctx context.Context, sq *session.SearchQuery) (query.Se
 			}
 		}
 		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-x8n23uh", "List.Query.Invalid")
+	case *session.SearchQuery_ExpirationDateQuery:
+		return expirationDateQueryToQuery(q.ExpirationDateQuery)
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid")
 	}
@@ -121,6 +124,30 @@ func idsQueryToQuery(q *session.IDsQuery) (query.SearchQuery, error) {
 func creationDateQueryToQuery(q *session.CreationDateQuery) (query.SearchQuery, error) {
 	comparison := timestampComparisons[q.GetMethod()]
 	return query.NewCreationDateQuery(q.GetCreationDate().AsTime(), comparison)
+}
+
+func expirationDateQueryToQuery(q *session.ExpirationDateQuery) (query.SearchQuery, error) {
+	comparison := timestampComparisons[q.GetMethod()]
+
+	// to obtain sessions with a set expiration date
+	expirationDateQuery, err := query.NewExpirationDateQuery(q.GetExpirationDate().AsTime(), comparison)
+	if err != nil {
+		return nil, err
+	}
+
+	switch comparison {
+	case query.TimestampEquals, query.TimestampLess, query.TimestampLessOrEquals:
+		return expirationDateQuery, nil
+	case query.TimestampGreater, query.TimestampGreaterOrEquals:
+		// to obtain sessions without an expiration date
+		expirationDateIsNullQuery, err := query.NewIsNullQuery(query.SessionColumnExpiration)
+		if err != nil {
+			return nil, err
+		}
+		return query.NewOrQuery(expirationDateQuery, expirationDateIsNullQuery)
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-Dwigt", "List.Query.InvalidComparisonMethod")
+	}
 }
 
 func fieldNameToSessionColumn(field session.SessionFieldName) query.Column {

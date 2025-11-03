@@ -21,7 +21,7 @@ import (
 )
 
 func (h *UsersHandler) queryMetadataForUsers(ctx context.Context, userIds []string) (map[string]map[metadata.ScopedKey][]byte, error) {
-	queries := h.buildMetadataQueries(ctx)
+	queries := BuildMetadataQueries(ctx, metadata.ScimUserRelevantMetadataKeys)
 
 	md, err := h.query.SearchUserMetadataForUsers(ctx, false, userIds, queries)
 	if err != nil {
@@ -43,9 +43,9 @@ func (h *UsersHandler) queryMetadataForUsers(ctx context.Context, userIds []stri
 }
 
 func (h *UsersHandler) queryMetadataForUser(ctx context.Context, id string) (map[metadata.ScopedKey][]byte, error) {
-	queries := h.buildMetadataQueries(ctx)
+	queries := BuildMetadataQueries(ctx, metadata.ScimUserRelevantMetadataKeys)
 
-	md, err := h.query.SearchUserMetadata(ctx, false, id, queries, false)
+	md, err := h.query.SearchUserMetadata(ctx, false, id, queries, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -53,9 +53,9 @@ func (h *UsersHandler) queryMetadataForUser(ctx context.Context, id string) (map
 	return metadata.MapListToScopedKeyMap(md.Metadata), nil
 }
 
-func (h *UsersHandler) buildMetadataQueries(ctx context.Context) *query.UserMetadataSearchQueries {
-	keyQueries := make([]query.SearchQuery, len(metadata.ScimUserRelevantMetadataKeys))
-	for i, key := range metadata.ScimUserRelevantMetadataKeys {
+func BuildMetadataQueries(ctx context.Context, metadataKeys []metadata.Key) *query.UserMetadataSearchQueries {
+	keyQueries := make([]query.SearchQuery, len(metadataKeys))
+	for i, key := range metadataKeys {
 		keyQueries[i] = buildMetadataKeyQuery(ctx, key)
 	}
 

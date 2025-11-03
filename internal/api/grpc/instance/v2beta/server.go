@@ -1,7 +1,10 @@
 package instance
 
 import (
-	"google.golang.org/grpc"
+	"net/http"
+
+	"connectrpc.com/connect"
+	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
@@ -9,12 +12,12 @@ import (
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/query"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/instance/v2beta/instanceconnect"
 )
 
-var _ instance.InstanceServiceServer = (*Server)(nil)
+var _ instanceconnect.InstanceServiceHandler = (*Server)(nil)
 
 type Server struct {
-	instance.UnimplementedInstanceServiceServer
 	command         *command.Commands
 	query           *query.Queries
 	systemDefaults  systemdefaults.SystemDefaults
@@ -39,8 +42,12 @@ func CreateServer(
 	}
 }
 
-func (s *Server) RegisterServer(grpcServer *grpc.Server) {
-	instance.RegisterInstanceServiceServer(grpcServer, s)
+func (s *Server) RegisterConnectServer(interceptors ...connect.Interceptor) (string, http.Handler) {
+	return instanceconnect.NewInstanceServiceHandler(s, connect.WithInterceptors(interceptors...))
+}
+
+func (s *Server) FileDescriptor() protoreflect.FileDescriptor {
+	return instance.File_zitadel_instance_v2beta_instance_service_proto
 }
 
 func (s *Server) AppName() string {

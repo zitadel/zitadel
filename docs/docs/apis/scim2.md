@@ -2,15 +2,6 @@
 title: SCIM v2.0 (Preview)
 ---
 
-:::info
-The SCIM v2 interface of Zitadel is currently in a [preview stage](/support/software-release-cycles-support#preview).
-It is not yet feature-complete, may contain bugs, and is not generally available.
-
-Do not use it for production yet.
-
-As long as the feature is in a preview state, it will be available for free, it will be put behind a commercial license once it is fully available.
-:::
-
 The Zitadel [SCIM v2](https://scim.cloud/) service provider interface enables seamless integration of identity and
 access management (IAM) systems with Zitadel,
 following the System for Cross-domain Identity Management (SCIM) v2.0 specification.
@@ -20,7 +11,7 @@ deprovisioning.
 ## Supported endpoints
 
 The Zitadel SCIM v2.0 service provider implementation supports the following endpoints.
-The base URL for the SCIM endpoint in Zitadel is: `https://${ZITADEL_DOMAIN}/scim/v2/{orgId}`.
+The base URL for the SCIM endpoint in Zitadel is: `https://${CUSTOM_DOMAIN}/scim/v2/{orgId}`.
 
 | Endpoint                                                                | Remarks                                                    |
 |-------------------------------------------------------------------------|------------------------------------------------------------|

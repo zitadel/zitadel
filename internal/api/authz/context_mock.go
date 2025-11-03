@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/feature"
 )
 
 type MockContextInstanceOpts func(i *instance)
@@ -14,10 +16,25 @@ func WithMockDefaultLanguage(lang language.Tag) MockContextInstanceOpts {
 	}
 }
 
+func WithMockFeatures(features feature.Features) MockContextInstanceOpts {
+	return func(i *instance) {
+		i.features = features
+	}
+}
+
+func WithMockProjectID(projectID string) MockContextInstanceOpts {
+	return func(i *instance) {
+		i.projectID = projectID
+	}
+}
+
 func NewMockContext(instanceID, orgID, userID string, opts ...MockContextInstanceOpts) context.Context {
 	ctx := context.WithValue(context.Background(), dataKey, CtxData{UserID: userID, OrgID: orgID})
 
-	i := &instance{id: instanceID}
+	i := &instance{
+		id:    instanceID,
+		orgID: orgID,
+	}
 	for _, o := range opts {
 		o(i)
 	}

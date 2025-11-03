@@ -25,8 +25,6 @@ type SearchQueryBuilder struct {
 	queries               []*SearchQuery
 	excludeAggregateIDs   *ExclusionQuery
 	tx                    *sql.Tx
-	lockRows              bool
-	lockOption            LockOption
 	positionAtLeast       decimal.Decimal
 	awaitOpenTransactions bool
 	creationDateAfter     time.Time
@@ -96,10 +94,6 @@ func (q SearchQueryBuilder) GetCreationDateAfter() time.Time {
 
 func (q SearchQueryBuilder) GetCreationDateBefore() time.Time {
 	return q.creationDateBefore
-}
-
-func (q SearchQueryBuilder) GetLockRows() (bool, LockOption) {
-	return q.lockRows, q.lockOption
 }
 
 // ensureInstanceID makes sure that the instance id is always set
@@ -319,27 +313,6 @@ func (builder *SearchQueryBuilder) CreationDateBefore(creationDate time.Time) *S
 		return builder
 	}
 	builder.creationDateBefore = creationDate
-	return builder
-}
-
-type LockOption int
-
-const (
-	// Wait until the previous lock on all of the selected rows is released (default)
-	LockOptionWait LockOption = iota
-	// With NOWAIT, the statement reports an error, rather than waiting, if a selected row cannot be locked immediately.
-	LockOptionNoWait
-	// With SKIP LOCKED, any selected rows that cannot be immediately locked are skipped.
-	LockOptionSkipLocked
-)
-
-// LockRowsDuringTx locks the found rows for the duration of the transaction,
-// using the [`FOR UPDATE`](https://www.postgresql.org/docs/17/sql-select.html#SQL-FOR-UPDATE-SHARE) lock strength.
-// The lock is removed on transaction commit or rollback.
-func (builder *SearchQueryBuilder) LockRowsDuringTx(tx *sql.Tx, option LockOption) *SearchQueryBuilder {
-	builder.tx = tx
-	builder.lockRows = true
-	builder.lockOption = option
 	return builder
 }
 

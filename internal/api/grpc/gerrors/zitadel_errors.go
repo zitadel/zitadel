@@ -3,10 +3,12 @@ package gerrors
 import (
 	"errors"
 
+	"connectrpc.com/connect"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/protoadapt"
 
 	commandErrors "github.com/zitadel/zitadel/internal/command/errors"
@@ -34,6 +36,30 @@ func ZITADELToGRPCError(err error) error {
 	}
 
 	return s.Err()
+}
+
+func ZITADELToConnectError(err error) error {
+	if err == nil {
+		return nil
+	}
+	connectError := new(connect.Error)
+	if errors.As(err, &connectError) {
+		return err
+	}
+	code, key, id, ok := ExtractZITADELError(err)
+	if !ok {
+		return status.Convert(err).Err()
+	}
+	msg := key
+	msg += " (" + id + ")"
+
+	errorInfo := getErrorInfo(id, key, err)
+
+	cErr := connect.NewError(connect.Code(code), errors.New(msg))
+	if detail, detailErr := connect.NewErrorDetail(errorInfo.(proto.Message)); detailErr == nil {
+		cErr.AddDetail(detail)
+	}
+	return cErr
 }
 
 func ExtractZITADELError(err error) (c codes.Code, msg, id string, ok bool) {

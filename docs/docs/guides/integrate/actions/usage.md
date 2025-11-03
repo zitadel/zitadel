@@ -10,7 +10,7 @@ The Action API provides a flexible mechanism for customizing and extending the f
 - Custom Code will be triggered and executed
 
 **Use Cases:**
-- User Management: Automate provisioning user data to external systems when users are crreated, updated or deleted.
+- User Management: Automate provisioning user data to external systems when users are created, updated or deleted.
 - Security: Implement IP blocking or rate limiting based on API usage patterns.
 - Extend Workflows: Automatically setup resources in your application, when a new organization in ZITADEL is created. 
 - Token extension: Add custom claims to the tokens.
@@ -406,17 +406,11 @@ If you then have a call on `/zitadel.user.v2.UserService/UpdateHumanUser` the fo
 
 And if you use a different service, for example `zitadel.session.v2.SessionService`, then the `all` Execution would still be used.
 
-### Targets and Includes
+### Targets
 
-:::info
-Includes are limited to 3 levels, which mean that include1->include2->include3 is the maximum for now.
-If you have feedback to the include logic, or a reason why 3 levels are not enough, please open [an issue on github](https://github.com/zitadel/zitadel/issues) or [start a discussion on github](https://github.com/zitadel/zitadel/discussions)/[start a topic on discord](https://zitadel.com/chat)
-:::
+An execution can contain only a list of Targets, and Targets are comma separated string values.
 
-An execution can not only contain a list of Targets, but also Includes.
-The Includes can be defined in the Execution directly, which means you include all defined Targets by a before set Execution.
-
-If you define 2 Executions as follows:
+Here's an example of a Target defined on a service (e.g. `zitadel.user.v2.UserService`)
 
 ```json
 {
@@ -426,13 +420,12 @@ If you define 2 Executions as follows:
     }
   },
   "targets": [
-    {
-      "target": "<TargetID1>"
-    }
+    "<TargetID1>"
   ]
 }
 ```
 
+Here's an example of a Target defined on a method (e.g. `/zitadel.user.v2.UserService/AddHumanUser`)
 ```json
 {
   "condition": {
@@ -441,21 +434,13 @@ If you define 2 Executions as follows:
     }
   },
   "targets": [
-    {
-      "target": "<TargetID2>"
-    },
-    {
-      "include": {
-        "request": {
-          "service": "zitadel.user.v2.UserService"
-        }
-      }
-    }
+    "<TargetID2>",
+    "<TargetID1>"
   ]
 }
 ```
 
-The called Targets on "/zitadel.user.v2.UserService/AddHumanUser" would be, in order:
+The called Targets on `/zitadel.user.v2.UserService/AddHumanUser` would be, in order:
 
 1. `<TargetID2>`
 2. `<TargetID1>`
@@ -500,3 +485,7 @@ If you want to forward a specific error from the Target through ZITADEL, you can
 Only values from 400 to 499 will be forwarded through ZITADEL, other StatusCodes will end in a PreconditionFailed error.
 
 If the Target returns any other status code than >= 200 and < 299, the execution is looked at as failed, and a PreconditionFailed error is logged.
+
+:::important
+To interrupt the execution while forwarding this error, "interruptOnError" must be **true** for the Target
+:::

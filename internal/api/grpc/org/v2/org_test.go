@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"connectrpc.com/connect"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -138,7 +139,7 @@ func Test_createdOrganizationToPb(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *org.AddOrganizationResponse
+		want    *connect.Response[org.AddOrganizationResponse]
 		wantErr error
 	}{
 		{
@@ -159,7 +160,7 @@ func Test_createdOrganizationToPb(t *testing.T) {
 					},
 				},
 			},
-			want: &org.AddOrganizationResponse{
+			want: connect.NewResponse(&org.AddOrganizationResponse{
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.New(now),
@@ -173,7 +174,7 @@ func Test_createdOrganizationToPb(t *testing.T) {
 						PhoneCode: gu.Ptr("phoneCode"),
 					},
 				},
-			},
+			}),
 		},
 	}
 	for _, tt := range tests {
