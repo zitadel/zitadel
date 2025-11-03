@@ -369,7 +369,7 @@ func (s *settingsRelationalProjection) reduceLoginPolicyAdded(event eventstore.E
 		settingsRepo := repository.SettingsRepository()
 		setting := domain.Setting{
 			InstanceID: policyEvent.Aggregate().InstanceID,
-			OrgID:      orgId,
+			OrganizationID:      orgId,
 			Type:       domain.SettingTypeLogin,
 			OwnerType:  ownerType,
 			Settings:   settingJSON,
@@ -745,7 +745,7 @@ func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) 
 		settingsRepo := repository.SettingsRepository()
 		setting := domain.Setting{
 			InstanceID: policyEvent.Aggregate().InstanceID,
-			OrgID:      orgId,
+			OrganizationID:      orgId,
 			OwnerType:  ownerType,
 			Type:       domain.SettingTypeLabel,
 			LabelState: &labelStatePreview,
@@ -1381,7 +1381,7 @@ func (p *settingsRelationalProjection) reducePassedComplexityAdded(event eventst
 		settingsRepo := repository.SettingsRepository()
 		newSetting := domain.Setting{
 			InstanceID: policyEvent.Aggregate().InstanceID,
-			OrgID:      orgId,
+			OrganizationID:      orgId,
 			Type:       domain.SettingTypePasswordComplexity,
 			OwnerType:  ownerType,
 			Settings:   settingJSON,
@@ -1513,7 +1513,7 @@ func (p *settingsRelationalProjection) reducePasswordPolicyAdded(event eventstor
 		settingsRepo := repository.SettingsRepository()
 		setting := domain.Setting{
 			InstanceID: policyEvent.Aggregate().InstanceID,
-			OrgID:      orgId,
+			OrganizationID:      orgId,
 			Type:       domain.SettingTypePasswordExpiry,
 			OwnerType:  ownerType,
 			Settings:   settings,
@@ -1687,7 +1687,7 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyAdded(event eventstore
 		settingsRepo := repository.SettingsRepository()
 		setting := domain.Setting{
 			InstanceID: policyEvent.Aggregate().InstanceID,
-			OrgID:      orgId,
+			OrganizationID:      orgId,
 			Type:       domain.SettingTypeLockout,
 			OwnerType:  ownerType,
 			Settings:   settings,
@@ -1784,7 +1784,7 @@ func (p *settingsRelationalProjection) reduceDomainPolicyAdded(event eventstore.
 		settingsRepo := repository.SettingsRepository()
 		setting := domain.Setting{
 			InstanceID: policyEvent.Aggregate().InstanceID,
-			OrgID:      orgId,
+			OrganizationID:      orgId,
 			Type:       domain.SettingTypeDomain,
 			OwnerType:  ownerType,
 			Settings:   settingJSON,
@@ -1825,7 +1825,7 @@ func (s *settingsRelationalProjection) reduceDomainPolicyChanged(event eventstor
 		setting := &domain.DomainSetting{
 			Setting: &domain.Setting{
 				InstanceID: policyEvent.Agg.InstanceID,
-				OrgID:      orgId,
+				OrganizationID:      orgId,
 				OwnerType:  ownerType,
 			},
 		}
@@ -1949,7 +1949,7 @@ func (s *settingsRelationalProjection) reduceOrganizationSettingsSet(event event
 		setting := &domain.OrganizationSetting{
 			Setting: &domain.Setting{
 				InstanceID: e.Aggregate().InstanceID,
-				OrgID:      &e.Aggregate().ID,
+				OrganizationID:      &e.Aggregate().ID,
 				Type:       domain.SettingTypeOrganization,
 				OwnerType:  domain.OwnerTypeOrganization,
 				// Settings:   payload,

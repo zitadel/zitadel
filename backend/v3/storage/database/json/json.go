@@ -123,39 +123,6 @@ func NewArrayChange(path []string, value any, remove bool) []JsonUpdate {
 func (c *ArrayChange) getPathValue() ([]string, string, error) {
 	path, v := c.path, c.value
 
-	// var outValue string
-	// switch v := v.(type) {
-	// case string:
-	// 	value, err := json.Marshal(v)
-	// 	if err != nil {
-	// 		return nil, "", err
-	// 	}
-	// 	outValue = string(value) + "::TEXT"
-	// case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
-	// 	value, err := json.Marshal(v)
-	// 	if err != nil {
-	// 		return nil, "", err
-	// 	}
-	// 	outValue = string(value) + "::INTEGER"
-	// case float32, float64:
-	// 	value, err := json.Marshal(v)
-	// 	if err != nil {
-	// 		return nil, "", err
-	// 	}
-	// 	outValue = string(value) + "::NUMERIC"
-	// case bool:
-	// 	value, err := json.Marshal(v)
-	// 	if err != nil {
-	// 		return nil, "", err
-	// 	}
-	// 	outValue = string(value) + "::BOOL"
-	// default:
-	// 	fmt.Println("\033[45m[DBUGPRINT]\033[0m[:1]\033[45m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m BAD TYPE")
-	// 	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m v = %+v\n", v)
-	// 	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m v = %p\n", v)
-	// 	return nil, "", errors.New("bad type")
-	// }
-
 	value, err := json.Marshal(v)
 	if err != nil {
 		return nil, "", err
@@ -182,45 +149,12 @@ func (c *ArrayChange) addToArray(builder *database.StatementBuilder, changes jso
 	}
 	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m value = %+v\n", value)
 
-	// builder.WriteString("jsonb_insert(")
-	// //
-	// if i < 0 {
-	// 	changes.column.WriteQualified(builder)
-	// } else {
-	// 	changes.changes[i].writeUpdate(builder, changes, i-1)
-	// }
-	// //
-	// builder.WriteString(", " + "(CASE WHEN (SELECT ")
-	// changes.column.WriteQualified(builder)
-	// builder.WriteString(" ?& '" + writePath(path) + "') THEN")
-	// builder.WriteString(" '{" + strings.Join(path, "'") + ", -1}'")
-	// builder.WriteString(" ELSE '{" + strings.Join(path, ",") + "}'")
-	// builder.WriteString(" END)::TEXT[]")
-	// //
-	// builder.WriteString(", " + "(CASE WHEN (SELECT ")
-	// changes.column.WriteQualified(builder)
-	// builder.WriteString(" ?& '" + writePath(path) + "') THEN")
-	// builder.WriteString(" '" + value + "'::JSONB")
-	// builder.WriteString(" ELSE jsonb_build_array(")
-	// if len(value) > 2 && value[0] == '"' && value[len(value)-1] == '"' {
-	// 	builder.WriteString("'" + value[1:len(value)-1] + "'")
-	// } else {
-	// 	builder.WriteString(value)
-	// }
-	// builder.WriteString(")")
-	// builder.WriteString(" END)::JSONB")
-	// //
-	// builder.WriteString(", " + "true")
-
-	// builder.WriteString(")")
 	builder.WriteString("zitadel.jsonb_array_append(")
-	//
 	if i < 0 {
 		changes.column.WriteQualified(builder)
 	} else {
 		changes.changes[i].writeUpdate(builder, changes, i-1)
 	}
-	//
 	builder.WriteString(", ")
 	builder.WriteArg(path)
 	builder.WriteString(", ")
@@ -245,13 +179,11 @@ func (c *ArrayChange) removeFromArray(builder *database.StatementBuilder, change
 	}
 
 	builder.WriteString("zitadel.jsonb_array_remove(")
-	//
 	if i < 0 {
 		changes.column.WriteQualified(builder)
 	} else {
 		changes.changes[i].writeUpdate(builder, changes, i-1)
 	}
-	//
 	builder.WriteString(", ")
 	builder.WriteArg(path)
 	builder.WriteString(", ")
@@ -293,8 +225,6 @@ func (c jsonChanges) Write(builder *database.StatementBuilder) error {
 	if c.changes == nil {
 		return nil
 	}
-	// return c.writeUpdate(builder, len(c.changes)-1)
-	// return c.changes[len(c.changes)-1].writeUpdate(builder, c, len(c.changes)-2)
 	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> len(c.changes) = %+v\n", len(c.changes))
 	return c.changes[len(c.changes)-1].writeUpdate(builder, c, len(c.changes)-2)
 }

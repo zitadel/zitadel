@@ -4,13 +4,19 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/url"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	db_json "github.com/zitadel/zitadel/backend/v3/storage/database/json"
+)
+
+var (
+	ErrMissingInstanceID = errors.New("instance id must be set")
+	ErrMissingOrgID      = errors.New("org id must be set")
+	ErrMissingType       = errors.New("type must be set")
+	ErrMissingOwnerType  = errors.New("owner must be set")
 )
 
 type settings struct{}
@@ -38,7 +44,7 @@ func (settings) InstanceIDColumn() database.Column {
 	return database.NewColumn("settings", "instance_id")
 }
 
-func (settings) OrgIDColumn() database.Column {
+func (settings) OrganizationIDColumn() database.Column {
 	return database.NewColumn("settings", "organization_id")
 }
 
@@ -76,9 +82,9 @@ func (s settings) InstanceIDCondition(id string) database.Condition {
 
 func (s settings) OrgIDCondition(id *string) database.Condition {
 	if id == nil {
-		return database.IsNull(s.OrgIDColumn())
+		return database.IsNull(s.OrganizationIDColumn())
 	}
-	return database.NewTextCondition(s.OrgIDColumn(), database.TextOperationEqual, *id)
+	return database.NewTextCondition(s.OrganizationIDColumn(), database.TextOperationEqual, *id)
 }
 
 func (s settings) IDCondition(id string) database.Condition {
@@ -378,6 +384,25 @@ func (s *labelSettings) Set(ctx context.Context, client database.QueryExecutor, 
 	if setting == nil {
 		return ErrSettingObjectMustNotBeNil
 	}
+
+	if setting.InstanceID == "" {
+		return ErrMissingInstanceID
+	}
+
+	if setting.OrganizationID == nil {
+		return ErrMissingOrgID
+	}
+
+	// type is always set from the calling function to that functions respective type
+	// the check is left as a failsafe
+	if setting.Type == domain.SettingTypeUnspecified {
+		return ErrMissingType
+	}
+
+	if setting.OwnerType == domain.OwnerTypeUnspecified {
+		return ErrMissingOwnerType
+	}
+
 	settingJSON, err := json.Marshal(setting.Settings)
 	if err != nil {
 		return err
@@ -386,7 +411,7 @@ func (s *labelSettings) Set(ctx context.Context, client database.QueryExecutor, 
 	builder := database.NewStatementBuilder(
 		createLabelSettingStmt,
 		setting.InstanceID,
-		setting.OrgID,
+		setting.OrganizationID,
 		setting.Type,
 		setting.OwnerType,
 		setting.LabelState,
@@ -400,7 +425,6 @@ func (s *labelSettings) Update(ctx context.Context, client database.QueryExecuto
 	builder.WriteString(`UPDATE zitadel.settings SET `)
 	database.Changes(changes).Write(&builder)
 	writeCondition(&builder, condition)
-	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m builder.String() = %+v\n", builder.String())
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
@@ -473,7 +497,7 @@ func (s *labelSettings) ActivateLabelSetting(ctx context.Context, client databas
 
 	builder.AppendArgs(
 		setting.InstanceID,
-		setting.OrgID,
+		setting.OrganizationID,
 		setting.OwnerType,
 		string(settingJSON))
 
@@ -494,8 +518,8 @@ func (s *labelSettings) ActivateLabelSettingEvent(ctx context.Context, client da
 	if !condition.IsRestrictingColumn(s.InstanceIDColumn()) {
 		return 0, database.NewMissingConditionError(s.InstanceIDColumn())
 	}
-	if !condition.IsRestrictingColumn(s.OrgIDColumn()) {
-		return 0, database.NewMissingConditionError(s.OrgIDColumn())
+	if !condition.IsRestrictingColumn(s.OrganizationIDColumn()) {
+		return 0, database.NewMissingConditionError(s.OrganizationIDColumn())
 	}
 	if !condition.IsRestrictingColumn(s.TypeColumn()) {
 		return 0, database.NewMissingConditionError(s.TypeColumn())
@@ -533,7 +557,7 @@ func (s *settings) ActivateLabelSetting(ctx context.Context, client database.Que
 
 	builder.AppendArgs(
 		setting.InstanceID,
-		setting.OrgID,
+		setting.OrganizationID,
 		setting.OwnerType,
 		string(settingJSON))
 
@@ -812,7 +836,7 @@ func (s *securitySettings) SetEvent(ctx context.Context, client database.QueryEx
 	builder := database.NewStatementBuilder(
 		setSecuritySettingEventStmt,
 		setting.InstanceID,
-		setting.OrgID,
+		setting.OrganizationID,
 		// domain.SettingTypeSecurity,
 		setting.OwnerType,
 		string(settingJSON),
@@ -951,13 +975,10 @@ func (s *organizationSettings) SetEvent(ctx context.Context, client database.Que
 	builder := database.NewStatementBuilder(
 		setOrganizationSettingEventStmt,
 		setting.InstanceID,
-		setting.OrgID,
-		// domain.SettingTypeOrganization,
+		setting.OrganizationID,
 		setting.OwnerType,
 		string(settingJSON),
 		setting.CreatedAt)
-
-	// database.Changes(changes).Write(builder)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
@@ -973,7 +994,6 @@ func (s *settings) Update(ctx context.Context, client database.QueryExecutor, co
 		return 0, err
 	}
 	writeCondition(&builder, condition)
-	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m builder.String() = %+v\n", builder.String())
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
@@ -984,7 +1004,7 @@ func (s *settings) updateSetting(ctx context.Context, client database.QueryExecu
 	conditions := []database.Condition{
 		s.IDCondition(setting.ID),
 		s.InstanceIDCondition(setting.InstanceID),
-		s.OrgIDCondition(setting.OrgID),
+		s.OrgIDCondition(setting.OrganizationID),
 		s.TypeCondition(setting.Type),
 	}
 	settingJSON, err := json.Marshal(settings)
@@ -1017,7 +1037,7 @@ func (s *settings) Create(ctx context.Context, client database.QueryExecutor, se
 	builder := database.NewStatementBuilder(
 		eventCreateSettingStmt,
 		setting.InstanceID,
-		setting.OrgID,
+		setting.OrganizationID,
 		setting.Type,
 		setting.OwnerType,
 		setting.LabelState,
@@ -1040,10 +1060,28 @@ func createSetting(ctx context.Context, client database.QueryExecutor, setting *
 		return err
 	}
 
+	if setting.InstanceID == "" {
+		return ErrMissingInstanceID
+	}
+
+	if setting.OrganizationID == nil {
+		return ErrMissingOrgID
+	}
+
+	// type is always set from the calling function to that functions respective type
+	// the check is left as a failsafe
+	if setting.Type == domain.SettingTypeUnspecified {
+		return ErrMissingType
+	}
+
+	if setting.OwnerType == domain.OwnerTypeUnspecified {
+		return ErrMissingOwnerType
+	}
+
 	builder := database.NewStatementBuilder(
 		createSettingStmt,
 		setting.InstanceID,
-		setting.OrgID,
+		setting.OrganizationID,
 		setting.Type,
 		setting.OwnerType,
 		setting.LabelState,
@@ -1082,9 +1120,8 @@ func (s *settings) CheckMandatoryCondtions(condition database.Condition) error {
 	if !condition.IsRestrictingColumn(s.InstanceIDColumn()) {
 		return database.NewMissingConditionError(s.InstanceIDColumn())
 	}
-	if !condition.IsRestrictingColumn(s.OrgIDColumn()) {
-		fmt.Println("\033[45m[DBUGPRINT]\033[0m[:1]\033[45m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m errror")
-		return database.NewMissingConditionError(s.OrgIDColumn())
+	if !condition.IsRestrictingColumn(s.OrganizationIDColumn()) {
+		return database.NewMissingConditionError(s.OrganizationIDColumn())
 	}
 	if !condition.IsRestrictingColumn(s.TypeColumn()) {
 		return database.NewMissingConditionError(s.TypeColumn())

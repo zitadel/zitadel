@@ -36,15 +36,15 @@ const (
 )
 
 type Setting struct {
-	ID         string          `json:"id,omitempty" db:"id"`
-	InstanceID string          `json:"instanceId,omitempty" db:"instance_id"`
-	OrgID      *string         `json:"organizationId,omitempty" db:"organization_id"`
-	Type       SettingType     `json:"type,omitempty" db:"type"`
-	OwnerType  OwnerType       `json:"ownerType,omitempty" db:"owner_type"`
-	LabelState *LabelState     `json:"labelState,omitempty" db:"label_state"`
-	Settings   json.RawMessage `json:"settings,omitempty" db:"settings"`
-	CreatedAt  time.Time       `json:"createdAt,omitzero" db:"created_at"`
-	UpdatedAt  *time.Time      `json:"updatedAt,omitzero" db:"updated_at"`
+	ID             string          `json:"id,omitempty" db:"id"`
+	InstanceID     string          `json:"instanceId,omitempty" db:"instance_id"`
+	OrganizationID *string         `json:"organizationId,omitempty" db:"organization_id"`
+	Type           SettingType     `json:"type,omitempty" db:"type"`
+	OwnerType      OwnerType       `json:"ownerType,omitempty" db:"owner_type"`
+	LabelState     *LabelState     `json:"labelState,omitempty" db:"label_state"`
+	Settings       json.RawMessage `json:"settings,omitempty" db:"settings"`
+	CreatedAt      time.Time       `json:"createdAt,omitzero" db:"created_at"`
+	UpdatedAt      *time.Time      `json:"updatedAt,omitzero" db:"updated_at"`
 }
 
 type PasswordlessType int32
@@ -323,7 +323,7 @@ type OrganizationSetting struct {
 type settingsColumns interface {
 	IDColumn() database.Column
 	InstanceIDColumn() database.Column
-	OrgIDColumn() database.Column
+	OrganizationIDColumn() database.Column
 	TypeColumn() database.Column
 	OwnerTypeColumn() database.Column
 	LabelStateColumn() database.Column
