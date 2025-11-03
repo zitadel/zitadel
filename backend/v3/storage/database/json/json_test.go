@@ -8,46 +8,46 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-// func TestFieldChange(t *testing.T) {
-// 	for _, test := range []struct {
-// 		name   string
-// 		change database.Change
-// 		want   string
-// 	}{
-// 		{
-// 			name: "single josn update",
-// 			change: func() database.Change {
-// 				col := database.NewColumn("table", "column")
-// 				change := NewFieldChange([]string{"path", "to", "key"}, "value")
-// 				changes := NewJsonChanges(col, change)
+func TestFieldChange(t *testing.T) {
+	for _, test := range []struct {
+		name   string
+		change database.Change
+		output string
+	}{
+		{
+			name: "single josn update",
+			change: func() database.Change {
+				col := database.NewColumn("table", "column")
+				change := NewFieldChange([]string{"path", "to", "key"}, "value")
+				changes := NewJsonChanges(col, change)
 
-// 				return changes
-// 			}(),
-// 			want: "missing condition for column",
-// 		},
-// 		{
-// 			name: "two josn update",
-// 			change: func() database.Change {
-// 				col := database.NewColumn("table", "column")
-// 				change1 := NewFieldChange([]string{"path"}, "value")
-// 				change2 := NewFieldChange([]string{"path"}, "value")
-// 				changes := NewJsonChanges(col, change1, change2)
+				return changes
+			}(),
+			output: "missing condition for column",
+		},
+		{
+			name: "two josn update",
+			change: func() database.Change {
+				col := database.NewColumn("table", "column")
+				change1 := NewFieldChange([]string{"path"}, "value")
+				change2 := NewFieldChange([]string{"path"}, "value")
+				changes := NewJsonChanges(col, change1, change2)
 
-// 				return changes
-// 			}(),
-// 			want: "missing condition for column",
-// 		},
-// 	} {
-// 		t.Run(test.name, func(t *testing.T) {
-// 			builder := database.StatementBuilder{}
-// 			err := test.change.Write(&builder)
-// 			require.NoError(t, err)
-// 			fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> builder.String() = %+v\n", builder.String())
+				return changes
+			}(),
+			output: "missing condition for column",
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			builder := database.StatementBuilder{}
+			err := test.change.Write(&builder)
+			require.NoError(t, err)
+			fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> builder.String() = %+v\n", builder.String())
 
-// 			// assert.Equal(t, test.want, test.err.Error())
-// 		})
-// 	}
-// }
+			// assert.Equal(t, test.want, test.err.Error())
+		})
+	}
+}
 
 func TestArrayChange(t *testing.T) {
 	for _, test := range []struct {
@@ -60,9 +60,7 @@ func TestArrayChange(t *testing.T) {
 			change: func() database.Change {
 				col := database.NewColumn("table", "column")
 				change := NewArrayChange([]string{"path"}, "value", false)
-				fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m change = %+v\n", change[0])
-				fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m change = %+v\n", change[1])
-				changes := NewJsonChanges(col, change...)
+				changes := NewJsonChanges(col, change)
 
 				return changes
 			}(),

@@ -3,6 +3,7 @@ package json
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
@@ -149,12 +150,39 @@ func (c *ArrayChange) addToArray(builder *database.StatementBuilder, changes jso
 	}
 	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m value = %+v\n", value)
 
+	// builder.WriteString("zitadel.jsonb_array_append(")
+	// if i < 0 {
+	// 	changes.column.WriteQualified(builder)
+	// } else {
+	// 	changes.changes[i].writeUpdate(builder, changes, i-1)
+	// }
+	// builder.WriteString(", ")
+	// builder.WriteArg(path)
+	// builder.WriteString(", ")
+	// builder.WriteArg(value)
+	// if len(value) > 2 && value[0] == '"' && value[len(value)-1] == '"' {
+	// 	builder.WriteString("::TEXT")
+	// } else {
+	// 	builder.WriteString("::NUMERIC")
+	// }
+
 	builder.WriteString("zitadel.jsonb_array_append(")
+
+	// to avoid duplicates remove any preexisting value from array
+	builder.WriteString("zitadel.jsonb_array_remove(")
 	if i < 0 {
 		changes.column.WriteQualified(builder)
 	} else {
 		changes.changes[i].writeUpdate(builder, changes, i-1)
 	}
+
+	builder.WriteString(", ")
+	builder.WriteArg(path)
+	builder.WriteString(", ")
+	builder.WriteArg(value)
+	builder.WriteString("::TEXT")
+	builder.WriteString(")")
+
 	builder.WriteString(", ")
 	builder.WriteArg(path)
 	builder.WriteString(", ")
@@ -211,11 +239,36 @@ func NewJsonChanges(col database.Column, changes ...JsonUpdate) database.Change 
 }
 
 func (c *jsonChanges) Matches(x any) bool {
-	return false
+	toMatch, ok := x.(*jsonChanges)
+	if !ok {
+		return false
+	}
+
+	if c.column != toMatch.column {
+		return false
+	}
+
+	if len(c.changes) != len(toMatch.changes) {
+		return false
+	}
+
+	for _, c1 := range c.changes {
+		found := false
+		for _, c2 := range toMatch.changes {
+			if reflect.DeepEqual(c1, c2) {
+				found = true
+			}
+		}
+		if !found {
+			return false
+		}
+	}
+
+	return true
 }
 
 func (c *jsonChanges) String() string {
-	return ""
+	return "database.json.jsonChange"
 }
 
 func (c jsonChanges) Write(builder *database.StatementBuilder) error {

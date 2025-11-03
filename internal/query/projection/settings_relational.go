@@ -1928,6 +1928,7 @@ func (s *settingsRelationalProjection) reduceSecurityPolicySet(event eventstore.
 			changes = append(changes, settingsRepo.SetEnableImpersonation(*e.EnableImpersonation))
 		}
 
+		fmt.Println("\033[45m[DBUGPRINT]\033[0m[settings_instance_test.go:1]\033[45m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m SECURITY POLICY")
 		_, err := settingsRepo.SetEvent(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetLabelSettings(changes...),
 			settingsRepo.SetUpdatedAt(&e.Creation))
 		return err

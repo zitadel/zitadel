@@ -844,12 +844,13 @@ func (s *securitySettings) SetEvent(ctx context.Context, client database.QueryEx
 		setSecuritySettingEventStmt,
 		setting.InstanceID,
 		setting.OrganizationID,
-		// domain.SettingTypeSecurity,
 		setting.OwnerType,
 		string(settingJSON),
 		setting.CreatedAt)
 
 	database.Changes(changes).Write(builder)
+
+	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[settings_instance_test.go:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m  builder.String() = %+v\n", builder.String())
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }

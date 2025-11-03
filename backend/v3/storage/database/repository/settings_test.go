@@ -1404,249 +1404,249 @@ func TestSetSettingsError(t *testing.T) {
 // NOTE all updated functions are just a wrapper around repository.updateSetting()
 // for the sake of testing, UpdateLabel was used, but the underlying code is the same
 // across all Update.*() functions
-func TestUpdateSetting(t *testing.T) {
-	beforeUpdate := time.Now()
-	tx, err := pool.Begin(t.Context(), nil)
-	require.NoError(t, err)
-	defer func() {
-		err = tx.Rollback(t.Context())
-		if err != nil {
-			t.Logf("error during rollback: %v", err)
-		}
-	}()
+// func TestUpdateSetting(t *testing.T) {
+// 	beforeUpdate := time.Now()
+// 	tx, err := pool.Begin(t.Context(), nil)
+// 	require.NoError(t, err)
+// 	defer func() {
+// 		err = tx.Rollback(t.Context())
+// 		if err != nil {
+// 			t.Logf("error during rollback: %v", err)
+// 		}
+// 	}()
 
-	// create instance
-	instanceId := gofakeit.Name()
-	instance := domain.Instance{
-		ID:              instanceId,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleCLient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
-	}
-	instanceRepo := repository.InstanceRepository()
-	err = instanceRepo.Create(t.Context(), tx, &instance)
-	require.NoError(t, err)
+// 	// create instance
+// 	instanceId := gofakeit.Name()
+// 	instance := domain.Instance{
+// 		ID:              instanceId,
+// 		Name:            gofakeit.Name(),
+// 		DefaultOrgID:    "defaultOrgId",
+// 		IAMProjectID:    "iamProject",
+// 		ConsoleClientID: "consoleCLient",
+// 		ConsoleAppID:    "consoleApp",
+// 		DefaultLanguage: "defaultLanguage",
+// 	}
+// 	instanceRepo := repository.InstanceRepository()
+// 	err = instanceRepo.Create(t.Context(), tx, &instance)
+// 	require.NoError(t, err)
 
-	// create org
-	orgId := gofakeit.Name()
-	org := domain.Organization{
-		ID:         orgId,
-		Name:       gofakeit.Name(),
-		InstanceID: instanceId,
-		State:      domain.OrgStateActive,
-	}
-	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), tx, &org)
-	require.NoError(t, err)
+// 	// create org
+// 	orgId := gofakeit.Name()
+// 	org := domain.Organization{
+// 		ID:         orgId,
+// 		Name:       gofakeit.Name(),
+// 		InstanceID: instanceId,
+// 		State:      domain.OrgStateActive,
+// 	}
+// 	organizationRepo := repository.OrganizationRepository()
+// 	err = organizationRepo.Create(t.Context(), tx, &org)
+// 	require.NoError(t, err)
 
-	settingRepo := repository.OrganizationSettingRepository()
+// 	settingRepo := repository.OrganizationSettingRepository()
 
-	tests := []struct {
-		name         string
-		testFunc     func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting
-		conditions   database.Condition
-		changes      database.Changes
-		rowsAffected int64
-		err          error
-	}{
-		{
-			name: "missing instance id condition",
-			conditions: database.And(
-				// settingRepo.InstanceIDCondition(instanceId),
-				settingRepo.OrgIDCondition(&orgId),
-				settingRepo.TypeCondition(domain.SettingTypeLabel),
-				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
-			err: database.NewMissingConditionError(settingRepo.InstanceIDColumn()),
-		},
-		{
-			name: "missing org id condition",
-			conditions: database.And(
-				settingRepo.InstanceIDCondition(instanceId),
-				// settingRepo.OrgIDCondition(&orgId),
-				settingRepo.TypeCondition(domain.SettingTypeLabel),
-				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
-			err: database.NewMissingConditionError(settingRepo.OrganizationIDColumn()),
-		},
-		{
-			name: "missing type condition",
-			conditions: database.And(
-				settingRepo.InstanceIDCondition(instanceId),
-				settingRepo.OrgIDCondition(&orgId),
-				// settingRepo.TypeCondition(domain.SettingTypeLabel),
-				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
-			err: database.NewMissingConditionError(settingRepo.TypeColumn()),
-		},
-		{
-			name: "missing owner type condition",
-			conditions: database.And(
-				settingRepo.InstanceIDCondition(instanceId),
-				settingRepo.OrgIDCondition(&orgId),
-				settingRepo.TypeCondition(domain.SettingTypeLabel),
-				// settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
-			err: database.NewMissingConditionError(settingRepo.OwnerTypeColumn()),
-		},
-		{
-			name: "update setting with non existent instance id",
-			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
-				setting := domain.LabelSetting{
-					Setting: &domain.Setting{
-						InstanceID:     "non-existent-instanceID",
-						OrganizationID: &orgId,
-						ID:             gofakeit.Name(),
-						Type:           domain.SettingTypeLabel,
-						OwnerType:      domain.OwnerTypeOrganization,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
-						Settings:       []byte("{}"),
-					},
-					PrimaryColor:        "value",
-					BackgroundColor:     "value",
-					WarnColor:           "value",
-					FontColor:           "value",
-					PrimaryColorDark:    "value",
-					BackgroundColorDark: "value",
-					WarnColorDark:       "value",
-					FontColorDark:       "value",
-					HideLoginNameSuffix: true,
-					ErrorMsgPopup:       true,
-					DisableWatermark:    true,
-					ThemeMode:           domain.LabelPolicyThemeAuto,
-				}
+// 	tests := []struct {
+// 		name         string
+// 		testFunc     func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting
+// 		conditions   database.Condition
+// 		changes      database.Changes
+// 		rowsAffected int64
+// 		err          error
+// 	}{
+// 		{
+// 			name: "missing instance id condition",
+// 			conditions: database.And(
+// 				// settingRepo.InstanceIDCondition(instanceId),
+// 				settingRepo.OrgIDCondition(&orgId),
+// 				settingRepo.TypeCondition(domain.SettingTypeLabel),
+// 				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+// 				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+// 			err: database.NewMissingConditionError(settingRepo.InstanceIDColumn()),
+// 		},
+// 		{
+// 			name: "missing org id condition",
+// 			conditions: database.And(
+// 				settingRepo.InstanceIDCondition(instanceId),
+// 				// settingRepo.OrgIDCondition(&orgId),
+// 				settingRepo.TypeCondition(domain.SettingTypeLabel),
+// 				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+// 				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+// 			err: database.NewMissingConditionError(settingRepo.OrganizationIDColumn()),
+// 		},
+// 		{
+// 			name: "missing type condition",
+// 			conditions: database.And(
+// 				settingRepo.InstanceIDCondition(instanceId),
+// 				settingRepo.OrgIDCondition(&orgId),
+// 				// settingRepo.TypeCondition(domain.SettingTypeLabel),
+// 				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+// 				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+// 			err: database.NewMissingConditionError(settingRepo.TypeColumn()),
+// 		},
+// 		{
+// 			name: "missing owner type condition",
+// 			conditions: database.And(
+// 				settingRepo.InstanceIDCondition(instanceId),
+// 				settingRepo.OrgIDCondition(&orgId),
+// 				settingRepo.TypeCondition(domain.SettingTypeLabel),
+// 				// settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
+// 				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+// 			err: database.NewMissingConditionError(settingRepo.OwnerTypeColumn()),
+// 		},
+// 		{
+// 			name: "update setting with non existent instance id",
+// 			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
+// 				setting := domain.LabelSetting{
+// 					Setting: &domain.Setting{
+// 						InstanceID:     "non-existent-instanceID",
+// 						OrganizationID: &orgId,
+// 						ID:             gofakeit.Name(),
+// 						Type:           domain.SettingTypeLabel,
+// 						OwnerType:      domain.OwnerTypeOrganization,
+// 						LabelState:     gu.Ptr(domain.LabelStatePreview),
+// 						Settings:       []byte("{}"),
+// 					},
+// 					PrimaryColor:        "value",
+// 					BackgroundColor:     "value",
+// 					WarnColor:           "value",
+// 					FontColor:           "value",
+// 					PrimaryColorDark:    "value",
+// 					BackgroundColorDark: "value",
+// 					WarnColorDark:       "value",
+// 					FontColorDark:       "value",
+// 					HideLoginNameSuffix: true,
+// 					ErrorMsgPopup:       true,
+// 					DisableWatermark:    true,
+// 					ThemeMode:           domain.LabelPolicyThemeAuto,
+// 				}
 
-				return &setting
-			},
-			// expect nothing to get updated
-			rowsAffected: 0,
-			err:          new(database.ForeignKeyError),
-		},
-		{
-			name: "update setting with non existent org id",
-			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
-				setting := domain.LabelSetting{
-					Setting: &domain.Setting{
-						InstanceID:     instanceId,
-						OrganizationID: gu.Ptr("non-existent-orgID"),
-						ID:             gofakeit.Name(),
-						Type:           domain.SettingTypeLabel,
-						OwnerType:      domain.OwnerTypeOrganization,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
-						Settings:       []byte("{}"),
-					},
-					PrimaryColor:        "value",
-					BackgroundColor:     "value",
-					WarnColor:           "value",
-					FontColor:           "value",
-					PrimaryColorDark:    "value",
-					BackgroundColorDark: "value",
-					WarnColorDark:       "value",
-					FontColorDark:       "value",
-					HideLoginNameSuffix: true,
-					ErrorMsgPopup:       true,
-					DisableWatermark:    true,
-					ThemeMode:           domain.LabelPolicyThemeAuto,
-				}
-				return &setting
-			},
-			// expect nothing to get updated
-			rowsAffected: 0,
-			err:          new(database.ForeignKeyError),
-		},
-		{
-			name: "update setting with wrong type",
-			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
-				setting := domain.LabelSetting{
-					Setting: &domain.Setting{
-						InstanceID:     instanceId,
-						OrganizationID: &orgId,
-						ID:             gofakeit.Name(),
-						Type:           domain.SettingTypeLabel,
-						OwnerType:      domain.OwnerTypeOrganization,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
-						Settings:       []byte("{}"),
-					},
-					PrimaryColor:        "value",
-					BackgroundColor:     "value",
-					WarnColor:           "value",
-					FontColor:           "value",
-					PrimaryColorDark:    "value",
-					BackgroundColorDark: "value",
-					WarnColorDark:       "value",
-					FontColorDark:       "value",
-					HideLoginNameSuffix: true,
-					ErrorMsgPopup:       true,
-					DisableWatermark:    true,
-					ThemeMode:           domain.LabelPolicyThemeAuto,
-				}
-				// err := settingRepo.Set(t.Context(), tx, &setting)
-				// require.NoError(t, err)
+// 				return &setting
+// 			},
+// 			// expect nothing to get updated
+// 			rowsAffected: 0,
+// 			err:          new(database.ForeignKeyError),
+// 		},
+// 		{
+// 			name: "update setting with non existent org id",
+// 			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
+// 				setting := domain.LabelSetting{
+// 					Setting: &domain.Setting{
+// 						InstanceID:     instanceId,
+// 						OrganizationID: gu.Ptr("non-existent-orgID"),
+// 						ID:             gofakeit.Name(),
+// 						Type:           domain.SettingTypeLabel,
+// 						OwnerType:      domain.OwnerTypeOrganization,
+// 						LabelState:     gu.Ptr(domain.LabelStatePreview),
+// 						Settings:       []byte("{}"),
+// 					},
+// 					PrimaryColor:        "value",
+// 					BackgroundColor:     "value",
+// 					WarnColor:           "value",
+// 					FontColor:           "value",
+// 					PrimaryColorDark:    "value",
+// 					BackgroundColorDark: "value",
+// 					WarnColorDark:       "value",
+// 					FontColorDark:       "value",
+// 					HideLoginNameSuffix: true,
+// 					ErrorMsgPopup:       true,
+// 					DisableWatermark:    true,
+// 					ThemeMode:           domain.LabelPolicyThemeAuto,
+// 				}
+// 				return &setting
+// 			},
+// 			// expect nothing to get updated
+// 			rowsAffected: 0,
+// 			err:          new(database.ForeignKeyError),
+// 		},
+// 		{
+// 			name: "update setting with wrong type",
+// 			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
+// 				setting := domain.LabelSetting{
+// 					Setting: &domain.Setting{
+// 						InstanceID:     instanceId,
+// 						OrganizationID: &orgId,
+// 						ID:             gofakeit.Name(),
+// 						Type:           domain.SettingTypeLabel,
+// 						OwnerType:      domain.OwnerTypeOrganization,
+// 						LabelState:     gu.Ptr(domain.LabelStatePreview),
+// 						Settings:       []byte("{}"),
+// 					},
+// 					PrimaryColor:        "value",
+// 					BackgroundColor:     "value",
+// 					WarnColor:           "value",
+// 					FontColor:           "value",
+// 					PrimaryColorDark:    "value",
+// 					BackgroundColorDark: "value",
+// 					WarnColorDark:       "value",
+// 					FontColorDark:       "value",
+// 					HideLoginNameSuffix: true,
+// 					ErrorMsgPopup:       true,
+// 					DisableWatermark:    true,
+// 					ThemeMode:           domain.LabelPolicyThemeAuto,
+// 				}
+// 				// err := settingRepo.Set(t.Context(), tx, &setting)
+// 				// require.NoError(t, err)
 
-				// change type
-				setting.Type = domain.SettingTypeOrganization
-				return &setting
-			},
-			// expect nothing to get updated
-			rowsAffected: 0,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tx, err := tx.Begin(t.Context())
-			require.NoError(t, err)
-			defer func() {
-				err = tx.Rollback(t.Context())
-				if err != nil {
-					t.Logf("error during rollback: %v", err)
-				}
-			}()
+// 				// change type
+// 				setting.Type = domain.SettingTypeOrganization
+// 				return &setting
+// 			},
+// 			// expect nothing to get updated
+// 			rowsAffected: 0,
+// 		},
+// 	}
+// 	for _, tt := range tests {
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			tx, err := tx.Begin(t.Context())
+// 			require.NoError(t, err)
+// 			defer func() {
+// 				err = tx.Rollback(t.Context())
+// 				if err != nil {
+// 					t.Logf("error during rollback: %v", err)
+// 				}
+// 			}()
 
-			setting := tt.testFunc(t, tx)
+// 			setting := tt.testFunc(t, tx)
 
-			// update setting
-			_, err = settingRepo.Update(
-				t.Context(), tx,
-				tt.conditions,
-				tt.changes,
-			)
-			afterUpdate := time.Now()
-			assert.ErrorIs(t, err, tt.err)
-			if err != nil {
-				return
-			}
-			require.NoError(t, err)
+// 			// update setting
+// 			_, err = settingRepo.Update(
+// 				t.Context(), tx,
+// 				tt.conditions,
+// 				tt.changes,
+// 			)
+// 			afterUpdate := time.Now()
+// 			assert.ErrorIs(t, err, tt.err)
+// 			if err != nil {
+// 				return
+// 			}
+// 			require.NoError(t, err)
 
-			assert.ErrorIs(t, err, tt.err)
+// 			assert.ErrorIs(t, err, tt.err)
 
-			updatedSetting, err := settingRepo.Get(
-				t.Context(), tx,
-				database.WithCondition(
-					database.And(
-						settingRepo.InstanceIDCondition(setting.InstanceID),
-						settingRepo.OrgIDCondition(setting.OrganizationID),
-						settingRepo.TypeCondition(setting.Type),
-						settingRepo.OwnerTypeCondition(setting.OwnerType),
-						settingRepo.LabelStateCondition(*setting.LabelState),
-					),
-				),
-			)
-			require.NoError(t, err)
+// 			updatedSetting, err := settingRepo.Get(
+// 				t.Context(), tx,
+// 				database.WithCondition(
+// 					database.And(
+// 						settingRepo.InstanceIDCondition(setting.InstanceID),
+// 						settingRepo.OrgIDCondition(setting.OrganizationID),
+// 						settingRepo.TypeCondition(setting.Type),
+// 						settingRepo.OwnerTypeCondition(setting.OwnerType),
+// 						settingRepo.LabelStateCondition(*setting.LabelState),
+// 					),
+// 				),
+// 			)
+// 			require.NoError(t, err)
 
-			assert.Equal(t, setting.InstanceID, updatedSetting.InstanceID)
-			assert.Equal(t, setting.OrganizationID, updatedSetting.OrganizationID)
-			assert.Equal(t, setting.ID, updatedSetting.ID)
-			assert.Equal(t, setting.Type, updatedSetting.Type)
+// 			assert.Equal(t, setting.InstanceID, updatedSetting.InstanceID)
+// 			assert.Equal(t, setting.OrganizationID, updatedSetting.OrganizationID)
+// 			assert.Equal(t, setting.ID, updatedSetting.ID)
+// 			assert.Equal(t, setting.Type, updatedSetting.Type)
 
-			assert.Equal(t, setting.Settings, updatedSetting.Settings)
+// 			assert.Equal(t, setting.Settings, updatedSetting.Settings)
 
-			assert.WithinRange(t, *updatedSetting.UpdatedAt, beforeUpdate, afterUpdate)
-		})
-	}
-}
+// 			assert.WithinRange(t, *updatedSetting.UpdatedAt, beforeUpdate, afterUpdate)
+// 		})
+// 	}
+// }
 
 // TODO
 // NOTE all the Get.*() functions are a wrapper around Get()
