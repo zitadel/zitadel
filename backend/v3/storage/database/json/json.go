@@ -62,7 +62,6 @@ func (c *FieldChange) writeUpdate(builder *database.StatementBuilder, changes js
 	if err != nil {
 		return err
 	}
-	fmt.Println("\033[45m[DBUGPRINT]\033[0m[:1]\033[45m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m inside writeUpdate()")
 
 	builder.WriteString("jsonb_set_lax(")
 	if i < 0 {
@@ -70,11 +69,19 @@ func (c *FieldChange) writeUpdate(builder *database.StatementBuilder, changes js
 	} else {
 		changes.changes[i].writeUpdate(builder, changes, i-1)
 	}
-	builder.WriteString(", '" + writePath(path))
+	// builder.WriteString(", '" + writePath(path))
+	builder.WriteString(", ")
+	builder.WriteArg(path)
 	if value == "null" {
-		builder.WriteString("', " + string(value))
+		// builder.WriteString("', " + string(value))
+		builder.WriteString(", ")
+		builder.WriteArg(value)
 	} else {
-		builder.WriteString("', '" + string(value) + "'")
+		// builder.WriteString("', '" + string(value) + "'")
+		// builder.WriteString("', '")
+		builder.WriteString(", ")
+		builder.WriteArg(string(value))
+		// builder.WriteString("'")
 	}
 	builder.WriteString(", " + "true")
 	builder.WriteString(", 'delete_key'")
@@ -95,30 +102,11 @@ type ArrayChange struct {
 }
 
 func NewArrayChange(path []string, value any, remove bool) JsonUpdate {
-	// if remove {
-	// return []JsonUpdate{
 	return &ArrayChange{
 		path:   path,
 		value:  value,
 		remove: remove,
 	}
-	// }
-	// } else {
-	// 	return []JsonUpdate{
-	// 		// first remove so we don't have duplicates in the array
-	// 		&ArrayChange{
-	// 			path:  path,
-	// 			value: value,
-	// 			// remove: !remove,
-	// 			remove: true,
-	// 		},
-	// 		&ArrayChange{
-	// 			path:   path,
-	// 			value:  value,
-	// 			remove: remove,
-	// 		},
-	// 	}
-	// }
 }
 
 func (c *ArrayChange) getPathValue() ([]string, string, error) {
@@ -133,7 +121,6 @@ func (c *ArrayChange) getPathValue() ([]string, string, error) {
 }
 
 func (c *ArrayChange) writeUpdate(builder *database.StatementBuilder, changes jsonChanges, i int) error {
-	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m c.remove = %p\n", &c.remove)
 	if c.remove {
 		return c.removeFromArray(builder, changes, i)
 	} else {
@@ -142,8 +129,6 @@ func (c *ArrayChange) writeUpdate(builder *database.StatementBuilder, changes js
 }
 
 func (c *ArrayChange) addToArray(builder *database.StatementBuilder, changes jsonChanges, i int) error {
-	fmt.Println("\033[45m[DBUGPRINT]\033[0m[:1]\033[45m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m ADD")
-	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m i = %+v\n", i)
 	path, value, err := c.getPathValue()
 	if err != nil {
 		return err
@@ -168,7 +153,7 @@ func (c *ArrayChange) addToArray(builder *database.StatementBuilder, changes jso
 
 	builder.WriteString("zitadel.jsonb_array_append(")
 
-	// to avoid duplicates remove any preexisting value from array
+	// to mitigate the possibility of having duplicate values in the array
 	builder.WriteString("zitadel.jsonb_array_remove(")
 	if i < 0 {
 		changes.column.WriteQualified(builder)
@@ -176,6 +161,7 @@ func (c *ArrayChange) addToArray(builder *database.StatementBuilder, changes jso
 		changes.changes[i].writeUpdate(builder, changes, i-1)
 	}
 
+	// zitadel.jsonb_array_remove
 	builder.WriteString(", ")
 	builder.WriteArg(path)
 	builder.WriteString(", ")
@@ -183,6 +169,7 @@ func (c *ArrayChange) addToArray(builder *database.StatementBuilder, changes jso
 	builder.WriteString("::TEXT")
 	builder.WriteString(")")
 
+	// zitadel.jsonb_array_append
 	builder.WriteString(", ")
 	builder.WriteArg(path)
 	builder.WriteString(", ")
@@ -279,7 +266,10 @@ func (c jsonChanges) Write(builder *database.StatementBuilder) error {
 		return nil
 	}
 	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> len(c.changes) = %+v\n", len(c.changes))
-	return c.changes[len(c.changes)-1].writeUpdate(builder, c, len(c.changes)-2)
+	// return c.changes[len(c.changes)-1].writeUpdate(builder, c, len(c.changes)-2)
+	c.changes[len(c.changes)-1].writeUpdate(builder, c, len(c.changes)-2)
+	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[settings_test.go:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m builder.String() = %+v\n", builder.String())
+	return nil
 }
 
 func (c jsonChanges) IsOnColumn(col database.Column) bool {

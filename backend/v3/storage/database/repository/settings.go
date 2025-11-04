@@ -424,7 +424,10 @@ func (s *labelSettings) Set(ctx context.Context, client database.QueryExecutor, 
 func (s *labelSettings) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
 	builder := database.StatementBuilder{}
 	builder.WriteString(`UPDATE zitadel.settings SET `)
-	database.Changes(changes).Write(&builder)
+	err := database.Changes(changes).Write(&builder)
+	if err != nil {
+		return 0, err
+	}
 	writeCondition(&builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
@@ -828,7 +831,7 @@ func (s *securitySettings) Reset(ctx context.Context, client database.QueryExecu
 const setSecuritySettingEventStmt = `INSERT INTO zitadel.settings` +
 	` (instance_id, organization_id, type, owner_type, settings, created_at)` +
 	` VALUES ($1, $2, 'security', $3, $4, $5)` +
-	` ON CONFLICT (instance_id, organization_id, type, owner_type) WHERE type != 'label' DO UPDATE SET `
+	` ON CONFLICT (instance_id, organization_id, type, owner_type) WHERE type != 'label' DO UPDATE Set `
 
 func (s *securitySettings) SetEvent(ctx context.Context, client database.QueryExecutor, setting *domain.SecuritySetting, changes ...database.Change) (int64, error) {
 	if setting == nil {
@@ -848,7 +851,10 @@ func (s *securitySettings) SetEvent(ctx context.Context, client database.QueryEx
 		string(settingJSON),
 		setting.CreatedAt)
 
-	database.Changes(changes).Write(builder)
+	err = database.Changes(changes).Write(builder)
+	if err != nil {
+		return 0, err
+	}
 
 	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[settings_instance_test.go:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m  builder.String() = %+v\n", builder.String())
 
@@ -1027,7 +1033,10 @@ func (s *settings) updateSetting(ctx context.Context, client database.QueryExecu
 		changes = append(changes, s.SetSettings(string(settingJSON)))
 	}
 
-	database.Changes(changes).Write(&builder)
+	err = database.Changes(changes).Write(&builder)
+	if err != nil {
+		return 0, err
+	}
 
 	writeCondition(&builder, database.And(conditions...))
 
@@ -1098,7 +1107,10 @@ func createSetting(ctx context.Context, client database.QueryExecutor, setting *
 		setting.LabelState,
 		string(settingJSON))
 
-	database.Changes(changes).Write(builder)
+	err = database.Changes(changes).Write(builder)
+	if err != nil {
+		return err
+	}
 
 	builder.WriteString(` RETURNING id, created_at, updated_at`)
 

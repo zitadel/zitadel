@@ -93,7 +93,10 @@ func (m Changes) Write(builder *StatementBuilder) error {
 		if i > 0 {
 			builder.WriteString(", ")
 		}
-		change.Write(builder)
+		err := change.Write(builder)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

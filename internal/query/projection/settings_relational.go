@@ -459,6 +459,7 @@ func (s *settingsRelationalProjection) reduceLoginPolicyChanged(event eventstore
 		if policyEvent.MultiFactorCheckLifetime != nil {
 			changes = append(changes, settingsRepo.SetMultiFactorCheckLifetimeField(*policyEvent.MultiFactorCheckLifetime))
 		}
+		fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m orgId = %+v\n", orgId)
 
 		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
@@ -1903,7 +1904,7 @@ func (s *settingsRelationalProjection) reduceSecurityPolicySet(event eventstore.
 				OwnerType:  domain.OwnerTypeInstance,
 				// Settings:   payload,
 				CreatedAt: e.CreatedAt(),
-				UpdatedAt: &e.Creation,
+				// UpdatedAt: &e.Creation,
 			},
 		}
 
@@ -1928,9 +1929,11 @@ func (s *settingsRelationalProjection) reduceSecurityPolicySet(event eventstore.
 			changes = append(changes, settingsRepo.SetEnableImpersonation(*e.EnableImpersonation))
 		}
 
+		updatedAt := e.CreatedAt()
+
 		fmt.Println("\033[45m[DBUGPRINT]\033[0m[settings_instance_test.go:1]\033[45m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m SECURITY POLICY")
 		_, err := settingsRepo.SetEvent(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetLabelSettings(changes...),
-			settingsRepo.SetUpdatedAt(&e.Creation))
+			settingsRepo.SetUpdatedAt(&updatedAt))
 		return err
 	}), nil
 }
@@ -1961,6 +1964,7 @@ func (s *settingsRelationalProjection) reduceOrganizationSettingsSet(event event
 			OrganizationScopedUsernames: e.OrganizationScopedUsernames,
 		}
 
+		fmt.Println("\033[45m[DBUGPRINT]\033[0m[settings_instance_test.go:1]\033[45m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m REMOVE SECURITY POLICY")
 		_, err := settingsRepo.SetEvent(ctx, v3_sql.SQLTx(tx), setting)
 		return err
 	}), nil

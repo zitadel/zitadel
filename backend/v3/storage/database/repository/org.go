@@ -108,7 +108,10 @@ func (o org) Update(ctx context.Context, client database.QueryExecutor, conditio
 
 	var builder database.StatementBuilder
 	builder.WriteString(`UPDATE zitadel.organizations SET `)
-	database.Changes(changes).Write(&builder)
+	err := database.Changes(changes).Write(&builder)
+	if err != nil {
+		return 0, err
+	}
 	writeCondition(&builder, condition)
 
 	stmt := builder.String()
