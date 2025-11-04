@@ -6,16 +6,6 @@
         <div>
           <h1>{{ 'APP.PAGES.QUICK_CREATE_FRAMEWORK' | translate }}</h1>
           <p>{{ 'APP.PAGES.QUICK_CREATE_FRAMEWORK_DESC' | translate }}</p>
-
-          <!-- <cnsl-search-project-autocomplete
-            class="block"
-            [autocompleteType]="ProjectAutocompleteType.PROJECT_OWNED"
-            (selectionChanged)="selectProject($any($event))"
-            (valueChanged)="projectName = $any($event)"
-          >
-          </cnsl-search-project-autocomplete> -->
-
-          <!-- <p>{{ 'APP.PAGES.CREATE_NEW_PROJECT' | translate }}</p> -->
         </div>
 
         <div *ngIf="!initialParam()">
@@ -36,17 +26,6 @@
               </button>
             </ng-container>
           </div>
-
-          <!-- <div class="framework-search-wrapper">
-            <p class="search-label">{{ 'APP.PAGES.FRAMEWORK_NOT_LISTED' | translate }}</p>
-            <cnsl-framework-autocomplete
-              *ngIf="frameworks"
-              [frameworkId]="framework()?.id"
-              [frameworks]="frameworks"
-              [withCustom]="true"
-              (selectionChanged)="findFramework($event)"
-            ></cnsl-framework-autocomplete>
-          </div> -->
         </div>
       </div>
 
