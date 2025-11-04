@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
@@ -21,6 +22,15 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/network"
 	"github.com/zitadel/zitadel/internal/database"
+)
+
+// ANSI color codes
+const (
+	colorReset  = "\033[0m"
+	colorBold   = "\033[1m"
+	colorGreen  = "\033[32m"
+	colorYellow = "\033[33m"
+	colorCyan   = "\033[36m"
 )
 
 type Config struct {
@@ -71,9 +81,22 @@ func New() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("Error writing YAML to stdout: %v", err)
 			}
+
+			// Print follow-up instructions to stderr with colors
+			os.Stderr.Write([]byte("\n" + colorCyan + strings.Repeat("=", 80) + colorReset + "\n"))
+			os.Stderr.Write([]byte(colorBold + colorGreen + "NEXT STEPS" + colorReset + "\n"))
+			os.Stderr.Write([]byte(colorCyan + strings.Repeat("=", 80) + colorReset + "\n\n"))
+
+			os.Stderr.Write([]byte(colorBold + "1. Generate a master key and store it securely:" + colorReset + "\n\n"))
+			os.Stderr.Write([]byte("   " + colorYellow + "$ zitadel config generate-masterkey > masterkey.txt" + colorReset + "\n\n"))
+			os.Stderr.Write([]byte("   Then pass it to ZITADEL with: " + colorCyan + "--masterkeyFile=./masterkey.txt" + colorReset + "\n"))
+
 			if note != "" {
-				_, err = os.Stderr.Write([]byte("\n\n" + note))
+				os.Stderr.Write([]byte("\n" + colorCyan + strings.Repeat("-", 80) + colorReset + "\n\n"))
+				_, err = os.Stderr.Write([]byte(note))
 			}
+
+			os.Stderr.Write([]byte("\n" + colorCyan + strings.Repeat("=", 80) + colorReset + "\n"))
 			return nil
 		},
 	}
@@ -154,7 +177,13 @@ func addSystemUser(in *Config, out *yaml.Node) (string, error) {
 		},
 		systemUsersNode,
 	)
-	return fmt.Sprintf("Write the following base64 encoded private key, store it securely and pass it to the login, for example with SYSTEM_USER_PRIVATE_KEY_FILE=login-client.pem\n\necho '%s' > login-client.pem\n", base64PrivateKey), nil
+
+	note := fmt.Sprintf(colorBold+"2. Store the private key securely:"+colorReset+"\n\n"+
+		"   "+colorYellow+"$ echo '%s' > login-client.pem"+colorReset+"\n\n"+
+		"   Then pass it to the login app with: "+colorCyan+"SYSTEM_USER_PRIVATE_KEY_FILE=login-client.pem"+colorReset,
+		base64PrivateKey)
+
+	return note, nil
 }
 
 func newGenerateMasterKeyCmd() *cobra.Command {
