@@ -42,7 +42,6 @@ import (
 )
 
 const signingKey = "somekey" // signing key received after creating the target
-const signingHeader = "ZITADEL-Signature"
 
 // webhook HandleFunc to read the request body and then print out the contents
 func webhook(w http.ResponseWriter, req *http.Request) {
@@ -55,7 +54,7 @@ func webhook(w http.ResponseWriter, req *http.Request) {
 	}
 	defer req.Body.Close()
 	// validate signature
-	if err := actions.ValidatePayload(sentBody, req.Header.Get(signingHeader), signingKey); err != nil {
+	if err := actions.ValidatePayload(sentBody, req.Header.Get(actions.SigningHeader), signingKey); err != nil {
 		// if the signed content is not equal the sent content return an error
 		http.Error(w, "error", http.StatusInternalServerError)
 		return
@@ -96,7 +95,7 @@ curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/actions/targets' \
     "interruptOnError": true    
   },
   "endpoint": "http://localhost:8090/webhook",
-  "timeout": "10s",
+  "timeout": "10s"
 }'
 ```
 
