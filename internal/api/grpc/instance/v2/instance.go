@@ -35,6 +35,10 @@ func (s *Server) DeleteInstance(ctx context.Context, request *connect.Request[in
 }
 
 func (s *Server) UpdateInstance(ctx context.Context, request *connect.Request[instance.UpdateInstanceRequest]) (*connect.Response[instance.UpdateInstanceResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.UpdateInstance(ctx, request)
+	}
+
 	if err := s.checkPermission(ctx, domain.PermissionSystemInstanceWrite, domain.PermissionInstanceWrite); err != nil {
 		return nil, err
 	}
