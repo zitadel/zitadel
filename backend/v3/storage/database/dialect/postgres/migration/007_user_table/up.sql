@@ -52,6 +52,29 @@ CREATE TABLE zitadel.users(
 CREATE UNIQUE INDEX ON zitadel.users(instance_id, organization_id, username) WHERE username_org_unique IS TRUE; --TODO(adlerhurst): does that work if a username is already present on a user without org unique?
 CREATE UNIQUE INDEX ON zitadel.users(instance_id, username) WHERE username_org_unique IS FALSE;
 
+CREATE TABLE zitadel.user_metadata (
+    instance_id TEXT NOT NULL
+    , user_id TEXT NOT NULL
+    , key TEXT NOT NULL CHECK (key <> '')
+    , value BYTEA NOT NULL
+
+    , created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    , updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    
+    , PRIMARY KEY (instance_id, user_id, key)
+    
+    , CONSTRAINT fk_user_metadata_org FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users (instance_id, id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_user_metadata_key ON zitadel.user_metadata (key);
+CREATE INDEX idx_user_metadata_value ON zitadel.user_metadata (sha256(value));
+
+CREATE TRIGGER trg_set_updated_at_user_metadata
+  BEFORE INSERT OR UPDATE ON zitadel.user_metadata
+  FOR EACH ROW
+  WHEN (NEW.updated_at IS NULL)
+  EXECUTE FUNCTION zitadel.set_updated_at();
+
 -- machine user
 CREATE TABLE zitadel.machine_users(
     name TEXT NOT NULL CHECK (name <> '')
@@ -155,7 +178,57 @@ CREATE TABLE IF NOT EXISTS zitadel.user_personal_access_tokens(
     , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users(instance_id, id) ON DELETE CASCADE
 );
 
+CREATE TYPE zitadel.passkey_type AS ENUM (
+    'passwordless'
+    , 'u2f'
+);
+
+CREATE TYPE zitadel.passkey_state AS ENUM (
+    'unverified'
+    , 'verified'
+);
+
 CREATE TABLE zitadel.human_passkeys(
     instance_id TEXT NOT NULL
+    , token_id TEXT NOT NULL
+
+    , user_id TEXT NOT NULL
+
+    , created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    , updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+
+    , type zitadel.passkey_type NOT NULL
+    , name TEXT NOT NULL CHECK (name <> '')
+    , sign_count INT NOT NULL DEFAULT 0 CHECK (sign_count >= 0)
+    , challenge BYTES NOT NULL
+    , is_verified BOOLEAN NOT NULL DEFAULT FALSE
+
+    , PRIMARY KEY (instance_id, token_id)
+    , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users(instance_id, id) ON DELETE CASCADE
+);
+
+CREATE TABLE zitadel.human_refresh_tokens(
+    instance_id TEXT NOT NULL
+    , token_id TEXT NOT NULL
+
+    , user_id TEXT NOT NULL
+
+    , created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     
-)
+    , authenticated_at TIMESTAMPTZ NOT NULL
+    
+    , idle_expiration INTERVAL NOT NULL
+    , absolute_expiration INTERVAL NOT NULL
+
+    , client_id TEXT NOT NULL
+    , user_agent_id TEXT NOT NULL
+    , audience TEXT[]
+    , scopes TEXT[]
+    , auth_method_references TEXT[]
+    , preferred_language TEXT
+    , refresh_token BYTES
+    -- , actor TODO: whats this?
+
+    , PRIMARY KEY (instance_id, token_id)
+    , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users(instance_id, id) ON DELETE CASCADE
+);

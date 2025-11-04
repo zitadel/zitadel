@@ -22,12 +22,13 @@ const (
 // It can be a human user or a machine user.
 // Meaning that either Human or Machine is set, the other is nil.
 type User struct {
-	InstanceID          string    `json:"instanceId,omitempty" db:"instance_id"`
-	OrgID               string    `json:"orgId,omitempty" db:"org_id"`
-	ID                  string    `json:"id,omitempty" db:"id"`
-	Username            string    `json:"username,omitempty" db:"username"`
-	IsUsernameOrgUnique bool      `json:"usernameOrgUnique,omitempty" db:"username_org_unique"`
-	State               UserState `json:"state,omitempty" db:"state"`
+	InstanceID          string          `json:"instanceId,omitempty" db:"instance_id"`
+	OrgID               string          `json:"orgId,omitempty" db:"org_id"`
+	ID                  string          `json:"id,omitempty" db:"id"`
+	Username            string          `json:"username,omitempty" db:"username"`
+	IsUsernameOrgUnique bool            `json:"usernameOrgUnique,omitempty" db:"username_org_unique"`
+	State               UserState       `json:"state,omitempty" db:"state"`
+	Metadata            []*UserMetadata `json:"metadata,omitempty" db:"-"` // metadata need to be handled separately
 
 	*Machine `db:"machine"`
 	*Human   `db:"human"`
@@ -55,14 +56,16 @@ type UserRepository interface {
 	Human() HumanUserRepository
 	Machine() MachineUserRepository
 
-	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOpts) *User
-	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOpts) []*User
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) *User
+	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) []*User
 	// DISCUSS(adlerhurst): Instead of having this method the Create methods could be on the sub-repositories?
 	// The sub repos should then get the CreateMachineCommand or CreateHumanCommand as parameter instead of the User.
 	// Passing the command instead of the object would generally simplify the domain logic for creation.
 	Create(ctx context.Context, client database.QueryExecutor, user *User) error
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+
+	LoadMetadata() UserRepository
 }
 
 type userColumns interface {
@@ -88,6 +91,8 @@ type userConditions interface {
 	StateCondition(state UserState) database.Condition
 	CreatedAtCondition(op database.NumberOperation, createdAt time.Time) database.Condition
 	UpdatedAtCondition(op database.NumberOperation, updatedAt time.Time) database.Condition
+
+	ExistsMetadata(cond database.Condition) database.Condition
 }
 
 type userChanges interface {

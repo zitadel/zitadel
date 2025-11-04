@@ -10,7 +10,10 @@ import (
 
 var _ domain.MachineUserRepository = (*userMachine)(nil)
 
-type userMachine struct{}
+type userMachine struct {
+	shouldLoadMetadata bool
+	metadata           userMetadata
+}
 
 func MachineUserRepository() domain.MachineUserRepository {
 	return new(userMachine)
@@ -192,6 +195,17 @@ func (m userMachine) UsernameOrgUniqueCondition(condition bool) database.Conditi
 func (m userMachine) TypeCondition(userType domain.UserType) database.Condition {
 	// TODO(adlerhurst): it doesn't make sense to have this method on userMachine
 	return user{}.TypeCondition(userType)
+}
+
+func (u userMachine) ExistsMetadata(cond database.Condition) database.Condition {
+	return database.Exists(
+		u.metadata.qualifiedTableName(),
+		database.And(
+			database.NewColumnCondition(u.InstanceIDColumn(), u.metadata.InstanceIDColumn()),
+			database.NewColumnCondition(u.IDColumn(), u.metadata.UserIDColumn()),
+			cond,
+		),
+	)
 }
 
 // -------------------------------------------------------------

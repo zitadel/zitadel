@@ -16,6 +16,9 @@ type userHuman struct {
 	// userHumanEmail
 	verification
 	// userHumanPhone
+
+	shouldLoadMetadata bool
+	metadata           userMetadata
 }
 
 func HumanUserRepository() domain.HumanUserRepository {
@@ -228,6 +231,17 @@ func (u userHuman) UsernameCondition(op database.TextOperation, username string)
 // UsernameOrgUniqueCondition implements [domain.HumanUserRepository].
 func (u userHuman) UsernameOrgUniqueCondition(condition bool) database.Condition {
 	return database.NewBooleanCondition(u.UsernameOrgUniqueColumn(), condition)
+}
+
+func (u userHuman) ExistsMetadata(cond database.Condition) database.Condition {
+	return database.Exists(
+		u.metadata.qualifiedTableName(),
+		database.And(
+			database.NewColumnCondition(u.InstanceIDColumn(), u.metadata.InstanceIDColumn()),
+			database.NewColumnCondition(u.IDColumn(), u.metadata.UserIDColumn()),
+			cond,
+		),
+	)
 }
 
 // -------------------------------------------------------------

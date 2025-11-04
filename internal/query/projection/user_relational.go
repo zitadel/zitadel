@@ -303,13 +303,50 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 				},
 
 				{
-					Event: user.MetadataSetType,
+					Event:  user.MetadataSetType,
+					Reduce: p.reduceMetadataSet,
 				},
 				{
-					Event: user.MetadataRemovedType,
+					Event:  user.MetadataRemovedType,
+					Reduce: p.reduceMetadataRemoved,
 				},
 				{
-					Event: user.MetadataRemovedAllType,
+					Event:  user.MetadataRemovedAllType,
+					Reduce: p.reduceMetadataRemovedAll,
+				},
+
+				{
+					Event:  user.HumanPasswordlessTokenAddedType,
+					Reduce: p.reducePasskeyAdded,
+				},
+				{
+					Event:  user.HumanPasswordlessTokenVerifiedType,
+					Reduce: p.reducePasskeyVerified,
+				},
+				{
+					Event:  user.HumanPasswordlessTokenSignCountChangedType,
+					Reduce: p.reducePasskeySignCountSet,
+				},
+				{
+					Event:  user.HumanPasswordlessTokenRemovedType,
+					Reduce: p.reducePasskeyRemoved,
+				},
+
+				{
+					Event:  user.HumanU2FTokenAddedType,
+					Reduce: p.reducePasskeyAdded,
+				},
+				{
+					Event:  user.HumanU2FTokenVerifiedType,
+					Reduce: p.reducePasskeyVerified,
+				},
+				{
+					Event:  user.HumanU2FTokenSignCountChangedType,
+					Reduce: p.reducePasskeySignCountSet,
+				},
+				{
+					Event:  user.HumanU2FTokenRemovedType,
+					Reduce: p.reducePasskeyRemoved,
 				},
 			},
 		},
@@ -1328,6 +1365,189 @@ func (p *userRelationalProjection) reducePersonalAccessTokenRemoved(event events
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.TokenID),
 			repo.UserIDCondition(e.Aggregate().ID),
 		))
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceMetadataSet(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.MetadataSetEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xOO4e", "reduce.wrong.event.type %s", user.MetadataSetType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-xg4IJ", "reduce.wrong.db.pool %T", ex)
+		}
+		return repository.UserMetadataRepository().Set(ctx, v3_sql.SQLTx(tx), &domain.UserMetadata{
+			Metadata: domain.Metadata{
+				InstanceID: e.Aggregate().InstanceID,
+				Key:        e.Key,
+				Value:      e.Value,
+				CreatedAt:  e.CreationDate(),
+				UpdatedAt:  e.CreationDate(),
+			},
+			UserID: e.Aggregate().ID,
+		})
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceMetadataRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.MetadataRemovedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xOO4e", "reduce.wrong.event.type %s", user.MetadataRemovedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-xg4IJ", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.UserMetadataRepository()
+		_, err := repo.Remove(ctx, v3_sql.SQLTx(tx), repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID, e.Key))
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceMetadataRemovedAll(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.MetadataRemovedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xOO4e", "reduce.wrong.event.type %s", user.MetadataRemovedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-xg4IJ", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.UserMetadataRepository()
+		_, err := repo.Remove(ctx, v3_sql.SQLTx(tx), database.And(
+			repo.InstanceIDCondition(e.Aggregate().InstanceID),
+			repo.UserIDCondition(e.Aggregate().ID),
+		))
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reducePasskeyAdded(event eventstore.Event) (*handler.Statement, error) {
+	var (
+		e   user.HumanWebAuthNAddedEvent
+		typ domain.PasskeyType
+	)
+	switch typed := event.(type) {
+	case *user.HumanPasswordlessAddedEvent:
+		e = typed.HumanWebAuthNAddedEvent
+		typ = domain.PasskeyTypePasswordless
+	case *user.HumanU2FAddedEvent:
+		e = typed.HumanWebAuthNAddedEvent
+		typ = domain.PasskeyTypeU2F
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type for passkey %s", event.Type())
+	}
+	return handler.NewStatement(&e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.PasskeyRepository()
+		return repo.Add(ctx, v3_sql.SQLTx(tx), &domain.Passkey{
+			InstanceID:      e.Aggregate().InstanceID,
+			UserID:          e.Aggregate().ID,
+			TokenID:         e.WebAuthNTokenID,
+			CreatedAt:       e.CreatedAt(),
+			UpdatedAt:       e.CreatedAt(),
+			Type:            typ,
+			Challenge:       []byte(e.Challenge),
+			RelayingPartyID: e.RPID,
+		})
+	}), nil
+}
+
+func (p *userRelationalProjection) reducePasskeyVerified(event eventstore.Event) (*handler.Statement, error) {
+	var (
+		e user.HumanWebAuthNVerifiedEvent
+	)
+	switch typed := event.(type) {
+	case *user.HumanPasswordlessVerifiedEvent:
+		e = typed.HumanWebAuthNVerifiedEvent
+	case *user.HumanU2FVerifiedEvent:
+		e = typed.HumanWebAuthNVerifiedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type for passkey %s", event.Type())
+	}
+	return handler.NewStatement(&e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		// TODO: remaining fields to be updated?
+		repo := repository.PasskeyRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			database.And(
+				repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.WebAuthNTokenID),
+				repo.UserIDCondition(e.Aggregate().ID),
+			),
+			repo.SetUpdatedAt(e.CreatedAt()),
+			repo.SetState(domain.PasskeyStateVerified),
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reducePasskeySignCountSet(event eventstore.Event) (*handler.Statement, error) {
+	var (
+		e user.HumanWebAuthNSignCountChangedEvent
+	)
+	switch typed := event.(type) {
+	case *user.HumanPasswordlessSignCountChangedEvent:
+		e = typed.HumanWebAuthNSignCountChangedEvent
+	case *user.HumanU2FSignCountChangedEvent:
+		e = typed.HumanWebAuthNSignCountChangedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type for passkey %s", event.Type())
+	}
+	return handler.NewStatement(&e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		// TODO: remaining fields to be updated?
+		repo := repository.PasskeyRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			database.And(
+				repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.WebAuthNTokenID),
+				repo.UserIDCondition(e.Aggregate().ID),
+			),
+			repo.SetUpdatedAt(e.CreatedAt()),
+			repo.SetSignCount(e.SignCount),
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reducePasskeyRemoved(event eventstore.Event) (*handler.Statement, error) {
+	var (
+		e user.HumanWebAuthNRemovedEvent
+	)
+	switch typed := event.(type) {
+	case *user.HumanPasswordlessRemovedEvent:
+		e = typed.HumanWebAuthNRemovedEvent
+	case *user.HumanU2FRemovedEvent:
+		e = typed.HumanWebAuthNRemovedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type for passkey %s", event.Type())
+	}
+	return handler.NewStatement(&e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		// TODO: remaining fields to be updated?
+		repo := repository.PasskeyRepository()
+		_, err := repo.Delete(ctx, v3_sql.SQLTx(tx),
+			database.And(
+				repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.WebAuthNTokenID),
+				repo.UserIDCondition(e.Aggregate().ID),
+			),
+		)
 		return err
 	}), nil
 }

@@ -14,6 +14,9 @@ var _ domain.UserRepository = (*user)(nil)
 type user struct {
 	machine userMachine
 	human   userHuman
+
+	shouldLoadMetadata bool
+	metadata           userMetadata
 }
 
 func UserRepository() domain.UserRepository {
@@ -71,12 +74,20 @@ func (u user) Delete(ctx context.Context, client database.QueryExecutor, conditi
 }
 
 // Get implements [domain.UserRepository].
-func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOpts) *domain.User {
+func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) *domain.User {
+	opts = append(opts,
+		u.joinMetadata(),
+		database.WithGroupBy(u.PrimaryKeyColumns()...),
+	)
 	panic("unimplemented")
 }
 
 // List implements [domain.UserRepository].
-func (u user) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOpts) []*domain.User {
+func (u user) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) []*domain.User {
+	opts = append(opts,
+		u.joinMetadata(),
+		database.WithGroupBy(u.PrimaryKeyColumns()...),
+	)
 	panic("unimplemented")
 }
 
@@ -167,6 +178,17 @@ func (u user) TypeCondition(userType domain.UserType) database.Condition {
 	return database.IsNull(u.IDColumn())
 }
 
+func (u user) ExistsMetadata(cond database.Condition) database.Condition {
+	return database.Exists(
+		u.metadata.qualifiedTableName(),
+		database.And(
+			database.NewColumnCondition(u.InstanceIDColumn(), u.metadata.InstanceIDColumn()),
+			database.NewColumnCondition(u.IDColumn(), u.metadata.UserIDColumn()),
+			cond,
+		),
+	)
+}
+
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
@@ -230,4 +252,35 @@ func (u user) Human() domain.HumanUserRepository {
 // Machine implements [domain.UserRepository].
 func (u user) Machine() domain.MachineUserRepository {
 	return u.machine
+}
+
+func (u user) LoadMetadata() domain.UserRepository {
+	return &user{
+		shouldLoadMetadata: true,
+		machine: userMachine{
+			shouldLoadMetadata: true,
+		},
+		human: userHuman{
+			shouldLoadMetadata: true,
+		},
+	}
+}
+
+func (u user) joinMetadata() database.QueryOption {
+	columns := make([]database.Condition, 0, 3)
+	columns = append(columns,
+		database.NewColumnCondition(u.InstanceIDColumn(), u.metadata.InstanceIDColumn()),
+		database.NewColumnCondition(u.IDColumn(), u.metadata.UserIDColumn()),
+	)
+
+	// If metadata should not be joined, we make sure to return null for the metadata columns
+	// the query optimizer of the dialect should optimize this away if no metadata are requested
+	if !u.shouldLoadMetadata {
+		columns = append(columns, database.IsNull(u.metadata.UserIDColumn()))
+	}
+
+	return database.WithLeftJoin(
+		u.metadata.qualifiedTableName(),
+		database.And(columns...),
+	)
 }
