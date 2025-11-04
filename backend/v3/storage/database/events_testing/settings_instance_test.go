@@ -147,10 +147,6 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		// check inital MFAType value
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := loginRepo.Get(
-			// 	ctx, pool,
-			// 	newInstance.ID(),
-			// 	nil)
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -175,10 +171,6 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := loginRepo.Get(
-			// 	ctx, pool,
-			// 	newInstance.ID(),
-			// 	nil)
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -206,10 +198,6 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		// add MFAType
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := loginRepo.Get(
-			// 	ctx, pool,
-			// 	newInstance.ID(),
-			// 	nil)
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -269,10 +257,6 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		// check new second factor type is added
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := loginRepo.Get(
-			// 	ctx, pool,
-			// 	newInstance.ID(),
-			// 	nil)
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -304,10 +288,6 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		// check new second factor type is removed
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := loginRepo.Get(
-			// 	ctx, pool,
-			// 	newInstance.ID(),
-			// 	nil)
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -465,11 +445,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := settingsRepo.GetLabel(
-			// 	ctx, pool,
-			// 	newInstance.ID(),
-			// 	nil,
-			// 	domain.LabelStatePreview)
 			setting, err := settingsRepo.Get(
 
 				ctx, pool,
@@ -518,11 +493,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := settingsRepo.GetLabel(
-			// 	ctx, pool,
-			// 	newInstance.ID(),
-			// 	nil,
-			// 	domain.LabelStateActivated)
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -564,17 +534,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := settingsRepo.Get(
-			// 	ctx, pool,
-			// 	database.WithCondition(
-			// 		database.And(
-			// 			settingsRepo.InstanceIDCondition(instanceID),
-			// 			settingsRepo.OrgIDCondition(nil),
-			// 			settingsRepo.TypeCondition(domain.SettingTypeLabel),
-			// 			settingsRepo.LabelStateCondition(domain.LabelStatePreview),
-			// 		),
-			// 	),
-			// )
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -617,11 +576,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := settingsRepo.GetLabel(
-			// 	ctx, pool,
-			// 	instanceID,
-			// 	nil,
-			// 	domain.LabelStatePreview)
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -662,11 +616,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		// check light logo set
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := settingsRepo.GetLabel(
-			// 	ctx, pool,
-			// 	instanceID,
-			// 	nil,
-			// 	domain.LabelStatePreview)
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -695,11 +644,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		// check light logo removed
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := settingsRepo.GetLabel(
-			// 	ctx, pool,
-			// 	instanceID,
-			// 	nil,
-			// 	domain.LabelStatePreview)
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -740,11 +684,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		// check dark logo set
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := settingsRepo.GetLabel(
-			// 	ctx, pool,
-			// 	instanceID,
-			// 	nil,
-			// 	domain.LabelStatePreview)
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -773,11 +712,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		// check dark logo removed
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := settingsRepo.GetLabel(
-			// 	ctx, pool,
-			// 	instanceID,
-			// 	nil,
-			// 	domain.LabelStatePreview)
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -820,11 +754,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := settingsRepo.GetLabel(
-			// 	ctx, pool,
-			// 	instanceID,
-			// 	nil,
-			// 	domain.LabelStatePreview)
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -867,11 +796,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := settingsRepo.GetLabel(
-			// 	ctx, pool,
-			// 	instanceID,
-			// 	nil,
-			// 	domain.LabelStatePreview)
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -912,11 +836,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		// check light icon set
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := settingsRepo.GetLabel(
-			// 	ctx, pool,
-			// 	instanceID,
-			// 	nil,
-			// 	domain.LabelStatePreview)
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -945,11 +864,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		// check light icon removed
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := settingsRepo.GetLabel(
-			// 	ctx, pool,
-			// 	instanceID,
-			// 	nil,
-			// 	domain.LabelStatePreview)
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -990,11 +904,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		// check dark icon set
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := settingsRepo.GetLabel(
-			// 	ctx, pool,
-			// 	instanceID,
-			// 	nil,
-			// 	domain.LabelStatePreview)
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -1023,11 +932,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		// check dark icon removed
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := settingsRepo.GetLabel(
-			// 	ctx, pool,
-			// 	instanceID,
-			// 	nil,
-			// 	domain.LabelStatePreview)
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -1070,11 +974,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := settingsRepo.GetLabel(
-			// 	ctx, pool,
-			// 	instanceID,
-			// 	nil,
-			// 	domain.LabelStatePreview)
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -1114,11 +1013,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := settingsRepo.GetLabel(
-			// 	ctx, pool,
-			// 	instanceID,
-			// 	nil,
-			// 	domain.LabelStatePreview)
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -1147,11 +1041,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		// check font policy removed
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// setting, err := settingsRepo.GetLabel(
-			// 	ctx, pool,
-			// 	instanceID,
-			// 	nil,
-			// 	domain.LabelStatePreview)
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -1497,10 +1386,6 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 		// check password expiry settings removed
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// _, err := settingsRepo.GetPasswordExpiry(
-			// 	ctx, pool,
-			// 	newInstance.ID(),
-			// 	nil)
 			_, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -1627,10 +1512,6 @@ func TestServer_TestInstanceDomainSettingsReduces(t *testing.T) {
 		// check domain settings removed
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			// _, err := settingsRepo.GetDomain(
-			// 	ctx, pool,
-			// 	newInstance.ID(),
-			// 	nil)
 			_, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
@@ -1812,7 +1693,6 @@ func TestServer_TestInstanceSecuritySettingsReduces(t *testing.T) {
 			assert.Equal(t, []string{"value"}, setting.AllowedOrigins)
 			assert.Equal(t, true, setting.EnableImpersonation)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
-			// assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 
 		// 2. re-set security policy

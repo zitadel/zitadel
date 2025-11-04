@@ -4724,12 +4724,6 @@ func TestDeleteSetting(t *testing.T) {
 						require.NoError(t, err)
 					}
 
-					// delete organization
-					// affectedRows, err := settingRepo.Delete(t.Context(), tx,
-					// 	instanceId,
-					// 	&orgId,
-					// 	domain.SettingTypeLogin,
-					// )
 					affectedRows, err := settingRepo.Delete(t.Context(), tx,
 						database.And(
 							settingRepo.InstanceIDCondition(instanceId),
