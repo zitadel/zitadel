@@ -1008,39 +1008,6 @@ func (s *settings) Update(ctx context.Context, client database.QueryExecutor, co
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-// func (s *settings) updateSetting(ctx context.Context, client database.QueryExecutor, setting *domain.Setting, settings any, changes ...database.Change) (int64, error) {
-// 	builder := database.StatementBuilder{}
-// 	builder.WriteString(`UPDATE zitadel.settings SET `)
-// 	conditions := []database.Condition{
-// 		s.IDCondition(setting.ID),
-// 		s.InstanceIDCondition(setting.InstanceID),
-// 		s.OrgIDCondition(setting.OrganizationID),
-// 		s.TypeCondition(setting.Type),
-// 	}
-// 	settingJSON, err := json.Marshal(settings)
-// 	if err != nil {
-// 		return 0, err
-// 	}
-
-// 	if changes == nil || !database.Changes(changes).IsOnColumn(s.UpdatedAtColumn()) {
-// 		// if updated_at is not set, then explicitly set it to NULL so that the db trigger sets it to NOW()
-// 		changes = append(changes, s.SetSettings(string(settingJSON)), s.SetUpdatedAt(nil))
-// 	} else {
-// 		changes = append(changes, s.SetSettings(string(settingJSON)))
-// 	}
-
-// 	err = database.Changes(changes).Write(&builder)
-// 	if err != nil {
-// 		return 0, err
-// 	}
-
-// 	writeCondition(&builder, database.And(conditions...))
-
-// 	stmt := builder.String()
-
-// 	return client.Exec(ctx, stmt, builder.Args()...)
-// / }
-
 const eventCreateSettingStmt = `INSERT INTO zitadel.settings` +
 	` (instance_id, organization_id, type, owner_type, label_state, settings, created_at, updated_at)` +
 	` VALUES ($1, $2, $3, $4, $5, $6, $7, $8)` +
@@ -1112,14 +1079,6 @@ func createSetting(ctx context.Context, client database.QueryExecutor, setting *
 }
 
 func (s *settings) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	// options := new(database.QueryOpts)
-	// for _, opt := range opts {
-	// 	opt(options)
-	// }
-
-	// if condition.IsRestrictingColumn(s.LabelStateColumn()) {
-	// 	return 0, database.NewMissingConditionError(s.LabelStateColumn())
-	// }
 	// TODO label
 	if err := s.CheckMandatoryCondtions(condition); err != nil {
 		return 0, err
