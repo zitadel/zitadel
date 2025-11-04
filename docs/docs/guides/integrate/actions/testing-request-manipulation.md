@@ -163,7 +163,7 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/executions' \
         }
     },
     "targets": [
-        "344654516211155086"
+        "<TargetID returned>"
     ]
 }'
 ```
