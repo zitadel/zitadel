@@ -972,7 +972,6 @@ const setOrganizationSettingEventStmt = `INSERT INTO zitadel.settings` +
 	` ON CONFLICT (instance_id, organization_id, type, owner_type) WHERE type != 'label'` +
 	` DO UPDATE SET settings = EXCLUDED.settings, updated_at = $5`
 
-// func (s *organizationSettings) SetEvent(ctx context.Context, client database.QueryExecutor, setting *domain.OrganizationSetting, changes ...database.Change) (int64, error) {
 func (s *organizationSettings) SetEvent(ctx context.Context, client database.QueryExecutor, setting *domain.OrganizationSetting) (int64, error) {
 	if setting == nil {
 		return 0, ErrSettingObjectMustNotBeNil

@@ -37,25 +37,6 @@ func (c *FieldChange) getPathValue() ([]string, string, error) {
 	return path, string(value), nil
 }
 
-func writePath(path []string) string {
-	if len(path) == 0 {
-		return "{}"
-	}
-
-	out := "{"
-
-	for _, p := range path[:len(path)-1] {
-		// out += "'" + p + "',"
-		out += p
-	}
-	// out += "'" + path[len(path)-1] + "'"
-	out += path[len(path)-1]
-
-	out += "}"
-
-	return out
-}
-
 func (c *FieldChange) writeUpdate(builder *database.StatementBuilder, changes jsonChanges, i int) error {
 	path, value, err := c.getPathValue()
 	if err != nil {
@@ -68,7 +49,6 @@ func (c *FieldChange) writeUpdate(builder *database.StatementBuilder, changes js
 	} else {
 		changes.changes[i].writeUpdate(builder, changes, i-1)
 	}
-	// builder.WriteString(", '" + writePath(path))
 	builder.WriteString(", ")
 	builder.WriteArg(path)
 	if value == "null" {
@@ -184,7 +164,6 @@ func (c *ArrayChange) addToArray(builder *database.StatementBuilder, changes jso
 }
 
 func (c *ArrayChange) removeFromArray(builder *database.StatementBuilder, changes jsonChanges, i int) error {
-
 	path, value, err := c.getPathValue()
 	if err != nil {
 		return err
