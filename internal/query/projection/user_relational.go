@@ -348,6 +348,27 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.HumanU2FTokenRemovedType,
 					Reduce: p.reducePasskeyRemoved,
 				},
+
+				{
+					Event:  user.UserIDPLinkAddedType,
+					Reduce: p.reduceIDPLinkAdded,
+				},
+				{
+					Event:  user.UserIDPLinkCascadeRemovedType,
+					Reduce: p.reduceIDPLinkCascadeRemoved,
+				},
+				{
+					Event:  user.UserIDPLinkRemovedType,
+					Reduce: p.reduceIDPLinkRemoved,
+				},
+				{
+					Event:  user.UserIDPExternalIDMigratedType,
+					Reduce: p.reduceIDPLinkUserIDMigrated,
+				},
+				{
+					Event:  user.UserIDPExternalUsernameChangedType,
+					Reduce: p.reduceIDPLinkUsernameChanged,
+				},
 			},
 		},
 	}
@@ -1579,7 +1600,7 @@ func (p *userRelationalProjection) reducePasskeyRemoved(event eventstore.Event) 
 func (p *userRelationalProjection) reduceMFAInitSkipped(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanMFAInitSkippedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.MachineChangedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanMFAInitSkippedType)
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -1591,6 +1612,108 @@ func (p *userRelationalProjection) reduceMFAInitSkipped(event eventstore.Event) 
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.SetMFAInitSkippedAt(gu.Ptr(e.CreatedAt())),
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceIDPLinkAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.UserIDPLinkAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.UserIDPLinkAddedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.UserIdentityProviderLinkRepository()
+
+		return repo.Create(ctx, v3_sql.SQLTx(tx),
+			&domain.UserIdentityProviderLink{
+				InstanceID:         e.Aggregate().InstanceID,
+				UserID:             e.Aggregate().ID,
+				IdentityProviderID: e.IDPConfigID,
+				ProvidedID:         e.ExternalUserID,
+				ProvidedUsername:   e.DisplayName,
+				CreatedAt:          e.CreatedAt(),
+				UpdatedAt:          e.CreatedAt(),
+			},
+		)
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceIDPLinkCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.UserIDPLinkCascadeRemovedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.UserIDPLinkCascadeRemovedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.UserIdentityProviderLinkRepository()
+
+		_, err := repo.Delete(ctx, v3_sql.SQLTx(tx), repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.IDPConfigID, e.ExternalUserID))
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceIDPLinkRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.UserIDPLinkRemovedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.UserIDPLinkRemovedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.UserIdentityProviderLinkRepository()
+
+		_, err := repo.Delete(ctx, v3_sql.SQLTx(tx), repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.IDPConfigID, e.ExternalUserID))
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceIDPLinkUserIDMigrated(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.UserIDPExternalIDMigratedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.UserIDPExternalIDMigratedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.UserIdentityProviderLinkRepository()
+
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.IDPConfigID, e.PreviousID),
+			repo.SetProvidedUserID(e.NewID),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceIDPLinkUsernameChanged(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.UserIDPExternalUsernameEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.UserIDPExternalUsernameChangedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.UserIdentityProviderLinkRepository()
+
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.IDPConfigID, e.ExternalUserID),
+			repo.SetProvidedUsername(e.ExternalUsername),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil

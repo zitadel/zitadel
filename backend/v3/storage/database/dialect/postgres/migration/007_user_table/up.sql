@@ -215,8 +215,13 @@ CREATE TABLE zitadel.human_identity_provider_links(
     , provided_username TEXT NOT NULL
     , user_id TEXT NOT NULL
 
-    , PRIMARY KEY (instance_id, provided_user_id, identity_provider_id)
+    , created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    , updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+
+    , PRIMARY KEY (instance_id, identity_provider_id, provided_user_id)
 
     , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.human_users(instance_id, id) ON DELETE CASCADE
     , FOREIGN KEY (instance_id, identity_provider_id) REFERENCES zitadel.identity_providers(instance_id, id) ON DELETE CASCADE
+
+    , UNIQUE (instance_id, user_id, provided_user_id)
 );
