@@ -54,7 +54,7 @@ func webhook(w http.ResponseWriter, req *http.Request) {
 	}
 	defer req.Body.Close()
 	// validate signature
-	if err := actions.ValidatePayload(sentBody, req.Header.Get(actions.SigningHeader), signingKey); err != nil {
+	if err := actions.ValidateRequestPayload(sentBody, req.Header, signingKey); err != nil {
 		// if the signed content is not equal the sent content return an error
 		http.Error(w, "error", http.StatusInternalServerError)
 		return
