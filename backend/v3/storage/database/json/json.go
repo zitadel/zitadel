@@ -52,14 +52,11 @@ func (c *FieldChange) writeUpdate(builder *database.StatementBuilder, changes js
 	builder.WriteString(", ")
 	builder.WriteArg(path)
 	if value == "null" {
-		// builder.WriteString("', " + string(value))
 		builder.WriteString(", ")
 		builder.WriteArg(value)
 	} else {
-		// builder.WriteString("', '" + string(value) + "'")
-		// builder.WriteString("', '")
 		builder.WriteString(", ")
-		builder.WriteArg(string(value))
+		builder.WriteArg(value)
 		// builder.WriteString("'")
 	}
 	builder.WriteString(", " + "true")
@@ -242,10 +239,7 @@ func (c jsonChanges) Write(builder *database.StatementBuilder) error {
 		return nil
 	}
 
-	// return c.changes[len(c.changes)-1].writeUpdate(builder, c, len(c.changes)-2)
-	c.changes[len(c.changes)-1].writeUpdate(builder, c, len(c.changes)-2)
-
-	return nil
+	return c.changes[len(c.changes)-1].writeUpdate(builder, c, len(c.changes)-2)
 }
 
 func (c jsonChanges) IsOnColumn(col database.Column) bool {

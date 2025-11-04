@@ -276,7 +276,7 @@ func (s *loginSettings) Get(ctx context.Context, client database.QueryExecutor, 
 		return nil, err
 	}
 
-	err = json.Unmarshal(loginSetting.Setting.Settings, &loginSetting)
+	err = json.Unmarshal(loginSetting.Settings, &loginSetting)
 	if err != nil {
 		return nil, err
 	}
@@ -441,7 +441,7 @@ func (s *labelSettings) Get(ctx context.Context, client database.QueryExecutor, 
 		return nil, err
 	}
 
-	err = json.Unmarshal(labelSetting.Setting.Settings, &labelSetting)
+	err = json.Unmarshal(labelSetting.Settings, &labelSetting)
 	if err != nil {
 		return nil, err
 	}
@@ -459,7 +459,7 @@ func (s *labelSettings) getLabel(ctx context.Context, client database.QueryExecu
 		opt(options)
 	}
 
-	if err := s.settings.CheckMandatoryCondtions(options.Condition); err != nil {
+	if err := s.CheckMandatoryCondtions(options.Condition); err != nil {
 		return nil, err
 	}
 
@@ -475,7 +475,7 @@ func (s *labelSettings) getLabel(ctx context.Context, client database.QueryExecu
 }
 
 func (s *labelSettings) Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	return s.settings.Delete(ctx, client, condition)
+	return s.Delete(ctx, client, condition)
 }
 
 func (s *settings) CreateLabel(ctx context.Context, client database.QueryExecutor, setting *domain.LabelSetting) error {
@@ -517,7 +517,7 @@ const activatedLabelSettingEventStmtEnd = ` ON CONFLICT (instance_id, organizati
 	` settings = EXCLUDED.settings, updated_at = $1` +
 	` RETURNING id, created_at, updated_at`
 
-func (s *labelSettings) ActivateLabelSettingEvent(ctx context.Context, client database.QueryExecutor, condition database.Condition, UpdateAt time.Time) (int64, error) {
+func (s *labelSettings) ActivateLabelSettingEvent(ctx context.Context, client database.QueryExecutor, condition database.Condition, uudateAt time.Time) (int64, error) {
 	if !condition.IsRestrictingColumn(s.InstanceIDColumn()) {
 		return 0, database.NewMissingConditionError(s.InstanceIDColumn())
 	}
@@ -535,7 +535,7 @@ func (s *labelSettings) ActivateLabelSettingEvent(ctx context.Context, client da
 	builder.WriteString(activatedLabelSettingEventStmtStart)
 
 	builder.AppendArgs(
-		UpdateAt)
+		uudateAt)
 	writeCondition(&builder, condition)
 
 	builder.WriteString(activatedLabelSettingEventStmtEnd)
@@ -644,7 +644,7 @@ func (s *passwordComplexitySettings) Update(ctx context.Context, client database
 }
 
 func (s *passwordComplexitySettings) Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	return s.SettingsRepository.Delete(ctx, client, condition)
+	return s.Delete(ctx, client, condition)
 }
 
 // passwordExpiry
@@ -685,7 +685,7 @@ func (s *passwordExpirySettings) Get(ctx context.Context, client database.QueryE
 		return nil, err
 	}
 
-	err = json.Unmarshal(passwordExpirySetting.Setting.Settings, &passwordExpirySetting)
+	err = json.Unmarshal(passwordExpirySetting.Settings, &passwordExpirySetting)
 	if err != nil {
 		return nil, err
 	}
@@ -743,7 +743,7 @@ func (s *lockoutSettings) Get(ctx context.Context, client database.QueryExecutor
 		return nil, err
 	}
 
-	err = json.Unmarshal(lockoutSetting.Setting.Settings, &lockoutSetting)
+	err = json.Unmarshal(lockoutSetting.Settings, &lockoutSetting)
 	if err != nil {
 		return nil, err
 	}
@@ -756,7 +756,7 @@ func (s *lockoutSettings) Update(ctx context.Context, client database.QueryExecu
 }
 
 func (s *lockoutSettings) Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	return s.SettingsRepository.Delete(ctx, client, condition)
+	return s.Delete(ctx, client, condition)
 }
 
 // security
@@ -900,7 +900,7 @@ func (s *domainSettings) Get(ctx context.Context, client database.QueryExecutor,
 		return nil, err
 	}
 
-	err = json.Unmarshal(DomainSetting.Setting.Settings, &DomainSetting)
+	err = json.Unmarshal(DomainSetting.Settings, &DomainSetting)
 	if err != nil {
 		return nil, err
 	}
@@ -913,7 +913,7 @@ func (s *domainSettings) Update(ctx context.Context, client database.QueryExecut
 }
 
 func (s *domainSettings) Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	return s.SettingsRepository.Delete(ctx, client, condition)
+	return s.Delete(ctx, client, condition)
 }
 
 // organization
@@ -950,7 +950,7 @@ func (s *organizationSettings) Get(ctx context.Context, client database.QueryExe
 		return nil, err
 	}
 
-	err = json.Unmarshal(organizationSetting.Setting.Settings, &organizationSetting)
+	err = json.Unmarshal(organizationSetting.Settings, &organizationSetting)
 	if err != nil {
 		return nil, err
 	}
@@ -963,7 +963,7 @@ func (s *organizationSettings) Update(ctx context.Context, client database.Query
 }
 
 func (s *organizationSettings) Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	return s.SettingsRepository.Delete(ctx, client, condition)
+	return s.Delete(ctx, client, condition)
 }
 
 const setOrganizationSettingEventStmt = `INSERT INTO zitadel.settings` +
@@ -1008,38 +1008,38 @@ func (s *settings) Update(ctx context.Context, client database.QueryExecutor, co
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-func (s *settings) updateSetting(ctx context.Context, client database.QueryExecutor, setting *domain.Setting, settings any, changes ...database.Change) (int64, error) {
-	builder := database.StatementBuilder{}
-	builder.WriteString(`UPDATE zitadel.settings SET `)
-	conditions := []database.Condition{
-		s.IDCondition(setting.ID),
-		s.InstanceIDCondition(setting.InstanceID),
-		s.OrgIDCondition(setting.OrganizationID),
-		s.TypeCondition(setting.Type),
-	}
-	settingJSON, err := json.Marshal(settings)
-	if err != nil {
-		return 0, err
-	}
+// func (s *settings) updateSetting(ctx context.Context, client database.QueryExecutor, setting *domain.Setting, settings any, changes ...database.Change) (int64, error) {
+// 	builder := database.StatementBuilder{}
+// 	builder.WriteString(`UPDATE zitadel.settings SET `)
+// 	conditions := []database.Condition{
+// 		s.IDCondition(setting.ID),
+// 		s.InstanceIDCondition(setting.InstanceID),
+// 		s.OrgIDCondition(setting.OrganizationID),
+// 		s.TypeCondition(setting.Type),
+// 	}
+// 	settingJSON, err := json.Marshal(settings)
+// 	if err != nil {
+// 		return 0, err
+// 	}
 
-	if changes == nil || !database.Changes(changes).IsOnColumn(s.UpdatedAtColumn()) {
-		// if updated_at is not set, then explicitly set it to NULL so that the db trigger sets it to NOW()
-		changes = append(changes, s.SetSettings(string(settingJSON)), s.SetUpdatedAt(nil))
-	} else {
-		changes = append(changes, s.SetSettings(string(settingJSON)))
-	}
+// 	if changes == nil || !database.Changes(changes).IsOnColumn(s.UpdatedAtColumn()) {
+// 		// if updated_at is not set, then explicitly set it to NULL so that the db trigger sets it to NOW()
+// 		changes = append(changes, s.SetSettings(string(settingJSON)), s.SetUpdatedAt(nil))
+// 	} else {
+// 		changes = append(changes, s.SetSettings(string(settingJSON)))
+// 	}
 
-	err = database.Changes(changes).Write(&builder)
-	if err != nil {
-		return 0, err
-	}
+// 	err = database.Changes(changes).Write(&builder)
+// 	if err != nil {
+// 		return 0, err
+// 	}
 
-	writeCondition(&builder, database.And(conditions...))
+// 	writeCondition(&builder, database.And(conditions...))
 
-	stmt := builder.String()
+// 	stmt := builder.String()
 
-	return client.Exec(ctx, stmt, builder.Args()...)
-}
+// 	return client.Exec(ctx, stmt, builder.Args()...)
+// / }
 
 const eventCreateSettingStmt = `INSERT INTO zitadel.settings` +
 	` (instance_id, organization_id, type, owner_type, label_state, settings, created_at, updated_at)` +
