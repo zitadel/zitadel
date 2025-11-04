@@ -959,16 +959,20 @@ func getSystemConfigWriteModel(ctx context.Context, filter preparation.FilterToQ
 	return writeModel, err
 }
 
-func (c *Commands) RemoveInstance(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveInstance(ctx context.Context, id string, errorIfNotFound bool) (*domain.ObjectDetails, error) {
 	instID := strings.TrimSpace(id)
 	if instID == "" || len(instID) > 200 {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-VeS2zI", "Errors.Invalid.Argument")
 	}
 
 	instanceAgg := instance.NewAggregate(instID)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveInstance(instanceAgg))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveInstance(instanceAgg, errorIfNotFound))
 	if err != nil {
 		return nil, err
+	}
+
+	if len(cmds) == 0 {
+		return nil, nil
 	}
 
 	events, err := c.eventstore.Push(ctx, cmds...)
@@ -984,7 +988,7 @@ func (c *Commands) RemoveInstance(ctx context.Context, id string) (*domain.Objec
 	}, nil
 }
 
-func (c *Commands) prepareRemoveInstance(a *instance.Aggregate) preparation.Validation {
+func (c *Commands) prepareRemoveInstance(a *instance.Aggregate, errorIfNotFound bool) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel, err := c.getInstanceWriteModelByID(ctx, a.ID)
@@ -992,7 +996,10 @@ func (c *Commands) prepareRemoveInstance(a *instance.Aggregate) preparation.Vali
 				return nil, zerrors.ThrowNotFound(err, "COMMA-pax9m3", "Errors.Instance.NotFound")
 			}
 			if !writeModel.State.Exists() {
-				return nil, zerrors.ThrowNotFound(err, "COMMA-AE3GS", "Errors.Instance.NotFound")
+				if errorIfNotFound {
+					return nil, zerrors.ThrowNotFound(err, "COMMA-AE3GS", "Errors.Instance.NotFound")
+				}
+				return nil, nil
 			}
 			milestoneAggregate := milestone.NewInstanceAggregate(a.ID)
 			return []eventstore.Command{

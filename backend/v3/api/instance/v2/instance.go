@@ -26,7 +26,7 @@ func DeleteInstanceBeta(ctx context.Context, request *connect.Request[instance_v
 
 	if err != nil {
 		if errors.Is(err, &database.NoRowFoundError{}) {
-			return nil, zerrors.ThrowNotFound(err, "INST-QVrUwc", "instance not found")
+			return &connect.Response[instance_v2beta.DeleteInstanceResponse]{}, nil
 		}
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func DeleteInstance(ctx context.Context, request *connect.Request[instance_v2.De
 
 	if err != nil {
 		if errors.Is(err, &database.NoRowFoundError{}) {
-			return nil, zerrors.ThrowNotFound(err, "INST-QVrUwc", "instance not found")
+			return nil, nil
 		}
 		return nil, err
 	}
