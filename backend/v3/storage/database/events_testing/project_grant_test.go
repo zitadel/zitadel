@@ -40,6 +40,7 @@ func TestServer_ProjectGrantReduces(t *testing.T) {
 		Group:       nil,
 	})
 	require.NoError(t, err)
+
 	grantedOrgRes, err := OrgClient.CreateOrganization(CTX, &org.CreateOrganizationRequest{
 		Name: integration.OrganizationName(),
 	})
@@ -47,7 +48,6 @@ func TestServer_ProjectGrantReduces(t *testing.T) {
 	_, err = ProjectClient.CreateProjectGrant(CTX, &v2beta_project.CreateProjectGrantRequest{
 		ProjectId:             createProjectRes.GetId(),
 		GrantedOrganizationId: grantedOrgRes.GetId(),
-		RoleKeys:              nil,
 	})
 	require.NoError(t, err)
 
@@ -76,7 +76,7 @@ func TestServer_ProjectGrantReduces(t *testing.T) {
 		_, err := ProjectClient.UpdateProjectGrant(CTX, &v2beta_project.UpdateProjectGrantRequest{
 			ProjectId:             createProjectRes.GetId(),
 			GrantedOrganizationId: grantedOrgRes.GetId(),
-			RoleKeys:              []string{"key"},
+			RoleKeys:              []string{keyName},
 		})
 		require.NoError(t, err)
 
@@ -88,6 +88,7 @@ func TestServer_ProjectGrantReduces(t *testing.T) {
 					projectGrantRepo.GrantedOrganizationIDCondition(grantedOrgRes.GetId()),
 				),
 			))
+			require.NoError(collect, err)
 			dbProjectGrantRoles, err := projectGrantRoleRepo.List(CTX, pool, database.WithCondition(
 				database.And(
 					projectGrantRoleRepo.InstanceIDCondition(instanceID),
@@ -95,7 +96,10 @@ func TestServer_ProjectGrantReduces(t *testing.T) {
 				),
 			))
 			require.NoError(collect, err)
-			assert.ElementsMatch(collect, []string{keyName}, dbProjectGrantRoles)
+			if !assert.Len(collect, dbProjectGrantRoles, 1) {
+				return
+			}
+			assert.Equal(collect, dbProjectGrantRoles[0].Key, keyName)
 		}, retryDuration, tick, "project grant not updated within %v: %v", retryDuration, err)
 	})
 
@@ -116,7 +120,7 @@ func TestServer_ProjectGrantReduces(t *testing.T) {
 			))
 			require.NoError(collect, err)
 			assert.Equal(collect, domain.ProjectGrantStateInactive, dbProject.State)
-		}, retryDuration, tick, "project not deactivated within %v: %v", retryDuration, err)
+		}, retryDuration, tick, "project grant not deactivated within %v: %v", retryDuration, err)
 
 		_, err = ProjectClient.ActivateProjectGrant(CTX, &v2beta_project.ActivateProjectGrantRequest{
 			ProjectId:             createProjectRes.GetId(),
@@ -134,7 +138,7 @@ func TestServer_ProjectGrantReduces(t *testing.T) {
 			))
 			require.NoError(collect, err)
 			assert.Equal(collect, domain.ProjectGrantStateActive, dbProject.State)
-		}, retryDuration, tick, "project not activated within %v: %v", retryDuration, err)
+		}, retryDuration, tick, "project grant not activated within %v: %v", retryDuration, err)
 	})
 
 	t.Run("delete project grant reduces", func(t *testing.T) {

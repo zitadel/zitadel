@@ -100,12 +100,11 @@ type ProjectGrantRepository interface {
 }
 
 type ProjectGrantRole struct {
-	InstanceID   string    `json:"instanceId,omitempty" db:"instance_id"`
-	GrantID      string    `json:"grantId,omitempty" db:"grant_id"`
-	ProjectOrgID string    `json:"projectOrgId,omitempty" db:"project_org_id"`
-	ProjectID    string    `json:"projectId,omitempty" db:"project_id"`
-	Key          string    `json:"key,omitempty" db:"key"`
-	CreatedAt    time.Time `json:"createdAt,omitzero" db:"created_at"`
+	InstanceID string    `json:"instanceId,omitempty" db:"instance_id"`
+	GrantID    string    `json:"grantId,omitempty" db:"grant_id"`
+	ProjectID  string    `json:"projectId,omitempty" db:"project_id"`
+	Key        string    `json:"key,omitempty" db:"key"`
+	CreatedAt  time.Time `json:"createdAt,omitzero" db:"created_at"`
 }
 
 type projectGrantRoleColumns interface {
@@ -121,8 +120,6 @@ type projectGrantRoleColumns interface {
 	CreatedAtColumn() database.Column
 	// ProjectIDColumn returns the column for the project id field
 	ProjectIDColumn() database.Column
-	// ProjectOrgIDColumn returns the column for the project organization id field
-	ProjectOrgIDColumn() database.Column
 }
 
 type projectGrantRoleConditions interface {

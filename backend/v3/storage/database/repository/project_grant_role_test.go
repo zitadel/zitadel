@@ -17,6 +17,8 @@ func TestListProjectGrantRoles(t *testing.T) {
 	instanceID := createInstance(t, tx)
 	orgID := createOrganization(t, tx, instanceID)
 	projectID := createProject(t, tx, instanceID, orgID)
+	firstProjectRole := createProjectRole(t, tx, instanceID, orgID, projectID, "key1")
+	secondProjectRole := createProjectRole(t, tx, instanceID, orgID, projectID, "key2")
 	firstGrantedOrgID := createOrganization(t, tx, instanceID)
 	firstGrantID := createProjectGrant(t, tx, instanceID, orgID, projectID, firstGrantedOrgID)
 	secondGrantedOrgID := createOrganization(t, tx, instanceID)
@@ -25,32 +27,28 @@ func TestListProjectGrantRoles(t *testing.T) {
 
 	roles := [...]*domain.ProjectGrantRole{
 		{
-			InstanceID:   instanceID,
-			GrantID:      firstGrantID,
-			ProjectOrgID: orgID,
-			ProjectID:    projectID,
-			Key:          "key1",
+			InstanceID: instanceID,
+			GrantID:    firstGrantID,
+			ProjectID:  projectID,
+			Key:        firstProjectRole,
 		},
 		{
-			InstanceID:   instanceID,
-			GrantID:      firstGrantID,
-			ProjectOrgID: orgID,
-			ProjectID:    projectID,
-			Key:          "key2",
+			InstanceID: instanceID,
+			GrantID:    firstGrantID,
+			ProjectID:  projectID,
+			Key:        secondProjectRole,
 		},
 		{
-			InstanceID:   instanceID,
-			GrantID:      secondGrantID,
-			ProjectOrgID: orgID,
-			ProjectID:    projectID,
-			Key:          "key1",
+			InstanceID: instanceID,
+			GrantID:    secondGrantID,
+			ProjectID:  projectID,
+			Key:        firstProjectRole,
 		},
 		{
-			InstanceID:   instanceID,
-			GrantID:      secondGrantID,
-			ProjectOrgID: orgID,
-			ProjectID:    projectID,
-			Key:          "key2",
+			InstanceID: instanceID,
+			GrantID:    secondGrantID,
+			ProjectID:  projectID,
+			Key:        secondProjectRole,
 		},
 	}
 	for _, r := range roles {
@@ -86,7 +84,7 @@ func TestListProjectGrantRoles(t *testing.T) {
 			condition: database.And(
 				roleRepo.InstanceIDCondition(instanceID),
 				roleRepo.GrantIDCondition(secondGrantID),
-				roleRepo.KeyCondition("key2"),
+				roleRepo.KeyCondition(secondProjectRole),
 			),
 			wantRoles: []*domain.ProjectGrantRole{roles[3]},
 		},
@@ -104,23 +102,25 @@ func TestListProjectGrantRoles(t *testing.T) {
 	}
 }
 
-func TestAddProjectRole(t *testing.T) {
+func TestAddProjectGrantRole(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
 	defer rollback()
 	instanceID := createInstance(t, tx)
 	orgID := createOrganization(t, tx, instanceID)
 	projectID := createProject(t, tx, instanceID, orgID)
+	projectRoleKey := createProjectRole(t, tx, instanceID, orgID, projectID, "key1")
+	firstProjectRoleKey := createProjectRole(t, tx, instanceID, orgID, projectID, "key2")
+	secondProjectRoleKey := createProjectRole(t, tx, instanceID, orgID, projectID, "key3")
 	grantedOrgID := createOrganization(t, tx, instanceID)
 	grantID := createProjectGrant(t, tx, instanceID, orgID, projectID, grantedOrgID)
 
 	roleRepo := repository.ProjectGrantRepository().Role()
 
 	existingRole := &domain.ProjectGrantRole{
-		InstanceID:   instanceID,
-		GrantID:      grantID,
-		ProjectOrgID: orgID,
-		ProjectID:    projectID,
-		Key:          "key1",
+		InstanceID: instanceID,
+		GrantID:    grantID,
+		ProjectID:  projectID,
+		Key:        projectRoleKey,
 	}
 	err := roleRepo.Add(t.Context(), tx, existingRole)
 	require.NoError(t, err)
@@ -133,54 +133,49 @@ func TestAddProjectRole(t *testing.T) {
 		{
 			name: "add role",
 			role: &domain.ProjectGrantRole{
-				InstanceID:   instanceID,
-				GrantID:      grantID,
-				ProjectOrgID: orgID,
-				ProjectID:    projectID,
-				Key:          "key2",
+				InstanceID: instanceID,
+				GrantID:    grantID,
+				ProjectID:  projectID,
+				Key:        firstProjectRoleKey,
 			},
 		},
 		{
 			name: "non-existing instance",
 			role: &domain.ProjectGrantRole{
-				InstanceID:   "foo",
-				GrantID:      grantID,
-				ProjectOrgID: orgID,
-				ProjectID:    projectID,
-				Key:          "key3",
+				InstanceID: "foo",
+				GrantID:    grantID,
+				ProjectID:  projectID,
+				Key:        secondProjectRoleKey,
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
 		{
 			name: "non-existing project",
 			role: &domain.ProjectGrantRole{
-				InstanceID:   instanceID,
-				GrantID:      grantID,
-				ProjectOrgID: orgID,
-				ProjectID:    "foo",
-				Key:          "key3",
+				InstanceID: instanceID,
+				GrantID:    grantID,
+				ProjectID:  "foo",
+				Key:        secondProjectRoleKey,
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
 		{
-			name: "non-existing organization",
+			name: "non-existing project grant",
 			role: &domain.ProjectGrantRole{
-				InstanceID:   instanceID,
-				GrantID:      grantID,
-				ProjectOrgID: "foo",
-				ProjectID:    projectID,
-				Key:          "key3",
+				InstanceID: instanceID,
+				GrantID:    "foo",
+				ProjectID:  projectID,
+				Key:        secondProjectRoleKey,
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
 		{
 			name: "empty key error",
 			role: &domain.ProjectGrantRole{
-				InstanceID:   instanceID,
-				GrantID:      grantID,
-				ProjectOrgID: orgID,
-				ProjectID:    projectID,
-				Key:          "",
+				InstanceID: instanceID,
+				GrantID:    grantID,
+				ProjectID:  projectID,
+				Key:        "",
 			},
 			wantErr: new(database.CheckError),
 		},
@@ -202,22 +197,22 @@ func TestAddProjectRole(t *testing.T) {
 	}
 }
 
-func TestRemoveProjectRole(t *testing.T) {
+func TestRemoveProjectGrantRole(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
 	defer rollback()
 	instanceID := createInstance(t, tx)
 	orgID := createOrganization(t, tx, instanceID)
 	projectID := createProject(t, tx, instanceID, orgID)
+	projectRoleKey := createProjectRole(t, tx, instanceID, orgID, projectID, "key1")
 	grantedOrgID := createOrganization(t, tx, instanceID)
 	grantID := createProjectGrant(t, tx, instanceID, orgID, projectID, grantedOrgID)
 	roleRepo := repository.ProjectGrantRepository().Role()
 
 	existingRole := &domain.ProjectGrantRole{
-		InstanceID:   instanceID,
-		GrantID:      grantID,
-		ProjectOrgID: orgID,
-		ProjectID:    projectID,
-		Key:          "key1",
+		InstanceID: instanceID,
+		GrantID:    grantID,
+		ProjectID:  projectID,
+		Key:        projectRoleKey,
 	}
 	err := roleRepo.Add(t.Context(), tx, existingRole)
 	require.NoError(t, err)

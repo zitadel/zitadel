@@ -14,6 +14,8 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/integration"
+	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
+	v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
@@ -43,12 +45,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(tt *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX, pool,
-				database.WithCondition(
-					database.And(
-						orgRepo.IDCondition(org.GetId()),
-						orgRepo.InstanceIDCondition(instanceID),
-					),
-				),
+				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, org.GetId())),
 			)
 			require.NoError(tt, err)
 
@@ -93,12 +90,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX, pool,
-				database.WithCondition(
-					database.And(
-						orgRepo.IDCondition(organization.Id),
-						orgRepo.InstanceIDCondition(instanceID),
-					),
-				),
+				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetId())),
 			)
 			require.NoError(t, err)
 
@@ -138,12 +130,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX, pool,
-				database.WithCondition(
-					database.And(
-						orgRepo.IDCondition(organization.Id),
-						orgRepo.InstanceIDCondition(instanceID),
-					),
-				),
+				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetId())),
 			)
 			require.NoError(t, err)
 
@@ -182,12 +169,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX, pool,
-				database.WithCondition(
-					database.And(
-						orgRepo.IDCondition(organization.Id),
-						orgRepo.InstanceIDCondition(instanceID),
-					),
-				),
+				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetId())),
 			)
 			require.NoError(t, err)
 			assert.Equal(t, domain.OrgStateInactive, organization.State)
@@ -204,12 +186,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX, pool,
-				database.WithCondition(
-					database.And(
-						orgRepo.IDCondition(organization.Id),
-						orgRepo.InstanceIDCondition(instanceID),
-					),
-				),
+				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetId())),
 			)
 			require.NoError(t, err)
 
@@ -234,12 +211,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			_, err := orgRepo.Get(CTX, pool,
-				database.WithCondition(
-					database.And(
-						orgRepo.IDCondition(organization.Id),
-						orgRepo.InstanceIDCondition(instanceID),
-					),
-				),
+				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetId())),
 			)
 			require.NoError(t, err)
 		}, retryDuration, tick)
@@ -253,12 +225,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX, pool,
-				database.WithCondition(
-					database.And(
-						orgRepo.IDCondition(organization.Id),
-						orgRepo.InstanceIDCondition(instanceID),
-					),
-				),
+				database.WithCondition(orgRepo.PrimaryKeyCondition(instanceID, organization.GetId())),
 			)
 			require.ErrorIs(t, err, new(database.NoRowFoundError))
 
@@ -266,4 +233,38 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 			assert.Nil(t, organization)
 		}, retryDuration, tick)
 	})
+}
+
+func createOrg(t *testing.T) *org.CreateOrganizationResponse {
+	t.Helper()
+	org, err := OrgClient.CreateOrganization(CTX, &org.CreateOrganizationRequest{
+		Name: gofakeit.Name(),
+	})
+	require.NoError(t, err)
+
+	orgRepo := repository.OrganizationRepository()
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(t.Context(), time.Minute)
+	assert.EventuallyWithT(t, func(tc *assert.CollectT) {
+		_, err := orgRepo.Get(t.Context(), pool,
+			database.WithCondition(orgRepo.PrimaryKeyCondition(Instance.Instance.Id, org.GetId())),
+		)
+		assert.NoError(tc, err)
+	}, retryDuration, tick)
+
+	return org
+}
+
+func createTestScopedOrg(t *testing.T) *org.CreateOrganizationResponse {
+	org := createOrg(t)
+
+	t.Cleanup(func() {
+		_, err := OrgClient.DeleteOrganization(CTX, &v2beta.DeleteOrganizationRequest{
+			Id: org.GetId(),
+		})
+		if err != nil {
+			t.Logf("Failed to delete organization on cleanup: %v", err)
+		}
+	})
+
+	return org
 }

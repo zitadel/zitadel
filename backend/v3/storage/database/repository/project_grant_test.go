@@ -4,13 +4,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
+	"github.com/zitadel/zitadel/internal/integration"
 )
 
 func TestGetProjectGrant(t *testing.T) {
@@ -18,26 +18,27 @@ func TestGetProjectGrant(t *testing.T) {
 	defer rollback()
 	instanceID := createInstance(t, tx)
 	grantingOrgID := createOrganization(t, tx, instanceID)
-	grantedOrgID := createOrganization(t, tx, instanceID)
+	firstGrantedOrgID := createOrganization(t, tx, instanceID)
+	secondGrantedOrgID := createOrganization(t, tx, instanceID)
 	projectID := createProject(t, tx, instanceID, grantingOrgID)
 	projectGrantRepo := repository.ProjectGrantRepository()
 
 	firstProjectGrant := &domain.ProjectGrant{
 		InstanceID:             instanceID,
-		ID:                     gofakeit.UUID(),
+		ID:                     integration.ID(),
 		GrantingOrganizationID: grantingOrgID,
 		ProjectID:              projectID,
-		GrantedOrganizationID:  grantedOrgID,
+		GrantedOrganizationID:  firstGrantedOrgID,
 		State:                  domain.ProjectGrantStateActive,
 	}
 	err := projectGrantRepo.Create(t.Context(), tx, firstProjectGrant)
 	require.NoError(t, err)
 	secondProjectGrant := &domain.ProjectGrant{
 		InstanceID:             instanceID,
-		ID:                     gofakeit.UUID(),
+		ID:                     integration.ID(),
 		GrantingOrganizationID: grantingOrgID,
 		ProjectID:              projectID,
-		GrantedOrganizationID:  grantedOrgID,
+		GrantedOrganizationID:  secondGrantedOrgID,
 		State:                  domain.ProjectGrantStateActive,
 	}
 	err = projectGrantRepo.Create(t.Context(), tx, secondProjectGrant)
@@ -157,23 +158,23 @@ func TestListProjectGrants(t *testing.T) {
 				projectGrantRepo.InstanceIDCondition(instanceID),
 				projectGrantRepo.GrantingOrganizationIDCondition(firstGrantingOrgID),
 			),
-			want: projectGrants[0:1],
+			want: projectGrants[0:2],
 		},
 		{
-			name: "all grating from second org",
+			name: "all granting from second org",
 			condition: database.And(
 				projectGrantRepo.InstanceIDCondition(instanceID),
 				projectGrantRepo.GrantingOrganizationIDCondition(secondGrantingOrgID),
 			),
-			want: projectGrants[2:3],
+			want: projectGrants[2:4],
 		},
 		{
-			name: "all granted to first org",
+			name: "all granted from first org",
 			condition: database.And(
 				projectGrantRepo.InstanceIDCondition(instanceID),
 				projectGrantRepo.GrantingOrganizationIDCondition(firstGrantingOrgID),
 			),
-			want: []*domain.ProjectGrant{projectGrants[0], projectGrants[2]},
+			want: []*domain.ProjectGrant{projectGrants[0], projectGrants[1]},
 		},
 		{
 			name: "all granted to second org",
@@ -210,96 +211,85 @@ func TestCreateProjectGrant(t *testing.T) {
 	defer rollback()
 	instanceID := createInstance(t, tx)
 	grantingOrgID := createOrganization(t, tx, instanceID)
-	grantedOrgID := createOrganization(t, tx, instanceID)
+	firstGrantedOrgID := createOrganization(t, tx, instanceID)
+	secondGrantedOrgID := createOrganization(t, tx, instanceID)
 	projectID := createProject(t, tx, instanceID, grantingOrgID)
 	projectGrantRepo := repository.ProjectGrantRepository()
 
 	existingProjectGrant := &domain.ProjectGrant{
 		InstanceID:             instanceID,
-		ID:                     gofakeit.UUID(),
+		ID:                     integration.ID(),
 		ProjectID:              projectID,
 		GrantingOrganizationID: grantingOrgID,
-		GrantedOrganizationID:  grantedOrgID,
+		GrantedOrganizationID:  firstGrantedOrgID,
 		State:                  domain.ProjectGrantStateActive,
 	}
 	err := projectGrantRepo.Create(t.Context(), tx, existingProjectGrant)
 	require.NoError(t, err)
 
 	tests := []struct {
-		name    string
-		project *domain.ProjectGrant
-		wantErr error
+		name         string
+		projectGrant *domain.ProjectGrant
+		wantErr      error
 	}{
 		{
-			name: "add project",
-			project: &domain.ProjectGrant{
+			name: "add project grant",
+			projectGrant: &domain.ProjectGrant{
 				InstanceID:             instanceID,
-				ID:                     gofakeit.UUID(),
+				ID:                     integration.ID(),
 				ProjectID:              projectID,
 				GrantingOrganizationID: grantingOrgID,
-				GrantedOrganizationID:  grantedOrgID,
+				GrantedOrganizationID:  secondGrantedOrgID,
 				State:                  domain.ProjectGrantStateActive,
 			},
 		},
 		{
 			name: "non-existing instance",
-			project: &domain.ProjectGrant{
+			projectGrant: &domain.ProjectGrant{
 				InstanceID:             "foo",
-				ID:                     gofakeit.UUID(),
+				ID:                     integration.ID(),
 				ProjectID:              projectID,
 				GrantingOrganizationID: grantingOrgID,
-				GrantedOrganizationID:  grantedOrgID,
+				GrantedOrganizationID:  secondGrantedOrgID,
 				State:                  domain.ProjectGrantStateActive,
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
 		{
 			name: "non-existing org",
-			project: &domain.ProjectGrant{
+			projectGrant: &domain.ProjectGrant{
 				InstanceID:             instanceID,
-				ID:                     gofakeit.UUID(),
+				ID:                     integration.ID(),
 				ProjectID:              projectID,
 				GrantingOrganizationID: "foo",
-				GrantedOrganizationID:  grantedOrgID,
+				GrantedOrganizationID:  secondGrantedOrgID,
 				State:                  domain.ProjectGrantStateActive,
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
 		{
 			name: "empty id error",
-			project: &domain.ProjectGrant{
+			projectGrant: &domain.ProjectGrant{
 				InstanceID:             instanceID,
 				ID:                     "",
 				ProjectID:              projectID,
 				GrantingOrganizationID: grantingOrgID,
-				GrantedOrganizationID:  grantedOrgID,
+				GrantedOrganizationID:  secondGrantedOrgID,
 				State:                  domain.ProjectGrantStateActive,
 			},
 			wantErr: new(database.CheckError),
 		},
 		{
-			name: "empty name error",
-			project: &domain.ProjectGrant{
-				InstanceID:             instanceID,
-				ID:                     gofakeit.UUID(),
-				ProjectID:              projectID,
-				GrantingOrganizationID: grantingOrgID,
-				GrantedOrganizationID:  grantedOrgID,
-				State:                  domain.ProjectGrantStateActive,
-			},
-			wantErr: new(database.CheckError),
-		},
-		{
-			name:    "duplicate project",
-			project: existingProjectGrant,
-			wantErr: new(database.UniqueError),
+			name:         "duplicate project grant",
+			projectGrant: existingProjectGrant,
+			wantErr:      new(database.UniqueError),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			savepoint, rollback := savepointForRollback(t, tx)
 			defer rollback()
-			err := projectGrantRepo.Create(t.Context(), savepoint, tt.project)
+			err := projectGrantRepo.Create(t.Context(), savepoint, tt.projectGrant)
 			require.ErrorIs(t, err, tt.wantErr)
 		})
 	}
@@ -316,7 +306,7 @@ func TestUpdateProjectGrant(t *testing.T) {
 
 	existingProjectGrant := &domain.ProjectGrant{
 		InstanceID:             instanceID,
-		ID:                     gofakeit.UUID(),
+		ID:                     integration.ID(),
 		ProjectID:              projectID,
 		GrantingOrganizationID: grantingOrgID,
 		GrantedOrganizationID:  grantedOrgID,
@@ -396,7 +386,7 @@ func TestDeleteProjectGrant(t *testing.T) {
 
 	existingProjectGrant := &domain.ProjectGrant{
 		InstanceID:             instanceID,
-		ID:                     gofakeit.UUID(),
+		ID:                     integration.ID(),
 		ProjectID:              projectID,
 		GrantingOrganizationID: grantingOrgID,
 		GrantedOrganizationID:  grantedOrgID,

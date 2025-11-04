@@ -76,9 +76,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             <Translated i18nKey="unknownContext" namespace="error" />
           </Alert>
         )}
-      </div>
 
-      <div className="w-full">
         {(loginName || sessionId) && (
           <LoginPasskey
             loginName={loginName}

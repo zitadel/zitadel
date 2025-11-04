@@ -59,6 +59,7 @@ type instanceDomainChanges interface {
 	SetType(typ DomainType) database.Change
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/instance_domain.mock.go . InstanceDomainRepository
 type InstanceDomainRepository interface {
 	Repository
 
