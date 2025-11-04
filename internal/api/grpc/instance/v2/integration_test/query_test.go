@@ -4,16 +4,19 @@ package instance_test
 
 import (
 	"context"
+	"fmt"
 	"slices"
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/filter/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/instance/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
@@ -27,70 +30,110 @@ func TestGetInstance(t *testing.T) {
 	defer cancel()
 
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
-	inst := integration.NewInstance(ctxWithSysAuthZ)
-	instanceOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
-	organizationOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
+	instES := integration.NewInstance(ctxWithSysAuthZ)
+	instanceOwnerCtxES := instES.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
+	organizationOwnerCtxES := instES.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
+
+	// Relational
+	instRelational := integration.NewInstance(ctxWithSysAuthZ)
+	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)}, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+		assert.True(tCollect, got.EnableRelationalTables.GetEnabled())
+	})
+	instanceOwnerCtxRelational := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
+	organizationOwnerCtxRelational := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
 
 	t.Cleanup(func() {
-		inst.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+		instES.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: instES.ID()})
+		instRelational.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: instRelational.ID()})
 	})
 
-	tt := []struct {
-		testName           string
-		inputContext       context.Context
-		inputInstanceID    string
-		expectedInstanceID string
-		expectedErrorMsg   string
-		expectedErrorCode  codes.Code
-	}{
-		{
-			testName:          "when unauthN context should return unauthN error",
-			inputContext:      context.Background(),
-			inputInstanceID:   inst.ID(),
-			expectedErrorCode: codes.Unauthenticated,
-			expectedErrorMsg:  "auth header missing",
-		},
-		{
-			testName:          "when unauthZ context should return unauthZ error",
-			inputContext:      organizationOwnerCtx,
-			inputInstanceID:   inst.ID(),
-			expectedErrorCode: codes.NotFound,
-			expectedErrorMsg:  "membership not found (AUTHZ-cdgFk)",
-		},
-		{
-			testName:           "when request succeeds should return matching instance (systemUser)",
-			inputContext:       ctxWithSysAuthZ,
-			inputInstanceID:    inst.ID(),
-			expectedInstanceID: inst.ID(),
-		},
-		{
-			testName:           "when request succeeds should return matching instance (own context)",
-			inputContext:       instanceOwnerCtx,
-			expectedInstanceID: inst.ID(),
-		},
-		{
-			testName:          "when instance not found should return not found error",
-			inputContext:      ctxWithSysAuthZ,
-			inputInstanceID:   "invalid",
-			expectedErrorCode: codes.NotFound,
-			expectedErrorMsg:  "Errors.IAM.NotFound (QUERY-n0wng)",
-		},
+	type instAndCtx struct {
+		testType         string
+		inst             *integration.Instance
+		instanceOwnerCtx context.Context
+		orgOwnerCtx      context.Context
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.testName, func(t *testing.T) {
-			// Test
-			res, err := inst.Client.InstanceV2.GetInstance(tc.inputContext, &instance.GetInstanceRequest{InstanceId: tc.inputInstanceID})
+	testedInstanceAndCtxs := []instAndCtx{
+		{testType: "eventstore", inst: instES, instanceOwnerCtx: instanceOwnerCtxES, orgOwnerCtx: organizationOwnerCtxES},
+		{testType: "relational", inst: instRelational, instanceOwnerCtx: instanceOwnerCtxRelational, orgOwnerCtx: organizationOwnerCtxRelational},
+	}
 
-			// Verify
-			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
-			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
+	for _, instWithCtx := range testedInstanceAndCtxs {
+		tt := []struct {
+			testName           string
+			inputContext       context.Context
+			inputInstanceID    string
+			expectedInstanceID string
+			expectedErrorMsg   string
+			expectedErrorCode  codes.Code
+		}{
+			{
+				testName:          "when unauthN context should return unauthN error",
+				inputContext:      context.Background(),
+				inputInstanceID:   instWithCtx.inst.ID(),
+				expectedErrorCode: codes.Unauthenticated,
+				expectedErrorMsg:  "auth header missing",
+			},
+			{
+				// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place
+				testName:          "when unauthZ context should return unauthZ error",
+				inputContext:      instWithCtx.orgOwnerCtx,
+				inputInstanceID:   instWithCtx.inst.ID(),
+				expectedErrorCode: codes.NotFound,
+				expectedErrorMsg:  "membership not found (AUTHZ-cdgFk)",
+			},
+			{
+				testName:           "when request succeeds should return matching instance (systemUser)",
+				inputContext:       ctxWithSysAuthZ,
+				inputInstanceID:    instWithCtx.inst.ID(),
+				expectedInstanceID: instWithCtx.inst.ID(),
+			},
+			{
+				// TODO(IAM-Marco): Decide if we should set the instance in context.
+				testName:           "when request succeeds should return matching instance (own context)",
+				inputContext:       instWithCtx.instanceOwnerCtx,
+				expectedInstanceID: instWithCtx.inst.ID(),
+			},
+			{
+				// TODO(IAM-Marco): This test won't reach the relational side due to an interceptor
+				// automatically changing the instance in context to an empty one.
+				// The interceptor will look for the instance matching the instance ID passed here.
+				// Since the instance doesn't exist, it will put an empty instance in context.
+				// But an empty instance has no feature flags enabled.
+				testName:          "when instance not found should return not found error",
+				inputContext:      ctxWithSysAuthZ,
+				inputInstanceID:   "invalid",
+				expectedErrorCode: codes.NotFound,
+				expectedErrorMsg:  "Errors.IAM.NotFound (QUERY-n0wng)",
+			},
+		}
 
-			if tc.expectedErrorMsg == "" {
-				require.NoError(t, err)
-				assert.Equal(t, tc.expectedInstanceID, res.GetInstance().GetId())
+		faultyTestCasesForRelational := []string{
+			// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place
+			"when unauthZ context should return unauthZ error",
+			// TODO(IAM-Marco): Decide if we should set the instance in context.
+			"when request succeeds should return matching instance (own context)",
+		}
+
+		for _, tc := range tt {
+			if instWithCtx.testType == "relational" && slices.Contains(faultyTestCasesForRelational, tc.testName) {
+				continue
 			}
-		})
+			t.Run(fmt.Sprintf("%s - %s", instWithCtx.testType, tc.testName), func(t *testing.T) {
+				// Test
+				res, err := instWithCtx.inst.Client.InstanceV2.GetInstance(tc.inputContext, &instance.GetInstanceRequest{InstanceId: tc.inputInstanceID})
+
+				// Verify
+				assert.Equal(t, tc.expectedErrorCode, status.Code(err))
+				assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
+
+				if tc.expectedErrorMsg == "" {
+					require.NoError(t, err)
+					assert.Equal(t, tc.expectedInstanceID, res.GetInstance().GetId())
+				}
+			})
+		}
 	}
 }
 
