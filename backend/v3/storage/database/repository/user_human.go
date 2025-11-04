@@ -155,6 +155,14 @@ func (u userHuman) SetUsernameOrgUnique(usernameOrgUnique bool) database.Change 
 	return database.NewChange(u.UsernameOrgUniqueColumn(), usernameOrgUnique)
 }
 
+// SetMFAInitSkippedAt implements [domain.HumanUserRepository].
+func (u userHuman) SetMFAInitSkippedAt(skippedAt *time.Time) database.Change {
+	if skippedAt == nil || skippedAt.IsZero() {
+		return database.NewChangeToNull(u.multifactorInitializationSkippedAt())
+	}
+	return database.NewChange(u.multifactorInitializationSkippedAt(), *skippedAt)
+}
+
 // -------------------------------------------------------------
 // conditions
 // -------------------------------------------------------------
@@ -329,4 +337,8 @@ func (u userHuman) UsernameOrgUniqueColumn() database.Column {
 // NicknameColumn implements [domain.HumanUserRepository].
 func (u userHuman) NicknameColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "nick_name")
+}
+
+func (u userHuman) multifactorInitializationSkippedAt() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "multi_factor_initialization_skipped_at")
 }

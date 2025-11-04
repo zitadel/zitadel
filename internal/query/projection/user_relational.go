@@ -269,14 +269,14 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 
 				// Pats only on machines
 
-				// 		{
-				// 			Event:  user.UserV1MFAInitSkippedType,
-				// 			Reduce: p.reduceMFAInitSkipped,
-				// 		},
-				// 		{
-				// 			Event:  user.HumanMFAInitSkippedType,
-				// 			Reduce: p.reduceMFAInitSkipped,
-				// 		},
+				{
+					Event:  user.UserV1MFAInitSkippedType,
+					Reduce: p.reduceMFAInitSkipped,
+				},
+				{
+					Event:  user.HumanMFAInitSkippedType,
+					Reduce: p.reduceMFAInitSkipped,
+				},
 				// 	},
 				// },
 
@@ -911,7 +911,7 @@ func (p *userRelationalProjection) reduceHumanPhoneVerificationFailed(event even
 		}
 		repo := repository.UserRepository().Human()
 
-		_, err := repo.IncrementPhoneVerificationAttempts(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.IncrementFailedPhoneVerificationAttempts(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 		)
 		return err
@@ -1008,7 +1008,7 @@ func (p *userRelationalProjection) reduceHumanEmailVerificationFailed(event even
 		}
 		repo := repository.UserRepository().Human()
 
-		_, err := repo.IncrementEmailVerificationAttempts(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.IncrementFailedEmailOTPAttempts(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 		)
 		return err
@@ -1576,26 +1576,25 @@ func (p *userRelationalProjection) reducePasskeyRemoved(event eventstore.Event) 
 // 	), nil
 // }
 
-// func (p *userRelationalProjection) reduceMFAInitSkipped(event eventstore.Event) (*handler.Statement, error) {
-// 	e, ok := event.(*user.HumanMFAInitSkippedEvent)
-// 	if !ok {
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.MachineChangedEventType)
-// 	}
-// 	return handler.NewUpdateStatement(
-// 		e,
-// 		[]handler.Column{
-// 			handler.NewCol(HumanMFAInitSkipped, sql.NullTime{
-// 				Time:  e.CreatedAt(),
-// 				Valid: true,
-// 			}),
-// 		},
-// 		[]handler.Condition{
-// 			handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
-// 			handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
-// 		},
-// 		handler.WithTableSuffix(UserHumanSuffix),
-// 	), nil
-// }
+func (p *userRelationalProjection) reduceMFAInitSkipped(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanMFAInitSkippedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.MachineChangedEventType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.SetMFAInitSkippedAt(gu.Ptr(e.CreatedAt())),
+		)
+		return err
+	}), nil
+}
 
 func mapHumanGender(gender old_domain.Gender) domain.Gender {
 	switch gender {

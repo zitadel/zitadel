@@ -42,11 +42,6 @@ type SetPasswordVerificationChangeRequired struct {
 func (s SetPasswordVerificationChangeRequired) isSetPasswordVerification() {}
 
 type Human struct {
-	// HumanEmailContact HumanContact  `db:"email"`
-	// HumanPhoneContact *HumanContact `db:"phone"`
-
-	// HumanSecurity
-
 	FirstName         string        `json:"firstName,omitempty" db:"first_name"`
 	LastName          string        `json:"lastName,omitempty" db:"last_name"`
 	Nickname          string        `json:"nickName,omitempty" db:"nick_name"`
@@ -101,6 +96,8 @@ type humanChanges interface {
 	SetPasswordChangeRequired(required bool) database.Change
 	IncrementFailedPasswordAttempts() database.Change
 	ResetFailedPasswordAttempts() database.Change
+
+	SetMFAInitSkippedAt(skippedAt *time.Time) database.Change
 
 	RemovePhone() database.Change
 }

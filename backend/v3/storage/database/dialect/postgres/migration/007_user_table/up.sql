@@ -102,6 +102,7 @@ CREATE TABLE zitadel.human_users(
     , preferred_language TEXT CHECK (preferred_language <> '')
     , gender SMALLINT 
     , avatar_key TEXT
+    , multi_factor_initialization_skipped_at TIMESTAMPTZ
 
     , password BYTES
     , password_change_required BOOLEAN NOT NULL DEFAULT FALSE
@@ -207,28 +208,15 @@ CREATE TABLE zitadel.human_passkeys(
     , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users(instance_id, id) ON DELETE CASCADE
 );
 
-CREATE TABLE zitadel.human_refresh_tokens(
+CREATE TABLE zitadel.human_identity_provider_links(
     instance_id TEXT NOT NULL
-    , token_id TEXT NOT NULL
-
+    , identity_provider_id TEXT NOT NULL
+    , provided_user_id TEXT NOT NULL
+    , provided_username TEXT NOT NULL
     , user_id TEXT NOT NULL
 
-    , created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-    
-    , authenticated_at TIMESTAMPTZ NOT NULL
-    
-    , idle_expiration INTERVAL NOT NULL
-    , absolute_expiration INTERVAL NOT NULL
+    , PRIMARY KEY (instance_id, provided_user_id, identity_provider_id)
 
-    , client_id TEXT NOT NULL
-    , user_agent_id TEXT NOT NULL
-    , audience TEXT[]
-    , scopes TEXT[]
-    , auth_method_references TEXT[]
-    , preferred_language TEXT
-    , refresh_token BYTES
-    -- , actor TODO: whats this?
-
-    , PRIMARY KEY (instance_id, token_id)
-    , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users(instance_id, id) ON DELETE CASCADE
+    , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.human_users(instance_id, id) ON DELETE CASCADE
+    , FOREIGN KEY (instance_id, identity_provider_id) REFERENCES zitadel.identity_providers(instance_id, id) ON DELETE CASCADE
 );
