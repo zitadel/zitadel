@@ -1,0 +1,365 @@
+{
+  "common": {
+    "back": "戻る",
+    "title": "ZITADELでログイン"
+  },
+  "accounts": {
+    "title": "アカウント",
+    "description": "使用するアカウントを選択してください。",
+    "addAnother": "別のアカウントを追加",
+    "noResults": "アカウントが見つかりません",
+    "verified": "認証済み",
+    "expired": "期限切れ"
+  },
+  "logout": {
+    "title": "ログアウト",
+    "description": "セッションを終了するアカウントをクリックしてください",
+    "noResults": "アカウントが見つかりません",
+    "clear": "セッション終了",
+    "verifiedAt": "最後のアクティブ: {time}",
+    "success": {
+      "title": "ログアウト完了",
+      "description": "正常にログアウトしました。"
+    }
+  },
+  "loginname": {
+    "title": "お帰りなさい！",
+    "description": "ログイン情報を入力してください。",
+    "register": "新規ユーザー登録",
+    "submit": "続行",
+    "labels": {
+      "loginname": "ログイン名",
+      "username": "ユーザー名",
+      "usernameOrPhoneNumber": "ユーザー名または電話番号",
+      "usernameOrEmail": "ユーザー名またはメールアドレス"
+    },
+    "required": {
+      "loginName": "必須項目です"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "パスワード",
+      "description": "パスワードを入力してください。",
+      "resetPassword": "パスワードをリセット",
+      "submit": "続行",
+      "labels": {
+        "password": "パスワード"
+      },
+      "required": {
+        "password": "必須項目です"
+      }
+    },
+    "set": {
+      "title": "パスワード設定",
+      "description": "アカウントのパスワードを設定してください",
+      "codeSent": "確認コードをメールアドレスに送信しました。",
+      "noCodeReceived": "コードが届きませんか？",
+      "resend": "コードを再送信",
+      "submit": "続行",
+      "labels": {
+        "code": "コード",
+        "newPassword": "新しいパスワード",
+        "confirmPassword": "パスワード確認"
+      },
+      "required": {
+        "code": "必須項目です",
+        "newPassword": "パスワードを入力してください！",
+        "confirmPassword": "必須項目です"
+      }
+    },
+    "change": {
+      "title": "パスワード変更",
+      "description": "アカウントのパスワードを設定してください",
+      "submit": "続行",
+      "labels": {
+        "newPassword": "新しいパスワード",
+        "confirmPassword": "パスワード確認"
+      },
+      "required": {
+        "newPassword": "新しいパスワードを入力してください！",
+        "confirmPassword": "必須項目です"
+      }
+    }
+  },
+  "idp": {
+    "title": "SSOでサインイン",
+    "description": "以下のプロバイダーを選択してサインインしてください",
+    "orSignInWith": "または次でサインイン",
+    "signInWithApple": "Appleでサインイン",
+    "signInWithGoogle": "Googleでサインイン",
+    "signInWithAzureAD": "AzureADでサインイン",
+    "signInWithGithub": "GitHubでサインイン",
+    "signInWithGitlab": "GitLabでサインイン",
+    "loginError": {
+      "title": "ログイン失敗",
+      "description": "ログインの際にエラーが発生しました。"
+    },
+    "linkingError": {
+      "title": "アカウント連携失敗",
+      "description": "アカウント連携の際にエラーが発生しました。"
+    },
+    "completeRegister": {
+      "title": "データを完成させる",
+      "description": "メールアドレスと名前を入力して登録を完了してください。"
+    },
+    "accountNotFound": {
+      "title": "アカウントが見つかりません",
+      "description": "アイデンティティプロバイダの認証情報に関連付けられたアカウントが見つかりませんでした。",
+      "info": "既存のアカウントが見つかりませんでした。既存のアカウントでサインインするか、管理者にお問い合わせください。",
+      "backToLogin": "ログインに戻る"
+    },
+    "registrationFailed": {
+      "title": "登録が利用できません",
+      "description": "登録プロセスを完了できませんでした。",
+      "info": "登録する組織を特定できませんでした。管理者にお問い合わせください。",
+      "backToLogin": "ログインに戻る"
+    },
+    "processing": {
+      "message": "認証を処理しています...",
+      "noRedirect": "サーバーからリダイレクトまたはエラーが返されませんでした",
+      "unexpectedError": "予期しないエラーが発生しました"
+    },
+    "errors": {
+      "missingParameters": "必要なパラメータが不足しています",
+      "missingIdpInfo": "IDP情報が不足しています",
+      "idpNotFound": "アイデンティティプロバイダが見つかりません",
+      "linkingNotAllowed": "このアイデンティティプロバイダとの連携は許可されていません",
+      "linkingFailed": "アイデンティティプロバイダのアカウントへの連携に失敗しました",
+      "autoLinkingFailed": "アカウントの自動連携に失敗しました",
+      "userCreationFailed": "ユーザーアカウントの作成に失敗しました",
+      "orgResolutionFailed": "登録する組織を特定できませんでした",
+      "sessionCreationFailed": "セッションの作成またはリダイレクトの決定に失敗しました",
+      "unknownError": "不明なエラーが発生しました"
+    }
+  },
+  "ldap": {
+    "title": "LDAPログイン",
+    "description": "LDAP認証情報を入力してください。",
+    "submit": "続行",
+    "labels": {
+      "username": "ユーザー名",
+      "password": "パスワード"
+    },
+    "required": {
+      "username": "必須項目です",
+      "password": "必須項目です"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "本人確認",
+      "description": "以下の要素の中から一つを選択してください。",
+      "noResults": "設定可能な二要素認証がありません。"
+    },
+    "set": {
+      "title": "二要素認証の設定",
+      "description": "以下の二要素認証の中から一つを選択してください。",
+      "skip": "スキップ"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "二要素認証",
+      "totpDescription": "認証アプリからコードを入力してください。",
+      "smsDescription": "SMSで受信したコードを入力してください。",
+      "emailDescription": "メールで受信したコードを入力してください。",
+      "noCodeReceived": "コードが届きませんか？",
+      "resendCode": "コードを再送信",
+      "submit": "続行",
+      "labels": {
+        "code": "コード"
+      },
+      "required": {
+        "code": "必須項目です"
+      }
+    },
+    "set": {
+      "title": "二要素認証の設定",
+      "totpDescription": "認証アプリでQRコードをスキャンしてください。",
+      "smsDescription": "SMSでコードを受信する電話番号を入力してください。",
+      "emailDescription": "メールでコードを受信するメールアドレスを入力してください。",
+      "totpRegisterDescription": "QRコードをスキャンするか、URLに手動でアクセスしてください。",
+      "submit": "続行",
+      "labels": {
+        "code": "コード"
+      },
+      "required": {
+        "code": "必須項目です"
+      }
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "パスキーで認証",
+      "description": "デバイスが指紋、顔、または画面ロックの入力を求めます",
+      "usePassword": "パスワードを使用",
+      "submit": "続行"
+    },
+    "set": {
+      "title": "パスキーの設定",
+      "description": "デバイスが指紋、顔、または画面ロックの入力を求めます",
+      "info": {
+        "description": "パスキーは、指紋やApple FaceIDなどのデバイス上の認証方法です。",
+        "link": "パスワードレス認証"
+      },
+      "skip": "スキップ",
+      "submit": "続行"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "二要素認証",
+      "description": "デバイスでアカウントを確認してください。"
+    },
+    "set": {
+      "title": "二要素認証の設定",
+      "description": "デバイスを二要素認証として設定します。",
+      "submit": "続行"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "パスキー",
+      "password": "パスワード"
+    },
+    "disabled": {
+      "title": "登録が無効",
+      "description": "登録が無効になっています。管理者にお問い合わせください。"
+    },
+    "missingdata": {
+      "title": "データが不足",
+      "description": "登録するにはメールアドレス、姓、名を入力してください。"
+    },
+    "title": "登録",
+    "description": "ZITADELアカウントを作成します。",
+    "noMethodAvailableWarning": "使用可能な認証方法がありません。管理者にお問い合わせください。",
+    "selectMethod": "認証に使用する方法を選択してください",
+    "agreeTo": "登録するには利用規約に同意する必要があります",
+    "termsOfService": "利用規約",
+    "privacyPolicy": "プライバシーポリシー",
+    "submit": "続行",
+    "password": {
+      "title": "パスワード設定",
+      "description": "アカウントのパスワードを設定してください",
+      "submit": "続行",
+      "labels": {
+        "password": "パスワード",
+        "confirmPassword": "パスワード確認"
+      },
+      "required": {
+        "password": "パスワードを入力してください！",
+        "confirmPassword": "必須項目です"
+      }
+    },
+    "labels": {
+      "firstname": "名",
+      "lastname": "姓",
+      "email": "メールアドレス"
+    },
+    "required": {
+      "firstname": "必須項目です",
+      "lastname": "必須項目です",
+      "email": "必須項目です"
+    }
+  },
+  "invite": {
+    "title": "ユーザー招待",
+    "description": "招待するユーザーのメールアドレスと名前を入力してください。",
+    "info": "ユーザーには詳細な手順が記載されたメールが送信されます。",
+    "notAllowed": "設定によりユーザーを招待できません。",
+    "submit": "続行",
+    "success": {
+      "title": "ユーザーを招待しました",
+      "description": "メールが正常に送信されました。",
+      "verified": "ユーザーが招待され、既にメールアドレスが確認済みです。",
+      "notVerifiedYet": "ユーザーが招待されました。詳細な手順が記載されたメールを受信します。",
+      "submit": "別のユーザーを招待"
+    }
+  },
+  "signedin": {
+    "title": "ようこそ {user}さん！",
+    "description": "サインインしました。",
+    "continue": "続行",
+    "error": {
+      "title": "エラー",
+      "description": "サインインの際にエラーが発生しました。"
+    }
+  },
+  "verify": {
+    "userIdMissing": "ユーザーIDが指定されていません！",
+    "successTitle": "ユーザー確認完了",
+    "successDescription": "ユーザーの確認が正常に完了しました。",
+    "setupAuthenticator": "認証の設定",
+    "verify": {
+      "title": "ユーザー確認",
+      "description": "確認メールに記載されたコードを入力してください。",
+      "noCodeReceived": "コードが届きませんか？",
+      "resendCode": "コードを再送信",
+      "codeSent": "確認コードをメールアドレスに送信しました。",
+      "submit": "続行",
+      "labels": {
+        "code": "コード"
+      },
+      "required": {
+        "code": "必須項目です"
+      }
+    },
+    "errors": {
+      "couldNotResendEmail": "メールを再送信できませんでした",
+      "couldNotVerifyUser": "ユーザーを確認できませんでした",
+      "couldNotVerifyInvite": "招待を確認できませんでした",
+      "couldNotVerifyEmail": "メールアドレスを確認できませんでした",
+      "couldNotVerify": "確認できませんでした",
+      "couldNotLoadUser": "ユーザーを読み込めませんでした",
+      "couldNotLoadAuthenticators": "認証方法を読み込めませんでした",
+      "couldNotCreateSession": "セッションを作成できませんでした",
+      "noHostFound": "ホストが見つかりません",
+      "userAlreadyVerified": "ユーザーは既に確認済みです！",
+      "couldNotResendInvite": "招待を再送信できませんでした",
+      "inviteSendFailed": "招待メールの送信に失敗しました",
+      "emailSendFailed": "確認メールの送信に失敗しました"
+    }
+  },
+  "authenticator": {
+    "title": "認証方法を選択",
+    "description": "認証に使用する方法を選択してください",
+    "noMethodsAvailable": "使用可能な認証方法がありません",
+    "allSetup": "認証の設定は既に完了しています！",
+    "linkWithIDP": "またはIDプロバイダーと連携"
+  },
+  "device": {
+    "usercode": {
+      "title": "デバイスコード",
+      "description": "アプリまたはデバイスに表示されるコードを入力してください。",
+      "submit": "続行",
+      "labels": {
+        "code": "コード"
+      },
+      "required": {
+        "code": "必須項目です"
+      }
+    },
+    "request": {
+      "title": "{appName}が接続を要求しています",
+      "description": "{appName}は以下にアクセスします：",
+      "disclaimer": "「許可」をクリックすることで、{appName}とZitadelがそれぞれの利用規約およびプライバシーポリシーに従ってあなたの情報を使用することを許可します。このアクセスはいつでも取り消すことができます。",
+      "submit": "許可",
+      "deny": "拒否"
+    },
+    "scope": {
+      "openid": "本人確認を行います。",
+      "email": "メールアドレスを表示します。",
+      "profile": "すべてのプロフィール情報を表示します。",
+      "offline_access": "アカウントへのオフラインアクセスを許可します。"
+    }
+  },
+  "error": {
+    "noUserCode": "ユーザーコードが指定されていません！",
+    "noDeviceRequest": "デバイスリクエストが見つかりません。",
+    "unknownContext": "ユーザーのコンテキストを取得できませんでした。最初にユーザー名を入力するか、検索パラメータとしてloginNameを指定してください。",
+    "sessionExpired": "現在のセッションが期限切れです。再度ログインしてください。",
+    "failedLoading": "データの読み込みに失敗しました。再試行してください。",
+    "tryagain": "再試行"
+  }
+}

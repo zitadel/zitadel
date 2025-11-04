@@ -749,6 +749,15 @@ SystemDefaults:
       Length: 10 # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_RECOVERYCODES_LENGTH
       # Whether to include hyphens in the recovery codes (alphanumeric: hyphen in middle, uuid: keep/remove all hyphens)
       WithHyphen: true # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_RECOVERYCODES_WITHHYPHEN
+  Tarpit:
+    # The amount of failed attempts, the tarpit should start.
+    MinFailedAttempts: 5 # ZITADEL_SYSTEMDEFAULTS_TARPIT_MINFAILEDATTEMPTS
+    # The seconds that will be added per step.
+    StepDuration: 1s # ZITADEL_SYSTEMDEFAULTS_TARPIT_STEPDURATION
+    # The failed attempts that are needed to increase the tarpit by one step.
+    StepSize: 5 # ZITADEL_SYSTEMDEFAULTS_TARPIT_STEPSIZE
+    # The maximum duration the tarpit can reach.
+    MaxDuration: 10s # ZITADEL_SYSTEMDEFAULTS_TARPIT_MAXDURATION
   DomainVerification:
     VerificationGenerator:
       Length: 32 # ZITADEL_SYSTEMDEFAULTS_DOMAINVERIFICATION_VERIFICATIONGENERATOR_LENGTH
@@ -1156,7 +1165,7 @@ DefaultInstance:
     # EnableBackChannelLogout: false # ZITADEL_DEFAULTINSTANCE_FEATURES_ENABLEBACKCHANNELLOGOUT
     LoginV2:
       Required: true # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED
-    #  BaseURI: "" # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI
+      BaseURI: # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI
     # PermissionCheckV2: false # ZITADEL_DEFAULTINSTANCE_FEATURES_PERMISSIONCHECKV2
     ConsoleUseV2UserApi: true # ZITADEL_DEFAULTINSTANCE_FEATURES_CONSOLEUSEV2USERAPI
     # EnableRelationalTables: false # ZITADEL_DEFAULTINSTANCE_FEATURES_ENABLERELATIONALTABLES
@@ -1388,6 +1397,13 @@ InternalAuthZ:
         - "userschema.read"
         - "userschema.write"
         - "userschema.delete"
+        - "group.create"
+        - "group.write"
+        - "group.read"
+        - "group.delete"
+        - "group.user.write"
+        - "group.user.read"
+        - "group.user.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -1424,6 +1440,8 @@ InternalAuthZ:
         - "action.execution.read"
         - "userschema.read"
         - "session.read"
+        - "group.read"
+        - "group.user.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"
@@ -1483,6 +1501,13 @@ InternalAuthZ:
         - "project.grant.member.delete"
         - "session.read"
         - "session.delete"
+        - "group.create"
+        - "group.write"
+        - "group.read"
+        - "group.delete"
+        - "group.user.write"
+        - "group.user.read"
+        - "group.user.delete"
     - Role: "IAM_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -1511,6 +1536,8 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "session.read"
         - "session.delete"
+        - "group.read"
+        - "group.user.read"
     - Role: "IAM_ADMIN_IMPERSONATOR"
       Permissions:
         - "admin.impersonation"
@@ -1575,6 +1602,13 @@ InternalAuthZ:
         - "project.grant.member.delete"
         - "session.read"
         - "session.delete"
+        - "group.create"
+        - "group.write"
+        - "group.read"
+        - "group.delete"
+        - "group.user.write"
+        - "group.user.read"
+        - "group.user.delete"
     - Role: "IAM_LOGIN_CLIENT"
       Permissions:
         - "iam.read"
@@ -1613,6 +1647,8 @@ InternalAuthZ:
         - "session.link"
         - "session.delete"
         - "userschema.read"
+        - "group.read"
+        - "group.user.read"
     - Role: "ORG_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -1632,6 +1668,8 @@ InternalAuthZ:
         - "project.role.read"
         - "session.read"
         - "session.delete"
+        - "group.read"
+        - "group.user.read"
     - Role: "ORG_OWNER_VIEWER"
       Permissions:
         - "org.read"
@@ -1653,6 +1691,8 @@ InternalAuthZ:
         - "project.grant.read"
         - "project.grant.member.read"
         - "project.grant.user.grant.read"
+        - "group.read"
+        - "group.user.read"
     - Role: "ORG_SETTINGS_MANAGER"
       Permissions:
         - "org.read"
@@ -1683,6 +1723,8 @@ InternalAuthZ:
         - "project.app.read"
         - "project.grant.read"
         - "project.grant.member.read"
+        - "group.read"
+        - "group.user.read"
     - Role: "ORG_PROJECT_PERMISSION_EDITOR"
       Permissions:
         - "org.read"
@@ -1948,6 +1990,13 @@ SystemAuthZ:
         - "userschema.read"
         - "userschema.write"
         - "userschema.delete"
+        - "group.create"
+        - "group.write"
+        - "group.read"
+        - "group.delete"
+        - "group.user.write"
+        - "group.user.read"
+        - "group.user.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -1984,6 +2033,8 @@ SystemAuthZ:
         - "action.execution.read"
         - "userschema.read"
         - "session.read"
+        - "group.read"
+        - "group.user.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"
@@ -2043,6 +2094,13 @@ SystemAuthZ:
         - "project.grant.member.delete"
         - "session.read"
         - "session.delete"
+        - "group.create"
+        - "group.write"
+        - "group.read"
+        - "group.delete"
+        - "group.user.write"
+        - "group.user.read"
+        - "group.user.delete"
     - Role: "IAM_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -2071,6 +2129,8 @@ SystemAuthZ:
         - "project.grant.member.read"
         - "session.read"
         - "session.delete"
+        - "group.read"
+        - "group.user.read"
     - Role: "IAM_ADMIN_IMPERSONATOR"
       Permissions:
         - "admin.impersonation"
@@ -2116,6 +2176,8 @@ SystemAuthZ:
         - "session.link"
         - "session.delete"
         - "userschema.read"
+        - "group.read"
+        - "group.user.read"
 
 # If a new projection is introduced it will be prefilled during the setup process (if enabled)
 # This can prevent serving outdated data after a version upgrade, but might require a longer setup / upgrade process:

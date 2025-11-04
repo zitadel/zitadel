@@ -43,6 +43,7 @@ type SessionCommands struct {
 	getCodeVerifier      func(ctx context.Context, id string) (senders.CodeGenerator, error)
 	now                  func() time.Time
 	maxIdPIntentLifetime time.Duration
+	tarpit               func(failedAttempts uint64)
 }
 
 func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWriteModel) *SessionCommands {
@@ -60,6 +61,7 @@ func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWri
 		getCodeVerifier:      c.phoneCodeVerifierFromConfig,
 		now:                  time.Now,
 		maxIdPIntentLifetime: c.maxIdPIntentLifetime,
+		tarpit:               c.tarpit,
 	}
 }
 
@@ -76,7 +78,7 @@ func CheckUser(id string, resourceOwner string, preferredLanguage *language.Tag)
 // CheckPassword defines a password check to be executed for a session update
 func CheckPassword(password string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) ([]eventstore.Command, error) {
-		commands, err := checkPassword(ctx, cmd.sessionWriteModel.UserID, password, cmd.eventstore, cmd.hasher, nil)
+		commands, err := checkPassword(ctx, cmd.sessionWriteModel.UserID, password, cmd.eventstore, cmd.hasher, nil, cmd.tarpit)
 		if err != nil {
 			return commands, err
 		}
@@ -135,6 +137,7 @@ func CheckTOTP(code string) SessionCommand {
 			cmd.eventstore.FilterToQueryReducer,
 			cmd.totpAlg,
 			nil,
+			cmd.tarpit,
 		)
 		if err != nil {
 			return commands, err

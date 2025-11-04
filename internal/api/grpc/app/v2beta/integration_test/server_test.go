@@ -212,8 +212,6 @@ func createAppKey(t *testing.T, ctx context.Context, inst *integration.Instance,
 			ExpirationDate: timestamppb.New(expirationDate.UTC()),
 		},
 	)
-
 	require.Nil(t, err)
-
 	return res
 }

@@ -3,7 +3,7 @@ package systemdefaults
 import (
 	"fmt"
 	"time"
-
+	
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 )
@@ -13,6 +13,7 @@ type SystemDefaults struct {
 	PasswordHasher       crypto.HashConfig
 	SecretHasher         crypto.HashConfig
 	Multifactors         MultifactorConfig
+	Tarpit               TarpitConfig
 	DomainVerification   DomainVerification
 	Notifications        Notifications
 	KeyConfig            KeyConfig

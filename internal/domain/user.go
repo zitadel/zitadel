@@ -110,6 +110,25 @@ func RequiresMFA(forceMFA, forceMFALocalOnly, isInternalLogin bool) bool {
 	return forceMFA && !forceMFALocalOnly
 }
 
+// AuthMethodToSecondFactor maps user auth methods to their corresponding second factor types
+func AuthMethodToSecondFactor(method UserAuthMethodType) SecondFactorType {
+	switch method {
+	case UserAuthMethodTypeTOTP:
+		return SecondFactorTypeTOTP
+	case UserAuthMethodTypeU2F:
+		return SecondFactorTypeU2F
+	case UserAuthMethodTypeOTPSMS:
+		return SecondFactorTypeOTPSMS
+	case UserAuthMethodTypeOTPEmail:
+		return SecondFactorTypeOTPEmail
+	case UserAuthMethodTypeOTP:
+		return SecondFactorTypeOTPSMS
+	default:
+		// First-factor methods: password, IDP, passwordless, private key
+		return 0
+	}
+}
+
 type PersonalAccessTokenState int32
 
 const (

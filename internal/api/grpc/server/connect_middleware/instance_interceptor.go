@@ -40,7 +40,10 @@ func setInstance(ctx context.Context, req connect.AnyRequest, handler connect.Un
 			if !ok {
 				return handler(ctx, req)
 			}
-			return addInstanceByID(interceptorCtx, req, handler, verifier, translator, withInstanceIDProperty.GetInstanceId())
+			instanceID := withInstanceIDProperty.GetInstanceId()
+			if instanceID != "" {
+				return addInstanceByID(interceptorCtx, req, handler, verifier, translator, instanceID)
+			}
 		}
 	}
 	explicitInstanceRequest, ok := req.Any().(interface {
@@ -61,11 +64,12 @@ func setInstance(ctx context.Context, req connect.AnyRequest, handler connect.Un
 func addInstanceByID(ctx context.Context, req connect.AnyRequest, handler connect.UnaryFunc, verifier authz.InstanceVerifier, translator *i18n.Translator, id string) (connect.AnyResponse, error) {
 	instance, err := verifier.InstanceByID(ctx, id)
 	if err != nil {
-		notFoundErr := new(zerrors.ZitadelError)
-		if errors.As(err, &notFoundErr) {
-			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
-		}
-		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("unable to set instance using id %s: %w", id, notFoundErr))
+		// We do not want to expose whether the instance id was invalid or not
+		// to prevent leaking information about existing instances.
+		// In case the user has permission to access the instance, but the instance does not exist,
+		// the error will be returned by the business logic later on.
+		logging.WithFields("instanceID", id).WithError(err).Error("unable to set instance by id")
+		return handler(ctx, req)
 	}
 	return handler(authz.WithInstance(ctx, instance), req)
 }
@@ -84,11 +88,11 @@ func addInstanceByDomain(ctx context.Context, req connect.AnyRequest, handler co
 
 func addInstanceByRequestedHost(ctx context.Context, req connect.AnyRequest, handler connect.UnaryFunc, verifier authz.InstanceVerifier, translator *i18n.Translator, externalDomain string) (connect.AnyResponse, error) {
 	requestContext := zitadel_http.DomainContext(ctx)
-	if requestContext.InstanceHost == "" {
+	if requestContext.InstanceDomain() == "" {
 		logging.WithFields("origin", requestContext.Origin(), "externalDomain", externalDomain).Error("unable to set instance")
 		return nil, connect.NewError(connect.CodeNotFound, errors.New("no instanceHost specified"))
 	}
-	instance, err := verifier.InstanceByHost(ctx, requestContext.InstanceHost, requestContext.PublicHost)
+	instance, err := verifier.InstanceByHost(ctx, requestContext.InstanceDomain(), requestContext.RequestedDomain())
 	if err != nil {
 		origin := zitadel_http.DomainContext(ctx)
 		logging.WithFields("origin", requestContext.Origin(), "externalDomain", externalDomain).WithError(err).Error("unable to set instance")

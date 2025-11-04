@@ -16,7 +16,7 @@ import (
 )
 
 func TestServer_Deprecated_SetEmail(t *testing.T) {
-	userID := Instance.CreateHumanUser(CTX).GetUserId()
+	userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
 
 	tests := []struct {
 		name    string
@@ -127,7 +127,7 @@ func TestServer_Deprecated_SetEmail(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.SetEmail(CTX, tt.req)
+			got, err := Client.SetEmail(OrgCTX, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -145,8 +145,8 @@ func TestServer_Deprecated_SetEmail(t *testing.T) {
 }
 
 func TestServer_ResendEmailCode(t *testing.T) {
-	userID := Instance.CreateHumanUser(CTX).GetUserId()
-	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, integration.Email(), integration.Phone()).GetUserId()
+	userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
+	verifiedUserID := Instance.CreateHumanUserVerified(OrgCTX, Instance.DefaultOrg.Id, integration.Email(), integration.Phone()).GetUserId()
 
 	tests := []struct {
 		name    string
@@ -231,7 +231,7 @@ func TestServer_ResendEmailCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.ResendEmailCode(CTX, tt.req)
+			got, err := Client.ResendEmailCode(OrgCTX, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -249,8 +249,8 @@ func TestServer_ResendEmailCode(t *testing.T) {
 }
 
 func TestServer_SendEmailCode(t *testing.T) {
-	userID := Instance.CreateHumanUser(CTX).GetUserId()
-	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, integration.Email(), integration.Phone()).GetUserId()
+	userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
+	verifiedUserID := Instance.CreateHumanUserVerified(OrgCTX, Instance.DefaultOrg.Id, integration.Email(), integration.Phone()).GetUserId()
 
 	tests := []struct {
 		name    string
@@ -341,7 +341,7 @@ func TestServer_SendEmailCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.SendEmailCode(CTX, tt.req)
+			got, err := Client.SendEmailCode(OrgCTX, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -359,7 +359,7 @@ func TestServer_SendEmailCode(t *testing.T) {
 }
 
 func TestServer_VerifyEmail(t *testing.T) {
-	userResp := Instance.CreateHumanUser(CTX)
+	userResp := Instance.CreateHumanUser(OrgCTX)
 	tests := []struct {
 		name    string
 		req     *user.VerifyEmailRequest
@@ -399,7 +399,7 @@ func TestServer_VerifyEmail(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.VerifyEmail(CTX, tt.req)
+			got, err := Client.VerifyEmail(OrgCTX, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return

@@ -39,10 +39,7 @@ func TestServer_TestOrgDomainReduces(t *testing.T) {
 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
 		_, err := orgRepo.Get(CTX, pool,
 			database.WithCondition(
-				database.And(
-					orgRepo.InstanceIDCondition(Instance.Instance.Id),
-					orgRepo.IDCondition(org.GetId()),
-				),
+				orgRepo.PrimaryKeyCondition(Instance.Instance.Id, org.GetId()),
 			),
 		)
 		assert.NoError(t, err)

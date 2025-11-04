@@ -75,7 +75,7 @@ func (g *groupProjection) Reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: group.AggregateType,
+			Aggregate: org.AggregateType,
 			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.OrgRemovedEventType,
@@ -145,6 +145,7 @@ func (g *groupProjection) reduceGroupChanged(event eventstore.Event) (*handler.S
 		columns,
 		[]handler.Condition{
 			handler.NewCond(GroupColumnID, e.Aggregate().ID),
+			handler.NewCond(GroupColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCond(GroupColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
@@ -159,6 +160,7 @@ func (g *groupProjection) reduceGroupRemoved(event eventstore.Event) (*handler.S
 		e,
 		[]handler.Condition{
 			handler.NewCond(GroupColumnID, e.Aggregate().ID),
+			handler.NewCond(GroupColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCond(GroupColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil

@@ -88,10 +88,10 @@ func setInstance(ctx context.Context, verifier authz.InstanceVerifier) (_ contex
 	defer func() { span.EndWithError(err) }()
 
 	requestContext := zitadel_http.DomainContext(ctx)
-	if requestContext.InstanceHost == "" {
+	if requestContext.InstanceDomain() == "" {
 		return nil, zerrors.ThrowNotFound(err, "INST-zWq7X", "Errors.IAM.NotFound")
 	}
-	instance, err := verifier.InstanceByHost(authCtx, requestContext.InstanceHost, requestContext.PublicHost)
+	instance, err := verifier.InstanceByHost(authCtx, requestContext.InstanceDomain(), requestContext.RequestedDomain())
 	if err != nil {
 		return nil, err
 	}

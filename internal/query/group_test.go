@@ -1,12 +1,15 @@
 package query
 
 import (
+	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
 	"fmt"
 	"regexp"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -302,4 +305,123 @@ func Test_GroupPrepares(t *testing.T) {
 			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
+}
+
+func Test_GroupsCheckPermission(t *testing.T) {
+	tests := []struct {
+		name        string
+		want        []*Group
+		groups      *Groups
+		permissions []string
+	}{
+		{
+			name: "no permissions",
+			want: []*Group{},
+			groups: &Groups{
+				Groups: []*Group{
+					{ID: "group1"}, {ID: "group2"}, {ID: "group3"},
+				},
+			},
+			permissions: []string{},
+		},
+		{
+			name: "permissions for all groups",
+			want: []*Group{
+				{ID: "group1"}, {ID: "group2"}, {ID: "group3"},
+			},
+			groups: &Groups{
+				Groups: []*Group{
+					{ID: "group1"}, {ID: "group2"}, {ID: "group3"},
+				},
+			},
+			permissions: []string{"group1", "group2", "group3"},
+		},
+		{
+			name: "permissions for group1",
+			want: []*Group{
+				{ID: "group1"},
+			},
+			groups: &Groups{
+				Groups: []*Group{
+					{ID: "group1"}, {ID: "group2"}, {ID: "group3"},
+				},
+			},
+			permissions: []string{"group1"},
+		},
+		{
+			name: "permissions for group2",
+			want: []*Group{
+				{ID: "group2"},
+			},
+			groups: &Groups{
+				Groups: []*Group{
+					{ID: "group1"}, {ID: "group2"}, {ID: "group3"},
+				},
+			},
+			permissions: []string{"group2"},
+		},
+		{
+			name: "permissions for group3",
+			want: []*Group{
+				{ID: "group3"},
+			},
+			groups: &Groups{
+				Groups: []*Group{
+					{ID: "group1"}, {ID: "group2"}, {ID: "group3"},
+				},
+			},
+			permissions: []string{"group3"},
+		},
+		{
+			name: "permissions for group1 and group2",
+			want: []*Group{
+				{ID: "group1"}, {ID: "group2"},
+			},
+			groups: &Groups{
+				Groups: []*Group{
+					{ID: "group1"}, {ID: "group2"}, {ID: "group3"},
+				},
+			},
+			permissions: []string{"group1", "group2"},
+		},
+		{
+			name: "permissions for group1 and group3",
+			want: []*Group{
+				{ID: "group1"}, {ID: "group3"},
+			},
+			groups: &Groups{
+				Groups: []*Group{
+					{ID: "group1"}, {ID: "group2"}, {ID: "group3"},
+				},
+			},
+			permissions: []string{"group1", "group3"},
+		},
+		{
+			name: "permissions for group2 and group3",
+			want: []*Group{
+				{ID: "group2"}, {ID: "group3"},
+			},
+			groups: &Groups{
+				Groups: []*Group{
+					{ID: "group1"}, {ID: "group2"}, {ID: "group3"},
+				},
+			},
+			permissions: []string{"group2", "group3"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			checkPermission := func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+				for _, perm := range tt.permissions {
+					if resourceID == perm {
+						return nil
+					}
+				}
+				return errors.New("failed")
+			}
+			groupsCheckPermission(context.Background(), tt.groups, checkPermission)
+			require.Equal(t, tt.want, tt.groups.Groups)
+		})
+	}
+
 }
