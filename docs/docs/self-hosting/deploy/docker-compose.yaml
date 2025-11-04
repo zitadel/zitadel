@@ -5,7 +5,7 @@ services:
     command:
       - |
         # if there is no private key provided generate private and public key
-        if [ ! -f "/current-dir/login-system-user-base64.pem" || ! -f "/current-dir/login-system-user.pub" ]; 
+        if [[ ! -f "/current-dir/login-system-user-base64.pem" ]] || [[ ! -f "/current-dir/login-system-user.pub" ]]; 
         then 
           openssl genrsa -traditional -out /current-dir/login-system-user.pem 2048 &&
           openssl rsa -in /current-dir/login-system-user.pem -outform PEM -pubout -out /current-dir/login-system-user.pub &&
