@@ -278,7 +278,6 @@
       margin: 2rem 0;
 
       .client-secret-note {
-        margin: 1rem 0;
         font-size: 0.875rem;
 
         .secret-link {
@@ -468,6 +467,7 @@
             .generic-links {
               display: flex;
               gap: 1rem;
+              margin-top: 1rem;
               margin-bottom: 1rem;
               flex-wrap: wrap;
 
@@ -517,6 +517,13 @@
                 justify-content: flex-start;
                 align-items: flex-start;
 
+                .generic-links {
+                  display: flex;
+                  gap: 1rem;
+                  margin-top: 1rem;
+                  flex-wrap: wrap;
+                }
+
                 .framework-actions {
                   display: flex;
                   width: 100%;
@@ -551,7 +558,6 @@
                 }
 
                 .client-secret-note {
-                  margin: 1rem 0;
                   font-size: 0.875rem;
 
                   .secret-link {

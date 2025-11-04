@@ -236,6 +236,21 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public envVarsArray: EnvVar[] = [];
 
+  private getEnvVarPrefix(): string {
+    if (this.selectedScenario !== 'new') {
+      return '';
+    }
+
+    const framework = this.framework?.toLowerCase();
+
+    const prefixMap: { [key: string]: string } = {
+      angular: 'NG_APP_',
+      vue: 'VITE_',
+    };
+
+    return prefixMap[framework || ''] || '';
+  }
+
   private async updateEnvVars(): Promise<void> {
     try {
       const env = await this.envSvc.env.pipe(take(1)).toPromise();
@@ -247,21 +262,20 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
       const issuer = env.issuer || 'https://your-domain.zitadel.cloud';
       const clientId = this.app.oidcConfig?.clientId || 'your-client-id';
+      const prefix = this.getEnvVarPrefix();
+
       const envVars: EnvVar[] = [
         {
-          key: 'ZITADEL_ISSUER',
+          key: `${prefix}ZITADEL_ISSUER`,
           value: issuer,
-          // description: 'The ZITADEL issuer URL for your instance',
         },
         {
-          key: 'ZITADEL_CLIENT_ID',
+          key: `${prefix}ZITADEL_CLIENT_ID`,
           value: clientId,
-          // description: 'Your application client ID',
         },
         {
-          key: 'ZITADEL_PROJECT_ID',
+          key: `${prefix}ZITADEL_PROJECT_ID`,
           value: this.projectId,
-          // description: 'The project ID containing your application',
         },
       ];
 
@@ -271,27 +285,24 @@ export class AppDetailComponent implements OnInit, OnDestroy {
           this.app.oidcConfig.authMethodType === OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_POST
         ) {
           envVars.push({
-            key: 'ZITADEL_CLIENT_SECRET',
+            key: `${prefix}ZITADEL_CLIENT_SECRET`,
             value: 'your-client-secret',
-            // description: 'Your application client secret (replace with actual secret)',
           });
         }
 
         const redirectUris = this.app.oidcConfig.redirectUrisList || [];
         if (redirectUris.length > 0) {
           envVars.push({
-            key: 'ZITADEL_REDIRECT_URL',
+            key: `${prefix}ZITADEL_REDIRECT_URL`,
             value: redirectUris[0],
-            // description: 'Primary redirect URI for authentication callbacks',
           });
         }
 
         const postLogoutUris = this.app.oidcConfig.postLogoutRedirectUrisList || [];
         if (postLogoutUris.length > 0) {
           envVars.push({
-            key: 'ZITADEL_POST_LOGOUT_URL',
+            key: `${prefix}ZITADEL_POST_LOGOUT_URL`,
             value: postLogoutUris[0],
-            // description: 'URI to redirect to after logout',
           });
         }
       }
@@ -1214,6 +1225,11 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     return !!frameworkInfo?.example;
   }
 
+  public hasExampleLink(): boolean {
+    const frameworkInfo = this.getFrameworkInfo();
+    return !!frameworkInfo?.exampleLink;
+  }
+
   public hasSdk(): boolean {
     const frameworkInfo = this.getFrameworkInfo();
     return !!(frameworkInfo?.sdk || frameworkInfo?.sdkCommand);
@@ -1279,6 +1295,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public switchScenario(scenario: 'new' | 'existing'): void {
     this.selectedScenario = scenario;
+    // Regenerate environment variables with appropriate prefixes for the selected scenario
+    this.updateEnvVars();
   }
 
   private async checkAuthenticationStatus(): Promise<void> {

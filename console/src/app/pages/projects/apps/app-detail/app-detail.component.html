@@ -144,7 +144,6 @@
                       </div>
 
                       <div class="integration-steps">
-                        <!-- Step 1: Clone Example (only if example available) -->
                         <div class="step-item" *ngIf="hasExample()">
                           <div class="step-number">1</div>
                           <div class="step-content">
@@ -168,7 +167,6 @@
                           </div>
                         </div>
 
-                        <!-- Generic guidance for frameworks without examples -->
                         <div class="step-item" *ngIf="!hasAnyFrameworkContent()">
                           <div class="step-number">1</div>
                           <div class="step-content">
@@ -182,11 +180,9 @@
                                   mat-raised-button
                                   color="primary"
                                 >
-                                  <i class="las la-code"></i>
                                   {{ 'APP.OVERVIEW_DETAIL.BROWSE_EXAMPLES' | translate }}
                                 </a>
                                 <a href="https://zitadel.com/docs/guides/integrate" target="_blank" mat-stroked-button>
-                                  <i class="las la-puzzle-piece"></i>
                                   {{ 'APP.OVERVIEW_DETAIL.INTEGRATION_GUIDE' | translate }}
                                 </a>
                               </div>
@@ -194,9 +190,8 @@
                           </div>
                         </div>
 
-                        <!-- Step 2: Environment Variables (always shown) -->
                         <div class="step-item">
-                          <div class="step-number">{{ hasExample() ? '2' : '1' }}</div>
+                          <div class="step-number">{{ hasExample() ? '2' : !hasAnyFrameworkContent() ? '2' : '1' }}</div>
                           <div class="step-content">
                             <h6>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP2_TITLE' | translate }}</h6>
                             <p>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP2_DESC' | translate }}</p>
@@ -217,9 +212,8 @@
                           </div>
                         </div>
 
-                        <!-- Step 3: Build and Run (only if build commands available) -->
                         <div class="step-item" *ngIf="hasBuildCommands()">
-                          <div class="step-number">{{ hasExample() ? '3' : '2' }}</div>
+                          <div class="step-number">{{ hasExample() ? '3' : !hasAnyFrameworkContent() ? '3' : '2' }}</div>
                           <div class="step-content">
                             <h6>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP3_TITLE' | translate }}</h6>
                             <p>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP3_DESC' | translate }}</p>
@@ -260,8 +254,8 @@
                           </div>
                         </div>
 
-                        <div class="step-item" *ngIf="hasBuildCommands()">
-                          <div class="step-number">{{ hasExample() ? '4' : '3' }}</div>
+                        <div class="step-item" *ngIf="hasBuildCommands() && hasExampleLink()">
+                          <div class="step-number">4</div>
                           <div class="step-content">
                             <h6>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP4_TITLE' | translate }}</h6>
                             <p>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP4_DESC' | translate }}</p>
@@ -273,7 +267,6 @@
                           </div>
                         </div>
 
-                        <!-- Final step: View Documentation (always shown if any framework content exists) -->
                         <div class="step-item" *ngIf="hasAnyFrameworkContent() && getFrameworkInfo()?.docsLink">
                           <div class="step-number">{{ (hasExample() ? 1 : 0) + (hasBuildCommands() ? 1 : 0) + 2 }}</div>
                           <div class="step-content">
@@ -295,7 +288,6 @@
                       </div>
 
                       <div class="integration-steps">
-                        <!-- Step 1: Install SDK (only if SDK available) -->
                         <div class="step-item" *ngIf="hasSdk()">
                           <div class="step-number">1</div>
                           <div class="step-content">
@@ -319,7 +311,6 @@
                           </div>
                         </div>
 
-                        <!-- Generic guidance for frameworks without SDK -->
                         <div class="step-item" *ngIf="!hasSdk() && !hasAnyFrameworkContent()">
                           <div class="step-number">1</div>
                           <div class="step-content">
@@ -333,11 +324,9 @@
                                   mat-raised-button
                                   color="primary"
                                 >
-                                  <i class="las la-puzzle-piece"></i>
                                   {{ 'APP.OVERVIEW_DETAIL.INTEGRATION_GUIDE' | translate }}
                                 </a>
                                 <a href="https://zitadel.com/docs/apis" target="_blank" mat-stroked-button>
-                                  <i class="las la-cogs"></i>
                                   {{ 'APP.OVERVIEW_DETAIL.API_DOCS' | translate }}
                                 </a>
                               </div>
@@ -346,7 +335,9 @@
                         </div>
 
                         <div class="step-item">
-                          <div class="step-number">{{ hasSdk() ? '2' : '1' }}</div>
+                          <div class="step-number">
+                            {{ hasSdk() ? '2' : !hasSdk() && !hasAnyFrameworkContent() ? '2' : '1' }}
+                          </div>
                           <div class="step-content">
                             <h6>{{ 'APP.OVERVIEW_DETAIL.EXISTING_STEP2_TITLE' | translate }}</h6>
                             <cnsl-info-section *ngIf="requiresClientSecret()" class="client-secret-note">
@@ -366,7 +357,6 @@
                           </div>
                         </div>
 
-                        <!-- Final step: View Documentation (always shown if framework content exists) -->
                         <div class="step-item" *ngIf="hasAnyFrameworkContent() && getFrameworkInfo()?.docsLink">
                           <div class="step-number">{{ hasSdk() ? '3' : '2' }}</div>
                           <div class="step-content">
@@ -383,7 +373,17 @@
                           </div>
                         </div>
                         <div class="step-item">
-                          <div class="step-number">3</div>
+                          <div class="step-number">
+                            {{
+                              hasSdk() && hasAnyFrameworkContent() && getFrameworkInfo()?.docsLink
+                                ? '4'
+                                : hasSdk() || (hasAnyFrameworkContent() && getFrameworkInfo()?.docsLink)
+                                  ? '3'
+                                  : !hasSdk() && !hasAnyFrameworkContent()
+                                    ? '3'
+                                    : '2'
+                            }}
+                          </div>
                           <div class="step-content">
                             <h6>{{ 'APP.OVERVIEW_DETAIL.EXISTING_STEP3_TITLE' | translate }}</h6>
                             <p>{{ 'APP.OVERVIEW_DETAIL.EXISTING_STEP3_DESC' | translate }}</p>
