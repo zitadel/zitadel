@@ -19,7 +19,7 @@
               >
                 <img *ngIf="themeService.isDarkTheme | async" [src]="framework.imgSrcDark" alt="{{ framework.title }}" />
                 <img
-                  *ngIf="!(themeService.isDarkTheme | async) && framework.imgSrcLight"
+                  *ngIf="(themeService.isDarkTheme | async) === false && framework.imgSrcLight"
                   [src]="framework.imgSrcLight"
                   alt="{{ framework.title }}"
                 />
@@ -44,7 +44,7 @@
           />
           <img
             class="framework-logo"
-            *ngIf="!(themeService.isDarkTheme | async) && selectedFramework()!.imgSrcLight"
+            *ngIf="(themeService.isDarkTheme | async) === false && selectedFramework()!.imgSrcLight"
             [src]="selectedFramework()!.imgSrcLight"
             alt="{{ selectedFramework()!.title }}"
           />
