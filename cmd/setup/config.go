@@ -162,7 +162,6 @@ type Steps struct {
 	s63AlterResourceCounts                  *AlterResourceCounts
 	s64ChangePushPosition                   *ChangePushPosition
 	s65FixUserMetadata5Index                *FixUserMetadata5Index
-	s66SqlArrayFunctions                    *SqlJsonArrayFunctions
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
