@@ -462,7 +462,7 @@ func (s *settingsRelationalProjection) reduceLoginPolicyChanged(event eventstore
 		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Agg.InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypeLogin),
 				settingsRepo.OwnerTypeCondition(ownerType),
 			),
@@ -517,7 +517,7 @@ func (s *settingsRelationalProjection) reduceMFAAdded(event eventstore.Event) (*
 		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Agg.InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypeLogin),
 				settingsRepo.OwnerTypeCondition(ownerType),
 			),
@@ -557,7 +557,7 @@ func (s *settingsRelationalProjection) reduceMFARemoved(event eventstore.Event) 
 		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Agg.InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypeLogin),
 				settingsRepo.OwnerTypeCondition(ownerType),
 			),
@@ -585,7 +585,7 @@ func (*settingsRelationalProjection) reduceLoginPolicyRemoved(event eventstore.E
 			ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(loginPolicyRemovedEvent.Aggregate().InstanceID),
-				settingsRepo.OrgIDCondition(&loginPolicyRemovedEvent.Aggregate().ID),
+				settingsRepo.OrganizationIDCondition(&loginPolicyRemovedEvent.Aggregate().ID),
 				settingsRepo.TypeCondition(domain.SettingTypeLogin),
 				settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 			))
@@ -631,7 +631,7 @@ func (s *settingsRelationalProjection) reduceSecondFactorAdded(event eventstore.
 		_, err := loginRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Aggregate().InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypeLogin),
 				settingsRepo.OwnerTypeCondition(ownerType),
 			),
@@ -679,7 +679,7 @@ func (s *settingsRelationalProjection) reduceSecondFactorRemoved(event eventstor
 		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Agg.InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypeLogin),
 				settingsRepo.OwnerTypeCondition(ownerType),
 			),
@@ -826,7 +826,7 @@ func (s *settingsRelationalProjection) reduceLabelChanged(event eventstore.Event
 		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Agg.InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypeLabel),
 				settingsRepo.OwnerTypeCondition(ownerType),
 				settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -858,7 +858,7 @@ func (s *settingsRelationalProjection) reduceLabelPolicyRemoved(event eventstore
 		_, err := settingsRepo.Delete(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Agg.InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypeLabel),
 				settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 				// settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -892,7 +892,7 @@ func (s *settingsRelationalProjection) reduceLabelActivated(event eventstore.Eve
 		_, err := settingsRepo.ActivateLabelSettingEvent(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(event.Aggregate().InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypeLabel),
 				settingsRepo.OwnerTypeCondition(ownerType),
 				settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -977,7 +977,7 @@ func (p *settingsRelationalProjection) reduceLabelLogoAdded(event eventstore.Eve
 		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(event.Aggregate().InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypeLabel),
 				settingsRepo.OwnerTypeCondition(ownerType),
 				settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1046,7 +1046,7 @@ func (p *settingsRelationalProjection) reduceLogoRemoved(event eventstore.Event)
 		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(event.Aggregate().InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypeLabel),
 				settingsRepo.OwnerTypeCondition(ownerType),
 				settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1137,7 +1137,7 @@ func (p *settingsRelationalProjection) reduceIconAdded(event eventstore.Event) (
 		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(event.Aggregate().InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypeLabel),
 				settingsRepo.OwnerTypeCondition(ownerType),
 				settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1209,7 +1209,7 @@ func (p *settingsRelationalProjection) reduceIconRemoved(event eventstore.Event)
 		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(event.Aggregate().InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypeLabel),
 				settingsRepo.OwnerTypeCondition(ownerType),
 				settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1280,7 +1280,7 @@ func (p *settingsRelationalProjection) reduceFontAdded(event eventstore.Event) (
 		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(event.Aggregate().InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypeLabel),
 				settingsRepo.OwnerTypeCondition(ownerType),
 				settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1336,7 +1336,7 @@ func (p *settingsRelationalProjection) reduceFontRemoved(event eventstore.Event)
 		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(event.Aggregate().InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypeLabel),
 				settingsRepo.OwnerTypeCondition(ownerType),
 				settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1442,7 +1442,7 @@ func (s *settingsRelationalProjection) reducePasswordComplexityChanged(event eve
 		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Aggregate().InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypePasswordComplexity),
 				settingsRepo.OwnerTypeCondition(ownerType),
 			),
@@ -1471,7 +1471,7 @@ func (s *settingsRelationalProjection) reducePasswordComplexityRemoved(event eve
 		_, err := settingsRepo.Reset(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Aggregate().InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypePasswordComplexity),
 				settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 			))
@@ -1570,7 +1570,7 @@ func (p *settingsRelationalProjection) reducePasswordPolicyChanged(event eventst
 		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Agg.InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypePasswordExpiry),
 				settingsRepo.OwnerTypeCondition(ownerType),
 			),
@@ -1598,7 +1598,7 @@ func (p *settingsRelationalProjection) reducePasswordPolicyRemoved(event eventst
 		_, err := settingsRepo.Reset(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Agg.InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypePasswordExpiry),
 				settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 			))
@@ -1624,7 +1624,7 @@ func (p *settingsRelationalProjection) reduceOrgLockoutPolicyRemoved(event event
 		_, err := settingsRepo.Reset(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Agg.InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypeLockout),
 				settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 			))
@@ -1739,7 +1739,7 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyChanged(event eventsto
 		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Agg.InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypeLockout),
 				settingsRepo.OwnerTypeCondition(ownerType),
 			),
@@ -1841,7 +1841,7 @@ func (s *settingsRelationalProjection) reduceDomainPolicyChanged(event eventstor
 		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Aggregate().InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypeDomain),
 				settingsRepo.OwnerTypeCondition(ownerType),
 			),
@@ -1869,7 +1869,7 @@ func (p *settingsRelationalProjection) reduceOrgDomainPolicyRemoved(event events
 		_, err := settingsRepo.Reset(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Aggregate().InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypeDomain),
 				settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 			))
@@ -1980,7 +1980,7 @@ func (s *settingsRelationalProjection) reduceOrganizationSettingsRemoved(event e
 		_, err := settingsRepo.Reset(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(e.Agg.InstanceID),
-				settingsRepo.OrgIDCondition(orgId),
+				settingsRepo.OrganizationIDCondition(orgId),
 				settingsRepo.TypeCondition(domain.SettingTypeOrganization),
 				settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 			))

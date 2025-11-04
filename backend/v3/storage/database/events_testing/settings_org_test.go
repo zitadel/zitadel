@@ -71,7 +71,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLogin),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -163,7 +163,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLogin),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -237,7 +237,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLogin),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -263,7 +263,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLogin),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -289,7 +289,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLogin),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -348,7 +348,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLogin),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -377,7 +377,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLogin),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -408,7 +408,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLogin),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -467,7 +467,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLogin),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -521,7 +521,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLogin),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -546,7 +546,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLogin),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -598,7 +598,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
@@ -679,7 +679,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
@@ -743,7 +743,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
@@ -763,7 +763,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.LabelStateCondition(domain.LabelStateActivated),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
@@ -787,7 +787,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.LabelStateCondition(domain.LabelStateActivated),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
@@ -865,7 +865,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -945,7 +945,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1023,7 +1023,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1053,7 +1053,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1131,7 +1131,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1161,7 +1161,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1241,7 +1241,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1320,7 +1320,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1398,7 +1398,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1428,7 +1428,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1506,7 +1506,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1537,7 +1537,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1617,7 +1617,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1694,7 +1694,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1724,7 +1724,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1775,7 +1775,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1799,7 +1799,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1847,7 +1847,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1873,7 +1873,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLabel),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
@@ -1920,7 +1920,7 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypePasswordComplexity),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -1981,7 +1981,7 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypePasswordComplexity),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2030,7 +2030,7 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypePasswordComplexity),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2053,7 +2053,7 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypePasswordComplexity),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2095,7 +2095,7 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypePasswordComplexity),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2120,7 +2120,7 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypePasswordComplexity),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2164,7 +2164,7 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypePasswordExpiry),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2214,7 +2214,7 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypePasswordExpiry),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2256,7 +2256,7 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypePasswordExpiry),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2279,7 +2279,7 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypePasswordExpiry),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2317,7 +2317,7 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypePasswordExpiry),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2342,7 +2342,7 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypePasswordExpiry),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2385,7 +2385,7 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLockout),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2434,7 +2434,7 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLockout),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2476,7 +2476,7 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLockout),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2499,7 +2499,7 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLockout),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2537,7 +2537,7 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLockout),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2562,7 +2562,7 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeLockout),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2606,7 +2606,7 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeDomain),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2662,7 +2662,7 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeDomain),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2708,7 +2708,7 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeDomain),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2733,7 +2733,7 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeDomain),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2773,7 +2773,7 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeDomain),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2798,7 +2798,7 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeDomain),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2842,7 +2842,7 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeOrganization),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2885,7 +2885,7 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeOrganization),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2910,7 +2910,7 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeOrganization),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2950,7 +2950,7 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeOrganization),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -2975,7 +2975,7 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeOrganization),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -3015,7 +3015,7 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeOrganization),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
@@ -3040,7 +3040,7 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrgIDCondition(&orgId),
+						settingsRepo.OrganizationIDCondition(&orgId),
 						settingsRepo.TypeCondition(domain.SettingTypeOrganization),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),

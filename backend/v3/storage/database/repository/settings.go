@@ -80,7 +80,7 @@ func (s settings) InstanceIDCondition(id string) database.Condition {
 	return database.NewTextCondition(s.InstanceIDColumn(), database.TextOperationEqual, id)
 }
 
-func (s settings) OrgIDCondition(id *string) database.Condition {
+func (s settings) OrganizationIDCondition(id *string) database.Condition {
 	if id == nil {
 		return database.IsNull(s.OrganizationIDColumn())
 	}
@@ -1044,7 +1044,7 @@ func createSetting(ctx context.Context, client database.QueryExecutor, setting *
 	}
 
 	// type is always set from the calling function to that functions respective type
-	// the check is left as a failsafe
+	// the check is left as a fail-safe
 	if setting.Type == domain.SettingTypeUnspecified {
 		return ErrMissingType
 	}
@@ -1079,14 +1079,12 @@ func createSetting(ctx context.Context, client database.QueryExecutor, setting *
 }
 
 func (s *settings) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	// TODO label
 	if err := s.CheckMandatoryCondtions(condition); err != nil {
 		return 0, err
 	}
 
 	var builder database.StatementBuilder
 	builder.WriteString(`DELETE FROM zitadel.settings`)
-	// options.Write(&builder)
 
 	writeCondition(&builder, condition)
 	return client.Exec(ctx, builder.String(), builder.Args()...)

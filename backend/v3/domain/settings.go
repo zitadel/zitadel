@@ -306,7 +306,7 @@ type settingsColumns interface {
 
 type settingsConditions interface {
 	InstanceIDCondition(id string) database.Condition
-	OrgIDCondition(id *string) database.Condition
+	OrganizationIDCondition(id *string) database.Condition
 	IDCondition(id string) database.Condition
 	TypeCondition(typ SettingType) database.Condition
 	OwnerTypeCondition(typ OwnerType) database.Condition
