@@ -1,0 +1,91 @@
+---
+title: Express.js
+sidebar_label: Express.js
+framework_url: https://expressjs.com
+auth_library: "@auth/express"
+auth_library_url: https://www.npmjs.com/package/@auth/express
+example_repo: https://github.com/zitadel/example-auth-express
+auth_flow: pkce
+status: stable
+---
+
+## Overview
+
+[Express.js](https://expressjs.com) is a fast, unopinionated, minimalist web framework for [Node.js](https://nodejs.org) that provides a robust set of features for building web and mobile applications. This example demonstrates how to integrate **Zitadel** using the **[OAuth 2.0 PKCE flow](/docs/concepts/pkce)** to authenticate users securely and maintain sessions across your Express application.
+
+#### Auth library
+
+This example uses **[@auth/express](https://www.npmjs.com/package/@auth/express)** ([GitHub](https://github.com/nextauthjs/next-auth)), the Express.js adapter for [Auth.js](https://authjs.dev). This library implements the [OpenID Connect (OIDC)](https://zitadel.com/docs/apis/openidoauth/endpoints) protocol with [PKCE](/docs/concepts/pkce) support, manages [token exchange](https://zitadel.com/docs/apis/openidoauth/grant-types), performs automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token), and provides [session management](https://zitadel.com/docs/concepts/sessions) with secure cookie-based storage.
+
+---
+
+## What this example demonstrates
+
+This Express.js example provides a complete authentication implementation using [Zitadel](https://zitadel.com/docs) as the identity provider. The application starts with a public landing page featuring a login button that initiates the [PKCE authentication flow](/docs/concepts/pkce). When users click login, [@auth/express](https://www.npmjs.com/package/@auth/express) generates a cryptographic code verifier and challenge, then redirects to Zitadel's authorization endpoint. After successful authentication at Zitadel, users return to the application's [callback URL](https://zitadel.com/docs/guides/integrate/login/oidc/) where the authorization code is exchanged for [access tokens](https://zitadel.com/docs/apis/openidoauth/endpoints) and an [ID token](https://zitadel.com/docs/apis/openidoauth/claims).
+
+The example includes protected routes using [Express middleware](https://expressjs.com/en/guide/using-middleware.html) that automatically verify [session state](https://zitadel.com/docs/concepts/sessions) and redirect unauthenticated users to the sign-in page. Authenticated users can access their profile page displaying user information including email, name, and custom [metadata claims](https://zitadel.com/docs/apis/openidoauth/claims) from Zitadel. The application maintains long-lived sessions through automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) using [refresh tokens](https://zitadel.com/docs/concepts/tokens), ensuring users remain authenticated without repeated logins.
+
+Sign-out functionality implements **[federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)** by redirecting to Zitadel's end-session endpoint with the ID token hint, terminating both the local [session](https://zitadel.com/docs/concepts/sessions) and the Zitadel session. The logout flow includes [CSRF protection](https://authjs.dev/guides/basics/securing-pages-and-api-routes) through state parameter validation, and users are redirected to a success page after logout completion. All authentication flows use secure HTTP-only cookies for [session storage](https://authjs.dev/concepts/session-strategies) and implement proper security headers.
+
+---
+
+## Getting started
+
+### Prerequisites
+
+Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the **[PKCE Application Setup guide](/docs/guides/integrate/login/oidc/pkce-setup)** to:
+
+1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/overview)
+2. Configure it to use the [PKCE authentication method](/docs/concepts/pkce)
+3. Set up your redirect URIs (e.g., `http://localhost:3000/auth/callback` for development)
+4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/auth/logout/callback`)
+5. Copy your **Client ID** for use in the next steps
+
+> **Note:** Make sure to enable **Dev Mode** in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
+
+### Run the example
+
+Once you have your [Zitadel application configured](https://zitadel.com/docs/guides/integrate/login/oidc/):
+
+1. Clone the [repository](https://github.com/zitadel/example-auth-express).
+2. Create a `.env.local` file and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/overview). Use the exact environment variable names from the repository:
+   ```
+   NODE_ENV=development
+   PORT=3000
+   SESSION_SECRET=your-very-secret-and-strong-session-key
+   SESSION_DURATION=3600
+   ZITADEL_DOMAIN=https://your-instance.zitadel.cloud
+   ZITADEL_CLIENT_ID=your_client_id_from_console
+   ZITADEL_CLIENT_SECRET=your-randomly-generated-client-secret
+   ZITADEL_CALLBACK_URL=http://localhost:3000/auth/callback
+   ZITADEL_POST_LOGIN_URL=/profile
+   ZITADEL_POST_LOGOUT_URL=http://localhost:3000
+   ```
+   Replace these values with:
+	- Your actual Zitadel instance URL (the **Issuer** from the [PKCE setup guide](/docs/guides/integrate/login/oidc/pkce-setup))
+	- The **Client ID** you copied when creating the application
+	- A randomly generated client secret (generate using: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
+	- The **redirect URI** you configured in the PKCE setup (must match exactly)
+	- A strong session secret (generate using: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
+3. Install dependencies using [npm](https://www.npmjs.com) and start the development server:
+   ```bash
+   npm install
+   npm run dev
+   ```
+
+The application will be running at `http://localhost:3000`.
+
+---
+
+## Learn more and resources
+
+* **Zitadel documentation:** [https://zitadel.com/docs](https://zitadel.com/docs)
+* **PKCE concept:** /docs/concepts/pkce
+* **PKCE application setup:** /docs/guides/integrate/login/oidc/pkce-setup
+* **Federated logout:** [https://zitadel.com/docs/guides/integrate/login/oidc/logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
+* **OIDC integration guide:** [https://zitadel.com/docs/guides/integrate/login/oidc/](https://zitadel.com/docs/guides/integrate/login/oidc/)
+* **Framework docs:** https://expressjs.com
+* **Auth library:** https://www.npmjs.com/package/@auth/express
+* **Auth.js documentation:** https://authjs.dev
+* **Example repository:** https://github.com/zitadel/example-auth-express
+* **All framework examples:** /docs/examples
