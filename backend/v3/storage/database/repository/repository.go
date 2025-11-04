@@ -65,4 +65,3 @@ func getMany[Target any](ctx context.Context, querier database.Querier, builder 
 	}
 	return targets, nil
 }
-

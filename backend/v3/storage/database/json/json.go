@@ -2,7 +2,6 @@ package json
 
 import (
 	"encoding/json"
-	"fmt"
 	"reflect"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -133,7 +132,6 @@ func (c *ArrayChange) addToArray(builder *database.StatementBuilder, changes jso
 	if err != nil {
 		return err
 	}
-	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m value = %+v\n", value)
 
 	// builder.WriteString("zitadel.jsonb_array_append(")
 	// if i < 0 {
@@ -186,8 +184,7 @@ func (c *ArrayChange) addToArray(builder *database.StatementBuilder, changes jso
 }
 
 func (c *ArrayChange) removeFromArray(builder *database.StatementBuilder, changes jsonChanges, i int) error {
-	fmt.Println("\033[45m[DBUGPRINT]\033[0m[:1]\033[45m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m REMOVE")
-	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m i = %+v\n", i)
+
 	path, value, err := c.getPathValue()
 	if err != nil {
 		return err
@@ -265,10 +262,10 @@ func (c jsonChanges) Write(builder *database.StatementBuilder) error {
 	if c.changes == nil {
 		return nil
 	}
-	fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> len(c.changes) = %+v\n", len(c.changes))
+
 	// return c.changes[len(c.changes)-1].writeUpdate(builder, c, len(c.changes)-2)
 	c.changes[len(c.changes)-1].writeUpdate(builder, c, len(c.changes)-2)
-	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[settings_test.go:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m builder.String() = %+v\n", builder.String())
+
 	return nil
 }
 

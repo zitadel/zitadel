@@ -5,7 +5,6 @@ package events_test
 import (
 	"bytes"
 	_ "embed"
-	"fmt"
 	"testing"
 	"time"
 
@@ -1270,8 +1269,6 @@ func TestServer_TestInstancePasswordComplexitySettingsReduces(t *testing.T) {
 		before := time.Now()
 		newInstance := integration.NewInstance(t.Context())
 		after := time.Now()
-
-		fmt.Printf("[DEBUGPRINT] [settings_relational.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> newInstance.ID() = %+v\n", newInstance.ID())
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {

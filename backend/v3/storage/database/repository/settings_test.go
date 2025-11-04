@@ -1,7 +1,6 @@
 package repository_test
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -3392,7 +3391,6 @@ func TestCreateUpdateLabelPolicySetting(t *testing.T) {
 					),
 				),
 			)
-			fmt.Printf("\033[43m[DBUGPRINT]\033[0m[settings_test.go:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m returnedSetting = %+v\n", returnedSetting)
 
 			_, err = settingRepo.Update(t.Context(), tx,
 				database.And(
@@ -3989,7 +3987,6 @@ func TestCreateUpdateSecurityPolicySetting(t *testing.T) {
 			assert.Equal(t, returnedSetting.Type, setting.Type)
 			assert.Equal(t, returnedSetting.OwnerType, setting.OwnerType)
 
-			fmt.Printf("\033[43m[DBUGPRINT]\033[0m[settings_test.go:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m returnedSetting.AllowedOrigins = %+v\n", returnedSetting.AllowedOrigins)
 			assert.Equal(t, returnedSetting.Enabled, setting.Enabled)
 			assert.Equal(t, returnedSetting.EnableIframeEmbedding, setting.EnableIframeEmbedding)
 			assert.Equal(t, returnedSetting.AllowedOrigins, setting.AllowedOrigins)

@@ -12,6 +12,8 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
+
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
@@ -21,7 +23,6 @@ import (
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/policy"
 	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
-	durationpb "google.golang.org/protobuf/types/known/durationpb"
 )
 
 func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {

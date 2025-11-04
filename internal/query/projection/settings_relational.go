@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/url"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -459,7 +458,6 @@ func (s *settingsRelationalProjection) reduceLoginPolicyChanged(event eventstore
 		if policyEvent.MultiFactorCheckLifetime != nil {
 			changes = append(changes, settingsRepo.SetMultiFactorCheckLifetimeField(*policyEvent.MultiFactorCheckLifetime))
 		}
-		fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m orgId = %+v\n", orgId)
 
 		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
@@ -525,7 +523,7 @@ func (s *settingsRelationalProjection) reduceMFAAdded(event eventstore.Event) (*
 			),
 			settingsRepo.SetLabelSettings(change),
 			settingsRepo.SetUpdatedAt(&policyEvent.Creation))
-		fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  err = %+v\n", err)
+
 		return err
 	}), nil
 }
@@ -565,7 +563,7 @@ func (s *settingsRelationalProjection) reduceMFARemoved(event eventstore.Event) 
 			),
 			settingsRepo.SetLabelSettings(change),
 			settingsRepo.SetUpdatedAt(&policyEvent.Creation))
-		fmt.Printf("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  err = %+v\n", err)
+
 		return err
 	}), nil
 }
@@ -591,7 +589,7 @@ func (*settingsRelationalProjection) reduceLoginPolicyRemoved(event eventstore.E
 				settingsRepo.TypeCondition(domain.SettingTypeLogin),
 				settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 			))
-		fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m REMOVE LOGIN err = %+v\n", err)
+
 		return err
 	}), nil
 }
@@ -630,7 +628,7 @@ func (s *settingsRelationalProjection) reduceSecondFactorAdded(event eventstore.
 			settingsRepo.AddSecondFactorTypesField(domain.SecondFactorType(policyEvent.MFAType)),
 		)
 
-		effectedRows, err := loginRepo.Update(ctx, v3_sql.SQLTx(tx),
+		_, err := loginRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Aggregate().InstanceID),
 				settingsRepo.OrgIDCondition(orgId),
@@ -639,8 +637,6 @@ func (s *settingsRelationalProjection) reduceSecondFactorAdded(event eventstore.
 			),
 			change,
 			settingsRepo.SetUpdatedAt(&policyEvent.Creation))
-		fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m effectedRows = %+v\n", effectedRows)
-		fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m SECOND Add err = %+v\n", err)
 
 		return err
 	}), nil
@@ -680,7 +676,7 @@ func (s *settingsRelationalProjection) reduceSecondFactorRemoved(event eventstor
 			settingsRepo.RemoveSecondFactorTypesField(domain.SecondFactorType(policyEvent.MFAType)),
 		)
 
-		effectedRows, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
+		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Agg.InstanceID),
 				settingsRepo.OrgIDCondition(orgId),
@@ -690,8 +686,6 @@ func (s *settingsRelationalProjection) reduceSecondFactorRemoved(event eventstor
 			change,
 			settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 
-		fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m effectedRows = %+v\n", effectedRows)
-		fmt.Printf("\033[43m[DBUGPRINT]\033[0m[:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m SECOND REMOVE err = %+v\n", err)
 		return err
 	}), nil
 }
@@ -903,7 +897,7 @@ func (s *settingsRelationalProjection) reduceLabelActivated(event eventstore.Eve
 				settingsRepo.OwnerTypeCondition(ownerType),
 				settingsRepo.LabelStateCondition(domain.LabelStatePreview),
 			), event.CreatedAt())
-		fmt.Println("\033[45m[DBUGPRINT]\033[0m[:1]\033[45m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m ACTIVATED")
+
 		return err
 	}), nil
 }
@@ -1338,7 +1332,7 @@ func (p *settingsRelationalProjection) reduceFontRemoved(event eventstore.Event)
 
 		// _, err = settingsRepo.UpdateLabel(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
 		// err := settingsRepo.Set(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&CreatedAt))
-		fmt.Println("\033[45m[DBUGPRINT]\033[0m[:1]\033[45m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m FONT POLICY REMOVE")
+
 		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(event.Aggregate().InstanceID),
@@ -1931,7 +1925,6 @@ func (s *settingsRelationalProjection) reduceSecurityPolicySet(event eventstore.
 
 		updatedAt := e.CreatedAt()
 
-		fmt.Println("\033[45m[DBUGPRINT]\033[0m[settings_instance_test.go:1]\033[45m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m SECURITY POLICY")
 		_, err := settingsRepo.SetEvent(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetLabelSettings(changes...),
 			settingsRepo.SetUpdatedAt(&updatedAt))
 		return err
@@ -1964,7 +1957,6 @@ func (s *settingsRelationalProjection) reduceOrganizationSettingsSet(event event
 			OrganizationScopedUsernames: e.OrganizationScopedUsernames,
 		}
 
-		fmt.Println("\033[45m[DBUGPRINT]\033[0m[settings_instance_test.go:1]\033[45m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m REMOVE SECURITY POLICY")
 		_, err := settingsRepo.SetEvent(ctx, v3_sql.SQLTx(tx), setting)
 		return err
 	}), nil

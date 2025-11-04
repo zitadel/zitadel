@@ -97,7 +97,7 @@ var (
 	ProjectRelationalProjection              *handler.Handler
 	ProjectRoleRelationalProjection          *handler.Handler
 	OrganizationMetadataRelationalProjection *handler.Handler
-	SettingsRelationalProjection           *handler.Handler
+	SettingsRelationalProjection             *handler.Handler
 
 	ProjectGrantFields      *handler.FieldHandler
 	OrgDomainVerifiedFields *handler.FieldHandler

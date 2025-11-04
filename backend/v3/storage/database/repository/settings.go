@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/url"
 	"time"
 
@@ -798,7 +797,7 @@ func (s *securitySettings) Set(ctx context.Context, client database.QueryExecuto
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypeSecurity
-	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[settings_test.go:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m setting = %+v\n", setting)
+
 	// return createSetting(ctx, client, setting.Setting, &setting.Settings)
 	return createSetting(ctx, client, setting.Setting, setting)
 }
@@ -855,8 +854,6 @@ func (s *securitySettings) SetEvent(ctx context.Context, client database.QueryEx
 	if err != nil {
 		return 0, err
 	}
-
-	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[settings_instance_test.go:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m  builder.String() = %+v\n", builder.String())
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
@@ -1094,8 +1091,6 @@ func createSetting(ctx context.Context, client database.QueryExecutor, setting *
 	if err != nil {
 		return err
 	}
-
-	fmt.Printf("\033[43m[DBUGPRINT]\033[0m[settings_test.go:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m string(settingJSON) = %+v\n", string(settingJSON))
 
 	builder := database.NewStatementBuilder(
 		createSettingStmt,

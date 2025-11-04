@@ -1,11 +1,11 @@
 package json
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
@@ -43,7 +43,6 @@ func TestFieldChange(t *testing.T) {
 			builder := database.StatementBuilder{}
 			err := test.change.Write(&builder)
 			require.NoError(t, err)
-			fmt.Printf("\033[43m[DBUGPRINT]\033[0m[settings_test.go:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m builder.String() = %+v\n", builder.String())
 
 			assert.Equal(t, test.output, builder.String())
 		})
@@ -107,7 +106,6 @@ func TestArrayChange(t *testing.T) {
 			builder := database.StatementBuilder{}
 			err := test.change.Write(&builder)
 			require.NoError(t, err)
-			fmt.Printf("\033[43m[DBUGPRINT]\033[0m[settings_test.go:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m builder.String() = %+v\n", builder.String())
 
 			assert.Equal(t, test.output, builder.String())
 		})
@@ -175,7 +173,6 @@ func TestArrayMixedChange(t *testing.T) {
 			builder := database.StatementBuilder{}
 			err := test.change.Write(&builder)
 			require.NoError(t, err)
-			fmt.Printf("\033[43m[DBUGPRINT]\033[0m[settings_test.go:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m builder.String() = %+v\n", builder.String())
 
 			assert.Equal(t, test.output, builder.String())
 		})
@@ -245,7 +242,6 @@ func TestFieldArrayMixedChange(t *testing.T) {
 			builder := database.StatementBuilder{}
 			err := test.change.Write(&builder)
 			require.NoError(t, err)
-			fmt.Printf("\033[43m[DBUGPRINT]\033[0m[settings_test.go:1]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m builder.String() = %+v\n", builder.String())
 
 			assert.Equal(t, test.output, builder.String())
 		})
