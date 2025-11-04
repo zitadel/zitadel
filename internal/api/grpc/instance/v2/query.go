@@ -30,6 +30,10 @@ func (s *Server) GetInstance(ctx context.Context, req *connect.Request[instance.
 }
 
 func (s *Server) ListInstances(ctx context.Context, req *connect.Request[instance.ListInstancesRequest]) (*connect.Response[instance.ListInstancesResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.ListInstances(ctx, req)
+	}
+
 	// List instances is currently only allowed with system permissions,
 	// so we directly check for them in the auth interceptor and do not check here again.
 	queries, err := ListInstancesRequestToModel(req.Msg, s.systemDefaults)
