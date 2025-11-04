@@ -46,15 +46,15 @@ import (
 )
 
 type contextRequest struct {
-	Request *addHumanUserRequestWrapper `json:"request"`
+	Request *createUserRequestWrapper `json:"request"`
 }
 
-// addHumanUserRequestWrapper necessary to marshal and unmarshal the JSON into the proto message correctly
-type addHumanUserRequestWrapper struct {
-	user.AddHumanUserRequest
+// createUserRequestWrapper necessary to marshal and unmarshal the JSON into the proto message correctly
+type createUserRequestWrapper struct {
+	user.CreateUserRequest
 }
 
-func (r *addHumanUserRequestWrapper) MarshalJSON() ([]byte, error) {
+func (r *createUserRequestWrapper) MarshalJSON() ([]byte, error) {
 	data, err := protojson.Marshal(r)
 	if err != nil {
 		return nil, err
@@ -62,7 +62,7 @@ func (r *addHumanUserRequestWrapper) MarshalJSON() ([]byte, error) {
 	return data, nil
 }
 
-func (r *addHumanUserRequestWrapper) UnmarshalJSON(data []byte) error {
+func (r *createUserRequestWrapper) UnmarshalJSON(data []byte) error {
 	return protojson.Unmarshal(data, r)
 }
 
@@ -82,14 +82,17 @@ func call(w http.ResponseWriter, req *http.Request) {
 	if err := json.Unmarshal(sentBody, request); err != nil {
 		http.Error(w, "error", http.StatusInternalServerError)
 	}
-    
+
 	// build the response from the received request
 	response := request.Request
 	// manipulate the request to send back as response
-	if response.Metadata == nil {
-		response.Metadata = make([]*user.SetMetadataEntry, 0)
+	metadata := response.GetHuman().GetMetadata()
+	if metadata == nil {
+		metadata = make([]*user.Metadata, 0)
 	}
-	response.Metadata = append(response.Metadata, &user.SetMetadataEntry{Key: "organization", Value: []byte("company")})
+	metadata = append(metadata, &user.Metadata{Key: "organization", Value: []byte("dunder mifflin")})
+
+	response.GetHuman().Metadata = metadata
 
 	// marshal the request into json
 	data, err := json.Marshal(response)
@@ -126,7 +129,7 @@ As you see in the example above the target is created with HTTP and port '8090' 
 See [Create a target](/apis/resources/action_service_v2/action-service-create-target) for more detailed information.
 
 ```shell
-curl -L -X POST 'https://$CUSTOM-DOMAIN/v2beta/actions/targets' \
+curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/actions/targets' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -149,7 +152,7 @@ To call the target just created before, with the intention to manipulate the req
 See [Set an execution](/apis/resources/action_service_v2/action-service-set-execution) for more detailed information.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
+curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/executions' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -176,7 +179,7 @@ curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/users/new' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
 --data-raw '{
-    "organizationId": "336392597046099971",
+    "organizationId": "344648897353810062",
     "human":
     {
         "profile":
@@ -205,7 +208,7 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/new' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
 --data-raw '{
-    "organizationId": "336392597046099971",
+    "organizationId": "344648897353810062",
     "human":
     {
         "profile":
@@ -220,11 +223,15 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/new' \
         "email":
         {
             "email": "mini@mouse.com"
-        }
+        },
+        "metadata":
+        [
+            {
+                "key": "organization",
+                "value": "ZHVuZGVyIG1pZmZsaW4="
+            }
+        ]
     }
-    "metadata": [
-        {"key": "organization", "value": "Y29tcGFueQ=="}
-    ]
 }'
 ```
 
