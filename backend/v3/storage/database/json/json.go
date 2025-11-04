@@ -54,14 +54,8 @@ func (c *FieldChange) writeUpdate(builder *database.StatementBuilder, changes js
 	}
 	builder.WriteString(", ")
 	builder.WriteArg(path)
-	// if value == "null" {
-	// 	builder.WriteString(", ")
-	// 	builder.WriteArg(value)
-	// } else {
 	builder.WriteString(", ")
 	builder.WriteArg(value)
-	// builder.WriteString("'")
-	// }
 	builder.WriteString(", " + "true")
 	builder.WriteString(", 'delete_key'")
 
