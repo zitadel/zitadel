@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
+// SetPhone implements [domain.HumanUserRepository].
 func (u userHuman) SetPhone(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification domain.VerificationType) (int64, error) {
 	switch v := verification.(type) {
 	case *domain.VerificationTypeSuccessful:
@@ -22,6 +23,7 @@ func (u userHuman) SetPhone(ctx context.Context, client database.QueryExecutor, 
 	panic("unknown verification type")
 }
 
+// GetPhoneVerification implements [domain.HumanUserRepository].
 func (u userHuman) GetPhoneVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*domain.Verification, error) {
 	return u.verification.get(ctx, client, database.Exists(
 		u.unqualifiedTableName(),
@@ -33,7 +35,8 @@ func (u userHuman) GetPhoneVerification(ctx context.Context, client database.Que
 	))
 }
 
-func (u userHuman) IncrementPhoneVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+// IncrementFailedPhoneVerificationAttempts implements [domain.HumanUserRepository].
+func (u userHuman) IncrementFailedPhoneVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	var builder database.StatementBuilder
 	builder.WriteString("UPDATE zitadel.verifications SET ")
 	database.NewIncrementColumnChange(u.verification.FailedAttemptsColumn()).Write(&builder)
@@ -41,6 +44,33 @@ func (u userHuman) IncrementPhoneVerificationAttempts(ctx context.Context, clien
 	database.And(
 		database.NewColumnCondition(u.verification.InstanceIDColumn(), u.InstanceIDColumn()),
 		database.NewColumnCondition(u.verification.IDColumn(), u.phoneVerificationIDColumn()),
+		condition,
+	).Write(&builder)
+
+	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+// GetPhoneOTPVerification implements [domain.HumanUserRepository].
+func (u userHuman) GetPhoneOTPVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*domain.Verification, error) {
+	return u.verification.get(ctx, client, database.Exists(
+		u.unqualifiedTableName(),
+		database.And(
+			database.NewColumnCondition(u.InstanceIDColumn(), u.verification.InstanceIDColumn()),
+			database.NewColumnCondition(u.phoneOTPVerificationIDColumn(), u.verification.IDColumn()),
+			condition,
+		),
+	))
+}
+
+// IncrementFailedPhoneOTPAttempts implements [domain.HumanUserRepository].
+func (u userHuman) IncrementFailedPhoneOTPAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	var builder database.StatementBuilder
+	builder.WriteString("UPDATE zitadel.verifications SET ")
+	database.NewIncrementColumnChange(u.verification.FailedAttemptsColumn()).Write(&builder)
+	builder.WriteString(" FROM zitadel.human_users WHERE ")
+	database.And(
+		database.NewColumnCondition(u.verification.InstanceIDColumn(), u.InstanceIDColumn()),
+		database.NewColumnCondition(u.verification.IDColumn(), u.phoneOTPVerificationIDColumn()),
 		condition,
 	).Write(&builder)
 
@@ -210,4 +240,8 @@ func (u userHuman) PhoneColumn() database.Column {
 
 func (u userHuman) phoneVerificationIDColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "phone_verification_id")
+}
+
+func (u userHuman) phoneOTPVerificationIDColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "phone_otp_verification_id")
 }

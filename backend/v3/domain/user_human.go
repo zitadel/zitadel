@@ -119,9 +119,13 @@ type HumanUserRepository interface {
 
 	SetEmail(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
 	GetEmailVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
-	IncrementEmailVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+	IncrementFailedEmailVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+	GetEmailOTPVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
+	IncrementFailedEmailOTPAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 
 	SetPhone(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
 	GetPhoneVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
-	IncrementPhoneVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+	IncrementFailedPhoneVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+	GetPhoneOTPVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
+	IncrementFailedPhoneOTPAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }

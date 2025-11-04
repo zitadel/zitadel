@@ -222,6 +222,7 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.MachineChangedEventType,
 					Reduce: p.reduceMachineChanged,
 				},
+
 				{
 					Event:  user.MachineSecretSetType,
 					Reduce: p.reduceMachineSecretSet,
@@ -233,6 +234,13 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  user.MachineSecretRemovedType,
 					Reduce: p.reduceMachineSecretRemoved,
+				},
+
+				{
+					Event: user.MachineKeyAddedEventType,
+				},
+				{
+					Event: user.MachineKeyRemovedEventType,
 				},
 				// 		{
 				// 			Event:  user.UserV1MFAOTPVerifiedType,
@@ -254,10 +262,13 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 				// 			Event:  user.HumanU2FTokenVerifiedType,
 				// 			Reduce: p.reduceUnsetMFAInitSkipped,
 				// 		},
-				// 		{
-				// 			Event:  user.HumanPasswordlessTokenVerifiedType,
-				// 			Reduce: p.reduceUnsetMFAInitSkipped,
-				// 		},
+				{
+					Event: user.HumanPasswordlessTokenVerifiedType,
+					// Reduce: p.reduceUnsetMFAInitSkipped,
+				},
+
+				// Pats only on machines
+
 				// 		{
 				// 			Event:  user.UserV1MFAInitSkippedType,
 				// 			Reduce: p.reduceMFAInitSkipped,
@@ -268,6 +279,38 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 				// 		},
 				// 	},
 				// },
+
+				{
+					Event: user.HumanRefreshTokenAddedType,
+					// TODO: needed?
+				},
+				{
+					Event: user.HumanRefreshTokenRenewedType,
+					// TODO: needed?
+				},
+				{
+					Event: user.HumanRefreshTokenRemovedType,
+					// TODO: needed?
+				},
+
+				{
+					Event:  user.PersonalAccessTokenAddedType,
+					Reduce: p.reducePersonalAccessTokenAdded,
+				},
+				{
+					Event:  user.PersonalAccessTokenRemovedType,
+					Reduce: p.reducePersonalAccessTokenRemoved,
+				},
+
+				{
+					Event: user.MetadataSetType,
+				},
+				{
+					Event: user.MetadataRemovedType,
+				},
+				{
+					Event: user.MetadataRemovedAllType,
+				},
 			},
 		},
 	}
@@ -1244,6 +1287,47 @@ func (p *userRelationalProjection) reduceMachineChanged(event eventstore.Event) 
 			),
 			changes...,
 		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reducePersonalAccessTokenAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.PersonalAccessTokenAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.PersonalAccessTokenAddedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.PersonalAccessTokenRepository()
+		return repo.Create(ctx, v3_sql.SQLTx(tx), &domain.PersonalAccessToken{
+			ID:         e.TokenID,
+			UserID:     e.Aggregate().ID,
+			InstanceID: e.Aggregate().InstanceID,
+			Scopes:     e.Scopes,
+			ExpiresAt:  e.Expiration,
+			CreatedAt:  e.CreatedAt(),
+		})
+	}), nil
+}
+
+func (p *userRelationalProjection) reducePersonalAccessTokenRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.PersonalAccessTokenRemovedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.PersonalAccessTokenRemovedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.PersonalAccessTokenRepository()
+		_, err := repo.Delete(ctx, v3_sql.SQLTx(tx), database.And(
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.TokenID),
+			repo.UserIDCondition(e.Aggregate().ID),
+		))
 		return err
 	}), nil
 }

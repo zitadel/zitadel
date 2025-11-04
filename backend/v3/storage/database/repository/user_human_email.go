@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
+// SetEmail implements [domain.HumanUserRepository].
 func (u userHuman) SetEmail(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification domain.VerificationType) (int64, error) {
 	switch v := verification.(type) {
 	case *domain.VerificationTypeSuccessful:
@@ -22,6 +23,7 @@ func (u userHuman) SetEmail(ctx context.Context, client database.QueryExecutor, 
 	panic("unknown verification type")
 }
 
+// GetEmailVerification implements [domain.HumanUserRepository].
 func (u userHuman) GetEmailVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*domain.Verification, error) {
 	return u.verification.get(ctx, client, database.Exists(
 		u.unqualifiedTableName(),
@@ -33,7 +35,8 @@ func (u userHuman) GetEmailVerification(ctx context.Context, client database.Que
 	))
 }
 
-func (u userHuman) IncrementEmailVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+// IncrementFailedEmailVerificationAttempts implements [domain.HumanUserRepository].
+func (u userHuman) IncrementFailedEmailVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	var builder database.StatementBuilder
 	builder.WriteString("UPDATE zitadel.verifications SET ")
 	database.NewIncrementColumnChange(u.verification.FailedAttemptsColumn()).Write(&builder)
@@ -41,6 +44,33 @@ func (u userHuman) IncrementEmailVerificationAttempts(ctx context.Context, clien
 	database.And(
 		database.NewColumnCondition(u.verification.InstanceIDColumn(), u.InstanceIDColumn()),
 		database.NewColumnCondition(u.verification.IDColumn(), u.emailVerificationIDColumn()),
+		condition,
+	).Write(&builder)
+
+	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+// GetEmailOTPVerification implements [domain.HumanUserRepository].
+func (u userHuman) GetEmailOTPVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*domain.Verification, error) {
+	return u.verification.get(ctx, client, database.Exists(
+		u.unqualifiedTableName(),
+		database.And(
+			database.NewColumnCondition(u.InstanceIDColumn(), u.verification.InstanceIDColumn()),
+			database.NewColumnCondition(u.emailOTPVerificationIDColumn(), u.verification.IDColumn()),
+			condition,
+		),
+	))
+}
+
+// IncrementFailedEmailOTPAttempts implements [domain.HumanUserRepository].
+func (u userHuman) IncrementFailedEmailOTPAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	var builder database.StatementBuilder
+	builder.WriteString("UPDATE zitadel.verifications SET ")
+	database.NewIncrementColumnChange(u.verification.FailedAttemptsColumn()).Write(&builder)
+	builder.WriteString(" FROM zitadel.human_users WHERE ")
+	database.And(
+		database.NewColumnCondition(u.verification.InstanceIDColumn(), u.InstanceIDColumn()),
+		database.NewColumnCondition(u.verification.IDColumn(), u.emailOTPVerificationIDColumn()),
 		condition,
 	).Write(&builder)
 
@@ -202,4 +232,8 @@ func (u userHuman) EmailColumn() database.Column {
 
 func (u userHuman) emailVerificationIDColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "email_verification_id")
+}
+
+func (u userHuman) emailOTPVerificationIDColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "email_otp_verification_id")
 }
