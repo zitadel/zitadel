@@ -232,9 +232,13 @@ func TestListProjects(t *testing.T) {
 			want: projects[1:3],
 		},
 		{
-			name: "state active",
+			name: "state active from first or second org",
 			condition: database.And(
 				projectRepo.InstanceIDCondition(instanceID),
+				database.Or(
+					projectRepo.OrganizationIDCondition(firstOrgID),
+					projectRepo.OrganizationIDCondition(secondOrgID),
+				),
 				projectRepo.StateCondition(domain.ProjectStateActive),
 			),
 			want: []*domain.Project{projects[0], projects[2]},

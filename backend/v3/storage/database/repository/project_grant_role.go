@@ -22,17 +22,16 @@ func (p projectGrantRole) List(ctx context.Context, client database.QueryExecuto
 }
 
 const insertProjectGrantRoleStmt = `INSERT INTO zitadel.project_grant_roles(
-	instance_id, grant_id, key, project_org_id, project_id
+	instance_id, grant_id, key, project_id
 )
-VALUES ($1, $2, $3, $4, $5)
+VALUES ($1, $2, $3, $4)
 RETURNING created_at`
 
 func (p projectGrantRole) Add(ctx context.Context, client database.QueryExecutor, role *domain.ProjectGrantRole) error {
 	builder := database.NewStatementBuilder(insertProjectGrantRoleStmt,
 		role.InstanceID,
-		role.ProjectID,
+		role.GrantID,
 		role.Key,
-		role.ProjectOrgID,
 		role.ProjectID,
 	)
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).
@@ -100,10 +99,6 @@ func (p projectGrantRole) CreatedAtColumn() database.Column {
 	return database.NewColumn(p.unqualifiedTableName(), "created_at")
 }
 
-func (p projectGrantRole) ProjectOrgIDColumn() database.Column {
-	return database.NewColumn(p.unqualifiedTableName(), "project_org_id")
-}
-
 func (p projectGrantRole) ProjectIDColumn() database.Column {
 	return database.NewColumn(p.unqualifiedTableName(), "project_id")
 }
@@ -117,7 +112,6 @@ const queryProjectGrantRoleStmt = `SELECT
 	project_grant_roles.grant_id,	
 	project_grant_roles.key,
 	project_grant_roles.created_at,
-	project_grant_roles.project_org_id,
 	project_grant_roles.project_id
 	FROM zitadel.project_grant_roles`
 
@@ -126,7 +120,7 @@ func (p projectGrantRole) prepareQuery(opts []database.QueryOption) (*database.S
 	for _, opt := range opts {
 		opt(options)
 	}
-	if err := checkRestrictingColumns(options.Condition, p.InstanceIDColumn(), p.ProjectOrgIDColumn(), p.ProjectIDColumn(), p.GrantIDColumn()); err != nil {
+	if err := checkRestrictingColumns(options.Condition, p.InstanceIDColumn()); err != nil {
 		return nil, err
 	}
 	builder := database.NewStatementBuilder(queryProjectGrantRoleStmt)
