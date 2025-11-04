@@ -19,8 +19,9 @@ Once Zitadel up is and running, learn more about a production setup in the [What
 The setup is likely to work with other software versions too, but it is tested against the following environment:
 
 - Ubuntu 24.04.1
-- Docker 28.3.2
-- Docker Compose v2.38.2
+- Docker 28.5.1
+- Docker Compose v2.40.3-desktop.1
+- Docker Desktop for Linux v4.49.0
 - curl 8.5.0
 
 ## Docker compose
@@ -35,7 +36,7 @@ The following commands set up services for a PostgreSQL database, a Zitadel API 
     ```shell
     docker compose pull
     ```
-3. Run the Zitadel initialization, PostgreSQL database, the Zitadel API, and the Zitadel login.
+3. Generate an RSA key pair and run PostgreSQL database, the Zitadel API with the public RSA key, and the Zitadel login with the private RSA key.
     ```shell
     docker compose up --detach --wait
     ```
