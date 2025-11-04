@@ -151,6 +151,7 @@ Errors:
       NotSet: El usuario no ha establecido una contraseña
       NotChanged: La nueva contraseña no puede coincidir con la contraseña actual
       NotSupported: No se admite la codificación hash de contraseña. Consulte https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
+      NoVerificationTokenOrCurrentPassword: No se puede cambiar la contraseña sin el token de verificación o la contraseña actual
     PasswordComplexityPolicy:
       NotFound: Política de contraseñas no encontrada
       MinLength: La contraseña es demasiado corta

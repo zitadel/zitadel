@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/logging"
 	"github.com/zitadel/passwap"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	commandErrors "github.com/zitadel/zitadel/internal/command/errors"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -34,10 +35,17 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, password stri
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.IDMissing")
 	}
+
+	callersUserID := authz.GetCtxData(ctx).UserID
+	if callersUserID == userID {
+		return nil, zerrors.ThrowPermissionDenied(nil, "COMMAND-SHr8d2", "Errors.User.Password.NoVerificationTokenOrCurrentPassword")
+	}
+
 	wm, err := c.passwordWriteModel(ctx, userID, orgID)
 	if err != nil {
 		return nil, err
 	}
+
 	return c.setPassword(
 		ctx,
 		wm,
@@ -112,7 +120,7 @@ type setPasswordVerification func(ctx context.Context) (newEncodedPassword strin
 // setPasswordWithPermission returns a permission check as [setPasswordVerification] implementation
 func (c *Commands) setPasswordWithPermission(userID, orgID string) setPasswordVerification {
 	return func(ctx context.Context) (_ string, err error) {
-		return "", c.checkPermissionUpdateUser(ctx, orgID, userID, false)
+		return "", c.checkPermission(ctx, domain.PermissionUserWrite, orgID, userID)
 	}
 }
 

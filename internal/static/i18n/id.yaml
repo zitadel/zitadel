@@ -151,6 +151,7 @@ Errors:
       NotSet: Pengguna belum menetapkan kata sandi
       NotChanged: Kata sandi baru tidak boleh sama dengan kata sandi Anda saat ini
       NotSupported: 'Pengkodean hash kata sandi tidak didukung. '
+      NoVerificationTokenOrCurrentPassword: Tidak dapat mengubah kata sandi tanpa token verifikasi atau kata sandi saat ini
     PasswordComplexityPolicy:
       NotFound: Kebijakan kata sandi tidak ditemukan
       MinLength: Kata sandi terlalu pendek
