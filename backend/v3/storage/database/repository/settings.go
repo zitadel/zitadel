@@ -798,7 +798,6 @@ func (s *securitySettings) Set(ctx context.Context, client database.QueryExecuto
 	}
 	setting.Type = domain.SettingTypeSecurity
 
-	// return createSetting(ctx, client, setting.Setting, &setting.Settings)
 	return createSetting(ctx, client, setting.Setting, setting)
 }
 

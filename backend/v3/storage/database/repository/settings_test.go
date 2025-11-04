@@ -161,13 +161,6 @@ func TestCreateGenericSetting(t *testing.T) {
 					setting.InstanceID = instanceId
 					return &setting
 				},
-				// setting: domain.Setting{
-				// 	InstanceID: instanceId,
-				// 	OrgID:      &newOrgId,
-				// 	Type:       domain.SettingTypePasswordExpiry,
-				// 	OwnerType:  domain.OwnerTypeInstance,
-				// 	Settings:   []byte("{}"),
-				// },
 				err: new(database.IntegrityViolationError),
 			}
 		}(),
@@ -374,19 +367,14 @@ func TestCreateGenericSetting(t *testing.T) {
 			settingRepo := repository.SettingsRepository()
 
 			// create setting
-			// beforeCreate := time.Now()
 			err = settingRepo.Create(t.Context(), tx, setting)
 			assert.ErrorIs(t, err, tt.err)
 			if err != nil {
 				return
 			}
-			// afterCreate := time.Now()
 
 			// check organization values
 			setting, err = settingRepo.Get(t.Context(), tx,
-				// setting.InstanceID,
-				// setting.OrgID,
-				// setting.Type,
 				database.WithCondition(
 					database.And(
 						settingRepo.InstanceIDCondition(setting.InstanceID),
@@ -501,7 +489,6 @@ func TestSetSpecificSetting(t *testing.T) {
 					Settings:       []byte("{}"),
 				},
 			},
-			// err: new(database.UniqueError),
 		},
 		func() test {
 			newInstId := gofakeit.Name()
@@ -2322,8 +2309,6 @@ func TestCreateGetPasswordComplexityPolicySetting(t *testing.T) {
 
 			// get setting
 			returnedSetting, err := settingRepo.Get(t.Context(), tx,
-				// setting.InstanceID,
-				// setting.OrgID,
 				database.WithCondition(
 					database.And(
 						settingRepo.InstanceIDCondition(setting.InstanceID),
@@ -2436,8 +2421,6 @@ func TestCreateGetPasswordExpiryPolicySetting(t *testing.T) {
 
 			// get setting
 			returnedSetting, err := settingRepo.Get(t.Context(), tx,
-				// setting.InstanceID,
-				// setting.OrgID,
 				database.WithCondition(
 					database.And(
 						settingRepo.InstanceIDCondition(setting.InstanceID),
