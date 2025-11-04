@@ -1,7 +1,6 @@
 package json
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -201,7 +200,7 @@ func TestFieldArrayMixedChange(t *testing.T) {
 			output: `column = zitadel.jsonb_array_remove(zitadel.jsonb_array_append(zitadel.jsonb_array_remove(jsonb_set_lax(table.column, $1, $2, true, 'delete_key'), $3, $4::TEXT), $5, $6::TEXT), $7, $8::TEXT)`,
 		},
 		{
-			name: "one json array addone field change, , one json remove",
+			name: "one json array add, one field change, one json remove",
 			change: func() database.Change {
 				col := database.NewColumn("table", "column")
 				change1 := NewArrayChange([]string{"path)"}, "value", false)
@@ -213,13 +212,38 @@ func TestFieldArrayMixedChange(t *testing.T) {
 			}(),
 			output: `column = zitadel.jsonb_array_remove(jsonb_set_lax(zitadel.jsonb_array_append(zitadel.jsonb_array_remove(table.column, $1, $2::TEXT), $3, $4::TEXT), $5, $6, true, 'delete_key'), $7, $8::TEXT)`,
 		},
+		{
+			name: "one json remove, one json array, add one field change",
+			change: func() database.Change {
+				col := database.NewColumn("table", "column")
+				change1 := NewArrayChange([]string{"path"}, "value", true)
+				change2 := NewArrayChange([]string{"path)"}, "value", false)
+				change3 := NewFieldChange([]string{"path"}, "value")
+				changes := NewJsonChanges(col, change1, change2, change3)
+
+				return changes
+			}(),
+			output: `column = jsonb_set_lax(zitadel.jsonb_array_append(zitadel.jsonb_array_remove(zitadel.jsonb_array_remove(table.column, $1, $2::TEXT), $3, $4::TEXT), $5, $6::TEXT), $7, $8, true, 'delete_key')`,
+		},
+		{
+			name: "one json remove, one field change, one json array add",
+			change: func() database.Change {
+				col := database.NewColumn("table", "column")
+				change1 := NewArrayChange([]string{"path"}, "value", true)
+				change2 := NewFieldChange([]string{"path"}, "value")
+				change3 := NewArrayChange([]string{"path)"}, "value", false)
+				changes := NewJsonChanges(col, change1, change2, change3)
+
+				return changes
+			}(),
+			output: `column = zitadel.jsonb_array_append(zitadel.jsonb_array_remove(jsonb_set_lax(zitadel.jsonb_array_remove(table.column, $1, $2::TEXT), $3, $4, true, 'delete_key'), $5, $6::TEXT), $7, $8::TEXT)`,
+		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			builder := database.StatementBuilder{}
 			err := test.change.Write(&builder)
 			require.NoError(t, err)
 
-			fmt.Printf("\033[43m[DEBUGPRINT]\033[0m[json_test.go:21]\033[43m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m builder.String() = %+v\n", builder.String())
 			assert.Equal(t, test.output, builder.String())
 		})
 	}

@@ -1757,7 +1757,6 @@ func (p *settingsRelationalProjection) reduceDomainPolicyAdded(event eventstore.
 	case *org.DomainPolicyAddedEvent:
 		policyEvent = e.DomainPolicyAddedEvent
 		ownerType = domain.OwnerTypeOrganization
-		ownerType = domain.OwnerTypeOrganization
 		orgId = &policyEvent.Aggregate().ResourceOwner
 	case *instance.DomainPolicyAddedEvent:
 		policyEvent = e.DomainPolicyAddedEvent
