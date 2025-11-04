@@ -20,7 +20,7 @@ func TestFieldChange(t *testing.T) {
 			name: "single json update",
 			change: func() database.Change {
 				col := database.NewColumn("table", "column")
-				change := NewFieldChange([]string{"path", "to", "key"}, "value")
+				change := NewFieldChange([]string{"path"}, "value")
 				changes := NewJsonChanges(col, change)
 
 				return changes
@@ -31,8 +31,8 @@ func TestFieldChange(t *testing.T) {
 			name: "two json update",
 			change: func() database.Change {
 				col := database.NewColumn("table", "column")
-				change1 := NewFieldChange([]string{"path1"}, "value1")
-				change2 := NewFieldChange([]string{"path2"}, "value2")
+				change1 := NewFieldChange([]string{"path"}, "value")
+				change2 := NewFieldChange([]string{"path"}, "value")
 				changes := NewJsonChanges(col, change1, change2)
 
 				return changes
@@ -71,8 +71,8 @@ func TestArrayChange(t *testing.T) {
 			name: "two json array add",
 			change: func() database.Change {
 				col := database.NewColumn("table", "column")
-				change1 := NewArrayChange([]string{"path1)"}, "value1", false)
-				change2 := NewArrayChange([]string{"path2"}, "value2", false)
+				change1 := NewArrayChange([]string{"path)"}, "value", false)
+				change2 := NewArrayChange([]string{"path"}, "value", false)
 				changes := NewJsonChanges(col, change1, change2)
 
 				return changes
@@ -94,8 +94,8 @@ func TestArrayChange(t *testing.T) {
 			name: "two json array remove",
 			change: func() database.Change {
 				col := database.NewColumn("table", "column")
-				change1 := NewArrayChange([]string{"path1)"}, "value1", true)
-				change2 := NewArrayChange([]string{"path2"}, "value2", true)
+				change1 := NewArrayChange([]string{"path)"}, "value", true)
+				change2 := NewArrayChange([]string{"path"}, "value", true)
 				changes := NewJsonChanges(col, change1, change2)
 
 				return changes
@@ -123,8 +123,8 @@ func TestArrayMixedChange(t *testing.T) {
 			name: "one json array add, one json remove",
 			change: func() database.Change {
 				col := database.NewColumn("table", "column")
-				change1 := NewArrayChange([]string{"path1)"}, "value1", false)
-				change2 := NewArrayChange([]string{"path2"}, "value2", true)
+				change1 := NewArrayChange([]string{"path)"}, "value", false)
+				change2 := NewArrayChange([]string{"path"}, "value", true)
 				changes := NewJsonChanges(col, change1, change2)
 
 				return changes
@@ -135,8 +135,8 @@ func TestArrayMixedChange(t *testing.T) {
 			name: "one json array remove, one json array add",
 			change: func() database.Change {
 				col := database.NewColumn("table", "column")
-				change1 := NewArrayChange([]string{"path1)"}, "value1", true)
-				change2 := NewArrayChange([]string{"path2"}, "value2", false)
+				change1 := NewArrayChange([]string{"path)"}, "value", true)
+				change2 := NewArrayChange([]string{"path"}, "value", false)
 				changes := NewJsonChanges(col, change1, change2)
 
 				return changes
@@ -147,9 +147,9 @@ func TestArrayMixedChange(t *testing.T) {
 			name: "one json array add, one json array remove, one array add",
 			change: func() database.Change {
 				col := database.NewColumn("table", "column")
-				change1 := NewArrayChange([]string{"path1)"}, "value1", false)
-				change2 := NewArrayChange([]string{"path2"}, "value2", true)
-				change3 := NewArrayChange([]string{"path3)"}, "value3", false)
+				change1 := NewArrayChange([]string{"path)"}, "value", false)
+				change2 := NewArrayChange([]string{"path"}, "value", true)
+				change3 := NewArrayChange([]string{"path)"}, "value", false)
 				changes := NewJsonChanges(col, change1, change2, change3)
 
 				return changes
@@ -160,9 +160,9 @@ func TestArrayMixedChange(t *testing.T) {
 			name: "one json array remove, one json array add, one array remove",
 			change: func() database.Change {
 				col := database.NewColumn("table", "column")
-				change1 := NewArrayChange([]string{"path1)"}, "value1", true)
-				change2 := NewArrayChange([]string{"path2"}, "value2", false)
-				change3 := NewArrayChange([]string{"path3)"}, "value3", true)
+				change1 := NewArrayChange([]string{"path)"}, "value", true)
+				change2 := NewArrayChange([]string{"path"}, "value", false)
+				change3 := NewArrayChange([]string{"path)"}, "value", true)
 				changes := NewJsonChanges(col, change1, change2, change3)
 
 				return changes
@@ -191,52 +191,27 @@ func TestFieldArrayMixedChange(t *testing.T) {
 			name: "one field change, one json array add, one json remove",
 			change: func() database.Change {
 				col := database.NewColumn("table", "column")
-				change1 := NewFieldChange([]string{"path", "to", "key"}, "value")
-				change2 := NewArrayChange([]string{"path1)"}, "value1", false)
-				change3 := NewArrayChange([]string{"path3"}, "value3", true)
+				change1 := NewFieldChange([]string{"path"}, "value")
+				change2 := NewArrayChange([]string{"path)"}, "value", false)
+				change3 := NewArrayChange([]string{"path"}, "value", true)
 				changes := NewJsonChanges(col, change1, change2, change3)
 
 				return changes
 			}(),
 			output: `column = zitadel.jsonb_array_remove(zitadel.jsonb_array_append(zitadel.jsonb_array_remove(jsonb_set_lax(table.column, $1, $2, true, 'delete_key'), $3, $4::TEXT), $5, $6::TEXT), $7, $8::TEXT)`,
-			// },
-			// {
-			// 	name: "one json array remove, one json array add",
-			// 	change: func() database.Change {
-			// 		col := database.NewColumn("table", "column")
-			// 		change1 := NewArrayChange([]string{"path1)"}, "value1", true)
-			// 		change2 := NewArrayChange([]string{"path2"}, "value2", false)
-			// 		changes := NewJsonChanges(col, change1, change2)
+		},
+		{
+			name: "one json array addone field change, , one json remove",
+			change: func() database.Change {
+				col := database.NewColumn("table", "column")
+				change1 := NewArrayChange([]string{"path)"}, "value", false)
+				change2 := NewFieldChange([]string{"path"}, "value")
+				change3 := NewArrayChange([]string{"path"}, "value", true)
+				changes := NewJsonChanges(col, change1, change2, change3)
 
-			// 		return changes
-			// 	}(),
-			// 	output: `column = zitadel.jsonb_array_append(zitadel.jsonb_array_remove(zitadel.jsonb_array_remove(table.column, $1, $2::TEXT), $3, $4::TEXT), $5, $6::TEXT)`,
-			// },
-			// {
-			// 	name: "one json array add, one json array remove, one array add",
-			// 	change: func() database.Change {
-			// 		col := database.NewColumn("table", "column")
-			// 		change1 := NewArrayChange([]string{"path1)"}, "value1", false)
-			// 		change2 := NewArrayChange([]string{"path2"}, "value2", true)
-			// 		change3 := NewArrayChange([]string{"path3)"}, "value3", false)
-			// 		changes := NewJsonChanges(col, change1, change2, change3)
-
-			// 		return changes
-			// 	}(),
-			// 	output: `column = zitadel.jsonb_array_append(zitadel.jsonb_array_remove(zitadel.jsonb_array_remove(zitadel.jsonb_array_append(zitadel.jsonb_array_remove(table.column, $1, $2::TEXT), $3, $4::TEXT), $5, $6::TEXT), $7, $8::TEXT), $9, $10::TEXT)`,
-			// },
-			// {
-			// 	name: "one json array remove, one json array add, one array remove",
-			// 	change: func() database.Change {
-			// 		col := database.NewColumn("table", "column")
-			// 		change1 := NewArrayChange([]string{"path1)"}, "value1", true)
-			// 		change2 := NewArrayChange([]string{"path2"}, "value2", false)
-			// 		change3 := NewArrayChange([]string{"path3)"}, "value3", true)
-			// 		changes := NewJsonChanges(col, change1, change2, change3)
-
-			// 		return changes
-			// 	}(),
-			// 	output: `column = zitadel.jsonb_array_remove(zitadel.jsonb_array_append(zitadel.jsonb_array_remove(zitadel.jsonb_array_remove(table.column, $1, $2::TEXT), $3, $4::TEXT), $5, $6::TEXT), $7, $8::TEXT)`,
+				return changes
+			}(),
+			output: `column = zitadel.jsonb_array_remove(jsonb_set_lax(zitadel.jsonb_array_append(zitadel.jsonb_array_remove(table.column, $1, $2::TEXT), $3, $4::TEXT), $5, $6, true, 'delete_key'), $7, $8::TEXT)`,
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {

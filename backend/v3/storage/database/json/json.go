@@ -47,28 +47,27 @@ func (c *FieldChange) writeUpdate(builder *database.StatementBuilder, changes js
 	if i < 0 {
 		changes.column.WriteQualified(builder)
 	} else {
-		changes.changes[i].writeUpdate(builder, changes, i-1)
+		err := changes.changes[i].writeUpdate(builder, changes, i-1)
+		if err != nil {
+			return err
+		}
 	}
 	builder.WriteString(", ")
 	builder.WriteArg(path)
-	if value == "null" {
-		builder.WriteString(", ")
-		builder.WriteArg(value)
-	} else {
-		builder.WriteString(", ")
-		builder.WriteArg(value)
-		// builder.WriteString("'")
-	}
+	// if value == "null" {
+	// 	builder.WriteString(", ")
+	// 	builder.WriteArg(value)
+	// } else {
+	builder.WriteString(", ")
+	builder.WriteArg(value)
+	// builder.WriteString("'")
+	// }
 	builder.WriteString(", " + "true")
 	builder.WriteString(", 'delete_key'")
 
 	builder.WriteString(")")
 
 	return nil
-}
-
-type jsonArrayValues interface {
-	~int64 | ~string
 }
 
 type ArrayChange struct {
@@ -110,22 +109,6 @@ func (c *ArrayChange) addToArray(builder *database.StatementBuilder, changes jso
 		return err
 	}
 
-	// builder.WriteString("zitadel.jsonb_array_append(")
-	// if i < 0 {
-	// 	changes.column.WriteQualified(builder)
-	// } else {
-	// 	changes.changes[i].writeUpdate(builder, changes, i-1)
-	// }
-	// builder.WriteString(", ")
-	// builder.WriteArg(path)
-	// builder.WriteString(", ")
-	// builder.WriteArg(value)
-	// if len(value) > 2 && value[0] == '"' && value[len(value)-1] == '"' {
-	// 	builder.WriteString("::TEXT")
-	// } else {
-	// 	builder.WriteString("::NUMERIC")
-	// }
-
 	builder.WriteString("zitadel.jsonb_array_append(")
 
 	// to mitigate the possibility of having duplicate values in the array
@@ -133,7 +116,10 @@ func (c *ArrayChange) addToArray(builder *database.StatementBuilder, changes jso
 	if i < 0 {
 		changes.column.WriteQualified(builder)
 	} else {
-		changes.changes[i].writeUpdate(builder, changes, i-1)
+		err := changes.changes[i].writeUpdate(builder, changes, i-1)
+		if err != nil {
+			return err
+		}
 	}
 
 	// zitadel.jsonb_array_remove
@@ -170,7 +156,10 @@ func (c *ArrayChange) removeFromArray(builder *database.StatementBuilder, change
 	if i < 0 {
 		changes.column.WriteQualified(builder)
 	} else {
-		changes.changes[i].writeUpdate(builder, changes, i-1)
+		err := changes.changes[i].writeUpdate(builder, changes, i-1)
+		if err != nil {
+			return err
+		}
 	}
 	builder.WriteString(", ")
 	builder.WriteArg(path)

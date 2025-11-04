@@ -894,7 +894,6 @@ func TestSetLabelSetting(t *testing.T) {
 		name     string
 		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting
 		setting  domain.LabelSetting
-		changes  []database.Change
 		err      error
 	}
 

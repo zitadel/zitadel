@@ -698,7 +698,7 @@ func (s *passwordExpirySettings) Update(ctx context.Context, client database.Que
 }
 
 func (s *passwordExpirySettings) Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	return s.SettingsRepository.Delete(ctx, client, condition)
+	return s.Delete(ctx, client, condition)
 }
 
 // lockout
@@ -811,7 +811,7 @@ func (s *securitySettings) Get(ctx context.Context, client database.QueryExecuto
 		return nil, err
 	}
 
-	err = json.Unmarshal(securitySetting.Setting.Settings, &securitySetting)
+	err = json.Unmarshal(securitySetting.Settings, &securitySetting)
 	if err != nil {
 		return nil, err
 	}
@@ -824,7 +824,7 @@ func (s *securitySettings) Update(ctx context.Context, client database.QueryExec
 }
 
 func (s *securitySettings) Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	return s.SettingsRepository.Delete(ctx, client, condition)
+	return s.Delete(ctx, client, condition)
 }
 
 const setSecuritySettingEventStmt = `INSERT INTO zitadel.settings` +
