@@ -6,11 +6,17 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	instancev2 "github.com/zitadel/zitadel/backend/v3/api/instance/v2"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/pkg/grpc/instance/v2"
 )
 
 func (s *Server) AddCustomDomain(ctx context.Context, req *connect.Request[instance.AddCustomDomainRequest]) (*connect.Response[instance.AddCustomDomainResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.AddCustomDomain(ctx, req)
+	}
+
 	// Adding a custom domain is currently only allowed with system permissions,
 	// so we directly check for them in the auth interceptor and do not check here again.
 	details, err := s.command.AddInstanceDomain(ctx, req.Msg.GetCustomDomain())

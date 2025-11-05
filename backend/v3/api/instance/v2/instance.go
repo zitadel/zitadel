@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	filter_v2 "github.com/zitadel/zitadel/pkg/grpc/filter/v2"
 	filter_v2beta "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
@@ -183,34 +182,6 @@ func ListInstances(ctx context.Context, request *connect.Request[instance_v2.Lis
 				TotalResult:  uint64(len(instances)),
 				AppliedLimit: uint64(request.Msg.GetPagination().GetLimit()),
 			},
-		},
-	}, nil
-}
-
-func AddCustomDomain(ctx context.Context, request *connect.Request[instance_v2beta.AddCustomDomainRequest]) (*connect.Response[instance_v2beta.AddCustomDomainResponse], error) {
-	addCustomDomainCmd := domain.NewAddInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetDomain())
-	oidcConfigUpdateCmd := domain.NewOIDCConfigurationUpdate(request.Msg.GetDomain(), authz.GetInstance(ctx).ProjectID(), authz.GetInstance(ctx).ConsoleApplicationID())
-
-	batchExec := domain.BatchExecutors(
-		addCustomDomainCmd,
-		oidcConfigUpdateCmd,
-	)
-
-	err := domain.Invoke(
-		ctx,
-		batchExec,
-		domain.WithInstanceDomainRepo(repository.InstanceDomainRepository()),
-		// domain.WithOIDCConfigurationRepo(repository.OIDCConfigurationRepository()),
-	)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &connect.Response[instance_v2beta.AddCustomDomainResponse]{
-		Msg: &instance_v2beta.AddCustomDomainResponse{
-			// TODO(IAM-Marco): Return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10881
-			CreationDate: timestamppb.Now(),
 		},
 	}, nil
 }

@@ -4,16 +4,19 @@ package instance_test
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/instance/v2"
 )
 
@@ -29,77 +32,95 @@ func TestAddCustomDomain(t *testing.T) {
 	inst := integration.NewInstance(ctxWithSysAuthZ)
 	iamOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
 
-	t.Cleanup(func() {
-		inst.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+	relationalInst := integration.NewInstance(ctxWithSysAuthZ)
+	iamOwnerRelationalCtx := relationalInst.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
+	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, relationalInst, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)}, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+		assert.True(tCollect, got.EnableRelationalTables.GetEnabled())
 	})
 
-	tt := []struct {
-		testName          string
-		inputContext      context.Context
-		inputRequest      *instance.AddCustomDomainRequest
-		expectedErrorMsg  string
-		expectedErrorCode codes.Code
-	}{
-		{
-			testName: "when invalid context should return unauthN error",
-			inputRequest: &instance.AddCustomDomainRequest{
-				InstanceId:   inst.ID(),
-				CustomDomain: integration.DomainName(),
-			},
-			inputContext:      context.Background(),
-			expectedErrorCode: codes.Unauthenticated,
-			expectedErrorMsg:  "auth header missing",
-		},
-		{
-			testName: "when unauthZ context should return unauthZ error",
-			inputRequest: &instance.AddCustomDomainRequest{
-				InstanceId:   inst.ID(),
-				CustomDomain: integration.DomainName(),
-			},
-			inputContext:      iamOwnerCtx,
-			expectedErrorCode: codes.PermissionDenied,
-			expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
-		},
-		{
-			testName: "when invalid domain should return invalid argument error",
-			inputRequest: &instance.AddCustomDomainRequest{
-				InstanceId:   inst.ID(),
-				CustomDomain: " ",
-			},
-			inputContext:      ctxWithSysAuthZ,
-			expectedErrorCode: codes.InvalidArgument,
-			expectedErrorMsg:  "Errors.Invalid.Argument (INST-28nlD)",
-		},
-		{
-			testName: "when valid request should return successful response",
-			inputRequest: &instance.AddCustomDomainRequest{
-				InstanceId:   inst.ID(),
-				CustomDomain: " " + integration.DomainName(),
-			},
-			inputContext: ctxWithSysAuthZ,
-		},
-	}
+	t.Cleanup(func() {
+		inst.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+		relationalInst.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: relationalInst.ID()})
+	})
 
-	for _, tc := range tt {
-		t.Run(tc.testName, func(t *testing.T) {
-			t.Cleanup(func() {
+	type instanceAndCtx struct {
+		testType string
+		instance *integration.Instance
+		ctx      context.Context
+	}
+	testedInstances := []instanceAndCtx{
+		{testType: "eventstore", instance: inst, ctx: iamOwnerCtx},
+		{testType: "relational", instance: relationalInst, ctx: iamOwnerRelationalCtx},
+	}
+	for _, instAndCtx := range testedInstances {
+		tt := []struct {
+			testName          string
+			inputContext      context.Context
+			inputRequest      *instance.AddCustomDomainRequest
+			expectedErrorMsg  string
+			expectedErrorCode codes.Code
+		}{
+			{
+				testName: "when invalid context should return unauthN error",
+				inputRequest: &instance.AddCustomDomainRequest{
+					InstanceId:   instAndCtx.instance.ID(),
+					CustomDomain: integration.DomainName(),
+				},
+				inputContext:      context.Background(),
+				expectedErrorCode: codes.Unauthenticated,
+				expectedErrorMsg:  "auth header missing",
+			},
+			{
+				testName: "when unauthZ context should return unauthZ error",
+				inputRequest: &instance.AddCustomDomainRequest{
+					InstanceId:   instAndCtx.instance.ID(),
+					CustomDomain: integration.DomainName(),
+				},
+				inputContext:      instAndCtx.ctx,
+				expectedErrorCode: codes.PermissionDenied,
+				expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
+			},
+			{
+				testName: "when invalid domain should return invalid argument error",
+				inputRequest: &instance.AddCustomDomainRequest{
+					InstanceId:   instAndCtx.instance.ID(),
+					CustomDomain: " ",
+				},
+				inputContext:      ctxWithSysAuthZ,
+				expectedErrorCode: codes.InvalidArgument,
+				expectedErrorMsg:  "Errors.Invalid.Argument",
+			},
+			{
+				testName: "when valid request should return successful response",
+				inputRequest: &instance.AddCustomDomainRequest{
+					InstanceId:   instAndCtx.instance.ID(),
+					CustomDomain: " " + integration.DomainName(),
+				},
+				inputContext: ctxWithSysAuthZ,
+			},
+		}
+
+		for _, tc := range tt {
+			t.Run(fmt.Sprintf("%s - %s", instAndCtx.testType, tc.testName), func(t *testing.T) {
+				t.Cleanup(func() {
+					if tc.expectedErrorMsg == "" {
+						instAndCtx.instance.Client.InstanceV2.RemoveCustomDomain(ctxWithSysAuthZ, &instance.RemoveCustomDomainRequest{CustomDomain: strings.TrimSpace(tc.inputRequest.CustomDomain)})
+					}
+				})
+
+				// Test
+				res, err := instAndCtx.instance.Client.InstanceV2.AddCustomDomain(tc.inputContext, tc.inputRequest)
+
+				// Verify
+				assert.Equal(t, tc.expectedErrorCode, status.Code(err))
+				assert.Contains(t, status.Convert(err).Message(), tc.expectedErrorMsg)
+
 				if tc.expectedErrorMsg == "" {
-					inst.Client.InstanceV2.RemoveCustomDomain(ctxWithSysAuthZ, &instance.RemoveCustomDomainRequest{CustomDomain: strings.TrimSpace(tc.inputRequest.CustomDomain)})
+					assert.NotNil(t, res)
+					assert.NotEmpty(t, res.GetCreationDate())
 				}
 			})
-
-			// Test
-			res, err := inst.Client.InstanceV2.AddCustomDomain(tc.inputContext, tc.inputRequest)
-
-			// Verify
-			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
-			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
-
-			if tc.expectedErrorMsg == "" {
-				assert.NotNil(t, res)
-				assert.NotEmpty(t, res.GetCreationDate())
-			}
-		})
+		}
 	}
 }
 

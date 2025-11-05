@@ -13,7 +13,7 @@ import (
 
 func (s *Server) AddCustomDomain(ctx context.Context, req *connect.Request[instance.AddCustomDomainRequest]) (*connect.Response[instance.AddCustomDomainResponse], error) {
 	if authz.GetFeatures(ctx).EnableRelationalTables {
-		return instancev2.AddCustomDomain(ctx, req)
+		return instancev2.AddCustomDomainBeta(ctx, req)
 	}
 
 	details, err := s.command.AddInstanceDomain(ctx, req.Msg.GetDomain())
