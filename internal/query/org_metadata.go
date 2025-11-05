@@ -114,7 +114,7 @@ func (q *Queries) GetOrgMetadataByKey(ctx context.Context, shouldTriggerBulk boo
 	return metadata, err
 }
 
-func (q *Queries) SearchOrgMetadata(ctx context.Context, shouldTriggerBulk bool, orgID string, queries *OrgMetadataSearchQueries, withOwnerRemoved bool) (metadata *OrgMetadataList, err error) {
+func (q *Queries) SearchOrgMetadata(ctx context.Context, shouldTriggerBulk bool, orgID string, queries *OrgMetadataSearchQueries, withOwnerRemoved, withPermissionCheck bool) (metadata *OrgMetadataList, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -132,9 +132,11 @@ func (q *Queries) SearchOrgMetadata(ctx context.Context, shouldTriggerBulk bool,
 		eq[OrgMetadataOwnerRemovedCol.identifier()] = false
 	}
 	query, scan := prepareOrgMetadataListQuery()
-	// We always use the permission v2 check and don't check the feature flag, since it's stable enough to work
-	// in this case and using the old checks only adds more latency, but no benefit.
-	query = orgMetadataPermissionCheckV2(ctx, query, queries)
+	if withPermissionCheck {
+		// We always use the permission v2 check and don't check the feature flag, since it's stable enough to work
+		// in this case and using the old checks only adds more latency, but no benefit.
+		query = orgMetadataPermissionCheckV2(ctx, query, queries)
+	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-Egbld", "Errors.Query.SQLStatement")
