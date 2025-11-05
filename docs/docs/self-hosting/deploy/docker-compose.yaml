@@ -52,7 +52,7 @@ services:
       ZITADEL_OIDC_DEFAULTLOGOUTURLV2: http://localhost:3000/ui/v2/login/logout?post_logout_redirect=
       ZITADEL_SAML_DEFAULTLOGINURLV2: http://localhost:3000/ui/v2/login/login?samlRequest=
 
-      # The Login authenticates at the API with a system users private key.
+      # The Login authenticates at the API with a system user's private key.
       # The corresponding public key in ZITADEL_SYSTEMAPIUSERS grants the necessary permissions with the role IAM_LOGIN_CLIENT.
       ZITADEL_SYSTEMAPIUSERS: '{"login-system-user":{"Path":"/current-dir/login-system-user.pub","Memberships":[{"MemberType":"System","Roles":["IAM_LOGIN_CLIENT"]}]}}'
 
