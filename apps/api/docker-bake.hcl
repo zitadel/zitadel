@@ -6,6 +6,9 @@ target "api" {
     context = "."
     dockerfile = "apps/api/Dockerfile"
     tags = [ "zitadel-api:local"]
+    annotations = [
+        "org.opencontainers.image.description=ZITADEL API - Identity infrastructure, simplified for you."
+    ]
 }
 
 target "api-debug" {
