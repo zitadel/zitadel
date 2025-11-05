@@ -3,7 +3,7 @@
   "projectType": "application",
   "targets": {
     "nx-release-publish": {
-      "description": "Uploads checksums for all released artifacts to the GitHub release and configures the org scope for GitHub Packages.",
+      "description": "Runs repo scoped release tasks. Uploads checksums for all released artifacts to the GitHub release, configures the org scope for publishing GitHub Packages and triggers version bump action runs in the Helm chart and homebrew tap repos.",
       "dependsOn": [
         "@zitadel/api:nx-release-publish",
         "@zitadel/login:nx-release-publish"
@@ -26,12 +26,12 @@
           },
           {
             "forwardAllArgs": false,
-            "prefix": "[only on zitadel/zitadel release] ",
+            "prefix": "[bumping homebrew tap version on original zitadel/zitadel release, not on forks] ",
             "command": "bash -c \"[[ \\\"${NX_DRY_RUN}\\\" == \\\"true\\\" ]] || [[ \\\"${ZITADEL_RELEASE_GITHUB_REPO}\\\" != \\\"zitadel/zitadel\\\" ]] || gh workflow --repo zitadel/homebrew-tap run update.yml -f runId=${RUN_ID} -f version=${ZITADEL_RELEASE_VERSION}\""
           },
           {
             "forwardAllArgs": false,
-            "prefix": "[only on zitadel/zitadel release] ",
+            "prefix": "[bumping chart version on original zitadel/zitadel release, not on forks] ",
             "command": "bash -c \"[[ \\\"${NX_DRY_RUN}\\\" == \\\"true\\\" ]] || [[ \\\"${ZITADEL_RELEASE_GITHUB_REPO}\\\" != \\\"zitadel/zitadel\\\" ]] || gh workflow --repo zitadel/zitadel-charts run bump.yml\""
           }
         ]
@@ -49,14 +49,6 @@
         "@zitadel/login:clean",
         "@zitadel/console:clean"
       ]
-    },
-    "local-npm-registry": {
-      "executor": "@nx/js:verdaccio",
-      "options": {
-        "port": 4873,
-        "config": ".verdaccio/config.yml",
-        "storage": ".artifacts/local-npm-registry/storage"
-      }
     }
   }
 }

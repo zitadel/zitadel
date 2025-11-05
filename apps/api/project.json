@@ -411,7 +411,7 @@
             }
         },
         "build-darwin-windows": {
-            "description": "Builds the Go-based API backend for Darwin (amd64 and arm64) and Windows (amd64) into executable binaries.",
+            "description": "Builds the Go-based API backend for Darwin (amd64 and arm64) and Windows (amd64 and arm64) into executable binaries.",
             "dependsOn": [
                 "generate",
                 "build-console"
