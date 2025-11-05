@@ -1,4 +1,4 @@
-import { execSync } from 'node:child_process';
+import { execSync, execFileSync } from 'node:child_process';
 import { releaseVersion, releaseChangelog, releasePublish } from 'nx/release';
 import yargs from 'yargs';
 
@@ -182,15 +182,27 @@ export function executeDockerBuild(conventionalCommits: boolean, dryRun: boolean
  * Executes docker build commands with the appropriate configuration.
  */
 export function executeDockerBuildForProject(dryRun: boolean, nxProject: string, projectBakeArgs: string): void {
-  const nxCommand = `pnpm nx run ${nxProject}:build-docker --no-tui`;
-  let bakeArgs = `--file release/docker-bake-release.hcl ${projectBakeArgs}`;
+  // Construct argument array for safer invocation.
+  let bakeArgsArray = ['--file', 'release/docker-bake-release.hcl'];
+  if (projectBakeArgs) {
+    // Split projectBakeArgs string by spaces for now. To be robust, if projectBakeArgs can contain quoted args,
+    // consider using a parser like shell-quote, but in this codebase, args are hardcoded and simple.
+    bakeArgsArray = bakeArgsArray.concat(projectBakeArgs.split(' '));
+  }
   if (!dryRun) {
     console.log('Docker images will be pushed to the registry after build, because dryRun is false.');
-    bakeArgs += ' --push';
+    bakeArgsArray.push('--push');
   }
-  bakeArgs = ` --args=\"${bakeArgs}\"`;
-  console.log(`Executing docker build with command: ${nxCommand}${bakeArgs}`);
-  execSync(`${nxCommand}${bakeArgs}`, {
+  // Build full nx arguments array
+  const nxArgs = [
+    'nx',
+    'run',
+    `${nxProject}:build-docker`,
+    '--no-tui',
+    `--args=${bakeArgsArray.join(' ')}`
+  ];
+  console.log(`Executing docker build with command: pnpm ${nxArgs.map(a => `"${a}"`).join(' ')}`);
+  execFileSync('pnpm', nxArgs, {
     stdio: 'inherit', env: process.env
   });
 }
