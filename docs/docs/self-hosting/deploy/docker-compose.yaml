@@ -10,8 +10,8 @@ services:
           openssl genrsa -traditional -out /current-dir/login-system-user.pem 2048 &&
           openssl rsa -in /current-dir/login-system-user.pem -outform PEM -pubout -out /current-dir/login-system-user.pub &&
           openssl pkcs8 -topk8 -in /current-dir/login-system-user.pem -nocrypt | base64 > /current-dir/login-system-user-base64.pem 
-          chown 1001 /current-dir/login-system-user-base64.pem;
-          chown 1000 /current-dir/login-system-user.pub;
+          # Set permissions to restrict access, but do not change ownership to hardcoded UIDs.
+          # If specific ownership is required, adjust this to use a symbolic user name or ensure the user exists.
           chmod 640 /current-dir/login-system-user-base64.pem /current-dir/login-system-user.pub;
         fi
     volumes:
