@@ -7,7 +7,7 @@ if [ -f /.env-file/.env ]; then
 fi
 
 if [ -n "${SYSTEM_USER_PRIVATE_KEY_FILE}" ]; then
-    echo "SYSTEM_USER_PRIVATE_KEY_FILE=${SYSTEM_USER_PRIVATE_KEY_FILE} is set. Awaiting file and reading token."
+    echo "SYSTEM_USER_PRIVATE_KEY_FILE=${SYSTEM_USER_PRIVATE_KEY_FILE} is set. Awaiting file and reading private key."
     while [ ! -f "${SYSTEM_USER_PRIVATE_KEY_FILE}" ]; do
         sleep 2
     done
