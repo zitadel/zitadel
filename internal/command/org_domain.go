@@ -20,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+//nolint:gocognit
 func (c *Commands) prepareAddOrgDomain(a *org.Aggregate, addDomain string, userIDs []string, permissionCheck OrganizationPermissionCheck) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if addDomain = strings.TrimSpace(addDomain); addDomain == "" {
@@ -137,7 +138,7 @@ func (c *Commands) AddOrgDomain(ctx context.Context, orgID, domain string, claim
 	defer func() { span.EndWithError(err) }()
 
 	orgAgg := org.NewAggregate(orgID)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgDomain(orgAgg, domain, claimedUserIDs, permissionCheck))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgDomain(orgAgg, domain, claimedUserIDs, permissionCheck)) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}

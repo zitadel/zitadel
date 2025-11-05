@@ -502,7 +502,7 @@ func (c *Commands) ReactivateOrg(ctx context.Context, organizationID string, per
 func (c *Commands) RemoveOrg(ctx context.Context, id string, permissionCheck OrganizationPermissionCheck, mustExist bool) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(id)
 
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveOrg(orgAgg, permissionCheck, mustExist))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveOrg(orgAgg, permissionCheck, mustExist)) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
@@ -522,6 +522,7 @@ func (c *Commands) RemoveOrg(ctx context.Context, id string, permissionCheck Org
 	}, nil
 }
 
+//nolint:gocognit
 func (c *Commands) prepareRemoveOrg(a *org.Aggregate, permissionCheck OrganizationPermissionCheck, mustExist bool) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
