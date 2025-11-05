@@ -463,9 +463,10 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx   context.Context
-		orgID string
-		name  string
+		ctx             context.Context
+		orgID           string
+		name            string
+		permissionCheck OrganizationPermissionCheck
 	}
 	type res struct {
 		err func(error) bool
@@ -727,13 +728,76 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 			},
 			res: res{},
 		},
+		{
+			name: "change org name (with permission check), ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org"),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org"),
+						),
+						eventFromEventPusher(
+							org.NewDomainAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org.zitadel.ch"),
+						),
+						eventFromEventPusher(
+							org.NewDomainVerifiedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org.zitadel.ch"),
+						),
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org.zitadel.ch"),
+						),
+					),
+					expectPush(
+						org.NewOrgChangedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate, "org", "ORG",
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:             http_util.WithRequestedHost(context.Background(), "zitadel.ch"),
+				orgID:           "org1",
+				name:            "ORG",
+				permissionCheck: newMockOrganizationPermissionCheckAllowed(),
+			},
+			res: res{},
+		},
+		{
+			name: "change org name (no permission), error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:             http_util.WithRequestedHost(context.Background(), "zitadel.ch"),
+				orgID:           "org1",
+				name:            "ORG",
+				permissionCheck: newMockOrganizationPermissionCheckNotAllowed(),
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			_, err := r.ChangeOrg(tt.args.ctx, tt.args.orgID, tt.args.name)
+			_, err := r.ChangeOrg(tt.args.ctx, tt.args.orgID, tt.args.name, tt.args.permissionCheck)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -751,8 +815,9 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 		iamDomain   string
 	}
 	type args struct {
-		ctx   context.Context
-		orgID string
+		ctx             context.Context
+		orgID           string
+		permissionCheck OrganizationPermissionCheck
 	}
 	type res struct {
 		want *domain.Org
@@ -855,6 +920,45 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 			},
 			res: res{},
 		},
+		{
+			name: "deactivate org (with permission check)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org"),
+						),
+					),
+					expectPush(
+						org.NewOrgDeactivatedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:             context.Background(),
+				orgID:           "org1",
+				permissionCheck: newMockOrganizationPermissionCheckAllowed(),
+			},
+			res: res{},
+		},
+		{
+			name: "deactivate org (no permission)",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:             context.Background(),
+				orgID:           "org1",
+				permissionCheck: newMockOrganizationPermissionCheckNotAllowed(),
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -862,7 +966,7 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 				eventstore:  tt.fields.eventstore(t),
 				idGenerator: tt.fields.idGenerator,
 			}
-			_, err := r.DeactivateOrg(tt.args.ctx, tt.args.orgID)
+			_, err := r.DeactivateOrg(tt.args.ctx, tt.args.orgID, tt.args.permissionCheck)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -880,8 +984,9 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 		iamDomain   string
 	}
 	type args struct {
-		ctx   context.Context
-		orgID string
+		ctx             context.Context
+		orgID           string
+		permissionCheck OrganizationPermissionCheck
 	}
 	type res struct {
 		want *domain.Org
@@ -989,6 +1094,49 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 			},
 			res: res{},
 		},
+		{
+			name: "reactivate org (with permission check)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org"),
+						),
+						eventFromEventPusher(
+							org.NewOrgDeactivatedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate),
+						),
+					),
+					expectPush(
+						org.NewOrgReactivatedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:             context.Background(),
+				orgID:           "org1",
+				permissionCheck: newMockOrganizationPermissionCheckAllowed(),
+			},
+			res: res{},
+		},
+		{
+			name: "reactivate org (with permission check)",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:             context.Background(),
+				orgID:           "org1",
+				permissionCheck: newMockOrganizationPermissionCheckNotAllowed(),
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -996,7 +1144,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 				eventstore:  tt.fields.eventstore(t),
 				idGenerator: tt.fields.idGenerator,
 			}
-			_, err := r.ReactivateOrg(tt.args.ctx, tt.args.orgID)
+			_, err := r.ReactivateOrg(tt.args.ctx, tt.args.orgID, tt.args.permissionCheck)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1013,8 +1161,10 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 		idGenerator id.Generator
 	}
 	type args struct {
-		ctx   context.Context
-		orgID string
+		ctx             context.Context
+		orgID           string
+		permissionCheck OrganizationPermissionCheck
+		mustExist       bool
 	}
 	type res struct {
 		err func(error) bool
@@ -1064,7 +1214,24 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 			},
 		},
 		{
-			name: "org not found, error",
+			name: "org not found, must exist, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(), // zitadel project check
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:       context.Background(),
+				orgID:     "org1",
+				mustExist: true,
+			},
+			res: res{
+				err: zerrors.IsNotFound,
+			},
+		},
+		{
+			name: "org not found, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(), // zitadel project check
@@ -1075,9 +1242,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 				ctx:   context.Background(),
 				orgID: "org1",
 			},
-			res: res{
-				err: zerrors.IsNotFound,
-			},
+			res: res{},
 		},
 		{
 			name: "push failed, error",
@@ -1249,6 +1414,62 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 			},
 			res: res{},
 		},
+
+		{
+			name: "remove org (with permission check)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(), // zitadel project check
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org"),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilter(),
+					expectFilter(),
+					expectFilter(),
+					expectFilter(),
+					expectPush(
+						org.NewOrgRemovedEvent(
+							context.Background(), &org.NewAggregate("org1").Aggregate, "org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{},
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:             context.Background(),
+				orgID:           "org1",
+				permissionCheck: newMockOrganizationPermissionCheckAllowed(),
+			},
+			res: res{},
+		},
+
+		{
+			name: "remove org (no permission)",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:             context.Background(),
+				orgID:           "org1",
+				permissionCheck: newMockOrganizationPermissionCheckNotAllowed(),
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1256,7 +1477,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 				eventstore:  tt.fields.eventstore(t),
 				idGenerator: tt.fields.idGenerator,
 			}
-			_, err := r.RemoveOrg(tt.args.ctx, tt.args.orgID)
+			_, err := r.RemoveOrg(tt.args.ctx, tt.args.orgID, tt.args.permissionCheck, tt.args.mustExist)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1278,6 +1499,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 		ctx              context.Context
 		setupOrg         *OrgSetup
 		allowInitialMail bool
+		permissionCheck  OrganizationPermissionCheck
 		userIDs          []string
 	}
 	type res struct {
@@ -1816,6 +2038,41 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "no permission, error",
+			fields: fields{
+				eventstore:   expectEventstore(),
+				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t),
+				newCode:      mockEncryptedCode("userinit", time.Hour),
+				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
+				setupOrg: &OrgSetup{
+					Name: "Org",
+					Admins: []*OrgSetupAdmin{
+						{
+							Machine: &AddMachine{
+								Machine: &Machine{
+									Username:        "username",
+									Name:            "name",
+									Description:     "description",
+									AccessTokenType: domain.OIDCTokenTypeBearer,
+								},
+								Pat: &AddPat{
+									ExpirationDate: testNow.Add(time.Hour),
+									Scopes:         []string{openid.ScopeOpenID},
+								},
+							},
+						},
+					},
+				},
+				permissionCheck: newMockOrganizationPermissionCheckNotAllowed(),
+			},
+			res: res{
+				err: zerrors.ThrowPermissionDenied(nil, "", "Errors.PermissionDenied"),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1830,7 +2087,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 					},
 				},
 			}
-			got, err := r.SetUpOrg(tt.args.ctx, tt.args.setupOrg, tt.args.allowInitialMail, tt.args.userIDs...)
+			got, err := r.SetUpOrg(tt.args.ctx, tt.args.setupOrg, tt.args.allowInitialMail, tt.args.permissionCheck, tt.args.userIDs...)
 			assert.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.createdOrg, got)
 		})

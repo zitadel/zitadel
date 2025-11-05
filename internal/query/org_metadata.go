@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	domain_pkg "github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -131,6 +132,9 @@ func (q *Queries) SearchOrgMetadata(ctx context.Context, shouldTriggerBulk bool,
 		eq[OrgMetadataOwnerRemovedCol.identifier()] = false
 	}
 	query, scan := prepareOrgMetadataListQuery()
+	// We always use the permission v2 check and don't check the feature flag, since it's stable enough to work
+	// in this case and using the old checks only adds more latency, but no benefit.
+	query = orgMetadataPermissionCheckV2(ctx, query, queries)
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-Egbld", "Errors.Query.SQLStatement")
@@ -247,4 +251,14 @@ func prepareOrgMetadataListQuery() (sq.SelectBuilder, func(*sql.Rows) (*OrgMetad
 				},
 			}, nil
 		}
+}
+
+func orgMetadataPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, queries *OrgMetadataSearchQueries) sq.SelectBuilder {
+	join, args := PermissionClause(
+		ctx,
+		OrgMetadataOrgIDCol,
+		domain_pkg.PermissionOrgRead,
+		SingleOrgPermissionOption(queries.Queries),
+	)
+	return query.JoinClause(join, args...)
 }

@@ -125,7 +125,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.create"
+        permission: "authenticated"
       }
     };
 
@@ -160,7 +160,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.write"
+        permission: "authenticated"
       }
     };
 
@@ -192,7 +192,7 @@ service OrganizationService {
   // Returns a list of organizations that match the requesting filters. All filters are applied with an AND condition.
   //
   // Required permission:
-  //  - `iam.read`
+  //  - `org.read`
   //
   // Deprecated: Use [ListOrganizations](/apis/resources/org_service_v2/organization-service-list-organizations.api.mdx) instead to list organizations.
   rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse) {
@@ -203,7 +203,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "iam.read";
+        permission: "authenticated";
       }
     };
 
@@ -228,7 +228,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.delete";
+        permission: "authenticated";
       }
     };
 
@@ -262,7 +262,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.write"
+        permission: "authenticated"
       }
     };
 
@@ -293,7 +293,7 @@ service OrganizationService {
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = { auth_option: {
-        permission: "org.read"
+        permission: "authenticated"
       }
     };
 
@@ -318,7 +318,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.write"
+        permission: "authenticated"
       }
     };
 
@@ -344,7 +344,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.write"
+        permission: "authenticated"
       }
     };
 
@@ -376,7 +376,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.read"
+        permission: "authenticated"
       }
     };
 
@@ -401,7 +401,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.write"
+        permission: "authenticated"
       }
     };
 
@@ -427,7 +427,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.write"
+        permission: "authenticated"
       }
     };
 
@@ -458,7 +458,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.write"
+        permission: "authenticated"
       }
     };
 
@@ -483,7 +483,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.write"
+        permission: "authenticated"
       }
     };
 
@@ -509,7 +509,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.write"
+        permission: "authenticated"
       }
     };
 

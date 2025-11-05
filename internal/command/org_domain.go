@@ -20,7 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) prepareAddOrgDomain(a *org.Aggregate, addDomain string, userIDs []string) preparation.Validation {
+func (c *Commands) prepareAddOrgDomain(a *org.Aggregate, addDomain string, userIDs []string, permissionCheck OrganizationPermissionCheck) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if addDomain = strings.TrimSpace(addDomain); addDomain == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "ORG-r3h4J", "Errors.Invalid.Argument")
@@ -28,6 +28,15 @@ func (c *Commands) prepareAddOrgDomain(a *org.Aggregate, addDomain string, userI
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (_ []eventstore.Command, err error) {
 			ctx, span := tracing.NewSpan(ctx)
 			defer func() { span.EndWithError(err) }()
+
+			if permissionCheck != nil {
+				if err := permissionCheck(ctx, a.ID); err != nil {
+					return nil, err
+				}
+			}
+			if err := c.checkOrgExists(ctx, a.ID); err != nil {
+				return nil, err
+			}
 
 			existing, err := orgDomain(ctx, filter, a.ID, addDomain)
 			if err != nil && !errors.Is(err, zerrors.ThrowNotFound(nil, "", "")) {
@@ -123,12 +132,12 @@ func (c *Commands) VerifyOrgDomain(ctx context.Context, orgID, domain string) (_
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) AddOrgDomain(ctx context.Context, orgID, domain string, claimedUserIDs []string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) AddOrgDomain(ctx context.Context, orgID, domain string, claimedUserIDs []string, permissionCheck OrganizationPermissionCheck) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	orgAgg := org.NewAggregate(orgID)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgDomain(orgAgg, domain, claimedUserIDs))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgDomain(orgAgg, domain, claimedUserIDs, permissionCheck))
 	if err != nil {
 		return nil, err
 	}
@@ -139,13 +148,18 @@ func (c *Commands) AddOrgDomain(ctx context.Context, orgID, domain string, claim
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) GenerateOrgDomainValidation(ctx context.Context, orgDomain *domain.OrgDomain) (token, url string, err error) {
+func (c *Commands) GenerateOrgDomainValidation(ctx context.Context, orgDomain *domain.OrgDomain, permissionCheck OrganizationPermissionCheck) (token, url string, err error) {
 	if orgDomain == nil || !orgDomain.IsValid() || orgDomain.AggregateID == "" {
 		return "", "", zerrors.ThrowInvalidArgument(nil, "ORG-R24hb", "Errors.Org.InvalidDomain")
 	}
 	checkType, ok := orgDomain.ValidationType.CheckType()
 	if !ok {
 		return "", "", zerrors.ThrowInvalidArgument(nil, "ORG-Gsw31", "Errors.Org.DomainVerificationTypeInvalid")
+	}
+	if permissionCheck != nil {
+		if err := permissionCheck(ctx, orgDomain.AggregateID); err != nil {
+			return "", "", err
+		}
 	}
 	domainWriteModel, err := c.getOrgDomainWriteModel(ctx, orgDomain.AggregateID, orgDomain.Domain)
 	if err != nil {
@@ -177,9 +191,14 @@ func (c *Commands) GenerateOrgDomainValidation(ctx context.Context, orgDomain *d
 	return token, url, nil
 }
 
-func (c *Commands) ValidateOrgDomain(ctx context.Context, orgDomain *domain.OrgDomain, claimedUserIDs []string) (*domain.ObjectDetails, error) {
+func (c *Commands) ValidateOrgDomain(ctx context.Context, orgDomain *domain.OrgDomain, claimedUserIDs []string, permissionCheck OrganizationPermissionCheck) (*domain.ObjectDetails, error) {
 	if orgDomain == nil || !orgDomain.IsValid() || orgDomain.AggregateID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-R24hb", "Errors.Org.InvalidDomain")
+	}
+	if permissionCheck != nil {
+		if err := permissionCheck(ctx, orgDomain.AggregateID); err != nil {
+			return nil, err
+		}
 	}
 	domainWriteModel, err := c.getOrgDomainWriteModel(ctx, orgDomain.AggregateID, orgDomain.Domain)
 	if err != nil {
@@ -261,9 +280,14 @@ func (c *Commands) SetPrimaryOrgDomain(ctx context.Context, orgDomain *domain.Or
 	return writeModelToObjectDetails(&domainWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RemoveOrgDomain(ctx context.Context, orgDomain *domain.OrgDomain) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveOrgDomain(ctx context.Context, orgDomain *domain.OrgDomain, permissionCheck OrganizationPermissionCheck) (*domain.ObjectDetails, error) {
 	if orgDomain == nil || !orgDomain.IsValid() || orgDomain.AggregateID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-SJsK3", "Errors.Org.InvalidDomain")
+	}
+	if permissionCheck != nil {
+		if err := permissionCheck(ctx, orgDomain.AggregateID); err != nil {
+			return nil, err
+		}
 	}
 	domainWriteModel, err := c.getOrgDomainWriteModel(ctx, orgDomain.AggregateID, orgDomain.Domain)
 	if err != nil {

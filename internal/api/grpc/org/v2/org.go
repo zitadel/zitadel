@@ -17,7 +17,7 @@ func (s *Server) AddOrganization(ctx context.Context, request *connect.Request[o
 	if err != nil {
 		return nil, err
 	}
-	createdOrg, err := s.command.SetUpOrg(ctx, orgSetup, false)
+	createdOrg, err := s.command.SetUpOrg(ctx, orgSetup, false, s.command.CheckPermissionOrganizationCreate)
 	if err != nil {
 		return nil, err
 	}
