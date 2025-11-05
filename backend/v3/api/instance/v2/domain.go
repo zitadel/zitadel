@@ -13,6 +13,10 @@ import (
 	instance_v2beta "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 )
 
+// =================
+// v2Beta endpoints
+// =================
+
 func AddCustomDomainBeta(ctx context.Context, request *connect.Request[instance_v2beta.AddCustomDomainRequest]) (*connect.Response[instance_v2beta.AddCustomDomainResponse], error) {
 	addCustomDomainCmd := domain.NewAddInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetDomain())
 	oidcConfigUpdateCmd := domain.NewOIDCConfigurationUpdate(request.Msg.GetDomain(), authz.GetInstance(ctx).ProjectID(), authz.GetInstance(ctx).ConsoleApplicationID())
@@ -40,6 +44,10 @@ func AddCustomDomainBeta(ctx context.Context, request *connect.Request[instance_
 		},
 	}, nil
 }
+
+// =================
+// v2 endpoints
+// =================
 
 func AddCustomDomain(ctx context.Context, request *connect.Request[instance_v2.AddCustomDomainRequest]) (*connect.Response[instance_v2.AddCustomDomainResponse], error) {
 	addCustomDomainCmd := domain.NewAddInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetCustomDomain())

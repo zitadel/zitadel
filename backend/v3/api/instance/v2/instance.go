@@ -18,6 +18,10 @@ import (
 	instance_v2beta "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 )
 
+// =================
+// v2Beta endpoints
+// =================
+
 func DeleteInstanceBeta(ctx context.Context, request *connect.Request[instance_v2beta.DeleteInstanceRequest]) (*connect.Response[instance_v2beta.DeleteInstanceResponse], error) {
 	instanceDeleteCmd := domain.NewDeleteInstanceCommand(request.Msg.GetInstanceId())
 
@@ -101,6 +105,10 @@ func ListInstancesBeta(ctx context.Context, request *connect.Request[instance_v2
 		},
 	}, nil
 }
+
+// =================
+// v2 endpoints
+// =================
 
 func DeleteInstance(ctx context.Context, request *connect.Request[instance_v2.DeleteInstanceRequest]) (*connect.Response[instance_v2.DeleteInstanceResponse], error) {
 	instanceDeleteCmd := domain.NewDeleteInstanceCommand(request.Msg.GetInstanceId())
