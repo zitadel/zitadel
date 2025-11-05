@@ -123,7 +123,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.create"
+        permission: "authenticated"
       }
       http_response: {
         success_code: 201

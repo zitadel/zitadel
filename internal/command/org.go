@@ -181,7 +181,7 @@ func (c *orgSetupCommands) setupOrgAdminMachine(orgAgg *org.Aggregate, machine *
 
 func (c *orgSetupCommands) addCustomDomain(domain string, userIDs []string) error {
 	if domain != "" {
-		c.validations = append(c.validations, c.commands.prepareAddOrgDomain(c.aggregate, domain, userIDs))
+		c.validations = append(c.validations, c.commands.prepareAddOrgDomain(c.aggregate, domain, userIDs, nil))
 	}
 	return nil
 }
@@ -263,7 +263,7 @@ func (c *orgSetupCommands) createdMachineAdmin(admin *OrgSetupAdmin) *CreatedOrg
 	return createdAdmin
 }
 
-func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, allowInitialMail bool, userIDs ...string) (*CreatedOrg, error) {
+func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, allowInitialMail bool, permissionCheck OrganizationPermissionCheck, userIDs ...string) (*CreatedOrg, error) {
 	if err := o.Validate(); err != nil {
 		return nil, err
 	}
@@ -272,6 +272,12 @@ func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, allowInitialMail b
 		var err error
 		o.OrgID, err = c.idGenerator.Next()
 		if err != nil {
+			return nil, err
+		}
+	}
+
+	if permissionCheck != nil {
+		if err := permissionCheck(ctx, o.OrgID); err != nil {
 			return nil, err
 		}
 	}
@@ -394,14 +400,18 @@ func (c *Commands) addOrgWithIDAndMember(ctx context.Context, name, userID, reso
 	return orgWriteModelToOrg(addedOrg), nil
 }
 
-func (c *Commands) ChangeOrg(ctx context.Context, orgID, name string) (*domain.ObjectDetails, error) {
+func (c *Commands) ChangeOrg(ctx context.Context, organizationID, name string, permissionCheck OrganizationPermissionCheck) (*domain.ObjectDetails, error) {
 	name = strings.TrimSpace(name)
-	orgID = strings.TrimSpace(orgID)
-	if orgID == "" || name == "" {
+	organizationID = strings.TrimSpace(organizationID)
+	if organizationID == "" || name == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "EVENT-Mf9sd", "Errors.Org.Invalid")
 	}
-
-	orgWriteModel, err := c.getOrgWriteModelByID(ctx, orgID)
+	if permissionCheck != nil {
+		if err := permissionCheck(ctx, organizationID); err != nil {
+			return nil, err
+		}
+	}
+	orgWriteModel, err := c.getOrgWriteModelByID(ctx, organizationID)
 	if err != nil {
 		return nil, err
 	}
@@ -414,7 +424,7 @@ func (c *Commands) ChangeOrg(ctx context.Context, orgID, name string) (*domain.O
 	orgAgg := OrgAggregateFromWriteModel(&orgWriteModel.WriteModel)
 	events := make([]eventstore.Command, 0)
 	events = append(events, org.NewOrgChangedEvent(ctx, orgAgg, orgWriteModel.Name, name))
-	changeDomainEvents, err := c.changeDefaultDomain(ctx, orgID, name)
+	changeDomainEvents, err := c.changeDefaultDomain(ctx, organizationID, name)
 	if err != nil {
 		return nil, err
 	}
@@ -432,8 +442,15 @@ func (c *Commands) ChangeOrg(ctx context.Context, orgID, name string) (*domain.O
 	return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
 }
 
-func (c *Commands) DeactivateOrg(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
-	orgWriteModel, err := c.getOrgWriteModelByID(ctx, orgID)
+type OrganizationPermissionCheck func(ctx context.Context, organizationID string) error
+
+func (c *Commands) DeactivateOrg(ctx context.Context, organizationID string, permissionCheck OrganizationPermissionCheck) (*domain.ObjectDetails, error) {
+	if permissionCheck != nil {
+		if err := permissionCheck(ctx, organizationID); err != nil {
+			return nil, err
+		}
+	}
+	orgWriteModel, err := c.getOrgWriteModelByID(ctx, organizationID)
 	if err != nil {
 		return nil, err
 	}
@@ -455,8 +472,13 @@ func (c *Commands) DeactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 	return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
 }
 
-func (c *Commands) ReactivateOrg(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
-	orgWriteModel, err := c.getOrgWriteModelByID(ctx, orgID)
+func (c *Commands) ReactivateOrg(ctx context.Context, organizationID string, permissionCheck OrganizationPermissionCheck) (*domain.ObjectDetails, error) {
+	if permissionCheck != nil {
+		if err := permissionCheck(ctx, organizationID); err != nil {
+			return nil, err
+		}
+	}
+	orgWriteModel, err := c.getOrgWriteModelByID(ctx, organizationID)
 	if err != nil {
 		return nil, err
 	}
@@ -478,12 +500,15 @@ func (c *Commands) ReactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 	return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RemoveOrg(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveOrg(ctx context.Context, id string, permissionCheck OrganizationPermissionCheck, mustExist bool) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(id)
 
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveOrg(orgAgg))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveOrg(orgAgg, permissionCheck, mustExist))
 	if err != nil {
 		return nil, err
+	}
+	if len(cmds) == 0 {
+		return &domain.ObjectDetails{}, nil
 	}
 
 	events, err := c.eventstore.Push(ctx, cmds...)
@@ -498,9 +523,14 @@ func (c *Commands) RemoveOrg(ctx context.Context, id string) (*domain.ObjectDeta
 	}, nil
 }
 
-func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
+func (c *Commands) prepareRemoveOrg(a *org.Aggregate, permissionCheck OrganizationPermissionCheck, mustExist bool) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			if permissionCheck != nil {
+				if err := permissionCheck(ctx, a.ID); err != nil {
+					return nil, err
+				}
+			}
 			instance := authz.GetInstance(ctx)
 			if a.ID == instance.DefaultOrganisationID() {
 				return nil, zerrors.ThrowPreconditionFailed(nil, "COMMA-wG9p1", "Errors.Org.DefaultOrgNotDeletable")
@@ -520,7 +550,10 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
 				return nil, zerrors.ThrowPreconditionFailed(err, "COMMA-wG9p1", "Errors.Org.NotFound")
 			}
 			if !isOrgStateExists(writeModel.State) {
-				return nil, zerrors.ThrowNotFound(nil, "COMMA-aps2n", "Errors.Org.NotFound")
+				if mustExist {
+					return nil, zerrors.ThrowNotFound(nil, "COMMA-aps2n", "Errors.Org.NotFound")
+				}
+				return nil, nil
 			}
 
 			domainPolicy, err := domainPolicyWriteModel(ctx, filter, a.ID)
