@@ -67,7 +67,7 @@ export async function parseReleaseOptions(argv: string[]): Promise<ReleaseOption
     .option('dryRun', {
       alias: 'd',
       description:
-        'Whether or not to perform a dry-run of the release process, defaults to false',
+        'Whether or not to perform a dry-run of the release process, defaults to true',
       type: 'boolean',
       default: true,
     })
