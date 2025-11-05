@@ -10,12 +10,14 @@ import (
 // eventStoreInvoker checks if the [EventProducer].Events function returns any events.
 // If it does, it collects the events and publishes them to the event store.
 type eventStoreInvoker struct {
-	next      Invoker
-	collector *eventCollector
+	invoker
+	collector eventCollector
 }
 
-func newEventStoreInvoker(next Invoker) *eventStoreInvoker {
-	return &eventStoreInvoker{next: next}
+func NewEventStoreInvoker(next Invoker) *eventStoreInvoker {
+	return &eventStoreInvoker{
+		invoker: invoker{next: next},
+	}
 }
 
 type EventProducer interface {
@@ -25,82 +27,140 @@ type EventProducer interface {
 }
 
 func (i *eventStoreInvoker) Invoke(ctx context.Context, executor Executor, opts *InvokeOpts) (err error) {
+	if _, ok := executor.(*batchExecutor); ok {
+		return i.collect(ctx, executor, opts)
+	}
 	if _, ok := executor.(EventProducer); !ok {
 		return i.execute(ctx, executor, opts)
 	}
+	return i.collect(ctx, executor, opts)
+}
 
-	if i.collector != nil {
-		return i.collector.Invoke(ctx, executor, opts)
-	}
-
-	close, err := opts.EnsureTx(ctx)
-	if err != nil {
-		return err
-	}
-	defer func() { err = close(ctx, err) }()
-
-	i.collector = &eventCollector{next: i.next}
-
-	if err = i.collector.Invoke(ctx, executor, opts); err != nil {
-		return err
-	}
-
-	if len(i.collector.events) > 0 {
-		err = eventstore.Publish(ctx, legacyEventstore, opts.DB, i.collector.events...)
+func (i *eventStoreInvoker) collect(ctx context.Context, executor Executor, opts *InvokeOpts) (err error) {
+	if i.collector == nil {
+		var close func(err error) error
+		close, err = i.ensureTx(ctx, opts)
 		if err != nil {
 			return err
 		}
+		defer func() {
+			if err != nil {
+				err = close(err)
+				return
+			}
+			commands := i.collector.commands()
+			if len(commands) == 0 {
+				err = close(nil)
+				return
+			}
+			err = eventstore.Publish(ctx, opts.LegacyEventstore(), opts.DB(), commands...)
+			err = close(err)
+		}()
+		i.collector = initEventCollector(i.invoker, nil, executor)
+	} else {
+		i.collector = i.collector.initSub(executor)
 	}
+
+	defer func() {
+		if i.collector.parent() == nil {
+			return
+		}
+		i.collector = i.collector.parent()
+	}()
+	err = i.execute(ctx, executor, opts)
+	if err != nil {
+		return err
+	}
+	return i.collector.collect(ctx, opts)
+}
+
+type eventCollector interface {
+	collect(ctx context.Context, opts *InvokeOpts) error
+	commands() []legacy_es.Command
+	initSub(executor Executor) eventCollector
+	parent() eventCollector
+}
+
+type batchCollector struct {
+	invoker
+	executor   Executor
+	collectors []eventCollector
+	previous   eventCollector
+}
+
+// collect implements [eventCollector].
+func (b batchCollector) collect(ctx context.Context, opts *InvokeOpts) error {
 	return nil
 }
 
-func (i *eventStoreInvoker) execute(ctx context.Context, executor Executor, opts *InvokeOpts) error {
-	if i.next != nil {
-		return i.next.Invoke(ctx, executor, opts)
+// commands implements [eventCollector].
+func (b batchCollector) commands() []legacy_es.Command {
+	var commands []legacy_es.Command
+	for _, collector := range b.collectors {
+		commands = append(commands, collector.commands()...)
 	}
-	return executor.Execute(ctx, opts)
+	return commands
 }
 
-// eventCollector collects events from all commands. The [eventStoreInvoker] pushes the collected events after all commands are executed.
-// The events are collected after the command got executed, the collector ensures that the command is executed in the same transaction as writing the events.
-type eventCollector struct {
-	next          Invoker
-	events        []legacy_es.Command
-	shouldPrepend bool
+// initSub implements [eventCollector].
+func (b *batchCollector) initSub(executor Executor) eventCollector {
+	b.collectors = append(b.collectors, initEventCollector(b.invoker, b, executor))
+	return b.collectors[len(b.collectors)-1]
 }
 
-func (i *eventCollector) Invoke(ctx context.Context, executor Executor, opts *InvokeOpts) (err error) {
-	command, ok := executor.(EventProducer)
-	if !ok {
-		if i.next != nil {
-			return i.next.Invoke(ctx, executor, opts)
-		}
-		return executor.Execute(ctx, opts)
-	}
+// parent implements [eventCollector].
+func (b batchCollector) parent() eventCollector {
+	return b.previous
+}
 
-	shouldPrepend := i.shouldPrepend
-	i.shouldPrepend = false
+var _ eventCollector = (*batchCollector)(nil)
 
-	if i.next != nil {
-		i.shouldPrepend = true
-		err = i.next.Invoke(ctx, executor, opts)
-		i.shouldPrepend = false
-	} else {
-		err = executor.Execute(ctx, opts)
-	}
-	if err != nil {
-		return err
-	}
-	collectedEvents, err := command.Events(ctx, opts)
-	if err != nil {
-		return err
-	}
+type commandCollector struct {
+	invoker
+	producer EventProducer
+	sub      eventCollector
+	previous eventCollector
+	cmds     []legacy_es.Command
+}
 
-	if shouldPrepend {
-		i.events = append(collectedEvents, i.events...)
-	} else {
-		i.events = append(i.events, collectedEvents...)
-	}
-
+// collect implements [eventCollector].
+func (c *commandCollector) collect(ctx context.Context, opts *InvokeOpts) (err error) {
+	c.cmds, err = c.producer.Events(ctx, opts)
 	return err
+}
+
+// commands implements [eventCollector].
+func (c commandCollector) commands() []legacy_es.Command {
+	if c.sub == nil {
+		return c.cmds
+	}
+	return append(c.cmds, c.sub.commands()...)
+}
+
+// initSub implements [eventCollector].
+func (c *commandCollector) initSub(executor Executor) eventCollector {
+	c.sub = initEventCollector(c.invoker, c, executor)
+	return c.sub
+}
+
+// parent implements [eventCollector].
+func (c commandCollector) parent() eventCollector {
+	return c.previous
+}
+
+var _ eventCollector = (*commandCollector)(nil)
+
+func initEventCollector(i invoker, parent eventCollector, executor Executor) eventCollector {
+	if _, ok := executor.(*batchExecutor); ok {
+		return &batchCollector{
+			invoker:  i,
+			executor: executor,
+			previous: parent,
+		}
+	}
+	return &commandCollector{
+		invoker:  i,
+		producer: executor.(EventProducer),
+		previous: parent,
+	}
 }

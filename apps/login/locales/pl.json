@@ -159,18 +159,6 @@
     "signInWithAzureAD": "Zaloguj się przez AzureAD",
     "signInWithGithub": "Zaloguj się przez GitHub",
     "signInWithGitlab": "Zaloguj się przez GitLab",
-    "loginSuccess": {
-      "title": "Logowanie udane",
-      "description": "Zostałeś pomyślnie zalogowany!"
-    },
-    "linkingSuccess": {
-      "title": "Konto powiązane",
-      "description": "Pomyślnie powiązałeś swoje konto!"
-    },
-    "registerSuccess": {
-      "title": "Rejestracja udana",
-      "description": "Pomyślnie się zarejestrowałeś!"
-    },
     "loginError": {
       "title": "Logowanie nieudane",
       "description": "Wystąpił błąd podczas próby logowania."
@@ -194,6 +182,23 @@
       "description": "Nie mogliśmy ukończyć procesu rejestracji.",
       "info": "Nie można określić organizacji do rejestracji. Skontaktuj się z administratorem w celu uzyskania pomocy.",
       "backToLogin": "Powrót do logowania"
+    },
+    "processing": {
+      "message": "Przetwarzanie uwierzytelniania...",
+      "noRedirect": "Nie otrzymano przekierowania ani błędu z serwera",
+      "unexpectedError": "Wystąpił nieoczekiwany błąd"
+    },
+    "errors": {
+      "missingParameters": "Brakuje wymaganych parametrów",
+      "missingIdpInfo": "Brak informacji IDP",
+      "idpNotFound": "Dostawca tożsamości nie znaleziony",
+      "linkingNotAllowed": "Łączenie nie jest dozwolone dla tego dostawcy tożsamości",
+      "linkingFailed": "Nie udało się połączyć dostawcy tożsamości z kontem",
+      "autoLinkingFailed": "Nie udało się automatycznie połączyć konta",
+      "userCreationFailed": "Nie udało się utworzyć konta użytkownika",
+      "orgResolutionFailed": "Nie można określić organizacji do rejestracji",
+      "sessionCreationFailed": "Nie można utworzyć sesji lub określić przekierowania",
+      "unknownError": "Wystąpił nieznany błąd"
     }
   },
   "ldap": {
@@ -257,7 +262,23 @@
       "title": "Uwierzytelnij się za pomocą klucza dostępu",
       "description": "Twoje urządzenie poprosi o użycie odcisku palca, rozpoznawania twarzy lub blokady ekranu.",
       "usePassword": "Użyj hasła",
-      "submit": "Kontynuuj"
+      "submit": "Kontynuuj",
+      "errors": {
+        "couldNotRequestChallenge": "Nie można zażądać wyzwania klucza dostępu",
+        "couldNotVerifyPasskey": "Nie można zweryfikować klucza dostępu",
+        "noResponseReceived": "Weryfikacja klucza dostępu nie powiodła się - nie otrzymano odpowiedzi",
+        "noRedirectProvided": "Weryfikacja klucza dostępu zakończona, ale nie podano przekierowania",
+        "couldNotRetrievePasskey": "Wystąpił błąd podczas pobierania klucza dostępu",
+        "verificationCancelled": "Weryfikacja klucza dostępu została anulowana",
+        "verificationFailed": "Wystąpił błąd podczas weryfikacji klucza dostępu",
+        "couldNotFindSession": "Nie można znaleźć sesji",
+        "couldNotUpdateSession": "Nie można zaktualizować sesji",
+        "userNotFound": "Użytkownik nie znaleziony w systemie",
+        "couldNotDetermineRedirect": "Nie można określić adresu URL przekierowania po weryfikacji klucza dostępu",
+        "couldNotSetSession": "Nie można ustawić sesji",
+        "couldNotGetUser": "Nie można pobrać danych użytkownika",
+        "couldNotRetrieveSessionCookie": "Nie można pobrać pliku cookie sesji"
+      }
     },
     "set": {
       "title": "Skonfiguruj klucz dostępu",
@@ -430,6 +451,7 @@
     "unknownContext": "Nie udało się pobrać kontekstu użytkownika. Upewnij się, że najpierw wprowadziłeś nazwę użytkownika lub podałeś login jako parametr wyszukiwania.",
     "sessionExpired": "Twoja sesja wygasła. Zaloguj się ponownie.",
     "failedLoading": "Nie udało się załadować danych. Spróbuj ponownie.",
-    "tryagain": "Spróbuj ponownie"
+    "tryagain": "Spróbuj ponownie",
+    "couldNotContinueSession": "Nie można kontynuować sesji - brakujące informacje o użytkowniku"
   }
 }

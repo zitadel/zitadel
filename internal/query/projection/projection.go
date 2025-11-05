@@ -104,7 +104,8 @@ var (
 	MembershipFields        *handler.FieldHandler
 	PermissionFields        *handler.FieldHandler
 
-	GroupProjection *handler.Handler
+	GroupProjection      *handler.Handler
+	GroupUsersProjection *handler.Handler
 )
 
 type projection interface {
@@ -211,6 +212,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	// Don't forget to add the new field handler to [ProjectInstanceFields]
 
 	GroupProjection = newGroupProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["groups"]))
+	GroupUsersProjection = newGroupUsersProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["group_users"]))
 
 	InstanceRelationalProjection = newInstanceRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instances_relational"]))
 	OrganizationRelationalProjection = newOrgRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organizations_relational"]))
@@ -403,6 +405,7 @@ func newProjectionsList() {
 		HostedLoginTranslationProjection,
 		OrganizationSettingsProjection,
 		GroupProjection,
+		GroupUsersProjection,
 
 		InstanceRelationalProjection,
 		OrganizationRelationalProjection,

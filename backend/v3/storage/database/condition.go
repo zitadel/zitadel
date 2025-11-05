@@ -250,7 +250,7 @@ func NewTextIgnoreCaseCondition[T Text](col Column, op TextOperation, value T) C
 	}
 }
 
-// NewDateCondition creates a condition that compares a numeric column with a value.
+// NewNumberCondition creates a condition that compares a numeric column with a value.
 func NewNumberCondition[V Number](col Column, op NumberOperation, value V) Condition {
 	return valueCondition{
 		col: col,
@@ -260,7 +260,7 @@ func NewNumberCondition[V Number](col Column, op NumberOperation, value V) Condi
 	}
 }
 
-// NewDateCondition creates a condition that compares a boolean column with a value.
+// NewBooleanCondition creates a condition that compares a boolean column with a value.
 func NewBooleanCondition[V Boolean](col Column, value V) Condition {
 	return valueCondition{
 		col: col,
@@ -319,7 +319,7 @@ func (e *existsCondition) Matches(x any) bool {
 
 // String implements [Condition].
 func (e *existsCondition) String() string {
-	return "unimplemented"
+	return "existsCondition"
 }
 
 // Exists creates a condition that checks for the existence of rows in a subquery.
