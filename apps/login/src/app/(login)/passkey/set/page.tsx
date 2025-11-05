@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
-  const { userId, loginName, prompt, organization, requestId, code, id } = searchParams;
+  const { userId, loginName, prompt, organization, requestId, code, codeId } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -58,10 +58,14 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="set.title" namespace="passkey" />
         </h1>
+
+        <p className="ztdl-p mb-6 block">
+          <Translated i18nKey="set.description" namespace="passkey" />
+        </p>
 
         {session ? (
           <UserAvatar
@@ -78,10 +82,9 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             searchParams={searchParams}
           ></UserAvatar>
         ) : null}
-        <p className="ztdl-p mb-6 block">
-          <Translated i18nKey="set.description" namespace="passkey" />
-        </p>
+      </div>
 
+      <div className="w-full">
         <Alert type={AlertType.INFO}>
           <span>
             <Translated i18nKey="set.info.description" namespace="passkey" />
@@ -111,7 +114,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             organization={organization}
             requestId={requestId}
             code={code}
-            codeId={id}
+            codeId={codeId}
           />
         )}
       </div>

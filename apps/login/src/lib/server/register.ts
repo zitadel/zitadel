@@ -6,11 +6,12 @@ import { create } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksJson, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { cookies, headers } from "next/headers";
-import crypto from "crypto";
-import { completeFlowOrGetUrl } from "../client";
+import { getTranslations } from "next-intl/server";
 import { getServiceUrlFromHeaders } from "../service-url";
 import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
 import { getOrSetFingerprintId } from "../fingerprint";
+import crypto from "crypto";
+import { completeFlowOrGetUrl } from "../client";
 
 type RegisterUserCommand = {
   email: string;
@@ -27,6 +28,7 @@ export type RegisterUserResponse = {
   factors: Factors | undefined;
 };
 export async function registerUser(command: RegisterUserCommand) {
+  const t = await getTranslations("register");
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -40,7 +42,7 @@ export async function registerUser(command: RegisterUserCommand) {
   });
 
   if (!addResponse) {
-    return { error: "Could not create user" };
+    return { error: t("errors.couldNotCreateUser") };
   }
 
   const loginSettings = await getLoginSettings({
@@ -68,7 +70,7 @@ export async function registerUser(command: RegisterUserCommand) {
   });
 
   if (!session || !session.factors?.user) {
-    return { error: "Could not create session" };
+    return { error: t("errors.couldNotCreateSession") };
   }
 
   if (!command.password) {
@@ -104,7 +106,7 @@ export async function registerUser(command: RegisterUserCommand) {
     });
 
     if (!userResponse.user) {
-      return { error: "User not found in the system" };
+      return { error: t("errors.userNotFound") };
     }
 
     const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
@@ -157,6 +159,8 @@ export type registerUserAndLinkToIDPResponse = {
   factors: Factors | undefined;
 };
 export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDPommand) {
+  const t = await getTranslations("register");
+
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -169,7 +173,7 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
   });
 
   if (!addUserResponse) {
-    return { error: "Could not create user" };
+    return { error: t("errors.couldNotCreateUser") };
   }
 
   const loginSettings = await getLoginSettings({
@@ -188,7 +192,7 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
   });
 
   if (!idpLink) {
-    return { error: "Could not link IDP to user" };
+    return { error: t("errors.couldNotLinkIDP") };
   }
 
   const session = await createSessionForIdpAndUpdateCookie({
@@ -199,7 +203,7 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
   });
 
   if (!session || !session.factors?.user) {
-    return { error: "Could not create session" };
+    return { error: t("errors.couldNotCreateSession") };
   }
 
   // const userResponse = await getUserByID({
