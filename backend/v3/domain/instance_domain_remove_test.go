@@ -236,8 +236,17 @@ func TestRemoveInstanceDomainCommand_Execute(t *testing.T) {
 					PrimaryKeyCondition("test-domain.com").
 					Times(1).
 					Return(domainCond)
+				instanceIDCond := database.NewTextCondition(
+					database.NewColumn("instance_domains", "instance_id"),
+					database.TextOperationEqual,
+					"instance-1",
+				)
 				repo.EXPECT().
-					Remove(gomock.Any(), gomock.Any(), domainCond).
+					InstanceIDCondition("instance-1").
+					Times(1).
+					Return(instanceIDCond)
+				repo.EXPECT().
+					Remove(gomock.Any(), gomock.Any(), database.And(instanceIDCond, domainCond)).
 					Times(1).
 					Return(int64(0), removeErr)
 				return repo
@@ -258,8 +267,17 @@ func TestRemoveInstanceDomainCommand_Execute(t *testing.T) {
 					PrimaryKeyCondition("test-domain.com").
 					Times(1).
 					Return(domainCond)
+				instanceIDCond := database.NewTextCondition(
+					database.NewColumn("instance_domains", "instance_id"),
+					database.TextOperationEqual,
+					"instance-1",
+				)
 				repo.EXPECT().
-					Remove(gomock.Any(), gomock.Any(), domainCond).
+					InstanceIDCondition("instance-1").
+					Times(1).
+					Return(instanceIDCond)
+				repo.EXPECT().
+					Remove(gomock.Any(), gomock.Any(), database.And(instanceIDCond, domainCond)).
 					Times(1).
 					Return(int64(0), nil)
 				return repo
@@ -280,8 +298,17 @@ func TestRemoveInstanceDomainCommand_Execute(t *testing.T) {
 					PrimaryKeyCondition("test-domain.com").
 					Times(1).
 					Return(domainCond)
+				instanceIDCond := database.NewTextCondition(
+					database.NewColumn("instance_domains", "instance_id"),
+					database.TextOperationEqual,
+					"instance-1",
+				)
 				repo.EXPECT().
-					Remove(gomock.Any(), gomock.Any(), domainCond).
+					InstanceIDCondition("instance-1").
+					Times(1).
+					Return(instanceIDCond)
+				repo.EXPECT().
+					Remove(gomock.Any(), gomock.Any(), database.And(instanceIDCond, domainCond)).
 					Times(1).
 					Return(int64(2), nil)
 				return repo
@@ -302,8 +329,17 @@ func TestRemoveInstanceDomainCommand_Execute(t *testing.T) {
 					PrimaryKeyCondition("test-domain.com").
 					Times(1).
 					Return(domainCond)
+				instanceIDCond := database.NewTextCondition(
+					database.NewColumn("instance_domains", "instance_id"),
+					database.TextOperationEqual,
+					"instance-1",
+				)
 				repo.EXPECT().
-					Remove(gomock.Any(), gomock.Any(), domainCond).
+					InstanceIDCondition("instance-1").
+					Times(1).
+					Return(instanceIDCond)
+				repo.EXPECT().
+					Remove(gomock.Any(), gomock.Any(), database.And(instanceIDCond, domainCond)).
 					Times(1).
 					Return(int64(1), nil)
 				return repo

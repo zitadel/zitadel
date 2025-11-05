@@ -29,6 +29,10 @@ func (s *Server) AddCustomDomain(ctx context.Context, req *connect.Request[insta
 }
 
 func (s *Server) RemoveCustomDomain(ctx context.Context, req *connect.Request[instance.RemoveCustomDomainRequest]) (*connect.Response[instance.RemoveCustomDomainResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.RemoveCustomDomain(ctx, req)
+	}
+
 	// Removing a custom domain is currently only allowed with system permissions,
 	// so we directly check for them in the auth interceptor and do not check here again.
 	details, err := s.command.RemoveInstanceDomain(ctx, req.Msg.GetCustomDomain())

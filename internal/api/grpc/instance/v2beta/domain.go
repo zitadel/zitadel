@@ -26,6 +26,10 @@ func (s *Server) AddCustomDomain(ctx context.Context, req *connect.Request[insta
 }
 
 func (s *Server) RemoveCustomDomain(ctx context.Context, req *connect.Request[instance.RemoveCustomDomainRequest]) (*connect.Response[instance.RemoveCustomDomainResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.RemoveCustomDomainBeta(ctx, req)
+	}
+
 	details, err := s.command.RemoveInstanceDomain(ctx, req.Msg.GetDomain())
 	if err != nil {
 		return nil, err

@@ -37,7 +37,9 @@ func (r *RemoveInstanceDomainCommand) Events(ctx context.Context, _ *InvokeOpts)
 // Execute implements [Commander].
 func (r *RemoveInstanceDomainCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	instanceRepo := opts.instanceDomainRepo
-	deletedRows, err := instanceRepo.Remove(ctx, opts.DB(), instanceRepo.PrimaryKeyCondition(r.DomainName))
+	// TODO(IAM-Marco): I'm not sure if this is a mistake, but InstanceIDCondition must be passed, otherwise an error is returned.
+	// But instance_id is not a primary key
+	deletedRows, err := instanceRepo.Remove(ctx, opts.DB(), database.And(instanceRepo.InstanceIDCondition(r.InstanceID), instanceRepo.PrimaryKeyCondition(r.DomainName)))
 	if err != nil {
 		// TODO(IAM-Marco): Should we wrap err into zerrors.ThrowInternalError() ?
 		return err

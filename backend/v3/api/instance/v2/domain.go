@@ -45,6 +45,22 @@ func AddCustomDomainBeta(ctx context.Context, request *connect.Request[instance_
 	}, nil
 }
 
+func RemoveCustomDomainBeta(ctx context.Context, request *connect.Request[instance_v2beta.RemoveCustomDomainRequest]) (*connect.Response[instance_v2beta.RemoveCustomDomainResponse], error) {
+	removeCustomDomainCmd := domain.NewRemoveInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetDomain())
+
+	err := domain.Invoke(ctx, removeCustomDomainCmd, domain.WithInstanceDomainRepo(repository.InstanceDomainRepository()))
+	if err != nil {
+		return nil, err
+	}
+
+	return &connect.Response[instance_v2beta.RemoveCustomDomainResponse]{
+		Msg: &instance_v2beta.RemoveCustomDomainResponse{
+			// TODO(IAM-Marco): Return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10881
+			DeletionDate: timestamppb.Now(),
+		},
+	}, nil
+}
+
 // =================
 // v2 endpoints
 // =================
@@ -73,6 +89,22 @@ func AddCustomDomain(ctx context.Context, request *connect.Request[instance_v2.A
 		Msg: &instance_v2.AddCustomDomainResponse{
 			// TODO(IAM-Marco): Return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10881
 			CreationDate: timestamppb.Now(),
+		},
+	}, nil
+}
+
+func RemoveCustomDomain(ctx context.Context, request *connect.Request[instance_v2.RemoveCustomDomainRequest]) (*connect.Response[instance_v2.RemoveCustomDomainResponse], error) {
+	removeCustomDomainCmd := domain.NewRemoveInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetCustomDomain())
+
+	err := domain.Invoke(ctx, removeCustomDomainCmd, domain.WithInstanceDomainRepo(repository.InstanceDomainRepository()))
+	if err != nil {
+		return nil, err
+	}
+
+	return &connect.Response[instance_v2.RemoveCustomDomainResponse]{
+		Msg: &instance_v2.RemoveCustomDomainResponse{
+			// TODO(IAM-Marco): Return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10881
+			DeletionDate: timestamppb.Now(),
 		},
 	}, nil
 }
