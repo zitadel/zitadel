@@ -237,10 +237,12 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 				},
 
 				{
-					Event: user.MachineKeyAddedEventType,
+					Event:  user.MachineKeyAddedEventType,
+					Reduce: p.reduceMachineKeyAdded,
 				},
 				{
-					Event: user.MachineKeyRemovedEventType,
+					Event:  user.MachineKeyRemovedEventType,
+					Reduce: p.reduceMachineKeyRemoved,
 				},
 				// 		{
 				// 			Event:  user.UserV1MFAOTPVerifiedType,
@@ -262,10 +264,10 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 				// 			Event:  user.HumanU2FTokenVerifiedType,
 				// 			Reduce: p.reduceUnsetMFAInitSkipped,
 				// 		},
-				{
-					Event: user.HumanPasswordlessTokenVerifiedType,
-					// Reduce: p.reduceUnsetMFAInitSkipped,
-				},
+				// {
+				// 	Event:  user.HumanPasswordlessTokenVerifiedType,
+				// 	Reduce: p.reduceUnsetMFAInitSkipped,
+				// },
 
 				// Pats only on machines
 
@@ -277,8 +279,6 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.HumanMFAInitSkippedType,
 					Reduce: p.reduceMFAInitSkipped,
 				},
-				// 	},
-				// },
 
 				{
 					Event: user.HumanRefreshTokenAddedType,
@@ -350,6 +350,23 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 				},
 
 				{
+					Event:  user.HumanPasswordlessInitCodeAddedType,
+					Reduce: p.reducePasskeyInitCodeAdded,
+				},
+				{
+					Event:  user.HumanPasswordlessInitCodeCheckFailedType,
+					Reduce: p.reducePasskeyInitCodeCheckFailed,
+				},
+				{
+					Event:  user.HumanPasswordlessInitCodeCheckSucceededType,
+					Reduce: p.reducePasskeyInitCodeCheckSucceeded,
+				},
+				{
+					Event:  user.HumanPasswordlessInitCodeRequestedType,
+					Reduce: p.reducePasskeyInitCodeRequested,
+				},
+
+				{
 					Event:  user.UserIDPLinkAddedType,
 					Reduce: p.reduceIDPLinkAdded,
 				},
@@ -368,6 +385,67 @@ func (p *userRelationalProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  user.UserIDPExternalUsernameChangedType,
 					Reduce: p.reduceIDPLinkUsernameChanged,
+				},
+
+				{
+					Event:  user.HumanMFAOTPAddedType,
+					Reduce: p.reduceTOTPAdded,
+				},
+				{
+					Event:  user.HumanMFAOTPVerifiedType,
+					Reduce: p.reduceTOTPVerified,
+				},
+				{
+					Event:  user.HumanMFAOTPRemovedType,
+					Reduce: p.reduceTOTPRemoved,
+				},
+				{
+					Event:  user.HumanMFAOTPCheckSucceededType,
+					Reduce: p.reduceTOTPCheckSucceeded,
+				},
+				{
+					Event:  user.HumanMFAOTPCheckFailedType,
+					Reduce: p.reduceTOTPCheckFailed,
+				},
+				{
+					Event:  user.HumanOTPSMSAddedType,
+					Reduce: p.reduceOTPSMSEnabled,
+				},
+				{
+					Event:  user.HumanOTPSMSRemovedType,
+					Reduce: p.reduceOTPSMSDisabled,
+				},
+				{
+					Event:  user.HumanOTPSMSCodeAddedType,
+					Reduce: p.reduceOTPSMSCodeAdded,
+				},
+				{
+					Event:  user.HumanOTPSMSCheckSucceededType,
+					Reduce: p.reduceOTPSMSCheckSucceeded,
+				},
+				{
+					Event:  user.HumanOTPSMSCheckFailedType,
+					Reduce: p.reduceOTPSMSCheckFailed,
+				},
+				{
+					Event:  user.HumanOTPEmailAddedType,
+					Reduce: p.reduceOTPEmailEnabled,
+				},
+				{
+					Event:  user.HumanOTPEmailRemovedType,
+					Reduce: p.reduceOTPEmailDisabled,
+				},
+				{
+					Event:  user.HumanOTPEmailCodeAddedType,
+					Reduce: p.reduceOTPEmailCodeAdded,
+				},
+				{
+					Event:  user.HumanOTPEmailCheckSucceededType,
+					Reduce: p.reduceOTPEmailCheckSucceeded,
+				},
+				{
+					Event:  user.HumanOTPEmailCheckFailedType,
+					Reduce: p.reduceOTPEmailCheckFailed,
 				},
 			},
 		},
@@ -932,8 +1010,9 @@ func (p *userRelationalProjection) reduceHumanPhoneVerificationFailed(event even
 		}
 		repo := repository.UserRepository().Human()
 
-		_, err := repo.IncrementFailedPhoneVerificationAttempts(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.SetPhone(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			&domain.VerificationTypeFailed{},
 		)
 		return err
 	}), nil
@@ -1029,8 +1108,9 @@ func (p *userRelationalProjection) reduceHumanEmailVerificationFailed(event even
 		}
 		repo := repository.UserRepository().Human()
 
-		_, err := repo.IncrementFailedEmailOTPAttempts(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.SetEmail(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			&domain.VerificationTypeFailed{},
 		)
 		return err
 	}), nil
@@ -1155,10 +1235,9 @@ func (p *userRelationalProjection) reduceHumanPasswordCheckSucceeded(event event
 		}
 		repo := repository.HumanUserRepository()
 
-		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.SetPassword(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.ResetFailedPasswordAttempts(),
-			repo.SetUpdatedAt(e.CreatedAt()),
+			&domain.VerificationTypeSuccessful{},
 		)
 		return err
 	}), nil
@@ -1176,10 +1255,9 @@ func (p *userRelationalProjection) reduceHumanPasswordCheckFailed(event eventsto
 		}
 		repo := repository.HumanUserRepository()
 
-		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.SetPassword(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.IncrementFailedPasswordAttempts(),
-			repo.SetUpdatedAt(e.CreatedAt()),
+			&domain.VerificationTypeFailed{},
 		)
 		return err
 	}), nil
@@ -1218,7 +1296,7 @@ func (p *userRelationalProjection) reduceMachineSecretSet(event eventstore.Event
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.UserRepository().Machine()
+		repo := repository.MachineUserRepository()
 
 		secret := crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)
 
@@ -1269,6 +1347,49 @@ func (p *userRelationalProjection) reduceMachineSecretRemoved(event eventstore.E
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.SetSecret(nil),
 			repo.SetUpdatedAt(e.CreationDate()),
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceMachineKeyAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.MachineKeyAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.MachineKeyAddedEventType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.MachineKeyRepository()
+
+		return repo.Add(ctx, v3_sql.SQLTx(tx),
+			&domain.MachineKey{
+				ID:        e.KeyID,
+				Type:      mapMachineKeyType(e.KeyType),
+				PublicKey: e.PublicKey,
+				CreatedAt: e.CreatedAt(),
+				ExpiresAt: &e.ExpirationDate,
+			},
+		)
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceMachineKeyRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.MachineKeyRemovedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.MachineKeyRemovedEventType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.MachineKeyRepository()
+
+		_, err := repo.Remove(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.KeyID),
 		)
 		return err
 	}), nil
@@ -1573,6 +1694,89 @@ func (p *userRelationalProjection) reducePasskeyRemoved(event eventstore.Event) 
 	}), nil
 }
 
+func (p *userRelationalProjection) reducePasskeyInitCodeAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanPasswordlessInitCodeAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.HumanPasswordlessInitCodeAddedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.PasskeyRepository()
+		_, err := repo.SetInitializationVerification(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.ID),
+			&domain.VerificationTypeInitCode{
+				Code:      e.Code.Crypted,
+				CreatedAt: e.CreatedAt(),
+				Expiry:    &e.Expiry,
+			},
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reducePasskeyInitCodeCheckFailed(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanPasswordlessInitCodeCheckFailedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.HumanPasswordlessInitCodeCheckFailedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.PasskeyRepository()
+		_, err := repo.IncrementFailedInitializationAttempts(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.ID),
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reducePasskeyInitCodeCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanPasswordlessInitCodeCheckSucceededEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.HumanPasswordlessInitCodeCheckSucceededType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.PasskeyRepository()
+		_, err := repo.SetInitializationVerification(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.ID),
+			&domain.VerificationTypeSuccessful{VerifiedAt: e.CreatedAt()},
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reducePasskeyInitCodeRequested(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanPasswordlessInitCodeRequestedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type %s", user.HumanPasswordlessInitCodeRequestedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.PasskeyRepository()
+		_, err := repo.SetInitializationVerification(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.ID),
+			&domain.VerificationTypeInitCode{
+				Code:      e.Code.Crypted,
+				CreatedAt: e.CreatedAt(),
+				Expiry:    &e.Expiry,
+			},
+		)
+		return err
+	}), nil
+}
+
 // func (p *userRelationalProjection) reduceUnsetMFAInitSkipped(e eventstore.Event) (*handler.Statement, error) {
 // 	switch e.(type) {
 // 	default:
@@ -1719,6 +1923,203 @@ func (p *userRelationalProjection) reduceIDPLinkUsernameChanged(event eventstore
 	}), nil
 }
 
+func (p *userRelationalProjection) reduceTOTPAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanOTPAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanMFAOTPAddedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+
+		_, err := repo.SetTOTP(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			&domain.VerificationTypeInitCode{
+				Value:     gu.Ptr(string(e.Secret.Crypted)),
+				CreatedAt: e.CreatedAt(),
+				Code:      e.Secret.Crypted,
+			},
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceTOTPVerified(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanOTPVerifiedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanMFAOTPVerifiedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+
+		_, err := repo.SetTOTP(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			&domain.VerificationTypeSuccessful{VerifiedAt: e.CreatedAt()},
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceTOTPCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanOTPCheckSucceededEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanMFAOTPCheckSucceededType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.SetTOTPLastSuccessfulCheckedAt(e.CreatedAt()),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceTOTPCheckFailed(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanOTPCheckFailedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanMFAOTPCheckFailedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.IncrementFailedTOTPAttempts(),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceOTPSMSEnabled(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanOTPSMSAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanOTPSMSAddedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.SetPhoneOTPEnabled(true),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceOTPSMSDisabled(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanOTPSMSRemovedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanOTPSMSRemovedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.SetPhoneOTPEnabled(false),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceOTPSMSCodeAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanOTPSMSCodeAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanOTPSMSCodeAddedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+
+		_, err := repo.SetPhoneOTPVerification(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			&domain.VerificationTypeInitCode{
+				Code:      e.Code.Crypted,
+				CreatedAt: e.CreatedAt(),
+				Expiry:    &e.Expiry,
+			},
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceOTPSMSCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanOTPSMSCheckSucceededEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanOTPSMSCheckSucceededType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+
+		_, err := repo.SetPhoneOTPVerification(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			&domain.VerificationTypeSuccessful{
+				Code:      e.Code.Crypted,
+				CreatedAt: e.CreatedAt(),
+				Expiry:    &e.Expiry,
+			},
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceTOTPRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanOTPRemovedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanMFAOTPRemovedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.RemoveTOTP(),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
+}
+
 func mapHumanGender(gender old_domain.Gender) domain.Gender {
 	switch gender {
 	case old_domain.GenderFemale:
@@ -1740,5 +2141,16 @@ func mapMachineAccessTokenType(tokenType old_domain.OIDCTokenType) domain.Access
 		return domain.AccessTokenTypeJWT
 	default:
 		return domain.AccessTokenTypeUnspecified
+	}
+}
+
+func mapMachineKeyType(keyType old_domain.AuthNKeyType) domain.MachineKeyType {
+	switch keyType {
+	case old_domain.AuthNKeyTypeJSON:
+		return domain.MachineKeyTypeJSON
+	case old_domain.AuthNKeyTypeNONE:
+		return domain.MachineKeyTypeNone
+	default:
+		return domain.MachineKeyTypeUnspecified
 	}
 }

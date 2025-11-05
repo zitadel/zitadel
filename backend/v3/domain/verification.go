@@ -13,14 +13,42 @@ type VerificationType interface {
 	isVerificationType()
 }
 
+type OTPVerificationType interface {
+	isOTPVerificationType()
+}
+
 // VerificationTypeSuccessful indicates that the verification was successful.
-// The Value of the verification is used as the new value to be set.
+// If the Value of the verification is present, it is used as the new value to be set.
 // If VerifiedAt is zero, the current time will be used.
 type VerificationTypeSuccessful struct {
 	VerifiedAt time.Time
 }
 
+// isOTPVerificationType implements [OTPVerificationType].
+func (v *VerificationTypeSuccessful) isOTPVerificationType() {}
+
+// isVerificationType implements [VerificationType].
 func (v *VerificationTypeSuccessful) isVerificationType() {}
+
+var (
+	_ VerificationType    = (*VerificationTypeSuccessful)(nil)
+	_ OTPVerificationType = (*VerificationTypeSuccessful)(nil)
+)
+
+// VerificationTypeFailed indicates that the verification was failed.
+// This can be used to increment the failed attempts counter.
+type VerificationTypeFailed struct{}
+
+// isOTPVerificationType implements [OTPVerificationType].
+func (v *VerificationTypeFailed) isOTPVerificationType() {}
+
+// isVerificationType implements [VerificationType].
+func (v *VerificationTypeFailed) isVerificationType() {}
+
+var (
+	_ VerificationType    = (*VerificationTypeFailed)(nil)
+	_ OTPVerificationType = (*VerificationTypeFailed)(nil)
+)
 
 // VerificationTypeSkipVerification indicates that the verification is skipped.
 // The Value is used as the new value to be set.
@@ -30,11 +58,10 @@ type VerificationTypeSkipVerification struct {
 	Value      string
 }
 
+// isVerificationType implements [VerificationType].
 func (v *VerificationTypeSkipVerification) isVerificationType() {}
 
 var _ VerificationType = (*VerificationTypeSkipVerification)(nil)
-
-var _ VerificationType = (*VerificationTypeSuccessful)(nil)
 
 // VerificationTypeInitCode indicates that a verification is started
 type VerificationTypeInitCode struct {
@@ -46,9 +73,16 @@ type VerificationTypeInitCode struct {
 	Expiry    *time.Duration
 }
 
+// isOTPVerificationType implements [OTPVerificationType.]
+func (v *VerificationTypeInitCode) isOTPVerificationType() {}
+
+// isVerificationType implements [VerificationType.]
 func (v *VerificationTypeInitCode) isVerificationType() {}
 
-var _ VerificationType = (*VerificationTypeInitCode)(nil)
+var (
+	_ VerificationType    = (*VerificationTypeInitCode)(nil)
+	_ OTPVerificationType = (*VerificationTypeInitCode)(nil)
+)
 
 // VerificationTypeUpdate indicates that a verification is updated.
 // The fields that are non-nil will be updated.

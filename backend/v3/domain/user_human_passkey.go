@@ -61,4 +61,8 @@ type PasskeyRepository interface {
 	Add(ctx context.Context, client database.QueryExecutor, passkey *Passkey) error
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+
+	SetInitializationVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
+	GetInitializationVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
+	IncrementFailedInitializationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }

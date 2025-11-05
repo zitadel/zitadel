@@ -94,11 +94,12 @@ type humanChanges interface {
 	SetAvatarKey(key *string) database.Change
 
 	SetPasswordChangeRequired(required bool) database.Change
-	IncrementFailedPasswordAttempts() database.Change
-	ResetFailedPasswordAttempts() database.Change
 
 	SetMFAInitSkippedAt(skippedAt *time.Time) database.Change
+	SetEmailOTPEnabled(enabled bool) database.Change
+	SetSMSOTPEnabled(enabled bool) database.Change
 
+	RemoveTOTP() database.Change
 	RemovePhone() database.Change
 }
 
@@ -114,15 +115,16 @@ type HumanUserRepository interface {
 	GetPasswordVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
 	IncrementPasswordVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 
-	SetEmail(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
+	SetEmail(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (uint64, error)
 	GetEmailVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
-	IncrementFailedEmailVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+	SetEmailOTP(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification OTPVerificationType) (int64, error)
 	GetEmailOTPVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
-	IncrementFailedEmailOTPAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 
 	SetPhone(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
 	GetPhoneVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
-	IncrementFailedPhoneVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
-	GetPhoneOTPVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
-	IncrementFailedPhoneOTPAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+	SetSMSOTP(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification OTPVerificationType) (int64, error)
+	GetSMSOTPVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
+
+	SetTOTP(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
+	GetTOTPVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
 }

@@ -93,6 +93,22 @@ CREATE INDEX idx_machine_name ON zitadel.machine_users (instance_id, name);
 CREATE INDEX idx_machine_user_username ON zitadel.machine_users (instance_id, username);
 CREATE INDEX idx_machine_user_username_insensitive ON zitadel.machine_users (instance_id, lower(username));
 
+CREATE TABLE zitadel.machine_keys(
+    instance_id TEXT NOT NULL
+    , id TEXT NOT NULL
+
+    , user_id TEXT NOT NULL
+
+    , created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    , expires_at TIMESTAMPTZ
+
+    , type SMALLINT NOT NULL CHECK (type >= 0)
+    , public_key BYTES NOT NULL
+
+    , PRIMARY KEY (instance_id, id)
+    , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.machine_users(instance_id, id) ON DELETE CASCADE
+);
+
 -- human user
 CREATE TABLE zitadel.human_users(
     first_name TEXT CHECK (first_name <> '')
@@ -112,13 +128,20 @@ CREATE TABLE zitadel.human_users(
 
     , email TEXT
     , unverified_email_id TEXT
-    , email_verified_at TIMESTAMPTZ
+    , email_otp_enabled BOOLEAN NOT NULL DEFAULT FALSE
+    , email_otp_last_verified_at TIMESTAMPTZ
     , email_otp_verification_id TEXT
 
     , phone TEXT
     , unverified_phone_id TEXT
-    , phone_verified_at TIMESTAMPTZ
+    , phone_otp_enabled BOOLEAN NOT NULL DEFAULT FALSE
+    , phone_otp_last_verified_at TIMESTAMPTZ
     , phone_otp_verification_id TEXT
+
+    , totp_secret BYTES
+    , totp_verified_at TIMESTAMPTZ
+    , totp_last_successful_checked_at TIMESTAMPTZ
+    , failed_totp_attempts SMALLINT DEFAULT 0 CHECK (failed_totp_attempts >= 0)
 
     , PRIMARY KEY (instance_id, organization_id, id)
     , FOREIGN KEY (instance_id, organization_id) REFERENCES zitadel.organizations
@@ -133,7 +156,6 @@ CREATE TABLE zitadel.human_users(
     , UNIQUE (phone_verification_id) WHERE phone_verification_id IS NOT NULL
     , UNIQUE (email_otp_verification_id) WHERE email_otp_verification_id IS NOT NULL
     , UNIQUE (phone_otp_verification_id) WHERE phone_otp_verification_id IS NOT NULL
-
 ) INHERITS (zitadel.users);
 
 CREATE UNIQUE INDEX ON zitadel.human_users(instance_id, organization_id, username) WHERE username_org_unique IS TRUE; --TODO(adlerhurst): does that work if a username is already present on a user without org unique?
@@ -184,11 +206,6 @@ CREATE TYPE zitadel.passkey_type AS ENUM (
     , 'u2f'
 );
 
-CREATE TYPE zitadel.passkey_state AS ENUM (
-    'unverified'
-    , 'verified'
-);
-
 CREATE TABLE zitadel.human_passkeys(
     instance_id TEXT NOT NULL
     , token_id TEXT NOT NULL
@@ -197,6 +214,9 @@ CREATE TABLE zitadel.human_passkeys(
 
     , created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     , updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    , verified_at TIMESTAMPTZ
+
+    , init_verification_id TEXT
 
     , type zitadel.passkey_type NOT NULL
     , name TEXT NOT NULL CHECK (name <> '')
@@ -206,6 +226,7 @@ CREATE TABLE zitadel.human_passkeys(
 
     , PRIMARY KEY (instance_id, token_id)
     , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users(instance_id, id) ON DELETE CASCADE
+    , FOREIGN KEY (instance_id, init_verification_id) REFERENCES zitadel.verifications(instance_id, id) ON DELETE SET NULL (init_verification_id)
 );
 
 CREATE TABLE zitadel.human_identity_provider_links(
