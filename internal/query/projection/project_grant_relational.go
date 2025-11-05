@@ -65,12 +65,12 @@ func (p *projectGrantRelationalProjection) Reducers() []handler.AggregateReducer
 func (p *projectGrantRelationalProjection) reduceProjectGrantAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantAddedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInternalf(nil, "HANDL-Oox5e", "reduce.wrong.event.type %s", project.GrantAddedType)
+		return nil, zerrors.ThrowInternalf(nil, "HANDL-5l2bWQrkKf", "reduce.wrong.event.type %s", project.GrantAddedType)
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-kGokE", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5w96sjaQ16", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.ProjectGrantRepository()
 		if err := repo.Create(ctx, v3_sql.SQLTx(tx), &repoDomain.ProjectGrant{
@@ -106,12 +106,12 @@ func (p *projectGrantRelationalProjection) reduceProjectGrantAdded(event eventst
 func (p *projectGrantRelationalProjection) reduceProjectGrantChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantChangedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Oox5e", "reduce.wrong.event.type %s", project.GrantChangedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-I2ciunHcy7", "reduce.wrong.event.type %s", project.GrantChangedType)
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-kGokE", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-ANaKzWKAUc", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.ProjectGrantRepository().Role()
 		roles, err := repo.List(ctx, v3_sql.SQLTx(tx),
@@ -156,12 +156,12 @@ func (p *projectGrantRelationalProjection) reduceProjectGrantChanged(event event
 func (p *projectGrantRelationalProjection) reduceProjectGrantCascadeChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantCascadeChangedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Oox5e", "reduce.wrong.event.type %s", project.GrantCascadeChangedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-osXtu6jnWa", "reduce.wrong.event.type %s", project.GrantCascadeChangedType)
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-kGokE", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-aI2o6NlWpv", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.ProjectGrantRepository().Role()
 		if _, err := repo.Remove(ctx, v3_sql.SQLTx(tx),
@@ -192,13 +192,13 @@ func (p *projectGrantRelationalProjection) reduceProjectGrantCascadeChanged(even
 func (p *projectGrantRelationalProjection) reduceProjectGrantDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantDeactivateEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Oox5e", "reduce.wrong.event.type %s", project.GrantDeactivatedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-XraL17MUkr", "reduce.wrong.event.type %s", project.GrantDeactivatedType)
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
 		repo := repository.ProjectGrantRepository()
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-kGokE", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rIjAqCzj67", "reduce.wrong.db.pool %T", ex)
 		}
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.GrantID),
@@ -212,13 +212,13 @@ func (p *projectGrantRelationalProjection) reduceProjectGrantDeactivated(event e
 func (p *projectGrantRelationalProjection) reduceProjectGrantReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantReactivatedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-oof4U", "reduce.wrong.event.type %s", project.GrantReactivatedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-vGUHp6uHJ7", "reduce.wrong.event.type %s", project.GrantReactivatedType)
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
 		repo := repository.ProjectGrantRepository()
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-kGokE", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-8milgIP7BS", "reduce.wrong.db.pool %T", ex)
 		}
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.GrantID),
@@ -232,13 +232,13 @@ func (p *projectGrantRelationalProjection) reduceProjectGrantReactivated(event e
 func (p *projectGrantRelationalProjection) reduceProjectGrantRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantRemovedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Xae7w", "reduce.wrong.event.type %s", project.GrantRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-MVPgtdg1w5", "reduce.wrong.event.type %s", project.GrantRemovedType)
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
 		repo := repository.ProjectGrantRepository()
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-kGokE", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-gYyqxBv5d0", "reduce.wrong.db.pool %T", ex)
 		}
 		_, err := repo.Delete(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.GrantID),
@@ -250,13 +250,13 @@ func (p *projectGrantRelationalProjection) reduceProjectGrantRemoved(event event
 func (p *projectGrantRelationalProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Xae7w", "reduce.wrong.event.type %s", project.ProjectRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-cG9c3iJONp", "reduce.wrong.event.type %s", project.ProjectRemovedType)
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
 		repo := repository.ProjectGrantRepository()
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-kGokE", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-UbYFa8ih8F", "reduce.wrong.db.pool %T", ex)
 		}
 		_, err := repo.Delete(ctx, v3_sql.SQLTx(tx),
 			database.And(

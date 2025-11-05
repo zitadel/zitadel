@@ -58,8 +58,8 @@ func (p projectGrantRole) InstanceIDCondition(instanceID string) database.Condit
 	return database.NewTextCondition(p.InstanceIDColumn(), database.TextOperationEqual, instanceID)
 }
 
-func (p projectGrantRole) GrantIDCondition(instanceID string) database.Condition {
-	return database.NewTextCondition(p.GrantIDColumn(), database.TextOperationEqual, instanceID)
+func (p projectGrantRole) GrantIDCondition(grantID string) database.Condition {
+	return database.NewTextCondition(p.GrantIDColumn(), database.TextOperationEqual, grantID)
 }
 
 func (p projectGrantRole) KeyCondition(key string) database.Condition {

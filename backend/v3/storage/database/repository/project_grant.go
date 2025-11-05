@@ -59,11 +59,11 @@ func (projectGrant) Create(ctx context.Context, client database.QueryExecutor, p
 }
 
 func (p projectGrant) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	return updateOne[projectGrant](ctx, client, p, condition, changes...)
+	return updateOne(ctx, client, p, condition, changes...)
 }
 
 func (p projectGrant) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	return deleteOne[projectGrant](ctx, client, p, condition)
+	return deleteOne(ctx, client, p, condition)
 }
 
 // -------------------------------------------------------------
@@ -128,7 +128,6 @@ func (projectGrant) unqualifiedTableName() string {
 	return "project_grants"
 }
 
-// PrimaryKeyColumns implements the [pkRepository] interface
 func (p projectGrant) PrimaryKeyColumns() []database.Column {
 	return []database.Column{
 		p.InstanceIDColumn(),

@@ -1,2 +1,2 @@
-DROP TABLE CREATE TABLE zitadel.project_grant_roles;
-DROP TABLE CREATE TABLE zitadel.project_grants;
+DROP TABLE IF EXISTS zitadel.project_grant_roles;
+DROP TABLE IF EXISTS zitadel.project_grants;

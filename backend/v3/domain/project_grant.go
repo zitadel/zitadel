@@ -44,6 +44,8 @@ type projectGrantColumns interface {
 	CreatedAtColumn() database.Column
 	// UpdatedAtColumn returns the column for the updated at field.
 	UpdatedAtColumn() database.Column
+	// StateColumn returns the column for the state field.
+	StateColumn() database.Column
 }
 
 type projectGrantConditions interface {
@@ -135,6 +137,9 @@ type projectGrantRoleConditions interface {
 
 type projectGrantRoleChanges interface{}
 
+// ProjectGrantRoleRepository manages project grants roles.
+//
+//go:generate mockgen -typed -package domainmock -destination ./mock/project_grant_role.mock.go . ProjectGrantRoleRepository
 type ProjectGrantRoleRepository interface {
 	projectGrantRoleColumns
 	projectGrantRoleConditions

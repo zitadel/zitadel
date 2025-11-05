@@ -18,7 +18,6 @@ CREATE TABLE zitadel.project_grants(
 
     , PRIMARY KEY (instance_id, id)
 
-    -- we need both orgs because a project id is unique on org level
     , FOREIGN KEY (instance_id, granting_organization_id) REFERENCES zitadel.organizations(instance_id, id) ON DELETE CASCADE
     , FOREIGN KEY (instance_id, granted_organization_id) REFERENCES zitadel.organizations(instance_id, id) ON DELETE CASCADE
     , FOREIGN KEY (instance_id, project_id) REFERENCES zitadel.projects(instance_id, id) ON DELETE CASCADE
