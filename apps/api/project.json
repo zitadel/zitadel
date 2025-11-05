@@ -35,7 +35,7 @@
             }
         },
         "prod": {
-            "description": "Runs the Go-based API backend in production mode ",
+            "description": "Runs the Go-based API backend in production mode",
             "continuous": true,
             "dependsOn": [
                 "build"
@@ -44,7 +44,7 @@
             "options": {
                 "parallel": false,
                 "commands": [
-                    "./.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel} start-from-init --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters"
+                    "bash -c 'DEFAULT_ZITADEL_BINARY=\"zitadel\"; if [ \"$(go env GOOS)\" = \"windows\" ]; then DEFAULT_ZITADEL_BINARY=\"zitadel.exe\"; fi; ./.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-$DEFAULT_ZITADEL_BINARY} start-from-init --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters'"
                 ]
             },
             "defaultConfiguration": "default",
@@ -72,7 +72,7 @@
                 "generate",
                 "build-console"
             ],
-            "command": "bash -c 'EXT=\"\"; if [ \"$(go env GOOS)\" = \"windows\" ]; then EXT=\".exe\"; fi; echo \"Building for $(go env GOOS)-$(go env GOARCH)...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel$EXT -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\") -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_RELEASE_VERSION}\"'",
+            "command": "bash -c 'EXT=\"\"; if [ \"$(go env GOOS)\" = \"windows\" ]; then EXT=\".exe\"; fi; DATE=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\"); echo \"Building for $(go env GOOS)-$(go env GOARCH)...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel$EXT -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=${DATE} -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_RELEASE_VERSION:-${DATE}}\"'",
             "inputs": [
                 {
                     "runtime": "go env GOOS"
@@ -86,7 +86,8 @@
                 "runtime"
             ],
             "outputs": [
-                "{workspaceRoot}/.artifacts/bin/*/*/zitadel"
+                "{workspaceRoot}/.artifacts/bin/*/*/zitadel",
+                "{workspaceRoot}/.artifacts/bin/*/*/zitadel.exe"
             ]
         },
         "generate": {
