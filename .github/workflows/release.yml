@@ -22,10 +22,8 @@ on:
 
 jobs:
   release:
-    runs-on: ubuntu-22.04
-    permissions:
-      contents: write
-      packages: write
+    name: Release
+    runs-on: depot-ubuntu-22.04-16
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4

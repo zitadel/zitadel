@@ -27,12 +27,12 @@
           {
             "forwardAllArgs": false,
             "prefix": "[only on zitadel/zitadel release] ",
-            "command": "bash -c \"[[ \\\"${NX_DRY_RUN}\\\" == \\\"true\\\" ]] || [[ \\\"${ZITADEL_RELEASE_GITHUB_REPO}\\\" != \\\"zitadel/zitadel\\\" ]] || gh workflow -R zitadel/homebrew-tap run update.yml -f runId=${RUN_ID} -f version=${ZITADEL_RELEASE_VERSION}\""
+            "command": "bash -c \"[[ \\\"${NX_DRY_RUN}\\\" == \\\"true\\\" ]] || [[ \\\"${ZITADEL_RELEASE_GITHUB_REPO}\\\" != \\\"zitadel/zitadel\\\" ]] || gh workflow --repo zitadel/homebrew-tap run update.yml -f runId=${RUN_ID} -f version=${ZITADEL_RELEASE_VERSION}\""
           },
           {
             "forwardAllArgs": false,
             "prefix": "[only on zitadel/zitadel release] ",
-            "command": "bash -c \"[[ \\\"${NX_DRY_RUN}\\\" == \\\"true\\\" ]] || [[ \\\"${ZITADEL_RELEASE_GITHUB_REPO}\\\" != \\\"zitadel/zitadel\\\" ]] || gh workflow -R zitadel/zitadel-charts run bump.yml\""
+            "command": "bash -c \"[[ \\\"${NX_DRY_RUN}\\\" == \\\"true\\\" ]] || [[ \\\"${ZITADEL_RELEASE_GITHUB_REPO}\\\" != \\\"zitadel/zitadel\\\" ]] || gh workflow --repo zitadel/zitadel-charts run bump.yml\""
           }
         ]
       }
