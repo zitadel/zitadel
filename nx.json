@@ -83,5 +83,10 @@
       ],
       "cache": true
     }
-  }
+  },
+  "plugins": [
+    {
+      "plugin": "@nx/js/typescript"
+    }
+  ]
 }
