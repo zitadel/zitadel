@@ -484,22 +484,6 @@ func (s *settingsRelationalProjection) reduceMFAAdded(event eventstore.Event) (*
 
 		settingsRepo := repository.LoginRepository()
 
-		// setting := &domain.LoginSetting{
-		// 	Setting: &domain.Setting{
-		// 		InstanceID: policyEvent.Agg.InstanceID,
-		// 		OrgID:      orgId,
-		// 		OwnerType:  ownerType,
-		// 	},
-		// }
-
-		// if slices.Contains(setting.Settings.MFAType, domain.MultiFactorType(policyEvent.MFAType)) {
-		// 	return nil
-		// }
-
-		// setting.Settings.MFAType = append(setting.Settings.MFAType, domain.MultiFactorType(policyEvent.MFAType))
-
-		// err := settingsRepo.Set(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetUpdatedAt(&policyEvent.Creation))
-
 		change := settingsRepo.AddMFAType(domain.MultiFactorType(policyEvent.MFAType))
 
 		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
