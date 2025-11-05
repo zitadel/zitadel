@@ -8,7 +8,7 @@
  * - Main release orchestration logic
  */
 
-import { execSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
 import { releaseVersion, releaseChangelog, releasePublish } from 'nx/release';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import {
@@ -25,6 +25,7 @@ import {
 // Mock external dependencies
 vi.mock('node:child_process', () => ({
   execSync: vi.fn(),
+  execFileSync: vi.fn(),
 }));
 
 vi.mock('nx/release', () => ({
@@ -140,7 +141,7 @@ describe('setupWorkspaceVersionEnvironmentVariables', () => {
       { ...mockGitInfo, branch: 'v3.x' },
       '3.0.2'
     );
-    
+
     expect(process.env.ZITADEL_RELEASE_VERSION).toBe('v3.0.2');
   });
 
@@ -182,41 +183,40 @@ describe('executeDockerBuild', () => {
   });
 
   test('includes the release bake file', () => {
-    const mockExecSync = vi.mocked(execSync);
+    const mockExecFileSync = vi.mocked(execFileSync);
 
     executeDockerBuild(false, false);
 
-    const calls = mockExecSync.mock.calls.map(call => call[0] as string);
-    expect(calls.every(call => call.includes('--file release/docker-bake-release.hcl'))).toBe(true);
+    const calls = mockExecFileSync.mock.calls.map(call => call[1] as Array<string>);
+    expect(calls.every(call => call.find(arg => arg.includes('release/docker-bake-release.hcl')))).toBeTruthy();
   });
 
   test('includes --push flag when dryRun is false', () => {
-    const mockExecSync = vi.mocked(execSync);
+    const mockExecFileSync = vi.mocked(execFileSync);
 
     executeDockerBuild(false, false);
 
-    const calls = mockExecSync.mock.calls.map(call => call[0] as string);
-    expect(calls.every(call => call.includes('--push'))).toBe(true);
+    const calls = mockExecFileSync.mock.calls.map(call => call[1] as Array<string>);
+    expect(calls.every(args => args.find(arg => arg.includes('--push')))).toBeTruthy();
   });
 
   test('includes api-debug target for conventional commits', () => {
-    const mockExecSync = vi.mocked(execSync);
+    const mockExecFileSync = vi.mocked(execFileSync);
 
     executeDockerBuild(true, false);
 
-    expect(mockExecSync).toHaveBeenCalledWith(
-      expect.stringContaining('api-debug'),
-      expect.any(Object)
-    );
+    const calls = mockExecFileSync.mock.calls.map(call => call[1] as Array<string>);
+    expect(calls.find(args => args.find(arg => arg.includes('api-debug')))).toBeTruthy();
   });
 
-  test('passes environment variables to execSync', () => {
-    const mockExecSync = vi.mocked(execSync);
+  test('passes environment variables to execFileSync', () => {
+    const mockExecFileSync = vi.mocked(execFileSync);
 
     executeDockerBuild(false, false);
 
-    expect(mockExecSync).toHaveBeenCalledWith(
+    expect(mockExecFileSync).toHaveBeenCalledWith(
       expect.any(String),
+      expect.any(Array<String>),
       expect.objectContaining({
         stdio: 'inherit',
         env: process.env,
@@ -227,7 +227,7 @@ describe('executeDockerBuild', () => {
 
 describe('parseReleaseOptions', () => {
 
-  const githubRepo = ['--githubRepo', 'some/repo']; 
+  const githubRepo = ['--githubRepo', 'some/repo'];
 
   test('parses githubRepo option', async () => {
     const options = await parseReleaseOptions(githubRepo);
@@ -360,7 +360,7 @@ describe('executeRelease', () => {
   const mockOptions: ReleaseOptions = {
     dryRun: false,
     verbose: false,
-    githubRepo: 'zitadel/zitadel',    
+    githubRepo: 'zitadel/zitadel',
   };
 
   test('returns 0 for non-conventional commits after docker build', async () => {

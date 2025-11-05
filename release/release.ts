@@ -240,7 +240,7 @@ export async function executeRelease(
 
   const { workspaceVersion, projectsVersionData } = await releaseVersion({
     dryRun: options.dryRun,
-    verbose: options.verbose,    
+    verbose: options.verbose,
   });
 
   setupWorkspaceVersionEnvironmentVariables(options, gitInfo, workspaceVersion);
@@ -260,7 +260,7 @@ export async function executeRelease(
     verbose: options.verbose,
     tag: process.env[isLatestEnvVar] == 'true' ? 'latest' : gitInfo.branch.replaceAll('.', '-'),
   });
-  
+
   const code = Object.values(publishResults).every((result) => result.code === 0) ? 0 : 1;
   if (code === 0) {
     console.log(`Release process completed successfully for version ${workspaceVersion}. Resetting changed files.`);
