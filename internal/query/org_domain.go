@@ -55,7 +55,7 @@ func NewOrgDomainVerifiedSearchQuery(verified bool) (SearchQuery, error) {
 	return NewBoolQuery(OrgDomainIsVerifiedCol, verified)
 }
 
-func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearchQueries, withOwnerRemoved bool) (domains *Domains, err error) {
+func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearchQueries, withOwnerRemoved, withPermissionCheck bool) (domains *Domains, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -64,9 +64,11 @@ func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearch
 	if !withOwnerRemoved {
 		eq[OrgDomainOwnerRemovedCol.identifier()] = false
 	}
-	// We always use the permission v2 check and don't check the feature flag, since it's stable enough to work
-	// in this case and using the old checks only adds more latency, but no benefit.
-	query = orgDomainPermissionCheckV2(ctx, query, queries)
+	if withPermissionCheck {
+		// We always use the permission v2 check and don't check the feature flag, since it's stable enough to work
+		// in this case and using the old checks only adds more latency, but no benefit.
+		query = orgDomainPermissionCheckV2(ctx, query, queries)
+	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-ZRfj1", "Errors.Query.SQLStatement")

@@ -83,7 +83,7 @@ func (s *Server) ListOrganizationMetadata(ctx context.Context, request *connect.
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchOrgMetadata(ctx, true, request.Msg.GetOrganizationId(), metadataQueries, false)
+	res, err := s.query.SearchOrgMetadata(ctx, true, request.Msg.GetOrganizationId(), metadataQueries, false, true)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func (s *Server) ListOrganizationDomains(ctx context.Context, req *connect.Reque
 	}
 	queries.Queries = append(queries.Queries, orgIDQuery)
 
-	domains, err := s.query.SearchOrgDomains(ctx, queries, false)
+	domains, err := s.query.SearchOrgDomains(ctx, queries, false, true)
 	if err != nil {
 		return nil, err
 	}
