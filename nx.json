@@ -86,7 +86,8 @@
   },
   "plugins": [
     {
-      "plugin": "@nx/js/typescript"
+      "plugin": "@nx/js/typescript",
+      "exclude": ["benchmark/**"]
     }
   ]
 }
