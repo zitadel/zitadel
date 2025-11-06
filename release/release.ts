@@ -217,6 +217,31 @@ function resetChangedFiles(): void {
 }
 
 /**
+ * Fix GitHub's "latest" designation after Nx creates the release with the hardcoded make_latest=legacy value.
+ * https://github.com/nrwl/nx/blob/master/packages/nx/src/command-line/release/utils/remote-release-clients/github.ts#L405-L406
+ * GitHub's legacy mode after some timeframe uses creation date instead of the semantic version, so backport releases steal the "latest" badge
+ * We need to explicitly set the highest semantic version release as latest
+ */
+function fixGitHubReleaseLatestBadge(options: ReleaseOptions, gitInfo: GitInfo): void {
+  const highestVersionTag = `v${gitInfo.highestVersionBefore}`;
+  const currentVersionTag = process.env[versionEnvVar];
+  const shouldFixLatest = currentVersionTag !== highestVersionTag;
+  if (shouldFixLatest) {
+    console.log(`Correcting GitHub "latest" release badge: moving from ${currentVersionTag} to ${highestVersionTag}`);
+    const cmd = `gh release edit ${highestVersionTag} --latest`;
+    if (options.dryRun) {
+      console.log(`[Dry Run] Would execute command: ${cmd}`);
+      return;
+    }
+    try {
+      execSync(cmd, { stdio: 'inherit' });
+    } catch (error) {
+      console.error(`Failed to update latest release badge to ${highestVersionTag}:`, error);
+    }
+  }
+}
+
+/**
  * Main execution logic for the release process.
  * Returns exit code instead of calling process.exit for testability.
  */
@@ -254,6 +279,8 @@ export async function executeRelease(
     dryRun: options.dryRun,
     verbose: options.verbose,
   });
+
+  fixGitHubReleaseLatestBadge(options, gitInfo);
 
   const publishResults = await releasePublish({
     dryRun: options.dryRun,
