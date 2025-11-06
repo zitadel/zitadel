@@ -249,73 +249,81 @@ func TestAddTrustedDomain(t *testing.T) {
 		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 	})
 
-	tt := []struct {
-		testName          string
-		inputContext      context.Context
-		inputRequest      *instance.AddTrustedDomainRequest
-		expectedErrorMsg  string
-		expectedErrorCode codes.Code
-	}{
-		{
-			testName: "when invalid context should return unauthN error",
-			inputRequest: &instance.AddTrustedDomainRequest{
-				InstanceId: inst.ID(),
-				Domain:     "trusted1",
-			},
-			inputContext:      context.Background(),
-			expectedErrorCode: codes.Unauthenticated,
-			expectedErrorMsg:  "auth header missing",
-		},
-		{
-			testName: "when unauthZ context should return unauthZ error",
-			inputRequest: &instance.AddTrustedDomainRequest{
-				InstanceId: inst.ID(),
-				Domain:     "trusted1",
-			},
-			inputContext:      orgOwnerCtx,
-			expectedErrorCode: codes.PermissionDenied,
-			expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
-		},
-		{
-			testName: "when invalid domain should return invalid argument error",
-			inputRequest: &instance.AddTrustedDomainRequest{
-				InstanceId: inst.ID(),
-				Domain:     " ",
-			},
-			inputContext:      ctxWithSysAuthZ,
-			expectedErrorCode: codes.InvalidArgument,
-			expectedErrorMsg:  "Errors.Invalid.Argument (COMMA-Stk21)",
-		},
-		{
-			testName: "when valid request should return successful response",
-			inputRequest: &instance.AddTrustedDomainRequest{
-				InstanceId: inst.ID(),
-				Domain:     " " + integration.DomainName(),
-			},
-			inputContext: ctxWithSysAuthZ,
-		},
-	}
+	relTableState := integration.RelationalTablesEnableMatrix()
 
-	for _, tc := range tt {
-		t.Run(tc.testName, func(t *testing.T) {
-			t.Cleanup(func() {
+	for _, stateCase := range relTableState {
+		integration.EnsureInstanceFeature(t, ctx, inst, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
+		})
+
+		tt := []struct {
+			testName          string
+			inputContext      context.Context
+			inputRequest      *instance.AddTrustedDomainRequest
+			expectedErrorMsg  string
+			expectedErrorCode codes.Code
+		}{
+			{
+				testName: "when invalid context should return unauthN error",
+				inputRequest: &instance.AddTrustedDomainRequest{
+					InstanceId: inst.ID(),
+					Domain:     "trusted" + integration.DomainName(),
+				},
+				inputContext:      context.Background(),
+				expectedErrorCode: codes.Unauthenticated,
+				expectedErrorMsg:  "auth header missing",
+			},
+			{
+				testName: "when unauthZ context should return unauthZ error",
+				inputRequest: &instance.AddTrustedDomainRequest{
+					InstanceId: inst.ID(),
+					Domain:     "trusted" + integration.DomainName(),
+				},
+				inputContext:      orgOwnerCtx,
+				expectedErrorCode: codes.PermissionDenied,
+				expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
+			},
+			{
+				testName: "when invalid domain should return invalid argument error",
+				inputRequest: &instance.AddTrustedDomainRequest{
+					InstanceId: inst.ID(),
+					Domain:     " ",
+				},
+				inputContext:      ctxWithSysAuthZ,
+				expectedErrorCode: codes.InvalidArgument,
+				expectedErrorMsg:  "Errors.Invalid.Argument",
+			},
+			{
+				testName: "when valid request should return successful response",
+				inputRequest: &instance.AddTrustedDomainRequest{
+					InstanceId: inst.ID(),
+					Domain:     " " + integration.DomainName(),
+				},
+				inputContext: ctxWithSysAuthZ,
+			},
+		}
+
+		for _, tc := range tt {
+			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tc.testName), func(t *testing.T) {
+				t.Cleanup(func() {
+					if tc.expectedErrorMsg == "" {
+						inst.Client.InstanceV2Beta.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{Domain: strings.TrimSpace(tc.inputRequest.Domain)})
+					}
+				})
+
+				// Test
+				res, err := inst.Client.InstanceV2Beta.AddTrustedDomain(tc.inputContext, tc.inputRequest)
+
+				// Verify
+				assert.Equal(t, tc.expectedErrorCode, status.Code(err))
+				assert.Contains(t, status.Convert(err).Message(), tc.expectedErrorMsg)
+
 				if tc.expectedErrorMsg == "" {
-					inst.Client.InstanceV2Beta.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{Domain: strings.TrimSpace(tc.inputRequest.Domain)})
+					assert.NotNil(t, res)
+					assert.NotEmpty(t, res.GetCreationDate())
 				}
 			})
-
-			// Test
-			res, err := inst.Client.InstanceV2Beta.AddTrustedDomain(tc.inputContext, tc.inputRequest)
-
-			// Verify
-			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
-			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
-
-			if tc.expectedErrorMsg == "" {
-				assert.NotNil(t, res)
-				assert.NotEmpty(t, res.GetCreationDate())
-			}
-		})
+		}
 	}
 }
 

@@ -21,7 +21,7 @@ import (
 // =================
 
 func AddCustomDomainBeta(ctx context.Context, request *connect.Request[instance_v2beta.AddCustomDomainRequest]) (*connect.Response[instance_v2beta.AddCustomDomainResponse], error) {
-	addCustomDomainCmd := domain.NewAddInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetDomain())
+	addCustomDomainCmd := domain.NewAddInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetDomain(), domain.DomainTypeCustom)
 	oidcConfigUpdateCmd := domain.NewOIDCConfigurationUpdate(request.Msg.GetDomain(), authz.GetInstance(ctx).ProjectID(), authz.GetInstance(ctx).ConsoleApplicationID())
 
 	batchExec := domain.BatchExecutors(
@@ -85,12 +85,33 @@ func ListCustomDomainsBeta(ctx context.Context, request *connect.Request[instanc
 	}, nil
 }
 
+func AddTrustedDomainBeta(ctx context.Context, request *connect.Request[instance_v2beta.AddTrustedDomainRequest]) (*connect.Response[instance_v2beta.AddTrustedDomainResponse], error) {
+	addTrustedDomainCmd := domain.NewAddInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetDomain(), domain.DomainTypeTrusted)
+
+	err := domain.Invoke(
+		ctx,
+		addTrustedDomainCmd,
+		domain.WithInstanceDomainRepo(repository.InstanceDomainRepository()),
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &connect.Response[instance_v2beta.AddTrustedDomainResponse]{
+		Msg: &instance_v2beta.AddTrustedDomainResponse{
+			// TODO(IAM-Marco): Return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10881
+			CreationDate: timestamppb.Now(),
+		},
+	}, nil
+}
+
 // =================
 // v2 endpoints
 // =================
 
 func AddCustomDomain(ctx context.Context, request *connect.Request[instance_v2.AddCustomDomainRequest]) (*connect.Response[instance_v2.AddCustomDomainResponse], error) {
-	addCustomDomainCmd := domain.NewAddInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetCustomDomain())
+	addCustomDomainCmd := domain.NewAddInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetCustomDomain(), domain.DomainTypeCustom)
 	oidcConfigUpdateCmd := domain.NewOIDCConfigurationUpdate(request.Msg.GetCustomDomain(), authz.GetInstance(ctx).ProjectID(), authz.GetInstance(ctx).ConsoleApplicationID())
 
 	batchExec := domain.BatchExecutors(
@@ -150,6 +171,27 @@ func ListCustomDomains(ctx context.Context, request *connect.Request[instance_v2
 				TotalResult:  uint64(len(customDomains)),
 				AppliedLimit: uint64(request.Msg.GetPagination().GetLimit()),
 			},
+		},
+	}, nil
+}
+
+func AddTrustedDomain(ctx context.Context, request *connect.Request[instance_v2.AddTrustedDomainRequest]) (*connect.Response[instance_v2.AddTrustedDomainResponse], error) {
+	addTrustedDomainCmd := domain.NewAddInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetTrustedDomain(), domain.DomainTypeTrusted)
+
+	err := domain.Invoke(
+		ctx,
+		addTrustedDomainCmd,
+		domain.WithInstanceDomainRepo(repository.InstanceDomainRepository()),
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &connect.Response[instance_v2.AddTrustedDomainResponse]{
+		Msg: &instance_v2.AddTrustedDomainResponse{
+			// TODO(IAM-Marco): Return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10881
+			CreationDate: timestamppb.Now(),
 		},
 	}, nil
 }

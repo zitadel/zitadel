@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dbmock"
 	noopdb "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/noop"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -33,9 +34,15 @@ func TestAddInstanceDomainCommand_Validate(t *testing.T) {
 		expectedError      error
 	}{
 		{
-			testName:        "when no name shuld return invalid argument error",
+			testName:        "when no name should return invalid argument error",
 			inputInstanceID: " ",
 			inputDomainName: " ",
+			expectedError:   zerrors.ThrowInvalidArgument(nil, "DOM-jieuM8", "Errors.Invalid.Argument"),
+		},
+		{
+			testName:        "when name too long should return invalid argument error",
+			inputInstanceID: " ",
+			inputDomainName: "domain.is.to.loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong",
 			expectedError:   zerrors.ThrowInvalidArgument(nil, "DOM-jieuM8", "Errors.Invalid.Argument"),
 		},
 		{
@@ -164,7 +171,7 @@ func TestAddInstanceDomainCommand_Validate(t *testing.T) {
 			// Given
 			ctx := authz.NewMockContext("instance-1", "org-1", "")
 			ctrl := gomock.NewController(t)
-			cmd := domain.NewAddInstanceDomainCommand(tc.inputInstanceID, tc.inputDomainName)
+			cmd := domain.NewAddInstanceDomainCommand(tc.inputInstanceID, tc.inputDomainName, domain.DomainTypeCustom)
 
 			opts := &domain.InvokeOpts{
 				Invoker: domain.NewTransactionInvoker(nil),
@@ -185,24 +192,56 @@ func TestAddInstanceDomainCommand_Validate(t *testing.T) {
 
 func TestAddInstanceDomainCommand_Events(t *testing.T) {
 	t.Parallel()
-	// Given
-	instanceID := "instance-1"
-	domainName := "test.domain"
-	ctx := authz.NewMockContext(instanceID, "org-1", "")
-	cmd := domain.NewAddInstanceDomainCommand(instanceID, domainName)
 
-	// When
-	events, err := cmd.Events(ctx, &domain.InvokeOpts{})
+	tt := []struct {
+		testName            string
+		domainType          domain.DomainType
+		expectedAggregateID string
+		expectedEventType   eventstore.Command
+	}{
+		{
+			testName:            "trusted domain",
+			domainType:          domain.DomainTypeTrusted,
+			expectedAggregateID: "instance-1",
+			expectedEventType:   &instance.TrustedDomainAddedEvent{},
+		},
+		{
+			testName:            "custom domain",
+			domainType:          domain.DomainTypeCustom,
+			expectedAggregateID: "instance-1",
+			expectedEventType:   &instance.DomainAddedEvent{},
+		},
+	}
 
-	// Then
-	require.NoError(t, err)
-	require.Len(t, events, 1)
-	require.NotNil(t, events[0].Aggregate())
-	assert.Equal(t, instanceID, events[0].Aggregate().ID)
-	assert.Equal(t, instanceID, events[0].Aggregate().InstanceID)
-	assert.Equal(t, instanceID, events[0].Aggregate().ResourceOwner)
-	assert.EqualValues(t, instance.AggregateType, events[0].Aggregate().Type)
-	assert.EqualValues(t, instance.AggregateVersion, events[0].Aggregate().Version)
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+			// Given
+			instanceID := "instance-1"
+			domainName := "test.domain"
+			ctx := authz.NewMockContext(instanceID, "org-1", "")
+			cmd := domain.NewAddInstanceDomainCommand(instanceID, domainName, tc.domainType)
+
+			// When
+			events, err := cmd.Events(ctx, &domain.InvokeOpts{})
+
+			// Then
+			require.NoError(t, err)
+			require.Len(t, events, 1)
+			require.NotNil(t, events[0].Aggregate())
+			assert.Equal(t, instanceID, events[0].Aggregate().ID)
+
+			require.IsType(t, tc.expectedEventType, events[0])
+
+			switch asserted := events[0].(type) {
+			case *instance.DomainAddedEvent:
+				assert.Equal(t, domainName, asserted.Domain)
+				assert.False(t, asserted.Generated)
+			case *instance.TrustedDomainAddedEvent:
+				assert.Equal(t, domainName, asserted.Domain)
+			}
+		})
+	}
 }
 
 func TestAddInstanceDomainCommand_Execute(t *testing.T) {
@@ -212,10 +251,12 @@ func TestAddInstanceDomainCommand_Execute(t *testing.T) {
 	tt := []struct {
 		testName           string
 		instanceDomainRepo func(ctrl *gomock.Controller) domain.InstanceDomainRepository
+		inputDomainType    domain.DomainType
 		expectedError      error
 	}{
 		{
-			testName: "when adding domain succeeds should return nil",
+			testName:        "when adding domain succeeds should return nil",
+			inputDomainType: domain.DomainTypeCustom,
 			instanceDomainRepo: func(ctrl *gomock.Controller) domain.InstanceDomainRepository {
 				repo := domainmock.NewInstancesDomainRepo(ctrl)
 				repo.EXPECT().
@@ -232,16 +273,15 @@ func TestAddInstanceDomainCommand_Execute(t *testing.T) {
 			},
 		},
 		{
-			testName: "when adding domain fails should return error",
+			testName:        "when adding domain fails should return error",
+			inputDomainType: domain.DomainTypeTrusted,
 			instanceDomainRepo: func(ctrl *gomock.Controller) domain.InstanceDomainRepository {
 				repo := domainmock.NewInstancesDomainRepo(ctrl)
 				repo.EXPECT().
 					Add(gomock.Any(), gomock.Any(), &domain.AddInstanceDomain{
-						InstanceID:  "instance-1",
-						Domain:      "valid.domain",
-						IsPrimary:   gu.Ptr(false),
-						IsGenerated: gu.Ptr(false),
-						Type:        domain.DomainTypeCustom,
+						InstanceID: "instance-1",
+						Domain:     "valid.domain",
+						Type:       domain.DomainTypeTrusted,
 					}).
 					Times(1).
 					Return(addErr)
@@ -257,7 +297,7 @@ func TestAddInstanceDomainCommand_Execute(t *testing.T) {
 			// Given
 			ctx := authz.NewMockContext("instance-1", "org-1", "")
 			ctrl := gomock.NewController(t)
-			cmd := domain.NewAddInstanceDomainCommand("instance-1", "valid.domain")
+			cmd := domain.NewAddInstanceDomainCommand("instance-1", "valid.domain", tc.inputDomainType)
 
 			opts := &domain.InvokeOpts{
 				Invoker: domain.NewTransactionInvoker(nil),

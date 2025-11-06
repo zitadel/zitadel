@@ -18,36 +18,54 @@ import (
 var allowedDomainCharacters = regexp.MustCompile(`^[a-zA-Z0-9\\.\\-]+$`)
 
 type AddInstanceDomainCommand struct {
-	InstanceID string `json:"instance_id"`
-	DomainName string `json:"domain_name"`
+	InstanceID string     `json:"instance_id"`
+	DomainName string     `json:"domain_name"`
+	DType      DomainType `json:"domain_type"`
 }
 
 // RequiresTransaction implements [Transactional].
 func (a *AddInstanceDomainCommand) RequiresTransaction() {}
 
-func NewAddInstanceDomainCommand(instanceID, domainName string) *AddInstanceDomainCommand {
+func NewAddInstanceDomainCommand(instanceID, domainName string, domainType DomainType) *AddInstanceDomainCommand {
 	return &AddInstanceDomainCommand{
 		InstanceID: instanceID,
 		DomainName: domainName,
+		DType:      domainType,
 	}
 }
 
 // Events implements [Commander].
 func (a *AddInstanceDomainCommand) Events(ctx context.Context, _ *InvokeOpts) ([]eventstore.Command, error) {
+	var toReturn eventstore.Command
+	switch a.DType {
+	case DomainTypeCustom:
+		toReturn = instance.NewDomainAddedEvent(ctx, &instance.NewAggregate(a.InstanceID).Aggregate, a.DomainName, false)
+	case DomainTypeTrusted:
+		toReturn = instance.NewTrustedDomainAddedEvent(ctx, &instance.NewAggregate(a.InstanceID).Aggregate, a.DomainName)
+	default:
+		return nil, nil
+	}
+
 	return []eventstore.Command{
-		instance.NewDomainAddedEvent(ctx, &instance.NewAggregate(a.InstanceID).Aggregate, a.DomainName, false),
+		toReturn,
 	}, nil
 }
 
 // Execute implements [Commander].
 func (a *AddInstanceDomainCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	instanceRepo := opts.instanceDomainRepo
+
+	var isPrimary, isGenerated *bool
+	if a.DType == DomainTypeCustom {
+		isPrimary, isGenerated = gu.Ptr(false), gu.Ptr(false)
+	}
+
 	err = instanceRepo.Add(ctx, opts.DB(), &AddInstanceDomain{
 		InstanceID:  a.InstanceID,
 		Domain:      a.DomainName,
-		IsPrimary:   gu.Ptr(false),
-		IsGenerated: gu.Ptr(false),
-		Type:        DomainTypeCustom,
+		IsPrimary:   isPrimary,
+		IsGenerated: isGenerated,
+		Type:        a.DType,
 	})
 	if err != nil {
 		// TODO(IAM-Marco): Should we wrap err into zerrors.ThrowInternalError() ?
@@ -64,7 +82,7 @@ func (a *AddInstanceDomainCommand) String() string {
 
 // Validate implements [Commander].
 func (a *AddInstanceDomainCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
-	if a.DomainName = strings.TrimSpace(a.DomainName); a.DomainName == "" {
+	if a.DomainName = strings.TrimSpace(a.DomainName); a.DomainName == "" || len(a.DomainName) > 253 {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-jieuM8", "Errors.Invalid.Argument")
 	}
 

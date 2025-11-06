@@ -40,6 +40,10 @@ func (s *Server) RemoveCustomDomain(ctx context.Context, req *connect.Request[in
 }
 
 func (s *Server) AddTrustedDomain(ctx context.Context, req *connect.Request[instance.AddTrustedDomainRequest]) (*connect.Response[instance.AddTrustedDomainResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.AddTrustedDomainBeta(ctx, req)
+	}
+
 	details, err := s.command.AddTrustedDomain(ctx, req.Msg.GetDomain())
 	if err != nil {
 		return nil, err
