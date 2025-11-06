@@ -272,7 +272,12 @@
                           <div class="step-content">
                             <h6>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP_DOCS_TITLE' | translate }}</h6>
                             <p>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP_DOCS_DESC' | translate }}</p>
-                            <a [href]="getFrameworkInfo()?.docsLink" target="_blank" mat-raised-button color="primary">
+                            <a
+                              [href]="`https://zitadel.com${getFrameworkInfo()?.docsLink}`"
+                              target="_blank"
+                              mat-raised-button
+                              color="primary"
+                            >
                               {{ 'APP.OVERVIEW_DETAIL.VIEWDOCS' | translate }}
                             </a>
                           </div>
@@ -363,7 +368,11 @@
                             <h6>{{ 'APP.OVERVIEW_DETAIL.EXISTING_STEP_DOCS_TITLE' | translate }}</h6>
                             <p>{{ 'APP.OVERVIEW_DETAIL.EXISTING_STEP_DOCS_DESC' | translate }}</p>
                             <a
-                              [href]="hasSdk() ? getFrameworkInfo()?.sdkDocLink : getFrameworkInfo()?.docsLink"
+                              [href]="
+                                hasSdk()
+                                  ? `https://zitadel.com${getFrameworkInfo()?.sdkDocLink}`
+                                  : `https://zitadel.com${getFrameworkInfo()?.docsLink}`
+                              "
                               target="_blank"
                               mat-raised-button
                               color="primary"
