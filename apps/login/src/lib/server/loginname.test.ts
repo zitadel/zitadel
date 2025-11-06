@@ -42,6 +42,11 @@ vi.mock("./host", () => ({
   getOriginalHost: vi.fn(),
 }));
 
+// this returns the key itself that can be checked not the translated value
+vi.mock("next-intl/server", () => ({
+  getTranslations: vi.fn(() => (key: string) => key),
+}));
+
 describe("sendLoginname", () => {
   // Mock modules
   let mockHeaders: any;
@@ -116,7 +121,7 @@ describe("sendLoginname", () => {
         loginName: "user@example.com",
       });
 
-      expect(result).toEqual({ error: "Could not get login settings" });
+      expect(result).toEqual({ error: "errors.couldNotGetLoginSettings" });
     });
 
     test("should return error when user search fails", async () => {
@@ -138,7 +143,7 @@ describe("sendLoginname", () => {
         loginName: "user@example.com",
       });
 
-      expect(result).toEqual({ error: "Could not search users" });
+      expect(result).toEqual({ error: "errors.couldNotSearchUsers" });
     });
 
     test("should return error when more than one user found", async () => {
@@ -154,7 +159,7 @@ describe("sendLoginname", () => {
         loginName: "user@example.com",
       });
 
-      expect(result).toEqual({ error: "More than one user found. Provide a unique identifier." });
+      expect(result).toEqual({ error: "errors.moreThanOneUserFound" });
     });
   });
 
@@ -244,13 +249,37 @@ describe("sendLoginname", () => {
           authMethodTypes: [AuthenticationMethodType.PASSWORD],
         });
         mockListIDPLinks.mockResolvedValue({ result: [] });
+        mockGetActiveIdentityProviders.mockResolvedValue({ identityProviders: [] });
 
         const result = await sendLoginname({
           loginName: "user@example.com",
         });
 
         expect(result).toEqual({
-          error: "Username Password not allowed! Contact your administrator for more information.",
+          error: "errors.usernamePasswordNotAllowed",
+        });
+      });
+
+      test("should redirect to organization IDP when password not allowed, no user IDP links, but organization has active IDP", async () => {
+        mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: false });
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSWORD],
+        });
+        mockListIDPLinks.mockResolvedValue({ result: [] });
+        mockGetActiveIdentityProviders.mockResolvedValue({
+          identityProviders: [{ id: "org-idp-123", type: 0 }],
+        });
+        mockIdpTypeToSlug.mockReturnValue("google");
+        mockStartIdentityProviderFlow.mockResolvedValue("https://org-idp.example.com/auth");
+
+        const result = await sendLoginname({
+          loginName: "user@example.com",
+        });
+
+        expect(result).toEqual({ redirect: "https://org-idp.example.com/auth" });
+        expect(mockGetActiveIdentityProviders).toHaveBeenCalledWith({
+          serviceUrl: "https://api.example.com",
+          orgId: "org123", // User's organization from resourceOwner
         });
       });
 
@@ -282,7 +311,7 @@ describe("sendLoginname", () => {
         });
 
         expect(result).toEqual({
-          error: "Passkeys not allowed! Contact your administrator for more information.",
+          error: "errors.passkeysNotAllowed",
         });
       });
 
@@ -368,13 +397,14 @@ describe("sendLoginname", () => {
           authMethodTypes: [AuthenticationMethodType.PASSWORD],
         });
         mockListIDPLinks.mockResolvedValue({ result: [] });
+        mockGetActiveIdentityProviders.mockResolvedValue({ identityProviders: [] });
 
         const result = await sendLoginname({
           loginName: "user@example.com",
         });
 
         expect(result).toEqual({
-          error: "Username Password not allowed! Contact your administrator for more information.",
+          error: "errors.usernamePasswordNotAllowed",
         });
       });
     });
@@ -450,7 +480,7 @@ describe("sendLoginname", () => {
         loginName: "user@example.com",
       });
 
-      expect(result).toEqual({ error: "User not found in the system" });
+      expect(result).toEqual({ error: "errors.userNotFound" });
     });
   });
 
@@ -473,7 +503,7 @@ describe("sendLoginname", () => {
         loginName: "user@example.com",
       });
 
-      expect(result).toEqual({ error: "Could not create session for user" });
+      expect(result).toEqual({ error: "errors.couldNotCreateSession" });
     });
 
     test("should handle initial user state", async () => {
@@ -504,7 +534,7 @@ describe("sendLoginname", () => {
         loginName: "user@example.com",
       });
 
-      expect(result).toEqual({ error: "Initial User not supported" });
+      expect(result).toEqual({ error: "errors.initialUserNotSupported" });
     });
 
     test("should handle organization parameter in all redirects", async () => {

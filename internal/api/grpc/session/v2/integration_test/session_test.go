@@ -127,6 +127,9 @@ func verifyFactors(t assert.TestingT, factors *session.Factors, creationDate, ch
 }
 
 func TestServer_CreateSession(t *testing.T) {
+	lockedUser := createLockedUser(CTX, t)
+	deactivatedUser := createDeactivatedUser(CTX, t)
+
 	tests := []struct {
 		name                 string
 		req                  *session.CreateSessionRequest
@@ -190,7 +193,7 @@ func TestServer_CreateSession(t *testing.T) {
 				Checks: &session.Checks{
 					User: &session.CheckUser{
 						Search: &session.CheckUser_UserId{
-							UserId: DeactivatedUser.GetUserId(),
+							UserId: deactivatedUser.GetUserId(),
 						},
 					},
 				},
@@ -203,7 +206,7 @@ func TestServer_CreateSession(t *testing.T) {
 				Checks: &session.Checks{
 					User: &session.CheckUser{
 						Search: &session.CheckUser_UserId{
-							UserId: LockedUser.GetUserId(),
+							UserId: lockedUser.GetUserId(),
 						},
 					},
 				},
@@ -965,6 +968,17 @@ func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 		}
 		assert.Nil(tt, sessionResp)
 	}, retryDuration, tick)
+}
+
+func Test_ZITADEL_API_missing_mfa(t *testing.T) {
+	mfaUser := createFullUser(CTX)
+	registerTOTP(CTX, t, mfaUser.GetUserId())
+	id, token, _, _ := Instance.CreatePasswordSession(t, LoginCTX, mfaUser.GetUserId(), integration.UserPassword)
+	ctx := integration.WithAuthorizationToken(context.Background(), token)
+
+	sessionResp, err := Instance.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
+	require.Error(t, err)
+	require.Nil(t, sessionResp)
 }
 
 func Test_ZITADEL_API_success(t *testing.T) {
