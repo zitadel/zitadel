@@ -388,12 +388,6 @@ func idpUserToUpdateHumanUser(userID string, idpUser idp.User) *user.UpdateHuman
 			FamilyName: idpUser.GetLastName(),
 		},
 	}
-	if email := string(idpUser.GetEmail()); email != "" {
-		updateHumanUser.Email = &user.SetHumanEmail{
-			Email:        email,
-			Verification: &user.SetHumanEmail_SendCode{},
-		}
-	}
 	if username := idpUser.GetPreferredUsername(); username != "" {
 		updateHumanUser.Username = &username
 	}
@@ -406,12 +400,18 @@ func idpUserToUpdateHumanUser(userID string, idpUser idp.User) *user.UpdateHuman
 	if lang := idpUser.GetPreferredLanguage().String(); lang != "" {
 		updateHumanUser.Profile.PreferredLanguage = &lang
 	}
-	if isEmailVerified := idpUser.IsEmailVerified(); isEmailVerified {
-		updateHumanUser.Email.Verification = &user.SetHumanEmail_IsVerified{IsVerified: isEmailVerified}
+	if email := string(idpUser.GetEmail()); email != "" {
+		updateHumanUser.Email = &user.SetHumanEmail{
+			Email:        email,
+			Verification: &user.SetHumanEmail_SendCode{},
+		}
+		if isEmailVerified := idpUser.IsEmailVerified(); isEmailVerified {
+			updateHumanUser.Email.Verification = &user.SetHumanEmail_IsVerified{IsVerified: isEmailVerified}
+		}
 	}
-	if phone := idpUser.GetPhone(); phone != "" {
+	if phone := string(idpUser.GetPhone()); phone != "" {
 		updateHumanUser.Phone = &user.SetHumanPhone{
-			Phone:        string(phone),
+			Phone:        phone,
 			Verification: &user.SetHumanPhone_SendCode{},
 		}
 		if isPhoneVerified := idpUser.IsPhoneVerified(); isPhoneVerified {
