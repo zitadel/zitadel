@@ -4,14 +4,14 @@ variable "ZITADEL_RELEASE_GITHUB_ORG" {
 
 target "api" {
     tags = [
-        "ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/api:${ZITADEL_RELEASE_VERSION}",
-        ZITADEL_RELEASE_IS_LATEST ? "ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/api:latest": "",
+        "ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/zitadel:${ZITADEL_RELEASE_VERSION}",
+        ZITADEL_RELEASE_IS_LATEST ? "ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/zitadel:latest": "",
     ]
 }
 
 target "api-debug" {
     tags = [
-        "ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/api-debug:${ZITADEL_RELEASE_VERSION}",
-        ZITADEL_RELEASE_IS_LATEST ? "ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/api-debug:latest": "",
+        "ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/zitadel-debug:${ZITADEL_RELEASE_VERSION}",
+        ZITADEL_RELEASE_IS_LATEST ? "ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/zitadel-debug:latest": "",
     ]
 }

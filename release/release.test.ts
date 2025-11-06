@@ -457,4 +457,74 @@ describe('executeRelease', () => {
       verbose: false,
     });
   });
+
+  test('does not call gh release edit when current version equals highest version', async () => {
+    const mockExecSync = vi.mocked(execSync);
+
+    vi.mocked(releaseVersion).mockResolvedValue({
+      workspaceVersion: '1.0.0',
+      projectsVersionData: {} as any,
+    });
+    // Avoid triggering resetChangedFiles (which uses execSync) by simulating a failed publish
+    vi.mocked(releasePublish).mockResolvedValue({
+      project1: { code: 1 },
+    } as any);
+
+    await executeRelease(
+      { ...mockGitInfo, highestVersionBefore: '1.0.0' },
+      { ...mockOptions, dryRun: false }
+    );
+
+    // Ensure we did not attempt to edit the latest release
+    expect(
+      mockExecSync.mock.calls.some(([cmd]) =>
+        String(cmd).includes('gh release edit')
+      )
+    ).toBe(false);
+  });
+
+  test('does not call gh release edit when dryRun is true even if tags differ', async () => {
+    const mockExecSync = vi.mocked(execSync);
+
+    vi.mocked(releaseVersion).mockResolvedValue({
+      workspaceVersion: '1.1.0',
+      projectsVersionData: {} as any,
+    });
+    vi.mocked(releasePublish).mockResolvedValue({
+      project1: { code: 1 },
+    } as any);
+
+    await executeRelease(
+      { ...mockGitInfo, highestVersionBefore: '1.0.0' },
+      { ...mockOptions, dryRun: true }
+    );
+
+    expect(
+      mockExecSync.mock.calls.some(([cmd]) =>
+        String(cmd).includes('gh release edit')
+      )
+    ).toBe(false);
+  });
+
+  test('calls gh release edit to set latest when current version tag differs and not dryRun', async () => {
+    const mockExecSync = vi.mocked(execSync);
+
+    vi.mocked(releaseVersion).mockResolvedValue({
+      workspaceVersion: '1.1.0',
+      projectsVersionData: {} as any,
+    });
+    vi.mocked(releasePublish).mockResolvedValue({
+      project1: { code: 1 },
+    } as any);
+
+    await executeRelease(
+      { ...mockGitInfo, highestVersionBefore: '2.0.0' },
+      { ...mockOptions, dryRun: false }
+    );
+
+    expect(mockExecSync).toHaveBeenCalledWith(
+      'gh release edit v2.0.0 --latest',
+      expect.objectContaining({ stdio: 'inherit' })
+    );
+  });
 });
