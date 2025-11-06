@@ -10,19 +10,12 @@
       ],
       "executor": "nx:run-commands",
       "options": {
-        "parallel": false,
+        "parallel": true,
         "commands": [
           {
             "forwardAllArgs": false,
-            "command": "cd .artifacts/pack && rm -f checksums.txt && sha256sum * > checksums.txt"
-          },
-          {
-            "forwardAllArgs": false,
-            "command": "bash -c \"[[ \\\"${NX_DRY_RUN}\\\" == \\\"true\\\" ]] || gh release upload ${ZITADEL_RELEASE_VERSION} .artifacts/pack/checksums.txt\""
-          },
-          {
-            "forwardAllArgs": false,
-            "command": "echo @${ZITADEL_RELEASE_GITHUB_ORG}:registry=https://npm.pkg.github.com >> ./.npmrc"
+            "prefix": "[uploading checksums to GitHub release] ",
+            "command": "bash -c \"[[ \\\"${NX_DRY_RUN}\\\" == \\\"true\\\" ]] || cd .artifacts/pack && rm -f checksums.txt && sha256sum * > checksums.txt && gh release upload ${ZITADEL_RELEASE_VERSION} checksums.txt\""
           },
           {
             "forwardAllArgs": false,
