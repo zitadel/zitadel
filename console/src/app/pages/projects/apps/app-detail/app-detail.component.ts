@@ -308,7 +308,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       }
 
       this.envVarsArray = envVars;
-      console.log('Updated envVarsArray:', this.envVarsArray.length, 'variables');
       this.cdr.detectChanges();
     } catch (error) {
       console.error('Error updating env vars:', error);
