@@ -31,18 +31,18 @@ pnpm release --github-repo my-org/zitadel --no-dry-run
     - @${ZITADEL_RELEASE_GITHUB_ORG}/client@${ZITADEL_RELEASE_VERSION}
     - @${ZITADEL_RELEASE_GITHUB_ORG}/proto@${ZITADEL_RELEASE_VERSION}
   - Docker images are pushed:
-    - ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/api:${ZITADEL_RELEASE_VERSION}
-    - ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/api-debug:${ZITADEL_RELEASE_VERSION}
-    - ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/login:${ZITADEL_RELEASE_VERSION}
+    - ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/zitadel:${ZITADEL_RELEASE_VERSION}
+    - ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/zitadel:${ZITADEL_RELEASE_VERSION}-debug
+    - ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/zitadel-login:${ZITADEL_RELEASE_VERSION}
   - If the bumped version is the highest regular semantic version in the repository, the Docker images are additionally pushed with the `latest` tag:
-    - ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/api:latest
-    - ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/api-debug:latest
-    - ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/login:latest
+    - ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/zitadel:latest
+    - ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/zitadel:latest-debug
+    - ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/zitadel-login:latest
   - If the release script is not triggered on a major or minor maintenance branch, only SHA tagged Docker images are pushed.
     Apart from this, nothing else is released.
     On every commit to main, the release script is triggered in CI and SHA Docker images are pushed.
-    - ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/api:${ZITADEL_RELEASE_REVISION}
-    - ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/login:${ZITADEL_RELEASE_REVISION}
+    - ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/zitadel:${ZITADEL_RELEASE_REVISION}
+    - ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/zitadel-login:${ZITADEL_RELEASE_REVISION}
 
 ## Customizing the Release Process
 
