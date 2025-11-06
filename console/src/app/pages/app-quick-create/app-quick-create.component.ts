@@ -1,5 +1,5 @@
 import { Component, OnDestroy, signal } from '@angular/core';
-import { ActivatedRoute, Navigation, Params, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
