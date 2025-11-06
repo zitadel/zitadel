@@ -115,9 +115,12 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 service OrganizationService {
 
-  // Create an Organization
+  // Add Organization
   //
   // Create a new organization with an administrative user. If no specific roles are sent for the users, they will be granted the role ORG_OWNER.
+  //
+  // Required permission:
+  //  - `org.create`
   rpc AddOrganization(AddOrganizationRequest) returns (AddOrganizationResponse) {
     option (google.api.http) = {
       post: "/v2/organizations"

@@ -366,7 +366,7 @@ module.exports = {
           },
           org_v2: {
             specPath:
-              ".artifacts/openapi/zitadel/org/v2/org_service.swagger.json",
+              ".artifacts/openapi3/zitadel/org/v2/org_service.openapi.yaml",
             outputDir: "docs/apis/resources/org_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
