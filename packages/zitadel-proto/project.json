@@ -6,7 +6,8 @@
       "description": "Sets the package name to the GitHub org scope for publishing to GitHub Packages. This allows to publish the package on forks.",
       "dependsOn": [
         "generate",
-        "link-to-repo"
+        "link-to-repo",
+        "configure-npmrc"
       ]
     },
     "link-to-repo": {
@@ -16,6 +17,10 @@
         "cwd": "{projectRoot}",
         "command": "npm pkg set name=\"@${ZITADEL_RELEASE_GITHUB_ORG}/proto\" repository=\"https://github.com/${ZITADEL_RELEASE_GITHUB_REPO}\""
       }
+    },
+    "configure-npmrc": {
+      "description": "Configures the root workspace .npmrc file to publish to GitHub Packages.",
+      "command": "bash -c 'grep -qxF @${ZITADEL_RELEASE_GITHUB_ORG}:registry=https://npm.pkg.github.com ./.npmrc || echo @${ZITADEL_RELEASE_GITHUB_ORG}:registry=https://npm.pkg.github.com >> ./.npmrc'"
     },
     "generate": {
       "inputs": [

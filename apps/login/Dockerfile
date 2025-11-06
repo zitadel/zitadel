@@ -4,7 +4,6 @@ LABEL org.opencontainers.image.documentation="https://zitadel.com/docs" \
       org.opencontainers.image.vendor="ZITADEL" \
       org.opencontainers.image.description="ZITADEL Login - Identity infrastructure, simplified for you." \
       org.opencontainers.image.licenses="MIT" \
-      org.opencontainers.image.source="https://github.com/zitadel/zitadel" \
       org.opencontainers.image.title="Zitadel Login" \
       org.opencontainers.image.url="https://github.com/zitadel/login" \
       org.opencontainers.image.vendor="ZITADEL"
