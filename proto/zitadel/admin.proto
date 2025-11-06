@@ -1309,7 +1309,7 @@ service AdminService {
 
     // Setup Organization
     //
-    // Deprecated: use [organization service v2 CreateOrganization](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-create-organization.api.mdx) instead.
+    // Deprecated: use [organization service v2 AddOrganization](apis/resources/org_service_v2b/zitadel-org-v-2-organization-service-add-organization.api.mdx) instead.
     //
     // Create a new organization with an administrative user. If no specific roles are sent for the first user, the user will get the role ORG_OWNER.
     rpc SetUpOrg(SetUpOrgRequest) returns (SetUpOrgResponse) {
@@ -1347,7 +1347,7 @@ service AdminService {
 
     // Remove Organization
     //
-    // Deprecated: use [organization service v2 DeleteOrganization](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-delete-organization.api.mdx) instead.
+    // Deprecated: use [organization service v2 DeleteOrganization](apis/resources/org_service_v2/zitadel-org-v-2-organization-service-delete-organization.api.mdx) instead.
     //
     // Deletes the organization and all its resources (Users, Projects, Grants to and from the org). Users of this organization will not be able to log in.
     rpc RemoveOrg(RemoveOrgRequest) returns (RemoveOrgResponse) {
