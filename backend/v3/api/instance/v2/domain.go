@@ -49,7 +49,7 @@ func AddCustomDomainBeta(ctx context.Context, request *connect.Request[instance_
 }
 
 func RemoveCustomDomainBeta(ctx context.Context, request *connect.Request[instance_v2beta.RemoveCustomDomainRequest]) (*connect.Response[instance_v2beta.RemoveCustomDomainResponse], error) {
-	removeCustomDomainCmd := domain.NewRemoveInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetDomain())
+	removeCustomDomainCmd := domain.NewRemoveInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetDomain(), domain.DomainTypeCustom)
 
 	err := domain.Invoke(ctx, removeCustomDomainCmd, domain.WithInstanceDomainRepo(repository.InstanceDomainRepository()))
 	if err != nil {
@@ -106,6 +106,22 @@ func AddTrustedDomainBeta(ctx context.Context, request *connect.Request[instance
 	}, nil
 }
 
+func RemoveTrustedDomainBeta(ctx context.Context, request *connect.Request[instance_v2beta.RemoveTrustedDomainRequest]) (*connect.Response[instance_v2beta.RemoveTrustedDomainResponse], error) {
+	removeCustomDomainCmd := domain.NewRemoveInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetDomain(), domain.DomainTypeTrusted)
+
+	err := domain.Invoke(ctx, removeCustomDomainCmd, domain.WithInstanceDomainRepo(repository.InstanceDomainRepository()))
+	if err != nil {
+		return nil, err
+	}
+
+	return &connect.Response[instance_v2beta.RemoveTrustedDomainResponse]{
+		Msg: &instance_v2beta.RemoveTrustedDomainResponse{
+			// TODO(IAM-Marco): Return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10881
+			DeletionDate: timestamppb.Now(),
+		},
+	}, nil
+}
+
 // =================
 // v2 endpoints
 // =================
@@ -139,7 +155,7 @@ func AddCustomDomain(ctx context.Context, request *connect.Request[instance_v2.A
 }
 
 func RemoveCustomDomain(ctx context.Context, request *connect.Request[instance_v2.RemoveCustomDomainRequest]) (*connect.Response[instance_v2.RemoveCustomDomainResponse], error) {
-	removeCustomDomainCmd := domain.NewRemoveInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetCustomDomain())
+	removeCustomDomainCmd := domain.NewRemoveInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetCustomDomain(), domain.DomainTypeCustom)
 
 	err := domain.Invoke(ctx, removeCustomDomainCmd, domain.WithInstanceDomainRepo(repository.InstanceDomainRepository()))
 	if err != nil {
@@ -192,6 +208,22 @@ func AddTrustedDomain(ctx context.Context, request *connect.Request[instance_v2.
 		Msg: &instance_v2.AddTrustedDomainResponse{
 			// TODO(IAM-Marco): Return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10881
 			CreationDate: timestamppb.Now(),
+		},
+	}, nil
+}
+
+func RemoveTrustedDomain(ctx context.Context, request *connect.Request[instance_v2.RemoveTrustedDomainRequest]) (*connect.Response[instance_v2.RemoveTrustedDomainResponse], error) {
+	removeCustomDomainCmd := domain.NewRemoveInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetTrustedDomain(), domain.DomainTypeTrusted)
+
+	err := domain.Invoke(ctx, removeCustomDomainCmd, domain.WithInstanceDomainRepo(repository.InstanceDomainRepository()))
+	if err != nil {
+		return nil, err
+	}
+
+	return &connect.Response[instance_v2.RemoveTrustedDomainResponse]{
+		Msg: &instance_v2.RemoveTrustedDomainResponse{
+			// TODO(IAM-Marco): Return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10881
+			DeletionDate: timestamppb.Now(),
 		},
 	}, nil
 }

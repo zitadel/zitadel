@@ -54,6 +54,9 @@ func (s *Server) AddTrustedDomain(ctx context.Context, req *connect.Request[inst
 }
 
 func (s *Server) RemoveTrustedDomain(ctx context.Context, req *connect.Request[instance.RemoveTrustedDomainRequest]) (*connect.Response[instance.RemoveTrustedDomainResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.RemoveTrustedDomainBeta(ctx, req)
+	}
 	details, err := s.command.RemoveTrustedDomain(ctx, req.Msg.GetDomain())
 	if err != nil {
 		return nil, err

@@ -385,19 +385,32 @@ func TestRemoveTrustedDomain(t *testing.T) {
 		},
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.testName, func(t *testing.T) {
-			// Test
-			res, err := inst.Client.InstanceV2Beta.RemoveTrustedDomain(tc.inputContext, tc.inputRequest)
+	relTableState := integration.RelationalTablesEnableMatrix()
 
-			// Verify
-			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
-			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
-
-			if tc.expectedErrorMsg == "" {
-				require.NotNil(t, res)
-				require.NotEmpty(t, res.GetDeletionDate())
-			}
+	for _, stateCase := range relTableState {
+		integration.EnsureInstanceFeature(t, ctx, inst, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
 		})
+		for _, tc := range tt {
+			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tc.testName), func(t *testing.T) {
+				t.Cleanup(func() {
+					if tc.expectedErrorMsg == "" {
+						_, err := inst.Client.InstanceV2Beta.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: inst.ID(), Domain: trustedDomain})
+						require.Nil(t, err)
+					}
+				})
+				// Test
+				res, err := inst.Client.InstanceV2Beta.RemoveTrustedDomain(tc.inputContext, tc.inputRequest)
+
+				// Verify
+				assert.Equal(t, tc.expectedErrorCode, status.Code(err))
+				assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
+
+				if tc.expectedErrorMsg == "" {
+					require.NotNil(t, res)
+					require.NotEmpty(t, res.GetDeletionDate())
+				}
+			})
+		}
 	}
 }

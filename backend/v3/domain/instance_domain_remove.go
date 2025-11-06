@@ -13,25 +13,34 @@ import (
 )
 
 type RemoveInstanceDomainCommand struct {
-	InstanceID string `json:"instance_id"`
-	DomainName string `json:"domain_name"`
+	InstanceID string     `json:"instance_id"`
+	DomainName string     `json:"domain_name"`
+	DType      DomainType `json:"domain_type"`
 }
 
 // RequiresTransaction implements [Transactional].
 func (r *RemoveInstanceDomainCommand) RequiresTransaction() {}
 
-func NewRemoveInstanceDomainCommand(instanceID, domainName string) *RemoveInstanceDomainCommand {
+func NewRemoveInstanceDomainCommand(instanceID, domainName string, domainType DomainType) *RemoveInstanceDomainCommand {
 	return &RemoveInstanceDomainCommand{
 		InstanceID: instanceID,
 		DomainName: domainName,
+		DType:      domainType,
 	}
 }
 
 // Events implements [Commander].
 func (r *RemoveInstanceDomainCommand) Events(ctx context.Context, _ *InvokeOpts) ([]eventstore.Command, error) {
-	return []eventstore.Command{
-		instance.NewDomainRemovedEvent(ctx, &instance.NewAggregate(r.InstanceID).Aggregate, r.DomainName),
-	}, nil
+	var toReturn eventstore.Command
+	switch r.DType {
+	case DomainTypeCustom:
+		toReturn = instance.NewDomainRemovedEvent(ctx, &instance.NewAggregate(r.InstanceID).Aggregate, r.DomainName)
+	case DomainTypeTrusted:
+		toReturn = instance.NewTrustedDomainRemovedEvent(ctx, &instance.NewAggregate(r.InstanceID).Aggregate, r.DomainName)
+	default:
+		return nil, nil
+	}
+	return []eventstore.Command{toReturn}, nil
 }
 
 // Execute implements [Commander].
@@ -64,12 +73,16 @@ func (r *RemoveInstanceDomainCommand) String() string {
 
 // Validate implements [Commander].
 func (r *RemoveInstanceDomainCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
-	if r.DomainName = strings.TrimSpace(r.DomainName); r.DomainName == "" {
+	if r.DomainName = strings.TrimSpace(r.DomainName); r.DomainName == "" || len(r.DomainName) > 253 {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-PLpYix", "Errors.Invalid.Argument")
 	}
 
 	if r.InstanceID = strings.TrimSpace(r.InstanceID); r.InstanceID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-VSsTTf", "Errors.Invalid.Argument")
+	}
+
+	if !allowedDomainCharacters.MatchString(r.DomainName) {
+		return zerrors.ThrowInvalidArgument(nil, "DOM-dYD5I7", "Errors.Instance.Domain.InvalidCharacter")
 	}
 
 	// TODO(IAM-Marco): Do we want to restrict to the instance in context?
@@ -93,7 +106,7 @@ func (r *RemoveInstanceDomainCommand) Validate(ctx context.Context, opts *Invoke
 		return err
 	}
 
-	if d.IsGenerated != nil && *d.IsGenerated {
+	if d.Type == DomainTypeCustom && d.IsGenerated != nil && *d.IsGenerated {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-cSfCVG", "Errors.Instance.Domain.GeneratedNotRemovable")
 	}
 

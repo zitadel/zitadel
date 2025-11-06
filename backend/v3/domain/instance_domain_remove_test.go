@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dbmock"
 	noopdb "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/noop"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -43,6 +44,12 @@ func TestRemoveInstanceDomainCommand_Validate(t *testing.T) {
 			testName:        "when no domain name should return invalid argument error",
 			inputInstanceID: "instance-1",
 			inputDomainName: "",
+			expectedError:   zerrors.ThrowInvalidArgument(nil, "DOM-PLpYix", "Errors.Invalid.Argument"),
+		},
+		{
+			testName:        "when name too long should return invalid argument error",
+			inputInstanceID: " ",
+			inputDomainName: "domain.is.to.loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong",
 			expectedError:   zerrors.ThrowInvalidArgument(nil, "DOM-PLpYix", "Errors.Invalid.Argument"),
 		},
 		{
@@ -149,7 +156,7 @@ func TestRemoveInstanceDomainCommand_Validate(t *testing.T) {
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(domainCond))).
 					Times(1).
-					Return(&domain.InstanceDomain{IsGenerated: &isGenerated}, nil)
+					Return(&domain.InstanceDomain{IsGenerated: &isGenerated, Type: domain.DomainTypeCustom}, nil)
 				return repo
 			},
 			inputInstanceID: "instance-1",
@@ -180,7 +187,7 @@ func TestRemoveInstanceDomainCommand_Validate(t *testing.T) {
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(domainCond))).
 					Times(1).
-					Return(&domain.InstanceDomain{IsGenerated: &isGenerated}, nil)
+					Return(&domain.InstanceDomain{IsGenerated: &isGenerated, Type: domain.DomainTypeCustom}, nil)
 				return repo
 			},
 			inputInstanceID: "instance-1",
@@ -194,7 +201,7 @@ func TestRemoveInstanceDomainCommand_Validate(t *testing.T) {
 			// Given
 			ctx := authz.NewMockContext("instance-1", "", "")
 			ctrl := gomock.NewController(t)
-			cmd := domain.NewRemoveInstanceDomainCommand(tc.inputInstanceID, tc.inputDomainName)
+			cmd := domain.NewRemoveInstanceDomainCommand(tc.inputInstanceID, tc.inputDomainName, domain.DomainTypeCustom)
 
 			opts := &domain.InvokeOpts{
 				Invoker: domain.NewTransactionInvoker(nil),
@@ -355,7 +362,7 @@ func TestRemoveInstanceDomainCommand_Execute(t *testing.T) {
 			// Given
 			ctx := authz.NewMockContext("instance-1", "", "")
 			ctrl := gomock.NewController(t)
-			cmd := domain.NewRemoveInstanceDomainCommand(tc.inputInstanceID, tc.inputDomainName)
+			cmd := domain.NewRemoveInstanceDomainCommand(tc.inputInstanceID, tc.inputDomainName, domain.DomainTypeCustom)
 
 			opts := &domain.InvokeOpts{
 				Invoker: domain.NewTransactionInvoker(nil),
@@ -374,18 +381,52 @@ func TestRemoveInstanceDomainCommand_Execute(t *testing.T) {
 func TestRemoveInstanceDomainCommand_Events(t *testing.T) {
 	t.Parallel()
 
-	// Given
-	ctx := authz.NewMockContext("instance-1", "", "")
-	cmd := domain.NewRemoveInstanceDomainCommand("instance-1", "test-domain.com")
+	tt := []struct {
+		testName            string
+		domainType          domain.DomainType
+		expectedAggregateID string
+		expectedEventType   eventstore.Command
+	}{
+		{
+			testName:            "trusted domain",
+			domainType:          domain.DomainTypeTrusted,
+			expectedAggregateID: "instance-1",
+			expectedEventType:   &instance.TrustedDomainRemovedEvent{},
+		},
+		{
+			testName:            "custom domain",
+			domainType:          domain.DomainTypeCustom,
+			expectedAggregateID: "instance-1",
+			expectedEventType:   &instance.DomainRemovedEvent{},
+		},
+	}
 
-	// Test
-	events, err := cmd.Events(ctx, &domain.InvokeOpts{})
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+			// Given
+			instanceID := "instance-1"
+			domainName := "test.domain"
+			ctx := authz.NewMockContext(instanceID, "org-1", "")
+			cmd := domain.NewRemoveInstanceDomainCommand(instanceID, domainName, tc.domainType)
 
-	// Verify
-	assert.NoError(t, err)
-	require.Len(t, events, 1)
+			// When
+			events, err := cmd.Events(ctx, &domain.InvokeOpts{})
 
-	event := events[0].(*instance.DomainRemovedEvent)
-	assert.Equal(t, "instance-1", event.Aggregate().ID)
-	assert.Equal(t, "test-domain.com", event.Domain)
+			// Then
+			require.NoError(t, err)
+			require.Len(t, events, 1)
+			require.NotNil(t, events[0].Aggregate())
+			assert.Equal(t, instanceID, events[0].Aggregate().ID)
+
+			require.IsType(t, tc.expectedEventType, events[0])
+
+			switch asserted := events[0].(type) {
+			case *instance.DomainRemovedEvent:
+				assert.Equal(t, domainName, asserted.Domain)
+			case *instance.TrustedDomainRemovedEvent:
+				assert.Equal(t, domainName, asserted.Domain)
+			}
+		})
+	}
 }
