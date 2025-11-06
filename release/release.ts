@@ -228,13 +228,13 @@ function fixGitHubReleaseLatestBadge(options: ReleaseOptions, gitInfo: GitInfo):
   const shouldFixLatest = currentVersionTag !== highestVersionTag;
   if (shouldFixLatest) {
     console.log(`Correcting GitHub "latest" release badge: moving from ${currentVersionTag} to ${highestVersionTag}`);
-    const cmd = `gh release edit ${highestVersionTag} --latest`;
+    const ghArgs = ['release', 'edit', highestVersionTag, '--latest'];
     if (options.dryRun) {
-      console.log(`[Dry Run] Would execute command: ${cmd}`);
+      console.log(`[Dry Run] Would execute: gh ${ghArgs.map(a => JSON.stringify(a)).join(' ')}`);
       return;
     }
     try {
-      execSync(cmd, { stdio: 'inherit' });
+      execFileSync('gh', ghArgs, { stdio: 'inherit' });
     } catch (error) {
       console.error(`Failed to update latest release badge to ${highestVersionTag}:`, error);
     }
