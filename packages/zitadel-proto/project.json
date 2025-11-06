@@ -20,7 +20,7 @@
     },
     "configure-npmrc": {
       "description": "Configures the root workspace .npmrc file to publish to GitHub Packages.",
-      "command": "bash -c 'grep -qxF @${ZITADEL_RELEASE_GITHUB_ORG}:registry=https://npm.pkg.github.com ./.npmrc || echo @${ZITADEL_RELEASE_GITHUB_ORG}:registry=https://npm.pkg.github.com >> ./.npmrc"
+      "command": "bash -c 'grep -qxF @${ZITADEL_RELEASE_GITHUB_ORG}:registry=https://npm.pkg.github.com ./.npmrc || echo @${ZITADEL_RELEASE_GITHUB_ORG}:registry=https://npm.pkg.github.com >> ./.npmrc'"
     },
     "generate": {
       "inputs": [
