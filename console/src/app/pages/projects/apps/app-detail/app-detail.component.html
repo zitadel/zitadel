@@ -382,17 +382,7 @@
                           </div>
                         </div>
                         <div class="step-item">
-                          <div class="step-number">
-                            {{
-                              hasSdk() && hasAnyFrameworkContent() && getFrameworkInfo()?.docsLink
-                                ? '4'
-                                : hasSdk() || (hasAnyFrameworkContent() && getFrameworkInfo()?.docsLink)
-                                  ? '3'
-                                  : !hasSdk() && !hasAnyFrameworkContent()
-                                    ? '3'
-                                    : '2'
-                            }}
-                          </div>
+                          <div class="step-number">{{ getExistingAppFinalStepNumber() }}</div>
                           <div class="step-content">
                             <h6>{{ 'APP.OVERVIEW_DETAIL.EXISTING_STEP3_TITLE' | translate }}</h6>
                             <p>{{ 'APP.OVERVIEW_DETAIL.EXISTING_STEP3_DESC' | translate }}</p>

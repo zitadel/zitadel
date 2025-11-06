@@ -1242,6 +1242,30 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     return this.hasExample() || this.hasSdk() || this.hasBuildCommands();
   }
 
+  public getExistingAppFinalStepNumber(): number {
+    const hasSdk = this.hasSdk();
+    const hasFrameworkContent = this.hasAnyFrameworkContent();
+    const hasDocsLink = !!this.getFrameworkInfo()?.docsLink;
+
+    // If has SDK and framework content with docs link: 1 (SDK) + 2 (env vars) + 3 (docs) = 4
+    if (hasSdk && hasFrameworkContent && hasDocsLink) {
+      return 4;
+    }
+
+    // If has SDK OR (framework content with docs link): step 3
+    if (hasSdk || (hasFrameworkContent && hasDocsLink)) {
+      return 3;
+    }
+
+    // If no SDK and no framework content: step 3 (generic guidance + env vars + integration)
+    if (!hasSdk && !hasFrameworkContent) {
+      return 3;
+    }
+
+    // Default case: step 2
+    return 2;
+  }
+
   public requiresClientSecret(): boolean {
     return !!(
       this.app?.oidcConfig &&
