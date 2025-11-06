@@ -382,15 +382,6 @@ module.exports = {
               categoryLinkSource: "auto",
             },
           },
-          org_v2beta: {
-            specPath:
-              ".artifacts/openapi3/zitadel/org/v2beta/org_service.openapi.yaml",
-            outputDir: "docs/apis/resources/org_service_v2beta",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
-            },
-          },
           project_v2: {
             specPath:
               ".artifacts/openapi3/zitadel/project/v2/project_service.openapi.yaml",

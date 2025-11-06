@@ -766,18 +766,6 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Organization (Beta)",
-              link: {
-                type: "generated-index",
-                title: "Organization Service Beta API",
-                slug: "/apis/resources/org_service/v2beta",
-                description:
-                  "This beta API is intended to manage organizations for ZITADEL. Expect breaking changes to occur. Please use the v2 version for a stable API. \n",
-              },
-              items: sidebar_api_org_service_v2beta,
-            },
-            {
-              type: "category",
               label: "Identity Provider",
               link: {
                 type: "generated-index",
