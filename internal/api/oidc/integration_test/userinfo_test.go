@@ -162,10 +162,10 @@ func TestServer_UserInfo(t *testing.T) {
 			},
 		},
 		{
-			name:    "group scope",
+			name:    "custom group scope",
 			prepare: getTokens,
 			scope: []string{oidc.ScopeProfile, oidc.ScopeOpenID, oidc.ScopeEmail, oidc.ScopeOfflineAccess,
-				oidc_api.ScopeUserGroups},
+				oidc_api.ScopeCustomUserGroups},
 			assertions: []func(*testing.T, *oidc.UserInfo){
 				assertUserinfo,
 				func(t *testing.T, info *oidc.UserInfo) {
@@ -173,6 +173,21 @@ func TestServer_UserInfo(t *testing.T) {
 						{"id": group1.GetId(), "name": "group1"},
 						{"id": group2.GetId(), "name": "group2"},
 					}
+					userGroupsClaim := info.Claims[oidc_api.ClaimCustomUserGroups]
+					require.Len(t, userGroupsClaim, len(expectedUserGroups))
+					assert.ElementsMatch(t, expectedUserGroups, userGroupsClaim)
+				},
+			},
+		},
+		{
+			name:    "group scope",
+			prepare: getTokens,
+			scope: []string{oidc.ScopeProfile, oidc.ScopeOpenID, oidc.ScopeEmail, oidc.ScopeOfflineAccess,
+				oidc_api.ScopeUserGroups},
+			assertions: []func(*testing.T, *oidc.UserInfo){
+				assertUserinfo,
+				func(t *testing.T, info *oidc.UserInfo) {
+					expectedUserGroups := []string{"group1", "group2"}
 					userGroupsClaim := info.Claims[oidc_api.ClaimUserGroups]
 					require.Len(t, userGroupsClaim, len(expectedUserGroups))
 					assert.ElementsMatch(t, expectedUserGroups, userGroupsClaim)

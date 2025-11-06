@@ -515,15 +515,15 @@ func Test_userInfoToOIDC(t *testing.T) {
 			},
 		},
 		{
-			name: "human, scope user groups, found",
+			name: "human, scope custom user groups, found",
 			args: args{
 				user:  humanUserInfo,
-				scope: []string{ScopeUserGroups},
+				scope: []string{ScopeCustomUserGroups},
 			},
 			want: &oidc.UserInfo{
 				Subject: "human1",
 				Claims: map[string]any{
-					ClaimUserGroups: []query.UserInfoUserGroup{
+					ClaimCustomUserGroups: []query.UserInfoUserGroup{
 						{
 							Name: "group1",
 							ID:   "group1-id",
@@ -533,6 +533,19 @@ func Test_userInfoToOIDC(t *testing.T) {
 							ID:   "group2-id",
 						},
 					},
+				},
+			},
+		},
+		{
+			name: "human, scope user groups (group names), found",
+			args: args{
+				user:  humanUserInfo,
+				scope: []string{ScopeUserGroups},
+			},
+			want: &oidc.UserInfo{
+				Subject: "human1",
+				Claims: map[string]any{
+					ClaimUserGroups: []string{"group1", "group2"},
 				},
 			},
 		},

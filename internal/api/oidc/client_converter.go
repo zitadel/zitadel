@@ -271,7 +271,7 @@ func isScopeAllowed(scope string, allowedScopes ...string) bool {
 	if scope == ScopeProjectsRoles {
 		return true
 	}
-	if scope == ScopeUserGroups {
+	if scope == ScopeCustomUserGroups || scope == ScopeUserGroups {
 		return true
 	}
 	return slices.Contains(allowedScopes, scope)

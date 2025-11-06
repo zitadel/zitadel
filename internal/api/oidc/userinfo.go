@@ -190,6 +190,8 @@ func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []st
 			setUserInfoMetadata(user.Metadata, out)
 		case ScopeResourceOwner:
 			setUserInfoOrgClaims(user, out)
+		case ScopeCustomUserGroups:
+			setUserInfoCustomUserGroups(user.UserGroups, out)
 		case ScopeUserGroups:
 			setUserInfoUserGroups(user.UserGroups, out)
 		default:
@@ -289,11 +291,22 @@ func setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
 	}
 }
 
+func setUserInfoCustomUserGroups(userGroups []query.UserInfoUserGroup, out *oidc.UserInfo) {
+	if len(userGroups) == 0 {
+		return
+	}
+	out.AppendClaims(ClaimCustomUserGroups, userGroups)
+}
+
 func setUserInfoUserGroups(userGroups []query.UserInfoUserGroup, out *oidc.UserInfo) {
 	if len(userGroups) == 0 {
 		return
 	}
-	out.AppendClaims(ClaimUserGroups, userGroups)
+	groups := make([]string, len(userGroups))
+	for i, userGroup := range userGroups {
+		groups[i] = userGroup.Name
+	}
+	out.AppendClaims(ClaimUserGroups, groups)
 }
 
 //nolint:gocognit
