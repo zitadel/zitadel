@@ -1309,7 +1309,7 @@ service AdminService {
 
     // Setup Organization
     //
-    // Deprecated: use [organization service v2 AddOrganization](apis/resources/org_service_v2b/zitadel-org-v-2-organization-service-add-organization.api.mdx) instead.
+    // Deprecated: use [organization service v2 AddOrganization](apis/resources/org_service_v2/zitadel-org-v-2-organization-service-add-organization.api.mdx) instead.
     //
     // Create a new organization with an administrative user. If no specific roles are sent for the first user, the user will get the role ORG_OWNER.
     rpc SetUpOrg(SetUpOrgRequest) returns (SetUpOrgResponse) {
