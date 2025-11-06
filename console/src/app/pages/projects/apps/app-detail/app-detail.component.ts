@@ -10,7 +10,7 @@ import frameworks from '../../../../../../../docs/frameworks.json';
 import { Buffer } from 'buffer';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { mergeMap, Subject, Subscription } from 'rxjs';
-import { map, shareReplay, startWith, switchMap, take, takeUntil } from 'rxjs/operators';
+import { map, startWith, switchMap, take } from 'rxjs/operators';
 import { EnvVar } from 'src/app/components/env-vars-block/env-vars-block.component';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
