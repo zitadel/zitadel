@@ -459,7 +459,7 @@ describe('executeRelease', () => {
   });
 
   test('does not call gh release edit when current version equals highest version', async () => {
-    const mockExecSync = vi.mocked(execSync);
+    const mockExecFileSync = vi.mocked(execFileSync);
 
     vi.mocked(releaseVersion).mockResolvedValue({
       workspaceVersion: '1.0.0',
@@ -476,15 +476,17 @@ describe('executeRelease', () => {
     );
 
     // Ensure we did not attempt to edit the latest release
-    expect(
-      mockExecSync.mock.calls.some(([cmd]) =>
-        String(cmd).includes('gh release edit')
-      )
-    ).toBe(false);
+    expect(mockExecFileSync).not.toHaveBeenCalledWith(
+      'gh',
+      expect.arrayContaining([
+        'release', 'edit', '--latest',
+      ]),
+      expect.objectContaining({ stdio: 'inherit' })
+    );
   });
 
   test('does not call gh release edit when dryRun is true even if tags differ', async () => {
-    const mockExecSync = vi.mocked(execSync);
+    const mockExecFileSync = vi.mocked(execFileSync);
 
     vi.mocked(releaseVersion).mockResolvedValue({
       workspaceVersion: '1.1.0',
@@ -499,15 +501,17 @@ describe('executeRelease', () => {
       { ...mockOptions, dryRun: true }
     );
 
-    expect(
-      mockExecSync.mock.calls.some(([cmd]) =>
-        String(cmd).includes('gh release edit')
-      )
-    ).toBe(false);
+    expect(mockExecFileSync).not.toHaveBeenCalledWith(
+      'gh',
+      expect.arrayContaining([
+        'release', 'edit', '--latest',
+      ]),
+      expect.objectContaining({ stdio: 'inherit' })
+    );
   });
 
   test('calls gh release edit to set latest when current version tag differs and not dryRun', async () => {
-    const mockExecSync = vi.mocked(execSync);
+    const mockExecFileSync = vi.mocked(execFileSync);
 
     vi.mocked(releaseVersion).mockResolvedValue({
       workspaceVersion: '1.1.0',
@@ -522,8 +526,11 @@ describe('executeRelease', () => {
       { ...mockOptions, dryRun: false }
     );
 
-    expect(mockExecSync).toHaveBeenCalledWith(
-      'gh release edit v2.0.0 --latest',
+    expect(mockExecFileSync).toHaveBeenCalledWith(
+      'gh',
+      expect.arrayContaining([
+        'release', 'edit', 'v2.0.0', '--latest',
+      ]),
       expect.objectContaining({ stdio: 'inherit' })
     );
   });
