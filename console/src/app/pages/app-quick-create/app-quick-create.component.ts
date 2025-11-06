@@ -8,8 +8,6 @@ import {
   AddProjectRequest,
   AddProjectResponse,
   AddOIDCAppRequest,
-  AddProjectRoleRequest,
-  AddUserGrantRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { GrantedProject, Project } from 'src/app/proto/generated/zitadel/project_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
