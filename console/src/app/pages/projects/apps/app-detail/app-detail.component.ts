@@ -465,7 +465,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
           .then((app) => {
             if (app.app) {
               this.app = app.app;
-              console.log('Setting app data:', { name: app.app.name, clientId: app.app.oidcConfig?.clientId });
               this.updateEnvVars();
 
               // TODO: duplicates should be handled in the API
