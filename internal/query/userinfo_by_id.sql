@@ -67,7 +67,7 @@ user_groups as (
     select json_agg(row_to_json(r)) as user_groups from (
         select g.id, g.name
         from projections.group_users1 as gu
-            left join projections.groups1 as g on gu.group_id = g.id
+            left join projections.groups1 as g on gu.group_id = g.id and gu.instance_id = g.instance_id
         where gu.user_id = $1
           and gu.instance_id = $2)
         r
