@@ -248,6 +248,8 @@ func TestListCustomDomains(t *testing.T) {
 		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 	})
 
+	relTableState := integration.RelationalTablesEnableMatrix()
+
 	tt := []struct {
 		testName          string
 		inputRequest      *instance.ListCustomDomainsRequest
@@ -302,27 +304,33 @@ func TestListCustomDomains(t *testing.T) {
 		},
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.testName, func(t *testing.T) {
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputContext, time.Minute)
-			require.EventuallyWithT(t, func(collect *assert.CollectT) {
-				// Test
-				res, err := inst.Client.InstanceV2Beta.ListCustomDomains(tc.inputContext, tc.inputRequest)
-
-				// Verify
-				assert.Equal(collect, tc.expectedErrorCode, status.Code(err))
-				assert.Equal(collect, tc.expectedErrorMsg, status.Convert(err).Message())
-
-				if tc.expectedErrorMsg == "" {
-					domains := []string{}
-					for _, d := range res.GetDomains() {
-						domains = append(domains, d.GetDomain())
-					}
-
-					assert.Subset(collect, domains, tc.expectedDomains)
-				}
-			}, retryDuration, tick)
+	for _, stateCase := range relTableState {
+		integration.EnsureInstanceFeature(t, ctx, inst, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
 		})
+
+		for _, tc := range tt {
+			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tc.testName), func(t *testing.T) {
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputContext, time.Minute)
+				require.EventuallyWithT(t, func(collect *assert.CollectT) {
+					// Test
+					res, err := inst.Client.InstanceV2Beta.ListCustomDomains(tc.inputContext, tc.inputRequest)
+
+					// Verify
+					assert.Equal(collect, tc.expectedErrorCode, status.Code(err))
+					assert.Equal(collect, tc.expectedErrorMsg, status.Convert(err).Message())
+
+					if tc.expectedErrorMsg == "" {
+						domains := []string{}
+						for _, d := range res.GetDomains() {
+							domains = append(domains, d.GetDomain())
+						}
+
+						assert.Subset(collect, domains, tc.expectedDomains)
+					}
+				}, retryDuration, tick)
+			})
+		}
 	}
 }
 

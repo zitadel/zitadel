@@ -181,6 +181,7 @@ func TestListInstanceDomainsQuery_Execute(t *testing.T) {
 						dbmock.QueryOptions(
 							database.WithCondition(database.And(
 								repo.DomainCondition(database.TextOperationContains, "test.domain"),
+								repo.TypeCondition(domain.DomainTypeCustom),
 							)),
 						),
 						dbmock.QueryOptions(database.WithOrderBy(database.OrderDirectionDesc, repo.DomainColumn())),
@@ -224,6 +225,7 @@ func TestListInstanceDomainsQuery_Execute(t *testing.T) {
 								repo.DomainCondition(database.TextOperationContains, "test.domain"),
 								repo.IsGeneratedCondition(true),
 								repo.IsPrimaryCondition(true),
+								repo.TypeCondition(domain.DomainTypeCustom),
 							)),
 						),
 						dbmock.QueryOptions(database.WithOrderBy(database.OrderDirectionDesc, repo.DomainColumn())),

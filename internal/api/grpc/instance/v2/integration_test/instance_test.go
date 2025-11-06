@@ -255,7 +255,7 @@ func TestUpdateInstance(t *testing.T) {
 				expectedErrorMsg:  "Errors.Token.Invalid (AUTH-7fs1e)",
 			},
 			{
-				// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place
+				// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place (see https://github.com/zitadel/zitadel/issues/10917)
 				testName: "when unauthZ context should return unauthZ error",
 				inputRequest: &instance.UpdateInstanceRequest{
 					InstanceId:   instancesWithCtx.inst.ID(),
@@ -301,7 +301,7 @@ func TestUpdateInstance(t *testing.T) {
 		}
 
 		for _, tc := range tt {
-			// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place
+			// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place (see https://github.com/zitadel/zitadel/issues/10917)
 			if tc.testName == "when unauthZ context should return unauthZ error" && instancesWithCtx.testType == "relational" {
 				continue
 			}

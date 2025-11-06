@@ -53,6 +53,10 @@ func (s *Server) ListInstances(ctx context.Context, req *connect.Request[instanc
 }
 
 func (s *Server) ListCustomDomains(ctx context.Context, req *connect.Request[instance.ListCustomDomainsRequest]) (*connect.Response[instance.ListCustomDomainsResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.ListCustomDomains(ctx, req)
+	}
+
 	if err := s.checkPermission(ctx, domain.PermissionSystemInstanceRead, domain.PermissionInstanceRead); err != nil {
 		return nil, err
 	}

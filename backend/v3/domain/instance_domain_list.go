@@ -78,6 +78,7 @@ func (l *ListInstanceDomainsQuery) conditions(domainRepo InstanceDomainRepositor
 		}
 	}
 
+	conditions = append(conditions, domainRepo.TypeCondition(DomainTypeCustom))
 	return database.WithCondition(database.And(conditions...)), nil
 }
 

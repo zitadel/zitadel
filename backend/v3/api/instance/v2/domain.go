@@ -6,9 +6,12 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/backend/v3/api/instance/v2/convert"
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	filter_v2 "github.com/zitadel/zitadel/pkg/grpc/filter/v2"
+	filter_v2beta "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
 	instance_v2 "github.com/zitadel/zitadel/pkg/grpc/instance/v2"
 	instance_v2beta "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 )
@@ -61,6 +64,27 @@ func RemoveCustomDomainBeta(ctx context.Context, request *connect.Request[instan
 	}, nil
 }
 
+func ListCustomDomainsBeta(ctx context.Context, request *connect.Request[instance_v2beta.ListCustomDomainsRequest]) (*connect.Response[instance_v2beta.ListCustomDomainsResponse], error) {
+	listCustomDomainsQuery := domain.NewListInstanceDomainsQuery(convert.ListCustomDomainsBetaRequestToV2Request(request.Msg))
+
+	err := domain.Invoke(ctx, listCustomDomainsQuery, domain.WithInstanceDomainRepo(repository.InstanceDomainRepository()))
+	if err != nil {
+		return nil, err
+	}
+
+	customDomains := listCustomDomainsQuery.Result()
+	return &connect.Response[instance_v2beta.ListCustomDomainsResponse]{
+		Msg: &instance_v2beta.ListCustomDomainsResponse{
+			Domains: convert.DomainInstanceDomainListModelToGRPCBetaResponse(customDomains),
+			Pagination: &filter_v2beta.PaginationResponse{
+				// TODO(IAM-Marco): return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10955
+				TotalResult:  uint64(len(customDomains)),
+				AppliedLimit: uint64(request.Msg.GetPagination().GetLimit()),
+			},
+		},
+	}, nil
+}
+
 // =================
 // v2 endpoints
 // =================
@@ -105,6 +129,27 @@ func RemoveCustomDomain(ctx context.Context, request *connect.Request[instance_v
 		Msg: &instance_v2.RemoveCustomDomainResponse{
 			// TODO(IAM-Marco): Return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10881
 			DeletionDate: timestamppb.Now(),
+		},
+	}, nil
+}
+
+func ListCustomDomains(ctx context.Context, request *connect.Request[instance_v2.ListCustomDomainsRequest]) (*connect.Response[instance_v2.ListCustomDomainsResponse], error) {
+	listCustomDomainsQuery := domain.NewListInstanceDomainsQuery(request.Msg)
+
+	err := domain.Invoke(ctx, listCustomDomainsQuery, domain.WithInstanceDomainRepo(repository.InstanceDomainRepository()))
+	if err != nil {
+		return nil, err
+	}
+
+	customDomains := listCustomDomainsQuery.Result()
+	return &connect.Response[instance_v2.ListCustomDomainsResponse]{
+		Msg: &instance_v2.ListCustomDomainsResponse{
+			Domains: convert.DomainInstanceDomainListModelToGRPCResponse(customDomains),
+			Pagination: &filter_v2.PaginationResponse{
+				// TODO(IAM-Marco): return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10955
+				TotalResult:  uint64(len(customDomains)),
+				AppliedLimit: uint64(request.Msg.GetPagination().GetLimit()),
+			},
 		},
 	}, nil
 }

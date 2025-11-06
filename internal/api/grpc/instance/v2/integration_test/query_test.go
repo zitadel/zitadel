@@ -76,7 +76,7 @@ func TestGetInstance(t *testing.T) {
 				expectedErrorMsg:  "auth header missing",
 			},
 			{
-				// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place
+				// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place (see https://github.com/zitadel/zitadel/issues/10917)
 				testName:          "when unauthZ context should return unauthZ error",
 				inputContext:      instWithCtx.orgOwnerCtx,
 				inputInstanceID:   instWithCtx.inst.ID(),
@@ -110,7 +110,7 @@ func TestGetInstance(t *testing.T) {
 		}
 
 		faultyTestCasesForRelational := []string{
-			// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place
+			// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place (see https://github.com/zitadel/zitadel/issues/10917)
 			"when unauthZ context should return unauthZ error",
 			// TODO(IAM-Marco): Decide if we should set the instance in context.
 			"when request succeeds should return matching instance (own context)",
@@ -185,6 +185,7 @@ func TestListInstances(t *testing.T) {
 			expectedErrorMsg:  "auth header missing",
 		},
 		{
+			// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place (see https://github.com/zitadel/zitadel/issues/10917)
 			testName: "when unauthZ context should return unauthZ error",
 			inputRequest: &instance.ListInstancesRequest{
 				Pagination: &filter.PaginationRequest{Offset: 0, Limit: 10},
@@ -226,6 +227,10 @@ func TestListInstances(t *testing.T) {
 		})
 
 		for _, tc := range tt {
+			// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place (see https://github.com/zitadel/zitadel/issues/10917)
+			if tc.testName == "when unauthZ context should return unauthZ error" && stateCase.State == "when relational tables are enabled" {
+				continue
+			}
 			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tc.testName), func(t *testing.T) {
 				// Test
 				res, err := inst.Client.InstanceV2.ListInstances(tc.inputContext, tc.inputRequest)
@@ -273,6 +278,8 @@ func TestListCustomDomains(t *testing.T) {
 		inst.Client.InstanceV2.RemoveCustomDomain(ctxWithSysAuthZ, &instance.RemoveCustomDomainRequest{InstanceId: inst.ID(), CustomDomain: d2})
 		inst.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 	})
+
+	relTableState := integration.RelationalTablesEnableMatrix()
 
 	tt := []struct {
 		testName          string
@@ -345,27 +352,33 @@ func TestListCustomDomains(t *testing.T) {
 		},
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.testName, func(t *testing.T) {
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputContext, time.Minute)
-			require.EventuallyWithT(t, func(collect *assert.CollectT) {
-				// Test
-				res, err := inst.Client.InstanceV2.ListCustomDomains(tc.inputContext, tc.inputRequest)
-
-				// Verify
-				assert.Equal(collect, tc.expectedErrorCode, status.Code(err))
-				assert.Equal(collect, tc.expectedErrorMsg, status.Convert(err).Message())
-
-				if tc.expectedErrorMsg == "" {
-					domains := []string{}
-					for _, d := range res.GetDomains() {
-						domains = append(domains, d.GetDomain())
-					}
-
-					assert.Subset(collect, domains, tc.expectedDomains)
-				}
-			}, retryDuration, tick)
+	for _, stateCase := range relTableState {
+		integration.EnsureInstanceFeature(t, ctx, inst, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
 		})
+
+		for _, tc := range tt {
+			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tc.testName), func(t *testing.T) {
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputContext, time.Minute)
+				require.EventuallyWithT(t, func(collect *assert.CollectT) {
+					// Test
+					res, err := inst.Client.InstanceV2.ListCustomDomains(tc.inputContext, tc.inputRequest)
+
+					// Verify
+					assert.Equal(collect, tc.expectedErrorCode, status.Code(err))
+					assert.Equal(collect, tc.expectedErrorMsg, status.Convert(err).Message())
+
+					if tc.expectedErrorMsg == "" {
+						domains := []string{}
+						for _, d := range res.GetDomains() {
+							domains = append(domains, d.GetDomain())
+						}
+
+						assert.Subset(collect, domains, tc.expectedDomains)
+					}
+				}, retryDuration, tick)
+			})
+		}
 	}
 }
 

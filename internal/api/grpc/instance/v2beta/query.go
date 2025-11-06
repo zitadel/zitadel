@@ -48,6 +48,10 @@ func (s *Server) ListInstances(ctx context.Context, req *connect.Request[instanc
 }
 
 func (s *Server) ListCustomDomains(ctx context.Context, req *connect.Request[instance.ListCustomDomainsRequest]) (*connect.Response[instance.ListCustomDomainsResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.ListCustomDomainsBeta(ctx, req)
+	}
+
 	queries, err := ListCustomDomainsRequestToModel(req.Msg, s.systemDefaults)
 	if err != nil {
 		return nil, err
