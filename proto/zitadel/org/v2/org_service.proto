@@ -643,11 +643,13 @@ message ListOrganizationsRequest {
 }
 
 message ListOrganizationsResponse {
-
+  // Details of organizations results.
   zitadel.object.v2.ListDetails details = 1;
 
+  // The sorting columns the result is sorted.
   zitadel.org.v2.OrganizationFieldName sorting_column = 2;
 
+  // The Result is a list of organizations matching the query.
   repeated zitadel.org.v2.Organization result = 3;
 }
 
@@ -861,6 +863,7 @@ message GenerateOrganizationDomainValidationResponse {
       example: "\"ofSBHsSAVHAoTIE4Iv2gwhaYhTjcY5QX\"";
     }
   ];
+
   // URL is the location where the token needs to be placed for HTTP challenge.
   string url = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -880,6 +883,7 @@ message VerifyOrganizationDomainRequest {
       example: "\"69629012906488334\"";
     }
   ];
+
   // Domain is the full qualified domain name to be verified.
   string domain = 2 [
     (validate.rules).string = {min_len: 1, max_len: 253},
@@ -918,6 +922,7 @@ message SetOrganizationMetadataRequest{
       example: "\"69629012906488334\"";
     }
   ];
+
   // Metadata is a list of metadata entries to set.
   repeated Metadata metadata = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -973,6 +978,7 @@ message DeleteOrganizationMetadataRequest {
       example: "\"69629012906488334\"";
     }
   ];
+
   // Keys are the organization metadata entries to be deleted by their key.
   repeated string keys = 2 [(validate.rules).repeated.items.string = {min_len: 1, max_len: 200}];
 }

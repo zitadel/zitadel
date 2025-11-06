@@ -12,21 +12,26 @@ import "zitadel/object/v2/object.proto";
 
 
 message Organization {
-  // Unique identifier of the organization.
+  // ID is the unique identifier of the organization.
   string id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629023906488334\""
     }
   ];
+
+  // Details about the organizations' creation and change date.
   zitadel.object.v2.Details details = 2;
+
   // Current state of the organization, for example active, inactive and deleted.
   OrganizationState state = 3;
+
   // Name of the organization.
   string name = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"ZITADEL\"";
     }
   ];
+
   // Primary domain used in the organization.
   string primary_domain = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
