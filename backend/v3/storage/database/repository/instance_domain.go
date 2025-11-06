@@ -160,6 +160,11 @@ func (i instanceDomain) TypeCondition(typ domain.DomainType) database.Condition 
 	return database.NewTextCondition(i.TypeColumn(), database.TextOperationEqual, typ.String())
 }
 
+// IsGeneratedCondition implements domain.InstanceDomainRepository.
+func (i *instanceDomain) IsGeneratedCondition(isGenerated bool) database.Condition {
+	return database.NewBooleanCondition(i.IsGeneratedColumn(), isGenerated)
+}
+
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
