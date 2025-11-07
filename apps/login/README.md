@@ -228,13 +228,15 @@ const isValid =
 | Variable                     | Description                        | Default | Required |
 | ---------------------------- | ---------------------------------- | ------- | -------- |
 | `ZITADEL_API_URL`            | ZITADEL API endpoint               | -       | ✅       |
-| `ZITADEL_SERVICE_USER_TOKEN` | Service user token for API auth    | -       | ✅       |
-| `ZITADEL_SERVICE_USER_TOKEN_FILE` | Service user token file for API auth    | -       | ✅       |
+| `ZITADEL_SERVICE_USER_TOKEN` | Service user token for API auth    | -       | ✅ (one of) |
+| `ZITADEL_SERVICE_USER_TOKEN_FILE` | Service user token file for API auth    | -       | ✅ (one of) |
 | `EMAIL_VERIFICATION`         | Enforce email verification         | `false` | ❌       |
 | `DEBUG`                      | Enable debug mode                  | `false` | ❌       |
 | `PORT`                       | Custom port for the application    | `3000`  | ❌       |
 | `NEXT_PUBLIC_BASE_PATH`      | Base path for reverse proxy setups | -       | ❌       |
 
+> **Note:** Either `ZITADEL_SERVICE_USER_TOKEN` or `ZITADEL_SERVICE_USER_TOKEN_FILE` must be set for API authentication.  
+> These options are mutually exclusive—set only one, not both.
 ### Login Settings (from ZITADEL)
 
 Key settings that affect the flow:
