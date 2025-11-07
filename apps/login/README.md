@@ -264,7 +264,7 @@ Key settings that affect the flow:
 
 ### Run Login UI Acceptance tests
 
-To run the acceptance tests you need a running ZITADEL environment and a component which receives HTTP requests for the emails and sms's.
+To run the acceptance tests you need a running ZITADEL environment and a component which receives HTTP requests for the emails and SMSs.
 This component should also be able to return the content of these notifications, as the codes and links are used in the login flows.
 There is a basic implementation in Golang available under [the sink package](./acceptance/sink).
 
