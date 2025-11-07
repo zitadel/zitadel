@@ -86,6 +86,7 @@ func TestListProjectGrants(t *testing.T) {
 	instanceID := createInstance(t, tx)
 	firstGrantingOrgID := createOrganization(t, tx, instanceID)
 	firstProjectID := createProject(t, tx, instanceID, firstGrantingOrgID)
+	roleKey := createProjectRole(t, tx, instanceID, firstGrantingOrgID, firstProjectID, "")
 	secondGrantingOrgID := createOrganization(t, tx, instanceID)
 	secondProjectID := createProject(t, tx, instanceID, secondGrantingOrgID)
 
@@ -101,6 +102,7 @@ func TestListProjectGrants(t *testing.T) {
 			GrantedOrganizationID:  firstGrantedOrgID,
 			GrantingOrganizationID: firstGrantingOrgID,
 			State:                  domain.ProjectGrantStateActive,
+			RoleKeys:               []string{roleKey},
 		},
 		{
 			InstanceID:             instanceID,
@@ -192,6 +194,14 @@ func TestListProjectGrants(t *testing.T) {
 			),
 			want: []*domain.ProjectGrant{projectGrants[0], projectGrants[3]},
 		},
+		{
+			name: "exists role key",
+			condition: database.And(
+				projectGrantRepo.InstanceIDCondition(instanceID),
+				projectGrantRepo.ExistsRoleKey(projectGrantRepo.RoleKeyCondition(database.TextOperationEqual, roleKey)),
+			),
+			want: []*domain.ProjectGrant{projectGrants[0]},
+		},
 	}
 
 	for _, tt := range tests {
@@ -213,7 +223,9 @@ func TestCreateProjectGrant(t *testing.T) {
 	grantingOrgID := createOrganization(t, tx, instanceID)
 	firstGrantedOrgID := createOrganization(t, tx, instanceID)
 	secondGrantedOrgID := createOrganization(t, tx, instanceID)
+	thirdGrantedOrgID := createOrganization(t, tx, instanceID)
 	projectID := createProject(t, tx, instanceID, grantingOrgID)
+	roleKey := createProjectRole(t, tx, instanceID, grantingOrgID, projectID, "")
 	projectGrantRepo := repository.ProjectGrantRepository()
 
 	existingProjectGrant := &domain.ProjectGrant{
@@ -283,6 +295,18 @@ func TestCreateProjectGrant(t *testing.T) {
 			name:         "duplicate project grant",
 			projectGrant: existingProjectGrant,
 			wantErr:      new(database.UniqueError),
+		},
+		{
+			name: "add project grant with role",
+			projectGrant: &domain.ProjectGrant{
+				InstanceID:             instanceID,
+				ID:                     integration.ID(),
+				ProjectID:              projectID,
+				GrantingOrganizationID: grantingOrgID,
+				GrantedOrganizationID:  thirdGrantedOrgID,
+				State:                  domain.ProjectGrantStateActive,
+				RoleKeys:               []string{roleKey},
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -375,13 +399,14 @@ func TestUpdateProjectGrant(t *testing.T) {
 	}
 }
 
-func TestDeleteProjectGrant(t *testing.T) {
+func TestSetRolesProjectGrant(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
 	defer rollback()
 	instanceID := createInstance(t, tx)
 	grantingOrgID := createOrganization(t, tx, instanceID)
 	grantedOrgID := createOrganization(t, tx, instanceID)
 	projectID := createProject(t, tx, instanceID, grantingOrgID)
+	roleKey := createProjectRole(t, tx, instanceID, grantingOrgID, projectID, "")
 	projectGrantRepo := repository.ProjectGrantRepository()
 
 	existingProjectGrant := &domain.ProjectGrant{
@@ -391,6 +416,77 @@ func TestDeleteProjectGrant(t *testing.T) {
 		GrantingOrganizationID: grantingOrgID,
 		GrantedOrganizationID:  grantedOrgID,
 		State:                  domain.ProjectGrantStateActive,
+	}
+	err := projectGrantRepo.Create(t.Context(), tx, existingProjectGrant)
+	require.NoError(t, err)
+	lastUpdatedAt := existingProjectGrant.UpdatedAt
+
+	tests := []struct {
+		name             string
+		condition        database.Condition
+		roleKeys         []string
+		wantRowsAffected int64
+		wantErr          error
+		assertChanges    func(t *testing.T, project *domain.ProjectGrant)
+	}{
+		{
+			name:             "incomplete condition",
+			condition:        projectGrantRepo.InstanceIDCondition(instanceID),
+			roleKeys:         []string{roleKey},
+			wantRowsAffected: 0,
+			wantErr:          database.NewMissingConditionError(projectGrantRepo.IDColumn()),
+		},
+		{
+			name:             "set rolekey",
+			condition:        projectGrantRepo.PrimaryKeyCondition(instanceID, existingProjectGrant.ID),
+			roleKeys:         []string{roleKey},
+			wantRowsAffected: 1,
+			assertChanges: func(t *testing.T, updatedProject *domain.ProjectGrant) {
+				assert.Equal(t, []string{roleKey}, updatedProject.RoleKeys)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			savepoint, rollback := savepointForRollback(t, tx)
+			defer rollback()
+			rowsAffected, err := projectGrantRepo.SetRoleKeys(t.Context(), savepoint, tt.condition, tt.roleKeys)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
+
+			if tt.assertChanges != nil {
+				updatedProjectGrant, err := projectGrantRepo.Get(t.Context(), savepoint, database.WithCondition(
+					projectGrantRepo.PrimaryKeyCondition(instanceID, existingProjectGrant.ID),
+				))
+				require.NoError(t, err)
+				assert.WithinRange(t, updatedProjectGrant.CreatedAt, existingProjectGrant.CreatedAt, existingProjectGrant.CreatedAt)
+				assert.WithinRange(t, updatedProjectGrant.UpdatedAt, lastUpdatedAt, lastUpdatedAt.Add(time.Second))
+				lastUpdatedAt = updatedProjectGrant.UpdatedAt
+				tt.assertChanges(t, updatedProjectGrant)
+			}
+		})
+	}
+}
+
+func TestDeleteProjectGrant(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+	instanceID := createInstance(t, tx)
+	grantingOrgID := createOrganization(t, tx, instanceID)
+	grantedOrgID := createOrganization(t, tx, instanceID)
+	projectID := createProject(t, tx, instanceID, grantingOrgID)
+	roleKey := createProjectRole(t, tx, instanceID, grantingOrgID, projectID, "")
+	projectGrantRepo := repository.ProjectGrantRepository()
+
+	existingProjectGrant := &domain.ProjectGrant{
+		InstanceID:             instanceID,
+		ID:                     integration.ID(),
+		ProjectID:              projectID,
+		GrantingOrganizationID: grantingOrgID,
+		GrantedOrganizationID:  grantedOrgID,
+		State:                  domain.ProjectGrantStateActive,
+		RoleKeys:               []string{roleKey},
 	}
 	err := projectGrantRepo.Create(t.Context(), tx, existingProjectGrant)
 	require.NoError(t, err)

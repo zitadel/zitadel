@@ -36,8 +36,6 @@ CREATE TABLE zitadel.project_grant_roles(
     , grant_id TEXT NOT NULL
     , key TEXT NOT NULL CHECK (key <> '')
 
-    , created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-
     , project_id TEXT NOT NULL
 
     , PRIMARY KEY (instance_id, grant_id, key)

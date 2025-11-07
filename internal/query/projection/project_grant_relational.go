@@ -73,7 +73,7 @@ func (p *projectGrantRelationalProjection) reduceProjectGrantAdded(event eventst
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5w96sjaQ16", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.ProjectGrantRepository()
-		if err := repo.Create(ctx, v3_sql.SQLTx(tx), &repoDomain.ProjectGrant{
+		return repo.Create(ctx, v3_sql.SQLTx(tx), &repoDomain.ProjectGrant{
 			InstanceID:             e.Aggregate().InstanceID,
 			ID:                     e.GrantID,
 			ProjectID:              e.Aggregate().ID,
@@ -82,24 +82,8 @@ func (p *projectGrantRelationalProjection) reduceProjectGrantAdded(event eventst
 			CreatedAt:              e.CreationDate(),
 			UpdatedAt:              e.CreationDate(),
 			State:                  repoDomain.ProjectGrantStateActive,
-		}); err != nil {
-			return err
-		}
-		if len(e.RoleKeys) > 0 {
-			roleRepo := repo.Role()
-			for _, key := range e.RoleKeys {
-				if err := roleRepo.Add(ctx, v3_sql.SQLTx(tx), &repoDomain.ProjectGrantRole{
-					InstanceID: e.Aggregate().InstanceID,
-					GrantID:    e.GrantID,
-					ProjectID:  e.Aggregate().ID,
-					CreatedAt:  e.CreationDate(),
-					Key:        key,
-				}); err != nil {
-					return err
-				}
-			}
-		}
-		return nil
+			RoleKeys:               e.RoleKeys,
+		})
 	}), nil
 }
 
@@ -113,43 +97,12 @@ func (p *projectGrantRelationalProjection) reduceProjectGrantChanged(event event
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-ANaKzWKAUc", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.ProjectGrantRepository().Role()
-		roles, err := repo.List(ctx, v3_sql.SQLTx(tx),
-			database.WithCondition(
-				database.And(
-					repo.InstanceIDCondition(e.Aggregate().InstanceID),
-					repo.GrantIDCondition(e.GrantID),
-				),
-			),
+		repo := repository.ProjectGrantRepository()
+		_, err := repo.SetRoles(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.GrantID),
+			e.RoleKeys,
 		)
-		if err != nil {
-			return err
-		}
-		for _, role := range roles {
-			if _, err := repo.Remove(ctx, v3_sql.SQLTx(tx),
-				database.And(
-					repo.InstanceIDCondition(role.InstanceID),
-					repo.GrantIDCondition(role.GrantID),
-					repo.KeyCondition(role.Key),
-				),
-			); err != nil {
-				return err
-			}
-		}
-		if len(e.RoleKeys) > 0 {
-			for _, key := range e.RoleKeys {
-				if err := repo.Add(ctx, v3_sql.SQLTx(tx), &repoDomain.ProjectGrantRole{
-					InstanceID: e.Aggregate().InstanceID,
-					GrantID:    e.GrantID,
-					ProjectID:  e.Aggregate().ID,
-					CreatedAt:  e.CreationDate(),
-					Key:        key,
-				}); err != nil {
-					return err
-				}
-			}
-		}
-		return nil
+		return err
 	}), nil
 }
 
@@ -163,29 +116,12 @@ func (p *projectGrantRelationalProjection) reduceProjectGrantCascadeChanged(even
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-aI2o6NlWpv", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.ProjectGrantRepository().Role()
-		if _, err := repo.Remove(ctx, v3_sql.SQLTx(tx),
-			database.And(
-				repo.InstanceIDCondition(e.Aggregate().InstanceID),
-				repo.GrantIDCondition(e.GrantID),
-			),
-		); err != nil {
-			return err
-		}
-		if len(e.RoleKeys) > 0 {
-			for _, key := range e.RoleKeys {
-				if err := repo.Add(ctx, v3_sql.SQLTx(tx), &repoDomain.ProjectGrantRole{
-					InstanceID: e.Aggregate().InstanceID,
-					GrantID:    e.GrantID,
-					ProjectID:  e.Aggregate().ID,
-					CreatedAt:  e.CreationDate(),
-					Key:        key,
-				}); err != nil {
-					return err
-				}
-			}
-		}
-		return nil
+		repo := repository.ProjectGrantRepository()
+		_, err := repo.SetRoles(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.GrantID),
+			e.RoleKeys,
+		)
+		return err
 	}), nil
 }
 
