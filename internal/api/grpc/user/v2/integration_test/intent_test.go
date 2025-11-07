@@ -499,9 +499,6 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 					Profile: &user.SetHumanProfile{
 						PreferredLanguage: gu.Ptr("und"),
 					},
-					Email: &user.SetHumanEmail{
-						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
-					},
 				},
 			},
 			wantErr: false,
@@ -732,9 +729,6 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 					Profile: &user.SetHumanProfile{
 						PreferredLanguage: gu.Ptr("und"),
 					},
-					Email: &user.SetHumanEmail{
-						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
-					},
 				},
 			},
 			wantErr: false,
@@ -845,9 +839,6 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 					Profile: &user.SetHumanProfile{
 						PreferredLanguage: gu.Ptr("en"),
 					},
-					Email: &user.SetHumanEmail{
-						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
-					},
 				},
 			},
 			wantErr: false,
@@ -942,9 +933,6 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 					Profile: &user.SetHumanProfile{
 						PreferredLanguage: gu.Ptr("und"),
 					},
-					Email: &user.SetHumanEmail{
-						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
-					},
 				},
 			},
 			wantErr: false,
@@ -1032,9 +1020,6 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 					UserId: "user",
 					Profile: &user.SetHumanProfile{
 						PreferredLanguage: gu.Ptr("und"),
-					},
-					Email: &user.SetHumanEmail{
-						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
 					},
 				},
 			},
