@@ -4,40 +4,11 @@ A Next.js-based login application implementing ZITADEL's authentication flow wit
 
 ## Quick Start
 
-### Prerequisites
+For complete setup instructions including prerequisites and dependencies, see the [Contributing Guide](/CONTRIBUTING.md#contribute-to-login).
 
-- Node.js 18+ and pnpm
-- ZITADEL instance running (can be local or remote)
+### Environment Variables
 
-## Developing Your Own ZITADEL Login UI
-
-We think the easiest path of getting up and running, is the following:
-
-1. Fork and clone this repository
-2. Rename the file .github/dependabot.example.yml to .github/dependabot.yml so you don't miss version and security updates.
-3. [Run the ZITADEL Cloud login UI locally](#development-setup)
-4. Make changes to the code and see the effects live on your local machine
-5. Study the rest of this README.md and get familiar and comfortable with how everything works.
-6. Decide on a way of how you want to build and run your login UI.
-   You can reuse ZITADEL Clouds way.
-   But if you need more freedom, you can also import the packages you need into your self built application.
-
-The `@zitadel/client` package is using [@connectrpc/connect](https://github.com/connectrpc/connect-es#readme).
-
-You can read the [contribution guide](/CONTRIBUTING.md) on how to contribute.
-Questions can be raised in our [Discord channel](https://discord.gg/erh5Brh7jE) or as
-a [GitHub issue](https://github.com/zitadel/typescript/issues).
-
-### Development Setup
-
-1. **Install dependencies:**
-
-   ```bash
-   pnpm install
-   ```
-
-2. **Set environment variables:**
-   Create a `.env.local` file in the `apps/login` directory:
+Create a `.env.local` file in the `apps/login` directory:
 
    ```env
    # Required: ZITADEL API endpoint
@@ -61,20 +32,7 @@ a [GitHub issue](https://github.com/zitadel/typescript/issues).
    NEXT_PUBLIC_BASE_PATH=/ui/v2/login
    ```
 
-3. **Run the development server:**
-
-   ```bash
-   # From project root
-   pnpm dev
-
-   # Or specifically for login app
-   cd apps/login
-   pnpm dev
-   ```
-
-4. **Access the application:**
-   - Local: `http://localhost:3000`
-   - The app will auto-redirect to `/loginname` unless `DEBUG=true`
+For development workflows including running the dev server, building, and testing, see the [Contributing Guide](/CONTRIBUTING.md#contribute-to-login).
 
 ### Production Build
 
@@ -327,15 +285,6 @@ Then create a personal access token (PAT), copy and set it as ZITADEL_SERVICE_US
 Finally set your instance url as ZITADEL_API_URL. Make sure to set it without trailing slash.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzitadel%2Ftypescript&env=ZITADEL_API_URL,ZITADEL_SERVICE_USER_TOKEN&root-directory=apps/login&envDescription=Setup%20a%20service%20account%20with%20IAM_LOGIN_CLIENT%20membership%20on%20your%20instance%20and%20provide%20its%20personal%20access%20token.&project-name=zitadel-login&repository-name=zitadel-login)
-
-## Versioning And Publishing Packages
-
-Package publishing has been configured using [Changesets](https://github.com/changesets/changesets).
-Here is their [documentation](https://github.com/changesets/changesets#documentation) for more information about the workflow.
-
-The [GitHub Action](https://github.com/changesets/action) needs an `NPM_TOKEN` and `GITHUB_TOKEN` in the repository settings. The [Changesets bot](https://github.com/apps/changeset-bot) should also be installed on the GitHub repository.
-
-Read the [changesets documentation](https://github.com/changesets/changesets/blob/main/docs/automating-changesets.md) for more information about this automation
 
 ## Development
 
