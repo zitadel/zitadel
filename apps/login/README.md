@@ -67,7 +67,7 @@ This login application is implemented as a **state machine** with multiple pages
 ### Custom translations
 
 The new login uses the [SettingsApi](https://zitadel.com/docs/apis/resources/settings_service_v2/settings-service-get-hosted-login-translation) to load custom translations.
-Translations can be overriden at both the instance and organization levels.
+Translations can be overridden at both the instance and organization levels.
 To find the keys more easily, you can inspect the HTML and search for a `data-i18n-key` attribute, or look at the defaults in `/apps/login/locales/[locale].ts`.
 ![Custom Translations](.github/custom-i18n.png)
 
