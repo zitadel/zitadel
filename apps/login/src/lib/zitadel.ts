@@ -29,7 +29,7 @@ import {
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { unstable_cacheLife as cacheLife } from "next/cache";
+import { cacheLife } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { getUserAgent } from "./fingerprint";
 import { setSAMLFormCookie } from "./saml";
@@ -37,25 +37,13 @@ import { createServiceForHost } from "./service";
 
 const useCache = process.env.DEBUG !== "true";
 
-async function cacheWrapper<T>(callback: Promise<T>) {
+async function getHostedLoginTranslationCached(serviceUrl: string, organization?: string, locale?: string) {
   "use cache";
   cacheLife("hours");
 
-  return callback;
-}
-
-export async function getHostedLoginTranslation({
-  serviceUrl,
-  organization,
-  locale,
-}: {
-  serviceUrl: string;
-  organization?: string;
-  locale?: string;
-}) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
-  const callback = settingsService
+  return settingsService
     .getHostedLoginTranslation(
       {
         level: organization
@@ -74,56 +62,153 @@ export async function getHostedLoginTranslation({
     .then((resp) => {
       return resp.translations ? resp.translations : undefined;
     });
+}
 
-  return useCache ? cacheWrapper(callback) : callback;
+export async function getHostedLoginTranslation({
+  serviceUrl,
+  organization,
+  locale,
+}: {
+  serviceUrl: string;
+  organization?: string;
+  locale?: string;
+}) {
+  if (useCache) {
+    return getHostedLoginTranslationCached(serviceUrl, organization, locale);
+  }
+
+  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
+
+  return settingsService
+    .getHostedLoginTranslation(
+      {
+        level: organization
+          ? {
+              case: "organizationId",
+              value: organization,
+            }
+          : {
+              case: "instance",
+              value: true,
+            },
+        locale: locale,
+      },
+      {},
+    )
+    .then((resp) => {
+      return resp.translations ? resp.translations : undefined;
+    });
+}
+
+async function getBrandingSettingsCached(serviceUrl: string, organization?: string) {
+  "use cache";
+  cacheLife("hours");
+
+  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
+
+  return settingsService
+    .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
+    .then((resp) => (resp.settings ? resp.settings : undefined));
 }
 
 export async function getBrandingSettings({ serviceUrl, organization }: { serviceUrl: string; organization?: string }) {
+  if (useCache) {
+    return getBrandingSettingsCached(serviceUrl, organization);
+  }
+
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
-  const callback = settingsService
+  return settingsService
     .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
+}
 
-  return useCache ? cacheWrapper(callback) : callback;
+async function getLoginSettingsCached(serviceUrl: string, organization?: string) {
+  "use cache";
+  cacheLife("hours");
+
+  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
+
+  return settingsService
+    .getLoginSettings({ ctx: makeReqCtx(organization) }, {})
+    .then((resp) => (resp.settings ? resp.settings : undefined));
 }
 
 export async function getLoginSettings({ serviceUrl, organization }: { serviceUrl: string; organization?: string }) {
+  if (useCache) {
+    return getLoginSettingsCached(serviceUrl, organization);
+  }
+
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
-  const callback = settingsService
+  return settingsService
     .getLoginSettings({ ctx: makeReqCtx(organization) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
+}
 
-  return useCache ? cacheWrapper(callback) : callback;
+async function getSecuritySettingsCached(serviceUrl: string) {
+  "use cache";
+  cacheLife("hours");
+
+  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
+
+  return settingsService.getSecuritySettings({}).then((resp) => (resp.settings ? resp.settings : undefined));
 }
 
 export async function getSecuritySettings({ serviceUrl }: { serviceUrl: string }) {
+  if (useCache) {
+    return getSecuritySettingsCached(serviceUrl);
+  }
+
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
-  const callback = settingsService.getSecuritySettings({}).then((resp) => (resp.settings ? resp.settings : undefined));
+  return settingsService.getSecuritySettings({}).then((resp) => (resp.settings ? resp.settings : undefined));
+}
 
-  return useCache ? cacheWrapper(callback) : callback;
+async function getLockoutSettingsCached(serviceUrl: string, orgId?: string) {
+  "use cache";
+  cacheLife("hours");
+
+  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
+
+  return settingsService
+    .getLockoutSettings({ ctx: makeReqCtx(orgId) }, {})
+    .then((resp) => (resp.settings ? resp.settings : undefined));
 }
 
 export async function getLockoutSettings({ serviceUrl, orgId }: { serviceUrl: string; orgId?: string }) {
+  if (useCache) {
+    return getLockoutSettingsCached(serviceUrl, orgId);
+  }
+
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
-  const callback = settingsService
+  return settingsService
     .getLockoutSettings({ ctx: makeReqCtx(orgId) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
+}
 
-  return useCache ? cacheWrapper(callback) : callback;
+async function getPasswordExpirySettingsCached(serviceUrl: string, orgId?: string) {
+  "use cache";
+  cacheLife("hours");
+
+  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
+
+  return settingsService
+    .getPasswordExpirySettings({ ctx: makeReqCtx(orgId) }, {})
+    .then((resp) => (resp.settings ? resp.settings : undefined));
 }
 
 export async function getPasswordExpirySettings({ serviceUrl, orgId }: { serviceUrl: string; orgId?: string }) {
+  if (useCache) {
+    return getPasswordExpirySettingsCached(serviceUrl, orgId);
+  }
+
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
-  const callback = settingsService
+  return settingsService
     .getPasswordExpirySettings({ ctx: makeReqCtx(orgId) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
-
-  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function listIDPLinks({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
@@ -150,12 +235,34 @@ export async function registerTOTP({ serviceUrl, userId }: { serviceUrl: string;
   return userService.registerTOTP({ userId }, {});
 }
 
-export async function getGeneralSettings({ serviceUrl }: { serviceUrl: string }) {
+async function getGeneralSettingsCached(serviceUrl: string) {
+  "use cache";
+  cacheLife("hours");
+
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
-  const callback = settingsService.getGeneralSettings({}, {}).then((resp) => resp.supportedLanguages);
+  return settingsService.getGeneralSettings({}, {}).then((resp) => resp.supportedLanguages);
+}
 
-  return useCache ? cacheWrapper(callback) : callback;
+export async function getGeneralSettings({ serviceUrl }: { serviceUrl: string }) {
+  if (useCache) {
+    return getGeneralSettingsCached(serviceUrl);
+  }
+
+  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
+
+  return settingsService.getGeneralSettings({}, {}).then((resp) => resp.supportedLanguages);
+}
+
+async function getLegalAndSupportSettingsCached(serviceUrl: string, organization?: string) {
+  "use cache";
+  cacheLife("hours");
+
+  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
+
+  return settingsService
+    .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
+    .then((resp) => (resp.settings ? resp.settings : undefined));
 }
 
 export async function getLegalAndSupportSettings({
@@ -165,13 +272,26 @@ export async function getLegalAndSupportSettings({
   serviceUrl: string;
   organization?: string;
 }) {
+  if (useCache) {
+    return getLegalAndSupportSettingsCached(serviceUrl, organization);
+  }
+
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
-  const callback = settingsService
+  return settingsService
     .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
+}
 
-  return useCache ? cacheWrapper(callback) : callback;
+async function getPasswordComplexitySettingsCached(serviceUrl: string, organization?: string) {
+  "use cache";
+  cacheLife("hours");
+
+  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
+
+  return settingsService
+    .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
+    .then((resp) => (resp.settings ? resp.settings : undefined));
 }
 
 export async function getPasswordComplexitySettings({
@@ -181,13 +301,15 @@ export async function getPasswordComplexitySettings({
   serviceUrl: string;
   organization?: string;
 }) {
+  if (useCache) {
+    return getPasswordComplexitySettingsCached(serviceUrl, organization);
+  }
+
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
-  const callback = settingsService
+  return settingsService
     .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
     .then((resp) => (resp.settings ? resp.settings : undefined));
-
-  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function createSessionFromChecks({

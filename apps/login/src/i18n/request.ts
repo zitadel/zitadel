@@ -8,14 +8,13 @@ import { cookies, headers } from "next/headers";
 
 export default getRequestConfig(async () => {
   const fallback = "en";
-  const cookiesList = await cookies();
-
+  
   let locale: string = fallback;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const languageHeader = await (await headers()).get(LANGUAGE_HEADER_NAME);
+  const languageHeader = _headers.get(LANGUAGE_HEADER_NAME);
   if (languageHeader) {
     const headerLocale = languageHeader.split(",")[0].split("-")[0]; // Extract the language code
     if (LANGS.map((l) => l.code).includes(headerLocale)) {
@@ -23,6 +22,7 @@ export default getRequestConfig(async () => {
     }
   }
 
+  const cookiesList = await cookies();
   const languageCookie = cookiesList?.get(LANGUAGE_COOKIE_NAME);
   if (languageCookie && languageCookie.value) {
     if (LANGS.map((l) => l.code).includes(languageCookie.value)) {

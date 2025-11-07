@@ -28,24 +28,24 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       <head />
       <body>
         <ThemeProvider>
-          <Tooltip.Provider>
-            <Suspense
-              fallback={
-                <BackgroundWrapper
-                  className={`relative flex min-h-screen flex-col justify-center bg-background-light-600 dark:bg-background-dark-600`}
-                >
-                  <div className="relative mx-auto w-full max-w-[440px] py-8">
-                    <Skeleton>
-                      <div className="h-40"></div>
-                    </Skeleton>
-                    <div className="flex flex-row items-center justify-end space-x-4 py-4">
-                      <ThemeSwitch />
-                    </div>
+          <Suspense
+            fallback={
+              <BackgroundWrapper
+                className={`relative flex min-h-screen flex-col justify-center bg-background-light-600 dark:bg-background-dark-600`}
+              >
+                <div className="relative mx-auto w-full max-w-[440px] py-8">
+                  <Skeleton>
+                    <div className="h-40"></div>
+                  </Skeleton>
+                  <div className="flex flex-row items-center justify-end space-x-4 py-4">
+                    <ThemeSwitch />
                   </div>
-                </BackgroundWrapper>
-              }
-            >
-              <LanguageProvider>
+                </div>
+              </BackgroundWrapper>
+            }
+          >
+            <LanguageProvider>
+              <Tooltip.Provider>
                 <BackgroundWrapper
                   className={`relative flex min-h-screen flex-col justify-center bg-background-light-600 dark:bg-background-dark-600`}
                 >
@@ -57,9 +57,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                     </div>
                   </div>
                 </BackgroundWrapper>
-              </LanguageProvider>
-            </Suspense>
-          </Tooltip.Provider>
+              </Tooltip.Provider>
+            </LanguageProvider>
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>
