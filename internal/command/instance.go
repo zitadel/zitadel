@@ -966,6 +966,7 @@ func (c *Commands) RemoveInstance(ctx context.Context, id string, errorIfNotFoun
 	}
 
 	instanceAgg := instance.NewAggregate(instID)
+	//nolint: staticcheck
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveInstance(instanceAgg, errorIfNotFound))
 	if err != nil {
 		return nil, err
