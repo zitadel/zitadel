@@ -492,9 +492,9 @@ func (u *userRelationalProjection) reduceHumanAdded(event eventstore.Event) (*ha
 		if password := crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash); password != "" {
 			_, err = humanRepo.SetPassword(ctx, v3Tx,
 				condition,
-				&domain.VerificationTypeSkipVerification{
-					VerifiedAt: gu.Ptr(e.CreatedAt()),
-					Value:      password,
+				&domain.VerificationTypeSkipped{
+					VerifiedAt: e.CreatedAt(),
+					Value:      &password,
 				},
 			)
 			if err != nil {
@@ -597,9 +597,9 @@ func (p *userRelationalProjection) reduceHumanRegistered(event eventstore.Event)
 		if password := crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash); password != "" {
 			_, err = humanRepo.SetPassword(ctx, v3Tx,
 				condition,
-				&domain.VerificationTypeSkipVerification{
-					VerifiedAt: gu.Ptr(e.CreatedAt()),
-					Value:      password,
+				&domain.VerificationTypeSkipped{
+					VerifiedAt: e.CreatedAt(),
+					Value:      &password,
 				},
 			)
 			if err != nil {
@@ -919,7 +919,7 @@ func (p *userRelationalProjection) reduceHumanPhoneChanged(event eventstore.Even
 
 		_, err := repo.SetPhone(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeInitCode{
+			&domain.VerificationTypeInit{
 				Value:     (*string)(&e.PhoneNumber),
 				CreatedAt: e.CreatedAt(),
 			},
@@ -965,7 +965,7 @@ func (p *userRelationalProjection) reduceHumanPhoneVerified(event eventstore.Eve
 
 		_, err := repo.SetPhone(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeSuccessful{
+			&domain.VerificationTypeVerified{
 				VerifiedAt: e.CreatedAt(),
 			},
 		)
@@ -989,7 +989,7 @@ func (p *userRelationalProjection) reduceHumanPhoneCodeAdded(event eventstore.Ev
 		_, err := repo.SetPhone(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			&domain.VerificationTypeUpdate{
-				Code:   e.Code.Crypted,
+				Code:   &e.Code.Crypted,
 				Expiry: &e.Expiry,
 			},
 		)
@@ -1034,7 +1034,7 @@ func (p *userRelationalProjection) reduceHumanEmailChanged(event eventstore.Even
 
 		_, err := repo.SetEmail(ctx, v3Tx,
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeInitCode{
+			&domain.VerificationTypeInit{
 				Value:     (*string)(&e.EmailAddress),
 				CreatedAt: e.CreatedAt(),
 			},
@@ -1058,7 +1058,7 @@ func (p *userRelationalProjection) reduceHumanEmailVerified(event eventstore.Eve
 
 		_, err := repo.SetEmail(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeSuccessful{
+			&domain.VerificationTypeVerified{
 				VerifiedAt: e.CreatedAt(),
 			},
 		)
@@ -1087,7 +1087,7 @@ func (p *userRelationalProjection) reduceHumanEmailCodeAdded(event eventstore.Ev
 		_, err := repo.SetEmail(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			&domain.VerificationTypeUpdate{
-				Code:   e.Code.Crypted,
+				Code:   &e.Code.Crypted,
 				Expiry: expiry,
 			},
 		)
@@ -1176,7 +1176,7 @@ func (p *userRelationalProjection) reduceHumanPasswordChanged(event eventstore.E
 
 		_, err := repo.SetPassword(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeInitCode{
+			&domain.VerificationTypeInit{
 				Value:     &password,
 				CreatedAt: e.CreatedAt(),
 			},
@@ -1215,7 +1215,7 @@ func (p *userRelationalProjection) reduceHumanPasswordCodeAdded(event eventstore
 		_, err := repo.SetPassword(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			&domain.VerificationTypeUpdate{
-				Code:   e.Code.Crypted,
+				Code:   &e.Code.Crypted,
 				Expiry: expiry,
 			},
 		)
@@ -1237,7 +1237,7 @@ func (p *userRelationalProjection) reduceHumanPasswordCheckSucceeded(event event
 
 		_, err := repo.SetPassword(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeSuccessful{},
+			&domain.VerificationTypeVerified{},
 		)
 		return err
 	}), nil
@@ -1277,9 +1277,9 @@ func (p *userRelationalProjection) reduceHumanPasswordHashUpdated(event eventsto
 
 		_, err := repo.SetPassword(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeSkipVerification{
-				Value:      e.EncodedHash,
-				VerifiedAt: gu.Ptr(e.CreatedAt()),
+			&domain.VerificationTypeSkipped{
+				Value:      &e.EncodedHash,
+				VerifiedAt: e.CreatedAt(),
 			},
 		)
 		return err
@@ -1937,10 +1937,9 @@ func (p *userRelationalProjection) reduceTOTPAdded(event eventstore.Event) (*han
 
 		_, err := repo.SetTOTP(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeInitCode{
-				Value:     gu.Ptr(string(e.Secret.Crypted)),
+			&domain.VerificationTypeInit{
 				CreatedAt: e.CreatedAt(),
-				Code:      e.Secret.Crypted,
+				Value:     gu.Ptr(string(e.Secret.Crypted)),
 			},
 		)
 		return err
@@ -1961,7 +1960,7 @@ func (p *userRelationalProjection) reduceTOTPVerified(event eventstore.Event) (*
 
 		_, err := repo.SetTOTP(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeSuccessful{VerifiedAt: e.CreatedAt()},
+			&domain.VerificationTypeVerified{VerifiedAt: e.CreatedAt()},
 		)
 		return err
 	}), nil
@@ -2000,10 +1999,9 @@ func (p *userRelationalProjection) reduceTOTPCheckFailed(event eventstore.Event)
 		}
 		repo := repository.HumanUserRepository()
 
-		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.SetTOTP(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.IncrementFailedTOTPAttempts(),
-			repo.SetUpdatedAt(e.CreatedAt()),
+			&domain.VerificationTypeFailed{},
 		)
 		return err
 	}), nil
@@ -2023,7 +2021,7 @@ func (p *userRelationalProjection) reduceOTPSMSEnabled(event eventstore.Event) (
 
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetPhoneOTPEnabled(true),
+			repo.SetSMSOTPEnabled(true),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -2044,7 +2042,7 @@ func (p *userRelationalProjection) reduceOTPSMSDisabled(event eventstore.Event) 
 
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetPhoneOTPEnabled(false),
+			repo.SetSMSOTPEnabled(false),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -2063,7 +2061,7 @@ func (p *userRelationalProjection) reduceOTPSMSCodeAdded(event eventstore.Event)
 		}
 		repo := repository.HumanUserRepository()
 
-		_, err := repo.SetPhoneOTPVerification(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.SetSMSOTP(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			&domain.VerificationTypeInitCode{
 				Code:      e.Code.Crypted,
@@ -2087,12 +2085,10 @@ func (p *userRelationalProjection) reduceOTPSMSCheckSucceeded(event eventstore.E
 		}
 		repo := repository.HumanUserRepository()
 
-		_, err := repo.SetPhoneOTPVerification(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.SetSMSOTP(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			&domain.VerificationTypeSuccessful{
-				Code:      e.Code.Crypted,
-				CreatedAt: e.CreatedAt(),
-				Expiry:    &e.Expiry,
+				VerifiedAt: e.CreatedAt(),
 			},
 		)
 		return err

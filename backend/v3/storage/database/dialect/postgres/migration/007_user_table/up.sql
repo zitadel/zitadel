@@ -139,7 +139,7 @@ CREATE TABLE zitadel.human_users(
     , phone_otp_verification_id TEXT
 
     , totp_secret BYTES
-    , totp_verified_at TIMESTAMPTZ
+    , unverified_totp_id TEXT
     , totp_last_successful_checked_at TIMESTAMPTZ
     , failed_totp_attempts SMALLINT DEFAULT 0 CHECK (failed_totp_attempts >= 0)
 
