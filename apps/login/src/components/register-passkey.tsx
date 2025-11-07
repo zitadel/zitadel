@@ -1,12 +1,9 @@
 "use client";
 
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
-import {
-  registerPasskeyLink,
-  verifyPasskeyRegistration,
-} from "@/lib/server/passkeys";
+import { registerPasskeyLink, verifyPasskeyRegistration } from "@/lib/server/passkeys";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { Alert } from "./alert";
 import { BackButton } from "./back-button";
@@ -17,18 +14,16 @@ import { Translated } from "./translated";
 type Inputs = {};
 
 type Props = {
-  sessionId: string;
+  sessionId?: string;
+  userId?: string;
   isPrompt: boolean;
   requestId?: string;
   organization?: string;
+  code?: string;
+  codeId?: string;
 };
 
-export function RegisterPasskey({
-  sessionId,
-  isPrompt,
-  organization,
-  requestId,
-}: Props) {
+export function RegisterPasskey({ sessionId, userId, isPrompt, organization, requestId, code, codeId }: Props) {
   const { handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
   });
@@ -43,14 +38,16 @@ export function RegisterPasskey({
     passkeyId: string,
     passkeyName: string,
     publicKeyCredential: any,
-    sessionId: string,
+    currentSessionId?: string,
+    currentUserId?: string,
   ) {
     setLoading(true);
     const response = await verifyPasskeyRegistration({
       passkeyId,
       passkeyName,
       publicKeyCredential,
-      sessionId,
+      sessionId: currentSessionId,
+      userId: currentUserId,
     })
       .catch(() => {
         setError("Could not verify Passkey");
@@ -63,11 +60,28 @@ export function RegisterPasskey({
     return response;
   }
 
-  async function submitRegisterAndContinue(): Promise<boolean | void> {
+  const submitRegisterAndContinue = useCallback(async (): Promise<boolean | void> => {
+    // Require either sessionId or userId
+    if (!sessionId && !userId) {
+      setError("Missing session or user information");
+      return;
+    }
+
     setLoading(true);
-    const resp = await registerPasskeyLink({
-      sessionId,
-    })
+
+    let regReq;
+
+    if (sessionId) {
+      regReq = { sessionId };
+    } else if (userId && code && codeId) {
+      regReq = { userId, code, codeId };
+    } else {
+      setError("Missing code for user-based registration");
+      setLoading(false);
+      return;
+    }
+
+    const resp = await registerPasskeyLink(regReq)
       .catch(() => {
         setError("Could not register passkey");
         return;
@@ -92,29 +106,18 @@ export function RegisterPasskey({
     }
 
     const passkeyId = resp.passkeyId;
-    const options: CredentialCreationOptions =
-      (resp.publicKeyCredentialCreationOptions as CredentialCreationOptions) ??
-      {};
+    const options: CredentialCreationOptions = (resp.publicKeyCredentialCreationOptions as CredentialCreationOptions) ?? {};
 
     if (!options.publicKey) {
       setError("An error on registering passkey");
       return;
     }
 
-    options.publicKey.challenge = coerceToArrayBuffer(
-      options.publicKey.challenge,
-      "challenge",
-    );
-    options.publicKey.user.id = coerceToArrayBuffer(
-      options.publicKey.user.id,
-      "userid",
-    );
+    options.publicKey.challenge = coerceToArrayBuffer(options.publicKey.challenge, "challenge");
+    options.publicKey.user.id = coerceToArrayBuffer(options.publicKey.user.id, "userid");
     if (options.publicKey.excludeCredentials) {
       options.publicKey.excludeCredentials.map((cred: any) => {
-        cred.id = coerceToArrayBuffer(
-          cred.id as string,
-          "excludeCredentials.id",
-        );
+        cred.id = coerceToArrayBuffer(cred.id as string, "excludeCredentials.id");
         return cred;
       });
     }
@@ -140,20 +143,12 @@ export function RegisterPasskey({
       rawId: coerceToBase64Url(rawId, "rawId"),
       type: credentials.type,
       response: {
-        attestationObject: coerceToBase64Url(
-          attestationObject,
-          "attestationObject",
-        ),
+        attestationObject: coerceToBase64Url(attestationObject, "attestationObject"),
         clientDataJSON: coerceToBase64Url(clientDataJSON, "clientDataJSON"),
       },
     };
 
-    const verificationResponse = await submitVerify(
-      passkeyId,
-      "",
-      data,
-      sessionId,
-    );
+    const verificationResponse = await submitVerify(passkeyId, "", data, sessionId, userId);
 
     if (!verificationResponse) {
       setError("Could not verify Passkey!");
@@ -161,7 +156,14 @@ export function RegisterPasskey({
     }
 
     continueAndLogin();
-  }
+  }, [sessionId, userId, code]);
+
+  // Auto-submit when code is provided (similar to VerifyForm)
+  useEffect(() => {
+    if (code) {
+      submitRegisterAndContinue();
+    }
+  }, [code, submitRegisterAndContinue]);
 
   function continueAndLogin() {
     const params = new URLSearchParams();
@@ -174,7 +176,13 @@ export function RegisterPasskey({
       params.set("requestId", requestId);
     }
 
-    params.set("sessionId", sessionId);
+    if (sessionId) {
+      params.set("sessionId", sessionId);
+    }
+
+    if (userId) {
+      params.set("userId", userId);
+    }
 
     router.push("/passkey?" + params);
   }
@@ -211,8 +219,7 @@ export function RegisterPasskey({
           onClick={handleSubmit(submitRegisterAndContinue)}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
-          <Translated i18nKey="set.submit" namespace="passkey" />
+          {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="set.submit" namespace="passkey" />
         </Button>
       </div>
     </form>

@@ -4,6 +4,7 @@ import { Event } from 'src/app/proto/generated/zitadel/event_pb';
 
 @Pipe({
   name: 'topayload',
+  standalone: false,
 })
 export class ToPayloadPipe implements PipeTransform {
   public transform(value: Event): JavaScriptValue | string {

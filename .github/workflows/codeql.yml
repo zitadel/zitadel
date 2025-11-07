@@ -25,21 +25,21 @@ jobs:
       matrix:
         language: [go,javascript]
     steps:
-    - name: Checkout repository
+    - name: Checkout Repository
       uses: actions/checkout@v4
     - if: matrix.language == 'go'
       name: Install Go
       uses: actions/setup-go@v5
       with:
         go-version-file: go.mod
-
-    # node to install sass for go
     - if: matrix.language == 'go'
-      uses: actions/setup-node@v4
-    - if: matrix.language == 'go'
+      name: Set up pnpm
+      uses: pnpm/action-setup@v4
+    - name: Generate gRPC Stubs and Static Assets
+      if: matrix.language == 'go'
       run: |
-        npm install -g sass
-        make core_build
+        pnpm install --frozen-lockfile
+        pnpm nx run-many --nxBail --projects @zitadel/api --targets generate-stubs generate-statik generate-assets
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3

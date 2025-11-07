@@ -19,7 +19,7 @@ const sidebar_api_webkey_service_v2 = require("./docs/apis/resources/webkey_serv
 const sidebar_api_instance_service_v2 = require("./docs/apis/resources/instance_service_v2/sidebar.ts").default
 const sidebar_api_authorization_service_v2 = require("./docs/apis/resources/authorization_service_v2/sidebar.ts").default
 const sidebar_api_internal_permission_service_v2 = require("./docs/apis/resources/internal_permission_service_v2/sidebar.ts").default
-const sidebar_api_app_v2 = require("./docs/apis/resources/application_service_v2/sidebar.ts").default
+const sidebar_api_application_v2 = require("./docs/apis/resources/application_service_v2/sidebar.ts").default
 
 module.exports = {
   guides: [
@@ -124,6 +124,11 @@ module.exports = {
           type: "link",
           label: "Pylon",
           href: "https://github.com/getcronit/pylon",
+        },
+        {
+          type: "link",
+          label: "Vanilla-JS",
+          href: "https://github.com/zitadel/zitadel-vanilla-js",
         },
       ],
     },
@@ -355,7 +360,7 @@ module.exports = {
             "guides/integrate/login-ui/oidc-standard",
             "guides/integrate/login-ui/saml-standard",
             "guides/integrate/login-ui/device-auth",
-            "guides/integrate/login-ui/typescript-repo",
+            "guides/integrate/login-ui/login-app",
           ],
         },
         {
@@ -837,15 +842,13 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Instance (Beta)",
+              label: "Instance",
               link: {
                 type: "generated-index",
-                title: "Instance Service API (Beta)",
+                title: "Instance Service API",
                 slug: "/apis/resources/instance_service_v2",
                 description:
                   "This API is intended to manage instances, custom domains and trusted domains in ZITADEL.\n" +
-                  "\n" +
-                  "This service is in beta state. It can AND will continue breaking until a stable version is released.\n" +
                   "\n" +
                   "This v2 of the API provides the same functionalities as the v1, but organised on a per resource basis.\n" +
                   "The whole functionality related to domains (custom and trusted) has been moved under this instance API."
@@ -855,62 +858,54 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Project (Beta)",
+              label: "Project",
               link: {
                 type: "generated-index",
-                title: "Project Service API (Beta)",
+                title: "Project Service API",
                 slug: "/apis/resources/project_service_v2",
                 description:
-                  "This API is intended to manage projects and subresources for ZITADEL. \n" +
-                  "\n" +
-                  "This service is in beta state. It can AND will continue breaking until a stable version is released.",
+                  "This API is intended to manage projects and subresources for ZITADEL."
               },
               items: sidebar_api_project_service_v2,
             },
             {
               type: "category",
-              label: "App (Beta)",
+              label: "Application",
               link: {
                 type: "generated-index",
-                title: "Application Service API (Beta)",
+                title: "Application Service API",
                 slug: "/apis/resources/application_service_v2",
                 description:
                   "This API lets you manage Zitadel applications (API, SAML, OIDC).\n" +
                   "\n" +
-                  "The API offers generic endpoints that work for all app types (API, SAML, OIDC), " +
-                  "\n" +
-                  "This API is in beta state. It can AND will continue breaking until a stable version is released.\n"
+                  "The API offers generic endpoints that work for all app types (API, SAML, OIDC), "
               },
-              items: sidebar_api_app_v2,
+              items: sidebar_api_application_v2,
             },
             {
               type: "category",
-              label: "Authorizations (Beta)",
+              label: "Authorizations",
               link: {
                 type: "generated-index",
-                title: "Authorization Service API (Beta)",
+                title: "Authorization Service API",
                 slug: "/apis/resources/authorization_service_v2",
                 description:
                   "AuthorizationService provides methods to manage authorizations for users within your projects and applications.\n" +
                   "\n" +
                   "For managing permissions and roles for ZITADEL internal resources, like organizations, projects,\n" +
-                  "users, etc., please use the InternalPermissionService." +
-                  "\n" +
-                  "This API is in beta state. It can AND will continue breaking until a stable version is released.\n"
+                  "users, etc., please use the InternalPermissionService."
               },
               items: sidebar_api_authorization_service_v2,
             },
             {
               type: "category",
-              label: "Internal Permissions (Beta)",
+              label: "Internal Permissions",
               link: {
                 type: "generated-index",
-                title: "Internal Permission Service API (Beta)",
+                title: "Internal Permission Service API",
                 slug: "/apis/resources/internal_permission_service_v2",
                 description:
-                  "This API is intended to manage internal permissions in ZITADEL.\n" +
-                  "\n" +
-                  "This API is in beta state. It can AND will continue breaking until a stable version is released.\n"
+                  "This API provides methods to manage permissions for resource and and their management in ZITADEL itself also known as \"administrators\"."
               },
               items: sidebar_api_internal_permission_service_v2,
             },

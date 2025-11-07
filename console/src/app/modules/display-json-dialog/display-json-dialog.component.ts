@@ -7,6 +7,7 @@ import { Event } from 'src/app/proto/generated/zitadel/event_pb';
   selector: 'cnsl-display-json-dialog',
   templateUrl: './display-json-dialog.component.html',
   styleUrls: ['./display-json-dialog.component.scss'],
+  standalone: false,
 })
 export class DisplayJsonDialogComponent {
   public event?: Event;

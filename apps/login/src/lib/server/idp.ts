@@ -29,10 +29,12 @@ export async function redirectToIdp(prevState: RedirectToIdpState, formData: For
   const organization = formData.get("organization") as string;
   const idpId = formData.get("id") as string;
   const provider = formData.get("provider") as string;
+  const postErrorRedirectUrl = formData.get("postErrorRedirectUrl") as string;
 
   if (linkOnly) params.set("link", "true");
   if (requestId) params.set("requestId", requestId);
   if (organization) params.set("organization", organization);
+  if (postErrorRedirectUrl) params.set("postErrorRedirectUrl", postErrorRedirectUrl);
 
   // redirect to LDAP page where username and password is requested
   if (provider === "ldap") {
@@ -44,7 +46,7 @@ export async function redirectToIdp(prevState: RedirectToIdpState, formData: For
     serviceUrl,
     host,
     idpId,
-    successUrl: `/idp/${provider}/success?` + params.toString(),
+    successUrl: `/idp/${provider}/process?` + params.toString(),
     failureUrl: `/idp/${provider}/failure?` + params.toString(),
   });
 
