@@ -30,6 +30,19 @@ func DomainInstanceDomainListModelToGRPCBetaResponse(dms []*domain.InstanceDomai
 	return toReturn
 }
 
+func TrustedDomainInstanceDomainListModelToGRPCBetaResponse(dms []*domain.InstanceDomain) []*instance_v2beta.TrustedDomain {
+	toReturn := make([]*instance_v2beta.TrustedDomain, len(dms))
+	for i, domain := range dms {
+		toReturn[i] = &instance_v2beta.TrustedDomain{
+			InstanceId:   domain.InstanceID,
+			CreationDate: timestamppb.New(domain.CreatedAt),
+			Domain:       domain.Domain,
+		}
+	}
+
+	return toReturn
+}
+
 /*
  * Domain Model to GRPC v2
  */
@@ -45,6 +58,19 @@ func DomainInstanceDomainListModelToGRPCResponse(dms []*domain.InstanceDomain) [
 			Domain:       domain.Domain,
 			Primary:      isPrimary,
 			Generated:    isGenerated,
+		}
+	}
+
+	return toReturn
+}
+
+func TrustedDomainInstanceDomainListModelToGRPCResponse(dms []*domain.InstanceDomain) []*instance_v2.TrustedDomain {
+	toReturn := make([]*instance_v2.TrustedDomain, len(dms))
+	for i, domain := range dms {
+		toReturn[i] = &instance_v2.TrustedDomain{
+			InstanceId:   domain.InstanceID,
+			CreationDate: timestamppb.New(domain.CreatedAt),
+			Domain:       domain.Domain,
 		}
 	}
 
@@ -112,6 +138,51 @@ func listCustomDomainsQueriesToV2Request(domainSearchQuery []*instance_v2beta.Do
 				PrimaryFilter: assertedType.PrimaryQuery.GetPrimary(),
 			}
 			toReturn[i] = &instance_v2.CustomDomainFilter{
+				Filter: filter,
+			}
+		}
+	}
+	return toReturn
+}
+
+func ListTrustedDomainsBetaRequestToV2Request(in *instance_v2beta.ListTrustedDomainsRequest) *instance_v2.ListTrustedDomainsRequest {
+	return &instance_v2.ListTrustedDomainsRequest{
+		InstanceId: in.GetInstanceId(),
+		Pagination: &filter_v2.PaginationRequest{
+			Offset: in.GetPagination().GetOffset(),
+			Limit:  in.GetPagination().GetLimit(),
+			Asc:    in.GetPagination().GetAsc(),
+		},
+		SortingColumn: listTrustedDomainsBetaSortingColToV2Request(in.GetSortingColumn()),
+		Filters:       listTrustedDomainsQueriesToV2Request(in.GetQueries()),
+	}
+}
+
+func listTrustedDomainsBetaSortingColToV2Request(domainFieldName instance_v2beta.TrustedDomainFieldName) instance_v2.TrustedDomainFieldName {
+	switch domainFieldName {
+	case instance_v2beta.TrustedDomainFieldName_TRUSTED_DOMAIN_FIELD_NAME_CREATION_DATE:
+		return instance_v2.TrustedDomainFieldName_TRUSTED_DOMAIN_FIELD_NAME_CREATION_DATE
+	case instance_v2beta.TrustedDomainFieldName_TRUSTED_DOMAIN_FIELD_NAME_DOMAIN:
+		return instance_v2.TrustedDomainFieldName_TRUSTED_DOMAIN_FIELD_NAME_DOMAIN
+	case instance_v2beta.TrustedDomainFieldName_TRUSTED_DOMAIN_FIELD_NAME_UNSPECIFIED:
+		fallthrough
+	default:
+		return instance_v2.TrustedDomainFieldName_TRUSTED_DOMAIN_FIELD_NAME_UNSPECIFIED
+	}
+}
+
+func listTrustedDomainsQueriesToV2Request(domainSearchQuery []*instance_v2beta.TrustedDomainSearchQuery) []*instance_v2.TrustedDomainFilter {
+	toReturn := make([]*instance_v2.TrustedDomainFilter, len(domainSearchQuery))
+
+	for i, query := range domainSearchQuery {
+		if assertedType, ok := query.GetQuery().(*instance_v2beta.TrustedDomainSearchQuery_DomainQuery); ok {
+			filter := &instance_v2.TrustedDomainFilter_DomainFilter{
+				DomainFilter: &instance_v2.DomainFilter{
+					Domain: assertedType.DomainQuery.GetDomain(),
+					Method: assertedType.DomainQuery.GetMethod(),
+				},
+			}
+			toReturn[i] = &instance_v2.TrustedDomainFilter{
 				Filter: filter,
 			}
 		}
