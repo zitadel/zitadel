@@ -137,6 +137,16 @@
                     </button>
                   </div>
 
+                  <!-- Framework selector (shown when no framework is selected) -->
+                  <div *ngIf="!framework" class="framework-selector-section">
+                    <h5>{{ 'APP.OVERVIEW_DETAIL.SELECT_FRAMEWORK' | translate }}</h5>
+                    <p class="framework-selector-desc">{{ 'APP.OVERVIEW_DETAIL.SELECT_FRAMEWORK_DESC' | translate }}</p>
+                    <cnsl-framework-autocomplete
+                      [frameworks]="frameworks"
+                      (selectionChanged)="selectFrameworkById($event)"
+                    ></cnsl-framework-autocomplete>
+                  </div>
+
                   <div class="scenario-card new-app-scenario" *ngIf="selectedScenario === 'new'">
                     <div class="scenario-content">
                       <div class="scenario-description">

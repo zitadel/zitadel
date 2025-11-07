@@ -1,14 +1,13 @@
 <cnsl-create-layout title="{{ 'APP.PAGES.CREATE' | translate }}" (closed)="close()">
   <div class="app-create-wrapper">
     <div class="app-create-main-content">
-      <cnsl-framework-change *ngIf="initialParam()" (frameworkChanged)="framework.set($event)"></cnsl-framework-change>
-      <div class="content-wrapper" [ngClass]="{ reverse: initialParam() }">
-        <div>
+      <div class="content-wrapper">
+        <div class="content-title-area">
           <h1>{{ 'APP.PAGES.QUICK_CREATE_FRAMEWORK' | translate }}</h1>
           <p>{{ 'APP.PAGES.QUICK_CREATE_FRAMEWORK_DESC' | translate }}</p>
         </div>
 
-        <div *ngIf="!initialParam()">
+        <div>
           <div class="framework-wrapper">
             <ng-container *ngFor="let framework of frameworks.slice(0, 18)">
               <button
@@ -23,8 +22,30 @@
                   [src]="framework.imgSrcLight"
                   alt="{{ framework.title }}"
                 />
+                <p class="framework-title">{{ framework.title }}</p>
               </button>
             </ng-container>
+          </div>
+
+          <!-- Checkbox for auto-creating project -->
+          <div class="create-project-checkbox">
+            <mat-checkbox [(ngModel)]="createProject" color="primary">
+              {{ 'APP.PAGES.CREATE_PROJECT_AUTO' | translate }}
+            </mat-checkbox>
+            <p class="checkbox-description">{{ 'APP.PAGES.CREATE_PROJECT_AUTO_DESC' | translate }}</p>
+          </div>
+
+          <!-- Project selector (shown when checkbox is unchecked) -->
+          <div *ngIf="!createProject" class="project-selector">
+            <h3>{{ 'APP.PAGES.CREATE_SELECT_PROJECT' | translate }}</h3>
+            <p class="hint">{{ 'APP.PAGES.CREATE_NEW_PROJECT' | translate }}</p>
+            <cnsl-search-project-autocomplete
+              class="block"
+              [autocompleteType]="ProjectAutocompleteType.PROJECT_OWNED"
+              (selectionChanged)="selectProject($any($event))"
+              (valueChanged)="projectName = $any($event)"
+            >
+            </cnsl-search-project-autocomplete>
           </div>
         </div>
       </div>
@@ -56,6 +77,9 @@
       </div>
 
       <div class="panel-content">
+        <div class="detail-section" *ngIf="selectedFramework()!.ecosystem">
+          <cnsl-info-section> We will create your project and all necessary configurations for you. </cnsl-info-section>
+        </div>
         <div class="detail-section" *ngIf="selectedFramework()!.ecosystem">
           <h3>Ecosystem</h3>
           <p>{{ selectedFramework()!.ecosystem }}</p>

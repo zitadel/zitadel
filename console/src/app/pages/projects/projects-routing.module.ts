@@ -20,15 +20,6 @@ const routes: Routes = [
     },
   },
   {
-    path: 'app-create',
-    canActivate: [roleGuard],
-    data: {
-      animation: 'AddPage',
-      roles: ['project.app.write'],
-    },
-    loadChildren: () => import('../app-create/app-create.module'),
-  },
-  {
     path: 'app-quick-create',
     canActivate: [roleGuard],
     data: {

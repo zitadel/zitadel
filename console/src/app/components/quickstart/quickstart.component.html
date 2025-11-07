@@ -4,7 +4,7 @@
     <p class="description">{{ 'QUICKSTART.DESCRIPTION' | translate }}</p>
 
     <div class="btn-wrapper">
-      <a mat-raised-button color="primary" [routerLink]="['/projects', 'app-create']">{{
+      <a mat-raised-button color="primary" [routerLink]="['/projects', 'app-quick-create']">{{
         'QUICKSTART.BTN_START' | translate
       }}</a>
       <a mat-stroked-button color="primary" href="https://zitadel.com/docs/sdk-examples/introduction" target="_blank">{{
@@ -14,7 +14,12 @@
   </div>
   <div class="quickstart-card-wrapper">
     <ng-container *ngFor="let framework of frameworks.slice(0, 18)">
-      <a [routerLink]="['/projects', 'app-create']" [queryParams]="{ framework: framework.id }" class="quickstart-card card">
+      <a
+        [routerLink]="['/projects', 'app-quick-create']"
+        [queryParams]="{ framework: framework.id }"
+        title="{{ framework.title }}"
+        class="quickstart-card card"
+      >
         <img class="dark-only" *ngIf="framework.imgSrcDark" [src]="framework.imgSrcDark" alt="{{ framework.title }}" />
         <img class="light-only" *ngIf="framework.imgSrcLight" [src]="framework.imgSrcLight" alt="{{ framework.title }}" />
       </a>

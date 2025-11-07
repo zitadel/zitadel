@@ -6,7 +6,9 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import frameworks from '../../../../../../../docs/frameworks.json';
+import frameworkDefinition from '../../../../../../../docs/frameworks.json';
+import { Framework } from 'src/app/components/quickstart/quickstart.component';
+import { OIDC_CONFIGURATIONS } from 'src/app/utils/framework';
 import { Buffer } from 'buffer';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { mergeMap, Subject, Subscription } from 'rxjs';
@@ -192,6 +194,16 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   ];
   public currentSetting = this.settingsList[0];
   public framework: string | null = null;
+  public frameworks: Framework[] = frameworkDefinition
+    .filter((f) => f.id && OIDC_CONFIGURATIONS[f.id])
+    .map((f) => {
+      return {
+        ...f,
+        fragment: f.id || '',
+        imgSrcDark: `assets${f.imgSrcDark}`,
+        imgSrcLight: `assets${f.imgSrcLight ? f.imgSrcLight : f.imgSrcDark}`,
+      };
+    });
 
   public isNew = signal<boolean>(false);
   public selectedScenario: 'new' | 'existing' = 'new';
@@ -1170,7 +1182,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   } | null {
     if (!this.framework) return null;
 
-    const frameworkInfo = frameworks.find((f) => f.id === this.framework);
+    const frameworkInfo = this.frameworks.find((f) => f.id === this.framework);
 
     return frameworkInfo || null;
   }
@@ -1318,6 +1330,16 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public switchScenario(scenario: 'new' | 'existing'): void {
     this.selectedScenario = scenario;
     // Regenerate environment variables with appropriate prefixes for the selected scenario
+    this.updateEnvVars();
+  }
+
+  public selectFramework(framework: any): void {
+    this.framework = framework.id;
+    this.updateEnvVars();
+  }
+
+  public selectFrameworkById(frameworkId: string): void {
+    this.framework = frameworkId;
     this.updateEnvVars();
   }
 

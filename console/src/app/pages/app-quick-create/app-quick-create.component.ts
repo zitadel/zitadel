@@ -43,6 +43,7 @@ export class AppQuickCreateComponent implements OnDestroy {
   public selectedFramework = signal<Framework | undefined>(undefined);
   public customFramework = signal<boolean>(false);
   public initialParam = signal<string>('');
+  public createProject: boolean = true; // Auto-create project by default (regular property for ngModel)
   public destroy$: Subject<void> = new Subject();
 
   public loading: boolean = false;
@@ -113,6 +114,12 @@ export class AppQuickCreateComponent implements OnDestroy {
       const { framework } = params;
       if (framework) {
         this.initialParam.set(framework);
+        // Auto-select the framework if provided via query param
+        const matchingFramework = this.frameworks.find((f) => f.id === framework);
+        if (matchingFramework) {
+          this.selectedFramework.set(matchingFramework);
+          this.framework.set(matchingFramework);
+        }
       }
     });
   }
@@ -263,9 +270,40 @@ export class AppQuickCreateComponent implements OnDestroy {
   }
 
   public createProjectAndContinue(frameworkId?: string) {
-    const project = new AddProjectRequest();
-    project.setName(generateRandomProjectName());
     this.framework.set(this.frameworks.find((f) => f.id === frameworkId));
+
+    // Determine if we're creating a new project or using existing
+    let shouldCreateProject = this.createProject;
+    let projectNameForCreation = '';
+
+    // If checkbox is unchecked, check if they selected an existing project or typed a new name
+    if (!this.createProject) {
+      if (this.project) {
+        // They selected an existing project
+        const projectId = (this.project.project as Project.AsObject).id
+          ? (this.project.project as Project.AsObject).id
+          : (this.project.project as GrantedProject.AsObject).projectId;
+
+        if (frameworkId === 'other' || !frameworkId) {
+          this.router.navigate(['/projects', projectId, 'apps', 'create']);
+        } else {
+          this.createApp(projectId);
+        }
+        return;
+      } else if (this.projectName && this.projectName.trim().length > 0) {
+        // They typed a new project name - create project with that name
+        shouldCreateProject = true;
+        projectNameForCreation = this.projectName.trim();
+      } else {
+        // No project selected and no name typed
+        this.error.set('Please select an existing project or enter a new project name');
+        return;
+      }
+    }
+
+    // Create new project (either because checkbox is checked or they typed a new name)
+    const project = new AddProjectRequest();
+    project.setName(projectNameForCreation || generateRandomProjectName());
 
     return this.mgmtService
       .addProject(project.toObject())

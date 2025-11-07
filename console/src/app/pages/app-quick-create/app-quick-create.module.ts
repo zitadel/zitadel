@@ -33,6 +33,7 @@ import { FrameworkChangeComponent } from 'src/app/components/framework-change/fr
     InfoSectionModule,
     InputModule,
     MatButtonModule,
+    MatCheckboxModule,
     MatDialogModule,
     MatIconModule,
     MatTooltipModule,

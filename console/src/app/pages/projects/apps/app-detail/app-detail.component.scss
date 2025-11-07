@@ -408,6 +408,27 @@
         }
       }
 
+      .framework-selector-section {
+        margin: 2rem 0;
+        padding: 1.5rem;
+        background: map-get($background, app-bar);
+        border-radius: 8px;
+        border: 1px solid $divider-color;
+
+        h5 {
+          margin: 0 0 0.5rem 0;
+          font-size: 1.1rem;
+          text-align: center;
+        }
+
+        .framework-selector-desc {
+          margin: 0 0 1.5rem 0;
+          font-size: 0.9rem;
+          opacity: 0.7;
+          text-align: center;
+        }
+      }
+
       .scenario-card {
         background: map-get($background, card);
         border: 1px solid $divider-color;
