@@ -107,9 +107,9 @@ func AddTrustedDomainBeta(ctx context.Context, request *connect.Request[instance
 }
 
 func RemoveTrustedDomainBeta(ctx context.Context, request *connect.Request[instance_v2beta.RemoveTrustedDomainRequest]) (*connect.Response[instance_v2beta.RemoveTrustedDomainResponse], error) {
-	removeCustomDomainCmd := domain.NewRemoveInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetDomain(), domain.DomainTypeTrusted)
+	removeTrustedDomainCmd := domain.NewRemoveInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetDomain(), domain.DomainTypeTrusted)
 
-	err := domain.Invoke(ctx, removeCustomDomainCmd, domain.WithInstanceDomainRepo(repository.InstanceDomainRepository()))
+	err := domain.Invoke(ctx, removeTrustedDomainCmd, domain.WithInstanceDomainRepo(repository.InstanceDomainRepository()))
 	if err != nil {
 		return nil, err
 	}
@@ -118,6 +118,27 @@ func RemoveTrustedDomainBeta(ctx context.Context, request *connect.Request[insta
 		Msg: &instance_v2beta.RemoveTrustedDomainResponse{
 			// TODO(IAM-Marco): Return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10881
 			DeletionDate: timestamppb.Now(),
+		},
+	}, nil
+}
+
+func ListTrustedDomainsBeta(ctx context.Context, request *connect.Request[instance_v2beta.ListTrustedDomainsRequest]) (*connect.Response[instance_v2beta.ListTrustedDomainsResponse], error) {
+	listTrustedDomainsQuery := domain.NewListInstanceTrustedDomainsQuery(convert.ListTrustedDomainsBetaRequestToV2Request(request.Msg))
+
+	err := domain.Invoke(ctx, listTrustedDomainsQuery, domain.WithInstanceDomainRepo(repository.InstanceDomainRepository()))
+	if err != nil {
+		return nil, err
+	}
+
+	trustedDomains := listTrustedDomainsQuery.Result()
+	return &connect.Response[instance_v2beta.ListTrustedDomainsResponse]{
+		Msg: &instance_v2beta.ListTrustedDomainsResponse{
+			TrustedDomain: convert.TrustedDomainInstanceDomainListModelToGRPCBetaResponse(trustedDomains),
+			Pagination: &filter_v2beta.PaginationResponse{
+				// TODO(IAM-Marco): return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10955
+				TotalResult:  uint64(len(trustedDomains)),
+				AppliedLimit: uint64(request.Msg.GetPagination().GetLimit()),
+			},
 		},
 	}, nil
 }
@@ -213,9 +234,9 @@ func AddTrustedDomain(ctx context.Context, request *connect.Request[instance_v2.
 }
 
 func RemoveTrustedDomain(ctx context.Context, request *connect.Request[instance_v2.RemoveTrustedDomainRequest]) (*connect.Response[instance_v2.RemoveTrustedDomainResponse], error) {
-	removeCustomDomainCmd := domain.NewRemoveInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetTrustedDomain(), domain.DomainTypeTrusted)
+	removeTrustedDomainCmd := domain.NewRemoveInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetTrustedDomain(), domain.DomainTypeTrusted)
 
-	err := domain.Invoke(ctx, removeCustomDomainCmd, domain.WithInstanceDomainRepo(repository.InstanceDomainRepository()))
+	err := domain.Invoke(ctx, removeTrustedDomainCmd, domain.WithInstanceDomainRepo(repository.InstanceDomainRepository()))
 	if err != nil {
 		return nil, err
 	}
@@ -224,6 +245,27 @@ func RemoveTrustedDomain(ctx context.Context, request *connect.Request[instance_
 		Msg: &instance_v2.RemoveTrustedDomainResponse{
 			// TODO(IAM-Marco): Return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10881
 			DeletionDate: timestamppb.Now(),
+		},
+	}, nil
+}
+
+func ListTrustedDomains(ctx context.Context, request *connect.Request[instance_v2.ListTrustedDomainsRequest]) (*connect.Response[instance_v2.ListTrustedDomainsResponse], error) {
+	listTrustedDomainsQuery := domain.NewListInstanceTrustedDomainsQuery(request.Msg)
+
+	err := domain.Invoke(ctx, listTrustedDomainsQuery, domain.WithInstanceDomainRepo(repository.InstanceDomainRepository()))
+	if err != nil {
+		return nil, err
+	}
+
+	trustedDomains := listTrustedDomainsQuery.Result()
+	return &connect.Response[instance_v2.ListTrustedDomainsResponse]{
+		Msg: &instance_v2.ListTrustedDomainsResponse{
+			TrustedDomain: convert.TrustedDomainInstanceDomainListModelToGRPCResponse(trustedDomains),
+			Pagination: &filter_v2.PaginationResponse{
+				// TODO(IAM-Marco): return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10955
+				TotalResult:  uint64(len(trustedDomains)),
+				AppliedLimit: uint64(request.Msg.GetPagination().GetLimit()),
+			},
 		},
 	}, nil
 }

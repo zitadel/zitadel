@@ -407,6 +407,8 @@ func TestListTrustedDomains(t *testing.T) {
 		inst.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 	})
 
+	relTableState := integration.RelationalTablesEnableMatrix()
+
 	tt := []struct {
 		testName          string
 		inputRequest      *instance.ListTrustedDomainsRequest
@@ -426,6 +428,7 @@ func TestListTrustedDomains(t *testing.T) {
 			expectedErrorMsg:  "auth header missing",
 		},
 		{
+			// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place (see https://github.com/zitadel/zitadel/issues/10917)
 			testName: "when unauthZ context should return unauthZ error",
 			inputRequest: &instance.ListTrustedDomainsRequest{
 				InstanceId: inst.ID(),
@@ -470,28 +473,39 @@ func TestListTrustedDomains(t *testing.T) {
 		},
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.testName, func(t *testing.T) {
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputContext, time.Minute)
-			require.EventuallyWithT(t, func(collect *assert.CollectT) {
-				// Test
-				res, err := inst.Client.InstanceV2.ListTrustedDomains(tc.inputContext, tc.inputRequest)
-
-				// Verify
-				assert.Equal(collect, tc.expectedErrorCode, status.Code(err))
-				assert.Equal(collect, tc.expectedErrorMsg, status.Convert(err).Message())
-
-				if tc.expectedErrorMsg == "" {
-					require.NotNil(t, res)
-
-					domains := []string{}
-					for _, d := range res.GetTrustedDomain() {
-						domains = append(domains, d.GetDomain())
-					}
-
-					assert.Subset(collect, domains, tc.expectedDomains)
-				}
-			}, retryDuration, tick)
+	for _, stateCase := range relTableState {
+		// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place (see https://github.com/zitadel/zitadel/issues/10917)
+		integration.EnsureInstanceFeature(t, ctx, inst, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
 		})
+
+		for _, tc := range tt {
+			if tc.testName == "when unauthZ context should return unauthZ error" && stateCase.State == "when relational tables are enabled" {
+				continue
+			}
+
+			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tc.testName), func(t *testing.T) {
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputContext, time.Minute)
+				require.EventuallyWithT(t, func(collect *assert.CollectT) {
+					// Test
+					res, err := inst.Client.InstanceV2.ListTrustedDomains(tc.inputContext, tc.inputRequest)
+
+					// Verify
+					assert.Equal(collect, tc.expectedErrorCode, status.Code(err))
+					assert.Equal(collect, tc.expectedErrorMsg, status.Convert(err).Message())
+
+					if tc.expectedErrorMsg == "" {
+						require.NotNil(t, res)
+
+						domains := []string{}
+						for _, d := range res.GetTrustedDomain() {
+							domains = append(domains, d.GetDomain())
+						}
+
+						assert.Subset(collect, domains, tc.expectedDomains)
+					}
+				}, retryDuration, tick)
+			})
+		}
 	}
 }

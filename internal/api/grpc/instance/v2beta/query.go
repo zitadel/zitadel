@@ -69,6 +69,10 @@ func (s *Server) ListCustomDomains(ctx context.Context, req *connect.Request[ins
 }
 
 func (s *Server) ListTrustedDomains(ctx context.Context, req *connect.Request[instance.ListTrustedDomainsRequest]) (*connect.Response[instance.ListTrustedDomainsResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.ListTrustedDomainsBeta(ctx, req)
+	}
+
 	queries, err := ListTrustedDomainsRequestToModel(req.Msg, s.systemDefaults)
 	if err != nil {
 		return nil, err
