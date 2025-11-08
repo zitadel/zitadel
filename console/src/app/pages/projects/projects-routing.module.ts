@@ -20,7 +20,7 @@ const routes: Routes = [
     },
   },
   {
-    path: 'app-quick-create',
+    path: 'app-create',
     canActivate: [roleGuard],
     data: {
       animation: 'AddPage',

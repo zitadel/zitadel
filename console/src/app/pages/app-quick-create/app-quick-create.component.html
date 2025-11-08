@@ -36,7 +36,7 @@
           </div>
 
           <!-- Project selector (shown when checkbox is unchecked) -->
-          <div *ngIf="!createProject" class="project-selector">
+          <div *ngIf="!createProject">
             <h3>{{ 'APP.PAGES.CREATE_SELECT_PROJECT' | translate }}</h3>
             <p class="hint">{{ 'APP.PAGES.CREATE_NEW_PROJECT' | translate }}</p>
             <cnsl-search-project-autocomplete
@@ -110,7 +110,12 @@
 
       <div class="panel-actions">
         <button mat-stroked-button (click)="selectedFramework.set(undefined)">Cancel</button>
-        <button color="primary" mat-raised-button (click)="createProjectAndContinue(selectedFramework()!.id)">
+        <button
+          color="primary"
+          mat-raised-button
+          (click)="createProjectAndContinue(selectedFramework()!.id)"
+          [disabled]="!createProject && !project && !projectName"
+        >
           Continue with {{ selectedFramework()!.title }}
         </button>
       </div>

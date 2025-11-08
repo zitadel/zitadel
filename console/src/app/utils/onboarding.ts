@@ -35,7 +35,7 @@ export const ONBOARDING_MILESTONES: OnboardingActions[] = [
   {
     order: 1,
     milestoneType: MilestoneType.MILESTONE_TYPE_APPLICATION_CREATED,
-    link: '/projects/app-quick-create',
+    link: '/projects/app-create',
     iconClasses: 'lab la-openid',
     darkcolor: purpledark,
     lightcolor: purplelight,
