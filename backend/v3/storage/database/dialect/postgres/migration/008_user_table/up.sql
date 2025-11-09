@@ -127,21 +127,22 @@ CREATE TABLE zitadel.human_users(
     , failed_password_attempts SMALLINT NOT NULL DEFAULT 0 CHECK (failed_password_attempts >= 0)
 
     , email TEXT
+    , email_verified_at TIMESTAMPTZ
     , unverified_email_id TEXT
     , email_otp_enabled BOOLEAN NOT NULL DEFAULT FALSE
-    , email_otp_last_verified_at TIMESTAMPTZ
+    , last_successful_email_otp_check TIMESTAMPTZ
     , email_otp_verification_id TEXT
 
     , phone TEXT
+    , phone_verified_at TIMESTAMPTZ
     , unverified_phone_id TEXT
-    , phone_otp_enabled BOOLEAN NOT NULL DEFAULT FALSE
-    , phone_otp_last_verified_at TIMESTAMPTZ
-    , phone_otp_verification_id TEXT
+    , sms_otp_enabled BOOLEAN NOT NULL DEFAULT FALSE
+    , last_successful_sms_otp_check TIMESTAMPTZ
+    , sms_otp_verification_id TEXT
 
-    , totp_secret BYTES
-    , unverified_totp_id TEXT
-    , totp_last_successful_checked_at TIMESTAMPTZ
-    , failed_totp_attempts SMALLINT DEFAULT 0 CHECK (failed_totp_attempts >= 0)
+    , unverified_totp_id TEXT -- reference to a verification that holds the new secret during change
+    , last_successful_totp_check TIMESTAMPTZ
+    , totp_secret_id TEXT -- reference to a verification that holds the secret
 
     , PRIMARY KEY (instance_id, organization_id, id)
     , FOREIGN KEY (instance_id, organization_id) REFERENCES zitadel.organizations

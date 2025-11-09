@@ -113,18 +113,20 @@ type HumanUserRepository interface {
 	// SetPassword sets the password based on the given verification type.
 	SetPassword(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
 	GetPasswordVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
-	IncrementPasswordVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+	// IncrementPasswordVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 
-	SetEmail(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (uint64, error)
+	SetEmail(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
 	GetEmailVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
-	SetEmailOTP(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification OTPVerificationType) (int64, error)
-	GetEmailOTPVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
-
 	SetPhone(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
 	GetPhoneVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
-	SetSMSOTP(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification OTPVerificationType) (int64, error)
-	GetSMSOTPVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
 
 	SetTOTP(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
 	GetTOTPVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
+
+	SetEmailOTPCheck(ctx context.Context, client database.QueryExecutor, condition database.Condition, check CheckType) (int64, error)
+	GetEmailOTPCheck(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Check, error)
+	SetSMSOTPCheck(ctx context.Context, client database.QueryExecutor, condition database.Condition, check CheckType) (int64, error)
+	GetSMSOTPCheck(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Check, error)
+	SetTOTPCheck(ctx context.Context, client database.QueryExecutor, condition database.Condition, check CheckType) (int64, error)
+	GetTOTPCheck(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Check, error)
 }

@@ -28,11 +28,20 @@ func (v verification) qualifiedTableName() string {
 
 const getVerificationStmt = "SELECT verifications.value, verifications.code, verifications.expires_at, verifications.failed_attempts FROM zitadel.verifications"
 
-func (v verification) get(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*domain.Verification, error) {
+func (v verification) getVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*domain.Verification, error) {
 	var builder database.StatementBuilder
 	builder.WriteString(getVerificationStmt)
 	condition.Write(&builder)
 	return getOne[domain.Verification](ctx, client, &builder)
+}
+
+const getCheckStmt = "SELECT verifications.code, verifications.expires_at, verifications.failed_attempts FROM zitadel.verifications"
+
+func (v verification) getCheck(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*domain.Check, error) {
+	var builder database.StatementBuilder
+	builder.WriteString(getCheckStmt)
+	condition.Write(&builder)
+	return getOne[domain.Check](ctx, client, &builder)
 }
 
 // -------------------------------------------------------------

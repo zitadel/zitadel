@@ -8,13 +8,14 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
+// SetPassword implements [domain.HumanUserRepository].
 func (u userHuman) SetPassword(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification domain.VerificationType) (int64, error) {
 	switch v := verification.(type) {
-	case *domain.VerificationTypeSuccessful:
-		return u.setPasswordFromSuccessfulVerification(ctx, client, condition, v)
-	case *domain.VerificationTypeSkipVerification:
+	case *domain.VerificationTypeVerified:
+		return u.setPasswordVerified(ctx, client, condition, v)
+	case *domain.VerificationTypeSkipped:
 		return u.setPasswordSkipVerification(ctx, client, condition, v)
-	case *domain.VerificationTypeInitCode:
+	case *domain.VerificationTypeInit:
 		return u.initPasswordVerification(ctx, client, condition, v)
 	case *domain.VerificationTypeUpdate:
 		return u.updatePasswordVerification(ctx, client, condition, v)
@@ -23,7 +24,7 @@ func (u userHuman) SetPassword(ctx context.Context, client database.QueryExecuto
 }
 
 func (u userHuman) GetPasswordVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*domain.Verification, error) {
-	return u.verification.get(ctx, client, database.Exists(
+	return u.verification.getVerification(ctx, client, database.Exists(
 		u.unqualifiedTableName(),
 		database.And(
 			database.NewColumnCondition(u.InstanceIDColumn(), u.verification.InstanceIDColumn()),
@@ -33,21 +34,7 @@ func (u userHuman) GetPasswordVerification(ctx context.Context, client database.
 	))
 }
 
-func (u userHuman) IncrementPasswordVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	var builder database.StatementBuilder
-	builder.WriteString("UPDATE zitadel.verifications SET ")
-	database.NewIncrementColumnChange(u.verification.FailedAttemptsColumn()).Write(&builder)
-	builder.WriteString(" FROM zitadel.human_users WHERE ")
-	database.And(
-		database.NewColumnCondition(u.verification.InstanceIDColumn(), u.InstanceIDColumn()),
-		database.NewColumnCondition(u.verification.IDColumn(), u.passwordVerificationIDColumn()),
-		condition,
-	).Write(&builder)
-
-	return client.Exec(ctx, builder.String(), builder.Args()...)
-}
-
-func (u userHuman) setPasswordFromSuccessfulVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *domain.VerificationTypeSuccessful) (int64, error) {
+func (u userHuman) setPasswordVerified(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *domain.VerificationTypeVerified) (int64, error) {
 	var builder database.StatementBuilder
 	builder.WriteString("WITH found_verification AS (SELECT ")
 	database.Columns{
@@ -82,19 +69,14 @@ func (u userHuman) setPasswordFromSuccessfulVerification(ctx context.Context, cl
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-func (u userHuman) setPasswordSkipVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *domain.VerificationTypeSkipVerification) (int64, error) {
+func (u userHuman) setPasswordSkipVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *domain.VerificationTypeSkipped) (int64, error) {
 	var builder database.StatementBuilder
-
-	var verifiedAt time.Time
-	if verification.VerifiedAt != nil {
-		verifiedAt = *verification.VerifiedAt
-	}
 
 	builder.WriteString("UPDATE zitadel.human_users SET ")
 	database.NewChanges(
-		u.SetUpdatedAt(verifiedAt),
-		u.setPassword(verification.Value),
-		u.setPasswordVerifiedAt(verifiedAt),
+		u.SetUpdatedAt(verification.VerifiedAt),
+		u.setPassword(*verification.Value),
+		u.setPasswordVerifiedAt(verification.VerifiedAt),
 		u.clearPasswordVerificationID(),
 	).Write(&builder)
 	writeCondition(&builder, condition)
@@ -102,7 +84,7 @@ func (u userHuman) setPasswordSkipVerification(ctx context.Context, client datab
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-func (u userHuman) initPasswordVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *domain.VerificationTypeInitCode) (int64, error) {
+func (u userHuman) initPasswordVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *domain.VerificationTypeInit) (int64, error) {
 	var builder database.StatementBuilder
 
 	var createdAt any = database.NowInstruction
@@ -136,7 +118,9 @@ func (u userHuman) updatePasswordVerification(ctx context.Context, client databa
 	var builder database.StatementBuilder
 
 	changes := make(database.Changes, 0, 3)
-	changes = append(changes, u.verification.SetCode(verification.Code))
+	if verification.Code != nil {
+		changes = append(changes, u.verification.SetCode(*verification.Code))
+	}
 	if verification.Value != nil {
 		changes = append(changes, u.verification.SetValue(*verification.Value))
 	}

@@ -1012,7 +1012,9 @@ func (p *userRelationalProjection) reduceHumanPhoneVerificationFailed(event even
 
 		_, err := repo.SetPhone(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeFailed{},
+			&domain.VerificationTypeFailed{
+				FailedAt: e.CreatedAt(),
+			},
 		)
 		return err
 	}), nil
@@ -1110,7 +1112,9 @@ func (p *userRelationalProjection) reduceHumanEmailVerificationFailed(event even
 
 		_, err := repo.SetEmail(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeFailed{},
+			&domain.VerificationTypeFailed{
+				FailedAt: e.CreatedAt(),
+			},
 		)
 		return err
 	}), nil
@@ -1257,7 +1261,9 @@ func (p *userRelationalProjection) reduceHumanPasswordCheckFailed(event eventsto
 
 		_, err := repo.SetPassword(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeFailed{},
+			&domain.VerificationTypeFailed{
+				FailedAt: e.CreatedAt(),
+			},
 		)
 		return err
 	}), nil
@@ -1707,7 +1713,7 @@ func (p *userRelationalProjection) reducePasskeyInitCodeAdded(event eventstore.E
 		repo := repository.PasskeyRepository()
 		_, err := repo.SetInitializationVerification(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.ID),
-			&domain.VerificationTypeInitCode{
+			&domain.VerificationTypeInit{
 				Code:      e.Code.Crypted,
 				CreatedAt: e.CreatedAt(),
 				Expiry:    &e.Expiry,
@@ -1748,7 +1754,7 @@ func (p *userRelationalProjection) reducePasskeyInitCodeCheckSucceeded(event eve
 		repo := repository.PasskeyRepository()
 		_, err := repo.SetInitializationVerification(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.ID),
-			&domain.VerificationTypeSuccessful{VerifiedAt: e.CreatedAt()},
+			&domain.VerificationTypeVerified{VerifiedAt: e.CreatedAt()},
 		)
 		return err
 	}), nil
@@ -1767,7 +1773,7 @@ func (p *userRelationalProjection) reducePasskeyInitCodeRequested(event eventsto
 		repo := repository.PasskeyRepository()
 		_, err := repo.SetInitializationVerification(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.ID),
-			&domain.VerificationTypeInitCode{
+			&domain.VerificationTypeInit{
 				Code:      e.Code.Crypted,
 				CreatedAt: e.CreatedAt(),
 				Expiry:    &e.Expiry,
@@ -1939,7 +1945,7 @@ func (p *userRelationalProjection) reduceTOTPAdded(event eventstore.Event) (*han
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			&domain.VerificationTypeInit{
 				CreatedAt: e.CreatedAt(),
-				Value:     gu.Ptr(string(e.Secret.Crypted)),
+				Code:      e.Secret.Crypted,
 			},
 		)
 		return err
@@ -1966,6 +1972,27 @@ func (p *userRelationalProjection) reduceTOTPVerified(event eventstore.Event) (*
 	}), nil
 }
 
+func (p *userRelationalProjection) reduceTOTPRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanOTPRemovedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanMFAOTPRemovedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.RemoveTOTP(),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
+}
+
 func (p *userRelationalProjection) reduceTOTPCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanOTPCheckSucceededEvent)
 	if !ok {
@@ -1978,10 +2005,11 @@ func (p *userRelationalProjection) reduceTOTPCheckSucceeded(event eventstore.Eve
 		}
 		repo := repository.HumanUserRepository()
 
-		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.SetTOTPCheck(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetTOTPLastSuccessfulCheckedAt(e.CreatedAt()),
-			repo.SetUpdatedAt(e.CreatedAt()),
+			&domain.CheckTypeSucceeded{
+				SucceededAt: e.CreatedAt(),
+			},
 		)
 		return err
 	}), nil
@@ -1999,9 +2027,11 @@ func (p *userRelationalProjection) reduceTOTPCheckFailed(event eventstore.Event)
 		}
 		repo := repository.HumanUserRepository()
 
-		_, err := repo.SetTOTP(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.SetTOTPCheck(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeFailed{},
+			&domain.CheckTypeFailed{
+				FailedAt: e.CreatedAt(),
+			},
 		)
 		return err
 	}), nil
@@ -2061,9 +2091,9 @@ func (p *userRelationalProjection) reduceOTPSMSCodeAdded(event eventstore.Event)
 		}
 		repo := repository.HumanUserRepository()
 
-		_, err := repo.SetSMSOTP(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.SetSMSOTPCheck(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeInitCode{
+			&domain.CheckTypeInit{
 				Code:      e.Code.Crypted,
 				CreatedAt: e.CreatedAt(),
 				Expiry:    &e.Expiry,
@@ -2085,20 +2115,42 @@ func (p *userRelationalProjection) reduceOTPSMSCheckSucceeded(event eventstore.E
 		}
 		repo := repository.HumanUserRepository()
 
-		_, err := repo.SetSMSOTP(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.SetSMSOTPCheck(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeSuccessful{
-				VerifiedAt: e.CreatedAt(),
+			&domain.CheckTypeSucceeded{
+				SucceededAt: e.CreatedAt(),
 			},
 		)
 		return err
 	}), nil
 }
 
-func (p *userRelationalProjection) reduceTOTPRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanOTPRemovedEvent)
+func (p *userRelationalProjection) reduceOTPSMSCheckFailed(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanOTPSMSCheckFailedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanMFAOTPRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanOTPSMSCheckFailedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+
+		_, err := repo.SetSMSOTPCheck(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			&domain.CheckTypeFailed{
+				FailedAt: e.CreatedAt(),
+			},
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceOTPEmailEnabled(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanOTPEmailAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanOTPEmailAddedType)
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -2109,8 +2161,97 @@ func (p *userRelationalProjection) reduceTOTPRemoved(event eventstore.Event) (*h
 
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.RemoveTOTP(),
+			repo.SetEmailOTPEnabled(true),
 			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceOTPEmailDisabled(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanOTPEmailRemovedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanOTPEmailRemovedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.SetEmailOTPEnabled(false),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceOTPEmailCodeAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanOTPEmailCodeAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanOTPEmailCodeAddedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+
+		_, err := repo.SetEmailOTPCheck(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			&domain.CheckTypeInit{
+				Code:      e.Code.Crypted,
+				CreatedAt: e.CreatedAt(),
+				Expiry:    &e.Expiry,
+			},
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceOTPEmailCheckSucceeded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanOTPEmailCheckSucceededEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanOTPEmailCheckSucceededType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+
+		_, err := repo.SetEmailOTPCheck(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			&domain.CheckTypeSucceeded{
+				SucceededAt: e.CreatedAt(),
+			},
+		)
+		return err
+	}), nil
+}
+
+func (p *userRelationalProjection) reduceOTPEmailCheckFailed(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanOTPEmailCheckFailedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.HumanOTPEmailCheckFailedType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.HumanUserRepository()
+
+		_, err := repo.SetEmailOTPCheck(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			&domain.CheckTypeFailed{
+				FailedAt: e.CreatedAt(),
+			},
 		)
 		return err
 	}), nil

@@ -8,24 +8,24 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-// SetPhone implements [domain.HumanUserRepository].
+// SetPhone implements [domain.HumanUserRepository.SetPhone].
 func (u userHuman) SetPhone(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification domain.VerificationType) (int64, error) {
 	switch v := verification.(type) {
-	case *domain.VerificationTypeSuccessful:
-		return u.setPhoneFromSuccessfulVerification(ctx, client, condition, v)
-	case *domain.VerificationTypeSkipVerification:
+	case *domain.VerificationTypeVerified:
+		return u.setPhoneVerified(ctx, client, condition, v)
+	case *domain.VerificationTypeSkipped:
 		return u.setPhoneSkipVerification(ctx, client, condition, v)
-	case *domain.VerificationTypeInitCode:
-		return u.initPhoneVerification(ctx, client, condition, v)
+	case *domain.VerificationTypeInit:
+		return u.initPhone(ctx, client, condition, v)
 	case *domain.VerificationTypeUpdate:
 		return u.updatePhoneVerification(ctx, client, condition, v)
 	}
 	panic("unknown verification type")
 }
 
-// GetPhoneVerification implements [domain.HumanUserRepository].
+// GetPhoneVerification implements [domain.HumanUserRepository.GetPhoneVerification].
 func (u userHuman) GetPhoneVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*domain.Verification, error) {
-	return u.verification.get(ctx, client, database.Exists(
+	return u.verification.getVerification(ctx, client, database.Exists(
 		u.unqualifiedTableName(),
 		database.And(
 			database.NewColumnCondition(u.InstanceIDColumn(), u.verification.InstanceIDColumn()),
@@ -35,49 +35,60 @@ func (u userHuman) GetPhoneVerification(ctx context.Context, client database.Que
 	))
 }
 
-// IncrementFailedPhoneVerificationAttempts implements [domain.HumanUserRepository].
-func (u userHuman) IncrementFailedPhoneVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+// SetSMSOTPCheck implements [domain.HumanUserRepository.SetSMSOTPCheck].
+func (u userHuman) SetSMSOTPCheck(ctx context.Context, client database.QueryExecutor, condition database.Condition, check domain.CheckType) (int64, error) {
 	var builder database.StatementBuilder
-	builder.WriteString("UPDATE zitadel.verifications SET ")
-	database.NewIncrementColumnChange(u.verification.FailedAttemptsColumn()).Write(&builder)
-	builder.WriteString(" FROM zitadel.human_users WHERE ")
-	database.And(
-		database.NewColumnCondition(u.verification.InstanceIDColumn(), u.InstanceIDColumn()),
-		database.NewColumnCondition(u.verification.IDColumn(), u.phoneVerificationIDColumn()),
-		condition,
-	).Write(&builder)
+	switch c := check.(type) {
+	case *domain.CheckTypeSucceeded:
+		builder.WriteString("UPDATE zitadel.human_users SET ")
+		database.NewChanges(
+			u.SetUpdatedAt(c.SucceededAt),
+			u.setLastSuccessfulSMSOTPCheck(c.SucceededAt),
+			u.clearSMSOTPVerificationID(),
+		).Write(&builder)
+		writeCondition(&builder, condition)
+	case *domain.CheckTypeFailed:
+		builder.WriteString("UPDATE zitadel.verifications SET ")
+		database.NewIncrementColumnChange(u.verification.FailedAttemptsColumn()).Write(&builder)
+		builder.WriteString(" FROM zitadel.human_users WHERE ")
+		database.And(
+			database.NewColumnCondition(u.verification.InstanceIDColumn(), u.InstanceIDColumn()),
+			database.NewColumnCondition(u.verification.IDColumn(), u.smsOTPVerificationIDColumn()),
+			condition,
+		).Write(&builder)
+	case *domain.CheckTypeInit:
+		var createdAt any = database.NowInstruction
+		if !c.CreatedAt.IsZero() {
+			createdAt = c.CreatedAt
+		}
+		builder.WriteString("WITH found_user AS (SELECT")
+		builder.WriteString(" instance_id, user_id FROM zitadel.human_users")
+		writeCondition(&builder, condition)
+		builder.WriteString("), created_verification AS (")
+		builder.WriteString("INSERT INTO zitadel.verifications (instance_id, code, created_at, expiry) ")
+		builder.WriteString("SELECT u.instance_id, ")
+		builder.WriteArgs(c.Code, createdAt, c.Expiry)
+		builder.WriteString(" FROM found_user u RETURNING id")
+		builder.WriteString(") UPDATE zitadel.human_users SET sms_otp_verification_id = (SELECT id FROM created_verification) ")
+		builder.WriteString("WHERE (instance_id, id) IN (SELECT instance_id, user_id FROM found_user)")
+	}
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-// GetPhoneOTPVerification implements [domain.HumanUserRepository].
-func (u userHuman) GetPhoneOTPVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*domain.Verification, error) {
-	return u.verification.get(ctx, client, database.Exists(
+// GetSMSOTPCheck implements [domain.HumanUserRepository.GetSMSOTPCheck].
+func (u userHuman) GetSMSOTPCheck(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*domain.Check, error) {
+	return u.verification.getCheck(ctx, client, database.Exists(
 		u.unqualifiedTableName(),
 		database.And(
 			database.NewColumnCondition(u.InstanceIDColumn(), u.verification.InstanceIDColumn()),
-			database.NewColumnCondition(u.phoneOTPVerificationIDColumn(), u.verification.IDColumn()),
+			database.NewColumnCondition(u.smsOTPVerificationIDColumn(), u.verification.IDColumn()),
 			condition,
 		),
 	))
 }
 
-// IncrementFailedPhoneOTPAttempts implements [domain.HumanUserRepository].
-func (u userHuman) IncrementFailedPhoneOTPAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	var builder database.StatementBuilder
-	builder.WriteString("UPDATE zitadel.verifications SET ")
-	database.NewIncrementColumnChange(u.verification.FailedAttemptsColumn()).Write(&builder)
-	builder.WriteString(" FROM zitadel.human_users WHERE ")
-	database.And(
-		database.NewColumnCondition(u.verification.InstanceIDColumn(), u.InstanceIDColumn()),
-		database.NewColumnCondition(u.verification.IDColumn(), u.phoneOTPVerificationIDColumn()),
-		condition,
-	).Write(&builder)
-
-	return client.Exec(ctx, builder.String(), builder.Args()...)
-}
-
-func (u userHuman) setPhoneFromSuccessfulVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *domain.VerificationTypeSuccessful) (int64, error) {
+func (u userHuman) setPhoneVerified(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *domain.VerificationTypeVerified) (int64, error) {
 	var builder database.StatementBuilder
 	builder.WriteString("WITH found_verification AS (SELECT ")
 	database.Columns{
@@ -112,19 +123,14 @@ func (u userHuman) setPhoneFromSuccessfulVerification(ctx context.Context, clien
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-func (u userHuman) setPhoneSkipVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *domain.VerificationTypeSkipVerification) (int64, error) {
+func (u userHuman) setPhoneSkipVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *domain.VerificationTypeSkipped) (int64, error) {
 	var builder database.StatementBuilder
-
-	var verifiedAt time.Time
-	if verification.VerifiedAt != nil {
-		verifiedAt = *verification.VerifiedAt
-	}
 
 	builder.WriteString("UPDATE zitadel.human_users SET ")
 	database.NewChanges(
-		u.SetUpdatedAt(verifiedAt),
-		u.setPhone(verification.Value),
-		u.setPhoneVerifiedAt(verifiedAt),
+		u.SetUpdatedAt(verification.VerifiedAt),
+		u.setPhone(*verification.Value),
+		u.setPhoneVerifiedAt(verification.VerifiedAt),
 		u.clearPhoneVerificationID(),
 	).Write(&builder)
 	writeCondition(&builder, condition)
@@ -132,7 +138,7 @@ func (u userHuman) setPhoneSkipVerification(ctx context.Context, client database
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-func (u userHuman) initPhoneVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *domain.VerificationTypeInitCode) (int64, error) {
+func (u userHuman) initPhone(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification *domain.VerificationTypeInit) (int64, error) {
 	var builder database.StatementBuilder
 
 	var createdAt any = database.NowInstruction
@@ -166,7 +172,9 @@ func (u userHuman) updatePhoneVerification(ctx context.Context, client database.
 	var builder database.StatementBuilder
 
 	changes := make(database.Changes, 0, 3)
-	changes = append(changes, u.verification.SetCode(verification.Code))
+	if verification.Code != nil {
+		changes = append(changes, u.verification.SetCode(*verification.Code))
+	}
 	if verification.Value != nil {
 		changes = append(changes, u.verification.SetValue(*verification.Value))
 	}
@@ -196,12 +204,21 @@ func (u userHuman) updatePhoneVerification(ctx context.Context, client database.
 // changes
 // -------------------------------------------------------------
 
+// RemovePhone implements [domain.HumanUserRepository.RemovePhone].
 func (u userHuman) RemovePhone() database.Change {
 	return database.NewChanges(
-		database.NewChange(u.PhoneColumn(), database.NullInstruction),
-		database.NewChange(u.PhoneVerifiedAtColumn(), database.NullInstruction),
+		database.NewChangeToNull(u.PhoneColumn()),
+		database.NewChangeToNull(u.PhoneVerifiedAtColumn()),
 		u.clearPhoneVerificationID(),
+		u.SetSMSOTPEnabled(false),
+		database.NewChangeToNull(u.lastSuccessfulSMSOTPCheckColumn()),
+		u.clearSMSOTPVerificationID(),
 	)
+}
+
+// SetSMSOTPEnabled implements [domain.HumanUserRepository.SetSMSOTPEnabled].
+func (u userHuman) SetSMSOTPEnabled(enabled bool) database.Change {
+	return database.NewChange(u.smsOTPEnabledColumn(), enabled)
 }
 
 func (u userHuman) setPhone(phone string) database.Change {
@@ -219,10 +236,19 @@ func (u userHuman) clearPhoneVerificationID() database.Change {
 	return database.NewChangeToNull(u.phoneVerificationIDColumn())
 }
 
+func (u userHuman) clearSMSOTPVerificationID() database.Change {
+	return database.NewChangeToNull(u.smsOTPVerificationIDColumn())
+}
+
+func (u userHuman) setLastSuccessfulSMSOTPCheck(succeededAt time.Time) database.Change {
+	return database.NewChange(u.lastSuccessfulSMSOTPCheckColumn(), succeededAt)
+}
+
 // -------------------------------------------------------------
 // conditions
 // -------------------------------------------------------------
 
+// PhoneCondition implements [domain.HumanUserRepository.PhoneCondition].
 func (u userHuman) PhoneCondition(op database.TextOperation, phone string) database.Condition {
 	return database.NewTextCondition(u.PhoneColumn(), op, phone)
 }
@@ -231,9 +257,12 @@ func (u userHuman) PhoneCondition(op database.TextOperation, phone string) datab
 // columns
 // -------------------------------------------------------------
 
+// PhoneVerifiedAtColumn implements [domain.HumanUserRepository.PhoneVerifiedAtColumn].
 func (u userHuman) PhoneVerifiedAtColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "phone_verified_at")
 }
+
+// PhoneColumn implements [domain.HumanUserRepository.PhoneColumn].
 func (u userHuman) PhoneColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "phone")
 }
@@ -242,6 +271,14 @@ func (u userHuman) phoneVerificationIDColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "phone_verification_id")
 }
 
-func (u userHuman) phoneOTPVerificationIDColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "phone_otp_verification_id")
+func (u userHuman) smsOTPVerificationIDColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "sms_otp_verification_id")
+}
+
+func (u userHuman) lastSuccessfulSMSOTPCheckColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "last_successful_sms_otp_check")
+}
+
+func (u userHuman) smsOTPEnabledColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "sms_otp_enabled")
 }

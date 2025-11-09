@@ -173,40 +173,6 @@ func (u userHuman) SetPhoneOTPEnabled(enabled bool) database.Change {
 	return database.NewChange(u.phoneOTPEnabledColumn(), enabled)
 }
 
-// SetMFAInitSkippedAt implements [domain.HumanUserRepository].
-func (u userHuman) SetTOTPSecret(secret []byte) database.Change {
-	return database.NewChange(u.totpSecretColumn(), secret)
-}
-
-// SetMFAInitSkippedAt implements [domain.HumanUserRepository].
-func (u userHuman) SetTOTPVerifiedAt(verifiedAt time.Time) database.Change {
-	return database.NewChange(u.totpVerifiedAtColumn(), verifiedAt)
-}
-
-// SetMFAInitSkippedAt implements [domain.HumanUserRepository].
-func (u userHuman) IncrementFailedTOTPAttempts() database.Change {
-	return database.NewIncrementColumnChange(u.failedTOTPAttemptsColumn())
-}
-
-// SetMFAInitSkippedAt implements [domain.HumanUserRepository].
-func (u userHuman) ResetFailedTOTPAttempts() database.Change {
-	return database.NewChange(u.failedTOTPAttemptsColumn(), 0)
-}
-
-// SetMFAInitSkippedAt implements [domain.HumanUserRepository].
-func (u userHuman) RemoveTOTP() database.Change {
-	return database.NewChanges(
-		database.NewChangeToNull(u.totpSecretColumn()),
-		database.NewChangeToNull(u.totpVerifiedAtColumn()),
-		database.NewChangeToNull(u.failedTOTPAttemptsColumn()),
-	)
-}
-
-// SetTOTPLastSuccessfulCheckedAt implements [domain.HumanUserRepository].
-func (u userHuman) SetTOTPLastSuccessfulCheckedAt(checkedAt time.Time) database.Change {
-	return database.NewChange(u.totpCheckedAtColumn(), checkedAt)
-}
-
 // -------------------------------------------------------------
 // conditions
 // -------------------------------------------------------------
@@ -393,20 +359,4 @@ func (u userHuman) emailOTPEnabledColumn() database.Column {
 
 func (u userHuman) phoneOTPEnabledColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "phone_otp_enabled")
-}
-
-func (u userHuman) totpSecretColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "totp_secret")
-}
-
-func (u userHuman) totpVerifiedAtColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "totp_verified_at")
-}
-
-func (u userHuman) failedTOTPAttemptsColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "failed_totp_attempts")
-}
-
-func (u userHuman) totpLastSuccessfulCheckedAtColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "totp_last_successful_checked_at")
 }

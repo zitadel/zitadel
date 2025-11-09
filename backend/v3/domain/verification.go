@@ -13,10 +13,6 @@ type VerificationType interface {
 	isVerificationType()
 }
 
-type OTPVerificationType interface {
-	isOTPVerificationType()
-}
-
 // VerificationTypeInit indicates that an object which needs verification is created.
 type VerificationTypeInit struct {
 	// CreatedAt is the time when the verification was created.
@@ -47,15 +43,6 @@ func (v *VerificationTypeVerified) isVerificationType() {}
 
 var _ VerificationType = (*VerificationTypeVerified)(nil)
 
-// VerificationTypeFailed indicates that the verification was failed.
-// It is used to increment the failed attempts counter.
-type VerificationTypeFailed struct{}
-
-// isVerificationType implements [VerificationType].
-func (v *VerificationTypeFailed) isVerificationType() {}
-
-var _ VerificationType = (*VerificationTypeFailed)(nil)
-
 // VerificationTypeUpdate updates an existing verification.
 // The fields that are non-nil will be updated.
 type VerificationTypeUpdate struct {
@@ -80,3 +67,12 @@ type VerificationTypeSkipped struct {
 func (v *VerificationTypeSkipped) isVerificationType() {}
 
 var _ VerificationType = (*VerificationTypeSkipped)(nil)
+
+type VerificationTypeFailed struct {
+	FailedAt time.Time
+}
+
+// isVerificationType implements [VerificationType].
+func (v *VerificationTypeFailed) isVerificationType() {}
+
+var _ VerificationType = (*VerificationTypeFailed)(nil)
