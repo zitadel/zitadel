@@ -35,7 +35,7 @@ type SessionRepository interface {
 	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Session, error)
 	// Create creates a new session.
 	Create(ctx context.Context, client database.QueryExecutor, user *Session) error
-	// Update one re more existing sessions.
+	// Update one or more existing sessions.
 	// The condition must include at least the instanceID of the session to update.
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	// Delete removes sessions based on the given condition.
@@ -56,7 +56,7 @@ type sessionColumns interface {
 	LifetimeColumn() database.Column
 	// ExpirationColumn returns the column for the expiration field.
 	ExpirationColumn() database.Column
-	// UserIDColumn returns the column for the expiration field.
+	// UserIDColumn returns the column for the user id field.
 	UserIDColumn() database.Column
 	// IdentityProviderIDColumn returns the column for the identity provider ID field.
 	IdentityProviderIDColumn() database.Column
