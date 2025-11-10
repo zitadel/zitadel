@@ -28,7 +28,7 @@ func (v *CheckTypeInit) isCheckType() {}
 
 var _ CheckType = (*CheckTypeInit)(nil)
 
-// CheckTypeFailed indicates that the verification was failed.
+// CheckTypeFailed indicates that the check failed.
 // It is used to increment the failed attempts counter.
 type CheckTypeFailed struct {
 	FailedAt time.Time
