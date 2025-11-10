@@ -18,7 +18,7 @@ const (
 	UserStateSuspended
 )
 
-// User represents a the polymorphic user in the system.
+// User represents the polymorphic user in the system.
 // It can be a human user or a machine user.
 // Meaning that either Human or Machine is set, the other is nil.
 type User struct {
