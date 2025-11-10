@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-const _UserStateName = "initalactiveinactivelockedsuspended"
+const _UserStateName = "initialactiveinactivelockedsuspended"
 
-var _UserStateIndex = [...]uint8{0, 6, 12, 20, 26, 35}
+var _UserStateIndex = [...]uint8{0, 7, 13, 21, 27, 36}
 
-const _UserStateLowerName = "initalactiveinactivelockedsuspended"
+const _UserStateLowerName = "initialactiveinactivelockedsuspended"
 
 func (i UserState) String() string {
 	if i >= UserState(len(_UserStateIndex)-1) {
@@ -35,24 +35,24 @@ func _UserStateNoOp() {
 var _UserStateValues = []UserState{UserStateInitial, UserStateActive, UserStateInactive, UserStateLocked, UserStateSuspended}
 
 var _UserStateNameToValueMap = map[string]UserState{
-	_UserStateName[0:6]:        UserStateInitial,
-	_UserStateLowerName[0:6]:   UserStateInitial,
-	_UserStateName[6:12]:       UserStateActive,
-	_UserStateLowerName[6:12]:  UserStateActive,
-	_UserStateName[12:20]:      UserStateInactive,
-	_UserStateLowerName[12:20]: UserStateInactive,
-	_UserStateName[20:26]:      UserStateLocked,
-	_UserStateLowerName[20:26]: UserStateLocked,
-	_UserStateName[26:35]:      UserStateSuspended,
-	_UserStateLowerName[26:35]: UserStateSuspended,
+	_UserStateName[0:7]:        UserStateInitial,
+	_UserStateLowerName[0:7]:   UserStateInitial,
+	_UserStateName[7:13]:       UserStateActive,
+	_UserStateLowerName[7:13]:  UserStateActive,
+	_UserStateName[13:21]:      UserStateInactive,
+	_UserStateLowerName[13:21]: UserStateInactive,
+	_UserStateName[21:27]:      UserStateLocked,
+	_UserStateLowerName[21:27]: UserStateLocked,
+	_UserStateName[27:36]:      UserStateSuspended,
+	_UserStateLowerName[27:36]: UserStateSuspended,
 }
 
 var _UserStateNames = []string{
-	_UserStateName[0:6],
-	_UserStateName[6:12],
-	_UserStateName[12:20],
-	_UserStateName[20:26],
-	_UserStateName[26:35],
+	_UserStateName[0:7],
+	_UserStateName[7:13],
+	_UserStateName[13:21],
+	_UserStateName[21:27],
+	_UserStateName[27:36],
 }
 
 // UserStateString retrieves an enum value from the enum constants string name.

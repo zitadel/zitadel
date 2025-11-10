@@ -138,7 +138,7 @@ type humanChanges interface {
 
 	SetPasswordChangeRequired(required bool) database.Change
 
-	// SetMFAInitRequiredAt sets the MFA init required at time,
+	// SetMFAInitSkippedAt sets the time when MFA initialization was skipped,
 	SetMFAInitSkippedAt(skippedAt *time.Time) database.Change
 	// SetEmailOTPEnabledAt sets the email OTP enabled at time,
 	// If [time.Time.IsZero] is treated as NOW()
