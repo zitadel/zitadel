@@ -7,6 +7,7 @@
     "release": "tsx release/release.ts"
   },
   "devDependencies": {
+    "@nx/docker": "21.6.1",
     "@nx/js": "21.6.1",
     "@swc-node/register": "~1.9.1",
     "@swc/core": "~1.5.7",
@@ -15,6 +16,5 @@
     "sass": "^1.64.1",
     "tsx": "^4.20.6",
     "wait-on": "^9.0.1"
-  },
-  "dependencies": {}
+  }
 }

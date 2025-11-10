@@ -1,8 +1,19 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "release": {
+    "docker": {
+      "repositoryName": "zitadel/zitadel-login"
+    }
+  },
   "targets": {
     "nx-release-publish": {
-      "description": "Publishes the packaged Login application to a GitHub release",
+      "description": "The special nx-release-publish target is used by Nx Release to publish Docker images. It depends on the upload-assets target to upload the built assets to the GitHub release.",
+      "dependsOn": [
+        "upload-assets"
+      ]
+    },
+    "upload-assets": {
+      "description": "Uploads the packaged Login application to the GitHub release",
       "dependsOn": [
         "pack"
       ],
@@ -11,22 +22,9 @@
         "commands": [
           {
             "forwardAllArgs": false,
-            "command": "bash -c \"[[ \\\"${NX_DRY_RUN}\\\" == \\\"true\\\" ]] || gh release upload ${ZITADEL_RELEASE_VERSION} ./.artifacts/pack/zitadel-login.tar.gz\""
+            "command": "bash -c \"[[ \\\"${NX_DRY_RUN}\\\" == \\\"true\\\" ]] || gh release upload ${GITHUB_RELEASE_TAG} ./.artifacts/pack/zitadel-login.tar.gz\""
           }
         ]
-      }
-    },
-    "build-docker": {
-      "description": "Builds the Login Docker image",
-      "dependsOn": [
-        "build"
-      ],
-      "executor": "nx:run-commands",
-      "options": {
-        "env": {
-          "BAKE_FILE": "{projectRoot}/docker-bake.hcl"
-        },
-        "command": "docker buildx bake login --file ${BAKE_FILE}"
       }
     },
     "prod": {

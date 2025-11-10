@@ -10,13 +10,13 @@
     ]
   },
   "release": {
+    "git": {
+      "commit": false,
+      "stageChanges": false,
+      "tag": false
+    },
     "version": {
-      "conventionalCommits": true,
-      "git": {
-        "commit": false,
-        "stageChanges": false,
-        "tag": false
-      }
+      "conventionalCommits": true
     },
     "projects": [
       "@zitadel/api",
@@ -27,11 +27,6 @@
     ],
     "projectsRelationship": "fixed",
     "changelog": {
-      "git": {
-        "commit": false,
-        "stageChanges": false,
-        "tag": false
-      },
       "workspaceChangelog": {
         "createRelease": "github",
         "file": false,
@@ -39,6 +34,13 @@
           "authors": false,
           "applyUsernameToAuthors": false
         }
+      }
+    },
+    "docker": {
+      "registryUrl": "ghcr.io",
+      "versionSchemes": {
+        "semver": "{env.VERSION}",
+        "sha": "{shortCommitSha}"
       }
     }
   },
@@ -87,7 +89,32 @@
   "plugins": [
     {
       "plugin": "@nx/js/typescript",
-      "exclude": ["benchmark/**"]
+      "exclude": [
+        "benchmark/**"
+      ]
+    },
+    {
+      "plugin": "@nx/docker",
+      "options": {
+        "buildTarget": {
+          "name": "build-docker",
+          "args": [
+            "--platform",
+            "linux/amd64,linux/arm64",
+            "--label",
+            "org.opencontainers.image.title={projectName}",
+            "--label",
+            "org.opencontainers.image.source={projectRoot}",
+            "--label",
+            "org.opencontainers.image.revision={commitSha}",
+            "--label",
+            "org.opencontainers.image.created={currentDate}"
+          ]
+        },
+        "runTarget": {
+          "name": "run-docker"
+        }
+      }
     }
   ]
 }

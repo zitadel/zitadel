@@ -11,6 +11,9 @@ importers:
 
   .:
     devDependencies:
+      '@nx/docker':
+        specifier: 21.6.1
+        version: 21.6.1(nx@21.6.1(@swc-node/register@1.9.2(@swc/core@1.5.29(@swc/helpers@0.5.17))(@swc/types@0.1.25)(typescript@5.9.2))(@swc/core@1.5.29(@swc/helpers@0.5.17)))
       '@nx/js':
         specifier: 21.6.1
         version: 21.6.1(@babel/traverse@7.28.4)(@swc-node/register@1.9.2(@swc/core@1.5.29(@swc/helpers@0.5.17))(@swc/types@0.1.25)(typescript@5.9.2))(@swc/core@1.5.29(@swc/helpers@0.5.17))(nx@21.6.1(@swc-node/register@1.9.2(@swc/core@1.5.29(@swc/helpers@0.5.17))(@swc/types@0.1.25)(typescript@5.9.2))(@swc/core@1.5.29(@swc/helpers@0.5.17)))
@@ -3603,6 +3606,9 @@ packages:
     resolution: {integrity: sha512-dNKNMMvT+Twjpm5+wjfrVCaPfeeg0xJQv4+AwqE+masyLeNpa55vpZkE7aspmZteXb7DB16Xp3qy+JBbb1AACg==}
     peerDependencies:
       nx: '>= 20 <= 22'
+
+  '@nx/docker@21.6.1':
+    resolution: {integrity: sha512-4j9cSdTdD/gR5bZzFDaWuic1oT8QCgtBQWq+WNRDAMjRFydkYLqLtjkD6fa8Y/ON93gkCvnkH06DKVOyn6vPYw==}
 
   '@nx/js@21.6.1':
     resolution: {integrity: sha512-o72Qv4+1/RAmca7/ZE8/+MzxE5+VRvibGyWdl3VY/+yTF+eeAebaTfagV32sFQ/1bdGiPFAsM/+Ms/3l0cn68w==}
@@ -18344,6 +18350,14 @@ snapshots:
       semver: 7.7.2
       tslib: 2.8.1
       yargs-parser: 21.1.1
+
+  '@nx/docker@21.6.1(nx@21.6.1(@swc-node/register@1.9.2(@swc/core@1.5.29(@swc/helpers@0.5.17))(@swc/types@0.1.25)(typescript@5.9.2))(@swc/core@1.5.29(@swc/helpers@0.5.17)))':
+    dependencies:
+      '@nx/devkit': 21.6.1(nx@21.6.1(@swc-node/register@1.9.2(@swc/core@1.5.29(@swc/helpers@0.5.17))(@swc/types@0.1.25)(typescript@5.9.2))(@swc/core@1.5.29(@swc/helpers@0.5.17)))
+      enquirer: 2.3.6
+      tslib: 2.8.1
+    transitivePeerDependencies:
+      - nx
 
   '@nx/js@21.6.1(@babel/traverse@7.28.4)(@swc-node/register@1.9.2(@swc/core@1.5.29(@swc/helpers@0.5.17))(@swc/types@0.1.25)(typescript@5.9.2))(@swc/core@1.5.29(@swc/helpers@0.5.17))(nx@21.6.1(@swc-node/register@1.9.2(@swc/core@1.5.29(@swc/helpers@0.5.17))(@swc/types@0.1.25)(typescript@5.9.2))(@swc/core@1.5.29(@swc/helpers@0.5.17)))':
     dependencies:

@@ -2,6 +2,11 @@
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "name": "@zitadel/api",
     "projectType": "application",
+    "release": {
+        "docker": {
+            "repositoryName": "zitadel/zitadel"
+        }
+    },
     "namedInputs": {
         "sources": [
             "{workspaceRoot}/cmd/**/*.go",
@@ -20,7 +25,13 @@
     },
     "targets": {
         "nx-release-publish": {
-            "description": "Publishes cross-compiled binary tarballs to the GitHub release and publishes Docker images for production and for debugging.",
+            "description": "The special nx-release-publish target is used by Nx Release to publish Docker images. It depends on the upload-assets target to upload the built assets to the GitHub release.",
+            "dependsOn": [
+                "upload-assets"
+            ]
+        },
+        "upload-assets": {
+            "description": "Uploads static assets to the GitHub release.",
             "dependsOn": [
                 "pack-all"
             ],
