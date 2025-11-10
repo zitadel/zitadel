@@ -76,6 +76,17 @@ describe("processIDPCallback", () => {
         email: "test@example.com",
       },
     },
+    updateHumanUser: {
+      username: "testuser",
+      profile: {
+        givenName: "Test",
+        familyName: "User 1",
+        displayName: "Test User 1",
+      },
+      email: {
+        email: "test@example.com",
+      },
+    },
   };
 
   const defaultIdp = {
@@ -257,8 +268,8 @@ describe("processIDPCallback", () => {
         serviceUrl: "https://api.example.com",
         request: expect.objectContaining({
           userId: "user123",
-          profile: defaultIntent.addHumanUser.profile,
-          email: defaultIntent.addHumanUser.email,
+          profile: defaultIntent.updateHumanUser.profile,
+          email: defaultIntent.updateHumanUser.email,
         }),
       });
     });
