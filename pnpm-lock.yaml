@@ -38,6 +38,12 @@ importers:
       '@tailwindcss/forms':
         specifier: 0.5.7
         version: 0.5.7(tailwindcss@3.4.14)
+      '@zitadel/client':
+        specifier: workspace:*
+        version: link:../../packages/zitadel-client
+      '@zitadel/proto':
+        specifier: workspace:*
+        version: link:../../packages/zitadel-proto
       clsx:
         specifier: 1.2.1
         version: 1.2.1
@@ -141,12 +147,6 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^4.4.1
         version: 4.7.0(vite@5.4.20(@types/node@22.18.1)(less@4.1.3)(lightningcss@1.30.1)(sass@1.92.1)(terser@5.44.0))
-      '@zitadel/client':
-        specifier: workspace:*
-        version: link:../../packages/zitadel-client
-      '@zitadel/proto':
-        specifier: workspace:*
-        version: link:../../packages/zitadel-proto
       autoprefixer:
         specifier: 10.4.21
         version: 10.4.21(postcss@8.5.3)

@@ -45,7 +45,9 @@
     "react-dom": "19.1.0",
     "react-hook-form": "7.39.5",
     "tinycolor2": "1.4.2",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "@zitadel/client": "workspace:*",
+    "@zitadel/proto": "workspace:*"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.23.0",
@@ -67,8 +69,6 @@
     "@typescript-eslint/parser": "^7.0.0",
     "@vercel/git-hooks": "1.0.0",
     "@vitejs/plugin-react": "^4.4.1",
-    "@zitadel/client": "workspace:*",
-    "@zitadel/proto": "workspace:*",
     "autoprefixer": "10.4.21",
     "concurrently": "^9.1.2",
     "cypress": "^14.5.4",
