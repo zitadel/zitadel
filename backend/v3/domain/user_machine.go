@@ -22,6 +22,23 @@ type Machine struct {
 	AccessTokenType AccessTokenType `json:"accessTokenType,omitempty" db:"access_token_type"`
 }
 
+type MachineUserRepository interface {
+	machineColumns
+	machineConditions
+	machineChanges
+
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
+
+	// Keys returns the [MachineKeyRepository] for machine users
+	Keys() MachineKeyRepository
+	// LoadKeys enables fetching of machine keys when getting or listing machine users
+	LoadKeys() MachineUserRepository
+	// PersonalAccessTokens returns the [PersonalAccessTokenRepository] for machine users
+	PersonalAccessTokens() PersonalAccessTokenRepository
+	// LoadPersonalAccessTokens enables fetching of personal access tokens when getting or listing machine users
+	LoadPersonalAccessTokens() MachineUserRepository
+}
+
 type machineColumns interface {
 	userColumns
 	NameColumn() database.Column
@@ -45,12 +62,4 @@ type machineChanges interface {
 	// SetSecret sets the secret, nil to clear it
 	SetSecret(secret *string) database.Change
 	SetAccessTokenType(accessTokenType AccessTokenType) database.Change
-}
-
-type MachineUserRepository interface {
-	machineColumns
-	machineConditions
-	machineChanges
-
-	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 }

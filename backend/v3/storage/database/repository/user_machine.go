@@ -20,7 +20,7 @@ func MachineUserRepository() domain.MachineUserRepository {
 }
 
 func (m userMachine) unqualifiedTableName() string {
-	return "machine_users"
+	return "users"
 }
 
 // -------------------------------------------------------------
@@ -69,6 +69,12 @@ func (m userMachine) Update(ctx context.Context, client database.QueryExecutor, 
 	}
 	if err := checkPKCondition(m, condition); err != nil {
 		return 0, err
+	}
+	if !condition.IsRestrictingColumn(m.typeColumn()) {
+		condition = database.And(
+			condition,
+			m.TypeCondition(domain.UserTypeMachine),
+		)
 	}
 	if !database.Changes(changes).IsOnColumn(m.UpdatedAtColumn()) {
 		changes = append(changes, database.NewChange(m.UpdatedAtColumn(), database.NullInstruction))

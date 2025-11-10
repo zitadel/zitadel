@@ -18,29 +18,6 @@ const (
 	GenderDiverse
 )
 
-type SetPasswordVerification interface {
-	isSetPasswordVerification()
-}
-
-type SetPasswordVerificationCurrentPasswordChecked struct {
-	VerifiedAt time.Time
-}
-
-func (s SetPasswordVerificationCurrentPasswordChecked) isSetPasswordVerification() {}
-
-type SetPasswordVerificationVerificationCode struct {
-	VerifiedAt time.Time
-}
-
-func (s SetPasswordVerificationVerificationCode) isSetPasswordVerification() {}
-
-// TODO(adlerhurst): is there a code present in that case?
-type SetPasswordVerificationChangeRequired struct {
-	VerifiedAt time.Time
-}
-
-func (s SetPasswordVerificationChangeRequired) isSetPasswordVerification() {}
-
 type Human struct {
 	FirstName         string        `json:"firstName,omitempty" db:"first_name"`
 	LastName          string        `json:"lastName,omitempty" db:"last_name"`
@@ -50,6 +27,68 @@ type Human struct {
 	Gender            *Gender       `json:"gender,omitempty" db:"gender"`
 	AvatarKey         *string       `json:"avatarKey,omitempty" db:"avatar_key"`
 	Avatar            []byte        `json:"avatar,omitempty" db:"avatar"`
+}
+
+type HumanUserRepository interface {
+	humanColumns
+	humanConditions
+	humanChanges
+
+	// Update updates a human user.
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
+
+	// SetPassword sets the password based on the given verification type.
+	SetPassword(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
+	// GetPasswordVerification retrieves the password verification based on the given condition.
+	GetPasswordVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
+
+	// SetEmail sets the email based on the given verification type.
+	// * [VerificationTypeInit] to initialize email verification, previously verified email remains verified
+	// * [VerificationTypeVerified] to mark email as verified, a verification must exist
+	// * [VerificationTypeUpdate] to update email verification, a verification must exist (e.g. resend code)
+	// * [VerificationTypeSkipped] to skip email verification, existing verification is removed (e.g. admin set email)
+	SetEmail(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
+	// GetEmailVerification retrieves the email verification based on the given condition.
+	GetEmailVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
+
+	// SetPhone sets the phone based on the given verification type.
+	// * [VerificationTypeInit] to initialize phone verification, previously verified phone remains verified
+	// * [VerificationTypeVerified] to mark phone as verified, a verification must exist
+	// * [VerificationTypeUpdate] to update phone verification, a verification must exist (e.g. resend code)
+	// * [VerificationTypeSkipped] to skip phone verification, existing verification is removed (e.g. admin set phone)
+	SetPhone(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
+	// GetPhoneVerification retrieves the phone verification based on the given condition.
+	GetPhoneVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
+
+	// SetTOTP sets the TOTP based on the given verification type.
+	SetTOTP(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
+	// GetTOTPVerification retrieves the TOTP verification based on the given condition.
+	GetTOTPVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
+
+	// SetEmailOTPCheck sets the email OTP check based on the given check type.
+	// * [CheckTypeInit] to initialize email OTP check, it overwrites the existing check
+	// * [CheckTypeSuccessful] to mark email OTP check as successful, updating last successful check time
+	// * [CheckTypeFailed] to mark email OTP check as failed, increasing failed attempts count
+	SetEmailOTPCheck(ctx context.Context, client database.QueryExecutor, condition database.Condition, check CheckType) (int64, error)
+	// GetEmailOTPCheck retrieves the email OTP check based on the given condition.
+	GetEmailOTPCheck(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Check, error)
+	// SetSMSOTPCheck sets the SMS OTP check based on the given check type.
+	// * [CheckTypeInit] to initialize SMS OTP check, it overwrites the existing check
+	// * [CheckTypeSuccessful] to mark SMS OTP check as successful, updating last successful check time
+	// * [CheckTypeFailed] to mark SMS OTP check as failed, increasing failed attempts count
+	SetSMSOTPCheck(ctx context.Context, client database.QueryExecutor, condition database.Condition, check CheckType) (int64, error)
+	// GetSMSOTPCheck retrieves the SMS OTP check based on the given condition.
+	GetSMSOTPCheck(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Check, error)
+	// SetTOTPCheck sets the TOTP check based on the given check type.
+	// * [CheckTypeInit] is not allowed for TOTP check. because the secret must already be set.
+	// * [CheckTypeSuccessful] to mark TOTP check as successful, updating last successful check time
+	// * [CheckTypeFailed] to mark TOTP check as failed, increasing failed attempts count
+	SetTOTPCheck(ctx context.Context, client database.QueryExecutor, condition database.Condition, check CheckType) (int64, error)
+	// GetTOTPCheck retrieves the TOTP check based on the given condition.
+	GetTOTPCheck(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Check, error)
+
+	// LoadIdentityProviderLinks enables fetching of identity provider links when getting or listing human users
+	LoadIdentityProviderLinks() HumanUserRepository
 }
 
 type humanColumns interface {
@@ -87,46 +126,29 @@ type humanChanges interface {
 	SetLastName(name string) database.Change
 	SetNickname(name string) database.Change
 	SetDisplayName(name string) database.Change
+	// SetPreferredLanguage sets the preferred language,
 	// nil and [language.Und] are treated as unset
 	SetPreferredLanguage(language *language.Tag) database.Change
+	// SetGender sets the gender,
 	// nil and [GenderUnspecified] are treated as unset
 	SetGender(gender *Gender) database.Change
+	// SetAvatarKey sets the avatar key,
+	// nil removes the avatar key
 	SetAvatarKey(key *string) database.Change
 
 	SetPasswordChangeRequired(required bool) database.Change
 
+	// SetMFAInitRequiredAt sets the MFA init required at time,
 	SetMFAInitSkippedAt(skippedAt *time.Time) database.Change
-	SetEmailOTPEnabled(enabled bool) database.Change
-	SetSMSOTPEnabled(enabled bool) database.Change
+	// SetEmailOTPEnabledAt sets the email OTP enabled at time,
+	// If [time.Time.IsZero] is treated as NOW()
+	SetEmailOTPEnabledAt(enabledAt time.Time) database.Change
+	// SetSMSOTPEnabledAt sets the SMS OTP enabled at time,
+	// If [time.Time.IsZero] is treated as NOW()
+	SetSMSOTPEnabledAt(enabledAt time.Time) database.Change
 
+	// RemoveTOTP removes the TOTP settings.
 	RemoveTOTP() database.Change
+	// RemovePhone removes the phone number and its verification.
 	RemovePhone() database.Change
-}
-
-type HumanUserRepository interface {
-	humanColumns
-	humanConditions
-	humanChanges
-
-	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
-
-	// SetPassword sets the password based on the given verification type.
-	SetPassword(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
-	GetPasswordVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
-	// IncrementPasswordVerificationAttempts(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
-
-	SetEmail(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
-	GetEmailVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
-	SetPhone(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
-	GetPhoneVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
-
-	SetTOTP(ctx context.Context, client database.QueryExecutor, condition database.Condition, verification VerificationType) (int64, error)
-	GetTOTPVerification(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Verification, error)
-
-	SetEmailOTPCheck(ctx context.Context, client database.QueryExecutor, condition database.Condition, check CheckType) (int64, error)
-	GetEmailOTPCheck(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Check, error)
-	SetSMSOTPCheck(ctx context.Context, client database.QueryExecutor, condition database.Condition, check CheckType) (int64, error)
-	GetSMSOTPCheck(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Check, error)
-	SetTOTPCheck(ctx context.Context, client database.QueryExecutor, condition database.Condition, check CheckType) (int64, error)
-	GetTOTPCheck(ctx context.Context, client database.QueryExecutor, condition database.Condition) (*Check, error)
 }
