@@ -14,12 +14,6 @@ type SessionUserAgent struct {
 	Header        http.Header
 }
 
-//
-//type SessionUserAgentRepository interface {
-//	sessionUserAgentColumns
-//	sessionUserAgentConditions
-//}
-
 type sessionUserAgentColumns interface {
 	// InstanceIDColumn returns the column for the instance id field.
 	InstanceIDColumn() database.Column

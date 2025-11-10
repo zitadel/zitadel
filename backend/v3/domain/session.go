@@ -9,18 +9,18 @@ import (
 )
 
 type Session struct {
-	InstanceID         string
-	ID                 string
-	Token              string
-	UserAgent          *SessionUserAgent
-	Lifetime           time.Duration
-	Expiration         time.Time
-	UserID             string
-	IdentityProviderID string
-	CreatedAt          time.Time
-	UpdatedAt          time.Time
-	Metadata           []SessionMetadata
-	Factors            SessionFactors
+	InstanceID string
+	ID         string
+	Token      string
+	Lifetime   time.Duration
+	Expiration time.Time
+	UserID     string
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	Factors    SessionFactors
+	Challenges SessionChallenges
+	Metadata   []SessionMetadata
+	UserAgent  *SessionUserAgent
 }
 
 type SessionRepository interface {
@@ -36,22 +36,11 @@ type SessionRepository interface {
 	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Session, error)
 	// Create creates a new session.
 	Create(ctx context.Context, client database.QueryExecutor, user *Session) error
-	// Update an existing session.
-	// The condition must include the instanceID and ID of the session to update.
+	// Update one re more existing sessions.
+	// The condition must include at least the instanceID of the session to update.
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	// Delete removes sessions based on the given condition.
 	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) error
-
-	// SetChallenge adds or updates the challenge of the session matching the condition.
-	SetChallenge(ctx context.Context, client database.QueryExecutor, condition database.Condition, challenge SessionChallengeType) error
-	// SetFactor adds or updates the factor of the session matching the condition.
-	SetFactor(ctx context.Context, client database.QueryExecutor, condition database.Condition, factor SessionFactorType) error
-	// ClearFactor resets the factor of the session matching the condition.
-	ClearFactor(ctx context.Context, client database.QueryExecutor, condition database.Condition) error
-	// SetUserAgent adds or updates the user agent of the session matching the condition.
-	SetUserAgent(ctx context.Context, client database.QueryExecutor, condition database.Condition, userAgent SessionUserAgent) error
-	// SetMetadata adds or updates the metadata of the session matching the condition.
-	SetMetadata(ctx context.Context, client database.QueryExecutor, condition database.Condition, metadata []SessionMetadata) error
 }
 
 // sessionColumns define all the columns of the session table.
@@ -76,6 +65,13 @@ type sessionColumns interface {
 	CreatedAtColumn() database.Column
 	// UpdatedAtColumn returns the column for the updated at field.
 	UpdatedAtColumn() database.Column
+
+	// FactorColumns returns the columns for the factors fields.
+	FactorColumns() sessionFactorColumns
+	// MetadataColumns returns the columns for the metadata fields.
+	MetadataColumns() sessionMetadataColumns
+	// UserAgentColumns returns the columns for the user agent fields.
+	UserAgentColumns() sessionUserAgentColumns
 }
 
 // sessionConditions define all the conditions for the session table.
@@ -95,7 +91,12 @@ type sessionConditions interface {
 	// UpdatedAtCondition returns a filter on the updated at field.
 	UpdatedAtCondition(op database.NumberOperation, updatedAt time.Time) database.Condition
 
+	// FactorConditions returns the conditions for the factors fields.
 	FactorConditions() sessionFactorConditions
+	// MetadataConditions returns the conditions for the metadata fields.
+	MetadataConditions() sessionMetadataConditions
+	// UserAgentConditions returns the conditions for the user agent fields.
+	UserAgentConditions() sessionUserAgentConditions
 }
 
 type sessionChanges interface {
@@ -107,4 +108,15 @@ type sessionChanges interface {
 	SetToken(token string) database.Change
 	// SetLifetime sets the lifetime field of the session and will update the computed expiration field.
 	SetLifetime(lifetime time.Duration) database.Change
+
+	//SetChallenge adds or updates the challenge of the corresponding type.
+	SetChallenge(challenge SessionChallengeType) database.Change
+	//SetFactor adds or updates the factor of the corresponding type.
+	SetFactor(factor SessionFactor) database.Change
+	//ClearFactor resets the factor of the corresponding type.
+	ClearFactor(factor SessionFactorType) database.Change
+	// SetMetadata adds or updates the metadata of the session.
+	SetMetadata(metadata []SessionMetadata) database.Change
+	// SetUserAgent adds or updates the user agent of the session.
+	SetUserAgent(userAgent SessionUserAgent) database.Change
 }

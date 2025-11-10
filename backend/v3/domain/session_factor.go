@@ -8,142 +8,9 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
-type SessionFactorType interface {
-	isSessionFactorType()
-}
-
-type SessionFactorTypeUser struct {
-	UserID         string
-	LastVerifiedAt time.Time
-}
-
-func (s *SessionFactorTypeUser) isSessionFactorType() {}
-
-type SessionFactorTypePassword struct {
-	LastVerifiedAt time.Time
-}
-
-func (s SessionFactorTypePassword) isSessionFactorType() {}
-
-type SessionFactorTypeIDPIntent struct {
-	LastVerifiedAt time.Time
-}
-
-func (s SessionFactorTypeIDPIntent) isSessionFactorType() {}
-
-type SessionFactorTypePasskey struct {
-	LastVerifiedAt time.Time
-	UserVerified   bool
-}
-
-func (s SessionFactorTypePasskey) isSessionFactorType() {}
-
-type SessionFactorTypeTOTP struct {
-	LastVerifiedAt time.Time
-}
-
-func (s SessionFactorTypeTOTP) isSessionFactorType() {}
-
-type SessionFactorTypeOTPSMS struct {
-	LastVerifiedAt time.Time
-}
-
-func (s SessionFactorTypeOTPSMS) isSessionFactorType() {}
-
-type SessionFactorTypeOTPEmail struct {
-	LastVerifiedAt time.Time
-}
-
-func (s SessionFactorTypeOTPEmail) isSessionFactorType() {}
-
-type SessionFactors []SessionFactorType
-
-func (s SessionFactors) GetUserFactor() *SessionFactorTypeUser {
-	factor, _ := GetFactorType[*SessionFactorTypeUser](s)
-	return factor
-}
-
-func (s SessionFactors) GetPasswordFactor() *SessionFactorTypePassword {
-	factor, _ := GetFactorType[*SessionFactorTypePassword](s)
-	return factor
-}
-
-func (s SessionFactors) GetIDPIntentFactor() *SessionFactorTypeIDPIntent {
-	factor, _ := GetFactorType[*SessionFactorTypeIDPIntent](s)
-	return factor
-}
-
-func (s SessionFactors) GetPasskeyFactor() *SessionFactorTypePasskey {
-	factor, _ := GetFactorType[*SessionFactorTypePasskey](s)
-	return factor
-}
-
-func (s SessionFactors) GetTOTPFactor() *SessionFactorTypeTOTP {
-	factor, _ := GetFactorType[*SessionFactorTypeTOTP](s)
-	return factor
-}
-
-func (s SessionFactors) GetOTPSMSFactor() *SessionFactorTypeOTPSMS {
-	factor, _ := GetFactorType[*SessionFactorTypeOTPSMS](s)
-	return factor
-}
-
-func (s SessionFactors) GetOTPEmailFactor() *SessionFactorTypeOTPEmail {
-	factor, _ := GetFactorType[*SessionFactorTypeOTPEmail](s)
-	return factor
-}
-
-func GetFactorType[T SessionFactorType](s SessionFactors) (T, bool) {
-	var nilT T
-	for _, factorType := range s {
-		if ft, ok := factorType.(T); ok {
-			return ft, true
-		}
-	}
-	return nilT, false
-}
-
-type SessionChallengeType interface {
-	isSessionChallengeType()
-}
-
-type SessionChallengeTypePasskey struct {
-	LastChallengedAt     time.Time
-	Challenge            string
-	AllowedCredentialIDs [][]byte
-	UserVerification     domain.UserVerificationRequirement
-	RPID                 string
-}
-
-func (s *SessionChallengeTypePasskey) isSessionChallengeType() {}
-
-type SessionChallengeTypeOTPSMS struct {
-	LastChallengedAt  time.Time
-	Code              *crypto.CryptoValue
-	Expiry            time.Duration
-	CodeReturned      bool
-	GeneratorID       string
-	TriggeredAtOrigin string
-}
-
-func (s *SessionChallengeTypeOTPSMS) isSessionChallengeType() {}
-
-type SessionChallengeTypeOTPEmail struct {
-	LastChallengedAt  time.Time
-	Code              *crypto.CryptoValue
-	Expiry            time.Duration
-	CodeReturned      bool
-	URLTmpl           string
-	TriggeredAtOrigin string
-}
-
-func (s *SessionChallengeTypeOTPEmail) isSessionChallengeType() {}
-
-/*
 type SessionFactorType int
 
 const (
-
 	SessionFactorTypeUnknown SessionFactorType = iota
 	SessionFactorTypeUser
 	SessionFactorTypePassword
@@ -152,13 +19,185 @@ const (
 	SessionFactorTypeTOTP
 	SessionFactorTypeOTPSMS
 	SessionFactorTypeOTPEmail
-
 )
-*/
-//type SessionFactorRepository interface {
-//	sessionFactorColumns
-//	sessionFactorConditions
-//}
+
+type SessionFactor interface {
+	sessionFactorType() SessionFactorType
+}
+
+type SessionFactorUser struct {
+	UserID         string
+	LastVerifiedAt time.Time
+}
+
+func (s *SessionFactorUser) sessionFactorType() SessionFactorType {
+	return SessionFactorTypeUser
+}
+
+type SessionFactorPassword struct {
+	LastVerifiedAt time.Time
+}
+
+func (s *SessionFactorPassword) sessionFactorType() SessionFactorType {
+	return SessionFactorTypePassword
+}
+
+type SessionFactorIDPIntent struct {
+	LastVerifiedAt time.Time
+}
+
+func (s *SessionFactorIDPIntent) sessionFactorType() SessionFactorType {
+	return SessionFactorTypeIDPIntent
+}
+
+type SessionFactorPasskey struct {
+	LastVerifiedAt time.Time
+	UserVerified   bool
+}
+
+func (s *SessionFactorPasskey) sessionFactorType() SessionFactorType {
+	return SessionFactorTypePasskey
+}
+
+type SessionFactorTOTP struct {
+	LastVerifiedAt time.Time
+}
+
+func (s *SessionFactorTOTP) sessionFactorType() SessionFactorType {
+	return SessionFactorTypeTOTP
+}
+
+type SessionFactorOTPSMS struct {
+	LastVerifiedAt time.Time
+}
+
+func (s *SessionFactorOTPSMS) sessionFactorType() SessionFactorType {
+	return SessionFactorTypeOTPSMS
+}
+
+type SessionFactorOTPEmail struct {
+	LastVerifiedAt time.Time
+}
+
+func (s *SessionFactorOTPEmail) sessionFactorType() SessionFactorType {
+	return SessionFactorTypeOTPEmail
+}
+
+type SessionFactors []SessionFactor
+
+func (s SessionFactors) GetUserFactor() *SessionFactorUser {
+	factor, _ := GetFactor[*SessionFactorUser](s)
+	return factor
+}
+
+func (s SessionFactors) GetPasswordFactor() *SessionFactorPassword {
+	factor, _ := GetFactor[*SessionFactorPassword](s)
+	return factor
+}
+
+func (s SessionFactors) GetIDPIntentFactor() *SessionFactorIDPIntent {
+	factor, _ := GetFactor[*SessionFactorIDPIntent](s)
+	return factor
+}
+
+func (s SessionFactors) GetPasskeyFactor() *SessionFactorPasskey {
+	factor, _ := GetFactor[*SessionFactorPasskey](s)
+	return factor
+}
+
+func (s SessionFactors) GetTOTPFactor() *SessionFactorTOTP {
+	factor, _ := GetFactor[*SessionFactorTOTP](s)
+	return factor
+}
+
+func (s SessionFactors) GetOTPSMSFactor() *SessionFactorOTPSMS {
+	factor, _ := GetFactor[*SessionFactorOTPSMS](s)
+	return factor
+}
+
+func (s SessionFactors) GetOTPEmailFactor() *SessionFactorOTPEmail {
+	factor, _ := GetFactor[*SessionFactorOTPEmail](s)
+	return factor
+}
+
+func GetFactor[T SessionFactor](factors SessionFactors) (T, bool) {
+	var nilT T
+	for _, factor := range factors {
+		if f, ok := factor.(T); ok {
+			return f, true
+		}
+	}
+	return nilT, false
+}
+
+type SessionChallenge interface {
+	sessionChallengeType() SessionFactorType
+}
+
+type SessionChallengePasskey struct {
+	LastChallengedAt     time.Time
+	Challenge            string
+	AllowedCredentialIDs [][]byte
+	UserVerification     domain.UserVerificationRequirement
+	RPID                 string
+}
+
+func (s *SessionChallengePasskey) sessionChallengeType() SessionFactorType {
+	return SessionFactorTypePasskey
+}
+
+type SessionChallengeOTPSMS struct {
+	LastChallengedAt  time.Time
+	Code              *crypto.CryptoValue
+	Expiry            time.Duration
+	CodeReturned      bool
+	GeneratorID       string
+	TriggeredAtOrigin string
+}
+
+func (s *SessionChallengeOTPSMS) sessionChallengeType() SessionFactorType {
+	return SessionFactorTypeOTPSMS
+}
+
+type SessionChallengeOTPEmail struct {
+	LastChallengedAt  time.Time
+	Code              *crypto.CryptoValue
+	Expiry            time.Duration
+	CodeReturned      bool
+	URLTmpl           string
+	TriggeredAtOrigin string
+}
+
+func (s *SessionChallengeOTPEmail) sessionChallengeType() SessionFactorType {
+	return SessionFactorTypeOTPEmail
+}
+
+type SessionChallenges []SessionChallenge
+
+func (s SessionChallenges) GetPasskeyChallenge() *SessionChallengePasskey {
+	challenge, _ := GetChallenge[*SessionChallengePasskey](s)
+	return challenge
+}
+
+func (s SessionChallenges) GetOTPSMSChallenge() *SessionChallengeOTPSMS {
+	challenge, _ := GetChallenge[*SessionChallengeOTPSMS](s)
+	return challenge
+}
+
+func (s SessionChallenges) GetOTPEmailChallenge() *SessionChallengeOTPEmail {
+	challenge, _ := GetChallenge[*SessionChallengeOTPEmail](s)
+	return challenge
+}
+
+func GetChallenge[T SessionChallenge](challenges SessionChallenges) (T, bool) {
+	var nilT T
+	for _, challenge := range challenges {
+		if c, ok := challenge.(T); ok {
+			return c, true
+		}
+	}
+	return nilT, false
+}
 
 type sessionFactorColumns interface {
 	// InstanceIDColumn returns the column for the instance id field.
