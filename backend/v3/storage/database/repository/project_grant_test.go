@@ -21,6 +21,7 @@ func TestGetProjectGrant(t *testing.T) {
 	firstGrantedOrgID := createOrganization(t, tx, instanceID)
 	secondGrantedOrgID := createOrganization(t, tx, instanceID)
 	projectID := createProject(t, tx, instanceID, grantingOrgID)
+	roleKey := createProjectRole(t, tx, instanceID, grantingOrgID, projectID, "")
 	projectGrantRepo := repository.ProjectGrantRepository()
 
 	firstProjectGrant := &domain.ProjectGrant{
@@ -30,6 +31,7 @@ func TestGetProjectGrant(t *testing.T) {
 		ProjectID:              projectID,
 		GrantedOrganizationID:  firstGrantedOrgID,
 		State:                  domain.ProjectGrantStateActive,
+		RoleKeys:               []string{roleKey},
 	}
 	err := projectGrantRepo.Create(t.Context(), tx, firstProjectGrant)
 	require.NoError(t, err)

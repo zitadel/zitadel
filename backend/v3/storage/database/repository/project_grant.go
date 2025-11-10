@@ -49,20 +49,38 @@ const insertProjectGrantStmt = `INSERT INTO zitadel.project_grants(
 VALUES ($1, $2, $3, $4, $5, $6)
 RETURNING created_at, updated_at`
 
-func (p projectGrant) Create(ctx context.Context, client database.QueryExecutor, projectGrant *domain.ProjectGrant) error {
-	builder := database.NewStatementBuilder(insertProjectGrantStmt,
-		projectGrant.InstanceID,
-		projectGrant.ID,
-		projectGrant.ProjectID,
-		projectGrant.GrantingOrganizationID,
-		projectGrant.GrantedOrganizationID,
-		projectGrant.State,
+const insertProjectGrantWithRolesStmt = `WITH added_roles AS (
+	INSERT INTO zitadel.project_grant_roles (
+		instance_id, grant_id, project_id, key
 	)
+	VALUES ($1, $2, $3, unnest($7::text[]))
+) ` + insertProjectGrantStmt
+
+func (p projectGrant) Create(ctx context.Context, client database.QueryExecutor, projectGrant *domain.ProjectGrant) error {
+	var builder *database.StatementBuilder
+	if len(projectGrant.RoleKeys) == 0 {
+		builder = database.NewStatementBuilder(insertProjectGrantStmt,
+			projectGrant.InstanceID,
+			projectGrant.ID,
+			projectGrant.ProjectID,
+			projectGrant.GrantingOrganizationID,
+			projectGrant.GrantedOrganizationID,
+			projectGrant.State,
+		)
+	} else {
+		builder = database.NewStatementBuilder(insertProjectGrantWithRolesStmt,
+			projectGrant.InstanceID,
+			projectGrant.ID,
+			projectGrant.ProjectID,
+			projectGrant.GrantingOrganizationID,
+			projectGrant.GrantedOrganizationID,
+			projectGrant.State,
+			projectGrant.RoleKeys,
+		)
+	}
+
 	if err := client.QueryRow(ctx, builder.String(), builder.Args()...).
 		Scan(&projectGrant.CreatedAt, &projectGrant.UpdatedAt); err != nil {
-		return err
-	}
-	if _, err := p.SetRoleKeys(ctx, client, p.PrimaryKeyCondition(projectGrant.InstanceID, projectGrant.ID), projectGrant.RoleKeys); err != nil {
 		return err
 	}
 	return nil
@@ -267,7 +285,7 @@ const queryProjectGrantStmt = `SELECT
 	zitadel.project_grants.created_at,
 	zitadel.project_grants.updated_at,
 	zitadel.project_grants.state,
-    json_agg(project_grant_roles.key) FILTER (WHERE project_grant_roles.grant_id IS NOT NULL) AS role_keys
+    ARRAY_AGG(project_grant_roles.key) FILTER (WHERE project_grant_roles.grant_id IS NOT NULL) AS role_keys
 	FROM zitadel.project_grants
 	LEFT JOIN zitadel.project_grant_roles ON zitadel.project_grant_roles.instance_id = zitadel.project_grants.instance_id AND zitadel.project_grant_roles.grant_id = zitadel.project_grants.id`
 

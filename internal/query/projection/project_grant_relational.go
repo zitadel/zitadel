@@ -98,7 +98,7 @@ func (p *projectGrantRelationalProjection) reduceProjectGrantChanged(event event
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-ANaKzWKAUc", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.ProjectGrantRepository()
-		_, err := repo.SetRoles(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.SetRoleKeys(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.GrantID),
 			e.RoleKeys,
 		)
@@ -117,7 +117,7 @@ func (p *projectGrantRelationalProjection) reduceProjectGrantCascadeChanged(even
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-aI2o6NlWpv", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.ProjectGrantRepository()
-		_, err := repo.SetRoles(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.SetRoleKeys(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.GrantID),
 			e.RoleKeys,
 		)
