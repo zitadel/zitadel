@@ -10,6 +10,7 @@ import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_ser
 import { UserService } from "@zitadel/proto/zitadel/user/v2/user_service_pb.js";
 
 import { createClientFor } from "./helpers.js";
+import { InstanceService } from "@zitadel/proto/zitadel/instance/v2/instance_service_pb";
 
 export const createUserServiceClient = createClientFor(UserService);
 export const createSettingsServiceClient = createClientFor(SettingsService);
@@ -19,6 +20,7 @@ export const createSAMLServiceClient = createClientFor(SAMLService);
 export const createOrganizationServiceClient = createClientFor(OrganizationService);
 export const createFeatureServiceClient = createClientFor(FeatureService);
 export const createIdpServiceClient = createClientFor(IdentityProviderService);
+export const createInstanceServiceClient = createClientFor(InstanceService);
 
 export function makeReqCtx(orgId: string | undefined) {
   return create(RequestContextSchema, {

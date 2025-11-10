@@ -11,6 +11,7 @@ import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_p
 import { Checks, SessionService } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
+import { InstanceService } from "@zitadel/proto/zitadel/instance/v2/instance_service_pb";
 import { SendEmailVerificationCodeSchema } from "@zitadel/proto/zitadel/user/v2/email_pb";
 import type { FormData, RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import { NotificationType, SendPasswordResetLinkSchema } from "@zitadel/proto/zitadel/user/v2/password_pb";
@@ -87,6 +88,27 @@ export async function getBrandingSettings({ serviceUrl, organization }: { servic
 
   return useCache ? cacheWrapper(callback) : callback;
 }
+
+export async function listTrustedDomains({ serviceUrl }: { serviceUrl: string }) {
+  const instanceService: Client<typeof InstanceService> = await createServiceForHost(InstanceService, serviceUrl);
+
+  const callback = instanceService
+    .listTrustedDomains({ }, {})
+    .then((resp) => (resp.trustedDomain ? resp.trustedDomain : undefined));
+
+  return useCache ? cacheWrapper(callback) : callback;
+}
+
+export async function listCustomDomains({ serviceUrl }: { serviceUrl: string }) {
+  const instanceService: Client<typeof InstanceService> = await createServiceForHost(InstanceService, serviceUrl);
+
+  const callback = instanceService
+    .listCustomDomains({ }, {})
+    .then((resp) => (resp.domains ? resp.domains : undefined));
+
+  return useCache ? cacheWrapper(callback) : callback;
+}
+
 
 export async function getLoginSettings({ serviceUrl, organization }: { serviceUrl: string; organization?: string }) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);

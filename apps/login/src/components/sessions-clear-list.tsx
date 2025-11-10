@@ -1,6 +1,7 @@
 "use client";
 
 import { clearSession } from "@/lib/server/session";
+import { getValidatedRedirectUri } from "@/lib/url-validation";
 import { timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { redirect, useRouter } from "next/navigation";
@@ -14,9 +15,10 @@ type Props = {
   postLogoutRedirectUri?: string;
   logoutHint?: string;
   organization?: string;
+  serviceUrl: string;
 };
 
-export function SessionsClearList({ sessions, logoutHint, postLogoutRedirectUri, organization }: Props) {
+export function SessionsClearList({ sessions, logoutHint, postLogoutRedirectUri, organization, serviceUrl }: Props) {
   const [list, setList] = useState<Session[]>(sessions);
   const router = useRouter();
 
@@ -40,7 +42,16 @@ export function SessionsClearList({ sessions, logoutHint, postLogoutRedirectUri,
       }
 
       if (postLogoutRedirectUri) {
-        return redirect(postLogoutRedirectUri);
+        const validatedUri = await getValidatedRedirectUri(
+          postLogoutRedirectUri,
+          '/logout/done',
+          {
+            serviceUrl,
+            enforceHttps: process.env.NODE_ENV === 'production',
+            fallbackParams: organization ? { organization } : undefined,
+          }
+        );
+        return redirect(validatedUri);
       }
 
       const params = new URLSearchParams();
@@ -76,10 +87,20 @@ export function SessionsClearList({ sessions, logoutHint, postLogoutRedirectUri,
           return (
             <SessionClearItem
               session={session}
-              reload={() => {
+              reload={async () => {
                 setList(list.filter((s) => s.id !== session.id));
                 if (postLogoutRedirectUri) {
-                  router.push(postLogoutRedirectUri);
+                  // Validate redirect URI before navigation
+                  const validatedUri = await getValidatedRedirectUri(
+                    postLogoutRedirectUri,
+                    '/logout/done',
+                    {
+                      serviceUrl,
+                      enforceHttps: process.env.NODE_ENV === 'production',
+                      fallbackParams: organization ? { organization } : undefined,
+                    }
+                  );
+                  router.push(validatedUri);
                 }
               }}
               key={"session-" + index}

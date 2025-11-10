@@ -82,6 +82,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             logoutHint={logoutHint}
             postLogoutRedirectUri={postLogoutRedirectUri}
             organization={organization ?? defaultOrganization}
+            serviceUrl={serviceUrl}
           />
         </div>
       </div>
