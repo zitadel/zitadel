@@ -56,8 +56,8 @@ type UserRepository interface {
 	Human() HumanUserRepository
 	Machine() MachineUserRepository
 
-	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) *User
-	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) []*User
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*User, error)
+	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*User, error)
 	// DISCUSS(adlerhurst): Instead of having this method the Create methods could be on the sub-repositories?
 	// The sub repos should then get the CreateMachineCommand or CreateHumanCommand as parameter instead of the User.
 	// Passing the command instead of the object would generally simplify the domain logic for creation.
