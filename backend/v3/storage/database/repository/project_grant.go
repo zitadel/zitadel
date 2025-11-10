@@ -217,10 +217,6 @@ func (p projectGrant) ExistsRoleKey(cond database.Condition) database.Condition 
 // columns
 // -------------------------------------------------------------
 
-func (p projectGrant) qualifiedTableName() string {
-	return "zitadel." + p.unqualifiedTableName()
-}
-
 func (projectGrant) unqualifiedTableName() string {
 	return "project_grants"
 }
