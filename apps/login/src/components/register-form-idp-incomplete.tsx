@@ -4,6 +4,7 @@ import { registerUserAndLinkToIDP } from "@/lib/server/register";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { FieldValues, useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { Alert } from "./alert";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
@@ -55,6 +56,7 @@ export function RegisterFormIDPIncomplete({
   });
 
   const t = useTranslations("register");
+  const router = useRouter();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -85,7 +87,9 @@ export function RegisterFormIDPIncomplete({
       return;
     }
 
-    // If no error, the function has already handled the redirect
+    if (response && "redirect" in response && response.redirect) {
+      return router.push(response.redirect);
+    }
   }
 
   const { errors } = formState;
