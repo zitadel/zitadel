@@ -78,7 +78,7 @@ As you see in the example above the target is created with HTTP and port '8090' 
 See [Create a target](/apis/resources/action_service_v2/action-service-create-target) for more detailed information.
 
 ```shell
-curl -L -X POST 'https://$CUSTOM-DOMAIN/v2beta/actions/targets' \
+curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/actions/targets' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -102,7 +102,7 @@ condition.
 See [Set an execution](/apis/resources/action_service_v2/action-service-set-execution) for more detailed information.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
+curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/executions' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -129,7 +129,7 @@ curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/users/new' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
 --data-raw '{
-    "organizationId": "336392597046099971",
+    "organizationId": "344648897353810062",
     "human":
     {
         "profile":
@@ -156,13 +156,13 @@ The incoming request headers to the Execution are propagated via the request pay
 ```json
 {
   "fullMethod": "/zitadel.user.v2.UserService/CreateUser",
-  "instanceID": "336392597046034435",
-  "orgID": "336392597046099971",
-  "projectID": "336392597046165507",
-  "userID": "336392597046755331",
+  "instanceID": "344648897353744526",
+  "orgID": "344648897353810062",
+  "projectID": "344648897353875598",
+  "userID": "344648897354465422",
   "request":
   {
-    "organizationId": "336392597046099971",
+    "organizationId": "344648897353810062",
     "human":
     {
       "profile":
@@ -194,6 +194,10 @@ The incoming request headers to the Execution are propagated via the request pay
     "Host":
     [
       "localhost:8080"
+    ],
+    "X-Forwarded-For":
+    [
+      "::1"
     ],
     "X-Forwarded-Host":
     [
