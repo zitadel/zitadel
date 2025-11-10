@@ -30,6 +30,7 @@ type SessionFactorUser struct {
 	LastVerifiedAt time.Time
 }
 
+// sessionFactorType implements [SessionFactor].
 func (s *SessionFactorUser) sessionFactorType() SessionFactorType {
 	return SessionFactorTypeUser
 }
@@ -38,6 +39,7 @@ type SessionFactorPassword struct {
 	LastVerifiedAt time.Time
 }
 
+// sessionFactorType implements [SessionFactor].
 func (s *SessionFactorPassword) sessionFactorType() SessionFactorType {
 	return SessionFactorTypePassword
 }
@@ -46,6 +48,7 @@ type SessionFactorIDPIntent struct {
 	LastVerifiedAt time.Time
 }
 
+// sessionFactorType implements [SessionFactor].
 func (s *SessionFactorIDPIntent) sessionFactorType() SessionFactorType {
 	return SessionFactorTypeIDPIntent
 }
@@ -55,6 +58,7 @@ type SessionFactorPasskey struct {
 	UserVerified   bool
 }
 
+// sessionFactorType implements [SessionFactor].
 func (s *SessionFactorPasskey) sessionFactorType() SessionFactorType {
 	return SessionFactorTypePasskey
 }
@@ -63,6 +67,7 @@ type SessionFactorTOTP struct {
 	LastVerifiedAt time.Time
 }
 
+// sessionFactorType implements [SessionFactor].
 func (s *SessionFactorTOTP) sessionFactorType() SessionFactorType {
 	return SessionFactorTypeTOTP
 }
@@ -71,6 +76,7 @@ type SessionFactorOTPSMS struct {
 	LastVerifiedAt time.Time
 }
 
+// sessionFactorType implements [SessionFactor].
 func (s *SessionFactorOTPSMS) sessionFactorType() SessionFactorType {
 	return SessionFactorTypeOTPSMS
 }
@@ -79,47 +85,56 @@ type SessionFactorOTPEmail struct {
 	LastVerifiedAt time.Time
 }
 
+// sessionFactorType implements [SessionFactor].
 func (s *SessionFactorOTPEmail) sessionFactorType() SessionFactorType {
 	return SessionFactorTypeOTPEmail
 }
 
 type SessionFactors []SessionFactor
 
+// GetUserFactor returns the user factor from the factors.
 func (s SessionFactors) GetUserFactor() *SessionFactorUser {
 	factor, _ := GetFactor[*SessionFactorUser](s)
 	return factor
 }
 
+// GetPasswordFactor returns the password factor from the factors.
 func (s SessionFactors) GetPasswordFactor() *SessionFactorPassword {
 	factor, _ := GetFactor[*SessionFactorPassword](s)
 	return factor
 }
 
+// GetIDPIntentFactor returns the IDP Intent factor from the factors.
 func (s SessionFactors) GetIDPIntentFactor() *SessionFactorIDPIntent {
 	factor, _ := GetFactor[*SessionFactorIDPIntent](s)
 	return factor
 }
 
+// GetPasskeyFactor returns the passkey factor from the factors.
 func (s SessionFactors) GetPasskeyFactor() *SessionFactorPasskey {
 	factor, _ := GetFactor[*SessionFactorPasskey](s)
 	return factor
 }
 
+// GetTOTPFactor returns the TOTP factor from the factors.
 func (s SessionFactors) GetTOTPFactor() *SessionFactorTOTP {
 	factor, _ := GetFactor[*SessionFactorTOTP](s)
 	return factor
 }
 
+// GetOTPSMSFactor returns the OTP SMS factor from the factors.
 func (s SessionFactors) GetOTPSMSFactor() *SessionFactorOTPSMS {
 	factor, _ := GetFactor[*SessionFactorOTPSMS](s)
 	return factor
 }
 
+// GetOTPEmailFactor returns the OTP Email factor from the factors.
 func (s SessionFactors) GetOTPEmailFactor() *SessionFactorOTPEmail {
 	factor, _ := GetFactor[*SessionFactorOTPEmail](s)
 	return factor
 }
 
+// GetFactor returns the factor of the given type from the factors.
 func GetFactor[T SessionFactor](factors SessionFactors) (T, bool) {
 	var nilT T
 	for _, factor := range factors {
@@ -142,6 +157,7 @@ type SessionChallengePasskey struct {
 	RPID                 string
 }
 
+// sessionChallengeType implements [SessionChallenge].
 func (s *SessionChallengePasskey) sessionChallengeType() SessionFactorType {
 	return SessionFactorTypePasskey
 }
@@ -155,6 +171,7 @@ type SessionChallengeOTPSMS struct {
 	TriggeredAtOrigin string
 }
 
+// sessionChallengeType implements [SessionChallenge].
 func (s *SessionChallengeOTPSMS) sessionChallengeType() SessionFactorType {
 	return SessionFactorTypeOTPSMS
 }
@@ -168,27 +185,32 @@ type SessionChallengeOTPEmail struct {
 	TriggeredAtOrigin string
 }
 
+// sessionChallengeType implements [SessionChallenge].
 func (s *SessionChallengeOTPEmail) sessionChallengeType() SessionFactorType {
 	return SessionFactorTypeOTPEmail
 }
 
 type SessionChallenges []SessionChallenge
 
+// GetPasskeyChallenge returns the passkey challenge from the challenges.
 func (s SessionChallenges) GetPasskeyChallenge() *SessionChallengePasskey {
 	challenge, _ := GetChallenge[*SessionChallengePasskey](s)
 	return challenge
 }
 
+// GetOTPSMSChallenge returns the OTP SMS challenge from the challenges.
 func (s SessionChallenges) GetOTPSMSChallenge() *SessionChallengeOTPSMS {
 	challenge, _ := GetChallenge[*SessionChallengeOTPSMS](s)
 	return challenge
 }
 
+// GetOTPEmailChallenge returns the OTP Email challenge from the challenges.
 func (s SessionChallenges) GetOTPEmailChallenge() *SessionChallengeOTPEmail {
 	challenge, _ := GetChallenge[*SessionChallengeOTPEmail](s)
 	return challenge
 }
 
+// GetChallenge returns the challenge of the given type from the challenges.
 func GetChallenge[T SessionChallenge](challenges SessionChallenges) (T, bool) {
 	var nilT T
 	for _, challenge := range challenges {

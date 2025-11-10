@@ -1,26 +1,25 @@
 package domain
 
 import (
+	"context"
 	"time"
-
-	"golang.org/x/net/context"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
 type Session struct {
-	InstanceID string
-	ID         string
-	Token      string
-	Lifetime   time.Duration
-	Expiration time.Time
-	UserID     string
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
-	Factors    SessionFactors
-	Challenges SessionChallenges
-	Metadata   []SessionMetadata
-	UserAgent  *SessionUserAgent
+	InstanceID string            `json:"instance_id,omitempty" db:"instance_id"`
+	ID         string            `json:"id,omitempty" db:"id"`
+	Token      string            `json:"token,omitempty" db:"token"`
+	Lifetime   time.Duration     `json:"lifetime,omitempty" db:"lifetime"`
+	Expiration time.Time         `json:"expiration,omitempty" db:"expiration"`
+	UserID     string            `json:"user_id,omitempty" db:"user_id"`
+	CreatedAt  time.Time         `json:"created_at,omitzero" db:"created_at"`
+	UpdatedAt  time.Time         `json:"updated_at,omitzero" db:"updated_at"`
+	Factors    SessionFactors    `json:"factors,omitempty"`
+	Challenges SessionChallenges `json:"challenges,omitempty"`
+	Metadata   []SessionMetadata `json:"metadata,omitempty"`
+	UserAgent  *SessionUserAgent `json:"user_agent,omitempty"`
 }
 
 type SessionRepository interface {
@@ -110,7 +109,7 @@ type sessionChanges interface {
 	SetLifetime(lifetime time.Duration) database.Change
 
 	//SetChallenge adds or updates the challenge of the corresponding type.
-	SetChallenge(challenge SessionChallengeType) database.Change
+	SetChallenge(challenge SessionChallenge) database.Change
 	//SetFactor adds or updates the factor of the corresponding type.
 	SetFactor(factor SessionFactor) database.Change
 	//ClearFactor resets the factor of the corresponding type.

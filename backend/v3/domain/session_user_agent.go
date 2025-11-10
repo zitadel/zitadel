@@ -8,10 +8,11 @@ import (
 )
 
 type SessionUserAgent struct {
-	FingerprintID *string
-	Description   *string
-	IP            net.IP
-	Header        http.Header
+	InstanceID    string      `json:"instanceId,omitempty" db:"instance_id"`
+	FingerprintID *string     `json:"fingerprintId,omitempty" db:"fingerprint_id"`
+	Description   *string     `json:"description,omitempty" db:"description"`
+	IP            net.IP      `json:"ip,omitempty" db:"ip"`
+	Header        http.Header `json:"header,omitempty" db:"headers"`
 }
 
 type sessionUserAgentColumns interface {
