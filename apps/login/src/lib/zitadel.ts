@@ -93,7 +93,7 @@ export async function listTrustedDomains({ serviceUrl }: { serviceUrl: string })
   const instanceService: Client<typeof InstanceService> = await createServiceForHost(InstanceService, serviceUrl);
 
   const callback = instanceService
-    .listTrustedDomains({ }, {})
+    .listTrustedDomains({}, {})
     .then((resp) => (resp.trustedDomain ? resp.trustedDomain : undefined));
 
   return useCache ? cacheWrapper(callback) : callback;
@@ -102,13 +102,10 @@ export async function listTrustedDomains({ serviceUrl }: { serviceUrl: string })
 export async function listCustomDomains({ serviceUrl }: { serviceUrl: string }) {
   const instanceService: Client<typeof InstanceService> = await createServiceForHost(InstanceService, serviceUrl);
 
-  const callback = instanceService
-    .listCustomDomains({ }, {})
-    .then((resp) => (resp.domains ? resp.domains : undefined));
+  const callback = instanceService.listCustomDomains({}, {}).then((resp) => (resp.domains ? resp.domains : undefined));
 
   return useCache ? cacheWrapper(callback) : callback;
 }
-
 
 export async function getLoginSettings({ serviceUrl, organization }: { serviceUrl: string; organization?: string }) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
