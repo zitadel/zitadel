@@ -39,7 +39,7 @@ func (v *CheckTypeFailed) isCheckType() {}
 
 var _ CheckType = (*CheckTypeFailed)(nil)
 
-// CheckTypeSucceeded indicates that the verification was Succeeded.
+// CheckTypeSucceeded indicates that the check succeeded.
 // It is used to reset the failed attempts counter.
 type CheckTypeSucceeded struct {
 	SucceededAt time.Time
