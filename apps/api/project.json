@@ -33,7 +33,21 @@
     "build-docker": {
       "dependsOn": ["build-linux"],
       "options": {
-        "cwd": "{workspaceRoot}"
+        "cwd": "{workspaceRoot}",
+        "args": [
+            "--file",
+            "apps/api/Dockerfile",
+            "--tag",
+            "${IMAGE_REF}",
+            "--platform",
+            "linux/amd64",
+            "--label",
+            "org.opencontainers.image.revision=${COMMIT_SHA}",
+            "--label",
+            "org.opencontainers.image.created=${CURRENT_DATE}",
+            "--label",
+            "org.opencontainers.image.version=${VERSION}"
+        ]
       }
     },
     "upload-assets": {

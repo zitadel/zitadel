@@ -41,8 +41,8 @@
       "versionSchemes": {
         "semver": "{versionActionsVersion}",
         "sha": "{shortCommitSha}"
-      },
-      "preVersionCommand": "ZITADEL_RELEASE_VERSION={versionActionsVersion} pnpm nx run-many --target build-docker --excludeTaskDependencies --tag={imageRef}"
+      },      
+      "preVersionCommand": "pnpm nx run-many --target build-docker --excludeTaskDependencies --tag={imageRef}"
     }
   },
   "targetDefaults": {
@@ -99,19 +99,14 @@
       "options": {
         "buildTarget": {
           "name": "build-docker",
-          "args": [
-              "--file",
-              "apps/api/Dockerfile",
-              "--platform",
-              "linux/amd64",
-              "--label",
-              "org.opencontainers.image.source={projectRoot}",
-              "--label",
-              "org.opencontainers.image.revision={commitSha}",
-              "--label",
-              "org.opencontainers.image.created={currentDate}"
-          ]
-        },
+          "env": {
+            "DOCKER_BUILDKIT": "1",
+            "CURRENT_DATE": "{currentDate}",
+            "COMMIT_SHA": "{commitSha}",
+            "VERSION": "{versionActionsVersion}",
+            "IMAGE_REF": "{imageRef}"
+          }
+      },
         "runTarget": {
           "name": "run-docker"
         }
