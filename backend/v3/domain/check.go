@@ -12,14 +12,14 @@ type CheckType interface {
 	isCheckType()
 }
 
-// CheckTypeInit indicates that an object which needs verification is created.
+// CheckTypeInit initializes a new check.
 type CheckTypeInit struct {
-	// CreatedAt is the time when the verification was created.
+	// CreatedAt is the time when the check was created.
 	// If zero, the current time will be used.
 	CreatedAt time.Time
-	// Expiry is the duration after which the verification expires.
+	// Expiry is the duration after which the check expires.
 	Expiry *time.Duration
-	// Code is the code to be used for verification.
+	// Code to be used for the check.
 	Code []byte
 }
 
