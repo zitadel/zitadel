@@ -39,9 +39,10 @@
     "docker": {
       "registryUrl": "ghcr.io",
       "versionSchemes": {
-        "semver": "{env.VERSION}",
+        "semver": "{versionActionsVersion}",
         "sha": "{shortCommitSha}"
-      }
+      },
+      "preVersionCommand": "ZITADEL_RELEASE_VERSION={versionActionsVersion} pnpm nx run-many --target build-docker --excludeTaskDependencies --tag={imageRef}"
     }
   },
   "targetDefaults": {
@@ -99,16 +100,16 @@
         "buildTarget": {
           "name": "build-docker",
           "args": [
-            "--platform",
-            "linux/amd64,linux/arm64",
-            "--label",
-            "org.opencontainers.image.title={projectName}",
-            "--label",
-            "org.opencontainers.image.source={projectRoot}",
-            "--label",
-            "org.opencontainers.image.revision={commitSha}",
-            "--label",
-            "org.opencontainers.image.created={currentDate}"
+              "--file",
+              "apps/api/Dockerfile",
+              "--platform",
+              "linux/amd64",
+              "--label",
+              "org.opencontainers.image.source={projectRoot}",
+              "--label",
+              "org.opencontainers.image.revision={commitSha}",
+              "--label",
+              "org.opencontainers.image.created={currentDate}"
           ]
         },
         "runTarget": {

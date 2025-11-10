@@ -27,6 +27,11 @@
         ]
       }
     },
+    "build-docker": {
+      "dependsOn": [
+        "build-linux"
+      ]
+    },
     "prod": {
       "description": "Runs the Next.js Login application in production mode from the standalone build",
       "continuous": true,
