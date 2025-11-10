@@ -317,7 +317,6 @@ type Settings interface {
 }
 
 type settingsChanges interface {
-	SetType(state SettingType) database.Change
 	SetSettings(settings string) database.Change
 	SetUpdatedAt(updatedAt *time.Time) database.Change
 }

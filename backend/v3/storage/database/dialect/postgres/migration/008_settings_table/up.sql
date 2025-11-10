@@ -40,9 +40,6 @@ CREATE TABLE zitadel.settings (
 CREATE UNIQUE INDEX idx_settings_unique_type ON zitadel.settings (instance_id, organization_id, type, owner_type) NULLS NOT DISTINCT WHERE type != 'label';
 CREATE UNIQUE INDEX idx_settings_label_unique_type ON zitadel.settings (instance_id, organization_id, type, owner_type, label_state) NULLS NOT DISTINCT WHERE type = 'label';
 
-CREATE INDEX idx_settings_type ON zitadel.settings(instance_id, type, label_state) NULLS NOT DISTINCT;
-
-
 CREATE TRIGGER trigger_set_updated_at
 BEFORE UPDATE ON zitadel.settings
 FOR EACH ROW

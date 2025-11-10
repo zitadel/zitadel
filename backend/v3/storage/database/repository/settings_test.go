@@ -742,20 +742,6 @@ func TestSetSpecificSetting(t *testing.T) {
 			err: repository.ErrMissingInstanceID,
 		},
 		{
-			name: "instance id not set",
-			setting: domain.PasswordExpirySetting{
-				Setting: &domain.Setting{
-					InstanceID: instanceId,
-					// OrgID:     gu.Ptr(gofakeit.Name()),
-					ID:        gofakeit.Name(),
-					Type:      domain.SettingTypeLockout,
-					OwnerType: domain.OwnerTypeInstance,
-					Settings:  []byte("{}"),
-				},
-			},
-			err: repository.ErrMissingOrgID,
-		},
-		{
 			name: "owner type not set",
 			setting: domain.PasswordExpirySetting{
 				Setting: &domain.Setting{
@@ -1174,20 +1160,6 @@ func TestSetLabelSetting(t *testing.T) {
 				},
 			},
 			err: repository.ErrMissingInstanceID,
-		},
-		{
-			name: "org id not set",
-			setting: domain.LabelSetting{
-				Setting: &domain.Setting{
-					InstanceID: instanceId,
-					// OrgID:     gu.Ptr(gofakeit.Name()),
-					ID:        gofakeit.Name(),
-					Type:      domain.SettingTypeLockout,
-					OwnerType: domain.OwnerTypeInstance,
-					Settings:  []byte("{}"),
-				},
-			},
-			err: repository.ErrMissingOrgID,
 		},
 		{
 			name: "owner type not set",

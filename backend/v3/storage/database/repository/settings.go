@@ -14,12 +14,15 @@ import (
 
 var (
 	ErrMissingInstanceID = errors.New("instance id must be set")
-	ErrMissingOrgID      = errors.New("org id must be set")
 	ErrMissingType       = errors.New("type must be set")
 	ErrMissingOwnerType  = errors.New("owner must be set")
 )
 
 type settings struct{}
+
+func (settings) unqualifiedTableName() string {
+	return "settings"
+}
 
 func SettingsRepository() domain.SettingsRepository {
 	return new(settings)
@@ -28,7 +31,7 @@ func SettingsRepository() domain.SettingsRepository {
 var _ domain.SettingsRepository = (*settings)(nil)
 
 var (
-	ErrSettingObjectMustNotBeNil error = errors.New("setting object must not be nill")
+	ErrSettingObjectMustNotBeNil error = errors.New("setting object must not be nil")
 	ErrLabelStateMustBeDefined   error = errors.New("label state must be defined")
 )
 
@@ -36,40 +39,40 @@ var (
 // columns
 // -------------------------------------------------------------
 
-func (settings) IDColumn() database.Column {
-	return database.NewColumn("settings", "id")
+func (s settings) IDColumn() database.Column {
+	return database.NewColumn(s.unqualifiedTableName(), "id")
 }
 
-func (settings) InstanceIDColumn() database.Column {
-	return database.NewColumn("settings", "instance_id")
+func (s settings) InstanceIDColumn() database.Column {
+	return database.NewColumn(s.unqualifiedTableName(), "instance_id")
 }
 
-func (settings) OrganizationIDColumn() database.Column {
-	return database.NewColumn("settings", "organization_id")
+func (s settings) OrganizationIDColumn() database.Column {
+	return database.NewColumn(s.unqualifiedTableName(), "organization_id")
 }
 
-func (settings) TypeColumn() database.Column {
-	return database.NewColumn("settings", "type")
+func (s settings) TypeColumn() database.Column {
+	return database.NewColumn(s.unqualifiedTableName(), "type")
 }
 
-func (settings) OwnerTypeColumn() database.Column {
-	return database.NewColumn("settings", "owner_type")
+func (s settings) OwnerTypeColumn() database.Column {
+	return database.NewColumn(s.unqualifiedTableName(), "owner_type")
 }
 
-func (settings) LabelStateColumn() database.Column {
-	return database.NewColumn("settings", "label_state")
+func (s settings) LabelStateColumn() database.Column {
+	return database.NewColumn(s.unqualifiedTableName(), "label_state")
 }
 
-func (settings) SettingsColumn() database.Column {
-	return database.NewColumn("settings", "settings")
+func (s settings) SettingsColumn() database.Column {
+	return database.NewColumn(s.unqualifiedTableName(), "settings")
 }
 
-func (settings) CreatedAtColumn() database.Column {
-	return database.NewColumn("settings", "created_at")
+func (s settings) CreatedAtColumn() database.Column {
+	return database.NewColumn(s.unqualifiedTableName(), "created_at")
 }
 
-func (settings) UpdatedAtColumn() database.Column {
-	return database.NewColumn("settings", "updated_at")
+func (s settings) UpdatedAtColumn() database.Column {
+	return database.NewColumn(s.unqualifiedTableName(), "updated_at")
 }
 
 // -------------------------------------------------------------
@@ -106,10 +109,6 @@ func (s settings) LabelStateCondition(typ domain.LabelState) database.Condition 
 // -------------------------------------------------------------
 // changes
 // -------------------------------------------------------------
-
-func (s settings) SetType(name domain.SettingType) database.Change {
-	return database.NewChange(s.TypeColumn(), name.String())
-}
 
 func (s settings) SetSettings(settings string) database.Change {
 	return database.NewChange(s.SettingsColumn(), settings)
@@ -263,13 +262,12 @@ func (s *loginSettings) Set(ctx context.Context, client database.QueryExecutor, 
 	if setting == nil {
 		return ErrSettingObjectMustNotBeNil
 	}
-	setting.Type = domain.SettingTypeLockout
-	return createSetting(ctx, client, setting.Setting, setting)
+	setting.Type = domain.SettingTypeLogin
+	return setSetting(ctx, client, setting.Setting, setting)
 }
 
-func (s *loginSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.LoginSetting, error) {
-	loginSetting := &domain.LoginSetting{}
-	var err error
+func (s *loginSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (loginSetting *domain.LoginSetting, err error) {
+	loginSetting = &domain.LoginSetting{}
 
 	loginSetting.Setting, err = s.SettingsRepository.Get(ctx, client, opts...)
 	if err != nil {
@@ -389,10 +387,6 @@ func (s *labelSettings) Set(ctx context.Context, client database.QueryExecutor, 
 		return ErrMissingInstanceID
 	}
 
-	if setting.OrganizationID == nil {
-		return ErrMissingOrgID
-	}
-
 	// type is always set from the calling function to that functions respective type
 	// the check is left as a failsafe
 	if setting.Type == domain.SettingTypeUnspecified {
@@ -487,7 +481,7 @@ func (s *settings) CreateLabel(ctx context.Context, client database.QueryExecuto
 	}
 
 	setting.Type = domain.SettingTypeLabel
-	return createSetting(ctx, client, setting.Setting, setting)
+	return setSetting(ctx, client, setting.Setting, setting)
 }
 
 func (s *labelSettings) ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *domain.LabelSetting) error {
@@ -574,7 +568,7 @@ func (s *settings) CreatePasswordComplexity(ctx context.Context, client database
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypePasswordComplexity
-	return createSetting(ctx, client, setting.Setting, setting)
+	return setSetting(ctx, client, setting.Setting, setting)
 }
 
 // passwordComplexity
@@ -619,7 +613,7 @@ func (s *passwordComplexitySettings) Set(ctx context.Context, client database.Qu
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypePasswordComplexity
-	return createSetting(ctx, client, setting.Setting, setting)
+	return setSetting(ctx, client, setting.Setting, setting)
 }
 
 func (s *passwordComplexitySettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.PasswordComplexitySetting, error) {
@@ -673,7 +667,7 @@ func (s *passwordExpirySettings) Set(ctx context.Context, client database.QueryE
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypePasswordExpiry
-	return createSetting(ctx, client, setting.Setting, setting)
+	return setSetting(ctx, client, setting.Setting, setting)
 }
 
 func (s *passwordExpirySettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.PasswordExpirySetting, error) {
@@ -731,7 +725,7 @@ func (s *lockoutSettings) Set(ctx context.Context, client database.QueryExecutor
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypeLockout
-	return createSetting(ctx, client, setting.Setting, setting)
+	return setSetting(ctx, client, setting.Setting, setting)
 }
 
 func (s *lockoutSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.LockoutSetting, error) {
@@ -798,7 +792,7 @@ func (s *securitySettings) Set(ctx context.Context, client database.QueryExecuto
 	}
 	setting.Type = domain.SettingTypeSecurity
 
-	return createSetting(ctx, client, setting.Setting, setting)
+	return setSetting(ctx, client, setting.Setting, setting)
 }
 
 func (s *securitySettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.SecuritySetting, error) {
@@ -887,7 +881,7 @@ func (s *domainSettings) Set(ctx context.Context, client database.QueryExecutor,
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypeDomain
-	return createSetting(ctx, client, setting.Setting, setting)
+	return setSetting(ctx, client, setting.Setting, setting)
 }
 
 func (s *domainSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.DomainSetting, error) {
@@ -937,7 +931,7 @@ func (s *organizationSettings) Set(ctx context.Context, client database.QueryExe
 		return ErrSettingObjectMustNotBeNil
 	}
 	setting.Type = domain.SettingTypeOrganization
-	return createSetting(ctx, client, setting.Setting, setting)
+	return setSetting(ctx, client, setting.Setting, setting)
 }
 
 func (s *organizationSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.OrganizationSetting, error) {
@@ -1033,13 +1027,9 @@ const createSettingStmt = `INSERT INTO zitadel.settings` +
 	` ON CONFLICT (instance_id, organization_id, type, owner_type) WHERE type != 'label' DO UPDATE SET` +
 	` settings =  EXCLUDED.settings::JSONB `
 
-func createSetting(ctx context.Context, client database.QueryExecutor, setting *domain.Setting, settings any, changes ...database.Change) error {
+func setSetting(ctx context.Context, client database.QueryExecutor, setting *domain.Setting, settings any, changes ...database.Change) error {
 	if setting.InstanceID == "" {
 		return ErrMissingInstanceID
-	}
-
-	if setting.OrganizationID == nil {
-		return ErrMissingOrgID
 	}
 
 	// type is always set from the calling function to that functions respective type
@@ -1063,7 +1053,6 @@ func createSetting(ctx context.Context, client database.QueryExecutor, setting *
 		setting.OrganizationID,
 		setting.Type,
 		setting.OwnerType,
-		// TODO
 		setting.LabelState,
 		string(settingJSON))
 

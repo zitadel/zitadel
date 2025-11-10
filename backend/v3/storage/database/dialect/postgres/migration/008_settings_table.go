@@ -6,11 +6,11 @@ import (
 
 var (
 	//go:embed 008_settings_table/up.sql
-	up004SettingsTable string
+	up008SettingsTable string
 	//go:embed 008_settings_table/down.sql
-	down004SettingsTable string
+	down008SettingsTable string
 )
 
 func init() {
-	registerSQLMigration(8, up004SettingsTable, down004SettingsTable)
+	registerSQLMigration(8, up008SettingsTable, down008SettingsTable)
 }
