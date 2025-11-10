@@ -285,7 +285,7 @@ export async function executeRelease(
   const publishResults = await releasePublish({
     dryRun: options.dryRun,
     verbose: options.verbose,
-    tag: process.env[isLatestEnvVar] == 'true' ? 'latest' : gitInfo.branch.replaceAll('.', '-'),
+    tag: process.env[isLatestEnvVar] === 'true' ? 'latest' : gitInfo.branch.replaceAll('.', '-'),
   });
 
   const code = Object.values(publishResults).every((result) => result.code === 0) ? 0 : 1;
