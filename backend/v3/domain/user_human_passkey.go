@@ -33,7 +33,7 @@ type Passkey struct {
 	Name            string      `json:"name,omitempty" db:"name"`
 	SignCount       uint32      `json:"signCount,omitempty" db:"sign_count"`
 	Challenge       []byte      `json:"challenge,omitempty" db:"challenge"`
-	RelayingPartyID string      `json:"relayingPartyId,omitempty" db:"relaying_party_id"`
+	RelyingPartyID string      `json:"relyingPartyId,omitempty" db:"relying_party_id"`
 }
 
 type passkeyConditions interface {
