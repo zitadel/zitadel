@@ -16,6 +16,14 @@
             "!{workspaceRoot}/internal/integration/**/*",
             "!{workspaceRoot}/**/*_test.go",
             "!{workspaceRoot}/**/integration_test/**/*"
+        ],
+        "go-platform": [
+            {
+                "runtime": "go env GOOS"
+            },
+            {
+                "runtime": "go env GOARCH"
+            }
         ]
     },
     "targets": {
@@ -74,16 +82,11 @@
             ],
             "command": "bash -c 'EXT=\"\"; if [ \"$(go env GOOS)\" = \"windows\" ]; then EXT=\".exe\"; fi; DATE=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\"); echo \"Building for $(go env GOOS)-$(go env GOARCH)...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel$EXT -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=${DATE} -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_RELEASE_VERSION:-${DATE}}\"'",
             "inputs": [
-                {
-                    "runtime": "go env GOOS"
-                },
-                {
-                    "runtime": "go env GOARCH"
-                },
+                "runtime",
+                "go-platform",
                 {
                     "env": "ZITADEL_RELEASE_VERSION"
-                },
-                "runtime"
+                }
             ],
             "outputs": [
                 "{workspaceRoot}/.artifacts/bin/*/*/zitadel",
@@ -103,12 +106,7 @@
             "cache": true,
             "command": "curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b .artifacts/bin/$(go env GOOS)/$(go env GOARCH) v2.5.0",
             "inputs": [
-                {
-                    "runtime": "go env GOOS"
-                },
-                {
-                    "runtime": "go env GOARCH"
-                }
+                "go-platform"
             ],
             "outputs": [
                 "{workspaceRoot}/.artifacts/bin/*/*/golangci-lint"
@@ -157,12 +155,7 @@
             "command": "go build -cover -race -tags integration -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.test main.go",
             "cache": true,
             "inputs": [
-                {
-                    "runtime": "go env GOOS"
-                },
-                {
-                    "runtime": "go env GOARCH"
-                },
+                "go-platform",
                 "sources",
                 "{workspaceRoot}/internal/integration/**",
                 "{workspaceRoot}/go*"
@@ -217,12 +210,7 @@
                 ]
             },
             "inputs": [
-                {
-                    "runtime": "go env GOOS"
-                },
-                {
-                    "runtime": "go env GOARCH"
-                },
+                "go-platform",
                 "sources",
                 "{workspaceRoot}/internal/integration/**",
                 "{workspaceRoot}/go*"
@@ -273,12 +261,7 @@
             },
             "cache": true,
             "inputs": [
-                {
-                    "runtime": "go env GOOS"
-                },
-                {
-                    "runtime": "go env GOARCH"
-                },
+                "go-platform",
                 "{workspaceRoot}/internal/protoc/protoc-gen-authoption/**/*",
                 "{workspaceRoot}/internal/protoc/protoc-gen-zitadel/**/*"
             ],
@@ -341,12 +324,7 @@
             },
             "cache": true,
             "inputs": [
-                {
-                    "runtime": "go env GOOS"
-                },
-                {
-                    "runtime": "go env GOARCH"
-                },
+                "go-platform",
                 "{workspaceRoot}/internal/statik/generate.go",
                 "{workspaceRoot}/internal/notification/statik/generate.go",
                 "{workspaceRoot}/internal/api/ui/login/static/resources/generate.go",
@@ -442,12 +420,7 @@
             },
             "cache": true,
             "inputs": [
-                {
-                    "runtime": "go env GOOS"
-                },
-                {
-                    "runtime": "go env GOARCH"
-                },
+                "go-platform",
                 "sources",
                 "{workspaceRoot}/README.md",
                 "{workspaceRoot}/LICENSE"
