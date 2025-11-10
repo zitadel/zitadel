@@ -69,7 +69,9 @@ user_groups as (
         from projections.group_users1 as gu
             left join projections.groups1 as g on gu.group_id = g.id and gu.instance_id = g.instance_id
         where gu.user_id = $1
-          and gu.instance_id = $2)
+          and gu.instance_id = $2
+          and g.state = 1
+        )
         r
 ),
 -- join user grants to orgs, projects and user
