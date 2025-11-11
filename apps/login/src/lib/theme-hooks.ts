@@ -23,7 +23,8 @@ export function useResponsiveLayout(): { isSideBySide: boolean; isResponsiveOver
       return;
     }
 
-    // Mark as hydrated on client side
+    // Mark as hydrated on client side - this is intentional for SSR/CSR sync
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsHydrated(true);
 
     const mediaQuery = window.matchMedia("(max-width: 767px)"); // md breakpoint is 768px in Tailwind

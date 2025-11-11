@@ -42,8 +42,9 @@ export default function ThemeSwitch() {
   const toggleRoundness = getThemeToggleRoundness();
   const cardAppearance = getThemeSwitchCardAppearance();
 
-  // Mark as mounted after initial render
+  // Mark as mounted after initial render - this is intentional for hydration
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
