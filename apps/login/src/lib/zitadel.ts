@@ -1,4 +1,4 @@
-import { Client, create, Duration } from "@zitadel/client";
+import { Client, ConnectError, create, Duration } from "@zitadel/client";
 import { createServerTransport as libCreateServerTransport } from "@zitadel/client/node";
 import { makeReqCtx } from "@zitadel/client/v2";
 import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb";
@@ -56,8 +56,8 @@ export async function getHostedLoginTranslation({
 }) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
-  const callback = settingsService
-    .getHostedLoginTranslation(
+  const callback = async () => {
+    const resp = await settingsService.getHostedLoginTranslation(
       {
         level: organization
           ? {
@@ -71,78 +71,88 @@ export async function getHostedLoginTranslation({
         locale: locale,
       },
       {},
-    )
-    .then((resp) => {
-      return resp.translations ? resp.translations : undefined;
-    });
+    );
+    return resp.translations ? resp.translations : undefined;
+  };
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return useCache ? cacheWrapper(callback()) : callback();
 }
 
-export async function getBrandingSettings({ serviceUrl, organization }: { serviceUrl: string; organization?: string }) {
+export async function getBrandingSettings({ serviceUrl }: { serviceUrl: string }) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
-  const callback = settingsService
-    .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
-    .then((resp) => (resp.settings ? resp.settings : undefined));
+  const callback = async () => {
+    const resp = await settingsService.getBrandingSettings({}, {});
+    return resp.settings ? resp.settings : undefined;
+  };
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return useCache ? cacheWrapper(callback()) : callback();
 }
 
 export async function listTrustedDomains({ serviceUrl }: { serviceUrl: string }) {
   const instanceService: Client<typeof InstanceService> = await createServiceForHost(InstanceService, serviceUrl);
 
-  const callback = instanceService
-    .listTrustedDomains({}, {})
-    .then((resp) => (resp.trustedDomain ? resp.trustedDomain : undefined));
+  const callback = async () => {
+    const resp = await instanceService.listTrustedDomains({}, {});
+    return resp.trustedDomain ? resp.trustedDomain : undefined;
+  };
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return useCache ? cacheWrapper(callback()) : callback();
 }
 
 export async function listCustomDomains({ serviceUrl }: { serviceUrl: string }) {
   const instanceService: Client<typeof InstanceService> = await createServiceForHost(InstanceService, serviceUrl);
 
-  const callback = instanceService.listCustomDomains({}, {}).then((resp) => (resp.domains ? resp.domains : undefined));
+  const callback = async () => {
+    const resp = await instanceService.listCustomDomains({}, {});
+    return resp.domains ? resp.domains : undefined;
+  };
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return useCache ? cacheWrapper(callback()) : callback();
 }
 
 export async function getLoginSettings({ serviceUrl, organization }: { serviceUrl: string; organization?: string }) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
-  const callback = settingsService
-    .getLoginSettings({ ctx: makeReqCtx(organization) }, {})
-    .then((resp) => (resp.settings ? resp.settings : undefined));
+  const callback = async () => {
+    const resp = await settingsService.getLoginSettings({ ctx: makeReqCtx(organization) }, {});
+    return resp.settings ? resp.settings : undefined;
+  };
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return useCache ? cacheWrapper(callback()) : callback();
 }
 
 export async function getSecuritySettings({ serviceUrl }: { serviceUrl: string }) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
-  const callback = settingsService.getSecuritySettings({}).then((resp) => (resp.settings ? resp.settings : undefined));
+  const callback = async () => {
+    const resp = await settingsService.getSecuritySettings({});
+    return resp.settings ? resp.settings : undefined;
+  };
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return useCache ? cacheWrapper(callback()) : callback();
 }
 
 export async function getLockoutSettings({ serviceUrl, orgId }: { serviceUrl: string; orgId?: string }) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
-  const callback = settingsService
-    .getLockoutSettings({ ctx: makeReqCtx(orgId) }, {})
-    .then((resp) => (resp.settings ? resp.settings : undefined));
+  const callback = async () => {
+    const resp = await settingsService.getLockoutSettings({ ctx: makeReqCtx(orgId) }, {});
+    return resp.settings ? resp.settings : undefined;
+  };
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return useCache ? cacheWrapper(callback()) : callback();
 }
 
 export async function getPasswordExpirySettings({ serviceUrl, orgId }: { serviceUrl: string; orgId?: string }) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
-  const callback = settingsService
-    .getPasswordExpirySettings({ ctx: makeReqCtx(orgId) }, {})
-    .then((resp) => (resp.settings ? resp.settings : undefined));
+  const callback = async () => {
+    const resp = await settingsService.getPasswordExpirySettings({ ctx: makeReqCtx(orgId) }, {});
+    return resp.settings ? resp.settings : undefined;
+  };
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return useCache ? cacheWrapper(callback()) : callback();
 }
 
 export async function listIDPLinks({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
@@ -172,9 +182,12 @@ export async function registerTOTP({ serviceUrl, userId }: { serviceUrl: string;
 export async function getGeneralSettings({ serviceUrl }: { serviceUrl: string }) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
-  const callback = settingsService.getGeneralSettings({}, {}).then((resp) => resp.supportedLanguages);
+  const callback = async () => {
+    const resp = await settingsService.getGeneralSettings({}, {});
+    return resp.supportedLanguages;
+  };
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return useCache ? cacheWrapper(callback()) : callback();
 }
 
 export async function getLegalAndSupportSettings({
@@ -186,11 +199,12 @@ export async function getLegalAndSupportSettings({
 }) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
-  const callback = settingsService
-    .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
-    .then((resp) => (resp.settings ? resp.settings : undefined));
+  const callback = async () => {
+    const resp = await settingsService.getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {});
+    return resp.settings ? resp.settings : undefined;
+  };
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return useCache ? cacheWrapper(callback()) : callback();
 }
 
 export async function getPasswordComplexitySettings({
@@ -202,11 +216,12 @@ export async function getPasswordComplexitySettings({
 }) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
-  const callback = settingsService
-    .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
-    .then((resp) => (resp.settings ? resp.settings : undefined));
+  const callback = async () => {
+    const resp = await settingsService.getPasswordComplexitySettings({ ctx: makeReqCtx(organization) });
+    return resp.settings ? resp.settings : undefined;
+  };
 
-  return useCache ? cacheWrapper(callback) : callback;
+  return useCache ? cacheWrapper(callback()) : callback();
 }
 
 export async function createSessionFromChecks({
@@ -743,21 +758,20 @@ export async function searchUsers({ serviceUrl, searchValue, loginSettings, orga
 export async function getDefaultOrg({ serviceUrl }: { serviceUrl: string }): Promise<Organization | null> {
   const orgService: Client<typeof OrganizationService> = await createServiceForHost(OrganizationService, serviceUrl);
 
-  return orgService
-    .listOrganizations(
-      {
-        queries: [
-          {
-            query: {
-              case: "defaultQuery",
-              value: {},
-            },
+  const resp = await orgService.listOrganizations(
+    {
+      queries: [
+        {
+          query: {
+            case: "defaultQuery",
+            value: {},
           },
-        ],
-      },
-      {},
-    )
-    .then((resp) => (resp?.result && resp.result[0] ? resp.result[0] : null));
+        },
+      ],
+    },
+    {},
+  );
+  return resp?.result && resp.result[0] ? resp.result[0] : null;
 }
 
 export async function getOrgsByDomain({ serviceUrl, domain }: { serviceUrl: string; domain: string }) {
@@ -789,54 +803,50 @@ export async function startIdentityProviderFlow({
 }): Promise<string | null> {
   const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
-  return userService
-    .startIdentityProviderIntent({
-      idpId,
-      content: {
-        case: "urls",
-        value: urls,
-      },
-    })
-    .then(async (resp) => {
-      if (resp.nextStep.case === "authUrl" && resp.nextStep.value) {
-        return resp.nextStep.value;
-      } else if (resp.nextStep.case === "formData" && resp.nextStep.value) {
-        const formData: FormData = resp.nextStep.value;
-        const redirectUrl = "/saml-post";
+  const resp = await userService.startIdentityProviderIntent({
+    idpId,
+    content: {
+      case: "urls",
+      value: urls,
+    },
+  });
 
-        try {
-          // Log the attempt with structure inspection
-          console.log("Attempting to stringify formData.fields:", {
-            fields: formData.fields,
-            fieldsType: typeof formData.fields,
-            fieldsKeys: Object.keys(formData.fields || {}),
-            fieldsEntries: Object.entries(formData.fields || {}),
-          });
+  if (resp.nextStep.case === "authUrl" && resp.nextStep.value) {
+    return resp.nextStep.value;
+  } else if (resp.nextStep.case === "formData" && resp.nextStep.value) {
+    const formData: FormData = resp.nextStep.value;
+    const redirectUrl = "/saml-post";
 
-          const stringifiedFields = JSON.stringify(formData.fields);
-          console.log("Successfully stringified formData.fields, length:", stringifiedFields.length);
+    try {
+      // Log the attempt with structure inspection
+      console.log("Attempting to stringify formData.fields:", {
+        fields: formData.fields,
+        fieldsType: typeof formData.fields,
+        fieldsKeys: Object.keys(formData.fields || {}),
+        fieldsEntries: Object.entries(formData.fields || {}),
+      });
 
-          // Check cookie size limits (typical limit is 4KB)
-          if (stringifiedFields.length > 4000) {
-            console.warn(
-              `SAML form cookie value is large (${stringifiedFields.length} characters), may exceed browser limits`,
-            );
-          }
+      const stringifiedFields = JSON.stringify(formData.fields);
+      console.log("Successfully stringified formData.fields, length:", stringifiedFields.length);
 
-          const dataId = await setSAMLFormCookie(stringifiedFields);
-          const params = new URLSearchParams({ url: formData.url, id: dataId });
-
-          return `${redirectUrl}?${params.toString()}`;
-        } catch (stringifyError) {
-          console.error("JSON serialization failed:", stringifyError);
-          throw new Error(
-            `Failed to serialize SAML form data: ${stringifyError instanceof Error ? stringifyError.message : String(stringifyError)}`,
-          );
-        }
-      } else {
-        return null;
+      // Check cookie size limits (typical limit is 4KB)
+      if (stringifiedFields.length > 4000) {
+        console.warn(`SAML form cookie value is large (${stringifiedFields.length} characters), may exceed browser limits`);
       }
-    });
+
+      const dataId = await setSAMLFormCookie(stringifiedFields);
+      const params = new URLSearchParams({ url: formData.url, id: dataId });
+
+      return `${redirectUrl}?${params.toString()}`;
+    } catch (stringifyError) {
+      console.error("JSON serialization failed:", stringifyError);
+      throw new Error(
+        `Failed to serialize SAML form data: ${stringifyError instanceof Error ? stringifyError.message : String(stringifyError)}`,
+      );
+    }
+  } else {
+    return null;
+  }
 }
 
 export async function startLDAPIdentityProviderFlow({
@@ -978,7 +988,8 @@ export async function retrieveIDPIntent({ serviceUrl, id, token }: { serviceUrl:
 export async function getIDPByID({ serviceUrl, id }: { serviceUrl: string; id: string }) {
   const idpService: Client<typeof IdentityProviderService> = await createServiceForHost(IdentityProviderService, serviceUrl);
 
-  return idpService.getIDPByID({ id }, {}).then((resp) => resp.idp);
+  const resp = await idpService.getIDPByID({ id }, {});
+  return resp.idp;
 }
 
 export async function addIDPLink({
@@ -1067,7 +1078,7 @@ export async function setUserPassword({
 
   const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceUrl);
 
-  return userService.setPassword(payload, {}).catch((error) => {
+  return userService.setPassword(payload, {}).catch((error: ConnectError) => {
     // throw error if failed precondition (ex. User is not yet initialized)
     if (error.code === 9 && error.message) {
       return { error: error.message };
@@ -1226,8 +1237,8 @@ export function createServerTransport(token: string, baseUrl: string) {
     interceptors: !process.env.CUSTOM_REQUEST_HEADERS
       ? undefined
       : [
-          (next) => {
-            return (req) => {
+          (next: (...args: unknown[]) => unknown) => {
+            return (req: { header: Map<string, string> }) => {
               process.env.CUSTOM_REQUEST_HEADERS!.split(",").forEach((header) => {
                 const kv = header.indexOf(":");
                 if (kv > 0) {

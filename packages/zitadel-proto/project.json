@@ -12,6 +12,11 @@
         "{projectRoot}/es",
         "{projectRoot}/types"
       ]
+    },
+    "build": {
+      "description": "Generates protobuf files (alias for generate)",
+      "dependsOn": ["generate"],
+      "cache": true
     }
   }
 }
