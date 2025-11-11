@@ -12,7 +12,6 @@ import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
-export const revalidate = 3600; // 1 hour - revalidate cached data
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("otp");

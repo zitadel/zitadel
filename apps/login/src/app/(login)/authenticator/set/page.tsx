@@ -24,7 +24,6 @@ import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-export const revalidate = 3600; // 1 hour - revalidate cached data
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("authenticator");

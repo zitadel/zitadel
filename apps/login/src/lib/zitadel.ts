@@ -39,6 +39,8 @@ const useCache = process.env.DEBUG !== "true";
 
 async function getHostedLoginTranslationCached(serviceUrl: string, organization?: string, locale?: string) {
   "use cache";
+  // Next.js 16: "use cache" directive enables caching
+  // For time-based revalidation, use unstable_cache with revalidate option in the export function
 
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
@@ -73,7 +75,12 @@ export async function getHostedLoginTranslation({
   locale?: string;
 }) {
   if (useCache) {
-    return getHostedLoginTranslationCached(serviceUrl, organization, locale);
+    // Use unstable_cache for time-based revalidation (1 hour)
+    return unstable_cache(
+      async () => getHostedLoginTranslationCached(serviceUrl, organization, locale),
+      ["hosted-login-translation", serviceUrl, organization || "default", locale || "default"],
+      { revalidate: 3600 }, // 1 hour
+    )();
   }
 
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
@@ -111,7 +118,11 @@ async function getBrandingSettingsCached(serviceUrl: string, organization?: stri
 
 export async function getBrandingSettings({ serviceUrl, organization }: { serviceUrl: string; organization?: string }) {
   if (useCache) {
-    return getBrandingSettingsCached(serviceUrl, organization);
+    return unstable_cache(
+      async () => getBrandingSettingsCached(serviceUrl, organization),
+      ["branding-settings", serviceUrl, organization || "default"],
+      { revalidate: 3600 }, // 1 hour
+    )();
   }
 
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
@@ -133,7 +144,11 @@ async function getLoginSettingsCached(serviceUrl: string, organization?: string)
 
 export async function getLoginSettings({ serviceUrl, organization }: { serviceUrl: string; organization?: string }) {
   if (useCache) {
-    return getLoginSettingsCached(serviceUrl, organization);
+    return unstable_cache(
+      async () => getLoginSettingsCached(serviceUrl, organization),
+      ["login-settings", serviceUrl, organization || "default"],
+      { revalidate: 3600 }, // 1 hour
+    )();
   }
 
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
@@ -153,7 +168,9 @@ async function getSecuritySettingsCached(serviceUrl: string) {
 
 export async function getSecuritySettings({ serviceUrl }: { serviceUrl: string }) {
   if (useCache) {
-    return getSecuritySettingsCached(serviceUrl);
+    return unstable_cache(async () => getSecuritySettingsCached(serviceUrl), ["security-settings", serviceUrl], {
+      revalidate: 3600,
+    })();
   }
 
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
@@ -173,7 +190,11 @@ async function getLockoutSettingsCached(serviceUrl: string, orgId?: string) {
 
 export async function getLockoutSettings({ serviceUrl, orgId }: { serviceUrl: string; orgId?: string }) {
   if (useCache) {
-    return getLockoutSettingsCached(serviceUrl, orgId);
+    return unstable_cache(
+      async () => getLockoutSettingsCached(serviceUrl, orgId),
+      ["lockout-settings", serviceUrl, orgId || "default"],
+      { revalidate: 3600 },
+    )();
   }
 
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
@@ -195,7 +216,11 @@ async function getPasswordExpirySettingsCached(serviceUrl: string, orgId?: strin
 
 export async function getPasswordExpirySettings({ serviceUrl, orgId }: { serviceUrl: string; orgId?: string }) {
   if (useCache) {
-    return getPasswordExpirySettingsCached(serviceUrl, orgId);
+    return unstable_cache(
+      async () => getPasswordExpirySettingsCached(serviceUrl, orgId),
+      ["password-expiry-settings", serviceUrl, orgId || "default"],
+      { revalidate: 3600 },
+    )();
   }
 
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
@@ -239,7 +264,9 @@ async function getGeneralSettingsCached(serviceUrl: string) {
 
 export async function getGeneralSettings({ serviceUrl }: { serviceUrl: string }) {
   if (useCache) {
-    return getGeneralSettingsCached(serviceUrl);
+    return unstable_cache(async () => getGeneralSettingsCached(serviceUrl), ["general-settings", serviceUrl], {
+      revalidate: 3600,
+    })();
   }
 
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
@@ -265,7 +292,11 @@ export async function getLegalAndSupportSettings({
   organization?: string;
 }) {
   if (useCache) {
-    return getLegalAndSupportSettingsCached(serviceUrl, organization);
+    return unstable_cache(
+      async () => getLegalAndSupportSettingsCached(serviceUrl, organization),
+      ["legal-support-settings", serviceUrl, organization || "default"],
+      { revalidate: 3600 },
+    )();
   }
 
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
@@ -293,7 +324,11 @@ export async function getPasswordComplexitySettings({
   organization?: string;
 }) {
   if (useCache) {
-    return getPasswordComplexitySettingsCached(serviceUrl, organization);
+    return unstable_cache(
+      async () => getPasswordComplexitySettingsCached(serviceUrl, organization),
+      ["password-complexity-settings", serviceUrl, organization || "default"],
+      { revalidate: 3600 },
+    )();
   }
 
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);

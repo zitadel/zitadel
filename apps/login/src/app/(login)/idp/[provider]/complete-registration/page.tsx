@@ -8,7 +8,6 @@ import { headers } from "next/headers";
 /**
  * Complete registration page - shown when manual user registration is required
  */
-export const revalidate = 3600; // 1 hour - revalidate cached data
 
 export default async function CompleteRegistrationPage(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;

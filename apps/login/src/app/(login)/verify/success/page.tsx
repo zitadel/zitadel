@@ -7,7 +7,6 @@ import { getBrandingSettings, getUserByID } from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { headers } from "next/headers";
 
-export const revalidate = 3600; // 1 hour - revalidate cached data
 
 export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
