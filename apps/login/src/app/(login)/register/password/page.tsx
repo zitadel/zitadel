@@ -34,7 +34,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   const legal = await getLegalAndSupportSettings({
     serviceUrl,
-    organization,
+    orgId: organization,
   });
   const passwordComplexitySettings = await getPasswordComplexitySettings({
     serviceUrl,
