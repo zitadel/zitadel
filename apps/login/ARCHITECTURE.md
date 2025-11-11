@@ -3220,9 +3220,568 @@ export default function HealthyPage() {
 DEBUG=true  # Disables caching, enables verbose logging
 ```
 
+## Cross-Layer Security Analysis
+
+### Overview
+
+The ZITADEL Login application operates across three architectural layers that interact to provide authentication services. Security vulnerabilities can arise not just within individual layers, but in the interactions and assumptions between them. This section defines security boundaries, attack vectors, and acceptance criteria to ensure changes in any layer don't compromise the login application's security.
+
+### Architectural Layers
+
+```
+┌─────────────────────────────────────┐  ┌─────────────────────────────────────┐
+│       Presentation Layer            │  │        Service Layer                │
+│   (Login UI - Next.js App)          │  │    (ZITADEL Backend APIs)           │
+│                                     │  │                                     │
+│  • User Interface & Forms           │  │  • Session Service                  │
+│  • Server Actions (auth logic)      │  │  • User Service                     │
+│  • Session Cookie Management        │  │  • Settings Service                 │
+│  • WebAuthn/Passkey flows           │  │  • Auth Service (OIDC/SAML)         │
+│  • URL parameter handling           │  │  • Notification Service             │
+└──────────────┬──────────────────────┘  └──────────────┬──────────────────────┘
+               │                                        │
+               │ gRPC/HTTPS (JWT/PAT)                   │ SQL/gRPC
+               │                                        │
+               │    ┌───────────────────────────────────┤
+               │    │                                   │
+               └────┼───────────────────────────────────┘
+                    │
+                    ▼
+┌────────────────────────────────────────────────────────────────────┐
+│                          Infrastructure Layer                      │
+│                   (Shared Platform Services)                       │
+│                                                                    │
+│  ┌────────────────────────────┐  ┌────────────────────────────┐    │
+│  │    Network Services        │  │   Secret Management        │    │
+│  │                            │  │                            │    │
+│  │  • TLS/HTTPS Termination   │  │  • Key Vault               │    │
+│  │  • Load Balancers          │  │  • Token Storage           │    │
+│  │  • Reverse Proxies         │  │  • Certificate Management  │    │
+│  │  • Firewalls               │  │  • Secret Rotation         │    │
+│  │  • DDoS Protection         │  │                            │    │
+│  └────────────────────────────┘  └────────────────────────────┘    │
+│                                                                    │
+│  ┌──────────────────────────────────────────────────────────────┐  │
+│  │             Logging & Monitoring                             │  │
+│  │  • Security Event Logging  • Metrics  • Alerting             │  │
+│  └──────────────────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────────────────┘
+
+Key Dependencies:
+- Presentation Layer → Infrastructure: TLS, Proxies, Secrets (JWT/PAT keys)
+- Service Layer → Infrastructure: Secrets, Network
+- Presentation Layer → Service Layer: gRPC API calls (authenticated)
+```
+
+### Layer-Specific Security Responsibilities
+
+#### Presentation Layer (Login UI)
+
+**Security Responsibilities:**
+
+1. **Input Validation & Sanitization**
+   - Validate all user inputs before processing
+   - Sanitize display data (React handles most XSS automatically)
+   - Validate URL parameters (requestId, organization, loginName, etc.)
+
+2. **Session Management**
+   - Store sessions only in HTTP-only cookies
+   - Never expose session tokens to client-side JavaScript
+   - Validate session expiration timestamps
+   - Clean up expired sessions
+
+3. **CSRF Protection**
+   - Rely on Next.js Server Actions' built-in Origin validation
+   - Ensure all state-changing operations use POST
+   - Maintain SameSite cookie policy
+
+4. **Redirect Validation**
+   - Validate all redirect URIs against trusted domains
+   - Never blindly redirect based on user input
+   - Use backend-validated redirect URIs for OIDC/SAML
+
+5. **Authentication Context**
+   - Never trust client-provided authentication state
+   - Always verify session with backend before granting access
+   - Validate MFA requirements server-side
+
+6. **Error Handling**
+   - Never expose internal error details to users
+   - Log security-relevant errors server-side
+   - Provide generic error messages to prevent information leakage
+
+**Trust Assumptions:**
+
+- ✅ Service Layer correctly validates authentication factors
+- ✅ Service Layer enforces security policies (MFA, password complexity)
+- ✅ Service Layer validates session tokens
+- ✅ Infrastructure provides TLS/HTTPS
+- ❌ NEVER trust client-provided data without validation
+- ❌ NEVER trust cookies without backend verification
+
+#### Service Layer (ZITADEL Backend)
+
+**Security Responsibilities:**
+
+1. **Authentication & Authorization**
+   - Validate all gRPC authentication tokens (JWT/PAT)
+   - Enforce role-based access control (e.g., IAM_LOGIN_CLIENT)
+   - Validate session tokens before operations
+   - Verify user permissions for requested operations
+
+2. **Session Validation**
+   - Validate session existence and expiration
+   - Enforce authentication factor requirements
+   - Check MFA/2FA policies
+   - Validate password expiry settings
+
+3. **Security Policy Enforcement**
+   - Enforce password complexity requirements
+   - Apply account lockout policies after failed attempts
+   - Validate MFA enrollment requirements
+   - Check email verification requirements
+
+4. **Request Validation**
+   - Validate OIDC/SAML auth requests
+   - Verify client credentials and redirect URIs
+   - Validate callback URLs against registered clients
+   - Sanitize and validate all input data
+
+5. **Host Header Validation**
+   - Validate host headers in URL templates for emails
+   - Maintain trusted domain allowlist
+   - Log suspicious host header attempts
+
+6. **Rate Limiting**
+   - Implement rate limiting for authentication attempts
+   - Throttle password reset requests
+   - Limit session creation rate per user/IP
+
+**Trust Assumptions:**
+
+- ✅ Presentation Layer uses authenticated gRPC (JWT/PAT)
+- ✅ Infrastructure provides secure database connections
+- ✅ Infrastructure protects secrets (private keys, tokens)
+- ❌ NEVER trust presentation layer to enforce security policies
+- ❌ NEVER trust presentation layer's session validation
+- ❌ NEVER trust host headers without validation
+
+#### Infrastructure Layer
+
+**Security Responsibilities:**
+
+1. **Network Security**
+   - Enforce TLS/HTTPS for all external communications
+   - Implement network segmentation between layers
+   - Configure firewall rules (only necessary ports open)
+   - Protect against DDoS attacks
+
+2. **Header Validation & Sanitization**
+   - **Strip untrusted headers from client requests** (e.g., `X-Forwarded-*`, `Host`)
+   - **Set headers based on validated routing logic only** (never trust client values)
+   - Validate Origin headers for cross-origin requests
+   - Configure proxy to add authenticated headers (e.g., `x-zitadel-forward-host` in multi-tenant)
+   - Prevent header injection attacks
+
+3. **Proxy/Load Balancer Configuration**
+   - Set `X-Forwarded-For` and `X-Forwarded-Host` based on actual client IP and routing
+   - Configure request size limits and timeouts
+   - Implement rate limiting at proxy level
+   - Ensure headers are forwarded correctly to application layers
+
+4. **Secret Management**
+   - Securely store private keys and tokens
+   - Use secret management systems (Kubernetes secrets, AWS Secrets Manager)
+   - Never log secrets
+
+5. **Logging & Monitoring**
+   - Log security events (failed logins, suspicious activity)
+   - Monitor for anomalous patterns
+   - Alert on security-relevant events
+   - Securely store and protect logs
+
+**Trust Assumptions:**
+
+- ✅ Service Layer implements authentication/authorization
+- ✅ Presentation Layer handles user interaction securely
+- ❌ NEVER expose internal services directly to internet
+- ❌ NEVER trust external network traffic
+- ❌ NEVER trust client-provided headers (always strip and set based on validated routing)
+
+### Cross-Layer Attack Vectors
+
+#### 1. Session Fixation/Hijacking
+
+**Attack:** Attacker attempts to reuse or steal session tokens across layers.
+
+**Layer Interactions:**
+
+- Presentation Layer: Stores session tokens in HTTP-only cookies
+- Service Layer: Validates session tokens and enforces expiration
+- Infrastructure Layer: Protects cookies with TLS
+
+**Mitigations:**
+
+- ✅ HTTP-only cookies (Presentation)
+- ✅ Session token validation on every request (Service)
+- ✅ Session expiration enforcement (Service)
+- ✅ TLS/HTTPS for all communications (Infrastructure)
+- ✅ Session rotation on authentication level changes (Service)
+
+**Checklist for Changes:**
+
+- [ ] Does this change expose session tokens to client-side JavaScript?
+- [ ] Does session validation still occur on every privileged operation?
+- [ ] Are session expiration timestamps checked?
+- [ ] Is TLS/HTTPS enforced for cookie transmission?
+
+#### 2. Open Redirect Vulnerabilities
+
+**Attack:** Attacker manipulates redirect parameters to send users to malicious sites.
+
+**Layer Interactions:**
+
+- Presentation Layer: Accepts redirect URIs from query parameters
+- Service Layer: Validates redirect URIs against client registrations
+- Infrastructure Layer: May modify or forward redirect headers
+
+**Mitigations:**
+
+- ✅ Backend validates OIDC/SAML redirect URIs against client config (Service)
+- ✅ Frontend validates post-logout redirects against trusted domains (Presentation)
+- ✅ Never blindly redirect based on user input (Presentation)
+- ✅ Host header validation for email links (Service)
+
+**Checklist for Changes:**
+
+- [ ] Are redirect URIs validated against an allowlist?
+- [ ] Does the change introduce new redirect parameters?
+- [ ] Are redirect URIs sanitized (no javascript:, data:, file: protocols)?
+- [ ] Is the host header validated before constructing URLs?
+- [ ] Are email/notification links constructed with validated hosts?
+
+#### 3. Authentication Bypass
+
+**Attack:** Attacker bypasses authentication checks by exploiting layer assumptions.
+
+**Layer Interactions:**
+
+- Presentation Layer: Creates/validates sessions via gRPC
+- Service Layer: Enforces authentication policies
+- Infrastructure Layer: Routes requests between layers
+
+**Mitigations:**
+
+- ✅ Backend validates all authentication factors (Service)
+- ✅ Frontend never trusts client-provided auth state (Presentation)
+- ✅ MFA requirements enforced server-side (Service)
+- ✅ Session validation on every privileged operation (Service)
+- ✅ Network segmentation prevents direct database access (Infrastructure)
+
+**Checklist for Changes:**
+
+- [ ] Are authentication checks performed server-side?
+- [ ] Can client-side code bypass authentication logic?
+- [ ] Are MFA requirements enforced by the backend?
+- [ ] Is session validation still required for this operation?
+- [ ] Does the change introduce new authentication paths?
+
+#### 4. Authorization Bypass
+
+**Attack:** Attacker accesses resources without proper authorization.
+
+**Layer Interactions:**
+
+- Presentation Layer: Uses service account token (IAM_LOGIN_CLIENT) for operations
+- Service Layer: Validates token permissions and user context
+- Infrastructure Layer: Doesn't perform authorization
+
+**Mitigations:**
+
+- ✅ Service account has minimal permissions (IAM_LOGIN_CLIENT only)
+- ✅ User context validated for self-service operations (Service)
+- ✅ Organization/resource ownership checked (Service)
+- ✅ Session token used for user-context operations (Presentation)
+
+**Checklist for Changes:**
+
+- [ ] Does this operation require user context or system context?
+- [ ] Are organization/resource ownership checks in place?
+- [ ] Is the correct token used (service account vs user session)?
+- [ ] Can users access resources belonging to other users/organizations?
+- [ ] Are permissions checked at the service layer?
+
+#### 5. Injection Attacks (SQL, Command, LDAP)
+
+**Attack:** Attacker injects malicious code through untrusted inputs.
+
+**Layer Interactions:**
+
+- Presentation Layer: Accepts user input, sanitizes for display
+- Service Layer: Validates and sanitizes inputs, uses parameterized queries
+- Infrastructure Layer: Database enforces query structure
+
+**Mitigations:**
+
+- ✅ React automatically escapes JSX content (Presentation)
+- ✅ gRPC protocol buffers prevent injection (Presentation → Service)
+- ✅ Backend uses parameterized queries (Service)
+- ✅ Input validation on all fields (Service)
+
+**Checklist for Changes:**
+
+- [ ] Are all user inputs validated and sanitized?
+- [ ] Does the code use parameterized queries (no string concatenation)?
+- [ ] Are inputs properly escaped for display?
+- [ ] Does the change introduce new input fields?
+- [ ] Are search/filter parameters properly validated?
+
+#### 6. Host Header Poisoning
+
+**Attack:** Attacker manipulates host header to poison cached content or generate malicious links.
+
+**Layer Interactions:**
+
+- Presentation Layer: Reads host header for URL construction
+- Service Layer: Validates host header against trusted domains
+- Infrastructure Layer: Forwards/modifies host headers (proxy)
+
+**Mitigations:**
+
+- ✅ Service layer validates host headers for email templates (Service)
+- ✅ Trusted domains maintained in backend configuration (Service)
+- ✅ Proxy configuration sets X-Forwarded-Host correctly (Infrastructure)
+- ⚠️ Password reset/verification links use validated hosts (Service)
+
+**Checklist for Changes:**
+
+- [ ] Does this change construct URLs using host headers?
+- [ ] Is the host header validated against trusted domains?
+- [ ] Are email/notification templates affected?
+- [ ] Does the change trust X-Forwarded-Host headers?
+- [ ] Is proxy configuration documented for this change?
+
+#### 7. CSRF Attacks
+
+**Attack:** Attacker tricks user into performing unwanted actions while authenticated.
+
+**Layer Interactions:**
+
+- Presentation Layer: Uses Next.js Server Actions (automatic Origin validation)
+- Service Layer: Doesn't perform CSRF checks (trusts presentation layer)
+- Infrastructure Layer: Forwards headers correctly
+
+**Mitigations:**
+
+- ✅ Server Actions use POST-only (Presentation)
+- ✅ Automatic Origin validation (Presentation)
+- ✅ SameSite cookie policy (Presentation)
+- ✅ Proxy forwards Origin/Host headers correctly (Infrastructure)
+
+**Checklist for Changes:**
+
+- [ ] Are state-changing operations POST-only?
+- [ ] Does the change use Server Actions or custom Route Handlers?
+- [ ] If custom Route Handlers, is CSRF protection implemented?
+- [ ] Are SameSite cookie settings maintained?
+- [ ] Does proxy configuration preserve Origin headers?
+
+#### 8. Information Disclosure
+
+**Attack:** Attacker gains sensitive information through error messages, logs, or responses.
+
+**Layer Interactions:**
+
+- Presentation Layer: Displays error messages to users
+- Service Layer: Generates errors with internal details
+- Infrastructure Layer: Logs requests and responses
+
+**Mitigations:**
+
+- ✅ Generic error messages shown to users (Presentation)
+- ✅ Detailed errors logged server-side only (Service)
+- ✅ Session tokens never logged (All layers)
+- ✅ Secrets masked in logs (Infrastructure)
+
+**Checklist for Changes:**
+
+- [ ] Are error messages generic and safe for users?
+- [ ] Does the change log sensitive information?
+- [ ] Are session tokens/passwords excluded from logs?
+- [ ] Does the response include unnecessary internal details?
+- [ ] Are stack traces hidden from users in production?
+
+### PR Acceptance Criteria for Security
+
+When implementing features or changes in any layer, the following security acceptance criteria must be met:
+
+#### For All Changes
+
+- [ ] **Threat Model Updated**: Document how this change affects the threat model
+- [ ] **Layer Boundaries Respected**: Change doesn't violate trust assumptions between layers
+- [ ] **Security Review Completed**: Change reviewed by security-conscious team member
+- [ ] **Tests Include Security Cases**: Tests cover security-relevant edge cases (auth bypass, injection, etc.)
+- [ ] **Documentation Updated**: ARCHITECTURE.md and relevant docs reflect security implications
+
+#### Presentation Layer Changes (Login UI)
+
+- [ ] **Input Validation**: All user inputs validated and sanitized
+- [ ] **Session Handling**: Sessions remain in HTTP-only cookies, never exposed to JavaScript
+- [ ] **Authentication Checks**: Authentication verified server-side (never client-side only)
+- [ ] **CSRF Protection**: State-changing operations use Server Actions or have CSRF protection
+- [ ] **Redirect Validation**: All redirects validated against allowlist or backend configuration
+- [ ] **Error Handling**: Error messages don't leak sensitive information
+- [ ] **gRPC Authentication**: All backend calls use authenticated transport (JWT/PAT)
+- [ ] **No Client-Side Secrets**: No tokens, keys, or secrets in client-side code
+- [ ] **Security Headers**: CSP, X-Frame-Options, etc. remain intact
+- [ ] **Cookie Configuration**: HTTP-only, Secure, SameSite attributes maintained
+
+**Security Checklist Questions:**
+
+- Does this change trust any client-provided data without backend validation?
+- Can an attacker manipulate this flow to bypass authentication?
+- Are sessions or tokens exposed where they shouldn't be?
+- Could this change enable open redirect attacks?
+- Does this change handle errors securely?
+
+#### Service Layer Changes (ZITADEL Backend)
+
+- [ ] **Authentication Required**: All operations validate authentication token (JWT/PAT)
+- [ ] **Authorization Enforced**: User permissions checked for requested operations
+- [ ] **Input Validation**: All inputs validated against schema and business rules
+- [ ] **Session Validation**: Session tokens validated before accepting session operations
+- [ ] **Security Policy Enforcement**: MFA, password complexity, lockout policies enforced
+- [ ] **Host Header Validation**: Host headers validated if used in URL construction
+- [ ] **Rate Limiting**: Rate limits applied to sensitive operations
+- [ ] **Audit Logging**: Security-relevant actions logged with sufficient detail
+- [ ] **Error Responses**: Error messages don't leak internal details
+- [ ] **Parameterized Queries**: No SQL injection vulnerabilities (use parameterized queries)
+
+**Security Checklist Questions:**
+
+- Does this change trust the presentation layer to enforce security policies?
+- Are authentication and authorization checks in place?
+- Could this change be used to enumerate users or resources?
+- Does this change validate redirect URIs or host headers?
+- Are rate limits applied to prevent abuse?
+
+#### Infrastructure Layer Changes
+
+- [ ] **TLS/HTTPS Enforced**: All external communications use TLS
+- [ ] **Secrets Protected**: Secrets stored securely, never logged
+- [ ] **Network Segmentation**: Services properly isolated by network policies
+- [ ] **Header Sanitization**: Client-provided headers stripped before setting routing/instance headers
+- [ ] **Proxy Configuration**: Headers (X-Forwarded-\*, Origin) set by proxy based on validated routing only
+- [ ] **No Client Header Trust**: Instance/routing headers (e.g., x-zitadel-forward-host) never taken from client
+- [ ] **Logging Secure**: Logs don't contain secrets, stored securely
+- [ ] **Monitoring Configured**: Security events monitored and alerted
+- [ ] **Firewall Rules**: Only necessary ports exposed
+- [ ] **DDoS Protection**: Anti-DDoS measures in place
+
+**Security Checklist Questions:**
+
+- Does this change expose internal services to the internet?
+- Are secrets properly managed and rotated?
+- Could this change leak sensitive information through logs?
+- Are client-provided headers stripped before setting routing headers?
+- Does the proxy set headers based on validated routing logic (not client input)?
+- Is TLS/HTTPS maintained throughout the request path?
+
+#### Cross-Layer Changes
+
+When a change spans multiple layers:
+
+- [ ] **Layer Communication Documented**: How layers interact is clearly documented
+- [ ] **Trust Boundaries Defined**: What each layer trusts/validates is explicit
+- [ ] **Defense in Depth**: Multiple layers provide overlapping security controls
+- [ ] **Failure Modes Secure**: If one layer fails, others maintain security
+- [ ] **End-to-End Testing**: Security tests cover the full request path
+- [ ] **Attack Vector Analysis**: Cross-layer attack vectors considered and mitigated
+
+### Security Review Process
+
+#### Before Implementation
+
+1. **Threat Modeling**: Identify potential attack vectors for the feature
+2. **Layer Analysis**: Determine which layers are affected and their security responsibilities
+3. **Trust Boundary Review**: Ensure the feature respects layer trust assumptions
+4. **Acceptance Criteria**: Define security acceptance criteria from the relevant sections above
+
+#### During Implementation
+
+1. **Secure Coding**: Follow secure coding practices (input validation, error handling, etc.)
+2. **Security Tests**: Write tests that cover security edge cases
+3. **Code Review**: Include security-focused review by another team member
+4. **Documentation**: Update ARCHITECTURE.md with security implications
+
+#### Before Merge
+
+1. **Security Checklist**: Complete all relevant security checklists above
+2. **Attack Vector Analysis**: Verify identified attack vectors are mitigated
+3. **Layer Boundary Validation**: Confirm trust assumptions still hold
+4. **Test Coverage**: Ensure security tests are included and passing
+5. **Documentation Review**: Verify security documentation is accurate and complete
+
+### Security Testing Guidelines
+
+#### Unit Tests
+
+- Test input validation (valid, invalid, edge cases, malicious inputs)
+- Test authentication/authorization checks
+- Test error handling (no information leakage)
+- Test session validation logic
+
+#### Integration Tests
+
+- Test cross-layer authentication flows
+- Test OIDC/SAML flows with invalid redirect URIs
+- Test session hijacking prevention
+- Test CSRF protection
+- Test host header validation
+
+#### Security Tests
+
+- Test authentication bypass attempts
+- Test authorization bypass attempts
+- Test injection attacks (SQL, XSS, command)
+- Test open redirect vulnerabilities
+- Test session fixation/hijacking
+- Test CSRF attacks
+- Test rate limiting
+
+#### Manual Security Review
+
+- Review for sensitive information in logs
+- Review for secrets in code or environment variables
+- Review redirect URI validation
+- Review error messages shown to users
+- Review authentication/authorization flows
+
+### Security Incident Response
+
+If a security vulnerability is discovered:
+
+1. **Identify Affected Layers**: Determine which layers are impacted
+2. **Assess Cross-Layer Impact**: Check if other layers have compensating controls
+3. **Implement Defense in Depth**: Add security controls in multiple layers
+4. **Update Acceptance Criteria**: Add new checklist items based on the vulnerability
+5. **Improve Testing**: Add security tests to prevent regression
+6. **Document Lessons Learned**: Update ARCHITECTURE.md with new attack vectors
+
+### Key Principles
+
+1. **Defense in Depth**: Multiple layers should have overlapping security controls
+2. **Least Privilege**: Each layer should have minimal necessary permissions
+3. **Never Trust, Always Verify**: Each layer validates inputs, even from trusted layers
+4. **Fail Securely**: When errors occur, fail in a secure state (deny access)
+5. **Secure by Default**: Security features enabled by default
+6. **Layer Responsibility**: Each layer enforces its own security requirements
+7. **Explicit Trust Boundaries**: What each layer trusts is explicitly documented
+8. **Audit Everything**: Security-relevant actions are logged and monitored
+
 ## Conclusion
 
-The ZITADEL Login application is a sophisticated Next.js 15 application that:
+The ZITADEL Login application is a Next.js 15 application that:
 
 1. **Establishes secure sessions** using HTTP-only cookies and server-side validation
 2. **Supports multiple authentication flows** (password, passkeys, IDPs, MFA)
@@ -3232,3 +3791,5 @@ The ZITADEL Login application is a sophisticated Next.js 15 application that:
 6. **Scales efficiently** (caching, connection pooling, Server Components)
 
 The architecture leverages Next.js 15's latest features (App Router, Server Actions, Dynamic IO) while maintaining compatibility with ZITADEL's gRPC backend through type-safe protocol buffer communication.
+
+**Security Posture**: This architecture implements defense-in-depth across three layers (Presentation, Service, Infrastructure) with explicit trust boundaries, attack vector analysis, and strict acceptance criteria for all changes. Each layer maintains its security responsibilities while providing overlapping protections against common attack vectors.
