@@ -101,24 +101,12 @@ export async function getBrandingSettings({ serviceUrl, organization }: { servic
   )();
 }
 
-async function getLoginSettingsImpl(serviceUrl: string, organization?: string) {
+export async function getLoginSettings({ serviceUrl, organization }: { serviceUrl: string; organization?: string }) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
   return settingsService
     .getLoginSettings({ ctx: makeReqCtx(organization) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
-}
-
-export async function getLoginSettings({ serviceUrl, organization }: { serviceUrl: string; organization?: string }) {
-  if (!useCache) {
-    return getLoginSettingsImpl(serviceUrl, organization);
-  }
-
-  return unstable_cache(
-    async () => getLoginSettingsImpl(serviceUrl, organization),
-    ["login-settings", serviceUrl, organization || "default"],
-    { revalidate: 3600 },
-  )();
 }
 
 async function getSecuritySettingsImpl(serviceUrl: string) {
