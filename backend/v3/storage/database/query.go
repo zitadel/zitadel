@@ -73,6 +73,13 @@ func WithPermissionCheck(permission string) QueryOption {
 	}
 }
 
+// WithResultLock locks the results of the query during the transaction.
+func WithResultLock() QueryOption {
+	return func(opts *QueryOpts) {
+		opts.ShouldLock = true
+	}
+}
+
 type joinType string
 
 const (
@@ -119,6 +126,8 @@ type QueryOpts struct {
 	// Permission required to read or write the resource.
 	// When unset, no permission check is made.
 	Permission string
+	// ShouldLock the results during the transaction.
+	ShouldLock bool
 }
 
 // Matches implements [gomock.Matcher].
@@ -184,6 +193,7 @@ func (opts *QueryOpts) Write(builder *StatementBuilder) {
 	opts.WriteOrderBy(builder)
 	opts.WriteLimit(builder)
 	opts.WriteOffset(builder)
+	opts.WriteLock(builder)
 }
 
 func (opts *QueryOpts) WriteCondition(builder *StatementBuilder) {
@@ -246,4 +256,11 @@ func (opts *QueryOpts) WriteLeftJoins(builder *StatementBuilder) {
 		builder.WriteString(" ON ")
 		join.columns.Write(builder)
 	}
+}
+
+func (opts *QueryOpts) WriteLock(builder *StatementBuilder) {
+	if !opts.ShouldLock {
+		return
+	}
+	builder.WriteString(" FOR UPDATE")
 }
