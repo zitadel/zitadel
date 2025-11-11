@@ -74,7 +74,7 @@ func (u user) Delete(ctx context.Context, client database.QueryExecutor, conditi
 }
 
 // Get implements [domain.UserRepository].
-func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) *domain.User {
+func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.User, error) {
 	opts = append(opts,
 		u.joinMetadata(),
 		database.WithGroupBy(u.PrimaryKeyColumns()...),
@@ -83,7 +83,7 @@ func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...da
 }
 
 // List implements [domain.UserRepository].
-func (u user) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) []*domain.User {
+func (u user) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.User, error) {
 	opts = append(opts,
 		u.joinMetadata(),
 		database.WithGroupBy(u.PrimaryKeyColumns()...),

@@ -13,6 +13,12 @@ var _ domain.MachineUserRepository = (*userMachine)(nil)
 type userMachine struct {
 	shouldLoadMetadata bool
 	metadata           userMetadata
+
+	shouldLoadKeys bool
+	keys           userMachineKey
+
+	shouldLoadPATs bool
+	pats           userPersonalAccessToken
 }
 
 func MachineUserRepository() domain.MachineUserRepository {
@@ -86,48 +92,84 @@ func (m userMachine) Update(ctx context.Context, client database.QueryExecutor, 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
+// Keys implements [domain.MachineUserRepository].
+func (m userMachine) Keys() domain.MachineKeyRepository {
+	return m.keys
+}
+
+// LoadKeys implements [domain.MachineUserRepository].
+func (m userMachine) LoadKeys() domain.MachineUserRepository {
+	return &userMachine{
+		shouldLoadMetadata: m.shouldLoadMetadata,
+		metadata:           m.metadata,
+		shouldLoadKeys:     true,
+		keys:               m.keys,
+	}
+}
+
+// PersonalAccessTokens implements [domain.MachineUserRepository].
+func (m userMachine) PersonalAccessTokens() domain.PersonalAccessTokenRepository {
+	return m.pats
+}
+
+// LoadPersonalAccessTokens implements [domain.MachineUserRepository].
+func (m userMachine) LoadPersonalAccessTokens() domain.MachineUserRepository {
+	return &userMachine{
+		shouldLoadMetadata: m.shouldLoadMetadata,
+		metadata:           m.metadata,
+		shouldLoadKeys:     m.shouldLoadKeys,
+		keys:               m.keys,
+		shouldLoadPATs:     true,
+		pats:               m.pats,
+	}
+}
+
 // -------------------------------------------------------------
 // changes
 // -------------------------------------------------------------
 
-// SetAccessTokenType implements [domain.MachineUserRepository].
+// SetAccessTokenType implements [domain.MachineUserRepository.SetAccessTokenType].
 func (m userMachine) SetAccessTokenType(accessTokenType domain.AccessTokenType) database.Change {
-	panic("unimplemented")
+	return database.NewChange(m.AccessTokenTypeColumn(), accessTokenType)
 }
 
-// SetDescription implements [domain.MachineUserRepository].
+// SetDescription implements [domain.MachineUserRepository.SetDescription].
 func (m userMachine) SetDescription(description *string) database.Change {
 	return database.NewChangePtr(m.DescriptionColumn(), description)
 }
 
-// SetName implements [domain.MachineUserRepository].
+// SetName implements [domain.MachineUserRepository.SetName].
 func (m userMachine) SetName(name string) database.Change {
 	return database.NewChange(m.NameColumn(), name)
 }
 
-// SetSecret implements [domain.MachineUserRepository].
+// SetSecret implements [domain.MachineUserRepository.SetSecret].
 func (m userMachine) SetSecret(secret *string) database.Change {
 	return database.NewChangePtr(m.SecretColumn(), secret)
 }
 
-// SetState implements [domain.MachineUserRepository].
+// SetState implements [domain.MachineUserRepository.SetState].
 func (m userMachine) SetState(state domain.UserState) database.Change {
 	return database.NewChange(m.StateColumn(), state)
 }
 
-// SetUpdatedAt implements [domain.MachineUserRepository].
+// SetUpdatedAt implements [domain.MachineUserRepository.SetUpdatedAt].
 func (m userMachine) SetUpdatedAt(updatedAt time.Time) database.Change {
 	return database.NewChange(m.UpdatedAtColumn(), updatedAt)
 }
 
-// SetUsername implements [domain.MachineUserRepository].
+// SetUsername implements [domain.MachineUserRepository.SetUsername].
 func (m userMachine) SetUsername(username string) database.Change {
 	return database.NewChange(m.UsernameColumn(), username)
 }
 
-// SetUsernameOrgUnique implements [domain.MachineUserRepository].
+// SetUsernameOrgUnique implements [domain.MachineUserRepository.SetUsernameOrgUnique].
 func (m userMachine) SetUsernameOrgUnique(usernameOrgUnique bool) database.Change {
 	return database.NewChange(m.UsernameOrgUniqueColumn(), usernameOrgUnique)
+}
+
+func (m userMachine) typeColumn() database.Column {
+	return database.NewColumn(m.unqualifiedTableName(), "type")
 }
 
 // -------------------------------------------------------------

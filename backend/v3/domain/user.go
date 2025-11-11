@@ -54,8 +54,8 @@ type UserRepository interface {
 	userConditions
 	userChanges
 
-	Human() HumanUserRepository
-	Machine() MachineUserRepository
+	// Human() HumanUserRepository
+	// Machine() MachineUserRepository
 
 	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*User, error)
 	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*User, error)
