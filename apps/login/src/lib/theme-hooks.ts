@@ -24,9 +24,7 @@ export function useResponsiveLayout(): { isSideBySide: boolean; isResponsiveOver
     }
 
     // Mark as hydrated on client side
-    setTimeout(() => {
-      setIsHydrated(true);
-    }, 0);
+    setIsHydrated(true);
 
     const mediaQuery = window.matchMedia("(max-width: 767px)"); // md breakpoint is 768px in Tailwind
 
