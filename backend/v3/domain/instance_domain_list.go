@@ -101,12 +101,11 @@ func (l *ListInstanceDomainsQuery) Sorting(domainRepo InstanceDomainRepository) 
 		return func(opts *database.QueryOpts) {}
 	}
 
-	orderDirection := database.OrderDirectionDesc
 	if l.Request.GetPagination().GetAsc() {
-		orderDirection = database.OrderDirectionAsc
+		return database.WithOrderByAscending(sortingCol)
 	}
 
-	return database.WithOrderBy(orderDirection, sortingCol)
+	return database.WithOrderByDescending(sortingCol)
 }
 
 // String implements [Querier].
