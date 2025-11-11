@@ -3,7 +3,7 @@
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
 import { registerPasskeyLink, verifyPasskeyRegistration } from "@/lib/server/passkeys";
 import { useRouter } from "next/navigation";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef, startTransition } from "react";
 import { useForm } from "react-hook-form";
 import { Alert } from "./alert";
 import { BackButton } from "./back-button";
@@ -33,6 +33,7 @@ export function RegisterPasskey({ sessionId, userId, isPrompt, organization, req
   const [loading, setLoading] = useState<boolean>(false);
 
   const router = useRouter();
+  const initialized = useRef(false);
 
   async function submitVerify(
     passkeyId: string,
@@ -182,10 +183,11 @@ export function RegisterPasskey({ sessionId, userId, isPrompt, organization, req
 
   // Auto-submit when code is provided (similar to VerifyForm)
   useEffect(() => {
-    if (code) {
-      setTimeout(() => {
+    if (!initialized.current && code) {
+      initialized.current = true;
+      startTransition(() => {
         submitRegisterAndContinue();
-      }, 0);
+      });
     }
   }, [code, submitRegisterAndContinue]);
 
