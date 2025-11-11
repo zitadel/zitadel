@@ -82,7 +82,9 @@ func updateOne[Target updatable](ctx context.Context, client database.QueryExecu
 	if !database.Changes(changes).IsOnColumn(target.UpdatedAtColumn()) {
 		changes = append(changes, database.NewChange(target.UpdatedAtColumn(), database.NullInstruction))
 	}
-	builder := database.NewStatementBuilder(`UPDATE zitadel.` + target.unqualifiedTableName() + ` SET `)
+	builder := database.NewStatementBuilder("UPDATE ")
+    builder.WriteString(target.qualifiedTableName())
+    builder.WriteString(" SET ")
 	database.Changes(changes).Write(builder)
 	writeCondition(builder, condition)
 
@@ -99,7 +101,9 @@ func deleteOne[Target deletable](ctx context.Context, client database.QueryExecu
 		return 0, err
 	}
 
-	builder := database.NewStatementBuilder(`DELETE FROM zitadel.` + target.unqualifiedTableName() + ` `)
+	builder := database.NewStatementBuilder("DELETE FROM ")
+    builder.WriteString(target.qualifiedTableName())
+    builder.WriteRune(' ')
 	writeCondition(builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)

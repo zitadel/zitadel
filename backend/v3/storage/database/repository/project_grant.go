@@ -86,25 +86,20 @@ func (p projectGrant) Create(ctx context.Context, client database.QueryExecutor,
 	return nil
 }
 
-const queryUpdateProjectGrantRoleStmt = `SELECT instance_id, id, project_id, unnest($1::text[]) as key from zitadel.project_grants`
+const queryUpdateProjectGrantRoleStmt = `SELECT instance_id, id, project_id, $1::TEXT[] AS keys from zitadel.project_grants`
 
 const updateProjectGrantRoleStmt = `removed_roles AS (
     DELETE FROM zitadel.project_grant_roles as pgr
-    WHERE NOT EXISTS (
-		SELECT 1
-			FROM pg
-			WHERE pg.instance_id = pgr.instance_id
-			AND pg.id = pgr.grant_id
-			AND pg.key = pgr.key 
-	)
+    USING pg
+    WHERE pg.instance_id = pgr.instance_id AND pg.id = pgr.grant_id AND NOT(pgr.key = ANY(pg.keys))
 ), added_roles AS (
 	INSERT INTO zitadel.project_grant_roles (
 		instance_id, grant_id, project_id, key
 	)
-	SELECT instance_id, id, project_id, key FROM pg
+	SELECT instance_id, id, project_id, unnest(pg.keys) FROM pg
 	ON CONFLICT (instance_id, grant_id, key) DO NOTHING
 )
-UPDATE zitadel.project_grants 
+UPDATE zitadel.project_grants
 SET updated_at = now()
 FROM pg
 WHERE pg.instance_id = project_grants.instance_id
@@ -119,12 +114,12 @@ func (p projectGrant) SetRoleKeys(ctx context.Context, client database.QueryExec
 		return 0, err
 	}
 
-	queryBuilder := database.NewStatementBuilder(queryUpdateProjectGrantRoleStmt, roleKeys)
-	writeCondition(queryBuilder, condition)
-
-	builder := database.NewStatementBuilder(`WITH pg AS ( `+queryBuilder.String()+` ), `+updateProjectGrantRoleStmt,
-		queryBuilder.Args()...,
-	)
+    // the statement begins with getting the project grant we want to update
+    builder := database.NewStatementBuilder("WITH pg AS (SELECT instance_id, id, project_id, unnest($1::text[]) as key from zitadel.project_grants", roleKeys)
+	writeCondition(builder, condition)
+    builder.WriteString(" ), ")
+    // now we add the logic to do the required changes based on the given project grant
+    builder.WriteString(updateProjectGrantRoleStmt)
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
