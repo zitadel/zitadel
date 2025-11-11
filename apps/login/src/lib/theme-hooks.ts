@@ -31,9 +31,7 @@ export function useResponsiveLayout(): { isSideBySide: boolean; isResponsiveOver
     const mediaQuery = window.matchMedia("(max-width: 767px)"); // md breakpoint is 768px in Tailwind
 
     // Set initial value
-    setTimeout(() => {
-      setIsMdOrSmaller(mediaQuery.matches);
-    }, 0);
+    setIsMdOrSmaller(mediaQuery.matches);
 
     // Listen for changes
     const handleChange = (e: MediaQueryListEvent) => {
