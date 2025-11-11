@@ -12,6 +12,15 @@
 - [Multi-Factor Authentication](#multi-factor-authentication)
 - [Identity Provider Integration](#identity-provider-integration)
 - [Deployment Modes](#deployment-modes)
+- [Next.js Implementation](#nextjs-implementation)
+  - [Server Actions](#server-actions)
+  - [Internationalization](#internationalization)
+  - [Theming System](#theming-system)
+  - [Performance Optimizations](#performance-optimizations)
+- [Error Handling](#error-handling)
+- [Monitoring and Debugging](#monitoring-and-debugging)
+- [Cross-Layer Security Analysis](#cross-layer-security-analysis)
+- [Conclusion](#conclusion)
 
 ## Overview
 
@@ -2841,7 +2850,9 @@ DEBUG=true  # Disables caching
 | **HTTPS**               | Required                                      | Recommended                             | Not enabled (HTTP)                     |
 | **Organization Header** | Propagated                                    | Propagated                              | Propagated                             |
 
-## Next.js 15 Server Actions
+## Next.js Implementation
+
+### Server Actions
 
 Server Actions provide type-safe, server-side mutations without API routes:
 
@@ -2899,9 +2910,9 @@ export function PasswordForm() {
 4. **Automatic Serialization**: Return values are automatically serialized
 5. **Server-Only Code**: Sensitive operations never exposed to client
 
-## Internationalization
+### Internationalization
 
-### Translation Architecture
+#### Translation Architecture
 
 ```typescript
 // Server-side translations
@@ -2950,11 +2961,11 @@ if (organization) {
 }
 ```
 
-## Theming System
+### Theming System
 
 The application supports environment-variable driven theming:
 
-### Theme Configuration
+#### Theme Configuration
 
 ```bash
 # .env.local
@@ -3033,9 +3044,9 @@ export async function getBrandingSettings({ serviceUrl, organization }: { servic
 }
 ```
 
-## Performance Optimizations
+### Performance Optimizations
 
-### Caching Strategy
+#### Caching Strategy
 
 ```typescript
 // src/lib/zitadel.ts
