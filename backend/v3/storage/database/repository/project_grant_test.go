@@ -608,7 +608,7 @@ func TestDeleteProjectGrant(t *testing.T) {
 	}{
 		{
 			name:             "incomplete condition",
-			condition:        projectGrantRepo.InstanceIDCondition(instanceID),
+			condition:        projectGrantRepo.GrantedOrganizationIDCondition("something"),
 			wantRowsAffected: 0,
 			wantErr:          database.NewMissingConditionError(projectGrantRepo.IDColumn()),
 		},

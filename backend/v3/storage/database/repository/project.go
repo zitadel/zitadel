@@ -66,6 +66,9 @@ func (p project) Update(ctx context.Context, client database.QueryExecutor, cond
 }
 
 func (p project) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	if err := checkRestrictingColumns(condition, p.InstanceIDColumn()); err != nil {
+		return 0, err
+	}
 	return delete(ctx, client, p, condition)
 }
 

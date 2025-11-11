@@ -51,16 +51,6 @@ const insertProjectGrantRolesStmt = `WITH added_roles AS (
 ) `
 
 func (p projectGrant) Create(ctx context.Context, client database.QueryExecutor, projectGrant *domain.ProjectGrant) error {
-	var (
-		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
-	)
-	if !projectGrant.CreatedAt.IsZero() {
-		createdAt = projectGrant.CreatedAt
-	}
-	if !projectGrant.UpdatedAt.IsZero() {
-		updatedAt = projectGrant.UpdatedAt
-	}
-
 	// separate statement to add roles to project grant
 	builder := database.NewStatementBuilder(insertProjectGrantRolesStmt, projectGrant.RoleKeys)
 
@@ -72,8 +62,8 @@ func (p projectGrant) Create(ctx context.Context, client database.QueryExecutor,
 		projectGrant.GrantingOrganizationID,
 		projectGrant.GrantedOrganizationID,
 		projectGrant.State,
-		createdAt,
-		updatedAt,
+		defaultTimestamp(projectGrant.CreatedAt),
+		defaultTimestamp(projectGrant.UpdatedAt),
 	)
 	builder.WriteString(` ) RETURNING created_at, updated_at`)
 
@@ -130,6 +120,9 @@ func (p projectGrant) Update(ctx context.Context, client database.QueryExecutor,
 }
 
 func (p projectGrant) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	if err := checkRestrictingColumns(condition, p.InstanceIDColumn()); err != nil {
+		return 0, err
+	}
 	return delete(ctx, client, p, condition)
 }
 

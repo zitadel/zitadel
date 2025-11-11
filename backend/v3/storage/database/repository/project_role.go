@@ -50,30 +50,14 @@ func (p projectRole) Create(ctx context.Context, client database.QueryExecutor, 
 }
 
 func (p projectRole) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	if len(changes) == 0 {
-		return 0, database.ErrNoChanges
-	}
-	if err := checkPKCondition(p, condition); err != nil {
-		return 0, err
-	}
-	if !database.Changes(changes).IsOnColumn(p.UpdatedAtColumn()) {
-		changes = append(changes, database.NewChange(p.UpdatedAtColumn(), database.NullInstruction))
-	}
-	builder := database.NewStatementBuilder(`UPDATE zitadel.project_roles SET `)
-	database.Changes(changes).Write(builder)
-	writeCondition(builder, condition)
-
-	return client.Exec(ctx, builder.String(), builder.Args()...)
+	return update(ctx, client, p, condition, changes...)
 }
 
 func (p projectRole) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	if err := checkPKCondition(p, condition); err != nil {
+	if err := checkRestrictingColumns(condition, p.InstanceIDColumn()); err != nil {
 		return 0, err
 	}
-	builder := database.NewStatementBuilder(`DELETE FROM zitadel.project_roles`)
-	writeCondition(builder, condition)
-
-	return client.Exec(ctx, builder.String(), builder.Args()...)
+	return delete(ctx, client, p, condition)
 }
 
 // -------------------------------------------------------------
@@ -127,6 +111,10 @@ func (p projectRole) RoleGroupCondition(op database.TextOperation, roleGroup str
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
+
+func (p projectRole) qualifiedTableName() string {
+	return "zitadel." + p.unqualifiedTableName()
+}
 
 func (projectRole) unqualifiedTableName() string {
 	return "project_roles"

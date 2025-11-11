@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -68,16 +69,24 @@ func list[Target any](ctx context.Context, querier database.Querier, builder *da
 
 type updatable interface {
 	PrimaryKeyColumns() []database.Column
+	updatableSub
+}
+
+func update[Target updatable](ctx context.Context, client database.QueryExecutor, target Target, condition database.Condition, changes ...database.Change) (int64, error) {
+	if err := checkPKCondition(target, condition); err != nil {
+		return 0, err
+	}
+	return updateSub(ctx, client, target, condition, changes...)
+}
+
+type updatableSub interface {
 	UpdatedAtColumn() database.Column
 	qualifiedTableName() string
 }
 
-func update[Target updatable](ctx context.Context, client database.QueryExecutor, target Target, condition database.Condition, changes ...database.Change) (int64, error) {
+func updateSub[Target updatableSub](ctx context.Context, client database.QueryExecutor, target Target, condition database.Condition, changes ...database.Change) (int64, error) {
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
-	}
-	if err := checkPKCondition(target, condition); err != nil {
-		return 0, err
 	}
 	if !database.Changes(changes).IsOnColumn(target.UpdatedAtColumn()) {
 		changes = append(changes, database.NewChange(target.UpdatedAtColumn(), database.NullInstruction))
@@ -90,17 +99,19 @@ func update[Target updatable](ctx context.Context, client database.QueryExecutor
 }
 
 type deletable interface {
-	PrimaryKeyColumns() []database.Column
 	qualifiedTableName() string
 }
 
 func delete[Target deletable](ctx context.Context, client database.QueryExecutor, target Target, condition database.Condition) (int64, error) {
-	if err := checkPKCondition(target, condition); err != nil {
-		return 0, err
-	}
-
 	builder := database.NewStatementBuilder(`DELETE FROM ` + target.qualifiedTableName() + ` `)
 	writeCondition(builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+func defaultTimestamp(timestamp time.Time) any {
+	if !timestamp.IsZero() {
+		return timestamp
+	}
+	return database.DefaultInstruction
 }

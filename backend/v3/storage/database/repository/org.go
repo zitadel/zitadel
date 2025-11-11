@@ -32,11 +32,6 @@ func OrganizationRepository() domain.OrganizationRepository {
 	return new(org)
 }
 
-const queryOrganizationStmt = `SELECT organizations.id, organizations.name, organizations.instance_id, organizations.state, organizations.created_at, organizations.updated_at` +
-	` , jsonb_agg(json_build_object('instanceId', org_domains.instance_id, 'orgId', org_domains.org_id, 'domain', org_domains.domain, 'isVerified', org_domains.is_verified, 'isPrimary', org_domains.is_primary, 'validationType', org_domains.validation_type, 'createdAt', org_domains.created_at, 'updatedAt', org_domains.updated_at)) FILTER (WHERE org_domains.org_id IS NOT NULL) AS domains` +
-	` , jsonb_agg(json_build_object('instanceId', organization_metadata.instance_id, 'orgId', organization_metadata.organization_id, 'key', organization_metadata.key, 'value', encode(organization_metadata.value, 'base64'), 'createdAt', organization_metadata.created_at, 'updatedAt', organization_metadata.updated_at)) FILTER (WHERE organization_metadata.organization_id IS NOT NULL) AS metadata` +
-	` FROM zitadel.organizations`
-
 // Get implements [domain.OrganizationRepository].
 func (o org) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Organization, error) {
 	opts = append(opts,
@@ -50,15 +45,11 @@ func (o org) Get(ctx context.Context, client database.QueryExecutor, opts ...dat
 		opt(options)
 	}
 
-	if !options.Condition.IsRestrictingColumn(o.InstanceIDColumn()) {
-		return nil, database.NewMissingConditionError(o.InstanceIDColumn())
+	builder, err := o.prepareQuery(opts)
+	if err != nil {
+		return nil, err
 	}
-
-	var builder database.StatementBuilder
-	builder.WriteString(queryOrganizationStmt)
-	options.Write(&builder)
-
-	return scanOrganization(ctx, client, &builder)
+	return scanOrganization(ctx, client, builder)
 }
 
 // List implements [domain.OrganizationRepository].
@@ -74,64 +65,34 @@ func (o org) List(ctx context.Context, client database.QueryExecutor, opts ...da
 		opt(options)
 	}
 
-	if !options.Condition.IsRestrictingColumn(o.InstanceIDColumn()) {
-		return nil, database.NewMissingConditionError(o.InstanceIDColumn())
+	builder, err := o.prepareQuery(opts)
+	if err != nil {
+		return nil, err
 	}
-
-	var builder database.StatementBuilder
-	builder.WriteString(queryOrganizationStmt)
-	options.Write(&builder)
-
-	return scanOrganizations(ctx, client, &builder)
+	return scanOrganizations(ctx, client, builder)
 }
-
-const createOrganizationStmt = `INSERT INTO zitadel.organizations (id, name, instance_id, state)` +
-	` VALUES ($1, $2, $3, $4)` +
-	` RETURNING created_at, updated_at`
 
 // Create implements [domain.OrganizationRepository].
 func (o org) Create(ctx context.Context, client database.QueryExecutor, organization *domain.Organization) error {
-	builder := database.StatementBuilder{}
-	builder.AppendArgs(organization.ID, organization.Name, organization.InstanceID, organization.State)
-	builder.WriteString(createOrganizationStmt)
+	builder := database.NewStatementBuilder(`INSERT INTO ` + o.qualifiedTableName() + ` (id, name, instance_id, state, created_at, updated_at) VALUES (`)
+	builder.WriteArgs(organization.ID, organization.Name, organization.InstanceID, organization.State, defaultTimestamp(organization.CreatedAt), defaultTimestamp(organization.UpdatedAt))
+	builder.WriteString(`) RETURNING created_at, updated_at`)
 
-	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&organization.CreatedAt, &organization.UpdatedAt)
+	return client.QueryRow(ctx, builder.String(), builder.Args()...).
+		Scan(&organization.CreatedAt, &organization.UpdatedAt)
 }
 
 // Update implements [domain.OrganizationRepository].
 func (o org) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	if len(changes) == 0 {
-		return 0, database.ErrNoChanges
-	}
-	if !condition.IsRestrictingColumn(o.InstanceIDColumn()) {
-		return 0, database.NewMissingConditionError(o.InstanceIDColumn())
-	}
-	if !database.Changes(changes).IsOnColumn(o.UpdatedAtColumn()) {
-		changes = append(changes, database.NewChange(o.UpdatedAtColumn(), database.NullInstruction))
-	}
-
-	var builder database.StatementBuilder
-	builder.WriteString(`UPDATE zitadel.organizations SET `)
-	database.Changes(changes).Write(&builder)
-	writeCondition(&builder, condition)
-
-	stmt := builder.String()
-
-	rowsAffected, err := client.Exec(ctx, stmt, builder.Args()...)
-	return rowsAffected, err
+	return update(ctx, client, o, condition, changes...)
 }
 
 // Delete implements [domain.OrganizationRepository].
 func (o org) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	if !condition.IsRestrictingColumn(o.InstanceIDColumn()) {
-		return 0, database.NewMissingConditionError(o.InstanceIDColumn())
+	if err := checkRestrictingColumns(condition, o.InstanceIDColumn()); err != nil {
+		return 0, err
 	}
-
-	var builder database.StatementBuilder
-	builder.WriteString(`DELETE FROM zitadel.organizations`)
-	writeCondition(&builder, condition)
-
-	return client.Exec(ctx, builder.String(), builder.Args()...)
+	return delete(ctx, client, o, condition)
 }
 
 // -------------------------------------------------------------
@@ -281,39 +242,28 @@ type rawOrg struct {
 }
 
 func scanOrganization(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Organization, error) {
-	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
+	org, err := get[rawOrg](ctx, querier, builder)
 	if err != nil {
 		return nil, err
 	}
 
-	var org rawOrg
-	if err := rows.(database.CollectableRows).CollectExactlyOneRow(&org); err != nil {
-		return nil, err
-	}
 	org.Organization.Domains = org.Domains
 	org.Organization.Metadata = org.Metadata
-
 	return org.Organization, nil
 }
 
 func scanOrganizations(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.Organization, error) {
-	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
+	orgs, err := list[rawOrg](ctx, querier, builder)
 	if err != nil {
 		return nil, err
 	}
 
-	var orgs []*rawOrg
-	if err := rows.(database.CollectableRows).Collect(&orgs); err != nil {
-		return nil, err
-	}
-
 	result := make([]*domain.Organization, len(orgs))
-	for i, org := range orgs {
-		result[i] = org.Organization
-		result[i].Domains = org.Domains
-		result[i].Metadata = org.Metadata
+	for i := range orgs {
+		result[i] = orgs[i].Organization
+		result[i].Domains = orgs[i].Domains
+		result[i].Metadata = orgs[i].Metadata
 	}
-
 	return result, nil
 }
 
@@ -371,4 +321,27 @@ func (o org) joinMetadata() database.QueryOption {
 		o.metadataRepo.qualifiedTableName(),
 		database.And(columns...),
 	)
+}
+
+// -------------------------------------------------------------
+// helpers
+// -------------------------------------------------------------
+
+const queryOrganizationStmt = `SELECT organizations.id, organizations.name, organizations.instance_id, organizations.state, organizations.created_at, organizations.updated_at` +
+	` , jsonb_agg(json_build_object('instanceId', org_domains.instance_id, 'orgId', org_domains.org_id, 'domain', org_domains.domain, 'isVerified', org_domains.is_verified, 'isPrimary', org_domains.is_primary, 'validationType', org_domains.validation_type, 'createdAt', org_domains.created_at, 'updatedAt', org_domains.updated_at)) FILTER (WHERE org_domains.org_id IS NOT NULL) AS domains` +
+	` , jsonb_agg(json_build_object('instanceId', organization_metadata.instance_id, 'orgId', organization_metadata.organization_id, 'key', organization_metadata.key, 'value', encode(organization_metadata.value, 'base64'), 'createdAt', organization_metadata.created_at, 'updatedAt', organization_metadata.updated_at)) FILTER (WHERE organization_metadata.organization_id IS NOT NULL) AS metadata` +
+	` FROM `
+
+func (o org) prepareQuery(opts []database.QueryOption) (*database.StatementBuilder, error) {
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+	if err := checkRestrictingColumns(options.Condition, o.InstanceIDColumn()); err != nil {
+		return nil, err
+	}
+	builder := database.NewStatementBuilder(queryOrganizationStmt + o.qualifiedTableName())
+	options.Write(builder)
+
+	return builder, nil
 }

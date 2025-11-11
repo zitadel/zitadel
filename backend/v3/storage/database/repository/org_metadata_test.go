@@ -371,7 +371,7 @@ func TestSetOrganizationMetadata_UpdatedAt(t *testing.T) {
 	err := instanceRepo.Create(t.Context(), pool, &instance)
 	require.NoError(t, err)
 	t.Cleanup(func() {
-		_, err := instanceRepo.Delete(context.Background(), pool, instanceID)
+		_, err := instanceRepo.Delete(context.Background(), pool, instanceRepo.PrimaryKeyCondition(instanceID))
 		require.NoError(t, err)
 	})
 
