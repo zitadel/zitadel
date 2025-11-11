@@ -2,6 +2,7 @@ package initialise
 
 import (
 	"context"
+	"database/sql"
 	_ "embed"
 	"fmt"
 
@@ -37,6 +38,17 @@ The user provided by flags needs privileges to
 
 func VerifyUser(username, password string) func(context.Context, *database.DB) error {
 	return func(ctx context.Context, db *database.DB) error {
+		var currentUser string
+		err := db.QueryRowContext(ctx, func(r *sql.Row) error {
+			return r.Scan(&currentUser)
+		}, "SELECT current_user")
+		if err != nil {
+			return fmt.Errorf("unable to get current user: %w", err)
+		}
+		if currentUser == username {
+			logging.WithFields("username", username).Info("config.database.postgres.user.username is same as config.database.postgres.admin.username, skipping create user")
+			return nil
+		}
 		logging.WithFields("username", username).Info("verify user")
 
 		if password != "" {
