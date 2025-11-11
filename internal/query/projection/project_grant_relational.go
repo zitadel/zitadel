@@ -5,7 +5,6 @@ import (
 	"database/sql"
 
 	repoDomain "github.com/zitadel/zitadel/backend/v3/domain"
-	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -53,10 +52,6 @@ func (p *projectGrantRelationalProjection) Reducers() []handler.AggregateReducer
 					Event:  project.GrantRemovedType,
 					Reduce: p.reduceProjectGrantRemoved,
 				},
-				{
-					Event:  project.ProjectRemovedType,
-					Reduce: p.reduceProjectRemoved,
-				},
 			},
 		},
 	}
@@ -98,9 +93,10 @@ func (p *projectGrantRelationalProjection) reduceProjectGrantChanged(event event
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-ANaKzWKAUc", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.ProjectGrantRepository()
-		_, err := repo.SetRoleKeys(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.GrantID),
 			e.RoleKeys,
+			repo.SetUpdatedAt(e.CreationDate()),
 		)
 		return err
 	}), nil
@@ -117,9 +113,10 @@ func (p *projectGrantRelationalProjection) reduceProjectGrantCascadeChanged(even
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-aI2o6NlWpv", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.ProjectGrantRepository()
-		_, err := repo.SetRoleKeys(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.GrantID),
 			e.RoleKeys,
+			repo.SetUpdatedAt(e.CreationDate()),
 		)
 		return err
 	}), nil
@@ -138,6 +135,7 @@ func (p *projectGrantRelationalProjection) reduceProjectGrantDeactivated(event e
 		}
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.GrantID),
+			nil,
 			repo.SetUpdatedAt(e.CreationDate()),
 			repo.SetState(repoDomain.ProjectGrantStateInactive),
 		)
@@ -158,6 +156,7 @@ func (p *projectGrantRelationalProjection) reduceProjectGrantReactivated(event e
 		}
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.GrantID),
+			nil,
 			repo.SetUpdatedAt(e.CreationDate()),
 			repo.SetState(repoDomain.ProjectGrantStateActive),
 		)
@@ -178,27 +177,6 @@ func (p *projectGrantRelationalProjection) reduceProjectGrantRemoved(event event
 		}
 		_, err := repo.Delete(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.GrantID),
-		)
-		return err
-	}), nil
-}
-
-func (p *projectGrantRelationalProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*project.ProjectRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-cG9c3iJONp", "reduce.wrong.event.type %s", project.ProjectRemovedType)
-	}
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
-		repo := repository.ProjectGrantRepository()
-		tx, ok := ex.(*sql.Tx)
-		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-UbYFa8ih8F", "reduce.wrong.db.pool %T", ex)
-		}
-		_, err := repo.Delete(ctx, v3_sql.SQLTx(tx),
-			database.And(
-				repo.InstanceIDCondition(e.Aggregate().InstanceID),
-				repo.ProjectIDCondition(e.Aggregate().ID),
-			),
 		)
 		return err
 	}), nil

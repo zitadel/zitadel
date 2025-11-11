@@ -86,7 +86,7 @@ func (p projectGrant) Create(ctx context.Context, client database.QueryExecutor,
 	return nil
 }
 
-const queryUpdateProjectGrantRoleStmt = `SELECT instance_id, id, project_id, $1::TEXT[] AS keys from zitadel.project_grants`
+const queryUpdateProjectGrantRoleStmt = `SELECT instance_id, id, project_id, $1::text[] as keys from zitadel.project_grants`
 
 const updateProjectGrantRoleStmt = `removed_roles AS (
     DELETE FROM zitadel.project_grant_roles as pgr
@@ -99,27 +99,38 @@ const updateProjectGrantRoleStmt = `removed_roles AS (
 	SELECT instance_id, id, project_id, unnest(pg.keys) FROM pg
 	ON CONFLICT (instance_id, grant_id, key) DO NOTHING
 )
-UPDATE zitadel.project_grants
-SET updated_at = now()
-FROM pg
+UPDATE zitadel.project_grants SET `
+
+const updateProjectGrantRoleStmtWhere = ` FROM pg
 WHERE pg.instance_id = project_grants.instance_id
   AND pg.id = project_grants.id`
 
-func (p projectGrant) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	return updateOne(ctx, client, p, condition, changes...)
-}
+func (p projectGrant) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, roleKeys []string, changes ...database.Change) (int64, error) {
+	// if no role keys set we only have to update the project grant table
+	if roleKeys == nil {
+		return updateOne(ctx, client, p, condition, changes...)
+	}
 
-func (p projectGrant) SetRoleKeys(ctx context.Context, client database.QueryExecutor, condition database.Condition, roleKeys []string) (int64, error) {
+	// if you want to update the roles you have to have the primary key, otherwise multiple project grants get updated
 	if err := checkPKCondition(p, condition); err != nil {
 		return 0, err
 	}
+	if !database.Changes(changes).IsOnColumn(p.UpdatedAtColumn()) {
+		changes = append(changes, database.NewChange(p.UpdatedAtColumn(), database.NullInstruction))
+	}
 
-    // the statement begins with getting the project grant we want to update
-    builder := database.NewStatementBuilder("WITH pg AS (SELECT instance_id, id, project_id, unnest($1::text[]) as key from zitadel.project_grants", roleKeys)
+	// the statement begins with getting the project grant we want to update
+	builder := database.NewStatementBuilder("WITH pg AS (")
+	builder.WriteString(queryUpdateProjectGrantRoleStmt)
+	builder.AppendArg(roleKeys)
 	writeCondition(builder, condition)
-    builder.WriteString(" ), ")
-    // now we add the logic to do the required changes based on the given project grant
-    builder.WriteString(updateProjectGrantRoleStmt)
+	builder.WriteString(" ), ")
+
+	// now we add the logic to do the required changes based on the given project grant
+	builder.WriteString(updateProjectGrantRoleStmt)
+	database.Changes(changes).Write(builder)
+	builder.WriteString(updateProjectGrantRoleStmtWhere)
+
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
@@ -211,6 +222,10 @@ func (p projectGrant) ExistsRoleKey(cond database.Condition) database.Condition 
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
+
+func (p projectGrant) qualifiedTableName() string {
+	return "zitadel." + p.unqualifiedTableName()
+}
 
 func (projectGrant) unqualifiedTableName() string {
 	return "project_grants"

@@ -95,11 +95,8 @@ type ProjectGrantRepository interface {
 	Create(ctx context.Context, client database.QueryExecutor, project *ProjectGrant) error
 	// Update an existing project grant.
 	// The condition must include the instanceID and ID of the project grant to update.
-	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, roleKeys []string, changes ...database.Change) (int64, error)
 	// Delete an existing project grant.
 	// The condition must include the instanceID and ID of the project grant to delete.
 	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
-	// SetRoleKeys of an existing project grant.
-	// The condition must include the instanceID and ID of the project grant to update.
-	SetRoleKeys(ctx context.Context, client database.QueryExecutor, condition database.Condition, roleKeys []string) (int64, error)
 }

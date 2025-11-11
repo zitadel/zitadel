@@ -226,8 +226,11 @@ func TestCreateProjectGrant(t *testing.T) {
 	firstGrantedOrgID := createOrganization(t, tx, instanceID)
 	secondGrantedOrgID := createOrganization(t, tx, instanceID)
 	thirdGrantedOrgID := createOrganization(t, tx, instanceID)
+	fourthGrantedOrgID := createOrganization(t, tx, instanceID)
 	projectID := createProject(t, tx, instanceID, grantingOrgID)
-	roleKey := createProjectRole(t, tx, instanceID, grantingOrgID, projectID, "")
+	firstRoleKey := createProjectRole(t, tx, instanceID, grantingOrgID, projectID, "")
+	secondRoleKey := createProjectRole(t, tx, instanceID, grantingOrgID, projectID, "")
+	thirdRoleKey := createProjectRole(t, tx, instanceID, grantingOrgID, projectID, "")
 	projectGrantRepo := repository.ProjectGrantRepository()
 
 	existingProjectGrant := &domain.ProjectGrant{
@@ -307,7 +310,19 @@ func TestCreateProjectGrant(t *testing.T) {
 				GrantingOrganizationID: grantingOrgID,
 				GrantedOrganizationID:  thirdGrantedOrgID,
 				State:                  domain.ProjectGrantStateActive,
-				RoleKeys:               []string{roleKey},
+				RoleKeys:               []string{firstRoleKey},
+			},
+		},
+		{
+			name: "add project grant with multiple roles",
+			projectGrant: &domain.ProjectGrant{
+				InstanceID:             instanceID,
+				ID:                     integration.ID(),
+				ProjectID:              projectID,
+				GrantingOrganizationID: grantingOrgID,
+				GrantedOrganizationID:  fourthGrantedOrgID,
+				State:                  domain.ProjectGrantStateActive,
+				RoleKeys:               []string{firstRoleKey, secondRoleKey, thirdRoleKey},
 			},
 		},
 	}
@@ -326,8 +341,15 @@ func TestUpdateProjectGrant(t *testing.T) {
 	defer rollback()
 	instanceID := createInstance(t, tx)
 	grantingOrgID := createOrganization(t, tx, instanceID)
-	grantedOrgID := createOrganization(t, tx, instanceID)
+	firstGrantedOrgID := createOrganization(t, tx, instanceID)
+	secondGrantedOrgID := createOrganization(t, tx, instanceID)
+	thirdGrantedOrgID := createOrganization(t, tx, instanceID)
+	fourthGrantedOrgID := createOrganization(t, tx, instanceID)
+	fifthGrantedOrgID := createOrganization(t, tx, instanceID)
 	projectID := createProject(t, tx, instanceID, grantingOrgID)
+	firstRoleKey := createProjectRole(t, tx, instanceID, grantingOrgID, projectID, "")
+	secondRoleKey := createProjectRole(t, tx, instanceID, grantingOrgID, projectID, "")
+	thirdRoleKey := createProjectRole(t, tx, instanceID, grantingOrgID, projectID, "")
 	projectGrantRepo := repository.ProjectGrantRepository()
 
 	existingProjectGrant := &domain.ProjectGrant{
@@ -335,16 +357,64 @@ func TestUpdateProjectGrant(t *testing.T) {
 		ID:                     integration.ID(),
 		ProjectID:              projectID,
 		GrantingOrganizationID: grantingOrgID,
-		GrantedOrganizationID:  grantedOrgID,
+		GrantedOrganizationID:  firstGrantedOrgID,
 		State:                  domain.ProjectGrantStateActive,
 	}
 	err := projectGrantRepo.Create(t.Context(), tx, existingProjectGrant)
 	require.NoError(t, err)
-	lastUpdatedAt := existingProjectGrant.UpdatedAt
+
+	existingProjectGrantWithRole := &domain.ProjectGrant{
+		InstanceID:             instanceID,
+		ID:                     integration.ID(),
+		ProjectID:              projectID,
+		GrantingOrganizationID: grantingOrgID,
+		GrantedOrganizationID:  secondGrantedOrgID,
+		State:                  domain.ProjectGrantStateActive,
+		RoleKeys:               []string{firstRoleKey},
+	}
+	err = projectGrantRepo.Create(t.Context(), tx, existingProjectGrantWithRole)
+	require.NoError(t, err)
+
+	existingProjectGrantWithRoles := &domain.ProjectGrant{
+		InstanceID:             instanceID,
+		ID:                     integration.ID(),
+		ProjectID:              projectID,
+		GrantingOrganizationID: grantingOrgID,
+		GrantedOrganizationID:  thirdGrantedOrgID,
+		State:                  domain.ProjectGrantStateActive,
+		RoleKeys:               []string{firstRoleKey, secondRoleKey, thirdRoleKey},
+	}
+	err = projectGrantRepo.Create(t.Context(), tx, existingProjectGrantWithRoles)
+	require.NoError(t, err)
+
+	existingProjectGrantWithAllRoles := &domain.ProjectGrant{
+		InstanceID:             instanceID,
+		ID:                     integration.ID(),
+		ProjectID:              projectID,
+		GrantingOrganizationID: grantingOrgID,
+		GrantedOrganizationID:  fourthGrantedOrgID,
+		State:                  domain.ProjectGrantStateActive,
+		RoleKeys:               []string{firstRoleKey, secondRoleKey, thirdRoleKey},
+	}
+	err = projectGrantRepo.Create(t.Context(), tx, existingProjectGrantWithAllRoles)
+	require.NoError(t, err)
+
+	existingProjectGrantToRemoveRoles := &domain.ProjectGrant{
+		InstanceID:             instanceID,
+		ID:                     integration.ID(),
+		ProjectID:              projectID,
+		GrantingOrganizationID: grantingOrgID,
+		GrantedOrganizationID:  fifthGrantedOrgID,
+		State:                  domain.ProjectGrantStateActive,
+		RoleKeys:               []string{firstRoleKey, secondRoleKey, thirdRoleKey},
+	}
+	err = projectGrantRepo.Create(t.Context(), tx, existingProjectGrantToRemoveRoles)
+	require.NoError(t, err)
 
 	tests := []struct {
 		name             string
 		condition        database.Condition
+		roleKeys         []string
 		changes          []database.Change
 		wantRowsAffected int64
 		wantErr          error
@@ -377,74 +447,69 @@ func TestUpdateProjectGrant(t *testing.T) {
 				assert.Equal(t, domain.ProjectGrantStateInactive, updatedProject.State)
 			},
 		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			savepoint, rollback := savepointForRollback(t, tx)
-			defer rollback()
-			rowsAffected, err := projectGrantRepo.Update(t.Context(), savepoint, tt.condition, tt.changes...)
-			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
-
-			if tt.assertChanges != nil {
-				updatedProjectGrant, err := projectGrantRepo.Get(t.Context(), savepoint, database.WithCondition(
-					projectGrantRepo.PrimaryKeyCondition(instanceID, existingProjectGrant.ID),
-				))
-				require.NoError(t, err)
-				assert.WithinRange(t, updatedProjectGrant.CreatedAt, existingProjectGrant.CreatedAt, existingProjectGrant.CreatedAt)
-				assert.WithinRange(t, updatedProjectGrant.UpdatedAt, lastUpdatedAt, lastUpdatedAt.Add(time.Second))
-				lastUpdatedAt = updatedProjectGrant.UpdatedAt
-				tt.assertChanges(t, updatedProjectGrant)
-			}
-		})
-	}
-}
-
-func TestSetRolesProjectGrant(t *testing.T) {
-	tx, rollback := transactionForRollback(t)
-	defer rollback()
-	instanceID := createInstance(t, tx)
-	grantingOrgID := createOrganization(t, tx, instanceID)
-	grantedOrgID := createOrganization(t, tx, instanceID)
-	projectID := createProject(t, tx, instanceID, grantingOrgID)
-	roleKey := createProjectRole(t, tx, instanceID, grantingOrgID, projectID, "")
-	projectGrantRepo := repository.ProjectGrantRepository()
-
-	existingProjectGrant := &domain.ProjectGrant{
-		InstanceID:             instanceID,
-		ID:                     integration.ID(),
-		ProjectID:              projectID,
-		GrantingOrganizationID: grantingOrgID,
-		GrantedOrganizationID:  grantedOrgID,
-		State:                  domain.ProjectGrantStateActive,
-	}
-	err := projectGrantRepo.Create(t.Context(), tx, existingProjectGrant)
-	require.NoError(t, err)
-	lastUpdatedAt := existingProjectGrant.UpdatedAt
-
-	tests := []struct {
-		name             string
-		condition        database.Condition
-		roleKeys         []string
-		wantRowsAffected int64
-		wantErr          error
-		assertChanges    func(t *testing.T, project *domain.ProjectGrant)
-	}{
 		{
-			name:             "incomplete condition",
-			condition:        projectGrantRepo.InstanceIDCondition(instanceID),
-			roleKeys:         []string{roleKey},
+			name:      "incomplete condition for set rolekey",
+			condition: projectGrantRepo.InstanceIDCondition(instanceID),
+			roleKeys:  []string{firstRoleKey},
+			changes: []database.Change{
+				projectGrantRepo.SetState(domain.ProjectGrantStateActive),
+			},
 			wantRowsAffected: 0,
 			wantErr:          database.NewMissingConditionError(projectGrantRepo.IDColumn()),
 		},
 		{
 			name:             "set rolekey",
 			condition:        projectGrantRepo.PrimaryKeyCondition(instanceID, existingProjectGrant.ID),
-			roleKeys:         []string{roleKey},
+			roleKeys:         []string{firstRoleKey},
 			wantRowsAffected: 1,
-			assertChanges: func(t *testing.T, updatedProject *domain.ProjectGrant) {
-				assert.Equal(t, []string{roleKey}, updatedProject.RoleKeys)
+			assertChanges: func(t *testing.T, updatedProjectGrant *domain.ProjectGrant) {
+				assert.WithinRange(t, updatedProjectGrant.CreatedAt, existingProjectGrant.CreatedAt, existingProjectGrant.CreatedAt)
+				assert.WithinRange(t, updatedProjectGrant.UpdatedAt, existingProjectGrant.UpdatedAt, existingProjectGrant.UpdatedAt.Add(time.Second))
+				assert.ElementsMatch(t, []string{firstRoleKey}, updatedProjectGrant.RoleKeys)
+			},
+		},
+		{
+			name:             "add rolekeys",
+			condition:        projectGrantRepo.PrimaryKeyCondition(instanceID, existingProjectGrantWithRole.ID),
+			roleKeys:         []string{firstRoleKey, secondRoleKey, thirdRoleKey},
+			wantRowsAffected: 1,
+			assertChanges: func(t *testing.T, updatedProjectGrant *domain.ProjectGrant) {
+				assert.WithinRange(t, updatedProjectGrant.CreatedAt, existingProjectGrantWithRole.CreatedAt, existingProjectGrantWithRole.CreatedAt)
+				assert.WithinRange(t, updatedProjectGrant.UpdatedAt, existingProjectGrantWithRole.UpdatedAt, existingProjectGrantWithRole.UpdatedAt.Add(time.Second))
+				assert.ElementsMatch(t, []string{firstRoleKey, secondRoleKey, thirdRoleKey}, updatedProjectGrant.RoleKeys)
+			},
+		},
+		{
+			name:             "remove rolekeys",
+			condition:        projectGrantRepo.PrimaryKeyCondition(instanceID, existingProjectGrantWithRoles.ID),
+			roleKeys:         []string{firstRoleKey},
+			wantRowsAffected: 1,
+			assertChanges: func(t *testing.T, updatedProjectGrant *domain.ProjectGrant) {
+				assert.WithinRange(t, updatedProjectGrant.CreatedAt, existingProjectGrantWithRoles.CreatedAt, existingProjectGrantWithRoles.CreatedAt)
+				assert.WithinRange(t, updatedProjectGrant.UpdatedAt, existingProjectGrantWithRoles.UpdatedAt, existingProjectGrantWithRoles.UpdatedAt.Add(time.Second))
+				assert.ElementsMatch(t, []string{firstRoleKey}, updatedProjectGrant.RoleKeys)
+			},
+		},
+		{
+			name:             "remove all rolekeys",
+			condition:        projectGrantRepo.PrimaryKeyCondition(instanceID, existingProjectGrantToRemoveRoles.ID),
+			roleKeys:         []string{},
+			wantRowsAffected: 1,
+			assertChanges: func(t *testing.T, updatedProjectGrant *domain.ProjectGrant) {
+				assert.WithinRange(t, updatedProjectGrant.CreatedAt, existingProjectGrantToRemoveRoles.CreatedAt, existingProjectGrantToRemoveRoles.CreatedAt)
+				assert.WithinRange(t, updatedProjectGrant.UpdatedAt, existingProjectGrantToRemoveRoles.UpdatedAt, existingProjectGrantToRemoveRoles.UpdatedAt.Add(time.Second))
+				assert.ElementsMatch(t, []string{}, updatedProjectGrant.RoleKeys)
+			},
+		},
+		{
+			name:             "no changes role keys",
+			condition:        projectGrantRepo.PrimaryKeyCondition(instanceID, existingProjectGrantWithAllRoles.ID),
+			roleKeys:         []string{firstRoleKey, secondRoleKey, thirdRoleKey},
+			wantRowsAffected: 1,
+			assertChanges: func(t *testing.T, updatedProjectGrant *domain.ProjectGrant) {
+				assert.WithinRange(t, updatedProjectGrant.CreatedAt, existingProjectGrantWithAllRoles.CreatedAt, existingProjectGrantWithAllRoles.CreatedAt)
+				assert.WithinRange(t, updatedProjectGrant.UpdatedAt, existingProjectGrantWithAllRoles.UpdatedAt, existingProjectGrantWithAllRoles.UpdatedAt.Add(time.Second))
+				assert.ElementsMatch(t, []string{firstRoleKey, secondRoleKey, thirdRoleKey}, updatedProjectGrant.RoleKeys)
 			},
 		},
 	}
@@ -453,18 +518,13 @@ func TestSetRolesProjectGrant(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			savepoint, rollback := savepointForRollback(t, tx)
 			defer rollback()
-			rowsAffected, err := projectGrantRepo.SetRoleKeys(t.Context(), savepoint, tt.condition, tt.roleKeys)
+			rowsAffected, err := projectGrantRepo.Update(t.Context(), savepoint, tt.condition, tt.roleKeys, tt.changes...)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
 
 			if tt.assertChanges != nil {
-				updatedProjectGrant, err := projectGrantRepo.Get(t.Context(), savepoint, database.WithCondition(
-					projectGrantRepo.PrimaryKeyCondition(instanceID, existingProjectGrant.ID),
-				))
+				updatedProjectGrant, err := projectGrantRepo.Get(t.Context(), savepoint, database.WithCondition(tt.condition))
 				require.NoError(t, err)
-				assert.WithinRange(t, updatedProjectGrant.CreatedAt, existingProjectGrant.CreatedAt, existingProjectGrant.CreatedAt)
-				assert.WithinRange(t, updatedProjectGrant.UpdatedAt, lastUpdatedAt, lastUpdatedAt.Add(time.Second))
-				lastUpdatedAt = updatedProjectGrant.UpdatedAt
 				tt.assertChanges(t, updatedProjectGrant)
 			}
 		})

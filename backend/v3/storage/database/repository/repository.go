@@ -69,7 +69,7 @@ func getMany[Target any](ctx context.Context, querier database.Querier, builder 
 type updatable interface {
 	PrimaryKeyColumns() []database.Column
 	UpdatedAtColumn() database.Column
-	unqualifiedTableName() string
+	qualifiedTableName() string
 }
 
 func updateOne[Target updatable](ctx context.Context, client database.QueryExecutor, target Target, condition database.Condition, changes ...database.Change) (int64, error) {
@@ -83,8 +83,8 @@ func updateOne[Target updatable](ctx context.Context, client database.QueryExecu
 		changes = append(changes, database.NewChange(target.UpdatedAtColumn(), database.NullInstruction))
 	}
 	builder := database.NewStatementBuilder("UPDATE ")
-    builder.WriteString(target.qualifiedTableName())
-    builder.WriteString(" SET ")
+	builder.WriteString(target.qualifiedTableName())
+	builder.WriteString(" SET ")
 	database.Changes(changes).Write(builder)
 	writeCondition(builder, condition)
 
@@ -93,7 +93,7 @@ func updateOne[Target updatable](ctx context.Context, client database.QueryExecu
 
 type deletable interface {
 	PrimaryKeyColumns() []database.Column
-	unqualifiedTableName() string
+	qualifiedTableName() string
 }
 
 func deleteOne[Target deletable](ctx context.Context, client database.QueryExecutor, target Target, condition database.Condition) (int64, error) {
@@ -102,8 +102,8 @@ func deleteOne[Target deletable](ctx context.Context, client database.QueryExecu
 	}
 
 	builder := database.NewStatementBuilder("DELETE FROM ")
-    builder.WriteString(target.qualifiedTableName())
-    builder.WriteRune(' ')
+	builder.WriteString(target.qualifiedTableName())
+	builder.WriteRune(' ')
 	writeCondition(builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)

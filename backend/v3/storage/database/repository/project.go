@@ -140,6 +140,10 @@ func (p project) StateCondition(state domain.ProjectState) database.Condition {
 // columns
 // -------------------------------------------------------------
 
+func (p project) qualifiedTableName() string {
+	return "zitadel." + p.unqualifiedTableName()
+}
+
 func (project) unqualifiedTableName() string {
 	return "projects"
 }
