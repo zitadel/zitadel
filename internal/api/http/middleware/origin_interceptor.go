@@ -1,11 +1,15 @@
 package middleware
 
 import (
+	"errors"
+	"net"
 	"net/http"
 	"slices"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/muhlemmer/httpforwarded"
+	"github.com/zitadel/logging"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
@@ -16,7 +20,7 @@ func WithOrigin(enforceHttps bool, http1Header, http2Header string, instanceHost
 			origin := composeDomainContext(
 				r,
 				enforceHttps,
-				// to make sure we don't break existing configurations we append the existing checked headers as well
+				// to make sure we don't break existing configurations, we append the existing checked headers as well
 				slices.Compact(append(instanceHostHeaders, http1Header, http2Header, http_util.Forwarded, http_util.ZitadelForwarded, http_util.ForwardedFor, http_util.ForwardedHost, http_util.ForwardedProto)),
 				publicDomainHeaders,
 			)
@@ -25,17 +29,13 @@ func WithOrigin(enforceHttps bool, http1Header, http2Header string, instanceHost
 	}
 }
 
-func composeDomainContext(r *http.Request, enforceHttps bool, instanceDomainHeaders, publicDomainHeaders []string) *http_util.DomainCtx {
+func composeDomainContext(r *http.Request, enforceHttps bool, instanceDomainHeaders, publicDomainHeaders []string) (_ *http_util.DomainCtx) {
 	instanceHost, instanceProto := hostFromRequest(r, instanceDomainHeaders)
 	publicHost, publicProto := hostFromRequest(r, publicDomainHeaders)
 	if instanceHost == "" {
 		instanceHost = r.Host
 	}
-	return &http_util.DomainCtx{
-		InstanceHost: instanceHost,
-		Protocol:     protocolFromRequest(instanceProto, publicProto, enforceHttps),
-		PublicHost:   publicHost,
-	}
+	return http_util.NewDomainCtx(instanceHost, publicHost, protocolFromRequest(instanceProto, publicProto, enforceHttps))
 }
 
 func protocolFromRequest(instanceProto, publicProto string, enforceHttps bool) string {
@@ -67,13 +67,42 @@ func hostFromRequest(r *http.Request, headers []string) (host, proto string) {
 			hostFromHeader = r.Header.Get(header)
 		}
 		if host == "" {
-			host = hostFromHeader
+			host = sanitizeHost(hostFromHeader)
 		}
 		if proto == "" && (protoFromHeader == "http" || protoFromHeader == "https") {
 			proto = protoFromHeader
 		}
 	}
 	return host, proto
+}
+
+func sanitizeHost(rawHost string) (host string) {
+	if rawHost == "" {
+		return ""
+	}
+	host, port, err := net.SplitHostPort(rawHost)
+	if err != nil {
+		// if the error is about a missing port, the host is probably just "example.com", so we can return it
+		if isMissingPortError(err) {
+			return rawHost
+		}
+		// if the error is about something else, the host is probably invalid, so we log it and return an empty string
+		logging.WithFields("host", rawHost).Warning("invalid host header, ignoring header")
+		return ""
+	}
+	// if the port is not numeric, the host was probably something like "localhost:@attacker.com"
+	portNumber, err := strconv.Atoi(port)
+	if err != nil || portNumber < 1 || portNumber > 65535 {
+		logging.WithFields("host", rawHost).Warning("invalid port in host header, ignoring header")
+		return ""
+	}
+	// if we reach this point, the host contains a valid port, so we return the complete host
+	return rawHost
+}
+
+func isMissingPortError(err error) bool {
+	var addrErr *net.AddrError
+	return errors.As(err, &addrErr) && (addrErr.Err == "missing port in address")
 }
 
 func hostFromForwarded(values []string) (string, string) {

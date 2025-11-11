@@ -293,7 +293,7 @@ service AdminService {
 
     // Get My Instance
     //
-    // Deprecated: use [instance service v2 GetInstance](apis/resources/instance_service_v2/zitadel-instance-v-2-beta-instance-service-get-instance.api.mdx) instead.
+    // Deprecated: use [instance service v2 GetInstance](apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-get-instance.api.mdx) instead.
     //
     // Returns the details about the current instance such as the name, version, domains, etc.
     rpc GetMyInstance(GetMyInstanceRequest) returns (GetMyInstanceResponse) {
@@ -313,7 +313,7 @@ service AdminService {
 
     // List Instance Domains
     //
-    // Deprecated: use [instance service v2 GetInstance](apis/resources/instance_service_v2/zitadel-instance-v-2-beta-instance-service-get-instance.api.mdx) instead.
+    // Deprecated: use [instance service v2 GetInstance](apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-get-instance.api.mdx) instead.
     //
     // Returns a list of domains that are configured for this ZITADEL instance. These domains are the URLs where ZITADEL is running.
     rpc ListInstanceDomains(ListInstanceDomainsRequest) returns (ListInstanceDomainsResponse) {
@@ -333,7 +333,7 @@ service AdminService {
 
     // List Instance Trusted Domains
     //
-    // Deprecated: use [instance service v2 ListTrustedDomains](apis/resources/instance_service_v2/zitadel-instance-v-2-beta-instance-service-list-trusted-domains.api.mdx) instead.
+    // Deprecated: use [instance service v2 ListTrustedDomains](apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-list-trusted-domains.api.mdx) instead.
     //
     // Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts.
     rpc ListInstanceTrustedDomains(ListInstanceTrustedDomainsRequest) returns (ListInstanceTrustedDomainsResponse) {
@@ -353,7 +353,7 @@ service AdminService {
 
     // Add an Instance Trusted Domain
     //
-    // Deprecated: use [instance service v2 ListTrustedDomains](apis/resources/instance_service_v2/zitadel-instance-v-2-beta-instance-service-add-trusted-domain.api.mdx) instead.
+    // Deprecated: use [instance service v2 ListTrustedDomains](apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-add-trusted-domain.api.mdx) instead.
     //
     // Add a domain to the list configured for this ZITADEL instance. These domains are trusted to be used as public hosts.
     rpc AddInstanceTrustedDomain(AddInstanceTrustedDomainRequest) returns (AddInstanceTrustedDomainResponse) {
@@ -374,7 +374,7 @@ service AdminService {
 
     // Remove an Instance Trusted Domain
     //
-    // Deprecated: use [instance service v2 ListTrustedDomains](apis/resources/instance_service_v2/zitadel-instance-v-2-beta-instance-service-remove-trusted-domain.api.mdx) instead.
+    // Deprecated: use [instance service v2 ListTrustedDomains](apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-remove-trusted-domain.api.mdx) instead.
     //
     // Removes a domain from the list configured for this ZITADEL instance. These domains are trusted to be used as public hosts.
     rpc RemoveInstanceTrustedDomain(RemoveInstanceTrustedDomainRequest) returns (RemoveInstanceTrustedDomainResponse) {
@@ -3376,6 +3376,9 @@ service AdminService {
     rpc GetDefaultPasswordResetMessageText(GetDefaultPasswordResetMessageTextRequest) returns (GetDefaultPasswordResetMessageTextResponse) {
         option (google.api.http) = {
             get: "/text/deafult/message/passwordreset/{language}";
+            additional_bindings {
+              get: "/text/default/message/passwordreset/{language}";
+            };
         };
 
         option (zitadel.v1.auth_option) = {

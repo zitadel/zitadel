@@ -1,0 +1,86 @@
+---
+title: Astro
+sidebar_label: Astro
+framework_url: https://astro.build
+auth_library: "@auth/core"
+auth_library_url: https://www.npmjs.com/package/@auth/core
+example_repo: https://github.com/zitadel/example-auth-astro
+auth_flow: pkce
+status: stable
+---
+
+## Overview
+
+[Astro](https://astro.build) is a modern web framework that delivers lightning-fast performance with server-first architecture and seamless client-side hydration. This example demonstrates how to integrate **[Zitadel](https://zitadel.com/docs)** authentication using the **[OAuth 2.0 PKCE flow](/docs/concepts/pkce)** to secure your Astro application with professional identity management.
+
+#### Auth library
+
+This example uses **[Auth.js](https://authjs.dev)** (specifically the **[@auth/core](https://www.npmjs.com/package/@auth/core)** package and **[auth-astro](https://www.npmjs.com/package/auth-astro)** adapter), a comprehensive authentication library that implements the [OpenID Connect](https://openid.net/connect/) protocol. Auth.js handles [PKCE](/docs/concepts/pkce) code generation and verification, [token exchange](https://zitadel.com/docs/apis/openidoauth/endpoints), [session management](https://zitadel.com/docs/concepts/sessions), and automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) to maintain long-lived user sessions.
+
+---
+
+## What this example demonstrates
+
+This Astro application showcases a complete authentication workflow with [Zitadel](https://zitadel.com/docs) using [Auth.js](https://authjs.dev). Users start on a public landing page and click a login button to authenticate through Zitadel's [authorization endpoint](https://zitadel.com/docs/apis/openidoauth/endpoints) using the secure [PKCE flow](/docs/concepts/pkce). After successful authentication, users are redirected to a protected profile page displaying their [user information and claims](https://zitadel.com/docs/apis/openidoauth/claims) retrieved from the [ID token](https://zitadel.com/docs/concepts/tokens).
+
+The example implements [server-side session management](https://zitadel.com/docs/concepts/sessions) with encrypted [JWT tokens](https://zitadel.com/docs/concepts/tokens), ensuring secure authentication state across Astro's [server-rendered pages](https://docs.astro.build/en/core-concepts/astro-pages/). Protected routes automatically redirect unauthenticated users to the login flow using [Astro's middleware](https://docs.astro.build/en/guides/middleware/), preventing unauthorized access to sensitive areas.
+
+The application includes complete [logout functionality](https://zitadel.com/docs/guides/integrate/login/oidc/logout) that performs [federated single sign-out](https://zitadel.com/docs/guides/integrate/login/oidc/logout), terminating both the local session and the remote Zitadel session through the [end-session endpoint](https://zitadel.com/docs/apis/openidoauth/endpoints). It demonstrates [token refresh](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) capabilities using [refresh tokens](https://zitadel.com/docs/concepts/tokens) with the `offline_access` [scope](https://zitadel.com/docs/apis/openidoauth/scopes), allowing users to maintain authenticated sessions without repeated logins. The example also shows how to request additional [OIDC scopes](https://zitadel.com/docs/apis/openidoauth/scopes) like `profile`, `email`, and Zitadel-specific scopes for [user metadata](https://zitadel.com/docs/guides/manage/customize/user-metadata), [organization information](https://zitadel.com/docs/guides/manage/organizations/), and [role assignments](https://zitadel.com/docs/guides/manage/console/roles).
+
+---
+
+## Getting started
+
+### Prerequisites
+
+Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the **[PKCE Application Setup guide](/docs/guides/integrate/login/oidc/pkce-setup)** to:
+
+1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects)
+2. Configure it to use the [PKCE authentication method](/docs/concepts/pkce)
+3. Set up your redirect URIs (e.g., `http://localhost:4321/api/auth/callback` for development)
+4. Configure post-logout redirect URIs (e.g., `http://localhost:4321/api/auth/logout/callback`)
+5. Copy your **Client ID** from the application details
+
+> **Note:** Make sure to enable **Dev Mode** in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview) if you're using HTTP URLs during local development. For production deployments, always use HTTPS URLs and disable Dev Mode.
+
+### Run the example
+
+Once you have your [Zitadel application configured](https://zitadel.com/docs/guides/integrate/login/oidc/):
+
+1. Clone the [repository](https://github.com/zitadel/example-auth-astro).
+2. Create a `.env` file based on `.env.example` and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/overview). Use these environment variable names exactly as shown:
+   ```
+   PORT=4321
+   SESSION_DURATION=3600
+   SESSION_SECRET=your-very-secret-and-strong-session-key
+   ZITADEL_DOMAIN=https://your-zitadel-instance.zitadel.cloud
+   ZITADEL_CLIENT_ID=your_client_id_from_console
+   ZITADEL_CLIENT_SECRET=your-randomly-generated-client-secret
+   ZITADEL_CALLBACK_URL=http://localhost:4321/auth/callback
+   ZITADEL_POST_LOGOUT_URL=http://localhost:4321/api/auth/logout/callback
+   AUTH_TRUST_HOST=true
+   NEXTAUTH_URL=http://localhost:4321
+   ```
+   Replace these values with:
+	- Your actual [Zitadel instance URL](https://zitadel.com/docs/guides/manage/console/instance-settings) (the **ZITADEL_DOMAIN**)
+	- The **Client ID** you copied when creating the application
+	- A randomly generated **SESSION_SECRET** using: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+	- A randomly generated **ZITADEL_CLIENT_SECRET** (required by Auth.js even though PKCE doesn't require it)
+	- The **redirect URIs** you configured in the PKCE setup (must match exactly)
+3. Install dependencies using [npm](https://www.npmjs.com) by running `npm install`, then start the development server with `npm run dev` to verify the authentication flow end-to-end at `http://localhost:4321`.
+
+---
+
+## Learn more and resources
+
+* **Zitadel documentation:** [https://zitadel.com/docs](https://zitadel.com/docs)
+* **PKCE concept:** [/docs/concepts/pkce](/docs/concepts/pkce)
+* **PKCE application setup:** [/docs/guides/integrate/login/oidc/pkce-setup](/docs/guides/integrate/login/oidc/pkce-setup)
+* **Federated logout:** [https://zitadel.com/docs/guides/integrate/login/oidc/logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
+* **OIDC integration guide:** [https://zitadel.com/docs/guides/integrate/login/oidc/](https://zitadel.com/docs/guides/integrate/login/oidc/)
+* **Astro documentation:** [https://astro.build](https://astro.build)
+* **Auth.js documentation:** [https://authjs.dev](https://authjs.dev)
+* **@auth/core package:** [https://www.npmjs.com/package/@auth/core](https://www.npmjs.com/package/@auth/core)
+* **auth-astro adapter:** [https://www.npmjs.com/package/auth-astro](https://www.npmjs.com/package/auth-astro)
+* **Example repository:** [https://github.com/zitadel/example-auth-astro](https://github.com/zitadel/example-auth-astro)
+* **All framework examples:** [/docs/examples](/docs/examples)
