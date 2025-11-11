@@ -113,6 +113,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
+// This service is intended to manage organizations in a ZITADEL instance.
 service OrganizationService {
 
   // Add Organization
