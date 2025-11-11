@@ -145,24 +145,12 @@ export async function getLockoutSettings({ serviceUrl, orgId }: { serviceUrl: st
   )();
 }
 
-async function getPasswordExpirySettingsImpl(serviceUrl: string, orgId?: string) {
+export async function getPasswordExpirySettings({ serviceUrl, orgId }: { serviceUrl: string; orgId?: string }) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
   return settingsService
     .getPasswordExpirySettings({ ctx: makeReqCtx(orgId) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
-}
-
-export async function getPasswordExpirySettings({ serviceUrl, orgId }: { serviceUrl: string; orgId?: string }) {
-  if (!useCache) {
-    return getPasswordExpirySettingsImpl(serviceUrl, orgId);
-  }
-
-  return unstable_cache(
-    async () => getPasswordExpirySettingsImpl(serviceUrl, orgId),
-    ["password-expiry-settings", serviceUrl, orgId || "default"],
-    { revalidate: 3600 },
-  )();
 }
 
 export async function listIDPLinks({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
@@ -225,14 +213,6 @@ export async function getLegalAndSupportSettings({ serviceUrl, orgId }: { servic
   )();
 }
 
-async function getPasswordComplexitySettingsImpl(serviceUrl: string, organization?: string) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
-
-  return settingsService
-    .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
-    .then((resp) => (resp.settings ? resp.settings : undefined));
-}
-
 export async function getPasswordComplexitySettings({
   serviceUrl,
   organization,
@@ -240,15 +220,11 @@ export async function getPasswordComplexitySettings({
   serviceUrl: string;
   organization?: string;
 }) {
-  if (!useCache) {
-    return getPasswordComplexitySettingsImpl(serviceUrl, organization);
-  }
+  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
-  return unstable_cache(
-    async () => getPasswordComplexitySettingsImpl(serviceUrl, organization),
-    ["password-complexity-settings", serviceUrl, organization || "default"],
-    { revalidate: 3600 },
-  )();
+  return settingsService
+    .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
+    .then((resp) => (resp.settings ? resp.settings : undefined));
 }
 
 export async function createSessionFromChecks({
