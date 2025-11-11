@@ -81,24 +81,12 @@ export async function getHostedLoginTranslation({
   )();
 }
 
-async function getBrandingSettingsImpl(serviceUrl: string, organization?: string) {
+export async function getBrandingSettings({ serviceUrl, organization }: { serviceUrl: string; organization?: string }) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
   return settingsService
     .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
-}
-
-export async function getBrandingSettings({ serviceUrl, organization }: { serviceUrl: string; organization?: string }) {
-  if (!useCache) {
-    return getBrandingSettingsImpl(serviceUrl, organization);
-  }
-
-  return unstable_cache(
-    async () => getBrandingSettingsImpl(serviceUrl, organization),
-    ["branding-settings", serviceUrl, organization || "default"],
-    { revalidate: 3600 },
-  )();
 }
 
 export async function getLoginSettings({ serviceUrl, organization }: { serviceUrl: string; organization?: string }) {
@@ -109,40 +97,18 @@ export async function getLoginSettings({ serviceUrl, organization }: { serviceUr
     .then((resp) => (resp.settings ? resp.settings : undefined));
 }
 
-async function getSecuritySettingsImpl(serviceUrl: string) {
+export async function getSecuritySettings({ serviceUrl }: { serviceUrl: string }) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
   return settingsService.getSecuritySettings({}).then((resp) => (resp.settings ? resp.settings : undefined));
 }
 
-export async function getSecuritySettings({ serviceUrl }: { serviceUrl: string }) {
-  if (!useCache) {
-    return getSecuritySettingsImpl(serviceUrl);
-  }
-
-  return unstable_cache(async () => getSecuritySettingsImpl(serviceUrl), ["security-settings", serviceUrl], {
-    revalidate: 3600,
-  })();
-}
-
-async function getLockoutSettingsImpl(serviceUrl: string, orgId?: string) {
+export async function getLockoutSettings({ serviceUrl, orgId }: { serviceUrl: string; orgId?: string }) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
   return settingsService
     .getLockoutSettings({ ctx: makeReqCtx(orgId) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
-}
-
-export async function getLockoutSettings({ serviceUrl, orgId }: { serviceUrl: string; orgId?: string }) {
-  if (!useCache) {
-    return getLockoutSettingsImpl(serviceUrl, orgId);
-  }
-
-  return unstable_cache(
-    async () => getLockoutSettingsImpl(serviceUrl, orgId),
-    ["lockout-settings", serviceUrl, orgId || "default"],
-    { revalidate: 3600 },
-  )();
 }
 
 export async function getPasswordExpirySettings({ serviceUrl, orgId }: { serviceUrl: string; orgId?: string }) {
@@ -193,24 +159,12 @@ export async function getGeneralSettings({ serviceUrl }: { serviceUrl: string })
   })();
 }
 
-async function getLegalAndSupportSettingsImpl(serviceUrl: string, orgId?: string) {
+export async function getLegalAndSupportSettings({ serviceUrl, orgId }: { serviceUrl: string; orgId?: string }) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
   return settingsService
     .getLegalAndSupportSettings({ ctx: makeReqCtx(orgId) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
-}
-
-export async function getLegalAndSupportSettings({ serviceUrl, orgId }: { serviceUrl: string; orgId?: string }) {
-  if (!useCache) {
-    return getLegalAndSupportSettingsImpl(serviceUrl, orgId);
-  }
-
-  return unstable_cache(
-    async () => getLegalAndSupportSettingsImpl(serviceUrl, orgId),
-    ["legal-support-settings", serviceUrl, orgId || "default"],
-    { revalidate: 3600 },
-  )();
 }
 
 export async function getPasswordComplexitySettings({
