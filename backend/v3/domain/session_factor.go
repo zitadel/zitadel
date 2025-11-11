@@ -14,8 +14,8 @@ const (
 	SessionFactorTypeUnknown SessionFactorType = iota
 	SessionFactorTypeUser
 	SessionFactorTypePassword
-	SessionFactorTypePasskey
-	SessionFactorTypeIDPIntent
+	SessionFactorTypePasskey // formerly known as WebAuthn
+	SessionFactorTypeIdentityProviderIntent
 	SessionFactorTypeTOTP
 	SessionFactorTypeOTPSMS
 	SessionFactorTypeOTPEmail
@@ -37,6 +37,7 @@ func (s *SessionFactorUser) sessionFactorType() SessionFactorType {
 
 type SessionFactorPassword struct {
 	LastVerifiedAt time.Time
+	LastFailedAt   time.Time
 }
 
 // sessionFactorType implements [SessionFactor].
@@ -44,13 +45,13 @@ func (s *SessionFactorPassword) sessionFactorType() SessionFactorType {
 	return SessionFactorTypePassword
 }
 
-type SessionFactorIDPIntent struct {
+type SessionFactorIdentityProviderIntent struct {
 	LastVerifiedAt time.Time
 }
 
 // sessionFactorType implements [SessionFactor].
-func (s *SessionFactorIDPIntent) sessionFactorType() SessionFactorType {
-	return SessionFactorTypeIDPIntent
+func (s *SessionFactorIdentityProviderIntent) sessionFactorType() SessionFactorType {
+	return SessionFactorTypeIdentityProviderIntent
 }
 
 type SessionFactorPasskey struct {
@@ -65,6 +66,7 @@ func (s *SessionFactorPasskey) sessionFactorType() SessionFactorType {
 
 type SessionFactorTOTP struct {
 	LastVerifiedAt time.Time
+	LastFailedAt   time.Time
 }
 
 // sessionFactorType implements [SessionFactor].
@@ -74,6 +76,7 @@ func (s *SessionFactorTOTP) sessionFactorType() SessionFactorType {
 
 type SessionFactorOTPSMS struct {
 	LastVerifiedAt time.Time
+	LastFailedAt   time.Time
 }
 
 // sessionFactorType implements [SessionFactor].
@@ -83,6 +86,7 @@ func (s *SessionFactorOTPSMS) sessionFactorType() SessionFactorType {
 
 type SessionFactorOTPEmail struct {
 	LastVerifiedAt time.Time
+	LastFailedAt   time.Time
 }
 
 // sessionFactorType implements [SessionFactor].
@@ -105,8 +109,8 @@ func (s SessionFactors) GetPasswordFactor() *SessionFactorPassword {
 }
 
 // GetIDPIntentFactor returns the IDP Intent factor from the factors.
-func (s SessionFactors) GetIDPIntentFactor() *SessionFactorIDPIntent {
-	factor, _ := GetFactor[*SessionFactorIDPIntent](s)
+func (s SessionFactors) GetIDPIntentFactor() *SessionFactorIdentityProviderIntent {
+	factor, _ := GetFactor[*SessionFactorIdentityProviderIntent](s)
 	return factor
 }
 

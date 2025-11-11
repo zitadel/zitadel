@@ -12,7 +12,7 @@ type Session struct {
 	ID         string            `json:"id,omitempty" db:"id"`
 	Token      string            `json:"token,omitempty" db:"token"`
 	Lifetime   time.Duration     `json:"lifetime,omitempty" db:"lifetime"`
-	Expiration time.Time         `json:"expiration,omitempty" db:"expiration"`
+	Expiration time.Time         `json:"expiration,omitzero" db:"expiration"`
 	UserID     string            `json:"user_id,omitempty" db:"user_id"`
 	CreatedAt  time.Time         `json:"created_at,omitzero" db:"created_at"`
 	UpdatedAt  time.Time         `json:"updated_at,omitzero" db:"updated_at"`
@@ -21,6 +21,8 @@ type Session struct {
 	Metadata   []SessionMetadata `json:"metadata,omitempty"`
 	UserAgent  *SessionUserAgent `json:"user_agent,omitempty"`
 }
+
+//go:generate mockgen -typed -package domainmock -destination ./mock/session.mock.go . SessionRepository
 
 type SessionRepository interface {
 	Repository
@@ -50,16 +52,12 @@ type sessionColumns interface {
 	IDColumn() database.Column
 	// TokenColumn returns the column for the token field.
 	TokenColumn() database.Column
-	// UserAgentIDColumn returns the column for the user agent id field.
-	UserAgentIDColumn() database.Column
 	// LifetimeColumn returns the column for the lifetime field.
 	LifetimeColumn() database.Column
 	// ExpirationColumn returns the column for the expiration field.
 	ExpirationColumn() database.Column
 	// UserIDColumn returns the column for the user id field.
 	UserIDColumn() database.Column
-	// IdentityProviderIDColumn returns the column for the identity provider ID field.
-	IdentityProviderIDColumn() database.Column
 	// CreatedAtColumn returns the column for the created at field.
 	CreatedAtColumn() database.Column
 	// UpdatedAtColumn returns the column for the updated at field.
@@ -108,11 +106,11 @@ type sessionChanges interface {
 	// SetLifetime sets the lifetime field of the session and will update the computed expiration field.
 	SetLifetime(lifetime time.Duration) database.Change
 
-	//SetChallenge adds or updates the challenge of the corresponding type.
+	// SetChallenge adds or updates the challenge of the corresponding type.
 	SetChallenge(challenge SessionChallenge) database.Change
-	//SetFactor adds or updates the factor of the corresponding type.
+	// SetFactor adds or updates the factor of the corresponding type.
 	SetFactor(factor SessionFactor) database.Change
-	//ClearFactor resets the factor of the corresponding type.
+	// ClearFactor resets the factor of the corresponding type.
 	ClearFactor(factor SessionFactorType) database.Change
 	// SetMetadata adds or updates the metadata of the session.
 	SetMetadata(metadata []SessionMetadata) database.Change
