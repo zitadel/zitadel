@@ -150,18 +150,9 @@ importers:
       autoprefixer:
         specifier: 10.4.21
         version: 10.4.21(postcss@8.5.3)
-      concurrently:
-        specifier: ^9.1.2
-        version: 9.2.1
       cypress:
         specifier: ^14.5.4
         version: 14.5.4
-      dotenv-cli:
-        specifier: ^8.0.0
-        version: 8.0.0
-      env-cmd:
-        specifier: ^10.1.0
-        version: 10.1.0
       eslint:
         specifier: ^8.57.0
         version: 8.57.1
@@ -6999,11 +6990,6 @@ packages:
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
-  concurrently@9.2.1:
-    resolution: {integrity: sha512-fsfrO0MxV64Znoy8/l1vVIjjHa29SZyyqPgQBwhiDcaW8wJc2W3XWVOGx4M3oJBnv/zdUZIIp1gDeS98GzP8Ng==}
-    engines: {node: '>=18'}
-    hasBin: true
-
   confbox@0.1.8:
     resolution: {integrity: sha512-RMtmw0iFkeR4YV+fUOSucriAQNb9g8zFR52MWCtl+cCZOFRNL6zeB395vPzFhEjjn4fMxXudmELnl/KF/WrK6w==}
 
@@ -7764,14 +7750,6 @@ packages:
     resolution: {integrity: sha512-1gxPBJpI/pcjQhKgIU91II6Wkay+dLcN3M6rf2uwP8hRur3HtQXjVrdAK3sjC0piaEuxzMwjXChcETiJl47lAQ==}
     engines: {node: '>=18'}
 
-  dotenv-cli@8.0.0:
-    resolution: {integrity: sha512-aLqYbK7xKOiTMIRf1lDPbI+Y+Ip/wo5k3eyp6ePysVaSqbyxjyK3dK35BTxG+rmd7djf5q2UPs4noPNH+cj0Qw==}
-    hasBin: true
-
-  dotenv-expand@10.0.0:
-    resolution: {integrity: sha512-GopVGCpVS1UKH75VKHGuQFqS1Gusej0z4FyQkPdwjil2gNIv+LNsqBlboOzpJFZKVT95GkCyWJbBSdFEFUWI2A==}
-    engines: {node: '>=12'}
-
   dotenv-expand@11.0.7:
     resolution: {integrity: sha512-zIHwmZPRshsCdpMDyVsqGmgyP0yT8GAgXUnkdAoJisxvf33k7yO6OuoKmcTGuXPWSsm8Oh88nZicRLA9Y0rUeA==}
     engines: {node: '>=12'}
@@ -7876,11 +7854,6 @@ packages:
   entities@6.0.1:
     resolution: {integrity: sha512-aN97NXWF6AWBTahfVOIrB/NShkzi5H7F9r1s9mD3cDj4Ko5f2qhhVoYMibXF7GlLveb/D2ioWay8lxI97Ven3g==}
     engines: {node: '>=0.12'}
-
-  env-cmd@10.1.0:
-    resolution: {integrity: sha512-mMdWTT9XKN7yNth/6N6g2GuKuJTsKMDHlQFUDacb/heQRRWOTIZ42t1rMHnQu4jYxU1ajdTeJM+9eEETlqToMA==}
-    engines: {node: '>=8.0.0'}
-    hasBin: true
 
   env-paths@2.2.1:
     resolution: {integrity: sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A==}
@@ -22012,15 +21985,6 @@ snapshots:
 
   concat-map@0.0.1: {}
 
-  concurrently@9.2.1:
-    dependencies:
-      chalk: 4.1.2
-      rxjs: 7.8.2
-      shell-quote: 1.8.3
-      supports-color: 8.1.1
-      tree-kill: 1.2.2
-      yargs: 17.7.2
-
   confbox@0.1.8: {}
 
   confbox@0.2.2: {}
@@ -22955,15 +22919,6 @@ snapshots:
     dependencies:
       type-fest: 4.41.0
 
-  dotenv-cli@8.0.0:
-    dependencies:
-      cross-spawn: 7.0.6
-      dotenv: 16.6.1
-      dotenv-expand: 10.0.0
-      minimist: 1.2.8
-
-  dotenv-expand@10.0.0: {}
-
   dotenv-expand@11.0.7:
     dependencies:
       dotenv: 16.6.1
@@ -23068,11 +23023,6 @@ snapshots:
   entities@4.5.0: {}
 
   entities@6.0.1: {}
-
-  env-cmd@10.1.0:
-    dependencies:
-      commander: 4.1.1
-      cross-spawn: 7.0.6
 
   env-paths@2.2.1: {}
 
