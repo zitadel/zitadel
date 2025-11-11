@@ -3376,6 +3376,9 @@ service AdminService {
     rpc GetDefaultPasswordResetMessageText(GetDefaultPasswordResetMessageTextRequest) returns (GetDefaultPasswordResetMessageTextResponse) {
         option (google.api.http) = {
             get: "/text/deafult/message/passwordreset/{language}";
+            additional_bindings {
+              get: "/text/default/message/passwordreset/{language}";
+            };
         };
 
         option (zitadel.v1.auth_option) = {
