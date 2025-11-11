@@ -63,10 +63,10 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
         <button
           onClick={async () => {
             if (valid && session?.factors?.user) {
-              const sessionPayload: ContinueWithSessionCommand = session;
-              if (requestId) {
-                sessionPayload.requestId = requestId;
-              }
+              const sessionPayload: ContinueWithSessionCommand = {
+                ...session,
+                ...(requestId && { requestId }),
+              };
 
               const callbackResponse = await continueWithSession(sessionPayload);
 

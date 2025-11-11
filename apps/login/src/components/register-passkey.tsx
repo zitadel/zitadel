@@ -60,6 +60,28 @@ export function RegisterPasskey({ sessionId, userId, isPrompt, organization, req
     return response;
   }
 
+  const continueAndLogin = useCallback(() => {
+    const params = new URLSearchParams();
+
+    if (organization) {
+      params.set("organization", organization);
+    }
+
+    if (requestId) {
+      params.set("requestId", requestId);
+    }
+
+    if (sessionId) {
+      params.set("sessionId", sessionId);
+    }
+
+    if (userId) {
+      params.set("userId", userId);
+    }
+
+    router.push("/passkey?" + params);
+  }, [organization, requestId, sessionId, userId, router]);
+
   const submitRegisterAndContinue = useCallback(async (): Promise<boolean | void> => {
     // Require either sessionId or userId
     if (!sessionId && !userId) {
@@ -156,36 +178,16 @@ export function RegisterPasskey({ sessionId, userId, isPrompt, organization, req
     }
 
     continueAndLogin();
-  }, [sessionId, userId, code]);
+  }, [sessionId, userId, code, codeId, organization, requestId, continueAndLogin]);
 
   // Auto-submit when code is provided (similar to VerifyForm)
   useEffect(() => {
     if (code) {
-      submitRegisterAndContinue();
+      setTimeout(() => {
+        submitRegisterAndContinue();
+      }, 0);
     }
   }, [code, submitRegisterAndContinue]);
-
-  function continueAndLogin() {
-    const params = new URLSearchParams();
-
-    if (organization) {
-      params.set("organization", organization);
-    }
-
-    if (requestId) {
-      params.set("requestId", requestId);
-    }
-
-    if (sessionId) {
-      params.set("sessionId", sessionId);
-    }
-
-    if (userId) {
-      params.set("userId", userId);
-    }
-
-    router.push("/passkey?" + params);
-  }
 
   return (
     <form className="w-full">

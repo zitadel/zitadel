@@ -25,14 +25,7 @@ type Props = {
   requestId?: string;
 };
 
-export function VerifyForm({
-  userId,
-  loginName,
-  organization,
-  requestId,
-  code,
-  isInvite,
-}: Props) {
+export function VerifyForm({ userId, loginName, organization, requestId, code, isInvite }: Props) {
   const router = useRouter();
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
@@ -73,9 +66,7 @@ export function VerifyForm({
   }
 
   const fcn = useCallback(
-    async function submitCodeAndContinue(
-      value: Inputs,
-    ): Promise<boolean | void> {
+    async function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
       setLoading(true);
 
       const response = await sendVerification({
@@ -103,12 +94,16 @@ export function VerifyForm({
         return router.push(response?.redirect);
       }
     },
-    [isInvite, userId],
+    [isInvite, userId, loginName, organization, requestId, t, router],
   );
 
   useEffect(() => {
     if (code) {
-      fcn({ code });
+      // Don't call fcn directly in effect - schedule it
+      const timeoutId = setTimeout(() => {
+        fcn({ code });
+      }, 0);
+      return () => clearTimeout(timeoutId);
     }
   }, [code, fcn]);
 

@@ -18,18 +18,22 @@ export function useResponsiveLayout(): { isSideBySide: boolean; isResponsiveOver
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    // Mark as hydrated on client side
-    setIsHydrated(true);
-
     // Check if we're in a browser environment
     if (typeof window === "undefined") {
       return;
     }
 
+    // Mark as hydrated on client side
+    setTimeout(() => {
+      setIsHydrated(true);
+    }, 0);
+
     const mediaQuery = window.matchMedia("(max-width: 767px)"); // md breakpoint is 768px in Tailwind
 
     // Set initial value
-    setIsMdOrSmaller(mediaQuery.matches);
+    setTimeout(() => {
+      setIsMdOrSmaller(mediaQuery.matches);
+    }, 0);
 
     // Listen for changes
     const handleChange = (e: MediaQueryListEvent) => {

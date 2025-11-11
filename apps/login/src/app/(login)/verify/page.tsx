@@ -42,8 +42,9 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-  async function sendEmail(userId: string) {
+  async function sendEmail(userId: string): Promise<string | undefined> {
     const hostWithProtocol = await getOriginalHostWithProtocol();
+    let emailError: string | undefined;
 
     if (invite === "true") {
       await sendInviteEmailCode({
@@ -53,7 +54,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           (requestId ? `&requestId=${requestId}` : ""),
       }).catch((apiError) => {
         console.error("Could not send invitation email", apiError);
-        error = "inviteSendFailed";
+        emailError = "inviteSendFailed";
       });
     } else {
       await sendEmailCode({
@@ -63,9 +64,11 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           (requestId ? `&requestId=${requestId}` : ""),
       }).catch((apiError) => {
         console.error("Could not send verification email", apiError);
-        error = "emailSendFailed";
+        emailError = "emailSendFailed";
       });
     }
+
+    return emailError;
   }
 
   if ("loginName" in searchParams) {
@@ -78,11 +81,17 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     });
 
     if (doSend && sessionFactors?.factors?.user?.id) {
-      await sendEmail(sessionFactors.factors.user.id);
+      const emailError = await sendEmail(sessionFactors.factors.user.id);
+      if (emailError) {
+        error = emailError;
+      }
     }
   } else if ("userId" in searchParams && userId) {
     if (doSend) {
-      await sendEmail(userId);
+      const emailError = await sendEmail(userId);
+      if (emailError) {
+        error = emailError;
+      }
     }
 
     const userResponse = await getUserByID({

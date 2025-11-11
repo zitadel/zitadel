@@ -2,7 +2,7 @@
 
 import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getThemeConfig, getComponentRoundness, APPEARANCE_STYLES } from "@/lib/theme";
 
 function getThemeToggleRoundness() {
@@ -42,9 +42,11 @@ export default function ThemeSwitch() {
   const toggleRoundness = getThemeToggleRoundness();
   const cardAppearance = getThemeSwitchCardAppearance();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // Mark as mounted after initial render
+  if (!mounted && typeof window !== "undefined") {
+    // This will trigger on first render client-side only
+    setTimeout(() => setMounted(true), 0);
+  }
 
   if (!mounted) return null;
 
