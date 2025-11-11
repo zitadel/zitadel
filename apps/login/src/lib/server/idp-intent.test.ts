@@ -24,6 +24,7 @@ vi.mock("../zitadel", () => ({
   addHuman: vi.fn(),
   getLoginSettings: vi.fn(),
   getOrgsByDomain: vi.fn(),
+  getDefaultOrg: vi.fn(),
 }));
 
 vi.mock("./idp", () => ({
@@ -46,6 +47,7 @@ describe("processIDPCallback", () => {
   let mockAddHuman: any;
   let mockGetLoginSettings: any;
   let mockGetOrgsByDomain: any;
+  let mockGetDefaultOrg: any;
   let mockCreateNewSessionFromIdpIntent: any;
 
   const defaultParams = {
@@ -69,6 +71,17 @@ describe("processIDPCallback", () => {
         givenName: "Test",
         familyName: "User",
         displayName: "Test User",
+      },
+      email: {
+        email: "test@example.com",
+      },
+    },
+    updateHumanUser: {
+      username: "testuser",
+      profile: {
+        givenName: "Test",
+        familyName: "User 1",
+        displayName: "Test User 1",
       },
       email: {
         email: "test@example.com",
@@ -104,6 +117,7 @@ describe("processIDPCallback", () => {
       addHuman,
       getLoginSettings,
       getOrgsByDomain,
+      getDefaultOrg,
     } = await import("../zitadel");
     const { createNewSessionFromIdpIntent } = await import("./idp");
 
@@ -118,6 +132,7 @@ describe("processIDPCallback", () => {
     mockAddHuman = vi.mocked(addHuman);
     mockGetLoginSettings = vi.mocked(getLoginSettings);
     mockGetOrgsByDomain = vi.mocked(getOrgsByDomain);
+    mockGetDefaultOrg = vi.mocked(getDefaultOrg);
     mockCreateNewSessionFromIdpIntent = vi.mocked(createNewSessionFromIdpIntent);
 
     // Default mock implementations
@@ -253,8 +268,8 @@ describe("processIDPCallback", () => {
         serviceUrl: "https://api.example.com",
         request: expect.objectContaining({
           userId: "user123",
-          profile: defaultIntent.addHumanUser.profile,
-          email: defaultIntent.addHumanUser.email,
+          profile: defaultIntent.updateHumanUser.profile,
+          email: defaultIntent.updateHumanUser.email,
         }),
       });
     });
@@ -564,7 +579,8 @@ describe("processIDPCallback", () => {
       });
     });
 
-    test("should create user without organization when not resolved", async () => {
+    test("should fallback to default organization when not resolved", async () => {
+      mockGetDefaultOrg.mockResolvedValue({ id: "default-org" });
       mockAddHuman.mockResolvedValue({ userId: "newuser123" });
 
       await processIDPCallback({
@@ -572,12 +588,31 @@ describe("processIDPCallback", () => {
         organization: undefined,
       });
 
+      expect(mockGetDefaultOrg).toHaveBeenCalledWith({
+        serviceUrl: "https://api.example.com",
+      });
       expect(mockAddHuman).toHaveBeenCalledWith({
         serviceUrl: "https://api.example.com",
-        request: expect.not.objectContaining({
-          organization: expect.anything(),
+        request: expect.objectContaining({
+          organization: expect.objectContaining({
+            org: { case: "orgId", value: "default-org" },
+          }),
         }),
       });
+    });
+
+    test("should return error when no organization context can be determined", async () => {
+      mockGetDefaultOrg.mockResolvedValue(null);
+
+      const result = await processIDPCallback({
+        ...defaultParams,
+        organization: undefined,
+      });
+
+      expect(mockGetDefaultOrg).toHaveBeenCalled();
+      expect(mockAddHuman).not.toHaveBeenCalled();
+      expect(result.redirect).toContain("/idp/google/failure");
+      expect(result.redirect).toContain("error=no_organization_context");
     });
 
     test("should return error redirect when user creation fails", async () => {
@@ -634,12 +669,28 @@ describe("processIDPCallback", () => {
       expect(result.redirect).toContain("email=test%40example.com");
     });
 
-    test("should redirect to registration failed when organization cannot be resolved", async () => {
+    test("should fallback to default organization for registration", async () => {
+      mockGetDefaultOrg.mockResolvedValue({ id: "default-org" });
+
       const result = await processIDPCallback({
         ...defaultParams,
         organization: undefined,
       });
 
+      expect(mockGetDefaultOrg).toHaveBeenCalled();
+      expect(result.redirect).toContain("/idp/google/complete-registration");
+      expect(result.redirect).toContain("organization=default-org");
+    });
+
+    test("should redirect to registration failed when no organization context available", async () => {
+      mockGetDefaultOrg.mockResolvedValue(null);
+
+      const result = await processIDPCallback({
+        ...defaultParams,
+        organization: undefined,
+      });
+
+      expect(mockGetDefaultOrg).toHaveBeenCalled();
       expect(result.redirect).toContain("/idp/google/registration-failed");
       expect(result.redirect).toContain("id=intent123");
     });
