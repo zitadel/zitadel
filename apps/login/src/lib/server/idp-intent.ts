@@ -119,7 +119,7 @@ export async function processIDPCallback({
 
     console.log("[IDP Process] Intent retrieved successfully, processing business logic");
 
-    const { idpInformation, userId, addHumanUser } = intent;
+    const { idpInformation, userId, addHumanUser, updateHumanUser } = intent;
 
     if (!idpInformation) {
       console.error("[IDP Process] IDP information missing");
@@ -161,15 +161,15 @@ export async function processIDPCallback({
     // ============================================
     if (userId && !link) {
       // Auto-update user if enabled
-      if (options?.isAutoUpdate && addHumanUser) {
+      if (options?.isAutoUpdate && updateHumanUser) {
         try {
           await updateHuman({
             serviceUrl,
             request: create(UpdateHumanUserRequestSchema, {
               userId: userId,
-              profile: addHumanUser.profile,
-              email: addHumanUser.email,
-              phone: addHumanUser.phone,
+              profile: updateHumanUser.profile,
+              email: updateHumanUser.email,
+              phone: updateHumanUser.phone,
             }),
           });
           console.log("[IDP Process] User auto-updated successfully");

@@ -21,7 +21,6 @@ func TestServer_ProjectGrantReduces(t *testing.T) {
 	instanceID := Instance.ID()
 	orgID := Instance.DefaultOrg.Id
 	projectGrantRepo := repository.ProjectGrantRepository()
-	projectGrantRoleRepo := projectGrantRepo.Role()
 
 	projectName := integration.ProjectName()
 	createProjectRes, err := ProjectClient.CreateProject(CTX, &v2beta_project.CreateProjectRequest{
@@ -89,17 +88,10 @@ func TestServer_ProjectGrantReduces(t *testing.T) {
 				),
 			))
 			require.NoError(collect, err)
-			dbProjectGrantRoles, err := projectGrantRoleRepo.List(CTX, pool, database.WithCondition(
-				database.And(
-					projectGrantRoleRepo.InstanceIDCondition(instanceID),
-					projectGrantRoleRepo.GrantIDCondition(dbProjectGrant.ID),
-				),
-			))
-			require.NoError(collect, err)
-			if !assert.Len(collect, dbProjectGrantRoles, 1) {
+			if !assert.Len(collect, dbProjectGrant.RoleKeys, 1) {
 				return
 			}
-			assert.Equal(collect, dbProjectGrantRoles[0].Key, keyName)
+			assert.Equal(collect, dbProjectGrant.RoleKeys[0], keyName)
 		}, retryDuration, tick, "project grant not updated within %v: %v", retryDuration, err)
 	})
 

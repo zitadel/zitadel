@@ -19,11 +19,11 @@ func ProjectGrantRepository() domain.ProjectGrantRepository {
 	return new(projectGrant)
 }
 
-func (projectGrant) Role() domain.ProjectGrantRoleRepository {
-	return projectGrantRole{}
-}
-
 func (p projectGrant) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.ProjectGrant, error) {
+	opts = append(opts,
+		database.WithGroupBy(p.InstanceIDColumn(), p.IDColumn()),
+	)
+
 	builder, err := p.prepareQuery(opts)
 	if err != nil {
 		return nil, err
@@ -32,6 +32,10 @@ func (p projectGrant) Get(ctx context.Context, client database.QueryExecutor, op
 }
 
 func (p projectGrant) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.ProjectGrant, error) {
+	opts = append(opts,
+		database.WithGroupBy(p.InstanceIDColumn(), p.IDColumn()),
+	)
+
 	builder, err := p.prepareQuery(opts)
 	if err != nil {
 		return nil, err
@@ -39,27 +43,90 @@ func (p projectGrant) List(ctx context.Context, client database.QueryExecutor, o
 	return list[domain.ProjectGrant](ctx, client, builder)
 }
 
-const insertProjectGrantStmt = `INSERT INTO zitadel.project_grants(
-	instance_id, id, project_id, granting_organization_id, granted_organization_id, state
-)
-VALUES ($1, $2, $3, $4, $5, $6)
-RETURNING created_at, updated_at`
+const insertProjectGrantRolesStmt = `WITH added_roles AS (
+	INSERT INTO zitadel.project_grant_roles (
+		instance_id, grant_id, project_id, key
+	)
+	VALUES ($2, $3, $4, unnest($1::text[]))
+) `
 
-func (projectGrant) Create(ctx context.Context, client database.QueryExecutor, projectGrant *domain.ProjectGrant) error {
-	builder := database.NewStatementBuilder(insertProjectGrantStmt,
+func (p projectGrant) Create(ctx context.Context, client database.QueryExecutor, projectGrant *domain.ProjectGrant) error {
+	var (
+		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
+	)
+	if !projectGrant.CreatedAt.IsZero() {
+		createdAt = projectGrant.CreatedAt
+	}
+	if !projectGrant.UpdatedAt.IsZero() {
+		updatedAt = projectGrant.UpdatedAt
+	}
+
+	// separate statement to add roles to project grant
+	builder := database.NewStatementBuilder(insertProjectGrantRolesStmt, projectGrant.RoleKeys)
+
+	builder.WriteString(`INSERT INTO ` + p.qualifiedTableName() + ` (instance_id, id, project_id, granting_organization_id, granted_organization_id, state, created_at, updated_at) VALUES ( `)
+	builder.WriteArgs(
 		projectGrant.InstanceID,
 		projectGrant.ID,
 		projectGrant.ProjectID,
 		projectGrant.GrantingOrganizationID,
 		projectGrant.GrantedOrganizationID,
 		projectGrant.State,
+		createdAt,
+		updatedAt,
 	)
+	builder.WriteString(` ) RETURNING created_at, updated_at`)
+
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).
 		Scan(&projectGrant.CreatedAt, &projectGrant.UpdatedAt)
 }
 
-func (p projectGrant) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	return update(ctx, client, p, condition, changes...)
+const queryUpdateProjectGrantRoleStmt = `SELECT instance_id, id, project_id, $1::text[] as keys from zitadel.project_grants`
+
+const updateProjectGrantRoleStmt = `removed_roles AS (
+    DELETE FROM zitadel.project_grant_roles as pgr
+    USING pg
+    WHERE pg.instance_id = pgr.instance_id AND pg.id = pgr.grant_id AND NOT(pgr.key = ANY(pg.keys))
+), added_roles AS (
+	INSERT INTO zitadel.project_grant_roles (
+		instance_id, grant_id, project_id, key
+	)
+	SELECT instance_id, id, project_id, unnest(pg.keys) FROM pg
+	ON CONFLICT (instance_id, grant_id, key) DO NOTHING
+)
+UPDATE zitadel.project_grants SET `
+
+const updateProjectGrantRoleStmtWhere = ` FROM pg
+WHERE pg.instance_id = project_grants.instance_id
+  AND pg.id = project_grants.id`
+
+func (p projectGrant) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, roleKeys []string, changes ...database.Change) (int64, error) {
+	// if no role keys set we only have to update the project grant table
+	if roleKeys == nil {
+		return update(ctx, client, p, condition, changes...)
+	}
+
+	// if you want to update the roles you have to have the primary key, otherwise multiple project grants get updated
+	if err := checkPKCondition(p, condition); err != nil {
+		return 0, err
+	}
+	if !database.Changes(changes).IsOnColumn(p.UpdatedAtColumn()) {
+		changes = append(changes, database.NewChange(p.UpdatedAtColumn(), database.NullInstruction))
+	}
+
+	// the statement begins with getting the project grant we want to update
+	builder := database.NewStatementBuilder("WITH pg AS (")
+	builder.WriteString(queryUpdateProjectGrantRoleStmt)
+	builder.AppendArg(roleKeys)
+	writeCondition(builder, condition)
+	builder.WriteString(" ), ")
+
+	// now we add the logic to do the required changes based on the given project grant
+	builder.WriteString(updateProjectGrantRoleStmt)
+	database.Changes(changes).Write(builder)
+	builder.WriteString(updateProjectGrantRoleStmtWhere)
+
+	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
 func (p projectGrant) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
@@ -120,6 +187,33 @@ func (p projectGrant) StateCondition(state domain.ProjectGrantState) database.Co
 	return database.NewTextCondition(p.StateColumn(), database.TextOperationEqual, state.String())
 }
 
+func (p projectGrant) RoleKeyCondition(op database.TextOperation, role string) database.Condition {
+	return database.NewTextCondition(database.NewColumn(p.unqualifiedRolesTableName(), "key"), op, role)
+}
+
+// ExistsRoleKey creates a correlated [database.Exists] condition on project_grant_roles.
+// Use this filter to make sure the project grant returned contains a specific project grant role.
+// Example usage:
+//
+//	projectGrant, _ := projectGrantRepo.Get(ctx,
+//	    database.WithCondition(
+//	        database.And(
+//	            projectGrantRepo.InstanceIDCondition(instanceID),
+//	            projectGrantRepo.ExistsRoleKey(projectGrantRepo.RoleKeyCondition(database.TextOperationEqual, "admin")),
+//	        ),
+//	    ),
+//	)
+func (p projectGrant) ExistsRoleKey(cond database.Condition) database.Condition {
+	return database.Exists(
+		p.qualifiedRolesTableName(),
+		database.And(
+			database.NewColumnCondition(p.InstanceIDColumn(), database.NewColumn(p.unqualifiedRolesTableName(), "instance_id")),
+			database.NewColumnCondition(p.IDColumn(), database.NewColumn(p.unqualifiedRolesTableName(), "grant_id")),
+			cond,
+		),
+	)
+}
+
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
@@ -132,7 +226,14 @@ func (projectGrant) unqualifiedTableName() string {
 	return "project_grants"
 }
 
-// PrimaryKeyColumns implements the [pkRepository] interface
+func (p projectGrant) qualifiedRolesTableName() string {
+	return "zitadel." + p.unqualifiedRolesTableName()
+}
+
+func (projectGrant) unqualifiedRolesTableName() string {
+	return "project_grant_roles"
+}
+
 func (p projectGrant) PrimaryKeyColumns() []database.Column {
 	return []database.Column{
 		p.InstanceIDColumn(),
@@ -177,15 +278,17 @@ func (p projectGrant) StateColumn() database.Column {
 // -------------------------------------------------------------
 
 const queryProjectGrantStmt = `SELECT
-	project_grants.instance_id,	
-	project_grants.id,
-	project_grants.project_id,
-	project_grants.granting_organization_id,
-	project_grants.granted_organization_id,
-	project_grants.created_at,
-	project_grants.updated_at,
-	project_grants.state
-	FROM zitadel.project_grants`
+	zitadel.project_grants.instance_id,	
+	zitadel.project_grants.id,
+	zitadel.project_grants.project_id,
+	zitadel.project_grants.granting_organization_id,
+	zitadel.project_grants.granted_organization_id,
+	zitadel.project_grants.created_at,
+	zitadel.project_grants.updated_at,
+	zitadel.project_grants.state,
+    ARRAY_AGG(project_grant_roles.key) FILTER (WHERE project_grant_roles.grant_id IS NOT NULL) AS role_keys
+	FROM zitadel.project_grants
+	LEFT JOIN zitadel.project_grant_roles ON zitadel.project_grant_roles.instance_id = zitadel.project_grants.instance_id AND zitadel.project_grant_roles.grant_id = zitadel.project_grants.id`
 
 func (p projectGrant) prepareQuery(opts []database.QueryOption) (*database.StatementBuilder, error) {
 	options := new(database.QueryOpts)
