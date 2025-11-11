@@ -39,6 +39,7 @@ The ZITADEL Login application is a Next.js 15-based authentication frontend that
 ```
 
 **Next.js 15** provides:
+
 - **App Router**: File-system based routing with React Server Components
 - **Server Actions**: Type-safe server-side mutations without API routes
 - **Dynamic IO**: Improved data fetching and caching capabilities
@@ -179,18 +180,19 @@ Sessions are stored as a **JSON array** in an HTTP-only cookie named `"sessions"
 
 ```typescript
 type SessionCookie = {
-  id: string;              // ZITADEL session ID
-  token: string;           // Session token (opaque)
-  loginName: string;       // User's login name
-  organization?: string;   // Organization ID (optional)
-  creationTs: string;      // Creation timestamp
-  expirationTs: string;    // Expiration timestamp
-  changeTs: string;        // Last change timestamp
-  requestId?: string;      // OIDC/SAML request ID (if linked)
+  id: string; // ZITADEL session ID
+  token: string; // Session token (opaque)
+  loginName: string; // User's login name
+  organization?: string; // Organization ID (optional)
+  creationTs: string; // Creation timestamp
+  expirationTs: string; // Expiration timestamp
+  changeTs: string; // Last change timestamp
+  requestId?: string; // OIDC/SAML request ID (if linked)
 };
 ```
 
 **Example cookie value**:
+
 ```json
 [
   {
@@ -212,10 +214,10 @@ type SessionCookie = {
 // From src/lib/cookies.ts
 const cookieConfig = {
   name: "sessions",
-  httpOnly: true,        // Prevents JavaScript access
+  httpOnly: true, // Prevents JavaScript access
   path: "/",
   sameSite: iFrameEnabled ? "none" : "lax",
-  secure: process.env.NODE_ENV === "production"
+  secure: process.env.NODE_ENV === "production",
 };
 ```
 
@@ -223,13 +225,14 @@ const cookieConfig = {
 
 1. **HTTP-only**: Cookies cannot be accessed via `document.cookie` or JavaScript
 2. **Secure flag**: Transmitted only over HTTPS in production
-3. **SameSite policy**: 
+3. **SameSite policy**:
    - `"lax"`: Default - allows cookies with top-level navigation
    - `"none"`: For iframe embedding (requires `secure: true`)
 
 #### Multi-Session Support
 
 The application supports **multiple concurrent sessions** for:
+
 - Multiple organizations
 - Different users on the same device
 - Session switching without re-authentication
@@ -239,9 +242,9 @@ The application supports **multiple concurrent sessions** for:
 await addSessionToCookie({ session, iFrameEnabled });
 
 // Retrieve specific session by login name
-await getSessionCookieByLoginName({ 
-  loginName, 
-  organization 
+await getSessionCookieByLoginName({
+  loginName,
+  organization,
 });
 
 // Get all sessions
@@ -255,7 +258,7 @@ Sessions are created via gRPC calls to ZITADEL's Session Service:
 ```typescript
 // From src/lib/server/cookie.ts
 export async function createSessionAndUpdateCookie(command: {
-  checks: Checks;              // Authentication factors
+  checks: Checks; // Authentication factors
   requestId: string | undefined;
   lifetime?: Duration;
 }): Promise<Session> {
@@ -263,7 +266,7 @@ export async function createSessionAndUpdateCookie(command: {
   const createdSession = await createSessionFromChecks({
     serviceUrl,
     checks: command.checks,
-    lifetime: sessionLifetime,  // Default: 24 hours
+    lifetime: sessionLifetime, // Default: 24 hours
   });
 
   // 2. Retrieve full session details
@@ -281,9 +284,9 @@ export async function createSessionAndUpdateCookie(command: {
     // ... timestamps and metadata
   };
 
-  await addSessionToCookie({ 
-    session: sessionCookie, 
-    iFrameEnabled 
+  await addSessionToCookie({
+    session: sessionCookie,
+    iFrameEnabled,
   });
 
   return response.session;
@@ -299,12 +302,12 @@ Session updates occur when authentication factors are added:
 export async function updateSession(options: {
   loginName?: string;
   sessionId?: string;
-  checks?: Checks;           // New authentication factor
+  checks?: Checks; // New authentication factor
   challenges?: RequestChallenges;
   lifetime?: Duration;
 }) {
   // 1. Find existing session cookie
-  const recentSession = sessionId 
+  const recentSession = sessionId
     ? await getSessionCookieById({ sessionId })
     : await getSessionCookieByLoginName({ loginName, organization });
 
@@ -331,28 +334,19 @@ Session validation ensures that sessions meet security policies:
 
 ```typescript
 // From src/lib/session.ts
-export async function isSessionValid({ 
-  serviceUrl, 
-  session 
-}: { 
-  serviceUrl: string; 
-  session: Session 
-}): Promise<boolean> {
-  
+export async function isSessionValid({ serviceUrl, session }: { serviceUrl: string; session: Session }): Promise<boolean> {
   // 1. Check session has user
   if (!session.factors?.user) return false;
 
   // 2. Check expiration
-  const stillValid = session.expirationDate 
-    ? timestampDate(session.expirationDate) > new Date()
-    : true;
+  const stillValid = session.expirationDate ? timestampDate(session.expirationDate) > new Date() : true;
   if (!stillValid) return false;
 
   // 3. Verify authentication factors
   const validPassword = !!session.factors.password?.verifiedAt;
   const validPasskey = !!session.factors.webAuthN?.verifiedAt;
   const validIDP = !!session.factors.intent?.verifiedAt;
-  
+
   if (!(validPassword || validPasskey || validIDP)) return false;
 
   // 4. Check MFA requirements
@@ -362,7 +356,7 @@ export async function isSessionValid({
   });
 
   const isMfaRequired = shouldEnforceMFA(session, loginSettings);
-  
+
   if (isMfaRequired) {
     const authMethods = await listAuthenticationMethodTypes({
       serviceUrl,
@@ -380,10 +374,8 @@ export async function isSessionValid({
       serviceUrl,
       userId: session.factors.user.id,
     });
-    
-    const humanUser = user?.user?.type.case === "human" 
-      ? user.user.type.value 
-      : undefined;
+
+    const humanUser = user?.user?.type.case === "human" ? user.user.type.value : undefined;
 
     if (humanUser && !humanUser.email?.isVerified) {
       return false;
@@ -410,13 +402,13 @@ type SessionFactors = {
   };
   webAuthN?: {
     verifiedAt?: Timestamp;
-    userVerified?: boolean;  // For passkeys
+    userVerified?: boolean; // For passkeys
   };
   intent?: {
-    verifiedAt?: Timestamp;  // For IDP authentication
+    verifiedAt?: Timestamp; // For IDP authentication
   };
   totp?: {
-    verifiedAt?: Timestamp;  // Time-based OTP
+    verifiedAt?: Timestamp; // Time-based OTP
   };
   otpEmail?: {
     verifiedAt?: Timestamp;
@@ -468,17 +460,13 @@ if (JSON.stringify(temp).length >= MAX_COOKIE_SIZE) {
 Expired sessions are automatically cleaned up:
 
 ```typescript
-export async function getAllSessions<T>(
-  cleanup: boolean = false
-): Promise<SessionCookie<T>[]> {
+export async function getAllSessions<T>(cleanup: boolean = false): Promise<SessionCookie<T>[]> {
   const sessions = JSON.parse(cookieValue);
 
   if (cleanup) {
     const now = new Date();
-    return sessions.filter(session =>
-      session.expirationTs 
-        ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now 
-        : true
+    return sessions.filter((session) =>
+      session.expirationTs ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now : true,
     );
   }
 
@@ -504,7 +492,6 @@ export async function sendPassword(command: {
   checks: Checks;
   requestId?: string;
 }): Promise<{ error: string } | { redirect: string }> {
-  
   // 1. Find or create session
   let sessionCookie = await getSessionCookieByLoginName({
     loginName: command.loginName,
@@ -515,7 +502,7 @@ export async function sendPassword(command: {
   try {
     session = await setSessionAndUpdateCookie({
       recentCookie: sessionCookie,
-      checks: command.checks,  // Contains password
+      checks: command.checks, // Contains password
       lifetime: loginSettings.passwordCheckLifetime,
     });
   } catch (error) {
@@ -539,12 +526,7 @@ export async function sendPassword(command: {
   );
 
   // 4. Check email verification
-  const emailVerificationCheck = checkEmailVerification(
-    session,
-    humanUser,
-    command.organization,
-    command.requestId,
-  );
+  const emailVerificationCheck = checkEmailVerification(session, humanUser, command.organization, command.requestId);
 
   // 5. Check MFA requirements
   const authMethods = await listAuthenticationMethodTypes({
@@ -564,18 +546,24 @@ export async function sendPassword(command: {
   // 6. Complete flow or redirect
   if (command.requestId) {
     // OIDC/SAML flow
-    return await completeFlowOrGetUrl({
-      sessionId: session.id,
-      requestId: command.requestId,
-      organization: command.organization,
-    }, loginSettings?.defaultRedirectUri);
+    return await completeFlowOrGetUrl(
+      {
+        sessionId: session.id,
+        requestId: command.requestId,
+        organization: command.organization,
+      },
+      loginSettings?.defaultRedirectUri,
+    );
   }
 
   // Regular flow
-  return await completeFlowOrGetUrl({
-    loginName: session.factors.user.loginName,
-    organization: session.factors.user.organizationId,
-  }, loginSettings?.defaultRedirectUri);
+  return await completeFlowOrGetUrl(
+    {
+      loginName: session.factors.user.loginName,
+      organization: session.factors.user.organizationId,
+    },
+    loginSettings?.defaultRedirectUri,
+  );
 }
 ```
 
@@ -604,7 +592,7 @@ export async function updateSession(options: {
       }
     },
   });
-  
+
   return {
     sessionId: session.id,
     challenges: session.challenges,  // Return challenge for client
@@ -779,28 +767,28 @@ The login UI receives auth requests at `/src/app/login/route.ts`:
 ```typescript
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  
+
   // 1. Block React Server Component requests (internal Next.js)
   if (isRSCRequest(searchParams)) {
     return NextResponse.json({ error: "RSC requests not supported" }, { status: 400 });
   }
-  
+
   // 2. Validate and extract request ID
   const requestId = validateAuthRequest(searchParams);
   // Converts: authRequest=V2_xxx → "oidc_V2_xxx"
   // Converts: samlRequest=xxx → "saml_xxx"
-  
+
   if (!requestId) {
     return NextResponse.json({ error: "No valid authentication request found" }, { status: 400 });
   }
-  
+
   // 3. Load existing sessions from HTTP-only cookies
   const sessionCookies = await getAllSessions();
-  const sessions = await loadSessions({ 
-    serviceUrl, 
-    ids: sessionCookies.map(s => s.id) 
+  const sessions = await loadSessions({
+    serviceUrl,
+    ids: sessionCookies.map((s) => s.id),
   });
-  
+
   // 4. Delegate to appropriate handler
   if (requestId.startsWith("oidc_")) {
     return handleOIDCFlowInitiation({
@@ -829,26 +817,26 @@ The OIDC handler (`/src/lib/server/flow-initiation.ts`) determines the authentic
 ```typescript
 export async function handleOIDCFlowInitiation(params: FlowInitiationParams) {
   const { serviceUrl, requestId, sessions, sessionCookies, request } = params;
-  
+
   // 1. Fetch auth request details from ZITADEL backend
   const { authRequest } = await getAuthRequest({
     serviceUrl,
     authRequestId: requestId.replace("oidc_", ""),
   });
-  
+
   // 2. Extract organization and IDP from OIDC scopes
   let organization = "";
   let idpId = "";
-  
+
   if (authRequest?.scope) {
     // Organization ID scope: urn:zitadel:iam:org:id:123456789
-    const orgScope = authRequest.scope.find(s => /urn:zitadel:iam:org:id:([0-9]+)/.test(s));
+    const orgScope = authRequest.scope.find((s) => /urn:zitadel:iam:org:id:([0-9]+)/.test(s));
     if (orgScope) {
       organization = /urn:zitadel:iam:org:id:([0-9]+)/.exec(orgScope)?.[1] ?? "";
     }
-    
+
     // Organization domain scope: urn:zitadel:iam:org:domain:primary:example.com
-    const orgDomainScope = authRequest.scope.find(s => /urn:zitadel:iam:org:domain:primary:(.+)/.test(s));
+    const orgDomainScope = authRequest.scope.find((s) => /urn:zitadel:iam:org:domain:primary:(.+)/.test(s));
     if (orgDomainScope) {
       const orgDomain = /urn:zitadel:iam:org:domain:primary:(.+)/.exec(orgDomainScope)?.[1];
       // Resolve organization by domain
@@ -857,12 +845,12 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams) {
         organization = orgs.result[0].id;
       }
     }
-    
+
     // IDP scope: urn:zitadel:iam:org:idp:id:xxx (bypass login UI, direct IDP redirect)
-    const idpScope = authRequest.scope.find(s => /urn:zitadel:iam:org:idp:id:(.+)/.test(s));
+    const idpScope = authRequest.scope.find((s) => /urn:zitadel:iam:org:idp:id:(.+)/.test(s));
     if (idpScope) {
       idpId = /urn:zitadel:iam:org:idp:id:(.+)/.exec(idpScope)?.[1] ?? "";
-      
+
       // Start IDP flow immediately
       const url = await startIdentityProviderFlow({
         serviceUrl,
@@ -870,11 +858,11 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams) {
         successUrl: `${origin}/idp/${provider}/process?requestId=${requestId}&organization=${organization}`,
         failureUrl: `${origin}/idp/${provider}/failure?requestId=${requestId}&organization=${organization}`,
       });
-      
+
       return NextResponse.redirect(url);
     }
   }
-  
+
   // 3. Handle OIDC prompt parameter
   if (authRequest.prompt.includes(Prompt.CREATE)) {
     // Registration flow requested
@@ -885,12 +873,12 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams) {
     }
     return NextResponse.redirect(registerUrl);
   }
-  
+
   if (authRequest.prompt.includes(Prompt.LOGIN)) {
     // Force login (ignore existing sessions)
     const loginNameUrl = constructUrl(request, "/loginname");
     loginNameUrl.searchParams.set("requestId", requestId);
-    
+
     if (authRequest.loginHint) {
       loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
       // Optionally auto-submit if configured
@@ -898,15 +886,15 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams) {
     if (organization) {
       loginNameUrl.searchParams.set("organization", organization);
     }
-    
+
     return NextResponse.redirect(loginNameUrl);
   }
-  
+
   if (authRequest.prompt.includes(Prompt.SELECT_ACCOUNT)) {
     // Show account selection page
     return NextResponse.redirect(constructUrl(request, "/accounts"));
   }
-  
+
   if (authRequest.prompt.includes(Prompt.NONE)) {
     // Silent authentication - must use existing session or fail
     const selectedSession = await findValidSession({
@@ -914,13 +902,13 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams) {
       sessions,
       authRequest,
     });
-    
+
     if (!selectedSession) {
       return NextResponse.json({ error: "No active session found" }, { status: 400 });
     }
-    
-    const cookie = sessionCookies.find(c => c.id === selectedSession.id);
-    
+
+    const cookie = sessionCookies.find((c) => c.id === selectedSession.id);
+
     // Complete flow immediately without user interaction
     const { callbackUrl } = await createCallback({
       serviceUrl,
@@ -932,10 +920,10 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams) {
         },
       }),
     });
-    
+
     return NextResponse.redirect(callbackUrl);
   }
-  
+
   // 4. Default behavior: check for existing valid session
   if (sessions.length > 0) {
     const selectedSession = await findValidSession({
@@ -943,11 +931,11 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams) {
       sessions,
       authRequest,
     });
-    
+
     if (selectedSession) {
       // Valid session exists - complete flow
-      const cookie = sessionCookies.find(c => c.id === selectedSession.id);
-      
+      const cookie = sessionCookies.find((c) => c.id === selectedSession.id);
+
       try {
         const { callbackUrl } = await createCallback({
           serviceUrl,
@@ -959,7 +947,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams) {
             },
           }),
         });
-        
+
         return NextResponse.redirect(callbackUrl);
       } catch (error) {
         // Callback failed (session expired, etc.) - show account selection
@@ -970,18 +958,18 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams) {
       return NextResponse.redirect(constructUrl(request, "/accounts"));
     }
   }
-  
+
   // 5. No sessions - start fresh authentication
   const loginNameUrl = constructUrl(request, "/loginname");
   loginNameUrl.searchParams.set("requestId", requestId);
-  
+
   if (authRequest?.loginHint) {
     loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
   }
   if (organization) {
     loginNameUrl.searchParams.set("organization", organization);
   }
-  
+
   return NextResponse.redirect(loginNameUrl);
 }
 ```
@@ -993,42 +981,42 @@ SAML flow initiation is simpler (no prompt parameter):
 ```typescript
 export async function handleSAMLFlowInitiation(params: FlowInitiationParams) {
   const { serviceUrl, requestId, sessions, sessionCookies, request } = params;
-  
+
   // 1. Fetch SAML request details
   const { samlRequest } = await getSAMLRequest({
     serviceUrl,
     samlRequestId: requestId.replace("saml_", ""),
   });
-  
+
   if (!samlRequest) {
     return NextResponse.json({ error: "No samlRequest found" }, { status: 400 });
   }
-  
+
   // 2. No sessions - start authentication
   if (sessions.length === 0) {
     const loginNameUrl = constructUrl(request, "/loginname");
     loginNameUrl.searchParams.set("requestId", requestId);
     return NextResponse.redirect(loginNameUrl);
   }
-  
+
   // 3. Find valid session
   const selectedSession = await findValidSession({
     serviceUrl,
     sessions,
     samlRequest,
   });
-  
+
   if (!selectedSession) {
     // No valid session - show account selection
     return NextResponse.redirect(constructUrl(request, "/accounts"));
   }
-  
-  const cookie = sessionCookies.find(c => c.id === selectedSession.id);
-  
+
+  const cookie = sessionCookies.find((c) => c.id === selectedSession.id);
+
   if (!cookie) {
     return NextResponse.redirect(constructUrl(request, "/accounts"));
   }
-  
+
   // 4. Complete SAML flow
   try {
     const { url, binding } = await createResponse({
@@ -1044,7 +1032,7 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams) {
         },
       }),
     });
-    
+
     if (binding.case === "redirect") {
       // HTTP-Redirect binding
       return NextResponse.redirect(url);
@@ -1063,7 +1051,7 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams) {
           </body>
         </html>
       `;
-      
+
       return new NextResponse(html, {
         headers: { "Content-Type": "text/html" },
       });
@@ -1079,17 +1067,15 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams) {
 
 The `prompt` parameter controls authentication behavior:
 
-| Prompt | Behavior |
-|--------|----------|
-| `none` | Silent authentication - use existing session or fail immediately. No user interaction allowed. |
-| `login` | Force re-authentication even if valid session exists. Ignores existing sessions. |
-| `consent` | Not yet implemented - treated as default behavior. |
-| `select_account` | Show account selection page even if only one session exists. |
-| `create` | Redirect to registration flow instead of login. |
+| Prompt           | Behavior                                                                                       |
+| ---------------- | ---------------------------------------------------------------------------------------------- |
+| `none`           | Silent authentication - use existing session or fail immediately. No user interaction allowed. |
+| `login`          | Force re-authentication even if valid session exists. Ignores existing sessions.               |
+| `consent`        | Not yet implemented - treated as default behavior.                                             |
+| `select_account` | Show account selection page even if only one session exists.                                   |
+| `create`         | Redirect to registration flow instead of login.                                                |
 
-**Multiple prompts** can be combined (space-separated):
-- `prompt=login select_account`: Force login then show account selection
-- `prompt=create`: Only registration, no login option
+**Prompt Priority**: If multiple prompt values are provided (space-separated), they are processed in priority order: `create` > `select_account` > `login` > `none`. Only the first matching prompt is acted upon.
 
 #### Request ID Format
 
@@ -1100,6 +1086,7 @@ Request IDs are prefixed to identify the protocol:
 - **Device**: `device_789012` (handled at `/device` endpoint, not `/login`)
 
 The prefix allows the login UI to:
+
 1. Route to the correct handler
 2. Call the appropriate backend API (getAuthRequest vs getSAMLRequest)
 3. Complete with the correct callback method
@@ -1111,30 +1098,27 @@ The middleware proxies certain paths to ZITADEL backend:
 ```typescript
 export async function middleware(request: NextRequest) {
   const proxyPaths = [
-    "/.well-known/",   // OpenID configuration
-    "/oauth/",         // Token, introspection, revocation
-    "/oidc/",          // Userinfo, end_session
+    "/.well-known/", // OpenID configuration
+    "/oauth/", // Token, introspection, revocation
+    "/oidc/", // Userinfo, end_session
     "/idps/callback/", // IDP OAuth/SAML callbacks
-    "/saml/",          // SAML SSO/SLO endpoints
+    "/saml/", // SAML SSO/SLO endpoints
   ];
-  
+
   // Only proxy in self-hosted mode
-  if (
-    process.env.ZITADEL_API_URL && 
-    process.env.ZITADEL_SERVICE_USER_TOKEN
-  ) {
+  if (process.env.ZITADEL_API_URL && process.env.ZITADEL_SERVICE_USER_TOKEN) {
     // Rewrite to ZITADEL backend
     request.nextUrl.href = `${serviceUrl}${request.nextUrl.pathname}`;
-    
+
     // Add headers for backend
     requestHeaders.set("x-zitadel-public-host", request.nextUrl.host);
     requestHeaders.set("x-zitadel-instance-host", instanceHost);
-    
+
     return NextResponse.rewrite(request.nextUrl, {
       request: { headers: requestHeaders },
     });
   }
-  
+
   // Multi-tenant mode: no proxy (integrated stack)
   return NextResponse.next();
 }
@@ -1154,12 +1138,14 @@ Without proxying, applications would need to know two URLs (login UI + ZITADEL b
 #### Deployment Mode Differences
 
 **Multi-Tenant (ZITADEL Cloud)**:
+
 - ZITADEL backend and login UI run in the same context
 - Authorization endpoint directly redirects to integrated login UI
 - No middleware proxy needed
 - Single domain for all endpoints
 
 **Self-Hosted**:
+
 - ZITADEL backend and login UI are separate services
 - Authorization endpoint redirects to external login UI domain
 - Middleware proxies protocol endpoints to ZITADEL backend
@@ -1173,7 +1159,7 @@ Without proxying, applications would need to know two URLs (login UI + ZITADEL b
 
 3. **Session Binding**: Sessions are validated against auth request requirements (organization, authentication level, etc.) before completion.
 
-4. **Origin Validation**: Next.js CSRF protection ensures the `/login` endpoint is only accessed from legitimate origins.
+4. **Request ID Validation**: The `/login` endpoint (GET) doesn't require CSRF protection because it only reads the request ID from query parameters and immediately validates it by fetching the full auth request from ZITADEL backend. Invalid or malicious request IDs are rejected before any authentication occurs.
 
 5. **Proxy Security**: Self-hosted deployments must configure the login UI domain as a trusted domain in ZITADEL to prevent unauthorized proxying.
 
@@ -1191,9 +1177,7 @@ export async function loginWithOIDCAndSession({
   sessionId,
   sessions,
   sessionCookies,
-}: LoginWithOIDCAndSession): Promise<
-  { error: string } | { redirect: string }
-> {
+}: LoginWithOIDCAndSession): Promise<{ error: string } | { redirect: string }> {
   const selectedSession = sessions.find((s) => s.id === sessionId);
 
   // Validate session is still valid
@@ -1211,9 +1195,7 @@ export async function loginWithOIDCAndSession({
     });
   }
 
-  const cookie = sessionCookies.find(
-    (cookie) => cookie.id === selectedSession?.id
-  );
+  const cookie = sessionCookies.find((cookie) => cookie.id === selectedSession?.id);
 
   // Create OIDC callback
   const { callbackUrl } = await createCallback({
@@ -1244,9 +1226,7 @@ export async function loginWithSAMLAndSession({
   sessionId,
   sessions,
   sessionCookies,
-}: LoginWithSAMLAndSession): Promise<
-  { error: string } | { redirect: string }
-> {
+}: LoginWithSAMLAndSession): Promise<{ error: string } | { redirect: string }> {
   // Similar to OIDC but creates SAML response
   const { url } = await createResponse({
     serviceUrl,
@@ -1277,7 +1257,7 @@ export async function completeAuthFlow(command: {
   const sessionCookies = await getAllSessions();
   const sessions = await loadSessions({
     serviceUrl,
-    ids: sessionCookies.map(s => s.id)
+    ids: sessionCookies.map((s) => s.id),
   });
 
   if (requestId.startsWith("oidc_")) {
@@ -1314,14 +1294,14 @@ Device → Display Code → User → /device?user_code=XXX → Authenticate → 
 // src/lib/server/device.ts
 export async function completeDeviceAuthorization(
   deviceAuthorizationId: string,
-  session?: { sessionId: string; sessionToken: string }
+  session?: { sessionId: string; sessionToken: string },
 ) {
   // With session: approve device
   // Without session: deny device
   return authorizeOrDenyDeviceAuthorization({
     serviceUrl,
     deviceAuthorizationId,
-    session,  // undefined = deny
+    session, // undefined = deny
   });
 }
 ```
@@ -1329,6 +1309,7 @@ export async function completeDeviceAuthorization(
 ## Middleware Architecture
 
 The middleware intercepts all requests to handle:
+
 1. Multi-tenancy routing
 2. Proxy requests to ZITADEL backend
 3. Security header injection
@@ -1339,14 +1320,7 @@ The middleware intercepts all requests to handle:
 ```typescript
 // src/middleware.ts
 export const config = {
-  matcher: [
-    "/.well-known/:path*",
-    "/oauth/:path*",
-    "/oidc/:path*",
-    "/idps/callback/:path*",
-    "/saml/:path*",
-    "/:path*",
-  ],
+  matcher: ["/.well-known/:path*", "/oauth/:path*", "/oidc/:path*", "/idps/callback/:path*", "/saml/:path*", "/:path*"],
 };
 
 export async function middleware(request: NextRequest) {
@@ -1359,24 +1333,13 @@ export async function middleware(request: NextRequest) {
   }
 
   // 2. Determine if this is a proxy path
-  const proxyPaths = [
-    "/.well-known/",
-    "/oauth/",
-    "/oidc/",
-    "/idps/callback/",
-    "/saml/",
-  ];
+  const proxyPaths = ["/.well-known/", "/oauth/", "/oidc/", "/idps/callback/", "/saml/"];
 
-  const isMatched = proxyPaths.some((prefix) =>
-    request.nextUrl.pathname.startsWith(prefix)
-  );
+  const isMatched = proxyPaths.some((prefix) => request.nextUrl.pathname.startsWith(prefix));
 
   // 3. Check if proxy is configured (self-hosted mode only)
   // Multi-tenant mode does NOT set these variables - runs integrated stack
-  const isProxyConfigured = !!(
-    process.env.ZITADEL_API_URL &&
-    process.env.ZITADEL_SERVICE_USER_TOKEN
-  );
+  const isProxyConfigured = !!(process.env.ZITADEL_API_URL && process.env.ZITADEL_SERVICE_USER_TOKEN);
 
   // 4. For non-proxy paths or missing configuration, just add headers
   if (!isMatched || !isProxyConfigured) {
@@ -1389,9 +1352,7 @@ export async function middleware(request: NextRequest) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const instanceHost = serviceUrl
-    .replace("https://", "")
-    .replace("http://", "");
+  const instanceHost = serviceUrl.replace("https://", "").replace("http://", "");
 
   // Add headers for ZITADEL backend
   requestHeaders.set("x-zitadel-public-host", request.nextUrl.host);
@@ -1407,7 +1368,7 @@ export async function middleware(request: NextRequest) {
   if (securitySettings?.embeddedIframe?.enabled) {
     responseHeaders.set(
       "Content-Security-Policy",
-      `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`
+      `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
     );
     responseHeaders.delete("X-Frame-Options");
   }
@@ -1436,9 +1397,7 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
   // 1. Multi-tenant: Use forwarded host
   const forwardedHost = headers.get("x-zitadel-forward-host");
   if (forwardedHost) {
-    instanceUrl = forwardedHost.startsWith("http://")
-      ? forwardedHost
-      : `https://${forwardedHost}`;
+    instanceUrl = forwardedHost.startsWith("http://") ? forwardedHost : `https://${forwardedHost}`;
   }
   // 2. Self-hosted with fixed URL: Use ZITADEL_API_URL
   else if (process.env.ZITADEL_API_URL) {
@@ -1450,9 +1409,7 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
     if (host) {
       const [hostname] = host.split(":");
       if (hostname !== "localhost") {
-        instanceUrl = host.startsWith("http") 
-          ? host 
-          : `https://${host}`;
+        instanceUrl = host.startsWith("http") ? host : `https://${host}`;
       }
     }
   }
@@ -1474,13 +1431,14 @@ All session cookies are **HTTP-only**, preventing JavaScript access:
 ```typescript
 cookiesList.set({
   name: "sessions",
-  httpOnly: true,  // ← Cannot be accessed via JavaScript
+  httpOnly: true, // ← Cannot be accessed via JavaScript
   secure: process.env.NODE_ENV === "production",
   sameSite: iFrameEnabled ? "none" : "lax",
 });
 ```
 
 **Benefits**:
+
 - Protection against XSS attacks
 - Sessions cannot be stolen via client-side scripts
 - Cookie manipulation requires server-side access
@@ -1490,7 +1448,7 @@ cookiesList.set({
 The `sameSite` attribute prevents CSRF attacks:
 
 ```typescript
-sameSite: iFrameEnabled ? "none" : "lax"
+sameSite: iFrameEnabled ? "none" : "lax";
 ```
 
 - **`"lax"`** (default): Cookies sent with top-level navigation (GET requests)
@@ -1528,7 +1486,7 @@ When iframe embedding is enabled via security settings:
 if (securitySettings?.embeddedIframe?.enabled) {
   responseHeaders.set(
     "Content-Security-Policy",
-    `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`
+    `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
   );
   responseHeaders.delete("X-Frame-Options");
 }
@@ -1548,15 +1506,15 @@ catch (error) {
     });
 
     const hasLimit = lockoutSettings?.maxPasswordAttempts > BigInt(0);
-    const locked = hasLimit && 
+    const locked = hasLimit &&
       error.failedAttempts >= lockoutSettings?.maxPasswordAttempts;
 
     return {
       error: t("errors.failedToAuthenticate", {
         failedAttempts: error.failedAttempts,
         maxPasswordAttempts: lockoutSettings?.maxPasswordAttempts,
-        lockoutMessage: locked 
-          ? t("errors.accountLockedContactAdmin") 
+        lockoutMessage: locked
+          ? t("errors.accountLockedContactAdmin")
           : "",
       }),
     };
@@ -1576,13 +1534,14 @@ All Server Actions exclusively use the POST HTTP method:
 
 ```typescript
 // Server Actions are always invoked via POST
-"use server"
+"use server";
 export async function loginAction(formData: FormData) {
   // This can only be called via POST
 }
 ```
 
 **Benefits**:
+
 - GET requests cannot invoke Server Actions
 - SameSite cookies (default `"lax"`) block cross-site POST requests
 - Traditional CSRF attacks via `<img>`, `<link>`, or simple form GET submissions are prevented
@@ -1596,16 +1555,18 @@ Next.js 14+ validates that requests originate from the same host:
 // Compares Origin header with Host/X-Forwarded-Host header
 if (requestOrigin !== expectedHost) {
   // Request rejected
-  throw new Error('Origin validation failed');
+  throw new Error("Origin validation failed");
 }
 ```
 
 **What gets validated**:
+
 - `Origin` header (sent by browser for POST requests)
 - Compared against `Host` or `X-Forwarded-Host` headers
 - Must match exactly, including protocol and port
 
 **Why this matters**:
+
 - Prevents attacks from external domains
 - Ensures Server Actions only callable from pages served by the same application
 - Works even in old browsers that don't support `Origin` header (request is rejected)
@@ -1616,7 +1577,7 @@ Cookies are configured with appropriate SameSite attributes:
 
 ```typescript
 // src/lib/cookies.ts
-sameSite: iFrameEnabled ? "none" : "lax"
+sameSite: iFrameEnabled ? "none" : "lax";
 ```
 
 - **`"lax"`** (default): Cookies only sent with same-site requests or top-level navigation
@@ -1629,10 +1590,12 @@ sameSite: iFrameEnabled ? "none" : "lax"
 **4. Proxy-Aware Validation**
 
 Next.js's Origin validation is proxy-aware and checks against:
+
 - `Host` header (direct connections)
 - `X-Forwarded-Host` header (when behind a proxy/load balancer)
 
 This ensures CSRF protection works correctly in both:
+
 - Direct deployments (Next.js exposed directly)
 - Proxied deployments (behind nginx, load balancer, etc.)
 
@@ -1650,11 +1613,13 @@ These mechanisms work together to provide comprehensive CSRF protection:
 #### No CSRF Tokens Required
 
 Unlike traditional approaches, Next.js Server Actions do **not** use:
+
 - Hidden CSRF tokens in forms
 - Double-submit cookies
 - Custom anti-CSRF headers
 
 This simplification is possible because:
+
 - Modern browsers support `Origin` headers and SameSite cookies
 - Server Actions are framework-controlled (not arbitrary endpoints)
 - Origin validation happens automatically at the framework level
@@ -1662,6 +1627,7 @@ This simplification is possible because:
 #### Legacy Browser Considerations
 
 For browsers that don't support the `Origin` header:
+
 - The action is rejected (fail-secure approach)
 - No silent fallback to potentially unsafe behavior
 - Only modern, supported browsers can invoke Server Actions
@@ -1673,13 +1639,16 @@ The login application accepts numerous search parameters (URL query parameters) 
 #### Search Parameter Inventory
 
 **🔴 High Risk: Redirect URIs**
+
 - `post_logout_redirect` / `post_logout_redirect_uri` (logout page)
 - Requires multi-layer validation to prevent open redirect attacks
 
 **🟡 Medium Risk: Pre-validated by Backend**
+
 - `authRequest`, `samlRequest`, `requestId` - Authentication flow identifiers validated by backend
 
 **🟢 Low Risk: Safe Parameters**
+
 - Entity identifiers: `organization`, `userId`, `sessionId`, `user_code`, `code`
 - Display/pre-fill: `firstname`, `lastname`, `email`, `loginName`, `suffix` (XSS-protected by React)
 - Flags: `submit`, `invite`, `initial`, `send`
@@ -1690,16 +1659,19 @@ The login application accepts numerous search parameters (URL query parameters) 
 The login application implements **defense-in-depth validation** for redirect URIs:
 
 **Validation Architecture**:
+
 1. **Backend Validation** (Primary): ZITADEL validates URIs against registered client configurations
 2. **Frontend Validation** (Defense-in-Depth): Login UI validates using trusted domains from ZITADEL API
 
 **Frontend Implementation** (`/src/lib/url-validation.ts`):
+
 - Fetches trusted domains from ZITADEL API via `listTrustedDomains()`
 - Multi-layer validation: protocol checking, HTTPS enforcement, domain allowlist
 - Automatic fallback to safe default (`/logout/done`) if validation fails
 - Security logging for monitoring
 
 **Security Layers**:
+
 1. ✅ Protocol Validation - Blocks `javascript:`, `data:`, `file:`, etc.
 2. ✅ HTTPS Enforcement - Requires HTTPS in production
 3. ✅ Domain Allowlist - Only allows configured trusted domains
@@ -1712,6 +1684,7 @@ Trusted domains are configured in the ZITADEL Console by administrators and fetc
 #### OIDC/SAML Backend Validation
 
 For OIDC/SAML flows, the ZITADEL backend validates `post_logout_redirect_uri` against pre-registered client URIs:
+
 - Exact matching required (scheme, host, port, path)
 - Client binding via `id_token_hint` or `client_id` parameter
 - Supports glob patterns for dynamic deployments
@@ -1720,6 +1693,7 @@ For OIDC/SAML flows, the ZITADEL backend validates `post_logout_redirect_uri` ag
 #### Security Best Practices
 
 **For ZITADEL Operators**:
+
 1. Register URIs strictly - only necessary redirect URIs
 2. Avoid wildcards unless required for dynamic deployments
 3. Enforce HTTPS for all production redirect URIs
@@ -1727,6 +1701,7 @@ For OIDC/SAML flows, the ZITADEL backend validates `post_logout_redirect_uri` ag
 5. Monitor and alert on validation failures
 
 **For Application Developers**:
+
 1. Pre-register all redirect URIs in ZITADEL Console
 2. Use specific paths, not just domains
 3. Match registered URIs exactly (case-sensitive)
@@ -1738,6 +1713,7 @@ For OIDC/SAML flows, the ZITADEL backend validates `post_logout_redirect_uri` ag
 The login application accepts various search parameters across different pages. Most are safe as they're used for lookups or validated by the backend:
 
 **Safe Parameters** (validated by backend or used for lookups):
+
 - `authRequest`, `samlRequest`, `requestId`: Auth request IDs
 - `organization`, `userId`, `sessionId`: Entity identifiers
 - `user_code`: Device authorization code
@@ -1746,11 +1722,13 @@ The login application accepts various search parameters across different pages. 
 - `logout_hint`: Username hint for logout
 
 **Pre-fill Parameters** (safe, used for UX):
+
 - `firstname`, `lastname`, `email`: Registration pre-fill
 - `loginName`, `suffix`: Username hints
 - `submit`, `invite`, `initial`: Boolean flags
 
 **Backend-Controlled** (not from search params):
+
 - `loginSettings.defaultRedirectUri`: Configured in ZITADEL Console
   - Used as fallback redirect after authentication
   - ✅ Safe - controlled by administrators, not user input
@@ -1783,18 +1761,11 @@ The `createServiceForHost` function is the central factory for creating authenti
 
 ```typescript
 // src/lib/service.ts
-export async function createServiceForHost<T extends ServiceClass>(
-  service: T,
-  serviceUrl: string,
-) {
+export async function createServiceForHost<T extends ServiceClass>(service: T, serviceUrl: string) {
   let token;
 
   // 1. Multi-tenancy mode: Generate JWT from service account
-  if (
-    process.env.AUDIENCE &&
-    process.env.SYSTEM_USER_ID &&
-    process.env.SYSTEM_USER_PRIVATE_KEY
-  ) {
+  if (process.env.AUDIENCE && process.env.SYSTEM_USER_ID && process.env.SYSTEM_USER_PRIVATE_KEY) {
     token = await systemAPIToken();
   }
   // 2. Self-hosted mode: Use static PAT
@@ -1823,6 +1794,7 @@ export async function createServiceForHost<T extends ServiceClass>(
 **Strategy 1: Multi-Tenancy with JWT Service Account** (Priority 1)
 
 Used when all three environment variables are present:
+
 - `AUDIENCE`: Target ZITADEL API audience
 - `SYSTEM_USER_ID`: Service account user ID
 - `SYSTEM_USER_PRIVATE_KEY`: Base64-encoded private key
@@ -1833,22 +1805,20 @@ export async function systemAPIToken() {
   const token = {
     audience: process.env.AUDIENCE,
     userID: process.env.SYSTEM_USER_ID,
-    token: Buffer.from(
-      process.env.SYSTEM_USER_PRIVATE_KEY,
-      "base64"
-    ).toString("utf-8"),
+    token: Buffer.from(process.env.SYSTEM_USER_PRIVATE_KEY, "base64").toString("utf-8"),
   };
 
   // Generate short-lived JWT (typically 1 hour)
   return newSystemToken({
     audience: token.audience,
     subject: token.userID,
-    key: token.token,  // Private key for signing
+    key: token.token, // Private key for signing
   });
 }
 ```
 
 **Benefits**:
+
 - **Dynamic JWT generation**: Fresh tokens for each request
 - **Short-lived tokens**: Enhanced security (typically 1-hour expiry)
 - **Region-wide access**: Single service account can access all instances in a region
@@ -1864,6 +1834,7 @@ ZITADEL_SERVICE_USER_TOKEN=<long-lived-token>
 ```
 
 **Benefits**:
+
 - **Simple setup**: Single token, no key management
 - **Self-hosted friendly**: Easy for single-instance deployments
 - **File-based loading**: Can load from file for Kubernetes secrets
@@ -1872,9 +1843,7 @@ ZITADEL_SERVICE_USER_TOKEN=<long-lived-token>
 // Token file support (checked during startup)
 if (process.env.ZITADEL_SERVICE_USER_TOKEN_FILE) {
   // Block until file exists and read token
-  const token = await readTokenFile(
-    process.env.ZITADEL_SERVICE_USER_TOKEN_FILE
-  );
+  const token = await readTokenFile(process.env.ZITADEL_SERVICE_USER_TOKEN_FILE);
   process.env.ZITADEL_SERVICE_USER_TOKEN = token;
 }
 ```
@@ -1882,6 +1851,7 @@ if (process.env.ZITADEL_SERVICE_USER_TOKEN_FILE) {
 **Required Role: `IAM_LOGIN_CLIENT`**
 
 The service user must have the `IAM_LOGIN_CLIENT` role, which provides:
+
 - Necessary permissions for authentication flows (session management, settings, OIDC/SAML)
 - Restricted from user/organization management operations
 - Follows principle of least privilege for login operations only
@@ -1893,12 +1863,13 @@ The service user must have the `IAM_LOGIN_CLIENT` role, which provides:
 export function createServerTransport(token: string, baseUrl: string) {
   return libCreateServerTransport(token, {
     baseUrl,
-    httpVersion: "2",  // HTTP/2 required for gRPC
+    httpVersion: "2", // HTTP/2 required for gRPC
   });
 }
 ```
 
 The transport automatically:
+
 - Adds `Authorization: Bearer <token>` header to all requests
 - Uses HTTP/2 for multiplexed streams
 - Handles connection pooling and keep-alives
@@ -1910,28 +1881,24 @@ Once created, service clients provide type-safe gRPC methods:
 
 ```typescript
 // Get login settings
-const settingsService = await createServiceForHost(
-  SettingsService,
-  serviceUrl
-);
+const settingsService = await createServiceForHost(SettingsService, serviceUrl);
 
 const loginSettings = await settingsService.getLoginSettings(
   { ctx: makeReqCtx(organization) },
-  {}  // gRPC call options
+  {}, // gRPC call options
 );
 
 // Create session
-const sessionService = await createServiceForHost(
-  SessionService,
-  serviceUrl
-);
+const sessionService = await createServiceForHost(SessionService, serviceUrl);
 
 const session = await sessionService.createSession(
   {
-    checks: { /* ... */ },
+    checks: {
+      /* ... */
+    },
     lifetime: { seconds: BigInt(3600), nanos: 0 },
   },
-  {}
+  {},
 );
 ```
 
@@ -1941,16 +1908,13 @@ The token determines the authentication context for all gRPC calls:
 
 ```typescript
 // Service account context (via createServiceForHost)
-const settingsService = await createServiceForHost(
-  SettingsService,
-  serviceUrl
-);
+const settingsService = await createServiceForHost(SettingsService, serviceUrl);
 // ↑ Uses service account token (system-level access)
 
 // User session context (via createServerTransport directly)
 const transport = createServerTransport(
-  sessionToken,  // ← User's session token
-  serviceUrl
+  sessionToken, // ← User's session token
+  serviceUrl,
 );
 const userService = createUserServiceClient(transport);
 // ↑ Uses user's session token (user-level access)
@@ -1996,14 +1960,14 @@ const userService = createUserServiceClient(transport);
 export async function sendPassword(command: {...}) {
   // 2. Determine service URL (multi-tenant or self-hosted)
   const { serviceUrl } = getServiceUrlFromHeaders(headers);
-  
+
   // 3. Create authenticated session service
   //    (automatically selects JWT or PAT based on env vars)
   const sessionService = await createServiceForHost(
     SessionService,
     serviceUrl
   );
-  
+
   // 4. Make authenticated gRPC call
   const session = await sessionService.setSession({
     sessionId: existingSession.id,
@@ -2012,7 +1976,7 @@ export async function sendPassword(command: {...}) {
       password: { password: command.password }
     }
   });
-  
+
   // 5. Session created/updated with service account permissions
   return { sessionId: session.sessionId };
 }
@@ -2021,18 +1985,21 @@ export async function sendPassword(command: {...}) {
 #### Security Considerations
 
 **JWT Service Account Mode**:
+
 - Private key must be kept secure
 - Key should be stored in secure secret management (Kubernetes secrets, AWS Secrets Manager, etc.)
 - Short-lived JWTs reduce impact of token compromise
 - Each request gets a fresh token (no token reuse)
 
 **Static PAT Mode**:
+
 - Token has longer lifetime (typically months/years)
 - Should be rotated periodically
 - If compromised, must be revoked and regenerated
 - Suitable for trusted environments (self-hosted)
 
 **Transport Security**:
+
 - All gRPC communication over TLS (HTTPS)
 - HTTP/2 provides multiplexing and header compression
 - Tokens transmitted in HTTP headers (not URL)
@@ -2045,7 +2012,7 @@ Password operations have additional safeguards:
 ```typescript
 // Password reset requires verification code
 export async function changePassword(command: {
-  code?: string;        // Verification code from email
+  code?: string; // Verification code from email
   userId: string;
   password: string;
 }) {
@@ -2064,8 +2031,7 @@ export async function changePassword(command: {
     }
 
     // Check for valid user verification check
-    const hasValidUserVerificationCheck = 
-      await checkUserVerification(userId);
+    const hasValidUserVerificationCheck = await checkUserVerification(userId);
 
     if (!hasValidUserVerificationCheck) {
       return { error: "Verification required" };
@@ -2087,6 +2053,7 @@ export async function changePassword(command: {
 **⚠️ CRITICAL SECURITY REQUIREMENT**:
 
 The login application uses the **host header** from incoming requests to construct URLs for:
+
 - Password reset emails
 - Email verification links
 - User invite links
@@ -2101,13 +2068,14 @@ const loginUrl = `https://${host}/reset-password?token=xyz`;
 
 // ZITADEL backend receives this URL for email templates
 await sendPasswordResetEmail({
-  resetUrl: loginUrl,  // Used in email template
+  resetUrl: loginUrl, // Used in email template
 });
 ```
 
 **Security Risk**:
 
 If the host header is not validated, an attacker could:
+
 1. Send a request with a malicious host header (e.g., `Host: evil.com`)
 2. Trigger a password reset, email verification, or invite flow
 3. The victim receives an email with a link to the attacker's domain
@@ -2117,6 +2085,7 @@ If the host header is not validated, an attacker could:
 **Required Protection**:
 
 ZITADEL **MUST** validate the host header against its configured trusted domains before:
+
 - Generating email templates with URLs
 - Sending password reset emails
 - Sending verification emails
@@ -2126,6 +2095,7 @@ ZITADEL **MUST** validate the host header against its configured trusted domains
 **Implementation Requirements**:
 
 ZITADEL backend MUST:
+
 - ✅ Maintain a list of trusted/allowed domains for the instance
 - ✅ Validate the host header from login application requests
 - ✅ Reject requests with untrusted host headers before sending emails
@@ -2133,6 +2103,7 @@ ZITADEL backend MUST:
 - ✅ Use only validated host values in URL templates
 
 The login application:
+
 - ✅ Passes the host header value in its requests to ZITADEL
 - ❌ Does NOT validate the host header itself (trusts the request)
 - ❌ Cannot prevent header manipulation by clients
@@ -2156,6 +2127,7 @@ curl -H "Host: attacker.com" \
 **Why This Matters**:
 
 This is a **critical phishing vector** because:
+
 - Links in emails appear to come from legitimate ZITADEL notifications
 - Users trust password reset and verification emails
 - Valid tokens make the malicious links fully functional
@@ -2191,6 +2163,7 @@ The combination of Next.js Origin validation and ZITADEL's trusted domain valida
 **Remaining Attack Vectors**:
 
 Even with Next.js protection, ZITADEL's validation is still critical because:
+
 - Direct API calls to ZITADEL that bypass the Next.js frontend
 - Internal requests between services that don't go through Next.js
 - Custom integrations that use ZITADEL's email APIs directly
@@ -2209,10 +2182,7 @@ Even with Next.js protection, ZITADEL's validation is still critical because:
 const userAgentId = await getOrSetFingerprintId();
 
 // Create SHA-256 hash binding userId to browser fingerprint
-const verificationCheck = crypto
-  .createHash("sha256")
-  .update(`${user.userId}:${userAgentId}`)
-  .digest("hex");
+const verificationCheck = crypto.createHash("sha256").update(`${user.userId}:${userAgentId}`).digest("hex");
 
 // Set short-lived verification cookie
 await cookiesList.set({
@@ -2260,6 +2230,7 @@ const userAgentData: UserAgent = {
 This mechanism prevents several attack vectors:
 
 1. **Verification Link Interception**:
+
    ```
    Attacker intercepts: /verify?code=xyz&userId=123
    → When attacker visits link, verification check fails
@@ -2279,6 +2250,7 @@ This mechanism prevents several attack vectors:
 **When This Protection Applies**:
 
 This verification check is used specifically when:
+
 - User verifies email/invite AND has **no existing authentication methods**
 - User is being redirected to set up their first authenticator
 - Session doesn't exist or user is not authenticated
@@ -2290,10 +2262,7 @@ This verification check is used specifically when:
 if (authMethodTypes.length === 0) {
   // No auth methods - user needs to set up authenticator
   const userAgentId = await getOrSetFingerprintId();
-  const verificationCheck = crypto
-    .createHash("sha256")
-    .update(`${user.userId}:${userAgentId}`)
-    .digest("hex");
+  const verificationCheck = crypto.createHash("sha256").update(`${user.userId}:${userAgentId}`).digest("hex");
 
   await cookies().set({
     name: "verificationCheck",
@@ -2326,6 +2295,7 @@ if (authMethodTypes.length === 0) {
 **Why 5 Minutes?**:
 
 The short expiration balances security and usability:
+
 - Long enough for legitimate users to complete authenticator setup
 - Short enough to limit attack window
 - Forces attackers to act immediately, increasing detection likelihood
@@ -2338,16 +2308,11 @@ MFA enforcement is determined by login settings:
 
 ```typescript
 // src/lib/verify-helper.ts
-export function shouldEnforceMFA(
-  session: Session,
-  loginSettings: LoginSettings | undefined
-): boolean {
+export function shouldEnforceMFA(session: Session, loginSettings: LoginSettings | undefined): boolean {
   if (!loginSettings) return false;
 
   // Passkeys are inherently multi-factor
-  const authenticatedWithPasskey = 
-    session.factors?.webAuthN?.verifiedAt && 
-    session.factors?.webAuthN?.userVerified;
+  const authenticatedWithPasskey = session.factors?.webAuthN?.verifiedAt && session.factors?.webAuthN?.userVerified;
 
   if (authenticatedWithPasskey) return false;
 
@@ -2356,10 +2321,8 @@ export function shouldEnforceMFA(
 
   // forceMfaLocalOnly: MFA only for password auth
   if (loginSettings.forceMfaLocalOnly) {
-    const authenticatedWithPassword = 
-      !!session.factors?.password?.verifiedAt;
-    const authenticatedWithIDP = 
-      !!session.factors?.intent?.verifiedAt;
+    const authenticatedWithPassword = !!session.factors?.password?.verifiedAt;
+    const authenticatedWithIDP = !!session.factors?.intent?.verifiedAt;
 
     // IDP users skip MFA with forceMfaLocalOnly
     if (authenticatedWithIDP) return false;
@@ -2389,13 +2352,11 @@ export async function checkMFAFactors(
       m === AuthenticationMethodType.TOTP ||
       m === AuthenticationMethodType.OTP_SMS ||
       m === AuthenticationMethodType.OTP_EMAIL ||
-      m === AuthenticationMethodType.U2F
+      m === AuthenticationMethodType.U2F,
   );
 
   // Passkeys satisfy MFA automatically
-  const hasAuthenticatedWithPasskey = 
-    session.factors?.webAuthN?.verifiedAt && 
-    session.factors?.webAuthN?.userVerified;
+  const hasAuthenticatedWithPasskey = session.factors?.webAuthN?.verifiedAt && session.factors?.webAuthN?.userVerified;
 
   if (hasAuthenticatedWithPasskey) return;
 
@@ -2424,23 +2385,19 @@ export async function checkMFAFactors(
     return { redirect: `/mfa?` + params };
   }
   // MFA enforced but no methods: force setup
-  else if (shouldEnforceMFA(session, loginSettings) && 
-           !availableMultiFactors.length) {
-    return { 
-      redirect: `/mfa/set?` + params + `&force=true&checkAfter=true` 
+  else if (shouldEnforceMFA(session, loginSettings) && !availableMultiFactors.length) {
+    return {
+      redirect: `/mfa/set?` + params + `&force=true&checkAfter=true`,
     };
   }
   // MFA skip lifetime: allow temporary skip
-  else if (loginSettings?.mfaInitSkipLifetime && 
-           shouldEnforceMFA(session, loginSettings)) {
+  else if (loginSettings?.mfaInitSkipLifetime && shouldEnforceMFA(session, loginSettings)) {
     const user = await getUserByID({
       serviceUrl,
       userId: session.factors.user.id,
     });
 
-    const humanUser = user?.user?.type.case === "human" 
-      ? user.user.type.value 
-      : undefined;
+    const humanUser = user?.user?.type.case === "human" ? user.user.type.value : undefined;
 
     // Check if skip is still valid
     if (humanUser?.mfaInitSkipped) {
@@ -2448,12 +2405,12 @@ export async function checkMFAFactors(
       const skipLifetime = Number(loginSettings.mfaInitSkipLifetime.seconds) * 1000;
       const elapsed = Date.now() - skipTime;
 
-      if (elapsed <= skipLifetime) return;  // Skip still valid
+      if (elapsed <= skipLifetime) return; // Skip still valid
     }
 
     // Offer optional MFA setup
-    return { 
-      redirect: `/mfa/set?` + params + `&force=false&checkAfter=true` 
+    return {
+      redirect: `/mfa/set?` + params + `&force=false&checkAfter=true`,
     };
   }
 }
@@ -2561,7 +2518,7 @@ const linkOnly = formData.get("linkOnly") === "true";
 if (linkOnly) {
   // Require existing session
   const existingSession = await getMostRecentSessionCookie();
-  
+
   if (!existingSession) {
     return { error: "Authentication required to link IDP" };
   }
@@ -2600,7 +2557,7 @@ export async function createNewSessionForLDAP(command: {
   });
 
   // Returns IDP intent on success
-  const { userId, idpIntentId, idpIntentToken } = 
+  const { userId, idpIntentId, idpIntentToken } =
     response.nextStep.value;
 
   // Continue with IDP intent flow
@@ -2615,6 +2572,7 @@ export async function createNewSessionForLDAP(command: {
 ### 1. Multi-Tenant Deployment
 
 **Configuration**:
+
 ```bash
 # Required environment variables for multi-tenancy
 AUDIENCE=https://api.zitadel.cloud  # Target ZITADEL API audience
@@ -2622,10 +2580,11 @@ SYSTEM_USER_ID=<service-account-user-id>
 SYSTEM_USER_PRIVATE_KEY=<base64-encoded-private-key>
 
 # Optional: Override API URL (defaults to AUDIENCE)
-ZITADEL_API_URL=https://api.zitadel.cloud
+ZITADEL_API_URL=https://zitadel.cloud
 ```
 
 **Characteristics**:
+
 - Centralized login UI serving multiple instances in a region
 - Instance context passed via `x-zitadel-forward-host` header
 - JWT service account with region-wide access
@@ -2633,11 +2592,12 @@ ZITADEL_API_URL=https://api.zitadel.cloud
 - Organization-specific branding and translations
 
 **Host Resolution**:
+
 ```typescript
 // Multi-tenant: Use forwarded host header to determine target instance
 const forwardedHost = headers.get("x-zitadel-forward-host");
 if (forwardedHost) {
-  instanceUrl = `https://${forwardedHost}`;  // e.g., customer-abc.zitadel.cloud
+  instanceUrl = `https://${forwardedHost}`; // e.g., custom-abc123.zitadel.cloud
 }
 ```
 
@@ -2653,29 +2613,30 @@ The multi-tenant deployment model relies on a **trustworthy proxy/gateway** that
 **Security Model**:
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Trusted Proxy/Gateway                    │
-│                                                             │
-│  1. Receives: https://customer-abc.zitadel.cloud/login     │
-│  2. Validates: customer-abc exists and is authorized       │
-│  3. Strips: Any x-zitadel-forward-host from client         │
-│  4. Sets: x-zitadel-forward-host: customer-abc.zitadel.cloud│
-│  5. Forwards to: Login App                                 │
-└─────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                    Trusted Proxy/Gateway                     │
+│                                                              │
+│  1. Receives: https://custom-abc123.zitadel.cloud/login      │
+│  2. Validates: custom-abc123 exists and is authorized        │
+│  3. Strips: Any x-zitadel-forward-host from client           │
+│  4. Sets: x-zitadel-forward-host: custom-abc123.zitadel.cloud│
+│  5. Forwards to: Login App                                   │
+└──────────────────────────────────────────────────────────────┘
                             │
                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│                      Login Application                      │
-│                                                             │
-│  - Trusts x-zitadel-forward-host header implicitly        │
-│  - Uses header to determine target ZITADEL instance        │
-│  - Creates gRPC clients for that specific instance         │
-└─────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                      Login Application                       │
+│                                                              │
+│  - Trusts x-zitadel-forward-host header implicitly           │
+│  - Uses header to determine target ZITADEL instance          │
+│  - Creates gRPC clients for that specific instance           │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 **Why This Matters**:
 
 Without a trusted proxy that validates requests and controls header injection:
+
 - **Instance impersonation**: Attackers could access any instance by forging headers
 - **Unauthorized access**: Users could authenticate against wrong instances
 - **Cross-tenant attacks**: Session/data leakage between different customers
@@ -2683,6 +2644,7 @@ Without a trusted proxy that validates requests and controls header injection:
 **Implementation Requirements**:
 
 The proxy MUST:
+
 - ✅ Validate the original request URL/domain against allowed instances
 - ✅ Strip all `x-zitadel-forward-host` headers from client requests
 - ✅ Set `x-zitadel-forward-host` based ONLY on validated routing logic
@@ -2690,19 +2652,17 @@ The proxy MUST:
 - ✅ Not expose the login application directly to clients
 
 The login application:
+
 - ❌ Does NOT validate the `x-zitadel-forward-host` header
 - ❌ Does NOT verify instance authorization
 - ✅ Assumes the header is set by a trusted component
 - ✅ Uses the header value directly for instance resolution
 
 **Authentication**:
+
 ```typescript
 // Multi-tenant uses JWT service account
-if (
-  process.env.AUDIENCE &&
-  process.env.SYSTEM_USER_ID &&
-  process.env.SYSTEM_USER_PRIVATE_KEY
-) {
+if (process.env.AUDIENCE && process.env.SYSTEM_USER_ID && process.env.SYSTEM_USER_PRIVATE_KEY) {
   // Generate fresh JWT for each request
   token = await systemAPIToken();
 }
@@ -2711,17 +2671,15 @@ if (
 ### 2. Self-Hosted Single-Instance
 
 **Configuration**:
-```bash
-# Option A: Fixed API URL with static PAT
-ZITADEL_API_URL=https://auth.mycompany.com
-ZITADEL_SERVICE_USER_TOKEN=<personal-access-token>
 
-# Option B: Custom domain (no ZITADEL_API_URL)
-# Uses host header automatically
+```bash
+# Required environment variables for self-hosted
+ZITADEL_API_URL=https://login-abc123.zitadel.cloud
 ZITADEL_SERVICE_USER_TOKEN=<personal-access-token>
 ```
 
 **Characteristics**:
+
 - Single ZITADEL instance
 - Direct communication with local backend
 - Static PAT (Personal Access Token) for authentication
@@ -2759,6 +2717,7 @@ The service user that generates the `ZITADEL_SERVICE_USER_TOKEN` must be assigne
 ```
 
 **Authentication**:
+
 ```typescript
 // Self-hosted uses static PAT
 if (process.env.ZITADEL_SERVICE_USER_TOKEN) {
@@ -2767,15 +2726,20 @@ if (process.env.ZITADEL_SERVICE_USER_TOKEN) {
 ```
 
 **Host Resolution**:
+
 ```typescript
-// Self-hosted with fixed URL
+// Self-hosted: Use ZITADEL_API_URL
 if (process.env.ZITADEL_API_URL) {
   instanceUrl = process.env.ZITADEL_API_URL;
 }
-// Self-hosted with custom domain
+// Fallback: Use host header (only for non-localhost)
+// Note: This is rarely used and requires login UI on same domain as ZITADEL
 else {
   const host = headers.get("host");
-  instanceUrl = `https://${host}`;
+  const [hostname] = host.split(":");
+  if (hostname !== "localhost") {
+    instanceUrl = `https://${host}`;
+  }
 }
 ```
 
@@ -2792,13 +2756,14 @@ The domain where the login application runs must be configured as a **trusted do
 When proxying OIDC/SAML endpoints, the middleware adds these headers to identify the request origin:
 
 ```typescript
-requestHeaders.set("x-zitadel-public-host", request.nextUrl.host);  // Login UI domain
-requestHeaders.set("x-zitadel-instance-host", instanceHost);         // Target ZITADEL instance
+requestHeaders.set("x-zitadel-public-host", request.nextUrl.host); // Login UI domain
+requestHeaders.set("x-zitadel-instance-host", instanceHost); // Target ZITADEL instance
 ```
 
 ZITADEL validates the `x-zitadel-public-host` against its trusted domains configuration.
 
 Without this configuration:
+
 - **ZITADEL will reject proxied requests** from the login UI domain
 - CORS errors will prevent the login UI from communicating with ZITADEL
 - Session cookies may be blocked by browser security policies
@@ -2806,13 +2771,13 @@ Without this configuration:
 
 ### Deployment Differences
 
-- **Multi-tenant (ZITADEL Cloud)**: 
+- **Multi-tenant (ZITADEL Cloud)**:
   - ZITADEL runs the entire application stack together (backend + login UI)
   - No proxy needed - everything runs in the same context
   - `ZITADEL_API_URL` and `ZITADEL_SERVICE_USER_TOKEN` are **not set**
   - OIDC/SAML endpoints handled directly by the integrated stack
 
-- **Self-hosted**: 
+- **Self-hosted**:
   - Login UI and ZITADEL backend are separate services
   - Proxy required to forward protocol endpoints to backend
   - `ZITADEL_API_URL` and `ZITADEL_SERVICE_USER_TOKEN` **must be set**
@@ -2821,6 +2786,7 @@ Without this configuration:
 **Why Proxy Only in Self-Hosted?**
 
 In self-hosted deployments, the login UI needs to proxy OIDC/SAML endpoints because:
+
 1. **Separate services**: Login UI (Next.js) and ZITADEL backend run independently
 2. **Protocol endpoints** (`/.well-known/`, `/oauth/`, `/oidc/`, `/saml/`) must be handled by ZITADEL backend
 3. **IDP callbacks** (`/idps/callback/`) return to the same domain and must reach ZITADEL
@@ -2831,10 +2797,7 @@ In self-hosted deployments, the login UI needs to proxy OIDC/SAML endpoints beca
 ```typescript
 // Middleware rewrites proxy paths to backend
 // This ONLY applies to self-hosted deployments where login UI is separate
-const isProxyConfigured = !!(
-  process.env.ZITADEL_API_URL &&
-  process.env.ZITADEL_SERVICE_USER_TOKEN
-);
+const isProxyConfigured = !!(process.env.ZITADEL_API_URL && process.env.ZITADEL_SERVICE_USER_TOKEN);
 
 if (isProxyConfigured && isProxyPath) {
   request.nextUrl.href = `${serviceUrl}${request.nextUrl.pathname}`;
@@ -2850,6 +2813,7 @@ if (isProxyConfigured && isProxyPath) {
 ### 3. Development Mode
 
 **Configuration**:
+
 ```bash
 # .env.local
 ZITADEL_API_URL=http://localhost:8080
@@ -2857,35 +2821,25 @@ DEBUG=true  # Disables caching
 ```
 
 **Characteristics**:
+
 - Local ZITADEL instance
 - Hot reloading
 - Disabled caching for immediate updates
 - HTTP allowed for localhost
 
-**Local Development Setup**:
-```bash
-# Start ZITADEL locally
-docker compose up
-
-# Run login UI
-pnpm dev
-
-# Access at http://localhost:3000
-```
-
 ### Deployment Comparison
 
-| Feature | Multi-Tenant | Self-Hosted | Development |
-|---------|-------------|-------------|-------------|
-| **Authentication** | JWT Service Account (AUDIENCE + SYSTEM_USER_ID + PRIVATE_KEY) | Static PAT (ZITADEL_SERVICE_USER_TOKEN) | Static PAT or None |
-| **ZITADEL_API_URL** | Optional (defaults to AUDIENCE) | Optional | Required |
-| **Token Generation** | Dynamic JWT per request | Static long-lived token | Static long-lived token |
-| **Middleware Proxy** | No (integrated stack) | Yes (for OIDC/SAML endpoints) | No (direct access) |
-| **Host Resolution** | `x-zitadel-forward-host` header | `ZITADEL_API_URL` or `host` header | `ZITADEL_API_URL` |
-| **Access Scope** | Region-wide (all instances) | Single instance | Single instance |
-| **Caching** | Enabled | Enabled | Disabled (DEBUG=true) |
-| **HTTPS** | Required | Recommended | Optional |
-| **Organization Header** | Propagated | Propagated | Propagated |
+| Feature                 | Multi-Tenant                                  | Self-Hosted                             | Development                            |
+| ----------------------- | --------------------------------------------- | --------------------------------------- | -------------------------------------- |
+| **Authentication**      | JWT (AUDIENCE + SYSTEM_USER_ID + PRIVATE_KEY) | Static PAT (ZITADEL_SERVICE_USER_TOKEN) | JWT OR Static PAT (same as production) |
+| **ZITADEL_API_URL**     | Optional (defaults to AUDIENCE)               | Required                                | Required                               |
+| **Token Generation**    | Dynamic JWT per request                       | Static long-lived token                 | Dynamic JWT or Static PAT              |
+| **Middleware Proxy**    | No (integrated stack)                         | Yes (for OIDC/SAML endpoints)           | No (direct access)                     |
+| **Host Resolution**     | `x-zitadel-forward-host` header               | `ZITADEL_API_URL`                       | `ZITADEL_API_URL`                      |
+| **Access Scope**        | Region-wide (all instances)                   | Single instance                         | Single instance                        |
+| **Caching**             | Enabled                                       | Enabled                                 | Disabled (DEBUG=true)                  |
+| **HTTPS**               | Required                                      | Recommended                             | Not enabled (HTTP)                     |
+| **Organization Header** | Propagated                                    | Propagated                              | Propagated                             |
 
 ## Next.js 15 Server Actions
 
@@ -2955,9 +2909,9 @@ import { getTranslations } from "next-intl/server";
 
 export async function sendPassword(command: {...}) {
   const t = await getTranslations("password");
-  
-  return { 
-    error: t("errors.couldNotVerifyPassword") 
+
+  return {
+    error: t("errors.couldNotVerifyPassword")
   };
 }
 ```
@@ -2975,15 +2929,10 @@ export async function getHostedLoginTranslation({
   organization?: string;
   locale?: string;
 }) {
-  const settingsService = await createServiceForHost(
-    SettingsService, 
-    serviceUrl
-  );
+  const settingsService = await createServiceForHost(SettingsService, serviceUrl);
 
   return settingsService.getHostedLoginTranslation({
-    level: organization
-      ? { case: "organizationId", value: organization }
-      : { case: "instance", value: true },
+    level: organization ? { case: "organizationId", value: organization } : { case: "instance", value: true },
     locale,
   });
 }
@@ -3028,12 +2977,10 @@ export function getThemeConfig() {
   };
 }
 
-export function getComponentRoundness(
-  component: keyof ComponentRoundnessConfig
-): string {
+export function getComponentRoundness(component: keyof ComponentRoundnessConfig): string {
   const config = getThemeConfig();
   const roundness = config.roundness;
-  
+
   const mapping = {
     button: {
       edgy: "rounded-none",
@@ -3042,7 +2989,7 @@ export function getComponentRoundness(
     },
     // ... other components
   };
-  
+
   return mapping[component][roundness];
 }
 ```
@@ -3061,15 +3008,13 @@ export function useResponsiveLayout() {
     const mediaQuery = window.matchMedia("(max-width: 768px)");
     setIsMdOrSmaller(mediaQuery.matches);
 
-    const handler = (e: MediaQueryListEvent) => 
-      setIsMdOrSmaller(e.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMdOrSmaller(e.matches);
     mediaQuery.addEventListener("change", handler);
 
     return () => mediaQuery.removeEventListener("change", handler);
   }, []);
 
-  const isSideBySide = 
-    themeConfig.layout === "side-by-side" && !isMdOrSmaller;
+  const isSideBySide = themeConfig.layout === "side-by-side" && !isMdOrSmaller;
 
   return { isSideBySide, isResponsiveOverride: isMdOrSmaller };
 }
@@ -3079,17 +3024,8 @@ export function useResponsiveLayout() {
 
 ```typescript
 // Fetch organization-specific branding
-export async function getBrandingSettings({
-  serviceUrl,
-  organization,
-}: {
-  serviceUrl: string;
-  organization?: string;
-}) {
-  const settingsService = await createServiceForHost(
-    SettingsService,
-    serviceUrl
-  );
+export async function getBrandingSettings({ serviceUrl, organization }: { serviceUrl: string; organization?: string }) {
+  const settingsService = await createServiceForHost(SettingsService, serviceUrl);
 
   return settingsService.getBrandingSettings({
     ctx: makeReqCtx(organization),
@@ -3126,12 +3062,14 @@ export async function getLoginSettings({
 ```
 
 **Cached Resources**:
+
 - Login settings
 - Branding settings
 - Security settings
 - Translations
 
 **Cache Invalidation**:
+
 - Disabled in development (`DEBUG=true`)
 - Automatic TTL-based invalidation (1 hour)
 - Organization-specific cache keys
@@ -3144,7 +3082,7 @@ let transportCache: Map<string, Transport> = new Map();
 
 export function createServerTransport(token: string, baseUrl: string) {
   const cacheKey = `${token}:${baseUrl}`;
-  
+
   if (transportCache.has(cacheKey)) {
     return transportCache.get(cacheKey);
   }
@@ -3166,7 +3104,7 @@ export function createServerTransport(token: string, baseUrl: string) {
 export default async function LoginPage() {
   // Rendered on server, no JavaScript shipped to client
   const branding = await getBrandingSettings({...});
-  
+
   return (
     <div>
       {/* Static HTML rendered on server */}
@@ -3215,13 +3153,15 @@ try {
   await setPassword({ serviceUrl, payload });
 } catch (error: ConnectError) {
   // gRPC error codes
-  if (error.code === 7) {  // PERMISSION_DENIED
+  if (error.code === 7) {
+    // PERMISSION_DENIED
     return { error: t("errors.sessionNotValid") };
   }
-  if (error.code === 9) {  // FAILED_PRECONDITION
+  if (error.code === 9) {
+    // FAILED_PRECONDITION
     return { error: t("errors.failedPrecondition") };
   }
-  
+
   // Handle error details
   const details = error.findDetails(CredentialsCheckErrorSchema);
   if (details[0]?.failedAttempts) {
