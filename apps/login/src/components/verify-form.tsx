@@ -3,7 +3,7 @@
 import { Alert, AlertType } from "@/components/alert";
 import { resendVerification, sendVerification } from "@/lib/server/verify";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, startTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { BackButton } from "./back-button";
@@ -99,11 +99,10 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
 
   useEffect(() => {
     if (code) {
-      // Don't call fcn directly in effect - schedule it
-      const timeoutId = setTimeout(() => {
+      // Don't call fcn directly in effect - use startTransition
+      startTransition(() => {
         fcn({ code });
-      }, 0);
-      return () => clearTimeout(timeoutId);
+      });
     }
   }, [code, fcn]);
 

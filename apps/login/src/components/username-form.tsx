@@ -3,7 +3,7 @@
 import { sendLoginname } from "@/lib/server/loginname";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, startTransition } from "react";
 import { useForm } from "react-hook-form";
 import { Alert } from "./alert";
 import { BackButton } from "./back-button";
@@ -74,11 +74,9 @@ export function UsernameForm({ loginName, requestId, organization, suffix, login
   useEffect(() => {
     if (submit && loginName) {
       // When we navigate to this page, we always want to be redirected if submit is true and the parameters are valid.
-      // Schedule it to avoid setState during render
-      const timeoutId = setTimeout(() => {
+      startTransition(() => {
         submitLoginName({ loginName }, organization);
-      }, 0);
-      return () => clearTimeout(timeoutId);
+      });
     }
   }, [submit, loginName, organization, submitLoginName]);
 
