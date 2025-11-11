@@ -3240,48 +3240,67 @@ The ZITADEL Login application operates across three architectural layers that in
 ### Architectural Layers
 
 ```
-┌─────────────────────────────────────┐  ┌─────────────────────────────────────┐
-│       Presentation Layer            │  │        Service Layer                │
-│   (Login UI - Next.js App)          │  │    (ZITADEL Backend APIs)           │
-│                                     │  │                                     │
-│  • User Interface & Forms           │  │  • Session Service                  │
-│  • Server Actions (auth logic)      │  │  • User Service                     │
-│  • Session Cookie Management        │  │  • Settings Service                 │
-│  • WebAuthn/Passkey flows           │  │  • Auth Service (OIDC/SAML)         │
-│  • URL parameter handling           │  │  • Notification Service             │
-└──────────────┬──────────────────────┘  └──────────────┬──────────────────────┘
-               │                                        │
-               │ gRPC/HTTPS (JWT/PAT)                   │ SQL/gRPC
-               │                                        │
-               │    ┌───────────────────────────────────┤
-               │    │                                   │
-               └────┼───────────────────────────────────┘
-                    │
-                    ▼
-┌────────────────────────────────────────────────────────────────────┐
-│                          Infrastructure Layer                      │
-│                   (Shared Platform Services)                       │
-│                                                                    │
-│  ┌────────────────────────────┐  ┌────────────────────────────┐    │
-│  │    Network Services        │  │   Secret Management        │    │
-│  │                            │  │                            │    │
-│  │  • TLS/HTTPS Termination   │  │  • Key Vault               │    │
-│  │  • Load Balancers          │  │  • Token Storage           │    │
-│  │  • Reverse Proxies         │  │  • Certificate Management  │    │
-│  │  • Firewalls               │  │  • Secret Rotation         │    │
-│  │  • DDoS Protection         │  │                            │    │
-│  └────────────────────────────┘  └────────────────────────────┘    │
-│                                                                    │
-│  ┌──────────────────────────────────────────────────────────────┐  │
-│  │             Logging & Monitoring                             │  │
-│  │  • Security Event Logging  • Metrics  • Alerting             │  │
-│  └──────────────────────────────────────────────────────────────┘  │
-└────────────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────┐       ┌───────────────────────────────────────┐
+│        Presentation Layer             │       │         Service Layer                 │
+│    (Login UI - Next.js App)           │       │     (ZITADEL Backend APIs)            │
+│                                       │       │                                       │
+│  • User Interface & Forms             │       │  • Session Service                    │
+│  • Server Actions (auth logic)        │       │  • User Service                       │
+│  • Session Cookie Management          │◄─────►│  • Settings Service                   │
+│  • WebAuthn/Passkey flows             │       │  • Auth Service (OIDC/SAML)           │
+│  • URL parameter handling             │       │  • Notification Service               │
+└───────────────┬───────────────────────┘       └───────────────┬───────────────────────┘
+                │                                               │
+                │ gRPC/HTTPS                                    │ SQL/gRPC
+                │ (JWT/PAT Auth)                                │ (Queries)
+                │                                               │
+                ▼                                               ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                           Infrastructure Layer                                  │
+│                        (Shared Platform Services)                               │
+│                                                                                 │
+│  ┌──────────────────────────┐  ┌──────────────────────────┐                    │
+│  │   Network Services       │  │   Secret Management      │                    │
+│  │                          │  │                          │                    │
+│  │  • TLS/HTTPS             │  │  • Key Vault             │                    │
+│  │  • Load Balancers        │  │  • Token Storage         │                    │
+│  │  • Reverse Proxies       │  │  • Certificates          │                    │
+│  │  • Firewalls             │  │  • Secret Rotation       │                    │
+│  │  • DDoS Protection       │  │                          │                    │
+│  └──────────────────────────┘  └──────────────────────────┘                    │
+│                                                                                 │
+│  ┌───────────────────────────────────────────────────────────────────────────┐  │
+│  │                      Logging & Monitoring                                 │  │
+│  │         • Security Event Logging  • Metrics  • Alerting                   │  │
+│  └───────────────────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────────────┘
 
-Key Dependencies:
-- Presentation Layer → Infrastructure: TLS, Proxies, Secrets (JWT/PAT keys)
-- Service Layer → Infrastructure: Secrets, Network
-- Presentation Layer → Service Layer: gRPC API calls (authenticated)
+Communication Flows:
+━━━━━━━━━━━━━━━━
+
+1. Presentation ◄────► Service
+   • Protocol: gRPC over HTTPS
+   • Authentication: JWT (multi-tenant) or PAT (self-hosted)
+   • Purpose: API calls for sessions, users, settings, auth flows
+
+2. Presentation ──► Infrastructure
+   • Uses: TLS termination, load balancing, proxy routing
+   • Gets: Secrets (JWT/PAT keys from secret management)
+   • Protected by: Network security, firewall rules
+
+3. Service ──► Infrastructure
+   • Uses: Database connections (SQL), gRPC infrastructure
+   • Gets: Secrets (database credentials, encryption keys)
+   • Protected by: Network segmentation, access controls
+
+Architecture Notes:
+━━━━━━━━━━━━━━━━━
+
+• Presentation and Service are PEER layers (same level)
+• Infrastructure is a SHARED FOUNDATION supporting both
+• All external traffic flows through Infrastructure first
+• No direct database access from Presentation layer
+• All cross-layer communication is authenticated and encrypted
 ```
 
 ### Layer-Specific Security Responsibilities
