@@ -50,8 +50,7 @@ func (r *RemoveInstanceDomainCommand) Execute(ctx context.Context, opts *InvokeO
 	// But instance_id is not a primary key
 	deletedRows, err := instanceRepo.Remove(ctx, opts.DB(), database.And(instanceRepo.InstanceIDCondition(r.InstanceID), instanceRepo.PrimaryKeyCondition(r.DomainName)))
 	if err != nil {
-		// TODO(IAM-Marco): Should we wrap err into zerrors.ThrowInternalError() ?
-		return err
+		return zerrors.ThrowInternal(err, "DOM-KH7AuJ", "failde removing instance domain")
 	}
 
 	if deletedRows > 1 {
@@ -101,9 +100,7 @@ func (r *RemoveInstanceDomainCommand) Validate(ctx context.Context, opts *Invoke
 		if errors.Is(err, &database.NoRowFoundError{}) {
 			return zerrors.ThrowNotFound(err, "DOM-nryNFt", "Errors.Instance.Domain.NotFound")
 		}
-
-		// TODO(IAM-Marco): Should we wrap err into zerrors.ThrowInternalError() ?
-		return err
+		return zerrors.ThrowInternal(err, "DOM-Zvv1fi", "failed fetching instance domain")
 	}
 
 	if d.Type == DomainTypeCustom && d.IsGenerated != nil && *d.IsGenerated {

@@ -191,7 +191,7 @@ func TestListInstanceDomainsQuery_Execute(t *testing.T) {
 					Return(nil, listErr)
 				return repo
 			},
-			expectedError: listErr,
+			expectedError: zerrors.ThrowInternal(listErr, "DOM-ubaPNU", "failed fetching instance domains"),
 		},
 		{
 			name: "when listing domains succeeds should return domains",

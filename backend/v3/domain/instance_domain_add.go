@@ -53,14 +53,14 @@ func (a *AddInstanceDomainCommand) Events(ctx context.Context, _ *InvokeOpts) ([
 
 // Execute implements [Commander].
 func (a *AddInstanceDomainCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
-	instanceRepo := opts.instanceDomainRepo
+	instanceDomainRepo := opts.instanceDomainRepo
 
 	var isPrimary, isGenerated *bool
 	if a.DType == DomainTypeCustom {
 		isPrimary, isGenerated = gu.Ptr(false), gu.Ptr(false)
 	}
 
-	err = instanceRepo.Add(ctx, opts.DB(), &AddInstanceDomain{
+	err = instanceDomainRepo.Add(ctx, opts.DB(), &AddInstanceDomain{
 		InstanceID:  a.InstanceID,
 		Domain:      a.DomainName,
 		IsPrimary:   isPrimary,
@@ -68,8 +68,7 @@ func (a *AddInstanceDomainCommand) Execute(ctx context.Context, opts *InvokeOpts
 		Type:        a.DType,
 	})
 	if err != nil {
-		// TODO(IAM-Marco): Should we wrap err into zerrors.ThrowInternalError() ?
-		return err
+		return zerrors.ThrowInternal(err, "DOM-uSCVn3", "failed adding instance domain")
 	}
 
 	return nil
@@ -111,7 +110,7 @@ func (a *AddInstanceDomainCommand) Validate(ctx context.Context, opts *InvokeOpt
 	}
 
 	if !errors.Is(err, &database.NoRowFoundError{}) {
-		return err
+		return zerrors.ThrowInternal(err, "DOM-LrTy2z", "failed fetching instance domain")
 	}
 
 	return nil

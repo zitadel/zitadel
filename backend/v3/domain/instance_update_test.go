@@ -85,7 +85,7 @@ func TestUpdateInstanceCommand_Validate(t *testing.T) {
 			},
 			inputInstanceID:   "instance-1",
 			inputInstanceName: "test instance update",
-			expectedError:     getErr,
+			expectedError:     zerrors.ThrowInternal(getErr, "DOM-j05Hdo", "failed fetching instance"),
 		},
 		{
 			testName: "when instance name is not changed should return name not changed error",
@@ -201,7 +201,7 @@ func TestUpdateInstanceCommand_Execute(t *testing.T) {
 			},
 			inputID:       "instance-1",
 			inputName:     "test instance update",
-			expectedError: updateErr,
+			expectedError: zerrors.ThrowInternal(updateErr, "DOM-PkVMNR", "failed updating instance"),
 		},
 		{
 			testName:  "when instance update returns 0 rows updated should return not found error",

@@ -63,7 +63,6 @@ func TestAddInstanceDomainCommand_Validate(t *testing.T) {
 			inputDomainName: "valid.domain",
 			expectedError:   zerrors.ThrowInvalidArgument(nil, "DOM-x01cai", "Errors.Invalid.Argument"),
 		},
-
 		{
 			testName: "when user is missing permission should return permission denied",
 			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionChecker {
@@ -106,7 +105,7 @@ func TestAddInstanceDomainCommand_Validate(t *testing.T) {
 			},
 			inputInstanceID: "instance-1",
 			inputDomainName: "valid.domain",
-			expectedError:   getErr,
+			expectedError:   zerrors.ThrowInternal(getErr, "DOM-LrTy2z", "failed fetching instance domain"),
 		},
 		{
 			testName: "when retrieving instance domain succeeds should return already exists error",
@@ -287,7 +286,7 @@ func TestAddInstanceDomainCommand_Execute(t *testing.T) {
 					Return(addErr)
 				return repo
 			},
-			expectedError: addErr,
+			expectedError: zerrors.ThrowInternal(addErr, "DOM-uSCVn3", "failed adding instance domain"),
 		},
 	}
 

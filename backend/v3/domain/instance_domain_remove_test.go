@@ -130,7 +130,7 @@ func TestRemoveInstanceDomainCommand_Validate(t *testing.T) {
 			},
 			inputInstanceID: "instance-1",
 			inputDomainName: "test-domain.com",
-			expectedError:   getErr,
+			expectedError:   zerrors.ThrowInternal(getErr, "DOM-Zvv1fi", "failed fetching instance domain"),
 		},
 		{
 			testName: "when domain is generated should return precondition failed error",
@@ -260,7 +260,7 @@ func TestRemoveInstanceDomainCommand_Execute(t *testing.T) {
 			},
 			inputInstanceID: "instance-1",
 			inputDomainName: "test-domain.com",
-			expectedError:   removeErr,
+			expectedError:   zerrors.ThrowInternal(removeErr, "DOM-KH7AuJ", "failde removing instance domain"),
 		},
 		{
 			testName: "when domain remove returns 0 rows removed should return not found error",

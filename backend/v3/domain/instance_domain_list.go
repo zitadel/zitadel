@@ -43,7 +43,7 @@ func (l *ListInstanceDomainsQuery) Execute(ctx context.Context, opts *InvokeOpts
 
 	instances, err := domainRepo.List(ctx, opts.DB(), conds, sorting, limit, offset)
 	if err != nil {
-		return err
+		return zerrors.ThrowInternal(err, "DOM-ubaPNU", "failed fetching instance domains")
 	}
 
 	l.toReturn = instances

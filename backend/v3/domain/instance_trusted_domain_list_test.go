@@ -191,7 +191,7 @@ func TestListInstanceTrustedDomainsQuery_Execute(t *testing.T) {
 					Return(nil, listErr)
 				return repo
 			},
-			expectedError: listErr,
+			expectedError: zerrors.ThrowInternal(listErr, "DOM-8eoWqY", "failed fetching trusted domains"),
 		},
 		{
 			name: "when listing domains succeeds should return domains",

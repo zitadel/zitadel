@@ -41,7 +41,7 @@ func (l *ListInstancesQuery) Execute(ctx context.Context, opts *InvokeOpts) (err
 
 	instances, err := instanceRepo.List(ctx, opts.DB(), conds, sorting, limit, offset)
 	if err != nil {
-		return err
+		return zerrors.ThrowInternal(err, "DOM-AIRPxN", "failed fetching instances")
 	}
 
 	l.toReturn = instances

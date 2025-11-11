@@ -161,7 +161,7 @@ func TestListInstancesCommand_Execute(t *testing.T) {
 					}}},
 				},
 			},
-			expectedError: listErr,
+			expectedError: zerrors.ThrowInternal(listErr, "DOM-AIRPxN", "failed fetching instances"),
 		},
 		{
 			testName: "when listing instances succeeds should save into result and return nil",

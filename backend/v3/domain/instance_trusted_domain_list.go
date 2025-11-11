@@ -43,7 +43,7 @@ func (l *ListInstanceTrustedDomainsQuery) Execute(ctx context.Context, opts *Inv
 
 	instances, err := domainRepo.List(ctx, opts.DB(), conds, sorting, limit, offset)
 	if err != nil {
-		return err
+		return zerrors.ThrowInternal(err, "DOM-8eoWqY", "failed fetching trusted domains")
 	}
 
 	l.toReturn = instances
