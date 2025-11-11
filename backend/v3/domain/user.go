@@ -46,6 +46,7 @@ const (
 	UserTypeMachine
 )
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/user.mock.go . UserRepository
 type UserRepository interface {
 	Repository
 

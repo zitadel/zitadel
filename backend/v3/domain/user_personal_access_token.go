@@ -23,6 +23,7 @@ type personalAccessTokenConditions interface {
 	InstanceIDCondition(instanceID string) database.Condition
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/personal_access_token.mock.go . PersonalAccessTokenRepository
 type PersonalAccessTokenRepository interface {
 	personalAccessTokenConditions
 

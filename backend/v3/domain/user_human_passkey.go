@@ -29,10 +29,10 @@ type Passkey struct {
 	CreatedAt time.Time `json:"createdAt,omitempty" db:"created_at"`
 	UpdatedAt time.Time `json:"updatedAt,omitempty" db:"updated_at"`
 
-	Type            PasskeyType `json:"type,omitempty" db:"type"`
-	Name            string      `json:"name,omitempty" db:"name"`
-	SignCount       uint32      `json:"signCount,omitempty" db:"sign_count"`
-	Challenge       []byte      `json:"challenge,omitempty" db:"challenge"`
+	Type           PasskeyType `json:"type,omitempty" db:"type"`
+	Name           string      `json:"name,omitempty" db:"name"`
+	SignCount      uint32      `json:"signCount,omitempty" db:"sign_count"`
+	Challenge      []byte      `json:"challenge,omitempty" db:"challenge"`
 	RelyingPartyID string      `json:"relyingPartyId,omitempty" db:"relying_party_id"`
 }
 
@@ -51,6 +51,7 @@ type passkeyChanges interface {
 	SetState(state PasskeyState) database.Change
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/user_human_passkey.mock.go . PasskeyRepository
 type PasskeyRepository interface {
 	passkeyChanges
 	passkeyConditions

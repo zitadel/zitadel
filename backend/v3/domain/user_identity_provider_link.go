@@ -18,6 +18,7 @@ type UserIdentityProviderLink struct {
 	UpdatedAt time.Time `json:"updatedAt,omitempty" db:"updated_at"`
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/user_identity_provider_link.mock.go . UserIdentityProviderLinkRepository
 type UserIdentityProviderLinkRepository interface {
 	Repository
 	userIdentityProviderLinkColumns

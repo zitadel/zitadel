@@ -23,6 +23,7 @@ type MachineKey struct {
 	ExpiresAt *time.Time
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/machine_key.mock.go . MachineKeyRepository
 type MachineKeyRepository interface {
 	Repository
 	machineKeyColumns

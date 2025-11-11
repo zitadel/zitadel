@@ -25,6 +25,7 @@ type userMetadataConditions interface {
 	UserIDCondition(userID string) database.Condition
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/user_metadata.mock.go . UserMetadataRepository
 type UserMetadataRepository interface {
 	userMetadataColumns
 	userMetadataConditions

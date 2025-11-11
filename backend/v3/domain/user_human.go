@@ -29,6 +29,7 @@ type Human struct {
 	Avatar            []byte        `json:"avatar,omitempty" db:"avatar"`
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/user_human.mock.go . HumanUserRepository
 type HumanUserRepository interface {
 	humanColumns
 	humanConditions

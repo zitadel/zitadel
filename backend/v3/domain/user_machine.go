@@ -22,6 +22,7 @@ type Machine struct {
 	AccessTokenType AccessTokenType `json:"accessTokenType,omitempty" db:"access_token_type"`
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/user_machine.mock.go . MachineUserRepository
 type MachineUserRepository interface {
 	machineColumns
 	machineConditions
