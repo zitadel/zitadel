@@ -52,7 +52,7 @@
             "options": {
                 "parallel": false,
                 "commands": [
-                    "bash -c 'DEFAULT_ZITADEL_BINARY=\"zitadel\"; if [ \"$(go env GOOS)\" = \"windows\" ]; then DEFAULT_ZITADEL_BINARY=\"zitadel.exe\"; fi; ./.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-$DEFAULT_ZITADEL_BINARY} start-from-init --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters'"
+                    "bash -c './.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel} start-from-init --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters'"
                 ]
             },
             "defaultConfiguration": "default",
@@ -80,7 +80,7 @@
                 "generate",
                 "build-console"
             ],
-            "command": "bash -c 'EXT=\"\"; if [ \"$(go env GOOS)\" = \"windows\" ]; then EXT=\".exe\"; fi; DATE=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\"); echo \"Building for $(go env GOOS)-$(go env GOARCH)...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel$EXT -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=${DATE} -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_RELEASE_VERSION:-${DATE}}\"'",
+            "command": "bash -c 'DATE=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\"); echo \"Building for $(go env GOOS)-$(go env GOARCH)...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=${DATE} -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_RELEASE_VERSION:-${DATE}}\"'",
             "inputs": [
                 "runtime",
                 "go-platform",
@@ -89,8 +89,7 @@
                 }
             ],
             "outputs": [
-                "{workspaceRoot}/.artifacts/bin/*/*/zitadel",
-                "{workspaceRoot}/.artifacts/bin/*/*/zitadel.exe"
+                "{workspaceRoot}/.artifacts/bin/*/*/zitadel"
             ]
         },
         "generate": {
@@ -388,8 +387,8 @@
                 ]
             }
         },
-        "build-darwin-windows": {
-            "description": "Builds the Go-based API backend for Darwin (amd64 and arm64) and Windows (amd64 and arm64) into executable binaries.",
+        "build-darwin": {
+            "description": "Builds the Go-based API backend for Darwin (amd64 and arm64) into executable binaries.",
             "dependsOn": [
                 "generate",
                 "build-console"
@@ -399,9 +398,7 @@
                 "parallel": false,
                 "commands": [
                     "GOOS=darwin GOARCH=amd64 nx run @zitadel/api:build --excludeTaskDependencies",
-                    "GOOS=darwin GOARCH=arm64 nx run @zitadel/api:build --excludeTaskDependencies",
-                    "GOOS=windows GOARCH=amd64 nx run @zitadel/api:build --excludeTaskDependencies",
-                    "GOOS=windows GOARCH=arm64 nx run @zitadel/api:build --excludeTaskDependencies"
+                    "GOOS=darwin GOARCH=arm64 nx run @zitadel/api:build --excludeTaskDependencies"
                 ]
             }
         },
@@ -415,7 +412,7 @@
                 "parallel": false,
                 "commands": [
                     "mkdir -p .artifacts/pack",
-                    "bash -c 'EXT=\"\"; if [ \"$(go env GOOS)\" = \"windows\" ]; then EXT=\".exe\"; fi; FOLDER=\"zitadel-$(go env GOOS)-$(go env GOARCH)\"; mkdir -p \".artifacts/pack/$FOLDER\"; cp README.md LICENSE \".artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel$EXT\" \".artifacts/pack/$FOLDER/\"; tar -czvf \".artifacts/pack/$FOLDER.tar.gz\" -C .artifacts/pack \"$FOLDER\"; rm -rf \".artifacts/pack/$FOLDER\"'"
+                    "bash -c 'FOLDER=\"zitadel-$(go env GOOS)-$(go env GOARCH)\"; mkdir -p \".artifacts/pack/$FOLDER\"; cp README.md LICENSE \".artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel\" \".artifacts/pack/$FOLDER/\"; tar -czvf \".artifacts/pack/$FOLDER.tar.gz\" -C .artifacts/pack \"$FOLDER\"; rm -rf \".artifacts/pack/$FOLDER\"'"
                 ]
             },
             "cache": true,
@@ -430,10 +427,10 @@
             ]
         },
         "pack-all": {
-            "description": "Packages the binary for the Linux, Darwin, and Windows platforms.",
+            "description": "Packages the binary for the Linux and Darwin platforms.",
             "dependsOn": [
                 "build-linux",
-                "build-darwin-windows"
+                "build-darwin"
             ],
             "executor": "nx:run-commands",
             "options": {
@@ -442,9 +439,7 @@
                     "GOOS=linux GOARCH=amd64 nx run @zitadel/api:pack --excludeTaskDependencies",
                     "GOOS=linux GOARCH=arm64 nx run @zitadel/api:pack --excludeTaskDependencies",
                     "GOOS=darwin GOARCH=amd64 nx run @zitadel/api:pack --excludeTaskDependencies",
-                    "GOOS=darwin GOARCH=arm64 nx run @zitadel/api:pack --excludeTaskDependencies",
-                    "GOOS=windows GOARCH=amd64 nx run @zitadel/api:pack --excludeTaskDependencies",
-                    "GOOS=windows GOARCH=arm64 nx run @zitadel/api:pack --excludeTaskDependencies"
+                    "GOOS=darwin GOARCH=arm64 nx run @zitadel/api:pack --excludeTaskDependencies"
                 ]
             }
         }
