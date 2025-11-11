@@ -19,6 +19,9 @@ type userHuman struct {
 
 	shouldLoadMetadata bool
 	metadata           userMetadata
+
+	shouldLoadIdentityProviderLinks bool
+	identityProviderLinks           userIdentityProviderLink
 }
 
 func HumanUserRepository() domain.HumanUserRepository {
@@ -85,6 +88,16 @@ func (u userHuman) Update(ctx context.Context, client database.QueryExecutor, co
 	writeCondition(builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+func (u userHuman) LoadIdentityProviderLinks() domain.HumanUserRepository {
+	return &userHuman{
+		verification:                    u.verification,
+		shouldLoadMetadata:              u.shouldLoadMetadata,
+		metadata:                        u.metadata,
+		shouldLoadIdentityProviderLinks: true,
+		identityProviderLinks:           u.identityProviderLinks,
+	}
 }
 
 // -------------------------------------------------------------
@@ -164,13 +177,19 @@ func (u userHuman) SetMFAInitSkippedAt(skippedAt *time.Time) database.Change {
 }
 
 // SetMFAInitSkippedAt implements [domain.HumanUserRepository].
-func (u userHuman) SetEmailOTPEnabled(enabled bool) database.Change {
-	return database.NewChange(u.emailOTPEnabledColumn(), enabled)
+func (u userHuman) SetEmailOTPEnabledAt(verifiedAt time.Time) database.Change {
+	if verifiedAt.IsZero() {
+		return database.NewChange(u.emailOTPEnabledColumn(), database.NowInstruction)
+	}
+	return database.NewChange(u.emailOTPEnabledColumn(), verifiedAt)
 }
 
-// SetMFAInitSkippedAt implements [domain.HumanUserRepository].
-func (u userHuman) SetPhoneOTPEnabled(enabled bool) database.Change {
-	return database.NewChange(u.phoneOTPEnabledColumn(), enabled)
+// SetSMSOTPEnabledAt implements [domain.HumanUserRepository].
+func (u userHuman) SetSMSOTPEnabledAt(verifiedAt time.Time) database.Change {
+	if verifiedAt.IsZero() {
+		return database.NewChange(u.smsOTPEnabledColumn(), database.NowInstruction)
+	}
+	return database.NewChange(u.smsOTPEnabledColumn(), verifiedAt)
 }
 
 // -------------------------------------------------------------
