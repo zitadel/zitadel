@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"errors"
 	"strings"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -29,7 +30,10 @@ func (g *GetInstanceQuery) Execute(ctx context.Context, opts *InvokeOpts) (err e
 
 	instance, err := instanceRepo.Get(ctx, opts.DB(), database.WithCondition(instanceRepo.IDCondition(g.ID)))
 	if err != nil {
-		return err
+		if errors.Is(err, &database.NoRowFoundError{}) {
+			return zerrors.ThrowNotFound(err, "DOM-QVrUwc", "instance not found")
+		}
+		return zerrors.ThrowInternal(err, "DOM-lvsRce", "failed fetching instance")
 	}
 
 	g.returnedInstance = instance

@@ -2,7 +2,11 @@ package domain
 
 import (
 	"context"
+	"errors"
 	"strings"
+	"time"
+
+	"github.com/muhlemmer/gu"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -20,6 +24,8 @@ type DeleteInstanceCommand struct {
 	// InstanceName is public for testing purposes
 	// do not use this field
 	InstanceName string
+
+	DeleteTime *time.Time
 }
 
 // RequiresTransaction implements [Transactional].
@@ -58,7 +64,10 @@ func (d *DeleteInstanceCommand) Execute(ctx context.Context, opts *InvokeOpts) (
 
 	deletedRows, err := instanceRepo.Delete(ctx, opts.DB(), instanceToDelete.ID)
 	if err != nil {
-		return err
+		if errors.Is(err, &database.NoRowFoundError{}) {
+			return nil
+		}
+		return zerrors.ThrowInternal(err, "DOM-caF4Vs", "failed deleting instance")
 	}
 
 	if deletedRows > 1 {
@@ -67,8 +76,10 @@ func (d *DeleteInstanceCommand) Execute(ctx context.Context, opts *InvokeOpts) (
 	}
 
 	if deletedRows < 1 {
-		err = zerrors.ThrowNotFound(nil, "DOM-daglwD", "instance not found")
+		return nil
 	}
+
+	d.DeleteTime = gu.Ptr(time.Now())
 
 	return err
 }

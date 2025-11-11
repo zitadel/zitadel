@@ -2,16 +2,13 @@ package instancev2
 
 import (
 	"context"
-	"errors"
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/backend/v3/api/instance/v2/convert"
 	"github.com/zitadel/zitadel/backend/v3/domain"
-	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
-	"github.com/zitadel/zitadel/internal/zerrors"
 	filter_v2 "github.com/zitadel/zitadel/pkg/grpc/filter/v2"
 	filter_v2beta "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
 	instance_v2 "github.com/zitadel/zitadel/pkg/grpc/instance/v2"
@@ -28,17 +25,18 @@ func DeleteInstanceBeta(ctx context.Context, request *connect.Request[instance_v
 	err := domain.Invoke(ctx, instanceDeleteCmd, domain.WithInstanceRepo(repository.InstanceRepository()))
 
 	if err != nil {
-		if errors.Is(err, &database.NoRowFoundError{}) {
-			return &connect.Response[instance_v2beta.DeleteInstanceResponse]{}, nil
-		}
 		return nil, err
 	}
 
+	var deletionDate *timestamppb.Timestamp
+	if instanceDeleteCmd.DeleteTime != nil {
+		deletionDate = timestamppb.New(*instanceDeleteCmd.DeleteTime)
+	}
 	return &connect.Response[instance_v2beta.DeleteInstanceResponse]{
 		Msg: &instance_v2beta.DeleteInstanceResponse{
 			// TODO(IAM-Marco): Change this with the real update date when OrganizationRepo.Update()
 			// returns the timestamp
-			DeletionDate: timestamppb.Now(),
+			DeletionDate: deletionDate,
 		},
 	}, nil
 }
@@ -49,9 +47,6 @@ func GetInstanceBeta(ctx context.Context, request *connect.Request[instance_v2be
 	err := domain.Invoke(ctx, instanceGetCmd, domain.WithInstanceRepo(repository.InstanceRepository()))
 
 	if err != nil {
-		if errors.Is(err, &database.NoRowFoundError{}) {
-			return nil, zerrors.ThrowNotFound(err, "INST-QVrUwc", "instance not found")
-		}
 		return nil, err
 	}
 
@@ -116,17 +111,18 @@ func DeleteInstance(ctx context.Context, request *connect.Request[instance_v2.De
 	err := domain.Invoke(ctx, instanceDeleteCmd, domain.WithInstanceRepo(repository.InstanceRepository()))
 
 	if err != nil {
-		if errors.Is(err, &database.NoRowFoundError{}) {
-			return nil, nil
-		}
 		return nil, err
 	}
 
+	var deletionDate *timestamppb.Timestamp
+	if instanceDeleteCmd.DeleteTime != nil {
+		deletionDate = timestamppb.New(*instanceDeleteCmd.DeleteTime)
+	}
 	return &connect.Response[instance_v2.DeleteInstanceResponse]{
 		Msg: &instance_v2.DeleteInstanceResponse{
 			// TODO(IAM-Marco): Change this with the real update date when OrganizationRepo.Update()
 			// returns the timestamp
-			DeletionDate: timestamppb.Now(),
+			DeletionDate: deletionDate,
 		},
 	}, nil
 }
@@ -137,9 +133,6 @@ func GetInstance(ctx context.Context, request *connect.Request[instance_v2.GetIn
 	err := domain.Invoke(ctx, instanceGetCmd, domain.WithInstanceRepo(repository.InstanceRepository()))
 
 	if err != nil {
-		if errors.Is(err, &database.NoRowFoundError{}) {
-			return nil, zerrors.ThrowNotFound(err, "INST-QVrUwc", "instance not found")
-		}
 		return nil, err
 	}
 

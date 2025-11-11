@@ -126,6 +126,7 @@ func TestDeleteInstanceCommand_Execute(t *testing.T) {
 		expectedError           error
 		expectedInstanceName    string
 		expectedInstanceDomains []string
+		expectsDeleteTime       bool
 	}{
 		{
 			testName: "when retrieving instance fails should return error",
@@ -188,7 +189,46 @@ func TestDeleteInstanceCommand_Execute(t *testing.T) {
 				return instanceRepo
 			},
 			inputInstanceID:         "instance-1",
-			expectedError:           deleteErr,
+			expectedError:           zerrors.ThrowInternal(deleteErr, "DOM-caF4Vs", "failed deleting instance"),
+			expectedInstanceName:    "My instance 1",
+			expectedInstanceDomains: []string{"d1.example.com", "d2.example.com", "d3.example.com"},
+		},
+		{
+			testName: "when delete instance fails with no row found should return no error",
+			instanceRepo: func(ctrl *gomock.Controller) domain.InstanceRepository {
+				instanceRepo := domainmock.NewInstanceRepo(ctrl)
+
+				instanceRepo.EXPECT().
+					LoadDomains().
+					Times(1).
+					Return(instanceRepo)
+
+				instanceRepo.EXPECT().
+					Get(
+						gomock.Any(),
+						gomock.Any(),
+						dbmock.QueryOptions(database.WithCondition(
+							instanceRepo.IDCondition("instance-1"),
+						)),
+					).
+					Times(1).
+					Return(&domain.Instance{
+						ID:   "instance-1",
+						Name: "My instance 1",
+						Domains: []*domain.InstanceDomain{
+							{Domain: "d1.example.com"},
+							{Domain: "d2.example.com"},
+							{Domain: "d3.example.com"},
+						},
+					}, nil)
+
+				instanceRepo.EXPECT().
+					Delete(gomock.Any(), gomock.Any(), "instance-1").
+					Times(1).
+					Return(int64(0), database.NewNoRowFoundError(nil))
+				return instanceRepo
+			},
+			inputInstanceID:         "instance-1",
 			expectedInstanceName:    "My instance 1",
 			expectedInstanceDomains: []string{"d1.example.com", "d2.example.com", "d3.example.com"},
 		},
@@ -233,7 +273,7 @@ func TestDeleteInstanceCommand_Execute(t *testing.T) {
 			expectedInstanceDomains: []string{"d1.example.com", "d2.example.com", "d3.example.com"},
 		},
 		{
-			testName: "when no rows deleted should return not found error",
+			testName: "when no rows deleted should return no error",
 			instanceRepo: func(ctrl *gomock.Controller) domain.InstanceRepository {
 				instanceRepo := domainmock.NewInstanceRepo(ctrl)
 
@@ -268,7 +308,6 @@ func TestDeleteInstanceCommand_Execute(t *testing.T) {
 				return instanceRepo
 			},
 			inputInstanceID:         "instance-1",
-			expectedError:           zerrors.ThrowNotFound(nil, "DOM-daglwD", "instance not found"),
 			expectedInstanceName:    "My instance 1",
 			expectedInstanceDomains: []string{"d1.example.com", "d2.example.com", "d3.example.com"},
 		},
@@ -310,6 +349,7 @@ func TestDeleteInstanceCommand_Execute(t *testing.T) {
 			inputInstanceID:         "instance-1",
 			expectedInstanceName:    "My instance 1",
 			expectedInstanceDomains: []string{"d1.example.com", "d2.example.com", "d3.example.com"},
+			expectsDeleteTime:       true,
 		},
 	}
 
@@ -335,6 +375,7 @@ func TestDeleteInstanceCommand_Execute(t *testing.T) {
 			assert.Equal(t, tc.expectedError, err)
 			assert.Equal(t, tc.expectedInstanceName, d.InstanceName)
 			assert.ElementsMatch(t, tc.expectedInstanceDomains, d.InstanceDomains)
+			assert.Equal(t, tc.expectsDeleteTime, d.DeleteTime != nil && !d.DeleteTime.IsZero())
 		})
 	}
 }
