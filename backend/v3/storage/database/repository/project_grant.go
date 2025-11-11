@@ -43,47 +43,42 @@ func (p projectGrant) List(ctx context.Context, client database.QueryExecutor, o
 	return getMany[domain.ProjectGrant](ctx, client, builder)
 }
 
-const insertProjectGrantStmt = `INSERT INTO zitadel.project_grants(
-	instance_id, id, project_id, granting_organization_id, granted_organization_id, state
-)
-VALUES ($1, $2, $3, $4, $5, $6)
-RETURNING created_at, updated_at`
-
-const insertProjectGrantWithRolesStmt = `WITH added_roles AS (
+const insertProjectGrantRolesStmt = `WITH added_roles AS (
 	INSERT INTO zitadel.project_grant_roles (
 		instance_id, grant_id, project_id, key
 	)
-	VALUES ($1, $2, $3, unnest($7::text[]))
-) ` + insertProjectGrantStmt
+	VALUES ($2, $3, $4, unnest($1::text[]))
+) `
 
 func (p projectGrant) Create(ctx context.Context, client database.QueryExecutor, projectGrant *domain.ProjectGrant) error {
-	var builder *database.StatementBuilder
-	if len(projectGrant.RoleKeys) == 0 {
-		builder = database.NewStatementBuilder(insertProjectGrantStmt,
-			projectGrant.InstanceID,
-			projectGrant.ID,
-			projectGrant.ProjectID,
-			projectGrant.GrantingOrganizationID,
-			projectGrant.GrantedOrganizationID,
-			projectGrant.State,
-		)
-	} else {
-		builder = database.NewStatementBuilder(insertProjectGrantWithRolesStmt,
-			projectGrant.InstanceID,
-			projectGrant.ID,
-			projectGrant.ProjectID,
-			projectGrant.GrantingOrganizationID,
-			projectGrant.GrantedOrganizationID,
-			projectGrant.State,
-			projectGrant.RoleKeys,
-		)
+	var (
+		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
+	)
+	if !projectGrant.CreatedAt.IsZero() {
+		createdAt = projectGrant.CreatedAt
+	}
+	if !projectGrant.UpdatedAt.IsZero() {
+		updatedAt = projectGrant.UpdatedAt
 	}
 
-	if err := client.QueryRow(ctx, builder.String(), builder.Args()...).
-		Scan(&projectGrant.CreatedAt, &projectGrant.UpdatedAt); err != nil {
-		return err
-	}
-	return nil
+	// separate statement to add roles to project grant
+	builder := database.NewStatementBuilder(insertProjectGrantRolesStmt, projectGrant.RoleKeys)
+
+	builder.WriteString(`INSERT INTO ` + p.qualifiedTableName() + ` (instance_id, id, project_id, granting_organization_id, granted_organization_id, state, created_at, updated_at) VALUES ( `)
+	builder.WriteArgs(
+		projectGrant.InstanceID,
+		projectGrant.ID,
+		projectGrant.ProjectID,
+		projectGrant.GrantingOrganizationID,
+		projectGrant.GrantedOrganizationID,
+		projectGrant.State,
+		createdAt,
+		updatedAt,
+	)
+	builder.WriteString(` ) RETURNING created_at, updated_at`)
+
+	return client.QueryRow(ctx, builder.String(), builder.Args()...).
+		Scan(&projectGrant.CreatedAt, &projectGrant.UpdatedAt)
 }
 
 const queryUpdateProjectGrantRoleStmt = `SELECT instance_id, id, project_id, $1::text[] as keys from zitadel.project_grants`

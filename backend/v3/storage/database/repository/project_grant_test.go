@@ -21,7 +21,9 @@ func TestGetProjectGrant(t *testing.T) {
 	firstGrantedOrgID := createOrganization(t, tx, instanceID)
 	secondGrantedOrgID := createOrganization(t, tx, instanceID)
 	projectID := createProject(t, tx, instanceID, grantingOrgID)
-	roleKey := createProjectRole(t, tx, instanceID, grantingOrgID, projectID, "")
+	firstRoleKey := createProjectRole(t, tx, instanceID, grantingOrgID, projectID, "")
+	secondRoleKey := createProjectRole(t, tx, instanceID, grantingOrgID, projectID, "")
+	thirdRoleKey := createProjectRole(t, tx, instanceID, grantingOrgID, projectID, "")
 	projectGrantRepo := repository.ProjectGrantRepository()
 
 	firstProjectGrant := &domain.ProjectGrant{
@@ -31,7 +33,7 @@ func TestGetProjectGrant(t *testing.T) {
 		ProjectID:              projectID,
 		GrantedOrganizationID:  firstGrantedOrgID,
 		State:                  domain.ProjectGrantStateActive,
-		RoleKeys:               []string{roleKey},
+		RoleKeys:               []string{firstRoleKey},
 	}
 	err := projectGrantRepo.Create(t.Context(), tx, firstProjectGrant)
 	require.NoError(t, err)
@@ -41,7 +43,8 @@ func TestGetProjectGrant(t *testing.T) {
 		GrantingOrganizationID: grantingOrgID,
 		ProjectID:              projectID,
 		GrantedOrganizationID:  secondGrantedOrgID,
-		State:                  domain.ProjectGrantStateActive,
+		State:                  domain.ProjectGrantStateInactive,
+		RoleKeys:               []string{firstRoleKey, secondRoleKey, thirdRoleKey},
 	}
 	err = projectGrantRepo.Create(t.Context(), tx, secondProjectGrant)
 	require.NoError(t, err)
@@ -68,16 +71,21 @@ func TestGetProjectGrant(t *testing.T) {
 			wantErr:   database.NewMultipleRowsFoundError(nil),
 		},
 		{
-			name:      "ok",
+			name:      "ok first",
 			condition: projectGrantRepo.PrimaryKeyCondition(instanceID, firstProjectGrant.ID),
 			want:      firstProjectGrant,
+		},
+		{
+			name:      "ok second",
+			condition: projectGrantRepo.PrimaryKeyCondition(instanceID, secondProjectGrant.ID),
+			want:      secondProjectGrant,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := projectGrantRepo.Get(t.Context(), tx, database.WithCondition(tt.condition))
 			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.want, got)
+			assertProjectGrant(t, tt.want, got)
 		})
 	}
 }
@@ -88,7 +96,9 @@ func TestListProjectGrants(t *testing.T) {
 	instanceID := createInstance(t, tx)
 	firstGrantingOrgID := createOrganization(t, tx, instanceID)
 	firstProjectID := createProject(t, tx, instanceID, firstGrantingOrgID)
-	roleKey := createProjectRole(t, tx, instanceID, firstGrantingOrgID, firstProjectID, "")
+	firstRoleKey := createProjectRole(t, tx, instanceID, firstGrantingOrgID, firstProjectID, "")
+	secondRoleKey := createProjectRole(t, tx, instanceID, firstGrantingOrgID, firstProjectID, "")
+	thirdRoleKey := createProjectRole(t, tx, instanceID, firstGrantingOrgID, firstProjectID, "")
 	secondGrantingOrgID := createOrganization(t, tx, instanceID)
 	secondProjectID := createProject(t, tx, instanceID, secondGrantingOrgID)
 
@@ -104,7 +114,7 @@ func TestListProjectGrants(t *testing.T) {
 			GrantedOrganizationID:  firstGrantedOrgID,
 			GrantingOrganizationID: firstGrantingOrgID,
 			State:                  domain.ProjectGrantStateActive,
-			RoleKeys:               []string{roleKey},
+			RoleKeys:               []string{firstRoleKey},
 		},
 		{
 			InstanceID:             instanceID,
@@ -113,6 +123,7 @@ func TestListProjectGrants(t *testing.T) {
 			GrantedOrganizationID:  secondGrantedOrgID,
 			GrantingOrganizationID: firstGrantingOrgID,
 			State:                  domain.ProjectGrantStateInactive,
+			RoleKeys:               []string{secondRoleKey, thirdRoleKey},
 		},
 		{
 			InstanceID:             instanceID,
@@ -200,7 +211,7 @@ func TestListProjectGrants(t *testing.T) {
 			name: "exists role key",
 			condition: database.And(
 				projectGrantRepo.InstanceIDCondition(instanceID),
-				projectGrantRepo.ExistsRoleKey(projectGrantRepo.RoleKeyCondition(database.TextOperationEqual, roleKey)),
+				projectGrantRepo.ExistsRoleKey(projectGrantRepo.RoleKeyCondition(database.TextOperationEqual, firstRoleKey)),
 			),
 			want: []*domain.ProjectGrant{projectGrants[0]},
 		},
@@ -213,12 +224,20 @@ func TestListProjectGrants(t *testing.T) {
 				database.WithOrderByAscending(projectGrantRepo.PrimaryKeyColumns()...),
 			)
 			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.want, got)
+
+			if !assert.Len(t, got, len(tt.want)) {
+				return
+			}
+			for i, want := range tt.want {
+				assertProjectGrant(t, want, got[i])
+			}
 		})
 	}
 }
 
 func TestCreateProjectGrant(t *testing.T) {
+	beforeCreate := time.Now()
+
 	tx, rollback := transactionForRollback(t)
 	defer rollback()
 	instanceID := createInstance(t, tx)
@@ -332,8 +351,36 @@ func TestCreateProjectGrant(t *testing.T) {
 			defer rollback()
 			err := projectGrantRepo.Create(t.Context(), savepoint, tt.projectGrant)
 			require.ErrorIs(t, err, tt.wantErr)
+			if err != nil {
+				return
+			}
+			afterCreate := time.Now()
+
+			// check instance values
+			projectGrant, err := projectGrantRepo.Get(t.Context(), tx,
+				database.WithCondition(
+					projectGrantRepo.PrimaryKeyCondition(tt.projectGrant.InstanceID, tt.projectGrant.ID),
+				),
+			)
+			require.NoError(t, err)
+			assertProjectGrant(t, tt.projectGrant, projectGrant)
+			assert.WithinRange(t, projectGrant.CreatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, projectGrant.UpdatedAt, beforeCreate, afterCreate)
 		})
 	}
+}
+
+func assertProjectGrant(t assert.TestingT, expected *domain.ProjectGrant, actual *domain.ProjectGrant) {
+	if expected == nil {
+		assert.Nil(t, actual)
+		return
+	}
+	assert.Equal(t, expected.ID, actual.ID)
+	assert.Equal(t, expected.ProjectID, actual.ProjectID)
+	assert.Equal(t, expected.GrantingOrganizationID, actual.GrantingOrganizationID)
+	assert.Equal(t, expected.GrantedOrganizationID, actual.GrantedOrganizationID)
+	assert.Equal(t, expected.State, actual.State)
+	assert.ElementsMatch(t, expected.RoleKeys, actual.RoleKeys)
 }
 
 func TestUpdateProjectGrant(t *testing.T) {
