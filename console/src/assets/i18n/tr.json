@@ -1550,7 +1550,7 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Ukraynaca"
+        "uk": "Українська"
       }
     },
     "SMTP": {
@@ -1801,7 +1801,7 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Ukraynaca"
+        "uk": "Українська"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-posta doğrulama tamamlandı",
@@ -2783,7 +2783,7 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "uk": "Ukraynaca"
+    "uk": "Українська"
   },
   "MEMBER": {
     "ADD": "Yönetici Ekle",

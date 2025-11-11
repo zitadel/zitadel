@@ -1548,7 +1548,7 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Ucraniano"
+        "uk": "Українська"
       }
     },
     "SMTP": {
@@ -1799,7 +1799,7 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Ucraniano"
+        "uk": "Українська"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verificação de email concluída",
@@ -2750,7 +2750,7 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "uk": "Ucraniano"
+    "uk": "Українська"
   },
   "MEMBER": {
     "ADD": "Adicionar um Gerente",

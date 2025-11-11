@@ -1551,7 +1551,7 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Ukrainska"
+        "uk": "Українська"
       }
     },
     "SMTP": {
@@ -1802,7 +1802,7 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Ukrainska"
+        "uk": "Українська"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-postverifiering klar",
@@ -2783,7 +2783,7 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "uk": "Ukrainska"
+    "uk": "Українська"
   },
   "MEMBER": {
     "ADD": "Lägg till en administratör",

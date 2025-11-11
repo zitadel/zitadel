@@ -1551,7 +1551,7 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Ukrainian"
+        "uk": "Українська"
       }
     },
     "SMTP": {
@@ -1802,7 +1802,7 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Ukrainian"
+        "uk": "Українська"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -2784,7 +2784,7 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "uk": "Ukrainian"
+    "uk": "Українська"
   },
   "MEMBER": {
     "ADD": "Add a Manager",
