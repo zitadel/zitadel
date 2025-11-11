@@ -51,6 +51,7 @@ func (g *groupProjection) Init() *old_handler.Check {
 		},
 			handler.NewPrimaryKey(GroupColumnInstanceID, GroupColumnID),
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{GroupColumnResourceOwner})),
+			handler.WithIndex(handler.NewIndex("state", []string{GroupColumnState})),
 		),
 	)
 }
