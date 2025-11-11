@@ -115,32 +115,12 @@ func TestQueryOptions(t *testing.T) {
 			},
 		},
 		{
-			name: "lock for primary key update option",
+			name: "with lock",
 			options: []QueryOption{
-				WithResultLock(ResultLockForPrimaryKeyUpdate),
+				WithResultLock(),
 			},
 			want: want{
 				stmt: " FOR UPDATE",
-				args: nil,
-			},
-		},
-		{
-			name: "lock for update option",
-			options: []QueryOption{
-				WithResultLock(ResultLockForUpdate),
-			},
-			want: want{
-				stmt: " FOR NO KEY UPDATE",
-				args: nil,
-			},
-		},
-		{
-			name: "lock for share option",
-			options: []QueryOption{
-				WithResultLock(ResultLockForShare),
-			},
-			want: want{
-				stmt: " FOR SHARE",
 				args: nil,
 			},
 		},
@@ -152,10 +132,10 @@ func TestQueryOptions(t *testing.T) {
 				WithOrderByDescending(NewColumn("table", "column")),
 				WithLimit(10),
 				WithOffset(5),
-				WithResultLock(ResultLockForUpdate),
+				WithResultLock(),
 			},
 			want: want{
-				stmt: " LEFT JOIN other_table ON table.id = other_table.table_id WHERE table.column = $1 ORDER BY table.column DESC LIMIT $2 OFFSET $3 FOR NO KEY UPDATE",
+				stmt: " LEFT JOIN other_table ON table.id = other_table.table_id WHERE table.column = $1 ORDER BY table.column DESC LIMIT $2 OFFSET $3 FOR UPDATE",
 				args: []any{123, uint32(10), uint32(5)},
 			},
 		},
