@@ -7,7 +7,7 @@ import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/chall
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, startTransition } from "react";
 import { useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
 import { BackButton } from "./back-button";
@@ -105,7 +105,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
   useEffect(() => {
     if (!initialized.current && ["email", "sms"].includes(method) && !code) {
       initialized.current = true;
-      setTimeout(() => {
+      startTransition(() => {
         setLoading(true);
         updateSessionForOTPChallenge()
           .catch((error) => {
@@ -115,7 +115,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
           .finally(() => {
             setLoading(false);
           });
-      }, 0);
+      });
     }
   }, [code, method, updateSessionForOTPChallenge]);
 
