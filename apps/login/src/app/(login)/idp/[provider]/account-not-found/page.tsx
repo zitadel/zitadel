@@ -10,6 +10,8 @@ import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import Link from "next/link";
 
+export const revalidate = 3600; // 1 hour - revalidate cached data
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("idp");
   return { title: t("accountNotFound.title") };

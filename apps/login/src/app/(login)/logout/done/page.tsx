@@ -4,6 +4,8 @@ import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { getBrandingSettings } from "@/lib/zitadel";
 import { headers } from "next/headers";
 
+export const revalidate = 3600; // 1 hour - revalidate cached data
+
 export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
 

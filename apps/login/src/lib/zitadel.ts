@@ -29,7 +29,7 @@ import {
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { cacheLife } from "next/cache";
+import { unstable_cache } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { getUserAgent } from "./fingerprint";
 import { setSAMLFormCookie } from "./saml";
@@ -39,7 +39,6 @@ const useCache = process.env.DEBUG !== "true";
 
 async function getHostedLoginTranslationCached(serviceUrl: string, organization?: string, locale?: string) {
   "use cache";
-  cacheLife("hours");
 
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
@@ -102,7 +101,6 @@ export async function getHostedLoginTranslation({
 
 async function getBrandingSettingsCached(serviceUrl: string, organization?: string) {
   "use cache";
-  cacheLife("hours");
 
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
@@ -125,7 +123,6 @@ export async function getBrandingSettings({ serviceUrl, organization }: { servic
 
 async function getLoginSettingsCached(serviceUrl: string, organization?: string) {
   "use cache";
-  cacheLife("hours");
 
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
@@ -148,7 +145,6 @@ export async function getLoginSettings({ serviceUrl, organization }: { serviceUr
 
 async function getSecuritySettingsCached(serviceUrl: string) {
   "use cache";
-  cacheLife("hours");
 
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
@@ -167,7 +163,6 @@ export async function getSecuritySettings({ serviceUrl }: { serviceUrl: string }
 
 async function getLockoutSettingsCached(serviceUrl: string, orgId?: string) {
   "use cache";
-  cacheLife("hours");
 
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
@@ -190,7 +185,6 @@ export async function getLockoutSettings({ serviceUrl, orgId }: { serviceUrl: st
 
 async function getPasswordExpirySettingsCached(serviceUrl: string, orgId?: string) {
   "use cache";
-  cacheLife("hours");
 
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
@@ -237,7 +231,6 @@ export async function registerTOTP({ serviceUrl, userId }: { serviceUrl: string;
 
 async function getGeneralSettingsCached(serviceUrl: string) {
   "use cache";
-  cacheLife("hours");
 
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
@@ -256,7 +249,6 @@ export async function getGeneralSettings({ serviceUrl }: { serviceUrl: string })
 
 async function getLegalAndSupportSettingsCached(serviceUrl: string, organization?: string) {
   "use cache";
-  cacheLife("hours");
 
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
@@ -285,7 +277,6 @@ export async function getLegalAndSupportSettings({
 
 async function getPasswordComplexitySettingsCached(serviceUrl: string, organization?: string) {
   "use cache";
-  cacheLife("hours");
 
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
