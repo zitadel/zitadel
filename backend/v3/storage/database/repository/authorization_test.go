@@ -605,6 +605,8 @@ func assertAuthorization(t *testing.T, expected, actual *domain.Authorization) {
 }
 
 func TestUpdateAuthorization(t *testing.T) {
+	beforeUpdate := time.Now()
+
 	tx, rollback := transactionForRollback(t)
 	defer rollback()
 
@@ -697,6 +699,7 @@ func TestUpdateAuthorization(t *testing.T) {
 			if err != nil {
 				return
 			}
+			afterUpdate := time.Now()
 			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
 
 			if tt.wantRowsAffected == 0 {
@@ -706,7 +709,245 @@ func TestUpdateAuthorization(t *testing.T) {
 			updatedAuthorization, err := authorizationRepo.Get(t.Context(), savepoint, database.WithCondition(tt.condition))
 			require.NoError(t, err)
 			assert.Equal(t, tt.wantState, updatedAuthorization.State)
+			assert.WithinRange(t, updatedAuthorization.UpdatedAt, beforeUpdate, afterUpdate)
 		})
 	}
 
+}
+
+func TestAuthorizationSetRoles(t *testing.T) {
+	beforeUpdate := time.Now()
+
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	organizationID := createOrganization(t, tx, instanceID)
+	projectID := createProject(t, tx, instanceID, organizationID)
+	role1 := createProjectRole(t, tx, instanceID, organizationID, projectID, "role1")
+	role2 := createProjectRole(t, tx, instanceID, organizationID, projectID, "role2")
+	role3 := createProjectRole(t, tx, instanceID, organizationID, projectID, "role3")
+	role4 := createProjectRole(t, tx, instanceID, organizationID, projectID, "role4")
+
+	project2ID := createProject(t, tx, instanceID, organizationID)
+	role5 := createProjectRole(t, tx, instanceID, organizationID, project2ID, "role5")
+	role6 := createProjectRole(t, tx, instanceID, organizationID, project2ID, "role6")
+
+	authorizationRepo := repository.AuthorizationRepository()
+	authorization1 := &domain.Authorization{
+		ID:         integration.ID(),
+		UserID:     integration.ID(),
+		ProjectID:  projectID,
+		GrantID:    integration.ID(),
+		InstanceID: instanceID,
+		State:      domain.AuthorizationStateActive,
+		Roles:      nil,
+	}
+	err := authorizationRepo.Create(t.Context(), tx, authorization1)
+	require.NoError(t, err)
+
+	authorization2 := &domain.Authorization{
+		ID:         integration.ID(),
+		UserID:     integration.ID(),
+		ProjectID:  project2ID,
+		GrantID:    integration.ID(),
+		InstanceID: instanceID,
+		State:      domain.AuthorizationStateActive,
+		Roles:      []string{role5, role6},
+	}
+	err = authorizationRepo.Create(t.Context(), tx, authorization2)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name             string
+		roles            []string
+		condition        database.Condition
+		wantRowsAffected int64
+		wantErr          error
+	}{
+		{
+			name:      "incomplete primary key condition - missing instance ID",
+			roles:     []string{role1, role2},
+			condition: authorizationRepo.IDCondition(authorization1.ID),
+			wantErr:   new(database.MissingConditionError),
+		},
+		{
+			name:      "incomplete primary key condition - missing authorization ID",
+			roles:     []string{role1, role2},
+			condition: authorizationRepo.InstanceIDCondition(authorization1.InstanceID),
+			wantErr:   new(database.MissingConditionError),
+		},
+		{
+			name:             "set single role",
+			roles:            []string{role1},
+			condition:        authorizationRepo.PrimaryKeyCondition(authorization1.InstanceID, authorization1.ID),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "set multiple roles",
+			roles:            []string{role1, role2},
+			condition:        authorizationRepo.PrimaryKeyCondition(authorization1.InstanceID, authorization1.ID),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "overwrite roles",
+			roles:            []string{role3, role4},
+			condition:        authorizationRepo.PrimaryKeyCondition(authorization1.InstanceID, authorization1.ID),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "remove role",
+			roles:            []string{role3},
+			condition:        authorizationRepo.PrimaryKeyCondition(authorization1.InstanceID, authorization1.ID),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "no changes",
+			roles:            []string{role5, role6},
+			condition:        authorizationRepo.PrimaryKeyCondition(authorization2.InstanceID, authorization2.ID),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "clear roles",
+			roles:            []string{},
+			condition:        authorizationRepo.PrimaryKeyCondition(authorization2.InstanceID, authorization2.ID),
+			wantRowsAffected: 1,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			savepoint, rollback := savepointForRollback(t, tx)
+			defer rollback()
+
+			rowsAffected, err := authorizationRepo.SetRoles(t.Context(), savepoint, tt.condition, tt.roles)
+			require.ErrorIs(t, err, tt.wantErr)
+			if err != nil {
+				return
+			}
+			afterUpdate := time.Now()
+			require.Equal(t, tt.wantRowsAffected, rowsAffected)
+
+			// get roles
+			updatedAuthorization, err := authorizationRepo.Get(t.Context(), savepoint, database.WithCondition(tt.condition))
+			require.NoError(t, err)
+			assert.ElementsMatch(t, tt.roles, updatedAuthorization.Roles)
+			assert.WithinRange(t, updatedAuthorization.UpdatedAt, beforeUpdate, afterUpdate)
+		})
+	}
+}
+
+func TestDeleteAuthorization(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	organizationID := createOrganization(t, tx, instanceID)
+	projectID := createProject(t, tx, instanceID, organizationID)
+	role1 := createProjectRole(t, tx, instanceID, organizationID, projectID, "role1")
+	role2 := createProjectRole(t, tx, instanceID, organizationID, projectID, "role2")
+
+	authorizationRepo := repository.AuthorizationRepository()
+	authorizationWithRoles := &domain.Authorization{
+		ID:         integration.ID(),
+		UserID:     integration.ID(),
+		ProjectID:  projectID,
+		GrantID:    integration.ID(),
+		InstanceID: instanceID,
+		State:      domain.AuthorizationStateActive,
+		Roles:      []string{role1, role2},
+	}
+	err := authorizationRepo.Create(t.Context(), tx, authorizationWithRoles)
+	require.NoError(t, err)
+
+	authorizationWithoutRoles := &domain.Authorization{
+		ID:         integration.ID(),
+		UserID:     integration.ID(),
+		ProjectID:  projectID,
+		GrantID:    integration.ID(),
+		InstanceID: instanceID,
+		State:      domain.AuthorizationStateActive,
+		Roles:      nil,
+	}
+	err = authorizationRepo.Create(t.Context(), tx, authorizationWithoutRoles)
+	require.NoError(t, err)
+
+	deletedAuthorization := &domain.Authorization{
+		ID:         integration.ID(),
+		UserID:     integration.ID(),
+		ProjectID:  projectID,
+		GrantID:    integration.ID(),
+		InstanceID: instanceID,
+		State:      domain.AuthorizationStateActive,
+		Roles:      nil,
+	}
+	err = authorizationRepo.Create(t.Context(), tx, deletedAuthorization)
+	require.NoError(t, err)
+	_, err = authorizationRepo.Delete(t.Context(), tx, authorizationRepo.PrimaryKeyCondition(
+		instanceID,
+		deletedAuthorization.ID,
+	))
+	require.NoError(t, err)
+
+	tests := []struct {
+		name             string
+		condition        database.Condition
+		wantRowsAffected int64
+		wantErr          error
+	}{
+		{
+			name:      "incomplete condition",
+			condition: authorizationRepo.IDCondition(authorizationWithRoles.ID),
+			wantErr:   new(database.MissingConditionError),
+		},
+		{
+			name: "delete non-existent authorization",
+			condition: authorizationRepo.PrimaryKeyCondition(
+				instanceID,
+				"random-id",
+			),
+			wantRowsAffected: 0,
+		},
+		{
+			name: "delete authorization with roles",
+			condition: authorizationRepo.PrimaryKeyCondition(
+				instanceID,
+				authorizationWithRoles.ID,
+			),
+			wantRowsAffected: 1,
+		},
+		{
+			name: "delete authorization without roles",
+			condition: authorizationRepo.PrimaryKeyCondition(
+				instanceID,
+				authorizationWithoutRoles.ID,
+			),
+			wantRowsAffected: 1,
+		},
+		{
+			name: "delete again",
+			condition: authorizationRepo.PrimaryKeyCondition(
+				instanceID,
+				deletedAuthorization.ID,
+			),
+			wantRowsAffected: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			savepoint, rollback := savepointForRollback(t, tx)
+			defer rollback()
+
+			rowsAffected, err := authorizationRepo.Delete(t.Context(), savepoint, tt.condition)
+			require.ErrorIs(t, err, tt.wantErr)
+			if err != nil {
+				return
+			}
+			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
+
+			// verify deletion
+			got, err := authorizationRepo.List(t.Context(), savepoint, database.WithCondition(tt.condition))
+			require.NoError(t, err)
+			require.Nil(t, got)
+		})
+	}
 }

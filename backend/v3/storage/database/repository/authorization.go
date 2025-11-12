@@ -158,31 +158,33 @@ func (a authorization) Update(ctx context.Context, client database.QueryExecutor
 	return rowsAffected, err
 }
 
-const queryUpdateAuthorizationRolesStmt = `SELECT instance_id, id, $1::text[] AS roles
+const queryUpdateAuthorizationRolesStmt = `SELECT instance_id, id, project_id, grant_id, $1::text[] AS roles
 FROM zitadel.authorizations`
 
 // todo: review
 const updateAuthorizationRolesStmt = `deleted_roles AS (
-    DELETE FROM zitadel.authorization_roles
-        WHERE authorization_roles.instance_id = authorization.instance_id
-            AND authorization_roles.authorization_id = authorization.id
-            AND NOT role_key = ANY ($1::text[])
+    DELETE FROM zitadel.authorization_roles as azr
+	USING az
+        WHERE azr.instance_id = az.instance_id
+            AND azr.authorization_id = az.id
+            AND NOT azr.role_key = ANY ($1::text[])
         RETURNING *
 ), inserted_roles AS (
     INSERT INTO zitadel.authorization_roles (instance_id, authorization_id, project_id, grant_id, role_key)
-        SELECT authorization.instance_id,
-               authorization.id,
-               authorization.project_id,
-               authorization.grant_id,
-               role_key
-        FROM authorization, UNNEST($1::text[]) AS role_key
+        SELECT instance_id,
+               id,
+               project_id,
+               grant_id,
+               UNNEST(az.roles) AS role_key
+        FROM az
         ON CONFLICT DO NOTHING
         RETURNING *
 )
 UPDATE zitadel.authorizations
 SET updated_at = NOW()
-WHERE authorization.instance_id = zitadel.authorizations.instance_id
- AND authorization.id = zitadel.authorizations.id`
+FROM az
+WHERE az.instance_id = authorizations.instance_id
+  AND az.id = authorizations.id`
 
 // SetRoles implements [domain.AuthorizationRepository].
 func (a authorization) SetRoles(ctx context.Context, client database.QueryExecutor, condition database.Condition, roles []string) (int64, error) {
@@ -193,7 +195,7 @@ func (a authorization) SetRoles(ctx context.Context, client database.QueryExecut
 	writeCondition(queryBuilder, condition)
 
 	builder := database.NewStatementBuilder(
-		`WITH authorization AS ( `+
+		`WITH az AS ( `+
 			queryBuilder.String()+` ), `+
 			updateAuthorizationRolesStmt,
 		queryBuilder.Args()...,
