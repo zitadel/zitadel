@@ -2,6 +2,7 @@ package initialise
 
 import (
 	"context"
+	"database/sql"
 	_ "embed"
 	"fmt"
 
@@ -37,6 +38,17 @@ The user provided by flags needs privileges to
 
 func VerifyDatabase(databaseName string) func(context.Context, *database.DB) error {
 	return func(ctx context.Context, db *database.DB) error {
+		var currentDatabase string
+		err := db.QueryRowContext(ctx, func(r *sql.Row) error {
+			return r.Scan(&currentDatabase)
+		}, "SELECT current_database()")
+		if err != nil {
+			return fmt.Errorf("unable to get current database: %w", err)
+		}
+		if currentDatabase == databaseName {
+			logging.WithFields("database", databaseName).Info("database is same as config.database.postgres.admin.ExistingDatabase, skipping creation")
+			return nil
+		}
 		logging.WithFields("database", databaseName).Info("verify database")
 
 		return exec(ctx, db, fmt.Sprintf(databaseStmt, databaseName), []string{dbAlreadyExistsCode})

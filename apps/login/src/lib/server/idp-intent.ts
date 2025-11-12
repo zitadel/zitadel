@@ -10,6 +10,7 @@ import {
   addHuman,
   getLoginSettings,
   getOrgsByDomain,
+  getDefaultOrg,
 } from "@/lib/zitadel";
 import { headers } from "next/headers";
 import { create } from "@zitadel/client";
@@ -56,7 +57,10 @@ async function resolveOrganizationForUser({
       }
     }
   }
-  return undefined;
+
+  // Fallback to default organization if no org was resolved through discovery
+  const defaultOrg = await getDefaultOrg({ serviceUrl });
+  return defaultOrg?.id;
 }
 
 /**
@@ -115,7 +119,7 @@ export async function processIDPCallback({
 
     console.log("[IDP Process] Intent retrieved successfully, processing business logic");
 
-    const { idpInformation, userId, addHumanUser } = intent;
+    const { idpInformation, userId, addHumanUser, updateHumanUser } = intent;
 
     if (!idpInformation) {
       console.error("[IDP Process] IDP information missing");
@@ -157,15 +161,15 @@ export async function processIDPCallback({
     // ============================================
     if (userId && !link) {
       // Auto-update user if enabled
-      if (options?.isAutoUpdate && addHumanUser) {
+      if (options?.isAutoUpdate && updateHumanUser) {
         try {
           await updateHuman({
             serviceUrl,
             request: create(UpdateHumanUserRequestSchema, {
               userId: userId,
-              profile: addHumanUser.profile,
-              email: addHumanUser.email,
-              phone: addHumanUser.phone,
+              profile: updateHumanUser.profile,
+              email: updateHumanUser.email,
+              phone: updateHumanUser.phone,
             }),
           });
           console.log("[IDP Process] User auto-updated successfully");
@@ -333,19 +337,20 @@ export async function processIDPCallback({
         serviceUrl,
       });
 
-      let addHumanUserWithOrganization: AddHumanUserRequest;
-      if (orgToRegisterOn) {
-        const organizationSchema = create(OrganizationSchema, {
-          org: { case: "orgId", value: orgToRegisterOn },
-        });
-
-        addHumanUserWithOrganization = create(AddHumanUserRequestSchema, {
-          ...addHumanUser,
-          organization: organizationSchema,
-        });
-      } else {
-        addHumanUserWithOrganization = create(AddHumanUserRequestSchema, addHumanUser);
+      if (!orgToRegisterOn) {
+        console.error("[IDP Process] Could not determine organization for auto-creation (no default org available)");
+        const params = buildRedirectParams();
+        return { redirect: `/idp/${provider}/failure?${params}&error=no_organization_context` };
       }
+
+      const organizationSchema = create(OrganizationSchema, {
+        org: { case: "orgId", value: orgToRegisterOn },
+      });
+
+      const addHumanUserWithOrganization = create(AddHumanUserRequestSchema, {
+        ...addHumanUser,
+        organization: organizationSchema,
+      });
 
       try {
         const newUser = await addHuman({
@@ -394,7 +399,7 @@ export async function processIDPCallback({
       });
 
       if (!orgToRegisterOn) {
-        console.error("[IDP Process] Could not determine organization for registration");
+        console.error("[IDP Process] Could not determine organization for registration (no default org available)");
         const params = buildRedirectParams();
         return { redirect: `/idp/${provider}/registration-failed?${params}` };
       }
