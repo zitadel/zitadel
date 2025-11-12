@@ -124,34 +124,6 @@ func (p *sessionRelationalProjection) reduceSessionAdded(event eventstore.Event)
 		return nil, err
 	}
 
-	cols := make([]handler.Column, 0, 12)
-	cols = append(cols,
-		handler.NewCol(SessionColumnID, e.Aggregate().ID),
-		handler.NewCol(SessionColumnInstanceID, e.Aggregate().InstanceID),
-		handler.NewCol(SessionColumnCreationDate, e.CreationDate()),
-		handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
-		handler.NewCol(SessionColumnResourceOwner, e.Aggregate().ResourceOwner),
-		handler.NewCol(SessionColumnState, domain.SessionStateActive),
-		handler.NewCol(SessionColumnSequence, e.Sequence()),
-		handler.NewCol(SessionColumnCreator, e.User),
-	)
-	if e.UserAgent != nil {
-		cols = append(cols,
-			handler.NewCol(SessionColumnUserAgentFingerprintID, e.UserAgent.FingerprintID),
-			handler.NewCol(SessionColumnUserAgentDescription, e.UserAgent.Description),
-		)
-		if e.UserAgent.IP != nil {
-			cols = append(cols,
-				handler.NewCol(SessionColumnUserAgentIP, e.UserAgent.IP.String()),
-			)
-		}
-		if e.UserAgent.Header != nil {
-			cols = append(cols,
-				handler.NewJSONCol(SessionColumnUserAgentHeader, e.UserAgent.Header),
-			)
-		}
-	}
-
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
@@ -159,18 +131,24 @@ func (p *sessionRelationalProjection) reduceSessionAdded(event eventstore.Event)
 		}
 		v3Tx := v3_sql.SQLTx(tx)
 
-		sessionRepo := repository.SessionRepository()
-		return sessionRepo.Create(ctx, v3Tx, &domain.Session{
-			InstanceID: e.Aggregate().InstanceID,
-			ID:         e.Aggregate().ID,
-			CreatedAt:  e.CreationDate(),
-			UpdatedAt:  e.CreationDate(),
-			UserAgent: &domain.SessionUserAgent{
+		var userAgent *domain.SessionUserAgent
+		if e.UserAgent != nil {
+			userAgent = &domain.SessionUserAgent{
 				FingerprintID: e.UserAgent.FingerprintID,
 				Description:   e.UserAgent.Description,
 				IP:            e.UserAgent.IP,
 				Header:        e.UserAgent.Header,
-			},
+			}
+		}
+
+		sessionRepo := repository.SessionRepository()
+		return sessionRepo.Create(ctx, v3Tx, &domain.Session{
+			InstanceID: e.Aggregate().InstanceID,
+			ID:         e.Aggregate().ID,
+			CreatorID:  e.User,
+			CreatedAt:  e.CreationDate(),
+			UpdatedAt:  e.CreationDate(),
+			UserAgent:  userAgent,
 		})
 	}), nil
 }
@@ -241,7 +219,7 @@ func (p *sessionRelationalProjection) reduceIntentChecked(event eventstore.Event
 		condition := sessionRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID)
 		_, err = sessionRepo.Update(ctx, v3Tx, condition,
 			sessionRepo.SetUpdatedAt(e.CreatedAt()),
-			sessionRepo.SetFactor(&domain.SessionFactorIDPIntent{
+			sessionRepo.SetFactor(&domain.SessionFactorIdentityProviderIntent{
 				LastVerifiedAt: e.CreatedAt(),
 			}),
 		)
@@ -556,7 +534,7 @@ func (p *sessionRelationalProjection) reducePasswordChanged(event eventstore.Eve
 		)
 		_, err = sessionRepo.Update(ctx, v3Tx, condition,
 			sessionRepo.SetUpdatedAt(e.CreatedAt()),
-			sessionRepo.ClearFactor(domain.SessionFactorTypePassword),
+			sessionRepo.ClearFactor(),
 		)
 		return err
 	}), nil
