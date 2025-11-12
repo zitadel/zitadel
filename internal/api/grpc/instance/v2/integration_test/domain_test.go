@@ -241,20 +241,38 @@ func TestAddTrustedDomain(t *testing.T) {
 	defer cancel()
 
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
-	inst := integration.NewInstance(ctxWithSysAuthZ)
-	orgOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
+
+	// Eventstore objects
+	instES := integration.NewInstance(ctxWithSysAuthZ)
+	orgOwnerCtxES := instES.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
+	d1ES := integration.DomainName()
+
+	// Relational objects
+	instRelational := integration.NewInstance(ctxWithSysAuthZ)
+	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)}, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+		assert.True(tCollect, got.EnableRelationalTables.GetEnabled())
+	})
+	orgOwnerCtxRelational := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
+	d1Relational := integration.DomainName()
 
 	t.Cleanup(func() {
-		inst.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+		instES.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: instES.ID()})
+		instRelational.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: instRelational.ID()})
 	})
 
-	relTableState := integration.RelationalTablesEnableMatrix()
+	type instAndCtx struct {
+		testType    string
+		inst        *integration.Instance
+		orgOwnerCtx context.Context
+		domain      string
+	}
 
-	for _, stateCase := range relTableState {
-		integration.EnsureInstanceFeature(t, ctx, inst, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
-		})
+	testedInstanceAndCtxs := []instAndCtx{
+		{testType: "eventstore", inst: instES, orgOwnerCtx: orgOwnerCtxES, domain: d1ES},
+		{testType: "relational", inst: instRelational, orgOwnerCtx: orgOwnerCtxRelational, domain: d1Relational},
+	}
 
+	for _, stateCase := range testedInstanceAndCtxs {
 		tt := []struct {
 			testName          string
 			inputContext      context.Context
@@ -265,8 +283,8 @@ func TestAddTrustedDomain(t *testing.T) {
 			{
 				testName: "when invalid context should return unauthN error",
 				inputRequest: &instance.AddTrustedDomainRequest{
-					InstanceId:    inst.ID(),
-					TrustedDomain: integration.DomainName(),
+					InstanceId:    stateCase.inst.ID(),
+					TrustedDomain: stateCase.domain,
 				},
 				inputContext:      context.Background(),
 				expectedErrorCode: codes.Unauthenticated,
@@ -276,17 +294,17 @@ func TestAddTrustedDomain(t *testing.T) {
 				// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place (see https://github.com/zitadel/zitadel/issues/10917)
 				testName: "when unauthZ context should return unauthZ error",
 				inputRequest: &instance.AddTrustedDomainRequest{
-					InstanceId:    inst.ID(),
-					TrustedDomain: integration.DomainName(),
+					InstanceId:    stateCase.inst.ID(),
+					TrustedDomain: stateCase.domain,
 				},
-				inputContext:      orgOwnerCtx,
+				inputContext:      stateCase.orgOwnerCtx,
 				expectedErrorCode: codes.NotFound,
 				expectedErrorMsg:  "membership not found (AUTHZ-cdgFk)",
 			},
 			{
 				testName: "when invalid domain should return invalid argument error",
 				inputRequest: &instance.AddTrustedDomainRequest{
-					InstanceId:    inst.ID(),
+					InstanceId:    stateCase.inst.ID(),
 					TrustedDomain: " ",
 				},
 				inputContext:      ctxWithSysAuthZ,
@@ -296,8 +314,8 @@ func TestAddTrustedDomain(t *testing.T) {
 			{
 				testName: "when valid request should return successful response",
 				inputRequest: &instance.AddTrustedDomainRequest{
-					InstanceId:    inst.ID(),
-					TrustedDomain: " " + integration.DomainName(),
+					InstanceId:    stateCase.inst.ID(),
+					TrustedDomain: " " + stateCase.domain,
 				},
 				inputContext: ctxWithSysAuthZ,
 			},
@@ -305,18 +323,18 @@ func TestAddTrustedDomain(t *testing.T) {
 
 		for _, tc := range tt {
 			// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place (see https://github.com/zitadel/zitadel/issues/10917)
-			if tc.testName == "when unauthZ context should return unauthZ error" && stateCase.State == "when relational tables are enabled" {
+			if tc.testName == "when unauthZ context should return unauthZ error" && stateCase.testType == "relational" {
 				continue
 			}
-			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tc.testName), func(t *testing.T) {
+			t.Run(fmt.Sprintf("%s - %s", stateCase.testType, tc.testName), func(t *testing.T) {
 				t.Cleanup(func() {
 					if tc.expectedErrorMsg == "" {
-						inst.Client.InstanceV2.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{TrustedDomain: strings.TrimSpace(tc.inputRequest.TrustedDomain)})
+						stateCase.inst.Client.InstanceV2.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{TrustedDomain: strings.TrimSpace(tc.inputRequest.TrustedDomain)})
 					}
 				})
 
 				// Test
-				res, err := inst.Client.InstanceV2.AddTrustedDomain(tc.inputContext, tc.inputRequest)
+				res, err := stateCase.inst.Client.InstanceV2.AddTrustedDomain(tc.inputContext, tc.inputRequest)
 
 				// Verify
 				assert.Equal(t, tc.expectedErrorCode, status.Code(err))
@@ -339,77 +357,91 @@ func TestRemoveTrustedDomain(t *testing.T) {
 	defer cancel()
 
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
-	inst := integration.NewInstance(ctxWithSysAuthZ)
-	orgOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
 
-	trustedDomain := integration.DomainName()
+	// Eventstore objects
+	instES := integration.NewInstance(ctxWithSysAuthZ)
+	orgOwnerCtxES := instES.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
+	trustedDomainES := integration.DomainName()
+	_, err := instES.Client.InstanceV2.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: instES.ID(), TrustedDomain: trustedDomainES})
+	require.Nil(t, err)
 
-	_, err := inst.Client.InstanceV2.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: inst.ID(), TrustedDomain: trustedDomain})
+	// Relational objects
+	instRelational := integration.NewInstance(ctxWithSysAuthZ)
+	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)}, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+		assert.True(tCollect, got.EnableRelationalTables.GetEnabled())
+	})
+	orgOwnerCtxRelational := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
+	trustedDomainRelational := integration.DomainName()
+	_, err = instRelational.Client.InstanceV2.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: instRelational.ID(), TrustedDomain: trustedDomainRelational})
 	require.Nil(t, err)
 
 	t.Cleanup(func() {
-		inst.Client.InstanceV2.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{InstanceId: inst.ID(), TrustedDomain: trustedDomain})
-		inst.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+		instES.Client.InstanceV2.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{InstanceId: instES.ID(), TrustedDomain: trustedDomainES})
+		instES.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: instES.ID()})
+
+		instRelational.Client.InstanceV2.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{InstanceId: instRelational.ID(), TrustedDomain: trustedDomainRelational})
+		instRelational.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: instRelational.ID()})
 	})
 
-	tt := []struct {
-		testName          string
-		inputContext      context.Context
-		inputRequest      *instance.RemoveTrustedDomainRequest
-		expectedErrorMsg  string
-		expectedErrorCode codes.Code
-	}{
-		{
-			testName: "when invalid context should return unauthN error",
-			inputRequest: &instance.RemoveTrustedDomainRequest{
-				InstanceId:    inst.ID(),
-				TrustedDomain: "trusted1",
-			},
-			inputContext:      context.Background(),
-			expectedErrorCode: codes.Unauthenticated,
-			expectedErrorMsg:  "auth header missing",
-		},
-		{
-			// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place (see https://github.com/zitadel/zitadel/issues/10917)			testName: "when unauthZ context should return unauthZ error",
-			testName: "when unauthZ context should return unauthZ error",
-			inputRequest: &instance.RemoveTrustedDomainRequest{
-				InstanceId:    inst.ID(),
-				TrustedDomain: "trusted1",
-			},
-			inputContext:      orgOwnerCtx,
-			expectedErrorCode: codes.NotFound,
-			expectedErrorMsg:  "membership not found (AUTHZ-cdgFk)",
-		},
-		{
-			testName: "when valid request should return successful response",
-			inputRequest: &instance.RemoveTrustedDomainRequest{
-				InstanceId:    inst.ID(),
-				TrustedDomain: " " + trustedDomain,
-			},
-			inputContext: ctxWithSysAuthZ,
-		},
+	type instAndCtx struct {
+		testType    string
+		inst        *integration.Instance
+		orgOwnerCtx context.Context
+		domain      string
 	}
 
-	relTableState := integration.RelationalTablesEnableMatrix()
+	testedInstanceAndCtxs := []instAndCtx{
+		{testType: "eventstore", inst: instES, orgOwnerCtx: orgOwnerCtxES, domain: trustedDomainES},
+		{testType: "relational", inst: instRelational, orgOwnerCtx: orgOwnerCtxRelational, domain: trustedDomainRelational},
+	}
 
-	for _, stateCase := range relTableState {
-		integration.EnsureInstanceFeature(t, ctx, inst, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
-		})
+	for _, stateCase := range testedInstanceAndCtxs {
+		tt := []struct {
+			testName          string
+			inputContext      context.Context
+			inputRequest      *instance.RemoveTrustedDomainRequest
+			expectedErrorMsg  string
+			expectedErrorCode codes.Code
+		}{
+			{
+				testName: "when invalid context should return unauthN error",
+				inputRequest: &instance.RemoveTrustedDomainRequest{
+					InstanceId:    stateCase.inst.ID(),
+					TrustedDomain: "trusted1",
+				},
+				inputContext:      context.Background(),
+				expectedErrorCode: codes.Unauthenticated,
+				expectedErrorMsg:  "auth header missing",
+			},
+			{
+				// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place (see https://github.com/zitadel/zitadel/issues/10917)			testName: "when unauthZ context should return unauthZ error",
+				testName: "when unauthZ context should return unauthZ error",
+				inputRequest: &instance.RemoveTrustedDomainRequest{
+					InstanceId:    stateCase.inst.ID(),
+					TrustedDomain: "trusted1",
+				},
+				inputContext:      stateCase.orgOwnerCtx,
+				expectedErrorCode: codes.NotFound,
+				expectedErrorMsg:  "membership not found (AUTHZ-cdgFk)",
+			},
+			{
+				testName: "when valid request should return successful response",
+				inputRequest: &instance.RemoveTrustedDomainRequest{
+					InstanceId:    stateCase.inst.ID(),
+					TrustedDomain: " " + stateCase.domain,
+				},
+				inputContext: ctxWithSysAuthZ,
+			},
+		}
+
 		for _, tc := range tt {
 			// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place (see https://github.com/zitadel/zitadel/issues/10917)
-			if tc.testName == "when unauthZ context should return unauthZ error" && stateCase.State == "when relational tables are enabled" {
+			if tc.testName == "when unauthZ context should return unauthZ error" && stateCase.testType == "relational" {
 				continue
 			}
-			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tc.testName), func(t *testing.T) {
-				t.Cleanup(func() {
-					if tc.expectedErrorMsg == "" {
-						_, err := inst.Client.InstanceV2.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: inst.ID(), TrustedDomain: trustedDomain})
-						require.Nil(t, err)
-					}
-				})
+			t.Run(fmt.Sprintf("%s - %s", stateCase.testType, tc.testName), func(t *testing.T) {
 				// Test
-				res, err := inst.Client.InstanceV2.RemoveTrustedDomain(tc.inputContext, tc.inputRequest)
+				res, err := stateCase.inst.Client.InstanceV2.RemoveTrustedDomain(tc.inputContext, tc.inputRequest)
 
 				// Verify
 				assert.Equal(t, tc.expectedErrorCode, status.Code(err))

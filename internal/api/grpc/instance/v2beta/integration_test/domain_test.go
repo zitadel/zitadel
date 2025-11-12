@@ -242,20 +242,38 @@ func TestAddTrustedDomain(t *testing.T) {
 	defer cancel()
 
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
-	inst := integration.NewInstance(ctxWithSysAuthZ)
-	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
+
+	// Eventstore objects
+	instES := integration.NewInstance(ctxWithSysAuthZ)
+	orgOwnerCtxES := instES.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
+	d1ES := "trusted" + integration.DomainName()
+
+	// Relational objects
+	instRelational := integration.NewInstance(ctxWithSysAuthZ)
+	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)}, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+		assert.True(tCollect, got.EnableRelationalTables.GetEnabled())
+	})
+	orgOwnerCtxRelational := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
+	d1Relational := "trusted" + integration.DomainName()
 
 	t.Cleanup(func() {
-		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+		instES.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: instES.ID()})
+		instRelational.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: instRelational.ID()})
 	})
 
-	relTableState := integration.RelationalTablesEnableMatrix()
+	type instAndCtx struct {
+		testType    string
+		inst        *integration.Instance
+		orgOwnerCtx context.Context
+		domain      string
+	}
 
-	for _, stateCase := range relTableState {
-		integration.EnsureInstanceFeature(t, ctx, inst, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
-		})
+	testedInstanceAndCtxs := []instAndCtx{
+		{testType: "eventstore", inst: instES, orgOwnerCtx: orgOwnerCtxES, domain: d1ES},
+		{testType: "relational", inst: instRelational, orgOwnerCtx: orgOwnerCtxRelational, domain: d1Relational},
+	}
 
+	for _, stateCase := range testedInstanceAndCtxs {
 		tt := []struct {
 			testName          string
 			inputContext      context.Context
@@ -266,8 +284,8 @@ func TestAddTrustedDomain(t *testing.T) {
 			{
 				testName: "when invalid context should return unauthN error",
 				inputRequest: &instance.AddTrustedDomainRequest{
-					InstanceId: inst.ID(),
-					Domain:     "trusted" + integration.DomainName(),
+					InstanceId: stateCase.inst.ID(),
+					Domain:     stateCase.domain,
 				},
 				inputContext:      context.Background(),
 				expectedErrorCode: codes.Unauthenticated,
@@ -276,17 +294,17 @@ func TestAddTrustedDomain(t *testing.T) {
 			{
 				testName: "when unauthZ context should return unauthZ error",
 				inputRequest: &instance.AddTrustedDomainRequest{
-					InstanceId: inst.ID(),
-					Domain:     "trusted" + integration.DomainName(),
+					InstanceId: stateCase.inst.ID(),
+					Domain:     stateCase.domain,
 				},
-				inputContext:      orgOwnerCtx,
+				inputContext:      stateCase.orgOwnerCtx,
 				expectedErrorCode: codes.PermissionDenied,
 				expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
 			},
 			{
 				testName: "when invalid domain should return invalid argument error",
 				inputRequest: &instance.AddTrustedDomainRequest{
-					InstanceId: inst.ID(),
+					InstanceId: stateCase.inst.ID(),
 					Domain:     " ",
 				},
 				inputContext:      ctxWithSysAuthZ,
@@ -296,23 +314,17 @@ func TestAddTrustedDomain(t *testing.T) {
 			{
 				testName: "when valid request should return successful response",
 				inputRequest: &instance.AddTrustedDomainRequest{
-					InstanceId: inst.ID(),
-					Domain:     " " + integration.DomainName(),
+					InstanceId: stateCase.inst.ID(),
+					Domain:     " " + stateCase.domain,
 				},
 				inputContext: ctxWithSysAuthZ,
 			},
 		}
 
 		for _, tc := range tt {
-			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tc.testName), func(t *testing.T) {
-				t.Cleanup(func() {
-					if tc.expectedErrorMsg == "" {
-						inst.Client.InstanceV2Beta.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{Domain: strings.TrimSpace(tc.inputRequest.Domain)})
-					}
-				})
-
+			t.Run(fmt.Sprintf("%s - %s", stateCase.testType, tc.testName), func(t *testing.T) {
 				// Test
-				res, err := inst.Client.InstanceV2Beta.AddTrustedDomain(tc.inputContext, tc.inputRequest)
+				res, err := stateCase.inst.Client.InstanceV2Beta.AddTrustedDomain(tc.inputContext, tc.inputRequest)
 
 				// Verify
 				assert.Equal(t, tc.expectedErrorCode, status.Code(err))
@@ -335,72 +347,85 @@ func TestRemoveTrustedDomain(t *testing.T) {
 	defer cancel()
 
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
-	inst := integration.NewInstance(ctxWithSysAuthZ)
-	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
+	// Eventstore objects
+	instES := integration.NewInstance(ctxWithSysAuthZ)
+	orgOwnerCtxES := instES.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
+	trustedDomainES := integration.DomainName()
+	_, err := instES.Client.InstanceV2Beta.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: instES.ID(), Domain: trustedDomainES})
+	require.Nil(t, err)
 
-	trustedDomain := integration.DomainName()
-
-	_, err := inst.Client.InstanceV2Beta.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: inst.ID(), Domain: trustedDomain})
+	// Relational objects
+	instRelational := integration.NewInstance(ctxWithSysAuthZ)
+	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)}, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+		assert.True(tCollect, got.EnableRelationalTables.GetEnabled())
+	})
+	orgOwnerCtxRelational := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
+	trustedDomainRelational := integration.DomainName()
+	_, err = instRelational.Client.InstanceV2Beta.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: instRelational.ID(), Domain: trustedDomainRelational})
 	require.Nil(t, err)
 
 	t.Cleanup(func() {
-		inst.Client.InstanceV2Beta.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{InstanceId: inst.ID(), Domain: trustedDomain})
-		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+		instES.Client.InstanceV2Beta.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{InstanceId: instES.ID(), Domain: trustedDomainES})
+		instES.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: instES.ID()})
+
+		instRelational.Client.InstanceV2Beta.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{InstanceId: instRelational.ID(), Domain: trustedDomainRelational})
+		instRelational.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: instRelational.ID()})
 	})
 
-	tt := []struct {
-		testName          string
-		inputContext      context.Context
-		inputRequest      *instance.RemoveTrustedDomainRequest
-		expectedErrorMsg  string
-		expectedErrorCode codes.Code
-	}{
-		{
-			testName: "when invalid context should return unauthN error",
-			inputRequest: &instance.RemoveTrustedDomainRequest{
-				InstanceId: inst.ID(),
-				Domain:     "trusted1",
-			},
-			inputContext:      context.Background(),
-			expectedErrorCode: codes.Unauthenticated,
-			expectedErrorMsg:  "auth header missing",
-		},
-		{
-			testName: "when unauthZ context should return unauthZ error",
-			inputRequest: &instance.RemoveTrustedDomainRequest{
-				InstanceId: inst.ID(),
-				Domain:     "trusted1",
-			},
-			inputContext:      orgOwnerCtx,
-			expectedErrorCode: codes.PermissionDenied,
-			expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
-		},
-		{
-			testName: "when valid request should return successful response",
-			inputRequest: &instance.RemoveTrustedDomainRequest{
-				InstanceId: inst.ID(),
-				Domain:     " " + trustedDomain,
-			},
-			inputContext: ctxWithSysAuthZ,
-		},
+	type instAndCtx struct {
+		testType    string
+		inst        *integration.Instance
+		orgOwnerCtx context.Context
+		domain      string
 	}
 
-	relTableState := integration.RelationalTablesEnableMatrix()
+	testedInstanceAndCtxs := []instAndCtx{
+		{testType: "eventstore", inst: instES, orgOwnerCtx: orgOwnerCtxES, domain: trustedDomainES},
+		{testType: "relational", inst: instRelational, orgOwnerCtx: orgOwnerCtxRelational, domain: trustedDomainRelational},
+	}
 
-	for _, stateCase := range relTableState {
-		integration.EnsureInstanceFeature(t, ctx, inst, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
-		})
+	for _, stateCase := range testedInstanceAndCtxs {
+		tt := []struct {
+			testName          string
+			inputContext      context.Context
+			inputRequest      *instance.RemoveTrustedDomainRequest
+			expectedErrorMsg  string
+			expectedErrorCode codes.Code
+		}{
+			{
+				testName: "when invalid context should return unauthN error",
+				inputRequest: &instance.RemoveTrustedDomainRequest{
+					InstanceId: stateCase.inst.ID(),
+					Domain:     "trusted1",
+				},
+				inputContext:      context.Background(),
+				expectedErrorCode: codes.Unauthenticated,
+				expectedErrorMsg:  "auth header missing",
+			},
+			{
+				testName: "when unauthZ context should return unauthZ error",
+				inputRequest: &instance.RemoveTrustedDomainRequest{
+					InstanceId: stateCase.inst.ID(),
+					Domain:     "trusted1",
+				},
+				inputContext:      stateCase.orgOwnerCtx,
+				expectedErrorCode: codes.PermissionDenied,
+				expectedErrorMsg:  "No matching permissions found (AUTH-5mWD2)",
+			},
+			{
+				testName: "when valid request should return successful response",
+				inputRequest: &instance.RemoveTrustedDomainRequest{
+					InstanceId: stateCase.inst.ID(),
+					Domain:     " " + stateCase.domain,
+				},
+				inputContext: ctxWithSysAuthZ,
+			},
+		}
+
 		for _, tc := range tt {
-			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tc.testName), func(t *testing.T) {
-				t.Cleanup(func() {
-					if tc.expectedErrorMsg == "" {
-						_, err := inst.Client.InstanceV2Beta.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: inst.ID(), Domain: trustedDomain})
-						require.Nil(t, err)
-					}
-				})
+			t.Run(fmt.Sprintf("%s - %s", stateCase.testType, tc.testName), func(t *testing.T) {
 				// Test
-				res, err := inst.Client.InstanceV2Beta.RemoveTrustedDomain(tc.inputContext, tc.inputRequest)
+				res, err := stateCase.inst.Client.InstanceV2Beta.RemoveTrustedDomain(tc.inputContext, tc.inputRequest)
 
 				// Verify
 				assert.Equal(t, tc.expectedErrorCode, status.Code(err))
