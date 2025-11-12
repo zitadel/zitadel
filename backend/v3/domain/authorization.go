@@ -24,7 +24,7 @@ type Authorization struct {
 	State      AuthorizationState `json:"state,omitempty" db:"state"`
 	CreatedAt  time.Time          `json:"createdAt,omitempty" db:"created_at"`
 	UpdatedAt  time.Time          `json:"updatedAt,omitempty" db:"updated_at"`
-	Roles      []string           `json:"roles,omitempty" db:"roles"` // todo: review
+	Roles      []string           `json:"roles,omitempty" db:"roles"`
 }
 
 // authorizationColumns defines all the columns of the authorizations table.
@@ -43,8 +43,6 @@ type authorizationColumns interface {
 	InstanceIDColumn() database.Column
 	// StateColumn returns the column for the state field.
 	StateColumn() database.Column
-	// RolesColumn returns the column for the roles field.
-	RolesColumn() database.Column
 	// CreatedAtColumn returns the column for the created_at field.
 	CreatedAtColumn() database.Column
 	// UpdatedAtColumn returns the column for the updated_at field.
@@ -73,8 +71,12 @@ type authorizationConditions interface {
 
 // authorizationChanges defines all the changes for the authorizations table.
 type authorizationChanges interface {
+	// SetUpdatedAt sets the updated at column.
+	// Only use this when reducing events,
+	// during regular updates the DB sets this column automatically.
+	SetUpdatedAt(updatedAt time.Time) database.Change
 	// SetState sets the state column.
-	SetState(state OrgState) database.Change
+	SetState(state AuthorizationState) database.Change
 }
 
 //go:generate mockgen -typed -package domainmock -destination ./mock/authorization.mock.go . AuthorizationRepository
@@ -90,7 +92,7 @@ type AuthorizationRepository interface {
 	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Authorization, error)
 	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Authorization, error)
 
-	Create(ctx context.Context, client database.QueryExecutor, userGrant *Authorization) error
+	Create(ctx context.Context, client database.QueryExecutor, authorization *Authorization) error
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	// SetRoles ensures that the roles for the authorization are exactly the given roles.
 	// It removes any roles that are not in the given list and adds any missing roles.

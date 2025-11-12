@@ -12,6 +12,7 @@ package domainmock
 import (
 	context "context"
 	reflect "reflect"
+	time "time"
 
 	domain "github.com/zitadel/zitadel/backend/v3/domain"
 	database "github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -43,17 +44,17 @@ func (m *MockAuthorizationRepository) EXPECT() *MockAuthorizationRepositoryMockR
 }
 
 // Create mocks base method.
-func (m *MockAuthorizationRepository) Create(ctx context.Context, client database.QueryExecutor, userGrant *domain.Authorization) error {
+func (m *MockAuthorizationRepository) Create(ctx context.Context, client database.QueryExecutor, authorization *domain.Authorization) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", ctx, client, userGrant)
+	ret := m.ctrl.Call(m, "Create", ctx, client, authorization)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockAuthorizationRepositoryMockRecorder) Create(ctx, client, userGrant any) *MockAuthorizationRepositoryCreateCall {
+func (mr *MockAuthorizationRepositoryMockRecorder) Create(ctx, client, authorization any) *MockAuthorizationRepositoryCreateCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockAuthorizationRepository)(nil).Create), ctx, client, userGrant)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockAuthorizationRepository)(nil).Create), ctx, client, authorization)
 	return &MockAuthorizationRepositoryCreateCall{Call: call}
 }
 
@@ -625,44 +626,6 @@ func (c *MockAuthorizationRepositoryProjectIDConditionCall) DoAndReturn(f func(s
 	return c
 }
 
-// RolesColumn mocks base method.
-func (m *MockAuthorizationRepository) RolesColumn() database.Column {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RolesColumn")
-	ret0, _ := ret[0].(database.Column)
-	return ret0
-}
-
-// RolesColumn indicates an expected call of RolesColumn.
-func (mr *MockAuthorizationRepositoryMockRecorder) RolesColumn() *MockAuthorizationRepositoryRolesColumnCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RolesColumn", reflect.TypeOf((*MockAuthorizationRepository)(nil).RolesColumn))
-	return &MockAuthorizationRepositoryRolesColumnCall{Call: call}
-}
-
-// MockAuthorizationRepositoryRolesColumnCall wrap *gomock.Call
-type MockAuthorizationRepositoryRolesColumnCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *MockAuthorizationRepositoryRolesColumnCall) Return(arg0 database.Column) *MockAuthorizationRepositoryRolesColumnCall {
-	c.Call = c.Call.Return(arg0)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *MockAuthorizationRepositoryRolesColumnCall) Do(f func() database.Column) *MockAuthorizationRepositoryRolesColumnCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockAuthorizationRepositoryRolesColumnCall) DoAndReturn(f func() database.Column) *MockAuthorizationRepositoryRolesColumnCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
 // RolesCondition mocks base method.
 func (m *MockAuthorizationRepository) RolesCondition(op database.TextOperation, roles string) database.Condition {
 	m.ctrl.T.Helper()
@@ -741,7 +704,7 @@ func (c *MockAuthorizationRepositorySetRolesCall) DoAndReturn(f func(context.Con
 }
 
 // SetState mocks base method.
-func (m *MockAuthorizationRepository) SetState(state domain.OrgState) database.Change {
+func (m *MockAuthorizationRepository) SetState(state domain.AuthorizationState) database.Change {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetState", state)
 	ret0, _ := ret[0].(database.Change)
@@ -767,13 +730,51 @@ func (c *MockAuthorizationRepositorySetStateCall) Return(arg0 database.Change) *
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockAuthorizationRepositorySetStateCall) Do(f func(domain.OrgState) database.Change) *MockAuthorizationRepositorySetStateCall {
+func (c *MockAuthorizationRepositorySetStateCall) Do(f func(domain.AuthorizationState) database.Change) *MockAuthorizationRepositorySetStateCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockAuthorizationRepositorySetStateCall) DoAndReturn(f func(domain.OrgState) database.Change) *MockAuthorizationRepositorySetStateCall {
+func (c *MockAuthorizationRepositorySetStateCall) DoAndReturn(f func(domain.AuthorizationState) database.Change) *MockAuthorizationRepositorySetStateCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SetUpdatedAt mocks base method.
+func (m *MockAuthorizationRepository) SetUpdatedAt(updatedAt time.Time) database.Change {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetUpdatedAt", updatedAt)
+	ret0, _ := ret[0].(database.Change)
+	return ret0
+}
+
+// SetUpdatedAt indicates an expected call of SetUpdatedAt.
+func (mr *MockAuthorizationRepositoryMockRecorder) SetUpdatedAt(updatedAt any) *MockAuthorizationRepositorySetUpdatedAtCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetUpdatedAt", reflect.TypeOf((*MockAuthorizationRepository)(nil).SetUpdatedAt), updatedAt)
+	return &MockAuthorizationRepositorySetUpdatedAtCall{Call: call}
+}
+
+// MockAuthorizationRepositorySetUpdatedAtCall wrap *gomock.Call
+type MockAuthorizationRepositorySetUpdatedAtCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockAuthorizationRepositorySetUpdatedAtCall) Return(arg0 database.Change) *MockAuthorizationRepositorySetUpdatedAtCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockAuthorizationRepositorySetUpdatedAtCall) Do(f func(time.Time) database.Change) *MockAuthorizationRepositorySetUpdatedAtCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockAuthorizationRepositorySetUpdatedAtCall) DoAndReturn(f func(time.Time) database.Change) *MockAuthorizationRepositorySetUpdatedAtCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
