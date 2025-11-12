@@ -74,12 +74,17 @@ func (s *Server) RemoveTrustedDomain(ctx context.Context, req *connect.Request[i
 	if err := s.checkPermission(ctx, domain.PermissionSystemInstanceWrite, domain.PermissionInstanceWrite); err != nil {
 		return nil, err
 	}
-	details, err := s.command.RemoveTrustedDomain(ctx, req.Msg.GetTrustedDomain())
+	details, err := s.command.RemoveTrustedDomain(ctx, req.Msg.GetTrustedDomain(), false)
 	if err != nil {
 		return nil, err
 	}
 
+	var deletionDate *timestamppb.Timestamp
+	if details != nil {
+		deletionDate = timestamppb.New(details.EventDate)
+	}
+
 	return connect.NewResponse(&instance.RemoveTrustedDomainResponse{
-		DeletionDate: timestamppb.New(details.EventDate),
+		DeletionDate: deletionDate,
 	}), nil
 }

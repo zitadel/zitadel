@@ -63,12 +63,17 @@ func (s *Server) RemoveTrustedDomain(ctx context.Context, req *connect.Request[i
 	if authz.GetFeatures(ctx).EnableRelationalTables {
 		return instancev2.RemoveTrustedDomainBeta(ctx, req)
 	}
-	details, err := s.command.RemoveTrustedDomain(ctx, req.Msg.GetDomain())
+	details, err := s.command.RemoveTrustedDomain(ctx, req.Msg.GetDomain(), false)
 	if err != nil {
 		return nil, err
 	}
 
+	var deletionDate *timestamppb.Timestamp
+	if details != nil {
+		deletionDate = timestamppb.New(details.EventDate)
+	}
+
 	return connect.NewResponse(&instance.RemoveTrustedDomainResponse{
-		DeletionDate: timestamppb.New(details.EventDate),
+		DeletionDate: deletionDate,
 	}), nil
 }
