@@ -262,7 +262,7 @@ func TestUpdateInstance(t *testing.T) {
 
 				// delete instance
 				affectedRows, err := instanceRepo.Delete(t.Context(), tx,
-					inst.ID,
+					instanceRepo.IDCondition(inst.ID),
 				)
 				require.NoError(t, err)
 				assert.Equal(t, int64(1), affectedRows)
@@ -290,7 +290,7 @@ func TestUpdateInstance(t *testing.T) {
 			// update name
 			newName := "new_" + instance.Name
 			rowsAffected, err := instanceRepo.Update(t.Context(), tx,
-				instance.ID,
+				instanceRepo.IDCondition(instance.ID),
 				instanceRepo.SetName(newName),
 			)
 			afterUpdate := time.Now()
@@ -690,7 +690,7 @@ func TestDeleteInstance(t *testing.T) {
 
 					// delete instance
 					affectedRows, err := instanceRepo.Delete(t.Context(), tx,
-						inst.ID,
+						instanceRepo.IDCondition(inst.ID),
 					)
 					require.NoError(t, err)
 					assert.Equal(t, int64(1), affectedRows)
@@ -717,7 +717,9 @@ func TestDeleteInstance(t *testing.T) {
 			}
 
 			// delete instance
-			noOfDeletedRows, err := instanceRepo.Delete(t.Context(), savepoint, tt.instanceID)
+			noOfDeletedRows, err := instanceRepo.Delete(t.Context(), savepoint,
+				instanceRepo.IDCondition(tt.instanceID),
+			)
 			require.NoError(t, err)
 			assert.Equal(t, noOfDeletedRows, tt.noOfDeletedRows)
 

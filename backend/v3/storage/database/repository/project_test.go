@@ -558,7 +558,7 @@ func TestDeleteProject(t *testing.T) {
 	}{
 		{
 			name:             "incomplete condition",
-			condition:        projectRepo.InstanceIDCondition(instanceID),
+			condition:        projectRepo.IDCondition("something"),
 			wantRowsAffected: 0,
 			wantErr:          database.NewMissingConditionError(projectRepo.IDColumn()),
 		},

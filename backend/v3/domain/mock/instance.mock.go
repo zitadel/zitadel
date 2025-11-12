@@ -272,7 +272,7 @@ func (c *MockInstanceRepositoryDefaultOrgIDColumnCall) DoAndReturn(f func() data
 }
 
 // Delete mocks base method.
-func (m *MockInstanceRepository) Delete(arg0 context.Context, arg1 database.QueryExecutor, arg2 string) (int64, error) {
+func (m *MockInstanceRepository) Delete(arg0 context.Context, arg1 database.QueryExecutor, arg2 database.Condition) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0, arg1, arg2)
 	ret0, _ := ret[0].(int64)
@@ -299,13 +299,13 @@ func (c *MockInstanceRepositoryDeleteCall) Return(arg0 int64, arg1 error) *MockI
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockInstanceRepositoryDeleteCall) Do(f func(context.Context, database.QueryExecutor, string) (int64, error)) *MockInstanceRepositoryDeleteCall {
+func (c *MockInstanceRepositoryDeleteCall) Do(f func(context.Context, database.QueryExecutor, database.Condition) (int64, error)) *MockInstanceRepositoryDeleteCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockInstanceRepositoryDeleteCall) DoAndReturn(f func(context.Context, database.QueryExecutor, string) (int64, error)) *MockInstanceRepositoryDeleteCall {
+func (c *MockInstanceRepositoryDeleteCall) DoAndReturn(f func(context.Context, database.QueryExecutor, database.Condition) (int64, error)) *MockInstanceRepositoryDeleteCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -1007,7 +1007,7 @@ func (c *MockInstanceRepositorySetUpdatedAtCall) DoAndReturn(f func(time.Time) d
 }
 
 // Update mocks base method.
-func (m *MockInstanceRepository) Update(arg0 context.Context, arg1 database.QueryExecutor, arg2 string, arg3 ...database.Change) (int64, error) {
+func (m *MockInstanceRepository) Update(arg0 context.Context, arg1 database.QueryExecutor, arg2 database.Condition, arg3 ...database.Change) (int64, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1, arg2}
 	for _, a := range arg3 {
@@ -1039,13 +1039,13 @@ func (c *MockInstanceRepositoryUpdateCall) Return(arg0 int64, arg1 error) *MockI
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockInstanceRepositoryUpdateCall) Do(f func(context.Context, database.QueryExecutor, string, ...database.Change) (int64, error)) *MockInstanceRepositoryUpdateCall {
+func (c *MockInstanceRepositoryUpdateCall) Do(f func(context.Context, database.QueryExecutor, database.Condition, ...database.Change) (int64, error)) *MockInstanceRepositoryUpdateCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockInstanceRepositoryUpdateCall) DoAndReturn(f func(context.Context, database.QueryExecutor, string, ...database.Change) (int64, error)) *MockInstanceRepositoryUpdateCall {
+func (c *MockInstanceRepositoryUpdateCall) DoAndReturn(f func(context.Context, database.QueryExecutor, database.Condition, ...database.Change) (int64, error)) *MockInstanceRepositoryUpdateCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

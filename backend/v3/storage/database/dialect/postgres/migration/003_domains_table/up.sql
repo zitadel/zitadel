@@ -31,7 +31,7 @@ CREATE INDEX idx_instance_domain_instance ON zitadel.instance_domains(instance_i
 
 CREATE TABLE zitadel.org_domains(
   instance_id TEXT NOT NULL
-  , org_id TEXT NOT NULL
+  , organization_id TEXT NOT NULL
   , domain TEXT NOT NULL CHECK (LENGTH(domain) BETWEEN 1 AND 255)
   , is_verified BOOLEAN NOT NULL DEFAULT FALSE
   , is_primary BOOLEAN NOT NULL DEFAULT FALSE

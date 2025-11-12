@@ -111,8 +111,8 @@ type InstanceRepository interface {
 	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Instance, error)
 
 	Create(ctx context.Context, client database.QueryExecutor, instance *Instance) error
-	Update(ctx context.Context, client database.QueryExecutor, id string, changes ...database.Change) (int64, error)
-	Delete(ctx context.Context, client database.QueryExecutor, id string) (int64, error)
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
+	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 
 	// LoadDomains loads the domains of the given instance.
 	// If it is called the [Instance].Domains field will be set on future calls to Get or List.
