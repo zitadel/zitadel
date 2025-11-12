@@ -500,9 +500,11 @@ func (l *Login) handleExternalUserAuthenticated(
 
 // checkAutoLinking checks if a user with the provided information (username or email) already exists within ZITADEL.
 // The decision, which information will be checked is based on the IdP template option.
-// The function returns a boolean whether a user was found or not.
+// The function returns a boolean whether a user was found or not, resp. if it was linked.
 // If single a user was found, it will be automatically linked.
-func (l *Login) checkAutoLinking(r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser) (bool, error) {
+// Before the actual linking, it will check if the user's organization allows external IdP and
+// has activated the correspond IdP.
+func (l *Login) checkAutoLinking(r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser, human *domain.Human) (bool, error) {
 	queries := make([]query.SearchQuery, 0, 2)
 	switch provider.AutoLinking {
 	case domain.AutoLinkingOptionUnspecified:
@@ -511,20 +513,18 @@ func (l *Login) checkAutoLinking(r *http.Request, authReq *domain.AuthRequest, p
 	case domain.AutoLinkingOptionUsername:
 		// if we're checking for usernames there are to options:
 		//
-		// If no specific org has been requested (by id or domain scope), we'll check the provided username against
+		// If no specific org has been requested (by id or domain scope), we'll check the provided username (loginname) against
 		// all existing loginnames and directly use that result to either prompt or continue with other idp options.
 		if authReq.RequestedOrgID == "" {
 			user, err := l.query.GetNotifyUserByLoginName(r.Context(), false, externalUser.PreferredUsername)
 			if err != nil {
 				return false, nil
 			}
-			if err = l.autoLinkUser(r, authReq, user); err != nil {
-				return false, err
-			}
-			return true, nil
+			return l.autoLinkUser(r, authReq, user)
 		}
-		// If a specific org has been requested, we'll check the provided username against usernames (of that org).
-		usernameQuery, err := query.NewUserUsernameSearchQuery(externalUser.PreferredUsername, query.TextEqualsIgnoreCase)
+		// If a specific org has been requested, we'll check the username (org policy (suffixed or not) is already applied)
+		// against usernames (of that org).
+		usernameQuery, err := query.NewUserUsernameSearchQuery(human.Username, query.TextEqualsIgnoreCase)
 		if err != nil {
 			return false, nil
 		}
@@ -549,21 +549,36 @@ func (l *Login) checkAutoLinking(r *http.Request, authReq *domain.AuthRequest, p
 	if err != nil {
 		return false, nil
 	}
-	if err = l.autoLinkUser(r, authReq, user); err != nil {
-		return false, err
-	}
-	return true, nil
+	return l.autoLinkUser(r, authReq, user)
 }
 
-func (l *Login) autoLinkUser(r *http.Request, authReq *domain.AuthRequest, user *query.NotifyUser) error {
+func (l *Login) checkAutoLinkingAllowedForUserAndIdP(r *http.Request, authReq *domain.AuthRequest, user *query.NotifyUser) (bool, error) {
+	policy, err := l.getLoginPolicy(r, user.ResourceOwner)
+	if err != nil {
+		return false, err
+	}
+	if !policy.AllowExternalIDPs {
+		return false, nil
+	}
+	return slices.ContainsFunc(policy.IDPLinks, func(link *query.IDPLoginPolicyLink) bool {
+		return link.IDPID == authReq.SelectedIDPConfigID
+	}), nil
+}
+
+// autoLink user will link the external user to the found user in case the user's organization
+// has the corresponding IdP activated. In case it doesn't, the function returns false and no error.
+func (l *Login) autoLinkUser(r *http.Request, authReq *domain.AuthRequest, user *query.NotifyUser) (bool, error) {
+	if allowed, err := l.checkAutoLinkingAllowedForUserAndIdP(r, authReq, user); err != nil || !allowed {
+		return false, nil
+	}
 	if err := l.authRepo.SelectUser(r.Context(), authReq.ID, user.ID, authReq.AgentID, false); err != nil {
-		return err
+		return false, err
 	}
 	if err := l.authRepo.LinkExternalUsers(r.Context(), authReq.ID, authReq.AgentID, domain.BrowserInfoFromRequest(r)); err != nil {
-		return err
+		return false, err
 	}
 	authReq.UserID = user.ID
-	return nil
+	return true, nil
 }
 
 // createOrLinkUser is called if an externalAuthentication couldn't find a corresponding externalID
@@ -584,7 +599,7 @@ func (l *Login) createOrLinkUser(w http.ResponseWriter, r *http.Request, authReq
 	human, idpLink, _ := mapExternalUserToLoginUser(externalUser, orgIAMPolicy.UserLoginMustBeDomain)
 	// let's check if auto-linking is enabled and if the user would be found by the corresponding option
 	if provider.AutoLinking != domain.AutoLinkingOptionUnspecified {
-		userLinked, err = l.checkAutoLinking(r, authReq, provider, externalUser)
+		userLinked, err = l.checkAutoLinking(r, authReq, provider, externalUser, human)
 		if err != nil {
 			l.renderError(w, r, authReq, err)
 			return false
