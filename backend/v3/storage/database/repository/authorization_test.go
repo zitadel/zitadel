@@ -637,7 +637,6 @@ func TestUpdateAuthorization(t *testing.T) {
 	err = authorizationRepo.Create(t.Context(), tx, inactiveAuthorization)
 	require.NoError(t, err)
 
-
 	tests := []struct {
 		name             string
 		condition        database.Condition
