@@ -1,4 +1,4 @@
-//go:generate enumer -type MemberType -trimprefix MemberType -json -sql
+//go:generate enumer -type MemberType -trimprefix MemberType -json -yaml -sql
 
 package authz
 
@@ -49,13 +49,12 @@ type Grant struct {
 type Memberships []*Membership
 
 type Membership struct {
-	MemberType  MemberType
-	AggregateID string
-	InstanceID  string
+	MemberType  MemberType `yaml:",omitempty"`
+	AggregateID string     `yaml:",omitempty"`
+	InstanceID  string     `yaml:",omitempty"`
 	// ObjectID differs from aggregate id if object is sub of an aggregate
-	ObjectID string
-
-	Roles []string
+	ObjectID string   `yaml:",omitempty"`
+	Roles    []string `yaml:",omitempty"`
 }
 
 type MemberType int32

@@ -13,6 +13,7 @@ import (
 
 	"github.com/zitadel/zitadel/cmd/admin"
 	"github.com/zitadel/zitadel/cmd/build"
+	"github.com/zitadel/zitadel/cmd/config"
 	"github.com/zitadel/zitadel/cmd/initialise"
 	"github.com/zitadel/zitadel/cmd/key"
 	"github.com/zitadel/zitadel/cmd/mirror"
@@ -59,6 +60,7 @@ func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server
 		mirror.New(&configFiles),
 		key.New(),
 		ready.New(),
+		config.New(),
 	)
 
 	cmd.InitDefaultVersionFlag()

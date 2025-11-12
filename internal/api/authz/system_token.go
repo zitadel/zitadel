@@ -81,9 +81,9 @@ type systemJWTStorage struct {
 }
 
 type SystemAPIUser struct {
-	Path        string // if a path is specified, the key will be read from that path
-	KeyData     []byte // else you can also specify the data directly in the KeyData
-	Memberships Memberships
+	Path        string      `yaml:",omitempty"` // if a path is specified, the key will be read from that path
+	KeyData     []byte      `yaml:",omitempty"` // else you can also specify the data directly in the KeyData
+	Memberships Memberships `yaml:",omitempty"`
 }
 
 func (s *SystemAPIUser) readKey() (*rsa.PublicKey, error) {
