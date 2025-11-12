@@ -59,10 +59,7 @@ func (i instanceDomain) Add(ctx context.Context, client database.QueryExecutor, 
 
 // Update implements [domain.InstanceDomainRepository].
 func (i instanceDomain) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	if err := checkRestrictingColumns(condition, i.InstanceIDColumn()); err != nil {
-		return 0, err
-	}
-	return updateSub(ctx, client, i, condition, changes...)
+	return update(ctx, client, i, condition, changes...)
 }
 
 // Remove implements [domain.InstanceDomainRepository].

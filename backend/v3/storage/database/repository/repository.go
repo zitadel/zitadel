@@ -69,22 +69,14 @@ func list[Target any](ctx context.Context, querier database.Querier, builder *da
 
 type updatable interface {
 	PrimaryKeyColumns() []database.Column
-	updatableSub
+	UpdatedAtColumn() database.Column
+	qualifiedTableName() string
 }
 
 func update[Target updatable](ctx context.Context, client database.QueryExecutor, target Target, condition database.Condition, changes ...database.Change) (int64, error) {
 	if err := checkPKCondition(target, condition); err != nil {
 		return 0, err
 	}
-	return updateSub(ctx, client, target, condition, changes...)
-}
-
-type updatableSub interface {
-	UpdatedAtColumn() database.Column
-	qualifiedTableName() string
-}
-
-func updateSub[Target updatableSub](ctx context.Context, client database.QueryExecutor, target Target, condition database.Condition, changes ...database.Change) (int64, error) {
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}
@@ -107,6 +99,13 @@ func delete[Target deletable](ctx context.Context, client database.QueryExecutor
 	writeCondition(builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+func defaultValue(value any) any {
+	if value == nil {
+		return database.DefaultInstruction
+	}
+	return value
 }
 
 func defaultTimestamp(timestamp time.Time) any {

@@ -182,7 +182,7 @@ func TestDeleteInstanceCommand_Execute(t *testing.T) {
 					}, nil)
 
 				instanceRepo.EXPECT().
-					Delete(gomock.Any(), gomock.Any(), "instance-1").
+					Delete(gomock.Any(), gomock.Any(), instanceRepo.PrimaryKeyCondition("instance-1")).
 					Times(1).
 					Return(int64(0), deleteErr)
 				return instanceRepo
@@ -222,7 +222,7 @@ func TestDeleteInstanceCommand_Execute(t *testing.T) {
 					}, nil)
 
 				instanceRepo.EXPECT().
-					Delete(gomock.Any(), gomock.Any(), "instance-1").
+					Delete(gomock.Any(), gomock.Any(), instanceRepo.PrimaryKeyCondition("instance-1")).
 					Times(1).
 					Return(int64(2), nil)
 				return instanceRepo
@@ -262,7 +262,7 @@ func TestDeleteInstanceCommand_Execute(t *testing.T) {
 					}, nil)
 
 				instanceRepo.EXPECT().
-					Delete(gomock.Any(), gomock.Any(), "instance-1").
+					Delete(gomock.Any(), gomock.Any(), instanceRepo.PrimaryKeyCondition("instance-1")).
 					Times(1).
 					Return(int64(0), nil)
 				return instanceRepo
@@ -302,7 +302,7 @@ func TestDeleteInstanceCommand_Execute(t *testing.T) {
 					}, nil)
 
 				instanceRepo.EXPECT().
-					Delete(gomock.Any(), gomock.Any(), "instance-1").
+					Delete(gomock.Any(), gomock.Any(), instanceRepo.PrimaryKeyCondition("instance-1")).
 					Times(1).
 					Return(int64(1), nil)
 				return instanceRepo

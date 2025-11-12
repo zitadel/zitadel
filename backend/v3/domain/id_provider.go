@@ -269,13 +269,6 @@ type IDPSAML struct {
 	SAML
 }
 
-// IDPIdentifierCondition is used to help specify a single identity_provider,
-// it will either be used as the  identity_provider ID or identity_provider name,
-// as identity_provider can be identified either using (instanceID + OrgID + ID) OR (instanceID + OrgID + name)
-type IDPIdentifierCondition interface {
-	database.Condition
-}
-
 type idProviderColumns interface {
 	InstanceIDColumn() database.Column
 	OrgIDColumn() database.Column
@@ -300,9 +293,9 @@ type idProviderConditions interface {
 	PrimaryKeyCondition(instanceID, idpID string) database.Condition
 	InstanceIDCondition(id string) database.Condition
 	OrgIDCondition(id *string) database.Condition
-	IDCondition(id string) IDPIdentifierCondition
+	IDCondition(id string) database.Condition
 	StateCondition(state IDPState) database.Condition
-	NameCondition(name string) IDPIdentifierCondition
+	NameCondition(name string) database.Condition
 	TypeCondition(typee IDPType) database.Condition
 	AutoRegisterCondition(allow bool) database.Condition
 	AllowCreationCondition(allow bool) database.Condition
@@ -335,25 +328,25 @@ type IDProviderRepository interface {
 	idProviderConditions
 	idProviderChanges
 
-	Get(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IdentityProvider, error)
-	List(ctx context.Context, client database.QueryExecutor, conditions ...database.Condition) ([]*IdentityProvider, error)
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IdentityProvider, error)
+	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*IdentityProvider, error)
 
 	Create(ctx context.Context, client database.QueryExecutor, idp *IdentityProvider) error
-	Update(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string, changes ...database.Change) (int64, error)
-	Delete(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (int64, error)
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
+	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 
-	GetOIDC(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPOIDC, error)
-	GetJWT(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPJWT, error)
+	GetOIDC(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPOIDC, error)
+	GetJWT(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPJWT, error)
 
-	GetOAuth(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPOAuth, error)
+	GetOAuth(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPOAuth, error)
 
-	GetAzureAD(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPAzureAD, error)
-	GetGoogle(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGoogle, error)
-	GetGithub(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGithub, error)
-	GetGithubEnterprise(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGithubEnterprise, error)
-	GetGitlab(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGitlab, error)
-	GetGitlabSelfHosting(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGitlabSelfHosting, error)
-	GetLDAP(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPLDAP, error)
-	GetApple(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPApple, error)
-	GetSAML(ctx context.Context, client database.QueryExecutor, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPSAML, error)
+	GetAzureAD(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPAzureAD, error)
+	GetGoogle(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPGoogle, error)
+	GetGithub(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPGithub, error)
+	GetGithubEnterprise(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPGithubEnterprise, error)
+	GetGitlab(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPGitlab, error)
+	GetGitlabSelfHosting(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPGitlabSelfHosting, error)
+	GetLDAP(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPLDAP, error)
+	GetApple(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPApple, error)
+	GetSAML(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*IDPSAML, error)
 }
