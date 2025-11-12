@@ -10,6 +10,8 @@ import {
   addHuman,
   getLoginSettings,
   getOrgsByDomain,
+  getActiveIdentityProviders,
+  getUserByID,
   getDefaultOrg,
 } from "@/lib/zitadel";
 import { headers } from "next/headers";
@@ -61,6 +63,48 @@ async function resolveOrganizationForUser({
   // Fallback to default organization if no org was resolved through discovery
   const defaultOrg = await getDefaultOrg({ serviceUrl });
   return defaultOrg?.id;
+}
+
+/**
+ * Validates if IDP linking is allowed for a user's organization.
+ * Checks:
+ * 1. Organization allows external IDP login (allowExternalIdp)
+ * 2. The specific IDP is activated for the organization
+ *
+ */
+export async function validateIDPLinkingPermissions({
+  serviceUrl,
+  userOrganizationId,
+  idpId,
+}: {
+  serviceUrl: string;
+  userOrganizationId: string;
+  idpId: string;
+}): Promise<boolean> {
+  // Check organization login settings
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    organization: userOrganizationId,
+  });
+
+  if (!loginSettings?.allowExternalIdp) {
+    return false;
+  }
+
+  // Check if the IDP is activated for the organization and allows linking
+  const activeIDPs = await getActiveIdentityProviders({
+    serviceUrl,
+    orgId: userOrganizationId,
+    linking_allowed: true,
+  });
+
+  const isIDPActive = activeIDPs.identityProviders?.some((idp) => idp.id === idpId);
+
+  if (!isIDPActive) {
+    return false;
+  }
+
+  return true;
 }
 
 /**
@@ -119,7 +163,7 @@ export async function processIDPCallback({
 
     console.log("[IDP Process] Intent retrieved successfully, processing business logic");
 
-    const { idpInformation, userId, addHumanUser } = intent;
+    const { idpInformation, userId, addHumanUser, updateHumanUser } = intent;
 
     if (!idpInformation) {
       console.error("[IDP Process] IDP information missing");
@@ -161,15 +205,15 @@ export async function processIDPCallback({
     // ============================================
     if (userId && !link) {
       // Auto-update user if enabled
-      if (options?.isAutoUpdate && addHumanUser) {
+      if (options?.isAutoUpdate && updateHumanUser) {
         try {
           await updateHuman({
             serviceUrl,
             request: create(UpdateHumanUserRequestSchema, {
               userId: userId,
-              profile: addHumanUser.profile,
-              email: addHumanUser.email,
-              phone: addHumanUser.phone,
+              profile: updateHumanUser.profile,
+              email: updateHumanUser.email,
+              phone: updateHumanUser.phone,
             }),
           });
           console.log("[IDP Process] User auto-updated successfully");
@@ -208,12 +252,34 @@ export async function processIDPCallback({
     // ============================================
     if (link && userId) {
       if (!options?.isLinkingAllowed) {
-        console.error("[IDP Process] Linking not allowed");
+        console.error("[IDP Process] Linking not allowed by IDP configuration");
         const params = buildRedirectParams();
         return { redirect: `/idp/${provider}/linking-failed?${params}&error=linking_not_allowed` };
       }
 
       try {
+        // Get user to retrieve their organization
+        const targetUser = await getUserByID({ serviceUrl, userId });
+
+        if (!targetUser || !targetUser.details?.resourceOwner) {
+          console.error("[IDP Process] User not found or missing organization");
+          const params = buildRedirectParams();
+          return { redirect: `/idp/${provider}/linking-failed?${params}&error=user_not_found` };
+        }
+
+        // Validate IDP linking permissions
+        const isAllowed = await validateIDPLinkingPermissions({
+          serviceUrl,
+          userOrganizationId: targetUser.details.resourceOwner,
+          idpId: idpInformation.idpId,
+        });
+
+        if (!isAllowed) {
+          console.error("[IDP Process] IDP linking validation failed");
+          const params = buildRedirectParams();
+          return { redirect: `/idp/${provider}/linking-failed?${params}&error=validation_failed` };
+        }
+
         await addIDPLink({
           serviceUrl,
           idp: {
@@ -286,6 +352,25 @@ export async function processIDPCallback({
 
       if (foundUser) {
         try {
+          if (!foundUser.details?.resourceOwner) {
+            console.error("[IDP Process] Found user missing organization information");
+            const params = buildRedirectParams();
+            return { redirect: `/idp/${provider}/linking-failed?${params}&error=missing_organization` };
+          }
+
+          // Validate IDP linking permissions
+          const isAllowed = await validateIDPLinkingPermissions({
+            serviceUrl,
+            userOrganizationId: foundUser.details.resourceOwner,
+            idpId: idpInformation.idpId,
+          });
+
+          if (!isAllowed) {
+            console.error("[IDP Process] Auto-linking validation failed");
+            const params = buildRedirectParams();
+            return { redirect: `/idp/${provider}/linking-failed?${params}&error=validation_failed` };
+          }
+
           await addIDPLink({
             serviceUrl,
             idp: {
