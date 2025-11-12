@@ -1,0 +1,93 @@
+---
+title: Hono
+sidebar_label: Hono
+framework_url: https://hono.dev
+auth_library: "@auth/core"
+auth_library_url: https://authjs.dev
+example_repo: https://github.com/zitadel/example-auth-hono
+auth_flow: pkce
+status: stable
+---
+
+## Overview
+
+[Hono](https://hono.dev) is a small, simple, and ultrafast web framework for the Edges that works on Cloudflare Workers, Fastly Compute, Deno, Bun, Vercel, Netlify, AWS Lambda, Lambda@Edge, and Node.js. This example demonstrates how to integrate **Zitadel** using the **[OAuth 2.0 PKCE flow](/docs/concepts/pkce)** to authenticate users securely and maintain sessions across your Hono application.
+
+#### Auth library
+
+This example uses **[Auth.js](https://authjs.dev)** (formerly NextAuth.js), the standard authentication library for modern web frameworks. Auth.js implements the [OpenID Connect](https://openid.net/connect/) (OIDC) protocol with [PKCE](/docs/concepts/pkce), performs secure token exchange, and provides session management helpers. The integration uses **[@hono/auth-js](https://www.npmjs.com/package/@hono/auth-js)**, the official Hono adapter for Auth.js, along with **[@auth/core](https://www.npmjs.com/package/@auth/core)** which handles the core OIDC flows and the **[Zitadel provider](https://authjs.dev/reference/core/providers/zitadel)**.
+
+---
+
+## What this example demonstrates
+
+This example showcases a complete web application authentication pattern with [Hono](https://hono.dev) and [Zitadel](https://zitadel.com/docs). Users start on a public landing page, initiate authentication with Zitadel using the secure [PKCE flow](/docs/concepts/pkce), and are redirected to a protected profile page displaying their [user information](https://zitadel.com/docs/apis/openidoauth/claims) after successful authentication. The application demonstrates several key features including sign-in with [authorization code flow + PKCE](/docs/concepts/pkce), OAuth callback handling with secure [session storage](https://authjs.dev/concepts/session-strategies) using [JWT strategy](https://authjs.dev/concepts/session-strategies#jwt-session), route protection through [authentication middleware](https://hono.dev/docs/guides/middleware) that guards sensitive pages, automatic [token refresh](https://authjs.dev/guides/refresh-token-rotation) to maintain long-lived sessions without requiring re-authentication, access to user profile information including [OIDC standard claims](https://zitadel.com/docs/apis/openidoauth/claims) and [Zitadel-specific claims](https://zitadel.com/docs/apis/openidoauth/claims#reserved-claims) such as organization roles and metadata, and secure sign-out with [federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout) that terminates both the local session and the Zitadel session through the end-session endpoint.
+
+The implementation uses [Handlebars templates](https://handlebarsjs.com/) for server-side rendering, [@hono/node-server](https://www.npmjs.com/package/@hono/node-server) for running on Node.js, secure [HTTP-only cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#security) for session management, and [CSRF protection](https://authjs.dev/concepts/session-strategies#csrf-protection) through Auth.js built-in tokens. The authentication flow follows OAuth 2.0 best practices with [Proof Key for Code Exchange](https://zitadel.com/docs/guides/integrate/login/oidc/oauth-recommended-flows) to prevent authorization code interception attacks.
+
+---
+
+## Getting started
+
+### Prerequisites
+
+Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the **[PKCE Application Setup guide](/docs/guides/integrate/login/oidc/pkce-setup)** to:
+
+1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects)
+2. Configure it to use the [PKCE authentication method](/docs/concepts/pkce)
+3. Set up your redirect URIs (e.g., `http://localhost:3000/auth/callback` for development)
+4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/auth/logout/callback`)
+5. Copy your **Client ID** for use in the next steps
+
+> **Note:** Make sure to enable **Dev Mode** in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
+
+### Run the example
+
+Once you have your Zitadel application configured:
+
+1. Clone the [repository](https://github.com/zitadel/example-auth-hono).
+2. Create a `.env` file (copy from `.env.example`) and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/overview). **Use the exact environment variable names from the repository:**
+   ```
+   NODE_ENV=development
+   PORT=3000
+   SESSION_SECRET=your-very-secret-and-strong-session-key
+   SESSION_DURATION=3600
+   ZITADEL_DOMAIN=https://your-instance.zitadel.cloud
+   ZITADEL_CLIENT_ID=your_client_id_from_console
+   ZITADEL_CLIENT_SECRET=
+   ZITADEL_CALLBACK_URL=http://localhost:3000/auth/callback
+   ZITADEL_POST_LOGIN_URL=/profile
+   ZITADEL_POST_LOGOUT_URL=http://localhost:3000
+   ```
+   Replace these values with:
+	- Your actual **Zitadel instance URL** (the Issuer from your [instance settings](https://zitadel.com/docs/guides/manage/console/instance-settings))
+	- The **Client ID** you copied when creating the application in the PKCE setup
+	- The **redirect URI** you configured in the PKCE setup (must match exactly)
+	- The **post-logout redirect URI** for handling logout callbacks
+	- A strong random **session secret** (generate using: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
+
+> **Note:** While PKCE doesn't require a client secret for public clients, Auth.js requires a value for internal configuration. You can leave `ZITADEL_CLIENT_SECRET` empty or provide a random string.
+
+3. Install dependencies using [npm](https://www.npmjs.com) and start the development server:
+   ```bash
+   npm install
+   npm run dev
+   ```
+
+The application will be running at `http://localhost:3000`. Visit the homepage to test the authentication flow.
+
+---
+
+## Learn more and resources
+
+* **Zitadel documentation:** [https://zitadel.com/docs](https://zitadel.com/docs)
+* **PKCE concept:** [/docs/concepts/pkce](/docs/concepts/pkce)
+* **PKCE application setup:** [/docs/guides/integrate/login/oidc/pkce-setup](/docs/guides/integrate/login/oidc/pkce-setup)
+* **Federated logout:** [https://zitadel.com/docs/guides/integrate/login/oidc/logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
+* **OIDC integration guide:** [https://zitadel.com/docs/guides/integrate/login/oidc/](https://zitadel.com/docs/guides/integrate/login/oidc/)
+* **OAuth recommended flows:** [https://zitadel.com/docs/guides/integrate/login/oidc/oauth-recommended-flows](https://zitadel.com/docs/guides/integrate/login/oidc/oauth-recommended-flows)
+* **Framework docs:** [https://hono.dev](https://hono.dev)
+* **Auth.js:** [https://authjs.dev](https://authjs.dev)
+* **Auth.js Hono adapter:** [https://www.npmjs.com/package/@hono/auth-js](https://www.npmjs.com/package/@hono/auth-js)
+* **Example repository:** [https://github.com/zitadel/example-auth-hono](https://github.com/zitadel/example-auth-hono)
+* **All framework examples:** [/docs/examples](/docs/examples)
