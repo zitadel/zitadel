@@ -8,6 +8,7 @@ import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_ser
 import { UserService } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { systemAPIToken } from "./api";
 import { createServerTransport } from "./zitadel";
+import { InstanceService } from "@zitadel/proto/zitadel/instance/v2/instance_service_pb";
 
 type ServiceClass =
   | typeof IdentityProviderService
@@ -16,7 +17,8 @@ type ServiceClass =
   | typeof SessionService
   | typeof OIDCService
   | typeof SettingsService
-  | typeof SAMLService;
+  | typeof SAMLService
+  | typeof InstanceService;
 
 export async function createServiceForHost<T extends ServiceClass>(
   service: T,
