@@ -44,7 +44,7 @@ func (i idProvider) List(ctx context.Context, client database.QueryExecutor, opt
 func (i idProvider) Create(ctx context.Context, client database.QueryExecutor, idp *domain.IdentityProvider) error {
 	builder := database.NewStatementBuilder(`INSERT INTO `)
 	builder.WriteString(i.qualifiedTableName())
-	builder.WriteString(` (instance_id, org_id, id, state, name, type, allow_creation, allow_auto_creation, allow_auto_update, allow_linking, auto_linking_field, styling_type, payload, created_at, updated_at) VALUES (`)
+	builder.WriteString(` (instance_id, organization_id, id, state, name, type, allow_creation, allow_auto_creation, allow_auto_update, allow_linking, auto_linking_field, styling_type, payload, created_at, updated_at) VALUES (`)
 	builder.WriteArgs(
 		idp.InstanceID,
 		idp.OrgID,
@@ -161,7 +161,7 @@ func (i idProvider) InstanceIDColumn() database.Column {
 }
 
 func (i idProvider) OrgIDColumn() database.Column {
-	return database.NewColumn(i.unqualifiedTableName(), "org_id")
+	return database.NewColumn(i.unqualifiedTableName(), "organization_id")
 }
 
 func (i idProvider) IDColumn() database.Column {
@@ -342,7 +342,7 @@ func (i idProvider) SetUpdatedAt(updatedAt *time.Time) database.Change {
 // helpers
 // -------------------------------------------------------------
 
-const queryIDProviderStmt = `SELECT instance_id, org_id, id, state, name, type, auto_register, allow_creation, allow_auto_creation,` +
+const queryIDProviderStmt = `SELECT instance_id, organization_id, id, state, name, type, auto_register, allow_creation, allow_auto_creation,` +
 	` allow_auto_update, allow_linking, auto_linking_field, styling_type, payload, created_at, updated_at` +
 	` FROM `
 

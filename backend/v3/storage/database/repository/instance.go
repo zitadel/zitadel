@@ -67,7 +67,7 @@ func (i instance) List(ctx context.Context, client database.QueryExecutor, opts 
 func (i instance) Create(ctx context.Context, client database.QueryExecutor, instance *domain.Instance) error {
 	builder := database.NewStatementBuilder(`INSERT INTO `)
 	builder.WriteString(i.qualifiedTableName())
-	builder.WriteString(` (id, name, default_org_id, iam_project_id, console_client_id, console_app_id, default_language, created_at, updated_at) VALUES (`)
+	builder.WriteString(` (id, name, default_organization_id, iam_project_id, console_client_id, console_application_id, default_language, created_at, updated_at) VALUES (`)
 	builder.WriteArgs(instance.ID, instance.Name, instance.DefaultOrgID, instance.IAMProjectID, instance.ConsoleClientID, instance.ConsoleAppID, instance.DefaultLanguage, defaultTimestamp(instance.CreatedAt), defaultTimestamp(instance.UpdatedAt))
 	builder.WriteString(`) RETURNING created_at, updated_at`)
 
@@ -182,7 +182,7 @@ func (i instance) CreatedAtColumn() database.Column {
 
 // DefaultOrgIdColumn implements [domain.instanceColumns].
 func (i instance) DefaultOrgIDColumn() database.Column {
-	return database.NewColumn(i.unqualifiedTableName(), "default_org_id")
+	return database.NewColumn(i.unqualifiedTableName(), "default_organization_id")
 }
 
 // IAMProjectIDColumn implements [domain.instanceColumns].
@@ -197,7 +197,7 @@ func (i instance) ConsoleClientIDColumn() database.Column {
 
 // ConsoleAppIDColumn implements [domain.instanceColumns].
 func (i instance) ConsoleAppIDColumn() database.Column {
-	return database.NewColumn(i.unqualifiedTableName(), "console_app_id")
+	return database.NewColumn(i.unqualifiedTableName(), "console_application_id")
 }
 
 // DefaultLanguageColumn implements [domain.instanceColumns].
@@ -274,7 +274,7 @@ func (i *instance) joinDomains() database.QueryOption {
 // -------------------------------------------------------------
 
 const (
-	queryInstanceStmt = `SELECT instances.id, instances.name, instances.default_org_id, instances.iam_project_id, instances.console_client_id, instances.console_app_id, instances.default_language, instances.created_at, instances.updated_at` +
+	queryInstanceStmt = `SELECT instances.id, instances.name, instances.default_organization_id, instances.iam_project_id, instances.console_client_id, instances.console_application_id, instances.default_language, instances.created_at, instances.updated_at` +
 		` , jsonb_agg(json_build_object('domain', instance_domains.domain, 'isPrimary', instance_domains.is_primary, 'isGenerated', instance_domains.is_generated, 'createdAt', instance_domains.created_at, 'updatedAt', instance_domains.updated_at)) FILTER (WHERE instance_domains.instance_id IS NOT NULL) AS domains` +
 		` FROM `
 )

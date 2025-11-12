@@ -52,7 +52,7 @@ func (o orgDomain) List(ctx context.Context, client database.QueryExecutor, opts
 func (o orgDomain) Add(ctx context.Context, client database.QueryExecutor, domain *domain.AddOrganizationDomain) error {
 	builder := database.NewStatementBuilder(`INSERT INTO `)
 	builder.WriteString(o.qualifiedTableName())
-	builder.WriteString(` (instance_id, org_id, domain, is_verified, is_primary, validation_type, created_at, updated_at) VALUES (`)
+	builder.WriteString(` (instance_id, organization_id, domain, is_verified, is_primary, validation_type, created_at, updated_at) VALUES (`)
 	builder.WriteArgs(domain.InstanceID, domain.OrgID, domain.Domain, domain.IsVerified, domain.IsPrimary, domain.ValidationType, defaultTimestamp(domain.CreatedAt), defaultTimestamp(domain.UpdatedAt))
 	builder.WriteString(`) RETURNING created_at, updated_at`)
 
@@ -176,7 +176,7 @@ func (o orgDomain) IsVerifiedColumn() database.Column {
 
 // OrgIDColumn implements [domain.OrganizationDomainRepository].
 func (o orgDomain) OrgIDColumn() database.Column {
-	return database.NewColumn(o.unqualifiedTableName(), "org_id")
+	return database.NewColumn(o.unqualifiedTableName(), "organization_id")
 }
 
 // UpdatedAtColumn implements [domain.OrganizationDomainRepository].
@@ -193,7 +193,7 @@ func (o orgDomain) ValidationTypeColumn() database.Column {
 // helpers
 // -------------------------------------------------------------
 
-const queryOrganizationDomainStmt = `SELECT instance_id, org_id, domain, is_verified, is_primary, validation_type, created_at, updated_at ` +
+const queryOrganizationDomainStmt = `SELECT instance_id, organization_id, domain, is_verified, is_primary, validation_type, created_at, updated_at ` +
 	`FROM `
 
 func (o orgDomain) prepareQuery(opts []database.QueryOption) (*database.StatementBuilder, error) {

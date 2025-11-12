@@ -5,7 +5,7 @@ CREATE TYPE zitadel.idp_state AS ENUM (
 
 CREATE TABLE zitadel.identity_providers (
     instance_id TEXT NOT NULL
-    , org_id TEXT
+    , organization_id TEXT
     , id TEXT NOT NULL CHECK (id <> '')
     , state zitadel.idp_state NOT NULL DEFAULT 'active'
     , name TEXT NOT NULL CHECK (name <> '')
