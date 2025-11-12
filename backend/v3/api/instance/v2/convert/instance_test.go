@@ -61,7 +61,6 @@ func TestDomainInstanceModelToGRPCBetaResponse(t *testing.T) {
 		Id:           "instance-1",
 		ChangeDate:   timestamppb.New(now),
 		CreationDate: timestamppb.New(yesterday),
-		State:        instance_v2beta.State_STATE_RUNNING,
 		Name:         "Instance One",
 		Version:      "",
 		Domains: []*instance_v2beta.Domain{
@@ -222,7 +221,6 @@ func TestDomainInstanceListModelToGRPCBetaResponse(t *testing.T) {
 					Name:         "test-instance",
 					CreationDate: timestamppb.New(now),
 					ChangeDate:   timestamppb.New(now),
-					State:        instance_v2beta.State_STATE_RUNNING,
 					Domains:      []*instance_v2beta.Domain{},
 				},
 			},
@@ -259,7 +257,6 @@ func TestDomainInstanceListModelToGRPCBetaResponse(t *testing.T) {
 					Name:         "test-instance-1",
 					CreationDate: timestamppb.New(now),
 					ChangeDate:   timestamppb.New(now),
-					State:        instance_v2beta.State_STATE_RUNNING,
 					Domains: []*instance_v2beta.Domain{
 						{
 							InstanceId:   "instance1",
@@ -275,7 +272,6 @@ func TestDomainInstanceListModelToGRPCBetaResponse(t *testing.T) {
 					Name:         "test-instance-2",
 					CreationDate: timestamppb.New(now),
 					ChangeDate:   timestamppb.New(now),
-					State:        instance_v2beta.State_STATE_RUNNING,
 					Domains:      []*instance_v2beta.Domain{},
 				},
 			},

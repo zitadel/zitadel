@@ -29,7 +29,6 @@ func DomainInstanceModelToGRPCBetaResponse(inst *domain.Instance) *instance_v2be
 		Id:           inst.ID,
 		ChangeDate:   timestamppb.New(inst.UpdatedAt),
 		CreationDate: timestamppb.New(inst.CreatedAt),
-		State:        instance_v2beta.State_STATE_RUNNING, // TODO(IAM-Marco): Not sure what to put here
 		Name:         inst.Name,
 		Version:      build.Version(),
 		Domains:      DomainInstanceDomainListModelToGRPCBetaResponse(inst.Domains),
