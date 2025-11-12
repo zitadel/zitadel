@@ -56,10 +56,14 @@ func RemoveCustomDomainBeta(ctx context.Context, request *connect.Request[instan
 		return nil, err
 	}
 
+	var deletionDate *timestamppb.Timestamp
+	if removeCustomDomainCmd.DeleteTime != nil {
+		deletionDate = timestamppb.New(*removeCustomDomainCmd.DeleteTime)
+	}
 	return &connect.Response[instance_v2beta.RemoveCustomDomainResponse]{
 		Msg: &instance_v2beta.RemoveCustomDomainResponse{
 			// TODO(IAM-Marco): Return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10881
-			DeletionDate: timestamppb.Now(),
+			DeletionDate: deletionDate,
 		},
 	}, nil
 }
@@ -114,10 +118,14 @@ func RemoveTrustedDomainBeta(ctx context.Context, request *connect.Request[insta
 		return nil, err
 	}
 
+	var deletionDate *timestamppb.Timestamp
+	if removeTrustedDomainCmd.DeleteTime != nil {
+		deletionDate = timestamppb.New(*removeTrustedDomainCmd.DeleteTime)
+	}
 	return &connect.Response[instance_v2beta.RemoveTrustedDomainResponse]{
 		Msg: &instance_v2beta.RemoveTrustedDomainResponse{
 			// TODO(IAM-Marco): Return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10881
-			DeletionDate: timestamppb.Now(),
+			DeletionDate: deletionDate,
 		},
 	}, nil
 }
@@ -183,10 +191,14 @@ func RemoveCustomDomain(ctx context.Context, request *connect.Request[instance_v
 		return nil, err
 	}
 
+	var deletionDate *timestamppb.Timestamp
+	if removeCustomDomainCmd.DeleteTime != nil {
+		deletionDate = timestamppb.New(*removeCustomDomainCmd.DeleteTime)
+	}
 	return &connect.Response[instance_v2.RemoveCustomDomainResponse]{
 		Msg: &instance_v2.RemoveCustomDomainResponse{
 			// TODO(IAM-Marco): Return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10881
-			DeletionDate: timestamppb.Now(),
+			DeletionDate: deletionDate,
 		},
 	}, nil
 }
@@ -241,10 +253,14 @@ func RemoveTrustedDomain(ctx context.Context, request *connect.Request[instance_
 		return nil, err
 	}
 
+	var deletionDate *timestamppb.Timestamp
+	if removeTrustedDomainCmd.DeleteTime != nil {
+		deletionDate = timestamppb.New(*removeTrustedDomainCmd.DeleteTime)
+	}
 	return &connect.Response[instance_v2.RemoveTrustedDomainResponse]{
 		Msg: &instance_v2.RemoveTrustedDomainResponse{
 			// TODO(IAM-Marco): Return correct value. Tracked in https://github.com/zitadel/zitadel/issues/10881
-			DeletionDate: timestamppb.Now(),
+			DeletionDate: deletionDate,
 		},
 	}, nil
 }

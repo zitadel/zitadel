@@ -21,12 +21,13 @@ func (s *Server) DeleteInstance(ctx context.Context, request *connect.Request[in
 		return nil, err
 	}
 
-	// obj is nil when the instance is not found, so we return an empty message.
-	if obj == nil {
-		return &connect.Response[instance.DeleteInstanceResponse]{}, nil
+	var deletionDate *timestamppb.Timestamp
+	if obj != nil {
+		deletionDate = timestamppb.New(obj.EventDate)
 	}
+
 	return connect.NewResponse(&instance.DeleteInstanceResponse{
-		DeletionDate: timestamppb.New(obj.EventDate),
+		DeletionDate: deletionDate,
 	}), nil
 
 }

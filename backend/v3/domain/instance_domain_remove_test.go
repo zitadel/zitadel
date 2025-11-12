@@ -73,7 +73,7 @@ func TestRemoveInstanceDomainCommand_Validate(t *testing.T) {
 			expectedError:   zerrors.ThrowPermissionDenied(permissionErr, "DOM-eroxID", "permission denied"),
 		},
 		{
-			testName: "when domain not found should return not found error",
+			testName: "when domain not found should return no error",
 			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionChecker {
 				permChecker := domainmock.NewMockPermissionChecker(ctrl)
 				permChecker.EXPECT().
@@ -100,7 +100,6 @@ func TestRemoveInstanceDomainCommand_Validate(t *testing.T) {
 			},
 			inputInstanceID: "instance-1",
 			inputDomainName: "test-domain.com",
-			expectedError:   zerrors.ThrowNotFound(noRowFoundErr, "DOM-nryNFt", "Errors.Instance.Domain.NotFound"),
 		},
 		{
 			testName: "when get domain fails should return error",
@@ -219,17 +218,19 @@ func TestRemoveInstanceDomainCommand_Validate(t *testing.T) {
 		})
 	}
 }
+
 func TestRemoveInstanceDomainCommand_Execute(t *testing.T) {
 	t.Parallel()
 
 	removeErr := errors.New("remove error")
 
 	tt := []struct {
-		testName        string
-		domainRepo      func(ctrl *gomock.Controller) domain.InstanceDomainRepository
-		inputInstanceID string
-		inputDomainName string
-		expectedError   error
+		testName          string
+		domainRepo        func(ctrl *gomock.Controller) domain.InstanceDomainRepository
+		inputInstanceID   string
+		inputDomainName   string
+		expectedError     error
+		expectsDeleteTime bool
 	}{
 		{
 			testName: "when domain remove fails should return error",
@@ -263,7 +264,7 @@ func TestRemoveInstanceDomainCommand_Execute(t *testing.T) {
 			expectedError:   zerrors.ThrowInternal(removeErr, "DOM-KH7AuJ", "failde removing instance domain"),
 		},
 		{
-			testName: "when domain remove returns 0 rows removed should return not found error",
+			testName: "when domain remove returns 0 rows removed should return no error",
 			domainRepo: func(ctrl *gomock.Controller) domain.InstanceDomainRepository {
 				repo := domainmock.NewMockInstanceDomainRepository(ctrl)
 				domainCond := database.NewTextCondition(
@@ -291,7 +292,6 @@ func TestRemoveInstanceDomainCommand_Execute(t *testing.T) {
 			},
 			inputInstanceID: "instance-1",
 			inputDomainName: "test-domain.com",
-			expectedError:   zerrors.ThrowNotFound(nil, "DOM-ZUteYg", "instance domain not found"),
 		},
 		{
 			testName: "when domain remove returns more than 1 row removed should return internal error",
@@ -351,8 +351,9 @@ func TestRemoveInstanceDomainCommand_Execute(t *testing.T) {
 					Return(int64(1), nil)
 				return repo
 			},
-			inputInstanceID: "instance-1",
-			inputDomainName: "test-domain.com",
+			inputInstanceID:   "instance-1",
+			inputDomainName:   "test-domain.com",
+			expectsDeleteTime: true,
 		},
 	}
 
@@ -374,6 +375,7 @@ func TestRemoveInstanceDomainCommand_Execute(t *testing.T) {
 
 			err := cmd.Execute(ctx, opts)
 			assert.Equal(t, tc.expectedError, err)
+			assert.Equal(t, tc.expectsDeleteTime, cmd.DeleteTime != nil && !cmd.DeleteTime.IsZero())
 		})
 	}
 }

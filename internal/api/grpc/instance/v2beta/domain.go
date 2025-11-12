@@ -30,12 +30,18 @@ func (s *Server) RemoveCustomDomain(ctx context.Context, req *connect.Request[in
 		return instancev2.RemoveCustomDomainBeta(ctx, req)
 	}
 
-	details, err := s.command.RemoveInstanceDomain(ctx, req.Msg.GetDomain())
+	details, err := s.command.RemoveInstanceDomain(ctx, req.Msg.GetDomain(), false)
 	if err != nil {
 		return nil, err
 	}
+
+	var deletionDate *timestamppb.Timestamp
+	if details != nil {
+		deletionDate = timestamppb.New(details.EventDate)
+	}
+
 	return connect.NewResponse(&instance.RemoveCustomDomainResponse{
-		DeletionDate: timestamppb.New(details.EventDate),
+		DeletionDate: deletionDate,
 	}), nil
 }
 

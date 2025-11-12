@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 	"strings"
+	"time"
+
+	"github.com/muhlemmer/gu"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -16,6 +19,8 @@ type RemoveInstanceDomainCommand struct {
 	InstanceID string     `json:"instance_id"`
 	DomainName string     `json:"domain_name"`
 	DType      DomainType `json:"domain_type"`
+
+	DeleteTime *time.Time `json:"delete_date"`
 }
 
 // RequiresTransaction implements [Transactional].
@@ -59,9 +64,10 @@ func (r *RemoveInstanceDomainCommand) Execute(ctx context.Context, opts *InvokeO
 	}
 
 	if deletedRows < 1 {
-		err = zerrors.ThrowNotFound(nil, "DOM-ZUteYg", "instance domain not found")
+		return nil
 	}
 
+	r.DeleteTime = gu.Ptr(time.Now())
 	return err
 }
 
@@ -98,7 +104,7 @@ func (r *RemoveInstanceDomainCommand) Validate(ctx context.Context, opts *Invoke
 	d, err := domainRepo.Get(ctx, opts.DB(), database.WithCondition(domainRepo.DomainCondition(database.TextOperationEqual, r.DomainName)))
 	if err != nil {
 		if errors.Is(err, &database.NoRowFoundError{}) {
-			return zerrors.ThrowNotFound(err, "DOM-nryNFt", "Errors.Instance.Domain.NotFound")
+			return nil
 		}
 		return zerrors.ThrowInternal(err, "DOM-Zvv1fi", "failed fetching instance domain")
 	}

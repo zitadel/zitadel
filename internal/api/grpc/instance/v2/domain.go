@@ -35,12 +35,18 @@ func (s *Server) RemoveCustomDomain(ctx context.Context, req *connect.Request[in
 
 	// Removing a custom domain is currently only allowed with system permissions,
 	// so we directly check for them in the auth interceptor and do not check here again.
-	details, err := s.command.RemoveInstanceDomain(ctx, req.Msg.GetCustomDomain())
+	details, err := s.command.RemoveInstanceDomain(ctx, req.Msg.GetCustomDomain(), false)
 	if err != nil {
 		return nil, err
 	}
+
+	var deletionDate *timestamppb.Timestamp
+	if details != nil {
+		deletionDate = timestamppb.New(details.EventDate)
+	}
+
 	return connect.NewResponse(&instance.RemoveCustomDomainResponse{
-		DeletionDate: timestamppb.New(details.EventDate),
+		DeletionDate: deletionDate,
 	}), nil
 }
 
