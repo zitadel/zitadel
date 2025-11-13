@@ -36,16 +36,25 @@ const (
 	OwnerTypeOrganization
 )
 
-type Setting struct {
-	ID             string         `json:"id,omitempty" db:"id"`
-	InstanceID     string         `json:"instanceId,omitempty" db:"instance_id"`
-	OrganizationID *string        `json:"organizationId,omitempty" db:"organization_id"`
-	Type           SettingType    `json:"type,omitempty" db:"type"`
-	OwnerType      OwnerType      `json:"ownerType,omitempty" db:"owner_type"`
-	BrandingState  *BrandingState `json:"brandingState,omitempty" db:"branding_state"`
-	Settings       []byte         `json:"settings,omitempty" db:"settings"`
-	CreatedAt      time.Time      `json:"createdAt,omitzero" db:"created_at"`
-	UpdatedAt      *time.Time     `json:"updatedAt,omitzero" db:"updated_at"`
+//go:generate enumer -type SettingState -transform snake -trimprefix SettingState -sql
+type SettingState int32
+
+const (
+	SettingStateUnspecified SettingState = iota
+	SettingStateActivated
+	SettingStatePreview
+)
+
+type Settings struct {
+	ID             string       `json:"id,omitempty" db:"id"`
+	InstanceID     string       `json:"instanceId,omitempty" db:"instance_id"`
+	OrganizationID *string      `json:"organizationId,omitempty" db:"organization_id"`
+	Type           SettingType  `json:"type,omitempty" db:"type"`
+	OwnerType      OwnerType    `json:"ownerType,omitempty" db:"owner_type"`
+	State          SettingState `json:"state,omitempty" db:"state"`
+	Settings       []byte       `json:"settings,omitempty" db:"settings"`
+	CreatedAt      time.Time    `json:"createdAt,omitzero" db:"created_at"`
+	UpdatedAt      *time.Time   `json:"updatedAt,omitzero" db:"updated_at"`
 }
 
 type PasswordlessType int32
@@ -72,7 +81,9 @@ const (
 	SecondFactorTypeOTPSMS
 )
 
-type loginSettingsJSONFieldsChanges interface {
+type loginSettingsJSONChanges interface {
+	SetSettingFields(value *LoginSettings) database.Change
+
 	SetAllowUserNamePasswordField(value bool) db_json.JsonUpdate
 	SetAllowRegisterField(value bool) db_json.JsonUpdate
 	SetAllowExternalIDPField(value bool) db_json.JsonUpdate
@@ -96,29 +107,25 @@ type loginSettingsJSONFieldsChanges interface {
 	RemoveSecondFactorTypesField(value SecondFactorType) db_json.JsonUpdate
 }
 
-type loginSettingsJsonChanges interface {
-	loginSettingsJSONFieldsChanges
-}
-
-type LoginSetting struct {
-	*Setting
-	AllowUserNamePassword      bool             `json:"allowUsernamePassword,omitempty"`
-	AllowRegister              bool             `json:"allowRegister,omitempty"`
-	AllowExternalIDP           bool             `json:"allowExternalIdp,omitempty"`
-	ForceMFA                   bool             `json:"forceMfa,omitempty"`
-	ForceMFALocalOnly          bool             `json:"forceMFALocalOnly,omitempty"`
-	HidePasswordReset          bool             `json:"hidePasswordReset,omitempty"`
-	IgnoreUnknownUsernames     bool             `json:"ignoreUnknownUsernames,omitempty"`
-	AllowDomainDiscovery       bool             `json:"allowDomainDiscovery,omitempty"`
-	DisableLoginWithEmail      bool             `json:"disableLoginWithEmail,omitempty"`
-	DisableLoginWithPhone      bool             `json:"disableLoginWithPhone,omitempty"`
-	PasswordlessType           PasswordlessType `json:"passwordlessType,omitempty"`
-	DefaultRedirectURI         string           `json:"defaultRedirectUri,omitempty"`
-	PasswordCheckLifetime      time.Duration    `json:"passwordCheckLifetime,omitempty"`
-	ExternalLoginCheckLifetime time.Duration    `json:"externalLoginCheckLifetime,omitempty"`
-	MFAInitSkipLifetime        time.Duration    `json:"mfaInitSkipLifetime,omitempty"`
-	SecondFactorCheckLifetime  time.Duration    `json:"secondFactorCheckLifetime,omitempty"`
-	MultiFactorCheckLifetime   time.Duration    `json:"multiFactorCheckLifetime,omitempty"`
+type LoginSettings struct {
+	Settings
+	AllowUserNamePassword      *bool             `json:"allowUsernamePassword,omitempty"`
+	AllowRegister              *bool             `json:"allowRegister,omitempty"`
+	AllowExternalIDP           *bool             `json:"allowExternalIdp,omitempty"`
+	ForceMFA                   *bool             `json:"forceMfa,omitempty"`
+	ForceMFALocalOnly          *bool             `json:"forceMFALocalOnly,omitempty"`
+	HidePasswordReset          *bool             `json:"hidePasswordReset,omitempty"`
+	IgnoreUnknownUsernames     *bool             `json:"ignoreUnknownUsernames,omitempty"`
+	AllowDomainDiscovery       *bool             `json:"allowDomainDiscovery,omitempty"`
+	DisableLoginWithEmail      *bool             `json:"disableLoginWithEmail,omitempty"`
+	DisableLoginWithPhone      *bool             `json:"disableLoginWithPhone,omitempty"`
+	PasswordlessType           *PasswordlessType `json:"passwordlessType,omitempty"`
+	DefaultRedirectURI         *string           `json:"defaultRedirectUri,omitempty"`
+	PasswordCheckLifetime      *time.Duration    `json:"passwordCheckLifetime,omitempty"`
+	ExternalLoginCheckLifetime *time.Duration    `json:"externalLoginCheckLifetime,omitempty"`
+	MFAInitSkipLifetime        *time.Duration    `json:"mfaInitSkipLifetime,omitempty"`
+	SecondFactorCheckLifetime  *time.Duration    `json:"secondFactorCheckLifetime,omitempty"`
+	MultiFactorCheckLifetime   *time.Duration    `json:"multiFactorCheckLifetime,omitempty"`
 
 	MFAType           []MultiFactorType  `json:"mfaType"`
 	SecondFactorTypes []SecondFactorType `json:"secondFactors"`
@@ -132,15 +139,9 @@ const (
 	BrandingPolicyThemeDark
 )
 
-//go:generate enumer -type BrandingState -transform snake -trimprefix BrandingState -sql
-type BrandingState int32
+type brandingSettingsJSONChanges interface {
+	SetSettingFields(value *BrandingSettings) database.Change
 
-const (
-	BrandingStatePreview BrandingState = iota + 1
-	BrandingStateActivated
-)
-
-type brandingSettingsJSONFieldsChanges interface {
 	SetPrimaryColorField(value string) db_json.JsonUpdate
 	SetBackgroundColorField(value string) db_json.JsonUpdate
 	SetWarnColorField(value string) db_json.JsonUpdate
@@ -153,42 +154,40 @@ type brandingSettingsJSONFieldsChanges interface {
 	SetErrorMsgPopupField(value bool) db_json.JsonUpdate
 	SetDisableWatermarkField(value bool) db_json.JsonUpdate
 	SetThemeModeField(value BrandingPolicyThemeMode) db_json.JsonUpdate
-	SetLabelPolicyLightLogoURL(value *url.URL) db_json.JsonUpdate
-	SetLabelPolicyDarkLogoURL(value *url.URL) db_json.JsonUpdate
-	SetLabelPolicyLightIconURL(value *url.URL) db_json.JsonUpdate
-	SetLabelPolicyDarkIconURL(value *url.URL) db_json.JsonUpdate
-	SetLabelPolicyFontURL(value *url.URL) db_json.JsonUpdate
+	SetLightLogoURL(value *url.URL) db_json.JsonUpdate
+	SetDarkLogoURL(value *url.URL) db_json.JsonUpdate
+	SetLightIconURL(value *url.URL) db_json.JsonUpdate
+	SetDarkIconURL(value *url.URL) db_json.JsonUpdate
+	SetFontURL(value *url.URL) db_json.JsonUpdate
 }
 
-type brandingSettingsJsonChanges interface {
-	brandingSettingsJSONFieldsChanges
+type BrandingSettings struct {
+	Settings
+	PrimaryColor        *string                  `json:"primaryColor,omitempty"`
+	BackgroundColor     *string                  `json:"backgroundColor,omitempty"`
+	WarnColor           *string                  `json:"warnColor,omitempty"`
+	FontColor           *string                  `json:"fontColor,omitempty"`
+	PrimaryColorDark    *string                  `json:"primaryColorDark,omitempty"`
+	BackgroundColorDark *string                  `json:"backgroundColorDark,omitempty"`
+	WarnColorDark       *string                  `json:"warnColorDark,omitempty"`
+	FontColorDark       *string                  `json:"fontColorDark,omitempty"`
+	HideLoginNameSuffix *bool                    `json:"hideLoginNameSuffix,omitempty"`
+	ErrorMsgPopup       *bool                    `json:"errorMsgPopup,omitempty"`
+	DisableWatermark    *bool                    `json:"disableMsgPopup,omitempty"`
+	ThemeMode           *BrandingPolicyThemeMode `json:"themeMode,omitempty"`
+
+	LightLogoURL *url.URL `json:"lightLogoUrl,omitempty"`
+	DarkLogoURL  *url.URL `json:"darkLogoUrl,omitempty"`
+
+	LightIconURL *url.URL `json:"lightIconUrl,omitempty"`
+	DarkIconURL  *url.URL `json:"darkIconUrl,omitempty"`
+
+	FontURL *url.URL `json:"fontUrl,omitempty"`
 }
 
-type BrandingSetting struct {
-	*Setting
-	PrimaryColor        string                  `json:"primaryColor,omitempty"`
-	BackgroundColor     string                  `json:"backgroundColor,omitempty"`
-	WarnColor           string                  `json:"warnColor,omitempty"`
-	FontColor           string                  `json:"fontColor,omitempty"`
-	PrimaryColorDark    string                  `json:"primaryColorDark,omitempty"`
-	BackgroundColorDark string                  `json:"backgroundColorDark,omitempty"`
-	WarnColorDark       string                  `json:"warnColorDark,omitempty"`
-	FontColorDark       string                  `json:"fontColorDark,omitempty"`
-	HideLoginNameSuffix bool                    `json:"hideLoginNameSuffix,omitempty"`
-	ErrorMsgPopup       bool                    `json:"errorMsgPopup,omitempty"`
-	DisableWatermark    bool                    `json:"disableMsgPopup,omitempty"`
-	ThemeMode           BrandingPolicyThemeMode `json:"themeMode,omitempty"`
+type passwordComplexitySettingsJSONChanges interface {
+	SetSettingFields(value *PasswordComplexitySettings) database.Change
 
-	LightLogoURL *url.URL `json:"lightLogoURL,omitempty"`
-	DarkLogoURL  *url.URL `json:"darkLogoURL,omitempty"`
-
-	LightIconURL *url.URL `json:"lightIconURL,omitempty"`
-	DarkIconURL  *url.URL `json:"darkIconURL,omitempty"`
-
-	FontURL *url.URL `json:"labelPolicyLightFontURL,omitempty"`
-}
-
-type passwordComplexityJSONFieldsChanges interface {
 	SetMinLengthField(value uint64) db_json.JsonUpdate
 	SetHasLowercaseField(value bool) db_json.JsonUpdate
 	SetHasUppercaseField(value bool) db_json.JsonUpdate
@@ -196,70 +195,61 @@ type passwordComplexityJSONFieldsChanges interface {
 	SetHasSymbolField(value bool) db_json.JsonUpdate
 }
 
-type passwordComplexitySettingsJsonChanges interface {
-	passwordComplexityJSONFieldsChanges
+type PasswordComplexitySettings struct {
+	Settings
+	MinLength    *uint64 `json:"minLength,omitempty"`
+	HasLowercase *bool   `json:"hasLowercase,omitempty"`
+	HasUppercase *bool   `json:"hasUppercase,omitempty"`
+	HasNumber    *bool   `json:"hasNumber,omitempty"`
+	HasSymbol    *bool   `json:"hasSymbol,omitempty"`
 }
 
-type PasswordComplexitySetting struct {
-	*Setting
-	// Settings PasswordComplexitySettings
-	MinLength    uint64 `json:"minLength,omitempty"`
-	HasLowercase bool   `json:"hasLowercase,omitempty"`
-	HasUppercase bool   `json:"hasUppercase,omitempty"`
-	HasNumber    bool   `json:"hasNumber,omitempty"`
-	HasSymbol    bool   `json:"hasSymbol,omitempty"`
-}
+type passwordExpirySettingsJSONChanges interface {
+	SetSettingFields(value *PasswordExpirySettings) database.Change
 
-type passwordExpiryJsonUpdates interface {
 	SetExpireWarnDays(value uint64) db_json.JsonUpdate
 	SetMaxAgeDays(value uint64) db_json.JsonUpdate
 }
 
-type passwordExpirySettingsJsonChanges interface {
-	passwordExpiryJsonUpdates
+type PasswordExpirySettings struct {
+	Settings
+	ExpireWarnDays *uint64 `json:"expireWarnDays,omitempty"`
+	MaxAgeDays     *uint64 `json:"maxAgeDays,omitempty"`
 }
 
-type PasswordExpirySetting struct {
-	*Setting
-	ExpireWarnDays uint64 `json:"expireWarnDays,omitempty"`
-	MaxAgeDays     uint64 `json:"maxAgeDays,omitempty"`
-}
+type lockoutSettingsJSONChanges interface {
+	SetSettingFields(value *LockoutSettings) database.Change
 
-type lockoutJsonUpdates interface {
 	SetMaxPasswordAttempts(value uint64) db_json.JsonUpdate
 	SetMaxOTPAttempts(value uint64) db_json.JsonUpdate
 	SetShowLockOutFailures(value bool) db_json.JsonUpdate
 }
 
-type lockoutSettingsJsonChanges interface {
-	lockoutJsonUpdates
+type LockoutSettings struct {
+	Settings
+	MaxPasswordAttempts *uint64 `json:"maxPasswordAttempts,omitempty"`
+	MaxOTPAttempts      *uint64 `json:"maxOtpAttempts,omitempty"`
+	ShowLockOutFailures *bool   `json:"showLockOutFailures,omitempty"`
 }
 
-type LockoutSetting struct {
-	*Setting
-	MaxPasswordAttempts uint64 `json:"maxPasswordAttempts,omitempty"`
-	MaxOTPAttempts      uint64 `json:"maxOtpAttempts,omitempty"`
-	ShowLockOutFailures bool   `json:"showLockOutFailures,omitempty"`
-}
+type domainSettingsJSONChanges interface {
+	SetSettingFields(value *DomainSettings) database.Change
 
-type domainJsonUpdates interface {
 	SetUserLoginMustBeDomain(value bool) db_json.JsonUpdate
 	SetValidateOrgDomains(value bool) db_json.JsonUpdate
 	SetSMTPSenderAddressMatchesInstanceDomain(value bool) db_json.JsonUpdate
 }
 
-type domainSettingsJsonChanges interface {
-	domainJsonUpdates
+type DomainSettings struct {
+	Settings
+	UserLoginMustBeDomain                  *bool `json:"userLoginMustBeDomain,omitempty"`
+	ValidateOrgDomains                     *bool `json:"validateOrgDomains,omitempty"`
+	SMTPSenderAddressMatchesInstanceDomain *bool `json:"smtpSenderAddressMatchesInstanceDomain,omitempty"`
 }
 
-type DomainSetting struct {
-	*Setting
-	UserLoginMustBeDomain                  bool `json:"userLoginMustBeDomain,omitempty"`
-	ValidateOrgDomains                     bool `json:"validateOrgDomains,omitempty"`
-	SMTPSenderAddressMatchesInstanceDomain bool `json:"smtpSenderAddressMatchesInstanceDomain,omitempty"`
-}
+type securitySettingsJSONChanges interface {
+	SetSettingFields(value *SecuritySettings) database.Change
 
-type securityJsonUpdates interface {
 	SetEnabled(value bool) db_json.JsonUpdate
 	SetEnableIframeEmbedding(value bool) db_json.JsonUpdate
 	AddAllowedOrigins(value string) db_json.JsonUpdate
@@ -267,29 +257,23 @@ type securityJsonUpdates interface {
 	SetEnableImpersonation(value bool) db_json.JsonUpdate
 }
 
-type securitySettingsJsonChanges interface {
-	securityJsonUpdates
-}
-
-type SecuritySetting struct {
-	*Setting
-	Enabled               bool     `json:"enabled,omitempty"`
-	EnableIframeEmbedding bool     `json:"enableIframe_embedding,omitempty"`
+type SecuritySettings struct {
+	Settings
+	Enabled               *bool    `json:"enabled,omitempty"`
+	EnableIframeEmbedding *bool    `json:"enableIframe_embedding,omitempty"`
 	AllowedOrigins        []string `json:"allowedOrigins,omitempty"`
-	EnableImpersonation   bool     `json:"enableImpersonation,omitempty"`
+	EnableImpersonation   *bool    `json:"enableImpersonation,omitempty"`
 }
 
-type organizationJsonUpdates interface {
+type organizationSettingsJSONChanges interface {
+	SetSettingFields(value *OrganizationSettings) database.Change
+
 	SetOrganizationScopedUsernames(value bool) db_json.JsonUpdate
 }
 
-type organizationSettingsJsonChanges interface {
-	organizationJsonUpdates
-}
-
-type OrganizationSetting struct {
-	*Setting
-	OrganizationScopedUsernames bool `json:"organizationScopedUsernames,omitempty"`
+type OrganizationSettings struct {
+	Settings
+	OrganizationScopedUsernames *bool `json:"organizationScopedUsernames,omitempty"`
 }
 
 type settingsColumns interface {
@@ -298,11 +282,10 @@ type settingsColumns interface {
 	OrganizationIDColumn() database.Column
 	TypeColumn() database.Column
 	OwnerTypeColumn() database.Column
-	LabelStateColumn() database.Column
+	StateColumn() database.Column
 	SettingsColumn() database.Column
 	CreatedAtColumn() database.Column
 	UpdatedAtColumn() database.Column
-	SetBrandingSettings(changes ...db_json.JsonUpdate) database.Change
 }
 
 type settingsConditions interface {
@@ -311,11 +294,7 @@ type settingsConditions interface {
 	IDCondition(id string) database.Condition
 	TypeCondition(typ SettingType) database.Condition
 	OwnerTypeCondition(typ OwnerType) database.Condition
-	BrandingStateCondition(typ BrandingState) database.Condition
-}
-
-type Settings interface {
-	GetSettings() []byte
+	StateCondition(typ SettingState) database.Condition
 }
 
 type settingsChanges interface {
@@ -323,126 +302,60 @@ type settingsChanges interface {
 	SetUpdatedAt(updatedAt *time.Time) database.Change
 }
 
-type SettingsRepository interface {
+type setting interface {
+	ToJsonChanges() []db_json.JsonUpdate
+	GetSettings() []byte
+}
+
+type settingsRepository[T setting] interface {
 	settingsColumns
 	settingsConditions
 	settingsChanges
 
-	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Setting, error)
-	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Setting, error)
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*setting, error)
+	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*setting, error)
 
-	// Create is used for events reduction
-	Create(ctx context.Context, client database.QueryExecutor, setting *Setting) error
+	Set(ctx context.Context, client database.QueryExecutor, setting *setting) error
 	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
-
-	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 }
 
-type LoginRepository interface {
-	settingsColumns
-	settingsConditions
-	settingsChanges
-	loginSettingsJsonChanges
-
-	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*LoginSetting, error)
-	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*LoginSetting, error)
-
-	Set(ctx context.Context, client database.QueryExecutor, setting *LoginSetting) error
-	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
-	Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+type LoginSettingsRepository interface {
+	settingsRepository[LoginSettings]
+	loginSettingsJSONChanges
 }
 
-type LabelRepository interface {
-	settingsColumns
-	settingsConditions
-	settingsChanges
-
-	brandingSettingsJsonChanges
-
-	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*BrandingSetting, error)
-	Set(ctx context.Context, client database.QueryExecutor, setting *BrandingSetting) error
-	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
-	Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
-	ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *BrandingSetting) error
-	ActivateLabelSettingEvent(ctx context.Context, client database.QueryExecutor, condition database.Condition, UpdateAt time.Time) (int64, error)
+type BrandingSettingsRepository interface {
+	settingsRepository[BrandingSettings]
+	brandingSettingsJSONChanges
+	Activate(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }
 
-type PasswordComplexityRepository interface {
-	settingsColumns
-	settingsConditions
-	settingsChanges
-
-	passwordComplexitySettingsJsonChanges
-
-	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*PasswordComplexitySetting, error)
-	Set(ctx context.Context, client database.QueryExecutor, setting *PasswordComplexitySetting) error
-	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
-	Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+type PasswordComplexitySettingsRepository interface {
+	settingsRepository[PasswordComplexitySettings]
+	passwordComplexitySettingsJSONChanges
 }
 
-type PasswordExpiryRepository interface {
-	settingsColumns
-	settingsConditions
-	settingsChanges
-
-	passwordExpirySettingsJsonChanges
-
-	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*PasswordExpirySetting, error)
-	Set(ctx context.Context, client database.QueryExecutor, setting *PasswordExpirySetting) error
-	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
-	Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+type PasswordExpirySettingsRepository interface {
+	settingsRepository[PasswordExpirySettings]
+	passwordExpirySettingsJSONChanges
 }
 
-type LockoutRepository interface {
-	settingsColumns
-	settingsConditions
-	settingsChanges
-
-	lockoutSettingsJsonChanges
-
-	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*LockoutSetting, error)
-	Set(ctx context.Context, client database.QueryExecutor, setting *LockoutSetting) error
-	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
-	Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+type LockoutSettingsRepository interface {
+	settingsRepository[LockoutSettings]
+	lockoutSettingsJSONChanges
 }
 
-type SecurityRepository interface {
-	settingsColumns
-	settingsConditions
-	settingsChanges
-
-	securitySettingsJsonChanges
-
-	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*SecuritySetting, error)
-	Set(ctx context.Context, client database.QueryExecutor, setting *SecuritySetting) error
-	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
-	Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
-	SetEvent(ctx context.Context, client database.QueryExecutor, setting *SecuritySetting, changes ...database.Change) (int64, error)
+type SecuritySettingsRepository interface {
+	settingsRepository[SecuritySettings]
+	securitySettingsJSONChanges
 }
 
-type DomainRepository interface {
-	settingsColumns
-	settingsConditions
-	settingsChanges
-
-	domainSettingsJsonChanges
-
-	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*DomainSetting, error)
-	Set(ctx context.Context, client database.QueryExecutor, setting *DomainSetting) error
-	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
-	Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+type DomainSettingsRepository interface {
+	settingsRepository[DomainSettings]
+	domainSettingsJSONChanges
 }
 
-type OrganizationSettingRepository interface {
-	settingsColumns
-	settingsConditions
-	settingsChanges
-
-	organizationSettingsJsonChanges
-
-	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*OrganizationSetting, error)
-	Set(ctx context.Context, client database.QueryExecutor, setting *OrganizationSetting) error
-	SetEvent(ctx context.Context, client database.QueryExecutor, setting *OrganizationSetting) (int64, error)
-	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
-	Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+type OrganizationSettingsRepository interface {
+	settingsRepository[OrganizationSettings]
+	organizationSettingsJSONChanges
 }
