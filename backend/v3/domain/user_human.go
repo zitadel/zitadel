@@ -21,7 +21,7 @@ const (
 type Human struct {
 	FirstName         string        `json:"firstName,omitempty" db:"first_name"`
 	LastName          string        `json:"lastName,omitempty" db:"last_name"`
-	Nickname          string        `json:"nickName,omitempty" db:"nick_name"`
+	Nickname          string        `json:"nickName,omitempty" db:"nickname"`
 	DisplayName       string        `json:"displayName,omitempty" db:"display_name"`
 	PreferredLanguage *language.Tag `json:"preferredLanguage,omitempty" db:"preferred_language"`
 	Gender            *Gender       `json:"gender,omitempty" db:"gender"`

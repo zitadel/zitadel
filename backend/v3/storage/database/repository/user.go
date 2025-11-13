@@ -12,11 +12,17 @@ import (
 var _ domain.UserRepository = (*user)(nil)
 
 type user struct {
-	machine userMachine
-	human   userHuman
-
 	shouldLoadMetadata bool
 	metadata           userMetadata
+
+	shouldLoadIdentityProviderLinks bool
+	identityProviderLinks           userIdentityProviderLink
+
+	shouldLoadKeys bool
+	keys           userMachineKey
+
+	shouldLoadPATs bool
+	pats           userPersonalAccessToken
 }
 
 func UserRepository() domain.UserRepository {
@@ -34,17 +40,17 @@ func (u user) unqualifiedTableName() string {
 // Create implements [domain.UserRepository].
 func (u user) Create(ctx context.Context, client database.QueryExecutor, user *domain.User) error {
 	if user.Machine != nil {
-		return u.machine.create(ctx, client, user)
+		return userMachine{user: &u}.create(ctx, client, user)
 	}
 	if user.Human != nil {
-		return u.human.create(ctx, client, user)
+		return userHuman{user: &u}.create(ctx, client, user)
 	}
 	// TODO(adlerhurst): return a proper error here
 	return database.NewCheckError(u.unqualifiedTableName(), "type", errors.New("no type specified"))
 }
 
 // Update implements [domain.UserRepository].
-func (u *user) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+func (u user) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}
@@ -73,22 +79,92 @@ func (u user) Delete(ctx context.Context, client database.QueryExecutor, conditi
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
+const userQuery = "SELECT" +
+	" users.instance_id" +
+	" , users.organization_id" +
+	" , users.id" +
+	" , users.username" +
+	" , users.username_org_unique" +
+	" , users.state" +
+	" , users.type" +
+	" , users.created_at" +
+	" , users.updated_at" +
+	" , users.first_name AS human.first_name" +
+	" , users.last_name AS human.last_name" +
+	" , users.nickname AS human.nickname" +
+	" , users.display_name AS human.display_name" +
+	" , users.preferred_language AS human.preferred_language" +
+	" , users.gender AS human.gender" +
+	" , users.avatar_key AS human.avatar_key" +
+	// " , users.multi_factor_initialization_skipped_at" +
+	// " , users.password" +
+	// " , users.password_change_required" +
+	// " , users.password_verified_at" +
+	// " , users.failed_password_attempts" +
+	// " , users.email" +
+	// " , users.email_verified_at" +
+	// " , users.email_otp_enabled" +
+	// " , users.last_successful_email_otp_check" +
+	// " , users.phone" +
+	// " , users.phone_verified_at" +
+	// " , users.sms_otp_enabled" +
+	// " , users.last_successful_sms_otp_check" +
+	// " , users.last_successful_totp_check" +
+	" , users.name AS machine.name" +
+	" , users.description AS machine.description" +
+	" , users.secret AS machine.Secret" +
+	" , users.access_token_type AS machine.AccessTokenType" +
+	` , jsonb_agg(json_build_object('instanceId', user_metadata.instance_id, 'orgId', user_metadata.organization_id, 'key', user_metadata.key, 'value', encode(user_metadata.value, 'base64'), 'createdAt', user_metadata.created_at, 'updatedAt', user_metadata.updated_at)) FILTER (WHERE user_metadata.organization_id IS NOT NULL) AS metadata` +
+	" FROM zitadel.users "
+
 // Get implements [domain.UserRepository].
 func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.User, error) {
+	builder := database.NewStatementBuilder(userQuery)
 	opts = append(opts,
 		u.joinMetadata(),
 		database.WithGroupBy(u.PrimaryKeyColumns()...),
 	)
-	panic("unimplemented")
+
+	for _, option := range opts {
+		option(&database.QueryOpts{})
+	}
+
+	user, err := getOne[rawUser](ctx, client, builder)
+	if err != nil {
+		return nil, err
+	}
+	user.User.Metadata = user.Metadata
+
+	return user.User, nil
 }
 
 // List implements [domain.UserRepository].
 func (u user) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.User, error) {
+	builder := database.NewStatementBuilder(userQuery)
 	opts = append(opts,
 		u.joinMetadata(),
 		database.WithGroupBy(u.PrimaryKeyColumns()...),
 	)
-	panic("unimplemented")
+
+	for _, option := range opts {
+		option(&database.QueryOpts{})
+	}
+
+	users, err := getMany[rawUser](ctx, client, builder)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*domain.User, len(users))
+	for i, user := range users {
+		user.User.Metadata = user.Metadata
+		result[i] = user.User
+	}
+	return result, nil
+}
+
+type rawUser struct {
+	*domain.User
+	Metadata JSONArray[domain.UserMetadata] `json:"metadata,omitempty" db:"metadata"`
 }
 
 // -------------------------------------------------------------
@@ -168,14 +244,7 @@ func (u user) UsernameOrgUniqueCondition(condition bool) database.Condition {
 
 // TypeCondition implements [domain.UserRepository].
 func (u user) TypeCondition(userType domain.UserType) database.Condition {
-	switch userType {
-	case domain.UserTypeHuman:
-		return database.IsNull(u.machine.IDColumn())
-	case domain.UserTypeMachine:
-		return database.IsNull(u.human.IDColumn())
-	}
-	// TODO(adlerhurst): add a log line here to indicate an invalid user type was provided
-	return database.IsNull(u.IDColumn())
+	return database.NewNumberCondition(u.typeColumn(), database.NumberOperationEqual, userType)
 }
 
 func (u user) ExistsMetadata(cond database.Condition) database.Condition {
@@ -240,29 +309,40 @@ func (u user) UsernameOrgUniqueColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "username_org_unique")
 }
 
+func (u user) typeColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "type")
+}
+
 // -------------------------------------------------------------
 // sub repositories
 // -------------------------------------------------------------
 
 // Human implements [domain.UserRepository].
 func (u user) Human() domain.HumanUserRepository {
-	return u.human
+	return &userHuman{user: &u}
 }
 
 // Machine implements [domain.UserRepository].
 func (u user) Machine() domain.MachineUserRepository {
-	return u.machine
+	return &userMachine{user: &u}
 }
 
 func (u user) LoadMetadata() domain.UserRepository {
 	return &user{
 		shouldLoadMetadata: true,
-		machine: userMachine{
-			shouldLoadMetadata: true,
-		},
-		human: userHuman{
-			shouldLoadMetadata: true,
-		},
+	}
+}
+
+func (u user) copy() user {
+	return user{
+		shouldLoadMetadata:              u.shouldLoadMetadata,
+		metadata:                        u.metadata,
+		shouldLoadIdentityProviderLinks: u.shouldLoadIdentityProviderLinks,
+		identityProviderLinks:           u.identityProviderLinks,
+		shouldLoadKeys:                  u.shouldLoadKeys,
+		keys:                            u.keys,
+		shouldLoadPATs:                  u.shouldLoadPATs,
+		pats:                            u.pats,
 	}
 }
 

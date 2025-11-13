@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
@@ -11,14 +13,15 @@ import (
 var _ domain.MachineUserRepository = (*userMachine)(nil)
 
 type userMachine struct {
-	shouldLoadMetadata bool
-	metadata           userMetadata
+	*user
+	// shouldLoadMetadata bool
+	// metadata           userMetadata
 
-	shouldLoadKeys bool
-	keys           userMachineKey
+	// shouldLoadKeys bool
+	// keys           userMachineKey
 
-	shouldLoadPATs bool
-	pats           userPersonalAccessToken
+	// shouldLoadPATs bool
+	// pats           userPersonalAccessToken
 }
 
 func MachineUserRepository() domain.MachineUserRepository {
@@ -99,12 +102,12 @@ func (m userMachine) Keys() domain.MachineKeyRepository {
 
 // LoadKeys implements [domain.MachineUserRepository].
 func (m userMachine) LoadKeys() domain.MachineUserRepository {
-	return &userMachine{
-		shouldLoadMetadata: m.shouldLoadMetadata,
-		metadata:           m.metadata,
-		shouldLoadKeys:     true,
-		keys:               m.keys,
+	res := &userMachine{
+		user: gu.Ptr(m.user.copy()),
 	}
+	res.user.shouldLoadKeys = true
+
+	return res
 }
 
 // PersonalAccessTokens implements [domain.MachineUserRepository].
@@ -114,14 +117,12 @@ func (m userMachine) PersonalAccessTokens() domain.PersonalAccessTokenRepository
 
 // LoadPersonalAccessTokens implements [domain.MachineUserRepository].
 func (m userMachine) LoadPersonalAccessTokens() domain.MachineUserRepository {
-	return &userMachine{
-		shouldLoadMetadata: m.shouldLoadMetadata,
-		metadata:           m.metadata,
-		shouldLoadKeys:     m.shouldLoadKeys,
-		keys:               m.keys,
-		shouldLoadPATs:     true,
-		pats:               m.pats,
+	res := &userMachine{
+		user: gu.Ptr(m.user.copy()),
 	}
+	res.user.shouldLoadPATs = true
+
+	return res
 }
 
 // -------------------------------------------------------------

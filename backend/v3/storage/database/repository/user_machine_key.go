@@ -13,9 +13,19 @@ func MachineKeyRepository() domain.MachineKeyRepository {
 	return new(userMachineKey)
 }
 
+const addMachineKeyStmt = "INSERT INTO zitadel.machine_keys (instance_id, id, user_id, public_key, created_at) VALUES ($1, $2, $3, $4, $5)"
+
 // Add implements [domain.MachineKeyRepository].
 func (u userMachineKey) Add(ctx context.Context, client database.QueryExecutor, key *domain.MachineKey) error {
-	panic("unimplemented")
+	builder := database.NewStatementBuilder(addMachineKeyStmt,
+		key.InstanceID,
+		key.ID,
+		key.UserID,
+		key.PublicKey,
+		key.CreatedAt,
+	)
+	_, err := client.Exec(ctx, builder.String(), builder.Args()...)
+	return err
 }
 
 // Get implements [domain.MachineKeyRepository].

@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -13,15 +14,10 @@ import (
 var _ domain.HumanUserRepository = (*userHuman)(nil)
 
 type userHuman struct {
+	*user
 	// userHumanEmail
 	verification
 	// userHumanPhone
-
-	shouldLoadMetadata bool
-	metadata           userMetadata
-
-	shouldLoadIdentityProviderLinks bool
-	identityProviderLinks           userIdentityProviderLink
 }
 
 func HumanUserRepository() domain.HumanUserRepository {
@@ -91,13 +87,13 @@ func (u userHuman) Update(ctx context.Context, client database.QueryExecutor, co
 }
 
 func (u userHuman) LoadIdentityProviderLinks() domain.HumanUserRepository {
-	return &userHuman{
-		verification:                    u.verification,
-		shouldLoadMetadata:              u.shouldLoadMetadata,
-		metadata:                        u.metadata,
-		shouldLoadIdentityProviderLinks: true,
-		identityProviderLinks:           u.identityProviderLinks,
+	res := userHuman{
+		verification: u.verification,
+		user:         gu.Ptr(u.user.copy()),
 	}
+	res.user.shouldLoadIdentityProviderLinks = true
+
+	return res
 }
 
 // -------------------------------------------------------------

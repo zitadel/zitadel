@@ -7,10 +7,11 @@ import (
 
 	"github.com/muhlemmer/gu"
 
-	"github.com/zitadel/zitadel/backend/v3/domain"
+	domain_v1 "github.com/zitadel/zitadel/backend/v3/domain"
+	domain "github.com/zitadel/zitadel/backend/v3/domain/v2"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
-	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
+	repository "github.com/zitadel/zitadel/backend/v3/storage/database/repository/v2"
 	"github.com/zitadel/zitadel/internal/crypto"
 	old_domain "github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -476,13 +477,13 @@ func (u *userRelationalProjection) reduceHumanAdded(event eventstore.Event) (*ha
 			State:      domain.UserStateActive,
 			CreatedAt:  e.CreatedAt(),
 			UpdatedAt:  e.CreatedAt(),
-			Human: &domain.Human{
+			Human: &domain.HumanUser{
 				FirstName:         e.FirstName,
 				LastName:          e.LastName,
 				Nickname:          e.NickName,
 				DisplayName:       e.DisplayName,
-				PreferredLanguage: &e.PreferredLanguage,
-				Gender:            gu.Ptr(mapHumanGender(e.Gender)),
+				PreferredLanguage: e.PreferredLanguage,
+				Gender:            mapHumanGender(e.Gender),
 			},
 		})
 		if err != nil {
@@ -490,19 +491,19 @@ func (u *userRelationalProjection) reduceHumanAdded(event eventstore.Event) (*ha
 		}
 
 		if password := crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash); password != "" {
-			_, err = humanRepo.SetPassword(ctx, v3Tx,
+			_, err = userRepo.Update(ctx, v3Tx,
 				condition,
-				&domain.VerificationTypeSkipped{
-					VerifiedAt: e.CreatedAt(),
-					Value:      &password,
-				},
+				humanRepo.SetPassword(&domain.VerificationTypeSkipped{
+					SkippedAt: e.CreatedAt(),
+					Value:     &password,
+				}),
 			)
 			if err != nil {
 				return err
 			}
 		}
 		if e.ChangeRequired {
-			_, err = humanRepo.Update(ctx, v3Tx,
+			_, err = userRepo.Update(ctx, v3Tx,
 				condition,
 				humanRepo.SetPasswordChangeRequired(e.ChangeRequired),
 				humanRepo.SetUpdatedAt(e.CreatedAt()),
@@ -581,13 +582,13 @@ func (p *userRelationalProjection) reduceHumanRegistered(event eventstore.Event)
 			State:      domain.UserStateActive,
 			CreatedAt:  e.CreatedAt(),
 			UpdatedAt:  e.CreatedAt(),
-			Human: &domain.Human{
+			Human: &domain.HumanUser{
 				FirstName:         e.FirstName,
 				LastName:          e.LastName,
 				Nickname:          e.NickName,
 				DisplayName:       e.DisplayName,
-				PreferredLanguage: &e.PreferredLanguage,
-				Gender:            gu.Ptr(mapHumanGender(e.Gender)),
+				PreferredLanguage: e.PreferredLanguage,
+				Gender:            mapHumanGender(e.Gender),
 			},
 		})
 		if err != nil {
@@ -595,19 +596,19 @@ func (p *userRelationalProjection) reduceHumanRegistered(event eventstore.Event)
 		}
 
 		if password := crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash); password != "" {
-			_, err = humanRepo.SetPassword(ctx, v3Tx,
+			_, err = userRepo.Update(ctx, v3Tx,
 				condition,
-				&domain.VerificationTypeSkipped{
-					VerifiedAt: e.CreatedAt(),
-					Value:      &password,
-				},
+				humanRepo.SetPassword(&domain.VerificationTypeSkipped{
+					SkippedAt: e.CreatedAt(),
+					Value:     &password,
+				}),
 			)
 			if err != nil {
 				return err
 			}
 		}
 		if e.ChangeRequired {
-			_, err = humanRepo.Update(ctx, v3Tx,
+			_, err = userRepo.Update(ctx, v3Tx,
 				condition,
 				humanRepo.SetPasswordChangeRequired(e.ChangeRequired),
 				humanRepo.SetUpdatedAt(e.CreatedAt()),
@@ -662,40 +663,6 @@ func (p *userRelationalProjection) reduceHumanRegistered(event eventstore.Event)
 		// )
 	}), nil
 }
-
-// func (p *userRelationalProjection) reduceHumanInitCodeAdded(event eventstore.Event) (*handler.Statement, error) {
-// 	e, ok := event.(*user.HumanInitialCodeAddedEvent)
-// 	if !ok {
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-vv7Qs", "reduce.wrong.event.type %s", user.HumanInitialCodeAddedType)
-// 	}
-// 	return handler.NewUpdateStatement(
-// 		e,
-// 		[]handler.Column{
-// 			handler.NewCol(UserStateCol, domain.UserStateInitial),
-// 		},
-// 		[]handler.Condition{
-// 			handler.NewCond(UserIDCol, e.Aggregate().ID),
-// 			handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
-// 		},
-// 	), nil
-// }
-
-// func (p *userRelationalProjection) reduceHumanInitCodeSucceeded(event eventstore.Event) (*handler.Statement, error) {
-// 	e, ok := event.(*user.HumanInitializedCheckSucceededEvent)
-// 	if !ok {
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ifH8N", "reduce.wrong.event.type %s", user.HumanInitializedCheckSucceededType)
-// 	}
-// 	return handler.NewUpdateStatement(
-// 		e,
-// 		[]handler.Column{
-// 			handler.NewCol(UserStateCol, domain.UserStateActive),
-// 		},
-// 		[]handler.Condition{
-// 			handler.NewCond(UserIDCol, e.Aggregate().ID),
-// 			handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
-// 		},
-// 	), nil
-// }
 
 func (p *userRelationalProjection) reduceUserLocked(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserLockedEvent)
@@ -882,11 +849,11 @@ func (p *userRelationalProjection) reduceHumanProfileChanged(event eventstore.Ev
 	}
 
 	if e.PreferredLanguage != nil {
-		changes = append(changes, repo.SetPreferredLanguage(e.PreferredLanguage))
+		changes = append(changes, repo.SetPreferredLanguage(*e.PreferredLanguage))
 	}
 
 	if e.Gender != nil {
-		changes = append(changes, repo.SetGender(gu.Ptr(mapHumanGender(*e.Gender))))
+		changes = append(changes, repo.SetGender(mapHumanGender(*e.Gender)))
 	}
 	changes = append(changes, repo.SetUpdatedAt(e.CreatedAt()))
 
@@ -916,13 +883,13 @@ func (p *userRelationalProjection) reduceHumanPhoneChanged(event eventstore.Even
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.HumanUserRepository()
-
-		_, err := repo.SetPhone(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeInit{
+			repo.SetPhone(&domain.VerificationTypeInit{
 				Value:     (*string)(&e.PhoneNumber),
 				CreatedAt: e.CreatedAt(),
-			},
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -963,11 +930,12 @@ func (p *userRelationalProjection) reduceHumanPhoneVerified(event eventstore.Eve
 		}
 		repo := repository.HumanUserRepository()
 
-		_, err := repo.SetPhone(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeVerified{
+			repo.SetPhone(&domain.VerificationTypeVerified{
 				VerifiedAt: e.CreatedAt(),
-			},
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -986,12 +954,13 @@ func (p *userRelationalProjection) reduceHumanPhoneCodeAdded(event eventstore.Ev
 		}
 		repo := repository.UserRepository().Human()
 
-		_, err := repo.SetPhone(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeUpdate{
+			repo.SetPhone(&domain.VerificationTypeUpdate{
 				Code:   &e.Code.Crypted,
 				Expiry: &e.Expiry,
-			},
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -1009,12 +978,12 @@ func (p *userRelationalProjection) reduceHumanPhoneVerificationFailed(event even
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.UserRepository().Human()
-
-		_, err := repo.SetPhone(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeFailed{
+			repo.SetPhone(&domain.VerificationTypeFailed{
 				FailedAt: e.CreatedAt(),
-			},
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -1031,15 +1000,15 @@ func (p *userRelationalProjection) reduceHumanEmailChanged(event eventstore.Even
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
-		v3Tx := v3_sql.SQLTx(tx)
 		repo := repository.UserRepository().Human()
 
-		_, err := repo.SetEmail(ctx, v3Tx,
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeInit{
+			repo.SetEmail(&domain.VerificationTypeInit{
 				Value:     (*string)(&e.EmailAddress),
 				CreatedAt: e.CreatedAt(),
-			},
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -1057,12 +1026,12 @@ func (p *userRelationalProjection) reduceHumanEmailVerified(event eventstore.Eve
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.UserRepository().Human()
-
-		_, err := repo.SetEmail(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeVerified{
+			repo.SetEmail(&domain.VerificationTypeVerified{
 				VerifiedAt: e.CreatedAt(),
-			},
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -1086,12 +1055,13 @@ func (p *userRelationalProjection) reduceHumanEmailCodeAdded(event eventstore.Ev
 			expiry = &e.Expiry
 		}
 
-		_, err := repo.SetEmail(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeUpdate{
+			repo.SetEmail(&domain.VerificationTypeUpdate{
 				Code:   &e.Code.Crypted,
 				Expiry: expiry,
-			},
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -1109,12 +1079,12 @@ func (p *userRelationalProjection) reduceHumanEmailVerificationFailed(event even
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.UserRepository().Human()
-
-		_, err := repo.SetEmail(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeFailed{
+			repo.SetEmail(&domain.VerificationTypeFailed{
 				FailedAt: e.CreatedAt(),
-			},
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -1175,24 +1145,15 @@ func (p *userRelationalProjection) reduceHumanPasswordChanged(event eventstore.E
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.HumanUserRepository()
-
 		password := crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 
-		_, err := repo.SetPassword(ctx, v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeInit{
-				Value:     &password,
-				CreatedAt: e.CreatedAt(),
-			},
-		)
-
-		if err != nil {
-			return err
-		}
-
-		_, err = repo.Update(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.SetPasswordChangeRequired(e.ChangeRequired),
+			repo.SetPassword(&domain.VerificationTypeInit{
+				Value:     &password,
+				CreatedAt: e.CreatedAt(),
+			}),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -1216,12 +1177,13 @@ func (p *userRelationalProjection) reduceHumanPasswordCodeAdded(event eventstore
 			expiry = &e.Expiry
 		}
 
-		_, err := repo.SetPassword(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeUpdate{
+			repo.SetPassword(&domain.VerificationTypeUpdate{
 				Code:   &e.Code.Crypted,
 				Expiry: expiry,
-			},
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -1238,10 +1200,12 @@ func (p *userRelationalProjection) reduceHumanPasswordCheckSucceeded(event event
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.HumanUserRepository()
-
-		_, err := repo.SetPassword(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeVerified{},
+			repo.SetPassword(&domain.VerificationTypeVerified{
+				VerifiedAt: e.CreatedAt(),
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -1258,12 +1222,12 @@ func (p *userRelationalProjection) reduceHumanPasswordCheckFailed(event eventsto
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.HumanUserRepository()
-
-		_, err := repo.SetPassword(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeFailed{
+			repo.SetPassword(&domain.VerificationTypeFailed{
 				FailedAt: e.CreatedAt(),
-			},
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -1280,13 +1244,13 @@ func (p *userRelationalProjection) reduceHumanPasswordHashUpdated(event eventsto
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.HumanUserRepository()
-
-		_, err := repo.SetPassword(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeSkipped{
-				Value:      &e.EncodedHash,
-				VerifiedAt: e.CreatedAt(),
-			},
+			repo.SetPassword(&domain.VerificationTypeSkipped{
+				Value:     &e.EncodedHash,
+				SkippedAt: e.CreatedAt(),
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -1368,17 +1332,19 @@ func (p *userRelationalProjection) reduceMachineKeyAdded(event eventstore.Event)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.MachineKeyRepository()
-
-		return repo.Add(ctx, v3_sql.SQLTx(tx),
-			&domain.MachineKey{
+		repo := repository.MachineUserRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.AddKey(&domain.MachineKey{
 				ID:        e.KeyID,
 				Type:      mapMachineKeyType(e.KeyType),
 				PublicKey: e.PublicKey,
 				CreatedAt: e.CreatedAt(),
-				ExpiresAt: &e.ExpirationDate,
-			},
+				ExpiresAt: e.ExpirationDate,
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
+		return err
 	}), nil
 }
 
@@ -1392,10 +1358,11 @@ func (p *userRelationalProjection) reduceMachineKeyRemoved(event eventstore.Even
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.MachineKeyRepository()
-
-		_, err := repo.Remove(ctx, v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.KeyID),
+		repo := repository.MachineUserRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.RemoveKey(e.KeyID),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -1414,11 +1381,6 @@ func (p *userRelationalProjection) reduceMachineAdded(event eventstore.Event) (*
 		}
 		repo := repository.UserRepository()
 
-		var description *string
-		if e.Description != "" {
-			description = &e.Description
-		}
-
 		return repo.Create(ctx, v3_sql.SQLTx(tx),
 			&domain.User{
 				ID:         e.Aggregate().ID,
@@ -1430,9 +1392,9 @@ func (p *userRelationalProjection) reduceMachineAdded(event eventstore.Event) (*
 				State:     domain.UserStateActive,
 				CreatedAt: e.CreatedAt(),
 				UpdatedAt: e.CreatedAt(),
-				Machine: &domain.Machine{
+				Machine: &domain.MachineUser{
 					Name:            e.Name,
-					Description:     description,
+					Description:     e.Description,
 					AccessTokenType: mapMachineAccessTokenType(e.AccessTokenType),
 				},
 			},
@@ -1445,14 +1407,14 @@ func (p *userRelationalProjection) reduceMachineChanged(event eventstore.Event) 
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.MachineChangedEventType)
 	}
-	repo := repository.UserRepository().Machine()
+	repo := repository.MachineUserRepository()
 
 	changes := make([]database.Change, 0, 4)
 	if e.Name != nil {
 		changes = append(changes, repo.SetName(*e.Name))
 	}
 	if e.Description != nil {
-		changes = append(changes, repo.SetDescription(e.Description))
+		changes = append(changes, repo.SetDescription(*e.Description))
 	}
 	if e.AccessTokenType != nil {
 		changes = append(changes, repo.SetAccessTokenType(mapMachineAccessTokenType(*e.AccessTokenType)))
@@ -1486,15 +1448,17 @@ func (p *userRelationalProjection) reducePersonalAccessTokenAdded(event eventsto
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.PersonalAccessTokenRepository()
-		return repo.Create(ctx, v3_sql.SQLTx(tx), &domain.PersonalAccessToken{
-			ID:         e.TokenID,
-			UserID:     e.Aggregate().ID,
-			InstanceID: e.Aggregate().InstanceID,
-			Scopes:     e.Scopes,
-			ExpiresAt:  e.Expiration,
-			CreatedAt:  e.CreatedAt(),
-		})
+		repo := repository.MachineUserRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.AddPersonalAccessToken(&domain.PersonalAccessToken{
+				ID:        e.TokenID,
+				Scopes:    e.Scopes,
+				ExpiresAt: e.Expiration,
+				CreatedAt: e.CreatedAt(),
+			}),
+		)
+		return err
 	}), nil
 }
 
@@ -1508,11 +1472,11 @@ func (p *userRelationalProjection) reducePersonalAccessTokenRemoved(event events
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.PersonalAccessTokenRepository()
-		_, err := repo.Delete(ctx, v3_sql.SQLTx(tx), database.And(
-			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.TokenID),
-			repo.UserIDCondition(e.Aggregate().ID),
-		))
+		repo := repository.MachineUserRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.RemovePersonalAccessToken(e.TokenID),
+		)
 		return err
 	}), nil
 }
@@ -1527,16 +1491,17 @@ func (p *userRelationalProjection) reduceMetadataSet(event eventstore.Event) (*h
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-xg4IJ", "reduce.wrong.db.pool %T", ex)
 		}
-		return repository.UserMetadataRepository().Set(ctx, v3_sql.SQLTx(tx), &domain.UserMetadata{
-			Metadata: domain.Metadata{
-				InstanceID: e.Aggregate().InstanceID,
-				Key:        e.Key,
-				Value:      e.Value,
-				CreatedAt:  e.CreationDate(),
-				UpdatedAt:  e.CreationDate(),
-			},
-			UserID: e.Aggregate().ID,
-		})
+		repo := repository.UserRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.AddMetadata(&domain_v1.Metadata{
+				Key:       e.Key,
+				Value:     e.Value,
+				CreatedAt: e.CreationDate(),
+				UpdatedAt: e.CreationDate(),
+			}),
+		)
+		return err
 	}), nil
 }
 
@@ -1550,8 +1515,11 @@ func (p *userRelationalProjection) reduceMetadataRemoved(event eventstore.Event)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-xg4IJ", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.UserMetadataRepository()
-		_, err := repo.Remove(ctx, v3_sql.SQLTx(tx), repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID, e.Key))
+		repo := repository.UserRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.RemoveMetadata(repo.MetadataKeyCondition(e.Key)),
+		)
 		return err
 	}), nil
 }
@@ -1566,11 +1534,11 @@ func (p *userRelationalProjection) reduceMetadataRemovedAll(event eventstore.Eve
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-xg4IJ", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.UserMetadataRepository()
-		_, err := repo.Remove(ctx, v3_sql.SQLTx(tx), database.And(
-			repo.InstanceIDCondition(e.Aggregate().InstanceID),
-			repo.UserIDCondition(e.Aggregate().ID),
-		))
+		repo := repository.UserRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.RemoveMetadata(nil),
+		)
 		return err
 	}), nil
 }
@@ -1595,17 +1563,23 @@ func (p *userRelationalProjection) reducePasskeyAdded(event eventstore.Event) (*
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.PasskeyRepository()
-		return repo.Add(ctx, v3_sql.SQLTx(tx), &domain.Passkey{
-			InstanceID:      e.Aggregate().InstanceID,
-			UserID:          e.Aggregate().ID,
-			TokenID:         e.WebAuthNTokenID,
-			CreatedAt:       e.CreatedAt(),
-			UpdatedAt:       e.CreatedAt(),
-			Type:            typ,
-			Challenge:       []byte(e.Challenge),
-			RelayingPartyID: e.RPID,
-		})
+		repo := repository.HumanUserRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			database.And(
+				repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+				repo.PasskeyIDCondition(e.WebAuthNTokenID),
+			),
+			repo.AddPasskey(&domain.Passkey{
+				ID:              e.WebAuthNTokenID,
+				Challenge:       []byte(e.Challenge),
+				RelayingPartyID: e.RPID,
+				CreatedAt:       e.CreatedAt(),
+				UpdatedAt:       e.CreatedAt(),
+				Type:            typ,
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
+		return err
 	}), nil
 }
 
@@ -1627,14 +1601,20 @@ func (p *userRelationalProjection) reducePasskeyVerified(event eventstore.Event)
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		// TODO: remaining fields to be updated?
-		repo := repository.PasskeyRepository()
+		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
-			database.And(
-				repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.WebAuthNTokenID),
-				repo.UserIDCondition(e.Aggregate().ID),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.UpdatePasskey(
+				repo.PasskeyIDCondition(e.WebAuthNTokenID),
+				repo.SetPasskeyKeyID(e.KeyID),
+				repo.SetPasskeyPublicKey(e.PublicKey),
+				repo.SetPasskeyAttestationType(e.AttestationType),
+				repo.SetPasskeyAuthenticatorAttestationGUID(e.AAGUID),
+				repo.SetPasskeySignCount(e.SignCount),
+				repo.SetPasskeyName(e.WebAuthNTokenName),
+				repo.SetPasskeyUpdatedAt(e.CreatedAt()),
 			),
 			repo.SetUpdatedAt(e.CreatedAt()),
-			repo.SetState(domain.PasskeyStateVerified),
 		)
 		return err
 	}), nil
@@ -1657,15 +1637,14 @@ func (p *userRelationalProjection) reducePasskeySignCountSet(event eventstore.Ev
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
-		// TODO: remaining fields to be updated?
-		repo := repository.PasskeyRepository()
+		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
-			database.And(
-				repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.WebAuthNTokenID),
-				repo.UserIDCondition(e.Aggregate().ID),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.UpdatePasskey(
+				repo.PasskeyIDCondition(e.WebAuthNTokenID),
+				repo.SetPasskeySignCount(e.SignCount),
 			),
 			repo.SetUpdatedAt(e.CreatedAt()),
-			repo.SetSignCount(e.SignCount),
 		)
 		return err
 	}), nil
@@ -1688,13 +1667,12 @@ func (p *userRelationalProjection) reducePasskeyRemoved(event eventstore.Event) 
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
-		// TODO: remaining fields to be updated?
-		repo := repository.PasskeyRepository()
-		_, err := repo.Delete(ctx, v3_sql.SQLTx(tx),
-			database.And(
-				repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.WebAuthNTokenID),
-				repo.UserIDCondition(e.Aggregate().ID),
-			),
+		userRepo := repository.UserRepository()
+		humanRepo := userRepo.Human()
+		_, err := userRepo.Update(ctx, v3_sql.SQLTx(tx),
+			userRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.WebAuthNTokenID),
+			humanRepo.RemovePasskey(humanRepo.PasskeyIDCondition(e.WebAuthNTokenID)),
+			humanRepo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -1710,14 +1688,15 @@ func (p *userRelationalProjection) reducePasskeyInitCodeAdded(event eventstore.E
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.PasskeyRepository()
-		_, err := repo.SetInitializationVerification(ctx, v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.ID),
-			&domain.VerificationTypeInit{
+		repo := repository.HumanUserRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.SetVerification(e.ID, &domain.VerificationTypeInit{
 				Code:      e.Code.Crypted,
 				CreatedAt: e.CreatedAt(),
 				Expiry:    &e.Expiry,
-			},
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -1733,9 +1712,13 @@ func (p *userRelationalProjection) reducePasskeyInitCodeCheckFailed(event events
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.PasskeyRepository()
-		_, err := repo.IncrementFailedInitializationAttempts(ctx, v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.ID),
+		repo := repository.HumanUserRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.SetVerification(e.ID, &domain.VerificationTypeFailed{
+				FailedAt: e.CreatedAt(),
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -1751,10 +1734,13 @@ func (p *userRelationalProjection) reducePasskeyInitCodeCheckSucceeded(event eve
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.PasskeyRepository()
-		_, err := repo.SetInitializationVerification(ctx, v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.ID),
-			&domain.VerificationTypeVerified{VerifiedAt: e.CreatedAt()},
+		repo := repository.HumanUserRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.SetVerification(e.ID, &domain.VerificationTypeVerified{
+				VerifiedAt: e.CreatedAt(),
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -1770,14 +1756,15 @@ func (p *userRelationalProjection) reducePasskeyInitCodeRequested(event eventsto
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.PasskeyRepository()
-		_, err := repo.SetInitializationVerification(ctx, v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.ID),
-			&domain.VerificationTypeInit{
+		repo := repository.HumanUserRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.SetVerification(e.ID, &domain.VerificationTypeInit{
 				Code:      e.Code.Crypted,
 				CreatedAt: e.CreatedAt(),
 				Expiry:    &e.Expiry,
-			},
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -1821,7 +1808,8 @@ func (p *userRelationalProjection) reduceMFAInitSkipped(event eventstore.Event) 
 
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetMFAInitSkippedAt(gu.Ptr(e.CreatedAt())),
+			repo.SetMultifactorInitializationSkippedAt(e.CreatedAt()),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -1837,19 +1825,19 @@ func (p *userRelationalProjection) reduceIDPLinkAdded(event eventstore.Event) (*
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.UserIdentityProviderLinkRepository()
-
-		return repo.Create(ctx, v3_sql.SQLTx(tx),
-			&domain.UserIdentityProviderLink{
-				InstanceID:         e.Aggregate().InstanceID,
-				UserID:             e.Aggregate().ID,
-				IdentityProviderID: e.IDPConfigID,
-				ProvidedID:         e.ExternalUserID,
-				ProvidedUsername:   e.DisplayName,
-				CreatedAt:          e.CreatedAt(),
-				UpdatedAt:          e.CreatedAt(),
-			},
+		repo := repository.HumanUserRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.AddIdentityProviderLink(&domain.IdentityProviderLink{
+				ProviderID:       e.IDPConfigID,
+				ProvidedUserID:   e.ExternalUserID,
+				ProvidedUsername: e.DisplayName,
+				CreatedAt:        e.CreatedAt(),
+				UpdatedAt:        e.CreatedAt(),
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
+		return err
 	}), nil
 }
 
@@ -1863,9 +1851,12 @@ func (p *userRelationalProjection) reduceIDPLinkCascadeRemoved(event eventstore.
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.UserIdentityProviderLinkRepository()
-
-		_, err := repo.Delete(ctx, v3_sql.SQLTx(tx), repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.IDPConfigID, e.ExternalUserID))
+		repo := repository.HumanUserRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.RemoveIdentityProviderLink(e.IDPConfigID, e.ExternalUserID),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
 		return err
 	}), nil
 }
@@ -1880,9 +1871,12 @@ func (p *userRelationalProjection) reduceIDPLinkRemoved(event eventstore.Event) 
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.UserIdentityProviderLinkRepository()
-
-		_, err := repo.Delete(ctx, v3_sql.SQLTx(tx), repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.IDPConfigID, e.ExternalUserID))
+		repo := repository.HumanUserRepository()
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.RemoveIdentityProviderLink(e.IDPConfigID, e.ExternalUserID),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		)
 		return err
 	}), nil
 }
@@ -1897,11 +1891,12 @@ func (p *userRelationalProjection) reduceIDPLinkUserIDMigrated(event eventstore.
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.UserIdentityProviderLinkRepository()
-
+		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.IDPConfigID, e.PreviousID),
-			repo.SetProvidedUserID(e.NewID),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.UpdateIdentityProviderLink(
+				repo.SetIdentityProviderLinkProvidedID(e.IDPConfigID, e.PreviousID, e.NewID),
+			),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -1918,11 +1913,12 @@ func (p *userRelationalProjection) reduceIDPLinkUsernameChanged(event eventstore
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
-		repo := repository.UserIdentityProviderLinkRepository()
-
+		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.IDPConfigID, e.ExternalUserID),
-			repo.SetProvidedUsername(e.ExternalUsername),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
+			repo.UpdateIdentityProviderLink(
+				repo.SetIdentityProviderLinkProvidedID(e.IDPConfigID, e.ExternalUserID, e.ExternalUsername),
+			),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -1940,13 +1936,14 @@ func (p *userRelationalProjection) reduceTOTPAdded(event eventstore.Event) (*han
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.HumanUserRepository()
-
-		_, err := repo.SetTOTP(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeInit{
+			repo.SetTOTP(&domain.VerificationTypeInit{
 				CreatedAt: e.CreatedAt(),
 				Code:      e.Secret.Crypted,
-			},
+				Value:     gu.Ptr(string(e.Secret.Crypted)),
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -1963,10 +1960,12 @@ func (p *userRelationalProjection) reduceTOTPVerified(event eventstore.Event) (*
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.HumanUserRepository()
-
-		_, err := repo.SetTOTP(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.VerificationTypeVerified{VerifiedAt: e.CreatedAt()},
+			repo.SetTOTP(&domain.VerificationTypeVerified{
+				VerifiedAt: e.CreatedAt(),
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -1983,7 +1982,6 @@ func (p *userRelationalProjection) reduceTOTPRemoved(event eventstore.Event) (*h
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.HumanUserRepository()
-
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.RemoveTOTP(),
@@ -2004,12 +2002,12 @@ func (p *userRelationalProjection) reduceTOTPCheckSucceeded(event eventstore.Eve
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.HumanUserRepository()
-
-		_, err := repo.SetTOTPCheck(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.CheckTypeSucceeded{
+			repo.CheckTOTP(&domain.CheckTypeSucceeded{
 				SucceededAt: e.CreatedAt(),
-			},
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -2026,12 +2024,12 @@ func (p *userRelationalProjection) reduceTOTPCheckFailed(event eventstore.Event)
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.HumanUserRepository()
-
-		_, err := repo.SetTOTPCheck(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.CheckTypeFailed{
+			repo.CheckTOTP(&domain.CheckTypeFailed{
 				FailedAt: e.CreatedAt(),
-			},
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -2051,7 +2049,7 @@ func (p *userRelationalProjection) reduceOTPSMSEnabled(event eventstore.Event) (
 
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetSMSOTPEnabled(true),
+			repo.EnableSMSOTPAt(e.CreatedAt()),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -2072,7 +2070,7 @@ func (p *userRelationalProjection) reduceOTPSMSDisabled(event eventstore.Event) 
 
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetSMSOTPEnabled(false),
+			repo.DisableSMSOTP(),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -2090,14 +2088,14 @@ func (p *userRelationalProjection) reduceOTPSMSCodeAdded(event eventstore.Event)
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.HumanUserRepository()
-
-		_, err := repo.SetSMSOTPCheck(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.CheckTypeInit{
+			repo.CheckSMSOTP(&domain.CheckTypeInit{
 				Code:      e.Code.Crypted,
 				CreatedAt: e.CreatedAt(),
 				Expiry:    &e.Expiry,
-			},
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -2114,12 +2112,12 @@ func (p *userRelationalProjection) reduceOTPSMSCheckSucceeded(event eventstore.E
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.HumanUserRepository()
-
-		_, err := repo.SetSMSOTPCheck(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.CheckTypeSucceeded{
+			repo.CheckSMSOTP(&domain.CheckTypeSucceeded{
 				SucceededAt: e.CreatedAt(),
-			},
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -2136,12 +2134,12 @@ func (p *userRelationalProjection) reduceOTPSMSCheckFailed(event eventstore.Even
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.HumanUserRepository()
-
-		_, err := repo.SetSMSOTPCheck(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.CheckTypeFailed{
+			repo.CheckSMSOTP(&domain.CheckTypeFailed{
 				FailedAt: e.CreatedAt(),
-			},
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -2158,10 +2156,9 @@ func (p *userRelationalProjection) reduceOTPEmailEnabled(event eventstore.Event)
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.HumanUserRepository()
-
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetEmailOTPEnabled(true),
+			repo.EnableEmailOTPAt(e.CreatedAt()),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -2179,10 +2176,9 @@ func (p *userRelationalProjection) reduceOTPEmailDisabled(event eventstore.Event
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.HumanUserRepository()
-
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetEmailOTPEnabled(false),
+			repo.DisableEmailOTP(),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -2200,14 +2196,14 @@ func (p *userRelationalProjection) reduceOTPEmailCodeAdded(event eventstore.Even
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.HumanUserRepository()
-
-		_, err := repo.SetEmailOTPCheck(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.CheckTypeInit{
+			repo.CheckEmailOTP(&domain.CheckTypeInit{
 				Code:      e.Code.Crypted,
 				CreatedAt: e.CreatedAt(),
 				Expiry:    &e.Expiry,
-			},
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -2224,12 +2220,12 @@ func (p *userRelationalProjection) reduceOTPEmailCheckSucceeded(event eventstore
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.HumanUserRepository()
-
-		_, err := repo.SetEmailOTPCheck(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.CheckTypeSucceeded{
+			repo.CheckEmailOTP(&domain.CheckTypeSucceeded{
 				SucceededAt: e.CreatedAt(),
-			},
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
@@ -2246,27 +2242,27 @@ func (p *userRelationalProjection) reduceOTPEmailCheckFailed(event eventstore.Ev
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.HumanUserRepository()
-
-		_, err := repo.SetEmailOTPCheck(ctx, v3_sql.SQLTx(tx),
+		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			&domain.CheckTypeFailed{
+			repo.CheckEmailOTP(&domain.CheckTypeFailed{
 				FailedAt: e.CreatedAt(),
-			},
+			}),
+			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
 }
 
-func mapHumanGender(gender old_domain.Gender) domain.Gender {
+func mapHumanGender(gender old_domain.Gender) domain.HumanGender {
 	switch gender {
 	case old_domain.GenderFemale:
-		return domain.GenderFemale
+		return domain.HumanGenderFemale
 	case old_domain.GenderMale:
-		return domain.GenderMale
+		return domain.HumanGenderMale
 	case old_domain.GenderDiverse:
-		return domain.GenderDiverse
+		return domain.HumanGenderDiverse
 	default:
-		return domain.GenderUnspecified
+		return domain.HumanGenderUnspecified
 	}
 }
 
