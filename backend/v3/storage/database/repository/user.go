@@ -2,290 +2,422 @@ package repository
 
 import (
 	"context"
+	"slices"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-const queryUserStmt = `SELECT instance_id, org_id, id, username, type, created_at, updated_at, deleted_at,` +
-	` first_name, last_name, email_address, email_verified_at, phone_number, phone_verified_at, description` +
-	` FROM users_view users`
-
-type user struct{}
+// -------------------------------------------------------------
+// repository
+// -------------------------------------------------------------
 
 func UserRepository() domain.UserRepository {
 	return new(user)
 }
 
-var _ domain.UserRepository = (*user)(nil)
-
-// -------------------------------------------------------------
-// repository
-// -------------------------------------------------------------
-
-// Human implements [domain.UserRepository].
-func (u user) Human() domain.HumanRepository {
-	return &userHuman{user: u}
+func HumanUserRepository() domain.HumanUserRepository {
+	// TODO: implement human user repository
+	return nil
 }
 
-// Machine implements [domain.UserRepository].
-func (u user) Machine() domain.MachineRepository {
-	return &userMachine{user: u}
+func MachineUserRepository() domain.MachineUserRepository {
+	// TODO: implement machine user repository
+	return nil
 }
 
-// List implements [domain.UserRepository].
-func (u user) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (users []*domain.User, err error) {
-	options := new(database.QueryOpts)
-	for _, opt := range opts {
-		opt(options)
-	}
+type user struct{}
 
-	builder := database.StatementBuilder{}
-	builder.WriteString(queryUserStmt)
-	options.WriteCondition(&builder)
-	options.WriteOrderBy(&builder)
-	options.WriteLimit(&builder)
-	options.WriteOffset(&builder)
-
-	rows, err := client.Query(ctx, builder.String(), builder.Args()...)
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		closeErr := rows.Close()
-		if err != nil {
-			return
-		}
-		err = closeErr
-	}()
-	for rows.Next() {
-		user, err := scanUser(rows)
-		if err != nil {
-			return nil, err
-		}
-		users = append(users, user)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return users, nil
-}
-
-// Get implements [domain.UserRepository].
-func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.User, error) {
-	options := new(database.QueryOpts)
-	for _, opt := range opts {
-		opt(options)
-	}
-
-	builder := database.StatementBuilder{}
-	builder.WriteString(queryUserStmt)
-	options.WriteCondition(&builder)
-	options.WriteOrderBy(&builder)
-	options.WriteLimit(&builder)
-	options.WriteOffset(&builder)
-
-	return scanUser(client.QueryRow(ctx, builder.String(), builder.Args()...))
-}
-
-const (
-	createHumanStmt = `INSERT INTO human_users (instance_id, org_id, user_id, username, first_name, last_name, email_address, email_verified_at, phone_number, phone_verified_at)` +
-		` VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)` +
-		` RETURNING created_at, updated_at`
-	createMachineStmt = `INSERT INTO user_machines (instance_id, org_id, user_id, username, description)` +
-		` VALUES ($1, $2, $3, $4, $5)` +
-		` RETURNING created_at, updated_at`
-)
-
-// Create implements [domain.UserRepository].
+// Create implements [domain.UserRepository.Create].
 func (u user) Create(ctx context.Context, client database.QueryExecutor, user *domain.User) error {
-	builder := database.StatementBuilder{}
-	builder.AppendArgs(user.InstanceID, user.OrgID, user.ID, user.Username, user.Traits.Type())
-	switch trait := user.Traits.(type) {
-	case *domain.Human:
-		builder.WriteString(createHumanStmt)
-		builder.AppendArgs(trait.FirstName, trait.LastName, trait.Email.Address, trait.Email.VerifiedAt, trait.Phone.Number, trait.Phone.VerifiedAt)
-	case *domain.Machine:
-		builder.WriteString(createMachineStmt)
-		builder.AppendArgs(trait.Description)
-	}
-	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
+	panic("unimplemented")
 }
 
-// Delete implements [domain.UserRepository].
-func (u user) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) error {
-	builder := database.StatementBuilder{}
-	builder.WriteString("DELETE FROM users")
-	writeCondition(&builder, condition)
-	_, err := client.Exec(ctx, builder.String(), builder.Args()...)
-	return err
+// Delete implements [domain.UserRepository.Delete].
+func (u user) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	if err := checkPKCondition(u, condition); err != nil {
+		return 0, err
+	}
+
+	builder := database.NewStatementBuilder("DELETE FROM zitadel.users")
+	writeCondition(builder, condition)
+	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+// Get implements [domain.UserRepository.Get].
+func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.User, error) {
+	panic("unimplemented")
+}
+
+// List implements [domain.UserRepository.List].
+func (u user) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.User, error) {
+	panic("unimplemented")
+}
+
+// Update implements [domain.UserRepository.Update].
+func (u user) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+	if err := checkPKCondition(u, condition); err != nil {
+		return 0, err
+	}
+	if len(changes) == 0 {
+		return 0, database.ErrNoChanges
+	}
+
+	builder := database.NewStatementBuilder("WITH existing_user AS (SELECT id, instance_id FROM zitadel.users")
+	writeCondition(builder, condition)
+	builder.WriteRune(')')
+
+	changes = slices.DeleteFunc(changes, func(change database.Change) bool {
+		switch c := change.(type) {
+		case *addMetadataChange:
+			builder.WriteString(", set_metadata AS (")
+			c.Write(builder)
+			builder.WriteRune(')')
+			return true
+		case *removeMetadataChange:
+			builder.WriteString(", removed_metadata AS (")
+			c.Write(builder)
+			builder.WriteRune(')')
+			return true
+		default:
+			return false
+		}
+	})
+
+	if !database.Changes(changes).IsOnColumn(u.updatedAtColumn()) {
+		changes = append(changes, u.clearUpdatedAt())
+	}
+
+	builder.WriteString(" UPDATE zitadel.users SET ")
+	database.Changes(changes).Write(builder)
+	builder.WriteString(" FROM existing_user")
+	writeCondition(builder, database.And(
+		database.NewColumnCondition(u.idColumn(), u.existingUserIDColumn()),
+		database.NewColumnCondition(u.instanceIDColumn(), u.existingUserInstanceIDColumn()),
+	))
+
+	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+func (u user) unqualifiedTableName() string {
+	return "users"
+}
+
+func (u user) unqualifiedMetadataTableName() string {
+	return "user_metadata"
+}
+
+func (u user) existingUserCTEName() string {
+	return "existing_user"
 }
 
 // -------------------------------------------------------------
 // changes
 // -------------------------------------------------------------
 
-// SetUsername implements [domain.userChanges].
+// AddMetadata implements [domain.UserRepository.AddMetadata].
+func (u user) AddMetadata(metadata ...*domain.Metadata) database.Change {
+	return &addMetadataChange{
+		metadata: metadata,
+	}
+}
+
+type addMetadataChange struct {
+	metadata []*domain.Metadata
+}
+
+// IsOnColumn implements [database.Change.IsOnColumn].
+// Always returns false as this change is on multiple columns.
+func (addMetadata *addMetadataChange) IsOnColumn(col database.Column) bool {
+	return false
+}
+
+// Matches implements [database.Change.Matches].
+func (addMetadata *addMetadataChange) Matches(x any) bool {
+	toMatch, ok := x.(*addMetadataChange)
+	if !ok {
+		return false
+	}
+	return slices.EqualFunc(addMetadata.metadata, toMatch.metadata, func(a, b *domain.Metadata) bool {
+		return a.InstanceID == b.InstanceID &&
+			a.Key == b.Key &&
+			slices.Equal(a.Value, b.Value)
+	})
+}
+
+// String implements [database.Change.String].
+func (addMetadata *addMetadataChange) String() string {
+	return "user.addMetadataChange"
+}
+
+// Write implements [database.Change.Write].
+func (addMetadata *addMetadataChange) Write(builder *database.StatementBuilder) {
+	builder.WriteString("INSERT INTO zitadel.user_metadata(instance_id, user_id, key, value, created_at, updated_at)")
+	builder.WriteString(" SELECT existing_user.instance_id, existing_user.id, md.key, md.value, md.created_at, md.updated_at")
+	builder.WriteString(" FROM existing_user CROSS JOIN (VALUES ")
+	for i, md := range addMetadata.metadata {
+		if i > 0 {
+			builder.WriteString(", ")
+		}
+		builder.WriteRune('(')
+		builder.WriteArgs(md.Key, md.Value)
+		var createdAt, updatedAt any = database.DefaultInstruction, database.NullInstruction
+		if !md.CreatedAt.IsZero() {
+			createdAt = md.CreatedAt
+		}
+		if !md.UpdatedAt.IsZero() {
+			updatedAt = md.UpdatedAt
+		}
+		builder.WriteArgs(createdAt, updatedAt)
+		builder.WriteRune(')')
+	}
+	builder.WriteString(") AS md(key, value, created_at, updated_at)")
+}
+
+var _ database.Change = (*addMetadataChange)(nil)
+
+// RemoveMetadata implements [domain.UserRepository.RemoveMetadata].
+func (u user) RemoveMetadata(condition database.Condition) database.Change {
+	return &removeMetadataChange{
+		user:      u,
+		condition: condition,
+	}
+}
+
+type removeMetadataChange struct {
+	user      user
+	condition database.Condition
+}
+
+// IsOnColumn implements [database.Change.IsOnColumn].
+func (removeMetadata *removeMetadataChange) IsOnColumn(col database.Column) bool {
+	return false
+}
+
+// Matches implements [database.Change.Matches].
+func (removeMetadata *removeMetadataChange) Matches(x any) bool {
+	toMatch, ok := x.(*removeMetadataChange)
+	if !ok {
+		return false
+	}
+	return removeMetadata.condition.Matches(toMatch.condition)
+}
+
+// String implements [database.Change.String].
+func (removeMetadata *removeMetadataChange) String() string {
+	return "user.removeMetadataChange"
+}
+
+// Write implements [database.Change.Write].
+func (removeMetadata *removeMetadataChange) Write(builder *database.StatementBuilder) {
+	builder.WriteString("DELETE FROM zitadel.user_metadata USING existing_user")
+	writeCondition(builder, database.And(
+		database.NewColumnCondition(removeMetadata.user.existingUserInstanceIDColumn(), removeMetadata.user.metadataInstanceIDColumn()),
+		database.NewColumnCondition(removeMetadata.user.existingUserIDColumn(), removeMetadata.user.metadataUserIDColumn()),
+		removeMetadata.condition,
+	))
+}
+
+var _ database.Change = (*removeMetadataChange)(nil)
+
+// SetState implements [domain.UserRepository.SetState].
+func (u user) SetState(state domain.UserState) database.Change {
+	return database.NewChange(u.StateColumn(), state)
+}
+
+// SetUpdatedAt implements [domain.UserRepository.SetUpdatedAt].
+func (u user) SetUpdatedAt(updatedAt time.Time) database.Change {
+	return database.NewChange(u.updatedAtColumn(), updatedAt)
+}
+
+// SetUsername implements [domain.UserRepository.SetUsername].
 func (u user) SetUsername(username string) database.Change {
 	return database.NewChange(u.UsernameColumn(), username)
+}
+
+func (u user) clearUpdatedAt() database.Change {
+	return database.NewChange(u.updatedAtColumn(), database.NullInstruction)
 }
 
 // -------------------------------------------------------------
 // conditions
 // -------------------------------------------------------------
 
-func (u user) PrimaryKeyCondition(instanceID, userID string) database.Condition {
+// ExistsMetadata implements [domain.UserRepository.ExistsMetadata].
+func (u user) ExistsMetadata(condition database.Condition) database.Condition {
+	panic("unimplemented")
+}
+
+// IDCondition implements [domain.UserRepository.IDCondition].
+func (u user) IDCondition(userID string) database.Condition {
+	return database.NewTextCondition(u.idColumn(), database.TextOperationEqual, userID)
+}
+
+// InstanceIDCondition implements [domain.UserRepository.InstanceIDCondition].
+func (u user) InstanceIDCondition(instanceID string) database.Condition {
+	return database.NewTextCondition(u.instanceIDColumn(), database.TextOperationEqual, instanceID)
+}
+
+// LoginNameCondition implements [domain.UserRepository.LoginNameCondition].
+func (u user) LoginNameCondition(op database.TextOperation, loginName string) database.Condition {
+	panic("unimplemented")
+}
+
+// MetadataKeyCondition implements [domain.UserRepository.MetadataKeyCondition].
+func (u user) MetadataKeyCondition(key string) database.Condition {
+	return database.NewTextCondition(u.metadataKeyColumn(), database.TextOperationEqual, key)
+}
+
+// MetadataValueCondition implements [domain.UserRepository.MetadataValueCondition].
+func (u user) MetadataValueCondition(op database.BytesOperation, value []byte) database.Condition {
+	return database.NewBytesCondition[[]byte](database.SHA256Column(u.metadataValueColumn()), op, database.SHA256Value(value))
+}
+
+// OrganizationIDCondition implements [domain.UserRepository.OrganizationIDCondition].
+func (u user) OrganizationIDCondition(orgID string) database.Condition {
+	return database.NewTextCondition(u.organizationIDColumn(), database.TextOperationEqual, orgID)
+}
+
+// PrimaryKeyCondition implements [domain.UserRepository.PrimaryKeyCondition].
+func (u user) PrimaryKeyCondition(instanceID string, userID string) database.Condition {
 	return database.And(
 		u.InstanceIDCondition(instanceID),
 		u.IDCondition(userID),
 	)
 }
 
-// InstanceIDCondition implements [domain.userConditions].
-func (u user) InstanceIDCondition(instanceID string) database.Condition {
-	return database.NewTextCondition(u.InstanceIDColumn(), database.TextOperationEqual, instanceID)
+// StateCondition implements [domain.UserRepository.StateCondition].
+func (u user) StateCondition(state domain.UserState) database.Condition {
+	return database.NewNumberCondition(u.StateColumn(), database.NumberOperationEqual, state)
 }
 
-// OrgIDCondition implements [domain.userConditions].
-func (u user) OrgIDCondition(orgID string) database.Condition {
-	return database.NewTextCondition(u.OrgIDColumn(), database.TextOperationEqual, orgID)
+// TypeCondition implements [domain.UserRepository.TypeCondition].
+func (u user) TypeCondition(userType domain.UserType) database.Condition {
+	return database.NewNumberCondition(u.TypeColumn(), database.NumberOperationEqual, userType)
 }
 
-// IDCondition implements [domain.userConditions].
-func (u user) IDCondition(userID string) database.Condition {
-	return database.NewTextCondition(u.IDColumn(), database.TextOperationEqual, userID)
-}
-
-// UsernameCondition implements [domain.userConditions].
+// UsernameCondition implements [domain.UserRepository.UsernameCondition].
 func (u user) UsernameCondition(op database.TextOperation, username string) database.Condition {
 	return database.NewTextCondition(u.UsernameColumn(), op, username)
-}
-
-// CreatedAtCondition implements [domain.userConditions].
-func (u user) CreatedAtCondition(op database.NumberOperation, createdAt time.Time) database.Condition {
-	return database.NewNumberCondition(u.CreatedAtColumn(), op, createdAt)
-}
-
-// UpdatedAtCondition implements [domain.userConditions].
-func (u user) UpdatedAtCondition(op database.NumberOperation, updatedAt time.Time) database.Condition {
-	return database.NewNumberCondition(u.UpdatedAtColumn(), op, updatedAt)
-}
-
-// DeletedCondition implements [domain.userConditions].
-func (u user) DeletedCondition(isDeleted bool) database.Condition {
-	if isDeleted {
-		return database.IsNotNull(u.DeletedAtColumn())
-	}
-	return database.IsNull(u.DeletedAtColumn())
-}
-
-// DeletedAtCondition implements [domain.userConditions].
-func (u user) DeletedAtCondition(op database.NumberOperation, deletedAt time.Time) database.Condition {
-	return database.NewNumberCondition(u.DeletedAtColumn(), op, deletedAt)
 }
 
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
 
-// PrimaryKeyColumns implements [domain.Repository].
+// PrimaryKeyColumns implements [domain.UserRepository.PrimaryKeyColumns].
 func (u user) PrimaryKeyColumns() []database.Column {
-	return []database.Column{
-		u.InstanceIDColumn(),
-		u.IDColumn(),
-	}
-}
-
-// InstanceIDColumn implements [domain.userColumns].
-func (user) InstanceIDColumn() database.Column {
-	return database.NewColumn("users", "instance_id")
-}
-
-// OrgIDColumn implements [domain.userColumns].
-func (user) OrgIDColumn() database.Column {
-	return database.NewColumn("users", "org_id")
-}
-
-// IDColumn implements [domain.userColumns].
-func (user) IDColumn() database.Column {
-	return database.NewColumn("users", "id")
-}
-
-// UsernameColumn implements [domain.userColumns].
-func (user) UsernameColumn() database.Column {
-	return database.NewColumn("users", "username")
-}
-
-// FirstNameColumn implements [domain.userColumns].
-func (user) CreatedAtColumn() database.Column {
-	return database.NewColumn("users", "created_at")
-}
-
-// UpdatedAtColumn implements [domain.userColumns].
-func (user) UpdatedAtColumn() database.Column {
-	return database.NewColumn("users", "updated_at")
-}
-
-// DeletedAtColumn implements [domain.userColumns].
-func (user) DeletedAtColumn() database.Column {
-	return database.NewColumn("users", "deleted_at")
-}
-
-func (u user) columns() database.Columns {
 	return database.Columns{
-		u.InstanceIDColumn(),
-		u.OrgIDColumn(),
-		u.IDColumn(),
-		u.UsernameColumn(),
-		u.CreatedAtColumn(),
-		u.UpdatedAtColumn(),
-		u.DeletedAtColumn(),
+		u.instanceIDColumn(),
+		u.idColumn(),
 	}
 }
 
-func scanUser(scanner database.Scanner) (*domain.User, error) {
-	var (
-		user    domain.User
-		human   domain.Human
-		email   domain.Email
-		phone   domain.Phone
-		machine domain.Machine
-		typ     domain.UserType
-	)
-	err := scanner.Scan(
-		&user.InstanceID,
-		&user.OrgID,
-		&user.ID,
-		&user.Username,
-		&typ,
-		&user.CreatedAt,
-		&user.UpdatedAt,
-		&user.DeletedAt,
-		&human.FirstName,
-		&human.LastName,
-		&email.Address,
-		&email.VerifiedAt,
-		&phone.Number,
-		&phone.VerifiedAt,
-		&machine.Description,
-	)
-	if err != nil {
-		return nil, err
-	}
+// CreatedAtColumn implements [domain.UserRepository.CreatedAtColumn].
+func (u user) CreatedAtColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "created_at")
+}
 
-	switch typ {
-	case domain.UserTypeHuman:
-		if email.Address != "" {
-			human.Email = &email
-		}
-		if phone.Number != "" {
-			human.Phone = &phone
-		}
-		user.Traits = &human
-	case domain.UserTypeMachine:
-		user.Traits = &machine
-	}
+// StateColumn implements [domain.UserRepository.StateColumn].
+func (u user) StateColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "state")
+}
 
-	return &user, nil
+// TypeColumn implements [domain.UserRepository.TypeColumn].
+func (u user) TypeColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "type")
+}
+
+// UsernameColumn implements [domain.UserRepository.UsernameColumn].
+func (u user) UsernameColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "username")
+}
+
+func (u user) idColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "id")
+}
+
+func (u user) instanceIDColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "instance_id")
+}
+
+func (u user) updatedAtColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "updated_at")
+}
+
+func (u user) existingUserInstanceIDColumn() database.Column {
+	return database.NewColumn(u.existingUserCTEName(), "instance_id")
+}
+
+func (u user) existingUserIDColumn() database.Column {
+	return database.NewColumn(u.existingUserCTEName(), "id")
+}
+
+func (u user) metadataInstanceIDColumn() database.Column {
+	return database.NewColumn(u.unqualifiedMetadataTableName(), "instance_id")
+}
+
+func (u user) organizationIDColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "organization_id")
+}
+
+func (u user) metadataUserIDColumn() database.Column {
+	return database.NewColumn(u.unqualifiedMetadataTableName(), "user_id")
+}
+
+func (u user) metadataKeyColumn() database.Column {
+	return database.NewColumn(u.unqualifiedMetadataTableName(), "key")
+}
+
+func (u user) metadataValueColumn() database.Column {
+	return database.NewColumn(u.unqualifiedMetadataTableName(), "value")
+}
+
+// -------------------------------------------------------------
+// scanners
+// -------------------------------------------------------------
+
+// -------------------------------------------------------------
+// sub repositories
+// -------------------------------------------------------------
+
+// Human implements [domain.UserRepository.Human].
+func (u user) Human() domain.HumanUserRepository {
+	panic("unimplemented")
+}
+
+// LoadIdentityProviderLinks implements [domain.UserRepository.LoadIdentityProviderLinks].
+func (u user) LoadIdentityProviderLinks() domain.UserRepository {
+	panic("unimplemented")
+}
+
+// LoadKeys implements [domain.UserRepository.LoadKeys].
+func (u user) LoadKeys() domain.UserRepository {
+	panic("unimplemented")
+}
+
+// LoadMetadata implements [domain.UserRepository.LoadMetadata].
+func (u user) LoadMetadata() domain.UserRepository {
+	panic("unimplemented")
+}
+
+// LoadPATs implements [domain.UserRepository.LoadPATs].
+func (u user) LoadPATs() domain.UserRepository {
+	panic("unimplemented")
+}
+
+// LoadPasskeys implements [domain.UserRepository.LoadPasskeys].
+func (u user) LoadPasskeys() domain.UserRepository {
+	panic("unimplemented")
+}
+
+// LoadVerifications implements [domain.UserRepository.LoadVerifications].
+func (u user) LoadVerifications() domain.UserRepository {
+	panic("unimplemented")
+}
+
+// Machine implements [domain.UserRepository.Machine].
+func (u user) Machine() domain.MachineUserRepository {
+	panic("unimplemented")
 }
