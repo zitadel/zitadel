@@ -63,6 +63,7 @@ func (c *Commands) RemoveInstanceDomain(ctx context.Context, instanceDomain stri
 		return nil, zerrors.ThrowInvalidArgument(nil, "INST-39nls", "Errors.Invalid.Argument")
 	}
 
+	//nolint: staticcheck
 	writeModel, err := getInstanceDomainWriteModel(ctx, c.eventstore.Filter, instanceDomain)
 	if err != nil {
 		return nil, err
