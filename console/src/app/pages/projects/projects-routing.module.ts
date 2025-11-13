@@ -26,7 +26,7 @@ const routes: Routes = [
       animation: 'AddPage',
       roles: ['project.app.write'],
     },
-    loadChildren: () => import('../app-create/app-create.module'),
+    loadChildren: () => import('../app-quick-create/app-quick-create.module'),
   },
   {
     path: ':projectid',

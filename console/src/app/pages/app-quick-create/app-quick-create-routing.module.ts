@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { AppCreateComponent } from './app-create.component';
+import { AppQuickCreateComponent } from './app-quick-create.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: AppCreateComponent,
+    component: AppQuickCreateComponent,
     data: { animation: 'DetailPage' },
   },
 ];
