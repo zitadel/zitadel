@@ -695,7 +695,7 @@ func TestUpdateAuthorization(t *testing.T) {
 			defer rollback()
 
 			rowsAffected, err := authorizationRepo.Update(t.Context(), savepoint, tt.condition, nil, tt.changes...)
-			require.ErrorIs(t, tt.wantErr, err)
+			require.ErrorIs(t, err, tt.wantErr)
 			if err != nil {
 				return
 			}
@@ -947,7 +947,7 @@ func TestDeleteAuthorization(t *testing.T) {
 			// verify deletion
 			got, err := authorizationRepo.List(t.Context(), savepoint, database.WithCondition(tt.condition))
 			require.NoError(t, err)
-			require.Nil(t, got)
+			require.Empty(t, got)
 		})
 	}
 }

@@ -57,7 +57,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		role1, role2 := "role1", "role2"
 		projectID := prepareProjectAndProjectRoles(t, orgID, []string{role1, role2})
 
-		// create authorization without roles
+		// create authorization
 		createdAuthorization, err := AuthorizationClient.CreateAuthorization(CTX, &authorization_v2.CreateAuthorizationRequest{
 			UserId:         user.UserId,
 			ProjectId:      projectID,
@@ -88,9 +88,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
 			))
 			require.NoError(collect, err)
-			if !assert.Len(collect, az.Roles, 3) {
-				return
-			}
+			require.Len(collect, az.Roles, 3)
 			assert.Equal(collect, []string{role1, role2, role3}, az.Roles)
 		}, retryDuration, tick, "authorization not updated within %v: %v", retryDuration, err)
 	})
@@ -171,8 +169,8 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
 				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
 			))
-			assert.Nil(collect, az)
-			require.Error(collect, new(database.MissingConditionError), err)
+			require.Empty(collect, az)
+			require.ErrorIs(collect, err, new(database.NoRowFoundError))
 		}, retryDuration, tick, "authorization not deleted within %v: %v", retryDuration, err)
 	})
 
