@@ -10,11 +10,11 @@ import (
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres/embedded"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
+	"github.com/zitadel/zitadel/internal/integration"
 )
 
 func TestMain(m *testing.M) {
@@ -125,32 +125,32 @@ func createProject(t *testing.T, tx database.Transaction, instanceID, orgID stri
 	return project.ID
 }
 
-func createUser(t *testing.T, tx database.Transaction, instanceID, orgID string) (userID string) {
-	t.Helper()
-	user := domain.User{
-		InstanceID: instanceID,
-		OrgID:      orgID,
-		ID:         gofakeit.UUID(),
-		Username:   gofakeit.Username(),
-		Traits: &domain.Human{
-			FirstName: gofakeit.FirstName(),
-			LastName:  gofakeit.LastName(),
-			Email: &domain.Email{
-				Address:    gofakeit.Email(),
-				VerifiedAt: gofakeit.Date(),
-			},
-			Phone: &domain.Phone{
-				Number:     gofakeit.Phone(),
-				VerifiedAt: gofakeit.Date(),
-			},
-		},
-	}
-	userRepo := repository.UserRepository()
-	err := userRepo.Create(t.Context(), tx, &user)
-	require.NoError(t, err)
-
-	return user.ID
-}
+//func createUser(t *testing.T, tx database.Transaction, instanceID, orgID string) (userID string) {
+//	t.Helper()
+//	user := domain.User{
+//		InstanceID: instanceID,
+//		OrgID:      orgID,
+//		ID:         gofakeit.UUID(),
+//		Username:   gofakeit.Username(),
+//		Traits: &domain.Human{
+//			FirstName: gofakeit.FirstName(),
+//			LastName:  gofakeit.LastName(),
+//			Email: &domain.Email{
+//				Address:    gofakeit.Email(),
+//				VerifiedAt: gofakeit.Date(),
+//			},
+//			Phone: &domain.Phone{
+//				Number:     gofakeit.Phone(),
+//				VerifiedAt: gofakeit.Date(),
+//			},
+//		},
+//	}
+//	userRepo := repository.UserRepository()
+//	err := userRepo.Create(t.Context(), tx, &user)
+//	require.NoError(t, err)
+//
+//	return user.ID
+//}
 
 func createProjectRole(t *testing.T, tx database.Transaction, instanceID, orgID, projectID, key string) string {
 	t.Helper()

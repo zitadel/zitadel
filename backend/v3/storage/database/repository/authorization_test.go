@@ -26,8 +26,8 @@ func TestCreateAuthorization(t *testing.T) {
 	role1 := createProjectRole(t, tx, instanceID, organizationID, projectID, "role1")
 	role2 := createProjectRole(t, tx, instanceID, organizationID, projectID, "role2")
 	// TODO: uncomment when user table is available
-	//userID := createUser(t, tx, instanceID, organizationID)
-	//require.NotNil(t, userID)
+	// userID := createUser(t, tx, instanceID, organizationID)
+	// require.NotNil(t, userID)
 	userID := integration.ID()
 
 	authorizationRepo := repository.AuthorizationRepository()
@@ -100,7 +100,7 @@ func TestCreateAuthorization(t *testing.T) {
 			wantErr: new(database.ForeignKeyError),
 		},
 		// TODO: uncomment when user table is available
-		//{
+		// {
 		//	name: "non-existent user",
 		//	authorization: &domain.Authorization{
 		//		ID:         integration.ID(),
@@ -112,7 +112,7 @@ func TestCreateAuthorization(t *testing.T) {
 		//		Roles:      nil,
 		//	},
 		//	wantErr: new(database.ForeignKeyError),
-		//},
+		// },
 		{
 			name: "duplicate authorization",
 			authorization: &domain.Authorization{
@@ -178,8 +178,8 @@ func TestGetAuthorization(t *testing.T) {
 	role2 := createProjectRole(t, tx, instanceID, organizationID, projectID, "role2")
 
 	// TODO: uncomment when user table is available
-	//userID := createUser(t, tx, instanceID, organizationID)
-	//require.NotNil(t, userID)
+	// userID := createUser(t, tx, instanceID, organizationID)
+	// require.NotNil(t, userID)
 	userID := integration.ID()
 
 	// create authorization with roles
@@ -284,11 +284,11 @@ func TestListAuthorization(t *testing.T) {
 	project2Role2 := createProjectRole(t, tx, instanceID, organizationID, project2ID, "project2Role2")
 
 	// TODO: uncomment when user table is available
-	//user1ID := createUser(t, tx, instanceID, organizationID)
-	//require.NotNil(t, user1ID)
+	// user1ID := createUser(t, tx, instanceID, organizationID)
+	// require.NotNil(t, user1ID)
 	user1ID := integration.ID()
-	//user2ID := createUser(t, tx, instanceID, organizationID)
-	//require.NotNil(t, user2ID)
+	// user2ID := createUser(t, tx, instanceID, organizationID)
+	// require.NotNil(t, user2ID)
 	user2ID := integration.ID()
 
 	// create authorization with roles for user1 for project1

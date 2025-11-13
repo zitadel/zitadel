@@ -24,10 +24,6 @@ func (a authorization) unqualifiedAuthorizationRolesTableName() string {
 	return "authorization_roles"
 }
 
-func (a authorization) qualifiedAuthorizationRolesTableName() string {
-	return "zitadel." + a.unqualifiedAuthorizationRolesTableName()
-}
-
 // -------------------------------------------------------------
 // repository
 // -------------------------------------------------------------
