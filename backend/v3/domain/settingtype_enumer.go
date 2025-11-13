@@ -27,7 +27,7 @@ func _SettingTypeNoOp() {
 	var x [1]struct{}
 	_ = x[SettingTypeUnspecified-(0)]
 	_ = x[SettingTypeLogin-(1)]
-	_ = x[SettingTypeLabel-(2)]
+	_ = x[SettingTypeBranding-(2)]
 	_ = x[SettingTypePasswordComplexity-(3)]
 	_ = x[SettingTypePasswordExpiry-(4)]
 	_ = x[SettingTypeDomain-(5)]
@@ -36,15 +36,15 @@ func _SettingTypeNoOp() {
 	_ = x[SettingTypeOrganization-(8)]
 }
 
-var _SettingTypeValues = []SettingType{SettingTypeUnspecified, SettingTypeLogin, SettingTypeLabel, SettingTypePasswordComplexity, SettingTypePasswordExpiry, SettingTypeDomain, SettingTypeLockout, SettingTypeSecurity, SettingTypeOrganization}
+var _SettingTypeValues = []SettingType{SettingTypeUnspecified, SettingTypeLogin, SettingTypeBranding, SettingTypePasswordComplexity, SettingTypePasswordExpiry, SettingTypeDomain, SettingTypeLockout, SettingTypeSecurity, SettingTypeOrganization}
 
 var _SettingTypeNameToValueMap = map[string]SettingType{
 	_SettingTypeName[0:11]:       SettingTypeUnspecified,
 	_SettingTypeLowerName[0:11]:  SettingTypeUnspecified,
 	_SettingTypeName[11:16]:      SettingTypeLogin,
 	_SettingTypeLowerName[11:16]: SettingTypeLogin,
-	_SettingTypeName[16:21]:      SettingTypeLabel,
-	_SettingTypeLowerName[16:21]: SettingTypeLabel,
+	_SettingTypeName[16:21]:      SettingTypeBranding,
+	_SettingTypeLowerName[16:21]: SettingTypeBranding,
 	_SettingTypeName[21:40]:      SettingTypePasswordComplexity,
 	_SettingTypeLowerName[21:40]: SettingTypePasswordComplexity,
 	_SettingTypeName[40:55]:      SettingTypePasswordExpiry,

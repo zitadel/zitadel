@@ -102,7 +102,7 @@ func (s settings) OwnerTypeCondition(typ domain.OwnerType) database.Condition {
 	return database.NewTextCondition(s.OwnerTypeColumn(), database.TextOperationEqual, typ.String())
 }
 
-func (s settings) LabelStateCondition(typ domain.LabelState) database.Condition {
+func (s settings) BrandingStateCondition(typ domain.BrandingState) database.Condition {
 	return database.NewTextCondition(s.LabelStateColumn(), database.TextOperationEqual, typ.String())
 }
 
@@ -118,7 +118,7 @@ func (s settings) SetUpdatedAt(updatedAt *time.Time) database.Change {
 	return database.NewChangePtr(s.UpdatedAtColumn(), updatedAt)
 }
 
-func (s settings) SetLabelSettings(changes ...db_json.JsonUpdate) database.Change {
+func (s settings) SetBrandingSettings(changes ...db_json.JsonUpdate) database.Change {
 	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
 }
 
@@ -339,7 +339,7 @@ func (l labelSettings) SetDisableWatermarkField(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"disableMsgPopup"}, value)
 }
 
-func (l labelSettings) SetThemeModeField(value domain.LabelPolicyThemeMode) db_json.JsonUpdate {
+func (l labelSettings) SetThemeModeField(value domain.BrandingPolicyThemeMode) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"themeMode"}, value)
 }
 
@@ -378,7 +378,7 @@ const createLabelSettingStmt = `INSERT INTO zitadel.settings` +
 	` settings = EXCLUDED.settings` +
 	` RETURNING id, created_at, updated_at`
 
-func (s *labelSettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.LabelSetting) error {
+func (s *labelSettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.BrandingSetting) error {
 	if setting == nil {
 		return ErrSettingObjectMustNotBeNil
 	}
@@ -408,7 +408,7 @@ func (s *labelSettings) Set(ctx context.Context, client database.QueryExecutor, 
 		setting.OrganizationID,
 		setting.Type,
 		setting.OwnerType,
-		setting.LabelState,
+		setting.BrandingState,
 		string(settingJSON))
 
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.ID, &setting.CreatedAt, &setting.UpdatedAt)
@@ -426,8 +426,8 @@ func (s *labelSettings) Update(ctx context.Context, client database.QueryExecuto
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-func (s *labelSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.LabelSetting, error) {
-	labelSetting := &domain.LabelSetting{}
+func (s *labelSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.BrandingSetting, error) {
+	labelSetting := &domain.BrandingSetting{}
 	var err error
 
 	labelSetting.Setting, err = s.getLabel(ctx, client, opts...)
@@ -472,19 +472,19 @@ func (s *labelSettings) Reset(ctx context.Context, client database.QueryExecutor
 	return s.Delete(ctx, client, condition)
 }
 
-func (s *settings) CreateLabel(ctx context.Context, client database.QueryExecutor, setting *domain.LabelSetting) error {
+func (s *settings) CreateLabel(ctx context.Context, client database.QueryExecutor, setting *domain.BrandingSetting) error {
 	if setting == nil {
 		return ErrSettingObjectMustNotBeNil
 	}
-	if setting.LabelState == nil {
+	if setting.BrandingState == nil {
 		return ErrLabelStateMustBeDefined
 	}
 
-	setting.Type = domain.SettingTypeLabel
+	setting.Type = domain.SettingTypeBranding
 	return setSetting(ctx, client, setting.Setting, setting)
 }
 
-func (s *labelSettings) ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *domain.LabelSetting) error {
+func (s *labelSettings) ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *domain.BrandingSetting) error {
 	builder := database.StatementBuilder{}
 
 	settingJSON, err := json.Marshal(setting)
@@ -544,7 +544,7 @@ const activatedLabelSettingStmt = `INSERT INTO zitadel.settings` +
 	` settings = EXCLUDED.settings` +
 	` RETURNING id, created_at, updated_at`
 
-func (s *settings) ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *domain.LabelSetting) error {
+func (s *settings) ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *domain.BrandingSetting) error {
 	builder := database.StatementBuilder{}
 
 	settingJSON, err := json.Marshal(setting)
@@ -1013,7 +1013,7 @@ func (s *settings) Create(ctx context.Context, client database.QueryExecutor, se
 		setting.OrganizationID,
 		setting.Type,
 		setting.OwnerType,
-		setting.LabelState,
+		setting.BrandingState,
 		string(setting.Settings),
 		setting.CreatedAt,
 		setting.UpdatedAt)
@@ -1053,7 +1053,7 @@ func setSetting(ctx context.Context, client database.QueryExecutor, setting *dom
 		setting.OrganizationID,
 		setting.Type,
 		setting.OwnerType,
-		setting.LabelState,
+		setting.BrandingState,
 		string(settingJSON))
 
 	err = database.Changes(changes).Write(builder)

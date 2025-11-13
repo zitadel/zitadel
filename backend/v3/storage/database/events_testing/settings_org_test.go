@@ -599,8 +599,8 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
-						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
+						settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
 				),
@@ -622,7 +622,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			assert.Equal(t, false, setting.ErrorMsgPopup)
 			assert.Equal(t, false, setting.DisableWatermark)
 			assert.Equal(t, domain.LabelPolicyThemeDark, setting.ThemeMode)
-			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
+			assert.Equal(t, domain.LabelStatePreview, *setting.BrandingState)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -680,8 +680,8 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
-						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
+						settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
 				),
@@ -703,7 +703,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			assert.Equal(t, false, setting.ErrorMsgPopup)
 			assert.Equal(t, true, setting.DisableWatermark)
 			assert.Equal(t, domain.LabelPolicyThemeLight, setting.ThemeMode)
-			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
+			assert.Equal(t, domain.LabelStatePreview, *setting.BrandingState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -744,15 +744,15 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
-						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
+						settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
 				),
 			)
 			require.NoError(t, err)
 
-			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
+			assert.Equal(t, domain.LabelStatePreview, *setting.BrandingState)
 		}, retryDuration, tick)
 
 		// check label policy does not exists in activated
@@ -764,8 +764,8 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
-						settingsRepo.LabelStateCondition(domain.LabelStateActivated),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
+						settingsRepo.BrandingStateCondition(domain.LabelStateActivated),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
 				),
@@ -788,8 +788,8 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
-						settingsRepo.LabelStateCondition(domain.LabelStateActivated),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
+						settingsRepo.BrandingStateCondition(domain.LabelStateActivated),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 					),
 				),
@@ -797,7 +797,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.activated
-			assert.Equal(t, domain.LabelStateActivated, *setting.LabelState)
+			assert.Equal(t, domain.LabelStateActivated, *setting.BrandingState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -866,17 +866,17 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 					),
 				),
 			)
 			require.NoError(t, err)
 
 			// event org.policy.label.logo.added
-			assert.NotNil(t, setting.LabelPolicyLightLogoURL)
-			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
+			assert.NotNil(t, setting.LightLogoURL)
+			assert.Equal(t, domain.LabelStatePreview, *setting.BrandingState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -946,17 +946,17 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 					),
 				),
 			)
 			require.NoError(t, err)
 
 			// event org.policy.label.logo.dark.added
-			assert.NotNil(t, setting.LabelPolicyDarkLogoURL)
-			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
+			assert.NotNil(t, setting.DarkLogoURL)
+			assert.Equal(t, domain.LabelStatePreview, *setting.BrandingState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1024,15 +1024,15 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 					),
 				),
 			)
 			require.NoError(t, err)
 
-			assert.NotNil(t, setting.LabelPolicyLightLogoURL)
+			assert.NotNil(t, setting.LightLogoURL)
 		}, retryDuration, tick)
 
 		// remote logo light
@@ -1054,17 +1054,17 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 					),
 				),
 			)
 			require.NoError(t, err)
 
 			// event org.policy.label.logo.removed
-			assert.Nil(t, setting.LabelPolicyLightLogoURL)
-			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
+			assert.Nil(t, setting.LightLogoURL)
+			assert.Equal(t, domain.LabelStatePreview, *setting.BrandingState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1132,15 +1132,15 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 					),
 				),
 			)
 			require.NoError(t, err)
 
-			assert.NotNil(t, setting.LabelPolicyDarkLogoURL)
+			assert.NotNil(t, setting.DarkLogoURL)
 		}, retryDuration, tick)
 
 		// remote logo dark
@@ -1162,17 +1162,17 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 					),
 				),
 			)
 			require.NoError(t, err)
 
 			// event org.policy.label.logo.dark.removed
-			assert.Nil(t, setting.LabelPolicyDarkLogoURL)
-			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
+			assert.Nil(t, setting.DarkLogoURL)
+			assert.Equal(t, domain.LabelStatePreview, *setting.BrandingState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1242,17 +1242,17 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 					),
 				),
 			)
 			require.NoError(t, err)
 
 			// event org.policy.label.icon.added
-			assert.NotNil(t, setting.LabelPolicyLightIconURL)
-			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
+			assert.NotNil(t, setting.LightIconURL)
+			assert.Equal(t, domain.LabelStatePreview, *setting.BrandingState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1321,17 +1321,17 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 					),
 				),
 			)
 			require.NoError(t, err)
 
 			// event org.policy.label.icon.dark.added
-			assert.NotNil(t, setting.LabelPolicyDarkIconURL)
-			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
+			assert.NotNil(t, setting.DarkIconURL)
+			assert.Equal(t, domain.LabelStatePreview, *setting.BrandingState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1399,15 +1399,15 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 					),
 				),
 			)
 			require.NoError(t, err)
 
-			assert.NotNil(t, setting.LabelPolicyLightIconURL)
+			assert.NotNil(t, setting.LightIconURL)
 		}, retryDuration, tick)
 
 		// remote icon light
@@ -1429,17 +1429,17 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 					),
 				),
 			)
 			require.NoError(t, err)
 
 			// event org.policy.label.icon.removed
-			assert.Nil(t, setting.LabelPolicyLightIconURL)
-			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
+			assert.Nil(t, setting.LightIconURL)
+			assert.Equal(t, domain.LabelStatePreview, *setting.BrandingState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1507,16 +1507,16 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 					),
 				),
 			)
 			require.NoError(t, err)
 
-			// assert.Equal(t, domain.LabelPolicyThemeLight, setting.LabelPolicyLightLogoURL)
-			assert.NotNil(t, setting.LabelPolicyDarkIconURL)
+			// assert.Equal(t, domain.LabelPolicyThemeLight, setting.LightLogoURL)
+			assert.NotNil(t, setting.DarkIconURL)
 		}, retryDuration, tick)
 
 		// remote icon dark
@@ -1538,17 +1538,17 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 					),
 				),
 			)
 			require.NoError(t, err)
 
 			// event org.policy.label.icon.dark.removed
-			assert.Nil(t, setting.LabelPolicyDarkIconURL)
-			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
+			assert.Nil(t, setting.DarkIconURL)
+			assert.Equal(t, domain.LabelStatePreview, *setting.BrandingState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1618,17 +1618,17 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 					),
 				),
 			)
 			require.NoError(t, err)
 
 			// event org.policy.label.font.added
-			assert.NotNil(t, setting.LabelPolicyFontURL)
-			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
+			assert.NotNil(t, setting.FontURL)
+			assert.Equal(t, domain.LabelStatePreview, *setting.BrandingState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1695,15 +1695,15 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 					),
 				),
 			)
 			require.NoError(t, err)
 
-			assert.NotNil(t, setting.LabelPolicyFontURL)
+			assert.NotNil(t, setting.FontURL)
 		}, retryDuration, tick)
 
 		// remote font policy
@@ -1725,17 +1725,17 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(instanceID),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 					),
 				),
 			)
 			require.NoError(t, err)
 
 			// event org.policy.label.font.removed
-			assert.Nil(t, setting.LabelPolicyFontURL)
-			assert.Equal(t, domain.LabelStatePreview, *setting.LabelState)
+			assert.Nil(t, setting.FontURL)
+			assert.Equal(t, domain.LabelStatePreview, *setting.BrandingState)
 			assert.WithinRange(t, *setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1776,9 +1776,9 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 					),
 				),
 			)
@@ -1800,9 +1800,9 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 					),
 				),
 			)
@@ -1848,9 +1848,9 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 					),
 				),
 			)
@@ -1874,9 +1874,9 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 					database.And(
 						settingsRepo.InstanceIDCondition(newInstance.ID()),
 						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLabel),
+						settingsRepo.TypeCondition(domain.SettingTypeBranding),
 						settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-						settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+						settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 					),
 				),
 			)

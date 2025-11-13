@@ -848,8 +848,8 @@ func TestSetLabelSetting(t *testing.T) {
 
 	type test struct {
 		name     string
-		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting
-		setting  domain.LabelSetting
+		testFunc func(t *testing.T, tx database.QueryExecutor) *domain.BrandingSetting
+		setting  domain.BrandingSetting
 		err      error
 	}
 
@@ -857,31 +857,31 @@ func TestSetLabelSetting(t *testing.T) {
 	tests := []test{
 		{
 			name: "happy path",
-			setting: domain.LabelSetting{
+			setting: domain.BrandingSetting{
 				Setting: &domain.Setting{
 					InstanceID:     instanceId,
 					OrganizationID: &orgId,
 					ID:             gofakeit.Name(),
-					Type:           domain.SettingTypeLabel,
+					Type:           domain.SettingTypeBranding,
 					OwnerType:      domain.OwnerTypeInstance,
-					LabelState:     gu.Ptr(domain.LabelStatePreview),
+					BrandingState:  gu.Ptr(domain.LabelStatePreview),
 					Settings:       []byte("{}"),
 				},
 			},
 		},
 		{
 			name: "adding setting with same instance id, org id twice",
-			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.BrandingSetting {
 				settingRepo := repository.LabelRepository()
 
-				setting := domain.LabelSetting{
+				setting := domain.BrandingSetting{
 					Setting: &domain.Setting{
 						InstanceID:     instanceId,
 						OrganizationID: &orgId,
 						ID:             gofakeit.Name(),
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeBranding,
 						OwnerType:      domain.OwnerTypeInstance,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
+						BrandingState:  gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
 				}
@@ -890,14 +890,14 @@ func TestSetLabelSetting(t *testing.T) {
 				require.NoError(t, err)
 				return &setting
 			},
-			setting: domain.LabelSetting{
+			setting: domain.BrandingSetting{
 				Setting: &domain.Setting{
 					InstanceID:     instanceId,
 					OrganizationID: &orgId,
 					ID:             gofakeit.Name(),
-					Type:           domain.SettingTypeLabel,
+					Type:           domain.SettingTypeBranding,
 					OwnerType:      domain.OwnerTypeInstance,
-					LabelState:     gu.Ptr(domain.LabelStatePreview),
+					BrandingState:  gu.Ptr(domain.LabelStatePreview),
 					Settings:       []byte("{}"),
 				},
 			},
@@ -907,7 +907,7 @@ func TestSetLabelSetting(t *testing.T) {
 			newOrgId := gofakeit.Name()
 			return test{
 				name: "adding setting with same org (org on different instance), type, different instance",
-				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.BrandingSetting {
 					// create instance
 					instance := domain.Instance{
 						ID:              newInstId,
@@ -935,7 +935,7 @@ func TestSetLabelSetting(t *testing.T) {
 
 					// create setting
 					settingRepo := repository.LabelRepository()
-					setting := domain.LabelSetting{
+					setting := domain.BrandingSetting{
 						Setting: &domain.Setting{
 							InstanceID:     newInstId,
 							OrganizationID: &newOrgId,
@@ -952,13 +952,13 @@ func TestSetLabelSetting(t *testing.T) {
 					setting.InstanceID = instanceId
 					return &setting
 				},
-				setting: domain.LabelSetting{
+				setting: domain.BrandingSetting{
 					Setting: &domain.Setting{
 						InstanceID:     instanceId,
 						OrganizationID: &newOrgId,
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeBranding,
 						OwnerType:      domain.OwnerTypeInstance,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
+						BrandingState:  gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
 				},
@@ -970,7 +970,7 @@ func TestSetLabelSetting(t *testing.T) {
 			newOrgId := gofakeit.Name()
 			return test{
 				name: "adding setting with same instance, type, different org (org on different instance)",
-				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.BrandingSetting {
 					// create instance
 					instance := domain.Instance{
 						ID:              newInstId,
@@ -998,13 +998,13 @@ func TestSetLabelSetting(t *testing.T) {
 
 					// create setting
 					settingRepo := repository.LabelRepository()
-					setting := domain.LabelSetting{
+					setting := domain.BrandingSetting{
 						Setting: &domain.Setting{
 							InstanceID:     newInstId,
 							OrganizationID: &newOrgId,
 							Type:           domain.SettingTypeLockout,
 							OwnerType:      domain.OwnerTypeInstance,
-							LabelState:     gu.Ptr(domain.LabelStatePreview),
+							BrandingState:  gu.Ptr(domain.LabelStatePreview),
 							Settings:       []byte("{}"),
 						},
 					}
@@ -1016,13 +1016,13 @@ func TestSetLabelSetting(t *testing.T) {
 					setting.OrganizationID = &orgId
 					return &setting
 				},
-				setting: domain.LabelSetting{
+				setting: domain.BrandingSetting{
 					Setting: &domain.Setting{
 						InstanceID:     newInstId,
 						OrganizationID: &orgId,
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeBranding,
 						OwnerType:      domain.OwnerTypeInstance,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
+						BrandingState:  gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
 				},
@@ -1034,7 +1034,7 @@ func TestSetLabelSetting(t *testing.T) {
 			newOrgId := gofakeit.Name()
 			return test{
 				name: "adding setting with same instance, type different org (org on same instance)",
-				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
+				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.BrandingSetting {
 					// create instance
 					instance := domain.Instance{
 						ID:              newInstId,
@@ -1062,13 +1062,13 @@ func TestSetLabelSetting(t *testing.T) {
 
 					// create setting
 					settingRepo := repository.LabelRepository()
-					setting := domain.LabelSetting{
+					setting := domain.BrandingSetting{
 						Setting: &domain.Setting{
 							InstanceID:     newInstId,
 							OrganizationID: &org.ID,
-							Type:           domain.SettingTypeLabel,
+							Type:           domain.SettingTypeBranding,
 							OwnerType:      domain.OwnerTypeInstance,
-							LabelState:     gu.Ptr(domain.LabelStatePreview),
+							BrandingState:  gu.Ptr(domain.LabelStatePreview),
 							Settings:       []byte("{}"),
 						},
 					}
@@ -1090,13 +1090,13 @@ func TestSetLabelSetting(t *testing.T) {
 					setting.OrganizationID = &newOrgId
 					return &setting
 				},
-				setting: domain.LabelSetting{
+				setting: domain.BrandingSetting{
 					Setting: &domain.Setting{
 						InstanceID:     newInstId,
 						OrganizationID: &newOrgId,
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeBranding,
 						OwnerType:      domain.OwnerTypeInstance,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
+						BrandingState:  gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
 				},
@@ -1104,14 +1104,14 @@ func TestSetLabelSetting(t *testing.T) {
 		}(),
 		{
 			name: "adding idp with non existent instance id",
-			setting: domain.LabelSetting{
+			setting: domain.BrandingSetting{
 				Setting: &domain.Setting{
 					InstanceID:     gofakeit.Name(),
 					OrganizationID: &orgId,
 					ID:             gofakeit.Name(),
 					Type:           domain.SettingTypeLockout,
 					OwnerType:      domain.OwnerTypeInstance,
-					LabelState:     gu.Ptr(domain.LabelStatePreview),
+					BrandingState:  gu.Ptr(domain.LabelStatePreview),
 					Settings:       []byte("{}"),
 				},
 			},
@@ -1119,14 +1119,14 @@ func TestSetLabelSetting(t *testing.T) {
 		},
 		{
 			name: "adding idp with non existent org id",
-			setting: domain.LabelSetting{
+			setting: domain.BrandingSetting{
 				Setting: &domain.Setting{
 					InstanceID:     instanceId,
 					OrganizationID: gu.Ptr(gofakeit.Name()),
 					ID:             gofakeit.Name(),
 					Type:           domain.SettingTypeLockout,
 					OwnerType:      domain.OwnerTypeInstance,
-					LabelState:     gu.Ptr(domain.LabelStatePreview),
+					BrandingState:  gu.Ptr(domain.LabelStatePreview),
 					Settings:       []byte("{}"),
 				},
 			},
@@ -1134,14 +1134,14 @@ func TestSetLabelSetting(t *testing.T) {
 		},
 		{
 			name: "adding idp with non existent org id",
-			setting: domain.LabelSetting{
+			setting: domain.BrandingSetting{
 				Setting: &domain.Setting{
 					InstanceID:     instanceId,
 					OrganizationID: gu.Ptr(gofakeit.Name()),
 					ID:             gofakeit.Name(),
 					Type:           domain.SettingTypeLockout,
 					OwnerType:      domain.OwnerTypeInstance,
-					LabelState:     gu.Ptr(domain.LabelStatePreview),
+					BrandingState:  gu.Ptr(domain.LabelStatePreview),
 					Settings:       []byte("{}"),
 				},
 			},
@@ -1149,7 +1149,7 @@ func TestSetLabelSetting(t *testing.T) {
 		},
 		{
 			name: "instance id not set",
-			setting: domain.LabelSetting{
+			setting: domain.BrandingSetting{
 				Setting: &domain.Setting{
 					// InstanceID: instanceId,
 					OrganizationID: gu.Ptr(gofakeit.Name()),
@@ -1163,7 +1163,7 @@ func TestSetLabelSetting(t *testing.T) {
 		},
 		{
 			name: "owner type not set",
-			setting: domain.LabelSetting{
+			setting: domain.BrandingSetting{
 				Setting: &domain.Setting{
 					InstanceID:     instanceId,
 					OrganizationID: gu.Ptr(gofakeit.Name()),
@@ -1187,7 +1187,7 @@ func TestSetLabelSetting(t *testing.T) {
 				}
 			}()
 
-			var setting *domain.LabelSetting
+			var setting *domain.BrandingSetting
 			if tt.testFunc != nil {
 				setting = tt.testFunc(t, tx)
 			} else {
@@ -1210,7 +1210,7 @@ func TestSetLabelSetting(t *testing.T) {
 						settingRepo.OrganizationIDCondition(setting.OrganizationID),
 						settingRepo.TypeCondition(setting.Type),
 						settingRepo.OwnerTypeCondition(setting.OwnerType),
-						settingRepo.LabelStateCondition(*setting.LabelState),
+						settingRepo.BrandingStateCondition(*setting.BrandingState),
 					),
 				),
 			)
@@ -1386,9 +1386,9 @@ func TestUpdateSetting(t *testing.T) {
 			conditions: database.And(
 				// settingRepo.InstanceIDCondition(instanceId),
 				settingRepo.OrganizationIDCondition(&orgId),
-				settingRepo.TypeCondition(domain.SettingTypeLabel),
+				settingRepo.TypeCondition(domain.SettingTypeBranding),
 				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+				settingRepo.BrandingStateCondition(domain.LabelStatePreview)),
 			err: database.NewMissingConditionError(settingRepo.InstanceIDColumn()),
 		},
 		{
@@ -1396,9 +1396,9 @@ func TestUpdateSetting(t *testing.T) {
 			conditions: database.And(
 				settingRepo.InstanceIDCondition(instanceId),
 				// settingRepo.OrgIDCondition(&orgId),
-				settingRepo.TypeCondition(domain.SettingTypeLabel),
+				settingRepo.TypeCondition(domain.SettingTypeBranding),
 				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+				settingRepo.BrandingStateCondition(domain.LabelStatePreview)),
 			err: database.NewMissingConditionError(settingRepo.OrganizationIDColumn()),
 		},
 		{
@@ -1406,9 +1406,9 @@ func TestUpdateSetting(t *testing.T) {
 			conditions: database.And(
 				settingRepo.InstanceIDCondition(instanceId),
 				settingRepo.OrganizationIDCondition(&orgId),
-				// settingRepo.TypeCondition(domain.SettingTypeLabel),
+				// settingRepo.TypeCondition(domain.SettingTypeBranding),
 				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+				settingRepo.BrandingStateCondition(domain.LabelStatePreview)),
 			err: database.NewMissingConditionError(settingRepo.TypeColumn()),
 		},
 		{
@@ -1418,7 +1418,7 @@ func TestUpdateSetting(t *testing.T) {
 				settingRepo.OrganizationIDCondition(&orgId),
 				settingRepo.TypeCondition(domain.SettingTypeOrganization),
 				// settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+				settingRepo.BrandingStateCondition(domain.LabelStatePreview)),
 			err: database.NewMissingConditionError(settingRepo.OwnerTypeColumn()),
 		},
 	}
@@ -1461,7 +1461,7 @@ func TestUpdateSetting(t *testing.T) {
 						settingRepo.OrganizationIDCondition(setting.OrganizationID),
 						settingRepo.TypeCondition(setting.Type),
 						settingRepo.OwnerTypeCondition(setting.OwnerType),
-						settingRepo.LabelStateCondition(*setting.LabelState),
+						settingRepo.BrandingStateCondition(*setting.BrandingState),
 					),
 				),
 			)
@@ -1842,9 +1842,9 @@ func TestCreateGetLoginPolicySetting(t *testing.T) {
 					Setting: &domain.Setting{
 						InstanceID:     instanceId,
 						OrganizationID: &orgId,
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeBranding,
 						OwnerType:      domain.OwnerTypeInstance,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
+						BrandingState:  gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
 					AllowUserNamePassword:      true,
@@ -1897,7 +1897,7 @@ func TestCreateGetLoginPolicySetting(t *testing.T) {
 						settingRepo.OrganizationIDCondition(setting.OrganizationID),
 						settingRepo.TypeCondition(setting.Type),
 						settingRepo.OwnerTypeCondition(setting.OwnerType),
-						settingRepo.LabelStateCondition(*setting.LabelState),
+						settingRepo.BrandingStateCondition(*setting.BrandingState),
 					),
 				),
 			)
@@ -1960,7 +1960,7 @@ func TestCreateGetLabelPolicySetting(t *testing.T) {
 
 	type test struct {
 		name       string
-		testFunc   func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting
+		testFunc   func(t *testing.T, tx database.QueryExecutor) *domain.BrandingSetting
 		conditions database.Condition
 		err        error
 	}
@@ -1968,14 +1968,14 @@ func TestCreateGetLabelPolicySetting(t *testing.T) {
 	tests := []test{
 		{
 			name: "happy path, state preview",
-			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
-				setting := domain.LabelSetting{
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.BrandingSetting {
+				setting := domain.BrandingSetting{
 					Setting: &domain.Setting{
 						InstanceID:     instanceId,
 						OrganizationID: &orgId,
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeBranding,
 						OwnerType:      domain.OwnerTypeOrganization,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
+						BrandingState:  gu.Ptr(domain.LabelStatePreview),
 					},
 					PrimaryColor:        "value",
 					BackgroundColor:     "value",
@@ -1998,18 +1998,18 @@ func TestCreateGetLabelPolicySetting(t *testing.T) {
 			conditions: database.And(
 				settingRepo.InstanceIDCondition(instanceId),
 				settingRepo.OrganizationIDCondition(&orgId),
-				settingRepo.TypeCondition(domain.SettingTypeLabel),
+				settingRepo.TypeCondition(domain.SettingTypeBranding),
 				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+				settingRepo.BrandingStateCondition(domain.LabelStatePreview)),
 		},
 		{
 			name: "missing instance id condition",
 			conditions: database.And(
 				// settingRepo.InstanceIDCondition(instanceId),
 				settingRepo.OrganizationIDCondition(&orgId),
-				settingRepo.TypeCondition(domain.SettingTypeLabel),
+				settingRepo.TypeCondition(domain.SettingTypeBranding),
 				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+				settingRepo.BrandingStateCondition(domain.LabelStatePreview)),
 			err: database.NewMissingConditionError(settingRepo.InstanceIDColumn()),
 		},
 		{
@@ -2017,9 +2017,9 @@ func TestCreateGetLabelPolicySetting(t *testing.T) {
 			conditions: database.And(
 				settingRepo.InstanceIDCondition(instanceId),
 				// settingRepo.OrgIDCondition(&orgId),
-				settingRepo.TypeCondition(domain.SettingTypeLabel),
+				settingRepo.TypeCondition(domain.SettingTypeBranding),
 				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+				settingRepo.BrandingStateCondition(domain.LabelStatePreview)),
 			err: database.NewMissingConditionError(settingRepo.OrganizationIDColumn()),
 		},
 		{
@@ -2027,9 +2027,9 @@ func TestCreateGetLabelPolicySetting(t *testing.T) {
 			conditions: database.And(
 				settingRepo.InstanceIDCondition(instanceId),
 				settingRepo.OrganizationIDCondition(&orgId),
-				// settingRepo.TypeCondition(domain.SettingTypeLabel),
+				// settingRepo.TypeCondition(domain.SettingTypeBranding),
 				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+				settingRepo.BrandingStateCondition(domain.LabelStatePreview)),
 			err: database.NewMissingConditionError(settingRepo.TypeColumn()),
 		},
 		{
@@ -2037,9 +2037,9 @@ func TestCreateGetLabelPolicySetting(t *testing.T) {
 			conditions: database.And(
 				settingRepo.InstanceIDCondition(instanceId),
 				settingRepo.OrganizationIDCondition(&orgId),
-				settingRepo.TypeCondition(domain.SettingTypeLabel),
+				settingRepo.TypeCondition(domain.SettingTypeBranding),
 				// settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+				settingRepo.BrandingStateCondition(domain.LabelStatePreview)),
 			err: database.NewMissingConditionError(settingRepo.OwnerTypeColumn()),
 		},
 		{
@@ -2047,21 +2047,21 @@ func TestCreateGetLabelPolicySetting(t *testing.T) {
 			conditions: database.And(
 				settingRepo.InstanceIDCondition(instanceId),
 				settingRepo.OrganizationIDCondition(&orgId),
-				settingRepo.TypeCondition(domain.SettingTypeLabel),
+				settingRepo.TypeCondition(domain.SettingTypeBranding),
 				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization)),
-			// settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+			// settingRepo.BrandingStateCondition(domain.LabelStatePreview)),
 			err: database.NewMissingConditionError(settingRepo.LabelStateColumn()),
 		},
 		{
 			name: "happy path, state activated",
-			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
-				setting := domain.LabelSetting{
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.BrandingSetting {
+				setting := domain.BrandingSetting{
 					Setting: &domain.Setting{
 						InstanceID:     instanceId,
 						OrganizationID: &orgId,
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeBranding,
 						OwnerType:      domain.OwnerTypeOrganization,
-						LabelState:     gu.Ptr(domain.LabelStateActivated),
+						BrandingState:  gu.Ptr(domain.LabelStateActivated),
 					},
 					PrimaryColor:        "value",
 					BackgroundColor:     "value",
@@ -2084,47 +2084,47 @@ func TestCreateGetLabelPolicySetting(t *testing.T) {
 			conditions: database.And(
 				settingRepo.InstanceIDCondition(instanceId),
 				settingRepo.OrganizationIDCondition(&orgId),
-				settingRepo.TypeCondition(domain.SettingTypeLabel),
+				settingRepo.TypeCondition(domain.SettingTypeBranding),
 				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStateActivated)),
+				settingRepo.BrandingStateCondition(domain.LabelStateActivated)),
 		},
 		{
 			name: "get label policy using wrong state",
-			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
-				setting := domain.LabelSetting{
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.BrandingSetting {
+				setting := domain.BrandingSetting{
 					Setting: &domain.Setting{
 						InstanceID:     instanceId,
 						OrganizationID: &orgId,
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeBranding,
 						OwnerType:      domain.OwnerTypeInstance,
-						LabelState:     gu.Ptr(domain.LabelStateActivated),
+						BrandingState:  gu.Ptr(domain.LabelStateActivated),
 					},
 				}
 
 				err := settingRepo.Set(t.Context(), tx, &setting)
 				require.NoError(t, err)
 
-				setting.LabelState = gu.Ptr(domain.LabelStatePreview)
+				setting.BrandingState = gu.Ptr(domain.LabelStatePreview)
 				return &setting
 			},
 			conditions: database.And(
 				settingRepo.InstanceIDCondition(instanceId),
 				settingRepo.OrganizationIDCondition(&orgId),
-				settingRepo.TypeCondition(domain.SettingTypeLabel),
+				settingRepo.TypeCondition(domain.SettingTypeBranding),
 				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+				settingRepo.BrandingStateCondition(domain.LabelStatePreview)),
 			err: new(database.NoRowFoundError),
 		},
 		{
 			name: "get non existent label policy",
-			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
-				setting := domain.LabelSetting{
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.BrandingSetting {
+				setting := domain.BrandingSetting{
 					Setting: &domain.Setting{
 						InstanceID:     instanceId,
 						OrganizationID: &orgId,
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeBranding,
 						OwnerType:      domain.OwnerTypeInstance,
-						LabelState:     gu.Ptr(domain.LabelStateActivated),
+						BrandingState:  gu.Ptr(domain.LabelStateActivated),
 						Settings:       []byte("{}"),
 					},
 				}
@@ -2134,9 +2134,9 @@ func TestCreateGetLabelPolicySetting(t *testing.T) {
 			conditions: database.And(
 				settingRepo.InstanceIDCondition(instanceId),
 				settingRepo.OrganizationIDCondition(&orgId),
-				settingRepo.TypeCondition(domain.SettingTypeLabel),
+				settingRepo.TypeCondition(domain.SettingTypeBranding),
 				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+				settingRepo.BrandingStateCondition(domain.LabelStatePreview)),
 			err: new(database.NoRowFoundError),
 		},
 	}
@@ -2151,7 +2151,7 @@ func TestCreateGetLabelPolicySetting(t *testing.T) {
 				}
 			}()
 
-			var setting *domain.LabelSetting
+			var setting *domain.BrandingSetting
 			if tt.testFunc != nil {
 				setting = tt.testFunc(t, tx)
 			}
@@ -2244,9 +2244,9 @@ func TestCreateGetPasswordComplexityPolicySetting(t *testing.T) {
 					Setting: &domain.Setting{
 						InstanceID:     instanceId,
 						OrganizationID: &orgId,
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeBranding,
 						OwnerType:      domain.OwnerTypeInstance,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
+						BrandingState:  gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
 					MinLength:    89,
@@ -2287,7 +2287,7 @@ func TestCreateGetPasswordComplexityPolicySetting(t *testing.T) {
 						settingRepo.OrganizationIDCondition(setting.OrganizationID),
 						settingRepo.TypeCondition(setting.Type),
 						settingRepo.OwnerTypeCondition(setting.OwnerType),
-						settingRepo.LabelStateCondition(*setting.LabelState),
+						settingRepo.BrandingStateCondition(*setting.BrandingState),
 					),
 				),
 			)
@@ -2359,9 +2359,9 @@ func TestCreateGetPasswordExpiryPolicySetting(t *testing.T) {
 					Setting: &domain.Setting{
 						InstanceID:     instanceId,
 						OrganizationID: &orgId,
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeBranding,
 						OwnerType:      domain.OwnerTypeInstance,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
+						BrandingState:  gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
 					ExpireWarnDays: 30,
@@ -2399,7 +2399,7 @@ func TestCreateGetPasswordExpiryPolicySetting(t *testing.T) {
 						settingRepo.OrganizationIDCondition(setting.OrganizationID),
 						settingRepo.TypeCondition(setting.Type),
 						settingRepo.OwnerTypeCondition(setting.OwnerType),
-						settingRepo.LabelStateCondition(*setting.LabelState),
+						settingRepo.BrandingStateCondition(*setting.BrandingState),
 					),
 				),
 			)
@@ -2471,9 +2471,9 @@ func TestCreateGetLockoutPolicySetting(t *testing.T) {
 					Setting: &domain.Setting{
 						InstanceID:     instanceId,
 						OrganizationID: &orgId,
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeBranding,
 						OwnerType:      domain.OwnerTypeInstance,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
+						BrandingState:  gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
 					MaxPasswordAttempts: 50,
@@ -2512,7 +2512,7 @@ func TestCreateGetLockoutPolicySetting(t *testing.T) {
 						settingRepo.OrganizationIDCondition(setting.OrganizationID),
 						settingRepo.TypeCondition(setting.Type),
 						settingRepo.OwnerTypeCondition(setting.OwnerType),
-						settingRepo.LabelStateCondition(*setting.LabelState),
+						settingRepo.BrandingStateCondition(*setting.BrandingState),
 					),
 				),
 			)
@@ -2584,9 +2584,9 @@ func TestCreateGetSecurityPolicySetting(t *testing.T) {
 					Setting: &domain.Setting{
 						InstanceID:     instanceId,
 						OrganizationID: &orgId,
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeBranding,
 						OwnerType:      domain.OwnerTypeInstance,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
+						BrandingState:  gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
 					Enabled:               true,
@@ -2617,7 +2617,7 @@ func TestCreateGetSecurityPolicySetting(t *testing.T) {
 						settingRepo.OrganizationIDCondition(setting.OrganizationID),
 						settingRepo.TypeCondition(setting.Type),
 						settingRepo.OwnerTypeCondition(setting.OwnerType),
-						settingRepo.LabelStateCondition(*setting.LabelState),
+						settingRepo.BrandingStateCondition(*setting.BrandingState),
 					),
 				),
 			)
@@ -2689,9 +2689,9 @@ func TestCreateGetDomainPolicySetting(t *testing.T) {
 					Setting: &domain.Setting{
 						InstanceID:     instanceId,
 						OrganizationID: &orgId,
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeBranding,
 						OwnerType:      domain.OwnerTypeInstance,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
+						BrandingState:  gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
 					UserLoginMustBeDomain:                  true,
@@ -2721,7 +2721,7 @@ func TestCreateGetDomainPolicySetting(t *testing.T) {
 						settingRepo.OrganizationIDCondition(setting.OrganizationID),
 						settingRepo.TypeCondition(setting.Type),
 						settingRepo.OwnerTypeCondition(setting.OwnerType),
-						settingRepo.LabelStateCondition(*setting.LabelState),
+						settingRepo.BrandingStateCondition(*setting.BrandingState),
 					),
 				),
 			)
@@ -2793,9 +2793,9 @@ func TestCreateGetOrgPolicySetting(t *testing.T) {
 					Setting: &domain.Setting{
 						InstanceID:     instanceId,
 						OrganizationID: &orgId,
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeBranding,
 						OwnerType:      domain.OwnerTypeInstance,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
+						BrandingState:  gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
 					OrganizationScopedUsernames: true,
@@ -2823,7 +2823,7 @@ func TestCreateGetOrgPolicySetting(t *testing.T) {
 						settingRepo.OrganizationIDCondition(setting.OrganizationID),
 						settingRepo.TypeCondition(setting.Type),
 						settingRepo.OwnerTypeCondition(setting.OwnerType),
-						settingRepo.LabelStateCondition(*setting.LabelState),
+						settingRepo.BrandingStateCondition(*setting.BrandingState),
 					),
 				),
 			)
@@ -2900,9 +2900,9 @@ func TestCreateUpdateLoginPolicySetting(t *testing.T) {
 					Setting: &domain.Setting{
 						InstanceID:     instanceId,
 						OrganizationID: &orgId,
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeBranding,
 						OwnerType:      domain.OwnerTypeInstance,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
+						BrandingState:  gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
 					AllowUserNamePassword:      true,
@@ -2951,7 +2951,7 @@ func TestCreateUpdateLoginPolicySetting(t *testing.T) {
 				return &setting
 			},
 			changes: database.Changes{
-				settingRepo.SetLabelSettings(
+				settingRepo.SetBrandingSettings(
 					settingRepo.SetAllowUserNamePasswordField(false),
 					settingRepo.SetAllowDomainDiscoveryField(false),
 					settingRepo.SetAllowRegisterField(false),
@@ -2999,7 +2999,7 @@ func TestCreateUpdateLoginPolicySetting(t *testing.T) {
 					settingRepo.OrganizationIDCondition(setting.OrganizationID),
 					settingRepo.TypeCondition(setting.Type),
 					settingRepo.OwnerTypeCondition(setting.OwnerType),
-					settingRepo.LabelStateCondition(*setting.LabelState),
+					settingRepo.BrandingStateCondition(*setting.BrandingState),
 				),
 				tt.changes,
 			)
@@ -3013,7 +3013,7 @@ func TestCreateUpdateLoginPolicySetting(t *testing.T) {
 						settingRepo.OrganizationIDCondition(setting.OrganizationID),
 						settingRepo.TypeCondition(setting.Type),
 						settingRepo.OwnerTypeCondition(setting.OwnerType),
-						settingRepo.LabelStateCondition(*setting.LabelState),
+						settingRepo.BrandingStateCondition(*setting.BrandingState),
 					),
 				),
 			)
@@ -3089,7 +3089,7 @@ func TestCreateUpdateLabelPolicySetting(t *testing.T) {
 
 	type test struct {
 		name       string
-		testFunc   func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting
+		testFunc   func(t *testing.T, tx database.QueryExecutor) *domain.BrandingSetting
 		conditions database.Condition
 		changes    database.Changes
 		err        error
@@ -3098,14 +3098,14 @@ func TestCreateUpdateLabelPolicySetting(t *testing.T) {
 	tests := []test{
 		{
 			name: "happy path",
-			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.LabelSetting {
-				setting := domain.LabelSetting{
+			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.BrandingSetting {
+				setting := domain.BrandingSetting{
 					Setting: &domain.Setting{
 						InstanceID:     instanceId,
 						OrganizationID: &orgId,
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeBranding,
 						OwnerType:      domain.OwnerTypeOrganization,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
+						BrandingState:  gu.Ptr(domain.LabelStatePreview),
 					},
 					PrimaryColor:        "value",
 					BackgroundColor:     "value",
@@ -3141,11 +3141,11 @@ func TestCreateUpdateLabelPolicySetting(t *testing.T) {
 			conditions: database.And(
 				settingRepo.InstanceIDCondition(instanceId),
 				settingRepo.OrganizationIDCondition(&orgId),
-				settingRepo.TypeCondition(domain.SettingTypeLabel),
+				settingRepo.TypeCondition(domain.SettingTypeBranding),
 				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+				settingRepo.BrandingStateCondition(domain.LabelStatePreview)),
 			changes: database.Changes{
-				settingRepo.SetLabelSettings(
+				settingRepo.SetBrandingSettings(
 					settingRepo.SetPrimaryColorField("new_value"),
 					settingRepo.SetBackgroundColorField("new_value"),
 					settingRepo.SetWarnColorField("new_value"),
@@ -3164,76 +3164,76 @@ func TestCreateUpdateLabelPolicySetting(t *testing.T) {
 		{
 			name: "missing instance id condition",
 			changes: database.Changes{
-				settingRepo.SetLabelSettings(
+				settingRepo.SetBrandingSettings(
 					settingRepo.SetBackgroundColorDarkField("new_value"),
 				),
 			},
 			conditions: database.And(
 				// settingRepo.InstanceIDCondition(instanceId),
 				settingRepo.OrganizationIDCondition(&orgId),
-				settingRepo.TypeCondition(domain.SettingTypeLabel),
+				settingRepo.TypeCondition(domain.SettingTypeBranding),
 				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+				settingRepo.BrandingStateCondition(domain.LabelStatePreview)),
 			err: database.NewMissingConditionError(settingRepo.InstanceIDColumn()),
 		},
 		{
 			name: "missing org id condition",
 			changes: database.Changes{
-				settingRepo.SetLabelSettings(
+				settingRepo.SetBrandingSettings(
 					settingRepo.SetBackgroundColorDarkField("new_value"),
 				),
 			},
 			conditions: database.And(
 				settingRepo.InstanceIDCondition(instanceId),
 				// settingRepo.OrgIDCondition(&orgId),
-				settingRepo.TypeCondition(domain.SettingTypeLabel),
+				settingRepo.TypeCondition(domain.SettingTypeBranding),
 				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+				settingRepo.BrandingStateCondition(domain.LabelStatePreview)),
 			err: database.NewMissingConditionError(settingRepo.OrganizationIDColumn()),
 		},
 		{
 			name: "missing type condition",
 			changes: database.Changes{
-				settingRepo.SetLabelSettings(
+				settingRepo.SetBrandingSettings(
 					settingRepo.SetBackgroundColorDarkField("new_value"),
 				),
 			},
 			conditions: database.And(
 				settingRepo.InstanceIDCondition(instanceId),
 				settingRepo.OrganizationIDCondition(&orgId),
-				// settingRepo.TypeCondition(domain.SettingTypeLabel),
+				// settingRepo.TypeCondition(domain.SettingTypeBranding),
 				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+				settingRepo.BrandingStateCondition(domain.LabelStatePreview)),
 			err: database.NewMissingConditionError(settingRepo.TypeColumn()),
 		},
 		{
 			name: "missing owner type condition",
 			changes: database.Changes{
-				settingRepo.SetLabelSettings(
+				settingRepo.SetBrandingSettings(
 					settingRepo.SetBackgroundColorDarkField("new_value"),
 				),
 			},
 			conditions: database.And(
 				settingRepo.InstanceIDCondition(instanceId),
 				settingRepo.OrganizationIDCondition(&orgId),
-				settingRepo.TypeCondition(domain.SettingTypeLabel),
+				settingRepo.TypeCondition(domain.SettingTypeBranding),
 				// settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+				settingRepo.BrandingStateCondition(domain.LabelStatePreview)),
 			err: database.NewMissingConditionError(settingRepo.OwnerTypeColumn()),
 		},
 		{
 			name: "missing owner label state condition",
 			changes: database.Changes{
-				settingRepo.SetLabelSettings(
+				settingRepo.SetBrandingSettings(
 					settingRepo.SetBackgroundColorDarkField("new_value"),
 				),
 			},
 			conditions: database.And(
 				settingRepo.InstanceIDCondition(instanceId),
 				settingRepo.OrganizationIDCondition(&orgId),
-				settingRepo.TypeCondition(domain.SettingTypeLabel),
+				settingRepo.TypeCondition(domain.SettingTypeBranding),
 				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization)),
-			// settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+			// settingRepo.BrandingStateCondition(domain.LabelStatePreview)),
 			err: database.NewMissingConditionError(settingRepo.LabelStateColumn()),
 		},
 	}
@@ -3248,7 +3248,7 @@ func TestCreateUpdateLabelPolicySetting(t *testing.T) {
 				}
 			}()
 
-			var setting *domain.LabelSetting
+			var setting *domain.BrandingSetting
 			if tt.testFunc != nil {
 				setting = tt.testFunc(t, tx)
 			}
@@ -3344,9 +3344,9 @@ func TestCreateUpdatePasswordComplexityPolicySetting(t *testing.T) {
 					Setting: &domain.Setting{
 						InstanceID:     instanceId,
 						OrganizationID: &orgId,
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeBranding,
 						OwnerType:      domain.OwnerTypeInstance,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
+						BrandingState:  gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
 					MinLength:    89,
@@ -3367,7 +3367,7 @@ func TestCreateUpdatePasswordComplexityPolicySetting(t *testing.T) {
 				return &setting
 			},
 			changes: database.Changes{
-				settingRepo.SetLabelSettings(
+				settingRepo.SetBrandingSettings(
 					settingRepo.SetMinLengthField(200),
 					settingRepo.SetHasLowercaseField(false),
 					settingRepo.SetHasUppercaseField(false),
@@ -3400,7 +3400,7 @@ func TestCreateUpdatePasswordComplexityPolicySetting(t *testing.T) {
 					settingRepo.OrganizationIDCondition(setting.OrganizationID),
 					settingRepo.TypeCondition(setting.Type),
 					settingRepo.OwnerTypeCondition(setting.OwnerType),
-					settingRepo.LabelStateCondition(*setting.LabelState),
+					settingRepo.BrandingStateCondition(*setting.BrandingState),
 				),
 				tt.changes,
 			)
@@ -3414,7 +3414,7 @@ func TestCreateUpdatePasswordComplexityPolicySetting(t *testing.T) {
 						settingRepo.OrganizationIDCondition(setting.OrganizationID),
 						settingRepo.TypeCondition(setting.Type),
 						settingRepo.OwnerTypeCondition(setting.OwnerType),
-						settingRepo.LabelStateCondition(*setting.LabelState),
+						settingRepo.BrandingStateCondition(*setting.BrandingState),
 					),
 				),
 			)
@@ -3491,9 +3491,9 @@ func TestCreateUpdatePasswordExpiryPolicySetting(t *testing.T) {
 					Setting: &domain.Setting{
 						InstanceID:     instanceId,
 						OrganizationID: &orgId,
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeBranding,
 						OwnerType:      domain.OwnerTypeInstance,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
+						BrandingState:  gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
 					ExpireWarnDays: 30,
@@ -3508,7 +3508,7 @@ func TestCreateUpdatePasswordExpiryPolicySetting(t *testing.T) {
 				return &setting
 			},
 			changes: database.Changes{
-				settingRepo.SetLabelSettings(
+				settingRepo.SetBrandingSettings(
 					settingRepo.SetExpireWarnDays(200),
 					settingRepo.SetMaxAgeDays(200),
 				),
@@ -3538,7 +3538,7 @@ func TestCreateUpdatePasswordExpiryPolicySetting(t *testing.T) {
 					settingRepo.OrganizationIDCondition(setting.OrganizationID),
 					settingRepo.TypeCondition(setting.Type),
 					settingRepo.OwnerTypeCondition(setting.OwnerType),
-					settingRepo.LabelStateCondition(*setting.LabelState),
+					settingRepo.BrandingStateCondition(*setting.BrandingState),
 				),
 				tt.changes,
 			)
@@ -3552,7 +3552,7 @@ func TestCreateUpdatePasswordExpiryPolicySetting(t *testing.T) {
 						settingRepo.OrganizationIDCondition(setting.OrganizationID),
 						settingRepo.TypeCondition(setting.Type),
 						settingRepo.OwnerTypeCondition(setting.OwnerType),
-						settingRepo.LabelStateCondition(*setting.LabelState),
+						settingRepo.BrandingStateCondition(*setting.BrandingState),
 					),
 				),
 			)
@@ -3626,9 +3626,9 @@ func TestCreateUpdateLockoutPolicySetting(t *testing.T) {
 					Setting: &domain.Setting{
 						InstanceID:     instanceId,
 						OrganizationID: &orgId,
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeBranding,
 						OwnerType:      domain.OwnerTypeInstance,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
+						BrandingState:  gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
 					MaxPasswordAttempts: 50,
@@ -3645,7 +3645,7 @@ func TestCreateUpdateLockoutPolicySetting(t *testing.T) {
 				return &setting
 			},
 			changes: database.Changes{
-				settingRepo.SetLabelSettings(
+				settingRepo.SetBrandingSettings(
 					settingRepo.SetMaxPasswordAttempts(100),
 					settingRepo.SetMaxOTPAttempts(100),
 					settingRepo.SetShowLockOutFailures(false),
@@ -3676,7 +3676,7 @@ func TestCreateUpdateLockoutPolicySetting(t *testing.T) {
 					settingRepo.OrganizationIDCondition(setting.OrganizationID),
 					settingRepo.TypeCondition(setting.Type),
 					settingRepo.OwnerTypeCondition(setting.OwnerType),
-					settingRepo.LabelStateCondition(*setting.LabelState),
+					settingRepo.BrandingStateCondition(*setting.BrandingState),
 				),
 				tt.changes,
 			)
@@ -3690,7 +3690,7 @@ func TestCreateUpdateLockoutPolicySetting(t *testing.T) {
 						settingRepo.OrganizationIDCondition(setting.OrganizationID),
 						settingRepo.TypeCondition(setting.Type),
 						settingRepo.OwnerTypeCondition(setting.OwnerType),
-						settingRepo.LabelStateCondition(*setting.LabelState),
+						settingRepo.BrandingStateCondition(*setting.BrandingState),
 					),
 				),
 			)
@@ -3785,7 +3785,7 @@ func TestCreateUpdateSecurityPolicySetting(t *testing.T) {
 				return &setting
 			},
 			changes: database.Changes{
-				settingRepo.SetLabelSettings(
+				settingRepo.SetBrandingSettings(
 					settingRepo.SetEnabled(false),
 					settingRepo.SetEnableIframeEmbedding(false),
 					settingRepo.SetEnableImpersonation(false),
@@ -3896,9 +3896,9 @@ func TestCreateUpdateDomainPolicySetting(t *testing.T) {
 					Setting: &domain.Setting{
 						InstanceID:     instanceId,
 						OrganizationID: &orgId,
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeBranding,
 						OwnerType:      domain.OwnerTypeInstance,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
+						BrandingState:  gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
 					UserLoginMustBeDomain:                  true,
@@ -3915,7 +3915,7 @@ func TestCreateUpdateDomainPolicySetting(t *testing.T) {
 				return &setting
 			},
 			changes: database.Changes{
-				settingRepo.SetLabelSettings(
+				settingRepo.SetBrandingSettings(
 					settingRepo.SetUserLoginMustBeDomain(false),
 					settingRepo.SetValidateOrgDomains(false),
 					settingRepo.SetSMTPSenderAddressMatchesInstanceDomain(false),
@@ -3937,7 +3937,7 @@ func TestCreateUpdateDomainPolicySetting(t *testing.T) {
 					settingRepo.OrganizationIDCondition(setting.OrganizationID),
 					settingRepo.TypeCondition(setting.Type),
 					settingRepo.OwnerTypeCondition(setting.OwnerType),
-					settingRepo.LabelStateCondition(*setting.LabelState),
+					settingRepo.BrandingStateCondition(*setting.BrandingState),
 				),
 				tt.changes,
 			)
@@ -3951,7 +3951,7 @@ func TestCreateUpdateDomainPolicySetting(t *testing.T) {
 						settingRepo.OrganizationIDCondition(setting.OrganizationID),
 						settingRepo.TypeCondition(setting.Type),
 						settingRepo.OwnerTypeCondition(setting.OwnerType),
-						settingRepo.LabelStateCondition(*setting.LabelState),
+						settingRepo.BrandingStateCondition(*setting.BrandingState),
 					),
 				),
 			)
@@ -4026,9 +4026,9 @@ func TestCreateUpdateOrgPolicySetting(t *testing.T) {
 					Setting: &domain.Setting{
 						InstanceID:     instanceId,
 						OrganizationID: &orgId,
-						Type:           domain.SettingTypeLabel,
+						Type:           domain.SettingTypeBranding,
 						OwnerType:      domain.OwnerTypeInstance,
-						LabelState:     gu.Ptr(domain.LabelStatePreview),
+						BrandingState:  gu.Ptr(domain.LabelStatePreview),
 						Settings:       []byte("{}"),
 					},
 					OrganizationScopedUsernames: true,
@@ -4041,7 +4041,7 @@ func TestCreateUpdateOrgPolicySetting(t *testing.T) {
 				return &setting
 			},
 			changes: database.Changes{
-				settingRepo.SetLabelSettings(
+				settingRepo.SetBrandingSettings(
 					settingRepo.SetOrganizationScopedUsernames(false),
 				),
 			},
@@ -4061,7 +4061,7 @@ func TestCreateUpdateOrgPolicySetting(t *testing.T) {
 					settingRepo.OrganizationIDCondition(setting.OrganizationID),
 					settingRepo.TypeCondition(setting.Type),
 					settingRepo.OwnerTypeCondition(setting.OwnerType),
-					settingRepo.LabelStateCondition(*setting.LabelState),
+					settingRepo.BrandingStateCondition(*setting.BrandingState),
 				),
 				tt.changes,
 			)
@@ -4075,7 +4075,7 @@ func TestCreateUpdateOrgPolicySetting(t *testing.T) {
 						settingRepo.OrganizationIDCondition(setting.OrganizationID),
 						settingRepo.TypeCondition(setting.Type),
 						settingRepo.OwnerTypeCondition(setting.OwnerType),
-						settingRepo.LabelStateCondition(*setting.LabelState),
+						settingRepo.BrandingStateCondition(*setting.BrandingState),
 					),
 				),
 			)
@@ -4626,7 +4626,7 @@ func TestDeleteSetting(t *testing.T) {
 			conditions: database.And(
 				// settingRepo.InstanceIDCondition(instanceId),
 				settingRepo.OrganizationIDCondition(&orgId),
-				settingRepo.TypeCondition(domain.SettingTypeLabel),
+				settingRepo.TypeCondition(domain.SettingTypeBranding),
 				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization)),
 			err: database.NewMissingConditionError(settingRepo.InstanceIDColumn()),
 		},
@@ -4635,9 +4635,9 @@ func TestDeleteSetting(t *testing.T) {
 			conditions: database.And(
 				settingRepo.InstanceIDCondition(instanceId),
 				// settingRepo.OrgIDCondition(&orgId),
-				settingRepo.TypeCondition(domain.SettingTypeLabel),
+				settingRepo.TypeCondition(domain.SettingTypeBranding),
 				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+				settingRepo.BrandingStateCondition(domain.LabelStatePreview)),
 			err: database.NewMissingConditionError(settingRepo.OrganizationIDColumn()),
 		},
 		{
@@ -4645,9 +4645,9 @@ func TestDeleteSetting(t *testing.T) {
 			conditions: database.And(
 				settingRepo.InstanceIDCondition(instanceId),
 				settingRepo.OrganizationIDCondition(&orgId),
-				// settingRepo.TypeCondition(domain.SettingTypeLabel),
+				// settingRepo.TypeCondition(domain.SettingTypeBranding),
 				settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+				settingRepo.BrandingStateCondition(domain.LabelStatePreview)),
 			err: database.NewMissingConditionError(settingRepo.TypeColumn()),
 		},
 		{
@@ -4655,9 +4655,9 @@ func TestDeleteSetting(t *testing.T) {
 			conditions: database.And(
 				settingRepo.InstanceIDCondition(instanceId),
 				settingRepo.OrganizationIDCondition(&orgId),
-				settingRepo.TypeCondition(domain.SettingTypeLabel),
+				settingRepo.TypeCondition(domain.SettingTypeBranding),
 				// settingRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
-				settingRepo.LabelStateCondition(domain.LabelStatePreview)),
+				settingRepo.BrandingStateCondition(domain.LabelStatePreview)),
 			err: database.NewMissingConditionError(settingRepo.OwnerTypeColumn()),
 		},
 	}

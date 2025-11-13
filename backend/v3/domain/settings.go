@@ -15,13 +15,15 @@ type SettingType uint8
 const (
 	SettingTypeUnspecified SettingType = iota
 	SettingTypeLogin
-	SettingTypeLabel
+	SettingTypeBranding
 	SettingTypePasswordComplexity
 	SettingTypePasswordExpiry
 	SettingTypeDomain
 	SettingTypeLockout
 	SettingTypeSecurity
 	SettingTypeOrganization
+	SettingTypeNotification
+	SettingTypeLegalAndSupport
 )
 
 //go:generate enumer -type OwnerType -transform snake -trimprefix OwnerType -sql
@@ -35,15 +37,15 @@ const (
 )
 
 type Setting struct {
-	ID             string      `json:"id,omitempty" db:"id"`
-	InstanceID     string      `json:"instanceId,omitempty" db:"instance_id"`
-	OrganizationID *string     `json:"organizationId,omitempty" db:"organization_id"`
-	Type           SettingType `json:"type,omitempty" db:"type"`
-	OwnerType      OwnerType   `json:"ownerType,omitempty" db:"owner_type"`
-	LabelState     *LabelState `json:"labelState,omitempty" db:"label_state"`
-	Settings       []byte      `json:"settings,omitempty" db:"settings"`
-	CreatedAt      time.Time   `json:"createdAt,omitzero" db:"created_at"`
-	UpdatedAt      *time.Time  `json:"updatedAt,omitzero" db:"updated_at"`
+	ID             string         `json:"id,omitempty" db:"id"`
+	InstanceID     string         `json:"instanceId,omitempty" db:"instance_id"`
+	OrganizationID *string        `json:"organizationId,omitempty" db:"organization_id"`
+	Type           SettingType    `json:"type,omitempty" db:"type"`
+	OwnerType      OwnerType      `json:"ownerType,omitempty" db:"owner_type"`
+	BrandingState  *BrandingState `json:"brandingState,omitempty" db:"branding_state"`
+	Settings       []byte         `json:"settings,omitempty" db:"settings"`
+	CreatedAt      time.Time      `json:"createdAt,omitzero" db:"created_at"`
+	UpdatedAt      *time.Time     `json:"updatedAt,omitzero" db:"updated_at"`
 }
 
 type PasswordlessType int32
@@ -122,23 +124,23 @@ type LoginSetting struct {
 	SecondFactorTypes []SecondFactorType `json:"secondFactors"`
 }
 
-type LabelPolicyThemeMode int32
+type BrandingPolicyThemeMode int32
 
 const (
-	LabelPolicyThemeAuto LabelPolicyThemeMode = iota
-	LabelPolicyThemeLight
-	LabelPolicyThemeDark
+	BrandingPolicyThemeAuto BrandingPolicyThemeMode = iota
+	BrandingPolicyThemeLight
+	BrandingPolicyThemeDark
 )
 
-//go:generate enumer -type LabelState -transform snake -trimprefix LabelState -sql
-type LabelState int32
+//go:generate enumer -type BrandingState -transform snake -trimprefix BrandingState -sql
+type BrandingState int32
 
 const (
-	LabelStatePreview LabelState = iota + 1
-	LabelStateActivated
+	BrandingStatePreview BrandingState = iota + 1
+	BrandingStateActivated
 )
 
-type labelSettingsJSONFieldsChanges interface {
+type brandingSettingsJSONFieldsChanges interface {
 	SetPrimaryColorField(value string) db_json.JsonUpdate
 	SetBackgroundColorField(value string) db_json.JsonUpdate
 	SetWarnColorField(value string) db_json.JsonUpdate
@@ -150,7 +152,7 @@ type labelSettingsJSONFieldsChanges interface {
 	SetHideLoginNameSuffixField(value bool) db_json.JsonUpdate
 	SetErrorMsgPopupField(value bool) db_json.JsonUpdate
 	SetDisableWatermarkField(value bool) db_json.JsonUpdate
-	SetThemeModeField(value LabelPolicyThemeMode) db_json.JsonUpdate
+	SetThemeModeField(value BrandingPolicyThemeMode) db_json.JsonUpdate
 	SetLabelPolicyLightLogoURL(value *url.URL) db_json.JsonUpdate
 	SetLabelPolicyDarkLogoURL(value *url.URL) db_json.JsonUpdate
 	SetLabelPolicyLightIconURL(value *url.URL) db_json.JsonUpdate
@@ -158,32 +160,32 @@ type labelSettingsJSONFieldsChanges interface {
 	SetLabelPolicyFontURL(value *url.URL) db_json.JsonUpdate
 }
 
-type labelSettingsJsonChanges interface {
-	labelSettingsJSONFieldsChanges
+type brandingSettingsJsonChanges interface {
+	brandingSettingsJSONFieldsChanges
 }
 
-type LabelSetting struct {
+type BrandingSetting struct {
 	*Setting
-	PrimaryColor        string               `json:"primaryColor,omitempty"`
-	BackgroundColor     string               `json:"backgroundColor,omitempty"`
-	WarnColor           string               `json:"warnColor,omitempty"`
-	FontColor           string               `json:"fontColor,omitempty"`
-	PrimaryColorDark    string               `json:"primaryColorDark,omitempty"`
-	BackgroundColorDark string               `json:"backgroundColorDark,omitempty"`
-	WarnColorDark       string               `json:"warnColorDark,omitempty"`
-	FontColorDark       string               `json:"fontColorDark,omitempty"`
-	HideLoginNameSuffix bool                 `json:"hideLoginNameSuffix,omitempty"`
-	ErrorMsgPopup       bool                 `json:"errorMsgPopup,omitempty"`
-	DisableWatermark    bool                 `json:"disableMsgPopup,omitempty"`
-	ThemeMode           LabelPolicyThemeMode `json:"themeMode,omitempty"`
+	PrimaryColor        string                  `json:"primaryColor,omitempty"`
+	BackgroundColor     string                  `json:"backgroundColor,omitempty"`
+	WarnColor           string                  `json:"warnColor,omitempty"`
+	FontColor           string                  `json:"fontColor,omitempty"`
+	PrimaryColorDark    string                  `json:"primaryColorDark,omitempty"`
+	BackgroundColorDark string                  `json:"backgroundColorDark,omitempty"`
+	WarnColorDark       string                  `json:"warnColorDark,omitempty"`
+	FontColorDark       string                  `json:"fontColorDark,omitempty"`
+	HideLoginNameSuffix bool                    `json:"hideLoginNameSuffix,omitempty"`
+	ErrorMsgPopup       bool                    `json:"errorMsgPopup,omitempty"`
+	DisableWatermark    bool                    `json:"disableMsgPopup,omitempty"`
+	ThemeMode           BrandingPolicyThemeMode `json:"themeMode,omitempty"`
 
-	LabelPolicyLightLogoURL *url.URL `json:"labelPolicyLightLogoURL,omitempty"`
-	LabelPolicyDarkLogoURL  *url.URL `json:"labelPolicyDarkLogoURL,omitempty"`
+	LightLogoURL *url.URL `json:"lightLogoURL,omitempty"`
+	DarkLogoURL  *url.URL `json:"darkLogoURL,omitempty"`
 
-	LabelPolicyLightIconURL *url.URL `json:"labelPolicyLightIconURL,omitempty"`
-	LabelPolicyDarkIconURL  *url.URL `json:"labelPolicyDarkIconURL,omitempty"`
+	LightIconURL *url.URL `json:"lightIconURL,omitempty"`
+	DarkIconURL  *url.URL `json:"darkIconURL,omitempty"`
 
-	LabelPolicyFontURL *url.URL `json:"labelPolicyLightFontURL,omitempty"`
+	FontURL *url.URL `json:"labelPolicyLightFontURL,omitempty"`
 }
 
 type passwordComplexityJSONFieldsChanges interface {
@@ -300,7 +302,7 @@ type settingsColumns interface {
 	SettingsColumn() database.Column
 	CreatedAtColumn() database.Column
 	UpdatedAtColumn() database.Column
-	SetLabelSettings(changes ...db_json.JsonUpdate) database.Change
+	SetBrandingSettings(changes ...db_json.JsonUpdate) database.Change
 }
 
 type settingsConditions interface {
@@ -309,7 +311,7 @@ type settingsConditions interface {
 	IDCondition(id string) database.Condition
 	TypeCondition(typ SettingType) database.Condition
 	OwnerTypeCondition(typ OwnerType) database.Condition
-	LabelStateCondition(typ LabelState) database.Condition
+	BrandingStateCondition(typ BrandingState) database.Condition
 }
 
 type Settings interface {
@@ -343,8 +345,11 @@ type LoginRepository interface {
 	loginSettingsJsonChanges
 
 	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*LoginSetting, error)
+	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*LoginSetting, error)
+
 	Set(ctx context.Context, client database.QueryExecutor, setting *LoginSetting) error
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
+	Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }
 
 type LabelRepository interface {
@@ -352,13 +357,13 @@ type LabelRepository interface {
 	settingsConditions
 	settingsChanges
 
-	labelSettingsJsonChanges
+	brandingSettingsJsonChanges
 
-	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*LabelSetting, error)
-	Set(ctx context.Context, client database.QueryExecutor, setting *LabelSetting) error
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*BrandingSetting, error)
+	Set(ctx context.Context, client database.QueryExecutor, setting *BrandingSetting) error
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
-	ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *LabelSetting) error
+	ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *BrandingSetting) error
 	ActivateLabelSettingEvent(ctx context.Context, client database.QueryExecutor, condition database.Condition, UpdateAt time.Time) (int64, error)
 }
 

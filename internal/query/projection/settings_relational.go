@@ -454,7 +454,7 @@ func (s *settingsRelationalProjection) reduceLoginPolicyChanged(event eventstore
 				settingsRepo.TypeCondition(domain.SettingTypeLogin),
 				settingsRepo.OwnerTypeCondition(ownerType),
 			),
-			settingsRepo.SetLabelSettings(changes...),
+			settingsRepo.SetBrandingSettings(changes...),
 			settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
@@ -493,7 +493,7 @@ func (s *settingsRelationalProjection) reduceMFAAdded(event eventstore.Event) (*
 				settingsRepo.TypeCondition(domain.SettingTypeLogin),
 				settingsRepo.OwnerTypeCondition(ownerType),
 			),
-			settingsRepo.SetLabelSettings(change),
+			settingsRepo.SetBrandingSettings(change),
 			settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 
 		return err
@@ -533,7 +533,7 @@ func (s *settingsRelationalProjection) reduceMFARemoved(event eventstore.Event) 
 				settingsRepo.TypeCondition(domain.SettingTypeLogin),
 				settingsRepo.OwnerTypeCondition(ownerType),
 			),
-			settingsRepo.SetLabelSettings(change),
+			settingsRepo.SetBrandingSettings(change),
 			settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 
 		return err
@@ -592,7 +592,7 @@ func (s *settingsRelationalProjection) reduceSecondFactorAdded(event eventstore.
 
 		loginRepo := repository.LoginRepository()
 
-		change := settingsRepo.SetLabelSettings(
+		change := settingsRepo.SetBrandingSettings(
 			settingsRepo.AddSecondFactorTypesField(domain.SecondFactorType(policyEvent.MFAType)),
 		)
 
@@ -634,7 +634,7 @@ func (s *settingsRelationalProjection) reduceSecondFactorRemoved(event eventstor
 
 		settingsRepo := repository.LoginRepository()
 
-		change := settingsRepo.SetLabelSettings(
+		change := settingsRepo.SetBrandingSettings(
 			settingsRepo.RemoveSecondFactorTypesField(domain.SecondFactorType(policyEvent.MFAType)),
 		)
 
@@ -685,8 +685,8 @@ func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) 
 			InstanceID:     policyEvent.Aggregate().InstanceID,
 			OrganizationID: orgId,
 			OwnerType:      ownerType,
-			Type:           domain.SettingTypeLabel,
-			LabelState:     &labelStatePreview,
+			Type:           domain.SettingTypeBranding,
+			BrandingState:  &labelStatePreview,
 			Settings:       settings,
 			CreatedAt:      policyEvent.CreationDate(),
 			UpdatedAt:      &policyEvent.Creation,
@@ -756,18 +756,18 @@ func (s *settingsRelationalProjection) reduceLabelChanged(event eventstore.Event
 			changes = append(changes, settingsRepo.SetDisableWatermarkField(*policyEvent.DisableWatermark))
 		}
 		if policyEvent.ThemeMode != nil {
-			changes = append(changes, settingsRepo.SetThemeModeField(domain.LabelPolicyThemeMode(*policyEvent.ThemeMode)))
+			changes = append(changes, settingsRepo.SetThemeModeField(domain.BrandingPolicyThemeMode(*policyEvent.ThemeMode)))
 		}
 
 		_, err := settingsRepo.Update(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Agg.InstanceID),
 				settingsRepo.OrganizationIDCondition(orgId),
-				settingsRepo.TypeCondition(domain.SettingTypeLabel),
+				settingsRepo.TypeCondition(domain.SettingTypeBranding),
 				settingsRepo.OwnerTypeCondition(ownerType),
-				settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+				settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 			),
-			settingsRepo.SetLabelSettings(changes...),
+			settingsRepo.SetBrandingSettings(changes...),
 			settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 
 		return err
@@ -794,7 +794,7 @@ func (s *settingsRelationalProjection) reduceLabelPolicyRemoved(event eventstore
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Agg.InstanceID),
 				settingsRepo.OrganizationIDCondition(orgId),
-				settingsRepo.TypeCondition(domain.SettingTypeLabel),
+				settingsRepo.TypeCondition(domain.SettingTypeBranding),
 				settingsRepo.OwnerTypeCondition(domain.OwnerTypeOrganization),
 			))
 		return err
@@ -826,9 +826,9 @@ func (s *settingsRelationalProjection) reduceLabelActivated(event eventstore.Eve
 			database.And(
 				settingsRepo.InstanceIDCondition(event.Aggregate().InstanceID),
 				settingsRepo.OrganizationIDCondition(orgId),
-				settingsRepo.TypeCondition(domain.SettingTypeLabel),
+				settingsRepo.TypeCondition(domain.SettingTypeBranding),
 				settingsRepo.OwnerTypeCondition(ownerType),
-				settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+				settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 			), event.CreatedAt())
 
 		return err
@@ -896,11 +896,11 @@ func (p *settingsRelationalProjection) reduceLabelLogoAdded(event eventstore.Eve
 			database.And(
 				settingsRepo.InstanceIDCondition(event.Aggregate().InstanceID),
 				settingsRepo.OrganizationIDCondition(orgId),
-				settingsRepo.TypeCondition(domain.SettingTypeLabel),
+				settingsRepo.TypeCondition(domain.SettingTypeBranding),
 				settingsRepo.OwnerTypeCondition(ownerType),
-				settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+				settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 			),
-			settingsRepo.SetLabelSettings(change),
+			settingsRepo.SetBrandingSettings(change),
 			settingsRepo.SetUpdatedAt(&CreatedAt))
 
 		return err
@@ -951,11 +951,11 @@ func (p *settingsRelationalProjection) reduceLogoRemoved(event eventstore.Event)
 			database.And(
 				settingsRepo.InstanceIDCondition(event.Aggregate().InstanceID),
 				settingsRepo.OrganizationIDCondition(orgId),
-				settingsRepo.TypeCondition(domain.SettingTypeLabel),
+				settingsRepo.TypeCondition(domain.SettingTypeBranding),
 				settingsRepo.OwnerTypeCondition(ownerType),
-				settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+				settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 			),
-			settingsRepo.SetLabelSettings(change),
+			settingsRepo.SetBrandingSettings(change),
 			settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
@@ -1021,11 +1021,11 @@ func (p *settingsRelationalProjection) reduceIconAdded(event eventstore.Event) (
 			database.And(
 				settingsRepo.InstanceIDCondition(event.Aggregate().InstanceID),
 				settingsRepo.OrganizationIDCondition(orgId),
-				settingsRepo.TypeCondition(domain.SettingTypeLabel),
+				settingsRepo.TypeCondition(domain.SettingTypeBranding),
 				settingsRepo.OwnerTypeCondition(ownerType),
-				settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+				settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 			),
-			settingsRepo.SetLabelSettings(change),
+			settingsRepo.SetBrandingSettings(change),
 			settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
@@ -1076,11 +1076,11 @@ func (p *settingsRelationalProjection) reduceIconRemoved(event eventstore.Event)
 			database.And(
 				settingsRepo.InstanceIDCondition(event.Aggregate().InstanceID),
 				settingsRepo.OrganizationIDCondition(orgId),
-				settingsRepo.TypeCondition(domain.SettingTypeLabel),
+				settingsRepo.TypeCondition(domain.SettingTypeBranding),
 				settingsRepo.OwnerTypeCondition(ownerType),
-				settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+				settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 			),
-			settingsRepo.SetLabelSettings(change),
+			settingsRepo.SetBrandingSettings(change),
 			settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
@@ -1129,11 +1129,11 @@ func (p *settingsRelationalProjection) reduceFontAdded(event eventstore.Event) (
 			database.And(
 				settingsRepo.InstanceIDCondition(event.Aggregate().InstanceID),
 				settingsRepo.OrganizationIDCondition(orgId),
-				settingsRepo.TypeCondition(domain.SettingTypeLabel),
+				settingsRepo.TypeCondition(domain.SettingTypeBranding),
 				settingsRepo.OwnerTypeCondition(ownerType),
-				settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+				settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 			),
-			settingsRepo.SetLabelSettings(change),
+			settingsRepo.SetBrandingSettings(change),
 			settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
@@ -1168,11 +1168,11 @@ func (p *settingsRelationalProjection) reduceFontRemoved(event eventstore.Event)
 			database.And(
 				settingsRepo.InstanceIDCondition(event.Aggregate().InstanceID),
 				settingsRepo.OrganizationIDCondition(orgId),
-				settingsRepo.TypeCondition(domain.SettingTypeLabel),
+				settingsRepo.TypeCondition(domain.SettingTypeBranding),
 				settingsRepo.OwnerTypeCondition(ownerType),
-				settingsRepo.LabelStateCondition(domain.LabelStatePreview),
+				settingsRepo.BrandingStateCondition(domain.LabelStatePreview),
 			),
-			settingsRepo.SetLabelSettings(change),
+			settingsRepo.SetBrandingSettings(change),
 			settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
@@ -1270,7 +1270,7 @@ func (s *settingsRelationalProjection) reducePasswordComplexityChanged(event eve
 				settingsRepo.TypeCondition(domain.SettingTypePasswordComplexity),
 				settingsRepo.OwnerTypeCondition(ownerType),
 			),
-			settingsRepo.SetLabelSettings(changes...),
+			settingsRepo.SetBrandingSettings(changes...),
 			settingsRepo.SetUpdatedAt(&CreatedAt))
 		return err
 	}), nil
@@ -1383,7 +1383,7 @@ func (p *settingsRelationalProjection) reducePasswordPolicyChanged(event eventst
 				settingsRepo.TypeCondition(domain.SettingTypePasswordExpiry),
 				settingsRepo.OwnerTypeCondition(ownerType),
 			),
-			settingsRepo.SetLabelSettings(changes...),
+			settingsRepo.SetBrandingSettings(changes...),
 			settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
@@ -1525,7 +1525,7 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyChanged(event eventsto
 				settingsRepo.TypeCondition(domain.SettingTypeLockout),
 				settingsRepo.OwnerTypeCondition(ownerType),
 			),
-			settingsRepo.SetLabelSettings(changes...),
+			settingsRepo.SetBrandingSettings(changes...),
 			settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
@@ -1625,7 +1625,7 @@ func (s *settingsRelationalProjection) reduceDomainPolicyChanged(event eventstor
 				settingsRepo.TypeCondition(domain.SettingTypeDomain),
 				settingsRepo.OwnerTypeCondition(ownerType),
 			),
-			settingsRepo.SetLabelSettings(changes...),
+			settingsRepo.SetBrandingSettings(changes...),
 			settingsRepo.SetUpdatedAt(&policyEvent.Creation))
 		return err
 	}), nil
@@ -1703,7 +1703,7 @@ func (s *settingsRelationalProjection) reduceSecurityPolicySet(event eventstore.
 
 		updatedAt := e.CreatedAt()
 
-		_, err := settingsRepo.SetEvent(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetLabelSettings(changes...),
+		_, err := settingsRepo.SetEvent(ctx, v3_sql.SQLTx(tx), setting, settingsRepo.SetBrandingSettings(changes...),
 			settingsRepo.SetUpdatedAt(&updatedAt))
 		return err
 	}), nil
