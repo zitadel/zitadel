@@ -7,11 +7,10 @@ import (
 
 	"github.com/muhlemmer/gu"
 
-	domain_v1 "github.com/zitadel/zitadel/backend/v3/domain"
-	domain "github.com/zitadel/zitadel/backend/v3/domain/v2"
+	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
-	repository "github.com/zitadel/zitadel/backend/v3/storage/database/repository/v2"
+	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/crypto"
 	old_domain "github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -470,13 +469,13 @@ func (u *userRelationalProjection) reduceHumanAdded(event eventstore.Event) (*ha
 		condition := userRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID)
 
 		err := userRepo.Create(ctx, v3Tx, &domain.User{
-			InstanceID: e.Aggregate().InstanceID,
-			OrgID:      e.Aggregate().ResourceOwner,
-			ID:         e.Aggregate().ID,
-			Username:   e.UserName,
-			State:      domain.UserStateActive,
-			CreatedAt:  e.CreatedAt(),
-			UpdatedAt:  e.CreatedAt(),
+			InstanceID:     e.Aggregate().InstanceID,
+			OrganizationID: e.Aggregate().ResourceOwner,
+			ID:             e.Aggregate().ID,
+			Username:       e.UserName,
+			State:          domain.UserStateActive,
+			CreatedAt:      e.CreatedAt(),
+			UpdatedAt:      e.CreatedAt(),
 			Human: &domain.HumanUser{
 				FirstName:         e.FirstName,
 				LastName:          e.LastName,
@@ -575,13 +574,13 @@ func (p *userRelationalProjection) reduceHumanRegistered(event eventstore.Event)
 		condition := userRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID)
 
 		err := userRepo.Create(ctx, v3Tx, &domain.User{
-			InstanceID: e.Aggregate().InstanceID,
-			OrgID:      e.Aggregate().ResourceOwner,
-			ID:         e.Aggregate().ID,
-			Username:   e.UserName,
-			State:      domain.UserStateActive,
-			CreatedAt:  e.CreatedAt(),
-			UpdatedAt:  e.CreatedAt(),
+			InstanceID:     e.Aggregate().InstanceID,
+			OrganizationID: e.Aggregate().ResourceOwner,
+			ID:             e.Aggregate().ID,
+			Username:       e.UserName,
+			State:          domain.UserStateActive,
+			CreatedAt:      e.CreatedAt(),
+			UpdatedAt:      e.CreatedAt(),
 			Human: &domain.HumanUser{
 				FirstName:         e.FirstName,
 				LastName:          e.LastName,
@@ -1383,10 +1382,10 @@ func (p *userRelationalProjection) reduceMachineAdded(event eventstore.Event) (*
 
 		return repo.Create(ctx, v3_sql.SQLTx(tx),
 			&domain.User{
-				ID:         e.Aggregate().ID,
-				InstanceID: e.Aggregate().InstanceID,
-				OrgID:      e.Aggregate().ResourceOwner,
-				Username:   e.UserName,
+				ID:             e.Aggregate().ID,
+				InstanceID:     e.Aggregate().InstanceID,
+				OrganizationID: e.Aggregate().ResourceOwner,
+				Username:       e.UserName,
 				// TODO check when to set username unique
 				// IsUsernameOrgUnique: ,
 				State:     domain.UserStateActive,
@@ -1494,7 +1493,7 @@ func (p *userRelationalProjection) reduceMetadataSet(event eventstore.Event) (*h
 		repo := repository.UserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.AddMetadata(&domain_v1.Metadata{
+			repo.AddMetadata(&domain.Metadata{
 				Key:       e.Key,
 				Value:     e.Value,
 				CreatedAt: e.CreationDate(),
@@ -2266,14 +2265,14 @@ func mapHumanGender(gender old_domain.Gender) domain.HumanGender {
 	}
 }
 
-func mapMachineAccessTokenType(tokenType old_domain.OIDCTokenType) domain.AccessTokenType {
+func mapMachineAccessTokenType(tokenType old_domain.OIDCTokenType) domain.PersonalAccessTokenType {
 	switch tokenType {
 	case old_domain.OIDCTokenTypeBearer:
-		return domain.AccessTokenTypeBearer
+		return domain.PersonalAccessTokenTypeBearer
 	case old_domain.OIDCTokenTypeJWT:
-		return domain.AccessTokenTypeJWT
+		return domain.PersonalAccessTokenTypeJWT
 	default:
-		return domain.AccessTokenTypeUnspecified
+		return domain.PersonalAccessTokenTypeUnspecified
 	}
 }
 

@@ -60,8 +60,8 @@ var _ VerificationType = (*VerificationTypeUpdate)(nil)
 // VerificationTypeSkipped indicates that the verification was skipped.
 // If Value is present, it is used as the new value to be set.
 type VerificationTypeSkipped struct {
-	VerifiedAt time.Time
-	Value      *string
+	SkippedAt time.Time
+	Value     *string
 }
 
 // isVerificationType implements [VerificationType].

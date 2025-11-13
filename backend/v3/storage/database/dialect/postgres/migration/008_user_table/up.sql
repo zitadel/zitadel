@@ -258,14 +258,12 @@ CREATE TABLE zitadel.human_passkeys(
     , created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     , updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
     , verified_at TIMESTAMPTZ
-
     , init_verification_id TEXT
 
     , type zitadel.passkey_type NOT NULL
     , name TEXT NOT NULL CHECK (name <> '')
     , sign_count INT NOT NULL DEFAULT 0 CHECK (sign_count >= 0)
     , challenge BYTES NOT NULL
-    , is_verified BOOLEAN NOT NULL DEFAULT FALSE
 
     , PRIMARY KEY (instance_id, token_id)
     , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users(instance_id, id) ON DELETE CASCADE

@@ -997,6 +997,44 @@ func (c *MockMachineUserRepositoryStateConditionCall) DoAndReturn(f func(domain.
 	return c
 }
 
+// TypeColumn mocks base method.
+func (m *MockMachineUserRepository) TypeColumn() database.Column {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TypeColumn")
+	ret0, _ := ret[0].(database.Column)
+	return ret0
+}
+
+// TypeColumn indicates an expected call of TypeColumn.
+func (mr *MockMachineUserRepositoryMockRecorder) TypeColumn() *MockMachineUserRepositoryTypeColumnCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TypeColumn", reflect.TypeOf((*MockMachineUserRepository)(nil).TypeColumn))
+	return &MockMachineUserRepositoryTypeColumnCall{Call: call}
+}
+
+// MockMachineUserRepositoryTypeColumnCall wrap *gomock.Call
+type MockMachineUserRepositoryTypeColumnCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockMachineUserRepositoryTypeColumnCall) Return(arg0 database.Column) *MockMachineUserRepositoryTypeColumnCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockMachineUserRepositoryTypeColumnCall) Do(f func() database.Column) *MockMachineUserRepositoryTypeColumnCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockMachineUserRepositoryTypeColumnCall) DoAndReturn(f func() database.Column) *MockMachineUserRepositoryTypeColumnCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // TypeCondition mocks base method.
 func (m *MockMachineUserRepository) TypeCondition(userType domain.UserType) database.Condition {
 	m.ctrl.T.Helper()

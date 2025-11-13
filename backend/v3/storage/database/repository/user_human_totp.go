@@ -128,9 +128,9 @@ func (u userHuman) setTOTPSkipVerification(ctx context.Context, client database.
 
 	builder.WriteString("UPDATE zitadel.human_users SET ")
 	database.NewChanges(
-		u.SetUpdatedAt(verification.VerifiedAt),
+		u.SetUpdatedAt(verification.SkippedAt),
 		u.setTOTP(*verification.Value),
-		u.setTOTPVerifiedAt(verification.VerifiedAt),
+		u.setTOTPVerifiedAt(verification.SkippedAt),
 		u.clearTOTPVerificationID(),
 	).Write(&builder)
 	writeCondition(&builder, condition)

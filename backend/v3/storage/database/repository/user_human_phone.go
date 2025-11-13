@@ -128,9 +128,9 @@ func (u userHuman) setPhoneSkipVerification(ctx context.Context, client database
 
 	builder.WriteString("UPDATE zitadel.human_users SET ")
 	database.NewChanges(
-		u.SetUpdatedAt(verification.VerifiedAt),
+		u.SetUpdatedAt(verification.SkippedAt),
 		u.setPhone(*verification.Value),
-		u.setPhoneVerifiedAt(verification.VerifiedAt),
+		u.setPhoneVerifiedAt(verification.SkippedAt),
 		u.clearPhoneVerificationID(),
 	).Write(&builder)
 	writeCondition(&builder, condition)

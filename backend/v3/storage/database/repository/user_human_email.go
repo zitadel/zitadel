@@ -128,9 +128,9 @@ func (u userHuman) setEmailSkipVerification(ctx context.Context, client database
 
 	builder.WriteString("UPDATE zitadel.human_users SET ")
 	database.NewChanges(
-		u.SetUpdatedAt(verification.VerifiedAt),
+		u.SetUpdatedAt(verification.SkippedAt),
 		u.setEmail(*verification.Value),
-		u.setEmailVerifiedAt(verification.VerifiedAt),
+		u.setEmailVerifiedAt(verification.SkippedAt),
 		u.clearEmailVerificationID(),
 	).Write(&builder)
 	writeCondition(&builder, condition)

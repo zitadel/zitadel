@@ -74,9 +74,9 @@ func (u userHuman) setPasswordSkipVerification(ctx context.Context, client datab
 
 	builder.WriteString("UPDATE zitadel.human_users SET ")
 	database.NewChanges(
-		u.SetUpdatedAt(verification.VerifiedAt),
+		u.SetUpdatedAt(verification.SkippedAt),
 		u.setPassword(*verification.Value),
-		u.setPasswordVerifiedAt(verification.VerifiedAt),
+		u.setPasswordVerifiedAt(verification.SkippedAt),
 		u.clearPasswordVerificationID(),
 	).Write(&builder)
 	writeCondition(&builder, condition)
