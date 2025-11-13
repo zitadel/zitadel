@@ -8,6 +8,7 @@ cypress
 node_modules
 *.log
 .next
+next-env.d.ts
 dist
 dist-ssr
 *.local

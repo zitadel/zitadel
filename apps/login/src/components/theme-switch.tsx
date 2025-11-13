@@ -2,7 +2,7 @@
 
 import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { getThemeConfig, getComponentRoundness, APPEARANCE_STYLES } from "@/lib/theme";
 
 function getThemeToggleRoundness() {
@@ -42,7 +42,9 @@ export default function ThemeSwitch() {
   const toggleRoundness = getThemeToggleRoundness();
   const cardAppearance = getThemeSwitchCardAppearance();
 
+  // Mark as mounted after initial render - this is intentional for hydration
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 

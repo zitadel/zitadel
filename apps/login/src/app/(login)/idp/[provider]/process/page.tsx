@@ -5,6 +5,7 @@ import { IdpProcessHandler } from "@/components/idp-process-handler";
  * It delegates to a client component which calls the server action.
  * The client component is needed so that cookies can be set properly.
  */
+
 export default async function ProcessPage(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
   params: Promise<{ provider: string }>;
