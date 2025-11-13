@@ -4,9 +4,10 @@ import "time"
 
 type Verification struct {
 	Value          *string    `db:"value"`
-	Code           *[]byte    `db:"code"`
+	Code           []byte     `db:"code"`
 	ExpiresAt      *time.Time `db:"expires_at"`
 	FailedAttempts uint8      `db:"failed_attempts"`
+	VerifiedAt     time.Time  `db:"verified_at"`
 }
 
 type VerificationType interface {
@@ -44,7 +45,7 @@ func (v *VerificationTypeVerified) isVerificationType() {}
 var _ VerificationType = (*VerificationTypeVerified)(nil)
 
 // VerificationTypeUpdate updates an existing verification.
-// The fields that are non-nil will be updated.
+// Non-nil fields get updated.
 type VerificationTypeUpdate struct {
 	Code   *[]byte
 	Value  *string
