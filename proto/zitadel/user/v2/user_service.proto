@@ -3180,6 +3180,7 @@ message RetrieveIdentityProviderIntentResponse{
     }
   ];
   AddHumanUserRequest add_human_user = 4;
+  UpdateHumanUserRequest update_human_user = 5;
 }
 
 message AddIDPLinkRequest{
