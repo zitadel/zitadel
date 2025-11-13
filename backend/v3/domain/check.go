@@ -3,7 +3,7 @@ package domain
 import "time"
 
 type Check struct {
-	Code           *[]byte    `db:"code"`
+	Code           []byte     `db:"code"`
 	ExpiresAt      *time.Time `db:"expires_at"`
 	FailedAttempts uint8      `db:"failed_attempts"`
 }
