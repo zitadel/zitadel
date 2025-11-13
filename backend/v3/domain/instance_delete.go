@@ -52,6 +52,9 @@ func (d *DeleteInstanceCommand) Execute(ctx context.Context, opts *InvokeOpts) (
 
 	instanceToDelete, err := instanceRepo.Get(ctx, opts.DB(), database.WithCondition(instanceRepo.IDCondition(d.ID)))
 	if err != nil {
+		if errors.Is(err, &database.NoRowFoundError{}) {
+			return nil
+		}
 		return err
 	}
 

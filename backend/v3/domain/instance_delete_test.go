@@ -116,6 +116,7 @@ func TestDeleteInstanceCommand_Execute(t *testing.T) {
 	ctx := authz.NewMockContext("inst-1", "org-1", gofakeit.UUID())
 	deleteErr := errors.New("delete error")
 	getErr := errors.New("get error")
+	noRowFoundErr := database.NewNoRowFoundError(nil)
 
 	tests := []struct {
 		testName     string
@@ -130,6 +131,30 @@ func TestDeleteInstanceCommand_Execute(t *testing.T) {
 	}{
 		{
 			testName: "when retrieving instance fails should return error",
+			instanceRepo: func(ctrl *gomock.Controller) domain.InstanceRepository {
+				instanceRepo := domainmock.NewInstanceRepo(ctrl)
+
+				instanceRepo.EXPECT().
+					LoadDomains().
+					Times(1).
+					Return(instanceRepo)
+
+				instanceRepo.EXPECT().
+					Get(
+						gomock.Any(),
+						gomock.Any(),
+						dbmock.QueryOptions(database.WithCondition(
+							instanceRepo.IDCondition("instance-1"),
+						)),
+					).
+					Times(1).
+					Return(nil, noRowFoundErr)
+				return instanceRepo
+			},
+			inputInstanceID: "instance-1",
+		},
+		{
+			testName: "when retrieving instance fails with no row found should return no error",
 			instanceRepo: func(ctrl *gomock.Controller) domain.InstanceRepository {
 				instanceRepo := domainmock.NewInstanceRepo(ctrl)
 
