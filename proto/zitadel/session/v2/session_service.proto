@@ -651,6 +651,9 @@ message CheckOTP {
 }
 
 message CheckRecoveryCode {
+  // The Recovery Code of the user to be checked.
+  // The code must match the exact code previously generated for the user, including dashes if any.
+  // On successful check, the recovery code will be invalidated and cannot be used again.
   string code = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
