@@ -612,9 +612,10 @@ message UpdateOrganizationRequest {
 
   // Name is the new name for the organization to be set.
   // Note that since the name is used to generate the organization's default domain,
-  // changing the name will not change the domain.
+  // changing the name will also change the domain.
   // Additionally, if the domain is used as suffix for user logins,
-  // those users
+  // their login names will also change accordingly.
+  // It will not affect any custom domains added to the organization.
   string name = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -972,7 +973,7 @@ message ListOrganizationMetadataResponse {
 }
 
 message DeleteOrganizationMetadataRequest {
-  // Organization ID is the unique identifier of the organization whose metadata is to be deleted is stored on.
+  // Organization ID is the unique identifier of the organization whose metadata is to be deleted.
   string organization_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,

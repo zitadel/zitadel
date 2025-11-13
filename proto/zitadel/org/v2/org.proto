@@ -22,7 +22,7 @@ message Organization {
   // Details about the organizations' creation and change date.
   zitadel.object.v2.Details details = 2;
 
-  // Current state of the organization, for example active, inactive and deleted.
+  // Current state of the organization, for example active, inactive or deleted.
   OrganizationState state = 3;
 
   // Name of the organization.
