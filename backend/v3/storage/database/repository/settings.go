@@ -20,15 +20,13 @@ var (
 
 type settings struct{}
 
+func (s settings) qualifiedTableName() string {
+	return "zitadel." + s.unqualifiedTableName()
+}
+
 func (settings) unqualifiedTableName() string {
 	return "settings"
 }
-
-func SettingsRepository() domain.SettingsRepository {
-	return new(settings)
-}
-
-var _ domain.SettingsRepository = (*settings)(nil)
 
 var (
 	ErrSettingObjectMustNotBeNil error = errors.New("setting object must not be nil")
@@ -59,8 +57,8 @@ func (s settings) OwnerTypeColumn() database.Column {
 	return database.NewColumn(s.unqualifiedTableName(), "owner_type")
 }
 
-func (s settings) LabelStateColumn() database.Column {
-	return database.NewColumn(s.unqualifiedTableName(), "label_state")
+func (s settings) StateColumn() database.Column {
+	return database.NewColumn(s.unqualifiedTableName(), "state")
 }
 
 func (s settings) SettingsColumn() database.Column {
@@ -102,8 +100,8 @@ func (s settings) OwnerTypeCondition(typ domain.OwnerType) database.Condition {
 	return database.NewTextCondition(s.OwnerTypeColumn(), database.TextOperationEqual, typ.String())
 }
 
-func (s settings) BrandingStateCondition(typ domain.BrandingState) database.Condition {
-	return database.NewTextCondition(s.LabelStateColumn(), database.TextOperationEqual, typ.String())
+func (s settings) StateCondition(typ domain.SettingState) database.Condition {
+	return database.NewTextCondition(s.StateColumn(), database.TextOperationEqual, typ.String())
 }
 
 // -------------------------------------------------------------
@@ -118,11 +116,7 @@ func (s settings) SetUpdatedAt(updatedAt *time.Time) database.Change {
 	return database.NewChangePtr(s.UpdatedAtColumn(), updatedAt)
 }
 
-func (s settings) SetBrandingSettings(changes ...db_json.JsonUpdate) database.Change {
-	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
-}
-
-func (s *settings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Setting, error) {
+func (s settings) get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Settings, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
@@ -137,10 +131,10 @@ func (s *settings) Get(ctx context.Context, client database.QueryExecutor, opts 
 
 	options.Write(&builder)
 
-	return getOne[domain.Setting](ctx, client, &builder)
+	return getOne[domain.Settings](ctx, client, &builder)
 }
 
-func (s *settings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Setting, error) {
+func (s settings) list(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Settings, error) {
 	builder := database.StatementBuilder{}
 
 	builder.WriteString(querySettingStmt)
@@ -154,140 +148,291 @@ func (s *settings) List(ctx context.Context, client database.QueryExecutor, opts
 	orderBy := database.OrderBy(s.CreatedAtColumn())
 	orderBy.Write(&builder)
 
-	return getMany[domain.Setting](ctx, client, &builder)
+	return getMany[domain.Settings](ctx, client, &builder)
+}
+
+const setSettingStmt = `INSERT INTO zitadel.settings` +
+	` (id, instance_id, organization_id, type, owner_type, state, settings)` +
+	` VALUES ($1, $2, $3, $4, $5, $6, $7)` +
+	` ON CONFLICT (id, instance_id, organization_id, type, owner_type) DO UPDATE SET`
+
+func (s settings) set(ctx context.Context, client database.QueryExecutor, settings *domain.Settings, changes ...database.Change) error {
+	builder := database.NewStatementBuilder(setSettingStmt,
+		settings.ID,
+		settings.InstanceID,
+		settings.OrganizationID,
+		settings.Type,
+		settings.OwnerType,
+		settings.State,
+		settings.Settings,
+	)
+	err := database.Changes(changes).Write(builder)
+	if err != nil {
+		return err
+	}
+	builder.WriteString(` RETURNING created_at, updated_at`)
+
+	return client.QueryRow(ctx, builder.String(), settings).Scan(&settings.CreatedAt, &settings.UpdatedAt)
+}
+
+func (s settings) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	if err := s.CheckMandatoryCondtions(condition); err != nil {
+		return 0, err
+	}
+
+	var builder database.StatementBuilder
+	builder.WriteString(`DELETE FROM ` + s.qualifiedTableName())
+
+	writeCondition(&builder, condition)
+	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+func (s settings) CheckMandatoryCondtions(condition database.Condition) error {
+	if !condition.IsRestrictingColumn(s.InstanceIDColumn()) {
+		return database.NewMissingConditionError(s.InstanceIDColumn())
+	}
+	if !condition.IsRestrictingColumn(s.OrganizationIDColumn()) {
+		return database.NewMissingConditionError(s.OrganizationIDColumn())
+	}
+	if !condition.IsRestrictingColumn(s.TypeColumn()) {
+		return database.NewMissingConditionError(s.TypeColumn())
+	}
+	if !condition.IsRestrictingColumn(s.OwnerTypeColumn()) {
+		return database.NewMissingConditionError(s.OwnerTypeColumn())
+	}
+	return nil
 }
 
 // login
 type loginSettings struct {
-	domain.SettingsRepository
+	settings
 }
 
 // -------------------------------------------------------------
 // login changes
 // -------------------------------------------------------------
 
-func (l loginSettings) SetAllowUserNamePasswordField(value bool) db_json.JsonUpdate {
+func (l loginSettings) SetSettingFields(value *domain.LoginSettings) database.Change {
+	changes := make([]db_json.JsonUpdate, 0)
+	if value == nil {
+		return nil
+	}
+	if value.AllowUserNamePassword != nil {
+		changes = append(changes, l.SetAllowUserNamePassword(*value.AllowUserNamePassword))
+	}
+	if value.AllowRegister != nil {
+		changes = append(changes, l.SetAllowRegister(*value.AllowRegister))
+	}
+	if value.AllowExternalIDP != nil {
+		changes = append(changes, l.SetAllowExternalIDP(*value.AllowExternalIDP))
+	}
+	if value.ForceMFA != nil {
+		changes = append(changes, l.SetForceMFA(*value.ForceMFA))
+	}
+	if value.ForceMFALocalOnly != nil {
+		changes = append(changes, l.SetForceMFALocalOnly(*value.ForceMFALocalOnly))
+	}
+	if value.HidePasswordReset != nil {
+		changes = append(changes, l.SetHidePasswordReset(*value.HidePasswordReset))
+	}
+	if value.IgnoreUnknownUsernames != nil {
+		changes = append(changes, l.SetIgnoreUnknownUsernames(*value.IgnoreUnknownUsernames))
+	}
+	if value.AllowDomainDiscovery != nil {
+		changes = append(changes, l.SetAllowDomainDiscovery(*value.AllowDomainDiscovery))
+	}
+	if value.DisableLoginWithEmail != nil {
+		changes = append(changes, l.SetDisableLoginWithEmail(*value.DisableLoginWithEmail))
+	}
+	if value.DisableLoginWithPhone != nil {
+		changes = append(changes, l.SetDisableLoginWithPhone(*value.DisableLoginWithPhone))
+	}
+	if value.PasswordlessType != nil {
+		changes = append(changes, l.SetPasswordlessType(*value.PasswordlessType))
+	}
+	if value.DefaultRedirectURI != nil {
+		changes = append(changes, l.SetDefaultRedirectURI(*value.DefaultRedirectURI))
+	}
+	if value.PasswordCheckLifetime != nil {
+		changes = append(changes, l.SetPasswordCheckLifetime(*value.PasswordCheckLifetime))
+	}
+	if value.ExternalLoginCheckLifetime != nil {
+		changes = append(changes, l.SetExternalLoginCheckLifetime(*value.ExternalLoginCheckLifetime))
+	}
+	if value.MFAInitSkipLifetime != nil {
+		changes = append(changes, l.SetMFAInitSkipLifetime(*value.MFAInitSkipLifetime))
+	}
+	if value.SecondFactorCheckLifetime != nil {
+		changes = append(changes, l.SetSecondFactorCheckLifetime(*value.SecondFactorCheckLifetime))
+	}
+	if value.MultiFactorCheckLifetime != nil {
+		changes = append(changes, l.SetMultiFactorCheckLifetime(*value.MultiFactorCheckLifetime))
+	}
+	if value.DisableLoginWithEmail != nil {
+		changes = append(changes, l.SetDisableLoginWithEmail(*value.DisableLoginWithEmail))
+	}
+	if value.MFAType != nil {
+		// TODO(stebenz): determine what factors have to be removed and added
+		//changes = append(changes, l.AddMFAType(0))
+		//changes = append(changes, l.RemoveMFAType(0))
+	}
+	if value.SecondFactorTypes != nil {
+		// TODO(stebenz): determine what factors have to be removed and added
+		//changes = append(changes, l.AddSecondFactorTypes(0))
+		//changes = append(changes, l.RemoveSecondFactorTypes(0))
+	}
+	return db_json.NewJsonChanges(l.SettingsColumn(), changes...)
+}
+
+func (loginSettings) SetAllowUserNamePassword(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"allowUsernamePassword"}, value)
 }
 
-func (l loginSettings) SetAllowRegisterField(value bool) db_json.JsonUpdate {
+func (loginSettings) SetAllowRegister(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"allowRegister"}, value)
 }
 
-func (l loginSettings) SetAllowExternalIDPField(value bool) db_json.JsonUpdate {
+func (loginSettings) SetAllowExternalIDP(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"allowExternalIdp"}, value)
 }
 
-func (l loginSettings) SetForceMFAField(value bool) db_json.JsonUpdate {
+func (loginSettings) SetForceMFA(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"forceMfa"}, value)
 }
 
-func (l loginSettings) SetForceMFALocalOnlyField(value bool) db_json.JsonUpdate {
+func (loginSettings) SetForceMFALocalOnly(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"forceMFALocalOnly"}, value)
 }
 
-func (l loginSettings) SetHidePasswordResetField(value bool) db_json.JsonUpdate {
+func (loginSettings) SetHidePasswordReset(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"hidePasswordReset"}, value)
 }
 
-func (l loginSettings) SetIgnoreUnknownUsernamesField(value bool) db_json.JsonUpdate {
+func (loginSettings) SetIgnoreUnknownUsernames(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"ignoreUnknownUsernames"}, value)
 }
 
-func (l loginSettings) SetAllowDomainDiscoveryField(value bool) db_json.JsonUpdate {
+func (loginSettings) SetAllowDomainDiscovery(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"allowDomainDiscovery"}, value)
 }
 
-func (l loginSettings) SetDisableLoginWithEmailField(value bool) db_json.JsonUpdate {
+func (loginSettings) SetDisableLoginWithEmail(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"disableLoginWithEmail"}, value)
 }
 
-func (l loginSettings) SetDisableLoginWithPhoneField(value bool) db_json.JsonUpdate {
+func (loginSettings) SetDisableLoginWithPhone(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"disableLoginWithPhone"}, value)
 }
 
-func (l loginSettings) SetPasswordlessTypeField(value domain.PasswordlessType) db_json.JsonUpdate {
+func (loginSettings) SetPasswordlessType(value domain.PasswordlessType) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"passwordlessType"}, value)
 }
 
-func (l loginSettings) SetDefaultRedirectURIField(value string) db_json.JsonUpdate {
+func (loginSettings) SetDefaultRedirectURI(value string) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"defaultRedirectUri"}, value)
 }
 
-func (l loginSettings) SetPasswordCheckLifetimeField(value time.Duration) db_json.JsonUpdate {
+func (loginSettings) SetPasswordCheckLifetime(value time.Duration) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"passwordCheckLifetime"}, value)
 }
 
-func (l loginSettings) SetExternalLoginCheckLifetimeField(value time.Duration) db_json.JsonUpdate {
+func (loginSettings) SetExternalLoginCheckLifetime(value time.Duration) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"externalLoginCheckLifetime"}, value)
 }
 
-func (l loginSettings) SetMFAInitSkipLifetimeField(value time.Duration) db_json.JsonUpdate {
+func (loginSettings) SetMFAInitSkipLifetime(value time.Duration) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"mfaInitSkipLifetime"}, value)
 }
 
-func (l loginSettings) SetSecondFactorCheckLifetimeField(value time.Duration) db_json.JsonUpdate {
+func (loginSettings) SetSecondFactorCheckLifetime(value time.Duration) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"secondFactorCheckLifetime"}, value)
 }
 
-func (l loginSettings) SetMultiFactorCheckLifetimeField(value time.Duration) db_json.JsonUpdate {
+func (loginSettings) SetMultiFactorCheckLifetime(value time.Duration) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"multiFactorCheckLifetime"}, value)
 }
 
-func (l loginSettings) AddMFAType(value domain.MultiFactorType) db_json.JsonUpdate {
+func (loginSettings) AddMFAType(value domain.MultiFactorType) db_json.JsonUpdate {
 	return db_json.NewArrayChange([]string{"mfaType"}, value, false)
 }
 
-func (l loginSettings) RemoveMFAType(value domain.MultiFactorType) db_json.JsonUpdate {
+func (loginSettings) RemoveMFAType(value domain.MultiFactorType) db_json.JsonUpdate {
 	return db_json.NewArrayChange([]string{"mfaType"}, value, true)
 }
 
-func (l loginSettings) AddSecondFactorTypesField(value domain.SecondFactorType) db_json.JsonUpdate {
+func (loginSettings) AddSecondFactorTypes(value domain.SecondFactorType) db_json.JsonUpdate {
 	return db_json.NewArrayChange([]string{"secondFactors"}, value, false)
 }
 
-func (l loginSettings) RemoveSecondFactorTypesField(value domain.SecondFactorType) db_json.JsonUpdate {
+func (loginSettings) RemoveSecondFactorTypes(value domain.SecondFactorType) db_json.JsonUpdate {
 	return db_json.NewArrayChange([]string{"secondFactors"}, value, true)
 }
 
-func LoginRepository() domain.LoginRepository {
+func LoginRepository() domain.LoginSettingsRepository {
 	return &loginSettings{
-		&settings{},
+		settings{},
 	}
 }
 
-var _ domain.LoginRepository = (*loginSettings)(nil)
+var _ domain.LoginSettingsRepository = (*loginSettings)(nil)
 
-func (s *loginSettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.LoginSetting) error {
-	if setting == nil {
-		return ErrSettingObjectMustNotBeNil
+func (l loginSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.LoginSettings) error {
+	settings.Type = domain.SettingTypeLogin
+	settings.State = domain.SettingStateActivated
+	if settings.OrganizationID == nil {
+		settings.OwnerType = domain.OwnerTypeOrganization
+	} else {
+		settings.OwnerType = domain.OwnerTypeInstance
 	}
-	setting.Type = domain.SettingTypeLogin
-	return setSetting(ctx, client, setting.Setting, setting)
+
+	var settingsJSON []byte
+	if err := json.Unmarshal(settingsJSON, settings.LoginSettingsAttributes); err != nil {
+		return err
+	}
+	settings.Settings.Settings = settingsJSON
+	args, changes, err := setSettingChanges(settings.Settings, settingsJSON, l.SetSettingFields(settings))
+	if err != nil {
+		return err
+	}
+	return l.settings.set(ctx, client, settings.Settings, l.SetSettingFields(settings))
 }
 
-func (s *loginSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (loginSetting *domain.LoginSetting, err error) {
-	loginSetting = &domain.LoginSetting{}
+func (s *loginSettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.LoginSettings, error) {
+	list := make([]*domain.LoginSettings, 0)
 
-	loginSetting.Setting, err = s.SettingsRepository.Get(ctx, client, opts...)
+	settings, err := s.settings.list(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	err = json.Unmarshal(loginSetting.Settings, &loginSetting)
+	for i := range settings {
+		err = json.Unmarshal(settings[i].Settings, &list[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return list, nil
+}
+
+func (s *loginSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.LoginSettings, error) {
+	loginSettings := &domain.LoginSettings{}
+
+	settings, err := s.settings.get(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	return loginSetting, nil
-}
+	err = json.Unmarshal(settings.Settings, &loginSettings)
+	if err != nil {
+		return nil, err
+	}
 
-func (s *loginSettings) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	return s.SettingsRepository.Update(ctx, client, condition, changes...)
+	return loginSettings, nil
 }
 
 // label
-type labelSettings struct {
+type brandingSettings struct {
 	*settings
 }
 
@@ -295,81 +440,81 @@ type labelSettings struct {
 // label changes
 // -------------------------------------------------------------
 
-func (l labelSettings) SetPrimaryColorField(value string) db_json.JsonUpdate {
-	return db_json.NewFieldChange([]string{"primaryColor"}, value)
+func (brandingSettings) SetPrimaryColor(value string) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"primaryColorLight"}, value)
 }
 
-func (l labelSettings) SetBackgroundColorField(value string) db_json.JsonUpdate {
-	return db_json.NewFieldChange([]string{"backgroundColor"}, value)
+func (brandingSettings) SetBackgroundColor(value string) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"backgroundColorLight"}, value)
 }
 
-func (l labelSettings) SetWarnColorField(value string) db_json.JsonUpdate {
-	return db_json.NewFieldChange([]string{"warnColor"}, value)
+func (brandingSettings) SetWarnColor(value string) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"warnColorLight"}, value)
 }
 
-func (l labelSettings) SetFontColorField(value string) db_json.JsonUpdate {
-	return db_json.NewFieldChange([]string{"fontColor"}, value)
+func (brandingSettings) SetFontColor(value string) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"fontColorLight"}, value)
 }
 
-func (l labelSettings) SetPrimaryColorDarkField(value string) db_json.JsonUpdate {
+func (brandingSettings) SetPrimaryColorDark(value string) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"primaryColorDark"}, value)
 }
 
-func (l labelSettings) SetBackgroundColorDarkField(value string) db_json.JsonUpdate {
+func (brandingSettings) SetBackgroundColorDark(value string) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"backgroundColorDark"}, value)
 }
 
-func (l labelSettings) SetWarnColorDarkField(value string) db_json.JsonUpdate {
+func (brandingSettings) SetWarnColorDark(value string) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"warnColorDark"}, value)
 }
 
-func (l labelSettings) SetFontColorDarkField(value string) db_json.JsonUpdate {
+func (brandingSettings) SetFontColorDark(value string) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"fontColorDark"}, value)
 }
 
-func (l labelSettings) SetHideLoginNameSuffixField(value bool) db_json.JsonUpdate {
+func (brandingSettings) SetHideLoginNameSuffix(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"hideLoginNameSuffix"}, value)
 }
 
-func (l labelSettings) SetErrorMsgPopupField(value bool) db_json.JsonUpdate {
+func (brandingSettings) SetErrorMsgPopup(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"errorMsgPopup"}, value)
 }
 
-func (l labelSettings) SetDisableWatermarkField(value bool) db_json.JsonUpdate {
+func (brandingSettings) SetDisableWatermark(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"disableMsgPopup"}, value)
 }
 
-func (l labelSettings) SetThemeModeField(value domain.BrandingPolicyThemeMode) db_json.JsonUpdate {
+func (brandingSettings) SetThemeMode(value domain.BrandingPolicyThemeMode) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"themeMode"}, value)
 }
 
-func (l labelSettings) SetLabelPolicyLightLogoURL(value *url.URL) db_json.JsonUpdate {
-	return db_json.NewFieldChange([]string{"labelPolicyLightLogoURL"}, value)
+func (brandingSettings) SetLogoURLLight(value *url.URL) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"logoURLLight"}, value)
 }
 
-func (l labelSettings) SetLabelPolicyDarkLogoURL(value *url.URL) db_json.JsonUpdate {
-	return db_json.NewFieldChange([]string{"labelPolicyDarkLogoURL"}, value)
+func (brandingSettings) SetLogoURLDark(value *url.URL) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"logoUrlDark"}, value)
 }
 
-func (l labelSettings) SetLabelPolicyLightIconURL(value *url.URL) db_json.JsonUpdate {
-	return db_json.NewFieldChange([]string{"labelPolicyLightIconURL"}, value)
+func (brandingSettings) SetIconURLLight(value *url.URL) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"iconUrlLight"}, value)
 }
 
-func (l labelSettings) SetLabelPolicyDarkIconURL(value *url.URL) db_json.JsonUpdate {
-	return db_json.NewFieldChange([]string{"labelPolicyDarkIconURL"}, value)
+func (brandingSettings) SetIconURLDark(value *url.URL) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"iconUrlDark"}, value)
 }
 
-func (l labelSettings) SetLabelPolicyFontURL(value *url.URL) db_json.JsonUpdate {
-	return db_json.NewFieldChange([]string{"labelPolicyLightFontURL"}, value)
+func (brandingSettings) SetFontURL(value *url.URL) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"fontUrl"}, value)
 }
 
-func LabelRepository() domain.LabelRepository {
-	return &labelSettings{
-		&settings{},
+func BrandingSettingsRepository() domain.BrandingSettingsRepository {
+	return &brandingSettings{
+		settings{},
 	}
 }
 
-var _ domain.LabelRepository = (*labelSettings)(nil)
+var _ domain.BrandingSettingsRepository = (*brandingSettings)(nil)
 
 const createLabelSettingStmt = `INSERT INTO zitadel.settings` +
 	` (instance_id, organization_id, type, owner_type, label_state, settings)` +
@@ -378,7 +523,7 @@ const createLabelSettingStmt = `INSERT INTO zitadel.settings` +
 	` settings = EXCLUDED.settings` +
 	` RETURNING id, created_at, updated_at`
 
-func (s *labelSettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.BrandingSetting) error {
+func (s *brandingSettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.BrandingSetting) error {
 	if setting == nil {
 		return ErrSettingObjectMustNotBeNil
 	}
@@ -414,7 +559,7 @@ func (s *labelSettings) Set(ctx context.Context, client database.QueryExecutor, 
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.ID, &setting.CreatedAt, &setting.UpdatedAt)
 }
 
-func (s *labelSettings) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+func (s *brandingSettings) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
 	builder := database.StatementBuilder{}
 	builder.WriteString(`UPDATE zitadel.settings SET `)
 	err := database.Changes(changes).Write(&builder)
@@ -426,7 +571,7 @@ func (s *labelSettings) Update(ctx context.Context, client database.QueryExecuto
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-func (s *labelSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.BrandingSetting, error) {
+func (s *brandingSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.BrandingSetting, error) {
 	labelSetting := &domain.BrandingSetting{}
 	var err error
 
@@ -447,7 +592,7 @@ const querySettingStmt = `SELECT instance_id, organization_id, id, type, owner_t
 	` created_at, updated_at` +
 	` FROM zitadel.settings`
 
-func (s *labelSettings) getLabel(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Setting, error) {
+func (s *brandingSettings) getLabel(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Setting, error) {
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
@@ -468,7 +613,7 @@ func (s *labelSettings) getLabel(ctx context.Context, client database.QueryExecu
 	return getOne[domain.Setting](ctx, client, &builder)
 }
 
-func (s *labelSettings) Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+func (s *brandingSettings) Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	return s.Delete(ctx, client, condition)
 }
 
@@ -484,7 +629,7 @@ func (s *settings) CreateLabel(ctx context.Context, client database.QueryExecuto
 	return setSetting(ctx, client, setting.Setting, setting)
 }
 
-func (s *labelSettings) ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *domain.BrandingSetting) error {
+func (s *brandingSettings) ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *domain.BrandingSetting) error {
 	builder := database.StatementBuilder{}
 
 	settingJSON, err := json.Marshal(setting)
@@ -511,7 +656,7 @@ const activatedLabelSettingEventStmtEnd = ` ON CONFLICT (instance_id, organizati
 	` settings = EXCLUDED.settings, updated_at = $1` +
 	` RETURNING id, created_at, updated_at`
 
-func (s *labelSettings) ActivateLabelSettingEvent(ctx context.Context, client database.QueryExecutor, condition database.Condition, uudateAt time.Time) (int64, error) {
+func (s *brandingSettings) ActivateLabelSettingEvent(ctx context.Context, client database.QueryExecutor, condition database.Condition, uudateAt time.Time) (int64, error) {
 	if !condition.IsRestrictingColumn(s.InstanceIDColumn()) {
 		return 0, database.NewMissingConditionError(s.InstanceIDColumn())
 	}
@@ -1019,77 +1164,4 @@ func (s *settings) Create(ctx context.Context, client database.QueryExecutor, se
 		setting.UpdatedAt)
 
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.ID, &setting.CreatedAt, &setting.UpdatedAt)
-}
-
-const createSettingStmt = `INSERT INTO zitadel.settings` +
-	` (instance_id, organization_id, type, owner_type, label_state, settings)` +
-	` VALUES ($1, $2, $3, $4, $5, $6)` +
-	` ON CONFLICT (instance_id, organization_id, type, owner_type) WHERE type != 'label' DO UPDATE SET` +
-	` settings =  EXCLUDED.settings::JSONB `
-
-func setSetting(ctx context.Context, client database.QueryExecutor, setting *domain.Setting, settings any, changes ...database.Change) error {
-	if setting.InstanceID == "" {
-		return ErrMissingInstanceID
-	}
-
-	// type is always set from the calling function to that functions respective type
-	// the check is left as a fail-safe
-	if setting.Type == domain.SettingTypeUnspecified {
-		return ErrMissingType
-	}
-
-	if setting.OwnerType == domain.OwnerTypeUnspecified {
-		return ErrMissingOwnerType
-	}
-
-	settingJSON, err := json.Marshal(settings)
-	if err != nil {
-		return err
-	}
-
-	builder := database.NewStatementBuilder(
-		createSettingStmt,
-		setting.InstanceID,
-		setting.OrganizationID,
-		setting.Type,
-		setting.OwnerType,
-		setting.BrandingState,
-		string(settingJSON))
-
-	err = database.Changes(changes).Write(builder)
-	if err != nil {
-		return err
-	}
-
-	builder.WriteString(` RETURNING id, created_at, updated_at`)
-
-	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.ID, &setting.CreatedAt, &setting.UpdatedAt)
-}
-
-func (s *settings) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	if err := s.CheckMandatoryCondtions(condition); err != nil {
-		return 0, err
-	}
-
-	var builder database.StatementBuilder
-	builder.WriteString(`DELETE FROM zitadel.settings`)
-
-	writeCondition(&builder, condition)
-	return client.Exec(ctx, builder.String(), builder.Args()...)
-}
-
-func (s *settings) CheckMandatoryCondtions(condition database.Condition) error {
-	if !condition.IsRestrictingColumn(s.InstanceIDColumn()) {
-		return database.NewMissingConditionError(s.InstanceIDColumn())
-	}
-	if !condition.IsRestrictingColumn(s.OrganizationIDColumn()) {
-		return database.NewMissingConditionError(s.OrganizationIDColumn())
-	}
-	if !condition.IsRestrictingColumn(s.TypeColumn()) {
-		return database.NewMissingConditionError(s.TypeColumn())
-	}
-	if !condition.IsRestrictingColumn(s.OwnerTypeColumn()) {
-		return database.NewMissingConditionError(s.OwnerTypeColumn())
-	}
-	return nil
 }

@@ -1,13 +1,7 @@
 package domain
 
 import (
-	"errors"
 	"fmt"
-)
-
-var (
-	ErrNoAdminSpecified = errors.New("at least one admin must be specified")
-	ErrNoOrgIdSpecified = errors.New("organization id must be specified")
 )
 
 type wrongIDPTypeError struct {
