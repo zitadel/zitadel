@@ -12,7 +12,7 @@ import (
 type Change interface {
 	gomock.Matcher
 	// Write writes the change to the given statement builder.
-	Write(builder *StatementBuilder)
+	Write(builder *StatementBuilder) error
 	// IsOnColumn checks if the change is on the given column.
 	IsOnColumn(col Column) bool
 }
@@ -62,10 +62,11 @@ func NewChangePtr[V Value](col Column, value *V) Change {
 }
 
 // Write implements [Change].
-func (c change[V]) Write(builder *StatementBuilder) {
+func (c change[V]) Write(builder *StatementBuilder) error {
 	c.column.WriteUnqualified(builder)
 	builder.WriteString(" = ")
 	builder.WriteArg(c.value)
+	return nil
 }
 
 // IsOnColumn implements [Change].
@@ -87,13 +88,16 @@ func (c Changes) IsOnColumn(col Column) bool {
 }
 
 // Write implements [Change].
-func (m Changes) Write(builder *StatementBuilder) {
+func (m Changes) Write(builder *StatementBuilder) error {
 	for i, change := range m {
 		if i > 0 {
 			builder.WriteString(", ")
 		}
-		change.Write(builder)
+		if err := change.Write(builder); err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 // Matches implements [gomock.Matcher].
