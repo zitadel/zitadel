@@ -93,10 +93,6 @@ type AuthorizationRepository interface {
 	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Authorization, error)
 
 	Create(ctx context.Context, client database.QueryExecutor, authorization *Authorization) error
-	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
-	// SetRoles ensures that the roles for the authorization are exactly the given roles.
-	// It removes any roles that are not in the given list and adds any missing roles.
-	// Additionally, it updates the updated_at timestamp of the authorization.
-	SetRoles(ctx context.Context, client database.QueryExecutor, condition database.Condition, roles []string) (int64, error)
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, roles []string, changes ...database.Change) (int64, error)
 	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }

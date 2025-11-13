@@ -694,7 +694,7 @@ func TestUpdateAuthorization(t *testing.T) {
 			savepoint, rollback := savepointForRollback(t, tx)
 			defer rollback()
 
-			rowsAffected, err := authorizationRepo.Update(t.Context(), savepoint, tt.condition, tt.changes...)
+			rowsAffected, err := authorizationRepo.Update(t.Context(), savepoint, tt.condition, nil, tt.changes...)
 			require.ErrorIs(t, tt.wantErr, err)
 			if err != nil {
 				return
@@ -715,7 +715,7 @@ func TestUpdateAuthorization(t *testing.T) {
 
 }
 
-func TestAuthorizationSetRoles(t *testing.T) {
+func TestAuthorizationUpdate_setRoles(t *testing.T) {
 	beforeUpdate := time.Now()
 
 	tx, rollback := transactionForRollback(t)
@@ -819,7 +819,7 @@ func TestAuthorizationSetRoles(t *testing.T) {
 			savepoint, rollback := savepointForRollback(t, tx)
 			defer rollback()
 
-			rowsAffected, err := authorizationRepo.SetRoles(t.Context(), savepoint, tt.condition, tt.roles)
+			rowsAffected, err := authorizationRepo.Update(t.Context(), savepoint, tt.condition, tt.roles)
 			require.ErrorIs(t, err, tt.wantErr)
 			if err != nil {
 				return

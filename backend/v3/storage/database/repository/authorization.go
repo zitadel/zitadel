@@ -131,34 +131,9 @@ func (a authorization) prepareQuery(opts []database.QueryOption) (*database.Stat
 	return builder, nil
 }
 
-// Update implements [domain.AuthorizationRepository].
-func (a authorization) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	if len(changes) == 0 {
-		return 0, database.ErrNoChanges
-	}
-	if !condition.IsRestrictingColumn(a.InstanceIDColumn()) {
-		return 0, database.NewMissingConditionError(a.InstanceIDColumn())
-	}
-	if !database.Changes(changes).IsOnColumn(a.UpdatedAtColumn()) {
-		changes = append(changes, database.NewChange(a.UpdatedAtColumn(), database.NullInstruction))
-	}
+const queryUpdateAuthorizationRoleStmt = `SELECT instance_id, id, project_id, grant_id, $1::text[] as roles from zitadel.authorizations`
 
-	var builder database.StatementBuilder
-	builder.WriteString(`UPDATE zitadel.authorizations SET `)
-	database.Changes(changes).Write(&builder)
-	writeCondition(&builder, condition)
-
-	stmt := builder.String()
-
-	rowsAffected, err := client.Exec(ctx, stmt, builder.Args()...)
-	return rowsAffected, err
-}
-
-const queryUpdateAuthorizationRolesStmt = `SELECT instance_id, id, project_id, grant_id, $1::text[] AS roles
-FROM zitadel.authorizations`
-
-// todo: review
-const updateAuthorizationRolesStmt = `deleted_roles AS (
+const updateAuthorizationRoleStmt = `deleted_roles AS (
     DELETE FROM zitadel.authorization_roles as azr
 	USING az
         WHERE azr.instance_id = az.instance_id
@@ -176,26 +151,62 @@ const updateAuthorizationRolesStmt = `deleted_roles AS (
         ON CONFLICT DO NOTHING
         RETURNING *
 )
-UPDATE zitadel.authorizations
-SET updated_at = NOW()
-FROM az
+UPDATE zitadel.authorizations SET `
+
+const updateAuthorizationRoleStmtWhere = ` FROM az
 WHERE az.instance_id = authorizations.instance_id
   AND az.id = authorizations.id`
 
-// SetRoles implements [domain.AuthorizationRepository].
-func (a authorization) SetRoles(ctx context.Context, client database.QueryExecutor, condition database.Condition, roles []string) (int64, error) {
+// Update implements [domain.AuthorizationRepository].
+func (a authorization) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, roles []string, changes ...database.Change) (int64, error) {
+	if roles != nil {
+		return a.setRoles(ctx, client, condition, roles, changes...)
+	}
+	return a.update(ctx, client, condition, changes)
+}
+
+func (a authorization) update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes []database.Change) (int64, error) {
+	if len(changes) == 0 {
+		return 0, database.ErrNoChanges
+	}
+	if !condition.IsRestrictingColumn(a.InstanceIDColumn()) {
+		return 0, database.NewMissingConditionError(a.InstanceIDColumn())
+	}
+	if !database.Changes(changes).IsOnColumn(a.UpdatedAtColumn()) {
+		changes = append(changes, database.NewChange(a.UpdatedAtColumn(), database.NullInstruction))
+	}
+
+	builder := database.NewStatementBuilder("UPDATE zitadel.authorizations SET ")
+	database.Changes(changes).Write(builder)
+	writeCondition(builder, condition)
+
+	stmt := builder.String()
+
+	rowsAffected, err := client.Exec(ctx, stmt, builder.Args()...)
+	return rowsAffected, err
+}
+
+// setRoles sets the roles of an authorization.
+func (a authorization) setRoles(ctx context.Context, client database.QueryExecutor, condition database.Condition, roles []string, changes ...database.Change) (int64, error) {
 	if err := checkPKCondition(a, condition); err != nil {
 		return 0, err
 	}
-	queryBuilder := database.NewStatementBuilder(queryUpdateAuthorizationRolesStmt, roles)
-	writeCondition(queryBuilder, condition)
+	if !database.Changes(changes).IsOnColumn(a.UpdatedAtColumn()) {
+		changes = append(changes, database.NewChange(a.UpdatedAtColumn(), database.NullInstruction))
+	}
 
-	builder := database.NewStatementBuilder(
-		`WITH az AS ( `+
-			queryBuilder.String()+` ), `+
-			updateAuthorizationRolesStmt,
-		queryBuilder.Args()...,
-	)
+	// get the authorization to be updated
+	builder := database.NewStatementBuilder("WITH az AS (")
+	builder.WriteString(queryUpdateAuthorizationRoleStmt)
+	builder.AppendArg(roles)
+	writeCondition(builder, condition)
+	builder.WriteString(" ), ")
+
+	// set the roles
+	builder.WriteString(updateAuthorizationRoleStmt)
+	database.Changes(changes).Write(builder)
+	builder.WriteString(updateAuthorizationRoleStmtWhere)
+
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
@@ -205,9 +216,8 @@ func (a authorization) Delete(ctx context.Context, client database.QueryExecutor
 		return 0, database.NewMissingConditionError(a.InstanceIDColumn())
 	}
 
-	var builder database.StatementBuilder
-	builder.WriteString(`DELETE FROM zitadel.authorizations`)
-	writeCondition(&builder, condition)
+	builder := database.NewStatementBuilder("DELETE FROM zitadel.authorizations")
+	writeCondition(builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }

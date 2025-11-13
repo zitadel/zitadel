@@ -42,11 +42,11 @@ func (a *authorizationRelationalProjection) Reducers() []handler.AggregateReduce
 				},
 				{
 					Event:  usergrant.UserGrantCascadeChangedType,
-					Reduce: a.reduceUserGrantCascadeChanged,
+					Reduce: a.reduceUserGrantChanged,
 				},
 				{
 					Event:  usergrant.UserGrantCascadeRemovedType,
-					Reduce: a.reduceUserGrantCascadeRemoved,
+					Reduce: a.reduceUserGrantRemoved,
 				},
 				{
 					Event:  usergrant.UserGrantRemovedType,
@@ -91,93 +91,68 @@ func (a *authorizationRelationalProjection) reduceUserGrantAdded(event eventstor
 }
 
 func (a *authorizationRelationalProjection) reduceUserGrantChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*usergrant.UserGrantChangedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInternalf(nil, "HANDL-Kdr7KP", "reduce.wrong.event.type %s", usergrant.UserGrantChangedType)
+	var roles []string
+	switch e := event.(type) {
+	case *usergrant.UserGrantChangedEvent:
+		roles = e.RoleKeys
+	case *usergrant.UserGrantCascadeChangedEvent:
+		roles = e.RoleKeys
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-hOr1E", "reduce.wrong.event.type %v", []eventstore.EventType{usergrant.UserGrantChangedType, usergrant.UserGrantCascadeChangedType})
 	}
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
+
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-sBwGEW", "reduce.wrong.db.pool %T", ex)
 		}
+
 		repo := repository.AuthorizationRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.ID),
-			repo.SetUpdatedAt(e.CreationDate()),
-		)
-		return err
-	}), nil
-}
-
-func (a *authorizationRelationalProjection) reduceUserGrantCascadeChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*usergrant.UserGrantCascadeChangedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInternalf(nil, "HANDL-dFtRl7", "reduce.wrong.event.type %s", usergrant.UserGrantCascadeChangedType)
-	}
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
-		tx, ok := ex.(*sql.Tx)
-		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-FlZ55M", "reduce.wrong.db.pool %T", ex)
-		}
-		repo := repository.AuthorizationRepository()
-		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.ID),
-			repo.SetUpdatedAt(e.CreationDate()),
-		)
-		return err
-	}), nil
-}
-
-func (a *authorizationRelationalProjection) reduceUserGrantCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*usergrant.UserGrantCascadeRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-dFtRl8", "reduce.wrong.event.type %s", usergrant.UserGrantCascadeRemovedType)
-	}
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
-		tx, ok := ex.(*sql.Tx)
-		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-FlZ55N", "reduce.wrong.db.pool %T", ex)
-		}
-		repo := repository.AuthorizationRepository()
-		_, err := repo.Delete(ctx, v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.ID),
+			repo.PrimaryKeyCondition(event.Aggregate().InstanceID, event.Aggregate().ID),
+			roles,
+			repo.SetUpdatedAt(event.CreatedAt()),
 		)
 		return err
 	}), nil
 }
 
 func (a *authorizationRelationalProjection) reduceUserGrantRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*usergrant.UserGrantRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-dFtRl9", "reduce.wrong.event.type %s", usergrant.UserGrantRemovedType)
+	switch event.(type) {
+	case *usergrant.UserGrantRemovedEvent, *usergrant.UserGrantCascadeRemovedEvent:
+		// ok
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-dFtRl9", "reduce.wrong.event.type %v", []eventstore.EventType{usergrant.UserGrantRemovedType, usergrant.UserGrantCascadeRemovedType})
 	}
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
+
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-FlZ55O", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.AuthorizationRepository()
 		_, err := repo.Delete(ctx, v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.ID),
+			repo.PrimaryKeyCondition(event.Aggregate().InstanceID, event.Aggregate().ID),
 		)
 		return err
 	}), nil
 }
 
 func (a *authorizationRelationalProjection) reduceUserGrantDeactivated(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*usergrant.UserGrantDeactivatedEvent)
+	_, ok := event.(*usergrant.UserGrantDeactivatedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-dFtRl0", "reduce.wrong.event.type %s", usergrant.UserGrantDeactivatedType)
 	}
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-FlZ55P", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.AuthorizationRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.ID),
-			repo.SetUpdatedAt(e.CreationDate()),
+			repo.PrimaryKeyCondition(event.Aggregate().InstanceID, event.Aggregate().ID),
+			nil,
+			repo.SetUpdatedAt(event.CreatedAt()),
 			repo.SetState(repoDomain.AuthorizationStateInactive),
 		)
 		return err
@@ -185,19 +160,20 @@ func (a *authorizationRelationalProjection) reduceUserGrantDeactivated(event eve
 }
 
 func (a *authorizationRelationalProjection) reduceUserGrantReactivated(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*usergrant.UserGrantReactivatedEvent)
+	_, ok := event.(*usergrant.UserGrantReactivatedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-dFtRl1", "reduce.wrong.event.type %s", usergrant.UserGrantReactivatedType)
 	}
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, _ string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-FlZ55Q", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.AuthorizationRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
-			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.ID),
-			repo.SetUpdatedAt(e.CreationDate()),
+			repo.PrimaryKeyCondition(event.Aggregate().InstanceID, event.Aggregate().ID),
+			nil,
+			repo.SetUpdatedAt(event.CreatedAt()),
 			repo.SetState(repoDomain.AuthorizationStateActive),
 		)
 		return err

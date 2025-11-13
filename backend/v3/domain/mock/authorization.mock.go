@@ -664,45 +664,6 @@ func (c *MockAuthorizationRepositoryRolesConditionCall) DoAndReturn(f func(datab
 	return c
 }
 
-// SetRoles mocks base method.
-func (m *MockAuthorizationRepository) SetRoles(ctx context.Context, client database.QueryExecutor, condition database.Condition, roles []string) (int64, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetRoles", ctx, client, condition, roles)
-	ret0, _ := ret[0].(int64)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// SetRoles indicates an expected call of SetRoles.
-func (mr *MockAuthorizationRepositoryMockRecorder) SetRoles(ctx, client, condition, roles any) *MockAuthorizationRepositorySetRolesCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetRoles", reflect.TypeOf((*MockAuthorizationRepository)(nil).SetRoles), ctx, client, condition, roles)
-	return &MockAuthorizationRepositorySetRolesCall{Call: call}
-}
-
-// MockAuthorizationRepositorySetRolesCall wrap *gomock.Call
-type MockAuthorizationRepositorySetRolesCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *MockAuthorizationRepositorySetRolesCall) Return(arg0 int64, arg1 error) *MockAuthorizationRepositorySetRolesCall {
-	c.Call = c.Call.Return(arg0, arg1)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *MockAuthorizationRepositorySetRolesCall) Do(f func(context.Context, database.QueryExecutor, database.Condition, []string) (int64, error)) *MockAuthorizationRepositorySetRolesCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockAuthorizationRepositorySetRolesCall) DoAndReturn(f func(context.Context, database.QueryExecutor, database.Condition, []string) (int64, error)) *MockAuthorizationRepositorySetRolesCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
 // SetState mocks base method.
 func (m *MockAuthorizationRepository) SetState(state domain.AuthorizationState) database.Change {
 	m.ctrl.T.Helper()
@@ -856,9 +817,9 @@ func (c *MockAuthorizationRepositoryStateConditionCall) DoAndReturn(f func(domai
 }
 
 // Update mocks base method.
-func (m *MockAuthorizationRepository) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+func (m *MockAuthorizationRepository) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, roles []string, changes ...database.Change) (int64, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, client, condition}
+	varargs := []any{ctx, client, condition, roles}
 	for _, a := range changes {
 		varargs = append(varargs, a)
 	}
@@ -869,9 +830,9 @@ func (m *MockAuthorizationRepository) Update(ctx context.Context, client databas
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockAuthorizationRepositoryMockRecorder) Update(ctx, client, condition any, changes ...any) *MockAuthorizationRepositoryUpdateCall {
+func (mr *MockAuthorizationRepositoryMockRecorder) Update(ctx, client, condition, roles any, changes ...any) *MockAuthorizationRepositoryUpdateCall {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, client, condition}, changes...)
+	varargs := append([]any{ctx, client, condition, roles}, changes...)
 	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockAuthorizationRepository)(nil).Update), varargs...)
 	return &MockAuthorizationRepositoryUpdateCall{Call: call}
 }
@@ -888,13 +849,13 @@ func (c *MockAuthorizationRepositoryUpdateCall) Return(arg0 int64, arg1 error) *
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockAuthorizationRepositoryUpdateCall) Do(f func(context.Context, database.QueryExecutor, database.Condition, ...database.Change) (int64, error)) *MockAuthorizationRepositoryUpdateCall {
+func (c *MockAuthorizationRepositoryUpdateCall) Do(f func(context.Context, database.QueryExecutor, database.Condition, []string, ...database.Change) (int64, error)) *MockAuthorizationRepositoryUpdateCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockAuthorizationRepositoryUpdateCall) DoAndReturn(f func(context.Context, database.QueryExecutor, database.Condition, ...database.Change) (int64, error)) *MockAuthorizationRepositoryUpdateCall {
+func (c *MockAuthorizationRepositoryUpdateCall) DoAndReturn(f func(context.Context, database.QueryExecutor, database.Condition, []string, ...database.Change) (int64, error)) *MockAuthorizationRepositoryUpdateCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
