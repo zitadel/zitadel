@@ -522,7 +522,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, settings_v2.CreateServer(commands, queries)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, org_v2.CreateServer(commands, queries, permissionCheck)); err != nil {
+	if err := apis.RegisterService(ctx, org_v2.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, feature_v2.CreateServer(commands, queries)); err != nil {

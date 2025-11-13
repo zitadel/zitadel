@@ -14,11 +14,14 @@ import "zitadel/user/v2/user_service.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
 import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 import "zitadel/org/v2/org.proto";
 import "zitadel/org/v2/query.proto";
+import "zitadel/filter/v2/filter.proto";
+import "zitadel/metadata/v2/metadata.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/org/v2;org";
 
@@ -110,11 +113,15 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
+// This service is intended to manage organizations in a ZITADEL instance.
 service OrganizationService {
 
-  // Create an Organization
+  // Add Organization
   //
   // Create a new organization with an administrative user. If no specific roles are sent for the users, they will be granted the role ORG_OWNER.
+  //
+  // Required permission:
+  //  - `org.create`
   rpc AddOrganization(AddOrganizationRequest) returns (AddOrganizationResponse) {
     option (google.api.http) = {
       post: "/v2/organizations"
@@ -140,9 +147,54 @@ service OrganizationService {
     };
   }
 
-  // Search Organizations
+
+  // Update Organization
   //
-  // Search for Organizations. By default, we will return all organization of the instance. Make sure to include a limit and sorting for pagination..
+  // Change the name of the organization.
+  //
+  // Required permission:
+  //  - `org.write`
+  rpc UpdateOrganization(UpdateOrganizationRequest) returns (UpdateOrganizationResponse) {
+    option (google.api.http) = {
+      post: "/v2/organizations/{organization_id}"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "Organization updated successfully";
+        };
+      };
+      responses: {
+        key: "404"
+        value: {
+          description: "Organisation's not found";
+        }
+      };
+      responses: {
+        key: "409"
+        value: {
+          description: "Organisation's name already taken";
+        }
+      };
+    };
+  }
+
+  // List Organizations
+  //
+  // Search for Organizations. By default, we will return all organization of the instance that you have permission to read.
+  // Make sure to include a limit and sorting for pagination.
+  //
+  // Required permission:
+  //  - `org.read`
   rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse) {
     option (google.api.http) = {
       post: "/v2/organizations/_search";
@@ -175,6 +227,311 @@ service OrganizationService {
       };
     };
   }
+
+  // Delete Organization
+  //
+  // Deletes the organization and all its resources (Users, Projects, Grants to and from the org). Users of this organization will not be able to log in.
+  //
+  // Required permission:
+  //  - `org.delete`
+  rpc DeleteOrganization(DeleteOrganizationRequest) returns (DeleteOrganizationResponse) {
+    option (google.api.http) = {
+      delete: "/v2/organizations/{organization_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated";
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "Organization created successfully";
+        };
+      };
+      responses: {
+        key: "404"
+        value: {
+          description: "Organisation's not found";
+        }
+      };
+    };
+  }
+
+  // Set Organization Metadata
+  //
+  // Adds or updates a metadata value for the requested key. Make sure the value is base64 encoded.
+  //
+  // Required permission:
+  //  - `org.write`
+  rpc SetOrganizationMetadata(SetOrganizationMetadataRequest) returns (SetOrganizationMetadataResponse) {
+    option (google.api.http) = {
+      post: "/v2/organizations/{organization_id}/metadata"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+      };
+      responses: {
+        key: "400"
+        value: {
+          description: "Organisation's not found";
+        }
+      };
+    };
+  }
+
+  // List Organization Metadata
+  //
+  // List metadata of an organization filtered by query.
+  //
+  // Required permission:
+  //  - `org.read`
+  rpc ListOrganizationMetadata(ListOrganizationMetadataRequest) returns (ListOrganizationMetadataResponse ) {
+    option (google.api.http) = {
+      post: "/v2/organizations/{organization_id}/metadata/search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = { auth_option: {
+      permission: "authenticated"
+    }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+      };
+    };
+
+  }
+
+  // Delete Organization Metadata
+  //
+  // Delete metadata objects from an organization with a specific key.
+  //
+  // Required permission:
+  //  - `org.write`
+  rpc DeleteOrganizationMetadata(DeleteOrganizationMetadataRequest) returns (DeleteOrganizationMetadataResponse) {
+    option (google.api.http) = {
+      delete: "/v2/organizations/{organization_id}/metadata"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+      };
+    };
+
+  }
+
+  // Add Organization Domain
+  //
+  // Add a new domain to an organization. The domains are used to identify to which organization a user belongs.
+  //
+  // Required permission:
+  //  - `org.write`
+  rpc AddOrganizationDomain(AddOrganizationDomainRequest) returns (AddOrganizationDomainResponse) {
+    option (google.api.http) = {
+      post: "/v2/organizations/{organization_id}/domains"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+      };
+      responses: {
+        key: "409"
+        value: {
+          description: "Domain already exists";
+        }
+      };
+    };
+
+  }
+
+  // List Organization Domains
+  //
+  // Returns the list of registered domains of an organization. The domains are used to identify to which organization a user belongs.
+  //
+  // Required permission:
+  //  - `org.read`
+  rpc ListOrganizationDomains(ListOrganizationDomainsRequest) returns (ListOrganizationDomainsResponse) {
+    option (google.api.http) = {
+      post: "/v2/organizations/{organization_id}/domains/search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+      };
+    };
+
+  }
+
+  // Delete Organization Domain
+  //
+  // Delete a new domain from an organization. The domains are used to identify to which organization a user belongs. If the uses use the domain for login, this will not be possible afterwards. They have to use another domain instead.
+  //
+  // Required permission:
+  //  - `org.write`
+  rpc DeleteOrganizationDomain(DeleteOrganizationDomainRequest) returns (DeleteOrganizationDomainResponse) {
+    option (google.api.http) = {
+      delete: "/v2/organizations/{organization_id}/domains"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+      };
+    };
+
+  }
+
+  // Generate Organization Domain Validation
+  //
+  // Generate a new file to be able to verify your domain with DNS or HTTP challenge.
+  //
+  // Required permission:
+  //  - `org.write`
+  rpc GenerateOrganizationDomainValidation(GenerateOrganizationDomainValidationRequest) returns (GenerateOrganizationDomainValidationResponse) {
+    option (google.api.http) = {
+      post: "/v2/organizations/{organization_id}/domains/validation/generate"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+      };
+      responses: {
+        key: "404"
+        value: {
+          description: "Domain doesn't exist on organization";
+        }
+      };
+    };
+  }
+
+  // Verify Organization Domain
+  //
+  // Make sure you have added the required verification to your domain, depending on the method you have chosen (HTTP or DNS challenge). ZITADEL will check it and set the domain as verified if it was successful. A verify domain has to be unique.
+  //
+  // Required permission:
+  //  - `org.write`
+  rpc VerifyOrganizationDomain(VerifyOrganizationDomainRequest) returns (VerifyOrganizationDomainResponse) {
+    option (google.api.http) = {
+      post: "/v2/organizations/{organization_id}/domains/validation/verify"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+      };
+    };
+  }
+
+  // Deactivate Organization
+  //
+  // Sets the state of my organization to deactivated. Users of this organization will not be able to log in.
+  //
+  // Required permission:
+  //  - `org.write`
+  rpc DeactivateOrganization(DeactivateOrganizationRequest) returns (DeactivateOrganizationResponse) {
+    option (google.api.http) = {
+      post: "/v2/organizations/{organization_id}/deactivate"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+      };
+    };
+
+  }
+
+  // Activate Organization
+  //
+  // Set the state of my organization to active. The state of the organization has to be deactivated to perform the request. Users of this organization will be able to log in again.
+  //
+  // Required permission:
+  //  - `org.write`
+  rpc ActivateOrganization(ActivateOrganizationRequest) returns (ActivateOrganizationResponse) {
+    option (google.api.http) = {
+      post: "/v2/organizations/{organization_id}/activate"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+      };
+    };
+
+  }
 }
 
 message AddOrganizationRequest{
@@ -187,6 +544,8 @@ message AddOrganizationRequest{
     repeated string roles = 3;
   }
 
+  // Name is the unique name of the organization to be created.
+  // This must be unique across the instance.
   string name = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -196,9 +555,30 @@ message AddOrganizationRequest{
       example: "\"ZITADEL\"";
     }
   ];
+
+  // Specify users to be assigned as organization admins.
+  // If no users are specified here, the organization will be created without any admin users.
+  // The organization can still be managed by any instance administrator.
+  // If no roles are specified for a user, they will be assigned the role ORG_OWNER.
   repeated Admin admins = 2;
-  // optionally set your own id unique for the organization.
+
+  // OrganizationID is the unique identifier of the organization. This field is optional.
+  // If omitted, the system will generate one,
+  // which is the recommended way. The generated ID will be returned in the response.
+  optional string organization_id = 4 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+
+  // Optionally, set a unique id for the organization. If omitted, the system will generate one,
+  // which is the recommended way. The generated ID will be returned in the response.
+  //
+  // Deprecated: use 'organization_id' field instead.
   optional string org_id = 3 [
+    deprecated = true,
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       max_length: 200;
@@ -218,17 +598,403 @@ message AddOrganizationResponse{
   repeated CreatedAdmin created_admins = 3;
 }
 
+message UpdateOrganizationRequest {
+  // OrganizationID is the unique identifier of the organization to be updated.
+  string organization_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    }
+  ];
+
+  // Name is the new name for the organization to be set.
+  // Note that since the name is used to generate the organization's default domain,
+  // changing the name will also change the domain.
+  // Additionally, if the domain is used as suffix for user logins,
+  // their login names will also change accordingly.
+  // It will not affect any custom domains added to the organization.
+  string name = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"Customer 1\"";
+    }
+  ];
+}
+
+message UpdateOrganizationResponse {
+  // ChangeDate is the timestamp of the update to the organization.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
 message ListOrganizationsRequest {
   //list limitations and ordering
   zitadel.object.v2.ListQuery query = 1;
+
   // the field the result is sorted
   zitadel.org.v2.OrganizationFieldName sorting_column = 2;
-  //criteria the client is looking for
+
+  // criteria the client is looking for
   repeated zitadel.org.v2.SearchQuery queries = 3;
 }
 
 message ListOrganizationsResponse {
+  // Details of organizations results.
   zitadel.object.v2.ListDetails details = 1;
+
+  // The sorting columns the result is sorted.
   zitadel.org.v2.OrganizationFieldName sorting_column = 2;
+
+  // The Result is a list of organizations matching the query.
   repeated zitadel.org.v2.Organization result = 3;
 }
+
+message DeleteOrganizationRequest {
+  // OrganizationID is the unique identifier of the organization to be deleted.
+  string organization_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\"";
+      min_length: 1;
+      max_length: 200;
+    }
+  ];
+}
+
+message DeleteOrganizationResponse {
+  // DeletionDate is the timestamp of the deletion of the organization.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message DeactivateOrganizationRequest {
+  // OrganizationID is the unique identifier of the organization to be deactivated.
+  string organization_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\"";
+      min_length: 1;
+      max_length: 200;
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message DeactivateOrganizationResponse {
+  // ChangeDate is the timestamp of the deactivation of the organization.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message ActivateOrganizationRequest {
+  // OrganizationID is the unique identifier of the organization to be activated.
+  string organization_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\"";
+      min_length: 1;
+      max_length: 200;
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message ActivateOrganizationResponse {
+  // ChangeDate is the timestamp of the activation of the organization.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message AddOrganizationDomainRequest {
+  // OrganizationID is the unique identifier of the organization to which the domain is to be added.
+  string organization_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    }
+  ];
+
+  // Domain is the full qualified domain name to be added to the organization.
+  // Note that the domain has to be unique across the instance.
+  // Depending on the settings, you might have to verify the domain before it can be used.
+  string domain = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"testdomain.com\"";
+    }
+  ];
+}
+
+message AddOrganizationDomainResponse {
+  // CreationDate is the timestamp when the organization domain was created.
+  google.protobuf.Timestamp creation_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+}
+
+message ListOrganizationDomainsRequest {
+  // OrganizationID is the unique identifier of the organization from which the domains are to be listed.
+  string organization_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    }
+  ];
+
+  // List limitations and ordering.
+  optional zitadel.filter.v2.PaginationRequest pagination = 2;
+
+  // Filters define the criteria to query for.
+  repeated DomainSearchFilter filters = 3;
+
+  // SortingColumn is the field the result is sorted by.
+  // Beware that if you change this, your result pagination might be inconsistent.
+  DomainFieldName sorting_column = 4;
+}
+
+message ListOrganizationDomainsResponse {
+  // Pagination of the organizations domain results.
+  zitadel.filter.v2.PaginationResponse pagination = 1;
+
+  // Domains is a list of fully qualified domain names registered to the organization matching the query.
+  repeated Domain domains = 2;
+}
+
+message DeleteOrganizationDomainRequest {
+  // OrganizationID is the unique identifier of the organization from which the domain is to be deleted.
+  string organization_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    }
+  ];
+
+  // Domain is the full qualified domain name to be deleted from the organization.
+  // Note that if the domain is used as suffix for user logins,
+  // those users will not be able to log in anymore. They have to use another domain instead.
+  // Also if the domain was used for domain discovery,
+  // users will not be able to find the organization by the domain anymore.
+  string domain = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"testdomain.com\"";
+    }
+  ];
+}
+
+message DeleteOrganizationDomainResponse {
+  // DeletionDate is the timestamp of the deletion of the organization domain.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message GenerateOrganizationDomainValidationRequest {
+  // OrganizationID is the unique identifier of the organization for which the domain validation is to be generated.
+  string organization_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    }
+  ];
+
+  // Domain is the full qualified domain name for which the validation is to be generated.
+  string domain = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"testdomain.com\"";
+    }
+  ];
+
+  // Type is the domain validation type to be generated.
+  // Depending on the type, you will have to add a DNS record or a file to your webserver.
+  // Make sure that the challenge is reachable via the chosen method.
+  // The validation has to be done within one hour, otherwise the token will expire and you will have to generate a new one.
+  // After you have added the record or the file, you can verify the domain via the VerifyOrganizationDomain endpoint.
+  // You can check the status of the domain via the ListOrganizationDomains endpoint.
+  // The domain will be marked as verified after a successful verification.
+  DomainValidationType type = 3 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+}
+
+message GenerateOrganizationDomainValidationResponse {
+  // Token is a verification token that needs to be added to the DNS records or as a file to the webserver.
+  // Zitadel will check for this token to verify the domain.
+  string token = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"ofSBHsSAVHAoTIE4Iv2gwhaYhTjcY5QX\"";
+    }
+  ];
+
+  // URL is the location where the token needs to be placed for HTTP challenge.
+  string url = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"https://testdomain.com/.well-known/zitadel-challenge/ofSBHsSAVHAoTIE4Iv2gwhaYhTjcY5QX\"";
+    }
+  ];
+}
+
+message VerifyOrganizationDomainRequest {
+  // Organization ID is the unique identifier of the organization whose domain is to be verified.
+  string organization_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    }
+  ];
+
+  // Domain is the full qualified domain name to be verified.
+  string domain = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 253},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 253;
+      example: "\"testdomain.com\"";
+    }
+  ];
+}
+
+message VerifyOrganizationDomainResponse {
+  // ChangeDate is the timestamp of the verification of the organization domain.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message Metadata {
+  // Key is identifier of the metadata entry.
+  string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+
+  // Value is the values of the metadata entry.
+  bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+}
+message SetOrganizationMetadataRequest{
+  // Organization ID is the unique identifier of the organization whose metadata is to be set.
+  string organization_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    }
+  ];
+
+  // Metadata is a list of metadata entries to set.
+  repeated Metadata metadata = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[{\"key\": \"test1\", \"value\": \"VGhpcyBpcyBteSBmaXJzdCB2YWx1ZQ==\"}, {\"key\": \"test2\", \"value\": \"VGhpcyBpcyBteSBzZWNvbmQgdmFsdWU=\"}]"
+    }
+  ];
+}
+
+message SetOrganizationMetadataResponse{
+  // The timestamp of the update of the organization metadata.
+  google.protobuf.Timestamp set_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message ListOrganizationMetadataRequest {
+  // Organization ID is the unique identifier of the organization whose metadata is to be listed.
+  string organization_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    }
+  ];
+
+  // List limitations and ordering.
+  optional zitadel.filter.v2.PaginationRequest pagination = 2;
+
+  // Filters define the criteria to query the metadata for.
+  repeated zitadel.metadata.v2.MetadataSearchFilter filters = 3;
+}
+
+message ListOrganizationMetadataResponse {
+  // Pagination of the Organizations metadata results.
+  zitadel.filter.v2.PaginationResponse pagination = 1;
+
+  // Metadata is a list of organization metadata that matched the query.
+  repeated zitadel.metadata.v2.Metadata metadata = 2;
+}
+
+message DeleteOrganizationMetadataRequest {
+  // Organization ID is the unique identifier of the organization whose metadata is to be deleted.
+  string organization_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    }
+  ];
+
+  // Keys are the organization metadata entries to be deleted by their key.
+  repeated string keys = 2 [(validate.rules).repeated.items.string = {min_len: 1, max_len: 200}];
+}
+
+message DeleteOrganizationMetadataResponse{
+  // DeletionDate is the timestamp of the deletion of the organization metadata.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+
