@@ -1,13 +1,15 @@
+@use 'sass:map';
+
 @mixin redirect-uris-theme($theme) {
-  $foreground: map-get($theme, foreground);
-  $background: map-get($theme, background);
-  $is-dark-theme: map-get($theme, is-dark);
-  $warn: map-get($theme, warn);
-  $warn-color: map-get($warn, 500);
-  $button-text-color: map-get($foreground, text);
-  $button-disabled-text-color: map-get($foreground, disabled-button);
-  $divider-color: map-get($foreground, dividers);
-  $secondary-text: map-get($foreground, secondary-text);
+  $foreground: map.get($theme, foreground);
+  $background: map.get($theme, background);
+  $is-dark-theme: map.get($theme, is-dark);
+  $warn: map.get($theme, warn);
+  $warn-color: map.get($warn, 500);
+  $button-text-color: map.get($foreground, text);
+  $button-disabled-text-color: map.get($foreground, disabled-button);
+  $divider-color: map.get($foreground, dividers);
+  $secondary-text: map.get($foreground, secondary-text);
 
   .redirect-uris-list {
     width: 100%;
@@ -18,7 +20,7 @@
       margin: 0.5rem 0;
       padding: 0 0 0 0.75rem;
       border-radius: 4px;
-      background: map-get($background, infosection);
+      background: map.get($background, infosection);
 
       .uri {
         font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
@@ -57,8 +59,8 @@
       }
 
       &.alert {
-        background-color: map-get($background, alertinfosection);
-        color: map-get($foreground, alertinfosection);
+        background-color: map.get($background, alertinfosection);
+        color: map.get($foreground, alertinfosection);
 
         .alerticon {
           display: inline;

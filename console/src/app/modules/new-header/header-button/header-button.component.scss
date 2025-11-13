@@ -1,3 +1,5 @@
+@use 'sass:map';
+
 :host {
   display: flex;
   flex-direction: row;
@@ -23,8 +25,8 @@
 }
 
 @mixin header-button-theme($theme) {
-  $foreground: map-get($theme, foreground);
-  $is-dark-theme: map-get($theme, is-dark);
+  $foreground: map.get($theme, foreground);
+  $is-dark-theme: map.get($theme, is-dark);
 
   .header-button {
     height: 36px;
@@ -36,7 +38,7 @@
     border-radius: 6px;
     padding: 0 0.25rem;
     cursor: pointer;
-    color: map-get($foreground, text);
+    color: map.get($foreground, text);
 
     &:hover {
       background-color: if($is-dark-theme, #ffffff10, #00000010);

@@ -49,6 +49,17 @@
                     class="nav-item"
                     [routerLinkActive]="['active']"
                     [routerLinkActiveOptions]="{ exact: false }"
+                    [routerLink]="['/active-user']"
+                  >
+                    <span class="label">Analytics</span>
+                  </a>
+                </ng-template>
+
+                <ng-template cnslHasRole [hasRole]="['org.read']">
+                  <a
+                    class="nav-item"
+                    [routerLinkActive]="['active']"
+                    [routerLinkActiveOptions]="{ exact: false }"
                     [routerLink]="['/instance']"
                     *ngIf="['iam.policy.read'] | hasRole | async"
                   >

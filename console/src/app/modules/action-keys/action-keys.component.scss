@@ -1,11 +1,13 @@
+@use 'sass:map';
+
 @mixin action-keys-theme($theme) {
-  $primary: map-get($theme, primary);
-  $background: map-get($theme, background);
-  $foreground: map-get($theme, foreground);
-  $accent: map-get($theme, accent);
-  $is-dark-theme: map-get($theme, is-dark);
-  $accent-color: map-get($primary, 500);
-  $back: map-get($background, background);
+  $primary: map.get($theme, primary);
+  $background: map.get($theme, background);
+  $foreground: map.get($theme, foreground);
+  $accent: map.get($theme, accent);
+  $is-dark-theme: map.get($theme, is-dark);
+  $accent-color: map.get($primary, 500);
+  $back: map.get($background, background);
 
   .action-keys-wrapper {
     display: inline-block;
@@ -43,7 +45,7 @@
           right: 0;
           bottom: 0;
           left: 0;
-          background: map-get($primary, default-contrast);
+          background: map.get($primary, default-contrast);
           opacity: 0.2;
           border-radius: 4px;
         }

@@ -1,12 +1,14 @@
+@use 'sass:map';
+
 :host {
   max-height: 100%;
   height: 100%;
 }
 
 @mixin organization-selector-theme($theme) {
-  $foreground: map-get($theme, foreground);
-  $background: map-get($theme, background);
-  $is-dark-theme: map-get($theme, is-dark);
+  $foreground: map.get($theme, foreground);
+  $background: map.get($theme, background);
+  $is-dark-theme: map.get($theme, is-dark);
 
   .dropdown-label {
     color: if($is-dark-theme, #ffffff60, #00000060);

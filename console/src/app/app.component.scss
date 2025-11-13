@@ -1,14 +1,16 @@
-@mixin main-theme($theme) {
-  $primary: map-get($theme, primary);
-  $warn: map-get($theme, warn);
-  $background: map-get($theme, background);
-  $foreground: map-get($theme, foreground);
-  $accent: map-get($theme, accent);
-  $primary-color: map-get($primary, 500);
+@use 'sass:map';
 
-  $warn-color: map-get($warn, 500);
-  $accent-color: map-get($accent, 500);
-  $is-dark-theme: map-get($theme, is-dark);
+@mixin main-theme($theme) {
+  $primary: map.get($theme, primary);
+  $warn: map.get($theme, warn);
+  $background: map.get($theme, background);
+  $foreground: map.get($theme, foreground);
+  $accent: map.get($theme, accent);
+  $primary-color: map.get($primary, 500);
+
+  $warn-color: map.get($warn, 500);
+  $accent-color: map.get($accent, 500);
+  $is-dark-theme: map.get($theme, is-dark);
 
   .main-container {
     display: flex;
@@ -34,14 +36,14 @@
       top: 0;
       right: 0;
       left: 0;
-      background-color: map-get($background, toolbar);
+      background-color: map.get($background, toolbar);
       backdrop-filter: blur(10px);
-      border-bottom: 1px solid map-get($foreground, divider);
+      border-bottom: 1px solid map.get($foreground, divider);
       z-index: 50;
       transform: all 0.2s ease;
 
       @-moz-document url-prefix() {
-        background-color: map-get($background, moz-toolbar);
+        background-color: map.get($background, moz-toolbar);
         backdrop-filter: none;
       }
 

@@ -1,5 +1,6 @@
 @use '../../../../../styles/input.scss' as input;
 @use '../../../label/label.component.scss' as label;
+@use 'sass:map';
 
 @mixin preview-theme($show-dark) {
   $theme: if($show-dark, $caos-dark-app-theme, $caos-light-app-theme);
@@ -8,17 +9,17 @@
   @include label.cnsl-label-theme($theme);
   //   @include mat.all-component-themes($theme);
 
-  $primary: map-get($theme, primary);
-  $primary-color: map-get($primary, 500);
-  $is-dark-theme: map-get($theme, is-dark);
-  $background: map-get($theme, background);
-  $foreground: map-get($theme, foreground);
+  $primary: map.get($theme, primary);
+  $primary-color: map.get($primary, 500);
+  $is-dark-theme: map.get($theme, is-dark);
+  $background: map.get($theme, background);
+  $foreground: map.get($theme, foreground);
 
   .preview {
     pointer-events: none;
     border-radius: 0.5rem;
     transform: scale(0.9);
-    color: map-get($foreground, text);
+    color: map.get($foreground, text);
 
     * {
       pointer-events: none;
