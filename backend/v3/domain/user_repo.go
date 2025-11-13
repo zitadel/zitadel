@@ -37,7 +37,7 @@ type UserRepository interface {
 type userConditions interface {
 	PrimaryKeyCondition(instanceID, userID string) database.Condition
 	InstanceIDCondition(instanceID string) database.Condition
-	OrgIDCondition(orgID string) database.Condition
+	OrganizationIDCondition(orgID string) database.Condition
 	IDCondition(userID string) database.Condition
 	UsernameCondition(op database.TextOperation, username string) database.Condition
 	StateCondition(state UserState) database.Condition
