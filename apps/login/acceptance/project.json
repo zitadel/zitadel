@@ -22,7 +22,10 @@
                 "run-mock-server",
                 "run-login"
             ],
-            "continuous": false,
+            "options": {
+                "cwd": "{projectRoot}"
+            },
+            "continuous": true,
             "command": "wait-on --verbose --interval 2000 --simultaneous 1 \"${ZITADEL_API_URL}/debug/ready\" \"${LOGIN_BASE_URL}\" \"http://localhost:3333/ready\" && playwright test"
         },
         "run-mock-server": {
