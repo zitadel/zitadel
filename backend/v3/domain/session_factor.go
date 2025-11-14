@@ -225,7 +225,7 @@ func GetChallenge[T SessionChallenge](challenges SessionChallenges) (T, bool) {
 	return nilT, false
 }
 
-type sessionFactorColumns interface {
+type SessionFactorColumns interface {
 	// InstanceIDColumn returns the column for the instance id field.
 	InstanceIDColumn() database.Column
 	// SessionIDColumn returns the column for the session id field.
@@ -240,7 +240,7 @@ type sessionFactorColumns interface {
 	LastVerifiedAtColumn() database.Column
 }
 
-type sessionFactorConditions interface {
+type SessionFactorConditions interface {
 	// PrimaryKeyCondition returns a filter on the primary key fields.
 	PrimaryKeyCondition(instanceID, sessionID string, factorType SessionFactorType) database.Condition
 	// InstanceIDCondition returns an equal filter on the instance id field.

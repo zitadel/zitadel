@@ -64,11 +64,11 @@ type sessionColumns interface {
 	UpdatedAtColumn() database.Column
 
 	// FactorColumns returns the columns for the factors fields.
-	FactorColumns() sessionFactorColumns
+	FactorColumns() SessionFactorColumns
 	// MetadataColumns returns the columns for the metadata fields.
-	MetadataColumns() sessionMetadataColumns
+	MetadataColumns() SessionMetadataColumns
 	// UserAgentColumns returns the columns for the user agent fields.
-	UserAgentColumns() sessionUserAgentColumns
+	UserAgentColumns() SessionUserAgentColumns
 }
 
 // sessionConditions define all the conditions for the session table.
@@ -89,11 +89,11 @@ type sessionConditions interface {
 	UpdatedAtCondition(op database.NumberOperation, updatedAt time.Time) database.Condition
 
 	// FactorConditions returns the conditions for the factors fields.
-	FactorConditions() sessionFactorConditions
+	FactorConditions() SessionFactorConditions
 	// MetadataConditions returns the conditions for the metadata fields.
-	MetadataConditions() sessionMetadataConditions
+	MetadataConditions() SessionMetadataConditions
 	// UserAgentConditions returns the conditions for the user agent fields.
-	UserAgentConditions() sessionUserAgentConditions
+	UserAgentConditions() SessionUserAgentConditions
 }
 
 type sessionChanges interface {
