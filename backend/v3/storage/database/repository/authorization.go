@@ -165,6 +165,7 @@ func (a authorization) Update(ctx context.Context, client database.QueryExecutor
 	return a.update(ctx, client, condition, changes)
 }
 
+// update updates the authorization table when there are no roles to be set.
 func (a authorization) update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes []database.Change) (int64, error) {
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
@@ -303,9 +304,9 @@ func (a authorization) UserIDCondition(userID string) database.Condition {
 	return database.NewTextCondition(a.UserIDColumn(), database.TextOperationEqual, userID)
 }
 
-// RolesCondition implements [domain.authorizationConditions]
-func (a authorization) RolesCondition(op database.TextOperation, roles string) database.Condition {
-	return database.NewTextCondition(database.NewColumn(a.unqualifiedAuthorizationRolesTableName(), "role_key"), op, roles)
+// RoleCondition implements [domain.authorizationConditions]
+func (a authorization) RoleCondition(op database.TextOperation, role string) database.Condition {
+	return database.NewTextCondition(database.NewColumn(a.unqualifiedAuthorizationRolesTableName(), "role_key"), op, role)
 }
 
 // StateCondition implements [domain.authorizationConditions]

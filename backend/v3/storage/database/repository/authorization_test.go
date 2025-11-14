@@ -546,7 +546,7 @@ func TestListAuthorization(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						authorizationRepo.InstanceIDCondition(instanceID),
-						authorizationRepo.RolesCondition(database.TextOperationContains, project1Role1),
+						authorizationRepo.RoleCondition(database.TextOperationContains, project1Role1),
 					),
 				),
 				database.WithOrderByAscending(authorizationRepo.IDColumn()),

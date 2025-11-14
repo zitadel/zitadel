@@ -63,8 +63,8 @@ type authorizationConditions interface {
 	GrantIDCondition(grantID string) database.Condition
 	// UserIDCondition returns a filter on the user_id field.
 	UserIDCondition(userID string) database.Condition
-	// RolesCondition returns a filter on the roles field.
-	RolesCondition(op database.TextOperation, roles string) database.Condition
+	// RoleCondition returns a filter on the role_key field from the authotization_roles table.
+	RoleCondition(op database.TextOperation, role string) database.Condition
 	// StateCondition returns a filter on the name field.
 	StateCondition(state AuthorizationState) database.Condition
 }

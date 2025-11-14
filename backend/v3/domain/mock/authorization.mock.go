@@ -626,40 +626,40 @@ func (c *MockAuthorizationRepositoryProjectIDConditionCall) DoAndReturn(f func(s
 	return c
 }
 
-// RolesCondition mocks base method.
-func (m *MockAuthorizationRepository) RolesCondition(op database.TextOperation, roles string) database.Condition {
+// RoleCondition mocks base method.
+func (m *MockAuthorizationRepository) RoleCondition(op database.TextOperation, role string) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RolesCondition", op, roles)
+	ret := m.ctrl.Call(m, "RoleCondition", op, role)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
-// RolesCondition indicates an expected call of RolesCondition.
-func (mr *MockAuthorizationRepositoryMockRecorder) RolesCondition(op, roles any) *MockAuthorizationRepositoryRolesConditionCall {
+// RoleCondition indicates an expected call of RoleCondition.
+func (mr *MockAuthorizationRepositoryMockRecorder) RoleCondition(op, role any) *MockAuthorizationRepositoryRoleConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RolesCondition", reflect.TypeOf((*MockAuthorizationRepository)(nil).RolesCondition), op, roles)
-	return &MockAuthorizationRepositoryRolesConditionCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RoleCondition", reflect.TypeOf((*MockAuthorizationRepository)(nil).RoleCondition), op, role)
+	return &MockAuthorizationRepositoryRoleConditionCall{Call: call}
 }
 
-// MockAuthorizationRepositoryRolesConditionCall wrap *gomock.Call
-type MockAuthorizationRepositoryRolesConditionCall struct {
+// MockAuthorizationRepositoryRoleConditionCall wrap *gomock.Call
+type MockAuthorizationRepositoryRoleConditionCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockAuthorizationRepositoryRolesConditionCall) Return(arg0 database.Condition) *MockAuthorizationRepositoryRolesConditionCall {
+func (c *MockAuthorizationRepositoryRoleConditionCall) Return(arg0 database.Condition) *MockAuthorizationRepositoryRoleConditionCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockAuthorizationRepositoryRolesConditionCall) Do(f func(database.TextOperation, string) database.Condition) *MockAuthorizationRepositoryRolesConditionCall {
+func (c *MockAuthorizationRepositoryRoleConditionCall) Do(f func(database.TextOperation, string) database.Condition) *MockAuthorizationRepositoryRoleConditionCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockAuthorizationRepositoryRolesConditionCall) DoAndReturn(f func(database.TextOperation, string) database.Condition) *MockAuthorizationRepositoryRolesConditionCall {
+func (c *MockAuthorizationRepositoryRoleConditionCall) DoAndReturn(f func(database.TextOperation, string) database.Condition) *MockAuthorizationRepositoryRoleConditionCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
