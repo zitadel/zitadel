@@ -100,6 +100,15 @@ func TestBinarySearchRouter_GetEventBestMatch(t *testing.T) {
 			wantOk:      true,
 		},
 		{
+			name:    "event group match with specific match available",
+			targets: []Target{eventGroupTarget, eventMatchTarget},
+			args: args{
+				id: "event/foo.bar.baz",
+			},
+			wantTargets: []Target{eventMatchTarget},
+			wantOk:      true,
+		},
+		{
 			name:    "event match",
 			targets: testTargets,
 			args: args{
