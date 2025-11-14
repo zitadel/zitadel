@@ -40,7 +40,7 @@ export async function createServiceForHost<T extends ServiceClass>(
   }
 
   if (!token) {
-    throw new Error("No token found");
+    throw new Error(`Can't authenticate API requests. Either set the environment variables AUDIENCE (${process.env.AUDIENCE && 'set' || 'not set'}), SYSTEM_USER_ID (${process.env.SYSTEM_USER_ID && 'set' || 'not set'}), and SYSTEM_USER_PRIVATE_KEY (${process.env.SYSTEM_USER_PRIVATE_KEY && 'set' || 'not set'}) or provide a service user token via ZITADEL_SERVICE_USER_TOKEN (${!!process.env.ZITADEL_SERVICE_USER_TOKEN && 'set' || 'not set'}).`);
   }
 
   const transport = createServerTransport(token, serviceUrl);
