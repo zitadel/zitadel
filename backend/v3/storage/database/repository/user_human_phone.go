@@ -1,0 +1,80 @@
+package repository
+
+import (
+	"time"
+
+	"github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
+)
+
+// -------------------------------------------------------------
+// changes
+// -------------------------------------------------------------
+
+// RemovePhone implements [domain.HumanUserRepository.RemovePhone].
+func (u userHuman) RemovePhone() database.Change {
+	return database.NewChanges(
+		database.NewChangeToNull(u.phoneColumn()),
+		database.NewChangeToNull(u.phoneVerifiedAtColumn()),
+		database.NewChangeToNull(u.smsOTPEnabledAtColumn()),
+		database.NewChangeToNull(u.lastSuccessfulSMSOTPCheckColumn()),
+		database.NewChangeToNull(u.smsOTPVerificationIDColumn()),
+	)
+}
+
+// SetPhone implements [domain.HumanUserRepository.SetPhone].
+func (u userHuman) SetPhone(verification domain.VerificationType) database.Change {
+	panic("unimplemented")
+}
+
+// CheckSMSOTP implements [domain.HumanUserRepository.CheckSMSOTP].
+func (u userHuman) CheckSMSOTP(check domain.CheckType) database.Change {
+	panic("unimplemented")
+}
+
+// DisableSMSOTP implements [domain.HumanUserRepository.DisableSMSOTP].
+func (u userHuman) DisableSMSOTP() database.Change {
+	return database.NewChangeToNull(u.smsOTPEnabledAtColumn())
+}
+
+// EnableSMSOTP implements [domain.HumanUserRepository.EnableSMSOTP].
+func (u userHuman) EnableSMSOTP() database.Change {
+	return database.NewChange(u.smsOTPEnabledAtColumn(), database.NowInstruction)
+}
+
+// EnableSMSOTPAt implements [domain.HumanUserRepository.EnableSMSOTPAt].
+func (u userHuman) EnableSMSOTPAt(enabledAt time.Time) database.Change {
+	return database.NewChange(u.smsOTPEnabledAtColumn(), enabledAt)
+}
+
+// -------------------------------------------------------------
+// conditions
+// -------------------------------------------------------------
+
+// PhoneCondition implements [domain.HumanUserRepository.PhoneCondition].
+func (u userHuman) PhoneCondition(op database.TextOperation, phone string) database.Condition {
+	return database.NewTextCondition(u.phoneColumn(), op, phone)
+}
+
+// -------------------------------------------------------------
+// columns
+// -------------------------------------------------------------
+
+func (u userHuman) phoneColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "phone")
+}
+func (u userHuman) phoneVerifiedAtColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "phone_verified_at")
+}
+
+func (u userHuman) smsOTPEnabledAtColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "sms_otp_enabled_at")
+}
+
+func (u userHuman) lastSuccessfulSMSOTPCheckColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "last_successful_sms_otp_check")
+}
+
+func (u userHuman) smsOTPVerificationIDColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "sms_otp_verification_id")
+}

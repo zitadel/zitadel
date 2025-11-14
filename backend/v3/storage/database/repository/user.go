@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"slices"
+	"fmt"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -17,17 +17,18 @@ func UserRepository() domain.UserRepository {
 	return new(user)
 }
 
-func HumanUserRepository() domain.HumanUserRepository {
-	// TODO: implement human user repository
-	return nil
-}
-
 func MachineUserRepository() domain.MachineUserRepository {
 	// TODO: implement machine user repository
 	return nil
 }
 
-type user struct{}
+type user struct {
+	verification verification
+	tableName    string
+}
+
+// existingUser is used to get the columns and conditions for the CTE that selects the existing user in update and delete operations.
+var existingUser = user{tableName: "existing_user"}
 
 // Create implements [domain.UserRepository.Create].
 func (u user) Create(ctx context.Context, client database.QueryExecutor, user *domain.User) error {
@@ -68,22 +69,17 @@ func (u user) Update(ctx context.Context, client database.QueryExecutor, conditi
 	writeCondition(builder, condition)
 	builder.WriteRune(')')
 
-	changes = slices.DeleteFunc(changes, func(change database.Change) bool {
-		switch c := change.(type) {
-		case *addMetadataChange:
-			builder.WriteString(", set_metadata AS (")
-			c.Write(builder)
+	for i, change := range changes {
+		if cteChange, ok := change.(database.CTEChange); ok {
+			builder.WriteString(", ")
+			cteName := fmt.Sprintf("cte_%d", i)
+			builder.WriteString(cteName)
+			builder.WriteString(" AS (")
+			cteChange.SetName(cteName)
+			cteChange.WriteCTE(builder)
 			builder.WriteRune(')')
-			return true
-		case *removeMetadataChange:
-			builder.WriteString(", removed_metadata AS (")
-			c.Write(builder)
-			builder.WriteRune(')')
-			return true
-		default:
-			return false
 		}
-	})
+	}
 
 	if !database.Changes(changes).IsOnColumn(u.updatedAtColumn()) {
 		changes = append(changes, u.clearUpdatedAt())
@@ -93,23 +89,22 @@ func (u user) Update(ctx context.Context, client database.QueryExecutor, conditi
 	database.Changes(changes).Write(builder)
 	builder.WriteString(" FROM existing_user")
 	writeCondition(builder, database.And(
-		database.NewColumnCondition(u.idColumn(), u.existingUserIDColumn()),
-		database.NewColumnCondition(u.instanceIDColumn(), u.existingUserInstanceIDColumn()),
+		database.NewColumnCondition(u.idColumn(), existingUser.idColumn()),
+		database.NewColumnCondition(u.instanceIDColumn(), existingUser.instanceIDColumn()),
 	))
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
 func (u user) unqualifiedTableName() string {
+	if u.tableName != "" {
+		return u.tableName
+	}
 	return "users"
 }
 
 func (u user) unqualifiedMetadataTableName() string {
 	return "user_metadata"
-}
-
-func (u user) existingUserCTEName() string {
-	return "existing_user"
 }
 
 // -------------------------------------------------------------
@@ -118,108 +113,54 @@ func (u user) existingUserCTEName() string {
 
 // AddMetadata implements [domain.UserRepository.AddMetadata].
 func (u user) AddMetadata(metadata ...*domain.Metadata) database.Change {
-	return &addMetadataChange{
-		metadata: metadata,
-	}
+	return database.NewCTEChange(
+		func(builder *database.StatementBuilder) {
+			builder.WriteString("INSERT INTO zitadel.user_metadata(instance_id, user_id, key, value, created_at, updated_at)")
+			builder.WriteString(" SELECT existing_user.instance_id, existing_user.id, md.key, md.value, md.created_at, md.updated_at")
+			builder.WriteString(" FROM existing_user CROSS JOIN (VALUES ")
+			for i, md := range metadata {
+				if i > 0 {
+					builder.WriteString(", ")
+				}
+				builder.WriteRune('(')
+				builder.WriteArgs(md.Key, md.Value)
+				var createdAt, updatedAt any = database.DefaultInstruction, database.NullInstruction
+				if !md.CreatedAt.IsZero() {
+					createdAt = md.CreatedAt
+				}
+				if !md.UpdatedAt.IsZero() {
+					updatedAt = md.UpdatedAt
+				}
+				builder.WriteArgs(createdAt, updatedAt)
+				builder.WriteRune(')')
+			}
+			builder.WriteString(") AS md(key, value, created_at, updated_at)")
+			builder.WriteString("ON CONFLICT (")
+			database.Columns{
+				u.metadataInstanceIDColumn(),
+				u.metadataUserIDColumn(),
+				u.metadataKeyColumn(),
+			}.WriteQualified(builder)
+			builder.WriteString(") DO UPDATE SET value = EXCLUDED.value, updated_at = EXCLUDED.updated_at")
+		},
+		nil,
+	)
 }
-
-type addMetadataChange struct {
-	metadata []*domain.Metadata
-}
-
-// IsOnColumn implements [database.Change.IsOnColumn].
-// Always returns false as this change is on multiple columns.
-func (addMetadata *addMetadataChange) IsOnColumn(col database.Column) bool {
-	return false
-}
-
-// Matches implements [database.Change.Matches].
-func (addMetadata *addMetadataChange) Matches(x any) bool {
-	toMatch, ok := x.(*addMetadataChange)
-	if !ok {
-		return false
-	}
-	return slices.EqualFunc(addMetadata.metadata, toMatch.metadata, func(a, b *domain.Metadata) bool {
-		return a.InstanceID == b.InstanceID &&
-			a.Key == b.Key &&
-			slices.Equal(a.Value, b.Value)
-	})
-}
-
-// String implements [database.Change.String].
-func (addMetadata *addMetadataChange) String() string {
-	return "user.addMetadataChange"
-}
-
-// Write implements [database.Change.Write].
-func (addMetadata *addMetadataChange) Write(builder *database.StatementBuilder) {
-	builder.WriteString("INSERT INTO zitadel.user_metadata(instance_id, user_id, key, value, created_at, updated_at)")
-	builder.WriteString(" SELECT existing_user.instance_id, existing_user.id, md.key, md.value, md.created_at, md.updated_at")
-	builder.WriteString(" FROM existing_user CROSS JOIN (VALUES ")
-	for i, md := range addMetadata.metadata {
-		if i > 0 {
-			builder.WriteString(", ")
-		}
-		builder.WriteRune('(')
-		builder.WriteArgs(md.Key, md.Value)
-		var createdAt, updatedAt any = database.DefaultInstruction, database.NullInstruction
-		if !md.CreatedAt.IsZero() {
-			createdAt = md.CreatedAt
-		}
-		if !md.UpdatedAt.IsZero() {
-			updatedAt = md.UpdatedAt
-		}
-		builder.WriteArgs(createdAt, updatedAt)
-		builder.WriteRune(')')
-	}
-	builder.WriteString(") AS md(key, value, created_at, updated_at)")
-}
-
-var _ database.Change = (*addMetadataChange)(nil)
 
 // RemoveMetadata implements [domain.UserRepository.RemoveMetadata].
 func (u user) RemoveMetadata(condition database.Condition) database.Change {
-	return &removeMetadataChange{
-		user:      u,
-		condition: condition,
-	}
+	return database.NewCTEChange(
+		func(builder *database.StatementBuilder) {
+			builder.WriteString("DELETE FROM zitadel.user_metadata USING existing_user")
+			writeCondition(builder, database.And(
+				database.NewColumnCondition(u.existingUserInstanceIDColumn(), u.metadataInstanceIDColumn()),
+				database.NewColumnCondition(u.existingUserIDColumn(), u.metadataUserIDColumn()),
+				condition,
+			))
+		},
+		nil,
+	)
 }
-
-type removeMetadataChange struct {
-	user      user
-	condition database.Condition
-}
-
-// IsOnColumn implements [database.Change.IsOnColumn].
-func (removeMetadata *removeMetadataChange) IsOnColumn(col database.Column) bool {
-	return false
-}
-
-// Matches implements [database.Change.Matches].
-func (removeMetadata *removeMetadataChange) Matches(x any) bool {
-	toMatch, ok := x.(*removeMetadataChange)
-	if !ok {
-		return false
-	}
-	return removeMetadata.condition.Matches(toMatch.condition)
-}
-
-// String implements [database.Change.String].
-func (removeMetadata *removeMetadataChange) String() string {
-	return "user.removeMetadataChange"
-}
-
-// Write implements [database.Change.Write].
-func (removeMetadata *removeMetadataChange) Write(builder *database.StatementBuilder) {
-	builder.WriteString("DELETE FROM zitadel.user_metadata USING existing_user")
-	writeCondition(builder, database.And(
-		database.NewColumnCondition(removeMetadata.user.existingUserInstanceIDColumn(), removeMetadata.user.metadataInstanceIDColumn()),
-		database.NewColumnCondition(removeMetadata.user.existingUserIDColumn(), removeMetadata.user.metadataUserIDColumn()),
-		removeMetadata.condition,
-	))
-}
-
-var _ database.Change = (*removeMetadataChange)(nil)
 
 // SetState implements [domain.UserRepository.SetState].
 func (u user) SetState(state domain.UserState) database.Change {
@@ -344,14 +285,6 @@ func (u user) instanceIDColumn() database.Column {
 
 func (u user) updatedAtColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "updated_at")
-}
-
-func (u user) existingUserInstanceIDColumn() database.Column {
-	return database.NewColumn(u.existingUserCTEName(), "instance_id")
-}
-
-func (u user) existingUserIDColumn() database.Column {
-	return database.NewColumn(u.existingUserCTEName(), "id")
 }
 
 func (u user) metadataInstanceIDColumn() database.Column {
