@@ -8,7 +8,10 @@
                 "run-login"
             ],
             "options": {
-                "cwd": "{projectRoot}"
+                "cwd": "{projectRoot}",
+                "env": {
+                    "PLAYWRIGHT_HTML_OPEN": "never"
+                }
             },
             "command": "wait-on --verbose --interval 2000 --simultaneous 1 \"${ZITADEL_API_URL}/debug/ready\" \"${LOGIN_BASE_URL}\" \"http://localhost:3333/ready\" && playwright test",
             "cache": true,
