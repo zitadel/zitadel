@@ -117,47 +117,31 @@ func (s settings) SetUpdatedAt(updatedAt *time.Time) database.Change {
 }
 
 func (s settings) get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Settings, error) {
-	options := new(database.QueryOpts)
-	for _, opt := range opts {
-		opt(options)
-	}
-
-	if err := s.CheckMandatoryCondtions(options.Condition); err != nil {
+	builder, err := s.prepareQuery(opts)
+	if err != nil {
 		return nil, err
 	}
-
-	builder := database.StatementBuilder{}
-	builder.WriteString(querySettingStmt)
-
-	options.Write(&builder)
-
-	return getOne[domain.Settings](ctx, client, &builder)
+	return getOne[domain.Settings](ctx, client, builder)
 }
 
 func (s settings) list(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Settings, error) {
-	builder := database.StatementBuilder{}
-
-	builder.WriteString(querySettingStmt)
-
-	options := new(database.QueryOpts)
-	for _, opt := range opts {
-		opt(options)
+	builder, err := s.prepareQuery(opts)
+	if err != nil {
+		return nil, err
 	}
-	options.Write(&builder)
-
-	orderBy := database.OrderBy(s.CreatedAtColumn())
-	orderBy.Write(&builder)
-
-	return getMany[domain.Settings](ctx, client, &builder)
+	return getMany[domain.Settings](ctx, client, builder)
 }
 
-const setSettingStmt = `INSERT INTO zitadel.settings` +
-	` (id, instance_id, organization_id, type, owner_type, state, settings)` +
-	` VALUES ($1, $2, $3, $4, $5, $6, $7)` +
-	` ON CONFLICT (id, instance_id, organization_id, type, owner_type) DO UPDATE SET`
+func (s settings) set(ctx context.Context, client database.QueryExecutor, settings domain.Settings, changes ...database.Change) error {
+	if settings.OrganizationID == nil {
+		settings.OwnerType = domain.OwnerTypeOrganization
+	} else {
+		settings.OwnerType = domain.OwnerTypeInstance
+	}
 
-func (s settings) set(ctx context.Context, client database.QueryExecutor, settings *domain.Settings, changes ...database.Change) error {
-	builder := database.NewStatementBuilder(setSettingStmt,
+	builder := database.NewStatementBuilder(`INSERT INTO ` + s.qualifiedTableName())
+	builder.WriteString(` (id, instance_id, organization_id, type, owner_type, state, settings) VALUES (`)
+	builder.WriteArgs(
 		settings.ID,
 		settings.InstanceID,
 		settings.OrganizationID,
@@ -166,6 +150,7 @@ func (s settings) set(ctx context.Context, client database.QueryExecutor, settin
 		settings.State,
 		settings.Settings,
 	)
+	builder.WriteString(`) ON CONFLICT (id, instance_id, organization_id, type, owner_type) DO UPDATE SET`)
 	err := database.Changes(changes).Write(builder)
 	if err != nil {
 		return err
@@ -176,7 +161,7 @@ func (s settings) set(ctx context.Context, client database.QueryExecutor, settin
 }
 
 func (s settings) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	if err := s.CheckMandatoryCondtions(condition); err != nil {
+	if err := checkPKCondition(s, condition); err != nil {
 		return 0, err
 	}
 
@@ -187,20 +172,23 @@ func (s settings) Delete(ctx context.Context, client database.QueryExecutor, con
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-func (s settings) CheckMandatoryCondtions(condition database.Condition) error {
-	if !condition.IsRestrictingColumn(s.InstanceIDColumn()) {
-		return database.NewMissingConditionError(s.InstanceIDColumn())
+// PrimaryKeyColumns implements [domain.Repository].
+func (s settings) PrimaryKeyColumns() []database.Column {
+	return []database.Column{
+		s.InstanceIDColumn(),
+		s.IDColumn(),
+		s.TypeColumn(),
+		s.OwnerTypeColumn(),
 	}
-	if !condition.IsRestrictingColumn(s.OrganizationIDColumn()) {
-		return database.NewMissingConditionError(s.OrganizationIDColumn())
-	}
-	if !condition.IsRestrictingColumn(s.TypeColumn()) {
-		return database.NewMissingConditionError(s.TypeColumn())
-	}
-	if !condition.IsRestrictingColumn(s.OwnerTypeColumn()) {
-		return database.NewMissingConditionError(s.OwnerTypeColumn())
-	}
-	return nil
+}
+
+func (s settings) PrimaryKeyCondition(instanceID, id string, t domain.SettingType, owner domain.OwnerType) database.Condition {
+	return database.And(
+		s.InstanceIDCondition(instanceID),
+		s.IDCondition(id),
+		s.TypeCondition(t),
+		s.OwnerTypeCondition(owner),
+	)
 }
 
 // login
@@ -379,25 +367,16 @@ var _ domain.LoginSettingsRepository = (*loginSettings)(nil)
 func (l loginSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.LoginSettings) error {
 	settings.Type = domain.SettingTypeLogin
 	settings.State = domain.SettingStateActivated
-	if settings.OrganizationID == nil {
-		settings.OwnerType = domain.OwnerTypeOrganization
-	} else {
-		settings.OwnerType = domain.OwnerTypeInstance
-	}
 
 	var settingsJSON []byte
 	if err := json.Unmarshal(settingsJSON, settings.LoginSettingsAttributes); err != nil {
 		return err
 	}
 	settings.Settings.Settings = settingsJSON
-	args, changes, err := setSettingChanges(settings.Settings, settingsJSON, l.SetSettingFields(settings))
-	if err != nil {
-		return err
-	}
 	return l.settings.set(ctx, client, settings.Settings, l.SetSettingFields(settings))
 }
 
-func (s *loginSettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.LoginSettings, error) {
+func (s loginSettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.LoginSettings, error) {
 	list := make([]*domain.LoginSettings, 0)
 
 	settings, err := s.settings.list(ctx, client, opts...)
@@ -411,11 +390,10 @@ func (s *loginSettings) List(ctx context.Context, client database.QueryExecutor,
 			return nil, err
 		}
 	}
-
 	return list, nil
 }
 
-func (s *loginSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.LoginSettings, error) {
+func (s loginSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.LoginSettings, error) {
 	loginSettings := &domain.LoginSettings{}
 
 	settings, err := s.settings.get(ctx, client, opts...)
@@ -433,26 +411,85 @@ func (s *loginSettings) Get(ctx context.Context, client database.QueryExecutor, 
 
 // label
 type brandingSettings struct {
-	*settings
+	settings
 }
 
 // -------------------------------------------------------------
 // label changes
 // -------------------------------------------------------------
 
-func (brandingSettings) SetPrimaryColor(value string) db_json.JsonUpdate {
+func (b brandingSettings) SetSettingFields(value *domain.BrandingSettings) database.Change {
+	changes := make([]db_json.JsonUpdate, 0)
+	if value == nil {
+		return nil
+	}
+	if value.PrimaryColorLight != nil {
+		changes = append(changes, b.SetPrimaryColorLight(*value.PrimaryColorLight))
+	}
+	if value.BackgroundColorLight != nil {
+		changes = append(changes, b.SetBackgroundColorLight(*value.BackgroundColorLight))
+	}
+	if value.WarnColorLight != nil {
+		changes = append(changes, b.SetWarnColorLight(*value.WarnColorLight))
+	}
+	if value.FontColorLight != nil {
+		changes = append(changes, b.SetFontColorLight(*value.FontColorLight))
+	}
+	if value.PrimaryColorDark != nil {
+		changes = append(changes, b.SetPrimaryColorDark(*value.PrimaryColorDark))
+	}
+	if value.BackgroundColorDark != nil {
+		changes = append(changes, b.SetBackgroundColorDark(*value.BackgroundColorDark))
+	}
+	if value.WarnColorDark != nil {
+		changes = append(changes, b.SetWarnColorDark(*value.WarnColorDark))
+	}
+	if value.FontColorDark != nil {
+		changes = append(changes, b.SetFontColorDark(*value.FontColorDark))
+	}
+	if value.HideLoginNameSuffix != nil {
+		changes = append(changes, b.SetHideLoginNameSuffix(*value.HideLoginNameSuffix))
+	}
+	if value.ErrorMsgPopup != nil {
+		changes = append(changes, b.SetErrorMsgPopup(*value.ErrorMsgPopup))
+	}
+	if value.DisableWatermark != nil {
+		changes = append(changes, b.SetDisableWatermark(*value.DisableWatermark))
+	}
+	if value.ThemeMode != nil {
+		changes = append(changes, b.SetThemeMode(*value.ThemeMode))
+	}
+	if value.LogoURLLight != nil {
+		changes = append(changes, b.SetLogoURLLight(*value.LogoURLLight))
+	}
+	if value.LogoURLDark != nil {
+		changes = append(changes, b.SetLogoURLDark(*value.LogoURLDark))
+	}
+	if value.IconURLLight != nil {
+		changes = append(changes, b.SetIconURLLight(*value.IconURLLight))
+	}
+	if value.IconURLDark != nil {
+		changes = append(changes, b.SetIconURLDark(*value.IconURLDark))
+	}
+	if value.FontURL != nil {
+		changes = append(changes, b.SetFontURL(*value.FontURL))
+	}
+	return db_json.NewJsonChanges(b.SettingsColumn(), changes...)
+}
+
+func (brandingSettings) SetPrimaryColorLight(value string) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"primaryColorLight"}, value)
 }
 
-func (brandingSettings) SetBackgroundColor(value string) db_json.JsonUpdate {
+func (brandingSettings) SetBackgroundColorLight(value string) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"backgroundColorLight"}, value)
 }
 
-func (brandingSettings) SetWarnColor(value string) db_json.JsonUpdate {
+func (brandingSettings) SetWarnColorLight(value string) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"warnColorLight"}, value)
 }
 
-func (brandingSettings) SetFontColor(value string) db_json.JsonUpdate {
+func (brandingSettings) SetFontColorLight(value string) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"fontColorLight"}, value)
 }
 
@@ -488,23 +525,23 @@ func (brandingSettings) SetThemeMode(value domain.BrandingPolicyThemeMode) db_js
 	return db_json.NewFieldChange([]string{"themeMode"}, value)
 }
 
-func (brandingSettings) SetLogoURLLight(value *url.URL) db_json.JsonUpdate {
+func (brandingSettings) SetLogoURLLight(value url.URL) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"logoURLLight"}, value)
 }
 
-func (brandingSettings) SetLogoURLDark(value *url.URL) db_json.JsonUpdate {
+func (brandingSettings) SetLogoURLDark(value url.URL) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"logoUrlDark"}, value)
 }
 
-func (brandingSettings) SetIconURLLight(value *url.URL) db_json.JsonUpdate {
+func (brandingSettings) SetIconURLLight(value url.URL) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"iconUrlLight"}, value)
 }
 
-func (brandingSettings) SetIconURLDark(value *url.URL) db_json.JsonUpdate {
+func (brandingSettings) SetIconURLDark(value url.URL) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"iconUrlDark"}, value)
 }
 
-func (brandingSettings) SetFontURL(value *url.URL) db_json.JsonUpdate {
+func (brandingSettings) SetFontURL(value url.URL) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"fontUrl"}, value)
 }
 
@@ -516,652 +553,680 @@ func BrandingSettingsRepository() domain.BrandingSettingsRepository {
 
 var _ domain.BrandingSettingsRepository = (*brandingSettings)(nil)
 
-const createLabelSettingStmt = `INSERT INTO zitadel.settings` +
-	` (instance_id, organization_id, type, owner_type, label_state, settings)` +
-	` VALUES ($1, $2, $3, $4, $5, $6)` +
-	` ON CONFLICT (instance_id, organization_id, type, owner_type, label_state) WHERE type = 'label' DO UPDATE SET` +
-	` settings = EXCLUDED.settings` +
-	` RETURNING id, created_at, updated_at`
+func (s brandingSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.BrandingSettings) error {
+	settings.Type = domain.SettingTypeBranding
+	settings.State = domain.SettingStatePreview
 
-func (s *brandingSettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.BrandingSetting) error {
-	if setting == nil {
-		return ErrSettingObjectMustNotBeNil
-	}
-
-	if setting.InstanceID == "" {
-		return ErrMissingInstanceID
-	}
-
-	// type is always set from the calling function to that functions respective type
-	// the check is left as a failsafe
-	if setting.Type == domain.SettingTypeUnspecified {
-		return ErrMissingType
-	}
-
-	if setting.OwnerType == domain.OwnerTypeUnspecified {
-		return ErrMissingOwnerType
-	}
-
-	settingJSON, err := json.Marshal(setting)
-	if err != nil {
+	var settingsJSON []byte
+	if err := json.Unmarshal(settingsJSON, settings.BrandingSettingsAttributes); err != nil {
 		return err
 	}
-
-	builder := database.NewStatementBuilder(
-		createLabelSettingStmt,
-		setting.InstanceID,
-		setting.OrganizationID,
-		setting.Type,
-		setting.OwnerType,
-		setting.BrandingState,
-		string(settingJSON))
-
-	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.ID, &setting.CreatedAt, &setting.UpdatedAt)
+	settings.Settings.Settings = settingsJSON
+	return s.settings.set(ctx, client, settings.Settings, s.SetSettingFields(settings))
 }
 
-func (s *brandingSettings) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	builder := database.StatementBuilder{}
-	builder.WriteString(`UPDATE zitadel.settings SET `)
-	err := database.Changes(changes).Write(&builder)
+func (s brandingSettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.BrandingSettings, error) {
+	list := make([]*domain.BrandingSettings, 0)
+
+	settings, err := s.settings.list(ctx, client, opts...)
 	if err != nil {
+		return nil, err
+	}
+
+	for i := range settings {
+		err = json.Unmarshal(settings[i].Settings, &list[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return list, nil
+}
+
+func (s brandingSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.BrandingSettings, error) {
+	item := &domain.BrandingSettings{}
+
+	settings, err := s.settings.get(ctx, client, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(settings.Settings, &item)
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
+}
+
+const queryActivateBrandingSettingsStmt = `SELECT instance_id, organization_id, id, type, owner_type, created_at, updated_at, settings FROM`
+
+func (s brandingSettings) Activate(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+	// if you want to update the roles you have to have the primary key, otherwise multiple project grants get updated
+	if err := checkPKCondition(s, condition); err != nil {
 		return 0, err
 	}
-	writeCondition(&builder, condition)
+	condition = database.And(
+		condition,
+		s.StateCondition(domain.SettingStatePreview),
+	)
+	if !database.Changes(changes).IsOnColumn(s.UpdatedAtColumn()) {
+		changes = append(changes, database.NewChange(s.UpdatedAtColumn(), database.NullInstruction))
+	}
+
+	// the statement begins with getting settings in preview state
+	builder := database.NewStatementBuilder("WITH preview AS (")
+	builder.WriteString(queryActivateBrandingSettingsStmt + s.qualifiedTableName())
+	writeCondition(builder, condition)
+	builder.WriteString(" ), ")
+
+	// insert or update settings as active
+	builder.WriteString(`INSERT INTO ` + s.qualifiedTableName())
+	builder.WriteString(` (instance_id, organization_id, id, type, owner_type, state, created_at, updated_at, settings)`)
+	builder.WriteString(`SELECT preview.instance_id, preview.organization_id, preview.id, preview.type, preview.owner_type, 'activated', preview.created_at, preview.updated_at,  preview.settings FROM preview`)
+	builder.WriteString(`ON CONFLICT (instance_id, organization_id, id, type, owner_type, state) DO UPDATE SET` +
+		` settings = EXCLUDED.settings `)
+	database.Changes(changes).Write(builder)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-func (s *brandingSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.BrandingSetting, error) {
-	labelSetting := &domain.BrandingSetting{}
-	var err error
-
-	labelSetting.Setting, err = s.getLabel(ctx, client, opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(labelSetting.Settings, &labelSetting)
-	if err != nil {
-		return nil, err
-	}
-
-	return labelSetting, nil
-}
-
-const querySettingStmt = `SELECT instance_id, organization_id, id, type, owner_type, label_state, settings,` +
-	` created_at, updated_at` +
-	` FROM zitadel.settings`
-
-func (s *brandingSettings) getLabel(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Setting, error) {
-	options := new(database.QueryOpts)
-	for _, opt := range opts {
-		opt(options)
-	}
-
-	if err := s.CheckMandatoryCondtions(options.Condition); err != nil {
-		return nil, err
-	}
-
-	if !options.Condition.IsRestrictingColumn(s.LabelStateColumn()) {
-		return nil, database.NewMissingConditionError(s.LabelStateColumn())
-	}
-
-	var builder database.StatementBuilder
-	builder.WriteString(querySettingStmt)
-	options.Write(&builder)
-
-	return getOne[domain.Setting](ctx, client, &builder)
-}
-
-func (s *brandingSettings) Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	return s.Delete(ctx, client, condition)
-}
-
-func (s *settings) CreateLabel(ctx context.Context, client database.QueryExecutor, setting *domain.BrandingSetting) error {
-	if setting == nil {
-		return ErrSettingObjectMustNotBeNil
-	}
-	if setting.BrandingState == nil {
-		return ErrLabelStateMustBeDefined
-	}
-
-	setting.Type = domain.SettingTypeBranding
-	return setSetting(ctx, client, setting.Setting, setting)
-}
-
-func (s *brandingSettings) ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *domain.BrandingSetting) error {
-	builder := database.StatementBuilder{}
-
-	settingJSON, err := json.Marshal(setting)
-	if err != nil {
-		return err
-	}
-
-	builder.AppendArgs(
-		setting.InstanceID,
-		setting.OrganizationID,
-		setting.OwnerType,
-		string(settingJSON))
-
-	builder.WriteString(activatedLabelSettingStmt)
-
-	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.ID, &setting.CreatedAt, &setting.UpdatedAt)
-}
-
-const activatedLabelSettingEventStmtStart = `INSERT INTO zitadel.settings` +
-	` (instance_id, organization_id, type, owner_type, label_state, settings, created_at)` +
-	` SELECT instance_id, organization_id, type, owner_type, 'activated', settings, $1 FROM zitadel.settings`
-
-const activatedLabelSettingEventStmtEnd = ` ON CONFLICT (instance_id, organization_id, type, owner_type, label_state) WHERE type = 'label' DO UPDATE SET` +
-	` settings = EXCLUDED.settings, updated_at = $1` +
-	` RETURNING id, created_at, updated_at`
-
-func (s *brandingSettings) ActivateLabelSettingEvent(ctx context.Context, client database.QueryExecutor, condition database.Condition, uudateAt time.Time) (int64, error) {
-	if !condition.IsRestrictingColumn(s.InstanceIDColumn()) {
-		return 0, database.NewMissingConditionError(s.InstanceIDColumn())
-	}
-	if !condition.IsRestrictingColumn(s.OrganizationIDColumn()) {
-		return 0, database.NewMissingConditionError(s.OrganizationIDColumn())
-	}
-	if !condition.IsRestrictingColumn(s.TypeColumn()) {
-		return 0, database.NewMissingConditionError(s.TypeColumn())
-	}
-	if !condition.IsRestrictingColumn(s.OwnerTypeColumn()) {
-		return 0, database.NewMissingConditionError(s.OwnerTypeColumn())
-	}
-	builder := database.StatementBuilder{}
-
-	builder.WriteString(activatedLabelSettingEventStmtStart)
-
-	builder.AppendArgs(
-		uudateAt)
-	writeCondition(&builder, condition)
-
-	builder.WriteString(activatedLabelSettingEventStmtEnd)
-
-	return client.Exec(ctx, builder.String(), builder.Args()...)
-}
-
-const activatedLabelSettingStmt = `INSERT INTO zitadel.settings` +
-	` (instance_id, organization_id, type, owner_type, label_state, settings)` +
-	` VALUES ($1, $2, 'label', $3, 'activated', $4)` +
-	` ON CONFLICT (instance_id, organization_id, type, owner_type, label_state) WHERE type = 'label' DO UPDATE SET` +
-	` settings = EXCLUDED.settings` +
-	` RETURNING id, created_at, updated_at`
-
-func (s *settings) ActivateLabelSetting(ctx context.Context, client database.QueryExecutor, setting *domain.BrandingSetting) error {
-	builder := database.StatementBuilder{}
-
-	settingJSON, err := json.Marshal(setting)
-	if err != nil {
-		return err
-	}
-
-	builder.AppendArgs(
-		setting.InstanceID,
-		setting.OrganizationID,
-		setting.OwnerType,
-		string(settingJSON))
-
-	builder.WriteString(activatedLabelSettingStmt)
-
-	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.ID, &setting.CreatedAt, &setting.UpdatedAt)
-}
-
-func (s *settings) CreatePasswordComplexity(ctx context.Context, client database.QueryExecutor, setting *domain.PasswordComplexitySetting) error {
-	if setting == nil {
-		return ErrSettingObjectMustNotBeNil
-	}
-	setting.Type = domain.SettingTypePasswordComplexity
-	return setSetting(ctx, client, setting.Setting, setting)
-}
-
-// passwordComplexity
+// -------------------------------------------------------------
+// password complexity
+// -------------------------------------------------------------
 type passwordComplexitySettings struct {
-	domain.SettingsRepository
+	settings
 }
 
-// -------------------------------------------------------------
-// label changes
-// -------------------------------------------------------------
+func (s passwordComplexitySettings) SetSettingFields(value *domain.PasswordComplexitySettings) database.Change {
+	changes := make([]db_json.JsonUpdate, 0)
+	if value == nil {
+		return nil
+	}
+	if value.MinLength != nil {
+		changes = append(changes, s.SetMinLength(*value.MinLength))
+	}
+	if value.HasLowercase != nil {
+		changes = append(changes, s.SetHasLowercase(*value.HasLowercase))
+	}
+	if value.HasUppercase != nil {
+		changes = append(changes, s.SetHasUppercase(*value.HasUppercase))
+	}
+	if value.HasNumber != nil {
+		changes = append(changes, s.SetHasNumber(*value.HasNumber))
+	}
+	if value.HasSymbol != nil {
+		changes = append(changes, s.SetHasSymbol(*value.HasSymbol))
+	}
+	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
+}
 
-func (l passwordComplexitySettings) SetMinLengthField(value uint64) db_json.JsonUpdate {
+func (passwordComplexitySettings) SetMinLength(value uint64) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"minLength"}, value)
 }
 
-func (l passwordComplexitySettings) SetHasLowercaseField(value bool) db_json.JsonUpdate {
+func (passwordComplexitySettings) SetHasLowercase(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"hasLowercase"}, value)
 }
 
-func (l passwordComplexitySettings) SetHasUppercaseField(value bool) db_json.JsonUpdate {
+func (passwordComplexitySettings) SetHasUppercase(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"hasUppercase"}, value)
 }
 
-func (l passwordComplexitySettings) SetHasNumberField(value bool) db_json.JsonUpdate {
+func (passwordComplexitySettings) SetHasNumber(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"hasNumber"}, value)
 }
 
-func (l passwordComplexitySettings) SetHasSymbolField(value bool) db_json.JsonUpdate {
+func (passwordComplexitySettings) SetHasSymbol(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"hasSymbol"}, value)
 }
 
-func PasswordComplexityRepository() domain.PasswordComplexityRepository {
+func PasswordComplexityRepository() domain.PasswordComplexitySettingsRepository {
 	return &passwordComplexitySettings{
-		&settings{},
+		settings{},
 	}
 }
 
-var _ domain.PasswordComplexityRepository = (*passwordComplexitySettings)(nil)
+var _ domain.PasswordComplexitySettingsRepository = (*passwordComplexitySettings)(nil)
 
-func (s *passwordComplexitySettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.PasswordComplexitySetting) error {
-	if setting == nil {
-		return ErrSettingObjectMustNotBeNil
+func (s passwordComplexitySettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.PasswordComplexitySettings) error {
+	settings.Type = domain.SettingTypeLogin
+	settings.State = domain.SettingStateActivated
+	if settings.OrganizationID == nil {
+		settings.OwnerType = domain.OwnerTypeOrganization
+	} else {
+		settings.OwnerType = domain.OwnerTypeInstance
 	}
-	setting.Type = domain.SettingTypePasswordComplexity
-	return setSetting(ctx, client, setting.Setting, setting)
+
+	var settingsJSON []byte
+	if err := json.Unmarshal(settingsJSON, settings.PasswordComplexitySettingsAttributes); err != nil {
+		return err
+	}
+	settings.Settings.Settings = settingsJSON
+	return s.settings.set(ctx, client, settings.Settings, s.SetSettingFields(settings))
 }
 
-func (s *passwordComplexitySettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.PasswordComplexitySetting, error) {
-	passwordComplexitySetting := &domain.PasswordComplexitySetting{}
-	var err error
+func (s passwordComplexitySettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.PasswordComplexitySettings, error) {
+	list := make([]*domain.PasswordComplexitySettings, 0)
 
-	passwordComplexitySetting.Setting, err = s.SettingsRepository.Get(ctx, client, opts...)
+	settings, err := s.settings.list(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	err = json.Unmarshal(passwordComplexitySetting.Settings, &passwordComplexitySetting)
+	for i := range settings {
+		err = json.Unmarshal(settings[i].Settings, &list[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return list, nil
+}
+
+func (s passwordComplexitySettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.PasswordComplexitySettings, error) {
+	item := &domain.PasswordComplexitySettings{}
+
+	settings, err := s.settings.get(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	return passwordComplexitySetting, nil
+	err = json.Unmarshal(settings.Settings, &item)
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
-func (s *passwordComplexitySettings) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	return s.SettingsRepository.Update(ctx, client, condition, changes...)
-}
+// -------------------------------------------------------------
+// password expiry
+// -------------------------------------------------------------
 
-func (s *passwordComplexitySettings) Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	return s.Delete(ctx, client, condition)
-}
-
-// passwordExpiry
 type passwordExpirySettings struct {
-	domain.SettingsRepository
+	settings
 }
 
-func (l passwordExpirySettings) SetExpireWarnDays(value uint64) db_json.JsonUpdate {
+func (s passwordExpirySettings) SetSettingFields(value *domain.PasswordExpirySettings) database.Change {
+	changes := make([]db_json.JsonUpdate, 0)
+	if value == nil {
+		return nil
+	}
+	if value.ExpireWarnDays != nil {
+		changes = append(changes, s.SetExpireWarnDays(*value.ExpireWarnDays))
+	}
+	if value.MaxAgeDays != nil {
+		changes = append(changes, s.SetMaxAgeDays(*value.MaxAgeDays))
+	}
+	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
+}
+
+func (passwordExpirySettings) SetExpireWarnDays(value uint64) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"expireWarnDays"}, value)
 }
 
-func (l passwordExpirySettings) SetMaxAgeDays(value uint64) db_json.JsonUpdate {
+func (passwordExpirySettings) SetMaxAgeDays(value uint64) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"maxAgeDays"}, value)
 }
 
-func PasswordExpiryRepository() domain.PasswordExpiryRepository {
+var _ domain.PasswordExpirySettingsRepository = (*passwordExpirySettings)(nil)
+
+func PasswordExpiryRepository() domain.PasswordExpirySettingsRepository {
 	return &passwordExpirySettings{
-		&settings{},
+		settings{},
 	}
 }
 
-var _ domain.PasswordExpiryRepository = (*passwordExpirySettings)(nil)
-
-func (s *passwordExpirySettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.PasswordExpirySetting) error {
-	if setting == nil {
-		return ErrSettingObjectMustNotBeNil
+func (s passwordExpirySettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.PasswordExpirySettings) error {
+	settings.Type = domain.SettingTypeLogin
+	settings.State = domain.SettingStateActivated
+	if settings.OrganizationID == nil {
+		settings.OwnerType = domain.OwnerTypeOrganization
+	} else {
+		settings.OwnerType = domain.OwnerTypeInstance
 	}
-	setting.Type = domain.SettingTypePasswordExpiry
-	return setSetting(ctx, client, setting.Setting, setting)
+
+	var settingsJSON []byte
+	if err := json.Unmarshal(settingsJSON, settings.PasswordExpirySettingsAttributes); err != nil {
+		return err
+	}
+	settings.Settings.Settings = settingsJSON
+	return s.settings.set(ctx, client, settings.Settings, s.SetSettingFields(settings))
 }
 
-func (s *passwordExpirySettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.PasswordExpirySetting, error) {
-	passwordExpirySetting := &domain.PasswordExpirySetting{}
-	var err error
+func (s passwordExpirySettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.PasswordExpirySettings, error) {
+	list := make([]*domain.PasswordExpirySettings, 0)
 
-	passwordExpirySetting.Setting, err = s.SettingsRepository.Get(ctx, client, opts...)
+	settings, err := s.settings.list(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	err = json.Unmarshal(passwordExpirySetting.Settings, &passwordExpirySetting)
+	for i := range settings {
+		err = json.Unmarshal(settings[i].Settings, &list[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return list, nil
+}
+
+func (s passwordExpirySettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.PasswordExpirySettings, error) {
+	item := &domain.PasswordExpirySettings{}
+
+	settings, err := s.settings.get(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	return passwordExpirySetting, nil
+	err = json.Unmarshal(settings.Settings, &item)
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
-func (s *passwordExpirySettings) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	return s.SettingsRepository.Update(ctx, client, condition, changes...)
-}
-
-func (s *passwordExpirySettings) Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	return s.Delete(ctx, client, condition)
-}
-
+// -------------------------------------------------------------
 // lockout
+// -------------------------------------------------------------
 type lockoutSettings struct {
-	domain.SettingsRepository
+	settings
 }
 
-func (l lockoutSettings) SetMaxPasswordAttempts(value uint64) db_json.JsonUpdate {
+func (s lockoutSettings) SetSettingFields(value *domain.LockoutSettings) database.Change {
+	changes := make([]db_json.JsonUpdate, 0)
+	if value == nil {
+		return nil
+	}
+	if value.MaxPasswordAttempts != nil {
+		changes = append(changes, s.SetMaxPasswordAttempts(*value.MaxPasswordAttempts))
+	}
+	if value.MaxOTPAttempts != nil {
+		changes = append(changes, s.SetMaxOTPAttempts(*value.MaxOTPAttempts))
+	}
+	if value.ShowLockOutFailures != nil {
+		changes = append(changes, s.SetShowLockOutFailures(*value.ShowLockOutFailures))
+	}
+	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
+}
+
+func (lockoutSettings) SetMaxPasswordAttempts(value uint64) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"maxPasswordAttempts"}, value)
 }
 
-func (l lockoutSettings) SetMaxOTPAttempts(value uint64) db_json.JsonUpdate {
+func (lockoutSettings) SetMaxOTPAttempts(value uint64) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"maxOtpAttempts"}, value)
 }
 
-func (l lockoutSettings) SetShowLockOutFailures(value bool) db_json.JsonUpdate {
+func (lockoutSettings) SetShowLockOutFailures(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"showLockOutFailures"}, value)
 }
 
-func LockoutRepository() domain.LockoutRepository {
+func LockoutRepository() domain.LockoutSettingsRepository {
 	return &lockoutSettings{
-		&settings{},
+		settings{},
 	}
 }
 
-var _ domain.LockoutRepository = (*lockoutSettings)(nil)
+var _ domain.LockoutSettingsRepository = (*lockoutSettings)(nil)
 
-func (s *lockoutSettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.LockoutSetting) error {
-	if setting == nil {
-		return ErrSettingObjectMustNotBeNil
+func (s lockoutSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.LockoutSettings) error {
+	settings.Type = domain.SettingTypeLogin
+	settings.State = domain.SettingStateActivated
+	if settings.OrganizationID == nil {
+		settings.OwnerType = domain.OwnerTypeOrganization
+	} else {
+		settings.OwnerType = domain.OwnerTypeInstance
 	}
-	setting.Type = domain.SettingTypeLockout
-	return setSetting(ctx, client, setting.Setting, setting)
+
+	var settingsJSON []byte
+	if err := json.Unmarshal(settingsJSON, settings.LockoutSettingsAttributes); err != nil {
+		return err
+	}
+	settings.Settings.Settings = settingsJSON
+	return s.settings.set(ctx, client, settings.Settings, s.SetSettingFields(settings))
 }
 
-func (s *lockoutSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.LockoutSetting, error) {
-	lockoutSetting := &domain.LockoutSetting{}
-	var err error
+func (s lockoutSettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.LockoutSettings, error) {
+	list := make([]*domain.LockoutSettings, 0)
 
-	lockoutSetting.Setting, err = s.SettingsRepository.Get(ctx, client, opts...)
+	settings, err := s.settings.list(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	err = json.Unmarshal(lockoutSetting.Settings, &lockoutSetting)
+	for i := range settings {
+		err = json.Unmarshal(settings[i].Settings, &list[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return list, nil
+}
+
+func (s lockoutSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.LockoutSettings, error) {
+	item := &domain.LockoutSettings{}
+
+	settings, err := s.settings.get(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	return lockoutSetting, nil
+	err = json.Unmarshal(settings.Settings, &item)
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
-func (s *lockoutSettings) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	return s.SettingsRepository.Update(ctx, client, condition, changes...)
-}
-
-func (s *lockoutSettings) Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	return s.Delete(ctx, client, condition)
-}
-
+// -------------------------------------------------------------
 // security
+// -------------------------------------------------------------
 type securitySettings struct {
-	domain.SettingsRepository
+	settings
 }
 
-func (l securitySettings) SetEnabled(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange([]string{"enabled"}, value)
+func (s securitySettings) SetSettingFields(value *domain.SecuritySettings) database.Change {
+	changes := make([]db_json.JsonUpdate, 0)
+	if value == nil {
+		return nil
+	}
+	if value.EnableIframeEmbedding != nil {
+		changes = append(changes, s.SetEnableIframeEmbedding(*value.EnableIframeEmbedding))
+	}
+	if value.AllowedOrigins != nil {
+		// TODO(stebenz): add and remove of origins
+		//changes = append(changes, s.AddAllowedOrigins(*value.AllowedOrigins))
+		//changes = append(changes, s.RemoveAllowedOrigins(*value.AllowedOrigins))
+	}
+	if value.EnableImpersonation != nil {
+		changes = append(changes, s.SetEnableImpersonation(*value.EnableImpersonation))
+	}
+	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
 }
 
-func (l securitySettings) SetEnableIframeEmbedding(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange([]string{"enableIframe_embedding"}, value)
+func (securitySettings) SetEnableIframeEmbedding(value bool) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"enableIframeEmbedding"}, value)
 }
 
-func (l securitySettings) AddAllowedOrigins(value string) db_json.JsonUpdate {
+func (securitySettings) AddAllowedOrigins(value string) db_json.JsonUpdate {
 	return db_json.NewArrayChange([]string{"allowedOrigins"}, value, false)
 }
 
-func (l securitySettings) RemoveAllowedOrigins(value string) db_json.JsonUpdate {
+func (securitySettings) RemoveAllowedOrigins(value string) db_json.JsonUpdate {
 	return db_json.NewArrayChange([]string{"allowedOrigins"}, value, true)
 }
 
-func (l securitySettings) SetEnableImpersonation(value bool) db_json.JsonUpdate {
+func (securitySettings) SetEnableImpersonation(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"enableImpersonation"}, value)
 }
 
-func SecurityRepository() domain.SecurityRepository {
+func SecurityRepository() domain.SecuritySettingsRepository {
 	return &securitySettings{
-		&settings{},
+		settings{},
 	}
 }
 
-var _ domain.SecurityRepository = (*securitySettings)(nil)
+var _ domain.SecuritySettingsRepository = (*securitySettings)(nil)
 
-func (s *securitySettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.SecuritySetting) error {
-	if setting == nil {
-		return ErrSettingObjectMustNotBeNil
+func (s securitySettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.SecuritySettings) error {
+	settings.Type = domain.SettingTypeLogin
+	settings.State = domain.SettingStateActivated
+	if settings.OrganizationID == nil {
+		settings.OwnerType = domain.OwnerTypeOrganization
+	} else {
+		settings.OwnerType = domain.OwnerTypeInstance
 	}
-	setting.Type = domain.SettingTypeSecurity
 
-	return setSetting(ctx, client, setting.Setting, setting)
+	var settingsJSON []byte
+	if err := json.Unmarshal(settingsJSON, settings.SecuritySettingsAttributes); err != nil {
+		return err
+	}
+	settings.Settings.Settings = settingsJSON
+	return s.settings.set(ctx, client, settings.Settings, s.SetSettingFields(settings))
 }
 
-func (s *securitySettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.SecuritySetting, error) {
-	securitySetting := &domain.SecuritySetting{}
-	var err error
+func (s securitySettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.SecuritySettings, error) {
+	list := make([]*domain.SecuritySettings, 0)
 
-	securitySetting.Setting, err = s.SettingsRepository.Get(ctx, client, opts...)
+	settings, err := s.settings.list(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	err = json.Unmarshal(securitySetting.Settings, &securitySetting)
+	for i := range settings {
+		err = json.Unmarshal(settings[i].Settings, &list[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return list, nil
+}
+
+func (s securitySettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.SecuritySettings, error) {
+	item := &domain.SecuritySettings{}
+
+	settings, err := s.settings.get(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	return securitySetting, nil
-}
-
-func (s *securitySettings) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	return s.SettingsRepository.Update(ctx, client, condition, changes...)
-}
-
-func (s *securitySettings) Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	return s.Delete(ctx, client, condition)
-}
-
-const setSecuritySettingEventStmt = `INSERT INTO zitadel.settings` +
-	` (instance_id, organization_id, type, owner_type, settings, created_at)` +
-	` VALUES ($1, $2, 'security', $3, $4, $5)` +
-	` ON CONFLICT (instance_id, organization_id, type, owner_type) WHERE type != 'label' DO UPDATE Set `
-
-func (s *securitySettings) SetEvent(ctx context.Context, client database.QueryExecutor, setting *domain.SecuritySetting, changes ...database.Change) (int64, error) {
-	if setting == nil {
-		return 0, ErrSettingObjectMustNotBeNil
-	}
-
-	settingJSON, err := json.Marshal(setting)
+	err = json.Unmarshal(settings.Settings, &item)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	builder := database.NewStatementBuilder(
-		setSecuritySettingEventStmt,
-		setting.InstanceID,
-		setting.OrganizationID,
-		setting.OwnerType,
-		string(settingJSON),
-		setting.CreatedAt)
-
-	err = database.Changes(changes).Write(builder)
-	if err != nil {
-		return 0, err
-	}
-
-	return client.Exec(ctx, builder.String(), builder.Args()...)
+	return item, nil
 }
 
+// -------------------------------------------------------------
 // domain
+// -------------------------------------------------------------
 type domainSettings struct {
-	domain.SettingsRepository
+	settings
 }
 
-func (l domainSettings) SetUserLoginMustBeDomain(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange([]string{"userLoginMustBeDomain"}, value)
+func (s domainSettings) SetSettingFields(value *domain.DomainSettings) database.Change {
+	changes := make([]db_json.JsonUpdate, 0)
+	if value == nil {
+		return nil
+	}
+	if value.LoginNameIncludesDomain != nil {
+		changes = append(changes, s.SetLoginNameIncludesDomain(*value.LoginNameIncludesDomain))
+	}
+	if value.RequireOrgDomainVerification != nil {
+		changes = append(changes, s.SetRequireOrgDomainVerification(*value.RequireOrgDomainVerification))
+	}
+	if value.SMTPSenderAddressMatchesInstanceDomain != nil {
+		changes = append(changes, s.SetSMTPSenderAddressMatchesInstanceDomain(*value.SMTPSenderAddressMatchesInstanceDomain))
+	}
+	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
 }
 
-func (l domainSettings) SetValidateOrgDomains(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange([]string{"validateOrgDomains"}, value)
+func (domainSettings) SetLoginNameIncludesDomain(value bool) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"loginNameIncludesDomain"}, value)
 }
 
-func (l domainSettings) SetSMTPSenderAddressMatchesInstanceDomain(value bool) db_json.JsonUpdate {
+func (domainSettings) SetRequireOrgDomainVerification(value bool) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"requireOrgDomainVerification"}, value)
+}
+
+func (domainSettings) SetSMTPSenderAddressMatchesInstanceDomain(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"smtpSenderAddressMatchesInstanceDomain"}, value)
 }
 
-func DomainRepository() domain.DomainRepository {
+func DomainRepository() domain.DomainSettingsRepository {
 	return &domainSettings{
-		&settings{},
+		settings{},
 	}
 }
 
-var _ domain.DomainRepository = (*domainSettings)(nil)
+var _ domain.DomainSettingsRepository = (*domainSettings)(nil)
 
-func (s *domainSettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.DomainSetting) error {
-	if setting == nil {
-		return ErrSettingObjectMustNotBeNil
+func (s domainSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.DomainSettings) error {
+	settings.Type = domain.SettingTypeLogin
+	settings.State = domain.SettingStateActivated
+	if settings.OrganizationID == nil {
+		settings.OwnerType = domain.OwnerTypeOrganization
+	} else {
+		settings.OwnerType = domain.OwnerTypeInstance
 	}
-	setting.Type = domain.SettingTypeDomain
-	return setSetting(ctx, client, setting.Setting, setting)
+
+	var settingsJSON []byte
+	if err := json.Unmarshal(settingsJSON, settings.DomainSettingsAttributes); err != nil {
+		return err
+	}
+	settings.Settings.Settings = settingsJSON
+	return s.settings.set(ctx, client, settings.Settings, s.SetSettingFields(settings))
 }
 
-func (s *domainSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.DomainSetting, error) {
-	DomainSetting := &domain.DomainSetting{}
-	var err error
+func (s domainSettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.DomainSettings, error) {
+	list := make([]*domain.DomainSettings, 0)
 
-	DomainSetting.Setting, err = s.SettingsRepository.Get(ctx, client, opts...)
+	settings, err := s.settings.list(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	err = json.Unmarshal(DomainSetting.Settings, &DomainSetting)
+	for i := range settings {
+		err = json.Unmarshal(settings[i].Settings, &list[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return list, nil
+}
+
+func (s domainSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.DomainSettings, error) {
+	item := &domain.DomainSettings{}
+
+	settings, err := s.settings.get(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	return DomainSetting, nil
+	err = json.Unmarshal(settings.Settings, &item)
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
-func (s *domainSettings) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	return s.SettingsRepository.Update(ctx, client, condition, changes...)
-}
-
-func (s *domainSettings) Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	return s.Delete(ctx, client, condition)
-}
-
+// -------------------------------------------------------------
 // organization
+// -------------------------------------------------------------
 type organizationSettings struct {
-	domain.SettingsRepository
+	settings
+}
+
+func (s organizationSettings) SetSettingFields(value *domain.OrganizationSettings) database.Change {
+	changes := make([]db_json.JsonUpdate, 0)
+	if value == nil {
+		return nil
+	}
+	if value.OrganizationScopedUsernames != nil {
+		changes = append(changes, s.SetOrganizationScopedUsernames(*value.OrganizationScopedUsernames))
+	}
+	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
 }
 
 func (l organizationSettings) SetOrganizationScopedUsernames(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"organizationScopedUsernames"}, value)
 }
 
-func OrganizationSettingRepository() domain.OrganizationSettingRepository {
+func OrganizationSettingRepository() domain.OrganizationSettingsRepository {
 	return &organizationSettings{
-		&settings{},
+		settings{},
 	}
 }
 
-var _ domain.OrganizationSettingRepository = (*organizationSettings)(nil)
+var _ domain.OrganizationSettingsRepository = (*organizationSettings)(nil)
 
-func (s *organizationSettings) Set(ctx context.Context, client database.QueryExecutor, setting *domain.OrganizationSetting) error {
-	if setting == nil {
-		return ErrSettingObjectMustNotBeNil
+func (s organizationSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.OrganizationSettings) error {
+	settings.Type = domain.SettingTypeLogin
+	settings.State = domain.SettingStateActivated
+	if settings.OrganizationID == nil {
+		settings.OwnerType = domain.OwnerTypeOrganization
+	} else {
+		settings.OwnerType = domain.OwnerTypeInstance
 	}
-	setting.Type = domain.SettingTypeOrganization
-	return setSetting(ctx, client, setting.Setting, setting)
+
+	var settingsJSON []byte
+	if err := json.Unmarshal(settingsJSON, settings.OrganizationSettingsAttributes); err != nil {
+		return err
+	}
+	settings.Settings.Settings = settingsJSON
+	return s.settings.set(ctx, client, settings.Settings, s.SetSettingFields(settings))
 }
 
-func (s *organizationSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.OrganizationSetting, error) {
-	organizationSetting := &domain.OrganizationSetting{}
-	var err error
+func (s organizationSettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.OrganizationSettings, error) {
+	list := make([]*domain.OrganizationSettings, 0)
 
-	organizationSetting.Setting, err = s.SettingsRepository.Get(ctx, client, opts...)
+	settings, err := s.settings.list(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	err = json.Unmarshal(organizationSetting.Settings, &organizationSetting)
+	for i := range settings {
+		err = json.Unmarshal(settings[i].Settings, &list[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return list, nil
+}
+
+func (s organizationSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.OrganizationSettings, error) {
+	item := &domain.OrganizationSettings{}
+
+	settings, err := s.settings.get(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	return organizationSetting, nil
-}
-
-func (s *organizationSettings) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	return s.SettingsRepository.Update(ctx, client, condition, changes...)
-}
-
-func (s *organizationSettings) Reset(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	return s.Delete(ctx, client, condition)
-}
-
-const setOrganizationSettingEventStmt = `INSERT INTO zitadel.settings` +
-	` (instance_id, organization_id, type, owner_type, settings, created_at)` +
-	` VALUES ($1, $2, 'organization', $3, $4, $5)` +
-	` ON CONFLICT (instance_id, organization_id, type, owner_type) WHERE type != 'label'` +
-	` DO UPDATE SET settings = EXCLUDED.settings, updated_at = $5`
-
-func (s *organizationSettings) SetEvent(ctx context.Context, client database.QueryExecutor, setting *domain.OrganizationSetting) (int64, error) {
-	if setting == nil {
-		return 0, ErrSettingObjectMustNotBeNil
-	}
-
-	settingJSON, err := json.Marshal(setting)
+	err = json.Unmarshal(settings.Settings, &item)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	builder := database.NewStatementBuilder(
-		setOrganizationSettingEventStmt,
-		setting.InstanceID,
-		setting.OrganizationID,
-		setting.OwnerType,
-		string(settingJSON),
-		setting.CreatedAt)
-
-	return client.Exec(ctx, builder.String(), builder.Args()...)
+	return item, nil
 }
 
-func (s *settings) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	if err := s.CheckMandatoryCondtions(condition); err != nil {
-		return 0, err
+// -------------------------------------------------------------
+// helpers
+// -------------------------------------------------------------
+
+const querySettingsStmt = `SELECT 
+	settings.instance_id, 
+	settings.organization_id, 
+	settings.id, 
+	settings.type, 
+	settings.owner_type, 
+	settings.state,
+	settings.settings,
+	settings.created_at, 
+	settings.updated_at 
+	FROM`
+
+func (s settings) prepareQuery(opts []database.QueryOption) (*database.StatementBuilder, error) {
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
 	}
-	builder := database.StatementBuilder{}
-	builder.WriteString(`UPDATE zitadel.settings SET `)
-	err := database.Changes(changes).Write(&builder)
-	if err != nil {
-		return 0, err
+	if err := checkRestrictingColumns(options.Condition, s.InstanceIDColumn()); err != nil {
+		return nil, err
 	}
-	writeCondition(&builder, condition)
+	builder := database.NewStatementBuilder(querySettingsStmt)
+	options.Write(builder)
 
-	return client.Exec(ctx, builder.String(), builder.Args()...)
-}
-
-const eventCreateSettingStmt = `INSERT INTO zitadel.settings` +
-	` (instance_id, organization_id, type, owner_type, label_state, settings, created_at, updated_at)` +
-	` VALUES ($1, $2, $3, $4, $5, $6, $7, $8)` +
-	` RETURNING id, created_at, updated_at`
-
-func (s *settings) Create(ctx context.Context, client database.QueryExecutor, setting *domain.Setting) error {
-	builder := database.NewStatementBuilder(
-		eventCreateSettingStmt,
-		setting.InstanceID,
-		setting.OrganizationID,
-		setting.Type,
-		setting.OwnerType,
-		setting.BrandingState,
-		string(setting.Settings),
-		setting.CreatedAt,
-		setting.UpdatedAt)
-
-	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.ID, &setting.CreatedAt, &setting.UpdatedAt)
+	return builder, nil
 }

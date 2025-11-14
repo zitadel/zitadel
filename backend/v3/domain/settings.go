@@ -191,27 +191,32 @@ type brandingSettingsJSONChanges interface {
 	SetSettingFields(value *BrandingSettings) database.Change
 
 	SetPrimaryColorLight(value string) db_json.JsonUpdate
-	SetBackgroundColorLightF(value string) db_json.JsonUpdate
+	SetBackgroundColorLight(value string) db_json.JsonUpdate
 	SetWarnColorLight(value string) db_json.JsonUpdate
 	SetFontColorLight(value string) db_json.JsonUpdate
-	SetLogoURLLight(value *url.URL) db_json.JsonUpdate
-	SetIconURLLight(value *url.URL) db_json.JsonUpdate
+	SetLogoURLLight(value url.URL) db_json.JsonUpdate
+	SetIconURLLight(value url.URL) db_json.JsonUpdate
 
 	SetPrimaryColorDark(value string) db_json.JsonUpdate
 	SetBackgroundColorDark(value string) db_json.JsonUpdate
 	SetWarnColorDark(value string) db_json.JsonUpdate
 	SetFontColorDark(value string) db_json.JsonUpdate
-	SetLogoURLDark(value *url.URL) db_json.JsonUpdate
-	SetIconURLDark(value *url.URL) db_json.JsonUpdate
+	SetLogoURLDark(value url.URL) db_json.JsonUpdate
+	SetIconURLDark(value url.URL) db_json.JsonUpdate
 
 	SetHideLoginNameSuffix(value bool) db_json.JsonUpdate
 	SetErrorMsgPopup(value bool) db_json.JsonUpdate
 	SetDisableWatermark(value bool) db_json.JsonUpdate
 	SetThemeMode(value BrandingPolicyThemeMode) db_json.JsonUpdate
-	SetFontURL(value *url.URL) db_json.JsonUpdate
+	SetFontURL(value url.URL) db_json.JsonUpdate
 }
 
 type BrandingSettings struct {
+	Settings
+	BrandingSettingsAttributes
+}
+
+type BrandingSettingsAttributes struct {
 	Settings
 	PrimaryColorLight    *string  `json:"primaryColorLight,omitempty"`
 	BackgroundColorLight *string  `json:"backgroundColorLight,omitempty"`
@@ -237,7 +242,7 @@ type BrandingSettings struct {
 type BrandingSettingsRepository interface {
 	settingsRepository[BrandingSettings]
 	brandingSettingsJSONChanges
-	Activate(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+	Activate(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 }
 
 type passwordComplexitySettingsJSONChanges interface {
@@ -251,6 +256,11 @@ type passwordComplexitySettingsJSONChanges interface {
 }
 
 type PasswordComplexitySettings struct {
+	Settings
+	PasswordComplexitySettingsAttributes
+}
+
+type PasswordComplexitySettingsAttributes struct {
 	Settings
 	MinLength    *uint64 `json:"minLength,omitempty"`
 	HasLowercase *bool   `json:"hasLowercase,omitempty"`
@@ -273,6 +283,10 @@ type passwordExpirySettingsJSONChanges interface {
 
 type PasswordExpirySettings struct {
 	Settings
+	PasswordExpirySettingsAttributes
+}
+
+type PasswordExpirySettingsAttributes struct {
 	ExpireWarnDays *uint64 `json:"expireWarnDays,omitempty"`
 	MaxAgeDays     *uint64 `json:"maxAgeDays,omitempty"`
 }
@@ -292,6 +306,10 @@ type lockoutSettingsJSONChanges interface {
 
 type LockoutSettings struct {
 	Settings
+	LockoutSettingsAttributes
+}
+
+type LockoutSettingsAttributes struct {
 	MaxPasswordAttempts *uint64 `json:"maxPasswordAttempts,omitempty"`
 	MaxOTPAttempts      *uint64 `json:"maxOtpAttempts,omitempty"`
 	ShowLockOutFailures *bool   `json:"showLockOutFailures,omitempty"`
@@ -313,6 +331,10 @@ type securitySettingsJSONChanges interface {
 
 type SecuritySettings struct {
 	Settings
+	SecuritySettingsAttributes
+}
+
+type SecuritySettingsAttributes struct {
 	EnableIframeEmbedding *bool    `json:"enableIframe_embedding,omitempty"`
 	AllowedOrigins        []string `json:"allowedOrigins,omitempty"`
 	EnableImpersonation   *bool    `json:"enableImpersonation,omitempty"`
@@ -333,6 +355,10 @@ type domainSettingsJSONChanges interface {
 
 type DomainSettings struct {
 	Settings
+	DomainSettingsAttributes
+}
+type DomainSettingsAttributes struct {
+	Settings
 	LoginNameIncludesDomain                *bool `json:"loginNameIncludesDomain,omitempty"`
 	RequireOrgDomainVerification           *bool `json:"requireOrgDomainVerification,omitempty"`
 	SMTPSenderAddressMatchesInstanceDomain *bool `json:"smtpSenderAddressMatchesInstanceDomain,omitempty"`
@@ -351,6 +377,9 @@ type organizationSettingsJSONChanges interface {
 
 type OrganizationSettings struct {
 	Settings
+	OrganizationSettingsAttributes
+}
+type OrganizationSettingsAttributes struct {
 	OrganizationScopedUsernames *bool `json:"organizationScopedUsernames,omitempty"`
 }
 

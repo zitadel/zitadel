@@ -9,9 +9,9 @@ CREATE TYPE zitadel.settings_type AS ENUM (
     'organization'
 );
 
-CREATE TYPE zitadel.label_state AS ENUM (
+CREATE TYPE zitadel.settings_state AS ENUM (
     'preview',
-    'activated'
+    'active'
 );
 
 CREATE TYPE zitadel.owner_type AS ENUM (
@@ -26,7 +26,7 @@ CREATE TABLE zitadel.settings (
     , id TEXT NOT NULL CHECK (id <> '') DEFAULT gen_random_uuid()
     , type zitadel.settings_type NOT NULL
     , owner_type zitadel.owner_type NOT NULL
-    , label_state zitadel.label_state DEFAULT NULL CHECK (type != 'label' OR label_state <> NULL )
+    , label_state zitadel.settings_state DEFAULT NULL CHECK (type != 'label' OR label_state <> NULL )
     , settings JSONB -- the storage does not really care about what is configured so we store it as json
 
     , created_at TIMESTAMPTZ NOT NULL DEFAULT now()
