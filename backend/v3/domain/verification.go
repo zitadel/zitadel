@@ -47,7 +47,7 @@ var _ VerificationType = (*VerificationTypeVerified)(nil)
 // VerificationTypeUpdate updates an existing verification.
 // Non-nil fields get updated.
 type VerificationTypeUpdate struct {
-	Code   *[]byte
+	Code   []byte
 	Value  *string
 	Expiry *time.Duration
 }
