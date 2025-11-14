@@ -2,7 +2,7 @@ package systemdefaults
 
 import (
 	"time"
-	
+
 	"github.com/zitadel/zitadel/internal/crypto"
 )
 
