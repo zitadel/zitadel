@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormGroup, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { FormGroup, UntypedFormControl, UntypedFormGroup, ValidatorFn } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { debounceTime } from 'rxjs';
 import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
@@ -11,10 +11,29 @@ export enum EditDialogType {
   EMAIL = 2,
 }
 
+export type EditDialogData = {
+  confirmKey: 'ACTIONS.SAVE' | 'ACTIONS.CHANGE';
+  cancelKey: 'ACTIONS.CANCEL';
+  labelKey: 'ACTIONS.NEWVALUE';
+  titleKey: 'USER.LOGINMETHODS.EMAIL.EDITTITLE';
+  descriptionKey: 'USER.LOGINMETHODS.EMAIL.EDITDESC';
+  isVerifiedTextKey?: 'USER.LOGINMETHODS.EMAIL.ISVERIFIED';
+  isVerifiedTextDescKey?: 'USER.LOGINMETHODS.EMAIL.ISVERIFIEDDESC';
+  value: string | undefined;
+  type: EditDialogType;
+  validator?: ValidatorFn;
+};
+
+export type EditDialogResult = {
+  value?: string;
+  isVerified: boolean;
+};
+
 @Component({
   selector: 'cnsl-edit-dialog',
   templateUrl: './edit-dialog.component.html',
   styleUrls: ['./edit-dialog.component.scss'],
+  standalone: false,
 })
 export class EditDialogComponent implements OnInit {
   public controlKey = 'editingField';
@@ -31,7 +50,7 @@ export class EditDialogComponent implements OnInit {
   public countryPhoneCodes: CountryPhoneCode[] = [];
   constructor(
     public dialogRef: MatDialogRef<EditDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
+    @Inject(MAT_DIALOG_DATA) public data: EditDialogData,
     private countryCallingCodesService: CountryCallingCodesService,
   ) {
     if (data.type === EditDialogType.PHONE) {

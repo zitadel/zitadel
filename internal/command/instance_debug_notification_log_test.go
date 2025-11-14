@@ -128,7 +128,7 @@ func TestCommandSide_AddDefaultDebugNotificationProviderLog(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -199,7 +199,7 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 			},
 		},
 		{
-			name: "change, ok",
+			name: "change, ok 1",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -232,7 +232,7 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 			},
 		},
 		{
-			name: "change, ok",
+			name: "change, ok 2",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -277,7 +277,7 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -359,7 +359,7 @@ func TestCommandSide_RemoveDebugNotificationProviderLog(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}

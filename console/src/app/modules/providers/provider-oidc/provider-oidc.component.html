@@ -3,7 +3,7 @@
   (closed)="close()"
 >
   <div class="identity-provider-create-content">
-    <div class="title-row">
+    <div class="identity-provider-title-row">
       <mat-icon class="idp-logo" svgIcon="mdi_openid" alt="openid" />
       <h1>{{ 'IDP.CREATE.OIDC.TITLE' | translate }}</h1>
       <ng-container *ngIf="exists$ | async">
@@ -92,14 +92,21 @@
             </cnsl-form-field>
           </div>
 
-          <div class="id-token-mapping">
+          <div class="specific-oidc-option">
             <cnsl-info-section>
               <div>
                 <p class="checkbox-desc">{{ 'IDP.ISIDTOKENMAPPING_DESC' | translate }}</p>
                 <mat-checkbox formControlName="isIdTokenMapping">{{ 'IDP.ISIDTOKENMAPPING' | translate }}</mat-checkbox>
               </div>
+              <cnsl-info-section>
+                <div>
+                  <p class="checkbox-desc">{{ 'IDP.USEPKCE_DESC' | translate }}</p>
+                  <mat-checkbox formControlName="usePkce">{{ 'IDP.USEPKCE' | translate }}</mat-checkbox>
+                </div>
+              </cnsl-info-section>
             </cnsl-info-section>
           </div>
+
           <cnsl-provider-options
             [initialOptions]="provider?.config?.options"
             (optionsChanged)="options = $event"

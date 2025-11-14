@@ -18,6 +18,8 @@ The trigger is represented by the following Ids in the API: `TRIGGER_TYPE_POST_A
 The first parameter contains the following fields
   - `accessToken` *string*  
     The access token returned by the identity provider. This can be an opaque token or a JWT
+  - `refreshToken` *string*  
+    The refresh token returned by the identity provider if there is one. This is most likely to be an opaque token.
   - `claimsJSON()` [*idTokenClaims*](../openidoauth/claims)  
     Returns all claims of the id token
   - `getClaim(key)` *Any*  
@@ -25,7 +27,7 @@ The first parameter contains the following fields
   - `idToken` *string*  
     The id token provided by the identity provider.
   - `v1`
-    - `externalUser()` [*externalUser*](./objects#external-user)
+    - `externalUser` [*externalUser*](./objects#external-user)
     - `authError` *string*  
       This is a verification errors string representation. If the verification succeeds, this is "none"
     - `authRequest` [*auth request*](/docs/apis/actions/objects#auth-request)

@@ -1,0 +1,147 @@
+{
+  "schemas": ["urn:ietf:params:scim:api:messages:2.0:PatchOp"],
+  "Operations": [
+    // add without path
+    {
+      "op": "Add", // with PascalCase operation type
+      "value": {
+        "emails":[
+          {
+            "value":"{{ .Username }}+2@example.com",
+            "type":"home",
+            "primary": true
+          }
+        ],
+        "nickname":"added-babs"
+      }
+    },
+    // add complex attribute with path
+    {
+      "op": "add", // with camelCase operation type
+      "path":  "name",
+      "value": {
+        "formatted": "added-formatted",
+        "familyName": "added-family-name",
+        "givenName": "added-given-name",
+        "middleName": "added-middle-name",
+        "honorificPrefix": "added-honorific-prefix",
+        "honorificSuffix": "added-honorific-suffix"
+      }
+    },
+    // add complex attribute value
+    {
+      "op": "ADD", // with UPPERCASE operation type
+      "path": "name.middlename",
+      "value": "added-middle-name-2"
+    },
+    // add single to multi valued attribute
+    {
+      "op": "add",
+      "path": "entitlements",
+      "value": { "value":  "added-entitlement-1" }
+    },
+    // add single already existing to multi valued attribute
+    // (should be replaced)
+    {
+      "op": "add",
+      "path": "entitlements",
+      "value": {
+        "value":  "my-entitlement-1",
+        "display": "added-entitlement-1",
+        "type": "added-entitlement-1",
+        "primary": true
+      }
+    },
+    // add multiple to multi valued attribute,
+    // with one item already existing (should be replaced)
+    {
+      "op": "add",
+      "path": "entitlements",
+      "value": [
+        { "value":  "added-entitlement-2" },
+        { "value":  "added-entitlement-3", "primary": true }
+      ]
+    },
+    // remove single valued attribute
+    {
+      "op": "remove",
+      "path": "nickname"
+    },
+    // remove multi valued attribute
+    {
+      "op": "remove",
+      "path": "roles"
+    },
+    // remove multi valued attribute with filter
+    {
+      "op": "remove",
+      "path": "photos[type eq \"thumbnail\"]"
+    },
+    // remove attribute of multi valued attribute with filter
+    {
+      "op": "remove",
+      "path": "ims[type eq \"X\"].type"
+    },
+    // remove multi valued attribute with non-matching filter
+    {
+      "op": "remove",
+      "path": "ims[type eq \"fooBar\"].type"
+    },
+    // replace without path
+    {
+      "op": "replace",
+      "value": {
+        "displayName": "replaced-display-name"
+      }
+    },
+    // replace nested with path
+    {
+      "op": "replace",
+      "path": "name.honorificSuffix",
+      "value": "replaced-honorific-suffix"
+    },
+    // replace complex multi attribute
+    {
+      "op": "replace",
+      "path": "addresses",
+      "value": [
+        {
+          "type": "replaced-work",
+          "streetAddress": "replaced-100 Universal City Plaza",
+          "locality": "replaced-Hollywood",
+          "region": "replaced-CA",
+          "postalCode": "replaced-91608",
+          "country": "replaced-USA",
+          "formatted": "replaced-100 Universal City Plaza\nHollywood, CA 91608 USA",
+          "primary": true
+        }
+      ]
+    },
+    // replace phone
+    {
+      "op": "replace",
+      "path": "phonenumbers[primary eq true].value",
+      "value": "+41711234567"
+    },
+    // replace externalID
+    {
+      "op": "replace",
+      "path": "externalid",
+      "value": "fooBAR"
+    },
+    // replace password
+    {
+      "op": "replace",
+      "path": "password",
+      "value": "Password2!"
+    },
+    // replace active state
+    {
+      "op": "replace",
+      "path": "active",
+      // quoted uppercase bool
+      // (ensure compatibility with Microsoft Entra)
+      "value": "True"
+    }
+  ]
+}

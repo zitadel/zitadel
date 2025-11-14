@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+package zitadel.filter.v2beta;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta;filter";
+
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+enum TextFilterMethod {
+  TEXT_FILTER_METHOD_EQUALS = 0;
+  TEXT_FILTER_METHOD_EQUALS_IGNORE_CASE = 1;
+  TEXT_FILTER_METHOD_STARTS_WITH = 2;
+  TEXT_FILTER_METHOD_STARTS_WITH_IGNORE_CASE = 3;
+  TEXT_FILTER_METHOD_CONTAINS = 4;
+  TEXT_FILTER_METHOD_CONTAINS_IGNORE_CASE = 5;
+  TEXT_FILTER_METHOD_ENDS_WITH = 6;
+  TEXT_FILTER_METHOD_ENDS_WITH_IGNORE_CASE = 7;
+}
+
+enum ListFilterMethod {
+  LIST_FILTER_METHOD_IN = 0;
+}
+
+enum TimestampFilterMethod {
+  TIMESTAMP_FILTER_METHOD_EQUALS = 0;
+  TIMESTAMP_FILTER_METHOD_GREATER = 1;
+  TIMESTAMP_FILTER_METHOD_GREATER_OR_EQUALS = 2;
+  TIMESTAMP_FILTER_METHOD_LESS = 3;
+  TIMESTAMP_FILTER_METHOD_LESS_OR_EQUALS = 4;
+}
+
+message PaginationRequest {
+  // Starting point for retrieval, in combination of offset used to query a set list of objects.
+  uint64 offset = 1;
+  // limit is the maximum amount of objects returned. The default is set to 100
+  // with a maximum of 1000 in the runtime configuration.
+  // If the limit exceeds the maximum configured ZITADEL will throw an error.
+  // If no limit is present the default is taken.
+  uint32 limit = 2;
+  // Asc is the sorting order. If true the list is sorted ascending, if false
+  // the list is sorted descending. The default is descending.
+  bool asc = 3;
+}
+
+message PaginationResponse {
+  // Absolute number of objects matching the query, regardless of applied limit.
+  uint64 total_result = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"100\"";
+    }
+  ];
+  // Applied limit from query, defines maximum amount of objects per request, to compare if all objects are returned.
+  uint64 applied_limit = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"100\"";
+    }
+  ];
+}
+
+message IDFilter {
+  // Only return resources that belong to this id.
+  string id = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"69629023906488337\"";
+    }
+  ];
+}
+
+message TimestampFilter {
+  // Filter resources by timestamp.
+  google.protobuf.Timestamp timestamp = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // Defines the condition (e.g., equals, before, after) that the timestamp of the retrieved resources should match.
+  TimestampFilterMethod method = 2 [
+    (validate.rules).enum.defined_only = true
+  ];
+}
+
+message InIDsFilter {
+  // Defines the ids to query for.
+  repeated string ids = 1 [
+    (validate.rules).repeated = {
+      unique: true
+      items: {
+        string: {
+          min_len: 1
+          max_len: 200
+        }
+      }
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "[\"69629023906488334\",\"69622366012355662\"]";
+    }
+  ];
+}

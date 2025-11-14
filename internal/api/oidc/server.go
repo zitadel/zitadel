@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/auth/repository"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -33,18 +34,20 @@ type Server struct {
 	defaultLogoutURLV2         string
 	defaultAccessTokenLifetime time.Duration
 	defaultIdTokenLifetime     time.Duration
+	jwksCacheControlMaxAge     time.Duration
 
-	fallbackLogger      *slog.Logger
-	hasher              *crypto.Hasher
-	signingKeyAlgorithm string
-	encAlg              crypto.EncryptionAlgorithm
-	opCrypto            op.Crypto
+	fallbackLogger            *slog.Logger
+	hasher                    *crypto.Hasher
+	signingKeyAlgorithm       string
+	encAlg                    crypto.EncryptionAlgorithm
+	targetEncryptionAlgorithm crypto.EncryptionAlgorithm
+	opCrypto                  op.Crypto
 
 	assetAPIPrefix func(ctx context.Context) string
 }
 
 func endpoints(endpointConfig *EndpointConfig) op.Endpoints {
-	// some defaults. The new Server will disable enpoints that are nil.
+	// some defaults. The new Server will disable endpoints that are nil.
 	endpoints := op.Endpoints{
 		Authorization:       op.NewEndpoint("/oauth/v2/authorize"),
 		Token:               op.NewEndpoint("/oauth/v2/token"),
@@ -119,20 +122,13 @@ func (s *Server) Discovery(ctx context.Context, r *op.Request[struct{}]) (_ *op.
 	}()
 	restrictions, err := s.query.GetInstanceRestrictions(ctx)
 	if err != nil {
-		return nil, op.NewStatusError(oidc.ErrServerError().WithParent(err).WithDescription("internal server error"), http.StatusInternalServerError)
+		return nil, op.NewStatusError(oidc.ErrServerError().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError).WithDescription("internal server error"), http.StatusInternalServerError)
 	}
 	allowedLanguages := restrictions.AllowedLanguages
 	if len(allowedLanguages) == 0 {
 		allowedLanguages = i18n.SupportedLanguages()
 	}
 	return op.NewResponse(s.createDiscoveryConfig(ctx, allowedLanguages)), nil
-}
-
-func (s *Server) Keys(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.Keys(ctx, r)
 }
 
 func (s *Server) VerifyAuthRequest(ctx context.Context, r *op.Request[oidc.AuthRequest]) (_ *op.ClientRequest[oidc.AuthRequest], err error) {
@@ -144,9 +140,19 @@ func (s *Server) VerifyAuthRequest(ctx context.Context, r *op.Request[oidc.AuthR
 
 func (s *Server) Authorize(ctx context.Context, r *op.ClientRequest[oidc.AuthRequest]) (_ *op.Redirect, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer span.End()
 
-	return s.LegacyServer.Authorize(ctx, r)
+	// Use an own method to validate the id_token_hint, because in case of an error, we don't want to fail the request.
+	// We just want to ignore the hint.
+	userID, err := op.ValidateAuthReqIDTokenHint(ctx, r.Data.IDTokenHint, s.Provider().IDTokenHintVerifier(ctx))
+	logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID()).
+		OnError(err).Error("invalid id_token_hint")
+
+	req, err := s.Provider().Storage().CreateAuthRequest(ctx, r.Data, userID)
+	if err != nil {
+		return op.TryErrorRedirect(ctx, r.Data, oidc.DefaultToServerError(err, "unable to save auth request"), s.Provider().Encoder(), s.Provider().Logger())
+	}
+	return op.NewRedirect(r.Client.LoginURL(req.GetID())), nil
 }
 
 func (s *Server) DeviceAuthorization(ctx context.Context, r *op.ClientRequest[oidc.DeviceAuthorizationRequest]) (_ *op.Response, err error) {
@@ -172,6 +178,8 @@ func (s *Server) EndSession(ctx context.Context, r *op.Request[oidc.EndSessionRe
 
 func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales oidc.Locales) *oidc.DiscoveryConfiguration {
 	issuer := op.IssuerFromContext(ctx)
+	backChannelLogoutSupported := authz.GetInstance(ctx).Features().EnableBackChannelLogout
+
 	return &oidc.DiscoveryConfiguration{
 		Issuer:                      issuer,
 		AuthorizationEndpoint:       s.Endpoints().Authorization.Absolute(issuer),
@@ -191,7 +199,7 @@ func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales o
 		},
 		GrantTypesSupported:                                op.GrantTypes(s.Provider()),
 		SubjectTypesSupported:                              op.SubjectTypes(s.Provider()),
-		IDTokenSigningAlgValuesSupported:                   []string{s.signingKeyAlgorithm},
+		IDTokenSigningAlgValuesSupported:                   supportedSigningAlgs(),
 		RequestObjectSigningAlgValuesSupported:             op.RequestObjectSigAlgorithms(s.Provider()),
 		TokenEndpointAuthMethodsSupported:                  op.AuthMethodsTokenEndpoint(s.Provider()),
 		TokenEndpointAuthSigningAlgValuesSupported:         op.TokenSigAlgorithms(s.Provider()),
@@ -203,6 +211,8 @@ func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales o
 		CodeChallengeMethodsSupported:                      op.CodeChallengeMethods(s.Provider()),
 		UILocalesSupported:                                 supportedUILocales,
 		RequestParameterSupported:                          s.Provider().RequestObjectSupported(),
+		BackChannelLogoutSupported:                         backChannelLogoutSupported,
+		BackChannelLogoutSessionSupported:                  backChannelLogoutSupported,
 	}
 }
 

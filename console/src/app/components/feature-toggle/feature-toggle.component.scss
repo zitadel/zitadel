@@ -1,0 +1,39 @@
+.feature-row {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 1rem;
+
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .buttongroup {
+      margin-right: 0.5rem;
+      margin-top: 0.5rem;
+
+      .toggle-row {
+        display: flex;
+        align-items: center;
+
+        i {
+          margin-right: 0.5rem;
+        }
+
+        .info-i {
+          font-size: 1.2rem;
+          margin-left: 0.5rem;
+          margin-right: 0;
+        }
+
+        .current-dot {
+          height: 8px;
+          width: 8px;
+          border-radius: 50%;
+          margin-left: 0.5rem;
+          background-color: rgb(59, 128, 247);
+        }
+      }
+    }
+  }
+}

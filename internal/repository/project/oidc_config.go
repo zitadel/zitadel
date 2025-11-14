@@ -11,12 +11,10 @@ import (
 )
 
 const (
-	OIDCConfigAddedType                = applicationEventTypePrefix + "config.oidc.added"
-	OIDCConfigChangedType              = applicationEventTypePrefix + "config.oidc.changed"
-	OIDCConfigSecretChangedType        = applicationEventTypePrefix + "config.oidc.secret.changed"
-	OIDCClientSecretCheckSucceededType = applicationEventTypePrefix + "oidc.secret.check.succeeded"
-	OIDCClientSecretCheckFailedType    = applicationEventTypePrefix + "oidc.secret.check.failed"
-	OIDCConfigSecretHashUpdatedType    = applicationEventTypePrefix + "config.oidc.secret.updated"
+	OIDCConfigAddedType             = applicationEventTypePrefix + "config.oidc.added"
+	OIDCConfigChangedType           = applicationEventTypePrefix + "config.oidc.changed"
+	OIDCConfigSecretChangedType     = applicationEventTypePrefix + "config.oidc.secret.changed"
+	OIDCConfigSecretHashUpdatedType = applicationEventTypePrefix + "config.oidc.secret.updated"
 )
 
 type OIDCConfigAddedEvent struct {
@@ -45,6 +43,9 @@ type OIDCConfigAddedEvent struct {
 	ClockSkew                time.Duration              `json:"clockSkew,omitempty"`
 	AdditionalOrigins        []string                   `json:"additionalOrigins,omitempty"`
 	SkipNativeAppSuccessPage bool                       `json:"skipNativeAppSuccessPage,omitempty"`
+	BackChannelLogoutURI     string                     `json:"backChannelLogoutURI,omitempty"`
+	LoginVersion             domain.LoginVersion        `json:"loginVersion,omitempty"`
+	LoginBaseURI             string                     `json:"loginBaseURI,omitempty"`
 }
 
 func (e *OIDCConfigAddedEvent) Payload() interface{} {
@@ -76,6 +77,9 @@ func NewOIDCConfigAddedEvent(
 	clockSkew time.Duration,
 	additionalOrigins []string,
 	skipNativeAppSuccessPage bool,
+	backChannelLogoutURI string,
+	loginVersion domain.LoginVersion,
+	loginBaseURI string,
 ) *OIDCConfigAddedEvent {
 	return &OIDCConfigAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -101,6 +105,9 @@ func NewOIDCConfigAddedEvent(
 		ClockSkew:                clockSkew,
 		AdditionalOrigins:        additionalOrigins,
 		SkipNativeAppSuccessPage: skipNativeAppSuccessPage,
+		BackChannelLogoutURI:     backChannelLogoutURI,
+		LoginVersion:             loginVersion,
+		LoginBaseURI:             loginBaseURI,
 	}
 }
 
@@ -186,7 +193,16 @@ func (e *OIDCConfigAddedEvent) Validate(cmd eventstore.Command) bool {
 			return false
 		}
 	}
-	return e.SkipNativeAppSuccessPage == c.SkipNativeAppSuccessPage
+	if e.SkipNativeAppSuccessPage != c.SkipNativeAppSuccessPage {
+		return false
+	}
+	if e.BackChannelLogoutURI != c.BackChannelLogoutURI {
+		return false
+	}
+	if e.LoginVersion != c.LoginVersion {
+		return false
+	}
+	return e.LoginBaseURI == c.LoginBaseURI
 }
 
 func OIDCConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
@@ -221,6 +237,9 @@ type OIDCConfigChangedEvent struct {
 	ClockSkew                *time.Duration              `json:"clockSkew,omitempty"`
 	AdditionalOrigins        *[]string                   `json:"additionalOrigins,omitempty"`
 	SkipNativeAppSuccessPage *bool                       `json:"skipNativeAppSuccessPage,omitempty"`
+	BackChannelLogoutURI     *string                     `json:"backChannelLogoutURI,omitempty"`
+	LoginVersion             *domain.LoginVersion        `json:"loginVersion,omitempty"`
+	LoginBaseURI             *string                     `json:"loginBaseURI,omitempty"`
 }
 
 func (e *OIDCConfigChangedEvent) Payload() interface{} {
@@ -265,6 +284,10 @@ func ChangeVersion(version domain.OIDCVersion) func(event *OIDCConfigChangedEven
 
 func ChangeRedirectURIs(uris []string) func(event *OIDCConfigChangedEvent) {
 	return func(e *OIDCConfigChangedEvent) {
+		if uris == nil {
+			// explicitly set them to empty so we can differentiate "not set" in the event in case of no changes
+			uris = make([]string, 0)
+		}
 		e.RedirectUris = &uris
 	}
 }
@@ -295,6 +318,10 @@ func ChangeAuthMethodType(authMethodType domain.OIDCAuthMethodType) func(event *
 
 func ChangePostLogoutRedirectURIs(logoutRedirects []string) func(event *OIDCConfigChangedEvent) {
 	return func(e *OIDCConfigChangedEvent) {
+		if logoutRedirects == nil {
+			// explicitly set them to empty so we can differentiate "not set" in the event in case of no changes
+			logoutRedirects = make([]string, 0)
+		}
 		e.PostLogoutRedirectUris = &logoutRedirects
 	}
 }
@@ -337,6 +364,10 @@ func ChangeClockSkew(clockSkew time.Duration) func(event *OIDCConfigChangedEvent
 
 func ChangeAdditionalOrigins(additionalOrigins []string) func(event *OIDCConfigChangedEvent) {
 	return func(e *OIDCConfigChangedEvent) {
+		if additionalOrigins == nil {
+			// explicitly set them to empty so we can differentiate "not set" in the event in case of no changes
+			additionalOrigins = make([]string, 0)
+		}
 		e.AdditionalOrigins = &additionalOrigins
 	}
 }
@@ -344,6 +375,24 @@ func ChangeAdditionalOrigins(additionalOrigins []string) func(event *OIDCConfigC
 func ChangeSkipNativeAppSuccessPage(skipNativeAppSuccessPage bool) func(event *OIDCConfigChangedEvent) {
 	return func(e *OIDCConfigChangedEvent) {
 		e.SkipNativeAppSuccessPage = &skipNativeAppSuccessPage
+	}
+}
+
+func ChangeBackChannelLogoutURI(backChannelLogoutURI string) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.BackChannelLogoutURI = &backChannelLogoutURI
+	}
+}
+
+func ChangeOIDCLoginVersion(loginVersion domain.LoginVersion) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.LoginVersion = &loginVersion
+	}
+}
+
+func ChangeOIDCLoginBaseURI(loginBaseURI string) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.LoginBaseURI = &loginBaseURI
 	}
 }
 
@@ -404,90 +453,6 @@ func OIDCConfigSecretChangedEventMapper(event eventstore.Event) (eventstore.Even
 	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "OIDC-M893d", "unable to unmarshal oidc config")
-	}
-
-	return e, nil
-}
-
-type OIDCConfigSecretCheckSucceededEvent struct {
-	eventstore.BaseEvent `json:"-"`
-
-	AppID string `json:"appId"`
-}
-
-func (e *OIDCConfigSecretCheckSucceededEvent) Payload() interface{} {
-	return e
-}
-
-func (e *OIDCConfigSecretCheckSucceededEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
-}
-
-func NewOIDCConfigSecretCheckSucceededEvent(
-	ctx context.Context,
-	aggregate *eventstore.Aggregate,
-	appID string,
-) *OIDCConfigSecretCheckSucceededEvent {
-	return &OIDCConfigSecretCheckSucceededEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			aggregate,
-			OIDCClientSecretCheckSucceededType,
-		),
-		AppID: appID,
-	}
-}
-
-func OIDCConfigSecretCheckSucceededEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	e := &OIDCConfigSecretCheckSucceededEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-
-	err := event.Unmarshal(e)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "OIDC-837gV", "unable to unmarshal oidc config")
-	}
-
-	return e, nil
-}
-
-type OIDCConfigSecretCheckFailedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-
-	AppID string `json:"appId"`
-}
-
-func (e *OIDCConfigSecretCheckFailedEvent) Payload() interface{} {
-	return e
-}
-
-func (e *OIDCConfigSecretCheckFailedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
-}
-
-func NewOIDCConfigSecretCheckFailedEvent(
-	ctx context.Context,
-	aggregate *eventstore.Aggregate,
-	appID string,
-) *OIDCConfigSecretCheckFailedEvent {
-	return &OIDCConfigSecretCheckFailedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			aggregate,
-			OIDCClientSecretCheckFailedType,
-		),
-		AppID: appID,
-	}
-}
-
-func OIDCConfigSecretCheckFailedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	e := &OIDCConfigSecretCheckFailedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-
-	err := event.Unmarshal(e)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "OIDC-987g%", "unable to unmarshal oidc config")
 	}
 
 	return e, nil

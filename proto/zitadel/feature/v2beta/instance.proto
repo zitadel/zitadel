@@ -11,22 +11,12 @@ import "zitadel/feature/v2beta/feature.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta;feature";
 
 message SetInstanceFeaturesRequest{
+  reserved 2, 3, 6, 8;
+  reserved "oidc_trigger_introspection_projections", "oidc_legacy_introspection", "actions", "web_key";
   optional bool login_default_org = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "The login UI will use the settings of the default org (and not from the instance) if no organization context is set";
-    }
-  ];
-  optional bool oidc_trigger_introspection_projections = 2 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-      description: "Enable projection triggers during an introspection request. This can act as workaround if there are noticeable consistency issues in the introspection response but can have an impact on performance. We are planning to remove triggers for introspection requests in the future. Please raise an issue if you needed to enable this feature.";
-    }
-  ];
-  optional bool oidc_legacy_introspection = 3 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-      description: "We have recently refactored the introspection endpoint for performance reasons. This feature can be used to rollback to the legacy implementation if unexpected bugs arise. Please raise an issue if you needed to enable this feature.";
     }
   ];
 
@@ -43,12 +33,6 @@ message SetInstanceFeaturesRequest{
       description: "Enable the experimental `urn:ietf:params:oauth:grant-type:token-exchange` grant type for the OIDC token endpoint. Token exchange can be used to request tokens with a lesser scope or impersonate other users. See the security policy to allow impersonation on an instance.";
     }
   ];
-  optional bool actions = 6 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-      description: "Actions allow to manage data executions and targets. If the flag is enabled, you'll be able to use the new API and its features. Note that it is still in an early stage.";
-    }
-  ];
 
   repeated ImprovedPerformance improved_performance = 7 [
     (validate.rules).repeated.unique = true,
@@ -56,6 +40,20 @@ message SetInstanceFeaturesRequest{
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[1]";
       description: "Improves performance of specified execution paths.";
+    }
+  ];
+
+  optional bool debug_oidc_parent_error = 9 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Return parent errors to OIDC clients for debugging purposes. Parent errors may contain sensitive data or unwanted details about the system status of zitadel. Only enable if really needed.";
+    }
+  ];
+
+  optional bool oidc_single_v1_session_termination = 10 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If the flag is enabled, you'll be able to terminate a single session from the login UI by providing an id_token with a `sid` claim as id_token_hint on the end_session endpoint. Note that currently all sessions from the same user agent (browser) are terminated in the login UI. Sessions managed through the Session API already allow the termination of single sessions.";
     }
   ];
 }
@@ -80,25 +78,13 @@ message GetInstanceFeaturesRequest {
 }
 
 message GetInstanceFeaturesResponse {
+  reserved 3, 4, 7, 9;
+  reserved "oidc_trigger_introspection_projections", "oidc_legacy_introspection", "actions", "web_key";
   zitadel.object.v2beta.Details details = 1;
   FeatureFlag login_default_org = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "The login UI will use the settings of the default org (and not from the instance) if no organization context is set";
-    }
-  ];
-
-  FeatureFlag oidc_trigger_introspection_projections = 3 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-      description: "Enable projection triggers during an introspection request. This can act as workaround if there are noticeable consistency issues in the introspection response but can have an impact on performance. We are planning to remove triggers for introspection requests in the future. Please raise an issue if you needed to enable this feature.";
-    }
-  ];
-
-  FeatureFlag oidc_legacy_introspection = 4 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-      description: "We have recently refactored the introspection endpoint for performance reasons. This feature can be used to rollback to the legacy implementation if unexpected bugs arise. Please raise an issue if you needed to enable this feature.";
     }
   ];
 
@@ -116,17 +102,24 @@ message GetInstanceFeaturesResponse {
     }
   ];
 
-  FeatureFlag actions = 7 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-      description: "Actions v2 allow to manage data executions and targets. If the flag is enabled, you'll be able to use the new API and its features. Note that it is still in an early stage.";
-    }
-  ];
-
   ImprovedPerformanceFeatureFlag improved_performance = 8 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[1]";
       description: "Improves performance of specified execution paths.";
+    }
+  ];
+
+  FeatureFlag debug_oidc_parent_error = 10 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Return parent errors to OIDC clients for debugging purposes. Parent errors may contain sensitive data or unwanted details about the system status of zitadel. Only enable if really needed.";
+    }
+  ];
+
+  FeatureFlag oidc_single_v1_session_termination = 11 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If the flag is enabled, you'll be able to terminate a single session from the login UI by providing an id_token with a `sid` claim as id_token_hint on the end_session endpoint. Note that currently all sessions from the same user agent (browser) are terminated in the login UI. Sessions managed through the Session API already allow the termination of single sessions.";
     }
   ];
 }

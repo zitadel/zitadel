@@ -5,13 +5,11 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -34,19 +32,15 @@ type AuthRequest struct {
 	HintUserID   *string
 }
 
-func (a *AuthRequest) checkLoginClient(ctx context.Context) error {
+func (a *AuthRequest) checkLoginClient(ctx context.Context, permissionCheck domain.PermissionCheck) error {
 	if uid := authz.GetCtxData(ctx).UserID; uid != a.LoginClient {
-		return zerrors.ThrowPermissionDenied(nil, "OIDCv2-aL0ag", "Errors.AuthRequest.WrongLoginClient")
+		return permissionCheck(ctx, domain.PermissionSessionRead, authz.GetInstance(ctx).InstanceID(), "")
 	}
 	return nil
 }
 
 //go:embed auth_request_by_id.sql
 var authRequestByIDQuery string
-
-func (q *Queries) authRequestByIDQuery(ctx context.Context) string {
-	return fmt.Sprintf(authRequestByIDQuery, q.client.Timetravel(call.Took(ctx)))
-}
 
 func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, id string, checkLoginClient bool) (_ *AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
@@ -74,7 +68,7 @@ func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, i
 				&prompt, &locales, &dst.LoginHint, &dst.MaxAge, &dst.HintUserID,
 			)
 		},
-		q.authRequestByIDQuery(ctx),
+		authRequestByIDQuery,
 		id, authz.GetInstance(ctx).InstanceID(),
 	)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -89,7 +83,7 @@ func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, i
 	dst.UiLocales = locales
 
 	if checkLoginClient {
-		if err = dst.checkLoginClient(ctx); err != nil {
+		if err = dst.checkLoginClient(ctx, q.checkPermission); err != nil {
 			return nil, err
 		}
 	}

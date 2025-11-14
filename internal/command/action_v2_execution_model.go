@@ -16,6 +16,18 @@ type ExecutionWriteModel struct {
 	ExecutionTargets []*execution.Target
 }
 
+func (e *ExecutionWriteModel) ExecutionTargetsEqual(targets []*execution.Target) bool {
+	if len(e.ExecutionTargets) != len(targets) {
+		return false
+	}
+	for i := range e.ExecutionTargets {
+		if e.ExecutionTargets[i].Type != targets[i].Type || e.ExecutionTargets[i].Target != targets[i].Target {
+			return false
+		}
+	}
+	return true
+}
+
 func (e *ExecutionWriteModel) IncludeList() []string {
 	includes := make([]string, 0)
 	for i := range e.ExecutionTargets {

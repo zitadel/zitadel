@@ -1,6 +1,7 @@
 package login
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -53,6 +54,17 @@ func InitUserLink(origin, userID, loginName, code, orgID string, passwordSet boo
 	v.Set(queryInitUserPassword, strconv.FormatBool(passwordSet))
 	v.Set(QueryAuthRequestID, authRequestID)
 	return externalLink(origin) + EndpointInitUser + "?" + v.Encode()
+}
+
+func InitUserLinkTemplate(origin, userID, orgID, authRequestID string) string {
+	return fmt.Sprintf("%s%s?%s=%s&%s=%s&%s=%s&%s=%s&%s=%s&%s=%s",
+		externalLink(origin), EndpointInitUser,
+		queryInitUserUserID, userID,
+		queryInitUserLoginName, "{{.LoginName}}",
+		queryInitUserCode, "{{.Code}}",
+		queryOrgID, orgID,
+		queryInitUserPassword, "{{.PasswordSet}}",
+		QueryAuthRequestID, authRequestID)
 }
 
 func (l *Login) handleInitUser(w http.ResponseWriter, r *http.Request) {
@@ -119,17 +131,13 @@ func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, authReq *
 }
 
 func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, loginName string, code string, passwordSet bool, err error) {
-	var errID, errMessage string
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
-	}
 	if authReq != nil {
 		userID = authReq.UserID
 	}
 
 	translator := l.getTranslator(r.Context(), authReq)
 	data := initUserData{
-		baseData:    l.getBaseData(r, authReq, translator, "InitUser.Title", "InitUser.Description", errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, translator, "InitUser.Title", "InitUser.Description", err),
 		profileData: l.getProfileData(authReq),
 		UserID:      userID,
 		Code:        code,
@@ -167,7 +175,7 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 
 func (l *Login) renderInitUserDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgID string) {
 	translator := l.getTranslator(r.Context(), authReq)
-	data := l.getUserData(r, authReq, translator, "InitUserDone.Title", "InitUserDone.Description", "", "")
+	data := l.getUserData(r, authReq, translator, "InitUserDone.Title", "InitUserDone.Description", nil)
 	if authReq == nil {
 		l.customTexts(r.Context(), translator, orgID)
 	}

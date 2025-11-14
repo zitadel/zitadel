@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Telefoon is al geverifieerd
       Empty: Telefoon is leeg
       NotChanged: Telefoon niet veranderd
+      VerifyingRemovalIsNotSupported: Verwijderen van verificatie is niet ondersteund
     Address:
       NotFound: Adres niet gevonden
       NotChanged: Adres niet veranderd
@@ -193,7 +194,7 @@ Errors:
     AlreadyExists: Instantie bestaat al
     NotChanged: Instantie is niet veranderd
   Org:
-    AlreadyExists: Organisatienaam is al in gebruik
+    AlreadyExists: Organisatienaam of -id is al in gebruik
     Invalid: Organisatie is ongeldig
     AlreadyDeactivated: Organisatie is al gedeactiveerd
     AlreadyActive: Organisatie is al actief
@@ -435,8 +436,6 @@ Errors:
     Invalid: Gebruikerstoekenning is ongeldig
     NotChanged: Gebruikerstoekenning is niet veranderd
     IDMissing: ID ontbreekt
-    NotActive: Gebruikerstoekenning is niet actief
-    NotInactive: Gebruikerstoekenning is niet gedeactiveerd
     NoPermissionForProject: Gebruiker heeft geen rechten op dit project
     RoleKeyNotFound: Rol niet gevonden
   Member:
@@ -495,6 +494,7 @@ Errors:
     SQLStatement: SQL Statement kon niet worden gemaakt
     InvalidRequest: Verzoek is ongeldig
     TooManyNestingLevels: Te veel query nesting niveaus (Max 20)
+    LimitExceeded: Limiet overschreden
   Quota:
     AlreadyExists: Quota bestaat al voor deze eenheid
     NotFound: Quota niet gevonden voor deze eenheid
@@ -535,6 +535,7 @@ Errors:
     StateMissing: Staat parameter ontbreekt in het verzoek
     NotStarted: Intentie is niet gestart of was al beëindigd
     NotSucceeded: Intentie is niet geslaagd
+    Expired: Intentie is verlopen
     TokenCreationFailed: Token aanmaken mislukt
     InvalidToken: Intentie Token is ongeldig
     OtherUser: Intentie bedoeld voor een andere gebruiker
@@ -542,12 +543,23 @@ Errors:
     AlreadyExists: Auth Verzoek bestaat al
     NotExisting: Auth Verzoek bestaat niet
     WrongLoginClient: Auth Verzoek aangemaakt door andere login client
+    AlreadyHandled: Authenticatieverzoek is al verwerkt
   OIDCSession:
     RefreshTokenInvalid: Refresh Token is ongeldig
     Token:
       Invalid: Token is ongeldig
       Expired: Token is verlopen
     InvalidClient: Token is niet uitgegeven voor deze client
+  SAMLRequest:
+    AlreadyExists: SAMLRequest bestaat al
+    NotExisting: SAMLRequest bestaat niet
+    WrongLoginClient: SAMLRequest aangemaakt door andere login client
+    AlreadyHandled: SAML-verzoek is al verwerkt
+  SAMLSession:
+    InvalidClient: SAMLResponse is niet uitgegeven voor deze client
+  DeviceAuth:
+    NotFound: Apparaatautorisatieverzoek bestaat niet
+    AlreadyHandled: Apparaatautorisatieverzoek is al verwerkt
   Feature:
     NotExisting: Functie bestaat niet
     TypeNotSupported: Functie type wordt niet ondersteund
@@ -563,6 +575,8 @@ Errors:
     NotFound: Uitvoering niet gevonden
     IncludeNotFound: Inclusief niet gevonden
     NoTargets: Geen doelstellingen gedefinieerd
+    Failed: Uitvoering mislukt
+    ResponseIsNotValidJSON: Reactie is geen geldige JSON
   UserSchema:
     NotEnabled: Functie "Gebruikersschema" is niet ingeschakeld
     Type:
@@ -573,6 +587,11 @@ Errors:
     NotActive: Gebruikersschema niet actief
     NotInactive: Gebruikersschema niet inactief
     NotExists: Gebruikersschema bestaat niet
+    ID:
+      Missing: Недостасува ID на корисничка шема
+    Invalid: Корисничката шема е неважечка
+    Data:
+      Invalid: Податоците не се валидни за корисничка шема
   TokenExchange:
     FeatureDisabled: De Token Exchange-functie is uitgeschakeld voor uw instantie. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -584,6 +603,13 @@ Errors:
       NotForAPI: Nagebootste tokens zijn niet toegestaan voor API
     Impersonation:
       PolicyDisabled: Nabootsing van identiteit is uitgeschakeld in het beveiligingsbeleid van de instantie.
+  WebKey:
+    ActiveDelete: Kan actieve websleutel niet verwijderen
+    Config: Ongeldige websleutelconfiguratie
+    Duplicate: Websleutel-ID niet uniek
+    FeatureDisabled: Websleutelfunctie uitgeschakeld
+    NoActive: Geen actieve websleutel gevonden
+    NotFound: Websleutel niet gevonden
 
 AggregateTypes:
   action: Actie
@@ -607,6 +633,9 @@ AggregateTypes:
   restrictions: Beperkingen
   system: Systeem
   session: Sessie
+  web_key: Websleutel
+  saml_request: SAML-aanvraag
+  saml_session: SAML-sessie
 
 EventTypes:
   execution:
@@ -671,6 +700,13 @@ EventTypes:
         check:
           succeeded: Initialisatiecontrole geslaagd
           failed: Initialisatiecontrole mislukt
+      invite:
+        code:
+          added: Uitnodigingscode gegenereerd
+          sent: Uitnodigingscode verzonden
+        check:
+          succeeded: Uitnodigingscontrole geslaagd
+          failed: Uitnodigingscontrole mislukt
       username:
         reserved: Gebruikersnaam gereserveerd
         released: Gebruikersnaam vrijgegeven
@@ -1303,6 +1339,31 @@ EventTypes:
     deactivated: Gebruikersschema gedeactiveerd
     reactivated: Gebruikersschema opnieuw geactiveerd
     deleted: Gebruikersschema verwijderd
+    user:
+      created: Gebruiker aangemaakt
+      updated: Gebruiker bijgewerkt
+      deleted: Gebruiker verwijderd
+      email:
+        updated: E-mailadres gewijzigd
+        verified: E-mailadres geverifieerd
+        verification:
+          failed: E-mailadres verificatie mislukt
+        code:
+          added: E-mailadres verificatiecode gegenereerd
+          sent: E-mailadres verificatiecode verzonden
+      phone:
+        updated: Telefoonnummer gewijzigd
+        verified: Telefoonnummer geverifieerd
+        verification:
+          failed: Telefoonnummer verificatie mislukt
+        code:
+          added: Telefoonnummer verificatiecode gegenereerd
+          sent: Telefoonnummer verificatiecode verzonden
+  web_key:
+    added: Web Key toegevoegd
+    activated: Web Key geactiveerd
+    deactivated: Web Key gedeactiveerd
+    removed: Web Key verwijderd
 
 Application:
   OIDC:

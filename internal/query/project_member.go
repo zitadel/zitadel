@@ -7,7 +7,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -44,6 +43,10 @@ var (
 		name:  projection.MemberResourceOwner,
 		table: projectMemberTable,
 	}
+	ProjectMemberUserResourceOwner = Column{
+		name:  projection.MemberUserResourceOwner,
+		table: projectMemberTable,
+	}
 	ProjectMemberInstanceID = Column{
 		name:  projection.MemberInstanceID,
 		table: projectMemberTable,
@@ -69,7 +72,7 @@ func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQue
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareProjectMembersQuery(ctx, q.client)
+	query, scan := prepareProjectMembersQuery()
 	eq := sq.Eq{ProjectMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
@@ -93,12 +96,13 @@ func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQue
 	return members, err
 }
 
-func prepareProjectMembersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Members, error)) {
+func prepareProjectMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, error)) {
 	return sq.Select(
 			ProjectMemberCreationDate.identifier(),
 			ProjectMemberChangeDate.identifier(),
 			ProjectMemberSequence.identifier(),
 			ProjectMemberResourceOwner.identifier(),
+			ProjectMemberUserResourceOwner.identifier(),
 			ProjectMemberUserID.identifier(),
 			ProjectMemberRoles.identifier(),
 			LoginNameNameCol.identifier(),
@@ -114,7 +118,7 @@ func prepareProjectMembersQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 			LeftJoin(join(HumanUserIDCol, ProjectMemberUserID)).
 			LeftJoin(join(MachineUserIDCol, ProjectMemberUserID)).
 			LeftJoin(join(UserIDCol, ProjectMemberUserID)).
-			LeftJoin(join(LoginNameUserIDCol, ProjectMemberUserID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(LoginNameUserIDCol, ProjectMemberUserID)).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),
@@ -141,6 +145,7 @@ func prepareProjectMembersQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 					&member.ChangeDate,
 					&member.Sequence,
 					&member.ResourceOwner,
+					&member.UserResourceOwner,
 					&member.UserID,
 					&member.Roles,
 					&preferredLoginName,

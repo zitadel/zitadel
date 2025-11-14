@@ -15,8 +15,7 @@ import (
 )
 
 var (
-	//go:embed 14/cockroach/*.sql
-	//go:embed 14/postgres/*.sql
+	//go:embed 14/*.sql
 	newEventsTable embed.FS
 )
 
@@ -25,15 +24,11 @@ type NewEventsTable struct {
 }
 
 func (mig *NewEventsTable) Execute(ctx context.Context, _ eventstore.Event) error {
-	migrations, err := newEventsTable.ReadDir("14/" + mig.dbClient.Type())
-	if err != nil {
-		return err
-	}
 	// if events already exists events2 is created during a setup job
 	var count int
-	err = mig.dbClient.QueryRow(
+	err := mig.dbClient.QueryRowContext(ctx,
 		func(row *sql.Row) error {
-			if err = row.Scan(&count); err != nil {
+			if err := row.Scan(&count); err != nil {
 				return err
 			}
 			return row.Err()
@@ -43,16 +38,15 @@ func (mig *NewEventsTable) Execute(ctx context.Context, _ eventstore.Event) erro
 	if err != nil || count == 1 {
 		return err
 	}
-	for _, migration := range migrations {
-		stmt, err := readStmt(newEventsTable, "14", mig.dbClient.Type(), migration.Name())
-		if err != nil {
-			return err
-		}
-		stmt = strings.ReplaceAll(stmt, "{{.username}}", mig.dbClient.Username())
 
-		logging.WithFields("migration", mig.String(), "file", migration.Name()).Debug("execute statement")
-
-		_, err = mig.dbClient.ExecContext(ctx, stmt)
+	statements, err := readStatements(newEventsTable, "14")
+	if err != nil {
+		return err
+	}
+	for _, stmt := range statements {
+		stmt.query = strings.ReplaceAll(stmt.query, "{{.username}}", mig.dbClient.Username())
+		logging.WithFields("file", stmt.file, "migration", mig.String()).Info("execute statement")
+		_, err = mig.dbClient.ExecContext(ctx, stmt.query)
 		if err != nil {
 			return err
 		}

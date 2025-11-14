@@ -18,6 +18,7 @@ type StepStates struct {
 // Query implements eventstore.QueryReducer.
 func (*StepStates) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		InstanceID(""). // to make sure we can use an appropriate index
 		AddQuery().
 		AggregateTypes(SystemAggregate).
 		AggregateIDs(SystemAggregateID).

@@ -38,6 +38,7 @@ type AddedEvent struct {
 	LoginHint        *string                   `json:"login_hint,omitempty"`
 	HintUserID       *string                   `json:"hint_user_id,omitempty"`
 	NeedRefreshToken bool                      `json:"need_refresh_token,omitempty"`
+	Issuer           string                    `json:"issuer,omitempty"`
 }
 
 func (e *AddedEvent) Payload() interface{} {
@@ -66,6 +67,7 @@ func NewAddedEvent(ctx context.Context,
 	loginHint,
 	hintUserID *string,
 	needRefreshToken bool,
+	issuer string,
 ) *AddedEvent {
 	return &AddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -89,6 +91,7 @@ func NewAddedEvent(ctx context.Context,
 		LoginHint:        loginHint,
 		HintUserID:       hintUserID,
 		NeedRefreshToken: needRefreshToken,
+		Issuer:           issuer,
 	}
 }
 

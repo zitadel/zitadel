@@ -79,3 +79,8 @@ func (err *ZitadelError) As(target interface{}) bool {
 	reflect.Indirect(reflect.ValueOf(target)).Set(reflect.ValueOf(err))
 	return true
 }
+
+func IsZitadelError(err error) bool {
+	zitadelErr := new(ZitadelError)
+	return errors.As(err, &zitadelErr)
+}

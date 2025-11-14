@@ -6,21 +6,22 @@ import (
 	"time"
 
 	"github.com/go-jose/go-jose/v4"
+	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/saml/pkg/provider/key"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
-	locksTable = "projections.locks"
+	locksTable = projection.LocksTable
 	signingKey = "signing_key"
 	samlUser   = "SAML"
 
@@ -53,7 +54,7 @@ func (c *CertificateAndKey) ID() string {
 	return c.id
 }
 
-func (p *Storage) GetCertificateAndKey(ctx context.Context, usage domain.KeyUsage) (certAndKey *key.CertificateAndKey, err error) {
+func (p *Storage) GetCertificateAndKey(ctx context.Context, usage crypto.KeyUsage) (certAndKey *key.CertificateAndKey, err error) {
 	err = retry(func() error {
 		certAndKey, err = p.getCertificateAndKey(ctx, usage)
 		if err != nil {
@@ -67,7 +68,7 @@ func (p *Storage) GetCertificateAndKey(ctx context.Context, usage domain.KeyUsag
 	return certAndKey, err
 }
 
-func (p *Storage) getCertificateAndKey(ctx context.Context, usage domain.KeyUsage) (*key.CertificateAndKey, error) {
+func (p *Storage) getCertificateAndKey(ctx context.Context, usage crypto.KeyUsage) (*key.CertificateAndKey, error) {
 	certs, err := p.query.ActiveCertificates(ctx, time.Now().Add(gracefulPeriod), usage)
 	if err != nil {
 		return nil, err
@@ -77,7 +78,7 @@ func (p *Storage) getCertificateAndKey(ctx context.Context, usage domain.KeyUsag
 		return p.certificateToCertificateAndKey(selectCertificate(certs.Certificates))
 	}
 
-	var position float64
+	var position decimal.Decimal
 	if certs.State != nil {
 		position = certs.State.Position
 	}
@@ -87,8 +88,8 @@ func (p *Storage) getCertificateAndKey(ctx context.Context, usage domain.KeyUsag
 
 func (p *Storage) refreshCertificate(
 	ctx context.Context,
-	usage domain.KeyUsage,
-	position float64,
+	usage crypto.KeyUsage,
+	position decimal.Decimal,
 ) error {
 	ok, err := p.ensureIsLatestCertificate(ctx, position)
 	if err != nil {
@@ -104,15 +105,15 @@ func (p *Storage) refreshCertificate(
 	return nil
 }
 
-func (p *Storage) ensureIsLatestCertificate(ctx context.Context, position float64) (bool, error) {
-	maxSequence, err := p.getMaxKeySequence(ctx)
+func (p *Storage) ensureIsLatestCertificate(ctx context.Context, position decimal.Decimal) (bool, error) {
+	maxSequence, err := p.getMaxKeyPosition(ctx)
 	if err != nil {
 		return false, fmt.Errorf("error retrieving new events: %w", err)
 	}
-	return position >= maxSequence, nil
+	return position.GreaterThanOrEqual(maxSequence), nil
 }
 
-func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage domain.KeyUsage) error {
+func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage crypto.KeyUsage) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	ctx = setSAMLCtx(ctx)
@@ -128,8 +129,8 @@ func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage do
 	}
 
 	switch usage {
-	case domain.KeyUsageSAMLMetadataSigning, domain.KeyUsageSAMLResponseSinging:
-		certAndKey, err := p.GetCertificateAndKey(ctx, domain.KeyUsageSAMLCA)
+	case crypto.KeyUsageSAMLMetadataSigning, crypto.KeyUsageSAMLResponseSinging:
+		certAndKey, err := p.GetCertificateAndKey(ctx, crypto.KeyUsageSAMLCA)
 		if err != nil {
 			return fmt.Errorf("error while reading ca certificate: %w", err)
 		}
@@ -138,34 +139,35 @@ func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage do
 		}
 
 		switch usage {
-		case domain.KeyUsageSAMLMetadataSigning:
+		case crypto.KeyUsageSAMLMetadataSigning:
 			return p.command.GenerateSAMLMetadataCertificate(setSAMLCtx(ctx), p.certificateAlgorithm, certAndKey.Key, certAndKey.Certificate)
-		case domain.KeyUsageSAMLResponseSinging:
+		case crypto.KeyUsageSAMLResponseSinging:
 			return p.command.GenerateSAMLResponseCertificate(setSAMLCtx(ctx), p.certificateAlgorithm, certAndKey.Key, certAndKey.Certificate)
 		default:
 			return fmt.Errorf("unknown usage")
 		}
-	case domain.KeyUsageSAMLCA:
+	case crypto.KeyUsageSAMLCA:
 		return p.command.GenerateSAMLCACertificate(setSAMLCtx(ctx), p.certificateAlgorithm)
 	default:
 		return fmt.Errorf("unknown certificate usage")
 	}
 }
 
-func (p *Storage) getMaxKeySequence(ctx context.Context) (float64, error) {
-	return p.eventstore.LatestSequence(ctx,
-		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
+func (p *Storage) getMaxKeyPosition(ctx context.Context) (decimal.Decimal, error) {
+	return p.eventstore.LatestPosition(ctx,
+		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxPosition).
 			ResourceOwner(authz.GetInstance(ctx).InstanceID()).
 			AwaitOpenTransactions().
 			AddQuery().
-			AggregateTypes(keypair.AggregateType).
+			AggregateTypes(
+				keypair.AggregateType,
+				instance.AggregateType,
+			).
 			EventTypes(
 				keypair.AddedEventType,
 				keypair.AddedCertificateEventType,
+				instance.InstanceRemovedEventType,
 			).
-			Or().
-			AggregateTypes(instance.AggregateType).
-			EventTypes(instance.InstanceRemovedEventType).
 			Builder(),
 	)
 }

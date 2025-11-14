@@ -8,9 +8,9 @@ import (
 	"github.com/zitadel/zitadel/cmd/build"
 )
 
-func ResourceWithService() (*resource.Resource, error) {
+func ResourceWithService(serviceName string) (*resource.Resource, error) {
 	attributes := []attribute.KeyValue{
-		semconv.ServiceNameKey.String("ZITADEL"),
+		semconv.ServiceNameKey.String(serviceName),
 	}
 	if build.Version() != "" {
 		attributes = append(attributes, semconv.ServiceVersionKey.String(build.Version()))

@@ -23,7 +23,7 @@ You don't need any additional parameter for this request. We're identifying the 
 
 So your request might look like this (linebreaks and whitespace for display reasons):
 
-Try out the request in our [OIDC Authentication Request Playground](/apis/openidoauth/authrequest?auth_method=Client%20Secret%20Basic).
+Try out the request in our [OIDC Authentication Request Playground](https://zitadel.com/playgrounds/oidc?auth_method=Client%20Secret%20Basic).
 
 ### Additional parameters and customization
 
@@ -62,7 +62,7 @@ for us to validate the signature against the registered public key:
 
 ```curl
 curl --request POST \
---url {your-domain}/oauth/v2/token \
+--url ${CUSTOM_DOMAIN}/oauth/v2/token \
 --header 'Content-Type: application/x-www-form-urlencoded' \
 --data grant_type=authorization_code \
 --data code=${code} \

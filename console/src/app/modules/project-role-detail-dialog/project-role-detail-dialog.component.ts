@@ -9,6 +9,7 @@ import { requiredValidator } from '../form-field/validators/validators';
   selector: 'cnsl-project-role-detail-dialog',
   templateUrl: './project-role-detail-dialog.component.html',
   styleUrls: ['./project-role-detail-dialog.component.scss'],
+  standalone: false,
 })
 export class ProjectRoleDetailDialogComponent {
   public projectId: string = '';
@@ -31,9 +32,9 @@ export class ProjectRoleDetailDialogComponent {
   }
 
   submitForm(): void {
-    if (this.formGroup.valid && this.key?.value && this.group?.value && this.displayName?.value) {
+    if (this.formGroup.valid && this.key?.value && this.displayName?.value) {
       this.mgmtService
-        .updateProjectRole(this.projectId, this.key.value, this.displayName.value, this.group.value)
+        .updateProjectRole(this.projectId, this.key.value, this.displayName.value, this.group?.value)
         .then(() => {
           this.toast.showInfo('PROJECT.TOAST.ROLECHANGED', true);
           this.dialogRef.close(true);

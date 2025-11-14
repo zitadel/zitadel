@@ -21,7 +21,7 @@ Please refer to our guides how to [authenticate users](/docs/guides/integrate/lo
 
 For user authentication on devices with limited accessibility (eg, SmartTV, Smart Watch etc.) use the [device authorization grant](/docs/guides/integrate/login/oidc/device-authorization).
 
-Additionally, you can use the [session API](../apis/resources/session_service/) to authenticate users, for example by building a [custom login UI](/docs/guides/integrate/login-ui/).
+Additionally, you can use the [session API](../apis/resources/session_service_v2/) to authenticate users, for example by building a [custom login UI](/docs/guides/integrate/login-ui/).
 
 ### Authenticate service users and machines
 
@@ -36,7 +36,7 @@ Accessing the ZITADEL APIs through a service user might require additional steps
 - Standard and reserved [scopes reference](/docs/apis/openidoauth/scopes)
 - Standard, custom, and reserved [claims reference](/docs/apis/openidoauth/claims)
 
-The [OIDC Playground](/docs/apis/openidoauth/authrequest) is for testing OpenID authentication requests and their parameters.
+The [OIDC Playground](https://zitadel.com/playgrounds/oidc) is for testing OpenID authentication requests and their parameters.
 
 ### SAML 2.0
 
@@ -45,7 +45,7 @@ The [OIDC Playground](/docs/apis/openidoauth/authrequest) is for testing OpenID 
 
 ### Custom
 
-ZITADEL allows to authenticate users by creating a session with the [Session API](/docs/apis/resources/session_service) or get OIDC authentication request details with the [OIDC service API](/docs/apis/resources/oidc_service).
+ZITADEL allows to authenticate users by creating a session with the [Session API](/docs/apis/resources/session_service_v2), get OIDC authentication request details with the [OIDC service API](/docs/apis/resources/oidc_service_v2) or get SAML request details with the [SAML service API](/docs/apis/resources/saml_service_v2).
 User authorizations can be [retrieved as roles from our APIs](/docs/guides/integrate/retrieve-user-roles).
 
 Refer to our guide to learn how to [build your own login UI](/docs/guides/integrate/login-ui)
@@ -54,9 +54,9 @@ Refer to our guide to learn how to [build your own login UI](/docs/guides/integr
 
 ZITADEL provides APIs for each [core resource](/docs/apis/v2):
 
-- [User](/docs/apis/resources/user_service)
-- [Session](/docs/apis/resources/session_service)
-- [Settings](/docs/apis/resources/settings_service)
+- [User](/docs/apis/resources/user_service_v2)
+- [Session](/docs/apis/resources/session_service_v2)
+- [Settings](/docs/apis/resources/settings_service_v2)
 
 :::info
 We are migrating to a resource-based API approach.
@@ -70,7 +70,7 @@ ZITADEL APIs were organized by UseCase/Context, such as Auth API for authenticat
 This led to confusion about which API to use, particularly for requests that could be useful across multiple APIs but with different filters.
 For instance, SearchUsers on an Instance Level or on an Organization Level.
 
-To address this issue, ZITADEL is migrating to a [resource-based API](#zitadel-apis-resource-based). 
+To address this issue, ZITADEL is migrating to a [resource-based API](#zitadel-apis-resource-based).
 :::
 
 <ApiCard title="Authentication" type="AUTH">
@@ -87,7 +87,7 @@ The authentication API (aka Auth API) is used for all operations on the currentl
 #### GRPC
 
 Endpoint:
-$ZITADEL_DOMAIN/zitadel.auth.v1.AuthService/
+`${CUSTOM_DOMAIN}/zitadel.auth.v1.AuthService/`
 
 Definition:
 [Auth Proto](https://github.com/zitadel/zitadel/blob/main/proto/zitadel/auth.proto)
@@ -95,7 +95,7 @@ Definition:
 #### REST
 
 Endpoint:
-$ZITADEL_DOMAIN/auth/v1/
+`${CUSTOM_DOMAIN}/auth/v1/`
 
 API Reference:
 [OpenAPI Docs](/apis/resources/auth)
@@ -120,7 +120,7 @@ To identify the current organization you can send a header `x-zitadel-orgid` or 
 #### GRPC
 
 Endpoint:
-$ZITADEL_DOMAIN/zitadel.management.v1.ManagementService/
+`${CUSTOM_DOMAIN}/zitadel.management.v1.ManagementService/`
 
 Definition:
 [Management Proto](https://github.com/zitadel/zitadel/blob/main/proto/zitadel/management.proto)
@@ -128,7 +128,7 @@ Definition:
 #### REST
 
 Endpoint:
-$ZITADEL_DOMAIN/management/v1/
+`${CUSTOM_DOMAIN}/management/v1/`
 
 API Reference:
 [OpenAPI Docs](/apis/resources/mgmt)
@@ -151,7 +151,7 @@ This API is intended to configure and manage one ZITADEL instance itself.
 #### GRPC
 
 Endpoint:
-$ZITADEL_DOMAIN/zitadel.admin.v1.AdminService/
+`${CUSTOM_DOMAIN}/zitadel.admin.v1.AdminService/`
 
 Definition:
 [Admin Proto](https://github.com/zitadel/zitadel/blob/main/proto/zitadel/admin.proto)
@@ -159,7 +159,7 @@ Definition:
 #### REST
 
 Endpoint:
-$ZITADEL_DOMAIN/admin/v1/
+`${CUSTOM_DOMAIN}/admin/v1/`
 
 API Reference:
 [OpenAPI Docs](/apis/resources/admin)
@@ -184,7 +184,7 @@ Checkout the guide how to [access the ZITADEL System API](/docs/guides/integrate
 #### GRPC
 
 Endpoint:
-$ZITADEL_DOMAIN/zitadel.system.v1.SystemService/
+`${CUSTOM_DOMAIN}/zitadel.system.v1.SystemService/`
 
 Definition:
 [System Proto](https://github.com/zitadel/zitadel/blob/main/proto/zitadel/system.proto)
@@ -192,7 +192,7 @@ Definition:
 #### REST
 
 Endpoint:
-$ZITADEL_DOMAIN/system/v1/
+`${CUSTOM_DOMAIN}/system/v1/`
 
 API Reference:
 [OpenAPI Docs](/apis/resources/system)
@@ -215,7 +215,7 @@ The Assets API allows you to up- and download all kinds of assets. This can be f
 #### REST
 
 Endpoint:
-$ZITADEL_DOMAIN/assets/v1/
+`${CUSTOM_DOMAIN}/assets/v1/`
 
 Definition:
 [Assets](./assets/assets.md)
@@ -223,7 +223,6 @@ Definition:
 </div>
 </Column>
 </ApiCard>
-
 
 ## API definitions
 
@@ -242,12 +241,6 @@ Most languages allow you to build a client from proto definitions, which allows 
 All of our APIs are generated by proto definitions. You can find all the proto definitions in the [Proto API Definitions](https://github.com/zitadel/zitadel/tree/main/proto/zitadel).
 
 > More about [Protocol Buffer](https://developers.google.com/protocol-buffers)
-
-### Swagger documentation
-
-We provide some json files for the swagger documentation of our APIs with the following link: [https://zitadel.cloud/openapi/v2/swagger/](https://zitadel.cloud/openapi/v2/swagger/)
-
-The easiest way to have a look at them is, to import them in the [Swagger Editor](https://editor.swagger.io/)
 
 ### Example
 
@@ -270,18 +263,18 @@ As you can see the `GetMyUser` function is also available as a REST service unde
 
 In the table below you can see the URI of those calls.
 
-| Service | URI                                                 |
-| :------ | :-------------------------------------------------- |
-| REST    | $ZITADEL_DOMAIN/auth/v1/users/me                      |
-| GRPC    | $ZITADEL_DOMAIN/zitadel.auth.v1.AuthService/GetMyUser |
+| Service | URI                                                   |
+| :------ | :---------------------------------------------------- |
+| REST    | `${CUSTOM_DOMAIN}/auth/v1/users/me`                      |
+| GRPC    | `${CUSTOM_DOMAIN}/zitadel.auth.v1.AuthService/GetMyUser` |
 
 ## Domains
 
-ZITADEL hosts everything under a single domain: `{instance}.zitadel.cloud` or your custom domain `$ZITADEL_DOMAIN`
+ZITADEL hosts everything under a single domain: `{instance}.zitadel.cloud` or your custom domain `${CUSTOM_DOMAIN}`
 
-The domain is used as the OIDC issuer and as the base url for the gRPC and REST APIs, the Login and Console UI, which you'll find under `{your_domain}/ui/console/`.
+The domain is used as the OIDC issuer and as the base url for the gRPC and REST APIs, the Login and Console UI, which you'll find under `${CUSTOM_DOMAIN}/ui/console/`.
 
-Are you self-hosting and having troubles with *Instance not found* errors? [Check out this page](/docs/self-hosting/manage/custom-domain).
+Are you self-hosting and having troubles with _Instance not found_ errors? [Check out this page](/docs/self-hosting/manage/custom-domain).
 
 ## API path prefixes
 
@@ -303,7 +296,6 @@ For easy copying to your reverse proxy configuration, here is the list of URL pa
 /saml/v2/
 /oauth/v2/
 /device
-/oidc/v1/
 /.well-known/openid-configuration
 /openapi/
 /idps/callback
@@ -313,4 +305,29 @@ For easy copying to your reverse proxy configuration, here is the list of URL pa
 /zitadel.settings.v2beta.SettingsService/
 /zitadel.oidc.v2beta.OIDCService/
 /zitadel.org.v2beta.OrganizationService/
+/v2/
+/zitadel.user.v2.UserService/
+/zitadel.session.v2.SessionService/
+/zitadel.settings.v2.SettingsService/
+/zitadel.oidc.v2.OIDCService/
+/zitadel.org.v2.OrganizationService/
 ```
+## Postman Collection (Beta)
+
+We published an official Postman collection to help you explore and test the ZITADEL APIs.  
+
+The collection is organized by services, and includes a script to automatically authenticate requests. Before using it, make sure to configure the required environment variables in Postman:
+
+| Variable Name           | Description |
+|-------------------------|-------------|
+| `protocol`          | **http** for local testing, or **https** for cloud/self hosted instances |
+| `custom_domain`          | The domain of your Zitadel instance. |
+| `service_client_id`     | Client ID of service account with **IAM_OWNER** role in your Zitadel instance. |
+| `service_client_secret` | Client secret for the service account. |
+| `api_client_id`         | Client ID of an API application. |
+| `api_client_secret`     | Client secret for the API application. |
+| `project_id`            | A project ID within your Zitadel instance. |
+
+[Fork the Postman Collection](https://app.getpostman.com/run-collection/44392838-6417c238-b9b9-4334-bef0-233ae38cbc51?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D44392838-6417c238-b9b9-4334-bef0-233ae38cbc51%26entityType%3Dcollection%26workspaceId%3D54ef8cdd-5ea3-4f31-89f6-20720b45528c)
+
+This release is currently in **beta**, and we welcome your feedback to improve it.

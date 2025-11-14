@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
@@ -24,13 +24,14 @@ enum SubQuery {
   selector: 'cnsl-filter-user-grants',
   templateUrl: './filter-user-grants.component.html',
   styleUrls: ['./filter-user-grants.component.scss'],
+  standalone: false,
 })
 export class FilterUserGrantsComponent extends FilterComponent implements OnInit {
   public SubQuery: any = SubQuery;
   public searchQueries: UserGrantQuery[] = [];
 
-  constructor(router: Router, route: ActivatedRoute) {
-    super(router, route);
+  constructor(router: Router, route: ActivatedRoute, destroyRef: DestroyRef) {
+    super(router, route, destroyRef);
   }
 
   ngOnInit(): void {

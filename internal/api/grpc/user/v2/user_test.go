@@ -11,14 +11,13 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func Test_idpIntentToIDPIntentPb(t *testing.T) {
@@ -322,7 +321,7 @@ func Test_idpIntentToIDPIntentPb(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := idpIntentToIDPIntentPb(tt.args.intent, tt.args.alg)
 			require.ErrorIs(t, err, tt.res.err)
-			grpc.AllFieldsEqual(t, tt.res.resp.ProtoReflect(), got.ProtoReflect(), grpc.CustomMappers)
+			assert.EqualExportedValues(t, tt.res.resp, got)
 		})
 	}
 }

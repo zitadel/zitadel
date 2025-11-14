@@ -3,6 +3,7 @@ package azuread
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	httphelper "github.com/zitadel/oidc/v3/pkg/http"
@@ -12,6 +13,8 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 )
 
+var _ idp.Session = (*Session)(nil)
+
 // Session extends the [oauth.Session] to be able to handle the id_token and to implement the [idp.SessionSupportsMigration] functionality
 type Session struct {
 	*Provider
@@ -20,8 +23,12 @@ type Session struct {
 	OAuthSession *oauth.Session
 }
 
+func NewSession(provider *Provider, code string) *Session {
+	return &Session{Provider: provider, Code: code}
+}
+
 // GetAuth implements the [idp.Provider] interface by calling the wrapped [oauth.Session].
-func (s *Session) GetAuth(ctx context.Context) (content string, redirect bool) {
+func (s *Session) GetAuth(ctx context.Context) (idp.Auth, error) {
 	return s.oauth().GetAuth(ctx)
 }
 
@@ -37,6 +44,11 @@ func (s *Session) RetrievePreviousID() (string, error) {
 		return "", err
 	}
 	return userinfo.Subject, nil
+}
+
+// PersistentParameters implements the [idp.Session] interface.
+func (s *Session) PersistentParameters() map[string]any {
+	return nil
 }
 
 // FetchUser implements the [idp.Session] interface.
@@ -68,6 +80,13 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	}
 	s.oauth().Tokens.IDToken = idToken
 	return user, nil
+}
+
+func (s *Session) ExpiresAt() time.Time {
+	if s.OAuthSession == nil {
+		return time.Time{}
+	}
+	return s.OAuthSession.ExpiresAt()
 }
 
 // Tokens returns the [oidc.Tokens] of the underlying [oauth.Session].

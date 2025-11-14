@@ -1,0 +1,188 @@
+{
+  "schemas": [
+    "urn:ietf:params:scim:api:messages:2.0:BulkRequest"
+  ],
+  "Operations": [
+    // create a minimal user without a bulkId
+    {
+      "method": "POST",
+      "path": "/Users",
+      "data": {
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:User"
+        ],
+        "externalId": "scim-bulk-created-user-0",
+        "userName": "scim-bulk-created-user-0",
+        "name": {
+          "familyName": "scim-bulk-created-user-0-family-name",
+          "givenName": "scim-bulk-created-user-0-given-name"
+        },
+        "emails": [
+          {
+            "value": "scim-bulk-created-user-0@example.com",
+            "primary": true
+          }
+        ],
+        "password": "Password1!"
+      }
+    },
+    // create a new minimal user
+    {
+      "method": "POST",
+      "path": "/Users",
+      "bulkId": "1",
+      "data": {
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:User"
+        ],
+        "externalId": "scim-bulk-created-user-1",
+        "userName": "scim-bulk-created-user-1",
+        "name": {
+          "familyName": "scim-bulk-created-user-1-family-name",
+          "givenName": "scim-bulk-created-user-1-given-name"
+        },
+        "emails": [
+          {
+            "value": "scim-bulk-created-user-1@example.com",
+            "primary": true
+          }
+        ],
+        "password": "Password1!"
+      }
+    },
+    // update the just created user
+    {
+      "method": "PATCH",
+      "path": "/Users/bulkId:1",
+      "data": {
+        "schemas": [
+          "urn:ietf:params:scim:api:messages:2.0:PatchOp"
+        ],
+        "Operations": [
+          {
+            "op": "replace",
+            "path": "nickname",
+            "value": "scim-bulk-created-user-1-nickname-patched"
+          },
+          {
+            "op": "replace",
+            "path": "phonenumbers",
+            "value": {
+              "value": "+41711231212",
+              "primary": true
+            }
+          }
+        ]
+      }
+    },
+    // create another user
+    {
+      "method": "POST",
+      "path": "/Users",
+      "bulkId": "2",
+      "data": {
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:User"
+        ],
+        "externalId": "scim-bulk-created-user-2",
+        "userName": "scim-bulk-created-user-2",
+        "name": {
+          "familyName": "scim-bulk-created-user-2-family-name",
+          "givenName": "scim-bulk-created-user-2-given-name"
+        },
+        "emails": [
+          {
+            "value": "scim-bulk-created-user-2@example.com",
+            "primary": true
+          }
+        ],
+        "password": "Password1!"
+      }
+    },
+    // replace the just created user
+    {
+      "method": "PUT",
+      "path": "/Users/bulkId:2",
+      "data": {
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:User"
+        ],
+        "externalId": "scim-bulk-created-user-2-updated",
+        "userName": "scim-bulk-created-user-2-updated",
+        "name": {
+          "familyName": "scim-bulk-created-user-2-family-name-updated",
+          "givenName": "scim-bulk-created-user-2-given-name-updated"
+        },
+        "emails": [
+          {
+            "value": "scim-bulk-created-user-2-updated@example.com",
+            "primary": true
+          }
+        ]
+      }
+    },
+    // create another user
+    {
+      "method": "POST",
+      "path": "/Users",
+      "bulkId": "3",
+      "data": {
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:User"
+        ],
+        "externalId": "scim-bulk-created-user-3",
+        "userName": "scim-bulk-created-user-3",
+        "name": {
+          "familyName": "scim-bulk-created-user-3-family-name",
+          "givenName": "scim-bulk-created-user-3-given-name"
+        },
+        "emails": [
+          {
+            "value": "scim-bulk-created-user-3@example.com",
+            "primary": true
+          }
+        ],
+        "password": "Password1!"
+      }
+    },
+    // delete the just created user
+    {
+      "method": "DELETE",
+      "path": "/Users/bulkId:3"
+    },
+    // update unknown user
+    {
+      "method": "PATCH",
+      "path": "/Users/fooBar",
+      "data": {
+        "schemas": [
+          "urn:ietf:params:scim:api:messages:2.0:PatchOp"
+        ],
+        "Operations": [
+          {
+            "op": "replace",
+            "path": "nickname",
+            "value": "scim-bulk-created-user-1-nickname"
+          }
+        ]
+      }
+    },
+    // update unknown bulkId user
+    {
+      "method": "PATCH",
+      "path": "/Users/bulkId:99",
+      "data": {
+        "schemas": [
+          "urn:ietf:params:scim:api:messages:2.0:PatchOp"
+        ],
+        "Operations": [
+          {
+            "op": "replace",
+            "path": "nickname",
+            "value": "scim-bulk-created-user-1-nickname"
+          }
+        ]
+      }
+    }
+  ]
+}

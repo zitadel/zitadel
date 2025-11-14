@@ -4,8 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-
-	"golang.org/x/exp/slices"
+	"slices"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -19,9 +18,10 @@ type UserSchemaWriteModel struct {
 	Schema                 json.RawMessage
 	PossibleAuthenticators []domain.AuthenticatorType
 	State                  domain.UserSchemaState
+	SchemaRevision         uint64
 }
 
-func NewUserSchemaWriteModel(schemaID, resourceOwner string) *UserSchemaWriteModel {
+func NewUserSchemaWriteModel(resourceOwner, schemaID string) *UserSchemaWriteModel {
 	return &UserSchemaWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   schemaID,
@@ -38,9 +38,13 @@ func (wm *UserSchemaWriteModel) Reduce() error {
 			wm.Schema = e.Schema
 			wm.PossibleAuthenticators = e.PossibleAuthenticators
 			wm.State = domain.UserSchemaStateActive
+			wm.SchemaRevision = 1
 		case *schema.UpdatedEvent:
 			if e.SchemaType != nil {
 				wm.SchemaType = *e.SchemaType
+			}
+			if e.SchemaRevision != nil {
+				wm.SchemaRevision = *e.SchemaRevision
 			}
 			if len(e.Schema) > 0 {
 				wm.Schema = e.Schema
@@ -60,7 +64,7 @@ func (wm *UserSchemaWriteModel) Reduce() error {
 }
 
 func (wm *UserSchemaWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
 		AggregateTypes(schema.AggregateType).
@@ -71,9 +75,11 @@ func (wm *UserSchemaWriteModel) Query() *eventstore.SearchQueryBuilder {
 			schema.DeactivatedType,
 			schema.ReactivatedType,
 			schema.DeletedType,
-		).
-		Builder()
+		)
+
+	return query.Builder()
 }
+
 func (wm *UserSchemaWriteModel) NewUpdatedEvent(
 	ctx context.Context,
 	agg *eventstore.Aggregate,
@@ -87,6 +93,8 @@ func (wm *UserSchemaWriteModel) NewUpdatedEvent(
 	}
 	if !bytes.Equal(wm.Schema, userSchema) {
 		changes = append(changes, schema.ChangeSchema(userSchema))
+		// change revision if the content of the schema changed
+		changes = append(changes, schema.IncreaseRevision(wm.SchemaRevision))
 	}
 	if len(possibleAuthenticators) > 0 && slices.Compare(wm.PossibleAuthenticators, possibleAuthenticators) != 0 {
 		changes = append(changes, schema.ChangePossibleAuthenticators(possibleAuthenticators))

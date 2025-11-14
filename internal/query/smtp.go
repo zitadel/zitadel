@@ -9,7 +9,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -52,34 +51,6 @@ var (
 		name:  projection.SMTPConfigColumnSequence,
 		table: smtpConfigsTable,
 	}
-	SMTPConfigColumnTLS = Column{
-		name:  projection.SMTPConfigColumnTLS,
-		table: smtpConfigsTable,
-	}
-	SMTPConfigColumnSenderAddress = Column{
-		name:  projection.SMTPConfigColumnSenderAddress,
-		table: smtpConfigsTable,
-	}
-	SMTPConfigColumnSenderName = Column{
-		name:  projection.SMTPConfigColumnSenderName,
-		table: smtpConfigsTable,
-	}
-	SMTPConfigColumnReplyToAddress = Column{
-		name:  projection.SMTPConfigColumnReplyToAddress,
-		table: smtpConfigsTable,
-	}
-	SMTPConfigColumnSMTPHost = Column{
-		name:  projection.SMTPConfigColumnSMTPHost,
-		table: smtpConfigsTable,
-	}
-	SMTPConfigColumnSMTPUser = Column{
-		name:  projection.SMTPConfigColumnSMTPUser,
-		table: smtpConfigsTable,
-	}
-	SMTPConfigColumnSMTPPassword = Column{
-		name:  projection.SMTPConfigColumnSMTPPassword,
-		table: smtpConfigsTable,
-	}
 	SMTPConfigColumnID = Column{
 		name:  projection.SMTPConfigColumnID,
 		table: smtpConfigsTable,
@@ -92,13 +63,93 @@ var (
 		name:  projection.SMTPConfigColumnDescription,
 		table: smtpConfigsTable,
 	}
+
+	smtpConfigsSMTPTable = table{
+		name:          projection.SMTPConfigTable,
+		instanceIDCol: projection.SMTPConfigColumnInstanceID,
+	}
+	SMTPConfigSMTPColumnInstanceID = Column{
+		name:  projection.SMTPConfigColumnInstanceID,
+		table: smtpConfigsSMTPTable,
+	}
+	SMTPConfigSMTPColumnID = Column{
+		name:  projection.SMTPConfigColumnID,
+		table: smtpConfigsSMTPTable,
+	}
+	SMTPConfigSMTPColumnTLS = Column{
+		name:  projection.SMTPConfigSMTPColumnTLS,
+		table: smtpConfigsSMTPTable,
+	}
+	SMTPConfigSMTPColumnSenderAddress = Column{
+		name:  projection.SMTPConfigSMTPColumnSenderAddress,
+		table: smtpConfigsSMTPTable,
+	}
+	SMTPConfigSMTPColumnSenderName = Column{
+		name:  projection.SMTPConfigSMTPColumnSenderName,
+		table: smtpConfigsSMTPTable,
+	}
+	SMTPConfigSMTPColumnReplyToAddress = Column{
+		name:  projection.SMTPConfigSMTPColumnReplyToAddress,
+		table: smtpConfigsSMTPTable,
+	}
+	SMTPConfigSMTPColumnHost = Column{
+		name:  projection.SMTPConfigSMTPColumnHost,
+		table: smtpConfigsSMTPTable,
+	}
+	SMTPConfigSMTPColumnUser = Column{
+		name:  projection.SMTPConfigSMTPColumnUser,
+		table: smtpConfigsSMTPTable,
+	}
+	SMTPConfigSMTPColumnPassword = Column{
+		name:  projection.SMTPConfigSMTPColumnPassword,
+		table: smtpConfigsSMTPTable,
+	}
+
+	smtpConfigsHTTPTable = table{
+		name:          projection.SMTPConfigHTTPTable,
+		instanceIDCol: projection.SMTPConfigHTTPColumnInstanceID,
+	}
+	SMTPConfigHTTPColumnInstanceID = Column{
+		name:  projection.SMTPConfigHTTPColumnInstanceID,
+		table: smtpConfigsHTTPTable,
+	}
+	SMTPConfigHTTPColumnID = Column{
+		name:  projection.SMTPConfigHTTPColumnID,
+		table: smtpConfigsHTTPTable,
+	}
+	SMTPConfigHTTPColumnEndpoint = Column{
+		name:  projection.SMTPConfigHTTPColumnEndpoint,
+		table: smtpConfigsHTTPTable,
+	}
+	SMTPConfigHTTPColumnSigningKey = Column{
+		name:  projection.SMTPConfigHTTPColumnSigningKey,
+		table: smtpConfigsHTTPTable,
+	}
 )
 
 type SMTPConfig struct {
-	CreationDate   time.Time
-	ChangeDate     time.Time
-	ResourceOwner  string
-	Sequence       uint64
+	CreationDate  time.Time
+	ChangeDate    time.Time
+	ResourceOwner string
+	AggregateID   string
+	ID            string
+	Sequence      uint64
+	Description   string
+
+	SMTPConfig *SMTP
+	HTTPConfig *HTTP
+
+	State domain.SMTPConfigState
+}
+
+func (h *SMTPConfig) decryptSigningKey(alg crypto.EncryptionAlgorithm) error {
+	if h.HTTPConfig == nil {
+		return nil
+	}
+	return h.HTTPConfig.decryptSigningKey(alg)
+}
+
+type SMTP struct {
 	TLS            bool
 	SenderAddress  string
 	SenderName     string
@@ -106,16 +157,13 @@ type SMTPConfig struct {
 	Host           string
 	User           string
 	Password       *crypto.CryptoValue
-	ID             string
-	State          domain.SMTPConfigState
-	Description    string
 }
 
 func (q *Queries) SMTPConfigActive(ctx context.Context, resourceOwner string) (config *SMTPConfig, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareSMTPConfigQuery(ctx, q.client)
+	stmt, scan := prepareSMTPConfigQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		SMTPConfigColumnResourceOwner.identifier(): resourceOwner,
 		SMTPConfigColumnInstanceID.identifier():    resourceOwner,
@@ -129,18 +177,23 @@ func (q *Queries) SMTPConfigActive(ctx context.Context, resourceOwner string) (c
 		config, err = scan(row)
 		return err
 	}, query, args...)
-	return config, err
+	if err != nil {
+		return nil, err
+	}
+	if err := config.decryptSigningKey(q.smtpEncryptionAlgorithm); err != nil {
+		return nil, err
+	}
+	return config, nil
 }
 
-func (q *Queries) SMTPConfigByID(ctx context.Context, instanceID, resourceOwner, id string) (config *SMTPConfig, err error) {
+func (q *Queries) SMTPConfigByID(ctx context.Context, instanceID, id string) (config *SMTPConfig, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareSMTPConfigQuery(ctx, q.client)
+	stmt, scan := prepareSMTPConfigQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		SMTPConfigColumnResourceOwner.identifier(): resourceOwner,
-		SMTPConfigColumnInstanceID.identifier():    instanceID,
-		SMTPConfigColumnID.identifier():            id,
+		SMTPConfigColumnInstanceID.identifier(): instanceID,
+		SMTPConfigColumnID.identifier():         id,
 	}).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-8f8gw", "Errors.Query.SQLStatement")
@@ -150,46 +203,67 @@ func (q *Queries) SMTPConfigByID(ctx context.Context, instanceID, resourceOwner,
 		config, err = scan(row)
 		return err
 	}, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	if err := config.decryptSigningKey(q.smtpEncryptionAlgorithm); err != nil {
+		return nil, err
+	}
 	return config, err
 }
 
-func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, error)) {
-	password := new(crypto.CryptoValue)
-
+func prepareSMTPConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, error)) {
 	return sq.Select(
 			SMTPConfigColumnCreationDate.identifier(),
 			SMTPConfigColumnChangeDate.identifier(),
 			SMTPConfigColumnResourceOwner.identifier(),
 			SMTPConfigColumnSequence.identifier(),
-			SMTPConfigColumnTLS.identifier(),
-			SMTPConfigColumnSenderAddress.identifier(),
-			SMTPConfigColumnSenderName.identifier(),
-			SMTPConfigColumnReplyToAddress.identifier(),
-			SMTPConfigColumnSMTPHost.identifier(),
-			SMTPConfigColumnSMTPUser.identifier(),
-			SMTPConfigColumnSMTPPassword.identifier(),
 			SMTPConfigColumnID.identifier(),
 			SMTPConfigColumnState.identifier(),
-			SMTPConfigColumnDescription.identifier()).
-			From(smtpConfigsTable.identifier() + db.Timetravel(call.Took(ctx))).
+			SMTPConfigColumnDescription.identifier(),
+
+			SMTPConfigSMTPColumnID.identifier(),
+			SMTPConfigSMTPColumnTLS.identifier(),
+			SMTPConfigSMTPColumnSenderAddress.identifier(),
+			SMTPConfigSMTPColumnSenderName.identifier(),
+			SMTPConfigSMTPColumnReplyToAddress.identifier(),
+			SMTPConfigSMTPColumnHost.identifier(),
+			SMTPConfigSMTPColumnUser.identifier(),
+			SMTPConfigSMTPColumnPassword.identifier(),
+
+			SMTPConfigHTTPColumnID.identifier(),
+			SMTPConfigHTTPColumnEndpoint.identifier(),
+			SMTPConfigHTTPColumnSigningKey.identifier(),
+		).
+			From(smtpConfigsTable.identifier()).
+			LeftJoin(join(SMTPConfigSMTPColumnID, SMTPConfigColumnID)).
+			LeftJoin(join(SMTPConfigHTTPColumnID, SMTPConfigColumnID)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*SMTPConfig, error) {
 			config := new(SMTPConfig)
+			var (
+				smtpConfig = sqlSmtpConfig{}
+				httpConfig = sqlHTTPConfig{}
+			)
 			err := row.Scan(
 				&config.CreationDate,
 				&config.ChangeDate,
 				&config.ResourceOwner,
 				&config.Sequence,
-				&config.TLS,
-				&config.SenderAddress,
-				&config.SenderName,
-				&config.ReplyToAddress,
-				&config.Host,
-				&config.User,
-				&password,
 				&config.ID,
 				&config.State,
 				&config.Description,
+				&smtpConfig.id,
+				&smtpConfig.tls,
+				&smtpConfig.senderAddress,
+				&smtpConfig.senderName,
+				&smtpConfig.replyToAddress,
+				&smtpConfig.host,
+				&smtpConfig.user,
+				&smtpConfig.password,
+				&httpConfig.id,
+				&httpConfig.endpoint,
+				&httpConfig.signingKey,
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
@@ -197,57 +271,78 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				}
 				return nil, zerrors.ThrowInternal(err, "QUERY-9k87F", "Errors.Internal")
 			}
-			config.Password = password
+
+			smtpConfig.set(config)
+			httpConfig.setSMTP(config)
+
 			return config, nil
 		}
 }
 
-func prepareSMTPConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*SMTPConfigs, error)) {
+func prepareSMTPConfigsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SMTPConfigs, error)) {
 	return sq.Select(
 			SMTPConfigColumnCreationDate.identifier(),
 			SMTPConfigColumnChangeDate.identifier(),
 			SMTPConfigColumnResourceOwner.identifier(),
 			SMTPConfigColumnSequence.identifier(),
-			SMTPConfigColumnTLS.identifier(),
-			SMTPConfigColumnSenderAddress.identifier(),
-			SMTPConfigColumnSenderName.identifier(),
-			SMTPConfigColumnReplyToAddress.identifier(),
-			SMTPConfigColumnSMTPHost.identifier(),
-			SMTPConfigColumnSMTPUser.identifier(),
-			SMTPConfigColumnSMTPPassword.identifier(),
 			SMTPConfigColumnID.identifier(),
 			SMTPConfigColumnState.identifier(),
 			SMTPConfigColumnDescription.identifier(),
-			countColumn.identifier()).
-			From(smtpConfigsTable.identifier() + db.Timetravel(call.Took(ctx))).
+
+			SMTPConfigSMTPColumnID.identifier(),
+			SMTPConfigSMTPColumnTLS.identifier(),
+			SMTPConfigSMTPColumnSenderAddress.identifier(),
+			SMTPConfigSMTPColumnSenderName.identifier(),
+			SMTPConfigSMTPColumnReplyToAddress.identifier(),
+			SMTPConfigSMTPColumnHost.identifier(),
+			SMTPConfigSMTPColumnUser.identifier(),
+			SMTPConfigSMTPColumnPassword.identifier(),
+
+			SMTPConfigHTTPColumnID.identifier(),
+			SMTPConfigHTTPColumnEndpoint.identifier(),
+			SMTPConfigHTTPColumnSigningKey.identifier(),
+
+			countColumn.identifier(),
+		).From(smtpConfigsTable.identifier()).
+			LeftJoin(join(SMTPConfigSMTPColumnID, SMTPConfigColumnID)).
+			LeftJoin(join(SMTPConfigHTTPColumnID, SMTPConfigColumnID)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*SMTPConfigs, error) {
 			configs := &SMTPConfigs{Configs: []*SMTPConfig{}}
 			for rows.Next() {
 				config := new(SMTPConfig)
+				var (
+					smtpConfig = sqlSmtpConfig{}
+					httpConfig = sqlHTTPConfig{}
+				)
 				err := rows.Scan(
 					&config.CreationDate,
 					&config.ChangeDate,
 					&config.ResourceOwner,
 					&config.Sequence,
-					&config.TLS,
-					&config.SenderAddress,
-					&config.SenderName,
-					&config.ReplyToAddress,
-					&config.Host,
-					&config.User,
-					&config.Password,
 					&config.ID,
 					&config.State,
 					&config.Description,
+					&smtpConfig.id,
+					&smtpConfig.tls,
+					&smtpConfig.senderAddress,
+					&smtpConfig.senderName,
+					&smtpConfig.replyToAddress,
+					&smtpConfig.host,
+					&smtpConfig.user,
+					&smtpConfig.password,
+					&httpConfig.id,
+					&httpConfig.endpoint,
+					&httpConfig.signingKey,
 					&configs.Count,
 				)
 				if err != nil {
-					if errors.Is(err, sql.ErrNoRows) {
-						return nil, zerrors.ThrowNotFound(err, "QUERY-fwofw", "Errors.SMTPConfig.NotFound")
-					}
 					return nil, zerrors.ThrowInternal(err, "QUERY-9k87F", "Errors.Internal")
 				}
+
+				smtpConfig.set(config)
+				httpConfig.setSMTP(config)
+
 				configs.Configs = append(configs.Configs, config)
 			}
 			return configs, nil
@@ -258,7 +353,7 @@ func (q *Queries) SearchSMTPConfigs(ctx context.Context, queries *SMTPConfigsSea
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareSMTPConfigsQuery(ctx, q.client)
+	query, scan := prepareSMTPConfigsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
 			SMTPConfigColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -274,6 +369,47 @@ func (q *Queries) SearchSMTPConfigs(ctx context.Context, queries *SMTPConfigsSea
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-tOpKN", "Errors.Internal")
 	}
+	for i := range configs.Configs {
+		if err := configs.Configs[i].decryptSigningKey(q.smtpEncryptionAlgorithm); err != nil {
+			return nil, err
+		}
+	}
 	configs.State, err = q.latestState(ctx, smsConfigsTable)
 	return configs, err
+}
+
+type sqlSmtpConfig struct {
+	id             sql.NullString
+	tls            sql.NullBool
+	senderAddress  sql.NullString
+	senderName     sql.NullString
+	replyToAddress sql.NullString
+	host           sql.NullString
+	user           sql.NullString
+	password       *crypto.CryptoValue
+}
+
+func (c sqlSmtpConfig) set(smtpConfig *SMTPConfig) {
+	if !c.id.Valid {
+		return
+	}
+	smtpConfig.SMTPConfig = &SMTP{
+		TLS:            c.tls.Bool,
+		SenderAddress:  c.senderAddress.String,
+		SenderName:     c.senderName.String,
+		ReplyToAddress: c.replyToAddress.String,
+		Host:           c.host.String,
+		User:           c.user.String,
+		Password:       c.password,
+	}
+}
+
+func (c sqlHTTPConfig) setSMTP(smtpConfig *SMTPConfig) {
+	if !c.id.Valid {
+		return
+	}
+	smtpConfig.HTTPConfig = &HTTP{
+		Endpoint:   c.endpoint.String,
+		signingKey: c.signingKey,
+	}
 }

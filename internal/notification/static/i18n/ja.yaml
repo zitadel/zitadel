@@ -59,3 +59,10 @@ PasswordChange:
   Greeting: こんにちは {{.DisplayName}} さん、
   Text: ユーザーのパスワードが変更されました。この変更があなたによって行われなかった場合は、すぐにパスワードをリセットすることをお勧めします。
   ButtonText: ログイン
+InviteUser:
+  Title: '{{.ApplicationName}}への招待'
+  PreHeader: '{{.ApplicationName}}への招待'
+  Subject: '{{.ApplicationName}}への招待'
+  Greeting: こんにちは {{.DisplayName}} さん、
+  Text: あなたのユーザーは{{.ApplicationName}}に招待されました。下のボタンをクリックして、招待プロセスを完了してください。このメールをリクエストしていない場合は、無視してください。
+  ButtonText: 招待を受け入れる

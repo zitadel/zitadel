@@ -1,4 +1,4 @@
-//go:generate enumer -type MemberType -trimprefix MemberType
+//go:generate enumer -type MemberType -trimprefix MemberType -json -sql
 
 package authz
 
@@ -25,13 +25,14 @@ const (
 )
 
 type CtxData struct {
-	UserID            string
-	OrgID             string
-	ProjectID         string
-	AgentID           string
-	PreferredLanguage string
-	ResourceOwner     string
-	SystemMemberships Memberships
+	UserID                string
+	OrgID                 string
+	ProjectID             string
+	AgentID               string
+	PreferredLanguage     string
+	ResourceOwner         string
+	SystemMemberships     Memberships
+	SystemUserPermissions []SystemUserPermissions
 }
 
 func (ctxData CtxData) IsZero() bool {
@@ -50,7 +51,8 @@ type Memberships []*Membership
 type Membership struct {
 	MemberType  MemberType
 	AggregateID string
-	//ObjectID differs from aggregate id if object is sub of an aggregate
+	InstanceID  string
+	// ObjectID differs from aggregate id if object is sub of an aggregate
 	ObjectID string
 
 	Roles []string
@@ -96,7 +98,7 @@ func (s SystemTokenVerifierFunc) VerifySystemToken(ctx context.Context, token st
 	return s(ctx, token, orgID)
 }
 
-func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain string, t APITokenVerifier) (_ CtxData, err error) {
+func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain string, t APITokenVerifier, systemRoleMap []RoleMapping) (_ CtxData, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	tokenWOBearer, err := extractBearerToken(token)
@@ -116,39 +118,46 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 			return CtxData{}, zerrors.ThrowUnauthenticated(errors.Join(err, sysTokenErr), "AUTH-7fs1e", "Errors.Token.Invalid")
 		}
 	}
-	var projectID string
-	var origins []string
-	if clientID != "" {
-		projectID, origins, err = t.ProjectIDAndOriginsByClientID(ctx, clientID)
-		if err != nil {
-			return CtxData{}, zerrors.ThrowPermissionDenied(err, "AUTH-GHpw2", "could not read projectid by clientid")
-		}
-		// We used to check origins for every token, but service users shouldn't be used publicly (native app / SPA).
-		// Therefore, mostly won't send an origin and aren't able to configure them anyway.
-		// For the current time we will only check origins for tokens issued to users through apps (code / implicit flow).
-		if err := checkOrigin(ctx, origins); err != nil {
-			return CtxData{}, err
-		}
+	projectID, err := projectIDAndCheckOriginForClientID(ctx, clientID, t)
+	if err != nil {
+		return CtxData{}, err
 	}
 	if orgID == "" && orgDomain == "" {
 		orgID = resourceOwner
 	}
 	// System API calls don't have a resource owner
-	if orgID != "" {
+	if orgID != "" || orgDomain != "" {
 		orgID, err = t.ExistsOrg(ctx, orgID, orgDomain)
 		if err != nil {
 			return CtxData{}, zerrors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
 		}
 	}
 	return CtxData{
-		UserID:            userID,
-		OrgID:             orgID,
-		ProjectID:         projectID,
-		AgentID:           agentID,
-		PreferredLanguage: prefLang,
-		ResourceOwner:     resourceOwner,
-		SystemMemberships: sysMemberships,
+		UserID:                userID,
+		OrgID:                 orgID,
+		ProjectID:             projectID,
+		AgentID:               agentID,
+		PreferredLanguage:     prefLang,
+		ResourceOwner:         resourceOwner,
+		SystemMemberships:     sysMemberships,
+		SystemUserPermissions: systemMembershipsToUserPermissions(sysMemberships, systemRoleMap),
 	}, nil
+}
+
+func projectIDAndCheckOriginForClientID(ctx context.Context, clientID string, t APITokenVerifier) (string, error) {
+	if clientID == "" {
+		return "", nil
+	}
+	projectID, origins, err := t.ProjectIDAndOriginsByClientID(ctx, clientID)
+	logging.WithFields("clientID", clientID).OnError(err).Debug("could not check projectID and origin of clientID (might be service account)")
+
+	// We used to check origins for every token, but service users shouldn't be used publicly (native app / SPA).
+	// Therefore, mostly won't send an origin and aren't able to configure them anyway.
+	// For the current time we will only check origins for tokens issued to users through apps (code / implicit flow).
+	if projectID == "" {
+		return "", nil
+	}
+	return projectID, checkOrigin(ctx, origins)
 }
 
 func SetCtxData(ctx context.Context, ctxData CtxData) context.Context {

@@ -16,7 +16,8 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
-	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/idp/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 )
 
 var ignoreTypes = []protoreflect.FullName{"google.protobuf.Duration"}
@@ -54,6 +55,7 @@ func Test_loginSettingsToPb(t *testing.T) {
 
 	want := &settings.LoginSettings{
 		AllowUsernamePassword:      true,
+		AllowLocalAuthentication:   true,
 		AllowRegister:              true,
 		AllowExternalIdp:           true,
 		ForceMfa:                   true,
@@ -152,8 +154,13 @@ func Test_secondFactorTypeToPb(t *testing.T) {
 		want settings.SecondFactorType
 	}{
 		{
+			// making sure it doesn't break existing mappings
 			args: args{domain.SecondFactorTypeTOTP},
-			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP,
+			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP, //nolint:staticcheck
+		},
+		{
+			args: args{domain.SecondFactorTypeTOTP},
+			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_TOTP,
 		},
 		{
 			args: args{domain.SecondFactorTypeU2F},
@@ -382,14 +389,24 @@ func Test_lockoutSettingsToPb(t *testing.T) {
 func Test_identityProvidersToPb(t *testing.T) {
 	arg := []*query.IDPLoginPolicyLink{
 		{
-			IDPID:   "1",
-			IDPName: "foo",
-			IDPType: domain.IDPTypeOIDC,
+			IDPID:             "1",
+			IDPName:           "foo",
+			IDPType:           domain.IDPTypeOIDC,
+			IsCreationAllowed: true,
+			IsLinkingAllowed:  true,
+			IsAutoCreation:    true,
+			IsAutoUpdate:      true,
+			AutoLinking:       domain.AutoLinkingOptionUsername,
 		},
 		{
-			IDPID:   "2",
-			IDPName: "bar",
-			IDPType: domain.IDPTypeGitHub,
+			IDPID:             "2",
+			IDPName:           "bar",
+			IDPType:           domain.IDPTypeGitHub,
+			IsCreationAllowed: true,
+			IsLinkingAllowed:  true,
+			IsAutoCreation:    true,
+			IsAutoUpdate:      true,
+			AutoLinking:       domain.AutoLinkingOptionEmail,
 		},
 	}
 	want := []*settings.IdentityProvider{
@@ -397,11 +414,25 @@ func Test_identityProvidersToPb(t *testing.T) {
 			Id:   "1",
 			Name: "foo",
 			Type: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_OIDC,
+			Options: &idp.Options{
+				IsCreationAllowed: true,
+				IsLinkingAllowed:  true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			},
 		},
 		{
 			Id:   "2",
 			Name: "bar",
 			Type: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_GITHUB,
+			Options: &idp.Options{
+				IsCreationAllowed: true,
+				IsLinkingAllowed:  true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
 		},
 	}
 	got := identityProvidersToPb(arg)
@@ -465,6 +496,10 @@ func Test_idpTypeToPb(t *testing.T) {
 		{
 			args: args{domain.IDPTypeGoogle},
 			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_GOOGLE,
+		},
+		{
+			args: args{domain.IDPTypeApple},
+			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_APPLE,
 		},
 		{
 			args: args{domain.IDPTypeSAML},

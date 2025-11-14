@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -50,7 +49,7 @@ func Read(obj interface{}, configFiles ...string) error {
 func readConfigFile(readerFunc ReaderFunc, configFile string, obj interface{}) error {
 	configFile = os.ExpandEnv(configFile)
 
-	configStr, err := ioutil.ReadFile(configFile)
+	configStr, err := os.ReadFile(configFile)
 	if err != nil {
 		return zerrors.ThrowInternalf(err, "CONFI-nJk2a", "failed to read config file %s", configFile)
 	}

@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -19,7 +20,6 @@ func AccessStorageInterceptor(svc *logstore.Service[*record.AccessLog]) grpc.Una
 		if !svc.Enabled() {
 			return handler(ctx, req)
 		}
-
 		reqMd, _ := metadata.FromIncomingContext(ctx)
 
 		resp, handlerErr := handler(ctx, req)
@@ -35,6 +35,7 @@ func AccessStorageInterceptor(svc *logstore.Service[*record.AccessLog]) grpc.Una
 
 		resMd, _ := metadata.FromOutgoingContext(ctx)
 		instance := authz.GetInstance(ctx)
+		domainCtx := http_util.DomainContext(ctx)
 
 		r := &record.AccessLog{
 			LogDate:         time.Now(),
@@ -45,8 +46,8 @@ func AccessStorageInterceptor(svc *logstore.Service[*record.AccessLog]) grpc.Una
 			ResponseHeaders: resMd,
 			InstanceID:      instance.InstanceID(),
 			ProjectID:       instance.ProjectID(),
-			RequestedDomain: instance.RequestedDomain(),
-			RequestedHost:   instance.RequestedHost(),
+			RequestedDomain: domainCtx.RequestedDomain(),
+			RequestedHost:   domainCtx.RequestedHost(),
 		}
 
 		svc.Handle(interceptorCtx, r)

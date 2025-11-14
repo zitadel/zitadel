@@ -8,9 +8,11 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/shopspring/decimal"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type FieldHandler struct {
@@ -33,6 +35,9 @@ func (f *fieldProjection) Reducers() []AggregateReducer {
 
 var _ Projection = (*fieldProjection)(nil)
 
+// NewFieldHandler returns a projection handler which backfills the `eventstore.fields` table with historic events which
+// might have existed before they had and Field Operations defined.
+// The events are filtered by the mapped aggregate types and each event type for that aggregate.
 func NewFieldHandler(config *Config, name string, eventTypes map[eventstore.AggregateType][]eventstore.EventType) *FieldHandler {
 	return &FieldHandler{
 		Handler: Handler{
@@ -42,7 +47,6 @@ func NewFieldHandler(config *Config, name string, eventTypes map[eventstore.Aggr
 			bulkLimit:              config.BulkLimit,
 			eventTypes:             eventTypes,
 			requeueEvery:           config.RequeueEvery,
-			handleActiveInstances:  config.HandleActiveInstances,
 			now:                    time.Now,
 			maxFailureCount:        config.MaxFailureCount,
 			retryFailedAfter:       config.RetryFailedAfter,
@@ -53,6 +57,7 @@ func NewFieldHandler(config *Config, name string, eventTypes map[eventstore.Aggr
 	}
 }
 
+// Trigger executes the backfill job of events for the instance currently in the context.
 func (h *FieldHandler) Trigger(ctx context.Context, opts ...TriggerOpt) (err error) {
 	config := new(triggerConfig)
 	for _, opt := range opts {
@@ -66,7 +71,14 @@ func (h *FieldHandler) Trigger(ctx context.Context, opts ...TriggerOpt) (err err
 	defer cancel()
 
 	for i := 0; ; i++ {
-		additionalIteration, err := h.processEvents(ctx, config)
+		var additionalIteration bool
+		var wg sync.WaitGroup
+		wg.Add(1)
+		queue <- func() {
+			additionalIteration, err = h.processEvents(ctx, config)
+			wg.Done()
+		}
+		wg.Wait()
 		h.log().OnError(err).Info("process events failed")
 		h.log().WithField("iteration", i).Debug("trigger iteration")
 		if !additionalIteration || err != nil {
@@ -98,9 +110,7 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		defer cancel()
 	}
 
-	ctx, spanBeginTx := tracing.NewNamedSpan(ctx, "db.BeginTx")
 	tx, err := h.client.BeginTx(txCtx, nil)
-	spanBeginTx.EndWithError(err)
 	if err != nil {
 		return false, err
 	}
@@ -116,16 +126,29 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		}
 	}()
 
-	currentState, err := h.currentState(ctx, tx, config)
+	var hasLocked bool
+	err = tx.QueryRowContext(ctx, "SELECT pg_try_advisory_xact_lock(hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID()).Scan(&hasLocked)
 	if err != nil {
-		if errors.Is(err, errJustUpdated) {
-			return false, nil
-		}
+		return false, err
+	}
+	if !hasLocked {
+		return false, zerrors.ThrowInternal(nil, "V2-xRffO", "projection already locked")
+	}
+
+	// always await currently running transactions
+	config.awaitRunning = true
+	currentState, err := h.currentState(ctx, tx)
+	if err != nil {
 		return additionalIteration, err
 	}
 	// stop execution if currentState.eventTimestamp >= config.maxCreatedAt
-	if config.maxPosition != 0 && currentState.position >= config.maxPosition {
+	if !config.maxPosition.IsZero() && currentState.position.GreaterThanOrEqual(config.maxPosition) {
 		return false, nil
+	}
+
+	if config.minPosition.GreaterThan(decimal.NewFromInt(0)) {
+		currentState.position = config.minPosition
+		currentState.offset = 0
 	}
 
 	events, additionalIteration, err := h.fetchEvents(ctx, tx, currentState)
@@ -157,7 +180,7 @@ func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState
 
 	idx, offset := skipPreviouslyReducedEvents(events, currentState)
 
-	if currentState.position == events[len(events)-1].Position() {
+	if currentState.position.Equal(events[len(events)-1].Position()) {
 		offset += currentState.offset
 	}
 	currentState.position = events[len(events)-1].Position()
@@ -177,7 +200,7 @@ func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState
 	fillFieldsEvents := make([]eventstore.FillFieldsEvent, len(events))
 	highestPosition := events[len(events)-1].Position()
 	for i, event := range events {
-		if event.Position() == highestPosition {
+		if event.Position().Equal(highestPosition) {
 			offset++
 		}
 		fillFieldsEvents[i] = event.(eventstore.FillFieldsEvent)
@@ -187,14 +210,14 @@ func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState
 }
 
 func skipPreviouslyReducedEvents(events []eventstore.Event, currentState *state) (index int, offset uint32) {
-	var position float64
+	var position decimal.Decimal
 	for i, event := range events {
-		if event.Position() != position {
+		if !event.Position().Equal(position) {
 			offset = 0
 			position = event.Position()
 		}
 		offset++
-		if event.Position() == currentState.position &&
+		if event.Position().Equal(currentState.position) &&
 			event.Aggregate().ID == currentState.aggregateID &&
 			event.Aggregate().Type == currentState.aggregateType &&
 			event.Sequence() == currentState.sequence {

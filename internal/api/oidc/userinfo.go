@@ -20,7 +20,9 @@ import (
 	"github.com/zitadel/zitadel/internal/actions/object"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/query"
+	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -31,18 +33,9 @@ func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoReques
 		err = oidcError(err)
 		span.EndWithError(err)
 	}()
-
-	features := authz.GetFeatures(ctx)
-	if features.LegacyIntrospection {
-		return s.LegacyServer.UserInfo(ctx, r)
-	}
-	if features.TriggerIntrospectionProjections {
-		query.TriggerOIDCUserInfoProjections(ctx)
-	}
-
 	token, err := s.verifyAccessToken(ctx, r.Data.AccessToken)
 	if err != nil {
-		return nil, op.NewStatusError(oidc.ErrAccessDenied().WithDescription("access token invalid").WithParent(err), http.StatusUnauthorized)
+		return nil, op.NewStatusError(oidc.ErrAccessDenied().WithDescription("access token invalid").WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError), http.StatusUnauthorized)
 	}
 
 	var (
@@ -61,12 +54,16 @@ func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoReques
 		token.userID,
 		token.scope,
 		projectID,
+		token.clientID,
 		assertion,
 		true,
 		false,
 	)(ctx, true, domain.TriggerTypePreUserinfoCreation)
 	if err != nil {
-		return nil, err
+		if !zerrors.IsNotFound(err) {
+			return nil, err
+		}
+		return nil, op.NewStatusError(oidc.ErrAccessDenied().WithDescription("no active user").WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError), http.StatusUnauthorized)
 	}
 	return op.NewResponse(userInfo), nil
 }
@@ -90,6 +87,7 @@ func (s *Server) userInfo(
 	userID string,
 	scope []string,
 	projectID string,
+	clientID string,
 	projectRoleAssertion, userInfoAssertion, currentProjectOnly bool,
 ) func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType) (_ *oidc.UserInfo, err error) {
 	var (
@@ -124,7 +122,7 @@ func (s *Server) userInfo(
 			Claims:          maps.Clone(rawUserInfo.Claims),
 		}
 		assertRoles(projectID, qu, roleAudience, requestedRoles, roleAssertion, userInfo)
-		return userInfo, s.userinfoFlows(ctx, qu, userInfo, triggerType)
+		return userInfo, s.userinfoFlows(ctx, qu, userInfo, triggerType, clientID)
 	}
 }
 
@@ -163,11 +161,11 @@ func prepareRoles(ctx context.Context, scope []string, projectID string, project
 }
 
 func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []string, assetPrefix string) *oidc.UserInfo {
-	out := new(oidc.UserInfo)
+	out := &oidc.UserInfo{
+		Subject: user.User.ID,
+	}
 	for _, s := range scope {
 		switch s {
-		case oidc.ScopeOpenID:
-			out.Subject = user.User.ID
 		case oidc.ScopeEmail:
 			if !userInfoAssertion {
 				continue
@@ -192,6 +190,10 @@ func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []st
 			setUserInfoMetadata(user.Metadata, out)
 		case ScopeResourceOwner:
 			setUserInfoOrgClaims(user, out)
+		case ScopeCustomUserGroups:
+			setUserInfoCustomUserGroups(user.UserGroups, out)
+		case ScopeUserGroups:
+			setUserInfoUserGroups(user.UserGroups, out)
 		default:
 			if claim, ok := strings.CutPrefix(s, domain.OrgDomainPrimaryScope); ok {
 				out.AppendClaims(domain.OrgDomainPrimaryClaim, claim)
@@ -289,7 +291,26 @@ func setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
 	}
 }
 
-func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, triggerType domain.TriggerType) (err error) {
+func setUserInfoCustomUserGroups(userGroups []query.UserInfoUserGroup, out *oidc.UserInfo) {
+	if len(userGroups) == 0 {
+		return
+	}
+	out.AppendClaims(ClaimCustomUserGroups, userGroups)
+}
+
+func setUserInfoUserGroups(userGroups []query.UserInfoUserGroup, out *oidc.UserInfo) {
+	if len(userGroups) == 0 {
+		return
+	}
+	groups := make([]string, len(userGroups))
+	for i, userGroup := range userGroups {
+		groups[i] = userGroup.Name
+	}
+	out.AppendClaims(ClaimUserGroups, groups)
+}
+
+//nolint:gocognit
+func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, triggerType domain.TriggerType, clientID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -320,6 +341,13 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 				actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
 					return func(goja.FunctionCall) goja.Value {
 						return object.GetOrganizationMetadata(ctx, s.query, c, qu.User.ResourceOwner)
+					}
+				}),
+			),
+			actions.SetFields("application",
+				actions.SetFields("getClientId", func(c *actions.FieldConfig) interface{} {
+					return func(goja.FunctionCall) goja.Value {
+						return c.Runtime.ToValue(clientID)
 					}
 				}),
 			),
@@ -380,7 +408,7 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 							Key:   key,
 							Value: value,
 						}
-						if _, err = s.command.SetUserMetadata(ctx, metadata, userInfo.Subject, qu.User.ResourceOwner); err != nil {
+						if _, err = s.command.SetUserMetadata(ctx, metadata, userInfo.Subject, qu.User.ResourceOwner, nil); err != nil {
 							logging.WithError(err).Info("unable to set md in action")
 							panic(err)
 						}
@@ -407,5 +435,107 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 		}
 	}
 
+	var function string
+	switch triggerType {
+	case domain.TriggerTypePreUserinfoCreation:
+		function = exec_repo.ID(domain.ExecutionTypeFunction, domain.ActionFunctionPreUserinfo.LocalizationKey())
+	case domain.TriggerTypePreAccessTokenCreation:
+		function = exec_repo.ID(domain.ExecutionTypeFunction, domain.ActionFunctionPreAccessToken.LocalizationKey())
+	case domain.TriggerTypeUnspecified, domain.TriggerTypePostAuthentication, domain.TriggerTypePreCreation, domain.TriggerTypePostCreation, domain.TriggerTypePreSAMLResponseCreation:
+		// added for linting, there should never be any trigger type be used here besides PreUserinfo and PreAccessToken
+		return err
+	}
+
+	if function == "" {
+		return nil
+	}
+
+	executionTargets := execution.QueryExecutionTargetsForFunction(ctx, function)
+	info := &ContextInfo{
+		Function:     function,
+		UserInfo:     userInfo,
+		User:         qu.User,
+		UserMetadata: qu.Metadata,
+		Org:          qu.Org,
+		Application:  &ContextInfoApplication{ClientID: clientID},
+		UserGrants:   qu.UserGrants,
+	}
+
+	resp, err := execution.CallTargets(ctx, executionTargets, info, s.targetEncryptionAlgorithm)
+	if err != nil {
+		return err
+	}
+	contextInfoResponse, ok := resp.(*ContextInfoResponse)
+	if !ok || contextInfoResponse == nil {
+		return nil
+	}
+	claimLogs := make([]string, 0)
+	for _, metadata := range contextInfoResponse.SetUserMetadata {
+		if _, err = s.command.SetUserMetadata(ctx, metadata, userInfo.Subject, qu.User.ResourceOwner, nil); err != nil {
+			claimLogs = append(claimLogs, fmt.Sprintf("failed to set user metadata key %q", metadata.Key))
+		}
+	}
+	for _, claim := range contextInfoResponse.AppendClaims {
+		if strings.HasPrefix(claim.Key, ClaimPrefix) {
+			continue
+		}
+		if userInfo.Claims[claim.Key] == nil {
+			userInfo.AppendClaims(claim.Key, claim.Value)
+			continue
+		}
+		claimLogs = append(claimLogs, fmt.Sprintf("key %q already exists", claim.Key))
+	}
+	claimLogs = append(claimLogs, contextInfoResponse.AppendLogClaims...)
+	if len(claimLogs) > 0 {
+		userInfo.AppendClaims(fmt.Sprintf(ClaimActionLogFormat, function), claimLogs)
+	}
+
 	return nil
+}
+
+type ContextInfo struct {
+	Function     string                  `json:"function,omitempty"`
+	UserInfo     *oidc.UserInfo          `json:"userinfo,omitempty"`
+	User         *query.User             `json:"user,omitempty"`
+	UserMetadata []query.UserMetadata    `json:"user_metadata,omitempty"`
+	Org          *query.UserInfoOrg      `json:"org,omitempty"`
+	UserGrants   []query.UserGrant       `json:"user_grants,omitempty"`
+	Application  *ContextInfoApplication `json:"application,omitempty"`
+	Response     *ContextInfoResponse    `json:"response,omitempty"`
+}
+type ContextInfoApplication struct {
+	ClientID string `json:"client_id,omitempty"`
+}
+
+type ContextInfoResponse struct {
+	SetUserMetadata []*domain.Metadata `json:"set_user_metadata,omitempty"`
+	AppendClaims    []*AppendClaim     `json:"append_claims,omitempty"`
+	AppendLogClaims []string           `json:"append_log_claims,omitempty"`
+}
+
+type AppendClaim struct {
+	Key   string `json:"key"`
+	Value any    `json:"value"`
+}
+
+func (c *ContextInfo) GetHTTPRequestBody() []byte {
+	data, err := json.Marshal(c)
+	if err != nil {
+		return nil
+	}
+	return data
+}
+
+func (c *ContextInfo) SetHTTPResponseBody(resp []byte) error {
+	if !json.Valid(resp) {
+		return zerrors.ThrowPreconditionFailed(nil, "ACTION-4m9s2", "Errors.Execution.ResponseIsNotValidJSON")
+	}
+	if c.Response == nil {
+		c.Response = &ContextInfoResponse{}
+	}
+	return json.Unmarshal(resp, c.Response)
+}
+
+func (c *ContextInfo) GetContent() any {
+	return c.Response
 }

@@ -28,7 +28,6 @@ type Server struct {
 	systemDefaults systemdefaults.SystemDefaults
 	assetAPIPrefix func(context.Context) string
 	userCodeAlg    crypto.EncryptionAlgorithm
-	externalSecure bool
 }
 
 func CreateServer(
@@ -36,15 +35,13 @@ func CreateServer(
 	query *query.Queries,
 	sd systemdefaults.SystemDefaults,
 	userCodeAlg crypto.EncryptionAlgorithm,
-	externalSecure bool,
 ) *Server {
 	return &Server{
 		command:        command,
 		query:          query,
 		systemDefaults: sd,
-		assetAPIPrefix: assets.AssetAPI(externalSecure),
+		assetAPIPrefix: assets.AssetAPI(),
 		userCodeAlg:    userCodeAlg,
-		externalSecure: externalSecure,
 	}
 }
 

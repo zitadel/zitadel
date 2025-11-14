@@ -39,9 +39,9 @@ func failureFromEvent(event eventstore.Event, err error) *failure {
 func failureFromStatement(statement *Statement, err error) *failure {
 	return &failure{
 		sequence:      statement.Sequence,
-		instance:      statement.InstanceID,
-		aggregateID:   statement.AggregateID,
-		aggregateType: statement.AggregateType,
+		instance:      statement.Aggregate.InstanceID,
+		aggregateID:   statement.Aggregate.ID,
+		aggregateType: statement.Aggregate.Type,
 		eventDate:     statement.CreationDate,
 		err:           err,
 	}

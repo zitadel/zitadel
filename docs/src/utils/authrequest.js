@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 export const AuthRequestContext = React.createContext(null);
 
@@ -34,7 +34,7 @@ export default ({ children }) => {
     const id_token_hint = params.get("id_token_hint");
     const organization_id = params.get("organization_id");
 
-    setInstance(instance_param ?? "https://mydomain-xyza.zitadel.cloud/");
+    setInstance(instance_param ?? "http://localhost:8080/");
     setClientId(client_id ?? "170086824411201793@yourapp");
     setRedirectUri(
       redirect_uri ?? "http://localhost:8080/api/auth/callback/zitadel"

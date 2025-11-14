@@ -20,7 +20,7 @@ message LDAPCredentials {
     }
   ];
   string password = 2[
-    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
+    (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "Password used to login through LDAP"
       min_length: 1;
@@ -32,20 +32,20 @@ message LDAPCredentials {
 
 message RedirectURLs {
   string success_url = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
+    (validate.rules).string = {min_len: 1, max_len: 2048, uri_ref: true},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "URL on which the user will be redirected after a successful login"
       min_length: 1;
-      max_length: 200;
+      max_length: 2048;
       example: "\"https://custom.com/login/idp/success\"";
     }
   ];
   string failure_url = 2 [
-    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
+    (validate.rules).string = {min_len: 1, max_len: 2048, uri_ref: true},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "URL on which the user will be redirected after a failed login"
       min_length: 1;
-      max_length: 200;
+      max_length: 2048;
       example: "\"https://custom.com/login/idp/fail\"";
     }
   ];
@@ -159,6 +159,24 @@ message IDPLink {
       min_length: 1;
       max_length: 200;
       example: "\"user@external.com\"";
+    }
+  ];
+}
+
+message FormData {
+  // The URL to which the form should be submitted using the POST method.
+  string url = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"https://idp.com/saml/v2/acs\"";
+    }
+  ];
+  // The form fields to be submitted.
+  // Each field is represented as a key-value pair, where the key is the field / input name
+  // and the value is the field / input value.
+  // All fields need to be submitted as is and as input type "text".
+  map<string, string> fields = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "{\"relayState\":\"state\",\"SAMLRequest\":\"asjfkj3ir2fj248=\"}";
     }
   ];
 }

@@ -17,7 +17,11 @@ func (l *Login) handlePasswordReset(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	user, err := l.query.GetUserByLoginName(setContext(r.Context(), authReq.UserOrgID), true, authReq.LoginName)
+	// We check if the user really exists or if it is just a placeholder or an unknown user.
+	// In theory, we could also check for the unknownUserID constant. However, that could disclose
+	// information about the existence of a user to an attacker if they check response times,
+	// since those requests would take shorter than the ones for real users.
+	user, err := l.query.GetUserByID(setContext(r.Context(), authReq.UserOrgID), true, authReq.UserID)
 	if err != nil {
 		if authReq.LoginPolicy.IgnoreUnknownUsernames && zerrors.IsNotFound(err) {
 			err = nil
@@ -25,24 +29,12 @@ func (l *Login) handlePasswordReset(w http.ResponseWriter, r *http.Request) {
 		l.renderPasswordResetDone(w, r, authReq, err)
 		return
 	}
-	passwordCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypePasswordResetCode, l.userCodeAlg)
-	if err != nil {
-		if authReq.LoginPolicy.IgnoreUnknownUsernames && zerrors.IsNotFound(err) {
-			err = nil
-		}
-		l.renderPasswordResetDone(w, r, authReq, err)
-		return
-	}
-	_, err = l.command.RequestSetPassword(setContext(r.Context(), authReq.UserOrgID), user.ID, authReq.UserOrgID, domain.NotificationTypeEmail, passwordCodeGenerator, authReq.ID)
+	_, err = l.command.RequestSetPassword(setContext(r.Context(), authReq.UserOrgID), user.ID, authReq.UserOrgID, domain.NotificationTypeEmail, authReq.ID)
 	l.renderPasswordResetDone(w, r, authReq, err)
 }
 
 func (l *Login) renderPasswordResetDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
-	var errID, errMessage string
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
-	}
 	translator := l.getTranslator(r.Context(), authReq)
-	data := l.getUserData(r, authReq, translator, "PasswordResetDone.Title", "PasswordResetDone.Description", errID, errMessage)
+	data := l.getUserData(r, authReq, translator, "PasswordResetDone.Title", "PasswordResetDone.Description", err)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplPasswordResetDone], data, nil)
 }

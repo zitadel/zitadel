@@ -276,6 +276,13 @@ enum SAMLBinding {
     SAML_BINDING_ARTIFACT = 3;
 }
 
+enum SAMLSignatureAlgorithm {
+    SAML_SIGNATURE_UNSPECIFIED = 0;
+    SAML_SIGNATURE_RSA_SHA1 = 1;
+    SAML_SIGNATURE_RSA_SHA256 = 2;
+    SAML_SIGNATURE_RSA_SHA512 = 3;
+}
+
 enum SAMLNameIDFormat {
     SAML_NAME_ID_FORMAT_UNSPECIFIED = 0;
     SAML_NAME_ID_FORMAT_EMAIL_ADDRESS = 1;
@@ -338,6 +345,8 @@ message OAuthConfig {
             description: "defines how the attribute is called where ZITADEL can get the id of the user";
         }
     ];
+    // Defines if the Proof Key for Code Exchange (PKCE) is used for the authorization code flow.
+    bool use_pkce = 7;
 }
 
 message GenericOIDCConfig {
@@ -363,6 +372,12 @@ message GenericOIDCConfig {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "true";
             description: "if true, provider information get mapped from the id token, not from the userinfo endpoint";
+        }
+    ];
+    // Defines if the Proof Key for Code Exchange (PKCE) is used for the authorization code flow.
+    bool use_pkce = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "true";
         }
     ];
 }
@@ -456,6 +471,7 @@ message LDAPConfig {
     repeated string user_filters = 7;
     google.protobuf.Duration timeout = 8;
     LDAPAttributes attributes = 9;
+    bytes root_ca = 10;
 }
 
 message SAMLConfig {
@@ -470,6 +486,11 @@ message SAMLConfig {
     // Optional name of the attribute, which will be used to map the user
     // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
     optional string transient_mapping_attribute_name = 5;
+    // Boolean value to indicate whether federated logout is enabled. If enabled, ZITADEL will send a logout request to the identity provider,
+    // if the user terminates the session in ZITADEL. Be sure to provide a SLO endpoint as part of the metadata.
+    optional bool federated_logout_enabled = 6;
+    // Optional value to indicate the configured Signing Algorithm used to sign SAML requests and responses.
+    optional zitadel.idp.v1.SAMLSignatureAlgorithm signature_algorithm = 7;
 }
 
 message AzureADConfig {
@@ -500,12 +521,12 @@ message AzureADConfig {
 message Options {
     bool is_linking_allowed = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Enable if users should be able to link an existing ZITADEL user with an external account.";
+            description: "Enable if users should be able to manually link an existing ZITADEL user with an external account. Disable if users should only be allowed to link the proposed account in case of active auto_linking.";
         }
     ];
     bool is_creation_allowed = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Enable if users should be able to create a new account in ZITADEL when using an external account.";
+            description: "Enable if users should be able to manually create a new account in ZITADEL when using an external account. Disable if users should not be able to edit account information when auto_creation is enabled.";
         }
     ];
     bool is_auto_creation = 3 [

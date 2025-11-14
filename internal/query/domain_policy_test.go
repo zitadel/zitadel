@@ -23,8 +23,7 @@ var (
 		` projections.domain_policies2.smtp_sender_address_matches_instance_domain,` +
 		` projections.domain_policies2.is_default,` +
 		` projections.domain_policies2.state` +
-		` FROM projections.domain_policies2` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.domain_policies2`
 	prepareDomainPolicyCols = []string{
 		"id",
 		"sequence",
@@ -122,7 +121,7 @@ func Test_DomainPolicyPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

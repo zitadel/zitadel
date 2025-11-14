@@ -47,9 +47,9 @@ Log:
 `},
 		want: func(t *testing.T, config *Config) {
 			assert.Equal(t, config.Actions.HTTP.DenyList, []actions.AddressChecker{
-				&actions.DomainChecker{Domain: "localhost"},
-				&actions.IPChecker{IP: net.ParseIP("127.0.0.1")},
-				&actions.DomainChecker{Domain: "foobar"}})
+				&actions.HostChecker{Domain: "localhost"},
+				&actions.HostChecker{IP: net.ParseIP("127.0.0.1")},
+				&actions.HostChecker{Domain: "foobar"}})
 		},
 	}, {
 		name: "actions deny list string ok",
@@ -63,9 +63,9 @@ Log:
 `},
 		want: func(t *testing.T, config *Config) {
 			assert.Equal(t, config.Actions.HTTP.DenyList, []actions.AddressChecker{
-				&actions.DomainChecker{Domain: "localhost"},
-				&actions.IPChecker{IP: net.ParseIP("127.0.0.1")},
-				&actions.DomainChecker{Domain: "foobar"}})
+				&actions.HostChecker{Domain: "localhost"},
+				&actions.HostChecker{IP: net.ParseIP("127.0.0.1")},
+				&actions.HostChecker{Domain: "foobar"}})
 		},
 	}, {
 		name: "features ok",
@@ -73,9 +73,10 @@ Log:
 DefaultInstance:
   Features:
     LoginDefaultOrg: true
-    LegacyIntrospection: true
-    TriggerIntrospectionProjections: true
     UserSchema: true
+    LoginV2:
+      Required: true
+      BaseURI: 'http://zitadel:8080'
 Log:
   Level: info
 Actions:
@@ -83,11 +84,13 @@ Actions:
     DenyList: []
 `},
 		want: func(t *testing.T, config *Config) {
-			assert.Equal(t, config.DefaultInstance.Features, &command.InstanceFeatures{
-				LoginDefaultOrg:                 gu.Ptr(true),
-				LegacyIntrospection:             gu.Ptr(true),
-				TriggerIntrospectionProjections: gu.Ptr(true),
-				UserSchema:                      gu.Ptr(true),
+			assert.Equal(t, config.DefaultInstance.Features, &command.InstanceSetupFeatures{
+				LoginDefaultOrg: gu.Ptr(true),
+				UserSchema:      gu.Ptr(true),
+				LoginV2: &command.InstanceSetupFeatureLoginV2{
+					Required: true,
+					BaseURI:  gu.Ptr("http://zitadel:8080"),
+				},
 			})
 		},
 	}, {

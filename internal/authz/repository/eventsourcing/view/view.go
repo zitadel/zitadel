@@ -1,11 +1,8 @@
 package view
 
 import (
-	"context"
-
 	"github.com/jinzhu/gorm"
 
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/query"
 )
@@ -30,8 +27,4 @@ func StartView(sqlClient *database.DB, queries *query.Queries) (*View, error) {
 
 func (v *View) Health() (err error) {
 	return v.Db.DB().Ping()
-}
-
-func (v *View) TimeTravel(ctx context.Context, tableName string) string {
-	return tableName + v.client.Timetravel(call.Took(ctx))
 }

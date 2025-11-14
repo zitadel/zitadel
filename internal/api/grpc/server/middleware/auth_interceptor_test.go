@@ -20,6 +20,7 @@ type authzRepoMock struct{}
 func (v *authzRepoMock) VerifyAccessToken(ctx context.Context, token, clientID, projectID string) (string, string, string, string, string, error) {
 	return "", "", "", "", "", nil
 }
+
 func (v *authzRepoMock) SearchMyMemberships(ctx context.Context, orgID string, _ bool) ([]*authz.Membership, error) {
 	return authz.Memberships{{
 		MemberType:  authz.MemberTypeOrganization,
@@ -31,9 +32,11 @@ func (v *authzRepoMock) SearchMyMemberships(ctx context.Context, orgID string, _
 func (v *authzRepoMock) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (string, []string, error) {
 	return "", nil, nil
 }
+
 func (v *authzRepoMock) ExistsOrg(ctx context.Context, orgID, domain string) (string, error) {
 	return orgID, nil
 }
+
 func (v *authzRepoMock) VerifierClientID(ctx context.Context, appName string) (string, string, error) {
 	return "", "", nil
 }
@@ -252,7 +255,7 @@ func Test_authorize(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := authorize(tt.args.ctx, tt.args.req, tt.args.info, tt.args.handler, tt.args.verifier(), tt.args.authConfig)
+			got, err := authorize(tt.args.ctx, tt.args.req, tt.args.info, tt.args.handler, tt.args.verifier(), tt.args.authConfig, tt.args.authConfig)
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("authorize() error = %v, wantErr %v", err, tt.res.wantErr)
 				return

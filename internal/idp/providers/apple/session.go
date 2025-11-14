@@ -10,11 +10,17 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
 )
 
+var _ idp.Session = (*Session)(nil)
+
 // Session extends the [oidc.Session] with the formValues returned from the callback.
 // This enables to parse the user (name and email), which Apple only returns as form params on registration
 type Session struct {
 	*oidc.Session
 	UserFormValue string
+}
+
+func NewSession(provider *Provider, code, userFormValue string) *Session {
+	return &Session{Session: oidc.NewSession(provider.Provider, code, nil), UserFormValue: userFormValue}
 }
 
 type userFormValue struct {
@@ -52,6 +58,10 @@ func NewUser(info *openid.UserInfo, names userNamesFormValue) *User {
 	user.GivenName = names.FirstName
 	user.FamilyName = names.LastName
 	return &User{User: user}
+}
+
+func InitUser() idp.User {
+	return &User{User: oidc.InitUser()}
 }
 
 // User extends the [oidc.User] by returning the email as preferred_username, since Apple does not return the latter.

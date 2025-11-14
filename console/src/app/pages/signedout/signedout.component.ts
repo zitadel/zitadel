@@ -7,6 +7,7 @@ const LABELPOLICY_LOCALSTORAGE_KEY = 'labelPolicyOnSignout';
   selector: 'cnsl-signedout',
   templateUrl: './signedout.component.html',
   styleUrls: ['./signedout.component.scss'],
+  standalone: false,
 })
 export class SignedoutComponent {
   public dark: boolean = true;
@@ -19,16 +20,21 @@ export class SignedoutComponent {
 
     const lP = localStorage.getItem(LABELPOLICY_LOCALSTORAGE_KEY);
 
-    if (lP) {
-      const parsed = JSON.parse(lP);
-      localStorage.removeItem(LABELPOLICY_LOCALSTORAGE_KEY);
-      if (parsed) {
-        this.labelpolicy = parsed;
-        authService.labelpolicy.next(parsed);
-        authService.labelPolicyLoading$.next(false);
-      }
-    } else {
+    if (!lP) {
       authService.labelPolicyLoading$.next(false);
+      return;
     }
+
+    const parsed = JSON.parse(lP);
+    localStorage.removeItem(LABELPOLICY_LOCALSTORAGE_KEY);
+
+    if (!parsed) {
+      return;
+    }
+
+    this.labelpolicy = parsed;
+    // todo: figure this one out
+    // authService.labelpolicy.next(parsed);
+    authService.labelPolicyLoading$.next(false);
   }
 }

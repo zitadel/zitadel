@@ -1,0 +1,68 @@
+InitCode:
+  Title: 사용자 초기화
+  PreHeader: 사용자 초기화
+  Subject: 사용자 초기화
+  Greeting: 안녕하세요, {{.DisplayName}}님,
+  Text: 사용자가 생성되었습니다. 로그인하려면 사용자 이름 {{.PreferredLoginName}}을 사용하세요. 초기화 프로세스를 완료하려면 아래 버튼을 클릭하세요. (코드 {{.Code}}) 이 메일을 요청하지 않으셨다면 무시하셔도 됩니다.
+  ButtonText: 초기화 완료
+PasswordReset:
+  Title: 비밀번호 재설정
+  PreHeader: 비밀번호 재설정
+  Subject: 비밀번호 재설정
+  Greeting: 안녕하세요, {{.DisplayName}}님,
+  Text: 비밀번호 재설정 요청을 받았습니다. 비밀번호를 재설정하려면 아래 버튼을 사용하세요. (코드 {{.Code}}) 이 메일을 요청하지 않으셨다면 무시하셔도 됩니다.
+  ButtonText: 비밀번호 재설정
+VerifyEmail:
+  Title: 이메일 인증
+  PreHeader: 이메일 인증
+  Subject: 이메일 인증
+  Greeting: 안녕하세요, {{.DisplayName}}님,
+  Text: 새 이메일이 추가되었습니다. 이메일을 인증하려면 아래 버튼을 사용하세요. (코드 {{.Code}}) 새로운 이메일을 추가하지 않으셨다면 이 메일을 무시하세요.
+  ButtonText: 이메일 인증
+VerifyPhone:
+  Title: 전화번호 인증
+  PreHeader: 전화번호 인증
+  Subject: 전화번호 인증
+  Greeting: 안녕하세요, {{.DisplayName}}님,
+  Text: 새 전화번호가 추가되었습니다. 다음 코드를 사용하여 인증하세요 {{.Code}}
+  ButtonText: 전화번호 인증
+VerifyEmailOTP:
+  Title: 일회용 비밀번호 인증
+  PreHeader: 일회용 비밀번호 인증
+  Subject: 일회용 비밀번호 인증
+  Greeting: 안녕하세요, {{.DisplayName}}님,
+  Text: 인증하려면 다음 일회용 비밀번호 {{.OTP}}를 5분 이내에 사용하거나 "인증" 버튼을 클릭하세요.
+  ButtonText: 인증
+VerifySMSOTP:
+  Text: >-
+    {{.OTP}}는 {{ .Domain }}의 일회용 비밀번호입니다. 다음 {{.Expiry}} 이내에 사용하세요.
+    
+    @{{.Domain}} #{{.OTP}}
+DomainClaimed:
+  Title: 조직에서 도메인을 소유하게 되었습니다
+  PreHeader: 이메일 / 사용자 이름 변경
+  Subject: 조직에서 도메인을 소유하게 되었습니다
+  Greeting: 안녕하세요, {{.DisplayName}}님,
+  Text: 도메인 {{.Domain}} 은(는) 조직에서 소유하게 되었습니다. 현재 사용자인 {{.Username}}은 이 조직의 구성원이 아닙니다. 따라서 로그인할 때 이메일을 변경해야 합니다. 이 로그인용으로 임시 사용자 이름 ({{.TempUsername}})을 생성했습니다.
+  ButtonText: 로그인
+PasswordlessRegistration:
+  Title: 비밀번호 없는 로그인 추가
+  PreHeader: 비밀번호 없는 로그인 추가
+  Subject: 비밀번호 없는 로그인 추가
+  Greeting: 안녕하세요, {{.DisplayName}}님,
+  Text: 비밀번호 없는 로그인을 위한 토큰 추가 요청을 받았습니다. 비밀번호 없는 로그인을 위해 토큰 또는 장치를 추가하려면 아래 버튼을 클릭하세요.
+  ButtonText: 비밀번호 없는 로그인 추가
+PasswordChange:
+  Title: 사용자 비밀번호 변경됨
+  PreHeader: 비밀번호 변경
+  Subject: 사용자 비밀번호 변경됨
+  Greeting: 안녕하세요, {{.DisplayName}}님,
+  Text: 사용자의 비밀번호가 변경되었습니다. 본인이 직접 변경하지 않으셨다면 즉시 비밀번호를 재설정하시기 바랍니다.
+  ButtonText: 로그인
+InviteUser:
+  Title: "{{.ApplicationName}} 초대"
+  PreHeader: "{{.ApplicationName}} 초대"
+  Subject: "{{.ApplicationName}} 초대"
+  Greeting: 안녕하세요, {{.DisplayName}}님,
+  Text: "{{.ApplicationName}}에 초대되었습니다. 초대 프로세스를 완료하려면 아래 버튼을 클릭하세요. 이 메일을 요청하지 않으셨다면 무시하셔도 됩니다."
+  ButtonText: 초대 수락

@@ -17,7 +17,7 @@ This annex of the [Framework Agreement](../terms-of-service) describes the servi
 You will benefit from the same software as the open-source project, but we take care of the hosting, maintenance, backup, scaling, and operational security. The cloud service is managed and maintained by the team that also develops the software.
 
 When creating a new instance, you are able to choose a [data location](#data-location).
-We follow a single-provider strategy by minimizing the involved [sub-processors](../subprocessors.md) to increase security, compliance, and performance of our services. [Billing](./billing.md) is based on effective usage of our services.
+We follow a single-provider strategy by minimizing the involved [sub-processors](../subprocessors.md) to increase security, compliance, and performance of our services. [Billing](https://help.zitadel.com/pricing-and-billing-of-zitadel-services) is based on effective usage of our services.
 
 ### Enterprise license / self-hosted
 
@@ -74,12 +74,6 @@ In a self-hosted setup, you will be responsible for SMTP / SMS services, domains
 Data location refers to a region, consisting of one or many countries or territories, where the customer's data is being hosted.
 
 We can not guarantee that during transit the data will only remain within this region. We take measures, as outlined in our [privacy policy](../policies/privacy-policy), to protect your data in transit and in rest.
-
-The following regions will be available when using our cloud service. This list is for informational purposes and will be updated in due course, please refer to our website for all available regions at this time.
-
-- **Global**: All available cloud regions offered by our cloud provider
-- **Switzerland**: Exclusively on Swiss region
-- **GDPR safe countries**: Hosting location is within any of the EU member states and [Adequate Countries](https://ec.europa.eu/info/law/law-topic/data-protection/international-dimension-data-protection/adequacy-decisions_en) as recognized by the European Commission under the GDPR
 
 ## Backup
 

@@ -1,13 +1,13 @@
 package actions
 
 import (
+	"errors"
+	"fmt"
 	"net"
 	"reflect"
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
-
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func SetHTTPConfig(config *HTTPConfig) {
@@ -48,7 +48,7 @@ func HTTPConfigDecodeHook(from, to reflect.Value) (interface{}, error) {
 
 	for _, unsplit := range config.DenyList {
 		for _, split := range strings.Split(unsplit, ",") {
-			parsed, parseErr := parseDenyListEntry(split)
+			parsed, parseErr := NewHostChecker(split)
 			if parseErr != nil {
 				return nil, parseErr
 			}
@@ -61,46 +61,59 @@ func HTTPConfigDecodeHook(from, to reflect.Value) (interface{}, error) {
 	return c, nil
 }
 
-func parseDenyListEntry(entry string) (AddressChecker, error) {
-	if checker, err := NewIPChecker(entry); err == nil {
-		return checker, nil
+func NewHostChecker(entry string) (AddressChecker, error) {
+	if entry == "" {
+		return nil, nil
 	}
-	return &DomainChecker{Domain: entry}, nil
-}
-
-func NewIPChecker(i string) (AddressChecker, error) {
-	_, network, err := net.ParseCIDR(i)
+	_, network, err := net.ParseCIDR(entry)
 	if err == nil {
-		return &IPChecker{Net: network}, nil
+		return &HostChecker{Net: network}, nil
 	}
-	if ip := net.ParseIP(i); ip != nil {
-		return &IPChecker{IP: ip}, nil
+	if ip := net.ParseIP(entry); ip != nil {
+		return &HostChecker{IP: ip}, nil
 	}
-	return nil, zerrors.ThrowInvalidArgument(nil, "ACTIO-ddJ7h", "invalid ip")
+	return &HostChecker{Domain: entry}, nil
 }
 
-type IPChecker struct {
-	Net *net.IPNet
-	IP  net.IP
-}
-
-func (c *IPChecker) Matches(address string) bool {
-	ip := net.ParseIP(address)
-	if ip == nil {
-		return false
-	}
-
-	if c.IP != nil {
-		return c.IP.Equal(ip)
-	}
-	return c.Net.Contains(ip)
-}
-
-type DomainChecker struct {
+type HostChecker struct {
+	Net    *net.IPNet
+	IP     net.IP
 	Domain string
 }
 
-func (c *DomainChecker) Matches(domain string) bool {
-	//TODO: allow wild cards
-	return c.Domain == domain
+type AddressDeniedError struct {
+	deniedBy string
+}
+
+func NewAddressDeniedError(deniedBy string) *AddressDeniedError {
+	return &AddressDeniedError{deniedBy: deniedBy}
+}
+
+func (e *AddressDeniedError) Error() string {
+	return fmt.Sprintf("address is denied by '%s'", e.deniedBy)
+}
+
+func (e *AddressDeniedError) Is(target error) bool {
+	var addressDeniedErr *AddressDeniedError
+	if !errors.As(target, &addressDeniedErr) {
+		return false
+	}
+	return e.deniedBy == addressDeniedErr.deniedBy
+}
+
+func (c *HostChecker) IsDenied(ips []net.IP, address string) error {
+	// if the address matches the domain, no additional checks as needed
+	if c.Domain == address {
+		return NewAddressDeniedError(c.Domain)
+	}
+	// otherwise we need to check on ips (incl. the resolved ips of the host)
+	for _, ip := range ips {
+		if c.Net != nil && c.Net.Contains(ip) {
+			return NewAddressDeniedError(c.Net.String())
+		}
+		if c.IP != nil && c.IP.Equal(ip) {
+			return NewAddressDeniedError(c.IP.String())
+		}
+	}
+	return nil
 }

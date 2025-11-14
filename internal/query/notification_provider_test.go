@@ -21,8 +21,7 @@ var (
 		` projections.notification_providers.state,` +
 		` projections.notification_providers.provider_type,` +
 		` projections.notification_providers.compact` +
-		` FROM projections.notification_providers` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.notification_providers`
 	prepareNotificationProviderCols = []string{
 		"aggregate_id",
 		"creation_date",
@@ -114,7 +113,7 @@ func Test_NotificationProviderPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

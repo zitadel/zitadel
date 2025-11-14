@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Fluxos",
         "DESCRIPTION": "Escolha um fluxo de autenticação e acione sua ação em um evento específico dentro desse fluxo."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, uma nova e melhorada versão de Actions, já está disponível. A versão atual ainda é acessível, mas o nosso desenvolvimento futuro se concentrará na nova versão, que acabará por substituir a atual."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -185,6 +186,32 @@
           "DESCRIPTION": "A vida útil do token de atualização inativo é o tempo máximo que um token de atualização pode ficar sem uso."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Gerencie suas Chaves Web OIDC para assinar e validar tokens com segurança em sua instância do ZITADEL.",
+        "TABLE": {
+          "TITLE": "Chaves Web Ativas e Futuras",
+          "DESCRIPTION": "Suas chaves web ativas e futuras. Ativar uma nova chave desativará a atual.",
+          "NOTE": "Nota: O endpoint JWKs OIDC retorna uma resposta que pode ser armazenada em cache (padrão: 5 min). Evite ativar uma chave muito cedo, pois ela pode ainda não estar disponível no cache e para os clientes.",
+          "ACTIVATE": "Ativar próxima Chave Web",
+          "ACTIVE": "Atualmente ativa",
+          "NEXT": "Próxima na fila",
+          "FUTURE": "Futuro",
+          "WARNING": "A chave da Web tem menos de 5 minutos"
+        },
+        "CREATE": {
+          "TITLE": "Criar nova Chave Web",
+          "DESCRIPTION": "Criar uma nova chave web a adicionará à sua lista. O ZITADEL usa, por padrão, chaves RSA2048 com um algoritmo de hash SHA256.",
+          "KEY_TYPE": "Tipo de Chave",
+          "BITS": "Bits",
+          "HASHER": "Algoritmo de Hash",
+          "CURVE": "Curva"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Chaves Web Anteriores",
+          "DESCRIPTION": "Estas são suas chaves web anteriores que não estão mais ativas.",
+          "DEACTIVATED_ON": "Desativada em"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Textos de Mensagens",
         "DESCRIPTION": "Personalize os textos do seu e-mail de notificação ou mensagens SMS. Se desejar desativar alguns idiomas, restrinja-os nas configurações de idioma da sua instância.",
@@ -197,7 +224,8 @@
           "VE": "Quando um usuário muda seu endereço de e-mail, ele receberá um e-mail com um link para verificar o novo endereço.",
           "VP": "Quando um usuário muda seu número de telefone, ele receberá um SMS com um código para verificar o novo número.",
           "VEO": "Quando um usuário adiciona um método de Senha Única via e-mail, ele precisa ativá-lo inserindo um código enviado para seu endereço de e-mail.",
-          "VSO": "Quando um usuário adiciona um método de Senha Única via SMS, ele precisa ativá-lo inserindo um código enviado para seu número de telefone."
+          "VSO": "Quando um usuário adiciona um método de Senha Única via SMS, ele precisa ativá-lo inserindo um código enviado para seu número de telefone.",
+          "IU": "Quando um código de convite de usuário é criado, eles receberão um e-mail com um link para configurar seu método de autenticação."
         }
       },
       "LOGIN_TEXTS": {
@@ -231,7 +259,7 @@
           "LABEL": "Duração Máxima em horas",
           "PW_CHECK": {
             "TITLE": "Verificação de Senha",
-            "DESCRIPTION": "Seus usuários devem mudar suas senhas nesses períodos."
+            "DESCRIPTION": "Os usuários serão obrigados a reautentificar-se com sua senha após este período."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Verificação de Login Externo",
@@ -501,6 +529,118 @@
     "DOWNLOAD": "Baixar",
     "APPLY": "Aplicar"
   },
+  "ACTIONSTWO": {
+    "BETA_NOTE": "Você está atualmente usando a nova Actions V2, que está em versão beta. A versão anterior 1 ainda está disponível, mas será descontinuada no futuro. Por favor, reporte quaisquer problemas ou envie feedback.",
+    "EXECUTION": {
+      "TITLE": "Ações",
+      "DESCRIPTION": "As ações permitem que você execute código personalizado em resposta a solicitações de API, eventos ou funções específicas. Use-as para estender o Zitadel, automatizar fluxos de trabalho e integrar-se a outros sistemas.",
+      "TYPES": {
+        "request": "Solicitação",
+        "response": "Resposta",
+        "event": "Eventos",
+        "function": "Função"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Criar uma Ação",
+        "UPDATE_TITLE": "Atualizar uma Ação",
+        "TYPE": {
+          "DESCRIPTION": "Selecione quando você deseja que esta Ação seja executada",
+          "REQUEST": {
+            "TITLE": "Solicitação",
+            "DESCRIPTION": "Solicitações que ocorrem dentro do Zitadel. Isso pode ser algo como uma chamada de solicitação de login."
+          },
+          "RESPONSE": {
+            "TITLE": "Resposta",
+            "DESCRIPTION": "Uma resposta de uma solicitação dentro do Zitadel. Pense na resposta que você recebe ao buscar um usuário."
+          },
+          "EVENTS": {
+            "TITLE": "Eventos",
+            "DESCRIPTION": "Eventos que acontecem dentro do Zitadel. Isso pode ser qualquer coisa, como um usuário criando uma conta, um login bem-sucedido, etc."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Funções",
+            "DESCRIPTION": "Funções que você pode chamar dentro do Zitadel. Isso pode ser qualquer coisa, desde enviar um e-mail até criar um usuário."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Escolha se esta ação se aplica a todas as solicitações, um serviço específico (por exemplo, gerenciamento de usuários) ou uma única solicitação (por exemplo, criar usuário).",
+          "ALL": {
+            "TITLE": "Todas",
+            "DESCRIPTION": "Selecione isso se você quiser executar sua ação em cada solicitação"
+          },
+          "ALL_EVENTS": "Selecione isto se quiser executar sua ação em cada evento",
+          "SELECT_SERVICE": {
+            "TITLE": "Selecionar Serviço",
+            "DESCRIPTION": "Escolha um Serviço Zitadel para sua ação."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Selecionar Método",
+            "DESCRIPTION": "Se você quiser executar apenas em uma solicitação específica, selecione-a aqui",
+            "NOTE": "Se você não selecionar um método, sua ação será executada em todas as solicitações em seu serviço selecionado."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Nome da Função",
+            "DESCRIPTION": "Escolha a função que você deseja executar"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Definir Grupo",
+            "DESCRIPTION": "Se você quiser executar apenas em um grupo de eventos, defina o grupo aqui"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Selecionar Evento",
+            "DESCRIPTION": "Se você quiser executar apenas em um evento específico, especifique-o aqui"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "Você pode escolher executar um destino ou executá-lo nas mesmas condições que outros destinos.",
+          "TARGET": {
+            "DESCRIPTION": "O destino que você deseja executar para esta ação"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Condições de Execução"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Condição",
+        "TYPE": "Tipo",
+        "TARGET": "Destino",
+        "CREATIONDATE": "Data de Criação"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Destinos",
+      "DESCRIPTION": "Um destino é o destino do código que você deseja executar a partir de uma ação. Crie um destino aqui e adicione-o às suas ações.",
+      "CREATE": {
+        "TITLE": "Criar seu Destino",
+        "DESCRIPTION": "Crie seu próprio destino fora do Zitadel",
+        "NAME": "Nome",
+        "NAME_DESCRIPTION": "Dê ao seu destino um nome claro e descritivo para torná-lo fácil de identificar mais tarde",
+        "TYPE": "Tipo",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "Chamada REST",
+          "restAsync": "REST Assíncrono"
+        },
+        "TYPES_DESCRIPTION": "Webhook, a chamada lida com o código de status, mas a resposta é irrelevante\nCall, a chamada lida com o código de status e a resposta\nAsync, a chamada não lida nem com o código de status nem com a resposta, mas pode ser chamada em paralelo com outros alvos",
+        "ENDPOINT": "Ponto de Extremidade",
+        "ENDPOINT_DESCRIPTION": "Insira o ponto de extremidade onde seu código está hospedado. Certifique-se de que ele esteja acessível para nós!",
+        "TIMEOUT": "Tempo Limite",
+        "TIMEOUT_DESCRIPTION": "Defina o tempo máximo que seu destino tem para responder. Se demorar mais, interromperemos a solicitação.",
+        "INTERRUPT_ON_ERROR": "Interromper em Caso de Erro",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Pare todas as execuções quando os destinos retornarem um erro",
+        "INTERRUPT_ON_ERROR_WARNING": "Atenção: “Interromper em caso de erro” interrompe as operações em caso de falha, com risco de bloqueio. Teste com esta opção desativada para evitar bloquear o login/criação.",
+        "AWAIT_RESPONSE": "Aguardar Resposta",
+        "AWAIT_RESPONSE_DESCRIPTION": "Aguardaremos uma resposta antes de fazermos qualquer outra coisa. Útil se você pretende usar vários destinos para uma única ação"
+      },
+      "TABLE": {
+        "NAME": "Nome",
+        "ENDPOINT": "Ponto de Extremidade",
+        "CREATIONDATE": "Data de Criação",
+        "REORDER": "Reordenar"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "Tem controle sobre toda a instância, incluindo todas as organizações",
     "IAM_OWNER_VIEWER": "Tem permissão para revisar toda a instância, incluindo todas as organizações",
@@ -508,14 +648,17 @@
     "IAM_USER_MANAGER": "Tem permissão para criar e gerenciar usuários",
     "IAM_ADMIN_IMPERSONATOR": "Tem permissão para se passar por administradores e usuários finais de todas as organizações",
     "IAM_END_USER_IMPERSONATOR": "Tem permissão para se passar por usuários finais de todas as organizações",
+    "IAM_LOGIN_CLIENT": "Tem permissão para gerenciar clientes de login",
     "ORG_OWNER": "Tem permissão sobre toda a organização",
     "ORG_USER_MANAGER": "Tem permissão para criar e gerenciar usuários da organização",
     "ORG_OWNER_VIEWER": "Tem permissão para revisar toda a organização",
+    "ORG_SETTINGS_MANAGER": "Tem permissão para gerenciar as configurações da organização",
     "ORG_USER_PERMISSION_EDITOR": "Tem permissão para gerenciar concessões de usuários",
     "ORG_PROJECT_PERMISSION_EDITOR": "Tem permissão para gerenciar concessões de projetos",
     "ORG_PROJECT_CREATOR": "Tem permissão para criar seus próprios projetos e configurações subjacentes",
     "ORG_ADMIN_IMPERSONATOR": "Tem permissão para se passar por administradores e usuários finais da organização",
     "ORG_END_USER_IMPERSONATOR": "Tem permissão para se passar por usuários finais da organização",
+    "ORG_USER_SELF_MANAGER": "Tem permissão para gerenciar seu próprio usuário",
     "PROJECT_OWNER": "Tem permissão sobre todo o projeto",
     "PROJECT_OWNER_VIEWER": "Tem permissão para revisar todo o projeto",
     "PROJECT_OWNER_GLOBAL": "Tem permissão sobre todo o projeto",
@@ -550,6 +693,7 @@
     "EMAIL": "E-mail",
     "USERNAME": "Nome de Usuário",
     "ORGNAME": "Nome da Organização",
+    "ORGID": "ID da Organização",
     "PRIMARYDOMAIN": "Domínio primário",
     "PROJECTNAME": "Nome do Projeto",
     "RESOURCEOWNER": "Proprietário do Recurso",
@@ -786,7 +930,10 @@
       "PHONESECTION": "Números de Telefone",
       "PASSWORDSECTION": "Senha Inicial",
       "ADDRESSANDPHONESECTION": "Número de telefone",
-      "INITMAILDESCRIPTION": "Se ambas as opções forem selecionadas, nenhum e-mail de inicialização será enviado. Se apenas uma das opções for selecionada, um e-mail para fornecer/verificar os dados será enviado."
+      "INITMAILDESCRIPTION": "Se ambas as opções forem selecionadas, nenhum e-mail de inicialização será enviado. Se apenas uma das opções for selecionada, um e-mail para fornecer/verificar os dados será enviado.",
+      "SETUPAUTHENTICATIONLATER": "Configurar autenticação mais tarde para este usuário.",
+      "INVITATION": "Enviar um E-mail de convite para configuração de autenticação e verificação de E-mail.",
+      "INITIALPASSWORD": "Defina uma senha inicial para o usuário."
     },
     "CODEDIALOG": {
       "TITLE": "Verificar Número de Telefone",
@@ -808,6 +955,9 @@
       "EMAIL": "E-mail",
       "PHONE": "Número de Telefone",
       "PHONE_HINT": "Use o símbolo + seguido do código de chamada do país, ou selecione o país na lista suspensa e, em seguida, insira o número de telefone",
+      "PHONE_VERIFIED": "Número de telefone verificado",
+      "SEND_SMS": "Enviar SMS de verificação",
+      "SEND_EMAIL": "Enviar E-mail",
       "USERNAME": "Nome de Usuário",
       "CHANGEUSERNAME": "modificar",
       "CHANGEUSERNAME_TITLE": "Alterar nome de usuário",
@@ -948,6 +1098,14 @@
       "5": "Suspenso",
       "6": "Inicial"
     },
+    "STATEV2": {
+      "0": "Desconhecido",
+      "1": "Ativo",
+      "2": "Inativo",
+      "3": "Excluído",
+      "4": "Bloqueado",
+      "5": "Inicial"
+    },
     "SEARCH": {
       "ADDITIONAL": "Nome de usuário (organização atual)",
       "ADDITIONAL-EXTERNAL": "Nome de usuário (organização externa)"
@@ -1086,7 +1244,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Excluir Ações Selecionadas?",
         "DESCRIPTION": "Tem certeza de que deseja excluir as ações selecionadas do fluxo?"
-      }
+      },
+      "ABOUTNAME": "O nome da ação e o nome da função no javascript devem ser iguais"
     },
     "TOAST": {
       "ACTIONSSET": "Ações definidas",
@@ -1339,6 +1498,7 @@
       "BRANDING": "Marca",
       "PRIVACYPOLICY": "Política de Privacidade",
       "OIDC": "Tempo de Vida e Expiração do Token OIDC",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Aparência de Segredo",
       "SECURITY": "Configurações de Segurança",
       "EVENTS": "Eventos",
@@ -1354,7 +1514,8 @@
       "APPEARANCE": "Aparência",
       "OTHER": "Outro",
       "STORAGE": "armazenar"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -1381,7 +1542,12 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română",
+        "tr": "Türkçe"
       }
     },
     "SMTP": {
@@ -1418,6 +1584,8 @@
         "SID": "SID",
         "TOKEN": "Token",
         "SENDERNUMBER": "Número do remetente",
+        "VERIFYSERVICESID": "SID do serviço de verificação",
+        "VERIFYSERVICESID_DESCRIPTION": "Configurar um SID do serviço de verificação permite usar o serviço Twilio Verify em vez do serviço de mensagens para a verificação de números de telefone e SMS OTP.",
         "ADDED": "Twilio adicionado com sucesso.",
         "UPDATED": "Twilio atualizado com sucesso.",
         "REMOVED": "Twilio removido",
@@ -1438,9 +1606,7 @@
         "7": "Senha única (OTP) - SMS",
         "8": "Senha única (OTP) - e-mail"
       },
-      "ADDGENERATOR": "Definir aparência de segredo",
-      "GENERATORTYPE": "Tipo",
-      "EXPIRY": "Expiração (em horas)",
+      "EXPIRY": "Expiração (em minutos)",
       "INCLUDEDIGITS": "Incluir números",
       "INCLUDESYMBOLS": "Incluir símbolos",
       "INCLUDELOWERLETTERS": "Incluir letras minúsculas",
@@ -1460,16 +1626,20 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Organização Padrão de Login",
       "LOGINDEFAULTORG_DESCRIPTION": "A interface de login utilizará as configurações da organização padrão (e não da instância) se nenhum contexto de organização estiver definido",
-      "OIDCLEGACYINTROSPECTION": "Introspecção Legada OIDC",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Recentemente refatoramos o endpoint de introspecção por motivos de performance. Esse recurso pode ser usado para reverter para a implementação legada caso surjam bugs inesperados.",
       "OIDCTOKENEXCHANGE": "Troca de Token OIDC",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Habilita o tipo de concessão experimental urn:ietf:params:oauth:grant-type:token-exchange para o endpoint de token OIDC. A troca de token pode ser usada para solicitar tokens com escopo menor ou personificar outros usuários. Consulte a política de segurança para permitir a personificação em uma instância.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Projeções de Introspecção com Gatilho OIDC",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Habilita gatilhos de projeção durante uma solicitação de introspecção. Isso pode funcionar como uma solução alternativa se houver problemas de consistência perceptíveis na resposta de introspecção, mas pode impactar o desempenho. Planejamos remover gatilhos para solicitações de introspecção no futuro.",
       "USERSCHEMA": "Esquema de Usuário",
       "USERSCHEMAS_DESCRIPTION": "Esquemas de Usuário permitem gerenciar esquemas de dados do usuário. Se o sinalizador estiver ativado, você poderá usar a nova API e seus recursos.",
       "ACTIONS": "Ações",
       "ACTIONS_DESCRIPTION": "Actions v2 permitem gerenciar execuções e destinos de dados. Se a flag estiver habilitada, você poderá usar a nova API e seus recursos.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Término de sessão",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Se a bandeira estiver habilitada, você poderá encerrar uma sessão única da interface do usuário de login fornecendo um id_token com uma reivindicação `sid como id_token_hint no ponto final de end_session. Observe que atualmente todas as sessões do mesmo agente de usuário (navegador) são encerradas na interface do usuário de login. As sessões gerenciadas por meio da API de sessão já permitem o encerramento de sessões individuais.",
+      "DEBUGOIDCPARENTERROR": "Erro de Depuração do Pai OIDC",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Se a bandeira estiver ativada, o erro do pai OIDC será registrado no console.",
+      "ENABLEBACKCHANNELLOGOUT": "Ativar Logout de Backchannel",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "O Logout de Back-Channel implementa o OpenID Connect Back-Channel Logout 1.0 e pode ser usado para notificar os clientes sobre a terminação da sessão no Provedor de OpenID.",
+      "PERMISSIONCHECKV2": "Verificação de Permissão V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Se a bandeira estiver ativada, você poderá usar a nova API e seus recursos.",
       "STATES": {
         "INHERITED": "Herdade",
         "ENABLED": "Habilitado",
@@ -1480,7 +1650,14 @@
         "ENABLED": "\"Habilitado\" é herdado",
         "DISABLED": "\"Desabilitado\" é herdado"
       },
-      "RESET": "Definir tudo para herdar"
+      "RESET": "Definir tudo para herdar",
+      "CONSOLEUSEV2USERAPI": "Use a API V2 no console para criação de usuários",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Quando esta opção está ativada, o console utiliza a API V2 de Usuários para criar novos usuários. Com a API V2, os novos usuários criados começam sem um estado inicial.",
+      "LOGINV2": "Login V2",
+      "LOGINV2_DESCRIPTION": "Ativar esta opção ativa a nova interface de login baseada em TypeScript, com melhorias na segurança, desempenho e personalização.",
+      "LOGINV2_BASEURI": "URI base",
+      "ENABLERELATIONALTABLES": "Tabelas relacionais",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Ative isso para usar tabelas relacionais em vez de projeções para armazenar dados. Atualmente, este interruptor não faz nada."
     },
     "DIALOG": {
       "RESET": {
@@ -1615,7 +1792,12 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română",
+        "tr": "Türkçe"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verificação de email concluída",
@@ -1630,7 +1812,6 @@
         "initPasswordText": "Inicialização de senha",
         "initializeDoneText": "Inicialização de usuário concluída",
         "initializeUserText": "Inicializaçãode usuário",
-        "linkingUserPromptText": "Prompt de usuário para vinculação",
         "linkingUserDoneText": "Vinculação de usuário concluída",
         "loginText": "Login",
         "logoutText": "Logout",
@@ -1666,7 +1847,8 @@
         "PR": "Redefinição de Senha",
         "DC": "Reivindicação de Domínio",
         "PL": "Sem senha",
-        "PC": "Alteração de Senha"
+        "PC": "Alteração de Senha",
+        "IU": "Convidar usuário"
       },
       "CHIPS": {
         "firstname": "Nome próprio",
@@ -1686,7 +1868,8 @@
         "tempUsername": "Nome de usuário temporário",
         "otp": "Senha de uso único",
         "verifyUrl": "URL para verificar a senha de uso único",
-        "expiry": "Data de expiração"
+        "expiry": "Data de expiração",
+        "applicationName": "Nome do aplicativo"
       },
       "TOAST": {
         "UPDATED": "Textos personalizados salvos."
@@ -1714,7 +1897,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "O login convencional com nome de usuário e senha é permitido.",
       "ALLOWEXTERNALIDP_DESC": "O login é permitido para os provedores de identidade subjacentes",
       "ALLOWREGISTER_DESC": "Se a opção estiver selecionada, uma etapa adicional para registrar um usuário aparecerá no login.",
-      "FORCEMFA": "Forçar MFA",
+      "FORCEMFA": "Forçar MFA para todos os utilizadores",
+      "FORCEMFALOCALONLY": "Forçar MFA apenas para utilizadores autenticados localmente",
       "HIDEPASSWORDRESET_DESC": "Se a opção estiver selecionada, o usuário não poderá redefinir sua senha no processo de login.",
       "HIDELOGINNAMESUFFIX": "Ocultar sufixo do nome de login",
       "HIDELOGINNAMESUFFIX_DESC": "Oculta o sufixo do nome de login na interface de login",
@@ -1782,7 +1966,7 @@
       "TYPE": {
         "OWNED": "Projetos Próprios",
         "OWNED_SINGULAR": "Projeto Próprio",
-        "GRANTED_SINGULAR": "Projeto Concedido"
+        "GRANTED_SINGULAR": "Projeto atribuído a {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Configuração de Marca",
@@ -1965,6 +2149,7 @@
       "ACTIVATE": "Ativar Projeto",
       "DELETE": "Excluir Projeto",
       "ORGNAME": "Nome da Organização",
+      "ORGID": "ID da Organização",
       "ORGDOMAIN": "Domínio da Organização",
       "STATE": "Status",
       "TYPE": "Tipo",
@@ -2060,10 +2245,10 @@
       "ISAUTOCREATION_DESC": "Se selecionado, uma conta será criada se ainda não existir.",
       "ISAUTOUPDATE": "Atualização Automática",
       "ISAUTOUPDATE_DESC": "Se selecionado, as contas são atualizadas ao serem reautenticadas.",
-      "ISCREATIONALLOWED": "Criação de Conta Permitida",
-      "ISCREATIONALLOWED_DESC": "Determina se as contas podem ser criadas.",
-      "ISLINKINGALLOWED": "Vinculação de Conta Permitida",
-      "ISLINKINGALLOWED_DESC": "Determina se uma identidade pode ser vinculada a uma conta existente.",
+      "ISCREATIONALLOWED": "Criação de conta permitida (manualmente)",
+      "ISCREATIONALLOWED_DESC": "Determina se contas podem ser criadas usando uma conta externa. Desative se os usuários não devem poder editar informações da conta quando a criação automática está ativada.",
+      "ISLINKINGALLOWED": "Vinculação de conta permitida (manualmente)",
+      "ISLINKINGALLOWED_DESC": "Determina se uma identidade pode ser vinculada manualmente a uma conta existente. Desative se os usuários só devem poder vincular a conta proposta em caso de vinculação automática ativa.",
       "AUTOLINKING_DESC": "Determina se uma identidade será solicitada a ser vinculada a uma conta existente.",
       "AUTOLINKINGTYPE": {
         "0": "Desativado",
@@ -2151,6 +2336,8 @@
     "DELETE_DESCRIPTION": "Você está prestes a excluir um provedor de identidade. As alterações resultantes são irreversíveis. Você realmente deseja fazer isso?",
     "DELETE_SELECTION_TITLE": "Excluir Provedor de Identidade",
     "DELETE_SELECTION_DESCRIPTION": "Você está prestes a excluir um provedor de identidade. As alterações resultantes são irreversíveis. Você realmente deseja fazer isso?",
+    "FEDERATEDLOGOUTENABLED": "Logout Federado Ativado",
+    "FEDERATEDLOGOUTENABLED_DESC": "Se ativado, o usuário também será desconectado do IdP se encerrar a sessão no ZITADEL.",
     "EMPTY": "Nenhum provedor de identidade disponível",
     "OIDC": {
       "GENERAL": "Informações Gerais",
@@ -2176,7 +2363,9 @@
       "REMOVED": "Removido com sucesso."
     },
     "ISIDTOKENMAPPING": "Mapeamento do token ID",
-    "ISIDTOKENMAPPING_DESC": "Se selecionado, as informações do provedor são mapeadas a partir do token ID, e não do ponto final userinfo."
+    "ISIDTOKENMAPPING_DESC": "Se selecionado, as informações do provedor são mapeadas a partir do token ID, e não do ponto final userinfo.",
+    "USEPKCE": "Usar PKCE",
+    "USEPKCE_DESC": "Determina se os parâmetros code_challenge e code_challenge_method estão incluídos na solicitação de autenticação"
   },
   "MFA": {
     "LIST": {
@@ -2526,6 +2715,10 @@
       "CLIENTSECRETREGENERATED": "segredo do cliente gerado.",
       "DELETED": "Aplicativo excluído.",
       "CONFIGCHANGED": "Alterações detectadas!"
+    },
+    "LOGINV2": {
+      "USEV2": "Usar a nova interface de usuário de login",
+      "BASEURL": "URL base personalizado para a nova interface de usuário de login"
     }
   },
   "GENDERS": {
@@ -2549,7 +2742,12 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia",
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română",
+    "tr": "Türkçe"
   },
   "MEMBER": {
     "ADD": "Adicionar um Gerente",

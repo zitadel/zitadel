@@ -163,6 +163,7 @@ func (a *AccessInterceptor) writeLog(ctx context.Context, wrappedWriter *statusR
 		logging.WithError(err).WithField("url", requestURL).Warning("failed to unescape request url")
 	}
 	instance := authz.GetInstance(ctx)
+	domainCtx := http_utils.DomainContext(ctx)
 	a.logstoreSvc.Handle(ctx, &record.AccessLog{
 		LogDate:         time.Now(),
 		Protocol:        record.HTTP,
@@ -172,8 +173,8 @@ func (a *AccessInterceptor) writeLog(ctx context.Context, wrappedWriter *statusR
 		ResponseHeaders: writer.Header(),
 		InstanceID:      instance.InstanceID(),
 		ProjectID:       instance.ProjectID(),
-		RequestedDomain: instance.RequestedDomain(),
-		RequestedHost:   instance.RequestedHost(),
+		RequestedDomain: domainCtx.RequestedDomain(),
+		RequestedHost:   domainCtx.RequestedHost(),
 		NotCountable:    notCountable,
 	})
 }

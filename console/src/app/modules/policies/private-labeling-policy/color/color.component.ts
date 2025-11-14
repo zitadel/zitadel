@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ColorEvent } from 'ngx-color';
+import type { ColorEvent } from 'ngx-color';
 import { BehaviorSubject, debounceTime } from 'rxjs';
 
 import { ColorType } from '../private-labeling-policy.component';
@@ -8,6 +8,7 @@ import { ColorType } from '../private-labeling-policy.component';
   selector: 'cnsl-color',
   templateUrl: './color.component.html',
   styleUrls: ['./color.component.scss'],
+  standalone: false,
 })
 export class ColorComponent implements OnInit {
   public PRIMARY: Array<{ name: string; color: string }> = [

@@ -16,12 +16,14 @@ To authenticate the user a self-signed JWT will be created and utilized.
 
 You can define any id for your user. This guide will assume it's `system-user-1`.
 
+**NOTE:** system user id cannot contain capital letters
+
 ## Generate an RSA keypair
 
 Generate an RSA private key with 2048 bit modulus:
 
 ```bash
-openssl genrsa -out system-user-1.pem 2048
+openssl genrsa -traditional -out system-user-1.pem 2048
 ```
 
 and export a public key from the newly created private key:

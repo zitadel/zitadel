@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -21,9 +23,9 @@ type SearchQueryBuilder struct {
 	instanceIDs           []string
 	editorUser            string
 	queries               []*SearchQuery
+	excludeAggregateIDs   *ExclusionQuery
 	tx                    *sql.Tx
-	allowTimeTravel       bool
-	positionAfter         float64
+	positionAtLeast       decimal.Decimal
 	awaitOpenTransactions bool
 	creationDateAfter     time.Time
 	creationDateBefore    time.Time
@@ -66,16 +68,16 @@ func (b *SearchQueryBuilder) GetQueries() []*SearchQuery {
 	return b.queries
 }
 
+func (b *SearchQueryBuilder) GetExcludeAggregateIDs() *ExclusionQuery {
+	return b.excludeAggregateIDs
+}
+
 func (b *SearchQueryBuilder) GetTx() *sql.Tx {
 	return b.tx
 }
 
-func (b *SearchQueryBuilder) GetAllowTimeTravel() bool {
-	return b.allowTimeTravel
-}
-
-func (b SearchQueryBuilder) GetPositionAfter() float64 {
-	return b.positionAfter
+func (b SearchQueryBuilder) GetPositionAtLeast() decimal.Decimal {
+	return b.positionAtLeast
 }
 
 func (b SearchQueryBuilder) GetAwaitOpenTransactions() bool {
@@ -107,6 +109,7 @@ type SearchQuery struct {
 	aggregateIDs   []string
 	eventTypes     []EventType
 	eventData      map[string]interface{}
+	positionAfter  decimal.Decimal
 }
 
 func (q SearchQuery) GetAggregateTypes() []AggregateType {
@@ -125,14 +128,32 @@ func (q SearchQuery) GetEventData() map[string]interface{} {
 	return q.eventData
 }
 
+func (q SearchQuery) GetPositionAfter() decimal.Decimal {
+	return q.positionAfter
+}
+
+type ExclusionQuery struct {
+	builder        *SearchQueryBuilder
+	aggregateTypes []AggregateType
+	eventTypes     []EventType
+}
+
+func (q ExclusionQuery) GetAggregateTypes() []AggregateType {
+	return q.aggregateTypes
+}
+
+func (q ExclusionQuery) GetEventTypes() []EventType {
+	return q.eventTypes
+}
+
 // Columns defines which fields of the event are needed for the query
 type Columns int8
 
 const (
 	//ColumnsEvent represents all fields of an event
 	ColumnsEvent = iota + 1
-	// ColumnsMaxSequence represents the latest sequence of the filtered events
-	ColumnsMaxSequence
+	// ColumnsMaxPosition represents the latest sequence of the filtered events
+	ColumnsMaxPosition
 	// ColumnsInstanceIDs represents the instance ids of the filtered events
 	ColumnsInstanceIDs
 
@@ -259,16 +280,9 @@ func (builder *SearchQueryBuilder) EditorUser(id string) *SearchQueryBuilder {
 	return builder
 }
 
-// AllowTimeTravel activates the time travel feature of the database if supported
-// The queries will be made based on the call time
-func (builder *SearchQueryBuilder) AllowTimeTravel() *SearchQueryBuilder {
-	builder.allowTimeTravel = true
-	return builder
-}
-
-// PositionAfter filters for events which happened after the specified time
-func (builder *SearchQueryBuilder) PositionAfter(position float64) *SearchQueryBuilder {
-	builder.positionAfter = position
+// PositionAtLeast filters for events which happened after the specified time
+func (builder *SearchQueryBuilder) PositionAtLeast(position decimal.Decimal) *SearchQueryBuilder {
+	builder.positionAtLeast = position
 	return builder
 }
 
@@ -314,6 +328,16 @@ func (builder *SearchQueryBuilder) AddQuery() *SearchQuery {
 	return query
 }
 
+// ExcludeAggregateIDs excludes events from the aggregate IDs returned by the [ExclusionQuery].
+// There can be only 1 exclusion query. Subsequent calls overwrite previous definitions.
+func (builder *SearchQueryBuilder) ExcludeAggregateIDs() *ExclusionQuery {
+	query := &ExclusionQuery{
+		builder: builder,
+	}
+	builder.excludeAggregateIDs = query
+	return query
+}
+
 // Or creates a new sub query on the search query builder
 func (query SearchQuery) Or() *SearchQuery {
 	return query.builder.AddQuery()
@@ -344,6 +368,11 @@ func (query *SearchQuery) EventData(data map[string]interface{}) *SearchQuery {
 	return query
 }
 
+func (query *SearchQuery) PositionAfter(position decimal.Decimal) *SearchQuery {
+	query.positionAfter = position
+	return query
+}
+
 // Builder returns the SearchQueryBuilder of the sub query
 func (query *SearchQuery) Builder() *SearchQueryBuilder {
 	return query.builder
@@ -360,4 +389,21 @@ func (query *SearchQuery) matches(command Command) bool {
 		return false
 	}
 	return true
+}
+
+// AggregateTypes filters for events with the given aggregate types
+func (query *ExclusionQuery) AggregateTypes(types ...AggregateType) *ExclusionQuery {
+	query.aggregateTypes = types
+	return query
+}
+
+// EventTypes filters for events with the given event types
+func (query *ExclusionQuery) EventTypes(types ...EventType) *ExclusionQuery {
+	query.eventTypes = types
+	return query
+}
+
+// Builder returns the SearchQueryBuilder of the sub query
+func (query *ExclusionQuery) Builder() *SearchQueryBuilder {
+	return query.builder
 }

@@ -1,0 +1,145 @@
+{
+  "schemas": [
+    "urn:ietf:params:scim:api:messages:2.0:BulkRequest"
+  ],
+  "Operations": [
+    // update unknown user
+    {
+      "method": "PATCH",
+      "path": "/Users/fooBar",
+      "data": {
+        "schemas": [
+          "urn:ietf:params:scim:api:messages:2.0:PatchOp"
+        ],
+        "Operations": [
+          {
+            "op": "replace",
+            "path": "nickname",
+            "value": "scim-bulk-created-user-1-nickname"
+          }
+        ]
+      }
+    },
+    // create user without email
+    {
+      "method": "POST",
+      "path": "/Users",
+      "data": {
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:User"
+        ],
+        "userName": "acmeUser1",
+        "name": {
+          "familyName": "Ross",
+          "givenName": "Bethany"
+        }
+      }
+    },
+    // create user with invalid locale
+    {
+      "method": "POST",
+      "path": "/Users",
+      "data": {
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:User"
+        ],
+        "userName": "acmeUser1",
+        "name": {
+          "familyName": "Ross",
+          "givenName": "Bethany"
+        },
+        "emails": [
+          {
+            "value": "user1@example.com",
+            "primary": true
+          }
+        ],
+        "locale": "fooBar"
+      }
+    },
+    // create user with invalid password
+    {
+      "method": "POST",
+      "path": "/Users",
+      "data": {
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:User"
+        ],
+        "userName": "acmeUser1",
+        "name": {
+          "familyName": "Ross",
+          "givenName": "Bethany"
+        },
+        "emails": [
+          {
+            "value": "user1@example.com",
+            "primary": true
+          }
+        ],
+        "password": "fooBar"
+      }
+    },
+    // create user with invalid timezone
+    {
+      "method": "POST",
+      "path": "/Users",
+      "data": {
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:User"
+        ],
+        "userName": "acmeUser1",
+        "name": {
+          "familyName": "Ross",
+          "givenName": "Bethany"
+        },
+        "emails": [
+          {
+            "value": "user1@example.com",
+            "primary": true
+          }
+        ],
+        "timezone": "fooBar"
+      }
+    },
+    // create user without username
+    {
+      "method": "POST",
+      "path": "/Users",
+      "data": {
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:User"
+        ],
+        "externalId": "scim-bulk-created-user-0",
+        "name": {
+          "familyName": "scim-bulk-created-user-0-family-name",
+          "givenName": "scim-bulk-created-user-0-given-name"
+        },
+        "emails": [
+          {
+            "value": "scim-bulk-created-user-0@example.com",
+            "primary": true
+          }
+        ],
+        "password": "Password1!"
+      }
+    },
+    // create user without name
+    {
+      "method": "POST",
+      "path": "/Users",
+      "data": {
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:User"
+        ],
+        "username": "scim-bulk-created-username-0",
+        "emails": [
+          {
+            "value": "scim-bulk-created-user-0@example.com",
+            "primary": true
+          }
+        ],
+        "password": "Password1!"
+      }
+    }
+  ]
+}

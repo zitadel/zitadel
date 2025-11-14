@@ -1,0 +1,166 @@
+---
+title: SMS, SMTP and HTTP Provider for Notifications
+sidebar_label: Notification Providers
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+ZITADEL can send messages to users via different notification providers, such as SMS, SMTP, or Webhook (HTTP Provider).
+While you can add multiple providers to different channels, messages will only be delivered via the actived provider.
+Message and notification texts can be [customized](./texts) for an instance or for each organization.
+
+## SMS providers
+
+ZITADEL integrates with Twilio as SMS provider.
+
+## SMTP providers
+
+Integration with most SMTP providers is possible through a generic SMTP provider template that allows you to configure custom SMTP providers.
+Additionally, integration templates are available for:
+
+- Amazon SES
+- Mailgun
+- Mailjet
+- Postmark
+- Sendgrid
+
+:::info Default Provider ZITADEL Cloud
+A default SMTP provider is configured for ZITADEL Cloud customers.
+This provider meant for development and testing purposes and you must replace this provider with your custom SMTP provider for production use cases to guarantee security and reliability of your service.
+:::
+
+## Webhook / HTTP provider
+
+Webhook (HTTP Provider) allows you to fully customize the messages and use integrate with any provider or custom solution to deliver the messages to users.
+A provider with HTTP type will send the messages and the data to a pre-defined webhook as JSON.
+
+### Configuring a HTTP provider
+
+<Tabs>
+  <TabItem value="sms" label="SMS" default>
+
+  First [add a new SMS Provider of type HTTP](/apis/resources/admin/admin-service-add-sms-provider-http) to create a new HTTP provider that can be used to send SMS messages:
+
+  ```bash
+  curl -L 'https://$CUSTOM-DOMAIN/admin/v1/sms/http' \
+    -H 'Content-Type: application/json' \
+    -H 'Accept: application/json' \
+    -H 'Authorization: Bearer <TOKEN>' \
+    -d '{
+      "endpoint": "http://relay.example.com/provider",
+      "description": "provider description"
+    }'
+  ```
+
+  Where `endpoint` defines the Webhook endpoint to which the data should be sent to.
+  The result will contain an ID of the provider that we need in the next step.
+
+  You can configure multiple SMS providers at the same time.
+  To use the HTTP provider you need to [activate the SMS provider](/apis/resources/admin/admin-service-activate-sms-provider): 
+
+  ```bash
+  curl -L 'https://$CUSTOM-DOMAIN/admin/v1/sms/:id/_activate' \
+    -H 'Content-Type: application/json' \
+    -H 'Accept: application/json' \
+    -H 'Authorization: Bearer <TOKEN>' \
+    -d '{}'
+  ```
+
+  The `id` is the provider's ID from the previous step.
+
+  See full API reference for [SMS Providers](/apis/resources/admin/sms-provider) for more details.
+
+  </TabItem>
+  <TabItem value="email" label="Email">
+
+    First [add a new Email Provider of type HTTP](/apis/resources/admin/admin-service-add-email-provider-http) to create a new HTTP provider that can be used to send Email messages:
+
+  ```bash
+  curl -L 'https://$CUSTOM-DOMAIN/admin/v1/email/http' \
+    -H 'Content-Type: application/json' \
+    -H 'Accept: application/json' \
+    -H 'Authorization: Bearer <TOKEN>' \
+    -d '{
+      "endpoint": "http://relay.example.com/provider",
+      "description": "provider description"
+    }'
+  ```
+
+  Where `endpoint` defines the Webhook endpoint to which the data should be sent to.
+  The result will contain an ID of the provider that we need in the next step.
+
+  You can configure multiple Email providers at the same time.
+  To use the HTTP provider you need to [activate the Email provider](/apis/resources/admin/admin-service-activate-email-provider):
+
+  ```bash
+  curl -L 'https://$CUSTOM-DOMAIN/admin/v1/email/:id/_activate' \
+    -H 'Content-Type: application/json' \
+    -H 'Accept: application/json' \
+    -H 'Authorization: Bearer <TOKEN>' \
+    -d '{}'
+  ```
+
+  The `id` is the provider's ID from the previous step.
+
+  See full API reference for [Email Providers](/apis/resources/admin/admin-service-list-email-providers) for more details.
+
+  </TabItem>
+</Tabs>
+
+### HTTP provider payload
+
+In case of the Twilio and Email providers, the messages will be sent as before, in case of the HTTP providers the content of the messages is the same but as a HTTP call.
+
+Here an example of the body of an payload sent via Email HTTP provider:
+
+```json
+{
+  "contextInfo": {
+    "eventType": "user.human.initialization.code.added",
+    "provider": {
+      "id": "285181292935381355",
+      "description": "test"
+    },
+    "recipientEmailAddress": "example@zitadel.com"
+  },
+  "templateData": {
+    "title": "Zitadel - Initialize User",
+    "preHeader": "Initialize User",
+    "subject": "Initialize User",
+    "greeting": "Hello GivenName FamilyName,",
+    "text": "This user was created in Zitadel. Use the username Username to login. Please click the button below to finish the initialization process. (Code 0M53RF) If you didn't ask for this mail, please ignore it.",
+    "url": "http://example.zitadel.com/ui/login/user/init?authRequestID=\u0026code=0M53RF\u0026loginname=Username\u0026orgID=275353657317327214\u0026passwordset=false\u0026userID=285181014567813483",
+    "buttonText": "Finish initialization",
+    "primaryColor": "#5469d4",
+    "backgroundColor": "#fafafa",
+    "fontColor": "#000000",
+    "fontFamily": "-apple-system, BlinkMacSystemFont, Segoe UI, Lato, Arial, Helvetica, sans-serif",
+    "footerText": "InitCode.Footer"
+  },
+  "args": {
+    "changeDate": "2024-09-16T10:58:50.73237+02:00",
+    "code": "0M53RF",
+    "creationDate": "2024-09-16T10:58:50.73237+02:00",
+    "displayName": "GivenName FamilyName",
+    "firstName": "GivenName",
+    "lastEmail": "example@zitadel.com",
+    "lastName": "FamilyName",
+    "lastPhone": "+41791234567",
+    "loginNames": [
+      "Username"
+    ],
+    "nickName": "",
+    "preferredLoginName": "Username",
+    "userName": "Username",
+    "verifiedEmail": "example@zitadel.com",
+    "verifiedPhone": ""
+  }
+}
+```
+
+There are 3 elements to this message:
+
+- `contextInfo`, with information on why this message is sent like the Event, which Email or SMS provider is used and which recipient should receive this message
+- `templateData`, with all texts and format information which can be used with a template to produce the desired message
+- `args`, with the information provided to the user which can be used in the message to customize 

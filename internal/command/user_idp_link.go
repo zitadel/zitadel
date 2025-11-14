@@ -56,7 +56,7 @@ func (c *Commands) BulkAddedUserIDPLinks(ctx context.Context, userID, resourceOw
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-Ek9s", "Errors.User.ExternalIDP.MinimumExternalIDPNeeded")
 	}
 
-	if err := c.checkUserExists(ctx, userID, resourceOwner); err != nil {
+	if _, err := c.checkUserExists(ctx, userID, resourceOwner); err != nil {
 		return err
 	}
 
@@ -86,12 +86,13 @@ func (c *Commands) addUserIDPLink(ctx context.Context, human *eventstore.Aggrega
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-39nfs", "Errors.IDPConfig.NotExisting")
 	}
+	options := idpWriteModel.GetProviderOptions()
 	// IDP user will either be linked or created on a new user
 	// Therefore we need to either check if linking is allowed or creation:
-	if linkToExistingUser && !idpWriteModel.GetProviderOptions().IsLinkingAllowed {
+	if linkToExistingUser && !options.IsLinkingAllowed && options.AutoLinkingOption == domain.AutoLinkingOptionUnspecified {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-Sfee2", "Errors.ExternalIDP.LinkingNotAllowed")
 	}
-	if !linkToExistingUser && !idpWriteModel.GetProviderOptions().IsCreationAllowed {
+	if !linkToExistingUser && !options.IsCreationAllowed && !options.IsAutoCreation {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-SJI3g", "Errors.ExternalIDP.CreationNotAllowed")
 	}
 	return user.NewUserIDPLinkAddedEvent(ctx, human, link.IDPConfigID, link.DisplayName, link.ExternalUserID), nil
@@ -125,6 +126,11 @@ func (c *Commands) removeUserIDPLink(ctx context.Context, link *domain.UserIDPLi
 	}
 	if existingLink.State == domain.UserIDPLinkStateUnspecified || existingLink.State == domain.UserIDPLinkStateRemoved {
 		return nil, nil, zerrors.ThrowNotFound(nil, "COMMAND-1M9xR", "Errors.User.ExternalIDP.NotFound")
+	}
+	if existingLink.AggregateID != authz.GetCtxData(ctx).UserID {
+		if err := c.checkPermission(ctx, domain.PermissionUserWrite, existingLink.ResourceOwner, existingLink.AggregateID); err != nil {
+			return nil, nil, err
+		}
 	}
 	userAgg := UserAggregateFromWriteModel(&existingLink.WriteModel)
 	if cascade {

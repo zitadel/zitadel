@@ -4,17 +4,17 @@ import (
 	"testing"
 	"time"
 
+	"connectrpc.com/connect"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func Test_addOrganizationRequestToCommand(t *testing.T) {
@@ -38,6 +38,21 @@ func Test_addOrganizationRequestToCommand(t *testing.T) {
 				},
 			},
 			wantErr: zerrors.ThrowUnimplementedf(nil, "ORGv2-SD2r1", "userType oneOf %T in method AddOrganization not implemented", nil),
+		},
+		{
+			name: "custom org ID",
+			args: args{
+				request: &org.AddOrganizationRequest{
+					Name:  "custom org ID",
+					OrgId: gu.Ptr("org-ID"),
+				},
+			},
+			want: &command.OrgSetup{
+				Name:         "custom org ID",
+				CustomDomain: "",
+				Admins:       []*command.OrgSetupAdmin{},
+				OrgID:        "org-ID",
+			},
 		},
 		{
 			name: "user ID",
@@ -110,7 +125,7 @@ func Test_addOrganizationRequestToCommand(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := addOrganizationRequestToCommand(tt.args.request)
-			require.ErrorIs(t, err, tt.wantErr)
+			assert.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
 		})
 	}
@@ -124,7 +139,7 @@ func Test_createdOrganizationToPb(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *org.AddOrganizationResponse
+		want    *connect.Response[org.AddOrganizationResponse]
 		wantErr error
 	}{
 		{
@@ -136,8 +151,8 @@ func Test_createdOrganizationToPb(t *testing.T) {
 						EventDate:     now,
 						ResourceOwner: "orgID",
 					},
-					CreatedAdmins: []*command.CreatedOrgAdmin{
-						{
+					OrgAdmins: []command.OrgAdmin{
+						&command.CreatedOrgAdmin{
 							ID:        "id",
 							EmailCode: gu.Ptr("emailCode"),
 							PhoneCode: gu.Ptr("phoneCode"),
@@ -145,7 +160,7 @@ func Test_createdOrganizationToPb(t *testing.T) {
 					},
 				},
 			},
-			want: &org.AddOrganizationResponse{
+			want: connect.NewResponse(&org.AddOrganizationResponse{
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.New(now),
@@ -159,13 +174,13 @@ func Test_createdOrganizationToPb(t *testing.T) {
 						PhoneCode: gu.Ptr("phoneCode"),
 					},
 				},
-			},
+			}),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := createdOrganizationToPb(tt.args.createdOrg)
-			require.ErrorIs(t, err, tt.wantErr)
+			assert.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
 		})
 	}

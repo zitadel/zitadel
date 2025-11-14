@@ -13,7 +13,6 @@ import (
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/gorilla/mux"
 	"github.com/zitadel/logging"
-	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
@@ -55,9 +54,9 @@ func (h *Handler) Storage() static.Storage {
 	return h.storage
 }
 
-func AssetAPI(externalSecure bool) func(context.Context) string {
+func AssetAPI() func(context.Context) string {
 	return func(ctx context.Context) string {
-		return http_util.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), externalSecure) + HandlerPrefix
+		return http_util.DomainContext(ctx).Origin() + HandlerPrefix
 	}
 }
 
@@ -94,13 +93,21 @@ func DefaultErrorHandler(translator *i18n.Translator) func(w http.ResponseWriter
 	}
 }
 
-func NewHandler(commands *command.Commands, verifier authz.APITokenVerifier, authConfig authz.Config, idGenerator id.Generator, storage static.Storage, queries *query.Queries, callDurationInterceptor, instanceInterceptor, assetCacheInterceptor, accessInterceptor func(handler http.Handler) http.Handler) http.Handler {
-	translator, err := i18n.NewZitadelTranslator(language.English)
-	logging.OnError(err).Panic("unable to get translator")
+func NewHandler(
+	commands *command.Commands,
+	verifier authz.APITokenVerifier,
+	systemAuthCOnfig authz.Config,
+	authConfig authz.Config,
+	idGenerator id.Generator,
+	storage static.Storage,
+	queries *query.Queries,
+	callDurationInterceptor, instanceInterceptor, assetCacheInterceptor, accessInterceptor func(handler http.Handler) http.Handler,
+	translator *i18n.Translator,
+) http.Handler {
 	h := &Handler{
 		commands:        commands,
 		errorHandler:    DefaultErrorHandler(translator),
-		authInterceptor: http_mw.AuthorizationInterceptor(verifier, authConfig),
+		authInterceptor: http_mw.AuthorizationInterceptor(verifier, systemAuthCOnfig, authConfig),
 		idGenerator:     idGenerator,
 		storage:         storage,
 		query:           queries,
@@ -129,8 +136,10 @@ func (l *publicFileDownloader) ResourceOwner(_ context.Context, ownerPath string
 	return ownerPath
 }
 
-const maxMemory = 2 << 20
-const paramFile = "file"
+const (
+	maxMemory = 2 << 20
+	paramFile = "file"
+)
 
 func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -204,7 +213,12 @@ func DownloadHandleFunc(s AssetsService, downloader Downloader) func(http.Respon
 		resourceOwner := downloader.ResourceOwner(ctx, ownerPath)
 		path := ""
 		if ownerPath != "" {
-			path = strings.Split(r.RequestURI, ownerPath+"/")[1]
+			splitPath := strings.Split(r.RequestURI, ownerPath+"/")
+			if len(splitPath) < 2 {
+				s.ErrorHandler()(w, r, fmt.Errorf("invalid request URI format: %v", r.RequestURI), http.StatusNotFound)
+				return
+			}
+			path = splitPath[1]
 		}
 		objectName, err := downloader.ObjectName(ctx, path)
 		if err != nil {

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package zitadel.app.v2beta;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/app/v2beta;app";
+
+message LoginVersion {
+    oneof version {
+        LoginV1 login_v1 = 1;
+        LoginV2 login_v2 = 2;
+    }
+}
+
+message LoginV1 {}
+
+message LoginV2 {
+    // Optionally specify a base uri of the login UI. If unspecified the default URI will be used.
+    optional string base_uri = 1;
+}

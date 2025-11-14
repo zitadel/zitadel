@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -118,7 +117,7 @@ func (q *Queries) DomainPolicyByOrg(ctx context.Context, shouldTriggerBulk bool,
 		}
 	}
 
-	stmt, scan := prepareDomainPolicyQuery(ctx, q.client)
+	stmt, scan := prepareDomainPolicyQuery()
 	query, args, err := stmt.Where(eq).OrderBy(DomainPolicyColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
@@ -136,7 +135,7 @@ func (q *Queries) DefaultDomainPolicy(ctx context.Context) (policy *DomainPolicy
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareDomainPolicyQuery(ctx, q.client)
+	stmt, scan := prepareDomainPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		DomainPolicyColID.identifier():         authz.GetInstance(ctx).InstanceID(),
 		DomainPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -154,7 +153,7 @@ func (q *Queries) DefaultDomainPolicy(ctx context.Context) (policy *DomainPolicy
 	return policy, err
 }
 
-func prepareDomainPolicyQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*DomainPolicy, error)) {
+func prepareDomainPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*DomainPolicy, error)) {
 	return sq.Select(
 			DomainPolicyColID.identifier(),
 			DomainPolicyColSequence.identifier(),
@@ -167,7 +166,7 @@ func prepareDomainPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			DomainPolicyColIsDefault.identifier(),
 			DomainPolicyColState.identifier(),
 		).
-			From(domainPolicyTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(domainPolicyTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*DomainPolicy, error) {
 			policy := new(DomainPolicy)

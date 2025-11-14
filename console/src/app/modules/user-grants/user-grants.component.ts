@@ -7,8 +7,13 @@ import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
 import { UserGrant as AuthUserGrant } from 'src/app/proto/generated/zitadel/auth_pb';
-import { Role } from 'src/app/proto/generated/zitadel/project_pb';
-import { Type, UserGrant as MgmtUserGrant, UserGrantQuery, UserGrant } from 'src/app/proto/generated/zitadel/user_pb';
+import {
+  Type,
+  UserGrant as MgmtUserGrant,
+  UserGrant,
+  UserGrantQuery,
+  UserGrantState,
+} from 'src/app/proto/generated/zitadel/user_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -18,7 +23,9 @@ import { PageEvent, PaginatorComponent } from '../paginator/paginator.component'
 import { UserGrantRoleDialogComponent } from '../user-grant-role-dialog/user-grant-role-dialog.component';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 import { UserGrantContext, UserGrantsDataSource } from './user-grants-datasource';
-import { Org, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
+import { Org } from 'src/app/proto/generated/zitadel/org_pb';
+import { QueryClient } from '@tanstack/angular-query-experimental';
+import { NewOrganizationService } from '../../services/new-organization.service';
 
 export enum UserGrantListSearchKey {
   DISPLAY_NAME,
@@ -34,10 +41,10 @@ type UserGrantAsObject = AuthUserGrant.AsObject | MgmtUserGrant.AsObject;
   templateUrl: './user-grants.component.html',
   styleUrls: ['./user-grants.component.scss'],
   animations: [enterAnimations],
+  standalone: false,
 })
 export class UserGrantsComponent implements OnInit, AfterViewInit {
   public userGrantListSearchKey: UserGrantListSearchKey | undefined = undefined;
-  public UserGrantListSearchKey: any = UserGrantListSearchKey;
 
   public INITIAL_PAGE_SIZE: number = 50;
   @Input() context: UserGrantContext = UserGrantContext.NONE;
@@ -56,26 +63,24 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   @Input() grantId: string = '';
   @ViewChild('input') public filter!: MatInput;
 
-  public projectRoleOptions: Role.AsObject[] = [];
   public routerLink: any = undefined;
 
-  public loadedId: string = '';
-  public loadedProjectId: string = '';
-  public grantToEdit: string = '';
-
-  public UserGrantContext: any = UserGrantContext;
-  public Type: any = Type;
-  public ActionKeysType: any = ActionKeysType;
+  public UserGrantContext = UserGrantContext;
+  public Type = Type;
+  public ActionKeysType = ActionKeysType;
+  public UserGrantState = UserGrantState;
   @Input() public type: Type | undefined = undefined;
 
   public filterOpen: boolean = false;
   public myOrgs: Array<Org.AsObject> = [];
   constructor(
-    private authService: GrpcAuthService,
-    private userService: ManagementService,
-    private toast: ToastService,
-    private dialog: MatDialog,
-    private router: Router,
+    private readonly authService: GrpcAuthService,
+    private readonly userService: ManagementService,
+    private readonly toast: ToastService,
+    private readonly dialog: MatDialog,
+    private readonly queryClient: QueryClient,
+    protected readonly router: Router,
+    private readonly newOrganizationService: NewOrganizationService,
   ) {}
 
   @Input() public displayedColumns: string[] = [
@@ -86,6 +91,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     'type',
     'creationDate',
     'changeDate',
+    'state',
     'roleNamesList',
     'actions',
   ];
@@ -139,10 +145,6 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     } else {
       return '';
     }
-  }
-
-  public gotoCreateLink(rL: any): void {
-    this.router.navigate(rL);
   }
 
   private loadGrantsPage(type: Type | undefined, searchQueries?: UserGrantQuery[]): void {
@@ -306,18 +308,13 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
   }
 
-  public showUser(grant: UserGrant.AsObject) {
-    const org: Org.AsObject = {
-      id: grant.grantedOrgId,
-      name: grant.grantedOrgName,
-      state: OrgState.ORG_STATE_ACTIVE,
-      primaryDomain: grant.grantedOrgDomain,
-    };
-
-    // Check if user has permissions for that org before changing active org
-    if (this.myOrgs.find((org) => org.id === grant.grantedOrgId)) {
-      this.authService.setActiveOrg(org);
-      this.router.navigate(['/users', grant.userId]);
+  public async showUser(grant: UserGrant.AsObject) {
+    const org = await this.queryClient.fetchQuery(
+      this.newOrganizationService.organizationByIdQueryOptions(grant.grantedOrgId),
+    );
+    if (org) {
+      this.newOrganizationService.setOrgId(grant.grantedOrgId);
+      await this.router.navigate(['/users', grant.userId]);
     } else {
       this.toast.showInfo('GRANTS.TOAST.CANTSHOWINFO', true);
     }

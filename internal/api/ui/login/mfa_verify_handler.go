@@ -39,7 +39,7 @@ func (l *Login) handleMFAVerify(w http.ResponseWriter, r *http.Request) {
 
 		metadata, actionErr := l.runPostInternalAuthenticationActions(authReq, r, authMethodOTP, err)
 		if err == nil && actionErr == nil && len(metadata) > 0 {
-			_, err = l.command.BulkSetUserMetadata(r.Context(), authReq.UserID, authReq.UserOrgID, metadata...)
+			err = l.bulkSetUserMetadata(r.Context(), authReq.UserID, authReq.UserOrgID, metadata)
 		} else if actionErr != nil && err == nil {
 			err = actionErr
 		}
@@ -62,12 +62,8 @@ func (l *Login) renderMFAVerify(w http.ResponseWriter, r *http.Request, authReq 
 }
 
 func (l *Login) renderMFAVerifySelected(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, verificationStep *domain.MFAVerificationStep, selectedProvider domain.MFAType, err error) {
-	var errID, errMessage string
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
-	}
 	translator := l.getTranslator(r.Context(), authReq)
-	data := l.getUserData(r, authReq, translator, "", "", errID, errMessage)
+	data := l.getUserData(r, authReq, translator, "", "", err)
 	if verificationStep == nil {
 		l.renderError(w, r, authReq, err)
 		return

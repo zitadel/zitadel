@@ -8,7 +8,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -62,7 +61,7 @@ func (q *Queries) SearchInstanceDomains(ctx context.Context, queries *InstanceDo
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareInstanceDomainsQuery(ctx, q.client)
+	query, scan := prepareInstanceDomainsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
 			InstanceDomainInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -78,7 +77,7 @@ func (q *Queries) SearchInstanceDomainsGlobal(ctx context.Context, queries *Inst
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareInstanceDomainsQuery(ctx, q.client)
+	query, scan := prepareInstanceDomainsQuery()
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-IHhLR", "Errors.Query.SQLStatement")
@@ -99,7 +98,7 @@ func (q *Queries) queryInstanceDomains(ctx context.Context, stmt string, scan fu
 	return domains, err
 }
 
-func prepareInstanceDomainsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*InstanceDomains, error)) {
+func prepareInstanceDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*InstanceDomains, error)) {
 	return sq.Select(
 			InstanceDomainCreationDateCol.identifier(),
 			InstanceDomainChangeDateCol.identifier(),
@@ -109,7 +108,7 @@ func prepareInstanceDomainsQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			InstanceDomainIsGeneratedCol.identifier(),
 			InstanceDomainIsPrimaryCol.identifier(),
 			countColumn.identifier(),
-		).From(instanceDomainsTable.identifier() + db.Timetravel(call.Took(ctx))).
+		).From(instanceDomainsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*InstanceDomains, error) {
 			domains := make([]*InstanceDomain, 0)

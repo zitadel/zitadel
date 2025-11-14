@@ -8,7 +8,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/milestone"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -54,10 +53,6 @@ var (
 		name:  projection.MilestoneColumnType,
 		table: milestonesTable,
 	}
-	MilestonePrimaryDomainColID = Column{
-		name:  projection.MilestoneColumnPrimaryDomain,
-		table: milestonesTable,
-	}
 	MilestoneReachedDateColID = Column{
 		name:  projection.MilestoneColumnReachedDate,
 		table: milestonesTable,
@@ -72,11 +67,16 @@ var (
 func (q *Queries) SearchMilestones(ctx context.Context, instanceIDs []string, queries *MilestonesSearchQueries) (milestones *Milestones, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	query, scan := prepareMilestonesQuery(ctx, q.client)
+	query, scan := prepareMilestonesQuery()
 	if len(instanceIDs) == 0 {
 		instanceIDs = []string{authz.GetInstance(ctx).InstanceID()}
 	}
-	stmt, args, err := queries.toQuery(query).Where(sq.Eq{MilestoneInstanceIDColID.identifier(): instanceIDs}).ToSql()
+	stmt, args, err := queries.toQuery(query).Where(
+		sq.Eq{
+			MilestoneInstanceIDColID.identifier():   instanceIDs,
+			InstanceDomainIsPrimaryCol.identifier(): true,
+		},
+	).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-A9i5k", "Errors.Query.SQLStatement")
 	}
@@ -90,19 +90,19 @@ func (q *Queries) SearchMilestones(ctx context.Context, instanceIDs []string, qu
 
 	milestones.State, err = q.latestState(ctx, milestonesTable)
 	return milestones, err
-
 }
 
-func prepareMilestonesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Milestones, error)) {
+func prepareMilestonesQuery() (sq.SelectBuilder, func(*sql.Rows) (*Milestones, error)) {
 	return sq.Select(
 			MilestoneInstanceIDColID.identifier(),
-			MilestonePrimaryDomainColID.identifier(),
+			InstanceDomainDomainCol.identifier(),
 			MilestoneReachedDateColID.identifier(),
 			MilestonePushedDateColID.identifier(),
 			MilestoneTypeColID.identifier(),
 			countColumn.identifier(),
 		).
-			From(milestonesTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(milestonesTable.identifier()).
+			LeftJoin(join(InstanceDomainInstanceIDCol, MilestoneInstanceIDColID)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Milestones, error) {
 			milestones := make([]*Milestone, 0)

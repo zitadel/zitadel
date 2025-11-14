@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	exec "github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/target"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -73,6 +74,35 @@ func TestExecutionProjection_reduces(t *testing.T) {
 								2,
 								"include",
 								"",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceTargetRemoved",
+			args: args{
+				event: getEvent(
+					testEvent(
+						target.RemovedEventType,
+						target.AggregateType,
+						[]byte(`{}`),
+					),
+					eventstore.GenericEventMapper[target.RemovedEvent],
+				),
+			},
+			reduce: (&executionProjection{}).reduceTargetRemoved,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("target"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.executions1_targets WHERE (instance_id = $1) AND (target_id = $2)",
+							expectedArgs: []interface{}{
+								"instance-id",
+								"agg-id",
 							},
 						},
 					},

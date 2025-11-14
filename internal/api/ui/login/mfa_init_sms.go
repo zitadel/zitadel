@@ -53,12 +53,8 @@ func (l *Login) handleRegisterOTPSMS(w http.ResponseWriter, r *http.Request, aut
 }
 
 func (l *Login) renderRegisterSMS(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *smsInitData, err error) {
-	var errID, errMessage string
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
-	}
 	translator := l.getTranslator(r.Context(), authReq)
-	data.baseData = l.getBaseData(r, authReq, translator, "InitMFAOTP.Title", "InitMFAOTP.Description", errID, errMessage)
+	data.baseData = l.getBaseData(r, authReq, translator, "InitMFAOTP.Title", "InitMFAOTP.Description", err)
 	data.profileData = l.getProfileData(authReq)
 	data.MFAType = domain.MFATypeOTPSMS
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplMFASMSInit], data, nil)

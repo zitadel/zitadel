@@ -1,0 +1,127 @@
+<cnsl-refresh-table
+  [hideRefresh]="true"
+  [loading]="loading$ | async"
+  (refreshed)="refreshPage()"
+  [timestamp]="actionsResult?.details?.viewTimestamp"
+  [selection]="selection"
+>
+  <div actions *ngIf="selection.isEmpty()">
+    <a color="primary" mat-raised-button (click)="openAddAction()">
+      <div class="cnsl-action-button">
+        <mat-icon class="icon">add</mat-icon>
+        <span>{{ 'ACTIONS.NEW' | translate }}</span>
+      </div>
+    </a>
+  </div>
+  <div actions *ngIf="!selection.isEmpty()">
+    <button class="margin-right action-state-btn bg-state inactive" mat-raised-button (click)="deactivateSelection()">
+      <div class="cnsl-action-button">
+        <span>{{ 'ACTIONS.DEACTIVATE' | translate }}</span>
+        <cnsl-action-keys (actionTriggered)="deactivateSelection()" [type]="ActionKeysType.DEACTIVATE"> </cnsl-action-keys>
+      </div>
+    </button>
+    <button class="action-state-btn bg-state active" mat-raised-button (click)="activateSelection()">
+      <div class="cnsl-action-button">
+        <span>{{ 'ACTIONS.REACTIVATE' | translate }}</span>
+        <cnsl-action-keys (actionTriggered)="activateSelection()" [type]="ActionKeysType.REACTIVATE"> </cnsl-action-keys>
+      </div>
+    </button>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="table" mat-table [dataSource]="dataSource">
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef>
+          <div class="selection">
+            <mat-checkbox
+              color="primary"
+              (change)="$event ? masterToggle() : null"
+              [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()"
+            >
+            </mat-checkbox>
+          </div>
+        </th>
+        <td mat-cell *matCellDef="let key" class="selection">
+          <mat-checkbox
+            color="primary"
+            (click)="$event.stopPropagation()"
+            (change)="$event ? selection.toggle(key) : null"
+            [checked]="selection.isSelected(key)"
+          >
+          </mat-checkbox>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>{{ 'FLOWS.ID' | translate }}</th>
+        <td mat-cell *matCellDef="let action" class="pointer">{{ action?.id }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>{{ 'FLOWS.NAME' | translate }}</th>
+        <td mat-cell *matCellDef="let action" class="pointer">{{ action?.name }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="state">
+        <th mat-header-cell *matHeaderCellDef>{{ 'FLOWS.STATE' | translate }}</th>
+        <td mat-cell *matCellDef="let action" class="pointer">
+          <span
+            class="state"
+            [ngClass]="{
+              active: action.state === ActionState.ACTION_STATE_ACTIVE,
+              inactive: action.state === ActionState.ACTION_STATE_INACTIVE,
+            }"
+          >
+            {{ 'FLOWS.STATES.' + action.state | translate }}</span
+          >
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="timeout">
+        <th mat-header-cell *matHeaderCellDef>{{ 'FLOWS.TIMEOUT' | translate }}</th>
+        <td mat-cell *matCellDef="let key" class="pointer">
+          {{ key.timeout | durationToSeconds }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="allowedToFail">
+        <th mat-header-cell *matHeaderCellDef>{{ 'FLOWS.ALLOWEDTOFAIL' | translate }}</th>
+        <td mat-cell *matCellDef="let action" class="pointer">
+          {{ action.allowedToFail }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let action" class="pointer">
+          <cnsl-table-actions>
+            <button
+              [disabled]="(['action.write'] | hasRole | async) === false"
+              actions
+              matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
+              color="warn"
+              (click)="$event.stopPropagation(); deleteAction(action)"
+              mat-icon-button
+            >
+              <i class="las la-trash"></i>
+            </button>
+          </cnsl-table-actions>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr class="highlight" mat-row *matRowDef="let action; columns: displayedColumns" (click)="openDialog(action)"></tr>
+    </table>
+  </div>
+
+  <cnsl-paginator
+    #paginator
+    class="paginator"
+    [timestamp]="actionsResult?.details?.viewTimestamp"
+    [length]="actionsResult?.details?.totalResult || 0"
+    [pageSize]="20"
+    [pageSizeOptions]="[10, 20, 50, 100]"
+    (page)="changePage($event)"
+  ></cnsl-paginator>
+</cnsl-refresh-table>

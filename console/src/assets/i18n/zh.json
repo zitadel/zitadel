@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "流程",
         "DESCRIPTION": "选择一个认证流程，并在该流程中的特定事件上触发您的操作。"
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2，一个全新改进版的Actions，现在已上线。目前版本仍可使用，但未来开发将专注于新版本，最终将取代当前版本。"
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -91,28 +92,28 @@
         "DESCRIPTION": "解锁您的实例的功能。"
       },
       "IDPS": {
-        "TITLE": "身份提供商",
-        "DESCRIPTION": "创建并激活外部身份提供商。选择一个知名提供商或根据您的选择配置任何其他兼容OIDC、OAuth或SAML的提供商。您甚至可以通过配置JWT身份提供商，使用您现有的JWT令牌作为联合身份。",
+        "TITLE": "身份提供者",
+        "DESCRIPTION": "创建并激活外部身份提供者。选择一个知名提供者或根据您的选择配置任何其他兼容OIDC、OAuth或SAML的提供者。您甚至可以通过配置JWT身份提供者，使用您现有的JWT令牌作为联合身份。",
         "NEXT": "下一步？",
         "SAML": {
-          "TITLE": "配置你的SAML身份提供商",
-          "DESCRIPTION": "ZITADEL已配置。现在需要配置你的SAML身份提供商。大多数提供商允许你直接上传整个ZITADEL元数据XML。其他提供商可能仅要求你提供一些特定的URL，例如实体ID（元数据URL）、断言消费服务（ACS）URL或单点登出URL。"
+          "TITLE": "配置你的SAML身份提供者",
+          "DESCRIPTION": "ZITADEL已配置。现在需要配置你的SAML身份提供者。大多数提供者允许你直接上传整个ZITADEL元数据XML。其他提供者可能仅要求你提供一些特定的URL，例如实体ID（元数据URL）、断言消费服务（ACS）URL或单点登出URL。"
         },
         "CALLBACK": {
-          "TITLE": "配置你的{{ provider }}身份提供商",
-          "DESCRIPTION": "在你能配置ZITADEL之前，将这个URL传递给你的身份提供商，以便在认证后启用浏览器重定向回到ZITADEL。"
+          "TITLE": "配置你的{{ provider }}身份提供者",
+          "DESCRIPTION": "在你能配置ZITADEL之前，将这个URL传递给你的身份提供者，以便在认证后启用浏览器重定向回到ZITADEL。"
         },
         "JWT": {
           "TITLE": "将JWT用作联合身份",
-          "DESCRIPTION": "JWT身份提供商使你能够将现有的JWT令牌用作联合身份。如果你已经有一个JWT发行者，这个功能非常有用。使用JWT IdP，你可以利用这些JWT即时创建和更新ZITADEL中的用户。"
+          "DESCRIPTION": "JWT身份提供者使你能够将现有的JWT令牌用作联合身份。如果你已经有一个JWT发行者，这个功能非常有用。使用JWT IdP，你可以利用这些JWT即时创建和更新ZITADEL中的用户。"
         },
         "LDAP": {
-          "TITLE": "配置ZITADEL以连接到你的LDAP身份提供商",
+          "TITLE": "配置ZITADEL以连接到你的LDAP身份提供者",
           "DESCRIPTION": "提供你的LDAP服务器的连接细节，并配置你的LDAP属性到ZITADEL属性的映射。"
         },
         "AUTOFILL": {
           "TITLE": "自动填充用户数据",
-          "DESCRIPTION": "使用一个操作来改善用户体验。你可以使用身份提供商的值预填充ZITADEL的注册表单。"
+          "DESCRIPTION": "使用一个操作来改善用户体验。你可以使用身份提供者的值预填充ZITADEL的注册表单。"
         },
         "ACTIVATE": {
           "TITLE": "激活IdP",
@@ -185,6 +186,32 @@
           "DESCRIPTION": "空闲刷新令牌的生命周期是刷新令牌可以未使用的最长时间。"
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "管理您的 OIDC Web 密钥，以安全地签署和验证您的 ZITADEL 实例的令牌。",
+        "TABLE": {
+          "TITLE": "活动和未来的 Web 密钥",
+          "DESCRIPTION": "您的当前活动和即将启用的 Web 密钥。激活新密钥将会停用当前密钥。",
+          "NOTE": "注意：JWKs OIDC 端点返回可缓存的响应（默认 5 分钟）。请避免过早激活密钥，否则它可能尚未在缓存或客户端中可用。",
+          "ACTIVATE": "激活下一个 Web 密钥",
+          "ACTIVE": "当前活动",
+          "NEXT": "队列中的下一个",
+          "FUTURE": "未来",
+          "WARNING": "Web密钥不到5分钟。"
+        },
+        "CREATE": {
+          "TITLE": "创建新的 Web 密钥",
+          "DESCRIPTION": "创建新的 Web 密钥会将其添加到您的列表。ZITADEL 默认使用 RSA2048 密钥和 SHA256 哈希算法。",
+          "KEY_TYPE": "密钥类型",
+          "BITS": "位数",
+          "HASHER": "哈希算法",
+          "CURVE": "曲线"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "先前的 Web 密钥",
+          "DESCRIPTION": "这些是您之前使用但不再活动的 Web 密钥。",
+          "DEACTIVATED_ON": "停用时间"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "消息文本",
         "DESCRIPTION": "自定义您的通知电子邮件或短信消息的文本。如果您想禁用某些语言，请在您的实例语言设置中限制它们。",
@@ -197,7 +224,8 @@
           "VE": "当用户更改其电子邮件地址时，他们将收到一封带有验证新地址链接的电子邮件。",
           "VP": "当用户更改其电话号码时，他们将收到一条带有验证新号码的代码的短信。",
           "VEO": "当用户通过电子邮件方式添加一次性密码时，他们需要通过输入发送到其电子邮件地址的代码来激活它。",
-          "VSO": "当用户通过短信方式添加一次性密码时，他们需要通过输入发送到其电话号码的代码来激活它。"
+          "VSO": "当用户通过短信方式添加一次性密码时，他们需要通过输入发送到其电话号码的代码来激活它。",
+          "IU": "当创建用户邀请代码时，他们将收到一封包含设置其身份验证方法的链接的电子邮件。"
         }
       },
       "LOGIN_TEXTS": {
@@ -231,7 +259,7 @@
           "LABEL": "最大有效期（小时）",
           "PW_CHECK": {
             "TITLE": "密码检查",
-            "DESCRIPTION": "您的用户必须在这些时期内更改他们的密码。"
+            "DESCRIPTION": "此期间后，用户将需要使用密码重新验证。"
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "外部登录检查",
@@ -501,6 +529,118 @@
     "DOWNLOAD": "下载",
     "APPLY": "申请"
   },
+  "ACTIONSTWO": {
+    "BETA_NOTE": "您目前正在使用新的 Actions V2（测试版）。之前的版本1仍可使用，但未来将停止支持。请报告任何问题或反馈意见。",
+    "EXECUTION": {
+      "TITLE": "操作",
+      "DESCRIPTION": "操作允许您运行自定义代码以响应 API 请求、事件或特定函数。使用它们来扩展 Zitadel、自动化工作流程并与其他系统集成。",
+      "TYPES": {
+        "request": "请求",
+        "response": "响应",
+        "event": "事件",
+        "function": "函数"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "创建操作",
+        "UPDATE_TITLE": "更新操作",
+        "TYPE": {
+          "DESCRIPTION": "选择您希望此操作运行的时间",
+          "REQUEST": {
+            "TITLE": "请求",
+            "DESCRIPTION": "Zitadel 中发生的请求。这可能是登录请求调用之类的操作。"
+          },
+          "RESPONSE": {
+            "TITLE": "响应",
+            "DESCRIPTION": "来自 Zitadel 中请求的响应。考虑一下从获取用户返回的响应。"
+          },
+          "EVENTS": {
+            "TITLE": "事件",
+            "DESCRIPTION": "Zitadel 中发生的事件。这可能是用户创建帐户、成功登录等任何操作。"
+          },
+          "FUNCTIONS": {
+            "TITLE": "函数",
+            "DESCRIPTION": "您可以在 Zitadel 中调用的函数。这可能是从发送电子邮件到创建用户的任何操作。"
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "选择此操作是适用于所有请求、特定服务（例如用户管理）还是单个请求（例如创建用户）。",
+          "ALL": {
+            "TITLE": "全部",
+            "DESCRIPTION": "如果您希望在每个请求上运行您的操作，请选择此项"
+          },
+          "ALL_EVENTS": "如果您想在每个事件上运行操作，请选择此项",
+          "SELECT_SERVICE": {
+            "TITLE": "选择服务",
+            "DESCRIPTION": "为您的操作选择一个 Zitadel 服务。"
+          },
+          "SELECT_METHOD": {
+            "TITLE": "选择方法",
+            "DESCRIPTION": "如果您只想在特定请求上执行，请在此处选择它",
+            "NOTE": "如果您不选择方法，您的操作将在您选择的服务中的每个请求上运行。"
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "函数名称",
+            "DESCRIPTION": "选择您要执行的函数"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "设置组",
+            "DESCRIPTION": "如果您只想在事件组上执行，请在此处设置组"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "选择事件",
+            "DESCRIPTION": "如果您只想在特定事件上执行，请在此处指定它"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "您可以选择执行目标，或在与其他目标相同的条件下运行它。",
+          "TARGET": {
+            "DESCRIPTION": "您要为此操作执行的目标"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "执行条件"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "条件",
+        "TYPE": "类型",
+        "TARGET": "目标",
+        "CREATIONDATE": "创建日期"
+      }
+    },
+    "TARGET": {
+      "TITLE": "目标",
+      "DESCRIPTION": "目标是您要从操作中执行的代码的目标。在此处创建一个目标并将其添加到您的操作中。",
+      "CREATE": {
+        "TITLE": "创建您的目标",
+        "DESCRIPTION": "在 Zitadel 外部创建您自己的目标",
+        "NAME": "名称",
+        "NAME_DESCRIPTION": "为您的目标提供清晰、描述性的名称，以便稍后轻松识别",
+        "TYPE": "类型",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST 调用",
+          "restAsync": "REST 异步"
+        },
+        "TYPES_DESCRIPTION": "Webhook，调用处理状态码但响应无关紧要\nCall，调用处理状态码和响应\nAsync，调用既不处理状态码也不处理响应，但可以与其他目标并行调用",
+        "ENDPOINT": "端点",
+        "ENDPOINT_DESCRIPTION": "输入您的代码托管的端点。确保我们可以访问它！",
+        "TIMEOUT": "超时",
+        "TIMEOUT_DESCRIPTION": "设置您的目标必须响应的最大时间。如果花费的时间更长，我们将停止请求。",
+        "INTERRUPT_ON_ERROR": "错误时中断",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "当目标返回错误时，停止所有执行",
+        "INTERRUPT_ON_ERROR_WARNING": "注意：“出错时中断”会在失败时停止操作，存在被锁定的风险。请在禁用该选项的情况下进行测试，以避免阻止登录/创建。",
+        "AWAIT_RESPONSE": "等待响应",
+        "AWAIT_RESPONSE_DESCRIPTION": "我们将在执行任何其他操作之前等待响应。如果您打算为单个操作使用多个目标，这将非常有用"
+      },
+      "TABLE": {
+        "NAME": "名称",
+        "ENDPOINT": "端点",
+        "CREATIONDATE": "创建日期",
+        "REORDER": "重新排序"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "控制整个实例，包括所有组织",
     "IAM_OWNER_VIEWER": "有权审查整个实例，包括所有组织",
@@ -508,14 +648,17 @@
     "IAM_USER_MANAGER": "有权创建和管理用户",
     "IAM_ADMIN_IMPERSONATOR": "有权模拟所有组织的管理员和最终用户",
     "IAM_END_USER_IMPERSONATOR": "有权模拟所有组织的最终用户",
+    "IAM_LOGIN_CLIENT": "具有管理登录客户端的权限",
     "ORG_OWNER": "拥有整个组织的权限",
     "ORG_USER_MANAGER": "有权创建和管理组织的用户",
     "ORG_OWNER_VIEWER": "有权审查整个组织",
+    "ORG_SETTINGS_MANAGER": "有权管理组织的设置",
     "ORG_USER_PERMISSION_EDITOR": "有权管理用户授权",
     "ORG_PROJECT_PERMISSION_EDITOR": "有权管理项目授权",
     "ORG_PROJECT_CREATOR": "有权创建自己的项目和基础设置",
     "ORG_ADMIN_IMPERSONATOR": "有权模拟组织的管理员和最终用户",
     "ORG_END_USER_IMPERSONATOR": "有权模拟组织的最终用户",
+    "ORG_USER_SELF_MANAGER": "有权管理自己的用户",
     "PROJECT_OWNER": "拥有整个项目的权限",
     "PROJECT_OWNER_VIEWER": "有权审查整个项目",
     "PROJECT_OWNER_GLOBAL": "拥有整个项目的权限",
@@ -550,6 +693,7 @@
     "EMAIL": "邮箱",
     "USERNAME": "用户名",
     "ORGNAME": "组织名称",
+    "ORGID": "组织ID",
     "PRIMARYDOMAIN": "主域",
     "PROJECTNAME": "项目名称",
     "RESOURCEOWNER": "资源所有者",
@@ -786,7 +930,10 @@
       "PHONESECTION": "手机号码",
       "PASSWORDSECTION": "初始密码",
       "ADDRESSANDPHONESECTION": "手机号码",
-      "INITMAILDESCRIPTION": "如果选择了这两个选项，则不会发送初始化电子邮件。如果只选择了其中一个选项，将发送一封提供/验证数据的邮件。"
+      "INITMAILDESCRIPTION": "如果选择了这两个选项，则不会发送初始化电子邮件。如果只选择了其中一个选项，将发送一封提供/验证数据的邮件。",
+      "SETUPAUTHENTICATIONLATER": "稍后为此用户设置身份验证。",
+      "INVITATION": "发送邀请邮件以进行身份验证设置和电子邮件验证。",
+      "INITIALPASSWORD": "为用户设置初始密码。"
     },
     "CODEDIALOG": {
       "TITLE": "验证手机号码",
@@ -808,6 +955,9 @@
       "EMAIL": "电子邮件",
       "PHONE": "手机号码",
       "PHONE_HINT": "使用+号，后跟呼叫者的国家/地区代码，或从下拉列表中选择国家/地区，最后输入电话号码",
+      "PHONE_VERIFIED": "电话号码已验证",
+      "SEND_SMS": "发送验证短信",
+      "SEND_EMAIL": "发送电子邮件",
       "USERNAME": "用户名",
       "CHANGEUSERNAME": "修改",
       "CHANGEUSERNAME_TITLE": "修改用户名称",
@@ -948,6 +1098,14 @@
       "5": "已暂停",
       "6": "初始化"
     },
+    "STATEV2": {
+      "0": "未知",
+      "1": "启用",
+      "2": "停用",
+      "3": "已删除",
+      "4": "已锁定",
+      "5": "初始化"
+    },
     "SEARCH": {
       "ADDITIONAL": "登录名 (当前组织)",
       "ADDITIONAL-EXTERNAL": "登录名 (外部组织)"
@@ -994,7 +1152,7 @@
       "SECRETREMOVED": "秘密被成功删除!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "CITADEL 管理角色",
+      "TITLE": "ZITADEL 管理角色",
       "DESCRIPTION": "这些都是用户成员授权。您还可以在组织、项目或 IAM 详细信息页面上修改它们。",
       "ORGCONTEXT": "您会看到与当前所选组织相关的所有组织和项目。",
       "USERCONTEXT": "您会看到您被授权的所有组织和项目。包括其他组织。",
@@ -1086,7 +1244,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "删除选定的操作？",
         "DESCRIPTION": "您确定要从流中删除选定的操作吗？"
-      }
+      },
+      "ABOUTNAME": "javascript 中的操作名称和函数名称必须相同"
     },
     "TOAST": {
       "ACTIONSSET": "动作设置",
@@ -1338,11 +1497,14 @@
       "BRANDING": "品牌标识",
       "PRIVACYPOLICY": "隐私政策",
       "OIDC": "OIDC 令牌有效期和过期时间",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "验证码外观",
       "SECURITY": "安全设置",
       "EVENTS": "活动",
       "FAILEDEVENTS": "失败事件",
-      "VIEWS": "数据表"
+      "VIEWS": "数据表",
+      "ACTIONS": "Actions",
+      "TARGETS": "Targets"
     },
     "GROUPS": {
       "GENERAL": "通用",
@@ -1352,8 +1514,10 @@
       "TEXTS": "文本和语言",
       "APPEARANCE": "外观",
       "OTHER": "其他",
-      "STORAGE": "贮存"
-    }
+      "STORAGE": "贮存",
+      "ACTIONS": "Actions"
+    },
+    "BETA": "测试版"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -1380,7 +1544,12 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română",
+        "tr": "Türkçe"
       }
     },
     "SMTP": {
@@ -1417,6 +1586,8 @@
         "SID": "Sid",
         "TOKEN": "令牌",
         "SENDERNUMBER": "发件人号码",
+        "VERIFYSERVICESID": "验证服务 SID",
+        "VERIFYSERVICESID_DESCRIPTION": "设置验证服务 SID，允许使用 Twilio 验证服务而不是消息服务来验证电话号码和 OTP SMS。",
         "ADDED": "Twilio 添加成功。",
         "UPDATED": "Twilio 更新成功。",
         "REMOVED": "Twilio 已删除",
@@ -1437,9 +1608,7 @@
         "7": "一次性密码 (OTP) - SMS",
         "8": "一次性密码 (OTP) - 电子邮件"
       },
-      "ADDGENERATOR": "定义验证码外观",
-      "GENERATORTYPE": "类型",
-      "EXPIRY": "过期时间 (in hours)",
+      "EXPIRY": "过期时间 (以分钟为单位)",
       "INCLUDEDIGITS": "包含数字",
       "INCLUDESYMBOLS": "包含特殊符号",
       "INCLUDELOWERLETTERS": "包含小写字母",
@@ -1459,16 +1628,20 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "登录默认组织",
       "LOGINDEFAULTORG_DESCRIPTION": "如果没有设置组织上下文，登录界面将使用默认组织的设置（而不是实例的设置）",
-      "OIDCLEGACYINTROSPECTION": "OIDC 传统内省",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "我们最近出于性能原因重构了内省端点。如果出现意外错误，可以使用此功能回滚到传统实现。",
       "OIDCTOKENEXCHANGE": "OIDC 令牌交换",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "启用 OIDC 令牌端点的实验性 urn:ietf:params:oauth:grant-type:token-exchange 授权类型。令牌交换可用于请求具有较少范围的令牌或模拟其他用户。请参阅安全策略以允许在实例上模拟。",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC 触发内省投影",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "在内省请求期间启用投影触发器。如果内省响应中存在明显的一致性问题，这可以作为一个解决方法，但可能会影响性能。我们计划在未来删除内省请求的触发器。",
       "USERSCHEMA": "用户架构",
       "USERSCHEMA_DESCRIPTION": "用户架构允许管理用户的数据架构。如果启用此标志，您将可以使用新的 API 及其功能。",
       "ACTIONS": "操作",
       "ACTIONS_DESCRIPTION": "Actions v2 可以管理数据执行和目标。如果启用此标志，您将可以使用新的 API 及其功能。",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 终止会话",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "如果启用了标志，您可以通过在 end_session 端点上提供带有 `sid` 声明的 id_token 作为 id_token_hint 来从登录 UI 终止单个会话。 请注意，目前所有来自同一用户代理（浏览器）的会话都在登录 UI 中终止。 通过会话 API 管理的会话已经允许终止单个会话。",
+      "DEBUGOIDCPARENTERROR": "调试 OIDC 父错误",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "如果启用该标志，OIDC 父错误将记录在控制台中。",
+      "ENABLEBACKCHANNELLOGOUT": "启用 Backchannel 注销",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel 注销实现了 OpenID Connect Back-Channel Logout 1.0，可用于通知客户端在 OpenID 提供商处终止会话。",
+      "PERMISSIONCHECKV2": "权限检查 V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "如果启用该标志，您将能够使用新的 API 及其功能。",
       "STATES": {
         "INHERITED": "继承",
         "ENABLED": "已启用",
@@ -1479,7 +1652,14 @@
         "ENABLED": "“已启用” 是继承的",
         "DISABLED": "“已禁用” 是继承的"
       },
-      "RESET": "全部设置为继承"
+      "RESET": "全部设置为继承",
+      "CONSOLEUSEV2USERAPI": "在控制台中使用V2 API创建用户。",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "启用此标志时，控制台使用V2用户API创建新用户。使用V2 API，新创建的用户将以无初始状态开始。",
+      "LOGINV2": "登录 V2",
+      "LOGINV2_DESCRIPTION": "启用此选项将激活基于 TypeScript 的新登录界面，具有更高的安全性、性能和可定制性。",
+      "LOGINV2_BASEURI": "基础 URI",
+      "ENABLERELATIONALTABLES": "关系表",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "启用此功能以使用关系表而不是投影来存储数据。目前此切换没有任何作用。"
     },
     "DIALOG": {
       "RESET": {
@@ -1525,6 +1705,7 @@
       "MAXSIZE": "图片最大支持 524kB",
       "EMAILNOSVG": "电子邮件不支持 SVG 文件格式。因此建议以 PNG 或其他支持的格式上传您的 Logo。",
       "MAXSIZEEXCEEDED": "文件大小超过了 524kB。",
+      "NOSVGSUPPORTED": "不支持 SVG 格式！",
       "FONTINLOGINONLY": "该字体仅在当前登录界面中显示。",
       "BACKGROUNDCOLOR": "背景颜色",
       "PRIMARYCOLOR": "原色",
@@ -1568,7 +1749,7 @@
       "DESCRIPTIONCREATEMGMT": "用户可以从以下可用的身份提供者中进行选择。注意：您可为系统设置提供者也可以仅为您的组织单独设置提供者。",
       "LIFETIME_INVALID": "表单包含无效值。",
       "SAVED": "保存成功！",
-      "PROVIDER_ADDED": "身份提供商已激活。"
+      "PROVIDER_ADDED": "身份提供者已激活。"
     },
     "PRIVACY_POLICY": {
       "DESCRIPTION": "设置您的隐私政策和服务条款链接",
@@ -1613,7 +1794,12 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română",
+        "tr": "Türkçe"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -1628,7 +1814,6 @@
         "initPasswordText": "初始化密码",
         "initializeDoneText": "初始化用户完成",
         "initializeUserText": "初始化用户",
-        "linkingUserPromptText": "用户链接提示",
         "linkingUserDoneText": "链接用户完成",
         "loginText": "登录",
         "logoutText": "登出",
@@ -1664,7 +1849,8 @@
         "PR": "重置密码",
         "DC": "域名声明",
         "PL": "无密码身份验证",
-        "PC": "修改密码"
+        "PC": "修改密码",
+        "IU": "邀请用户"
       },
       "CHIPS": {
         "firstname": "名",
@@ -1684,7 +1870,8 @@
         "tempUsername": "临时用户名",
         "otp": "一次性密码",
         "verifyUrl": "验证一次性密码的URL",
-        "expiry": "过期时间"
+        "expiry": "过期时间",
+        "applicationName": "应用程序名称"
       },
       "TOAST": {
         "UPDATED": "自定义文本已保存。"
@@ -1712,8 +1899,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "允许使用用户名和密码进行登录。",
       "ALLOWEXTERNALIDP_DESC": "允许外部身份提供者进行登录",
       "ALLOWREGISTER_DESC": "如果选择了该选项，登录中会出现一个用于注册用户的附加步骤。",
-      "FORCEMFA": "强制使用 MFA",
-      "FORCEMFALOCALONLY": "对本地用户强制执行 MFA",
+      "FORCEMFA": "强制所有用户使用 MFA",
+      "FORCEMFALOCALONLY": "仅强制本地认证用户使用 MFA",
       "FORCEMFALOCALONLY_DESC": "如果选择该选项，本地经过身份验证的用户必须配置第二个登录因素。",
       "HIDEPASSWORDRESET_DESC": "如果选择该选项，则用户无法在登录过程中重置其密码。",
       "HIDELOGINNAMESUFFIX": "隐藏登录名后缀",
@@ -1782,7 +1969,7 @@
       "TYPE": {
         "OWNED": "拥有的项目",
         "OWNED_SINGULAR": "拥有项目",
-        "GRANTED_SINGULAR": "被授予的项目"
+        "GRANTED_SINGULAR": "授予{{name}}的项目"
       },
       "PRIVATELABEL": {
         "TITLE": "品牌标识设置",
@@ -1963,6 +2150,7 @@
       "ACTIVATE": "启用项目",
       "DELETE": "删除项目",
       "ORGNAME": "组织名称",
+      "ORGID": "组织ID",
       "ORGDOMAIN": "组织域名",
       "STATE": "状态",
       "TYPE": "类型",
@@ -2003,53 +2191,61 @@
       "ACTIVETITLE": "启用的身份提供者"
     },
     "CREATE": {
-      "TITLE": "创建供应商",
-      "DESCRIPTION": "选择以下一个或多个供应商。",
-      "STEPPERTITLE": "创建供应商",
+      "TITLE": "创建身份提供者",
+      "DESCRIPTION": "选择以下一个或多个身份提供者。",
+      "STEPPERTITLE": "创建身份提供者",
       "OIDC": {
-        "TITLE": "OIDC供应商",
-        "DESCRIPTION": "输入你的OIDC供应商的必要数据。"
+        "TITLE": "OIDC 身份提供者",
+        "DESCRIPTION": "输入你的 OIDC 供应商的必要数据。"
       },
       "OAUTH": {
-        "TITLE": "OAuth供应商",
-        "DESCRIPTION": "输入你的OAuth供应商的必要数据。"
+        "TITLE": "OAuth 身份提供者",
+        "DESCRIPTION": "输入你的 OAuth 供应商的必要数据。"
       },
       "JWT": {
-        "TITLE": "JWT供应商",
-        "DESCRIPTION": "输入你的JWT供应商所需的数据。"
+        "TITLE": "JWT 身份提供者",
+        "DESCRIPTION": "输入你的 JWT 供应商所需的数据。"
       },
       "GOOGLE": {
         "TITLE": "Google 身份提供者",
-        "DESCRIPTION": "输入您的 Google 身份提供商的凭据"
+        "DESCRIPTION": "输入您的 Google 身份提供者的凭据"
       },
       "GITLAB": {
-        "TITLE": "Gitlab身份提供商",
-        "DESCRIPTION": "输入您的Gitlab身份提供者的凭据"
+        "TITLE": "Gitlab 身份提供者",
+        "DESCRIPTION": "输入您的 Gitlab 身份提供者的凭据"
       },
       "GITLABSELFHOSTED": {
-        "TITLE": "Gitlab自我托管供应商",
-        "DESCRIPTION": "输入您的Gitlab自我托管身份提供商的凭据"
+        "TITLE": "Gitlab 自我托管身份提供者",
+        "DESCRIPTION": "输入您的 Gitlab 自我托管身份提供者的凭据"
       },
       "GITHUBES": {
         "TITLE": "Github Enterprise Server 身份提供者",
-        "DESCRIPTION": "输入您的GitHubEnterpriseServer身份提供者的凭据"
+        "DESCRIPTION": "输入您的 GitHub Enterprise Server 身份提供者的凭据"
       },
       "GITHUB": {
         "TITLE": "Github 身份提供者",
-        "DESCRIPTION": "输入您的 Github 身份提供商的凭据"
+        "DESCRIPTION": "输入您的 Github 身份提供者的凭据"
       },
       "AZUREAD": {
         "TITLE": "Microsoft 身份提供者",
-        "DESCRIPTION": "输入您的 Microsoft 身份提供商的凭据"
+        "DESCRIPTION": "输入您的 Microsoft 身份提供者的凭据"
       },
       "LDAP": {
-        "TITLE": "LDAP 身份提供者",
-        "DESCRIPTION": "输入您的 LDAP 身份提供商的凭据"
+        "TITLE": "域控服务 / LDAP 身份提供者",
+        "DESCRIPTION": "输入您的 LDAP 身份提供者的凭据"
+      },
+      "APPLE": {
+        "TITLE": "Apple 身份提供者",
+        "DESCRIPTION": "输入您的 Apple 身份提供者的凭据"
+      },
+      "SAML": {
+        "TITLE": "SAML 身份提供者",
+        "DESCRIPTION": "输入您的 SAML 身份提供者的凭据"
       }
     },
     "DETAIL": {
       "TITLE": "身份提供者",
-      "DESCRIPTION": "更新你的供应商配置",
+      "DESCRIPTION": "更新你的身份提供者配置",
       "DATECREATED": "已创建",
       "DATECHANGED": "已更新"
     },
@@ -2058,10 +2254,10 @@
       "ISAUTOCREATION_DESC": "如果选择了，如果账户还不存在，就会创建一个账户。",
       "ISAUTOUPDATE": "正在自动更新",
       "ISAUTOUPDATE_DESC": "如果选择，账户将在重新认证时更新。",
-      "ISCREATIONALLOWED": "是否允许创作",
-      "ISCREATIONALLOWED_DESC": "确定是否可以创建账户。",
-      "ISLINKINGALLOWED": "是否允许连接",
-      "ISLINKINGALLOWED_DESC": "确定一个身份是否可以与一个现有的账户相联系。",
+      "ISCREATIONALLOWED": "允许创建账户（手动）",
+      "ISCREATIONALLOWED_DESC": "确定是否可以使用外部账户创建账户。如果用户在启用自动创建时不应该能够编辑账户信息，请禁用。",
+      "ISLINKINGALLOWED": "允许链接账户（手动）",
+      "ISLINKINGALLOWED_DESC": "确定是否可以手动将身份链接到现有账户。如果用户只能在激活自动链接的情况下链接建议的账户，请禁用。",
       "AUTOLINKING_DESC": "确定是否提示将身份链接到现有帐户。",
       "AUTOLINKINGTYPE": {
         "0": "已禁用",
@@ -2156,6 +2352,8 @@
     "REMOVE_WARN_DESCRIPTION": "您即将删除身份提供者。这将为您的用户删除可用 IDP 的选择，并且已经注册的用户将无法再次登录。您确定要继续吗？",
     "DELETE_SELECTION_TITLE": "删除 IDP",
     "DELETE_SELECTION_DESCRIPTION": "您即将删除身份提供者。由此产生的变化是不可撤销的。你真的想这样做吗？",
+    "FEDERATEDLOGOUTENABLED": "已启用联合注销",
+    "FEDERATEDLOGOUTENABLED_DESC": "如果启用，用户在 ZITADEL 中终止会话时，也会从 IdP 注销。",
     "EMPTY": "没有可用的 IDP",
     "OIDC": {
       "GENERAL": "通用信息",
@@ -2169,6 +2367,23 @@
       "JWTENDPOINT": "JWT 端点",
       "JWTKEYSENDPOINT": "JWT Keys 端点"
     },
+    "APPLE": {
+      "TEAMID": "Team ID",
+      "KEYID": "Key ID",
+      "PRIVATEKEY": "私钥",
+      "UPDATEPRIVATEKEY": "更新私钥",
+      "UPLOADPRIVATEKEY": "上传私钥",
+      "KEYMAXSIZEEXCEEDED": "达到了最大 5kB 的上限。"
+    },
+    "SAML": {
+      "METADATAXML": "元数据 Xml",
+      "METADATAURL": "元数据 URL",
+      "BINDING": "绑定",
+      "SIGNEDREQUEST": "登录请求",
+      "NAMEIDFORMAT": "名字 ID 格式",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "自定义映射属性名称",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "如果返回的 `nameid-format` 是 `transient` ，则映射用户的备用属性名称，参考 `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    },
     "TOAST": {
       "SAVED": "成功保存。",
       "REACTIVATED": "IDP 已重新启用.",
@@ -2181,7 +2396,9 @@
       "REMOVED": "成功删除。"
     },
     "ISIDTOKENMAPPING": "从ID令牌映射",
-    "ISIDTOKENMAPPING_DESC": "如果选中，提供商信息将从ID令牌映射，而不是从userinfo端点。"
+    "ISIDTOKENMAPPING_DESC": "如果选中，提供商信息将从ID令牌映射，而不是从userinfo端点。",
+    "USEPKCE": "使用PKCE",
+    "USEPKCE_DESC": "确定 auth 请求中是否包含 code_challenge 和 code_challenge_method 参数"
   },
   "MFA": {
     "LIST": {
@@ -2253,7 +2470,11 @@
         "DELETE_TITLE": "删除 SMTP 配置",
         "DELETE_DESCRIPTION": "您将要删除一个配置。输入发件人姓名确认此操作",
         "DELETED": "SMTP 配置已被删除",
-        "SENDER": "输入 {{ value }}，删除此 SMTP 配置。"
+        "SENDER": "输入 {{ value }}，删除此 SMTP 配置。",
+        "TEST_TITLE": "测试你的 SMTP 配置",
+        "TEST_DESCRIPTION": "指定一个电子邮件地址来测试此提供商的 SMTP 配置",
+        "TEST_EMAIL": "邮件地址",
+        "TEST_RESULT": "测试结果"
       }
     },
     "CREATE": {
@@ -2531,6 +2752,10 @@
       "CLIENTSECRETREGENERATED": "客户端秘钥已生成。",
       "DELETED": "应用已删除。",
       "CONFIGCHANGED": "检测到变化！"
+    },
+    "LOGINV2": {
+      "USEV2": "使用新的登录UI",
+      "BASEURL": "新的登录UI的自定义基本URL"
     }
   },
   "GENDERS": {
@@ -2554,7 +2779,12 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia",
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română",
+    "tr": "Türkçe"
   },
   "MEMBER": {
     "ADD": "添加管理者",

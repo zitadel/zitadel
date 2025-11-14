@@ -3,7 +3,12 @@ package repository
 import (
 	"database/sql"
 	"encoding/json"
+	"strconv"
+	"strings"
 	"time"
+
+	"github.com/shopspring/decimal"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -18,7 +23,7 @@ type Event struct {
 	// Seq is the sequence of the event
 	Seq uint64
 	// Pos is the global sequence of the event multiple events can have the same sequence
-	Pos float64
+	Pos decimal.Decimal
 
 	//CreationDate is the time the event is created
 	// it's used for human readability.
@@ -82,7 +87,9 @@ func (e *Event) Type() eventstore.EventType {
 
 // Revision implements [eventstore.Event]
 func (e *Event) Revision() uint16 {
-	return 0
+	revision, err := strconv.ParseUint(strings.TrimPrefix(string(e.Version), "v"), 10, 16)
+	logging.OnError(err).Debug("failed to parse event revision")
+	return uint16(revision)
 }
 
 // Sequence implements [eventstore.Event]
@@ -91,7 +98,7 @@ func (e *Event) Sequence() uint64 {
 }
 
 // Position implements [eventstore.Event]
-func (e *Event) Position() float64 {
+func (e *Event) Position() decimal.Decimal {
 	return e.Pos
 }
 

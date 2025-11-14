@@ -27,7 +27,7 @@ func (l *Login) renderUserSelection(w http.ResponseWriter, r *http.Request, auth
 		descriptionI18nKey = "SelectAccount.DescriptionLinking"
 	}
 	data := userSelectionData{
-		baseData: l.getBaseData(r, authReq, translator, titleI18nKey, descriptionI18nKey, "", ""),
+		baseData: l.getBaseData(r, authReq, translator, titleI18nKey, descriptionI18nKey, nil),
 		Users:    selectionData.Users,
 		Linking:  linking,
 	}
@@ -46,7 +46,7 @@ func (l *Login) handleSelectUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.SelectUser(r.Context(), authSession.ID, data.UserID, userAgentID)
+	err = l.authRepo.SelectUser(r.Context(), authSession.ID, data.UserID, userAgentID, true)
 	if err != nil {
 		l.renderError(w, r, authSession, err)
 		return

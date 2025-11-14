@@ -17,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/repository/mock"
+	"github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -208,14 +209,6 @@ func (m *mockInstance) DefaultOrganisationID() string {
 	return "defaultOrgID"
 }
 
-func (m *mockInstance) RequestedDomain() string {
-	return "zitadel.cloud"
-}
-
-func (m *mockInstance) RequestedHost() string {
-	return "zitadel.cloud:443"
-}
-
 func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
 	return nil
 }
@@ -228,6 +221,10 @@ func (m *mockInstance) Features() feature.Features {
 	return feature.Features{}
 }
 
+func (m *mockInstance) ExecutionRouter() target.Router {
+	return target.NewRouter(nil)
+}
+
 func newMockPermissionCheckAllowed() domain.PermissionCheck {
 	return func(ctx context.Context, permission, orgID, resourceID string) (err error) {
 		return nil
@@ -237,6 +234,24 @@ func newMockPermissionCheckAllowed() domain.PermissionCheck {
 func newMockPermissionCheckNotAllowed() domain.PermissionCheck {
 	return func(ctx context.Context, permission, orgID, resourceID string) (err error) {
 		return zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied")
+	}
+}
+
+func newMockProjectPermissionCheckAllowed() domain.ProjectPermissionCheck {
+	return func(ctx context.Context, clientID, userID string) (err error) {
+		return nil
+	}
+}
+
+func newMockProjectPermissionCheckOIDCNotAllowed() domain.ProjectPermissionCheck {
+	return func(ctx context.Context, clientID, userID string) (err error) {
+		return zerrors.ThrowPermissionDenied(nil, "OIDC-foSyH49RvL", "Errors.PermissionDenied")
+	}
+}
+
+func newMockProjectPermissionCheckSAMLNotAllowed() domain.ProjectPermissionCheck {
+	return func(ctx context.Context, clientID, userID string) (err error) {
+		return zerrors.ThrowPermissionDenied(nil, "SAML-foSyH49RvL", "Errors.PermissionDenied")
 	}
 }
 

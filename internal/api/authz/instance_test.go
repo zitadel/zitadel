@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/feature"
 )
 
@@ -118,14 +119,6 @@ func (m *mockInstance) DefaultOrganisationID() string {
 	return "orgID"
 }
 
-func (m *mockInstance) RequestedDomain() string {
-	return "zitadel.cloud"
-}
-
-func (m *mockInstance) RequestedHost() string {
-	return "zitadel.cloud:443"
-}
-
 func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
 	return nil
 }
@@ -136,4 +129,8 @@ func (m *mockInstance) EnableImpersonation() bool {
 
 func (m *mockInstance) Features() feature.Features {
 	return feature.Features{}
+}
+
+func (m *mockInstance) ExecutionRouter() target.Router {
+	return target.NewRouter(nil)
 }

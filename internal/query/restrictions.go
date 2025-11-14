@@ -10,7 +10,6 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -72,14 +71,14 @@ func (q *Queries) GetInstanceRestrictions(ctx context.Context) (restrictions Res
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareRestrictionsQuery(ctx, q.client)
+	stmt, scan := prepareRestrictionsQuery()
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	query, args, err := stmt.Where(sq.Eq{
 		RestrictionsColumnInstanceID.identifier():    instanceID,
 		RestrictionsColumnResourceOwner.identifier(): instanceID,
 	}).ToSql()
 	if err != nil {
-		return restrictions, zitade_errors.ThrowInternal(err, "QUERY-XnLMQ", "Errors.Query.SQLStatment")
+		return restrictions, zitade_errors.ThrowInternal(err, "QUERY-XnLMQ", "Errors.Query.SQLStatement")
 	}
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
 		restrictions, err = scan(row)
@@ -92,7 +91,7 @@ func (q *Queries) GetInstanceRestrictions(ctx context.Context) (restrictions Res
 	return restrictions, err
 }
 
-func prepareRestrictionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (Restrictions, error)) {
+func prepareRestrictionsQuery() (sq.SelectBuilder, func(*sql.Row) (Restrictions, error)) {
 	return sq.Select(
 			RestrictionsColumnAggregateID.identifier(),
 			RestrictionsColumnCreationDate.identifier(),
@@ -102,7 +101,7 @@ func prepareRestrictionsQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			RestrictionsColumnDisallowPublicOrgRegistration.identifier(),
 			RestrictionsColumnAllowedLanguages.identifier(),
 		).
-			From(restrictionsTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(restrictionsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (restrictions Restrictions, err error) {
 			allowedLanguages := database.TextArray[string](make([]string, 0))

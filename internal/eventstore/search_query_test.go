@@ -45,16 +45,6 @@ func testSetLimit(limit uint64) func(builder *SearchQueryBuilder) *SearchQueryBu
 	}
 }
 
-func testOr(queryFuncs ...func(*SearchQuery) *SearchQuery) func(*SearchQuery) *SearchQuery {
-	return func(query *SearchQuery) *SearchQuery {
-		subQuery := query.Or()
-		for _, queryFunc := range queryFuncs {
-			queryFunc(subQuery)
-		}
-		return subQuery
-	}
-}
-
 func testSetAggregateTypes(types ...AggregateType) func(*SearchQuery) *SearchQuery {
 	return func(query *SearchQuery) *SearchQuery {
 		query = query.AggregateTypes(types...)
@@ -116,10 +106,10 @@ func TestSearchQuerybuilderSetters(t *testing.T) {
 		{
 			name: "set columns",
 			args: args{
-				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testSetColumns(ColumnsMaxSequence)},
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testSetColumns(ColumnsMaxPosition)},
 			},
 			res: &SearchQueryBuilder{
-				columns: ColumnsMaxSequence,
+				columns: ColumnsMaxPosition,
 			},
 		},
 		{

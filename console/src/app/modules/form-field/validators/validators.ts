@@ -24,6 +24,17 @@ export function requiredValidator(c: AbstractControl): ValidationErrors | null {
   return i18nErr(Validators.required(c), 'ERRORS.REQUIRED');
 }
 
+export function atLeastOneFieldValidator(fields: string[]): ValidatorFn {
+  return (formGroup: AbstractControl): ValidationErrors | null => {
+    const isValid = fields.some((field) => {
+      const control = formGroup.get(field);
+      return control && control.value;
+    });
+
+    return isValid ? null : { atLeastOneRequired: true }; // Return an error if none are set
+  };
+}
+
 export function minArrayLengthValidator(minArrLength: number): ValidatorFn {
   return (c: AbstractControl): ValidationErrors | null => {
     return arrayLengthValidator(c, minArrLength, 'ERRORS.ATLEASTONE');

@@ -19,9 +19,14 @@ type EncryptionAlgorithm interface {
 	DecryptionKeyIDs() []string
 	Encrypt(value []byte) ([]byte, error)
 	Decrypt(hashed []byte, keyID string) ([]byte, error)
+
+	// DecryptString decrypts the value using the key identified by keyID.
+	// When the decrypted value contains non-UTF8 characters an error is returned.
 	DecryptString(hashed []byte, keyID string) (string, error)
 }
 
+// CryptoValue is a struct that can be used to store encrypted values in a database.
+// The struct is compatible with the [driver.Valuer] and database/sql.Scanner interfaces.
 type CryptoValue struct {
 	CryptoType CryptoType
 	Algorithm  string
@@ -65,6 +70,14 @@ func Encrypt(value []byte, alg EncryptionAlgorithm) (*CryptoValue, error) {
 	}, nil
 }
 
+func EncryptJSON(obj any, alg EncryptionAlgorithm) (*CryptoValue, error) {
+	data, err := json.Marshal(obj)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "CRYPT-Ei6doF", "error encrypting value")
+	}
+	return Encrypt(data, alg)
+}
+
 func Decrypt(value *CryptoValue, alg EncryptionAlgorithm) ([]byte, error) {
 	if err := checkEncryptionAlgorithm(value, alg); err != nil {
 		return nil, err
@@ -72,6 +85,19 @@ func Decrypt(value *CryptoValue, alg EncryptionAlgorithm) ([]byte, error) {
 	return alg.Decrypt(value.Crypted, value.KeyID)
 }
 
+func DecryptJSON(value *CryptoValue, dst any, alg EncryptionAlgorithm) error {
+	data, err := Decrypt(value, alg)
+	if err != nil {
+		return err
+	}
+	if err = json.Unmarshal(data, dst); err != nil {
+		return zerrors.ThrowInternal(err, "CRYPT-Jaik2R", "error decrypting value")
+	}
+	return nil
+}
+
+// DecryptString decrypts the value using the key identified by keyID.
+// When the decrypted value contains non-UTF8 characters an error is returned.
 func DecryptString(value *CryptoValue, alg EncryptionAlgorithm) (string, error) {
 	if err := checkEncryptionAlgorithm(value, alg); err != nil {
 		return "", err

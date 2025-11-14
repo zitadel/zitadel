@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -24,12 +25,12 @@ func (s *Server) DeviceToken(ctx context.Context, r *op.ClientRequest[oidc.Devic
 	if !ok {
 		return nil, zerrors.ThrowInternal(nil, "OIDC-Ae2ph", "Error.Internal")
 	}
-	session, err := s.command.CreateOIDCSessionFromDeviceAuth(ctx, r.Data.DeviceCode)
+	session, err := s.command.CreateOIDCSessionFromDeviceAuth(ctx, r.Data.DeviceCode, client.client.BackChannelLogoutURI)
 	if err == nil {
 		return response(s.accessTokenResponseFromSession(ctx, client, session, "", client.client.ProjectID, client.client.ProjectRoleAssertion, client.client.AccessTokenRoleAssertion, client.client.IDTokenRoleAssertion, client.client.IDTokenUserinfoAssertion))
 	}
 	if errors.Is(err, context.DeadlineExceeded) {
-		return nil, oidc.ErrSlowDown().WithParent(err)
+		return nil, oidc.ErrSlowDown().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
 	}
 
 	var target command.DeviceAuthStateError
@@ -41,6 +42,9 @@ func (s *Server) DeviceToken(ctx context.Context, r *op.ClientRequest[oidc.Devic
 		if state == domain.DeviceAuthStateExpired {
 			return nil, oidc.ErrExpiredDeviceCode()
 		}
+		if state == domain.DeviceAuthStateDenied {
+			return nil, oidc.ErrAccessDenied()
+		}
 	}
-	return nil, oidc.ErrAccessDenied().WithParent(err)
+	return nil, oidc.ErrInvalidGrant().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
 }

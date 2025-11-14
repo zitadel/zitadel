@@ -31,7 +31,6 @@ type Server struct {
 	defaults        systemdefaults.SystemDefaults
 	assetsAPIDomain func(context.Context) string
 	userCodeAlg     crypto.EncryptionAlgorithm
-	externalSecure  bool
 }
 
 type Config struct {
@@ -43,16 +42,14 @@ func CreateServer(command *command.Commands,
 	authRepo repository.Repository,
 	defaults systemdefaults.SystemDefaults,
 	userCodeAlg crypto.EncryptionAlgorithm,
-	externalSecure bool,
 ) *Server {
 	return &Server{
 		command:         command,
 		query:           query,
 		repo:            authRepo,
 		defaults:        defaults,
-		assetsAPIDomain: assets.AssetAPI(externalSecure),
+		assetsAPIDomain: assets.AssetAPI(),
 		userCodeAlg:     userCodeAlg,
-		externalSecure:  externalSecure,
 	}
 }
 

@@ -5,28 +5,42 @@ import (
 	"net"
 	"net/http"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 const (
-	Authorization   = "authorization"
-	Accept          = "accept"
-	AcceptLanguage  = "accept-language"
-	CacheControl    = "cache-control"
-	ContentType     = "content-type"
-	ContentLength   = "content-length"
-	Expires         = "expires"
-	Location        = "location"
-	Origin          = "origin"
-	Pragma          = "pragma"
-	UserAgentHeader = "user-agent"
-	ForwardedFor    = "x-forwarded-for"
-	XUserAgent      = "x-user-agent"
-	XGrpcWeb        = "x-grpc-web"
-	XRequestedWith  = "x-requested-with"
-	XRobotsTag      = "x-robots-tag"
-	IfNoneMatch     = "If-None-Match"
-	LastModified    = "Last-Modified"
-	Etag            = "Etag"
+	Authorization          = "authorization"
+	Accept                 = "accept"
+	AcceptLanguage         = "accept-language"
+	CacheControl           = "cache-control"
+	ContentType            = "content-type"
+	ContentLength          = "content-length"
+	ContentLocation        = "content-location"
+	Expires                = "expires"
+	Location               = "location"
+	Origin                 = "origin"
+	Pragma                 = "pragma"
+	UserAgentHeader        = "user-agent"
+	ForwardedFor           = "x-forwarded-for"
+	ForwardedHost          = "x-forwarded-host"
+	ForwardedProto         = "x-forwarded-proto"
+	Forwarded              = "forwarded"
+	Host                   = "host"
+	ZitadelForwarded       = "x-zitadel-forwarded"
+	XUserAgent             = "x-user-agent"
+	XGrpcWeb               = "x-grpc-web"
+	XRequestedWith         = "x-requested-with"
+	XRobotsTag             = "x-robots-tag"
+	IfNoneMatch            = "if-none-match"
+	LastModified           = "last-modified"
+	Etag                   = "etag"
+	GRPCTimeout            = "grpc-timeout"
+	ConnectProtocolVersion = "connect-protocol-version"
+	ConnectTimeoutMS       = "connect-timeout-ms"
+	GrpcStatus             = "grpc-status"
+	GrpcMessage            = "grpc-message"
+	GrpcStatusDetailsBin   = "grpc-status-details-bin"
 
 	ContentSecurityPolicy   = "content-security-policy"
 	XXSSProtection          = "x-xss-protection"
@@ -38,6 +52,9 @@ const (
 	PermissionsPolicy       = "permissions-policy"
 
 	ZitadelOrgID = "x-zitadel-orgid"
+
+	OrgIdInPathVariableName = "orgId"
+	OrgIdInPathVariable     = "{" + OrgIdInPathVariableName + "}"
 )
 
 type key int
@@ -45,7 +62,7 @@ type key int
 const (
 	httpHeaders key = iota
 	remoteAddr
-	origin
+	domainCtx
 )
 
 func CopyHeadersToContext(h http.Handler) http.Handler {
@@ -68,18 +85,6 @@ func OriginHeader(ctx context.Context) string {
 		return ""
 	}
 	return headers.Get(Origin)
-}
-
-func ComposedOrigin(ctx context.Context) string {
-	o, ok := ctx.Value(origin).(string)
-	if !ok {
-		return ""
-	}
-	return o
-}
-
-func WithComposedOrigin(ctx context.Context, composed string) context.Context {
-	return context.WithValue(ctx, origin, composed)
 }
 
 func RemoteIPFromCtx(ctx context.Context) string {
@@ -112,18 +117,18 @@ func GetAuthorization(r *http.Request) string {
 }
 
 func GetOrgID(r *http.Request) string {
+	// path variable takes precedence over header
+	orgID, ok := mux.Vars(r)[OrgIdInPathVariableName]
+	if ok {
+		return orgID
+	}
+
 	return r.Header.Get(ZitadelOrgID)
 }
 
 func GetForwardedFor(headers http.Header) (string, bool) {
-	forwarded, ok := headers[ForwardedFor]
-	if ok {
-		ip := strings.TrimSpace(strings.Split(forwarded[0], ",")[0])
-		if ip != "" {
-			return ip, true
-		}
-	}
-	return "", false
+	forwarded := strings.Split(headers.Get(ForwardedFor), ",")[0]
+	return forwarded, forwarded != ""
 }
 
 func RemoteAddrFromCtx(ctx context.Context) string {

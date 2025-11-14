@@ -19,8 +19,30 @@ type HumanPasswordWriteModel struct {
 	CodeCreationDate         time.Time
 	CodeExpiry               time.Duration
 	PasswordCheckFailedCount uint64
+	GeneratorID              string
+	VerificationID           string
 
 	UserState domain.UserState
+}
+
+func (wm *HumanPasswordWriteModel) GetUserState() domain.UserState {
+	return wm.UserState
+}
+
+func (wm *HumanPasswordWriteModel) GetPasswordCheckFailedCount() uint64 {
+	return wm.PasswordCheckFailedCount
+}
+
+func (wm *HumanPasswordWriteModel) GetEncodedHash() string {
+	return wm.EncodedHash
+}
+
+func (wm *HumanPasswordWriteModel) GetResourceOwner() string {
+	return wm.ResourceOwner
+}
+
+func (wm *HumanPasswordWriteModel) GetWriteModel() *eventstore.WriteModel {
+	return &wm.WriteModel
 }
 
 func NewHumanPasswordWriteModel(userID, resourceOwner string) *HumanPasswordWriteModel {
@@ -56,6 +78,10 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 			wm.Code = e.Code
 			wm.CodeCreationDate = e.CreationDate()
 			wm.CodeExpiry = e.Expiry
+			wm.GeneratorID = e.GeneratorID
+		case *user.HumanPasswordCodeSentEvent:
+			wm.GeneratorID = e.GeneratorInfo.GetID()
+			wm.VerificationID = e.GeneratorInfo.GetVerificationID()
 		case *user.HumanEmailVerifiedEvent:
 			if wm.UserState == domain.UserStateInitial {
 				wm.UserState = domain.UserStateActive
@@ -91,6 +117,7 @@ func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanInitializedCheckSucceededType,
 			user.HumanPasswordChangedType,
 			user.HumanPasswordCodeAddedType,
+			user.HumanPasswordCodeSentType,
 			user.HumanEmailVerifiedType,
 			user.HumanPasswordCheckFailedType,
 			user.HumanPasswordCheckSucceededType,
@@ -104,6 +131,7 @@ func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserV1InitializedCheckSucceededType,
 			user.UserV1PasswordChangedType,
 			user.UserV1PasswordCodeAddedType,
+			user.UserV1PasswordCodeSentType,
 			user.UserV1EmailVerifiedType,
 			user.UserV1PasswordCheckFailedType,
 			user.UserV1PasswordCheckSucceededType,

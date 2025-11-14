@@ -1,7 +1,6 @@
 package smtp
 
 type Config struct {
-	Description    string
 	SMTP           SMTP
 	Tls            bool
 	From           string
@@ -17,4 +16,8 @@ type SMTP struct {
 
 func (smtp *SMTP) HasAuth() bool {
 	return smtp.User != "" && smtp.Password != ""
+}
+
+type ConfigHTTP struct {
+	Endpoint string
 }

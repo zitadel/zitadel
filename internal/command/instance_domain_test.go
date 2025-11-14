@@ -155,6 +155,9 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 								time.Second*1,
 								[]string{"https://sub.test.ch"},
 								false,
+								"",
+								domain.LoginVersionUnspecified,
+								"",
 							),
 						),
 					),
@@ -198,7 +201,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 				return
 			}
-			assert.Equal(t, tt.res.want, got)
+			assertObjectDetails(t, tt.res.want, got)
 		})
 	}
 }
@@ -299,7 +302,7 @@ func TestCommandSide_SetPrimaryInstanceDomain(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -425,7 +428,7 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}

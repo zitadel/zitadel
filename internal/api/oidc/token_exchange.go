@@ -55,7 +55,7 @@ func (s *Server) tokenExchange(ctx context.Context, r *op.ClientRequest[oidc.Tok
 
 	subjectToken, err := s.verifyExchangeToken(ctx, client, r.Data.SubjectToken, r.Data.SubjectTokenType, oidc.AllTokenTypes...)
 	if err != nil {
-		return nil, oidc.ErrInvalidRequest().WithParent(err).WithDescription("subject_token invalid")
+		return nil, oidc.ErrInvalidRequest().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError).WithDescription("subject_token invalid")
 	}
 
 	actorToken := subjectToken // see [createExchangeTokens] comment.
@@ -65,7 +65,7 @@ func (s *Server) tokenExchange(ctx context.Context, r *op.ClientRequest[oidc.Tok
 		}
 		actorToken, err = s.verifyExchangeToken(ctx, client, r.Data.ActorToken, r.Data.ActorTokenType, oidc.AccessTokenType, oidc.IDTokenType, oidc.RefreshTokenType)
 		if err != nil {
-			return nil, oidc.ErrInvalidRequest().WithParent(err).WithDescription("actor_token invalid")
+			return nil, oidc.ErrInvalidRequest().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError).WithDescription("actor_token invalid")
 		}
 		ctx = authz.SetCtxData(ctx, authz.CtxData{
 			UserID: actorToken.userID,
@@ -218,7 +218,7 @@ func validateTokenExchangeAudience(requestedAudience, subjectAudience, actorAudi
 // Both tokens may point to the same object (subjectToken) in case of a regular Token Exchange.
 // When the subject and actor Tokens point to different objects, the new tokens will be for impersonation / delegation.
 func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenType, client *Client, subjectToken, actorToken *exchangeToken, audience, scopes []string) (_ *oidc.TokenExchangeResponse, err error) {
-	getUserInfo := s.getUserInfo(subjectToken.userID, client.client.ProjectID, client.client.ProjectRoleAssertion, client.IDTokenUserinfoClaimsAssertion(), scopes)
+	getUserInfo := s.getUserInfo(subjectToken.userID, client.client.ProjectID, client.GetID(), client.client.ProjectRoleAssertion, client.IDTokenUserinfoClaimsAssertion(), scopes)
 	getSigner := s.getSignerOnce()
 
 	resp := &oidc.TokenExchangeResponse{
@@ -288,6 +288,7 @@ func (s *Server) createExchangeAccessToken(
 		userID,
 		resourceOwner,
 		client.client.ClientID,
+		client.client.BackChannelLogoutURI,
 		scope,
 		audience,
 		authMethods,
@@ -298,6 +299,8 @@ func (s *Server) createExchangeAccessToken(
 		reason,
 		actor,
 		slices.Contains(scope, oidc.ScopeOfflineAccess),
+		"",
+		domain.OIDCResponseTypeUnspecified,
 	)
 	if err != nil {
 		return "", "", "", 0, err
@@ -314,7 +317,7 @@ func (s *Server) createExchangeJWT(
 	client *Client,
 	getUserInfo userInfoFunc,
 	roleAssertion bool,
-	getSigner signerFunc,
+	getSigner SignerFunc,
 	userID,
 	resourceOwner string,
 	audience,
@@ -332,6 +335,7 @@ func (s *Server) createExchangeJWT(
 		userID,
 		resourceOwner,
 		client.client.ClientID,
+		client.client.BackChannelLogoutURI,
 		scope,
 		audience,
 		authMethods,
@@ -342,7 +346,12 @@ func (s *Server) createExchangeJWT(
 		reason,
 		actor,
 		slices.Contains(scope, oidc.ScopeOfflineAccess),
+		"",
+		domain.OIDCResponseTypeUnspecified,
 	)
+	if err != nil {
+		return "", "", 0, err
+	}
 	accessToken, err = s.createJWT(ctx, client, session, getUserInfo, roleAssertion, getSigner)
 	if err != nil {
 		return "", "", 0, err

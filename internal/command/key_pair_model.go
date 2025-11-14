@@ -1,6 +1,7 @@
 package command
 
 import (
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
@@ -9,7 +10,7 @@ import (
 type KeyPairWriteModel struct {
 	eventstore.WriteModel
 
-	Usage       domain.KeyUsage
+	Usage       crypto.KeyUsage
 	Algorithm   string
 	PrivateKey  *domain.Key
 	PublicKey   *domain.Key

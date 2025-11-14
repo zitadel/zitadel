@@ -1,0 +1,116 @@
+{
+  "schemas": ["urn:ietf:params:scim:schemas:core:2.0:User"],
+  "externalId": "701984",
+  "userName": "{{ .Username }}@example.com",
+  "name": {
+    "formatted": "Ms. Barbara J Jensen, III",
+    "familyName": "Jensen",
+    "givenName": "Barbara",
+    "middleName": "Jane",
+    "honorificPrefix": "Ms.",
+    "honorificSuffix": "III"
+  },
+  "displayName": "Babs Jensen",
+  "nickName": "Babs",
+  "profileUrl": "http://login.example.com/bjensen",
+  "emails": [
+    {
+      "value": "{{ .Username }}@example.com",
+      "type": "work",
+      "primary": true
+    },
+    {
+      "value": "{{ .Username }}+1@example.com",
+      "type": "home"
+    }
+  ],
+  "addresses": [
+    {
+      "type": "work",
+      "streetAddress": "100 Universal City Plaza",
+      "locality": "Hollywood",
+      "region": "CA",
+      "postalCode": "91608",
+      "country": "USA",
+      "formatted": "100 Universal City Plaza\nHollywood, CA 91608 USA",
+      "primary": true
+    },
+    {
+      "type": "home",
+      "streetAddress": "456 Hollywood Blvd",
+      "locality": "Hollywood",
+      "region": "CA",
+      "postalCode": "91608",
+      "country": "USA",
+      "formatted": "456 Hollywood Blvd\nHollywood, CA 91608 USA"
+    }
+  ],
+  "phoneNumbers": [
+    {
+      "value": "555-555-5555",
+      "type": "work",
+      "primary": true
+    },
+    {
+      "value": "555-555-4444",
+      "type": "mobile"
+    }
+  ],
+  "ims": [
+    {
+      "value": "someaimhandle",
+      "type": "aim"
+    },
+    {
+      "value": "twitterhandle",
+      "type": "X"
+    }
+  ],
+  "photos": [
+    {
+      "value":
+      "https://photos.example.com/profilephoto/72930000000Ccne/F",
+      "type": "photo"
+    },
+    {
+      "value":
+      "https://photos.example.com/profilephoto/72930000000Ccne/T",
+      "type": "thumbnail"
+    }
+  ],
+  "roles": [
+    {
+      "value": "my-role-1",
+      "display": "Rolle 1",
+      "type": "main-role",
+      "primary": true
+    },
+    {
+      "value": "my-role-2",
+      "display": "Rolle 2",
+      "type": "secondary-role",
+      "primary": false
+    }
+  ],
+  "entitlements": [
+    {
+      "value": "my-entitlement-1",
+      "display": "Entitlement 1",
+      "type": "main-entitlement",
+      "primary": true
+    },
+    {
+      "value": "my-entitlement-2",
+      "display": "Entitlement 2",
+      "type": "secondary-entitlement",
+      "primary": false
+    }
+  ],
+  "userType": "Employee",
+  "title": "Tour Guide",
+  "preferredLanguage": "en-US",
+  "locale": "en-US",
+  "timezone": "America/Los_Angeles",
+  "active":true,
+  "password": "Password1!"
+}

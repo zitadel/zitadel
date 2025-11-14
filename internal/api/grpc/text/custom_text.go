@@ -64,7 +64,6 @@ func CustomLoginTextToPb(text *domain.CustomLoginText) *text_pb.LoginCustomText 
 		RegistrationUserText:                 RegistrationUserScreenTextToPb(text.RegistrationUser),
 		ExternalRegistrationUserOverviewText: ExternalRegistrationUserOverviewScreenTextToPb(text.ExternalRegistrationUserOverview),
 		RegistrationOrgText:                  RegistrationOrgScreenTextToPb(text.RegistrationOrg),
-		LinkingUserPromptText:                LinkingUserPromptScreenTextToPb(text.LinkingUserPrompt),
 		LinkingUserDoneText:                  LinkingUserDoneScreenTextToPb(text.LinkingUsersDone),
 		ExternalUserNotFoundText:             ExternalUserNotFoundScreenTextToPb(text.ExternalNotFound),
 		SuccessLoginText:                     SuccessLoginScreenTextToPb(text.LoginSuccess),
@@ -424,15 +423,6 @@ func LinkingUserDoneScreenTextToPb(text domain.LinkingUserDoneScreenText) *text_
 	}
 }
 
-func LinkingUserPromptScreenTextToPb(text domain.LinkingUserPromptScreenText) *text_pb.LinkingUserPromptScreenText {
-	return &text_pb.LinkingUserPromptScreenText{
-		Title:           text.Title,
-		Description:     text.Description,
-		LinkButtonText:  text.LinkButtonText,
-		OtherButtonText: text.OtherButtonText,
-	}
-}
-
 func ExternalUserNotFoundScreenTextToPb(text domain.ExternalUserNotFoundScreenText) *text_pb.ExternalUserNotFoundScreenText {
 	return &text_pb.ExternalUserNotFoundScreenText{
 		Title:                  text.Title,
@@ -441,7 +431,7 @@ func ExternalUserNotFoundScreenTextToPb(text domain.ExternalUserNotFoundScreenTe
 		AutoRegisterButtonText: text.AutoRegisterButtonText,
 		TosAndPrivacyLabel:     text.TOSAndPrivacyLabel,
 		TosConfirm:             text.TOSConfirm,
-		TosLinkText:            text.PrivacyLinkText,
+		TosLinkText:            text.TOSLinkText,
 		PrivacyConfirm:         text.PrivacyConfirm,
 		PrivacyLinkText:        text.PrivacyLinkText,
 	}
@@ -902,15 +892,6 @@ func RegistrationOrgScreenTextPbToDomain(text *text_pb.RegistrationOrgScreenText
 	}
 }
 
-func LinkingUserPromptScreenTextPbToDomain(text *text_pb.LinkingUserPromptScreenText) domain.LinkingUserPromptScreenText {
-	return domain.LinkingUserPromptScreenText{
-		Title:           text.GetTitle(),
-		Description:     text.GetDescription(),
-		LinkButtonText:  text.GetLinkButtonText(),
-		OtherButtonText: text.GetOtherButtonText(),
-	}
-}
-
 func LinkingUserDoneScreenTextPbToDomain(text *text_pb.LinkingUserDoneScreenText) domain.LinkingUserDoneScreenText {
 	if text == nil {
 		return domain.LinkingUserDoneScreenText{}
@@ -934,7 +915,7 @@ func ExternalUserNotFoundScreenTextPbToDomain(text *text_pb.ExternalUserNotFound
 		AutoRegisterButtonText: text.AutoRegisterButtonText,
 		TOSAndPrivacyLabel:     text.TosAndPrivacyLabel,
 		TOSConfirm:             text.TosConfirm,
-		TOSLinkText:            text.PrivacyLinkText,
+		TOSLinkText:            text.TosLinkText,
 		PrivacyConfirm:         text.PrivacyConfirm,
 		PrivacyLinkText:        text.PrivacyLinkText,
 	}

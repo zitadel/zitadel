@@ -31,12 +31,6 @@ var oidcUserInfoTriggerHandlers = sync.OnceValue(func() []*handler.Handler {
 	}
 })
 
-// TriggerOIDCUserInfoProjections triggers all projections
-// relevant to userinfo queries concurrently.
-func TriggerOIDCUserInfoProjections(ctx context.Context) {
-	triggerBatch(ctx, oidcUserInfoTriggerHandlers()...)
-}
-
 var (
 	//go:embed userinfo_by_id.sql
 	oidcUserInfoQueryTmpl           string
@@ -88,16 +82,22 @@ func (q *Queries) GetOIDCUserInfo(ctx context.Context, userID string, roleAudien
 }
 
 type OIDCUserInfo struct {
-	User       *User          `json:"user,omitempty"`
-	Metadata   []UserMetadata `json:"metadata,omitempty"`
-	Org        *UserInfoOrg   `json:"org,omitempty"`
-	UserGrants []UserGrant    `json:"user_grants,omitempty"`
+	User       *User               `json:"user,omitempty"`
+	Metadata   []UserMetadata      `json:"metadata,omitempty"`
+	Org        *UserInfoOrg        `json:"org,omitempty"`
+	UserGrants []UserGrant         `json:"user_grants,omitempty"`
+	UserGroups []UserInfoUserGroup `json:"user_groups,omitempty"`
 }
 
 type UserInfoOrg struct {
 	ID            string `json:"id,omitempty"`
 	Name          string `json:"name,omitempty"`
 	PrimaryDomain string `json:"primary_domain,omitempty"`
+}
+
+type UserInfoUserGroup struct {
+	ID   string `json:"id,omitempty"`
+	Name string `json:"name,omitempty"`
 }
 
 //go:embed userinfo_client_by_id.sql

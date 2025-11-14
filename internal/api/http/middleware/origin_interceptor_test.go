@@ -5,113 +5,151 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
 func Test_composeOrigin(t *testing.T) {
 	type args struct {
-		h               http.Header
-		fallBackToHttps bool
+		h            http.Header
+		enforceHttps bool
 	}
 	tests := []struct {
 		name string
 		args args
-		want string
+		want *http_util.DomainCtx
 	}{{
 		name: "no proxy headers",
-		want: "http://host.header",
+		want: &http_util.DomainCtx{
+			InstanceHost: "host.header",
+			Protocol:     "http",
+		},
 	}, {
 		name: "forwarded proto",
 		args: args{
 			h: http.Header{
 				"Forwarded": []string{"proto=https"},
 			},
-			fallBackToHttps: false,
+			enforceHttps: false,
 		},
-		want: "https://host.header",
+		want: &http_util.DomainCtx{
+			InstanceHost: "host.header",
+			Protocol:     "https",
+		},
 	}, {
 		name: "forwarded host",
 		args: args{
 			h: http.Header{
 				"Forwarded": []string{"host=forwarded.host"},
 			},
-			fallBackToHttps: false,
+			enforceHttps: false,
 		},
-		want: "http://forwarded.host",
+		want: &http_util.DomainCtx{
+			InstanceHost: "forwarded.host",
+			Protocol:     "http",
+		},
 	}, {
 		name: "forwarded proto and host",
 		args: args{
 			h: http.Header{
 				"Forwarded": []string{"proto=https;host=forwarded.host"},
 			},
-			fallBackToHttps: false,
+			enforceHttps: false,
 		},
-		want: "https://forwarded.host",
+		want: &http_util.DomainCtx{
+			InstanceHost: "forwarded.host",
+			Protocol:     "https",
+		},
 	}, {
 		name: "forwarded proto and host with multiple complete entries",
 		args: args{
 			h: http.Header{
 				"Forwarded": []string{"proto=https;host=forwarded.host, proto=http;host=forwarded.host2"},
 			},
-			fallBackToHttps: false,
+			enforceHttps: false,
 		},
-		want: "https://forwarded.host",
+		want: &http_util.DomainCtx{
+			InstanceHost: "forwarded.host",
+			Protocol:     "https",
+		},
 	}, {
 		name: "forwarded proto and host with multiple incomplete entries",
 		args: args{
 			h: http.Header{
 				"Forwarded": []string{"proto=https;host=forwarded.host, proto=http"},
 			},
-			fallBackToHttps: false,
+			enforceHttps: false,
 		},
-		want: "https://forwarded.host",
+		want: &http_util.DomainCtx{
+			InstanceHost: "forwarded.host",
+			Protocol:     "https",
+		},
 	}, {
 		name: "forwarded proto and host with incomplete entries in different values",
 		args: args{
 			h: http.Header{
 				"Forwarded": []string{"proto=http", "proto=https;host=forwarded.host", "proto=http"},
 			},
-			fallBackToHttps: true,
+			enforceHttps: true,
 		},
-		want: "http://forwarded.host",
+		want: &http_util.DomainCtx{
+			InstanceHost: "forwarded.host",
+			Protocol:     "https",
+		},
 	}, {
 		name: "x-forwarded-proto https",
 		args: args{
 			h: http.Header{
 				"X-Forwarded-Proto": []string{"https"},
 			},
-			fallBackToHttps: false,
+			enforceHttps: false,
 		},
-		want: "https://host.header",
+		want: &http_util.DomainCtx{
+			InstanceHost: "host.header",
+			Protocol:     "https",
+		},
 	}, {
 		name: "x-forwarded-proto http",
 		args: args{
 			h: http.Header{
 				"X-Forwarded-Proto": []string{"http"},
 			},
-			fallBackToHttps: true,
+			enforceHttps: true,
 		},
-		want: "http://host.header",
+		want: &http_util.DomainCtx{
+			InstanceHost: "host.header",
+			Protocol:     "https",
+		},
 	}, {
 		name: "fallback to http",
 		args: args{
-			fallBackToHttps: false,
+			enforceHttps: false,
 		},
-		want: "http://host.header",
+		want: &http_util.DomainCtx{
+			InstanceHost: "host.header",
+			Protocol:     "http",
+		},
 	}, {
-		name: "fallback to https",
+		name: "enforce https",
 		args: args{
-			fallBackToHttps: true,
+			enforceHttps: true,
 		},
-		want: "https://host.header",
+		want: &http_util.DomainCtx{
+			InstanceHost: "host.header",
+			Protocol:     "https",
+		},
 	}, {
 		name: "x-forwarded-host",
 		args: args{
 			h: http.Header{
 				"X-Forwarded-Host": []string{"x-forwarded.host"},
 			},
-			fallBackToHttps: false,
+			enforceHttps: false,
 		},
-		want: "http://x-forwarded.host",
+		want: &http_util.DomainCtx{
+			InstanceHost: "x-forwarded.host",
+			Protocol:     "http",
+		},
 	}, {
 		name: "x-forwarded-proto and x-forwarded-host",
 		args: args{
@@ -119,9 +157,12 @@ func Test_composeOrigin(t *testing.T) {
 				"X-Forwarded-Proto": []string{"https"},
 				"X-Forwarded-Host":  []string{"x-forwarded.host"},
 			},
-			fallBackToHttps: false,
+			enforceHttps: false,
 		},
-		want: "https://x-forwarded.host",
+		want: &http_util.DomainCtx{
+			InstanceHost: "x-forwarded.host",
+			Protocol:     "https",
+		},
 	}, {
 		name: "forwarded host and x-forwarded-host",
 		args: args{
@@ -129,9 +170,12 @@ func Test_composeOrigin(t *testing.T) {
 				"Forwarded":        []string{"host=forwarded.host"},
 				"X-Forwarded-Host": []string{"x-forwarded.host"},
 			},
-			fallBackToHttps: false,
+			enforceHttps: false,
 		},
-		want: "http://forwarded.host",
+		want: &http_util.DomainCtx{
+			InstanceHost: "forwarded.host",
+			Protocol:     "http",
+		},
 	}, {
 		name: "forwarded host and x-forwarded-proto",
 		args: args{
@@ -139,20 +183,97 @@ func Test_composeOrigin(t *testing.T) {
 				"Forwarded":         []string{"host=forwarded.host"},
 				"X-Forwarded-Proto": []string{"https"},
 			},
-			fallBackToHttps: false,
+			enforceHttps: false,
 		},
-		want: "https://forwarded.host",
+		want: &http_util.DomainCtx{
+			InstanceHost: "forwarded.host",
+			Protocol:     "https",
+		},
 	},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equalf(t, tt.want, composeOrigin(
+			assert.Equalf(t, tt.want, composeDomainContext(
 				&http.Request{
 					Host:   "host.header",
 					Header: tt.args.h,
 				},
-				tt.args.fallBackToHttps,
-			), "headers: %+v, fallBackToHttps: %t", tt.args.h, tt.args.fallBackToHttps)
+				tt.args.enforceHttps,
+				[]string{http_util.Forwarded, http_util.ForwardedFor, http_util.ForwardedHost, http_util.ForwardedProto},
+				[]string{"x-zitadel-public-host"},
+			), "headers: %+v, enforceHttps: %t", tt.args.h, tt.args.enforceHttps)
+		})
+	}
+}
+
+func Test_sanitizeHost(t *testing.T) {
+	type args struct {
+		rawHost string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "normal host",
+			args: args{rawHost: "example.com"},
+			want: "example.com",
+		},
+		{
+			name: "host with port",
+			args: args{rawHost: "example.com:8080"},
+			want: "example.com:8080",
+		},
+		{
+			name: "ipv4",
+			args: args{rawHost: "192.168.1.1"},
+			want: "192.168.1.1",
+		},
+		{
+			name: "ipv4 with port",
+			args: args{rawHost: "192.168.1.1:8080"},
+			want: "192.168.1.1:8080",
+		},
+		{
+			name: "ipv6",
+			args: args{rawHost: "[2001:0db8:85a3:0000:0000:8a2e:0370:7334]"},
+			want: "[2001:0db8:85a3:0000:0000:8a2e:0370:7334]",
+		},
+		{
+			name: "ipv6 with port",
+			args: args{rawHost: "[2001:0db8:85a3:0000:0000:8a2e:0370:7334]:8080"},
+			want: "[2001:0db8:85a3:0000:0000:8a2e:0370:7334]:8080",
+		},
+		{
+			name: "host with trailing colon",
+			args: args{rawHost: "example.com:"},
+			want: "",
+		},
+		{
+			name: "host with invalid port",
+			args: args{rawHost: "example.com:port"},
+			want: "",
+		},
+		{
+			name: "invalid host",
+			args: args{rawHost: "localhost:@attacker.com"},
+			want: "",
+		},
+		{
+			name: "invalid host",
+			args: args{rawHost: "localhost:@attacker.com:8080"},
+			want: "",
+		},
+		{
+			name: "empty host",
+			args: args{rawHost: ""},
+			want: "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, sanitizeHost(tt.args.rawHost), "sanitizeHost(%v)", tt.args.rawHost)
 		})
 	}
 }

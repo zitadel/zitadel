@@ -8,7 +8,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	z_db "github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -114,9 +113,7 @@ func (d *Database) CreateKeys(ctx context.Context, keys ...*crypto.Key) error {
 	if err != nil {
 		return zerrors.ThrowInternal(err, "", "unable to insert new keys")
 	}
-	ctx, spanBeginTx := tracing.NewNamedSpan(ctx, "db.BeginTx")
 	tx, err := d.client.BeginTx(ctx, nil)
-	spanBeginTx.EndWithError(err)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "", "unable to insert new keys")
 	}

@@ -10,34 +10,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
 )
-
-func (c *Commands) GenerateSigningKeyPair(ctx context.Context, algorithm string) error {
-	privateCrypto, publicCrypto, err := crypto.GenerateEncryptedKeyPair(c.keySize, c.keyAlgorithm)
-	if err != nil {
-		return err
-	}
-	keyID, err := c.idGenerator.Next()
-	if err != nil {
-		return err
-	}
-
-	privateKeyExp := time.Now().UTC().Add(c.privateKeyLifetime)
-	publicKeyExp := time.Now().UTC().Add(c.publicKeyLifetime)
-
-	keyPairWriteModel := NewKeyPairWriteModel(keyID, authz.GetInstance(ctx).InstanceID())
-	keyAgg := KeyPairAggregateFromWriteModel(&keyPairWriteModel.WriteModel)
-	_, err = c.eventstore.Push(ctx, keypair.NewAddedEvent(
-		ctx,
-		keyAgg,
-		domain.KeyUsageSigning,
-		algorithm,
-		privateCrypto, publicCrypto,
-		privateKeyExp, publicKeyExp))
-	return err
-}
 
 func (c *Commands) GenerateSAMLCACertificate(ctx context.Context, algorithm string) error {
 	now := time.Now().UTC()
@@ -69,7 +43,7 @@ func (c *Commands) GenerateSAMLCACertificate(ctx context.Context, algorithm stri
 		keypair.NewAddedEvent(
 			ctx,
 			keyAgg,
-			domain.KeyUsageSAMLCA,
+			crypto.KeyUsageSAMLCA,
 			algorithm,
 			privateCrypto, publicCrypto,
 			after, after,
@@ -115,7 +89,7 @@ func (c *Commands) GenerateSAMLResponseCertificate(ctx context.Context, algorith
 		keypair.NewAddedEvent(
 			ctx,
 			keyAgg,
-			domain.KeyUsageSAMLResponseSinging,
+			crypto.KeyUsageSAMLResponseSinging,
 			algorithm,
 			privateCrypto, publicCrypto,
 			after, after,
@@ -160,7 +134,7 @@ func (c *Commands) GenerateSAMLMetadataCertificate(ctx context.Context, algorith
 		keypair.NewAddedEvent(
 			ctx,
 			keyAgg,
-			domain.KeyUsageSAMLMetadataSigning,
+			crypto.KeyUsageSAMLMetadataSigning,
 			algorithm,
 			privateCrypto, publicCrypto,
 			after, after),

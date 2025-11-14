@@ -37,13 +37,9 @@ func (l *Login) handleLoginSuccess(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) renderSuccessAndCallback(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
-	var errID, errMessage string
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
-	}
 	translator := l.getTranslator(r.Context(), authReq)
 	data := loginSuccessData{
-		userData: l.getUserData(r, authReq, translator, "LoginSuccess.Title", "", errID, errMessage),
+		userData: l.getUserData(r, authReq, translator, "LoginSuccess.Title", "", err),
 	}
 	if authReq != nil {
 		data.RedirectURI, err = l.authRequestCallback(r.Context(), authReq)

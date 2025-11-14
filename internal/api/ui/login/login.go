@@ -3,6 +3,7 @@ package login
 import (
 	"context"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -15,9 +16,12 @@ import (
 	_ "github.com/zitadel/zitadel/internal/api/ui/login/statik"
 	auth_repository "github.com/zitadel/zitadel/internal/auth/repository"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
+	"github.com/zitadel/zitadel/internal/cache"
+	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/domain/federatedlogout"
 	"github.com/zitadel/zitadel/internal/form"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/static"
@@ -38,6 +42,7 @@ type Login struct {
 	samlAuthCallbackURL func(context.Context, string) string
 	idpConfigAlg        crypto.EncryptionAlgorithm
 	userCodeAlg         crypto.EncryptionAlgorithm
+	caches              *Caches
 }
 
 type Config struct {
@@ -47,7 +52,43 @@ type Config struct {
 	AssetCache         middleware.CacheConfig
 
 	// LoginV2
-	DefaultOTPEmailURLV2 string
+	DefaultPaths *DefaultPaths
+}
+
+type DefaultPaths struct {
+	BasePath        string
+	PasswordSetPath string
+	EmailCodePath   string
+	OTPEmailPath    string
+}
+
+func (c *Config) defaultBaseURL(ctx context.Context) string {
+	loginV2 := authz.GetInstance(ctx).Features().LoginV2
+	if loginV2.Required {
+		// use the origin as default
+		baseURI := http_utils.DomainContext(ctx).Origin()
+		// use custom base URI if defined
+		if loginV2.BaseURI != nil && loginV2.BaseURI.String() != "" {
+			baseURI = loginV2.BaseURI.String()
+		}
+		return baseURI + c.DefaultPaths.BasePath
+	}
+	return ""
+}
+
+func (c *Config) DefaultEmailCodeURLTemplate(ctx context.Context) string {
+	basePath := c.defaultBaseURL(ctx)
+	if basePath == "" {
+		return ""
+	}
+	return basePath + c.DefaultPaths.EmailCodePath
+}
+func (c *Config) DefaultPasswordSetURLTemplate(ctx context.Context) string {
+	basePath := c.defaultBaseURL(ctx)
+	if basePath == "" {
+		return ""
+	}
+	return c.defaultBaseURL(ctx) + c.DefaultPaths.PasswordSetPath
 }
 
 const (
@@ -56,24 +97,20 @@ const (
 	DefaultLoggedOutPath = HandlerPrefix + EndpointLogoutDone
 )
 
-func CreateLogin(config Config,
+func CreateLogin(
+	config Config,
 	command *command.Commands,
 	query *query.Queries,
 	authRepo *eventsourcing.EsRepository,
 	staticStorage static.Storage,
 	consolePath string,
-	oidcAuthCallbackURL func(context.Context, string) string,
-	samlAuthCallbackURL func(context.Context, string) string,
+	oidcAuthCallbackURL, samlAuthCallbackURL func(context.Context, string) string,
 	externalSecure bool,
-	userAgentCookie,
-	issuerInterceptor,
-	oidcInstanceHandler,
-	samlInstanceHandler,
-	assetCache,
-	accessHandler mux.MiddlewareFunc,
-	userCodeAlg crypto.EncryptionAlgorithm,
-	idpConfigAlg crypto.EncryptionAlgorithm,
+	userAgentCookie, issuerInterceptor, oidcInstanceHandler, samlInstanceHandler, assetCache, accessHandler mux.MiddlewareFunc,
+	userCodeAlg, idpConfigAlg crypto.EncryptionAlgorithm,
 	csrfCookieKey []byte,
+	cacheConnectors connector.Connectors,
+	federateLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout],
 ) (*Login, error) {
 	login := &Login{
 		oidcAuthCallbackURL: oidcAuthCallbackURL,
@@ -94,6 +131,12 @@ func CreateLogin(config Config,
 	login.router = CreateRouter(login, middleware.TelemetryHandler(IgnoreInstanceEndpoints...), oidcInstanceHandler, samlInstanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, issuerInterceptor, accessHandler)
 	login.renderer = CreateRenderer(HandlerPrefix, staticStorage, config.LanguageCookieName)
 	login.parser = form.NewParser()
+
+	var err error
+	login.caches, err = startCaches(context.Background(), cacheConnectors, federateLogoutCache)
+	if err != nil {
+		return nil, err
+	}
 	return login, nil
 }
 
@@ -101,7 +144,11 @@ func csp() *middleware.CSP {
 	csp := middleware.DefaultSCP
 	csp.ObjectSrc = middleware.CSPSourceOptsSelf()
 	csp.StyleSrc = csp.StyleSrc.AddNonce()
-	csp.ScriptSrc = csp.ScriptSrc.AddNonce().AddHash("sha256", "AjPdJSbZmeWHnEc5ykvJFay8FTWeTeRbs9dutfZ0HqE=")
+	csp.ScriptSrc = csp.ScriptSrc.AddNonce().
+		// SAML POST ACS
+		AddHash("sha256", "AjPdJSbZmeWHnEc5ykvJFay8FTWeTeRbs9dutfZ0HqE=").
+		// SAML POST SLO
+		AddHash("sha256", "4Su6mBWzEIFnH4pAGMOuaeBrstwJN4Z3pq/s1Kn4/KQ=")
 	return &csp
 }
 
@@ -129,7 +176,7 @@ func createCSRFInterceptor(cookieName string, csrfCookieKey []byte, externalSecu
 				sameSiteMode = csrf.SameSiteNoneMode
 				// ... and since SameSite none requires the secure flag, we'll set it for TLS and for localhost
 				// (regardless of the TLS / externalSecure settings)
-				secureOnly = externalSecure || instance.RequestedDomain() == "localhost"
+				secureOnly = externalSecure || http_utils.DomainContext(r.Context()).RequestedDomain() == "localhost"
 			}
 			csrf.Protect(csrfCookieKey,
 				csrf.Secure(secureOnly),
@@ -163,23 +210,11 @@ func (l *Login) Handler() http.Handler {
 }
 
 func (l *Login) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgName string) ([]string, error) {
-	orgDomain, err := domain.NewIAMDomainName(orgName, authz.GetInstance(ctx).RequestedDomain())
+	orgDomain, err := domain.NewIAMDomainName(orgName, http_utils.DomainContext(ctx).RequestedDomain())
 	if err != nil {
 		return nil, err
 	}
-	loginName, err := query.NewUserPreferredLoginNameSearchQuery("@"+orgDomain, query.TextEndsWithIgnoreCase)
-	if err != nil {
-		return nil, err
-	}
-	users, err := l.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{loginName}})
-	if err != nil {
-		return nil, err
-	}
-	userIDs := make([]string, len(users.Users))
-	for i, user := range users.Users {
-		userIDs[i] = user.ID
-	}
-	return userIDs, nil
+	return l.query.SearchClaimedUserIDsOfOrgDomain(ctx, orgDomain, "")
 }
 
 func setContext(ctx context.Context, resourceOwner string) context.Context {
@@ -199,5 +234,45 @@ func setUserContext(ctx context.Context, userID, resourceOwner string) context.C
 }
 
 func (l *Login) baseURL(ctx context.Context) string {
-	return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), l.externalSecure) + HandlerPrefix
+	return http_utils.DomainContext(ctx).Origin() + HandlerPrefix
+}
+
+type Caches struct {
+	idpFormCallbacks cache.Cache[idpFormCallbackIndex, string, *idpFormCallback]
+	federatedLogouts cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout]
+}
+
+func startCaches(background context.Context, connectors connector.Connectors, federateLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout]) (_ *Caches, err error) {
+	caches := new(Caches)
+	caches.idpFormCallbacks, err = connector.StartCache[idpFormCallbackIndex, string, *idpFormCallback](background, []idpFormCallbackIndex{idpFormCallbackIndexRequestID}, cache.PurposeIdPFormCallback, connectors.Config.IdPFormCallbacks, connectors)
+	if err != nil {
+		return nil, err
+	}
+	caches.federatedLogouts = federateLogoutCache
+	return caches, nil
+}
+
+type idpFormCallbackIndex int
+
+const (
+	idpFormCallbackIndexUnspecified idpFormCallbackIndex = iota
+	idpFormCallbackIndexRequestID
+)
+
+type idpFormCallback struct {
+	InstanceID string
+	State      string
+	Form       url.Values
+}
+
+// Keys implements cache.Entry
+func (c *idpFormCallback) Keys(i idpFormCallbackIndex) []string {
+	if i == idpFormCallbackIndexRequestID {
+		return []string{idpFormCallbackKey(c.InstanceID, c.State)}
+	}
+	return nil
+}
+
+func idpFormCallbackKey(instanceID, state string) string {
+	return instanceID + "-" + state
 }

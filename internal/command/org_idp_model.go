@@ -70,6 +70,7 @@ func (wm *OrgOAuthIDPWriteModel) NewChangedEvent(
 	userEndpoint,
 	idAttribute string,
 	scopes []string,
+	usePKCE bool,
 	options idp.Options,
 ) (*org.OAuthIDPChangedEvent, error) {
 
@@ -83,6 +84,7 @@ func (wm *OrgOAuthIDPWriteModel) NewChangedEvent(
 		userEndpoint,
 		idAttribute,
 		scopes,
+		usePKCE,
 		options,
 	)
 	if err != nil || len(changes) == 0 {
@@ -176,7 +178,7 @@ func (wm *OrgOIDCIDPWriteModel) NewChangedEvent(
 	clientSecretString string,
 	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
-	idTokenMapping bool,
+	idTokenMapping, usePKCE bool,
 	options idp.Options,
 ) (*org.OIDCIDPChangedEvent, error) {
 
@@ -188,6 +190,7 @@ func (wm *OrgOIDCIDPWriteModel) NewChangedEvent(
 		secretCrypto,
 		scopes,
 		idTokenMapping,
+		usePKCE,
 		options,
 	)
 	if err != nil || len(changes) == 0 {
@@ -778,6 +781,7 @@ func (wm *OrgLDAPIDPWriteModel) NewChangedEvent(
 	userObjectClasses []string,
 	userFilters []string,
 	timeout time.Duration,
+	rootCA []byte,
 	secretCrypto crypto.EncryptionAlgorithm,
 	attributes idp.LDAPAttributes,
 	options idp.Options,
@@ -794,6 +798,7 @@ func (wm *OrgLDAPIDPWriteModel) NewChangedEvent(
 		userObjectClasses,
 		userFilters,
 		timeout,
+		rootCA,
 		secretCrypto,
 		attributes,
 		options,
@@ -928,8 +933,10 @@ func (wm *OrgSAMLIDPWriteModel) NewChangedEvent(
 	secretCrypto crypto.EncryptionAlgorithm,
 	binding string,
 	withSignedRequest bool,
+	signatureAlgorithm string,
 	nameIDFormat *domain.SAMLNameIDFormat,
 	transientMappingAttributeName string,
+	federatedLogoutEnabled bool,
 	options idp.Options,
 ) (*org.SAMLIDPChangedEvent, error) {
 	changes, err := wm.SAMLIDPWriteModel.NewChanges(
@@ -940,8 +947,10 @@ func (wm *OrgSAMLIDPWriteModel) NewChangedEvent(
 		secretCrypto,
 		binding,
 		withSignedRequest,
+		signatureAlgorithm,
 		nameIDFormat,
 		transientMappingAttributeName,
+		federatedLogoutEnabled,
 		options,
 	)
 	if err != nil || len(changes) == 0 {

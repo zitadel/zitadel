@@ -10,9 +10,9 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -26,7 +26,7 @@ type Stateful interface {
 type State struct {
 	LastRun time.Time
 
-	Position       float64
+	Position       decimal.Decimal
 	EventCreatedAt time.Time
 	AggregateID    string
 	AggregateType  eventstore.AggregateType
@@ -68,7 +68,7 @@ func (q *Queries) SearchCurrentStates(ctx context.Context, queries *CurrentState
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareCurrentStateQuery(ctx, q.client)
+	query, scan := prepareCurrentStateQuery()
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-MmFef", "Errors.Query.InvalidRequest")
@@ -90,9 +90,7 @@ func (q *Queries) latestState(ctx context.Context, projections ...table) (state 
 }
 
 func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName string) (err error) {
-	ctx, spanBeginTx := tracing.NewNamedSpan(ctx, "db.BeginTx")
 	tx, err := q.client.BeginTx(ctx, nil)
-	spanBeginTx.EndWithError(err)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "QUERY-9iOpr", "Errors.RemoveFailed")
 	}
@@ -132,7 +130,7 @@ func (q *Queries) checkAndLock(tx *sql.Tx, projectionName string) (name string, 
 		From(currentStateTable.identifier()).
 		Where(sq.Eq{
 			CurrentStateColProjectionName.identifier(): projectionName,
-		}).Suffix("FOR UPDATE").
+		}).Suffix("FOR NO KEY UPDATE").
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
@@ -205,25 +203,25 @@ func reset(ctx context.Context, tx *sql.Tx, tables []string, projectionName stri
 	if err != nil {
 		return zerrors.ThrowInternal(err, "QUERY-Ff3tw", "Errors.RemoveFailed")
 	}
-	_, err = tx.Exec(update, args...)
+	_, err = tx.ExecContext(ctx, update, args...)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "QUERY-NFiws", "Errors.RemoveFailed")
 	}
 	return nil
 }
 
-func prepareLatestState(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*State, error)) {
+func prepareLatestState() (sq.SelectBuilder, func(*sql.Row) (*State, error)) {
 	return sq.Select(
 			CurrentStateColEventDate.identifier(),
 			CurrentStateColPosition.identifier(),
 			CurrentStateColLastUpdated.identifier()).
-			From(currentStateTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(currentStateTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*State, error) {
 			var (
 				creationDate sql.NullTime
 				lastUpdated  sql.NullTime
-				position     sql.NullFloat64
+				position     decimal.NullDecimal
 			)
 			err := row.Scan(
 				&creationDate,
@@ -236,12 +234,12 @@ func prepareLatestState(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 			return &State{
 				EventCreatedAt: creationDate.Time,
 				LastRun:        lastUpdated.Time,
-				Position:       position.Float64,
+				Position:       position.Decimal,
 			}, nil
 		}
 }
 
-func prepareCurrentStateQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*CurrentStates, error)) {
+func prepareCurrentStateQuery() (sq.SelectBuilder, func(*sql.Rows) (*CurrentStates, error)) {
 	return sq.Select(
 			CurrentStateColLastUpdated.identifier(),
 			CurrentStateColEventDate.identifier(),
@@ -251,7 +249,7 @@ func prepareCurrentStateQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			CurrentStateColAggregateID.identifier(),
 			CurrentStateColSequence.identifier(),
 			countColumn.identifier()).
-			From(currentStateTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(currentStateTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*CurrentStates, error) {
 			states := make([]*CurrentState, 0)
@@ -261,7 +259,7 @@ func prepareCurrentStateQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				var (
 					lastRun         sql.NullTime
 					eventDate       sql.NullTime
-					currentPosition sql.NullFloat64
+					currentPosition decimal.NullDecimal
 					aggregateType   sql.NullString
 					aggregateID     sql.NullString
 					sequence        sql.NullInt64
@@ -282,7 +280,7 @@ func prepareCurrentStateQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				}
 				currentState.State.EventCreatedAt = eventDate.Time
 				currentState.State.LastRun = lastRun.Time
-				currentState.Position = currentPosition.Float64
+				currentState.Position = currentPosition.Decimal
 				currentState.AggregateType = eventstore.AggregateType(aggregateType.String)
 				currentState.AggregateID = aggregateID.String
 				currentState.Sequence = uint64(sequence.Int64)

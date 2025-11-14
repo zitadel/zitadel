@@ -3,13 +3,16 @@ package actions
 import (
 	"bytes"
 	"context"
+	"errors"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"reflect"
 	"testing"
 
 	"github.com/dop251/goja"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/record"
@@ -19,59 +22,99 @@ import (
 func Test_isHostBlocked(t *testing.T) {
 	SetLogstoreService(logstore.New[*record.ExecutionLog](nil, nil))
 	var denyList = []AddressChecker{
-		mustNewIPChecker(t, "192.168.5.0/24"),
-		mustNewIPChecker(t, "127.0.0.1"),
-		&DomainChecker{Domain: "test.com"},
+		mustNewHostChecker(t, "192.168.5.0/24"),
+		mustNewHostChecker(t, "127.0.0.1"),
+		mustNewHostChecker(t, "test.com"),
+	}
+	type fields struct {
+		lookup func(host string) ([]net.IP, error)
 	}
 	type args struct {
 		address *url.URL
 	}
 	tests := []struct {
-		name string
-		args args
-		want bool
+		name   string
+		fields fields
+		args   args
+		want   error
 	}{
 		{
 			name: "in range",
 			args: args{
 				address: mustNewURL(t, "https://192.168.5.4/hodor"),
 			},
-			want: true,
+			want: NewAddressDeniedError("192.168.5.0/24"),
 		},
 		{
 			name: "exact ip",
 			args: args{
 				address: mustNewURL(t, "http://127.0.0.1:8080/hodor"),
 			},
-			want: true,
+			want: NewAddressDeniedError("127.0.0.1"),
 		},
 		{
 			name: "address match",
+			fields: fields{
+				lookup: func(host string) ([]net.IP, error) {
+					return []net.IP{net.ParseIP("194.264.52.4")}, nil
+				},
+			},
 			args: args{
 				address: mustNewURL(t, "https://test.com:42/hodor"),
 			},
-			want: true,
+			want: NewAddressDeniedError("test.com"),
 		},
 		{
 			name: "address not match",
+			fields: fields{
+				lookup: func(host string) ([]net.IP, error) {
+					return []net.IP{net.ParseIP("194.264.52.4")}, nil
+				},
+			},
 			args: args{
 				address: mustNewURL(t, "https://test2.com/hodor"),
 			},
-			want: false,
+			want: nil,
+		},
+		{
+			name: "looked up ip matches",
+			fields: fields{
+				lookup: func(host string) ([]net.IP, error) {
+					return []net.IP{net.ParseIP("127.0.0.1")}, nil
+				},
+			},
+			args: args{
+				address: mustNewURL(t, "https://test2.com/hodor"),
+			},
+			want: NewAddressDeniedError("127.0.0.1"),
+		},
+		{
+			name: "looked up failure",
+			fields: fields{
+				lookup: func(host string) ([]net.IP, error) {
+					return nil, errors.New("some error")
+				},
+			},
+			args: args{
+				address: mustNewURL(t, "https://test2.com/hodor"),
+			},
+			want: zerrors.ThrowInternal(nil, "ACTIO-4m9s2", "lookup failed"),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := isHostBlocked(denyList, tt.args.address); got != tt.want {
-				t.Errorf("isHostBlocked() = %v, want %v", got, tt.want)
+			trans := &transport{
+				lookup: tt.fields.lookup,
 			}
+			got := trans.isHostBlocked(denyList, tt.args.address)
+			assert.ErrorIs(t, got, tt.want)
 		})
 	}
 }
 
-func mustNewIPChecker(t *testing.T, ip string) AddressChecker {
+func mustNewHostChecker(t *testing.T, ip string) AddressChecker {
 	t.Helper()
-	checker, err := NewIPChecker(ip)
+	checker, err := NewHostChecker(ip)
 	if err != nil {
 		t.Errorf("unable to parse cidr of %q because: %v", ip, err)
 		t.FailNow()

@@ -86,9 +86,8 @@ var (
 			") AS members" +
 			" LEFT JOIN projections.projects4 ON members.project_id = projections.projects4.id AND members.instance_id = projections.projects4.instance_id" +
 			" LEFT JOIN projections.orgs1 ON members.org_id = projections.orgs1.id AND members.instance_id = projections.orgs1.instance_id" +
-			" LEFT JOIN projections.project_grants4 ON members.grant_id = projections.project_grants4.grant_id AND members.instance_id = projections.project_grants4.instance_id" +
-			" LEFT JOIN projections.instances ON members.instance_id = projections.instances.id" +
-			` AS OF SYSTEM TIME '-1 ms'`)
+			" LEFT JOIN projections.project_grants4 ON members.grant_id = projections.project_grants4.grant_id AND members.instance_id = projections.project_grants4.instance_id AND members.project_id = projections.project_grants4.project_id" +
+			" LEFT JOIN projections.instances ON members.instance_id = projections.instances.id")
 	membershipCols = []string{
 		"user_id",
 		"roles",
@@ -456,14 +455,14 @@ func Test_MembershipPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }
 
-func prepareMembershipWrapper() func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
-	return func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
-		builder, _, fun := prepareMembershipsQuery(ctx, db, &MembershipSearchQuery{})
+func prepareMembershipWrapper() func() (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
+	return func() (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
+		builder, _, fun := prepareMembershipsQuery(context.Background(), &MembershipSearchQuery{}, false)
 		return builder, fun
 	}
 }

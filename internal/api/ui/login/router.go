@@ -14,6 +14,7 @@ const (
 	EndpointExternalLogin                 = "/login/externalidp"
 	EndpointExternalLoginCallback         = "/login/externalidp/callback"
 	EndpointExternalLoginCallbackFormPost = "/login/externalidp/callback/form"
+	EndpointExternalLogout                = "/logout/externalidp"
 	EndpointSAMLACS                       = "/login/externalidp/saml/acs"
 	EndpointJWTAuthorize                  = "/login/jwt/authorize"
 	EndpointJWTCallback                   = "/login/jwt/callback"
@@ -30,6 +31,7 @@ const (
 	EndpointChangePassword                = "/password/change"
 	EndpointPasswordReset                 = "/password/reset"
 	EndpointInitUser                      = "/user/init"
+	EndpointInviteUser                    = "/user/invite"
 	EndpointMFAVerify                     = "/mfa/verify"
 	EndpointMFAPrompt                     = "/mfa/prompt"
 	EndpointMFAInitVerify                 = "/mfa/init/verify"
@@ -76,6 +78,7 @@ func CreateRouter(login *Login, interceptors ...mux.MiddlewareFunc) *mux.Router 
 	router.HandleFunc(EndpointExternalLogin, login.handleExternalLogin).Methods(http.MethodGet)
 	router.HandleFunc(EndpointExternalLoginCallback, login.handleExternalLoginCallback).Methods(http.MethodGet)
 	router.HandleFunc(EndpointExternalLoginCallbackFormPost, login.handleExternalLoginCallbackForm).Methods(http.MethodPost)
+	router.HandleFunc(EndpointExternalLogout, login.handleExternalLogout).Methods(http.MethodGet)
 	router.HandleFunc(EndpointSAMLACS, login.handleExternalLoginCallback).Methods(http.MethodGet)
 	router.HandleFunc(EndpointSAMLACS, login.handleExternalLoginCallbackForm).Methods(http.MethodPost)
 	router.HandleFunc(EndpointJWTAuthorize, login.handleJWTRequest).Methods(http.MethodGet)
@@ -94,6 +97,8 @@ func CreateRouter(login *Login, interceptors ...mux.MiddlewareFunc) *mux.Router 
 	router.HandleFunc(EndpointPasswordReset, login.handlePasswordReset).Methods(http.MethodGet)
 	router.HandleFunc(EndpointInitUser, login.handleInitUser).Methods(http.MethodGet)
 	router.HandleFunc(EndpointInitUser, login.handleInitUserCheck).Methods(http.MethodPost)
+	router.HandleFunc(EndpointInviteUser, login.handleInviteUser).Methods(http.MethodGet)
+	router.HandleFunc(EndpointInviteUser, login.handleInviteUserCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointMFAVerify, login.handleMFAVerify).Methods(http.MethodPost)
 	router.HandleFunc(EndpointMFAPrompt, login.handleMFAPromptSelection).Methods(http.MethodGet)
 	router.HandleFunc(EndpointMFAPrompt, login.handleMFAPrompt).Methods(http.MethodPost)
@@ -124,6 +129,5 @@ func CreateRouter(login *Login, interceptors ...mux.MiddlewareFunc) *mux.Router 
 	router.SkipClean(true).Handle("", http.RedirectHandler(HandlerPrefix+"/", http.StatusMovedPermanently))
 	router.HandleFunc(EndpointDeviceAuth, login.handleDeviceAuthUserCode).Methods(http.MethodGet, http.MethodPost)
 	router.HandleFunc(EndpointDeviceAuthAction, login.handleDeviceAuthAction).Methods(http.MethodGet, http.MethodPost)
-	router.HandleFunc(EndpointLinkingUserPrompt, login.handleLinkingUserPrompt).Methods(http.MethodPost)
 	return router
 }

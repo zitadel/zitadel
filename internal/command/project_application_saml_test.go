@@ -3,12 +3,14 @@ package command
 import (
 	"bytes"
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -48,8 +50,10 @@ var testMetadataChangedEntityID = []byte(`<?xml version="1.0"?>
 `)
 
 func TestCommandSide_AddSAMLApplication(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
-		eventstore  *eventstore.Eventstore
+		eventstore  func(t *testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
 		httpClient  *http.Client
 	}
@@ -71,12 +75,10 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 		{
 			name: "no aggregate id, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
 				samlApp:       &domain.SAMLApp{},
 				resourceOwner: "org1",
 			},
@@ -87,13 +89,12 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 		{
 			name: "project not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				samlApp: &domain.SAMLApp{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
@@ -110,8 +111,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 		{
 			name: "invalid app, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -120,10 +120,11 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
+					expectFilter(),
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				samlApp: &domain.SAMLApp{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
@@ -138,10 +139,9 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 			},
 		},
 		{
-			name: "create saml app, metadata not parsable",
+			name: "empty metas, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -150,11 +150,43 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
+					expectFilter(),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
+				samlApp: &domain.SAMLApp{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "project1",
+					},
+					AppName:  "app",
+					EntityID: "https://test.com/saml/metadata",
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "create saml app, metadata not parsable",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project", true, true, true,
+								domain.PrivateLabelingSettingUnspecified),
+						),
+					),
+					expectFilter(),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				samlApp: &domain.SAMLApp{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
@@ -162,7 +194,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 					AppName:     "app",
 					EntityID:    "https://test.com/saml/metadata",
 					Metadata:    []byte("test metadata"),
-					MetadataURL: "",
+					MetadataURL: gu.Ptr(""),
 				},
 				resourceOwner: "org1",
 			},
@@ -173,8 +205,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 		{
 			name: "create saml app, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -183,6 +214,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -195,13 +227,15 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 							"https://test.com/saml/metadata",
 							testMetadata,
 							"",
+							domain.LoginVersionUnspecified,
+							"",
 						),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1"),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				samlApp: &domain.SAMLApp{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
@@ -209,7 +243,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 					AppName:     "app",
 					EntityID:    "https://test.com/saml/metadata",
 					Metadata:    testMetadata,
-					MetadataURL: "",
+					MetadataURL: gu.Ptr(""),
 				},
 				resourceOwner: "org1",
 			},
@@ -219,20 +253,21 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 						AggregateID:   "project1",
 						ResourceOwner: "org1",
 					},
-					AppID:       "app1",
-					AppName:     "app",
-					EntityID:    "https://test.com/saml/metadata",
-					Metadata:    testMetadata,
-					MetadataURL: "",
-					State:       domain.AppStateActive,
+					AppID:        "app1",
+					AppName:      "app",
+					EntityID:     "https://test.com/saml/metadata",
+					Metadata:     testMetadata,
+					MetadataURL:  gu.Ptr(""),
+					State:        domain.AppStateActive,
+					LoginVersion: gu.Ptr(domain.LoginVersionUnspecified),
+					LoginBaseURI: gu.Ptr(""),
 				},
 			},
 		},
 		{
-			name: "create saml app metadataURL, ok",
+			name: "create saml app, loginversion, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -241,6 +276,71 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
+					expectFilter(),
+					expectPush(
+						project.NewApplicationAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							"app",
+						),
+						project.NewSAMLConfigAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							"https://test.com/saml/metadata",
+							testMetadata,
+							"",
+							domain.LoginVersion2,
+							"https://test.com/login",
+						),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1"),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
+				samlApp: &domain.SAMLApp{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "project1",
+					},
+					AppName:      "app",
+					EntityID:     "https://test.com/saml/metadata",
+					Metadata:     testMetadata,
+					MetadataURL:  gu.Ptr(""),
+					LoginVersion: gu.Ptr(domain.LoginVersion2),
+					LoginBaseURI: gu.Ptr("https://test.com/login"),
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.SAMLApp{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "project1",
+						ResourceOwner: "org1",
+					},
+					AppID:        "app1",
+					AppName:      "app",
+					EntityID:     "https://test.com/saml/metadata",
+					Metadata:     testMetadata,
+					MetadataURL:  gu.Ptr(""),
+					State:        domain.AppStateActive,
+					LoginVersion: gu.Ptr(domain.LoginVersion2),
+					LoginBaseURI: gu.Ptr("https://test.com/login"),
+				},
+			},
+		},
+		{
+			name: "create saml app metadataURL, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project", true, true, true,
+								domain.PrivateLabelingSettingUnspecified),
+						),
+					),
+					expectFilter(),
 					expectPush(
 						project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -253,6 +353,8 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 							"https://test.com/saml/metadata",
 							testMetadata,
 							"http://localhost:8080/saml/metadata",
+							domain.LoginVersionUnspecified,
+							"",
 						),
 					),
 				),
@@ -260,7 +362,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 				httpClient:  newTestClient(200, testMetadata),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				samlApp: &domain.SAMLApp{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
@@ -268,7 +370,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 					AppName:     "app",
 					EntityID:    "https://test.com/saml/metadata",
 					Metadata:    nil,
-					MetadataURL: "http://localhost:8080/saml/metadata",
+					MetadataURL: gu.Ptr("http://localhost:8080/saml/metadata"),
 				},
 				resourceOwner: "org1",
 			},
@@ -278,20 +380,21 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 						AggregateID:   "project1",
 						ResourceOwner: "org1",
 					},
-					AppID:       "app1",
-					AppName:     "app",
-					EntityID:    "https://test.com/saml/metadata",
-					Metadata:    testMetadata,
-					MetadataURL: "http://localhost:8080/saml/metadata",
-					State:       domain.AppStateActive,
+					AppID:        "app1",
+					AppName:      "app",
+					EntityID:     "https://test.com/saml/metadata",
+					Metadata:     testMetadata,
+					MetadataURL:  gu.Ptr("http://localhost:8080/saml/metadata"),
+					State:        domain.AppStateActive,
+					LoginVersion: gu.Ptr(domain.LoginVersionUnspecified),
+					LoginBaseURI: gu.Ptr(""),
 				},
 			},
 		},
 		{
 			name: "create saml app metadataURL, http error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -300,12 +403,13 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
+					expectFilter(),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t),
 				httpClient:  newTestClient(http.StatusNotFound, nil),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				samlApp: &domain.SAMLApp{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
@@ -313,7 +417,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 					AppName:     "app",
 					EntityID:    "https://test.com/saml/metadata",
 					Metadata:    nil,
-					MetadataURL: "http://localhost:8080/saml/metadata",
+					MetadataURL: gu.Ptr("http://localhost:8080/saml/metadata"),
 				},
 				resourceOwner: "org1",
 			},
@@ -325,13 +429,16 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
-				eventstore:  tt.fields.eventstore,
-				idGenerator: tt.fields.idGenerator,
-				httpClient:  tt.fields.httpClient,
-			}
+			t.Parallel()
 
-			got, err := r.AddSAMLApplication(tt.args.ctx, tt.args.samlApp, tt.args.resourceOwner)
+			c := &Commands{
+				eventstore:      tt.fields.eventstore(t),
+				idGenerator:     tt.fields.idGenerator,
+				httpClient:      tt.fields.httpClient,
+				checkPermission: newMockPermissionCheckAllowed(),
+			}
+			c.setMilestonesCompletedForTest("instanceID")
+			got, err := c.AddSAMLApplication(tt.args.ctx, tt.args.samlApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -346,8 +453,10 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 }
 
 func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 		httpClient *http.Client
 	}
 	type args struct {
@@ -368,9 +477,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 		{
 			name: "invalid app, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -389,9 +496,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 		{
 			name: "missing appid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -411,9 +516,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 		{
 			name: "missing aggregateid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -433,8 +536,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 		{
 			name: "app not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -456,8 +558,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 		{
 			name: "no changes, precondition error, metadataURL",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewApplicationAddedEvent(context.Background(),
@@ -473,6 +574,8 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 								"https://test.com/saml/metadata",
 								testMetadata,
 								"http://localhost:8080/saml/metadata",
+								domain.LoginVersionUnspecified,
+								"",
 							),
 						),
 					),
@@ -490,7 +593,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 					AppID:       "app1",
 					EntityID:    "https://test.com/saml/metadata",
 					Metadata:    nil,
-					MetadataURL: "http://localhost:8080/saml/metadata",
+					MetadataURL: gu.Ptr("http://localhost:8080/saml/metadata"),
 				},
 				resourceOwner: "org1",
 			},
@@ -501,8 +604,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 		{
 			name: "no changes, precondition error, metadata",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewApplicationAddedEvent(context.Background(),
@@ -517,6 +619,8 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 								"app1",
 								"https://test.com/saml/metadata",
 								testMetadata,
+								"",
+								domain.LoginVersionUnspecified,
 								"",
 							),
 						),
@@ -535,7 +639,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 					AppID:       "app1",
 					EntityID:    "https://test.com/saml/metadata",
 					Metadata:    testMetadata,
-					MetadataURL: "",
+					MetadataURL: gu.Ptr(""),
 				},
 				resourceOwner: "org1",
 			},
@@ -546,8 +650,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 		{
 			name: "change saml app, ok, metadataURL",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewApplicationAddedEvent(context.Background(),
@@ -563,6 +666,8 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 								"https://test.com/saml/metadata",
 								testMetadata,
 								"http://localhost:8080/saml/metadata",
+								domain.LoginVersionUnspecified,
+								"",
 							),
 						),
 					),
@@ -590,7 +695,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 					AppName:     "app",
 					EntityID:    "https://test2.com/saml/metadata",
 					Metadata:    nil,
-					MetadataURL: "http://localhost:8080/saml/metadata",
+					MetadataURL: gu.Ptr("http://localhost:8080/saml/metadata"),
 				},
 				resourceOwner: "org1",
 			},
@@ -600,20 +705,21 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 						AggregateID:   "project1",
 						ResourceOwner: "org1",
 					},
-					AppID:       "app1",
-					AppName:     "app",
-					EntityID:    "https://test2.com/saml/metadata",
-					Metadata:    testMetadataChangedEntityID,
-					MetadataURL: "http://localhost:8080/saml/metadata",
-					State:       domain.AppStateActive,
+					AppID:        "app1",
+					AppName:      "app",
+					EntityID:     "https://test2.com/saml/metadata",
+					Metadata:     testMetadataChangedEntityID,
+					MetadataURL:  gu.Ptr("http://localhost:8080/saml/metadata"),
+					State:        domain.AppStateActive,
+					LoginVersion: gu.Ptr(domain.LoginVersionUnspecified),
+					LoginBaseURI: gu.Ptr(""),
 				},
 			},
 		},
 		{
-			name: "change saml app, ok, metadata",
+			name: "partial change saml app, ok, metadata",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewApplicationAddedEvent(context.Background(),
@@ -628,6 +734,8 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 								"app1",
 								"https://test.com/saml/metadata",
 								testMetadata,
+								"",
+								domain.LoginVersionUnspecified,
 								"",
 							),
 						),
@@ -656,7 +764,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 					AppName:     "app",
 					EntityID:    "https://test2.com/saml/metadata",
 					Metadata:    testMetadataChangedEntityID,
-					MetadataURL: "",
+					MetadataURL: gu.Ptr(""),
 				},
 				resourceOwner: "org1",
 			},
@@ -666,12 +774,87 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 						AggregateID:   "project1",
 						ResourceOwner: "org1",
 					},
-					AppID:       "app1",
-					AppName:     "app",
-					EntityID:    "https://test2.com/saml/metadata",
-					Metadata:    testMetadataChangedEntityID,
-					MetadataURL: "",
-					State:       domain.AppStateActive,
+					AppID:        "app1",
+					AppName:      "app",
+					EntityID:     "https://test2.com/saml/metadata",
+					Metadata:     testMetadataChangedEntityID,
+					MetadataURL:  gu.Ptr(""),
+					State:        domain.AppStateActive,
+					LoginVersion: gu.Ptr(domain.LoginVersionUnspecified),
+					LoginBaseURI: gu.Ptr(""),
+				},
+			},
+		},
+		{
+			name: "change saml app, ok, loginversion",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewApplicationAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"app1",
+								"app",
+							),
+						),
+						eventFromEventPusher(
+							project.NewSAMLConfigAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"app1",
+								"https://test.com/saml/metadata",
+								testMetadata,
+								"",
+								domain.LoginVersionUnspecified,
+								"",
+							),
+						),
+					),
+					expectPush(
+						newSAMLAppChangedEventLoginVersion(context.Background(),
+							"app1",
+							"project1",
+							"org1",
+							"https://test.com/saml/metadata",
+							"https://test2.com/saml/metadata",
+							testMetadataChangedEntityID,
+							domain.LoginVersion2,
+							"https://test.com/login",
+						),
+					),
+				),
+				httpClient: nil,
+			},
+			args: args{
+				ctx: context.Background(),
+				samlApp: &domain.SAMLApp{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "project1",
+						ResourceOwner: "org1",
+					},
+					AppID:        "app1",
+					AppName:      "app",
+					EntityID:     "https://test2.com/saml/metadata",
+					Metadata:     testMetadataChangedEntityID,
+					MetadataURL:  gu.Ptr(""),
+					LoginVersion: gu.Ptr(domain.LoginVersion2),
+					LoginBaseURI: gu.Ptr("https://test.com/login"),
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.SAMLApp{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "project1",
+						ResourceOwner: "org1",
+					},
+					AppID:        "app1",
+					AppName:      "app",
+					EntityID:     "https://test2.com/saml/metadata",
+					Metadata:     testMetadataChangedEntityID,
+					MetadataURL:  gu.Ptr(""),
+					State:        domain.AppStateActive,
+					LoginVersion: gu.Ptr(domain.LoginVersion2),
+					LoginBaseURI: gu.Ptr("https://test.com/login"),
 				},
 			},
 		},
@@ -679,11 +862,14 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
-				httpClient: tt.fields.httpClient,
+				eventstore:      tt.fields.eventstore(t),
+				httpClient:      tt.fields.httpClient,
+				checkPermission: newMockPermissionCheckAllowed(),
 			}
-			got, err := r.ChangeSAMLApplication(tt.args.ctx, tt.args.samlApp, tt.args.resourceOwner)
+			got, err := r.UpdateSAMLApplication(tt.args.ctx, tt.args.samlApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -725,6 +911,22 @@ func newSAMLAppChangedEventMetadataURL(ctx context.Context, appID, projectID, re
 	return event
 }
 
+func newSAMLAppChangedEventLoginVersion(ctx context.Context, appID, projectID, resourceOwner, oldEntityID, entityID string, metadata []byte, loginVersion domain.LoginVersion, loginURI string) *project.SAMLConfigChangedEvent {
+	changes := []project.SAMLConfigChanges{
+		project.ChangeEntityID(entityID),
+		project.ChangeMetadata(metadata),
+		project.ChangeSAMLLoginVersion(loginVersion),
+		project.ChangeSAMLLoginBaseURI(loginURI),
+	}
+	event, _ := project.NewSAMLConfigChangedEvent(ctx,
+		&project.NewAggregate(projectID, resourceOwner).Aggregate,
+		appID,
+		oldEntityID,
+		changes,
+	)
+	return event
+}
+
 type roundTripperFunc func(*http.Request) *http.Response
 
 // RoundTrip implements the http.RoundTripper interface.
@@ -737,7 +939,7 @@ func newTestClient(httpStatus int, metadata []byte) *http.Client {
 	fn := roundTripperFunc(func(req *http.Request) *http.Response {
 		return &http.Response{
 			StatusCode: httpStatus,
-			Body:       ioutil.NopCloser(bytes.NewBuffer(metadata)),
+			Body:       io.NopCloser(bytes.NewBuffer(metadata)),
 			Header:     make(http.Header), //must be non-nil value
 		}
 	})

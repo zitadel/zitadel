@@ -80,7 +80,7 @@ Use the function that reflects your log level.
 ### Example
 
 ```js
-logger.info("This is an info log.")
+logger.log("This is an info log.")
 
 logger.warn("This is a warn log.")
 

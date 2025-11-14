@@ -1,5 +1,5 @@
 ---
-title: Mirror data to another database
+title: Mirror data from cockroach to postgres
 sidebar_label: Mirror command
 ---
 
@@ -9,15 +9,15 @@ The data can be mirrored to multiple database without influencing each other.
 
 ## Use cases
 
-Migrate from cockroachdb to postgres or vice versa.
+Migrate from cockroachdb to postgres.
 
 Replicate data to a secondary environment for testing.
 
 ## Prerequisites
 
-You need an existing source database, most probably the database ZITADEL currently serves traffic from.
+You need an existing source database, most probably the database Zitadel currently serves traffic from.
 
-To mirror the data the destination database needs to be initialized and setup without an instance.
+To mirror the data, the destination database needs to be initialized and set up without an instance. You can find the commands to start an empty Zitadel deployment in [the example section](#prepare-the-destination-database).
 
 ### Start the destination database 
 
@@ -38,12 +38,30 @@ docker compose up db --detach
 
 ## Example
 
-The following commands setup the database as described above. See [configuration](#configuration) for more details about the configuration options.
+### Prepare the destination database
+
+The following commands setup the database without an instance.
 
 ```bash
 zitadel init --config /path/to/your/new/config.yaml
 zitadel setup --for-mirror --config /path/to/your/new/config.yaml # make sure to set --tlsMode and masterkey analog to your current deployment
+```
+
+### Mirror the data
+
+The next step is to copy the data from the source to the destination database. For detailed configuration options, please refer to the [configuration section](#configuration).
+
+```bash
 zitadel mirror --system --config /path/to/your/mirror/config.yaml # make sure to set --tlsMode and masterkey analog to your current deployment
+```
+
+### Initialize the data and verify
+
+The last step is to setup the permissions and verify the data, there might be differences between source and destination, refer to [`zitadel mirror verify`](#zitadel-mirror-verify) to get an overview of possible diffs.
+
+```bash
+zitadel setup --for-mirror --config /path/to/your/new/config.yaml # make sure to set --tlsMode and masterkey analog to your current deployment
+zitadel mirror verify --system --config /path/to/your/mirror/config.yaml # make sure to set --tlsMode and masterkey analog to your current deployment
 ```
 
 ## Usage
@@ -73,7 +91,7 @@ Flags:
       --masterkey string         masterkey as argument for en/decryption keys
   -m, --masterkeyFile string     path to the masterkey for en/decryption keys
       --masterkeyFromEnv         read masterkey for en/decryption keys from environment variable (ZITADEL_MASTERKEY)
-      --tlsMode externalSecure   start ZITADEL with (enabled), without (disabled) TLS or external component e.g. reverse proxy (external) terminating TLS, this flag will overwrite externalSecure and `tls.enabled` in configs files
+      --tlsMode externalSecure   start Zitadel with (enabled), without (disabled) TLS or external component e.g. reverse proxy (external) terminating TLS, this flag will overwrite externalSecure and `tls.enabled` in configs files
 ```
 
 ## Configuration
@@ -87,8 +105,6 @@ Source:
     Database: zitadel # ZITADEL_SOURCE_COCKROACH_DATABASE
     MaxOpenConns: 6 # ZITADEL_SOURCE_COCKROACH_MAXOPENCONNS
     MaxIdleConns: 6 # ZITADEL_SOURCE_COCKROACH_MAXIDLECONNS
-    EventPushConnRatio: 0.33 # ZITADEL_SOURCE_COCKROACH_EVENTPUSHCONNRATIO
-    ProjectionSpoolerConnRatio: 0.33 # ZITADEL_SOURCE_COCKROACH_PROJECTIONSPOOLERCONNRATIO
     MaxConnLifetime: 30m # ZITADEL_SOURCE_COCKROACH_MAXCONNLIFETIME
     MaxConnIdleTime: 5m # ZITADEL_SOURCE_COCKROACH_MAXCONNIDLETIME
     Options: "" # ZITADEL_SOURCE_COCKROACH_OPTIONS
@@ -122,47 +138,29 @@ Source:
 
 # The destination database the data are copied to. Use either cockroach or postgres, by default cockroach is used
 Destination:
-  cockroach:
-    Host: localhost # ZITADEL_DESTINATION_COCKROACH_HOST
-    Port: 26257 # ZITADEL_DESTINATION_COCKROACH_PORT
-    Database: zitadel # ZITADEL_DESTINATION_COCKROACH_DATABASE
-    MaxOpenConns: 0 # ZITADEL_DESTINATION_COCKROACH_MAXOPENCONNS
-    MaxIdleConns: 0 # ZITADEL_DESTINATION_COCKROACH_MAXIDLECONNS
-    MaxConnLifetime: 30m # ZITADEL_DESTINATION_COCKROACH_MAXCONNLIFETIME
-    MaxConnIdleTime: 5m # ZITADEL_DESTINATION_COCKROACH_MAXCONNIDLETIME
-    EventPushConnRatio: 0.01 # ZITADEL_DESTINATION_COCKROACH_EVENTPUSHCONNRATIO
-    ProjectionSpoolerConnRatio: 0.5 # ZITADEL_DESTINATION_COCKROACH_PROJECTIONSPOOLERCONNRATIO
-    Options: "" # ZITADEL_DESTINATION_COCKROACH_OPTIONS
-    User:
-      Username: zitadel # ZITADEL_DESTINATION_COCKROACH_USER_USERNAME
-      Password: "" # ZITADEL_DESTINATION_COCKROACH_USER_PASSWORD
-      SSL:
-        Mode: disable # ZITADEL_DESTINATION_COCKROACH_USER_SSL_MODE
-        RootCert: "" # ZITADEL_DESTINATION_COCKROACH_USER_SSL_ROOTCERT
-        Cert: "" # ZITADEL_DESTINATION_COCKROACH_USER_SSL_CERT
-        Key: "" # ZITADEL_DESTINATION_COCKROACH_USER_SSL_KEY
-  # Postgres is used as soon as a value is set
-  # The values describe the possible fields to set values
   postgres:
-    Host: # ZITADEL_DESTINATION_POSTGRES_HOST
-    Port: # ZITADEL_DESTINATION_POSTGRES_PORT
-    Database: # ZITADEL_DESTINATION_POSTGRES_DATABASE
-    MaxOpenConns: # ZITADEL_DESTINATION_POSTGRES_MAXOPENCONNS
-    MaxIdleConns: # ZITADEL_DESTINATION_POSTGRES_MAXIDLECONNS
-    MaxConnLifetime: # ZITADEL_DESTINATION_POSTGRES_MAXCONNLIFETIME
-    MaxConnIdleTime: # ZITADEL_DESTINATION_POSTGRES_MAXCONNIDLETIME
-    Options: # ZITADEL_DESTINATION_POSTGRES_OPTIONS
+    Host: localhost # ZITADEL_DATABASE_POSTGRES_HOST
+    Port: 5432 # ZITADEL_DATABASE_POSTGRES_PORT
+    Database: zitadel # ZITADEL_DATABASE_POSTGRES_DATABASE
+    MaxOpenConns: 5 # ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS
+    MaxIdleConns: 2 # ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS
+    MaxConnLifetime: 30m # ZITADEL_DATABASE_POSTGRES_MAXCONNLIFETIME
+    MaxConnIdleTime: 5m # ZITADEL_DATABASE_POSTGRES_MAXCONNIDLETIME
+    Options: "" # ZITADEL_DATABASE_POSTGRES_OPTIONS
     User:
-      Username: # ZITADEL_DESTINATION_POSTGRES_USER_USERNAME
-      Password: # ZITADEL_DESTINATION_POSTGRES_USER_PASSWORD
+      Username: zitadel # ZITADEL_DATABASE_POSTGRES_USER_USERNAME
+      Password: "" # ZITADEL_DATABASE_POSTGRES_USER_PASSWORD
       SSL:
-        Mode: # ZITADEL_DESTINATION_POSTGRES_USER_SSL_MODE
-        RootCert: # ZITADEL_DESTINATION_POSTGRES_USER_SSL_ROOTCERT
-        Cert: # ZITADEL_DESTINATION_POSTGRES_USER_SSL_CERT
-        Key: # ZITADEL_DESTINATION_POSTGRES_USER_SSL_KEY
+        Mode: disable # ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE
+        RootCert: "" # ZITADEL_DATABASE_POSTGRES_USER_SSL_ROOTCERT
+        Cert: "" # ZITADEL_DATABASE_POSTGRES_USER_SSL_CERT
+        Key: "" # ZITADEL_DATABASE_POSTGRES_USER_SSL_KEY
 
 # As cockroachdb first copies the data into memory this parameter is used to iterate through the events table and fetch only the given amount of events per iteration
 EventBulkSize: 10000 # ZITADEL_EVENTBULKSIZE
+# The maximum duration an auth request was last updated before it gets ignored.
+# Default is 30 days
+MaxAuthRequestAge: 720h # ZITADEL_MAXAUTHREQUESTAGE
 
 Projections:
   # Defines how many projections are allowed to run in parallel
@@ -227,6 +225,6 @@ It is not possible to use files as source or destination. See github issue [here
 
 Currently the encryption keys of the source database must be copied to the destination database. See github issue [here](https://github.com/zitadel/zitadel/issues/7964)
 
-It is not possible to change the domain of the ZITADEL deployment.
+It is not possible to change the domain of the Zitadel deployment.
 
 Once you mirrored an instance using the `--instance` flag, you have to make sure you don't mirror other preexisting instances. This means for example, you cannot mirror a few instances and then pass the `--system` flag. You have to pass all remaining instances explicitly, once you used the `--instance` flag 

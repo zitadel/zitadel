@@ -27,13 +27,9 @@ func (l *Login) handlePasswordlessPrompt(w http.ResponseWriter, r *http.Request)
 }
 
 func (l *Login) renderPasswordlessPrompt(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
-	var errID, errMessage string
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
-	}
 	translator := l.getTranslator(r.Context(), authReq)
 	data := &passwordlessPromptData{
-		userData: l.getUserData(r, authReq, translator, "PasswordlessPrompt.Title", "PasswordlessPrompt.Description", errID, errMessage),
+		userData: l.getUserData(r, authReq, translator, "PasswordlessPrompt.Title", "PasswordlessPrompt.Description", err),
 	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplPasswordlessPrompt], data, nil)
 }

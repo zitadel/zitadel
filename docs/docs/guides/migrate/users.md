@@ -129,11 +129,10 @@ The snippets in the sections below are parts from the bulk import endpoint, to c
 
 ### Passwords
 
-Passwords are stored only as hash.
-You can transfer the hashes as long as ZITADEL [supports the same hash algorithm](/docs/concepts/architecture/secrets#hashed-secrets).
-Password change on the next sign-in can be enforced.
+ZITADEL stores passwords only as irreversible hashes, never in clear text.
+Existing password hashes can be imported if they use a supported [hash algorithm](/docs/concepts/architecture/secrets#hashed-secrets).
 
-_snippet from [bulk-import](#bulk-import) example:_
+Import password hashes using the import API (snippet from [bulk-import](#bulk-import)):
 ```json
 {
   "userName": "test9@test9",
@@ -147,15 +146,34 @@ _snippet from [bulk-import](#bulk-import) example:_
 }
 ```
 
-In case the hashes can't be transferred directly, you always have the option to create a user in ZITADEL without password and prompt users to create a new password.
+Upon initial login, ZITADEL validates the imported password using the appropriate verifier.
 
-If your legacy system receives the passwords in clear text (eg, login form) you could also directly create users via ZITADEL API. We will explain this pattern in more detail in this guide.
-
-:::info
-In case the hash algorithm you are using is not supported by ZITADEL, please let us know after searching our discussions, issues, and chat for similar requests.
+:::info Verifiers
+In ZITADEL, a password verifier checks the validity of a password hash created with an algorithm different from the currently configured one.
+It acts as a translator, allowing ZITADEL to understand and validate hashes made with older algorithms like MD5 even when the system has transitioned to newer ones like Argon2.  
+This is crucial during migrations or when importing user data.
+Essentially, a verifier ensures ZITADEL can work with passwords hashed using various algorithms, maintaining security while transitioning to stronger hashing methods.
 :::
 
-### One-time-passwords (OTP)
+Regardless of the `passwordChangeRequired` setting, the password is rehashed using the configured hasher algorithm and stored.
+This ensures consistency and allows for automatic updates even when hasher configurations are changed, such as increasing salt cost for bcrypt.
+
+To configure the default hasher for new user passwords, set the `Algorithm` of the `PasswordHasher` in the [runtime configuration file](/docs/self-hosting/manage/configure#runtime-configuration-file)
+or by the environment variable `ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM`, for example:
+
+```
+ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM='pbkdf2'
+```
+
+Hasher configuration updates will automatically rehash existing passwords when they are validated or changed.
+
+
+In case the hashes can't be transferred directly, you always have the option to create a user in ZITADEL without password and prompt users to create a new password.
+
+If your legacy system receives the passwords in clear text (eg, login form) you could also directly create users via ZITADEL API.
+We will explain this pattern in more detail in this guide.
+
+### One-time passwords (OTP)
 
 You can pass the OTP secret when creating users:
 

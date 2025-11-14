@@ -24,14 +24,11 @@ type mfaU2FFormData struct {
 }
 
 func (l *Login) renderU2FVerification(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, providers []domain.MFAType, err error) {
-	var errID, errMessage, credentialData string
+	var credentialData string
 	var webAuthNLogin *domain.WebAuthNLogin
 	if err == nil {
 		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 		webAuthNLogin, err = l.authRepo.BeginMFAU2FLogin(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, userAgentID)
-	}
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	if webAuthNLogin != nil {
 		credentialData = base64.RawURLEncoding.EncodeToString(webAuthNLogin.CredentialAssertionData)
@@ -39,7 +36,7 @@ func (l *Login) renderU2FVerification(w http.ResponseWriter, r *http.Request, au
 	translator := l.getTranslator(r.Context(), authReq)
 	data := &mfaU2FData{
 		webAuthNData: webAuthNData{
-			userData:               l.getUserData(r, authReq, translator, "VerifyMFAU2F.Title", "VerifyMFAU2F.Description", errID, errMessage),
+			userData:               l.getUserData(r, authReq, translator, "VerifyMFAU2F.Title", "VerifyMFAU2F.Description", err),
 			CredentialCreationData: credentialData,
 		},
 		MFAProviders:     providers,
@@ -74,7 +71,7 @@ func (l *Login) handleU2FVerification(w http.ResponseWriter, r *http.Request) {
 
 	metadata, actionErr := l.runPostInternalAuthenticationActions(authReq, r, authMethodU2F, err)
 	if err == nil && actionErr == nil && len(metadata) > 0 {
-		_, err = l.command.BulkSetUserMetadata(r.Context(), authReq.UserID, authReq.UserOrgID, metadata...)
+		err = l.bulkSetUserMetadata(r.Context(), authReq.UserID, authReq.UserOrgID, metadata)
 	} else if actionErr != nil && err == nil {
 		err = actionErr
 	}

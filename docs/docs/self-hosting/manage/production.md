@@ -54,11 +54,33 @@ Tracing:
 ZITADEL follows the principles that guide cloud-native and twelve factor applications.
 Logs are a stream of time-ordered events collected from all running processes.
 
-ZITADEL processes write the following events to the standard output:
+[ZITADEL is configurable](#default-zitadel-logging-config) to write the following events to the standard output:
 
-- Runtime Logs: Define the log level and record format [in the Log configuration section](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml#L1-L4)
-- Access Logs: Enable logging all HTTP and gRPC responses from the ZITADEL binary [in the LogStore section](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml#L366) 
-- Actions Exectution Logs: Actions can emit custom logs at different levels. For example, a log record can be emitted each time a user is created or authenticated. If you don't want to have these logs in STDOUT, you can disable this [in the LogStore section](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml#L387) .
+- Runtime Logs: Define the log level and record format in the `Log` configuration section.
+- Access Logs: Enable logging all HTTP and gRPC responses from the ZITADEL binary by setting `LogStore.Access.Stdout.Enabled` to true.
+- Actions Execution Logs: Actions can emit custom logs at different levels. For example, a log record can be emitted each time a user is created or authenticated. If you don't want to have these logs in STDOUT, you can disable this by setting `LogStore.Execution.Stdout.Enabled` to true.
+
+### Default ZITADEL Logging Config
+
+```yaml
+Log:
+  Level: info # ZITADEL_LOG_LEVEL
+  Formatter:
+    Format: text # ZITADEL_LOG_FORMATTER_FORMAT
+    
+LogStore:
+  Access:
+    Stdout:
+      # If enabled, all access logs are printed to the binary's standard output
+      Enabled: false # ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED
+  Execution:
+    Stdout:
+      # If enabled, all execution logs are printed to the binary's standard output
+      Enabled: true # ZITADEL_LOGSTORE_EXECUTION_STDOUT_ENABLED
+
+```
+
+### Why ZITADEL does not write logs to files
 
 Log file management should not be in each business apps responsibility.
 Instead, your execution environment should provide tooling for managing logs in a generic way.
@@ -87,17 +109,17 @@ but in the Projections.Customizations.Telemetry section
 
 ## Database
 
-### Prefer CockroachDB
+### Prefer PostgreSQL
 
-ZITADEL supports [CockroachDB](https://www.cockroachlabs.com/) and [PostgreSQL](https://www.postgresql.org/).
-We recommend using CockroachDB,
-as horizontal scaling is much easier than with PostgreSQL.
-Also, if you are concerned about multi-regional data locality,
-[the way to go is with CockroachDB](https://www.cockroachlabs.com/docs/stable/multiregion-overview.html).
+ZITADEL supports [PostgreSQL](https://www.postgresql.org/).
+
+:::info
+ZITADEL v2 supports [CockroachDB](https://www.cockroachlabs.com/) and [PostgreSQL](https://www.postgresql.org/). Please refer to [the mirror guide](cli/mirror) to migrate to postgres.
+:::
 
 The indexes for the database are optimized using load tests from [ZITADEL Cloud](https://zitadel.com), 
-which runs with CockroachDB.
-If you identify problems with your Postgresql during load tests that indicate that the indexes are not optimized,
+which runs with PostgreSQL.
+If you identify problems with your database during load tests that indicate that the indexes are not optimized,
 please create an issue in our [github repository](https://github.com/zitadel/zitadel).
 
 ### Configure ZITADEL
@@ -106,17 +128,19 @@ Depending on your environment, you maybe would want to tweak some settings about
 
 ```yaml
 Database:
-  cockroach:
+  postgres:
     Host: localhost
-    Port: 26257
+    Port: 5432
     Database: zitadel
     //highlight-start
-    MaxOpenConns: 20
+    MaxOpenConns: 10
+    MaxIdleConns: 5
     MaxConnLifetime: 30m
-    MaxConnIdleTime: 30m
+    MaxConnIdleTime: 5m
     //highlight-end
     Options: ""
 ```
+
 
 You also might want to configure how [projections](/concepts/eventstore/implementation#projections) are computed. These are the default values:
 
@@ -170,9 +194,7 @@ The ZITADEL binary itself is stateless,
 so there is no need for a special backup job.
 
 Generally, for maintaining your database management system in production,
-please refer to the corresponding docs
-[for CockroachDB](https://www.cockroachlabs.com/docs/stable/recommended-production-settings.html)
-or [for PostgreSQL](https://www.postgresql.org/docs/current/admin.html).
+please refer to the corresponding docs [for PostgreSQL](https://www.postgresql.org/docs/current/admin.html).
 
 
 ## Data initialization
@@ -218,8 +240,7 @@ you might want to [limit usage and/or execute tasks on certain usage units and l
 
 ### General resource usage
 
-ZITADEL consumes around 512MB RAM and can run with less than 1 CPU core.
-The database consumes around 2 CPU under normal conditions and 6GB RAM with some caching to it.
+ZITADEL itself requires approximately 512MB of RAM and can operate with less than one CPU core. The database component, under typical conditions, utilizes about one CPU core per 100 requests per second (req/s) and 4GB of RAM per core, which includes some caching.
 
 :::info Password hashing
 Be aware of CPU spikes when hashing passwords. We recommend to have 4 CPU cores available for this purpose.
@@ -227,5 +248,6 @@ Be aware of CPU spikes when hashing passwords. We recommend to have 4 CPU cores 
 
 ### Production HA cluster
 
-It is recommended to build a minimal high-availability with 3 Nodes with 4 CPU and 16GB memory each.
-Excluding non-essential services, such as log collection, metrics etc, the resources could be reduced to around 4 CPU and  8GB memory each.
+For a minimal high-availability setup, we recommend a cluster of 3 nodes, each with 4 CPU cores and 16GB of memory. 
+
+If you exclude non-essential services like log collection and metrics, you can reduce the resources to approximately 4 CPU cores and 8GB of memory per node.

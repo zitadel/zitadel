@@ -1,0 +1,116 @@
+{
+  "schemas": ["urn:ietf:params:scim:schemas:core:2.0:User"],
+  "externalId": "701984-updated",
+  "userName": "bjensen-replaced-full@example.com",
+  "name": {
+    "formatted": "Ms. Barbara J Jensen, III-updated",
+    "familyName": "Jensen-updated",
+    "givenName": "Barbara-updated",
+    "middleName": "Jane-updated",
+    "honorificPrefix": "Ms.-updated",
+    "honorificSuffix": "III"
+  },
+  "displayName": "Babs Jensen-updated",
+  "nickName": "Babs-updated",
+  "profileUrl": "http://login.example.com/bjensen-updated",
+  "emails": [
+    {
+      "value": "bjensen-replaced-full@example.com",
+      "type": "work-updated",
+      "primary": true
+    },
+    {
+      "value": "babs-replaced-full@jensen.org",
+      "type": "home-updated"
+    }
+  ],
+  "addresses": [
+    {
+      "type": "work-updated",
+      "streetAddress": "100 Universal City Plaza-updated",
+      "locality": "Hollywood-updated",
+      "region": "CA-updated",
+      "postalCode": "91608-updated",
+      "country": "USA-updated",
+      "formatted": "100 Universal City Plaza\nHollywood, CA 91608 USA-updated",
+      "primary": true
+    },
+    {
+      "type": "home-updated",
+      "streetAddress": "456 Hollywood Blvd-updated",
+      "locality": "Hollywood-updated",
+      "region": "CA-updated",
+      "postalCode": "91608-updated",
+      "country": "USA-updated",
+      "formatted": "456 Hollywood Blvd\nHollywood, CA 91608 USA-updated"
+    }
+  ],
+  "phoneNumbers": [
+    {
+      "value": "555-555-5555-updated",
+      "type": "work-updated",
+      "primary": true
+    },
+    {
+      "value": "555-555-4444-updated",
+      "type": "mobile-updated"
+    }
+  ],
+  "ims": [
+    {
+      "value": "someaimhandle-updated",
+      "type": "aim-updated"
+    },
+    {
+      "value": "twitterhandle-updated",
+      "type": "X-updated"
+    }
+  ],
+  "photos": [
+    {
+      "value":
+      "https://photos.example.com/profilephoto/72930000000Ccne/F-updated",
+      "type": "photo-updated"
+    },
+    {
+      "value":
+      "https://photos.example.com/profilephoto/72930000000Ccne/T-updated",
+      "type": "thumbnail-updated"
+    }
+  ],
+  "roles": [
+    {
+      "value": "my-role-1-updated",
+      "display": "Rolle 1-updated",
+      "type": "main-role-updated",
+      "primary": true
+    },
+    {
+      "value": "my-role-2-updated",
+      "display": "Rolle 2-updated",
+      "type": "secondary-role-updated",
+      "primary": false
+    }
+  ],
+  "entitlements": [
+    {
+      "value": "my-entitlement-1-updated",
+      "display": "Entitlement 1-updated",
+      "type": "main-entitlement-updated",
+      "primary": true
+    },
+    {
+      "value": "my-entitlement-2-updated",
+      "display": "Entitlement 2-updated",
+      "type": "secondary-entitlement-updated",
+      "primary": false
+    }
+  ],
+  "userType": "Employee-updated",
+  "title": "Tour Guide-updated",
+  "preferredLanguage": "en-CH",
+  "locale": "en-CH",
+  "timezone": "Europe/Zurich",
+  "active": false,
+  "password": "Password1!-updated"
+}

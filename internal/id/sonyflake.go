@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"hash/fnv"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"os"
@@ -73,7 +73,7 @@ func privateIPv4() (net.IP, error) {
 		}
 	}
 
-	//change: use "POD_IP"
+	// change: use "POD_IP"
 	ip := net.ParseIP(os.Getenv("POD_IP"))
 	if ip == nil {
 		return nil, errors.New("no private ip address")
@@ -87,6 +87,22 @@ func privateIPv4() (net.IP, error) {
 func isPrivateIPv4(ip net.IP) bool {
 	return ip != nil &&
 		(ip[0] == 10 || ip[0] == 172 && (ip[1] >= 16 && ip[1] < 32) || ip[0] == 192 && ip[1] == 168)
+}
+
+func MachineIdentificationMethod() string {
+	if GeneratorConfig.Identification.PrivateIp.Enabled {
+		return "Private Ip"
+	}
+
+	if GeneratorConfig.Identification.Hostname.Enabled {
+		return "Hostname"
+	}
+
+	if GeneratorConfig.Identification.Webhook.Enabled {
+		return "Webhook"
+	}
+
+	return "No machine identification method has been enabled"
 }
 
 func machineID() (uint16, error) {
@@ -124,7 +140,7 @@ func machineID() (uint16, error) {
 	}
 
 	logging.WithFields("errors", strings.Join(errors, ", ")).Panic("none of the enabled methods for identifying the machine succeeded")
-	//this return will never happen because of panic one line before
+	// this return will never happen because of panic one line before
 	return 0, nil
 }
 
@@ -184,7 +200,7 @@ func metadataWebhookID() (uint16, error) {
 	if resp.StatusCode >= 400 && resp.StatusCode < 600 {
 		return 0, fmt.Errorf("metadata endpoint returned an unsuccessful status code %d", resp.StatusCode)
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return 0, err
 	}

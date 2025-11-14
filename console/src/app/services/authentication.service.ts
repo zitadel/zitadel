@@ -10,8 +10,8 @@ import { ToastService } from './toast.service';
 })
 export class AuthenticationService {
   private authConfig!: AuthConfig;
-  private _authenticated: boolean = false;
-  private readonly _authenticationChanged: BehaviorSubject<boolean> = new BehaviorSubject(this.authenticated);
+  private _authenticated = false;
+  private readonly _authenticationChanged = new BehaviorSubject(this.authenticated);
 
   constructor(
     private oauthService: OAuthService,
@@ -45,9 +45,11 @@ export class AuthenticationService {
     }
     this.oauthService.configure(this.authConfig);
     this.oauthService.strictDiscoveryDocumentValidation = false;
-    await this.oauthService.loadDiscoveryDocumentAndTryLogin().catch((error) => {
+    try {
+      await this.oauthService.loadDiscoveryDocumentAndTryLogin();
+    } catch (error) {
       this.toast.showError(error, false, false);
-    });
+    }
 
     this._authenticated = this.oauthService.hasValidAccessToken();
     if (!this.oauthService.hasValidIdToken() || !this.authenticated || partialConfig || force) {

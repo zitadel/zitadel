@@ -90,6 +90,8 @@ type OTPCodeWriteModel interface {
 	Code() *crypto.CryptoValue
 	CheckFailedCount() uint64
 	UserLocked() bool
+	GeneratorID() string
+	ProviderVerificationID() string
 	eventstore.QueryReducer
 }
 
@@ -192,6 +194,20 @@ func (wm *HumanOTPSMSCodeWriteModel) UserLocked() bool {
 	return wm.userLocked
 }
 
+func (wm *HumanOTPSMSCodeWriteModel) GeneratorID() string {
+	if wm.otpCode == nil {
+		return ""
+	}
+	return wm.otpCode.GeneratorID
+}
+
+func (wm *HumanOTPSMSCodeWriteModel) ProviderVerificationID() string {
+	if wm.otpCode == nil {
+		return ""
+	}
+	return wm.otpCode.VerificationID
+}
+
 func NewHumanOTPSMSCodeWriteModel(userID, resourceOwner string) *HumanOTPSMSCodeWriteModel {
 	return &HumanOTPSMSCodeWriteModel{
 		HumanOTPSMSWriteModel: NewHumanOTPSMSWriteModel(userID, resourceOwner),
@@ -206,7 +222,11 @@ func (wm *HumanOTPSMSCodeWriteModel) Reduce() error {
 				Code:         e.Code,
 				CreationDate: e.CreationDate(),
 				Expiry:       e.Expiry,
+				GeneratorID:  e.GeneratorID,
 			}
+		case *user.HumanOTPSMSCodeSentEvent:
+			wm.otpCode.GeneratorID = e.GeneratorInfo.GetID()
+			wm.otpCode.VerificationID = e.GeneratorInfo.GetVerificationID()
 		case *user.HumanOTPSMSCheckSucceededEvent:
 			wm.checkFailedCount = 0
 		case *user.HumanOTPSMSCheckFailedEvent:
@@ -228,6 +248,7 @@ func (wm *HumanOTPSMSCodeWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			user.HumanOTPSMSCodeAddedType,
+			user.HumanOTPSMSCodeSentType,
 			user.HumanOTPSMSCheckSucceededType,
 			user.HumanOTPSMSCheckFailedType,
 			user.UserLockedType,
@@ -342,6 +363,20 @@ func (wm *HumanOTPEmailCodeWriteModel) CheckFailedCount() uint64 {
 
 func (wm *HumanOTPEmailCodeWriteModel) UserLocked() bool {
 	return wm.userLocked
+}
+
+func (wm *HumanOTPEmailCodeWriteModel) GeneratorID() string {
+	if wm.otpCode == nil {
+		return ""
+	}
+	return wm.otpCode.GeneratorID
+}
+
+func (wm *HumanOTPEmailCodeWriteModel) ProviderVerificationID() string {
+	if wm.otpCode == nil {
+		return ""
+	}
+	return wm.otpCode.VerificationID
 }
 
 func NewHumanOTPEmailCodeWriteModel(userID, resourceOwner string) *HumanOTPEmailCodeWriteModel {

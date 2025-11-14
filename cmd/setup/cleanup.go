@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
@@ -22,23 +21,19 @@ func NewCleanup() *cobra.Command {
 		Long:  `cleans up migration if they got stuck`,
 		Run: func(cmd *cobra.Command, args []string) {
 			config := MustNewConfig(viper.GetViper())
-			Cleanup(config)
+			Cleanup(cmd.Context(), config)
 		},
 	}
 }
 
-func Cleanup(config *Config) {
-	ctx := context.Background()
-
+func Cleanup(ctx context.Context, config *Config) {
 	logging.Info("cleanup started")
 
-	queryDBClient, err := database.Connect(config.Database, false, dialect.DBPurposeQuery)
-	logging.OnError(err).Fatal("unable to connect to database")
-	esPusherDBClient, err := database.Connect(config.Database, false, dialect.DBPurposeEventPusher)
+	dbClient, err := database.Connect(config.Database, false)
 	logging.OnError(err).Fatal("unable to connect to database")
 
-	config.Eventstore.Pusher = new_es.NewEventstore(esPusherDBClient)
-	config.Eventstore.Querier = old_es.NewCRDB(queryDBClient)
+	config.Eventstore.Pusher = new_es.NewEventstore(dbClient)
+	config.Eventstore.Querier = old_es.NewPostgres(dbClient)
 	es := eventstore.NewEventstore(config.Eventstore)
 
 	step, err := migration.LastStuckStep(ctx, es)

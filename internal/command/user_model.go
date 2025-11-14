@@ -1,6 +1,8 @@
 package command
 
 import (
+	"context"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -95,6 +97,7 @@ func (wm *UserWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			user.HumanAddedType,
 			user.HumanRegisteredType,
+			user.HumanInitialCodeAddedType,
 			user.HumanInitializedCheckSucceededType,
 			user.UserIDPLinkAddedType,
 			user.UserIDPLinkRemovedType,
@@ -122,12 +125,20 @@ func UserAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregat
 	return eventstore.AggregateFromWriteModel(wm, user.AggregateType, user.AggregateVersion)
 }
 
+func UserAggregateFromWriteModelCtx(ctx context.Context, wm *eventstore.WriteModel) *eventstore.Aggregate {
+	return eventstore.AggregateFromWriteModelCtx(ctx, wm, user.AggregateType, user.AggregateVersion)
+}
+
 func isUserStateExists(state domain.UserState) bool {
 	return !hasUserState(state, domain.UserStateDeleted, domain.UserStateUnspecified)
 }
 
 func isUserStateInactive(state domain.UserState) bool {
 	return hasUserState(state, domain.UserStateInactive)
+}
+
+func isUserStateActive(state domain.UserState) bool {
+	return hasUserState(state, domain.UserStateActive)
 }
 
 func isUserStateInitial(state domain.UserState) bool {

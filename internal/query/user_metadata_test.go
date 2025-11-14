@@ -18,8 +18,7 @@ var (
 		` projections.user_metadata5.sequence,` +
 		` projections.user_metadata5.key,` +
 		` projections.user_metadata5.value` +
-		` FROM projections.user_metadata5` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.user_metadata5`
 	userMetadataCols = []string{
 		"creation_date",
 		"change_date",
@@ -30,6 +29,7 @@ var (
 	}
 	userMetadataListQuery = `SELECT projections.user_metadata5.creation_date,` +
 		` projections.user_metadata5.change_date,` +
+		` projections.user_metadata5.user_id,` +
 		` projections.user_metadata5.resource_owner,` +
 		` projections.user_metadata5.sequence,` +
 		` projections.user_metadata5.key,` +
@@ -39,6 +39,7 @@ var (
 	userMetadataListCols = []string{
 		"creation_date",
 		"change_date",
+		"user_id",
 		"resource_owner",
 		"sequence",
 		"key",
@@ -148,6 +149,7 @@ func Test_UserMetadataPrepares(t *testing.T) {
 						{
 							testNow,
 							testNow,
+							"1",
 							"resource_owner",
 							uint64(20211108),
 							"key",
@@ -164,6 +166,7 @@ func Test_UserMetadataPrepares(t *testing.T) {
 					{
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
+						UserID:        "1",
 						ResourceOwner: "resource_owner",
 						Sequence:      20211108,
 						Key:           "key",
@@ -183,6 +186,7 @@ func Test_UserMetadataPrepares(t *testing.T) {
 						{
 							testNow,
 							testNow,
+							"1",
 							"resource_owner",
 							uint64(20211108),
 							"key",
@@ -191,6 +195,7 @@ func Test_UserMetadataPrepares(t *testing.T) {
 						{
 							testNow,
 							testNow,
+							"2",
 							"resource_owner",
 							uint64(20211108),
 							"key2",
@@ -207,6 +212,7 @@ func Test_UserMetadataPrepares(t *testing.T) {
 					{
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
+						UserID:        "1",
 						ResourceOwner: "resource_owner",
 						Sequence:      20211108,
 						Key:           "key",
@@ -215,6 +221,7 @@ func Test_UserMetadataPrepares(t *testing.T) {
 					{
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
+						UserID:        "2",
 						ResourceOwner: "resource_owner",
 						Sequence:      20211108,
 						Key:           "key2",
@@ -243,7 +250,7 @@ func Test_UserMetadataPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

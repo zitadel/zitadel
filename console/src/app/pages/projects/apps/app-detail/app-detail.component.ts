@@ -1,6 +1,6 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
-import { Component, OnDestroy, OnInit, ViewEncapsulation, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { AbstractControl, FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
@@ -21,6 +21,9 @@ import {
   APIConfig,
   App,
   AppState,
+  LoginV1,
+  LoginV2,
+  LoginVersion,
   OIDCAppType,
   OIDCAuthMethodType,
   OIDCConfig,
@@ -50,8 +53,8 @@ import {
   getAuthMethodFromPartialConfig,
   getPartialConfigFromAuthMethod,
   IMPLICIT_METHOD,
-  PKCE_METHOD,
   PK_JWT_METHOD,
+  PKCE_METHOD,
   POST_METHOD,
 } from '../authmethods';
 import { AuthMethodDialogComponent } from './auth-method-dialog/auth-method-dialog.component';
@@ -62,6 +65,7 @@ const MAX_ALLOWED_SIZE = 1 * 1024 * 1024;
   selector: 'cnsl-app-detail',
   templateUrl: './app-detail.component.html',
   styleUrls: ['./app-detail.component.scss'],
+  standalone: false,
 })
 export class AppDetailComponent implements OnInit, OnDestroy {
   public editState: boolean = false;
@@ -70,7 +74,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public canWrite: boolean = false;
   public errorMessage: string = '';
   public removable: boolean = true;
-  public addOnBlur: boolean = true;
 
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
@@ -165,23 +168,23 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public isZitadel: boolean = false;
   public docs!: GetOIDCInformationResponse.AsObject;
 
-  public OIDCAppType: any = OIDCAppType;
-  public OIDCAuthMethodType: any = OIDCAuthMethodType;
-  public APIAuthMethodType: any = APIAuthMethodType;
-  public OIDCTokenType: any = OIDCTokenType;
-  public OIDCGrantType: any = OIDCGrantType;
+  public OIDCAppType = OIDCAppType;
+  public OIDCAuthMethodType = OIDCAuthMethodType;
+  public APIAuthMethodType = APIAuthMethodType;
+  public OIDCTokenType = OIDCTokenType;
+  public OIDCGrantType = OIDCGrantType;
 
-  public ChangeType: any = ChangeType;
+  public ChangeType = ChangeType;
 
   public requestRedirectValuesSubject$: Subject<void> = new Subject();
-  public copiedKey: any = '';
-  public InfoSectionType: any = InfoSectionType;
+  public InfoSectionType = InfoSectionType;
   public copied: string = '';
 
   public settingsList: SidenavSetting[] = [{ id: 'configuration', i18nKey: 'APP.CONFIGURATION' }];
-  public currentSetting: string | undefined = this.settingsList[0].id;
+  public currentSetting = this.settingsList[0];
 
   public isNew = signal<boolean>(false);
+
   constructor(
     private envSvc: EnvironmentService,
     public translate: TranslateService,
@@ -203,6 +206,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       grantTypesList: [{ value: [], disabled: true }],
       appType: [{ value: '', disabled: true }],
       authMethodType: [{ value: '', disabled: true }],
+      loginV2: [{ value: false, disabled: true }],
+      loginV2BaseURL: [{ value: '', disabled: true }],
     });
 
     this.oidcTokenForm = this.fb.group({
@@ -222,6 +227,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       entityId: ['', []],
       acsURL: ['', []],
       metadataXml: [{ value: '', disabled: true }],
+      loginV2: [{ value: false, disabled: true }],
+      loginV2BaseURL: [{ value: '', disabled: true }],
     });
 
     this.samlForm.valueChanges.subscribe(() => {
@@ -297,7 +304,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     if (projectId && appId) {
       this.projectId = projectId;
       this.appId = appId;
-      this.getData(projectId, appId);
+      this.getData(projectId, appId).then();
     }
   }
 
@@ -387,7 +394,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
                 if (this.initialAuthMethod === 'BASIC') {
                   this.settingsList = [{ id: 'urls', i18nKey: 'APP.URLS' }];
-                  this.currentSetting = 'urls';
+                  this.currentSetting = this.settingsList[0];
                 } else {
                   this.settingsList = [
                     { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
@@ -407,10 +414,17 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                   { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
                   { id: 'urls', i18nKey: 'APP.URLS' },
                 ];
+                if (this.app.samlConfig?.loginVersion?.loginV1) {
+                  this.samlForm.controls['loginV2'].setValue(false);
+                } else if (this.app.samlConfig?.loginVersion?.loginV2) {
+                  this.samlForm.controls['loginV2'].setValue(true);
+                  this.samlForm.controls['loginV2BaseURL'].setValue(this.app.samlConfig.loginVersion.loginV2.baseUri);
+                }
               }
 
               if (allowed) {
                 this.oidcForm.enable();
+                this.oidcForm.controls['clientId'].disable();
                 this.oidcTokenForm.enable();
                 this.apiForm.enable();
                 this.samlForm.enable();
@@ -429,6 +443,12 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               if (this.app.oidcConfig?.clockSkew) {
                 const inSecs = this.app.oidcConfig?.clockSkew.seconds + this.app.oidcConfig?.clockSkew.nanos / 100000;
                 this.oidcTokenForm.controls['clockSkewSeconds'].setValue(inSecs);
+              }
+              if (this.app.oidcConfig?.loginVersion?.loginV1) {
+                this.oidcForm.controls['loginV2'].setValue(false);
+              } else if (this.app.oidcConfig?.loginVersion?.loginV2) {
+                this.oidcForm.controls['loginV2'].setValue(true);
+                this.oidcForm.controls['loginV2BaseURL'].setValue(this.app.oidcConfig.loginVersion.loginV2.baseUri);
               }
               if (this.app.oidcConfig) {
                 this.oidcForm.patchValue(this.app.oidcConfig);
@@ -655,6 +675,15 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         req.setAuthMethodType(this.app.oidcConfig.authMethodType);
         req.setGrantTypesList(this.app.oidcConfig.grantTypesList);
         req.setAppType(this.app.oidcConfig.appType);
+        const login = new LoginVersion();
+        if (this.oidcLoginV2?.value) {
+          const loginV2 = new LoginV2();
+          loginV2.setBaseUri(this.oidcLoginV2BaseURL?.value);
+          login.setLoginV2(loginV2);
+        } else {
+          login.setLoginV1(new LoginV1());
+        }
+        req.setLoginVersion(login);
 
         // token
         req.setAccessTokenType(this.app.oidcConfig.accessTokenType);
@@ -713,13 +742,13 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
             if (this.currentAuthMethod === 'BASIC') {
               this.settingsList = [{ id: 'urls', i18nKey: 'APP.URLS' }];
-              this.currentSetting = 'urls';
+              this.currentSetting = this.settingsList[0];
             } else {
               this.settingsList = [
                 { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
                 { id: 'urls', i18nKey: 'APP.URLS' },
               ];
-              this.currentSetting = 'configuration';
+              this.currentSetting = this.settingsList[0];
             }
           }
           this.toast.showInfo('APP.TOAST.APIUPDATED', true);
@@ -736,12 +765,22 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       req.setProjectId(this.projectId);
       req.setAppId(this.app.id);
 
-      if (this.app.samlConfig?.metadataUrl.length > 0) {
+      if (this.app.samlConfig?.metadataUrl?.length > 0) {
         req.setMetadataUrl(this.app.samlConfig?.metadataUrl);
       }
-      if (this.app.samlConfig?.metadataXml.length > 0) {
+      if (this.app.samlConfig?.metadataXml?.length > 0) {
         req.setMetadataXml(this.app.samlConfig?.metadataXml);
       }
+
+      const login = new LoginVersion();
+      if (this.samlLoginV2?.value) {
+        const loginV2 = new LoginV2();
+        loginV2.setBaseUri(this.samlLoginV2BaseURL?.value);
+        login.setLoginV2(loginV2);
+      } else {
+        login.setLoginV1(new LoginV1());
+      }
+      req.setLoginVersion(login);
 
       this.mgmtService
         .updateSAMLAppConfig(req)
@@ -839,6 +878,14 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     return this.oidcForm.get('authMethodType');
   }
 
+  public get oidcLoginV2(): FormControl<boolean> | null {
+    return this.oidcForm.get('loginV2') as FormControl<boolean>;
+  }
+
+  public get oidcLoginV2BaseURL(): AbstractControl | null {
+    return this.oidcForm.get('loginV2BaseURL');
+  }
+
   public get apiAuthMethodType(): AbstractControl | null {
     return this.apiForm.get('authMethodType') as UntypedFormControl;
   }
@@ -881,6 +928,14 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public get acsURL(): AbstractControl | null {
     return this.samlForm.get('acsURL');
+  }
+
+  public get samlLoginV2(): FormControl<boolean> | null {
+    return this.samlForm.get('loginV2') as FormControl<boolean>;
+  }
+
+  public get samlLoginV2BaseURL(): AbstractControl | null {
+    return this.samlForm.get('loginV2BaseURL');
   }
 
   get decodedBase64(): string {

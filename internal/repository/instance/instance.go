@@ -106,6 +106,14 @@ func (e *InstanceRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstrain
 	return constraints
 }
 
+func (e *InstanceRemovedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.RemoveSearchFields(map[eventstore.FieldType]any{
+			eventstore.FieldTypeInstanceID: e.Aggregate().ID,
+		}),
+	}
+}
+
 func NewInstanceRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string, domains []string) *InstanceRemovedEvent {
 	return &InstanceRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(

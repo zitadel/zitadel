@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strings"
+	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -15,9 +15,10 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -141,11 +142,15 @@ func (q *InstanceSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 	return query
 }
 
+func (q *Queries) ActiveInstances() []string {
+	return q.caches.activeInstances.Keys()
+}
+
 func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQueries) (instances *Instances, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	filter, query, scan := prepareInstancesQuery(ctx, q.client)
+	filter, query, scan := prepareInstancesQuery(queries.SortingColumn, queries.Asc)
 	stmt, args, err := query(queries.toQuery(filter)).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-M9fow", "Errors.Query.SQLStatement")
@@ -172,7 +177,7 @@ func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (instanc
 		traceSpan.EndWithError(err)
 	}
 
-	stmt, scan := prepareInstanceDomainQuery(ctx, q.client)
+	stmt, scan := prepareInstanceDomainQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		InstanceColumnID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
@@ -195,30 +200,53 @@ var (
 	instanceByIDQuery string
 )
 
-func (q *Queries) InstanceByHost(ctx context.Context, host string) (_ authz.Instance, err error) {
+func (q *Queries) InstanceByHost(ctx context.Context, instanceDomain, publicDomain string) (_ authz.Instance, err error) {
+	var instance *authzInstance
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("unable to get instance by host %s: %w", host, err)
+			err = fmt.Errorf("unable to get instance by domain: instanceDomain %s, publicHostname %s: %w", instanceDomain, publicDomain, err)
+		} else {
+			q.caches.activeInstances.Add(instance.ID, true)
 		}
 		span.EndWithError(err)
 	}()
 
-	domain := strings.Split(host, ":")[0] // remove possible port
-	instance, scan := scanAuthzInstance(host, domain)
-	err = q.client.QueryRowContext(ctx, scan, instanceByDomainQuery, domain)
-	logging.OnError(err).WithField("host", host).WithField("domain", domain).Warn("instance by host")
-	return instance, err
+	instance, ok := q.caches.instance.Get(ctx, instanceIndexByHost, instanceDomain)
+	if ok {
+		return instance, instance.checkDomain(instanceDomain, publicDomain)
+	}
+	instance, scan := scanAuthzInstance()
+	if err = q.client.QueryRowContext(ctx, scan, instanceByDomainQuery, instanceDomain); err != nil {
+		return nil, err
+	}
+	q.caches.instance.Set(ctx, instance)
+
+	return instance, instance.checkDomain(instanceDomain, publicDomain)
 }
 
-func (q *Queries) InstanceByID(ctx context.Context) (_ authz.Instance, err error) {
+func (q *Queries) InstanceByID(ctx context.Context, id string) (_ authz.Instance, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+	defer func() {
+		if err != nil {
+			return
+		}
+		q.caches.activeInstances.Add(id, true)
+	}()
 
-	instanceID := authz.GetInstance(ctx).InstanceID()
-	instance, scan := scanAuthzInstance("", "")
-	err = q.client.QueryRowContext(ctx, scan, instanceByIDQuery, instanceID)
-	logging.OnError(err).WithField("instance_id", instanceID).Warn("instance by ID")
+	instance, ok := q.caches.instance.Get(ctx, instanceIndexByID, id)
+	if ok {
+		return instance, nil
+	}
+
+	instance, scan := scanAuthzInstance()
+	err = q.client.QueryRowContext(ctx, scan, instanceByIDQuery, id)
+	logging.OnError(err).WithField("instance_id", id).Warn("instance by ID")
+
+	if err == nil {
+		q.caches.instance.Set(ctx, instance)
+	}
 	return instance, err
 }
 
@@ -230,17 +258,20 @@ func (q *Queries) GetDefaultLanguage(ctx context.Context) language.Tag {
 	return instance.DefaultLang
 }
 
-func prepareInstancesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(sq.SelectBuilder) sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+func prepareInstancesQuery(sortBy Column, isAscedingSort bool) (sq.SelectBuilder, func(sq.SelectBuilder) sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
 	instanceFilterTable := instanceTable.setAlias(InstancesFilterTableAlias)
 	instanceFilterIDColumn := InstanceColumnID.setTable(instanceFilterTable)
 	instanceFilterCountColumn := InstancesFilterTableAlias + ".count"
-	return sq.Select(
-			InstanceColumnID.identifier(),
-			countColumn.identifier(),
-		).Distinct().From(instanceTable.identifier()).
+
+	selector := sq.Select(InstanceColumnID.identifier(), countColumn.identifier())
+	if !sortBy.isZero() {
+		selector = sq.Select(InstanceColumnID.identifier(), countColumn.identifier(), sortBy.identifier())
+	}
+
+	return selector.Distinct().From(instanceTable.identifier()).
 			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)),
 		func(builder sq.SelectBuilder) sq.SelectBuilder {
-			return sq.Select(
+			outerQuery := sq.Select(
 				instanceFilterCountColumn,
 				instanceFilterIDColumn.identifier(),
 				InstanceColumnCreationDate.identifier(),
@@ -260,8 +291,18 @@ func prepareInstancesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 				InstanceDomainSequenceCol.identifier(),
 			).FromSelect(builder, InstancesFilterTableAlias).
 				LeftJoin(join(InstanceColumnID, instanceFilterIDColumn)).
-				LeftJoin(join(InstanceDomainInstanceIDCol, instanceFilterIDColumn) + db.Timetravel(call.Took(ctx))).
+				LeftJoin(join(InstanceDomainInstanceIDCol, instanceFilterIDColumn)).
 				PlaceholderFormat(sq.Dollar)
+
+			if !sortBy.isZero() {
+				sorting := sortBy.identifier()
+				if !isAscedingSort {
+					sorting += " DESC"
+				}
+				return outerQuery.OrderBy(sorting)
+			}
+
+			return outerQuery
 		},
 		func(rows *sql.Rows) (*Instances, error) {
 			instances := make([]*Instance, 0)
@@ -335,7 +376,7 @@ func prepareInstancesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 		}
 }
 
-func prepareInstanceDomainQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Instance, error)) {
+func prepareInstanceDomainQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance, error)) {
 	return sq.Select(
 			InstanceColumnID.identifier(),
 			InstanceColumnCreationDate.identifier(),
@@ -355,7 +396,7 @@ func prepareInstanceDomainQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 			InstanceDomainSequenceCol.identifier(),
 		).
 			From(instanceTable.identifier()).
-			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Instance, error) {
 			instance := &Instance{
@@ -417,86 +458,105 @@ func prepareInstanceDomainQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 }
 
 type authzInstance struct {
-	id                  string
-	iamProjectID        string
-	consoleID           string
-	consoleAppID        string
-	host                string
-	domain              string
-	defaultLang         language.Tag
-	defaultOrgID        string
-	csp                 csp
-	enableImpersonation bool
-	block               *bool
-	auditLogRetention   *time.Duration
-	features            feature.Features
+	ID               string                     `json:"id,omitempty"`
+	IAMProjectID     string                     `json:"iam_project_id,omitempty"`
+	ConsoleID        string                     `json:"console_id,omitempty"`
+	ConsoleAppID     string                     `json:"console_app_id,omitempty"`
+	DefaultLang      language.Tag               `json:"default_lang,omitempty"`
+	DefaultOrgID     string                     `json:"default_org_id,omitempty"`
+	CSP              csp                        `json:"csp,omitempty"`
+	Impersonation    bool                       `json:"impersonation,omitempty"`
+	IsBlocked        *bool                      `json:"is_blocked,omitempty"`
+	LogRetention     *time.Duration             `json:"log_retention,omitempty"`
+	Feature          feature.Features           `json:"feature,omitempty"`
+	ExternalDomains  database.TextArray[string] `json:"external_domains,omitempty"`
+	TrustedDomains   database.TextArray[string] `json:"trusted_domains,omitempty"`
+	ExecutionTargets target_domain.Router       `json:"execution_targets,omitzero"`
 }
 
 type csp struct {
-	enableIframeEmbedding bool
-	allowedOrigins        database.TextArray[string]
+	EnableIframeEmbedding bool                       `json:"enable_iframe_embedding,omitempty"`
+	AllowedOrigins        database.TextArray[string] `json:"allowed_origins,omitempty"`
 }
 
 func (i *authzInstance) InstanceID() string {
-	return i.id
+	return i.ID
 }
 
 func (i *authzInstance) ProjectID() string {
-	return i.iamProjectID
+	return i.IAMProjectID
 }
 
 func (i *authzInstance) ConsoleClientID() string {
-	return i.consoleID
+	return i.ConsoleID
 }
 
 func (i *authzInstance) ConsoleApplicationID() string {
-	return i.consoleAppID
-}
-
-func (i *authzInstance) RequestedDomain() string {
-	return strings.Split(i.host, ":")[0]
-}
-
-func (i *authzInstance) RequestedHost() string {
-	return i.host
+	return i.ConsoleAppID
 }
 
 func (i *authzInstance) DefaultLanguage() language.Tag {
-	return i.defaultLang
+	return i.DefaultLang
 }
 
 func (i *authzInstance) DefaultOrganisationID() string {
-	return i.defaultOrgID
+	return i.DefaultOrgID
 }
 
 func (i *authzInstance) SecurityPolicyAllowedOrigins() []string {
-	if !i.csp.enableIframeEmbedding {
+	if !i.CSP.EnableIframeEmbedding {
 		return nil
 	}
-	return i.csp.allowedOrigins
+	return i.CSP.AllowedOrigins
 }
 
 func (i *authzInstance) EnableImpersonation() bool {
-	return i.enableImpersonation
+	return i.Impersonation
 }
 
 func (i *authzInstance) Block() *bool {
-	return i.block
+	return i.IsBlocked
 }
 
 func (i *authzInstance) AuditLogRetention() *time.Duration {
-	return i.auditLogRetention
+	return i.LogRetention
 }
 
 func (i *authzInstance) Features() feature.Features {
-	return i.features
+	return i.Feature
 }
 
-func scanAuthzInstance(host, domain string) (*authzInstance, func(row *sql.Row) error) {
-	instance := &authzInstance{
-		host:   host,
-		domain: domain,
+func (i *authzInstance) ExecutionRouter() target_domain.Router {
+	return i.ExecutionTargets
+}
+
+var errPublicDomain = "public domain %q not trusted"
+
+func (i *authzInstance) checkDomain(instanceDomain, publicDomain string) error {
+	// in case public domain is empty, or the same as the instance domain, we do not need to check it
+	if publicDomain == "" || instanceDomain == publicDomain {
+		return nil
 	}
+	if !slices.Contains(i.TrustedDomains, publicDomain) {
+		return zerrors.ThrowNotFound(fmt.Errorf(errPublicDomain, publicDomain), "QUERY-IuGh1", "Errors.IAM.NotFound")
+	}
+	return nil
+}
+
+// Keys implements [cache.Entry]
+func (i *authzInstance) Keys(index instanceIndex) []string {
+	switch index {
+	case instanceIndexByID:
+		return []string{i.ID}
+	case instanceIndexByHost:
+		return i.ExternalDomains
+	case instanceIndexUnspecified:
+	}
+	return nil
+}
+
+func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
+	instance := &authzInstance{}
 	return instance, func(row *sql.Row) error {
 		var (
 			lang                  string
@@ -505,20 +565,24 @@ func scanAuthzInstance(host, domain string) (*authzInstance, func(row *sql.Row) 
 			auditLogRetention     database.NullDuration
 			block                 sql.NullBool
 			features              []byte
+			executionTargetsBytes []byte
 		)
 		err := row.Scan(
-			&instance.id,
-			&instance.defaultOrgID,
-			&instance.iamProjectID,
-			&instance.consoleID,
-			&instance.consoleAppID,
+			&instance.ID,
+			&instance.DefaultOrgID,
+			&instance.IAMProjectID,
+			&instance.ConsoleID,
+			&instance.ConsoleAppID,
 			&lang,
 			&enableIframeEmbedding,
-			&instance.csp.allowedOrigins,
+			&instance.CSP.AllowedOrigins,
 			&enableImpersonation,
 			&auditLogRetention,
 			&block,
 			&features,
+			&instance.ExternalDomains,
+			&instance.TrustedDomains,
+			&executionTargetsBytes,
 		)
 		if errors.Is(err, sql.ErrNoRows) {
 			return zerrors.ThrowNotFound(nil, "QUERY-1kIjX", "Errors.IAM.NotFound")
@@ -526,21 +590,60 @@ func scanAuthzInstance(host, domain string) (*authzInstance, func(row *sql.Row) 
 		if err != nil {
 			return zerrors.ThrowInternal(err, "QUERY-d3fas", "Errors.Internal")
 		}
-		instance.defaultLang = language.Make(lang)
+		instance.DefaultLang = language.Make(lang)
 		if auditLogRetention.Valid {
-			instance.auditLogRetention = &auditLogRetention.Duration
+			instance.LogRetention = &auditLogRetention.Duration
 		}
 		if block.Valid {
-			instance.block = &block.Bool
+			instance.IsBlocked = &block.Bool
 		}
-		instance.csp.enableIframeEmbedding = enableIframeEmbedding.Bool
-		instance.enableImpersonation = enableImpersonation.Bool
+		instance.CSP.EnableIframeEmbedding = enableIframeEmbedding.Bool
+		instance.Impersonation = enableImpersonation.Bool
 		if len(features) == 0 {
 			return nil
 		}
-		if err = json.Unmarshal(features, &instance.features); err != nil {
+		if err = json.Unmarshal(features, &instance.Feature); err != nil {
 			return zerrors.ThrowInternal(err, "QUERY-Po8ki", "Errors.Internal")
+		}
+		if len(executionTargetsBytes) > 0 {
+			var targets []target_domain.Target
+			if err := json.Unmarshal(executionTargetsBytes, &targets); err != nil {
+				return zerrors.ThrowInternal(err, "QUERY-aeKa2", "Errors.Internal")
+			}
+			instance.ExecutionTargets = target_domain.NewRouter(targets)
 		}
 		return nil
 	}
 }
+
+func (c *Caches) registerInstanceInvalidation() {
+	invalidate := cacheInvalidationFunc(c.instance, instanceIndexByID, getAggregateID)
+	projection.InstanceProjection.RegisterCacheInvalidation(invalidate)
+	projection.InstanceDomainProjection.RegisterCacheInvalidation(invalidate)
+	projection.InstanceFeatureProjection.RegisterCacheInvalidation(invalidate)
+	projection.InstanceTrustedDomainProjection.RegisterCacheInvalidation(invalidate)
+	projection.SecurityPolicyProjection.RegisterCacheInvalidation(invalidate)
+
+	// These projections have their own aggregate ID, invalidate using resource owner.
+	invalidate = cacheInvalidationFunc(c.instance, instanceIndexByID, getResourceOwner)
+	projection.LimitsProjection.RegisterCacheInvalidation(invalidate)
+	projection.RestrictionsProjection.RegisterCacheInvalidation(invalidate)
+	projection.ExecutionProjection.RegisterCacheInvalidation(invalidate)
+	projection.TargetProjection.RegisterCacheInvalidation(invalidate)
+
+	// System feature update should invalidate all instances, so Truncate the cache.
+	projection.SystemFeatureProjection.RegisterCacheInvalidation(func(ctx context.Context, _ []*eventstore.Aggregate) {
+		err := c.instance.Truncate(ctx)
+		logging.OnError(err).Warn("cache truncate failed")
+	})
+}
+
+type instanceIndex int
+
+//go:generate enumer -type instanceIndex -linecomment
+const (
+	// Empty line comment ensures empty string for unspecified value
+	instanceIndexUnspecified instanceIndex = iota //
+	instanceIndexByID
+	instanceIndexByHost
+)

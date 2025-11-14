@@ -3,11 +3,11 @@ package query
 import (
 	"context"
 	"database/sql"
+	"slices"
 
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -40,6 +40,15 @@ func (q *IDPUserLinksSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuild
 		query = q.toQuery(query)
 	}
 	return query
+}
+
+func (q *IDPUserLinksSearchQuery) hasUserID() bool {
+	for _, query := range q.Queries {
+		if query.Col() == IDPUserLinkUserIDCol {
+			return true
+		}
+	}
+	return false
 }
 
 var (
@@ -89,14 +98,56 @@ var (
 	}
 )
 
-func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQuery, withOwnerRemoved bool) (idps *IDPUserLinks, err error) {
+func idpLinksCheckPermission(ctx context.Context, links *IDPUserLinks, permissionCheck domain.PermissionCheck) {
+	links.Links = slices.DeleteFunc(links.Links,
+		func(link *IDPUserLink) bool {
+			return userCheckPermission(ctx, link.ResourceOwner, link.UserID, permissionCheck) != nil
+		},
+	)
+}
+
+func idpLinksPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *IDPUserLinksSearchQuery) sq.SelectBuilder {
+	if !enabled {
+		return query
+	}
+	join, args := PermissionClause(
+		ctx,
+		IDPUserLinkResourceOwnerCol,
+		domain.PermissionUserRead,
+		SingleOrgPermissionOption(queries.Queries),
+		OwnedRowsPermissionOption(IDPUserLinkUserIDCol),
+	)
+	return query.JoinClause(join, args...)
+}
+
+func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQuery, permissionCheck domain.PermissionCheck) (idps *IDPUserLinks, err error) {
+	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	links, err := q.idpUserLinks(ctx, queries, permissionCheckV2)
+	if err != nil {
+		return nil, err
+	}
+	if permissionCheck != nil && len(links.Links) > 0 && !permissionCheckV2 {
+		// when userID for query is provided, only one check has to be done
+		if queries.hasUserID() {
+			if err := userCheckPermission(ctx, links.Links[0].ResourceOwner, links.Links[0].UserID, permissionCheck); err != nil {
+				return nil, err
+			}
+		} else {
+			idpLinksCheckPermission(ctx, links, permissionCheck)
+		}
+	}
+	return links, nil
+}
+
+func (q *Queries) idpUserLinks(ctx context.Context, queries *IDPUserLinksSearchQuery, permissionCheckV2 bool) (idps *IDPUserLinks, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareIDPUserLinksQuery(ctx, q.client)
-	eq := sq.Eq{IDPUserLinkInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
-	if !withOwnerRemoved {
-		eq[IDPUserLinkOwnerRemovedCol.identifier()] = false
+	query, scan := prepareIDPUserLinksQuery()
+	query = idpLinksPermissionCheckV2(ctx, query, permissionCheckV2, queries)
+	eq := sq.Eq{
+		IDPUserLinkInstanceIDCol.identifier():   authz.GetInstance(ctx).InstanceID(),
+		IDPUserLinkOwnerRemovedCol.identifier(): false,
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
@@ -127,10 +178,10 @@ func NewIDPUserLinksResourceOwnerSearchQuery(value string) (SearchQuery, error) 
 }
 
 func NewIDPUserLinksExternalIDSearchQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(IDPUserLinkExternalUserIDCol, value, TextEquals)
+	return NewTextQuery(IDPUserLinkExternalUserIDCol, value, TextEqualsIgnoreCase)
 }
 
-func prepareIDPUserLinksQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*IDPUserLinks, error)) {
+func prepareIDPUserLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPUserLinks, error)) {
 	return sq.Select(
 			IDPUserLinkIDPIDCol.identifier(),
 			IDPUserLinkUserIDCol.identifier(),
@@ -141,7 +192,7 @@ func prepareIDPUserLinksQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			IDPUserLinkResourceOwnerCol.identifier(),
 			countColumn.identifier()).
 			From(idpUserLinkTable.identifier()).
-			LeftJoin(join(IDPTemplateIDCol, IDPUserLinkIDPIDCol) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(IDPTemplateIDCol, IDPUserLinkIDPIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPUserLinks, error) {
 			idps := make([]*IDPUserLink, 0)

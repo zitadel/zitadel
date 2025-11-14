@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { RoleGuard } from 'src/app/guards/role.guard';
+import { roleGuard } from 'src/app/guards/role-guard';
 
 import { ProjectsComponent } from './projects.component';
 
@@ -13,7 +13,7 @@ const routes: Routes = [
   {
     path: 'create',
     loadChildren: () => import('./project-create/project-create.module'),
-    canActivate: [RoleGuard],
+    canActivate: [roleGuard],
     data: {
       animation: 'AddPage',
       roles: ['project.create'],
@@ -21,7 +21,7 @@ const routes: Routes = [
   },
   {
     path: 'app-create',
-    canActivate: [RoleGuard],
+    canActivate: [roleGuard],
     data: {
       animation: 'AddPage',
       roles: ['project.app.write'],

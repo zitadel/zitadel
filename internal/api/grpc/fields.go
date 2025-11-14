@@ -3,15 +3,15 @@ package grpc
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
-var CustomMappers = map[protoreflect.FullName]func(testing.TB, protoreflect.ProtoMessage) any{
-	"google.protobuf.Struct": func(t testing.TB, msg protoreflect.ProtoMessage) any {
+var CustomMappers = map[protoreflect.FullName]func(assert.TestingT, protoreflect.ProtoMessage) any{
+	"google.protobuf.Struct": func(t assert.TestingT, msg protoreflect.ProtoMessage) any {
 		e, ok := msg.(*structpb.Struct)
-		require.True(t, ok)
+		assert.True(t, ok)
 		return e.AsMap()
 	},
 }
@@ -47,11 +47,11 @@ func AllFieldsSet(t testing.TB, msg protoreflect.Message, ignoreTypes ...protore
 	}
 }
 
-func AllFieldsEqual(t testing.TB, expected, actual protoreflect.Message, customMappers map[protoreflect.FullName]func(testing.TB, protoreflect.ProtoMessage) any) {
+func AllFieldsEqual(t assert.TestingT, expected, actual protoreflect.Message, customMappers map[protoreflect.FullName]func(assert.TestingT, protoreflect.ProtoMessage) any) {
 	md := expected.Descriptor()
 	name := md.FullName()
 	if mapper := customMappers[name]; mapper != nil {
-		require.Equal(t, mapper(t, expected.Interface()), mapper(t, actual.Interface()))
+		assert.Equal(t, mapper(t, expected.Interface()), mapper(t, actual.Interface()))
 		return
 	}
 
@@ -63,7 +63,7 @@ func AllFieldsEqual(t testing.TB, expected, actual protoreflect.Message, customM
 		if fd.Kind() == protoreflect.MessageKind {
 			AllFieldsEqual(t, expected.Get(fd).Message(), actual.Get(fd).Message(), customMappers)
 		} else {
-			require.Equal(t, expected.Get(fd).Interface(), actual.Get(fd).Interface())
+			assert.Equal(t, expected.Get(fd).Interface(), actual.Get(fd).Interface())
 		}
 	}
 }

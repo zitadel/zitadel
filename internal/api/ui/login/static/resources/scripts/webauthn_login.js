@@ -1,31 +1,38 @@
 document.addEventListener(
   "DOMContentLoaded",
-  checkWebauthnSupported("btn-login", login)
+  checkWebauthnSupported(login, "btn-login"),
 );
 
-function login() {
+async function login() {
   document.getElementById("wa-error").classList.add("hidden");
 
-  let makeAssertionOptions = JSON.parse(
-    atob(document.getElementsByName("credentialAssertionData")[0].value)
-  );
-  makeAssertionOptions.publicKey.challenge = bufferDecode(
-    makeAssertionOptions.publicKey.challenge,
-    "publicKey.challenge"
-  );
-  makeAssertionOptions.publicKey.allowCredentials.forEach(function (listItem) {
-    listItem.id = bufferDecode(listItem.id, "publicKey.allowCredentials.id");
-  });
-  navigator.credentials
-    .get({
-      publicKey: makeAssertionOptions.publicKey,
-    })
-    .then(function (credential) {
-      verifyAssertion(credential);
-    })
-    .catch(function (err) {
-      webauthnError(err);
+  let makeAssertionOptions;
+  try {
+    makeAssertionOptions = JSON.parse(atob(document.getElementsByName("credentialAssertionData")[0].value));
+  } catch (e) {
+    webauthnError({ message: "Failed to parse credential assertion data." });
+    return;
+  }
+
+  try {
+    makeAssertionOptions.publicKey.challenge = bufferDecode(makeAssertionOptions.publicKey.challenge, "publicKey.challenge");
+    makeAssertionOptions.publicKey.allowCredentials.forEach(function (listItem) {
+      listItem.id = bufferDecode(listItem.id, "publicKey.allowCredentials.id");
     });
+  } catch (e) {
+    webauthnError({ message: "Failed to decode buffer data." });
+    return;
+  }
+
+  try {
+    const credential = await navigator.credentials.get({
+      publicKey: makeAssertionOptions.publicKey,
+    });
+
+    verifyAssertion(credential);
+  } catch (err) {
+    webauthnError(err);
+  }
 }
 
 function verifyAssertion(assertedCredential) {
@@ -49,6 +56,6 @@ function verifyAssertion(assertedCredential) {
     },
   });
 
-  document.getElementsByName("credentialData")[0].value = btoa(data);
+  document.getElementsByName("credentialData")[0].value = window.btoa(data);
   document.getElementsByTagName("form")[0].submit();
 }

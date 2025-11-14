@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package zitadel.analytics.v2beta;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/analytics/v2beta;analytics";
+
+
+message InstanceInformation {
+  // The unique identifier of the instance.
+  string id = 1;
+  // The custom domains (incl. generated ones) of the instance.
+  repeated string domains = 2;
+  // The creation date of the instance.
+  google.protobuf.Timestamp created_at = 3;
+}
+
+message ResourceCount {
+  // The ID of the instance for which the resource counts are reported.
+  string instance_id = 3;
+  // The parent type of the resource counts (e.g. organization or instance).
+  // For example, reporting the amount of users per organization would use
+  // `COUNT_PARENT_TYPE_ORGANIZATION` as parent type and the organization ID as parent ID.
+  CountParentType parent_type = 4;
+  // The parent ID of the resource counts (e.g. organization or instance ID).
+  // For example, reporting the amount of users per organization would use
+  // `COUNT_PARENT_TYPE_ORGANIZATION` as parent type and the organization ID as parent ID.
+  string parent_id = 5;
+  // The resource counts to report, e.g. amount of `users`, `organizations`, etc.
+  string resource_name = 6;
+  // The name of the table in the database, which was used to calculate the counts.
+  // This can be used to deduplicate counts in case of multiple reports.
+  // For example, if the counts were calculated from the `users14` table,
+  // the table name would be `users14`, where there could also be a `users15` table
+  // reported at the same time as the system is rolling out a new version.
+  string table_name = 7;
+  // The timestamp when the count was last updated.
+  google.protobuf.Timestamp updated_at = 8;
+  // The actual amount of the resource.
+  uint32 amount = 9;
+}
+
+enum CountParentType {
+  COUNT_PARENT_TYPE_UNSPECIFIED = 0;
+  COUNT_PARENT_TYPE_INSTANCE = 1;
+  COUNT_PARENT_TYPE_ORGANIZATION = 2;
+}

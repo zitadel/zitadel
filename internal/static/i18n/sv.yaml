@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Mobilnr redan verifierad
       Empty: Mobilnr är tom
       NotChanged: Mobilnr ändrades inte
+      VerifyingRemovalIsNotSupported: Verifiering av borttagning stöds inte
     Address:
       NotFound: Adress hittades inte
       NotChanged: Adress ändrades inte
@@ -193,7 +194,7 @@ Errors:
     AlreadyExists: Instans finns redan
     NotChanged: Instans ändrades inte
   Org:
-    AlreadyExists: Organisationens namn är redan taget
+    AlreadyExists: Organisationens namn eller ID är redan upptaget
     Invalid: Organisationen är ogiltigt
     AlreadyDeactivated: Organisation är redan avaktiverad
     AlreadyActive: Organisationen är redan aktiv
@@ -435,8 +436,6 @@ Errors:
     Invalid: Användarbeviljandet är ogiltigt
     NotChanged: Användarbeviljandet har inte ändrats
     IDMissing: Id saknas
-    NotActive: Användarbeviljandet är inte aktivt
-    NotInactive: Användarbeviljandet är inte inaktivt
     NoPermissionForProject: Användaren har inga behörigheter i detta projekt
     RoleKeyNotFound: Rollen hittades inte
   Member:
@@ -495,6 +494,7 @@ Errors:
     SQLStatement: SQL-satsen kunde inte skapas
     InvalidRequest: Begäran är ogiltig
     TooManyNestingLevels: För många nivåer av frågenästning (Max 20)
+    LimitExceeded: Gränsen överskreds
   Quota:
     AlreadyExists: Kvota finns redan för denna enhet
     NotFound: Kvota hittades inte för denna enhet
@@ -535,6 +535,7 @@ Errors:
     StateMissing: State-parameter saknas i begäran
     NotStarted: Avsikten har inte startat eller har redan avslutats
     NotSucceeded: Avsikten har inte lyckats
+    Expired: Avsikten har gått ut
     TokenCreationFailed: Token-skapande misslyckades
     InvalidToken: Avsiktstoken är ogiltig
     OtherUser: Avsikten är avsedd för en annan användare
@@ -542,12 +543,23 @@ Errors:
     AlreadyExists: Autentiseringsbegäran finns redan
     NotExisting: Autentiseringsbegäran existerar inte
     WrongLoginClient: Autentiseringsbegäran skapad av annan inloggningsklient
+    AlreadyHandled: Autentiseringsbegäran har redan hanterats
   OIDCSession:
     RefreshTokenInvalid: Uppdateringstoken är ogiltig
     Token:
       Invalid: Token är ogiltig
       Expired: Token har gått ut
     InvalidClient: Token utfärdades inte för denna klient
+  SAMLRequest:
+    AlreadyExists: SAMLRequest finns redan
+    NotExisting: SAMLRequest finns inte
+    WrongLoginClient: SAMLRequest skapad av annan inloggningsklient
+    AlreadyHandled: SAML-begäran har redan hanterats
+  SAMLSession:
+    InvalidClient: SAMLResponse utfärdades inte för den här klienten
+  DeviceAuth:
+    NotFound: Begäran om enhetsauktorisering finns inte
+    AlreadyHandled: Begäran om enhetsauktorisering har redan hanterats
   Feature:
     NotExisting: Funktionen existerar inte
     TypeNotSupported: Funktionstypen stöds inte
@@ -563,6 +575,8 @@ Errors:
     NotFound: Exekveringen hittades inte
     IncludeNotFound: Inkluderingen hittades inte
     NoTargets: Inga mål definierade
+    Failed: Utförande misslyckades
+    ResponseIsNotValidJSON: Svaret är inte giltigt JSON
   UserSchema:
     NotEnabled: Funktionen "Användarschema" är inte aktiverad
     Type:
@@ -573,6 +587,11 @@ Errors:
     NotActive: Användarschema inte aktivt
     NotInactive: Användarschema inte inaktivt
     NotExists: Användarschema existerar inte
+    ID:
+      Missing: Användarschema-ID saknas
+    Invalid: Ogiltigt användarschema
+    Data:
+      Invalid: Data ogiltig för användarschema
   TokenExchange:
     FeatureDisabled: Token Exchange-funktionen är inaktiverad för din instans. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -584,6 +603,13 @@ Errors:
       NotForAPI: Imitationstoken tillåts inte för API
     Impersonation:
       PolicyDisabled: Imitation är inaktiverad i instansens säkerhetspolicy
+  WebKey:
+    ActiveDelete: Det går inte att ta bort aktiv webbnyckel
+    Config: Ogiltig webbnyckelkonfiguration
+    Duplicate: Webnyckel-ID är inte unikt
+    FeatureDisabled: Webnyckelfunktion inaktiverad
+    NoActive: Ingen aktiv webbnyckel hittades
+    NotFound: Webnyckel hittades inte
 
 AggregateTypes:
   action: Åtgärd
@@ -607,6 +633,9 @@ AggregateTypes:
   restrictions: Restriktioner
   system: System
   session: Session
+  web_key: Webbnyckel
+  saml_request: SAML-förfrågan
+  saml_session: SAML-session
 
 EventTypes:
   execution:
@@ -671,6 +700,13 @@ EventTypes:
         check:
           succeeded: Initialiseringskontroll lyckades
           failed: Initialiseringskontroll misslyckades
+      invite:
+        code:
+          added: Inbjudningskod genererad
+          sent: Inbjudningskod skickad
+        check:
+          succeeded: Inbjudningskontroll lyckad
+          failed: Inbjudningskontroll misslyckad
       username:
         reserved: Användarnamn reserverat
         released: Användarnamn släppt
@@ -1308,6 +1344,31 @@ EventTypes:
     deactivated: Användarschema avaktiverat
     reactivated: Användarschema återaktiverat
     deleted: Användarschema borttaget
+    user:
+      created: Användare skapad
+      updated: Användaren uppdaterad
+      deleted: Användare raderad
+      email:
+        updated: E-postadress ändrad
+        verified: E-postadress verifierad
+        verification:
+          failed: E-postadressverifiering misslyckades
+        code:
+          added: Verifieringskod för e-postadress genererad
+          sent: E-postadressens verifieringskod har skickats
+      phone:
+        updated: Telefonnummer ändrat
+        verified: Telefonnummer verifierat
+        verification:
+          failed: Verifiering av telefonnummer misslyckades
+        code:
+          added: Verifieringskod för telefonnummer genererad
+          sent: Verifieringskoden för telefonnummer har skickats
+  web_key:
+    added: Webbnyckel har lagts till
+    activated: Webbnyckel aktiverad
+    deactivated: Webnyckel avaktiverad
+    removed: Webbnyckeln har tagits bort
 
 Application:
   OIDC:

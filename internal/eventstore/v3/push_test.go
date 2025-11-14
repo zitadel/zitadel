@@ -1,15 +1,25 @@
 package eventstore
 
 import (
+	"context"
 	_ "embed"
 	"testing"
 
+	"github.com/riverqueue/river"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
+	new_pg "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
+	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/database/cockroach"
+	"github.com/zitadel/zitadel/internal/database/postgres"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/mock"
+	"github.com/zitadel/zitadel/internal/execution/target"
+	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
 )
 
 func Test_mapCommands(t *testing.T) {
@@ -65,16 +75,16 @@ func Test_mapCommands(t *testing.T) {
 					),
 				},
 				placeHolders: []string{
-					"($1, $2, $3, $4, $5, $6, $7, $8, $9, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $10)",
+					"($1, $2, $3, $4, $5, $6, $7, $8, $9, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $10)",
 				},
 				args: []any{
 					"instance",
 					"ro",
-					eventstore.AggregateType("type"),
+					"type",
 					"V3-VEIvq",
-					1,
+					uint16(1),
 					"creator",
-					eventstore.EventType("event.type"),
+					"event.type",
 					Payload(nil),
 					uint64(1),
 					0,
@@ -114,29 +124,29 @@ func Test_mapCommands(t *testing.T) {
 					),
 				},
 				placeHolders: []string{
-					"($1, $2, $3, $4, $5, $6, $7, $8, $9, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $10)",
-					"($11, $12, $13, $14, $15, $16, $17, $18, $19, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $20)",
+					"($1, $2, $3, $4, $5, $6, $7, $8, $9, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $10)",
+					"($11, $12, $13, $14, $15, $16, $17, $18, $19, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $20)",
 				},
 				args: []any{
 					// first event
 					"instance",
 					"ro",
-					eventstore.AggregateType("type"),
+					"type",
 					"V3-VEIvq",
-					1,
+					uint16(1),
 					"creator",
-					eventstore.EventType("event.type"),
+					"event.type",
 					Payload(nil),
 					uint64(6),
 					0,
 					// second event
 					"instance",
 					"ro",
-					eventstore.AggregateType("type"),
+					"type",
 					"V3-VEIvq",
-					1,
+					uint16(1),
 					"creator",
-					eventstore.EventType("event.type"),
+					"event.type",
 					Payload(nil),
 					uint64(7),
 					1,
@@ -180,29 +190,29 @@ func Test_mapCommands(t *testing.T) {
 					),
 				},
 				placeHolders: []string{
-					"($1, $2, $3, $4, $5, $6, $7, $8, $9, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $10)",
-					"($11, $12, $13, $14, $15, $16, $17, $18, $19, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $20)",
+					"($1, $2, $3, $4, $5, $6, $7, $8, $9, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $10)",
+					"($11, $12, $13, $14, $15, $16, $17, $18, $19, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $20)",
 				},
 				args: []any{
 					// first event
 					"instance",
 					"ro",
-					eventstore.AggregateType("type"),
+					"type",
 					"V3-VEIvq",
-					1,
+					uint16(1),
 					"creator",
-					eventstore.EventType("event.type"),
+					"event.type",
 					Payload(nil),
 					uint64(6),
 					0,
 					// second event
 					"instance",
 					"ro",
-					eventstore.AggregateType("type"),
+					"type",
 					"V3-IT6VN",
-					1,
+					uint16(1),
 					"creator",
-					eventstore.EventType("event.type"),
+					"event.type",
 					Payload(nil),
 					uint64(1),
 					1,
@@ -236,7 +246,7 @@ func Test_mapCommands(t *testing.T) {
 			}
 		}
 		// is used to set the the [pushPlaceholderFmt]
-		NewEventstore(&database.DB{Database: new(cockroach.Config)})
+		NewEventstore(&database.DB{Database: new(postgres.Config)})
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
 				cause := recover()
@@ -250,4 +260,173 @@ func Test_mapCommands(t *testing.T) {
 			assert.ElementsMatch(t, tt.want.args, gotArgs)
 		})
 	}
+}
+
+func TestEventstore_queueExecutions(t *testing.T) {
+	events := []eventstore.Event{
+		mockEventType(mockAggregate("TEST"), 1, []byte(`{"test":"test"}`), "ex.foo.bar"),
+		mockEventType(mockAggregate("TEST"), 2, []byte("{}"), "ex.bar.foo"),
+		mockEventType(mockAggregate("TEST"), 3, nil, "ex.removed"),
+	}
+	type args struct {
+		ctx    context.Context
+		tx     new_db.Transaction
+		events []eventstore.Event
+	}
+	tests := []struct {
+		name    string
+		queue   func(t *testing.T) eventstore.ExecutionQueue
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "no Tx type, noop",
+			queue: func(t *testing.T) eventstore.ExecutionQueue {
+				mQueue := mock.NewMockExecutionQueue(gomock.NewController(t))
+				return mQueue
+			},
+			args: args{
+				ctx:    context.Background(),
+				tx:     nil,
+				events: events,
+			},
+			wantErr: false,
+		},
+		{
+			name: "incorrect Tx type, noop",
+			queue: func(t *testing.T) eventstore.ExecutionQueue {
+				mQueue := mock.NewMockExecutionQueue(gomock.NewController(t))
+				return mQueue
+			},
+			args: args{
+				ctx:    context.Background(),
+				tx:     new_pg.PGxTx(nil),
+				events: events,
+			},
+			wantErr: false,
+		},
+		{
+			name: "no events",
+			queue: func(t *testing.T) eventstore.ExecutionQueue {
+				mQueue := mock.NewMockExecutionQueue(gomock.NewController(t))
+				return mQueue
+			},
+			args: args{
+				ctx:    context.Background(),
+				tx:     sql.SQLTx(nil),
+				events: []eventstore.Event{},
+			},
+			wantErr: false,
+		},
+		{
+			name: "no router in Ctx",
+			queue: func(t *testing.T) eventstore.ExecutionQueue {
+				mQueue := mock.NewMockExecutionQueue(gomock.NewController(t))
+				return mQueue
+			},
+			args: args{
+				ctx:    context.Background(),
+				tx:     sql.SQLTx(nil),
+				events: events,
+			},
+			wantErr: false,
+		},
+		{
+			name: "not found in router",
+			queue: func(t *testing.T) eventstore.ExecutionQueue {
+				mQueue := mock.NewMockExecutionQueue(gomock.NewController(t))
+				return mQueue
+			},
+			args: args{
+				ctx: authz.WithExecutionRouter(
+					context.Background(),
+					target.NewRouter([]target.Target{
+						{
+							ExecutionID: "function/fooBar",
+						},
+					}),
+				),
+				tx:     sql.SQLTx(nil),
+				events: events,
+			},
+			wantErr: false,
+		},
+		{
+			name: "event prefix",
+			queue: func(t *testing.T) eventstore.ExecutionQueue {
+				mQueue := mock.NewMockExecutionQueue(gomock.NewController(t))
+				mQueue.EXPECT().InsertManyFastTx(
+					gomock.Any(),
+					gomock.Any(),
+					[]river.JobArgs{
+						mustNewRequest(t, events[0], []target.Target{{ExecutionID: "event"}}),
+						mustNewRequest(t, events[1], []target.Target{{ExecutionID: "event"}}),
+						mustNewRequest(t, events[2], []target.Target{{ExecutionID: "event"}}),
+					},
+					gomock.Any(),
+				)
+				return mQueue
+			},
+			args: args{
+				ctx: authz.WithExecutionRouter(
+					context.Background(),
+					target.NewRouter([]target.Target{
+						{ExecutionID: "function/fooBar"},
+						{ExecutionID: "event"},
+					}),
+				),
+				tx:     sql.SQLTx(nil),
+				events: events,
+			},
+			wantErr: false,
+		},
+		{
+			name: "event wildcard and exact match",
+			queue: func(t *testing.T) eventstore.ExecutionQueue {
+				mQueue := mock.NewMockExecutionQueue(gomock.NewController(t))
+				mQueue.EXPECT().InsertManyFastTx(
+					gomock.Any(),
+					gomock.Any(),
+					[]river.JobArgs{
+						mustNewRequest(t, events[0], []target.Target{{ExecutionID: "event/ex.foo.*"}}),
+						mustNewRequest(t, events[2], []target.Target{{ExecutionID: "event/ex.removed"}}),
+					},
+					gomock.Any(),
+				)
+				return mQueue
+			},
+			args: args{
+				ctx: authz.WithExecutionRouter(
+					context.Background(),
+					target.NewRouter([]target.Target{
+						{ExecutionID: "function/fooBar"},
+						{ExecutionID: "event/ex.foo.*"},
+						{ExecutionID: "event/ex.removed"},
+					}),
+				),
+				tx:     sql.SQLTx(nil),
+				events: events,
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			es := &Eventstore{
+				queue: tt.queue(t),
+			}
+			err := es.queueExecutions(tt.args.ctx, tt.args.tx, tt.args.events)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			assert.NoError(t, err)
+		})
+	}
+}
+
+func mustNewRequest(t *testing.T, e eventstore.Event, targets []target.Target) *exec_repo.Request {
+	req, err := exec_repo.NewRequest(e, targets)
+	require.NoError(t, err, "exec_repo.NewRequest")
+	return req
 }

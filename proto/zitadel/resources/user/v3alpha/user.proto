@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+package zitadel.resources.user.v3alpha;
+
+import "google/api/field_behavior.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "zitadel/resources/object/v3alpha/object.proto";
+import "zitadel/resources/user/v3alpha/authenticator.proto";
+import "zitadel/resources/user/v3alpha/communication.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha;user";
+
+message CreateUser {
+  // Define the schema the user's data schema by providing it's ID.
+  string schema_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+  google.protobuf.Struct data = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "{\"name\":\"Gigi\",\"description\":\"the giraffe\"}"
+    }
+  ];
+  // Set the contact information (email, phone) for the user.
+  SetContact contact = 3;
+  // Set the initial authenticators of the user.
+  SetAuthenticators authenticators = 4;
+  // Optionally set a unique identifier of the user. If unset, ZITADEL will take care of it.
+  optional string user_id = 5 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message PatchUser {
+  optional string schema_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+  optional google.protobuf.Struct data = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "{\"name\":\"Gigi\",\"description\":\"the giraffe\"}"
+    }
+  ];
+  // Set the contact information (email, phone) for the user.
+  optional SetContact contact = 3;
+  // TODO: No SetAuthenticators?
+}
+
+message GetUser{
+  // Details provide some base information (such as the last change date) of the user.
+  zitadel.resources.object.v3alpha.Details details = 1;
+  // The schema the user and it's data is based on.
+  GetSchema schema = 2;
+  google.protobuf.Struct data = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "{\"name\":\"Gigi\",\"description\":\"the giraffe\"}"
+    }
+  ];
+  // Contact information for the user. ZITADEL will use this in case of internal notifications.
+  Contact contact = 4;
+  // The user's authenticators. They are used to identify and authenticate the user
+  // during the authentication process.
+  Authenticators authenticators = 5;
+  // State of the user.
+  State state = 6;
+}
+
+enum State {
+  USER_STATE_UNSPECIFIED = 0;
+  USER_STATE_ACTIVE = 1;
+  USER_STATE_INACTIVE = 2;
+  USER_STATE_DELETED = 3;
+  USER_STATE_LOCKED = 4;
+}
+
+message GetSchema {
+  // The unique identifier of the user schema.
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629026806489455\""
+    }
+  ];
+  // The human readable name of the user schema.
+  string type = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"employees\"";
+    }
+  ];
+  // The revision the user's data is based on of the revision.
+  uint32 revision = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "7";
+    }
+  ];
+}

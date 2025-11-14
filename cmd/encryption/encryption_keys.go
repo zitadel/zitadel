@@ -17,6 +17,7 @@ var (
 		"smsKey",
 		"smtpKey",
 		"userKey",
+		"targetKey",
 		"csrfCookieKey",
 		"userAgentCookieKey",
 	}
@@ -31,6 +32,7 @@ type EncryptionKeyConfig struct {
 	SMS                  *crypto.KeyConfig
 	SMTP                 *crypto.KeyConfig
 	User                 *crypto.KeyConfig
+	Target               *crypto.KeyConfig
 	CSRFCookieKeyID      string
 	UserAgentCookieKeyID string
 }
@@ -44,6 +46,7 @@ type EncryptionKeys struct {
 	SMS                crypto.EncryptionAlgorithm
 	SMTP               crypto.EncryptionAlgorithm
 	User               crypto.EncryptionAlgorithm
+	Target             crypto.EncryptionAlgorithm
 	CSRFCookieKey      []byte
 	UserAgentCookieKey []byte
 	OIDCKey            []byte
@@ -88,6 +91,10 @@ func EnsureEncryptionKeys(ctx context.Context, keyConfig *EncryptionKeyConfig, k
 		return nil, err
 	}
 	keys.User, err = crypto.NewAESCrypto(keyConfig.User, keyStorage)
+	if err != nil {
+		return nil, err
+	}
+	keys.Target, err = crypto.NewAESCrypto(keyConfig.Target, keyStorage)
 	if err != nil {
 		return nil, err
 	}

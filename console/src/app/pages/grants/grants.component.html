@@ -17,8 +17,9 @@
         'type',
         'creationDate',
         'changeDate',
+        'state',
         'roleNamesList',
-        'actions'
+        'actions',
       ]"
       [disableWrite]="(['user.grant.write$'] | hasRole | async) === false"
       [disableDelete]="(['user.grant.delete$'] | hasRole | async) === false"

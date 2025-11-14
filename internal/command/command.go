@@ -9,20 +9,25 @@ import (
 	"fmt"
 	"math/big"
 	"net/http"
+	"slices"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
+	"github.com/go-jose/go-jose/v4"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	webauthn_helper "github.com/zitadel/zitadel/internal/webauthn"
@@ -51,6 +56,7 @@ type Commands struct {
 	smtpEncryption                  crypto.EncryptionAlgorithm
 	smsEncryption                   crypto.EncryptionAlgorithm
 	userEncryption                  crypto.EncryptionAlgorithm
+	targetEncryption                crypto.EncryptionAlgorithm
 	userPasswordHasher              *crypto.Hasher
 	secretHasher                    *crypto.Hasher
 	machineKeySize                  int
@@ -63,6 +69,8 @@ type Commands struct {
 	defaultAccessTokenLifetime      time.Duration
 	defaultRefreshTokenLifetime     time.Duration
 	defaultRefreshTokenIdleLifetime time.Duration
+	phoneCodeVerifier               func(ctx context.Context, id string) (senders.CodeGenerator, error)
+	tarpit                          func(failedAttempts uint64)
 
 	multifactors            domain.MultifactorConfigs
 	webauthnConfig          *webauthn_helper.Config
@@ -74,8 +82,10 @@ type Commands struct {
 	publicKeyLifetime       time.Duration
 	certificateLifetime     time.Duration
 	defaultSecretGenerators *SecretGenerators
+	maxIdPIntentLifetime    time.Duration
 
 	samlCertificateAndKeyGenerator func(id string) ([]byte, []byte, error)
+	webKeyGenerator                func(keyID string, alg crypto.EncryptionAlgorithm, genConfig crypto.WebKeyConfig) (encryptedPrivate *crypto.CryptoValue, public *jose.JSONWebKey, err error)
 
 	GrpcMethodExisting     func(method string) bool
 	GrpcServiceExisting    func(method string) bool
@@ -84,10 +94,21 @@ type Commands struct {
 	EventGroupExisting     func(group string) bool
 
 	GenerateDomain func(instanceName, domain string) (string, error)
+
+	caches *Caches
+	// Store instance IDs where all milestones are reached (except InstanceDeleted).
+	// These instance's milestones never need to be invalidated,
+	// so the query and cache overhead can completely eliminated.
+	milestonesCompleted sync.Map
+
+	defaultEmailCodeURLTemplate   func(ctx context.Context) string
+	defaultPasswordSetURLTemplate func(ctx context.Context) string
 }
 
 func StartCommands(
+	ctx context.Context,
 	es *eventstore.Eventstore,
+	cacheConnectors connector.Connectors,
 	defaults sd.SystemDefaults,
 	zitadelRoles []authz.RoleMapping,
 	staticStore static.Storage,
@@ -95,7 +116,7 @@ func StartCommands(
 	externalDomain string,
 	externalSecure bool,
 	externalPort uint16,
-	idpConfigEncryption, otpEncryption, smtpEncryption, smsEncryption, userEncryption, domainVerificationEncryption, oidcEncryption, samlEncryption crypto.EncryptionAlgorithm,
+	idpConfigEncryption, otpEncryption, smtpEncryption, smsEncryption, userEncryption, domainVerificationEncryption, oidcEncryption, samlEncryption, targetEncryption crypto.EncryptionAlgorithm,
 	httpClient *http.Client,
 	permissionCheck domain.PermissionCheck,
 	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error),
@@ -103,6 +124,8 @@ func StartCommands(
 	defaultRefreshTokenLifetime,
 	defaultRefreshTokenIdleLifetime time.Duration,
 	defaultSecretGenerators *SecretGenerators,
+	defaultEmailCodeURLTemplate func(ctx context.Context) string,
+	defaultPasswordSetURLTemplate func(ctx context.Context) string,
 ) (repo *Commands, err error) {
 	if externalDomain == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "no external domain specified")
@@ -119,6 +142,10 @@ func StartCommands(
 	if err != nil {
 		return nil, fmt.Errorf("password hasher: %w", err)
 	}
+	caches, err := startCaches(ctx, cacheConnectors)
+	if err != nil {
+		return nil, fmt.Errorf("caches: %w", err)
+	}
 	repo = &Commands{
 		eventstore:                      es,
 		static:                          staticStore,
@@ -132,10 +159,12 @@ func StartCommands(
 		privateKeyLifetime:              defaults.KeyConfig.PrivateKeyLifetime,
 		publicKeyLifetime:               defaults.KeyConfig.PublicKeyLifetime,
 		certificateLifetime:             defaults.KeyConfig.CertificateLifetime,
+		maxIdPIntentLifetime:            defaults.MaxIdPIntentLifetime,
 		idpConfigEncryption:             idpConfigEncryption,
 		smtpEncryption:                  smtpEncryption,
 		smsEncryption:                   smsEncryption,
 		userEncryption:                  userEncryption,
+		targetEncryption:                targetEncryption,
 		userPasswordHasher:              userPasswordHasher,
 		secretHasher:                    secretHasher,
 		machineKeySize:                  int(defaults.SecretGenerators.MachineKeySize),
@@ -157,25 +186,36 @@ func StartCommands(
 		defaultRefreshTokenIdleLifetime: defaultRefreshTokenIdleLifetime,
 		defaultSecretGenerators:         defaultSecretGenerators,
 		samlCertificateAndKeyGenerator:  samlCertificateAndKeyGenerator(defaults.KeyConfig.CertificateSize, defaults.KeyConfig.CertificateLifetime),
-		// always true for now until we can check with an eventlist
-		EventExisting: func(event string) bool { return true },
-		// always true for now until we can check with an eventlist
-		EventGroupExisting:     func(group string) bool { return true },
+		webKeyGenerator:                 crypto.GenerateEncryptedWebKey,
+		EventExisting: func(value string) bool {
+			return slices.Contains(es.EventTypes(), value)
+		},
+		EventGroupExisting: func(group string) bool {
+			return slices.ContainsFunc(es.EventTypes(), func(value string) bool {
+				return strings.HasPrefix(value, group)
+			},
+			)
+		},
 		GrpcServiceExisting:    func(service string) bool { return false },
 		GrpcMethodExisting:     func(method string) bool { return false },
-		ActionFunctionExisting: domain.FunctionExists(),
+		ActionFunctionExisting: domain.ActionFunctionExists(),
 		multifactors: domain.MultifactorConfigs{
 			OTP: domain.OTPConfig{
 				CryptoMFA: otpEncryption,
 				Issuer:    defaults.Multifactors.OTP.Issuer,
 			},
 		},
-		GenerateDomain: domain.NewGeneratedInstanceDomain,
+		GenerateDomain:                domain.NewGeneratedInstanceDomain,
+		caches:                        caches,
+		defaultEmailCodeURLTemplate:   defaultEmailCodeURLTemplate,
+		defaultPasswordSetURLTemplate: defaultPasswordSetURLTemplate,
 	}
 
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {
 		repo.newHashedSecret = newHashedSecretWithDefault(secretHasher, defaultSecretGenerators.ClientSecret)
 	}
+	repo.phoneCodeVerifier = repo.phoneCodeVerifierFromConfig
+	repo.tarpit = defaults.Tarpit.Tarpit()
 	return repo, nil
 }
 
@@ -186,11 +226,28 @@ type AppendReducer interface {
 }
 
 func (c *Commands) pushAppendAndReduce(ctx context.Context, object AppendReducer, cmds ...eventstore.Command) error {
+	if len(cmds) == 0 {
+		return nil
+	}
 	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return err
 	}
 	return AppendAndReduce(object, events...)
+}
+
+type AppendReducerDetails interface {
+	AppendEvents(...eventstore.Event)
+	// TODO: Why is it allowed to return an error here?
+	Reduce() error
+	GetWriteModel() *eventstore.WriteModel
+}
+
+func (c *Commands) pushAppendAndReduceDetails(ctx context.Context, object AppendReducerDetails, cmds ...eventstore.Command) (*domain.ObjectDetails, error) {
+	if err := c.pushAppendAndReduce(ctx, object, cmds...); err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(object.GetWriteModel()), nil
 }
 
 func AppendAndReduce(object AppendReducer, events ...eventstore.Event) error {
@@ -239,7 +296,12 @@ func samlCertificateAndKeyGenerator(keySize int, lifetime time.Duration) func(id
 			SerialNumber: big.NewInt(int64(serial)),
 			Subject: pkix.Name{
 				Organization: []string{"ZITADEL"},
+				CommonName:   fmt.Sprintf("ZITADEL SP %s", id),
 				SerialNumber: id,
+			},
+			Issuer: pkix.Name{
+				Organization: []string{"ZITADEL"},
+				CommonName:   "ZITADEL",
 			},
 			NotBefore:             now,
 			NotAfter:              now.Add(lifetime),

@@ -163,6 +163,9 @@ curl --request POST \
 If you want to access ZITADEL APIs, make sure to include the required scopes `urn:zitadel:iam:org:project:id:zitadel:aud`.
 Read our guide [how to access ZITADEL APIs](../zitadel-apis/access-zitadel-apis) to learn more.
 
+**Important Note:** If the service user token needs to be validated using token introspection, ensure you include the `urn:zitadel:iam:org:project:id:{projectid}:aud` scope in your token request. 
+Without this, token introspection will fail.
+
 You should receive a successful response with `access_token`,  `token_type` and time to expiry in seconds as `expires_in`.
 
 ```bash

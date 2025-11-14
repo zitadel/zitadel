@@ -53,6 +53,7 @@ Errors:
     NotFound: SMS configuration not found
     AlreadyActive: SMS configuration already active
     AlreadyDeactivated: SMS configuration already deactivated
+    NotExternalVerification: SMS configuration does not support code verification
   SMTP:
     NotEmailMessage: message is not EmailMessage
     RequiredAttributes: subject, recipients and content must be set but some or all of them are empty
@@ -115,6 +116,7 @@ Errors:
       AlreadyVerified: Phone already verified
       Empty: Phone is empty
       NotChanged: Phone not changed
+      VerifyingRemovalIsNotSupported: Verifying phone removal is not supported
     Address:
       NotFound: Address not found
       NotChanged: Address not changed
@@ -193,7 +195,7 @@ Errors:
     AlreadyExists: Instance already exists
     NotChanged: Instance not changed
   Org:
-    AlreadyExists: Organisation's name already taken
+    AlreadyExists: Organisation's name or id already taken
     Invalid: Organisation is invalid
     AlreadyDeactivated: Organisation is already deactivated
     AlreadyActive: Organisation is already active
@@ -435,8 +437,6 @@ Errors:
     Invalid: User grant is invalid
     NotChanged: User grant has not been changed
     IDMissing: Id missing
-    NotActive: User grant is not active
-    NotInactive: User grant is not deactivated
     NoPermissionForProject: User has no permissions on this project
     RoleKeyNotFound: Role not found
   Member:
@@ -495,6 +495,7 @@ Errors:
     SQLStatement: SQL Statement could not be created
     InvalidRequest: Request is invalid
     TooManyNestingLevels: Too many query nesting levels (Max 20)
+    LimitExceeded: Limit exceeded
   Quota:
     AlreadyExists: Quota already exists for this unit
     NotFound: Quota not found for this unit
@@ -535,6 +536,7 @@ Errors:
     StateMissing: State parameter is missing in the request
     NotStarted: Intent is not started or was already terminated
     NotSucceeded: Intent has not succeeded
+    Expired: Intent has expired
     TokenCreationFailed: Token creation failed
     InvalidToken: Intent Token is invalid
     OtherUser: Intent meant for another user
@@ -542,12 +544,23 @@ Errors:
     AlreadyExists: Auth Request already exists
     NotExisting: Auth Request does not exist
     WrongLoginClient: Auth Request created by other login client
+    AlreadyHandled: Auth Request has already been handled
   OIDCSession:
     RefreshTokenInvalid: Refresh Token is invalid
     Token:
       Invalid: Token is invalid
       Expired: Token is expired
     InvalidClient: Token was not issued for this client
+  SAMLRequest:
+    AlreadyExists: SAMLRequest already exists
+    NotExisting: SAMLRequest does not exist
+    WrongLoginClient: SAMLRequest created by other login client
+    AlreadyHandled: SAMLRequest has already been handled
+  SAMLSession:
+    InvalidClient: SAMLResponse was not issued for this client
+  DeviceAuth:
+    NotFound: Device Authorization Request does not exist
+    AlreadyHandled: Device Authorization Request has already been handled
   Feature:
     NotExisting: Feature does not exist
     TypeNotSupported: Feature type is not supported
@@ -563,6 +576,8 @@ Errors:
     NotFound: Execution not found
     IncludeNotFound: Include not found
     NoTargets: No targets defined
+    Failed: Execution failed
+    ResponseIsNotValidJSON: Response is not valid JSON
   UserSchema:
     NotEnabled: Feature "User Schema" is not enabled
     Type:
@@ -573,6 +588,11 @@ Errors:
     NotActive: User Schema not active
     NotInactive: User Schema not inactive
     NotExists: User Schema does not exist
+    ID:
+      Missing: User Schema ID missing
+    Invalid: User Schema invalid
+    Data:
+      Invalid: Data invalid for User Schema
   TokenExchange:
     FeatureDisabled: Token Exchange feature is disabled for your instance. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -584,6 +604,13 @@ Errors:
       NotForAPI: Impersonated tokens not allowed for API
     Impersonation:
       PolicyDisabled: Impersonation is disabled in the instance security policy
+  WebKey:
+    ActiveDelete: Cannot delete active web key
+    Config: Invalid web key config
+    Duplicate: Web key ID not unique
+    FeatureDisabled: Web key feature disabled
+    NoActive: No active web key found
+    NotFound: Web key not found
 
 AggregateTypes:
   action: Action
@@ -607,6 +634,9 @@ AggregateTypes:
   restrictions: Restrictions
   system: System
   session: Session
+  web_key: Web Key
+  saml_request: SAML Request
+  saml_session: SAML Session
 
 EventTypes:
   execution:
@@ -671,6 +701,13 @@ EventTypes:
         check:
           succeeded: Initialization check succeeded
           failed: Initialization check failed
+      invite:
+        code:
+          added: Invitation code generated
+          sent: Invitation code sent
+        check:
+          succeeded: Invitation check succeeded
+          failed: Invitation check failed
       username:
         reserved: Username reserved
         released: Username released
@@ -914,8 +951,8 @@ EventTypes:
           added: Second factor added to Login Policy
           removed: Second factor removed from Login Policy
         multifactor:
-          added: Multi factor added to Login Policy
-          removed: Multi factor removed from Login Policy
+          added: Multi-factor added to Login Policy
+          removed: Multi-factor removed from Login Policy
       password:
         complexity:
           added: Password complexity policy added
@@ -1308,6 +1345,31 @@ EventTypes:
     deactivated: User Schema deactivated
     reactivated: User Schema reactivated
     deleted: User Schema deleted
+    user:
+      created: User created
+      updated: User updated
+      deleted: User deleted
+      email:
+        updated: Email address changed
+        verified: Email address verified
+        verification:
+          failed: Email address verification failed
+        code:
+          added: Email address verification code generated
+          sent: Email address verification code sent
+      phone:
+        updated: Phone number changed
+        verified: Phone number verified
+        verification:
+          failed: Phone number verification failed
+        code:
+          added: Phone number verification code generated
+          sent: Phone number verification code sent
+  web_key:
+    added: Web Key added
+    activated: Web Key activated
+    deactivated: Web Key deactivated
+    removed: Web Key removed
 
 Application:
   OIDC:

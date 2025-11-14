@@ -64,7 +64,7 @@ func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email, em
 	return writeModelToEmail(existingEmail), nil
 }
 
-func (c *Commands) VerifyHumanEmail(ctx context.Context, userID, code, resourceowner string, emailCodeGenerator crypto.Generator) (*domain.ObjectDetails, error) {
+func (c *Commands) VerifyHumanEmail(ctx context.Context, userID, code, resourceowner, optionalPassword, optionalUserAgentID string, emailCodeGenerator crypto.Generator) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
 	}
@@ -82,21 +82,30 @@ func (c *Commands) VerifyHumanEmail(ctx context.Context, userID, code, resourceo
 
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
 	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, emailCodeGenerator.Alg())
-	if err == nil {
-		pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanEmailVerifiedEvent(ctx, userAgg))
-		if err != nil {
-			return nil, err
-		}
-		err = AppendAndReduce(existingCode, pushedEvents...)
-		if err != nil {
-			return nil, err
-		}
-		return writeModelToObjectDetails(&existingCode.WriteModel), nil
+	if err != nil {
+		_, err = c.eventstore.Push(ctx, user.NewHumanEmailVerificationFailedEvent(ctx, userAgg))
+		logging.WithFields("userID", userAgg.ID).OnError(err).Error("NewHumanEmailVerificationFailedEvent push failed")
+		return nil, zerrors.ThrowInvalidArgument(err, "COMMAND-Gdsgs", "Errors.User.Code.Invalid")
 	}
-
-	_, err = c.eventstore.Push(ctx, user.NewHumanEmailVerificationFailedEvent(ctx, userAgg))
-	logging.LogWithFields("COMMAND-Dg2z5", "userID", userAgg.ID).OnError(err).Error("NewHumanEmailVerificationFailedEvent push failed")
-	return nil, zerrors.ThrowInvalidArgument(err, "COMMAND-Gdsgs", "Errors.User.Code.Invalid")
+	commands := []eventstore.Command{
+		user.NewHumanEmailVerifiedEvent(ctx, userAgg),
+	}
+	if optionalPassword != "" {
+		passwordCommand, err := c.setPasswordCommand(ctx, userAgg, domain.UserStateActive, optionalPassword, "", optionalUserAgentID, false, nil)
+		if err != nil {
+			return nil, err
+		}
+		commands = append(commands, passwordCommand)
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, commands...)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingCode, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingCode.WriteModel), nil
 }
 
 func (c *Commands) CreateHumanEmailVerificationCode(ctx context.Context, userID, resourceOwner string, emailCodeGenerator crypto.Generator, authRequestID string) (*domain.ObjectDetails, error) {

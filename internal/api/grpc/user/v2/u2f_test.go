@@ -13,8 +13,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func Test_u2fRegistrationDetailsToPb(t *testing.T) {
@@ -43,6 +43,7 @@ func Test_u2fRegistrationDetailsToPb(t *testing.T) {
 					ObjectDetails: &domain.ObjectDetails{
 						Sequence:      22,
 						EventDate:     time.Unix(3000, 22),
+						CreationDate:  time.Unix(3000, 22),
 						ResourceOwner: "me",
 					},
 					ID:                                 "123",
@@ -59,6 +60,7 @@ func Test_u2fRegistrationDetailsToPb(t *testing.T) {
 					ObjectDetails: &domain.ObjectDetails{
 						Sequence:      22,
 						EventDate:     time.Unix(3000, 22),
+						CreationDate:  time.Unix(3000, 22),
 						ResourceOwner: "me",
 					},
 					ID:                                 "123",
@@ -70,6 +72,10 @@ func Test_u2fRegistrationDetailsToPb(t *testing.T) {
 				Details: &object.Details{
 					Sequence: 22,
 					ChangeDate: &timestamppb.Timestamp{
+						Seconds: 3000,
+						Nanos:   22,
+					},
+					CreationDate: &timestamppb.Timestamp{
 						Seconds: 3000,
 						Nanos:   22,
 					},
@@ -86,11 +92,11 @@ func Test_u2fRegistrationDetailsToPb(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := u2fRegistrationDetailsToPb(tt.args.details, tt.args.err)
 			require.ErrorIs(t, err, tt.wantErr)
-			if !proto.Equal(tt.want, got) {
+			if tt.want != nil && !proto.Equal(tt.want, got.Msg) {
 				t.Errorf("Not equal:\nExpected\n%s\nActual:%s", tt.want, got)
 			}
 			if tt.want != nil {
-				grpc.AllFieldsSet(t, got.ProtoReflect())
+				grpc.AllFieldsSet(t, got.Msg.ProtoReflect())
 			}
 		})
 	}

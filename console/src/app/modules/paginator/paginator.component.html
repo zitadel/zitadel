@@ -8,12 +8,10 @@
     </p>
   </div>
   <span class="fill-space"></span>
-  <span class="pos cnsl-secondary-text" *ngIf="!hidePagination"
-    >{{ pageIndex * pageSize }} - {{ pageIndex * pageSize + pageSize }}
-  </span>
+  <span class="pos cnsl-secondary-text" *ngIf="!hidePagination">{{ startIndex }} - {{ endIndex }} </span>
   <div class="row" *ngIf="!hidePagination">
     <cnsl-form-field class="size">
-      <mat-select class="paginator-select" [(ngModel)]="pageSize" (selectionChange)="emitChange()">
+      <mat-select class="paginator-select" [value]="pageSize" (selectionChange)="updatePageSize($event.value)">
         <mat-option *ngFor="let sizeOption of pageSizeOptions" [value]="sizeOption">
           {{ sizeOption }}
         </mat-option>

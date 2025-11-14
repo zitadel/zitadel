@@ -8,7 +8,9 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	authn_grpc "github.com/zitadel/zitadel/internal/api/grpc/authn"
+	"github.com/zitadel/zitadel/internal/api/grpc/org"
 	text_grpc "github.com/zitadel/zitadel/internal/api/grpc/text"
+	user_converter "github.com/zitadel/zitadel/internal/api/grpc/user"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -36,13 +38,13 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		}
 		orgSearchQuery.Queries = []query.SearchQuery{orgIDsSearchQuery}
 	}
-	queriedOrgs, err := s.query.SearchOrgs(ctx, orgSearchQuery)
+	queriedOrgs, err := s.query.SearchOrgs(ctx, orgSearchQuery, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	orgs := make([]*admin_pb.DataOrg, len(queriedOrgs.Orgs))
-	processedOrgs := make([]string, len(queriedOrgs.Orgs))
+	processedOrgs := make([]string, 0, len(queriedOrgs.Orgs))
 	processedProjects := make([]string, 0)
 	processedGrants := make([]string, 0)
 	processedUsers := make([]string, 0)
@@ -65,7 +67,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		/******************************************************************************************************************
 		Organization
 		******************************************************************************************************************/
-		org := &admin_pb.DataOrg{OrgId: queriedOrg.ID, Org: &management_pb.AddOrgRequest{Name: queriedOrg.Name}}
+		org := &admin_pb.DataOrg{OrgId: queriedOrg.ID, OrgState: org.OrgStateToPb(queriedOrg.State), Org: &management_pb.AddOrgRequest{Name: queriedOrg.Name}}
 		orgs[i] = org
 	}
 
@@ -468,7 +470,7 @@ func (s *Server) getUserLinks(ctx context.Context, orgID string) (_ []*idp_pb.ID
 	if err != nil {
 		return nil, err
 	}
-	idpUserLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userLinksResourceOwner}}, false)
+	idpUserLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userLinksResourceOwner}}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -554,7 +556,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
-	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{orgSearch}})
+	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{orgSearch}}, nil)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
@@ -567,6 +569,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 		case domain.UserTypeHuman:
 			dataUser := &v1_pb.DataHumanUser{
 				UserId: user.ID,
+				State:  user_converter.UserStateToPb(user.State),
 				User: &management_pb.ImportHumanUserRequest{
 					UserName: user.Username,
 					Profile: &management_pb.ImportHumanUserRequest_Profile{
@@ -620,6 +623,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 		case domain.UserTypeMachine:
 			machineUsers = append(machineUsers, &v1_pb.DataMachineUser{
 				UserId: user.ID,
+				State:  user_converter.UserStateToPb(user.State),
 				User: &management_pb.AddMachineUserRequest{
 					UserName:    user.Username,
 					Name:        user.Machine.Name,
@@ -647,7 +651,6 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 					ExpirationDate: timestamppb.New(key.Expiration),
 					PublicKey:      key.PublicKey,
 				})
-
 			}
 		}
 
@@ -656,7 +659,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 		if err != nil {
 			return nil, nil, nil, nil, err
 		}
-		metadataList, err := s.query.SearchUserMetadata(ctx, false, user.ID, &query.UserMetadataSearchQueries{Queries: []query.SearchQuery{metadataOrgSearch}}, false)
+		metadataList, err := s.query.SearchUserMetadata(ctx, false, user.ID, &query.UserMetadataSearchQueries{Queries: []query.SearchQuery{metadataOrgSearch}}, nil)
 		metaspan.EndWithError(err)
 		if err != nil {
 			return nil, nil, nil, nil, err
@@ -736,7 +739,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 	if err != nil {
 		return nil, nil, nil, nil, nil, err
 	}
-	queriedProjects, err := s.query.SearchProjects(ctx, &query.ProjectSearchQueries{Queries: []query.SearchQuery{projectSearch}})
+	queriedProjects, err := s.query.SearchProjects(ctx, &query.ProjectSearchQueries{Queries: []query.SearchQuery{projectSearch}}, nil)
 	if err != nil {
 		return nil, nil, nil, nil, nil, err
 	}
@@ -763,7 +766,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 			return nil, nil, nil, nil, nil, err
 		}
 
-		queriedProjectRoles, err := s.query.SearchProjectRoles(ctx, false, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectRoleSearch}})
+		queriedProjectRoles, err := s.query.SearchProjectRoles(ctx, false, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectRoleSearch}}, nil)
 		if err != nil {
 			return nil, nil, nil, nil, nil, err
 		}
@@ -780,7 +783,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 		if err != nil {
 			return nil, nil, nil, nil, nil, err
 		}
-		apps, err := s.query.SearchApps(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{appSearch}}, false)
+		apps, err := s.query.SearchApps(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{appSearch}}, nil)
 		if err != nil {
 			return nil, nil, nil, nil, nil, err
 		}
@@ -888,7 +891,6 @@ func (s *Server) getNecessaryProjectGrantMembersForOrg(ctx context.Context, org 
 						break
 					}
 				}
-
 			}
 		}
 	}
@@ -940,12 +942,11 @@ func (s *Server) getNecessaryOrgMembersForOrg(ctx context.Context, org string, p
 }
 
 func (s *Server) getNecessaryProjectGrantsForOrg(ctx context.Context, org string, processedOrgs []string, processedProjects []string) ([]*v1_pb.DataProjectGrant, error) {
-
 	projectGrantSearchOrg, err := query.NewProjectGrantResourceOwnerSearchQuery(org)
 	if err != nil {
 		return nil, err
 	}
-	queriedProjectGrants, err := s.query.SearchProjectGrants(ctx, &query.ProjectGrantSearchQueries{Queries: []query.SearchQuery{projectGrantSearchOrg}})
+	queriedProjectGrants, err := s.query.SearchProjectGrants(ctx, &query.ProjectGrantSearchQueries{Queries: []query.SearchQuery{projectGrantSearchOrg}}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -983,7 +984,7 @@ func (s *Server) getNecessaryUserGrantsForOrg(ctx context.Context, org string, p
 		return nil, err
 	}
 
-	queriedUserGrants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantSearchOrg}}, true)
+	queriedUserGrants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantSearchOrg}}, true, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -991,7 +992,7 @@ func (s *Server) getNecessaryUserGrantsForOrg(ctx context.Context, org string, p
 	for _, userGrant := range queriedUserGrants.UserGrants {
 		for _, projectID := range processedProjects {
 			if projectID == userGrant.ProjectID {
-				//if usergrant is on a granted project
+				// if usergrant is on a granted project
 				if userGrant.GrantID != "" {
 					for _, grantID := range processedGrants {
 						if grantID == userGrant.GrantID {
@@ -1024,6 +1025,7 @@ func (s *Server) getNecessaryUserGrantsForOrg(ctx context.Context, org string, p
 	}
 	return userGrants, nil
 }
+
 func (s *Server) getCustomLoginTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomLoginTextsRequest, error) {
 	customTexts := make([]*management_pb.SetCustomLoginTextsRequest, 0, len(languages))
 	for _, lang := range languages {
@@ -1063,7 +1065,6 @@ func (s *Server) getCustomLoginTexts(ctx context.Context, org string, languages 
 				RegistrationUserText:                 text_grpc.RegistrationUserScreenTextToPb(text.RegistrationUser),
 				ExternalRegistrationUserOverviewText: text_grpc.ExternalRegistrationUserOverviewScreenTextToPb(text.ExternalRegistrationUserOverview),
 				RegistrationOrgText:                  text_grpc.RegistrationOrgScreenTextToPb(text.RegistrationOrg),
-				LinkingUserPromptText:                text_grpc.LinkingUserPromptScreenTextToPb(text.LinkingUserPrompt),
 				LinkingUserDoneText:                  text_grpc.LinkingUserDoneScreenTextToPb(text.LinkingUsersDone),
 				ExternalUserNotFoundText:             text_grpc.ExternalUserNotFoundScreenTextToPb(text.ExternalNotFound),
 				SuccessLoginText:                     text_grpc.SuccessLoginScreenTextToPb(text.LoginSuccess),

@@ -1,7 +1,6 @@
 package query
 
 import (
-	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
@@ -34,8 +33,7 @@ var (
 		` FROM (SELECT DISTINCT projections.instances.id, COUNT(*) OVER () FROM projections.instances` +
 		` LEFT JOIN projections.instance_domains ON projections.instances.id = projections.instance_domains.instance_id) AS f` +
 		` LEFT JOIN projections.instances ON f.id = projections.instances.id` +
-		` LEFT JOIN projections.instance_domains ON f.id = projections.instance_domains.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` LEFT JOIN projections.instance_domains ON f.id = projections.instance_domains.instance_id`
 	instancesCols = []string{
 		"count",
 		"id",
@@ -64,15 +62,15 @@ func Test_InstancePrepares(t *testing.T) {
 	}
 	tests := []struct {
 		name           string
-		prepare        interface{}
+		prepare        any
 		additionalArgs []reflect.Value
 		want           want
-		object         interface{}
+		object         any
 	}{
 		{
 			name: "prepareInstancesQuery no result",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery(ctx, db)
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+				filter, query, scan := prepareInstancesQuery(Column{}, true)
 				return query(filter), scan
 			},
 			want: want{
@@ -86,8 +84,8 @@ func Test_InstancePrepares(t *testing.T) {
 		},
 		{
 			name: "prepareInstancesQuery one result",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery(ctx, db)
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+				filter, query, scan := prepareInstancesQuery(Column{}, true)
 				return query(filter), scan
 			},
 			want: want{
@@ -150,8 +148,8 @@ func Test_InstancePrepares(t *testing.T) {
 		},
 		{
 			name: "prepareInstancesQuery multiple results",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery(ctx, db)
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+				filter, query, scan := prepareInstancesQuery(Column{}, true)
 				return query(filter), scan
 			},
 			want: want{
@@ -255,7 +253,8 @@ func Test_InstancePrepares(t *testing.T) {
 								IsPrimary:    true,
 							},
 						},
-					}, {
+					},
+					{
 						ID:           "id2",
 						CreationDate: testNow,
 						ChangeDate:   testNow,
@@ -283,8 +282,8 @@ func Test_InstancePrepares(t *testing.T) {
 		},
 		{
 			name: "prepareInstancesQuery sql err",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery(ctx, db)
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+				filter, query, scan := prepareInstancesQuery(Column{}, true)
 				return query(filter), scan
 			},
 			want: want{
@@ -304,7 +303,7 @@ func Test_InstancePrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, append(defaultPrepareArgs, tt.additionalArgs...)...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, tt.additionalArgs...)
 		})
 	}
 }

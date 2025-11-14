@@ -56,7 +56,7 @@ func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server
 		start.New(server),
 		start.NewStartFromInit(server),
 		start.NewStartFromSetup(server),
-		mirror.New(),
+		mirror.New(&configFiles),
 		key.New(),
 		ready.New(),
 	)

@@ -37,7 +37,7 @@
       "DESCRIPTION": "A project hosts one or more applications, that you can use to authenticate your users. Also you can authorize your users with projects. To allow users from other organizations to log in to your applications, grant them access to your project.<br/><br/>If you can't find a project, contact the projects owner or someone with the corresponding rights to gain access.",
       "OWNED": {
         "TITLE": "Owned Projects",
-        "DESCRIPTION": "These are the projects you own. You can manage theses projects settings, authorizations and applications."
+        "DESCRIPTION": "These are the projects you own. You can manage these project settings, authorizations and applications."
       },
       "GRANTED": {
         "TITLE": "Granted Projects",
@@ -75,11 +75,12 @@
       "FLOWS": {
         "TITLE": "Flows",
         "DESCRIPTION": "Choose an authentication flow and trigger your action on a specific event within this flow."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2 a new, improved version of Actions is now available. The current version is still accessible, but our future development will focus on the new one, which will eventually replace the current version."
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Default Settings",
+        "TITLE": "Instance Settings",
         "DESCRIPTION": "Default settings for all organizations. With the right permissions, some of them are overridable in organization settings."
       },
       "ORG": {
@@ -185,6 +186,32 @@
           "DESCRIPTION": "The idle refresh token lifetime is the maximum time a refresh token can be unused."
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Manage your OIDC Web Keys to securely sign and validate tokens for your ZITADEL instance.",
+        "TABLE": {
+          "TITLE": "Active and Future Web Keys",
+          "DESCRIPTION": "Your active and upcoming web keys. Activating a new key will deactivate the current one.",
+          "NOTE": "Note: The JWKs OIDC endpoint returns a cacheable response (default 5 min). Avoid activating a key too soon, as it may not be available to caches and clients yet.",
+          "ACTIVATE": "Activate next Web Key",
+          "ACTIVE": "Currently active",
+          "NEXT": "Next in queue",
+          "FUTURE": "Future",
+          "WARNING": "Web Key is less than 5 min old"
+        },
+        "CREATE": {
+          "TITLE": "Create new Web Key",
+          "DESCRIPTION": "Creating a new web key adds it to your list. ZITADEL uses RSA2048 keys with a SHA256 hasher by default.",
+          "KEY_TYPE": "Key Type",
+          "BITS": "Bits",
+          "HASHER": "Hasher",
+          "CURVE": "Curve"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Previous Web Keys",
+          "DESCRIPTION": "These are your previous web keys that are no longer active.",
+          "DEACTIVATED_ON": "Deactivated on"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "Message Texts",
         "DESCRIPTION": "Customize the texts of your notification email or SMS messages. If you want to disable some of the languages, restrict them in your instances language settings.",
@@ -197,7 +224,8 @@
           "VE": "When a user changes their email address, they will receive an email with a link to verify the new address.",
           "VP": "When a user changes their phone number, they will receive an SMS with a code to verify the new number.",
           "VEO": "When a user adds a One-Time Password via email method, they need to activate it by entering a code sent to their email address.",
-          "VSO": "When a user adds a One-Time Password via SMS method, they need to activate it by entering a code sent to their phone number."
+          "VSO": "When a user adds a One-Time Password via SMS method, they need to activate it by entering a code sent to their phone number.",
+          "IU": "When a user invite code is created, they will receive an email with a link to set their authentication method."
         }
       },
       "LOGIN_TEXTS": {
@@ -231,15 +259,15 @@
           "LABEL": "Maximum Lifetime in hours",
           "PW_CHECK": {
             "TITLE": "Password Check",
-            "DESCRIPTION": "Your users have to change their passwords in these periods."
+            "DESCRIPTION": "Users will be required to re-authenticate with their password after this period."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "External Login Check",
-            "DESCRIPTION": "Your users are redirected to their external identity proviers in theses periods."
+            "DESCRIPTION": "Your users are redirected to their external identity providers after this periods."
           },
           "MULTI_FACTOR_INIT": {
             "TITLE": "Multifactor Init Check",
-            "DESCRIPTION": "Your users will be prompted to set up a second factor or a Multifactor in these periods, if they haven't done so already. A lifetime of 0 deactivates this prompt."
+            "DESCRIPTION": "Your users will be prompted to set up a second factor or a Multifactor after this periods if they haven't done so already. A lifetime of 0 deactivates this prompt."
           },
           "SECOND_FACTOR_CHECK": {
             "TITLE": "Second Factor Check",
@@ -403,6 +431,7 @@
     "SHOWORGS": "Show All Organizations",
     "GRANTS": "Authorizations",
     "ACTIONS": "Actions",
+    "TARGETS": "Targets",
     "PRIVACY": "Privacy",
     "TOS": "Terms of Service",
     "OPENSHORTCUTSTOOLTIP": "Type ? to show keyboard shortcuts",
@@ -501,6 +530,118 @@
     "DOWNLOAD": "Download",
     "APPLY": "Apply"
   },
+  "ACTIONSTWO": {
+    "BETA_NOTE": "You are currently using the new Actions V2, which is in beta. The previous Version 1 is still available but will be discontinued in the future. Please report any issues or feedback.",
+    "EXECUTION": {
+      "TITLE": "Actions",
+      "DESCRIPTION": "Actions let you run custom code in response to API requests, events or specific functions. Use them to extend Zitadel, automate workflows, and integrate with other systems.",
+      "TYPES": {
+        "request": "Request",
+        "response": "Response",
+        "event": "Events",
+        "function": "Function"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Create an Action",
+        "UPDATE_TITLE": "Update an Action",
+        "TYPE": {
+          "DESCRIPTION": "Select when you want this Action to run",
+          "REQUEST": {
+            "TITLE": "Request",
+            "DESCRIPTION": "Requests that occur within Zitadel. This could be something as a login request call."
+          },
+          "RESPONSE": {
+            "TITLE": "Response",
+            "DESCRIPTION": "A response from a request within Zitadel. Think of the response you get back from fetching a user."
+          },
+          "EVENTS": {
+            "TITLE": "Events",
+            "DESCRIPTION": "Events that happen within Zitadel. This could be anything like a user creating an account, a successful login etc."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Functions",
+            "DESCRIPTION": "Functions that you can call within Zitadel. This could be anything from sending an email to creating a user."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Choose whether this action applies to all request, a specific service (ec. user management), or a single request (e.g. create user).",
+          "ALL": {
+            "TITLE": "All",
+            "DESCRIPTION": "Select this if you want to run your action on every request"
+          },
+          "ALL_EVENTS": "Select this if you want to run your action on every event",
+          "SELECT_SERVICE": {
+            "TITLE": "Select Service",
+            "DESCRIPTION": "Choose a Zitadel Service for you action."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Select Method",
+            "DESCRIPTION": "If you want to only execute on a specific request, select it here",
+            "NOTE": "If you don't select a method, your action will run on every request in your selected service."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Function Name",
+            "DESCRIPTION": "Choose the function you want to execute"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Set Group",
+            "DESCRIPTION": "If you want to only execute on a group of events, set the group here"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Select Event",
+            "DESCRIPTION": "If you want to only execute on a specific event, specify it here"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "You can choose to execute a target, or to run it on the same conditions as other targets.",
+          "TARGET": {
+            "DESCRIPTION": "The target you want to execute for this action"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Execution Conditions"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Condition",
+        "TYPE": "Type",
+        "TARGET": "Target",
+        "CREATIONDATE": "Creation Date"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Targets",
+      "DESCRIPTION": "A target is the destination of the code you want to execute from an action. Create a target here and at it to your actions.",
+      "CREATE": {
+        "TITLE": "Create your Target",
+        "DESCRIPTION": "Create your own target outside of Zitadel",
+        "NAME": "Name",
+        "NAME_DESCRIPTION": "Give your target a clear, descriptive name to make it easy to identify later",
+        "TYPE": "Type",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST Call",
+          "restAsync": "REST Async"
+        },
+        "TYPES_DESCRIPTION": "Webhook, the call handles the status code but response is irrelevant\nCall, the call handles the status code and response\nAsync, the call handles neither status code nor response, but can be called in parallel with other Targets",
+        "ENDPOINT": "Endpoint",
+        "ENDPOINT_DESCRIPTION": "Enter the endpoint where your code is hosted. Make sure it is accessible to us!",
+        "TIMEOUT": "Timeout",
+        "TIMEOUT_DESCRIPTION": "Set the maximum time your target has to respond. If it takes longer, we will stop the request.",
+        "INTERRUPT_ON_ERROR": "Interrupt on Error",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Stop all executions when the targets returns with an error",
+        "INTERRUPT_ON_ERROR_WARNING": "Caution: “Interrupt on Error” halts operations on failure, risking lockout. Test with it disabled to prevent blocking login/creation.",
+        "AWAIT_RESPONSE": "Await Response",
+        "AWAIT_RESPONSE_DESCRIPTION": "We'll Wait for a response before we do anything else. Useful if you intend to use multiple targets for a single action"
+      },
+      "TABLE": {
+        "NAME": "Name",
+        "ENDPOINT": "Endpoint",
+        "CREATIONDATE": "Creation Date",
+        "REORDER": "Reorder"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "Has control over the whole instance, including all organizations",
     "IAM_OWNER_VIEWER": "Has permission to review the whole instance, including all organizations",
@@ -508,14 +649,17 @@
     "IAM_USER_MANAGER": "Has permission to create and manage users",
     "IAM_ADMIN_IMPERSONATOR": "Has permission to impersonate admin and end users from all organizations",
     "IAM_END_USER_IMPERSONATOR": "Has permission to impersonate end users from all organizations",
+    "IAM_LOGIN_CLIENT": "Has permission to manage login clients",
     "ORG_OWNER": "Has permission over the whole organization",
     "ORG_USER_MANAGER": "Has permission to create and manage users of the organization",
     "ORG_OWNER_VIEWER": "Has permission to review the whole organization",
+    "ORG_SETTINGS_MANAGER": "Has permission to manage organization settings",
     "ORG_USER_PERMISSION_EDITOR": "Has permission to manage user grants",
     "ORG_PROJECT_PERMISSION_EDITOR": "Has permission to manage project grants",
     "ORG_PROJECT_CREATOR": "Has permission to create his own projects and underlying settings",
     "ORG_ADMIN_IMPERSONATOR": "Has permission to impersonate admin and end users from the organization",
     "ORG_END_USER_IMPERSONATOR": "Has permission to impersonate end users from the organization",
+    "ORG_USER_SELF_MANAGER": "Has permission to manage their own user",
     "PROJECT_OWNER": "Has permission over the whole project",
     "PROJECT_OWNER_VIEWER": "Has permission to review the whole project",
     "PROJECT_OWNER_GLOBAL": "Has permission over the whole project",
@@ -545,12 +689,13 @@
   },
   "FILTER": {
     "TITLE": "Filter",
-    "STATE": "Status",
+    "ORGNAME": "Organization Name",
+    "ORGID": "Organization ID",
+    "STATE": "State",
+    "PRIMARYDOMAIN": "Primary Domain",
     "DISPLAYNAME": "User Display Name",
     "EMAIL": "Email",
     "USERNAME": "User Name",
-    "ORGNAME": "Organization Name",
-    "PRIMARYDOMAIN": "Primary Domain",
     "PROJECTNAME": "Project Name",
     "RESOURCEOWNER": "Resource Owner",
     "METHODS": {
@@ -565,7 +710,7 @@
     "SIDEWIDE": "Site-wide shortcuts",
     "SHORTCUTS": {
       "HOME": "<strong>G</strong>o to <strong>H</strong>ome",
-      "INSTANCE": "<strong>G</strong>o to <strong>I</strong>instance",
+      "INSTANCE": "<strong>G</strong>o to <strong>I</strong>nstance",
       "ORG": "<strong>G</strong>o to <strong>O</strong>rganization",
       "ORGSETTINGS": "<strong>G</strong>o to Organization <strong>S</strong>ettings",
       "ORGSWITCHER": "Change Organization",
@@ -759,7 +904,7 @@
         "3": "Deleted"
       },
       "DIALOG": {
-        "MFA_DELETE_TITLE": "Remove Secondfactor",
+        "MFA_DELETE_TITLE": "Remove Second factor",
         "MFA_DELETE_DESCRIPTION": "You are about to delete a second factor. Are you sure?",
         "ADD_MFA_TITLE": "Add Second Factor",
         "ADD_MFA_DESCRIPTION": "Select one of the following options."
@@ -772,9 +917,9 @@
       "IDPNAME": "IDP Name",
       "USERDISPLAYNAME": "External Name",
       "EXTERNALUSERID": "External User ID",
-      "EMPTY": "No external IDP found",
+      "EMPTY": "No external IdP found",
       "DIALOG": {
-        "DELETE_TITLE": "Remove IDP",
+        "DELETE_TITLE": "Remove IdP",
         "DELETE_DESCRIPTION": "You are about to delete an Identity Provider from a user. Do you really want to continue?"
       }
     },
@@ -786,7 +931,10 @@
       "PHONESECTION": "Phone numbers",
       "PASSWORDSECTION": "Initial Password",
       "ADDRESSANDPHONESECTION": "Phone number",
-      "INITMAILDESCRIPTION": "If both options are selected, no email for initialization will be sent. If only one of the options is selected, a mail to provide / verify the data will be sent."
+      "INITMAILDESCRIPTION": "If both options are selected, no email for initialization will be sent. If only one of the options is selected, a mail to provide / verify the data will be sent.",
+      "SETUPAUTHENTICATIONLATER": "Setup authentication later for this User.",
+      "INVITATION": "Send an invitation E-Mail for authentication setup and E-Mail verification.",
+      "INITIALPASSWORD": "Set an initial password for the User."
     },
     "CODEDIALOG": {
       "TITLE": "Verify Phone Number",
@@ -808,6 +956,9 @@
       "EMAIL": "E-mail",
       "PHONE": "Phone number",
       "PHONE_HINT": "Use the + symbol followed by the calling country code, or select the country from the dropdown and finally enter the phone number",
+      "PHONE_VERIFIED": "Phone Number Verified",
+      "SEND_SMS": "Send Verification SMS",
+      "SEND_EMAIL": "Send E-Mail",
       "USERNAME": "User Name",
       "CHANGEUSERNAME": "modify",
       "CHANGEUSERNAME_TITLE": "Change username",
@@ -948,6 +1099,14 @@
       "5": "Suspended",
       "6": "Initial"
     },
+    "STATEV2": {
+      "0": "Unknown",
+      "1": "Active",
+      "2": "Inactive",
+      "3": "Deleted",
+      "4": "Locked",
+      "5": "Initial"
+    },
     "SEARCH": {
       "ADDITIONAL": "Loginname (current organization)",
       "ADDITIONAL-EXTERNAL": "Loginname (external organization)"
@@ -1086,7 +1245,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Delete selected Actions?",
         "DESCRIPTION": "Are you sure you want to delete the selected actions from the flow?"
-      }
+      },
+      "ABOUTNAME": "The name of the action and the name of the function in the javascript have to be the same"
     },
     "TOAST": {
       "ACTIONSSET": "Actions set",
@@ -1338,11 +1498,14 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "External links",
       "OIDC": "OIDC Token lifetime and expiration",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "Secret Generator",
       "SECURITY": "Security settings",
       "EVENTS": "Events",
       "FAILEDEVENTS": "Failed Events",
-      "VIEWS": "Views"
+      "VIEWS": "Views",
+      "ACTIONS": "Actions",
+      "TARGETS": "Targets"
     },
     "GROUPS": {
       "GENERAL": "General Information",
@@ -1352,8 +1515,10 @@
       "TEXTS": "Texts and Languages",
       "APPEARANCE": "Appearance",
       "OTHER": "Other",
-      "STORAGE": "Storage"
-    }
+      "STORAGE": "Storage",
+      "ACTIONS": "Actions"
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -1380,7 +1545,12 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română",
+        "tr": "Türkçe"
       }
     },
     "SMTP": {
@@ -1417,6 +1587,8 @@
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
+        "VERIFYSERVICESID": "Verification Service Sid",
+        "VERIFYSERVICESID_DESCRIPTION": "Setting a Verification Service Sid, allows using the Twilio Verify Service instead of the Messages Service for verification of phone numbers and OTP SMS",
         "ADDED": "Twilio added successfully.",
         "UPDATED": "Twilio updated successfully.",
         "REMOVED": "Twilio removed",
@@ -1437,9 +1609,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - Email"
       },
-      "ADDGENERATOR": "Define Secret Generator",
-      "GENERATORTYPE": "Type",
-      "EXPIRY": "Expiration (in hours)",
+      "EXPIRY": "Expiration (in minutes)",
       "INCLUDEDIGITS": "Include Numbers",
       "INCLUDESYMBOLS": "Include Symbols",
       "INCLUDELOWERLETTERS": "Include Lower letters",
@@ -1459,16 +1629,20 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Login Default Org",
       "LOGINDEFAULTORG_DESCRIPTION": "The login UI will use the settings of the default org (and not from the instance) if no organization context is set",
-      "OIDCLEGACYINTROSPECTION": "OIDC Legacy introspection",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "We have recently refactored the introspection endpoint for performance reasons. This feature can be used to rollback to the legacy implementation if unexpected bugs arise.",
       "OIDCTOKENEXCHANGE": "OIDC Token Exchange",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Enable the experimental urn:ietf:params:oauth:grant-type:token-exchange grant type for the OIDC token endpoint. Token exchange can be used to request tokens with a lesser scope or impersonate other users. See the security policy to allow impersonation on an instance.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC Trigger introspection Projections",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Enable projection triggers during an introspection request. This can act as workaround if there are noticeable consistency issues in the introspection response but can have an impact on performance. We are planning to remove triggers for introspection requests in the future.",
       "USERSCHEMA": "User Schema",
       "USERSCHEMA_DESCRIPTION": "User Schemas allow to manage data schemas of user. If the flag is enabled, you'll be able to use the new API and its features.",
       "ACTIONS": "Actions",
       "ACTIONS_DESCRIPTION": "Actions v2 allow to manage data executions and targets. If the flag is enabled, you'll be able to use the new API and its features.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Session Termination",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "If the flag is enabled, you'll be able to terminate a single session from the login UI by providing an id_token with a `sid` claim as id_token_hint on the end_session endpoint. Note that currently all sessions from the same user agent (browser) are terminated in the login UI. Sessions managed through the Session API already allow the termination of single sessions.",
+      "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "If the flag is enabled, the OIDC parent error will be logged in the console.",
+      "ENABLEBACKCHANNELLOGOUT": "Enable Backchannel Logout",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "The Back-Channel Logout implements OpenID Connect Back-Channel Logout 1.0 and can be used to notify clients about session termination at the OpenID Provider.",
+      "PERMISSIONCHECKV2": "Permission Check V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "If the flag is enabled, you'll be able to use the new API and its features.",
       "STATES": {
         "INHERITED": "Inherit",
         "ENABLED": "Enabled",
@@ -1479,7 +1653,14 @@
         "ENABLED": "\"Enabled\" is inherited",
         "DISABLED": "\"Disabled\" is inherited"
       },
-      "RESET": "Set all to inherit"
+      "RESET": "Set all to inherit",
+      "CONSOLEUSEV2USERAPI": "Use V2 Api in Console for User creation",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "When this flag is enabled, the console uses the V2 User API to create new users. With the V2 API, newly created users start without an initial state.",
+      "LOGINV2": "Login V2",
+      "LOGINV2_DESCRIPTION": "Enabling this activates the new TypeScript-based login UI with improved security, performance, and customization.",
+      "LOGINV2_BASEURI": "Base URI",
+      "ENABLERELATIONALTABLES": "Relational Tables",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Enable this to use relational tables instead of projections for storing data. Currently this toggle does nothing."
     },
     "DIALOG": {
       "RESET": {
@@ -1614,7 +1795,12 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română",
+        "tr": "Türkçe"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -1629,7 +1815,6 @@
         "initPasswordText": "Initialize password",
         "initializeDoneText": "Initialize user done",
         "initializeUserText": "Initialize user",
-        "linkingUserPromptText": "Linking user prompt",
         "linkingUserDoneText": "Linking user done",
         "loginText": "Login",
         "logoutText": "Logout",
@@ -1665,7 +1850,8 @@
         "PR": "Password Reset",
         "DC": "Domain Claim",
         "PL": "Passwordless",
-        "PC": "Password Change"
+        "PC": "Password Change",
+        "IU": "Invite User"
       },
       "CHIPS": {
         "firstname": "Given name",
@@ -1684,8 +1870,9 @@
         "username": "Username",
         "tempUsername": "Temp username",
         "otp": "One-time password",
-        "verifyUrl": "Verify One-time-password URL",
-        "expiry": "Expiry"
+        "verifyUrl": "Verify One-time password URL",
+        "expiry": "Expiry",
+        "applicationName": "Application name"
       },
       "TOAST": {
         "UPDATED": "Custom Texts saved."
@@ -1713,8 +1900,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "The conventional login with user name and password is allowed.",
       "ALLOWEXTERNALIDP_DESC": "The login is allowed for the underlying identity providers",
       "ALLOWREGISTER_DESC": "If the option is selected, an additional step for registering a user appears in the login.",
-      "FORCEMFA": "Force MFA",
-      "FORCEMFALOCALONLY": "Force MFA for local authenticated users",
+      "FORCEMFA": "Force MFA for all users",
+      "FORCEMFALOCALONLY": "Force MFA for local authenticated users only",
       "FORCEMFALOCALONLY_DESC": "If the option is selected, local authenticated users have to configure a second factor for login.",
       "HIDEPASSWORDRESET_DESC": "If the option is selected, the user can't reset his password in the login process.",
       "HIDELOGINNAMESUFFIX": "Hide Loginname suffix",
@@ -1783,7 +1970,7 @@
       "TYPE": {
         "OWNED": "Owned Projects",
         "OWNED_SINGULAR": "Owned Project",
-        "GRANTED_SINGULAR": "Granted Project"
+        "GRANTED_SINGULAR": "Granted Project of {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Branding Setting",
@@ -1946,17 +2133,17 @@
       "CHANGEDATE": "Last Modified",
       "SELECTGROUPTOOLTIP": "Select all Roles of the group {{group}}.",
       "OPTIONS": "Options",
-      "ASSERTION": "Assert Roles on Authentication",
-      "ASSERTION_DESCRIPTION": "Role information is sent from Userinfo endpoint and depending on your application settings in tokens and other types.",
-      "CHECK": "Check authorization on Authentication",
-      "CHECK_DESCRIPTION": "If set, users are only allowed to authenticate if any role is assigned to their account.",
+      "ASSERTION": "Return user roles during authentication",
+      "ASSERTION_DESCRIPTION": "When a user authenticates, their role information is provided to your application. For OpenID Connect, the roles can be requested from the UserInfo endpoint or sent in the ID or Access Token, based on your application's configuration.",
+      "CHECK": "Only authorized users can authenticate",
+      "CHECK_DESCRIPTION": "Deny authentication if the user has no authorization assigned to this project. Authorizations to the project without assigned a specific role to the user are allowed.",
       "DIALOG": {
         "DELETE_TITLE": "Delete role",
         "DELETE_DESCRIPTION": "You are about to delete a project role. Are you sure?"
       }
     },
-    "HAS_PROJECT": "Check for Project on Authentication",
-    "HAS_PROJECT_DESCRIPTION": "It is checked whether the user's organization has this project. If not, the user cannot be authenticated.",
+    "HAS_PROJECT": "Authentication is restricted to users from organizations that have been granted access to this project",
+    "HAS_PROJECT_DESCRIPTION": "Before a user can be authenticated, it is verified that their affiliated organization has been granted access to this project. Authentication is not permitted for users from unauthorized organizations.",
     "TABLE": {
       "TOTAL": "Entries total:",
       "SELECTION": "Selected Elements",
@@ -1964,6 +2151,7 @@
       "ACTIVATE": "Activate Project",
       "DELETE": "Delete Project",
       "ORGNAME": "Organization Name",
+      "ORGID": "Organization ID",
       "ORGDOMAIN": "Organization Domain",
       "STATE": "Status",
       "TYPE": "Type",
@@ -2067,10 +2255,10 @@
       "ISAUTOCREATION_DESC": "If selected, an account will be created if it does not exist yet.",
       "ISAUTOUPDATE": "Automatic update",
       "ISAUTOUPDATE_DESC": "If selected, accounts are updated on reauthentication.",
-      "ISCREATIONALLOWED": "Account creation allowed",
-      "ISCREATIONALLOWED_DESC": "Determines whether accounts can be created.",
-      "ISLINKINGALLOWED": "Account linking allowed",
-      "ISLINKINGALLOWED_DESC": "Determines whether an identity can be linked to an existing account.",
+      "ISCREATIONALLOWED": "Account creation allowed (manually)",
+      "ISCREATIONALLOWED_DESC": "Determines whether accounts can be created using an external account. Disable if users should not be able to edit account information when auto_creation is enabled.",
+      "ISLINKINGALLOWED": "Account linking allowed (manually)",
+      "ISLINKINGALLOWED_DESC": "Determines whether an identity can be manually linked to an existing account. Disable if users should only be allowed to link the proposed account in case of active auto_linking.",
       "AUTOLINKING_DESC": "Determines whether an identity will be prompted to be linked to an existing account.",
       "AUTOLINKINGTYPE": {
         "0": "Disabled",
@@ -2146,7 +2334,7 @@
     "PREFERREDLANGUAGEATTRIBUTE": "Preferred language attribute",
     "PREFERREDUSERNAMEATTRIBUTE": "Preferred username attribute",
     "PROFILEATTRIBUTE": "Profile attribute",
-    "IDPDISPLAYNAMMAPPING": "IDP Display Name Mapping",
+    "IDPDISPLAYNAMMAPPING": "IdP Display Name Mapping",
     "USERNAMEMAPPING": "Username Mapping",
     "DATES": "Dates",
     "CREATIONDATE": "Created At",
@@ -2154,13 +2342,15 @@
     "DEACTIVATE": "Deactivate",
     "ACTIVATE": "Activate",
     "DELETE": "Delete",
-    "DELETE_TITLE": "Delete IDP",
+    "DELETE_TITLE": "Delete IdP",
     "DELETE_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
-    "REMOVE_WARN_TITLE": "Remove IDP",
-    "REMOVE_WARN_DESCRIPTION": "You are about to remove an identity provider. This will remove the selection of the available IDP for your users and already registered users won't be able to login again. Are you sure to continue?",
-    "DELETE_SELECTION_TITLE": "Delete IDP",
+    "REMOVE_WARN_TITLE": "Remove IdP",
+    "REMOVE_WARN_DESCRIPTION": "You are about to remove an identity provider. This will remove the selection of the available IdP for your users and already registered users won't be able to login again. Are you sure to continue?",
+    "DELETE_SELECTION_TITLE": "Delete IdP",
     "DELETE_SELECTION_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
-    "EMPTY": "No IDP available",
+    "FEDERATEDLOGOUTENABLED": "Federated Logout Enabled",
+    "FEDERATEDLOGOUTENABLED_DESC": "If enabled, the user will be logged out from the IdP as well if the user terminates the session in ZITADEL.",
+    "EMPTY": "No IdP available",
     "OIDC": {
       "GENERAL": "General Information",
       "TITLE": "OIDC Configuration",
@@ -2186,6 +2376,7 @@
       "METADATAURL": "Metadata URL",
       "BINDING": "Binding",
       "SIGNEDREQUEST": "Signed Request",
+      "SIGNATUREALGORITHM": "Signature Algorithm",
       "NAMEIDFORMAT": "NameID Format",
       "TRANSIENTMAPPINGATTRIBUTENAME": "Custom Mapping Attribute Name",
       "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
@@ -2202,7 +2393,9 @@
       "REMOVED": "Removed successfully."
     },
     "ISIDTOKENMAPPING": "Map from the ID token",
-    "ISIDTOKENMAPPING_DESC": "If selected, provider information gets mapped from the ID token, not from the userinfo endpoint."
+    "ISIDTOKENMAPPING_DESC": "If selected, provider information gets mapped from the ID token, not from the userinfo endpoint.",
+    "USEPKCE": "Use PKCE",
+    "USEPKCE_DESC": "Determines whether the code_challenge and code_challenge_method params are included in the auth request"
   },
   "MFA": {
     "LIST": {
@@ -2456,8 +2649,8 @@
       "ACCESSTOKENROLEASSERTION": "Add user roles to the access token",
       "ACCESSTOKENROLEASSERTION_DESCRIPTION": "If selected, the requested roles of the authenticated user are added to the access token.",
       "IDTOKENROLEASSERTION": "User roles inside ID Token",
-      "IDTOKENROLEASSERTION_DESCRIPTION": "If selected, the requested roles of the authenticated user are added to the ID token.",
-      "IDTOKENUSERINFOASSERTION": "User Info inside ID Token",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "When this option is enabled, the authenticated user's assigned roles will be added directly to their ID token. Ensure to enable the Project setting 'Assign user roles during authentication' or request via custom scope.",
+      "IDTOKENUSERINFOASSERTION": "Include user's roles in the ID Token",
       "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Enables clients to retrieve profile, email, phone and address claims from ID token.",
       "CLOCKSKEW": "Enables clients to handle clock skew of OP and client. The duration (0-5s) will be added to exp claim and subtracted from iats, auth_time and nbf.",
       "RECOMMENDED": "recommended",
@@ -2556,6 +2749,10 @@
       "CLIENTSECRETREGENERATED": "client secret generated.",
       "DELETED": "App deleted.",
       "CONFIGCHANGED": "Changes detected!"
+    },
+    "LOGINV2": {
+      "USEV2": "Use new Login UI",
+      "BASEURL": "Custom base URL for the new Login UI"
     }
   },
   "GENDERS": {
@@ -2579,7 +2776,12 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia",
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română",
+    "tr": "Türkçe"
   },
   "MEMBER": {
     "ADD": "Add a Manager",

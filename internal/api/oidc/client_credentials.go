@@ -8,36 +8,16 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
-	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type clientCredentialsRequest struct {
-	sub      string
-	audience []string
-	scopes   []string
-}
-
-// GetSubject returns the subject for token to be created because of the client credentials request
-// the subject will be the id of the service user
-func (c *clientCredentialsRequest) GetSubject() string {
-	return c.sub
-}
-
-// GetAudience returns the audience for token to be created because of the client credentials request
-func (c *clientCredentialsRequest) GetAudience() []string {
-	return c.audience
-}
-
-func (c *clientCredentialsRequest) GetScopes() []string {
-	return c.scopes
-}
-
 func (s *Server) clientCredentialsAuth(ctx context.Context, clientID, clientSecret string) (op.Client, error) {
 	user, err := s.query.GetUserByLoginName(ctx, false, clientID)
 	if zerrors.IsNotFound(err) {
-		return nil, oidc.ErrInvalidClient().WithParent(err).WithDescription("client not found")
+		return nil, oidc.ErrInvalidClient().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError).WithDescription("client not found")
 	}
 	if err != nil {
 		return nil, err // defaults to server error
@@ -49,31 +29,34 @@ func (s *Server) clientCredentialsAuth(ctx context.Context, clientID, clientSecr
 	updated, err := s.hasher.Verify(user.Machine.EncodedSecret, clientSecret)
 	spanPasswordComparison.EndWithError(err)
 	if err != nil {
-		s.command.MachineSecretCheckFailed(ctx, user.ID, user.ResourceOwner)
 		return nil, zerrors.ThrowInvalidArgument(err, "OIDC-VoXo6", "Errors.User.Machine.Secret.Invalid")
 	}
 
 	s.command.MachineSecretCheckSucceeded(ctx, user.ID, user.ResourceOwner, updated)
 	return &clientCredentialsClient{
-		id:   clientID,
-		user: user,
+		clientID:      user.Username,
+		userID:        user.ID,
+		resourceOwner: user.ResourceOwner,
+		tokenType:     user.Machine.AccessTokenType,
 	}, nil
 }
 
 type clientCredentialsClient struct {
-	id   string
-	user *query.User
+	clientID      string
+	userID        string
+	resourceOwner string
+	tokenType     domain.OIDCTokenType
 }
 
 // AccessTokenType returns the AccessTokenType for the token to be created because of the client credentials request
 // machine users currently only have opaque tokens ([op.AccessTokenTypeBearer])
 func (c *clientCredentialsClient) AccessTokenType() op.AccessTokenType {
-	return accessTokenTypeToOIDC(c.user.Machine.AccessTokenType)
+	return accessTokenTypeToOIDC(c.tokenType)
 }
 
 // GetID returns the client_id (username of the machine user) for the token to be created because of the client credentials request
 func (c *clientCredentialsClient) GetID() string {
-	return c.id
+	return c.clientID
 }
 
 // RedirectURIs returns nil as there are no redirect uris

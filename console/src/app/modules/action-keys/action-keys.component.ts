@@ -16,6 +16,7 @@ export enum ActionKeysType {
   selector: 'cnsl-action-keys',
   templateUrl: './action-keys.component.html',
   styleUrls: ['./action-keys.component.scss'],
+  standalone: false,
 })
 export class ActionKeysComponent implements AfterViewInit {
   @Input() type: ActionKeysType = ActionKeysType.ADD;

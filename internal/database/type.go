@@ -225,3 +225,37 @@ func (d *NullDuration) Scan(src any) error {
 	d.Duration, d.Valid = time.Duration(*duration), true
 	return nil
 }
+
+// JSONArray allows sending and receiving JSON arrays to and from the database.
+// It implements the [database/sql.Scanner] and [database/sql/driver.Valuer] interfaces.
+// Values are marshaled and unmarshaled using the [encoding/json] package.
+type JSONArray[T any] []T
+
+// NewJSONArray wraps an existing slice into a JSONArray.
+func NewJSONArray[T any](a []T) JSONArray[T] {
+	return JSONArray[T](a)
+}
+
+// Scan implements the [database/sql.Scanner] interface.
+func (a *JSONArray[T]) Scan(src any) error {
+	if src == nil {
+		*a = nil
+		return nil
+	}
+
+	bytes := src.([]byte)
+	if len(bytes) == 0 {
+		*a = nil
+		return nil
+	}
+
+	return json.Unmarshal(bytes, a)
+}
+
+// Value implements the [database/sql/driver.Valuer] interface.
+func (a JSONArray[T]) Value() (driver.Value, error) {
+	if a == nil {
+		return nil, nil
+	}
+	return json.Marshal(a)
+}

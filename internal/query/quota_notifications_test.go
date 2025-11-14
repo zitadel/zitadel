@@ -92,8 +92,7 @@ var (
 		` projections.quotas_notifications.percent,` +
 		` projections.quotas_notifications.repeat,` +
 		` projections.quotas_notifications.next_due_threshold` +
-		` FROM projections.quotas_notifications` +
-		` AS OF SYSTEM TIME '-1 ms'`)
+		` FROM projections.quotas_notifications`)
 
 	quotaNotificationsCols = []string{
 		"id",
@@ -175,7 +174,7 @@ func Test_prepareQuotaNotificationsQuery(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

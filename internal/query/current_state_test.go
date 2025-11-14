@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
+
+	"github.com/shopspring/decimal"
 )
 
 var (
@@ -19,8 +21,7 @@ var (
 		` projections.current_states.aggregate_id,` +
 		` projections.current_states.sequence,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.current_states` +
-		" AS OF SYSTEM TIME '-1 ms' "
+		` FROM projections.current_states`
 
 	currentSequenceCols = []string{
 		"last_updated",
@@ -87,7 +88,7 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 						State: State{
 							EventCreatedAt: testNow,
 							LastRun:        testNow,
-							Position:       20211108,
+							Position:       decimal.NewFromInt(20211108),
 							AggregateID:    "agg-id",
 							AggregateType:  "agg-type",
 							Sequence:       20211108,
@@ -134,7 +135,7 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 						ProjectionName: "projection-name",
 						State: State{
 							EventCreatedAt: testNow,
-							Position:       20211108,
+							Position:       decimal.NewFromInt(20211108),
 							LastRun:        testNow,
 							AggregateID:    "agg-id",
 							AggregateType:  "agg-type",
@@ -145,7 +146,7 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 						ProjectionName: "projection-name2",
 						State: State{
 							EventCreatedAt: testNow,
-							Position:       20211108,
+							Position:       decimal.NewFromInt(20211108),
 							LastRun:        testNow,
 							AggregateID:    "agg-id",
 							AggregateType:  "agg-type",
@@ -175,7 +176,7 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

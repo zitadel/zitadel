@@ -16,8 +16,6 @@ type FillFieldsForOrgDomainVerified struct {
 func (mig *FillFieldsForOrgDomainVerified) Execute(ctx context.Context, _ eventstore.Event) error {
 	instances, err := mig.eventstore.InstanceIDs(
 		ctx,
-		0,
-		true,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).
 			OrderDesc().
 			AddQuery().

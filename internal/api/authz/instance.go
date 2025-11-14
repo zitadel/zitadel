@@ -6,20 +6,17 @@ import (
 
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/feature"
 )
 
-var (
-	emptyInstance = &instance{}
-)
+var emptyInstance = &instance{}
 
 type Instance interface {
 	InstanceID() string
 	ProjectID() string
 	ConsoleClientID() string
 	ConsoleApplicationID() string
-	RequestedDomain() string
-	RequestedHost() string
 	DefaultLanguage() language.Tag
 	DefaultOrganisationID() string
 	SecurityPolicyAllowedOrigins() []string
@@ -27,21 +24,26 @@ type Instance interface {
 	Block() *bool
 	AuditLogRetention() *time.Duration
 	Features() feature.Features
+	ExecutionRouter() target.Router
 }
 
 type InstanceVerifier interface {
-	InstanceByHost(ctx context.Context, host string) (Instance, error)
-	InstanceByID(ctx context.Context) (Instance, error)
+	// InstanceByHost returns the instance for the given instanceDomain or publicDomain.
+	// Previously it used the host (hostname[:port]) to find the instance, but is now using the domain (hostname) only.
+	// For preventing issues in backports, the name of the method is not changed.
+	InstanceByHost(ctx context.Context, instanceDomain, publicDomain string) (Instance, error)
+	InstanceByID(ctx context.Context, id string) (Instance, error)
 }
 
 type instance struct {
-	id        string
-	domain    string
-	projectID string
-	appID     string
-	clientID  string
-	orgID     string
-	features  feature.Features
+	id               string
+	projectID        string
+	appID            string
+	clientID         string
+	orgID            string
+	defaultLanguage  language.Tag
+	features         feature.Features
+	executionTargets target.Router
 }
 
 func (i *instance) Block() *bool {
@@ -68,16 +70,8 @@ func (i *instance) ConsoleApplicationID() string {
 	return i.appID
 }
 
-func (i *instance) RequestedDomain() string {
-	return i.domain
-}
-
-func (i *instance) RequestedHost() string {
-	return i.domain
-}
-
 func (i *instance) DefaultLanguage() language.Tag {
-	return language.Und
+	return i.defaultLanguage
 }
 
 func (i *instance) DefaultOrganisationID() string {
@@ -94,6 +88,10 @@ func (i *instance) EnableImpersonation() bool {
 
 func (i *instance) Features() feature.Features {
 	return i.features
+}
+
+func (i *instance) ExecutionRouter() target.Router {
+	return i.executionTargets
 }
 
 func GetInstance(ctx context.Context) Instance {
@@ -116,13 +114,13 @@ func WithInstanceID(ctx context.Context, id string) context.Context {
 	return context.WithValue(ctx, instanceKey, &instance{id: id})
 }
 
-func WithRequestedDomain(ctx context.Context, domain string) context.Context {
+func WithDefaultLanguage(ctx context.Context, defaultLanguage language.Tag) context.Context {
 	i, ok := ctx.Value(instanceKey).(*instance)
 	if !ok {
 		i = new(instance)
 	}
 
-	i.domain = domain
+	i.defaultLanguage = defaultLanguage
 	return context.WithValue(ctx, instanceKey, i)
 }
 
@@ -134,7 +132,15 @@ func WithConsole(ctx context.Context, projectID, appID string) context.Context {
 
 	i.projectID = projectID
 	i.appID = appID
-	//i.clientID = clientID
+	return context.WithValue(ctx, instanceKey, i)
+}
+
+func WithConsoleClientID(ctx context.Context, clientID string) context.Context {
+	i, ok := ctx.Value(instanceKey).(*instance)
+	if !ok {
+		i = new(instance)
+	}
+	i.clientID = clientID
 	return context.WithValue(ctx, instanceKey, i)
 }
 
@@ -144,5 +150,14 @@ func WithFeatures(ctx context.Context, f feature.Features) context.Context {
 		i = new(instance)
 	}
 	i.features = f
+	return context.WithValue(ctx, instanceKey, i)
+}
+
+func WithExecutionRouter(ctx context.Context, router target.Router) context.Context {
+	i, ok := ctx.Value(instanceKey).(*instance)
+	if !ok {
+		i = new(instance)
+	}
+	i.executionTargets = router
 	return context.WithValue(ctx, instanceKey, i)
 }

@@ -11,6 +11,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -65,14 +66,14 @@ func TestAddOrg(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AssertValidation(t, context.Background(), AddOrgCommand(authz.WithRequestedDomain(context.Background(), "localhost"), tt.args.a, tt.args.name), nil, tt.want)
+			AssertValidation(t, context.Background(), AddOrgCommand(http_util.WithRequestedHost(context.Background(), "localhost"), tt.args.a, tt.args.name), nil, tt.want)
 		})
 	}
 }
 
 func TestCommandSide_AddOrg(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(t *testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
 		zitadelRoles []authz.RoleMapping
 	}
@@ -96,9 +97,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 		{
 			name: "invalid org, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -112,9 +111,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 		{
 			name: "invalid org (spaces), error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -129,8 +126,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 		{
 			name: "user removed, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilterOrgDomainNotFound(),
 					expectFilter(
 						eventFromEventPusher(
@@ -173,8 +169,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 		{
 			name: "push failed unique constraint, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilterOrgDomainNotFound(),
 					expectFilter(
 						eventFromEventPusher(
@@ -192,7 +187,6 @@ func TestCommandSide_AddOrg(t *testing.T) {
 							),
 						),
 					),
-					expectFilterOrgMemberNotFound(),
 					expectPushFailed(zerrors.ThrowAlreadyExists(nil, "id", "internal"),
 						org.NewOrgAddedEvent(
 							context.Background(),
@@ -229,7 +223,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:           authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				ctx:           http_util.WithRequestedHost(context.Background(), "iam-domain"),
 				name:          "Org",
 				userID:        "user1",
 				resourceOwner: "org1",
@@ -241,8 +235,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 		{
 			name: "push failed, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilterOrgDomainNotFound(),
 					expectFilter(
 						eventFromEventPusher(
@@ -260,7 +253,6 @@ func TestCommandSide_AddOrg(t *testing.T) {
 							),
 						),
 					),
-					expectFilterOrgMemberNotFound(),
 					expectPushFailed(zerrors.ThrowInternal(nil, "id", "internal"),
 						org.NewOrgAddedEvent(
 							context.Background(),
@@ -297,7 +289,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:           authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				ctx:           http_util.WithRequestedHost(context.Background(), "iam-domain"),
 				name:          "Org",
 				userID:        "user1",
 				resourceOwner: "org1",
@@ -309,8 +301,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 		{
 			name: "add org, no error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilterOrgDomainNotFound(),
 					expectFilter(
 						eventFromEventPusher(
@@ -328,7 +319,6 @@ func TestCommandSide_AddOrg(t *testing.T) {
 							),
 						),
 					),
-					expectFilterOrgMemberNotFound(),
 					expectPush(
 						org.NewOrgAddedEvent(context.Background(),
 							&org.NewAggregate("org2").Aggregate,
@@ -360,7 +350,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:           authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				ctx:           http_util.WithRequestedHost(context.Background(), "iam-domain"),
 				name:          "Org",
 				userID:        "user1",
 				resourceOwner: "org1",
@@ -380,8 +370,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 		{
 			name: "add org (remove spaces), no error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilterOrgDomainNotFound(),
 					expectFilter(
 						eventFromEventPusher(
@@ -399,7 +388,6 @@ func TestCommandSide_AddOrg(t *testing.T) {
 							),
 						),
 					),
-					expectFilterOrgMemberNotFound(),
 					expectPush(
 						org.NewOrgAddedEvent(context.Background(),
 							&org.NewAggregate("org2").Aggregate,
@@ -431,7 +419,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:           authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				ctx:           http_util.WithRequestedHost(context.Background(), "iam-domain"),
 				name:          " Org ",
 				userID:        "user1",
 				resourceOwner: "org1",
@@ -452,7 +440,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:   tt.fields.eventstore,
+				eventstore:   tt.fields.eventstore(t),
 				idGenerator:  tt.fields.idGenerator,
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
@@ -472,7 +460,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 
 func TestCommandSide_ChangeOrg(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx   context.Context
@@ -491,9 +479,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 		{
 			name: "empty name, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -506,9 +492,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 		{
 			name: "empty name (spaces), invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -522,8 +506,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 		{
 			name: "org not found, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -539,8 +522,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 		{
 			name: "no change (spaces), error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
@@ -551,7 +533,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   authz.WithRequestedDomain(context.Background(), "zitadel.ch"),
+				ctx:   http_util.WithRequestedHost(context.Background(), "zitadel.ch"),
 				orgID: "org1",
 				name:  " org ",
 			},
@@ -562,8 +544,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 		{
 			name: "push failed, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
@@ -581,7 +562,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   authz.WithRequestedDomain(context.Background(), "zitadel.ch"),
+				ctx:   http_util.WithRequestedHost(context.Background(), "zitadel.ch"),
 				orgID: "org1",
 				name:  "neworg",
 			},
@@ -592,8 +573,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 		{
 			name: "change org name verified, not primary",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
@@ -635,7 +615,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   authz.WithRequestedDomain(context.Background(), "zitadel.ch"),
+				ctx:   http_util.WithRequestedHost(context.Background(), "zitadel.ch"),
 				orgID: "org1",
 				name:  "neworg",
 			},
@@ -644,8 +624,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 		{
 			name: "change org name verified, with primary",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
@@ -695,9 +674,56 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   authz.WithRequestedDomain(context.Background(), "zitadel.ch"),
+				ctx:   http_util.WithRequestedHost(context.Background(), "zitadel.ch"),
 				orgID: "org1",
 				name:  "neworg",
+			},
+			res: res{},
+		},
+		{
+			name: "change org name case verified, with primary",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org"),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org"),
+						),
+						eventFromEventPusher(
+							org.NewDomainAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org.zitadel.ch"),
+						),
+						eventFromEventPusher(
+							org.NewDomainVerifiedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org.zitadel.ch"),
+						),
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org.zitadel.ch"),
+						),
+					),
+					expectPush(
+						org.NewOrgChangedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate, "org", "ORG",
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:   http_util.WithRequestedHost(context.Background(), "zitadel.ch"),
+				orgID: "org1",
+				name:  "ORG",
 			},
 			res: res{},
 		},
@@ -705,7 +731,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			_, err := r.ChangeOrg(tt.args.ctx, tt.args.orgID, tt.args.name)
 			if tt.res.err == nil {
@@ -720,7 +746,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 
 func TestCommandSide_DeactivateOrg(t *testing.T) {
 	type fields struct {
-		eventstore  *eventstore.Eventstore
+		eventstore  func(t *testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
 		iamDomain   string
 	}
@@ -741,8 +767,7 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 		{
 			name: "org not found, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -757,8 +782,7 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 		{
 			name: "org already inactive, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
@@ -783,8 +807,7 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 		{
 			name: "push failed, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
@@ -811,8 +834,7 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 		{
 			name: "deactivate org",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
@@ -837,7 +859,7 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore,
+				eventstore:  tt.fields.eventstore(t),
 				idGenerator: tt.fields.idGenerator,
 			}
 			_, err := r.DeactivateOrg(tt.args.ctx, tt.args.orgID)
@@ -853,7 +875,7 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 
 func TestCommandSide_ReactivateOrg(t *testing.T) {
 	type fields struct {
-		eventstore  *eventstore.Eventstore
+		eventstore  func(t *testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
 		iamDomain   string
 	}
@@ -874,8 +896,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 		{
 			name: "org not found, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -890,8 +911,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 		{
 			name: "org already active, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
@@ -912,8 +932,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 		{
 			name: "push failed, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
@@ -945,8 +964,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 		{
 			name: "reactivate org",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
@@ -975,7 +993,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore,
+				eventstore:  tt.fields.eventstore(t),
 				idGenerator: tt.fields.idGenerator,
 			}
 			_, err := r.ReactivateOrg(tt.args.ctx, tt.args.orgID)
@@ -991,7 +1009,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 
 func TestCommandSide_RemoveOrg(t *testing.T) {
 	type fields struct {
-		eventstore  *eventstore.Eventstore
+		eventstore  func(t *testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
 	}
 	type args struct {
@@ -1010,9 +1028,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 		{
 			name: "default org, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:   authz.WithInstance(context.Background(), &mockInstance{}),
@@ -1025,8 +1041,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 		{
 			name: "zitadel org, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -1051,8 +1066,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 		{
 			name: "org not found, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(), // zitadel project check
 					expectFilter(),
 				),
@@ -1068,8 +1082,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 		{
 			name: "push failed, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(), // zitadel project check
 					expectFilter(
 						eventFromEventPusher(
@@ -1088,6 +1101,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(),
 					expectFilter(),
 					expectFilter(),
@@ -1111,8 +1125,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 		{
 			name: "remove org",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(), // zitadel project check
 					expectFilter(
 						eventFromEventPusher(
@@ -1131,6 +1144,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(),
 					expectFilter(),
 					expectFilter(),
@@ -1151,8 +1165,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 		{
 			name: "remove org with usernames and domains",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(), // zitadel project check
 					expectFilter(
 						eventFromEventPusher(
@@ -1172,6 +1185,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1215,10 +1229,10 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							project.NewSAMLConfigAddedEvent(context.Background(), &project.NewAggregate("project1", "org1").Aggregate, "app1", "entity1", []byte{}, ""),
+							project.NewSAMLConfigAddedEvent(context.Background(), &project.NewAggregate("project1", "org1").Aggregate, "app1", "entity1", []byte{}, "", domain.LoginVersionUnspecified, ""),
 						),
 						eventFromEventPusher(
-							project.NewSAMLConfigAddedEvent(context.Background(), &project.NewAggregate("project2", "org1").Aggregate, "app2", "entity2", []byte{}, ""),
+							project.NewSAMLConfigAddedEvent(context.Background(), &project.NewAggregate("project2", "org1").Aggregate, "app2", "entity2", []byte{}, "", domain.LoginVersionUnspecified, ""),
 						),
 					),
 					expectPush(
@@ -1242,7 +1256,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore,
+				eventstore:  tt.fields.eventstore(t),
 				idGenerator: tt.fields.idGenerator,
 			}
 			_, err := r.RemoveOrg(tt.args.ctx, tt.args.orgID)
@@ -1282,11 +1296,13 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 		{
 			name: "org name empty, error",
 			fields: fields{
-				eventstore:  expectEventstore(),
+				eventstore: expectEventstore(
+					expectFilter(), // org already exists check
+				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "orgID"),
 			},
 			args: args{
-				ctx: authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
 				setupOrg: &OrgSetup{
 					Name: "",
 				},
@@ -1296,15 +1312,32 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 			},
 		},
 		{
+			name: "org id empty, error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
+				setupOrg: &OrgSetup{
+					Name:  "Org",
+					OrgID: " ",
+				},
+			},
+			res: res{
+				err: zerrors.ThrowInvalidArgument(nil, "ORG-4ABd3", "Errors.Invalid.Argument"),
+			},
+		},
+		{
 			name: "userID not existing, error",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // org already exists check
 					expectFilter(),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "orgID"),
 			},
 			args: args{
-				ctx: authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
 				setupOrg: &OrgSetup{
 					Name: "Org",
 					Admins: []*OrgSetupAdmin{
@@ -1321,11 +1354,13 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 		{
 			name: "human invalid, error",
 			fields: fields{
-				eventstore:  expectEventstore(),
+				eventstore: expectEventstore(
+					expectFilter(), // org already exists check
+				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "orgID", "userID"),
 			},
 			args: args{
-				ctx: authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
 				setupOrg: &OrgSetup{
 					Name: "Org",
 					Admins: []*OrgSetupAdmin{
@@ -1354,6 +1389,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(), // add human exists check
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
@@ -1364,6 +1400,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(), // org member check
 					expectFilter(
 						eventFromEventPusher(
@@ -1418,7 +1455,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewHumanInitialCodeAddedEvent(
-								context.Background(),
+								http_util.WithRequestedHost(context.Background(), "iam-domain"),
 								&user.NewAggregate("userID", "orgID").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -1441,7 +1478,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 				newCode:     mockEncryptedCode("userinit", time.Hour),
 			},
 			args: args{
-				ctx: authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
 				setupOrg: &OrgSetup{
 					Name: "Org",
 					Admins: []*OrgSetupAdmin{
@@ -1466,8 +1503,8 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 					ObjectDetails: &domain.ObjectDetails{
 						ResourceOwner: "orgID",
 					},
-					CreatedAdmins: []*CreatedOrgAdmin{
-						{
+					OrgAdmins: []OrgAdmin{
+						&CreatedOrgAdmin{
 							ID: "userID",
 						},
 					},
@@ -1475,9 +1512,121 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 			},
 		},
 		{
+			name: "org already exists",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("custom-org-ID").Aggregate, "Org"),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
+				setupOrg: &OrgSetup{
+					Name:  "Org",
+					OrgID: "custom-org-ID",
+				},
+			},
+			res: res{
+				err: zerrors.ThrowAlreadyExists(nil, "ORG-laho2n", "Errors.Org.AlreadyExisting"),
+			},
+		},
+		{
+			name: "org with same id deleted",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("custom-org-ID").Aggregate, "Org"),
+						),
+						org.NewOrgRemovedEvent(
+							context.Background(), &org.NewAggregate("custom-org-ID").Aggregate,
+							"Org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{}),
+					),
+					expectPush(
+						eventFromEventPusher(org.NewOrgAddedEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate,
+							"Org",
+						)),
+						eventFromEventPusher(org.NewDomainAddedEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate, "org.iam-domain",
+						)),
+						eventFromEventPusher(org.NewDomainVerifiedEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate,
+							"org.iam-domain",
+						)),
+						eventFromEventPusher(org.NewDomainPrimarySetEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate,
+							"org.iam-domain",
+						)),
+					),
+				),
+			},
+			args: args{
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
+				setupOrg: &OrgSetup{
+					Name:  "Org",
+					OrgID: "custom-org-ID",
+				},
+			},
+			res: res{
+				createdOrg: &CreatedOrg{
+					ObjectDetails: &domain.ObjectDetails{
+						ResourceOwner: "custom-org-ID",
+					},
+					OrgAdmins: []OrgAdmin{},
+				},
+			},
+		},
+		{
+			name: "no human added, custom org ID",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(), // org already exists check
+					expectPush(
+						eventFromEventPusher(org.NewOrgAddedEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate,
+							"Org",
+						)),
+						eventFromEventPusher(org.NewDomainAddedEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate, "org.iam-domain",
+						)),
+						eventFromEventPusher(org.NewDomainVerifiedEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate,
+							"org.iam-domain",
+						)),
+						eventFromEventPusher(org.NewDomainPrimarySetEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate,
+							"org.iam-domain",
+						)),
+					),
+				),
+			},
+			args: args{
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
+				setupOrg: &OrgSetup{
+					Name:  "Org",
+					OrgID: "custom-org-ID",
+				},
+			},
+			res: res{
+				createdOrg: &CreatedOrg{
+					ObjectDetails: &domain.ObjectDetails{
+						ResourceOwner: "custom-org-ID",
+					},
+					OrgAdmins: []OrgAdmin{},
+				},
+			},
+		},
+		{
 			name: "existing human added",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // org already exists check
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1521,7 +1670,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "orgID"),
 			},
 			args: args{
-				ctx: authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
 				setupOrg: &OrgSetup{
 					Name: "Org",
 					Admins: []*OrgSetupAdmin{
@@ -1537,7 +1686,11 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 					ObjectDetails: &domain.ObjectDetails{
 						ResourceOwner: "orgID",
 					},
-					CreatedAdmins: []*CreatedOrgAdmin{},
+					OrgAdmins: []OrgAdmin{
+						&AssignedOrgAdmin{
+							ID: "userID",
+						},
+					},
 				},
 			},
 		},
@@ -1546,6 +1699,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(), // add machine exists check
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
@@ -1556,6 +1710,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(),
 					expectFilter(),
 					expectFilter(), // org member check
@@ -1621,7 +1776,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx: authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
 				setupOrg: &OrgSetup{
 					Name: "Org",
 					Admins: []*OrgSetupAdmin{
@@ -1647,8 +1802,8 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 					ObjectDetails: &domain.ObjectDetails{
 						ResourceOwner: "orgID",
 					},
-					CreatedAdmins: []*CreatedOrgAdmin{
-						{
+					OrgAdmins: []OrgAdmin{
+						&CreatedOrgAdmin{
 							ID: "userID",
 							PAT: &PersonalAccessToken{
 								ObjectRoot: models.ObjectRoot{

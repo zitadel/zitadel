@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	authn_grpc "github.com/zitadel/zitadel/internal/api/grpc/authn"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
@@ -36,39 +38,52 @@ func ListAppsRequestToModel(req *mgmt_pb.ListAppsRequest) (*query.AppSearchQueri
 	}, nil
 }
 
-func AddOIDCAppRequestToDomain(req *mgmt_pb.AddOIDCAppRequest) *domain.OIDCApp {
+func AddOIDCAppRequestToDomain(req *mgmt_pb.AddOIDCAppRequest) (*domain.OIDCApp, error) {
+	loginVersion, loginBaseURI, err := app_grpc.LoginVersionToDomain(req.GetLoginVersion())
+	if err != nil {
+		return nil, err
+	}
 	return &domain.OIDCApp{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: req.ProjectId,
 		},
 		AppName:                  req.Name,
-		OIDCVersion:              app_grpc.OIDCVersionToDomain(req.Version),
+		OIDCVersion:              gu.Ptr(app_grpc.OIDCVersionToDomain(req.Version)),
 		RedirectUris:             req.RedirectUris,
 		ResponseTypes:            app_grpc.OIDCResponseTypesToDomain(req.ResponseTypes),
 		GrantTypes:               app_grpc.OIDCGrantTypesToDomain(req.GrantTypes),
-		ApplicationType:          app_grpc.OIDCApplicationTypeToDomain(req.AppType),
-		AuthMethodType:           app_grpc.OIDCAuthMethodTypeToDomain(req.AuthMethodType),
+		ApplicationType:          gu.Ptr(app_grpc.OIDCApplicationTypeToDomain(req.AppType)),
+		AuthMethodType:           gu.Ptr(app_grpc.OIDCAuthMethodTypeToDomain(req.AuthMethodType)),
 		PostLogoutRedirectUris:   req.PostLogoutRedirectUris,
-		DevMode:                  req.DevMode,
-		AccessTokenType:          app_grpc.OIDCTokenTypeToDomain(req.AccessTokenType),
-		AccessTokenRoleAssertion: req.AccessTokenRoleAssertion,
-		IDTokenRoleAssertion:     req.IdTokenRoleAssertion,
-		IDTokenUserinfoAssertion: req.IdTokenUserinfoAssertion,
-		ClockSkew:                req.ClockSkew.AsDuration(),
+		DevMode:                  gu.Ptr(req.GetDevMode()),
+		AccessTokenType:          gu.Ptr(app_grpc.OIDCTokenTypeToDomain(req.AccessTokenType)),
+		AccessTokenRoleAssertion: gu.Ptr(req.GetAccessTokenRoleAssertion()),
+		IDTokenRoleAssertion:     gu.Ptr(req.GetIdTokenRoleAssertion()),
+		IDTokenUserinfoAssertion: gu.Ptr(req.GetIdTokenUserinfoAssertion()),
+		ClockSkew:                gu.Ptr(req.GetClockSkew().AsDuration()),
 		AdditionalOrigins:        req.AdditionalOrigins,
-		SkipNativeAppSuccessPage: req.SkipNativeAppSuccessPage,
-	}
+		SkipNativeAppSuccessPage: gu.Ptr(req.GetSkipNativeAppSuccessPage()),
+		BackChannelLogoutURI:     gu.Ptr(req.GetBackChannelLogoutUri()),
+		LoginVersion:             gu.Ptr(loginVersion),
+		LoginBaseURI:             gu.Ptr(loginBaseURI),
+	}, nil
 }
 
-func AddSAMLAppRequestToDomain(req *mgmt_pb.AddSAMLAppRequest) *domain.SAMLApp {
+func AddSAMLAppRequestToDomain(req *mgmt_pb.AddSAMLAppRequest) (*domain.SAMLApp, error) {
+	loginVersion, loginBaseURI, err := app_grpc.LoginVersionToDomain(req.GetLoginVersion())
+	if err != nil {
+		return nil, err
+	}
 	return &domain.SAMLApp{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: req.ProjectId,
 		},
-		AppName:     req.Name,
-		Metadata:    req.GetMetadataXml(),
-		MetadataURL: req.GetMetadataUrl(),
-	}
+		AppName:      req.Name,
+		Metadata:     req.GetMetadataXml(),
+		MetadataURL:  gu.Ptr(req.GetMetadataUrl()),
+		LoginVersion: gu.Ptr(loginVersion),
+		LoginBaseURI: gu.Ptr(loginBaseURI),
+	}, nil
 }
 
 func AddAPIAppRequestToDomain(app *mgmt_pb.AddAPIAppRequest) *domain.APIApp {
@@ -88,7 +103,11 @@ func UpdateAppRequestToDomain(app *mgmt_pb.UpdateAppRequest) domain.Application 
 	}
 }
 
-func UpdateOIDCAppConfigRequestToDomain(app *mgmt_pb.UpdateOIDCAppConfigRequest) *domain.OIDCApp {
+func UpdateOIDCAppConfigRequestToDomain(app *mgmt_pb.UpdateOIDCAppConfigRequest) (*domain.OIDCApp, error) {
+	loginVersion, loginBaseURI, err := app_grpc.LoginVersionToDomain(app.GetLoginVersion())
+	if err != nil {
+		return nil, err
+	}
 	return &domain.OIDCApp{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: app.ProjectId,
@@ -97,29 +116,38 @@ func UpdateOIDCAppConfigRequestToDomain(app *mgmt_pb.UpdateOIDCAppConfigRequest)
 		RedirectUris:             app.RedirectUris,
 		ResponseTypes:            app_grpc.OIDCResponseTypesToDomain(app.ResponseTypes),
 		GrantTypes:               app_grpc.OIDCGrantTypesToDomain(app.GrantTypes),
-		ApplicationType:          app_grpc.OIDCApplicationTypeToDomain(app.AppType),
-		AuthMethodType:           app_grpc.OIDCAuthMethodTypeToDomain(app.AuthMethodType),
+		ApplicationType:          gu.Ptr(app_grpc.OIDCApplicationTypeToDomain(app.AppType)),
+		AuthMethodType:           gu.Ptr(app_grpc.OIDCAuthMethodTypeToDomain(app.AuthMethodType)),
 		PostLogoutRedirectUris:   app.PostLogoutRedirectUris,
-		DevMode:                  app.DevMode,
-		AccessTokenType:          app_grpc.OIDCTokenTypeToDomain(app.AccessTokenType),
-		AccessTokenRoleAssertion: app.AccessTokenRoleAssertion,
-		IDTokenRoleAssertion:     app.IdTokenRoleAssertion,
-		IDTokenUserinfoAssertion: app.IdTokenUserinfoAssertion,
-		ClockSkew:                app.ClockSkew.AsDuration(),
+		DevMode:                  gu.Ptr(app.GetDevMode()),
+		AccessTokenType:          gu.Ptr(app_grpc.OIDCTokenTypeToDomain(app.AccessTokenType)),
+		AccessTokenRoleAssertion: gu.Ptr(app.GetAccessTokenRoleAssertion()),
+		IDTokenRoleAssertion:     gu.Ptr(app.GetIdTokenRoleAssertion()),
+		IDTokenUserinfoAssertion: gu.Ptr(app.GetIdTokenUserinfoAssertion()),
+		ClockSkew:                gu.Ptr(app.GetClockSkew().AsDuration()),
 		AdditionalOrigins:        app.AdditionalOrigins,
-		SkipNativeAppSuccessPage: app.SkipNativeAppSuccessPage,
-	}
+		SkipNativeAppSuccessPage: gu.Ptr(app.GetSkipNativeAppSuccessPage()),
+		BackChannelLogoutURI:     gu.Ptr(app.GetBackChannelLogoutUri()),
+		LoginVersion:             gu.Ptr(loginVersion),
+		LoginBaseURI:             gu.Ptr(loginBaseURI),
+	}, nil
 }
 
-func UpdateSAMLAppConfigRequestToDomain(app *mgmt_pb.UpdateSAMLAppConfigRequest) *domain.SAMLApp {
+func UpdateSAMLAppConfigRequestToDomain(app *mgmt_pb.UpdateSAMLAppConfigRequest) (*domain.SAMLApp, error) {
+	loginVersion, loginBaseURI, err := app_grpc.LoginVersionToDomain(app.GetLoginVersion())
+	if err != nil {
+		return nil, err
+	}
 	return &domain.SAMLApp{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: app.ProjectId,
 		},
-		AppID:       app.AppId,
-		Metadata:    app.GetMetadataXml(),
-		MetadataURL: app.GetMetadataUrl(),
-	}
+		AppID:        app.AppId,
+		Metadata:     app.GetMetadataXml(),
+		MetadataURL:  gu.Ptr(app.GetMetadataUrl()),
+		LoginVersion: gu.Ptr(loginVersion),
+		LoginBaseURI: gu.Ptr(loginBaseURI),
+	}, nil
 }
 
 func UpdateAPIAppConfigRequestToDomain(app *mgmt_pb.UpdateAPIAppConfigRequest) *domain.APIApp {
@@ -149,7 +177,7 @@ func AddAPIClientKeyRequestToDomain(key *mgmt_pb.AddAppKeyRequest) *domain.Appli
 }
 
 func ListAPIClientKeysRequestToQuery(ctx context.Context, req *mgmt_pb.ListAppKeysRequest) (*query.AuthNKeySearchQueries, error) {
-	resourcOwner, err := query.NewAuthNKeyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	resourceOwner, err := query.NewAuthNKeyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +197,7 @@ func ListAPIClientKeysRequestToQuery(ctx context.Context, req *mgmt_pb.ListAppKe
 			Asc:    asc,
 		},
 		Queries: []query.SearchQuery{
-			resourcOwner,
+			resourceOwner,
 			projectID,
 			appID,
 		},

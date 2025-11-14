@@ -20,16 +20,16 @@ const (
 	PermissionProperty = "urn:zitadel:schema:permission"
 )
 
-type role int32
+type Role int32
 
 const (
-	roleUnspecified role = iota
-	roleSelf
-	roleOwner
+	RoleUnspecified Role = iota
+	RoleSelf
+	RoleOwner
 )
 
 type permissionExtension struct {
-	role role
+	role Role
 }
 
 // Compile implements the [jsonschema.ExtCompiler] interface.
@@ -57,14 +57,14 @@ func (c permissionExtension) Compile(ctx jsonschema.CompilerContext, m map[strin
 				return
 			}
 		default:
-			return nil, zerrors.ThrowInvalidArgument(nil, "SCHEMA-GFjio", "invalid permission role")
+			return nil, zerrors.ThrowInvalidArgument(nil, "SCHEMA-GFjio", "invalid permission Role")
 		}
 	}
 	return permissionExtensionConfig{c.role, perms}, nil
 }
 
 type permissionExtensionConfig struct {
-	role        role
+	role        Role
 	permissions *permissions
 }
 
@@ -72,17 +72,17 @@ type permissionExtensionConfig struct {
 // It validates the fields of the json instance according to the permission schema.
 func (s permissionExtensionConfig) Validate(ctx jsonschema.ValidationContext, v interface{}) error {
 	switch s.role {
-	case roleSelf:
+	case RoleSelf:
 		if s.permissions.self == nil || !s.permissions.self.write {
 			return ctx.Error("permission", "missing required permission")
 		}
 		return nil
-	case roleOwner:
+	case RoleOwner:
 		if s.permissions.owner == nil || !s.permissions.owner.write {
 			return ctx.Error("permission", "missing required permission")
 		}
 		return nil
-	case roleUnspecified:
+	case RoleUnspecified:
 		fallthrough
 	default:
 		return ctx.Error("permission", "missing required permission")

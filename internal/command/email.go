@@ -12,6 +12,9 @@ type Email struct {
 	Address  domain.EmailAddress
 	Verified bool
 
+	// NoEmailVerification is used Verified field is false
+	NoEmailVerification bool
+
 	// ReturnCode is used if the Verified field is false
 	ReturnCode bool
 

@@ -33,10 +33,6 @@ func (l *Login) handleRegisterOption(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) renderRegisterOption(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
-	var errID, errMessage string
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
-	}
 	allowed := registrationAllowed(authReq)
 	externalAllowed := externalRegistrationAllowed(authReq)
 	if err == nil {
@@ -54,7 +50,7 @@ func (l *Login) renderRegisterOption(w http.ResponseWriter, r *http.Request, aut
 	}
 	translator := l.getTranslator(r.Context(), authReq)
 	data := registerOptionData{
-		baseData: l.getBaseData(r, authReq, translator, "RegisterOption.Title", "RegisterOption.Description", errID, errMessage),
+		baseData: l.getBaseData(r, authReq, translator, "RegisterOption.Title", "RegisterOption.Description", err),
 	}
 	funcs := map[string]interface{}{
 		"hasRegistration": func() bool {

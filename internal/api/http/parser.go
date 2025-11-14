@@ -1,6 +1,7 @@
 package http
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gorilla/schema"
@@ -25,4 +26,25 @@ func (p *Parser) Parse(r *http.Request, data interface{}) error {
 	}
 
 	return p.decoder.Decode(data, r.Form)
+}
+
+func (p *Parser) UnwrapParserError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	// try to unwrap the error
+	var multiErr schema.MultiError
+	if errors.As(err, &multiErr) && len(multiErr) == 1 {
+		for _, v := range multiErr {
+			var schemaErr schema.ConversionError
+			if errors.As(v, &schemaErr) {
+				return schemaErr.Err
+			}
+
+			return v
+		}
+	}
+
+	return err
 }

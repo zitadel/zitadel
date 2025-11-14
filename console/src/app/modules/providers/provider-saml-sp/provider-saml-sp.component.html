@@ -3,7 +3,7 @@
   (closed)="close()"
 >
   <div class="identity-provider-create-content">
-    <div class="title-row">
+    <div class="identity-provider-title-row">
       <img class="idp-logo" src="./assets/images/idp/saml-icon.svg" alt="saml" />
       <h1>{{ 'IDP.CREATE.SAML.TITLE' | translate }}</h1>
       <ng-container *ngIf="exists$ | async">
@@ -18,7 +18,7 @@
     </div>
 
     <cnsl-provider-next
-      [configureProvider]="exists$ | async"
+      [configureProvider]="(exists$ | async) === true"
       [configureTitle]="'DESCRIPTIONS.SETTINGS.IDPS.SAML.TITLE' | translate"
       [configureDescription]="'DESCRIPTIONS.SETTINGS.IDPS.SAML.DESCRIPTION' | translate"
       configureLink="https://zitadel.com/docs/guides/integrate/identity-providers/mocksaml"
@@ -54,7 +54,7 @@
         </cnsl-form-field>
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.SAML.BINDING' | translate }}</cnsl-label>
-          <mat-select formControlName="binding" [compareWith]="compareBinding">
+          <mat-select formControlName="binding">
             <mat-option *ngFor="let binding of bindingValues" [value]="binding">{{ binding }}</mat-option>
           </mat-select>
         </cnsl-form-field>
@@ -72,8 +72,17 @@
       <div *ngIf="showOptional">
         <div class="transient-info">
           <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'IDP.SAML.SIGNATUREALGORITHM' | translate }}</cnsl-label>
+            <mat-select formControlName="signatureAlgorithm">
+              <mat-option *ngFor="let signatureAlgorithm of signatureAlgorithmValues" [value]="signatureAlgorithm">{{
+                signatureAlgorithm
+              }}</mat-option>
+            </mat-select>
+          </cnsl-form-field>
+
+          <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'IDP.SAML.NAMEIDFORMAT' | translate }}</cnsl-label>
-            <mat-select formControlName="nameIdFormat" [compareWith]="compareNameIDFormat">
+            <mat-select formControlName="nameIdFormat">
               <mat-option *ngFor="let nameIdFormat of nameIDFormatValues" [value]="nameIdFormat">{{
                 nameIdFormat
               }}</mat-option>
@@ -82,13 +91,22 @@
 
           <cnsl-info-section>
             <div>
-              <p class="transient-info-desc">{{ 'IDP.SAML.TRANSIENTMAPPINGATTRIBUTENAME_DESC' | translate }}</p>
+              <p class="option-desc">{{ 'IDP.SAML.TRANSIENTMAPPINGATTRIBUTENAME_DESC' | translate }}</p>
             </div>
 
             <cnsl-form-field class="formfield">
               <cnsl-label>{{ 'IDP.SAML.TRANSIENTMAPPINGATTRIBUTENAME' | translate }}</cnsl-label>
               <input cnslInput formControlName="transientMappingAttributeName" />
             </cnsl-form-field>
+          </cnsl-info-section>
+
+          <cnsl-info-section>
+            <div>
+              <p class="option-desc">{{ 'IDP.FEDERATEDLOGOUTENABLED_DESC' | translate }}</p>
+              <mat-checkbox formControlName="federatedLogoutEnabled">{{
+                'IDP.FEDERATEDLOGOUTENABLED' | translate
+              }}</mat-checkbox>
+            </div>
           </cnsl-info-section>
         </div>
 

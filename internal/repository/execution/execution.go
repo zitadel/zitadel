@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -54,6 +55,13 @@ func (e *SetEventV2) UniqueConstraints() []*eventstore.UniqueConstraint {
 type Target struct {
 	Type   domain.ExecutionTargetType `json:"type"`
 	Target string                     `json:"target"`
+}
+
+func (t *Target) Validate() error {
+	if t.Type == domain.ExecutionTargetTypeUnspecified || t.Target == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-hdm4zl1hmd", "Errors.Execution.Invalid")
+	}
+	return nil
 }
 
 func NewSetEventV2(

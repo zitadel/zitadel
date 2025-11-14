@@ -41,7 +41,6 @@ const KeyNamesArray = [
   'initPasswordText',
   'initializeDoneText',
   'initializeUserText',
-  'linkingUserPromptText',
   'linkingUserDoneText',
   'loginText',
   'logoutText',
@@ -95,6 +94,7 @@ const REQUESTMAP = {
   selector: 'cnsl-login-texts',
   templateUrl: './login-texts.component.html',
   styleUrls: ['./login-texts.component.scss'],
+  standalone: false,
 })
 export class LoginTextsComponent implements OnInit, OnDestroy {
   public loading: boolean = false;

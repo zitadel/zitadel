@@ -1,0 +1,21 @@
+{
+  "schemas": [
+    "urn:ietf:params:scim:schemas:core:2.0:User"
+  ],
+  "userName": "acmeUser1-no-primary-email-phone",
+  "name": {
+    "familyName": "Ross",
+    "givenName": "Bethany"
+  },
+  "emails": [
+    {
+      "value": "user1-no-primary-email-phone@example.com"
+    }
+  ],
+  "phoneNumbers": [
+    {
+      "value": "+41 71 123 45 67",
+      "type": "work"
+    }
+  ]
+}

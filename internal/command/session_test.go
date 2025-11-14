@@ -145,8 +145,9 @@ func TestSessionCommands_getHumanWriteModel(t *testing.T) {
 
 func TestCommands_CreateSession(t *testing.T) {
 	type fields struct {
-		idGenerator  id.Generator
-		tokenCreator func(sessionID string) (string, string, error)
+		idGenerator     id.Generator
+		tokenCreator    func(sessionID string) (string, string, error)
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx       context.Context
@@ -195,6 +196,22 @@ func TestCommands_CreateSession(t *testing.T) {
 			},
 		},
 		{
+			"missing permission",
+			fields{
+				idGenerator:     mock.NewIDGeneratorExpectIDs(t, "sessionID"),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args{
+				ctx: context.Background(),
+			},
+			[]expect{
+				expectFilter(),
+			},
+			res{
+				err: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			},
+		},
+		{
 			"negative lifetime",
 			fields{
 				idGenerator: mock.NewIDGeneratorExpectIDs(t, "sessionID"),
@@ -203,6 +220,7 @@ func TestCommands_CreateSession(t *testing.T) {
 						"token",
 						nil
 				},
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				ctx: authz.NewMockContext("instance1", "", ""),
@@ -230,6 +248,7 @@ func TestCommands_CreateSession(t *testing.T) {
 						"token",
 						nil
 				},
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				ctx: authz.NewMockContext("instance1", "", ""),
@@ -275,6 +294,7 @@ func TestCommands_CreateSession(t *testing.T) {
 				eventstore:          expectEventstore(tt.expect...)(t),
 				idGenerator:         tt.fields.idGenerator,
 				sessionTokenCreator: tt.fields.tokenCreator,
+				checkPermission:     tt.fields.checkPermission,
 			}
 			got, err := c.CreateSession(tt.args.ctx, tt.args.checks, tt.args.metadata, tt.args.userAgent, tt.args.lifetime)
 			require.ErrorIs(t, err, tt.res.err)
@@ -285,8 +305,8 @@ func TestCommands_CreateSession(t *testing.T) {
 
 func TestCommands_UpdateSession(t *testing.T) {
 	type fields struct {
-		eventstore    func(*testing.T) *eventstore.Eventstore
-		tokenVerifier func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
+		eventstore      func(*testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx       context.Context
@@ -320,6 +340,36 @@ func TestCommands_UpdateSession(t *testing.T) {
 			},
 		},
 		{
+			"no token, no permission",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							session.NewAddedEvent(context.Background(),
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
+						eventFromEventPusher(
+							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"tokenID")),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args{
+				ctx:       context.Background(),
+				sessionID: "sessionID",
+			},
+			res{
+				err: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			},
+		},
+		{
 			"no change",
 			fields{
 				eventstore: expectEventstore(
@@ -339,9 +389,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 								"tokenID")),
 					),
 				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return nil
-				},
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				ctx:       context.Background(),
@@ -362,8 +410,8 @@ func TestCommands_UpdateSession(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:           tt.fields.eventstore(t),
-				sessionTokenVerifier: tt.fields.tokenVerifier,
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := c.UpdateSession(tt.args.ctx, tt.args.sessionID, tt.args.checks, tt.args.metadata, tt.args.lifetime)
 			require.ErrorIs(t, err, tt.res.err)
@@ -695,6 +743,7 @@ func TestCommands_updateSession(t *testing.T) {
 								"userID2",
 								nil,
 								"",
+								time.Now().Add(time.Hour),
 							),
 						),
 					),
@@ -758,6 +807,111 @@ func TestCommands_updateSession(t *testing.T) {
 			},
 		},
 		{
+			"set user, intent token already consumed",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+								"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
+						),
+						eventFromEventPusher(
+							idpintent.NewSucceededEvent(context.Background(),
+								&idpintent.NewAggregate("intent", "instance1").Aggregate,
+								nil,
+								"idpUserID",
+								"idpUsername",
+								"userID",
+								nil,
+								"",
+								time.Now().Add(time.Hour),
+							),
+						),
+						eventFromEventPusher(
+							idpintent.NewConsumedEvent(context.Background(),
+								&idpintent.NewAggregate("intent", "instance1").Aggregate,
+							),
+						),
+					),
+				),
+			},
+			args{
+				ctx: authz.NewMockContext("instance1", "", ""),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
+					sessionCommands: []SessionCommand{
+						CheckUser("userID", "org1", &language.Afrikaans),
+						CheckIntent("intent", "aW50ZW50"),
+					},
+					createToken: func(sessionID string) (string, string, error) {
+						return "tokenID",
+							"token",
+							nil
+					},
+					intentAlg: decryption(nil),
+					now: func() time.Time {
+						return testNow
+					},
+				},
+				metadata: map[string][]byte{
+					"key": []byte("value"),
+				},
+			},
+			res{
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Df4bw", "Errors.Intent.NotSucceeded"),
+			},
+		},
+		{
+			"set user, intent token already expired",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+								"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
+						),
+						eventFromEventPusher(
+							idpintent.NewSucceededEvent(context.Background(),
+								&idpintent.NewAggregate("intent", "instance1").Aggregate,
+								nil,
+								"idpUserID",
+								"idpUsername",
+								"userID",
+								nil,
+								"",
+								time.Now().Add(-time.Hour),
+							),
+						),
+					),
+				),
+			},
+			args{
+				ctx: authz.NewMockContext("instance1", "", ""),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
+					sessionCommands: []SessionCommand{
+						CheckUser("userID", "org1", &language.Afrikaans),
+						CheckIntent("intent", "aW50ZW50"),
+					},
+					createToken: func(sessionID string) (string, string, error) {
+						return "tokenID",
+							"token",
+							nil
+					},
+					intentAlg: decryption(nil),
+					now: func() time.Time {
+						return testNow
+					},
+				},
+				metadata: map[string][]byte{
+					"key": []byte("value"),
+				},
+			},
+			res{
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SAf42", "Errors.Intent.Expired"),
+			},
+		},
+		{
 			"set user, intent, metadata and token",
 			fields{
 				eventstore: expectEventstore(
@@ -768,13 +922,14 @@ func TestCommands_updateSession(t *testing.T) {
 						),
 						eventFromEventPusher(
 							idpintent.NewSucceededEvent(context.Background(),
-								&idpintent.NewAggregate("id", "instance1").Aggregate,
+								&idpintent.NewAggregate("intent", "instance1").Aggregate,
 								nil,
 								"idpUserID",
 								"idpUsername",
 								"userID",
 								nil,
 								"",
+								time.Now().Add(time.Hour),
 							),
 						),
 					),
@@ -783,6 +938,7 @@ func TestCommands_updateSession(t *testing.T) {
 							"userID", "org1", testNow, &language.Afrikaans),
 						session.NewIntentCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							testNow),
+						idpintent.NewConsumedEvent(context.Background(), &idpintent.NewAggregate("intent", "org1").Aggregate),
 						session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							map[string][]byte{"key": []byte("value")}),
 						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
@@ -837,17 +993,19 @@ func TestCommands_updateSession(t *testing.T) {
 								nil,
 								nil,
 								"idpID",
+								nil,
 							),
 						),
 						eventFromEventPusher(
 							idpintent.NewSucceededEvent(context.Background(),
-								&idpintent.NewAggregate("id", "instance1").Aggregate,
+								&idpintent.NewAggregate("intent", "instance1").Aggregate,
 								nil,
 								"idpUserID",
 								"idpUsername",
 								"",
 								nil,
 								"",
+								time.Now().Add(time.Hour),
 							),
 						),
 					),
@@ -865,6 +1023,7 @@ func TestCommands_updateSession(t *testing.T) {
 							"userID", "org1", testNow, &language.Afrikaans),
 						session.NewIntentCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							testNow),
+						idpintent.NewConsumedEvent(context.Background(), &idpintent.NewAggregate("intent", "org1").Aggregate),
 						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							"tokenID"),
 					),
@@ -932,6 +1091,7 @@ func TestCheckTOTP(t *testing.T) {
 	type fields struct {
 		sessionWriteModel *SessionWriteModel
 		eventstore        func(*testing.T) *eventstore.Eventstore
+		tarpit            Tarpit
 	}
 
 	tests := []struct {
@@ -950,6 +1110,7 @@ func TestCheckTOTP(t *testing.T) {
 					aggregate: sessAgg,
 				},
 				eventstore: expectEventstore(),
+				tarpit:     expectTarpit(0),
 			},
 			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing"),
 		},
@@ -965,6 +1126,7 @@ func TestCheckTOTP(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilterError(io.ErrClosedPipe),
 				),
+				tarpit: expectTarpit(0),
 			},
 			wantErr: io.ErrClosedPipe,
 		},
@@ -984,6 +1146,7 @@ func TestCheckTOTP(t *testing.T) {
 						),
 					),
 				),
+				tarpit: expectTarpit(0),
 			},
 			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-3Mif9s", "Errors.User.MFA.OTP.NotReady"),
 		},
@@ -1010,6 +1173,7 @@ func TestCheckTOTP(t *testing.T) {
 						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 0, 0, false)),
 					),
 				),
+				tarpit: expectTarpit(1),
 			},
 			wantErrorCommands: []eventstore.Command{
 				user.NewHumanOTPCheckFailedEvent(ctx, userAgg, nil),
@@ -1039,6 +1203,7 @@ func TestCheckTOTP(t *testing.T) {
 						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 1, 1, false)),
 					),
 				),
+				tarpit: expectTarpit(1),
 			},
 			wantErrorCommands: []eventstore.Command{
 				user.NewHumanOTPCheckFailedEvent(ctx, userAgg, nil),
@@ -1066,6 +1231,7 @@ func TestCheckTOTP(t *testing.T) {
 					),
 					expectFilter(), // recheck
 				),
+				tarpit: expectTarpit(0),
 			},
 			wantEventCommands: []eventstore.Command{
 				user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil),
@@ -1094,6 +1260,7 @@ func TestCheckTOTP(t *testing.T) {
 						user.NewUserLockedEvent(ctx, userAgg),
 					),
 				),
+				tarpit: expectTarpit(0),
 			},
 			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SF3fg", "Errors.User.Locked"),
 		},
@@ -1105,11 +1272,13 @@ func TestCheckTOTP(t *testing.T) {
 				eventstore:        tt.fields.eventstore(t),
 				totpAlg:           cryptoAlg,
 				now:               func() time.Time { return testNow },
+				tarpit:            tt.fields.tarpit.tarpit,
 			}
 			gotCmds, err := CheckTOTP(tt.code)(ctx, cmd)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.wantErrorCommands, gotCmds)
 			assert.Equal(t, tt.wantEventCommands, cmd.eventCommands)
+			tt.fields.tarpit.metExpectedCalls(t)
 		})
 	}
 }
@@ -1464,7 +1633,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 			}
 			got, err := c.TerminateSession(tt.args.ctx, tt.args.sessionID, tt.args.sessionToken)
 			require.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.want, got)
+			assertObjectDetails(t, tt.res.want, got)
 		})
 	}
 }

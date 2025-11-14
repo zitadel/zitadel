@@ -3,34 +3,47 @@ package oidc
 import (
 	"context"
 	"fmt"
+	"slices"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	"github.com/go-jose/go-jose/v4"
 	"github.com/jonboulle/clockwork"
-	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/repository/keypair"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type cachedPublicKey struct {
-	lastUse atomic.Int64 // unix micro time.
-	query.PublicKey
+var supportedWebKeyAlgs = []string{
+	string(jose.EdDSA),
+	string(jose.RS256),
+	string(jose.RS384),
+	string(jose.RS512),
+	string(jose.ES256),
+	string(jose.ES384),
+	string(jose.ES512),
 }
 
-func newCachedPublicKey(key query.PublicKey, now time.Time) *cachedPublicKey {
+func supportedSigningAlgs() []string {
+	return supportedWebKeyAlgs
+}
+
+type cachedPublicKey struct {
+	lastUse atomic.Int64 // unix micro time.
+	expiry  *time.Time   // expiry may be nil if the key does not expire.
+	webKey  *jose.JSONWebKey
+}
+
+func newCachedPublicKey(key *jose.JSONWebKey, expiry *time.Time, now time.Time) *cachedPublicKey {
 	cachedKey := &cachedPublicKey{
-		PublicKey: key,
+		expiry: expiry,
+		webKey: key,
 	}
 	cachedKey.setLastUse(now)
 	return cachedKey
@@ -54,14 +67,17 @@ func (c *cachedPublicKey) expired(now time.Time, validity time.Duration) bool {
 type publicKeyCache struct {
 	mtx          sync.RWMutex
 	instanceKeys map[string]map[string]*cachedPublicKey
-	queryKey     func(ctx context.Context, keyID string) (query.PublicKey, error)
-	clock        clockwork.Clock
+
+	// queryKey returns a public web key.
+	// If the key does not have expiry, Time may be nil.
+	queryKey func(ctx context.Context, keyID string) (*jose.JSONWebKey, *time.Time, error)
+	clock    clockwork.Clock
 }
 
 // newPublicKeyCache initializes a keySetCache starts a purging Go routine.
 // The purge routine deletes all public keys that are older than maxAge.
 // When the passed context is done, the purge routine will terminate.
-func newPublicKeyCache(background context.Context, maxAge time.Duration, queryKey func(ctx context.Context, keyID string) (query.PublicKey, error)) *publicKeyCache {
+func newPublicKeyCache(background context.Context, maxAge time.Duration, queryKey func(ctx context.Context, keyID string) (*jose.JSONWebKey, *time.Time, error)) *publicKeyCache {
 	k := &publicKeyCache{
 		instanceKeys: make(map[string]map[string]*cachedPublicKey),
 		queryKey:     queryKey,
@@ -120,11 +136,11 @@ func (k *publicKeyCache) getKey(ctx context.Context, keyID string) (_ *cachedPub
 	if ok {
 		key.setLastUse(k.clock.Now())
 	} else {
-		newKey, err := k.queryKey(ctx, keyID)
+		newKey, expiry, err := k.queryKey(ctx, keyID)
 		if err != nil {
 			return nil, err
 		}
-		key = newCachedPublicKey(newKey, k.clock.Now())
+		key = newCachedPublicKey(newKey, expiry, k.clock.Now())
 		k.setKey(instanceID, keyID, key)
 	}
 
@@ -145,10 +161,10 @@ func (k *publicKeyCache) verifySignature(ctx context.Context, jws *jose.JSONWebS
 	if err != nil {
 		return nil, err
 	}
-	if checkKeyExpiry && key.Expiry().Before(k.clock.Now()) {
+	if checkKeyExpiry && key.expiry != nil && key.expiry.Before(k.clock.Now()) {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-ciF4k", "Errors.Key.ExpireBeforeNow")
 	}
-	return jws.Verify(jsonWebkey(key))
+	return jws.Verify(key.webKey)
 }
 
 type oidcKeySet struct {
@@ -186,15 +202,6 @@ func withKeyExpiryCheck(check bool) keySetOption {
 	}
 }
 
-func jsonWebkey(key query.PublicKey) *jose.JSONWebKey {
-	return &jose.JSONWebKey{
-		KeyID:     key.ID(),
-		Algorithm: key.Algorithm(),
-		Use:       key.Use().String(),
-		Key:       key.Key(),
-	}
-}
-
 // keySetMap is a mapping of key IDs to public key data.
 type keySetMap map[string][]byte
 
@@ -208,7 +215,7 @@ func (k keySetMap) getKey(keyID string) (*jose.JSONWebKey, error) {
 	return &jose.JSONWebKey{
 		Key:   pubKey,
 		KeyID: keyID,
-		Use:   domain.KeyUsageSigning.String(),
+		Use:   crypto.KeyUsageSigning.String(),
 	}, nil
 }
 
@@ -225,7 +232,6 @@ func (k keySetMap) VerifySignature(ctx context.Context, jws *jose.JSONWebSignatu
 }
 
 const (
-	locksTable = "projections.locks"
 	signingKey = "signing_key"
 	oidcUser   = "OIDC"
 
@@ -254,173 +260,61 @@ func (s *SigningKey) ID() string {
 	return s.id
 }
 
-// PublicKey wraps the query.PublicKey to implement the op.Key interface
-type PublicKey struct {
-	key query.PublicKey
-}
-
-func (s *PublicKey) Algorithm() jose.SignatureAlgorithm {
-	return jose.SignatureAlgorithm(s.key.Algorithm())
-}
-
-func (s *PublicKey) Use() string {
-	return s.key.Use().String()
-}
-
-func (s *PublicKey) Key() interface{} {
-	return s.key.Key()
-}
-
-func (s *PublicKey) ID() string {
-	return s.key.ID()
-}
-
 // KeySet implements the op.Storage interface
 func (o *OPStorage) KeySet(ctx context.Context) (keys []op.Key, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-	err = retry(func() error {
-		publicKeys, err := o.query.ActivePublicKeys(ctx, time.Now())
-		if err != nil {
-			return err
-		}
-		keys = make([]op.Key, len(publicKeys.Keys))
-		for i, key := range publicKeys.Keys {
-			keys[i] = &PublicKey{key}
-		}
-		return nil
-	})
-	return keys, err
+	panic(o.panicErr("KeySet"))
 }
 
 // SignatureAlgorithms implements the op.Storage interface
 func (o *OPStorage) SignatureAlgorithms(ctx context.Context) ([]jose.SignatureAlgorithm, error) {
-	key, err := o.SigningKey(ctx)
-	if err != nil {
-		logging.WithError(err).Warn("unable to fetch signing key")
-		return nil, err
-	}
-	return []jose.SignatureAlgorithm{key.SignatureAlgorithm()}, nil
+	panic(o.panicErr("SignatureAlgorithms"))
 }
 
 // SigningKey implements the op.Storage interface
 func (o *OPStorage) SigningKey(ctx context.Context) (key op.SigningKey, err error) {
-	err = retry(func() error {
-		key, err = o.getSigningKey(ctx)
+	panic(o.panicErr("SigningKey"))
+}
+
+func (s *Server) Keys(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	keyset, err := s.query.GetWebKeySet(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := op.NewResponse(keyset)
+	if s.jwksCacheControlMaxAge != 0 {
+		resp.Header.Set(http_util.CacheControl,
+			fmt.Sprintf("max-age=%d, must-revalidate", int(s.jwksCacheControlMaxAge/time.Second)),
+		)
+	}
+	return resp, nil
+}
+
+func appendPublicKeysToWebKeySet(keyset *jose.JSONWebKeySet, pubkeys *query.PublicKeys) {
+	if pubkeys == nil || len(pubkeys.Keys) == 0 {
+		return
+	}
+	keyset.Keys = slices.Grow(keyset.Keys, len(pubkeys.Keys))
+
+	for _, key := range pubkeys.Keys {
+		keyset.Keys = append(keyset.Keys, jose.JSONWebKey{
+			Key:       key.Key(),
+			KeyID:     key.ID(),
+			Algorithm: key.Algorithm(),
+			Use:       key.Use().String(),
+		})
+	}
+}
+
+func queryKeyFunc(q *query.Queries) func(ctx context.Context, keyID string) (*jose.JSONWebKey, *time.Time, error) {
+	return func(ctx context.Context, keyID string) (*jose.JSONWebKey, *time.Time, error) {
+		webKey, err := q.GetPublicWebKeyByID(ctx, keyID)
 		if err != nil {
-			return err
+			return nil, nil, err
 		}
-		if key == nil {
-			return zerrors.ThrowNotFound(nil, "OIDC-ve4Qu", "Errors.Internal")
-		}
-		return nil
-	})
-	return key, err
-}
-
-func (o *OPStorage) getSigningKey(ctx context.Context) (op.SigningKey, error) {
-	keys, err := o.query.ActivePrivateSigningKey(ctx, time.Now().Add(gracefulPeriod))
-	if err != nil {
-		return nil, err
+		return webKey, nil, nil
 	}
-	if len(keys.Keys) > 0 {
-		return o.privateKeyToSigningKey(selectSigningKey(keys.Keys))
-	}
-	var position float64
-	if keys.State != nil {
-		position = keys.State.Position
-	}
-	return nil, o.refreshSigningKey(ctx, o.signingKeyAlgorithm, position)
-}
-
-func (o *OPStorage) refreshSigningKey(ctx context.Context, algorithm string, position float64) error {
-	ok, err := o.ensureIsLatestKey(ctx, position)
-	if err != nil || !ok {
-		return zerrors.ThrowInternal(err, "OIDC-ASfh3", "cannot ensure that projection is up to date")
-	}
-	err = o.lockAndGenerateSigningKeyPair(ctx, algorithm)
-	if err != nil {
-		return zerrors.ThrowInternal(err, "OIDC-ADh31", "could not create signing key")
-	}
-	return zerrors.ThrowInternal(nil, "OIDC-Df1bh", "")
-}
-
-func (o *OPStorage) ensureIsLatestKey(ctx context.Context, position float64) (bool, error) {
-	maxSequence, err := o.getMaxKeySequence(ctx)
-	if err != nil {
-		return false, fmt.Errorf("error retrieving new events: %w", err)
-	}
-	return position >= maxSequence, nil
-}
-
-func (o *OPStorage) privateKeyToSigningKey(key query.PrivateKey) (_ op.SigningKey, err error) {
-	keyData, err := crypto.Decrypt(key.Key(), o.encAlg)
-	if err != nil {
-		return nil, err
-	}
-	privateKey, err := crypto.BytesToPrivateKey(keyData)
-	if err != nil {
-		return nil, err
-	}
-	return &SigningKey{
-		algorithm: jose.SignatureAlgorithm(key.Algorithm()),
-		key:       privateKey,
-		id:        key.ID(),
-	}, nil
-}
-
-func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context, algorithm string) error {
-	logging.Info("lock and generate signing key pair")
-
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	errs := o.locker.Lock(ctx, lockDuration, authz.GetInstance(ctx).InstanceID())
-	err, ok := <-errs
-	if err != nil || !ok {
-		if zerrors.IsErrorAlreadyExists(err) {
-			return nil
-		}
-		logging.OnError(err).Debug("initial lock failed")
-		return err
-	}
-
-	return o.command.GenerateSigningKeyPair(setOIDCCtx(ctx), algorithm)
-}
-
-func (o *OPStorage) getMaxKeySequence(ctx context.Context) (float64, error) {
-	return o.eventstore.LatestSequence(ctx,
-		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
-			ResourceOwner(authz.GetInstance(ctx).InstanceID()).
-			AwaitOpenTransactions().
-			AllowTimeTravel().
-			AddQuery().
-			AggregateTypes(keypair.AggregateType).
-			EventTypes(
-				keypair.AddedEventType,
-			).
-			Or().
-			AggregateTypes(instance.AggregateType).
-			EventTypes(instance.InstanceRemovedEventType).
-			Builder(),
-	)
-}
-
-func selectSigningKey(keys []query.PrivateKey) query.PrivateKey {
-	return keys[len(keys)-1]
-}
-
-func setOIDCCtx(ctx context.Context) context.Context {
-	return authz.SetCtxData(ctx, authz.CtxData{UserID: oidcUser, OrgID: authz.GetInstance(ctx).InstanceID()})
-}
-
-func retry(retryable func() error) (err error) {
-	for i := 0; i < retryCount; i++ {
-		err = retryable()
-		if err == nil {
-			return nil
-		}
-		time.Sleep(retryBackoff)
-	}
-	return err
 }

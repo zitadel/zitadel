@@ -50,7 +50,7 @@ func (s *Server) VerifyMyEmail(ctx context.Context, req *auth_pb.VerifyMyEmailRe
 		return nil, err
 	}
 	ctxData := authz.GetCtxData(ctx)
-	objectDetails, err := s.command.VerifyHumanEmail(ctx, ctxData.UserID, req.Code, ctxData.ResourceOwner, emailCodeGenerator)
+	objectDetails, err := s.command.VerifyHumanEmail(ctx, ctxData.UserID, req.Code, ctxData.ResourceOwner, "", "", emailCodeGenerator)
 	if err != nil {
 		return nil, err
 	}

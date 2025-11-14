@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: O telefone já foi verificado
       Empty: O telefone está vazio
       NotChanged: Telefone não alterado
+      VerifyingRemovalIsNotSupported: Remoção de verificação não suportada
     Address:
       NotFound: Endereço não encontrado
       NotChanged: Endereço não alterado
@@ -192,7 +193,7 @@ Errors:
     AlreadyExists: Instância já existe
     NotChanged: Instância não alterada
   Org:
-    AlreadyExists: Nome da organização já está em uso
+    AlreadyExists: O nome ou ID da organização já está em uso
     Invalid: Organização é inválida
     AlreadyDeactivated: Organização já está desativada
     AlreadyActive: Organização já está ativa
@@ -434,8 +435,6 @@ Errors:
     Invalid: A concessão de usuário é inválida
     NotChanged: A concessão de usuário não foi alterada
     IDMissing: ID faltando
-    NotActive: A concessão de usuário não está ativa
-    NotInactive: A concessão de usuário não está desativada
     NoPermissionForProject: O usuário não possui permissões neste projeto
     RoleKeyNotFound: Função não encontrada
   Member:
@@ -494,6 +493,7 @@ Errors:
     SQLStatement: Não foi possível criar a instrução SQL
     InvalidRequest: O pedido é inválido
     TooManyNestingLevels: muitos níveis de aninhamento de consulta (máx. 20)
+    LimitExceeded: Limite excedido
   Quota:
     AlreadyExists: Cota já existe para esta unidade
     NotFound: Cota não encontrada para esta unidade
@@ -534,6 +534,7 @@ Errors:
     StateMissing: O parâmetro de estado está faltando na solicitação
     NotStarted: A intenção não foi iniciada ou já foi encerrada
     NotSucceeded: A intenção não teve sucesso
+    Expired: A intenção expirou
     TokenCreationFailed: Falha na criação do token
     InvalidToken: O token da intenção é inválido
     OtherUser: Intenção destinada a outro usuário
@@ -541,8 +542,23 @@ Errors:
     AlreadyExists: A solicitação de autenticação já existe
     NotExisting: A solicitação de autenticação não existe
     WrongLoginClient: A solicitação de autenticação foi criada por outro cliente de login
+    AlreadyHandled: O pedido de autenticação já foi processado
   OIDCSession:
     RefreshTokenInvalid: O Refresh Token é inválido
+    Token:
+      Invalid: O token é inválido
+      Expired: O token expirou
+    InvalidClient: O token não foi emitido para este cliente
+  SAMLRequest:
+    AlreadyExists: O SAMLRequest já existe
+    NotExisting: O SAMLRequest não existe
+    WrongLoginClient: SAMLRequest criado por outro cliente de login
+    AlreadyHandled: O pedido SAML já foi processado
+  SAMLSession:
+    InvalidClient: O SAMLResponse não foi emitido para este cliente
+  DeviceAuth:
+    NotFound: O pedido de autorização do dispositivo não existe
+    AlreadyHandled: O pedido de autorização do dispositivo já foi processado
   Feature:
     NotExisting: O recurso não existe
     TypeNotSupported: O tipo de recurso não é compatível
@@ -558,6 +574,8 @@ Errors:
     NotFound: Execução não encontrada
     IncludeNotFound: Incluir não encontrado
     NoTargets: Nenhuma meta definida
+    Failed: Falha na execução
+    ResponseIsNotValidJSON: A resposta não é um JSON válido
   UserSchema:
     NotEnabled: O recurso "Esquema do usuário" não está habilitado
     Type:
@@ -568,6 +586,11 @@ Errors:
     NotActive: Esquema do usuário não ativo
     NotInactive: Esquema do usuário não inativo
     NotExists: O esquema do usuário não existe
+    ID:
+      Missing: ID do esquema do utilizador em falta
+    Invalid: Esquema de utilizador inválido
+    Data:
+      Invalid: Dados inválidos para o esquema do utilizador
   TokenExchange:
     FeatureDisabled: O recurso Token Exchange está desabilitado para sua instância. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -579,6 +602,13 @@ Errors:
       NotForAPI: Tokens personificados não permitidos para API
     Impersonation:
       PolicyDisabled: A representação está desativada na política de segurança da instância
+  WebKey:
+    ActiveDelete: Não é possível eliminar a chave web ativa
+    Config: Configuração de chave web inválida
+    Duplicate: ID da chave Web não exclusivo
+    FeatureDisabled: Recurso chave da Web desativado
+    NoActive: Nenhuma chave web ativa encontrada
+    NotFound: Chave Web não encontrada
 
 AggregateTypes:
   action: Ação
@@ -602,6 +632,9 @@ AggregateTypes:
   restrictions: Restrições
   system: Sistema
   session: Sessão
+  web_key: Chave da Web
+  saml_request: Solicitação SAML
+  saml_session: Sessão SAML
 
 EventTypes:
   execution:
@@ -666,6 +699,13 @@ EventTypes:
         check:
           succeeded: Verificação de inicialização bem-sucedida
           failed: Verificação de inicialização falhou
+      invite:
+        code:
+          added: Código de convite gerado
+          sent: Código de convite enviado
+        check:
+          succeeded: Verificação do convite bem-sucedida
+          failed: Verificação do convite falhou
       username:
         reserved: Nome de usuário reservado
         released: Nome de usuário liberado
@@ -1300,6 +1340,31 @@ EventTypes:
     deactivated: Esquema de usuário desativado
     reactivated: Esquema do usuário reativado
     deleted: Esquema do usuário excluído
+    user:
+      created: Utilizador criado
+      updated: Utilizador atualizado
+      deleted: Utilizador excluído
+      email:
+        updated: Endereço de e-mail alterado
+        verified: Endereço de e-mail verificado
+        verification:
+          failed: Falha na verificação do endereço de e-mail
+        code:
+          added: Código de verificação do endereço de e-mail gerado
+          sent: Código de verificação do endereço de e-mail enviado
+      phone:
+        updated: Número de telefone alterado
+        verified: Número de telefone verificado
+        verification:
+          failed: Falha na verificação do número de telefone
+        code:
+          added: Código de verificação do número de telefone gerado
+          sent: Código de verificação do número de telefone enviado
+  web_key:
+    added: Chave Web adicionada
+    activated: Chave Web ativada
+    deactivated: Chave Web desativada
+    removed: Chave Web removida
 
 Application:
   OIDC:

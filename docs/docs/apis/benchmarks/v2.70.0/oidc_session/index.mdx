@@ -1,0 +1,109 @@
+---
+title: oidc session benchmark of Zitadel v2.70.0
+sidebar_label: oidc session
+---
+
+The test implementats [Support for (OIDC) Standard in a Custom Login UI flow](https://zitadel.com/docs/guides/integrate/login-ui/oidc-standard).
+
+The tests showed that querying the user takes too much time because Zitadel ensures the projection is up to date. This performance bottleneck must be resolved.
+
+## Performance test results
+
+| Metric                                | Value |
+|:--------------------------------------|:------|
+| Baseline                              | none  |
+| Purpose                               | Test current performance |
+| Test start                            | 14:24 UTC |
+| Test duration                         | 30min |
+| Executed test                         | oidc\_session |
+| k6 version                            | v0.57.0 |
+| VUs                                   | 600 |
+| Client location                       | US1 |
+| ZITADEL location                      | US1 |
+| ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 2<br/>Container max scale: 7 |
+| ZITADEL Version                       | v2.70.0 |
+| ZITADEL feature flags                 | webKey: true, improvedPerformance: \[\"IMPROVED\_PERFORMANCE\_ORG\_BY\_ID\", \"IMPROVED\_PERFORMANCE\_PROJECT\", \"IMPROVED\_PERFORMANCE\_USER\_GRANT\", \"IMPROVED\_PERFORMANCE\_ORG\_DOMAIN\_VERIFIED\", \"IMPROVED\_PERFORMANCE\_PROJECT\_GRANT\"\] |
+| Database                              | type: psql<br />version: v17.2 |
+| Database location                     | US1 |
+| Database specification                | vCPU: 8<br/> memory: 32Gib |
+| ZITADEL metrics during test           |  |
+| Observed errors                       |  |
+| Top 3 most expensive database queries | 1: lock current\_states table<br/>2: write events<br/>3: get events for projection<br/> |
+| k6 Iterations per second              | 153 |
+| k6 output                             | [output](#k6-output) |
+| flowchart outcome                     | Resolve locking issue |
+
+## Endpoint latencies
+
+import OutputSource from "./output.json";
+
+import { BenchmarkChart } from '/src/components/benchmark_chart';
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output {#k6-output}
+
+```bash
+     ✓ authorize status ok
+     ✓ auth request id returned
+     ✓ add Session status ok
+     ✓ finalize auth request status ok
+
+     █ setup
+
+       ✓ user defined
+       ✓ authorize status ok
+       ✓ login name status ok
+       ✓ login shows password page
+       ✓ password status ok
+       ✓ password callback
+       ✓ code set
+       ✓ token status ok
+       ✓ access token created
+       ✓ id token created
+       ✓ info created
+       ✓ org created
+       ✓ create user is status ok
+       ✓ generate machine key status ok
+       ✓ member added successful
+       ✓ openid configuration
+       ✓ access token returned
+
+     █ teardown
+
+       ✓ org removed
+
+     checks...............................: 100.00% 1097103 out of 1097103
+     data_received........................: 482 MB  267 kB/s
+     data_sent............................: 206 MB  114 kB/s
+     http_req_blocked.....................: min=150ns    avg=185.63µs max=639.06ms p(50)=360ns    p(95)=790ns    p(99)=1.11µs  
+     http_req_connecting..................: min=0s       avg=76.84µs  max=394.03ms p(50)=0s       p(95)=0s       p(99)=0s      
+     http_req_duration....................: min=2.27ms   avg=1.31s    max=6.57s    p(50)=326.44ms p(95)=3.94s    p(99)=4.28s   
+       { expected_response:true }.........: min=2.27ms   avg=1.31s    max=6.57s    p(50)=326.44ms p(95)=3.94s    p(99)=4.28s   
+     http_req_failed......................: 0.00%   0 out of 823429
+     http_req_receiving...................: min=22.92µs  avg=143.73µs max=245.98ms p(50)=105.17µs p(95)=188.26µs p(99)=260.56µs
+     http_req_sending.....................: min=22.37µs  avg=67.8µs   max=41.57ms  p(50)=63.65µs  p(95)=104.8µs  p(99)=138.46µs
+     http_req_tls_handshaking.............: min=0s       avg=106.12µs max=580.5ms  p(50)=0s       p(95)=0s       p(99)=0s      
+     http_req_waiting.....................: min=2.11ms   avg=1.31s    max=6.57s    p(50)=326.17ms p(95)=3.94s    p(99)=4.28s   
+     http_reqs............................: 823429  456.440453/s
+     iteration_duration...................: min=713.37ms avg=3.94s    max=8.94s    p(50)=3.92s    p(95)=4.98s    p(99)=5.44s   
+     iterations...........................: 274271  152.032998/s
+     login_ui_enter_login_name_duration...: min=113.75ms avg=113.75ms max=113.75ms p(50)=113.75ms p(95)=113.75ms p(99)=113.75ms
+     login_ui_enter_password_duration.....: min=2.27ms   avg=2.27ms   max=2.27ms   p(50)=2.27ms   p(95)=2.27ms   p(99)=2.27ms  
+     login_ui_init_login_duration.........: min=20.48ms  avg=156.67ms max=6.57s    p(50)=126.64ms p(95)=280.16ms p(99)=675.36ms
+     login_ui_token_duration..............: min=68.53ms  avg=68.53ms  max=68.53ms  p(50)=68.53ms  p(95)=68.53ms  p(99)=68.53ms 
+     membership_iam_member................: min=34.16ms  avg=34.16ms  max=34.16ms  p(50)=34.16ms  p(95)=34.16ms  p(99)=34.16ms 
+     oidc_auth_requst_by_id_duration......: min=20.59ms  avg=370.56ms max=2.87s    p(50)=294.12ms p(95)=911.42ms p(99)=1.08s   
+     oidc_session_duration................: min=713ms    avg=3.94s    max=8.94s    p(50)=3.92s    p(95)=4.98s    p(99)=5.44s   
+     oidc_token_duration..................: min=40.67ms  avg=40.67ms  max=40.67ms  p(50)=40.67ms  p(95)=40.67ms  p(99)=40.67ms 
+     org_create_org_duration..............: min=48.92ms  avg=48.92ms  max=48.92ms  p(50)=48.92ms  p(95)=48.92ms  p(99)=48.92ms 
+     session_add_session_duration.........: min=92.04ms  avg=3.4s     max=6.16s    p(50)=3.46s    p(95)=4.18s    p(99)=4.48s   
+     user_add_machine_key_duration........: min=32.08ms  avg=32.08ms  max=32.08ms  p(50)=32.08ms  p(95)=32.08ms  p(99)=32.08ms 
+     user_create_machine_duration.........: min=91.73ms  avg=91.73ms  max=91.73ms  p(50)=91.73ms  p(95)=91.73ms  p(99)=91.73ms 
+     vus..................................: 82      min=0                  max=600
+     vus_max..............................: 600     min=600                max=600
+
+
+running (30m04.0s), 000/600 VUs, 274271 complete and 0 interrupted iterations
+default ✓ [======================================] 600 VUs  30m0s
+```

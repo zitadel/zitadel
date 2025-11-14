@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"strings"
@@ -19,7 +20,7 @@ import (
 func WithHTTP(ctx context.Context) Option {
 	return func(c *runConfig) {
 		c.modules["zitadel/http"] = func(runtime *goja.Runtime, module *goja.Object) {
-			requireHTTP(ctx, &http.Client{Transport: new(transport)}, runtime, module)
+			requireHTTP(ctx, &http.Client{Transport: &transport{lookup: net.LookupIP}}, runtime, module)
 		}
 	}
 }
@@ -170,27 +171,40 @@ func parseHeaders(headers *goja.Object) http.Header {
 	return h
 }
 
-type transport struct{}
+type transport struct {
+	lookup func(string) ([]net.IP, error)
+}
 
-func (*transport) RoundTrip(req *http.Request) (*http.Response, error) {
-	if httpConfig == nil {
+func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
+	if httpConfig == nil || len(httpConfig.DenyList) == 0 {
 		return http.DefaultTransport.RoundTrip(req)
 	}
-	if isHostBlocked(httpConfig.DenyList, req.URL) {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ACTIO-N72d0", "host is denied")
+	if err := t.isHostBlocked(httpConfig.DenyList, req.URL); err != nil {
+		return nil, zerrors.ThrowInvalidArgument(err, "ACTIO-N72d0", "host is denied")
 	}
 	return http.DefaultTransport.RoundTrip(req)
 }
 
-func isHostBlocked(denyList []AddressChecker, address *url.URL) bool {
-	for _, blocked := range denyList {
-		if blocked.Matches(address.Hostname()) {
-			return true
+func (t *transport) isHostBlocked(denyList []AddressChecker, address *url.URL) error {
+	host := address.Hostname()
+	ip := net.ParseIP(host)
+	ips := []net.IP{ip}
+	// if the hostname is a domain, we need to check resolve the ip(s), since it might be denied
+	if ip == nil {
+		var err error
+		ips, err = t.lookup(host)
+		if err != nil {
+			return zerrors.ThrowInternal(err, "ACTIO-4m9s2", "lookup failed")
 		}
 	}
-	return false
+	for _, denied := range denyList {
+		if err := denied.IsDenied(ips, host); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 type AddressChecker interface {
-	Matches(string) bool
+	IsDenied([]net.IP, string) error
 }

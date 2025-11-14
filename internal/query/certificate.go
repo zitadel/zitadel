@@ -8,9 +8,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -66,11 +64,11 @@ var (
 	}
 )
 
-func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage domain.KeyUsage) (certs *Certificates, err error) {
+func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage crypto.KeyUsage) (certs *Certificates, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareCertificateQuery(ctx, q.client)
+	query, scan := prepareCertificateQuery()
 	if t.IsZero() {
 		t = time.Now()
 	}
@@ -103,7 +101,7 @@ func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage dom
 	return certs, nil
 }
 
-func prepareCertificateQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Certificates, error)) {
+func prepareCertificateQuery() (sq.SelectBuilder, func(*sql.Rows) (*Certificates, error)) {
 	return sq.Select(
 			KeyColID.identifier(),
 			KeyColCreationDate.identifier(),
@@ -118,7 +116,7 @@ func prepareCertificateQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			countColumn.identifier(),
 		).From(keyTable.identifier()).
 			LeftJoin(join(CertificateColID, KeyColID)).
-			LeftJoin(join(KeyPrivateColID, KeyColID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(KeyPrivateColID, KeyColID)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Certificates, error) {
 			certificates := make([]Certificate, 0)

@@ -49,7 +49,7 @@ The **JWT IdP Configuration** might then be:
 
 Therefore, if the user is redirected from ZITADEL to the JWT Endpoint on the WAF (`https://apps.test.com/existing/auth-new`), 
 the session cookies previously issued by the WAF, will be sent along by the browser due to the path being on the same domain as the exiting application.
-The WAF will reuse the session and send the JWT in the HTTP header `x-custom-tkn` to its upstream, the ZITADEL JWT Endpoint (`https://accounts.test.com/ui/login/login/jwt/authorize`).
+The WAF will reuse the session and send the JWT in the HTTP header `x-custom-tkn` to its upstream, the ZITADEL JWT Endpoint (`https://accounts.test.com/ipds/jwt`).
 
 For the signature validation, ZITADEL must be able to connect to Keys Endpoint (`https://issuer.test.internal/keys`) 
 and it will check if the token was signed (claim `iss`) by the defined Issuer (`https://issuer.test.internal`).

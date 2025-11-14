@@ -1,0 +1,72 @@
+<form *ngIf="form$ | async as form" class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+  <p class="target-description">{{ 'ACTIONSTWO.EXECUTION.DIALOG.TARGET.DESCRIPTION' | translate }}</p>
+
+  <cnsl-form-field class="full-width">
+    <cnsl-label>{{ 'ACTIONSTWO.EXECUTION.DIALOG.TARGET.TARGET.DESCRIPTION' | translate }}</cnsl-label>
+    <input
+      cnslInput
+      #trigger="matAutocompleteTrigger"
+      #input
+      type="text"
+      [formControl]="form.controls.autocomplete"
+      [matAutocomplete]="autoservice"
+      (keydown.enter)="handleEnter($event, form); input.blur(); trigger.closePanel()"
+    />
+    <mat-autocomplete #autoservice="matAutocomplete">
+      <mat-option *ngIf="targets().state === 'loading'" class="is-loading">
+        <mat-spinner diameter="30"></mat-spinner>
+      </mat-option>
+      <mat-option
+        *ngFor="let target of selectableTargets(); trackBy: trackTarget"
+        #option
+        (click)="addTarget(target, form); option.deselect()"
+        [value]="target.name"
+      >
+        {{ target.name }}
+      </mat-option>
+    </mat-autocomplete>
+  </cnsl-form-field>
+
+  <table mat-table cdkDropList (cdkDropListDropped)="drop($event, form)" [dataSource]="dataSource" [trackBy]="trackTarget">
+    <ng-container matColumnDef="order">
+      <th mat-header-cell *matHeaderCellDef>Reorder</th>
+      <td mat-cell *cnslCellDef="let row; let i = index; dataSource: dataSource">
+        <i class="las la-bars"></i>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Name</th>
+      <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
+        <cnsl-project-role-chip [roleName]="row.name">{{ row.name }}</cnsl-project-role-chip>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="deleteAction" stickyEnd>
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *cnslCellDef="let i = index; dataSource: dataSource">
+        <cnsl-table-actions>
+          <button
+            actions
+            matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
+            color="warn"
+            (click)="removeTarget(i, form)"
+            mat-icon-button
+          >
+            <i class="las la-trash"></i>
+          </button>
+        </cnsl-table-actions>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="['order', 'name', 'deleteAction']"></tr>
+    <tr class="drag-row" cdkDrag mat-row *matRowDef="let row; columns: ['order', 'name', 'deleteAction']"></tr>
+  </table>
+
+  <div class="actions">
+    <button *ngIf="!hideBackButton" mat-stroked-button (click)="back.emit()">
+      {{ 'ACTIONS.BACK' | translate }}
+    </button>
+    <span class="fill-space"></span>
+    <button color="primary" [disabled]="form.invalid" mat-raised-button type="submit">
+      {{ 'ACTIONS.CONTINUE' | translate }}
+    </button>
+  </div>
+</form>

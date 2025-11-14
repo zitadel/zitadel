@@ -5,10 +5,12 @@ import (
 
 	"google.golang.org/protobuf/types/known/durationpb"
 
+	idp_api "github.com/zitadel/zitadel/internal/api/grpc/idp/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
-	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
+	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 )
 
 func loginSettingsToPb(current *query.LoginPolicy) *settings.LoginSettings {
@@ -23,6 +25,7 @@ func loginSettingsToPb(current *query.LoginPolicy) *settings.LoginSettings {
 
 	return &settings.LoginSettings{
 		AllowUsernamePassword:      current.AllowUsernamePassword,
+		AllowLocalAuthentication:   current.AllowUsernamePassword,
 		AllowRegister:              current.AllowRegister,
 		AllowExternalIdp:           current.AllowExternalIDPs,
 		ForceMfa:                   current.ForceMFA,
@@ -66,7 +69,7 @@ func passkeysTypeToPb(passwordlessType domain.PasswordlessType) settings.Passkey
 func secondFactorTypeToPb(secondFactorType domain.SecondFactorType) settings.SecondFactorType {
 	switch secondFactorType {
 	case domain.SecondFactorTypeTOTP:
-		return settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP
+		return settings.SecondFactorType_SECOND_FACTOR_TYPE_TOTP
 	case domain.SecondFactorTypeU2F:
 		return settings.SecondFactorType_SECOND_FACTOR_TYPE_U2F
 	case domain.SecondFactorTypeOTPEmail:
@@ -189,6 +192,13 @@ func identityProviderToPb(idp *query.IDPLoginPolicyLink) *settings.IdentityProvi
 		Id:   idp.IDPID,
 		Name: domain.IDPName(idp.IDPName, idp.IDPType),
 		Type: idpTypeToPb(idp.IDPType),
+		Options: &idp_pb.Options{
+			IsLinkingAllowed:  idp.IsLinkingAllowed,
+			IsCreationAllowed: idp.IsCreationAllowed,
+			IsAutoCreation:    idp.IsAutoCreation,
+			IsAutoUpdate:      idp.IsAutoUpdate,
+			AutoLinking:       idp_api.AutoLinkingOptionToPb(idp.AutoLinking),
+		},
 	}
 }
 
@@ -216,6 +226,8 @@ func idpTypeToPb(idpType domain.IDPType) settings.IdentityProviderType {
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_GITLAB_SELF_HOSTED
 	case domain.IDPTypeGoogle:
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_GOOGLE
+	case domain.IDPTypeApple:
+		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_APPLE
 	case domain.IDPTypeSAML:
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_SAML
 	default:
@@ -238,5 +250,12 @@ func securitySettingsToCommand(req *settings.SetSecuritySettingsRequest) *comman
 		EnableIframeEmbedding: req.GetEmbeddedIframe().GetEnabled(),
 		AllowedOrigins:        req.GetEmbeddedIframe().GetAllowedOrigins(),
 		EnableImpersonation:   req.GetEnableImpersonation(),
+	}
+}
+
+func organizationSettingsToCommand(req *settings.SetOrganizationSettingsRequest) *command.SetOrganizationSettings {
+	return &command.SetOrganizationSettings{
+		OrganizationID:              req.OrganizationId,
+		OrganizationScopedUsernames: req.OrganizationScopedUsernames,
 	}
 }

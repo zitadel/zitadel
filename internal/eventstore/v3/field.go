@@ -2,7 +2,6 @@ package eventstore
 
 import (
 	"context"
-	"database/sql"
 	_ "embed"
 	"encoding/json"
 	"reflect"
@@ -10,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -28,16 +28,12 @@ func (es *Eventstore) FillFields(ctx context.Context, events ...eventstore.FillF
 	ctx, span := tracing.NewSpan(ctx)
 	defer span.End()
 
-	tx, err := es.client.BeginTx(ctx, nil)
+	tx, err := es.client.Begin(ctx, &database.TransactionOptions{IsolationLevel: database.IsolationLevelReadCommitted})
 	if err != nil {
 		return err
 	}
 	defer func() {
-		if err != nil {
-			_ = tx.Rollback()
-			return
-		}
-		err = tx.Commit()
+		err = tx.End(ctx, err)
 	}()
 
 	return handleFieldFillEvents(ctx, tx, events)
@@ -46,44 +42,43 @@ func (es *Eventstore) FillFields(ctx context.Context, events ...eventstore.FillF
 // Search implements the [eventstore.Search] method
 func (es *Eventstore) Search(ctx context.Context, conditions ...map[eventstore.FieldType]any) (result []*eventstore.SearchResult, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer span.EndWithError(err)
+	defer func() { span.EndWithError(err) }()
 
 	var builder strings.Builder
 	args := buildSearchStatement(ctx, &builder, conditions...)
 
-	err = es.client.QueryContext(
+	rows, err := es.client.Query(
 		ctx,
-		func(rows *sql.Rows) error {
-			for rows.Next() {
-				var (
-					res   eventstore.SearchResult
-					value fieldValue
-				)
-				err = rows.Scan(
-					&res.Aggregate.InstanceID,
-					&res.Aggregate.ResourceOwner,
-					&res.Aggregate.Type,
-					&res.Aggregate.ID,
-					&res.Object.Type,
-					&res.Object.ID,
-					&res.Object.Revision,
-					&res.FieldName,
-					&value.value,
-				)
-				if err != nil {
-					return err
-				}
-				res.Value = &value
-
-				result = append(result, &res)
-			}
-			return nil
-		},
 		builder.String(),
 		args...,
 	)
 	if err != nil {
 		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var (
+			res   eventstore.SearchResult
+			value fieldValue
+		)
+		err = rows.Scan(
+			&res.Aggregate.InstanceID,
+			&res.Aggregate.ResourceOwner,
+			&res.Aggregate.Type,
+			&res.Aggregate.ID,
+			&res.Object.Type,
+			&res.Object.ID,
+			&res.Object.Revision,
+			&res.FieldName,
+			&value.value,
+		)
+		if err != nil {
+			return nil, err
+		}
+		res.Value = &value
+
+		result = append(result, &res)
 	}
 
 	return result, nil
@@ -142,7 +137,7 @@ func buildSearchCondition(builder *strings.Builder, index int, conditions map[ev
 	return args
 }
 
-func handleFieldCommands(ctx context.Context, tx *sql.Tx, commands []eventstore.Command) error {
+func (es *Eventstore) handleFieldCommands(ctx context.Context, tx database.Transaction, commands []eventstore.Command) error {
 	for _, command := range commands {
 		if len(command.Fields()) > 0 {
 			if err := handleFieldOperations(ctx, tx, command.Fields()); err != nil {
@@ -153,18 +148,19 @@ func handleFieldCommands(ctx context.Context, tx *sql.Tx, commands []eventstore.
 	return nil
 }
 
-func handleFieldFillEvents(ctx context.Context, tx *sql.Tx, events []eventstore.FillFieldsEvent) error {
+func handleFieldFillEvents(ctx context.Context, tx database.Transaction, events []eventstore.FillFieldsEvent) error {
 	for _, event := range events {
-		if len(event.Fields()) > 0 {
-			if err := handleFieldOperations(ctx, tx, event.Fields()); err != nil {
-				return err
-			}
+		if len(event.Fields()) == 0 {
+			continue
+		}
+		if err := handleFieldOperations(ctx, tx, event.Fields()); err != nil {
+			return err
 		}
 	}
 	return nil
 }
 
-func handleFieldOperations(ctx context.Context, tx *sql.Tx, operations []*eventstore.FieldOperation) error {
+func handleFieldOperations(ctx context.Context, tx database.Transaction, operations []*eventstore.FieldOperation) error {
 	for _, operation := range operations {
 		if operation.Set != nil {
 			if err := handleFieldSet(ctx, tx, operation.Set); err != nil {
@@ -182,7 +178,7 @@ func handleFieldOperations(ctx context.Context, tx *sql.Tx, operations []*events
 	return nil
 }
 
-func handleFieldSet(ctx context.Context, tx *sql.Tx, field *eventstore.Field) error {
+func handleFieldSet(ctx context.Context, tx database.Transaction, field *eventstore.Field) error {
 	if len(field.UpsertConflictFields) == 0 {
 		return handleSearchInsert(ctx, tx, field)
 	}
@@ -193,12 +189,12 @@ const (
 	insertField = `INSERT INTO eventstore.fields (instance_id, resource_owner, aggregate_type, aggregate_id, object_type, object_id, object_revision, field_name, value, value_must_be_unique, should_index) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
 )
 
-func handleSearchInsert(ctx context.Context, tx *sql.Tx, field *eventstore.Field) error {
+func handleSearchInsert(ctx context.Context, tx database.Transaction, field *eventstore.Field) error {
 	value, err := json.Marshal(field.Value.Value)
 	if err != nil {
 		return zerrors.ThrowInvalidArgument(err, "V3-fcrW1", "unable to marshal field value")
 	}
-	_, err = tx.ExecContext(
+	_, err = tx.Exec(
 		ctx,
 		insertField,
 
@@ -222,13 +218,13 @@ const (
 	fieldsUpsertSuffix = ` RETURNING * ) INSERT INTO eventstore.fields (instance_id, resource_owner, aggregate_type, aggregate_id, object_type, object_id, object_revision, field_name, value, value_must_be_unique, should_index) SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11 WHERE NOT EXISTS (SELECT 1 FROM upsert)`
 )
 
-func handleSearchUpsert(ctx context.Context, tx *sql.Tx, field *eventstore.Field) error {
+func handleSearchUpsert(ctx context.Context, tx database.Transaction, field *eventstore.Field) error {
 	value, err := json.Marshal(field.Value.Value)
 	if err != nil {
 		return zerrors.ThrowInvalidArgument(err, "V3-fcrW1", "unable to marshal field value")
 	}
 
-	_, err = tx.ExecContext(
+	_, err = tx.Exec(
 		ctx,
 		writeUpsertField(field.UpsertConflictFields),
 
@@ -268,12 +264,12 @@ func writeUpsertField(fields []eventstore.FieldType) string {
 
 const removeSearch = `DELETE FROM eventstore.fields WHERE `
 
-func handleSearchDelete(ctx context.Context, tx *sql.Tx, clauses map[eventstore.FieldType]any) error {
+func handleSearchDelete(ctx context.Context, tx database.Transaction, clauses map[eventstore.FieldType]any) error {
 	if len(clauses) == 0 {
 		return zerrors.ThrowInvalidArgument(nil, "V3-oqlBZ", "no conditions")
 	}
 	stmt, args := writeDeleteField(clauses)
-	_, err := tx.ExecContext(ctx, stmt, args...)
+	_, err := tx.Exec(ctx, stmt, args...)
 	return err
 }
 

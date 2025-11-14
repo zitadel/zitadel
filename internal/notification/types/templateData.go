@@ -13,7 +13,7 @@ import (
 )
 
 func GetTemplateData(ctx context.Context, translator *i18n.Translator, translateArgs map[string]interface{}, href, msgType, lang string, policy *query.LabelPolicy) templates.TemplateData {
-	assetsPrefix := http_util.ComposedOrigin(ctx) + assets.HandlerPrefix
+	assetsPrefix := http_util.DomainContext(ctx).Origin() + assets.HandlerPrefix
 	templateData := templates.TemplateData{
 		URL:             href,
 		PrimaryColor:    templates.DefaultPrimaryColor,

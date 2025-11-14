@@ -29,7 +29,7 @@ func (s *Server) ListApps(ctx context.Context, req *mgmt_pb.ListAppsRequest) (*m
 	if err != nil {
 		return nil, err
 	}
-	apps, err := s.query.SearchApps(ctx, queries, false)
+	apps, err := s.query.SearchApps(ctx, queries, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,6 @@ func (s *Server) ListAppChanges(ctx context.Context, req *mgmt_pb.ListAppChanges
 	}
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		AllowTimeTravel().
 		Limit(limit).
 		AwaitOpenTransactions().
 		OrderDesc().
@@ -80,7 +79,11 @@ func (s *Server) ListAppChanges(ctx context.Context, req *mgmt_pb.ListAppChanges
 }
 
 func (s *Server) AddOIDCApp(ctx context.Context, req *mgmt_pb.AddOIDCAppRequest) (*mgmt_pb.AddOIDCAppResponse, error) {
-	app, err := s.command.AddOIDCApplication(ctx, AddOIDCAppRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	oidcApp, err := AddOIDCAppRequestToDomain(req)
+	if err != nil {
+		return nil, err
+	}
+	app, err := s.command.AddOIDCApplication(ctx, oidcApp, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +97,11 @@ func (s *Server) AddOIDCApp(ctx context.Context, req *mgmt_pb.AddOIDCAppRequest)
 	}, nil
 }
 func (s *Server) AddSAMLApp(ctx context.Context, req *mgmt_pb.AddSAMLAppRequest) (*mgmt_pb.AddSAMLAppResponse, error) {
-	app, err := s.command.AddSAMLApplication(ctx, AddSAMLAppRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	samlApp, err := AddSAMLAppRequestToDomain(req)
+	if err != nil {
+		return nil, err
+	}
+	app, err := s.command.AddSAMLApplication(ctx, samlApp, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +125,7 @@ func (s *Server) AddAPIApp(ctx context.Context, req *mgmt_pb.AddAPIAppRequest) (
 }
 
 func (s *Server) UpdateApp(ctx context.Context, req *mgmt_pb.UpdateAppRequest) (*mgmt_pb.UpdateAppResponse, error) {
-	details, err := s.command.ChangeApplication(ctx, req.ProjectId, UpdateAppRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.UpdateApplicationName(ctx, req.ProjectId, UpdateAppRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +135,11 @@ func (s *Server) UpdateApp(ctx context.Context, req *mgmt_pb.UpdateAppRequest) (
 }
 
 func (s *Server) UpdateOIDCAppConfig(ctx context.Context, req *mgmt_pb.UpdateOIDCAppConfigRequest) (*mgmt_pb.UpdateOIDCAppConfigResponse, error) {
-	config, err := s.command.ChangeOIDCApplication(ctx, UpdateOIDCAppConfigRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	oidcApp, err := UpdateOIDCAppConfigRequestToDomain(req)
+	if err != nil {
+		return nil, err
+	}
+	config, err := s.command.UpdateOIDCApplication(ctx, oidcApp, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +153,11 @@ func (s *Server) UpdateOIDCAppConfig(ctx context.Context, req *mgmt_pb.UpdateOID
 }
 
 func (s *Server) UpdateSAMLAppConfig(ctx context.Context, req *mgmt_pb.UpdateSAMLAppConfigRequest) (*mgmt_pb.UpdateSAMLAppConfigResponse, error) {
-	config, err := s.command.ChangeSAMLApplication(ctx, UpdateSAMLAppConfigRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	samlApp, err := UpdateSAMLAppConfigRequestToDomain(req)
+	if err != nil {
+		return nil, err
+	}
+	config, err := s.command.UpdateSAMLApplication(ctx, samlApp, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +171,7 @@ func (s *Server) UpdateSAMLAppConfig(ctx context.Context, req *mgmt_pb.UpdateSAM
 }
 
 func (s *Server) UpdateAPIAppConfig(ctx context.Context, req *mgmt_pb.UpdateAPIAppConfigRequest) (*mgmt_pb.UpdateAPIAppConfigResponse, error) {
-	config, err := s.command.ChangeAPIApplication(ctx, UpdateAPIAppConfigRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	config, err := s.command.UpdateAPIApplication(ctx, UpdateAPIAppConfigRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -256,7 +271,7 @@ func (s *Server) ListAppKeys(ctx context.Context, req *mgmt_pb.ListAppKeysReques
 	if err != nil {
 		return nil, err
 	}
-	keys, err := s.query.SearchAuthNKeys(ctx, queries, false)
+	keys, err := s.query.SearchAuthNKeys(ctx, queries, query.JoinFilterApp, nil)
 	if err != nil {
 		return nil, err
 	}

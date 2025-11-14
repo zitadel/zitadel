@@ -1,24 +1,57 @@
 {
-	"name": "zitadel",
-	"dockerComposeFile": "docker-compose.yml",
+	"$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.schema.json",
+	"name": "Zitadel Devcontainer",
+	"dockerComposeFile": "docker-compose.yaml",
 	"service": "devcontainer",
-	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-	"features": {
-		"ghcr.io/devcontainers/features/go:1": {
-			"version": "1.22"
-		},
-		"ghcr.io/devcontainers/features/node:1": {
-			"version": "18"
-		},
-		"ghcr.io/guiyomh/features/golangci-lint:0": {},
-		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
-		"ghcr.io/devcontainers/features/github-cli:1": {},
-		"ghcr.io/jungaretti/features/make:1": {}
-	},
+	"runServices": [
+		"devcontainer"
+	],
+	"workspaceFolder": "/workspaces/zitadel",
 	"forwardPorts": [
 		3000,
 		4200,
-		8080
+		8080,
+		3100
 	],
-	"onCreateCommand": "npm install -g sass@1.64.1"
+	"portsAttributes": {
+		"3000": {
+			"label": "Login",
+			"onAutoForward": "notify"
+		},
+		"4200": {
+			"label": "Console",
+			"onAutoForward": "notify"
+		},
+		"8080": {
+			"label": "API",
+			"onAutoForward": "notify"
+		},
+		"3100": {
+			"label": "Docs",
+			"onAutoForward": "notify"
+		}
+	},
+	"features": {
+		"ghcr.io/devcontainers/features/go:1": {
+			"version": "1.24"
+		},
+		"ghcr.io/devcontainers/features/docker-outside-of-docker": {},
+		"ghcr.io/schlich/devcontainer-features/cypress:1": {
+			"version": "14"
+		}
+	},
+	"containerEnv": {
+		"DEVCONTAINER_LOCAL_WORKSPACE_ROOT": "${localWorkspaceFolder}"
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"golang.Go",
+				"Angular.ng-template",
+				"dbaeumer.vscode-eslint",
+				"esbenp.prettier-vscode",
+				"nrwl.angular-console"
+			]
+		}
+	}
 }

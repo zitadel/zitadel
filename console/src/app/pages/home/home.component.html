@@ -5,30 +5,28 @@
     <cnsl-quickstart></cnsl-quickstart>
 
     <ng-container *ngIf="['iam.read$'] | hasRole | async; else defaultHome">
-      <cnsl-onboarding></cnsl-onboarding>
+      <cnsl-onboarding />
     </ng-container>
     <ng-template #defaultHome>
-      <cnsl-shortcuts></cnsl-shortcuts>
+      <cnsl-shortcuts />
     </ng-template>
 
-    <p class="disclaimer cnsl-secondary-text">{{ 'HOME.DISCLAIMER' | translate }}</p>
-
     <span class="fill-space"></span>
-    <h2 class="desc">{{ 'ONBOARDING.MOREDESCRIPTION' | translate }}</h2>
+    <h2 class="home-desc">{{ 'ONBOARDING.MOREDESCRIPTION' | translate }}</h2>
 
     <div class="home-grid-container">
       <a href="https://zitadel.com/docs/guides/start/quickstart" target="_blank" rel="noreferrer" class="grid-item">
         <div
           class="icon-wrapper"
           [ngStyle]="{
-            background: (themeService.isDarkTheme | async) ? greendark + 50 : greenlight + 50
+            background: (themeService.isDarkTheme | async) ? greendark + 50 : greenlight + 50,
           }"
         >
           <div
             class="inner"
             [ngStyle]="{
               background: (themeService.isDarkTheme | async) ? greendark : greenlight,
-              color: (themeService.isDarkTheme | async) ? greenlight : greendark
+              color: (themeService.isDarkTheme | async) ? greenlight : greendark,
             }"
           >
             <i class="las la-play"></i>
@@ -45,14 +43,14 @@
         <div
           class="icon-wrapper"
           [ngStyle]="{
-            background: (themeService.isDarkTheme | async) ? bluedark + 50 : bluelight + 50
+            background: (themeService.isDarkTheme | async) ? bluedark + 50 : bluelight + 50,
           }"
         >
           <div
             class="inner"
             [ngStyle]="{
               background: (themeService.isDarkTheme | async) ? bluedark : bluelight,
-              color: (themeService.isDarkTheme | async) ? bluelight : bluedark
+              color: (themeService.isDarkTheme | async) ? bluelight : bluedark,
             }"
           >
             <i class="las la-file-alt"></i>
@@ -69,14 +67,14 @@
         <div
           class="icon-wrapper"
           [ngStyle]="{
-            background: (themeService.isDarkTheme | async) ? cyandark + 50 : cyanlight + 50
+            background: (themeService.isDarkTheme | async) ? cyandark + 50 : cyanlight + 50,
           }"
         >
           <div
             class="inner"
             [ngStyle]="{
               background: (themeService.isDarkTheme | async) ? cyandark : cyanlight,
-              color: (themeService.isDarkTheme | async) ? cyanlight : cyandark
+              color: (themeService.isDarkTheme | async) ? cyanlight : cyandark,
             }"
           >
             <i class="las la-play"></i>

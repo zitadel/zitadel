@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: El teléfono ya se verificó
       Empty: El teléfono está vacío
       NotChanged: El teléfono no ha cambiado
+      VerifyingRemovalIsNotSupported: La verificación de eliminación no está soportada
     Address:
       NotFound: Dirección no encontrada
       NotChanged: La dirección no ha cambiado
@@ -193,7 +194,7 @@ Errors:
     AlreadyExists: La instancia ya existe
     NotChanged: La instancia no ha cambiado
   Org:
-    AlreadyExists: El nombre de la organización ya está cogido
+    AlreadyExists: El nombre o id de la organización ya está tomado
     Invalid: El nombre de la organización no es válido
     AlreadyDeactivated: La organización ya está desactivada
     AlreadyActive: La organización ya está activada
@@ -435,8 +436,6 @@ Errors:
     Invalid: La concesión de usuario no es válida
     NotChanged: La concesión de usuario no ha cambiado
     IDMissing: Falta Id
-    NotActive: La concesión de usuario no está activa
-    NotInactive: La concesión de usuario no está inactiva
     NoPermissionForProject: El usuario no tiene permisos en este proyecto
     RoleKeyNotFound: Rol no encontrado
   Member:
@@ -495,6 +494,7 @@ Errors:
     SQLStatement: La sentencia SQL no pudo crearse
     InvalidRequest: La solicitud no es válida
     TooManyNestingLevels: Demasiados niveles de anidamiento de consultas (máximo 20)
+    LimitExceeded: Se ha superado el límite de resultados
   Quota:
     AlreadyExists: La cuota ya existe para esta unidad
     NotFound: Cuota no encontrada para esta unidad
@@ -535,6 +535,7 @@ Errors:
     StateMissing: Falta un parámetro de estado en la solicitud
     NotStarted: La intención no se ha iniciado o ya ha finalizado
     NotSucceeded: Intento fallido
+    Expired: La intención ha expirado
     TokenCreationFailed: Fallo en la creación del token
     InvalidToken: El token de la intención no es válido
     OtherUser: Destinado a otro usuario
@@ -542,12 +543,23 @@ Errors:
     AlreadyExists: Auth Request ya existe
     NotExisting: Auth Request no existe
     WrongLoginClient: Auth Request creado por otro cliente de inicio de sesión
+    AlreadyHandled: Auth Request ya ha sido procesada
   OIDCSession:
     RefreshTokenInvalid: El token de refresco no es válido
     Token:
       Invalid: El token no es válido
       Expired: El token ha caducado
     InvalidClient: El token no ha sido emitido para este cliente
+  SAMLRequest:
+    AlreadyExists: SAMLRequest ya existe
+    NotExisting: SAMLRequest no existe
+    WrongLoginClient: SAMLRequest creado por otro cliente de inicio de sesión
+    AlreadyHandled: SAMLRequest ya ha sido procesada
+  SAMLSession:
+    InvalidClient: SAMLResponse no ha sido emitido para este cliente
+  DeviceAuth:
+    NotFound: La solicitud de autorización del dispositivo no existe
+    AlreadyHandled: La solicitud de autorización del dispositivo ya ha sido procesada
   Feature:
     NotExisting: La característica no existe
     TypeNotSupported: El tipo de característica no es compatible
@@ -563,6 +575,8 @@ Errors:
     NotFound: Ejecución no encontrada
     IncludeNotFound: Incluir no encontrado
     NoTargets: No hay objetivos definidos
+    Failed: Ejecución fallida
+    ResponseIsNotValidJSON: La respuesta no es un JSON válido
   UserSchema:
     NotEnabled: La función "Esquema de usuario" no está habilitada
     Type:
@@ -573,6 +587,11 @@ Errors:
     NotActive: Esquema de usuario no activo
     NotInactive: Esquema de usuario no inactivo
     NotExists: El esquema de usuario no existe
+    ID:
+      Missing: Falta el ID del esquema de usuario
+    Invalid: Esquema de usuario no válido
+    Data:
+      Invalid: Datos no válidos para el esquema de usuario
   TokenExchange:
     FeatureDisabled: La función de intercambio de tokens está deshabilitada para su instancia. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -584,6 +603,13 @@ Errors:
       NotForAPI: Tokens suplantados no permitidos para API
     Impersonation:
       PolicyDisabled: La suplantación está deshabilitada en la política de seguridad de la instancia.
+  WebKey:
+    ActiveDelete: No se puede eliminar la clave web activa
+    Config: Configuración de clave web no válida
+    Duplicate: ID de clave web no único
+    FeatureDisabled: Función de clave web deshabilitada
+    NoActive: No se encontró ninguna clave web activa
+    NotFound: Clave web no encontrada
 
 AggregateTypes:
   action: Acción
@@ -607,6 +633,9 @@ AggregateTypes:
   restrictions: Restricciones
   system: Sistema
   session: Sesión
+  web_key: Clave web
+  saml_request: Solicitud SAML
+  saml_session: Sesión SAML
 
 EventTypes:
   execution:
@@ -671,6 +700,13 @@ EventTypes:
         check:
           succeeded: Comprobación exitosa de la inicialización
           failed: Fallo en la comprobación de la inicialización
+      invite:
+        code:
+          added: Código de invitación generado
+          sent: Código de invitación enviado
+        check:
+          succeeded: Comprobación de invitación correcta
+          failed: Comprobación de invitación fallida
       username:
         reserved: Nombre de usuario reservado
         released: Nombre de usuario liberado
@@ -914,8 +950,8 @@ EventTypes:
           added: Doble factor añadido a la política de inicio de sesión
           removed: Doble factor eliminado de la política de inicio de sesión
         multifactor:
-          added: Multi factor añadido a la política de inicio de sesión
-          removed: Multi factor eliminado de la política de inicio de sesión
+          added: Multi-factor añadido a la política de inicio de sesión
+          removed: Multi-factor eliminado de la política de inicio de sesión
       password:
         complexity:
           added: Política de complejidad de la contraseña añadida
@@ -1308,6 +1344,31 @@ EventTypes:
     deactivated: Esquema de usuario desactivado
     reactivated: Esquema de usuario reactivado
     deleted: Esquema de usuario eliminado
+    user:
+      created: Usuario creado
+      updated: Usuario actualizado
+      deleted: Usuario eliminado
+      email:
+        updated:  Dirección de correo electrónico modificada
+        verified: Dirección de correo electrónico verificada
+        verification:
+          failed: Error en la verificación de la dirección de correo electrónico
+        code:
+          added: Código de verificación de la dirección de correo electrónico generado
+          sent: Código de verificación de la dirección de correo electrónico enviado
+      phone:
+        updated: Número de teléfono modificado
+        verified: Número de teléfono verificado
+        verification:
+          failed: Error en la verificación del número de teléfono
+        code:
+          added: Código de verificación del número de teléfono generado
+          sent: Código de verificación del número de teléfono enviado
+  web_key:
+    added: Clave web añadida
+    activated: Clave web activada
+    deactivated: Clave web desactivada
+    removed: Clave web eliminada
 
 Application:
   OIDC:

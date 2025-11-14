@@ -183,6 +183,7 @@ message User {
       example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
     }
   ];
+  zitadel.object.v2beta.Details details = 8;
   UserState state = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "current state of the user";

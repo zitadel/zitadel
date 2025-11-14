@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Телефонскиот број веќе е верифициран
       Empty: Телефонскиот број е празен
       NotChanged: Телефонскиот број не е променет
+      VerifyingRemovalIsNotSupported: Отстранувањето на верификацијата не е поддржано
     Address:
       NotFound: Адресата не е пронајдена
       NotChanged: Адресата не е променета
@@ -192,7 +193,7 @@ Errors:
     AlreadyExists: Инстанцата веќе постои
     NotChanged: Инстанцата не е променета
   Org:
-    AlreadyExists: Името на организацијата е веќе зафатено
+    AlreadyExists: Името или ID-то на организацијата е веќе зафатено
     Invalid: Организацијата е невалидна
     AlreadyDeactivated: Организацијата е веќе деактивирана
     AlreadyActive: Организацијата е веќе активна
@@ -434,8 +435,6 @@ Errors:
     Invalid: Овластувањето на корисникот е невалидно
     NotChanged: Овластувањето на корисникот не е променето
     IDMissing: ID недостасува
-    NotActive: Овластувањето на корисникот не е активно
-    NotInactive: Овластувањето на корисникот не е неактивно
     NoPermissionForProject: Корисникот нема овластувања за овој проект
     RoleKeyNotFound: Улогата не е пронајдена
   Member:
@@ -494,6 +493,7 @@ Errors:
     SQLStatement: SQL наредбата не може да се креира
     InvalidRequest: Барањето е невалидно
     TooManyNestingLevels: Премногу нивоа на вгнездување на барања (макс 20)
+    LimitExceeded: Превишена граница
   Quota:
     AlreadyExists: Веќе постои квота за оваа единица
     NotFound: Квотата не е пронајдена за оваа единица
@@ -534,6 +534,7 @@ Errors:
     StateMissing: Параметарот State недостасува во барањето
     NotStarted: Намерата не е започната или веќе завршена
     NotSucceeded: Намерата не е успешна
+    Expired: Намерата е истечена
     TokenCreationFailed: Неуспешно креирање на токен
     InvalidToken: Токенот за намера е невалиден
     OtherUser: Намерата е за друг корисник
@@ -541,12 +542,23 @@ Errors:
     AlreadyExists: Барањето за автентикација веќе постои
     NotExisting: Барањето за автентикација не постои
     WrongLoginClient: Барањето за автификација беше креирано од друг клиент за најавување
+    AlreadyHandled: Барањето за автентикација е веќе обработено
   OIDCSession:
     RefreshTokenInvalid: Токенот за освежување е неважечки
     Token:
       Invalid: токенот е неважечки
       Expired: токенот е истечен
     InvalidClient: Токен не беше издаден на овој клиент
+  SAMLRequest:
+    AlreadyExists: SAMLRequest веќе постои
+    NotExisting: SAMLRequest не постои
+    WrongLoginClient: SAML Барање создадено од друг клиент за најавување
+    AlreadyHandled: SAML барањето е веќе обработено
+  SAMLSession:
+    InvalidClient: SAMLResponse не беше издаден за овој клиент
+  DeviceAuth:
+    NotFound: Барањето за авторизација на уредот не постои
+    AlreadyHandled: Барањето за авторизација на уредот е веќе обработено
   Feature:
     NotExisting: Функцијата не постои
     TypeNotSupported: Типот на функција не е поддржан
@@ -562,6 +574,8 @@ Errors:
     NotFound: Извршувањето не е пронајдено
     IncludeNotFound: Вклучете не е пронајден
     NoTargets: Не се дефинирани цели
+    Failed: Извршувањето не успеа
+    ResponseIsNotValidJSON: Одговорот не е валиден JSON
   UserSchema:
     NotEnabled: Функцијата „Корисничка шема“ не е овозможена
     Type:
@@ -572,6 +586,11 @@ Errors:
     NotActive: Корисничката шема не е активна
     NotInactive: Корисничката шема не е неактивна
     NotExists: Корисничката шема не постои
+    ID:
+      Missing: Недостасува ID на корисничка шема
+    Invalid: Корисничката шема е неважечка
+    Data:
+      Invalid: Податоците не се валидни за корисничка шема
   TokenExchange:
     FeatureDisabled: Функцијата за размена на токени е оневозможена на вашиот пример. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -583,6 +602,13 @@ Errors:
       NotForAPI: Имитирани токени не се дозволени за API
     Impersonation:
       PolicyDisabled: Имитирањето е оневозможено во политиката за безбедност на примерот
+  WebKey:
+    ActiveDelete: Не може да се избрише активниот веб-клуч
+    Config: Неважечка конфигурација на веб-клуч
+    Duplicate: ID на веб-клучот не е единствен
+    FeatureDisabled: Функцијата за веб-клуч е оневозможена
+    NoActive: Не е пронајден активен веб-клуч
+    NotFound: Веб-клучот не е пронајден
 
 AggregateTypes:
   action: Акција
@@ -606,6 +632,9 @@ AggregateTypes:
   restrictions: Ограничувања
   system: Систем
   session: Сесија
+  web_key: Веб клуч
+  saml_request: Барање SAML
+  saml_session: SAML сесија
 
 EventTypes:
   execution:
@@ -670,6 +699,13 @@ EventTypes:
         check:
           succeeded: Проверката на иницијализацијата е успешна
           failed: Проверката на иницијализацијата е неуспешна
+      invite:
+        code:
+          added: Генериран е код за покана
+          sent: Изпратен е код за покана
+        check:
+          succeeded: Проверката на поканата е успешна
+          failed: Проверката на поканата е неуспешна
       username:
         reserved: Корисничкото име е резервирано
         released: Корисничкото име е ослободено
@@ -1306,6 +1342,31 @@ EventTypes:
     deactivated: Корисничката шема е деактивирана
     reactivated: Корисничката шема е реактивирана
     deleted: Корисничката шема е избришана
+    user:
+      created: Корисникот е создаден
+      updated: Корисникот е ажуриран
+      deleted: Корисникот е избришан
+      email:
+        updated: Адресата на е-пошта е променета
+        verified: Адресата на е-пошта е потврдена
+        verification:
+          failed: Потврдата на адресата на е-пошта не успеа
+        code:
+          added: Генериран е код за потврда на адресата на е-пошта
+          sent: Испратен е код за потврда на адресата на е-пошта
+      phone:
+        updated: Телефонскиот број е променет
+        verified: Телефонскиот број е потврден
+        verification:
+          failed: Потврдата на телефонскиот број не успеа
+        code:
+          added: Генериран е кодот за потврда на телефонскиот број
+          sent: Кодот за потврда на телефонскиот број е испратен
+  web_key:
+    added: Додаден е веб-клуч
+    activated: Веб-клучот е активиран
+    deactivated: Веб-клучот е деактивиран
+    removed: Веб-клучот е отстранет
 
 Application:
   OIDC:

@@ -28,6 +28,7 @@ import { ProviderNextService } from '../provider-next/provider-next.service';
 @Component({
   selector: 'cnsl-provider-ldap',
   templateUrl: './provider-ldap.component.html',
+  standalone: false,
 })
 export class ProviderLDAPComponent {
   public updateBindPassword: boolean = false;
@@ -179,7 +180,7 @@ export class ProviderLDAPComponent {
   }
 
   public submitForm(): void {
-    this.provider ? this.updateLDAPProvider() : this.addLDAPProvider();
+    this.provider || this.justCreated$.value ? this.updateLDAPProvider() : this.addLDAPProvider();
   }
 
   public addLDAPProvider(): void {

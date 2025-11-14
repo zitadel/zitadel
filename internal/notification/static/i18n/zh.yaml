@@ -59,3 +59,10 @@ PasswordChange:
   Greeting: 你好 {{.DisplayName}},
   Text: 您的用户的密码已经改变，如果这个改变不是由您做的，请注意立即重新设置您的密码。
   ButtonText: 登录
+InviteUser:
+  Title: '{{.ApplicationName}}邀请'
+  PreHeader: '{{.ApplicationName}}邀请'
+  Subject: '{{.ApplicationName}}邀请'
+  Greeting: 您好，{{.DisplayName}},
+  Text: 您的用户已被邀请加入{{.ApplicationName}}。请点击下面的按钮完成邀请过程。如果您没有请求此邮件，请忽略它。
+  ButtonText: 接受邀请

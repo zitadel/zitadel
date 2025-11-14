@@ -2,61 +2,68 @@ package eventstore
 
 import (
 	"context"
-	"database/sql"
 	_ "embed"
-	"errors"
 	"fmt"
-	"strconv"
-	"strings"
 
-	"github.com/cockroachdb/cockroach-go/v2/crdb"
-	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/riverqueue/river"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/queue"
+	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) (events []eventstore.Event, err error) {
-	ctx, spanBeginTx := tracing.NewNamedSpan(ctx, "db.BeginTx")
-	tx, err := es.client.BeginTx(ctx, nil)
-	spanBeginTx.EndWithError(err)
+func (es *Eventstore) Push(ctx context.Context, client database.QueryExecutor, commands ...eventstore.Command) (events []eventstore.Event, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	events, err = es.writeCommands(ctx, client, commands)
+	if isSetupNotExecutedError(err) {
+		return es.pushWithoutFunc(ctx, client, commands...)
+	}
+
+	return events, err
+}
+
+func (es *Eventstore) writeCommands(ctx context.Context, client database.QueryExecutor, commands []eventstore.Command) (_ []eventstore.Event, err error) {
+	if client == nil {
+		client = es.client
+	}
+
+	tx, close, err := es.pushTx(ctx, client)
 	if err != nil {
 		return nil, err
 	}
-	// tx is not closed because [crdb.ExecuteInTx] takes care of that
-	var (
-		sequences []*latestSequence
-	)
+	if close != nil {
+		defer func() {
+			err = close(err)
+		}()
+	}
 
-	err = crdb.ExecuteInTx(ctx, &transaction{tx}, func() error {
-		sequences, err = latestSequences(ctx, tx, commands)
-		if err != nil {
-			return err
-		}
+	// lock the instance for reading events if await events is set for the duration of the transaction.
+	_, err = tx.Exec(ctx, "SELECT pg_advisory_xact_lock_shared('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))", authz.GetInstance(ctx).InstanceID())
+	if err != nil {
+		return nil, err
+	}
 
-		events, err = insertEvents(ctx, tx, sequences, commands)
-		if err != nil {
-			return err
-		}
+	events, err := writeEvents(ctx, tx, commands)
+	if err != nil {
+		return nil, err
+	}
+	if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
+		return nil, err
+	}
 
-		if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
-			return err
-		}
+	err = es.handleFieldCommands(ctx, tx, commands)
+	if err != nil {
+		return nil, err
+	}
 
-		// CockroachDB by default does not allow multiple modifications of the same table using ON CONFLICT
-		// Thats why we enable it manually
-		if es.client.Type() == "cockroach" {
-			_, err = tx.Exec("SET enable_multiple_modifications_of_table = on")
-			if err != nil {
-				return err
-			}
-		}
-
-		return handleFieldCommands(ctx, tx, commands)
-	})
-
+	err = es.queueExecutions(ctx, tx, events)
 	if err != nil {
 		return nil, err
 	}
@@ -64,120 +71,81 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 	return events, nil
 }
 
-//go:embed push.sql
-var pushStmt string
+func writeEvents(ctx context.Context, tx database.Transaction, commands []eventstore.Command) (_ []eventstore.Event, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 
-func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, commands []eventstore.Command) ([]eventstore.Event, error) {
-	events, placeholders, args, err := mapCommands(commands, sequences)
+	events, cmds, err := commandsToEvents(ctx, commands)
 	if err != nil {
 		return nil, err
 	}
 
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf(pushStmt, strings.Join(placeholders, ", ")), args...)
+	rows, err := tx.Query(ctx, `select owner, created_at, "sequence", position from eventstore.push($1::eventstore.command[])`, cmds)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
 	for i := 0; rows.Next(); i++ {
-		err = rows.Scan(&events[i].(*event).createdAt, &events[i].(*event).position)
+		err = rows.Scan(&events[i].(*event).command.Owner, &events[i].(*event).createdAt, &events[i].(*event).sequence, &events[i].(*event).position)
 		if err != nil {
 			logging.WithError(err).Warn("failed to scan events")
 			return nil, err
 		}
 	}
-
-	if err := rows.Err(); err != nil {
-		pgErr := new(pgconn.PgError)
-		if errors.As(err, &pgErr) {
-			// Check if push tries to write an event just written
-			// by another transaction
-			if pgErr.Code == "40001" {
-				// TODO: @livio-a should we return the parent or not?
-				return nil, zerrors.ThrowInvalidArgument(err, "V3-p5xAn", "Errors.AlreadyExists")
-			}
-		}
-		logging.WithError(rows.Err()).Warn("failed to push events")
-		return nil, zerrors.ThrowInternal(err, "V3-VGnZY", "Errors.Internal")
+	if err = rows.Err(); err != nil {
+		return nil, err
 	}
-
 	return events, nil
 }
 
-const argsPerCommand = 10
-
-func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (events []eventstore.Event, placeholders []string, args []any, err error) {
-	events = make([]eventstore.Event, len(commands))
-	args = make([]any, 0, len(commands)*argsPerCommand)
-	placeholders = make([]string, len(commands))
-
-	for i, command := range commands {
-		sequence := searchSequenceByCommand(sequences, command)
-		if sequence == nil {
-			logging.WithFields(
-				"aggType", command.Aggregate().Type,
-				"aggID", command.Aggregate().ID,
-				"instance", command.Aggregate().InstanceID,
-			).Panic("no sequence found")
-			// added return for linting
-			return nil, nil, nil, nil
-		}
-		sequence.sequence++
-
-		events[i], err = commandToEvent(sequence, command)
-		if err != nil {
-			return nil, nil, nil, err
-		}
-
-		placeholders[i] = fmt.Sprintf(pushPlaceholderFmt,
-			i*argsPerCommand+1,
-			i*argsPerCommand+2,
-			i*argsPerCommand+3,
-			i*argsPerCommand+4,
-			i*argsPerCommand+5,
-			i*argsPerCommand+6,
-			i*argsPerCommand+7,
-			i*argsPerCommand+8,
-			i*argsPerCommand+9,
-			i*argsPerCommand+10,
-		)
-
-		revision, err := strconv.Atoi(strings.TrimPrefix(string(events[i].(*event).aggregate.Version), "v"))
-		if err != nil {
-			return nil, nil, nil, zerrors.ThrowInternal(err, "V3-JoZEp", "Errors.Internal")
-		}
-		args = append(args,
-			events[i].(*event).aggregate.InstanceID,
-			events[i].(*event).aggregate.ResourceOwner,
-			events[i].(*event).aggregate.Type,
-			events[i].(*event).aggregate.ID,
-			revision,
-			events[i].(*event).creator,
-			events[i].(*event).typ,
-			events[i].(*event).payload,
-			events[i].(*event).sequence,
-			i,
-		)
+func (es *Eventstore) queueExecutions(ctx context.Context, tx database.Transaction, events []eventstore.Event) error {
+	if es.queue == nil {
+		return nil
 	}
 
-	return events, placeholders, args, nil
+	sqlTx, ok := tx.(*sql.Transaction)
+	if !ok {
+		types := make([]string, len(events))
+		for i, event := range events {
+			types[i] = string(event.Type())
+		}
+		logging.WithFields("event_types", types).Warningf("event executions skipped: wrong type of transaction %T", tx)
+		return nil
+	}
+	jobArgs, err := eventsToJobArgs(ctx, events)
+	if err != nil {
+		return err
+	}
+	if len(jobArgs) == 0 {
+		return nil
+	}
+	return es.queue.InsertManyFastTx(
+		ctx, sqlTx.Tx, jobArgs,
+		queue.WithQueueName(exec_repo.QueueName),
+	)
 }
 
-type transaction struct {
-	*sql.Tx
-}
+func eventsToJobArgs(ctx context.Context, events []eventstore.Event) ([]river.JobArgs, error) {
+	if len(events) == 0 {
+		return nil, nil
+	}
+	router := authz.GetInstance(ctx).ExecutionRouter()
+	if router.IsZero() {
+		return nil, nil
+	}
 
-var _ crdb.Tx = (*transaction)(nil)
-
-func (t *transaction) Exec(ctx context.Context, query string, args ...interface{}) error {
-	_, err := t.Tx.ExecContext(ctx, query, args...)
-	return err
-}
-
-func (t *transaction) Commit(ctx context.Context) error {
-	return t.Tx.Commit()
-}
-
-func (t *transaction) Rollback(ctx context.Context) error {
-	return t.Tx.Rollback()
+	jobArgs := make([]river.JobArgs, 0, len(events))
+	for _, event := range events {
+		targets, ok := router.GetEventBestMatch(fmt.Sprintf("event/%s", event.Type()))
+		if !ok {
+			continue
+		}
+		req, err := exec_repo.NewRequest(event, targets)
+		if err != nil {
+			return nil, err
+		}
+		jobArgs = append(jobArgs, req)
+	}
+	return jobArgs, nil
 }

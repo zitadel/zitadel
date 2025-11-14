@@ -5,6 +5,7 @@ import (
 
 	"github.com/crewjam/saml"
 	"github.com/muhlemmer/gu"
+	dsig "github.com/russellhaering/goxmldsig"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
@@ -209,6 +210,7 @@ func addGenericOAuthProviderToCommand(req *mgmt_pb.AddGenericOAuthProviderReques
 		Scopes:                req.Scopes,
 		IDAttribute:           req.IdAttribute,
 		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
+		UsePKCE:               req.UsePkce,
 	}
 }
 
@@ -223,6 +225,7 @@ func updateGenericOAuthProviderToCommand(req *mgmt_pb.UpdateGenericOAuthProvider
 		Scopes:                req.Scopes,
 		IDAttribute:           req.IdAttribute,
 		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
+		UsePKCE:               req.UsePkce,
 	}
 }
 
@@ -234,6 +237,7 @@ func addGenericOIDCProviderToCommand(req *mgmt_pb.AddGenericOIDCProviderRequest)
 		ClientSecret:     req.ClientSecret,
 		Scopes:           req.Scopes,
 		IsIDTokenMapping: req.IsIdTokenMapping,
+		UsePKCE:          req.UsePkce,
 		IDPOptions:       idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
@@ -246,6 +250,7 @@ func updateGenericOIDCProviderToCommand(req *mgmt_pb.UpdateGenericOIDCProviderRe
 		ClientSecret:     req.ClientSecret,
 		Scopes:           req.Scopes,
 		IsIDTokenMapping: req.IsIdTokenMapping,
+		UsePKCE:          req.UsePkce,
 		IDPOptions:       idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
@@ -416,6 +421,7 @@ func addLDAPProviderToCommand(req *mgmt_pb.AddLDAPProviderRequest) command.LDAPP
 		UserObjectClasses: req.UserObjectClasses,
 		UserFilters:       req.UserFilters,
 		Timeout:           req.Timeout.AsDuration(),
+		RootCA:            req.RootCa,
 		LDAPAttributes:    idp_grpc.LDAPAttributesToCommand(req.Attributes),
 		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
@@ -435,6 +441,7 @@ func updateLDAPProviderToCommand(req *mgmt_pb.UpdateLDAPProviderRequest) command
 		Timeout:           req.Timeout.AsDuration(),
 		LDAPAttributes:    idp_grpc.LDAPAttributesToCommand(req.Attributes),
 		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+		RootCA:            req.RootCa,
 	}
 }
 
@@ -462,36 +469,42 @@ func updateAppleProviderToCommand(req *mgmt_pb.UpdateAppleProviderRequest) comma
 	}
 }
 
-func addSAMLProviderToCommand(req *mgmt_pb.AddSAMLProviderRequest) command.SAMLProvider {
+func addSAMLProviderToCommand(req *mgmt_pb.AddSAMLProviderRequest) *command.SAMLProvider {
 	var nameIDFormat *domain.SAMLNameIDFormat
 	if req.NameIdFormat != nil {
 		nameIDFormat = gu.Ptr(idp_grpc.SAMLNameIDFormatToDomain(req.GetNameIdFormat()))
 	}
-	return command.SAMLProvider{
+
+	return &command.SAMLProvider{
 		Name:                          req.Name,
 		Metadata:                      req.GetMetadataXml(),
 		MetadataURL:                   req.GetMetadataUrl(),
 		Binding:                       bindingToCommand(req.Binding),
 		WithSignedRequest:             req.WithSignedRequest,
+		SignatureAlgorithm:            signatureAlgorithmToCommand(req.GetSignatureAlgorithm()),
 		NameIDFormat:                  nameIDFormat,
 		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
+		FederatedLogoutEnabled:        req.GetFederatedLogoutEnabled(),
 		IDPOptions:                    idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 
-func updateSAMLProviderToCommand(req *mgmt_pb.UpdateSAMLProviderRequest) command.SAMLProvider {
+func updateSAMLProviderToCommand(req *mgmt_pb.UpdateSAMLProviderRequest) *command.SAMLProvider {
 	var nameIDFormat *domain.SAMLNameIDFormat
 	if req.NameIdFormat != nil {
 		nameIDFormat = gu.Ptr(idp_grpc.SAMLNameIDFormatToDomain(req.GetNameIdFormat()))
 	}
-	return command.SAMLProvider{
+
+	return &command.SAMLProvider{
 		Name:                          req.Name,
 		Metadata:                      req.GetMetadataXml(),
 		MetadataURL:                   req.GetMetadataUrl(),
 		Binding:                       bindingToCommand(req.Binding),
 		WithSignedRequest:             req.WithSignedRequest,
+		SignatureAlgorithm:            signatureAlgorithmToCommand(req.GetSignatureAlgorithm()),
 		NameIDFormat:                  nameIDFormat,
 		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
+		FederatedLogoutEnabled:        req.GetFederatedLogoutEnabled(),
 		IDPOptions:                    idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
@@ -506,6 +519,21 @@ func bindingToCommand(binding idp_pb.SAMLBinding) string {
 		return saml.HTTPRedirectBinding
 	case idp_pb.SAMLBinding_SAML_BINDING_ARTIFACT:
 		return saml.HTTPArtifactBinding
+	default:
+		return ""
+	}
+}
+
+func signatureAlgorithmToCommand(signatureAlgorithm idp_pb.SAMLSignatureAlgorithm) string {
+	switch signatureAlgorithm {
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_UNSPECIFIED:
+		return ""
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA1:
+		return dsig.RSASHA1SignatureMethod
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA256:
+		return dsig.RSASHA256SignatureMethod
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA512:
+		return dsig.RSASHA512SignatureMethod
 	default:
 		return ""
 	}

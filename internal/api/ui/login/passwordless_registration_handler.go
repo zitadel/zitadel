@@ -78,7 +78,7 @@ func (l *Login) handlePasswordlessRegistration(w http.ResponseWriter, r *http.Re
 }
 
 func (l *Login) renderPasswordlessRegistration(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, orgID, codeID, code string, requestedPlatformType authPlatform, err error) {
-	var errID, errMessage, credentialData string
+	var credentialData string
 	var disabled bool
 	if authReq != nil {
 		userID = authReq.UserID
@@ -93,7 +93,6 @@ func (l *Login) renderPasswordlessRegistration(w http.ResponseWriter, r *http.Re
 		}
 	}
 	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
 		disabled = true
 	}
 	if webAuthNToken != nil {
@@ -102,7 +101,7 @@ func (l *Login) renderPasswordlessRegistration(w http.ResponseWriter, r *http.Re
 	translator := l.getTranslator(r.Context(), authReq)
 	data := &passwordlessRegistrationData{
 		webAuthNData{
-			userData:               l.getUserData(r, authReq, translator, "PasswordlessRegistration.Title", "PasswordlessRegistration.Description", errID, errMessage),
+			userData:               l.getUserData(r, authReq, translator, "PasswordlessRegistration.Title", "PasswordlessRegistration.Description", err),
 			CredentialCreationData: credentialData,
 		},
 		code,
@@ -185,13 +184,9 @@ func (l *Login) checkPasswordlessRegistration(w http.ResponseWriter, r *http.Req
 }
 
 func (l *Login) renderPasswordlessRegistrationDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgID string, err error) {
-	var errID, errMessage string
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
-	}
 	translator := l.getTranslator(r.Context(), authReq)
 	data := passwordlessRegistrationDoneDate{
-		userData:       l.getUserData(r, authReq, translator, "PasswordlessRegistrationDone.Title", "PasswordlessRegistrationDone.Description", errID, errMessage),
+		userData:       l.getUserData(r, authReq, translator, "PasswordlessRegistrationDone.Title", "PasswordlessRegistrationDone.Description", err),
 		HideNextButton: authReq == nil,
 	}
 	if authReq == nil {

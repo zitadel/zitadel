@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+package zitadel.webkey.v2beta;
+
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/webkey/v2beta;webkey";
+
+enum State {
+  STATE_UNSPECIFIED = 0;
+  // A newly created key is in the initial state and published to the public key endpoint.
+  STATE_INITIAL = 1;
+  // The active key is used to sign tokens. Only one key can be active at a time.
+  STATE_ACTIVE = 2;
+  // The inactive key is not used to sign tokens anymore, but still published to the public key endpoint.
+  STATE_INACTIVE = 3;
+  // The removed key is not used to sign tokens anymore and not published to the public key endpoint.
+  STATE_REMOVED = 4;
+}
+
+message WebKey {
+  // The unique identifier of the key.
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // The timestamp of the key creation.
+  google.protobuf.Timestamp creation_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // The timestamp of the last change to the key (e.g. creation, activation, deactivation).
+  google.protobuf.Timestamp change_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+  // State of the key
+  State state = 4;
+  // Configured type of the key (either RSA, ECDSA or ED25519)
+  oneof key {
+    RSA rsa = 5;
+    ECDSA ecdsa = 6;
+    ED25519 ed25519 = 7;
+  }
+}
+
+message RSA {
+  // Bit size of the RSA key. Default is 2048 bits.
+  RSABits bits = 1 [
+    (validate.rules).enum = {defined_only: true, not_in: [0]},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "RSA_BITS_2048";
+    }
+  ];
+  // Signing algrithm used. Default is SHA256.
+  RSAHasher hasher = 2 [
+    (validate.rules).enum = {defined_only: true, not_in: [0]},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "RSA_HASHER_SHA256";
+    }
+  ];
+}
+
+enum RSABits {
+  RSA_BITS_UNSPECIFIED = 0;
+  // 2048 bit RSA key
+  RSA_BITS_2048 = 1;
+  // 3072 bit RSA key
+  RSA_BITS_3072 = 2;
+  // 4096 bit RSA key
+  RSA_BITS_4096 = 3;
+}
+
+enum RSAHasher {
+  RSA_HASHER_UNSPECIFIED = 0;
+  // SHA256 hashing algorithm resulting in the RS256 algorithm header
+  RSA_HASHER_SHA256 = 1;
+  // SHA384 hashing algorithm resulting in the RS384 algorithm header
+  RSA_HASHER_SHA384 = 2;
+  // SHA512 hashing algorithm resulting in the RS512 algorithm header
+  RSA_HASHER_SHA512 = 3;
+}
+
+message ECDSA {
+  // Curve of the ECDSA key. Default is P-256.
+  ECDSACurve curve = 1 [
+    (validate.rules).enum = {defined_only: true, not_in: [0]},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "ECDSA_CURVE_P256";
+    }
+  ];
+}
+
+enum ECDSACurve {
+  ECDSA_CURVE_UNSPECIFIED = 0;
+  // NIST P-256 curve resulting in the ES256 algorithm header
+  ECDSA_CURVE_P256 = 1;
+  // NIST P-384 curve resulting in the ES384 algorithm header
+  ECDSA_CURVE_P384 = 2;
+  // NIST P-512 curve resulting in the ES512 algorithm header
+  ECDSA_CURVE_P512 = 3;
+}
+
+message ED25519 {}

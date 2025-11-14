@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Téléphone déjà vérifié
       Empty: Téléphone est vide
       NotChanged: Téléphone n'a pas changé
+      VerifyingRemovalIsNotSupported: La vérification de la suppression n'est pas prise en charge
     Address:
       NotFound: Adresse non trouvée
       NotChanged: L'adresse n'a pas changé
@@ -193,7 +194,7 @@ Errors:
     AlreadyExists: L'instance existe déjà
     NotChanged: L'instance n'a pas changé
   Org:
-    AlreadyExists: Le nom de l'organisation est déjà pris
+    AlreadyExists: Le nom de l'organisation ou l'identifiant est déjà pris
     Invalid: L'organisation n'est pas valide
     AlreadyDeactivated: L'organisation est déjà désactivée
     AlreadyActive: L'organisation est déjà active
@@ -435,8 +436,6 @@ Errors:
     Invalid: La subvention d'utilisateur n'est pas valide
     NotChanged: L'autorisation de l'utilisateur n'a pas été modifiée.
     IDMissing: Id manquant
-    NotActive: La subvention de l'utilisateur n'est pas active
-    NotInactive: La subvention à l'utilisateur n'est pas désactivée
     NoPermissionForProject: L'utilisateur n'a aucune autorisation pour ce projet
     RoleKeyNotFound: Rôle non trouvé
   Member:
@@ -495,6 +494,7 @@ Errors:
     SQLStatement: L'instruction SQL n'a pas pu être créée
     InvalidRequest: La requête n'est pas valide
     TooManyNestingLevels: Trop de niveaux d'imbrication de requêtes (maximum 20)
+    LimitExceeded: Limite dépassée
   Quota:
     AlreadyExists: Contingent existe déjà pour cette unité
     NotFound: Contingent non trouvé pour cette unité
@@ -535,6 +535,7 @@ Errors:
     StateMissing: Paramètre d'état manquant dans la requête
     NotStarted: Intent n'a pas démarré ou s'est déjà terminé
     NotSucceeded: l'intention n'a pas abouti
+    Expired: L'intention a expiré
     TokenCreationFailed: La création du token a échoué
     InvalidToken: Le jeton d'intention n'est pas valide
     OtherUser: Intention destinée à un autre utilisateur
@@ -542,12 +543,23 @@ Errors:
     AlreadyExists: Auth Request existe déjà
     NotExisting: Auth Request n'existe pas
     WrongLoginClient: Auth Request créé par un autre client de connexion
+    AlreadyHandled: Auth Request a déjà été traitée
   OIDCSession:
     RefreshTokenInvalid: Le jeton de rafraîchissement n'est pas valide
     Token:
       Invalid: Le jeton n'est pas valide
       Expired: Le jeton est expiré
     InvalidClient: Le token n'a pas été émis pour ce client
+  SAMLRequest:
+    AlreadyExists: SAMLRequest existe déjà
+    NotExisting: SAMLRequest n'existe pas
+    WrongLoginClient: SAMLRequest créé par un autre client de connexion
+    AlreadyHandled: SAMLRequest a déjà été traitée
+  SAMLSession:
+    InvalidClient: SAMLResponse n'a pas été émise pour ce client
+  DeviceAuth:
+    NotFound: La demande d'autorisation de l'appareil n'existe pas
+    AlreadyHandled: La demande d'autorisation de l'appareil a déjà été traitée
   Feature:
     NotExisting: La fonctionnalité n'existe pas
     TypeNotSupported: Le type de fonctionnalité n'est pas pris en charge
@@ -563,6 +575,8 @@ Errors:
     NotFound: Exécution introuvable
     IncludeNotFound: Inclure introuvable
     NoTargets: Aucune cible définie
+    Failed: Exécution échouée
+    ResponseIsNotValidJSON: La réponse n'est pas un JSON valide
   UserSchema:
     NotEnabled: La fonctionnalité "Schéma utilisateur" n'est pas activée
     Type:
@@ -573,6 +587,11 @@ Errors:
     NotActive: Schéma utilisateur non actif
     NotInactive: Le schéma utilisateur n'est pas inactif
     NotExists: Le schéma utilisateur n'existe pas
+    ID:
+      Missing: ID de schéma utilisateur manquant
+    Invalid: Schéma utilisateur non valide
+    Data:
+      Invalid: Données non valides pour le schéma utilisateur
   TokenExchange:
     FeatureDisabled: La fonctionnalité Token Exchange est désactivée pour votre instance. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -584,6 +603,13 @@ Errors:
       NotForAPI: Les jetons usurpés d'identité ne sont pas autorisés pour l'API
     Impersonation:
       PolicyDisabled: L'usurpation d'identité est désactivée dans la politique de sécurité de l'instance
+  WebKey:
+    ActiveDelete: Impossible de supprimer la clé Web active
+    Config: Configuration de clé Web non valide
+    Duplicate: L'ID de clé Web n'est pas unique
+    FeatureDisabled: Fonctionnalité de clé Web désactivée
+    NoActive: Aucune clé Web active trouvée
+    NotFound: Clé Web introuvable
 
 AggregateTypes:
   action: Action
@@ -607,6 +633,9 @@ AggregateTypes:
   restrictions: Restrictions
   system: Système
   session: Session
+  web_key: Clé Web
+  saml_request: Requête SAML
+  saml_session: Session SAML
 
 EventTypes:
   execution:
@@ -669,6 +698,13 @@ EventTypes:
         check:
           succeeded: Vérification de l'initialisation réussie
           failed: La vérification de l'initialisation a échoué
+      invite:
+        code:
+          added: Code d'invitation généré
+          sent: Code d'invitation envoyé
+        check:
+          succeeded: Vérification de l'invitation réussie
+          failed: Vérification de l'invitation échouée
       username:
         reserved: Nom d'utilisateur réservé
         released: Nom d'utilisateur libéré
@@ -1169,140 +1205,166 @@ EventTypes:
     deactivated: Action désactivée
     reactivated: Action réactivée
     removed: Action supprimée
+  instance:
+    added: Instance ajoutée
+    changed: Instance modifiée
+    customtext:
+      removed: Texte personnalisé supprimé
+      set: Ensemble de texte personnalisé
+      template:
+        removed: Modèle de texte personnalisé supprimé
+    default:
+      language:
+        set: Langue par défaut définie
+      org:
+        set: Ensemble d'organisation par défaut
+    domain:
+      added: Domaine ajouté
+      primary:
+        set: Ensemble de domaines principal
+      removed: Domaine supprimé
+    iam:
+      console:
+        set: Ensemble d'applications Console ZITADEL
+      project:
+        set: ZITADEL project set
+    mail:
+      template:
+        added: Modèle de courrier électronique ajouté
+        changed: Modèle d'e-mail modifié
+      text:
+        added: Texte de l'e-mail ajouté
+        changed: Le texte de l'e-mail a été modifié
+    member:
+      added: Membre de l'instance ajouté
+      changed: Membre de l'instance modifié
+      removed: Membre de l'instance supprimé
+      cascade:
+        removed: Cascade de membres de l'instance supprimée
+    notification:
+      provider:
+        debug:
+          fileadded: Fournisseur de notification de débogage de fichiers ajouté
+          filechanged: Le fournisseur de notification de débogage de fichier a été modifié
+          fileremoved: Fournisseur de notification de débogage de fichier supprimé
+          logadded: Fournisseur de notification de débogage de journal ajouté
+          logchanged: Le fournisseur de notification de débogage du journal a été modifié
+          logremoved: Fournisseur de notification de débogage du journal supprimé
+    oidc:
+      settings:
+        added: Paramètres OIDC ajoutés
+        changed: Paramètres OIDC modifiés
+    policy:
+      domain:
+        added: Politique de domaine ajoutée
+        changed: Politique de domaine modifiée
+      label:
+        activated: Politique d'étiquetage activée
+        added: Politique d'étiquetage ajoutée
+        assets:
+          removed: L'élément de la stratégie d'étiquette a été supprimé
+        changed: Politique d'étiquetage modifiée
+        font:
+          added: Police ajoutée à la stratégie d'étiquette
+          removed: Police supprimée de la stratégie relative aux étiquettes
+        icon:
+          added: Icône ajoutée à la politique d'étiquetage
+          removed: Icône supprimée des règles relatives aux étiquettes
+          dark:
+            added: Icône ajoutée à la politique d'étiquette sombre
+            removed: Icône supprimée de la politique relative aux étiquettes sombres
+        logo:
+          added: Logo ajouté à la politique d'étiquetage
+          removed: Logo supprimé de la politique relative aux étiquettes
+          dark:
+            added: Logo ajouté à la politique relative aux étiquettes sombres
+            removed: Logo supprimé de la politique relative aux étiquettes sombres
+      lockout:
+        added: Politique de verrouillage ajoutée
+        changed: La politique de verrouillage a été modifiée
+      login:
+        added: Politique de connexion ajoutée
+        changed: Politique de connexion modifiée
+        idpprovider:
+          added: Fournisseur d'identité ajouté à la politique de connexion
+          cascade:
+            removed: Cascade de fournisseurs d'identité supprimée de la stratégie de connexion
+          removed: Fournisseur d'identité supprimé de la stratégie de connexion
+        multifactor:
+          added: Multifactor ajouté à la politique de connexion
+          removed: Multifactor supprimé de la politique de connexion
+        secondfactor:
+          added: Deuxième facteur ajouté à la politique de connexion
+          removed: Deuxième facteur supprimé de la politique de connexion
+      password:
+        age:
+          added: Politique d'âge du mot de passe ajoutée
+          changed: La politique relative à l'âge du mot de passe a été modifiée
+        complexity:
+          added: Politique de complexité des mots de passe ajoutée
+          changed: Politique de complexité des mots de passe supprimée
+      privacy:
+        added: Politique de confidentialité ajoutée
+        changed: Politique de confidentialité modifiée
+      security:
+        set: Ensemble de règles de sécurité
+
+    removed: Instance removed
+    secret:
+      generator:
+        added: Générateur de secrets ajouté
+        changed: Le générateur de secrets a changé
+        removed: Générateur de secrets supprimé
+    sms:
+      configtwilio:
+        activated: Configuration SMS Twilio activée
+        added: Configuration SMS Twilio ajoutée
+        changed: La configuration des SMS Twilio a été modifiée
+        deactivated: Configuration SMS Twilio désactivée
+        removed: Configuration SMS Twilio supprimée
+        token:
+          changed: Jeton de configuration SMS Twilio modifié
+    smtp:
+      config:
+        added: Configuration SMTP ajoutée
+        changed: Configuration SMTP modifiée
+        activated: Configuration SMTP activée
+        deactivated: Configuration SMTP désactivée
+        password:
+          changed: Mot de passe de configuration SMTP modifié
+        removed: Configuration SMTP supprimée
   user_schema:
     created: Schéma utilisateur créé
     updated: Schéma utilisateur mis à jour
     deactivated: Schéma utilisateur désactivé
     reactivated: Schéma utilisateur réactivé
     deleted: Schéma utilisateur supprimé
-instance:
-  added: Instance ajoutée
-  changed: Instance modifiée
-  customtext:
-    removed: Texte personnalisé supprimé
-    set: Ensemble de texte personnalisé
-    template:
-      removed: Modèle de texte personnalisé supprimé
-  default:
-    language:
-      set: Langue par défaut définie
-    org:
-      set: Ensemble d'organisation par défaut
-  domain:
-    added: Domaine ajouté
-    primary:
-      set: Ensemble de domaines principal
-    removed: Domaine supprimé
-  iam:
-    console:
-      set: Ensemble d'applications Console ZITADEL
-    project:
-      set: ZITADEL project set
-  mail:
-    template:
-      added: Modèle de courrier électronique ajouté
-      changed: Modèle d'e-mail modifié
-    text:
-      added: Texte de l'e-mail ajouté
-      changed: Le texte de l'e-mail a été modifié
-  member:
-    added: Membre de l'instance ajouté
-    changed: Membre de l'instance modifié
-    removed: Membre de l'instance supprimé
-    cascade:
-      removed: Cascade de membres de l'instance supprimée
-  notification:
-    provider:
-      debug:
-        fileadded: Fournisseur de notification de débogage de fichiers ajouté
-        filechanged: Le fournisseur de notification de débogage de fichier a été modifié
-        fileremoved: Fournisseur de notification de débogage de fichier supprimé
-        logadded: Fournisseur de notification de débogage de journal ajouté
-        logchanged: Le fournisseur de notification de débogage du journal a été modifié
-        logremoved: Fournisseur de notification de débogage du journal supprimé
-  oidc:
-    settings:
-      added: Paramètres OIDC ajoutés
-      changed: Paramètres OIDC modifiés
-  policy:
-    domain:
-      added: Politique de domaine ajoutée
-      changed: Politique de domaine modifiée
-    label:
-      activated: Politique d'étiquetage activée
-      added: Politique d'étiquetage ajoutée
-      assets:
-        removed: L'élément de la stratégie d'étiquette a été supprimé
-      changed: Politique d'étiquetage modifiée
-      font:
-        added: Police ajoutée à la stratégie d'étiquette
-        removed: Police supprimée de la stratégie relative aux étiquettes
-      icon:
-        added: Icône ajoutée à la politique d'étiquetage
-        removed: Icône supprimée des règles relatives aux étiquettes
-        dark:
-          added: Icône ajoutée à la politique d'étiquette sombre
-          removed: Icône supprimée de la politique relative aux étiquettes sombres
-      logo:
-        added: Logo ajouté à la politique d'étiquetage
-        removed: Logo supprimé de la politique relative aux étiquettes
-        dark:
-          added: Logo ajouté à la politique relative aux étiquettes sombres
-          removed: Logo supprimé de la politique relative aux étiquettes sombres
-    lockout:
-      added: Politique de verrouillage ajoutée
-      changed: La politique de verrouillage a été modifiée
-    login:
-      added: Politique de connexion ajoutée
-      changed: Politique de connexion modifiée
-      idpprovider:
-        added: Fournisseur d'identité ajouté à la politique de connexion
-        cascade:
-          removed: Cascade de fournisseurs d'identité supprimée de la stratégie de connexion
-        removed: Fournisseur d'identité supprimé de la stratégie de connexion
-      multifactor:
-        added: Multifactor ajouté à la politique de connexion
-        removed: Multifactor supprimé de la politique de connexion
-      secondfactor:
-        added: Deuxième facteur ajouté à la politique de connexion
-        removed: Deuxième facteur supprimé de la politique de connexion
-    password:
-      age:
-        added: Politique d'âge du mot de passe ajoutée
-        changed: La politique relative à l'âge du mot de passe a été modifiée
-      complexity:
-        added: Politique de complexité des mots de passe ajoutée
-        changed: Politique de complexité des mots de passe supprimée
-    privacy:
-      added: Politique de confidentialité ajoutée
-      changed: Politique de confidentialité modifiée
-    security:
-      set: Ensemble de règles de sécurité
+    user:
+      created: Utilisateur créé
+      updated: Utilisateur mis à jour
+      deleted: Utilisateur supprimé
+      email:
+        updated:  Adresse e-mail modifiée
+        verified: Adresse e-mail vérifiée
+        verification:
+          failed: Échec de la vérification de l'adresse e-mail
+        code:
+          added: Code de vérification de l'adresse e-mail généré
+          sent: Code de vérification de l'adresse e-mail envoyé
+      phone:
+        updated: Numéro de téléphone modifié
+        verified: Numéro de téléphone vérifié
+        verification:
+          failed: Échec de la vérification du numéro de téléphone
+        code:
+          added: Code de vérification du numéro de téléphone généré
+          sent: Code de vérification du numéro de téléphone envoyé
+  web_key:
+    added: Clé Web ajoutée
+    activated: Clé Web activée
+    deactivated: Clé Web désactivée
+    removed: Clé Web supprimée
 
-  removed: Instance removed
-  secret:
-    generator:
-      added: Générateur de secrets ajouté
-      changed: Le générateur de secrets a changé
-      removed: Générateur de secrets supprimé
-  sms:
-    configtwilio:
-      activated: Configuration SMS Twilio activée
-      added: Configuration SMS Twilio ajoutée
-      changed: La configuration des SMS Twilio a été modifiée
-      deactivated: Configuration SMS Twilio désactivée
-      removed: Configuration SMS Twilio supprimée
-      token:
-        changed: Jeton de configuration SMS Twilio modifié
-  smtp:
-    config:
-      added: Configuration SMTP ajoutée
-      changed: Configuration SMTP modifiée
-      activated: Configuration SMTP activée
-      deactivated: Configuration SMTP désactivée
-      password:
-        changed: Mot de passe de configuration SMTP modifié
-      removed: Configuration SMTP supprimée
 Application:
   OIDC:
     UnsupportedVersion: Votre version de l'OIDC n'est pas prise en charge

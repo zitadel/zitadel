@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package zitadel.settings.v2;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+message SecuritySettings {
+  // EmbeddedIframeSettings defines if the login UI can be embedded in an iframe
+  // and which origins are allowed to do so.
+  EmbeddedIframeSettings embedded_iframe = 1;
+
+  // If enabled, users are allowed to impersonate other users.
+  // The impersonator needs the appropriate `*_IMPERSONATOR` roles assigned as well".
+  bool enable_impersonation = 2;
+}
+
+message EmbeddedIframeSettings{
+  // Enabled states if iframe embedding is enabled or disabled.
+  bool enabled = 1;
+
+  // AllowedOrigins defines which origins are allowed to embed ZITADEL in an iframe.
+  repeated string allowed_origins = 2;
+}

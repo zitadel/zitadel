@@ -1,7 +1,6 @@
 package query
 
 import (
-	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
@@ -32,7 +31,7 @@ var (
 // func() (sq.SelectBuilder, func(*sql.Row) (*struct, error))
 // expectedObject represents the return value of scan
 // sqlExpectation represents the query executed on the database
-func assertPrepare(t *testing.T, prepareFunc, expectedObject interface{}, sqlExpectation sqlExpectation, isErr checkErr, prepareArgs ...reflect.Value) bool {
+func assertPrepare(t *testing.T, prepareFunc, expectedObject any, sqlExpectation sqlExpectation, isErr checkErr, prepareArgs ...reflect.Value) bool {
 	t.Helper()
 
 	client, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
@@ -82,9 +81,7 @@ type sqlExpectation func(sqlmock.Sqlmock) sqlmock.Sqlmock
 
 func mockQuery(stmt string, cols []string, row []driver.Value, args ...driver.Value) func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
 	return func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
-		m.ExpectBegin()
 		q := m.ExpectQuery(stmt).WithArgs(args...)
-		m.ExpectCommit()
 		result := m.NewRows(cols)
 		if len(row) > 0 {
 			result.AddRow(row...)
@@ -96,9 +93,7 @@ func mockQuery(stmt string, cols []string, row []driver.Value, args ...driver.Va
 
 func mockQueryScanErr(stmt string, cols []string, row []driver.Value, args ...driver.Value) func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
 	return func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
-		m.ExpectBegin()
 		q := m.ExpectQuery(stmt).WithArgs(args...)
-		m.ExpectRollback()
 		result := m.NewRows(cols)
 		if len(row) > 0 {
 			result.AddRow(row...)
@@ -110,13 +105,11 @@ func mockQueryScanErr(stmt string, cols []string, row []driver.Value, args ...dr
 
 func mockQueries(stmt string, cols []string, rows [][]driver.Value, args ...driver.Value) func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
 	return func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
-		m.ExpectBegin()
 		q := m.ExpectQuery(stmt).WithArgs(args...)
-		m.ExpectCommit()
 		result := m.NewRows(cols)
 		count := uint64(len(rows))
 		for _, row := range rows {
-			if cols[len(cols)-1] == "count" {
+			if cols[len(cols)-1] == "count" && len(row) == len(cols)-1 {
 				row = append(row, count)
 			}
 			result.AddRow(row...)
@@ -129,9 +122,7 @@ func mockQueries(stmt string, cols []string, rows [][]driver.Value, args ...driv
 
 func mockQueriesScanErr(stmt string, cols []string, rows [][]driver.Value, args ...driver.Value) func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
 	return func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
-		m.ExpectBegin()
 		q := m.ExpectQuery(stmt).WithArgs(args...)
-		m.ExpectRollback()
 		result := m.NewRows(cols)
 		count := uint64(len(rows))
 		for _, row := range rows {
@@ -148,10 +139,8 @@ func mockQueriesScanErr(stmt string, cols []string, rows [][]driver.Value, args 
 
 func mockQueryErr(stmt string, err error, args ...driver.Value) func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
 	return func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
-		m.ExpectBegin()
 		q := m.ExpectQuery(stmt).WithArgs(args...)
 		q.WillReturnError(err)
-		m.ExpectRollback()
 		return m
 	}
 }
@@ -253,9 +242,9 @@ func validateScan(scanType reflect.Type) error {
 	return nil
 }
 
-func execPrepare(prepare interface{}, args []reflect.Value) (builder sq.SelectBuilder, scan interface{}, err error) {
+func execPrepare(prepare any, args []reflect.Value) (builder sq.SelectBuilder, scan interface{}, err error) {
 	prepareVal := reflect.ValueOf(prepare)
-	if err := validatePrepare(prepareVal.Type()); err != nil {
+	if err := validatePrepare(prepareVal.Type(), len(args)); err != nil {
 		return sq.SelectBuilder{}, nil, err
 	}
 	res := prepareVal.Call(args)
@@ -263,12 +252,12 @@ func execPrepare(prepare interface{}, args []reflect.Value) (builder sq.SelectBu
 	return res[0].Interface().(sq.SelectBuilder), res[1].Interface(), nil
 }
 
-func validatePrepare(prepareType reflect.Type) error {
+func validatePrepare(prepareType reflect.Type, numArgs int) error {
 	if prepareType.Kind() != reflect.Func {
 		return errors.New("prepare is not a function")
 	}
-	if prepareType.NumIn() != 0 && prepareType.NumIn() != 2 {
-		return fmt.Errorf("prepare: invalid number of inputs: want: 0 or 2 got %d", prepareType.NumIn())
+	if prepareType.NumIn() != numArgs {
+		return fmt.Errorf("prepare: invalid number of inputs: want: %d got %d", numArgs, prepareType.NumIn())
 	}
 	if prepareType.NumOut() != 2 {
 		return fmt.Errorf("prepare: invalid number of outputs: want: 2 got %d", prepareType.NumOut())
@@ -373,7 +362,7 @@ func TestValidatePrepare(t *testing.T) {
 		},
 		{
 			name: "correct",
-			t: reflect.TypeOf(func(context.Context, prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (interface{}, error)) {
+			t: reflect.TypeOf(func() (sq.SelectBuilder, func(*sql.Rows) (interface{}, error)) {
 				log.Fatal("should not be executed")
 				return sq.SelectBuilder{}, nil
 			}),
@@ -382,24 +371,10 @@ func TestValidatePrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := validatePrepare(tt.t)
+			err := validatePrepare(tt.t, 0)
 			if (err != nil) != tt.expectErr {
 				t.Errorf("unexpected err: %v", err)
 			}
 		})
 	}
 }
-
-type prepareDB struct{}
-
-const asOfSystemTime = " AS OF SYSTEM TIME '-1 ms' "
-
-func (*prepareDB) Timetravel(time.Duration) string { return asOfSystemTime }
-
-var defaultPrepareArgs = []reflect.Value{reflect.ValueOf(context.Background()), reflect.ValueOf(new(prepareDB))}
-
-func (*prepareDB) DatabaseName() string { return "db" }
-
-func (*prepareDB) Username() string { return "user" }
-
-func (*prepareDB) Type() string { return "type" }

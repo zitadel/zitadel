@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -102,9 +103,10 @@ func NewHumanOTPVerifiedEvent(
 }
 
 func HumanOTPVerifiedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	return &HumanOTPVerifiedEvent{
+	out := &HumanOTPVerifiedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
+	}
+	return out, nil
 }
 
 type HumanOTPRemovedEvent struct {
@@ -280,6 +282,7 @@ type HumanOTPSMSCodeAddedEvent struct {
 	Code              *crypto.CryptoValue `json:"code,omitempty"`
 	Expiry            time.Duration       `json:"expiry,omitempty"`
 	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
+	GeneratorID       string              `json:"generatorId,omitempty"`
 	*AuthRequestInfo
 }
 
@@ -305,6 +308,7 @@ func NewHumanOTPSMSCodeAddedEvent(
 	code *crypto.CryptoValue,
 	expiry time.Duration,
 	info *AuthRequestInfo,
+	generatorID string,
 ) *HumanOTPSMSCodeAddedEvent {
 	return &HumanOTPSMSCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -314,17 +318,16 @@ func NewHumanOTPSMSCodeAddedEvent(
 		),
 		Code:              code,
 		Expiry:            expiry,
-		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 		AuthRequestInfo:   info,
+		GeneratorID:       generatorID,
 	}
 }
 
 type HumanOTPSMSCodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Code   *crypto.CryptoValue `json:"code,omitempty"`
-	Expiry time.Duration       `json:"expiry,omitempty"`
-	*AuthRequestInfo
+	GeneratorInfo *senders.CodeGeneratorInfo `json:"generatorInfo,omitempty"`
 }
 
 func (e *HumanOTPSMSCodeSentEvent) Payload() interface{} {
@@ -342,6 +345,7 @@ func (e *HumanOTPSMSCodeSentEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 func NewHumanOTPSMSCodeSentEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	generatorInfo *senders.CodeGeneratorInfo,
 ) *HumanOTPSMSCodeSentEvent {
 	return &HumanOTPSMSCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -349,6 +353,7 @@ func NewHumanOTPSMSCodeSentEvent(
 			aggregate,
 			HumanOTPSMSCodeSentType,
 		),
+		GeneratorInfo: generatorInfo,
 	}
 }
 
@@ -515,7 +520,7 @@ func NewHumanOTPEmailCodeAddedEvent(
 		Code:              code,
 		Expiry:            expiry,
 		AuthRequestInfo:   info,
-		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 	}
 }
 

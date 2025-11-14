@@ -1,0 +1,28 @@
+<h2 *ngIf="!data.execution" mat-dialog-title>{{ 'ACTIONSTWO.EXECUTION.DIALOG.CREATE_TITLE' | translate }}</h2>
+<h2 *ngIf="data.execution" mat-dialog-title>{{ 'ACTIONSTWO.EXECUTION.DIALOG.UPDATE_TITLE' | translate }}</h2>
+
+<mat-dialog-content>
+  <div class="framework-change-block" [ngSwitch]="page()">
+    <cnsl-actions-two-add-action-type
+      *ngSwitchCase="Page.Type"
+      [initialValue]="typeSignal()"
+      (back)="back()"
+      (continue)="typeSignal.set($event); continue()"
+    ></cnsl-actions-two-add-action-type>
+
+    <cnsl-actions-two-add-action-condition
+      *ngSwitchCase="Page.Condition"
+      [conditionType]="typeSignal()"
+      (back)="back()"
+      (continue)="conditionSignal.set({ conditionType: { case: typeSignal(), value: $event } }); continue()"
+    ></cnsl-actions-two-add-action-condition>
+
+    <cnsl-actions-two-add-action-target
+      *ngSwitchCase="Page.Target"
+      (back)="back()"
+      [hideBackButton]="!!data.execution"
+      (continue)="targetsSignal.set($event); continue()"
+      [preselectedTargetIds]="preselectedTargetIds"
+    ></cnsl-actions-two-add-action-target>
+  </div>
+</mat-dialog-content>

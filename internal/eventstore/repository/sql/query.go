@@ -9,9 +9,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -25,9 +26,9 @@ type querier interface {
 	conditionFormat(repository.Operation) string
 	placeholder(query string) string
 	eventQuery(useV1 bool) string
-	maxSequenceQuery(useV1 bool) string
+	maxPositionQuery(useV1 bool) string
 	instanceIDsQuery(useV1 bool) string
-	db() *database.DB
+	Client() *database.DB
 	orderByEventSequence(desc, shouldOrderBySequence, useV1 bool) string
 	dialect.Database
 }
@@ -65,16 +66,37 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	if where == "" || query == "" {
 		return zerrors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
-	if q.Tx == nil {
-		if travel := prepareTimeTravel(ctx, criteria, q.AllowTimeTravel); travel != "" {
-			query += travel
+
+	var contextQuerier interface {
+		QueryContext(context.Context, func(rows *sql.Rows) error, string, ...interface{}) error
+		ExecContext(context.Context, string, ...any) (sql.Result, error)
+	}
+	contextQuerier = criteria.Client()
+	if q.Tx != nil {
+		contextQuerier = &tx{Tx: q.Tx}
+	}
+
+	if q.AwaitOpenTransactions && q.Columns == eventstore.ColumnsEvent {
+		instanceID := authz.GetInstance(ctx).InstanceID()
+		if q.InstanceID != nil {
+			instanceID = q.InstanceID.Value.(string)
 		}
+
+		_, err = contextQuerier.ExecContext(ctx,
+			"select pg_advisory_lock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1)), pg_advisory_unlock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))",
+			instanceID,
+		)
+		if err != nil {
+			return err
+		}
+
+		where += awaitOpenTransactions(useV1)
 	}
 	query += where
 
 	// instead of using the max function of the database (which doesn't work for postgres)
 	// we select the most recent row
-	if q.Columns == eventstore.ColumnsMaxSequence {
+	if q.Columns == eventstore.ColumnsMaxPosition {
 		q.Limit = 1
 		q.Desc = true
 	}
@@ -91,7 +113,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 
 	switch q.Columns {
 	case eventstore.ColumnsEvent,
-		eventstore.ColumnsMaxSequence:
+		eventstore.ColumnsMaxPosition:
 		query += criteria.orderByEventSequence(q.Desc, shouldOrderBySequence, useV1)
 	}
 
@@ -106,14 +128,6 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	}
 
 	query = criteria.placeholder(query)
-
-	var contextQuerier interface {
-		QueryContext(context.Context, func(rows *sql.Rows) error, string, ...interface{}) error
-	}
-	contextQuerier = criteria.db()
-	if q.Tx != nil {
-		contextQuerier = &tx{Tx: q.Tx}
-	}
 
 	err = contextQuerier.QueryContext(ctx,
 		func(rows *sql.Rows) error {
@@ -135,8 +149,8 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 
 func prepareColumns(criteria querier, columns eventstore.Columns, useV1 bool) (string, func(s scan, dest interface{}) error) {
 	switch columns {
-	case eventstore.ColumnsMaxSequence:
-		return criteria.maxSequenceQuery(useV1), maxSequenceScanner
+	case eventstore.ColumnsMaxPosition:
+		return criteria.maxPositionQuery(useV1), maxPositionScanner
 	case eventstore.ColumnsInstanceIDs:
 		return criteria.instanceIDsQuery(useV1), instanceIDsScanner
 	case eventstore.ColumnsEvent:
@@ -146,21 +160,15 @@ func prepareColumns(criteria querier, columns eventstore.Columns, useV1 bool) (s
 	}
 }
 
-func prepareTimeTravel(ctx context.Context, criteria querier, allow bool) string {
-	if !allow {
-		return ""
-	}
-	took := call.Took(ctx)
-	return criteria.Timetravel(took)
-}
-
-func maxSequenceScanner(row scan, dest interface{}) (err error) {
-	position, ok := dest.(*sql.NullFloat64)
+func maxPositionScanner(row scan, dest interface{}) (err error) {
+	position, ok := dest.(*decimal.Decimal)
 	if !ok {
-		return zerrors.ThrowInvalidArgumentf(nil, "SQL-NBjA9", "type must be sql.NullInt64 got: %T", dest)
+		return zerrors.ThrowInvalidArgumentf(nil, "SQL-NBjA9", "type must be pointer to decimal.Decimal got: %T", dest)
 	}
-	err = row(position)
+	var res decimal.NullDecimal
+	err = row(&res)
 	if err == nil || errors.Is(err, sql.ErrNoRows) {
+		*position = res.Decimal
 		return nil
 	}
 	return zerrors.ThrowInternal(err, "SQL-bN5xg", "something went wrong")
@@ -189,7 +197,7 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 			return zerrors.ThrowInvalidArgumentf(nil, "SQL-4GP6F", "events scanner: invalid type %T", dest)
 		}
 		event := new(repository.Event)
-		position := new(sql.NullFloat64)
+		position := new(decimal.NullDecimal)
 
 		if useV1 {
 			err = scanner(
@@ -226,7 +234,7 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 			logging.New().WithError(err).Warn("unable to scan row")
 			return zerrors.ThrowInternal(err, "SQL-M0dsf", "unable to scan row")
 		}
-		event.Pos = position.Float64
+		event.Pos = position.Decimal
 		return reduce(event)
 	}
 }
@@ -271,8 +279,21 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 		args = append(args, additionalArgs...)
 	}
 
-	if query.AwaitOpenTransactions {
-		clauses += awaitOpenTransactions(useV1)
+	excludeAggregateIDs := query.ExcludeAggregateIDs
+	if len(excludeAggregateIDs) > 0 {
+		excludeAggregateIDs = append(excludeAggregateIDs, query.InstanceID, query.InstanceIDs, query.Position, query.CreatedAfter, query.CreatedBefore)
+	}
+	excludeAggregateIDsClauses, excludeAggregateIDsArgs := prepareQuery(criteria, useV1, excludeAggregateIDs...)
+	if excludeAggregateIDsClauses != "" {
+		if clauses != "" {
+			clauses += " AND "
+		}
+		if useV1 {
+			clauses += "aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events WHERE " + excludeAggregateIDsClauses + ")"
+		} else {
+			clauses += "aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE " + excludeAggregateIDsClauses + ")"
+		}
+		args = append(args, excludeAggregateIDsArgs...)
 	}
 
 	if clauses == "" {

@@ -1,6 +1,8 @@
 package command
 
 import (
+	"slices"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -14,15 +16,19 @@ type ProjectGrantWriteModel struct {
 	GrantedOrgID string
 	RoleKeys     []string
 	State        domain.ProjectGrantState
+
+	FoundGrantID string
 }
 
-func NewProjectGrantWriteModel(grantID, projectID, resourceOwner string) *ProjectGrantWriteModel {
+func NewProjectGrantWriteModel(grantID, grantedOrgID, projectID, resourceOwner string) *ProjectGrantWriteModel {
 	return &ProjectGrantWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   projectID,
 			ResourceOwner: resourceOwner,
 		},
-		GrantID: grantID,
+		// Always either the grantID or the grantedOrgID is provided
+		GrantID:      grantID,
+		GrantedOrgID: grantedOrgID,
 	}
 }
 
@@ -30,33 +36,46 @@ func (wm *ProjectGrantWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *project.GrantAddedEvent:
-			if e.GrantID == wm.GrantID {
+			if projectGrantExists(wm.GrantID, wm.GrantedOrgID, e.GrantID, e.GrantedOrgID) {
+				wm.FoundGrantID = e.GrantID
 				wm.WriteModel.AppendEvents(e)
 			}
 		case *project.GrantChangedEvent:
-			if e.GrantID == wm.GrantID {
+			if projectGrantEqual(wm.FoundGrantID, e.GrantID) {
 				wm.WriteModel.AppendEvents(e)
 			}
 		case *project.GrantCascadeChangedEvent:
-			if e.GrantID == wm.GrantID {
+			if projectGrantEqual(wm.FoundGrantID, e.GrantID) {
 				wm.WriteModel.AppendEvents(e)
 			}
 		case *project.GrantDeactivateEvent:
-			if e.GrantID == wm.GrantID {
+			if projectGrantEqual(wm.FoundGrantID, e.GrantID) {
 				wm.WriteModel.AppendEvents(e)
 			}
 		case *project.GrantReactivatedEvent:
-			if e.GrantID == wm.GrantID {
+			if projectGrantEqual(wm.FoundGrantID, e.GrantID) {
 				wm.WriteModel.AppendEvents(e)
 			}
 		case *project.GrantRemovedEvent:
-			if e.GrantID == wm.GrantID {
+			if projectGrantEqual(wm.FoundGrantID, e.GrantID) {
+				wm.FoundGrantID = ""
 				wm.WriteModel.AppendEvents(e)
 			}
 		case *project.ProjectRemovedEvent:
 			wm.WriteModel.AppendEvents(e)
 		}
 	}
+}
+
+func projectGrantExists(requiredGrantID, requiredGrantedOrgID, grantID, grantedOrgID string) bool {
+	// either grantID or grantedOrgID is provided and equal
+	return projectGrantEqual(requiredGrantID, grantID) ||
+		(requiredGrantedOrgID != "" && grantedOrgID == requiredGrantedOrgID)
+}
+
+func projectGrantEqual(requiredGrantID, grantID string) bool {
+	// grantID is provided and equal
+	return requiredGrantID != "" && grantID == requiredGrantID
 }
 
 func (wm *ProjectGrantWriteModel) Reduce() error {
@@ -91,7 +110,8 @@ func (wm *ProjectGrantWriteModel) Reduce() error {
 }
 
 func (wm *ProjectGrantWriteModel) Query() *eventstore.SearchQueryBuilder {
-	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(wm.AggregateID).
@@ -104,27 +124,25 @@ func (wm *ProjectGrantWriteModel) Query() *eventstore.SearchQueryBuilder {
 			project.GrantRemovedType,
 			project.ProjectRemovedType).
 		Builder()
-
-	if wm.ResourceOwner != "" {
-		query.ResourceOwner(wm.ResourceOwner)
-	}
-	return query
 }
 
 type ProjectGrantPreConditionReadModel struct {
 	eventstore.WriteModel
 
-	ProjectID        string
-	GrantedOrgID     string
-	ProjectExists    bool
-	GrantedOrgExists bool
-	ExistingRoleKeys []string
+	ProjectResourceOwner string
+	ProjectID            string
+	GrantedOrgID         string
+	ProjectExists        bool
+	GrantedOrgExists     bool
+	ExistingRoleKeys     []string
 }
 
-func NewProjectGrantPreConditionReadModel(projectID, grantedOrgID string) *ProjectGrantPreConditionReadModel {
+func NewProjectGrantPreConditionReadModel(projectID, grantedOrgID, resourceOwner string) *ProjectGrantPreConditionReadModel {
 	return &ProjectGrantPreConditionReadModel{
-		ProjectID:    projectID,
-		GrantedOrgID: grantedOrgID,
+		WriteModel:           eventstore.WriteModel{},
+		ProjectResourceOwner: resourceOwner,
+		ProjectID:            projectID,
+		GrantedOrgID:         grantedOrgID,
 	}
 }
 
@@ -132,20 +150,31 @@ func (wm *ProjectGrantPreConditionReadModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *project.ProjectAddedEvent:
+			if wm.ProjectResourceOwner == "" {
+				wm.ProjectResourceOwner = e.Aggregate().ResourceOwner
+			}
+			if wm.ProjectResourceOwner != e.Aggregate().ResourceOwner {
+				continue
+			}
 			wm.ProjectExists = true
 		case *project.ProjectRemovedEvent:
+			if wm.ProjectResourceOwner != e.Aggregate().ResourceOwner {
+				continue
+			}
+			wm.ProjectResourceOwner = ""
 			wm.ProjectExists = false
 		case *project.RoleAddedEvent:
+			if e.Aggregate().ResourceOwner != wm.ProjectResourceOwner {
+				continue
+			}
 			wm.ExistingRoleKeys = append(wm.ExistingRoleKeys, e.Key)
 		case *project.RoleRemovedEvent:
-			for i, key := range wm.ExistingRoleKeys {
-				if key == e.Key {
-					copy(wm.ExistingRoleKeys[i:], wm.ExistingRoleKeys[i+1:])
-					wm.ExistingRoleKeys[len(wm.ExistingRoleKeys)-1] = ""
-					wm.ExistingRoleKeys = wm.ExistingRoleKeys[:len(wm.ExistingRoleKeys)-1]
-					continue
-				}
+			if e.Aggregate().ResourceOwner != wm.ProjectResourceOwner {
+				continue
 			}
+			wm.ExistingRoleKeys = slices.DeleteFunc(wm.ExistingRoleKeys, func(key string) bool {
+				return key == e.Key
+			})
 		case *org.OrgAddedEvent:
 			wm.GrantedOrgExists = true
 		case *org.OrgRemovedEvent:
@@ -158,12 +187,6 @@ func (wm *ProjectGrantPreConditionReadModel) Reduce() error {
 func (wm *ProjectGrantPreConditionReadModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AddQuery().
-		AggregateTypes(org.AggregateType).
-		AggregateIDs(wm.GrantedOrgID).
-		EventTypes(
-			org.OrgAddedEventType,
-			org.OrgRemovedEventType).
-		Or().
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(wm.ProjectID).
 		EventTypes(
@@ -171,6 +194,12 @@ func (wm *ProjectGrantPreConditionReadModel) Query() *eventstore.SearchQueryBuil
 			project.ProjectRemovedType,
 			project.RoleAddedType,
 			project.RoleRemovedType).
+		Or().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.GrantedOrgID).
+		EventTypes(
+			org.OrgAddedEventType,
+			org.OrgRemovedEventType).
 		Builder()
 
 	return query

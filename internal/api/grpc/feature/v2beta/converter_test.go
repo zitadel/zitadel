@@ -1,0 +1,232 @@
+package feature
+
+import (
+	"testing"
+	"time"
+
+	"github.com/muhlemmer/gu"
+	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/feature"
+	"github.com/zitadel/zitadel/internal/query"
+	feature_pb "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+)
+
+func Test_systemFeaturesToCommand(t *testing.T) {
+	arg := &feature_pb.SetSystemFeaturesRequest{
+		LoginDefaultOrg:                gu.Ptr(true),
+		UserSchema:                     gu.Ptr(true),
+		OidcTokenExchange:              gu.Ptr(true),
+		ImprovedPerformance:            nil,
+		OidcSingleV1SessionTermination: gu.Ptr(true),
+	}
+	want := &command.SystemFeatures{
+		LoginDefaultOrg:                gu.Ptr(true),
+		UserSchema:                     gu.Ptr(true),
+		TokenExchange:                  gu.Ptr(true),
+		ImprovedPerformance:            nil,
+		OIDCSingleV1SessionTermination: gu.Ptr(true),
+	}
+	got := systemFeaturesToCommand(arg)
+	assert.Equal(t, want, got)
+}
+
+func Test_systemFeaturesToPb(t *testing.T) {
+	arg := &query.SystemFeatures{
+		Details: &domain.ObjectDetails{
+			Sequence:      22,
+			EventDate:     time.Unix(123, 0),
+			ResourceOwner: "SYSTEM",
+		},
+		LoginDefaultOrg: query.FeatureSource[bool]{
+			Level: feature.LevelSystem,
+			Value: true,
+		},
+		UserSchema: query.FeatureSource[bool]{
+			Level: feature.LevelSystem,
+			Value: true,
+		},
+		TokenExchange: query.FeatureSource[bool]{
+			Level: feature.LevelSystem,
+			Value: false,
+		},
+		ImprovedPerformance: query.FeatureSource[[]feature.ImprovedPerformanceType]{
+			Level: feature.LevelSystem,
+			Value: []feature.ImprovedPerformanceType{feature.ImprovedPerformanceTypeOrgDomainVerified},
+		},
+		OIDCSingleV1SessionTermination: query.FeatureSource[bool]{
+			Level: feature.LevelSystem,
+			Value: true,
+		},
+	}
+	want := &feature_pb.GetSystemFeaturesResponse{
+		Details: &object.Details{
+			Sequence:      22,
+			ChangeDate:    &timestamppb.Timestamp{Seconds: 123},
+			ResourceOwner: "SYSTEM",
+		},
+		LoginDefaultOrg: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
+		},
+		UserSchema: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
+		},
+		OidcTokenExchange: &feature_pb.FeatureFlag{
+			Enabled: false,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
+		},
+		ImprovedPerformance: &feature_pb.ImprovedPerformanceFeatureFlag{
+			ExecutionPaths: []feature_pb.ImprovedPerformance{feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED},
+			Source:         feature_pb.Source_SOURCE_SYSTEM,
+		},
+		OidcSingleV1SessionTermination: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
+		},
+	}
+	got := systemFeaturesToPb(arg)
+	assert.Equal(t, want, got)
+}
+
+func Test_instanceFeaturesToCommand(t *testing.T) {
+	arg := &feature_pb.SetInstanceFeaturesRequest{
+		LoginDefaultOrg:                gu.Ptr(true),
+		UserSchema:                     gu.Ptr(true),
+		OidcTokenExchange:              gu.Ptr(true),
+		ImprovedPerformance:            nil,
+		OidcSingleV1SessionTermination: gu.Ptr(true),
+	}
+	want := &command.InstanceFeatures{
+		LoginDefaultOrg:                gu.Ptr(true),
+		UserSchema:                     gu.Ptr(true),
+		TokenExchange:                  gu.Ptr(true),
+		ImprovedPerformance:            nil,
+		OIDCSingleV1SessionTermination: gu.Ptr(true),
+	}
+	got := instanceFeaturesToCommand(arg)
+	assert.Equal(t, want, got)
+}
+
+func Test_instanceFeaturesToPb(t *testing.T) {
+	arg := &query.InstanceFeatures{
+		Details: &domain.ObjectDetails{
+			Sequence:      22,
+			EventDate:     time.Unix(123, 0),
+			ResourceOwner: "instance1",
+		},
+		LoginDefaultOrg: query.FeatureSource[bool]{
+			Level: feature.LevelSystem,
+			Value: true,
+		},
+		UserSchema: query.FeatureSource[bool]{
+			Level: feature.LevelInstance,
+			Value: true,
+		},
+		TokenExchange: query.FeatureSource[bool]{
+			Level: feature.LevelSystem,
+			Value: false,
+		},
+		ImprovedPerformance: query.FeatureSource[[]feature.ImprovedPerformanceType]{
+			Level: feature.LevelSystem,
+			Value: []feature.ImprovedPerformanceType{feature.ImprovedPerformanceTypeOrgDomainVerified},
+		},
+		OIDCSingleV1SessionTermination: query.FeatureSource[bool]{
+			Level: feature.LevelInstance,
+			Value: true,
+		},
+	}
+	want := &feature_pb.GetInstanceFeaturesResponse{
+		Details: &object.Details{
+			Sequence:      22,
+			ChangeDate:    &timestamppb.Timestamp{Seconds: 123},
+			ResourceOwner: "instance1",
+		},
+		LoginDefaultOrg: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
+		},
+		UserSchema: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_INSTANCE,
+		},
+		OidcTokenExchange: &feature_pb.FeatureFlag{
+			Enabled: false,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
+		},
+		ImprovedPerformance: &feature_pb.ImprovedPerformanceFeatureFlag{
+			ExecutionPaths: []feature_pb.ImprovedPerformance{feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED},
+			Source:         feature_pb.Source_SOURCE_SYSTEM,
+		},
+		DebugOidcParentError: &feature_pb.FeatureFlag{
+			Enabled: false,
+			Source:  feature_pb.Source_SOURCE_UNSPECIFIED,
+		},
+		OidcSingleV1SessionTermination: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_INSTANCE,
+		},
+	}
+	got := instanceFeaturesToPb(arg)
+	assert.Equal(t, want, got)
+}
+
+func Test_featureLevelToSourcePb(t *testing.T) {
+	tests := []struct {
+		name  string
+		level feature.Level
+		want  feature_pb.Source
+	}{
+		{
+			name:  "unspecified",
+			level: feature.LevelUnspecified,
+			want:  feature_pb.Source_SOURCE_UNSPECIFIED,
+		},
+		{
+			name:  "system",
+			level: feature.LevelSystem,
+			want:  feature_pb.Source_SOURCE_SYSTEM,
+		},
+		{
+			name:  "instance",
+			level: feature.LevelInstance,
+			want:  feature_pb.Source_SOURCE_INSTANCE,
+		},
+		{
+			name:  "org",
+			level: feature.LevelOrg,
+			want:  feature_pb.Source_SOURCE_ORGANIZATION,
+		},
+		{
+			name:  "project",
+			level: feature.LevelProject,
+			want:  feature_pb.Source_SOURCE_PROJECT,
+		},
+		{
+			name:  "app",
+			level: feature.LevelApp,
+			want:  feature_pb.Source_SOURCE_APP,
+		},
+		{
+			name:  "user",
+			level: feature.LevelUser,
+			want:  feature_pb.Source_SOURCE_USER,
+		},
+		{
+			name:  "unknown",
+			level: 99,
+			want:  99,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := featureLevelToSourcePb(tt.level)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}

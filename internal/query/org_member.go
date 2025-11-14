@@ -7,7 +7,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -44,6 +43,10 @@ var (
 		name:  projection.MemberResourceOwner,
 		table: orgMemberTable,
 	}
+	OrgMemberUserResourceOwner = Column{
+		name:  projection.MemberUserResourceOwner,
+		table: orgMemberTable,
+	}
 	OrgMemberInstanceID = Column{
 		name:  projection.MemberInstanceID,
 		table: orgMemberTable,
@@ -69,7 +72,7 @@ func (q *Queries) OrgMembers(ctx context.Context, queries *OrgMembersQuery) (mem
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareOrgMembersQuery(ctx, q.client)
+	query, scan := prepareOrgMembersQuery()
 	eq := sq.Eq{OrgMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
@@ -93,12 +96,13 @@ func (q *Queries) OrgMembers(ctx context.Context, queries *OrgMembersQuery) (mem
 	return members, err
 }
 
-func prepareOrgMembersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Members, error)) {
+func prepareOrgMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, error)) {
 	return sq.Select(
 			OrgMemberCreationDate.identifier(),
 			OrgMemberChangeDate.identifier(),
 			OrgMemberSequence.identifier(),
 			OrgMemberResourceOwner.identifier(),
+			OrgMemberUserResourceOwner.identifier(),
 			OrgMemberUserID.identifier(),
 			OrgMemberRoles.identifier(),
 			LoginNameNameCol.identifier(),
@@ -114,7 +118,7 @@ func prepareOrgMembersQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			LeftJoin(join(HumanUserIDCol, OrgMemberUserID)).
 			LeftJoin(join(MachineUserIDCol, OrgMemberUserID)).
 			LeftJoin(join(UserIDCol, OrgMemberUserID)).
-			LeftJoin(join(LoginNameUserIDCol, OrgMemberUserID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(LoginNameUserIDCol, OrgMemberUserID)).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),
@@ -141,6 +145,7 @@ func prepareOrgMembersQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 					&member.ChangeDate,
 					&member.Sequence,
 					&member.ResourceOwner,
+					&member.UserResourceOwner,
 					&member.UserID,
 					&member.Roles,
 					&preferredLoginName,

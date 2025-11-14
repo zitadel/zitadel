@@ -7,6 +7,10 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+func RenderURLTemplate(w io.Writer, tmpl string, data any) error {
+	return renderURLTemplate(w, tmpl, data)
+}
+
 func renderURLTemplate(w io.Writer, tmpl string, data any) error {
 	parsed, err := template.New("").Parse(tmpl)
 	if err != nil {

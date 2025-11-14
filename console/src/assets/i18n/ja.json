@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "フロー",
         "DESCRIPTION": "認証フローを選択し、そのフロー内の特定のイベントでアクションをトリガーします。"
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2（アクションズV2）、改善された新しいバージョンが利用可能になりました。現在のバージョンも引き続き利用可能ですが、今後の開発は新バージョンに集中し、最終的には現在のバージョンを置き換える予定です。"
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -185,6 +186,32 @@
           "DESCRIPTION": "アイドル状態のリフレッシュトークンの有効期間は、リフレッシュトークンが使用されない最大時間です。"
         }
       },
+      "WEB_KEYS": {
+        "DESCRIPTION": "ZITADELインスタンスのトークンを安全に署名および検証するために、OIDC Webキーを管理します。",
+        "TABLE": {
+          "TITLE": "アクティブおよび今後のWebキー",
+          "DESCRIPTION": "現在アクティブなWebキーと、今後使用予定のWebキーです。新しいキーをアクティブ化すると、現在のキーは無効になります。",
+          "NOTE": "注意: JWKs OIDCエンドポイントはキャッシュ可能なレスポンスを返します（デフォルト5分）。キーを早くアクティブ化しすぎると、キャッシュやクライアントでまだ利用できない可能性があります。",
+          "ACTIVATE": "次のWebキーをアクティブ化",
+          "ACTIVE": "現在アクティブ",
+          "NEXT": "次のキュー",
+          "FUTURE": "今後",
+          "WARNING": "ウェブキーは5分未満です。"
+        },
+        "CREATE": {
+          "TITLE": "新しいWebキーを作成",
+          "DESCRIPTION": "新しいWebキーを作成すると、リストに追加されます。ZITADELはデフォルトでRSA2048キーとSHA256ハッシュを使用します。",
+          "KEY_TYPE": "キーの種類",
+          "BITS": "ビット",
+          "HASHER": "ハッシュ方式",
+          "CURVE": "カーブ"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "以前のWebキー",
+          "DESCRIPTION": "これらは、すでに無効になった以前のWebキーです。",
+          "DEACTIVATED_ON": "無効化日"
+        }
+      },
       "MESSAGE_TEXTS": {
         "TITLE": "メッセージテキスト",
         "DESCRIPTION": "通知メールやSMSメッセージのテキストをカスタマイズします。一部の言語を無効にしたい場合は、インスタンスの言語設定で制限してください。",
@@ -197,7 +224,8 @@
           "VE": "ユーザーがメールアドレスを変更すると、新しいアドレスを検証するリンクが記載されたメールを受け取ります。",
           "VP": "ユーザーが電話番号を変更すると、新しい番号を検証するコードが記載されたSMSを受け取ります。",
           "VEO": "ユーザーがメール経由でワンタイムパスワードの方法を追加すると、それをアクティブにするためにメールに送信されたコードを入力する必要があります。",
-          "VSO": "ユーザーがSMS経由でワンタイムパスワードの方法を追加すると、それをアクティブにするために電話番号に送信されたコードを入力する必要があります。"
+          "VSO": "ユーザーがSMS経由でワンタイムパスワードの方法を追加すると、それをアクティブにするために電話番号に送信されたコードを入力する必要があります。",
+          "IU": "ユーザー招待コードが作成されると、認証方法を設定するためのリンクを含むメールが送信されます。"
         }
       },
       "LOGIN_TEXTS": {
@@ -231,7 +259,7 @@
           "LABEL": "最大寿命（時間）",
           "PW_CHECK": {
             "TITLE": "パスワードチェック",
-            "DESCRIPTION": "ユーザーは、これらの期間中にパスワードを変更する必要があります。"
+            "DESCRIPTION": "この期間の後、ユーザーはパスワードで再認証する必要があります。"
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "外部ログインチェック",
@@ -501,6 +529,118 @@
     "DOWNLOAD": "ダウンロード",
     "APPLY": "アプライ"
   },
+  "ACTIONSTWO": {
+    "BETA_NOTE": "現在、新しいActions V2（ベータ版）を使用しています。以前のバージョン1はまだ利用可能ですが、今後廃止される予定です。問題やフィードバックがあればお知らせください。",
+    "EXECUTION": {
+      "TITLE": "アクション",
+      "DESCRIPTION": "アクションを使用すると、APIリクエスト、イベント、または特定の関数に応答してカスタムコードを実行できます。これらを使用して、Zitadelを拡張し、ワークフローを自動化し、他のシステムと統合します。",
+      "TYPES": {
+        "request": "リクエスト",
+        "response": "レスポンス",
+        "event": "イベント",
+        "function": "関数"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "アクションを作成",
+        "UPDATE_TITLE": "アクションを更新",
+        "TYPE": {
+          "DESCRIPTION": "このアクションを実行するタイミングを選択します",
+          "REQUEST": {
+            "TITLE": "リクエスト",
+            "DESCRIPTION": "Zitadel内で発生するリクエスト。これはログインリクエストの呼び出しのようなものです。"
+          },
+          "RESPONSE": {
+            "TITLE": "レスポンス",
+            "DESCRIPTION": "Zitadel内のリクエストからのレスポンス。ユーザーのフェッチから返されるレスポンスを考えてください。"
+          },
+          "EVENTS": {
+            "TITLE": "イベント",
+            "DESCRIPTION": "Zitadel内で発生するイベント。これは、ユーザーアカウントの作成、ログインの成功など、あらゆる可能性があります。"
+          },
+          "FUNCTIONS": {
+            "TITLE": "関数",
+            "DESCRIPTION": "Zitadel内で呼び出すことができる関数。これは、電子メールの送信からユーザーの作成まで、あらゆる可能性があります。"
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "このアクションをすべてのリクエスト、特定のサービス（例：ユーザー管理）、または単一のリクエスト（例：ユーザーの作成）に適用するかどうかを選択します。",
+          "ALL": {
+            "TITLE": "すべて",
+            "DESCRIPTION": "すべてのリクエストでアクションを実行する場合は、これを選択します"
+          },
+          "ALL_EVENTS": "すべてのイベントでアクションを実行する場合はこれを選択してください",
+          "SELECT_SERVICE": {
+            "TITLE": "サービスを選択",
+            "DESCRIPTION": "アクションのZitadelサービスを選択します。"
+          },
+          "SELECT_METHOD": {
+            "TITLE": "メソッドを選択",
+            "DESCRIPTION": "特定のリクエストでのみ実行する場合は、ここで選択します",
+            "NOTE": "メソッドを選択しない場合、アクションは選択したサービスのすべてのリクエストで実行されます。"
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "関数名",
+            "DESCRIPTION": "実行する関数を選択します"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "グループを設定",
+            "DESCRIPTION": "イベントのグループでのみ実行する場合は、ここでグループを設定します"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "イベントを選択",
+            "DESCRIPTION": "特定のイベントでのみ実行する場合は、ここで指定します"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "ターゲットを実行するか、他のターゲットと同じ条件で実行するかを選択できます。",
+          "TARGET": {
+            "DESCRIPTION": "このアクションで実行するターゲット"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "実行条件"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "条件",
+        "TYPE": "タイプ",
+        "TARGET": "ターゲット",
+        "CREATIONDATE": "作成日"
+      }
+    },
+    "TARGET": {
+      "TITLE": "ターゲット",
+      "DESCRIPTION": "ターゲットは、アクションから実行するコードの宛先です。ここでターゲットを作成し、アクションに追加します。",
+      "CREATE": {
+        "TITLE": "ターゲットを作成",
+        "DESCRIPTION": "Zitadelの外部で独自のターゲットを作成します",
+        "NAME": "名前",
+        "NAME_DESCRIPTION": "後で簡単に識別できるように、ターゲットに明確でわかりやすい名前を付けます",
+        "TYPE": "タイプ",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST 呼び出し",
+          "restAsync": "REST 非同期"
+        },
+        "TYPES_DESCRIPTION": "Webhook、呼び出しはステータスコードを処理しますが、応答は無関係です\nCall、呼び出しはステータスコードと応答を処理します\nAsync、呼び出しはステータスコードも応答も処理しませんが、他のターゲットと並行して呼び出すことができます",
+        "ENDPOINT": "エンドポイント",
+        "ENDPOINT_DESCRIPTION": "コードがホストされているエンドポイントを入力します。アクセス可能であることを確認してください。",
+        "TIMEOUT": "タイムアウト",
+        "TIMEOUT_DESCRIPTION": "ターゲットが応答する最大時間を設定します。これより時間がかかる場合は、リクエストを停止します。",
+        "INTERRUPT_ON_ERROR": "エラー時に中断",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "ターゲットがエラーを返した場合、すべての実行を停止します",
+        "INTERRUPT_ON_ERROR_WARNING": "注意：「エラー時に中断」を有効にすると、失敗時に処理が停止し、ロックアウトのリスクがあります。ログイン/作成のブロックを防ぐため、無効にしてテストしてください。",
+        "AWAIT_RESPONSE": "レスポンスを待機",
+        "AWAIT_RESPONSE_DESCRIPTION": "他の処理を行う前にレスポンスを待機します。単一のアクションに複数のターゲットを使用する場合に便利です"
+      },
+      "TABLE": {
+        "NAME": "名前",
+        "ENDPOINT": "エンドポイント",
+        "CREATIONDATE": "作成日",
+        "REORDER": "順序を変更"
+      }
+    }
+  },
   "MEMBERROLES": {
     "IAM_OWNER": "すべての組織を含むインスタンス全体を管理する権限を持ちます",
     "IAM_OWNER_VIEWER": "すべての組織を含むインスタンス全体を閲覧する権限を持ちます",
@@ -508,14 +648,17 @@
     "IAM_USER_MANAGER": "ユーザーの作成および管理する権限を持ちます",
     "IAM_ADMIN_IMPERSONATOR": "すべての組織の管理者およびエンドユーザーになりすます権限を持っています",
     "IAM_END_USER_IMPERSONATOR": "すべての組織のエンドユーザーになりすます権限を持っています",
+    "IAM_LOGIN_CLIENT": "ログインクライアントを管理する権限を持っています",
     "ORG_OWNER": "組織全体に対する権限を持ちます",
     "ORG_USER_MANAGER": "組織のユーザーを作成および管理する権限を持ちます",
     "ORG_OWNER_VIEWER": "組織全体を閲覧する権限を持ちます",
+    "ORG_SETTINGS_MANAGER": "組織の設定を管理する権限を持ちます",
     "ORG_USER_PERMISSION_EDITOR": "ユーザーグラントを管理する権限を持ちます",
     "ORG_PROJECT_PERMISSION_EDITOR": "プロジェクトグラントを管理する権限を持ちます",
     "ORG_PROJECT_CREATOR": "所有するプロジェクトと配下の設定を作成する権限を持ちます",
     "ORG_ADMIN_IMPERSONATOR": "組織の管理者およびエンドユーザーになりすます権限がある",
     "ORG_END_USER_IMPERSONATOR": "組織のエンドユーザーになりすます権限がある",
+    "ORG_USER_SELF_MANAGER": "自身を管理する権限がある",
     "PROJECT_OWNER": "特定のプロジェクト全体を管理する権限を持ちます",
     "PROJECT_OWNER_VIEWER": "特定のプロジェクト全体を閲覧する権限を持ちます",
     "PROJECT_OWNER_GLOBAL": "全てのプロジェクトを管理する権限を持ちます",
@@ -550,6 +693,7 @@
     "EMAIL": "Eメール",
     "USERNAME": "ユーザー名",
     "ORGNAME": "組織名",
+    "ORGID": "組織ID",
     "PRIMARYDOMAIN": "プライマリドメイン",
     "PROJECTNAME": "プロジェクト名",
     "RESOURCEOWNER": "リソース所有者",
@@ -786,7 +930,10 @@
       "PHONESECTION": "電話番号",
       "PASSWORDSECTION": "初期パスワード",
       "ADDRESSANDPHONESECTION": "電話番号",
-      "INITMAILDESCRIPTION": "両方のオプションが選択されている場合、初期セットアップ用のメールは送信されません。オプションのいずれかが選択されている場合、データを提供・認証するためのメールが送信されます。"
+      "INITMAILDESCRIPTION": "両方のオプションが選択されている場合、初期セットアップ用のメールは送信されません。オプションのいずれかが選択されている場合、データを提供・認証するためのメールが送信されます。",
+      "SETUPAUTHENTICATIONLATER": "このユーザーの認証を後で設定します。",
+      "INVITATION": "認証設定とメール確認のための招待メールを送信してください。",
+      "INITIALPASSWORD": "ユーザーの初期パスワードを設定してください。"
     },
     "CODEDIALOG": {
       "TITLE": "電話番号の検証",
@@ -808,6 +955,9 @@
       "EMAIL": "Eメール",
       "PHONE": "電話番号",
       "PHONE_HINT": "+ マークに続いて電話をかけたい国コードを入力するか、ドロップダウンから国を選択して電話番号を入力します。",
+      "PHONE_VERIFIED": "電話番号が確認されました",
+      "SEND_SMS": "認証SMSを送信",
+      "SEND_EMAIL": "メールを送信",
       "USERNAME": "ユーザー名",
       "CHANGEUSERNAME": "変更",
       "CHANGEUSERNAME_TITLE": "ユーザー名の変更",
@@ -948,6 +1098,14 @@
       "5": "停止",
       "6": "初期化待ち"
     },
+    "STATEV2": {
+      "0": "不明",
+      "1": "アクティブ",
+      "2": "非アクティブ",
+      "3": "削除",
+      "4": "ロック",
+      "5": "初期化待ち"
+    },
     "SEARCH": {
       "ADDITIONAL": "ログインネーム（現在の組織）",
       "ADDITIONAL-EXTERNAL": "ログインネーム（外部の組織）"
@@ -1086,7 +1244,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "選択したアクションの削除",
         "DESCRIPTION": "フローから選択したアクションを削除してよろしいですか？"
-      }
+      },
+      "ABOUTNAME": "アクションの名前とJavaScript内の関数の名前は同じである必要があります"
     },
     "TOAST": {
       "ACTIONSSET": "アクションセット",
@@ -1338,6 +1497,7 @@
       "BRANDING": "ブランディング",
       "PRIVACYPOLICY": "プライバシーポリシー",
       "OIDC": "OIDCトークンのライフタイムと有効期限",
+      "WEB_KEYS": "OIDC Web Keys",
       "SECRETS": "シークレット設定",
       "SECURITY": "セキュリティ設定",
       "EVENTS": "イベント",
@@ -1353,7 +1513,8 @@
       "APPEARANCE": "設定",
       "OTHER": "その他",
       "STORAGE": "ストレージ"
-    }
+    },
+    "BETA": "ベータ"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -1380,7 +1541,12 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română",
+        "tr": "Türkçe"
       }
     },
     "SMTP": {
@@ -1417,6 +1583,8 @@
         "SID": "Sid",
         "TOKEN": "トークン",
         "SENDERNUMBER": "送信者番号",
+        "VERIFYSERVICESID": "検証サービス SID",
+        "VERIFYSERVICESID_DESCRIPTION": "検証サービス SID を設定すると、電話番号と OTP SMS の検証にメッセージサービスの代わりに Twilio Verify サービスを使用できるようになります。",
         "ADDED": "Twilioは正常に追加されました。",
         "UPDATED": "Twilio が正常に更新されました。",
         "REMOVED": "Twilioが削除されました",
@@ -1437,9 +1605,7 @@
         "7": "ワンタイムパスワード (OTP) - SMS",
         "8": "ワンタイムパスワード (OTP) - 電子メール"
       },
-      "ADDGENERATOR": "シークレットの設定を定義する",
-      "GENERATORTYPE": "タイプ",
-      "EXPIRY": "有効期限（時間単位）",
+      "EXPIRY": "有効期限 (分単位)",
       "INCLUDEDIGITS": "数字を含める",
       "INCLUDESYMBOLS": "シンボルを含める",
       "INCLUDELOWERLETTERS": "小文字を含める",
@@ -1459,16 +1625,20 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "ログイン時の既定組織",
       "LOGINDEFAULTORG_DESCRIPTION": "組織コンテキストが設定されていない場合、ログイン UI は既定の組織の設定を使用します (インスタンスの設定ではなく)",
-      "OIDCLEGACYINTROSPECTION": "OIDC レガシーイントロスペクション",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "パフォーマンス上の理由から最近イントロスペクション エンドポイントをリファクタリングしました。この機能は、予期しないバグが発生した場合にレガシー実装にロールバックするために使用できます。",
       "OIDCTOKENEXCHANGE": "OIDC トークン交換",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "OIDC トークン エンドポイント用に実験的な urn:ietf:params:oauth:grant-type:token-exchange 付与タイプを有効にします。トークン交換は、より少ないスコープを持つトークンを要求するか、他のユーザーになりすますために使用できます。インスタンスでのなりすましを許可するには、セキュリティポリシーを参照してください。",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC トリガーイントロスペクションプロジェクション",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "イントロスペクション要求中にプロジェクショントリガーを有効にします。これは、イントロスペクションレスポンスに顕著な整合性問題がある場合の回避策として機能しますが、パフォーマンスに影響を与える可能性があります。今後、イントロスペクション要求のトリガーを削除する予定です。",
       "USERSCHEMA": "ユーザー スキーマ",
       "USERSCHEMA_DESCRIPTION": "ユーザー スキーマを使用すると、ユーザーのデータスキーマを管理できます。フラグが有効になっている場合、新しい APIとその機能を使用できます。",
       "ACTIONS": "アクション",
       "ACTIONS_DESCRIPTION": "Actions v2は、データの実行とターゲットを管理できます。フラグが有効になっている場合、新しい APIとその機能を使用できます。",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 セッション終了",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "フラグが有効になっている場合、id_token を `sid` クレームと共に id_token_hint として end_session エンドポイントに提供することで、ログイン UI から単一のセッションを終了できるようになります。 現在、同じユーザー エージェント (ブラウザ) からのすべてのセッションがログイン UI で終了することに注意してください。 セッション API を通じて管理されるセッションは、すでに単一のセッションの終了を許可しています。",
+      "DEBUGOIDCPARENTERROR": "デバッグ OIDC 親エラー",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "フラグが有効になっている場合、OIDC 親エラーはコンソールに記録されます。",
+      "ENABLEBACKCHANNELLOGOUT": "バックチャネルログアウトを有効にする",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "バックチャネルログアウトは OpenID Connect バックチャネルログアウト 1.0 を実装し、OpenID プロバイダーでのセッション終了についてクライアントに通知するために使用できます。",
+      "PERMISSIONCHECKV2": "権限チェック V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "フラグが有効になっている場合、新しい API とその機能を使用できます。",
       "STATES": {
         "INHERITED": "継承",
         "ENABLED": "有効",
@@ -1479,7 +1649,14 @@
         "ENABLED": "有効は継承されます",
         "DISABLED": "無効は継承されます"
       },
-      "RESET": "すべて継承に設定"
+      "RESET": "すべて継承に設定",
+      "CONSOLEUSEV2USERAPI": "コンソールでユーザー作成のためにV2 APIを使用してください。",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "このフラグが有効化されると、コンソールはV2ユーザーAPIを使用して新しいユーザーを作成します。V2 APIでは、新しく作成されたユーザーは初期状態なしで開始します。",
+      "LOGINV2": "ログイン V2",
+      "LOGINV2_DESCRIPTION": "これを有効にすると、セキュリティ、パフォーマンス、およびカスタマイズ性が向上した、TypeScript ベースの新しいログイン UI が有効になります。",
+      "LOGINV2_BASEURI": "ベースURI",
+      "ENABLERELATIONALTABLES": "リレーショナルテーブル",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "データを保存するためにプロジェクションの代わりにリレーショナルテーブルを使用するには、これを有効にします。現在、このトグルは何もしません。"
     },
     "DIALOG": {
       "RESET": {
@@ -1527,6 +1704,10 @@
       "MAXSIZEEXCEEDED": "最大サイズの524KBを超えました。",
       "NOSVGSUPPORTED": "SVGはサポートされていません！",
       "FONTINLOGINONLY": "フォントは現在、ログインインターフェイスにのみ表示されます。",
+      "BACKGROUNDCOLOR": "背景色",
+      "PRIMARYCOLOR": "プライマリカラー",
+      "WARNCOLOR": "警告色",
+      "FONTCOLOR": "フォントカラー",
       "VIEWS": {
         "PREVIEW": "プレビュー",
         "CURRENT": "現在の構成"
@@ -1610,7 +1791,12 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română",
+        "tr": "Türkçe"
       },
       "KEYS": {
         "emailVerificationDoneText": "メール認証が完了しました",
@@ -1625,7 +1811,6 @@
         "initPasswordText": "パスワードを初期化する",
         "initializeDoneText": "ユーザーの初期化が完了しました",
         "initializeUserText": "ユーザーを初期化する",
-        "linkingUserPromptText": "ユーザーのリンクプロンプト",
         "linkingUserDoneText": "ユーザーのリンクが完了しました",
         "loginText": "ログイン",
         "logoutText": "ログアウト",
@@ -1661,7 +1846,8 @@
         "PR": "パスワードのリセット",
         "DC": "ドメインクレーム",
         "PL": "パスワードレス",
-        "PC": "パスワードの変更"
+        "PC": "パスワードの変更",
+        "IU": "ユーザーの招待"
       },
       "CHIPS": {
         "firstname": "名",
@@ -1681,7 +1867,8 @@
         "tempUsername": "一時ユーザー名",
         "otp": "ワンタイムパスワード",
         "verifyUrl": "ワンタイムパスワードを確認するURL",
-        "expiry": "有効期限"
+        "expiry": "有効期限",
+        "applicationName": "アプリケーション名"
       },
       "TOAST": {
         "UPDATED": "カスタムテキストが保存されました。"
@@ -1709,8 +1896,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "ユーザー名とパスワードを使用した従来のログインを許可します。",
       "ALLOWEXTERNALIDP_DESC": "基礎となるIDプロバイダーにログインを許可します。",
       "ALLOWREGISTER_DESC": "このオプションが選択されている場合、ユーザーを登録するための追加のステップがログインに表示されます。",
-      "FORCEMFA": "MFAを強制する",
-      "FORCEMFALOCALONLY": "ローカル ユーザーに MFA を強制する",
+      "FORCEMFA": "すべてのユーザーに MFA を強制する",
+      "FORCEMFALOCALONLY": "ローカル認証ユーザーのみに MFA を強制する",
       "FORCEMFALOCALONLY_DESC": "オプションが選択されている場合、ローカル認証されたユーザーはログインの 2 番目の要素を構成する必要があります。",
       "HIDEPASSWORDRESET_DESC": "このオプションが選択されている場合、ユーザーはログイン過程ででパスワードをリセットできません。",
       "HIDELOGINNAMESUFFIX": "ログイン名の接尾辞を非表示にする",
@@ -1779,7 +1966,7 @@
       "TYPE": {
         "OWNED": "所有プロジェクト",
         "OWNED_SINGULAR": "所有プロジェクト",
-        "GRANTED_SINGULAR": "グラントされたプロジェクト"
+        "GRANTED_SINGULAR": "{{name}}に付与されたプロジェクト"
       },
       "PRIVATELABEL": {
         "TITLE": "ブランディング設定",
@@ -1960,6 +2147,7 @@
       "ACTIVATE": "プロジェクトのアクティブ化",
       "DELETE": "プロジェクトの削除",
       "ORGNAME": "組織名",
+      "ORGID": "組織ID",
       "ORGDOMAIN": "組織ドメイン",
       "STATE": "ステータス",
       "TYPE": "タイプ",
@@ -2042,6 +2230,14 @@
       "LDAP": {
         "TITLE": "LDAPプロバイダー",
         "DESCRIPTION": "LDAPプロバイダーのクレデンシャルを入力してください。"
+      },
+      "APPLE": {
+        "TITLE": "Appleプロバイダー",
+        "DESCRIPTION": "Appleプロバイダーのクレデンシャルを入力してください。"
+      },
+      "SAML": {
+        "TITLE": "SAMLプロバイダー",
+        "DESCRIPTION": "SAMLプロバイダーのクレデンシャルを入力してください。"
       }
     },
     "DETAIL": {
@@ -2055,10 +2251,10 @@
       "ISAUTOCREATION_DESC": "選択した場合、アカウントがまだ存在しない場合はアカウントが作成されます。",
       "ISAUTOUPDATE": "自動更新",
       "ISAUTOUPDATE_DESC": "選択した場合、アカウントは再認証時に更新されます。",
-      "ISCREATIONALLOWED": "アカウント作成を許可",
-      "ISCREATIONALLOWED_DESC": "アカウントを作成できるかどうかを決めます。",
-      "ISLINKINGALLOWED": "アカウントリンクを許可",
-      "ISLINKINGALLOWED_DESC": "IDを既存のアカウントにリンクできるかどうかを決めます。",
+      "ISCREATIONALLOWED": "アカウント作成を許可 (手動)",
+      "ISCREATIONALLOWED_DESC": "外部アカウントを使用してアカウントを作成できるかどうかを決定します。 自動作成が有効になっている場合、ユーザーがアカウント情報を編集できないようにするには、無効にします。",
+      "ISLINKINGALLOWED": "アカウントリンクを許可 (手動)",
+      "ISLINKINGALLOWED_DESC": "アイデンティティを手動で既存のアカウントにリンクできるかどうかを決定します。 自動リンクがアクティブな場合は、ユーザーが提案されたアカウントのみをリンクできるようにするには、無効にします。",
       "AUTOLINKING_DESC": "アイデンティティが既存のアカウントにリンクされるように促されるかどうかを決定します。",
       "AUTOLINKINGTYPE": {
         "0": "無効",
@@ -2148,6 +2344,8 @@
     "REMOVE_WARN_DESCRIPTION": "ID プロバイダーを削除しようとしています。これにより、ユーザーが使用できる IDP の選択が削除され、すでに登録されているユーザーは再度ログインできなくなります。続けてもよろしいですか?",
     "DELETE_SELECTION_TITLE": "IDPの削除",
     "DELETE_SELECTION_DESCRIPTION": "IDプロバイダーを削除しようとしています。変更は取消できません。本当によろしいですか？",
+    "FEDERATEDLOGOUTENABLED": "フェデレーションログアウト有効",
+    "FEDERATEDLOGOUTENABLED_DESC": "有効にすると、ユーザーがZITADELでセッションを終了した場合、IdPからもログアウトされます。",
     "EMPTY": "IDPは利用できません",
     "OIDC": {
       "GENERAL": "一般",
@@ -2161,6 +2359,24 @@
       "JWTENDPOINT": "JWTエンドポイント",
       "JWTKEYSENDPOINT": "JWTキーエンドポイント"
     },
+    "APPLE": {
+      "TEAMID": "チームID",
+      "KEYID": "キーID",
+      "PRIVATEKEY": "秘密鍵",
+      "UPDATEPRIVATEKEY": "秘密鍵の更新",
+      "UPLOADPRIVATEKEY": "秘密鍵のアップロード",
+      "KEYMAXSIZEEXCEEDED": "最大サイズの5kBを超えています"
+    },
+    "SAML": {
+      "METADATAXML": "Metadata XML",
+      "METADATAURL": "Metadata URL",
+      "BINDING": "Binding",
+      "SIGNEDREQUEST": "署名付きリクエスト",
+      "SIGNATUREALGORITHM": "署名アルゴリズム",
+      "NAMEIDFORMAT": "NameIDフォーマット",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "カスタム属性名",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "NameIDフォーマットが`transient`の場合にユーザーをマッピングするためのカスタム属性名 (例: `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`)"
+    },
     "TOAST": {
       "SAVED": "正常に保存されました。",
       "REACTIVATED": "IDPがアクティブになりました。",
@@ -2173,7 +2389,9 @@
       "REMOVED": "正常に削除されました。"
     },
     "ISIDTOKENMAPPING": "IDトークンからのマッピング",
-    "ISIDTOKENMAPPING_DESC": "選択された場合、プロバイダ情報はIDトークンからマッピングされ、userinfoエンドポイントからではありません。"
+    "ISIDTOKENMAPPING_DESC": "選択された場合、プロバイダ情報はIDトークンからマッピングされ、userinfoエンドポイントからではありません。",
+    "USEPKCE": "PKCEを使用する",
+    "USEPKCE_DESC": "code_challenge パラメータと code_challenge_method パラメータが認証リクエストに含まれるかどうかを決定します。"
   },
   "MFA": {
     "LIST": {
@@ -2245,7 +2463,11 @@
         "DELETE_TITLE": "SMTP設定を削除する",
         "DELETE_DESCRIPTION": "構成を削除しようとしています。送信者名を入力してこのアクションを確認します",
         "DELETED": "SMTP設定が削除されました",
-        "SENDER": "この SMTP 構成を削除するには、「{{ value }}」と入力します。"
+        "SENDER": "この SMTP 構成を削除するには、「{{ value }}」と入力します。",
+        "TEST_TITLE": "SMTP設定をテストする",
+        "TEST_DESCRIPTION": "テスト用のメールアドレスを指定してください",
+        "TEST_EMAIL": "メールアドレス",
+        "TEST_RESULT": "テスト結果"
       }
     },
     "CREATE": {
@@ -2523,6 +2745,10 @@
       "CLIENTSECRETREGENERATED": "クライアントシークレットが生成されました。",
       "DELETED": "アプリが削除されました。",
       "CONFIGCHANGED": "変更を検出しました！"
+    },
+    "LOGINV2": {
+      "USEV2": "新しいログインUIを使用する",
+      "BASEURL": "新しいログインUIのカスタムベースURL"
     }
   },
   "GENDERS": {
@@ -2546,7 +2772,12 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia",
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română",
+    "tr": "Türkçe"
   },
   "MEMBER": {
     "ADD": "マネージャーを追加する",

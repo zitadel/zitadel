@@ -29,6 +29,7 @@ import { ProviderNextService } from '../provider-next/provider-next.service';
   selector: 'cnsl-provider-oidc',
   templateUrl: './provider-oidc.component.html',
   styleUrls: ['./provider-oidc.component.scss'],
+  standalone: false,
 })
 export class ProviderOIDCComponent {
   public showOptional: boolean = false;
@@ -85,6 +86,7 @@ export class ProviderOIDCComponent {
       issuer: new UntypedFormControl('', [requiredValidator]),
       scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
       isIdTokenMapping: new UntypedFormControl(),
+      usePkce: new UntypedFormControl(false),
     });
 
     this.route.data.pipe(take(1)).subscribe((data) => {
@@ -165,6 +167,7 @@ export class ProviderOIDCComponent {
     req.setScopesList(this.scopesList?.value);
     req.setProviderOptions(this.options);
     req.setIsIdTokenMapping(this.isIdTokenMapping?.value);
+    req.setUsePkce(this.usePkce?.value);
 
     this.loading = true;
     this.service
@@ -193,11 +196,12 @@ export class ProviderOIDCComponent {
       req.setScopesList(this.scopesList?.value);
       req.setProviderOptions(this.options);
       req.setIsIdTokenMapping(this.isIdTokenMapping?.value);
+      req.setUsePkce(this.usePkce?.value);
 
       this.loading = true;
       this.service
         .updateGenericOIDCProvider(req)
-        .then((idp) => {
+        .then(() => {
           setTimeout(() => {
             this.loading = false;
             this.close();
@@ -260,5 +264,9 @@ export class ProviderOIDCComponent {
 
   public get isIdTokenMapping(): AbstractControl | null {
     return this.form.get('isIdTokenMapping');
+  }
+
+  public get usePkce(): AbstractControl | null {
+    return this.form.get('usePkce');
   }
 }

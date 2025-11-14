@@ -94,3 +94,36 @@ func TestResponseModeToOIDC(t *testing.T) {
 		})
 	}
 }
+
+func TestPromptToBusiness(t *testing.T) {
+	type args struct {
+		oidcPrompt []string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []domain.Prompt
+	}{
+		{
+			name: "unspecified",
+			args: args{nil},
+			want: []domain.Prompt{},
+		},
+		{
+			name: "invalid",
+			args: args{[]string{"non_existing_prompt"}},
+			want: []domain.Prompt{},
+		},
+		{
+			name: "prompt_none",
+			args: args{[]string{oidc.PromptNone}},
+			want: []domain.Prompt{domain.PromptNone},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := PromptToBusiness(tt.args.oidcPrompt)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}

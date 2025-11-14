@@ -8,13 +8,7 @@
   >
     <mat-icon class="icon">refresh</mat-icon>
   </button>
-  <cnsl-refresh-table
-    [hideRefresh]="true"
-    [loading]="loading$ | async"
-    [dataSize]="dataSource.data.length"
-    [timestamp]="viewTimestamp"
-    [selection]="selection"
-  >
+  <cnsl-refresh-table [hideRefresh]="true" [loading]="loading$ | async" [timestamp]="viewTimestamp" [selection]="selection">
     <div class="table-wrapper">
       <table class="table" mat-table [dataSource]="dataSource">
         <ng-container matColumnDef="select">

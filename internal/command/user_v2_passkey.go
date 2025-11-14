@@ -6,7 +6,6 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -18,7 +17,7 @@ import (
 // RegisterUserPasskey creates a passkey registration for the current authenticated user.
 // UserID, usually taken from the request is compared against the user ID in the context.
 func (c *Commands) RegisterUserPasskey(ctx context.Context, userID, resourceOwner, rpID string, authenticator domain.AuthenticatorAttachment) (*domain.WebAuthNRegistrationDetails, error) {
-	if err := authz.UserIDInCTX(ctx, userID); err != nil {
+	if err := c.checkPermissionUpdateUserCredentials(ctx, resourceOwner, userID); err != nil {
 		return nil, err
 	}
 	return c.registerUserPasskey(ctx, userID, resourceOwner, rpID, authenticator)
@@ -48,7 +47,7 @@ func (c *Commands) verifyUserPasskeyCode(ctx context.Context, userID, resourceOw
 	if err != nil {
 		return nil, err
 	}
-	err = verifyEncryptedCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordlessInitCode, alg, wm.ChangeDate, wm.Expiration, wm.CryptoCode, code) //nolint:staticcheck
+	err = crypto.VerifyCode(wm.ChangeDate, wm.Expiration, wm.CryptoCode, code, alg)
 	if err != nil || wm.State != domain.PasswordlessInitCodeStateActive {
 		c.verifyUserPasskeyCodeFailed(ctx, wm)
 		return nil, zerrors.ThrowInvalidArgument(err, "COMMAND-Eeb2a", "Errors.User.Code.Invalid")

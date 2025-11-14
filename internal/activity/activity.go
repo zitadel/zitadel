@@ -61,7 +61,7 @@ func Trigger(ctx context.Context, orgID, userID string, trigger TriggerMethod, r
 		authz.GetInstance(ctx).InstanceID(),
 		orgID,
 		userID,
-		http_utils.ComposedOrigin(ctx),
+		http_utils.DomainContext(ctx).Origin(), // TODO: origin?
 		trigger,
 		ai.Method,
 		ai.Path,
@@ -78,7 +78,7 @@ func TriggerGRPCWithContext(ctx context.Context, trigger TriggerMethod) {
 		authz.GetInstance(ctx).InstanceID(),
 		authz.GetCtxData(ctx).OrgID,
 		authz.GetCtxData(ctx).UserID,
-		http_utils.ComposedOrigin(ctx),
+		http_utils.DomainContext(ctx).Origin(), // TODO: origin?
 		trigger,
 		ai.Method,
 		ai.Path,

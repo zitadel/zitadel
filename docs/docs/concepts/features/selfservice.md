@@ -151,6 +151,6 @@ The project is granted to the customer organization, such that the customer can 
 Given such as setup the owner might want to give one administrative user of the customer organization the role `ORG_OWNER`.
 Equipped with this Manager Role, the user can perform actions like configuring their own SSO/Identity Provider, set security policy for their organization, customize branding, or assign project or Manager roles to other users.
 
-An `ORG_OWNER` can also not only delegate Manager roles to other users [as described in the earlier section](#managers-in-isolation) but also manage all aspects of her own organization as well as authorize users to use the granted project.
+An `ORG_OWNER` can also not only delegate Manager roles to other users [as described in the earlier section](#managers-in-isolation) but also manage all aspects of their own organization as well as authorize users to use the granted project.
 With ZITADEL there is no need to replicate all settings and projects across organizations.
 Instead you set-up the project in one organization, delegate it to different organizations, and then appoint users as Managers of that organization to allow for self-service in a multi-tenancy scenario.

@@ -3,6 +3,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { RefreshService } from 'src/app/services/refresh.service';
+import { Timestamp as ConnectTimestamp } from '@bufbuild/protobuf/wkt';
 
 import { ActionKeysType } from '../action-keys/action-keys.component';
 
@@ -24,11 +25,11 @@ const rotate = animation([
   templateUrl: './refresh-table.component.html',
   styleUrls: ['./refresh-table.component.scss'],
   animations: [trigger('rotate', [transition('* => *', [useAnimation(rotate, { params: { time: '1s' } })])])],
+  standalone: false,
 })
 export class RefreshTableComponent implements OnInit {
   @Input() public selection: SelectionModel<any> = new SelectionModel<any>(true, []);
-  @Input() public timestamp: Timestamp.AsObject | undefined = undefined;
-  @Input() public dataSize: number = 0;
+  @Input() public timestamp: Timestamp.AsObject | ConnectTimestamp | undefined = undefined;
   @Input() public emitRefreshAfterTimeoutInMs: number = 0;
   @Input() public loading: boolean | null = false;
   @Input() public emitRefreshOnPreviousRoutes: string[] = [];

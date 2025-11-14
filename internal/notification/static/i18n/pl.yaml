@@ -59,3 +59,10 @@ PasswordChange:
   Greeting: Witaj {{.DisplayName}},
   Text: Hasło Twojego użytkownika zostało zmienione, jeśli ta zmiana nie została dokonana przez Ciebie, zalecamy natychmiastowe zresetowanie hasła.
   ButtonText: Zaloguj się
+InviteUser:
+  Title: Zaproszenie do {{.ApplicationName}}
+  PreHeader: Zaproszenie do {{.ApplicationName}}
+  Subject: Zaproszenie do {{.ApplicationName}}
+  Greeting: Witaj {{.DisplayName}},
+  Text: Twój użytkownik został zaproszony do {{.ApplicationName}}. Kliknij poniższy przycisk, aby zakończyć proces zaproszenia. Jeśli nie zażądałeś tego e-maila, zignoruj go.
+  ButtonText: Akceptuj zaproszenie

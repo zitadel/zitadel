@@ -5,7 +5,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 )
@@ -253,22 +252,6 @@ func UserAuthMethodToWebAuthNTokenPb(token *query.AuthMethod) *user_pb.WebAuthNT
 		State: MFAStateToPb(token.State),
 		Name:  token.Name,
 	}
-}
-
-func ExternalIDPViewsToExternalIDPs(externalIDPs []*query.IDPUserLink) []*domain.UserIDPLink {
-	idps := make([]*domain.UserIDPLink, len(externalIDPs))
-	for i, idp := range externalIDPs {
-		idps[i] = &domain.UserIDPLink{
-			ObjectRoot: models.ObjectRoot{
-				AggregateID:   idp.UserID,
-				ResourceOwner: idp.ResourceOwner,
-			},
-			IDPConfigID:    idp.IDPID,
-			ExternalUserID: idp.ProvidedUserID,
-			DisplayName:    idp.ProvidedUsername,
-		}
-	}
-	return idps
 }
 
 func TypeToPb(userType domain.UserType) user_pb.Type {

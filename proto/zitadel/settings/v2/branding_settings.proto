@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+package zitadel.settings.v2;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "zitadel/settings/v2/settings.proto";
+
+message BrandingSettings {
+  // Theme used for light mode.
+  Theme light_theme = 1;
+
+  // Theme used for dark mode.
+  Theme dark_theme = 2;
+
+  // The url where the font is served.
+  string font_url = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"https://acme.com/assets/v1/165617850692654601/policy/label/font-180950243237405441\"";
+    }
+  ];
+
+  // If enabled, the organization suffix will be hidden on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is used.
+  bool hide_login_name_suffix = 4;
+
+  // If enabled, the Zitadel logo will not be displayed on the login screen.
+  bool disable_watermark = 5;
+
+  // ResourceOwnerType returns if the setting is managed on the organization explicitly or
+  // fell back on the instance settings.
+  ResourceOwnerType resource_owner_type = 6;
+
+  // States which themes will be used. If auto is selected, the theme will be changed based on the users system preferences.
+  // You can also choose to only allow dark or light theme.
+  ThemeMode theme_mode = 7;
+}
+
+message Theme {
+  // The hex value for primary color.
+  string primary_color = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"#5469d4\"";
+    }
+  ];
+
+  // The hex value for background color.
+  string background_color = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"#FAFAFA\"";
+    }
+  ];
+
+  // The hex value for warning color.
+  string warn_color = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"#CD3D56\"";
+    }
+  ];
+
+  // The value for font color.
+  string font_color = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"#000000\"";
+    }
+  ];
+
+  // The URL where the logo is served.
+  string logo_url = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"https://acme.com/assets/v1/165617850692654601/policy/label/logo-180950416321494657\"";
+    }
+  ];
+
+  // The URL where the icon is served.
+  string icon_url = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"https://acme.com/assets/v1/165617850692654601/policy/label/icon-180950498874178817\"";
+    }
+  ];
+}
+
+enum ThemeMode {
+  THEME_MODE_UNSPECIFIED = 0;
+  THEME_MODE_AUTO = 1;
+  THEME_MODE_LIGHT = 2;
+  THEME_MODE_DARK = 3;
+}

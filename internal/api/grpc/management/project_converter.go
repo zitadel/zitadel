@@ -3,10 +3,13 @@ package management
 import (
 	"context"
 
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	member_grpc "github.com/zitadel/zitadel/internal/api/grpc/member"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	proj_grpc "github.com/zitadel/zitadel/internal/api/grpc/project"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
@@ -14,8 +17,12 @@ import (
 	proj_pb "github.com/zitadel/zitadel/pkg/grpc/project"
 )
 
-func ProjectCreateToDomain(req *mgmt_pb.AddProjectRequest) *domain.Project {
-	return &domain.Project{
+func ProjectCreateToCommand(req *mgmt_pb.AddProjectRequest, projectID string, resourceOwner string) *command.AddProject {
+	return &command.AddProject{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   projectID,
+			ResourceOwner: resourceOwner,
+		},
 		Name:                   req.Name,
 		ProjectRoleAssertion:   req.ProjectRoleAssertion,
 		ProjectRoleCheck:       req.ProjectRoleCheck,
@@ -24,16 +31,17 @@ func ProjectCreateToDomain(req *mgmt_pb.AddProjectRequest) *domain.Project {
 	}
 }
 
-func ProjectUpdateToDomain(req *mgmt_pb.UpdateProjectRequest) *domain.Project {
-	return &domain.Project{
+func ProjectUpdateToCommand(req *mgmt_pb.UpdateProjectRequest, resourceOwner string) *command.ChangeProject {
+	return &command.ChangeProject{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.Id,
+			AggregateID:   req.Id,
+			ResourceOwner: resourceOwner,
 		},
-		Name:                   req.Name,
-		ProjectRoleAssertion:   req.ProjectRoleAssertion,
-		ProjectRoleCheck:       req.ProjectRoleCheck,
-		HasProjectCheck:        req.HasProjectCheck,
-		PrivateLabelingSetting: privateLabelingSettingToDomain(req.PrivateLabelingSetting),
+		Name:                   gu.Ptr(req.Name),
+		ProjectRoleAssertion:   gu.Ptr(req.ProjectRoleAssertion),
+		ProjectRoleCheck:       gu.Ptr(req.ProjectRoleCheck),
+		HasProjectCheck:        gu.Ptr(req.HasProjectCheck),
+		PrivateLabelingSetting: gu.Ptr(privateLabelingSettingToDomain(req.PrivateLabelingSetting)),
 	}
 }
 
@@ -48,10 +56,11 @@ func privateLabelingSettingToDomain(setting proj_pb.PrivateLabelingSetting) doma
 	}
 }
 
-func AddProjectRoleRequestToDomain(req *mgmt_pb.AddProjectRoleRequest) *domain.ProjectRole {
-	return &domain.ProjectRole{
+func AddProjectRoleRequestToCommand(req *mgmt_pb.AddProjectRoleRequest, resourceOwner string) *command.AddProjectRole {
+	return &command.AddProjectRole{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.ProjectId,
+			AggregateID:   req.ProjectId,
+			ResourceOwner: resourceOwner,
 		},
 		Key:         req.RoleKey,
 		DisplayName: req.DisplayName,
@@ -59,12 +68,13 @@ func AddProjectRoleRequestToDomain(req *mgmt_pb.AddProjectRoleRequest) *domain.P
 	}
 }
 
-func BulkAddProjectRolesRequestToDomain(req *mgmt_pb.BulkAddProjectRolesRequest) []*domain.ProjectRole {
-	roles := make([]*domain.ProjectRole, len(req.Roles))
+func BulkAddProjectRolesRequestToCommand(req *mgmt_pb.BulkAddProjectRolesRequest, resourceOwner string) []*command.AddProjectRole {
+	roles := make([]*command.AddProjectRole, len(req.Roles))
 	for i, role := range req.Roles {
-		roles[i] = &domain.ProjectRole{
+		roles[i] = &command.AddProjectRole{
 			ObjectRoot: models.ObjectRoot{
-				AggregateID: req.ProjectId,
+				AggregateID:   req.ProjectId,
+				ResourceOwner: resourceOwner,
 			},
 			Key:         role.Key,
 			DisplayName: role.DisplayName,
@@ -74,10 +84,11 @@ func BulkAddProjectRolesRequestToDomain(req *mgmt_pb.BulkAddProjectRolesRequest)
 	return roles
 }
 
-func UpdateProjectRoleRequestToDomain(req *mgmt_pb.UpdateProjectRoleRequest) *domain.ProjectRole {
-	return &domain.ProjectRole{
+func UpdateProjectRoleRequestToCommand(req *mgmt_pb.UpdateProjectRoleRequest, resourceOwner string) *command.ChangeProjectRole {
+	return &command.ChangeProjectRole{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.ProjectId,
+			AggregateID:   req.ProjectId,
+			ResourceOwner: resourceOwner,
 		},
 		Key:         req.RoleKey,
 		DisplayName: req.DisplayName,
@@ -93,12 +104,22 @@ func ProjectGrantsToIDs(projectGrants *query.ProjectGrants) []string {
 	return converted
 }
 
-func AddProjectMemberRequestToDomain(req *mgmt_pb.AddProjectMemberRequest) *domain.Member {
-	return domain.NewMember(req.ProjectId, req.UserId, req.Roles...)
+func AddProjectMemberRequestToCommand(req *mgmt_pb.AddProjectMemberRequest, orgID string) *command.AddProjectMember {
+	return &command.AddProjectMember{
+		ResourceOwner: orgID,
+		ProjectID:     req.ProjectId,
+		UserID:        req.UserId,
+		Roles:         req.Roles,
+	}
 }
 
-func UpdateProjectMemberRequestToDomain(req *mgmt_pb.UpdateProjectMemberRequest) *domain.Member {
-	return domain.NewMember(req.ProjectId, req.UserId, req.Roles...)
+func UpdateProjectMemberRequestToCommand(req *mgmt_pb.UpdateProjectMemberRequest, orgID string) *command.ChangeProjectMember {
+	return &command.ChangeProjectMember{
+		ResourceOwner: orgID,
+		ProjectID:     req.ProjectId,
+		UserID:        req.UserId,
+		Roles:         req.Roles,
+	}
 }
 
 func listProjectRequestToModel(req *mgmt_pb.ListProjectsRequest) (*query.ProjectSearchQueries, error) {

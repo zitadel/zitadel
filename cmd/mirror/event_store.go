@@ -8,7 +8,9 @@ import (
 	"io"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/stdlib"
+	"github.com/shopspring/decimal"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
@@ -44,11 +46,11 @@ Migrate only copies events2 and unique constraints`,
 }
 
 func copyEventstore(ctx context.Context, config *Migration) {
-	sourceClient, err := db.Connect(config.Source, false, dialect.DBPurposeQuery)
+	sourceClient, err := db.Connect(config.Source, false)
 	logging.OnError(err).Fatal("unable to connect to source database")
 	defer sourceClient.Close()
 
-	destClient, err := db.Connect(config.Destination, false, dialect.DBPurposeEventPusher)
+	destClient, err := db.Connect(config.Destination, false)
 	logging.OnError(err).Fatal("unable to connect to destination database")
 	defer destClient.Close()
 
@@ -58,9 +60,9 @@ func copyEventstore(ctx context.Context, config *Migration) {
 
 func positionQuery(db *db.DB) string {
 	switch db.Type() {
-	case "postgres":
+	case dialect.DatabaseTypePostgres:
 		return "SELECT EXTRACT(EPOCH FROM clock_timestamp())"
-	case "cockroach":
+	case dialect.DatabaseTypeCockroach:
 		return "SELECT cluster_logical_timestamp()"
 	default:
 		logging.WithFields("db_type", db.Type()).Fatal("database type not recognized")
@@ -69,6 +71,7 @@ func positionQuery(db *db.DB) string {
 }
 
 func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
+	logging.Info("starting to copy events")
 	start := time.Now()
 	reader, writer := io.Pipe()
 
@@ -81,9 +84,6 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	destConn, err := dest.Conn(ctx)
 	logging.OnError(err).Fatal("unable to acquire dest connection")
 
-	sourceES := eventstore.NewEventstoreFromOne(postgres.New(source, &postgres.Config{
-		MaxRetries: 3,
-	}))
 	destinationES := eventstore.NewEventstoreFromOne(postgres.New(dest, &postgres.Config{
 		MaxRetries: 3,
 	}))
@@ -91,13 +91,19 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	previousMigration, err := queryLastSuccessfulMigration(ctx, destinationES, source.DatabaseName())
 	logging.OnError(err).Fatal("unable to query latest successful migration")
 
-	maxPosition, err := writeMigrationStart(ctx, sourceES, migrationID, dest.DatabaseName())
-	logging.OnError(err).Fatal("unable to write migration started event")
+	var maxPosition decimal.Decimal
+	err = source.QueryRowContext(ctx,
+		func(row *sql.Row) error {
+			return row.Scan(&maxPosition)
+		},
+		"SELECT MAX(position) FROM eventstore.events2 "+instanceClause(),
+	)
+	logging.OnError(err).Fatal("unable to query max position from source")
 
 	logging.WithFields("from", previousMigration.Position, "to", maxPosition).Info("start event migration")
 
 	nextPos := make(chan bool, 1)
-	pos := make(chan float64, 1)
+	pos := make(chan decimal.Decimal, 1)
 	errs := make(chan error, 3)
 
 	go func() {
@@ -127,7 +133,10 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 				if err != nil {
 					return zerrors.ThrowUnknownf(err, "MIGRA-KTuSq", "unable to copy events from source during iteration %d", i)
 				}
+				logging.WithFields("batch_count", i).Info("batch of events copied")
+
 				if tag.RowsAffected() < int64(bulkSize) {
+					logging.WithFields("batch_count", i).Info("last batch of events copied")
 					return nil
 				}
 
@@ -145,7 +154,7 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	go func() {
 		defer close(pos)
 		for range nextPos {
-			var position float64
+			var position decimal.Decimal
 			err := dest.QueryRowContext(
 				ctx,
 				func(row *sql.Row) error {
@@ -168,6 +177,10 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 		tag, err := conn.PgConn().CopyFrom(ctx, reader, "COPY eventstore.events2 FROM STDIN")
 		eventCount = tag.RowsAffected()
 		if err != nil {
+			pgErr := new(pgconn.PgError)
+			errors.As(err, &pgErr)
+
+			logging.WithError(err).WithField("pg_err_details", pgErr.Detail).Error("unable to copy events into destination")
 			return zerrors.ThrowUnknown(err, "MIGRA-DTHi7", "unable to copy events into destination")
 		}
 
@@ -180,7 +193,7 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	logging.WithFields("took", time.Since(start), "count", eventCount).Info("events migrated")
 }
 
-func writeCopyEventsDone(ctx context.Context, es *eventstore.EventStore, id, source string, position float64, errs <-chan error) {
+func writeCopyEventsDone(ctx context.Context, es *eventstore.EventStore, id, source string, position decimal.Decimal, errs <-chan error) {
 	joinedErrs := make([]error, 0, len(errs))
 	for err := range errs {
 		joinedErrs = append(joinedErrs, err)
@@ -199,6 +212,7 @@ func writeCopyEventsDone(ctx context.Context, es *eventstore.EventStore, id, sou
 }
 
 func copyUniqueConstraints(ctx context.Context, source, dest *db.DB) {
+	logging.Info("starting to copy unique constraints")
 	start := time.Now()
 	reader, writer := io.Pipe()
 	errs := make(chan error, 1)

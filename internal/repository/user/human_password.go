@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -62,7 +63,7 @@ func NewHumanPasswordChangedEvent(
 		EncodedHash:       encodeHash,
 		ChangeRequired:    changeRequired,
 		UserAgentID:       userAgentID,
-		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 	}
 }
 
@@ -89,6 +90,7 @@ type HumanPasswordCodeAddedEvent struct {
 	TriggeredAtOrigin string                  `json:"triggerOrigin,omitempty"`
 	// AuthRequest is only used in V1 Login UI
 	AuthRequestID string `json:"authRequestID,omitempty"`
+	GeneratorID   string `json:"generatorId,omitempty"`
 }
 
 func (e *HumanPasswordCodeAddedEvent) Payload() interface{} {
@@ -109,7 +111,8 @@ func NewHumanPasswordCodeAddedEvent(
 	code *crypto.CryptoValue,
 	expiry time.Duration,
 	notificationType domain.NotificationType,
-	authRequestID string,
+	authRequestID,
+	generatorID string,
 ) *HumanPasswordCodeAddedEvent {
 	return &HumanPasswordCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -120,8 +123,9 @@ func NewHumanPasswordCodeAddedEvent(
 		Code:              code,
 		Expiry:            expiry,
 		NotificationType:  notificationType,
-		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 		AuthRequestID:     authRequestID,
+		GeneratorID:       generatorID,
 	}
 }
 
@@ -133,6 +137,7 @@ func NewHumanPasswordCodeAddedEventV2(
 	notificationType domain.NotificationType,
 	urlTemplate string,
 	codeReturned bool,
+	generatorID string,
 ) *HumanPasswordCodeAddedEvent {
 	return &HumanPasswordCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -145,7 +150,8 @@ func NewHumanPasswordCodeAddedEventV2(
 		NotificationType:  notificationType,
 		URLTemplate:       urlTemplate,
 		CodeReturned:      codeReturned,
-		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
+		GeneratorID:       generatorID,
 	}
 }
 
@@ -162,31 +168,32 @@ func HumanPasswordCodeAddedEventMapper(event eventstore.Event) (eventstore.Event
 }
 
 type HumanPasswordCodeSentEvent struct {
-	eventstore.BaseEvent `json:"-"`
+	*eventstore.BaseEvent `json:"-"`
+
+	GeneratorInfo *senders.CodeGeneratorInfo `json:"generatorInfo,omitempty"`
+}
+
+func (e *HumanPasswordCodeSentEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
 }
 
 func (e *HumanPasswordCodeSentEvent) Payload() interface{} {
-	return nil
+	return e
 }
 
 func (e *HumanPasswordCodeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func NewHumanPasswordCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPasswordCodeSentEvent {
+func NewHumanPasswordCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate, generatorInfo *senders.CodeGeneratorInfo) *HumanPasswordCodeSentEvent {
 	return &HumanPasswordCodeSentEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			HumanPasswordCodeSentType,
 		),
+		GeneratorInfo: generatorInfo,
 	}
-}
-
-func HumanPasswordCodeSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	return &HumanPasswordCodeSentEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
 }
 
 type HumanPasswordChangeSentEvent struct {

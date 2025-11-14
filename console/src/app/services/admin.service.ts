@@ -72,6 +72,8 @@ import {
   GetCustomPasswordChangeMessageTextResponse,
   GetCustomPasswordlessRegistrationMessageTextRequest,
   GetCustomPasswordlessRegistrationMessageTextResponse,
+  GetCustomInviteUserMessageTextRequest,
+  GetCustomInviteUserMessageTextResponse,
   GetCustomPasswordResetMessageTextRequest,
   GetCustomPasswordResetMessageTextResponse,
   GetCustomVerifyEmailMessageTextRequest,
@@ -96,6 +98,8 @@ import {
   GetDefaultPasswordChangeMessageTextResponse,
   GetDefaultPasswordlessRegistrationMessageTextRequest,
   GetDefaultPasswordlessRegistrationMessageTextResponse,
+  GetDefaultInviteUserMessageTextRequest,
+  GetDefaultInviteUserMessageTextResponse,
   GetDefaultPasswordResetMessageTextRequest,
   GetDefaultPasswordResetMessageTextResponse,
   GetDefaultVerifyEmailMessageTextRequest,
@@ -167,8 +171,6 @@ import {
   ListLoginPolicySecondFactorsResponse,
   ListMilestonesRequest,
   ListMilestonesResponse,
-  ListOrgsRequest,
-  ListOrgsResponse,
   ListProvidersRequest,
   ListProvidersResponse,
   ListSecretGeneratorsRequest,
@@ -224,6 +226,8 @@ import {
   SetDefaultPasswordChangeMessageTextResponse,
   SetDefaultPasswordlessRegistrationMessageTextRequest,
   SetDefaultPasswordlessRegistrationMessageTextResponse,
+  SetDefaultInviteUserMessageTextRequest,
+  SetDefaultInviteUserMessageTextResponse,
   SetDefaultPasswordResetMessageTextRequest,
   SetDefaultPasswordResetMessageTextResponse,
   SetDefaultVerifyEmailMessageTextRequest,
@@ -301,7 +305,6 @@ import {
   UpdateSMTPConfigRequest,
   UpdateSMTPConfigResponse,
 } from '../proto/generated/zitadel/admin_pb';
-import { Event } from '../proto/generated/zitadel/event_pb';
 import {
   ResetCustomDomainClaimedMessageTextToDefaultRequest,
   ResetCustomDomainClaimedMessageTextToDefaultResponse,
@@ -311,6 +314,8 @@ import {
   ResetCustomPasswordChangeMessageTextToDefaultResponse,
   ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest,
   ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse,
+  ResetCustomInviteUserMessageTextToDefaultRequest,
+  ResetCustomInviteUserMessageTextToDefaultResponse,
   ResetCustomPasswordResetMessageTextToDefaultRequest,
   ResetCustomPasswordResetMessageTextToDefaultResponse,
   ResetCustomVerifyEmailMessageTextToDefaultRequest,
@@ -332,9 +337,6 @@ import {
   MilestoneQuery,
   MilestoneType,
 } from '../proto/generated/zitadel/milestone/v1/milestone_pb';
-import { OrgFieldName, OrgQuery } from '../proto/generated/zitadel/org_pb';
-import { SortDirection } from '@angular/material/sort';
-import { SMTPConfig } from '../proto/generated/zitadel/settings_pb';
 
 export interface OnboardingActions {
   order: number;
@@ -720,6 +722,32 @@ export class AdminService {
     const req = new ResetCustomPasswordChangeMessageTextToDefaultRequest();
     req.setLanguage(lang);
     return this.grpcService.admin.resetCustomPasswordChangeMessageTextToDefault(req, null).then((resp) => resp.toObject());
+  }
+
+  public getDefaultInviteUserMessageText(
+    req: GetDefaultInviteUserMessageTextRequest,
+  ): Promise<GetDefaultInviteUserMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getDefaultInviteUserMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public getCustomInviteUserMessageText(
+    req: GetCustomInviteUserMessageTextRequest,
+  ): Promise<GetCustomInviteUserMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getCustomInviteUserMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public setDefaultInviteUserMessageText(
+    req: SetDefaultInviteUserMessageTextRequest,
+  ): Promise<SetDefaultInviteUserMessageTextResponse.AsObject> {
+    return this.grpcService.admin.setDefaultInviteUserMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public resetCustomInviteUserMessageTextToDefault(
+    lang: string,
+  ): Promise<ResetCustomInviteUserMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomInviteUserMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.admin.resetCustomInviteUserMessageTextToDefault(req, null).then((resp) => resp.toObject());
   }
 
   public SetUpOrg(org: SetUpOrgRequest.Org, human: SetUpOrgRequest.Human): Promise<SetUpOrgResponse.AsObject> {
@@ -1369,34 +1397,5 @@ export class AdminService {
 
   public listMilestones(req: ListMilestonesRequest): Promise<ListMilestonesResponse.AsObject> {
     return this.grpcService.admin.listMilestones(req, null).then((resp) => resp.toObject());
-  }
-
-  public listOrgs(
-    limit: number,
-    offset: number,
-    queriesList?: OrgQuery[],
-    sortingColumn?: OrgFieldName,
-    sortingDirection?: SortDirection,
-  ): Promise<ListOrgsResponse.AsObject> {
-    const req = new ListOrgsRequest();
-    const query = new ListQuery();
-    if (limit) {
-      query.setLimit(limit);
-    }
-    if (offset) {
-      query.setOffset(offset);
-    }
-    if (sortingDirection) {
-      query.setAsc(sortingDirection === 'asc');
-    }
-    req.setQuery(query);
-    if (sortingColumn) {
-      req.setSortingColumn(sortingColumn);
-    }
-
-    if (queriesList) {
-      req.setQueriesList(queriesList);
-    }
-    return this.grpcService.admin.listOrgs(req, null).then((resp) => resp.toObject());
   }
 }

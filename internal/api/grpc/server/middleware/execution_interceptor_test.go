@@ -11,67 +11,36 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/structpb"
 
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/execution"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 )
 
-var _ execution.Target = &mockExecutionTarget{}
-
-type mockExecutionTarget struct {
-	InstanceID       string
-	ExecutionID      string
-	TargetID         string
-	TargetType       domain.TargetType
-	Endpoint         string
-	Timeout          time.Duration
-	InterruptOnError bool
-}
-
-func (e *mockExecutionTarget) SetEndpoint(endpoint string) {
-	e.Endpoint = endpoint
-}
-func (e *mockExecutionTarget) IsInterruptOnError() bool {
-	return e.InterruptOnError
-}
-func (e *mockExecutionTarget) GetEndpoint() string {
-	return e.Endpoint
-}
-func (e *mockExecutionTarget) GetTargetType() domain.TargetType {
-	return e.TargetType
-}
-func (e *mockExecutionTarget) GetTimeout() time.Duration {
-	return e.Timeout
-}
-func (e *mockExecutionTarget) GetTargetID() string {
-	return e.TargetID
-}
-func (e *mockExecutionTarget) GetExecutionID() string {
-	return e.ExecutionID
-}
-
-type mockContentRequest struct {
-	Content string
-}
-
-func newMockContentRequest(content string) *mockContentRequest {
-	return &mockContentRequest{
-		Content: content,
+func newMockContentRequest(content string) proto.Message {
+	return &structpb.Struct{
+		Fields: map[string]*structpb.Value{
+			"content": {
+				Kind: &structpb.Value_StringValue{StringValue: content},
+			},
+		},
 	}
 }
 
 func newMockContextInfoRequest(fullMethod, request string) *ContextInfoRequest {
 	return &ContextInfoRequest{
 		FullMethod: fullMethod,
-		Request:    newMockContentRequest(request),
+		Request:    Message{Message: newMockContentRequest(request)},
 	}
 }
 
 func newMockContextInfoResponse(fullMethod, request, response string) *ContextInfoResponse {
 	return &ContextInfoResponse{
 		FullMethod: fullMethod,
-		Request:    newMockContentRequest(request),
-		Response:   newMockContentRequest(response),
+		Request:    Message{Message: newMockContentRequest(request)},
+		Response:   Message{Message: newMockContentRequest(response)},
 	}
 }
 
@@ -85,7 +54,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 	type args struct {
 		ctx context.Context
 
-		executionTargets []execution.Target
+		executionTargets []target_domain.Target
 		targets          []target
 		fullMethod       string
 		req              interface{}
@@ -116,7 +85,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:              context.Background(),
 				fullMethod:       "/service/method",
-				executionTargets: []execution.Target{},
+				executionTargets: []target_domain.Target{},
 				req:              newMockContentRequest("request"),
 			},
 			res{
@@ -128,12 +97,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
 					},
@@ -150,12 +118,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:  "instance",
-						ExecutionID: "request./zitadel.session.v2beta.SessionService/SetSession",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID: "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:    "target",
-						TargetType:  domain.TargetTypeCall,
+						TargetType:  target_domain.TargetTypeCall,
 						Timeout:     time.Minute,
 					},
 				},
@@ -178,12 +145,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
 					},
@@ -208,12 +174,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Second,
 						InterruptOnError: true,
 					},
@@ -237,12 +202,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Second,
 						InterruptOnError: true,
 					},
@@ -261,12 +225,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
 					},
@@ -290,12 +253,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:  "instance",
-						ExecutionID: "request./zitadel.session.v2beta.SessionService/SetSession",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID: "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:    "target",
-						TargetType:  domain.TargetTypeAsync,
+						TargetType:  target_domain.TargetTypeAsync,
 						Timeout:     time.Second,
 					},
 				},
@@ -318,12 +280,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:  "instance",
-						ExecutionID: "request./zitadel.session.v2beta.SessionService/SetSession",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID: "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:    "target",
-						TargetType:  domain.TargetTypeAsync,
+						TargetType:  target_domain.TargetTypeAsync,
 						Timeout:     time.Minute,
 					},
 				},
@@ -346,12 +307,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
-						TargetType:       domain.TargetTypeWebhook,
+						TargetType:       target_domain.TargetTypeWebhook,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
 					},
@@ -374,12 +334,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
-						TargetType:       domain.TargetTypeWebhook,
+						TargetType:       target_domain.TargetTypeWebhook,
 						Timeout:          time.Second,
 						InterruptOnError: true,
 					},
@@ -403,12 +362,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
-						TargetType:       domain.TargetTypeWebhook,
+						TargetType:       target_domain.TargetTypeWebhook,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
 					},
@@ -432,28 +390,25 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target1",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
 					},
-					&mockExecutionTarget{
-						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+					{
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target2",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
 					},
-					&mockExecutionTarget{
-						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+					{
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target3",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
 					},
@@ -490,28 +445,25 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target1",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
 					},
-					&mockExecutionTarget{
-						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+					{
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target2",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Second,
 						InterruptOnError: true,
 					},
-					&mockExecutionTarget{
-						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+					{
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target3",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Second,
 						InterruptOnError: true,
 					},
@@ -554,8 +506,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 					target.respBody,
 				)
 
-				et := tt.args.executionTargets[i].(*mockExecutionTarget)
-				et.SetEndpoint(url)
+				tt.args.executionTargets[i].Endpoint = url
 				closeFuncs[i] = closeF
 			}
 
@@ -564,6 +515,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				tt.args.executionTargets,
 				tt.args.fullMethod,
 				tt.args.req,
+				nil,
 			)
 
 			if tt.res.wantErr {
@@ -571,7 +523,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
-			assert.Equal(t, tt.res.want, resp)
+			assert.EqualExportedValues(t, tt.res.want, resp)
 
 			for _, closeF := range closeFuncs {
 				closeF()
@@ -612,12 +564,12 @@ func testServerCall(
 		time.Sleep(sleep)
 
 		w.Header().Set("Content-Type", "application/json")
-		resp, err := json.Marshal(respBody)
+		resp, err := protojson.Marshal(respBody.(proto.Message))
 		if err != nil {
 			http.Error(w, "error", http.StatusInternalServerError)
 			return
 		}
-		if _, err := io.WriteString(w, string(resp)); err != nil {
+		if _, err := w.Write(resp); err != nil {
 			http.Error(w, "error", http.StatusInternalServerError)
 			return
 		}
@@ -638,7 +590,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 	type args struct {
 		ctx context.Context
 
-		executionTargets []execution.Target
+		executionTargets []target_domain.Target
 		targets          []target
 		fullMethod       string
 		req              interface{}
@@ -671,7 +623,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 			args{
 				ctx:              context.Background(),
 				fullMethod:       "/service/method",
-				executionTargets: []execution.Target{},
+				executionTargets: []target_domain.Target{},
 				req:              newMockContentRequest("request"),
 				resp:             newMockContentRequest("response"),
 			},
@@ -684,12 +636,11 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
 					},
@@ -702,7 +653,8 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 						statusCode: http.StatusOK,
 					},
 				},
-				req: []byte{},
+				req:  newMockContentRequest(""),
+				resp: newMockContentRequest(""),
 			},
 			res{
 				wantErr: true,
@@ -713,12 +665,11 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
-						ExecutionID:      "response./zitadel.session.v2beta.SessionService/SetSession",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID:      "response./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
 					},
@@ -750,8 +701,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 					target.respBody,
 				)
 
-				et := tt.args.executionTargets[i].(*mockExecutionTarget)
-				et.SetEndpoint(url)
+				tt.args.executionTargets[i].Endpoint = url
 				closeFuncs[i] = closeF
 			}
 
@@ -761,6 +711,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 				tt.args.fullMethod,
 				tt.args.req,
 				tt.args.resp,
+				nil,
 			)
 
 			if tt.res.wantErr {
@@ -768,7 +719,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
-			assert.Equal(t, tt.res.want, resp)
+			assert.EqualExportedValues(t, tt.res.want, resp)
 
 			for _, closeF := range closeFuncs {
 				closeF()

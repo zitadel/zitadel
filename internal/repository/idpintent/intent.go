@@ -3,6 +3,7 @@ package idpintent
 import (
 	"context"
 	"net/url"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -16,14 +17,16 @@ const (
 	SAMLRequestEventType   = instanceEventTypePrefix + "saml.requested"
 	LDAPSucceededEventType = instanceEventTypePrefix + "ldap.succeeded"
 	FailedEventType        = instanceEventTypePrefix + "failed"
+	ConsumedEventType      = instanceEventTypePrefix + "consumed"
 )
 
 type StartedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	SuccessURL *url.URL `json:"successURL"`
-	FailureURL *url.URL `json:"failureURL"`
-	IDPID      string   `json:"idpId"`
+	SuccessURL   *url.URL       `json:"successURL"`
+	FailureURL   *url.URL       `json:"failureURL"`
+	IDPID        string         `json:"idpId"`
+	IDPArguments map[string]any `json:"idpArguments,omitempty"`
 }
 
 func NewStartedEvent(
@@ -32,6 +35,7 @@ func NewStartedEvent(
 	successURL,
 	failureURL *url.URL,
 	idpID string,
+	idpArguments map[string]any,
 ) *StartedEvent {
 	return &StartedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -39,9 +43,10 @@ func NewStartedEvent(
 			aggregate,
 			StartedEventType,
 		),
-		SuccessURL: successURL,
-		FailureURL: failureURL,
-		IDPID:      idpID,
+		SuccessURL:   successURL,
+		FailureURL:   failureURL,
+		IDPID:        idpID,
+		IDPArguments: idpArguments,
 	}
 }
 
@@ -76,6 +81,7 @@ type SucceededEvent struct {
 
 	IDPAccessToken *crypto.CryptoValue `json:"idpAccessToken,omitempty"`
 	IDPIDToken     string              `json:"idpIdToken,omitempty"`
+	ExpiresAt      time.Time           `json:"expiresAt,omitempty"`
 }
 
 func NewSucceededEvent(
@@ -87,6 +93,7 @@ func NewSucceededEvent(
 	userID string,
 	idpAccessToken *crypto.CryptoValue,
 	idpIDToken string,
+	expiresAt time.Time,
 ) *SucceededEvent {
 	return &SucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -100,6 +107,7 @@ func NewSucceededEvent(
 		UserID:         userID,
 		IDPAccessToken: idpAccessToken,
 		IDPIDToken:     idpIDToken,
+		ExpiresAt:      expiresAt,
 	}
 }
 
@@ -133,6 +141,7 @@ type SAMLSucceededEvent struct {
 	UserID      string `json:"userId,omitempty"`
 
 	Assertion *crypto.CryptoValue `json:"assertion,omitempty"`
+	ExpiresAt time.Time           `json:"expiresAt,omitempty"`
 }
 
 func NewSAMLSucceededEvent(
@@ -143,6 +152,7 @@ func NewSAMLSucceededEvent(
 	idpUserName,
 	userID string,
 	assertion *crypto.CryptoValue,
+	expiresAt time.Time,
 ) *SAMLSucceededEvent {
 	return &SAMLSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -155,6 +165,7 @@ func NewSAMLSucceededEvent(
 		IDPUserName: idpUserName,
 		UserID:      userID,
 		Assertion:   assertion,
+		ExpiresAt:   expiresAt,
 	}
 }
 
@@ -230,6 +241,7 @@ type LDAPSucceededEvent struct {
 	UserID      string `json:"userId,omitempty"`
 
 	EntryAttributes map[string][]string `json:"user,omitempty"`
+	ExpiresAt       time.Time           `json:"expiresAt,omitempty"`
 }
 
 func NewLDAPSucceededEvent(
@@ -240,6 +252,7 @@ func NewLDAPSucceededEvent(
 	idpUserName,
 	userID string,
 	attributes map[string][]string,
+	expiresAt time.Time,
 ) *LDAPSucceededEvent {
 	return &LDAPSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -252,6 +265,7 @@ func NewLDAPSucceededEvent(
 		IDPUserName:     idpUserName,
 		UserID:          userID,
 		EntryAttributes: attributes,
+		ExpiresAt:       expiresAt,
 	}
 }
 
@@ -316,4 +330,33 @@ func FailedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 
 	return e, nil
+}
+
+type ConsumedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func NewConsumedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *ConsumedEvent {
+	return &ConsumedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			ConsumedEventType,
+		),
+	}
+}
+
+func (e *ConsumedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *ConsumedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func (e *ConsumedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
 }

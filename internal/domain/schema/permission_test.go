@@ -14,7 +14,7 @@ import (
 
 func TestPermissionExtension(t *testing.T) {
 	type args struct {
-		role     role
+		role     Role
 		schema   string
 		instance string
 	}
@@ -83,7 +83,7 @@ func TestPermissionExtension(t *testing.T) {
 			},
 		},
 		{
-			"invalid role, compilation err",
+			"invalid Role, compilation err",
 			args{
 				schema: `{
 							"type": "object",
@@ -98,13 +98,13 @@ func TestPermissionExtension(t *testing.T) {
 						}`,
 			},
 			want{
-				compilationErr: zerrors.ThrowInvalidArgument(nil, "SCHEMA-GFjio", "invalid permission role"),
+				compilationErr: zerrors.ThrowInvalidArgument(nil, "SCHEMA-GFjio", "invalid permission Role"),
 			},
 		},
 		{
 			"invalid permission self, validation err",
 			args{
-				role: roleSelf,
+				role: RoleSelf,
 				schema: `{
 							"type": "object",
 							"properties": {
@@ -126,7 +126,7 @@ func TestPermissionExtension(t *testing.T) {
 		{
 			"invalid permission owner, validation err",
 			args{
-				role: roleOwner,
+				role: RoleOwner,
 				schema: `{
 							"type": "object",
 							"properties": {
@@ -148,7 +148,7 @@ func TestPermissionExtension(t *testing.T) {
 		{
 			"valid permission self, ok",
 			args{
-				role: roleSelf,
+				role: RoleSelf,
 				schema: `{
 							"type": "object",
 							"properties": {
@@ -170,7 +170,7 @@ func TestPermissionExtension(t *testing.T) {
 		{
 			"valid permission owner, ok",
 			args{
-				role: roleOwner,
+				role: RoleOwner,
 				schema: `{
 							"type": "object",
 							"properties": {
@@ -190,9 +190,9 @@ func TestPermissionExtension(t *testing.T) {
 			},
 		},
 		{
-			"no role, validation err",
+			"no Role, validation err",
 			args{
-				role: roleUnspecified,
+				role: RoleUnspecified,
 				schema: `{
 							"type": "object",
 							"properties": {
@@ -214,7 +214,7 @@ func TestPermissionExtension(t *testing.T) {
 		{
 			"no permission required, ok",
 			args{
-				role: roleSelf,
+				role: RoleSelf,
 				schema: `{
 							"type": "object",
 							"properties": {

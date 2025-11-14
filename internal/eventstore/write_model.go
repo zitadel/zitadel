@@ -1,6 +1,8 @@
 package eventstore
 
-import "time"
+import (
+	"time"
+)
 
 // WriteModel is the minimum representation of a command side write model.
 // It implements a basic reducer
@@ -27,21 +29,25 @@ func (wm *WriteModel) Reduce() error {
 		return nil
 	}
 
+	latestEvent := wm.Events[len(wm.Events)-1]
 	if wm.AggregateID == "" {
-		wm.AggregateID = wm.Events[0].Aggregate().ID
-	}
-	if wm.ResourceOwner == "" {
-		wm.ResourceOwner = wm.Events[0].Aggregate().ResourceOwner
-	}
-	if wm.InstanceID == "" {
-		wm.InstanceID = wm.Events[0].Aggregate().InstanceID
+		wm.AggregateID = latestEvent.Aggregate().ID
 	}
 
-	wm.ProcessedSequence = wm.Events[len(wm.Events)-1].Sequence()
-	wm.ChangeDate = wm.Events[len(wm.Events)-1].CreatedAt()
+	if wm.ResourceOwner == "" {
+		wm.ResourceOwner = latestEvent.Aggregate().ResourceOwner
+	}
+
+	if wm.InstanceID == "" {
+		wm.InstanceID = latestEvent.Aggregate().InstanceID
+	}
+
+	wm.ProcessedSequence = latestEvent.Sequence()
+	wm.ChangeDate = latestEvent.CreatedAt()
 
 	// all events processed and not needed anymore
 	wm.Events = nil
 	wm.Events = []Event{}
+
 	return nil
 }

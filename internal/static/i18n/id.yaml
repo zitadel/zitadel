@@ -1,0 +1,1387 @@
+Errors:
+  Internal: Terjadi kesalahan internal
+  NoChangesFound: Tidak ada perubahan
+  OriginNotAllowed: '"Asal" ini tidak diperbolehkan'
+  IDMissing: ID hilang
+  ResourceOwnerMissing: Organisasi Pemilik Sumber Daya tidak ada
+  RemoveFailed: Tidak dapat dihapus
+  ProjectionName:
+    Invalid: Nama proyeksi tidak valid
+  Assets:
+    EmptyKey: Kunci aset kosong
+    Store:
+      NotInitialized: Penyimpanan aset tidak diinisialisasi
+      NotConfigured: Penyimpanan aset tidak dikonfigurasi
+    Bucket:
+      Internal: Kesalahan internal saat membuat keranjang
+      AlreadyExists: Ember sudah ada
+      CreateFailed: Keranjang tidak dibuat
+      ListFailed: Ember tidak dapat dibaca
+      RemoveFailed: Keranjang tidak dihapus
+      SetPublicFailed: Tidak dapat menyetel keranjang ke publik
+    Object:
+      PutFailed: Objek tidak dibuat
+      GetFailed: Objek tidak dapat dibaca
+      NotFound: Objek tidak dapat ditemukan
+      PresignedTokenFailed: Token yang ditandatangani tidak dapat dibuat
+      ListFailed: Daftar objek tidak dapat dibaca
+      RemoveFailed: Objek tidak dapat dihapus
+  Limit:
+    ExceedsDefault: Batas melebihi batas default
+  Limits:
+    NotFound: Batasan tidak ditemukan
+    NoneSpecified: Tidak ada batasan yang ditentukan
+    Instance:
+      Blocked: Contoh diblokir
+  Restrictions:
+    NoneSpecified: Tidak ada batasan yang ditentukan
+    DefaultLanguageMustBeAllowed: Bahasa default harus diizinkan
+  Language:
+    NotParsed: Tidak dapat menguraikan bahasa
+    NotSupported: Bahasa tidak didukung
+    NotAllowed: Bahasa tidak diperbolehkan
+    Undefined: Bahasa tidak terdefinisi
+    Duplicate: Bahasa memiliki duplikat
+  OIDCSettings:
+    NotFound: Konfigurasi OIDC tidak ditemukan
+    AlreadyExists: Konfigurasi OIDC sudah ada
+  SecretGenerator:
+    AlreadyExists: Generator rahasia sudah ada
+    TypeMissing: Jenis generator rahasia tidak ada
+    NotFound: Generator rahasia tidak ditemukan
+  SMSConfig:
+    NotFound: Konfigurasi SMS tidak ditemukan
+    AlreadyActive: Konfigurasi SMS sudah aktif
+    AlreadyDeactivated: Konfigurasi SMS sudah dinonaktifkan
+  SMTP:
+    NotEmailMessage: pesan bukan EmailMessage
+    RequiredAttributes: subjek, penerima dan konten harus disetel tetapi sebagian atau semuanya kosong
+    CouldNotSplit: tidak dapat membagi host dan port untuk terhubung ke smtp
+    CouldNotDial: 'tidak dapat menghubungi server SMTP, periksa port, masalah firewall...'
+    CouldNotDialTLS: tidak dapat menghubungi server SMTP menggunakan TLS, periksa port, masalah firewall...
+    CouldNotCreateClient: tidak dapat membuat klien smtp
+    CouldNotStartTLS: tidak dapat memulai tls
+    CouldNotAuth: tidak dapat menambahkan autentikasi smtp, periksa apakah pengguna dan kata sandi Anda benar, jika benar mungkin penyedia Anda memerlukan metode autentikasi yang tidak didukung oleh ZITADEL
+    CouldNotSetSender: tidak dapat menyetel pengirim
+    CouldNotSetRecipient: tidak dapat menyetel penerima
+  SMTPConfig:
+    TestPassword: Kata sandi untuk tes tidak ditemukan
+    NotFound: Konfigurasi SMTP tidak ditemukan
+    AlreadyExists: Konfigurasi SMTP sudah ada
+    AlreadyDeactivated: Konfigurasi SMTP sudah dinonaktifkan
+    SenderAdressNotCustomDomain: Alamat pengirim harus dikonfigurasi sebagai domain kustom pada instance.
+    TestEmailNotFound: Alamat email untuk tes tidak ditemukan
+  Notification:
+    NoDomain: Tidak ada Domain yang ditemukan untuk pesan
+  User:
+    NotFound: Pengguna tidak dapat ditemukan
+    AlreadyExists: Pengguna sudah ada
+    NotFoundOnOrg: Pengguna tidak dapat ditemukan di organisasi yang dipilih
+    NotAllowedOrg: Pengguna bukan anggota organisasi yang diperlukan
+    UserIDMissing: ID pengguna hilang
+    UserIDWrong: Permintaan pengguna tidak sama dengan pengguna yang diautentikasi
+    DomainPolicyNil: Kebijakan Organisasi kosong
+    EmailAsUsernameNotAllowed: Email tidak diperbolehkan sebagai nama pengguna
+    Invalid: Data pengguna tidak valid
+    DomainNotAllowedAsUsername: Domain sudah dipesan dan tidak dapat digunakan
+    AlreadyInactive: Pengguna sudah tidak aktif
+    NotInactive: Pengguna bukannya tidak aktif
+    CantDeactivateInitial: Pengguna dengan inisial status hanya dapat dihapus dan tidak dapat dinonaktifkan
+    ShouldBeActiveOrInitial: Pengguna tidak aktif atau inisial
+    AlreadyInitialised: Pengguna sudah diinisialisasi
+    NotInitialised: Pengguna belum diinisialisasi
+    NotLocked: Pengguna tidak terkunci
+    NoChanges: Tidak ada perubahan yang ditemukan
+    InitCodeNotFound: Kode Inisialisasi tidak ditemukan
+    UsernameNotChanged: Nama pengguna tidak diubah
+    InvalidURLTemplate: Templat URL tidak valid
+    Profile:
+      NotFound: Profil tidak ditemukan
+      NotChanged: Profil tidak berubah
+      Empty: Profil kosong
+      FirstNameEmpty: Nama depan di profil kosong
+      LastNameEmpty: Nama keluarga di profil kosong
+      IDMissing: ID Profil tidak ada
+    Email:
+      NotFound: Email tidak ditemukan
+      Invalid: Email tidak valid
+      AlreadyVerified: Email sudah diverifikasi
+      NotChanged: Email tidak diubah
+      Empty: Emailnya kosong
+      IDMissing: ID email tidak ada
+    Phone:
+      NotFound: Telepon tidak ditemukan
+      Invalid: Telepon tidak valid
+      AlreadyVerified: Telepon sudah diverifikasi
+      Empty: Telepon kosong
+      NotChanged: Telepon tidak berubah
+      VerifyingRemovalIsNotSupported: Verifikasi penghapusan tidak didukung
+    Address:
+      NotFound: Alamat tidak ditemukan
+      NotChanged: Alamat tidak berubah
+    Machine:
+      Key:
+        NotFound: Kunci mesin tidak ditemukan
+        AlreadyExisting: Kunci mesin sudah ada
+        Invalid: Kunci publik bukan kunci publik RSA yang valid dalam format PKIX dengan pengkodean PEM
+      Secret:
+        NotExisting: Rahasia tidak ada
+        Invalid: Rahasia tidak valid
+        CouldNotGenerate: Rahasia tidak dapat dibuat
+    PAT:
+      NotFound: Token Akses Pribadi tidak ditemukan
+    NotHuman: Pengguna harus bersifat pribadi
+    NotMachine: Pengguna harus teknis
+    WrongType: Tidak diizinkan untuk jenis pengguna ini
+    NotAllowedToLink: Pengguna tidak diperbolehkan terhubung dengan penyedia login eksternal
+    Username:
+      AlreadyExists: Nama pengguna sudah dipakai
+      Reserved: Nama pengguna sudah dipakai
+      Empty: Nama pengguna kosong
+    Code:
+      Empty: Kode kosong
+      NotFound: Kode tidak ditemukan
+      Expired: Kode sudah habis masa berlakunya
+      GeneratorAlgNotSupported: Algoritme generator tidak didukung
+      Invalid: Kode tidak valid
+    Password:
+      NotFound: Kata sandi tidak ditemukan
+      Empty: Kata sandi kosong
+      Invalid: Kata sandi tidak valid
+      NotSet: Pengguna belum menetapkan kata sandi
+      NotChanged: Kata sandi baru tidak boleh sama dengan kata sandi Anda saat ini
+      NotSupported: 'Pengkodean hash kata sandi tidak didukung. '
+    PasswordComplexityPolicy:
+      NotFound: Kebijakan kata sandi tidak ditemukan
+      MinLength: Kata sandi terlalu pendek
+      MinLengthNotAllowed: Panjang minimum yang diberikan tidak diperbolehkan
+      HasLower: Kata sandi harus mengandung huruf kecil
+      HasUpper: Kata sandi harus mengandung huruf besar
+      HasNumber: Kata sandi harus berisi nomor
+      HasSymbol: Kata sandi harus mengandung simbol
+    ExternalIDP:
+      Invalid: IDP eksternal tidak valid
+      IDPConfigNotExisting: Penyedia IDP tidak valid untuk organisasi ini
+      NotAllowed: IDP eksternal tidak diperbolehkan
+      MinimumExternalIDPNeeded: Setidaknya satu IDP harus ditambahkan
+      AlreadyExists: IDP eksternal sudah diambil
+      NotFound: IDP eksternal tidak ditemukan
+      LoginFailed: Login di IDP Eksternal gagal
+    MFA:
+      OTP:
+        AlreadyReady: OTP multifaktor (OneTimePassword) sudah disiapkan
+        NotExisting: OTP multifaktor (OneTimePassword) tidak ada
+        NotReady: OTP multifaktor (OneTimePassword) belum siap
+        InvalidCode: Kode tidak valid
+      U2F:
+        NotExisting: U2F tidak ada
+      Passwordless:
+        NotExisting: Tanpa kata sandi tidak ada
+    WebAuthN:
+      NotFound: Token WebAuthN tidak dapat ditemukan
+      BeginRegisterFailed: Pendaftaran awal WebAuthN gagal
+      MarshalError: Kesalahan pada data marshal
+      ErrorOnParseCredential: Kesalahan saat mengurai data kredensial
+      CreateCredentialFailed: Kesalahan saat membuat kredensial
+      BeginLoginFailed: Login awal WebAuthN gagal
+      ValidateLoginFailed: Kesalahan saat memvalidasi kredensial login
+      CloneWarning: Kredensial dapat dikloning
+    RefreshToken:
+      Invalid: Token Penyegaran tidak valid
+      NotFound: Token Penyegaran tidak ditemukan
+  Instance:
+    NotFound: Contoh tidak ditemukan
+    AlreadyExists: Contoh sudah ada
+    NotChanged: Contoh tidak berubah
+  Org:
+    AlreadyExists: Nama atau ID organisasi sudah digunakan
+    Invalid: Organisasi tidak valid
+    AlreadyDeactivated: Organisasi sudah dinonaktifkan
+    AlreadyActive: Organisasi sudah aktif
+    Empty: Organisasi kosong
+    NotFound: Organisasi tidak ditemukan
+    NotChanged: Organisasi tidak berubah
+    DefaultOrgNotDeletable: Organisasi Default tidak boleh dihapus
+    ZitadelOrgNotDeletable: Organisasi dengan proyek ZITADEL tidak boleh dihapus
+    InvalidDomain: Domain tidak valid
+    DomainMissing: Domainnya hilang
+    DomainNotOnOrg: Domain tidak ada di organisasi
+    DomainNotVerified: Domain tidak diverifikasi
+    DomainAlreadyVerified: Domain sudah diverifikasi
+    DomainVerificationTypeInvalid: Jenis verifikasi domain tidak valid
+    DomainVerificationMissing: Verifikasi domain belum dimulai
+    DomainVerificationFailed: Verifikasi domain gagal
+    DomainVerificationTXTNotFound: Data TXT _zitadel-challenge tidak ditemukan untuk domain Anda.
+    DomainVerificationTXTNoMatch: Data TXT _zitadel-challenge telah ditemukan untuk domain Anda tetapi tidak berisi teks token yang tepat.
+    DomainVerificationHTTPNotFound: File yang berisi tantangan tidak ditemukan di URL yang diharapkan.
+    DomainVerificationHTTPNoMatch: File yang berisi tantangan telah ditemukan di URL yang diharapkan tetapi tidak berisi teks token yang tepat.
+    DomainVerificationTimeout: Ada waktu tunggu untuk menanyakan server DNS
+    PrimaryDomainNotDeletable: Domain primer tidak boleh dihapus
+    DomainNotFound: Domain tidak ditemukan
+    MemberIDMissing: ID anggota hilang
+    MemberNotFound: Anggota organisasi tidak ditemukan
+    InvalidMember: Anggota organisasi tidak valid
+    UserIDMissing: ID pengguna hilang
+    PolicyAlreadyExists: Kebijakan sudah ada
+    PolicyNotExisting: Kebijakan tidak ada
+    IdpInvalid: Konfigurasi IDP tidak valid
+    IdpNotExisting: Konfigurasi IDP tidak ada
+    OIDCConfigInvalid: Konfigurasi IDP OIDC tidak valid
+    IdpIsNotOIDC: Konfigurasi IDP bukan bertipe oidc
+    Domain:
+      AlreadyExists: Domain sudah ada
+      InvalidCharacter: 'Hanya karakter alfanumerik, . '
+      EmptyString: Karakter non numerik dan alfabet yang tidak valid diganti dengan spasi kosong dan domain yang dihasilkan berupa string kosong
+    IDP:
+      InvalidSearchQuery: Kueri penelusuran tidak valid
+      ClientIDMissing: ID Klien tidak ada
+      TeamIDMissing: ID Tim hilang
+      KeyIDMissing: ID Kunci hilang
+      PrivateKeyMissing: Kunci Pribadi hilang
+    LoginPolicy:
+      NotFound: Kebijakan Login tidak ditemukan
+      Invalid: Kebijakan Masuk tidak valid
+      RedirectURIInvalid: URI Pengalihan Default tidak valid
+      NotExisting: Kebijakan Masuk tidak ada
+      AlreadyExists: Kebijakan Login sudah ada
+      IdpProviderAlreadyExisting: Penyedia Identitas sudah ada
+      IdpProviderNotExisting: Penyedia Identitas tidak ada
+      RegistrationNotAllowed: Pendaftaran tidak diperbolehkan
+      UsernamePasswordNotAllowed: Login dengan Nama Pengguna/Kata Sandi tidak diperbolehkan
+      MFA:
+        AlreadyExists: Multifaktor sudah ada
+        NotExisting: Multifaktor tidak ada
+        Unspecified: Multifaktor tidak valid
+    MailTemplate:
+      NotFound: Templat Email Default tidak ditemukan
+      NotChanged: Templat Email Default belum diubah
+      AlreadyExists: Template Email Default sudah ada
+      Invalid: Templat Email Default tidak valid
+    CustomMessageText:
+      NotFound: Teks Pesan Default tidak ditemukan
+      NotChanged: Teks Pesan Default belum diubah
+      AlreadyExists: Teks Pesan Default sudah ada
+      Invalid: Teks Pesan Default tidak valid
+    PasswordComplexityPolicy:
+      NotFound: Kebijakan Kompleksitas Kata Sandi tidak ditemukan
+      Empty: Kebijakan Kompleksitas Kata Sandi kosong
+      NotExisting: Kebijakan Kompleksitas Kata Sandi tidak ada
+      AlreadyExists: Kebijakan Kompleksitas Kata Sandi sudah ada
+    PasswordLockoutPolicy:
+      NotFound: Kebijakan Penguncian Kata Sandi tidak ditemukan
+      Empty: Kebijakan Penguncian Kata Sandi kosong
+      NotExisting: Kebijakan Penguncian Kata Sandi tidak ada
+      AlreadyExists: Kebijakan Penguncian Kata Sandi sudah ada
+    PasswordAgePolicy:
+      NotFound: Kebijakan Usia Kata Sandi tidak ditemukan
+      Empty: Kebijakan Usia Kata Sandi kosong
+      NotExisting: Kebijakan Usia Kata Sandi tidak ada
+      AlreadyExists: Kebijakan Usia Kata Sandi sudah ada
+    OrgIAMPolicy:
+      Empty: Kebijakan IAM Organisasi kosong
+      NotExisting: Kebijakan IAM Organisasi tidak ada
+      AlreadyExists: Kebijakan IAM Organisasi sudah ada
+    NotificationPolicy:
+      NotFound: Kebijakan Pemberitahuan tidak ditemukan
+      NotChanged: Kebijakan Pemberitahuan tidak diubah
+      AlreadyExists: Kebijakan Pemberitahuan sudah ada
+    LabelPolicy:
+      NotFound: Kebijakan Label Pribadi tidak ditemukan
+      NotChanged: Kebijakan Label Pribadi belum diubah
+  Project:
+    ProjectIDMissing: Id Proyek tidak ada
+    AlreadyExists: Proyek sudah ada di organisasi
+    OrgNotExisting: Organisasi tidak ada
+    UserNotExisting: Pengguna tidak ada
+    CouldNotGenerateClientSecret: Tidak dapat membuat rahasia klien
+    Invalid: Proyek tidak valid
+    NotActive: Proyek tidak aktif
+    NotInactive: Proyek tidak dinonaktifkan
+    NotFound: Proyek tidak ditemukan
+    UserIDMissing: ID pengguna hilang
+    Member:
+      NotFound: Anggota proyek tidak ditemukan
+      Invalid: Anggota proyek tidak valid
+      AlreadyExists: Anggota proyek sudah ada
+      NotExisting: Anggota proyek tidak ada
+    MinimumOneRoleNeeded: Setidaknya satu peran harus ditambahkan
+    Role:
+      AlreadyExists: Peran sudah ada
+      Invalid: Peran tidak valid
+      NotExisting: Peran tidak ada
+    IDMissing: ID hilang
+    App:
+      AlreadyExists: Aplikasi sudah ada
+      NotFound: Aplikasi tidak ditemukan
+      Invalid: Aplikasi tidak valid
+      NotExisting: Aplikasi tidak ada
+      NotActive: Aplikasi tidak aktif
+      NotInactive: Aplikasi tidak aktif
+      OIDCConfigInvalid: Konfigurasi OIDC tidak valid
+      APIConfigInvalid: Konfigurasi API tidak valid
+      SAMLConfigInvalid: Konfigurasi SAML tidak valid
+      IsNotOIDC: Aplikasi bukan tipe OIDC
+      IsNotAPI: Aplikasi bukan tipe API
+      IsNotSAML: Aplikasi bukan tipe SAML
+      SAMLMetadataMissing: Metadata SAML tidak ada
+      SAMLMetadataFormat: Kesalahan format Metadata SAML
+      SAMLEntityIDAlreadyExisting: SAML EntityID sudah ada
+      OIDCAuthMethodNoSecret: Metode Auth OIDC yang dipilih tidak memerlukan rahasia
+      APIAuthMethodNoSecret: Metode Auth API yang dipilih tidak memerlukan rahasia
+      AuthMethodNoPrivateKeyJWT: Metode Auth yang Dipilih tidak memerlukan kunci
+      ClientSecretInvalid: Rahasia Klien tidak valid
+      Key:
+        AlreadyExisting: Kunci aplikasi sudah ada
+        NotFound: Kunci aplikasi tidak ditemukan
+    RequiredFieldsMissing: Beberapa bidang wajib diisi tidak ada
+    Grant:
+      AlreadyExists: Hibah proyek sudah ada
+      NotFound: Hibah tidak ditemukan
+      Invalid: Hibah proyek tidak valid
+      NotExisting: Hibah proyek tidak ada
+      HasNotExistingRole: Satu peran tidak ada di proyek
+      NotActive: Hibah proyek tidak aktif
+      NotInactive: Hibah proyek bukannya tidak aktif
+  IAM:
+    NotFound: 'Contoh tidak ditemukan. '
+    Member:
+      RolesNotChanged: Peran belum diubah
+    MemberInvalid: Anggota tidak valid
+    MemberAlreadyExisting: Anggota sudah ada
+    MemberNotExisting: Anggota tidak ada
+    IDMissing: Aku hilang
+    IAMProjectIDMissing: ID proyek IAM tidak ada
+    IamProjectAlreadySet: Id proyek IAM telah ditetapkan
+    IdpInvalid: Konfigurasi IDP tidak valid
+    IdpNotExisting: Konfigurasi IDP tidak ada
+    OIDCConfigInvalid: Konfigurasi IDP OIDC tidak valid
+    IdpIsNotOIDC: Konfigurasi IDP bukan bertipe oidc
+    LoginPolicyInvalid: Kebijakan Masuk tidak valid
+    LoginPolicyNotExisting: Kebijakan Masuk tidak ada
+    IdpProviderInvalid: Penyedia Identitas tidak valid
+    LoginPolicy:
+      NotFound: Kebijakan Login Default tidak ditemukan
+      NotChanged: Kebijakan Login Default belum diubah
+      NotExisting: Kebijakan Login Default tidak ada
+      AlreadyExists: Kebijakan Login Default sudah ada
+      RedirectURIInvalid: URI Pengalihan Default tidak valid
+      MFA:
+        AlreadyExists: Multifaktor sudah ada
+        NotExisting: Multifaktor tidak ada
+        Unspecified: Multifaktor tidak valid
+      IDP:
+        AlreadyExists: Penyedia identitas sudah ada
+        NotExisting: Penyedia identitas tidak ada
+        Invalid: Penyedia Identitas tidak valid
+      IDPConfig:
+        AlreadyExists: Konfigurasi Penyedia Identitas sudah ada
+        NotInactive: Konfigurasi Penyedia Identitas tidak aktif
+        NotActive: Konfigurasi Penyedia Identitas tidak aktif
+    LabelPolicy:
+      NotFound: Kebijakan Label Pribadi Default tidak ditemukan
+      NotChanged: Kebijakan Label Pribadi Default belum diubah
+    MailTemplate:
+      NotFound: Templat Email Default tidak ditemukan
+      NotChanged: Templat Email Default belum diubah
+      AlreadyExists: Template Email Default sudah ada
+      Invalid: Templat Email Default tidak valid
+    CustomMessageText:
+      NotFound: Teks Pesan Default tidak ditemukan
+      NotChanged: Teks Pesan Default belum diubah
+      AlreadyExists: Teks Pesan Default sudah ada
+      Invalid: Teks Pesan Default tidak valid
+    PasswordComplexityPolicy:
+      NotFound: Kebijakan Kompleksitas Kata Sandi Default tidak ditemukan
+      NotExisting: Kebijakan Kompleksitas Kata Sandi Default tidak ada
+      AlreadyExists: Kebijakan Kompleksitas Kata Sandi Default sudah ada
+      Empty: Kebijakan Kompleksitas Kata Sandi Default kosong
+      NotChanged: Kebijakan Kompleksitas Kata Sandi Default belum diubah
+    PasswordAgePolicy:
+      NotFound: Kebijakan Usia Kata Sandi Default tidak ditemukan
+      NotExisting: Kebijakan Usia Kata Sandi Default tidak ada
+      AlreadyExists: Kebijakan Usia Kata Sandi Default sudah ada
+      Empty: Kebijakan Usia Kata Sandi Default kosong
+      NotChanged: Kebijakan Usia Kata Sandi Default belum diubah
+    PasswordLockoutPolicy:
+      NotFound: Kebijakan Penguncian Kata Sandi Default tidak ditemukan
+      NotExisting: Kebijakan Penguncian Kata Sandi Default tidak ada
+      AlreadyExists: Kebijakan Penguncian Kata Sandi Default sudah ada
+      Empty: Kebijakan Penguncian Kata Sandi Default kosong
+      NotChanged: Kebijakan Penguncian Kata Sandi Default belum diubah
+    DomainPolicy:
+      NotFound: Kebijakan IAM Organisasi tidak ditemukan
+      Empty: Kebijakan IAM Organisasi kosong
+      NotExisting: Kebijakan IAM Organisasi tidak ada
+      AlreadyExists: Kebijakan IAM Organisasi sudah ada
+      NotChanged: Kebijakan IAM Organisasi belum diubah
+    NotificationPolicy:
+      NotFound: Kebijakan Pemberitahuan Default tidak ditemukan
+      NotChanged: Kebijakan Pemberitahuan Default tidak diubah
+      AlreadyExists: Kebijakan Pemberitahuan Default sudah ada
+  Policy:
+    AlreadyExists: Kebijakan sudah ada
+    Label:
+      Invalid:
+        PrimaryColor: Warna primer bukanlah nilai warna Hex yang valid
+        BackgroundColor: Warna latar belakang bukanlah nilai warna Hex yang valid
+        WarnColor: Warna peringatan bukanlah nilai warna Hex yang valid
+        FontColor: Warna font bukanlah nilai warna Hex yang valid
+        PrimaryColorDark: Warna primer (mode gelap) bukanlah nilai warna Hex yang valid
+        BackgroundColorDark: Warna latar belakang (mode gelap) bukanlah nilai warna Hex yang valid
+        WarnColorDark: Warna peringatan (mode gelap) bukanlah nilai warna Hex yang valid
+        FontColorDark: Warna font (mode gelap) bukanlah nilai warna Hex yang valid
+  UserGrant:
+    AlreadyExists: Hibah pengguna sudah ada
+    NotFound: Hibah pengguna tidak ditemukan
+    Invalid: Hibah pengguna tidak valid
+    NotChanged: Hibah pengguna belum diubah
+    IDMissing: Aku hilang
+    NoPermissionForProject: Pengguna tidak memiliki izin pada proyek ini
+    RoleKeyNotFound: Peran tidak ditemukan
+  Member:
+    AlreadyExists: Anggota sudah ada
+  IDPConfig:
+    AlreadyExists: Konfigurasi IDP dengan nama ini sudah ada
+    NotExisting: Konfigurasi Penyedia Identitas tidak ada
+  Changes:
+    NotFound: Tidak ada riwayat yang ditemukan
+    AuditRetention: Riwayat berada di luar Retensi Log Audit
+  Token:
+    NotFound: Token tidak ditemukan
+    Invalid: Token tidak valid
+  UserSession:
+    NotFound: Sesi Pengguna tidak ditemukan
+  Key:
+    NotFound: Kunci tidak ditemukan
+    ExpireBeforeNow: Tanggal kadaluwarsanya sudah lewat
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: Multifaktor dikonfigurasi sesuai kebutuhan, tetapi tidak ada penyedia yang mungkin dikonfigurasi.
+  Step:
+    Started:
+      AlreadyExists: Langkah memulai sudah ada
+    Done:
+      AlreadyExists: Langkah selesai sudah ada
+  CustomText:
+    AlreadyExists: Teks khusus sudah ada
+    Invalid: Teks khusus tidak valid
+    NotFound: Teks khusus tidak ditemukan
+  TranslationFile:
+    ReadError: Kesalahan dalam membaca file terjemahan
+    MergeError: File terjemahan tidak dapat digabungkan dengan terjemahan khusus
+    NotFound: File terjemahan tidak ada
+  Metadata:
+    NotFound: Metadata tidak ditemukan
+    NoData: Daftar metadata kosong
+    Invalid: Metadata tidak valid
+    KeyNotExisting: Satu atau lebih kunci tidak ada
+  Action:
+    Invalid: Tindakan tidak valid
+    NotFound: Tindakan tidak ditemukan
+    NotActive: Tindakan tidak aktif
+    NotInactive: Tindakan bukan berarti tidak aktif
+    MaxAllowed: Tidak ada Tindakan aktif tambahan yang diizinkan
+    NotEnabled: Fitur "Aksi" tidak diaktifkan
+  Flow:
+    FlowTypeMissing: Tipe Aliran tidak ada
+    Empty: Aliran sudah kosong
+    WrongTriggerType: TriggerType tidak valid
+    NoChanges: Tidak Ada Perubahan
+    ActionIDsNotExist: ActionID tidak ada
+  Query:
+    CloseRows: Pernyataan SQL tidak dapat diselesaikan
+    SQLStatement: Pernyataan SQL tidak dapat dibuat
+    InvalidRequest: Permintaan tidak valid
+    TooManyNestingLevels: Terlalu banyak tingkat kumpulan kueri (Maks 20)
+    LimitExceeded: Batas terlampaui
+  Quota:
+    AlreadyExists: Kuota sudah ada untuk unit ini
+    NotFound: Kuota tidak ditemukan untuk unit ini
+    Invalid:
+      CallURL: URL kuota panggilan tidak valid
+      Percent: Persen kuota lebih rendah dari 1
+      Unimplemented: Kuota tidak diterapkan untuk unit ini
+      Amount: Jumlah kuota lebih rendah dari 1
+      ResetInterval: Interval reset kuota lebih pendek dari satu menit
+      Noop: Kuota unlimited tanpa notifikasi tidak ada pengaruhnya
+    Access:
+      Exhausted: Kuota untuk permintaan yang diautentikasi telah habis
+    Execution:
+      Exhausted: Kuota detik eksekusi telah habis
+  LogStore:
+    Access:
+      StorageFailed: Gagal menyimpan log akses ke database
+      ScanFailed: Gagal menanyakan penggunaan untuk permintaan yang diautentikasi
+    Execution:
+      StorageFailed: Gagal menyimpan log eksekusi tindakan ke database
+      ScanFailed: Gagal menanyakan penggunaan detik eksekusi tindakan
+  Session:
+    NotExisting: Sesi tidak ada
+    Terminated: Sesi sudah dihentikan
+    Expired: Sesi telah berakhir
+    PositiveLifetime: Masa pakai sesi tidak boleh kurang dari 0
+    Token:
+      Invalid: Token Sesi tidak valid
+    WebAuthN:
+      NoChallenge: Sesi tanpa tantangan WebAuthN
+  Intent:
+    IDPMissing: ID IDP tidak ada dalam permintaan
+    IDPInvalid: IDP tidak valid untuk permintaan tersebut
+    ResponseInvalid: Tanggapan IDP tidak valid
+    MissingSingleMappingAttribute: Respons IDP tidak berisi atribut pemetaan atau memiliki lebih dari satu nilai
+    SuccessURLMissing: URL sukses tidak ada dalam permintaan
+    FailureURLMissing: URL kegagalan tidak ada dalam permintaan
+    StateMissing: Parameter status tidak ada dalam permintaan
+    NotStarted: Niat belum dimulai atau sudah dihentikan
+    NotSucceeded: Niatnya belum berhasil
+    Expired: Kode sudah habis masa berlakunya
+    TokenCreationFailed: Pembuatan token gagal
+    InvalidToken: Token Niat tidak valid
+    OtherUser: Maksudnya ditujukan untuk pengguna lain
+  AuthRequest:
+    AlreadyExists: Permintaan Otentikasi sudah ada
+    NotExisting: Permintaan Otentikasi tidak ada
+    WrongLoginClient: Permintaan Otentikasi dibuat oleh klien login lain
+    AlreadyHandled: Permintaan Otentikasi sudah ditangani
+  OIDCSession:
+    RefreshTokenInvalid: Token Penyegaran tidak valid
+    Token:
+      Invalid: Token tidak valid
+      Expired: Token sudah habis masa berlakunya
+    InvalidClient: Token tidak dikeluarkan untuk klien ini
+  SAMLRequest:
+    AlreadyExists: SAMLRequest sudah ada
+    NotExisting: SAMLRequest tidak ada
+    WrongLoginClient: SAMLRequest dibuat oleh klien login lainnya
+    AlreadyHandled: SAMLRequest sudah ditangani
+  SAMLSession:
+    InvalidClient: SAMLResponse tidak dikeluarkan untuk klien ini
+  DeviceAuth:
+    NotFound: Permintaan Otorisasi Perangkat tidak ada
+    AlreadyHandled: Permintaan Otorisasi Perangkat sudah ditangani
+  Feature:
+    NotExisting: Fitur tidak ada
+    TypeNotSupported: Jenis fitur tidak didukung
+    InvalidValue: Nilai tidak valid untuk fitur ini
+  Target:
+    Invalid: Sasaran tidak valid
+    NoTimeout: Target tidak memiliki batas waktu
+    InvalidURL: Target memiliki URL yang tidak valid
+    NotFound: Sasaran tidak ditemukan
+  Execution:
+    ConditionInvalid: Kondisi eksekusi tidak valid
+    Invalid: Eksekusi tidak valid
+    NotFound: Eksekusi tidak ditemukan
+    IncludeNotFound: Sertakan tidak ditemukan
+    NoTargets: Tidak ada target yang ditentukan
+    Failed: Eksekusi gagal
+    ResponseIsNotValidJSON: Responsnya bukan JSON yang valid
+  UserSchema:
+    NotEnabled: Fitur "Skema Pengguna" tidak diaktifkan
+    Type:
+      Missing: Jenis Skema Pengguna tidak ada
+      AlreadyExists: Tipe Skema Pengguna sudah ada
+    Authenticator:
+      Invalid: Jenis pengautentikasi tidak valid
+    NotActive: Skema Pengguna tidak aktif
+    NotInactive: Skema Pengguna tidak aktif
+    NotExists: Skema Pengguna tidak ada
+  TokenExchange:
+    FeatureDisabled: 'Fitur Token Exchange dinonaktifkan untuk instance Anda. '
+    Token:
+      Missing: Tokennya hilang
+      Invalid: Token tidak valid
+      TypeMissing: Jenis token tidak ada
+      TypeNotAllowed: Jenis token tidak diperbolehkan
+      TypeNotSupported: Jenis token tidak didukung
+      NotForAPI: Token yang ditiru tidak diperbolehkan untuk API
+    Impersonation:
+      PolicyDisabled: Peniruan identitas dinonaktifkan dalam kebijakan keamanan instans
+  WebKey:
+    ActiveDelete: Tidak dapat menghapus kunci web yang aktif
+    Config: Konfigurasi kunci web tidak valid
+    Duplicate: ID kunci web tidak unik
+    FeatureDisabled: Fitur kunci web dinonaktifkan
+    NoActive: Tidak ditemukan kunci web aktif
+    NotFound: Kunci web tidak ditemukan
+
+AggregateTypes:
+  action: Tindakan
+  instance: Contoh
+  key_pair: Pasangan Kunci
+  org: Organisasi
+  project: Proyek
+  user: Pengguna
+  usergrant: Hibah pengguna
+  quota: Kuota
+  feature: Fitur
+  target: Target
+  execution: Eksekusi
+  user_schema: Skema Pengguna
+  auth_request: Permintaan Otentikasi
+  device_auth: Otentikasi Perangkat
+  idpintent: Maksud IDP
+  limits: Batasan
+  milestone: Tonggak pencapaian
+  oidc_session: Sesi OIDC
+  restrictions: Pembatasan
+  system: Sistem
+  session: Sidang
+  web_key: Kunci Web
+  saml_request: Sesi SAML
+  saml_session: Permintaan SAML
+
+EventTypes:
+  execution:
+    set: Kumpulan eksekusi
+    removed: Eksekusi dihapus
+  target:
+    added: Sasaran dibuat
+    changed: Sasaran berubah
+    removed: Sasaran dihapus
+  user:
+    added: Pengguna ditambahkan
+    selfregistered: Pengguna mendaftarkan dirinya sendiri
+    initialization:
+      code:
+        added: Kode inisialisasi dihasilkan
+        sent: Kode inisialisasi terkirim
+      check:
+        succeeded: Pemeriksaan inisialisasi berhasil
+        failed: Pemeriksaan inisialisasi gagal
+    token:
+      added: Token Akses dibuat
+      v2.added: Token Akses dibuat
+      removed: Token Akses dihapus
+    impersonated: Pengguna ditiru
+    username:
+      reserved: Nama pengguna dicadangkan
+      released: Nama pengguna dirilis
+      changed: Nama pengguna diubah
+    email:
+      reserved: Alamat email sudah dipesan
+      released: Alamat email dirilis
+      changed: Alamat email diubah
+      verified: Alamat email terverifikasi
+      verification:
+        failed: Verifikasi alamat email gagal
+      code:
+        added: Kode verifikasi alamat email dibuat
+        sent: Kode verifikasi alamat email terkirim
+    machine:
+      added: Pengguna teknis ditambahkan
+      changed: Pengguna teknis berubah
+      key:
+        added: Kunci ditambahkan
+        removed: Kunci dihapus
+      secret:
+        set: Kumpulan rahasia
+        updated: Hash rahasia diperbarui
+        removed: Rahasia dihapus
+        check:
+          succeeded: Pemeriksaan rahasia berhasil
+          failed: Pemeriksaan rahasia gagal
+    human:
+      added: Orang ditambahkan
+      selfregistered: Orang mendaftarkan dirinya sendiri
+      avatar:
+        added: Avatar menambahkan
+        removed: Avatar dihapus
+      initialization:
+        code:
+          added: Kode inisialisasi dihasilkan
+          sent: Kode inisialisasi terkirim
+        check:
+          succeeded: Pemeriksaan inisialisasi berhasil
+          failed: Pemeriksaan inisialisasi gagal
+      invite:
+        code:
+          added: Kode undangan dihasilkan
+          sent: Kode undangan dikirim
+        check:
+          succeeded: Pemeriksaan undangan berhasil
+          failed: Pemeriksaan undangan gagal
+      username:
+        reserved: Nama pengguna dicadangkan
+        released: Nama pengguna dirilis
+      email:
+        changed: Alamat email diubah
+        verified: Alamat email terverifikasi
+        verification:
+          failed: Verifikasi alamat email gagal
+        code:
+          added: Kode verifikasi alamat email dibuat
+          sent: Kode verifikasi alamat email terkirim
+      password:
+        changed: Kata sandi diubah
+        code:
+          added: Kode kata sandi dibuat
+          sent: Kode kata sandi terkirim
+        check:
+          succeeded: Pemeriksaan kata sandi berhasil
+          failed: Pemeriksaan kata sandi gagal
+        change:
+          sent: Perubahan kata sandi terkirim
+        hash:
+          updated: Hash kata sandi diperbarui
+      externallogin:
+        check:
+          succeeded: Login eksternal berhasil
+      externalidp:
+        added: IDP eksternal ditambahkan
+        removed: IDP eksternal dihapus
+        cascade:
+          removed: Kaskade IDP eksternal dihapus
+        id:
+          migrated: UserID eksternal IDP telah dimigrasikan
+      phone:
+        changed: Nomor telepon berubah
+        verified: Nomor telepon terverifikasi
+        verification:
+          failed: Verifikasi nomor telepon gagal
+        code:
+          added: Kode nomor telepon dibuat
+          sent: Kode nomor telepon terkirim
+        removed: Nomor telepon dihapus
+      profile:
+        changed: Profil pengguna berubah
+      address:
+        changed: Alamat pengguna diubah
+      mfa:
+        otp:
+          added: OTP multifaktor ditambahkan
+          verified: OTP multifaktor terverifikasi
+          removed: OTP multifaktor dihapus
+          check:
+            succeeded: Pemeriksaan OTP multifaktor berhasil
+            failed: Pemeriksaan OTP multifaktor gagal
+          sms:
+            added: SMS OTP multifaktor ditambahkan
+            removed: SMS OTP multifaktor dihapus
+            code:
+              added: Kode SMS OTP multifaktor ditambahkan
+              sent: Kode SMS OTP multifaktor terkirim
+            check:
+              succeeded: Pengecekan SMS OTP multifaktor berhasil
+              failed: Pemeriksaan SMS OTP multifaktor gagal
+          email:
+            added: Email OTP Multifaktor ditambahkan
+            removed: Email OTP Multifaktor dihapus
+            code:
+              added: Kode Email OTP multifaktor ditambahkan
+              sent: Kode Email OTP multifaktor terkirim
+            check:
+              succeeded: Pemeriksaan Email OTP Multifaktor berhasil
+              failed: Pemeriksaan Email OTP multifaktor gagal
+        u2f:
+          token:
+            added: Token U2F Multifaktor ditambahkan
+            verified: Token U2F Multifaktor terverifikasi
+            removed: Token U2F Multifaktor dihapus
+            begin:
+              login: Pemeriksaan U2F multifaktor dimulai
+            check:
+              succeeded: Pemeriksaan U2F multifaktor berhasil
+              failed: Pemeriksaan U2F multifaktor gagal
+            signcount:
+              changed: Checksum Token U2F Multifaktor telah diubah
+        init:
+          skipped: Inisialisasi multifaktor dilewati
+      passwordless:
+        token:
+          added: Token untuk Login Tanpa Kata Sandi ditambahkan
+          verified: Token untuk Login Tanpa Kata Sandi terverifikasi
+          removed: Token untuk Login Tanpa Kata Sandi dihapus
+          begin:
+            login: Pemeriksaan Login Tanpa Kata Sandi dimulai
+          check:
+            succeeded: Pemeriksaan Login Tanpa Kata Sandi berhasil
+            failed: Pemeriksaan Login Tanpa Kata Sandi gagal
+          signcount:
+            changed: Checksum Token Login Tanpa Kata Sandi telah diubah
+        initialization:
+          code:
+            added: Kode inisialisasi tanpa kata sandi ditambahkan
+            sent: Kode inisialisasi tanpa kata sandi dikirim
+            requested: Kode inisialisasi tanpa kata sandi diminta
+            check:
+              succeeded: Kode inisialisasi tanpa kata sandi berhasil diperiksa
+              failed: Pemeriksaan kode inisialisasi tanpa kata sandi gagal
+      signed:
+        out: Pengguna keluar
+      refresh:
+        token:
+          added: Segarkan Token dibuat
+          renewed: Segarkan Token diperbarui
+          removed: Token Penyegaran dihapus
+    locked: Pengguna terkunci
+    unlocked: Pengguna tidak terkunci
+    deactivated: Pengguna dinonaktifkan
+    reactivated: Pengguna diaktifkan kembali
+    removed: Pengguna dihapus
+    password:
+      changed: Kata sandi diubah
+      code:
+        added: Kode kata sandi dihasilkan
+        sent: Kode kata sandi terkirim
+      check:
+        succeeded: Pemeriksaan kata sandi berhasil
+        failed: Pemeriksaan kata sandi gagal
+    phone:
+      changed: Nomor telepon berubah
+      verified: Nomor telepon terverifikasi
+      verification:
+        failed: Verifikasi nomor telepon gagal
+      code:
+        added: Kode nomor telepon dibuat
+        sent: Kode nomor telepon terkirim
+    profile:
+      changed: Profil pengguna berubah
+    address:
+      changed: Alamat pengguna diubah
+    mfa:
+      otp:
+        added: OTP multifaktor ditambahkan
+        verified: OTP multifaktor terverifikasi
+        removed: OTP multifaktor dihapus
+        check:
+          succeeded: Pemeriksaan OTP multifaktor berhasil
+          failed: Pemeriksaan OTP multifaktor gagal
+        init:
+          skipped: Inisialisasi OTP multifaktor dilewati
+      init:
+        skipped: Inisialisasi multifaktor dilewati
+    signed:
+      out: Pengguna keluar
+    grant:
+      added: Otorisasi ditambahkan
+      changed: Otorisasi berubah
+      removed: Otorisasi dihapus
+      deactivated: Otorisasi dinonaktifkan
+      reactivated: Otorisasi diaktifkan kembali
+      reserved: Otorisasi dicadangkan
+      released: Otorisasi dirilis
+      cascade:
+        removed: Otorisasi dihapus
+        changed: Otorisasi berubah
+    metadata:
+      set: Kumpulan metadata pengguna
+      removed: Metadata pengguna dihapus
+      removed.all: Semua metadata pengguna dihapus
+    domain:
+      claimed: Domain diklaim
+      claimed.sent: Notifikasi klaim domain terkirim
+    pat:
+      added: Token Akses Pribadi ditambahkan
+      removed: Token Akses Pribadi dihapus
+  org:
+    added: Organisasi ditambahkan
+    changed: Organisasi berubah
+    deactivated: Organisasi dinonaktifkan
+    reactivated: Organisasi diaktifkan kembali
+    removed: Organisasi dihapus
+    domain:
+      added: Domain ditambahkan
+      verification:
+        added: Verifikasi domain ditambahkan
+        failed: Verifikasi domain gagal
+      verified: Domain terverifikasi
+      removed: Domain dihapus
+      primary:
+        set: Kumpulan domain primer
+      reserved: Domain sudah dipesan
+      released: Domain dirilis
+    name:
+      reserved: Nama organisasi dicadangkan
+      released: Nama organisasi dirilis
+    member:
+      added: Anggota organisasi ditambahkan
+      changed: Anggota organisasi berubah
+      removed: Anggota organisasi dihapus
+      cascade:
+        removed: Rangkaian anggota organisasi dihapus
+    iam:
+      policy:
+        added: Kebijakan sistem ditambahkan
+        changed: Kebijakan sistem berubah
+        removed: Kebijakan sistem dihapus
+    idp:
+      config:
+        added: Konfigurasi IDP ditambahkan
+        changed: Konfigurasi IDP berubah
+        removed: Konfigurasi IDP dihapus
+        deactivated: Konfigurasi IDP dinonaktifkan
+        reactivated: Konfigurasi IDP diaktifkan kembali
+      oidc:
+        config:
+          added: Konfigurasi IDP OIDC ditambahkan
+          changed: Konfigurasi IDP OIDC diubah
+      saml:
+        config:
+          added: Konfigurasi SAML IDP ditambahkan
+          changed: Konfigurasi SAML IDP diubah
+      jwt:
+        config:
+          added: Konfigurasi JWT IDP ditambahkan
+          changed: Konfigurasi JWT IDP berubah
+    customtext:
+      set: Kumpulan teks khusus
+      removed: Teks khusus dihapus
+      template:
+        removed: Templat teks khusus dihapus
+    policy:
+      login:
+        added: Kebijakan Login ditambahkan
+        changed: Kebijakan Masuk berubah
+        removed: Kebijakan Login dihapus
+        idpprovider:
+          added: Penyedia Identitas ditambahkan ke Kebijakan Login
+          removed: Penyedia Identitas dihapus dari Kebijakan Login
+          cascade:
+            removed: Kaskade Penyedia Identitas dihapus dari Kebijakan Masuk
+        secondfactor:
+          added: Faktor kedua ditambahkan ke Kebijakan Login
+          removed: Faktor kedua dihapus dari Kebijakan Login
+        multifactor:
+          added: Multi faktor ditambahkan ke Kebijakan Login
+          removed: Multi faktor dihapus dari Kebijakan Login
+      password:
+        complexity:
+          added: Kebijakan kompleksitas kata sandi ditambahkan
+          changed: Kebijakan kompleksitas kata sandi diubah
+          removed: Kebijakan kompleksitas kata sandi dihapus
+        age:
+          added: Kebijakan usia kata sandi ditambahkan
+          changed: Kebijakan usia kata sandi diubah
+          removed: Kebijakan usia kata sandi dihapus
+        lockout:
+          added: Kebijakan penguncian kata sandi ditambahkan
+          changed: Kebijakan penguncian kata sandi diubah
+          removed: Kebijakan penguncian kata sandi dihapus
+      label:
+        added: Kebijakan Label ditambahkan
+        changed: Kebijakan Label berubah
+        activated: Kebijakan Label diaktifkan
+        removed: Kebijakan Label dihapus
+        logo:
+          added: Logo ditambahkan ke Kebijakan Label
+          removed: Logo dihapus dari Kebijakan Label
+          dark:
+            added: Logo (mode gelap) ditambahkan ke Kebijakan Label
+            removed: Logo (mode gelap) dihapus dari Kebijakan Label
+        icon:
+          added: Ikon ditambahkan ke Kebijakan Label
+          removed: Ikon dihapus dari Kebijakan Label
+          dark:
+            added: Ikon (mode gelap) ditambahkan ke Kebijakan Label
+            removed: Ikon (mode gelap) dihapus dari Kebijakan Label
+        font:
+          added: Font ditambahkan ke Kebijakan Label
+          removed: Font dihapus dari Kebijakan Label
+        assets:
+          removed: Aset dihapus dari Kebijakan Label
+      privacy:
+        added: Kebijakan privasi dan TOS ditambahkan
+        changed: Kebijakan privasi dan TOS diubah
+        removed: Kebijakan privasi dan TOS dihapus
+      domain:
+        added: Kebijakan domain ditambahkan
+        changed: Kebijakan domain berubah
+        removed: Kebijakan domain dihapus
+      lockout:
+        added: Kebijakan penguncian ditambahkan
+        changed: Kebijakan penguncian diubah
+        removed: Kebijakan penguncian dihapus
+      notification:
+        added: Kebijakan notifikasi ditambahkan
+        changed: Kebijakan notifikasi diubah
+        removed: Kebijakan notifikasi dihapus
+    flow:
+      trigger_actions:
+        set: Kumpulan tindakan
+        cascade:
+          removed: Rangkaian tindakan dihapus
+        removed: Tindakan dihapus
+      cleared: Aliran dibersihkan
+    mail:
+      template:
+        added: Templat email ditambahkan
+        changed: Templat email diubah
+        removed: Templat email dihapus
+      text:
+        added: Teks email ditambahkan
+        changed: Teks email berubah
+        removed: Teks email dihapus
+    metadata:
+      removed: Metadata dihapus
+      removed.all: Semua metadata dihapus
+      set: Kumpulan metadata
+  project:
+    added: Proyek ditambahkan
+    changed: Proyek berubah
+    deactivated: Proyek dinonaktifkan
+    reactivated: Proyek diaktifkan kembali
+    removed: Proyek dihapus
+    member:
+      added: Anggota proyek ditambahkan
+      changed: Anggota proyek berubah
+      removed: Anggota proyek dihapus
+      cascade:
+        removed: Rangkaian anggota proyek dihapus
+    role:
+      added: Peran proyek ditambahkan
+      changed: Peran proyek berubah
+      removed: Peran proyek dihapus
+    grant:
+      added: Akses manajemen ditambahkan
+      changed: Akses manajemen diubah
+      removed: Akses pengelolaan dihapus
+      deactivated: Akses pengelolaan dinonaktifkan
+      reactivated: Akses pengelolaan diaktifkan kembali
+      cascade:
+        changed: Akses manajemen diubah
+      member:
+        added: Anggota akses manajemen ditambahkan
+        changed: Anggota akses manajemen diubah
+        removed: Anggota akses manajemen dihapus
+        cascade:
+          removed: Kaskade akses manajemen dihapus
+    application:
+      added: Aplikasi ditambahkan
+      changed: Aplikasi diubah
+      removed: Aplikasi dihapus
+      deactivated: Aplikasi dinonaktifkan
+      reactivated: Aplikasi diaktifkan kembali
+      oidc:
+        secret:
+          check:
+            succeeded: Pemeriksaan Rahasia Klien OIDC berhasil
+            failed: Pemeriksaan Rahasia Klien OIDC gagal
+        key:
+          added: Kunci Aplikasi OIDC ditambahkan
+          removed: Kunci Aplikasi OIDC dihapus
+      api:
+        secret:
+          check:
+            succeeded: Pemeriksaan rahasia API berhasil
+            failed: Pemeriksaan rahasia API gagal
+        key:
+          added: Kunci aplikasi ditambahkan
+          removed: Kunci aplikasi dihapus
+      config:
+        saml:
+          added: Konfigurasi SAML ditambahkan
+          changed: Konfigurasi SAML berubah
+        oidc:
+          added: Konfigurasi OIDC ditambahkan
+          changed: Konfigurasi OIDC berubah
+          secret:
+            changed: Rahasia OIDC berubah
+            updated: Hash rahasia OIDC diperbarui
+        api:
+          added: Konfigurasi API ditambahkan
+          changed: Konfigurasi API berubah
+          secret:
+            changed: Rahasia API diubah
+            updated: Hash rahasia API diperbarui
+  policy:
+    password:
+      complexity:
+        added: Kebijakan kompleksitas kata sandi ditambahkan
+        changed: Kebijakan kompleksitas kata sandi diubah
+      age:
+        added: Kebijakan usia kata sandi ditambahkan
+        changed: Kebijakan usia kata sandi diubah
+      lockout:
+        added: Kebijakan penguncian kata sandi ditambahkan
+        changed: Kebijakan penguncian kata sandi diubah
+  iam:
+    setup:
+      started: Penyiapan ZITADEL dimulai
+      done: Penyiapan ZITADEL selesai
+    global:
+      org:
+        set: Kumpulan organisasi global
+    project:
+      iam:
+        set: Kumpulan proyek ZITADEL
+    member:
+      added: Anggota ZITADEL menambahkan
+      changed: Anggota ZITADEL berubah
+      removed: Anggota ZITADEL dihapus
+      cascade:
+        removed: Rangkaian anggota ZITADEL dihapus
+    idp:
+      config:
+        added: Konfigurasi IDP ditambahkan
+        changed: Konfigurasi IDP berubah
+        removed: Konfigurasi IDP dihapus
+        deactivated: Konfigurasi IDP dinonaktifkan
+        reactivated: Konfigurasi IDP diaktifkan kembali
+      oidc:
+        config:
+          added: Konfigurasi IDP OIDC ditambahkan
+          changed: Konfigurasi IDP OIDC diubah
+      saml:
+        config:
+          added: Konfigurasi SAML IDP ditambahkan
+          changed: Konfigurasi SAML IDP diubah
+      jwt:
+        config:
+          added: Konfigurasi JWT ke penyedia identitas ditambahkan
+          changed: Konfigurasi JWT dari penyedia identitas dihapus
+    customtext:
+      set: Teks telah diatur
+      removed: Teks telah dihapus
+    policy:
+      login:
+        added: Kebijakan Login Default ditambahkan
+        changed: Kebijakan Login Default berubah
+        idpprovider:
+          added: Penyedia Identitas ditambahkan ke Kebijakan Login Default
+          removed: Penyedia Identitas dihapus dari Kebijakan Login Default
+      label:
+        added: Kebijakan Label ditambahkan
+        changed: Kebijakan Label berubah
+        activated: Kebijakan Label diaktifkan
+        logo:
+          added: Logo ditambahkan ke Kebijakan Label
+          removed: Logo dihapus dari Kebijakan Label
+          dark:
+            added: Logo (mode gelap) ditambahkan ke Kebijakan Label
+            removed: Logo (mode gelap) dihapus dari Kebijakan Label
+        icon:
+          added: Ikon ditambahkan ke Kebijakan Label
+          removed: Ikon dihapus dari Kebijakan Label
+          dark:
+            added: Ikon (mode gelap) ditambahkan ke Kebijakan Label
+            removed: Ikon (mode gelap) dihapus dari Kebijakan Label
+        font:
+          added: Font ditambahkan ke Kebijakan Label
+          removed: Font dihapus dari Kebijakan Label
+        assets:
+          removed: Aset dihapus dari Kebijakan Label
+    default:
+      language:
+        set: Kumpulan bahasa default
+    oidc:
+      settings:
+        added: Konfigurasi OIDC ditambahkan
+        changed: Konfigurasi OIDC berubah
+        removed: Konfigurasi OIDC dihapus
+    secret:
+      generator:
+        added: Generator rahasia ditambahkan
+        changed: Generator rahasia berubah
+        removed: Generator rahasia dihapus
+    smtp:
+      config:
+        added: Konfigurasi SMTP ditambahkan
+        changed: Konfigurasi SMTP berubah
+        activated: Konfigurasi SMTP diaktifkan
+        deactivated: Konfigurasi SMTP dinonaktifkan
+        removed: Konfigurasi SMTP dihapus
+        password:
+          changed: Rahasia konfigurasi SMTP diubah
+    sms:
+      config:
+        twilio:
+          added: Penyedia SMS Twilio ditambahkan
+          changed: Penyedia SMS Twilio berubah
+          token:
+            changed: Token penyedia SMS Twilio berubah
+          removed: Penyedia SMS Twilio dihapus
+          activated: Penyedia SMS Twilio diaktifkan
+          deactivated: Penyedia SMS Twilio dinonaktifkan
+  key_pair:
+    added: Pasangan kunci ditambahkan
+    certificate:
+      added: Sertifikat ditambahkan
+  action:
+    added: Tindakan ditambahkan
+    changed: Tindakan berubah
+    deactivated: Tindakan dinonaktifkan
+    reactivated: Tindakan diaktifkan kembali
+    removed: Tindakan dihapus
+  instance:
+    added: Contoh ditambahkan
+    changed: Contohnya berubah
+    customtext:
+      removed: Teks khusus dihapus
+      set: Kumpulan teks khusus
+      template:
+        removed: Templat teks khusus dihapus
+    default:
+      language:
+        set: Kumpulan bahasa default
+      org:
+        set: Kumpulan organisasi default
+    domain:
+      added: Domain ditambahkan
+      primary:
+        set: Kumpulan domain primer
+      removed: Domain dihapus
+    iam:
+      console:
+        set: Kumpulan aplikasi Konsol ZITADEL
+      project:
+        set: Kumpulan proyek ZITADEL
+    mail:
+      template:
+        added: Templat email ditambahkan
+        changed: Templat email diubah
+      text:
+        added: Teks email ditambahkan
+        changed: Teks email berubah
+    member:
+      added: Anggota instans ditambahkan
+      changed: Anggota contoh berubah
+      removed: Anggota contoh dihapus
+      cascade:
+        removed: Kaskade anggota instans dihapus
+    notification:
+      provider:
+        debug:
+          fileadded: Penyedia pemberitahuan debug file ditambahkan
+          filechanged: Penyedia pemberitahuan debug file berubah
+          fileremoved: Penyedia pemberitahuan debug file dihapus
+          logadded: Penyedia pemberitahuan debug log ditambahkan
+          logchanged: Penyedia pemberitahuan debug log berubah
+          logremoved: Penyedia pemberitahuan debug log dihapus
+    oidc:
+      settings:
+        added: Pengaturan OIDC ditambahkan
+        changed: Pengaturan OIDC berubah
+    policy:
+      domain:
+        added: Kebijakan domain ditambahkan
+        changed: Kebijakan domain berubah
+      label:
+        activated: Kebijakan label diaktifkan
+        added: Kebijakan label ditambahkan
+        assets:
+          removed: Aset dari kebijakan label dihapus
+        changed: Kebijakan label diubah
+        font:
+          added: Font ditambahkan ke kebijakan label
+          removed: Font dihapus dari kebijakan label
+        icon:
+          added: Ikon ditambahkan ke kebijakan label
+          removed: Ikon dihapus dari kebijakan label
+          dark:
+            added: Ikon ditambahkan ke kebijakan label gelap
+            removed: Ikon dihapus dari kebijakan label gelap
+        logo:
+          added: Logo ditambahkan ke kebijakan label
+          removed: Logo dihapus dari kebijakan label
+          dark:
+            added: Logo ditambahkan ke kebijakan label gelap
+            removed: Logo dihapus dari kebijakan label gelap
+      lockout:
+        added: Kebijakan penguncian ditambahkan
+        changed: Kebijakan penguncian diubah
+      login:
+        added: Kebijakan login ditambahkan
+        changed: Kebijakan masuk diubah
+        idpprovider:
+          added: Penyedia Identitas ditambahkan ke kebijakan login
+          cascade:
+            removed: Kaskade Penyedia Identitas dihapus dari kebijakan login
+          removed: Penyedia Identitas dihapus dari kebijakan login
+        multifactor:
+          added: Multifaktor ditambahkan ke kebijakan login
+          removed: Multifaktor dihapus dari kebijakan login
+        secondfactor:
+          added: Faktor kedua ditambahkan ke kebijakan login
+          removed: Faktor kedua dihapus dari kebijakan login
+      password:
+        age:
+          added: Kebijakan usia kata sandi ditambahkan
+          changed: Kebijakan usia kata sandi diubah
+        complexity:
+          added: Kebijakan kompleksitas kata sandi ditambahkan
+          changed: Kebijakan kompleksitas kata sandi dihapus
+      privacy:
+        added: Kebijakan privasi ditambahkan
+        changed: Kebijakan privasi berubah
+      security:
+        set: Kebijakan keamanan ditetapkan
+    removed: Contoh dihapus
+    secret:
+      generator:
+        added: Generator rahasia ditambahkan
+        changed: Generator rahasia berubah
+        removed: Generator rahasia dihapus
+    sms:
+      configtwilio:
+        activated: Konfigurasi SMS Twilio diaktifkan
+        added: Konfigurasi SMS Twilio ditambahkan
+        changed: Konfigurasi SMS Twilio berubah
+        deactivated: Konfigurasi SMS Twilio dinonaktifkan
+        removed: Konfigurasi SMS Twilio dihapus
+        token:
+          changed: Konfigurasi Token Twilio SMS berubah
+    smtp:
+      config:
+        added: Konfigurasi SMTP ditambahkan
+        changed: Konfigurasi SMTP berubah
+        activated: Konfigurasi SMTP diaktifkan
+        deactivated: Konfigurasi SMTP dinonaktifkan
+        password:
+          changed: Kata sandi konfigurasi SMTP diubah
+        removed: Konfigurasi SMTP dihapus
+  user_schema:
+    created: Skema Pengguna dibuat
+    updated: Skema Pengguna diperbarui
+    deactivated: Skema Pengguna dinonaktifkan
+    reactivated: Skema Pengguna diaktifkan kembali
+    deleted: Skema Pengguna dihapus
+  web_key:
+    added: Kunci Web ditambahkan
+    activated: Kunci Web diaktifkan
+    deactivated: Kunci Web dinonaktifkan
+    removed: Kunci Web dihapus
+Application:
+  OIDC:
+    UnsupportedVersion: Versi OIDC Anda tidak didukung
+    V1:
+      NotCompliant: Konfigurasi Anda tidak sesuai dan berbeda dari standar OIDC 1.0.
+      NoRedirectUris: Setidaknya satu uri pengalihan harus didaftarkan.
+      NotAllCombinationsAreAllowed: Konfigurasinya sesuai, tetapi tidak semua kemungkinan kombinasi diperbolehkan.
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: Kode jenis pemberian hanya mengizinkan uri pengalihan http untuk web tipe aplikasi.
+          CustomOnlyForNative: Kode jenis pemberian hanya mengizinkan uri pengalihan khusus untuk apptype asli (mis. appname:// )
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: Jenis pemberian implisit tidak mengizinkan uris pengalihan khusus
+          HttpNotAllowed: Jenis hibah implisit tidak mengizinkan http redirect uris
+          HttpLocalhostOnlyForNative: Http://localhost redirect uri hanya diperbolehkan untuk aplikasi asli.
+      Native:
+        AuthMethodType:
+          NotNone: Aplikasi asli seharusnya tidak memiliki tipe metode autentikasi.
+        RedirectUris:
+          MustBeHttpLocalhost: URI pengalihan harus dimulai dengan protokol Anda sendiri, http://127.0.0.1, http://[::1] atau http://localhost.
+      UserAgent:
+        AuthMethodType:
+          NotNone: Aplikasi agen pengguna seharusnya tidak memiliki authmethodtype.
+      GrantType:
+        Refresh:
+          NoAuthCode: Refresh Token hanya diperbolehkan jika dikombinasikan dengan Kode Otorisasi.
+Action:
+  Flow:
+    Type:
+      Unspecified: Tidak ditentukan
+      ExternalAuthentication: Otentikasi Eksternal
+      CustomiseToken: Token Pelengkap
+      InternalAuthentication: Otentikasi Internal
+      CustomizeSAMLResponse: Melengkapi SAMLResponse
+  TriggerType:
+    Unspecified: Tidak ditentukan
+    PostAuthentication: Posting Otentikasi
+    PreCreation: Pra Penciptaan
+    PostCreation: Pasca Penciptaan
+    PreUserinfoCreation: Pra pembuatan Info Pengguna
+    PreAccessTokenCreation: Pembuatan token pra akses
+    PreSAMLResponseCreation: Sebelum pembuatan SAMLResponse

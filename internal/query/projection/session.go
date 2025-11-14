@@ -87,6 +87,7 @@ func (*sessionProjection) Init() *old_handler.Check {
 				SessionColumnUserAgentFingerprintID+"_idx",
 				[]string{SessionColumnUserAgentFingerprintID},
 			)),
+			handler.WithIndex(handler.NewIndex(SessionColumnUserID+"_idx", []string{SessionColumnUserID})),
 		),
 	)
 }

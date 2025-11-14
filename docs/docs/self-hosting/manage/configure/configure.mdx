@@ -8,9 +8,11 @@ import TabItem from "@theme/TabItem";
 import LinuxUnix from "./_linuxunix.mdx";
 import Compose from "./_compose.mdx";
 import Helm from "./_helm.mdx";
+import Login from "./_login.md";
 import CodeBlock from "@theme/CodeBlock";
 import DefaultsYamlSource from "!!raw-loader!./defaults.yaml";
 import StepsYamlSource from "!!raw-loader!./steps.yaml";
+import SkipSuperUserDatabaseQueries from "!!raw-loader!./example-skip-superuser-queries.yaml";
 
 This guide assumes you are familiar with [running ZITADEL using the least amount of configuration possible](/docs/self-hosting/deploy/overview).
 
@@ -44,6 +46,18 @@ By using the FirstInstance section, you can overwrite the [DefaultInstance confi
 <details>
   <summary>steps.yaml</summary>
   <CodeBlock language="yaml">{StepsYamlSource}</CodeBlock>
+</details>
+
+### Pre-existing Database and User
+
+By default, when you run `zitadel init` or `zitadel start-from-init`, ZITADEL checks if the specified database and user exist. If they don't, ZITADEL creates them and grants the necessary permissions.
+
+If you manage the database and user manually, you can instruct ZITADEL to skip these checks. This is useful if the ZITADEL user has limited database permissions, for example, if it is not a `SUPERUSER`. This scenario is most common on cloud providers.
+To skip the checks, you must ensure the database objects (database, user, grant) exist before running the commands and then set the `Database.postgres.Admin.ExistingDatabase` field in your configuration as shown below. This tells ZITADEL to connect to the existing database as an admin user, bypassing the creation and permission steps.
+
+<details>
+  <summary>skip-superuser-queries-config.yaml</summary>
+  <CodeBlock language="yaml">{SkipSuperUserDatabaseQueries}</CodeBlock>
 </details>
 
 ### Multiple configuration files
@@ -90,20 +104,16 @@ There are three ways to pass the masterkey to the `zitadel` binary:
 >
   <TabItem value="linuxunix">
     <LinuxUnix />
+    <Login/>
   </TabItem>
   <TabItem value="compose">
     <Compose />
+    <Login/>
   </TabItem>
   <TabItem value="k8s">
     <Helm />
   </TabItem>
 </Tabs>
-
-Open your favorite internet browser at [http://localhost:8080/ui/console](http://localhost:8080/ui/console).
-This is the IAM admin users login according to your configuration in the [example-zitadel-init-steps.yaml](./example-zitadel-init-steps.yaml):
-
-- **username**: _root@<span></span>zitadel.localhost_
-- **password**: _RootPassword1!_
 
 ## What's next
 

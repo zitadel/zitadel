@@ -56,6 +56,8 @@ func (*personalAccessTokenProjection) Init() *old_handler.Check {
 			handler.WithIndex(handler.NewIndex("user_id", []string{PersonalAccessTokenColumnUserID})),
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{PersonalAccessTokenColumnResourceOwner})),
 			handler.WithIndex(handler.NewIndex("owner_removed", []string{PersonalAccessTokenColumnOwnerRemoved})),
+			handler.WithIndex(handler.NewIndex("creation_date", []string{PersonalAccessTokenColumnCreationDate})),
+			handler.WithIndex(handler.NewIndex("expiration_date", []string{PersonalAccessTokenColumnExpiration})),
 		),
 	)
 }

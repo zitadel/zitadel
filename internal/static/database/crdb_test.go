@@ -40,7 +40,7 @@ const (
 		" WHERE instance_id = $1"
 )
 
-func Test_crdbStorage_CreateObject(t *testing.T) {
+func Test_dbStorage_CreateObject(t *testing.T) {
 	type fields struct {
 		client db
 	}
@@ -112,7 +112,7 @@ func Test_crdbStorage_CreateObject(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &crdbStorage{
+			c := &storage{
 				client: tt.fields.client.db,
 			}
 			got, err := c.PutObject(tt.args.ctx, tt.args.instanceID, tt.args.location, tt.args.resourceOwner, tt.args.name, tt.args.contentType, tt.args.objectType, tt.args.data, tt.args.objectSize)
@@ -127,7 +127,7 @@ func Test_crdbStorage_CreateObject(t *testing.T) {
 	}
 }
 
-func Test_crdbStorage_RemoveObject(t *testing.T) {
+func Test_dbStorage_RemoveObject(t *testing.T) {
 	type fields struct {
 		client db
 	}
@@ -166,7 +166,7 @@ func Test_crdbStorage_RemoveObject(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &crdbStorage{
+			c := &storage{
 				client: tt.fields.client.db,
 			}
 			err := c.RemoveObject(tt.args.ctx, tt.args.instanceID, tt.args.resourceOwner, tt.args.name)
@@ -178,7 +178,7 @@ func Test_crdbStorage_RemoveObject(t *testing.T) {
 	}
 }
 
-func Test_crdbStorage_RemoveObjects(t *testing.T) {
+func Test_dbStorage_RemoveObjects(t *testing.T) {
 	type fields struct {
 		client db
 	}
@@ -216,7 +216,7 @@ func Test_crdbStorage_RemoveObjects(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &crdbStorage{
+			c := &storage{
 				client: tt.fields.client.db,
 			}
 			err := c.RemoveObjects(tt.args.ctx, tt.args.instanceID, tt.args.resourceOwner, tt.args.objectType)
@@ -227,7 +227,7 @@ func Test_crdbStorage_RemoveObjects(t *testing.T) {
 		})
 	}
 }
-func Test_crdbStorage_RemoveInstanceObjects(t *testing.T) {
+func Test_dbStorage_RemoveInstanceObjects(t *testing.T) {
 	type fields struct {
 		client db
 	}
@@ -260,7 +260,7 @@ func Test_crdbStorage_RemoveInstanceObjects(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &crdbStorage{
+			c := &storage{
 				client: tt.fields.client.db,
 			}
 			err := c.RemoveInstanceObjects(tt.args.ctx, tt.args.instanceID)

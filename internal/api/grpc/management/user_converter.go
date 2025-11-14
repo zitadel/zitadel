@@ -133,8 +133,14 @@ func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human 
 }
 
 func AddMachineUserRequestToCommand(req *mgmt_pb.AddMachineUserRequest, resourceowner string) *command.Machine {
+	userId := ""
+	if req.UserId != nil {
+		userId = *req.UserId
+	}
+
 	return &command.Machine{
 		ObjectRoot: models.ObjectRoot{
+			AggregateID:   userId,
 			ResourceOwner: resourceowner,
 		},
 		Username:        req.UserName,

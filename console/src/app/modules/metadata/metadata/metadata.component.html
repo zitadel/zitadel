@@ -1,7 +1,7 @@
 <cnsl-card class="metadata-details" [title]="'DESCRIPTIONS.METADATA_TITLE' | translate" [description]="description">
   <mat-spinner card-actions class="spinner" diameter="20" *ngIf="loading"></mat-spinner>
 
-  <cnsl-refresh-table [loading]="loading$ | async" (refreshed)="refresh.emit()" [dataSize]="dataSource.data.length">
+  <cnsl-refresh-table *ngIf="dataSource$ | async as dataSource" [loading]="loading" (refreshed)="refresh.emit()">
     <button actions [disabled]="disabled" mat-raised-button color="primary" class="edit" (click)="editClicked.emit()">
       {{ 'ACTIONS.EDIT' | translate }}
     </button>
@@ -28,7 +28,7 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
-    <div *ngIf="(loading$ | async) === false && !dataSource?.data?.length" class="no-content-row">
+    <div *ngIf="!loading && !dataSource?.data?.length" class="no-content-row">
       <i class="las la-exclamation"></i>
       <span>{{ 'USER.MFA.EMPTY' | translate }}</span>
     </div>

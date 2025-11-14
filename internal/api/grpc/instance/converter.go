@@ -28,7 +28,7 @@ func InstanceToPb(instance *query.Instance) *instance_pb.Instance {
 		Name:    instance.Name,
 		Domains: DomainsToPb(instance.Domains),
 		Version: build.Version(),
-		State:   instance_pb.State_STATE_RUNNING, //TODO: change when delete is implemented
+		State:   instance_pb.State_STATE_RUNNING, // TODO: change when delete is implemented
 	}
 }
 
@@ -44,7 +44,7 @@ func InstanceDetailToPb(instance *query.Instance) *instance_pb.InstanceDetail {
 		Name:    instance.Name,
 		Domains: DomainsToPb(instance.Domains),
 		Version: build.Version(),
-		State:   instance_pb.State_STATE_RUNNING, //TODO: change when delete is implemented
+		State:   instance_pb.State_STATE_RUNNING, // TODO: change when delete is implemented
 	}
 }
 
@@ -107,6 +107,46 @@ func DomainToPb(d *query.InstanceDomain) *instance_pb.Domain {
 		Domain:    d.Domain,
 		Primary:   d.IsPrimary,
 		Generated: d.IsGenerated,
+		Details: object.ToViewDetailsPb(
+			d.Sequence,
+			d.CreationDate,
+			d.ChangeDate,
+			d.InstanceID,
+		),
+	}
+}
+
+func TrustedDomainQueriesToModel(queries []*instance_pb.TrustedDomainSearchQuery) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
+	for i, query := range queries {
+		q[i], err = TrustedDomainQueryToModel(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
+func TrustedDomainQueryToModel(searchQuery *instance_pb.TrustedDomainSearchQuery) (query.SearchQuery, error) {
+	switch q := searchQuery.Query.(type) {
+	case *instance_pb.TrustedDomainSearchQuery_DomainQuery:
+		return query.NewInstanceTrustedDomainDomainSearchQuery(object.TextMethodToQuery(q.DomainQuery.Method), q.DomainQuery.Domain)
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "INST-Ags42", "List.Query.Invalid")
+	}
+}
+
+func TrustedDomainsToPb(domains []*query.InstanceTrustedDomain) []*instance_pb.TrustedDomain {
+	d := make([]*instance_pb.TrustedDomain, len(domains))
+	for i, domain := range domains {
+		d[i] = TrustedDomainToPb(domain)
+	}
+	return d
+}
+
+func TrustedDomainToPb(d *query.InstanceTrustedDomain) *instance_pb.TrustedDomain {
+	return &instance_pb.TrustedDomain{
+		Domain: d.Domain,
 		Details: object.ToViewDetailsPb(
 			d.Sequence,
 			d.CreationDate,

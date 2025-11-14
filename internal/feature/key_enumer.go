@@ -7,17 +7,45 @@ import (
 	"strings"
 )
 
-const _KeyName = "unspecifiedlogin_default_orgtrigger_introspection_projectionslegacy_introspectionuser_schematoken_exchangeactionsimproved_performance"
+const (
+	_KeyName_0      = "unspecifiedlogin_default_org"
+	_KeyLowerName_0 = "unspecifiedlogin_default_org"
+	_KeyName_1      = "user_schematoken_exchange"
+	_KeyLowerName_1 = "user_schematoken_exchange"
+	_KeyName_2      = "improved_performance"
+	_KeyLowerName_2 = "improved_performance"
+	_KeyName_3      = "debug_oidc_parent_erroroidc_single_v1_session_termination"
+	_KeyLowerName_3 = "debug_oidc_parent_erroroidc_single_v1_session_termination"
+	_KeyName_4      = "enable_back_channel_logoutlogin_v2permission_check_v2console_use_v2_user_apienable_relational_tables"
+	_KeyLowerName_4 = "enable_back_channel_logoutlogin_v2permission_check_v2console_use_v2_user_apienable_relational_tables"
+)
 
-var _KeyIndex = [...]uint8{0, 11, 28, 61, 81, 92, 106, 113, 133}
-
-const _KeyLowerName = "unspecifiedlogin_default_orgtrigger_introspection_projectionslegacy_introspectionuser_schematoken_exchangeactionsimproved_performance"
+var (
+	_KeyIndex_0 = [...]uint8{0, 11, 28}
+	_KeyIndex_1 = [...]uint8{0, 11, 25}
+	_KeyIndex_2 = [...]uint8{0, 20}
+	_KeyIndex_3 = [...]uint8{0, 23, 57}
+	_KeyIndex_4 = [...]uint8{0, 26, 34, 53, 76, 100}
+)
 
 func (i Key) String() string {
-	if i < 0 || i >= Key(len(_KeyIndex)-1) {
+	switch {
+	case 0 <= i && i <= 1:
+		return _KeyName_0[_KeyIndex_0[i]:_KeyIndex_0[i+1]]
+	case 4 <= i && i <= 5:
+		i -= 4
+		return _KeyName_1[_KeyIndex_1[i]:_KeyIndex_1[i+1]]
+	case i == 7:
+		return _KeyName_2
+	case 9 <= i && i <= 10:
+		i -= 9
+		return _KeyName_3[_KeyIndex_3[i]:_KeyIndex_3[i+1]]
+	case 12 <= i && i <= 16:
+		i -= 12
+		return _KeyName_4[_KeyIndex_4[i]:_KeyIndex_4[i+1]]
+	default:
 		return fmt.Sprintf("Key(%d)", i)
 	}
-	return _KeyName[_KeyIndex[i]:_KeyIndex[i+1]]
 }
 
 // An "invalid array index" compiler error signifies that the constant values have changed.
@@ -26,44 +54,60 @@ func _KeyNoOp() {
 	var x [1]struct{}
 	_ = x[KeyUnspecified-(0)]
 	_ = x[KeyLoginDefaultOrg-(1)]
-	_ = x[KeyTriggerIntrospectionProjections-(2)]
-	_ = x[KeyLegacyIntrospection-(3)]
 	_ = x[KeyUserSchema-(4)]
 	_ = x[KeyTokenExchange-(5)]
-	_ = x[KeyActions-(6)]
 	_ = x[KeyImprovedPerformance-(7)]
+	_ = x[KeyDebugOIDCParentError-(9)]
+	_ = x[KeyOIDCSingleV1SessionTermination-(10)]
+	_ = x[KeyEnableBackChannelLogout-(12)]
+	_ = x[KeyLoginV2-(13)]
+	_ = x[KeyPermissionCheckV2-(14)]
+	_ = x[KeyConsoleUseV2UserApi-(15)]
+	_ = x[KeyEnableRelationalTables-(16)]
 }
 
-var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyTriggerIntrospectionProjections, KeyLegacyIntrospection, KeyUserSchema, KeyTokenExchange, KeyActions, KeyImprovedPerformance}
+var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyUserSchema, KeyTokenExchange, KeyImprovedPerformance, KeyDebugOIDCParentError, KeyOIDCSingleV1SessionTermination, KeyEnableBackChannelLogout, KeyLoginV2, KeyPermissionCheckV2, KeyConsoleUseV2UserApi, KeyEnableRelationalTables}
 
 var _KeyNameToValueMap = map[string]Key{
-	_KeyName[0:11]:         KeyUnspecified,
-	_KeyLowerName[0:11]:    KeyUnspecified,
-	_KeyName[11:28]:        KeyLoginDefaultOrg,
-	_KeyLowerName[11:28]:   KeyLoginDefaultOrg,
-	_KeyName[28:61]:        KeyTriggerIntrospectionProjections,
-	_KeyLowerName[28:61]:   KeyTriggerIntrospectionProjections,
-	_KeyName[61:81]:        KeyLegacyIntrospection,
-	_KeyLowerName[61:81]:   KeyLegacyIntrospection,
-	_KeyName[81:92]:        KeyUserSchema,
-	_KeyLowerName[81:92]:   KeyUserSchema,
-	_KeyName[92:106]:       KeyTokenExchange,
-	_KeyLowerName[92:106]:  KeyTokenExchange,
-	_KeyName[106:113]:      KeyActions,
-	_KeyLowerName[106:113]: KeyActions,
-	_KeyName[113:133]:      KeyImprovedPerformance,
-	_KeyLowerName[113:133]: KeyImprovedPerformance,
+	_KeyName_0[0:11]:        KeyUnspecified,
+	_KeyLowerName_0[0:11]:   KeyUnspecified,
+	_KeyName_0[11:28]:       KeyLoginDefaultOrg,
+	_KeyLowerName_0[11:28]:  KeyLoginDefaultOrg,
+	_KeyName_1[0:11]:        KeyUserSchema,
+	_KeyLowerName_1[0:11]:   KeyUserSchema,
+	_KeyName_1[11:25]:       KeyTokenExchange,
+	_KeyLowerName_1[11:25]:  KeyTokenExchange,
+	_KeyName_2[0:20]:        KeyImprovedPerformance,
+	_KeyLowerName_2[0:20]:   KeyImprovedPerformance,
+	_KeyName_3[0:23]:        KeyDebugOIDCParentError,
+	_KeyLowerName_3[0:23]:   KeyDebugOIDCParentError,
+	_KeyName_3[23:57]:       KeyOIDCSingleV1SessionTermination,
+	_KeyLowerName_3[23:57]:  KeyOIDCSingleV1SessionTermination,
+	_KeyName_4[0:26]:        KeyEnableBackChannelLogout,
+	_KeyLowerName_4[0:26]:   KeyEnableBackChannelLogout,
+	_KeyName_4[26:34]:       KeyLoginV2,
+	_KeyLowerName_4[26:34]:  KeyLoginV2,
+	_KeyName_4[34:53]:       KeyPermissionCheckV2,
+	_KeyLowerName_4[34:53]:  KeyPermissionCheckV2,
+	_KeyName_4[53:76]:       KeyConsoleUseV2UserApi,
+	_KeyLowerName_4[53:76]:  KeyConsoleUseV2UserApi,
+	_KeyName_4[76:100]:      KeyEnableRelationalTables,
+	_KeyLowerName_4[76:100]: KeyEnableRelationalTables,
 }
 
 var _KeyNames = []string{
-	_KeyName[0:11],
-	_KeyName[11:28],
-	_KeyName[28:61],
-	_KeyName[61:81],
-	_KeyName[81:92],
-	_KeyName[92:106],
-	_KeyName[106:113],
-	_KeyName[113:133],
+	_KeyName_0[0:11],
+	_KeyName_0[11:28],
+	_KeyName_1[0:11],
+	_KeyName_1[11:25],
+	_KeyName_2[0:20],
+	_KeyName_3[0:23],
+	_KeyName_3[23:57],
+	_KeyName_4[0:26],
+	_KeyName_4[26:34],
+	_KeyName_4[34:53],
+	_KeyName_4[53:76],
+	_KeyName_4[76:100],
 }
 
 // KeyString retrieves an enum value from the enum constants string name.

@@ -29,6 +29,7 @@ const (
 	NextStepProjectRequired
 	NextStepRedirectToExternalIDP
 	NextStepLoginSucceeded
+	NextStepVerifyInvite
 )
 
 type LoginStep struct{}
@@ -137,7 +138,9 @@ func (s *ChangeUsernameStep) Type() NextStepType {
 	return NextStepChangeUsername
 }
 
-type VerifyEMailStep struct{}
+type VerifyEMailStep struct {
+	InitPassword bool
+}
 
 func (s *VerifyEMailStep) Type() NextStepType {
 	return NextStepVerifyEmail
@@ -188,4 +191,10 @@ type LoginSucceededStep struct{}
 
 func (s *LoginSucceededStep) Type() NextStepType {
 	return NextStepLoginSucceeded
+}
+
+type VerifyInviteStep struct{}
+
+func (s *VerifyInviteStep) Type() NextStepType {
+	return NextStepVerifyInvite
 }

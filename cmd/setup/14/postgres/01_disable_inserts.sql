@@ -1,1 +1,0 @@
-ALTER TABLE eventstore.events RENAME TO events_old;

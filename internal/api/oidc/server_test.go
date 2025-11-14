@@ -30,6 +30,7 @@ func TestServer_createDiscoveryConfig(t *testing.T) {
 			fields{
 				LegacyServer: op.NewLegacyServer(
 					func() *op.Provider {
+						//nolint:staticcheck
 						provider, _ := op.NewForwardedOpenIDProvider("path",
 							&op.Config{
 								CodeMethodS256:          true,
@@ -77,7 +78,7 @@ func TestServer_createDiscoveryConfig(t *testing.T) {
 				GrantTypesSupported:                                []oidc.GrantType{oidc.GrantTypeCode, oidc.GrantTypeImplicit, oidc.GrantTypeRefreshToken, oidc.GrantTypeBearer},
 				ACRValuesSupported:                                 nil,
 				SubjectTypesSupported:                              []string{"public"},
-				IDTokenSigningAlgValuesSupported:                   []string{"RS256"},
+				IDTokenSigningAlgValuesSupported:                   supportedWebKeyAlgs,
 				IDTokenEncryptionAlgValuesSupported:                nil,
 				IDTokenEncryptionEncValuesSupported:                nil,
 				UserinfoSigningAlgValuesSupported:                  nil,

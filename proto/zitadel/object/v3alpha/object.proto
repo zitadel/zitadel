@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package zitadel.object.v3alpha;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha;object";
+
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+enum OwnerType {
+  OWNER_TYPE_UNSPECIFIED = 0;
+  OWNER_TYPE_SYSTEM = 1;
+  OWNER_TYPE_INSTANCE = 2;
+  OWNER_TYPE_ORG = 3;
+}
+
+message Owner {
+  OwnerType type = 1;
+  string id = 2;
+}
+
+message Instance {
+  oneof property {
+    option (validate.required) = true;
+    string id = 1;
+    string domain = 2;
+  }
+}
+
+message Organization {
+  oneof property {
+    option (validate.required) = true;
+    string org_id = 1;
+    string org_domain = 2;
+  }
+}

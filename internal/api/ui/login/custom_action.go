@@ -127,7 +127,7 @@ func (l *Login) runPostExternalAuthenticationActions(
 						return func(goja.FunctionCall) goja.Value {
 							metadata, err := l.query.SearchOrgMetadata(
 								ctx,
-								true,
+								false,
 								resourceOwner,
 								&query.OrgMetadataSearchQueries{},
 								false,
@@ -321,7 +321,7 @@ func (l *Login) runPreCreationActions(
 						return func(goja.FunctionCall) goja.Value {
 							metadata, err := l.query.SearchOrgMetadata(
 								ctx,
-								true,
+								false,
 								resourceOwner,
 								&query.OrgMetadataSearchQueries{},
 								false,
@@ -397,7 +397,7 @@ func (l *Login) runPostCreationActions(
 						return func(goja.FunctionCall) goja.Value {
 							metadata, err := l.query.SearchOrgMetadata(
 								ctx,
-								true,
+								false,
 								resourceOwner,
 								&query.OrgMetadataSearchQueries{},
 								false,
@@ -430,7 +430,7 @@ func (l *Login) runPostCreationActions(
 }
 
 func tokenCtxFields(tokens *oidc.Tokens[*oidc.IDTokenClaims]) []actions.FieldOption {
-	var accessToken, idToken string
+	var accessToken, idToken, refreshToken string
 	getClaim := func(claim string) interface{} {
 		return nil
 	}
@@ -443,9 +443,11 @@ func tokenCtxFields(tokens *oidc.Tokens[*oidc.IDTokenClaims]) []actions.FieldOpt
 			actions.SetFields("idToken", idToken),
 			actions.SetFields("getClaim", getClaim),
 			actions.SetFields("claimsJSON", claimsJSON),
+			actions.SetFields("refreshToken", refreshToken),
 		}
 	}
 	accessToken = tokens.AccessToken
+	refreshToken = tokens.RefreshToken
 	idToken = tokens.IDToken
 	if tokens.IDTokenClaims != nil {
 		getClaim = func(claim string) interface{} {
@@ -464,6 +466,7 @@ func tokenCtxFields(tokens *oidc.Tokens[*oidc.IDTokenClaims]) []actions.FieldOpt
 		actions.SetFields("idToken", idToken),
 		actions.SetFields("getClaim", getClaim),
 		actions.SetFields("claimsJSON", claimsJSON),
+		actions.SetFields("refreshToken", refreshToken),
 	}
 }
 
@@ -479,7 +482,7 @@ func (l *Login) resourceOwnerOfUserIDPLink(ctx context.Context, idpConfigID stri
 	queries := []query.SearchQuery{
 		idQuery, externalIDQuery,
 	}
-	links, err := l.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, false)
+	links, err := l.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, nil)
 	if err != nil {
 		return "", err
 	}

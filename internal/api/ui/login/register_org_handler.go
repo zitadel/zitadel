@@ -3,7 +3,7 @@ package login
 import (
 	"net/http"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -97,16 +97,12 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRequest *domain.AuthRequest, formData *registerOrgFormData, err error) {
-	var errID, errMessage string
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
-	}
 	if formData == nil {
 		formData = new(registerOrgFormData)
 	}
 	translator := l.getTranslator(r.Context(), authRequest)
 	data := registerOrgData{
-		baseData:            l.getBaseData(r, authRequest, translator, "RegistrationOrg.Title", "RegistrationOrg.Description", errID, errMessage),
+		baseData:            l.getBaseData(r, authRequest, translator, "RegistrationOrg.Title", "RegistrationOrg.Description", err),
 		registerOrgFormData: *formData,
 	}
 	pwPolicy := l.getPasswordComplexityPolicy(r, "0")
@@ -128,7 +124,7 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 	orgPolicy, _ := l.getDefaultDomainPolicy(r)
 	if orgPolicy != nil {
 		data.UserLoginMustBeDomain = orgPolicy.UserLoginMustBeDomain
-		data.IamDomain = authz.GetInstance(r.Context()).RequestedDomain()
+		data.IamDomain = http_util.DomainContext(r.Context()).RequestedDomain()
 	}
 
 	if authRequest == nil {

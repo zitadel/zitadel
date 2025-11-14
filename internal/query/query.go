@@ -11,6 +11,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/cache/connector"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
@@ -26,11 +27,15 @@ type Queries struct {
 	eventstore   *eventstore.Eventstore
 	eventStoreV4 es_v4.Querier
 	client       *database.DB
+	caches       *Caches
 
-	keyEncryptionAlgorithm crypto.EncryptionAlgorithm
-	idpConfigEncryption    crypto.EncryptionAlgorithm
-	sessionTokenVerifier   func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error)
-	checkPermission        domain.PermissionCheck
+	keyEncryptionAlgorithm    crypto.EncryptionAlgorithm
+	idpConfigEncryption       crypto.EncryptionAlgorithm
+	targetEncryptionAlgorithm crypto.EncryptionAlgorithm
+	smtpEncryptionAlgorithm   crypto.EncryptionAlgorithm
+	smsEncryptionAlgorithm    crypto.EncryptionAlgorithm
+	sessionTokenVerifier      func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error)
+	checkPermission           domain.PermissionCheck
 
 	DefaultLanguage                     language.Tag
 	mutex                               sync.Mutex
@@ -47,9 +52,10 @@ func StartQueries(
 	es *eventstore.Eventstore,
 	esV4 es_v4.Querier,
 	querySqlClient, projectionSqlClient *database.DB,
+	cacheConnectors connector.Connectors,
 	projections projection.Config,
 	defaults sd.SystemDefaults,
-	idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm,
+	idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm, certEncryptionAlgorithm, targetEncryptionAlgorithm, smsEncryptionAlgorithm, smtpEncryptionAlgorithm crypto.EncryptionAlgorithm,
 	zitadelRoles []authz.RoleMapping,
 	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error),
 	permissionCheck func(q *Queries) domain.PermissionCheck,
@@ -67,6 +73,9 @@ func StartQueries(
 		zitadelRoles:                        zitadelRoles,
 		keyEncryptionAlgorithm:              keyEncryptionAlgorithm,
 		idpConfigEncryption:                 idpConfigEncryption,
+		targetEncryptionAlgorithm:           targetEncryptionAlgorithm,
+		smsEncryptionAlgorithm:              smsEncryptionAlgorithm,
+		smtpEncryptionAlgorithm:             smtpEncryptionAlgorithm,
 		sessionTokenVerifier:                sessionTokenVerifier,
 		multifactors: domain.MultifactorConfigs{
 			OTP: domain.OTPConfig{
@@ -79,12 +88,28 @@ func StartQueries(
 
 	repo.checkPermission = permissionCheck(repo)
 
+	projections.ActiveInstancer = repo
 	err = projection.Create(ctx, projectionSqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm, systemAPIUsers)
 	if err != nil {
 		return nil, err
 	}
 	if startProjections {
-		projection.Start(ctx)
+		err = projection.Start(ctx)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	repo.caches, err = startCaches(
+		ctx,
+		cacheConnectors,
+		ActiveInstanceConfig{
+			MaxEntries: int(projections.MaxActiveInstances),
+			TTL:        projections.HandleActiveInstances,
+		},
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	return repo, nil
@@ -92,10 +117,6 @@ func StartQueries(
 
 func (q *Queries) Health(ctx context.Context) error {
 	return q.client.Ping()
-}
-
-type prepareDatabase interface {
-	Timetravel(d time.Duration) string
 }
 
 // cleanStaticQueries removes whitespaces,
@@ -133,4 +154,17 @@ func triggerBatch(ctx context.Context, handlers ...*handler.Handler) {
 	}
 
 	wg.Wait()
+}
+
+func findTextEqualsQuery(column Column, queries []SearchQuery) (text string, ok bool) {
+	for _, query := range queries {
+		if query.Col() != column {
+			continue
+		}
+		tq, ok := query.(*textQuery)
+		if ok && tq.Compare == TextEquals {
+			return tq.Text, true
+		}
+	}
+	return "", false
 }

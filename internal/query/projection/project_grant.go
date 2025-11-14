@@ -93,6 +93,10 @@ func (p *projectGrantProjection) Reducers() []handler.AggregateReducer {
 					Event:  project.ProjectRemovedType,
 					Reduce: p.reduceProjectRemoved,
 				},
+				{
+					Event:  project.ProjectOwnerCorrected,
+					Reduce: p.reduceOwnerCorrected,
+				},
 			},
 		},
 		{
@@ -267,5 +271,19 @@ func (p *projectGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*ha
 				handler.NewCond(ProjectGrantColumnGrantedOrgID, e.Aggregate().ID),
 			},
 		),
+	), nil
+}
+
+func (p *projectGrantProjection) reduceOwnerCorrected(event eventstore.Event) (*handler.Statement, error) {
+	return handler.NewUpdateStatement(
+		event,
+		[]handler.Column{
+			handler.NewCol(ProjectGrantColumnResourceOwner, event.Aggregate().ResourceOwner),
+		},
+		[]handler.Condition{
+			handler.NewCond(ProjectGrantColumnInstanceID, event.Aggregate().InstanceID),
+			handler.NewCond(ProjectGrantColumnProjectID, event.Aggregate().ID),
+			handler.NewUnequalCond(ProjectGrantColumnResourceOwner, event.Aggregate().ResourceOwner),
+		},
 	), nil
 }

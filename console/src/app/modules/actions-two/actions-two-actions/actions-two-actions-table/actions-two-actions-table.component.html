@@ -1,0 +1,69 @@
+<cnsl-refresh-table (refreshed)="refresh.emit()" [loading]="loading()">
+  <div actions>
+    <ng-content></ng-content>
+  </div>
+  <div class="table-wrapper">
+    <table mat-table class="table" aria-label="Elements" [dataSource]="dataSource">
+      <ng-container matColumnDef="condition">
+        <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.EXECUTION.TABLE.CONDITION' | translate }}</th>
+        <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
+          <span>
+            {{ row.execution.condition | condition }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.EXECUTION.TABLE.TYPE' | translate }}</th>
+        <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
+          {{ 'ACTIONSTWO.EXECUTION.TYPES.' + row.execution.condition.conditionType.case | translate }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="target">
+        <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.EXECUTION.TABLE.TARGET' | translate }}</th>
+        <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
+          <div class="target-key">
+            <cnsl-project-role-chip *ngFor="let target of row.mappedTargets; trackBy: trackTarget" [roleName]="target.name">
+              {{ target.name }}
+            </cnsl-project-role-chip>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="creationDate">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ 'ACTIONSTWO.EXECUTION.TABLE.CREATIONDATE' | translate }}
+        </th>
+        <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
+          <span class="no-break">{{ row.execution.creationDate | timestampToDate | localizedDate: 'regular' }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions" stickyEnd>
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
+          <cnsl-table-actions>
+            <button
+              actions
+              matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
+              color="warn"
+              (click)="$event.stopPropagation(); delete.emit(row.execution)"
+              mat-icon-button
+            >
+              <i class="las la-trash"></i>
+            </button>
+          </cnsl-table-actions>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="['condition', 'type', 'target', 'creationDate', 'actions']"></tr>
+      <tr
+        class="highlight pointer"
+        mat-row
+        *matRowDef="let row; columns: ['condition', 'type', 'target', 'creationDate', 'actions']"
+        (click)="selected.emit(row.execution)"
+      ></tr>
+    </table>
+  </div>
+</cnsl-refresh-table>

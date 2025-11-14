@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/metadata"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	org_grpc "github.com/zitadel/zitadel/internal/api/grpc/org"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
@@ -26,7 +27,7 @@ func ListOrgDomainsRequestToModel(req *mgmt_pb.ListOrgDomainsRequest) (*query.Or
 			Limit:  limit,
 			Asc:    asc,
 		},
-		//SortingColumn: //TODO: sorting
+		//  SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil
 }
@@ -67,8 +68,20 @@ func SetPrimaryOrgDomainRequestToDomain(ctx context.Context, req *mgmt_pb.SetPri
 	}
 }
 
-func UpdateOrgMemberRequestToDomain(ctx context.Context, req *mgmt_pb.UpdateOrgMemberRequest) *domain.Member {
-	return domain.NewMember(authz.GetCtxData(ctx).OrgID, req.UserId, req.Roles...)
+func AddOrgMemberRequestToCommand(req *mgmt_pb.AddOrgMemberRequest, orgID string) *command.AddOrgMember {
+	return &command.AddOrgMember{
+		OrgID:  orgID,
+		UserID: req.UserId,
+		Roles:  req.Roles,
+	}
+}
+
+func UpdateOrgMemberRequestToCommand(req *mgmt_pb.UpdateOrgMemberRequest, orgID string) *command.ChangeOrgMember {
+	return &command.ChangeOrgMember{
+		OrgID:  orgID,
+		UserID: req.UserId,
+		Roles:  req.Roles,
+	}
 }
 
 func ListOrgMembersRequestToModel(ctx context.Context, req *mgmt_pb.ListOrgMembersRequest) (*query.OrgMembersQuery, error) {
@@ -89,7 +102,7 @@ func ListOrgMembersRequestToModel(ctx context.Context, req *mgmt_pb.ListOrgMembe
 				Offset: offset,
 				Limit:  limit,
 				Asc:    asc,
-				//SortingColumn: //TODO: sorting
+				// SortingColumn: //TODO: sorting
 			},
 			Queries: queries,
 		},

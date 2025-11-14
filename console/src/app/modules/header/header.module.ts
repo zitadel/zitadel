@@ -17,6 +17,7 @@ import { ActionKeysModule } from '../action-keys/action-keys.module';
 import { AvatarModule } from '../avatar/avatar.module';
 import { OrgContextModule } from '../org-context/org-context.module';
 import { HeaderComponent } from './header.component';
+import { NewHeaderComponent } from '../new-header/new-header.component';
 
 @NgModule({
   declarations: [HeaderComponent],
@@ -38,6 +39,7 @@ import { HeaderComponent } from './header.component';
     AvatarModule,
     AccountsCardModule,
     HasRolePipeModule,
+    NewHeaderComponent,
   ],
   exports: [HeaderComponent],
 })

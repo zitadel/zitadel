@@ -85,8 +85,8 @@ In ZITADEL, you have the flexibility to link an external Identity Provider (IdP)
 The login policy can be set as a default at the instance level and can be customized for each organization. The configuration process varies slightly depending on your focus:
 
 
-- **For default settings**, navigate to: `$YOUR-DOMAIN/ui/console/instance?id=general`
-- **For specific organization settings**, select the organization from the menu and visit: `$YOUR-DOMAIN/ui/console/org-settings?id=login`
+- **For default settings**, navigate to: `${CUSTOM_DOMAIN}/ui/console/instance?id=general`
+- **For specific organization settings**, select the organization from the menu and visit: `${CUSTOM_DOMAIN}/ui/console/org-settings?id=login`
 
 
 Once in the settings:
@@ -147,9 +147,11 @@ When configuring external IdP templates in ZITADEL, several common settings enab
 
 - **Automatic update**: This feature, when activated, allows ZITADEL to automatically update a user's profile information whenever changes are detected in the user's account on the external IdP. For example, if a user changes their last name in their Google or Microsoft account, ZITADEL will reflect this update in the user's account upon their next login.
 
-- **Account creation allowed**: Determines whether new user accounts can be created in ZITADEL through the external IdP authentication process. Enabling this setting is crucial for allowing users who are new to your application to register and create accounts seamlessly via their existing external IdP accounts.
+- **Account creation allowed (manually)**: Determines whether new user accounts can be created in ZITADEL through the external IdP authentication process. Enabling this setting is crucial for allowing users who are new to your application to register and create accounts seamlessly via their existing external IdP accounts. However, if you rely on the **automatic creation** and want to prevent users to manually create their accounts or edit information during the automatic process, you need to disable this option.
 
-- **Account linking allowed**: Enables existing ZITADEL accounts to be linked with identities from external IdPs. It requires that a linkable ZITADEL account already exists for the user attempting to log in with an external IdP. Account linking is beneficial for users who wish to associate multiple login methods with their ZITADEL account, providing flexibility and convenience in how they access your application.
+- **Account linking allowed (manually)**: Enables existing ZITADEL accounts to be linked with identities from external IdPs. It requires that a linkable ZITADEL account already exists for the user attempting to log in with an external IdP. Account linking is beneficial for users who wish to associate multiple login methods with their ZITADEL account, providing flexibility and convenience in how they access your application. However, if you rely on an **automatic linking option** and want to prevent users to manually link their accounts, you need to disable this option.
+
+- **Automatic linking options**: Enables existing ZITADEL accounts to be linked with identities from external IdPs. If not disabled, ZITADEL will check for an existing account with the configured criteria (username or email) and prompt the user to link the account.
 
 
 

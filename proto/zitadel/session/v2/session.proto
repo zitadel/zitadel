@@ -1,0 +1,216 @@
+syntax = "proto3";
+
+package zitadel.session.v2;
+
+import "zitadel/object.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/session/v2;session";
+
+message Session {
+  // Unique identifier of the session.
+  string id = 1;
+
+  // The timestamp the session was created.
+  google.protobuf.Timestamp creation_date = 2;
+
+  // The timestamp the session was last updated.
+  google.protobuf.Timestamp change_date = 3;
+
+  // The sequence of the session represents the change sequence of the session.
+  uint64 sequence = 4;
+
+  // The factors that have been checked for this session, e.g. the user, password and more.
+  // If a factor is set, it means it has been checked and is valid.
+  // If a factor is not set, it means it has not been checked or is invalid.
+  // If a factor is set, the verified_at timestamp indicates when it was last checked.
+  Factors factors = 5;
+
+  // Metadata contains custom key value pairs set by the user.
+  // The metadata is not interpreted by ZITADEL and can be used to store any information
+  // relevant to the session.
+  map<string, bytes> metadata = 6;
+
+  // UserAgent contains information about the user agent used to create the session.
+  // This can include information such as the IP address, browser type, and operating system and
+  // a fingerprint id.
+  // This can be used to identify and filter sessions based on the user agent.
+  UserAgent user_agent = 7;
+
+  // ExpirationDate is the time the session will be automatically invalidated.
+  // If not set, the session does not expire automatically.
+  optional google.protobuf.Timestamp expiration_date = 8;
+}
+
+message Factors {
+  UserFactor user = 1;
+  PasswordFactor password = 2;
+  WebAuthNFactor web_auth_n = 3;
+  IntentFactor intent = 4;
+  TOTPFactor totp = 5;
+  OTPFactor otp_sms = 6;
+  OTPFactor otp_email = 7;
+}
+
+message UserFactor {
+  reserved 5;
+  reserved "organisation_id";
+
+  // The timestamp when the user was last verified.
+  google.protobuf.Timestamp verified_at = 1;
+
+  // The unique identifier of the user that was verified.
+  string id = 2;
+
+  // The login name of the user that was verified.
+  string login_name = 3;
+
+  // The display name of the user that was verified.
+  string display_name = 4;
+
+  // The id of the organization the user belongs to.
+  string organization_id = 6;
+}
+
+message PasswordFactor {
+  // The timestamp when the password was last verified.
+  google.protobuf.Timestamp verified_at = 1;
+}
+
+message IntentFactor {
+  // The timestamp when the intent was last verified.
+  google.protobuf.Timestamp verified_at = 1;
+}
+
+message WebAuthNFactor {
+  // The timestamp when the passkey challenge was last verified.
+  google.protobuf.Timestamp verified_at = 1;
+
+  // Indicates if the user presence was verified during the last challenge.
+  // This can be used to determine if the factor can be considered as multi-factor authentication.
+  bool user_verified = 2;
+}
+
+message TOTPFactor {
+  // The timestamp when the Time-based One-Time Password was last verified.
+  google.protobuf.Timestamp verified_at = 1;
+}
+
+message OTPFactor {
+  // The timestamp when the One-Time Password was last verified either by SMS or Email.
+  google.protobuf.Timestamp verified_at = 1;
+}
+
+message SearchQuery {
+  oneof query {
+    option (validate.required) = true;
+
+    // Search for sessions with the given IDs.
+    IDsQuery ids_query = 1;
+
+    // Search for sessions of the given user ID.
+    UserIDQuery user_id_query = 2;
+
+    // Search for sessions based on their creation date.
+    // This can be used to find sessions created before or after a certain date.
+    CreationDateQuery creation_date_query = 3;
+
+    // Search for sessions created by a specific user.
+    CreatorQuery creator_query = 4;
+
+    // Search for sessions based on the user agent used to create the session.
+    // It can be used to find sessions created from a specific device or browser.
+    // This is typically done for providing a list of active sessions to the user
+    // in a user interface.
+    UserAgentQuery user_agent_query = 5;
+
+    // Search for sessions based on their expiration date.
+    // This can be used to find sessions that are set to expire before or after a certain date.
+    ExpirationDateQuery expiration_date_query = 6;
+  }
+}
+
+message IDsQuery {
+  // List of session IDs to search for.
+  // If multiple IDs are provided, sessions matching any of the IDs will be returned.
+  repeated string ids = 1;
+}
+
+message UserIDQuery {
+  // ID of the user whose sessions are being searched for.
+  string id = 1;
+}
+
+message CreationDateQuery {
+  // The creation date to compare the session's creation date against.
+  google.protobuf.Timestamp creation_date = 1;
+
+  // The method of comparison to use for the creation date.
+  // This defines whether to search for sessions created before, after, or exactly at the specified date.
+  zitadel.v1.TimestampQueryMethod method = 2 [
+    (validate.rules).enum.defined_only = true
+  ];
+}
+
+message CreatorQuery {
+  // ID of the user who created the session. If empty, the calling user's ID is used.
+  optional string id = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"69629023906488334\"";
+    }
+  ];
+}
+
+message UserAgentQuery {
+  // Finger print id of the user agent used for the session.
+  // Set an empty fingerprint_id to use the user agent from the call.
+  // If the user agent is not available from the current token, an error will be returned.
+  optional string fingerprint_id = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"69629023906488334\"";
+    }
+  ];
+}
+
+message ExpirationDateQuery {
+  // The expiration date to compare the session's expiration date against.
+  google.protobuf.Timestamp expiration_date = 1;
+
+  // The method of comparison to use for the expiration date.
+  // This defines whether to search for sessions expiring before, after, or exactly at the specified date.
+  zitadel.v1.TimestampQueryMethod method = 2 [
+    (validate.rules).enum.defined_only = true
+  ];
+}
+
+message UserAgent {
+  // FingerprintID is a unique identifier for the user agent's fingerprint.
+  // It can be used to group sessions by device or browser.
+  optional string fingerprint_id = 1;
+
+  // IP is the IP address from which the session was created.
+  optional string ip = 2;
+
+  // Description is a human-readable description of the user agent.
+  optional string description = 3;
+
+  // A header may have multiple values.
+  // In Go, headers are defined
+  // as map[string][]string, but protobuf
+  // doesn't allow this scheme.
+  message HeaderValues {
+    repeated string values = 1;
+  }
+  map<string, HeaderValues> header = 4;
+}
+
+enum SessionFieldName {
+  SESSION_FIELD_NAME_UNSPECIFIED = 0;
+  SESSION_FIELD_NAME_CREATION_DATE = 1;
+}

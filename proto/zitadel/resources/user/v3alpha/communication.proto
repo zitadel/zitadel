@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+package zitadel.resources.user.v3alpha;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha;user";
+
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+message Contact {
+  // Email contact information of the user.
+  Email email = 1;
+  // Phone contact information of the user.
+  Phone phone = 2;
+}
+
+message Email {
+  // Email address of the user.
+  string address = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"mini@mouse.com\"";
+    }
+  ];
+  // IsVerified states if the email address has been verified to belong to the user.
+  bool is_verified = 2;
+}
+
+message Phone {
+  // Phone number of the user.
+  string number = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"+41791234567\"";
+    }
+  ];
+  // IsVerified states if the phone number has been verified to belong to the user.
+  bool is_verified = 2;
+}
+
+message SetContact {
+  optional SetEmail email = 1;
+  optional SetPhone phone = 2;
+}
+
+message SetEmail {
+  // Set the email address.
+  string address = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200, email: true},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"mini@mouse.com\"";
+    }
+  ];
+  // if no verification is specified, an email is sent with the default url
+  oneof verification {
+    // Let ZITADEL send the link to the user via email.
+    SendEmailVerificationCode send_code = 2;
+    // Get the code back to provide it to the user in your preferred mechanism.
+    ReturnEmailVerificationCode return_code = 3;
+    // Set the email as already verified.
+    bool is_verified = 4 [(validate.rules).bool.const = true];
+  }
+}
+
+message SendEmailVerificationCode {
+  // Optionally set a url_template, which will be used in the verification mail sent by ZITADEL
+  // to guide the user to your verification page.
+  // If no template is set, the default ZITADEL url will be used.
+  optional string url_template = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}\"";
+    }
+  ];
+}
+
+message ReturnEmailVerificationCode {}
+
+message SetPhone {
+  // Set the user's phone number.
+  string number = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 20},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 20;
+      example: "\"+41791234567\"";
+    }
+  ];
+  // if no verification is specified, a SMS is sent
+  oneof verification {
+    // Let ZITADEL send the link to the user via SMS.
+    SendPhoneVerificationCode send_code = 2;
+    // Get the code back to provide it to the user in your preferred mechanism.
+    ReturnPhoneVerificationCode return_code = 3;
+    // Set the phone as already verified.
+    bool is_verified = 4 [(validate.rules).bool.const = true];
+  }
+}
+
+message SendPhoneVerificationCode {}
+
+message ReturnPhoneVerificationCode {}
+
+

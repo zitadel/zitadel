@@ -6,13 +6,16 @@ on:
       semantic_version:
         required: true
         type: string
-      build_image_name:
+      image_name_github_api:
         required: true
         type: string
-      image_name:
+      image_name_google_api:
         required: true
         type: string
-      google_image_name:
+      image_name_github_login:
+        required: true
+        type: string
+      image_name_google_login:
         required: true
         type: string
     secrets:
@@ -29,6 +32,8 @@ on:
 jobs:
   version:
     uses: ./.github/workflows/version.yml
+    permissions:
+      contents: write
     with:
       semantic_version: ${{ inputs.semantic_version }}
       dry_run: false
@@ -38,7 +43,8 @@ jobs:
   # https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#create-a-release--parameters
   publish:
     runs-on: ubuntu-22.04
-    needs: [ version ]
+    needs: version
+    if: needs.version.outputs.published == 'true'
     steps:
       - id: get_release
         uses: cardinalby/git-get-release-action@v1
@@ -63,6 +69,7 @@ jobs:
   docker:
     runs-on: ubuntu-22.04
     needs: [ version ]
+    if: needs.version.outputs.published == 'true'
     steps:
     -
       name: Set up QEMU
@@ -88,29 +95,38 @@ jobs:
       name: Publish ${{ needs.version.outputs.version }}
       run: |
         docker buildx imagetools create \
-          --tag ${{ inputs.image_name }}:${{ needs.version.outputs.version }} \
-          ${{ inputs.build_image_name }}
+          --tag ${{ inputs.image_name_github_api }}:${{ needs.version.outputs.version }} \
+          ${{ inputs.image_name_github_api }}:${{ github.sha }}
         docker buildx imagetools create \
-          --tag ${{ inputs.image_name }}:${{ needs.version.outputs.version }}-debug \
-          ${{ inputs.build_image_name }}-debug        
+          --tag ${{ inputs.image_name_github_api }}:${{ needs.version.outputs.version }}-debug \
+          ${{ inputs.image_name_github_api }}:${{ github.sha }}-debug
         docker buildx imagetools create \
-          --tag ${{ inputs.google_image_name }}:${{ needs.version.outputs.version }} \
-          ${{ inputs.build_image_name }}
+          --tag ${{ inputs.image_name_google_api }}:${{ needs.version.outputs.version }} \
+          ${{ inputs.image_name_google_api }}:${{ github.sha }}
+        docker buildx imagetools create \
+          --tag ${{ inputs.image_name_github_login }}:${{ needs.version.outputs.version }} \
+          ${{ inputs.image_name_github_login }}:${{ github.sha }}
+        docker buildx imagetools create \
+          --tag ${{ inputs.image_name_google_login }}:${{ needs.version.outputs.version }} \
+          ${{ inputs.image_name_google_login }}:${{ github.sha }}
     -
       name: Publish latest
       if: ${{ github.ref_name == 'next' }}
       run: |
         docker buildx imagetools create \
-          --tag ${{ inputs.image_name }}:latest \
-          ${{ inputs.build_image_name }}
+          --tag ${{ inputs.image_name_github_api }}:latest \
+          ${{ inputs.image_name_github_api }}:${{ github.sha }}
         docker buildx imagetools create \
-          --tag ${{ inputs.image_name }}:latest-debug \
-          ${{ inputs.build_image_name }}-debug
+          --tag ${{ inputs.image_name_github_api }}:latest-debug \
+          ${{ inputs.image_name_github_api }}:${{ github.sha }}-debug
+        docker buildx imagetools create \
+          --tag ${{ inputs.image_name_github_login }}:latest \
+          ${{ inputs.image_name_github_login }}:${{ github.sha }}
 
   homebrew-tap:
     runs-on: ubuntu-22.04
     needs: version
-    if: ${{ github.ref_name == 'next' }}
+    if: needs.version.outputs.published == 'true' && github.ref_name == 'next'
     continue-on-error: true
     steps:
     - name: generate token
@@ -126,3 +142,53 @@ jobs:
         GH_TOKEN: ${{ steps.generate-token.outputs.token }}
       run: |
         gh workflow -R zitadel/homebrew-tap run update.yml -f runId=${RUN_ID} -f version=${VERSION}
+
+  helm-chart:
+    runs-on: ubuntu-22.04
+    needs: version
+    if: needs.version.outputs.published == 'true' && github.ref_name == 'next'
+    continue-on-error: true
+    steps:
+      - name: generate token
+        uses: tibdex/github-app-token@v2
+        id: generate-token
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+      - name: Trigger Chart Bump
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+          RUN_ID: ${{ github.run_id }}
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+        run: |
+          gh workflow -R zitadel/zitadel-charts run bump.yml
+
+  npm-packages:
+    runs-on: ubuntu-latest
+    needs: version
+    if: needs.version.outputs.published == 'true' && github.ref_name == 'next'
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        working-directory: login
+        run: pnpm install --frozen-lockfile
+
+      - name: Create Release Pull Request
+        uses: changesets/action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          version: ${{ needs.version.outputs.version }}
+          cwd: packages
+          createGithubReleases: false

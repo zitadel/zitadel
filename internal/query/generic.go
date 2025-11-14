@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
@@ -24,6 +25,7 @@ func genericRowsQuery[R any](
 
 	stmt, args, err := query.ToSql()
 	if err != nil {
+		logging.OnError(err).Warn("query: invalid request")
 		return rnil, zerrors.ThrowInvalidArgument(err, "QUERY-05wf2q36ji", "Errors.Query.InvalidRequest")
 	}
 	err = client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -31,6 +33,7 @@ func genericRowsQuery[R any](
 		return err
 	}, stmt, args...)
 	if err != nil {
+		logging.OnError(err).Error("query: internal error")
 		return rnil, zerrors.ThrowInternal(err, "QUERY-y2u7vctrha", "Errors.Internal")
 	}
 	return resp, err
@@ -44,12 +47,13 @@ func genericRowsQueryWithState[R Stateful](
 	scan func(rows *sql.Rows) (R, error),
 ) (resp R, err error) {
 	var rnil R
-	resp, err = genericRowsQuery[R](ctx, client, query, scan)
+	resp, err = genericRowsQuery(ctx, client, query, scan)
 	if err != nil {
 		return rnil, err
 	}
 	state, err := latestState(ctx, client, projection)
 	if err != nil {
+		logging.OnError(err).Error("query: latest state")
 		return rnil, err
 	}
 	resp.SetState(state)
@@ -60,7 +64,7 @@ func latestState(ctx context.Context, client *database.DB, projections ...table)
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareLatestState(ctx, client)
+	query, scan := prepareLatestState()
 	or := make(sq.Or, len(projections))
 	for i, projection := range projections {
 		or[i] = sq.Eq{CurrentStateColProjectionName.identifier(): projection.name}

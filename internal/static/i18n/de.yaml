@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Telefonnummer bereits verifiziert
       Empty: Telefonnummer ist leer
       NotChanged: Telefonnummer wurde nicht geändert
+      VerifyingRemovalIsNotSupported: Verifizieren der Telefonnummer Entfernung wird nicht unterstützt
     Address:
       NotFound: Adresse nicht gefunden
       NotChanged: Adresse wurde nicht geändert
@@ -193,7 +194,7 @@ Errors:
     AlreadyExists: Instanz exisitiert bereits
     NotChanged: Instanz wurde nicht verändert
   Org:
-    AlreadyExists: Organisationsname existiert bereits
+    AlreadyExists: Der Name oder die ID der Organisation ist bereits vorhanden
     Invalid: Organisation ist ungültig
     AlreadyDeactivated: Organisation ist bereits deaktiviert
     AlreadyActive: Organisation ist bereits aktiv
@@ -435,8 +436,6 @@ Errors:
     Invalid: Benutzer Berechtigung ist ungültig
     NotChanged: Benutzer Berechtigung wurde nicht verändert
     IDMissing: ID fehlt
-    NotActive: Benutzer Berechtigung ist nicht aktiv
-    NotInactive: Benutzer Berechtigung ist nicht deaktiviert
     NoPermissionForProject: Benutzer hat keine Rechte auf diesem Projekt
     RoleKeyNotFound: Rolle konnte nicht gefunden werden
   Member:
@@ -495,6 +494,7 @@ Errors:
     SQLStatement: SQL Statement konnte nicht erstellt werden
     InvalidRequest: Anfrage ist ungültig
     TooManyNestingLevels: Zu viele Abfrageverschachtelungsebenen (maximal 20)
+    LimitExceeded: Limit überschritten
   Quota:
     AlreadyExists: Das Kontingent existiert bereits für diese Einheit
     NotFound: Kontingent für diese Einheit nicht gefunden
@@ -535,6 +535,7 @@ Errors:
     StateMissing: State parameter fehlt im Request
     NotStarted: Intent wurde nicht gestartet oder wurde bereits beendet
     NotSucceeded: Intent war nicht erfolgreich
+    Expired: Intent ist abgelaufen
     TokenCreationFailed: Tokenerstellung schlug fehl
     InvalidToken: Intent Token ist ungültig
     OtherUser: Intent ist für anderen Benutzer gedacht
@@ -542,12 +543,23 @@ Errors:
     AlreadyExists: Auth Request existiert bereits
     NotExisting: Auth Request existiert nicht
     WrongLoginClient: Auth Request wurde von einem anderen Login-Client erstellt
+    AlreadyHandled: Auth Request wurde bereits bearbeitet
   OIDCSession:
     RefreshTokenInvalid: Refresh Token ist ungültig
     Token:
       Invalid: Token ist ungültig
       Expired: Token ist abgelaufen
     InvalidClient: Token wurde nicht für diesen Client ausgestellt
+  SAMLRequest:
+    AlreadyExists: SAMLRequest existiert bereits
+    NotExisting: SAMLRequest existiert nicht
+    WrongLoginClient: SAMLRequest wurde con einem andere Login-Client erstellt
+    AlreadyHandled: SAMLRequest wurde bereits bearbeitet
+  SAMLSession:
+    InvalidClient: SAMLResponse wurde nicht für diesen Client ausgestellt
+  DeviceAuth:
+    NotFound: Die Geräteautorisierungsanforderung existiert nicht
+    AlreadyHandled: Die Geräteautorisierungsanforderung wurde bereits bearbeitet
   Feature:
     NotExisting: Feature existiert nicht
     TypeNotSupported: Feature Typ wird nicht unterstützt
@@ -563,6 +575,8 @@ Errors:
     NotFound: Ausführung nicht gefunden
     IncludeNotFound: Einschließen nicht gefunden
     NoTargets: Keine Ziele definiert
+    Failed: Ausführung fehlgeschlagen
+    ResponseIsNotValidJSON: Antwort ist kein gültiges JSON
   UserSchema:
     NotEnabled: Funktion Benutzerschema ist nicht aktiviert
     Type:
@@ -573,6 +587,11 @@ Errors:
     NotActive: Benutzerschema nicht aktiv
     NotInactive: Benutzerschema nicht inaktiv
     NotExists: Benutzerschema existiert nicht
+    ID:
+      Missing: BenutzerschemaID fehlt
+    Invalid: Benutzerschema ist ungültig
+    Data:
+      Invalid: Daten für Benutzerschema ungültig
   TokenExchange:
     FeatureDisabled: Die Token-Austauschfunktion ist für Ihre Instanz deaktiviert. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -584,6 +603,13 @@ Errors:
       NotForAPI: Imitierte Token sind für die API nicht zulässig
     Impersonation:
       PolicyDisabled: Der Identitätswechsel ist in der Sicherheitsrichtlinie der Instanz deaktiviert
+  WebKey:
+    ActiveDelete: Aktiver Webschlüssel kann nicht gelöscht werden
+    Config: Ungültige Webschlüsselkonfiguration
+    Duplicate: Webschlüssel-ID nicht eindeutig
+    FeatureDisabled: Webschlüsselfunktion deaktiviert
+    NoActive: Kein aktiver Webschlüssel gefunden
+    NotFound: Webschlüssel nicht gefunden
 
 AggregateTypes:
   action: Action
@@ -607,6 +633,9 @@ AggregateTypes:
   restrictions: Restriktionen
   system: System
   session: Session
+  web_key: Webschlüssel
+  saml_request: SAML Request
+  saml_session: SAML Session
 
 EventTypes:
   execution:
@@ -671,6 +700,13 @@ EventTypes:
         check:
           succeeded: Benutzerinitialisierung erfolgreich
           failed: Benutzerinitialisierung fehlgeschlagen
+      invite:
+        code:
+          added: Einladungscode generiert
+          sent: Einladungscode gesendet
+        check:
+          succeeded: Einladungsprüfung erfolgreich
+          failed: Einladungsprüfung fehlgeschlagen
       username:
         reserved: Benutzername reserviert
         released: Benutzername freigegeben
@@ -1308,6 +1344,31 @@ EventTypes:
     deactivated: Benutzerschema deaktiviert
     reactivated: Benutzerschema reaktiviert
     deleted: Benutzerschema gelöscht
+    user:
+      created: Benutzer erstellt
+      updated: Benutzer aktualisiert
+      deleted: Benutzer gelöscht
+      email:
+        updated: E-Mail-Adresse geändert
+        verified: E-Mail-Adresse verifiziert
+        verification:
+          failed: E-Mail-Adressenverifizierung fehlgeschlagen
+        code:
+          added: E-Mail-Adressenverifizierungscode generiert
+          sent: E-Mail-Adressenverifizierungscode gesendet
+      phone:
+        updated: Telefonnummer geändert
+        verified: Telefonnummer verifiziert
+        verification:
+          failed: Telefonnummernverifizierung fehlgeschlagen
+        code:
+          added: Telefonnummernverifizierungscode generiert
+          sent: Telefonnummernverifizierungscode gesendet
+  web_key:
+    added: Web Key hinzugefügt
+    activated: Web Key aktiviert
+    deactivated: Web Key deaktiviert
+    removed: Web Key entfernen
 
 Application:
   OIDC:

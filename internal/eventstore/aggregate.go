@@ -48,15 +48,25 @@ func WithInstanceID(id string) aggregateOpt {
 	}
 }
 
-// AggregateFromWriteModel maps the given WriteModel to an Aggregate
+// AggregateFromWriteModel maps the given WriteModel to an Aggregate.
+// Deprecated: Creates linter errors on missing context. Use [AggregateFromWriteModelCtx] instead.
 func AggregateFromWriteModel(
 	wm *WriteModel,
 	typ AggregateType,
 	version Version,
 ) *Aggregate {
+	return AggregateFromWriteModelCtx(context.Background(), wm, typ, version)
+}
+
+// AggregateFromWriteModelCtx maps the given WriteModel to an Aggregate.
+func AggregateFromWriteModelCtx(
+	ctx context.Context,
+	wm *WriteModel,
+	typ AggregateType,
+	version Version,
+) *Aggregate {
 	return NewAggregate(
-		// TODO: the linter complains if this function is called without passing a context
-		context.Background(),
+		ctx,
 		wm.AggregateID,
 		typ,
 		version,
@@ -68,15 +78,15 @@ func AggregateFromWriteModel(
 // Aggregate is the basic implementation of Aggregater
 type Aggregate struct {
 	// ID is the unique identitfier of this aggregate
-	ID string `json:"-"`
+	ID string `json:"id"`
 	// Type is the name of the aggregate.
-	Type AggregateType `json:"-"`
+	Type AggregateType `json:"type"`
 	// ResourceOwner is the org this aggregates belongs to
-	ResourceOwner string `json:"-"`
+	ResourceOwner string `json:"resourceOwner"`
 	// InstanceID is the instance this aggregate belongs to
-	InstanceID string `json:"-"`
+	InstanceID string `json:"instanceId"`
 	// Version is the semver this aggregate represents
-	Version Version `json:"-"`
+	Version Version `json:"version"`
 }
 
 // AggregateType is the object name

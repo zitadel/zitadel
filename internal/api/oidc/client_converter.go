@@ -1,6 +1,7 @@
 package oidc
 
 import (
+	"context"
 	"slices"
 	"strings"
 	"time"
@@ -8,9 +9,14 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
+)
+
+const (
+	LoginAuthRequestParam = "authRequest"
 )
 
 type Client struct {
@@ -47,10 +53,21 @@ func (c *Client) GetID() string {
 }
 
 func (c *Client) LoginURL(id string) string {
-	if strings.HasPrefix(id, command.IDPrefixV2) {
+	// if the authRequest does not have the v2 prefix, it was created for login V1
+	if !strings.HasPrefix(id, command.IDPrefixV2) {
+		return c.defaultLoginURL + id
+	}
+	// any v2 login without a specific base uri will be sent to the configured login v2 UI
+	// this way we're also backwards compatible
+	if c.client.LoginBaseURI == nil || c.client.LoginBaseURI.URL().String() == "" {
 		return c.defaultLoginURLV2 + id
 	}
-	return c.defaultLoginURL + id
+	// for clients with a specific URI (internal or external) we only need to add the auth request id
+	uri := c.client.LoginBaseURI.URL().JoinPath(LoginPath)
+	q := uri.Query()
+	q.Set(LoginAuthRequestParam, id)
+	uri.RawQuery = q.Encode()
+	return uri.String()
 }
 
 func (c *Client) RedirectURIs() []string {
@@ -218,11 +235,11 @@ func removeScopeWithPrefix(scopes []string, scopePrefix ...string) []string {
 	return newScopeList
 }
 
-func clientIDFromCredentials(cc *op.ClientCredentials) (clientID string, assertion bool, err error) {
+func clientIDFromCredentials(ctx context.Context, cc *op.ClientCredentials) (clientID string, assertion bool, err error) {
 	if cc.ClientAssertion != "" {
 		claims := new(oidc.JWTTokenRequest)
 		if _, err := oidc.ParseToken(cc.ClientAssertion, claims); err != nil {
-			return "", false, oidc.ErrInvalidClient().WithParent(err)
+			return "", false, oidc.ErrInvalidClient().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
 		}
 		return claims.Issuer, true, nil
 	}
@@ -252,6 +269,9 @@ func isScopeAllowed(scope string, allowedScopes ...string) bool {
 		return true
 	}
 	if scope == ScopeProjectsRoles {
+		return true
+	}
+	if scope == ScopeCustomUserGroups || scope == ScopeUserGroups {
 		return true
 	}
 	return slices.Contains(allowedScopes, scope)

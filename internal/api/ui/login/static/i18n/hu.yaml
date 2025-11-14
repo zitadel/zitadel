@@ -1,0 +1,490 @@
+Login:
+  Title: Üdv újra itt!
+  Description: Add meg a bejelentkezési adataidat.
+  TitleLinking: Felhasználó összekapcsolása bejelentkezéssel
+  DescriptionLinking: Add meg a bejelentkezési adataidat a külső felhasználó összekapcsolásához.
+  LoginNameLabel: Bejelentkezési név
+  UsernamePlaceHolder: felhasználónév
+  LoginnamePlaceHolder: felhasználónév@domain
+  ExternalUserDescription: Jelentkezz be külső felhasználóval.
+  MustBeMemberOfOrg: A felhasználónak az {{.OrgName}} szervezet tagjának kell lennie.
+  RegisterButtonText: Regisztráció
+  NextButtonText: Következő
+LDAP:
+  Title: Bejelentkezés
+  Description: Add meg a bejelentkezési adataidat.
+  LoginNameLabel: Bejelentkezési név
+  PasswordLabel: Jelszó
+  NextButtonText: Következő
+SelectAccount:
+  Title: Fiók kiválasztása
+  Description: Használd a fiókodat
+  TitleLinking: Fiók kiválasztása a felhasználó összekapcsolásához
+  DescriptionLinking: Válaszd ki a fiókodat, hogy összekapcsold a külső felhasználóddal.
+  OtherUser: Másik felhasználó
+  SessionState0: aktív
+  SessionState1: Kijelentkezve
+  MustBeMemberOfOrg: A felhasználónak a {{.OrgName}} szervezet tagjának kell lennie.
+Password:
+  Title: Jelszó
+  Description: Add meg a bejelentkezési adataidat.
+  PasswordLabel: Jelszó
+  MinLength: Legalább
+  MinLengthp2: karakter hosszúnak kell lennie.
+  MaxLength: Kevesebb, mint 70 karakter hosszúnak kell lennie.
+  HasUppercase: Tartalmaznia kell egy nagybetűt.
+  HasLowercase: Tartalmaznia kell egy kisbetűt.
+  HasNumber: Tartalmaznia kell egy számot.
+  HasSymbol: Tartalmaznia kell egy szimbólumot.
+  Confirmation: A jelszó megerősítése egyezik.
+  ResetLinkText: Jelszó visszaállítása
+  BackButtonText: Vissza
+  NextButtonText: Következő
+UsernameChange:
+  Title: Felhasználónév megváltoztatása
+  Description: Állítsd be az új felhasználóneved
+  UsernameLabel: Felhasználónév
+  CancelButtonText: Mégse
+  NextButtonText: Következő
+UsernameChangeDone:
+  Title: Felhasználónév megváltoztatva
+  Description: A felhasználóneved sikeresen megváltozott.
+  NextButtonText: Következő
+InitPassword:
+  Title: Jelszó beállítása
+  Description: Kaptál egy kódot, amit az alábbi űrlapon meg kell adnod az új jelszavad beállításához.
+  CodeLabel: Kód
+  NewPasswordLabel: Új jelszó
+  NewPasswordConfirmLabel: Jelszó megerősítése
+  ResendButtonText: Kód újraküldése
+  NextButtonText: Következő
+InitPasswordDone:
+  Title: Jelszó beállítva
+  Description: A jelszót sikeresen beállítottad
+  NextButtonText: Következő
+  CancelButtonText: Mégse
+InitUser:
+  Title: Felhasználó aktiválása
+  Description: Igazold az e-mailed az alábbi kóddal és állítsd be a jelszavad.
+  CodeLabel: Kód
+  NewPasswordLabel: Új jelszó
+  NewPasswordConfirm: Jelszó megerősítése
+  NextButtonText: Következő
+  ResendButtonText: Kód újraküldése
+InitUserDone:
+  Title: Felhasználó aktiválva
+  Description: Az email ellenőrzése sikeres volt és a jelszó beállítása megtörtént
+  NextButtonText: Következő
+  CancelButtonText: Mégsem
+InviteUser:
+  Title: Felhasználó aktiválása
+  Description: Ellenőrizd az emailed az alábbi kóddal és állítsd be a jelszavad.
+  CodeLabel: Kód
+  NewPasswordLabel: Új jelszó
+  NewPasswordConfirm: Jelszó megerősítése
+  NextButtonText: Következő
+  ResendButtonText: Kód újraküldése
+InitMFAPrompt:
+  Title: 2-faktoros beállítás
+  Description: A 2-faktoros hitelesítés további biztonságot nyújt a felhasználói fiókodhoz. Ez biztosítja, hogy csak te férhetsz hozzá a fiókodhoz.
+  Provider0: Hitelesítő alkalmazás (pl. Google/Microsoft Authenticator, Authy)
+  Provider1: Eszközfüggő (pl. FaceID, Windows Hello, Ujjlenyomat)
+  Provider3: OTP SMS
+  Provider4: OTP Email
+  NextButtonText: Következő
+  SkipButtonText: Kihagyás
+InitMFAOTP:
+  Title: 2-faktoros ellenőrzés
+  Description: Hozd létre a 2-faktorodat. Töltsd le az authenticator appot, ha még nincs.
+  OTPDescription: Olvasd be a kódot az authenticator appoddal (pl. Google/Microsoft Authenticator, Authy), vagy másold be a titkos kódot és írd be a generált kódot alulra.
+  SecretLabel: Titkos
+  CodeLabel: Kód
+  NextButtonText: Következő
+  CancelButtonText: Mégsem
+InitMFAOTPSMS:
+  Title: Kétfaktoros hitelesítés
+  DescriptionPhone: Hozd létre a kétfaktoros hitelesítést. Add meg a telefonszámod a hitelesítéshez.
+  DescriptionCode: Hozd létre a kétfaktoros hitelesítést. Add meg a kapott kódot a telefonszámod hitelesítéséhez.
+  PhoneLabel: Telefon
+  CodeLabel: Kód
+  EditButtonText: Szerkesztés
+  ResendButtonText: Kód újraküldése
+  NextButtonText: Tovább
+InitMFAU2F:
+  Title: Biztonsági kulcs hozzáadása
+  Description: A biztonsági kulcs egy olyan hitelesítési módszer, amely beépíthető a telefonodba, használható Bluetooth-szal vagy közvetlenül a számítógéped USB-portjához csatlakoztatható.
+  TokenNameLabel: A biztonsági kulcs / eszköz neve
+  NotSupported: A WebAuthN nem támogatott a böngésződben. Kérlek, győződj meg róla, hogy a legújabb verziót használod, vagy használj egy másik böngészőt (pl. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Biztonsági kulcs hozzáadása
+  ErrorRetry: Próbáld újra, hozz létre egy új kihívást, vagy válassz egy másik módszert.
+InitMFADone:
+  Title: 2-faktoros hitelesítés igazolva
+  Description: Szuper! Sikeresen beállítottad a 2-faktoros hitelesítést, és így sokkal biztonságosabbá tetted a fiókodat. A faktort minden bejelentkezéskor meg kell adni.
+  NextButtonText: Következő
+  CancelButtonText: Mégse
+MFAProvider:
+  Provider0: Hitelesítő alkalmazás (pl. Google/Microsoft Authenticator, Authy)
+  Provider1: Eszközfüggő (pl. FaceID, Windows Hello, Ujjlenyomat)
+  Provider3: OTP SMS
+  Provider4: OTP Email
+  ChooseOther: vagy válassz egy másik lehetőséget
+VerifyMFAOTP:
+  Title: Kétlépcsős azonosítás ellenőrzése
+  Description: Ellenőrizd a második azonosítódat
+  CodeLabel: Kód
+  NextButtonText: Következő
+VerifyOTP:
+  Title: Kétlépcsős azonosítás ellenőrzése
+  Description: Ellenőrizd a második azonosítódat
+  CodeLabel: Kód
+  ResendButtonText: Kód újraküldése
+  NextButtonText: Következő
+VerifyMFAU2F:
+  Title: Kétlépcsős hitelesítés
+  Description: Hitelesítsd a kétlépcsős ellenőrzést a regisztrált eszközzel (például FaceID, Windows Hello, ujjlenyomat)
+  NotSupported: A böngésződ nem támogatja a WebAuthN-t. Győződj meg róla, hogy a legújabb verziót használod, vagy válts egy támogatott böngészőre (Chrome, Safari, Firefox)
+  ErrorRetry: Próbáld újra, készíts új kérést vagy válassz másik módszert.
+  ValidateTokenButtonText: Kétlépcsős hitelesítés ellenőrzése
+Passwordless:
+  Title: Jelszó nélküli bejelentkezés
+  Description: Jelentkezz be az eszközöd által biztosított hitelesítési módszerekkel, mint például FaceID, Windows Hello vagy ujjlenyomat.
+  NotSupported: A böngésződ nem támogatja a WebAuthN-t. Kérlek, győződj meg róla, hogy naprakész, vagy használj másikat (például Chrome, Safari, Firefox)
+  ErrorRetry: Próbáld újra, hozz létre egy új kihívást vagy válassz egy másik módszert.
+  LoginWithPwButtonText: Bejelentkezés jelszóval
+  ValidateTokenButtonText: Bejelentkezés jelszó nélküli módszerrel
+PasswordlessPrompt:
+  Title: Jelszó nélküli beállítás
+  Description: Szeretnéd beállítani a jelszó nélküli bejelentkezést? (Eszközöd hitelesítési módszerei, például FaceID, Windows Hello vagy ujjlenyomat)
+  DescriptionInit: Be kell állítanod a jelszó nélküli bejelentkezést. Használd a kapott linket az eszközöd regisztrálásához.
+  PasswordlessButtonText: Használd a jelszó nélküli módszert
+  NextButtonText: Következő
+  SkipButtonText: Kihagy
+PasswordlessRegistration:
+  Title: Jelszó nélküli beállítás
+  Description: Add meg az azonosításodat egy név megadásával (pl. MyMobilePhone, MacBook, stb.), majd kattints a lentebb található 'Register passwordless' gombra.
+  TokenNameLabel: Az eszköz neve
+  NotSupported: A böngésződ nem támogatja a WebAuthN-t. Kérjük, győződj meg róla, hogy naprakész, vagy használj egy másik böngészőt (pl. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Register passwordless
+  ErrorRetry: Próbáld újra, hozz létre egy új kihívást, vagy válassz egy másik módszert.
+PasswordlessRegistrationDone:
+  Title: Passwordless beállítás
+  Description: Az eszközt a passwordless sikeresen hozzáadtad.
+  DescriptionClose: Most bezárhatod ezt az ablakot.
+  NextButtonText: Következő
+  CancelButtonText: Mégse
+PasswordChange:
+  Title: Jelszó megváltoztatása
+  Description: Változtasd meg a jelszavad. Add meg a régi és az új jelszavad.
+  ExpiredDescription: A jelszavad lejárt, és meg kell változtatnod. Add meg a régi és az új jelszavad.
+  OldPasswordLabel: Régi jelszó
+  NewPasswordLabel: Új jelszó
+  NewPasswordConfirmLabel: Jelszó megerősítése
+  CancelButtonText: Mégse
+  NextButtonText: Következő
+  Footer: Lábléc
+PasswordChangeDone:
+  Title: Jelszó megváltoztatása
+  Description: A jelszavad sikeresen megváltozott.
+  NextButtonText: Tovább
+PasswordResetDone:
+  Title: Jelszó-visszaállítási link elküldve
+  Description: Ellenőrizd az emailjeidet a jelszó visszaállításához.
+  NextButtonText: Tovább
+EmailVerification:
+  Title: E-mail megerősítés
+  Description: Küldtünk neked egy e-mailt a címed megerősítéséhez. Kérjük, írd be a kódot az alábbi űrlapba.
+  CodeLabel: Kód
+  NextButtonText: Tovább
+  ResendButtonText: Kód újraküldése
+EmailVerificationDone:
+  Title: E-mail ellenőrzés
+  Description: Az e-mail címedet sikeresen ellenőriztük.
+  NextButtonText: Következő
+  CancelButtonText: Mégse
+  LoginButtonText: Bejelentkezés
+RegisterOption:
+  Title: Regisztrációs lehetőségek
+  Description: Válaszd ki, hogyan szeretnél regisztrálni
+  RegisterUsernamePasswordButtonText: Felhasználónévvel és jelszóval
+  ExternalLoginDescription: vagy regisztrálj egy külső felhasználóval
+  LoginButtonText: Bejelentkezés
+RegistrationUser:
+  Title: Regisztráció
+  Description: Add meg az adataidat. Az email címed lesz a bejelentkezési neved.
+  DescriptionOrgRegister: Add meg az adataidat.
+  EmailLabel: E-mail
+  UsernameLabel: Felhasználónév
+  FirstnameLabel: Keresztnév
+  LastnameLabel: Vezetéknév
+  LanguageLabel: Nyelv
+  German: Német
+  English: Angol
+  Italian: Olasz
+  French: Francia
+  Chinese: Egyszerűsített Kínai
+  Polish: Lengyel
+  Japanese: Japán
+  Spanish: Spanyol
+  Bulgarian: Bolgár
+  Portuguese: Portugál
+  Macedonian: Macedón
+  Czech: Cseh
+  Russian: Orosz
+  Dutch: Holland
+  Swedish: Svéd
+  Indonesian: Indonéz
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  GenderLabel: Nem
+  Female: Nő
+  Male: Férfi
+  Diverse: diverz / X
+  PasswordLabel: Jelszó
+  PasswordConfirmLabel: Jelszó megerősítése
+  TosAndPrivacyLabel: Felhasználási feltételek
+  TosConfirm: Elfogadom a
+  TosLinkText: Általános Szerződési Feltételeket (ÁSZF)
+  PrivacyConfirm: Elfogadom a
+  PrivacyLinkText: adatvédelmi szabályzatot
+  ExternalLogin: vagy regisztrálj külső felhasználóként
+  BackButtonText: Bejelentkezés
+  NextButtonText: Következő
+ExternalRegistrationUserOverview:
+  Title: Külső felhasználói regisztráció
+  Description: Átvettük a felhasználói adataidat a kiválasztott szolgáltatótól. Most megváltoztathatod vagy kiegészítheted őket.
+  EmailLabel: E-mail
+  UsernameLabel: Felhasználónév
+  FirstnameLabel: Keresztnév
+  LastnameLabel: Vezetéknév
+  NicknameLabel: Becenév
+  PhoneLabel: Telefonszám
+  LanguageLabel: Nyelv
+  German: Német
+  English: Angol
+  Italian: Olasz
+  French: Francia
+  Chinese: Egyszerűsített kínai
+  Polish: Lengyel
+  Japanese: Japán
+  Spanish: Spanyol
+  Bulgarian: Bolgár
+  Portuguese: Portugál
+  Macedonian: Macedón
+  Czech: Cseh
+  Russian: Orosz
+  Dutch: Holland
+  Swedish: Svéd
+  Indonesian: Indonéz
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  TosAndPrivacyLabel: Felhasználási feltételek
+  TosConfirm: Elfogadom a
+  TosLinkText: TOS
+  PrivacyConfirm: Elfogadom a
+  PrivacyLinkText: adatvédelmi nyilatkozatot
+  ExternalLogin: vagy regisztrálj külső felhasználóval
+  BackButtonText: Elutasít
+  NextButtonText: Mentés
+RegistrationOrg:
+  Title: Szervezet regisztráció
+  Description: Add meg a szervezet nevét és a felhasználói adatokat.
+  OrgNameLabel: Szervezet neve
+  EmailLabel: E-mail
+  UsernameLabel: Felhasználónév
+  FirstnameLabel: Keresztnév
+  LastnameLabel: Vezetéknév
+  PasswordLabel: Jelszó
+  PasswordConfirmLabel: Jelszó megerősítése
+  TosAndPrivacyLabel: Felhasználási feltételek
+  TosConfirm: Elfogadom a
+  TosLinkText: TOS-t
+  PrivacyConfirm: Elfogadom a
+  PrivacyLinkText: adatvédelmi irányelveket
+  SaveButtonText: Szervezet létrehozása
+LoginSuccess:
+  Title: Sikeres bejelentkezés
+  AutoRedirectDescription: Automatikusan vissza leszel irányítva az alkalmazásodhoz. Ha nem, kattints az alábbi gombra. Ezután bezárhatod az ablakot.
+  RedirectedDescription: Most már bezárhatod ezt az ablakot.
+  NextButtonText: Következő
+LogoutDone:
+  Title: Kijelentkezve
+  Description: Sikeresen kijelentkeztél.
+  LoginButtonText: Bejelentkezés
+LinkingUserPrompt:
+  Title: Meglévő felhasználó megtalálva
+  Description: Szeretnéd összekapcsolni a meglévő fiókodat
+  LinkButtonText: Összekapcsolás
+  OtherButtonText: Egyéb lehetőségek
+LinkingUsersDone:
+  Title: Felhasználó összekapcsolása
+  Description: Felhasználó összekapcsolva.
+  CancelButtonText: Mégse
+  NextButtonText: Következő
+ExternalNotFound:
+  Title: Külső felhasználó nem található
+  Description: Külső felhasználó nem található. Szeretnéd összekapcsolni a felhasználódat vagy automatikusan regisztrálni egy újat?
+  LinkButtonText: Összekapcsolás
+  AutoRegisterButtonText: Regisztráció
+  TosAndPrivacyLabel: Felhasználási feltételek
+  TosConfirm: Elfogadom a
+  TosLinkText: SZF-et
+  PrivacyConfirm: Elfogadom a
+  PrivacyLinkText: adatvédelmi szabályzatot
+  German: Német
+  English: Angol
+  Italian: Olasz
+  French: Francia
+  Chinese: Egyszerűsített kínai
+  Polish: Lengyel
+  Japanese: Japán
+  Spanish: Spanyol
+  Bulgarian: Bolgár
+  Portuguese: Portugál
+  Macedonian: Macedón
+  Czech: Cseh
+  Russian: Orosz
+  Dutch: Holland
+  Swedish: Svéd
+  Indonesian: Indonéz
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+DeviceAuth:
+  Title: Eszköz engedélyezése
+  UserCode:
+    Label: Felhasználói kód
+    Description: Add meg az eszközön megjelenített felhasználói kódot.
+    ButtonNext: Következő
+  Action:
+    Description: Eszköz hozzáférés engedélyezése.
+    GrantDevice: az eszközhöz való hozzáférést engedélyezed
+    AccessToScopes: hozzáférés az alábbi tartományokhoz
+    Button:
+      Allow: Engedélyez
+      Deny: Megtagad
+  Done:
+    Description: Kész.
+    Approved: Az eszköz engedélyezése jóváhagyva. Most visszatérhetsz az eszközhöz.
+    Denied: Az eszköz engedélyezése megtagadva. Most visszatérhetsz az eszközhöz.
+Footer:
+  PoweredBy: Működteti
+  Tos: Felhasználási feltételek
+  PrivacyPolicy: Adatvédelmi irányelvek
+  Help: Segítség
+  SupportEmail: Támogatási e-mail
+SignIn: Jelentkezz be a {{.Provider}} segítségével
+Errors:
+  Internal: Belső hiba történt
+  AuthRequest:
+    NotFound: Nem található hitelesítési kérés
+    UserAgentNotCorresponding: A felhasználói ügynök nem egyezik
+    UserAgentNotFound: Felhasználói ügynök azonosító nem található
+    TokenNotFound: Token nem található
+    RequestTypeNotSupported: A kérés típusa nem támogatott
+    MissingParameters: Kötelező paraméterek hiányoznak
+  User:
+    NotFound: A felhasználó nem található
+    AlreadyExists: A felhasználó már létezik
+    Inactive: A felhasználó inaktív
+    NotFoundOnOrg: A felhasználó nem található a kiválasztott szervezetben
+    NotAllowedOrg: A felhasználó nem tagja a szükséges szervezetnek
+    NotMatchingUserID: A felhasználó és az authrequest-ben szereplő felhasználó nem egyezik
+    UserIDMissing: A felhasználói azonosító üres
+    Invalid: Érvénytelen felhasználói adatok
+    DomainNotAllowedAsUsername: A domain már foglalt és nem használható
+    NotAllowedToLink: A felhasználó számára nem engedélyezett a külső bejelentkezési szolgáltatóval való kapcsolat
+    Profile:
+      NotFound: Profil nem található
+      NotChanged: Profil nem változott
+      Empty: Profil üres
+      FirstNameEmpty: A profilban a keresztnév üres
+      LastNameEmpty: A profilban a vezetéknév üres
+      IDMissing: Hiányzik a profil azonosító
+    Email:
+      NotFound: Email nem található
+      Invalid: Érvénytelen email
+      AlreadyVerified: Az email már ellenőrizve van
+      NotChanged: Az email nem változott
+      Empty: Az email üres
+      IDMissing: Az email azonosító hiányzik
+    Phone:
+      NotFound: A telefon nem található
+      Invalid: A telefon érvénytelen
+      AlreadyVerified: A telefon már ellenőrizve van
+      Empty: A telefon üres
+      NotChanged: A telefon nem változott
+    Address:
+      NotFound: A cím nem található
+      NotChanged: A cím nem változott
+    Username:
+      AlreadyExists: A felhasználónév már foglalt
+      Reserved: A felhasználónév már foglalt
+      Empty: A felhasználónév üres
+    Password:
+      ConfirmationWrong: A jelszó megerősítése helytelen
+      Empty: A jelszó üres
+      Invalid: A jelszó érvénytelen
+      InvalidAndLocked: A jelszó érvénytelen és a felhasználó zárolva van, vedd fel a kapcsolatot az adminisztrátoroddal.
+      NotChanged: Az új jelszó nem lehet azonos a jelenlegi jelszavaddal
+    UsernameOrPassword:
+      Invalid: A felhasználónév vagy a jelszó érvénytelen
+    PasswordComplexityPolicy:
+      NotFound: A jelszóházirend nem található
+      MinLength: A jelszó túl rövid
+      HasLower: A jelszónak kisbetűt kell tartalmaznia
+      HasUpper: A jelszónak nagybetűt kell tartalmaznia
+      HasNumber: A jelszónak számot kell tartalmaznia
+      HasSymbol: A jelszónak szimbólumot kell tartalmaznia
+    Code:
+      Expired: A kód lejárt
+      Invalid: A kód érvénytelen
+      Empty: A kód üres
+      CryptoCodeNil: A kriptográfiai kód nil
+      NotFound: Nem találom a kódot
+      GeneratorAlgNotSupported: Nem támogatott generáló algoritmus
+    EmailVerify:
+      UserIDEmpty: A felhasználói azonosító üres
+    ExternalData:
+      CouldNotRead: A külső adatokat nem sikerült helyesen beolvasni
+    MFA:
+      NoProviders: Nincsenek elérhető többfaktoros szolgáltatók
+      OTP:
+        AlreadyReady: A többfaktoros OTP (OneTimePassword) már be van állítva
+        NotExisting: A többfaktoros OTP (OneTimePassword) nem létezik
+        InvalidCode: Érvénytelen kód
+        NotReady: A többfaktoros OTP (OneTimePassword) nem áll készen
+    Locked: A felhasználó zárolva van
+    SomethingWentWrong: Valami elromlott
+    NotActive: A felhasználó nem aktív
+    ExternalIDP:
+      IDPTypeNotImplemented: Az IDP típus nincs megvalósítva
+      NotAllowed: Az külső bejelentkezési szolgáltató nem engedélyezett
+      IDPConfigIDEmpty: Az azonosítószolgáltató ID üres
+      ExternalUserIDEmpty: A külső felhasználói azonosító üres
+      UserDisplayNameEmpty: A felhasználó megjelenítendő neve üres
+      NoExternalUserData: Nem érkezett külső felhasználói adat
+      CreationNotAllowed: Új felhasználó létrehozása nem engedélyezett ezen a szolgáltatón
+      LinkingNotAllowed: A felhasználó összekapcsolása nem engedélyezett ezen a szolgáltatón
+      NoOptionAllowed: Sem új felhasználó létrehozása, sem összekapcsolás nem engedélyezett ezen a szolgáltatón. Kérjük, lépj kapcsolatba az adminisztrátoroddal.
+      LoginFailedSwitchLocal: |
+        Az egyéni azonosító szolgáltatóhoz való bejelentkezés sikertelen volt. Visszatérés a helyi bejelentkezéshez.
+        
+        Hiba részletei: {{.Details}}
+    GrantRequired: Bejelentkezés nem lehetséges. A felhasználónak legalább egy jogosultsággal kell rendelkeznie az alkalmazáson. Kérlek, lépj kapcsolatba az adminisztrátoroddal.
+    ProjectRequired: Bejelentkezés nem lehetséges. A felhasználó szervezetének engedélyezve kell lennie a projektre. Kérlek, lépj kapcsolatba az adminisztrátoroddal.
+  IdentityProvider:
+    InvalidConfig: Az Identity Provider konfiguráció érvénytelen
+  IAM:
+    LockoutPolicy:
+      NotExisting: A Lockout Policy nem létezik
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: A regisztráció nem engedélyezett
+  DeviceAuth:
+    NotExisting: A felhasználói kód nem létezik
+optional: (opcionális)

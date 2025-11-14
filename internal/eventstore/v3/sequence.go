@@ -2,13 +2,13 @@ package eventstore
 
 import (
 	"context"
-	"database/sql"
 	_ "embed"
 	"fmt"
 	"strings"
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -22,11 +22,11 @@ type latestSequence struct {
 //go:embed sequences_query.sql
 var latestSequencesStmt string
 
-func latestSequences(ctx context.Context, tx *sql.Tx, commands []eventstore.Command) ([]*latestSequence, error) {
+func latestSequences(ctx context.Context, tx database.Transaction, commands []eventstore.Command) ([]*latestSequence, error) {
 	sequences := commandsToSequences(ctx, commands)
 
 	conditions, args := sequencesToSql(sequences)
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf(latestSequencesStmt, strings.Join(conditions, " UNION ALL ")), args...)
+	rows, err := tx.Query(ctx, fmt.Sprintf(latestSequencesStmt, strings.Join(conditions, " UNION ALL ")), args...)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "V3-5jU5z", "Errors.Internal")
 	}
@@ -103,7 +103,7 @@ func sequencesToSql(sequences []*latestSequence) (conditions []string, args []an
 	return conditions, args
 }
 
-func scanToSequence(rows *sql.Rows, sequences []*latestSequence) error {
+func scanToSequence(rows database.Rows, sequences []*latestSequence) error {
 	var aggregateType eventstore.AggregateType
 	var aggregateID, instanceID string
 	var currentSequence uint64
@@ -124,7 +124,18 @@ func scanToSequence(rows *sql.Rows, sequences []*latestSequence) error {
 		return nil
 	}
 	sequence.sequence = currentSequence
-	if sequence.aggregate.ResourceOwner == "" {
+	if resourceOwner != "" && sequence.aggregate.ResourceOwner != "" && sequence.aggregate.ResourceOwner != resourceOwner {
+		logging.WithFields(
+			"current_sequence", sequence.sequence,
+			"instance_id", sequence.aggregate.InstanceID,
+			"agg_type", sequence.aggregate.Type,
+			"agg_id", sequence.aggregate.ID,
+			"current_owner", resourceOwner,
+			"provided_owner", sequence.aggregate.ResourceOwner,
+		).Info("would have set wrong resource owner")
+	}
+	// set resource owner from previous events
+	if resourceOwner != "" {
 		sequence.aggregate.ResourceOwner = resourceOwner
 	}
 

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
 
   proxy-disabled-tls:
@@ -9,7 +7,7 @@ services:
     ports:
       - "80:80"
     networks:
-      - 'zitadel'
+      - app
     depends_on:
       zitadel-disabled-tls:
         condition: 'service_healthy'
@@ -23,7 +21,7 @@ services:
     ports:
       - "443:443"
     networks:
-      - 'zitadel'
+      - app
     depends_on:
       zitadel-external-tls:
         condition: 'service_healthy'
@@ -37,10 +35,7 @@ services:
     ports:
       - "443:443"
     networks:
-      - 'zitadel'
+      - app
     depends_on:
       zitadel-enabled-tls:
         condition: 'service_healthy'
-
-networks:
-  zitadel:

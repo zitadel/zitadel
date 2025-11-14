@@ -7,8 +7,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/repository/target"
 )
 
@@ -16,10 +17,16 @@ func targetAddEvent(aggID, resourceOwner string) *target.AddedEvent {
 	return target.NewAddedEvent(context.Background(),
 		target.NewAggregate(aggID, resourceOwner),
 		"name",
-		domain.TargetTypeWebhook,
+		target_domain.TargetTypeWebhook,
 		"https://example.com",
 		time.Second,
 		false,
+		&crypto.CryptoValue{
+			CryptoType: crypto.TypeEncryption,
+			Algorithm:  "enc",
+			KeyID:      "id",
+			Crypted:    []byte("12345678"),
+		},
 	)
 }
 

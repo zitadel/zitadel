@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Telefon již ověřen
       Empty: Telefon je prázdný
       NotChanged: Telefon nezměněn
+      VerifyingRemovalIsNotSupported: Ověření odstranění telefonu není podporováno
     Address:
       NotFound: Adresa nenalezena
       NotChanged: Adresa nezměněna
@@ -193,7 +194,7 @@ Errors:
     AlreadyExists: Instance již existuje
     NotChanged: Instance nezměněna
   Org:
-    AlreadyExists: Název organizace je již obsazen
+    AlreadyExists: Името или идентификационният номер на организацията вече е зает
     Invalid: Organizace je neplatná
     AlreadyDeactivated: Organizace je již deaktivována
     AlreadyActive: Organizace je již aktivní
@@ -435,8 +436,6 @@ Errors:
     Invalid: Uživatelský grant je neplatný
     NotChanged: Uživatelský grant nebyl změněn
     IDMissing: Chybí Id
-    NotActive: Uživatelský grant není aktivní
-    NotInactive: Uživatelský grant není deaktivován
     NoPermissionForProject: Uživatel nemá na tomto projektu žádná oprávnění
     RoleKeyNotFound: Role nenalezena
   Member:
@@ -495,6 +494,7 @@ Errors:
     SQLStatement: SQL příkaz nemohl být vytvořen
     InvalidRequest: Požadavek je neplatný
     TooManyNestingLevels: Příliš mnoho úrovní vnoření dotazů (max. 20)
+    LimitExceeded: Překročen limit výsledků
   Quota:
     AlreadyExists: Kvóta pro tuto jednotku již existuje
     NotFound: Kvóta pro tuto jednotku nenalezena
@@ -533,6 +533,7 @@ Errors:
     StateMissing: V požadavku chybí parametr stavu
     NotStarted: Záměr nebyl zahájen nebo již byl ukončen
     NotSucceeded: Záměr nebyl úspěšný
+    Expired: Záměr vypršel
     TokenCreationFailed: Vytvoření tokenu selhalo
     InvalidToken: Token záměru je neplatný
     OtherUser: Záměr určený pro jiného uživatele
@@ -540,12 +541,23 @@ Errors:
     AlreadyExists: Požadavek na autentizaci již existuje
     NotExisting: Požadavek na autentizaci neexistuje
     WrongLoginClient: Požadavek na autentizaci vytvořen jiným klientem přihlášení
+    AlreadyHandled: Žádost o ověření již byla zpracována
   OIDCSession:
     RefreshTokenInvalid: Obnovovací token je neplatný
     Token:
       Invalid: Token je neplatný
       Expired: Token vypršel
     InvalidClient: Token nebyl vydán pro tohoto klienta
+  SAMLRequest:
+    AlreadyExists: SAMLRequest již existuje
+    NotExisting: SAMLRequest neexistuje
+    WrongLoginClient: SAMLRequest vytvořený jiným přihlašovacím klientem
+    AlreadyHandled: SAML požadavek již byl zpracován
+  SAMLSession:
+    InvalidClient: Pro tohoto klienta nebyla vydána odpověď SAMLResponse
+  DeviceAuth:
+    NotFound: Žádost o autorizaci zařízení neexistuje
+    AlreadyHandled: Žádost o autorizaci zařízení již byla zpracována
   Feature:
     NotExisting: Funkce neexistuje
     TypeNotSupported: Typ funkce není podporován
@@ -561,6 +573,8 @@ Errors:
     NotFound: Provedení nenalezeno
     IncludeNotFound: Zahrnout nenalezeno
     NoTargets: Nejsou definovány žádné cíle
+    Failed: Provedení se nezdařilo
+    ResponseIsNotValidJSON: Odpověď není platný JSON
   UserSchema:
     NotEnabled: Funkce "Uživatelské schéma" není povolena
     Type:
@@ -571,6 +585,11 @@ Errors:
     NotActive: Uživatelské schéma není aktivní
     NotInactive: Uživatelské schéma není neaktivní
     NotExists: Uživatelské schéma neexistuje
+    ID:
+      Missing: Chybí ID schématu uživatele
+    Invalid: Uživatelské schéma je neplatné
+    Data:
+      Invalid: Data neplatná pro uživatelské schéma
   TokenExchange:
     FeatureDisabled: Funkce Token Exchange je pro vaši instanci zakázána. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -582,6 +601,13 @@ Errors:
       NotForAPI: Zosobněné tokeny nejsou pro API povoleny
     Impersonation:
       PolicyDisabled: Zosobnění je zakázáno v zásadách zabezpečení instance
+  WebKey:
+    ActiveDelete: Aktivní webový klíč nelze smazat
+    Config: Neplatná konfigurace webového klíče
+    Duplicate: ID webového klíče není jedinečné
+    FeatureDisabled: Funkce webového klíče je zakázána
+    NoActive: Nebyl nalezen žádný aktivní webový klíč
+    NotFound: Webový klíč nebyl nalezen
 
 AggregateTypes:
   action: Akce
@@ -605,6 +631,9 @@ AggregateTypes:
   restrictions: Omezení
   system: Systém
   session: Sezení
+  web_key: Webový klíč
+  saml_request: Žádost SAML
+  saml_session: Relace SAML
 
 EventTypes:
   execution:
@@ -669,6 +698,13 @@ EventTypes:
         check:
           succeeded: Kontrola inicializace byla úspěšná
           failed: Kontrola inicializace selhala
+      invite:
+        code:
+          added: Vygenerován pozvánkový kód
+          sent: Pozvánkový kód byl odeslán
+        check:
+          succeeded: Kontrola pozvánky byla úspěšná
+          failed: Kontrola pozvánky selhala
       username:
         reserved: Uživatelské jméno rezervováno
         released: Uživatelské jméno uvolněno
@@ -1306,6 +1342,31 @@ EventTypes:
     deactivated: Uživatelské schéma deaktivováno
     reactivated: Uživatelské schéma bylo znovu aktivováno
     deleted: Uživatelské schéma bylo smazáno
+    user:
+      created: Uživatel vytvořen
+      updated: Uživatel aktualizován
+      deleted: Uživatel byl smazán
+      email:
+        updated: E-mailová adresa změněna
+        verified: E-mailová adresa ověřena
+        verification:
+          failed: Ověření e-mailové adresy se nezdařilo
+        code:
+          added: Vygenerován ověřovací kód e-mailové adresy
+          sent: Ověřovací kód e-mailové adresy odeslán
+      phone:
+        updated: Telefonní číslo změněno
+        verified: Telefonní číslo ověřeno
+        verification:
+          failed: Ověření telefonního čísla se nezdařilo
+        code:
+          added: Byl vygenerován ověřovací kód telefonního čísla
+          sent: Ověřovací kód telefonního čísla odeslán
+  web_key:
+    added: Přidán webový klíč
+    activated: Web Key aktivován
+    deactivated: Web Key deaktivován
+    removed: Odstraňte webový klíč
 
 Application:
   OIDC:

@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"slices"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -45,3 +46,51 @@ const (
 	ActionsMaxAllowed
 	ActionsAllowedUnlimited
 )
+
+type ActionFunction int32
+
+const (
+	ActionFunctionUnspecified ActionFunction = iota
+	ActionFunctionPreUserinfo
+	ActionFunctionPreAccessToken
+	ActionFunctionPreSAMLResponse
+	actionFunctionCount
+)
+
+func (s ActionFunction) Valid() bool {
+	return s >= 0 && s < actionFunctionCount
+}
+
+func (s ActionFunction) LocalizationKey() string {
+	if !s.Valid() {
+		return ActionFunctionUnspecified.LocalizationKey()
+	}
+
+	switch s {
+	case ActionFunctionPreUserinfo:
+		return "preuserinfo"
+	case ActionFunctionPreAccessToken:
+		return "preaccesstoken"
+	case ActionFunctionPreSAMLResponse:
+		return "presamlresponse"
+	case ActionFunctionUnspecified, actionFunctionCount:
+		fallthrough
+	default:
+		return "unspecified"
+	}
+}
+
+func AllActionFunctions() []string {
+	return []string{
+		ActionFunctionPreUserinfo.LocalizationKey(),
+		ActionFunctionPreAccessToken.LocalizationKey(),
+		ActionFunctionPreSAMLResponse.LocalizationKey(),
+	}
+}
+
+func ActionFunctionExists() func(string) bool {
+	functions := AllActionFunctions()
+	return func(s string) bool {
+		return slices.Contains(functions, s)
+	}
+}

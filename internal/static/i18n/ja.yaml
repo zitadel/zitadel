@@ -53,6 +53,7 @@ Errors:
     NotFound: SMS構成が見つかりません
     AlreadyActive: このSMS構成はすでにアクティブです
     AlreadyDeactivated: このSMS構成はすでに非アクティブです
+    NotExternalVerification: SMS構成は外部のコード検証をサポートしていません
   SMTP:
     NotEmailMessage: メッセージは EmailMessage ではありません
     RequiredAttributes: 件名、受信者、コンテンツを設定する必要がありますが、一部またはすべてが空です
@@ -98,16 +99,24 @@ Errors:
     Profile:
       NotFound: プロファイルが見つかりません
       NotChanged: プロファイルが変更されていません
+      Empty: プロファイルが空です
+      FirstNameEmpty: 名前が空です
+      LastNameEmpty: 姓が空です
       Invalid: プロファイルデータが無効です
     Email:
       NotFound: メールアドレスが見つかりません
       Invalid: 無効なメールアドレスです
       AlreadyVerified: メールアドレスはすでに検証済みです
       NotChanged: メールアドレスが変更されていません
+      Empty: メールアドレスが空です
+      IDMissing: メールアドレスIDが不足しています
     Phone:
       NotFound: 電話番号が見つかりません
       Invalid: 無効な電話番号です
       AlreadyVerified: 電話番号はすでに認証済みです
+      Empty: 電話番号が空です
+      NotChanged: 電話番号が変更されていません
+      VerifyingRemovalIsNotSupported: 電話番号の削除を検証することはできません
     Address:
       NotFound: 住所が見つかりません
       NotChanged: 住所は変更されていません
@@ -129,6 +138,7 @@ Errors:
     Username:
       AlreadyExists: ユーザー名はすでに使用されています
       Reserved: ユーザー名はすでに使用されています
+      Empty: ユーザー名が空です
     Code:
       Empty: コードは空です
       NotFound: コードが見つかりません
@@ -185,7 +195,7 @@ Errors:
     AlreadyExists: すでに存在するインスタンス
     NotChanged: インスタンスは変更されていません
   Org:
-    AlreadyExists: 組織の名前はすでに使用されています
+    AlreadyExists: 組織名またはIDはすでに使用されています
     Invalid: 無効な組織です
     AlreadyDeactivated: 組織はすでに非アクティブです
     AlreadyActive: 組織はすでにアクティブです
@@ -276,6 +286,9 @@ Errors:
       NotFound: 通知ポリシーが見つかりません
       NotChanged: 通知ポリシーは変更されていません
       AlreadyExists: 通知ポリシーはすでに存在しています
+    LabelPolicy:
+      NotFound: プライベートラベルポリシーが見つかりません
+      NotChanged: プライベートラベルポリシーが変更されていません
   Project:
     ProjectIDMissing: プロジェクトIDがありません
     AlreadyExists: プロジェクトはすでに組織に存在しています
@@ -424,8 +437,6 @@ Errors:
     Invalid: 無効なユーザーグラントです
     NotChanged: ユーザーグラントは変更されていません
     IDMissing: IDがありません
-    NotActive: ユーザーグラントはアクティブではありません
-    NotInactive: ユーザーグラントは非アクティブではありません
     NoPermissionForProject: ユーザーにはこのプロジェクトに許可がありません
     RoleKeyNotFound: ロールが見つかりません
   Member:
@@ -484,6 +495,7 @@ Errors:
     SQLStatement: SQLステートメントの作成に失敗しました
     InvalidRequest: 無効なリクエストです
     TooManyNestingLevels: クエリのネスト レベルが多すぎます (最大 20)
+    LimitExceeded: 制限を超えました
   Quota:
     AlreadyExists: このユニットにはすでにクォータが存在しています
     NotFound: このユニットにはクォータが見つかりません
@@ -524,6 +536,7 @@ Errors:
     StateMissing: リクエストに State パラメータがありません
     NotStarted: インテントが開始されなかったか、既に終了している
     NotSucceeded: インテントが成功しなかった
+    Expired: 意図の有効期限が切れました
     TokenCreationFailed: トークンの作成に失敗しました
     InvalidToken: インテントのトークンが無効である
     OtherUser: 他のユーザーを意図している
@@ -531,12 +544,23 @@ Errors:
     AlreadyExists: AuthRequestはすでに存在する
     NotExisting: AuthRequest が存在しません
     WrongLoginClient: 他のログインクライアントによって作成された AuthRequest
+    AlreadyHandled: 認証リクエストは既に処理済みです
   OIDCSession:
     RefreshTokenInvalid: 無効なリフレッシュトークンです
     Token:
       Invalid: トークンが無効です
       Expired: トークンの有効期限が切れている
     InvalidClient: トークンが発行されていません
+  SAMLRequest:
+    AlreadyExists: SAMLリクエストはすでに存在します
+    NotExisting: SAMLリクエストが存在しません
+    WrongLoginClient: 他のログイン クライアントによって作成された SAMLRequest
+    AlreadyHandled: SAMLリクエストは既に処理済みです
+  SAMLSession:
+    InvalidClient: このクライアントに対してSAMLResponseは発行されませんでした
+  DeviceAuth:
+    NotFound: デバイス認証リクエストが存在しません
+    AlreadyHandled: デバイス認証リクエストは既に処理済みです
   Feature:
     NotExisting: 機能が存在しません
     TypeNotSupported: 機能タイプはサポートされていません
@@ -552,6 +576,8 @@ Errors:
     NotFound: 実行が見つかりませんでした
     IncludeNotFound: 見つからないものを含める
     NoTargets: ターゲットが定義されていません
+    Failed: 実行に失敗しました
+    ResponseIsNotValidJSON: 応答は有効な JSON ではありません
   UserSchema:
     NotEnabled: 機能「ユーザースキーマ」が有効になっていません
     Type:
@@ -562,6 +588,11 @@ Errors:
     NotActive: ユーザースキーマがアクティブではありません
     NotInactive: ユーザースキーマが非アクティブではありません
     NotExists: ユーザースキーマが存在しません
+    ID:
+      Missing: ユーザー スキーマ ID がありません
+    Invalid: ユーザー スキーマが無効です
+    Data:
+      Invalid: ユーザー スキーマのデータが無効です
   TokenExchange:
     FeatureDisabled: インスタンスではトークン交換機能が無効になっています。 https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -573,6 +604,13 @@ Errors:
       NotForAPI: 偽装されたトークンは API では許可されません
     Impersonation:
       PolicyDisabled: インスタンスのセキュリティ ポリシーで偽装が無効になっています
+  WebKey:
+    ActiveDelete: アクティブな Web キーを削除できません
+    Config: 無効な Web キー設定
+    Duplicate: Web キー ID が一意ではありません
+    FeatureDisabled: Web キー機能が無効です
+    NoActive: アクティブな Web キーが見つかりません
+    NotFound: Web キーが見つかりません
 
 AggregateTypes:
   action: アクション
@@ -596,6 +634,9 @@ AggregateTypes:
   restrictions: 制限
   system: システム
   session: セッション
+  web_key: Web キー
+  saml_request: SAML リクエスト
+  saml_session: SAMLセッション
 
 EventTypes:
   execution:
@@ -660,6 +701,13 @@ EventTypes:
         check:
           succeeded: 初期化チェックの成功
           failed: 初期化チェックの失敗
+      invite:
+        code:
+          added: 招待コードが生成されました
+          sent: 招待コードが送信されました
+        check:
+          succeeded: 招待のチェックが成功しました
+          failed: 招待のチェックが失敗しました
       username:
         reserved: ユーザー名の予約
         released: ユーザー名の解放
@@ -679,6 +727,10 @@ EventTypes:
         check:
           succeeded: パスワードチェックの成功
           failed: パスワードチェックの失敗
+        change:
+          sent: パスワード変更メールを送信しました
+        hash:
+          updated: パスワードハッシュが更新されました
       externallogin:
         check:
           succeeded: 外部ログインの成功
@@ -782,10 +834,6 @@ EventTypes:
       check:
         succeeded: パスワードチェックの成功
         failed: パスワードチェックの失敗
-      change:
-        sent: パスワード変更を送信しました
-      hash:
-        updated: パスワードハッシュが更新されました
     phone:
       changed: 電話番号の変更
       verified: 電話番号の検証
@@ -794,7 +842,7 @@ EventTypes:
       code:
         added: 電話番号コードの生成
         sent: 電話番号コードの送信
-      removed: 電話番号の削除
+
     profile:
       changed: ユーザープロファイルの変更
     address:
@@ -1017,6 +1065,9 @@ EventTypes:
           check:
             succeeded: OIDCクライアントシークレットチェックの成功
             failed: OIDCクライアントシークレットチェックの失敗
+        key:
+          added: OIDCアプリキーの追加
+          removed: OIDCアプリキーの削除
       api:
         secret:
           check:
@@ -1294,6 +1345,32 @@ EventTypes:
     deactivated: ユーザースキーマが非アクティブ化されました
     reactivated: ユーザースキーマが再アクティブ化されました
     deleted: ユーザースキーマが削除されました
+    user:
+      created: ユーザーが作成されました
+      updated: ユーザーが更新されました
+      deleted: ユーザーが削除されました
+      email:
+        updated: メールアドレスが変更されました
+        verified: メールアドレスが確認されました
+        verification:
+          failed: メールアドレスの確認に失敗しました
+        code:
+          added: メールアドレスの確認コードが生成されました
+          sent: メールアドレスの確認コードが送信されました
+      phone:
+        updated: 電話番号が変更されました
+        verified: 電話番号が確認されました
+        verification:
+          failed: 電話番号の確認に失敗しました
+        code:
+          added: 電話番号の確認コードが生成されました
+          sent: 電話番号の確認コードが送信されました
+
+  web_key:
+    added: Web キーが追加されました
+    activated: Web キーが有効化されました
+    deactivated: Web キーが無効化されました
+    removed: Web キーが削除されました
 
 Application:
   OIDC:

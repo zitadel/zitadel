@@ -71,7 +71,7 @@ func (s *Storage) Push(ctx context.Context, intent *eventstore.PushIntent) (err 
 			return err
 		}
 
-		return push(ctx, tx, intent, commands)
+		return s.push(ctx, tx, intent, commands)
 	})
 }
 
@@ -144,7 +144,7 @@ func lockAggregates(ctx context.Context, tx *sql.Tx, intent *eventstore.PushInte
 	return res, nil
 }
 
-func push(ctx context.Context, tx *sql.Tx, reducer eventstore.Reducer, commands []*command) (err error) {
+func (s *Storage) push(ctx context.Context, tx *sql.Tx, reducer eventstore.Reducer, commands []*command) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -171,8 +171,7 @@ func push(ctx context.Context, tx *sql.Tx, reducer eventstore.Reducer, commands 
 			cmd.position.InPositionOrder,
 		)
 
-		stmt.WriteString(pushPositionStmt)
-		stmt.WriteString(`)`)
+		stmt.WriteString(", statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()))")
 	}
 	stmt.WriteString(` RETURNING created_at, "position"`)
 

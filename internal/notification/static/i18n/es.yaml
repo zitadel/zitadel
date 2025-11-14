@@ -59,3 +59,10 @@ PasswordChange:
   Greeting: Hola {{.DisplayName}},
   Text: La contraseña de tu usuario ha sido cambiada, si este cambio no fue hecho por ti, por favor proceder a restablecer inmediatamente tu contraseña.
   ButtonText: Iniciar sesión
+InviteUser:
+  Title: Invitación a {{.ApplicationName}}
+  PreHeader: Invitación a {{.ApplicationName}}
+  Subject: Invitación a {{.ApplicationName}}
+  Greeting: Hola {{.DisplayName}},
+  Text: Tu usuario ha sido invitado a {{.ApplicationName}}. Haz clic en el botón de abajo para finalizar el proceso de invitación. Si no solicitaste este correo electrónico, por favor ignóralo.
+  ButtonText: Aceptar invitación

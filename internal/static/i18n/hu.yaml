@@ -1,0 +1,1412 @@
+Errors:
+  Internal: Belső hiba történt
+  NoChangesFound: Nincs változás
+  OriginNotAllowed: Ez az "Eredet" nem engedélyezett
+  IDMissing: Hiányzó azonosító
+  ResourceOwnerMissing: Hiányzó forrástulajdonos szervezet
+  RemoveFailed: Nem sikerült eltávolítani
+  ProjectionName:
+    Invalid: Érvénytelen projectnév
+  Assets:
+    EmptyKey: Az eszközkulcs üres
+    Store:
+      NotInitialized: Az eszköztároló nincs inicializálva
+      NotConfigured: Az eszköztároló nincs konfigurálva
+    Bucket:
+      Internal: Belső hiba történt a bucket létrehozásakor
+      AlreadyExists: A bucket már létezik
+      CreateFailed: A bucket nem lett létrehozva
+      ListFailed: A bucketek nem olvashatók
+      RemoveFailed: A bucket nem lett törölve
+      SetPublicFailed: Nem sikerült a bucketet nyilvánossá tenni
+    Object:
+      PutFailed: Az objektum nem lett létrehozva
+      GetFailed: Az objektum nem olvasható
+      NotFound: Az objektum nem található
+      PresignedTokenFailed: A Signed token nem lett létrehozva
+      ListFailed: Az Objectlist nem olvasható
+      RemoveFailed: Az objektumot nem lehet eltávolítani
+  Limit:
+    ExceedsDefault: A határ túllépi az alapértelmezett limitet
+  Limits:
+    NotFound: A határértékek nem találhatók
+    NoneSpecified: Nincs megadva határ
+    Instance:
+      Blocked: Az instance blokkolva van
+  Restrictions:
+    NoneSpecified: Nincs megadva korlátozás
+    DefaultLanguageMustBeAllowed: Az alapértelmezett nyelvet engedélyezni kell
+  Language:
+    NotParsed: Nem sikerült feldolgozni a nyelvet
+    NotSupported: A nyelv nem támogatott
+    NotAllowed: A nyelv nem engedélyezett
+    Undefined: A nyelv nincs meghatározva
+    Duplicate: A nyelvek duplikálva vannak
+  OIDCSettings:
+    NotFound: OIDC konfiguráció nem található
+    AlreadyExists: OIDC konfiguráció már létezik
+  SecretGenerator:
+    AlreadyExists: A Secret generator már létezik
+    TypeMissing: A Secret generator típusa hiányzik
+    NotFound: A Secret generator nem található
+  SMSConfig:
+    NotFound: SMS konfiguráció nem található
+    AlreadyActive: SMS konfiguráció már aktív
+    AlreadyDeactivated: Az SMS konfiguráció már inaktiválva van
+  SMTP:
+    NotEmailMessage: az üzenet nem EmailMessage típusú
+    RequiredAttributes: a tárgyat, a címzetteket és a tartalmat be kell állítani, de valamelyik vagy mindegyik hiányzik
+    CouldNotSplit: nem sikerült szétválasztani a hostot és a portot az smtp kapcsolódáshoz
+    CouldNotDial: nem sikerült kapcsolatba lépni az SMTP szerverrel, ellenőrizd a portot, tűzfal problémák...
+    CouldNotDialTLS: nem sikerült TLS használatával kapcsolatba lépni az SMTP szerverrel, ellenőrizd a portot, tűzfal problémák...
+    CouldNotCreateClient: nem sikerült létrehozni az smtp klienst
+    CouldNotStartTLS: nem sikerült elindítani a tls-t
+    CouldNotAuth: nem sikerült hozzáadni az smtp hitelesítést, ellenőrizd, hogy a felhasználóneved és a jelszavad helyes-e, ha igen, lehet, hogy a szolgáltatód olyan hitelesítési módot kér, amelyet a ZITADEL nem támogat
+    CouldNotSetSender: nem sikerült beállítani a feladót
+    CouldNotSetRecipient: nem sikerült beállítani a címzettet
+  SMTPConfig:
+    TestPassword: Teszt jelszava nem található
+    NotFound: SMTP konfiguráció nem található
+    AlreadyExists: SMTP konfiguráció már létezik
+    AlreadyDeactivated: SMTP konfiguráció már inaktiválva lett
+    SenderAdressNotCustomDomain: A küldő címét egyéni domain névként kell beállítani az instanciánál.
+    TestEmailNotFound: Teszt email cím nem található
+  Notification:
+    NoDomain: Nem található domain az üzenethez
+  User:
+    NotFound: A felhasználó nem található
+    AlreadyExists: A felhasználó már létezik
+    NotFoundOnOrg: A felhasználó nem található a kiválasztott szervezetben
+    NotAllowedOrg: A felhasználó nem tagja a szükséges szervezetnek
+    UserIDMissing: Felhasználói ID hiányzik
+    UserIDWrong: A kért felhasználó nem egyezik meg a hitelesített felhasználóval
+    DomainPolicyNil: A szervezeti politika üres
+    EmailAsUsernameNotAllowed: Az email nem használható felhasználónévként
+    Invalid: A felhasználói adatok érvénytelenek
+    DomainNotAllowedAsUsername: A domain már foglalt, és nem használható
+    AlreadyInactive: A felhasználó már inaktív
+    NotInactive: A felhasználó nem inaktív
+    CantDeactivateInitial: Az inicializált állapotú felhasználó csak törölhető, nem deaktiválható
+    ShouldBeActiveOrInitial: A felhasználó nem aktív vagy nincs inicializálva
+    AlreadyInitialised: A felhasználó már inicializálva van
+    NotInitialised: A felhasználó még nincs inicializálva
+    NotLocked: A felhasználó nincs zárolva
+    NoChanges: Nincs változás
+    InitCodeNotFound: Az inicializáló kód nem található
+    UsernameNotChanged: A felhasználónév nem változott
+    InvalidURLTemplate: Az URL sablon érvénytelen
+    Profile:
+      NotFound: A profil nem található
+      NotChanged: A profil nem változott
+      Empty: A profil üres
+      FirstNameEmpty: A profilban megadott keresztnév üres
+      LastNameEmpty: A profilban megadott vezetéknév üres
+      IDMissing: A profil azonosítója hiányzik
+    Email:
+      NotFound: Az email nem található
+      Invalid: Az email érvénytelen
+      AlreadyVerified: Az email már ellenőrizve van
+      NotChanged: Az email nem változott
+      Empty: Az email üres
+      IDMissing: Hiányzik az e-mail azonosító
+    Phone:
+      NotFound: Telefon nem található
+      Invalid: Érvénytelen telefon
+      AlreadyVerified: Telefon már ellenőrizve
+      Empty: A telefon mező üres
+      NotChanged: Telefon nem lett megváltoztatva
+      VerifyingRemovalIsNotSupported: A telefon eltávolításának ellenőrzése nem támogatott
+    Address:
+      NotFound: Cím nem található
+      NotChanged: Cím nem lett megváltoztatva
+    Machine:
+      Key:
+        NotFound: A gép kulcsa nem található
+        AlreadyExisting: A gép kulcsa már létezik
+        Invalid: A publikus kulcs nem érvényes RSA publikus kulcs PKIX formátumban PEM kódolással
+      Secret:
+        NotExisting: A titok nem létezik
+        Invalid: A titok érvénytelen
+        CouldNotGenerate: A titkot nem sikerült generálni
+    PAT:
+      NotFound: A személyes hozzáférési token nem található
+    NotHuman: A felhasználónak személyesnek kell lennie
+    NotMachine: A felhasználónak technikai jellegűnek kell lennie
+    WrongType: Ez a felhasználótípus számára nem engedélyezett
+    NotAllowedToLink: A felhasználó nem kapcsolhat külső bejelentkezési szolgáltatóhoz
+    Username:
+      AlreadyExists: A felhasználónév már foglalt
+      Reserved: A felhasználónév már foglalt
+      Empty: A felhasználónév üres
+    Code:
+      Empty: A kód üres
+      NotFound: A kód nem található
+      Expired: A kód lejárt
+      GeneratorAlgNotSupported: Nem támogatott generátor algoritmus
+      Invalid: A kód érvénytelen
+    Password:
+      NotFound: A jelszó nem található
+      Empty: A jelszó üres
+      Invalid: A jelszó érvénytelen
+      NotSet: A felhasználó nem állított be jelszót
+      NotChanged: Az új jelszó nem egyezhet meg a jelenlegi jelszóval
+      NotSupported: 'A jelszó hash kódolása nem támogatott. További információ itt: https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets'
+    PasswordComplexityPolicy:
+      NotFound: A jelszó szabályzat nem található
+      MinLength: A jelszó túl rövid
+      MinLengthNotAllowed: A megadott minimális hosszúság nem engedélyezett
+      HasLower: A jelszónak tartalmaznia kell kisbetűt
+      HasUpper: A jelszónak tartalmaznia kell nagybetűt
+      HasNumber: A jelszónak tartalmaznia kell számot
+      HasSymbol: A jelszónak tartalmaznia kell szimbólumot
+    ExternalIDP:
+      Invalid: Külső IDP érvénytelen
+      IDPConfigNotExisting: Az IDP szolgáltató érvénytelen ehhez a szervezethez
+      NotAllowed: Külső IDP nem engedélyezett
+      MinimumExternalIDPNeeded: Legalább egy IDP-t hozzá kell adni
+      AlreadyExists: Külső IDP már foglalt
+      NotFound: Külső IDP nem található
+      LoginFailed: A belépés a külső IDP-nél sikertelen volt
+    MFA:
+      OTP:
+        AlreadyReady: A multifaktoros OTP (OneTimePassword) már be van állítva
+        NotExisting: A multifaktoros OTP (OneTimePassword) nem létezik
+        NotReady: A multifaktoros OTP (OneTimePassword) nincs készen
+        InvalidCode: Érvénytelen kód
+      U2F:
+        NotExisting: Az U2F nem létezik
+      Passwordless:
+        NotExisting: Passwordless nem létezik
+    WebAuthN:
+      NotFound: A WebAuthN token nem található
+      BeginRegisterFailed: A WebAuthN regisztráció megkezdése sikertelen
+      MarshalError: Hiba történt az adatkezelés során
+      ErrorOnParseCredential: Hiba történt a hitelesítési adatok feldolgozása közben
+      CreateCredentialFailed: Hiba történt a hitelesítési adatok létrehozása közben
+      BeginLoginFailed: A WebAuthN bejelentkezés megkezdése sikertelen
+      ValidateLoginFailed: Hiba történt a bejelentkezési adatok érvényesítése közben
+      CloneWarning: A hitelesítő adatok másolhatók
+    RefreshToken:
+      Invalid: A frissítő token érvénytelen
+      NotFound: A frissítő token nem található
+  Instance:
+    NotFound: Az instance nem található
+    AlreadyExists: Az instance már létezik
+    NotChanged: Az instance nem változott
+  Org:
+    AlreadyExists: A szervezet neve vagy azonosítója már foglalt
+    Invalid: A szervezet érvénytelen
+    AlreadyDeactivated: A szervezet már deaktiválva van
+    AlreadyActive: A szervezet már aktív
+    Empty: A szervezet üres
+    NotFound: Szervezet nem található
+    NotChanged: A szervezet nem változott
+    DefaultOrgNotDeletable: Az alapértelmezett szervezetet nem szabad törölni
+    ZitadelOrgNotDeletable: A ZITADEL projekttel rendelkező szervezetet nem szabad törölni
+    InvalidDomain: Érvénytelen domain
+    DomainMissing: Hiányzó domain
+    DomainNotOnOrg: A domain nem létezik a szervezeten
+    DomainNotVerified: A domain nincs ellenőrizve
+    DomainAlreadyVerified: A domain már ellenőrizve van
+    DomainVerificationTypeInvalid: A domain ellenőrzés típusa érvénytelen
+    DomainVerificationMissing: A domain ellenőrzés még nem kezdődött el
+    DomainVerificationFailed: A domain ellenőrzés sikertelen volt
+    DomainVerificationTXTNotFound: A _zitadel-challenge TXT rekord nem található a domain-edhez. Ellenőrizd, hogy hozzáadtad-e a DNS szerveredhez, vagy várj, amíg az új rekord elterjed
+    DomainVerificationTXTNoMatch: A _zitadel-challenge TXT rekord megtalálható a domain-edhez, de nem tartalmazza a megfelelő token szöveget. Ellenőrizd, hogy a megfelelő tokent adtad-e hozzá a DNS szerveredhez, vagy várj, amíg az új rekord elterjed
+    DomainVerificationHTTPNotFound: A kihívást tartalmazó fájl nem található a várt URL-en. Ellenőrizd, hogy feltöltötted-e a fájlt a megfelelő helyre olvasási jogosultsággal
+    DomainVerificationHTTPNoMatch: A kihívást tartalmazó fájl megtalálható a várt URL-en, de nem tartalmazza a megfelelő token szöveget. Ellenőrizd a tartalmát
+    DomainVerificationTimeout: Időtúllépés történt a DNS szerver lekérdezésekor
+    PrimaryDomainNotDeletable: Az elsődleges domain nem törölhető
+    DomainNotFound: A domain nem található
+    MemberIDMissing: A tagazonosító hiányzik
+    MemberNotFound: A szervezeti tag nem található
+    InvalidMember: A szervezeti tag érvénytelen
+    UserIDMissing: A felhasználói azonosító hiányzik
+    PolicyAlreadyExists: A szabályzat már létezik
+    PolicyNotExisting: A szabályzat nem létezik
+    IdpInvalid: Az IDP konfiguráció érvénytelen
+    IdpNotExisting: Az IDP konfiguráció nem létezik
+    OIDCConfigInvalid: Az OIDC IDP konfiguráció érvénytelen
+    IdpIsNotOIDC: Az IDP konfiguráció nem oidc típusú
+    Domain:
+      AlreadyExists: A domain már létezik
+      InvalidCharacter: Csak alfanumerikus karakterek, . és - engedélyezettek a domain számára
+      EmptyString: Érvénytelen nem numerikus és alfabetikus karaktereket üres helyekre cseréltük és az eredményül kapott domain egy üres string
+    IDP:
+      InvalidSearchQuery: Érvénytelen keresési lekérdezés
+      ClientIDMissing: ClientID hiányzik
+      TeamIDMissing: TeamID hiányzik
+      KeyIDMissing: KeyID hiányzik
+      PrivateKeyMissing: Privát kulcs hiányzik
+    LoginPolicy:
+      NotFound: Bejelentkezési politika nem található
+      Invalid: Bejelentkezési politika érvénytelen
+      RedirectURIInvalid: Az alapértelmezett átirányítási URI érvénytelen
+      NotExisting: Bejelentkezési szabályzat nem létezik
+      AlreadyExists: Bejelentkezési szabályzat már létezik
+      IdpProviderAlreadyExisting: Az Identitásszolgáltató már létezik
+      IdpProviderNotExisting: Az Identitásszolgáltató nem létezik
+      RegistrationNotAllowed: A regisztráció nem engedélyezett
+      UsernamePasswordNotAllowed: A felhasználónév/jelszóval való bejelentkezés nem engedélyezett
+      MFA:
+        AlreadyExists: A többtényezős hitelesítés már létezik
+        NotExisting: A többtényezős hitelesítés nem létezik
+        Unspecified: A többtényezős hitelesítés érvénytelen
+    MailTemplate:
+      NotFound: Alapértelmezett email sablon nem található
+      NotChanged: Az alapértelmezett email sablon nem lett módosítva
+      AlreadyExists: Az alapértelmezett email sablon már létezik
+      Invalid: Az alapértelmezett email sablon érvénytelen
+    CustomMessageText:
+      NotFound: Alapértelmezett üzenetszöveg nem található
+      NotChanged: Az alapértelmezett üzenetszöveg nem lett módosítva
+      AlreadyExists: Az alapértelmezett üzenetszöveg már létezik
+      Invalid: Az alapértelmezett üzenetszöveg érvénytelen
+    PasswordComplexityPolicy:
+      NotFound: Jelszókomplexitási szabályzat nem található
+      Empty: A jelszókomplexitási szabályzat üres
+      NotExisting: A jelszó komplexitási szabályzat nem létezik
+      AlreadyExists: A jelszó komplexitási szabályzat már létezik
+    PasswordLockoutPolicy:
+      NotFound: A jelszó zárolási szabályzat nem található
+      Empty: A jelszó zárolási szabályzat üres
+      NotExisting: A jelszó zárolási szabályzat nem létezik
+      AlreadyExists: A jelszó zárolási szabályzat már létezik
+    PasswordAgePolicy:
+      NotFound: A jelszó korhatár szabályzat nem található
+      Empty: A jelszó korhatár szabályzat üres
+      NotExisting: A jelszó korhatár szabályzat nem létezik
+      AlreadyExists: A jelszó korhatár szabályzat már létezik
+    OrgIAMPolicy:
+      Empty: Az Org IAM Policy üres
+      NotExisting: Az Org IAM Policy nem létezik
+      AlreadyExists: Az Org IAM Policy már létezik
+    NotificationPolicy:
+      NotFound: A Notification Policy nem található
+      NotChanged: A Notification Policy nem változott
+      AlreadyExists: A Notification Policy már létezik
+    LabelPolicy:
+      NotFound: A Private Label Policy nem található
+      NotChanged: A Private Label Policy nem lett megváltoztatva
+  Project:
+    ProjectIDMissing: Hiányzó Project Id
+    AlreadyExists: A projekt már létezik a szervezetben
+    OrgNotExisting: A szervezet nem létezik
+    UserNotExisting: A felhasználó nem létezik
+    CouldNotGenerateClientSecret: Nem sikerült kliens titkos kulcsot generálni
+    Invalid: A projekt érvénytelen
+    NotActive: A projekt nem aktív
+    NotInactive: A projekt nincs deaktiválva
+    NotFound: A projekt nem található
+    UserIDMissing: Hiányzó felhasználóazonosító
+    Member:
+      NotFound: A projekt tagja nem található
+      Invalid: A projekt tagja érvénytelen
+      AlreadyExists: A projekt tag már létezik
+      NotExisting: A projekt tag nem létezik
+    MinimumOneRoleNeeded: Legalább egy szerepet hozzá kell adni
+    Role:
+      AlreadyExists: A szerep már létezik
+      Invalid: A szerep érvénytelen
+      NotExisting: A szerep nem létezik
+    IDMissing: ID hiányzik
+    App:
+      AlreadyExists: Az alkalmazás már létezik
+      NotFound: Az alkalmazás nem található
+      Invalid: Az alkalmazás érvénytelen
+      NotExisting: Az alkalmazás nem létezik
+      NotActive: Az alkalmazás nem aktív
+      NotInactive: Az alkalmazás nem inaktív
+      OIDCConfigInvalid: Az OIDC konfiguráció érvénytelen
+      APIConfigInvalid: Az API konfiguráció érvénytelen
+      SAMLConfigInvalid: A SAML konfiguráció érvénytelen
+      IsNotOIDC: Az alkalmazás nem OIDC típusú
+      IsNotAPI: Az alkalmazás nem API típusú
+      IsNotSAML: Az alkalmazás nem SAML típusú
+      SAMLMetadataMissing: Hiányzik a SAML metaadat
+      SAMLMetadataFormat: SAML Metadata formátum hiba
+      SAMLEntityIDAlreadyExisting: SAML EntityID már létezik
+      OIDCAuthMethodNoSecret: A választott OIDC hitelesítési módszer nem igényel titkos kulcsot
+      APIAuthMethodNoSecret: A választott API hitelesítési módszer nem igényel titkos kulcsot
+      AuthMethodNoPrivateKeyJWT: A választott hitelesítési módszer nem igényel kulcsot
+      ClientSecretInvalid: Az ügyfél titkos kulcsa érvénytelen
+      Key:
+        AlreadyExisting: Az alkalmazás kulcs már létezik
+        NotFound: Az alkalmazás kulcs nem található
+    RequiredFieldsMissing: Néhány kötelező mező hiányzik
+    Grant:
+      AlreadyExists: A projekt támogatás már létezik
+      NotFound: Engedély nem található
+      Invalid: A projekt engedélye érvénytelen
+      NotExisting: A projekt engedélye nem létezik
+      HasNotExistingRole: Egy szerepkör nem létezik a projektben
+      NotActive: A projekt engedélye nem aktív
+      NotInactive: A projekt engedélye nem inaktív
+  IAM:
+    NotFound: 'Instance nem található. Győződj meg róla, hogy a domain helyes. Nézd meg itt: https://zitadel.com/docs/apis/introduction#domains'
+    Member:
+      RolesNotChanged: A szerepkörök nem változtak
+    MemberInvalid: Tag érvénytelen
+    MemberAlreadyExisting: Tag már létezik
+    MemberNotExisting: A tag nem létezik
+    IDMissing: Az azonosító hiányzik
+    IAMProjectIDMissing: Az IAM projekt azonosító hiányzik
+    IamProjectAlreadySet: Az IAM projekt azonosító már be van állítva
+    IdpInvalid: Az IDP konfiguráció érvénytelen
+    IdpNotExisting: Az IDP konfiguráció nem létezik
+    OIDCConfigInvalid: Az OIDC IDP konfiguráció érvénytelen
+    IdpIsNotOIDC: Az IDP konfiguráció nem oidc típusú
+    LoginPolicyInvalid: A bejelentkezési irányelv érvénytelen
+    LoginPolicyNotExisting: A bejelentkezési irányelv nem létezik
+    IdpProviderInvalid: Az Identity Provider érvénytelen
+    LoginPolicy:
+      NotFound: Alapértelmezett bejelentkezési irányelv nem található
+      NotChanged: Az alapértelmezett bejelentkezési irányelv nem lett módosítva
+      NotExisting: Alapértelmezett bejelentkezési irányelv nem létezik
+      AlreadyExists: Alapértelmezett bejelentkezési irányelv már létezik
+      RedirectURIInvalid: Az alapértelmezett átirányítási URI érvénytelen
+      MFA:
+        AlreadyExists: A multifaktor már létezik
+        NotExisting: A multifaktor nem létezik
+        Unspecified: A multifaktor érvénytelen
+      IDP:
+        AlreadyExists: Az Identity Provider már létezik
+        NotExisting: Az Identity provider nem létezik
+        Invalid: Érvénytelen Identity Provider
+      IDPConfig:
+        AlreadyExists: Az Identity Provider konfiguráció már létezik
+        NotInactive: Az Identity Provider konfiguráció nem inaktív
+        NotActive: Az Identity Provider konfiguráció nem aktív
+    LabelPolicy:
+      NotFound: Alapértelmezett Private Label Policy nem található
+      NotChanged: Az alapértelmezett Private Label Policy nem változott
+    MailTemplate:
+      NotFound: Az alapértelmezett Mail Template nem található
+      NotChanged: Az alapértelmezett Mail Template nem változott
+      AlreadyExists: Az alapértelmezett Mail Template már létezik
+      Invalid: Az alapértelmezett e-mail sablon érvénytelen
+    CustomMessageText:
+      NotFound: Az alapértelmezett üzenetszöveg nem található
+      NotChanged: Az alapértelmezett üzenetszöveg nem lett megváltoztatva
+      AlreadyExists: Az alapértelmezett üzenetszöveg már létezik
+      Invalid: Az alapértelmezett üzenetszöveg érvénytelen
+    PasswordComplexityPolicy:
+      NotFound: Az alapértelmezett jelszó-komplexitási szabályzat nem található
+      NotExisting: Az alapértelmezett jelszó-komplexitási szabályzat nem létezik
+      AlreadyExists: Az alapértelmezett jelszó-komplexitási szabályzat már létezik
+      Empty: Az alapértelmezett jelszó-komplexitási szabályzat üres
+      NotChanged: Az alapértelmezett jelszó-komplexitási szabályzat nem lett megváltoztatva
+    PasswordAgePolicy:
+      NotFound: Az alapértelmezett jelszó életkor szabályzat nem található
+      NotExisting: Az alapértelmezett jelszó életkor szabályzat nem létezik
+      AlreadyExists: Az alapértelmezett jelszó életkor szabályzat már létezik
+      Empty: Az alapértelmezett jelszó életkor szabályzat üres
+      NotChanged: Az alapértelmezett jelszó életkor szabályzat nem lett megváltoztatva
+    PasswordLockoutPolicy:
+      NotFound: Az alapértelmezett jelszó kizárás szabályzat nem található
+      NotExisting: Az alapértelmezett jelszó kizárás szabályzat nem létezik
+      AlreadyExists: Az alapértelmezett jelszó kizárás szabályzat már létezik
+      Empty: Az alapértelmezett jelszó kizárás szabályzat üres
+      NotChanged: Az alapértelmezett jelszó kizárás szabályzat nem lett megváltoztatva
+    DomainPolicy:
+      NotFound: Org IAM Policy nem található
+      Empty: Org IAM Policy üres
+      NotExisting: Org IAM Policy nem létezik
+      AlreadyExists: Org IAM Policy már létezik
+      NotChanged: Org IAM Policy nem lett módosítva
+    NotificationPolicy:
+      NotFound: Default Notification Policy nem található
+      NotChanged: Default Notification Policy nem lett módosítva
+      AlreadyExists: Default Notification Policy már létezik
+  Policy:
+    AlreadyExists: Policy már létezik
+    Label:
+      Invalid:
+        PrimaryColor: Az elsődleges szín nem érvényes Hex színérték
+        BackgroundColor: A háttérszín nem érvényes Hex színérték
+        WarnColor: A figyelmeztető szín nem érvényes Hex színérték
+        FontColor: A betűszín nem érvényes Hex színérték
+        PrimaryColorDark: Az elsődleges szín (sötét mód) nem érvényes Hex színérték
+        BackgroundColorDark: A háttérszín (sötét mód) nem érvényes Hex színérték
+        WarnColorDark: A figyelmeztető szín (sötét mód) nem érvényes Hex színérték
+        FontColorDark: A betűszín (sötét mód) nem érvényes Hex színérték
+  UserGrant:
+    AlreadyExists: A felhasználói jogosultság már létezik
+    NotFound: A felhasználói jogosultság nem található
+    Invalid: A felhasználói jogosultság érvénytelen
+    NotChanged: A felhasználói jogosultság nem lett módosítva
+    IDMissing: Hiányzó azonosító
+    NoPermissionForProject: A felhasználónak nincs jogosultsága ebben a projektben
+    RoleKeyNotFound: Szerepkör nem található
+  Member:
+    AlreadyExists: A tag már létezik
+  IDPConfig:
+    AlreadyExists: Ilyen nevű IDP konfiguráció már létezik
+    NotExisting: Az identitásszolgáltató konfiguráció nem létezik
+  Changes:
+    NotFound: Nem található előzmény
+    AuditRetention: A történelem kívül esik az Audit Napló Megtartási időn
+  Token:
+    NotFound: Token nem található
+    Invalid: Token érvénytelen
+  UserSession:
+    NotFound: UserSession nem található
+  Key:
+    NotFound: Kulcs nem található
+    ExpireBeforeNow: A lejárati dátum a múltban van
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: A többfaktoros hitelesítés be van állítva, de nincs lehetséges szolgáltató konfigurálva. Kérlek, vedd fel a kapcsolatot a rendszeradminisztrátorral.
+  Step:
+    Started:
+      AlreadyExists: A lépés már létezik
+    Done:
+      AlreadyExists: A végrehajtott lépés már létezik
+  CustomText:
+    AlreadyExists: A testreszabott szöveg már létezik
+    Invalid: Egyéni szöveg érvénytelen
+    NotFound: Egyéni szöveg nem található
+  TranslationFile:
+    ReadError: Hiba a fordítási fájl olvasása közben
+    MergeError: A fordítási fájlt nem sikerült egyesíteni az egyéni fordításokkal
+    NotFound: A fordítási fájl nem létezik
+  Metadata:
+    NotFound: Metaadat nem található
+    NoData: A metaadat lista üres
+    Invalid: A metaadat érvénytelen
+    KeyNotExisting: Egy vagy több kulcs nem létezik
+  Action:
+    Invalid: A művelet érvénytelen
+    NotFound: Művelet nem található
+    NotActive: A művelet nem aktív
+    NotInactive: A művelet nem inaktív
+    MaxAllowed: Nem engedélyezett további aktív műveletek
+    NotEnabled: Az "Action" funkció nincs engedélyezve
+  Flow:
+    FlowTypeMissing: FlowType hiányzik
+    Empty: Az áramlás már üres
+    WrongTriggerType: A TriggerType érvénytelen
+    NoChanges: Nincs változás
+    ActionIDsNotExist: Az ActionID-k nem léteznek
+  Query:
+    CloseRows: A SQL utasítást nem sikerült befejezni
+    SQLStatement: A SQL utasítást nem sikerült létrehozni
+    InvalidRequest: Érvénytelen kérés
+    TooManyNestingLevels: Túl sok lekérdezési szint (Max 20)
+    LimitExceeded: A limit túllépve
+  Quota:
+    AlreadyExists: Már létezik kvóta ehhez az egységhez
+    NotFound: Nem található kvóta ehhez az egységhez
+    Invalid:
+      CallURL: A kvótahívás URL érvénytelen
+      Percent: A kvóta százalék kevesebb, mint 1
+      Unimplemented: A kvóták nincsenek megvalósítva ehhez az egységhez
+      Amount: A kvóta mennyisége kisebb, mint 1
+      ResetInterval: A kvóta visszaállítási intervalluma rövidebb, mint egy perc
+      Noop: Egy értesítések nélküli korlátlan kvóta nincs hatással
+    Access:
+      Exhausted: Az autentikált kérésekre vonatkozó kvóta kimerült
+    Execution:
+      Exhausted: A végrehajtási másodpercekre vonatkozó kvóta kimerült
+  LogStore:
+    Access:
+      StorageFailed: A hozzáférési napló adatbázisba mentése sikertelen
+      ScanFailed: Az autentikált kérések felhasználásának lekérdezése sikertelen
+    Execution:
+      StorageFailed: Az akció végrehajtási napló adatbázisba mentése sikertelen
+      ScanFailed: Az akció végrehajtási másodperceinek felhasználásának lekérdezése sikertelen
+  Session:
+    NotExisting: A munkamenet nem létezik
+    Terminated: A munkamenet már befejeződött
+    Expired: A munkamenet lejárt
+    PositiveLifetime: A munkamenet élettartama nem lehet kevesebb, mint 0
+    Token:
+      Invalid: A munkamenet token érvénytelen
+    WebAuthN:
+      NoChallenge: WebAuthN kihívás nélküli munkamenet
+  Intent:
+    IDPMissing: A kérésből hiányzik az IDP ID
+    IDPInvalid: A kéréshez az IDP érvénytelen
+    ResponseInvalid: Az IDP válasz érvénytelen
+    MissingSingleMappingAttribute: Az IDP válasza nem tartalmazza a hozzárendelési attribútumot, vagy több értéke van
+    SuccessURLMissing: A kérésből hiányzik a sikeres URL
+    FailureURLMissing: A kérésből hiányzik a Failure URL
+    StateMissing: A kérésből hiányzik a State paraméter
+    NotStarted: Az intent nem indult el, vagy már befejeződött
+    NotSucceeded: Az intent nem sikerült
+    Expired: A kérésből lejárt
+    TokenCreationFailed: A token létrehozása nem sikerült
+    InvalidToken: Az Intent Token érvénytelen
+    OtherUser: Az intent egy másik felhasználónak szól
+  AuthRequest:
+    AlreadyExists: Az Auth Request már létezik
+    NotExisting: Az Auth Request nem létezik
+    WrongLoginClient: Az Auth Requestet egy másik bejelentkezési kliens hozta létre
+    AlreadyHandled: A hitelesítési kérelem már feldolgozva
+  OIDCSession:
+    RefreshTokenInvalid: Az Refresh Token érvénytelen
+    Token:
+      Invalid: A Token érvénytelen
+      Expired: A Token lejárt
+    InvalidClient: A Token nem ehhez a klienshez lett kiadva
+  SAMLRequest:
+    AlreadyExists: A SAMLRequest már létezik
+    NotExisting: A SAMLRequest nem létezik
+    WrongLoginClient: A SAMLRequest egy másik bejelentkezési ügyfél által létrehozott
+    AlreadyHandled: A SAMLRequest már feldolgozva
+  SAMLSession:
+    InvalidClient: SAMLResponse nem lett kiadva ehhez az ügyfélhez
+  DeviceAuth:
+    NotFound: Az eszközengedélyezési kérelem nem létezik
+    AlreadyHandled: Az eszközengedélyezési kérelem már feldolgozva
+  Feature:
+    NotExisting: A funkció nem létezik
+    TypeNotSupported: A funkció típusa nem támogatott
+    InvalidValue: Érvénytelen érték ehhez a funkcióhoz
+  Target:
+    Invalid: A cél érvénytelen
+    NoTimeout: A célnak nincs időkorlátja
+    InvalidURL: A cél érvénytelen URL-t tartalmaz
+    NotFound: Cél nem található
+  Execution:
+    ConditionInvalid: Végrehajtási feltétel érvénytelen
+    Invalid: A végrehajtás érvénytelen
+    NotFound: Végrehajtás nem található
+    IncludeNotFound: Beillesztés nem található
+    NoTargets: Nincsenek célok meghatározva
+    Failed: Végrehajtás sikertelen
+    ResponseIsNotValidJSON: Az válasz nem érvényes JSON
+  UserSchema:
+    NotEnabled: A "User Schema" funkció nincs engedélyezve
+    Type:
+      Missing: User Schema típus hiányzik
+      AlreadyExists: A User Schema típus már létezik
+    Authenticator:
+      Invalid: Érvénytelen hitelesítő típus
+    NotActive: A User Schema nem aktív
+    NotInactive: A User Schema nem inaktív
+    NotExists: A User Schema nem létezik
+    ID:
+      Missing: A User Schema azonosító hiányzik
+    Invalid: Érvénytelen User Schema
+    Data:
+      Invalid: Érvénytelen adat a User Schema-hoz
+  TokenExchange:
+    FeatureDisabled: A Token Exchange funkció le van tiltva az példányod esetében. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: A token hiányzik
+      Invalid: A token érvénytelen
+      TypeMissing: Hiányzó token típus
+      TypeNotAllowed: A token típus nem engedélyezett
+      TypeNotSupported: A token típus nem támogatott
+      NotForAPI: Az API-hoz nem engedélyezettek az álcázott tokenek
+    Impersonation:
+      PolicyDisabled: Az álcázás le van tiltva az instance biztonsági szabályzatában
+  WebKey:
+    ActiveDelete: Az aktív webkulcs nem törölhető
+    Config: Érvénytelen webkulcs konfiguráció
+    Duplicate: A webkulcs azonosító nem egyedi
+    FeatureDisabled: A webkulcs funkció le van tiltva
+    NoActive: Aktív web kulcs nem található
+    NotFound: Web kulcs nem található
+
+AggregateTypes:
+  action: Művelet
+  instance: Példány
+  key_pair: Kulcspár
+  org: Szervezet
+  project: Projekt
+  user: Felhasználó
+  usergrant: Felhasználói jogosultság
+  quota: Kvóta
+  feature: Funkció
+  target: Cél
+  execution: Végrehajtás
+  user_schema: Felhasználói séma
+  auth_request: Hitelesítési kérés
+  device_auth: Eszköz hitelesítés
+  idpintent: IDP szándék
+  limits: Korlátok
+  milestone: Mérföldkő
+  oidc_session: OIDC munkamenet
+  restrictions: Korlátozások
+  system: Rendszer
+  session: Munkamenet
+  web_key: Webkulcs
+  saml_request: SAML-kérés
+  saml_session: SAML munkamenet
+
+EventTypes:
+  execution:
+    set: Végrehajtási készlet
+    removed: Végrehajtás törölve
+  target:
+    added: Cél létrehozva
+    changed: Cél megváltozott
+    removed: Cél törölve
+  user:
+    added: Felhasználó hozzáadva
+    selfregistered: A felhasználó regisztrálta magát
+    initialization:
+      code:
+        added: Kezdő kód generálva
+        sent: Kezdő kód elküldve
+      check:
+        succeeded: A kezdő ellenőrzés sikeres volt
+        failed: A kezdő ellenőrzés meghiúsult
+    token:
+      added: Hozzáférési token létrehozva
+      v2.added: Hozzáférési token létrehozva
+      removed: Hozzáférési token eltávolítva
+    impersonated: A felhasználó megszemélyesítve
+    username:
+      reserved: Felhasználónév fenntartva
+      released: Felhasználónév felszabadítva
+      changed: Felhasználónév megváltoztatva
+    email:
+      reserved: Email cím lefoglalva
+      released: Email cím felszabadítva
+      changed: Email cím megváltoztatva
+      verified: Email cím megerősítve
+      verification:
+        failed: Email cím megerősítése sikertelen
+      code:
+        added: Email cím megerősítő kód generálva
+        sent: Email cím megerősítő kód elküldve
+    machine:
+      added: Technikai felhasználó hozzáadva
+      changed: Technikai felhasználó megváltoztatva
+      key:
+        added: Kulcs hozzáadva
+        removed: Kulcs eltávolítva
+      secret:
+        set: Titok beállítva
+        updated: Titkos hash frissítve
+        removed: Titok eltávolítva
+        check:
+          succeeded: Titkos ellenőrzés sikeres
+          failed: Titkos ellenőrzés sikertelen
+    human:
+      added: Személy hozzáadva
+      selfregistered: Személy regisztrálta magát
+      avatar:
+        added: Az avatar hozzáadva
+        removed: Az avatar eltávolítva
+      initialization:
+        code:
+          added: Inicializáló kód generálva
+          sent: Inicializáló kód elküldve
+        check:
+          succeeded: Inicializálási ellenőrzés sikeres
+          failed: Inicializálási ellenőrzés sikertelen
+      invite:
+        code:
+          added: Meghívó kód generálva
+          sent: Meghívó kód elküldve
+        check:
+          succeeded: Meghívó ellenőrzés sikeres
+          failed: Meghívó ellenőrzés sikertelen
+      username:
+        reserved: Felhasználónév lefoglalva
+        released: Felhasználónév feloldva
+      email:
+        changed: Email cím megváltoztatva
+        verified: Email cím megerősítve
+        verification:
+          failed: Email cím megerősítése sikertelen
+        code:
+          added: Email cím megerősítő kód generálva
+          sent: Email cím megerősítő kód elküldve
+      password:
+        changed: Jelszó megváltoztatva
+        code:
+          added: Jelszó kód generálva
+          sent: Jelszó kód elküldve
+        check:
+          succeeded: A jelszó ellenőrzése sikerült
+          failed: A jelszó ellenőrzése nem sikerült
+        change:
+          sent: A jelszóváltoztatás elküldve
+        hash:
+          updated: A jelszó hash frissítve
+      externallogin:
+        check:
+          succeeded: Külső bejelentkezés sikerült
+      externalidp:
+        added: Külső IDP hozzáadva
+        removed: Külső IDP eltávolítva
+        cascade:
+          removed: Külső IDP kaszkád eltávolítva
+        id:
+          migrated: Az IDP külső Felhasználó-ID áttelepítve
+      phone:
+        changed: Telefonszám megváltoztatva
+        verified: Telefonszám ellenőrizve
+        verification:
+          failed: Telefonszám ellenőrzése sikertelen
+        code:
+          added: Telefonszám kód generálva
+          sent: Telefonszám kód elküldve
+        removed: Telefonszám eltávolítva
+      profile:
+        changed: Felhasználói profil megváltoztatva
+      address:
+        changed: Felhasználói cím megváltoztatva
+      mfa:
+        otp:
+          added: Többfaktoros OTP hozzáadva
+          verified: Többfaktoros OTP ellenőrizve
+          removed: Többfaktoros OTP eltávolítva
+          check:
+            succeeded: A multifaktoros OTP ellenőrzés sikeres
+            failed: A multifaktoros OTP ellenőrzés sikertelen
+          sms:
+            added: Multifaktoros OTP SMS hozzáadva
+            removed: Multifaktoros OTP SMS eltávolítva
+            code:
+              added: Multifaktoros OTP SMS kód hozzáadva
+              sent: Multifaktoros OTP SMS kód elküldve
+            check:
+              succeeded: Multifaktoros OTP SMS ellenőrzés sikeres
+              failed: Multifaktoros OTP SMS ellenőrzés sikertelen
+          email:
+            added: Multifaktoros OTP Email hozzáadva
+            removed: Multifaktoros OTP Email eltávolítva
+            code:
+              added: Multifaktor OTP Email kód hozzáadva
+              sent: Multifaktor OTP Email kód elküldve
+            check:
+              succeeded: Multifaktor OTP Email ellenőrzés sikeres
+              failed: Multifaktor OTP Email ellenőrzés sikertelen
+        u2f:
+          token:
+            added: Multifaktor U2F Token hozzáadva
+            verified: Multifaktor U2F Token ellenőrizve
+            removed: Multifaktor U2F Token eltávolítva
+            begin:
+              login: Multifaktor U2F ellenőrzés elindítva
+            check:
+              succeeded: Multifaktor U2F ellenőrzés sikeres
+              failed: Multifaktor U2F ellenőrzés sikertelen
+            signcount:
+              changed: A Multifactor U2F Token ellenőrzőösszege megváltozott
+        init:
+          skipped: Több-faktoros inicializálás kihagyva
+      passwordless:
+        token:
+          added: Token a jelszó nélküli bejelentkezéshez hozzáadva
+          verified: Token a jelszó nélküli bejelentkezéshez ellenőrizve
+          removed: Token a jelszó nélküli bejelentkezéshez eltávolítva
+          begin:
+            login: Jelszó nélküli bejelentkezés ellenőrzése elindítva
+          check:
+            succeeded: Jelszó nélküli bejelentkezés ellenőrzése sikeres
+            failed: Jelszó nélküli bejelentkezés ellenőrzése sikertelen
+          signcount:
+            changed: A jelszó nélküli bejelentkezés tokene ellenőrzőösszege megváltozott
+        initialization:
+          code:
+            added: Jelszó nélküli inicializációs kód hozzáadva
+            sent: Jelszó nélküli inicializáló kód elküldve
+            requested: Jelszó nélküli inicializáló kód igényelve
+            check:
+              succeeded: Jelszó nélküli inicializáló kód sikeresen ellenőrizve
+              failed: Jelszó nélküli inicializáló kód ellenőrzése sikertelen
+      signed:
+        out: Felhasználó kijelentkezett
+      refresh:
+        token:
+          added: Refresh Token létrehozva
+          renewed: Refresh Token megújítva
+          removed: Refresh Token eltávolítva
+    locked: Felhasználó zárolva
+    unlocked: Felhasználó zárolása feloldva
+    deactivated: Felhasználó deaktiválva
+    reactivated: Felhasználó újraaktiválva
+    removed: Felhasználó eltávolítva
+    password:
+      changed: Jelszó megváltoztatva
+      code:
+        added: Jelszó kód generálva
+        sent: Jelszó kód elküldve
+      check:
+        succeeded: Jelszó ellenőrzése sikeres
+        failed: Jelszó ellenőrzése sikertelen
+    phone:
+      changed: Telefonszám megváltoztatva
+      verified: Telefonszám ellenőrizve
+      verification:
+        failed: A telefonszám ellenőrzése sikertelen
+      code:
+        added: A telefonszám kódja létrehozva
+        sent: A telefonszám kódja elküldve
+    profile:
+      changed: A felhasználói profil megváltozott
+    address:
+      changed: A felhasználói cím megváltozott
+    mfa:
+      otp:
+        added: Többfaktoros OTP hozzáadva
+        verified: Többfaktoros OTP ellenőrizve
+        removed: Többfaktoros OTP eltávolítva
+        check:
+          succeeded: A többfaktoros OTP ellenőrzése sikeres
+          failed: A többfaktoros OTP ellenőrzése sikertelen
+        init:
+          skipped: Többfaktoros OTP inicializálás kihagyva
+      init:
+        skipped: Többfaktoros inicializálás kihagyva
+    signed:
+      out: Felhasználó kijelentkezett
+    grant:
+      added: Engedély hozzáadva
+      changed: Engedély megváltoztatva
+      removed: Engedély eltávolítva
+      deactivated: Engedély deaktiválva
+      reactivated: Engedély újraaktiválva
+      reserved: Engedély fenntartva
+      released: Engedély felszabadítva
+      cascade:
+        removed: Engedély visszavonva
+        changed: Engedély megváltoztatva
+    metadata:
+      set: Felhasználói metaadatok beállítva
+      removed: Felhasználói metaadatok törölve
+      removed.all: Minden felhasználói metaadat törölve
+    domain:
+      claimed: Domain igényelve
+      claimed.sent: Domain igénylésről értesítés elküldve
+    pat:
+      added: Személyes hozzáférési token hozzáadva
+      removed: Személyes hozzáférési token törölve
+  org:
+    added: Szervezet hozzáadva
+    changed: Szervezet megváltozott
+    deactivated: Szervezet deaktiválva
+    reactivated: Szervezet újraaktiválva
+    removed: Szervezet eltávolítva
+    domain:
+      added: Domain hozzáadva
+      verification:
+        added: Domain ellenőrzés hozzáadva
+        failed: Domain ellenőrzés sikertelen
+      verified: Domain ellenőrizve
+      removed: Domain eltávolítva
+      primary:
+        set: Elsődleges domain beállítva
+      reserved: Domain lefoglalva
+      released: Domain feloldva
+    name:
+      reserved: Szervezet neve lefoglalva
+      released: Szervezet neve feloldva
+    member:
+      added: Szervezeti tag hozzáadva
+      changed: Szervezeti tag módosítva
+      removed: Szervezeti tag eltávolítva
+      cascade:
+        removed: Szervezeti tag láncolt eltávolítva
+    iam:
+      policy:
+        added: Rendszerpolitika hozzáadva
+        changed: Rendszerpolitika módosítva
+        removed: A rendszerpolitika eltávolítva
+    idp:
+      config:
+        added: IDP konfiguráció hozzáadva
+        changed: IDP konfiguráció megváltoztatva
+        removed: IDP konfiguráció eltávolítva
+        deactivated: IDP konfiguráció deaktiválva
+        reactivated: IDP konfiguráció újraaktiválva
+      oidc:
+        config:
+          added: OIDC IDP konfiguráció hozzáadva
+          changed: OIDC IDP konfiguráció megváltoztatva
+      saml:
+        config:
+          added: SAML IDP konfiguráció hozzáadva
+          changed: SAML IDP konfiguráció megváltoztatva
+      jwt:
+        config:
+          added: JWT IDP konfiguráció hozzáadva
+          changed: JWT IDP konfiguráció megváltoztatva
+    customtext:
+      set: Egyéni szöveg beállítva
+      removed: Egyéni szöveg eltávolítva
+      template:
+        removed: Egyéni szövegsablon eltávolítva
+    policy:
+      login:
+        added: Bejelentkezési szabályzat hozzáadva
+        changed: Bejelentkezési szabályzat megváltoztatva
+        removed: Bejelentkezési szabályzat eltávolítva
+        idpprovider:
+          added: Identity Provider hozzáadva a bejelentkezési szabályzathoz
+          removed: Identity Provider eltávolítva a bejelentkezési szabályzatból
+          cascade:
+            removed: Az Identity Provider kaszkád eltávolítva a Bejelentkezési Szabályzatból
+        secondfactor:
+          added: Második faktor hozzáadva a Bejelentkezési Szabályzathoz
+          removed: Második faktor eltávolítva a Bejelentkezési Szabályzatból
+        multifactor:
+          added: Többfaktoros hitelesítés hozzáadva a Bejelentkezési Szabályzathoz
+          removed: Többfaktoros hitelesítés eltávolítva a Bejelentkezési Szabályzatból
+      password:
+        complexity:
+          added: Jelszó összetettségi szabályzat hozzáadva
+          changed: Jelszó összetettségi szabályzat módosítva
+          removed: Jelszó összetettségi szabályzat eltávolítva
+        age:
+          added: Jelszó élettartam szabályzat hozzáadva
+          changed: Jelszó élettartam szabályzat módosítva
+          removed: Jelszókor szabályzat eltávolítva
+        lockout:
+          added: Jelszózár szabályzat hozzáadva
+          changed: Jelszózár szabályzat megváltoztatva
+          removed: Jelszózár szabályzat eltávolítva
+      label:
+        added: Címke szabályzat hozzáadva
+        changed: Címke szabályzat megváltoztatva
+        activated: Címke szabályzat aktiválva
+        removed: Címke szabályzat eltávolítva
+        logo:
+          added: Logo hozzáadva a címke szabályzathoz
+          removed: Logo eltávolítva a címke szabályzatból
+          dark:
+            added: Logo (sötét mód) hozzáadva a Label Policy-hoz
+            removed: Logo (sötét mód) eltávolítva a Label Policy-ból
+        icon:
+          added: Ikon hozzáadva a Label Policy-hoz
+          removed: Ikon eltávolítva a Label Policy-ból
+          dark:
+            added: Ikon (sötét mód) hozzáadva a Label Policy-hoz
+            removed: Ikon (sötét mód) eltávolítva a Label Policy-ból
+        font:
+          added: Betűtípus hozzáadva a Label Policy-hoz
+          removed: Betűtípus eltávolítva a Label Policy-ból
+        assets:
+          removed: Eszközök eltávolítva a Label Policy-ból
+      privacy:
+        added: Adatvédelmi szabályzat és ÁSZF hozzáadva
+        changed: Az adatvédelmi irányelvek és a szolgáltatási feltételek megváltoztak
+        removed: Az adatvédelmi irányelvek és a szolgáltatási feltételek eltávolítva
+      domain:
+        added: Domain szabályzat hozzáadva
+        changed: Domain szabályzat megváltozott
+        removed: Domain szabályzat eltávolítva
+      lockout:
+        added: Zárolási szabályzat hozzáadva
+        changed: Zárolási szabályzat megváltozott
+        removed: Zárolási szabályzat eltávolítva
+      notification:
+        added: Értesítési szabályzat hozzáadva
+        changed: Értesítési szabályzat megváltozott
+        removed: Értesítési szabályzat eltávolítva
+    flow:
+      trigger_actions:
+        set: Akció beállítva
+        cascade:
+          removed: Akciók kaszkád eltávolítva
+        removed: Akciók eltávolítva
+      cleared: Folyamat törölve
+    mail:
+      template:
+        added: E-mail sablon hozzáadva
+        changed: E-mail sablon megváltoztatva
+        removed: E-mail sablon eltávolítva
+      text:
+        added: E-mail szöveg hozzáadva
+        changed: E-mail szöveg megváltoztatva
+        removed: E-mail szöveg eltávolítva
+    metadata:
+      removed: Metaadat eltávolítva
+      removed.all: Minden metaadat eltávolítva
+      set: Metaadat beállítva
+  project:
+    added: Projekt hozzáadva
+    changed: Projekt megváltoztatva
+    deactivated: Projekt inaktiválva
+    reactivated: Projekt újraaktiválva
+    removed: Projekt eltávolítva
+    member:
+      added: Projekt tag hozzáadva
+      changed: Projekt tag megváltozott
+      removed: Projekt tag eltávolítva
+      cascade:
+        removed: Projekt tag láncolva eltávolítva
+    role:
+      added: Projekt szerepkör hozzáadva
+      changed: Projekt szerepkör megváltozott
+      removed: Projekt szerepkör eltávolítva
+    grant:
+      added: Adminisztratív hozzáférés hozzáadva
+      changed: Adminisztratív hozzáférés megváltozott
+      removed: Adminisztratív hozzáférés eltávolítva
+      deactivated: Adminisztratív hozzáférés inaktiválva
+      reactivated: Az adminisztrációs hozzáférés újra aktiválva
+      cascade:
+        changed: Az adminisztrációs hozzáférés módosítva
+      member:
+        added: Új adminisztrációs tag hozzáadva
+        changed: A adminisztrációs tag módosítva
+        removed: A adminisztrációs tag eltávolítva
+        cascade:
+          removed: Az adminisztrációs hozzáférés teljes eltávolítva
+    application:
+      added: Alkalmazás hozzáadva
+      changed: Alkalmazás módosítva
+      removed: Alkalmazás eltávolítva
+      deactivated: Alkalmazás inaktiválva
+      reactivated: Az alkalmazás újraaktiválva
+      oidc:
+        secret:
+          check:
+            succeeded: Az OIDC kliens titok ellenőrzése sikeres volt
+            failed: Az OIDC kliens titok ellenőrzése meghiúsult
+        key:
+          added: OIDC alkalmazáskulcs hozzáadva
+          removed: OIDC alkalmazáskulcs eltávolítva
+      api:
+        secret:
+          check:
+            succeeded: API titok ellenőrzése sikeres volt
+            failed: API titok ellenőrzése meghiúsult
+        key:
+          added: Alkalmazáskulcs hozzáadva
+          removed: Alkalmazáskulcs eltávolítva
+      config:
+        saml:
+          added: SAML konfiguráció hozzáadva
+          changed: A SAML konfiguráció megváltozott
+        oidc:
+          added: OIDC konfiguráció hozzáadva
+          changed: Az OIDC konfiguráció megváltozott
+          secret:
+            changed: OIDC titok megváltozott
+            updated: OIDC titok hash frissítve
+        api:
+          added: API konfiguráció hozzáadva
+          changed: Az API konfiguráció megváltozott
+          secret:
+            changed: API titok megváltozott
+            updated: API titok hash frissítve
+  policy:
+    password:
+      complexity:
+        added: Jelszó komplexitási irányelv hozzáadva
+        changed: A jelszó összetettségi irányelv megváltozott
+      age:
+        added: Új jelszó élettartam irányelvet adtunk hozzá
+        changed: A jelszó élettartam irányelv megváltozott
+      lockout:
+        added: Új jelszó kizárási irányelvet adtunk hozzá
+        changed: A jelszó kizárási irányelv megváltozott
+  iam:
+    setup:
+      started: A ZITADEL beállítás elindult
+      done: A ZITADEL beállítás befejeződött
+    global:
+      org:
+        set: Globális szervezet beállítva
+    project:
+      iam:
+        set: A ZITADEL projekt beállítva
+    member:
+      added: ZITADEL tag hozzáadva
+      changed: ZITADEL tag megváltoztatva
+      removed: ZITADEL tag eltávolítva
+      cascade:
+        removed: ZITADEL tag láncolt eltávolítva
+    idp:
+      config:
+        added: IDP konfiguráció hozzáadva
+        changed: IDP konfiguráció megváltoztatva
+        removed: IDP konfiguráció eltávolítva
+        deactivated: IDP konfiguráció inaktiválva
+        reactivated: IDP konfiguráció újraaktiválva
+      oidc:
+        config:
+          added: OIDC IDP konfiguráció hozzáadva
+          changed: OIDC IDP konfiguráció megváltoztatva
+      saml:
+        config:
+          added: SAML IDP konfiguráció hozzáadva
+          changed: SAML IDP konfiguráció megváltoztatva
+      jwt:
+        config:
+          added: JWT konfiguráció hozzáadva az azonosítószolgáltatóhoz
+          changed: JWT konfiguráció eltávolítva az azonosítószolgáltatótól
+    customtext:
+      set: Szöveg beállítva
+      removed: Szöveg eltávolítva
+    policy:
+      login:
+        added: Alapértelmezett bejelentkezési szabályzat hozzáadva
+        changed: Alapértelmezett bejelentkezési szabályzat megváltoztatva
+        idpprovider:
+          added: Azonosítószolgáltató hozzáadva az alapértelmezett bejelentkezési szabályzathoz
+          removed: Azonosítószolgáltató eltávolítva az alapértelmezett bejelentkezési szabályzatból
+      label:
+        added: Címke Politika hozzáadva
+        changed: Címke Politika megváltozott
+        activated: Címke Politika aktiválva
+        logo:
+          added: Logó hozzáadva a Címke Politikához
+          removed: Logó eltávolítva a Címke Politikából
+          dark:
+            added: Logó (sötét mód) hozzáadva a Címke Politikához
+            removed: Logó (sötét mód) eltávolítva a Címke Politikából
+        icon:
+          added: Ikon hozzáadva a Címke Politikához
+          removed: Ikon eltávolítva a Címke Politikából
+          dark:
+            added: Ikon (sötét mód) hozzáadva a Címke Politikához
+            removed: Az ikon (sötét mód) eltávolítva a címkepolitikából
+        font:
+          added: Betűtípus hozzáadva a címkepolitikához
+          removed: Betűtípus eltávolítva a címkepolitikából
+        assets:
+          removed: Az eszközök eltávolítva a címkepolitikából
+    default:
+      language:
+        set: Alapértelmezett nyelv beállítva
+    oidc:
+      settings:
+        added: OIDC konfiguráció hozzáadva
+        changed: OIDC konfiguráció megváltoztatva
+        removed: OIDC konfiguráció eltávolítva
+    secret:
+      generator:
+        added: Titokgenerátor hozzáadva
+        changed: Titokgenerátor megváltoztatva
+        removed: Titkosító generátor eltávolítva
+    smtp:
+      config:
+        added: SMTP konfiguráció hozzáadva
+        changed: SMTP konfiguráció megváltoztatva
+        activated: SMTP konfiguráció aktiválva
+        deactivated: SMTP konfiguráció deaktiválva
+        removed: SMTP konfiguráció eltávolítva
+        password:
+          changed: SMTP konfiguráció titkos kódja megváltoztatva
+    sms:
+      config:
+        twilio:
+          added: Twilio SMS szolgáltató hozzáadva
+          changed: Twilio SMS szolgáltató megváltoztatva
+          token:
+            changed: Twilio SMS szolgáltató token megváltoztatva
+          removed: Twilio SMS szolgáltató eltávolítva
+          activated: Twilio SMS szolgáltató aktiválva
+          deactivated: Twilio SMS szolgáltató deaktiválva
+  key_pair:
+    added: Kulcspár hozzáadva
+    certificate:
+      added: Tanúsítvány hozzáadva
+  action:
+    added: Művelet hozzáadva
+    changed: Művelet megváltoztatva
+    deactivated: Művelet deaktiválva
+    reactivated: Művelet újraaktiválva
+    removed: Művelet eltávolítva
+  instance:
+    added: Új példány hozzáadva
+    changed: Példány megváltozott
+    customtext:
+      removed: Egyéni szöveg eltávolítva
+      set: Egyéni szöveg beállítva
+      template:
+        removed: Egyéni szöveg sablon eltávolítva
+    default:
+      language:
+        set: Alapértelmezett nyelv beállítva
+      org:
+        set: Alapértelmezett szervezet beállítva
+    domain:
+      added: Domain hozzáadva
+      primary:
+        set: Elsődleges domain beállítva
+      removed: Domain eltávolítva
+    iam:
+      console:
+        set: ZITADEL Konzolalkalmazás beállítva
+      project:
+        set: ZITADEL projekt beállítva
+    mail:
+      template:
+        added: E-Mail sablon hozzáadva
+        changed: E-Mail sablon megváltoztatva
+      text:
+        added: E-Mail szöveg hozzáadva
+        changed: E-Mail szöveg megváltoztatva
+    member:
+      added: Példány tag hozzáadva
+      changed: Példány tag megváltoztatva
+      removed: Példány tag eltávolítva
+      cascade:
+        removed: Példány tag kaszkádosan eltávolítva
+    notification:
+      provider:
+        debug:
+          fileadded: Fájl debug értesítési szolgáltató hozzáadva
+          filechanged: Fájl debug értesítési szolgáltató megváltoztatva
+          fileremoved: Fájl debug értesítési szolgáltató eltávolítva
+          logadded: Napló debug értesítési szolgáltató hozzáadva
+          logchanged: Napló debug értesítési szolgáltató megváltoztatva
+          logremoved: Napló debug értesítési szolgáltató eltávolítva
+    oidc:
+      settings:
+        added: OIDC beállítások hozzáadva
+        changed: OIDC beállítások megváltoztatva
+    policy:
+      domain:
+        added: Domain szabályzat hozzáadva
+        changed: Domain szabályzat megváltoztatva
+      label:
+        activated: Címkeirányelv aktiválva
+        added: Címkeirányelv hozzáadva
+        assets:
+          removed: Eszköz eltávolítva a címkeirányelvből
+        changed: Címkeirányelv megváltoztatva
+        font:
+          added: Betűtípus hozzáadva a címkeirányelvhez
+          removed: Betűtípus eltávolítva a címkeirányelvből
+        icon:
+          added: Ikon hozzáadva a címkeirányelvhez
+          removed: Ikon eltávolítva a címkeirányelvből
+          dark:
+            added: Ikon hozzáadva a sötét címkeirányelvhez
+            removed: Ikon eltávolítva a sötét címkeirányelvből
+        logo:
+          added: Logó hozzáadva a címke politikához
+          removed: Logó eltávolítva a címke politikából
+          dark:
+            added: Logó hozzáadva a sötét címke politikához
+            removed: Logó eltávolítva a sötét címke politikából
+      lockout:
+        added: Zárolási politika hozzáadva
+        changed: Zárolási politika megváltoztatva
+      login:
+        added: Bejelentkezési politika hozzáadva
+        changed: Bejelentkezési politika megváltoztatva
+        idpprovider:
+          added: Identitásszolgáltató hozzáadva a bejelentkezési politikához
+          cascade:
+            removed: Identitásszolgáltató láncolata eltávolítva a bejelentkezési politikából
+          removed: Az azonosításszolgáltató eltávolítva a bejelentkezési szabályzatból
+        multifactor:
+          added: Többlépcsős hitelesítés hozzáadva a bejelentkezési szabályzathoz
+          removed: Többlépcsős hitelesítés eltávolítva a bejelentkezési szabályzatból
+        secondfactor:
+          added: Második tényező hozzáadva a bejelentkezési szabályzathoz
+          removed: Második tényező eltávolítva a bejelentkezési szabályzatból
+      password:
+        age:
+          added: Jelszó élettartam szabályzat hozzáadva
+          changed: Jelszó élettartam szabályzat megváltoztatva
+        complexity:
+          added: Jelszó komplexitás szabályzat hozzáadva
+          changed: Jelszó komplexitás szabályzat eltávolítva
+      privacy:
+        added: Adatvédelmi szabályzat hozzáadva
+        changed: Adatvédelmi irányelv megváltozott
+      security:
+        set: Biztonsági irányelv beállítva
+    removed: Példány eltávolítva
+    secret:
+      generator:
+        added: Titkos generátor hozzáadva
+        changed: Titkos generátor megváltozott
+        removed: Titkos generátor eltávolítva
+    sms:
+      configtwilio:
+        activated: Twilio SMS beállítás aktiválva
+        added: Twilio SMS beállítás hozzáadva
+        changed: Twilio SMS beállítás megváltozott
+        deactivated: Twilio SMS beállítás inaktiválva
+        removed: Twilio SMS konfiguráció eltávolítva
+        token:
+          changed: A Twilio SMS konfiguráció tokenje megváltozott
+    smtp:
+      config:
+        added: SMTP konfiguráció hozzáadva
+        changed: SMTP konfiguráció megváltozott
+        activated: SMTP konfiguráció aktiválva
+        deactivated: SMTP konfiguráció inaktiválva
+        password:
+          changed: Az SMTP konfiguráció jelszava megváltozott
+        removed: SMTP konfiguráció eltávolítva
+  user_schema:
+    created: Felhasználói séma létrehozva
+    updated: Felhasználói séma frissítve
+    deactivated: Felhasználói séma inaktiválva
+    reactivated: Felhasználói séma újraaktiválva
+    deleted: Felhasználói séma törölve
+    user:
+      created: Felhasználó létrehozva
+      updated: Felhasználó frissítve
+      deleted: Felhasználó törölve
+      email:
+        updated: E-mail cím megváltoztatva
+        verified: E-mail cím megerősítve
+        verification:
+          failed: E-mail cím megerősítése sikertelen
+        code:
+          added: E-mail cím megerősítő kód generálva
+          sent: E-mail cím megerősítő kód elküldve
+      phone:
+        updated: Telefonszám megváltoztatva
+        verified: Telefonszám megerősítve
+        verification:
+          failed: Telefonszám megerősítése sikertelen
+        code:
+          added: Telefonszám megerősítő kód létrehozva
+          sent: Telefonszám megerősítő kód elküldve
+  web_key:
+    added: Web Key hozzáadva
+    activated: Web Key aktiválva
+    deactivated: Web Key deaktiválva
+    removed: Web Key eltávolítva
+Application:
+  OIDC:
+    UnsupportedVersion: Az OIDC verziód nem támogatott
+    V1:
+      NotCompliant: A konfigurációd nem felel meg és eltér az OIDC 1.0 szabványtól.
+      NoRedirectUris: Legalább egy átirányítási URI-t regisztrálni kell.
+      NotAllCombinationsAreAllowed: A konfiguráció megfelel, de nem minden lehetséges kombináció engedélyezett.
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: A grant type kód csak http átirányítási URI-kat engedélyez web apptípushoz.
+          CustomOnlyForNative: A code típusú engedélyezés csak egyedi átirányítási URI-kat enged meg a "native" alkalmazástípushoz  (pl. appname:// )
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: A grant type implicit nem engedélyez egyéni átirányítási URI-kat
+          HttpNotAllowed: A grant type implicit nem engedélyez http átirányítási URI-kat
+          HttpLocalhostOnlyForNative: A http://localhost átirányítási URI csak natív alkalmazások esetén engedélyezett.
+      Native:
+        AuthMethodType:
+          NotNone: A natív alkalmazásoknak authmethodtype none kell, hogy legyen.
+        RedirectUris:
+          MustBeHttpLocalhost: Az átirányítási URI-knek a saját protokolloddal kell kezdődniük, http://127.0.0.1, http://[::1] vagy http://localhost.
+      UserAgent:
+        AuthMethodType:
+          NotNone: A felhasználói ügynök alkalmazásnak authmethodtype none-nak kell lennie.
+      GrantType:
+        Refresh:
+          NoAuthCode: A Frissítő Token csak az Engedélyezési Kóddal együtt használható.
+Action:
+  Flow:
+    Type:
+      Unspecified: Nem meghatározott
+      ExternalAuthentication: Külső hitelesítés
+      CustomiseToken: Kiegészítő Token
+      InternalAuthentication: Belső hitelesítés
+      CustomizeSAMLResponse: Kiegészítő SAMLResponse
+  TriggerType:
+    Unspecified: Nem meghatározott
+    PostAuthentication: Hitelesítés utáni
+    PreCreation: Létrehozás előtti
+    PostCreation: Létrehozás utáni
+    PreUserinfoCreation: Userinfo létrehozás előtti
+    PreAccessTokenCreation: Hozzáférési token létrehozás előtti
+    PreSAMLResponseCreation: SAMLResponse létrehozás előtti

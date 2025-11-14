@@ -1,0 +1,490 @@
+Login:
+  Title: Selamat Datang kembali!
+  Description: Masukkan data masuk Anda.
+  TitleLinking: Login untuk menghubungkan pengguna
+  DescriptionLinking: Masukkan data login Anda untuk menghubungkan pengguna eksternal Anda.
+  LoginNameLabel: Nama Masuk
+  UsernamePlaceHolder: nama belakang
+  LoginnamePlaceHolder: nama pengguna@domain
+  ExternalUserDescription: Masuk dengan pengguna eksternal.
+  MustBeMemberOfOrg: 'Pengguna harus menjadi anggota {{.OrgName}} organisasi.'
+  RegisterButtonText: Daftar
+  NextButtonText: Berikutnya
+LDAP:
+  Title: Login
+  Description: Masukkan data masuk Anda.
+  LoginNameLabel: Nama Masuk
+  PasswordLabel: Kata sandi
+  NextButtonText: Berikutnya
+SelectAccount:
+  Title: Pilih Akun
+  Description: Gunakan akun Anda
+  TitleLinking: Pilih akun untuk penautan pengguna
+  DescriptionLinking: Pilih akun Anda untuk ditautkan dengan pengguna eksternal Anda.
+  OtherUser: Pengguna Lain
+  SessionState0: aktif
+  SessionState1: Keluar
+  MustBeMemberOfOrg: 'Pengguna harus menjadi anggota {{.OrgName}} organisasi.'
+Password:
+  Title: Kata sandi
+  Description: Masukkan data masuk Anda.
+  PasswordLabel: Kata sandi
+  MinLength: Setidaknya harus begitu
+  MinLengthp2: karakter panjang.
+  MaxLength: Panjangnya harus kurang dari 70 karakter.
+  HasUppercase: Harus menyertakan huruf besar.
+  HasLowercase: Harus menyertakan huruf kecil.
+  HasNumber: Harus menyertakan nomor.
+  HasSymbol: Harus menyertakan simbol.
+  Confirmation: Konfirmasi kata sandi cocok.
+  ResetLinkText: Atur Ulang Kata Sandi
+  BackButtonText: Kembali
+  NextButtonText: Berikutnya
+UsernameChange:
+  Title: Ubah Nama Pengguna
+  Description: Tetapkan nama pengguna baru Anda
+  UsernameLabel: Nama belakang
+  CancelButtonText: Membatalkan
+  NextButtonText: Berikutnya
+UsernameChangeDone:
+  Title: Nama Pengguna Berubah
+  Description: Nama pengguna Anda berhasil diubah.
+  NextButtonText: Berikutnya
+InitPassword:
+  Title: Tetapkan Kata Sandi
+  Description: Anda telah menerima kode, yang harus Anda masukkan pada formulir di bawah ini, untuk mengatur kata sandi baru Anda.
+  CodeLabel: Kode
+  NewPasswordLabel: Kata Sandi Baru
+  NewPasswordConfirmLabel: Konfirmasi Kata Sandi
+  ResendButtonText: Kirim Ulang Kode
+  NextButtonText: Berikutnya
+InitPasswordDone:
+  Title: Kumpulan Kata Sandi
+  Description: Kata sandi berhasil disetel
+  NextButtonText: Berikutnya
+  CancelButtonText: Membatalkan
+InitUser:
+  Title: Aktifkan Pengguna
+  Description: Verifikasi email Anda dengan kode di bawah ini dan atur kata sandi Anda.
+  CodeLabel: Kode
+  NewPasswordLabel: Kata Sandi Baru
+  NewPasswordConfirm: Konfirmasi Kata Sandi
+  NextButtonText: Berikutnya
+  ResendButtonText: Kirim Ulang Kode
+InitUserDone:
+  Title: Pengguna Diaktifkan
+  Description: Email terverifikasi dan Kata Sandi berhasil ditetapkan
+  NextButtonText: Berikutnya
+  CancelButtonText: Membatalkan
+InviteUser:
+  Title: Aktifkan Pengguna
+  Description: Verifikasi email Anda dengan kode di bawah ini dan atur kata sandi Anda.
+  CodeLabel: Kode
+  NewPasswordLabel: Kata Sandi Baru
+  NewPasswordConfirm: Konfirmasi Kata Sandi
+  NextButtonText: Selanjutnya
+  ResendButtonText: Kirim Ulang Kode
+InitMFAPrompt:
+  Title: Pengaturan 2 Faktor
+  Description: Otentikasi 2 faktor memberi Anda keamanan tambahan untuk akun pengguna Anda. 
+  Provider0: 'Aplikasi Authenticator (misalnya Google/Microsoft Authenticator, Authy)'
+  Provider1: 'Tergantung pada perangkat (misalnya FaceID, Windows Hello, Fingerprint)'
+  Provider3: SMS OTP
+  Provider4: Email OTP
+  NextButtonText: Berikutnya
+  SkipButtonText: Melewati
+InitMFAOTP:
+  Title: Verifikasi 2 Faktor
+  Description: 'Buat 2 faktor Anda. '
+  OTPDescription: Pindai kode dengan aplikasi autentikator Anda (misalnya Google/Microsoft Authenticator, Authy) atau salin rahasianya dan masukkan kode yang dihasilkan di bawah.
+  SecretLabel: Rahasia
+  CodeLabel: Kode
+  NextButtonText: Berikutnya
+  CancelButtonText: Membatalkan
+InitMFAOTPSMS:
+  Title: Verifikasi 2 Faktor
+  DescriptionPhone: 'Buat 2 faktor Anda. '
+  DescriptionCode: 'Buat 2 faktor Anda. '
+  PhoneLabel: Telepon
+  CodeLabel: Kode
+  EditButtonText: Sunting
+  ResendButtonText: Kirim Ulang Kode
+  NextButtonText: Berikutnya
+InitMFAU2F:
+  Title: Tambahkan Kunci Keamanan
+  Description: Kunci keamanan adalah metode verifikasi yang dapat dipasang di ponsel Anda, menggunakan Bluetooth, atau dicolokkan langsung ke port USB komputer Anda.
+  TokenNameLabel: Nama kunci keamanan/perangkat
+  NotSupported: 'WebAuthN tidak didukung oleh browser Anda. '
+  RegisterTokenButtonText: Tambahkan kunci keamanan
+  ErrorRetry: 'Coba lagi, buat tantangan baru atau pilih metode lain.'
+InitMFADone:
+  Title: Terverifikasi 2 faktor
+  Description: 'Luar biasa! '
+  NextButtonText: Berikutnya
+  CancelButtonText: Membatalkan
+MFAProvider:
+  Provider0: 'Aplikasi Authenticator (misalnya Google/Microsoft Authenticator, Authy)'
+  Provider1: 'Tergantung pada perangkat (misalnya FaceID, Windows Hello, Fingerprint)'
+  Provider3: SMS OTP
+  Provider4: Email OTP
+  ChooseOther: atau pilih opsi lain
+VerifyMFAOTP:
+  Title: Verifikasi 2 Faktor
+  Description: Verifikasi faktor kedua Anda
+  CodeLabel: Kode
+  NextButtonText: Berikutnya
+VerifyOTP:
+  Title: Verifikasi 2 Faktor
+  Description: Verifikasi faktor kedua Anda
+  CodeLabel: Kode
+  ResendButtonText: Kirim Ulang Kode
+  NextButtonText: Berikutnya
+VerifyMFAU2F:
+  Title: Verifikasi 2 Faktor
+  Description: Verifikasi 2-Faktor Anda dengan perangkat yang terdaftar (misalnya FaceID, Windows Hello, Fingerprint)
+  NotSupported: 'WebAuthN tidak didukung oleh browser Anda. '
+  ErrorRetry: 'Coba lagi, buat permintaan baru atau pilih metode lain.'
+  ValidateTokenButtonText: Verifikasi 2 Faktor
+Passwordless:
+  Title: Masuk Tanpa Kata Sandi
+  Description: Masuk dengan metode autentikasi yang disediakan oleh perangkat Anda seperti FaceID, Windows Hello, atau Sidik Jari.
+  NotSupported: 'WebAuthN tidak didukung oleh browser Anda. '
+  ErrorRetry: 'Coba lagi, buat tantangan baru atau pilih metode lain.'
+  LoginWithPwButtonText: Masuk dengan kata sandi
+  ValidateTokenButtonText: Masuk dengan tanpa kata sandi
+PasswordlessPrompt:
+  Title: Pengaturan Tanpa Kata Sandi
+  Description: 'Apakah Anda ingin mengatur login tanpa kata sandi? '
+  DescriptionInit: 'Anda perlu mengatur login tanpa kata sandi. '
+  PasswordlessButtonText: Tanpa kata sandi
+  NextButtonText: Berikutnya
+  SkipButtonText: Melewati
+PasswordlessRegistration:
+  Title: Pengaturan Tanpa Kata Sandi
+  Description: Tambahkan otentikasi Anda dengan memberikan nama (misalnya MyMobilePhone, MacBook, dll) dan kemudian mengklik tombol 'Daftar tanpa kata sandi' di bawah.
+  TokenNameLabel: Nama perangkat
+  NotSupported: 'WebAuthN tidak didukung oleh browser Anda. '
+  RegisterTokenButtonText: Daftar tanpa kata sandi
+  ErrorRetry: 'Coba lagi, buat tantangan baru atau pilih metode lain.'
+PasswordlessRegistrationDone:
+  Title: Pengaturan Tanpa Kata Sandi
+  Description: Perangkat tanpa kata sandi berhasil ditambahkan.
+  DescriptionClose: Anda sekarang dapat menutup jendela ini.
+  NextButtonText: Berikutnya
+  CancelButtonText: Membatalkan
+PasswordChange:
+  Title: Ubah Kata Sandi
+  Description: 'Ubah kata sandi Anda. '
+  ExpiredDescription: 'Kata sandi Anda telah kedaluwarsa dan harus diubah. '
+  OldPasswordLabel: Kata Sandi Lama
+  NewPasswordLabel: Kata Sandi Baru
+  NewPasswordConfirmLabel: Konfirmasi kata sandi
+  CancelButtonText: Membatalkan
+  NextButtonText: Berikutnya
+  Footer: catatan kaki
+PasswordChangeDone:
+  Title: Ubah Kata Sandi
+  Description: Kata sandi Anda berhasil diubah.
+  NextButtonText: Berikutnya
+PasswordResetDone:
+  Title: Tautan Reset Kata Sandi Terkirim
+  Description: Periksa email Anda untuk mengatur ulang kata sandi Anda.
+  NextButtonText: Berikutnya
+EmailVerification:
+  Title: Verifikasi Email
+  Description: 'Kami telah mengirimi Anda email untuk memverifikasi alamat Anda. '
+  CodeLabel: Kode
+  NextButtonText: Berikutnya
+  ResendButtonText: Kirim Ulang Kode
+EmailVerificationDone:
+  Title: Verifikasi Email
+  Description: Alamat email Anda telah berhasil diverifikasi.
+  NextButtonText: Berikutnya
+  CancelButtonText: Membatalkan
+  LoginButtonText: Login
+RegisterOption:
+  Title: Opsi Pendaftaran
+  Description: Pilih bagaimana Anda ingin mendaftar
+  RegisterUsernamePasswordButtonText: Dengan nama pengguna dan kata sandi
+  ExternalLoginDescription: atau mendaftar dengan pengguna eksternal
+  LoginButtonText: Login
+RegistrationUser:
+  Title: Pendaftaran
+  Description: 'Masukkan Data Pengguna Anda. '
+  DescriptionOrgRegister: Masukkan Data Pengguna Anda.
+  EmailLabel: E-mail
+  UsernameLabel: Nama belakang
+  FirstnameLabel: Nama yang diberikan
+  LastnameLabel: Nama keluarga
+  LanguageLabel: Bahasa
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  GenderLabel: Jenis kelamin
+  Female: Perempuan
+  Male: Pria
+  Diverse: beragam / X
+  PasswordLabel: Kata sandi
+  PasswordConfirmLabel: Konfirmasi kata sandi
+  TosAndPrivacyLabel: Syarat dan Ketentuan
+  TosConfirm: Saya menerima itu
+  TosLinkText: KL
+  PrivacyConfirm: Saya menerima itu
+  PrivacyLinkText: kebijakan privasi
+  ExternalLogin: atau mendaftar dengan pengguna eksternal
+  BackButtonText: Login
+  NextButtonText: Berikutnya
+ExternalRegistrationUserOverview:
+  Title: Registrasi Pengguna Eksternal
+  Description: 'Kami telah mengambil detail pengguna Anda dari penyedia yang dipilih. '
+  EmailLabel: E-mail
+  UsernameLabel: Nama belakang
+  FirstnameLabel: Nama yang diberikan
+  LastnameLabel: Nama keluarga
+  NicknameLabel: Nama panggilan
+  PhoneLabel: Nomor telepon
+  LanguageLabel: Bahasa
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  TosAndPrivacyLabel: Syarat dan Ketentuan
+  TosConfirm: Saya menerima itu
+  TosLinkText: KL
+  PrivacyConfirm: Saya menerima itu
+  PrivacyLinkText: kebijakan privasi
+  ExternalLogin: atau mendaftar dengan pengguna eksternal
+  BackButtonText: tidak
+  NextButtonText: Menyimpan
+RegistrationOrg:
+  Title: Pendaftaran Organisasi
+  Description: Masukkan nama organisasi dan data pengguna Anda.
+  OrgNameLabel: Nama organisasi
+  EmailLabel: E-mail
+  UsernameLabel: Nama belakang
+  FirstnameLabel: Nama yang diberikan
+  LastnameLabel: Nama keluarga
+  PasswordLabel: Kata sandi
+  PasswordConfirmLabel: Konfirmasi kata sandi
+  TosAndPrivacyLabel: Syarat dan Ketentuan
+  TosConfirm: Saya menerima itu
+  TosLinkText: KL
+  PrivacyConfirm: Saya menerima itu
+  PrivacyLinkText: kebijakan privasi
+  SaveButtonText: Buat organisasi
+LoginSuccess:
+  Title: Masuk Berhasil
+  AutoRedirectDescription: 'Anda akan diarahkan kembali ke aplikasi Anda secara otomatis. '
+  RedirectedDescription: Anda sekarang dapat menutup jendela ini.
+  NextButtonText: Berikutnya
+LogoutDone:
+  Title: Keluar
+  Description: Anda telah berhasil logout.
+  LoginButtonText: Login
+LinkingUserPrompt:
+  Title: Pengguna Lama Ditemukan
+  Description: 'Apakah Anda ingin menautkan akun Anda yang ada:'
+  LinkButtonText: Link
+  OtherButtonText: Pilihan lain
+LinkingUsersDone:
+  Title: Menghubungkan Pengguna
+  Description: Tertaut pengguna.
+  CancelButtonText: Membatalkan
+  NextButtonText: Berikutnya
+ExternalNotFound:
+  Title: Pengguna Eksternal Tidak Ditemukan
+  Description: 'Pengguna eksternal tidak ditemukan. '
+  LinkButtonText: Link
+  AutoRegisterButtonText: Daftar
+  TosAndPrivacyLabel: Syarat dan Ketentuan
+  TosConfirm: Saya menerima itu
+  TosLinkText: KL
+  PrivacyConfirm: Saya menerima itu
+  PrivacyLinkText: kebijakan privasi
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+DeviceAuth:
+  Title: Otorisasi Perangkat
+  UserCode:
+    Label: Kode Pengguna
+    Description: Masukkan kode pengguna yang disajikan pada perangkat.
+    ButtonNext: Berikutnya
+  Action:
+    Description: Berikan akses perangkat.
+    GrantDevice: Anda akan memberikan perangkat
+    AccessToScopes: akses ke cakupan berikut
+    Button:
+      Allow: Mengizinkan
+      Deny: Membantah
+  Done:
+    Description: Selesai.
+    Approved: 'Otorisasi perangkat disetujui. '
+    Denied: 'Otorisasi perangkat ditolak. '
+Footer:
+  PoweredBy: Didukung oleh
+  Tos: KL
+  PrivacyPolicy: Kebijakan privasi
+  Help: Membantu
+  SupportEmail: Email Dukungan
+SignIn: 'Masuk dengan {{.Provider}}'
+Errors:
+  Internal: Terjadi kesalahan internal
+  AuthRequest:
+    NotFound: Tidak dapat menemukan permintaan autentikasi
+    UserAgentNotCorresponding: Agen Pengguna tidak sesuai
+    UserAgentNotFound: ID Agen Pengguna tidak ditemukan
+    TokenNotFound: Token tidak ditemukan
+    RequestTypeNotSupported: Jenis permintaan tidak didukung
+    MissingParameters: Parameter yang diperlukan tidak ada
+  User:
+    NotFound: Pengguna tidak dapat ditemukan
+    AlreadyExists: Pengguna sudah ada
+    Inactive: Pengguna tidak aktif
+    NotFoundOnOrg: Pengguna tidak dapat ditemukan di organisasi yang dipilih
+    NotAllowedOrg: Pengguna bukan anggota organisasi yang diperlukan
+    NotMatchingUserID: Pengguna dan pengguna dalam permintaan authrequest tidak cocok
+    UserIDMissing: ID Pengguna kosong
+    Invalid: Data pengguna tidak valid
+    DomainNotAllowedAsUsername: Domain sudah dipesan dan tidak dapat digunakan
+    NotAllowedToLink: Pengguna tidak diperbolehkan terhubung dengan penyedia login eksternal
+    Profile:
+      NotFound: Profil tidak ditemukan
+      NotChanged: Profil tidak berubah
+      Empty: Profil kosong
+      FirstNameEmpty: Nama depan di profil kosong
+      LastNameEmpty: Nama keluarga di profil kosong
+      IDMissing: ID Profil tidak ada
+    Email:
+      NotFound: Email tidak ditemukan
+      Invalid: Email tidak valid
+      AlreadyVerified: Email sudah diverifikasi
+      NotChanged: Email tidak diubah
+      Empty: Emailnya kosong
+      IDMissing: ID email tidak ada
+    Phone:
+      NotFound: Telepon tidak ditemukan
+      Invalid: Telepon tidak valid
+      AlreadyVerified: Telepon sudah diverifikasi
+      Empty: Telepon kosong
+      NotChanged: Telepon tidak berubah
+    Address:
+      NotFound: Alamat tidak ditemukan
+      NotChanged: Alamat tidak diubah
+    Username:
+      AlreadyExists: Nama pengguna sudah dipakai
+      Reserved: Nama pengguna sudah dipakai
+      Empty: Nama pengguna kosong
+    Password:
+      ConfirmationWrong: Konfirmasi kata sandi salah
+      Empty: Kata sandi kosong
+      Invalid: Kata sandi tidak valid
+      InvalidAndLocked: Kata sandi tidak valid dan pengguna terkunci, hubungi administrator Anda.
+      NotChanged: Kata sandi baru tidak boleh sama dengan kata sandi Anda saat ini
+    UsernameOrPassword:
+      Invalid: Nama Pengguna atau Kata Sandi tidak valid
+    PasswordComplexityPolicy:
+      NotFound: Kebijakan kata sandi tidak ditemukan
+      MinLength: Kata sandi terlalu pendek
+      HasLower: Kata sandi harus mengandung huruf kecil
+      HasUpper: Kata sandi harus mengandung huruf besar
+      HasNumber: Kata sandi harus berisi nomor
+      HasSymbol: Kata sandi harus mengandung simbol
+    Code:
+      Expired: Kode sudah habis masa berlakunya
+      Invalid: Kode tidak valid
+      Empty: Kode kosong
+      CryptoCodeNil: Kode kripto nihil
+      NotFound: Tidak dapat menemukan kode
+      GeneratorAlgNotSupported: Algoritme generator tidak didukung
+    EmailVerify:
+      UserIDEmpty: ID Pengguna kosong
+    ExternalData:
+      CouldNotRead: Data eksternal tidak dapat dibaca dengan benar
+    MFA:
+      NoProviders: Tidak ada penyedia multifaktor yang tersedia
+      OTP:
+        AlreadyReady: OTP multifaktor (OneTimePassword) sudah disiapkan
+        NotExisting: OTP multifaktor (OneTimePassword) tidak ada
+        InvalidCode: Kode tidak valid
+        NotReady: OTP multifaktor (OneTimePassword) belum siap
+    Locked: Pengguna terkunci
+    SomethingWentWrong: Ada yang tidak beres
+    NotActive: Pengguna tidak aktif
+    ExternalIDP:
+      IDPTypeNotImplemented: Tipe IDP tidak diterapkan
+      NotAllowed: Penyedia Login Eksternal tidak diizinkan
+      IDPConfigIDEmpty: ID Penyedia Identitas kosong
+      ExternalUserIDEmpty: ID Pengguna Eksternal kosong
+      UserDisplayNameEmpty: Nama Tampilan Pengguna kosong
+      NoExternalUserData: Tidak ada Data Pengguna eksternal yang diterima
+      CreationNotAllowed: Pembuatan pengguna baru tidak diperbolehkan pada penyedia ini
+      LinkingNotAllowed: Menautkan pengguna tidak diperbolehkan di penyedia ini
+      NoOptionAllowed: 'Pembuatan tautan tidak diperbolehkan pada penyedia ini. '
+      LoginFailedSwitchLocal: |
+        Gagal masuk ke Penyedia ID Eksternal. Kembali ke login lokal.
+    
+        Detail kesalahan: {{.Details}}
+    GrantRequired: 'Masuk tidak dapat dilakukan. '
+    ProjectRequired: 'Masuk tidak dapat dilakukan. '
+  IdentityProvider:
+    InvalidConfig: Konfigurasi Penyedia Identitas tidak valid
+  IAM:
+    LockoutPolicy:
+      NotExisting: Kebijakan Lockout tidak ada
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Pendaftaran tidak diperbolehkan
+  DeviceAuth:
+    NotExisting: Kode Pengguna tidak ada
+optional: (opsional)

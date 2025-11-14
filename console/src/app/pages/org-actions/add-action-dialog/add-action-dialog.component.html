@@ -1,0 +1,46 @@
+<span *ngIf="!id" class="action-dialog-title" mat-dialog-title>{{ 'FLOWS.DIALOG.ADD.TITLE' | translate }}</span>
+<span *ngIf="id" class="action-dialog-title" mat-dialog-title>{{ 'FLOWS.DIALOG.UPDATE.TITLE' | translate }}</span>
+
+<div mat-dialog-content>
+  <form [formGroup]="form">
+    <cnsl-form-field class="form-field">
+      <cnsl-label>{{ 'FLOWS.NAME' | translate }}</cnsl-label>
+      <input cnslInput formControlName="name" />
+    </cnsl-form-field>
+
+    <cnsl-info-section>{{ 'FLOWS.DIALOG.ABOUTNAME' | translate }}</cnsl-info-section>
+
+    <ngx-codemirror
+      *ngIf="opened$ | async"
+      formControlName="script"
+      [options]="{
+        lineNumbers: true,
+        theme: 'material',
+        mode: 'javascript',
+      }"
+    ></ngx-codemirror>
+
+    <cnsl-form-field class="form-field">
+      <cnsl-label>{{ 'FLOWS.TIMEOUTINSEC' | translate }}</cnsl-label>
+      <input type="number" cnslInput formControlName="durationInSec" />
+    </cnsl-form-field>
+
+    <mat-checkbox formControlName="allowedToFail">{{ 'FLOWS.ALLOWEDTOFAIL' | translate }}</mat-checkbox>
+  </form>
+</div>
+<div mat-dialog-actions class="action">
+  <button *ngIf="id" mat-stroked-button color="warn" (click)="deleteAndCloseDialog()">
+    {{ 'ACTIONS.DELETE' | translate }}
+  </button>
+
+  <span class="fill-space"></span>
+
+  <button mat-stroked-button (click)="closeDialog()">
+    {{ 'ACTIONS.CANCEL' | translate }}
+  </button>
+
+  <button color="primary" mat-raised-button class="ok-button" [disabled]="false" (click)="closeDialogWithSuccess()">
+    <span *ngIf="!id">{{ 'ACTIONS.ADD' | translate }}</span>
+    <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>
+  </button>
+</div>

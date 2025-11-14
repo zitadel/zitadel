@@ -1,6 +1,7 @@
 package metrics
 
 import (
+	"context"
 	"net/http"
 	"strings"
 
@@ -35,7 +36,8 @@ const (
 
 type StatusRecorder struct {
 	http.ResponseWriter
-	Status int
+	RequestURI *string
+	Status     int
 }
 
 func (r *StatusRecorder) WriteHeader(status int) {
@@ -56,6 +58,18 @@ func NewMetricsHandler(handler http.Handler, metricMethods []MetricType, ignored
 	return &h
 }
 
+type key int
+
+const requestURI key = iota
+
+func SetRequestURIPattern(ctx context.Context, pattern string) {
+	uri, ok := ctx.Value(requestURI).(*string)
+	if !ok {
+		return
+	}
+	*uri = pattern
+}
+
 // ServeHTTP serves HTTP requests (http.Handler)
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if len(h.methods) == 0 {
@@ -69,13 +83,16 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	uri := strings.Split(r.RequestURI, "?")[0]
 	recorder := &StatusRecorder{
 		ResponseWriter: w,
+		RequestURI:     &uri,
 		Status:         200,
 	}
+	r = r.WithContext(context.WithValue(r.Context(), requestURI, &uri))
 	h.handler.ServeHTTP(recorder, r)
 	if h.containsMetricsMethod(MetricTypeRequestCount) {
-		RegisterRequestCounter(r)
+		RegisterRequestCounter(recorder, r)
 	}
 	if h.containsMetricsMethod(MetricTypeTotalCount) {
 		RegisterTotalRequestCounter(r)
@@ -94,9 +111,9 @@ func (h *Handler) containsMetricsMethod(method MetricType) bool {
 	return false
 }
 
-func RegisterRequestCounter(r *http.Request) {
+func RegisterRequestCounter(recorder *StatusRecorder, r *http.Request) {
 	var labels = map[string]attribute.Value{
-		URI:    attribute.StringValue(strings.Split(r.RequestURI, "?")[0]),
+		URI:    attribute.StringValue(*recorder.RequestURI),
 		Method: attribute.StringValue(r.Method),
 	}
 	RegisterCounter(RequestCounter, RequestCountDescription)
@@ -110,7 +127,7 @@ func RegisterTotalRequestCounter(r *http.Request) {
 
 func RegisterRequestCodeCounter(recorder *StatusRecorder, r *http.Request) {
 	var labels = map[string]attribute.Value{
-		URI:        attribute.StringValue(strings.Split(r.RequestURI, "?")[0]),
+		URI:        attribute.StringValue(*recorder.RequestURI),
 		Method:     attribute.StringValue(r.Method),
 		ReturnCode: attribute.IntValue(recorder.Status),
 	}

@@ -1,0 +1,82 @@
+<div class="new-header-wrapper">
+  <ng-container *ngIf="myInstanceQuery.data()?.instance as instance">
+    <ng-container *ngTemplateOutlet="slash"></ng-container>
+    <a class="new-header-breadcrumb" matRipple [matRippleUnbounded]="false" [routerLink]="['/']">
+      {{ instance.name }}
+    </a>
+    <cnsl-header-button
+      cdkOverlayOrigin
+      #instanceTrigger="cdkOverlayOrigin"
+      (click)="isInstanceDropdownOpen.set(!isInstanceDropdownOpen())"
+      ariaLabel="{{ instance.name }}"
+    >
+    </cnsl-header-button>
+
+    <cnsl-header-dropdown
+      [trigger]="instanceTrigger"
+      [isOpen]="isInstanceDropdownOpen()"
+      (closed)="isInstanceDropdownOpen.set(false); instanceSelectorSecondStep.set(false)"
+    >
+      <cnsl-instance-selector
+        *ngIf="!isHandset() || !instanceSelectorSecondStep()"
+        [instance]="instance"
+        (instanceChanged)="instanceSelectorSecondStep.set(true)"
+        (settingsClicked)="isInstanceDropdownOpen.set(false)"
+      ></cnsl-instance-selector>
+      <cnsl-organization-selector
+        *ngIf="instanceSelectorSecondStep()"
+        [backButton]="isHandset() ? instance.name : ''"
+        (backButtonPressed)="instanceSelectorSecondStep.set(false)"
+        (orgChanged)="isInstanceDropdownOpen.set(false); instanceSelectorSecondStep.set(false)"
+      ></cnsl-organization-selector>
+    </cnsl-header-dropdown>
+  </ng-container>
+  <ng-container
+    *ngIf="(['org.read'] | hasRole | async) === true && (!myInstanceQuery.data()?.instance || !onInstanceLevel())"
+  >
+    <ng-container *ngTemplateOutlet="slash"></ng-container>
+    <a
+      *ngIf="activeOrganizationQuery.data() as org"
+      class="new-header-breadcrumb"
+      matRipple
+      [matRippleUnbounded]="false"
+      [routerLink]="['/org']"
+    >
+      {{ org.name }}
+    </a>
+    <cnsl-header-button
+      cdkOverlayOrigin
+      #orgTrigger="cdkOverlayOrigin"
+      (click)="isOrgDropdownOpen.set(!isOrgDropdownOpen())"
+      ariaLabel="{{ activeOrganizationQuery.data()?.name }}"
+    >
+    </cnsl-header-button>
+    <cnsl-header-dropdown [trigger]="orgTrigger" [isOpen]="isOrgDropdownOpen()" (closed)="isOrgDropdownOpen.set(false)">
+      <cnsl-organization-selector (orgChanged)="isOrgDropdownOpen.set(false)"></cnsl-organization-selector>
+    </cnsl-header-dropdown>
+  </ng-container>
+  <ng-container *ngIf="!isHandset()">
+    <ng-container *ngFor="let bread of nestedBreadcrumbs(); index as i; let last = last">
+      <ng-container *ngTemplateOutlet="slash"></ng-container>
+      <a class="new-header-breadcrumb" matRipple [matRippleUnbounded]="false" [routerLink]="bread.routerLink">
+        {{ bread.name }}
+      </a>
+    </ng-container>
+  </ng-container>
+</div>
+
+<ng-template #slash>
+  <svg
+    class="slash"
+    viewBox="0 0 24 24"
+    width="32"
+    height="32"
+    stroke="currentColor"
+    stroke-width="1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    shape-rendering="geometricPrecision"
+  >
+    <path d="M16.88 3.549L7.12 20.451"></path>
+  </svg>
+</ng-template>

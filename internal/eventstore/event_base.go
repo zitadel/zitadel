@@ -3,7 +3,12 @@ package eventstore
 import (
 	"context"
 	"encoding/json"
+	"strconv"
+	"strings"
 	"time"
+
+	"github.com/shopspring/decimal"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/service"
@@ -18,10 +23,10 @@ type BaseEvent struct {
 	ID        string
 	EventType EventType `json:"-"`
 
-	Agg *Aggregate
+	Agg *Aggregate `json:"-"`
 
 	Seq                           uint64
-	Pos                           float64
+	Pos                           decimal.Decimal
 	Creation                      time.Time
 	previousAggregateSequence     uint64
 	previousAggregateTypeSequence uint64
@@ -34,7 +39,7 @@ type BaseEvent struct {
 }
 
 // Position implements Event.
-func (e *BaseEvent) Position() float64 {
+func (e *BaseEvent) Position() decimal.Decimal {
 	return e.Pos
 }
 
@@ -84,8 +89,10 @@ func (e *BaseEvent) DataAsBytes() []byte {
 }
 
 // Revision implements action
-func (*BaseEvent) Revision() uint16 {
-	return 0
+func (e *BaseEvent) Revision() uint16 {
+	revision, err := strconv.ParseUint(strings.TrimPrefix(string(e.Agg.Version), "v"), 10, 16)
+	logging.OnError(err).Debug("failed to parse event revision")
+	return uint16(revision)
 }
 
 // Unmarshal implements Event

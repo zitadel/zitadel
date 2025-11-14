@@ -1,0 +1,19 @@
+.framework-change-block {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.hide {
+  visibility: hidden;
+}
+
+.show {
+  visibility: visible;
+}

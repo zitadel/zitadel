@@ -1,6 +1,8 @@
 package initialise
 
 import (
+	"context"
+	"database/sql"
 	_ "embed"
 	"fmt"
 
@@ -18,7 +20,7 @@ func newUser() *cobra.Command {
 		Long: `Sets up the ZITADEL database user.
 
 Prerequisites:
-- cockroachDB or postgreSQL
+- postgreSQL
 
 The user provided by flags needs privileges to 
 - create the database if it does not exist
@@ -28,20 +30,31 @@ The user provided by flags needs privileges to
 		Run: func(cmd *cobra.Command, args []string) {
 			config := MustNewConfig(viper.GetViper())
 
-			err := initialise(config.Database, VerifyUser(config.Database.Username(), config.Database.Password()))
+			err := initialise(cmd.Context(), config.Database, VerifyUser(config.Database.Username(), config.Database.Password()))
 			logging.OnError(err).Fatal("unable to init user")
 		},
 	}
 }
 
-func VerifyUser(username, password string) func(*database.DB) error {
-	return func(db *database.DB) error {
+func VerifyUser(username, password string) func(context.Context, *database.DB) error {
+	return func(ctx context.Context, db *database.DB) error {
+		var currentUser string
+		err := db.QueryRowContext(ctx, func(r *sql.Row) error {
+			return r.Scan(&currentUser)
+		}, "SELECT current_user")
+		if err != nil {
+			return fmt.Errorf("unable to get current user: %w", err)
+		}
+		if currentUser == username {
+			logging.WithFields("username", username).Info("config.database.postgres.user.username is same as config.database.postgres.admin.username, skipping create user")
+			return nil
+		}
 		logging.WithFields("username", username).Info("verify user")
 
 		if password != "" {
 			createUserStmt += " WITH PASSWORD '" + password + "'"
 		}
 
-		return exec(db, fmt.Sprintf(createUserStmt, username), []string{roleAlreadyExistsCode})
+		return exec(ctx, db, fmt.Sprintf(createUserStmt, username), []string{roleAlreadyExistsCode})
 	}
 }

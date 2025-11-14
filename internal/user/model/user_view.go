@@ -40,6 +40,7 @@ type HumanView struct {
 	Gender                   Gender
 	Email                    string
 	IsEmailVerified          bool
+	VerifiedEmail            string
 	Phone                    string
 	IsPhoneVerified          bool
 	Country                  string

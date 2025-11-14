@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package zitadel.settings.v2;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "zitadel/settings/v2/settings.proto";
+import "validate/validate.proto";
+
+message LegalAndSupportSettings {
+  // Link to the Terms of Service. Can be a relative or absolute URL.
+  string tos_link = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"https://zitadel.com/docs/legal/terms-of-service\"";
+    }
+  ];
+
+  // Link to the Privacy Policy. Can be a relative or absolute URL.
+  string privacy_policy_link = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"https://zitadel.com/docs/legal/privacy-policy\"";
+    }
+  ];
+
+  // Link to a help page. Can be a relative or absolute URL.
+  string help_link = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"https://zitadel.com/docs/manuals/introduction\"";
+    }
+  ];
+
+  // Email address for support issues.
+  string support_email = 4 [
+    (validate.rules).string = {ignore_empty: true, max_len: 320, email: true},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"support-email@test.com\"";
+    }
+  ];
+
+  // ResourceOwnerType returns if the setting is managed on the organization explicitly or
+  // fell back on the instance settings.
+  ResourceOwnerType resource_owner_type = 5;
+
+  // Link to documentation to be shown in the console.
+  string docs_link = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"https://zitadel.com/docs\"";
+    }
+  ];
+
+  // Link to an external resource that will be available to users in the console.
+  string custom_link = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"https://external.link\"";
+    }
+  ];
+
+  // The button text that would be shown in console pointing to custom link.
+  string custom_link_text = 8 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"External\"";
+    }
+  ];
+}

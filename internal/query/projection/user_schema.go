@@ -12,9 +12,10 @@ import (
 )
 
 const (
-	UserSchemaTable = "projections.user_schemas"
+	UserSchemaTable = "projections.user_schemas1"
 
 	UserSchemaIDCol                     = "id"
+	UserSchemaCreationDateCol           = "creation_date"
 	UserSchemaChangeDateCol             = "change_date"
 	UserSchemaSequenceCol               = "sequence"
 	UserSchemaInstanceIDCol             = "instance_id"
@@ -39,6 +40,7 @@ func (*userSchemaProjection) Init() *old_handler.Check {
 	return handler.NewTableCheck(
 		handler.NewTable([]*handler.InitColumn{
 			handler.NewColumn(UserSchemaIDCol, handler.ColumnTypeText),
+			handler.NewColumn(UserSchemaCreationDateCol, handler.ColumnTypeTimestamp),
 			handler.NewColumn(UserSchemaChangeDateCol, handler.ColumnTypeTimestamp),
 			handler.NewColumn(UserSchemaSequenceCol, handler.ColumnTypeInt64),
 			handler.NewColumn(UserSchemaStateCol, handler.ColumnTypeEnum),
@@ -102,6 +104,7 @@ func (p *userSchemaProjection) reduceCreated(event eventstore.Event) (*handler.S
 		event,
 		[]handler.Column{
 			handler.NewCol(UserSchemaIDCol, event.Aggregate().ID),
+			handler.NewCol(UserSchemaCreationDateCol, handler.OnlySetValueOnInsert(UserSchemaTable, e.CreationDate())),
 			handler.NewCol(UserSchemaChangeDateCol, event.CreatedAt()),
 			handler.NewCol(UserSchemaSequenceCol, event.Sequence()),
 			handler.NewCol(UserSchemaInstanceIDCol, event.Aggregate().InstanceID),
@@ -130,7 +133,10 @@ func (p *userSchemaProjection) reduceUpdated(event eventstore.Event) (*handler.S
 
 	if len(e.Schema) > 0 {
 		cols = append(cols, handler.NewCol(UserSchemaSchemaCol, e.Schema))
-		cols = append(cols, handler.NewIncrementCol(UserSchemaRevisionCol, 1))
+	}
+
+	if e.SchemaRevision != nil {
+		cols = append(cols, handler.NewCol(UserSchemaRevisionCol, *e.SchemaRevision))
 	}
 
 	if len(e.PossibleAuthenticators) > 0 {

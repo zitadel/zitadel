@@ -158,9 +158,9 @@ func UserGrantsToDomain(userID string, actionUserGrants []UserGrant) []*domain.U
 func mapObjectToGrant(object *goja.Object, grant *UserGrant) {
 	for _, key := range object.Keys() {
 		switch key {
-		case "projectId":
+		case "projectId", "projectID":
 			grant.ProjectID = object.Get(key).String()
-		case "projectGrantId":
+		case "projectGrantId", "projectGrantID":
 			grant.ProjectGrantID = object.Get(key).String()
 		case "roles":
 			if roles, ok := object.Get(key).Export().([]interface{}); ok {

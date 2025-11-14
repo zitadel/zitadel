@@ -5,6 +5,7 @@ import (
 
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -14,11 +15,16 @@ import (
 )
 
 type ChangeHuman struct {
-	ID       string
-	Username *string
-	Profile  *Profile
-	Email    *Email
-	Phone    *Phone
+	ID            string
+	ResourceOwner string
+	State         *domain.UserState
+	Username      *string
+	Profile       *Profile
+	Email         *Email
+	Phone         *Phone
+
+	Metadata             []*domain.Metadata
+	MetadataKeysToRemove []string
 
 	Password *Password
 
@@ -58,8 +64,8 @@ func (h *ChangeHuman) Validate(hasher *crypto.Hasher) (err error) {
 		}
 	}
 
-	if h.Phone != nil && h.Phone.Number != "" {
-		if h.Phone.Number, err = h.Phone.Number.Normalize(); err != nil {
+	if h.Phone != nil {
+		if err := h.Phone.Validate(); err != nil {
 			return err
 		}
 	}
@@ -100,6 +106,15 @@ func (h *ChangeHuman) Changed() bool {
 	if h.Password != nil {
 		return true
 	}
+	if h.State != nil {
+		return true
+	}
+	if len(h.Metadata) > 0 {
+		return true
+	}
+	if len(h.MetadataKeysToRemove) > 0 {
+		return true
+	}
 	return false
 }
 
@@ -107,7 +122,10 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 	if resourceOwner == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMA-095xh8fll1", "Errors.Internal")
 	}
-
+	if human.Details == nil {
+		human.Details = &domain.ObjectDetails{}
+	}
+	human.Details.ResourceOwner = resourceOwner
 	if err := human.Validate(c.userPasswordHasher); err != nil {
 		return err
 	}
@@ -118,7 +136,12 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 			return err
 		}
 	}
-
+	// check for permission to create user on resourceOwner
+	if !human.Register {
+		if err := c.checkPermissionUpdateUser(ctx, resourceOwner, human.ID, true); err != nil {
+			return err
+		}
+	}
 	// only check if user is already existing
 	existingHuman, err := c.userExistsWriteModel(
 		ctx,
@@ -129,12 +152,6 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 	}
 	if isUserStateExists(existingHuman.UserState) {
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-7yiox1isql", "Errors.User.AlreadyExisting")
-	}
-	// check for permission to create user on resourceOwner
-	if !human.Register {
-		if err := c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, human.ID); err != nil {
-			return err
-		}
 	}
 	// add resourceowner for the events with the aggregate
 	existingHuman.ResourceOwner = resourceOwner
@@ -147,6 +164,12 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 	if err = c.userValidateDomain(ctx, resourceOwner, human.Username, domainPolicy.UserLoginMustBeDomain); err != nil {
 		return err
 	}
+
+	organizationScopedUsername, err := c.checkOrganizationScopedUsernames(ctx, resourceOwner)
+	if err != nil {
+		return err
+	}
+
 	var createCmd humanCreationCommand
 	if human.Register {
 		createCmd = user.NewHumanRegisteredEvent(
@@ -160,7 +183,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 			human.PreferredLanguage,
 			human.Gender,
 			human.Email.Address,
-			domainPolicy.UserLoginMustBeDomain,
+			domainPolicy.UserLoginMustBeDomain || organizationScopedUsername,
 			human.UserAgentID,
 		)
 	} else {
@@ -175,7 +198,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 			human.PreferredLanguage,
 			human.Gender,
 			human.Email.Address,
-			domainPolicy.UserLoginMustBeDomain,
+			domainPolicy.UserLoginMustBeDomain || organizationScopedUsername,
 		)
 	}
 
@@ -189,17 +212,33 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 		return err
 	}
 
-	cmds := make([]eventstore.Command, 0, 3)
-	cmds = append(cmds, createCmd)
-
-	cmds, err = c.addHumanCommandEmail(ctx, filter, cmds, existingHuman.Aggregate(), human, alg, allowInitMail)
+	cmds, err := c.addUserHumanCommands(ctx, filter, existingHuman, human, allowInitMail, alg, createCmd)
 	if err != nil {
 		return err
+	}
+	if len(cmds) == 0 {
+		human.Details = writeModelToObjectDetails(&existingHuman.WriteModel)
+		return nil
+	}
+	err = c.pushAppendAndReduce(ctx, existingHuman, cmds...)
+	if err != nil {
+		return err
+	}
+	human.Details = writeModelToObjectDetails(&existingHuman.WriteModel)
+	return nil
+}
+
+func (c *Commands) addUserHumanCommands(ctx context.Context, filter preparation.FilterToQueryReducer, existingHuman *UserV2WriteModel, human *AddHuman, allowInitMail bool, alg crypto.EncryptionAlgorithm, addUserCommand eventstore.Command) ([]eventstore.Command, error) {
+	cmds := []eventstore.Command{addUserCommand}
+	var err error
+	cmds, err = c.addHumanCommandEmail(ctx, filter, cmds, existingHuman.Aggregate(), human, alg, allowInitMail)
+	if err != nil {
+		return nil, err
 	}
 
 	cmds, err = c.addHumanCommandPhone(ctx, filter, cmds, existingHuman.Aggregate(), human, alg)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	for _, metadataEntry := range human.Metadata {
@@ -213,7 +252,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 	for _, link := range human.Links {
 		cmd, err := addLink(ctx, filter, existingHuman.Aggregate(), link)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		cmds = append(cmds, cmd)
 	}
@@ -221,7 +260,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 	if human.TOTPSecret != "" {
 		encryptedSecret, err := crypto.Encrypt([]byte(human.TOTPSecret), c.multifactors.OTP.CryptoMFA)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		cmds = append(cmds,
 			user.NewHumanOTPAddedEvent(ctx, &existingHuman.Aggregate().Aggregate, encryptedSecret),
@@ -229,17 +268,10 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 		)
 	}
 
-	if len(cmds) == 0 {
-		human.Details = writeModelToObjectDetails(&existingHuman.WriteModel)
-		return nil
+	if human.SetInactive {
+		cmds = append(cmds, user.NewUserDeactivatedEvent(ctx, &existingHuman.Aggregate().Aggregate))
 	}
-
-	err = c.pushAppendAndReduce(ctx, existingHuman, cmds...)
-	if err != nil {
-		return err
-	}
-	human.Details = writeModelToObjectDetails(&existingHuman.WriteModel)
-	return nil
+	return cmds, nil
 }
 
 func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg crypto.EncryptionAlgorithm) (err error) {
@@ -247,29 +279,30 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg 
 		return err
 	}
 
-	existingHuman, err := c.userHumanWriteModel(
+	metadataChanged := len(human.Metadata) > 0 || len(human.MetadataKeysToRemove) > 0
+	existingHuman, err := c.UserHumanWriteModel(
 		ctx,
 		human.ID,
+		human.ResourceOwner,
 		human.Profile != nil,
 		human.Email != nil,
 		human.Phone != nil,
 		human.Password != nil,
 		false, // avatar not updateable
 		false, // IDPLinks not updateable
+		metadataChanged,
 	)
 	if err != nil {
 		return err
 	}
-	if !isUserStateExists(existingHuman.UserState) {
-		return zerrors.ThrowNotFound(nil, "COMMAND-ugjs0upun6", "Errors.User.NotFound")
-	}
 
 	if human.Changed() {
-		if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
+		if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID, !metadataChanged); err != nil {
 			return err
 		}
 	}
 
+	userAgg := UserAggregateFromWriteModelCtx(ctx, &existingHuman.WriteModel)
 	cmds := make([]eventstore.Command, 0)
 	if human.Username != nil {
 		cmds, err = c.changeUsername(ctx, cmds, existingHuman, *human.Username)
@@ -302,6 +335,57 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg 
 		}
 	}
 
+	for _, md := range human.Metadata {
+		cmd, err := c.setUserMetadata(ctx, userAgg, md)
+		if err != nil {
+			return err
+		}
+
+		cmds = append(cmds, cmd)
+	}
+
+	for _, mdKey := range human.MetadataKeysToRemove {
+		cmd, err := c.removeUserMetadata(ctx, userAgg, mdKey)
+		if err != nil {
+			return err
+		}
+
+		cmds = append(cmds, cmd)
+	}
+
+	if human.State != nil {
+		// only allow toggling between active and inactive
+		// any other target state is not supported
+		switch {
+		case isUserStateActive(*human.State):
+			if isUserStateActive(existingHuman.UserState) {
+				// user is already active => no change needed
+				break
+			}
+
+			// do not allow switching from other states than active (e.g. locked)
+			if !isUserStateInactive(existingHuman.UserState) {
+				return zerrors.ThrowInvalidArgumentf(nil, "USER2-statex1", "Errors.User.State.Invalid")
+			}
+
+			cmds = append(cmds, user.NewUserReactivatedEvent(ctx, &existingHuman.Aggregate().Aggregate))
+		case isUserStateInactive(*human.State):
+			if isUserStateInactive(existingHuman.UserState) {
+				// user is already inactive => no change needed
+				break
+			}
+
+			// do not allow switching from other states than active (e.g. locked)
+			if !isUserStateActive(existingHuman.UserState) {
+				return zerrors.ThrowInvalidArgumentf(nil, "USER2-statex2", "Errors.User.State.Invalid")
+			}
+
+			cmds = append(cmds, user.NewUserDeactivatedEvent(ctx, &existingHuman.Aggregate().Aggregate))
+		default:
+			return zerrors.ThrowInvalidArgumentf(nil, "USER2-statex3", "Errors.User.State.Invalid")
+		}
+	}
+
 	if len(cmds) == 0 {
 		human.Details = writeModelToObjectDetails(&existingHuman.WriteModel)
 		return nil
@@ -328,6 +412,10 @@ func (c *Commands) changeUserEmail(ctx context.Context, cmds []eventstore.Comman
 			if err != nil {
 				return cmds, code, err
 			}
+			if email.URLTemplate == "" {
+				email.URLTemplate = c.defaultEmailCodeURLTemplate(ctx)
+			}
+
 			cmds = append(cmds, user.NewHumanEmailCodeAddedEventV2(ctx, &wm.Aggregate().Aggregate, cryptoCode.Crypted, cryptoCode.Expiry, email.URLTemplate, email.ReturnCode, ""))
 			if email.ReturnCode {
 				code = &cryptoCode.Plain
@@ -346,23 +434,28 @@ func (c *Commands) changeUserPhone(ctx context.Context, cmds []eventstore.Comman
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.End() }()
 
+	if phone.Remove {
+		return append(cmds, user.NewHumanPhoneRemovedEvent(ctx, &wm.Aggregate().Aggregate)), nil, nil
+	}
+
 	if phone.Number != "" && phone.Number != wm.Phone {
 		cmds = append(cmds, user.NewHumanPhoneChangedEvent(ctx, &wm.Aggregate().Aggregate, phone.Number))
 
 		if phone.Verified {
 			return append(cmds, user.NewHumanPhoneVerifiedEvent(ctx, &wm.Aggregate().Aggregate)), code, nil
 		} else {
-			cryptoCode, err := c.newPhoneCode(ctx, c.eventstore.Filter, alg) //nolint:staticcheck
+			cryptoCode, generatorID, err := c.newPhoneCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode, alg, c.defaultSecretGenerators.PhoneVerificationCode) //nolint:staticcheck
 			if err != nil {
 				return cmds, code, err
 			}
-			cmds = append(cmds, user.NewHumanPhoneCodeAddedEventV2(ctx, &wm.Aggregate().Aggregate, cryptoCode.Crypted, cryptoCode.Expiry, phone.ReturnCode))
+			cmds = append(cmds, user.NewHumanPhoneCodeAddedEventV2(ctx, &wm.Aggregate().Aggregate, cryptoCode.CryptedCode(), cryptoCode.CodeExpiry(), phone.ReturnCode, generatorID))
 			if phone.ReturnCode {
 				code = &cryptoCode.Plain
 			}
 			return cmds, code, nil
 		}
 	}
+
 	// only create separate event of verified if email was not changed
 	if phone.Verified && wm.IsPhoneVerified != phone.Verified {
 		return append(cmds, user.NewHumanPhoneVerifiedEvent(ctx, &wm.Aggregate().Aggregate)), code, nil
@@ -389,11 +482,18 @@ func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Com
 	verification := c.setPasswordWithPermission(wm.AggregateID, wm.ResourceOwner)
 	// otherwise check the password code...
 	if password.PasswordCode != "" {
-		verification = c.setPasswordWithVerifyCode(wm.PasswordCodeCreationDate, wm.PasswordCodeExpiry, wm.PasswordCode, password.PasswordCode)
+		verification = c.setPasswordWithVerifyCode(
+			wm.PasswordCodeCreationDate,
+			wm.PasswordCodeExpiry,
+			wm.PasswordCode,
+			wm.PasswordCodeGeneratorID,
+			wm.PasswordCodeVerificationID,
+			password.PasswordCode,
+		)
 	}
 	// ...or old password
 	if password.OldPassword != "" {
-		verification = c.checkCurrentPassword(password.Password, password.EncodedPasswordHash, password.OldPassword, wm.PasswordEncodedHash)
+		verification = c.checkCurrentPassword(password.Password, password.EncodedPasswordHash, password.OldPassword, wm, c.tarpit)
 	}
 	cmd, err := c.setPasswordCommand(
 		ctx,
@@ -411,6 +511,28 @@ func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Com
 	return cmds, err
 }
 
+func (c *Commands) HumanMFAInitSkippedV2(ctx context.Context, userID string) (*domain.ObjectDetails, error) {
+	if userID == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Wei5kooz1i", "Errors.User.UserIDMissing")
+	}
+
+	existingHuman, err := c.userStateWriteModel(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if !isUserStateExists(existingHuman.UserState) {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-auj6jeBei4", "Errors.User.NotFound")
+	}
+	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID, true); err != nil {
+		return nil, err
+	}
+
+	if err := c.pushAppendAndReduce(ctx, existingHuman, user.NewHumanMFAInitSkippedEvent(ctx, &existingHuman.Aggregate().Aggregate)); err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingHuman.WriteModel), nil
+}
+
 func (c *Commands) userExistsWriteModel(ctx context.Context, userID string) (writeModel *UserV2WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -423,14 +545,19 @@ func (c *Commands) userExistsWriteModel(ctx context.Context, userID string) (wri
 	return writeModel, nil
 }
 
-func (c *Commands) userHumanWriteModel(ctx context.Context, userID string, profileWM, emailWM, phoneWM, passwordWM, avatarWM, idpLinksWM bool) (writeModel *UserV2WriteModel, err error) {
+func (c *Commands) UserHumanWriteModel(ctx context.Context, userID, resourceOwner string, profileWM, emailWM, phoneWM, passwordWM, avatarWM, idpLinksWM, metadataWM bool) (writeModel *UserV2WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewUserHumanWriteModel(userID, "", profileWM, emailWM, phoneWM, passwordWM, avatarWM, idpLinksWM)
+	writeModel = NewUserHumanWriteModel(userID, resourceOwner, profileWM, emailWM, phoneWM, passwordWM, avatarWM, idpLinksWM, metadataWM)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}
+
+	if !isUserStateExists(writeModel.UserState) {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-ugjs0upun6", "Errors.User.NotFound")
+	}
+
 	return writeModel, nil
 }

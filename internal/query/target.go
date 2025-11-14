@@ -9,7 +9,9 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -39,10 +41,6 @@ var (
 		name:  projection.TargetInstanceIDCol,
 		table: targetTable,
 	}
-	TargetColumnSequence = Column{
-		name:  projection.TargetSequenceCol,
-		table: targetTable,
-	}
 	TargetColumnName = Column{
 		name:  projection.TargetNameCol,
 		table: targetTable,
@@ -63,6 +61,10 @@ var (
 		name:  projection.TargetInterruptOnErrorCol,
 		table: targetTable,
 	}
+	TargetColumnSigningKey = Column{
+		name:  projection.TargetSigningKey,
+		table: targetTable,
+	}
 )
 
 type Targets struct {
@@ -75,14 +77,27 @@ func (t *Targets) SetState(s *State) {
 }
 
 type Target struct {
-	ID string
 	domain.ObjectDetails
 
 	Name             string
-	TargetType       domain.TargetType
+	TargetType       target_domain.TargetType
 	Endpoint         string
 	Timeout          time.Duration
 	InterruptOnError bool
+	signingKey       *crypto.CryptoValue
+	SigningKey       string
+}
+
+func (t *Target) decryptSigningKey(alg crypto.EncryptionAlgorithm) error {
+	if t.signingKey == nil {
+		return nil
+	}
+	keyValue, err := crypto.DecryptString(t.signingKey, alg)
+	if err != nil {
+		return zerrors.ThrowInternal(err, "QUERY-bxevy3YXwy", "Errors.Internal")
+	}
+	t.SigningKey = keyValue
+	return nil
 }
 
 type TargetSearchQueries struct {
@@ -98,21 +113,37 @@ func (q *TargetSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query
 }
 
-func (q *Queries) SearchTargets(ctx context.Context, queries *TargetSearchQueries) (targets *Targets, err error) {
+func (q *Queries) SearchTargets(ctx context.Context, queries *TargetSearchQueries) (*Targets, error) {
 	eq := sq.Eq{
 		TargetColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	query, scan := prepareTargetsQuery(ctx, q.client)
-	return genericRowsQueryWithState[*Targets](ctx, q.client, targetTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
+	query, scan := prepareTargetsQuery()
+	targets, err := genericRowsQueryWithState(ctx, q.client, targetTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
+	if err != nil {
+		return nil, err
+	}
+	for i := range targets.Targets {
+		if err := targets.Targets[i].decryptSigningKey(q.targetEncryptionAlgorithm); err != nil {
+			return nil, err
+		}
+	}
+	return targets, nil
 }
 
-func (q *Queries) GetTargetByID(ctx context.Context, id string) (target *Target, err error) {
+func (q *Queries) GetTargetByID(ctx context.Context, id string) (*Target, error) {
 	eq := sq.Eq{
 		TargetColumnID.identifier():         id,
 		TargetColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	query, scan := prepareTargetQuery(ctx, q.client)
-	return genericRowQuery[*Target](ctx, q.client, query.Where(eq), scan)
+	query, scan := prepareTargetQuery()
+	target, err := genericRowQuery(ctx, q.client, query.Where(eq), scan)
+	if err != nil {
+		return nil, err
+	}
+	if err := target.decryptSigningKey(q.targetEncryptionAlgorithm); err != nil {
+		return nil, err
+	}
+	return target, nil
 }
 
 func NewTargetNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
@@ -123,17 +154,18 @@ func NewTargetInIDsSearchQuery(values []string) (SearchQuery, error) {
 	return NewInTextQuery(TargetColumnID, values)
 }
 
-func prepareTargetsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(rows *sql.Rows) (*Targets, error)) {
+func prepareTargetsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Targets, error)) {
 	return sq.Select(
 			TargetColumnID.identifier(),
+			TargetColumnCreationDate.identifier(),
 			TargetColumnChangeDate.identifier(),
 			TargetColumnResourceOwner.identifier(),
-			TargetColumnSequence.identifier(),
 			TargetColumnName.identifier(),
 			TargetColumnTargetType.identifier(),
 			TargetColumnTimeout.identifier(),
 			TargetColumnURL.identifier(),
 			TargetColumnInterruptOnError.identifier(),
+			TargetColumnSigningKey.identifier(),
 			countColumn.identifier(),
 		).From(targetTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
@@ -144,14 +176,15 @@ func prepareTargetsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				target := new(Target)
 				err := rows.Scan(
 					&target.ID,
+					&target.CreationDate,
 					&target.EventDate,
 					&target.ResourceOwner,
-					&target.Sequence,
 					&target.Name,
 					&target.TargetType,
 					&target.Timeout,
 					&target.Endpoint,
 					&target.InterruptOnError,
+					&target.signingKey,
 					&count,
 				)
 				if err != nil {
@@ -173,31 +206,33 @@ func prepareTargetsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 		}
 }
 
-func prepareTargetQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(row *sql.Row) (*Target, error)) {
+func prepareTargetQuery() (sq.SelectBuilder, func(row *sql.Row) (*Target, error)) {
 	return sq.Select(
 			TargetColumnID.identifier(),
+			TargetColumnCreationDate.identifier(),
 			TargetColumnChangeDate.identifier(),
 			TargetColumnResourceOwner.identifier(),
-			TargetColumnSequence.identifier(),
 			TargetColumnName.identifier(),
 			TargetColumnTargetType.identifier(),
 			TargetColumnTimeout.identifier(),
 			TargetColumnURL.identifier(),
 			TargetColumnInterruptOnError.identifier(),
+			TargetColumnSigningKey.identifier(),
 		).From(targetTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Target, error) {
 			target := new(Target)
 			err := row.Scan(
 				&target.ID,
+				&target.CreationDate,
 				&target.EventDate,
 				&target.ResourceOwner,
-				&target.Sequence,
 				&target.Name,
 				&target.TargetType,
 				&target.Timeout,
 				&target.Endpoint,
 				&target.InterruptOnError,
+				&target.signingKey,
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {

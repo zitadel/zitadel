@@ -18,7 +18,7 @@
         ? 'iam.policy.write'
         : serviceType === PolicyComponentServiceType.MGMT
           ? 'policy.write'
-          : ''
+          : '',
     ]
       | hasRole
       | async) === false
@@ -44,7 +44,7 @@
               ? 'iam.policy.write'
               : serviceType === PolicyComponentServiceType.MGMT
                 ? 'policy.write'
-                : ''
+                : '',
           ]
             | hasRole
             | async) === false
@@ -98,7 +98,7 @@
               ? 'iam.policy.write'
               : serviceType === PolicyComponentServiceType.MGMT
                 ? 'policy.write'
-                : ''
+                : '',
           ]
             | hasRole
             | async) === false
@@ -124,7 +124,7 @@
               ? 'iam.policy.write'
               : serviceType === PolicyComponentServiceType.MGMT
                 ? 'policy.write'
-                : ''
+                : '',
           ]
             | hasRole
             | async) === false
@@ -147,7 +147,7 @@
           ? 'iam.policy.write'
           : serviceType === PolicyComponentServiceType.MGMT
             ? 'policy.write'
-            : ''
+            : '',
       ]
         | hasRole
         | async) === false

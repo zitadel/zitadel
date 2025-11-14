@@ -8,13 +8,16 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository/mock"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_ChangeApplication(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx           context.Context
@@ -35,9 +38,7 @@ func TestCommandSide_ChangeApplication(t *testing.T) {
 		{
 			name: "invalid app missing projectid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(func(mockRepository *mock.MockRepository) {}),
 			},
 			args: args{
 				ctx:       context.Background(),
@@ -55,9 +56,7 @@ func TestCommandSide_ChangeApplication(t *testing.T) {
 		{
 			name: "invalid app missing appid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(func(mockRepository *mock.MockRepository) {}),
 			},
 			args: args{
 				ctx:       context.Background(),
@@ -74,9 +73,7 @@ func TestCommandSide_ChangeApplication(t *testing.T) {
 		{
 			name: "invalid app missing name, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(func(mockRepository *mock.MockRepository) {}),
 			},
 			args: args{
 				ctx:       context.Background(),
@@ -94,10 +91,7 @@ func TestCommandSide_ChangeApplication(t *testing.T) {
 		{
 			name: "app not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(),
-				),
+				eventstore: expectEventstore(expectFilter()),
 			},
 			args: args{
 				ctx:       context.Background(),
@@ -115,8 +109,7 @@ func TestCommandSide_ChangeApplication(t *testing.T) {
 		{
 			name: "app name not changed, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -142,8 +135,14 @@ func TestCommandSide_ChangeApplication(t *testing.T) {
 		{
 			name: "app changed, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(project.NewApplicationAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							"app",
+						)),
+					),
 					expectFilter(
 						eventFromEventPusher(project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -179,10 +178,13 @@ func TestCommandSide_ChangeApplication(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: newMockPermissionCheckAllowed(),
 			}
-			got, err := r.ChangeApplication(tt.args.ctx, tt.args.projectID, tt.args.app, tt.args.resourceOwner)
+			got, err := r.UpdateApplicationName(tt.args.ctx, tt.args.projectID, tt.args.app, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -190,15 +192,17 @@ func TestCommandSide_ChangeApplication(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
 }
 
 func TestCommandSide_DeactivateApplication(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx           context.Context
@@ -219,9 +223,7 @@ func TestCommandSide_DeactivateApplication(t *testing.T) {
 		{
 			name: "missing projectid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(func(mockRepository *mock.MockRepository) {}),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -236,9 +238,7 @@ func TestCommandSide_DeactivateApplication(t *testing.T) {
 		{
 			name: "missing appid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(func(mockRepository *mock.MockRepository) {}),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -253,8 +253,7 @@ func TestCommandSide_DeactivateApplication(t *testing.T) {
 		{
 			name: "app not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -271,8 +270,7 @@ func TestCommandSide_DeactivateApplication(t *testing.T) {
 		{
 			name: "app already inactive, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -299,8 +297,14 @@ func TestCommandSide_DeactivateApplication(t *testing.T) {
 		{
 			name: "app deactivate, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(project.NewApplicationAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							"app",
+						)),
+					),
 					expectFilter(
 						eventFromEventPusher(project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -331,8 +335,11 @@ func TestCommandSide_DeactivateApplication(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: newMockPermissionCheckAllowed(),
 			}
 			got, err := r.DeactivateApplication(tt.args.ctx, tt.args.projectID, tt.args.appID, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -342,15 +349,17 @@ func TestCommandSide_DeactivateApplication(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
 }
 
 func TestCommandSide_ReactivateApplication(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx           context.Context
@@ -371,9 +380,7 @@ func TestCommandSide_ReactivateApplication(t *testing.T) {
 		{
 			name: "missing projectid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(func(mockRepository *mock.MockRepository) {}),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -388,9 +395,7 @@ func TestCommandSide_ReactivateApplication(t *testing.T) {
 		{
 			name: "missing appid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(func(mockRepository *mock.MockRepository) {}),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -405,10 +410,7 @@ func TestCommandSide_ReactivateApplication(t *testing.T) {
 		{
 			name: "app not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(),
-				),
+				eventstore: expectEventstore(expectFilter()),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -423,8 +425,7 @@ func TestCommandSide_ReactivateApplication(t *testing.T) {
 		{
 			name: "app already active, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -447,8 +448,7 @@ func TestCommandSide_ReactivateApplication(t *testing.T) {
 		{
 			name: "app reactivate, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -483,8 +483,11 @@ func TestCommandSide_ReactivateApplication(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: newMockPermissionCheckAllowed(),
 			}
 			got, err := r.ReactivateApplication(tt.args.ctx, tt.args.projectID, tt.args.appID, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -494,15 +497,17 @@ func TestCommandSide_ReactivateApplication(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
 }
 
 func TestCommandSide_RemoveApplication(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx           context.Context
@@ -523,9 +528,7 @@ func TestCommandSide_RemoveApplication(t *testing.T) {
 		{
 			name: "missing projectid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(func(mockRepository *mock.MockRepository) {}),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -540,9 +543,7 @@ func TestCommandSide_RemoveApplication(t *testing.T) {
 		{
 			name: "missing appid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(func(mockRepository *mock.MockRepository) {}),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -557,10 +558,7 @@ func TestCommandSide_RemoveApplication(t *testing.T) {
 		{
 			name: "app not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(),
-				),
+				eventstore: expectEventstore(expectFilter()),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -575,8 +573,7 @@ func TestCommandSide_RemoveApplication(t *testing.T) {
 		{
 			name: "app remove, entityID, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -584,6 +581,7 @@ func TestCommandSide_RemoveApplication(t *testing.T) {
 							"app",
 						)),
 					),
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -595,6 +593,8 @@ func TestCommandSide_RemoveApplication(t *testing.T) {
 							"app1",
 							"https://test.com/saml/metadata",
 							[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+							"",
+							domain.LoginVersionUnspecified,
 							"",
 						)),
 					),
@@ -623,8 +623,7 @@ func TestCommandSide_RemoveApplication(t *testing.T) {
 		{
 			name: "app remove, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -633,6 +632,7 @@ func TestCommandSide_RemoveApplication(t *testing.T) {
 						)),
 					),
 					// app is not saml, or no saml config available
+					expectFilter(),
 					expectFilter(),
 					expectPush(
 						project.NewApplicationRemovedEvent(context.Background(),
@@ -659,8 +659,11 @@ func TestCommandSide_RemoveApplication(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: newMockPermissionCheckAllowed(),
 			}
 			got, err := r.RemoveApplication(tt.args.ctx, tt.args.projectID, tt.args.appID, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -670,7 +673,7 @@ func TestCommandSide_RemoveApplication(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}

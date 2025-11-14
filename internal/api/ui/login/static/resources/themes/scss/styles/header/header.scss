@@ -18,5 +18,12 @@ $lgn-header-margin: auto;
     max-width: 250px;
     max-height: 150px;
     object-fit: contain;
+
+    .lgn-dark-theme &.lgn-logo-light {
+      display: none;
+    }
+    .lgn-light-theme &.lgn-logo-dark {
+      display: none;
+    }
   }
 }

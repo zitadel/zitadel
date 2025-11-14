@@ -20,6 +20,7 @@ enum SMSProviderType {
   selector: 'cnsl-dialog-add-sms-provider',
   templateUrl: './dialog-add-sms-provider.component.html',
   styleUrls: ['./dialog-add-sms-provider.component.scss'],
+  standalone: false,
 })
 export class DialogAddSMSProviderComponent {
   public SMSProviderType: any = SMSProviderType;
@@ -41,7 +42,9 @@ export class DialogAddSMSProviderComponent {
   ) {
     this.twilioForm = this.fb.group({
       sid: ['', [requiredValidator]],
-      senderNumber: ['', [requiredValidator]],
+      senderNumber: [''],
+      // NB: not required if not using verification service
+      verifyServiceSid: [''],
     });
 
     this.smsProviders = data.smsProviders;
@@ -62,12 +65,14 @@ export class DialogAddSMSProviderComponent {
       this.req.setId(this.twilioProvider.id);
       this.req.setSid(this.sid?.value);
       this.req.setSenderNumber(this.senderNumber?.value);
+      this.req.setVerifyServiceSid(this.verifyServiceSid?.value ?? '');
       this.dialogRef.close(this.req);
     } else {
       this.req = new AddSMSProviderTwilioRequest();
       this.req.setSid(this.sid?.value);
       this.req.setToken(this.token?.value);
       this.req.setSenderNumber(this.senderNumber?.value);
+      this.req.setVerifyServiceSid(this.verifyServiceSid?.value ?? '');
       this.dialogRef.close(this.req);
     }
   }
@@ -102,6 +107,10 @@ export class DialogAddSMSProviderComponent {
 
   public get senderNumber(): AbstractControl | null {
     return this.twilioForm.get('senderNumber');
+  }
+
+  public get verifyServiceSid(): AbstractControl | null {
+    return this.twilioForm.get('verifyServiceSid');
   }
 
   public get token(): AbstractControl | null {

@@ -12,7 +12,6 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -41,7 +40,7 @@ func newKey() *cobra.Command {
 		Long: `create new encryption key(s) (encrypted by the provided master key)
 provide key(s) by YAML file and/or by argument
 Requirements:
-- cockroachdb`,
+- postgreSQL`,
 		Example: `new -f keys.yaml
 new key1=somekey key2=anotherkey
 new -f keys.yaml key2=anotherkey`,
@@ -124,7 +123,7 @@ func openFile(fileName string) (io.Reader, error) {
 }
 
 func keyStorage(config database.Config, masterKey string) (crypto.KeyStorage, error) {
-	db, err := database.Connect(config, false, dialect.DBPurposeQuery)
+	db, err := database.Connect(config, false)
 	if err != nil {
 		return nil, err
 	}

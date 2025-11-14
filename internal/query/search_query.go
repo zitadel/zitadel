@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -22,6 +23,8 @@ type SearchRequest struct {
 	Limit         uint64
 	SortingColumn Column
 	Asc           bool
+
+	sortingConsumed bool
 }
 
 func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -31,15 +34,20 @@ func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	if req.Limit > 0 {
 		query = query.Limit(req.Limit)
 	}
+	return req.consumeSorting(query)
+}
 
-	if !req.SortingColumn.isZero() {
+// consumeSorting sets the sorting column to the query once.
+// subsequent calls will not set the sorting column again.
+func (req *SearchRequest) consumeSorting(query sq.SelectBuilder) sq.SelectBuilder {
+	if !req.sortingConsumed && !req.SortingColumn.isZero() {
 		clause := req.SortingColumn.orderBy()
 		if !req.Asc {
 			clause += " DESC"
 		}
 		query = query.OrderByClause(clause)
+		req.sortingConsumed = true
 	}
-
 	return query
 }
 
@@ -109,6 +117,10 @@ func NewOrQuery(queries ...SearchQuery) (*OrQuery, error) {
 	return &OrQuery{queries: queries}, nil
 }
 
+func (q *OrQuery) Prepend(queries ...SearchQuery) {
+	q.queries = append(queries, q.queries...)
+}
+
 func (q *OrQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query.Where(q.comp())
 }
@@ -145,6 +157,10 @@ func (q *AndQuery) comp() sq.Sqlizer {
 		and[i] = query.comp()
 	}
 	return and
+}
+
+func (q *AndQuery) Prepend(queries ...SearchQuery) {
+	q.queries = append(queries, q.queries...)
 }
 
 type NotQuery struct {
@@ -279,8 +295,7 @@ func NewTextQuery(col Column, value string, compare TextComparison) (*textQuery,
 	}
 	// handle the comparisons which use (i)like and therefore need to escape potential wildcards in the value
 	switch compare {
-	case TextEqualsIgnoreCase,
-		TextStartsWith,
+	case TextStartsWith,
 		TextStartsWithIgnoreCase,
 		TextEndsWith,
 		TextEndsWithIgnoreCase,
@@ -290,6 +305,8 @@ func NewTextQuery(col Column, value string, compare TextComparison) (*textQuery,
 	case TextEquals,
 		TextListContains,
 		TextNotEquals,
+		TextEqualsIgnoreCase,
+		TextNotEqualsIgnoreCase,
 		textCompareMax:
 		// do nothing
 	}
@@ -325,21 +342,23 @@ func (q *textQuery) comp() sq.Sqlizer {
 	case TextNotEquals:
 		return sq.NotEq{q.Column.identifier(): q.Text}
 	case TextEqualsIgnoreCase:
-		return sq.ILike{q.Column.identifier(): q.Text}
+		return sq.Eq{"LOWER(" + q.Column.identifier() + ")": strings.ToLower(q.Text)}
+	case TextNotEqualsIgnoreCase:
+		return sq.NotEq{"LOWER(" + q.Column.identifier() + ")": strings.ToLower(q.Text)}
 	case TextStartsWith:
 		return sq.Like{q.Column.identifier(): q.Text + "%"}
 	case TextStartsWithIgnoreCase:
-		return sq.ILike{q.Column.identifier(): q.Text + "%"}
+		return sq.Like{"LOWER(" + q.Column.identifier() + ")": strings.ToLower(q.Text) + "%"}
 	case TextEndsWith:
 		return sq.Like{q.Column.identifier(): "%" + q.Text}
 	case TextEndsWithIgnoreCase:
-		return sq.ILike{q.Column.identifier(): "%" + q.Text}
+		return sq.Like{"LOWER(" + q.Column.identifier() + ")": "%" + strings.ToLower(q.Text)}
 	case TextContains:
 		return sq.Like{q.Column.identifier(): "%" + q.Text + "%"}
 	case TextContainsIgnoreCase:
-		return sq.ILike{q.Column.identifier(): "%" + q.Text + "%"}
+		return sq.Like{"LOWER(" + q.Column.identifier() + ")": "%" + strings.ToLower(q.Text) + "%"}
 	case TextListContains:
-		return &listContains{col: q.Column, args: []interface{}{q.Text}}
+		return &listContains{col: q.Column, args: []any{q.Text}}
 	case textCompareMax:
 		return nil
 	}
@@ -360,6 +379,7 @@ const (
 	TextContainsIgnoreCase
 	TextListContains
 	TextNotEquals
+	TextNotEqualsIgnoreCase
 
 	textCompareMax
 )
@@ -406,8 +426,12 @@ func (q *NumberQuery) comp() sq.Sqlizer {
 		return sq.NotEq{q.Column.identifier(): q.Number}
 	case NumberLess:
 		return sq.Lt{q.Column.identifier(): q.Number}
+	case NumberLessOrEqual:
+		return sq.LtOrEq{q.Column.identifier(): q.Number}
 	case NumberGreater:
 		return sq.Gt{q.Column.identifier(): q.Number}
+	case NumberGreaterOrEqual:
+		return sq.GtOrEq{q.Column.identifier(): q.Number}
 	case NumberListContains:
 		return &listContains{col: q.Column, args: []interface{}{q.Number}}
 	case numberCompareMax:
@@ -423,7 +447,9 @@ const (
 	NumberEquals NumberComparison = iota
 	NumberNotEquals
 	NumberLess
+	NumberLessOrEqual
 	NumberGreater
+	NumberGreaterOrEqual
 	NumberListContains
 
 	numberCompareMax
@@ -588,6 +614,56 @@ func (q *BoolQuery) comp() sq.Sqlizer {
 	return sq.Eq{q.Column.identifier(): q.Value}
 }
 
+type BytesComparison int
+
+const (
+	BytesEquals BytesComparison = iota
+	BytesNotEquals
+	bytesCompareMax
+)
+
+type BytesQuery struct {
+	Column  Column
+	Compare BytesComparison
+	Value   []byte
+}
+
+func NewBytesQuery(col Column, values []byte, comparison BytesComparison) (*BytesQuery, error) {
+	if col.isZero() {
+		return nil, ErrMissingColumn
+	}
+
+	if comparison < 0 || comparison >= bytesCompareMax {
+		return nil, ErrInvalidCompare
+	}
+
+	return &BytesQuery{
+		Column:  col,
+		Value:   values,
+		Compare: comparison,
+	}, nil
+}
+
+func (q *BytesQuery) Col() Column {
+	return q.Column
+}
+
+func (q *BytesQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (q *BytesQuery) comp() sq.Sqlizer {
+	switch q.Compare {
+	case BytesEquals:
+		return sq.Expr("sha256("+q.Column.identifier()+") = sha256(?)", q.Value)
+	case BytesNotEquals:
+		return sq.Expr("sha256("+q.Column.identifier()+") <> sha256(?)", q.Value)
+	case bytesCompareMax:
+		return nil
+	}
+	return nil
+}
+
 type TimestampComparison int
 
 const (
@@ -605,6 +681,9 @@ type TimestampQuery struct {
 }
 
 func NewTimestampQuery(c Column, value time.Time, compare TimestampComparison) (*TimestampQuery, error) {
+	if c.isZero() {
+		return nil, ErrMissingColumn
+	}
 	return &TimestampQuery{
 		Column:  c,
 		Compare: compare,

@@ -1,0 +1,102 @@
+---
+title: machine jwt profile grant benchmark of zitadel v2.70.0
+sidebar_label: machine jwt profile grant
+---
+
+The performance goals of [this issue](https://github.com/zitadel/zitadel/issues/8352) are reached. Next we will test linear scalability.
+
+## Performance test results
+
+| Metric                                | Value |
+|:--------------------------------------|:------|
+| Baseline                              | none  |
+| Purpose                               | Test current performance |
+| Test start                            | 09:48 UTC |
+| Test duration                         | 30min |
+| Executed test                         | machine\_jwt\_profile\_grant |
+| k6 version                            | v0.57.0 |
+| VUs                                   | 600 |
+| Client location                       | US1 |
+| ZITADEL location                      | US1 |
+| ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 2<br/>Container max scale: 7 |
+| ZITADEL Version                       | v2.70.0 |
+| ZITADEL feature flags                 | webKey: true, improvedPerformance: \[\"IMPROVED\_PERFORMANCE\_ORG\_BY\_ID\", \"IMPROVED\_PERFORMANCE\_PROJECT\", \"IMPROVED\_PERFORMANCE\_USER\_GRANT\", \"IMPROVED\_PERFORMANCE\_ORG\_DOMAIN\_VERIFIED\", \"IMPROVED\_PERFORMANCE\_PROJECT\_GRANT\"\] |
+| Database                              | type: psql<br />version: v17.2 |
+| Database location                     | US1 |
+| Database specification                | vCPU: 8<br/> memory: 32Gib |
+| ZITADEL metrics during test           |  |
+| Observed errors                       |  |
+| Top 3 most expensive database queries | 1: Write events using eventstore.push function<br/>2: Query user<br/>3: Query events by instance id, aggregate type, aggregate id, event types, owner<br/> |
+| k6 Iterations per second              | 1806 |
+| k6 output                             | [output](#k6-output) |
+| flowchart outcome                     | Scale out |
+
+## Endpoint latencies
+
+import OutputSource from "./output.json";
+
+import { BenchmarkChart } from '/src/components/benchmark_chart';
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output {#k6-output}
+
+```bash
+     ✓ openid configuration
+     ✗ token status ok
+      ↳  99% — ✓ 3289559 / ✗ 5
+     ✗ access token returned
+      ↳  99% — ✓ 3289559 / ✗ 5
+
+     █ setup
+
+       ✓ user defined
+       ✓ authorize status ok
+       ✓ login name status ok
+       ✓ login shows password page
+       ✓ password status ok
+       ✓ password callback
+       ✓ code set
+       ✓ token status ok
+       ✓ access token created
+       ✓ id token created
+       ✓ info created
+       ✓ org created
+       ✓ create user is status ok
+       ✓ generate machine key status ok
+
+     █ teardown
+
+       ✓ org removed
+
+     checks...............................: 99.99%  6580931 out of 6580941
+     data_received........................: 4.8 GB  2.6 MB/s
+     data_sent............................: 2.8 GB  1.5 MB/s
+     http_req_blocked.....................: min=110ns    avg=53.66µs  max=937.62ms p(50)=420ns    p(95)=660ns    p(99)=989ns   
+     http_req_connecting..................: min=0s       avg=22.26µs  max=532.7ms  p(50)=0s       p(95)=0s       p(99)=0s      
+     http_req_duration....................: min=16.42ms  avg=323.71ms max=3.4s     p(50)=209.85ms p(95)=903.86ms p(99)=1.01s   
+       { expected_response:true }.........: min=16.42ms  avg=323.71ms max=3.4s     p(50)=209.85ms p(95)=903.85ms p(99)=1.01s   
+     http_req_failed......................: 0.00%   5 out of 3291974
+     http_req_receiving...................: min=18.23µs  avg=1.73ms   max=913.21ms p(50)=73.15µs  p(95)=8.73ms   p(99)=29.35ms 
+     http_req_sending.....................: min=17.54µs  avg=53.13µs  max=501.66ms p(50)=46.07µs  p(95)=75.92µs  p(99)=120.24µs
+     http_req_tls_handshaking.............: min=0s       avg=29.45µs  max=657.29ms p(50)=0s       p(95)=0s       p(99)=0s      
+     http_req_waiting.....................: min=3.84ms   avg=321.92ms max=3.4s     p(50)=206.45ms p(95)=901.97ms p(99)=1.01s   
+     http_reqs............................: 3291974 1807.469453/s
+     iteration_duration...................: min=18.62ms  avg=328.21ms max=3.41s    p(50)=215.77ms p(95)=907.48ms p(99)=1.01s   
+     iterations...........................: 3289564 1806.146234/s
+     login_ui_enter_login_name_duration...: min=131.65ms avg=131.65ms max=131.65ms p(50)=131.65ms p(95)=131.65ms p(99)=131.65ms
+     login_ui_enter_password_duration.....: min=18.55ms  avg=18.55ms  max=18.55ms  p(50)=18.55ms  p(95)=18.55ms  p(99)=18.55ms 
+     login_ui_init_login_duration.........: min=68.72ms  avg=68.72ms  max=68.72ms  p(50)=68.72ms  p(95)=68.72ms  p(99)=68.72ms 
+     login_ui_token_duration..............: min=77.56ms  avg=77.56ms  max=77.56ms  p(50)=77.56ms  p(95)=77.56ms  p(99)=77.56ms 
+     oidc_token_duration..................: min=16.42ms  avg=323.79ms max=3.4s     p(50)=209.87ms p(95)=903.91ms p(99)=1.01s   
+     org_create_org_duration..............: min=38.42ms  avg=38.42ms  max=38.42ms  p(50)=38.42ms  p(95)=38.42ms  p(99)=38.42ms 
+     user_add_machine_key_duration........: min=23.47ms  avg=280.32ms max=851.94ms p(50)=304.18ms p(95)=437.53ms p(99)=443.37ms
+     user_create_machine_duration.........: min=63.91ms  avg=406.02ms max=663.96ms p(50)=437.61ms p(95)=518.85ms p(99)=521.88ms
+     vus..................................: 425     min=0                  max=600
+     vus_max..............................: 600     min=600                max=600
+
+
+running (30m21.3s), 000/600 VUs, 3289564 complete and 0 interrupted iterations
+default ✓ [======================================] 600 VUs  30m0s
+```
+

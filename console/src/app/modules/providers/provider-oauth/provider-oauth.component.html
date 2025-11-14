@@ -3,7 +3,7 @@
   (closed)="close()"
 >
   <div class="identity-provider-create-content">
-    <div class="title-row">
+    <div class="identity-provider-title-row">
       <img class="idp-logo" src="./assets/images/idp/oauth.svg" alt="oauth" />
       <h1>{{ 'IDP.CREATE.OAUTH.TITLE' | translate }}</h1>
       <ng-container *ngIf="exists$ | async">
@@ -108,6 +108,15 @@
                 </mat-chip-row>
               </mat-chip-grid>
             </cnsl-form-field>
+          </div>
+
+          <div class="specific-oauth-option">
+            <cnsl-info-section>
+              <div>
+                <p class="checkbox-desc">{{ 'IDP.USEPKCE_DESC' | translate }}</p>
+                <mat-checkbox formControlName="usePkce">{{ 'IDP.USEPKCE' | translate }}</mat-checkbox>
+              </div>
+            </cnsl-info-section>
           </div>
 
           <cnsl-provider-options

@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Numer telefonu już zweryfikowany
       Empty: Numer telefonu jest pusty
       NotChanged: Numer telefonu nie zmieniony
+      VerifyingRemovalIsNotSupported: Usunięcie weryfikacji nie jest obsługiwane
     Address:
       NotFound: Adres nie znaleziony
       NotChanged: Adres nie zmieniony
@@ -193,7 +194,7 @@ Errors:
     AlreadyExists: Instancja już istnieje
     NotChanged: Instancja nie zmieniona
   Org:
-    AlreadyExists: Nazwa organizacji jest już zajęta
+    AlreadyExists: Nazwa lub identyfikator organizacji jest już zajęty
     Invalid: Organizacja jest nieprawidłowa
     AlreadyDeactivated: Organizacja jest już deaktywowana
     AlreadyActive: Organizacja jest już aktywna
@@ -435,8 +436,6 @@ Errors:
     Invalid: Uprawnienie użytkownika jest nieprawidłowe
     NotChanged: Uprawnienie użytkownika nie zostało zmienione
     IDMissing: Brak ID
-    NotActive: Uprawnienie użytkownika nie jest aktywne
-    NotInactive: Uprawnienie użytkownika nie jest dezaktywowane
     NoPermissionForProject: Użytkownik nie ma uprawnień do tego projektu
     RoleKeyNotFound: Rola nie znaleziona
   Member:
@@ -495,6 +494,7 @@ Errors:
     SQLStatement: Instrukcja SQL nie mogła zostać utworzona
     InvalidRequest: Żądanie jest nieprawidłowe
     TooManyNestingLevels: Zbyt wiele poziomów zagnieżdżenia zapytań (maks. 20)
+    LimitExceeded: Limit przekroczony
   Quota:
     AlreadyExists: Limit już istnieje dla tej jednostki
     NotFound: Nie znaleziono limitu dla tej jednostki
@@ -535,6 +535,7 @@ Errors:
     StateMissing: Brak parametru stanu w żądaniu
     NotStarted: Intencja nie została rozpoczęta lub już się zakończyła
     NotSucceeded: intencja nie powiodła się
+    Expired: Intencja wygasła
     TokenCreationFailed: Tworzenie tokena nie powiodło się
     InvalidToken: Token intencji jest nieprawidłowy
     OtherUser: Intencja przeznaczona dla innego użytkownika
@@ -542,12 +543,23 @@ Errors:
     AlreadyExists: Auth Request już istnieje
     NotExisting: Auth Request nie istnieje
     WrongLoginClient: Auth Request utworzony przez innego klienta logowania
+    AlreadyHandled: Żądanie uwierzytelnienia zostało już obsłużone
   OIDCSession:
     RefreshTokenInvalid: Refresh Token jest nieprawidłowy
     Token:
       Invalid: Token jest nieprawidłowy
       Expired: Token wygasł
     InvalidClient: Token nie został wydany dla tego klienta
+  SAMLRequest:
+    AlreadyExists: SAMLRequest już istnieje
+    NotExisting: SAMLRequest nie istnieje
+    WrongLoginClient: SAMLRequest utworzony przez innego klienta logowania
+    AlreadyHandled: Żądanie SAML zostało już obsłużone
+  SAMLSession:
+    InvalidClient: SAMLResponse nie został wydany dla tego klienta
+  DeviceAuth:
+    NotFound: Żądanie autoryzacji urządzenia nie istnieje
+    AlreadyHandled: Żądanie autoryzacji urządzenia zostało już obsłużone
   Feature:
     NotExisting: Funkcja nie istnieje
     TypeNotSupported: Typ funkcji nie jest obsługiwany
@@ -563,6 +575,8 @@ Errors:
     NotFound: Nie znaleziono wykonania
     IncludeNotFound: Nie znaleziono uwzględnienia
     NoTargets: Nie zdefiniowano celów
+    Failed: Wykonanie nie powiodło się
+    ResponseIsNotValidJSON: Odpowiedź nie jest prawidłowym JSON-em
   UserSchema:
     NotEnabled: Funkcja „Schemat użytkownika” nie jest włączona
     Type:
@@ -573,6 +587,11 @@ Errors:
     NotActive: Schemat użytkownika nieaktywny
     NotInactive: Schemat użytkownika nie jest nieaktywny
     NotExists: Schemat użytkownika nie istnieje
+    ID:
+      Missing: Brak identyfikatora schematu użytkownika
+    Invalid: Nieprawidłowy schemat użytkownika
+    Data:
+      Invalid: Nieprawidłowe dane dla schematu użytkownika
   TokenExchange:
     FeatureDisabled: Funkcja wymiany tokenów jest wyłączona dla Twojej instancji. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -584,6 +603,13 @@ Errors:
       NotForAPI: Podrabiane tokeny nie są dozwolone w interfejsie API
     Impersonation:
       PolicyDisabled: Podszywanie się jest wyłączone w polityce bezpieczeństwa instancji
+  WebKey:
+    ActiveDelete: Nie można usunąć aktywnego klucza internetowego
+    Config: Nieprawidłowa konfiguracja klucza internetowego
+    Duplicate: Identyfikator klucza internetowego nie jest unikalny
+    FeatureDisabled: Funkcja klucza internetowego jest wyłączona
+    NoActive: Nie znaleziono aktywnego klucza internetowego
+    NotFound: Nie znaleziono klucza internetowego
 
 AggregateTypes:
   action: Działanie
@@ -607,6 +633,9 @@ AggregateTypes:
   restrictions: Ograniczenia
   system: System
   session: Sesja
+  web_key: Klucz internetowy
+  saml_request: Żądanie SAML
+  saml_session: Sesja SAML
 
 EventTypes:
   execution:
@@ -671,6 +700,13 @@ EventTypes:
         check:
           succeeded: Sprawdzenie inicjalizacji zakończone powodzeniem
           failed: Sprawdzenie inicjalizacji nie powiodło się
+      invite:
+        code:
+          added: Wygenerowano kod zaproszenia
+          sent: Kod zaproszenia został wysłany
+        check:
+          succeeded: Kontrola zaproszenia zakończona sukcesem
+          failed: Kontrola zaproszenia zakończona niepowodzeniem
       username:
         reserved: Zarezerwowano nazwę użytkownika
         released: Zwolniono nazwę użytkownika
@@ -1308,6 +1344,31 @@ EventTypes:
     deactivated: Schemat użytkownika dezaktywowany
     reactivated: Schemat użytkownika został ponownie aktywowany
     deleted: Schemat użytkownika został usunięty
+    user:
+      created: Użytkownik utworzony
+      updated: Użytkownik zaktualizowany
+      deleted: Użytkownik usunięty
+      email:
+        updated: Adres e-mail zmieniony
+        verified: Adres e-mail zweryfikowany
+        verification:
+          failed: Weryfikacja adresu e-mail nie powiodła się
+        code:
+          added: Wygenerowano kod weryfikacyjny adresu e-mail
+          sent: Wysłano kod weryfikacyjny adresu e-mail
+      phone:
+        updated: Numer telefonu zmieniony
+        verified: Numer telefonu zweryfikowany
+        verification:
+          failed: Weryfikacja numeru telefonu nie powiodła się
+        code:
+          added: Wygenerowano kod weryfikacyjny numeru telefonu
+          sent: Wysłano kod weryfikacyjny numeru telefonu
+  web_key:
+    added: Dodano klucz internetowy
+    activated: Klucz internetowy aktywowano
+    deactivated: Klucz internetowy dezaktywowano
+    removed: Klucz internetowy usunięto
 
 Application:
   OIDC:

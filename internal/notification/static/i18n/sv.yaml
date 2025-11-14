@@ -59,3 +59,10 @@ PasswordChange:
   Greeting: Hej {{.DisplayName}},
   Text: Lösenordet för din användare har ändrats. Om denna ändring inte gjordes av dig, vänligen återställ ditt lösenord omedelbart.
   ButtonText: Logga in
+InviteUser:
+  Title: Inbjudan till {{.ApplicationName}}
+  PreHeader: Inbjudan till {{.ApplicationName}}
+  Subject: Inbjudan till {{.ApplicationName}}
+  Greeting: Hej {{.DisplayName}},
+  Text: Din användare har blivit inbjuden till {{.ApplicationName}}. Klicka på knappen nedan för att slutföra inbjudansprocessen. Om du inte har begärt detta e-postmeddelande, ignorera det.
+  ButtonText: Acceptera inbjudan

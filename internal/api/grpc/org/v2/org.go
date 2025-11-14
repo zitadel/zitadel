@@ -3,15 +3,17 @@ package org
 import (
 	"context"
 
+	"connectrpc.com/connect"
+
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/user/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 )
 
-func (s *Server) AddOrganization(ctx context.Context, request *org.AddOrganizationRequest) (*org.AddOrganizationResponse, error) {
-	orgSetup, err := addOrganizationRequestToCommand(request)
+func (s *Server) AddOrganization(ctx context.Context, request *connect.Request[org.AddOrganizationRequest]) (*connect.Response[org.AddOrganizationResponse], error) {
+	orgSetup, err := addOrganizationRequestToCommand(request.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -31,6 +33,7 @@ func addOrganizationRequestToCommand(request *org.AddOrganizationRequest) (*comm
 		Name:         request.GetName(),
 		CustomDomain: "",
 		Admins:       admins,
+		OrgID:        request.GetOrgId(),
 	}, nil
 }
 
@@ -57,6 +60,7 @@ func addOrganizationRequestAdminToCommand(admin *org.AddOrganizationRequest_Admi
 		if err != nil {
 			return nil, err
 		}
+
 		return &command.OrgSetupAdmin{
 			Human: human,
 			Roles: admin.GetRoles(),
@@ -66,18 +70,21 @@ func addOrganizationRequestAdminToCommand(admin *org.AddOrganizationRequest_Admi
 	}
 }
 
-func createdOrganizationToPb(createdOrg *command.CreatedOrg) (_ *org.AddOrganizationResponse, err error) {
-	admins := make([]*org.AddOrganizationResponse_CreatedAdmin, len(createdOrg.CreatedAdmins))
-	for i, admin := range createdOrg.CreatedAdmins {
-		admins[i] = &org.AddOrganizationResponse_CreatedAdmin{
-			UserId:    admin.ID,
-			EmailCode: admin.EmailCode,
-			PhoneCode: admin.PhoneCode,
+func createdOrganizationToPb(createdOrg *command.CreatedOrg) (_ *connect.Response[org.AddOrganizationResponse], err error) {
+	admins := make([]*org.AddOrganizationResponse_CreatedAdmin, 0, len(createdOrg.OrgAdmins))
+	for _, admin := range createdOrg.OrgAdmins {
+		admin, ok := admin.(*command.CreatedOrgAdmin)
+		if ok {
+			admins = append(admins, &org.AddOrganizationResponse_CreatedAdmin{
+				UserId:    admin.GetID(),
+				EmailCode: admin.EmailCode,
+				PhoneCode: admin.PhoneCode,
+			})
 		}
 	}
-	return &org.AddOrganizationResponse{
+	return connect.NewResponse(&org.AddOrganizationResponse{
 		Details:        object.DomainToDetailsPb(createdOrg.ObjectDetails),
 		OrganizationId: createdOrg.ObjectDetails.ResourceOwner,
 		CreatedAdmins:  admins,
-	}, nil
+	}), nil
 }

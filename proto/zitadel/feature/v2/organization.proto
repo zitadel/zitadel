@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package zitadel.feature.v2;
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+import "zitadel/object/v2/object.proto";
+import "zitadel/feature/v2/feature.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/feature/v2;feature";
+
+message SetOrganizationFeaturesRequest {
+  string organization_id = 1[
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629023906488334\"";
+    }
+  ];
+}
+
+message SetOrganizationFeaturesResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+message ResetOrganizationFeaturesRequest {
+  string organization_id = 1[
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629023906488334\"";
+    }
+  ];
+}
+
+message ResetOrganizationFeaturesResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+message GetOrganizationFeaturesRequest {
+  string organization_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629023906488334\"";
+    }
+  ];
+  bool inheritance = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Inherit unset features from the resource owners. This option is recursive: if the flag is set, the resource's ancestors are consulted up to system defaults. If this option is disabled and the feature is not set on the organization, it will be omitted from the response or Not Found is returned when the organization has no features flags at all.";
+    }
+  ];
+} 
+
+message GetOrganizationFeaturesResponse {
+  zitadel.object.v2.Details details = 1;
+}

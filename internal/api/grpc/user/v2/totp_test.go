@@ -10,8 +10,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func Test_totpDetailsToPb(t *testing.T) {
@@ -63,7 +63,7 @@ func Test_totpDetailsToPb(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := totpDetailsToPb(tt.args.otp, tt.args.err)
 			require.ErrorIs(t, err, tt.wantErr)
-			if !proto.Equal(tt.want, got) {
+			if tt.want != nil && !proto.Equal(tt.want, got.Msg) {
 				t.Errorf("RegisterTOTPResponse =\n%v\nwant\n%v", got, tt.want)
 			}
 		})

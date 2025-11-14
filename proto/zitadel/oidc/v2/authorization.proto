@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+package zitadel.oidc.v2;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/oidc/v2;oidc";
+
+// AuthRequest represents an OpenID Connect Authorization Request as defined in
+// https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest
+message AuthRequest{
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    external_docs: {
+      url: "https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest";
+      description: "Find out more about OIDC Auth Request parameters";
+    }
+  };
+
+  // The unique identifier of the authorization request.
+  string id = 1;
+
+  // The timestamp when the authorization request was created.
+  google.protobuf.Timestamp creation_date = 2;
+
+  // The OAuth2/OIDC client_id of the application that initiated the authorization request.
+  string client_id = 3;
+
+  // The scopes by the application that the user must consent to.
+  repeated string scope = 4;
+
+  // The redirect_uri used in the authorization request. This must exactly match one of the redirect URIs registered for the client.
+  // This uri is used to send the authorization code or tokens back to the application.
+  string redirect_uri = 5;
+
+  // Prompts that must be displayed to the user.
+  repeated Prompt prompt = 6;
+
+  // End-User's preferred languages and scripts for the user interface, represented as a list of BCP47 [RFC5646]
+  // language tag values, ordered by preference.
+  // For instance, the value [fr-CA, fr, en] represents a preference for French as spoken in Canada,
+  // then French (without a region designation), followed by English (without a region designation).
+  // An error SHOULD NOT result if some or all of the requested locales are not supported.
+  repeated string ui_locales = 7;
+
+  // Login hint can be set by the application with a user identifier such as an email or phone number.
+  optional string login_hint = 8;
+
+  // Specifies the allowable elapsed time in seconds since the last time the End-User was actively authenticated.
+  // If the elapsed time is greater than this value, or the field is present with 0 duration, the user must be re-authenticated.
+  optional google.protobuf.Duration max_age = 9;
+
+  // User ID taken from a ID Token Hint if it was present and valid.
+  optional string hint_user_id = 10;
+}
+
+enum Prompt {
+  PROMPT_UNSPECIFIED = 0;
+  PROMPT_NONE = 1;
+  PROMPT_LOGIN = 2;
+  PROMPT_CONSENT = 3;
+  PROMPT_SELECT_ACCOUNT = 4;
+  PROMPT_CREATE = 5;
+}
+
+message AuthorizationError {
+  ErrorReason error = 1;
+  optional string error_description = 2;
+  optional string error_uri = 3;
+}
+
+enum ErrorReason {
+  ERROR_REASON_UNSPECIFIED = 0;
+  
+  // Error states from https://datatracker.ietf.org/doc/html/rfc6749#section-4.2.2.1
+  ERROR_REASON_INVALID_REQUEST = 1;
+  ERROR_REASON_UNAUTHORIZED_CLIENT = 2;
+  ERROR_REASON_ACCESS_DENIED = 3;
+  ERROR_REASON_UNSUPPORTED_RESPONSE_TYPE = 4;
+  ERROR_REASON_INVALID_SCOPE = 5;
+  ERROR_REASON_SERVER_ERROR = 6;
+  ERROR_REASON_TEMPORARY_UNAVAILABLE = 7;
+
+  // Error states from https://openid.net/specs/openid-connect-core-1_0.html#AuthError
+  ERROR_REASON_INTERACTION_REQUIRED = 8;
+  ERROR_REASON_LOGIN_REQUIRED = 9;
+  ERROR_REASON_ACCOUNT_SELECTION_REQUIRED = 10;
+  ERROR_REASON_CONSENT_REQUIRED = 11;
+  ERROR_REASON_INVALID_REQUEST_URI = 12;
+  ERROR_REASON_INVALID_REQUEST_OBJECT = 13;
+  ERROR_REASON_REQUEST_NOT_SUPPORTED = 14;
+  ERROR_REASON_REQUEST_URI_NOT_SUPPORTED = 15;
+  ERROR_REASON_REGISTRATION_NOT_SUPPORTED = 16;
+}
+
+message DeviceAuthorizationRequest {
+  // The unique identifier of the device authorization request to be used for authorizing or denying the request.
+  string id = 1;
+
+  // The client_id of the application that initiated the device authorization request.
+  string client_id = 2;
+
+  // The scopes requested by the application.
+  repeated string scope = 3;
+
+  // Name of the client application.
+  string app_name = 4;
+
+  // Name of the project the client application is part of.
+  string project_name = 5;
+}

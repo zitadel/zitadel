@@ -1,21 +1,20 @@
 package query
 
 import (
+	"cmp"
 	"context"
 	"database/sql"
 	_ "embed"
 	"encoding/json"
 	"errors"
-	"time"
+	"slices"
 
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	exec "github.com/zitadel/zitadel/internal/repository/execution"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -28,6 +27,10 @@ var (
 		name:  projection.ExecutionIDCol,
 		table: executionTable,
 	}
+	ExecutionColumnCreationDate = Column{
+		name:  projection.ExecutionCreationDateCol,
+		table: executionTable,
+	}
 	ExecutionColumnChangeDate = Column{
 		name:  projection.ExecutionChangeDateCol,
 		table: executionTable,
@@ -36,11 +39,6 @@ var (
 		name:  projection.ExecutionInstanceIDCol,
 		table: executionTable,
 	}
-	ExecutionColumnSequence = Column{
-		name:  projection.ExecutionSequenceCol,
-		table: executionTable,
-	}
-
 	executionTargetsTable = table{
 		name:          projection.ExecutionTable + "_" + projection.ExecutionTargetSuffix,
 		instanceIDCol: projection.ExecutionTargetInstanceIDCol,
@@ -63,10 +61,6 @@ var (
 var (
 	//go:embed execution_targets.sql
 	executionTargetsQuery string
-	//go:embed targets_by_execution_id.sql
-	TargetsByExecutionIDQuery string
-	//go:embed targets_by_execution_ids.sql
-	TargetsByExecutionIDsQuery string
 )
 
 type Executions struct {
@@ -79,7 +73,6 @@ func (e *Executions) SetState(s *State) {
 }
 
 type Execution struct {
-	ID string
 	domain.ObjectDetails
 
 	Targets []*exec.Target
@@ -102,8 +95,8 @@ func (q *Queries) SearchExecutions(ctx context.Context, queries *ExecutionSearch
 	eq := sq.Eq{
 		ExecutionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	query, scan := prepareExecutionsQuery(ctx, q.client)
-	return genericRowsQueryWithState[*Executions](ctx, q.client, executionTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
+	query, scan := prepareExecutionsQuery()
+	return genericRowsQueryWithState(ctx, q.client, executionTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
 }
 
 func (q *Queries) GetExecutionByID(ctx context.Context, id string) (execution *Execution, err error) {
@@ -111,8 +104,8 @@ func (q *Queries) GetExecutionByID(ctx context.Context, id string) (execution *E
 		ExecutionColumnID.identifier():         id,
 		ExecutionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	query, scan := prepareExecutionQuery(ctx, q.client)
-	return genericRowQuery[*Execution](ctx, q.client, query.Where(eq), scan)
+	query, scan := prepareExecutionQuery()
+	return genericRowQuery(ctx, q.client, query.Where(eq), scan)
 }
 
 func NewExecutionInIDsSearchQuery(values []string) (SearchQuery, error) {
@@ -155,67 +148,12 @@ func targetItemJSONB(t domain.ExecutionTargetType, targetItem string) ([]byte, e
 	return json.Marshal([]*executionTarget{target})
 }
 
-// TargetsByExecutionID query list of targets for best match of a list of IDs,  for example:
-// [ "request/zitadel.action.v3alpha.ActionService/GetTargetByID",
-// "request/zitadel.action.v3alpha.ActionService",
-// "request" ]
-func (q *Queries) TargetsByExecutionID(ctx context.Context, ids []string) (execution []*ExecutionTarget, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.End() }()
-
-	instanceID := authz.GetInstance(ctx).InstanceID()
-	if instanceID == "" {
-		return nil, nil
-	}
-
-	err = q.client.QueryContext(ctx,
-		func(rows *sql.Rows) error {
-			execution, err = scanExecutionTargets(rows)
-			return err
-		},
-		TargetsByExecutionIDQuery,
-		instanceID,
-		database.TextArray[string](ids),
-	)
-	return execution, err
-}
-
-// TargetsByExecutionIDs query list of targets for best matches of 2 separate lists of IDs, combined for performance, for example:
-// [ "request/zitadel.action.v3alpha.ActionService/GetTargetByID",
-// "request/zitadel.action.v3alpha.ActionService",
-// "request" ]
-// and
-// [ "response/zitadel.action.v3alpha.ActionService/GetTargetByID",
-// "response/zitadel.action.v3alpha.ActionService",
-// "response" ]
-func (q *Queries) TargetsByExecutionIDs(ctx context.Context, ids1, ids2 []string) (execution []*ExecutionTarget, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.End() }()
-
-	instanceID := authz.GetInstance(ctx).InstanceID()
-	if instanceID == "" {
-		return nil, nil
-	}
-
-	err = q.client.QueryContext(ctx,
-		func(rows *sql.Rows) error {
-			execution, err = scanExecutionTargets(rows)
-			return err
-		},
-		TargetsByExecutionIDsQuery,
-		instanceID,
-		database.TextArray[string](ids1),
-		database.TextArray[string](ids2),
-	)
-	return execution, err
-}
-
-func prepareExecutionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(row *sql.Row) (*Execution, error)) {
+func prepareExecutionQuery() (sq.SelectBuilder, func(row *sql.Row) (*Execution, error)) {
 	return sq.Select(
 			ExecutionColumnInstanceID.identifier(),
 			ExecutionColumnID.identifier(),
+			ExecutionColumnCreationDate.identifier(),
 			ExecutionColumnChangeDate.identifier(),
-			ExecutionColumnSequence.identifier(),
 			executionTargetsListCol.identifier(),
 		).From(executionTable.identifier()).
 			Join("(" + executionTargetsQuery + ") AS " + executionTargetsTableAlias.alias + " ON " +
@@ -226,12 +164,12 @@ func prepareExecutionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 		scanExecution
 }
 
-func prepareExecutionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(rows *sql.Rows) (*Executions, error)) {
+func prepareExecutionsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Executions, error)) {
 	return sq.Select(
 			ExecutionColumnInstanceID.identifier(),
 			ExecutionColumnID.identifier(),
+			ExecutionColumnCreationDate.identifier(),
 			ExecutionColumnChangeDate.identifier(),
-			ExecutionColumnSequence.identifier(),
 			executionTargetsListCol.identifier(),
 			countColumn.identifier(),
 		).From(executionTable.identifier()).
@@ -256,8 +194,8 @@ func scanExecution(row *sql.Row) (*Execution, error) {
 	err := row.Scan(
 		&execution.ResourceOwner,
 		&execution.ID,
+		&execution.CreationDate,
 		&execution.EventDate,
-		&execution.Sequence,
 		&targets,
 	)
 	if err != nil {
@@ -292,13 +230,15 @@ func executionTargetsUnmarshal(data []byte) ([]*exec.Target, error) {
 	}
 
 	targets := make([]*exec.Target, len(executionTargets))
-	// position starts with 1
-	for _, item := range executionTargets {
+	slices.SortFunc(executionTargets, func(a, b *executionTarget) int {
+		return cmp.Compare(a.Position, b.Position)
+	})
+	for i, item := range executionTargets {
 		if item.Target != "" {
-			targets[item.Position-1] = &exec.Target{Type: domain.ExecutionTargetTypeTarget, Target: item.Target}
+			targets[i] = &exec.Target{Type: domain.ExecutionTargetTypeTarget, Target: item.Target}
 		}
 		if item.Include != "" {
-			targets[item.Position-1] = &exec.Target{Type: domain.ExecutionTargetTypeInclude, Target: item.Include}
+			targets[i] = &exec.Target{Type: domain.ExecutionTargetTypeInclude, Target: item.Include}
 		}
 	}
 	return targets, nil
@@ -315,8 +255,8 @@ func scanExecutions(rows *sql.Rows) (*Executions, error) {
 		err := rows.Scan(
 			&execution.ResourceOwner,
 			&execution.ID,
+			&execution.CreationDate,
 			&execution.EventDate,
-			&execution.Sequence,
 			&targets,
 			&count,
 		)
@@ -344,80 +284,4 @@ func scanExecutions(rows *sql.Rows) (*Executions, error) {
 			Count: count,
 		},
 	}, nil
-}
-
-type ExecutionTarget struct {
-	InstanceID       string
-	ExecutionID      string
-	TargetID         string
-	TargetType       domain.TargetType
-	Endpoint         string
-	Timeout          time.Duration
-	InterruptOnError bool
-}
-
-func (e *ExecutionTarget) GetExecutionID() string {
-	return e.ExecutionID
-}
-func (e *ExecutionTarget) GetTargetID() string {
-	return e.TargetID
-}
-func (e *ExecutionTarget) IsInterruptOnError() bool {
-	return e.InterruptOnError
-}
-func (e *ExecutionTarget) GetEndpoint() string {
-	return e.Endpoint
-}
-func (e *ExecutionTarget) GetTargetType() domain.TargetType {
-	return e.TargetType
-}
-func (e *ExecutionTarget) GetTimeout() time.Duration {
-	return e.Timeout
-}
-
-func scanExecutionTargets(rows *sql.Rows) ([]*ExecutionTarget, error) {
-	targets := make([]*ExecutionTarget, 0)
-	for rows.Next() {
-		target := new(ExecutionTarget)
-
-		var (
-			instanceID       = &sql.NullString{}
-			executionID      = &sql.NullString{}
-			targetID         = &sql.NullString{}
-			targetType       = &sql.NullInt32{}
-			endpoint         = &sql.NullString{}
-			timeout          = &sql.NullInt64{}
-			interruptOnError = &sql.NullBool{}
-		)
-
-		err := rows.Scan(
-			executionID,
-			instanceID,
-			targetID,
-			targetType,
-			endpoint,
-			timeout,
-			interruptOnError,
-		)
-
-		if err != nil {
-			return nil, err
-		}
-
-		target.InstanceID = instanceID.String
-		target.ExecutionID = executionID.String
-		target.TargetID = targetID.String
-		target.TargetType = domain.TargetType(targetType.Int32)
-		target.Endpoint = endpoint.String
-		target.Timeout = time.Duration(timeout.Int64)
-		target.InterruptOnError = interruptOnError.Bool
-
-		targets = append(targets, target)
-	}
-
-	if err := rows.Close(); err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-37ardr0pki", "Errors.Query.CloseRows")
-	}
-
-	return targets, nil
 }

@@ -15,6 +15,9 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+import "zitadel/filter/v2beta/filter.proto";
+import "zitadel/settings/v2beta/organization_settings.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta;settings";
 
@@ -30,7 +33,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     }
     license: {
       name: "Apache 2.0",
-      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSING.md";
     };
   };
   schemes: HTTPS;
@@ -106,9 +109,12 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
+// Deprecated: use settings service v2 instead. This service will be removed in the next major version of ZITADEL.
 service SettingsService {
 
   // Get basic information over the instance
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc GetGeneralSettings (GetGeneralSettingsRequest) returns (GetGeneralSettingsResponse) {
     option (google.api.http) = {
       get: "/v2beta/settings"
@@ -121,6 +127,7 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Get basic information over the instance";
       description: "Return the basic information of the instance for the requested context"
       responses: {
@@ -133,6 +140,8 @@ service SettingsService {
   }
 
   // Get the login settings
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc GetLoginSettings (GetLoginSettingsRequest) returns (GetLoginSettingsResponse) {
     option (google.api.http) = {
       get: "/v2beta/settings/login"
@@ -145,6 +154,7 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Get the login settings";
       description: "Return the settings for the requested context"
       responses: {
@@ -157,6 +167,8 @@ service SettingsService {
   }
 
   // Get the current active identity providers
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc GetActiveIdentityProviders (GetActiveIdentityProvidersRequest) returns (GetActiveIdentityProvidersResponse) {
     option (google.api.http) = {
       get: "/v2beta/settings/login/idps"
@@ -169,6 +181,7 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Get the current active identity providers";
       description: "Return the current active identity providers for the requested context"
       responses: {
@@ -181,6 +194,8 @@ service SettingsService {
   }
 
   // Get the password complexity settings
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc GetPasswordComplexitySettings (GetPasswordComplexitySettingsRequest) returns (GetPasswordComplexitySettingsResponse) {
     option (google.api.http) = {
       get: "/v2beta/settings/password/complexity"
@@ -193,6 +208,7 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Get the password complexity settings";
       description: "Return the password complexity settings for the requested context"
       responses: {
@@ -205,6 +221,8 @@ service SettingsService {
   }
 
   // Get the password expiry settings
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc GetPasswordExpirySettings (GetPasswordExpirySettingsRequest) returns (GetPasswordExpirySettingsResponse) {
     option (google.api.http) = {
       get: "/v2beta/settings/password/expiry"
@@ -217,6 +235,7 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Get the password expiry settings";
       description: "Return the password expiry settings for the requested context"
       responses: {
@@ -229,6 +248,8 @@ service SettingsService {
   }
 
   // Get the current active branding settings
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc GetBrandingSettings (GetBrandingSettingsRequest) returns (GetBrandingSettingsResponse) {
     option (google.api.http) = {
       get: "/v2beta/settings/branding"
@@ -241,6 +262,7 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Get the current active branding settings";
       description: "Return the current active branding settings for the requested context"
       responses: {
@@ -253,6 +275,8 @@ service SettingsService {
   }
 
   // Get the domain settings
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc GetDomainSettings (GetDomainSettingsRequest) returns (GetDomainSettingsResponse) {
     option (google.api.http) = {
       get: "/v2beta/settings/domain"
@@ -265,6 +289,7 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Get the domain settings";
       description: "Return the domain settings for the requested context"
       responses: {
@@ -277,6 +302,8 @@ service SettingsService {
   }
 
   // Get the legal and support settings
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc GetLegalAndSupportSettings (GetLegalAndSupportSettingsRequest) returns (GetLegalAndSupportSettingsResponse) {
     option (google.api.http) = {
       get: "/v2beta/settings/legal_support"
@@ -289,6 +316,7 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Get the legal and support settings";
       description: "Return the legal settings for the requested context"
       responses: {
@@ -301,6 +329,8 @@ service SettingsService {
   }
 
   // Get the lockout settings
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc GetLockoutSettings (GetLockoutSettingsRequest) returns (GetLockoutSettingsResponse) {
     option (google.api.http) = {
       get: "/v2beta/settings/lockout"
@@ -313,6 +343,7 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Get the lockout settings";
       description: "Return the lockout settings for the requested context, which define when a user will be locked"
       responses: {
@@ -325,6 +356,8 @@ service SettingsService {
   }
 
 // Get the security settings
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc GetSecuritySettings(GetSecuritySettingsRequest) returns (GetSecuritySettingsResponse) {
     option (google.api.http) = {
       get: "/v2beta/settings/security";
@@ -337,13 +370,15 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Settings";
+      deprecated: true;
       summary: "Get Security Settings";
       description: "Returns the security settings of the ZITADEL instance."
     };
   }
 
 // Set the security settings
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc SetSecuritySettings(SetSecuritySettingsRequest) returns (SetSecuritySettingsResponse) {
     option (google.api.http) = {
       put: "/v2beta/policies/security";
@@ -357,9 +392,110 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Settings";
+      deprecated: true;
       summary: "Set Security Settings";
       description: "Set the security settings of the ZITADEL instance."
+    };
+  }
+
+  // Set Organization Settings
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
+  // Sets the settings specific to an organization.
+  // Organization scopes usernames defines that the usernames have to be unique in the organization scope, can only be changed if the usernames of the users are unique in the scope.
+  //
+  // Required permissions:
+  //   - `iam.policy.write`
+  rpc SetOrganizationSettings(SetOrganizationSettingsRequest) returns (SetOrganizationSettingsResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
+      responses: {
+        key: "200";
+        value: {
+          description: "The translations was successfully set.";
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      post: "/v2/settings/organization";
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // Delete Organization Settings
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
+  // Delete the settings specific to an organization.
+  //
+  // Required permissions:
+  //   - `iam.policy.delete`
+  rpc DeleteOrganizationSettings(DeleteOrganizationSettingsRequest) returns (DeleteOrganizationSettingsResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
+      responses: {
+        key: "200";
+        value: {
+          description: "The translations was successfully set.";
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      delete: "/v2/settings/organization";
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // List Organization Settings
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
+  // Returns a list of organization settings.
+  //
+  // Required permission:
+  //   - `iam.policy.read`
+  //   - `org.policy.read`
+  rpc ListOrganizationSettings(ListOrganizationSettingsRequest) returns (ListOrganizationSettingsResponse) {
+    option (google.api.http) = {
+      post: "/v2/settings/organization/search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all project grants matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+        };
+      };
     };
   }
 }
@@ -476,4 +612,55 @@ message SetSecuritySettingsRequest{
 
 message SetSecuritySettingsResponse{
   zitadel.object.v2beta.Details details = 1;
+}
+
+
+message SetOrganizationSettingsRequest {
+  // Organization ID in which this settings are set.
+  string organization_id = 1;
+  // Force the usernames in the organization to be unique, only possible to set if the existing users already have unique usernames in the organization context.
+  optional bool organization_scoped_usernames = 2;
+}
+
+message SetOrganizationSettingsResponse {
+  // The timestamp of the set of the organization settings.
+  google.protobuf.Timestamp set_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message DeleteOrganizationSettingsRequest {
+  // Organization ID in which this settings are set.
+  string organization_id = 1;
+}
+
+message DeleteOrganizationSettingsResponse {
+  // The timestamp of the deletion of the organization settings.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message ListOrganizationSettingsRequest{
+  // List limitations and ordering.
+  optional zitadel.filter.v2beta.PaginationRequest pagination = 1;
+  // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
+  optional OrganizationSettingsFieldName sorting_column = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"ORGANIZATION_SETTINGS_FIELD_NAME_CREATION_DATE\""
+    }
+  ];
+  repeated OrganizationSettingsSearchFilter filters = 4;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"pagination\":{\"offset\":0,\"limit\":0,\"asc\":true},\"sortingColumn\":\"ORGANIZATION_SETTINGS_FIELD_NAME_CREATION_DATE\",\"filters\":[{\"inOrganizationIdsFilter\":{\"ids\":[\"28746028909593987\"]}}]}";
+  };
+}
+
+message ListOrganizationSettingsResponse {
+  zitadel.filter.v2beta.PaginationResponse pagination = 1;
+  repeated OrganizationSettings organization_settings = 2;
 }

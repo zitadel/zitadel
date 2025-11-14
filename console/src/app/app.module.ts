@@ -1,11 +1,12 @@
 import { CommonModule, registerLocaleData } from '@angular/common';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import localeBg from '@angular/common/locales/bg';
 import localeDe from '@angular/common/locales/de';
 import localeCs from '@angular/common/locales/cs';
 import localeEn from '@angular/common/locales/en';
 import localeEs from '@angular/common/locales/es';
 import localeFr from '@angular/common/locales/fr';
+import localeId from '@angular/common/locales/id';
 import localeIt from '@angular/common/locales/it';
 import localeJa from '@angular/common/locales/ja';
 import localeMk from '@angular/common/locales/mk';
@@ -15,7 +16,11 @@ import localeZh from '@angular/common/locales/zh';
 import localeRu from '@angular/common/locales/ru';
 import localeNl from '@angular/common/locales/nl';
 import localeSv from '@angular/common/locales/sv';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import localeHu from '@angular/common/locales/hu';
+import localeKo from '@angular/common/locales/ko';
+import localeRo from '@angular/common/locales/ro';
+import localeTr from '@angular/common/locales/tr';
+import { NgModule, inject, provideAppInitializer } from '@angular/core';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -29,9 +34,6 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { AuthConfig, OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
 import * as i18nIsoCountries from 'i18n-iso-countries';
 import { from, Observable } from 'rxjs';
-import { AuthGuard } from 'src/app/guards/auth.guard';
-import { RoleGuard } from 'src/app/guards/role.guard';
-import { UserGuard } from 'src/app/guards/user.guard';
 import { InfoOverlayModule } from 'src/app/modules/info-overlay/info-overlay.module';
 import { AssetService } from 'src/app/services/asset.service';
 import { AppRoutingModule } from './app-routing.module';
@@ -71,6 +73,11 @@ import { StorageService } from './services/storage.service';
 import { ThemeService } from './services/theme.service';
 import { ToastService } from './services/toast.service';
 import { LanguagesService } from './services/languages.service';
+import { PosthogService } from './services/posthog.service';
+import { NewHeaderComponent } from './modules/new-header/new-header.component';
+import { provideTanStackQuery, QueryClient, withDevtools } from '@tanstack/angular-query-experimental';
+import { CdkOverlayOrigin } from '@angular/cdk/overlay';
+import { provideNgIconsConfig } from '@ng-icons/core';
 
 registerLocaleData(localeDe);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/de.json'));
@@ -80,6 +87,8 @@ registerLocaleData(localeEs);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/es.json'));
 registerLocaleData(localeFr);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/fr.json'));
+registerLocaleData(localeId);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/id.json'));
 registerLocaleData(localeIt);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/it.json'));
 registerLocaleData(localeJa);
@@ -102,6 +111,14 @@ registerLocaleData(localeNl);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/nl.json'));
 registerLocaleData(localeSv);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/sv.json'));
+registerLocaleData(localeHu);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/hu.json'));
+registerLocaleData(localeKo);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/ko.json'));
+registerLocaleData(localeRo);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/ro.json'));
+registerLocaleData(localeTr);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/tr.json'));
 
 export class WebpackTranslateLoader implements TranslateLoader {
   getTranslation(lang: string): Observable<any> {
@@ -130,8 +147,11 @@ const authConfig: AuthConfig = {
 
 @NgModule({
   declarations: [AppComponent],
+  bootstrap: [AppComponent],
+  exports: [],
   imports: [
     AppRoutingModule,
+
     CommonModule,
     BrowserModule,
     HeaderModule,
@@ -147,7 +167,6 @@ const authConfig: AuthConfig = {
     HasRoleModule,
     InfoOverlayModule,
     BrowserAnimationsModule,
-    HttpClientModule,
     MatIconModule,
     MatTooltipModule,
     FooterModule,
@@ -158,26 +177,21 @@ const authConfig: AuthConfig = {
     MatDialogModule,
     KeyboardShortcutsModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: false }),
+    NewHeaderComponent,
+    CdkOverlayOrigin,
   ],
   providers: [
-    AuthGuard,
-    RoleGuard,
-    UserGuard,
     ThemeService,
     EnvironmentService,
     ExhaustedService,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: appInitializerFn,
-      multi: true,
-      deps: [GrpcService],
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: stateHandlerFn,
-      multi: true,
-      deps: [StatehandlerService],
-    },
+    provideAppInitializer(() => {
+      const initializerFn = appInitializerFn(inject(GrpcService));
+      return initializerFn();
+    }),
+    provideAppInitializer(() => {
+      const initializerFn = stateHandlerFn(inject(StatehandlerService));
+      return initializerFn();
+    }),
     {
       provide: AuthConfig,
       useValue: authConfig,
@@ -233,9 +247,17 @@ const authConfig: AuthConfig = {
     ToastService,
     NavigationService,
     LanguagesService,
+    PosthogService,
     { provide: 'windowObject', useValue: window },
+    provideTanStackQuery(
+      new QueryClient(),
+      withDevtools(() => ({ loadDevtools: 'auto' })),
+    ),
+    provideNgIconsConfig({
+      size: '1rem',
+    }),
+    provideHttpClient(withInterceptorsFromDi()),
   ],
-  bootstrap: [AppComponent],
 })
 export class AppModule {
   constructor() {}

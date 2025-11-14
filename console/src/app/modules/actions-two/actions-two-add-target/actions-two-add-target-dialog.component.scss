@@ -1,0 +1,29 @@
+.target-checkbox {
+  margin-bottom: 1rem;
+
+  .target-condition-text {
+    display: flex;
+    flex-direction: column;
+
+    .description {
+      font-size: 13px;
+    }
+  }
+}
+
+.target-description {
+  margin-bottom: 0;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.name-hint {
+  font-size: 12px;
+}
+
+.types-description {
+  white-space: pre-line;
+}

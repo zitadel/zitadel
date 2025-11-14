@@ -59,3 +59,10 @@ PasswordChange:
   Greeting: Olá {{.DisplayName}},
   Text: A senha do seu usuário foi alterada. Se esta alteração não foi feita por você, recomendamos que você redefina sua senha imediatamente.
   ButtonText: Fazer login
+InviteUser:
+  Title: Convite para {{.ApplicationName}}
+  PreHeader: Convite para {{.ApplicationName}}
+  Subject: Convite para {{.ApplicationName}}
+  Greeting: Olá {{.DisplayName}},
+  Text: Seu usuário foi convidado para {{.ApplicationName}}. Clique no botão abaixo para concluir o processo de convite. Se você não solicitou este e-mail, por favor, ignore-o.
+  ButtonText: Aceitar convite

@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package zitadel.settings.v2;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "zitadel/settings/v2/settings.proto";
+
+message LockoutSettings {
+  // The amount of failed password attempts before the account gets locked.
+  // Attempts are reset as soon as the password is entered correctly or the password is reset.
+  // If set to 0 the account will never be locked.
+  uint64 max_password_attempts = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"10\""
+    }
+  ];
+
+  // ResourceOwnerType returns if the settings is managed on the organization explicitly or
+  // fell back on the instance settings.
+  ResourceOwnerType resource_owner_type = 2;
+
+  // THe amount of failed OTP (TOTP, SMS, Email) attempts before the account gets locked.
+  // Attempts are reset as soon as the OTP is entered correctly.
+  // If set to 0 the account will never be locked.
+  uint64 max_otp_attempts = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"10\""
+    }
+  ];
+}

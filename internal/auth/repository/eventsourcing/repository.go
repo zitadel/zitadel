@@ -11,6 +11,7 @@ import (
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	eventstore2 "github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/query"
@@ -78,6 +79,8 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 			ProjectProvider:           queryView,
 			ApplicationProvider:       queries,
 			CustomTextProvider:        queries,
+			PasswordReset:             command,
+			PasswordChecker:           command,
 			IdGenerator:               id.SonyFlakeGenerator(),
 		},
 		eventstore.TokenRepo{
@@ -117,8 +120,12 @@ func (q queryViewWrapper) UserGrantsByProjectAndUserID(ctx context.Context, proj
 	if err != nil {
 		return nil, err
 	}
-	queries := &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantUserID, userGrantProjectID}}
-	grants, err := q.Queries.UserGrants(ctx, queries, true)
+	activeQuery, err := query.NewUserGrantStateQuery(domain.UserGrantStateActive)
+	if err != nil {
+		return nil, err
+	}
+	queries := &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantUserID, userGrantProjectID, activeQuery}}
+	grants, err := q.Queries.UserGrants(ctx, queries, true, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -26,7 +26,6 @@ func (e *UserSchemas) SetState(s *State) {
 }
 
 type UserSchema struct {
-	ID string
 	domain.ObjectDetails
 	State                  domain.UserSchemaState
 	Type                   string
@@ -47,6 +46,10 @@ var (
 	}
 	UserSchemaIDCol = Column{
 		name:  projection.UserSchemaIDCol,
+		table: userSchemaTable,
+	}
+	UserSchemaCreationDateCol = Column{
+		name:  projection.UserSchemaCreationDateCol,
 		table: userSchemaTable,
 	}
 	UserSchemaChangeDateCol = Column{
@@ -93,7 +96,7 @@ func (q *Queries) GetUserSchemaByID(ctx context.Context, id string) (userSchema 
 	}
 
 	query, scan := prepareUserSchemaQuery()
-	return genericRowQuery[*UserSchema](ctx, q.client, query.Where(eq), scan)
+	return genericRowQuery(ctx, q.client, query.Where(eq), scan)
 }
 
 func (q *Queries) SearchUserSchema(ctx context.Context, queries *UserSchemaSearchQueries) (userSchemas *UserSchemas, err error) {
@@ -105,7 +108,7 @@ func (q *Queries) SearchUserSchema(ctx context.Context, queries *UserSchemaSearc
 	}
 
 	query, scan := prepareUserSchemasQuery()
-	return genericRowsQueryWithState[*UserSchemas](ctx, q.client, userSchemaTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
+	return genericRowsQueryWithState(ctx, q.client, userSchemaTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
 }
 
 func (q *UserSchemaSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -131,6 +134,7 @@ func NewUserSchemaStateSearchQuery(value domain.UserSchemaState) (SearchQuery, e
 func prepareUserSchemaQuery() (sq.SelectBuilder, func(*sql.Row) (*UserSchema, error)) {
 	return sq.Select(
 			UserSchemaIDCol.identifier(),
+			UserSchemaCreationDateCol.identifier(),
 			UserSchemaChangeDateCol.identifier(),
 			UserSchemaSequenceCol.identifier(),
 			UserSchemaInstanceIDCol.identifier(),
@@ -147,6 +151,7 @@ func prepareUserSchemaQuery() (sq.SelectBuilder, func(*sql.Row) (*UserSchema, er
 			var schema database.ByteArray[byte]
 			err := row.Scan(
 				&u.ID,
+				&u.CreationDate,
 				&u.EventDate,
 				&u.Sequence,
 				&u.ResourceOwner,
@@ -173,6 +178,7 @@ func prepareUserSchemaQuery() (sq.SelectBuilder, func(*sql.Row) (*UserSchema, er
 func prepareUserSchemasQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserSchemas, error)) {
 	return sq.Select(
 			UserSchemaIDCol.identifier(),
+			UserSchemaCreationDateCol.identifier(),
 			UserSchemaChangeDateCol.identifier(),
 			UserSchemaSequenceCol.identifier(),
 			UserSchemaInstanceIDCol.identifier(),
@@ -195,6 +201,7 @@ func prepareUserSchemasQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserSchemas,
 				u := new(UserSchema)
 				err := rows.Scan(
 					&u.ID,
+					&u.CreationDate,
 					&u.EventDate,
 					&u.Sequence,
 					&u.ResourceOwner,

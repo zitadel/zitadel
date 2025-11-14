@@ -1,7 +1,6 @@
 <cnsl-refresh-table
   [loading]="loading$ | async"
   (refreshed)="refreshPage()"
-  [dataSize]="dataSource.data.length"
   [timestamp]="keyResult?.details?.viewTimestamp"
   [selection]="selection"
 >

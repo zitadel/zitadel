@@ -275,13 +275,13 @@ func OrgReactivatedEventMapper(event eventstore.Event) (eventstore.Event, error)
 }
 
 type OrgRemovedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-	name                 string
-	usernames            []string
-	loginMustBeDomain    bool
-	domains              []string
-	externalIDPs         []*domain.UserIDPLink
-	samlEntityIDs        []string
+	eventstore.BaseEvent        `json:"-"`
+	name                        string
+	usernames                   []string
+	organizationScopedUsernames bool
+	domains                     []string
+	externalIDPs                []*domain.UserIDPLink
+	samlEntityIDs               []string
 }
 
 func (e *OrgRemovedEvent) Payload() interface{} {
@@ -293,7 +293,7 @@ func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 		NewRemoveOrgNameUniqueConstraint(e.name),
 	}
 	for _, name := range e.usernames {
-		constraints = append(constraints, user.NewRemoveUsernameUniqueConstraint(name, e.Aggregate().ID, e.loginMustBeDomain))
+		constraints = append(constraints, user.NewRemoveUsernameUniqueConstraint(name, e.Aggregate().ID, e.organizationScopedUsernames))
 	}
 	for _, domain := range e.domains {
 		constraints = append(constraints, NewRemoveOrgDomainUniqueConstraint(domain))
@@ -310,39 +310,23 @@ func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 func (e *OrgRemovedEvent) Fields() []*eventstore.FieldOperation {
 	// TODO: project grants are currently not removed because we don't have the relationship between the granted org and the grant
 	return []*eventstore.FieldOperation{
-		eventstore.SetField(
-			e.Aggregate(),
-			orgSearchObject(e.Aggregate().ID),
-			OrgStateSearchField,
-			&eventstore.Value{
-				Value:       domain.OrgStateRemoved,
-				ShouldIndex: true,
-			},
-
-			eventstore.FieldTypeInstanceID,
-			eventstore.FieldTypeResourceOwner,
-			eventstore.FieldTypeAggregateType,
-			eventstore.FieldTypeAggregateID,
-			eventstore.FieldTypeObjectType,
-			eventstore.FieldTypeObjectID,
-			eventstore.FieldTypeFieldName,
-		),
+		eventstore.RemoveSearchFieldsByAggregate(e.Aggregate()),
 	}
 }
 
-func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string, usernames []string, loginMustBeDomain bool, domains []string, externalIDPs []*domain.UserIDPLink, samlEntityIDs []string) *OrgRemovedEvent {
+func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string, usernames []string, organizationScopedUsernames bool, domains []string, externalIDPs []*domain.UserIDPLink, samlEntityIDs []string) *OrgRemovedEvent {
 	return &OrgRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			OrgRemovedEventType,
 		),
-		name:              name,
-		usernames:         usernames,
-		domains:           domains,
-		externalIDPs:      externalIDPs,
-		samlEntityIDs:     samlEntityIDs,
-		loginMustBeDomain: loginMustBeDomain,
+		name:                        name,
+		usernames:                   usernames,
+		domains:                     domains,
+		externalIDPs:                externalIDPs,
+		samlEntityIDs:               samlEntityIDs,
+		organizationScopedUsernames: organizationScopedUsernames,
 	}
 }
 

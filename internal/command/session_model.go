@@ -20,9 +20,11 @@ type WebAuthNChallengeModel struct {
 }
 
 type OTPCode struct {
-	Code         *crypto.CryptoValue
-	Expiry       time.Duration
-	CreationDate time.Time
+	Code           *crypto.CryptoValue
+	Expiry         time.Duration
+	CreationDate   time.Time
+	GeneratorID    string
+	VerificationID string
 }
 
 func (p *WebAuthNChallengeModel) WebAuthNLogin(human *domain.Human, credentialAssertionData []byte) *domain.WebAuthNLogin {
@@ -92,6 +94,8 @@ func (wm *SessionWriteModel) Reduce() error {
 			wm.reduceTOTPChecked(e)
 		case *session.OTPSMSChallengedEvent:
 			wm.reduceOTPSMSChallenged(e)
+		case *session.OTPSMSSentEvent:
+			wm.reduceOTPSMSSent(e)
 		case *session.OTPSMSCheckedEvent:
 			wm.reduceOTPSMSChecked(e)
 		case *session.OTPEmailChallengedEvent:
@@ -123,6 +127,7 @@ func (wm *SessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 			session.WebAuthNCheckedType,
 			session.TOTPCheckedType,
 			session.OTPSMSChallengedType,
+			session.OTPSMSSentType,
 			session.OTPSMSCheckedType,
 			session.OTPEmailChallengedType,
 			session.OTPEmailCheckedType,
@@ -183,7 +188,13 @@ func (wm *SessionWriteModel) reduceOTPSMSChallenged(e *session.OTPSMSChallengedE
 		Code:         e.Code,
 		Expiry:       e.Expiry,
 		CreationDate: e.CreationDate(),
+		GeneratorID:  e.GeneratorID,
 	}
+}
+
+func (wm *SessionWriteModel) reduceOTPSMSSent(e *session.OTPSMSSentEvent) {
+	wm.OTPSMSCodeChallenge.GeneratorID = e.GeneratorInfo.GetID()
+	wm.OTPSMSCodeChallenge.VerificationID = e.GeneratorInfo.GetVerificationID()
 }
 
 func (wm *SessionWriteModel) reduceOTPSMSChecked(e *session.OTPSMSCheckedEvent) {

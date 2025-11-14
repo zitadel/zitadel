@@ -5,11 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -30,9 +32,23 @@ type Session struct {
 	Tokens  *oidc.Tokens[*oidc.IDTokenClaims]
 }
 
+func NewSession(provider *Provider, tokens *oidc.Tokens[*oidc.IDTokenClaims]) *Session {
+	return &Session{Provider: provider, Tokens: tokens}
+}
+
+func NewSessionFromRequest(provider *Provider, r *http.Request) *Session {
+	token := strings.TrimPrefix(r.Header.Get(provider.headerName), oidc.PrefixBearer)
+	return NewSession(provider, &oidc.Tokens[*oidc.IDTokenClaims]{IDToken: token, Token: &oauth2.Token{}})
+}
+
 // GetAuth implements the [idp.Session] interface.
-func (s *Session) GetAuth(ctx context.Context) (string, bool) {
+func (s *Session) GetAuth(ctx context.Context) (idp.Auth, error) {
 	return idp.Redirect(s.AuthURL)
+}
+
+// PersistentParameters implements the [idp.Session] interface.
+func (s *Session) PersistentParameters() map[string]any {
+	return nil
 }
 
 // FetchUser implements the [idp.Session] interface.
@@ -46,6 +62,13 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 		return nil, err
 	}
 	return &User{s.Tokens.IDTokenClaims}, nil
+}
+
+func (s *Session) ExpiresAt() time.Time {
+	if s.Tokens == nil || s.Tokens.IDTokenClaims == nil {
+		return time.Time{}
+	}
+	return s.Tokens.IDTokenClaims.GetExpiration()
 }
 
 func (s *Session) validateToken(ctx context.Context, token string) (*oidc.IDTokenClaims, error) {
@@ -81,6 +104,12 @@ func (s *Session) validateToken(ctx context.Context, token string) (*oidc.IDToke
 		}
 	}
 	return claims, nil
+}
+
+func InitUser() *User {
+	return &User{
+		IDTokenClaims: &oidc.IDTokenClaims{},
+	}
 }
 
 type User struct {

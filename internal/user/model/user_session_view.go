@@ -27,6 +27,7 @@ type UserSessionView struct {
 	MultiFactorVerification      time.Time
 	MultiFactorVerificationType  domain.MFAType
 	Sequence                     uint64
+	ID                           string
 }
 
 type UserSessionSearchRequest struct {

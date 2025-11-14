@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package zitadel.resources.debug_events.v3alpha;
+
+import "google/protobuf/duration.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/debug_events/v3alpha;debug_events";
+
+message Event {
+  oneof event {
+      AddedEvent add = 1;
+      ChangedEvent change = 2;
+      RemovedEvent remove = 3;
+  }
+}
+
+message AddedEvent {
+  // issues a pg_sleep command in the projection reducer, simulating a slow query.
+  google.protobuf.Duration projection_sleep = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"5s\"";
+    }
+  ];
+  // optional text that can be set as a state.
+  optional string blob = 2;
+}
+
+message ChangedEvent {
+  // issues a pg_sleep command in the projection reducer, simulating a slow query.
+  google.protobuf.Duration projection_sleep = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"5s\"";
+    }
+  ];
+  // optional text that can be set as a state.
+  optional string blob = 2;
+}
+
+message RemovedEvent {
+  // issues a pg_sleep command in the projection reducer, simulating a slow query.
+  google.protobuf.Duration projection_sleep = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"5s\"";
+    }
+  ];
+}

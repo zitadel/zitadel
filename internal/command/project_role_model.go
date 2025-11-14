@@ -17,6 +17,10 @@ type ProjectRoleWriteModel struct {
 	State       domain.ProjectRoleState
 }
 
+func (wm *ProjectRoleWriteModel) GetWriteModel() *eventstore.WriteModel {
+	return &wm.WriteModel
+}
+
 func NewProjectRoleWriteModelWithKey(key, projectID, resourceOwner string) *ProjectRoleWriteModel {
 	return &ProjectRoleWriteModel{
 		WriteModel: eventstore.WriteModel{

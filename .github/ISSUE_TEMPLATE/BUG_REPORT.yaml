@@ -2,6 +2,7 @@ name: Bug Report
 description: "Create a bug report to help us improve ZITADEL."
 title: "[Bug]: "
 labels: ["bug"]
+type: Bug
 body:
 - type: markdown
   attributes:
@@ -39,7 +40,7 @@ body:
     label: Database
     description: What database are you using? (self-hosters only)
     options:
-    - CockroachDB
+    - CockroachDB (Zitadel v2)
     - PostgreSQL
     - Other (describe below!)
 - type: input

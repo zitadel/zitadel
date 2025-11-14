@@ -1,0 +1,49 @@
+<p class="cnsl-secondary-text">{{ 'ACTIONSTWO.EXECUTION.DIALOG.TYPE.DESCRIPTION' | translate }}</p>
+
+<form class="form-grid" [formGroup]="typeForm" (ngSubmit)="submit()">
+  <div class="executionType">
+    <mat-radio-group class="execution-radio-group" aria-label="Select an option" formControlName="executionType">
+      <mat-radio-button class="execution-radio-button" [value]="'request'">
+        <div class="execution-type-text">
+          <span>{{ 'ACTIONSTWO.EXECUTION.DIALOG.TYPE.REQUEST.TITLE' | translate }}</span>
+          <span class="description cnsl-secondary-text">{{
+            'ACTIONSTWO.EXECUTION.DIALOG.TYPE.REQUEST.DESCRIPTION' | translate
+          }}</span>
+        </div>
+      </mat-radio-button>
+      <mat-radio-button class="execution-radio-button" [value]="'response'"
+        ><div class="execution-type-text">
+          <span>{{ 'ACTIONSTWO.EXECUTION.DIALOG.TYPE.RESPONSE.TITLE' | translate }}</span>
+          <span class="description cnsl-secondary-text">{{
+            'ACTIONSTWO.EXECUTION.DIALOG.TYPE.RESPONSE.DESCRIPTION' | translate
+          }}</span>
+        </div></mat-radio-button
+      >
+      <mat-radio-button class="execution-radio-button" [value]="'event'"
+        ><div class="execution-type-text">
+          <span>{{ 'ACTIONSTWO.EXECUTION.DIALOG.TYPE.EVENTS.TITLE' | translate }}</span>
+          <span class="description cnsl-secondary-text">{{
+            'ACTIONSTWO.EXECUTION.DIALOG.TYPE.EVENTS.DESCRIPTION' | translate
+          }}</span>
+        </div></mat-radio-button
+      >
+      <mat-radio-button class="execution-radio-button" [value]="'function'"
+        ><div class="execution-type-text">
+          <span>{{ 'ACTIONSTWO.EXECUTION.DIALOG.TYPE.FUNCTIONS.TITLE' | translate }}</span>
+          <span class="description cnsl-secondary-text">{{
+            'ACTIONSTWO.EXECUTION.DIALOG.TYPE.FUNCTIONS.DESCRIPTION' | translate
+          }}</span>
+        </div></mat-radio-button
+      >
+    </mat-radio-group>
+  </div>
+
+  <div class="actions">
+    <button mat-stroked-button (click)="back.emit()">
+      {{ 'ACTIONS.CANCEL' | translate }}
+    </button>
+    <button color="primary" mat-raised-button type="submit">
+      {{ 'ACTIONS.CONTINUE' | translate }}
+    </button>
+  </div>
+</form>

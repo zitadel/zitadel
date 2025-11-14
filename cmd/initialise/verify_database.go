@@ -1,6 +1,8 @@
 package initialise
 
 import (
+	"context"
+	"database/sql"
 	_ "embed"
 	"fmt"
 
@@ -18,7 +20,7 @@ func newDatabase() *cobra.Command {
 		Long: `Sets up the ZITADEL database.
 
 Prerequisites:
-- cockroachDB or postgreSQL
+- postgreSQL
 
 The user provided by flags needs privileges to 
 - create the database if it does not exist
@@ -28,16 +30,27 @@ The user provided by flags needs privileges to
 		Run: func(cmd *cobra.Command, args []string) {
 			config := MustNewConfig(viper.GetViper())
 
-			err := initialise(config.Database, VerifyDatabase(config.Database.DatabaseName()))
+			err := initialise(cmd.Context(), config.Database, VerifyDatabase(config.Database.DatabaseName()))
 			logging.OnError(err).Fatal("unable to initialize the database")
 		},
 	}
 }
 
-func VerifyDatabase(databaseName string) func(*database.DB) error {
-	return func(db *database.DB) error {
+func VerifyDatabase(databaseName string) func(context.Context, *database.DB) error {
+	return func(ctx context.Context, db *database.DB) error {
+		var currentDatabase string
+		err := db.QueryRowContext(ctx, func(r *sql.Row) error {
+			return r.Scan(&currentDatabase)
+		}, "SELECT current_database()")
+		if err != nil {
+			return fmt.Errorf("unable to get current database: %w", err)
+		}
+		if currentDatabase == databaseName {
+			logging.WithFields("database", databaseName).Info("database is same as config.database.postgres.admin.ExistingDatabase, skipping creation")
+			return nil
+		}
 		logging.WithFields("database", databaseName).Info("verify database")
 
-		return exec(db, fmt.Sprintf(string(databaseStmt), databaseName), []string{dbAlreadyExistsCode})
+		return exec(ctx, db, fmt.Sprintf(databaseStmt, databaseName), []string{dbAlreadyExistsCode})
 	}
 }

@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package zitadel.analytics.v2beta;
+
+import "google/protobuf/timestamp.proto";
+import "zitadel/analytics/v2beta/telemetry.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/analytics/v2beta;analytics";
+
+// The TelemetryService is used to report telemetry such as usage statistics of the ZITADEL instance(s).
+// back to a central storage.
+// It is used to collect anonymized data about the usage of ZITADEL features, capabilities, and configurations.
+// ZITADEL acts as a client of the TelemetryService.
+//
+// Reports are sent periodically based on the system's runtime configuration.
+// The content of the reports, respectively the data collected, can be configured in the system's runtime configuration.
+//
+// All endpoints follow the same error and retry handling:
+// In case of a failure to report the usage, ZITADEL will retry to report the usage
+// based on the configured retry policy and error type:
+// - Client side errors will not be retried, as they indicate a misconfiguration or an invalid request:
+//   - `INVALID_ARGUMENT`: The request was malformed.
+//   - `NOT_FOUND`: The TelemetryService's endpoint is likely misconfigured.
+// - Connection / transfer errors will be retried based on the retry policy configured in the system's runtime configuration:
+//   - `DEADLINE_EXCEEDED`: The request took too long to complete, it will be retried.
+//   - `RESOURCE_EXHAUSTED`: The request was rejected due to resource exhaustion, it will be retried after a backoff period.
+//   - `UNAVAILABLE`: The TelemetryService is currently unavailable, it will be retried after a backoff period.
+// Server side errors will also be retried based on the information provided by the server:
+// - `FAILED_PRECONDITION`: The request failed due to a precondition, e.g. the report ID does not exists,
+//    does not correspond to the same system ID or previous reporting is too old, do not retry.
+// - `INTERNAL`: An internal error occurred. Check details and logs.
+service TelemetryService {
+
+  // ReportBaseInformation is used to report the base information of the ZITADEL system,
+  // including the version, instances, their creation date and domains.
+  // The response contains a report ID to link it to the resource counts or other reports.
+  // The report ID is only valid for the same system ID.
+  rpc ReportBaseInformation (ReportBaseInformationRequest) returns (ReportBaseInformationResponse) {}
+
+  // ReportResourceCounts is used to report the resource counts such as amount of organizations
+  // or users per organization and much more.
+  // Since the resource counts can be reported in multiple batches,
+  // the response contains a report ID to continue reporting.
+  // The report ID is only valid for the same system ID.
+  rpc ReportResourceCounts (ReportResourceCountsRequest) returns (ReportResourceCountsResponse) {}
+}
+
+message ReportBaseInformationRequest {
+  // The system ID is a unique identifier for the ZITADEL system.
+  string system_id = 1;
+  // The current version of the ZITADEL system.
+  string version = 2;
+  // A list of instances in the ZITADEL system and their information.
+  repeated InstanceInformation instances = 3;
+}
+
+message ReportBaseInformationResponse {
+  // The report ID is a unique identifier for the report.
+  // It is used to identify the report to be able to link it to the resource counts or other reports.
+  // Note that the report ID is only valid for the same system ID.
+  string report_id = 1;
+}
+
+message ReportResourceCountsRequest {
+  // The system ID is a unique identifier for the ZITADEL system.
+  string system_id = 1;
+  // The previously returned report ID from the server to continue reporting.
+  // Note that the report ID is only valid for the same system ID.
+  optional string report_id = 2;
+  // A list of resource counts to report.
+  repeated ResourceCount resource_counts = 3;
+}
+
+message ReportResourceCountsResponse {
+  // The report ID is a unique identifier for the report.
+  // It is used to identify the report in case of additional data / pagination.
+  // Note that the report ID is only valid for the same system ID.
+  string report_id = 1;
+}
