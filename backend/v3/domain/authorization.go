@@ -54,7 +54,7 @@ type authorizationConditions interface {
 	// PrimaryKeyCondition returns a filter on the primary key fields.
 	PrimaryKeyCondition(instanceID, id string) database.Condition
 	// IDCondition returns an equal filter on the id field.
-	IDCondition(orgID string) database.Condition
+	IDCondition(id string) database.Condition
 	// InstanceIDCondition returns a filter on the instance_id field.
 	InstanceIDCondition(instanceID string) database.Condition
 	// ProjectIDCondition returns a filter on the project_id field.
@@ -63,7 +63,7 @@ type authorizationConditions interface {
 	GrantIDCondition(grantID string) database.Condition
 	// UserIDCondition returns a filter on the user_id field.
 	UserIDCondition(userID string) database.Condition
-	// RoleCondition returns a filter on the role_key field from the authotization_roles table.
+	// RoleCondition returns a filter on the role_key field from the authorization_roles table.
 	RoleCondition(op database.TextOperation, role string) database.Condition
 	// StateCondition returns a filter on the name field.
 	StateCondition(state AuthorizationState) database.Condition

@@ -317,17 +317,17 @@ func (c *MockAuthorizationRepositoryIDColumnCall) DoAndReturn(f func() database.
 }
 
 // IDCondition mocks base method.
-func (m *MockAuthorizationRepository) IDCondition(orgID string) database.Condition {
+func (m *MockAuthorizationRepository) IDCondition(id string) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IDCondition", orgID)
+	ret := m.ctrl.Call(m, "IDCondition", id)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // IDCondition indicates an expected call of IDCondition.
-func (mr *MockAuthorizationRepositoryMockRecorder) IDCondition(orgID any) *MockAuthorizationRepositoryIDConditionCall {
+func (mr *MockAuthorizationRepositoryMockRecorder) IDCondition(id any) *MockAuthorizationRepositoryIDConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IDCondition", reflect.TypeOf((*MockAuthorizationRepository)(nil).IDCondition), orgID)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IDCondition", reflect.TypeOf((*MockAuthorizationRepository)(nil).IDCondition), id)
 	return &MockAuthorizationRepositoryIDConditionCall{Call: call}
 }
 
