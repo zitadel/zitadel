@@ -1807,7 +1807,7 @@ func (p *userRelationalProjection) reduceMFAInitSkipped(event eventstore.Event) 
 
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetMultifactorInitializationSkippedAt(e.CreatedAt()),
+			repo.SkipMultifactorInitializationAt(e.CreatedAt()),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
