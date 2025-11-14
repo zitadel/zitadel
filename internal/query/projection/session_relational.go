@@ -534,7 +534,7 @@ func (p *sessionRelationalProjection) reducePasswordChanged(event eventstore.Eve
 		)
 		_, err = sessionRepo.Update(ctx, v3Tx, condition,
 			sessionRepo.SetUpdatedAt(e.CreatedAt()),
-			sessionRepo.ClearFactor(),
+			sessionRepo.ClearFactor(domain.SessionFactorTypePassword),
 		)
 		return err
 	}), nil

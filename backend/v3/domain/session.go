@@ -90,7 +90,8 @@ type sessionConditions interface {
 	CreatedAtCondition(op database.NumberOperation, createdAt time.Time) database.Condition
 	// UpdatedAtCondition returns a filter on the updated at field.
 	UpdatedAtCondition(op database.NumberOperation, updatedAt time.Time) database.Condition
-	//
+
+	ExistsFactor(condition database.Condition) database.Condition
 	//// FactorConditions returns the conditions for the factors fields.
 	//FactorConditions() sessionFactorConditions
 	//// MetadataConditions returns the conditions for the metadata fields.
@@ -114,7 +115,7 @@ type sessionChanges interface {
 	// SetFactor adds or updates the factor of the corresponding type.
 	SetFactor(factor SessionFactor) database.Change
 	// ClearFactor resets the factor's verification.
-	ClearFactor() database.Change
+	ClearFactor(factor SessionFactorType) database.Change
 	// SetMetadata adds or updates the metadata of the session.
 	SetMetadata(metadata []SessionMetadata) database.Change
 	// SetUserAgent adds or updates the user agent of the session.
