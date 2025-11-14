@@ -38,6 +38,7 @@ import { RedirectPipeModule } from 'src/app/pipes/redirect-pipe/redirect-pipe.mo
 
 import { AdditionalOriginsComponent } from './additional-origins/additional-origins.component';
 import { AppDetailComponent } from './app-detail/app-detail.component';
+import { AppCreateComponent } from './app-create/app-create.component';
 import { AuthMethodDialogComponent } from './app-detail/auth-method-dialog/auth-method-dialog.component';
 import { AppsRoutingModule } from './apps-routing.module';
 import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
@@ -51,6 +52,7 @@ import { EnvVarsBlockModule } from 'src/app/components/env-vars-block/env-vars-b
 @NgModule({
   declarations: [
     AppDetailComponent,
+    AppCreateComponent,
     RedirectUrisComponent,
     IntegrateAppComponent,
     AdditionalOriginsComponent,
