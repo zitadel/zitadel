@@ -141,7 +141,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
           serviceUrl,
           idpId,
           urls: {
-            successUrl: `${origin}/idp/${provider}/success?` + new URLSearchParams(params),
+            successUrl: `${origin}/idp/${provider}/process?` + new URLSearchParams(params),
             failureUrl: `${origin}/idp/${provider}/failure?` + new URLSearchParams(params),
           },
         });

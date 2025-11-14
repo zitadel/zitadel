@@ -296,15 +296,24 @@ pnpm nx run @zitadel/api:test-unit
 API tests are run as gRPC clients against a running Zitadel server binary.
 The server binary is [built with coverage enabled](https://go.dev/doc/build-cover).
 
+
 ```bash
 pnpm nx run @zitadel/api:test-integration
 ```
 
-To develop and run the test cases from within your IDE or by the command line, start only the API.
+To develop and run the test cases from within your IDE or by the command line, start only the database and the API.
 The actual integration test clients reside in the `integration_test` subdirectory of the package they aim to test.
 Integration test files use the `integration` build tag, in order to be excluded from regular unit tests.
 Because of the server-client split, Go is usually unaware of changes in server code and tends to cache test results.
 Pass `-count 1` to disable test caching.
+
+Start the ephemeral database for integration tests.
+
+```bash
+pnpm nx run @zitadel/api:test-integration-run-db
+```
+
+In another terminal, start the API.
 
 ```bash
 pnpm nx run @zitadel/api:test-integration-run-api
@@ -323,7 +332,13 @@ go test -count 1 -tags integration -parallel 1 $(go list -tags integration ./...
 ```
 
 It is also possible to run the API in a debugger and run the integrations tests against it.
-In order to run the server, a database with correctly set up data is required.
+
+First, start the ephemeral database for integration tests.
+
+```bash
+pnpm nx run @zitadel/api:test-integration-run-db
+```
+
 When starting the debugger, make sure the Zitadel binary starts with `start-from-init --config=./apps/api/test-integration-api.yaml --steps=./apps/api/test-integration-api.yaml --masterkey=MasterkeyNeedsToHave32Characters"`
 
 To cleanup after testing (deletes the ephemeral database!):

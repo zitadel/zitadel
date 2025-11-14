@@ -448,7 +448,7 @@ export async function createInviteCode({
   userId: string;
 }) {
   let medium = create(SendInviteCodeSchema, {
-    applicationName: "Typescript Login",
+    applicationName: process.env.NEXT_PUBLIC_APPLICATION_NAME || "Zitadel Login",
   });
 
   medium = {
@@ -658,7 +658,8 @@ export async function searchUsers({ serviceUrl, searchValue, loginSettings, orga
 
   const emailAndPhoneQueries: SearchQuery[] = [];
   if (loginSettings.disableLoginWithEmail && loginSettings.disableLoginWithPhone) {
-    return { error: t("errors.userNotFound") };
+    // Both email and phone login are disabled, return empty result
+    return { result: [] };
   } else if (loginSettings.disableLoginWithEmail && searchValue.length <= 20) {
     const phoneQuery = PhoneQuery(searchValue);
     emailAndPhoneQueries.push(phoneQuery);
@@ -718,7 +719,8 @@ export async function searchUsers({ serviceUrl, searchValue, loginSettings, orga
     return emailOrPhoneResult;
   }
 
-  return { error: t("errors.userNotFound") };
+  // No users found - return empty result, not an error
+  return { result: [] };
 }
 
 export async function getDefaultOrg({ serviceUrl }: { serviceUrl: string }): Promise<Organization | null> {
@@ -1210,9 +1212,9 @@ export function createServerTransport(token: string, baseUrl: string) {
           (next) => {
             return (req) => {
               process.env.CUSTOM_REQUEST_HEADERS!.split(",").forEach((header) => {
-                const kv = header.split(":");
-                if (kv.length === 2) {
-                  req.header.set(kv[0].trim(), kv[1].trim());
+                const kv = header.indexOf(":");
+                if (kv > 0) {
+                  req.header.set(header.slice(0, kv).trim(), header.slice(kv + 1).trim());
                 } else {
                   console.warn(`Skipping malformed header: ${header}`);
                 }

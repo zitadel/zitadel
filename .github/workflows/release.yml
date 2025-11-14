@@ -32,6 +32,8 @@ on:
 jobs:
   version:
     uses: ./.github/workflows/version.yml
+    permissions:
+      contents: write
     with:
       semantic_version: ${{ inputs.semantic_version }}
       dry_run: false

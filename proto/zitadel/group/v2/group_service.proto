@@ -108,13 +108,12 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 // This service provides methods to create, retrieve, update, and delete user groups in an organization.
 service GroupService {
 
-  // CreateGroup
+  // Create Group
   //
   // CreateGroup creates a new user group in an organization.
   //
-  // Required permissions: // TODO
-  //   - "iam.member.write" for instance administrators
-  //   - "org.member.write" for organization administrators
+  // Required permissions:
+  //   - group.create
   rpc CreateGroup(CreateGroupRequest) returns (CreateGroupResponse) {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
@@ -157,12 +156,12 @@ service GroupService {
     };
   }
 
-  // GetGroup
+  // Get Group
   //
   // Retrieves a group based on its ID.
   //
   // Required permission:
-  // - TODO
+  // - group.read
   rpc GetGroup(GetGroupRequest) returns (GetGroupResponse) {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
@@ -190,13 +189,12 @@ service GroupService {
     };
   }
 
-  // ListGroups
+  // List Groups
   //
   // ListGroups returns all groups matching the request and necessary permissions from an organization.
   //
-  // Required permissions: // TODO
-  //   - "iam.member.read" for instance administrators
-  //   - "org.member.read" for organization administrators
+  // Required permissions:
+  //   - group.read
   rpc ListGroups(ListGroupsRequest) returns (ListGroupsResponse) {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
@@ -225,17 +223,16 @@ service GroupService {
     };
   }
 
-  // UpdateGroup
+  // Update Group
   //
   // UpdateGroup updates the user group.
   //
-  // In case the group there aren't any changes, the request will return a successful response as
+  // In case there aren't any changes, the request will return a successful response as
   // the desired state is already achieved.
   // You can check the change date in the response to verify if the group was updated by the request.
   //
-  // Required permissions: // TODO
-  //   - "iam.member.write" for instance administrators
-  //   - "org.member.write" for organization administrators
+  // Required permissions:
+  //   - group.write
   rpc UpdateGroup(UpdateGroupRequest) returns (UpdateGroupResponse) {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
@@ -264,7 +261,7 @@ service GroupService {
     };
   }
 
-  // DeleteGroup
+  // Delete Group
   //
   // DeleteGroup deletes the group.
   //
@@ -272,9 +269,8 @@ service GroupService {
   // the desired state is already achieved.
   // You can check the deletion date in the response to verify if the group was deleted by the request.
   //
-  // Required permissions: // TODO
-  //   - "iam.member.delete" for instance administrators
-  //   - "org.member.delete" for organization administrators
+  // Required permissions:
+  //   - group.delete
   rpc DeleteGroup(DeleteGroupRequest) returns (DeleteGroupResponse) {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
@@ -300,6 +296,53 @@ service GroupService {
           };
         };
       };
+    };
+  }
+
+  // Add Users
+  //
+  // Adds one or more users to a group.
+  // The users should be in the same organization as the group.
+  // The request will not fail if some of the users could not be added to the group,
+  // and a list of failed user IDs is available in the response.
+  //
+  // Required permissions:
+  //   - group.user.write
+  rpc AddUsersToGroup(AddUsersToGroupRequest) returns (AddUsersToGroupResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // Remove Users
+  //
+  // Removes one or more users from a group.
+  // If some of the users are not in the group, the request will still return a successful response as
+  // the desired state is already achieved.
+  //
+  // Required permissions:
+  //   - group.user.delete
+  rpc RemoveUsersFromGroup(RemoveUsersFromGroupRequest) returns (RemoveUsersFromGroupResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // List Group Users
+  //
+  // Allows searching for groups based on user IDs, or retrieving users based on group IDs
+  //
+  // Required permissions:
+  //   - group.user.read
+  rpc ListGroupUsers(ListGroupUsersRequest) returns (ListGroupUsersResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
     };
   }
 }
@@ -464,4 +507,81 @@ message DeleteGroupResponse {
       example: "\"2025-08-11T15:00:00.051Z\"";
     }
   ];
+}
+
+message AddUsersToGroupRequest {
+  // ID of the group to which the users should be added.
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // UserIds is a list of IDs of the users who should be added to the group.
+  repeated string user_ids = 2 [
+    (validate.rules).repeated = {min_items: 1, items: {string: {min_len: 1, max_len: 200}}},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"69629023906488334\",\"69622366012355662\"]";
+    }
+  ];
+}
+
+message AddUsersToGroupResponse {
+  // ChangeDate is the timestamp when the users are added.
+  google.protobuf.Timestamp change_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-08-11T15:00:00.051Z\"";
+    }
+  ];
+}
+
+message RemoveUsersFromGroupRequest {
+  // ID of the group from which the users should be removed.
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // UserIds is a list of IDs of the users who should be removed the group.
+  repeated string user_ids = 2 [
+    (validate.rules).repeated = {min_items: 1, items: {string: {min_len: 1, max_len: 200}}},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"69629023906488334\",\"69622366012355662\"]";
+    }
+  ];
+}
+
+message RemoveUsersFromGroupResponse {
+  // ChangeDate is the timestamp when the users are removed.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-08-11T15:00:00.051Z\"";
+    }
+  ];
+}
+
+message ListGroupUsersRequest {
+  // GroupUsersSearchFilter defines the criteria to list the user groups.
+  repeated GroupUsersSearchFilter filters = 1;
+
+  // Pagination and sorting.
+  zitadel.filter.v2.PaginationRequest pagination = 2;
+
+  // SortingColumn defines the field the result is sorted by.
+  optional GroupUserFieldName sorting_column = 3;
+}
+
+message ListGroupUsersResponse {
+  // GroupUsers is the list of users present in the requested group, matching the search criteria
+  repeated GroupUser group_users = 1;
+
+  // Contains the total number of users matching the query and the applied limit.
+  zitadel.filter.v2.PaginationResponse pagination = 2;
 }

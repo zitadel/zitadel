@@ -1907,7 +1907,7 @@ service UserService {
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {auth_option: {
-      permission: "user.read"
+      permission: "authenticated"
     }
     };
 
@@ -3093,6 +3093,7 @@ message RetrieveIdentityProviderIntentResponse{
     }
   ];
   AddHumanUserRequest add_human_user = 4;
+  UpdateHumanUserRequest update_human_user = 5;
 }
 
 message AddIDPLinkRequest{

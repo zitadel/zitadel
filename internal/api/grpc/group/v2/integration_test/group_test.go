@@ -5,6 +5,7 @@ package group_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/muhlemmer/gu"
@@ -26,14 +27,22 @@ func TestServer_CreateGroup(t *testing.T) {
 	resp := instance.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), alreadyExistingGroupName)
 
 	tests := []struct {
-		name          string
-		ctx           context.Context
-		req           *group_v2.CreateGroupRequest
-		wantResp      bool
-		wantGroupID   string
-		wantErrorCode codes.Code
-		wantErrMsg    string
+		name        string
+		ctx         context.Context
+		req         *group_v2.CreateGroupRequest
+		wantResp    bool
+		wantGroupID string
+		wantErrCode codes.Code
 	}{
+		{
+			name: "unauthenticated, error",
+			ctx:  context.Background(),
+			req: &group_v2.CreateGroupRequest{
+				Name:           integration.GroupName(),
+				OrganizationId: orgResp.GetOrganizationId(),
+			},
+			wantErrCode: codes.Unauthenticated,
+		},
 		{
 			name: "invalid name, error",
 			ctx:  iamOwnerCtx,
@@ -41,8 +50,7 @@ func TestServer_CreateGroup(t *testing.T) {
 				Name:           " ",
 				OrganizationId: "org1",
 			},
-			wantErrorCode: codes.InvalidArgument,
-			wantErrMsg:    "Errors.Group.InvalidName (GROUP-m177lN)",
+			wantErrCode: codes.InvalidArgument,
 		},
 		{
 			name: "missing organization id, error",
@@ -50,8 +58,16 @@ func TestServer_CreateGroup(t *testing.T) {
 			req: &group_v2.CreateGroupRequest{
 				Name: integration.GroupName(),
 			},
-			wantErrorCode: codes.InvalidArgument,
-			wantErrMsg:    "invalid CreateGroupRequest.OrganizationId: value length must be between 1 and 200 runes, inclusive",
+			wantErrCode: codes.InvalidArgument,
+		},
+		{
+			name: "missing permission, error",
+			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
+			req: &group_v2.CreateGroupRequest{
+				Name:           integration.GroupName(),
+				OrganizationId: orgResp.GetOrganizationId(),
+			},
+			wantErrCode: codes.NotFound,
 		},
 		{
 			name: "organization not found, error",
@@ -60,32 +76,47 @@ func TestServer_CreateGroup(t *testing.T) {
 				Name:           integration.GroupName(),
 				OrganizationId: "org1",
 			},
-			wantErrorCode: codes.FailedPrecondition,
-			wantErrMsg:    "Organisation not found (CMDGRP-j1mH8l)",
+			wantErrCode: codes.FailedPrecondition,
 		},
 		{
-			name: "already existing group (unique name constraint), error",
+			name: "instance owner, already existing group (unique name constraint), error",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.CreateGroupRequest{
 				Name:           alreadyExistingGroupName,
 				OrganizationId: orgResp.GetOrganizationId(),
 			},
-			wantErrorCode: codes.AlreadyExists,
-			wantErrMsg:    "Errors.Group.AlreadyExists (V3-DKcYh)",
+			wantErrCode: codes.AlreadyExists,
 		},
 		{
-			name: "already existing group ID, error",
+			name: "instance owner, already existing group ID, error",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.CreateGroupRequest{
 				Id:             gu.Ptr(resp.Id),
 				Name:           integration.GroupName(),
 				OrganizationId: orgResp.GetOrganizationId(),
 			},
-			wantErrorCode: codes.AlreadyExists,
-			wantErrMsg:    "Errors.Group.AlreadyExists (CMDGRP-shRut3)",
+			wantErrCode: codes.AlreadyExists,
 		},
 		{
-			name: "create group with ID, ok",
+			name: "organization owner, missing permission, error",
+			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+			req: &group_v2.CreateGroupRequest{
+				Name:           integration.GroupName(),
+				OrganizationId: orgResp.GetOrganizationId(),
+			},
+			wantErrCode: codes.NotFound,
+		},
+		{
+			name: "organization owner, with permission, ok",
+			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+			req: &group_v2.CreateGroupRequest{
+				Name:           integration.GroupName(),
+				OrganizationId: instance.DefaultOrg.GetId(),
+			},
+			wantResp: true,
+		},
+		{
+			name: "instance owner, create group with ID, ok",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.CreateGroupRequest{
 				Id:             gu.Ptr("1234"),
@@ -96,7 +127,7 @@ func TestServer_CreateGroup(t *testing.T) {
 			wantGroupID: "1234",
 		},
 		{
-			name: "create group without user provided ID, ok",
+			name: "instance owner, create group without user provided ID, ok",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.CreateGroupRequest{
 				Name:           integration.GroupName(),
@@ -107,13 +138,14 @@ func TestServer_CreateGroup(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			beforeCreationDate := time.Now().UTC()
 			got, err := instance.Client.GroupV2.CreateGroup(tt.ctx, tt.req)
-			if tt.wantErrorCode != codes.OK {
+			afterCreationDate := time.Now().UTC()
+			if tt.wantErrCode != codes.OK {
 				require.Error(t, err)
 				require.Empty(t, got.GetId())
 				require.Empty(t, got.GetCreationDate())
-				assert.Equal(t, tt.wantErrorCode, status.Code(err))
-				assert.Equal(t, tt.wantErrMsg, status.Convert(err).Message())
+				assert.Equal(t, tt.wantErrCode, status.Code(err))
 				return
 			}
 			require.NoError(t, err)
@@ -121,7 +153,7 @@ func TestServer_CreateGroup(t *testing.T) {
 				assert.Equal(t, tt.wantGroupID, got.Id, "want: %v, got: %v", tt.wantGroupID, got)
 			}
 			require.NotEmpty(t, got.GetId())
-			require.NotEmpty(t, got.GetCreationDate())
+			assert.WithinRange(t, got.GetCreationDate().AsTime(), beforeCreationDate, afterCreationDate)
 		})
 	}
 }
@@ -129,8 +161,12 @@ func TestServer_CreateGroup(t *testing.T) {
 func TestServer_UpdateGroup(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+	// create a group in the default org
+	groupDefOrg := instance.CreateGroup(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.GroupName())
 
+	// create a new org
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+	// create a group in the new org
 	groupName := integration.GroupName()
 	existingGroup := instance.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), groupName)
 
@@ -140,8 +176,15 @@ func TestServer_UpdateGroup(t *testing.T) {
 		req            *group_v2.UpdateGroupRequest
 		wantChangeDate bool
 		wantErrCode    codes.Code
-		wantErrMsg     string
 	}{
+		{
+			name: "unauthenticated, error",
+			ctx:  context.Background(),
+			req: &group_v2.UpdateGroupRequest{
+				Name: gu.Ptr(integration.GroupName()),
+			},
+			wantErrCode: codes.Unauthenticated,
+		},
 		{
 			name: "invalid name, error",
 			ctx:  iamOwnerCtx,
@@ -150,29 +193,54 @@ func TestServer_UpdateGroup(t *testing.T) {
 				Name: gu.Ptr(" "),
 			},
 			wantErrCode: codes.InvalidArgument,
-			wantErrMsg:  "Errors.Group.InvalidName (GROUP-dUNd3r)",
 		},
 		{
-			name: "group not found, error",
-			ctx:  iamOwnerCtx,
+			name: "missing permission, error",
+			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 			req: &group_v2.UpdateGroupRequest{
-				Id:   "12345",
+				Id:   existingGroup.GetId(),
 				Name: gu.Ptr("updated group name"),
 			},
 			wantErrCode: codes.NotFound,
-			wantErrMsg:  "Errors.Group.NotFound (CMDGRP-b33zly)",
 		},
 		{
-			name: "no change, ok",
+			name: "organization owner, missing permission, error",
+			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+			req: &group_v2.UpdateGroupRequest{
+				Id:   existingGroup.GetId(),
+				Name: gu.Ptr("updated group name"),
+			},
+			wantErrCode: codes.NotFound,
+		},
+		{
+			name: "organization owner, with permission, ok",
+			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+			req: &group_v2.UpdateGroupRequest{
+				Id:   groupDefOrg.GetId(),
+				Name: gu.Ptr("updated group name 1"),
+			},
+			wantChangeDate: true,
+		},
+		{
+			name: "instance owner, group not found, error",
+			ctx:  iamOwnerCtx,
+			req: &group_v2.UpdateGroupRequest{
+				Id:   "12345",
+				Name: gu.Ptr("updated group name 2"),
+			},
+			wantErrCode: codes.NotFound,
+		},
+		{
+			name: "instance owner, no change, ok",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.UpdateGroupRequest{
 				Id:   existingGroup.GetId(),
 				Name: gu.Ptr(groupName),
 			},
-			wantChangeDate: true,
+			wantChangeDate: false,
 		},
 		{
-			name: "change name, ok",
+			name: "instance owner, change name, ok",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.UpdateGroupRequest{
 				Id:   existingGroup.GetId(),
@@ -181,7 +249,7 @@ func TestServer_UpdateGroup(t *testing.T) {
 			wantChangeDate: true,
 		},
 		{
-			name: "change description, ok",
+			name: "instance owner, change description, ok",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.UpdateGroupRequest{
 				Id:          existingGroup.GetId(),
@@ -190,7 +258,7 @@ func TestServer_UpdateGroup(t *testing.T) {
 			wantChangeDate: true,
 		},
 		{
-			name: "full change, ok",
+			name: "instance owner, full change, ok",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.UpdateGroupRequest{
 				Id:          existingGroup.GetId(),
@@ -202,39 +270,57 @@ func TestServer_UpdateGroup(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			beforeUpdateDate := time.Now().UTC()
 			got, err := instance.Client.GroupV2.UpdateGroup(tt.ctx, tt.req)
+			afterUpdateDate := time.Now().UTC()
 			if tt.wantErrCode != codes.OK {
 				require.Error(t, err)
 				require.Empty(t, got.GetChangeDate())
 				assert.Equal(t, tt.wantErrCode, status.Code(err))
-				assert.Equal(t, tt.wantErrMsg, status.Convert(err).Message())
 				return
 			}
 			require.NoError(t, err)
-			require.NotEmpty(t, got.GetChangeDate())
+			if tt.wantChangeDate {
+				assert.WithinRange(t, got.GetChangeDate().AsTime(), beforeUpdateDate, afterUpdateDate)
+			}
 		})
 	}
 }
 
 func TestServer_DeleteGroup(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+
+	// create a group in the default org
+	groupDefOrg := instance.CreateGroup(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.GroupName())
+
+	// create a new org
 	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
+	// create a group in the new org
 	groupName := integration.GroupName()
 	existingGroup := instance.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), groupName)
 
+	// create a group in the new org to be deleted before the test
 	deleteGroupName := integration.GroupName()
 	deleteGroup := instance.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), deleteGroupName)
 	deleteResp := instance.DeleteGroup(iamOwnerCtx, t, deleteGroup.GetId())
 
 	tests := []struct {
-		name         string
-		ctx          context.Context
-		req          *group_v2.DeleteGroupRequest
-		wantErrCode  codes.Code
-		wantErrMsg   string
-		deletionTime *timestamp.Timestamp
+		name             string
+		ctx              context.Context
+		req              *group_v2.DeleteGroupRequest
+		wantErrCode      codes.Code
+		wantDeletionDate bool
+		deletionTime     *timestamp.Timestamp
 	}{
+		{
+			name: "unauthenticated, error",
+			ctx:  context.Background(),
+			req: &group_v2.DeleteGroupRequest{
+				Id: "12345",
+			},
+			wantErrCode: codes.Unauthenticated,
+		},
 		{
 			name: "missing id, error",
 			ctx:  iamOwnerCtx,
@@ -242,7 +328,30 @@ func TestServer_DeleteGroup(t *testing.T) {
 				Id: "",
 			},
 			wantErrCode: codes.InvalidArgument,
-			wantErrMsg:  "invalid DeleteGroupRequest.Id: value length must be between 1 and 200 runes, inclusive",
+		},
+		{
+			name: "missing permission, error",
+			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
+			req: &group_v2.DeleteGroupRequest{
+				Id: existingGroup.GetId(),
+			},
+			wantErrCode: codes.NotFound,
+		},
+		{
+			name: "organization owner, missing permission, error",
+			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+			req: &group_v2.DeleteGroupRequest{
+				Id: existingGroup.GetId(),
+			},
+			wantErrCode: codes.NotFound,
+		},
+		{
+			name: "organization owner, with permission, ok",
+			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+			req: &group_v2.DeleteGroupRequest{
+				Id: groupDefOrg.GetId(),
+			},
+			wantDeletionDate: true,
 		},
 		{
 			name: "group not found, ok",
@@ -257,6 +366,7 @@ func TestServer_DeleteGroup(t *testing.T) {
 			req: &group_v2.DeleteGroupRequest{
 				Id: existingGroup.GetId(),
 			},
+			wantDeletionDate: true,
 		},
 		{
 			name: "delete already deleted group, ok",
@@ -269,18 +379,22 @@ func TestServer_DeleteGroup(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			beforeDeletionDate := time.Now().UTC()
 			got, err := instance.Client.GroupV2.DeleteGroup(tt.ctx, tt.req)
+			afterDeletionDate := time.Now().UTC()
 			if tt.wantErrCode != codes.OK {
 				require.Error(t, err)
 				require.Empty(t, got.GetDeletionDate())
 				assert.Equal(t, tt.wantErrCode, status.Code(err))
-				assert.Equal(t, tt.wantErrMsg, status.Convert(err).Message())
 				return
 			}
 			require.NoError(t, err)
 			require.NotEmpty(t, got.GetDeletionDate())
 			if tt.deletionTime != nil {
 				assert.Equal(t, tt.deletionTime, got.GetDeletionDate())
+			}
+			if tt.wantDeletionDate {
+				assert.WithinRange(t, got.GetDeletionDate().AsTime(), beforeDeletionDate, afterDeletionDate)
 			}
 		})
 	}

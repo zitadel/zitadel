@@ -88,11 +88,11 @@ func addInstanceByDomain(ctx context.Context, req interface{}, handler grpc.Unar
 
 func addInstanceByRequestedHost(ctx context.Context, req interface{}, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, externalDomain string) (interface{}, error) {
 	requestContext := zitadel_http.DomainContext(ctx)
-	if requestContext.InstanceHost == "" {
+	if requestContext.InstanceDomain() == "" {
 		logging.WithFields("origin", requestContext.Origin(), "externalDomain", externalDomain).Error("unable to set instance")
 		return nil, status.Error(codes.NotFound, "no instanceHost specified")
 	}
-	instance, err := verifier.InstanceByHost(ctx, requestContext.InstanceHost, requestContext.PublicHost)
+	instance, err := verifier.InstanceByHost(ctx, requestContext.InstanceDomain(), requestContext.RequestedDomain())
 	if err != nil {
 		origin := zitadel_http.DomainContext(ctx)
 		logging.WithFields("origin", requestContext.Origin(), "externalDomain", externalDomain).WithError(err).Error("unable to set instance")
