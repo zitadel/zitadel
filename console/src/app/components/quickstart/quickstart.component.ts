@@ -12,5 +12,7 @@ import { frameworksWithOidcConfiguration } from 'src/app/utils/framework';
   imports: [TranslateModule, RouterModule, CommonModule, MatButtonModule],
 })
 export class QuickstartComponent {
-  protected readonly frameworks = frameworksWithOidcConfiguration;
+  protected readonly frameworks = frameworksWithOidcConfiguration.filter(
+    (f) => !('excludeFromAppCreation' in f) || !f.excludeFromAppCreation,
+  );
 }

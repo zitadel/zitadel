@@ -95,7 +95,8 @@
     "startCommand": "python manage.py runserver",
     "localhost": "http://localhost:8000/",
     "external": false,
-    "hasExampleEnv": true
+    "hasExampleEnv": true,
+    "excludeFromAppCreation": true
   },
   {
     "id": "express",
@@ -139,7 +140,8 @@
     "startCommand": "python manage.py runserver",
     "localhost": "http://127.0.0.1:5000",
     "external": false,
-    "hasExampleEnv": true
+    "hasExampleEnv": true,
+    "excludeFromAppCreation": true
   },
   {
     "id": "flutter",
@@ -153,7 +155,7 @@
     "installCommand": "if cd flutter; then git pull && cd .. ; else git clone https://github.com/flutter/flutter.git; fi && ls && flutter/bin/flutter doctor && flutter/bin/flutter clean && flutter/bin/flutter config --enable-web",
     "startCommand": "flutter run -d chrome --web-port=4444 --dart-define zitadel_url={{ZITADEL_ISSUER}} --dart-define zitadel_client_id={{ZITADEL_CLIENT_ID}}",
     "localhost": "http://localhost:4444",
-    "client": true,
+    "excludeFromAppCreation": true,
     "external": false,
     "envSetup": {
       "type": "command-args",
@@ -306,6 +308,7 @@
     "imgSrcDark": "/docs/img/tech/spring.svg",
     "imgSrcLight": "/docs/img/tech/spring.svg",
     "docsLink": "/docs/sdk-examples/java",
+    "excludeFromAppCreation": true,
     "example": "https://github.com/zitadel/zitadel-java.git",
     "installCommand": "mvn clean package -DskipTests",
     "startCommand": "java -Dspring.security.oauth2.client.provider.zitadel.issuer-uri={{ZITADEL_ISSUER}} -Dspring.security.oauth2.client.registration.zitadel.client-id={{ZITADEL_CLIENT_ID}} -jar web/target/web-0.0.2-SNAPSHOT.jar",
@@ -343,7 +346,8 @@
     "startCommand": "symfony server:start --no-tls",
     "localhost": "http://localhost:8000",
     "external": false,
-    "hasExampleEnv": true
+    "hasExampleEnv": true,
+    "excludeFromAppCreation": true
   },
   {
     "id": "vue",

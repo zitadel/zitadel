@@ -57,7 +57,7 @@ export const OIDC_CONFIGURATIONS = {
   },
   astro: {
     appType: OIDCAppType.OIDC_APP_TYPE_WEB,
-    authMethodType: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC,
+    authMethodType: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE,
     responseTypes: [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
     grantTypes: [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE],
     redirectUris: [

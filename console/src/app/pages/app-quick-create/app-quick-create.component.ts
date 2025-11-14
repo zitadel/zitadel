@@ -61,6 +61,7 @@ export class AppQuickCreateComponent {
 
   protected frameworks = frameworksWithOidcConfiguration
     .filter((f) => !('client' in f) || !f.client) // Filter out client libraries/SDKs
+    .filter((f) => !('excludeFromAppCreation' in f) || !f.excludeFromAppCreation) // Filter out manually excluded frameworks
     .sort((a, b) => {
       const popularityOrder = [
         'react',
