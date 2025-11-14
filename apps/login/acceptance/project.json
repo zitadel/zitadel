@@ -1,0 +1,82 @@
+{
+    "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+    "targets": {
+        "test": {
+            "description": "Runs the Playwright tests for the Login application",
+            "dependsOn": [
+                "run-mock-server",
+                "run-login"
+            ],
+            "options": {
+                "cwd": "{projectRoot}",
+                "env": {
+                    "PLAYWRIGHT_HTML_OPEN": "never"
+                }
+            },
+            "command": "wait-on --verbose --interval 2000 --simultaneous 1 \"${ZITADEL_API_URL}/debug/ready\" \"${LOGIN_BASE_URL}\" \"http://localhost:3333/ready\" && playwright test",
+            "cache": true,
+            "inputs": [
+                "default"
+            ]
+        },
+        "test-local": {
+            "description": "Runs the Playwright tests for the Login application continuously. This ensures, that playwright can serve the test reports and that it can be started with the --ui flag. Ctrl+C terminates the all continuous tasks correctly.",
+            "dependsOn": [
+                "run-mock-server",
+                "run-login"
+            ],
+            "options": {
+                "cwd": "{projectRoot}"
+            },
+            "continuous": true,
+            "command": "wait-on --verbose --interval 2000 --simultaneous 1 \"${ZITADEL_API_URL}/debug/ready\" \"${LOGIN_BASE_URL}\" \"http://localhost:3333/ready\" && playwright test"
+        },
+        "run-mock-server": {
+            "description": "Runs the mock server for the Login acceptance tests",
+            "continuous": true,
+            "dependsOn": [
+                "run-api"
+            ],
+            "options": {
+                "cwd": "{projectRoot}"
+            },
+            "command": "wait-on --verbose --interval 2000 --simultaneous 1 \"${ZITADEL_API_URL}/debug/ready\" && tsx ./mock/server.ts"
+        },
+        "run-login": {
+            "description": "Runs the Login application for running acceptance tests",
+            "continuous": true,
+            "dependsOn": [
+                "@zitadel/login:build",
+                "run-api"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "parallel": false,
+                "commands": [
+                    "wait-on --verbose --interval 2000 --simultaneous 1 \"${ZITADEL_API_URL}/debug/ready\"",
+                    "nx run @zitadel/login:prod:test-login-acceptance --excludeTaskDependencies"
+                ]
+            }
+        },
+        "run-api": {
+            "description": "Runs the API for running acceptance tests",
+            "continuous": true,
+            "dependsOn": [
+                "build-api",
+                "run-db"
+            ],
+            "command": "nx run @zitadel/api:prod:test-acceptance-login --excludeTaskDependencies"
+        },
+        "run-db": {
+            "description": "Runs an ephemeral database for running acceptance tests",
+            "continuous": true,
+            "command": "nx run @zitadel/devcontainer:compose up --force-recreate --renew-anon-volumes db-login-acceptance"
+        },
+        "build-api": {
+            "dependsOn": [
+                "@zitadel/api:generate"
+            ],
+            "command": "nx run @zitadel/api:build --excludeTaskDependencies"
+        }
+    }
+}
