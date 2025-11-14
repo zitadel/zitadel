@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -89,7 +90,10 @@ func TestListProjects(t *testing.T) {
 	instanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, instanceID)
 	secondOrgID := createOrganization(t, tx, instanceID)
+	thirdOrgID := createOrganization(t, tx, instanceID)
+	grantedOrgID := createOrganization(t, tx, instanceID)
 	projectRepo := repository.ProjectRepository()
+	projectGrantRepo := repository.ProjectGrantRepository()
 
 	projects := [...]*domain.Project{
 		{
@@ -136,10 +140,59 @@ func TestListProjects(t *testing.T) {
 			IsProjectAccessRequired:  true,
 			UsedLabelingSettingOwner: 1,
 		},
+		{
+			InstanceID:               instanceID,
+			OrganizationID:           thirdOrgID,
+			ID:                       "5",
+			Name:                     "granted",
+			State:                    domain.ProjectStateActive,
+			ShouldAssertRole:         true,
+			IsAuthorizationRequired:  true,
+			IsProjectAccessRequired:  true,
+			UsedLabelingSettingOwner: 1,
+		},
+		{
+			InstanceID:               instanceID,
+			OrganizationID:           thirdOrgID,
+			ID:                       "5",
+			Name:                     "granted",
+			State:                    domain.ProjectStateActive,
+			ShouldAssertRole:         true,
+			IsAuthorizationRequired:  true,
+			IsProjectAccessRequired:  true,
+			UsedLabelingSettingOwner: 1,
+			GrantID:                  gu.Ptr("1"),
+			GrantedOrganizationID:    gu.Ptr(grantedOrgID),
+			GrantState:               gu.Ptr(domain.ProjectGrantStateActive),
+		},
+		{
+			InstanceID:               instanceID,
+			OrganizationID:           grantedOrgID,
+			ID:                       "6",
+			Name:                     "owned",
+			State:                    domain.ProjectStateActive,
+			ShouldAssertRole:         true,
+			IsAuthorizationRequired:  true,
+			IsProjectAccessRequired:  true,
+			UsedLabelingSettingOwner: 1,
+		},
 	}
 	for _, project := range projects {
-		err := projectRepo.Create(t.Context(), tx, project)
-		require.NoError(t, err)
+		// Granted Projects
+		if project.GrantedOrganizationID != nil {
+			err := projectGrantRepo.Create(t.Context(), tx, &domain.ProjectGrant{
+				InstanceID:             project.InstanceID,
+				ID:                     *project.GrantID,
+				ProjectID:              project.ID,
+				GrantedOrganizationID:  *project.GrantedOrganizationID,
+				GrantingOrganizationID: project.OrganizationID,
+				State:                  domain.ProjectGrantStateActive,
+			})
+			require.NoError(t, err)
+		} else {
+			err := projectRepo.Create(t.Context(), tx, project)
+			require.NoError(t, err)
+		}
 	}
 
 	tests := []struct {
@@ -179,12 +232,27 @@ func TestListProjects(t *testing.T) {
 			want: projects[1:3],
 		},
 		{
-			name: "state active",
+			name: "state active from first or second org",
 			condition: database.And(
 				projectRepo.InstanceIDCondition(instanceID),
+				database.Or(
+					projectRepo.OrganizationIDCondition(firstOrgID),
+					projectRepo.OrganizationIDCondition(secondOrgID),
+				),
 				projectRepo.StateCondition(domain.ProjectStateActive),
 			),
 			want: []*domain.Project{projects[0], projects[2]},
+		},
+		{
+			name: "all from granted org or granted to granted org",
+			condition: database.And(
+				projectRepo.InstanceIDCondition(instanceID),
+				database.Or(
+					projectRepo.OrganizationIDCondition(grantedOrgID),
+					projectRepo.GrantedOrganizationIDCondition(grantedOrgID),
+				),
+			),
+			want: []*domain.Project{projects[5], projects[6]},
 		},
 	}
 
@@ -195,7 +263,7 @@ func TestListProjects(t *testing.T) {
 				database.WithOrderByAscending(projectRepo.PrimaryKeyColumns()...),
 			)
 			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.want, got)
+			assert.EqualExportedValues(t, tt.want, got)
 		})
 	}
 }
