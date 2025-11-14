@@ -137,6 +137,16 @@
                     </button>
                   </div>
 
+                  <!-- Framework selector (shown when no framework is selected) -->
+                  <div *ngIf="!framework" class="framework-selector-section">
+                    <h5>{{ 'APP.OVERVIEW_DETAIL.SELECT_FRAMEWORK' | translate }}</h5>
+                    <p class="framework-selector-desc">{{ 'APP.OVERVIEW_DETAIL.SELECT_FRAMEWORK_DESC' | translate }}</p>
+                    <cnsl-framework-autocomplete
+                      [frameworks]="frameworks"
+                      (selectionChanged)="selectFrameworkById($event)"
+                    ></cnsl-framework-autocomplete>
+                  </div>
+
                   <div class="scenario-card new-app-scenario" *ngIf="selectedScenario === 'new'">
                     <div class="scenario-content">
                       <div class="scenario-description">
@@ -272,7 +282,12 @@
                           <div class="step-content">
                             <h6>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP_DOCS_TITLE' | translate }}</h6>
                             <p>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP_DOCS_DESC' | translate }}</p>
-                            <a [href]="getFrameworkInfo()?.docsLink" target="_blank" mat-raised-button color="primary">
+                            <a
+                              [href]="`https://zitadel.com${getFrameworkInfo()?.docsLink}`"
+                              target="_blank"
+                              mat-raised-button
+                              color="primary"
+                            >
                               {{ 'APP.OVERVIEW_DETAIL.VIEWDOCS' | translate }}
                             </a>
                           </div>
@@ -363,7 +378,11 @@
                             <h6>{{ 'APP.OVERVIEW_DETAIL.EXISTING_STEP_DOCS_TITLE' | translate }}</h6>
                             <p>{{ 'APP.OVERVIEW_DETAIL.EXISTING_STEP_DOCS_DESC' | translate }}</p>
                             <a
-                              [href]="hasSdk() ? getFrameworkInfo()?.sdkDocLink : getFrameworkInfo()?.docsLink"
+                              [href]="
+                                hasSdk()
+                                  ? `https://zitadel.com${getFrameworkInfo()?.sdkDocLink}`
+                                  : `https://zitadel.com${getFrameworkInfo()?.docsLink}`
+                              "
                               target="_blank"
                               mat-raised-button
                               color="primary"
@@ -373,17 +392,7 @@
                           </div>
                         </div>
                         <div class="step-item">
-                          <div class="step-number">
-                            {{
-                              hasSdk() && hasAnyFrameworkContent() && getFrameworkInfo()?.docsLink
-                                ? '4'
-                                : hasSdk() || (hasAnyFrameworkContent() && getFrameworkInfo()?.docsLink)
-                                  ? '3'
-                                  : !hasSdk() && !hasAnyFrameworkContent()
-                                    ? '3'
-                                    : '2'
-                            }}
-                          </div>
+                          <div class="step-number">{{ getExistingAppFinalStepNumber() }}</div>
                           <div class="step-content">
                             <h6>{{ 'APP.OVERVIEW_DETAIL.EXISTING_STEP3_TITLE' | translate }}</h6>
                             <p>{{ 'APP.OVERVIEW_DETAIL.EXISTING_STEP3_DESC' | translate }}</p>
