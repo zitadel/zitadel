@@ -141,6 +141,7 @@ const (
 	JoinFilterUnspecified JoinFilter = iota
 	JoinFilterApp
 	JoinFilterUserMachine
+	JoinFilterTarget
 )
 
 // SearchAuthNKeys returns machine or app keys, depending on the join filter.
@@ -173,6 +174,8 @@ func (q *Queries) searchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 	case JoinFilterUserMachine:
 		query = query.Join(join(MachineUserIDCol, AuthNKeyColumnIdentifier))
 		query = userPermissionCheckV2WithCustomColumns(ctx, query, permissionCheckV2, queries.Queries, AuthNKeyColumnResourceOwner, AuthNKeyColumnIdentifier)
+	case JoinFilterTarget:
+		query = query.Join(join(TargetColumnID, AuthNKeyColumnObjectID))
 	}
 	eq := sq.Eq{
 		AuthNKeyColumnEnabled.identifier():    true,

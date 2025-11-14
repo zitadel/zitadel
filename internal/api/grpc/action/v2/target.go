@@ -64,6 +64,52 @@ func (s *Server) DeleteTarget(ctx context.Context, req *connect.Request[action.D
 	}), nil
 }
 
+func (s *Server) AddPublicKey(ctx context.Context, req *connect.Request[action.AddPublicKeyRequest]) (*connect.Response[action.AddPublicKeyResponse], error) {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	key := &command.TargetPublicKey{
+		TargetID:  req.Msg.GetTargetId(),
+		PublicKey: req.Msg.GetPublicKey(),
+	}
+	details, err := s.command.AddTargetPublicKey(ctx, key, instanceID)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&action.AddPublicKeyResponse{
+		KeyId:        key.KeyID,
+		AdditionDate: timestamppb.New(details.EventDate),
+	}), nil
+}
+
+func (s *Server) ActivatePublicKey(ctx context.Context, req *connect.Request[action.ActivatePublicKeyRequest]) (*connect.Response[action.ActivatePublicKeyResponse], error) {
+	//instanceID := authz.GetInstance(ctx).InstanceID()
+	//activatedAt, err := s.command.ActivateTargetPublicKey(ctx, req.Msg.GetTargetId(), req.Msg.GetKeyId(), instanceID)
+	//if err != nil {
+	//	return nil, err
+	//}
+	var activationDate *timestamppb.Timestamp
+	//if !activatedAt.IsZero() {
+	//	activationDate = timestamppb.New(activatedAt)
+	//}
+	return connect.NewResponse(&action.ActivatePublicKeyResponse{
+		ActivationDate: activationDate,
+	}), nil
+}
+
+func (s *Server) RemovePublicKey(ctx context.Context, req *connect.Request[action.RemovePublicKeyRequest]) (*connect.Response[action.RemovePublicKeyResponse], error) {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	details, err := s.command.RemoveTargetPublicKey(ctx, req.Msg.GetTargetId(), req.Msg.GetKeyId(), instanceID)
+	if err != nil {
+		return nil, err
+	}
+	var removalDate *timestamppb.Timestamp
+	if !details.EventDate.IsZero() {
+		removalDate = timestamppb.New(details.EventDate)
+	}
+	return connect.NewResponse(&action.RemovePublicKeyResponse{
+		RemovalDate: removalDate,
+	}), nil
+}
+
 func createTargetToCommand(req *action.CreateTargetRequest) *command.AddTarget {
 	var (
 		targetType       target_domain.TargetType

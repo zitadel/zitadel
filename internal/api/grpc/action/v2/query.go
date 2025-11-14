@@ -58,6 +58,22 @@ func (s *Server) ListTargets(ctx context.Context, req *connect.Request[action.Li
 	}), nil
 }
 
+func (s *Server) ListPublicKeys(ctx context.Context, req *connect.Request[action.ListPublicKeysRequest]) (*connect.Response[action.ListPublicKeysResponse], error) {
+	res, err := s.query.SearchAuthNKeys(ctx, &query.AuthNKeySearchQueries{}, query.JoinFilterTarget, nil)
+	if err != nil {
+		return nil, err
+	}
+	publicKeys := make([]*action.PublicKey, len(res.AuthNKeys))
+	for i, key := range res.AuthNKeys {
+		publicKeys[i] = &action.PublicKey{
+			KeyId: key.ID,
+		}
+	}
+	return connect.NewResponse(&action.ListPublicKeysResponse{
+		PublicKeys: publicKeys,
+	}), nil
+}
+
 func (s *Server) ListExecutions(ctx context.Context, req *connect.Request[action.ListExecutionsRequest]) (*connect.Response[action.ListExecutionsResponse], error) {
 	queries, err := s.ListExecutionsRequestToModel(req.Msg)
 	if err != nil {

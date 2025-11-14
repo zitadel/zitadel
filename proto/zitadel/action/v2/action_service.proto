@@ -400,6 +400,34 @@ service ActionService {
     };
   }
 
+  // List Public Keys
+  //
+  // Lists all public keys of a target.
+  //
+  // Required permission:
+  //   - `action.target.read`
+  rpc ListPublicKeys (ListPublicKeysRequest) returns (ListPublicKeysResponse) {
+    option (google.api.http) = {
+      post: "/v2/actions/targets/{target_id}/publickeys"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.target.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "List of public keys retrieved successfully";
+        };
+      };
+    };
+  }
+
   // Set Execution
   //
   // Sets an execution to call a target or include the targets of another execution.
@@ -947,6 +975,54 @@ message RemovePublicKeyRequest {
 message RemovePublicKeyResponse {
   // The timestamp of the public key removal.
   google.protobuf.Timestamp removal_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+}
+
+message ListPublicKeysRequest {
+  // The unique identifier of the target to list the public keys for.
+  string target_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message ListPublicKeysResponse {
+  // List of all public keys for the target.
+  repeated PublicKey public_keys = 1;
+}
+
+message PublicKey {
+  // The unique identifier of the public key.
+  string key_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629032906489576\"";
+    }
+  ];
+
+  // The public key in PEM format.
+  string public_key = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"-----BEGIN PUBLIC KEY-----...\"";
+    }
+  ];
+
+  // Indicates whether the public key is active and used for payload encryption.
+  bool active = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+    }
+  ];
+
+  // The timestamp of the public key addition.
+  google.protobuf.Timestamp addition_date = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2024-12-18T07:50:47.492Z\"";
     }

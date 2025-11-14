@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/repository/target"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -118,6 +119,23 @@ func (p *authNKeyProjection) Reducers() []handler.AggregateReducer {
 			},
 		},
 		{
+			Aggregate: target.AggregateType,
+			EventReducers: []handler.EventReducer{
+				{
+					Event:  target.KeyAddedEventType,
+					Reduce: p.reduceAuthNKeyAdded,
+				},
+				{
+					Event:  target.KeyRemovedEventType,
+					Reduce: p.reduceAuthNKeyRemoved,
+				},
+				{
+					Event:  target.RemovedEventType,
+					Reduce: p.reduceAuthNKeyRemoved,
+				},
+			},
+		},
+		{
 			Aggregate: org.AggregateType,
 			EventReducers: []handler.EventReducer{
 				{
@@ -165,6 +183,13 @@ func (p *authNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handl
 		authNKeyEvent.identifier = e.Aggregate().ID
 		authNKeyEvent.publicKey = e.PublicKey
 		authNKeyEvent.keyType = e.KeyType
+	case *target.KeyAddedEvent:
+		authNKeyEvent.BaseEvent = e.BaseEvent
+		authNKeyEvent.keyID = e.KeyID
+		authNKeyEvent.objectID = e.Aggregate().ID
+		authNKeyEvent.expiration = time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC) //TODO: !
+		authNKeyEvent.identifier = e.KeyID
+		authNKeyEvent.publicKey = e.PublicKey
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-Dgb32", "reduce.wrong.event.type %v", []eventstore.EventType{project.ApplicationKeyAddedEventType, user.MachineKeyAddedEventType})
 	}
@@ -238,6 +263,10 @@ func (p *authNKeyProjection) reduceAuthNKeyRemoved(event eventstore.Event) (*han
 	case *user.MachineKeyRemovedEvent:
 		condition = handler.NewCond(AuthNKeyIDCol, e.KeyID)
 	case *user.UserRemovedEvent:
+		condition = handler.NewCond(AuthNKeyAggregateIDCol, e.Aggregate().ID)
+	case *target.KeyRemovedEvent:
+		condition = handler.NewCond(AuthNKeyIDCol, e.KeyID)
+	case *target.RemovedEvent:
 		condition = handler.NewCond(AuthNKeyAggregateIDCol, e.Aggregate().ID)
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-BGge42", "reduce.wrong.event.type %v", []eventstore.EventType{project.ApplicationKeyRemovedEventType, project.ApplicationRemovedType, project.ProjectRemovedType, user.MachineKeyRemovedEventType, user.UserRemovedType})
