@@ -142,7 +142,6 @@
                     <h5>{{ 'APP.OVERVIEW_DETAIL.SELECT_FRAMEWORK' | translate }}</h5>
                     <p class="framework-selector-desc">{{ 'APP.OVERVIEW_DETAIL.SELECT_FRAMEWORK_DESC' | translate }}</p>
                     <cnsl-framework-autocomplete
-                      [frameworks]="frameworks"
                       (selectionChanged)="selectFrameworkById($event)"
                     ></cnsl-framework-autocomplete>
                   </div>

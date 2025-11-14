@@ -28,9 +28,15 @@ import { createClientFor } from '@zitadel/client';
 
 import { WebKeyService } from '@zitadel/proto/zitadel/webkey/v2beta/webkey_service_pb';
 import { ActionService } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
+import { AppService } from '@zitadel/proto/zitadel/app/v2beta/app_service_pb';
+import { ProjectService } from '@zitadel/proto/zitadel/project/v2beta/project_service_pb';
+import { AuthorizationService } from '@zitadel/proto/zitadel/authorization/v2beta/authorization_service_pb';
 
 const createWebKeyServiceClient = createClientFor(WebKeyService);
 const createActionServiceClient = createClientFor(ActionService);
+const createAppServiceClient = createClientFor(AppService);
+const createProjectServiceClient = createClientFor(ProjectService);
+const createAuthorizationServiceClient = createClientFor(AuthorizationService);
 
 @Injectable({
   providedIn: 'root',
@@ -49,6 +55,9 @@ export class GrpcService {
   public webKey!: ReturnType<typeof createWebKeyServiceClient>;
   public organizationNew!: ReturnType<typeof createOrganizationServiceClient>;
   public adminNew!: ReturnType<typeof createAdminServiceClient>;
+  public application!: ReturnType<typeof createAppServiceClient>;
+  public project!: ReturnType<typeof createProjectServiceClient>;
+  public authorization!: ReturnType<typeof createAuthorizationServiceClient>;
 
   public assets!: void;
 
@@ -107,6 +116,9 @@ export class GrpcService {
         this.actionNew = createActionServiceClient(transport);
         this.webKey = createWebKeyServiceClient(transport);
         this.organizationNew = createOrganizationServiceClient(transport);
+        this.application = createAppServiceClient(transport);
+        this.project = createProjectServiceClient(transport);
+        this.authorization = createAuthorizationServiceClient(transport);
         this.adminNew = createAdminServiceClient(transportOldAPIs);
 
         const authConfig: AuthConfig = {

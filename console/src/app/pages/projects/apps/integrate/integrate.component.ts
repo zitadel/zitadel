@@ -1,37 +1,18 @@
-import { C, COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
-import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { Location } from '@angular/common';
-import { Component, OnDestroy, OnInit, Signal, computed, effect, signal } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { Component, OnInit, effect, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Buffer } from 'buffer';
-import { BehaviorSubject, Subject, Subscription, combineLatest } from 'rxjs';
-import { debounceTime, map, takeUntil } from 'rxjs/operators';
-import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
-import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
-import {
-  APIAuthMethodType,
-  OIDCAppType,
-  OIDCAuthMethodType,
-  OIDCGrantType,
-  OIDCResponseType,
-} from 'src/app/proto/generated/zitadel/app_pb';
-import {
-  AddAPIAppRequest,
-  AddAPIAppResponse,
-  AddOIDCAppRequest,
-  AddOIDCAppResponse,
-  AddSAMLAppRequest,
-} from 'src/app/proto/generated/zitadel/management_pb';
+import { ActivatedRoute, Router } from '@angular/router';
+import { BehaviorSubject, Subject, combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { OIDCAppType } from 'src/app/proto/generated/zitadel/app_pb';
+import { AddAPIAppResponse, AddOIDCAppRequest, AddOIDCAppResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
-import { Framework } from 'src/app/components/quickstart/quickstart.component';
-import { OIDC_CONFIGURATIONS } from 'src/app/utils/framework';
+import { frameworks, OIDC_CONFIGURATIONS } from 'src/app/utils/framework';
 import { NavigationService } from 'src/app/services/navigation.service';
 import { NameDialogComponent } from 'src/app/modules/name-dialog/name-dialog.component';
 
@@ -41,12 +22,12 @@ import { NameDialogComponent } from 'src/app/modules/name-dialog/name-dialog.com
   styleUrls: ['./integrate.component.scss'],
   standalone: false,
 })
-export class IntegrateAppComponent implements OnInit, OnDestroy {
+export class IntegrateAppComponent implements OnInit {
   private destroy$: Subject<void> = new Subject();
   public projectId: string = '';
   public loading: boolean = false;
-  public InfoSectionType: any = InfoSectionType;
-  public framework = signal<Framework | undefined>(undefined);
+  public InfoSectionType = InfoSectionType;
+  protected readonly framework = signal<(typeof frameworks)[number] | undefined>(undefined);
   public showRenameWarning: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public oidcAppRequest: BehaviorSubject<AddOIDCAppRequest> = new BehaviorSubject(new AddOIDCAppRequest());
 
@@ -64,17 +45,16 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
     public navigation: NavigationService,
   ) {
     effect(() => {
-      const fwId = this.framework()?.id;
       const fw = this.framework();
-      if (fw && fwId) {
-        const request = OIDC_CONFIGURATIONS[fwId];
-        request.setProjectId(this.projectId);
-        request.setName(fw.title);
-        request.setDevMode(true);
+      if (fw) {
+        const request = OIDC_CONFIGURATIONS[fw.id as unknown as keyof typeof OIDC_CONFIGURATIONS];
+        // request.setProjectId(this.projectId);
+        // request.setName(fw.title);
+        // request.setDevMode(true);
         this.requestRedirectValuesSubject$.next();
         this.showRenameWarning.next(false);
 
-        this.oidcAppRequest.next(request);
+        // this.oidcAppRequest.next(request);
         return request;
       } else {
         const request = new AddOIDCAppRequest();
@@ -95,10 +75,6 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
       return project?.name ?? grantedproject?.projectName ?? '';
     }),
   );
-
-  public setFramework(framework: Framework | undefined) {
-    this.framework.set(framework);
-  }
 
   public ngOnInit(): void {
     const projectId = this.activatedRoute.snapshot.paramMap.get('projectid');
@@ -121,11 +97,6 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
     }
   }
 
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
   public close(): void {
     if (this.navigation.isBackPossible) {
       this._location.back();
@@ -145,7 +116,7 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
         if (resp.clientSecret) {
           this.showSavedDialog(resp);
         } else {
-          this.router.navigate(['projects', this.projectId, 'apps', resp.appId], { queryParams: { new: true } });
+          this.router.navigate(['projects', this.projectId, 'apps', resp.appId], { queryParams: { new: true } }).then();
         }
       })
       .catch((error) => {

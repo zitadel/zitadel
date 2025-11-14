@@ -1,124 +1,165 @@
-import { AddOIDCAppRequest } from '../proto/generated/zitadel/management_pb';
-import { OIDCAppType, OIDCAuthMethodType, OIDCGrantType, OIDCResponseType } from '../proto/generated/zitadel/app_pb';
+import { MessageInitShape } from '@bufbuild/protobuf';
+import { CreateApplicationRequestSchema } from '@zitadel/proto/zitadel/app/v2beta/app_service_pb';
+import { OIDCAppType, OIDCAuthMethodType, OIDCGrantType, OIDCResponseType } from '@zitadel/proto/zitadel/app/v2beta/oidc_pb';
+import frameworkDefinition from 'src/../../../docs/frameworks.json';
 
-type OidcAppConfigurations = {
-  [framework: string]: AddOIDCAppRequest;
-};
+type OIDCConfiguration = Extract<
+  MessageInitShape<typeof CreateApplicationRequestSchema>['creationRequestType'],
+  { case: 'oidcRequest' }
+>['value'];
 
-export const OIDC_CONFIGURATIONS: OidcAppConfigurations = {
+export const OIDC_CONFIGURATIONS = {
   // user agent applications (SPA)
-  ['angular']: new AddOIDCAppRequest()
-    .setAppType(OIDCAppType.OIDC_APP_TYPE_USER_AGENT)
-    .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE)
-    .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
-    .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
-    .setRedirectUrisList(['http://localhost:4200/callback'])
-    .setPostLogoutRedirectUrisList(['http://localhost:4200']),
-  ['react']: new AddOIDCAppRequest()
-    .setAppType(OIDCAppType.OIDC_APP_TYPE_USER_AGENT)
-    .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE)
-    .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
-    .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
-    .setRedirectUrisList(['http://localhost:3000/callback'])
-    .setPostLogoutRedirectUrisList(['http://localhost:3000']),
-  ['vue']: new AddOIDCAppRequest()
-    .setAppType(OIDCAppType.OIDC_APP_TYPE_USER_AGENT)
-    .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE)
-    .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
-    .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
-    .setRedirectUrisList(['http://localhost:5173/auth/signinwin/zitadel'])
-    .setPostLogoutRedirectUrisList(['http://localhost:5173/']),
+  angular: {
+    appType: OIDCAppType.OIDC_APP_TYPE_USER_AGENT,
+    authMethodType: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE,
+    responseTypes: [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+    grantTypes: [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE],
+    redirectUris: ['http://localhost:4200/callback'],
+    postLogoutRedirectUris: ['http://localhost:4200'],
+  },
+  react: {
+    appType: OIDCAppType.OIDC_APP_TYPE_USER_AGENT,
+    authMethodType: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE,
+    responseTypes: [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+    grantTypes: [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE],
+    redirectUris: ['http://localhost:3000/callback'],
+    postLogoutRedirectUris: ['http://localhost:3000'],
+  },
+  vue: {
+    appType: OIDCAppType.OIDC_APP_TYPE_USER_AGENT,
+    authMethodType: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE,
+    responseTypes: [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+    grantTypes: [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE],
+    redirectUris: ['http://localhost:5173/auth/signinwin/zitadel'],
+    postLogoutRedirectUris: ['http://localhost:5173/'],
+  },
   // web applications (SSR)
-  ['next']: new AddOIDCAppRequest()
-    .setAppType(OIDCAppType.OIDC_APP_TYPE_WEB)
-    .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC)
-    .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
-    .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
-    .setRedirectUrisList(['http://localhost:3000/callback'])
-    .setPostLogoutRedirectUrisList(['http://localhost:3000']),
-  ['astro']: new AddOIDCAppRequest()
-    .setAppType(OIDCAppType.OIDC_APP_TYPE_WEB)
-    .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC)
-    .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
-    .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
-    .setRedirectUrisList(['http://localhost:3000/api/auth/callback'])
-    .setPostLogoutRedirectUrisList(['http://localhost:3000']),
-  ['hono']: new AddOIDCAppRequest()
-    .setAppType(OIDCAppType.OIDC_APP_TYPE_WEB)
-    .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC)
-    .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
-    .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
-    .setRedirectUrisList(['http://localhost:3000/api/auth/callback'])
-    .setPostLogoutRedirectUrisList(['http://localhost:3000']),
-  ['nestjs']: new AddOIDCAppRequest()
-    .setAppType(OIDCAppType.OIDC_APP_TYPE_WEB)
-    .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC)
-    .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
-    .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
-    .setRedirectUrisList(['http://localhost:3000/api/auth/callback'])
-    .setPostLogoutRedirectUrisList(['http://localhost:3000']),
-  ['nuxtjs']: new AddOIDCAppRequest()
-    .setAppType(OIDCAppType.OIDC_APP_TYPE_WEB)
-    .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC)
-    .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
-    .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
-    .setRedirectUrisList(['http://localhost:3000/api/auth/callback'])
-    .setPostLogoutRedirectUrisList(['http://localhost:3000']),
-  ['solidstart']: new AddOIDCAppRequest()
-    .setAppType(OIDCAppType.OIDC_APP_TYPE_WEB)
-    .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC)
-    .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
-    .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
-    .setRedirectUrisList(['http://localhost:3000/api/auth/callback'])
-    .setPostLogoutRedirectUrisList(['http://localhost:3000']),
-  ['sveltekit']: new AddOIDCAppRequest()
-    .setAppType(OIDCAppType.OIDC_APP_TYPE_WEB)
-    .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC)
-    .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
-    .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
-    .setRedirectUrisList(['http://localhost:3000/auth/callback'])
-    .setPostLogoutRedirectUrisList(['http://localhost:3000']),
-  ['spring-boot']: new AddOIDCAppRequest()
-    .setAppType(OIDCAppType.OIDC_APP_TYPE_WEB)
-    .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE)
-    .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
-    .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
-    .setRedirectUrisList(['http://localhost:18080/webapp/login/oauth2/code/zitadel'])
-    .setPostLogoutRedirectUrisList(['http://localhost:18080/webapp']),
-  ['java']: new AddOIDCAppRequest()
-    .setAppType(OIDCAppType.OIDC_APP_TYPE_WEB)
-    .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE)
-    .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
-    .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
-    .setRedirectUrisList(['http://localhost:18080/webapp/login/oauth2/code/zitadel'])
-    .setPostLogoutRedirectUrisList(['http://localhost:18080/webapp']),
-  ['symfony']: new AddOIDCAppRequest()
-    .setAppType(OIDCAppType.OIDC_APP_TYPE_WEB)
-    .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC)
-    .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
-    .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
-    .setRedirectUrisList(['http://localhost:8000/login_check'])
-    .setPostLogoutRedirectUrisList(['http://localhost:8000/logout']),
-  ['django']: new AddOIDCAppRequest()
-    .setAppType(OIDCAppType.OIDC_APP_TYPE_WEB)
-    .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE)
-    .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
-    .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
-    .setRedirectUrisList(['http://localhost:8000/oidc/callback/'])
-    .setPostLogoutRedirectUrisList(['http://localhost:8000/oidc/logout/ ']),
-  ['flask']: new AddOIDCAppRequest()
-    .setAppType(OIDCAppType.OIDC_APP_TYPE_WEB)
-    .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE)
-    .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
-    .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
-    .setRedirectUrisList(['http://127.0.0.1:5000/callback'])
-    .setPostLogoutRedirectUrisList(['http://127.0.0.1:5000']),
+  next: {
+    appType: OIDCAppType.OIDC_APP_TYPE_WEB,
+    authMethodType: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC,
+    responseTypes: [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+    grantTypes: [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE],
+    redirectUris: ['http://localhost:3000/callback'],
+    postLogoutRedirectUris: ['http://localhost:3000'],
+  },
+  astro: {
+    appType: OIDCAppType.OIDC_APP_TYPE_WEB,
+    authMethodType: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC,
+    responseTypes: [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+    grantTypes: [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE],
+    redirectUris: ['http://localhost:3000/api/auth/callback'],
+    postLogoutRedirectUris: ['http://localhost:3000'],
+  },
+  hono: {
+    appType: OIDCAppType.OIDC_APP_TYPE_WEB,
+    authMethodType: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC,
+    responseTypes: [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+    grantTypes: [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE],
+    redirectUris: ['http://localhost:3000/api/auth/callback'],
+    postLogoutRedirectUris: ['http://localhost:3000'],
+  },
+  nestjs: {
+    appType: OIDCAppType.OIDC_APP_TYPE_WEB,
+    authMethodType: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC,
+    responseTypes: [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+    grantTypes: [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE],
+    redirectUris: ['http://localhost:3000/api/auth/callback'],
+    postLogoutRedirectUris: ['http://localhost:3000'],
+  },
+  nuxtjs: {
+    appType: OIDCAppType.OIDC_APP_TYPE_WEB,
+    authMethodType: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC,
+    responseTypes: [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+    grantTypes: [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE],
+    redirectUris: ['http://localhost:3000/api/auth/callback'],
+    postLogoutRedirectUris: ['http://localhost:3000'],
+  },
+  solidstart: {
+    appType: OIDCAppType.OIDC_APP_TYPE_WEB,
+    authMethodType: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC,
+    responseTypes: [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+    grantTypes: [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE],
+    redirectUris: ['http://localhost:3000/api/auth/callback'],
+    postLogoutRedirectUris: ['http://localhost:3000'],
+  },
+  sveltekit: {
+    appType: OIDCAppType.OIDC_APP_TYPE_WEB,
+    authMethodType: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC,
+    responseTypes: [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+    grantTypes: [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE],
+    redirectUris: ['http://localhost:3000/auth/callback'],
+    postLogoutRedirectUris: ['http://localhost:3000'],
+  },
+  'spring-boot': {
+    appType: OIDCAppType.OIDC_APP_TYPE_WEB,
+    authMethodType: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE,
+    responseTypes: [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+    grantTypes: [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE],
+    redirectUris: ['http://localhost:18080/webapp/login/oauth2/code/zitadel'],
+    postLogoutRedirectUris: ['http://localhost:18080/webapp'],
+  },
+  java: {
+    appType: OIDCAppType.OIDC_APP_TYPE_WEB,
+    authMethodType: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE,
+    responseTypes: [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+    grantTypes: [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE],
+    redirectUris: ['http://localhost:18080/webapp/login/oauth2/code/zitadel'],
+    postLogoutRedirectUris: ['http://localhost:18080/webapp'],
+  },
+  symfony: {
+    appType: OIDCAppType.OIDC_APP_TYPE_WEB,
+    authMethodType: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC,
+    responseTypes: [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+    grantTypes: [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE],
+    redirectUris: ['http://localhost:8000/login_check'],
+    postLogoutRedirectUris: ['http://localhost:8000/logout'],
+  },
+  django: {
+    appType: OIDCAppType.OIDC_APP_TYPE_WEB,
+    authMethodType: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE,
+    responseTypes: [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+    grantTypes: [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE],
+    redirectUris: ['http://localhost:8000/oidc/callback/'],
+    postLogoutRedirectUris: ['http://localhost:8000/oidc/logout/ '],
+  },
+  flask: {
+    appType: OIDCAppType.OIDC_APP_TYPE_WEB,
+    authMethodType: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE,
+    responseTypes: [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+    grantTypes: [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE],
+    redirectUris: ['http://127.0.0.1:5000/callback'],
+    postLogoutRedirectUris: ['http://127.0.0.1:5000'],
+  },
   // native
-  ['flutter']: new AddOIDCAppRequest()
-    .setAppType(OIDCAppType.OIDC_APP_TYPE_NATIVE)
-    .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE)
-    .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
-    .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
-    .setRedirectUrisList(['http://localhost:4444/auth.html', 'com.example.zitadelflutter'])
-    .setPostLogoutRedirectUrisList(['http://localhost:4444', 'com.example.zitadelflutter']),
-};
+  flutter: {
+    appType: OIDCAppType.OIDC_APP_TYPE_NATIVE,
+    authMethodType: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE,
+    responseTypes: [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+    grantTypes: [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE],
+    redirectUris: ['http://localhost:4444/auth.html', 'com.example.zitadelflutter'],
+    postLogoutRedirectUris: ['http://localhost:4444', 'com.example.zitadelflutter'],
+  },
+} satisfies Record<string, OIDCConfiguration>;
+
+export const frameworks = frameworkDefinition.map((f) => ({
+  ...f,
+  imgSrcDark: `assets${f.imgSrcDark}`,
+  imgSrcLight: `assets${f.imgSrcLight ?? f.imgSrcDark}`,
+}));
+
+export const frameworksWithOidcConfiguration = frameworks
+  .map((f) => {
+    const id = f.id as unknown as keyof typeof OIDC_CONFIGURATIONS;
+    const oidcConfiguration: (typeof OIDC_CONFIGURATIONS)[typeof id] | undefined = OIDC_CONFIGURATIONS[id];
+
+    if (oidcConfiguration) {
+      return {
+        ...f,
+        id,
+      };
+    }
+
+    return undefined;
+  })
+  .filter((f) => !!f);
