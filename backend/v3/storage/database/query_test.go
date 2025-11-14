@@ -115,6 +115,16 @@ func TestQueryOptions(t *testing.T) {
 			},
 		},
 		{
+			name: "with lock",
+			options: []QueryOption{
+				WithResultLock(),
+			},
+			want: want{
+				stmt: " FOR UPDATE",
+				args: nil,
+			},
+		},
+		{
 			name: "multiple options",
 			options: []QueryOption{
 				WithLeftJoin("other_table", NewColumnCondition(NewColumn("table", "id"), NewColumn("other_table", "table_id"))),
@@ -122,9 +132,10 @@ func TestQueryOptions(t *testing.T) {
 				WithOrderByDescending(NewColumn("table", "column")),
 				WithLimit(10),
 				WithOffset(5),
+				WithResultLock(),
 			},
 			want: want{
-				stmt: " LEFT JOIN other_table ON table.id = other_table.table_id WHERE table.column = $1 ORDER BY table.column DESC LIMIT $2 OFFSET $3",
+				stmt: " LEFT JOIN other_table ON table.id = other_table.table_id WHERE table.column = $1 ORDER BY table.column DESC LIMIT $2 OFFSET $3 FOR UPDATE",
 				args: []any{123, uint32(10), uint32(5)},
 			},
 		},
