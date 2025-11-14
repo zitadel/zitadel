@@ -363,6 +363,7 @@ func TestEventstore_queueExecutions(t *testing.T) {
 						mustNewRequest(t, events[0], []target.Target{{ExecutionID: "event"}}),
 						mustNewRequest(t, events[1], []target.Target{{ExecutionID: "event"}}),
 						mustNewRequest(t, events[2], []target.Target{{ExecutionID: "event"}}),
+						mustNewRequest(t, events[3], []target.Target{{ExecutionID: "event"}}),
 					},
 					gomock.Any(),
 				)
