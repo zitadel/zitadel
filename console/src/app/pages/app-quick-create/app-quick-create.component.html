@@ -16,13 +16,8 @@
                 [class.selected]="selectedFramework()?.id === framework.id"
                 title="{{ framework.title }}"
               >
-                <img class="dark-only" [src]="framework.imgSrcDark"
-                     alt="{{ framework.title }}"/>
-                <img
-                  class="light-only"
-                  [src]="framework.imgSrcLight"
-                  alt="{{ framework.title }}"
-                />
+                <img class="dark-only" [src]="framework.imgSrcDark" alt="{{ framework.title }}" />
+                <img class="light-only" [src]="framework.imgSrcLight" alt="{{ framework.title }}" />
               </button>
             }
           </div>
@@ -62,16 +57,8 @@
       <div class="framework-details-panel">
         <div class="panel-header">
           <div class="panel-title-section">
-            <img
-              class="framework-logo dark-only"
-              [src]="framework.imgSrcDark"
-              alt="{{ framework.title }}"
-            />
-            <img
-              class="framework-logo light-only"
-              [src]="framework.imgSrcLight"
-              alt="{{ framework.title }}"
-            />
+            <img class="framework-logo dark-only" [src]="framework.imgSrcDark" alt="{{ framework.title }}" />
+            <img class="framework-logo light-only" [src]="framework.imgSrcLight" alt="{{ framework.title }}" />
             <h2>{{ framework.title }}</h2>
           </div>
           <button mat-icon-button (click)="selectedFramework.set(undefined)">
@@ -80,16 +67,11 @@
         </div>
 
         <div class="panel-content">
-          @if (framework.ecosystem) {
-            <div class="detail-section">
-              <h3>Ecosystem</h3>
-              <p>{{ framework.ecosystem }}</p>
-            </div>
-          }
           <div class="panel-content">
             @if (framework.ecosystem) {
               <div class="detail-section">
-                <cnsl-info-section> We will create your project and all necessary configurations for you.
+                <cnsl-info-section>
+                  We will create your project and all necessary configurations for you.
                 </cnsl-info-section>
               </div>
               <div class="detail-section">
@@ -128,14 +110,13 @@
                 </a>
               </div>
             }
-
           </div>
 
           <div class="panel-actions">
             <button mat-stroked-button (click)="selectedFramework.set(undefined)">Cancel</button>
             <button color="primary" mat-raised-button (click)="createProjectAndContinue(framework)">
               @if (createProjectMutation.isPending() || createOidcApplicationMutation.isPending()) {
-                <mat-spinner diameter="20"/>
+                <mat-spinner diameter="20" />
               } @else {
                 Continue with {{ framework.title }}
               }

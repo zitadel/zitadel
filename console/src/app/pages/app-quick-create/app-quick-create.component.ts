@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, Signal, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, effect, inject, Signal, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom, map } from 'rxjs';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
@@ -134,6 +134,17 @@ export class AppQuickCreateComponent {
 
     const framework$ = this.activatedRoute.queryParamMap.pipe(map((params) => params.get('framework') ?? ''));
     this.initialParam = toSignal(framework$, { initialValue: '' });
+
+    // Auto-select framework from query param
+    effect(() => {
+      const frameworkId = this.initialParam();
+      if (frameworkId && !this.selectedFramework()) {
+        const framework = this.frameworks.find((f) => f.id === frameworkId);
+        if (framework) {
+          this.selectedFramework.set(framework);
+        }
+      }
+    });
   }
 
   public getAppTypeLabel(framework: Framework): string {

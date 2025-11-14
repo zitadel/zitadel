@@ -16,10 +16,7 @@ export const OIDC_CONFIGURATIONS = {
     responseTypes: [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
     grantTypes: [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE],
     redirectUris: ['http://localhost:3000/auth/callback/zitadel'],
-    postLogoutRedirectUris: [
-      'http://localhost:3000/api/auth/logout/callback',
-      'http://localhost:3000/auth/logout/callback',
-    ],
+    postLogoutRedirectUris: ['http://localhost:3000/api/auth/logout/callback', 'http://localhost:3000/auth/logout/callback'],
   },
   react: {
     appType: OIDCAppType.OIDC_APP_TYPE_USER_AGENT,
@@ -40,10 +37,7 @@ export const OIDC_CONFIGURATIONS = {
       'http://localhost:3000/api/auth/callback/zitadel',
       'http://localhost:3000/auth/callback/zitadel',
     ],
-    postLogoutRedirectUris: [
-      'http://localhost:3000/api/auth/logout/callback',
-      'http://localhost:3000/auth/logout/callback',
-    ],
+    postLogoutRedirectUris: ['http://localhost:3000/api/auth/logout/callback', 'http://localhost:3000/auth/logout/callback'],
   },
   // web applications (SSR)
   next: {
@@ -57,10 +51,7 @@ export const OIDC_CONFIGURATIONS = {
       'http://localhost:3000/api/auth/callback/zitadel',
       'http://localhost:3000/auth/callback/zitadel',
     ],
-    postLogoutRedirectUris: [
-      'http://localhost:3000/api/auth/logout/callback',
-      'http://localhost:3000/auth/logout/callback',
-    ],
+    postLogoutRedirectUris: ['http://localhost:3000/api/auth/logout/callback', 'http://localhost:3000/auth/logout/callback'],
     idTokenRoleAssertion: true,
     idTokenUserinfoAssertion: true,
   },
@@ -75,10 +66,7 @@ export const OIDC_CONFIGURATIONS = {
       'http://localhost:3000/api/auth/callback/zitadel',
       'http://localhost:3000/auth/callback/zitadel',
     ],
-    postLogoutRedirectUris: [
-      'http://localhost:3000/api/auth/logout/callback',
-      'http://localhost:3000/auth/logout/callback',
-    ],
+    postLogoutRedirectUris: ['http://localhost:3000/api/auth/logout/callback', 'http://localhost:3000/auth/logout/callback'],
     idTokenRoleAssertion: true,
     idTokenUserinfoAssertion: true,
   },
@@ -93,10 +81,7 @@ export const OIDC_CONFIGURATIONS = {
       'http://localhost:3000/api/auth/callback/zitadel',
       'http://localhost:3000/auth/callback/zitadel',
     ],
-    postLogoutRedirectUris: [
-      'http://localhost:3000/api/auth/logout/callback',
-      'http://localhost:3000/auth/logout/callback',
-    ],
+    postLogoutRedirectUris: ['http://localhost:3000/api/auth/logout/callback', 'http://localhost:3000/auth/logout/callback'],
     idTokenRoleAssertion: true,
     idTokenUserinfoAssertion: true,
   },
@@ -111,14 +96,11 @@ export const OIDC_CONFIGURATIONS = {
       'http://localhost:3000/api/auth/callback/zitadel',
       'http://localhost:3000/auth/callback/zitadel',
     ],
-    postLogoutRedirectUris: [
-      'http://localhost:3000/api/auth/logout/callback',
-      'http://localhost:3000/auth/logout/callback',
-    ],
+    postLogoutRedirectUris: ['http://localhost:3000/api/auth/logout/callback', 'http://localhost:3000/auth/logout/callback'],
     idTokenRoleAssertion: true,
     idTokenUserinfoAssertion: true,
   },
-  nuxt: {
+  nuxtjs: {
     appType: OIDCAppType.OIDC_APP_TYPE_WEB,
     authMethodType: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE,
     responseTypes: [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
@@ -129,10 +111,7 @@ export const OIDC_CONFIGURATIONS = {
       'http://localhost:3000/api/auth/callback/zitadel',
       'http://localhost:3000/auth/callback/zitadel',
     ],
-    postLogoutRedirectUris: [
-      'http://localhost:3000/api/auth/logout/callback',
-      'http://localhost:3000/auth/logout/callback',
-    ],
+    postLogoutRedirectUris: ['http://localhost:3000/api/auth/logout/callback', 'http://localhost:3000/auth/logout/callback'],
     idTokenRoleAssertion: true,
     idTokenUserinfoAssertion: true,
   },
@@ -147,10 +126,7 @@ export const OIDC_CONFIGURATIONS = {
       'http://localhost:3000/api/auth/callback/zitadel',
       'http://localhost:3000/auth/callback/zitadel',
     ],
-    postLogoutRedirectUris: [
-      'http://localhost:3000/api/auth/logout/callback',
-      'http://localhost:3000/auth/logout/callback',
-    ],
+    postLogoutRedirectUris: ['http://localhost:3000/api/auth/logout/callback', 'http://localhost:3000/auth/logout/callback'],
     idTokenRoleAssertion: true,
     idTokenUserinfoAssertion: true,
   },
@@ -165,10 +141,7 @@ export const OIDC_CONFIGURATIONS = {
       'http://localhost:3000/api/auth/callback/zitadel',
       'http://localhost:3000/auth/callback/zitadel',
     ],
-    postLogoutRedirectUris: [
-      'http://localhost:3000/api/auth/logout/callback',
-      'http://localhost:3000/auth/logout/callback',
-    ],
+    postLogoutRedirectUris: ['http://localhost:3000/api/auth/logout/callback', 'http://localhost:3000/auth/logout/callback'],
     idTokenRoleAssertion: true,
     idTokenUserinfoAssertion: true,
   },
@@ -183,14 +156,11 @@ export const OIDC_CONFIGURATIONS = {
       'http://localhost:3000/api/auth/callback/zitadel',
       'http://localhost:3000/auth/callback/zitadel',
     ],
-    postLogoutRedirectUris: [
-      'http://localhost:3000/api/auth/logout/callback',
-      'http://localhost:3000/auth/logout/callback',
-    ],
+    postLogoutRedirectUris: ['http://localhost:3000/api/auth/logout/callback', 'http://localhost:3000/auth/logout/callback'],
     idTokenRoleAssertion: true,
     idTokenUserinfoAssertion: true,
   },
-  spring: {
+  'spring-boot': {
     appType: OIDCAppType.OIDC_APP_TYPE_WEB,
     authMethodType: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC,
     responseTypes: [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
@@ -241,10 +211,7 @@ export const OIDC_CONFIGURATIONS = {
       'http://localhost:3000/api/auth/callback/zitadel',
       'http://localhost:3000/auth/callback/zitadel',
     ],
-    postLogoutRedirectUris: [
-      'http://localhost:3000/api/auth/logout/callback',
-      'http://localhost:3000/auth/logout/callback',
-    ],
+    postLogoutRedirectUris: ['http://localhost:3000/api/auth/logout/callback', 'http://localhost:3000/auth/logout/callback'],
     idTokenRoleAssertion: true,
     idTokenUserinfoAssertion: true,
   },
@@ -259,10 +226,7 @@ export const OIDC_CONFIGURATIONS = {
       'http://localhost:3000/api/auth/callback/zitadel',
       'http://localhost:3000/auth/callback/zitadel',
     ],
-    postLogoutRedirectUris: [
-      'http://localhost:3000/api/auth/logout/callback',
-      'http://localhost:3000/auth/logout/callback',
-    ],
+    postLogoutRedirectUris: ['http://localhost:3000/api/auth/logout/callback', 'http://localhost:3000/auth/logout/callback'],
     idTokenRoleAssertion: true,
     idTokenUserinfoAssertion: true,
   },

@@ -1562,29 +1562,27 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const frameworkConfig = OIDC_CONFIGURATIONS[this.framework];
+    const frameworkConfig = OIDC_CONFIGURATIONS[this.framework as keyof typeof OIDC_CONFIGURATIONS];
     if (!frameworkConfig) {
       return;
     }
 
     // Initialize OIDC form with framework defaults
     this.oidcForm.patchValue({
-      appType: frameworkConfig.getAppType(),
-      authMethodType: frameworkConfig.getAuthMethodType(),
-      responseTypesList: frameworkConfig.getResponseTypesList(),
-      grantTypesList: frameworkConfig.getGrantTypesList(),
+      appType: frameworkConfig.appType,
+      authMethodType: frameworkConfig.authMethodType,
+      responseTypesList: frameworkConfig.responseTypes,
+      grantTypesList: frameworkConfig.grantTypes,
     });
 
     // Initialize OIDC token form with framework defaults
     this.oidcTokenForm.patchValue({
-      accessTokenType: frameworkConfig.getAccessTokenType(),
-      accessTokenRoleAssertion: frameworkConfig.getAccessTokenRoleAssertion(),
-      idTokenRoleAssertion: frameworkConfig.getIdTokenRoleAssertion(),
-      idTokenUserinfoAssertion: frameworkConfig.getIdTokenUserinfoAssertion(),
+      idTokenRoleAssertion: (frameworkConfig as any).idTokenRoleAssertion,
+      idTokenUserinfoAssertion: (frameworkConfig as any).idTokenUserinfoAssertion,
     });
 
     // Set redirect URIs
-    this.redirectUrisList = frameworkConfig.getRedirectUrisList();
-    this.postLogoutRedirectUrisList = frameworkConfig.getPostLogoutRedirectUrisList();
+    this.redirectUrisList = frameworkConfig.redirectUris;
+    this.postLogoutRedirectUrisList = frameworkConfig.postLogoutRedirectUris;
   }
 }
