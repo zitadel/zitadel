@@ -5,6 +5,8 @@ import "context"
 const (
 	InstanceReadPermission      = "instance.read"
 	InstanceWritePermission     = "instance.write"
+	DomainReadPermission        = "domain.read"
+	DomainWritePermission       = "domain.write"
 	OrganizationReadPermission  = "organization.read"
 	OrganizationWritePermission = "organization.write"
 )
