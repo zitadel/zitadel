@@ -125,7 +125,7 @@ func createProject(t *testing.T, tx database.Transaction, instanceID, orgID stri
 	return project.ID
 }
 
-//func createUser(t *testing.T, tx database.Transaction, instanceID, orgID string) (userID string) {
+// func createUser(t *testing.T, tx database.Transaction, instanceID, orgID string) (userID string) {
 //	t.Helper()
 //	user := domain.User{
 //		InstanceID: instanceID,
@@ -150,7 +150,7 @@ func createProject(t *testing.T, tx database.Transaction, instanceID, orgID stri
 //	require.NoError(t, err)
 //
 //	return user.ID
-//}
+// }
 
 func createProjectRole(t *testing.T, tx database.Transaction, instanceID, orgID, projectID, key string) string {
 	t.Helper()
