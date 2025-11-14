@@ -26,22 +26,11 @@ const (
 	SettingTypeLegalAndSupport
 )
 
-//go:generate enumer -type OwnerType -transform snake -trimprefix OwnerType -sql
-type OwnerType uint8
-
-const (
-	OwnerTypeUnspecified OwnerType = iota
-	OwnerTypeSystem
-	OwnerTypeInstance
-	OwnerTypeOrganization
-)
-
 //go:generate enumer -type SettingState -transform snake -trimprefix SettingState -sql
 type SettingState int32
 
 const (
-	SettingStateUnspecified SettingState = iota
-	SettingStateActivated
+	SettingStateActive SettingState = iota
 	SettingStatePreview
 )
 
@@ -50,10 +39,9 @@ type Settings struct {
 	InstanceID     string       `json:"instanceId,omitempty" db:"instance_id"`
 	OrganizationID *string      `json:"organizationId,omitempty" db:"organization_id"`
 	Type           SettingType  `json:"type,omitempty" db:"type"`
-	OwnerType      OwnerType    `json:"ownerType,omitempty" db:"owner_type"`
 	State          SettingState `json:"state,omitempty" db:"state"`
 	Settings       []byte       `json:"settings,omitempty" db:"settings"`
-	CreatedAt      time.Time    `json:"createdAt,omitzero" db:"created_at"`
+	CreatedAt      *time.Time   `json:"createdAt,omitzero" db:"created_at"`
 	UpdatedAt      *time.Time   `json:"updatedAt,omitzero" db:"updated_at"`
 }
 
@@ -62,7 +50,6 @@ type settingsColumns interface {
 	InstanceIDColumn() database.Column
 	OrganizationIDColumn() database.Column
 	TypeColumn() database.Column
-	OwnerTypeColumn() database.Column
 	StateColumn() database.Column
 	SettingsColumn() database.Column
 	CreatedAtColumn() database.Column
@@ -74,7 +61,6 @@ type settingsConditions interface {
 	OrganizationIDCondition(id *string) database.Condition
 	IDCondition(id string) database.Condition
 	TypeCondition(typ SettingType) database.Condition
-	OwnerTypeCondition(typ OwnerType) database.Condition
 	StateCondition(typ SettingState) database.Condition
 }
 
@@ -91,7 +77,8 @@ type settingsRepository[T any] interface {
 	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*T, error)
 	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*T, error)
 
-	Set(ctx context.Context, client database.QueryExecutor, setting *T) error
+	Set(ctx context.Context, client database.QueryExecutor, settings *T) error
+	SetColumns(ctx context.Context, client database.QueryExecutor, settings Settings, changes ...database.Change) error
 	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }
 
@@ -140,10 +127,10 @@ type loginSettingsJSONChanges interface {
 	SetSecondFactorCheckLifetime(value time.Duration) db_json.JsonUpdate
 	SetMultiFactorCheckLifetime(value time.Duration) db_json.JsonUpdate
 
-	AddMFAType(value MultiFactorType) db_json.JsonUpdate
-	RemoveMFAType(value MultiFactorType) db_json.JsonUpdate
-	AddSecondFactorTypes(value SecondFactorType) db_json.JsonUpdate
-	RemoveSecondFactorTypes(value SecondFactorType) db_json.JsonUpdate
+	AddMFAType(value MultiFactorType) database.Change
+	RemoveMFAType(value MultiFactorType) database.Change
+	AddSecondFactorTypes(value SecondFactorType) database.Change
+	RemoveSecondFactorTypes(value SecondFactorType) database.Change
 }
 
 type LoginSettings struct {
@@ -217,7 +204,6 @@ type BrandingSettings struct {
 }
 
 type BrandingSettingsAttributes struct {
-	Settings
 	PrimaryColorLight    *string  `json:"primaryColorLight,omitempty"`
 	BackgroundColorLight *string  `json:"backgroundColorLight,omitempty"`
 	WarnColorLight       *string  `json:"warnColorLight,omitempty"`
@@ -261,7 +247,6 @@ type PasswordComplexitySettings struct {
 }
 
 type PasswordComplexitySettingsAttributes struct {
-	Settings
 	MinLength    *uint64 `json:"minLength,omitempty"`
 	HasLowercase *bool   `json:"hasLowercase,omitempty"`
 	HasUppercase *bool   `json:"hasUppercase,omitempty"`
@@ -358,7 +343,6 @@ type DomainSettings struct {
 	DomainSettingsAttributes
 }
 type DomainSettingsAttributes struct {
-	Settings
 	LoginNameIncludesDomain                *bool `json:"loginNameIncludesDomain,omitempty"`
 	RequireOrgDomainVerification           *bool `json:"requireOrgDomainVerification,omitempty"`
 	SMTPSenderAddressMatchesInstanceDomain *bool `json:"smtpSenderAddressMatchesInstanceDomain,omitempty"`

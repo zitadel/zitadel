@@ -3,19 +3,12 @@ package repository
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"net/url"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	db_json "github.com/zitadel/zitadel/backend/v3/storage/database/json"
-)
-
-var (
-	ErrMissingInstanceID = errors.New("instance id must be set")
-	ErrMissingType       = errors.New("type must be set")
-	ErrMissingOwnerType  = errors.New("owner must be set")
 )
 
 type settings struct{}
@@ -27,11 +20,6 @@ func (s settings) qualifiedTableName() string {
 func (settings) unqualifiedTableName() string {
 	return "settings"
 }
-
-var (
-	ErrSettingObjectMustNotBeNil error = errors.New("setting object must not be nil")
-	ErrLabelStateMustBeDefined   error = errors.New("label state must be defined")
-)
 
 // -------------------------------------------------------------
 // columns
@@ -51,10 +39,6 @@ func (s settings) OrganizationIDColumn() database.Column {
 
 func (s settings) TypeColumn() database.Column {
 	return database.NewColumn(s.unqualifiedTableName(), "type")
-}
-
-func (s settings) OwnerTypeColumn() database.Column {
-	return database.NewColumn(s.unqualifiedTableName(), "owner_type")
 }
 
 func (s settings) StateColumn() database.Column {
@@ -96,12 +80,8 @@ func (s settings) TypeCondition(typ domain.SettingType) database.Condition {
 	return database.NewTextCondition(s.TypeColumn(), database.TextOperationEqual, typ.String())
 }
 
-func (s settings) OwnerTypeCondition(typ domain.OwnerType) database.Condition {
-	return database.NewTextCondition(s.OwnerTypeColumn(), database.TextOperationEqual, typ.String())
-}
-
 func (s settings) StateCondition(typ domain.SettingState) database.Condition {
-	return database.NewTextCondition(s.StateColumn(), database.TextOperationEqual, typ.String())
+	return database.NewTextCondition(s.StateColumn(), database.TextOperationEqual, "something")
 }
 
 // -------------------------------------------------------------
@@ -133,20 +113,13 @@ func (s settings) list(ctx context.Context, client database.QueryExecutor, opts 
 }
 
 func (s settings) set(ctx context.Context, client database.QueryExecutor, settings domain.Settings, changes ...database.Change) error {
-	if settings.OrganizationID == nil {
-		settings.OwnerType = domain.OwnerTypeOrganization
-	} else {
-		settings.OwnerType = domain.OwnerTypeInstance
-	}
-
 	builder := database.NewStatementBuilder(`INSERT INTO ` + s.qualifiedTableName())
-	builder.WriteString(` (id, instance_id, organization_id, type, owner_type, state, settings) VALUES (`)
+	builder.WriteString(` (id, instance_id, organization_id, type,  state, settings) VALUES (`)
 	builder.WriteArgs(
 		settings.ID,
 		settings.InstanceID,
 		settings.OrganizationID,
 		settings.Type,
-		settings.OwnerType,
 		settings.State,
 		settings.Settings,
 	)
@@ -158,6 +131,10 @@ func (s settings) set(ctx context.Context, client database.QueryExecutor, settin
 	builder.WriteString(` RETURNING created_at, updated_at`)
 
 	return client.QueryRow(ctx, builder.String(), settings).Scan(&settings.CreatedAt, &settings.UpdatedAt)
+}
+
+func (s settings) SetColumns(ctx context.Context, client database.QueryExecutor, settings domain.Settings, changes ...database.Change) error {
+	return s.set(ctx, client, settings, changes...)
 }
 
 func (s settings) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
@@ -178,16 +155,14 @@ func (s settings) PrimaryKeyColumns() []database.Column {
 		s.InstanceIDColumn(),
 		s.IDColumn(),
 		s.TypeColumn(),
-		s.OwnerTypeColumn(),
 	}
 }
 
-func (s settings) PrimaryKeyCondition(instanceID, id string, t domain.SettingType, owner domain.OwnerType) database.Condition {
+func (s settings) PrimaryKeyCondition(instanceID, id string, t domain.SettingType) database.Condition {
 	return database.And(
 		s.InstanceIDCondition(instanceID),
 		s.IDCondition(id),
 		s.TypeCondition(t),
-		s.OwnerTypeCondition(owner),
 	)
 }
 
@@ -260,14 +235,10 @@ func (l loginSettings) SetSettingFields(value *domain.LoginSettings) database.Ch
 		changes = append(changes, l.SetDisableLoginWithEmail(*value.DisableLoginWithEmail))
 	}
 	if value.MFAType != nil {
-		// TODO(stebenz): determine what factors have to be removed and added
-		//changes = append(changes, l.AddMFAType(0))
-		//changes = append(changes, l.RemoveMFAType(0))
+		changes = append(changes, l.SetMFAType(value.MFAType))
 	}
 	if value.SecondFactorTypes != nil {
-		// TODO(stebenz): determine what factors have to be removed and added
-		//changes = append(changes, l.AddSecondFactorTypes(0))
-		//changes = append(changes, l.RemoveSecondFactorTypes(0))
+		changes = append(changes, l.SetSecondFactorTypes(value.SecondFactorTypes))
 	}
 	return db_json.NewJsonChanges(l.SettingsColumn(), changes...)
 }
@@ -340,23 +311,39 @@ func (loginSettings) SetMultiFactorCheckLifetime(value time.Duration) db_json.Js
 	return db_json.NewFieldChange([]string{"multiFactorCheckLifetime"}, value)
 }
 
-func (loginSettings) AddMFAType(value domain.MultiFactorType) db_json.JsonUpdate {
-	return db_json.NewArrayChange([]string{"mfaType"}, value, false)
+func (loginSettings) SetMFAType(values []domain.MultiFactorType) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"mfaType"}, values)
 }
 
-func (loginSettings) RemoveMFAType(value domain.MultiFactorType) db_json.JsonUpdate {
-	return db_json.NewArrayChange([]string{"mfaType"}, value, true)
+func (l loginSettings) AddMFAType(value domain.MultiFactorType) database.Change {
+	return db_json.NewJsonChanges(l.SettingsColumn(),
+		db_json.NewArrayChange([]string{"mfaType"}, value, false),
+	)
 }
 
-func (loginSettings) AddSecondFactorTypes(value domain.SecondFactorType) db_json.JsonUpdate {
-	return db_json.NewArrayChange([]string{"secondFactors"}, value, false)
+func (l loginSettings) RemoveMFAType(value domain.MultiFactorType) database.Change {
+	return db_json.NewJsonChanges(l.SettingsColumn(),
+		db_json.NewArrayChange([]string{"mfaType"}, value, true),
+	)
 }
 
-func (loginSettings) RemoveSecondFactorTypes(value domain.SecondFactorType) db_json.JsonUpdate {
-	return db_json.NewArrayChange([]string{"secondFactors"}, value, true)
+func (loginSettings) SetSecondFactorTypes(values []domain.SecondFactorType) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"secondFactors"}, values)
 }
 
-func LoginRepository() domain.LoginSettingsRepository {
+func (l loginSettings) AddSecondFactorTypes(value domain.SecondFactorType) database.Change {
+	return db_json.NewJsonChanges(l.SettingsColumn(),
+		db_json.NewArrayChange([]string{"secondFactors"}, value, false),
+	)
+}
+
+func (l loginSettings) RemoveSecondFactorTypes(value domain.SecondFactorType) database.Change {
+	return db_json.NewJsonChanges(l.SettingsColumn(),
+		db_json.NewArrayChange([]string{"secondFactors"}, value, true),
+	)
+}
+
+func LoginSettingsRepository() domain.LoginSettingsRepository {
 	return &loginSettings{
 		settings{},
 	}
@@ -366,7 +353,7 @@ var _ domain.LoginSettingsRepository = (*loginSettings)(nil)
 
 func (l loginSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.LoginSettings) error {
 	settings.Type = domain.SettingTypeLogin
-	settings.State = domain.SettingStateActivated
+	settings.State = domain.SettingStateActive
 
 	var settingsJSON []byte
 	if err := json.Unmarshal(settingsJSON, settings.LoginSettingsAttributes); err != nil {
@@ -553,15 +540,14 @@ func BrandingSettingsRepository() domain.BrandingSettingsRepository {
 
 var _ domain.BrandingSettingsRepository = (*brandingSettings)(nil)
 
-func (s brandingSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.BrandingSettings) error {
+func (s brandingSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.BrandingSettings) (err error) {
 	settings.Type = domain.SettingTypeBranding
 	settings.State = domain.SettingStatePreview
 
-	var settingsJSON []byte
-	if err := json.Unmarshal(settingsJSON, settings.BrandingSettingsAttributes); err != nil {
+	settings.Settings.Settings, err = json.Marshal(settings.BrandingSettingsAttributes)
+	if err != nil {
 		return err
 	}
-	settings.Settings.Settings = settingsJSON
 	return s.settings.set(ctx, client, settings.Settings, s.SetSettingFields(settings))
 }
 
@@ -689,20 +675,14 @@ func PasswordComplexityRepository() domain.PasswordComplexitySettingsRepository 
 
 var _ domain.PasswordComplexitySettingsRepository = (*passwordComplexitySettings)(nil)
 
-func (s passwordComplexitySettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.PasswordComplexitySettings) error {
+func (s passwordComplexitySettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.PasswordComplexitySettings) (err error) {
 	settings.Type = domain.SettingTypeLogin
-	settings.State = domain.SettingStateActivated
-	if settings.OrganizationID == nil {
-		settings.OwnerType = domain.OwnerTypeOrganization
-	} else {
-		settings.OwnerType = domain.OwnerTypeInstance
-	}
+	settings.State = domain.SettingStateActive
 
-	var settingsJSON []byte
-	if err := json.Unmarshal(settingsJSON, settings.PasswordComplexitySettingsAttributes); err != nil {
+	settings.Settings.Settings, err = json.Marshal(settings.PasswordComplexitySettingsAttributes)
+	if err != nil {
 		return err
 	}
-	settings.Settings.Settings = settingsJSON
 	return s.settings.set(ctx, client, settings.Settings, s.SetSettingFields(settings))
 }
 
@@ -778,20 +758,14 @@ func PasswordExpiryRepository() domain.PasswordExpirySettingsRepository {
 	}
 }
 
-func (s passwordExpirySettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.PasswordExpirySettings) error {
+func (s passwordExpirySettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.PasswordExpirySettings) (err error) {
 	settings.Type = domain.SettingTypeLogin
-	settings.State = domain.SettingStateActivated
-	if settings.OrganizationID == nil {
-		settings.OwnerType = domain.OwnerTypeOrganization
-	} else {
-		settings.OwnerType = domain.OwnerTypeInstance
-	}
+	settings.State = domain.SettingStateActive
 
-	var settingsJSON []byte
-	if err := json.Unmarshal(settingsJSON, settings.PasswordExpirySettingsAttributes); err != nil {
+	settings.Settings.Settings, err = json.Marshal(settings.PasswordExpirySettingsAttributes)
+	if err != nil {
 		return err
 	}
-	settings.Settings.Settings = settingsJSON
 	return s.settings.set(ctx, client, settings.Settings, s.SetSettingFields(settings))
 }
 
@@ -865,7 +839,7 @@ func (lockoutSettings) SetShowLockOutFailures(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"showLockOutFailures"}, value)
 }
 
-func LockoutRepository() domain.LockoutSettingsRepository {
+func LockoutSettingsRepository() domain.LockoutSettingsRepository {
 	return &lockoutSettings{
 		settings{},
 	}
@@ -875,12 +849,7 @@ var _ domain.LockoutSettingsRepository = (*lockoutSettings)(nil)
 
 func (s lockoutSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.LockoutSettings) error {
 	settings.Type = domain.SettingTypeLogin
-	settings.State = domain.SettingStateActivated
-	if settings.OrganizationID == nil {
-		settings.OwnerType = domain.OwnerTypeOrganization
-	} else {
-		settings.OwnerType = domain.OwnerTypeInstance
-	}
+	settings.State = domain.SettingStateActive
 
 	var settingsJSON []byte
 	if err := json.Unmarshal(settingsJSON, settings.LockoutSettingsAttributes); err != nil {
@@ -966,7 +935,7 @@ func (securitySettings) SetEnableImpersonation(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"enableImpersonation"}, value)
 }
 
-func SecurityRepository() domain.SecuritySettingsRepository {
+func SecuritySettingsRepository() domain.SecuritySettingsRepository {
 	return &securitySettings{
 		settings{},
 	}
@@ -974,20 +943,14 @@ func SecurityRepository() domain.SecuritySettingsRepository {
 
 var _ domain.SecuritySettingsRepository = (*securitySettings)(nil)
 
-func (s securitySettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.SecuritySettings) error {
+func (s securitySettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.SecuritySettings) (err error) {
 	settings.Type = domain.SettingTypeLogin
-	settings.State = domain.SettingStateActivated
-	if settings.OrganizationID == nil {
-		settings.OwnerType = domain.OwnerTypeOrganization
-	} else {
-		settings.OwnerType = domain.OwnerTypeInstance
-	}
+	settings.State = domain.SettingStateActive
 
-	var settingsJSON []byte
-	if err := json.Unmarshal(settingsJSON, settings.SecuritySettingsAttributes); err != nil {
+	settings.Settings.Settings, err = json.Marshal(settings.SecuritySettingsAttributes)
+	if err != nil {
 		return err
 	}
-	settings.Settings.Settings = settingsJSON
 	return s.settings.set(ctx, client, settings.Settings, s.SetSettingFields(settings))
 }
 
@@ -1061,7 +1024,7 @@ func (domainSettings) SetSMTPSenderAddressMatchesInstanceDomain(value bool) db_j
 	return db_json.NewFieldChange([]string{"smtpSenderAddressMatchesInstanceDomain"}, value)
 }
 
-func DomainRepository() domain.DomainSettingsRepository {
+func DomainSettingsRepository() domain.DomainSettingsRepository {
 	return &domainSettings{
 		settings{},
 	}
@@ -1069,20 +1032,14 @@ func DomainRepository() domain.DomainSettingsRepository {
 
 var _ domain.DomainSettingsRepository = (*domainSettings)(nil)
 
-func (s domainSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.DomainSettings) error {
+func (s domainSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.DomainSettings) (err error) {
 	settings.Type = domain.SettingTypeLogin
-	settings.State = domain.SettingStateActivated
-	if settings.OrganizationID == nil {
-		settings.OwnerType = domain.OwnerTypeOrganization
-	} else {
-		settings.OwnerType = domain.OwnerTypeInstance
-	}
+	settings.State = domain.SettingStateActive
 
-	var settingsJSON []byte
-	if err := json.Unmarshal(settingsJSON, settings.DomainSettingsAttributes); err != nil {
+	settings.Settings.Settings, err = json.Marshal(settings.DomainSettingsAttributes)
+	if err != nil {
 		return err
 	}
-	settings.Settings.Settings = settingsJSON
 	return s.settings.set(ctx, client, settings.Settings, s.SetSettingFields(settings))
 }
 
@@ -1150,20 +1107,14 @@ func OrganizationSettingRepository() domain.OrganizationSettingsRepository {
 
 var _ domain.OrganizationSettingsRepository = (*organizationSettings)(nil)
 
-func (s organizationSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.OrganizationSettings) error {
+func (s organizationSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.OrganizationSettings) (err error) {
 	settings.Type = domain.SettingTypeLogin
-	settings.State = domain.SettingStateActivated
-	if settings.OrganizationID == nil {
-		settings.OwnerType = domain.OwnerTypeOrganization
-	} else {
-		settings.OwnerType = domain.OwnerTypeInstance
-	}
+	settings.State = domain.SettingStateActive
 
-	var settingsJSON []byte
-	if err := json.Unmarshal(settingsJSON, settings.OrganizationSettingsAttributes); err != nil {
+	settings.Settings.Settings, err = json.Marshal(settings.OrganizationSettingsAttributes)
+	if err != nil {
 		return err
 	}
-	settings.Settings.Settings = settingsJSON
 	return s.settings.set(ctx, client, settings.Settings, s.SetSettingFields(settings))
 }
 

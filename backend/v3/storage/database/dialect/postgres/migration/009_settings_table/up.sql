@@ -14,25 +14,18 @@ CREATE TYPE zitadel.settings_state AS ENUM (
     'active'
 );
 
-CREATE TYPE zitadel.owner_type AS ENUM (
-    'system',
-    'instance',
-    'organization'
-);
-
 CREATE TABLE zitadel.settings (
     instance_id TEXT NOT NULL
     , organization_id TEXT
-    , id TEXT NOT NULL CHECK (id <> '') DEFAULT gen_random_uuid()
+    , id TEXT NOT NULL DEFAULT gen_random_uuid()
     , type zitadel.settings_type NOT NULL
-    , owner_type zitadel.owner_type NOT NULL
-    , label_state zitadel.settings_state DEFAULT NULL CHECK (type != 'label' OR label_state <> NULL )
+    , state zitadel.settings_state NOT NULL
     , settings JSONB -- the storage does not really care about what is configured so we store it as json
 
     , created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     , updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 
-    , PRIMARY KEY (instance_id, id)
+    , PRIMARY KEY (instance_id, id, type, state)
     , FOREIGN KEY (instance_id) REFERENCES zitadel.instances(id) ON DELETE CASCADE
     , FOREIGN KEY (instance_id, organization_id) REFERENCES zitadel.organizations(instance_id, id) ON DELETE CASCADE
 );
@@ -50,13 +43,13 @@ CREATE OR REPLACE FUNCTION zitadel.jsonb_array_remove(
     source JSONB
     , path TEXT[]
     , value anyelement
-    
+
     , outt out jsonb
 )
     language 'plpgsql'
 AS $$
   BEGIN
-    outt = jsonb_set(source, path, 
+    outt = jsonb_set(source, path,
     (CASE WHEN (SELECT source ?& path) then
       coalesce(
       (SELECT jsonb_agg(v)
@@ -73,7 +66,7 @@ CREATE OR REPLACE FUNCTION zitadel.jsonb_array_append(
     source jsonb
     , path text[]
     , value anyelement
-    
+
     , outt out jsonb
 )
     language 'plpgsql'
