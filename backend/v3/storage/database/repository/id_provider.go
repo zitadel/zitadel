@@ -92,7 +92,10 @@ func (i *idProvider) Update(ctx context.Context, client database.QueryExecutor, 
 		i.InstanceIDCondition(instanceID),
 		i.OrgIDCondition(orgID),
 	}
-	database.Changes(changes).Write(&builder)
+	err := database.Changes(changes).Write(&builder)
+	if err != nil {
+		return 0, err
+	}
 	writeCondition(&builder, database.And(conditions...))
 
 	stmt := builder.String()
