@@ -9,22 +9,22 @@
 
         <div>
           <div class="framework-wrapper">
-            <ng-container *ngFor="let framework of frameworks.slice(0, 18)">
+            @for (framework of frameworks.slice(0, 18); track framework.title) {
               <button
-                (click)="selectFrameworkForPreview(framework)"
+                (click)="selectedFramework.set(framework)"
                 class="framework-card card"
                 [class.selected]="selectedFramework()?.id === framework.id"
                 title="{{ framework.title }}"
               >
-                <img *ngIf="themeService.isDarkTheme | async" [src]="framework.imgSrcDark" alt="{{ framework.title }}" />
+                <img class="dark-only" [src]="framework.imgSrcDark"
+                     alt="{{ framework.title }}"/>
                 <img
-                  *ngIf="(themeService.isDarkTheme | async) === false && framework.imgSrcLight"
+                  class="light-only"
                   [src]="framework.imgSrcLight"
                   alt="{{ framework.title }}"
                 />
-                <p class="framework-title">{{ framework.title }}</p>
               </button>
-            </ng-container>
+            }
           </div>
 
           <!-- Checkbox for auto-creating project -->
@@ -36,89 +36,113 @@
           </div>
 
           <!-- Project selector (shown when checkbox is unchecked) -->
-          <div *ngIf="!createProject">
-            <h3>{{ 'APP.PAGES.CREATE_SELECT_PROJECT' | translate }}</h3>
-            <p class="hint">{{ 'APP.PAGES.CREATE_NEW_PROJECT' | translate }}</p>
-            <cnsl-search-project-autocomplete
-              class="block"
-              [autocompleteType]="ProjectAutocompleteType.PROJECT_OWNED"
-              (selectionChanged)="selectProject($any($event))"
-              (valueChanged)="projectName = $any($event)"
-            >
-            </cnsl-search-project-autocomplete>
+          @if (!createProject()) {
+            <div>
+              <h3>{{ 'APP.PAGES.CREATE_SELECT_PROJECT' | translate }}</h3>
+              <p class="hint">{{ 'APP.PAGES.CREATE_NEW_PROJECT' | translate }}</p>
+              <cnsl-search-project-autocomplete
+                class="block"
+                [autocompleteType]="ProjectAutocompleteType.PROJECT_OWNED"
+                (selectionChanged)="selectProject($event)"
+                (valueChanged)="projectName.set($event)"
+              >
+              </cnsl-search-project-autocomplete>
+            </div>
+          }
+        </div>
+      </div>
+
+      @if (createProjectMutation.error() || createOidcApplicationMutation.error(); as error) {
+        <cnsl-info-section [type]="InfoSectionType.WARN">
+          <span class="error-msg">{{ error.message }}</span>
+        </cnsl-info-section>
+      }
+    </div>
+    @if (selectedFramework(); as framework) {
+      <div class="framework-details-panel">
+        <div class="panel-header">
+          <div class="panel-title-section">
+            <img
+              class="framework-logo dark-only"
+              [src]="framework.imgSrcDark"
+              alt="{{ framework.title }}"
+            />
+            <img
+              class="framework-logo light-only"
+              [src]="framework.imgSrcLight"
+              alt="{{ framework.title }}"
+            />
+            <h2>{{ framework.title }}</h2>
+          </div>
+          <button mat-icon-button (click)="selectedFramework.set(undefined)">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <div class="panel-content">
+          @if (framework.ecosystem) {
+            <div class="detail-section">
+              <h3>Ecosystem</h3>
+              <p>{{ framework.ecosystem }}</p>
+            </div>
+          }
+          <div class="panel-content">
+            @if (framework.ecosystem) {
+              <div class="detail-section">
+                <cnsl-info-section> We will create your project and all necessary configurations for you.
+                </cnsl-info-section>
+              </div>
+              <div class="detail-section">
+                <h3>Ecosystem</h3>
+                <p>{{ framework.ecosystem }}</p>
+              </div>
+            }
+
+            @if (framework.description) {
+              <div class="detail-section">
+                <h3>Description</h3>
+                <p>{{ framework.description }}</p>
+              </div>
+            }
+
+            @if (getAppTypeLabel(framework); as appTypeLabel) {
+              <div class="detail-section">
+                <h3>Application Type</h3>
+                <p>{{ appTypeLabel }}</p>
+              </div>
+            }
+
+            @if (getAuthMethod(framework); as authMethod) {
+              <div class="detail-section">
+                <h3>Authentication</h3>
+                <p>{{ authMethod }}</p>
+              </div>
+            }
+
+            @if (framework.docsLink) {
+              <div class="detail-section">
+                <h3>Documentation</h3>
+                <a [href]="framework.docsLink" target="_blank" rel="noopener noreferrer">
+                  View Documentation
+                  <mat-icon inline>open_in_new</mat-icon>
+                </a>
+              </div>
+            }
+
+          </div>
+
+          <div class="panel-actions">
+            <button mat-stroked-button (click)="selectedFramework.set(undefined)">Cancel</button>
+            <button color="primary" mat-raised-button (click)="createProjectAndContinue(framework)">
+              @if (createProjectMutation.isPending() || createOidcApplicationMutation.isPending()) {
+                <mat-spinner diameter="20"/>
+              } @else {
+                Continue with {{ framework.title }}
+              }
+            </button>
           </div>
         </div>
       </div>
-
-      <cnsl-info-section *ngIf="error()" [type]="InfoSectionType.WARN"
-        ><span class="error-msg">{{ error() }}</span></cnsl-info-section
-      >
-    </div>
-    <div class="framework-details-panel" *ngIf="selectedFramework()">
-      <div class="panel-header">
-        <div class="panel-title-section">
-          <img
-            class="framework-logo"
-            *ngIf="themeService.isDarkTheme | async"
-            [src]="selectedFramework()!.imgSrcDark"
-            alt="{{ selectedFramework()!.title }}"
-          />
-          <img
-            class="framework-logo"
-            *ngIf="(themeService.isDarkTheme | async) === false && selectedFramework()!.imgSrcLight"
-            [src]="selectedFramework()!.imgSrcLight"
-            alt="{{ selectedFramework()!.title }}"
-          />
-          <h2>{{ selectedFramework()!.title }}</h2>
-        </div>
-        <button mat-icon-button (click)="selectedFramework.set(undefined)">
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-
-      <div class="panel-content">
-        <div class="detail-section" *ngIf="selectedFramework()!.ecosystem">
-          <cnsl-info-section> We will create your project and all necessary configurations for you. </cnsl-info-section>
-        </div>
-        <div class="detail-section" *ngIf="selectedFramework()!.ecosystem">
-          <h3>Ecosystem</h3>
-          <p>{{ selectedFramework()!.ecosystem }}</p>
-        </div>
-
-        <div class="detail-section" *ngIf="selectedFramework()!.description">
-          <h3>Description</h3>
-          <p>{{ selectedFramework()!.description }}</p>
-        </div>
-
-        <div class="detail-section" *ngIf="getAppTypeLabel(selectedFramework()!.id)">
-          <h3>Application Type</h3>
-          <p>{{ getAppTypeLabel(selectedFramework()!.id) }}</p>
-        </div>
-
-        <div class="detail-section" *ngIf="getAuthMethod(selectedFramework()!.id)">
-          <h3>Authentication</h3>
-          <p>{{ getAuthMethod(selectedFramework()!.id) }}</p>
-        </div>
-
-        <div class="detail-section" *ngIf="selectedFramework()!.docsLink">
-          <h3>Documentation</h3>
-          <a [href]="selectedFramework()!.docsLink" target="_blank" rel="noopener noreferrer">
-            View Documentation <mat-icon inline>open_in_new</mat-icon>
-          </a>
-        </div>
-      </div>
-
-      <div class="panel-actions">
-        <button mat-stroked-button (click)="selectedFramework.set(undefined)">Cancel</button>
-        <button
-          color="primary"
-          mat-raised-button
-          (click)="createProjectAndContinue(selectedFramework()!.id)"
-          [disabled]="!createProject && !project && !projectName"
-        >
-          Continue with {{ selectedFramework()!.title }}
-        </button>
-      </div>
-    </div>
+    }
   </div>
 </cnsl-create-layout>

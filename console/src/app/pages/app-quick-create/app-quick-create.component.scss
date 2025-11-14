@@ -18,6 +18,14 @@
     display: flex;
     gap: 2rem;
     max-width: 100%;
+
+    .dark-only {
+      display: if($is-dark-theme, block, none);
+    }
+
+    .light-only {
+      display: if($is-dark-theme, none, block);
+    }
   }
 
   .app-create-main-content {

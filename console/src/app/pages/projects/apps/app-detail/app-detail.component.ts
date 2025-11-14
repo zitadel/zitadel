@@ -7,7 +7,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import frameworkDefinition from '../../../../../../../docs/frameworks.json';
-import { Framework } from 'src/app/components/quickstart/quickstart.component';
 import { OIDC_CONFIGURATIONS } from 'src/app/utils/framework';
 import { Buffer } from 'buffer';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
@@ -194,8 +193,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   ];
   public currentSetting = this.settingsList[0];
   public framework: string | null = null;
-  public frameworks: Framework[] = frameworkDefinition
-    .filter((f) => f.id && OIDC_CONFIGURATIONS[f.id])
+  public frameworks = frameworkDefinition
+    .filter((f) => OIDC_CONFIGURATIONS[f.id as unknown as keyof typeof OIDC_CONFIGURATIONS])
     .map((f) => {
       return {
         ...f,
