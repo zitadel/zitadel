@@ -22,11 +22,11 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 	orgID := Instance.DefaultOrg.Id
 	authorizationRepo := repository.AuthorizationRepository()
 
-	user := Instance.CreateHumanUserVerified(CTX, orgID, integration.Email(), integration.Phone())
-
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 
 	t.Run("user grant added reduces", func(t *testing.T) {
+		// create user
+		user := Instance.CreateHumanUserVerified(CTX, orgID, integration.Email(), integration.Phone())
 		// prepare project and project roles
 		role1, role2 := "role1", "role2"
 		projectID := prepareProjectAndProjectRoles(t, orgID, []string{role1, role2})
@@ -53,6 +53,8 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 	})
 
 	t.Run("user grant update reduces", func(t *testing.T) {
+		// create user
+		user := Instance.CreateHumanUserVerified(CTX, orgID, integration.Email(), integration.Phone())
 		// prepare project and project roles
 		role1, role2 := "role1", "role2"
 		projectID := prepareProjectAndProjectRoles(t, orgID, []string{role1, role2})
@@ -94,6 +96,8 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 	})
 
 	t.Run("user grant deactivate reduces", func(t *testing.T) {
+		// create user
+		user := Instance.CreateHumanUserVerified(CTX, orgID, integration.Email(), integration.Phone())
 		// prepare project
 		projectID := prepareProjectAndProjectRoles(t, orgID, nil)
 		// create authorization
@@ -120,6 +124,8 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 	})
 
 	t.Run("user grant activate reduces", func(t *testing.T) {
+		// create user
+		user := Instance.CreateHumanUserVerified(CTX, orgID, integration.Email(), integration.Phone())
 		// prepare project
 		projectID := prepareProjectAndProjectRoles(t, orgID, nil)
 		// create authorization
@@ -127,6 +133,12 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 			UserId:         user.UserId,
 			ProjectId:      projectID,
 			OrganizationId: orgID,
+		})
+		require.NoError(t, err)
+
+		// deactivate authorization
+		_, err = AuthorizationClient.DeactivateAuthorization(CTX, &authorization_v2.DeactivateAuthorizationRequest{
+			Id: createdAuthorization.Id,
 		})
 		require.NoError(t, err)
 
@@ -146,6 +158,8 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 	})
 
 	t.Run("user grant removed reduces", func(t *testing.T) {
+		// create user
+		user := Instance.CreateHumanUserVerified(CTX, orgID, integration.Email(), integration.Phone())
 		// prepare project and project roles
 		role1, role2 := "role1", "role2"
 		projectID := prepareProjectAndProjectRoles(t, orgID, []string{role1, role2})
