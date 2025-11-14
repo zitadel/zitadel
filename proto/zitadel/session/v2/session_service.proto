@@ -535,6 +535,12 @@ message Checks {
   // containing the verification time.
   // Note that the OTP code is valid for a single use only and will be invalidated after a successful check.
   optional CheckOTP otp_email = 7;
+
+  // Check the Recovery Code and update the session on success.
+  // Requires that the user is already checked, either in the previous or the same request.
+  // On successful Recovery Code check, the session's `factors` field will be updated with a `recovery_code` factor,
+  // containing the verification time.
+  optional CheckRecoveryCode recovery_code = 8;
 }
 
 message CheckUser {
@@ -640,6 +646,20 @@ message CheckOTP {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       example: "\"3237642\"";
+    }
+  ];
+}
+
+message CheckRecoveryCode {
+  // The Recovery Code of the user to be checked.
+  // The code must match the exact code previously generated for the user, including dashes if any.
+  // On successful check, the recovery code will be invalidated and cannot be used again.
+  string code = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"1234567890\"";
     }
   ];
 }
