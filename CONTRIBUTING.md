@@ -456,13 +456,13 @@ Their spec files are located at `apps/login/acceptance/tests`.
 The following command runs a local ephemeral database, an API and a Login and then runs the Playwright test suite against this environment.
 
 ```bash
-pnpm nx run @zitadel/login-acceptance:test
+pnpm nx run @zitadel/login-acceptance:test-local
 ```
 
 To write new tests or debug failing tests, open the interactive test suite by passing the `--ui` flag.
 
 ```bash
-pnpm nx run @zitadel/login-acceptance:test --ui
+pnpm nx run @zitadel/login-acceptance:test-local --ui
 ```
 
 #### Login Architecture

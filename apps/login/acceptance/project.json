@@ -16,6 +16,15 @@
                 "default"
             ]
         },
+        "test-local": {
+            "description": "Runs the Playwright tests for the Login application continuously. This ensures, that playwright can serve the test reports and that it can be started with the --ui flag. Ctrl+C terminates the all continuous tasks correctly.",
+            "dependsOn": [
+                "run-mock-server",
+                "run-login"
+            ],
+            "continuous": false,
+            "command": "wait-on --verbose --interval 2000 --simultaneous 1 \"${ZITADEL_API_URL}/debug/ready\" \"${LOGIN_BASE_URL}\" \"http://localhost:3333/ready\" && playwright test"
+        },
         "run-mock-server": {
             "description": "Runs the mock server for the Login acceptance tests",
             "continuous": true,
