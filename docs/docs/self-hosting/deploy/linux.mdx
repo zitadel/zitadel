@@ -8,66 +8,216 @@ import DefaultUser from "./_defaultuser.mdx";
 import Next from "./_next.mdx";
 import NoteInstanceNotFound from "./troubleshooting/_note_instance_not_found.mdx";
 
-:::caution
+## Prerequisites
 
-Be aware! This guide does not work for the newly updated version of Zitadel 4! [Learn more](https://github.com/zitadel/zitadel/issues/10526)
+The setup is likely to work with other software versions too, but it is tested against the following environment:
 
-Please use Docker version if you want to use Zitadel 4.
+- Ubuntu 24.04.1
+- Darwin 15.6.1
+- PostgreSQL 17.7
+- NodeJS v22.21.0
+- OpenSSL 3.0.13
+- Zitadel API v4.6.7
+- Zitadel Login v4.6.7 or higher is required
 
-:::
-
-## Install PostgreSQL
+## Download PostgreSQL
 
 Download a `postgresql` binary as described [in the PostgreSQL docs](https://www.postgresql.org/download/linux/).
 Zitadel is tested against PostgreSQL latest stable tag and latest Ubuntu LTS.
 
 ## Run PostgreSQL
 
+Use SystemD to manage the PostgreSQL processes.
+
 ```bash
+# Start PostgeSQL as a SystemD unit
 sudo systemctl start postgresql
+# Have PostgreSQL start with your operating system
 sudo systemctl enable postgresql
 ```
 
-## Install Zitadel
+### Getting Started
 
-Download the Zitadel release according to your architecture from [Github](https://github.com/zitadel/zitadel/releases/latest), unpack the archive and copy zitadel binary to /usr/local/bin
-
-```bash
-LATEST=$(curl -i https://github.com/zitadel/zitadel/releases/latest | grep location: | cut -d '/' -f 8 | tr -d '\r'); ARCH=$(uname -m); case $ARCH in armv5*) ARCH="armv5";; armv6*) ARCH="armv6";; armv7*) ARCH="arm";; aarch64) ARCH="arm64";; x86) ARCH="386";; x86_64) ARCH="amd64";;  i686) ARCH="386";; i386) ARCH="386";; esac; wget -c https://github.com/zitadel/zitadel/releases/download/$LATEST/zitadel-linux-$ARCH.tar.gz -O - | tar -xz && sudo mv zitadel-linux-$ARCH/zitadel /usr/local/bin
-```
-
-## Run Zitadel
+Give the initial super user a password so Zitadel can initialize the database
 
 ```bash
-ZITADEL_DATABASE_POSTGRES_HOST=localhost ZITADEL_DATABASE_POSTGRES_PORT=5432 ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=root ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=postgres ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable ZITADEL_EXTERNALSECURE=false zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
+sudo -u postgres psql -c "ALTER USER postgres password 'postgres';"
 ```
+
+### Getting to Production
+
+For production, rather than changing the postgres users password, create a separate superuser with a safe password.
+
+```bash
+# For example, define a username and password and export them as environment variables for the Zitadel API.
+export ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=${USER};
+export ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 20)";
+
+# Create the user in PostgreSQL and set 
+sudo -u postgres createuser -s ${ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME};
+sudo -u postgres psql -c "ALTER USER ${ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME} password \'${ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD}\'";
+
+From your terminal, you can connect via Unix socket and don't have to enter the password.
+psql -d postgres
+```
+
+## Download The Zitadel API and the Zitadel Login
+
+Download the Zitadel API and Login from [Github](https://github.com/zitadel/zitadel/releases/latest) and unpack the archives.
+
+```bash
+LATEST=$(curl -i https://github.com/zitadel/zitadel/releases/latest | grep location: | cut -d '/' -f 8 | tr -d '\r')
+ARCH=$(uname -m); case $ARCH in armv5*) ARCH="armv5";; armv6*) ARCH="armv6";; armv7*) ARCH="arm";; aarch64) ARCH="arm64";; x86) ARCH="386";; x86_64) ARCH="amd64";;  i686) ARCH="386";; i386) ARCH="386";; esac;
+mkdir -p zitadel-api zitadel-login
+wget -c https://github.com/zitadel/zitadel/releases/download/$LATEST/zitadel-linux-$ARCH.tar.gz -O - | tar -xz --strip-components=1 -C zitadel-api
+wget -c https://github.com/zitadel/zitadel/releases/download/$LATEST/zitadel-login.tar.gz -O - | tar -xz -C zitadel-login;
+```
+
+## Create the API Master Key
+
+- [ ] Describe: what's the master key for?
+
+### Getting Started
+
+```bash
+echo -n "MasterkeyNeedsToHave32Characters" > ./zitadel-api-masterkey.txt
+```
+
+### Getting to Production
+
+Generate a random string for the master key, for example
+
+```bash
+tr -dc A-Za-z0-9 </dev/urandom | head -c 32 > ./zitadel-api-masterkey.txt
+```
+
+::caution
+Don't lose or overwrite the masterkey of an existing Zitadel API.
+You won't be able to start the process anymore.
+::
+
+## Create an RSA Key pair
+
+To allow the Login to communicate with the API, you will have to run it with a private RSA key.
+The Login sends then all API requests with a Bearer token that has the private keys signature.
+The API can validate this signature against the public key.
+
+### Getting Started
+
+```bash
+echo LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2UUlCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktjd2dnU2pBZ0VBQW9JQkFRQzJhNG1ueldLbEVGblIKbXJ5ZGhoV1hyMnJJcXJodjZYVlQvb0N4aWJVcENIbWlZOHN2anpjeFY0M2tnYnVHd2l1R25paDh6THRJL0xxUgpzTFQrdGo2VGw2Zi9DTEsvdEJGaG5FN01jUmxMWXVKdThrbkJJUlNxbUZNMWowQWZudlVKaktvU3ZvUU1rRlE4ClhTdnJ3bzhlaGZxQzNOYXBncjB3VzhSa1pLUzlnR0hBalBUQ2duYnNZalhsOXdnOWhLOUFhN2ZsUmx1YzdUUE0KVE9GM3YwcEFEQnlqTiswMDJGb2MvWjBaZEhJYWhxbWRyTjI4WTBYZDhVSUdpNzkyZ0RDRHJETVJsK01MWjNIcgpJQzA5Vm5tT0kvUVNCQzFibzF1SS9mcDQ0L1N6bWZFNlVGdzA5VFVEK0NSTjlMM0FnN2F5TXF1aUxkSk83UHZRCmduOVBnUGFqQWdNQkFBRUNnZ0VBUkNBWEVZYS9ienVTLzVkVkYxTUszMUlRaEE1VndOMmtCcEZHU0lkUUU1bnAKcXY2djAvd2ROWjBvRFkxeGxoc1BuRCtXaVQwQU9IckJ4a1VDNHhqMmQ3SXNlQzhzYWpGNlNFVFNuTUVrSENZNgp3QXBXQnYwdXRhTWJlQ1llWVhEQXZDYy9JSzdycTdGKzgrZ3J6ZWtqLzljelBnbnhWTzdSYnF6bXhFTmR6ckx3ClpJMzhsUWVOZDJMVWhpOTltbE15eElVMDFvV3pFMEpEZFZ6K3BGaFFXV0tZN2VaQVVVUU16d1Y4TDN2R0hjT3oKaG13VmxLS29hNVZ1dkgyU0JlaUpqalkwV3lOZkE5TjJXSm10TENMYkxKV3lmNE9VOUFXVythelJ3SE1HTU80SQozWVYvK2xRdEUweVE2SmlSU01lYlIvSjN6NTZhdDZKNUVBQXd6R3JDNlFLQmdRRHA0eVdvVk9jeHp1Y2pZTHRFCmxQV1VDcWZHcEpjVWRqVlNGalFDRi91RTRPSmFVdlYzWEdNakZTVDZnZm90T3NGTzJ5aGNuSFVyM2VvUDVrNzkKcHMwRmJXcXc1MkZVMHZzeTB1MjBLcGdTNFZScjRNV3lGd0NnUndoNkpaS2lYM2VNY3BRdEcrbDg2ZUVVYjllQgpGajN6VWVadTkrcUR2UUZXVEpYY3RQOS9Gd0tCZ1FESHFyWkoxWUEzVkhsNUU4R3J4VUI5bGdQdzltKzZzdy8zCkl2ZUpuMDY5dXBkczJsdEVzMS9qRDArMHBUaldiM3Bkd3EyM0pDeVk3NWozK0plUCtmNHJiSjBBNlZCV1JRZzkKYTVvcGIzVXpnSGFOQmNNd1R0UUJ4aHUvYlB6dEtkS2NEYnpienpXZ2NwcDVramwxVjZSMEszMVkrbnZ1bEVyMwo4V0hKRHF6Y1ZRS0JnRStId3MxYm1ZWVJVZjF3cmgwaS9lTEtRTVRHUU8xZlNNQlI5bnRqeGs0bjNqQlNsMDl3CkpmSFBCZFQ5RDZJRG9hbjcwZHkwQXcvWWxQZTFHOVVhdkFxRmEwc2VVclZ5VEtLNm9NT3IzQ3hIWE5xV0F3T00KMk5TbmN0VitJejk5Y1B4Y0ZkREU5ZjlZMUFXTUJsN0p2bVVYeTJDZWdxc3JRT0lraHEwWEN1NGZBb0dBS2NzcgorT3g5dUJjd2pnMTZuby9kWGV4R3l1dHFtN1BiaGFtR0V3S0xvdDhwenhrdHZZV21ib3JIN2xJZlFaTjRFNlFxClpJbG41R05TcTZVWFpJVzVsREZaODlUaWdneFZHellvd0wrWjBydnpGTFcrRTZDTWRBcVp5RW54NzFxdndRYUgKSDZPUjRCSGREOUZ4d1lRazRrUXdLcTNUdnk2L09vTUdLdVd0ZlRrQ2dZRUF6ckJZU1NaWWF2c0YrRld4cHkzQwpMTTVGaVo3ZXZRZDBHZ3dFLzkycmQvMnpKc1dFV2E1RUxlMkNUZ2pLaHRDQStHSm5QbXRvd3ZkekRtRG56aDhTCksyRmpQdExJV2hQRXhYV3NpRjlvRzh6T3ZFUHBTdHA5cFk5MEk2dWxSdEZHdmNJaldDM1lmZU5OaVlReHI3K2gKTGVTcEl0Nm4zZDV3SWFkOU9PYkttRDg9Ci0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K > login-system-user-base64.pem
+cat <<EOF > login-system-user.pub
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtmuJp81ipRBZ0Zq8nYYV
+l69qyKq4b+l1U/6AsYm1KQh5omPLL483MVeN5IG7hsIrhp4ofMy7SPy6kbC0/rY+
+k5en/wiyv7QRYZxOzHEZS2LibvJJwSEUqphTNY9AH571CYyqEr6EDJBUPF0r68KP
+HoX6gtzWqYK9MFvEZGSkvYBhwIz0woJ27GI15fcIPYSvQGu35UZbnO0zzEzhd79K
+QAwcozftNNhaHP2dGXRyGoapnazdvGNF3fFCBou/doAwg6wzEZfjC2dx6yAtPVZ5
+jiP0EgQtW6NbiP36eOP0s5nxOlBcNPU1A/gkTfS9wIO2sjKroi3STuz70IJ/T4D2
+owIDAQAB
+-----END PUBLIC KEY-----
+EOF
+```
+
+### Getting to Production
+
+```bash
+openssl genrsa -traditional -out ./login-system-user.pem 2048
+openssl rsa -in ./login-system-user.pem -outform PEM -pubout -out ./login-system-user.pub
+openssl pkcs8 -topk8 -in ./login-system-user.pem -nocrypt | base64 --wrap 0 > ./login-system-user-base64.pem
+```
+
+## Run the API
+
+### Getting Started
+
+```bash
+# See "What's next" to learn about how to enable TLS.
+export ZITADEL_EXTERNALSECURE=false
+export ZITADEL_TLS_ENABLED=false
+
+export ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI=http://localhost:3000/ui/v2/login
+
+# The Login authenticates at the API with a system user's private key.
+# The corresponding public key in ZITADEL_SYSTEMAPIUSERS grants the necessary permissions with the role IAM_LOGIN_CLIENT.
+export ZITADEL_SYSTEMAPIUSERS='{"login-system-user":{"Path":"./login-system-user.pub","Memberships":[{"MemberType":"System","Roles":["IAM_LOGIN_CLIENT"]}]}}'
+
+export ZITADEL_DATABASE_POSTGRES_USER_PASSWORD="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 20)";
+
+./zitadel-api/zitadel start-from-init --masterkeyFile ./zitadel-api-masterkey.txt
+```
+
+### Getting to Production
+
+```bash
+# See "What's next" to learn about how to serve Zitadel on a different domain or IP.
+# export ZITADEL_EXTERNALDOMAIN=my.organization.com # Defaults to localhost
+
+# Database connection settings.
+# export ZITADEL_DATABASE_POSTGRES_HOST="my.managed.cloud.db" # Defaults to "localhost"
+# export ZITADEL_DATABASE_POSTGRES_PORT="5433" # Defaults to "5432"
+# The database is created by the init job if it does not exist.
+# export ZITADEL_DATABASE_POSTGRES_DATABASE="zitadel_api_data" # Defaults to "zitadel"
+# The admin user must already exist in the database.
+# export ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME="admin" # Defaults to "postgres"
+# export ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD="admin" # Defaults to "postgres"
+# export ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE="require" # Defaults to "disable"
+# The zitadel user is created by the init job if it does not exist.
+# Defining a password for the unpriviledged user is required.
+# Generate a secure password and store it safely.
+# export ZITADEL_DATABASE_POSTGRES_USER_USERNAME="zitadel-api" Defaults to "zitadel"
+# export ZITADEL_DATABASE_POSTGRES_USER_PASSWORD="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 20)" # Defaults to ""
+# export ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE="require" # Defaults to "disable"
+
+# To change the initial human admin users username and password, uncomment the following lines.
+# The first login name is formatted like this: <username>@<org_name>.<external_domain>
+# With the following incommented configuration, this would be root@my-organization.localhost
+# Visit http://localhost:8080/ui/console to check if the login name works.
+# If you can't log in, check the available login names:
+# echo "select * from projections.login_names3;" | psql -h localhost -U postgres -d zitadel
+# The postgres users password is postgres.
+# export ZITADEL_FIRSTINSTANCE_ORG_NAME=My Organization
+# export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME=root
+# export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD=RootPassword1!
+
+# Enable debug logs
+# export ZITADEL_LOG_LEVEL=debug     
+# Write Access Logs to stdout.
+# export ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED=true
+```
+
+## Run the Login
+
+### Getting Started
+
+```bash
+export ZITADEL_API_URL=http://localhost:8080
+export CUSTOM_REQUEST_HEADERS=x-zitadel-instance-host:localhost
+# If the Login is not custom-built, the base path must be set to /ui/v2/login
+export NEXT_PUBLIC_BASE_PATH=/ui/v2/login
+# The value for the audience has to correspond with the value of ZITADEL_EXTERNALDOMAIN which defaults to "localhost", ZITADEL_EXTERNALSECURE which defaults to "true" and ZITADEL_EXTERNALPORT which defaults to 8080.
+# If none of these values are overwritten, the audience would be https://localhost:8080
+# The default insecure port 80 and secure port 443 should be omitted in the audience.
+export AUDIENCE=http://localhost:8080
+# Provide the base64-encoded system user private key for authentication at the API.
+# This private key is used to create a signed JWT which is validated by the API using the key pair's public key configured in ZITADEL_SYSTEMAPIUSERS. 
+export SYSTEM_USER_PRIVATE_KEY_FILE=./login-system-user-base64.pem
+# The value for the system user ID must correspond with the Logins system users property name in ZITADEL_SYSTEMAPIUSERS
+export SYSTEM_USER_ID=login-system-user
+
+./zitadel-login/entrypoint.sh node ./zitadel-login/apps/login/server.js
+```
+
+
+### Getting to Production
+
+```
+export CUSTOM_REQUEST_HEADERS=x-zitadel-instance-host:localhost
+``` 
 
 <DefaultUser components={props.components} />
 
 <NoteInstanceNotFound />
-
-## VideoGuide
-
-<iframe
-  width="100%"
-  height="315"
-  src="https://www.youtube.com/embed/YVLua-q7dbs"
-  title="YouTube video player"
-  frameborder="0"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowfullscreen
-></iframe>
-
-### Setup Zitadel with a service account
-
-```bash
-ZITADEL_DATABASE_POSTGRES_HOST=localhost ZITADEL_DATABASE_POSTGRES_PORT=5432 ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=root ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable ZITADEL_EXTERNALSECURE=false ZITADEL_FIRSTINSTANCE_MACHINEKEYPATH=/tmp/zitadel-admin-sa.json ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME=zitadel-admin-sa ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME=Admin ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINEKEY_TYPE=1 zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
-
-# then you can move your machine key
-mv /tmp/zitadel-admin-sa.json $HOME/zitadel-admin-sa.json
-```
-
-This key can be used to provision resources with for example [Terraform](/docs/guides/manage/terraform-provider).
 
 <Next components={props.components} />
 <Disclaimer components={props.components} />
