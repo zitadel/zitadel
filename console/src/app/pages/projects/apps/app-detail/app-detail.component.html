@@ -62,29 +62,24 @@
   <div class="app-main-content">
     <cnsl-meta-layout>
       <cnsl-sidenav [(setting)]="currentSetting" [settingsList]="settingsList">
-        <ng-container *ngIf="currentSetting.id === 'overview'">
+        <ng-container *ngIf="currentSetting.id === 'quickstart'">
           <cnsl-card [collapsible]="false" title="{{ 'APP.OVERVIEW_DETAIL.TITLE' | translate }}">
             <div class="overview-content">
-              <div class="auth-status-section">
+              <div class="auth-status-section" *ngIf="isAuthenticated() === false">
                 <div
                   class="status-indicator"
                   [ngClass]="{
-                    'status-authenticated': isAuthenticated() === true,
                     'status-not-authenticated': isAuthenticated() === false,
                     'status-loading': isAuthenticated() === null,
                   }"
                 >
                   <div class="status-icon">
                     <i class="las" *ngIf="isAuthenticated() === null">la-spinner la-spin</i>
-                    <i class="las la-check-circle" *ngIf="isAuthenticated() === true"></i>
                     <i class="las la-exclamation-circle" *ngIf="isAuthenticated() === false"></i>
                   </div>
                   <div class="status-text">
                     <span *ngIf="isAuthenticated() === null">{{
                       'APP.OVERVIEW_DETAIL.AUTH_STATUS_CHECKING' | translate
-                    }}</span>
-                    <span *ngIf="isAuthenticated() === true">{{
-                      'APP.OVERVIEW_DETAIL.AUTH_STATUS_SUCCESS' | translate
                     }}</span>
                     <span *ngIf="isAuthenticated() === false">{{
                       'APP.OVERVIEW_DETAIL.AUTH_STATUS_PENDING' | translate
@@ -96,28 +91,7 @@
                 </div>
               </div>
 
-              <div *ngIf="isAuthenticated() === true" class="authenticated-state">
-                <div class="env-vars-section prominent">
-                  <h4>{{ 'APP.OVERVIEW_DETAIL.ENVVARS' | translate }}</h4>
-                  <p>{{ 'APP.OVERVIEW_DETAIL.ENVVARS_AUTHENTICATED_DESC' | translate }}</p>
-                  <cnsl-info-section *ngIf="requiresClientSecret()" class="client-secret-note">
-                    <span>
-                      {{ 'APP.OVERVIEW_DETAIL.NEW_STEP2_CLIENT_SECRET_NOTE' | translate }}
-                      <a (click)="regenerateOIDCClientSecret()" class="secret-link">{{
-                        'APP.OVERVIEW_DETAIL.NEW_STEP2_CLIENT_SECRET_LINK' | translate
-                      }}</a
-                      >.
-                    </span>
-                  </cnsl-info-section>
-                  <cnsl-env-vars-block
-                    [envVars]="envVarsArray"
-                    [availableFormats]="['env', 'json', 'yaml']"
-                    defaultFormat="env"
-                  ></cnsl-env-vars-block>
-                </div>
-              </div>
-
-              <div *ngIf="isAuthenticated() === false" class="integration-flow">
+              <div class="integration-flow">
                 <div class="scenarios-section">
                   <div class="scenario-header">
                     <div class="header-content">
@@ -204,7 +178,14 @@
                           <div class="step-number">{{ hasExample() ? '2' : !hasAnyFrameworkContent() ? '2' : '1' }}</div>
                           <div class="step-content">
                             <h6>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP2_TITLE' | translate }}</h6>
-                            <p>{{ 'APP.OVERVIEW_DETAIL.NEW_STEP2_DESC' | translate }}</p>
+                            <p>
+                              {{
+                                (isExampleEnvMode
+                                  ? 'APP.OVERVIEW_DETAIL.NEW_STEP2_DESC_EXAMPLE_ENV'
+                                  : 'APP.OVERVIEW_DETAIL.NEW_STEP2_DESC'
+                                ) | translate
+                              }}
+                            </p>
                             <cnsl-info-section *ngIf="requiresClientSecret()" class="client-secret-note">
                               <span>
                                 {{ 'APP.OVERVIEW_DETAIL.NEW_STEP2_CLIENT_SECRET_NOTE' | translate }}
@@ -216,7 +197,8 @@
                             </cnsl-info-section>
                             <cnsl-env-vars-block
                               [envVars]="envVarsArray"
-                              [availableFormats]="['env', 'json', 'yaml']"
+                              [availableFormats]="isExampleEnvMode ? [] : ['env', 'json', 'yaml']"
+                              [showDownload]="!isExampleEnvMode"
                               defaultFormat="env"
                             ></cnsl-env-vars-block>
                           </div>
@@ -366,7 +348,8 @@
                             </cnsl-info-section>
                             <cnsl-env-vars-block
                               [envVars]="envVarsArray"
-                              [availableFormats]="['env', 'json', 'yaml']"
+                              [availableFormats]="isExampleEnvMode ? [] : ['env', 'json', 'yaml']"
+                              [showDownload]="!isExampleEnvMode"
                               defaultFormat="env"
                             ></cnsl-env-vars-block>
                           </div>

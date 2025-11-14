@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
-import { Observable, BehaviorSubject, combineLatest, map } from 'rxjs';
+import { Observable, BehaviorSubject, combineLatest, map, take } from 'rxjs';
+import { saveAs } from 'file-saver';
 
 export type EnvFormat = 'env' | 'json' | 'yaml';
 
@@ -54,7 +55,7 @@ export class EnvVarsBlockComponent implements OnInit, OnChanges {
   }
 
   public copyToClipboard(): void {
-    this.formattedContent$.pipe().subscribe((content) => {
+    this.formattedContent$.pipe(take(1)).subscribe((content) => {
       navigator.clipboard.writeText(content).then(() => {
         this.copied = 'copy';
         setTimeout(() => (this.copied = null), 2000);
@@ -63,18 +64,13 @@ export class EnvVarsBlockComponent implements OnInit, OnChanges {
   }
 
   public downloadFile(): void {
-    this.formattedContent$.pipe().subscribe((content) => {
+    this.formattedContent$.pipe(take(1)).subscribe((content) => {
       const format = this.selectedFormat$.value;
       const filename = this.getFilename(format);
       const mimeType = this.getMimeType(format);
 
       const blob = new Blob([content], { type: mimeType });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      link.click();
-      window.URL.revokeObjectURL(url);
+      saveAs(blob, filename);
 
       this.copied = 'download';
       setTimeout(() => (this.copied = null), 2000);
@@ -148,13 +144,13 @@ export class EnvVarsBlockComponent implements OnInit, OnChanges {
   private getMimeType(format: EnvFormat): string {
     switch (format) {
       case 'env':
-        return 'text/plain';
+        return 'application/octet-stream';
       case 'json':
         return 'application/json';
       case 'yaml':
         return 'text/yaml';
       default:
-        return 'text/plain';
+        return 'application/octet-stream';
     }
   }
 

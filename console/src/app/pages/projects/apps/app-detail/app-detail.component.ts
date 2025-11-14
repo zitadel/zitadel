@@ -189,7 +189,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public copied: string = '';
 
   public settingsList: SidenavSetting[] = [
-    { id: 'overview', i18nKey: 'APP.OVERVIEW' },
+    { id: 'quickstart', i18nKey: 'APP.QUICKSTART' },
     { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
   ];
   public currentSetting = this.settingsList[0];
@@ -210,6 +210,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public isAuthenticated = signal<boolean | null>(null); // null = loading
 
   private appDataSubject = new Subject<void>();
+  private cachedIssuer: string = '';
+  private cachedDomain: string = '';
 
   public environmentVariables$ = this.appDataSubject.pipe(
     startWith(null),
@@ -247,6 +249,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   );
 
   public envVarsArray: EnvVar[] = [];
+  public isExampleEnvMode: boolean = false;
 
   private getEnvVarPrefix(): string {
     if (this.selectedScenario !== 'new') {
@@ -258,6 +261,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     const prefixMap: { [key: string]: string } = {
       angular: 'NG_APP_',
       vue: 'VITE_',
+      qwik: 'VITE_',
     };
 
     return prefixMap[framework || ''] || '';
@@ -273,12 +277,129 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       }
 
       const issuer = env.issuer || 'https://your-domain.zitadel.cloud';
+      const domain = env.issuer?.replace('https://', '').replace('http://', '') || 'your-domain.zitadel.cloud';
       const clientId = this.app.oidcConfig?.clientId || 'your-client-id';
+
+      // Cache the values for use in replacePlaceholders
+      this.cachedIssuer = issuer;
+      this.cachedDomain = domain;
+
+      // Get framework configuration
+      const frameworkInfo = this.getFrameworkInfo();
+      const hasExampleEnv = frameworkInfo?.hasExampleEnv;
+
+      // For frameworks with .env.example files (hasExampleEnv=true),
+      // only show minimal ZITADEL-specific values that need to be updated
+      if (hasExampleEnv && this.selectedScenario === 'new') {
+        this.isExampleEnvMode = true;
+        const prefix = this.getEnvVarPrefix();
+        const envVars: EnvVar[] = [
+          {
+            key: `${prefix}ZITADEL_DOMAIN`,
+            value: issuer,
+          },
+          {
+            key: `${prefix}ZITADEL_CLIENT_ID`,
+            value: clientId,
+          },
+        ];
+
+        // Add client secret if applicable
+        if (
+          this.app.oidcConfig &&
+          (this.app.oidcConfig.authMethodType === OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC ||
+            this.app.oidcConfig.authMethodType === OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_POST)
+        ) {
+          envVars.push({
+            key: `${prefix}ZITADEL_CLIENT_SECRET`,
+            value: 'your-client-secret',
+          });
+        }
+
+        // Add callback URL if configured
+        if (this.app.oidcConfig) {
+          const redirectUris = this.app.oidcConfig.redirectUrisList || [];
+          if (redirectUris.length > 0) {
+            envVars.push({
+              key: `${prefix}ZITADEL_CALLBACK_URL`,
+              value: redirectUris[0],
+            });
+          }
+
+          // Add post-logout redirect URL if configured
+          const postLogoutUris = this.app.oidcConfig.postLogoutRedirectUrisList || [];
+          if (postLogoutUris.length > 0) {
+            envVars.push({
+              key: `${prefix}ZITADEL_POST_LOGOUT_URL`,
+              value: postLogoutUris[0],
+            });
+          }
+        }
+
+        this.envVarsArray = envVars;
+        this.cdr.detectChanges();
+        return;
+      }
+
+      // Fallback to framework-specific envSetup configuration (for non-example frameworks)
+      const envSetup = frameworkInfo?.envSetup;
+
+      // Only use custom envSetup if:
+      // 1. Framework has envSetup defined AND
+      // 2. User selected "new" scenario (wants to use ZITADEL's example app)
+      // For "existing" scenario, always use standard ZITADEL variable names
+      if (envSetup && envSetup.variables && this.selectedScenario === 'new') {
+        this.isExampleEnvMode = false;
+        const envVars: EnvVar[] = envSetup.variables.map((variable: any) => {
+          let value = variable.placeholder;
+
+          // Replace template placeholders with actual values
+          value = value
+            .replace('{{ZITADEL_DOMAIN}}', domain)
+            .replace('{{ZITADEL_ISSUER}}', issuer)
+            .replace('{{CLIENT_ID}}', clientId)
+            .replace('{{PROJECT_ID}}', this.projectId)
+            .replace('{{PROJECT_NAME}}', this.app?.name || 'project');
+
+          // Handle special cases
+          if (variable.name.includes('SECRET') && value === variable.placeholder) {
+            value = 'your-client-secret';
+          }
+
+          // Handle redirect URIs
+          if (variable.name.includes('REDIRECT') || variable.name.includes('CALLBACK')) {
+            const redirectUris = this.app?.oidcConfig?.redirectUrisList || [];
+            if (redirectUris.length > 0) {
+              value = redirectUris[0];
+            }
+          }
+
+          // Handle post logout URIs
+          if (variable.name.includes('POST_LOGOUT') || variable.name.includes('LOGOUT')) {
+            const postLogoutUris = this.app?.oidcConfig?.postLogoutRedirectUrisList || [];
+            if (postLogoutUris.length > 0) {
+              value = postLogoutUris[0];
+            }
+          }
+
+          return {
+            key: variable.name,
+            value: value,
+          };
+        });
+
+        this.envVarsArray = envVars;
+        this.cdr.detectChanges();
+        return;
+      }
+
+      // Fallback to default behavior if no envSetup or hasExampleEnv
+      this.isExampleEnvMode = false;
       const prefix = this.getEnvVarPrefix();
 
       const envVars: EnvVar[] = [
         {
-          key: `${prefix}ZITADEL_ISSUER`,
+          key: `${prefix}ZITADEL_DOMAIN`,
           value: issuer,
         },
         {
@@ -305,7 +426,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         const redirectUris = this.app.oidcConfig.redirectUrisList || [];
         if (redirectUris.length > 0) {
           envVars.push({
-            key: `${prefix}ZITADEL_REDIRECT_URL`,
+            key: `${prefix}ZITADEL_CALLBACK_URL`,
             value: redirectUris[0],
           });
         }
@@ -449,11 +570,47 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     this.isNew.set(isNew === 'true');
     this.framework = framework;
 
+    // Reorder sidebar based on new query param
+    // If new=true: Quickstart first, Config second (users want to get started)
+    // If new!=true: Config first, Quickstart last (users want to manage settings)
+    if (isNew === 'true') {
+      this.settingsList = [
+        { id: 'quickstart', i18nKey: 'APP.QUICKSTART' },
+        { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
+      ];
+      this.currentSetting = this.settingsList[0]; // Start with quickstart
+    } else {
+      this.settingsList = [
+        { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
+        { id: 'quickstart', i18nKey: 'APP.QUICKSTART' },
+      ];
+      this.currentSetting = this.settingsList[0]; // Start with configuration
+    }
+
     if (projectId && appId) {
       this.projectId = projectId;
       this.appId = appId;
       this.getData(projectId, appId).then();
       this.checkAuthenticationStatus();
+    } else if (projectId && isNew === 'true') {
+      // Handle new app creation
+      this.projectId = projectId;
+      this.checkAuthenticationStatus();
+      // Enable forms for new apps so users can see framework defaults
+      this.authService
+        .isAllowed(['project.app.write$', 'project.app.write:' + projectId])
+        .pipe(take(1))
+        .subscribe((allowed) => {
+          if (allowed) {
+            this.oidcForm.enable();
+            this.oidcForm.controls['clientId'].disable(); // Keep clientId disabled as it's generated
+            this.oidcTokenForm.enable();
+            this.apiForm.enable();
+            this.samlForm.enable();
+            // Initialize form with framework defaults if framework is selected
+            this.initializeFormWithFrameworkDefaults();
+          }
+        });
     }
   }
 
@@ -514,21 +671,17 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                   this.app.oidcConfig.grantTypesList.length === 1 &&
                   this.app.oidcConfig.grantTypesList[0] === OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE
                 ) {
-                  this.settingsList = [
-                    { id: 'overview', i18nKey: 'APP.OVERVIEW' },
-                    { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
+                  this.settingsList = this.buildSettingsList([
                     { id: 'token', i18nKey: 'APP.TOKEN' },
                     { id: 'urls', i18nKey: 'APP.URLS' },
-                  ];
+                  ]);
                 } else {
-                  this.settingsList = [
-                    { id: 'overview', i18nKey: 'APP.OVERVIEW' },
-                    { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
+                  this.settingsList = this.buildSettingsList([
                     { id: 'token', i18nKey: 'APP.TOKEN' },
                     { id: 'redirect-uris', i18nKey: 'APP.OIDC.REDIRECTSECTIONTITLE' },
                     { id: 'additional-origins', i18nKey: 'APP.ADDITIONALORIGINS' },
                     { id: 'urls', i18nKey: 'APP.URLS' },
-                  ];
+                  ]);
                 }
 
                 this.initialAuthMethod = this.authMethodFromPartialConfig({ oidc: this.app.oidcConfig });
@@ -546,17 +699,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.initialAuthMethod = this.authMethodFromPartialConfig({ api: this.app.apiConfig });
 
                 if (this.initialAuthMethod === 'BASIC') {
-                  this.settingsList = [
-                    { id: 'overview', i18nKey: 'APP.OVERVIEW' },
-                    { id: 'urls', i18nKey: 'APP.URLS' },
-                  ];
+                  this.settingsList = this.buildSettingsList([{ id: 'urls', i18nKey: 'APP.URLS' }]);
                   this.currentSetting = this.settingsList[0];
                 } else {
-                  this.settingsList = [
-                    { id: 'overview', i18nKey: 'APP.OVERVIEW' },
-                    { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
-                    { id: 'urls', i18nKey: 'APP.URLS' },
-                  ];
+                  this.settingsList = this.buildSettingsList([{ id: 'urls', i18nKey: 'APP.URLS' }]);
                 }
                 this.currentAuthMethod = this.initialAuthMethod;
                 if (this.initialAuthMethod === CUSTOM_METHOD.key) {
@@ -567,11 +713,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                   this.authMethods = this.authMethods.filter((element) => element !== CUSTOM_METHOD);
                 }
               } else if (this.app.samlConfig) {
-                this.settingsList = [
-                  { id: 'overview', i18nKey: 'APP.OVERVIEW' },
-                  { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
-                  { id: 'urls', i18nKey: 'APP.URLS' },
-                ];
+                this.settingsList = this.buildSettingsList([{ id: 'urls', i18nKey: 'APP.URLS' }]);
                 if (this.app.samlConfig?.loginVersion?.loginV1) {
                   this.samlForm.controls['loginV2'].setValue(false);
                 } else if (this.app.samlConfig?.loginVersion?.loginV2) {
@@ -901,17 +1043,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             this.currentAuthMethod = this.authMethodFromPartialConfig(config);
 
             if (this.currentAuthMethod === 'BASIC') {
-              this.settingsList = [
-                { id: 'overview', i18nKey: 'APP.OVERVIEW' },
-                { id: 'urls', i18nKey: 'APP.URLS' },
-              ];
+              this.settingsList = this.buildSettingsList([{ id: 'urls', i18nKey: 'APP.URLS' }]);
               this.currentSetting = this.settingsList[0];
             } else {
-              this.settingsList = [
-                { id: 'overview', i18nKey: 'APP.OVERVIEW' },
-                { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
-                { id: 'urls', i18nKey: 'APP.URLS' },
-              ];
+              this.settingsList = this.buildSettingsList([{ id: 'urls', i18nKey: 'APP.URLS' }]);
               this.currentSetting = this.settingsList[0];
             }
           }
@@ -1136,7 +1271,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       }
     });
 
-    let envVars = `ZITADEL_ISSUER=${issuer}\n`;
+    let envVars = `ZITADEL_DOMAIN=${issuer}\n`;
     const clientId = this.clientId?.value || 'your-client-id';
     envVars += `ZITADEL_CLIENT_ID=${clientId}\n`;
     envVars += `ZITADEL_PROJECT_ID=${this.projectId}\n`;
@@ -1176,9 +1311,21 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     exampleLink?: string;
     client?: boolean;
     startCommand?: string;
-    buildCommand?: string;
+    installCommand?: string;
     sdkName?: string;
     sdkDocLink?: string;
+    hasExampleEnv?: boolean;
+    envSetup?: {
+      type: string;
+      filename?: string;
+      description: string;
+      variables: Array<{
+        name: string;
+        description: string;
+        placeholder: string;
+        required: boolean;
+      }>;
+    };
   } | null {
     if (!this.framework) return null;
 
@@ -1200,6 +1347,22 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     return `git clone ${frameworkInfo.example}`;
   }
 
+  private replacePlaceholders(command: string): string {
+    if (!this.app) return command;
+
+    const issuer = this.cachedIssuer || 'https://your-domain.zitadel.cloud';
+    const domain = this.cachedDomain || 'your-domain.zitadel.cloud';
+    const clientId = this.app.oidcConfig?.clientId || 'your-client-id';
+
+    return command
+      .replace(/\{\{ZITADEL_DOMAIN\}\}/g, domain)
+      .replace(/\{\{ZITADEL_ISSUER\}\}/g, issuer)
+      .replace(/\{\{ZITADEL_CLIENT_ID\}\}/g, clientId)
+      .replace(/\{\{CLIENT_ID\}\}/g, clientId)
+      .replace(/\{\{PROJECT_ID\}\}/g, this.projectId)
+      .replace(/\{\{PROJECT_NAME\}\}/g, this.app?.name || 'project');
+  }
+
   public getBuildCommand(): string {
     const frameworkInfo = this.getFrameworkInfo();
     if (!frameworkInfo) {
@@ -1207,8 +1370,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
 
     const example = frameworkInfo.example?.split('/').pop()?.replace('.git', '') || 'your-repo';
+    const installCmd = frameworkInfo.installCommand || 'npm install';
+    const replacedCmd = this.replacePlaceholders(installCmd);
 
-    return `cd ${example}\n${frameworkInfo.buildCommand}` || 'cd <your-repo> && npm install';
+    return `cd ${example}\n${replacedCmd}`;
   }
 
   public getRunCommand(): string {
@@ -1217,7 +1382,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       return 'npm start';
     }
 
-    return frameworkInfo.startCommand || 'npm start';
+    const startCmd = frameworkInfo.startCommand || 'npm start';
+    return this.replacePlaceholders(startCmd);
   }
 
   public getSdkCommand(): string {
@@ -1240,6 +1406,20 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     return !!frameworkInfo?.exampleLink;
   }
 
+  // Helper to build settings list with quickstart in correct position
+  private buildSettingsList(additionalSettings: SidenavSetting[] = []): SidenavSetting[] {
+    const quickstart = { id: 'quickstart', i18nKey: 'APP.QUICKSTART' };
+    const configuration = { id: 'configuration', i18nKey: 'APP.CONFIGURATION' };
+
+    // If new=true, quickstart goes first
+    // Otherwise, quickstart goes last
+    if (this.isNew()) {
+      return [quickstart, configuration, ...additionalSettings];
+    } else {
+      return [configuration, ...additionalSettings, quickstart];
+    }
+  }
+
   public hasSdk(): boolean {
     const frameworkInfo = this.getFrameworkInfo();
     return !!(frameworkInfo?.sdk || frameworkInfo?.sdkCommand);
@@ -1247,7 +1427,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public hasBuildCommands(): boolean {
     const frameworkInfo = this.getFrameworkInfo();
-    return !!(frameworkInfo?.buildCommand && frameworkInfo?.startCommand);
+    return !!(frameworkInfo?.installCommand && frameworkInfo?.startCommand);
   }
 
   public hasAnyFrameworkContent(): boolean {
@@ -1302,22 +1482,24 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   }
 
   public downloadEnvironmentVariables(): void {
-    this.environmentVariables$.pipe(take(1)).subscribe((envVars: string) => {
-      const blob = new Blob([envVars], { type: 'text/plain' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = '.env';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+    // Convert envVarsArray to env file format
+    const envVars = this.envVarsArray.map((v) => `${v.key}=${v.value}`).join('\n');
 
-      this.copied = 'download';
-      setTimeout(() => {
-        this.copied = '';
-      }, 2000);
-    });
+    const blob = new Blob([envVars], { type: 'text/plain;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = '.env';
+    link.setAttribute('download', '.env'); // Ensure download attribute is set
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    this.copied = 'download';
+    setTimeout(() => {
+      this.copied = '';
+    }, 2000);
   }
 
   public switchToTab(tabId: string): void {
@@ -1336,11 +1518,20 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public selectFramework(framework: any): void {
     this.framework = framework.id;
     this.updateEnvVars();
+    this.initializeFormWithFrameworkDefaults();
   }
 
   public selectFrameworkById(frameworkId: string): void {
     this.framework = frameworkId;
     this.updateEnvVars();
+    this.initializeFormWithFrameworkDefaults();
+
+    // Add framework as query param to URL
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { framework: frameworkId },
+      queryParamsHandling: 'merge',
+    });
   }
 
   private async checkAuthenticationStatus(): Promise<void> {
@@ -1364,5 +1555,37 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       console.error('Failed to check authentication status:', error);
       this.isAuthenticated.set(false);
     }
+  }
+
+  private initializeFormWithFrameworkDefaults(): void {
+    // Only initialize form defaults for new apps
+    if (!this.isNew() || !this.framework) {
+      return;
+    }
+
+    const frameworkConfig = OIDC_CONFIGURATIONS[this.framework];
+    if (!frameworkConfig) {
+      return;
+    }
+
+    // Initialize OIDC form with framework defaults
+    this.oidcForm.patchValue({
+      appType: frameworkConfig.getAppType(),
+      authMethodType: frameworkConfig.getAuthMethodType(),
+      responseTypesList: frameworkConfig.getResponseTypesList(),
+      grantTypesList: frameworkConfig.getGrantTypesList(),
+    });
+
+    // Initialize OIDC token form with framework defaults
+    this.oidcTokenForm.patchValue({
+      accessTokenType: frameworkConfig.getAccessTokenType(),
+      accessTokenRoleAssertion: frameworkConfig.getAccessTokenRoleAssertion(),
+      idTokenRoleAssertion: frameworkConfig.getIdTokenRoleAssertion(),
+      idTokenUserinfoAssertion: frameworkConfig.getIdTokenUserinfoAssertion(),
+    });
+
+    // Set redirect URIs
+    this.redirectUrisList = frameworkConfig.getRedirectUrisList();
+    this.postLogoutRedirectUrisList = frameworkConfig.getPostLogoutRedirectUrisList();
   }
 }

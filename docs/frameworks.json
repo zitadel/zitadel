@@ -8,10 +8,11 @@
     "imgSrcLight": "/docs/img/tech/angular.svg",
     "docsLink": "/docs/sdk-examples/angular",
     "example": "https://github.com/zitadel/example-auth-angular.git",
-    "buildCommand": "npm run build",
-    "startCommand": "npm start",
+    "installCommand": "npm install",
+    "startCommand": " npm start",
     "localhost": "http://localhost:3000",
-    "external": false
+    "external": false,
+    "hasExampleEnv": true
   },
   {
     "id": "astro",
@@ -22,10 +23,11 @@
     "imgSrcLight": "/docs/img/tech/astrojs.svg",
     "docsLink": "/docs/sdk-examples/astro",
     "example": "https://github.com/zitadel/example-auth-astro.git",
-    "buildCommand": "npm run build",
-    "startCommand": "npm run preview",
+    "installCommand": "npm install",
+    "startCommand": "npm run dev",
     "localhost": "http://localhost:3000",
-    "external": false
+    "external": false,
+    "hasExampleEnv": true
   },
   {
     "id": "client-go",
@@ -89,9 +91,41 @@
     "imgSrcLight": "/docs/img/tech/django.svg",
     "docsLink": "/docs/sdk-examples/python-django",
     "example": "https://github.com/zitadel/example-python-django-oidc.git",
+    "installCommand": "python -m pip install -r requirements.txt",
     "startCommand": "python manage.py runserver",
     "localhost": "http://localhost:8000/",
-    "external": false
+    "external": false,
+    "hasExampleEnv": true
+  },
+  {
+    "id": "express",
+    "title": "Express",
+    "ecosystem": "JavaScript/TypeScript",
+    "description": "AuthJS/OIDC/PKCE example",
+    "imgSrcDark": "/docs/img/tech/express.svg",
+    "imgSrcLight": "/docs/img/tech/express-dark.svg",
+    "docsLink": "/docs/sdk-examples/expressjs",
+    "example": "https://github.com/zitadel/example-auth-expressjs.git",
+    "installCommand": "npm install",
+    "startCommand": "npm run dev",
+    "localhost": "http://localhost:3000",
+    "external": false,
+    "hasExampleEnv": true
+  },
+  {
+    "id": "fastify",
+    "title": "Fastify",
+    "ecosystem": "JavaScript/TypeScript",
+    "description": "AuthJS/OIDC/PKCE example",
+    "imgSrcDark": "/docs/img/tech/fastify.svg",
+    "imgSrcLight": "/docs/img/tech/fastify-dark.svg",
+    "docsLink": "/docs/sdk-examples/fastify",
+    "example": "https://github.com/zitadel/example-auth-fastify.git",
+    "installCommand": "npm install",
+    "startCommand": "npm run dev",
+    "localhost": "http://localhost:3000",
+    "external": false,
+    "hasExampleEnv": true
   },
   {
     "id": "flask",
@@ -102,9 +136,10 @@
     "imgSrcLight": "/docs/img/tech/flask.svg",
     "docsLink": "/docs/sdk-examples/python-flask",
     "example": "https://github.com/zitadel/example-api-python3-flask.git",
-    "startCommand": "python3 server.py",
+    "startCommand": "python manage.py runserver",
     "localhost": "http://127.0.0.1:5000",
-    "external": false
+    "external": false,
+    "hasExampleEnv": true
   },
   {
     "id": "flutter",
@@ -115,7 +150,29 @@
     "imgSrcLight": "/docs/img/tech/flutter.svg",
     "docsLink": "/docs/sdk-examples/flutter",
     "example": "https://github.com/zitadel/zitadel_flutter.git",
-    "external": false
+    "installCommand": "if cd flutter; then git pull && cd .. ; else git clone https://github.com/flutter/flutter.git; fi && ls && flutter/bin/flutter doctor && flutter/bin/flutter clean && flutter/bin/flutter config --enable-web",
+    "startCommand": "flutter run -d chrome --web-port=4444 --dart-define zitadel_url={{ZITADEL_ISSUER}} --dart-define zitadel_client_id={{ZITADEL_CLIENT_ID}}",
+    "localhost": "http://localhost:4444",
+    "client": true,
+    "external": false,
+    "envSetup": {
+      "type": "command-args",
+      "description": "Flutter uses --dart-define arguments for configuration. Replace the placeholders with your ZITADEL instance values.",
+      "variables": [
+        {
+          "name": "ZITADEL_ISSUER",
+          "description": "Your ZITADEL instance URL",
+          "placeholder": "https://{{ZITADEL_DOMAIN}}",
+          "required": true
+        },
+        {
+          "name": "ZITADEL_CLIENT_ID",
+          "description": "Your application's client ID from ZITADEL",
+          "placeholder": "{{CLIENT_ID}}",
+          "required": true
+        }
+      ]
+    }
   },
   {
     "id": "hono",
@@ -126,10 +183,11 @@
     "imgSrcLight": "/docs/img/tech/hono.svg",
     "docsLink": "/docs/sdk-examples/hono",
     "example": "https://github.com/zitadel/example-auth-hono.git",
-    "buildCommand": "npm run build",
+    "installCommand": "npm install",
     "startCommand": "npm start",
     "localhost": "http://localhost:3000",
-    "external": false
+    "external": false,
+    "hasExampleEnv": true
   },
   {
     "id": "nestjs",
@@ -140,10 +198,11 @@
     "imgSrcLight": "/docs/img/tech/nestjs.svg",
     "docsLink": "/docs/sdk-examples/nestjs",
     "example": "https://github.com/zitadel/example-auth-nestjs.git",
-    "buildCommand": "npm run build",
+    "installCommand": "npm install",
     "startCommand": "npm start",
     "localhost": "http://localhost:3000",
-    "external": false
+    "external": false,
+    "hasExampleEnv": true
   },
   {
     "id": "next",
@@ -154,10 +213,11 @@
     "imgSrcLight": "/docs/img/tech/nextjs.svg",
     "docsLink": "/docs/sdk-examples/nextjs",
     "example": "https://github.com/zitadel/example-auth-nextjs.git",
-    "buildCommand": "npm run build",
-    "startCommand": "npm start",
+    "installCommand": "npm install",
+    "startCommand": "npm run dev",
     "localhost": "http://localhost:3000",
-    "external": false
+    "external": false,
+    "hasExampleEnv": true
   },
   {
     "id": "nuxtjs",
@@ -168,10 +228,26 @@
     "imgSrcLight": "/docs/img/tech/nuxtjs.svg",
     "docsLink": "/docs/sdk-examples/nuxtjs",
     "example": "https://github.com/zitadel/example-auth-nuxtjs.git",
-    "buildCommand": "npm run build",
+    "installCommand": "npm install",
     "startCommand": "npm run preview",
     "localhost": "http://localhost:3000",
-    "external": false
+    "external": false,
+    "hasExampleEnv": true
+  },
+  {
+    "id": "qwik",
+    "title": "Qwik",
+    "ecosystem": "JavaScript/TypeScript",
+    "description": "AuthJS/OIDC/PKCE example",
+    "imgSrcDark": "/docs/img/tech/qwik.svg",
+    "imgSrcLight": "/docs/img/tech/qwik.svg",
+    "docsLink": "/docs/sdk-examples/qwik",
+    "example": "https://github.com/zitadel/example-auth-qwik.git",
+    "installCommand": "npm install",
+    "startCommand": "npm run dev",
+    "localhost": "http://localhost:3000",
+    "external": false,
+    "hasExampleEnv": true
   },
   {
     "id": "react",
@@ -189,7 +265,7 @@
     "sdkPackage": "https://www.npmjs.com/package/@zitadel/react",
     "localhost": "http://localhost:3000",
     "external": false,
-    "buildCommand": "(cd ./lib && yarn && yarn build) && yarn",
+    "installCommand": "(cd ./lib && yarn && yarn build) && yarn",
     "startCommand": "yarn dev"
   },
   {
@@ -201,10 +277,11 @@
     "imgSrcLight": "/docs/img/tech/solidstart.svg",
     "docsLink": "/docs/sdk-examples/solidstart",
     "example": "https://github.com/zitadel/example-auth-solidstart.git",
-    "buildCommand": "npm run build",
+    "installCommand": "npm install",
     "startCommand": "npm start",
     "localhost": "http://localhost:3000",
-    "external": false
+    "external": false,
+    "hasExampleEnv": true
   },
   {
     "id": "sveltekit",
@@ -215,10 +292,11 @@
     "imgSrcLight": "/docs/img/tech/svelte.svg",
     "docsLink": "/docs/sdk-examples/sveltekit",
     "example": "https://github.com/zitadel/example-auth-sveltekit.git",
-    "buildCommand": "npm run build",
+    "installCommand": "npm install",
     "startCommand": "npm run preview",
     "localhost": "http://localhost:3000",
-    "external": false
+    "external": false,
+    "hasExampleEnv": true
   },
   {
     "id": "spring-boot",
@@ -229,9 +307,28 @@
     "imgSrcLight": "/docs/img/tech/spring.svg",
     "docsLink": "/docs/sdk-examples/java",
     "example": "https://github.com/zitadel/zitadel-java.git",
-    "buildCommand": "mvn clean package -DskipTests",
+    "installCommand": "mvn clean package -DskipTests",
+    "startCommand": "java -Dspring.security.oauth2.client.provider.zitadel.issuer-uri={{ZITADEL_ISSUER}} -Dspring.security.oauth2.client.registration.zitadel.client-id={{ZITADEL_CLIENT_ID}} -jar web/target/web-0.0.2-SNAPSHOT.jar",
     "localhost": "http://localhost:18080/",
-    "external": false
+    "external": false,
+    "envSetup": {
+      "type": "command-args",
+      "description": "Spring Boot uses command-line arguments for configuration. Replace the placeholders with your ZITADEL instance values.",
+      "variables": [
+        {
+          "name": "ZITADEL_ISSUER",
+          "description": "Your ZITADEL instance URL (e.g., https://my-domain.zitadel.cloud)",
+          "placeholder": "https://{{ZITADEL_DOMAIN}}",
+          "required": true
+        },
+        {
+          "name": "ZITADEL_CLIENT_ID",
+          "description": "Your application's client ID from ZITADEL",
+          "placeholder": "{{CLIENT_ID}}@{{PROJECT_NAME}}",
+          "required": true
+        }
+      ]
+    }
   },
   {
     "id": "symfony",
@@ -242,9 +339,11 @@
     "imgSrcLight": "/docs/img/tech/symfony.svg",
     "docsLink": "/docs/sdk-examples/symfony",
     "example": "https://github.com/zitadel/example-symfony-oidc.git",
+    "installCommand": "composer install\nbin/console doctrine:database:create\nbin/console doctrine:migrations:migrate",
     "startCommand": "symfony server:start --no-tls",
     "localhost": "http://localhost:8000",
-    "external": false
+    "external": false,
+    "hasExampleEnv": true
   },
   {
     "id": "vue",
@@ -255,10 +354,11 @@
     "imgSrcLight": "/docs/img/tech/vue.svg",
     "docsLink": "/docs/sdk-examples/vue",
     "example": "https://github.com/zitadel/example-auth-vue.git",
-    "buildCommand": "npm run build",
+    "installCommand": "npm install",
     "startCommand": "npm run preview",
     "localhost": "http://localhost:3000",
     "external": false,
+    "hasExampleEnv": true,
     "sdk": true,
     "sdkCommand": "npm install @zitadel/vue",
     "sdkName": "@zitadel/vue",

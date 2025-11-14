@@ -29,6 +29,17 @@ export type FrameworkDefinition = {
   startCommand?: string;
   example?: string;
   exampleLink?: string;
+  envSetup?: {
+    type: string;
+    filename?: string;
+    description: string;
+    variables: Array<{
+      name: string;
+      description: string;
+      placeholder: string;
+      required: boolean;
+    }>;
+  };
 };
 
 export type Framework = FrameworkDefinition & {
