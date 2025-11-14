@@ -49,7 +49,7 @@ type userConditions interface {
 
 type userMetadataConditions interface {
 	ExistsMetadata(condition database.Condition) database.Condition
-	MetadataKeyCondition(key string) database.Condition
+	MetadataKeyCondition(op database.TextOperation, key string) database.Condition
 	MetadataValueCondition(op database.BytesOperation, value []byte) database.Condition
 }
 
@@ -147,8 +147,15 @@ type humanChanges interface {
 
 type humanEmailChanges interface {
 	// SetEmail sets the email based on the verification
+	// 	* [VerificationTypeInit] to initialize email verification, previously verified email remains verified
+	// 	* [VerificationTypeVerified] to mark email as verified, a verification must exist
+	// 	* [VerificationTypeUpdate] to update email verification, a verification must exist (e.g. resend code)
+	// 	* [VerificationTypeSkipped] to skip email verification, existing verification is removed (e.g. admin set email)
 	SetEmail(verification VerificationType) database.Change
 	// CheckEmailOTP sets the email OTP based on the check
+	//  * [CheckTypeInit] to initialize a new check, previous check is overwritten
+	//  * [CheckTypeFailed] increments failed attempts
+	//  * [CheckTypeSucceeded] to mark the check as succeeded, removes the check and updates verified at time
 	CheckEmailOTP(check CheckType) database.Change
 	// EnableEmailOTPAt enables the email OTP
 	// If enabledAt is zero, it will be set to NOW()
@@ -161,10 +168,17 @@ type humanEmailChanges interface {
 
 type humanPhoneChanges interface {
 	// SetPhone sets the phone based on the verification
+	// 	* [VerificationTypeInit] to initialize phone verification, previously verified phone remains verified
+	// 	* [VerificationTypeVerified] to mark phone as verified, a verification must exist
+	// 	* [VerificationTypeUpdate] to update phone verification, a verification must exist (e.g. resend code)
+	// 	* [VerificationTypeSkipped] to skip phone verification, existing verification is removed (e.g. admin set phone)
 	SetPhone(verification VerificationType) database.Change
 	// RemovePhone removes the phone number
 	RemovePhone() database.Change
 	// CheckSMSOTP sets the SMS OTP based on the check
+	//  * [CheckTypeInit] to initialize a new check, previous check is overwritten
+	//  * [CheckTypeFailed] increments failed attempts
+	//  * [CheckTypeSucceeded] to mark the check as succeeded, removes the check and updates verified at time
 	CheckSMSOTP(check CheckType) database.Change
 	// EnableSMSOTPAt enables the SMS OTP
 	// If enabledAt is zero, it will be set to NOW()
@@ -177,8 +191,15 @@ type humanPhoneChanges interface {
 
 type humanTOTPChanges interface {
 	// SetTOTP changes the TOTP secret based on the verification
+	// 	* [VerificationTypeInit] to initialize totp verification, previously verified totp remains verified
+	// 	* [VerificationTypeVerified] to mark totp as verified, a verification must exist
+	// 	* [VerificationTypeUpdate] to update totp verification, a verification must exist (e.g. resend code)
+	// 	* [VerificationTypeSkipped] to skip totp verification, existing verification is removed (e.g. admin set totp)
 	SetTOTP(verification VerificationType) database.Change
 	// SetTOTPCheck sets the TOTP check based on the check type
+	//  * [CheckTypeFailed] increments failed attempts
+	//  * [CheckTypeSucceeded] to mark the check as succeeded, removes the check and updates verified at time
+	//  * [CheckTypeInit] is not allowed for TOTP
 	CheckTOTP(check CheckType) database.Change
 	// RemoveTOTP removes the TOTP
 	RemoveTOTP() database.Change
@@ -240,7 +261,6 @@ type machineChanges interface {
 
 	// AddPersonalAccessToken adds a personal access token for the machine user
 	AddPersonalAccessToken(pat *PersonalAccessToken) database.Change
-	// RemoveKey(tokenID string) database.Change
 	// RemovePersonalAccessToken removes a personal access token for the machine user
 	RemovePersonalAccessToken(id string) database.Change
 }

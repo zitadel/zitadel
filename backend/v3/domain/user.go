@@ -45,6 +45,7 @@ type HumanUser struct {
 	Phone    *HumanPhone   `json:"phone,omitempty" db:"phone"`
 	Passkeys []*Passkey    `json:"passkeys,omitempty" db:"passkeys"`
 	Password HumanPassword `json:"password,omitempty" db:"password"`
+	TOTP     HumanTOTP     `json:"totp,omitempty" db:"totp"`
 
 	IdentityProviderLinks []*IdentityProviderLink `json:"identityProviderLinks,omitempty" db:"identity_provider_links"`
 
