@@ -1,9 +1,34 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "@zitadel/client",
   "namedInputs": {
-    "sources": ["{projectRoot}/src/**/*"]
+    "sources": [
+      "{projectRoot}/src/**/*"
+    ]
   },
   "targets": {
+    "nx-release-publish": {
+      "description": "Sets the package name to the GitHub org scope for publishing to GitHub Packages. This allows to publish the package on forks.",
+      "dependsOn": [
+        "build",
+        "link-to-repo",
+        "configure-npmrc"
+      ]
+    },
+    "link-to-repo": {
+      "description": "Sets the package name to the GitHub org scope for publishing to GitHub Packages. Also links the package to the GitHub repository. This allows to publish the package on forks.",
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": [
+          "npm pkg set name=\"@${ZITADEL_RELEASE_GITHUB_ORG}/client\" repository=\"https://github.com/${ZITADEL_RELEASE_GITHUB_REPO}\""
+        ]
+      }
+    },
+    "configure-npmrc": {
+      "description": "Configures the root workspace .npmrc file to publish to GitHub Packages.",
+      "command": "bash -c 'grep -qxF @${ZITADEL_RELEASE_GITHUB_ORG}:registry=https://npm.pkg.github.com ./.npmrc || echo @${ZITADEL_RELEASE_GITHUB_ORG}:registry=https://npm.pkg.github.com >> ./.npmrc'"
+    },
     "test": {
       "description": "Tests the TypeScript client library. It is an alias for test-unit.",
       "dependsOn": [
@@ -22,22 +47,26 @@
         "default"
       ],
       "cache": true
-    }, 
+    },
     "lint-check-knip": {
       "description": "Checks for unused dependencies with knip",
       "inputs": [
         "default"
       ],
       "cache": true
-    }, 
+    },
     "build": {
       "description": "Builds the TypeScript client library",
       "inputs": [
         "default",
         "{workspaceRoot}/pnpm-lock.yaml"
       ],
-      "outputs": ["{projectRoot}/dist"],
-      "dependsOn": ["^generate"]
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "dependsOn": [
+        "^generate"
+      ]
     }
   }
 }

@@ -3,13 +3,18 @@
   "private": true,
   "name": "@zitadel/zitadel",
   "scripts": {
-    "changeset": "changeset",
-    "clean:all": "pnpm run clean && rm -rf .nx node_modules"
+    "clean:all": "pnpm run clean && rm -rf .nx node_modules",
+    "release": "tsx release/release.ts"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.29.5",
+    "@nx/js": "21.6.1",
+    "@swc-node/register": "~1.9.1",
+    "@swc/core": "~1.5.7",
+    "@swc/helpers": "~0.5.11",
     "nx": "21.6.1",
     "sass": "^1.64.1",
+    "tsx": "^4.20.6",
     "wait-on": "^9.0.1"
-  }
+  },
+  "dependencies": {}
 }

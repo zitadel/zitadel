@@ -22,32 +22,14 @@ permissions:
 jobs:
   lint_test_build:
     uses: ./.github/workflows/lint_test_build.yml
-    if: ${{ github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
     permissions:
       contents: read
     with:
       go_version: "1.25"
       node_version: "22"
     secrets:
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      NX_CLOUD_ACCESS_TOKEN_READONLY: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
-
-  pack:
-    uses: ./.github/workflows/pack.yml
-    permissions:
-      contents: write
-      packages: write
-    secrets:
-      GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
-    if: ${{ github.event_name == 'workflow_dispatch' }}
-    with:
-      go_version: "1.25"
-      node_version: "22"
-      semantic_version: "23.0.7"
-      image_name_github_api: "ghcr.io/zitadel/zitadel"
-      image_name_google_api: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
-      image_name_github_login: "ghcr.io/zitadel/zitadel-login"
-      image_name_google_login: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel-login"
 
   release:
     uses: ./.github/workflows/release.yml
@@ -56,17 +38,13 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
-    needs:
-      - lint_test_build
-      - pack
-    if: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
-      GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
       APP_ID: ${{ secrets.APP_ID }}
       APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
+    if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    needs:
+      - lint_test_build
     with:
-      semantic_version: "23.0.7"
-      image_name_github_api: "ghcr.io/zitadel/zitadel"
-      image_name_google_api: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
-      image_name_github_login: "ghcr.io/zitadel/zitadel-login"
-      image_name_google_login: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel-login"
+      go_version: "1.25"
+      node_version: "22"

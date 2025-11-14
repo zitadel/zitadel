@@ -1,9 +1,11 @@
 packages:
   - docs
   - console
+  - release
   - tests/*
   - packages/*
   - apps/*
+  - apps/login/integration/api-mock
 
 exclude:
   - benchmark # because of the node 18 or 20 dependency

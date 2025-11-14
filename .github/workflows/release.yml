@@ -3,192 +3,63 @@ name: Release
 on:
   workflow_call:
     inputs:
-      semantic_version:
+      go_version:
         required: true
         type: string
-      image_name_github_api:
-        required: true
-        type: string
-      image_name_google_api:
-        required: true
-        type: string
-      image_name_github_login:
-        required: true
-        type: string
-      image_name_google_login:
+      node_version:
         required: true
         type: string
     secrets:
-      GCR_JSON_KEY_BASE64:
-        description: 'base64 endcrypted key to connect to Google'
-        required: true
       APP_ID:
         description: 'GH App ID to request token for homebrew update'
         required: true
       APP_PRIVATE_KEY:
         description: 'GH App Private Key to request token for homebrew update'
         required: true
+      NX_CLOUD_ACCESS_TOKEN:
+        description: 'NX Cloud access token to read and write cache'
+        required: true
 
 jobs:
-  version:
-    uses: ./.github/workflows/version.yml
-    permissions:
-      contents: write
-    with:
-      semantic_version: ${{ inputs.semantic_version }}
-      dry_run: false
-
-  # TODO: remove the publish job and publish releases directly with the @semantic-release/github plugin (remove draftRelease: true)
-  # as soon as it supports configuring the create release payload property make_latest to "legacy"
-  # https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#create-a-release--parameters
-  publish:
-    runs-on: ubuntu-22.04
-    needs: version
-    if: needs.version.outputs.published == 'true'
+  release:
+    name: Release
+    runs-on: depot-ubuntu-22.04-16
     steps:
-      - id: get_release
-        uses: cardinalby/git-get-release-action@v1
-        with:
-          commitSha: ${{ github.sha }}
-          draft: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Publish Release
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            github.rest.repos.updateRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              release_id: ${{ steps.get_release.outputs.id }},
-              draft: false,
-              make_latest: "legacy"
-            });
-
-  docker:
-    runs-on: ubuntu-22.04
-    needs: [ version ]
-    if: needs.version.outputs.published == 'true'
-    steps:
-    -
-      name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
-    -
-      name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-    - 
-      name: Login to Docker registry
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-    -
-      name: Login to Google Artifact Registry
-      uses: docker/login-action@v3
-      with:
-        registry: europe-docker.pkg.dev
-        username: _json_key_base64
-        password: ${{ secrets.GCR_JSON_KEY_BASE64 }}
-    -
-      name: Publish ${{ needs.version.outputs.version }}
-      run: |
-        docker buildx imagetools create \
-          --tag ${{ inputs.image_name_github_api }}:${{ needs.version.outputs.version }} \
-          ${{ inputs.image_name_github_api }}:${{ github.sha }}
-        docker buildx imagetools create \
-          --tag ${{ inputs.image_name_github_api }}:${{ needs.version.outputs.version }}-debug \
-          ${{ inputs.image_name_github_api }}:${{ github.sha }}-debug
-        docker buildx imagetools create \
-          --tag ${{ inputs.image_name_google_api }}:${{ needs.version.outputs.version }} \
-          ${{ inputs.image_name_google_api }}:${{ github.sha }}
-        docker buildx imagetools create \
-          --tag ${{ inputs.image_name_github_login }}:${{ needs.version.outputs.version }} \
-          ${{ inputs.image_name_github_login }}:${{ github.sha }}
-        docker buildx imagetools create \
-          --tag ${{ inputs.image_name_google_login }}:${{ needs.version.outputs.version }} \
-          ${{ inputs.image_name_google_login }}:${{ github.sha }}
-    -
-      name: Publish latest
-      if: ${{ github.ref_name == 'next' }}
-      run: |
-        docker buildx imagetools create \
-          --tag ${{ inputs.image_name_github_api }}:latest \
-          ${{ inputs.image_name_github_api }}:${{ github.sha }}
-        docker buildx imagetools create \
-          --tag ${{ inputs.image_name_github_api }}:latest-debug \
-          ${{ inputs.image_name_github_api }}:${{ github.sha }}-debug
-        docker buildx imagetools create \
-          --tag ${{ inputs.image_name_github_login }}:latest \
-          ${{ inputs.image_name_github_login }}:${{ github.sha }}
-
-  homebrew-tap:
-    runs-on: ubuntu-22.04
-    needs: version
-    if: needs.version.outputs.published == 'true' && github.ref_name == 'next'
-    continue-on-error: true
-    steps:
-    - name: generate token
-      uses: tibdex/github-app-token@v2
-      id: generate-token
-      with:
-        app_id: ${{ secrets.APP_ID }}
-        private_key: ${{ secrets.APP_PRIVATE_KEY }}
-    - name: Trigger Homebrew
-      env:
-        VERSION: ${{ needs.version.outputs.version }}
-        RUN_ID: ${{ github.run_id }}
-        GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-      run: |
-        gh workflow -R zitadel/homebrew-tap run update.yml -f runId=${RUN_ID} -f version=${VERSION}
-
-  helm-chart:
-    runs-on: ubuntu-22.04
-    needs: version
-    if: needs.version.outputs.published == 'true' && github.ref_name == 'next'
-    continue-on-error: true
-    steps:
-      - name: generate token
-        uses: tibdex/github-app-token@v2
-        id: generate-token
-        with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}
-      - name: Trigger Chart Bump
-        env:
-          VERSION: ${{ needs.version.outputs.version }}
-          RUN_ID: ${{ github.run_id }}
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-        run: |
-          gh workflow -R zitadel/zitadel-charts run bump.yml
-
-  npm-packages:
-    runs-on: ubuntu-latest
-    needs: version
-    if: needs.version.outputs.published == 'true' && github.ref_name == 'next'
-    continue-on-error: true
-    steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v4
-
+        with:
+          fetch-depth: 0
+          filter: tree:0
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ inputs.go_version }}
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Install dependencies
-        working-directory: login
-        run: pnpm install --frozen-lockfile
-
-      - name: Create Release Pull Request
-        uses: changesets/action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          node-version: ${{ inputs.node_version }}
+          cache: "pnpm"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
         with:
-          version: ${{ needs.version.outputs.version }}
-          cwd: packages
-          createGithubReleases: false
+          version: v0.28.0
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Login to Docker registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Release API and Login
+        env:
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm release --no-dry-run --githubRepo "${{ github.repository }}"
+

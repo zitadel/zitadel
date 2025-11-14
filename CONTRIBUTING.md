@@ -83,6 +83,8 @@ The strongest part of a community is the possibility to share thoughts. That's w
 
 If you want to give an answer or be part of discussions please be kind. Treat others like you want to be treated. Read more about our code of conduct [here](CODE_OF_CONDUCT.md).
 
+If in compliance with the project licenses, you can also [release the changed artifacts on your own GitHub organization](./release/README.md).
+
 ## What can I contribute?
 
 For people who are new to Zitadel: We flag issues which are a good starting point to start contributing.
