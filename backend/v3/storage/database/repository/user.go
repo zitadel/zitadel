@@ -151,10 +151,11 @@ func (u user) AddMetadata(metadata ...*domain.Metadata) database.Change {
 func (u user) RemoveMetadata(condition database.Condition) database.Change {
 	return database.NewCTEChange(
 		func(builder *database.StatementBuilder) {
-			builder.WriteString("DELETE FROM zitadel.user_metadata USING existing_user")
+			builder.WriteString("DELETE FROM zitadel.user_metadata USING ")
+			builder.WriteString(existingUser.unqualifiedTableName())
 			writeCondition(builder, database.And(
-				database.NewColumnCondition(u.existingUserInstanceIDColumn(), u.metadataInstanceIDColumn()),
-				database.NewColumnCondition(u.existingUserIDColumn(), u.metadataUserIDColumn()),
+				database.NewColumnCondition(existingUser.instanceIDColumn(), u.metadataInstanceIDColumn()),
+				database.NewColumnCondition(existingUser.idColumn(), u.metadataUserIDColumn()),
 				condition,
 			))
 		},

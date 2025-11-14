@@ -19,6 +19,12 @@ type userHuman struct {
 	user
 }
 
+var existingHumanUser = userHuman{
+	user: user{
+		tableName: "existing_user",
+	},
+}
+
 func HumanUserRepository() domain.HumanUserRepository {
 	return &userHuman{
 		user: user{},
@@ -93,31 +99,30 @@ func (u userHuman) SetPassword(verification domain.VerificationType) database.Ch
 			func(builder *database.StatementBuilder) {
 				builder.WriteString("INSERT INTO zitadel.verifications (instance_id, user_id, value, code, created_at, expiry) SELECT")
 				builder.WriteArgs(
-					u.existingUserInstanceIDColumn(),
-					u.existingUserIDColumn(),
+					existingHumanUser.instanceIDColumn(),
+					existingHumanUser.idColumn(),
 					typ.Value,
 					typ.Code,
 					createdAt,
 					typ.Expiry,
 				)
 				builder.WriteString(" FROM ")
-				builder.WriteString(u.existingUserCTEName())
+				builder.WriteString(existingHumanUser.unqualifiedTableName())
 				builder.WriteString(" RETURNING verification.*")
 			},
 			func(name string) database.Change {
-				verificationIDColumn := database.NewColumn(name, "id")
-
-				getVerification := database.NewStatementBuilder("SELECT ")
-				verificationIDColumn.WriteQualified(getVerification)
-				getVerification.WriteString(" FROM ")
-				getVerification.WriteString(name)
-				writeCondition(getVerification, database.And(
-					database.NewColumnCondition(u.instanceIDColumn(), database.NewColumn(name, "instance_id")),
-					database.NewColumnCondition(u.idColumn(), database.NewColumn(name, "user_id")),
-				))
 				return database.NewChangeToStatement(
 					u.unverifiedPasswordIDColumn(),
-					getVerification,
+					func(builder *database.StatementBuilder) {
+						builder.WriteString(" SELECT ")
+						existingHumanUser.verification.IDColumn().WriteQualified(builder)
+						builder.WriteString(" FROM ")
+						builder.WriteString(name)
+						writeCondition(builder, database.And(
+							database.NewColumnCondition(u.instanceIDColumn(), database.NewColumn(name, "instance_id")),
+							database.NewColumnCondition(u.idColumn(), database.NewColumn(name, "user_id")),
+						))
+					},
 				)
 			},
 		)
@@ -126,17 +131,19 @@ func (u userHuman) SetPassword(verification domain.VerificationType) database.Ch
 		if !typ.VerifiedAt.IsZero() {
 			verifiedAtChange = database.NewChange(u.passwordVerifiedAtColumn(), typ.VerifiedAt)
 		}
-		getPassword := database.NewStatementBuilder("DELETE FROM zitadel.verifications USING existing_user")
-		writeCondition(getPassword, database.And(
-			database.NewColumnCondition(u.verification.InstanceIDColumn(), existingUser.instanceIDColumn()),
-			database.NewColumnCondition(u.verification.IDColumn(), existingUser.unverifiedPasswordIDColumn()),
-		))
-		getPassword.WriteString(" RETURNING value")
+
 		return database.NewChanges(
 			verifiedAtChange,
 			database.NewChangeToNull(u.unverifiedPasswordIDColumn()),
 			database.NewChange(u.failedPasswordAttemptsColumn(), 0),
-			database.NewChangeToStatement(u.passwordColumn(), getPassword),
+			database.NewChangeToStatement(u.passwordColumn(), func(builder *database.StatementBuilder) {
+				builder.WriteString("DELETE FROM zitadel.verifications USING existing_user")
+				writeCondition(builder, database.And(
+					database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.instanceIDColumn()),
+					database.NewColumnCondition(u.verification.IDColumn(), existingHumanUser.unverifiedPasswordIDColumn()),
+				))
+				builder.WriteString(" RETURNING value")
+			}),
 		)
 	case *domain.VerificationTypeUpdate:
 		changes := make(database.Changes, 0, 3)
@@ -155,8 +162,8 @@ func (u userHuman) SetPassword(verification domain.VerificationType) database.Ch
 				changes.Write(builder)
 				builder.WriteString(" FROM existing_user")
 				writeCondition(builder, database.And(
-					database.NewColumnCondition(u.verification.InstanceIDColumn(), u.existingUserInstanceIDColumn()),
-					database.NewColumnCondition(u.verification.IDColumn(), u.existingUserUnverifiedPasswordIDColumn()),
+					database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.instanceIDColumn()),
+					database.NewColumnCondition(u.verification.IDColumn(), existingHumanUser.unverifiedPasswordIDColumn()),
 				))
 			},
 			nil,
@@ -177,8 +184,8 @@ func (u userHuman) SetPassword(verification domain.VerificationType) database.Ch
 				builder.WriteString("UPDATE zitadel.verifications SET verifications.failed_attempts = verifications.failed_attempts + 1")
 				builder.WriteString("FROM existing_user")
 				writeCondition(builder, database.And(
-					database.NewColumnCondition(u.verification.InstanceIDColumn(), u.existingUserInstanceIDColumn()),
-					database.NewColumnCondition(u.verification.IDColumn(), u.existingUserUnverifiedPasswordIDColumn()),
+					database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.instanceIDColumn()),
+					database.NewColumnCondition(u.verification.IDColumn(), existingHumanUser.unverifiedPasswordIDColumn()),
 				))
 			},
 			nil,
