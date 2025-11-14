@@ -56,8 +56,8 @@ func (r Router) GetEventBestMatch(executionID string) ([]Target, bool) {
 		if e.ID == "event" && strings.HasPrefix(executionID, e.ID) {
 			bestMatch, ok = e, true
 		}
-		cut, has := strings.CutSuffix(e.ID, ".*")
-		if has && strings.HasPrefix(executionID, cut) {
+
+		if strings.HasPrefix(executionID, e.ID) {
 			bestMatch, ok = e, true
 		}
 	}

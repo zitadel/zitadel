@@ -8,7 +8,7 @@ import (
 
 var (
 	eventGlobalTarget   = Target{ExecutionID: "event", TargetID: "event_global"}
-	eventGroupTarget    = Target{ExecutionID: "event/foo.*", TargetID: "event_group"}
+	eventGroupTarget    = Target{ExecutionID: "event/foo", TargetID: "event_group"}
 	eventMatchTarget    = Target{ExecutionID: "event/foo.bar", TargetID: "event_specific"}
 	functionCallTarget1 = Target{ExecutionID: "function/Call", TargetID: "function_call_1"}
 	functionCallTarget2 = Target{ExecutionID: "function/Call", TargetID: "function_call_2"}
@@ -94,7 +94,7 @@ func TestBinarySearchRouter_GetEventBestMatch(t *testing.T) {
 			name:    "event group match",
 			targets: testTargets[1:],
 			args: args{
-				id: "event/foo.bar.baz",
+				id: "event/foo.baz",
 			},
 			wantTargets: []Target{eventGroupTarget},
 			wantOk:      true,
