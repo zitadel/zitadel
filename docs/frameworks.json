@@ -229,7 +229,7 @@
     "docsLink": "/docs/sdk-examples/nuxtjs",
     "example": "https://github.com/zitadel/example-auth-nuxtjs.git",
     "installCommand": "npm install",
-    "startCommand": "npm run preview",
+    "startCommand": "npm run dev",
     "localhost": "http://localhost:3000",
     "external": false,
     "hasExampleEnv": true
@@ -278,7 +278,7 @@
     "docsLink": "/docs/sdk-examples/solidstart",
     "example": "https://github.com/zitadel/example-auth-solidstart.git",
     "installCommand": "npm install",
-    "startCommand": "npm start",
+    "startCommand": "npm run dev",
     "localhost": "http://localhost:3000",
     "external": false,
     "hasExampleEnv": true
@@ -293,7 +293,7 @@
     "docsLink": "/docs/sdk-examples/sveltekit",
     "example": "https://github.com/zitadel/example-auth-sveltekit.git",
     "installCommand": "npm install",
-    "startCommand": "npm run preview",
+    "startCommand": "npm run dev",
     "localhost": "http://localhost:3000",
     "external": false,
     "hasExampleEnv": true
@@ -355,7 +355,7 @@
     "docsLink": "/docs/sdk-examples/vue",
     "example": "https://github.com/zitadel/example-auth-vue.git",
     "installCommand": "npm install",
-    "startCommand": "npm run preview",
+    "startCommand": "npm run dev",
     "localhost": "http://localhost:3000",
     "external": false,
     "hasExampleEnv": true,
