@@ -98,7 +98,7 @@ func (a *authorizationRelationalProjection) reduceUserGrantChanged(event eventst
 	case *usergrant.UserGrantCascadeChangedEvent:
 		roles = e.RoleKeys
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-hOr1E", "reduce.wrong.event.type %v", []eventstore.EventType{usergrant.UserGrantChangedType, usergrant.UserGrantCascadeChangedType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-kg1ryL", "reduce.wrong.event.type %v", []eventstore.EventType{usergrant.UserGrantChangedType, usergrant.UserGrantCascadeChangedType})
 	}
 
 	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
