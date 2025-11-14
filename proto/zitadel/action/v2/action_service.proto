@@ -307,6 +307,99 @@ service ActionService {
     };
   }
 
+  // Add Public Key
+  //
+  // Adds a public key to the target for payload encryption.
+  // The public key is used to encrypt the payload sent to the target when the payload type is set to `PAYLOAD_TYPE_JWE`.
+  // The public key must be in PEM format and be either an RSA or an EC key.
+  // On a successful addition, a key ID is returned which can not only be used to manage the key (activate, remove),
+  // but also will be used as the `kid` header in the JWE token sent to the target to indicate which key was used for encryption.
+  //
+  // Required permission:
+  //   - `action.target.write`
+  rpc AddPublicKey (AddPublicKeyRequest) returns (AddPublicKeyResponse) {
+    option (google.api.http) = {
+      post: "/v2/actions/targets/{target_id}/publickey"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.target.write"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "Public key added successfully";
+        };
+      };
+    };
+  }
+
+  // Activate Public Key
+  //
+  // Activates the public key for payload encryption.
+  // The public key is used to encrypt the payload sent to the target when the payload type is set to `PAYLOAD_TYPE_JWE`.
+  //
+  // Required permission:
+  //   - `action.target.write`
+  rpc ActivatePublicKey (ActivatePublicKeyRequest) returns (ActivatePublicKeyResponse) {
+    option (google.api.http) = {
+      post: "/v2/actions/targets/{target_id}/publickey/{key_id}/activate"
+    };
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.target.write"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "Public key activated successfully";
+        };
+      };
+      responses: {
+        key: "404"
+        value: {
+          description: "The key to activate does not exist.";
+        }
+      };
+    };
+  }
+
+  // Remove Public Key
+  //
+  // Removes the public key from the target. If the key is used to encrypt payloads and there's
+  // no other active public key, the target will no longer be able to receive encrypted payloads
+  // and calls with payload type `PAYLOAD_TYPE_JWE` will fail.
+  //
+  // Required permission:
+  //   - `action.target.write`
+  rpc RemovePublicKey (RemovePublicKeyRequest) returns (RemovePublicKeyResponse) {
+    option (google.api.http) = {
+      delete: "/v2/actions/targets/{target_id}/publickey/{key_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.target.write"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "Public key removed successfully";
+        };
+      };
+    };
+  }
+
   // Set Execution
   //
   // Sets an execution to call a target or include the targets of another execution.
@@ -510,6 +603,20 @@ message CreateTargetRequest {
     }
   ];
 
+  // Payload type defines how the payload is formatted and secured.
+  // The default is `PAYLOAD_TYPE_JSON`, which sends the payload as JSON in the body of the request.
+  // For integrity and authenticity a signature is included in the header `X-ZITADEL-Signature`.
+  // You can also choose to send the payload as a JWT (`PAYLOAD_TYPE_JWT`), which sends
+  // the payload as a signed JWT in the body of the request. This allows the receiver to verify
+  // the authenticity and integrity of the payload using the signing key.
+  // If you need encryption as well, you can choose `PAYLOAD_TYPE_JWE`, which sends the payload
+  // as an encrypted JWT in the body of the request. You can provide your own public key for encryption.
+  PayloadType payload_type = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"PAYLOAD_TYPE_JSON\""
+    }
+  ];
+
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     example: "{\"name\": \"ip_allow_list\",\"restWebhook\":{\"interruptOnError\":true},\"timeout\":\"10s\",\"endpoint\":\"https://example.com/hooks/ip_check\"}";
   };
@@ -630,6 +737,21 @@ message UpdateTargetRequest {
     }
   ];
 
+  // Payload type defines how the payload is formatted and secured.
+  // The default is `PAYLOAD_TYPE_JSON`, which sends the payload as JSON in the body of the request.
+  // For integrity and authenticity a signature is included in the header `X-ZITADEL-Signature`.
+  // You can also choose to send the payload as a JWT (`PAYLOAD_TYPE_JWT`), which sends
+  // the payload as a signed JWT in the body of the request. This allows the receiver to verify
+  // the authenticity and integrity of the payload using the signing key.
+  // If you need encryption as well, you can choose `PAYLOAD_TYPE_JWE`, which sends the payload
+  // as an encrypted JWT in the body of the request. You can provide your own public key for encryption.
+  // If unspecified, the payload type will not be changed.
+  PayloadType payload_type = 9 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"PAYLOAD_TYPE_JSON\""
+    }
+  ];
+
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     example: "{\"name\": \"ip_allow_list\",\"restCall\":{\"interruptOnError\":true},\"timeout\":\"10s\",\"endpoint\":\"https://example.com/hooks/ip_check\",\"expirationSigningKey\":\"0s\"}";
   };
@@ -723,6 +845,112 @@ message ListTargetsResponse {
 
   // List of all targets matching the query.
   repeated Target targets = 2;
+}
+
+message AddPublicKeyRequest {
+  // The unique identifier of the target to add the public key to.
+  string target_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+
+  // The public key in PEM format. It must be either an RSA or an EC public key.
+  bytes public_key = 2 [
+    (validate.rules).bytes = {min_len: 1, max_len: 8192},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS1cbk1JSUJJakFOQmdrcWhraUc5dzBCQVFzRkFEQV...\"";
+    }
+  ];
+}
+
+message AddPublicKeyResponse {
+  // The KeyID is the unique identifier of the newly added public key.
+  // The ID is also used a `kid` in the JWT header for payload encryption.
+  // This allows the target to identify the correct key to use for decryption.
+  string key_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629032906489576\"";
+    }
+  ];
+
+  // The timestamp of the public key addition.
+  google.protobuf.Timestamp addition_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+}
+
+message ActivatePublicKeyRequest {
+  // The unique identifier of the target to activate the public key for.
+  string target_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+
+  // The unique identifier of the public key to activate.
+  string key_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629032906489576\"";
+    }
+  ];
+}
+
+message ActivatePublicKeyResponse {
+  // The timestamp of the public key activation.
+  google.protobuf.Timestamp activation_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+}
+
+message RemovePublicKeyRequest {
+  // The unique identifier of the target to remove the public key from.
+  string target_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+
+  // The unique identifier of the public key to remove.
+  string key_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629032906489576\"";
+    }
+  ];
+}
+
+message RemovePublicKeyResponse {
+  // The timestamp of the public key removal.
+  google.protobuf.Timestamp removal_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
 }
 
 message SetExecutionRequest {
