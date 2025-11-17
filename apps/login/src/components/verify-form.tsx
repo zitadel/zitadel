@@ -3,7 +3,7 @@
 import { Alert, AlertType } from "@/components/alert";
 import { resendVerification, sendVerification } from "@/lib/server/verify";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, startTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { BackButton } from "./back-button";
@@ -25,14 +25,7 @@ type Props = {
   requestId?: string;
 };
 
-export function VerifyForm({
-  userId,
-  loginName,
-  organization,
-  requestId,
-  code,
-  isInvite,
-}: Props) {
+export function VerifyForm({ userId, loginName, organization, requestId, code, isInvite }: Props) {
   const router = useRouter();
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
@@ -73,9 +66,7 @@ export function VerifyForm({
   }
 
   const fcn = useCallback(
-    async function submitCodeAndContinue(
-      value: Inputs,
-    ): Promise<boolean | void> {
+    async function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
       setLoading(true);
 
       const response = await sendVerification({
@@ -103,12 +94,15 @@ export function VerifyForm({
         return router.push(response?.redirect);
       }
     },
-    [isInvite, userId],
+    [isInvite, userId, loginName, organization, requestId, t, router],
   );
 
   useEffect(() => {
     if (code) {
-      fcn({ code });
+      // Don't call fcn directly in effect - use startTransition
+      startTransition(() => {
+        fcn({ code });
+      });
     }
   }, [code, fcn]);
 

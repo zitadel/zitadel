@@ -12,6 +12,7 @@ import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import Link from "next/link";
 
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("accounts");
   return { title: t("title") };

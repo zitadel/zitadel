@@ -8,7 +8,7 @@
     "build-vercel": "next build",
     "dev": "HOSTNAME=127.0.0.1 ./scripts/entrypoint.sh next dev",
     "prod": "cd ./.next/standalone && HOSTNAME=127.0.0.1 ./entrypoint.sh node apps/login/server.js",
-    "lint-check-next": "next lint",
+    "lint-check-next": "eslint .",
     "lint-check-prettier": "prettier --check .",
     "lint-fix": "prettier --write .",
     "test-unit": "vitest --run",
@@ -17,7 +17,9 @@
   },
   "pnpm": {
     "overrides": {
-      "form-data@>=4.0.0 <4.0.4": ">=4.0.4"
+      "form-data@>=4.0.0 <4.0.4": ">=4.0.4",
+      "@types/react": "19.2.2",
+      "@types/react-dom": "19.2.2"
     }
   },
   "git": {
@@ -36,13 +38,13 @@
     "deepmerge": "^4.3.1",
     "lucide-react": "0.469.0",
     "moment": "^2.29.4",
-    "next": "15.4.0-canary.86",
-    "next-intl": "^3.25.1",
+    "next": "16.0.1",
+    "next-intl": "^4.4.0",
     "next-themes": "^0.2.1",
     "nice-grpc": "2.0.1",
     "qrcode.react": "^3.1.0",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
     "react-hook-form": "7.39.5",
     "tinycolor2": "1.4.2",
     "uuid": "^11.1.0"
@@ -59,8 +61,8 @@
     "@testing-library/react": "^16.3.0",
     "@types/ms": "2.1.0",
     "@types/node": "^22.14.1",
-    "@types/react": "19.1.2",
-    "@types/react-dom": "19.1.2",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
     "@types/tinycolor2": "1.4.3",
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
@@ -74,8 +76,8 @@
     "cypress": "^14.5.4",
     "dotenv-cli": "^8.0.0",
     "env-cmd": "^10.1.0",
-    "eslint": "^8.57.0",
-    "eslint-config-next": "15.4.0-canary.86",
+    "eslint": "^9",
+    "eslint-config-next": "16.0.1",
     "eslint-config-prettier": "^9.1.0",
     "gaxios": "^7.1.0",
     "grpc-tools": "1.13.0",

@@ -8,6 +8,7 @@ import { headers } from "next/headers";
 /**
  * Complete registration page - shown when manual user registration is required
  */
+
 export default async function CompleteRegistrationPage(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
   params: Promise<{ provider: string }>;

@@ -24,6 +24,7 @@ import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("authenticator");
   return { title: t("title") };
