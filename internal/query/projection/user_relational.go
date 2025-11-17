@@ -956,7 +956,7 @@ func (p *userRelationalProjection) reduceHumanPhoneCodeAdded(event eventstore.Ev
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.SetPhone(&domain.VerificationTypeUpdate{
-				Code:   &e.Code.Crypted,
+				Code:   e.Code.Crypted,
 				Expiry: &e.Expiry,
 			}),
 			repo.SetUpdatedAt(e.CreatedAt()),
@@ -1057,7 +1057,7 @@ func (p *userRelationalProjection) reduceHumanEmailCodeAdded(event eventstore.Ev
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.SetEmail(&domain.VerificationTypeUpdate{
-				Code:   &e.Code.Crypted,
+				Code:   e.Code.Crypted,
 				Expiry: expiry,
 			}),
 			repo.SetUpdatedAt(e.CreatedAt()),
@@ -1179,7 +1179,7 @@ func (p *userRelationalProjection) reduceHumanPasswordCodeAdded(event eventstore
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.SetPassword(&domain.VerificationTypeUpdate{
-				Code:   &e.Code.Crypted,
+				Code:   e.Code.Crypted,
 				Expiry: expiry,
 			}),
 			repo.SetUpdatedAt(e.CreatedAt()),
@@ -1517,7 +1517,7 @@ func (p *userRelationalProjection) reduceMetadataRemoved(event eventstore.Event)
 		repo := repository.UserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.RemoveMetadata(repo.MetadataKeyCondition(e.Key)),
+			repo.RemoveMetadata(repo.MetadataKeyCondition(database.TextOperationEqual, e.Key)),
 		)
 		return err
 	}), nil
@@ -1569,12 +1569,12 @@ func (p *userRelationalProjection) reducePasskeyAdded(event eventstore.Event) (*
 				repo.PasskeyIDCondition(e.WebAuthNTokenID),
 			),
 			repo.AddPasskey(&domain.Passkey{
-				ID:              e.WebAuthNTokenID,
-				Challenge:       []byte(e.Challenge),
-				RelayingPartyID: e.RPID,
-				CreatedAt:       e.CreatedAt(),
-				UpdatedAt:       e.CreatedAt(),
-				Type:            typ,
+				ID:             e.WebAuthNTokenID,
+				Challenge:      []byte(e.Challenge),
+				RelyingPartyID: e.RPID,
+				CreatedAt:      e.CreatedAt(),
+				UpdatedAt:      e.CreatedAt(),
+				Type:           typ,
 			}),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
@@ -1916,7 +1916,7 @@ func (p *userRelationalProjection) reduceIDPLinkUsernameChanged(event eventstore
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.UpdateIdentityProviderLink(
-				repo.SetIdentityProviderLinkProvidedID(e.IDPConfigID, e.ExternalUserID, e.ExternalUsername),
+				repo.SetIdentityProviderLinkUsername(e.IDPConfigID, e.ExternalUserID, e.ExternalUsername),
 			),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)

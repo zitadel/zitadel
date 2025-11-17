@@ -20,7 +20,6 @@ func (u userHuman) CheckTOTP(check domain.CheckType) database.Change {
 			builder.WriteString(u.verification.qualifiedTableName())
 			builder.WriteString(" SET ")
 			database.NewIncrementColumnChange(u.verification.FailedAttemptsColumn())
-
 		}, nil)
 	case *domain.CheckTypeSucceeded:
 		lastSucceededChange := database.NewChange(u.lastSuccessfulTOTPCheckColumn(), database.NowInstruction)
@@ -61,7 +60,46 @@ func (u userHuman) RemoveTOTP() database.Change {
 
 // SetTOTP implements [domain.HumanUserRepository.SetTOTP].
 func (u userHuman) SetTOTP(verification domain.VerificationType) database.Change {
-	panic("unimplemented")
+	switch typ := verification.(type) {
+	case *domain.VerificationTypeInit:
+		var createdAt any = database.NowInstruction
+		if !typ.CreatedAt.IsZero() {
+			createdAt = typ.CreatedAt
+		}
+		return database.NewChanges(
+			database.NewCTEChange(func(builder *database.StatementBuilder) {
+				builder.WriteString("INSERT INTO zitadel.verifications (instance_id, user_id, value, code, created_at, expiry) SELECT")
+				builder.WriteArgs(
+					existingHumanUser.instanceIDColumn(),
+					existingHumanUser.idColumn(),
+					typ.Value,
+					typ.Code,
+					createdAt,
+					typ.Expiry,
+				)
+				builder.WriteString(" FROM ")
+				builder.WriteString(existingHumanUser.unqualifiedTableName())
+				builder.WriteString(" RETURNING verification.*")
+			},
+				func(name string) database.Change {
+					return database.NewChangeToStatement(
+						u.unverifiedPasswordIDColumn(),
+						func(builder *database.StatementBuilder) {
+							builder.WriteString(" SELECT ")
+							existingHumanUser.verification.IDColumn().WriteQualified(builder)
+							builder.WriteString(" FROM ")
+							builder.WriteString(name)
+							writeCondition(builder, database.And(
+								database.NewColumnCondition(u.instanceIDColumn(), database.NewColumn(name, "instance_id")),
+								database.NewColumnCondition(u.idColumn(), database.NewColumn(name, "user_id")),
+							))
+						},
+					)
+				},
+			),
+		)
+	}
+	panic(fmt.Sprintf("unhandled verification type %T", verification))
 }
 
 // -------------------------------------------------------------

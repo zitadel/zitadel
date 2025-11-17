@@ -207,8 +207,8 @@ func (u user) LoginNameCondition(op database.TextOperation, loginName string) da
 }
 
 // MetadataKeyCondition implements [domain.UserRepository.MetadataKeyCondition].
-func (u user) MetadataKeyCondition(key string) database.Condition {
-	return database.NewTextCondition(u.metadataKeyColumn(), database.TextOperationEqual, key)
+func (u user) MetadataKeyCondition(op database.TextOperation, key string) database.Condition {
+	return database.NewTextCondition(u.metadataKeyColumn(), op, key)
 }
 
 // MetadataValueCondition implements [domain.UserRepository.MetadataValueCondition].

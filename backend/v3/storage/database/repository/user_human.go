@@ -148,7 +148,7 @@ func (u userHuman) SetPassword(verification domain.VerificationType) database.Ch
 	case *domain.VerificationTypeUpdate:
 		changes := make(database.Changes, 0, 3)
 		if typ.Code != nil {
-			changes = append(changes, database.NewChange(u.verification.CodeColumn(), *typ.Code))
+			changes = append(changes, database.NewChange(u.verification.CodeColumn(), typ.Code))
 		}
 		if typ.Expiry != nil {
 			changes = append(changes, database.NewChange(u.verification.ExpiryColumn(), *typ.Expiry))

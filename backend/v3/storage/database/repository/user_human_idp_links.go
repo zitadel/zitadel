@@ -15,12 +15,63 @@ func (u userHuman) unqualifiedIDPLinksTableName() string {
 
 // AddIdentityProviderLink implements [domain.HumanUserRepository.AddIdentityProviderLink].
 func (u userHuman) AddIdentityProviderLink(link *domain.IdentityProviderLink) database.Change {
-	panic("unimplemented")
+	var createdAt, updatedAt any = database.NowInstruction, database.NowInstruction
+	if !link.CreatedAt.IsZero() {
+		createdAt = link.CreatedAt
+	}
+	if !link.UpdatedAt.IsZero() {
+		updatedAt = link.UpdatedAt
+	}
+	return database.NewCTEChange(
+		func(builder *database.StatementBuilder) {
+			builder.WriteString("INSERT INTO zitadel.human_identity_provider_links" +
+				"(instance_id, user_id, provided_user_id, provided_username, provider_id, created_at, updated_at) SELECT ")
+			database.Columns{
+				existingHumanUser.instanceIDColumn(),
+				existingHumanUser.idColumn(),
+			}.WriteQualified(builder)
+			builder.WriteArgs(
+				link.ProvidedUserID,
+				link.ProvidedUsername,
+				link.ProviderID,
+				createdAt,
+				updatedAt,
+			)
+			builder.WriteString(" FROM ")
+			builder.WriteString(existingHumanUser.unqualifiedTableName())
+			builder.WriteString(" RETURNING *")
+		}, nil,
+	)
 }
 
 // RemoveIdentityProviderLink implements [domain.HumanUserRepository.RemoveIdentityProviderLink].
 func (u userHuman) RemoveIdentityProviderLink(providerID string, providedUserID string) database.Change {
-	panic("unimplemented")
+	return database.NewCTEChange(
+		func(builder *database.StatementBuilder) {
+			builder.WriteString("DELETE FROM zitadel.human_identity_provider_links USING ")
+			builder.WriteString(existingHumanUser.unqualifiedTableName())
+			writeCondition(builder, database.And(
+				database.NewColumnCondition(
+					existingHumanUser.instanceIDColumn(),
+					database.NewColumn("human_identity_provider_links", "instance_id"),
+				),
+				database.NewColumnCondition(
+					existingHumanUser.idColumn(),
+					database.NewColumn("human_identity_provider_links", "user_id"),
+				),
+				database.NewTextCondition(
+					database.NewColumn("human_identity_provider_links", "provider_id"),
+					database.TextOperationEqual,
+					providerID,
+				),
+				database.NewTextCondition(
+					database.NewColumn("human_identity_provider_links", "provided_user_id"),
+					database.TextOperationEqual,
+					providedUserID,
+				),
+			))
+		}, nil,
+	)
 }
 
 // SetIdentityProviderLinkProvidedID implements [domain.HumanUserRepository.SetIdentityProviderLinkProvidedID].

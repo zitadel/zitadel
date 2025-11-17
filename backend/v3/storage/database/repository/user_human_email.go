@@ -18,7 +18,7 @@ func (u userHuman) CheckEmailOTP(check domain.CheckType) database.Change {
 
 // DisableEmailOTP implements [domain.HumanUserRepository.DisableEmailOTP].
 func (u userHuman) DisableEmailOTP() database.Change {
-	return database.NewChangeToNull(u.emailOTPEnabledAtColumn())
+	return database.NewChange(u.emailOTPEnabledAtColumn(), false)
 }
 
 // EnableEmailOTP implements [domain.HumanUserRepository.EnableEmailOTP].
