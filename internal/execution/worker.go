@@ -45,7 +45,7 @@ func (w *Worker) Work(ctx context.Context, job *river.Job[*exec_repo.Request]) e
 		return river.JobCancel(fmt.Errorf("unable to unmarshal targets because %w", err))
 	}
 
-	_, err = CallTargets(ctx, targets, exec_repo.ContextInfoFromRequest(job.Args), w.targetEncAlg)
+	_, err = CallTargets(ctx, targets, exec_repo.ContextInfoFromRequest(job.Args), w.targetEncAlg, nil) // TODO: !
 	if err != nil {
 		// If there is an error returned from the targets, it means that the execution was interrupted
 		return river.JobCancel(fmt.Errorf("interruption during call of targets because %w", err))

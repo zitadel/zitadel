@@ -3,11 +3,17 @@ package execution
 import (
 	"bytes"
 	"context"
+	"crypto/ecdsa"
+	"crypto/ed25519"
+	"crypto/rsa"
+	"crypto/x509"
 	"encoding/json"
+	"encoding/pem"
 	"io"
 	"net/http"
 	"time"
 
+	"github.com/go-jose/go-jose/v4"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -27,19 +33,24 @@ type ContextInfo interface {
 	SetHTTPResponseBody([]byte) error
 }
 
+type SigningKey interface {
+	GetActiveSigningWebKey(ctx context.Context) (webKey *jose.JSONWebKey, err error)
+}
+
 // CallTargets call a list of targets in order with handling of error and responses
 func CallTargets(
 	ctx context.Context,
 	targets []target_domain.Target,
 	info ContextInfo,
 	alg crypto.EncryptionAlgorithm,
+	signingKey SigningKey,
 ) (_ interface{}, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	for _, target := range targets {
 		// call the type of target
-		resp, err := CallTarget(ctx, target, info, alg)
+		resp, err := CallTarget(ctx, target, info, alg, signingKey)
 		// handle error if interrupt is set
 		if err != nil && target.IsInterruptOnError() {
 			return nil, err
@@ -64,6 +75,7 @@ func CallTarget(
 	target target_domain.Target,
 	info ContextInfoRequest,
 	alg crypto.EncryptionAlgorithm,
+	getKey SigningKey,
 ) (res []byte, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -72,20 +84,57 @@ func CallTarget(
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "EXEC-thiiCh5b", "Errors.Internal")
 	}
+	body := info.GetHTTPRequestBody()
+	if len(target.GetEncryptionKey()) > 0 {
+		block, _ := pem.Decode(target.GetEncryptionKey())
+		if block == nil {
+			return nil, zerrors.ThrowInternal(nil, "EXEC-3n8fhs7g", "Errors.Execution.InvalidPublicKey")
+		}
+		publicKey, err := x509.ParsePKIXPublicKey(block.Bytes)
+		if err != nil {
+			return nil, err
+		}
+		var alg jose.KeyAlgorithm
+		switch publicKey.(type) {
+		case *rsa.PublicKey:
+			alg = jose.RSA_OAEP_256
+		case *ecdsa.PublicKey:
+			alg = jose.ECDH_ES_A256KW
+		case ed25519.PublicKey:
+			alg = jose.DIRECT
+		}
+		encrypter, err := jose.NewEncrypter(jose.A256GCM, jose.Recipient{
+			Algorithm: alg,
+			Key:       publicKey,
+			KeyID:     target.GetEncryptionKeyID(),
+		}, nil)
+		webKey, _ := getKey.GetActiveSigningWebKey(ctx)
+		s, _ := jose.NewSigner(jose.SigningKey{
+			Algorithm: jose.RS256,
+			Key:       webKey,
+		}, nil)
+		sig, _ := s.Sign(body)
+		data, _ := sig.CompactSerialize()
+		enc, _ := encrypter.Encrypt([]byte(data))
+		crypted, _ := enc.CompactSerialize()
+		body = []byte(crypted)
+		//_ = encrypter
+		_ = err
+	}
 
 	switch target.GetTargetType() {
 	// get request, ignore response and return request and error for handling in list of targets
 	case target_domain.TargetTypeWebhook:
-		return nil, webhook(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody(), signingKey)
+		return nil, webhook(ctx, target.GetEndpoint(), target.GetTimeout(), body, signingKey)
 	// get request, return response and error
 	case target_domain.TargetTypeCall:
-		return Call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody(), signingKey)
+		return Call(ctx, target.GetEndpoint(), target.GetTimeout(), body, signingKey)
 	case target_domain.TargetTypeAsync:
 		go func(ctx context.Context, target target_domain.Target, info []byte) {
 			if _, err := Call(ctx, target.GetEndpoint(), target.GetTimeout(), info, signingKey); err != nil {
 				logging.WithFields("target", target.GetTargetID()).OnError(err).Info(err)
 			}
-		}(context.WithoutCancel(ctx), target, info.GetHTTPRequestBody())
+		}(context.WithoutCancel(ctx), target, body)
 		return nil, nil
 	default:
 		return nil, zerrors.ThrowInternal(nil, "EXEC-auqnansr2m", "Errors.Execution.Unknown")

@@ -26,7 +26,9 @@ with features as (
 			'endpoint', t.endpoint,
 			'timeout', t.timeout,
 			'interrupt_on_error', t.interrupt_on_error,
-			'signing_key', t.signing_key
+			'signing_key', t.signing_key,
+            'encryption_key', encode(k.public_key, 'base64'),
+            'encryption_key_id', k.id
 		) as execution_targets
 		from projections.executions1 e
 		join projections.executions1_targets et
@@ -35,6 +37,14 @@ with features as (
 		join projections.targets2 t
 			on et.instance_id = t.instance_id
 			and et.target_id = t.id
+        left join lateral (
+            select * from projections.authn_keys2 k
+            where k.instance_id = et.instance_id
+              and k.object_id = t.id
+              and k.enabled = true
+              and k.expiration > now()
+            order by k.creation_date asc
+            limit 1) k on true
 		where e.instance_id = $1
 		order by et.position asc
 	) as x

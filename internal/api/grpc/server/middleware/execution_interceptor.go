@@ -58,7 +58,7 @@ func executeTargetsForRequest(ctx context.Context, targets []target_domain.Targe
 		Headers:    connect_middleware.SetRequestHeaders(md),
 	}
 
-	return execution.CallTargets(ctx, targets, info, alg)
+	return execution.CallTargets(ctx, targets, info, alg, nil)
 }
 
 func executeTargetsForResponse(ctx context.Context, targets []target_domain.Target, fullMethod string, req, resp interface{}, alg crypto.EncryptionAlgorithm) (_ interface{}, err error) {
@@ -83,7 +83,7 @@ func executeTargetsForResponse(ctx context.Context, targets []target_domain.Targ
 		Headers:    connect_middleware.SetRequestHeaders(md),
 	}
 
-	return execution.CallTargets(ctx, targets, info, alg)
+	return execution.CallTargets(ctx, targets, info, alg, nil)
 }
 
 var _ execution.ContextInfo = &ContextInfoRequest{}

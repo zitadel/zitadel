@@ -22,6 +22,8 @@ type Target struct {
 	Timeout          time.Duration       `json:"timeout,omitempty"`
 	InterruptOnError bool                `json:"interrupt_on_error,omitempty"`
 	SigningKey       *crypto.CryptoValue `json:"signing_key,omitempty"`
+	EncryptionKey    []byte              `json:"encryption_key,omitempty"`
+	EncryptionKeyID  string              `json:"encryption_key_id,omitempty"`
 }
 
 func (e *Target) GetExecutionID() string {
@@ -47,4 +49,11 @@ func (e *Target) GetSigningKey(alg crypto.EncryptionAlgorithm) (string, error) {
 		return "", nil
 	}
 	return crypto.DecryptString(e.SigningKey, alg)
+}
+func (e *Target) GetEncryptionKey() []byte {
+	return e.EncryptionKey
+}
+
+func (e *Target) GetEncryptionKeyID() string {
+	return e.EncryptionKeyID
 }
