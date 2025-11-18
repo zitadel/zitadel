@@ -35,9 +35,13 @@ func TestDeleteInstace(t *testing.T) {
 		assert.True(tCollect, got.EnableRelationalTables.GetEnabled())
 	})
 
-	instances := []*integration.Instance{
-		instEventStore,
-		instRelational,
+	type instanceWithType struct {
+		instType string
+		instance *integration.Instance
+	}
+	instances := []instanceWithType{
+		{instType: "eventstore", instance: instEventStore},
+		{instType: "relational", instance: instRelational},
 	}
 	t.Cleanup(func() {
 		instRelational.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: instRelational.ID()})
@@ -46,12 +50,13 @@ func TestDeleteInstace(t *testing.T) {
 
 	for _, inst := range instances {
 		tt := []struct {
-			testName           string
-			inputRequest       *instance.DeleteInstanceRequest
-			inputContext       context.Context
-			expectedErrorMsg   string
-			expectedErrorCode  codes.Code
-			expectedInstanceID string
+			testName             string
+			inputRequest         *instance.DeleteInstanceRequest
+			inputContext         context.Context
+			expectedErrorMsg     string
+			expectedErrorCode    codes.Code
+			expectedInstanceID   string
+			expectsNullTimestamp bool
 		}{
 			{
 				testName: "when invalid context should return unauthN error",
@@ -63,34 +68,33 @@ func TestDeleteInstace(t *testing.T) {
 				expectedErrorMsg:  "auth header missing",
 			},
 			{
-				testName: "when invalid input should return invalid argument error",
+				testName: "when instance not found should return no error",
 				inputRequest: &instance.DeleteInstanceRequest{
-					InstanceId: inst.ID() + "invalid",
+					InstanceId: inst.instance.ID() + "invalid",
 				},
-				inputContext:      ctxWithSysAuthZ,
-				expectedErrorCode: codes.NotFound,
-				expectedErrorMsg:  "not found",
+				inputContext:         ctxWithSysAuthZ,
+				expectsNullTimestamp: true,
 			},
 			{
 				testName: "when delete succeeds should return deletion date",
 				inputRequest: &instance.DeleteInstanceRequest{
-					InstanceId: inst.ID(),
+					InstanceId: inst.instance.ID(),
 				},
 				inputContext:       ctxWithSysAuthZ,
-				expectedInstanceID: inst.ID(),
+				expectedInstanceID: inst.instance.ID(),
 			},
 		}
 		for _, tc := range tt {
-			t.Run(tc.testName, func(t *testing.T) {
+			t.Run(fmt.Sprintf("%s - %s", inst.instType, tc.testName), func(t *testing.T) {
 				// Test
-				res, err := inst.Client.InstanceV2Beta.DeleteInstance(tc.inputContext, tc.inputRequest)
+				res, err := inst.instance.Client.InstanceV2Beta.DeleteInstance(tc.inputContext, tc.inputRequest)
 
 				// Verify
 				assert.Equal(t, tc.expectedErrorCode, status.Code(err))
 				assert.Contains(t, status.Convert(err).Message(), tc.expectedErrorMsg)
 				if tc.expectedErrorMsg == "" {
 					require.NotNil(t, res)
-					require.NotEmpty(t, res.GetDeletionDate())
+					require.Equal(t, tc.expectsNullTimestamp, res.GetDeletionDate() == nil)
 				}
 			})
 		}

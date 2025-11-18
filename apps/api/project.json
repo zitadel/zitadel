@@ -6,6 +6,7 @@
         "sources": [
             "{workspaceRoot}/cmd/**/*.go",
             "{workspaceRoot}/internal/**/*.go",
+            "{workspaceRoot}/backend/**/*.go",
             "{workspaceRoot}/proto/**/*.go",
             "{workspaceRoot}/pkg/**/*.go",
             "{workspaceRoot}/main.go"

@@ -352,6 +352,44 @@ func (c *MockInstanceDomainRepositoryIsGeneratedColumnCall) DoAndReturn(f func()
 	return c
 }
 
+// IsGeneratedCondition mocks base method.
+func (m *MockInstanceDomainRepository) IsGeneratedCondition(arg0 bool) database.Condition {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsGeneratedCondition", arg0)
+	ret0, _ := ret[0].(database.Condition)
+	return ret0
+}
+
+// IsGeneratedCondition indicates an expected call of IsGeneratedCondition.
+func (mr *MockInstanceDomainRepositoryMockRecorder) IsGeneratedCondition(arg0 any) *MockInstanceDomainRepositoryIsGeneratedConditionCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsGeneratedCondition", reflect.TypeOf((*MockInstanceDomainRepository)(nil).IsGeneratedCondition), arg0)
+	return &MockInstanceDomainRepositoryIsGeneratedConditionCall{Call: call}
+}
+
+// MockInstanceDomainRepositoryIsGeneratedConditionCall wrap *gomock.Call
+type MockInstanceDomainRepositoryIsGeneratedConditionCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockInstanceDomainRepositoryIsGeneratedConditionCall) Return(arg0 database.Condition) *MockInstanceDomainRepositoryIsGeneratedConditionCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockInstanceDomainRepositoryIsGeneratedConditionCall) Do(f func(bool) database.Condition) *MockInstanceDomainRepositoryIsGeneratedConditionCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockInstanceDomainRepositoryIsGeneratedConditionCall) DoAndReturn(f func(bool) database.Condition) *MockInstanceDomainRepositoryIsGeneratedConditionCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // IsPrimaryColumn mocks base method.
 func (m *MockInstanceDomainRepository) IsPrimaryColumn() database.Column {
 	m.ctrl.T.Helper()

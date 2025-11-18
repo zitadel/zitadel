@@ -894,17 +894,6 @@ func (c *Commands) prepareSetDefaultOrg(a *instance.Aggregate, orgID string) pre
 	}
 }
 
-func (c *Commands) setIAMProject(ctx context.Context, iamAgg *eventstore.Aggregate, iamWriteModel *InstanceWriteModel, projectID string) (eventstore.Command, error) {
-	err := c.eventstore.FilterToQueryReducer(ctx, iamWriteModel)
-	if err != nil {
-		return nil, err
-	}
-	if iamWriteModel.ProjectID != "" {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "IAM-EGbw2", "Errors.IAM.IAMProjectAlreadySet")
-	}
-	return instance.NewIAMProjectSetEvent(ctx, iamAgg, projectID), nil
-}
-
 func (c *Commands) prepareSetDefaultLanguage(a *instance.Aggregate, defaultLanguage language.Tag) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if err := domain.LanguageIsDefined(defaultLanguage); err != nil {
@@ -959,54 +948,42 @@ func getSystemConfigWriteModel(ctx context.Context, filter preparation.FilterToQ
 	return writeModel, err
 }
 
-func (c *Commands) RemoveInstance(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveInstance(ctx context.Context, id string, errorIfNotFound bool) (*domain.ObjectDetails, error) {
 	instID := strings.TrimSpace(id)
 	if instID == "" || len(instID) > 200 {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-VeS2zI", "Errors.Invalid.Argument")
 	}
 
 	instanceAgg := instance.NewAggregate(instID)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveInstance(instanceAgg))
+	writeModel, err := c.getInstanceWriteModelByID(ctx, instanceAgg.ID)
 	if err != nil {
+		return nil, err
+	}
+	if !writeModel.State.Exists() {
+		if errorIfNotFound {
+			return nil, zerrors.ThrowNotFound(err, "COMMA-AE3GS", "Errors.Instance.NotFound")
+		}
+		return nil, nil
+	}
+
+	milestoneAggregate := milestone.NewInstanceAggregate(instanceAgg.ID)
+	cmds := []eventstore.Command{
+		instance.NewInstanceRemovedEvent(ctx,
+			&instanceAgg.Aggregate,
+			writeModel.Name,
+			writeModel.Domains),
+		milestone.NewReachedEvent(ctx,
+			milestoneAggregate,
+			milestone.InstanceDeleted),
+	}
+
+	if err := c.pushAppendAndReduce(ctx, writeModel, cmds...); err != nil {
 		return nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, cmds...)
-	if err != nil {
-		return nil, err
-	}
 	err = c.caches.milestones.Invalidate(ctx, milestoneIndexInstanceID, id)
 	logging.OnError(err).Error("milestone invalidate")
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreatedAt(),
-		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
-	}, nil
-}
-
-func (c *Commands) prepareRemoveInstance(a *instance.Aggregate) preparation.Validation {
-	return func() (preparation.CreateCommands, error) {
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel, err := c.getInstanceWriteModelByID(ctx, a.ID)
-			if err != nil {
-				return nil, zerrors.ThrowNotFound(err, "COMMA-pax9m3", "Errors.Instance.NotFound")
-			}
-			if !writeModel.State.Exists() {
-				return nil, zerrors.ThrowNotFound(err, "COMMA-AE3GS", "Errors.Instance.NotFound")
-			}
-			milestoneAggregate := milestone.NewInstanceAggregate(a.ID)
-			return []eventstore.Command{
-					instance.NewInstanceRemovedEvent(ctx,
-						&a.Aggregate,
-						writeModel.Name,
-						writeModel.Domains),
-					milestone.NewReachedEvent(ctx,
-						milestoneAggregate,
-						milestone.InstanceDeleted),
-				},
-				nil
-		}, nil
-	}
+	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
 func (c *Commands) getInstanceWriteModelByID(ctx context.Context, orgID string) (*InstanceWriteModel, error) {
