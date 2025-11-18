@@ -1,5 +1,5 @@
 services:
-  zitadel:
+  api:
     restart: unless-stopped
     image: ghcr.io/zitadel/zitadel:latest
     command: start-from-init --masterkey "MasterkeyNeedsToHave32Characters"
@@ -8,7 +8,8 @@ services:
       ZITADEL_EXTERNALDOMAIN: localhost
 
       # See "What's next" to learn about how to enable TLS.
-      ZITADEL_EXTERNALSECURE: false
+      ZITADEL_EXTERNALSECURE: true
+      ZITADEL_EXTERNALPORT: 443
       ZITADEL_TLS_ENABLED: false
 
       # Database connection settings.
@@ -36,11 +37,11 @@ services:
       # Activate the login v2 on an installation from scratch.
       # To activate the login v2 on an existing installation, read the "What's next" section.
       ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED: true # To use the login v1, set this to false.
-      ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI: http://localhost:3000/ui/v2/login
+      ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI: https://localhost/ui/v2/login
       # Configure the redirection paths to the login v2.
-      ZITADEL_OIDC_DEFAULTLOGINURLV2: http://localhost:3000/ui/v2/login/login?authRequest=
-      ZITADEL_OIDC_DEFAULTLOGOUTURLV2: http://localhost:3000/ui/v2/login/logout?post_logout_redirect=
-      ZITADEL_SAML_DEFAULTLOGINURLV2: http://localhost:3000/ui/v2/login/login?samlRequest=
+      ZITADEL_OIDC_DEFAULTLOGINURLV2: https://localhost/ui/v2/login/login?authRequest=
+      ZITADEL_OIDC_DEFAULTLOGOUTURLV2: https://localhost/ui/v2/login/logout?post_logout_redirect=
+      ZITADEL_SAML_DEFAULTLOGINURLV2: https://localhost/ui/v2/login/login?samlRequest=
 
       # By configuring a machine, the setup job creates a user of type machine with the role IAM_OWNER.
       # It writes a personal access token (PAT) to the path specified in ZITADEL_FIRSTINSTANCE_PATPATH.
@@ -66,6 +67,21 @@ services:
       # Write Access Logs to stdout.
       # ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED: true
 
+      # Redis Cache
+      ZITADEL_CACHES_CONNECTORS_REDIS_ENABLED: true
+      ZITADEL_CACHES_CONNECTORS_REDIS_ADDR: cache:6379
+      
+      # Cache Objects
+      ZITADEL_CACHES_INSTANCE_CONNECTOR: redis
+      ZITADEL_CACHES_INSTANCE_MAXAGE: 1h
+      ZITADEL_CACHES_INSTANCE_LASTUSAGE: 10m
+      ZITADEL_CACHES_MILESTONES_CONNECTOR: redis
+      ZITADEL_CACHES_MILESTONES_MAXAGE: 1h
+      ZITADEL_CACHES_MILESTONES_LASTUSAGE: 10m
+      ZITADEL_CACHES_ORGANIZATION_CONNECTOR: redis
+      ZITADEL_CACHES_ORGANIZATION_MAXAGE: 1h
+      ZITADEL_CACHES_ORGANIZATION_LASTUSAGE: 10m
+
     healthcheck:
       test:
         - CMD
@@ -78,29 +94,43 @@ services:
     user: "0"
     volumes:
       - .:/current-dir:delegated
-    ports:
-      - 8080:8080
-      - 3000:3000
     networks:
       - zitadel
     depends_on:
       db:
         condition: service_healthy
+      cache:
+        condition: service_healthy
+
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+    networks:
+      - zitadel
 
   login:
     restart: unless-stopped
     image: ghcr.io/zitadel/zitadel-login:latest
-    # If you can't use the network_mode service:zitadel, you can pass the environment variables ZITADEL_API_URL=http://zitadel:8080 and CUSTOM_REQUEST_HEADERS=Host:localhost instead.
+    # If you can't use the network_mode service:api, you can pass the environment variables ZITADEL_API_URL=http://api:8080 and CUSTOM_REQUEST_HEADERS=Host:localhost instead.
     environment:
       - ZITADEL_API_URL=http://localhost:8080
       - NEXT_PUBLIC_BASE_PATH=/ui/v2/login
       - ZITADEL_SERVICE_USER_TOKEN_FILE=/current-dir/login-client.pat
-    network_mode: service:zitadel
+    network_mode: service:api
     user: "0"
     volumes:
       - .:/current-dir:ro
     depends_on:
-      zitadel:
+      api:
         condition: service_healthy
         restart: false
 
@@ -124,13 +154,28 @@ services:
       start_period: 20s
     networks:
       - zitadel
-    ports:
-      - 5432:5432
     volumes:
-      - 'data:/var/lib/postgresql/data:rw'
+      - 'db_data:/var/lib/postgresql/data:rw'
+
+  cache:
+    restart: unless-stopped
+    image: valkey/valkey:8
+    networks:
+      - zitadel
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - cache_data:/data
 
 networks:
   zitadel:
 
 volumes:
-  data:
+  db_data:
+  caddy_data:
+  caddy_config:
+  cache_data:
