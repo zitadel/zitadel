@@ -44,7 +44,8 @@ func AuthMethodTypesToAMR(methodTypes []domain.UserAuthMethodType) []string {
 		case domain.UserAuthMethodTypeOTP,
 			domain.UserAuthMethodTypeTOTP,
 			domain.UserAuthMethodTypeOTPSMS,
-			domain.UserAuthMethodTypeOTPEmail:
+			domain.UserAuthMethodTypeOTPEmail,
+			domain.UserAuthMethodTypeRecoveryCode:
 			// a user could use multiple (t)otp, which is a factor, but still will be returned as a single `otp` entry
 			otp++
 			factors++

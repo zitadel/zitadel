@@ -2419,7 +2419,8 @@
       "1": "Parolă unică după aplicația de autentificare (TOTP)",
       "2": "Amprentă, chei de securitate, Face ID și altele",
       "3": "Parolă unică prin e-mail (OTP e-mail)",
-      "4": "Parolă unică prin SMS (OTP SMS)"
+      "4": "Parolă unică prin SMS (OTP SMS)",
+      "5": "Coduri de recuperare"
     }
   },
   "LOGINPOLICY": {

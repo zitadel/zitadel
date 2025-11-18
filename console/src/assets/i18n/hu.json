@@ -2421,7 +2421,8 @@
       "1": "Egyszeri Jelszó az Authenticator App-al (TOTP)",
       "2": "Ujjlenyomat, Biztonsági Kulcsok, Face ID és egyéb",
       "3": "Egyszeri Jelszó Emailben (Email OTP)",
-      "4": "Egyszeri jelszó SMS-ben (SMS OTP)"
+      "4": "Egyszeri jelszó SMS-ben (SMS OTP)",
+      "5": "Helyreállítási kódok"
     }
   },
   "LOGINPOLICY": {

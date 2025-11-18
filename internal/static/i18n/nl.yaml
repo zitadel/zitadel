@@ -95,6 +95,7 @@ Errors:
     InitCodeNotFound: Initialisatiecode niet gevonden
     UsernameNotChanged: Gebruikersnaam niet veranderd
     InvalidURLTemplate: URL-sjabloon is ongeldig
+    Locked: Gebruiker is vergrendeld
     Profile:
       NotFound: Profiel niet gevonden
       NotChanged: Profiel niet veranderd
@@ -177,6 +178,11 @@ Errors:
         NotExisting: U2F bestaat niet
       Passwordless:
         NotExisting: Wachtwoordloos bestaat niet
+      RecoveryCodes:
+        InvalidCode: Ongeldige herstelcode opgegeven
+        MaxCountExceeded: Maximum aantal herstelcodes overschreden
+        NotReady: Herstelcodes zijn niet klaar voor gebruik
+        ConfigInvalid: Configuratie van herstelcodes is ongeldig
     WebAuthN:
       NotFound: WebAuthN Token kon niet worden gevonden
       BeginRegisterFailed: WebAuthN begin registratie mislukt
