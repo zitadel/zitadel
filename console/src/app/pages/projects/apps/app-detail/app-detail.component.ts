@@ -261,6 +261,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       angular: 'NG_APP_',
       vue: 'VITE_',
       qwik: 'VITE_',
+      react: 'VITE_',
     };
 
     return prefixMap[framework || ''] || '';
