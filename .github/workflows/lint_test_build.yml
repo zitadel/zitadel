@@ -22,7 +22,7 @@ jobs:
     environment: ${{ github.ref_protected == 'true' && 'Protected' || null }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           filter: tree:0
@@ -30,7 +30,7 @@ jobs:
         if: ${{ github.ref != 'refs/heads/main' }}
         run: git fetch origin main:main
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: ${{ inputs.go_version }}
       - name: Set up pnpm
@@ -38,7 +38,7 @@ jobs:
         with:
           run_install: false
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ inputs.node_version }}
           cache: "pnpm"
@@ -71,14 +71,14 @@ jobs:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
         run: pnpm nx fix-ci
       - name: Publish API Unit Test Coverage
-        uses: codecov/codecov-action@v4.3.0
+        uses: codecov/codecov-action@v5.5.1
         with:
           file: profile.api.test-unit.cov
           name: api-test-unit
           flags: api-test-unit
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Publish API Integration Test Coverage
-        uses: codecov/codecov-action@v4.3.0
+        uses: codecov/codecov-action@v5.5.1
         with:
           file: profile.api.test-integration.cov
           name: api-test-integration
@@ -86,13 +86,13 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Upload API Integration Test Race Logs
         if: failure() || cancelled()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: api-integration-test-race-logs
           path: |
            .artifacts/api-test-integration/race.log.*
       - name: Upload Functional UI Test Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure() || cancelled()
         with:
           name: functional-ui-tests
