@@ -1,4 +1,13 @@
 FROM node:22-alpine
+
+LABEL org.opencontainers.image.documentation="https://zitadel.com/docs" \
+      org.opencontainers.image.vendor="ZITADEL" \
+      org.opencontainers.image.description="ZITADEL Login - Identity infrastructure, simplified for you." \
+      org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.title="Zitadel Login" \
+      org.opencontainers.image.url="https://github.com/zitadel/login" \
+      org.opencontainers.image.vendor="ZITADEL"
+
 WORKDIR /app
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs

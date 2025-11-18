@@ -2,6 +2,34 @@
   "$schema": "./node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "targets": {
+    "nx-release-publish": {
+      "description": "Runs repo scoped release tasks. Uploads checksums for all released artifacts to the GitHub release, configures the org scope for publishing GitHub Packages and triggers version bump action runs in the Helm chart and homebrew tap repos.",
+      "dependsOn": [
+        "@zitadel/api:nx-release-publish",
+        "@zitadel/login:nx-release-publish"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "parallel": true,
+        "commands": [
+          {
+            "forwardAllArgs": false,
+            "prefix": "[uploading checksums to GitHub release] ",
+            "command": "bash -c \"[[ \\\"${NX_DRY_RUN}\\\" == \\\"true\\\" ]] || cd .artifacts/pack && rm -f checksums.txt && sha256sum * > checksums.txt && gh release upload ${ZITADEL_RELEASE_VERSION} checksums.txt\""
+          },
+          {
+            "forwardAllArgs": false,
+            "prefix": "[bumping homebrew tap version on original zitadel/zitadel release, not on forks] ",
+            "command": "bash -c \"[[ \\\"${NX_DRY_RUN}\\\" == \\\"true\\\" ]] || [[ \\\"${ZITADEL_RELEASE_GITHUB_REPO}\\\" != \\\"zitadel/zitadel\\\" ]] || gh workflow --repo zitadel/homebrew-tap run update.yml -f runId=${RUN_ID} -f version=${ZITADEL_RELEASE_VERSION}\""
+          },
+          {
+            "forwardAllArgs": false,
+            "prefix": "[bumping chart version on original zitadel/zitadel release, not on forks] ",
+            "command": "bash -c \"[[ \\\"${NX_DRY_RUN}\\\" == \\\"true\\\" ]] || [[ \\\"${ZITADEL_RELEASE_GITHUB_REPO}\\\" != \\\"zitadel/zitadel\\\" ]] || gh workflow --repo zitadel/zitadel-charts run bump.yml\""
+          }
+        ]
+      }
+    },
     "db": {
       "continuous": true,
       "description": "Runs a local Postgres database for development",
@@ -14,29 +42,6 @@
         "@zitadel/login:clean",
         "@zitadel/console:clean"
       ]
-    },
-    "pack": {
-        "description": "Creates package archives for the API across all platforms and for the Login component, then generates a checksums.txt file containing the SHA256 checksums for all created archives.",
-        "dependsOn": [
-            "@zitadel/api:pack-linux-*",
-            "@zitadel/api:pack-darwin-*",
-            "@zitadel/api:pack-windows-*",
-            "@zitadel/login:pack"
-        ],
-        "executor": "nx:run-commands",
-        "options": {
-            "parallel": false,
-            "commands": [
-                "sha256sum .artifacts/pack/zitadel-*.tar.gz > .artifacts/pack/checksums.txt"
-            ]
-        },
-        "cache": true,
-        "inputs": [
-            "{workspaceRoot}/.artifacts/pack/zitadel-*.tar.gz"
-        ],
-        "outputs": [
-            "{workspaceRoot}/.artifacts/pack/checksums.txt"
-        ]
-    }    
+    }
   }
 }
