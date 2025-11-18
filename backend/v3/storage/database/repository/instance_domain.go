@@ -93,7 +93,10 @@ func (i instanceDomain) Update(ctx context.Context, client database.QueryExecuto
 
 	var builder database.StatementBuilder
 	builder.WriteString(`UPDATE zitadel.instance_domains SET `)
-	database.Changes(changes).Write(&builder)
+	err := database.Changes(changes).Write(&builder)
+	if err != nil {
+		return 0, err
+	}
 
 	writeCondition(&builder, condition)
 

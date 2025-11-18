@@ -21,11 +21,14 @@ var _ domain.MachineRepository = (*userMachine)(nil)
 func (m userMachine) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) error {
 	builder := database.StatementBuilder{}
 	builder.WriteString("UPDATE user_machines SET ")
-	database.Changes(changes).Write(&builder)
+	err := database.Changes(changes).Write(&builder)
+	if err != nil {
+		return err
+	}
 	writeCondition(&builder, condition)
 	m.writeReturning()
 
-	_, err := client.Exec(ctx, builder.String(), builder.Args()...)
+	_, err = client.Exec(ctx, builder.String(), builder.Args()...)
 	return err
 }
 

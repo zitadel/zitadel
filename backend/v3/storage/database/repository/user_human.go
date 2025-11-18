@@ -42,12 +42,15 @@ func (u *userHuman) GetEmail(ctx context.Context, client database.QueryExecutor,
 func (h userHuman) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) error {
 	builder := database.StatementBuilder{}
 	builder.WriteString(`UPDATE human_users SET `)
-	database.Changes(changes).Write(&builder)
+	err := database.Changes(changes).Write(&builder)
+	if err != nil {
+		return err
+	}
 	writeCondition(&builder, condition)
 
 	stmt := builder.String()
 
-	_, err := client.Exec(ctx, stmt, builder.Args()...)
+	_, err = client.Exec(ctx, stmt, builder.Args()...)
 	return err
 }
 
