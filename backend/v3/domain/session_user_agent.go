@@ -8,7 +8,6 @@ import (
 )
 
 type SessionUserAgent struct {
-	InstanceID    string      `json:"instanceId,omitempty" db:"instance_id"`
 	FingerprintID *string     `json:"fingerprintId,omitempty" db:"fingerprint_id"`
 	Description   *string     `json:"description,omitempty" db:"description"`
 	IP            net.IP      `json:"ip,omitempty" db:"ip"`

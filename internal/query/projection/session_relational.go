@@ -65,7 +65,7 @@ func (p *sessionRelationalProjection) Reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  session.OTPSMSChallengedType,
-					Reduce: p.reduceOTPSMSChecked,
+					Reduce: p.reduceOTPSMSChallenged,
 				},
 				{
 					Event:  session.OTPSMSCheckedType,
@@ -73,7 +73,7 @@ func (p *sessionRelationalProjection) Reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  session.OTPEmailChallengedType,
-					Reduce: p.reduceOTPEmailChecked,
+					Reduce: p.reduceOTPEmailChallenged,
 				},
 				{
 					Event:  session.OTPEmailCheckedType,
@@ -466,6 +466,11 @@ func (p *sessionRelationalProjection) reduceMetadataSet(event eventstore.Event) 
 			sessionRepo.SetUpdatedAt(e.CreatedAt()),
 			sessionRepo.SetMetadata(metadataList),
 		)
+		if err != nil {
+			return err
+		}
+		session, err := sessionRepo.Get(ctx, v3Tx, database.WithCondition(condition))
+		_, _ = session, err
 		return err
 	}), nil
 }
@@ -508,7 +513,8 @@ func (p *sessionRelationalProjection) reduceSessionTerminated(event eventstore.E
 
 		sessionRepo := repository.SessionRepository()
 		condition := sessionRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID)
-		return sessionRepo.Delete(ctx, v3Tx, condition)
+		_, err := sessionRepo.Delete(ctx, v3Tx, condition)
+		return err
 	}), nil
 }
 
@@ -529,8 +535,12 @@ func (p *sessionRelationalProjection) reducePasswordChanged(event eventstore.Eve
 		condition := database.And(
 			sessionRepo.InstanceIDCondition(e.Aggregate().InstanceID),
 			sessionRepo.UserIDCondition(e.Aggregate().ID),
-			sessionRepo.FactorConditions().FactorTypeCondition(domain.SessionFactorTypePassword),
-			sessionRepo.FactorConditions().FactorLastVerifiedBeforeCondition(e.CreatedAt()),
+			sessionRepo.ExistsFactor(
+				database.And(
+					sessionRepo.FactorConditions().FactorTypeCondition(domain.SessionFactorTypePassword),
+					sessionRepo.FactorConditions().LastVerifiedBeforeCondition(e.CreatedAt()),
+				),
+			),
 		)
 		_, err = sessionRepo.Update(ctx, v3Tx, condition,
 			sessionRepo.SetUpdatedAt(e.CreatedAt()),

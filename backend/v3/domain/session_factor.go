@@ -8,7 +8,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
-type SessionFactorType int
+//go:generate enumer -type=SessionFactorType -trimprefix=SessionFactorType -transform snake
+type SessionFactorType uint8
 
 const (
 	SessionFactorTypeUnknown SessionFactorType = iota
@@ -240,15 +241,15 @@ type sessionFactorColumns interface {
 	LastVerifiedAtColumn() database.Column
 }
 
-type sessionFactorConditions interface {
+type SessionFactorConditions interface {
 	// PrimaryKeyCondition returns a filter on the primary key fields.
-	PrimaryKeyCondition(instanceID, sessionID string, factorType SessionFactorType) database.Condition
+	//PrimaryKeyCondition(instanceID, sessionID string, factorType SessionFactorType) database.Condition
 	// InstanceIDCondition returns an equal filter on the instance id field.
-	InstanceIDCondition(instanceID string) database.Condition
+	//InstanceIDCondition(instanceID string) database.Condition
 	// SessionIDCondition returns an equal filter on the session id field.
-	SessionIDCondition(sessionID string) database.Condition
+	//SessionIDCondition(sessionID string) database.Condition
 	// FactorTypeCondition returns an equal filter on the factor type field.
 	FactorTypeCondition(factorType SessionFactorType) database.Condition
-	// FactorLastVerifiedBeforeCondition returns a filter on the factor last verified field before the given time.
-	FactorLastVerifiedBeforeCondition(lastVerifiedAt time.Time) database.Condition
+	// LastVerifiedBeforeCondition returns a filter on the factor last verified field before the given time.
+	LastVerifiedBeforeCondition(lastVerifiedAt time.Time) database.Condition
 }

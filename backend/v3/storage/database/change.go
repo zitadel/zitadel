@@ -90,7 +90,29 @@ func (c Changes) IsOnColumn(col Column) bool {
 func (m Changes) Write(builder *StatementBuilder) {
 	for i, change := range m {
 		if i > 0 {
+			switch c := change.(type) {
+			case *cteChange:
+				if c.change == nil {
+					continue
+				}
+			case Changes:
+				var has bool
+				for _, cc := range c {
+					cte, ok := cc.(*cteChange)
+					if !(ok && cte.change == nil) {
+						has = true
+					}
+				}
+				if !has {
+					continue
+				}
+			}
 			builder.WriteString(", ")
+
+			//cte, ok := change.(*cteChange)
+			//if !(ok && cte.change == nil) {
+			//	builder.WriteString(", ")
+			//}
 		}
 		change.Write(builder)
 	}

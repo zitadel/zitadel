@@ -2,7 +2,9 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -21,6 +23,10 @@ type session struct {
 	userAgentRepo sessionUserAgent
 }
 
+func (s session) qualifiedTableName() string {
+	return "zitadel.sessions"
+}
+
 func (s session) unqualifiedTableName() string {
 	return "sessions"
 }
@@ -29,7 +35,10 @@ func SessionRepository() domain.SessionRepository {
 	return new(session)
 }
 
-const querySessionStmt = ""
+const querySessionStmt = `SELECT sessions.instance_id, sessions.id, sessions.token, sessions.lifetime, sessions.expiration, sessions.user_id, sessions.creator_id, sessions.created_at, sessions.updated_at` +
+	` , jsonb_agg(json_build_object('instanceId', session_factors.instance_id, 'sessionId', session_factors.session_id, 'type', session_factors.type, 'lastChallengeAt', session_factors.last_challenged_at, 'challenged_payload', session_factors.challenged_payload, 'lastVerifiedAt', session_factors.last_verified_at, 'verified_payload', session_factors.verified_payload)) FILTER (WHERE session_factors.session_id IS NOT NULL) AS factors` +
+	` , jsonb_agg(json_build_object('instanceId', session_metadata.instance_id, 'sessionId', session_metadata.session_id, 'key', session_metadata.key, 'value', encode(session_metadata.value, 'base64'), 'createdAt', session_metadata.created_at, 'updatedAt', session_metadata.updated_at)) FILTER (WHERE session_metadata.session_id IS NOT NULL) AS metadata` +
+	` FROM zitadel.sessions`
 
 // Get implements [domain.SessionRepository].
 func (s session) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Session, error) {
@@ -49,7 +58,7 @@ func (s session) Get(ctx context.Context, client database.QueryExecutor, opts ..
 	}
 
 	var builder database.StatementBuilder
-	builder.WriteString(queryOrganizationStmt)
+	builder.WriteString(querySessionStmt)
 	options.Write(&builder)
 
 	return scanSession(ctx, client, &builder)
@@ -57,32 +66,65 @@ func (s session) Get(ctx context.Context, client database.QueryExecutor, opts ..
 
 // List implements [domain.SessionRepository].
 func (s session) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Session, error) {
+	opts = append(opts,
+		s.joinUserAgent(),
+		s.joinFactors(),
+		s.joinMetadata(),
+		database.WithGroupBy(s.InstanceIDColumn(), s.IDColumn()),
+	)
+
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	if !options.Condition.IsRestrictingColumn(s.InstanceIDColumn()) {
+		return nil, database.NewMissingConditionError(s.InstanceIDColumn())
+	}
+
+	var builder database.StatementBuilder
+	builder.WriteString(querySessionStmt)
+	options.Write(&builder)
+
+	return scanSessions(ctx, client, &builder)
 }
 
-const createSessionStmt = "INSERT INTO zitadel.sessions(instance_id, id, creator_id, fingerprint_id) VALUES ($1, $2, $3, $4)"
-const upsertSessionUserAgentStmt = "INSERT INTO zitadel.session_user_agents(instancce_id, fingerprint_id, description, ip, headers) VALUES ($1, $2, $3, $4) ON CONFLICT (instance_id, fingerprint_id) DO UPDATE SET description = EXCLUDED.description, ip = EXCLUDED.ip, headers = excluded.headers"
+const upsertSessionUserAgentStmt = `WITH user_agent AS (
+	INSERT INTO zitadel.session_user_agents(
+		instance_id, fingerprint_id, description, ip, headers
+	)
+	VALUES ($1, $2, $3, $4, $5)
+	ON CONFLICT (instance_id, fingerprint_id)
+	DO UPDATE SET description = EXCLUDED.description, ip = EXCLUDED.ip, headers = excluded.headers
+) `
 
 // Create implements [domain.SessionRepository].
 func (s session) Create(ctx context.Context, client database.QueryExecutor, session *domain.Session) error {
-	builder := database.StatementBuilder{}
+	var (
+		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
+	)
+	if !session.CreatedAt.IsZero() {
+		createdAt = session.CreatedAt
+	}
+	if !session.UpdatedAt.IsZero() {
+		updatedAt = session.UpdatedAt
+	}
+
+	builder := new(database.StatementBuilder)
 	var fingerprintID *string
 	if session.UserAgent != nil {
-		builder.AppendArgs(
-			session.UserAgent.InstanceID,
+		builder = database.NewStatementBuilder(upsertSessionUserAgentStmt,
+			session.InstanceID,
 			session.UserAgent.FingerprintID,
 			session.UserAgent.Description,
 			session.UserAgent.IP,
 			session.UserAgent.Header,
 		)
-		builder.WriteString(upsertSessionUserAgentStmt)
-		_, err := client.Exec(ctx, builder.String(), builder.Args()...)
-		if err != nil {
-			return err
-		}
 		fingerprintID = session.UserAgent.FingerprintID
 	}
-	builder.AppendArgs(session.InstanceID, session.ID, session.CreatorID, fingerprintID)
-	builder.WriteString(createSessionStmt)
+	builder.WriteString(`INSERT INTO ` + s.qualifiedTableName() + ` (instance_id, id, creator_id, user_agent_id, created_at, updated_at) VALUES ( `)
+	builder.WriteArgs(session.InstanceID, session.ID, session.CreatorID, fingerprintID, createdAt, updatedAt)
+	builder.WriteString(` ) RETURNING created_at, updated_at`)
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&session.CreatedAt, &session.UpdatedAt)
 }
 
@@ -98,96 +140,33 @@ func (s session) Update(ctx context.Context, client database.QueryExecutor, cond
 		changes = append(changes, database.NewChange(s.UpdatedAtColumn(), database.NullInstruction))
 	}
 
-	factorChanges := make([]*factorChange, 0, len(changes))
 	var builder database.StatementBuilder
-	builder.WriteString("UPDATE zitadel.sessions SET ")
-	for _, change := range changes {
-		if isFactorChange(change, s.factorRepo) {
-			factorChanges = append(factorChanges, change.(*factorChange))
+	builder.WriteString("WITH existing_session AS (SELECT * FROM zitadel.sessions ")
+	writeCondition(&builder, condition)
+	builder.WriteString(") ")
+	for i, change := range changes {
+		if multi, ok := change.(database.Changes); ok {
+			for j, ch := range multi {
+				sessionCTE(ch, i, j, &builder)
+			}
 		}
+		sessionCTE(change, i, 0, &builder)
 	}
+	builder.WriteString("UPDATE zitadel.sessions SET ")
 	database.Changes(changes).Write(&builder)
 	writeCondition(&builder, condition)
-
-	for i, change := range factorChanges {
-		builder.WriteString(", factor_")
-		builder.WriteString(string(rune(i + '0')))
-		builder.WriteString(" AS (")
-		builder.WriteString(setSessionFactorStmt)
-		database.Changes(change.changes).Write(&builder)
-		builder.WriteString(")")
-		builder.AppendArgs(
-			change.factorType,
-			change.lastVerifiedAt,
-		)
-	}
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-type factorChange struct {
-	factorType     domain.SessionFactorType
-	lastVerifiedAt time.Time
-	changes []database.Change
-}
-
-func newFactorChange(repo sessionFactor, factorType domain.SessionFactorType, lastVerifiedAt time.Time) *factorChange {
-	return &factorChange{
-		factorType:     factorType,
-		lastVerifiedAt: lastVerifiedAt,
-		changes: []database.Change{
-			database.NewChange(repo.FactorTypeColumn(), factorType),
-			database.NewChange(repo.LastVerifiedAtColumn(), lastVerifiedAt),
-		},
+func sessionCTE(change database.Change, i, j int, builder *database.StatementBuilder) {
+	if cte, ok := change.(database.CTEChange); ok {
+		name := fmt.Sprintf("cte_%d_%d", i, j)
+		builder.WriteString(fmt.Sprintf(", %s as (", name))
+		cte.SetName(name)
+		cte.WriteCTE(builder)
+		builder.WriteString(") ")
 	}
-}
-
-func (f *factorChange) Matches(x any) bool {
-	return f.Change.Matches(x)
-}
-
-func (f *factorChange) String() string {
-	return f.Change.String()
-}
-
-func (f *factorChange) Write(builder *database.StatementBuilder) {
-	f.Change.Write(builder)
-}
-
-func (f *factorChange) IsOnColumn(col database.Column) bool {
-	return f.Change.IsOnColumn(col)
-}
-
-const updateSessionStmt = `WITH existing_session AS (
-    SELECT * 
-    FROM zitadel.sessions 
-    WHERE <condition>
-), factor_n AS (
-    UPDATE zitadel.session_factors 
-    SET <changes> 
-    FROM existing_session 
-    WHERE session_factors.instance_id = existing_session.instance_id AND session_factors.session_id = existing_session.id 
-    RETURNING session_factors.*
-)
-UPDATE zitadel.sessions 
-SET <changes> 
-FROM existing_session 
-WHERE sessions.instance_id = existing_session.instance_id AND sessions.id = existing_session.id 
-RETURNING sessions.*;
-`
-
-const setSessionFactorStmt = `INSERT INTO zitadel.session_factors 
-    (instance_id, session_id, factor_type, last_verified_at)
-    VALUES (existing_session.instance_id, existing_session.session_id, $1, $2)
-	ON CONFLICT (instance_id, session_id, fator_type) 
-	DO UPDATE SET last_verified_at = EXCLUDED.last_verified_at
-`
-
-func isFactorChange(change database.Change, factorRepo sessionFactor) bool {
-	return change.IsOnColumn(factorRepo.FactorTypeColumn()) ||
-		change.IsOnColumn(factorRepo.LastVerifiedAtColumn()) ||
-		change.IsOnColumn(factorRepo.LastChallengedAtColumn()) ||
-		change.IsOnColumn(factorRepo.PayloadColumn())
 }
 
 // Delete implements [domain.SessionRepository].
@@ -225,24 +204,36 @@ func (s session) SetChallenge(challenge domain.SessionChallenge) database.Change
 	switch c := challenge.(type) {
 	case *domain.SessionChallengePasskey:
 		payload, err := json.Marshal(c)
-		return database.NewChanges(
-			database.NewChange(s.factorRepo.FactorTypeColumn(), domain.SessionFactorTypePasskey),
-			database.NewChange(s.factorRepo.LastChallengedAtColumn(), c.LastChallengedAt),
-			database.NewChange(s.factorRepo.PayloadColumn(), payload),
+		_ = err // TODO: handle error
+		return database.NewCTEChange(
+			func(builder *database.StatementBuilder) {
+				builder.WriteString("INSERT INTO zitadel.session_factors (instance_id, session_id, type, last_challenged_at, challenged_payload) SELECT instance_id, id, ")
+				builder.WriteArgs(domain.SessionFactorTypePasskey, c.LastChallengedAt, payload) //TODO: json?
+				builder.WriteString(" FROM existing_session ON CONFLICT (instance_id, session_id, type) DO UPDATE SET last_challenged_at = EXCLUDED.last_challenged_at, challenged_payload = EXCLUDED.challenged_payload")
+			}, nil,
 		)
 	case *domain.SessionChallengeOTPSMS:
 		payload, err := json.Marshal(c)
-		return database.NewChanges(
-			database.NewChange(s.factorRepo.FactorTypeColumn(), domain.SessionFactorTypeOTPSMS),
-			database.NewChange(s.factorRepo.LastChallengedAtColumn(), c.LastChallengedAt),
-			database.NewChange(s.factorRepo.PayloadColumn(), payload),
+		_ = err // TODO: handle error
+		return database.NewCTEChange(
+			func(builder *database.StatementBuilder) {
+				builder.WriteString("INSERT INTO zitadel.session_factors (instance_id, session_id, type, last_challenged_at, challenged_payload) SELECT instance_id, id, ")
+				builder.WriteArgs(domain.SessionFactorTypeOTPSMS, c.LastChallengedAt, payload) //TODO: json?
+				builder.WriteString(" FROM existing_session ON CONFLICT (instance_id, session_id, type) DO UPDATE SET last_challenged_at = EXCLUDED.last_challenged_at, challenged_payload = EXCLUDED.challenged_payload")
+			}, nil,
+		)
 	case *domain.SessionChallengeOTPEmail:
 		payload, err := json.Marshal(c)
-		return database.NewChanges(
-			database.NewChange(s.factorRepo.FactorTypeColumn(), domain.SessionFactorTypeOTPEmail),
-			database.NewChange(s.factorRepo.LastChallengedAtColumn(), c.LastChallengedAt),
-			database.NewChange(s.factorRepo.PayloadColumn(), payload),
+		_ = err // TODO: handle error
+		return database.NewCTEChange(
+			func(builder *database.StatementBuilder) {
+				builder.WriteString("INSERT INTO zitadel.session_factors (instance_id, session_id, type, last_challenged_at, challenged_payload) SELECT instance_id, id, ")
+				builder.WriteArgs(domain.SessionFactorTypeOTPEmail, c.LastChallengedAt, payload) //TODO: json?
+				builder.WriteString(" FROM existing_session ON CONFLICT (instance_id, session_id, type) DO UPDATE SET last_challenged_at = EXCLUDED.last_challenged_at, challenged_payload = EXCLUDED.challenged_payload")
+			}, nil,
+		)
 	}
+	return nil //TODO: error?
 }
 
 // SetFactor implements [domain.sessionChanges].
@@ -251,30 +242,64 @@ func (s session) SetFactor(factor domain.SessionFactor) database.Change {
 	case *domain.SessionFactorUser:
 		return database.NewChanges(
 			database.NewChange(s.UserIDColumn(), f.UserID),
-			&factorChange{domain.SessionFactorTypeUser, f.LastVerifiedAt},
-			database.NewChange(s.factorRepo.InstanceIDColumn(), f.InstanceID),
-			database.NewChange(s.factorRepo.SessionIDColumn(), f.SessionID),
-			database.NewChange(s.factorRepo.FactorTypeColumn(), domain.SessionFactorTypeUser),
-			database.NewChange(s.factorRepo.LastVerifiedAtColumn(), f.LastVerifiedAt),
+			database.NewCTEChange(
+				func(builder *database.StatementBuilder) {
+					builder.WriteString("INSERT INTO zitadel.session_factors (instance_id, session_id, type, last_verified_at) SELECT instance_id, id, ")
+					builder.WriteArgs(domain.SessionFactorTypeUser.String(), f.LastVerifiedAt)
+					builder.WriteString(" FROM existing_session ON CONFLICT (instance_id, session_id, type) DO UPDATE SET last_verified_at = EXCLUDED.last_verified_at")
+				}, nil,
+			),
 		)
 	case *domain.SessionFactorPassword:
-		return database.NewChanges(
-			database.NewChange(s.factorRepo.InstanceIDColumn(), f.InstanceID),
-			database.NewChange(s.factorRepo.SessionIDColumn(), f.SessionID),
-			database.NewChange(s.factorRepo.FactorTypeColumn(), domain.SessionFactorTypePassword),
-			database.NewChange(s.factorRepo.LastVerifiedAtColumn(), f.LastVerifiedAt),
+		return database.NewCTEChange(
+			func(builder *database.StatementBuilder) {
+				builder.WriteString("INSERT INTO zitadel.session_factors (instance_id, session_id, type, last_verified_at) SELECT instance_id, id, ")
+				builder.WriteArgs(domain.SessionFactorTypePassword.String(), f.LastVerifiedAt)
+				builder.WriteString(" FROM existing_session ON CONFLICT (instance_id, session_id, type) DO UPDATE SET last_verified_at = EXCLUDED.last_verified_at")
+			}, nil,
+		)
+	case *domain.SessionFactorIdentityProviderIntent:
+		return database.NewCTEChange(
+			func(builder *database.StatementBuilder) {
+				builder.WriteString("INSERT INTO zitadel.session_factors (instance_id, session_id, type, last_verified_at) SELECT instance_id, id, ")
+				builder.WriteArgs(domain.SessionFactorTypeIdentityProviderIntent.String(), f.LastVerifiedAt)
+				builder.WriteString(" FROM existing_session ON CONFLICT (instance_id, session_id, type) DO UPDATE SET last_verified_at = EXCLUDED.last_verified_at")
+			}, nil,
+		)
+	case *domain.SessionFactorPasskey:
+		return database.NewCTEChange(
+			func(builder *database.StatementBuilder) {
+				builder.WriteString("INSERT INTO zitadel.session_factors (instance_id, session_id, type, last_verified_at, verified_payload) SELECT instance_id, id, ")
+				builder.WriteArgs(domain.SessionFactorTypePasskey.String(), f.LastVerifiedAt, f.UserVerified)
+				builder.WriteString(" FROM existing_session ON CONFLICT (instance_id, session_id, type) DO UPDATE SET last_verified_at = EXCLUDED.last_verified_at, verified_payload = EXCLUDED.verified_payload")
+			}, nil,
 		)
 	case *domain.SessionFactorTOTP:
-		return database.NewChanges(
-			database.NewChange(s.factorRepo.InstanceIDColumn(), f.InstanceID),
-			database.NewChange(s.factorRepo.SessionIDColumn(), f.SessionID),
-			database.NewChange(s.factorRepo.FactorTypeColumn(), domain.SessionFactorTypeTOTP),
-			database.NewChange(s.factorRepo.LastVerifiedAtColumn(), f.LastVerifiedAt),
+		return database.NewCTEChange(
+			func(builder *database.StatementBuilder) {
+				builder.WriteString("INSERT INTO zitadel.session_factors (instance_id, session_id, type, last_verified_at) SELECT instance_id, id, ")
+				builder.WriteArgs(domain.SessionFactorTypeTOTP.String(), f.LastVerifiedAt)
+				builder.WriteString(" FROM existing_session ON CONFLICT (instance_id, session_id, type) DO UPDATE SET last_verified_at = EXCLUDED.last_verified_at")
+			}, nil,
 		)
-	case *domain.SessionFactorWebAuthn:
-		return database.NewChange(s.factorRepo.FactorsColumn(), factor)
+	case *domain.SessionFactorOTPSMS:
+		return database.NewCTEChange(
+			func(builder *database.StatementBuilder) {
+				builder.WriteString("INSERT INTO zitadel.session_factors (instance_id, session_id, type, last_verified_at) SELECT instance_id, id, ")
+				builder.WriteArgs(domain.SessionFactorTypeOTPSMS.String(), f.LastVerifiedAt)
+				builder.WriteString(" FROM existing_session ON CONFLICT (instance_id, session_id, type) DO UPDATE SET last_verified_at = EXCLUDED.last_verified_at")
+			}, nil,
+		)
+	case *domain.SessionFactorOTPEmail:
+		return database.NewCTEChange(
+			func(builder *database.StatementBuilder) {
+				builder.WriteString("INSERT INTO zitadel.session_factors (instance_id, session_id, type, last_verified_at) SELECT instance_id, id, ")
+				builder.WriteArgs(domain.SessionFactorTypeOTPEmail.String(), f.LastVerifiedAt)
+				builder.WriteString(" FROM existing_session ON CONFLICT (instance_id, session_id, type) DO UPDATE SET last_verified_at = EXCLUDED.last_verified_at")
+			}, nil,
+		)
 	default:
-		return database.NewChange(s.factorRepo.FactorsColumn(), factor)
+		return nil //TODO: error?
 	}
 }
 
@@ -285,13 +310,24 @@ func (s session) ClearFactor(factorType domain.SessionFactorType) database.Chang
 
 // SetMetadata implements [domain.sessionChanges].
 func (s session) SetMetadata(metadata []domain.SessionMetadata) database.Change {
-	changes := make([]database.Change, len(metadata))
+	changes := make([]database.Change, len(metadata)+1)
+	keys := make([]any, len(metadata))
 	for i, md := range metadata {
-		changes[i] = database.NewChange(s.metadataRepo.InstanceIDColumn(), md.InstanceID)
-		changes[i] = database.NewChange(s.metadataRepo.SessionIDColumn(), md.SessionID)
-		changes[i] = database.NewChange(s.metadataRepo.KeyColumn(), md.Key)
-		changes[i] = database.NewChange(s.metadataRepo.ValueColumn(), md.Value)
+		keys[i] = md.Key
+		changes[i] = database.NewCTEChange(
+			func(builder *database.StatementBuilder) {
+				builder.WriteString("INSERT INTO zitadel.session_metadata (instance_id, session_id, key, value) SELECT instance_id, id, ")
+				builder.WriteArgs(md.Key, md.Value)
+				builder.WriteString(" FROM existing_session ON CONFLICT (instance_id, session_id, key) DO UPDATE SET value = EXCLUDED.value")
+			}, nil,
+		)
 	}
+	changes[len(metadata)] = database.NewCTEChange(
+		func(builder *database.StatementBuilder) {
+			builder.WriteString("DELETE FROM zitadel.session_metadata WHERE instance_id = (SELECT instance_id FROM existing_session) AND session_id = (SELECT id FROM existing_session) AND key NOT IN (")
+			builder.WriteArgs(keys...)
+			builder.WriteString(")")
+		}, nil)
 	return database.NewChanges(changes...)
 }
 
@@ -299,8 +335,8 @@ func (s session) SetMetadata(metadata []domain.SessionMetadata) database.Change 
 func (s session) SetUserAgent(userAgent domain.SessionUserAgent) database.Change {
 	//TODO: upsert user agent?
 	return database.NewChanges(
-		database.NewChange(s.UserAgentIDColumn(), userAgent.FingerprintID),
-
+		database.NewChange(s.UserAgentIDColumn(), *userAgent.FingerprintID),
+	)
 }
 
 // -------------------------------------------------------------
@@ -348,6 +384,32 @@ func (s session) CreatedAtCondition(op database.NumberOperation, createdAt time.
 // UpdatedAtCondition implements [domain.sessionConditions].
 func (s session) UpdatedAtCondition(op database.NumberOperation, updatedAt time.Time) database.Condition {
 	return database.NewNumberCondition(s.UpdatedAtColumn(), op, updatedAt)
+}
+
+func (s session) ExistsFactor(cond database.Condition) database.Condition {
+	return database.Exists(
+		s.factorRepo.qualifiedTableName(),
+		database.And(
+			database.NewColumnCondition(s.InstanceIDColumn(), s.factorRepo.InstanceIDColumn()),
+			database.NewColumnCondition(s.IDColumn(), s.factorRepo.SessionIDColumn()),
+			cond,
+		),
+	)
+}
+
+func (s session) FactorConditions() domain.SessionFactorConditions {
+	return s.factorRepo
+}
+
+func (s session) ExistsMetadata(cond database.Condition) database.Condition {
+	return database.Exists(
+		s.metadataRepo.qualifiedTableName(),
+		database.And(
+			database.NewColumnCondition(s.InstanceIDColumn(), s.metadataRepo.InstanceIDColumn()),
+			database.NewColumnCondition(s.IDColumn(), s.metadataRepo.SessionIDColumn()),
+			cond,
+		),
+	)
 }
 
 // -------------------------------------------------------------
@@ -412,26 +474,81 @@ func (s session) UpdatedAtColumn() database.Column {
 	return database.NewColumn(s.unqualifiedTableName(), "updated_at")
 }
 
-//
-//// UpdatedAtColumn implements [domain.sessionColumns].
-//func (s session) FactorColumns() sessionFactor {
-//	return sessionFactor{}
-//}
-//
-//// UpdatedAtColumn implements [domain.sessionColumns].
-//func (s session) MetadataColumns() sessionMetadataColumns
-//
-//// UpdatedAtColumn implements [domain.sessionColumns].
-//func (s session) UserAgentColumns() sessionUserAgentColumns
-
 // -------------------------------------------------------------
 // scanners
 // -------------------------------------------------------------
 
 type rawSession struct {
 	*domain.Session
-	Factors  JSONArray[domain.SessionFactor]   `json:"factorRepo,omitempty" db:"factorRepo"`
-	Metadata JSONArray[domain.SessionMetadata] `json:"metadata,omitempty" db:"metadata"`
+	Token      sql.NullString                    `db:"token"`
+	Lifetime   sql.Null[time.Duration]           `db:"lifetime"`
+	Expiration sql.NullTime                      `db:"expiration"`
+	UserID     sql.NullString                    `db:"user_id"`
+	CreatorID  sql.NullString                    `db:"creator_id"`
+	Factors    JSONArray[rawFactor]              `json:"factorRepo,omitempty" db:"factors"`
+	Metadata   JSONArray[domain.SessionMetadata] `json:"metadata,omitempty" db:"metadata"`
+	UserAgent  rawUserAgent                      `json:"userAgent,omitempty" db:"userAgentRepo"`
+}
+
+type rawFactor struct {
+	Type              string    `db:"type"`
+	LastChallengedAt  time.Time `db:"last_challenged_at"`
+	ChallengedPayload []byte    `db:"challenged_payload"`
+	LastVerifiedAt    time.Time `db:"last_verified_at"`
+	VerifiedPayload   []byte    `db:"verified_payload"`
+}
+
+func (f *rawFactor) ToDomain() (domain.SessionFactor, error) {
+	factorType, err := domain.SessionFactorTypeString(f.Type)
+	if err != nil {
+		return nil, err
+	}
+	switch factorType {
+	case domain.SessionFactorTypeUser:
+		return &domain.SessionFactorUser{
+			UserID:         "",
+			LastVerifiedAt: f.LastVerifiedAt,
+		}, nil
+	case domain.SessionFactorTypePassword:
+		return &domain.SessionFactorPassword{
+			LastVerifiedAt: f.LastVerifiedAt,
+			//LastFailedAt:   f.,
+		}, nil
+	case domain.SessionFactorTypePasskey:
+		passkey := new(domain.SessionFactorPasskey)
+		json.Unmarshal(f.VerifiedPayload, passkey)
+		return &domain.SessionFactorPasskey{
+			LastVerifiedAt: f.LastVerifiedAt,
+			UserVerified:   passkey.UserVerified,
+		}, nil
+	case domain.SessionFactorTypeIdentityProviderIntent:
+		return &domain.SessionFactorIdentityProviderIntent{
+			LastVerifiedAt: f.LastVerifiedAt,
+		}, nil
+	case domain.SessionFactorTypeTOTP:
+		return &domain.SessionFactorTOTP{
+			LastVerifiedAt: f.LastVerifiedAt,
+			//LastFailedAt:   time.Time{},
+		}, nil
+	case domain.SessionFactorTypeOTPSMS:
+		return &domain.SessionFactorOTPSMS{
+			LastVerifiedAt: f.LastVerifiedAt,
+			//LastFailedAt:   time.Time{},
+		}, nil
+	case domain.SessionFactorTypeOTPEmail:
+		return &domain.SessionFactorOTPEmail{
+			LastVerifiedAt: f.LastVerifiedAt,
+			//LastFailedAt:   time.Time{},
+		}, nil
+	}
+	return nil, nil // TODO: !
+}
+
+type rawUserAgent struct {
+	FingerprintID sql.NullString `json:"fingerprintId,omitempty" db:"fingerprint_id"`
+	Description   sql.NullString `json:"description,omitempty" db:"description"`
+	//IP            net.IP         `json:"ip,omitempty" db:"ip"`
+	//Header        http.Header    `json:"header,omitempty" db:"headers"`
 }
 
 func scanSession(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Session, error) {
@@ -444,9 +561,26 @@ func scanSession(ctx context.Context, querier database.Querier, builder *databas
 	if err := rows.(database.CollectableRows).CollectExactlyOneRow(&raw); err != nil {
 		return nil, err
 	}
-	raw.Session.Factors = raw.Factors
-	raw.Session.Metadata = raw.Metadata
 
+	raw.Session.Token = raw.Token.String
+	raw.Session.Lifetime = raw.Lifetime.V
+	raw.Session.Expiration = raw.Expiration.Time
+	raw.Session.UserID = raw.UserID.String
+	raw.Session.CreatorID = raw.CreatorID.String
+
+	raw.Session.Factors = make([]domain.SessionFactor, len(raw.Factors))
+	for i, factor := range raw.Factors {
+		raw.Session.Factors[i], err = factor.ToDomain()
+		_ = err //TODO: ?
+	}
+	raw.Session.Metadata = make([]domain.SessionMetadata, len(raw.Metadata))
+	for i, metadata := range raw.Metadata {
+		raw.Session.Metadata[i] = *metadata
+	}
+	raw.Session.UserAgent = &domain.SessionUserAgent{
+		FingerprintID: &raw.UserAgent.FingerprintID.String,
+		Description:   &raw.UserAgent.Description.String,
+	}
 	return raw.Session, nil
 }
 
@@ -464,8 +598,12 @@ func scanSessions(ctx context.Context, querier database.Querier, builder *databa
 	result := make([]*domain.Session, len(sessions))
 	for i, session := range sessions {
 		result[i] = session.Session
-		result[i].Factors = session.Factors
-		result[i].Metadata = session.Metadata
+		//for i, factor := range session.Factors {
+		//	session.Session.Factors[i] = *factor
+		//}
+		for i, metadata := range session.Metadata {
+			session.Session.Metadata[i] = *metadata
+		}
 	}
 
 	return result, nil
@@ -474,7 +612,26 @@ func scanSessions(ctx context.Context, querier database.Querier, builder *databa
 // -------------------------------------------------------------
 // sub repositories
 // -------------------------------------------------------------
-//
+
+func (s session) joinUserAgent() database.QueryOption {
+	columns := make([]database.Condition, 0, 3)
+	columns = append(columns,
+		database.NewColumnCondition(s.InstanceIDColumn(), s.userAgentRepo.InstanceIDColumn()),
+		database.NewColumnCondition(s.IDColumn(), s.userAgentRepo.FingerprintIDColumn()),
+	)
+	//
+	//// If domains should not be joined, we make sure to return null for the domain columns
+	//// the query optimizer of the dialect should optimize this away if no domains are requested
+	//if !s.shouldLoadDomains {
+	//	columns = append(columns, database.IsNull(s.factorRepo.SessionIDColumn()))
+	//}
+
+	return database.WithLeftJoin(
+		s.userAgentRepo.qualifiedTableName(),
+		database.And(columns...),
+	)
+}
+
 //func (s session) LoadDomains() domain.OrganizationRepository {
 //	return &session{
 //		shouldLoadDomains:  true,

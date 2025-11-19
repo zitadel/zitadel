@@ -92,8 +92,8 @@ type sessionConditions interface {
 	UpdatedAtCondition(op database.NumberOperation, updatedAt time.Time) database.Condition
 
 	ExistsFactor(condition database.Condition) database.Condition
-	//// FactorConditions returns the conditions for the factors fields.
-	//FactorConditions() sessionFactorConditions
+	// FactorConditions returns the conditions for the factors fields.
+	FactorConditions() SessionFactorConditions
 	//// MetadataConditions returns the conditions for the metadata fields.
 	//MetadataConditions() sessionMetadataConditions
 	//// UserAgentConditions returns the conditions for the user agent fields.
