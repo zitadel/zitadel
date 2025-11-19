@@ -1,10 +1,14 @@
+name: zitadel
+
 services:
   api:
     restart: unless-stopped
     image: ghcr.io/zitadel/zitadel:latest
-    command: start-from-init --masterkey "MasterkeyNeedsToHave32Characters"
+    command: start-from-init --masterkey "${ZITADEL_MASTERKEY}"
+    env_file:
+      - .env
     environment:
-      ZITADEL_EXTERNALDOMAIN: ${ZITADEL_EXTERNALDOMAIN:-localhost}
+      ZITADEL_EXTERNALDOMAIN: ${ZITADEL_EXTERNALDOMAIN}
       ZITADEL_EXTERNALSECURE: true
       ZITADEL_EXTERNALPORT: 443
       ZITADEL_TLS_ENABLED: false
@@ -12,11 +16,11 @@ services:
       ZITADEL_DATABASE_POSTGRES_HOST: db
       ZITADEL_DATABASE_POSTGRES_PORT: 5432
       ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
-      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: postgres
-      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: postgres
+      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: ${POSTGRES_ADMIN}
+      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
       ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
-      ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel
-      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_USERNAME: ${POSTGRES_USER}
+      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: ${POSTGRES_USER_PASSWORD}
       ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
       
       ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH: /current-dir/login-client.pat
@@ -26,24 +30,19 @@ services:
       ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_PAT_EXPIRATIONDATE: '2029-01-01T00:00:00Z'
       
       ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED: true
-      ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI: https://${ZITADEL_EXTERNALDOMAIN:-localhost}/ui/v2/login
-      ZITADEL_OIDC_DEFAULTLOGINURLV2: https://${ZITADEL_EXTERNALDOMAIN:-localhost}/ui/v2/login/login?authRequest=
-      ZITADEL_OIDC_DEFAULTLOGOUTURLV2: https://${ZITADEL_EXTERNALDOMAIN:-localhost}/ui/v2/login/logout?post_logout_redirect=
-      ZITADEL_SAML_DEFAULTLOGINURLV2: https://${ZITADEL_EXTERNALDOMAIN:-localhost}/ui/v2/login/login?samlRequest=
+      ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI: https://${ZITADEL_EXTERNALDOMAIN}/ui/v2/login
+      ZITADEL_OIDC_DEFAULTLOGINURLV2: https://${ZITADEL_EXTERNALDOMAIN}/ui/v2/login/login?authRequest=
+      ZITADEL_OIDC_DEFAULTLOGOUTURLV2: https://${ZITADEL_EXTERNALDOMAIN}/ui/v2/login/logout?post_logout_redirect=
+      ZITADEL_SAML_DEFAULTLOGINURLV2: https://${ZITADEL_EXTERNALDOMAIN}/ui/v2/login/login?samlRequest=
 
-      # To change the initial human admin users username and password, uncomment the following lines.
-      # The first login name is formatted like this: <username>@<org_name>.<external_domain>
-      # With the following incommented configuration, this would be root@my-organization.localhost
-      # Visit http://localhost:8080/ui/console to check if the login name works.
-      # If you can't log in, check the available login names:
-      # echo "select * from projections.login_names3;" | psql -h localhost -U postgres -d zitadel
-      # The postgres users password is postgres.
-      # ZITADEL_FIRSTINSTANCE_ORG_NAME: My Organization
-      # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME: root
-      # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD: RootPassword1!
+      ZITADEL_DEFAULTINSTANCE_DOMAINPOLICY_USERLOGINMUSTBEDOMAIN: false
+      ZITADEL_FIRSTINSTANCE_ORG_NAME: ${ZITADEL_FIRSTINSTANCE_ORG_NAME}
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME: ${ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME}
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD: ${ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD}
 
       ZITADEL_CACHES_CONNECTORS_REDIS_ENABLED: true
       ZITADEL_CACHES_CONNECTORS_REDIS_ADDR: cache:6379
+      ZITADEL_CACHES_CONNECTORS_REDIS_PASSWORD: ${VALKEY_PASSWORD}
       
       ZITADEL_CACHES_INSTANCE_CONNECTOR: redis
       ZITADEL_CACHES_INSTANCE_MAXAGE: 1h
@@ -78,6 +77,8 @@ services:
   caddy:
     image: caddy:latest
     restart: unless-stopped
+    env_file:
+      - .env
     ports:
       - "80:80"
       - "443:443"
@@ -109,17 +110,13 @@ services:
   db:
     restart: unless-stopped
     image: postgres:17
+    env_file:
+      - .env
     environment:
-      PGUSER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${POSTGRES_ADMIN}
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
     healthcheck:
-      test: 
-      - CMD-SHELL
-      - pg_isready
-      - -d
-      - zitadel
-      - -U
-      - postgres
+      test: ["CMD-SHELL", "pg_isready -d postgres -U ${POSTGRES_ADMIN}"]
       interval: 10s
       timeout: 30s
       retries: 5
@@ -132,16 +129,17 @@ services:
   cache:
     restart: unless-stopped
     image: valkey/valkey:8
+    command: valkey-server --requirepass "${VALKEY_PASSWORD}"
+    env_file:
+      - .env
     networks:
       - zitadel
     healthcheck:
-      test: ["CMD", "valkey-cli", "ping"]
+      test: ["CMD", "valkey-cli", "-a", "${VALKEY_PASSWORD}", "ping"]
       interval: 10s
       timeout: 30s
       retries: 5
       start_period: 10s
-    volumes:
-      - cache_data:/data
 
 networks:
   zitadel:
