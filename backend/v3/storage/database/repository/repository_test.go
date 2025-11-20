@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres/embedded"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
+	"github.com/zitadel/zitadel/internal/integration"
 )
 
 func TestMain(m *testing.M) {
@@ -122,4 +123,23 @@ func createProject(t *testing.T, tx database.Transaction, instanceID, orgID stri
 	require.NoError(t, err)
 
 	return project.ID
+}
+
+func createProjectRole(t *testing.T, tx database.Transaction, instanceID, orgID, projectID, key string) string {
+	t.Helper()
+	if key == "" {
+		key = integration.RoleKey()
+	}
+	projectRole := domain.ProjectRole{
+		InstanceID:     instanceID,
+		OrganizationID: orgID,
+		ProjectID:      projectID,
+		Key:            key,
+		DisplayName:    integration.RoleDisplayName(),
+	}
+	projectRoleRepo := repository.ProjectRepository().Role()
+	err := projectRoleRepo.Create(t.Context(), tx, &projectRole)
+	require.NoError(t, err)
+
+	return projectRole.Key
 }

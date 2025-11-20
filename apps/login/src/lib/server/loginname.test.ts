@@ -62,6 +62,7 @@ describe("sendLoginname", () => {
   let mockGetActiveIdentityProviders: any;
   let mockGetIDPByID: any;
   let mockIdpTypeToSlug: any;
+  let mockGetOrgsByDomain: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -77,6 +78,7 @@ describe("sendLoginname", () => {
       listIDPLinks,
       startIdentityProviderFlow,
       getActiveIdentityProviders,
+      getOrgsByDomain,
     } = await import("../zitadel");
     const { createSessionAndUpdateCookie } = await import("./cookie");
     const { getOriginalHost } = await import("./host");
@@ -96,6 +98,7 @@ describe("sendLoginname", () => {
     mockGetActiveIdentityProviders = vi.mocked(getActiveIdentityProviders);
     mockGetIDPByID = vi.mocked(getIDPByID);
     mockIdpTypeToSlug = vi.mocked(idpTypeToSlug);
+    mockGetOrgsByDomain = vi.mocked(getOrgsByDomain);
 
     // Default mock implementations
     mockHeaders.mockResolvedValue({} as any);
@@ -107,6 +110,8 @@ describe("sendLoginname", () => {
       name: "Google",
       type: "GOOGLE",
     });
+    // Default: org discovery returns empty result
+    mockGetOrgsByDomain.mockResolvedValue({ result: [] });
   });
 
   afterEach(() => {
@@ -481,6 +486,161 @@ describe("sendLoginname", () => {
       });
 
       expect(result).toEqual({ error: "errors.userNotFound" });
+    });
+
+    test("should discover organization from domain suffix when user not found without org context", async () => {
+      // Mock login settings for instance level (no org context)
+      mockGetLoginSettings
+        .mockResolvedValueOnce({
+          allowRegister: true,
+          allowUsernamePassword: true,
+          ignoreUnknownUsernames: false,
+        })
+        // Mock login settings for discovered org - must include all necessary flags
+        .mockResolvedValueOnce({
+          allowDomainDiscovery: true,
+          allowRegister: true,
+          allowUsernamePassword: true,
+          ignoreUnknownUsernames: false,
+        });
+
+      // Mock org discovery to return one org with matching domain
+      mockGetOrgsByDomain.mockResolvedValue({
+        result: [{ id: "discovered-org-123", name: "Example Org" }],
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+        requestId: "req123",
+        // No organization parameter - this is the key test scenario
+      });
+
+      expect(result).toBeDefined();
+      expect(result?.redirect).toMatch(/^\/register\?/);
+      expect(result?.redirect).toContain("organization=discovered-org-123");
+      expect(result?.redirect).toContain("requestId=req123");
+      expect(result?.redirect).toContain("email=user%40example.com");
+
+      // Verify org discovery was called with correct domain
+      expect(mockGetOrgsByDomain).toHaveBeenCalledWith({
+        serviceUrl: "https://api.example.com",
+        domain: "example.com",
+      });
+    });
+
+    test("should redirect to IDP with discovered org when user not found and only IDP allowed", async () => {
+      // Mock login settings for instance level (no org context)
+      mockGetLoginSettings
+        .mockResolvedValueOnce({
+          allowRegister: true,
+          allowUsernamePassword: false,
+        })
+        // Mock login settings for discovered org - must include all necessary flags
+        .mockResolvedValueOnce({
+          allowDomainDiscovery: true,
+          allowRegister: true,
+          allowUsernamePassword: false,
+        });
+
+      // Mock org discovery to return one org with matching domain
+      mockGetOrgsByDomain.mockResolvedValue({
+        result: [{ id: "discovered-org-456", name: "Example Org" }],
+      });
+
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [{ id: "idp123", type: "OIDC" }],
+      });
+      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth?org=discovered-org-456");
+
+      const result = await sendLoginname({
+        loginName: "user@company.com",
+        requestId: "req123",
+        // No organization parameter
+      });
+
+      expect(result).toEqual({ redirect: "https://idp.example.com/auth?org=discovered-org-456" });
+
+      // Verify org discovery was called
+      expect(mockGetOrgsByDomain).toHaveBeenCalledWith({
+        serviceUrl: "https://api.example.com",
+        domain: "company.com",
+      });
+
+      // Verify IDP redirect was called with discovered org
+      expect(mockGetActiveIdentityProviders).toHaveBeenCalledWith({
+        serviceUrl: "https://api.example.com",
+        orgId: "discovered-org-456",
+      });
+    });
+
+    test("should not discover org if domain discovery is disabled", async () => {
+      mockGetLoginSettings
+        .mockResolvedValueOnce({
+          allowRegister: true,
+          allowUsernamePassword: true,
+          ignoreUnknownUsernames: false,
+        })
+        // Mock login settings for org with domain discovery disabled
+        .mockResolvedValueOnce({
+          allowDomainDiscovery: false,
+        });
+
+      mockGetOrgsByDomain.mockResolvedValue({
+        result: [{ id: "10987654321", name: "Example Org" }],
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+        // No organization parameter
+      });
+
+      // Should return error since discovery is disabled and no org context
+      expect(result).toEqual({ error: "errors.userNotFound" });
+    });
+
+    test("should not discover org if multiple orgs match the domain", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowRegister: true,
+        allowUsernamePassword: true,
+        ignoreUnknownUsernames: false,
+      });
+
+      // Mock org discovery to return multiple orgs
+      mockGetOrgsByDomain.mockResolvedValue({
+        result: [
+          { id: "12345678910", name: "Example Org 1" },
+          { id: "10987654321", name: "Example Org 2" },
+        ],
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+        // No organization parameter
+      });
+
+      // Should return error since multiple orgs match
+      expect(result).toEqual({ error: "errors.userNotFound" });
+    });
+
+    test("should use provided organization instead of discovering when org context exists", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowRegister: true,
+        allowUsernamePassword: true,
+        ignoreUnknownUsernames: false,
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+        organization: "123456",
+        requestId: "req123",
+      });
+
+      expect(result).toBeDefined();
+      expect(result?.redirect).toMatch(/^\/register\?/);
+      expect(result?.redirect).toContain("organization=123456");
+
+      // Verify org discovery was NOT called since org was provided
+      expect(mockGetOrgsByDomain).not.toHaveBeenCalled();
     });
   });
 
