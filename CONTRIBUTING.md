@@ -29,6 +29,7 @@ Zitadel is an open-source identity and access management platform built with a m
    - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) - Code linting
    - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) - Code formatting
    - [Nx Console](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console) - Nx task runner tooling
+   - [Vitest](https://marketplace.visualstudio.com/items?itemName=vitest.explorer) - Vitest for running Login Unit Tests
 
 Jump to the dedicated sections for developing a specific project:
 
@@ -280,7 +281,7 @@ Call the API using the generated [](./admin.pat) with [grpcurl](https://github.c
 grpcurl -plaintext -H "Authorization: Bearer $(cat admin.pat)" localhost:8080 zitadel.user.v2.UserService.ListUsers
 ```
 
-To connect to the database and explore Zitadel data, run `psql "host=${DEVCONTAINER_DB_HOST:-localhost} dbname=zitadel sslmode=disable"`.
+To connect to the database and explore Zitadel data, run `psql "host=${DEVCONTAINER_DB_HOST:-localhost} user=postgres dbname=zitadel sslmode=disable"`.
 
 ### Run API Unit Tests
 
@@ -433,6 +434,36 @@ pnpm nx run @zitadel/login:dev
 ```
 
 Visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
+
+#### Run Unit Tests
+
+Unit tests cover a single component or function.
+Their spec files are located besides the source files that contain the code under test.
+By convention, they have the file endings `.test.tsx` or `.test.ts`.
+
+Either run the tests from within your IDE, for example by using the [Vitest VSCode Plugin](https://marketplace.visualstudio.com/items?itemName=vitest.explorer), or run them from the command line:
+
+```bash
+pnpm nx run @zitadel/login:test-unit
+```
+
+#### Run Acceptance Tests
+
+The Acceptance tests run in a browser and cover common user journeys.
+They make sure that the login integrates with the API as expected.
+Their spec files are located at `apps/login/acceptance/tests`.
+
+The following command runs a local ephemeral database, an API and a Login and then runs the Playwright test suite against this environment.
+
+```bash
+pnpm nx run @zitadel/login-acceptance:test-local
+```
+
+To write new tests or debug failing tests, open the interactive test suite by passing the `--ui` flag.
+
+```bash
+pnpm nx run @zitadel/login-acceptance:test-local --ui
+```
 
 #### Login Architecture
 
