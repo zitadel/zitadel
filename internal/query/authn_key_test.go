@@ -27,6 +27,9 @@ var (
 		` projections.authn_keys2.expiration,` +
 		` projections.authn_keys2.type,` +
 		` projections.authn_keys2.object_id,` +
+		` projections.authn_keys2.enabled,` +
+		` projections.authn_keys2.public_key,` +
+		` projections.authn_keys2.fingerprint,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.authn_keys2`
 	prepareAuthNKeysCols = []string{
@@ -39,6 +42,9 @@ var (
 		"expiration",
 		"type",
 		"object_id",
+		"enabled",
+		"public_key",
+		"fingerprint",
 		"count",
 	}
 
@@ -132,6 +138,9 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 							testNow,
 							1,
 							"app1",
+							true,
+							[]byte("public"),
+							"fingerprint",
 						},
 					},
 				),
@@ -151,6 +160,9 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 						Expiration:    testNow,
 						Type:          domain.AuthNKeyTypeJSON,
 						ApplicationID: "app1",
+						Enabled:       true,
+						PublicKey:     []byte("public"),
+						Fingerprint:   "fingerprint",
 					},
 				},
 			},
@@ -173,6 +185,9 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 							testNow,
 							1,
 							"app1",
+							true,
+							[]byte("public1"),
+							"fingerprint1",
 						},
 						{
 							"id-2",
@@ -184,6 +199,9 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 							testNow,
 							1,
 							"app1",
+							true,
+							[]byte("public2"),
+							"fingerprint2",
 						},
 					},
 				),
@@ -203,6 +221,9 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 						Expiration:    testNow,
 						Type:          domain.AuthNKeyTypeJSON,
 						ApplicationID: "app1",
+						Enabled:       true,
+						PublicKey:     []byte("public1"),
+						Fingerprint:   "fingerprint1",
 					},
 					{
 						ID:            "id-2",
@@ -214,6 +235,9 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 						Expiration:    testNow,
 						Type:          domain.AuthNKeyTypeJSON,
 						ApplicationID: "app1",
+						Enabled:       true,
+						PublicKey:     []byte("public2"),
+						Fingerprint:   "fingerprint2",
 					},
 				},
 			},

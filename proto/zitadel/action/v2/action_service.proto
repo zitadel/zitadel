@@ -314,12 +314,17 @@ service ActionService {
   // The public key must be in PEM format and be either an RSA or an EC key.
   // On a successful addition, a key ID is returned which can not only be used to manage the key (activate, remove),
   // but also will be used as the `kid` header in the JWE token sent to the target to indicate which key was used for encryption.
+  // Note that newly added keys are inactive by default. You must activate the key to use it for payload encryption.
+  // Providing an optional expiration date allows you to set a validity period for the key.
+  // After the expiration date, the key will be automatically deactivated and no longer used for payload encryption.
+  // Be sure to activate a new key before the current active key expires to avoid interruptions in your target executions.
+  // You can have multiple inactive keys for rotation purposes, but only one active key at a time.
   //
   // Required permission:
   //   - `action.target.write`
   rpc AddPublicKey (AddPublicKeyRequest) returns (AddPublicKeyResponse) {
     option (google.api.http) = {
-      post: "/v2/actions/targets/{target_id}/publickey"
+      post: "/v2/actions/targets/{target_id}/publickeys"
       body: "*"
     };
 
@@ -343,12 +348,15 @@ service ActionService {
   //
   // Activates the public key for payload encryption.
   // The public key is used to encrypt the payload sent to the target when the payload type is set to `PAYLOAD_TYPE_JWE`.
+  // Activating a new key will deactivate the current active key. Only one key can be active at a time.
+  // The active key is indicated in the `kid` header in the JWE token sent to the target.
+  // Activating a key that is already active is a no-op.
   //
   // Required permission:
   //   - `action.target.write`
   rpc ActivatePublicKey (ActivatePublicKeyRequest) returns (ActivatePublicKeyResponse) {
     option (google.api.http) = {
-      post: "/v2/actions/targets/{target_id}/publickey/{key_id}/activate"
+      post: "/v2/actions/targets/{target_id}/publickeys/{key_id}/activate"
     };
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
@@ -371,17 +379,54 @@ service ActionService {
     };
   }
 
+  // Deactivate Public Key
+  //
+  // Deactivates the public key for payload encryption.
+  // The public key will no longer be used to encrypt payloads sent to the target.
+  // Be aware that deactivating the active key will leave the target without an active key.
+  // Subsequent calls to the target with payload type `PAYLOAD_TYPE_JWE` will fail until a new key is activated.
+  // This endpoint can be used in break glass scenarios to quickly disable a compromised key.
+  // Deactivating a key that is already inactive is a no-op.
+  //
+  // Required permission:
+  //   - `action.target.write`
+  rpc DeactivatePublicKey (DeactivatePublicKeyRequest) returns (DeactivatePublicKeyResponse) {
+    option (google.api.http) = {
+      post: "/v2/actions/targets/{target_id}/publickeys/{key_id}/deactivate"
+    };
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.target.write"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "Public key activated successfully";
+        };
+      };
+      responses: {
+        key: "404"
+        value: {
+          description: "The key to activate does not exist.";
+        }
+      };
+    };
+  }
+
+
   // Remove Public Key
   //
-  // Removes the public key from the target. If the key is used to encrypt payloads and there's
-  // no other active public key, the target will no longer be able to receive encrypted payloads
-  // and calls with payload type `PAYLOAD_TYPE_JWE` will fail.
+  // Removes the public key from the target. This is a permanent action and can not be undone.
+  // Note that you can only remove inactive keys. Attempting to remove an active key will result in an error.
+  // For break glass scenarios, deactivate the key first and then remove it.
   //
   // Required permission:
   //   - `action.target.write`
   rpc RemovePublicKey (RemovePublicKeyRequest) returns (RemovePublicKeyResponse) {
     option (google.api.http) = {
-      delete: "/v2/actions/targets/{target_id}/publickey/{key_id}"
+      delete: "/v2/actions/targets/{target_id}/publickeys/{key_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -403,12 +448,14 @@ service ActionService {
   // List Public Keys
   //
   // Lists all public keys of a target.
+  // The response includes which key is active and the key's expiration dates.
+  // This allows you to manage key rotations and ensure that your target always has an active key for payload encryption.
   //
   // Required permission:
   //   - `action.target.read`
   rpc ListPublicKeys (ListPublicKeysRequest) returns (ListPublicKeysResponse) {
     option (google.api.http) = {
-      post: "/v2/actions/targets/{target_id}/publickeys"
+      post: "/v2/actions/targets/{target_id}/publickeys/search"
       body: "*"
     };
 
@@ -895,6 +942,16 @@ message AddPublicKeyRequest {
       example: "\"LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS1cbk1JSUJJakFOQmdrcWhraUc5dzBCQVFzRkFEQV...\"";
     }
   ];
+
+  // Optional expiration date of the public key.
+  // After the expiration date, the key will be automatically deactivated and no longer used for payload encryption.
+  // Be sure to activate a new key before the current active key expires to avoid interruptions.
+  // If not set, the key will not expire.
+  optional google.protobuf.Timestamp expiration_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-12-18T07:50:47.492Z\"";
+    }
+  ];
 }
 
 message AddPublicKeyResponse {
@@ -907,8 +964,8 @@ message AddPublicKeyResponse {
     }
   ];
 
-  // The timestamp of the public key addition.
-  google.protobuf.Timestamp addition_date = 2 [
+  // CreationDate represents the timestamp of the public key addition.
+  google.protobuf.Timestamp creation_date = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2024-12-18T07:50:47.492Z\"";
     }
@@ -916,7 +973,7 @@ message AddPublicKeyResponse {
 }
 
 message ActivatePublicKeyRequest {
-  // The unique identifier of the target to activate the public key for.
+  // TargetID is the unique identifier of the target to activate the public key for.
   string target_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -927,7 +984,7 @@ message ActivatePublicKeyRequest {
     }
   ];
 
-  // The unique identifier of the public key to activate.
+  // KeyID is the unique identifier of the public key to activate.
   string key_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -940,16 +997,16 @@ message ActivatePublicKeyRequest {
 }
 
 message ActivatePublicKeyResponse {
-  // The timestamp of the public key activation.
-  google.protobuf.Timestamp activation_date = 1 [
+  // ChangeDate is the timestamp of the public key's activation.
+  google.protobuf.Timestamp change_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2024-12-18T07:50:47.492Z\"";
     }
   ];
 }
 
-message RemovePublicKeyRequest {
-  // The unique identifier of the target to remove the public key from.
+message DeactivatePublicKeyRequest {
+  // TargetID is the unique identifier of the target to deactivate the public key for.
   string target_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -960,7 +1017,40 @@ message RemovePublicKeyRequest {
     }
   ];
 
-  // The unique identifier of the public key to remove.
+  // KeyID is the unique identifier of the public key to deactivate.
+  string key_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629032906489576\"";
+    }
+  ];
+}
+
+message DeactivatePublicKeyResponse {
+  // ChangeDate is the timestamp of the public key's deactivation.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+}
+
+message RemovePublicKeyRequest {
+  // TargetID is the unique identifier of the target to remove the public key from.
+  string target_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+
+  // KeyID is the unique identifier of the public key to remove.
   string key_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -973,8 +1063,8 @@ message RemovePublicKeyRequest {
 }
 
 message RemovePublicKeyResponse {
-  // The timestamp of the public key removal.
-  google.protobuf.Timestamp removal_date = 1 [
+  // DeletionDate is the timestamp of the public key removal.
+  google.protobuf.Timestamp deletion_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2024-12-18T07:50:47.492Z\"";
     }
@@ -982,7 +1072,7 @@ message RemovePublicKeyResponse {
 }
 
 message ListPublicKeysRequest {
-  // The unique identifier of the target to list the public keys for.
+  // TargetID is the unique identifier of the target to list the public keys for.
   string target_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -997,36 +1087,6 @@ message ListPublicKeysRequest {
 message ListPublicKeysResponse {
   // List of all public keys for the target.
   repeated PublicKey public_keys = 1;
-}
-
-message PublicKey {
-  // The unique identifier of the public key.
-  string key_id = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"69629032906489576\"";
-    }
-  ];
-
-  // The public key in PEM format.
-  string public_key = 2 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"-----BEGIN PUBLIC KEY-----...\"";
-    }
-  ];
-
-  // Indicates whether the public key is active and used for payload encryption.
-  bool active = 3 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-    }
-  ];
-
-  // The timestamp of the public key addition.
-  google.protobuf.Timestamp addition_date = 4 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"2024-12-18T07:50:47.492Z\"";
-    }
-  ];
 }
 
 message SetExecutionRequest {

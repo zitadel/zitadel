@@ -31,6 +31,7 @@ const (
 	AuthNKeyPublicKeyCol     = "public_key"
 	AuthNKeyTypeCol          = "type"
 	AuthNKeyEnabledCol       = "enabled"
+	AuthNKeyFingerprintCol   = "fingerprint"
 )
 
 type authNKeyProjection struct{}
@@ -59,6 +60,7 @@ func (*authNKeyProjection) Init() *old_handler.Check {
 			handler.NewColumn(AuthNKeyPublicKeyCol, handler.ColumnTypeBytes),
 			handler.NewColumn(AuthNKeyEnabledCol, handler.ColumnTypeBool, handler.Default(true)),
 			handler.NewColumn(AuthNKeyTypeCol, handler.ColumnTypeEnum, handler.Default(0)),
+			handler.NewColumn(AuthNKeyFingerprintCol, handler.ColumnTypeText, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(AuthNKeyInstanceIDCol, AuthNKeyIDCol),
 			handler.WithIndex(handler.NewIndex("enabled", []string{AuthNKeyEnabledCol})),
@@ -126,6 +128,14 @@ func (p *authNKeyProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceAuthNKeyAdded,
 				},
 				{
+					Event:  target.KeyActivatedEventType,
+					Reduce: p.reduceTargetKeyActivated,
+				},
+				{
+					Event:  target.KeyDeactivatedEventType,
+					Reduce: p.reduceTargetKeyDeactivated,
+				},
+				{
 					Event:  target.KeyRemovedEventType,
 					Reduce: p.reduceAuthNKeyRemoved,
 				},
@@ -159,12 +169,13 @@ func (p *authNKeyProjection) Reducers() []handler.AggregateReducer {
 func (p *authNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var authNKeyEvent struct {
 		eventstore.BaseEvent
-		keyID      string
-		objectID   string
-		expiration time.Time
-		identifier string
-		publicKey  []byte
-		keyType    domain.AuthNKeyType
+		keyID       string
+		objectID    string
+		expiration  time.Time
+		identifier  string
+		publicKey   []byte
+		keyType     domain.AuthNKeyType
+		fingerprint string
 	}
 	switch e := event.(type) {
 	case *project.ApplicationKeyAddedEvent:
@@ -187,9 +198,10 @@ func (p *authNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handl
 		authNKeyEvent.BaseEvent = e.BaseEvent
 		authNKeyEvent.keyID = e.KeyID
 		authNKeyEvent.objectID = e.Aggregate().ID
-		authNKeyEvent.expiration = time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC) //TODO: !
-		authNKeyEvent.identifier = e.KeyID
+		authNKeyEvent.expiration = e.ExpirationDate
+		authNKeyEvent.identifier = e.Aggregate().ID
 		authNKeyEvent.publicKey = e.PublicKey
+		authNKeyEvent.fingerprint = e.Fingerprint
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-Dgb32", "reduce.wrong.event.type %v", []eventstore.EventType{project.ApplicationKeyAddedEventType, user.MachineKeyAddedEventType})
 	}
@@ -208,6 +220,7 @@ func (p *authNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handl
 			handler.NewCol(AuthNKeyIdentifierCol, authNKeyEvent.identifier),
 			handler.NewCol(AuthNKeyPublicKeyCol, authNKeyEvent.publicKey),
 			handler.NewCol(AuthNKeyTypeCol, authNKeyEvent.keyType),
+			handler.NewCol(AuthNKeyFingerprintCol, authNKeyEvent.fingerprint),
 		},
 	), nil
 }
@@ -291,6 +304,58 @@ func (p *authNKeyProjection) reduceOwnerRemoved(event eventstore.Event) (*handle
 		[]handler.Condition{
 			handler.NewCond(AuthNKeyInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(AuthNKeyResourceOwnerCol, e.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *authNKeyProjection) reduceTargetKeyActivated(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*target.KeyActivatedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	return handler.NewMultiStatement(
+		e,
+		handler.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(AuthNKeyEnabledCol, false),
+				handler.NewCol(AuthNKeyChangeDateCol, e.CreationDate()),
+				handler.NewCol(AuthNKeySequenceCol, e.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(AuthNKeyInstanceIDCol, e.Aggregate().InstanceID),
+				handler.NewCond(AuthNKeyAggregateIDCol, e.Aggregate().ID),
+				handler.NewCond(AuthNKeyEnabledCol, true),
+			},
+		),
+		handler.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(AuthNKeyEnabledCol, true),
+				handler.NewCol(AuthNKeyChangeDateCol, e.CreationDate()),
+				handler.NewCol(AuthNKeySequenceCol, e.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(AuthNKeyIDCol, e.KeyID),
+				handler.NewCond(AuthNKeyInstanceIDCol, e.Aggregate().InstanceID),
+			},
+		),
+	), nil
+}
+
+func (p *authNKeyProjection) reduceTargetKeyDeactivated(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*target.KeyDeactivatedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	return handler.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(AuthNKeyEnabledCol, false),
+			handler.NewCol(AuthNKeyChangeDateCol, e.CreationDate()),
+			handler.NewCol(AuthNKeySequenceCol, e.Sequence()),
+		},
+		[]handler.Condition{
+			handler.NewCond(AuthNKeyIDCol, e.KeyID),
+			handler.NewCond(AuthNKeyInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
 }

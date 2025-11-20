@@ -11,6 +11,7 @@ type TargetKeyWriteModel struct {
 
 	KeyExists    bool
 	TargetExists bool
+	Active       bool
 }
 
 func NewTargetKeyWriteModel(targetID, keyID string, resourceOwner string) *TargetKeyWriteModel {
@@ -31,6 +32,8 @@ func (wm *TargetKeyWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
+		case *target.KeyActivatedEvent:
+			wm.WriteModel.AppendEvents(e)
 		case *target.KeyRemovedEvent:
 			if wm.KeyID != e.KeyID {
 				continue
@@ -50,6 +53,10 @@ func (wm *TargetKeyWriteModel) Reduce() error {
 		case *target.KeyAddedEvent:
 			wm.KeyID = e.KeyID
 			wm.KeyExists = true
+		case *target.KeyActivatedEvent:
+			wm.Active = wm.KeyID == e.KeyID
+		case *target.KeyDeactivatedEvent:
+			wm.Active = false
 		case *target.KeyRemovedEvent:
 			wm.KeyExists = false
 		case *target.AddedEvent:
@@ -68,6 +75,8 @@ func (wm *TargetKeyWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(target.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(target.KeyAddedEventType,
+			target.KeyActivatedEventType,
+			target.KeyDeactivatedEventType,
 			target.KeyRemovedEventType,
 			target.AddedEventType,
 			target.RemovedEventType).

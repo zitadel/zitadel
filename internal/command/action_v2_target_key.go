@@ -2,12 +2,14 @@ package command
 
 import (
 	"context"
-	"crypto"
 	"crypto/ecdsa"
-	"crypto/ed25519"
 	"crypto/rsa"
+	"crypto/sha256"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/pem"
+	"fmt"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/repository/target"
@@ -16,13 +18,16 @@ import (
 )
 
 const (
-	ErrTargetIDMissing = "ErrTargetIDMissing"
-	ErrPublicKeyFormat = "ErrPublicKeyFormat"
+	ErrTargetIDMissing          = "ErrTargetIDMissing"
+	ErrPublicKeyFormat          = "ErrPublicKeyFormat"
+	ErrExpirationDateBeforeNow  = "ErrExpirationDateBeforeNow"
+	ErrPublicKeyDeleteActiveKey = "ErrPublicKeyDeleteActiveKey"
 )
 
 type TargetPublicKey struct {
-	TargetID  string
-	PublicKey []byte
+	TargetID   string
+	PublicKey  []byte
+	Expiration time.Time
 
 	// KeyID is generated and returned after adding the public key
 	KeyID string
@@ -35,7 +40,10 @@ func (c *Commands) AddTargetPublicKey(ctx context.Context, key *TargetPublicKey,
 	if key.TargetID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, ErrTargetIDMissing, "Errors.IDMissing")
 	}
-	_, err = checkPublicKey(key.PublicKey)
+	if !key.Expiration.IsZero() && key.Expiration.Before(time.Now()) {
+		return nil, zerrors.ThrowInvalidArgument(nil, ErrExpirationDateBeforeNow, "Errors.Target.InvalidExpirationDate")
+	}
+	fingerprint, err := checkPublicKeyAndComputeFingerprint(key.PublicKey)
 	if err != nil {
 		return nil, err
 	}
@@ -56,6 +64,64 @@ func (c *Commands) AddTargetPublicKey(ctx context.Context, key *TargetPublicKey,
 		TargetAggregateFromWriteModel(&writeModel.WriteModel),
 		key.KeyID,
 		key.PublicKey,
+		fingerprint,
+		key.Expiration,
+	))
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&writeModel.WriteModel), nil
+}
+
+func (c *Commands) ActivateTargetPublicKey(ctx context.Context, targetID, keyID, resourceOwner string) (_ *domain.ObjectDetails, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if targetID == "" || keyID == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, ErrTargetIDMissing, "Errors.IDMissing")
+	}
+	writeModel, err := c.getTargetKeyWriteModelByID(ctx, targetID, keyID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if !writeModel.TargetExists {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-SAF4g", "Errors.Target.NotFound")
+	}
+	if writeModel.Active {
+		return writeModelToObjectDetails(&writeModel.WriteModel), nil
+	}
+	err = c.pushAppendAndReduce(ctx, writeModel, target.NewKeyActivatedEvent(
+		ctx,
+		TargetAggregateFromWriteModel(&writeModel.WriteModel),
+		keyID,
+	))
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&writeModel.WriteModel), nil
+}
+
+func (c *Commands) DeactivateTargetPublicKey(ctx context.Context, targetID, keyID, resourceOwner string) (_ *domain.ObjectDetails, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if targetID == "" || keyID == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, ErrTargetIDMissing, "Errors.IDMissing")
+	}
+	writeModel, err := c.getTargetKeyWriteModelByID(ctx, targetID, keyID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if !writeModel.TargetExists {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-SAF4g", "Errors.Target.NotFound")
+	}
+	if !writeModel.Active {
+		return writeModelToObjectDetails(&writeModel.WriteModel), nil
+	}
+	err = c.pushAppendAndReduce(ctx, writeModel, target.NewKeyDeactivatedEvent(
+		ctx,
+		TargetAggregateFromWriteModel(&writeModel.WriteModel),
+		keyID,
 	))
 	if err != nil {
 		return nil, err
@@ -77,6 +143,9 @@ func (c *Commands) RemoveTargetPublicKey(ctx context.Context, targetID, keyID, r
 	if !writeModel.TargetExists || !writeModel.KeyExists {
 		return writeModelToObjectDetails(&writeModel.WriteModel), nil
 	}
+	if writeModel.Active {
+		return nil, zerrors.ThrowPreconditionFailed(nil, ErrPublicKeyDeleteActiveKey, "Errors.Target.PublicKeyActive")
+	}
 	err = c.pushAppendAndReduce(ctx, writeModel, target.NewKeyRemovedEvent(
 		ctx,
 		TargetAggregateFromWriteModel(&writeModel.WriteModel),
@@ -88,22 +157,22 @@ func (c *Commands) RemoveTargetPublicKey(ctx context.Context, targetID, keyID, r
 	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func checkPublicKey(key []byte) (crypto.PublicKey, error) {
+func checkPublicKeyAndComputeFingerprint(key []byte) (string, error) {
 	block, _ := pem.Decode(key)
 	if block == nil || block.Type != "PUBLIC KEY" {
-		return nil, zerrors.ThrowInvalidArgument(nil, ErrPublicKeyFormat, "Errors.Target.InvalidPublicKey")
+		return "", zerrors.ThrowInvalidArgument(nil, ErrPublicKeyFormat, "Errors.Target.InvalidPublicKey")
 	}
 	pub, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
-		return nil, zerrors.ThrowInvalidArgument(err, ErrPublicKeyFormat, "Errors.Target.InvalidPublicKey")
+		return "", zerrors.ThrowInvalidArgument(err, ErrPublicKeyFormat, "Errors.Target.InvalidPublicKey")
 	}
-	switch publicKey := pub.(type) {
+	switch pub.(type) {
 	case *rsa.PublicKey,
-		*ecdsa.PublicKey,
-		ed25519.PublicKey:
-		return publicKey, nil
+		*ecdsa.PublicKey:
+		fingerprint := sha256.Sum256(block.Bytes)
+		return fmt.Sprintf("SHA256:%s", base64.RawStdEncoding.EncodeToString(fingerprint[:])), nil
 	default:
-		return nil, zerrors.ThrowInvalidArgument(nil, ErrPublicKeyFormat, "Errors.Target.InvalidPublicKey")
+		return "", zerrors.ThrowInvalidArgument(nil, ErrPublicKeyFormat, "Errors.Target.InvalidPublicKey")
 	}
 }
 

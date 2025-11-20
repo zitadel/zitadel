@@ -84,6 +84,10 @@ var (
 		name:  projection.AuthNKeyEnabledCol,
 		table: authNKeyTable,
 	}
+	AuthNKeyColumnFingerprint = Column{
+		name:  projection.AuthNKeyFingerprintCol,
+		table: authNKeyTable,
+	}
 )
 
 type AuthNKeys struct {
@@ -100,8 +104,11 @@ type AuthNKey struct {
 	Sequence      uint64
 	ApplicationID string
 
-	Expiration time.Time
-	Type       domain.AuthNKeyType
+	Expiration  time.Time
+	Type        domain.AuthNKeyType
+	Enabled     bool
+	PublicKey   []byte
+	Fingerprint string
 }
 
 type AuthNKeysData struct {
@@ -178,8 +185,12 @@ func (q *Queries) searchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 		query = query.Join(join(TargetColumnID, AuthNKeyColumnObjectID))
 	}
 	eq := sq.Eq{
-		AuthNKeyColumnEnabled.identifier():    true,
 		AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	// Until now all disabled keys were just filtered out, but target keys can be explicitly disabled and
+	// the state needs to be returned rather than filtering them out.
+	if joinFilter != JoinFilterTarget {
+		eq[AuthNKeyColumnEnabled.identifier()] = true
 	}
 
 	stmt, args, err := query.Where(eq).ToSql()
@@ -347,6 +358,9 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 		AuthNKeyColumnExpiration.identifier(),
 		AuthNKeyColumnType.identifier(),
 		AuthNKeyColumnObjectID.identifier(),
+		AuthNKeyColumnEnabled.identifier(),
+		AuthNKeyColumnPublicKey.identifier(),
+		AuthNKeyColumnFingerprint.identifier(),
 		countColumn.identifier(),
 	).From(authNKeyTable.identifier()).
 		PlaceholderFormat(sq.Dollar)
@@ -355,6 +369,7 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 		authNKeys := make([]*AuthNKey, 0)
 		var count uint64
 		for rows.Next() {
+			var fingerprint sql.NullString
 			authNKey := new(AuthNKey)
 			err := rows.Scan(
 				&authNKey.ID,
@@ -366,10 +381,16 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 				&authNKey.Expiration,
 				&authNKey.Type,
 				&authNKey.ApplicationID,
+				&authNKey.Enabled,
+				&authNKey.PublicKey,
+				&fingerprint,
 				&count,
 			)
 			if err != nil {
 				return nil, err
+			}
+			if fingerprint.Valid {
+				authNKey.Fingerprint = fingerprint.String
 			}
 			authNKeys = append(authNKeys, authNKey)
 		}

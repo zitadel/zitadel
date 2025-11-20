@@ -59,18 +59,16 @@ func (s *Server) ListTargets(ctx context.Context, req *connect.Request[action.Li
 }
 
 func (s *Server) ListPublicKeys(ctx context.Context, req *connect.Request[action.ListPublicKeysRequest]) (*connect.Response[action.ListPublicKeysResponse], error) {
-	res, err := s.query.SearchAuthNKeys(ctx, &query.AuthNKeySearchQueries{}, query.JoinFilterTarget, nil)
+	queries, err := listPublicKeysRequestToQuery(req.Msg)
 	if err != nil {
 		return nil, err
 	}
-	publicKeys := make([]*action.PublicKey, len(res.AuthNKeys))
-	for i, key := range res.AuthNKeys {
-		publicKeys[i] = &action.PublicKey{
-			KeyId: key.ID,
-		}
+	res, err := s.query.SearchAuthNKeys(ctx, queries, query.JoinFilterTarget, nil)
+	if err != nil {
+		return nil, err
 	}
 	return connect.NewResponse(&action.ListPublicKeysResponse{
-		PublicKeys: publicKeys,
+		PublicKeys: publicKeysToPb(res.AuthNKeys),
 	}), nil
 }
 
@@ -434,4 +432,32 @@ func includeEventToCondition(id string) *action.Condition {
 
 func includeFunctionToCondition(id string) *action.Condition {
 	return &action.Condition{ConditionType: &action.Condition_Function{Function: &action.FunctionExecution{Name: strings.TrimPrefix(id, "/")}}}
+}
+
+func listPublicKeysRequestToQuery(req *action.ListPublicKeysRequest) (*query.AuthNKeySearchQueries, error) {
+	targetQuery, err := query.NewAuthNKeyIdentifyerQuery(req.GetTargetId())
+	if err != nil {
+		return nil, err
+	}
+	return &query.AuthNKeySearchQueries{Queries: []query.SearchQuery{targetQuery}}, nil
+}
+
+func publicKeysToPb(keys []*query.AuthNKey) []*action.PublicKey {
+	pks := make([]*action.PublicKey, len(keys))
+	for i, key := range keys {
+		var expiration *timestamppb.Timestamp
+		if !key.Expiration.IsZero() {
+			expiration = timestamppb.New(key.Expiration)
+		}
+		pks[i] = &action.PublicKey{
+			KeyId:          key.ID,
+			Active:         key.Enabled,
+			PublicKey:      key.PublicKey,
+			Fingerprint:    key.Fingerprint,
+			ExpirationDate: expiration,
+			CreationDate:   timestamppb.New(key.CreationDate),
+			ChangeDate:     timestamppb.New(key.ChangeDate),
+		}
+	}
+	return pks
 }
