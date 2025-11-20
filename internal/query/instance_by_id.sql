@@ -27,6 +27,7 @@ with features as (
 			'timeout', t.timeout,
 			'interrupt_on_error', t.interrupt_on_error,
 			'signing_key', t.signing_key,
+            'payload_type', t.payload_type,
             'encryption_key', encode(k.public_key, 'base64'),
             'encryption_key_id', k.id
 		) as execution_targets

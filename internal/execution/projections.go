@@ -16,9 +16,10 @@ func Register(
 	workerConfig WorkerConfig,
 	queue *queue.Queue,
 	targetEncAlg crypto.EncryptionAlgorithm,
+	activeSigningKey GetActiveSigningWebKey,
 ) {
 	queue.ShouldStart()
-	queue.AddWorkers(NewWorker(workerConfig, targetEncAlg))
+	queue.AddWorkers(NewWorker(workerConfig, targetEncAlg, activeSigningKey))
 }
 
 func Start(ctx context.Context) {

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"crypto/ecdsa"
-	"crypto/ed25519"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/json"
@@ -18,6 +17,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	zhttp "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/api/oidc/sign"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
@@ -33,9 +33,7 @@ type ContextInfo interface {
 	SetHTTPResponseBody([]byte) error
 }
 
-type SigningKey interface {
-	GetActiveSigningWebKey(ctx context.Context) (webKey *jose.JSONWebKey, err error)
-}
+type GetActiveSigningWebKey func(ctx context.Context) (*jose.JSONWebKey, error)
 
 // CallTargets call a list of targets in order with handling of error and responses
 func CallTargets(
@@ -43,14 +41,17 @@ func CallTargets(
 	targets []target_domain.Target,
 	info ContextInfo,
 	alg crypto.EncryptionAlgorithm,
-	signingKey SigningKey,
+	activeSigningKey GetActiveSigningWebKey,
 ) (_ interface{}, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	// to ens
+	signerOnce := sign.GetSignerOnce(activeSigningKey)
+
 	for _, target := range targets {
 		// call the type of target
-		resp, err := CallTarget(ctx, target, info, alg, signingKey)
+		resp, err := CallTarget(ctx, target, info, alg, signerOnce)
 		// handle error if interrupt is set
 		if err != nil && target.IsInterruptOnError() {
 			return nil, err
@@ -75,7 +76,7 @@ func CallTarget(
 	target target_domain.Target,
 	info ContextInfoRequest,
 	alg crypto.EncryptionAlgorithm,
-	getKey SigningKey,
+	signerOnce sign.SignerFunc,
 ) (res []byte, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -84,42 +85,9 @@ func CallTarget(
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "EXEC-thiiCh5b", "Errors.Internal")
 	}
-	body := info.GetHTTPRequestBody()
-	if len(target.GetEncryptionKey()) > 0 {
-		block, _ := pem.Decode(target.GetEncryptionKey())
-		if block == nil {
-			return nil, zerrors.ThrowInternal(nil, "EXEC-3n8fhs7g", "Errors.Execution.InvalidPublicKey")
-		}
-		publicKey, err := x509.ParsePKIXPublicKey(block.Bytes)
-		if err != nil {
-			return nil, err
-		}
-		var alg jose.KeyAlgorithm
-		switch publicKey.(type) {
-		case *rsa.PublicKey:
-			alg = jose.RSA_OAEP_256
-		case *ecdsa.PublicKey:
-			alg = jose.ECDH_ES_A256KW
-		case ed25519.PublicKey:
-			alg = jose.DIRECT
-		}
-		encrypter, err := jose.NewEncrypter(jose.A256GCM, jose.Recipient{
-			Algorithm: alg,
-			Key:       publicKey,
-			KeyID:     target.GetEncryptionKeyID(),
-		}, nil)
-		webKey, _ := getKey.GetActiveSigningWebKey(ctx)
-		s, _ := jose.NewSigner(jose.SigningKey{
-			Algorithm: jose.RS256,
-			Key:       webKey,
-		}, nil)
-		sig, _ := s.Sign(body)
-		data, _ := sig.CompactSerialize()
-		enc, _ := encrypter.Encrypt([]byte(data))
-		crypted, _ := enc.CompactSerialize()
-		body = []byte(crypted)
-		//_ = encrypter
-		_ = err
+	body, err := payload(ctx, info.GetHTTPRequestBody(), target, signerOnce)
+	if err != nil {
+		return nil, err
 	}
 
 	switch target.GetTargetType() {
@@ -138,6 +106,93 @@ func CallTarget(
 		return nil, nil
 	default:
 		return nil, zerrors.ThrowInternal(nil, "EXEC-auqnansr2m", "Errors.Execution.Unknown")
+	}
+}
+
+func payload(ctx context.Context, payload []byte, target target_domain.Target, signerOnce sign.SignerFunc) ([]byte, error) {
+	switch target.GetPayloadType() {
+	case target_domain.PayloadTypeUnspecified:
+		return payload, nil
+	case target_domain.PayloadTypeJSON:
+		return payload, nil
+	case target_domain.PayloadTypeJWT:
+		return payloadJWT(ctx, payload, signerOnce)
+	case target_domain.PayloadTypeJWE:
+		return payloadJWE(ctx, payload, target, signerOnce)
+	default:
+		return payload, nil
+	}
+}
+
+func payloadJWT(ctx context.Context, payload []byte, signerOnce sign.SignerFunc) ([]byte, error) {
+	signer, _, err := signerOnce(ctx)
+	if err != nil {
+		return nil, err
+	}
+	sig, err := signer.Sign(payload)
+	if err != nil {
+		return nil, err
+	}
+	data, err := sig.CompactSerialize()
+	if err != nil {
+		return nil, err
+	}
+	return []byte(data), nil
+}
+
+func payloadJWE(ctx context.Context, payload []byte, target target_domain.Target, signerOnce sign.SignerFunc) ([]byte, error) {
+	payload, err := payloadJWT(ctx, payload, signerOnce)
+	if err != nil {
+		return nil, err
+	}
+	publicKey, algorithm, err := publicKeyFromBytes(target.GetEncryptionKey())
+	if err != nil {
+		return nil, err
+	}
+
+	opts := (&jose.EncrypterOptions{}).WithContentType("JWT")
+	encrypter, err := jose.NewEncrypter(
+		jose.A256GCM,
+		jose.Recipient{
+			Algorithm: algorithm,
+			Key:       publicKey,
+			KeyID:     target.GetEncryptionKeyID(),
+		},
+		opts,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	enc, err := encrypter.Encrypt(payload)
+	if err != nil {
+		return nil, err
+	}
+	crypted, err := enc.CompactSerialize()
+	if err != nil {
+		return nil, err
+	}
+	return []byte(crypted), nil
+}
+
+func publicKeyFromBytes(data []byte) (any, jose.KeyAlgorithm, error) {
+	block, _ := pem.Decode(data)
+	if block == nil {
+		return nil, "", zerrors.ThrowInternal(nil, "EXEC-3n8fhs7g", "Errors.Execution.InvalidPublicKey")
+	}
+	publicKey, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		return nil, "", err
+	}
+	switch pk := publicKey.(type) {
+	case *rsa.PublicKey:
+		return pk, jose.RSA_OAEP_256, nil
+	case *ecdsa.PublicKey:
+		return pk, jose.ECDH_ES_A256KW, nil
+	//case ed25519.PublicKey:
+	//	alg = jose.DIRECT
+	default:
+		return nil, "", zerrors.ThrowInternal(nil, "EXEC-NKJe2", "Errors.Execution.InvalidPublicKey")
 	}
 }
 

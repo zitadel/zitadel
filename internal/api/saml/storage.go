@@ -401,7 +401,7 @@ func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, use
 		UserGrants: userGrants.UserGrants,
 	}
 
-	resp, err := execution.CallTargets(ctx, executionTargets, info, p.targetEncAlg, p.query)
+	resp, err := execution.CallTargets(ctx, executionTargets, info, p.targetEncAlg, p.query.GetActiveSigningWebKey)
 	if err != nil {
 		return nil, err
 	}

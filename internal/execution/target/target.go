@@ -14,6 +14,15 @@ const (
 	TargetTypeAsync
 )
 
+type PayloadType uint
+
+const (
+	PayloadTypeUnspecified PayloadType = iota
+	PayloadTypeJSON
+	PayloadTypeJWT
+	PayloadTypeJWE
+)
+
 type Target struct {
 	ExecutionID      string              `json:"execution_id,omitempty"`
 	TargetID         string              `json:"target_id,omitempty"`
@@ -22,6 +31,7 @@ type Target struct {
 	Timeout          time.Duration       `json:"timeout,omitempty"`
 	InterruptOnError bool                `json:"interrupt_on_error,omitempty"`
 	SigningKey       *crypto.CryptoValue `json:"signing_key,omitempty"`
+	PayloadType      PayloadType         `json:"payload_type,omitempty"`
 	EncryptionKey    []byte              `json:"encryption_key,omitempty"`
 	EncryptionKeyID  string              `json:"encryption_key_id,omitempty"`
 }
@@ -49,6 +59,9 @@ func (e *Target) GetSigningKey(alg crypto.EncryptionAlgorithm) (string, error) {
 		return "", nil
 	}
 	return crypto.DecryptString(e.SigningKey, alg)
+}
+func (e *Target) GetPayloadType() PayloadType {
+	return e.PayloadType
 }
 func (e *Target) GetEncryptionKey() []byte {
 	return e.EncryptionKey

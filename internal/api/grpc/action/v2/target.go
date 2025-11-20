@@ -131,6 +131,22 @@ func createTargetToCommand(req *action.CreateTargetRequest) *command.AddTarget {
 		Endpoint:         req.GetEndpoint(),
 		Timeout:          req.GetTimeout().AsDuration(),
 		InterruptOnError: interruptOnError,
+		PayloadType:      payloadTypeToDomain(req.GetPayloadType()),
+	}
+}
+
+func payloadTypeToDomain(payloadType action.PayloadType) target_domain.PayloadType {
+	switch payloadType {
+	case action.PayloadType_PAYLOAD_TYPE_UNSPECIFIED:
+		return target_domain.PayloadTypeUnspecified
+	case action.PayloadType_PAYLOAD_TYPE_JSON:
+		return target_domain.PayloadTypeJSON
+	case action.PayloadType_PAYLOAD_TYPE_JWT:
+		return target_domain.PayloadTypeJWT
+	case action.PayloadType_PAYLOAD_TYPE_JWE:
+		return target_domain.PayloadTypeJWE
+	default:
+		return target_domain.PayloadTypeUnspecified
 	}
 }
 
@@ -148,6 +164,7 @@ func updateTargetToCommand(req *action.UpdateTargetRequest) *command.ChangeTarge
 		Name:                 req.Name,
 		Endpoint:             req.Endpoint,
 		ExpirationSigningKey: expirationSigningKey,
+		PayloadType:          payloadTypeToDomain(req.GetPayloadType()),
 	}
 	if req.TargetType != nil {
 		switch t := req.GetTargetType().(type) {

@@ -1110,14 +1110,15 @@ func (i *Instance) DeleteProjectGrantMembership(t *testing.T, ctx context.Contex
 	require.NoError(t, err)
 }
 
-func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoint string, ty target_domain.TargetType, interrupt bool) *action.CreateTargetResponse {
+func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoint string, ty target_domain.TargetType, interrupt bool, payloadType action.PayloadType) *action.CreateTargetResponse {
 	if name == "" {
 		name = TargetName()
 	}
 	req := &action.CreateTargetRequest{
-		Name:     name,
-		Endpoint: endpoint,
-		Timeout:  durationpb.New(5 * time.Second),
+		Name:        name,
+		Endpoint:    endpoint,
+		Timeout:     durationpb.New(5 * time.Second),
+		PayloadType: payloadType,
 	}
 	switch ty {
 	case target_domain.TargetTypeWebhook:

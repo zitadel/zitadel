@@ -99,11 +99,12 @@ func targetsToPb(targets []*query.Target) []*action.Target {
 
 func targetToPb(t *query.Target) *action.Target {
 	target := &action.Target{
-		Id:         t.ID,
-		Name:       t.Name,
-		Timeout:    durationpb.New(t.Timeout),
-		Endpoint:   t.Endpoint,
-		SigningKey: t.SigningKey,
+		Id:          t.ID,
+		Name:        t.Name,
+		Timeout:     durationpb.New(t.Timeout),
+		Endpoint:    t.Endpoint,
+		SigningKey:  t.SigningKey,
+		PayloadType: payloadTypeToPb(t.PayloadType),
 	}
 	switch t.TargetType {
 	case target_domain.TargetTypeWebhook:
@@ -123,6 +124,21 @@ func targetToPb(t *query.Target) *action.Target {
 		target.CreationDate = timestamppb.New(t.CreationDate)
 	}
 	return target
+}
+
+func payloadTypeToPb(payloadType target_domain.PayloadType) action.PayloadType {
+	switch payloadType {
+	case target_domain.PayloadTypeUnspecified:
+		return action.PayloadType_PAYLOAD_TYPE_UNSPECIFIED
+	case target_domain.PayloadTypeJSON:
+		return action.PayloadType_PAYLOAD_TYPE_JSON
+	case target_domain.PayloadTypeJWT:
+		return action.PayloadType_PAYLOAD_TYPE_JWT
+	case target_domain.PayloadTypeJWE:
+		return action.PayloadType_PAYLOAD_TYPE_JWE
+	default:
+		return action.PayloadType_PAYLOAD_TYPE_UNSPECIFIED
+	}
 }
 
 func (s *Server) ListTargetsRequestToModel(req *action.ListTargetsRequest) (*query.TargetSearchQueries, error) {

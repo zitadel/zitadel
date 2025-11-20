@@ -200,7 +200,7 @@ func (a *API) registerConnectServer(service server.ConnectServer) {
 		connect_middleware.AuthorizationInterceptor(a.verifier, a.systemAuthZ, a.authConfig),
 		connect_middleware.TranslationHandler(),
 		connect_middleware.QuotaExhaustedInterceptor(a.accessInterceptor.AccessService(), system_pb.SystemService_ServiceDesc.ServiceName),
-		connect_middleware.ExecutionHandler(a.targetEncryptionAlgorithm, a.queries),
+		connect_middleware.ExecutionHandler(a.targetEncryptionAlgorithm, a.queries.GetActiveSigningWebKey),
 		connect_middleware.ValidationHandler(),
 		connect_middleware.ServiceHandler(),
 		connect_middleware.ActivityInterceptor(),

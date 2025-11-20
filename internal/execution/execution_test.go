@@ -319,10 +319,11 @@ func Test_CallTarget(t *testing.T) {
 
 func Test_CallTargets(t *testing.T) {
 	type args struct {
-		ctx     context.Context
-		info    *middleware.ContextInfoRequest
-		servers []*callTestServer
-		targets []target_domain.Target
+		ctx                    context.Context
+		info                   *middleware.ContextInfoRequest
+		servers                []*callTestServer
+		targets                []target_domain.Target
+		getActiveSigningWebKey execution.GetActiveSigningWebKey
 	}
 	type res struct {
 		ret     interface{}
@@ -445,7 +446,7 @@ func Test_CallTargets(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			respBody, err := testServers(t,
 				tt.args.servers,
-				testCallTargets(tt.args.ctx, tt.args.info, tt.args.targets, crypto.CreateMockEncryptionAlg(gomock.NewController(t))),
+				testCallTargets(tt.args.ctx, tt.args.info, tt.args.targets, crypto.CreateMockEncryptionAlg(gomock.NewController(t)), tt.args.getActiveSigningWebKey),
 			)
 			if tt.res.wantErr {
 				assert.Error(t, err)
@@ -537,7 +538,7 @@ func testCallTarget(ctx context.Context,
 ) func(string) ([]byte, error) {
 	return func(url string) (r []byte, err error) {
 		target.Endpoint = url
-		return execution.CallTarget(ctx, target, info, alg)
+		return execution.CallTarget(ctx, target, info, alg, nil)
 	}
 }
 
@@ -545,6 +546,7 @@ func testCallTargets(ctx context.Context,
 	info *middleware.ContextInfoRequest,
 	target []target_domain.Target,
 	alg crypto.EncryptionAlgorithm,
+	activeSigningKey execution.GetActiveSigningWebKey,
 ) func([]string) (interface{}, error) {
 	return func(urls []string) (interface{}, error) {
 		targets := make([]target_domain.Target, len(target))
@@ -552,7 +554,7 @@ func testCallTargets(ctx context.Context,
 			t.Endpoint = urls[i]
 			targets[i] = t
 		}
-		return execution.CallTargets(ctx, targets, info, alg)
+		return execution.CallTargets(ctx, targets, info, alg, activeSigningKey)
 	}
 }
 
