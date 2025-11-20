@@ -313,7 +313,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
       this.newOrganizationService.organizationByIdQueryOptions(grant.grantedOrgId),
     );
     if (org) {
-      this.newOrganizationService.setOrgId(grant.grantedOrgId);
+      await this.authService.getActiveOrg(grant.grantedOrgId);
       await this.router.navigate(['/users', grant.userId]);
     } else {
       this.toast.showInfo('GRANTS.TOAST.CANTSHOWINFO', true);
