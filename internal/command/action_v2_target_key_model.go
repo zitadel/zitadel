@@ -1,6 +1,8 @@
 package command
 
 import (
+	"time"
+
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/target"
 )
@@ -9,9 +11,10 @@ type TargetKeyWriteModel struct {
 	eventstore.WriteModel
 	KeyID string
 
-	KeyExists    bool
-	TargetExists bool
-	Active       bool
+	KeyExists      bool
+	TargetExists   bool
+	Active         bool
+	ExpirationDate time.Time
 }
 
 func NewTargetKeyWriteModel(targetID, keyID string, resourceOwner string) *TargetKeyWriteModel {
@@ -53,6 +56,7 @@ func (wm *TargetKeyWriteModel) Reduce() error {
 		case *target.KeyAddedEvent:
 			wm.KeyID = e.KeyID
 			wm.KeyExists = true
+			wm.ExpirationDate = e.ExpirationDate
 		case *target.KeyActivatedEvent:
 			wm.Active = wm.KeyID == e.KeyID
 		case *target.KeyDeactivatedEvent:

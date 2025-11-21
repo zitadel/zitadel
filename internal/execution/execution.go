@@ -46,12 +46,14 @@ func CallTargets(
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	// to ens
+	// We make sure the signer and its key are only fetched once per CallTargets call.
 	signerOnce := sign.GetSignerOnce(activeSigningKey)
+	// Create a map to cache encrypters by key ID to avoid recreating them for each target.
+	encrypters := make(map[string]jose.Encrypter, len(targets))
 
 	for _, target := range targets {
 		// call the type of target
-		resp, err := CallTarget(ctx, target, info, alg, signerOnce)
+		resp, err := CallTarget(ctx, target, info, alg, signerOnce, encrypters)
 		// handle error if interrupt is set
 		if err != nil && target.IsInterruptOnError() {
 			return nil, err
@@ -77,6 +79,7 @@ func CallTarget(
 	info ContextInfoRequest,
 	alg crypto.EncryptionAlgorithm,
 	signerOnce sign.SignerFunc,
+	encrypters map[string]jose.Encrypter,
 ) (res []byte, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -85,7 +88,7 @@ func CallTarget(
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "EXEC-thiiCh5b", "Errors.Internal")
 	}
-	body, err := payload(ctx, info.GetHTTPRequestBody(), target, signerOnce)
+	body, err := payload(ctx, info.GetHTTPRequestBody(), target, signerOnce, encrypters)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +112,7 @@ func CallTarget(
 	}
 }
 
-func payload(ctx context.Context, payload []byte, target target_domain.Target, signerOnce sign.SignerFunc) ([]byte, error) {
+func payload(ctx context.Context, payload []byte, target target_domain.Target, signerOnce sign.SignerFunc, encrypters map[string]jose.Encrypter) ([]byte, error) {
 	switch target.GetPayloadType() {
 	case target_domain.PayloadTypeUnspecified:
 		return payload, nil
@@ -118,7 +121,7 @@ func payload(ctx context.Context, payload []byte, target target_domain.Target, s
 	case target_domain.PayloadTypeJWT:
 		return payloadJWT(ctx, payload, signerOnce)
 	case target_domain.PayloadTypeJWE:
-		return payloadJWE(ctx, payload, target, signerOnce)
+		return payloadJWE(ctx, payload, target, signerOnce, encrypters)
 	default:
 		return payload, nil
 	}
@@ -140,17 +143,19 @@ func payloadJWT(ctx context.Context, payload []byte, signerOnce sign.SignerFunc)
 	return []byte(data), nil
 }
 
-func payloadJWE(ctx context.Context, payload []byte, target target_domain.Target, signerOnce sign.SignerFunc) ([]byte, error) {
-	payload, err := payloadJWT(ctx, payload, signerOnce)
-	if err != nil {
-		return nil, err
+func loadEncrypter(target target_domain.Target, encrypters map[string]jose.Encrypter) (jose.Encrypter, error) {
+	if encrypter, ok := encrypters[target.GetEncryptionKeyID()]; ok {
+		return encrypter, nil
 	}
-	publicKey, algorithm, err := publicKeyFromBytes(target.GetEncryptionKey())
+	encryptionKey := target.GetEncryptionKey()
+	if len(encryptionKey) == 0 {
+		return nil, zerrors.ThrowInternal(nil, "EXEC-2n8fhs7g", "Errors.Execution.MissingEncryptionKey")
+	}
+	publicKey, algorithm, err := publicKeyFromBytes(encryptionKey)
 	if err != nil {
 		return nil, err
 	}
 
-	opts := (&jose.EncrypterOptions{}).WithContentType("JWT")
 	encrypter, err := jose.NewEncrypter(
 		jose.A256GCM,
 		jose.Recipient{
@@ -158,8 +163,23 @@ func payloadJWE(ctx context.Context, payload []byte, target target_domain.Target
 			Key:       publicKey,
 			KeyID:     target.GetEncryptionKeyID(),
 		},
-		opts,
+		(&jose.EncrypterOptions{}).
+			WithType("JWT").
+			WithContentType("JWT"),
 	)
+	if err != nil {
+		return nil, err
+	}
+	encrypters[target.GetEncryptionKeyID()] = encrypter
+	return encrypter, nil
+}
+
+func payloadJWE(ctx context.Context, payload []byte, target target_domain.Target, signerOnce sign.SignerFunc, encrypters map[string]jose.Encrypter) ([]byte, error) {
+	payload, err := payloadJWT(ctx, payload, signerOnce)
+	if err != nil {
+		return nil, err
+	}
+	encrypter, err := loadEncrypter(target, encrypters)
 	if err != nil {
 		return nil, err
 	}
@@ -189,8 +209,6 @@ func publicKeyFromBytes(data []byte) (any, jose.KeyAlgorithm, error) {
 		return pk, jose.RSA_OAEP_256, nil
 	case *ecdsa.PublicKey:
 		return pk, jose.ECDH_ES_A256KW, nil
-	//case ed25519.PublicKey:
-	//	alg = jose.DIRECT
 	default:
 		return nil, "", zerrors.ThrowInternal(nil, "EXEC-NKJe2", "Errors.Execution.InvalidPublicKey")
 	}

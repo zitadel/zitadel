@@ -403,13 +403,13 @@ service ActionService {
       responses: {
         key: "200";
         value: {
-          description: "Public key activated successfully";
+          description: "Public key deactivated successfully";
         };
       };
       responses: {
         key: "404"
         value: {
-          description: "The key to activate does not exist.";
+          description: "The key to deactivate does not exist.";
         }
       };
     };
@@ -421,6 +421,7 @@ service ActionService {
   // Removes the public key from the target. This is a permanent action and can not be undone.
   // Note that you can only remove inactive keys. Attempting to remove an active key will result in an error.
   // For break glass scenarios, deactivate the key first and then remove it.
+  // Removing a non-existing key is a no-op.
   //
   // Required permission:
   //   - `action.target.write`

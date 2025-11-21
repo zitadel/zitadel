@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/repository/target"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -33,31 +32,30 @@ type TargetPublicKey struct {
 	KeyID string
 }
 
-func (c *Commands) AddTargetPublicKey(ctx context.Context, key *TargetPublicKey, resourceOwner string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) AddTargetPublicKey(ctx context.Context, key *TargetPublicKey, resourceOwner string) (_ time.Time, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if key.TargetID == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, ErrTargetIDMissing, "Errors.IDMissing")
+		return time.Time{}, zerrors.ThrowInvalidArgument(nil, ErrTargetIDMissing, "Errors.IDMissing")
 	}
 	if !key.Expiration.IsZero() && key.Expiration.Before(time.Now()) {
-		return nil, zerrors.ThrowInvalidArgument(nil, ErrExpirationDateBeforeNow, "Errors.Target.InvalidExpirationDate")
+		return time.Time{}, zerrors.ThrowInvalidArgument(nil, ErrExpirationDateBeforeNow, "Errors.Target.InvalidExpirationDate")
 	}
 	fingerprint, err := checkPublicKeyAndComputeFingerprint(key.PublicKey)
 	if err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
-	id, err := c.idGenerator.Next()
-	if err != nil {
-		return nil, err
-	}
-	key.KeyID = id
 	writeModel, err := c.getTargetKeyWriteModelByID(ctx, key.TargetID, key.KeyID, resourceOwner)
 	if err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
 	if !writeModel.TargetExists {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-nd3fsd", "Errors.Target.NotFound")
+		return time.Time{}, zerrors.ThrowPreconditionFailed(nil, "COMMAND-nd3fsd", "Errors.Target.NotFound")
+	}
+	key.KeyID, err = c.idGenerator.Next()
+	if err != nil {
+		return time.Time{}, err
 	}
 	err = c.pushAppendAndReduce(ctx, writeModel, target.NewKeyAddedEvent(
 		ctx,
@@ -68,27 +66,30 @@ func (c *Commands) AddTargetPublicKey(ctx context.Context, key *TargetPublicKey,
 		key.Expiration,
 	))
 	if err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
-	return writeModelToObjectDetails(&writeModel.WriteModel), nil
+	return writeModel.WriteModel.ChangeDate, nil
 }
 
-func (c *Commands) ActivateTargetPublicKey(ctx context.Context, targetID, keyID, resourceOwner string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) ActivateTargetPublicKey(ctx context.Context, targetID, keyID, resourceOwner string) (_ time.Time, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if targetID == "" || keyID == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, ErrTargetIDMissing, "Errors.IDMissing")
+		return time.Time{}, zerrors.ThrowInvalidArgument(nil, ErrTargetIDMissing, "Errors.IDMissing")
 	}
 	writeModel, err := c.getTargetKeyWriteModelByID(ctx, targetID, keyID, resourceOwner)
 	if err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
-	if !writeModel.TargetExists {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-SAF4g", "Errors.Target.NotFound")
+	if !writeModel.TargetExists || !writeModel.KeyExists {
+		return time.Time{}, zerrors.ThrowPreconditionFailed(nil, "COMMAND-SAF4g", "Errors.Target.NotFound")
+	}
+	if !writeModel.ExpirationDate.IsZero() && writeModel.ExpirationDate.Before(time.Now()) {
+		return time.Time{}, zerrors.ThrowPreconditionFailed(nil, "COMMAND-SAF4g", "Errors.Target.PublicKeyExpired")
 	}
 	if writeModel.Active {
-		return writeModelToObjectDetails(&writeModel.WriteModel), nil
+		return writeModel.WriteModel.ChangeDate, nil
 	}
 	err = c.pushAppendAndReduce(ctx, writeModel, target.NewKeyActivatedEvent(
 		ctx,
@@ -96,27 +97,27 @@ func (c *Commands) ActivateTargetPublicKey(ctx context.Context, targetID, keyID,
 		keyID,
 	))
 	if err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
-	return writeModelToObjectDetails(&writeModel.WriteModel), nil
+	return writeModel.WriteModel.ChangeDate, nil
 }
 
-func (c *Commands) DeactivateTargetPublicKey(ctx context.Context, targetID, keyID, resourceOwner string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) DeactivateTargetPublicKey(ctx context.Context, targetID, keyID, resourceOwner string) (_ time.Time, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if targetID == "" || keyID == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, ErrTargetIDMissing, "Errors.IDMissing")
+		return time.Time{}, zerrors.ThrowInvalidArgument(nil, ErrTargetIDMissing, "Errors.IDMissing")
 	}
 	writeModel, err := c.getTargetKeyWriteModelByID(ctx, targetID, keyID, resourceOwner)
 	if err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
-	if !writeModel.TargetExists {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-SAF4g", "Errors.Target.NotFound")
+	if !writeModel.TargetExists || !writeModel.KeyExists {
+		return time.Time{}, zerrors.ThrowPreconditionFailed(nil, "COMMAND-SAF4g", "Errors.Target.NotFound")
 	}
 	if !writeModel.Active {
-		return writeModelToObjectDetails(&writeModel.WriteModel), nil
+		return writeModel.WriteModel.ChangeDate, nil
 	}
 	err = c.pushAppendAndReduce(ctx, writeModel, target.NewKeyDeactivatedEvent(
 		ctx,
@@ -124,27 +125,27 @@ func (c *Commands) DeactivateTargetPublicKey(ctx context.Context, targetID, keyI
 		keyID,
 	))
 	if err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
-	return writeModelToObjectDetails(&writeModel.WriteModel), nil
+	return writeModel.WriteModel.ChangeDate, nil
 }
 
-func (c *Commands) RemoveTargetPublicKey(ctx context.Context, targetID, keyID, resourceOwner string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) RemoveTargetPublicKey(ctx context.Context, targetID, keyID, resourceOwner string) (_ time.Time, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if targetID == "" || keyID == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, ErrTargetIDMissing, "Errors.IDMissing")
+		return time.Time{}, zerrors.ThrowInvalidArgument(nil, ErrTargetIDMissing, "Errors.IDMissing")
 	}
 	writeModel, err := c.getTargetKeyWriteModelByID(ctx, targetID, keyID, resourceOwner)
 	if err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
 	if !writeModel.TargetExists || !writeModel.KeyExists {
-		return writeModelToObjectDetails(&writeModel.WriteModel), nil
+		return writeModel.WriteModel.ChangeDate, nil
 	}
 	if writeModel.Active {
-		return nil, zerrors.ThrowPreconditionFailed(nil, ErrPublicKeyDeleteActiveKey, "Errors.Target.PublicKeyActive")
+		return time.Time{}, zerrors.ThrowPreconditionFailed(nil, ErrPublicKeyDeleteActiveKey, "Errors.Target.PublicKeyActive")
 	}
 	err = c.pushAppendAndReduce(ctx, writeModel, target.NewKeyRemovedEvent(
 		ctx,
@@ -152,14 +153,14 @@ func (c *Commands) RemoveTargetPublicKey(ctx context.Context, targetID, keyID, r
 		keyID,
 	))
 	if err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
-	return writeModelToObjectDetails(&writeModel.WriteModel), nil
+	return writeModel.WriteModel.ChangeDate, nil
 }
 
 func checkPublicKeyAndComputeFingerprint(key []byte) (string, error) {
 	block, _ := pem.Decode(key)
-	if block == nil || block.Type != "PUBLIC KEY" {
+	if block == nil {
 		return "", zerrors.ThrowInvalidArgument(nil, ErrPublicKeyFormat, "Errors.Target.InvalidPublicKey")
 	}
 	pub, err := x509.ParsePKIXPublicKey(block.Bytes)

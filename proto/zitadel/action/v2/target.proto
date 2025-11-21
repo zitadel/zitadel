@@ -144,13 +144,17 @@ message PublicKey {
 
   // Fingerprint is the fingerprint of the public key. It's prefixed with the hashing algorithm used
   // and base64 encoded without padding, e.g. `SHA256:STqK+Sd4qgdu+UjiwI8NBjOD6P7UqQ42EZYIdySEyTw`.
+  // The fingerprint can be used to easily compare the public key with other sources.
   string fingerprint = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"SHA256:STqK+Sd4qgdu+UjiwI8NBjOD6P7UqQ42EZYIdySEyTw\"";
     }
   ];
 
-  // ExpirationDate is the timestamp when the public key automatically expires and no longer will be used for payload encryption.
+  // ExpirationDate is the timestamp when the public key automatically expires and
+  // no longer will be used for payload encryption, even when active.
+  // Be sure to upload and activate a new public key before the expiration date
+  // to avoid failed executions.
   google.protobuf.Timestamp expiration_date = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2024-12-18T07:50:47.492Z\"";

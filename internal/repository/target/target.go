@@ -4,119 +4,180 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 )
 
 const (
-	keyEventTypePrefix      eventstore.EventType = "target.key."
-	KeyAddedEventType                            = keyEventTypePrefix + "added"
-	KeyActivatedEventType                        = keyEventTypePrefix + "activated"
-	KeyDeactivatedEventType                      = keyEventTypePrefix + "deactivated"
-	KeyRemovedEventType                          = keyEventTypePrefix + "removed"
+	eventTypePrefix  eventstore.EventType = "target."
+	AddedEventType                        = eventTypePrefix + "added"
+	ChangedEventType                      = eventTypePrefix + "changed"
+	RemovedEventType                      = eventTypePrefix + "removed"
 )
 
-type KeyAddedEvent struct {
+type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	KeyID          string    `json:"keyId,omitempty"`
-	PublicKey      []byte    `json:"publicKey,omitempty"`
-	Fingerprint    string    `json:"fingerprint,omitempty"`
-	ExpirationDate time.Time `json:"expirationDate,omitempty"`
+	Name             string                    `json:"name"`
+	TargetType       target_domain.TargetType  `json:"targetType"`
+	Endpoint         string                    `json:"endpoint"`
+	Timeout          time.Duration             `json:"timeout"`
+	InterruptOnError bool                      `json:"interruptOnError"`
+	SigningKey       *crypto.CryptoValue       `json:"signingKey"`
+	PayloadType      target_domain.PayloadType `json:"payloadType"`
 }
 
-func (e *KeyAddedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+func (e *AddedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = *b
 }
 
-func (e *KeyAddedEvent) Payload() any {
+func (e *AddedEvent) Payload() any {
 	return e
 }
 
-func (e *KeyAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
+func (e *AddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewAddUniqueConstraint(e.Name)}
 }
 
-func NewKeyAddedEvent(
+func NewAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	keyID string,
-	publicKey []byte,
-	fingerprint string,
-	expiration time.Time,
-) *KeyAddedEvent {
-	return &KeyAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx, aggregate, KeyAddedEventType,
+	name string,
+	targetType target_domain.TargetType,
+	endpoint string,
+	timeout time.Duration,
+	interruptOnError bool,
+	signingKey *crypto.CryptoValue,
+	payloadType target_domain.PayloadType,
+) *AddedEvent {
+	return &AddedEvent{
+		*eventstore.NewBaseEventForPush(
+			ctx, aggregate, AddedEventType,
 		),
-		KeyID:          keyID,
-		PublicKey:      publicKey,
-		Fingerprint:    fingerprint,
-		ExpirationDate: expiration,
+		name,
+		targetType,
+		endpoint,
+		timeout,
+		interruptOnError,
+		signingKey,
+		payloadType,
 	}
 }
 
-type KeyActivatedEvent struct {
+type ChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	KeyID string `json:"keyId,omitempty"`
+	Name             *string                   `json:"name,omitempty"`
+	TargetType       *target_domain.TargetType `json:"targetType,omitempty"`
+	Endpoint         *string                   `json:"endpoint,omitempty"`
+	Timeout          *time.Duration            `json:"timeout,omitempty"`
+	InterruptOnError *bool                     `json:"interruptOnError,omitempty"`
+	SigningKey       *crypto.CryptoValue       `json:"signingKey,omitempty"`
+	PayloadType      target_domain.PayloadType `json:"payloadType,omitempty"`
+
+	oldName string
 }
 
-func (e *KeyActivatedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+func (e *ChangedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = *b
 }
 
-func (e *KeyActivatedEvent) Payload() any {
+func (e *ChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *KeyActivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
+func (e *ChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	if e.oldName == "" {
+		return nil
+	}
+	return []*eventstore.UniqueConstraint{
+		NewRemoveUniqueConstraint(e.oldName),
+		NewAddUniqueConstraint(*e.Name),
+	}
 }
 
-func NewKeyActivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id string) *KeyActivatedEvent {
-	return &KeyActivatedEvent{*eventstore.NewBaseEventForPush(ctx, aggregate, KeyActivatedEventType), id}
+func NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	changes []Changes,
+) *ChangedEvent {
+	changeEvent := &ChangedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			ChangedEventType,
+		),
+	}
+	for _, change := range changes {
+		change(changeEvent)
+	}
+	return changeEvent
 }
 
-type KeyDeactivatedEvent struct {
+type Changes func(event *ChangedEvent)
+
+func ChangeName(oldName, name string) func(event *ChangedEvent) {
+	return func(e *ChangedEvent) {
+		e.Name = &name
+		e.oldName = oldName
+	}
+}
+
+func ChangeTargetType(targetType target_domain.TargetType) func(event *ChangedEvent) {
+	return func(e *ChangedEvent) {
+		e.TargetType = &targetType
+	}
+}
+
+func ChangeEndpoint(endpoint string) func(event *ChangedEvent) {
+	return func(e *ChangedEvent) {
+		e.Endpoint = &endpoint
+	}
+}
+
+func ChangeTimeout(timeout time.Duration) func(event *ChangedEvent) {
+	return func(e *ChangedEvent) {
+		e.Timeout = &timeout
+	}
+}
+
+func ChangeInterruptOnError(interruptOnError bool) func(event *ChangedEvent) {
+	return func(e *ChangedEvent) {
+		e.InterruptOnError = &interruptOnError
+	}
+}
+
+func ChangeSigningKey(signingKey *crypto.CryptoValue) func(event *ChangedEvent) {
+	return func(e *ChangedEvent) {
+		e.SigningKey = signingKey
+	}
+}
+
+func ChangePayloadType(payloadType target_domain.PayloadType) func(event *ChangedEvent) {
+	return func(e *ChangedEvent) {
+		e.PayloadType = payloadType
+	}
+}
+
+type RemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	KeyID string `json:"keyId,omitempty"`
+	name string
 }
 
-func (e *KeyDeactivatedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+func (e *RemovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = *b
 }
 
-func (e *KeyDeactivatedEvent) Payload() any {
+func (e *RemovedEvent) Payload() any {
 	return e
 }
 
-func (e *KeyDeactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
+func (e *RemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewRemoveUniqueConstraint(e.name)}
 }
 
-func NewKeyDeactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id string) *KeyDeactivatedEvent {
-	return &KeyDeactivatedEvent{*eventstore.NewBaseEventForPush(ctx, aggregate, KeyDeactivatedEventType), id}
-}
-
-type KeyRemovedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-
-	KeyID string `json:"keyId,omitempty"`
-}
-
-func (e *KeyRemovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
-	e.BaseEvent = *b
-}
-
-func (e *KeyRemovedEvent) Payload() any {
-	return e
-}
-
-func (e *KeyRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
-}
-
-func NewKeyRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id string) *KeyRemovedEvent {
-	return &KeyRemovedEvent{*eventstore.NewBaseEventForPush(ctx, aggregate, KeyRemovedEventType), id}
+func NewRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string) *RemovedEvent {
+	return &RemovedEvent{*eventstore.NewBaseEventForPush(ctx, aggregate, RemovedEventType), name}
 }

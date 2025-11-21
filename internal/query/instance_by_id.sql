@@ -44,7 +44,6 @@ with features as (
               and k.object_id = t.id
               and k.enabled = true
               and k.expiration > now()
-            order by k.creation_date asc
             limit 1) k on true
 		where e.instance_id = $1
 		order by et.position asc

@@ -10,7 +10,7 @@ import (
 
 var (
 	//go:embed 67.sql
-	targetAddPayloadTypeColumn string
+	targetAddPayloadTypeAndKeyFingerprintColumn string
 )
 
 type TargetAddPayloadTypeColumn struct {
@@ -18,10 +18,10 @@ type TargetAddPayloadTypeColumn struct {
 }
 
 func (mig *TargetAddPayloadTypeColumn) Execute(ctx context.Context, _ eventstore.Event) error {
-	_, err := mig.dbClient.ExecContext(ctx, targetAddPayloadTypeColumn)
+	_, err := mig.dbClient.ExecContext(ctx, targetAddPayloadTypeAndKeyFingerprintColumn)
 	return err
 }
 
 func (mig *TargetAddPayloadTypeColumn) String() string {
-	return "67_target2_add_payload_type"
+	return "67_target2_add_payload_type_authn_key2_fingerprint"
 }

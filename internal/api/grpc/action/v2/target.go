@@ -71,50 +71,46 @@ func (s *Server) AddPublicKey(ctx context.Context, req *connect.Request[action.A
 		PublicKey:  req.Msg.GetPublicKey(),
 		Expiration: req.Msg.GetExpirationDate().AsTime(),
 	}
-	details, err := s.command.AddTargetPublicKey(ctx, key, instanceID)
+	creationDate, err := s.command.AddTargetPublicKey(ctx, key, instanceID)
 	if err != nil {
 		return nil, err
 	}
 	return connect.NewResponse(&action.AddPublicKeyResponse{
 		KeyId:        key.KeyID,
-		CreationDate: timestamppb.New(details.EventDate),
+		CreationDate: timestamppb.New(creationDate),
 	}), nil
 }
 
 func (s *Server) ActivatePublicKey(ctx context.Context, req *connect.Request[action.ActivatePublicKeyRequest]) (*connect.Response[action.ActivatePublicKeyResponse], error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	details, err := s.command.ActivateTargetPublicKey(ctx, req.Msg.GetTargetId(), req.Msg.GetKeyId(), instanceID)
+	changeDate, err := s.command.ActivateTargetPublicKey(ctx, req.Msg.GetTargetId(), req.Msg.GetKeyId(), instanceID)
 	if err != nil {
 		return nil, err
 	}
 	return connect.NewResponse(&action.ActivatePublicKeyResponse{
-		ChangeDate: timestamppb.New(details.EventDate),
+		ChangeDate: timestamppb.New(changeDate),
 	}), nil
 }
 
 func (s *Server) DeactivatePublicKey(ctx context.Context, req *connect.Request[action.DeactivatePublicKeyRequest]) (*connect.Response[action.DeactivatePublicKeyResponse], error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	details, err := s.command.ActivateTargetPublicKey(ctx, req.Msg.GetTargetId(), req.Msg.GetKeyId(), instanceID)
+	changeDate, err := s.command.ActivateTargetPublicKey(ctx, req.Msg.GetTargetId(), req.Msg.GetKeyId(), instanceID)
 	if err != nil {
 		return nil, err
 	}
 	return connect.NewResponse(&action.DeactivatePublicKeyResponse{
-		ChangeDate: timestamppb.New(details.EventDate),
+		ChangeDate: timestamppb.New(changeDate),
 	}), nil
 }
 
 func (s *Server) RemovePublicKey(ctx context.Context, req *connect.Request[action.RemovePublicKeyRequest]) (*connect.Response[action.RemovePublicKeyResponse], error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	details, err := s.command.RemoveTargetPublicKey(ctx, req.Msg.GetTargetId(), req.Msg.GetKeyId(), instanceID)
+	deletionDate, err := s.command.RemoveTargetPublicKey(ctx, req.Msg.GetTargetId(), req.Msg.GetKeyId(), instanceID)
 	if err != nil {
 		return nil, err
 	}
-	var deletionDate *timestamppb.Timestamp
-	if !details.EventDate.IsZero() {
-		deletionDate = timestamppb.New(details.EventDate)
-	}
 	return connect.NewResponse(&action.RemovePublicKeyResponse{
-		DeletionDate: deletionDate,
+		DeletionDate: timestamppb.New(deletionDate),
 	}), nil
 }
 
