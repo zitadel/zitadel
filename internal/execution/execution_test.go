@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -401,11 +402,10 @@ func Test_CallTarget(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			encrypters := make(map[string]jose.Encrypter)
 			respBody, err := testServer(
 				t,
 				tt.args.server,
-				testCallTarget(tt.args.ctx, tt.args.info, tt.args.target, crypto.CreateMockEncryptionAlg(gomock.NewController(t)), tt.args.signer, encrypters),
+				testCallTarget(tt.args.ctx, tt.args.info, tt.args.target, crypto.CreateMockEncryptionAlg(gomock.NewController(t)), tt.args.signer, &sync.Map{}),
 			)
 			if tt.res.wantErr {
 				assert.Error(t, err)
@@ -611,6 +611,13 @@ type callTestServer struct {
 	statusCode  int
 	respondBody []byte
 	signingKey  string
+
+	server *http.Server
+	called bool
+}
+
+func (s *callTestServer) Called() bool {
+	return s.called
 }
 
 func testServers(
@@ -620,8 +627,8 @@ func testServers(
 ) (interface{}, error) {
 	urls := make([]string, len(c))
 	for i := range c {
-		url, close := listen(t, c[i])
-		defer close()
+		url, closeF, _ := listen(t, c[i])
+		defer closeF()
 		urls[i] = url
 	}
 	return call(urls)
@@ -632,16 +639,17 @@ func testServer(
 	c *callTestServer,
 	call func(string) ([]byte, error),
 ) ([]byte, error) {
-	url, close := listen(t, c)
-	defer close()
+	url, closeF, _ := listen(t, c)
+	defer closeF()
 	return call(url)
 }
 
 func listen(
 	t *testing.T,
 	c *callTestServer,
-) (url string, close func()) {
+) (url string, close func(), called func() bool) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
+		c.called = true
 		checkRequest(t, r, c.method, c.expectBody, c.signingKey)
 
 		if c.statusCode != http.StatusOK {
@@ -658,7 +666,7 @@ func listen(
 		}
 	}
 	server := httptest.NewServer(http.HandlerFunc(handler))
-	return server.URL, server.Close
+	return server.URL, server.Close, c.Called
 }
 
 func checkRequest(t *testing.T, sent *http.Request, method string, checkExpectedBody func(*testing.T, []byte) bool, signingKey string) {
@@ -684,7 +692,7 @@ func testCallTarget(ctx context.Context,
 	target target_domain.Target,
 	alg crypto.EncryptionAlgorithm,
 	signerOnce sign.SignerFunc,
-	encrypters map[string]jose.Encrypter,
+	encrypters *sync.Map,
 ) func(string) ([]byte, error) {
 	return func(url string) (r []byte, err error) {
 		target.Endpoint = url
@@ -693,7 +701,7 @@ func testCallTarget(ctx context.Context,
 }
 
 func testCallTargets(ctx context.Context,
-	info *middleware.ContextInfoRequest,
+	info execution.ContextInfo,
 	target []target_domain.Target,
 	alg crypto.EncryptionAlgorithm,
 	activeSigningKey execution.GetActiveSigningWebKey,

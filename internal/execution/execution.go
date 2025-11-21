@@ -10,6 +10,7 @@ import (
 	"encoding/pem"
 	"io"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/go-jose/go-jose/v4"
@@ -49,7 +50,7 @@ func CallTargets(
 	// We make sure the signer and its key are only fetched once per CallTargets call.
 	signerOnce := sign.GetSignerOnce(activeSigningKey)
 	// Create a map to cache encrypters by key ID to avoid recreating them for each target.
-	encrypters := make(map[string]jose.Encrypter, len(targets))
+	encrypters := &sync.Map{}
 
 	for _, target := range targets {
 		// call the type of target
@@ -79,7 +80,7 @@ func CallTarget(
 	info ContextInfoRequest,
 	alg crypto.EncryptionAlgorithm,
 	signerOnce sign.SignerFunc,
-	encrypters map[string]jose.Encrypter,
+	encrypters *sync.Map,
 ) (res []byte, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -112,11 +113,10 @@ func CallTarget(
 	}
 }
 
-func payload(ctx context.Context, payload []byte, target target_domain.Target, signerOnce sign.SignerFunc, encrypters map[string]jose.Encrypter) ([]byte, error) {
+func payload(ctx context.Context, payload []byte, target target_domain.Target, signerOnce sign.SignerFunc, encrypters *sync.Map) ([]byte, error) {
 	switch target.GetPayloadType() {
-	case target_domain.PayloadTypeUnspecified:
-		return payload, nil
-	case target_domain.PayloadTypeJSON:
+	case target_domain.PayloadTypeUnspecified,
+		target_domain.PayloadTypeJSON:
 		return payload, nil
 	case target_domain.PayloadTypeJWT:
 		return payloadJWT(ctx, payload, signerOnce)
@@ -143,9 +143,9 @@ func payloadJWT(ctx context.Context, payload []byte, signerOnce sign.SignerFunc)
 	return []byte(data), nil
 }
 
-func loadEncrypter(target target_domain.Target, encrypters map[string]jose.Encrypter) (jose.Encrypter, error) {
-	if encrypter, ok := encrypters[target.GetEncryptionKeyID()]; ok {
-		return encrypter, nil
+func loadEncrypter(target target_domain.Target, encrypters *sync.Map) (jose.Encrypter, error) {
+	if encrypter, ok := encrypters.Load(target.GetEncryptionKeyID()); ok {
+		return encrypter.(jose.Encrypter), nil
 	}
 	encryptionKey := target.GetEncryptionKey()
 	if len(encryptionKey) == 0 {
@@ -170,11 +170,17 @@ func loadEncrypter(target target_domain.Target, encrypters map[string]jose.Encry
 	if err != nil {
 		return nil, err
 	}
-	encrypters[target.GetEncryptionKeyID()] = encrypter
+	encrypters.Store(target.GetEncryptionKeyID(), encrypter)
 	return encrypter, nil
 }
 
-func payloadJWE(ctx context.Context, payload []byte, target target_domain.Target, signerOnce sign.SignerFunc, encrypters map[string]jose.Encrypter) ([]byte, error) {
+func payloadJWE(
+	ctx context.Context,
+	payload []byte,
+	target target_domain.Target,
+	signerOnce sign.SignerFunc,
+	encrypters *sync.Map,
+) ([]byte, error) {
 	payload, err := payloadJWT(ctx, payload, signerOnce)
 	if err != nil {
 		return nil, err

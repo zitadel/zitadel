@@ -2,6 +2,7 @@ package execution
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -19,7 +20,7 @@ func Register(
 	activeSigningKey GetActiveSigningWebKey,
 ) {
 	queue.ShouldStart()
-	queue.AddWorkers(NewWorker(workerConfig, targetEncAlg, activeSigningKey))
+	queue.AddWorkers(NewWorker(workerConfig, targetEncAlg, activeSigningKey, time.Now))
 }
 
 func Start(ctx context.Context) {

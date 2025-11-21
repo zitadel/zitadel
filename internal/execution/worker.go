@@ -18,7 +18,7 @@ type Worker struct {
 	river.WorkerDefaults[*exec_repo.Request]
 
 	config WorkerConfig
-	now    nowFunc
+	now    NowFunc
 
 	targetEncAlg     crypto.EncryptionAlgorithm
 	activeSigningKey GetActiveSigningWebKey
@@ -54,8 +54,8 @@ func (w *Worker) Work(ctx context.Context, job *river.Job[*exec_repo.Request]) e
 	return nil
 }
 
-// nowFunc makes [time.Now] mockable
-type nowFunc func() time.Time
+// NowFunc makes [time.Now] mockable
+type NowFunc func() time.Time
 
 type WorkerConfig struct {
 	Workers             uint8
@@ -67,10 +67,11 @@ func NewWorker(
 	config WorkerConfig,
 	targetEncAlg crypto.EncryptionAlgorithm,
 	activeSigningKey GetActiveSigningWebKey,
+	now NowFunc,
 ) *Worker {
 	return &Worker{
 		config:           config,
-		now:              time.Now,
+		now:              now,
 		targetEncAlg:     targetEncAlg,
 		activeSigningKey: activeSigningKey,
 	}
