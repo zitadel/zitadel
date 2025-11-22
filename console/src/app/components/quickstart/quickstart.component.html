@@ -14,7 +14,12 @@
   </div>
   <div class="quickstart-card-wrapper">
     @for (framework of frameworks.slice(0, 18); track framework.id) {
-      <a [routerLink]="['/projects', 'app-create']" [queryParams]="{ framework: framework.id }" [title]="framework.title" class="quickstart-card card">
+      <a
+        [routerLink]="['/projects', 'app-create']"
+        [queryParams]="{ framework: framework.id }"
+        [title]="framework.title"
+        class="quickstart-card card"
+      >
         <img class="dark-only" [src]="framework.imgSrcDark" alt="{{ framework.title }}" />
         <img class="light-only" [src]="framework.imgSrcLight" alt="{{ framework.title }}" />
       </a>
