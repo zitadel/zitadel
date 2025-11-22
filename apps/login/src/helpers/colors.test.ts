@@ -10,7 +10,6 @@ import {
   BACKGROUND,
   DARK_TEXT,
   TEXT,
-  type LabelPolicyColors,
 } from "./colors";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 

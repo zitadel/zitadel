@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { coerceToBase64Url, coerceToArrayBuffer } from "./base64";
 
 const originalBtoa = global.btoa;
