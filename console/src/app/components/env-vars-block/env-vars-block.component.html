@@ -1,0 +1,44 @@
+<div class="env-vars-block">
+  <div class="code-block">
+    <div class="code-header">
+      <div class="format-switcher">
+        @for (option of availableFormatOptions; track option.value) {
+          <button
+            mat-button
+            [class.active]="(selectedFormat$ | async) === option.value"
+            (click)="switchFormat(option.value)"
+            class="format-button"
+          >
+            <i class="las" [ngClass]="'la-' + option.icon"></i>
+            {{ option.label }}
+          </button>
+        }
+      </div>
+
+      <div class="header-actions">
+        @if (showCopy) {
+          <button
+            mat-icon-button
+            [disabled]="copied === 'copy'"
+            (click)="copyToClipboard()"
+            matTooltip="{{ 'ACTIONS.COPY' | translate }}"
+          >
+            <i class="las" [ngClass]="copied === 'copy' ? 'la-check text-green-500' : 'la-copy'"></i>
+          </button>
+        }
+        @if (showDownload) {
+          <button
+            mat-icon-button
+            [disabled]="copied === 'download'"
+            (click)="downloadFile()"
+            matTooltip="{{ 'ACTIONS.DOWNLOAD' | translate }}"
+          >
+            <i class="las" [ngClass]="copied === 'download' ? 'la-check text-green-500' : 'la-download'"></i>
+          </button>
+        }
+      </div>
+    </div>
+
+    <pre class="code-content">{{ formattedContent$ | async }}</pre>
+  </div>
+</div>

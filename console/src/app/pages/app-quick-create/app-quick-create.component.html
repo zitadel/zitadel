@@ -1,0 +1,129 @@
+<cnsl-create-layout title="{{ 'APP.PAGES.CREATE' | translate }}" (closed)="close()">
+  <div class="app-create-wrapper">
+    <div class="app-create-main-content">
+      <div class="content-wrapper">
+        <div class="content-title-area">
+          <h1>{{ 'APP.PAGES.QUICK_CREATE_FRAMEWORK' | translate }}</h1>
+          <p>{{ 'APP.PAGES.QUICK_CREATE_FRAMEWORK_DESC' | translate }}</p>
+        </div>
+
+        <div>
+          <div class="framework-wrapper">
+            @for (framework of frameworks.slice(0, 18); track framework.title) {
+              <button
+                (click)="selectedFramework.set(framework)"
+                class="framework-card card"
+                [class.selected]="selectedFramework()?.id === framework.id"
+                title="{{ framework.title }}"
+              >
+                <img class="dark-only" [src]="framework.imgSrcDark" alt="{{ framework.title }}" />
+                <img class="light-only" [src]="framework.imgSrcLight" alt="{{ framework.title }}" />
+              </button>
+            }
+          </div>
+
+          <!-- Checkbox for auto-creating project -->
+          <div class="create-project-checkbox">
+            <mat-checkbox [(ngModel)]="createProject" color="primary">
+              {{ 'APP.PAGES.CREATE_PROJECT_AUTO' | translate }}
+            </mat-checkbox>
+            <p class="checkbox-description">{{ 'APP.PAGES.CREATE_PROJECT_AUTO_DESC' | translate }}</p>
+          </div>
+
+          <!-- Project selector (shown when checkbox is unchecked) -->
+          @if (!createProject()) {
+            <div>
+              <h3>{{ 'APP.PAGES.CREATE_SELECT_PROJECT' | translate }}</h3>
+              <p class="hint">{{ 'APP.PAGES.CREATE_NEW_PROJECT' | translate }}</p>
+              <cnsl-search-project-autocomplete
+                class="block"
+                [autocompleteType]="ProjectAutocompleteType.PROJECT_OWNED"
+                (selectionChanged)="selectProject($event)"
+                (valueChanged)="projectName.set($event)"
+              >
+              </cnsl-search-project-autocomplete>
+            </div>
+          }
+        </div>
+      </div>
+
+      @if (createProjectMutation.error() || createOidcApplicationMutation.error(); as error) {
+        <cnsl-info-section [type]="InfoSectionType.WARN">
+          <span class="error-msg">{{ error.message }}</span>
+        </cnsl-info-section>
+      }
+    </div>
+    @if (selectedFramework(); as framework) {
+      <div class="framework-details-panel">
+        <div class="panel-header">
+          <div class="panel-title-section">
+            <img class="framework-logo dark-only" [src]="framework.imgSrcDark" alt="{{ framework.title }}" />
+            <img class="framework-logo light-only" [src]="framework.imgSrcLight" alt="{{ framework.title }}" />
+            <h2>{{ framework.title }}</h2>
+          </div>
+          <button mat-icon-button (click)="selectedFramework.set(undefined)">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <div class="panel-content">
+          <div class="panel-content">
+            @if (framework.ecosystem) {
+              <div class="detail-section">
+                <cnsl-info-section>
+                  We will create your project and all necessary configurations for you.
+                </cnsl-info-section>
+              </div>
+              <div class="detail-section">
+                <h3>Ecosystem</h3>
+                <p>{{ framework.ecosystem }}</p>
+              </div>
+            }
+
+            @if (framework.description) {
+              <div class="detail-section">
+                <h3>Description</h3>
+                <p>{{ framework.description }}</p>
+              </div>
+            }
+
+            @if (getAppTypeLabel(framework); as appTypeLabel) {
+              <div class="detail-section">
+                <h3>Application Type</h3>
+                <p>{{ appTypeLabel }}</p>
+              </div>
+            }
+
+            @if (getAuthMethod(framework); as authMethod) {
+              <div class="detail-section">
+                <h3>Authentication</h3>
+                <p>{{ authMethod }}</p>
+              </div>
+            }
+
+            @if (framework.docsLink) {
+              <div class="detail-section">
+                <h3>Documentation</h3>
+                <a [href]="`https://zitadel.com/${framework.docsLink}`" target="_blank" rel="noopener noreferrer">
+                  View Documentation
+                  <mat-icon inline>open_in_new</mat-icon>
+                </a>
+              </div>
+            }
+          </div>
+
+          <div class="panel-actions">
+            <button mat-stroked-button (click)="selectedFramework.set(undefined)">Cancel</button>
+            <button color="primary" mat-raised-button (click)="createProjectAndContinue(framework)">
+              @if (createProjectMutation.isPending() || createOidcApplicationMutation.isPending()) {
+                <mat-spinner diameter="20" />
+              } @else {
+                Continue with {{ framework.title }}
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</cnsl-create-layout>
