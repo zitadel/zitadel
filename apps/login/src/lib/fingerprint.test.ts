@@ -421,7 +421,6 @@ describe("fingerprint", () => {
       });
       vi.mocked(cookies).mockResolvedValue({ get: mockGet, set: vi.fn() } as any);
 
-      const mockHeaders = new Map();
       vi.mocked(headers).mockResolvedValue({
         get: () => null,
       } as any);
