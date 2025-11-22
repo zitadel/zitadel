@@ -24,10 +24,6 @@ const secureHeaders = [
     key: "X-XSS-Protection",
     value: "1; mode=block",
   },
-  {
-    key: "Content-Security-Policy",
-    value: `${DEFAULT_CSP} frame-ancestors 'none'`,
-  },
   { key: "X-Frame-Options", value: "deny" },
 ];
 

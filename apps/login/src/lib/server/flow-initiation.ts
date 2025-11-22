@@ -227,11 +227,14 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
       const noSessionResponse = NextResponse.json({ error: "No active session found" }, { status: 400 });
 
+      const cspImages = `${DEFAULT_CSP} img-src 'self' ${serviceUrl};`;
+      noSessionResponse.headers.set("Content-Security-Policy", cspImages);
+
       if (securitySettings?.embeddedIframe?.enabled) {
         securitySettings.embeddedIframe.allowedOrigins;
         noSessionResponse.headers.set(
           "Content-Security-Policy",
-          `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
+          `${cspImages} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
         );
         noSessionResponse.headers.delete("X-Frame-Options");
       }
@@ -264,11 +267,13 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
       const callbackResponse = NextResponse.redirect(callbackUrl);
 
+      callbackResponse.headers.set("Content-Security-Policy", cspImages);
+
       if (securitySettings?.embeddedIframe?.enabled) {
         securitySettings.embeddedIframe.allowedOrigins;
         callbackResponse.headers.set(
           "Content-Security-Policy",
-          `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
+          `${cspImages} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
         );
         callbackResponse.headers.delete("X-Frame-Options");
       }

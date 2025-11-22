@@ -57,6 +57,14 @@ export async function middleware(request: NextRequest) {
     "/saml/",
   ];
 
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  // dynamically set img-src in CSP to allow images from the service URL
+  const cspImages = `${DEFAULT_CSP} img-src 'self' ${serviceUrl};`;
+  const responseHeaders = new Headers();
+  responseHeaders.set("Content-Security-Policy", cspImages);
+
   const isMatched = proxyPaths.some((prefix) =>
     request.nextUrl.pathname.startsWith(prefix),
   );
@@ -70,11 +78,9 @@ export async function middleware(request: NextRequest) {
     // For all other routes, just add the header and continue
     return NextResponse.next({
       request: { headers: requestHeaders },
+      headers: responseHeaders,
     });
   }
-
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const instanceHost = `${serviceUrl}`
     .replace("https://", "")
@@ -84,7 +90,6 @@ export async function middleware(request: NextRequest) {
   requestHeaders.set("x-zitadel-public-host", `${request.nextUrl.host}`);
   requestHeaders.set("x-zitadel-instance-host", instanceHost);
 
-  const responseHeaders = new Headers();
   responseHeaders.set("Access-Control-Allow-Origin", "*");
   responseHeaders.set("Access-Control-Allow-Headers", "*");
 
@@ -93,7 +98,7 @@ export async function middleware(request: NextRequest) {
   if (securitySettings?.embeddedIframe?.enabled) {
     responseHeaders.set(
       "Content-Security-Policy",
-      `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
+      `${cspImages} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
     );
     responseHeaders.delete("X-Frame-Options");
   }
