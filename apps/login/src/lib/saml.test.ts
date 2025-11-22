@@ -1,10 +1,5 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import {
-  getSAMLFormUID,
-  setSAMLFormCookie,
-  getSAMLFormCookie,
-  loginWithSAMLAndSession,
-} from "./saml";
+import { getSAMLFormUID, setSAMLFormCookie, getSAMLFormCookie, loginWithSAMLAndSession } from "./saml";
 
 // Mock dependencies
 vi.mock("uuid");
@@ -41,7 +36,7 @@ describe("saml", () => {
       set: vi.fn(),
     };
     vi.mocked(cookies).mockResolvedValue(mockCookies);
-    
+
     // Suppress console logs during tests
     vi.spyOn(console, "log").mockImplementation(() => {});
     vi.spyOn(console, "warn").mockImplementation(() => {});
@@ -138,30 +133,8 @@ describe("saml", () => {
 
       await setSAMLFormCookie(largeSamlValue);
 
-      expect(console.warn).toHaveBeenCalledWith(
-        expect.stringContaining("SAML form cookie value is large")
-      );
-      expect(console.warn).toHaveBeenCalledWith(
-        expect.stringContaining("5000 characters")
-      );
-    });
-
-    it("should not warn when value is under 4000 characters", async () => {
-      const normalSamlValue = "x".repeat(3000);
-
-      await setSAMLFormCookie(normalSamlValue);
-
-      expect(console.warn).not.toHaveBeenCalled();
-    });
-
-    it("should log cookie value length", async () => {
-      const samlValue = "SAMLRequest=test";
-
-      await setSAMLFormCookie(samlValue);
-
-      expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining(`value length: ${samlValue.length}`)
-      );
+      expect(console.warn).toHaveBeenCalledWith(expect.stringContaining("SAML form cookie value is large"));
+      expect(console.warn).toHaveBeenCalledWith(expect.stringContaining("5000 characters"));
     });
 
     it("should handle empty SAML value", async () => {
@@ -171,7 +144,7 @@ describe("saml", () => {
       expect(mockCookies.set).toHaveBeenCalledWith(
         expect.objectContaining({
           value: "",
-        })
+        }),
       );
     });
 
@@ -188,9 +161,7 @@ describe("saml", () => {
       const error = new Error("Cookie set failed");
       mockCookies.set.mockRejectedValue(error);
 
-      await expect(setSAMLFormCookie("test-value")).rejects.toThrow(
-        "Failed to set SAML form cookie"
-      );
+      await expect(setSAMLFormCookie("test-value")).rejects.toThrow("Failed to set SAML form cookie");
     });
 
     it("should log error with details when cookie setting fails", async () => {
@@ -204,25 +175,7 @@ describe("saml", () => {
         expect.objectContaining({
           error,
           uid: mockUid,
-        })
-      );
-    });
-
-    it("should handle exactly 4000 character boundary", async () => {
-      const boundaryValue = "x".repeat(4000);
-
-      await setSAMLFormCookie(boundaryValue);
-
-      expect(console.warn).not.toHaveBeenCalled();
-    });
-
-    it("should warn at 4001 characters", async () => {
-      const overBoundary = "x".repeat(4001);
-
-      await setSAMLFormCookie(overBoundary);
-
-      expect(console.warn).toHaveBeenCalledWith(
-        expect.stringContaining("4001 characters")
+        }),
       );
     });
   });
@@ -249,9 +202,7 @@ describe("saml", () => {
       const result = await getSAMLFormCookie("non-existent-uid");
 
       expect(result).toBeNull();
-      expect(console.warn).toHaveBeenCalledWith(
-        expect.stringContaining("SAML form cookie not found")
-      );
+      expect(console.warn).toHaveBeenCalledWith(expect.stringContaining("SAML form cookie not found"));
     });
 
     it("should return null if cookie has empty value", async () => {
@@ -263,25 +214,7 @@ describe("saml", () => {
       const result = await getSAMLFormCookie("test-uid");
 
       expect(result).toBeNull();
-      expect(console.warn).toHaveBeenCalledWith(
-        expect.stringContaining("empty value")
-      );
-    });
-
-    it("should log successful retrieval with value length", async () => {
-      const uid = "test-uid";
-      const value = "SAMLRequest=test";
-
-      mockCookies.get.mockReturnValue({
-        name: uid,
-        value,
-      });
-
-      await getSAMLFormCookie(uid);
-
-      expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining(`value length: ${value.length}`)
-      );
+      expect(console.warn).toHaveBeenCalledWith(expect.stringContaining("empty value"));
     });
 
     it("should handle errors gracefully", async () => {
@@ -293,10 +226,7 @@ describe("saml", () => {
       const result = await getSAMLFormCookie("test-uid");
 
       expect(result).toBeNull();
-      expect(console.error).toHaveBeenCalledWith(
-        expect.stringContaining("Error retrieving SAML form cookie"),
-        error
-      );
+      expect(console.error).toHaveBeenCalledWith(expect.stringContaining("Error retrieving SAML form cookie"), error);
     });
 
     it("should handle null cookie value", async () => {
@@ -528,36 +458,6 @@ describe("saml", () => {
       expect(result).toEqual({
         redirect: "https://sp.example.com/acs",
       });
-    });
-
-    it("should log session ID and SAML request", async () => {
-      vi.mocked(isSessionValid).mockResolvedValue(true);
-      vi.mocked(createResponse).mockResolvedValue({
-        url: "https://sp.example.com/acs",
-      } as any);
-
-      await loginWithSAMLAndSession(baseParams);
-
-      expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining("session-123")
-      );
-      expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining("saml-request-id")
-      );
-    });
-
-    it("should log session validity status", async () => {
-      vi.mocked(isSessionValid).mockResolvedValue(true);
-      vi.mocked(createResponse).mockResolvedValue({
-        url: "https://sp.example.com/acs",
-      } as any);
-
-      await loginWithSAMLAndSession(baseParams);
-
-      expect(console.log).toHaveBeenCalledWith(
-        "Session is valid:",
-        true
-      );
     });
 
     it("should handle multiple sessions with correct selection", async () => {

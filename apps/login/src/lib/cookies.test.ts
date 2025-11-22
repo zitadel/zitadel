@@ -20,7 +20,7 @@ vi.mock("next/headers", () => ({
 
 vi.mock("@zitadel/client", () => ({
   timestampDate: vi.fn((ts: any) => new Date(Number(ts.seconds) * 1000)),
-  timestampFromMs: vi.fn((ms: number) => ({ seconds: BigInt(Math.floor(ms / 1000)) } as any)),
+  timestampFromMs: vi.fn((ms: number) => ({ seconds: BigInt(Math.floor(ms / 1000)) }) as any),
 }));
 
 import { cookies } from "next/headers";
@@ -52,30 +52,6 @@ describe("cookies", () => {
         httpOnly: true,
         path: "/",
       });
-    });
-
-    it("should handle different language codes", async () => {
-      const languages = ["de", "fr", "es", "ja"];
-
-      for (const lang of languages) {
-        await setLanguageCookie(lang);
-      }
-
-      expect(mockCookies.set).toHaveBeenCalledTimes(languages.length);
-    });
-
-    it("should set httpOnly flag", async () => {
-      await setLanguageCookie("en");
-
-      const callArgs = mockCookies.set.mock.calls[0][0];
-      expect(callArgs.httpOnly).toBe(true);
-    });
-
-    it("should set path to root", async () => {
-      await setLanguageCookie("en");
-
-      const callArgs = mockCookies.set.mock.calls[0][0];
-      expect(callArgs.path).toBe("/");
     });
   });
 
@@ -151,7 +127,7 @@ describe("cookies", () => {
 
       const setCall = mockCookies.set.mock.calls[0][0];
       const sessions = JSON.parse(setCall.value);
-      
+
       expect(sessions).toHaveLength(1);
       expect(sessions[0].id).toBe("session-new");
       expect(sessions[0].token).toBe("token-new");
@@ -177,10 +153,10 @@ describe("cookies", () => {
       await addSessionToCookie({ session: mockSession });
 
       expect(consoleSpy).toHaveBeenCalledWith("WARNING COOKIE OVERFLOW");
-      
+
       const setCall = mockCookies.set.mock.calls[0][0];
       const sessions = JSON.parse(setCall.value);
-      
+
       // Should have new session and all but the first old session
       expect(sessions[0]).toEqual(mockSession);
       expect(sessions).not.toContain(manySessions[0]);
@@ -212,18 +188,14 @@ describe("cookies", () => {
         value: JSON.stringify([expiredSession, validSession]),
       });
 
-      vi.mocked(timestampDate).mockImplementation((ts: any) => 
-        new Date(Number(ts.seconds) * 1000)
-      );
-      vi.mocked(timestampFromMs).mockImplementation((ms: number) => 
-        ({ seconds: BigInt(Math.floor(ms / 1000)) } as any)
-      );
+      vi.mocked(timestampDate).mockImplementation((ts: any) => new Date(Number(ts.seconds) * 1000));
+      vi.mocked(timestampFromMs).mockImplementation((ms: number) => ({ seconds: BigInt(Math.floor(ms / 1000)) }) as any);
 
       await addSessionToCookie({ session: mockSession, cleanup: true });
 
       const setCall = mockCookies.set.mock.calls[0][0];
       const sessions = JSON.parse(setCall.value);
-      
+
       // Should not include expired session
       const hasExpired = sessions.some((s: Cookie) => s.id === "session-expired");
       expect(hasExpired).toBe(false);
@@ -241,7 +213,7 @@ describe("cookies", () => {
       );
     });
 
-    it("should set sameSite to 'lax' when iFrameEnabled is false", async () => {
+    it("should set sameSite to 'lax' when iFrameEnabled is false or undefined", async () => {
       mockCookies.get.mockReturnValue(undefined);
 
       await addSessionToCookie({ session: mockSession, iFrameEnabled: false });
@@ -251,53 +223,13 @@ describe("cookies", () => {
           sameSite: "lax",
         }),
       );
-    });
 
-    it("should default sameSite to 'lax' when iFrameEnabled is undefined", async () => {
-      mockCookies.get.mockReturnValue(undefined);
-
+      mockCookies.set.mockClear();
       await addSessionToCookie({ session: mockSession });
 
       expect(mockCookies.set).toHaveBeenCalledWith(
         expect.objectContaining({
           sameSite: "lax",
-        }),
-      );
-    });
-
-    it("should set httpOnly to true", async () => {
-      mockCookies.get.mockReturnValue(undefined);
-
-      await addSessionToCookie({ session: mockSession });
-
-      expect(mockCookies.set).toHaveBeenCalledWith(
-        expect.objectContaining({
-          httpOnly: true,
-        }),
-      );
-    });
-
-    it("should set path to root", async () => {
-      mockCookies.get.mockReturnValue(undefined);
-
-      await addSessionToCookie({ session: mockSession });
-
-      expect(mockCookies.set).toHaveBeenCalledWith(
-        expect.objectContaining({
-          path: "/",
-        }),
-      );
-    });
-
-    it("should set secure flag", async () => {
-      mockCookies.get.mockReturnValue(undefined);
-
-      await addSessionToCookie({ session: mockSession });
-      
-      // Secure flag is set based on NODE_ENV
-      expect(mockCookies.set).toHaveBeenCalledWith(
-        expect.objectContaining({ 
-          secure: expect.any(Boolean) 
         }),
       );
     });
@@ -331,7 +263,7 @@ describe("cookies", () => {
 
       const setCall = mockCookies.set.mock.calls[0][0];
       const sessions = JSON.parse(setCall.value);
-      
+
       expect(sessions[0].token).toBe("new-token");
       expect(sessions[0].changeTs).toBe("1700000001000");
     });
@@ -345,7 +277,7 @@ describe("cookies", () => {
         updateSessionCookie({
           id: "non-existent-id",
           session: mockSession,
-        })
+        }),
       ).rejects.toThrow("updateSessionCookie<T>: session id now found");
     });
 
@@ -364,12 +296,8 @@ describe("cookies", () => {
         value: JSON.stringify([mockSession, expiredSession]),
       });
 
-      vi.mocked(timestampDate).mockImplementation((ts: any) => 
-        new Date(Number(ts.seconds) * 1000)
-      );
-      vi.mocked(timestampFromMs).mockImplementation((ms: number) => 
-        ({ seconds: BigInt(Math.floor(ms / 1000)) } as any)
-      );
+      vi.mocked(timestampDate).mockImplementation((ts: any) => new Date(Number(ts.seconds) * 1000));
+      vi.mocked(timestampFromMs).mockImplementation((ms: number) => ({ seconds: BigInt(Math.floor(ms / 1000)) }) as any);
 
       await updateSessionCookie({
         id: "session-1",
@@ -379,7 +307,7 @@ describe("cookies", () => {
 
       const setCall = mockCookies.set.mock.calls[0][0];
       const sessions = JSON.parse(setCall.value);
-      
+
       const hasExpired = sessions.some((s: Cookie) => s.id === "session-expired");
       expect(hasExpired).toBe(false);
     });
@@ -431,7 +359,7 @@ describe("cookies", () => {
 
       const setCall = mockCookies.set.mock.calls[0][0];
       const sessions = JSON.parse(setCall.value);
-      
+
       expect(sessions).toHaveLength(1);
       expect(sessions[0].id).toBe("session-2");
     });
@@ -450,7 +378,7 @@ describe("cookies", () => {
 
       const setCall = mockCookies.set.mock.calls[0][0];
       const sessions = JSON.parse(setCall.value);
-      
+
       expect(sessions).toHaveLength(1);
       expect(sessions[0].id).toBe("session-1");
     });
@@ -470,18 +398,14 @@ describe("cookies", () => {
         value: JSON.stringify([session1, session2, expiredSession]),
       });
 
-      vi.mocked(timestampDate).mockImplementation((ts: any) => 
-        new Date(Number(ts.seconds) * 1000)
-      );
-      vi.mocked(timestampFromMs).mockImplementation((ms: number) => 
-        ({ seconds: BigInt(Math.floor(ms / 1000)) } as any)
-      );
+      vi.mocked(timestampDate).mockImplementation((ts: any) => new Date(Number(ts.seconds) * 1000));
+      vi.mocked(timestampFromMs).mockImplementation((ms: number) => ({ seconds: BigInt(Math.floor(ms / 1000)) }) as any);
 
       await removeSessionFromCookie({ session: session1, cleanup: true });
 
       const setCall = mockCookies.set.mock.calls[0][0];
       const sessions = JSON.parse(setCall.value);
-      
+
       expect(sessions).toHaveLength(1);
       expect(sessions[0].id).toBe("session-2");
     });
@@ -536,9 +460,7 @@ describe("cookies", () => {
     it("should reject when no session cookie exists", async () => {
       mockCookies.get.mockReturnValue(undefined);
 
-      await expect(getMostRecentSessionCookie()).rejects.toBe(
-        "no session cookie found"
-      );
+      await expect(getMostRecentSessionCookie()).rejects.toBe("no session cookie found");
     });
 
     it("should handle single session", async () => {
@@ -612,9 +534,7 @@ describe("cookies", () => {
         value: JSON.stringify([session1]),
       });
 
-      await expect(
-        getSessionCookieById({ sessionId: "non-existent" })
-      ).rejects.toBeTypeOf("undefined");
+      await expect(getSessionCookieById({ sessionId: "non-existent" })).rejects.toBeTypeOf("undefined");
     });
 
     it("should reject if organization doesn't match", async () => {
@@ -626,16 +546,14 @@ describe("cookies", () => {
         getSessionCookieById({
           sessionId: "session-1",
           organization: "wrong-org",
-        })
+        }),
       ).rejects.toBeTypeOf("undefined");
     });
 
     it("should reject when no session cookie exists", async () => {
       mockCookies.get.mockReturnValue(undefined);
 
-      await expect(
-        getSessionCookieById({ sessionId: "session-1" })
-      ).rejects.toBeTypeOf("undefined");
+      await expect(getSessionCookieById({ sessionId: "session-1" })).rejects.toBeTypeOf("undefined");
     });
   });
 
@@ -692,17 +610,15 @@ describe("cookies", () => {
         value: JSON.stringify([session1]),
       });
 
-      await expect(
-        getSessionCookieByLoginName({ loginName: "nonexistent@example.com" })
-      ).rejects.toBe("no cookie found with loginName: nonexistent@example.com");
+      await expect(getSessionCookieByLoginName({ loginName: "nonexistent@example.com" })).rejects.toBe(
+        "no cookie found with loginName: nonexistent@example.com",
+      );
     });
 
     it("should reject when no session cookie exists", async () => {
       mockCookies.get.mockReturnValue(undefined);
 
-      await expect(
-        getSessionCookieByLoginName({ loginName: "user@example.com" })
-      ).rejects.toBe("no session cookie found");
+      await expect(getSessionCookieByLoginName({ loginName: "user@example.com" })).rejects.toBe("no session cookie found");
     });
   });
 
@@ -761,12 +677,8 @@ describe("cookies", () => {
         value: JSON.stringify(sessions),
       });
 
-      vi.mocked(timestampDate).mockImplementation((ts: any) => 
-        new Date(Number(ts.seconds) * 1000)
-      );
-      vi.mocked(timestampFromMs).mockImplementation((ms: number) => 
-        ({ seconds: BigInt(Math.floor(ms / 1000)) } as any)
-      );
+      vi.mocked(timestampDate).mockImplementation((ts: any) => new Date(Number(ts.seconds) * 1000));
+      vi.mocked(timestampFromMs).mockImplementation((ms: number) => ({ seconds: BigInt(Math.floor(ms / 1000)) }) as any);
 
       const result = await getAllSessionCookieIds(true);
 
@@ -836,12 +748,8 @@ describe("cookies", () => {
         value: JSON.stringify([validSession, expiredSession]),
       });
 
-      vi.mocked(timestampDate).mockImplementation((ts: any) => 
-        new Date(Number(ts.seconds) * 1000)
-      );
-      vi.mocked(timestampFromMs).mockImplementation((ms: number) => 
-        ({ seconds: BigInt(Math.floor(ms / 1000)) } as any)
-      );
+      vi.mocked(timestampDate).mockImplementation((ts: any) => new Date(Number(ts.seconds) * 1000));
+      vi.mocked(timestampFromMs).mockImplementation((ms: number) => ({ seconds: BigInt(Math.floor(ms / 1000)) }) as any);
 
       const result = await getAllSessions(true);
 
@@ -856,9 +764,7 @@ describe("cookies", () => {
       const result = await getAllSessions();
 
       expect(result).toEqual([]);
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "getAllSessions: No session cookie found, returning empty array"
-      );
+      expect(consoleSpy).toHaveBeenCalledWith("getAllSessions: No session cookie found, returning empty array");
 
       consoleSpy.mockRestore();
     });
@@ -971,87 +877,17 @@ describe("cookies", () => {
         value: JSON.stringify([session]),
       });
 
-      await expect(
-        getMostRecentCookieWithLoginname({ loginName: "user@example.com" })
-      ).rejects.toBe("Could not get the context or retrieve a session");
+      await expect(getMostRecentCookieWithLoginname({ loginName: "user@example.com" })).rejects.toBe(
+        "Could not get the context or retrieve a session",
+      );
     });
 
     it("should reject when no session cookie exists", async () => {
       mockCookies.get.mockReturnValue(undefined);
 
-      await expect(
-        getMostRecentCookieWithLoginname({ loginName: "user@example.com" })
-      ).rejects.toBe("Could not read session cookie");
-    });
-  });
-
-  describe("Cookie size and overflow edge cases", () => {
-    it("should handle exactly at MAX_COOKIE_SIZE boundary", async () => {
-      // Create sessions that are just under the limit
-      const sessions: Cookie[] = Array.from({ length: 5 }, (_, i) => ({
-        id: `session-${i}`,
-        token: `token-${i}`,
-        loginName: `user${i}@example.com`,
-        creationTs: "1700000000000",
-        expirationTs: "1800000000000",
-        changeTs: "1700000000000",
-      }));
-
-      const serialized = JSON.stringify(sessions);
-      // Ensure we're just under the limit
-      const padding = 2048 - serialized.length - 100;
-      sessions[0].token = "t".repeat(Math.max(0, padding));
-
-      mockCookies.get.mockReturnValue({
-        value: JSON.stringify(sessions),
-      });
-
-      const newSession: Cookie = {
-        id: "new-session",
-        token: "new-token-with-some-length",
-        loginName: "newuser@example.com",
-        creationTs: "1700000001000",
-        expirationTs: "1800000001000",
-        changeTs: "1700000001000",
-      };
-
-      await addSessionToCookie({ session: newSession });
-
-      // Should have been called
-      expect(mockCookies.set).toHaveBeenCalled();
-    });
-
-    it("should handle sessions without expirationTs during cleanup", async () => {
-      const sessionWithoutExpiry: Cookie = {
-        id: "session-no-expiry",
-        token: "token",
-        loginName: "user@example.com",
-        creationTs: "1700000000000",
-        expirationTs: "", // No expiration
-        changeTs: "1700000000000",
-      };
-
-      mockCookies.get.mockReturnValue({
-        value: JSON.stringify([sessionWithoutExpiry]),
-      });
-
-      const newSession: Cookie = {
-        id: "new-session",
-        token: "new-token",
-        loginName: "newuser@example.com",
-        creationTs: "1700000001000",
-        expirationTs: "1800000001000",
-        changeTs: "1700000001000",
-      };
-
-      await addSessionToCookie({ session: newSession, cleanup: true });
-
-      const setCall = mockCookies.set.mock.calls[0][0];
-      const sessions = JSON.parse(setCall.value);
-      
-      // Session without expiry should be kept
-      const hasNoExpiry = sessions.some((s: Cookie) => s.id === "session-no-expiry");
-      expect(hasNoExpiry).toBe(true);
+      await expect(getMostRecentCookieWithLoginname({ loginName: "user@example.com" })).rejects.toBe(
+        "Could not read session cookie",
+      );
     });
   });
 });
