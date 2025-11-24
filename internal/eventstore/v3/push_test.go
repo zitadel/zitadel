@@ -267,7 +267,6 @@ func TestEventstore_queueExecutions(t *testing.T) {
 		mockEventType(mockAggregate("TEST"), 1, []byte(`{"test":"test"}`), "ex.foo.bar"),
 		mockEventType(mockAggregate("TEST"), 2, []byte("{}"), "ex.bar.foo"),
 		mockEventType(mockAggregate("TEST"), 3, nil, "ex.removed"),
-		mockEventType(mockAggregate("TEST"), 4, []byte(`{"test":"test"}`), "ex.foo.bar.baz"),
 	}
 	type args struct {
 		ctx    context.Context
@@ -363,7 +362,6 @@ func TestEventstore_queueExecutions(t *testing.T) {
 						mustNewRequest(t, events[0], []target.Target{{ExecutionID: "event"}}),
 						mustNewRequest(t, events[1], []target.Target{{ExecutionID: "event"}}),
 						mustNewRequest(t, events[2], []target.Target{{ExecutionID: "event"}}),
-						mustNewRequest(t, events[3], []target.Target{{ExecutionID: "event"}}),
 					},
 					gomock.Any(),
 				)
@@ -390,9 +388,8 @@ func TestEventstore_queueExecutions(t *testing.T) {
 					gomock.Any(),
 					gomock.Any(),
 					[]river.JobArgs{
-						mustNewRequest(t, events[0], []target.Target{{ExecutionID: "event/ex.foo"}}),
+						mustNewRequest(t, events[0], []target.Target{{ExecutionID: "event/ex.foo.*"}}),
 						mustNewRequest(t, events[2], []target.Target{{ExecutionID: "event/ex.removed"}}),
-						mustNewRequest(t, events[3], []target.Target{{ExecutionID: "event/ex.foo"}}),
 					},
 					gomock.Any(),
 				)
@@ -403,7 +400,7 @@ func TestEventstore_queueExecutions(t *testing.T) {
 					context.Background(),
 					target.NewRouter([]target.Target{
 						{ExecutionID: "function/fooBar"},
-						{ExecutionID: "event/ex.foo"},
+						{ExecutionID: "event/ex.foo.*"},
 						{ExecutionID: "event/ex.removed"},
 					}),
 				),
