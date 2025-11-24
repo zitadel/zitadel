@@ -21,6 +21,7 @@ const (
 	SessionFactorTypeOTPEmail
 )
 
+// TODO(IAM-Marco): Add gomock.Matcher interface and implement it on all factors
 type SessionFactor interface {
 	sessionFactorType() SessionFactorType
 }
@@ -28,6 +29,30 @@ type SessionFactor interface {
 type SessionFactorUser struct {
 	UserID         string
 	LastVerifiedAt time.Time
+}
+
+func (s *SessionFactorUser) Matches(in any) bool {
+	inputFactor, isFactorUser := in.(*SessionFactorUser)
+	if !isFactorUser {
+		return false
+	}
+
+	isUserMatching := inputFactor.UserID == s.UserID
+
+	// Using a fixed delta, can be changed later to make it configurable if needed
+	timeDelta := 800 * time.Millisecond
+	// Due to LastVerifiedAt not being easily controllable through the tested code,
+	// we check that it's in a certain range rather than doing an exact match on time.
+	lowerThreshold := s.LastVerifiedAt.Add(-timeDelta)
+	upperThreshold := s.LastVerifiedAt.Add(timeDelta)
+
+	isLastVerifiedAtInRange := !inputFactor.LastVerifiedAt.Before(lowerThreshold) && !inputFactor.LastVerifiedAt.After(upperThreshold)
+
+	return isUserMatching && isLastVerifiedAtInRange
+}
+
+func (s *SessionFactorUser) String() string {
+	return "SessionFactorUser"
 }
 
 // sessionFactorType implements [SessionFactor].
