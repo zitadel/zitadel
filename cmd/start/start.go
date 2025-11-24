@@ -197,6 +197,11 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 
 	new_domain.SetLegacyEventstore(eventstoreClient)
 
+	// TODO(IAM-Marco): I am not sure if this is the best way to pass the tarpit (saved in the systemDefaults)
+	// I need this on session v2 APIs. So I could tecnically pass it when registering the gRPC service
+	// But I see that Livio passed it directly to the Commands (startCommands) instead of the session API.
+	new_domain.SetSystemConfig(config.SystemDefaults)
+
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
 	cacheConnectors, err := connector.StartConnectors(config.Caches, dbClient)
 	if err != nil {
