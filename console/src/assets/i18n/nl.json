@@ -2420,7 +2420,8 @@
       "1": "Eenmalig wachtwoord door Authenticator App (TOTP)",
       "2": "Vingerafdruk, Beveiligingssleutels, Face ID en andere",
       "3": "Eenmalig wachtwoord per e-mail (Email OTP)",
-      "4": "Eenmalig wachtwoord per SMS (SMS OTP)"
+      "4": "Eenmalig wachtwoord per SMS (SMS OTP)",
+      "5": "Herstelcodes"
     }
   },
   "LOGINPOLICY": {
