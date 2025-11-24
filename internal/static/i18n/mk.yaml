@@ -151,6 +151,7 @@ Errors:
       NotSet: Корисникот нема поставено лозинка
       NotChanged: Новата лозинка не може да биде иста со вашата тековна лозинка
       NotSupported: Не е поддржано хаш-кодирањето на лозинката. Проверете го https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
+      NoVerificationTokenOrCurrentPassword: Не може да се промени лозинката без токен за верификација или тековна лозинка
     PasswordComplexityPolicy:
       NotFound: Политиката за комплексност на лозинката не е пронајдена
       MinLength: Лозинката е прекратка

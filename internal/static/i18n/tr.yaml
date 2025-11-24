@@ -153,6 +153,7 @@ Errors:
       NotSet: Kullanıcı şifre ayarlamamış
       NotChanged: Yeni şifre mevcut şifrenizle aynı olamaz
       NotSupported: Şifre hash kodlaması desteklenmiyor. Kontrol edin https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
+      NoVerificationTokenOrCurrentPassword: Doğrulama belirteci veya geçerli parola olmadan parola değiştirilemez
     PasswordComplexityPolicy:
       NotFound: Şifre politikası bulunamadı
       MinLength: Şifre çok kısa
