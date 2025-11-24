@@ -96,6 +96,7 @@ Errors:
     InitCodeNotFound: Başlatma Kodu bulunamadı
     UsernameNotChanged: Kullanıcı adı değişmedi
     InvalidURLTemplate: URL Şablonu geçersiz
+    Locked: Kullanıcı kilitli
     Profile:
       NotFound: Profil bulunamadı
       NotChanged: Profil değişmedi
@@ -178,6 +179,11 @@ Errors:
         NotExisting: U2F mevcut değil
       Passwordless:
         NotExisting: Şifresiz giriş mevcut değil
+      RecoveryCodes:
+        InvalidCode: Geçersiz kurtarma kodu sağlandı
+        MaxCountExceeded: Maksimum kurtarma kodu sayısı aşıldı
+        NotReady: Kurtarma kodları kullanıma hazır değil
+        ConfigInvalid: Kurtarma kodları yapılandırması geçersiz
     WebAuthN:
       NotFound: WebAuthN Token bulunamadı
       BeginRegisterFailed: WebAuthN kayıt başlatma başarısız

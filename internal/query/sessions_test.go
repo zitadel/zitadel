@@ -40,6 +40,7 @@ var (
 		` projections.sessions8.totp_checked_at,` +
 		` projections.sessions8.otp_sms_checked_at,` +
 		` projections.sessions8.otp_email_checked_at,` +
+		` projections.sessions8.mfa_recovery_code_checked_at,` +
 		` projections.sessions8.metadata,` +
 		` projections.sessions8.token_id,` +
 		` projections.sessions8.user_agent_fingerprint_id,` +
@@ -70,6 +71,7 @@ var (
 		` projections.sessions8.totp_checked_at,` +
 		` projections.sessions8.otp_sms_checked_at,` +
 		` projections.sessions8.otp_email_checked_at,` +
+		` projections.sessions8.mfa_recovery_code_checked_at,` +
 		` projections.sessions8.metadata,` +
 		` projections.sessions8.user_agent_fingerprint_id,` +
 		` projections.sessions8.user_agent_ip,` +
@@ -102,6 +104,7 @@ var (
 		"totp_checked_at",
 		"otp_sms_checked_at",
 		"otp_email_checked_at",
+		"mfa_recovery_code_checked_at",
 		"metadata",
 		"token",
 		"user_agent_fingerprint_id",
@@ -131,6 +134,7 @@ var (
 		"totp_checked_at",
 		"otp_sms_checked_at",
 		"otp_email_checked_at",
+		"mfa_recovery_code_checked_at",
 		"metadata",
 		"user_agent_fingerprint_id",
 		"user_agent_ip",
@@ -192,6 +196,7 @@ func Test_SessionsPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							testNow,
+							testNow,
 							[]byte(`{"key": "dmFsdWU="}`),
 							"fingerPrintID",
 							"1.2.3.4",
@@ -241,6 +246,9 @@ func Test_SessionsPrepare(t *testing.T) {
 						OTPEmailFactor: SessionOTPFactor{
 							OTPCheckedAt: testNow,
 						},
+						RecoveryCodeFactor: SessionRecoveryCodeFactor{
+							RecoveryCodeCheckedAt: testNow,
+						},
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
 						},
@@ -283,6 +291,7 @@ func Test_SessionsPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							testNow,
+							testNow,
 							[]byte(`{"key": "dmFsdWU="}`),
 							"fingerPrintID",
 							"1.2.3.4",
@@ -307,6 +316,7 @@ func Test_SessionsPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							false,
+							testNow,
 							testNow,
 							testNow,
 							testNow,
@@ -359,6 +369,9 @@ func Test_SessionsPrepare(t *testing.T) {
 						OTPEmailFactor: SessionOTPFactor{
 							OTPCheckedAt: testNow,
 						},
+						RecoveryCodeFactor: SessionRecoveryCodeFactor{
+							RecoveryCodeCheckedAt: testNow,
+						},
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
 						},
@@ -403,6 +416,9 @@ func Test_SessionsPrepare(t *testing.T) {
 						},
 						OTPEmailFactor: SessionOTPFactor{
 							OTPCheckedAt: testNow,
+						},
+						RecoveryCodeFactor: SessionRecoveryCodeFactor{
+							RecoveryCodeCheckedAt: testNow,
 						},
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
@@ -499,6 +515,7 @@ func Test_SessionPrepare(t *testing.T) {
 						testNow,
 						testNow,
 						testNow,
+						testNow,
 						[]byte(`{"key": "dmFsdWU="}`),
 						"tokenID",
 						"fingerPrintID",
@@ -542,6 +559,9 @@ func Test_SessionPrepare(t *testing.T) {
 				},
 				OTPEmailFactor: SessionOTPFactor{
 					OTPCheckedAt: testNow,
+				},
+				RecoveryCodeFactor: SessionRecoveryCodeFactor{
+					RecoveryCodeCheckedAt: testNow,
 				},
 				Metadata: map[string][]byte{
 					"key": []byte("value"),
