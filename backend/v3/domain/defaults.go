@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/eventstore"
 	"github.com/zitadel/zitadel/backend/v3/telemetry/logging"
 	"github.com/zitadel/zitadel/backend/v3/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 )
 
 var (
@@ -14,6 +15,7 @@ var (
 	tracer           tracing.Tracer
 	logger           logging.Logger = *logging.NewLogger(slog.Default())
 	legacyEventstore eventstore.LegacyEventstore
+	sysConfig        systemdefaults.SystemDefaults
 )
 
 func SetPool(p database.Pool) {
@@ -30,4 +32,8 @@ func SetLogger(l logging.Logger) {
 
 func SetLegacyEventstore(es eventstore.LegacyEventstore) {
 	legacyEventstore = es
+}
+
+func SetSystemConfig(cfg systemdefaults.SystemDefaults) {
+	sysConfig = cfg
 }
