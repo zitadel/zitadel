@@ -352,8 +352,8 @@ func (s *settingsRelationalProjection) reduceLoginPolicyAdded(event eventstore.E
 			Settings: domain.Settings{
 				InstanceID:     policyEvent.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				CreatedAt:      &policyEvent.Creation,
-				UpdatedAt:      &policyEvent.Creation,
+				CreatedAt:      policyEvent.Creation,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			LoginSettingsAttributes: domain.LoginSettingsAttributes{
 				AllowUserNamePassword:      &policyEvent.AllowUserNamePassword,
@@ -412,7 +412,7 @@ func (s *settingsRelationalProjection) reduceLoginPolicyChanged(event eventstore
 			Settings: domain.Settings{
 				InstanceID:     policyEvent.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      &policyEvent.Creation,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			LoginSettingsAttributes: domain.LoginSettingsAttributes{
 				AllowUserNamePassword:      policyEvent.AllowUserNamePassword,
@@ -461,10 +461,10 @@ func (s *settingsRelationalProjection) reduceMFAAdded(event eventstore.Event) (*
 
 		settingsRepo := repository.LoginSettingsRepository()
 		return settingsRepo.SetColumns(ctx, v3_sql.SQLTx(tx),
-			domain.Settings{
+			&domain.Settings{
 				InstanceID:     policyEvent.Agg.InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      &policyEvent.Creation,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			settingsRepo.AddMFAType(domain.MultiFactorType(policyEvent.MFAType)),
 		)
@@ -492,10 +492,10 @@ func (s *settingsRelationalProjection) reduceMFARemoved(event eventstore.Event) 
 
 		settingsRepo := repository.LoginSettingsRepository()
 		return settingsRepo.SetColumns(ctx, v3_sql.SQLTx(tx),
-			domain.Settings{
+			&domain.Settings{
 				InstanceID:     policyEvent.Agg.InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      &policyEvent.Creation,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			settingsRepo.RemoveMFAType(domain.MultiFactorType(policyEvent.MFAType)),
 		)
@@ -519,7 +519,6 @@ func (*settingsRelationalProjection) reduceLoginPolicyRemoved(event eventstore.E
 			database.And(
 				settingsRepo.InstanceIDCondition(loginPolicyRemovedEvent.Aggregate().InstanceID),
 				settingsRepo.OrganizationIDCondition(&loginPolicyRemovedEvent.Aggregate().ID),
-				settingsRepo.TypeCondition(domain.SettingTypeLogin),
 			))
 
 		return err
@@ -547,10 +546,10 @@ func (s *settingsRelationalProjection) reduceSecondFactorAdded(event eventstore.
 
 		settingsRepo := repository.LoginSettingsRepository()
 		return settingsRepo.SetColumns(ctx, v3_sql.SQLTx(tx),
-			domain.Settings{
+			&domain.Settings{
 				InstanceID:     policyEvent.Agg.InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      &policyEvent.Creation,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			settingsRepo.AddSecondFactorTypes(domain.SecondFactorType(policyEvent.MFAType)),
 		)
@@ -577,10 +576,10 @@ func (s *settingsRelationalProjection) reduceSecondFactorRemoved(event eventstor
 		}
 		settingsRepo := repository.LoginSettingsRepository()
 		return settingsRepo.SetColumns(ctx, v3_sql.SQLTx(tx),
-			domain.Settings{
+			&domain.Settings{
 				InstanceID:     policyEvent.Agg.InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      &policyEvent.Creation,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			settingsRepo.RemoveSecondFactorTypes(domain.SecondFactorType(policyEvent.MFAType)),
 		)
@@ -612,8 +611,8 @@ func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) 
 			Settings: domain.Settings{
 				InstanceID:     policyEvent.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				CreatedAt:      &policyEvent.Creation,
-				UpdatedAt:      &policyEvent.Creation,
+				CreatedAt:      policyEvent.Creation,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
 				PrimaryColorLight:    &policyEvent.PrimaryColor,
@@ -666,8 +665,8 @@ func (s *settingsRelationalProjection) reduceLabelChanged(event eventstore.Event
 			Settings: domain.Settings{
 				InstanceID:     policyEvent.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				CreatedAt:      &policyEvent.Creation,
-				UpdatedAt:      &policyEvent.Creation,
+				CreatedAt:      policyEvent.Creation,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
 				PrimaryColorLight:    policyEvent.PrimaryColor,
@@ -713,7 +712,6 @@ func (s *settingsRelationalProjection) reduceLabelPolicyRemoved(event eventstore
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Agg.InstanceID),
 				settingsRepo.OrganizationIDCondition(orgId),
-				settingsRepo.TypeCondition(domain.SettingTypeBranding),
 			))
 		return err
 	}), nil
@@ -743,7 +741,6 @@ func (s *settingsRelationalProjection) reduceLabelActivated(event eventstore.Eve
 			database.And(
 				settingsRepo.InstanceIDCondition(event.Aggregate().InstanceID),
 				settingsRepo.OrganizationIDCondition(orgId),
-				settingsRepo.TypeCondition(domain.SettingTypeBranding),
 			),
 			settingsRepo.SetUpdatedAt(&policyEvent.Creation),
 		)
@@ -765,7 +762,7 @@ func (p *settingsRelationalProjection) reduceLabelLogoAdded(event eventstore.Eve
 			Settings: domain.Settings{
 				InstanceID: event.Aggregate().InstanceID,
 				Type:       domain.SettingTypeBranding,
-				UpdatedAt:  &updatedAt,
+				UpdatedAt:  updatedAt,
 			},
 			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{},
 		}
@@ -832,7 +829,7 @@ func (p *settingsRelationalProjection) reduceLogoRemoved(event eventstore.Event)
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      &updatedAt,
+				UpdatedAt:      updatedAt,
 			},
 			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
 				LogoURLLight: logoLight,
@@ -888,7 +885,7 @@ func (p *settingsRelationalProjection) reduceIconAdded(event eventstore.Event) (
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      &updatedAt,
+				UpdatedAt:      updatedAt,
 			},
 			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
 				IconURLLight: iconLight,
@@ -929,7 +926,7 @@ func (p *settingsRelationalProjection) reduceIconRemoved(event eventstore.Event)
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      &updatedAt,
+				UpdatedAt:      updatedAt,
 			},
 			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
 				IconURLLight: iconLight,
@@ -973,7 +970,7 @@ func (p *settingsRelationalProjection) reduceFontAdded(event eventstore.Event) (
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      &updatedAt,
+				UpdatedAt:      updatedAt,
 			},
 			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
 				FontURL: font,
@@ -1005,7 +1002,7 @@ func (p *settingsRelationalProjection) reduceFontRemoved(event eventstore.Event)
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      &updatedAt,
+				UpdatedAt:      updatedAt,
 			},
 			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
 				FontURL: &url.URL{},
@@ -1040,7 +1037,7 @@ func (p *settingsRelationalProjection) reducePassedComplexityAdded(event eventst
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      &updatedAt,
+				UpdatedAt:      updatedAt,
 			},
 			PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
 				MinLength:    &policyEvent.MinLength,
@@ -1079,7 +1076,7 @@ func (s *settingsRelationalProjection) reducePasswordComplexityChanged(event eve
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      &updatedAt,
+				UpdatedAt:      updatedAt,
 			},
 			PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
 				MinLength:    policyEvent.MinLength,
@@ -1113,7 +1110,6 @@ func (s *settingsRelationalProjection) reducePasswordComplexityRemoved(event eve
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Aggregate().InstanceID),
 				settingsRepo.OrganizationIDCondition(orgId),
-				settingsRepo.TypeCondition(domain.SettingTypePasswordComplexity),
 			))
 		return err
 	}), nil
@@ -1144,7 +1140,7 @@ func (p *settingsRelationalProjection) reducePasswordPolicyAdded(event eventstor
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      &updatedAt,
+				UpdatedAt:      updatedAt,
 			},
 			PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
 				ExpireWarnDays: &policyEvent.ExpireWarnDays,
@@ -1179,7 +1175,7 @@ func (p *settingsRelationalProjection) reducePasswordPolicyChanged(event eventst
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      &updatedAt,
+				UpdatedAt:      updatedAt,
 			},
 			PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
 				ExpireWarnDays: policyEvent.ExpireWarnDays,
@@ -1209,7 +1205,6 @@ func (p *settingsRelationalProjection) reducePasswordPolicyRemoved(event eventst
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Aggregate().InstanceID),
 				settingsRepo.OrganizationIDCondition(orgId),
-				settingsRepo.TypeCondition(domain.SettingTypePasswordExpiry),
 			))
 		return err
 	}), nil
@@ -1234,7 +1229,6 @@ func (p *settingsRelationalProjection) reduceOrgLockoutPolicyRemoved(event event
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Aggregate().InstanceID),
 				settingsRepo.OrganizationIDCondition(orgId),
-				settingsRepo.TypeCondition(domain.SettingTypePasswordExpiry),
 			))
 		return err
 	}), nil
@@ -1264,7 +1258,7 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyAdded(event eventstore
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      &updatedAt,
+				UpdatedAt:      updatedAt,
 			},
 			LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
 				MaxPasswordAttempts: &policyEvent.MaxPasswordAttempts,
@@ -1301,7 +1295,7 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyChanged(event eventsto
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      &updatedAt,
+				UpdatedAt:      updatedAt,
 			},
 			LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
 				MaxPasswordAttempts: policyEvent.MaxPasswordAttempts,
@@ -1338,7 +1332,7 @@ func (p *settingsRelationalProjection) reduceDomainPolicyAdded(event eventstore.
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      &updatedAt,
+				UpdatedAt:      updatedAt,
 			},
 			DomainSettingsAttributes: domain.DomainSettingsAttributes{
 				LoginNameIncludesDomain:                &policyEvent.UserLoginMustBeDomain,
@@ -1375,7 +1369,7 @@ func (s *settingsRelationalProjection) reduceDomainPolicyChanged(event eventstor
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      &updatedAt,
+				UpdatedAt:      updatedAt,
 			},
 			DomainSettingsAttributes: domain.DomainSettingsAttributes{
 				LoginNameIncludesDomain:                policyEvent.UserLoginMustBeDomain,
@@ -1406,7 +1400,6 @@ func (p *settingsRelationalProjection) reduceOrgDomainPolicyRemoved(event events
 			database.And(
 				settingsRepo.InstanceIDCondition(policyEvent.Aggregate().InstanceID),
 				settingsRepo.OrganizationIDCondition(orgId),
-				settingsRepo.TypeCondition(domain.SettingTypeDomain),
 			))
 		return err
 	}), nil
@@ -1435,7 +1428,7 @@ func (s *settingsRelationalProjection) reduceSecurityPolicySet(event eventstore.
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: nil,
-				UpdatedAt:      &updatedAt,
+				UpdatedAt:      updatedAt,
 			},
 			SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
 				EnableIframeEmbedding: policyEvent.EnableIframeEmbedding,
@@ -1465,7 +1458,7 @@ func (s *settingsRelationalProjection) reduceOrganizationSettingsSet(event event
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: &event.Aggregate().ID,
-				UpdatedAt:      &updatedAt,
+				UpdatedAt:      updatedAt,
 			},
 			OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
 				OrganizationScopedUsernames: &policyEvent.OrganizationScopedUsernames,
@@ -1492,7 +1485,6 @@ func (s *settingsRelationalProjection) reduceOrganizationSettingsRemoved(event e
 			database.And(
 				settingsRepo.InstanceIDCondition(e.Agg.InstanceID),
 				settingsRepo.OrganizationIDCondition(&event.Aggregate().ID),
-				settingsRepo.TypeCondition(domain.SettingTypeOrganization),
 			))
 		return err
 	}), nil

@@ -1,17 +1,19 @@
 CREATE TYPE zitadel.settings_type AS ENUM (
     'login',
-    'label',
+    'branding',
     'password_complexity',
     'password_expiry',
     'domain',
     'lockout',
     'security',
     'organization'
+    'notification'
+    'legal_and_support'
 );
 
 CREATE TYPE zitadel.settings_state AS ENUM (
-    'preview',
-    'active'
+    'active',
+    'preview'
 );
 
 CREATE TABLE zitadel.settings (
@@ -28,10 +30,11 @@ CREATE TABLE zitadel.settings (
     , PRIMARY KEY (instance_id, id, type, state)
     , FOREIGN KEY (instance_id) REFERENCES zitadel.instances(id) ON DELETE CASCADE
     , FOREIGN KEY (instance_id, organization_id) REFERENCES zitadel.organizations(instance_id, id) ON DELETE CASCADE
+
+    , UNIQUE (instance_id, organization_id, type, state)
 );
 
-CREATE UNIQUE INDEX idx_settings_unique_type ON zitadel.settings (instance_id, organization_id, type, owner_type) NULLS NOT DISTINCT WHERE type != 'label';
-CREATE UNIQUE INDEX idx_settings_label_unique_type ON zitadel.settings (instance_id, organization_id, type, owner_type, label_state) NULLS NOT DISTINCT WHERE type = 'label';
+CREATE UNIQUE INDEX idx_settings_unique_type ON zitadel.settings (instance_id, organization_id, type, state) NULLS NOT DISTINCT;
 
 CREATE TRIGGER trigger_set_updated_at
 BEFORE UPDATE ON zitadel.settings

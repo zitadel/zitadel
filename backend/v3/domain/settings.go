@@ -13,8 +13,7 @@ import (
 type SettingType uint8
 
 const (
-	SettingTypeUnspecified SettingType = iota
-	SettingTypeLogin
+	SettingTypeLogin SettingType = iota
 	SettingTypeBranding
 	SettingTypePasswordComplexity
 	SettingTypePasswordExpiry
@@ -41,8 +40,8 @@ type Settings struct {
 	Type           SettingType  `json:"type,omitempty" db:"type"`
 	State          SettingState `json:"state,omitempty" db:"state"`
 	Settings       []byte       `json:"settings,omitempty" db:"settings"`
-	CreatedAt      *time.Time   `json:"createdAt,omitzero" db:"created_at"`
-	UpdatedAt      *time.Time   `json:"updatedAt,omitzero" db:"updated_at"`
+	CreatedAt      time.Time    `json:"createdAt,omitzero" db:"created_at"`
+	UpdatedAt      time.Time    `json:"updatedAt,omitzero" db:"updated_at"`
 }
 
 type settingsColumns interface {
@@ -54,14 +53,14 @@ type settingsColumns interface {
 	SettingsColumn() database.Column
 	CreatedAtColumn() database.Column
 	UpdatedAtColumn() database.Column
+	PrimaryKeyColumns() []database.Column
 }
 
 type settingsConditions interface {
 	InstanceIDCondition(id string) database.Condition
 	OrganizationIDCondition(id *string) database.Condition
 	IDCondition(id string) database.Condition
-	TypeCondition(typ SettingType) database.Condition
-	StateCondition(typ SettingState) database.Condition
+	PrimaryKeyCondition(instanceID, id string) database.Condition
 }
 
 type settingsChanges interface {
@@ -78,7 +77,7 @@ type settingsRepository[T any] interface {
 	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*T, error)
 
 	Set(ctx context.Context, client database.QueryExecutor, settings *T) error
-	SetColumns(ctx context.Context, client database.QueryExecutor, settings Settings, changes ...database.Change) error
+	SetColumns(ctx context.Context, client database.QueryExecutor, settings *Settings, changes ...database.Change) error
 	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }
 
@@ -107,7 +106,7 @@ const (
 )
 
 type loginSettingsJSONChanges interface {
-	SetSettingFields(value *LoginSettings) database.Change
+	SetSettingFields(value LoginSettingsAttributes) database.Change
 
 	SetAllowUserNamePassword(value bool) db_json.JsonUpdate
 	SetAllowRegister(value bool) db_json.JsonUpdate
@@ -157,8 +156,8 @@ type LoginSettingsAttributes struct {
 	SecondFactorCheckLifetime  *time.Duration    `json:"secondFactorCheckLifetime,omitempty"`
 	MultiFactorCheckLifetime   *time.Duration    `json:"multiFactorCheckLifetime,omitempty"`
 
-	MFAType           []MultiFactorType  `json:"mfaType"`
-	SecondFactorTypes []SecondFactorType `json:"secondFactors"`
+	MFAType           []MultiFactorType  `json:"mfaType,omitempty"`
+	SecondFactorTypes []SecondFactorType `json:"secondFactors,omitempty"`
 }
 
 type LoginSettingsRepository interface {
@@ -175,7 +174,7 @@ const (
 )
 
 type brandingSettingsJSONChanges interface {
-	SetSettingFields(value *BrandingSettings) database.Change
+	SetSettingFields(value BrandingSettingsAttributes) database.Change
 
 	SetPrimaryColorLight(value string) db_json.JsonUpdate
 	SetBackgroundColorLight(value string) db_json.JsonUpdate
@@ -228,11 +227,13 @@ type BrandingSettingsAttributes struct {
 type BrandingSettingsRepository interface {
 	settingsRepository[BrandingSettings]
 	brandingSettingsJSONChanges
+
+	StateCondition(typ SettingState) database.Condition
 	Activate(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 }
 
 type passwordComplexitySettingsJSONChanges interface {
-	SetSettingFields(value *PasswordComplexitySettings) database.Change
+	SetSettingFields(value PasswordComplexitySettingsAttributes) database.Change
 
 	SetMinLength(value uint64) db_json.JsonUpdate
 	SetHasLowercase(value bool) db_json.JsonUpdate
@@ -260,7 +261,7 @@ type PasswordComplexitySettingsRepository interface {
 }
 
 type passwordExpirySettingsJSONChanges interface {
-	SetSettingFields(value *PasswordExpirySettings) database.Change
+	SetSettingFields(value PasswordExpirySettingsAttributes) database.Change
 
 	SetExpireWarnDays(value uint64) db_json.JsonUpdate
 	SetMaxAgeDays(value uint64) db_json.JsonUpdate
@@ -282,7 +283,7 @@ type PasswordExpirySettingsRepository interface {
 }
 
 type lockoutSettingsJSONChanges interface {
-	SetSettingFields(value *LockoutSettings) database.Change
+	SetSettingFields(value LockoutSettingsAttributes) database.Change
 
 	SetMaxPasswordAttempts(value uint64) db_json.JsonUpdate
 	SetMaxOTPAttempts(value uint64) db_json.JsonUpdate
@@ -306,7 +307,7 @@ type LockoutSettingsRepository interface {
 }
 
 type securitySettingsJSONChanges interface {
-	SetSettingFields(value *SecuritySettings) database.Change
+	SetSettingFields(value SecuritySettingsAttributes) database.Change
 
 	SetEnableIframeEmbedding(value bool) db_json.JsonUpdate
 	AddAllowedOrigins(value string) db_json.JsonUpdate
@@ -331,7 +332,7 @@ type SecuritySettingsRepository interface {
 }
 
 type domainSettingsJSONChanges interface {
-	SetSettingFields(value *DomainSettings) database.Change
+	SetSettingFields(value DomainSettingsAttributes) database.Change
 
 	SetLoginNameIncludesDomain(value bool) db_json.JsonUpdate
 	SetRequireOrgDomainVerification(value bool) db_json.JsonUpdate
@@ -354,7 +355,7 @@ type DomainSettingsRepository interface {
 }
 
 type organizationSettingsJSONChanges interface {
-	SetSettingFields(value *OrganizationSettings) database.Change
+	SetSettingFields(value OrganizationSettingsAttributes) database.Change
 
 	SetOrganizationScopedUsernames(value bool) db_json.JsonUpdate
 }
@@ -373,13 +374,17 @@ type OrganizationSettingsRepository interface {
 }
 
 type notificationSettingsJSONChanges interface {
-	SetSettingFields(value *NotificationSettings) database.Change
+	SetSettingFields(value NotificationSettingsAttributes) database.Change
 
 	SetPasswordChange(value bool) db_json.JsonUpdate
 }
 
 type NotificationSettings struct {
 	Settings
+	NotificationSettingsAttributes
+}
+
+type NotificationSettingsAttributes struct {
 	PasswordChange *bool `json:"passwordChange,omitempty"`
 }
 
@@ -389,7 +394,7 @@ type NotificationSettingsRepository interface {
 }
 
 type legalAndSupportSettingsJSONChanges interface {
-	SetSettingFields(value *LegalAndSupportSettings) database.Change
+	SetSettingFields(value LegalAndSupportSettings) database.Change
 
 	SetTOSLink(value bool) db_json.JsonUpdate
 	SetPrivacyPolicyLink(value bool) db_json.JsonUpdate
@@ -402,6 +407,10 @@ type legalAndSupportSettingsJSONChanges interface {
 
 type LegalAndSupportSettings struct {
 	Settings
+	LegalAndSupportSettingsAttributes
+}
+
+type LegalAndSupportSettingsAttributes struct {
 	TOSLink           *bool `json:"tosLink,omitempty"`
 	PrivacyPolicyLink *bool `json:"privacyPolicyLink,omitempty"`
 	HelpLink          *bool `json:"helpLink,omitempty"`

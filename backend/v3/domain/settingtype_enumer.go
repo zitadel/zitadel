@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-const _SettingTypeName = "unspecifiedloginlabelpassword_complexitypassword_expirydomainlockoutsecurityorganization"
+const _SettingTypeName = "loginbrandingpassword_complexitypassword_expirydomainlockoutsecurityorganizationnotificationlegal_and_support"
 
-var _SettingTypeIndex = [...]uint8{0, 11, 16, 21, 40, 55, 61, 68, 76, 88}
+var _SettingTypeIndex = [...]uint8{0, 5, 13, 32, 47, 53, 60, 68, 80, 92, 109}
 
-const _SettingTypeLowerName = "unspecifiedloginlabelpassword_complexitypassword_expirydomainlockoutsecurityorganization"
+const _SettingTypeLowerName = "loginbrandingpassword_complexitypassword_expirydomainlockoutsecurityorganizationnotificationlegal_and_support"
 
 func (i SettingType) String() string {
 	if i >= SettingType(len(_SettingTypeIndex)-1) {
@@ -25,50 +25,54 @@ func (i SettingType) String() string {
 // Re-run the stringer command to generate them again.
 func _SettingTypeNoOp() {
 	var x [1]struct{}
-	_ = x[SettingTypeUnspecified-(0)]
-	_ = x[SettingTypeLogin-(1)]
-	_ = x[SettingTypeBranding-(2)]
-	_ = x[SettingTypePasswordComplexity-(3)]
-	_ = x[SettingTypePasswordExpiry-(4)]
-	_ = x[SettingTypeDomain-(5)]
-	_ = x[SettingTypeLockout-(6)]
-	_ = x[SettingTypeSecurity-(7)]
-	_ = x[SettingTypeOrganization-(8)]
+	_ = x[SettingTypeLogin-(0)]
+	_ = x[SettingTypeBranding-(1)]
+	_ = x[SettingTypePasswordComplexity-(2)]
+	_ = x[SettingTypePasswordExpiry-(3)]
+	_ = x[SettingTypeDomain-(4)]
+	_ = x[SettingTypeLockout-(5)]
+	_ = x[SettingTypeSecurity-(6)]
+	_ = x[SettingTypeOrganization-(7)]
+	_ = x[SettingTypeNotification-(8)]
+	_ = x[SettingTypeLegalAndSupport-(9)]
 }
 
-var _SettingTypeValues = []SettingType{SettingTypeUnspecified, SettingTypeLogin, SettingTypeBranding, SettingTypePasswordComplexity, SettingTypePasswordExpiry, SettingTypeDomain, SettingTypeLockout, SettingTypeSecurity, SettingTypeOrganization}
+var _SettingTypeValues = []SettingType{SettingTypeLogin, SettingTypeBranding, SettingTypePasswordComplexity, SettingTypePasswordExpiry, SettingTypeDomain, SettingTypeLockout, SettingTypeSecurity, SettingTypeOrganization, SettingTypeNotification, SettingTypeLegalAndSupport}
 
 var _SettingTypeNameToValueMap = map[string]SettingType{
-	_SettingTypeName[0:11]:       SettingTypeUnspecified,
-	_SettingTypeLowerName[0:11]:  SettingTypeUnspecified,
-	_SettingTypeName[11:16]:      SettingTypeLogin,
-	_SettingTypeLowerName[11:16]: SettingTypeLogin,
-	_SettingTypeName[16:21]:      SettingTypeBranding,
-	_SettingTypeLowerName[16:21]: SettingTypeBranding,
-	_SettingTypeName[21:40]:      SettingTypePasswordComplexity,
-	_SettingTypeLowerName[21:40]: SettingTypePasswordComplexity,
-	_SettingTypeName[40:55]:      SettingTypePasswordExpiry,
-	_SettingTypeLowerName[40:55]: SettingTypePasswordExpiry,
-	_SettingTypeName[55:61]:      SettingTypeDomain,
-	_SettingTypeLowerName[55:61]: SettingTypeDomain,
-	_SettingTypeName[61:68]:      SettingTypeLockout,
-	_SettingTypeLowerName[61:68]: SettingTypeLockout,
-	_SettingTypeName[68:76]:      SettingTypeSecurity,
-	_SettingTypeLowerName[68:76]: SettingTypeSecurity,
-	_SettingTypeName[76:88]:      SettingTypeOrganization,
-	_SettingTypeLowerName[76:88]: SettingTypeOrganization,
+	_SettingTypeName[0:5]:         SettingTypeLogin,
+	_SettingTypeLowerName[0:5]:    SettingTypeLogin,
+	_SettingTypeName[5:13]:        SettingTypeBranding,
+	_SettingTypeLowerName[5:13]:   SettingTypeBranding,
+	_SettingTypeName[13:32]:       SettingTypePasswordComplexity,
+	_SettingTypeLowerName[13:32]:  SettingTypePasswordComplexity,
+	_SettingTypeName[32:47]:       SettingTypePasswordExpiry,
+	_SettingTypeLowerName[32:47]:  SettingTypePasswordExpiry,
+	_SettingTypeName[47:53]:       SettingTypeDomain,
+	_SettingTypeLowerName[47:53]:  SettingTypeDomain,
+	_SettingTypeName[53:60]:       SettingTypeLockout,
+	_SettingTypeLowerName[53:60]:  SettingTypeLockout,
+	_SettingTypeName[60:68]:       SettingTypeSecurity,
+	_SettingTypeLowerName[60:68]:  SettingTypeSecurity,
+	_SettingTypeName[68:80]:       SettingTypeOrganization,
+	_SettingTypeLowerName[68:80]:  SettingTypeOrganization,
+	_SettingTypeName[80:92]:       SettingTypeNotification,
+	_SettingTypeLowerName[80:92]:  SettingTypeNotification,
+	_SettingTypeName[92:109]:      SettingTypeLegalAndSupport,
+	_SettingTypeLowerName[92:109]: SettingTypeLegalAndSupport,
 }
 
 var _SettingTypeNames = []string{
-	_SettingTypeName[0:11],
-	_SettingTypeName[11:16],
-	_SettingTypeName[16:21],
-	_SettingTypeName[21:40],
-	_SettingTypeName[40:55],
-	_SettingTypeName[55:61],
-	_SettingTypeName[61:68],
-	_SettingTypeName[68:76],
-	_SettingTypeName[76:88],
+	_SettingTypeName[0:5],
+	_SettingTypeName[5:13],
+	_SettingTypeName[13:32],
+	_SettingTypeName[32:47],
+	_SettingTypeName[47:53],
+	_SettingTypeName[53:60],
+	_SettingTypeName[60:68],
+	_SettingTypeName[68:80],
+	_SettingTypeName[80:92],
+	_SettingTypeName[92:109],
 }
 
 // SettingTypeString retrieves an enum value from the enum constants string name.
