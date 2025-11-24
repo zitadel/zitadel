@@ -14,7 +14,6 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import {
   shouldUseConventionalCommits,
   setupWorkspaceVersionEnvironmentVariables,
-  executeDockerBuild,
   parseReleaseOptions,
   executeRelease,
   type GitInfo,
@@ -174,54 +173,6 @@ describe('setupWorkspaceVersionEnvironmentVariables', () => {
         '2.0.0'
       )
     ).toThrowError();
-  });
-});
-
-describe('executeDockerBuild', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  test('includes the release bake file', () => {
-    const mockExecFileSync = vi.mocked(execFileSync);
-
-    executeDockerBuild(false, false);
-
-    const calls = mockExecFileSync.mock.calls.map(call => call[1] as Array<string>);
-    expect(calls.every(call => call.find(arg => arg.includes('release/docker-bake-release.hcl')))).toBeTruthy();
-  });
-
-  test('includes --push flag when dryRun is false', () => {
-    const mockExecFileSync = vi.mocked(execFileSync);
-
-    executeDockerBuild(false, false);
-
-    const calls = mockExecFileSync.mock.calls.map(call => call[1] as Array<string>);
-    expect(calls.every(args => args.find(arg => arg.includes('--push')))).toBeTruthy();
-  });
-
-  test('includes api-debug target for conventional commits', () => {
-    const mockExecFileSync = vi.mocked(execFileSync);
-
-    executeDockerBuild(true, false);
-
-    const calls = mockExecFileSync.mock.calls.map(call => call[1] as Array<string>);
-    expect(calls.find(args => args.find(arg => arg.includes('api-debug')))).toBeTruthy();
-  });
-
-  test('passes environment variables to execFileSync', () => {
-    const mockExecFileSync = vi.mocked(execFileSync);
-
-    executeDockerBuild(false, false);
-
-    expect(mockExecFileSync).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.any(Array<String>),
-      expect.objectContaining({
-        stdio: 'inherit',
-        env: process.env,
-      })
-    );
   });
 });
 

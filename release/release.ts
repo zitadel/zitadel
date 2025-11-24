@@ -168,45 +168,6 @@ export function setupWorkspaceVersionEnvironmentVariables(
 
 }
 
-export function executeDockerBuild(conventionalCommits: boolean, dryRun: boolean): void {
-  let apiBakeArgs = '--file apps/api/docker-bake-release.hcl';
-  if (conventionalCommits) {
-    console.log('Publishing Debug API image as conventional commits were detected.');
-    apiBakeArgs += ' api-debug';
-  }
-  executeDockerBuildForProject(dryRun, '@zitadel/api', apiBakeArgs);
-  executeDockerBuildForProject(dryRun, '@zitadel/login', '--file apps/login/docker-bake-release.hcl');
-}
-
-/**
- * Executes docker build commands with the appropriate configuration.
- */
-export function executeDockerBuildForProject(dryRun: boolean, nxProject: string, projectBakeArgs: string): void {
-  // Construct argument array for safer invocation.
-  let bakeArgsArray = ['--file', 'release/docker-bake-release.hcl'];
-  if (projectBakeArgs) {
-    // Split projectBakeArgs string by spaces for now. To be robust, if projectBakeArgs can contain quoted args,
-    // consider using a parser like shell-quote, but in this codebase, args are hardcoded and simple.
-    bakeArgsArray = bakeArgsArray.concat(projectBakeArgs.split(' '));
-  }
-  if (!dryRun) {
-    console.log('Docker images will be pushed to the registry after build, because dryRun is false.');
-    bakeArgsArray.push('--push');
-  }
-  // Build full nx arguments array
-  const nxArgs = [
-    'nx',
-    'run',
-    `${nxProject}:build-docker`,
-    '--no-tui',
-    `--args=${bakeArgsArray.join(' ')}`
-  ];
-  console.log(`Executing docker build with command: pnpm ${nxArgs.map(a => `"${a}"`).join(' ')}`);
-  execFileSync('pnpm', nxArgs, {
-    stdio: 'inherit', env: process.env
-  });
-}
-
 function resetChangedFiles(): void {
   try {
     execSync('git checkout .npmrc package.json packages/zitadel-client/package.json packages/zitadel-proto/package.json apps/login/package.json', { stdio: 'inherit' });

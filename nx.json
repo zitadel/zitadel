@@ -87,7 +87,18 @@
   "plugins": [
     {
       "plugin": "@nx/js/typescript",
-      "exclude": ["benchmark/**"]
+      "exclude": [
+        "benchmark/**"
+      ]
+    },
+    {
+      "plugin": "@nx-tools/nx-container",
+      "exclude": [
+        "apps/login/integration/api-mock/**"
+      ],
+      "options": {
+        "defaultEngine": "docker"
+      }
     }
   ]
 }
