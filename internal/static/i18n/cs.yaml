@@ -95,6 +95,7 @@ Errors:
     InitCodeNotFound: Inicializační kód nenalezen
     UsernameNotChanged: Uživatelské jméno nezměněno
     InvalidURLTemplate: Šablona URL je neplatná
+    Locked: Uživatel je uzamčen
     Profile:
       NotFound: Profil nenalezen
       NotChanged: Profil nezměněn
@@ -177,6 +178,11 @@ Errors:
         NotExisting: U2F neexistuje
       Passwordless:
         NotExisting: Bezheslové přihlášení neexistuje
+      RecoveryCodes:
+        InvalidCode: Neplatný kód pro obnovení
+        MaxCountExceeded: Maximální počet kódů pro obnovení překročen
+        NotReady: Kódy pro obnovení nejsou připraveny k použití
+        ConfigInvalid: Konfigurace kódů pro obnovení je neplatná
     WebAuthN:
       NotFound: WebAuthN token nenalezen
       BeginRegisterFailed: Registrace WebAuthN selhala

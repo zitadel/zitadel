@@ -96,6 +96,7 @@ Errors:
     InitCodeNotFound: 未找到初始化验证码
     UsernameNotChanged: 用户名未更改
     InvalidURLTemplate: URL模板无效
+    Locked: 用户已被锁定
     Profile:
       NotFound: 未找到个人资料
       NotChanged: 个人资料未更改
@@ -178,6 +179,11 @@ Errors:
         NotExisting: U2F 不存在
       Passwordless:
         NotExisting: 未设置无密码登录
+      RecoveryCodes:
+        InvalidCode: 提供的恢复代码无效
+        MaxCountExceeded: 恢复代码数量已超过最大限制
+        NotReady: 恢复代码尚未准备好使用
+        ConfigInvalid: 恢复代码配置无效
     WebAuthN:
       NotFound: 找不到 WebAuthN 令牌
       BeginRegisterFailed: WebAuthN 注册失败

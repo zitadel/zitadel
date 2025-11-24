@@ -223,6 +223,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s63AlterResourceCounts = &AlterResourceCounts{dbClient: dbClient}
 	steps.s64ChangePushPosition = &ChangePushPosition{dbClient: dbClient}
 	steps.s65FixUserMetadata5Index = &FixUserMetadata5Index{dbClient: dbClient}
+	steps.s66SessionRecoveryCodeCheckedAt = &SessionRecoveryCodeCheckedAt{dbClient: dbClient}
 	steps.s67SyncMemberRoleFields = &SyncMemberRoleFields{dbClient: dbClient}
 	steps.s68TargetAddPayloadTypeColumn = &TargetAddPayloadTypeColumn{dbClient: dbClient}
 
@@ -338,6 +339,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s43CreateFieldsDomainIndex,
 		steps.s48Apps7SAMLConfigsLoginVersion,
 		steps.s59SetupWebkeys, // this step needs commands.
+		steps.s66SessionRecoveryCodeCheckedAt,
 		steps.s68TargetAddPayloadTypeColumn,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")

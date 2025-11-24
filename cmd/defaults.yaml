@@ -740,6 +740,15 @@ SystemDefaults:
       # If this is empty, the issuer is the requested domain
       # This is helpful in scenarios with multiple ZITADEL environments or virtual instances
       Issuer: "ZITADEL" # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_OTP_ISSUER
+    RecoveryCodes:
+      # The maximum number of recovery codes that a user can hold at any given time
+      MaxCount: 10 # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_RECOVERYCODES_MAXCOUNT
+      # The format of the recovery codes, supported: uuid, alphanumeric
+      Format: alphanumeric # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_RECOVERYCODES_FORMAT
+      # Length of the recovery codes (only applies to alphanumeric format)
+      Length: 10 # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_RECOVERYCODES_LENGTH
+      # Whether to include hyphens in the recovery codes (alphanumeric: hyphen in middle, uuid: keep/remove all hyphens)
+      WithHyphen: true # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_RECOVERYCODES_WITHHYPHEN
   Tarpit:
     # The amount of failed attempts, the tarpit should start.
     MinFailedAttempts: 5 # ZITADEL_SYSTEMDEFAULTS_TARPIT_MINFAILEDATTEMPTS

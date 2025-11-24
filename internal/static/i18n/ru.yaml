@@ -95,6 +95,7 @@ Errors:
     InitCodeNotFound: Код инициализации не найден
     UsernameNotChanged: Имя пользователя не изменено
     InvalidURLTemplate: Шаблон URL-адреса недействителен.
+    Locked: Пользователь заблокирован
     Profile:
       NotFound: Профиль не найден
       NotChanged: Профиль не изменён
@@ -177,6 +178,11 @@ Errors:
         NotExisting: Двухфакторная аутентификация не существует
       Passwordless:
         NotExisting: Беспарольный вход не существует
+      RecoveryCodes:
+        InvalidCode: Предоставлен неверный код восстановления
+        MaxCountExceeded: Превышено максимальное количество кодов восстановления
+        NotReady: Коды восстановления не готовы к использованию
+        ConfigInvalid: Конфигурация кодов восстановления недействительна
     WebAuthN:
       NotFound: Токен WebAuthN не найден
       BeginRegisterFailed: Ошибка начала регистрации WebAuthN
