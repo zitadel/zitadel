@@ -19,7 +19,13 @@
       "continuous": true,
       "dependsOn": [
         "^build"
-      ]
+      ],
+      "defaultConfiguration": "default",
+      "configurations": {
+        "default": {},
+        "test-login-integration": {},
+        "test-login-acceptance": {}
+      }
     },
     "build": {
       "description": "Builds the Next.js Login application in standalone mode for production",
