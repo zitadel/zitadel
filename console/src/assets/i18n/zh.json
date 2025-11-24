@@ -435,7 +435,8 @@
     "TOS": "服务条款",
     "OPENSHORTCUTSTOOLTIP": "按下 ？键查看快捷键",
     "SETTINGS": "设置",
-    "CUSTOMERPORTAL": "客户门户网站"
+    "CUSTOMERPORTAL": "客户门户网站",
+    "TARGETS": "目标"
   },
   "QUICKSTART": {
     "TITLE": "将 ZITADEL 集成到您的应用程序中",
@@ -698,9 +699,9 @@
     "PROJECTNAME": "项目名称",
     "RESOURCEOWNER": "资源所有者",
     "METHODS": {
+      "1": "等于",
       "5": "包含",
-      "7": "结尾是",
-      "1": "等于"
+      "7": "结尾是"
     }
   },
   "KEYBOARDSHORTCUTS": {
@@ -1972,7 +1973,6 @@
         "GRANTED_SINGULAR": "授予{{name}}的项目"
       },
       "PRIVATELABEL": {
-        "TITLE": "品牌标识设置",
         "0": {
           "TITLE": "未指定",
           "DESC": "识别用户后，将显示已识别用户的组织品牌，然后显示系统默认值。"
@@ -1985,6 +1985,7 @@
           "TITLE": "使用用户组织设置",
           "DESC": "将显示项目组织的品牌，但一旦识别用户，将显示已识别用户的组织设置。"
         },
+        "TITLE": "品牌标识设置",
         "DIALOG": {
           "TITLE": "品牌标识设置",
           "DESCRIPTION": "选择项目登录时使用的行为。"
@@ -2016,16 +2017,16 @@
       "DESCRIPTION": ""
     },
     "STATE": {
-      "TITLE": "状态",
       "0": "未定义",
       "1": "启用",
-      "2": "停用"
+      "2": "停用",
+      "TITLE": "状态"
     },
     "TYPE": {
-      "TITLE": "类型",
       "0": "未知类型",
       "1": "拥有的",
-      "2": "被授权的"
+      "2": "被授权的",
+      "TITLE": "类型"
     },
     "NAME": "名称",
     "NAMEDIALOG": {
@@ -2175,7 +2176,8 @@
       "UPDATED": "项目已修改。",
       "GRANTUPDATED": "授权已更新。",
       "DELETED": "项目已删除"
-    }
+    },
+    "CLICK_TO_EDIT_NAME": "点击编辑项目名称"
   },
   "ROLES": {
     "DIALOG": {
@@ -2280,10 +2282,10 @@
       "2": "停用"
     },
     "AZUREADTENANTTYPES": {
-      "3": "Tenant ID",
       "0": "Common",
       "1": "Organizations",
-      "2": "Consumers"
+      "2": "Consumers",
+      "3": "Tenant ID"
     },
     "AZUREADTENANTTYPE": "租户类型",
     "AZUREADTENANTID": "租户编号",
@@ -2382,7 +2384,8 @@
       "SIGNEDREQUEST": "登录请求",
       "NAMEIDFORMAT": "名字 ID 格式",
       "TRANSIENTMAPPINGATTRIBUTENAME": "自定义映射属性名称",
-      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "如果返回的 `nameid-format` 是 `transient` ，则映射用户的备用属性名称，参考 `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "如果返回的 `nameid-format` 是 `transient` ，则映射用户的备用属性名称，参考 `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`",
+      "SIGNATUREALGORITHM": "签名算法"
     },
     "TOAST": {
       "SAVED": "成功保存。",
@@ -2550,7 +2553,6 @@
         }
       },
       "NEXTSTEPS": {
-        "TITLE": "下一步",
         "0": {
           "TITLE": "添加角色",
           "DESC": "输入您的项目角色"
@@ -2562,8 +2564,16 @@
         "2": {
           "TITLE": "帮助支持",
           "DESC": "阅读我们关于创建应用程序的文档或联系我们的支持"
-        }
-      }
+        },
+        "TITLE": "下一步"
+      },
+      "CREATE_PROJECT_AUTO": "为我创建项目",
+      "CREATE_PROJECT_AUTO_DESC": "如果您是ZITADEL新手，推荐使用此选项。我们将为您处理项目设置。",
+      "QUICK_CREATE_DESC": "通过三个简单的步骤创建应用程序。",
+      "QUICK_CREATE_FRAMEWORK": "选择框架",
+      "QUICK_CREATE_FRAMEWORK_DESC": "我们为您的应用程序提供推荐配置。选择您正在使用或打算使用的框架。",
+      "QUICK_CREATE_NAME": "命名您的应用程序",
+      "QUICK_CREATE_TITLE": "创建应用程序"
     },
     "NAMEDIALOG": {
       "TITLE": "重命名应用",
@@ -2756,7 +2766,95 @@
     "LOGINV2": {
       "USEV2": "使用新的登录UI",
       "BASEURL": "新的登录UI的自定义基本URL"
-    }
+    },
+    "QUICKSTART": "快速开始",
+    "OVERVIEW_DETAIL": {
+      "TITLE": "快速开始",
+      "DESCRIPTION": "使用 ZITADEL 身份验证让您的应用程序快速运行。",
+      "GETSTARTED": "开始使用您的应用程序",
+      "GETSTARTED_DESC": "本指南将帮助您快速轻松地将 ZITADEL 身份验证集成到您的应用程序中。",
+      "FRAMEWORK": "框架",
+      "VIEWDOCS": "查看文档",
+      "VIEWEXAMPLE": "查看示例",
+      "ENVVARS": "环境变量",
+      "ENVVARS_DESC": "将这些环境变量添加到您的应用程序中：",
+      "ENVFILE": ".env",
+      "QUICKSTART": "您的起点是什么？",
+      "QUICKSTART_SUBTITLE": "选择最能描述您情况的选项：",
+      "OPTION1": "选项 1：克隆示例应用程序",
+      "OPTION1_DESC": "使用一个可运行的示例应用程序快速开始：",
+      "OPTION1_NOTE": "克隆后，使用您的应用程序信息更新环境变量。",
+      "OPTION2": "选项 2：集成现有应用程序",
+      "OPTION2_DESC": "将 ZITADEL 身份验证集成到您现有的应用程序中：",
+      "STEP1": "为您的框架安装 ZITADEL SDK",
+      "STEP2": "配置您的环境变量",
+      "STEP3": "将身份验证添加到您的应用程序",
+      "STEP4": "测试集成",
+      "GENERIC": "通用集成",
+      "GENERIC_DESC": "从我们的全面示例和指南中选择：",
+      "ALLEXAMPLES": "所有示例",
+      "INTEGRATION_GUIDE": "集成指南",
+      "NEXTSTEPS": "下一步",
+      "CONFIGURE": "配置设置",
+      "CONFIGURE_DESC": "自定义应用程序的 OIDC 配置",
+      "REDIRECTS": "设置重定向",
+      "REDIRECTS_DESC": "配置重定向和注销 URL",
+      "URLS_DESC": "查看集成所需的重要 URL",
+      "TERMINAL": "终端",
+      "SCENARIO_NEW_TITLE": "我想创建一个全新的应用程序",
+      "SCENARIO_NEW_DESC": "太好了！我们将帮助您快速开始，提供包含 ZITADEL 身份验证的可运行示例。",
+      "SCENARIO_NEW_TOGGLE": "我还没有应用程序",
+      "SCENARIO_EXISTING_TITLE": "我想集成到现有应用程序",
+      "SCENARIO_EXISTING_DESC": "很好！我们将逐步指导您将 ZITADEL 身份验证添加到现有应用程序中。",
+      "SCENARIO_EXISTING_TOGGLE": "我有一个现有应用程序",
+      "CLONE_EXAMPLE": "克隆示例",
+      "CLONE_NOTE": "克隆后，只需用上面的应用程序信息更新 .env 文件即可开始！",
+      "BROWSE_EXAMPLES": "浏览所有示例",
+      "GENERIC_NEW_NOTE": "选择一个匹配您技术栈的示例并克隆，以快速开始。",
+      "EXISTING_STEP1_TITLE": "安装 SDK",
+      "EXISTING_STEP1_DESC": "将 SDK 添加到您的项目中",
+      "EXISTING_STEP2_TITLE": "添加配置",
+      "EXISTING_STEP2_DESC": "将这些环境变量复制并粘贴到应用程序的配置文件中",
+      "EXISTING_STEP3_TITLE": "设置身份验证",
+      "EXISTING_STEP3_DESC": "按照我们的分步集成指南将身份验证添加到您的应用程序",
+      "VIEW_SDKS": "查看 SDK 文档",
+      "AUTH_STATUS_CHECKING": "正在检查身份验证状态...",
+      "AUTH_STATUS_SUCCESS": "您的应用程序已通过 ZITADEL 验证。",
+      "AUTH_STATUS_PENDING": "您的应用程序尚未通过 ZITADEL 验证。",
+      "AUTH_STATUS_PENDING_DESC": "请按照以下步骤完成集成。",
+      "SUCCESS_TITLE": "🎉 太棒了！您的应用程序已成功连接",
+      "SUCCESS_DESC": "您的应用程序已成功通过 ZITADEL 验证。您现在可以使用以下环境变量进行集成。",
+      "ENVVARS_AUTHENTICATED_DESC": "在您的应用程序中使用这些环境变量：",
+      "INTEGRATION_ENVVARS_TITLE": "您的应用程序配置",
+      "INTEGRATION_ENVVARS_DESC": "将这些环境变量添加到您的应用程序以连接 ZITADEL：",
+      "NEW_STEP1_TITLE": "克隆示例应用程序",
+      "NEW_STEP1_DESC": "使用包含 ZITADEL 身份验证的可运行示例快速开始。",
+      "NEW_STEP2_TITLE": "配置环境变量",
+      "NEW_STEP2_DESC": "将这些环境变量添加到您的应用程序中。将它们粘贴到项目根目录下的 .env 文件中，或下载 .env 文件并保存。",
+      "NEW_STEP2_DESC_EXAMPLE_ENV": "使用这些值更新示例的 .env.example 文件，然后重命名为 .env。",
+      "NEW_STEP2_CLIENT_SECRET_NOTE": "将 'your-client-secret' 替换为您的实际客户端密钥。如果您在创建应用程序时没有保存，",
+      "NEW_STEP2_CLIENT_SECRET_LINK": "在此生成一个新的",
+      "NEW_STEP3_TITLE": "运行并测试应用程序",
+      "NEW_STEP3_DESC": "安装依赖项。",
+      "NEW_STEP3_DESC2": "启动应用程序并测试身份验证流程。",
+      "NEW_STEP4_TITLE": "查看文档",
+      "NEW_STEP4_DESC": "按照我们的指南自定义并扩展您的应用程序与 ZITADEL 集成。",
+      "STEP4_ACTION": "查看文档",
+      "GENERIC_NEW_TITLE": "选择您的起点",
+      "GENERIC_EXISTING_TITLE": "选择集成方式",
+      "GENERIC_EXISTING_NOTE": "由于您的框架没有特定的 SDK，可使用我们的通用集成指南，或直接与 OIDC/OAuth2 端点交互。",
+      "API_DOCS": "API 文档",
+      "NEW_STEP_DOCS_TITLE": "查看完整文档",
+      "NEW_STEP_DOCS_DESC": "了解更多关于高级配置选项及框架最佳实践的信息。",
+      "EXISTING_STEP_DOCS_TITLE": "了解更多集成信息",
+      "EXISTING_STEP_DOCS_DESC": "探索我们的详细文档以获取高级配置和故障排除指南。",
+      "SELECT_FRAMEWORK": "选择您的框架",
+      "SELECT_FRAMEWORK_DESC": "选择您使用的框架，以获取定制的集成指导和示例。"
+    },
+    "NAMEANDTYPESECTION": "名称和类型",
+    "PROSWITCH": "我是专业用户。跳过此向导。",
+    "TITLEFIRST": "应用程序名称",
+    "TYPETITLE": "应用程序类型"
   },
   "GENDERS": {
     "0": "未知",
@@ -2790,10 +2888,10 @@
     "ADD": "添加管理者",
     "CREATIONTYPE": "创建类型",
     "CREATIONTYPES": {
-      "3": "IAM",
-      "2": "Organization",
       "0": "Owned Project",
       "1": "Granted Project",
+      "2": "Organization",
+      "3": "IAM",
       "4": "Project"
     },
     "EDITROLE": "编辑角色",

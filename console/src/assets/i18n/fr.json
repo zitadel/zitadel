@@ -435,7 +435,8 @@
     "TOS": "Conditions de service",
     "OPENSHORTCUTSTOOLTIP": "Tapez ? pour afficher les raccourcis clavier",
     "SETTINGS": "Paramètres",
-    "CUSTOMERPORTAL": "Portail Client"
+    "CUSTOMERPORTAL": "Portail Client",
+    "TARGETS": "Targets"
   },
   "QUICKSTART": {
     "TITLE": "Intégrer ZITADEL dans votre application",
@@ -1502,7 +1503,9 @@
       "SECURITY": "Paramètres de sécurité",
       "EVENTS": "Événements",
       "FAILEDEVENTS": "Événements échoués",
-      "VIEWS": "Vues"
+      "VIEWS": "Vues",
+      "ACTIONS": "Actions",
+      "TARGETS": "Targets"
     },
     "GROUPS": {
       "GENERAL": "Général",
@@ -1512,7 +1515,8 @@
       "TEXTS": "Textes et langues",
       "APPEARANCE": "Apparence",
       "OTHER": "Autres",
-      "STORAGE": "Stockage"
+      "STORAGE": "Stockage",
+      "ACTIONS": "Actions"
     },
     "BETA": "BÊTA"
   },
@@ -2172,7 +2176,8 @@
       "UPDATED": "Projet modifié.",
       "GRANTUPDATED": "Octroi modifié.",
       "DELETED": "Projet supprimé."
-    }
+    },
+    "CLICK_TO_EDIT_NAME": "Click to edit project name"
   },
   "ROLES": {
     "DIALOG": {
@@ -2230,6 +2235,18 @@
       "LDAP": {
         "TITLE": "Active Directory / LDAP",
         "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité LDAP"
+      },
+      "APPLE": {
+        "TITLE": "Sign in with Apple",
+        "DESCRIPTION": "Enter the credentials for your Apple Provider"
+      },
+      "OAUTH": {
+        "TITLE": "OAuth Provider",
+        "DESCRIPTION": "Enter the required data for your OAuth provider."
+      },
+      "SAML": {
+        "TITLE": "Sign in with SAML",
+        "DESCRIPTION": "Enter the credentials for your SAML Provider"
       }
     },
     "DETAIL": {
@@ -2370,7 +2387,25 @@
     "ISIDTOKENMAPPING": "Mappage depuis le jeton ID",
     "ISIDTOKENMAPPING_DESC": "Si sélectionné, les informations du fournisseur sont mappées à partir du jeton ID, et non à partir du point d'extrémité userinfo.",
     "USEPKCE": "Utiliser PKCE",
-    "USEPKCE_DESC": "Détermine si les paramètres code_challenge et code_challenge_method sont inclus dans la demande d'authentification"
+    "USEPKCE_DESC": "Détermine si les paramètres code_challenge et code_challenge_method sont inclus dans la demande d'authentification",
+    "APPLE": {
+      "TEAMID": "Team ID",
+      "KEYID": "Key ID",
+      "PRIVATEKEY": "Private Key",
+      "UPDATEPRIVATEKEY": "Update Private Key",
+      "UPLOADPRIVATEKEY": "Upload Private Key",
+      "KEYMAXSIZEEXCEEDED": "Maximum size of 5kB exceeded."
+    },
+    "SAML": {
+      "METADATAXML": "Metadata Xml",
+      "METADATAURL": "Metadata URL",
+      "BINDING": "Binding",
+      "SIGNEDREQUEST": "Signed Request",
+      "SIGNATUREALGORITHM": "Signature Algorithm",
+      "NAMEIDFORMAT": "NameID Format",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "Custom Mapping Attribute Name",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    }
   },
   "MFA": {
     "LIST": {
@@ -2442,7 +2477,11 @@
         "DELETE_TITLE": "Supprimer la configuration SMTP",
         "DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer une configuration. Confirmez cette action en tapant le nom de l'expéditeur",
         "DELETED": "La configuration SMTP a été supprimée",
-        "SENDER": "Tapez {{ value }} pour supprimer cette configuration SMTP."
+        "SENDER": "Tapez {{ value }} pour supprimer cette configuration SMTP.",
+        "TEST_DESCRIPTION": "Specify an email address to test your SMTP configuration for this provider",
+        "TEST_EMAIL": "Email address",
+        "TEST_RESULT": "Test result",
+        "TEST_TITLE": "Test your SMTP config"
       }
     },
     "CREATE": {
@@ -2815,7 +2854,11 @@
     "LOGINV2": {
       "USEV2": "Utiliser la nouvelle interface utilisateur de connexion",
       "BASEURL": "URL de base personnalisée pour la nouvelle interface utilisateur de connexion"
-    }
+    },
+    "NAMEANDTYPESECTION": "Name and Type",
+    "PROSWITCH": "I'm a pro. Skip this wizard.",
+    "TITLEFIRST": "Name of the application",
+    "TYPETITLE": "Type of application"
   },
   "GENDERS": {
     "0": "Inconnu",

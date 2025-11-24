@@ -435,7 +435,8 @@
     "TOS": "Algemene voorwaarden",
     "OPENSHORTCUTSTOOLTIP": "Typ ? om toetsenbordsnelkoppelingen te tonen",
     "SETTINGS": "Instellingen",
-    "CUSTOMERPORTAL": "Klantenportaal"
+    "CUSTOMERPORTAL": "Klantenportaal",
+    "TARGETS": "Doelen"
   },
   "QUICKSTART": {
     "TITLE": "Integreer ZITADEL in uw toepassing",
@@ -698,9 +699,9 @@
     "PROJECTNAME": "Projectnaam",
     "RESOURCEOWNER": "Eigenaar van de bron",
     "METHODS": {
+      "1": "gelijk aan",
       "5": "bevat",
-      "7": "eindigt met",
-      "1": "gelijk aan"
+      "7": "eindigt met"
     }
   },
   "KEYBOARDSHORTCUTS": {
@@ -1502,7 +1503,9 @@
       "SECURITY": "Beveiligingsinstellingen",
       "EVENTS": "Evenementen",
       "FAILEDEVENTS": "Mislukte evenementen",
-      "VIEWS": "Weergaves"
+      "VIEWS": "Weergaves",
+      "ACTIONS": "Acties",
+      "TARGETS": "Doelen"
     },
     "GROUPS": {
       "GENERAL": "Algemeen",
@@ -1512,7 +1515,8 @@
       "TEXTS": "Teksten en Talen",
       "APPEARANCE": "Verschijning",
       "OTHER": "Andere",
-      "STORAGE": "opslag"
+      "STORAGE": "opslag",
+      "ACTIONS": "Acties"
     },
     "BETA": "BÈTA"
   },
@@ -1969,7 +1973,6 @@
         "GRANTED_SINGULAR": "Project toegewezen {{name}}"
       },
       "PRIVATELABEL": {
-        "TITLE": "Branding Instelling",
         "0": {
           "TITLE": "Niet gespecificeerd",
           "DESC": "Zodra de gebruiker is geïdentificeerd, wordt de branding van de organisatie van de geïdentificeerde gebruiker getoond, voordat de systeemstandaard wordt getoond."
@@ -1982,6 +1985,7 @@
           "TITLE": "Gebruik instelling van gebruikersorganisatie",
           "DESC": "De branding van de organisatie van het project wordt getoond, maar zodra de gebruiker is geïdentificeerd, wordt de instelling van de organisatie van de geïdentificeerde gebruiker getoond."
         },
+        "TITLE": "Branding Instelling",
         "DIALOG": {
           "TITLE": "Branding instelling",
           "DESCRIPTION": "Selecteer het gedrag van de login, bij gebruik van het project."
@@ -2013,16 +2017,16 @@
       "DESCRIPTION": ""
     },
     "STATE": {
-      "TITLE": "Status",
       "0": "Niet gedefinieerd",
       "1": "Actief",
-      "2": "Inactief"
+      "2": "Inactief",
+      "TITLE": "Status"
     },
     "TYPE": {
-      "TITLE": "Type",
       "0": "Onbekend type",
       "1": "Eigen",
-      "2": "Verleend"
+      "2": "Verleend",
+      "TITLE": "Type"
     },
     "NAME": "Naam",
     "NAMEDIALOG": {
@@ -2172,7 +2176,8 @@
       "UPDATED": "Project gewijzigd.",
       "GRANTUPDATED": "Verlening gewijzigd.",
       "DELETED": "Project verwijderd."
-    }
+    },
+    "CLICK_TO_EDIT_NAME": "Klik om projectnaam te bewerken"
   },
   "ROLES": {
     "DIALOG": {
@@ -2272,10 +2277,10 @@
       "2": "inactief"
     },
     "AZUREADTENANTTYPES": {
-      "3": "Tenant ID",
       "0": "Algemeen",
       "1": "Organisaties",
-      "2": "Consumenten"
+      "2": "Consumenten",
+      "3": "Tenant ID"
     },
     "AZUREADTENANTTYPE": "Tenant Type",
     "AZUREADTENANTID": "Tenant ID",
@@ -2372,7 +2377,10 @@
       "METADATAURL": "Metadata URL",
       "BINDING": "Binding",
       "SIGNEDREQUEST": "Ondertekend Verzoek",
-      "SIGNATUREALGORITHM": "Handtekeningalgoritme"
+      "SIGNATUREALGORITHM": "Handtekeningalgoritme",
+      "NAMEIDFORMAT": "NameID Formaat",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "Aangepaste Mapping Attribuutnaam",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternatieve attribuutnaam om de gebruiker te mappen in het geval dat het geretourneerde `nameid-format` `transient` is."
     },
     "TOAST": {
       "SAVED": "Succesvol opgeslagen.",
@@ -2388,7 +2396,8 @@
     "ISIDTOKENMAPPING": "Kaart van de ID token",
     "ISIDTOKENMAPPING_DESC": "Als geselecteerd, wordt provider informatie in kaart gebracht van de ID token, niet van de userinfo eindpunt.",
     "USEPKCE": "Gebruik PKCE",
-    "USEPKCE_DESC": "Bepaalt of de parameters code_challenge en code_challenge_method zijn opgenomen in het verificatieverzoek"
+    "USEPKCE_DESC": "Bepaalt of de parameters code_challenge en code_challenge_method zijn opgenomen in het verificatieverzoek",
+    "IDPDISPLAYNAMMAPPING": "IdP Weergavenaam Mapping"
   },
   "MFA": {
     "LIST": {
@@ -2460,7 +2469,11 @@
         "DELETE_TITLE": "SMTP-configuratie verwijderen",
         "DELETE_DESCRIPTION": "U staat op het punt een configuratie te verwijderen. Bevestig deze actie door de naam van de afzender te typen",
         "DELETED": "SMTP-configuratie is verwijderd",
-        "SENDER": "Typ {{ value }} om deze SMTP-configuratie te verwijderen."
+        "SENDER": "Typ {{ value }} om deze SMTP-configuratie te verwijderen.",
+        "TEST_DESCRIPTION": "Specificeer een e-mailadres om uw SMTP-configuratie te testen",
+        "TEST_EMAIL": "E-mailadres",
+        "TEST_RESULT": "Testresultaat",
+        "TEST_TITLE": "Test uw SMTP-configuratie"
       }
     },
     "CREATE": {
@@ -2536,7 +2549,6 @@
         }
       },
       "NEXTSTEPS": {
-        "TITLE": "Volgende stappen",
         "0": {
           "TITLE": "Voeg rollen toe",
           "DESC": "Voer uw projectrollen in"
@@ -2548,8 +2560,16 @@
         "2": {
           "TITLE": "Hulp & Ondersteuning",
           "DESC": "Lees onze documentatie over het creëren van toepassingen of neem contact op met onze ondersteuning"
-        }
-      }
+        },
+        "TITLE": "Volgende stappen"
+      },
+      "CREATE_PROJECT_AUTO": "Maak project voor mij",
+      "CREATE_PROJECT_AUTO_DESC": "Aanbevolen als je nieuw bent bij ZITADEL. We regelen de projectinrichting voor je.",
+      "QUICK_CREATE_DESC": "Maak een applicatie in drie eenvoudige stappen.",
+      "QUICK_CREATE_FRAMEWORK": "Selecteer uw framework",
+      "QUICK_CREATE_FRAMEWORK_DESC": "We bieden een aanbevolen configuratie voor uw applicatie. Kies het framework dat u gebruikt of gaat gebruiken.",
+      "QUICK_CREATE_NAME": "Geef uw applicatie een naam",
+      "QUICK_CREATE_TITLE": "Applicatie maken"
     },
     "NAMEDIALOG": {
       "TITLE": "Hernoem App",
@@ -2742,6 +2762,90 @@
     "LOGINV2": {
       "USEV2": "Nieuwe login-gebruikersinterface gebruiken",
       "BASEURL": "Aangepaste basis-URL voor de nieuwe login-gebruikersinterface"
+    },
+    "QUICKSTART": "Snelstart",
+    "OVERVIEW_DETAIL": {
+      "TITLE": "Snelstart",
+      "DESCRIPTION": "Laat je applicatie snel draaien met ZITADEL-authenticatie.",
+      "GETSTARTED": "Aan de slag met je applicatie",
+      "GETSTARTED_DESC": "Deze gids helpt je om snel en eenvoudig ZITADEL-authenticatie in je applicatie te integreren.",
+      "FRAMEWORK": "Framework",
+      "VIEWDOCS": "Documentatie Bekijken",
+      "VIEWEXAMPLE": "Voorbeeld Bekijken",
+      "ENVVARS": "Omgevingsvariabelen",
+      "ENVVARS_DESC": "Voeg deze omgevingsvariabelen toe aan je applicatie:",
+      "ENVFILE": ".env",
+      "QUICKSTART": "Wat is je startpunt?",
+      "QUICKSTART_SUBTITLE": "Kies de optie die het beste bij jouw situatie past:",
+      "OPTION1": "Optie 1: Voorbeeldapplicatie Klonen",
+      "OPTION1_DESC": "Begin snel met een werkende voorbeeldapplicatie:",
+      "OPTION1_NOTE": "Werk na het klonen de omgevingsvariabelen bij met de gegevens van jouw applicatie.",
+      "OPTION2": "Optie 2: Integreren in een Bestaande Applicatie",
+      "OPTION2_DESC": "Integreer ZITADEL-authenticatie in je bestaande applicatie:",
+      "STEP1": "Installeer de ZITADEL SDK voor jouw framework",
+      "STEP2": "Configureer je omgevingsvariabelen",
+      "STEP3": "Voeg authenticatie toe aan je applicatie",
+      "STEP4": "Test de integratie",
+      "GENERIC": "Algemene Integratie",
+      "GENERIC_DESC": "Kies uit onze uitgebreide voorbeelden en gidsen:",
+      "ALLEXAMPLES": "Alle Voorbeelden",
+      "INTEGRATION_GUIDE": "Integratiegids",
+      "NEXTSTEPS": "Volgende Stappen",
+      "CONFIGURE": "Instellingen Configureren",
+      "CONFIGURE_DESC": "Pas de OIDC-configuratie van je app aan",
+      "REDIRECTS": "Redirects Instellen",
+      "REDIRECTS_DESC": "Configureer de redirect- en logout-URL’s",
+      "URLS_DESC": "Bekijk belangrijke URL’s voor integratie",
+      "TERMINAL": "Terminal",
+      "SCENARIO_NEW_TITLE": "Ik wil een volledig nieuwe applicatie maken",
+      "SCENARIO_NEW_DESC": "Perfect! We helpen je snel op weg met een werkend voorbeeld inclusief ingebouwde ZITADEL-authenticatie.",
+      "SCENARIO_NEW_TOGGLE": "Ik heb nog geen applicatie",
+      "SCENARIO_EXISTING_TITLE": "Ik wil integreren in een bestaande applicatie",
+      "SCENARIO_EXISTING_DESC": "Geweldig! We begeleiden je stap voor stap bij het toevoegen van ZITADEL-authenticatie aan je huidige applicatie.",
+      "SCENARIO_EXISTING_TOGGLE": "Ik heb een bestaande applicatie",
+      "CLONE_EXAMPLE": "Voorbeeld Klonen",
+      "CLONE_NOTE": "Na het klonen hoef je alleen nog het .env-bestand bij te werken met je gegevens, en je bent klaar om te beginnen!",
+      "BROWSE_EXAMPLES": "Alle Voorbeelden Bekijken",
+      "GENERIC_NEW_NOTE": "Kies een voorbeeld dat past bij jouw technologiestack en kloon het om snel te starten.",
+      "EXISTING_STEP1_TITLE": "Installeer de SDK",
+      "EXISTING_STEP1_DESC": "Voeg de SDK toe aan je project",
+      "EXISTING_STEP2_TITLE": "Voeg je configuratie toe",
+      "EXISTING_STEP2_DESC": "Kopieer en plak deze omgevingsvariabelen in het configuratiebestand van je applicatie",
+      "EXISTING_STEP3_TITLE": "Stel authenticatie in",
+      "EXISTING_STEP3_DESC": "Volg onze stapsgewijze integratiegids om authenticatie aan je applicatie toe te voegen",
+      "VIEW_SDKS": "SDK-documentatie Bekijken",
+      "AUTH_STATUS_CHECKING": "Authenticatiestatus controleren...",
+      "AUTH_STATUS_SUCCESS": "Je app is geauthenticeerd met ZITADEL.",
+      "AUTH_STATUS_PENDING": "Je app is nog niet geauthenticeerd met ZITADEL.",
+      "AUTH_STATUS_PENDING_DESC": "Volg de onderstaande stappen om de integratie te voltooien.",
+      "SUCCESS_TITLE": "🎉 Geweldig! Je app is succesvol verbonden",
+      "SUCCESS_DESC": "Je applicatie is succesvol geauthenticeerd met ZITADEL. Je kunt nu de onderstaande omgevingsvariabelen gebruiken voor je integratie.",
+      "ENVVARS_AUTHENTICATED_DESC": "Gebruik deze omgevingsvariabelen in je applicatie:",
+      "INTEGRATION_ENVVARS_TITLE": "Configuratie van je Applicatie",
+      "INTEGRATION_ENVVARS_DESC": "Voeg deze omgevingsvariabelen toe aan je applicatie om verbinding te maken met ZITADEL:",
+      "NEW_STEP1_TITLE": "Kloon de voorbeeldapplicatie",
+      "NEW_STEP1_DESC": "Begin snel met een werkend voorbeeld dat ZITADEL-authenticatie bevat.",
+      "NEW_STEP2_TITLE": "Configureer je omgevingsvariabelen",
+      "NEW_STEP2_DESC": "Voeg deze omgevingsvariabelen toe aan je applicatie. Plak ze in een .env-bestand in de hoofdmap van je project, of download het .env-bestand en sla het op.",
+      "NEW_STEP2_DESC_EXAMPLE_ENV": "Werk het .env.example-bestand van het voorbeeld bij met deze waarden en hernoem het vervolgens naar .env.",
+      "NEW_STEP2_CLIENT_SECRET_NOTE": "Vervang 'your-client-secret' door je echte client secret. Als je deze niet hebt opgeslagen tijdens het aanmaken van de app, kun je ",
+      "NEW_STEP2_CLIENT_SECRET_LINK": "hier een nieuwe genereren",
+      "NEW_STEP3_TITLE": "Voer je applicatie uit en test deze",
+      "NEW_STEP3_DESC": "Installeer afhankelijkheden.",
+      "NEW_STEP3_DESC2": "Start je applicatie en test de authenticatiestroom.",
+      "NEW_STEP4_TITLE": "Bekijk de documentatie",
+      "NEW_STEP4_DESC": "Volg onze gids over hoe je je applicatie kunt aanpassen en uitbreiden met ZITADEL.",
+      "STEP4_ACTION": "Documentatie Bekijken",
+      "GENERIC_NEW_TITLE": "Kies je startpunt",
+      "GENERIC_EXISTING_TITLE": "Kies je integratieaanpak",
+      "GENERIC_EXISTING_NOTE": "Omdat er geen specifieke SDK beschikbaar is voor jouw framework, kun je onze algemene integratiegidsen gebruiken of direct met de OIDC/OAuth2-endpoints werken.",
+      "API_DOCS": "API-documentatie",
+      "NEW_STEP_DOCS_TITLE": "Uitgebreide documentatie bekijken",
+      "NEW_STEP_DOCS_DESC": "Leer meer over geavanceerde configuratieopties en best practices voor jouw framework.",
+      "EXISTING_STEP_DOCS_TITLE": "Meer over integratie",
+      "EXISTING_STEP_DOCS_DESC": "Bekijk onze gedetailleerde documentatie voor geavanceerde configuratie en probleemoplossing.",
+      "SELECT_FRAMEWORK": "Selecteer je framework",
+      "SELECT_FRAMEWORK_DESC": "Kies het framework dat je gebruikt om gerichte integratie-instructies en voorbeelden te krijgen."
     }
   },
   "GENDERS": {
@@ -2776,10 +2880,10 @@
     "ADD": "Voeg een Manager toe",
     "CREATIONTYPE": "Creatietype",
     "CREATIONTYPES": {
-      "3": "IAM",
-      "2": "Organisatie",
       "0": "Eigendom Project",
       "1": "Verleend Project",
+      "2": "Organisatie",
+      "3": "IAM",
       "4": "Project"
     },
     "EDITROLE": "Bewerk rollen",

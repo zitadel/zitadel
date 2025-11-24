@@ -435,7 +435,8 @@
     "TOS": "Termeni și condiții",
     "OPENSHORTCUTSTOOLTIP": "Tastați ? pentru a afișa comenzile rapide de la tastatură",
     "SETTINGS": "Setări",
-    "CUSTOMERPORTAL": "Portalul clienților"
+    "CUSTOMERPORTAL": "Portalul clienților",
+    "TARGETS": "Ținte"
   },
   "QUICKSTART": {
     "TITLE": "Integrați ZITADEL în aplicația dvs.",
@@ -662,7 +663,9 @@
     "PROJECT_OWNER_GLOBAL": "Are permisiunea asupra întregului proiect",
     "PROJECT_OWNER_VIEWER_GLOBAL": "Are permisiunea de a revizui întregul proiect",
     "PROJECT_GRANT_OWNER": "Are permisiunea de a gestiona grantul proiectului",
-    "PROJECT_GRANT_OWNER_VIEWER": "Are permisiunea de a revizui grantul proiectului"
+    "PROJECT_GRANT_OWNER_VIEWER": "Are permisiunea de a revizui grantul proiectului",
+    "ORG_SETTINGS_MANAGER": "Org Settings Manager",
+    "ORG_USER_SELF_MANAGER": "Org User Self Manager"
   },
   "OVERLAYS": {
     "ORGSWITCHER": {
@@ -696,9 +699,9 @@
     "PROJECTNAME": "Numele proiectului",
     "RESOURCEOWNER": "Proprietarul resursei",
     "METHODS": {
+      "1": "este egal cu",
       "5": "conține",
-      "7": "se termină cu",
-      "1": "este egal cu"
+      "7": "se termină cu"
     }
   },
   "KEYBOARDSHORTCUTS": {
@@ -1500,7 +1503,9 @@
       "SECURITY": "Setări de securitate",
       "EVENTS": "Evenimente",
       "FAILEDEVENTS": "Evenimente eșuate",
-      "VIEWS": "Vizualizări"
+      "VIEWS": "Vizualizări",
+      "ACTIONS": "Acțiuni",
+      "TARGETS": "Ținte"
     },
     "GROUPS": {
       "GENERAL": "Informații generale",
@@ -1510,7 +1515,8 @@
       "TEXTS": "Texte și limbi",
       "APPEARANCE": "Aspect",
       "OTHER": "Altele",
-      "STORAGE": "Stocare"
+      "STORAGE": "Stocare",
+      "ACTIONS": "Acțiuni"
     },
     "BETA": "BETA"
   },
@@ -1967,7 +1973,6 @@
         "GRANTED_SINGULAR": "Proiect acordat al {{name}}"
       },
       "PRIVATELABEL": {
-        "TITLE": "Setare de branding",
         "0": {
           "TITLE": "Nespecificat",
           "DESC": "De îndată ce utilizatorul este identificat, brandingul organizației utilizatorului identificat va fi afișat înainte ca valoarea implicită a sistemului să fie afișată."
@@ -1980,6 +1985,7 @@
           "TITLE": "Utilizați setarea Organizației utilizatorului",
           "DESC": "Va fi afișat brandingul organizației proiectului, dar de îndată ce utilizatorul este identificat, va fi afișată setarea organizației utilizatorului identificat."
         },
+        "TITLE": "Setare de branding",
         "DIALOG": {
           "TITLE": "Setare branding",
           "DESCRIPTION": "Selectați comportamentul conectării, atunci când utilizați proiectul."
@@ -2011,16 +2017,16 @@
       "DESCRIPTION": ""
     },
     "STATE": {
-      "TITLE": "Stare",
       "0": "Nedefinit",
       "1": "Activ",
-      "2": "Inactiv"
+      "2": "Inactiv",
+      "TITLE": "Stare"
     },
     "TYPE": {
-      "TITLE": "Tip",
       "0": "Tip necunoscut",
       "1": "Deținut",
-      "2": "Acordat"
+      "2": "Acordat",
+      "TITLE": "Tip"
     },
     "NAME": "Nume",
     "NAMEDIALOG": {
@@ -2170,7 +2176,8 @@
       "UPDATED": "Proiect modificat.",
       "GRANTUPDATED": "Grant modificat.",
       "DELETED": "Proiect șters."
-    }
+    },
+    "CLICK_TO_EDIT_NAME": "Faceți clic pentru a edita numele proiectului"
   },
   "ROLES": {
     "DIALOG": {
@@ -2270,10 +2277,10 @@
       "2": "inactiv"
     },
     "AZUREADTENANTTYPES": {
-      "3": "ID chiriaș",
       "0": "Comun",
       "1": "Organizații",
-      "2": "Consumatori"
+      "2": "Consumatori",
+      "3": "ID chiriaș"
     },
     "AZUREADTENANTTYPE": "Tip chiriaș",
     "AZUREADTENANTID": "ID chiriaș",
@@ -2387,7 +2394,9 @@
       "REMOVED": "Eliminat cu succes."
     },
     "ISIDTOKENMAPPING": "Mapați din tokenul ID",
-    "ISIDTOKENMAPPING_DESC": "Dacă este selectat, informațiile despre furnizor sunt mapate din tokenul ID, nu din endpoint-ul userinfo."
+    "ISIDTOKENMAPPING_DESC": "Dacă este selectat, informațiile despre furnizor sunt mapate din tokenul ID, nu din endpoint-ul userinfo.",
+    "USEPKCE": "Utilizați PKCE",
+    "USEPKCE_DESC": "Determină dacă parametrii code_challenge și code_challenge_method sunt incluși în cererea de autentificare"
   },
   "MFA": {
     "LIST": {
@@ -2539,7 +2548,6 @@
         }
       },
       "NEXTSTEPS": {
-        "TITLE": "Pași următori",
         "0": {
           "TITLE": "Adăugați roluri",
           "DESC": "Introduceți rolurile proiectului dvs."
@@ -2551,8 +2559,16 @@
         "2": {
           "TITLE": "Ajutor și asistență",
           "DESC": "Citiți documentația noastră despre crearea aplicațiilor sau contactați asistența noastră"
-        }
-      }
+        },
+        "TITLE": "Pași următori"
+      },
+      "CREATE_PROJECT_AUTO": "Creați proiect pentru mine",
+      "CREATE_PROJECT_AUTO_DESC": "Recomandat dacă sunteți nou în ZITADEL. Vom gestiona configurarea proiectului pentru dvs.",
+      "QUICK_CREATE_DESC": "Creați o aplicație în trei pași simpli.",
+      "QUICK_CREATE_FRAMEWORK": "Selectați framework-ul",
+      "QUICK_CREATE_FRAMEWORK_DESC": "Oferim o configurație recomandată pentru aplicația dvs. Alegeți framework-ul pe care îl utilizați sau intenționați să îl utilizați.",
+      "QUICK_CREATE_NAME": "Denumiți aplicația",
+      "QUICK_CREATE_TITLE": "Creați aplicație"
     },
     "NAMEDIALOG": {
       "TITLE": "Redenumiți aplicația",
@@ -2745,6 +2761,90 @@
     "LOGINV2": {
       "USEV2": "Utilizați noua UI de conectare",
       "BASEURL": "Adresă URL de bază personalizată pentru noua UI de conectare"
+    },
+    "QUICKSTART": "Pornire Rapidă",
+    "OVERVIEW_DETAIL": {
+      "TITLE": "Pornire Rapidă",
+      "DESCRIPTION": "Porniți aplicația dvs. cu autentificare ZITADEL.",
+      "GETSTARTED": "Începeți cu aplicația dvs.",
+      "GETSTARTED_DESC": "Acest ghid vă va ajuta să integrați rapid și ușor autentificarea ZITADEL în aplicația dvs.",
+      "FRAMEWORK": "Framework",
+      "VIEWDOCS": "Vezi Documentația",
+      "VIEWEXAMPLE": "Vezi Exemplu",
+      "ENVVARS": "Variabile de Mediu",
+      "ENVVARS_DESC": "Adăugați aceste variabile de mediu în aplicația dvs.:",
+      "ENVFILE": ".env",
+      "QUICKSTART": "Care este punctul dvs. de pornire?",
+      "QUICKSTART_SUBTITLE": "Alegeți opțiunea care descrie cel mai bine situația dvs.:",
+      "OPTION1": "Opțiunea 1: Clonează Aplicația Exemplu",
+      "OPTION1_DESC": "Începeți rapid cu o aplicație exemplu funcțională:",
+      "OPTION1_NOTE": "După clonare, actualizați variabilele de mediu cu detaliile aplicației dvs.",
+      "OPTION2": "Opțiunea 2: Integrați Aplicația Existenta",
+      "OPTION2_DESC": "Integrați autentificarea ZITADEL în aplicația dvs. existentă:",
+      "STEP1": "Instalați SDK-ul ZITADEL pentru framework-ul dvs.",
+      "STEP2": "Configurați variabilele dvs. de mediu",
+      "STEP3": "Adăugați autentificarea în aplicația dvs.",
+      "STEP4": "Testați integrarea",
+      "GENERIC": "Integrare Generală",
+      "GENERIC_DESC": "Alegeți dintre exemplele și ghidurile noastre complete:",
+      "ALLEXAMPLES": "Toate Exemplele",
+      "INTEGRATION_GUIDE": "Ghid de Integrare",
+      "NEXTSTEPS": "Pașii Următori",
+      "CONFIGURE": "Configurează Setările",
+      "CONFIGURE_DESC": "Personalizați configurația OIDC a aplicației dvs.",
+      "REDIRECTS": "Setați Redirect-uri",
+      "REDIRECTS_DESC": "Configurați URL-urile de redirect și logout",
+      "URLS_DESC": "Vezi URL-urile importante pentru integrare",
+      "TERMINAL": "Terminal",
+      "SCENARIO_NEW_TITLE": "Vreau să creez o aplicație complet nouă",
+      "SCENARIO_NEW_DESC": "Perfect! Vă vom ajuta să începeți rapid cu un exemplu funcțional care include autentificarea ZITADEL.",
+      "SCENARIO_NEW_TOGGLE": "Încă nu am o aplicație",
+      "SCENARIO_EXISTING_TITLE": "Vreau să integrez într-o aplicație existentă",
+      "SCENARIO_EXISTING_DESC": "Groaznic! Vă vom ghida pas cu pas pentru a adăuga autentificarea ZITADEL aplicației dvs. existente.",
+      "SCENARIO_EXISTING_TOGGLE": "Am o aplicație existentă",
+      "CLONE_EXAMPLE": "Clonează Exemplu",
+      "CLONE_NOTE": "După clonare, actualizați fișierul .env cu detaliile aplicației dvs. și sunteți gata!",
+      "BROWSE_EXAMPLES": "Răsfoiește Toate Exemplele",
+      "GENERIC_NEW_NOTE": "Alegeți un exemplu care se potrivește cu stack-ul dvs. tehnologic și clonați-l pentru a începe rapid.",
+      "EXISTING_STEP1_TITLE": "Instalați SDK-ul",
+      "EXISTING_STEP1_DESC": "Adăugați SDK-ul în proiectul dvs.",
+      "EXISTING_STEP2_TITLE": "Adăugați configurația dvs.",
+      "EXISTING_STEP2_DESC": "Copiați și lipiți aceste variabile de mediu în fișierul de configurație al aplicației dvs.",
+      "EXISTING_STEP3_TITLE": "Configurați autentificarea",
+      "EXISTING_STEP3_DESC": "Urmăriți ghidul nostru pas cu pas pentru a adăuga autentificarea",
+      "VIEW_SDKS": "Vezi Documentația SDK",
+      "AUTH_STATUS_CHECKING": "Se verifică starea autentificării...",
+      "AUTH_STATUS_SUCCESS": "Aplicația dvs. a fost autentificată cu ZITADEL.",
+      "AUTH_STATUS_PENDING": "Aplicația dvs. încă nu a fost autentificată cu ZITADEL.",
+      "AUTH_STATUS_PENDING_DESC": "Urmați pașii de mai jos pentru a finaliza integrarea.",
+      "SUCCESS_TITLE": "🎉 Grozav! Aplicația dvs. este conectată cu succes",
+      "SUCCESS_DESC": "Aplicația dvs. a fost autentificată cu succes cu ZITADEL. Acum puteți folosi variabilele de mediu de mai jos pentru integrarea dvs.",
+      "ENVVARS_AUTHENTICATED_DESC": "Folosiți aceste variabile de mediu în aplicația dvs.:",
+      "INTEGRATION_ENVVARS_TITLE": "Configurația Aplicației Dvs.",
+      "INTEGRATION_ENVVARS_DESC": "Adăugați aceste variabile de mediu în aplicația dvs. pentru a vă conecta cu ZITADEL:",
+      "NEW_STEP1_TITLE": "Clonează aplicația exemplu",
+      "NEW_STEP1_DESC": "Începeți rapid cu un exemplu funcțional care include autentificarea ZITADEL.",
+      "NEW_STEP2_TITLE": "Configurați variabilele de mediu",
+      "NEW_STEP2_DESC": "Adăugați aceste variabile în aplicația dvs. Lipiți-le într-un fișier .env în rădăcina proiectului sau descărcați fișierul .env și salvați-l.",
+      "NEW_STEP2_DESC_EXAMPLE_ENV": "Actualizați fișierul .env.example al exemplului cu aceste valori, apoi redenumiți-l în .env.",
+      "NEW_STEP2_CLIENT_SECRET_NOTE": "Înlocuiți 'your-client-secret' cu secretul client real. Dacă nu l-ați salvat în timpul creării aplicației, ",
+      "NEW_STEP2_CLIENT_SECRET_LINK": "generează unul nou aici",
+      "NEW_STEP3_TITLE": "Rulați și testați aplicația dvs.",
+      "NEW_STEP3_DESC": "Instalați dependențele.",
+      "NEW_STEP3_DESC2": "Porniți aplicația și testați fluxul de autentificare.",
+      "NEW_STEP4_TITLE": "Vezi documentația",
+      "NEW_STEP4_DESC": "Urmăriți ghidul nostru despre cum să personalizați și să extindeți aplicația cu ZITADEL.",
+      "STEP4_ACTION": "Vezi Documentația",
+      "GENERIC_NEW_TITLE": "Alegeți punctul de pornire",
+      "GENERIC_EXISTING_TITLE": "Alegeți abordarea de integrare",
+      "GENERIC_EXISTING_NOTE": "Deoarece nu există un SDK specific pentru framework-ul dvs., puteți folosi ghidurile noastre generale sau să lucrați direct cu endpoint-urile OIDC/OAuth2.",
+      "API_DOCS": "Documentația API",
+      "NEW_STEP_DOCS_TITLE": "Vezi documentația completă",
+      "NEW_STEP_DOCS_DESC": "Aflați mai multe despre opțiuni de configurare avansate și bune practici pentru framework-ul dvs.",
+      "EXISTING_STEP_DOCS_TITLE": "Aflați mai multe despre integrare",
+      "EXISTING_STEP_DOCS_DESC": "Explorați documentația noastră detaliată pentru configurare avansată și depanare.",
+      "SELECT_FRAMEWORK": "Selectați framework-ul dvs.",
+      "SELECT_FRAMEWORK_DESC": "Alegeți framework-ul pe care îl folosiți pentru a obține ghiduri și exemple de integrare personalizate."
     }
   },
   "GENDERS": {
@@ -2779,10 +2879,10 @@
     "ADD": "Adăugați un manager",
     "CREATIONTYPE": "Tip creare",
     "CREATIONTYPES": {
-      "3": "IAM",
-      "2": "Organizație",
       "0": "Proiect deținut",
       "1": "Proiect acordat",
+      "2": "Organizație",
+      "3": "IAM",
       "4": "Proiect"
     },
     "EDITROLE": "Editați rolurile",

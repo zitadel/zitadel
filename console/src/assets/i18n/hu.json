@@ -435,7 +435,8 @@
     "TOS": "Szolgáltatási feltételek",
     "OPENSHORTCUTSTOOLTIP": "Írd be a ? jelet a billentyűparancsok megjelenítéséhez",
     "SETTINGS": "Beállítások",
-    "CUSTOMERPORTAL": "Ügyfélportál"
+    "CUSTOMERPORTAL": "Ügyfélportál",
+    "TARGETS": "Célok"
   },
   "QUICKSTART": {
     "TITLE": "Integráld a ZITADEL szolgáltatást az alkalmazásodba",
@@ -698,9 +699,9 @@
     "PROJECTNAME": "Projekt Neve",
     "RESOURCEOWNER": "Erőforrás Tulajdonos",
     "METHODS": {
+      "1": "egyenlő",
       "5": "tartalmaz",
-      "7": "azzal végződik",
-      "1": "egyenlő"
+      "7": "azzal végződik"
     }
   },
   "KEYBOARDSHORTCUTS": {
@@ -1502,7 +1503,9 @@
       "SECURITY": "Biztonsági beállítások",
       "EVENTS": "Események",
       "FAILEDEVENTS": "Sikertelen események",
-      "VIEWS": "Nézetek"
+      "VIEWS": "Nézetek",
+      "ACTIONS": "Műveletek",
+      "TARGETS": "Célok"
     },
     "GROUPS": {
       "GENERAL": "Általános információ",
@@ -1512,7 +1515,8 @@
       "TEXTS": "Szövegek és nyelvek",
       "APPEARANCE": "Megjelenés",
       "OTHER": "Egyéb",
-      "STORAGE": "Tárolás"
+      "STORAGE": "Tárolás",
+      "ACTIONS": "Műveletek"
     },
     "BETA": "BÉTA"
   },
@@ -1588,7 +1592,9 @@
         "REMOVED": "Twilio eltávolítva",
         "CHANGETOKEN": "Token módosítása",
         "SETTOKEN": "Token beállítása",
-        "TOKENSET": "A token sikeresen beállítva."
+        "TOKENSET": "A token sikeresen beállítva.",
+        "VERIFYSERVICESID": "Verify Service SID",
+        "VERIFYSERVICESID_DESCRIPTION": "A Twilio Verify Service SID használata az OTP küldéséhez"
       }
     },
     "SECRETS": {
@@ -1967,7 +1973,6 @@
         "GRANTED_SINGULAR": "{{name}} által Biztosított Projekt"
       },
       "PRIVATELABEL": {
-        "TITLE": "Márkabeállítás",
         "0": {
           "TITLE": "Nem meghatározott",
           "DESC": "Amint a felhasználó azonosításra kerül, az azonosított felhasználó szervezetének márkajelzése lesz látható, mielőtt a rendszer alapértelmezése megjelenne."
@@ -1980,6 +1985,7 @@
           "TITLE": "Felhasználói Szervezeti beállítás használata",
           "DESC": "A projekt szervezetének márkajelzése lesz látható, de amint a felhasználót azonosítják, az azonosított felhasználó szervezetének beállítása lesz látható."
         },
+        "TITLE": "Márkabeállítás",
         "DIALOG": {
           "TITLE": "Márka beállítás",
           "DESCRIPTION": "Válaszd ki a bejelentkezés viselkedését, amikor a projektet használod."
@@ -2011,16 +2017,16 @@
       "DESCRIPTION": ""
     },
     "STATE": {
-      "TITLE": "Állapot",
       "0": "Nincs meghatározva",
       "1": "Aktív",
-      "2": "Inaktív"
+      "2": "Inaktív",
+      "TITLE": "Állapot"
     },
     "TYPE": {
-      "TITLE": "Típus",
       "0": "Ismeretlen típus",
       "1": "Tulajdonolt",
-      "2": "Megadva"
+      "2": "Megadva",
+      "TITLE": "Típus"
     },
     "NAME": "Név",
     "NAMEDIALOG": {
@@ -2170,7 +2176,8 @@
       "UPDATED": "Projekt megváltoztatva.",
       "GRANTUPDATED": "Jogosultság megváltoztatva.",
       "DELETED": "Projekt törölve."
-    }
+    },
+    "CLICK_TO_EDIT_NAME": "Kattintson a projektnév szerkesztéséhez"
   },
   "ROLES": {
     "DIALOG": {
@@ -2270,10 +2277,10 @@
       "2": "inaktív"
     },
     "AZUREADTENANTTYPES": {
-      "3": "Bérlő azonosító",
       "0": "Gyakori",
       "1": "Szervezetek",
-      "2": "Fogyasztók"
+      "2": "Fogyasztók",
+      "3": "Bérlő azonosító"
     },
     "AZUREADTENANTTYPE": "Bérlő típusa",
     "AZUREADTENANTID": "Bérlő azonosító",
@@ -2541,7 +2548,6 @@
         }
       },
       "NEXTSTEPS": {
-        "TITLE": "Következő lépések",
         "0": {
           "TITLE": "Szerepkörök hozzáadása",
           "DESC": "Add meg a projekt szerepköreit"
@@ -2553,8 +2559,16 @@
         "2": {
           "TITLE": "Segítség & Támogatás",
           "DESC": "Olvasd el a dokumentációnkat az alkalmazások létrehozásáról, vagy vedd fel a kapcsolatot a támogatásunkkal"
-        }
-      }
+        },
+        "TITLE": "Következő lépések"
+      },
+      "QUICK_CREATE_TITLE": "Alkalmazás létrehozása",
+      "QUICK_CREATE_DESC": "Hozzon létre egy alkalmazást három egyszerű lépésben.",
+      "QUICK_CREATE_FRAMEWORK": "Válassza ki a keretrendszert",
+      "QUICK_CREATE_FRAMEWORK_DESC": "Ajánlott konfigurációt biztosítunk az alkalmazásához. Válassza ki a használt vagy használni kívánt keretrendszert.",
+      "QUICK_CREATE_NAME": "Nevezze el az alkalmazást",
+      "CREATE_PROJECT_AUTO": "Projekt létrehozása nekem",
+      "CREATE_PROJECT_AUTO_DESC": "Ajánlott, ha új a ZITADEL-ben. Mi elvégezzük a projekt beállítását."
     },
     "NAMEDIALOG": {
       "TITLE": "Alkalmazás átnevezése",
@@ -2747,6 +2761,90 @@
     "LOGINV2": {
       "USEV2": "Új bejelentkezési felhasználói felület használata",
       "BASEURL": "Egyéni alapértelmezett URL az új bejelentkezési felhasználói felülethez"
+    },
+    "QUICKSTART": "Gyorsindítás",
+    "OVERVIEW_DETAIL": {
+      "TITLE": "Gyorsindítás",
+      "DESCRIPTION": "Indítsa el alkalmazását ZITADEL hitelesítéssel.",
+      "GETSTARTED": "Kezdje el az alkalmazással",
+      "GETSTARTED_DESC": "Ez az útmutató segít gyorsan és egyszerűen integrálni a ZITADEL hitelesítést az alkalmazásába.",
+      "FRAMEWORK": "Keretrendszer",
+      "VIEWDOCS": "Dokumentáció megtekintése",
+      "VIEWEXAMPLE": "Példa megtekintése",
+      "ENVVARS": "Környezeti változók",
+      "ENVVARS_DESC": "Adja hozzá ezeket a környezeti változókat az alkalmazásához:",
+      "ENVFILE": ".env",
+      "QUICKSTART": "Mi a kiindulópontja?",
+      "QUICKSTART_SUBTITLE": "Válassza ki a helyzetet legjobban leíró lehetőséget:",
+      "OPTION1": "1. lehetőség: Példaalkalmazás klónozása",
+      "OPTION1_DESC": "Kezdjen gyorsan egy működő példaalkalmazással:",
+      "OPTION1_NOTE": "Klónozás után frissítse a környezeti változókat az alkalmazás adataival.",
+      "OPTION2": "2. lehetőség: Meglévő alkalmazás integrálása",
+      "OPTION2_DESC": "Integrálja a ZITADEL hitelesítést meglévő alkalmazásába:",
+      "STEP1": "Telepítse a ZITADEL SDK-t a keretrendszeréhez",
+      "STEP2": "Konfigurálja a környezeti változókat",
+      "STEP3": "Adjon hozzá hitelesítést az alkalmazásához",
+      "STEP4": "Tesztelje az integrációt",
+      "GENERIC": "Általános integráció",
+      "GENERIC_DESC": "Válasszon átfogó példáink és útmutatóink közül:",
+      "ALLEXAMPLES": "Minden példa",
+      "INTEGRATION_GUIDE": "Integrációs útmutató",
+      "NEXTSTEPS": "Következő lépések",
+      "CONFIGURE": "Beállítások konfigurálása",
+      "CONFIGURE_DESC": "Az alkalmazás OIDC konfigurációjának testreszabása",
+      "REDIRECTS": "Átirányítások beállítása",
+      "REDIRECTS_DESC": "Átirányítási és kijelentkezési URL-ek konfigurálása",
+      "URLS_DESC": "Fontos URL-ek megtekintése az integrációhoz",
+      "TERMINAL": "Terminál",
+      "SCENARIO_NEW_TITLE": "Teljesen új alkalmazást szeretnék létrehozni",
+      "SCENARIO_NEW_DESC": "Tökéletes! Segítünk gyorsan kezdeni egy működő példával, amely beépített ZITADEL hitelesítést tartalmaz.",
+      "SCENARIO_NEW_TOGGLE": "Még nincs alkalmazásom",
+      "SCENARIO_EXISTING_TITLE": "Meglévő alkalmazásba szeretnék integrálni",
+      "SCENARIO_EXISTING_DESC": "Nagyszerű! Lépésről lépésre végigvezetjük a ZITADEL hitelesítés hozzáadásán a jelenlegi alkalmazásához.",
+      "SCENARIO_EXISTING_TOGGLE": "Van meglévő alkalmazásom",
+      "CLONE_EXAMPLE": "Példa klónozása",
+      "CLONE_NOTE": "Klónozás után egyszerűen frissítse a .env fájlt a fenti alkalmazás adataival, és máris készen áll!",
+      "BROWSE_EXAMPLES": "Összes példa tallózása",
+      "GENERIC_NEW_NOTE": "Válasszon egy példát, amely megfelel a technológiai stackjének, és klónozza a gyors kezdéshez.",
+      "EXISTING_STEP1_TITLE": "SDK telepítése",
+      "EXISTING_STEP1_DESC": "Adja hozzá az SDK-t a projekthez",
+      "EXISTING_STEP2_TITLE": "Konfiguráció hozzáadása",
+      "EXISTING_STEP2_DESC": "Másolja és illessze be ezeket a környezeti változókat az alkalmazás konfigurációs fájljába",
+      "EXISTING_STEP3_TITLE": "Hitelesítés beállítása",
+      "EXISTING_STEP3_DESC": "Kövesse lépésről lépésre szóló integrációs útmutatónkat a hitelesítés hozzáadásához az alkalmazáshoz",
+      "VIEW_SDKS": "SDK dokumentáció megtekintése",
+      "AUTH_STATUS_CHECKING": "Hitelesítési állapot ellenőrzése...",
+      "AUTH_STATUS_SUCCESS": "Az alkalmazás hitelesítve lett a ZITADEL-lel.",
+      "AUTH_STATUS_PENDING": "Az alkalmazás még nem lett hitelesítve a ZITADEL-lel.",
+      "AUTH_STATUS_PENDING_DESC": "Kövesse az alábbi lépéseket az integráció befejezéséhez.",
+      "SUCCESS_TITLE": "🎉 Nagyszerű! Az alkalmazás sikeresen csatlakozott",
+      "SUCCESS_DESC": "Az alkalmazás sikeresen hitelesítve lett a ZITADEL-lel. Most használhatja az alábbi környezeti változókat az integrációhoz.",
+      "ENVVARS_AUTHENTICATED_DESC": "Használja ezeket a környezeti változókat az alkalmazásában:",
+      "INTEGRATION_ENVVARS_TITLE": "Az alkalmazás konfigurációja",
+      "INTEGRATION_ENVVARS_DESC": "Adja hozzá ezeket a környezeti változókat az alkalmazásához a ZITADEL-hez való csatlakozáshoz:",
+      "NEW_STEP1_TITLE": "Példaalkalmazás klónozása",
+      "NEW_STEP1_DESC": "Kezdjen gyorsan egy működő példával, amely beépített ZITADEL hitelesítést tartalmaz.",
+      "NEW_STEP2_TITLE": "Környezeti változók konfigurálása",
+      "NEW_STEP2_DESC": "Adja hozzá ezeket a környezeti változókat az alkalmazásához. Illessze be őket egy .env fájlba a projekt gyökerében, vagy töltse le a .env fájlt és mentse el.",
+      "NEW_STEP2_DESC_EXAMPLE_ENV": "Frissítse a példa .env.example fájlját ezekkel az értékekkel, majd nevezze át .env névre.",
+      "NEW_STEP2_CLIENT_SECRET_NOTE": "Cserélje le a 'your-client-secret' értéket a tényleges client secretre. Ha nem mentette el az alkalmazás létrehozása során, ",
+      "NEW_STEP2_CLIENT_SECRET_LINK": "generáljon egy újat itt",
+      "NEW_STEP3_TITLE": "Alkalmazás futtatása és tesztelése",
+      "NEW_STEP3_DESC": "Függőségek telepítése.",
+      "NEW_STEP3_DESC2": "Indítsa el az alkalmazást és tesztelje a hitelesítési folyamatot.",
+      "NEW_STEP4_TITLE": "Dokumentáció megtekintése",
+      "NEW_STEP4_DESC": "Kövesse útmutatónkat az alkalmazás testreszabásához és bővítéséhez a ZITADEL-lel.",
+      "STEP4_ACTION": "Dokumentáció megtekintése",
+      "GENERIC_NEW_TITLE": "Válassza ki a kiindulópontot",
+      "GENERIC_EXISTING_TITLE": "Válassza ki az integrációs megközelítést",
+      "GENERIC_EXISTING_NOTE": "Mivel a keretrendszeréhez nem áll rendelkezésre specifikus SDK, használhatja általános integrációs útmutatóinkat, vagy közvetlenül dolgozhat az OIDC/OAuth2 végpontokkal.",
+      "API_DOCS": "API dokumentáció",
+      "NEW_STEP_DOCS_TITLE": "Átfogó dokumentáció megtekintése",
+      "NEW_STEP_DOCS_DESC": "Tudjon meg többet a speciális konfigurációs lehetőségekről és a keretrendszerére vonatkozó bevált gyakorlatokról.",
+      "EXISTING_STEP_DOCS_TITLE": "Tudjon meg többet az integrációról",
+      "EXISTING_STEP_DOCS_DESC": "Fedezze fel részletes dokumentációnkat a speciális konfigurációhoz és hibaelhárításhoz.",
+      "SELECT_FRAMEWORK": "Válassza ki a keretrendszert",
+      "SELECT_FRAMEWORK_DESC": "Válassza ki a használt keretrendszert, hogy testreszabott integrációs útmutatókat és példákat kapjon."
     }
   },
   "GENDERS": {
@@ -2781,10 +2879,10 @@
     "ADD": "Hozzáadás egy menedzsert",
     "CREATIONTYPE": "Létrehozás típusa",
     "CREATIONTYPES": {
-      "3": "IAM",
-      "2": "Szervezet",
       "0": "Saját projekt",
       "1": "Engedélyezett Projekt",
+      "2": "Szervezet",
+      "3": "IAM",
       "4": "Projekt"
     },
     "EDITROLE": "Szerepkörök szerkesztése",

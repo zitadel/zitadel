@@ -435,7 +435,8 @@
     "TOS": "Términos de Servicio",
     "OPENSHORTCUTSTOOLTIP": "Pulsa ? para mostrar los atajos de teclado",
     "SETTINGS": "Ajustes",
-    "CUSTOMERPORTAL": "Portal del cliente"
+    "CUSTOMERPORTAL": "Portal del cliente",
+    "TARGETS": "Targets"
   },
   "QUICKSTART": {
     "TITLE": "Integra ZITADEL en tu aplicación",
@@ -458,6 +459,10 @@
       "CAMBIAR": {
         "TITLE": "Cambio framework",
         "DESCRIPTION": "Elige uno de los frameworks disponibles para configurar rápidamente tu aplicación."
+      },
+      "CHANGE": {
+        "TITLE": "Change Framework",
+        "DESCRIPTION": "Choose one of the available frameworks for quick setup of your application."
       }
     }
   },
@@ -1503,7 +1508,9 @@
       "SECURITY": "Ajustes de seguridad",
       "EVENTS": "Eventos",
       "FAILEDEVENTS": "Eventos fallidos",
-      "VIEWS": "Vistas"
+      "VIEWS": "Vistas",
+      "ACTIONS": "Actions",
+      "TARGETS": "Targets"
     },
     "GROUPS": {
       "GENERAL": "General",
@@ -1513,7 +1520,8 @@
       "TEXTS": "Textos e idiomas",
       "APPEARANCE": "Apariencia",
       "OTHER": "Otros",
-      "STORAGE": "Datos"
+      "STORAGE": "Datos",
+      "ACTIONS": "Actions"
     },
     "BETA": "BETA"
   },
@@ -2173,7 +2181,8 @@
       "UPDATED": "Proyecto modificado.",
       "GRANTUPDATED": "Concesión modificada.",
       "DELETED": "Proyecto borrado."
-    }
+    },
+    "CLICK_TO_EDIT_NAME": "Click to edit project name"
   },
   "ROLES": {
     "DIALOG": {
@@ -2231,6 +2240,14 @@
       "LDAP": {
         "TITLE": "Active Directory / LDAP",
         "DESCRIPTION": "Introduce las credenciales para tu proveedor LDAP"
+      },
+      "APPLE": {
+        "TITLE": "Sign in with Apple",
+        "DESCRIPTION": "Enter the credentials for your Apple Provider"
+      },
+      "SAML": {
+        "TITLE": "Sign in with SAML",
+        "DESCRIPTION": "Enter the credentials for your SAML Provider"
       }
     },
     "DETAIL": {
@@ -2366,7 +2383,25 @@
     "ISIDTOKENMAPPING": "Asignación del ID token",
     "ISIDTOKENMAPPING_DESC": "Si se selecciona, la información del proveedor se asigna desde el ID token, no desde el punto final de userinfo.",
     "USEPKCE": "Usa PKCE",
-    "USEPKCE_DESC": "Determina si los parámetros code_challenge y code_challenge_method son incluidos en la solicitud de autenticación."
+    "USEPKCE_DESC": "Determina si los parámetros code_challenge y code_challenge_method son incluidos en la solicitud de autenticación.",
+    "APPLE": {
+      "TEAMID": "Team ID",
+      "KEYID": "Key ID",
+      "PRIVATEKEY": "Private Key",
+      "UPDATEPRIVATEKEY": "Update Private Key",
+      "UPLOADPRIVATEKEY": "Upload Private Key",
+      "KEYMAXSIZEEXCEEDED": "Maximum size of 5kB exceeded."
+    },
+    "SAML": {
+      "METADATAXML": "Metadata Xml",
+      "METADATAURL": "Metadata URL",
+      "BINDING": "Binding",
+      "SIGNEDREQUEST": "Signed Request",
+      "SIGNATUREALGORITHM": "Signature Algorithm",
+      "NAMEIDFORMAT": "NameID Format",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "Custom Mapping Attribute Name",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    }
   },
   "MFA": {
     "LIST": {
@@ -2438,7 +2473,11 @@
         "DELETE_TITLE": "Eliminar configuración SMTP",
         "DELETE_DESCRIPTION": "Estás a punto de eliminar una configuración. Confirma esta acción escribiendo el nombre del remitente",
         "DELETED": "La configuración SMTP ha sido eliminada",
-        "SENDER": "Escribe {{ value }} para eliminar esta configuración SMTP."
+        "SENDER": "Escribe {{ value }} para eliminar esta configuración SMTP.",
+        "TEST_DESCRIPTION": "Specify an email address to test your SMTP configuration for this provider",
+        "TEST_EMAIL": "Email address",
+        "TEST_RESULT": "Test result",
+        "TEST_TITLE": "Test your SMTP config"
       }
     },
     "CREATE": {

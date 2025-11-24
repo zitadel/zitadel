@@ -435,7 +435,8 @@
     "TOS": "Termini di servizio",
     "OPENSHORTCUTSTOOLTIP": "Premi ? per mostrare le scorciatoie da tastiera",
     "SETTINGS": "Impostazioni",
-    "CUSTOMERPORTAL": "Customer Portal"
+    "CUSTOMERPORTAL": "Customer Portal",
+    "TARGETS": "Targets"
   },
   "QUICKSTART": {
     "TITLE": "Integra ZITADEL nella tua applicazione",
@@ -526,7 +527,8 @@
       "SHOWUSER": "Mostra utente {{value}}"
     },
     "DOWNLOAD": "Scarica",
-    "APPLY": "Applicare"
+    "APPLY": "Applicare",
+    "UNSAVEDCHANGES": "Unsaved changes"
   },
   "ACTIONSTWO": {
     "BETA_NOTE": "Stai attualmente utilizzando la nuova versione Actions V2, che è in beta. La precedente Versione 1 è ancora disponibile, ma sarà dismessa in futuro. Ti preghiamo di segnalare eventuali problemi o feedback.",
@@ -1502,7 +1504,9 @@
       "SECURITY": "Impostazioni di sicurezza",
       "EVENTS": "Eventi",
       "FAILEDEVENTS": "Eventi falliti",
-      "VIEWS": "Views"
+      "VIEWS": "Views",
+      "ACTIONS": "Actions",
+      "TARGETS": "Targets"
     },
     "GROUPS": {
       "GENERAL": "Generale",
@@ -1512,7 +1516,8 @@
       "TEXTS": "Testi e lingue",
       "APPEARANCE": "Aspetto",
       "OTHER": "Altro",
-      "STORAGE": "Dati"
+      "STORAGE": "Dati",
+      "ACTIONS": "Actions"
     },
     "BETA": "BETA"
   },
@@ -2172,7 +2177,8 @@
       "UPDATED": "Progetto cambiato con successo.",
       "GRANTUPDATED": "Grant cambiato con successo.",
       "DELETED": "Progetto eliminato con successo."
-    }
+    },
+    "CLICK_TO_EDIT_NAME": "Click to edit project name"
   },
   "ROLES": {
     "DIALOG": {
@@ -2230,6 +2236,18 @@
       "LDAP": {
         "TITLE": "Active Directory / LDAP",
         "DESCRIPTION": "Inserisci i dati necessari per il tuo provider LDAP."
+      },
+      "APPLE": {
+        "TITLE": "Sign in with Apple",
+        "DESCRIPTION": "Enter the credentials for your Apple Provider"
+      },
+      "OAUTH": {
+        "TITLE": "OAuth Provider",
+        "DESCRIPTION": "Enter the required data for your OAuth provider."
+      },
+      "SAML": {
+        "TITLE": "Sign in with SAML",
+        "DESCRIPTION": "Enter the credentials for your SAML Provider"
       }
     },
     "DETAIL": {
@@ -2370,7 +2388,25 @@
     "ISIDTOKENMAPPING": "Mappatura dal token ID",
     "ISIDTOKENMAPPING_DESC": "Se selezionato, le informazioni del provider vengono mappate dal token ID, non dal punto finale userinfo.",
     "USEPKCE": "Usa PKCE",
-    "USEPKCE_DESC": "Determina se i parametri code_challenge e code_challenge_method sono inclusi nella richiesta di autenticazione"
+    "USEPKCE_DESC": "Determina se i parametri code_challenge e code_challenge_method sono inclusi nella richiesta di autenticazione",
+    "APPLE": {
+      "TEAMID": "Team ID",
+      "KEYID": "Key ID",
+      "PRIVATEKEY": "Private Key",
+      "UPDATEPRIVATEKEY": "Update Private Key",
+      "UPLOADPRIVATEKEY": "Upload Private Key",
+      "KEYMAXSIZEEXCEEDED": "Maximum size of 5kB exceeded."
+    },
+    "SAML": {
+      "METADATAXML": "Metadata Xml",
+      "METADATAURL": "Metadata URL",
+      "BINDING": "Binding",
+      "SIGNEDREQUEST": "Signed Request",
+      "SIGNATUREALGORITHM": "Signature Algorithm",
+      "NAMEIDFORMAT": "NameID Format",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "Custom Mapping Attribute Name",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    }
   },
   "MFA": {
     "LIST": {
@@ -2442,7 +2478,11 @@
         "DELETE_TITLE": "Elimina configurazione SMTP",
         "DELETE_DESCRIPTION": "Stai per eliminare una configurazione. Conferma questa azione digitando il nome del mittente",
         "DELETED": "La configurazione SMTP è stata eliminata",
-        "SENDER": "Digita {{ value }} per eliminare questa configurazione SMTP."
+        "SENDER": "Digita {{ value }} per eliminare questa configurazione SMTP.",
+        "TEST_DESCRIPTION": "Specify an email address to test your SMTP configuration for this provider",
+        "TEST_EMAIL": "Email address",
+        "TEST_RESULT": "Test result",
+        "TEST_TITLE": "Test your SMTP config"
       }
     },
     "CREATE": {
