@@ -7,7 +7,7 @@ import { ResponsivePlayer } from "../../../src/components/player";
 
 In this quick start guide, we will be learning some fundamentals on how to set up ZITADEL for user management and application security. Thereafter, we will secure a React-based Single Page Application (SPA) using ZITADEL.
 
-<ResponsivePlayer controls url='https://www.youtube.com/watch?v=5THbQljoPKg' />
+<ResponsivePlayer controls url="https://www.youtube.com/watch?v=5THbQljoPKg" />
 
 The sample application allows users to securely log in to ZITADEL using the OIDC Proof Key for Code Exchange (PKCE) flow. This flow ensures that the authentication process is secure by using a code verifier and a code challenge, which are sent to ZITADEL to obtain an access token. The access token is then used by the app to access the userinfo endpoint to retrieve and display information about the logged-in user. The app also has a logout feature that allows users to end their session and clear their access token. Overall, the app provides a simple and secure way for users to authenticate and access protected resources within ZITADEL.
 
@@ -117,7 +117,7 @@ This includes instances for development, production, or user acceptance testing,
 The possibilities are endless. You can create your first instance for free.
 
 1. Create an instance.
-by clicking on “Create Instance”.
+   by clicking on “Create Instance”.
 
 ![Create Instance](/img/guides/quickstart/create_instance.png)
 
@@ -141,31 +141,68 @@ by clicking on “Create Instance”.
 
 ![Instance Details](/img/guides/quickstart/instance_dashboard.png)
 
-### 4. Create your first project and app
+### 4. Create your first project and app with Quick Create
 
-Because applications are always associated with a project, we'll guide you through setting up both in the following steps.
+ZITADEL's Quick Create feature streamlines the setup process by automatically configuring your application and project with the optimal settings for your chosen framework.
 
-1. Click the "Create Application" button or the Framework/Language of your choice on the right side
+#### What is Quick Create?
 
-2. Insert “Project1” (or any name of your choice) as the project’s name and select the framework/language of your choice in our case "React" and click the “Continue” button. (If you can't find your framework/languages select "Other")
+Quick Create automatically bootstraps all the core OIDC settings you need for your specific app type or framework, allowing you to get started quickly without manually configuring authentication settings. It pre-configures:
+
+- **App Type** (User Agent for SPAs, Web for SSR frameworks)
+- **Authentication Method** (appropriate for your framework's security profile)
+- **Grant Types** (Authorization Code with PKCE)
+- **Response Types** (Code flow)
+- **Redirect URIs** (framework-specific callback URLs for local development)
+- **Post Logout URIs** (where users return after signing out)
+- **Additional Settings** (like ID token assertions for SSR frameworks)
+
+:::info
+All settings configured by Quick Create can be customized later in your application settings. This feature simply provides sensible defaults to help you get started faster.
+:::
+
+#### Create your app
+
+1. Click the "Create Application" button or select your Framework/Language from the options on the right side
+
+2. Enter **Project1** (or any name of your choice) as the project's name and select the framework/language you're using—in this case, "React"—then click the **Continue** button.
 
 ![Project Name and Framework/Language](/img/guides/quickstart/create_project_react.png)
 
-3. An overview of the configuration for the framework you have selected is shown
+#### Understanding the auto-generated configuration
 
-![Project Configuration Overview - React App](/img/guides/quickstart/project_config_overview_react.png)
+For the React example, Quick Create automatically configures:
 
-What the configuration does:
-- We recommend using the [Authentication Code Flow](/docs/apis/openidoauth/grant-types#authorization-code) with [Proof Key for Code Exchange (PKCE)](/docs/apis/openidoauth/grant-types#authorization-code) for secure OIDC configuration. This setup includes specific App, Grant, and Response Types, as well as an Authentication Method. More about the different app types can be found [here](/docs/guides/integrate/login/oidc/oauth-recommended-flows#different-client-profiles).
-- The redirect URI is where the ZITADEL authorization server redirects the user after they have been authenticated. The "Redirect URI" is preconfigured to [http://localhost:3000/callback](http://localhost:3000/callback) and the “Post Logout URI” to [http://localhost:3000/](http://localhost:3000/) for the React example
+- **App Type**: User Agent (for Single Page Applications)
+- **Auth Method**: None (PKCE provides security without client secrets)
+- **Grant Types**: Authorization Code (the most secure OAuth 2.0 flow)
+- **Response Types**: Code (for the Authorization Code flow)
+- **Redirect URI**: `http://localhost:3000/callback` (where ZITADEL redirects after authentication)
+- **Post Logout URI**: `http://localhost:3000` (where users return after logout)
 
-4. The detailed configuration of your app will be shown
+We recommend using the [Authorization Code Flow](/docs/apis/openidoauth/grant-types#authorization-code) with [Proof Key for Code Exchange (PKCE)](/docs/apis/openidoauth/grant-types#authorization-code) for secure OIDC configuration. More about the different app types can be found [here](/docs/guides/integrate/login/oidc/oauth-recommended-flows#different-client-profiles).
+
+:::note Different frameworks, different configurations
+Quick Create adjusts settings based on your framework choice:
+
+- **SPAs** (React, Vue, Angular): User Agent app type with PKCE
+- **SSR frameworks** (Next.js, Nuxt, Astro): Web app type with additional token assertions
+- **Mobile apps**: Native app type with appropriate redirect schemes
+- **Backend services**: Service account or API configurations
+  :::
+
+3. The quickstart guide for your selected framework/language is displayed. Follow the steps in the guide to set up your application.
 
 ![Project Name and Framework/Language](/img/guides/quickstart/app_detail_overview_react.png)
 
-### 5. Add users (optional)
+:::tip Customizing your configuration
+Need to adjust the auto-generated settings? You can modify any of these values later:
 
-[Skip optional steps](quickstart/#7-create-an-application-in-your-project) and jump directly to the obtain ClientId and OIDC endpoints.
+- Navigate to your project in the console
+- Select your application
+- Update settings in the "Configuration" tab
+- Common changes include adding production redirect URIs or adjusting token lifetimes
+  :::
 
 1. To add users, click on “Users” at the top menu. You will see that the user you already created is listed as a user here. Click on the “New” button to create a new user.
 
