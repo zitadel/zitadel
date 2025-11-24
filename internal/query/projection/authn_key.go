@@ -2,6 +2,7 @@ package projection
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -171,37 +172,41 @@ func (p *authNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handl
 		eventstore.BaseEvent
 		keyID       string
 		objectID    string
-		expiration  time.Time
+		expiration  sql.NullTime
 		identifier  string
 		publicKey   []byte
 		keyType     domain.AuthNKeyType
 		fingerprint string
+		enabled     bool
 	}
 	switch e := event.(type) {
 	case *project.ApplicationKeyAddedEvent:
 		authNKeyEvent.BaseEvent = e.BaseEvent
 		authNKeyEvent.keyID = e.KeyID
 		authNKeyEvent.objectID = e.AppID
-		authNKeyEvent.expiration = e.ExpirationDate
+		authNKeyEvent.expiration = sql.NullTime{Time: e.ExpirationDate, Valid: true}
 		authNKeyEvent.identifier = e.ClientID
 		authNKeyEvent.publicKey = e.PublicKey
 		authNKeyEvent.keyType = e.KeyType
+		authNKeyEvent.enabled = true
 	case *user.MachineKeyAddedEvent:
 		authNKeyEvent.BaseEvent = e.BaseEvent
 		authNKeyEvent.keyID = e.KeyID
 		authNKeyEvent.objectID = e.Aggregate().ID
-		authNKeyEvent.expiration = e.ExpirationDate
+		authNKeyEvent.expiration = sql.NullTime{Time: e.ExpirationDate, Valid: true}
 		authNKeyEvent.identifier = e.Aggregate().ID
 		authNKeyEvent.publicKey = e.PublicKey
 		authNKeyEvent.keyType = e.KeyType
+		authNKeyEvent.enabled = true
 	case *target.KeyAddedEvent:
 		authNKeyEvent.BaseEvent = e.BaseEvent
 		authNKeyEvent.keyID = e.KeyID
 		authNKeyEvent.objectID = e.Aggregate().ID
-		authNKeyEvent.expiration = e.ExpirationDate
+		authNKeyEvent.expiration = sql.NullTime{Time: e.ExpirationDate, Valid: !e.ExpirationDate.IsZero()}
 		authNKeyEvent.identifier = e.Aggregate().ID
 		authNKeyEvent.publicKey = e.PublicKey
 		authNKeyEvent.fingerprint = e.Fingerprint
+		authNKeyEvent.enabled = false
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-Dgb32", "reduce.wrong.event.type %v", []eventstore.EventType{project.ApplicationKeyAddedEventType, user.MachineKeyAddedEventType})
 	}
@@ -221,6 +226,7 @@ func (p *authNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handl
 			handler.NewCol(AuthNKeyPublicKeyCol, authNKeyEvent.publicKey),
 			handler.NewCol(AuthNKeyTypeCol, authNKeyEvent.keyType),
 			handler.NewCol(AuthNKeyFingerprintCol, authNKeyEvent.fingerprint),
+			handler.NewCol(AuthNKeyEnabledCol, authNKeyEvent.enabled),
 		},
 	), nil
 }

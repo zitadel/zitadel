@@ -41,7 +41,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.authn_keys2 (id, creation_date, change_date, resource_owner, instance_id, aggregate_id, sequence, object_id, expiration, identifier, public_key, type, fingerprint) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+							expectedStmt: "INSERT INTO projections.authn_keys2 (id, creation_date, change_date, resource_owner, instance_id, aggregate_id, sequence, object_id, expiration, identifier, public_key, type, fingerprint, enabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"keyId",
 								anyArg{},
@@ -55,7 +55,8 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 								"clientId",
 								[]byte("publicKey"),
 								domain.AuthNKeyTypeJSON,
-								"", // fingerprint is not set for apps
+								"",   // fingerprint is not set for apps
+								true, // apps keys are enabled by default
 							},
 						},
 					},
@@ -79,7 +80,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.authn_keys2 (id, creation_date, change_date, resource_owner, instance_id, aggregate_id, sequence, object_id, expiration, identifier, public_key, type, fingerprint) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+							expectedStmt: "INSERT INTO projections.authn_keys2 (id, creation_date, change_date, resource_owner, instance_id, aggregate_id, sequence, object_id, expiration, identifier, public_key, type, fingerprint, enabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"keyId",
 								anyArg{},
@@ -93,7 +94,8 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 								"agg-id",
 								[]byte("publicKey"),
 								domain.AuthNKeyTypeJSON,
-								"", // fingerprint is not set for users
+								"",   // fingerprint is not set for users
+								true, // user keys are enabled by default
 							},
 						},
 					},
@@ -117,7 +119,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.authn_keys2 (id, creation_date, change_date, resource_owner, instance_id, aggregate_id, sequence, object_id, expiration, identifier, public_key, type, fingerprint) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+							expectedStmt: "INSERT INTO projections.authn_keys2 (id, creation_date, change_date, resource_owner, instance_id, aggregate_id, sequence, object_id, expiration, identifier, public_key, type, fingerprint, enabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"keyId",
 								anyArg{},
@@ -132,6 +134,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 								[]byte("publicKey"),
 								domain.AuthNKeyTypeNONE,
 								"fingerprint",
+								false, // target keys are disabled by default
 							},
 						},
 					},

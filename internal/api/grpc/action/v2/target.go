@@ -2,6 +2,7 @@ package action
 
 import (
 	"context"
+	"time"
 
 	"connectrpc.com/connect"
 	"github.com/muhlemmer/gu"
@@ -66,10 +67,14 @@ func (s *Server) DeleteTarget(ctx context.Context, req *connect.Request[action.D
 
 func (s *Server) AddPublicKey(ctx context.Context, req *connect.Request[action.AddPublicKeyRequest]) (*connect.Response[action.AddPublicKeyResponse], error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
+	var expirationDate time.Time
+	if req.Msg.GetExpirationDate() != nil {
+		expirationDate = req.Msg.GetExpirationDate().AsTime()
+	}
 	key := &command.TargetPublicKey{
 		TargetID:   req.Msg.GetTargetId(),
 		PublicKey:  req.Msg.GetPublicKey(),
-		Expiration: req.Msg.GetExpirationDate().AsTime(),
+		Expiration: expirationDate,
 	}
 	creationDate, err := s.command.AddTargetPublicKey(ctx, key, instanceID)
 	if err != nil {

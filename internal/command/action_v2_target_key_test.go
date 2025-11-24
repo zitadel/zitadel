@@ -145,6 +145,7 @@ func TestCommands_AddTargetPublicKey(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				idGenerator: mock.ExpectID(t, "key-1"),
 			},
 			args: args{
 				ctx: context.Background(),

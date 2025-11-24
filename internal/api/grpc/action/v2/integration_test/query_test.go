@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/integration"
@@ -71,7 +72,8 @@ func TestServer_GetTarget(t *testing.T) {
 					TargetType: &action.Target_RestWebhook{
 						RestWebhook: &action.RESTWebhook{},
 					},
-					Timeout: durationpb.New(5 * time.Second),
+					Timeout:     durationpb.New(5 * time.Second),
+					PayloadType: action.PayloadType_PAYLOAD_TYPE_JSON,
 				},
 			},
 		},
@@ -98,7 +100,8 @@ func TestServer_GetTarget(t *testing.T) {
 					TargetType: &action.Target_RestAsync{
 						RestAsync: &action.RESTAsync{},
 					},
-					Timeout: durationpb.New(5 * time.Second),
+					Timeout:     durationpb.New(5 * time.Second),
+					PayloadType: action.PayloadType_PAYLOAD_TYPE_JSON,
 				},
 			},
 		},
@@ -127,7 +130,8 @@ func TestServer_GetTarget(t *testing.T) {
 							InterruptOnError: true,
 						},
 					},
-					Timeout: durationpb.New(5 * time.Second),
+					Timeout:     durationpb.New(5 * time.Second),
+					PayloadType: action.PayloadType_PAYLOAD_TYPE_JSON,
 				},
 			},
 		},
@@ -156,7 +160,8 @@ func TestServer_GetTarget(t *testing.T) {
 							InterruptOnError: false,
 						},
 					},
-					Timeout: durationpb.New(5 * time.Second),
+					Timeout:     durationpb.New(5 * time.Second),
+					PayloadType: action.PayloadType_PAYLOAD_TYPE_JSON,
 				},
 			},
 		},
@@ -185,7 +190,8 @@ func TestServer_GetTarget(t *testing.T) {
 							InterruptOnError: true,
 						},
 					},
-					Timeout: durationpb.New(5 * time.Second),
+					Timeout:     durationpb.New(5 * time.Second),
+					PayloadType: action.PayloadType_PAYLOAD_TYPE_JSON,
 				},
 			},
 		},
@@ -291,7 +297,8 @@ func TestServer_ListTargets(t *testing.T) {
 								InterruptOnError: false,
 							},
 						},
-						Timeout: durationpb.New(5 * time.Second),
+						Timeout:     durationpb.New(5 * time.Second),
+						PayloadType: action.PayloadType_PAYLOAD_TYPE_JSON,
 					},
 				},
 			},
@@ -331,7 +338,8 @@ func TestServer_ListTargets(t *testing.T) {
 								InterruptOnError: false,
 							},
 						},
-						Timeout: durationpb.New(5 * time.Second),
+						Timeout:     durationpb.New(5 * time.Second),
+						PayloadType: action.PayloadType_PAYLOAD_TYPE_JSON,
 					},
 				},
 			},
@@ -386,7 +394,8 @@ func TestServer_ListTargets(t *testing.T) {
 						TargetType: &action.Target_RestAsync{
 							RestAsync: &action.RESTAsync{},
 						},
-						Timeout: durationpb.New(5 * time.Second),
+						Timeout:     durationpb.New(5 * time.Second),
+						PayloadType: action.PayloadType_PAYLOAD_TYPE_JWE,
 					},
 					{
 						Endpoint: "https://example.com",
@@ -395,7 +404,8 @@ func TestServer_ListTargets(t *testing.T) {
 								InterruptOnError: true,
 							},
 						},
-						Timeout: durationpb.New(5 * time.Second),
+						Timeout:     durationpb.New(5 * time.Second),
+						PayloadType: action.PayloadType_PAYLOAD_TYPE_JWT,
 					},
 					{
 						Endpoint: "https://example.com",
@@ -404,7 +414,8 @@ func TestServer_ListTargets(t *testing.T) {
 								InterruptOnError: false,
 							},
 						},
-						Timeout: durationpb.New(5 * time.Second),
+						Timeout:     durationpb.New(5 * time.Second),
+						PayloadType: action.PayloadType_PAYLOAD_TYPE_JSON,
 					},
 				},
 			},
@@ -778,6 +789,258 @@ func TestServer_ListExecutions(t *testing.T) {
 				}
 				assertPaginationResponse(ttt, tt.want.Pagination, got.Pagination)
 			}, retryDuration, tick, "timeout waiting for expected execution Executions")
+		})
+	}
+}
+
+func TestServer_ListPublicKeys(t *testing.T) {
+	instance := integration.NewInstance(CTX)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+
+	targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false, action.PayloadType_PAYLOAD_TYPE_JSON).GetId()
+	activeKey, err := instance.Client.ActionV2.AddPublicKey(isolatedIAMOwnerCTX, &action.AddPublicKeyRequest{
+		TargetId:  targetID,
+		PublicKey: publicKeyBytes,
+	})
+	require.NoError(t, err)
+	changeDate, err := instance.Client.ActionV2.ActivatePublicKey(isolatedIAMOwnerCTX, &action.ActivatePublicKeyRequest{
+		TargetId: targetID,
+		KeyId:    activeKey.GetKeyId(),
+	})
+	require.NoError(t, err)
+	expirationDate := timestamppb.New(time.Now().Add(24 * time.Hour))
+	inactiveKey, err := instance.Client.ActionV2.AddPublicKey(isolatedIAMOwnerCTX, &action.AddPublicKeyRequest{
+		TargetId:       targetID,
+		PublicKey:      rsaPublicKeyBytes,
+		ExpirationDate: expirationDate,
+	})
+	require.NoError(t, err)
+	anotherKey, err := instance.Client.ActionV2.AddPublicKey(isolatedIAMOwnerCTX, &action.AddPublicKeyRequest{
+		TargetId:  targetID,
+		PublicKey: rsaPublicKeyBytes,
+	})
+	require.NoError(t, err)
+	type args struct {
+		ctx context.Context
+		req *action.ListPublicKeysRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *action.ListPublicKeysResponse
+		wantErr bool
+	}{
+		{
+			name: "missing permission",
+			args: args{
+				ctx: instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
+				req: &action.ListPublicKeysRequest{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid target id",
+			args: args{
+				ctx: isolatedIAMOwnerCTX,
+				req: &action.ListPublicKeysRequest{
+					TargetId: "notfound",
+				},
+			},
+			want: &action.ListPublicKeysResponse{},
+		},
+		{
+			name: "list all",
+			args: args{
+				ctx: isolatedIAMOwnerCTX,
+				req: &action.ListPublicKeysRequest{
+					TargetId: targetID,
+				},
+			},
+			want: &action.ListPublicKeysResponse{
+				PublicKeys: []*action.PublicKey{
+					{
+						KeyId:          anotherKey.GetKeyId(),
+						Active:         false,
+						PublicKey:      rsaPublicKeyBytes,
+						Fingerprint:    rsaFingerprint,
+						ExpirationDate: nil,
+						CreationDate:   anotherKey.GetCreationDate(),
+						ChangeDate:     anotherKey.GetCreationDate(),
+					},
+					{
+						KeyId:          inactiveKey.GetKeyId(),
+						Active:         false,
+						PublicKey:      rsaPublicKeyBytes,
+						Fingerprint:    rsaFingerprint,
+						ExpirationDate: expirationDate,
+						CreationDate:   inactiveKey.GetCreationDate(),
+						ChangeDate:     inactiveKey.GetCreationDate(),
+					},
+					{
+						KeyId:          activeKey.GetKeyId(),
+						Active:         true,
+						PublicKey:      publicKeyBytes,
+						Fingerprint:    fingerprint,
+						ExpirationDate: nil,
+						CreationDate:   activeKey.GetCreationDate(),
+						ChangeDate:     changeDate.GetChangeDate(),
+					},
+				},
+			},
+		},
+		{
+			name: "list only active",
+			args: args{
+				ctx: isolatedIAMOwnerCTX,
+				req: &action.ListPublicKeysRequest{
+					TargetId: targetID,
+					Filters: []*action.PublicKeySearchFilter{
+						{
+							Filter: &action.PublicKeySearchFilter_ActiveFilter{
+								ActiveFilter: true,
+							},
+						},
+					},
+				},
+			},
+			want: &action.ListPublicKeysResponse{
+				PublicKeys: []*action.PublicKey{
+					{
+						KeyId:          activeKey.GetKeyId(),
+						Active:         true,
+						PublicKey:      publicKeyBytes,
+						Fingerprint:    fingerprint,
+						ExpirationDate: nil,
+						CreationDate:   activeKey.GetCreationDate(),
+						ChangeDate:     changeDate.GetChangeDate(),
+					},
+				},
+			},
+		},
+		{
+			name: "list only inactive",
+			args: args{
+				ctx: isolatedIAMOwnerCTX,
+				req: &action.ListPublicKeysRequest{
+					TargetId: targetID,
+					Filters: []*action.PublicKeySearchFilter{
+						{
+							Filter: &action.PublicKeySearchFilter_ActiveFilter{
+								ActiveFilter: false,
+							},
+						},
+					},
+				},
+			},
+			want: &action.ListPublicKeysResponse{
+				PublicKeys: []*action.PublicKey{
+					{
+						KeyId:          anotherKey.GetKeyId(),
+						Active:         false,
+						PublicKey:      rsaPublicKeyBytes,
+						Fingerprint:    rsaFingerprint,
+						ExpirationDate: nil,
+						CreationDate:   anotherKey.GetCreationDate(),
+						ChangeDate:     anotherKey.GetCreationDate(),
+					},
+					{
+						KeyId:          inactiveKey.GetKeyId(),
+						Active:         false,
+						PublicKey:      rsaPublicKeyBytes,
+						Fingerprint:    rsaFingerprint,
+						ExpirationDate: expirationDate,
+						CreationDate:   inactiveKey.GetCreationDate(),
+						ChangeDate:     inactiveKey.GetCreationDate(),
+					},
+				},
+			},
+		},
+		{
+			name: "list with expiration date filter",
+			args: args{
+				ctx: isolatedIAMOwnerCTX,
+				req: &action.ListPublicKeysRequest{
+					TargetId: targetID,
+					Filters: []*action.PublicKeySearchFilter{
+						{
+							Filter: &action.PublicKeySearchFilter_ExpirationDateFilter{
+								ExpirationDateFilter: &filter.TimestampFilter{
+									Timestamp: expirationDate,
+									Method:    filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_BEFORE,
+								},
+							},
+						},
+					},
+				},
+			},
+			want: &action.ListPublicKeysResponse{
+				PublicKeys: []*action.PublicKey{
+					{
+						KeyId:          anotherKey.GetKeyId(),
+						Active:         false,
+						PublicKey:      rsaPublicKeyBytes,
+						Fingerprint:    rsaFingerprint,
+						ExpirationDate: nil,
+						CreationDate:   anotherKey.GetCreationDate(),
+						ChangeDate:     anotherKey.GetCreationDate(),
+					},
+				},
+			},
+		},
+		{
+			name: "list by key id",
+			args: args{
+				ctx: isolatedIAMOwnerCTX,
+				req: &action.ListPublicKeysRequest{
+					TargetId: targetID,
+					Filters: []*action.PublicKeySearchFilter{
+						{
+							Filter: &action.PublicKeySearchFilter_KeyIdsFilter{
+								KeyIdsFilter: &filter.InIDsFilter{
+									Ids: []string{activeKey.GetKeyId(), anotherKey.GetKeyId()},
+								},
+							},
+						},
+					},
+					SortingColumn: action.PublicKeyFieldName_PUBLIC_KEY_FIELD_NAME_CHANGE_DATE,
+					Pagination: &filter.PaginationRequest{
+						Limit:  1,
+						Offset: 1,
+						Asc:    true,
+					},
+				},
+			},
+			want: &action.ListPublicKeysResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  2,
+					AppliedLimit: 1,
+				},
+				PublicKeys: []*action.PublicKey{
+					{
+						KeyId:          anotherKey.GetKeyId(),
+						Active:         false,
+						PublicKey:      rsaPublicKeyBytes,
+						Fingerprint:    rsaFingerprint,
+						ExpirationDate: nil,
+						CreationDate:   anotherKey.GetCreationDate(),
+						ChangeDate:     anotherKey.GetCreationDate(),
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, 2*time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := instance.Client.ActionV2.ListPublicKeys(tt.args.ctx, tt.args.req)
+				if tt.wantErr {
+					assert.Error(ttt, err, "Error: "+err.Error())
+					return
+				}
+				assert.NoError(ttt, err)
+				assert.EqualExportedValues(ttt, tt.want, got)
+			}, retryDuration, tick, "timeout waiting for expected public keys")
 		})
 	}
 }

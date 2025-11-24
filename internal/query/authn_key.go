@@ -297,6 +297,14 @@ func NewAuthNKeyIDQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(AuthNKeyColumnID, id, TextEquals)
 }
 
+func NewAuthNKeyInIDsSearchQuery(ids []string) (SearchQuery, error) {
+	return NewInTextQuery(AuthNKeyColumnID, ids)
+}
+
+func NewAuthNKeyEnabledSearchQuery(enabled bool) (SearchQuery, error) {
+	return NewBoolQuery(AuthNKeyColumnEnabled, enabled)
+}
+
 func NewAuthNKeyIdentifyerQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(AuthNKeyColumnIdentifier, id, TextEquals)
 }

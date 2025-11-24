@@ -1083,11 +1083,28 @@ message ListPublicKeysRequest {
       example: "\"69629026806489455\"";
     }
   ];
+
+  // List limitations and ordering.
+  optional zitadel.filter.v2.PaginationRequest pagination = 2;
+
+  // The field the result is sorted by. The default is the creation date.
+  // Beware that if you change this, your result pagination might be inconsistent.
+  PublicKeyFieldName sorting_column = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"EXECUTION_FIELD_NAME_CREATION_DATE\""
+    }
+  ];
+
+  // Define the criteria to query for.
+  repeated PublicKeySearchFilter filters = 4;
 }
 
 message ListPublicKeysResponse {
+  // List limitations and ordering.
+  zitadel.filter.v2.PaginationResponse pagination = 1;
+
   // List of all public keys for the target.
-  repeated PublicKey public_keys = 1;
+  repeated PublicKey public_keys = 2;
 }
 
 message SetExecutionRequest {

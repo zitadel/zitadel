@@ -46,16 +46,16 @@ func (c *Commands) AddTargetPublicKey(ctx context.Context, key *TargetPublicKey,
 	if err != nil {
 		return time.Time{}, err
 	}
+	key.KeyID, err = c.idGenerator.Next()
+	if err != nil {
+		return time.Time{}, err
+	}
 	writeModel, err := c.getTargetKeyWriteModelByID(ctx, key.TargetID, key.KeyID, resourceOwner)
 	if err != nil {
 		return time.Time{}, err
 	}
 	if !writeModel.TargetExists {
 		return time.Time{}, zerrors.ThrowPreconditionFailed(nil, "COMMAND-nd3fsd", "Errors.Target.NotFound")
-	}
-	key.KeyID, err = c.idGenerator.Next()
-	if err != nil {
-		return time.Time{}, err
 	}
 	err = c.pushAppendAndReduce(ctx, writeModel, target.NewKeyAddedEvent(
 		ctx,
