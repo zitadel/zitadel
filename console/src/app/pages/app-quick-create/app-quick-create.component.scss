@@ -339,6 +339,32 @@
           }
         }
 
+        .not-recommended-warning {
+          margin-top: 1rem;
+          margin-bottom: 0.5rem;
+          display: flex;
+          align-items: center;
+
+          .badge {
+            position: relative;
+            bottom: auto;
+            left: auto;
+            transform: none;
+            display: inline-block;
+
+            &.not-recommended {
+              background: if($is-dark-theme, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.12));
+              color: if($is-dark-theme, rgb(251, 191, 36), rgb(180, 83, 9));
+              font-size: 0.6875rem;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.3px;
+              padding: 0.25rem 0.5rem;
+              border-radius: 0.25rem;
+            }
+          }
+        }
+
         a {
           color: var(--success);
           text-decoration: none;

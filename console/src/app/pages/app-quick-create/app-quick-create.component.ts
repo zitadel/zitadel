@@ -277,6 +277,11 @@ export class AppQuickCreateComponent {
     return method?.descI18nKey || '';
   }
 
+  public getSelectedAuthMethod(): RadioItemAuthType | undefined {
+    const key = this.customAuthMethod();
+    return key ? this.authMethods.find((m) => m.key === key) : undefined;
+  }
+
   public getFilteredAuthMethods(): RadioItemAuthType[] {
     const appType = this.customAppType();
 

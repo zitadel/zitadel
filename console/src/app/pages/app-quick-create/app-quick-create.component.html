@@ -132,13 +132,15 @@
                     @if (method.recommended) {
                       <span class="badge recommended">Recommended</span>
                     }
-                    @if (method.notRecommended) {
-                      <span class="badge not-recommended">Not Recommended</span>
-                    }
                   </button>
                 }
               </div>
               @if (customAuthMethod()) {
+                @if (getSelectedAuthMethod()?.notRecommended) {
+                  <div class="not-recommended-warning">
+                    <span class="badge not-recommended">Not Recommended</span>
+                  </div>
+                }
                 <p class="type-description cnsl-secondary-text">
                   {{ getAuthMethodDescription(customAuthMethod()) | translate }}
                 </p>
