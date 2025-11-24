@@ -95,6 +95,7 @@ Errors:
     InitCodeNotFound: Кодот за иницијализација не е пронајден
     UsernameNotChanged: Корисничкото име не е променето
     InvalidURLTemplate: Шаблонот за URL е невалиден
+    Locked: Корисникот е заклучен
     Profile:
       NotFound: Профилот не е пронајден
       NotChanged: Профилот не е променет
@@ -176,6 +177,11 @@ Errors:
         NotExisting: U2F не постои
       Passwordless:
         NotExisting: Најава без лозинка не постои
+      RecoveryCodes:
+        InvalidCode: Невалиден код за опоравување
+        MaxCountExceeded: Максималниот број на кодови за опоравување е надминат
+        NotReady: Кодовите за опоравување не се готови за употреба
+        ConfigInvalid: Конфигурацијата за кодовите за опоравување е невалидна
     WebAuthN:
       NotFound: WebAuthN токенот не може да биде пронајден
       BeginRegisterFailed: Почетокот на регистрацијата на WebAuthN не успеа

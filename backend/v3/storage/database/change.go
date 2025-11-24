@@ -133,12 +133,12 @@ type changeToColumn struct {
 	from Column
 }
 
-// IsOnColumn implements [Change.IsOnColumn].
+// IsOnColumn implements [Change].
 func (c *changeToColumn) IsOnColumn(col Column) bool {
 	return c.to.Equals(col)
 }
 
-// Matches implements [Change.Matches].
+// Matches implements [Change].
 func (c *changeToColumn) Matches(x any) bool {
 	toMatch, ok := x.(*changeToColumn)
 	if !ok {
@@ -147,12 +147,12 @@ func (c *changeToColumn) Matches(x any) bool {
 	return c.to.Equals(toMatch.to) && c.from.Equals(toMatch.from)
 }
 
-// String implements [Change.String].
+// String implements [Change].
 func (c *changeToColumn) String() string {
 	return "database.changeToColumn"
 }
 
-// Write implements [Change.Write].
+// Write implements [Change].
 func (c *changeToColumn) Write(builder *StatementBuilder) {
 	c.to.WriteUnqualified(builder)
 	builder.WriteString(" = ")
@@ -171,12 +171,12 @@ func NewIncrementColumnChange(col Column) Change {
 	}
 }
 
-// IsOnColumn implements [Change.IsOnColumn].
+// IsOnColumn implements [Change].
 func (i *incrementColumnChange) IsOnColumn(col Column) bool {
 	return i.column.Equals(col)
 }
 
-// Matches implements [Change.Matches].
+// Matches implements [Change].
 func (i *incrementColumnChange) Matches(x any) bool {
 	toMatch, ok := x.(*incrementColumnChange)
 	if !ok {
@@ -185,12 +185,12 @@ func (i *incrementColumnChange) Matches(x any) bool {
 	return i.column.Equals(toMatch.column)
 }
 
-// String implements [Change.String].
+// String implements [Change].
 func (i *incrementColumnChange) String() string {
 	return "database.incrementColumnChange"
 }
 
-// Write implements [Change.Write].
+// Write implements [Change].
 func (i *incrementColumnChange) Write(builder *StatementBuilder) {
 	i.column.WriteUnqualified(builder)
 	builder.WriteString(" = ")
@@ -212,12 +212,12 @@ type changeToStatement struct {
 	stmt   func(builder *StatementBuilder)
 }
 
-// IsOnColumn implements [Change.IsOnColumn].
+// IsOnColumn implements [Change].
 func (c *changeToStatement) IsOnColumn(col Column) bool {
 	return c.column.Equals(col)
 }
 
-// Matches implements [Change.Matches].
+// Matches implements [Change].
 func (c *changeToStatement) Matches(x any) bool {
 	toMatch, ok := x.(*changeToStatement)
 	if !ok {
@@ -236,12 +236,12 @@ func (c *changeToStatement) Matches(x any) bool {
 	return c.column.Equals(toMatch.column)
 }
 
-// String implements [Change.String].
+// String implements [Change].
 func (c *changeToStatement) String() string {
 	return "database.changeToStatement"
 }
 
-// Write implements [Change.Write].
+// Write implements [Change].
 func (c *changeToStatement) Write(builder *StatementBuilder) {
 	_, ok := c.column.(Columns)
 	if ok {
@@ -284,12 +284,12 @@ type cteChange struct {
 	change func(name string) Change
 }
 
-// IsOnColumn implements [CTEChange.IsOnColumn].
+// IsOnColumn implements [CTEChange].
 func (c *cteChange) IsOnColumn(col Column) bool {
 	return false
 }
 
-// Matches implements [CTEChange.Matches].
+// Matches implements [CTEChange].
 func (c *cteChange) Matches(x any) bool {
 	toMatch, ok := x.(*cteChange)
 	if !ok {
@@ -298,11 +298,11 @@ func (c *cteChange) Matches(x any) bool {
 	var expectedCTEBuilder, actualCTEBuilder StatementBuilder
 	c.cte(&expectedCTEBuilder)
 	if c.change != nil {
-		c.change(c.name)
+		c.change(c.name).Write(&expectedCTEBuilder)
 	}
 	toMatch.cte(&actualCTEBuilder)
 	if toMatch.change != nil {
-		toMatch.change(toMatch.name)
+		toMatch.change(toMatch.name).Write(&actualCTEBuilder)
 	}
 
 	if expectedCTEBuilder.String() != actualCTEBuilder.String() {
@@ -311,17 +311,17 @@ func (c *cteChange) Matches(x any) bool {
 	return slices.Equal(expectedCTEBuilder.Args(), actualCTEBuilder.Args())
 }
 
-// Name implements [CTEChange.Name].
+// Name implements [CTEChange].
 func (c *cteChange) SetName(name string) {
 	c.name = name
 }
 
-// String implements [CTEChange.String].
+// String implements [CTEChange].
 func (c *cteChange) String() string {
 	return "database.cteChange"
 }
 
-// Write implements [CTEChange.Write].
+// Write implements [CTEChange].
 func (c *cteChange) Write(builder *StatementBuilder) {
 	if c.change == nil {
 		return
@@ -329,7 +329,7 @@ func (c *cteChange) Write(builder *StatementBuilder) {
 	c.change(c.name).Write(builder)
 }
 
-// WriteCTE implements [CTEChange.WriteCTE].
+// WriteCTE implements [CTEChange].
 func (c *cteChange) WriteCTE(builder *StatementBuilder) {
 	c.cte(builder)
 }
