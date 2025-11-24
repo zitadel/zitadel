@@ -2572,7 +2572,15 @@
       "QUICK_CREATE_FRAMEWORK": "Välj ditt ramverk",
       "QUICK_CREATE_FRAMEWORK_DESC": "Vi tillhandahåller en rekommenderad konfiguration för din applikation. Välj det ramverk du använder eller tänker använda.",
       "QUICK_CREATE_NAME": "Namnge din applikation",
-      "QUICK_CREATE_TITLE": "Skapa applikation"
+      "QUICK_CREATE_TITLE": "Skapa applikation",
+      "CUSTOM_APP_TITLE": "Anpassad applikation",
+      "CUSTOM_APP_DESC": "Vi kommer att skapa ditt projekt och din applikation med konfigurationen du väljer nedan.",
+      "CUSTOM_APP_NAME": "Applikationsnamn",
+      "CUSTOM_APP_NAME_LABEL": "Namn",
+      "CUSTOM_APP_TYPE": "Applikationstyp",
+      "CUSTOM_APP_AUTH_METHOD": "Autentiseringsmetod",
+      "CUSTOM_APP_CANCEL": "Avbryt",
+      "CUSTOM_APP_CREATE": "Skapa app"
     },
     "NAMEDIALOG": {
       "TITLE": "Byt namn på app",

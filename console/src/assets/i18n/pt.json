@@ -2575,7 +2575,15 @@
       "QUICK_CREATE_DESC": "Crie uma aplicação em três passos simples.",
       "QUICK_CREATE_FRAMEWORK": "Selecione o seu framework",
       "QUICK_CREATE_FRAMEWORK_DESC": "Fornecemos uma configuração recomendada para a sua aplicação. Escolha o framework que está a utilizar ou pretende utilizar.",
-      "QUICK_CREATE_NAME": "Dê um nome à sua aplicação"
+      "QUICK_CREATE_NAME": "Dê um nome à sua aplicação",
+      "CUSTOM_APP_TITLE": "Aplicação personalizada",
+      "CUSTOM_APP_DESC": "Criaremos o seu projeto e aplicação com a configuração que escolher abaixo.",
+      "CUSTOM_APP_NAME": "Nome da aplicação",
+      "CUSTOM_APP_NAME_LABEL": "Nome",
+      "CUSTOM_APP_TYPE": "Tipo de aplicação",
+      "CUSTOM_APP_AUTH_METHOD": "Método de autenticação",
+      "CUSTOM_APP_CANCEL": "Cancelar",
+      "CUSTOM_APP_CREATE": "Criar aplicação"
     },
     "NAMEDIALOG": {
       "TITLE": "Renomear Aplicativo",

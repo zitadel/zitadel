@@ -2662,7 +2662,15 @@
           "TITLE": "Hilfe & Support",
           "DESC": "Lesen Sie unsere Dokumentation zum Erstellen von Applikation oder kontaktieren Sie unseren Support"
         }
-      }
+      },
+      "CUSTOM_APP_TITLE": "Benutzerdefinierte Anwendung",
+      "CUSTOM_APP_DESC": "Wir erstellen Ihr Projekt und Ihre Anwendung mit der unten ausgewählten Konfiguration.",
+      "CUSTOM_APP_NAME": "Anwendungsname",
+      "CUSTOM_APP_NAME_LABEL": "Name",
+      "CUSTOM_APP_TYPE": "Anwendungstyp",
+      "CUSTOM_APP_AUTH_METHOD": "Authentifizierungsmethode",
+      "CUSTOM_APP_CANCEL": "Abbrechen",
+      "CUSTOM_APP_CREATE": "Anwendung erstellen"
     },
     "NAMEDIALOG": {
       "TITLE": "App umbenennen",

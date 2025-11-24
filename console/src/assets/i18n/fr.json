@@ -2661,7 +2661,15 @@
           "TITLE": "Aide et support",
           "DESC": "Lisez notre documentation sur la création d'applications ou contactez notre assistance"
         }
-      }
+      },
+      "CUSTOM_APP_TITLE": "Application personnalisée",
+      "CUSTOM_APP_DESC": "Nous créerons votre projet et votre application avec la configuration que vous choisissez ci-dessous.",
+      "CUSTOM_APP_NAME": "Nom de l'application",
+      "CUSTOM_APP_NAME_LABEL": "Nom",
+      "CUSTOM_APP_TYPE": "Type d'application",
+      "CUSTOM_APP_AUTH_METHOD": "Méthode d'authentification",
+      "CUSTOM_APP_CANCEL": "Annuler",
+      "CUSTOM_APP_CREATE": "Créer l'application"
     },
     "NAMEDIALOG": {
       "TITLE": "Renommer l'application",

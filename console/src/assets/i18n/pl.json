@@ -2573,7 +2573,15 @@
       "QUICK_CREATE_DESC": "Utwórz aplikację w trzech prostych krokach.",
       "QUICK_CREATE_FRAMEWORK": "Wybierz swój framework",
       "QUICK_CREATE_FRAMEWORK_DESC": "Oferujemy rekomendowaną konfigurację dla Twojej aplikacji. Wybierz framework, którego używasz lub zamierzasz używać.",
-      "QUICK_CREATE_NAME": "Nadaj nazwę swojej aplikacji"
+      "QUICK_CREATE_NAME": "Nadaj nazwę swojej aplikacji",
+      "CUSTOM_APP_TITLE": "Aplikacja niestandardowa",
+      "CUSTOM_APP_DESC": "Utworzymy Twój projekt i aplikację z konfiguracją, którą wybierzesz poniżej.",
+      "CUSTOM_APP_NAME": "Nazwa aplikacji",
+      "CUSTOM_APP_NAME_LABEL": "Nazwa",
+      "CUSTOM_APP_TYPE": "Typ aplikacji",
+      "CUSTOM_APP_AUTH_METHOD": "Metoda uwierzytelniania",
+      "CUSTOM_APP_CANCEL": "Anuluj",
+      "CUSTOM_APP_CREATE": "Utwórz aplikację"
     },
     "NAMEDIALOG": {
       "TITLE": "Zmień nazwę aplikacji",

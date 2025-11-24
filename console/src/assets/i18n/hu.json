@@ -2568,7 +2568,15 @@
       "QUICK_CREATE_FRAMEWORK_DESC": "Ajánlott konfigurációt biztosítunk az alkalmazásához. Válassza ki a használt vagy használni kívánt keretrendszert.",
       "QUICK_CREATE_NAME": "Nevezze el az alkalmazást",
       "CREATE_PROJECT_AUTO": "Projekt létrehozása nekem",
-      "CREATE_PROJECT_AUTO_DESC": "Ajánlott, ha új a ZITADEL-ben. Mi elvégezzük a projekt beállítását."
+      "CREATE_PROJECT_AUTO_DESC": "Ajánlott, ha új a ZITADEL-ben. Mi elvégezzük a projekt beállítását.",
+      "CUSTOM_APP_TITLE": "Egyéni alkalmazás",
+      "CUSTOM_APP_DESC": "Létrehozzuk projektjét és alkalmazását az alább választott konfigurációval.",
+      "CUSTOM_APP_NAME": "Alkalmazás neve",
+      "CUSTOM_APP_NAME_LABEL": "Név",
+      "CUSTOM_APP_TYPE": "Alkalmazás típusa",
+      "CUSTOM_APP_AUTH_METHOD": "Hitelesítési módszer",
+      "CUSTOM_APP_CANCEL": "Mégse",
+      "CUSTOM_APP_CREATE": "Alkalmazás létrehozása"
     },
     "NAMEDIALOG": {
       "TITLE": "Alkalmazás átnevezése",

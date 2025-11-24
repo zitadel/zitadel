@@ -2569,7 +2569,15 @@
       "QUICK_CREATE_FRAMEWORK": "Vyberte svůj framework",
       "QUICK_CREATE_FRAMEWORK_DESC": "Poskytujeme vám doporučenou konfiguraci pro vaši aplikaci. Vyberte framework, který používáte, nebo framework, který plánujete použít.",
       "QUICK_CREATE_NAME": "Pojmenujte svou aplikaci",
-      "QUICK_CREATE_TITLE": "Vytvořit aplikaci"
+      "QUICK_CREATE_TITLE": "Vytvořit aplikaci",
+      "CUSTOM_APP_TITLE": "Vlastní aplikace",
+      "CUSTOM_APP_DESC": "Vytvoříme váš projekt a aplikaci s konfigurací, kterou si zvolíte níže.",
+      "CUSTOM_APP_NAME": "Název aplikace",
+      "CUSTOM_APP_NAME_LABEL": "Název",
+      "CUSTOM_APP_TYPE": "Typ aplikace",
+      "CUSTOM_APP_AUTH_METHOD": "Metoda ověření",
+      "CUSTOM_APP_CANCEL": "Zrušit",
+      "CUSTOM_APP_CREATE": "Vytvořit aplikaci"
     },
     "NAMEDIALOG": {
       "TITLE": "Přejmenovat aplikaci",

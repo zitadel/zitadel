@@ -15,7 +15,8 @@ import { NavigationService } from 'src/app/services/navigation.service';
 import { ApplicationService } from 'src/app/services/application.service';
 import { CreateMutationResult, injectMutation } from '@tanstack/angular-query-experimental';
 import { ProjectService } from 'src/app/services/project.service';
-import { OIDCAppType, OIDCAuthMethodType } from '@zitadel/proto/zitadel/app/v2beta/oidc_pb';
+import { OIDCAppType, OIDCAuthMethodType, OIDCGrantType, OIDCResponseType } from '@zitadel/proto/zitadel/app/v2beta/oidc_pb';
+import { APIAuthMethodType } from '@zitadel/proto/zitadel/app/v2beta/api_pb';
 import { UserService } from 'src/app/services/user.service';
 import { AuthorizationService } from 'src/app/services/authorization.service';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -30,6 +31,28 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { GrantedProject, Project } from 'src/app/proto/generated/zitadel/project_pb';
 import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
+import {
+  WEB_TYPE,
+  NATIVE_TYPE,
+  USER_AGENT_TYPE,
+  API_TYPE,
+  SAML_TYPE,
+  RadioItemAppType,
+  AppCreateType,
+} from 'src/app/pages/projects/apps/authtypes';
+import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
+import {
+  PKCE_METHOD,
+  CODE_METHOD,
+  PK_JWT_METHOD,
+  POST_METHOD,
+  BASIC_AUTH_METHOD,
+  DEVICE_CODE_METHOD,
+  IMPLICIT_METHOD,
+  getPartialConfigFromAuthMethod,
+} from 'src/app/pages/projects/apps/authmethods';
+import { AppRadioModule } from 'src/app/modules/app-radio/app-radio.module';
+import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
 
 type Framework = (typeof frameworksWithOidcConfiguration)[number];
 
@@ -51,12 +74,33 @@ type Framework = (typeof frameworksWithOidcConfiguration)[number];
     MatButton,
     MatProgressSpinnerModule,
     FormsModule,
+    AppRadioModule,
+    FormFieldModule,
   ],
 })
 export class AppQuickCreateComponent {
   public InfoSectionType = InfoSectionType;
 
   public selectedFramework = signal<Framework | undefined>(undefined);
+
+  // Custom app creation mode
+  public customAppMode = signal(false);
+  public customAppType = signal<RadioItemAppType | undefined>(undefined);
+  public customAuthMethod = signal<string>('');
+  public customProjectName = generateRandomProjectName();
+  public customAppName = '';
+
+  // App types and auth methods for custom mode
+  public appTypes: RadioItemAppType[] = [WEB_TYPE, NATIVE_TYPE, USER_AGENT_TYPE, API_TYPE];
+  public authMethods: RadioItemAuthType[] = [
+    PKCE_METHOD,
+    CODE_METHOD,
+    PK_JWT_METHOD,
+    POST_METHOD,
+    BASIC_AUTH_METHOD,
+    DEVICE_CODE_METHOD,
+    IMPLICIT_METHOD,
+  ];
   public readonly initialParam: Signal<string>;
 
   protected frameworks = frameworksWithOidcConfiguration
@@ -107,6 +151,9 @@ export class AppQuickCreateComponent {
   private readonly navigation = inject(NavigationService);
   protected readonly createOidcApplicationMutation = injectMutation(
     inject(ApplicationService).createApplicationMutationOptions<'oidcRequest'>,
+  );
+  protected readonly createApiApplicationMutation = injectMutation(
+    inject(ApplicationService).createApplicationMutationOptions<'apiRequest'>,
   );
   protected readonly addProjectRoleMutation = injectMutation(inject(ProjectService).addProjectRoleMutationsOptions);
   protected readonly createProjectMutation = injectMutation(inject(ProjectService).createProjectMutationOptions);
@@ -175,6 +222,104 @@ export class AppQuickCreateComponent {
     }
 
     return 'OIDC';
+  }
+
+  public enableCustomAppMode() {
+    // Clear any selected framework first to avoid showing both panels
+    this.selectedFramework.set(undefined);
+    this.customAppMode.set(true);
+    this.customProjectName = generateRandomProjectName();
+    this.customAppName = generateFrameworkAppName('Custom');
+
+    // Clear framework query param to prevent auto-reselection
+    this.router.navigate([], {
+      queryParams: { framework: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
+
+  public disableCustomAppMode() {
+    this.customAppMode.set(false);
+    this.customAppType.set(undefined);
+    this.customAuthMethod.set('');
+    this.customAppName = '';
+  }
+
+  public selectFramework(framework: Framework) {
+    this.selectedFramework.set(framework);
+    // Disable custom app mode when a framework is selected
+    if (this.customAppMode()) {
+      this.disableCustomAppMode();
+    }
+
+    // Update query param to reflect the selected framework
+    this.router.navigate([], {
+      queryParams: { framework: framework.id },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
+
+  public deselectFramework() {
+    this.selectedFramework.set(undefined);
+
+    // Clear framework query param to prevent auto-reselection
+    this.router.navigate([], {
+      queryParams: { framework: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
+
+  public getAuthMethodDescription(key: string): string {
+    const method = this.authMethods.find((m) => m.key === key);
+    return method?.descI18nKey || '';
+  }
+
+  public getFilteredAuthMethods(): RadioItemAuthType[] {
+    const appType = this.customAppType();
+
+    if (!appType) {
+      return [];
+    }
+
+    if (appType.createType === AppCreateType.API) {
+      // API: JWT and BASIC
+      return this.authMethods.filter((m) => m.apiAuthMethod);
+    }
+
+    // OIDC apps - filter by specific app type
+    if (appType.oidcAppType === OIDCAppType.OIDC_APP_TYPE_WEB) {
+      // Web: PKCE, CODE, JWT, POST
+      return this.authMethods.filter((m) => m.key === 'PKCE' || m.key === 'CODE' || m.key === 'PK_JWT' || m.key === 'POST');
+    }
+
+    if (appType.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE) {
+      // Native: PKCE and DEVICE_CODE
+      return this.authMethods.filter((m) => m.key === 'PKCE' || m.key === 'DEVICECODE');
+    }
+
+    if (appType.oidcAppType === OIDCAppType.OIDC_APP_TYPE_USER_AGENT) {
+      // User Agent: PKCE and IMPLICIT
+      return this.authMethods.filter((m) => m.key === 'PKCE' || m.key === 'IMPLICIT');
+    }
+
+    // Fallback - show all OIDC methods
+    return this.authMethods;
+  }
+
+  public onAppTypeChange(): void {
+    // Reset auth method when app type changes if current selection is invalid
+    const filteredMethods = this.getFilteredAuthMethods();
+    const currentMethod = this.customAuthMethod();
+
+    // Check if current method is still valid for the new app type
+    const isCurrentMethodValid = filteredMethods.some((m) => m.key === currentMethod);
+
+    if (!isCurrentMethodValid) {
+      this.customAuthMethod.set('');
+    }
   }
 
   public async close() {
@@ -289,6 +434,156 @@ export class AppQuickCreateComponent {
     await this.router.navigate(['projects', projectId, 'apps', resp.appId], {
       queryParams: { new: true, framework: framework.id },
     });
+  }
+
+  async createCustomProjectAndApp() {
+    try {
+      const { project } = this.project() ?? {};
+      let projectId: string;
+
+      if (!this.createProject() && project) {
+        // They selected an existing project
+        projectId = 'id' in project ? project.id : project.projectId;
+      } else {
+        const projectName = this.projectName().trim();
+        if (!this.createProject() && !projectName) {
+          throw new Error('Please select an existing project or enter a new project name');
+        }
+
+        const response = await this.createProjectMutation.mutateAsync({
+          name: projectName || this.customProjectName,
+        });
+        projectId = response.id;
+
+        // Create admin role and grant it to the current user
+        await this.setupAdminRoleAndGrant(projectId);
+      }
+
+      await this.createCustomApp(projectId);
+    } catch (error) {
+      this.toast.showError(error);
+    }
+  }
+
+  private async createCustomApp(projectId: string): Promise<void> {
+    const appType = this.customAppType();
+    const authMethodKey = this.customAuthMethod();
+
+    if (!appType) {
+      throw new Error('Please select an application type');
+    }
+
+    const appName = this.customAppName.trim() || `${appType.prefix}-App`;
+
+    if (appType.createType === AppCreateType.OIDC) {
+      if (!authMethodKey) {
+        throw new Error('Please select an authentication method');
+      }
+
+      let authMethodType: OIDCAuthMethodType;
+      let responseTypes: OIDCResponseType[];
+      let grantTypes: OIDCGrantType[];
+
+      // Map auth method to proper OIDC configuration
+      switch (authMethodKey) {
+        case 'PKCE':
+          authMethodType = OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE;
+          responseTypes = [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE];
+          grantTypes = [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE];
+          break;
+        case 'CODE':
+          authMethodType = OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC;
+          responseTypes = [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE];
+          grantTypes = [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE];
+          break;
+        case 'PK_JWT':
+          authMethodType = OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT;
+          responseTypes = [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE];
+          grantTypes = [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE];
+          break;
+        case 'POST':
+          authMethodType = OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_POST;
+          responseTypes = [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE];
+          grantTypes = [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE];
+          break;
+        case 'DEVICECODE':
+          authMethodType = OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE;
+          responseTypes = [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE];
+          grantTypes = [OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE];
+          break;
+        case 'IMPLICIT':
+          authMethodType = OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE;
+          responseTypes = [OIDCResponseType.OIDC_RESPONSE_TYPE_ID_TOKEN];
+          grantTypes = [OIDCGrantType.OIDC_GRANT_TYPE_IMPLICIT];
+          break;
+        default:
+          throw new Error('Unknown authentication method');
+      }
+
+      const resp = await this.createOidcApplicationMutation.mutateAsync({
+        projectId,
+        name: appName,
+        creationRequestType: {
+          case: 'oidcRequest',
+          value: {
+            appType: appType.oidcAppType!,
+            responseTypes,
+            grantTypes,
+            authMethodType,
+            devMode: true,
+            redirectUris: ['http://localhost:3000/callback', 'http://localhost:3000/auth/callback'],
+            postLogoutRedirectUris: ['http://localhost:3000'],
+          },
+        },
+      });
+
+      this.toast.showInfo('APP.TOAST.CREATED', true);
+
+      // Navigate to app detail page and pass client secret if present
+      const clientSecret = resp.creationResponseType.value.clientSecret;
+      await this.router.navigate(['projects', projectId, 'apps', resp.appId], {
+        queryParams: { new: true, custom: true },
+        state: clientSecret ? { clientSecret } : undefined,
+      });
+    } else if (appType.createType === AppCreateType.API) {
+      if (!authMethodKey) {
+        throw new Error('Please select an authentication method');
+      }
+
+      let authMethodType: APIAuthMethodType;
+
+      // Map auth method to API auth type
+      switch (authMethodKey) {
+        case 'PK_JWT':
+          authMethodType = APIAuthMethodType.API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT;
+          break;
+        case 'BASIC':
+          authMethodType = APIAuthMethodType.API_AUTH_METHOD_TYPE_BASIC;
+          break;
+        default:
+          throw new Error('Unsupported authentication method for API apps');
+      }
+
+      const resp = await this.createApiApplicationMutation.mutateAsync({
+        projectId,
+        name: appName,
+        creationRequestType: {
+          case: 'apiRequest',
+          value: {
+            authMethodType,
+          },
+        },
+      });
+
+      this.toast.showInfo('APP.TOAST.CREATED', true);
+
+      // Navigate to app detail page and pass client secret if present
+      const clientSecret = resp.creationResponseType.value.clientSecret;
+      await this.router.navigate(['projects', projectId, 'apps', resp.appId], {
+        queryParams: { new: true, custom: true },
+        state: clientSecret ? { clientSecret } : undefined,
+      });
+    }
   }
 
   public selectProject(project: {

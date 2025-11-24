@@ -12,7 +12,8 @@
     "startCommand": " npm start",
     "localhost": "http://localhost:3000",
     "external": false,
-    "hasExampleEnv": true
+    "hasExampleEnv": true,
+    "integrationGuide": "/docs/examples/login/angular#angular-setup"
   },
   {
     "id": "astro",
@@ -219,7 +220,8 @@
     "startCommand": "npm run dev",
     "localhost": "http://localhost:3000",
     "external": false,
-    "hasExampleEnv": true
+    "hasExampleEnv": true,
+    "integrationGuide": "/docs/examples/login/nextjs#nextjs-setup"
   },
   {
     "id": "nuxtjs",

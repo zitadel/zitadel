@@ -2568,7 +2568,15 @@
       "QUICK_CREATE_FRAMEWORK": "Selectați framework-ul",
       "QUICK_CREATE_FRAMEWORK_DESC": "Oferim o configurație recomandată pentru aplicația dvs. Alegeți framework-ul pe care îl utilizați sau intenționați să îl utilizați.",
       "QUICK_CREATE_NAME": "Denumiți aplicația",
-      "QUICK_CREATE_TITLE": "Creați aplicație"
+      "QUICK_CREATE_TITLE": "Creați aplicație",
+      "CUSTOM_APP_TITLE": "Aplicație personalizată",
+      "CUSTOM_APP_DESC": "Vom crea proiectul și aplicația dvs. cu configurația pe care o alegeți mai jos.",
+      "CUSTOM_APP_NAME": "Numele aplicației",
+      "CUSTOM_APP_NAME_LABEL": "Nume",
+      "CUSTOM_APP_TYPE": "Tipul aplicației",
+      "CUSTOM_APP_AUTH_METHOD": "Metoda de autentificare",
+      "CUSTOM_APP_CANCEL": "Anulează",
+      "CUSTOM_APP_CREATE": "Creează aplicație"
     },
     "NAMEDIALOG": {
       "TITLE": "Redenumiți aplicația",

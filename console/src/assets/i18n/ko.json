@@ -2568,7 +2568,15 @@
       "QUICK_CREATE_FRAMEWORK": "프레임워크 선택",
       "QUICK_CREATE_FRAMEWORK_DESC": "애플리케이션에 권장 구성을 제공합니다. 사용 중이거나 사용할 예정인 프레임워크를 선택하세요.",
       "QUICK_CREATE_NAME": "애플리케이션 이름 지정",
-      "QUICK_CREATE_TITLE": "애플리케이션 생성"
+      "QUICK_CREATE_TITLE": "애플리케이션 생성",
+      "CUSTOM_APP_TITLE": "사용자 정의 애플리케이션",
+      "CUSTOM_APP_DESC": "아래에서 선택한 구성으로 프로젝트와 애플리케이션을 생성합니다.",
+      "CUSTOM_APP_NAME": "애플리케이션 이름",
+      "CUSTOM_APP_NAME_LABEL": "이름",
+      "CUSTOM_APP_TYPE": "애플리케이션 유형",
+      "CUSTOM_APP_AUTH_METHOD": "인증 방법",
+      "CUSTOM_APP_CANCEL": "취소",
+      "CUSTOM_APP_CREATE": "앱 만들기"
     },
     "NAMEDIALOG": {
       "TITLE": "앱 이름 변경",

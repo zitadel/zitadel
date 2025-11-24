@@ -2569,7 +2569,15 @@
       "QUICK_CREATE_FRAMEWORK": "Pilih kerangka kerja Anda",
       "QUICK_CREATE_FRAMEWORK_DESC": "Kami memberikan konfigurasi yang disarankan untuk aplikasi Anda. Pilih kerangka kerja yang Anda gunakan atau akan gunakan.",
       "QUICK_CREATE_NAME": "Beri nama aplikasi Anda",
-      "QUICK_CREATE_TITLE": "Buat Aplikasi"
+      "QUICK_CREATE_TITLE": "Buat Aplikasi",
+      "CUSTOM_APP_TITLE": "Aplikasi Kustom",
+      "CUSTOM_APP_DESC": "Kami akan membuat proyek dan aplikasi Anda dengan konfigurasi yang Anda pilih di bawah ini.",
+      "CUSTOM_APP_NAME": "Nama Aplikasi",
+      "CUSTOM_APP_NAME_LABEL": "Nama",
+      "CUSTOM_APP_TYPE": "Jenis Aplikasi",
+      "CUSTOM_APP_AUTH_METHOD": "Metode Autentikasi",
+      "CUSTOM_APP_CANCEL": "Batal",
+      "CUSTOM_APP_CREATE": "Buat Aplikasi"
     },
     "NAMEDIALOG": {
       "TITLE": "Ganti Nama Aplikasi",

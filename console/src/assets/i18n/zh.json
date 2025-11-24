@@ -2573,7 +2573,15 @@
       "QUICK_CREATE_FRAMEWORK": "选择框架",
       "QUICK_CREATE_FRAMEWORK_DESC": "我们为您的应用程序提供推荐配置。选择您正在使用或打算使用的框架。",
       "QUICK_CREATE_NAME": "命名您的应用程序",
-      "QUICK_CREATE_TITLE": "创建应用程序"
+      "QUICK_CREATE_TITLE": "创建应用程序",
+      "CUSTOM_APP_TITLE": "自定义应用程序",
+      "CUSTOM_APP_DESC": "我们将使用您在下方选择的配置创建您的项目和应用程序。",
+      "CUSTOM_APP_NAME": "应用程序名称",
+      "CUSTOM_APP_NAME_LABEL": "名称",
+      "CUSTOM_APP_TYPE": "应用程序类型",
+      "CUSTOM_APP_AUTH_METHOD": "身份验证方法",
+      "CUSTOM_APP_CANCEL": "取消",
+      "CUSTOM_APP_CREATE": "创建应用"
     },
     "NAMEDIALOG": {
       "TITLE": "重命名应用",

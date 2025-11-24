@@ -2657,7 +2657,15 @@
           "TITLE": "Ayuda & Soporte",
           "DESC": "Lee nuestra documentación acerca de crear aplicaciones o contactar con nuestro soporte"
         }
-      }
+      },
+      "CUSTOM_APP_TITLE": "Aplicación personalizada",
+      "CUSTOM_APP_DESC": "Crearemos su proyecto y aplicación con la configuración que elija a continuación.",
+      "CUSTOM_APP_NAME": "Nombre de la aplicación",
+      "CUSTOM_APP_NAME_LABEL": "Nombre",
+      "CUSTOM_APP_TYPE": "Tipo de aplicación",
+      "CUSTOM_APP_AUTH_METHOD": "Método de autenticación",
+      "CUSTOM_APP_CANCEL": "Cancelar",
+      "CUSTOM_APP_CREATE": "Crear aplicación"
     },
     "NAMEDIALOG": {
       "TITLE": "Renombrar App",

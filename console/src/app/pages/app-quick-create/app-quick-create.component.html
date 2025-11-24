@@ -11,15 +11,28 @@
           <div class="framework-wrapper">
             @for (framework of frameworks.slice(0, 18); track framework.title) {
               <button
-                (click)="selectedFramework.set(framework)"
+                (click)="selectFramework(framework)"
                 class="framework-card card"
                 [class.selected]="selectedFramework()?.id === framework.id"
                 title="{{ framework.title }}"
               >
                 <img class="dark-only" [src]="framework.imgSrcDark" alt="{{ framework.title }}" />
                 <img class="light-only" [src]="framework.imgSrcLight" alt="{{ framework.title }}" />
+                <span class="framework-title">{{ framework.title }}</span>
               </button>
             }
+            <!-- Custom app creation option -->
+            <button
+              (click)="enableCustomAppMode()"
+              class="framework-card card custom-card"
+              [class.selected]="customAppMode()"
+              title="Can't find your framework?"
+            >
+              <div class="custom-card-content">
+                <mat-icon>add_circle_outline</mat-icon>
+                <span>Can't find your framework?</span>
+              </div>
+            </button>
           </div>
 
           <!-- Checkbox for auto-creating project -->
@@ -53,6 +66,107 @@
         </cnsl-info-section>
       }
     </div>
+    <!-- Custom app creation panel -->
+    @if (customAppMode()) {
+      <div class="framework-details-panel">
+        <div class="panel-header">
+          <div class="panel-title-section">
+            <mat-icon>settings</mat-icon>
+            <h2>{{ 'APP.PAGES.CUSTOM_APP_TITLE' | translate }}</h2>
+          </div>
+          <button mat-icon-button (click)="disableCustomAppMode()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <div class="panel-content">
+          <div class="detail-section">
+            <cnsl-info-section>
+              {{ 'APP.PAGES.CUSTOM_APP_DESC' | translate }}
+            </cnsl-info-section>
+          </div>
+
+          <div class="detail-section">
+            <h3>{{ 'APP.PAGES.CUSTOM_APP_NAME' | translate }}</h3>
+            <cnsl-form-field class="name-formfield">
+              <cnsl-label>{{ 'APP.PAGES.CUSTOM_APP_NAME_LABEL' | translate }}</cnsl-label>
+              <input cnslInput [(ngModel)]="customAppName" />
+            </cnsl-form-field>
+          </div>
+
+          <div class="detail-section">
+            <h3>{{ 'APP.PAGES.CUSTOM_APP_TYPE' | translate }}</h3>
+            <div class="selection-grid">
+              @for (type of appTypes; track type.prefix) {
+                <button
+                  class="selection-card"
+                  [class.selected]="customAppType()?.prefix === type.prefix"
+                  [style.background]="type.background"
+                  (click)="customAppType.set(type); onAppTypeChange()"
+                  type="button"
+                >
+                  <span class="selection-card-title">{{ type.titleI18nKey | translate }}</span>
+                </button>
+              }
+            </div>
+            @if (customAppType()) {
+              <p class="type-description cnsl-secondary-text">{{ customAppType()!.descI18nKey | translate }}</p>
+            }
+          </div>
+
+          @if (customAppType()) {
+            <div class="detail-section">
+              <h3>{{ 'APP.PAGES.CUSTOM_APP_AUTH_METHOD' | translate }}</h3>
+              <div class="selection-grid">
+                @for (method of getFilteredAuthMethods(); track method.key) {
+                  <button
+                    class="selection-card"
+                    [class.selected]="customAuthMethod() === method.key"
+                    [class.recommended]="method.recommended"
+                    [class.not-recommended]="method.notRecommended"
+                    [style.background]="method.background"
+                    (click)="customAuthMethod.set(method.key)"
+                    type="button"
+                  >
+                    <span class="selection-card-title">{{ method.titleI18nKey | translate }}</span>
+                    @if (method.recommended) {
+                      <span class="badge recommended">Recommended</span>
+                    }
+                    @if (method.notRecommended) {
+                      <span class="badge not-recommended">Not Recommended</span>
+                    }
+                  </button>
+                }
+              </div>
+              @if (customAuthMethod()) {
+                <p class="type-description cnsl-secondary-text">
+                  {{ getAuthMethodDescription(customAuthMethod()) | translate }}
+                </p>
+              }
+            </div>
+          }
+
+          <div class="panel-actions">
+            <button mat-stroked-button (click)="disableCustomAppMode()">
+              {{ 'APP.PAGES.CUSTOM_APP_CANCEL' | translate }}
+            </button>
+            <button
+              color="primary"
+              mat-raised-button
+              (click)="createCustomProjectAndApp()"
+              [disabled]="!customAppType() || !customAuthMethod()"
+            >
+              @if (createProjectMutation.isPending() || createOidcApplicationMutation.isPending()) {
+                <mat-spinner diameter="20" />
+              } @else {
+                {{ 'APP.PAGES.CUSTOM_APP_CREATE' | translate }}
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+    <!-- Framework details panel -->
     @if (selectedFramework(); as framework) {
       <div class="framework-details-panel">
         <div class="panel-header">
@@ -61,7 +175,7 @@
             <img class="framework-logo light-only" [src]="framework.imgSrcLight" alt="{{ framework.title }}" />
             <h2>{{ framework.title }}</h2>
           </div>
-          <button mat-icon-button (click)="selectedFramework.set(undefined)">
+          <button mat-icon-button (click)="deselectFramework()">
             <mat-icon>close</mat-icon>
           </button>
         </div>
@@ -113,12 +227,12 @@
           </div>
 
           <div class="panel-actions">
-            <button mat-stroked-button (click)="selectedFramework.set(undefined)">Cancel</button>
+            <button mat-stroked-button (click)="deselectFramework()">Cancel</button>
             <button color="primary" mat-raised-button (click)="createProjectAndContinue(framework)">
               @if (createProjectMutation.isPending() || createOidcApplicationMutation.isPending()) {
                 <mat-spinner diameter="20" />
               } @else {
-                Continue with {{ framework.title }}
+                Create App
               }
             </button>
           </div>

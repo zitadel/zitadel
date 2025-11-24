@@ -2568,7 +2568,15 @@
       "QUICK_CREATE_FRAMEWORK": "Framework seçin",
       "QUICK_CREATE_FRAMEWORK_DESC": "Uygulamanız için önerilen yapılandırmayı sağlıyoruz. Kullandığınız veya kullanmayı planladığınız framework'ü seçin.",
       "QUICK_CREATE_NAME": "Uygulamanızı adlandırın",
-      "QUICK_CREATE_TITLE": "Uygulama Oluştur"
+      "QUICK_CREATE_TITLE": "Uygulama Oluştur",
+      "CUSTOM_APP_TITLE": "Özel Uygulama",
+      "CUSTOM_APP_DESC": "Aşağıda seçtiğiniz yapılandırma ile projenizi ve uygulamanızı oluşturacağız.",
+      "CUSTOM_APP_NAME": "Uygulama Adı",
+      "CUSTOM_APP_NAME_LABEL": "Ad",
+      "CUSTOM_APP_TYPE": "Uygulama Türü",
+      "CUSTOM_APP_AUTH_METHOD": "Kimlik Doğrulama Yöntemi",
+      "CUSTOM_APP_CANCEL": "İptal",
+      "CUSTOM_APP_CREATE": "Uygulama Oluştur"
     },
     "NAMEDIALOG": {
       "TITLE": "Uygulamayı Yeniden Adlandır",

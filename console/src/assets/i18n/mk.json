@@ -2571,7 +2571,15 @@
       "QUICK_CREATE_DESC": "Креирајте апликација во три едноставни чекори.",
       "QUICK_CREATE_FRAMEWORK": "Изберете го вашиот framework",
       "QUICK_CREATE_FRAMEWORK_DESC": "Ние ви нудиме препорачана конфигурација за вашата апликација. Изберете го framework-от кој го користите или планирате да го користите.",
-      "QUICK_CREATE_NAME": "Именувајте ја вашата апликација"
+      "QUICK_CREATE_NAME": "Именувајте ја вашата апликација",
+      "CUSTOM_APP_TITLE": "Прилагодена апликација",
+      "CUSTOM_APP_DESC": "Ќе го создадеме вашиот проект и апликација со конфигурацијата што ја избирате подолу.",
+      "CUSTOM_APP_NAME": "Име на апликацијата",
+      "CUSTOM_APP_NAME_LABEL": "Име",
+      "CUSTOM_APP_TYPE": "Тип на апликација",
+      "CUSTOM_APP_AUTH_METHOD": "Метод на автентикација",
+      "CUSTOM_APP_CANCEL": "Откажи",
+      "CUSTOM_APP_CREATE": "Креирај апликација"
     },
     "NAMEDIALOG": {
       "TITLE": "Преименувај апликација",

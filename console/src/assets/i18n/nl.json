@@ -2569,7 +2569,15 @@
       "QUICK_CREATE_FRAMEWORK": "Selecteer uw framework",
       "QUICK_CREATE_FRAMEWORK_DESC": "We bieden een aanbevolen configuratie voor uw applicatie. Kies het framework dat u gebruikt of gaat gebruiken.",
       "QUICK_CREATE_NAME": "Geef uw applicatie een naam",
-      "QUICK_CREATE_TITLE": "Applicatie maken"
+      "QUICK_CREATE_TITLE": "Applicatie maken",
+      "CUSTOM_APP_TITLE": "Aangepaste applicatie",
+      "CUSTOM_APP_DESC": "We maken je project en applicatie met de configuratie die je hieronder kiest.",
+      "CUSTOM_APP_NAME": "Applicatienaam",
+      "CUSTOM_APP_NAME_LABEL": "Naam",
+      "CUSTOM_APP_TYPE": "Applicatietype",
+      "CUSTOM_APP_AUTH_METHOD": "Authenticatiemethode",
+      "CUSTOM_APP_CANCEL": "Annuleren",
+      "CUSTOM_APP_CREATE": "App maken"
     },
     "NAMEDIALOG": {
       "TITLE": "Hernoem App",

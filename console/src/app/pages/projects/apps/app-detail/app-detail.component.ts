@@ -193,6 +193,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   ];
   public currentSetting = this.settingsList[0];
   public framework: string | null = null;
+  public isCustomApp: boolean = false;
   public frameworks = frameworkDefinition
     .filter((f) => OIDC_CONFIGURATIONS[f.id as unknown as keyof typeof OIDC_CONFIGURATIONS])
     .map((f) => {
@@ -566,9 +567,25 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     const appId = this.route.snapshot.paramMap.get('appid');
     const isNew = this.route.snapshot.queryParamMap.get('new');
     const framework = this.route.snapshot.queryParamMap.get('framework');
+    const isCustom = this.route.snapshot.queryParamMap.get('custom');
 
     this.isNew.set(isNew === 'true');
     this.framework = framework;
+    this.isCustomApp = isCustom === 'true';
+
+    // Check for client secret passed via navigation state (from custom app creation)
+    const navigation = this.router.getCurrentNavigation();
+    const clientSecret = navigation?.extras?.state?.['clientSecret'] || (history.state as any)?.clientSecret;
+
+    if (clientSecret && isNew === 'true') {
+      // Show client secret modal after a brief delay to ensure page is loaded
+      setTimeout(() => {
+        this.dialog.open(AppSecretDialogComponent, {
+          data: { clientSecret },
+          width: '800px',
+        });
+      }, 100);
+    }
 
     // Reorder sidebar based on new query param
     // If new=true: Quickstart first, Config second (users want to get started)
@@ -1315,6 +1332,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     sdkName?: string;
     sdkDocLink?: string;
     hasExampleEnv?: boolean;
+    integrationGuide?: string;
     envSetup?: {
       type: string;
       filename?: string;
@@ -1425,13 +1443,18 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     return !!(frameworkInfo?.sdk || frameworkInfo?.sdkCommand);
   }
 
+  public hasIntegrationGuide(): boolean {
+    const frameworkInfo = this.getFrameworkInfo();
+    return !!(frameworkInfo?.integrationGuide && !this.hasSdk());
+  }
+
   public hasBuildCommands(): boolean {
     const frameworkInfo = this.getFrameworkInfo();
     return !!(frameworkInfo?.installCommand && frameworkInfo?.startCommand);
   }
 
   public hasAnyFrameworkContent(): boolean {
-    return this.hasExample() || this.hasSdk() || this.hasBuildCommands();
+    return this.hasExample() || this.hasSdk() || this.hasIntegrationGuide() || this.hasBuildCommands();
   }
 
   public getExistingAppFinalStepNumber(): number {
