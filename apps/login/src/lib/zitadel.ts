@@ -143,22 +143,6 @@ export async function registerTOTP({ serviceUrl, userId }: { serviceUrl: string;
   return userService.registerTOTP({ userId }, {});
 }
 
-async function getGeneralSettingsImpl(serviceUrl: string) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
-
-  return settingsService.getGeneralSettings({}, {}).then((resp) => resp.supportedLanguages);
-}
-
-export async function getGeneralSettings({ serviceUrl }: { serviceUrl: string }) {
-  if (!useCache) {
-    return getGeneralSettingsImpl(serviceUrl);
-  }
-
-  return unstable_cache(async () => getGeneralSettingsImpl(serviceUrl), ["general-settings", serviceUrl], {
-    revalidate: 3600,
-  })();
-}
-
 export async function getLegalAndSupportSettings({ serviceUrl, orgId }: { serviceUrl: string; orgId?: string }) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
