@@ -38,11 +38,6 @@ pnpm release --github-repo my-org/zitadel --no-dry-run
     - ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/zitadel:latest
     - ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/zitadel:latest-debug
     - ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/zitadel-login:latest
-  - If the release script is not triggered on a major or minor maintenance branch, only SHA tagged Docker images are pushed.
-    Apart from this, nothing else is released.
-    On every commit to main, the release script is triggered in CI and SHA Docker images are pushed.
-    - ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/zitadel:${ZITADEL_RELEASE_REVISION}
-    - ghcr.io/${ZITADEL_RELEASE_GITHUB_ORG}/zitadel-login:${ZITADEL_RELEASE_REVISION}
 
 ## Customizing the Release Process
 

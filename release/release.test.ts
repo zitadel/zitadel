@@ -62,7 +62,6 @@ describe('setupWorkspaceVersionEnvironmentVariables', () => {
     process.env = { ...originalEnv, GITHUB_TOKEN: 'classic pat with package:write' };
     // Clear relevant env vars
     delete process.env.ZITADEL_RELEASE_VERSION;
-    delete process.env.ZITADEL_RELEASE_REVISION;
     delete process.env.ZITADEL_RELEASE_IS_LATEST;
   });
 
@@ -294,7 +293,6 @@ describe('executeRelease', () => {
     vi.clearAllMocks();
     process.env = { ...originalEnv, GITHUB_TOKEN: 'classic pat with package:write' };
     delete process.env.ZITADEL_RELEASE_VERSION;
-    delete process.env.ZITADEL_RELEASE_REVISION;
     delete process.env.ZITADEL_RELEASE_IS_LATEST;
   });
 
@@ -314,7 +312,7 @@ describe('executeRelease', () => {
     githubRepo: 'zitadel/zitadel',
   };
 
-  test('returns 0 for non-conventional commits after docker build', async () => {
+  test('returns 0 for non-conventional commits', async () => {
     const mockGitInfo: GitInfo = {
       branch: 'main',
       sha: 'abc123def456',

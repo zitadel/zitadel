@@ -8,8 +8,6 @@ import yargs from 'yargs';
 // - to upload GitHub release assets by referencing a release by its Git tag
 // - to build and push the docker images with the version tag
 const versionEnvVar = "ZITADEL_RELEASE_VERSION";
-// ZITADEL_RELEASE_REVISION is used in docker-bake-release.hcl to add the git revision as a label to the docker images
-const revisionEnvVar = "ZITADEL_RELEASE_REVISION";
 // ZITADEL_RELEASE_IS_LATEST is used in docker-bake-release.hcl to determine whether to tag the docker images as latest
 const isLatestEnvVar = "ZITADEL_RELEASE_IS_LATEST";
 // ZITADEL_RELEASE_GITHUB_ORG is used to specify the GitHub organization for which Docker images should be created.
@@ -119,8 +117,6 @@ export function setupDefaultEnvironmentVariables(
 ): void {
   process.env[dryRunEnvVar] = dryRun ? 'true' : 'false';
   console.log(`Setting default ${dryRunEnvVar}=${process.env[dryRunEnvVar]}`);
-  process.env[revisionEnvVar] = gitSha;
-  console.log(`Setting default ${revisionEnvVar}=${process.env[revisionEnvVar]}`);
   process.env[versionEnvVar] = gitSha;
   console.log(`Setting default ${versionEnvVar}=${process.env[versionEnvVar]}`);
   process.env[isLatestEnvVar] = 'false';
@@ -220,7 +216,6 @@ export async function executeRelease(
 
   if (!conventionalCommits) {
     console.log(`Skipping GitHub release creation based on conventionalCommits=${conventionalCommits}. Instead setting ${versionEnvVar}=${process.env[versionEnvVar]} ${isLatestEnvVar}=${process.env[isLatestEnvVar]} and running the build-docker targets with additional docker-bake-release.hcl files to push SHA tagged Docker images for production.`);
-    executeDockerBuild(false, options.dryRun);
     return 0;
   }
 
@@ -232,7 +227,6 @@ export async function executeRelease(
   setupWorkspaceVersionEnvironmentVariables(options, gitInfo, workspaceVersion);
   console.log(`Setting ${versionEnvVar}=${process.env[versionEnvVar]}`);
   console.log(`Setting ${isLatestEnvVar}=${process.env[isLatestEnvVar]} because ${versionEnvVar}=${process.env[versionEnvVar]} is higher or equal to the previously highest regular semantic tag v${gitInfo.highestVersionBefore}. Running the build-docker and build-docker-debug targets with additional docker-bake-release.hcl files to push Docker images.`);
-  executeDockerBuild(true, options.dryRun);
 
   await releaseChangelog({
     versionData: projectsVersionData,
