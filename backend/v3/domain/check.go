@@ -12,6 +12,10 @@ type CheckType interface {
 	isCheckType()
 }
 
+type PasswordCheckType interface {
+	isPasswordCheckType()
+}
+
 // CheckTypeInit initializes a new check.
 type CheckTypeInit struct {
 	// CreatedAt is the time when the check was created.
@@ -37,7 +41,13 @@ type CheckTypeFailed struct {
 // isCheckType implements [CheckType].
 func (v *CheckTypeFailed) isCheckType() {}
 
-var _ CheckType = (*CheckTypeFailed)(nil)
+// isPasswordCheckType implements [PasswordCheckType].
+func (v *CheckTypeFailed) isPasswordCheckType() {}
+
+var (
+	_ CheckType         = (*CheckTypeFailed)(nil)
+	_ PasswordCheckType = (*CheckTypeFailed)(nil)
+)
 
 // CheckTypeSucceeded indicates that the check succeeded.
 // It is used to reset the failed attempts counter.
@@ -48,4 +58,10 @@ type CheckTypeSucceeded struct {
 // isCheckType implements [CheckType].
 func (v *CheckTypeSucceeded) isCheckType() {}
 
-var _ CheckType = (*CheckTypeSucceeded)(nil)
+// isPasswordCheckType implements [PasswordCheckType].
+func (v *CheckTypeSucceeded) isPasswordCheckType() {}
+
+var (
+	_ CheckType         = (*CheckTypeSucceeded)(nil)
+	_ PasswordCheckType = (*CheckTypeSucceeded)(nil)
+)
