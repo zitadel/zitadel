@@ -29,15 +29,24 @@ import {
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { unstable_cache } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { getUserAgent } from "./fingerprint";
 import { setSAMLFormCookie } from "./saml";
 import { createServiceForHost } from "./service";
+import { cacheLife } from "next/cache";
 
-const useCache = process.env.DEBUG !== "true";
+export async function getHostedLoginTranslation({
+  serviceUrl,
+  organization,
+  locale,
+}: {
+  serviceUrl: string;
+  organization?: string;
+  locale?: string;
+}) {
+  "use cache";
+  cacheLife("hours");
 
-async function getHostedLoginTranslationImpl(serviceUrl: string, organization?: string, locale?: string) {
   const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceUrl);
 
   return settingsService
@@ -59,26 +68,6 @@ async function getHostedLoginTranslationImpl(serviceUrl: string, organization?: 
     .then((resp) => {
       return resp.translations ? resp.translations : undefined;
     });
-}
-
-export async function getHostedLoginTranslation({
-  serviceUrl,
-  organization,
-  locale,
-}: {
-  serviceUrl: string;
-  organization?: string;
-  locale?: string;
-}) {
-  if (!useCache) {
-    return getHostedLoginTranslationImpl(serviceUrl, organization, locale);
-  }
-
-  return unstable_cache(
-    async () => getHostedLoginTranslationImpl(serviceUrl, organization, locale),
-    ["hosted-login-translation", serviceUrl, organization || "default", locale || "default"],
-    { revalidate: 3600 },
-  )();
 }
 
 export async function getBrandingSettings({ serviceUrl, organization }: { serviceUrl: string; organization?: string }) {
