@@ -136,6 +136,10 @@ type humanChanges interface {
 	SetPassword(verification VerificationType) database.Change
 	// SetPasswordChangeRequired sets whether a password change is required
 	SetPasswordChangeRequired(required bool) database.Change
+	// CheckPassword sets the password check based on the check type
+	//  * [CheckTypeFailed] increments failed attempts
+	//  * [CheckTypeSucceeded] to mark the check as succeeded, removes the check and updates verified at time
+	CheckPassword(check PasswordCheckType) database.Change
 
 	// SetVerification sets the verification based on the verification type
 	SetVerification(id string, verification VerificationType) database.Change

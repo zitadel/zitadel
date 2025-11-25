@@ -35,17 +35,17 @@ type HumanUser struct {
 	LastName          string       `json:"lastName,omitempty" db:"last_name"`
 	Nickname          string       `json:"nickname,omitempty" db:"nickname"`
 	DisplayName       string       `json:"displayName,omitempty" db:"display_name"`
-	PreferredLanguage language.Tag `json:"preferredLanguage,omitempty" db:"preferred_language"`
+	PreferredLanguage language.Tag `json:"preferredLanguage,omitzero" db:"preferred_language"`
 	Gender            HumanGender  `json:"gender,omitempty" db:"gender"`
 	AvatarKey         string       `json:"avatarKey,omitempty" db:"avatar_key"`
 
-	MultifactorInitializationSkippedAt time.Time `json:"multifactorInitializationSkippedAt,omitempty" db:"multifactor_initialization_skipped_at"`
+	MultifactorInitializationSkippedAt time.Time `json:"multifactorInitializationSkippedAt,omitzero" db:"multifactor_initialization_skipped_at"`
 
-	Email    HumanEmail    `json:"email,omitempty" db:"email"`
+	Email    HumanEmail    `json:"email,omitzero" db:"email"`
 	Phone    *HumanPhone   `json:"phone,omitempty" db:"phone"`
 	Passkeys []*Passkey    `json:"passkeys,omitempty" db:"passkeys"`
-	Password HumanPassword `json:"password,omitempty" db:"password"`
-	TOTP     HumanTOTP     `json:"totp,omitempty" db:"totp"`
+	Password HumanPassword `json:"password,omitzero" db:"password"`
+	TOTP     HumanTOTP     `json:"totp,omitzero" db:"totp"`
 
 	IdentityProviderLinks []*IdentityProviderLink `json:"identityProviderLinks,omitempty" db:"identity_provider_links"`
 
