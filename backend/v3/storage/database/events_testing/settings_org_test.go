@@ -5,6 +5,7 @@ package events_test
 import (
 	"bytes"
 	"encoding/json"
+	"net/url"
 	"testing"
 	"time"
 
@@ -76,16 +77,16 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 
 			// event org.policy.login.added
 			// these values are found in default.yaml
-			assert.Equal(t, false, setting.AllowRegister)
-			assert.Equal(t, false, setting.AllowExternalIDP)
-			assert.Equal(t, domain.PasswordlessTypeNotAllowed, setting.PasswordlessType)
-			assert.Equal(t, false, setting.AllowDomainDiscovery)
-			assert.Equal(t, false, setting.AllowUserNamePassword)
-			assert.Equal(t, time.Duration(time.Second*10), setting.PasswordCheckLifetime)
-			assert.Equal(t, time.Duration(time.Second*10), setting.ExternalLoginCheckLifetime)
-			assert.Equal(t, time.Duration(time.Second*10), setting.MFAInitSkipLifetime)
-			assert.Equal(t, time.Duration(time.Second*10), setting.SecondFactorCheckLifetime)
-			assert.Equal(t, time.Duration(time.Second*10), setting.MultiFactorCheckLifetime)
+			assert.Equal(t, false, *setting.AllowRegister)
+			assert.Equal(t, false, *setting.AllowExternalIDP)
+			assert.Equal(t, domain.PasswordlessTypeNotAllowed, *setting.PasswordlessType)
+			assert.Equal(t, false, *setting.AllowDomainDiscovery)
+			assert.Equal(t, false, *setting.AllowUserNamePassword)
+			assert.Equal(t, time.Duration(time.Second*10), *setting.PasswordCheckLifetime)
+			assert.Equal(t, time.Duration(time.Second*10), *setting.ExternalLoginCheckLifetime)
+			assert.Equal(t, time.Duration(time.Second*10), *setting.MFAInitSkipLifetime)
+			assert.Equal(t, time.Duration(time.Second*10), *setting.SecondFactorCheckLifetime)
+			assert.Equal(t, time.Duration(time.Second*10), *setting.MultiFactorCheckLifetime)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -161,23 +162,23 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.login.changed
-			assert.Equal(t, true, setting.AllowRegister)
-			assert.Equal(t, true, setting.AllowExternalIDP)
-			assert.Equal(t, true, setting.ForceMFA)
-			assert.Equal(t, domain.PasswordlessTypeAllowed, setting.PasswordlessType)
-			assert.Equal(t, true, setting.HidePasswordReset)
-			assert.Equal(t, true, setting.IgnoreUnknownUsernames)
-			assert.Equal(t, "http://www.new_example.com", setting.DefaultRedirectURI)
-			assert.Equal(t, true, setting.AllowDomainDiscovery)
-			assert.Equal(t, true, setting.AllowUserNamePassword)
-			assert.Equal(t, time.Duration(time.Second*5*20), setting.PasswordCheckLifetime)
-			assert.Equal(t, time.Duration(time.Second*5*21), setting.ExternalLoginCheckLifetime)
-			assert.Equal(t, time.Duration(time.Second*5*22), setting.MFAInitSkipLifetime)
-			assert.Equal(t, time.Duration(time.Second*5*23), setting.SecondFactorCheckLifetime)
-			assert.Equal(t, time.Duration(time.Second*5*24), setting.MultiFactorCheckLifetime)
-			assert.Equal(t, true, setting.DisableLoginWithEmail)
-			assert.Equal(t, true, setting.DisableLoginWithPhone)
-			assert.Equal(t, true, setting.ForceMFALocalOnly)
+			assert.Equal(t, true, *setting.AllowRegister)
+			assert.Equal(t, true, *setting.AllowExternalIDP)
+			assert.Equal(t, true, *setting.ForceMFA)
+			assert.Equal(t, domain.PasswordlessTypeAllowed, *setting.PasswordlessType)
+			assert.Equal(t, true, *setting.HidePasswordReset)
+			assert.Equal(t, true, *setting.IgnoreUnknownUsernames)
+			assert.Equal(t, "http://www.new_example.com", *setting.DefaultRedirectURI)
+			assert.Equal(t, true, *setting.AllowDomainDiscovery)
+			assert.Equal(t, true, *setting.AllowUserNamePassword)
+			assert.Equal(t, time.Duration(time.Second*5*20), *setting.PasswordCheckLifetime)
+			assert.Equal(t, time.Duration(time.Second*5*21), *setting.ExternalLoginCheckLifetime)
+			assert.Equal(t, time.Duration(time.Second*5*22), *setting.MFAInitSkipLifetime)
+			assert.Equal(t, time.Duration(time.Second*5*23), *setting.SecondFactorCheckLifetime)
+			assert.Equal(t, time.Duration(time.Second*5*24), *setting.MultiFactorCheckLifetime)
+			assert.Equal(t, true, *setting.DisableLoginWithEmail)
+			assert.Equal(t, true, *setting.DisableLoginWithPhone)
+			assert.Equal(t, true, *setting.ForceMFALocalOnly)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -545,19 +546,19 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.added
-			assert.Equal(t, "#055090", setting.PrimaryColorLight)
-			assert.Equal(t, "#055090", setting.BackgroundColorLight)
-			assert.Equal(t, "#055090", setting.WarnColorLight)
-			assert.Equal(t, "#055090", setting.FontColorLight)
-			assert.Equal(t, "#055090", setting.PrimaryColorDark)
-			assert.Equal(t, "#055090", setting.BackgroundColorDark)
-			assert.Equal(t, "#055090", setting.WarnColorDark)
-			assert.Equal(t, "#055090", setting.WarnColorDark)
-			assert.Equal(t, "#055090", setting.FontColorDark)
-			assert.Equal(t, false, setting.HideLoginNameSuffix)
-			assert.Equal(t, false, setting.ErrorMsgPopup)
-			assert.Equal(t, false, setting.DisableWatermark)
-			assert.Equal(t, domain.BrandingPolicyThemeDark, setting.ThemeMode)
+			assert.Equal(t, "#055090", *setting.PrimaryColorLight)
+			assert.Equal(t, "#055090", *setting.BackgroundColorLight)
+			assert.Equal(t, "#055090", *setting.WarnColorLight)
+			assert.Equal(t, "#055090", *setting.FontColorLight)
+			assert.Equal(t, "#055090", *setting.PrimaryColorDark)
+			assert.Equal(t, "#055090", *setting.BackgroundColorDark)
+			assert.Equal(t, "#055090", *setting.WarnColorDark)
+			assert.Equal(t, "#055090", *setting.WarnColorDark)
+			assert.Equal(t, "#055090", *setting.FontColorDark)
+			assert.Equal(t, false, *setting.HideLoginNameSuffix)
+			assert.Equal(t, false, *setting.ErrorMsgPopup)
+			assert.Equal(t, false, *setting.DisableWatermark)
+			assert.Equal(t, domain.BrandingPolicyThemeDark, *setting.ThemeMode)
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
@@ -619,19 +620,19 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.change
-			assert.Equal(t, "#055000", setting.PrimaryColorLight)
-			assert.Equal(t, "#055000", setting.BackgroundColorLight)
-			assert.Equal(t, "#055000", setting.WarnColorLight)
-			assert.Equal(t, "#055000", setting.FontColorLight)
-			assert.Equal(t, "#055000", setting.PrimaryColorDark)
-			assert.Equal(t, "#055000", setting.BackgroundColorDark)
-			assert.Equal(t, "#055000", setting.WarnColorDark)
-			assert.Equal(t, "#055000", setting.WarnColorDark)
-			assert.Equal(t, "#055000", setting.FontColorDark)
-			assert.Equal(t, true, setting.HideLoginNameSuffix)
-			assert.Equal(t, false, setting.ErrorMsgPopup)
-			assert.Equal(t, true, setting.DisableWatermark)
-			assert.Equal(t, domain.BrandingPolicyThemeLight, setting.ThemeMode)
+			assert.Equal(t, "#055000", *setting.PrimaryColorLight)
+			assert.Equal(t, "#055000", *setting.BackgroundColorLight)
+			assert.Equal(t, "#055000", *setting.WarnColorLight)
+			assert.Equal(t, "#055000", *setting.FontColorLight)
+			assert.Equal(t, "#055000", *setting.PrimaryColorDark)
+			assert.Equal(t, "#055000", *setting.BackgroundColorDark)
+			assert.Equal(t, "#055000", *setting.WarnColorDark)
+			assert.Equal(t, "#055000", *setting.WarnColorDark)
+			assert.Equal(t, "#055000", *setting.FontColorDark)
+			assert.Equal(t, true, *setting.HideLoginNameSuffix)
+			assert.Equal(t, false, *setting.ErrorMsgPopup)
+			assert.Equal(t, true, *setting.DisableWatermark)
+			assert.Equal(t, domain.BrandingPolicyThemeLight, *setting.ThemeMode)
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -684,7 +685,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeBranding, domain.SettingStateActive),
 				),
 			)
 
@@ -695,7 +696,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		before := time.Now()
 		_, err = newInstance.Client.Mgmt.ActivateCustomLabelPolicy(IAMCTX, &management.ActivateCustomLabelPolicyRequest{})
 		require.NoError(t, err)
-		after := time.Now().Add(time.Second * 30)
+		after := time.Now()
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -950,7 +951,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.logo.removed
-			assert.Nil(t, setting.LogoURLLight)
+			assert.Equal(t, url.URL{}, *setting.LogoURLLight)
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1046,7 +1047,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.logo.dark.removed
-			assert.Nil(t, setting.LogoURLDark)
+			assert.Equal(t, url.URL{}, *setting.LogoURLDark)
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1289,7 +1290,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.icon.removed
-			assert.Nil(t, setting.IconURLLight)
+			assert.Equal(t, url.URL{}, *setting.IconURLLight)
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1386,7 +1387,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.icon.dark.removed
-			assert.Nil(t, setting.IconURLDark)
+			assert.Equal(t, url.URL{}, *setting.IconURLDark)
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1555,7 +1556,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.font.removed
-			assert.Nil(t, setting.FontURL)
+			assert.Equal(t, url.URL{}, *setting.FontURL)
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1612,7 +1613,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeBranding, domain.SettingStateActive),
 				),
 			)
 
@@ -1721,11 +1722,11 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.password.complexity.added
-			assert.Equal(t, uint64(10), setting.MinLength)
-			assert.Equal(t, true, setting.HasUppercase)
-			assert.Equal(t, true, setting.HasLowercase)
-			assert.Equal(t, true, setting.HasNumber)
-			assert.Equal(t, true, setting.HasSymbol)
+			assert.Equal(t, uint64(10), *setting.MinLength)
+			assert.Equal(t, true, *setting.HasUppercase)
+			assert.Equal(t, true, *setting.HasLowercase)
+			assert.Equal(t, true, *setting.HasNumber)
+			assert.Equal(t, true, *setting.HasSymbol)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1776,11 +1777,11 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.password.complexity.changed
-			assert.Equal(t, uint64(5), setting.MinLength)
-			assert.Equal(t, true, setting.HasUppercase)
-			assert.Equal(t, true, setting.HasLowercase)
-			assert.Equal(t, true, setting.HasNumber)
-			assert.Equal(t, true, setting.HasSymbol)
+			assert.Equal(t, uint64(5), *setting.MinLength)
+			assert.Equal(t, true, *setting.HasUppercase)
+			assert.Equal(t, true, *setting.HasLowercase)
+			assert.Equal(t, true, *setting.HasNumber)
+			assert.Equal(t, true, *setting.HasSymbol)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1933,8 +1934,8 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.password.age.added
-			assert.Equal(t, uint64(10), setting.ExpireWarnDays)
-			assert.Equal(t, uint64(10), setting.MaxAgeDays)
+			assert.Equal(t, uint64(10), *setting.ExpireWarnDays)
+			assert.Equal(t, uint64(10), *setting.MaxAgeDays)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1977,8 +1978,8 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.password.age.changed
-			assert.Equal(t, uint64(40), setting.ExpireWarnDays)
-			assert.Equal(t, uint64(40), setting.MaxAgeDays)
+			assert.Equal(t, uint64(40), *setting.ExpireWarnDays)
+			assert.Equal(t, uint64(40), *setting.MaxAgeDays)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -2122,8 +2123,8 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.lockout.added
-			assert.Equal(t, uint64(1), setting.MaxOTPAttempts)
-			assert.Equal(t, uint64(1), setting.MaxPasswordAttempts)
+			assert.Equal(t, uint64(1), *setting.MaxOTPAttempts)
+			assert.Equal(t, uint64(1), *setting.MaxPasswordAttempts)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -2165,8 +2166,8 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.lockout.changed
-			assert.Equal(t, uint64(5), setting.MaxOTPAttempts)
-			assert.Equal(t, uint64(5), setting.MaxPasswordAttempts)
+			assert.Equal(t, uint64(5), *setting.MaxOTPAttempts)
+			assert.Equal(t, uint64(5), *setting.MaxPasswordAttempts)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -2311,9 +2312,9 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.domain.added
-			assert.Equal(t, false, setting.SMTPSenderAddressMatchesInstanceDomain)
-			assert.Equal(t, false, setting.LoginNameIncludesDomain)
-			assert.Equal(t, false, setting.RequireOrgDomainVerification)
+			assert.Equal(t, false, *setting.SMTPSenderAddressMatchesInstanceDomain)
+			assert.Equal(t, false, *setting.LoginNameIncludesDomain)
+			assert.Equal(t, false, *setting.RequireOrgDomainVerification)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -2361,9 +2362,9 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.domain.changed
-			assert.Equal(t, true, setting.SMTPSenderAddressMatchesInstanceDomain)
-			assert.Equal(t, true, setting.LoginNameIncludesDomain)
-			assert.Equal(t, true, setting.RequireOrgDomainVerification)
+			assert.Equal(t, true, *setting.SMTPSenderAddressMatchesInstanceDomain)
+			assert.Equal(t, true, *setting.LoginNameIncludesDomain)
+			assert.Equal(t, true, *setting.RequireOrgDomainVerification)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -2515,7 +2516,7 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event settings.organization.set
-			assert.Equal(t, organizationScopedUsernames, setting.OrganizationScopedUsernames)
+			assert.Equal(t, organizationScopedUsernames, *setting.OrganizationScopedUsernames)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)

@@ -125,6 +125,7 @@ func (s settings) set(ctx context.Context, client database.QueryExecutor, settin
 	}
 	if !settings.UpdatedAt.IsZero() {
 		updatedAt = settings.UpdatedAt
+		changes = append(changes, s.SetUpdatedAt(&settings.UpdatedAt))
 	}
 
 	builder := database.NewStatementBuilder(`INSERT INTO ` + s.qualifiedTableName())
@@ -146,10 +147,6 @@ func (s settings) set(ctx context.Context, client database.QueryExecutor, settin
 	}
 	builder.WriteString(` RETURNING id, created_at, updated_at`)
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&settings.ID, &settings.CreatedAt, &settings.UpdatedAt)
-}
-
-func (s settings) SetColumns(ctx context.Context, client database.QueryExecutor, settings *domain.Settings, changes ...database.Change) error {
-	return s.set(ctx, client, settings, changes...)
 }
 
 func (s settings) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
@@ -393,6 +390,13 @@ func (s loginSettings) Set(ctx context.Context, client database.QueryExecutor, s
 	return nil
 }
 
+func (s loginSettings) SetColumns(ctx context.Context, client database.QueryExecutor, settings *domain.Settings, changes ...database.Change) error {
+	settings.Type = domain.SettingTypeLogin
+	settings.State = domain.SettingStateActive
+
+	return s.settings.set(ctx, client, settings, changes...)
+}
+
 func (s loginSettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.LoginSettings, error) {
 	settings, err := s.settings.list(ctx, client, opts...)
 	if err != nil {
@@ -580,6 +584,13 @@ func (s brandingSettings) Set(ctx context.Context, client database.QueryExecutor
 	return nil
 }
 
+func (s brandingSettings) SetColumns(ctx context.Context, client database.QueryExecutor, settings *domain.Settings, changes ...database.Change) error {
+	settings.Type = domain.SettingTypeBranding
+	settings.State = domain.SettingStatePreview
+
+	return s.settings.set(ctx, client, settings, changes...)
+}
+
 func (s brandingSettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.BrandingSettings, error) {
 	settings, err := s.settings.list(ctx, client, opts...)
 	if err != nil {
@@ -614,14 +625,15 @@ func (s brandingSettings) Get(ctx context.Context, client database.QueryExecutor
 const queryActivateBrandingSettingsStmt = `SELECT instance_id, organization_id, id, type, created_at, updated_at, settings FROM `
 
 func (s brandingSettings) Activate(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	// if you want to update the roles you have to have the primary key, otherwise multiple project grants get updated
-	if err := checkPKCondition(s, condition); err != nil {
-		return 0, err
-	}
 	condition = database.And(
 		condition,
+		s.TypeCondition(domain.SettingTypeBranding),
 		s.StateCondition(domain.SettingStatePreview),
 	)
+	// if you want to update the roles you have to have a unique condition, otherwise multiple branding settings get activated
+	if err := checkRestrictingColumns(condition, s.UniqueColumns()...); err != nil {
+		return 0, err
+	}
 	if !database.Changes(changes).IsOnColumn(s.UpdatedAtColumn()) {
 		changes = append(changes, database.NewChange(s.UpdatedAtColumn(), database.DefaultInstruction))
 	}
@@ -642,8 +654,7 @@ func (s brandingSettings) Activate(ctx context.Context, client database.QueryExe
 	}
 	database.Changes(changes).Write(builder)
 
-	stmt := builder.String()
-	return client.Exec(ctx, stmt, builder.Args()...)
+	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
 // -------------------------------------------------------------

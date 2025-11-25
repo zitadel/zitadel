@@ -5,6 +5,7 @@ package events_test
 import (
 	"bytes"
 	_ "embed"
+	"net/url"
 	"testing"
 	"time"
 
@@ -154,7 +155,7 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLogin, domain.SettingStateActive),
 				),
 			)
-			require.NoError(t, err)
+			require.NoError(collect, err)
 
 			// event instance.policy.login.multifactor.remove
 			assert.Equal(collect, []domain.MultiFactorType{}, setting.MFAType)
@@ -316,25 +317,25 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStateActive),
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(collect, err)
 
 			// event instance.policy.label.added
 			// these values are found in default.yaml
-			assert.Equal(collect, "#5469d4", setting.PrimaryColorLight)
-			assert.Equal(collect, "#fafafa", setting.BackgroundColorLight)
-			assert.Equal(collect, "#cd3d56", setting.WarnColorLight)
-			assert.Equal(collect, "#000000", setting.FontColorLight)
-			assert.Equal(collect, "#2073c4", setting.PrimaryColorDark)
-			assert.Equal(collect, "#111827", setting.BackgroundColorDark)
-			assert.Equal(collect, "#ff3b5b", setting.WarnColorDark)
-			assert.Equal(collect, "#ff3b5b", setting.WarnColorDark)
-			assert.Equal(collect, "#ffffff", setting.FontColorDark)
-			assert.Equal(collect, false, setting.HideLoginNameSuffix)
-			assert.Equal(collect, false, setting.ErrorMsgPopup)
-			assert.Equal(collect, false, setting.DisableWatermark)
+			assert.Equal(collect, "#5469d4", *setting.PrimaryColorLight)
+			assert.Equal(collect, "#fafafa", *setting.BackgroundColorLight)
+			assert.Equal(collect, "#cd3d56", *setting.WarnColorLight)
+			assert.Equal(collect, "#000000", *setting.FontColorLight)
+			assert.Equal(collect, "#2073c4", *setting.PrimaryColorDark)
+			assert.Equal(collect, "#111827", *setting.BackgroundColorDark)
+			assert.Equal(collect, "#ff3b5b", *setting.WarnColorDark)
+			assert.Equal(collect, "#ff3b5b", *setting.WarnColorDark)
+			assert.Equal(collect, "#ffffff", *setting.FontColorDark)
+			assert.Equal(collect, false, *setting.HideLoginNameSuffix)
+			assert.Equal(collect, false, *setting.ErrorMsgPopup)
+			assert.Equal(collect, false, *setting.DisableWatermark)
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.CreatedAt, before, after)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
@@ -385,25 +386,25 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 				ctx, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStateActive),
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(collect, err)
 
 			// event instance.policy.label.change
-			assert.Equal(collect, "#055000", setting.PrimaryColorLight)
-			assert.Equal(collect, "#055000", setting.BackgroundColorLight)
-			assert.Equal(collect, "#055000", setting.WarnColorLight)
-			assert.Equal(collect, "#055000", setting.FontColorLight)
-			assert.Equal(collect, "#055000", setting.PrimaryColorDark)
-			assert.Equal(collect, "#055000", setting.BackgroundColorDark)
-			assert.Equal(collect, "#055000", setting.WarnColorDark)
-			assert.Equal(collect, "#055000", setting.WarnColorDark)
-			assert.Equal(collect, "#055000", setting.FontColorDark)
-			assert.Equal(collect, true, setting.HideLoginNameSuffix)
-			assert.Equal(collect, false, setting.ErrorMsgPopup)
-			assert.Equal(collect, true, setting.DisableWatermark)
-			assert.Equal(collect, domain.BrandingPolicyThemeLight, setting.ThemeMode)
+			assert.Equal(collect, "#055000", *setting.PrimaryColorLight)
+			assert.Equal(collect, "#055000", *setting.BackgroundColorLight)
+			assert.Equal(collect, "#055000", *setting.WarnColorLight)
+			assert.Equal(collect, "#055000", *setting.FontColorLight)
+			assert.Equal(collect, "#055000", *setting.PrimaryColorDark)
+			assert.Equal(collect, "#055000", *setting.BackgroundColorDark)
+			assert.Equal(collect, "#055000", *setting.WarnColorDark)
+			assert.Equal(collect, "#055000", *setting.WarnColorDark)
+			assert.Equal(collect, "#055000", *setting.FontColorDark)
+			assert.Equal(collect, true, *setting.HideLoginNameSuffix)
+			assert.Equal(collect, false, *setting.ErrorMsgPopup)
+			assert.Equal(collect, true, *setting.DisableWatermark)
+			assert.Equal(collect, domain.BrandingPolicyThemeLight, *setting.ThemeMode)
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -563,7 +564,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.label.logo.removed
-			assert.Nil(collect, setting.LogoURLLight)
+			assert.Equal(collect, url.URL{}, *setting.LogoURLLight)
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -600,7 +601,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			assert.NotNil(collect, setting.LogoURLDark)
 		}, retryDuration, tick)
 
-		// remote logo dark
+		// remove logo dark
 		before := time.Now()
 		client = resty.New()
 		out, err = client.R().SetAuthToken(token).
@@ -621,7 +622,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.label.logo.dark.removed
-			assert.Nil(collect, setting.LogoURLDark)
+			assert.Equal(collect, url.URL{}, *setting.LogoURLDark)
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -753,7 +754,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.label.icon.removed
-			assert.Nil(collect, setting.IconURLLight)
+			assert.Equal(collect, url.URL{}, *setting.IconURLLight)
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -811,7 +812,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.label.icon.dark.removed
-			assert.Nil(collect, setting.IconURLDark)
+			assert.Equal(collect, url.URL{}, *setting.IconURLDark)
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -905,7 +906,7 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			require.NoError(collect, err)
 
 			// event instance.policy.label.font.removed
-			assert.Nil(collect, setting.FontURL)
+			assert.Equal(collect, url.URL{}, *setting.FontURL)
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -997,15 +998,15 @@ func TestServer_TestInstancePasswordComplexitySettingsReduces(t *testing.T) {
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypePasswordComplexity, domain.SettingStateActive),
 				),
 			)
-			require.NoError(t, err)
+			require.NoError(collect, err)
 
 			// event instance.policy.password.complexity.added
 			// these values are found in default.yaml
-			assert.Equal(collect, uint64(8), setting.MinLength)
-			assert.Equal(collect, true, setting.HasUppercase)
-			assert.Equal(collect, true, setting.HasLowercase)
-			assert.Equal(collect, true, setting.HasNumber)
-			assert.Equal(collect, true, setting.HasSymbol)
+			assert.Equal(collect, uint64(8), *setting.MinLength)
+			assert.Equal(collect, true, *setting.HasUppercase)
+			assert.Equal(collect, true, *setting.HasLowercase)
+			assert.Equal(collect, true, *setting.HasNumber)
+			assert.Equal(collect, true, *setting.HasSymbol)
 			assert.WithinRange(collect, setting.CreatedAt, before, after)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1035,14 +1036,14 @@ func TestServer_TestInstancePasswordComplexitySettingsReduces(t *testing.T) {
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypePasswordComplexity, domain.SettingStateActive),
 				),
 			)
-			require.NoError(t, err)
+			require.NoError(collect, err)
 
 			// event instance.policy.password.complexity.changed
-			assert.Equal(collect, uint64(5), setting.MinLength)
-			assert.Equal(collect, false, setting.HasUppercase)
-			assert.Equal(collect, false, setting.HasLowercase)
-			assert.Equal(collect, false, setting.HasNumber)
-			assert.Equal(collect, false, setting.HasSymbol)
+			assert.Equal(collect, uint64(5), *setting.MinLength)
+			assert.Equal(collect, false, *setting.HasUppercase)
+			assert.Equal(collect, false, *setting.HasLowercase)
+			assert.Equal(collect, false, *setting.HasNumber)
+			assert.Equal(collect, false, *setting.HasSymbol)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1062,7 +1063,7 @@ func TestServer_TestInstancePasswordComplexitySettingsReduces(t *testing.T) {
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypePasswordComplexity, domain.SettingStateActive),
 				),
 			)
-			require.NoError(t, err)
+			require.NoError(collect, err)
 
 			require.NotNil(t, setting)
 		}, retryDuration, tick)
@@ -1084,7 +1085,7 @@ func TestServer_TestInstancePasswordComplexitySettingsReduces(t *testing.T) {
 			)
 
 			// event instance.removed
-			require.ErrorIs(t, err, new(database.NoRowFoundError))
+			require.ErrorIs(collect, err, new(database.NoRowFoundError))
 		}, retryDuration, tick)
 	})
 }
@@ -1107,11 +1108,11 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypePasswordExpiry, domain.SettingStateActive),
 				),
 			)
-			require.NoError(t, err)
+			require.NoError(collect, err)
 
 			// event instance.policy.password.age.added
-			assert.Equal(collect, uint64(0), setting.ExpireWarnDays)
-			assert.Equal(collect, uint64(0), setting.MaxAgeDays)
+			assert.Equal(collect, uint64(0), *setting.ExpireWarnDays)
+			assert.Equal(collect, uint64(0), *setting.MaxAgeDays)
 			assert.WithinRange(collect, setting.CreatedAt, before, after)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1139,11 +1140,11 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypePasswordExpiry, domain.SettingStateActive),
 				),
 			)
-			require.NoError(t, err)
+			require.NoError(collect, err)
 
 			// event instance.policy.password.age.changed
-			assert.Equal(collect, uint64(30), setting.ExpireWarnDays)
-			assert.Equal(collect, uint64(30), setting.MaxAgeDays)
+			assert.Equal(collect, uint64(30), *setting.ExpireWarnDays)
+			assert.Equal(collect, uint64(30), *setting.MaxAgeDays)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1163,7 +1164,7 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypePasswordExpiry, domain.SettingStateActive),
 				),
 			)
-			require.NoError(t, err)
+			require.NoError(collect, err)
 
 			require.NotNil(t, setting)
 		}, retryDuration, tick)
@@ -1185,7 +1186,7 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 			)
 
 			// event instance.removed
-			require.ErrorIs(t, err, new(database.NoRowFoundError))
+			require.ErrorIs(collect, err, new(database.NoRowFoundError))
 		}, retryDuration, tick)
 	})
 }
@@ -1208,12 +1209,12 @@ func TestServer_TestInstanceDomainSettingsReduces(t *testing.T) {
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeDomain, domain.SettingStateActive),
 				),
 			)
-			require.NoError(t, err)
+			require.NoError(collect, err)
 
 			// event instance.policy.domain.added
-			assert.Equal(collect, false, setting.SMTPSenderAddressMatchesInstanceDomain)
-			assert.Equal(collect, false, setting.LoginNameIncludesDomain)
-			assert.Equal(collect, false, setting.RequireOrgDomainVerification)
+			assert.Equal(collect, false, *setting.SMTPSenderAddressMatchesInstanceDomain)
+			assert.Equal(collect, false, *setting.LoginNameIncludesDomain)
+			assert.Equal(collect, false, *setting.RequireOrgDomainVerification)
 			assert.WithinRange(collect, setting.CreatedAt, before, after)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1242,12 +1243,12 @@ func TestServer_TestInstanceDomainSettingsReduces(t *testing.T) {
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeDomain, domain.SettingStateActive),
 				),
 			)
-			require.NoError(t, err)
+			require.NoError(collect, err)
 
 			// event instance.policy.changed
-			assert.Equal(collect, true, setting.SMTPSenderAddressMatchesInstanceDomain)
-			assert.Equal(collect, true, setting.LoginNameIncludesDomain)
-			assert.Equal(collect, true, setting.RequireOrgDomainVerification)
+			assert.Equal(collect, true, *setting.SMTPSenderAddressMatchesInstanceDomain)
+			assert.Equal(collect, true, *setting.LoginNameIncludesDomain)
+			assert.Equal(collect, true, *setting.RequireOrgDomainVerification)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1267,7 +1268,7 @@ func TestServer_TestInstanceDomainSettingsReduces(t *testing.T) {
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeDomain, domain.SettingStateActive),
 				),
 			)
-			require.NoError(t, err)
+			require.NoError(collect, err)
 
 			require.NotNil(t, setting)
 		}, retryDuration, tick)
@@ -1289,7 +1290,7 @@ func TestServer_TestInstanceDomainSettingsReduces(t *testing.T) {
 			)
 
 			// event instance.removed
-			require.ErrorIs(t, err, new(database.NoRowFoundError))
+			require.ErrorIs(collect, err, new(database.NoRowFoundError))
 		}, retryDuration, tick)
 	})
 }
@@ -1312,12 +1313,12 @@ func TestServer_TestInstanceLockoutSettingsReduces(t *testing.T) {
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLockout, domain.SettingStateActive),
 				),
 			)
-			require.NoError(t, err)
+			require.NoError(collect, err)
 
 			// event instance.policy.lockout.added
-			assert.Equal(collect, uint64(0), setting.MaxOTPAttempts)
-			assert.Equal(collect, uint64(0), setting.MaxPasswordAttempts)
-			assert.Equal(collect, true, setting.ShowLockOutFailures)
+			assert.Equal(collect, uint64(0), *setting.MaxOTPAttempts)
+			assert.Equal(collect, uint64(0), *setting.MaxPasswordAttempts)
+			assert.Equal(collect, true, *setting.ShowLockOutFailures)
 			assert.WithinRange(collect, setting.CreatedAt, before, after)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1345,11 +1346,11 @@ func TestServer_TestInstanceLockoutSettingsReduces(t *testing.T) {
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLockout, domain.SettingStateActive),
 				),
 			)
-			require.NoError(t, err)
+			require.NoError(collect, err)
 
 			// event instance.policy.lockout.changed
-			assert.Equal(collect, uint64(5), setting.MaxOTPAttempts)
-			assert.Equal(collect, uint64(5), setting.MaxPasswordAttempts)
+			assert.Equal(collect, uint64(5), *setting.MaxOTPAttempts)
+			assert.Equal(collect, uint64(5), *setting.MaxPasswordAttempts)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1369,7 +1370,7 @@ func TestServer_TestInstanceLockoutSettingsReduces(t *testing.T) {
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLockout, domain.SettingStateActive),
 				),
 			)
-			require.NoError(t, err)
+			require.NoError(collect, err)
 
 			require.NotNil(t, setting)
 		}, retryDuration, tick)
@@ -1391,7 +1392,7 @@ func TestServer_TestInstanceLockoutSettingsReduces(t *testing.T) {
 			)
 
 			// event instance.removed
-			require.ErrorIs(t, err, new(database.NoRowFoundError))
+			require.ErrorIs(collect, err, new(database.NoRowFoundError))
 		}, retryDuration, tick)
 	})
 }
@@ -1423,12 +1424,12 @@ func TestServer_TestInstanceSecuritySettingsReduces(t *testing.T) {
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeSecurity, domain.SettingStateActive),
 				),
 			)
-			require.NoError(t, err)
+			require.NoError(collect, err)
 
 			// event instance.policy.security.set
-			assert.Equal(collect, true, setting.EnableIframeEmbedding)
+			assert.Equal(collect, true, *setting.EnableIframeEmbedding)
 			assert.Equal(collect, []string{"value"}, setting.AllowedOrigins)
-			assert.Equal(collect, true, setting.EnableImpersonation)
+			assert.Equal(collect, true, *setting.EnableImpersonation)
 			assert.WithinRange(collect, setting.CreatedAt, before, after)
 		}, retryDuration, tick)
 
@@ -1450,12 +1451,12 @@ func TestServer_TestInstanceSecuritySettingsReduces(t *testing.T) {
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeSecurity, domain.SettingStateActive),
 				),
 			)
-			require.NoError(t, err)
+			require.NoError(collect, err)
 
 			// event instance.policy.security.set
-			assert.Equal(collect, false, setting.EnableIframeEmbedding)
-			assert.Equal(collect, []string{"value", "new_value"}, setting.AllowedOrigins)
-			assert.Equal(collect, false, setting.EnableImpersonation)
+			assert.Equal(collect, false, *setting.EnableIframeEmbedding)
+			assert.Equal(collect, []string{"new_value"}, setting.AllowedOrigins)
+			assert.Equal(collect, false, *setting.EnableImpersonation)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1484,7 +1485,7 @@ func TestServer_TestInstanceSecuritySettingsReduces(t *testing.T) {
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeSecurity, domain.SettingStateActive),
 				),
 			)
-			require.NoError(t, err)
+			require.NoError(collect, err)
 
 			require.NotNil(t, setting)
 		}, retryDuration, tick)
@@ -1506,7 +1507,7 @@ func TestServer_TestInstanceSecuritySettingsReduces(t *testing.T) {
 			)
 
 			// event instance.removed
-			require.ErrorIs(t, err, new(database.NoRowFoundError))
+			require.ErrorIs(collect, err, new(database.NoRowFoundError))
 		}, retryDuration, tick)
 	})
 }

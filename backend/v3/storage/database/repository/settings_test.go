@@ -1182,6 +1182,127 @@ func TestSetBrandingSettings(t *testing.T) {
 	}
 }
 
+func TestActivateBrandingSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	repo := repository.BrandingSettingsRepository()
+
+	existingInstanceSettings := &domain.BrandingSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: nil,
+		},
+		BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+			PrimaryColorLight:    gu.Ptr("color"),
+			BackgroundColorLight: gu.Ptr("color"),
+			WarnColorLight:       gu.Ptr("color"),
+			FontColorLight:       gu.Ptr("color"),
+			LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			PrimaryColorDark:     gu.Ptr("color"),
+			BackgroundColorDark:  gu.Ptr("color"),
+			WarnColorDark:        gu.Ptr("color"),
+			FontColorDark:        gu.Ptr("color"),
+			LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			HideLoginNameSuffix:  gu.Ptr(true),
+			ErrorMsgPopup:        gu.Ptr(true),
+			DisableWatermark:     gu.Ptr(true),
+			ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
+			FontURL:              &url.URL{Scheme: "https", Host: "host"},
+		},
+	}
+
+	err := repo.Set(t.Context(), tx, existingInstanceSettings)
+	require.NoError(t, err)
+
+	existingOrganizationSettings := &domain.BrandingSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: gu.Ptr(orgID),
+		},
+		BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+			PrimaryColorLight:    gu.Ptr("color"),
+			BackgroundColorLight: gu.Ptr("color"),
+			WarnColorLight:       gu.Ptr("color"),
+			FontColorLight:       gu.Ptr("color"),
+			LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			PrimaryColorDark:     gu.Ptr("color"),
+			BackgroundColorDark:  gu.Ptr("color"),
+			WarnColorDark:        gu.Ptr("color"),
+			FontColorDark:        gu.Ptr("color"),
+			LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			HideLoginNameSuffix:  gu.Ptr(true),
+			ErrorMsgPopup:        gu.Ptr(true),
+			DisableWatermark:     gu.Ptr(true),
+			ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
+			FontURL:              &url.URL{Scheme: "https", Host: "host"},
+		},
+	}
+
+	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name             string
+		wantRowsAffected int64
+		condition        database.Condition
+		changes          []database.Change
+		wantErr          error
+	}{
+		{
+			name: "activate instance",
+			condition: database.And(
+				repo.InstanceIDCondition(existingInstanceSettings.InstanceID),
+				repo.OrganizationIDCondition(nil),
+			),
+			wantRowsAffected: 1,
+		},
+		{
+			name: "activate organization",
+			condition: database.And(
+				repo.InstanceIDCondition(existingOrganizationSettings.InstanceID),
+				repo.OrganizationIDCondition(existingOrganizationSettings.OrganizationID),
+			),
+			changes: []database.Change{
+				repo.SetUpdatedAt(gu.Ptr(time.Now())),
+			},
+			wantRowsAffected: 1,
+		},
+		{
+			name: "non-existing instance",
+			condition: database.And(
+				repo.InstanceIDCondition("foo"),
+				repo.OrganizationIDCondition(nil),
+			),
+			wantRowsAffected: 0,
+		},
+
+		{
+			name: "non-existing organization",
+			condition: database.And(
+				repo.InstanceIDCondition(existingOrganizationSettings.InstanceID),
+				repo.OrganizationIDCondition(gu.Ptr("foo")),
+			),
+			wantRowsAffected: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			savepoint, rollback := savepointForRollback(t, tx)
+			defer rollback()
+			rowsAffected, err := repo.Activate(t.Context(), savepoint, tt.condition, tt.changes...)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
+		})
+	}
+}
+
 func TestDeleteBrandingSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
 	defer rollback()

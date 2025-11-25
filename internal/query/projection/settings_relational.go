@@ -56,16 +56,16 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Reduce: s.reduceLoginPolicyChanged,
 				},
 				{
+					Event:  org.LoginPolicyRemovedEventType,
+					Reduce: s.reduceLoginPolicyRemoved,
+				},
+				{
 					Event:  org.LoginPolicyMultiFactorAddedEventType,
 					Reduce: s.reduceMFAAdded,
 				},
 				{
 					Event:  org.LoginPolicyMultiFactorRemovedEventType,
 					Reduce: s.reduceMFARemoved,
-				},
-				{
-					Event:  org.LoginPolicyRemovedEventType,
-					Reduce: s.reduceLoginPolicyRemoved,
 				},
 				{
 					Event:  org.LoginPolicySecondFactorAddedEventType,
@@ -94,11 +94,19 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  org.LabelPolicyLogoAddedEventType,
-					Reduce: s.reduceLabelLogoAdded,
+					Reduce: s.reduceLogoAdded,
 				},
 				{
 					Event:  org.LabelPolicyLogoRemovedEventType,
 					Reduce: s.reduceLogoRemoved,
+				},
+				{
+					Event:  org.LabelPolicyLogoDarkAddedEventType,
+					Reduce: s.reduceLogoDarkAdded,
+				},
+				{
+					Event:  org.LabelPolicyLogoDarkRemovedEventType,
+					Reduce: s.reduceLogoDarkRemoved,
 				},
 				{
 					Event:  org.LabelPolicyIconAddedEventType,
@@ -109,20 +117,12 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Reduce: s.reduceIconRemoved,
 				},
 				{
-					Event:  org.LabelPolicyLogoDarkAddedEventType,
-					Reduce: s.reduceLabelLogoAdded,
-				},
-				{
-					Event:  org.LabelPolicyLogoDarkRemovedEventType,
-					Reduce: s.reduceLogoRemoved,
-				},
-				{
 					Event:  org.LabelPolicyIconDarkAddedEventType,
-					Reduce: s.reduceIconAdded,
+					Reduce: s.reduceIconDarkAdded,
 				},
 				{
 					Event:  org.LabelPolicyIconDarkRemovedEventType,
-					Reduce: s.reduceIconRemoved,
+					Reduce: s.reduceIconDarkRemoved,
 				},
 				{
 					Event:  org.LabelPolicyFontAddedEventType,
@@ -269,11 +269,19 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  instance.LabelPolicyLogoAddedEventType,
-					Reduce: s.reduceLabelLogoAdded,
+					Reduce: s.reduceLogoAdded,
 				},
 				{
 					Event:  instance.LabelPolicyLogoRemovedEventType,
 					Reduce: s.reduceLogoRemoved,
+				},
+				{
+					Event:  instance.LabelPolicyLogoDarkAddedEventType,
+					Reduce: s.reduceLogoDarkAdded,
+				},
+				{
+					Event:  instance.LabelPolicyLogoDarkRemovedEventType,
+					Reduce: s.reduceLogoDarkRemoved,
 				},
 				{
 					Event:  instance.LabelPolicyIconAddedEventType,
@@ -284,20 +292,12 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Reduce: s.reduceIconRemoved,
 				},
 				{
-					Event:  instance.LabelPolicyLogoDarkAddedEventType,
-					Reduce: s.reduceLabelLogoAdded,
-				},
-				{
-					Event:  instance.LabelPolicyLogoDarkRemovedEventType,
-					Reduce: s.reduceLogoRemoved,
-				},
-				{
 					Event:  instance.LabelPolicyIconDarkAddedEventType,
-					Reduce: s.reduceIconAdded,
+					Reduce: s.reduceIconDarkAdded,
 				},
 				{
 					Event:  instance.LabelPolicyIconDarkRemovedEventType,
-					Reduce: s.reduceIconRemoved,
+					Reduce: s.reduceIconDarkRemoved,
 				},
 				{
 					Event:  instance.LabelPolicyFontAddedEventType,
@@ -706,7 +706,6 @@ func (s *settingsRelationalProjection) reduceLabelChanged(event eventstore.Event
 			Settings: domain.Settings{
 				InstanceID:     policyEvent.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				CreatedAt:      policyEvent.Creation,
 				UpdatedAt:      policyEvent.Creation,
 			},
 			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
@@ -784,92 +783,144 @@ func (s *settingsRelationalProjection) reduceLabelActivated(event eventstore.Eve
 	}), nil
 }
 
-func (p *settingsRelationalProjection) reduceLabelLogoAdded(event eventstore.Event) (*handler.Statement, error) {
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+func (p *settingsRelationalProjection) reduceLogoAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
+	var policyEvent policy.LabelPolicyLogoAddedEvent
+	switch e := event.(type) {
+	case *org.LabelPolicyLogoAddedEvent:
+		orgId = &e.Aggregate().ResourceOwner
+		policyEvent = e.LabelPolicyLogoAddedEvent
+	case *instance.LabelPolicyLogoAddedEvent:
+		policyEvent = e.LabelPolicyLogoAddedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-kg8H4", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyLogoAddedEventType, instance.LabelPolicyLogoAddedEventType})
+	}
+	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.BrandingSettingsRepository()
+		url, err := url.Parse(policyEvent.StoreKey)
+		if err != nil {
+			return err
+		}
 
-		updatedAt := event.CreatedAt()
+		settingsRepo := repository.BrandingSettingsRepository()
 		settings := domain.BrandingSettings{
 			Settings: domain.Settings{
-				InstanceID: event.Aggregate().InstanceID,
-				Type:       domain.SettingTypeBranding,
-				UpdatedAt:  updatedAt,
+				InstanceID:     event.Aggregate().InstanceID,
+				OrganizationID: orgId,
+				UpdatedAt:      policyEvent.Creation,
 			},
-			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{},
+			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+				LogoURLLight: url,
+			},
+		}
+		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
+	}), nil
+}
+
+func (p *settingsRelationalProjection) reduceLogoDarkAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
+	var policyEvent policy.LabelPolicyLogoDarkAddedEvent
+	switch e := event.(type) {
+	case *org.LabelPolicyLogoDarkAddedEvent:
+		orgId = &e.Aggregate().ResourceOwner
+		policyEvent = e.LabelPolicyLogoDarkAddedEvent
+	case *instance.LabelPolicyLogoDarkAddedEvent:
+		policyEvent = e.LabelPolicyLogoDarkAddedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-kg8H4", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyLogoDarkAddedEventType, instance.LabelPolicyLogoDarkAddedEventType})
+	}
+
+	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
 
-		switch e := event.(type) {
-		case *org.LabelPolicyLogoAddedEvent:
-			settings.OrganizationID = &e.Aggregate().ResourceOwner
-			url, err := url.Parse(e.StoreKey)
-			if err != nil {
-				return err
-			}
-			settings.LogoURLLight = url
-		case *instance.LabelPolicyLogoAddedEvent:
-			url, err := url.Parse(e.StoreKey)
-			if err != nil {
-				return err
-			}
-			settings.LogoURLLight = url
-		case *org.LabelPolicyLogoDarkAddedEvent:
-			settings.OrganizationID = &e.Aggregate().ResourceOwner
-			url, err := url.Parse(e.StoreKey)
-			if err != nil {
-				return err
-			}
-			settings.LogoURLDark = url
-		case *instance.LabelPolicyLogoDarkAddedEvent:
-			url, err := url.Parse(e.StoreKey)
-			if err != nil {
-				return err
-			}
-			settings.LogoURLDark = url
+		url, err := url.Parse(policyEvent.StoreKey)
+		if err != nil {
+			return err
 		}
 
+		settingsRepo := repository.BrandingSettingsRepository()
+		settings := domain.BrandingSettings{
+			Settings: domain.Settings{
+				InstanceID:     event.Aggregate().InstanceID,
+				OrganizationID: orgId,
+				UpdatedAt:      policyEvent.Creation,
+			},
+			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+				LogoURLDark: url,
+			},
+		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
 	}), nil
 }
 
 func (p *settingsRelationalProjection) reduceLogoRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
-	var logoLight, logoDark *url.URL
-	switch event.(type) {
+	var policyEvent policy.LabelPolicyLogoRemovedEvent
+	switch e := event.(type) {
 	case *org.LabelPolicyLogoRemovedEvent:
 		orgId = &event.Aggregate().ID
-		logoLight = &url.URL{}
+		policyEvent = e.LabelPolicyLogoRemovedEvent
 	case *instance.LabelPolicyLogoRemovedEvent:
-		logoLight = &url.URL{}
-	case *org.LabelPolicyLogoDarkRemovedEvent:
-		orgId = &event.Aggregate().ID
-		logoDark = &url.URL{}
-	case *instance.LabelPolicyLogoDarkRemovedEvent:
-		logoDark = &url.URL{}
+		policyEvent = e.LabelPolicyLogoRemovedEvent
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-kg8H4", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyLogoRemovedEventType, instance.LabelPolicyLogoRemovedEventType, org.LabelPolicyLogoDarkRemovedEventType, instance.LabelPolicyLogoDarkRemovedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-kg8H4", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyLogoRemovedEventType, instance.LabelPolicyLogoRemovedEventType})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
+		}
+
+		settingsRepo := repository.BrandingSettingsRepository()
+		settings := domain.BrandingSettings{
+			Settings: domain.Settings{
+				InstanceID:     event.Aggregate().InstanceID,
+				OrganizationID: orgId,
+				UpdatedAt:      policyEvent.Creation,
+			},
+			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+				LogoURLLight: &url.URL{},
+			},
+		}
+		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
+	}), nil
+}
+
+func (p *settingsRelationalProjection) reduceLogoDarkRemoved(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
+	var policyEvent policy.LabelPolicyLogoDarkRemovedEvent
+	switch e := event.(type) {
+	case *org.LabelPolicyLogoDarkRemovedEvent:
+		orgId = &event.Aggregate().ID
+		policyEvent = e.LabelPolicyLogoDarkRemovedEvent
+	case *instance.LabelPolicyLogoDarkRemovedEvent:
+		policyEvent = e.LabelPolicyLogoDarkRemovedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-kg8H4", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyLogoDarkRemovedEventType, instance.LabelPolicyLogoDarkRemovedEventType})
+	}
+
+	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
 		settingsRepo := repository.BrandingSettingsRepository()
-		updatedAt := event.CreatedAt()
 		settings := domain.BrandingSettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      updatedAt,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-				LogoURLLight: logoLight,
-				LogoURLDark:  logoDark,
+				LogoURLDark: &url.URL{},
 			},
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
@@ -878,54 +929,76 @@ func (p *settingsRelationalProjection) reduceLogoRemoved(event eventstore.Event)
 
 func (p *settingsRelationalProjection) reduceIconAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
-	var iconLight, iconDark *url.URL
+	var policyEvent policy.LabelPolicyIconAddedEvent
 	switch e := event.(type) {
 	case *org.LabelPolicyIconAddedEvent:
 		orgId = &event.Aggregate().ID
-		url, err := url.Parse(e.StoreKey)
-		if err != nil {
-			return nil, err
-		}
-		iconLight = url
+		policyEvent = e.LabelPolicyIconAddedEvent
 	case *instance.LabelPolicyIconAddedEvent:
-		url, err := url.Parse(e.StoreKey)
-		if err != nil {
-			return nil, err
-		}
-		iconLight = url
-	case *org.LabelPolicyIconDarkAddedEvent:
-		orgId = &event.Aggregate().ID
-		url, err := url.Parse(e.StoreKey)
-		if err != nil {
-			return nil, err
-		}
-		iconDark = url
-	case *instance.LabelPolicyIconDarkAddedEvent:
-		url, err := url.Parse(e.StoreKey)
-		if err != nil {
-			return nil, err
-		}
-		iconDark = url
+		policyEvent = e.LabelPolicyIconAddedEvent
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-e2JFz", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyIconAddedEventType, instance.LabelPolicyIconAddedEventType, org.LabelPolicyIconDarkAddedEventType, instance.LabelPolicyIconDarkAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-e2JFz", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyIconDarkAddedEventType, instance.LabelPolicyIconDarkAddedEventType})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
+
+		url, err := url.Parse(policyEvent.StoreKey)
+		if err != nil {
+			return err
+		}
+
 		settingsRepo := repository.BrandingSettingsRepository()
-		updatedAt := event.CreatedAt()
 		settings := domain.BrandingSettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      updatedAt,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-				IconURLLight: iconLight,
-				IconURLDark:  iconDark,
+				IconURLLight: url,
+			},
+		}
+		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
+	}), nil
+}
+
+func (p *settingsRelationalProjection) reduceIconDarkAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
+	var policyEvent policy.LabelPolicyIconDarkAddedEvent
+	switch e := event.(type) {
+	case *org.LabelPolicyIconDarkAddedEvent:
+		orgId = &event.Aggregate().ID
+		policyEvent = e.LabelPolicyIconDarkAddedEvent
+	case *instance.LabelPolicyIconDarkAddedEvent:
+		policyEvent = e.LabelPolicyIconDarkAddedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-e2JFz", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyIconDarkAddedEventType, instance.LabelPolicyIconDarkAddedEventType})
+	}
+
+	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
+		}
+
+		url, err := url.Parse(policyEvent.StoreKey)
+		if err != nil {
+			return err
+		}
+
+		settingsRepo := repository.BrandingSettingsRepository()
+		settings := domain.BrandingSettings{
+			Settings: domain.Settings{
+				InstanceID:     event.Aggregate().InstanceID,
+				OrganizationID: orgId,
+				UpdatedAt:      policyEvent.Creation,
+			},
+			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+				IconURLDark: url,
 			},
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
@@ -934,39 +1007,66 @@ func (p *settingsRelationalProjection) reduceIconAdded(event eventstore.Event) (
 
 func (p *settingsRelationalProjection) reduceIconRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
-	var iconLight, iconDark *url.URL
-	switch event.(type) {
+	var policyEvent policy.LabelPolicyIconRemovedEvent
+	switch e := event.(type) {
 	case *org.LabelPolicyIconRemovedEvent:
 		orgId = &event.Aggregate().ID
-		iconLight = &url.URL{}
+		policyEvent = e.LabelPolicyIconRemovedEvent
 	case *instance.LabelPolicyIconRemovedEvent:
-		iconLight = &url.URL{}
-	case *org.LabelPolicyIconDarkRemovedEvent:
-		orgId = &event.Aggregate().ID
-		iconDark = &url.URL{}
-	case *instance.LabelPolicyIconDarkRemovedEvent:
-		iconDark = &url.URL{}
+		policyEvent = e.LabelPolicyIconRemovedEvent
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-gfgbY", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyIconRemovedEventType, instance.LabelPolicyIconRemovedEventType, org.LabelPolicyIconDarkRemovedEventType, instance.LabelPolicyIconDarkRemovedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-gfgbY", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyIconRemovedEventType, instance.LabelPolicyIconRemovedEventType})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
 
 		settingsRepo := repository.BrandingSettingsRepository()
-		updatedAt := event.CreatedAt()
 		settings := domain.BrandingSettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      updatedAt,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-				IconURLLight: iconLight,
-				IconURLDark:  iconDark,
+				IconURLLight: &url.URL{},
+			},
+		}
+		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
+	}), nil
+}
+
+func (p *settingsRelationalProjection) reduceIconDarkRemoved(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
+	var policyEvent policy.LabelPolicyIconDarkRemovedEvent
+	switch e := event.(type) {
+	case *org.LabelPolicyIconDarkRemovedEvent:
+		orgId = &event.Aggregate().ID
+		policyEvent = e.LabelPolicyIconDarkRemovedEvent
+	case *instance.LabelPolicyIconDarkRemovedEvent:
+		policyEvent = e.LabelPolicyIconDarkRemovedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-gfgbY", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyIconDarkRemovedEventType, instance.LabelPolicyIconDarkRemovedEventType})
+	}
+
+	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
+		}
+
+		settingsRepo := repository.BrandingSettingsRepository()
+		settings := domain.BrandingSettings{
+			Settings: domain.Settings{
+				InstanceID:     event.Aggregate().InstanceID,
+				OrganizationID: orgId,
+				UpdatedAt:      policyEvent.Creation,
+			},
+			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+				IconURLDark: &url.URL{},
 			},
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
@@ -975,41 +1075,37 @@ func (p *settingsRelationalProjection) reduceIconRemoved(event eventstore.Event)
 
 func (p *settingsRelationalProjection) reduceFontAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
-	var font *url.URL
+	var policyEvent policy.LabelPolicyFontAddedEvent
 	switch e := event.(type) {
 	case *org.LabelPolicyFontAddedEvent:
 		orgId = &event.Aggregate().ID
-		url, err := url.Parse(e.StoreKey)
-		if err != nil {
-			return nil, err
-		}
-		font = url
+		policyEvent = e.LabelPolicyFontAddedEvent
 	case *instance.LabelPolicyFontAddedEvent:
-		url, err := url.Parse(e.StoreKey)
-		if err != nil {
-			return nil, err
-		}
-		font = url
+		policyEvent = e.LabelPolicyFontAddedEvent
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-65i9W", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyFontAddedEventType, instance.LabelPolicyFontAddedEventType})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
 
+		url, err := url.Parse(policyEvent.StoreKey)
+		if err != nil {
+			return err
+		}
+
 		settingsRepo := repository.BrandingSettingsRepository()
-		updatedAt := event.CreatedAt()
 		settings := domain.BrandingSettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      updatedAt,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-				FontURL: font,
+				FontURL: url,
 			},
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
@@ -1018,27 +1114,29 @@ func (p *settingsRelationalProjection) reduceFontAdded(event eventstore.Event) (
 
 func (p *settingsRelationalProjection) reduceFontRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
-	switch event.(type) {
+	var policyEvent policy.LabelPolicyFontRemovedEvent
+	switch e := event.(type) {
 	case *org.LabelPolicyFontRemovedEvent:
 		orgId = &event.Aggregate().ID
+		policyEvent = e.LabelPolicyFontRemovedEvent
 	case *instance.LabelPolicyFontRemovedEvent:
+		policyEvent = e.LabelPolicyFontRemovedEvent
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-xf32J", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyFontRemovedEventType, instance.LabelPolicyFontRemovedEventType})
 	}
 
-	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
 
 		settingsRepo := repository.BrandingSettingsRepository()
-		updatedAt := event.CreatedAt()
 		settings := domain.BrandingSettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      updatedAt,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
 				FontURL: &url.URL{},
@@ -1068,12 +1166,12 @@ func (p *settingsRelationalProjection) reducePasswordComplexityAdded(event event
 		}
 
 		settingsRepo := repository.PasswordComplexitySettingsRepository()
-		updatedAt := event.CreatedAt()
 		settings := domain.PasswordComplexitySettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      updatedAt,
+				CreatedAt:      policyEvent.Creation,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
 				MinLength:    &policyEvent.MinLength,
@@ -1107,12 +1205,11 @@ func (s *settingsRelationalProjection) reducePasswordComplexityChanged(event eve
 		}
 
 		settingsRepo := repository.PasswordComplexitySettingsRepository()
-		updatedAt := event.CreatedAt()
 		settings := domain.PasswordComplexitySettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      updatedAt,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
 				MinLength:    policyEvent.MinLength,
@@ -1166,12 +1263,12 @@ func (p *settingsRelationalProjection) reducePasswordPolicyAdded(event eventstor
 		}
 
 		settingsRepo := repository.PasswordExpirySettingsRepository()
-		updatedAt := event.CreatedAt()
 		settings := domain.PasswordExpirySettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      updatedAt,
+				CreatedAt:      policyEvent.Creation,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
 				ExpireWarnDays: &policyEvent.ExpireWarnDays,
@@ -1201,12 +1298,11 @@ func (p *settingsRelationalProjection) reducePasswordPolicyChanged(event eventst
 		}
 
 		settingsRepo := repository.PasswordExpirySettingsRepository()
-		updatedAt := event.CreatedAt()
 		settings := domain.PasswordExpirySettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      updatedAt,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
 				ExpireWarnDays: policyEvent.ExpireWarnDays,
@@ -1274,12 +1370,12 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyAdded(event eventstore
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hnNE", "reduce.wrong.db.pool %T", ex)
 		}
 		settingsRepo := repository.LockoutSettingsRepository()
-		updatedAt := event.CreatedAt()
 		settings := domain.LockoutSettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      updatedAt,
+				CreatedAt:      policyEvent.Creation,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
 				MaxPasswordAttempts: &policyEvent.MaxPasswordAttempts,
@@ -1311,12 +1407,12 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyChanged(event eventsto
 		}
 
 		settingsRepo := repository.LockoutSettingsRepository()
-		updatedAt := event.CreatedAt()
 		settings := domain.LockoutSettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      updatedAt,
+				CreatedAt:      policyEvent.Creation,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
 				MaxPasswordAttempts: policyEvent.MaxPasswordAttempts,
@@ -1348,12 +1444,12 @@ func (p *settingsRelationalProjection) reduceDomainPolicyAdded(event eventstore.
 		}
 
 		settingsRepo := repository.DomainSettingsRepository()
-		updatedAt := event.CreatedAt()
 		settings := domain.DomainSettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      updatedAt,
+				CreatedAt:      policyEvent.Creation,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			DomainSettingsAttributes: domain.DomainSettingsAttributes{
 				LoginNameIncludesDomain:                &policyEvent.UserLoginMustBeDomain,
@@ -1385,12 +1481,11 @@ func (s *settingsRelationalProjection) reduceDomainPolicyChanged(event eventstor
 		}
 
 		settingsRepo := repository.DomainSettingsRepository()
-		updatedAt := event.CreatedAt()
 		settings := domain.DomainSettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      updatedAt,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			DomainSettingsAttributes: domain.DomainSettingsAttributes{
 				LoginNameIncludesDomain:                policyEvent.UserLoginMustBeDomain,
@@ -1441,12 +1536,12 @@ func (p *settingsRelationalProjection) reduceNotificationPolicyAdded(event event
 		}
 
 		settingsRepo := repository.NotificationSettingsRepository()
-		updatedAt := event.CreatedAt()
 		settings := domain.NotificationSettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      updatedAt,
+				CreatedAt:      policyEvent.Creation,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
 				PasswordChange: &policyEvent.PasswordChange,
@@ -1476,12 +1571,12 @@ func (s *settingsRelationalProjection) reduceNotificationPolicyChanged(event eve
 		}
 
 		settingsRepo := repository.NotificationSettingsRepository()
-		updatedAt := event.CreatedAt()
 		settings := domain.NotificationSettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      updatedAt,
+				CreatedAt:      policyEvent.Creation,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
 				PasswordChange: policyEvent.PasswordChange,
@@ -1530,13 +1625,13 @@ func (p *settingsRelationalProjection) reducePrivacyPolicyAdded(event eventstore
 		}
 
 		settingsRepo := repository.LegalAndSupportSettingsRepository()
-		updatedAt := event.CreatedAt()
 		email := string(policyEvent.SupportEmail)
 		settings := domain.LegalAndSupportSettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      updatedAt,
+				CreatedAt:      policyEvent.Creation,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
 				TOSLink:           &policyEvent.TOSLink,
@@ -1572,13 +1667,12 @@ func (s *settingsRelationalProjection) reducePrivacyPolicyChanged(event eventsto
 		}
 
 		settingsRepo := repository.LegalAndSupportSettingsRepository()
-		updatedAt := event.CreatedAt()
 		email := string(policyEvent.SupportEmail)
 		settings := domain.LegalAndSupportSettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
-				UpdatedAt:      updatedAt,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
 				TOSLink:           &policyEvent.TOSLink,
@@ -1631,12 +1725,12 @@ func (s *settingsRelationalProjection) reduceSecurityPolicySet(event eventstore.
 		}
 
 		settingsRepo := repository.SecuritySettingsRepository()
-		updatedAt := event.CreatedAt()
 		settings := domain.SecuritySettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: nil,
-				UpdatedAt:      updatedAt,
+				CreatedAt:      policyEvent.Creation,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
 				EnableIframeEmbedding: policyEvent.EnableIframeEmbedding,
@@ -1661,12 +1755,12 @@ func (s *settingsRelationalProjection) reduceOrganizationSettingsSet(event event
 		}
 
 		settingsRepo := repository.OrganizationSettingsRepository()
-		updatedAt := event.CreatedAt()
 		settings := domain.OrganizationSettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: &event.Aggregate().ID,
-				UpdatedAt:      updatedAt,
+				CreatedAt:      policyEvent.Creation,
+				UpdatedAt:      policyEvent.Creation,
 			},
 			OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
 				OrganizationScopedUsernames: &policyEvent.OrganizationScopedUsernames,

@@ -79,7 +79,6 @@ type settingsRepository[T any] interface {
 	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*T, error)
 
 	Set(ctx context.Context, client database.QueryExecutor, settings *T) error
-	SetColumns(ctx context.Context, client database.QueryExecutor, settings *Settings, changes ...database.Change) error
 	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }
 
@@ -165,6 +164,8 @@ type LoginSettingsAttributes struct {
 type LoginSettingsRepository interface {
 	settingsRepository[LoginSettings]
 	loginSettingsJSONChanges
+
+	SetColumns(ctx context.Context, client database.QueryExecutor, settings *Settings, changes ...database.Change) error
 }
 
 type BrandingPolicyThemeMode int32
@@ -232,6 +233,7 @@ type BrandingSettingsRepository interface {
 
 	StateCondition(typ SettingState) database.Condition
 	Activate(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
+	SetColumns(ctx context.Context, client database.QueryExecutor, settings *Settings, changes ...database.Change) error
 }
 
 type passwordComplexitySettingsJSONChanges interface {
@@ -322,7 +324,7 @@ type SecuritySettings struct {
 }
 
 type SecuritySettingsAttributes struct {
-	EnableIframeEmbedding *bool    `json:"enableIframe_embedding,omitempty"`
+	EnableIframeEmbedding *bool    `json:"enableIframeEmbedding,omitempty"`
 	AllowedOrigins        []string `json:"allowedOrigins,omitempty"`
 	EnableImpersonation   *bool    `json:"enableImpersonation,omitempty"`
 }
